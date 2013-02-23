@@ -1,7 +1,8 @@
 #include "MeCtBodyReachState.h"
 #include <sb/SBEvent.h>
 #include <sb/SBScene.h>
-#include "sbm/mcontrol_util.h"
+#include <sb/SBPawn.h>
+
 #include <boost/lexical_cast.hpp>
 
 /************************************************************************/
@@ -13,10 +14,10 @@ EffectorState::EffectorState()
 	attachedPawnName = "";
 }
 
-SbmPawn* EffectorState::getAttachedPawn()
+SmartBody::SBPawn* EffectorState::getAttachedPawn()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	SbmPawn* attachedPawn =  SmartBody::SBScene::getScene()->getPawn(attachedPawnName);
+	
+	SmartBody::SBPawn* attachedPawn =  SmartBody::SBScene::getScene()->getPawn(attachedPawnName);
 	if (attachedPawnName != "" && !attachedPawn) // the pawn is no longer exist...
 	{
 		attachedPawnName = "";
@@ -29,7 +30,7 @@ void EffectorState::setAttachedPawn( ReachStateData* rd )
 	ReachTarget& target = rd->reachTarget;
 	if (target.targetHasGeometry())
 	{
-		SbmPawn* attachedPawn = target.getTargetPawn();
+		SmartBody::SBPawn* attachedPawn = target.getTargetPawn();
 		attachedPawnName = target.getTargetPawnName();
 		//attachMat = attachedPawn->get_world_offset_joint()->gmat()*curState.gmat().inverse();	
 		attachMat = attachedPawn->get_world_offset()*curState.gmat().inverse();
@@ -93,7 +94,7 @@ bool ReachTarget::targetIsJoint()
 	return (useTargetJoint && targetJoint);
 }
 
-SbmPawn* ReachTarget::getTargetPawn()
+SmartBody::SBPawn* ReachTarget::getTargetPawn()
 {
 	SmartBody::SBPawn* targetPawn = SmartBody::SBScene::getScene()->getPawn(targetPawnName);
 	if (targetPawnName != "" && !targetPawn) // the pawn is no longer exist...
@@ -113,7 +114,7 @@ SRT ReachTarget::getGrabTargetState( SRT& naturalState, float offset )
 	SRT st = naturalState;
 	//st.tran = getTargetState().tran;
 	// if there is a collider object, estimate the correct hand position & orientation
-	SbmPawn* targetPawn = getTargetPawn();
+	SmartBody::SBPawn* targetPawn = getTargetPawn();
 	if (useTargetPawn && targetPawn && targetPawn->getGeomObject())
 	{
 		targetPawn->getGeomObject()->estimateHandPosture(naturalState.rot,st.tran,st.rot, offset);				
@@ -141,7 +142,7 @@ void ReachTarget::setTargetState( SRT& ts )
 void ReachTarget::setTargetPawnName( std::string pawnName )
 {
 	targetPawnName = pawnName;
-	SbmPawn* tpawn = getTargetPawn();
+	SmartBody::SBPawn* tpawn = getTargetPawn();
 	useTargetPawn = true;	
 	useTargetJoint = false;
 	targetJoint = NULL;
@@ -196,7 +197,7 @@ void ReachHandAction::reachPreCompleteAction( ReachStateData* rd )
 {
 	ReachTarget& rtarget = rd->reachTarget;
 	EffectorState& estate = rd->effectorState;	
-	SbmPawn* targetPawn = rtarget.getTargetPawn();
+	SmartBody::SBPawn* targetPawn = rtarget.getTargetPawn();
 	if (!targetPawn || !targetPawn->getGeomObject())
 		return;
 	std::string cmd;
@@ -222,7 +223,7 @@ void ReachHandAction::reachPreCompleteAction( ReachStateData* rd )
 void ReachHandAction::reachCompleteAction( ReachStateData* rd )
 {
 	ReachTarget& rtarget = rd->reachTarget;
-	SbmPawn* targetPawn = rtarget.getTargetPawn();
+	SmartBody::SBPawn* targetPawn = rtarget.getTargetPawn();
 	if (!targetPawn || !targetPawn->getGeomObject())
 		return;
 

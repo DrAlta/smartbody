@@ -1,5 +1,5 @@
 #include "SBSimulationManager.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBScene.h>
 #include <sb/SBScript.h>
 #include <sbm/time_regulator.h>

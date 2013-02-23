@@ -2,7 +2,7 @@
 #include "ParameterGroup.h"
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
-#include <sbm/mcontrol_util.h>
+
 #include <controllers/me_ct_param_animation.h>
 #include "ParameterVisualization.h"
 #include "Parameter3DVisualization.h"

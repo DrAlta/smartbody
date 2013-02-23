@@ -153,12 +153,6 @@ namespace BML {
 		 */
 		void speechReply( SbmCharacter* character, SmartBody::RequestId requestId, srArgBuffer& response_args, SmartBody::SBScene* scene );
 
-//// Moved to BmlRequest::realize( Processor*, mcuCBHandle* )
-//		/**
-//		 *  Completes final timing calculations and triggers schedule
-//		 */
-//		void realizeRequest( BML::BmlRequestPtr request, BMLProcessorMsg& bpMsg, mcuCBHandle *mcu );
-
 		/**
 		 *  Begins interrupting a BML performance.
 		 */

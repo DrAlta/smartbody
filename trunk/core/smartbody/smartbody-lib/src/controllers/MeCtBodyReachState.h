@@ -1,6 +1,10 @@
 #pragma once
 #include "controllers/me_ct_example_body_reach.hpp"
 
+namespace SmartBody {
+	class SBPawn;
+}
+
 class ReachTarget
 {
 public:
@@ -21,7 +25,7 @@ public:
 	void setTargetJoint(SkJoint* tjoint);
 	SRT getTargetState(); // the return state is based on target's state
 	SRT getGrabTargetState(SRT& naturalState, float offset = 0.f); 
-	SbmPawn* getTargetPawn();
+	SmartBody::SBPawn* getTargetPawn();
 	std::string getTargetPawnName() { return targetPawnName; }
 };
 
@@ -42,7 +46,7 @@ public:
 public:
 	EffectorState();
 	~EffectorState() {}
-	SbmPawn* getAttachedPawn();
+	SmartBody::SBPawn* getAttachedPawn();
 	void setAttachedPawn(ReachStateData* rd);
 	void removeAttachedPawn(ReachStateData* rd);	
 };

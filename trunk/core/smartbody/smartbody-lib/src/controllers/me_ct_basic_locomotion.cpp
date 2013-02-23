@@ -21,7 +21,7 @@
  */
 
 #include "controllers/me_ct_basic_locomotion.h"
-#include "sbm/mcontrol_util.h"
+
 
 std::string MeCtBasicLocomotion::_type_name = "BasicLocomotion";
 

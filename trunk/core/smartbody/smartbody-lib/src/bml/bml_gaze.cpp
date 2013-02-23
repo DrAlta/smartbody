@@ -31,7 +31,7 @@
 #include "bml_gaze.hpp"
 #include "bml_event.hpp"
 
-#include "sbm/mcontrol_util.h"
+
 #include "controllers/me_ct_gaze.h"
 
 #include "bml_target.hpp"
@@ -323,7 +323,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
 		handle = asciiString(attrHandle);
 		// look for a gaze controller with that handle
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		const SbmCharacter* character = request->actor;
 		if (character)
 		{

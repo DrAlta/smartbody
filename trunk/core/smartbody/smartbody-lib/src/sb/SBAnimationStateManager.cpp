@@ -1,5 +1,5 @@
 #include "SBAnimationStateManager.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBAnimationState.h>
 #include <sb/SBMotionBlendBase.h>
 #include <sb/SBAnimationTransition.h>
@@ -54,7 +54,7 @@ bool SBAnimationBlendManager::addTransitionEdgeToGraph( const std::string& sourc
 SBAnimationBlend0D* SBAnimationBlendManager::createBlend0D(const std::string& name)
 {
 	SBAnimationBlend0D* blend = new SBAnimationBlend0D(name);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	addBlendToGraph(name);
 	_blends.push_back(blend);
 	return blend;
@@ -63,7 +63,7 @@ SBAnimationBlend0D* SBAnimationBlendManager::createBlend0D(const std::string& na
 SBAnimationBlend1D* SBAnimationBlendManager::createBlend1D(const std::string& name)
 {
 	SBAnimationBlend1D* blend = new SBAnimationBlend1D(name);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	addBlendToGraph(name);
 	_blends.push_back(blend);
 	return blend;
@@ -72,7 +72,7 @@ SBAnimationBlend1D* SBAnimationBlendManager::createBlend1D(const std::string& na
 SBAnimationBlend2D* SBAnimationBlendManager::createBlend2D(const std::string& name)
 {
 	SBAnimationBlend2D* blend = new SBAnimationBlend2D(name);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	addBlendToGraph(name);
 	_blends.push_back(blend);
 	return blend;
@@ -81,7 +81,7 @@ SBAnimationBlend2D* SBAnimationBlendManager::createBlend2D(const std::string& na
 SBAnimationBlend3D* SBAnimationBlendManager::createBlend3D(const std::string& name)
 {
 	SBAnimationBlend3D* blend = new SBAnimationBlend3D(name);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	addBlendToGraph(name);
 	_blends.push_back(blend);
 	return blend;
@@ -90,7 +90,7 @@ SBAnimationBlend3D* SBAnimationBlendManager::createBlend3D(const std::string& na
 SBMotionBlendBase* SBAnimationBlendManager::createMotionBlendBase( const std::string& name, const std::string& skelName, int dimension )
 {
 	SBMotionBlendBase* blend = new SBMotionBlendBase(name,skelName, dimension);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	//	addBlendToGraph(name);
 	_blends.push_back(blend);
 	return blend;
@@ -99,7 +99,7 @@ SBMotionBlendBase* SBAnimationBlendManager::createMotionBlendBase( const std::st
 SBAnimationTransition* SBAnimationBlendManager::createTransition(const std::string& source, const std::string& dest)
 {	
 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SBAnimationBlend* sourceBlend = getBlend(source);
 	if (!sourceBlend)
 	{

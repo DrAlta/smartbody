@@ -8,7 +8,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
 #include <sb/SBEvent.h>
-#include "sbm/mcontrol_util.h"
+
 #include "ResourceWindow.h"
 #include "channelbufferviewer/GlChartViewArchive.hpp"
 
@@ -376,7 +376,7 @@ void SeqItemInfoWidget::updateWidget()
 	// clean up text buffer
 	textBuffer->select(0, textBuffer->length());
 	textBuffer->remove_selection();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::string fullSeqPath;
 	/* 
 	FILE* fp = mcu.open_sequence_file(seqFilename.c_str(),fullSeqPath);

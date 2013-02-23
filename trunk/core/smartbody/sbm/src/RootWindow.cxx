@@ -439,6 +439,8 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 
 	SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
 	SmartBody::SBScene::destroyScene();
+
+	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->setCharacterListener(listener);
 
@@ -451,8 +453,10 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	SrCamera* camera = SmartBody::SBScene::getScene()->createCamera("cameraDefault");
 	camera->reset();
 
+	std::string pythonLibPath = SmartBody::SBScene::getSystemParameter("pythonlibpath");
 	setupPython();
-	
+
+
 	if (mediaPath != "")
 		SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
 	std::string filebasename = boost::filesystem::basename(seqFile);
@@ -644,6 +648,7 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 
 		std::string pythonLibPath = SmartBody::SBScene::getSystemParameter("pythonlibpath");
 		setupPython();
+		
 
 		scene->getVHMsgManager()->setEnable(true);
 
@@ -1421,7 +1426,7 @@ void BaseWindow::CreateTerrainCB(Fl_Widget* w, void* data)
 	const char* terrainFile = fl_file_chooser("Load terrain:", "*.ppm", NULL);
 	if (terrainFile)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		std::string terrainCommand = "terrain load ";
 		terrainCommand.append(terrainFile);
 		SmartBody::SBScene::getScene()->command((char*)terrainCommand.c_str());

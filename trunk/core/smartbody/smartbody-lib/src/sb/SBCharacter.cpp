@@ -1,6 +1,6 @@
 #include "SBCharacter.h"
 #include <sb/SBSkeleton.h>
-#include <sbm/mcontrol_util.h>
+
 #include <sbm/mcontrol_callbacks.h>
 #include "sb/SBController.h"
 #include "bml/bml_types.hpp"
@@ -15,6 +15,7 @@
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBSpeechManager.h>
+#include <sb/SBBmlProcessor.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_gaze.h>
@@ -23,17 +24,18 @@
 #include <sbm/local_speech.h>
 #include <sbm/text_speech.h>
 #include <sbm/sbm_speech_audiofile.hpp>
+#include <bml/bml_processor.hpp>
 
 namespace SmartBody {
 
 SBCharacter::SBCharacter() : SbmCharacter()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 }
 
 SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name.c_str(), type)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	
 	createBoolAttribute("gestureRequest.autoGestureTransition", true, true, "Basic", 89, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
 	createBoolAttribute("gestureRequest.matchingHandness", true, true, "Basic", 90, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
@@ -276,7 +278,7 @@ void SBCharacter::setVoice(std::string type)
 const std::string SBCharacter::getVoice()
 {
 	/*
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::string type = "";
 	if (mcu.speech_rvoice())
 		type = "remote";
@@ -310,7 +312,7 @@ const std::string& SBCharacter::getVoiceCode()
 
 void SBCharacter::setVoiceBackup(std::string type)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	if (type == "")
 	{
@@ -378,9 +380,7 @@ double SBCharacter::getLastScheduledSpeechBehavior()
 {
 	double lastTime =-1.0;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	BML::MapOfBmlRequest bmlRequestMap = mcu.bml_processor.getBMLRequestMap();
+	BML::MapOfBmlRequest bmlRequestMap = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor()->getBMLRequestMap();
 	for (BML::MapOfBmlRequest::iterator iter = bmlRequestMap.begin(); 
 		 iter != bmlRequestMap.end();
 		 iter ++
@@ -403,9 +403,7 @@ double SBCharacter::getLastScheduledSpeechBehavior()
 
 std::string SBCharacter::hasSpeechBehavior()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	BML::MapOfBmlRequest bmlRequestMap = mcu.bml_processor.getBMLRequestMap();
+	BML::MapOfBmlRequest bmlRequestMap = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor()->getBMLRequestMap();
 	for (BML::MapOfBmlRequest::iterator iter = bmlRequestMap.begin(); 
 		 iter != bmlRequestMap.end();
 		 iter ++
@@ -433,10 +431,8 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 	}
 	_curBehaviors.clear();
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
 	// speech
-	BML::MapOfBmlRequest bmlRequestMap = mcu.bml_processor.getBMLRequestMap();
+	BML::MapOfBmlRequest bmlRequestMap = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor()->getBMLRequestMap();
 	for (BML::MapOfBmlRequest::iterator iter = bmlRequestMap.begin(); 
 		 iter != bmlRequestMap.end();
 		 iter ++

@@ -36,10 +36,10 @@ class remote_speech;
 #include "sr_arg_buff.h"
 #include "sb/sbm_character.hpp"
 // Predeclare class
-class mcuCBHandle;
+
 
 int remoteSpeechResult_func( srArgBuffer& args, SmartBody::SBCommandManager* manager);
-int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p);
+int set_char_voice(char* char_name, char* voiceCode);
 int remoteSpeechTimeOut_func(srArgBuffer& args, SmartBody::SBCommandManager* manager);
 
 // Test functions
@@ -96,7 +96,7 @@ class remote_speech: public SmartBody::SpeechInterface {
 
 
 // included after class definition b/c dependency
-//#include "sbm/mcontrol_util.h"
+//
 
 
 

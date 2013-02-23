@@ -1,8 +1,9 @@
 #include "SBSteerManager.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
+#include <sb/SBAttribute.h>
 #include <PPRAgent.h>
 #include <sb/SBSteerAgent.h>
 #include <sbm/PPRAISteeringAgent.h>
@@ -79,7 +80,7 @@ void SBSteerManager::beforeUpdate(double time)
 
 void SBSteerManager::update(double time)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	SBScene* scene = SmartBody::SBScene::getScene();
 	if (getEngineDriver()->isInitialized())
@@ -127,7 +128,7 @@ void SBSteerManager::start()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if (scene->getSteerManager()->getEngineDriver()->isInitialized())
 	{
 		LOG("STEERSIM ALREADY STARTED");
@@ -227,7 +228,7 @@ void SBSteerManager::start()
 		character->get_world_offset(x, y, z, yaw, pitch, roll);
 		SteerLib::AgentInitialConditions initialConditions;
 		initialConditions.position = Util::Point( x * scene->getScale(), 0.0f, z * scene->getScale() );
-		Util::Vector orientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
+		Util::Vector orientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * 3.14159f / 180.0f);
 		initialConditions.direction = orientation;
 		double initialRadius = dynamic_cast<SmartBody::DoubleAttribute*>( SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("initialConditions.radius") )->getValue();
 		if (initialRadius == 0.0)
@@ -292,7 +293,7 @@ void SBSteerManager::start()
 
 void SBSteerManager::stop()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
 	{
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->stopSimulation();

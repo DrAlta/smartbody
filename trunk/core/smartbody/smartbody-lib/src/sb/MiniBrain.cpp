@@ -1,5 +1,5 @@
 #include "MiniBrain.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
@@ -24,7 +24,7 @@ int minibrainCounter = 0;
 
 void MiniBrain::update(SBCharacter* character, double time, double dt)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if (minibrainCounter < 300)
 	{
 		minibrainCounter ++;

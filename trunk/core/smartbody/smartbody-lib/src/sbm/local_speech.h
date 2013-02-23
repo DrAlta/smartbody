@@ -34,7 +34,7 @@
 #include "sr_arg_buff.h"
 #include "sb/sbm_character.hpp"
 // Predeclare class
-class mcuCBHandle;
+
 struct SpeechRequestMessageData;
 
 class SpeechRelayLocal
@@ -132,7 +132,7 @@ class local_speech: public remote_speech {
 
 
 // included after class definition b/c dependency
-//#include "sbm/mcontrol_util.h"
+//
 
 //int localSpeechResult_func( srArgBuffer& args, mcuCBHandle* mcu_p);
 //int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p);

@@ -1,5 +1,5 @@
 #include "PawnPosControl.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/sbm_pawn.hpp>
 #include "vhcl.h"
 #include <FL/gl.h>
@@ -12,6 +12,7 @@
 #include <sr/sr_sa_gl_render.h>
 #include <sr/sr_gl_render_funcs.h>
 #include <sb/SBScene.h>
+#include <sbm/gwiz_math.h>
 
 void PawnControl::init_font()
 {	

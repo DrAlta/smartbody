@@ -27,7 +27,7 @@
 
 
 // Forward Declaration
-class mcuCBHandle;
+
 
 namespace BML {
 	BML::BehaviorRequestPtr parse_bml_quickdraw( DOMElement* elem, std::string& unique_id, BML::BehaviorSyncPoints& behav_syncs, bool required, BML::BmlRequestPtr request, SmartBody::SBScene* scene );

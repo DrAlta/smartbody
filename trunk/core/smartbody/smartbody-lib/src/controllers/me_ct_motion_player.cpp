@@ -61,7 +61,7 @@ void MeCtMotionPlayer::init(SbmPawn* pawn, std::string name, double n)
 		controller->unref();
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(name);
 
 	motionName = name;

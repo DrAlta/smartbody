@@ -634,9 +634,6 @@
     <ClCompile Include="..\src\sbm\mcontrol_callbacks.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbm\mcontrol_util.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbm\ParserASFAMC.cxx">
       <Filter>sbm</Filter>
     </ClCompile>
@@ -1648,9 +1645,6 @@
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\mcontrol_callbacks.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbm\mcontrol_util.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbm\ParserASFAMC.h">

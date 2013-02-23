@@ -9,7 +9,7 @@
 #include <sb/SBAnimationStateManager.h>
 #include <controllers/me_ct_param_animation.h>
 #include "bml_states.hpp"
-#include "sbm/mcontrol_util.h"
+
 #include "bml_xml_consts.hpp"
 #include "bml_event.hpp"
 

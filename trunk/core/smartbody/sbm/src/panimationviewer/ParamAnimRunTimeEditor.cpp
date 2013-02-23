@@ -25,7 +25,7 @@
 #include <FL/gl.h>
 #include <GL/glu.h>
 #include <FL/fl_draw.H>
-#include <sbm/mcontrol_util.h>
+
 #include <controllers/me_ct_param_animation.h>
 #include "ParameterGroup.h"
 #include "ParameterVisualization.h"

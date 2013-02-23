@@ -5,6 +5,10 @@
 #include <string>
 #include <ostream>
 
+namespace BML {
+	class Processor;
+}
+
 namespace SmartBody {
 
 class SBBmlProcessor
@@ -26,10 +30,14 @@ class SBBmlProcessor
 		SBAPI void interruptCharacter(const std::string& character, double seconds);
 		SBAPI void interruptBML(const std::string& character, const std::string& id, double seconds);
 
+		SBAPI BML::Processor* getBMLProcessor();
+
 	protected:
 		std::string build_vrX(std::ostringstream& buffer, const std::string& cmd, const std::string& char_id, const std::string& recip_id, const std::string& content, bool for_seq );
 		std::string send_vrX( const char* cmd, const std::string& char_id, const std::string& recip_id,
 			const std::string& seq_id, bool echo, bool send, const std::string& bml );
+
+		BML::Processor* _bmlProcessor;
 };
 
 }

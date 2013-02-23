@@ -8,6 +8,7 @@
 #include <map>
 #include <sstream>
 #include <sr/sr_viewer.h>
+#include <sbm/general_param_setting.h>
 
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
@@ -24,6 +25,7 @@ class SrSnGroup;
 class SbmPawn;
 class SbmCharacter;
 class Heightfield;
+class KinectProcessor;
 
 namespace SmartBody {
 
@@ -210,6 +212,9 @@ class SBScene : public SBObject
 		SBAPI Heightfield* getHeightfield();
 		SBAPI float queryTerrain( float x, float z, float *normal_p );
 
+		SBAPI KinectProcessor* getKinectProcessor();
+		SBAPI std::map<std::string, GeneralParam*>& getGeneralParameters();
+
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
 		SBAPI void setPythonMainModule(boost::python::object* pyobject);
@@ -289,6 +294,7 @@ class SBScene : public SBObject
 		SBDebuggerUtility*	_debuggerUtility;
 		std::map<std::string, SrCamera*> _cameras;
 		std::string _activeCamera;
+		std::vector<CameraTrack*> _cameraTracking;
 
 		std::map<std::string, SmartBody::SBFaceDefinition*> _faceDefinitions;
 
@@ -310,8 +316,9 @@ class SBScene : public SBObject
 		SrViewerFactory* _viewerFactory;
 		SrViewerFactory* _ogreViewerFactory;
 
+		KinectProcessor* _kinectProcessor;
 		Heightfield* _heightField;
-		std::vector<CameraTrack*>	cameraTracking;
+		std::map<std::string, GeneralParam*> _generalParams;
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
 		boost::python::object* _mainModule;

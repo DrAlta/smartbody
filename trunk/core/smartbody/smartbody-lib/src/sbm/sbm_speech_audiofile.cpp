@@ -24,7 +24,7 @@
 #include "vhcl.h"
 #include "sbm_speech_audiofile.hpp"
 #include "sbm/BMLDefs.h"
-#include "sbm/mcontrol_util.h"
+
 #include "rapidxml_utils.hpp"
 #include <fstream>
 #include <sb/SBScene.h>
@@ -71,7 +71,7 @@ AudioFileSpeech::~AudioFileSpeech()
 
 RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const std::string voiceCode, const DOMNode * node, const char * callbackCmd )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	//mcu.mark("requestSpeechAudio", 0, "begin");
 	string encoding = "";
 	xml_utils::xml_translate( &encoding, node->getOwnerDocument()->getXmlEncoding() );
@@ -101,7 +101,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const std
 RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::string voiceCode, std::string text, const char * callbackCmd )
 {
 	
-    mcuCBHandle& mcu = mcuCBHandle::singleton();
+    
 	rapidxml::xml_document<> doc;
 	//std::vector<char> xml(text.begin(), text.end());
     //xml.push_back('\0');
@@ -190,7 +190,7 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::string voiceCode, std::string text, const char * callbackCmd )
 {
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
    // TODO:  Does return 0 signify error code?
    // TODO:  Handle xerces exceptions?
 
@@ -514,7 +514,7 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 {
    visemeData.clear();
 
-    mcuCBHandle& mcu = mcuCBHandle::singleton();
+    
 
 	DOMDocument* xmlDoc = NULL;
 	if (SmartBody::SBScene::getScene()->getBoolAttribute("useXMLCache"))
@@ -732,7 +732,7 @@ std::map< RequestId, AudioFileSpeech::SpeechRequestInfo >& AudioFileSpeech::getS
 void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character, rapidxml::xml_document<>& bmldoc)
 {
 	//////////////////////////////////
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	//ReadVisemeDataBML( bmlFilename.c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData );
 	m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
 
@@ -932,7 +932,7 @@ void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector<
 	
 void AudioFileSpeech::ReadSpeechTimingFast( const char * filename, std::map< std::string, float > & timeMarkers, rapidxml::xml_document<>& bmldoc)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.clear();
 
 	//rapidxml::xml_document<> bmldoc;

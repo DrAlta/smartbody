@@ -1,5 +1,5 @@
 #include "SBSteerAgent.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBCharacter.h>
 #include <sbm/PPRAISteeringAgent.h>
 
@@ -44,7 +44,7 @@ const std::string& SBSteerAgent::getSteerStateNamePrefix()
 void SBSteerAgent::setSteerType(std::string type)
 {
 	_steerType = type;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SbmCharacter* character = this->getCharacter();
 	if (!character)
 		return;

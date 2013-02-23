@@ -45,11 +45,11 @@
 #include <sb/SBScene.h>
 #include <sbm/sbm_constants.h>
 #include <sbm/xercesc_utils.hpp>
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBScene.h>
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/sbm_test_cmds.hpp>
-#include BML_PROCESSOR_INCLUDE
+#include <bml/bml_processor.hpp>
 #include <sbm/remote_speech.h>
 #include <sbm/sbm_audio.h>
 #include <sbm/sbm_speech_audiofile.hpp>
@@ -60,6 +60,7 @@
 //#include "SBMWindow.h"
 #include <sb/SBPython.h>
 #include <sb/SBSteerManager.h>
+#include <sb/SBBmlProcessor.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBAssetManager.h>
 #include <sbm/PPRAISteeringAgent.h>
@@ -245,7 +246,7 @@ int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 int mcu_quit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )	{
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->getSimulationManager()->stop();
@@ -286,15 +287,16 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 	SmartBody::SBScene::getScene()->getDebuggerServer()->ProcessVHMsgs(op, args);
 }
 
-int mcu_quit_func( srArgBuffer& args, mcuCBHandle *mcu_p  )	{
+int mcu_quit_func( srArgBuffer& args )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->getSimulationManager()->stop();
 
-	SmartBody::SBScene::getScene()->getSimulationManager()->stop();
-
-	if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
+	if (scene->getSteerManager()->getEngineDriver()->isInitialized())
 	{
-		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->stopSimulation();
-		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->unloadSimulation();
-		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->finish();
+		scene->getSteerManager()->getEngineDriver()->stopSimulation();
+		scene->getSteerManager()->getEngineDriver()->unloadSimulation();
+		scene->getSteerManager()->getEngineDriver()->finish();
 
 		/*
 		for (std::map<std::string, SbmCharacter*>::iterator iter = mcu_p->getCharacterMap().begin();
@@ -328,7 +330,7 @@ void mcu_register_callbacks( void ) {
 void cleanup( void )	{
 	{
 
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		if (SmartBody::SBScene::getScene()->getSimulationManager()->isStopped())
 		{
 			LOG( "SmartBody NOTE: unexpected exit " );
@@ -348,8 +350,6 @@ void cleanup( void )	{
 		}
 #endif
 	}
-
-	mcuCBHandle::destroy_singleton();
 	
 	XMLPlatformUtils::Terminate();
 
@@ -366,7 +366,7 @@ void cleanup( void )	{
 void signal_handler(int sig) {
 //	std::cout << "SmartBody shutting down after catching signal " << sig << std::endl;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrProcEnd sbm" );
 	// get the current directory
 #ifdef WIN32
@@ -376,48 +376,6 @@ void signal_handler(int sig) {
 	char buffer[PATH_MAX];
 	getcwd(buffer, PATH_MAX);
 #endif
-	/*
-	// dump to an available file in the current directory
-	int counter = 1;
-	bool fileOk = false;
-	char file[1024];
-	while (!fileOk || counter > 999)
-	{
-		sprintf(file, "%s\\smartbodycommands%.5d.dump", buffer, counter);
-
-		std::fstream fs(file, std::ios_base::in);// attempt open for read
-		if (!fs)
-		{
-			fileOk = true;
-			fs.close();
-			std::ofstream dumpFile;
-			dumpFile.open(file);
-
-			dumpFile << "Last commands run:" << std::endl;
-
-			// dump the command resources
-			int numResources = mcuCBHandle::singleton().resource_manager->getNumResources();
-			for (int r = 0; r < numResources; r++)
-			{
-				CmdResource * res = dynamic_cast<CmdResource  *>(mcuCBHandle::singleton().resource_manager->getResource(r));
-				if(res)
-					dumpFile << res->dump() << std::endl;
-			}
-			//std::cout << "Wrote commands to " << file << std::endl;
-
-			dumpFile.close();
-
-		}
-		else //ok, file exists. close and reopen in write mode
-		{
-		  fs.close();
-		  counter++;
-		}
-	}
-	*/
-	
-	//cleanup(); // 
-	//exit(sig);
 }
 
 
@@ -475,7 +433,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	
 	XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	TransparentListener transparentListener;
 	SmartBody::SBScene::getScene()->setCharacterListener(&transparentListener);
@@ -752,7 +710,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 		// Using a process id is a sign that we're running in a multiple SBM environment.
 		// So.. ignore BML requests with unknown agents by default
-		mcu.bml_processor.set_warn_unknown_agents( false );
+		SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor()->set_warn_unknown_agents( false );
 	}
 
 	if ( SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))

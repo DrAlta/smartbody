@@ -1,5 +1,4 @@
 #include "SBMotion.h"
-#include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
 #include <sr/sr_euler.h>
 #include <sb/SBSkeleton.h>
@@ -11,6 +10,7 @@
 #include <controllers/me_ct_jacobian_IK.hpp>
 #include <controllers/me_ct_ccd_IK.hpp>
 #include <boost/lexical_cast.hpp>
+#include <sbm/sbm_constants.h>
 
 namespace SmartBody {
 
@@ -161,7 +161,7 @@ std::vector<std::string> SBMotion::getChannels()
 
 void SBMotion::checkSkeleton(std::string skel)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 	int chanSize;
 	SkChannel chan;
 
@@ -443,7 +443,7 @@ void SBMotion::alignToSide(int numFrames, int direction)
 
 SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 	registerAnimation();
 
 	num++;
@@ -540,7 +540,7 @@ SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 
 SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJointMap)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 	SBSkeleton* srcSkeleton = SmartBody::SBScene::getScene()->getSkeleton(srcSkeletonName);
 	if (!srcSkeleton)
 	{
@@ -934,7 +934,7 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 
 SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 	SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
 	if (!skeleton)
 	{
@@ -969,7 +969,7 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 
 SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, std::string parentJointName )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 	SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
 	if (!skeleton)
 	{
@@ -1006,7 +1006,7 @@ SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, 
 
 SBMotion* SBMotion::smoothCycle( std::string name, float timeInterval )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 	
+	 	
 	SkMotion* motion = buildSmoothMotionCycle(timeInterval);
 	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
 	if (sbmotion)
@@ -1666,7 +1666,7 @@ SBMotion* SBMotion::constrain( std::string name, std::string srcSkeletonName, st
 		else
 			motionName = name;
 		constraintMotion->setName(motionName.c_str());
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		//mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, cleanUpMotion));
 		 SmartBody::SBScene::getScene()->getAssetManager()->addMotion(constraintMotion);
 	}

@@ -28,7 +28,7 @@
 #include "sbm/xercesc_utils.hpp"
 #include "sk/sk_skeleton.h"
 #include "sk/sk_motion.h"
-#include "sbm/mcontrol_util.h"
+
 #include "sbm/gwiz_math.h"
 
 namespace SmartBody {

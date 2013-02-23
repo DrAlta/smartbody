@@ -63,7 +63,7 @@
 #include <sbm/Heightfield.h>
 #include <sbm/KinectProcessor.h>
 #include <sbm/local_speech.h>
-#include <sbm/mcontrol_util.h>
+
 #include <sbm/action_unit.hpp>
 #include <vhmsg.h>
 
@@ -326,9 +326,9 @@ void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, SmartBody:
 	delete fr_seq_p;
 }
 
-int begin_sequence( char* name, mcuCBHandle* mcu_p )	{
+int begin_sequence( char* name )	{
 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	srCmdSeq *seq = SmartBody::SBScene::getScene()->getCommandManager()->lookup_seq( name );
 	
@@ -363,13 +363,13 @@ int mcu_sequence_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	char *seqName = args.read_token();
 	char *seqCmd = args.read_token();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	//std::cout << "SEQUENCE LOADED: " << seq_name << " " << seq_cmd << std::endl;
 	//std::string seqStr = seq_cmd;
 	//LOG("mcu_sequence_func : seq_name = %s, seqStr = %s",seq_cmd, seqStr.c_str());
 	if( ( strcmp( seqCmd, "begin" ) == 0 )||( strcmp( seqCmd, EMPTY_STRING ) == 0 ) )	{
-		int ret = begin_sequence( seqName, &mcu );
+		int ret = begin_sequence( seqName );
 		return ret;
 	}
 	else
@@ -874,7 +874,7 @@ int mcu_motion_player_func(srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 
 int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	
 	Heightfield* heightfield = SmartBody::SBScene::getScene()->getHeightfield();
 	char *terr_cmd = args.read_token();
@@ -1617,7 +1617,7 @@ void nodeStr(const XMLCh* s, std::string& out)
 	xml_utils::xml_translate(&out, s);
 }
 
-void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFactor, std::string jointPrefix, mcuCBHandle* mcu_p)
+void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFactor, std::string jointPrefix)
 {
 	boost::char_separator<char> sep(" \n");
 
@@ -1923,7 +1923,7 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 				LOG("mcu_character_load_skinweights ERR: no binding info contained");
 				return CMD_FAILURE;
 			}
-			parseLibraryControllers(controllerNode, char_name, scaleFactor, jointNamePrefix, &mcuCBHandle::singleton());
+			parseLibraryControllers(controllerNode, char_name, scaleFactor, jointNamePrefix);
 		}	
 		else if (ext == ".xml" || ext == ".XML")
 		{
@@ -1985,14 +1985,14 @@ int mcu_character_init(
 	const char* className, 
 	SmartBody::SBCommandManager* cmdMgr)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	int err;
 	
 	if( strcmp(char_name, "*" )==0 ) {  // TODO: better character name valiadtion
 		LOG( "init_character ERR: Invalid SbmCharacter name '%s'\n", char_name ); 
 		return( CMD_FAILURE );
 	}
-	SmartBody::SBCharacter* existingCharacter = SmartBody::SBScene::getScene()->getCharacter(char_name);
+	SmartBody::SBCharacter* existingCharacter = scene->getCharacter(char_name);
 	if (existingCharacter)
 	{
 		LOG( "init_character ERR: SbmCharacter '%s' EXISTS\n", char_name ); 
@@ -2000,15 +2000,15 @@ int mcu_character_init(
 	}
 
 	//SbmCharacter *char_p = new SbmCharacter(char_name);
-	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->createCharacter(char_name, className);
+	SmartBody::SBCharacter* char_p = scene->createCharacter(char_name, className);
 	
-	SmartBody::SBSkeleton* skeleton_p = SmartBody::SBScene::getScene()->getAssetManager()->createSkeleton(skel_file);
+	SmartBody::SBSkeleton* skeleton_p = scene->getAssetManager()->createSkeleton(skel_file);
 	SmartBody::SBFaceDefinition* faceDefinition = NULL;
 
 	// get the face motion mapping per character
-	faceDefinition = SmartBody::SBScene::getScene()->getFaceDefinition(char_name);
+	faceDefinition = scene->getFaceDefinition(char_name);
 
-	err = char_p->init( skeleton_p, faceDefinition, &mcu.param_map, className );
+	err = char_p->init( skeleton_p, faceDefinition, &scene->getGeneralParameters(), className );
 
 
 /*
@@ -2483,7 +2483,7 @@ int query_controller(
 
 int mcu_controller_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 	char *ctrl_name = args.read_token();
 	char *ctrl_cmd = args.read_token();
 	
@@ -2765,7 +2765,7 @@ int mcu_net_check( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
 int mcu_net_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
     char * command = args.read_token();
 
     if ( _stricmp( command, "boneupdates" ) == 0 )
@@ -3060,7 +3060,7 @@ int mcu_commapi_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 int mcu_vrKillComponent_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
     char * command = args.read_token();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	
     if ( _stricmp( command, "sb" ) == 0 ||
 		_stricmp( command, "sbm" ) == 0 ||
@@ -3082,7 +3082,7 @@ int mcu_vrKillComponent_func( srArgBuffer& args, SmartBody::SBCommandManager* cm
 
 int mcu_vrAllCall_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	
     SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrComponent sbm" );
  
@@ -3196,7 +3196,7 @@ int mcu_vrPerception_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 		std::string pml = args.read_remainder_raw();
 
 		// all characters should be receiving the perception message
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 
 		const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
 		for (std::vector<std::string>::const_iterator iter = characterNames.begin();
@@ -3266,7 +3266,7 @@ int mcu_vrBCFeedback_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
  */
 int mcu_vrSpeech_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::string status = args.read_token();
 	std::string id = args.read_token();
 	std::string speaker = args.read_token();
@@ -3293,7 +3293,7 @@ int mcu_vrSpeech_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 #ifndef SB_NO_PYTHON	
 #ifndef __ANDROID__
@@ -4539,7 +4539,7 @@ int showcharacters_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 
 int showpawns_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	
 	const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
@@ -4646,7 +4646,7 @@ int stopheapprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 // currently position is for global and rotation is for local
 int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::string operation = args.read_token();
 	if (operation == "echo")
 		LOG("%s", args.read_remainder_raw());
@@ -4683,7 +4683,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 		{
 			std::string jName;
 			if (emitterName == "kinect")
-				jName = mcu.kinectProcessor->getSBJointName(args.read_int());
+				jName = scene->getKinectProcessor()->getSBJointName(args.read_int());
 			else
 				jName = args.read_token();
 			float x = args.read_float() * scale;
@@ -4712,7 +4712,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 		{
 			std::string jName;
 			if (emitterName == "kinect")
-				jName = mcu.kinectProcessor->getSBJointName(args.read_int());
+				jName = scene->getKinectProcessor()->getSBJointName(args.read_int());
 			else
 				jName = args.read_token();
 
@@ -4733,7 +4733,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 		{
 			std::string jName;
 			if (emitterName == "kinect")
-				jName = mcu.kinectProcessor->getSBJointName(args.read_int());
+				jName = scene->getKinectProcessor()->getSBJointName(args.read_int());
 			else
 				jName = args.read_token();
 
@@ -4749,7 +4749,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 		{
 			std::string jName;
 			if (emitterName == "kinect")
-				jName = mcu.kinectProcessor->getSBJointName(args.read_int());
+				jName = scene->getKinectProcessor()->getSBJointName(args.read_int());
 			else
 				jName = args.read_token();
 
@@ -4794,7 +4794,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 					{
 						if (quats[i].w != 0)
 						{
-							const std::string& mappedJointName = mcu.kinectProcessor->getSBJointName(i);
+							const std::string& mappedJointName = scene->getKinectProcessor()->getSBJointName(i);
 							if (mappedJointName != "")
 								character->datareceiver_ct->setLocalRotation(mappedJointName, quats[i]);
 						}
@@ -5400,7 +5400,7 @@ int animation_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 int vhmsglog_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	SmartBody::SBVHMsgManager* vhmsgManager = SmartBody::SBScene::getScene()->getVHMsgManager();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if (args.calc_num_tokens() == 0)
 	{
 		if (vhmsgManager->isEnableLogging())
@@ -5513,7 +5513,7 @@ int mcu_echo_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )
 
 int sb_main_func( srArgBuffer & args, SmartBody::SBCommandManager* cmdMgr )
 {
-   mcuCBHandle& mcu = mcuCBHandle::singleton();
+   
    const char * token = args.read_token();
    if ( strcmp( token, "id" ) == 0 )
    {  // Process specific

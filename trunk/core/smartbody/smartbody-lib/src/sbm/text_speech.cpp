@@ -51,7 +51,7 @@ RequestId text_speech::requestSpeechAudio( const char* agentName, const std::str
 
 
 RequestId text_speech::requestSpeechAudio( const char* agentName, std::string voiceCode, std::string text, const char* callbackCmd ){
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
     
 	msgNumber++; //to make the message number unique it must not belong to any single object instantiation and thus resides in "lookup" along with other items that must be globally accessable among all text_speech objects
 	ostringstream myStream; //creates an ostringstream object
@@ -258,7 +258,7 @@ void text_speech::startSchedule( SmartBody::RequestId requestId ) {
 	srCmdSeq* seq = scheduleLookUp.lookup(myStream.str().c_str());
 
 	if (seq != NULL) {
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		seq->offset((float)SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 		string seqname = "text_speech_" + myStream.str();
 		SmartBody::SBScene::getScene()->getCommandManager()->getActiveSequences()->addSequence(seqname, seq);

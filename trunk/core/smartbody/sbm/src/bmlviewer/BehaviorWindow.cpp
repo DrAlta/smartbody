@@ -15,6 +15,7 @@
 #include <controllers/me_ct_gaze.h>
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBBmlProcessor.h>
 #include "BehaviorBlock.h"
 #include <bml/bml_types.hpp>
 #include <sbm/text_speech.h>
@@ -22,7 +23,7 @@
 #include <sbm/sbm_speech_audiofile.hpp>
 #include <bml/behavior_scheduler_fixed.hpp>
 #include "sbm/xercesc_utils.hpp"
-
+#include <bml/bml_processor.hpp>
 
 
 
@@ -108,8 +109,8 @@ void BehaviorWindow::label_viewer(std::string name)
 
 void BehaviorWindow::show_viewer()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.bml_processor.registerRequestCallback(OnRequest, this);
+	BML::Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
+	bp->registerRequestCallback(OnRequest, this);
 
 	this->show();
 	this->updateGUI();
@@ -118,8 +119,8 @@ void BehaviorWindow::show_viewer()
 
 void BehaviorWindow::hide_viewer()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.bml_processor.registerRequestCallback(NULL, NULL);
+	BML::Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
+	bp->registerRequestCallback(NULL, NULL);
 	this->hide();
 }
 
@@ -399,7 +400,7 @@ void BehaviorWindow::updateBehaviors(BML::BmlRequest* request)
 
 	model->clear(true);
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	double curTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 
 	// first, display the bml request in an intuitive way

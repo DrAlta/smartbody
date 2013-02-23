@@ -55,7 +55,7 @@ using namespace std;
  *  Returns true if valid.
  */
 bool normalize_character_id( const string& module, const string& role, const string& char_id ) {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	if( char_id.length()==0 ) {
 		std::stringstream strstr;
@@ -152,7 +152,7 @@ void build_vrX( ostringstream& buffer, const string& cmd, const string& char_id,
  */
 int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 			  const string& seq_id, bool echo, bool send, const string& bml ) {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	ostringstream msg;
 
 	bool all_characters = ( char_id=="*" );

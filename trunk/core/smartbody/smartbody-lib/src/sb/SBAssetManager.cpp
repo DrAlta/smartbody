@@ -3,7 +3,7 @@
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
-#include <sbm/mcontrol_util.h>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -14,6 +14,7 @@
 #include <sbm/ParserFBX.h>
 #include <sbm/lin_win.h>
 #include <sbm/sr_path_list.h>
+#include <sbm/sbm_constants.h>
 
 #ifdef WIN32
 #include <direct.h>
@@ -60,6 +61,8 @@ SBAssetManager::~SBAssetManager()
 	delete me_paths;
 	delete audio_paths;
 	delete mesh_paths;
+
+	_deformableMeshMap.clear();
 }
 
 double SBAssetManager::getGlobalMotionScale()
@@ -102,7 +105,7 @@ SBSkeleton* SBAssetManager::createSkeleton(const std::string& skeletonDefinition
 
 SBSkeleton* SBAssetManager::getSkeleton(const std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::map<std::string, SBSkeleton*>::iterator iter = _skeletons.find(name);
 	SBSkeleton* sbskel = NULL;
 	if (iter != _skeletons.end())
@@ -233,7 +236,7 @@ void SBAssetManager::removeAssetPath(const std::string& type, const std::string&
 
 void SBAssetManager::removeAllAssetPaths(const std::string& type)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 
 	bool ret = false;
 	if (type == "seq" || type == "script")
@@ -299,7 +302,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 		return;
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 
 	std::string ext = boost::filesystem::extension( finalPath );
 	std::string baseName = boost::filesystem::basename( finalPath );
@@ -807,7 +810,7 @@ int SBAssetManager::load_skeleton( const void* data, int sizeBytes, const char* 
 
 SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srPathList &path_list, double scale ) {
 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::map<std::string, SmartBody::SBSkeleton*>::iterator iter =_skeletons.find(std::string(skel_file));
 	if (iter != _skeletons.end())
 	{
@@ -1311,5 +1314,34 @@ const std::string SBAssetManager::findFileName(const std::string& type, const st
 }
 
 
+void SBAssetManager::addDeformableMesh(const std::string& meshName, DeformableMesh* mesh)
+{
+	_deformableMeshMap[meshName] = mesh;
+}
+
+void SBAssetManager::removeDeformableMesh(const std::string& meshName)
+{
+	std::map<std::string, DeformableMesh*>::iterator iter = _deformableMeshMap.find(meshName);
+	if (iter != _deformableMeshMap.end())
+	{
+		_deformableMeshMap.erase(iter);
+	}
+}
+
+DeformableMesh* SBAssetManager::getDeformableMesh(const std::string& meshName)
+{
+	std::map<std::string, DeformableMesh*>::iterator iter = _deformableMeshMap.find(meshName);
+	if (iter != _deformableMeshMap.end())
+	{
+		return (*iter).second;
+	}
+
+	return NULL;
+}
+
+void SBAssetManager::removeAllDeformableMeshes()
+{
+	_deformableMeshMap.clear();
+}
 
 }

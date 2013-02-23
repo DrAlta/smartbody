@@ -291,7 +291,7 @@ void BehaviorSyncPoints::parseStandardSyncPoints( DOMElement* elem, BmlRequestPt
 
 BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const string& behavior_id ) {
 	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	// Does the sync point already exist?
 	MapNameToPos::iterator map_it = name_to_pos.find( sync_attr );

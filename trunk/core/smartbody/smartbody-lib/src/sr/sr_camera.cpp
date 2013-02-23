@@ -26,7 +26,7 @@
 # include <sr/sr_plane.h>
 # include <sr/sr_camera.h>
 #include <sstream>
-#include <sbm/mcontrol_util.h>
+
 #include <sbm/gwiz_math.h>
 #include <sb/SBSubject.h>
 #include <sb/SBAttribute.h>

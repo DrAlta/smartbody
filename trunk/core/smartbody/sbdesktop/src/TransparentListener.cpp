@@ -3,9 +3,10 @@
 #include <sb/SBPawn.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
 #include <sb/SBSimulationManager.h>
 #include "TransparentViewer.h"
-#include <sbm/mcontrol_util.h>
+
 
 TransparentListener::TransparentListener()
 {
@@ -17,7 +18,7 @@ TransparentListener::~TransparentListener()
 
 void TransparentListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
@@ -72,7 +73,7 @@ void TransparentListener::OnCharacterCreate( const std::string & name, const std
 
 void TransparentListener::OnCharacterDelete( const std::string & name )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
@@ -110,7 +111,7 @@ void TransparentListener::OnCharacterUpdate( const std::string & name, const std
 
 void TransparentListener::OnCharacterChanged( const std::string& name )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
@@ -122,7 +123,7 @@ void TransparentListener::OnCharacterChanged( const std::string& name )
 
 void TransparentListener::OnPawnCreate( const std::string & name )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
 	if (!pawn)
 		return;
@@ -178,7 +179,7 @@ void TransparentListener::OnPawnCreate( const std::string & name )
 
 void TransparentListener::OnPawnDelete( const std::string & name )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SbmPawn* pawn =SmartBody::SBScene::getScene()->getPawn(name);
 	if (!pawn)
 		return;
@@ -208,7 +209,7 @@ void TransparentListener::OnChannel( const std::string & name, const std::string
 
 void TransparentListener::OnReset()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 }
 
@@ -221,7 +222,7 @@ void TransparentListener::notify(SmartBody::SBSubject* subject)
 		if (pawn->getName().find("light") == 0)
 		{
 			// adjust the lights based on the new position and color
-			mcuCBHandle& mcu = mcuCBHandle::singleton();
+			
 			TransparentViewer* window = dynamic_cast<TransparentViewer*>(SmartBody::SBScene::getScene()->getViewer());
 			if (window)
 			{

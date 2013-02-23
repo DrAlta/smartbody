@@ -27,7 +27,7 @@
 #include "sbm/BMLDefs.h"
 
 // Forward Declaration
-class mcuCBHandle;
+
 
 namespace BML {
 

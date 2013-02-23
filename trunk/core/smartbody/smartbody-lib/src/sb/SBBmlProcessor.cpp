@@ -1,41 +1,42 @@
 #include "SBBmlProcessor.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCommandManager.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBScene.h>
+#include <bml/bml_processor.hpp>
 
 namespace SmartBody {
 
 SBBmlProcessor::SBBmlProcessor()
 {
+	_bmlProcessor = new BML::Processor();
 }
 
 SBBmlProcessor::~SBBmlProcessor()
 {
+	delete _bmlProcessor;
 }
 
-// This command is inside bml_processor.cpp, unlike most of other commands inside mcontrol_util. So unable to rewrite, instead, re-routine to bp.
+// This command is inside bml_processor.cpp. So unable to rewrite, instead, re-routine to bp.
 void SBBmlProcessor::vrSpeak(std::string agent, std::string recip, std::string msgId, std::string msg)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	std::stringstream msgStr;
 	msgStr << agent << " " << recip << " " << msgId << " " << msg;
 	srArgBuffer vrMsg(msgStr.str().c_str());
-	BML::Processor& bp = mcu.bml_processor;
-	bp.vrSpeak_func(vrMsg, SmartBody::SBScene::getScene()->getCommandManager());
+	BML::Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
+	bp->vrSpeak_func(vrMsg, SmartBody::SBScene::getScene()->getCommandManager());
 }
 
 void SBBmlProcessor::vrAgentBML(std::string op, std::string agent, std::string msgId, std::string msg)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	if (op == "request" || op == "start" || op == "end")
 	{
 		std::stringstream msgStr;
 		msgStr << agent << " " << msgId << " " << op << " " << msg;
 		srArgBuffer vrMsg(msgStr.str().c_str());
-		BML::Processor& bp = mcu.bml_processor;
-		bp.vrAgentBML_cmd_func(vrMsg, SmartBody::SBScene::getScene()->getCommandManager());
+		BML::Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
+		bp->vrAgentBML_cmd_func(vrMsg, SmartBody::SBScene::getScene()->getCommandManager());
 	}
 	else
 	{
@@ -46,7 +47,7 @@ void SBBmlProcessor::vrAgentBML(std::string op, std::string agent, std::string m
 
 std::string SBBmlProcessor::build_vrX(std::ostringstream& buffer, const std::string& cmd, const std::string& char_id, const std::string& recip_id, const std::string& content, bool for_seq ) 
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	std::stringstream msgId;
 	SmartBody::IntAttribute* intAttr = dynamic_cast<SmartBody::IntAttribute*>(SmartBody::SBScene::getScene()->getAttribute("bmlIndex"));
@@ -67,7 +68,7 @@ std::string SBBmlProcessor::build_vrX(std::ostringstream& buffer, const std::str
 std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_id, const std::string& recip_id,
 			const std::string& seq_id, bool echo, bool send, const std::string& bml ) 
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::ostringstream msg;
 	std::string msgId = "";
 	bool all_characters = ( char_id=="*" );
@@ -230,8 +231,8 @@ void SBBmlProcessor::interruptCharacter(const std::string& character, double sec
 		return;
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.bml_processor.interrupt(sbCharacter, seconds, scene);
+	BML::Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
+	bp->interrupt(sbCharacter, seconds, scene);
 	
 }
 
@@ -245,12 +246,15 @@ void SBBmlProcessor::interruptBML(const std::string& character, const std::strin
 		return;
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.bml_processor.interrupt(sbCharacter, id, seconds, scene);
+	BML::Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
+	bp->interrupt(sbCharacter, id, seconds, scene);
 }
 
 
-
+BML::Processor* SBBmlProcessor::getBMLProcessor()
+{
+	return _bmlProcessor;
+}
 
 
 } // namespace

@@ -33,7 +33,7 @@
 
 #include "bml_reach.hpp"
 
-#include "sbm/mcontrol_util.h"
+
 #include "controllers/me_ct_reach.hpp"
 #include "controllers/me_ct_data_driven_reach.hpp"
 
@@ -52,7 +52,7 @@ using namespace std;
 using namespace BML;
 using namespace xml_utils;
 
-static void buildReachCtExamples(mcuCBHandle* mcu_p, MeCtDataDrivenReach* reachCt)
+static void buildReachCtExamples(MeCtDataDrivenReach* reachCt)
 {
 	const int NUM_MOTIONS = 4;
 	const char motionNames[NUM_MOTIONS][100] = { "HandsAtSide_RArm_GestureYou", "LHandOnHip_Arms_GestureWhy", "LHandOnHip_RArm_GestureOffer", "LHandOnHip_RArm_SweepRight" };
@@ -100,7 +100,7 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
 		handle = asciiString(attrHandle);
 		// look for a gaze controller with that handle
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		const SbmCharacter* character = request->actor;
 		if (character)
 		{

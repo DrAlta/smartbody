@@ -25,7 +25,7 @@
 #include <sb/SBGestureMap.h>
 #include <sb/SBGestureMapManager.h>
 #include <sb/nvbg.h>
-#include <sbm/mcontrol_util.h>
+
 #include <sbm/action_unit.hpp>
 #include <sbm/sr_path_list.h>
 #include <sb/sbm_character.hpp>
@@ -193,7 +193,7 @@ void ResourceWindow::show()
 
 void ResourceWindow::update()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();	
+		
 	if (0) //mcu.resourceDataChanged) // don't update the tree if nothing happens
 	{		
 		updateGUI();
@@ -218,7 +218,7 @@ void ResourceWindow::resize( int x, int y, int w, int h )
 
 void ResourceWindow::updateGUI()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 

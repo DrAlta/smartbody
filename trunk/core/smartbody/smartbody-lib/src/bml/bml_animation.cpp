@@ -27,7 +27,7 @@
 #include <string>
 
 #include "bml_animation.hpp"
-#include "sbm/mcontrol_util.h"
+
 #include "bml_xml_consts.hpp"
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>

@@ -253,7 +253,6 @@
     <ClCompile Include="..\src\sbm\lin_win.cpp" />
     <ClCompile Include="..\src\sbm\local_speech.cpp" />
     <ClCompile Include="..\src\sbm\mcontrol_callbacks.cpp" />
-    <ClCompile Include="..\src\sbm\mcontrol_util.cpp" />
     <ClCompile Include="..\src\sbm\MiscCommands.cpp" />
     <ClCompile Include="..\src\sbm\ODEPhysicsSim.cpp" />
     <ClCompile Include="..\src\sbm\ParserASFAMC.cxx" />
@@ -702,7 +701,6 @@
     <ClInclude Include="..\src\sbm\lin_win.h" />
     <ClInclude Include="..\src\sbm\local_speech.h" />
     <ClInclude Include="..\src\sbm\mcontrol_callbacks.h" />
-    <ClInclude Include="..\src\sbm\mcontrol_util.h" />
     <ClInclude Include="..\src\sbm\MiscCommands.h" />
     <ClInclude Include="..\src\sbm\ODEPhysicsSim.h" />
     <ClInclude Include="..\src\sbm\ParserASFAMC.h" />

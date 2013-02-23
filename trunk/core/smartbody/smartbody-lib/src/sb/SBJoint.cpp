@@ -2,7 +2,7 @@
 #include "SBSkeleton.h"
 #include "SBCharacter.h"
 #include <sk/sk_skeleton.h>
-#include <sbm/mcontrol_util.h>
+
 #include <queue>
 
 namespace SmartBody {

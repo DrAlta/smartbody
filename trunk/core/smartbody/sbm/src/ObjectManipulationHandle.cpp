@@ -190,7 +190,7 @@ void ObjectManipulationHandle::picking(float x,float y,SrCamera* cam)
 
 	// determine the size of the pawns relative to the size of the characters
 	float pawnSize = 1.0;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	mcu.character_map.reset();
 	while (SbmCharacter* character = mcu.character_map.next())
 	{

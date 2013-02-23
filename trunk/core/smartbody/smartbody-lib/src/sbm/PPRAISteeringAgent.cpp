@@ -20,7 +20,7 @@
 
 
 #include "PPRAISteeringAgent.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBScene.h>
 #include <sb/sbm_character.hpp>
 #ifndef __native_client__
@@ -47,7 +47,7 @@
 PPRAISteeringAgent::PPRAISteeringAgent(SmartBody::SBCharacter* c) : SmartBody::SBSteerAgent(c)
 {
 	character = c;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	agent = NULL;
 	target = NULL;
 
@@ -388,7 +388,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSteerManager* manager = scene->getSteerManager();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	float dt = (float) dtime;
 
 	if (!character)
@@ -574,7 +574,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 	std::string curStateName = "";
 	if (curStateData)
 		curStateName = curStateData->state->stateName;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();	
+		
 	
 	bool locomotionEnd = false;
 	static int counter = 0;		
@@ -1173,7 +1173,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 		normalizeAngle(diff);
 
 		// Improve on the starting angle by examining whether there's obstacles around
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 
 		std::vector<float> neigbors;
 		const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
@@ -1412,7 +1412,7 @@ void PPRAISteeringAgent::startLocomotion( float angleDiff )
 		float diff = angleGlobal - yaw;
 		normalizeAngle(diff);
 		*/
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		std::stringstream command;
 		double w;
 		float maxRotAngle = 180;
@@ -1484,7 +1484,7 @@ void PPRAISteeringAgent::startLocomotion( float angleDiff )
 
 void PPRAISteeringAgent::adjustFacingAngle( float angleDiff )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();	
+		
 	std::string playNow;
 	if (fabs(angleDiff) > facingAngleThreshold && !character->param_animation_ct->hasPABlend(idleTurnName.c_str()))
 	{
@@ -1523,7 +1523,7 @@ float PPRAISteeringAgent::evaluateSteppingLoco(float dt, float x, float y, float
 {
 	if (!character->param_animation_ct)
 		return .0f;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	float dist = sqrt((x - stepTargetX) * (x - stepTargetX) + (z - stepTargetZ) * (z - stepTargetZ));	
 	SrVec agentToTargetVec;
 	agentToTargetVec.x = stepTargetX - x;
@@ -1558,7 +1558,7 @@ float PPRAISteeringAgent::evaluateSteppingLoco(float dt, float x, float y, float
 void PPRAISteeringAgent::startParameterTesting()
 {
 	LOG("Parameter Testing Start...");
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	paramTestStartTime = (float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 	paramTestFlag = true;
 	paramTestAngle = 0.0f;
@@ -1570,7 +1570,7 @@ void PPRAISteeringAgent::startParameterTesting()
 
 void PPRAISteeringAgent::parameterTesting()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if ((SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - paramTestStartTime) > paramTestDur)
 	{
 		paramTestFlag = false;

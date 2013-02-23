@@ -15,20 +15,16 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SmartBody-lib.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
- *      Ed Fast, USC
  */
 
-#include "sbm/mcontrol_util.h"
+
 #include "controllers/me_ct_gaze.h"
 #include "sbm/lin_win.h"
 using namespace gwiz;
 #include <vhcl_log.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
+#include <sb/sbm_pawn.hpp>
 
 //#define DFL_GAZE_HEAD_SPEED 180.0
 //#define DFL_GAZE_EYE_SPEED  1000.0

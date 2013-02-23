@@ -1,10 +1,12 @@
 #include "SBPhysicsSim.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBScene.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBAttribute.h>
 #include <sr/sr_output.h>
+#include <sbm/gwiz_math.h>
 #include <controllers/me_ct_ublas.hpp>
 
 
@@ -168,7 +170,7 @@ void SBPhysicsSim::updateAllPhysicsJoints()
 
 SBPhysicsSim* SBPhysicsSim::getPhysicsEngine()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if ( SmartBody::SBScene::getScene())
 		return SmartBody::SBScene::getScene()->getPhysicsManager()->getPhysicsEngine();
 	else
@@ -314,7 +316,7 @@ void SBPhysicsObj::changeGeometry( std::string& geomType, SrVec extends )
 	colObj = SBGeomObject::createGeometry(geomType,extends);
 	colObj->setLocalTransform(localTran);
 	colObj->attachToObj(this);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	phySim->updatePhyObjGeometry(this);
 
@@ -397,7 +399,7 @@ void SBPhysicsJoint::updateTotalSupportMass()
 
 void SBPhysicsJoint::notify( SBSubject* subject )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	phySim->updatePhysicsJoint(this);	
 }
@@ -618,7 +620,7 @@ std::map<std::string,SbmJointObj*>& SBPhysicsCharacter::getJointObjMap()
 
 void SBPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vector<std::string>& jointNameList, bool buildGeometry )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SBScene* scene = SmartBody::SBScene::getScene();
 	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	SBCharacter* character = scene->getCharacter(charName);
@@ -806,7 +808,7 @@ void SBPhysicsCharacter::updatePDTorque()
 		return;
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SBPhysicsSim* phySim = SBPhysicsSim::getPhysicsEngine();
 	float Ks = (float)phySim->getDoubleAttribute("Ks");
 	float Kd = (float)phySim->getDoubleAttribute("Kd");

@@ -224,7 +224,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	sbm/Heightfield.cpp
 	sbm/lin_win.cpp
 	sbm/mcontrol_callbacks.cpp
-	sbm/mcontrol_util.cpp
 	sbm/action_unit.cpp
 	
 	controllers/me_ct_basic_locomotion.cpp

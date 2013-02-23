@@ -34,7 +34,7 @@
 
 #include <sr/sr.h>
 #include <sk/sk_channel_array.h>
-#include "sbm/mcontrol_util.h"
+
 #include <sb/sbm_pawn.hpp>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>

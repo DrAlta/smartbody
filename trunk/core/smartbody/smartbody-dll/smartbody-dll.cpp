@@ -15,7 +15,7 @@
 #pragma warning(push)
 #pragma warning(disable:4121)  // needed for boost::python::extract<std::string>() below
 #include "sb/SBScene.h"
-#include "sbm/mcontrol_util.h"
+
 #include "sbm/mcontrol_callbacks.h"
 #include "sb/SBPython.h"
 #include "sb/SBCharacter.h"
@@ -236,8 +236,6 @@ SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
    {
 	   SmartBody::SBScene::getScene()->getVHMsgManager()->send("vrProcEnd sbm");
    }
-
-   mcuCBHandle::destroy_singleton();
 
    XMLPlatformUtils::Terminate();
 
@@ -553,7 +551,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::PythonCommandVoid( const std::string & com
 bool Smartbody_dll::PythonCommandBool( const std::string & command )
 {
 #if USE_SBPYTHON
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   
    try
    {
       boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
@@ -574,7 +572,7 @@ bool Smartbody_dll::PythonCommandBool( const std::string & command )
 int Smartbody_dll::PythonCommandInt( const std::string & command )
 {
 #if USE_SBPYTHON
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   
    try
    {
       boost::python::object obj = boost::python::exec(command.c_str(),mcu.mainDict);
@@ -594,7 +592,7 @@ int Smartbody_dll::PythonCommandInt( const std::string & command )
 float Smartbody_dll::PythonCommandFloat( const std::string & command )
 {
 #if USE_SBPYTHON
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   
    try
    {
       boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
@@ -614,7 +612,7 @@ float Smartbody_dll::PythonCommandFloat( const std::string & command )
 std::string Smartbody_dll::PythonCommandString( const std::string & command )
 {
 #if USE_SBPYTHON
-   mcuCBHandle & mcu = mcuCBHandle::singleton();
+   
    try
    {
       boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);

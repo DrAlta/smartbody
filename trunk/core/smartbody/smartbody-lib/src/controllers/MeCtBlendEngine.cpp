@@ -6,7 +6,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <sr/sr_timer.h>
 #include "MeCtBlendEngine.h"
-#include "sbm/mcontrol_util.h"
+
 #include "controllers/me_ct_barycentric_interpolation.h"
 #include "controllers/me_ct_inverse_interpolation.h"
 #include <sb/SBEvent.h>
@@ -239,7 +239,7 @@ void MeCtBlendEngine::updateBlend(float t, float dt, BodyMotionFrame& inputFrame
 	updateSkeletonCopy();	
 	// update reach data
 	std::string rootName = rootJointName;	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();	
+		
 
 	VecOfInterpWeight weight;
 	dataInterpolator->predictInterpWeights(targetParameter,weight);	
