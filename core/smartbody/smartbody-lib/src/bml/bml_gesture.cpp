@@ -5,7 +5,7 @@
 #include <string>
 
 #include "bml_gesture.hpp"
-#include "sbm/mcontrol_util.h"
+
 #include "sb/SBScene.h"
 #include "bml_xml_consts.hpp"
 #include <sb/SBGestureMap.h>

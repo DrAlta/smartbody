@@ -34,7 +34,7 @@
 #include "bml_locomotion.hpp"
 #include "bml_event.hpp"
 
-#include "sbm/mcontrol_util.h"
+
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 

@@ -24,7 +24,7 @@
 #include <cstdlib>
 #include <ctime> 
 #include <math.h>
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 

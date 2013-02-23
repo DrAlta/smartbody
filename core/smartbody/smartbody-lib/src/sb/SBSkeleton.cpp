@@ -2,8 +2,9 @@
 #include "SBJoint.h"
 #include "SBPawn.h"
 #include "SBAttribute.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBCharacterListener.h>
 #include <sr/sr_string.h>
@@ -238,7 +239,7 @@ SBPawn* SBSkeleton::getPawn()
 {
 	// determine which character uses this skeleton
 	// NOTE: there should be back pointer between the skeleton and the pawn/character
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
@@ -263,7 +264,7 @@ void SBSkeleton::update()
 	if (character)
 	{
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		if (scene->getCharacterListener())
 			scene->getCharacterListener()->OnCharacterUpdate( character->getName().c_str(), character->getClassType() );
 	}

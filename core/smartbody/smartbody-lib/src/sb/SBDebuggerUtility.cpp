@@ -10,7 +10,7 @@
 #include <sb/SBMotion.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
-#include <sbm/mcontrol_util.h>
+
 #include <sr/sr_camera.h>
 
 

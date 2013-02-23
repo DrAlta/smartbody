@@ -10,7 +10,7 @@
 #include "SBBehavior.h"
 #include <sb/SBMotion.h>
 #include <sb/SBParseNode.h>
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBScene.h>
 #include <sb/SBScript.h>
 #include <sb/SBService.h>
@@ -46,6 +46,8 @@
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
 #include <stdlib.h>
+#include <sbm/GenericViewer.h>
+#include <controllers/me_ct_motion.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -1752,7 +1754,7 @@ void initPython(std::string pythonLibPath)
 
 	XMLPlatformUtils::Initialize(); 
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::string pythonHome = pythonLibPath + "/..";
 #ifdef __ANDROID__
 	std::string libPath = getenv("LD_LIBRARY_PATH");

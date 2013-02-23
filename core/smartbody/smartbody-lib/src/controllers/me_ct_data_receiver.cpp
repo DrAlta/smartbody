@@ -1,6 +1,6 @@
 #include "controllers/me_ct_data_receiver.h"
 #include <sr/sr_euler.h>
-#include <sbm/mcontrol_util.h>
+
 
 std::string MeCtDataReceiver::CONTROLLER_TYPE = "DataReceiver";
 
@@ -71,7 +71,7 @@ void MeCtDataReceiver::removeLocalPosition(const std::string& jName)
 
 bool MeCtDataReceiver::controller_evaluate(double t, MeFrameData& frame)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if (_prevTime == 0)
 		_dt = 0.016;
 	else

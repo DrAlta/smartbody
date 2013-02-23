@@ -6,7 +6,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBEvent.h>
 #include <sb/SBAssetManager.h>
-#include <sbm/mcontrol_util.h>
+
 #include <boost/algorithm/string.hpp>
 
 #include <sr/sr.h>
@@ -736,7 +736,7 @@ void SBAnimationBlend::plotMotionJointTrajectory(const std::string& motionName, 
 	SkSkeleton* sk = mo->connected_skeleton();
 	if(sk==0)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SBCharacter* sbSk = scene->getCharacter(chrName);
 		if(sbSk)
@@ -1035,7 +1035,7 @@ void SBAnimationBlend::removeMotion(const std::string& motionName)
 
 bool SBAnimationBlend::addSkMotion(const std::string& motion)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SBMotion* sbmotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motion);
 
 	if (sbmotion)
@@ -1124,7 +1124,7 @@ void SBAnimationBlend::validateCorrespondencePoints()
 {
 	for (int i = 0; i < getNumMotions(); i++)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motions[i]->getName());		
 		for (int j = 1; j < getNumCorrespondencePoints(); j++)
 		{
@@ -1144,7 +1144,7 @@ bool SBAnimationBlend::validateState()
 
 	for (int i=0; i < getNumMotions(); i++)
 	{
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motions[i]->getName());		
 		if ((int)keys.size() < i) // no keys for this state
 		{			

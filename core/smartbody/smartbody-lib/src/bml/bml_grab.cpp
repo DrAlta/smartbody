@@ -32,7 +32,7 @@
 
 #include "bml_grab.hpp"
 
-#include "sbm/mcontrol_util.h"
+
 #include "controllers/me_ct_hand.hpp"
 #include "controllers/me_controller_tree_root.hpp"
 
@@ -58,7 +58,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	if( attrHandle && XMLString::stringLen( attrHandle ) ) {
 		handle = asciiString(attrHandle);
 		// look for a gaze controller with that handle
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		const SbmCharacter* character = request->actor;
 		if (character)
 		{

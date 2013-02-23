@@ -97,7 +97,7 @@ RequestId remote_speech::requestSpeechAudio( const char* agentName, const std::s
 
 
 RequestId remote_speech::requestSpeechAudio( const char* agentName, std::string voiceCode, std::string text, const char* callbackCmd ){
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
     
 	msgNumber++; //to make the message number unique it must not belong to any single object instantiation and thus resides in "lookup" along with other items that must be globally accessable among all remote_speech objects
@@ -198,7 +198,7 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 void remote_speech::sendSpeechCommand(const char* cmd)
 {
 	//LOG("send speech command");
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SmartBody::SBScene::getScene()->getVHMsgManager()->send( "RemoteSpeechCmd", cmd ); //sends the remote speech command using singleton* MCU_p
 }
 void remote_speech::sendSpeechTimeout(std::ostringstream& outStream)
@@ -778,7 +778,7 @@ int remote_speech_test( srArgBuffer& args, SmartBody::SBCommandManager* manager)
 	}
 }
 
-int set_char_voice(char* char_name, char* voiceCode, mcuCBHandle* mcu_p) //handles the voice command
+int set_char_voice(char* char_name, char* voiceCode) //handles the voice command
 {	
 	if( SmartBody::SBScene::getScene()->getCharacter( char_name ) )	{ 
 		string voiceCodeStr= "";

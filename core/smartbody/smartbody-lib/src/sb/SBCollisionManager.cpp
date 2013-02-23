@@ -1,4 +1,5 @@
 #include "SBCollisionManager.h"
+#include <sb/SBAttribute.h>
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSteerManager.h>
@@ -7,7 +8,7 @@
 #include <sb/SBEvent.h>
 #include <sbm/ODEPhysicsSim.h>
 #include <boost/lexical_cast.hpp>
-#include <sbm/mcontrol_util.h>
+
 
 namespace SmartBody {
 

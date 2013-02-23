@@ -25,7 +25,7 @@
 #include <FL/Fl_Hold_Browser.H>
 #include "sb/SBScene.h"
 #include "sb/SBMotion.h"
-#include "sbm/mcontrol_util.h"
+
 #include "ParamAnimBlock.h"
 #include "ParamAnimEditorWidget.h"
 #include "PanimationWindow.h"

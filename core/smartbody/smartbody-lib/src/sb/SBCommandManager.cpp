@@ -9,9 +9,105 @@
 #include <sbm/sbm_test_cmds.hpp>
 #include <sbm/text_speech.h>
 #include <sbm/local_speech.h>
+#include <bml/bml_processor.hpp>
 #include <bml/bml.hpp>
 
+
+SequenceManager::SequenceManager()
+{
+}
+
+SequenceManager::~SequenceManager()
+{
+	clear();
+}
+
+void SequenceManager::clear()
+{
+	for (size_t x = 0; x < _sequences.size(); x++)
+	{
+		srCmdSeq* seq = _sequences[x].second;
+		seq->reset();
+		while(char* cmd = seq->pull() )	{
+			delete [] cmd;
+		}
+		delete seq;
+	}
+
+	_sequenceSet.clear();
+	_sequences.clear();
+}
+
+bool SequenceManager::addSequence(const std::string& seqName, srCmdSeq* seq)
+{
+	if (_sequenceSet.find(seqName) != _sequenceSet.end())
+		return false;
+
+	_sequenceSet.insert(seqName);
+	_sequences.push_back(std::pair<std::string, srCmdSeq*>(seqName, seq));
+	return true;
+}
+
+bool SequenceManager::removeSequence(const std::string& seqName, bool deleteSequence)
+{
+	std::set<std::string>::iterator iter = _sequenceSet.find(seqName);
+	if (iter == _sequenceSet.end())
+		return false;
+
+	_sequenceSet.erase(iter);
+
+	for (std::vector<std::pair<std::string, srCmdSeq*> >::iterator iter = _sequences.begin();
+		iter != _sequences.end();
+		iter++)
+	{
+		if ((*iter).first == seqName)
+		{
+			if (deleteSequence)
+				delete (*iter).second;
+			_sequences.erase(iter);
+			return true;
+		}
+	}
+
+	LOG("Could not find sequence in active sequence queue. Please check code - this should not happen.");
+	return false;
+}
+
+srCmdSeq* SequenceManager::getSequence(const std::string& name)
+{
+	for (std::vector<std::pair<std::string, srCmdSeq*> >::iterator iter = _sequences.begin();
+		iter != _sequences.end();
+		iter++)
+	{
+		if ((*iter).first == name)
+		{
+			return (*iter).second;
+		}
+	}
+
+	return NULL;
+}
+
+srCmdSeq* SequenceManager::getSequence(int num, std::string& name)
+{
+	if (_sequences.size() > (size_t) num)
+	{
+		name = _sequences[num].first;
+		return _sequences[num].second;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+int SequenceManager::getNumSequences()
+{
+	return _sequences.size();
+}
 namespace SmartBody {
+
+
 
 SBCommandManager::SBCommandManager()
 {
@@ -90,9 +186,9 @@ void SBCommandManager::registerCallbacks()
 	insert( "wsp",			mcu_wsp_cmd_func );
 	insert( "create_remote_pawn", create_remote_pawn_func );
 
-	insert( "vrAgentBML",   BML_PROCESSOR::vrAgentBML_cmd_func );
-	insert( "bp",		    BML_PROCESSOR::bp_cmd_func );
-	insert( "vrSpeak",		BML_PROCESSOR::vrSpeak_func );
+	insert( "vrAgentBML",   BML::Processor::vrAgentBML_cmd_func );
+	insert( "bp",		    BML::Processor::bp_cmd_func );
+	insert( "vrSpeak",		BML::Processor::vrSpeak_func );
 	insert( "vrExpress",  mcu_vrExpress_func );
 
 	insert( "receiver",		mcu_joint_datareceiver_func );
@@ -145,13 +241,13 @@ void SBCommandManager::registerCallbacks()
 	insert( "startheapprofile",			   startheapprofile_func );
 	insert( "stopheapprofile",			   stopheapprofile_func );
 #endif
-	insert_set_cmd( "bp",             BML_PROCESSOR::set_func );
+	insert_set_cmd( "bp",             BML::Processor::set_func );
 	insert_set_cmd( "pawn",           pawn_set_cmd_funcx );
 	insert_set_cmd( "character",      character_set_cmd_func );
 	insert_set_cmd( "char",           character_set_cmd_func );
 	insert_set_cmd( "face",           mcu_set_face_func );
 	
-	insert_print_cmd( "bp",           BML_PROCESSOR::print_func );
+	insert_print_cmd( "bp",           BML::Processor::print_func );
 	insert_print_cmd( "face",         mcu_print_face_func );
 	
 	insert_test_cmd( "bml",  test_bml_func );

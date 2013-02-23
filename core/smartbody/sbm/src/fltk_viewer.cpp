@@ -16,9 +16,6 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SBM.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
  */
 
 #include "FL/Fl_Slider.H"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
@@ -86,6 +83,7 @@
 # include <sb/SBBehaviorSetManager.h>
 # include <sb/SBSimulationManager.h>
 # include <sb/SBAssetManager.h>
+# include <sb/SBBmlProcessor.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -93,12 +91,11 @@
 #include <boost/lexical_cast.hpp>
 
 #include <sbm/Heightfield.h>
-
-
+#include <bml/bml_processor.hpp>
 
 #include "jointmapviewer/JointMapViewer.h"
 #include "jointmapviewer/RetargetStepWindow.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sbm/PPRAISteeringAgent.h>
 
 //#include <sbm/SbmShader.h>
@@ -1265,7 +1262,7 @@ void cameraInverse(float* dst, float* src)
 
 void FltkViewer::drawAllGeometries(bool shadowPass)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	// update deformable mesh
     bool hasGPUSupport = SbmShaderManager::getShaderSupport() != SbmShaderManager::NO_GPU_SUPPORT;
 	SrMat shadowTexMatrix;
@@ -1444,7 +1441,7 @@ void FltkViewer::draw()
 		_objManipulator.picking(pick_loc.x,pick_loc.y, cam);	   
    }  
 
-   mcuCBHandle& mcu = mcuCBHandle::singleton();
+   
    glViewport ( 0, 0, w(), h() );
    SrLight &light = _data->light;
   
@@ -4668,8 +4665,8 @@ SrVec& GestureData::getSyncPointColor(int type)
 
 void GestureData::toggleFeedback(bool val)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.bml_processor.set_bml_feedback(val);
+	BML::Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
+	bp->set_bml_feedback(val);
 }
 
 void GestureData::reset()

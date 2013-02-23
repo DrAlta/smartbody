@@ -33,7 +33,7 @@
 
 #include "bml_bodyreach.hpp"
 
-#include "sbm/mcontrol_util.h"
+
 #include "controllers/me_ct_example_body_reach.hpp"
 #include "controllers/me_controller_tree_root.hpp"
 #include <sb/SBCharacter.h>
@@ -88,7 +88,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 	std::string handle = xml_parse_string(BMLDefs::ATTR_HANDLE, elem, "", REQUIRED_ATTR);//"";
 	if( !handle.empty() ) {		
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		const SbmCharacter* character = request->actor;
 		if (character)
 		{

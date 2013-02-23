@@ -816,7 +816,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
 	  std::string dumpXMLstring = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + xml;
 	  fprintf(_outXML, "%d: %s\n\n", _dumpCounter - 1, dumpXMLstring.c_str() );
 #endif
-	  mcuCBHandle& mcu = mcuCBHandle::singleton();
+	  
 	  string replyCmd = "RemoteSpeechReply ";
 	  replyCmd = replyCmd + reply; //cmdConst;
 	  mcu.execute_later(replyCmd.c_str());
@@ -1200,7 +1200,7 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	//LOG("Sound path name = %s\n",soundPathName.c_str());
 
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	char* cmdConst = const_cast<char*>(remoteSpeechReply.c_str());
 	string replyCmd = "RemoteSpeechReply ";
 	replyCmd = replyCmd + remoteSpeechReply; //cmdConst;

@@ -8,7 +8,7 @@
 #include <sstream>
 #include <sbm/sr_arg_buff.h>
 #include <sbm/sbm_constants.h>
-#include <sbm/mcontrol_util.h>
+
 
 #ifdef __ANDROID__
 #define LINK_VHMSG_CLIENT		(1)

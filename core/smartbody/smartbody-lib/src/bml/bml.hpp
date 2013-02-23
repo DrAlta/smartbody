@@ -37,7 +37,7 @@
 #include "bml/behavior_scheduler.hpp"
 #include "bml/behavior_scheduler_constant_speed.hpp" // temporary, for BEHAVIOR_TIMING_BY_DURATION macro
 
-#include "sbm/mcontrol_util.h"
+
 #include "sb/sbm_character.hpp"
 
 #include "sbm/xercesc_utils.hpp"

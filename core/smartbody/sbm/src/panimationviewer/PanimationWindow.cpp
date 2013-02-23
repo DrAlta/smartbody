@@ -26,7 +26,7 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
-#include <sbm/mcontrol_util.h>
+
 #include <bml/bml.hpp>
 #include "ParamAnimBlock.h"
 #include "ParamAnimEditorWidget.h"
@@ -177,7 +177,7 @@ bool PanimationWindow::checkCommand(std::string command)
 void PanimationWindow::execCmd(PanimationWindow* window, std::string cmd, double tOffset)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	BML::SbmCommand* command = new BML::SbmCommand(cmd, (float)(SmartBody::SBScene::getScene()->getSimulationManager()->getTime() + tOffset));
 	bool success = true;

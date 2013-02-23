@@ -1,6 +1,6 @@
 #include "controllers/me_ct_noise_controller.h"
 #include <sr/sr_euler.h>
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBSkeleton.h>
 
 std::string MeCtNoiseController::CONTROLLER_TYPE = "NoiseController";
@@ -54,7 +54,7 @@ float MeCtNoiseController::getNormalizeTime( float t, float offset )
 
 bool MeCtNoiseController::controller_evaluate(double t, MeFrameData& frame)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if (_prevTime == 0)
 		_dt = 0.016;
 	else

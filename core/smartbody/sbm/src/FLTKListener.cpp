@@ -19,7 +19,7 @@ FLTKListener::~FLTKListener()
 
 void FLTKListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
@@ -85,7 +85,7 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 
 void FLTKListener::OnCharacterDelete( const std::string & name )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
@@ -189,7 +189,7 @@ void FLTKListener::OnCharacterChangeMesh( const std::string& name )
 
 void FLTKListener::OnPawnCreate( const std::string & name )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
 	if (!pawn)
 		return;
@@ -270,7 +270,7 @@ void FLTKListener::OnPawnCreate( const std::string & name )
 
 void FLTKListener::OnPawnDelete( const std::string & name )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
 	if (!pawn)
 		return;

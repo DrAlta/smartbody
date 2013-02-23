@@ -6,11 +6,12 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <sr/sr_timer.h>
 #include "MeCtReachEngine.h"
-#include "sbm/mcontrol_util.h"
+
 #include "controllers/me_ct_barycentric_interpolation.h"
 #include "controllers/me_ct_inverse_interpolation.h"
 #include <sb/SBEvent.h>
 #include "MeCtBodyReachState.h"
+#include <sb/sbm_character.hpp>
 
 
 
@@ -535,7 +536,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 		reachData->locomotionComplete = (curCharacter->_reachTarget && !curCharacter->_lastReachStatus);		
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	//reachData->hasSteering = (SmartBody::SBScene::getScene()->getSteerManager()->isInitialized());
 
 	curReachState->updateEffectorTargetState(reachData);		

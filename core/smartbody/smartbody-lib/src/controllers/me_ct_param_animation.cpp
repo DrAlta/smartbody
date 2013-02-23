@@ -21,7 +21,7 @@
  */
 
 #include "controllers/me_ct_param_animation.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBCharacter.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
@@ -101,7 +101,7 @@ double MeCtParamAnimation::controller_duration()
 
 bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 {	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	double timeStep = t - prevGlobalTime;
 	prevGlobalTime = t;

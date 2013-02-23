@@ -23,7 +23,7 @@
 #include "vhcl.h"
 
 #include <controllers/me_ct_container.hpp>
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 

@@ -15,16 +15,14 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SmartBody-lib.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
  */
 
 #ifndef SBM_TEST_CMDS_HPP
 #define SBM_TEST_CMDS_HPP
 
+#include <sb/SBCommandManager.h>
 #include "sr_arg_buff.h"
-#include "sbm/mcontrol_util.h"
+
 
 /**
  *  Handles the "test bml ..." commands.

@@ -1,5 +1,5 @@
 #include "SBReachManager.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBScene.h>
 #include <sb/SBReach.h>
 
@@ -15,7 +15,7 @@ SBReachManager::~SBReachManager()
 
 SBReach* SBReachManager::createReach(std::string characterName)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SBScene* scene = SmartBody::SBScene::getScene();
 	// get the character
 	SBCharacter* character = scene->getCharacter(characterName);

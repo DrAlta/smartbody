@@ -26,7 +26,8 @@
 #include <sstream>
 #include <string>
 
-#include "sbm/mcontrol_util.h"
+#include <sb/SBScene.h>
+
 #include "sbm/xercesc_utils.hpp"
 #include "bml_general_param.hpp"
 #include "sbm/general_param_setting.h"
@@ -59,9 +60,9 @@ BehaviorRequestPtr BML::parse_bml_param( DOMElement* elem, const std::string& un
 
 	int channel_size = 0;
 	int Index = 0;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	GeneralParamMap::const_iterator pos	=	mcu.param_map.begin();
-	GeneralParamMap::const_iterator end	=	mcu.param_map.end();
+	
+	GeneralParamMap::const_iterator pos	=	SmartBody::SBScene::getScene()->getGeneralParameters().begin();
+	GeneralParamMap::const_iterator end	=	SmartBody::SBScene::getScene()->getGeneralParameters().end();
 
 	string char_name;
 	string unique_id_copy = unique_id;

@@ -5,7 +5,8 @@
 #include <algorithm>
 #include <time.h>
 #include <boost/foreach.hpp>
-#include "sbm/mcontrol_util.h"
+#include <sb/sbm_character.hpp>
+
 #include "controllers/MeCtReachEngine.h"
 using namespace boost;
 
@@ -98,7 +99,7 @@ MeCtHand::~MeCtHand( void )
 
 SbmPawn* MeCtHand::getAttachedPawn()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SbmPawn* attachedPawn =  SmartBody::SBScene::getScene()->getPawn(attachedPawnName);	
 	if (attachedPawnName != "" && !attachedPawn) // pawn is removed
 	{
@@ -110,7 +111,7 @@ SbmPawn* MeCtHand::getAttachedPawn()
 
 SbmPawn* MeCtHand::getTargetObject()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SbmPawn* targetObject =  SmartBody::SBScene::getScene()->getPawn(grabTargetName);
 	if (grabTargetName != "" && !targetObject) // pawn is removed
 		grabTargetName = "";

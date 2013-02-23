@@ -15,12 +15,6 @@
 *  You should have received a copy of the Lesser GNU General Public
 *  License along with SmartBody-lib.  If not, see:
 *      http://www.gnu.org/licenses/lgpl-3.0.txt
-*
-*  CONTRIBUTORS:
-*      Andrew n marshall, USC
-*      Marcus Thiebaux, USC
-*      Ed Fast, USC
-*      Ashok Basawapatna, USC (no longer)
 */
 
 #include "vhcl.h"
@@ -39,9 +33,10 @@
 #include "sbm/sbm_constants.h"
 #include <sbm/general_param_setting.h>
 #include <sbm/action_unit.hpp>
+#include <controllers/me_prune_policy.hpp>
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_time_shift_warp.hpp>
-#include "sbm/mcontrol_util.h"
+
 #include "sbm/mcontrol_callbacks.h"
 #include "sb/SBScene.h"
 #include <controllers/me_spline_1d.hpp>
@@ -64,6 +59,7 @@
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBCharacterListener.h>
+#include <controllers/me_ct_examples.h>
 #include <controllers/me_ct_motion_player.h>
 #include <controllers/me_ct_pose.h>
 #include <controllers/me_ct_quick_draw.h>
@@ -268,7 +264,7 @@ SbmCharacter::~SbmCharacter( void )	{
 	delete pointHandData;
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if (scene->getCharacterListener())
 	{
 		scene->getCharacterListener()->OnCharacterDelete( getName() );
@@ -507,7 +503,7 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( record_ct );
 
 	// get the default attributes from the default controllers
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::vector<SmartBody::SBController*>& defaultControllers = SmartBody::SBScene::getScene()->getDefaultControllers();
 	for (size_t x = 0; x < defaultControllers.size(); x++)
 	{
@@ -660,7 +656,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 					   const char* classType)
 {
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	// Store pointers for access via init_skeleton()
 
@@ -928,7 +924,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	r_effector_name = std::string(name)+"_right_effector";
 	l_effector_name = std::string(name)+"_left_effector";	
 	// initialize two pawns as end effector
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	char pawnInitCmd[256];
 	sprintf(pawnInitCmd,"pawn %s init",r_effector_name.c_str());
 	mcu.execute(pawnInitCmd);
@@ -1086,7 +1082,6 @@ bool test_ct_for_pruning( MeCtScheduler2::TrackPtr track ) {
 // Recursive portion of SbmCharacter::prune_controller_tree
 void prune_schedule( SbmCharacter*   actor,
 					MeCtScheduler2* sched,
-					mcuCBHandle*    mcu_p,
 					double          time,
 					MeCtScheduler2* posture_sched_p,
 					//////  Higher priority controllers....
@@ -1275,7 +1270,7 @@ void prune_schedule( SbmCharacter*   actor,
 											MeCtSimpleNod* nod2_ct = NULL;
 											MeController*  motion2_ct = NULL;
 											MeCtPose*      pose2_ct = NULL;
-											prune_schedule( actor, sched_ct, mcu_p, time_offset, posture_sched_p, gaze_key2_cts, nod2_ct, motion2_ct, pose2_ct, raw_channels );
+											prune_schedule( actor, sched_ct, time_offset, posture_sched_p, gaze_key2_cts, nod2_ct, motion2_ct, pose2_ct, raw_channels );
 
 											delete[] gaze_key2_cts;
 											//if( sched_ct->count_children()==0 ) {
@@ -1284,7 +1279,7 @@ void prune_schedule( SbmCharacter*   actor,
 
 											in_use = true;
 										} else {
-											prune_schedule( actor, sched_ct, mcu_p, time_offset, posture_sched_p, gaze_key_cts, nod_ct, motion_ct, pose_ct, raw_channels );
+											prune_schedule( actor, sched_ct, time_offset, posture_sched_p, gaze_key_cts, nod_ct, motion_ct, pose_ct, raw_channels );
 											in_use = sched_ct->count_children()>0;
 										}
 									} else if( anim_ct_type == MeCtSimpleNod::_type_name )
@@ -1539,7 +1534,7 @@ void prune_schedule( SbmCharacter*   actor,
 */
 int SbmCharacter::prune_controller_tree( )
 {
-	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
+	
 
 	double time = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();  // current time
 
@@ -1560,12 +1555,12 @@ int SbmCharacter::prune_controller_tree( )
 	SkChannelArray raw_channels;
 
 	// Traverse the controller tree from highest priority down, most recent to earliest
-	prune_schedule( this, head_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
-	prune_schedule( this, reach_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
-	prune_schedule( this, grab_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
-	prune_schedule( this, gaze_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
-	prune_schedule( this, constraint_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
-	prune_schedule( this, motion_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, head_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, reach_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, grab_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, gaze_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, constraint_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, motion_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 
 	// For the posture track, ignore prior controllers, as they should never be used to mark a posture as unused
 	for( int key=0; key<MeCtGaze::NUM_GAZE_KEYS; ++key )
@@ -1574,7 +1569,7 @@ int SbmCharacter::prune_controller_tree( )
 	motion_ct = NULL;  // also covers quickdraw
 	pose_ct   = NULL;
 	raw_channels = SkChannelArray::empty_channel_array();
-	prune_schedule( this, posture_sched_p, mcu_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	prune_schedule( this, posture_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 
 	if( LOG_CONTROLLER_TREE_PRUNING ) {
 		LOG("");
@@ -2427,7 +2422,7 @@ void SbmCharacter::addVisemeChannel(std::string visemeName, SkMotion* motion)
 void SbmCharacter::addVisemeChannel(std::string visemeName, std::string motionName)
 {
 	// find the motion
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	if (motionName != "")
 	{
@@ -2536,7 +2531,7 @@ bool SbmCharacter::checkExamples()
 		steersuiteAgent->updateSteerStateName();
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::string prefix = this->getName();
 	if (this->statePrefix != "")
 	{

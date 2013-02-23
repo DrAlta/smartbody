@@ -5,12 +5,14 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sr/sr_timer.h>
-#include "sbm/mcontrol_util.h"
+
 #include <sb/SBScene.h>
 #include <sb/SBCommandManager.h>
+#include <sb/SBEvent.h>
+#include <sb/sbm_character.hpp>
 #include "me_ct_example_body_reach.hpp"
 #include "me_ct_barycentric_interpolation.h"
-#include <sb/SBEvent.h>
+
 #include "MeCtBodyReachState.h"
 #include <sb/SBSteerManager.h>
 #include <controllers/me_ct_example_body_reach.hpp>
@@ -219,7 +221,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	SrVec distanceVec(x, y, z);
 	float dist = currentReachData->XZDistanceToTarget(distanceVec);	
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if (currentReachEngine->curHandActionState == MeCtReachEngine::POINT_AT_OBJECT || !useLocomotion)
 	{
 		if (currentReachEngine->getCurrentState()->curStateName() == "Idle" && startReach)
@@ -383,7 +385,7 @@ void MeCtExampleBodyReach::setNewReachEngine( MeCtReachEngine* newEngine )
 bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 {	
 	//updateDefaultVariables(frame);	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	
 	updateDt((float)t);	
 	updateChannelBuffer(frame,inputMotionFrame,true);	

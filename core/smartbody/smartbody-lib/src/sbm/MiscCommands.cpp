@@ -1,6 +1,6 @@
 #include "MiscCommands.h"
 
-#include <sbm/mcontrol_util.h>
+
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/local_speech.h>
 #include <sbm/text_speech.h>
@@ -16,6 +16,8 @@
 #include <sb/SBMotion.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCommandManager.h>
+#include <sb/SBBmlProcessor.h>
+#include <bml/bml_processor.hpp>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_gaze.h>
@@ -33,7 +35,7 @@
 
 int set_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args)
 {
-	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
+	
 
 	if( attribute=="world_offset" || attribute=="world-offset" ) {
 		//  Command: set pawn <character id> world_offset ...
@@ -89,7 +91,6 @@ int set_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args)
 #if USE_WSP
 WSP::WSP_ERROR remote_pawn_position_update( std::string id, std::string attribute_name, wsp_vector & vector_3d, void * data, const std::string & data_provider )
 {
-	mcuCBHandle * mcu_p = static_cast< mcuCBHandle * >( data );
 	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(id);
 	if ( pawn != NULL )
 	{
@@ -111,8 +112,6 @@ WSP::WSP_ERROR remote_pawn_position_update( std::string id, std::string attribut
 
 WSP::WSP_ERROR remote_pawn_rotation_update( std::string id, std::string attribute_name, wsp_vector & vector_4d, void * data, const std::string & data_provider )
 {
-	mcuCBHandle * mcu_p = static_cast< mcuCBHandle * >( data );
-
 	SbmPawn * pawn_p =  SmartBody::SBScene::getScene()->getPawn( id );
 
 	if ( pawn_p != NULL )
@@ -151,7 +150,7 @@ int pawn_set_cmd_funcx( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 		return CMD_FAILURE;
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	SbmPawn* pawn =  SmartBody::SBScene::getScene()->getPawn( pawn_id );
 	if( pawn==NULL ) {
@@ -170,7 +169,7 @@ int pawn_set_cmd_funcx( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 
 int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 {
-	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
+	
 	//  Command: set character voice <speech_impl> <character id> voice <implementation-id> <voice code>
 	//  Where <implementation-id> is "remote" or "audiofile"
 	//  Sets character's voice code
@@ -233,7 +232,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 
 int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 {
-	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
+	
 	//  Command: set character voice <speech_impl> <character id> voice <implementation-id> <voice code>
 	//  Where <implementation-id> is "remote" or "audiofile"
 	//  Sets character's voice code
@@ -302,7 +301,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	std::string pawn_name = args.read_token();
 	if( pawn_name.length()==0 )
@@ -490,7 +489,7 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 
 int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
 	std::string char_name = args.read_token();
 	if( char_name.length()==0 ) {
@@ -544,14 +543,14 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	if( char_name == "*" ) {
 
 		all_characters = true;
-		const std::vector<std::string>& characters =  SmartBody::SBScene::getScene()->getCharacterNames();
+		const std::vector<std::string>& characters =  scene->getCharacterNames();
 
 		for (std::vector<std::string>::const_iterator citer = characters.begin();
 			citer != characters.end();
 			citer++)
 		{
 			srArgBuffer copy_args( args.peek_string() );
-			character = SmartBody::SBScene::getScene()->getCharacter( *citer );
+			character = scene->getCharacter( *citer );
 			int err = character_parse_character_command( character, char_cmd, copy_args, true );
 			if( err != CMD_SUCCESS )
 				return( err );
@@ -559,7 +558,7 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 		return( CMD_SUCCESS );
 	} 
 
-	character = SmartBody::SBScene::getScene()->getCharacter( char_name );
+	character = scene->getCharacter( char_name );
 	if( character ) {
 
 		int err = character_parse_character_command( character, char_cmd, args, false );
@@ -574,7 +573,7 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 		char* skel_file = args.read_token();
 		char* type = args.read_token();
 		return(	
-			mcu_character_init( char_name.c_str(), skel_file, type, SmartBody::SBScene::getScene()->getCommandManager() )
+			mcu_character_init( char_name.c_str(), skel_file, type, scene->getCommandManager() )
 			);
 	} 
 	else
@@ -601,14 +600,14 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 			}
 			new_param->char_names.push_back( char_name );
 			GeneralParamMap::iterator it; 
-			if( (it = mcu.param_map.find(param_name)) != mcu.param_map.end())
+			if( (it = scene->getGeneralParameters().find(param_name)) != scene->getGeneralParameters().end())
 			{
 				it->second->char_names.push_back( char_name );
 				delete new_param;
 			}
 			else
 			{
-				mcu.param_map.insert(make_pair(std::string(param_name),new_param));
+				scene->getGeneralParameters().insert(make_pair(std::string(param_name),new_param));
 			}
 			return( CMD_SUCCESS );
 		}
@@ -621,7 +620,7 @@ int create_remote_pawn_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	std::string pawn_and_attribute = args.read_token();
 	int interval = args.read_int();
@@ -773,7 +772,7 @@ int set_world_offset_cmd( SbmPawn* pawn, srArgBuffer& args )
 
 int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 {
-	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
+	
 
 	if (cmd == "remove")
 	{	
@@ -901,8 +900,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 {
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
-
+	
 	if (cmd == "mesh")
 	{
 		if (!character->dMesh_p)
@@ -918,10 +916,10 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 		}
 		std::string meshName = meshdir;
 
-		std::map<std::string, DeformableMesh*>::iterator iter = mcu_p->deformableMeshMap.find(meshName);
-		if (iter != mcu_p->deformableMeshMap.end())
+		DeformableMesh* mesh = scene->getAssetManager()->getDeformableMesh(meshName);
+		if (mesh)
 		{
-			DeformableMesh* deformableMesh = (*iter).second;
+			DeformableMesh* deformableMesh = mesh;
 			// mesh already exist, 
 			LOG("Mesh %s already exist, using mesh instance.",meshName.c_str());
 			character->dMesh_p = deformableMesh;		
@@ -1074,7 +1072,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 		{
 			// insert mesh map
 			character->dMesh_p->meshName = meshName;
-			mcu_p->deformableMeshMap[meshName] = character->dMesh_p;
+			scene->getAssetManager()->addDeformableMesh(meshName, character->dMesh_p);
 			character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
 
 		}
@@ -1212,9 +1210,9 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 						else 
 							if (cmd == "requests")
 							{
-								BML::Processor& bp = mcu_p->bml_processor;
-								for (std::map<std::string, BML::BmlRequestPtr >::iterator iter = bp.getBMLRequestMap().begin();
-									iter != bp.getBMLRequestMap().end();
+								BML::Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
+								for (std::map<std::string, BML::BmlRequestPtr >::iterator iter = bp->getBMLRequestMap().begin();
+									iter != bp->getBMLRequestMap().end();
 									iter++)
 								{
 									if (all_characters)
@@ -1239,9 +1237,9 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 							if (cmd == "interrupt")
 							{
 								int numRequestsInterrupted = 0;
-								BML::Processor& bp = mcu_p->bml_processor;
-								for (std::map<std::string, BML::BmlRequestPtr >::iterator iter = bp.getBMLRequestMap().begin();
-									iter != bp.getBMLRequestMap().end();
+								BML::Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
+								for (std::map<std::string, BML::BmlRequestPtr >::iterator iter = bp->getBMLRequestMap().begin();
+									iter != bp->getBMLRequestMap().end();
 									iter++)
 								{
 									std::string requestWithName = (*iter).second->requestId;
@@ -1596,7 +1594,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 							if( print_track )	{
 								LOG( "char '%s' gaze tracks:",character->getName().c_str() );
 							}
-							mcuCBHandle& mcu = mcuCBHandle::singleton();
+							
 							double curTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 							MeCtScheduler2::VecOfTrack track_vec = character->gaze_sched_p->tracks();
 							int n = track_vec.size();

@@ -28,7 +28,7 @@
 
 #include <sb/SBScene.h>
 
-#include "sbm/mcontrol_util.h"
+
 #include "bml_processor.hpp"
 #include "bml_interrupt.hpp"
 #include "sbm/xercesc_utils.hpp"

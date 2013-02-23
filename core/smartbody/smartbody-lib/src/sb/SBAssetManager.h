@@ -6,6 +6,7 @@
 #include <sb/SBObject.h>
 #include <map>
 #include <boost/filesystem/path.hpp>
+#include <sbm/sbm_deformable_mesh.h>
 
 class srPathList;
 
@@ -57,7 +58,11 @@ class SBAssetManager : public SBObject
 		SBAPI FILE* open_sequence_file( const char *seq_name, std::string& fullPath );
 
 		SBAPI const std::string findFileName(const std::string& type, const std::string& filename);
-
+		SBAPI void addDeformableMesh(const std::string& meshName, DeformableMesh* mesh);
+		SBAPI void removeDeformableMesh(const std::string& meshName);
+		SBAPI DeformableMesh* getDeformableMesh(const std::string& meshName);
+		SBAPI void removeAllDeformableMeshes();
+		
 protected:
 
 		SmartBody::SBSkeleton* load_skeleton( const char *filename, srPathList &path_list, double scale = 1.0 );
@@ -82,6 +87,8 @@ protected:
 		srPathList*	me_paths;
 		srPathList*	audio_paths;
 		srPathList*	mesh_paths;
+
+		std::map<std::string, DeformableMesh*> _deformableMeshMap;
 
 };
 

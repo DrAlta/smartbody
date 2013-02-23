@@ -23,7 +23,7 @@
 */
 
 #include "vhcl.h"
-#include <sbm/mcontrol_util.h>
+
 #include "sbm_pawn.hpp"
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
@@ -43,7 +43,7 @@
 #include <controllers/me_ct_curve_writer.hpp>
 #include "sbm/sbm_constants.h"
 #include <sbm/SteerSuiteEngineDriver.h>
-
+#include <sbm/sr_arg_buff.h>
 #include "sbm/sbm_deformable_mesh.h"
 
 #ifdef __APPLE__
@@ -65,8 +65,6 @@
 #include <iostream>
 
 #ifndef __native_client__
-
-// added by AShapiro 6/30/11 - not sure why the USE_WSP variable this is not being picked up in mcontrol_util.h
 
 #if USE_WSP
 #include "wsp.h"
@@ -189,7 +187,7 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 		LOG("Cannot set a null skeleton on object %s", getName().c_str());
 		return;
 	}
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 
 	if (_skeleton)
 	{		
@@ -229,7 +227,7 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 		}
 		ct_tree_p->add_skeleton( _skeleton->getName(), _skeleton );
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		if (scene->getCharacterListener())
 		{
 			scene->getCharacterListener()->OnCharacterChanged(getName());
@@ -405,7 +403,7 @@ void SbmPawn::exec_controller_cleanup( MeController* ct, mcuCBHandle* mcu_p ) {
 SbmPawn::~SbmPawn()	{
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if ( scene->getCharacterListener() )
 	{
 		scene->getCharacterListener()->OnCharacterDelete( getName() );
@@ -609,7 +607,7 @@ void SbmPawn::wo_cache_update() {
 
 int SbmPawn::remove_remote_pawn_func( srArgBuffer& args)
 {
-	mcuCBHandle* mcu_p = &mcuCBHandle::singleton();
+	
 
 	std::string pawn_name = args.read_token();
 
@@ -799,7 +797,7 @@ void SbmPawn::updateToColObject()
 
 void SbmPawn::updateToSteeringSpaceObject()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if (!SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())	return;
 	if (!SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine)	return;
 	if (steeringSpaceObj_p)
@@ -809,7 +807,7 @@ void SbmPawn::updateToSteeringSpaceObject()
 void SbmPawn::initSteeringSpaceObject()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	if (!scene->getSteerManager()->getEngineDriver()->isInitialized())	return;
 	if (!scene->getSteerManager()->getEngineDriver()->_engine)	return;
 

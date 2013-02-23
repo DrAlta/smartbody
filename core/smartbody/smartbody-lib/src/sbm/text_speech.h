@@ -13,7 +13,7 @@ class text_speech;
 #include "sr_arg_buff.h"
 #include "sb/sbm_character.hpp"
 // Predeclare class
-class mcuCBHandle;
+
 class srCmdSeq;
 
 
@@ -47,6 +47,6 @@ class text_speech: public SmartBody::SpeechInterface {
 
 
 // included after class definition b/c dependency
-#include "sbm/mcontrol_util.h"
+
 
 #endif

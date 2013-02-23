@@ -15,15 +15,6 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SBM.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
- *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
- *      Ed Fast, USC
- *      Ashok Basawapatna, USC (no longer)
- *      Eric Forbell, USC
- *      Thomas Amundsen, USC
  */
 
 #define ENABLE_CMDL_TEST		0
@@ -51,6 +42,7 @@
 #include <resourceViewer/ResourceWindow.h>
 #include <faceviewer/FaceViewer.h>
 #include <sbm/lin_win.h>
+#include <sb/SBBmlProcessor.h>
 #include "sbm/GPU/SbmShader.h"
 
 #ifndef USE_WSP
@@ -63,11 +55,11 @@
 
 #include <sbm/sbm_constants.h>
 #include <sbm/xercesc_utils.hpp>
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBScene.h>
 #include <sbm/mcontrol_callbacks.h>
 #include <sbm/sbm_test_cmds.hpp>
-#include BML_PROCESSOR_INCLUDE
+#include <bml/bml_processor.hpp>
 #include <sbm/remote_speech.h>
 #include <sbm/local_speech.h>
 #include <sbm/sbm_audio.h>
@@ -443,7 +435,7 @@ int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 int mcu_quit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )	{
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->getSimulationManager()->stop();
@@ -487,7 +479,7 @@ void mcu_register_callbacks( void ) {
 void cleanup( void )	{
 	{
 
-		mcuCBHandle& mcu = mcuCBHandle::singleton();
+		
 		if (SmartBody::SBScene::getScene()->getSimulationManager()->isStopped())
 		{
 			LOG( "SmartBody NOTE: unexpected exit " );
@@ -508,7 +500,6 @@ void cleanup( void )	{
 #endif
 	}
 
-	mcuCBHandle::destroy_singleton();
 	
 	XMLPlatformUtils::Terminate();
 
@@ -525,7 +516,7 @@ void cleanup( void )	{
 void signal_handler(int sig) {
 //	std::cout << "SmartBody shutting down after catching signal " << sig << std::endl;
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	SmartBody::SBScene::getScene()->getVHMsgManager()->send("vrProcEnd sbm" );
 	// get the current directory
@@ -674,19 +665,11 @@ int main( int argc, char **argv )	{
 	
 	XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	FLTKListener fltkListener;
 
-	// change the default font size
-	FL_NORMAL_SIZE = 12;
-	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
-	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
-	//viewerFactory->setFltkViewer(viewer);
-	SmartBody::SBScene::getScene()->setViewerFactory(viewerFactory);
-#if USE_OGRE_VIEWER > 0
-	SmartBody::SBScene::getScene()->setOgreViewerFactory(new OgreViewerFactory());
-#endif
+	
 	
 	
 
@@ -918,13 +901,18 @@ int main( int argc, char **argv )	{
 #ifndef SB_NO_PYTHON
 	// initialize python
 	LOG("Initializing Pyton with libraries at location: %s", python_lib_path.c_str());
+
+	SmartBody::SBScene::setSystemParameter("pythonlibpath", python_lib_path);
 	initPython(python_lib_path);
 #endif
 
+	
 	mcu_register_callbacks();
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->setCharacterListener(&fltkListener);
+
+
 
 	if (sleepFPS != -1.f)
 		scene->getSimulationManager()->setSleepFps( sleepFPS) ;
@@ -940,6 +928,17 @@ int main( int argc, char **argv )	{
 	}
 
 	scene->setMediaPath(mediaPath);
+
+// change the default font size
+	FL_NORMAL_SIZE = 12;
+	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
+	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
+	//viewerFactory->setFltkViewer(viewer);
+	SmartBody::SBScene::getScene()->setViewerFactory(viewerFactory);
+#if USE_OGRE_VIEWER > 0
+	SmartBody::SBScene::getScene()->setOgreViewerFactory(new OgreViewerFactory());
+#endif
+
 
 	SmartBody::SBScene::getScene()->getSpeechManager()->festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
 	SmartBody::SBScene::getScene()->getSpeechManager()->cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
@@ -1005,7 +1004,7 @@ int main( int argc, char **argv )	{
 
 		// Using a process id is a sign that we're running in a multiple SBM environment.
 		// So.. ignore BML requests with unknown agents by default
-		mcu.bml_processor.set_warn_unknown_agents( false );
+		SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor()->set_warn_unknown_agents( false );
 	}
 
 	if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))

@@ -2,9 +2,10 @@
 #include "vhcl.h"
 
 #include "sbm_deformable_mesh.h"
-#include "sbm/mcontrol_util.h"
+
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
+#include <sr/sr_sn_group.h>
 
 typedef std::pair<int,int> IntPair;
 typedef std::pair<int,float> IntFloatPair;

@@ -5,7 +5,7 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sr/sr_timer.h>
-#include "sbm/mcontrol_util.h"
+
 #include "sb/SBScene.h"
 #include <controllers/me_ct_motion_blend.hpp>
 #include <controllers/me_ct_example_body_reach.hpp>
@@ -63,7 +63,7 @@ void MeCtMotionBlend::setParameterVector( dVector& para )
 bool MeCtMotionBlend::controller_evaluate( double t, MeFrameData& frame )
 {	
 	//updateDefaultVariables(frame);	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();	
+		
 	updateDt((float)t);	
 	updateChannelBuffer(frame,inputMotionFrame,true);	
 

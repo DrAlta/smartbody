@@ -26,7 +26,7 @@
 #include <controllers/me_ct_container.hpp>
 #include <controllers/me_ct_motion.h>
 #include <sb/sbm_character.hpp>
-#include <sbm/mcontrol_util.h>
+
 #include <string>
 
 class MeCtMotionPlayer : public MeCtContainer

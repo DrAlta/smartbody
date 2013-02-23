@@ -1,6 +1,6 @@
 
 #include "vhcl.h"
-#include "sbm/mcontrol_util.h"
+
 #include "SBScene.h"
 #ifdef WIN32
 #include <direct.h>
@@ -53,6 +53,7 @@
 #include <sbm/ParserBVH.h>
 #include <sbm/Heightfield.h>
 #include <sbm/action_unit.hpp>
+#include <sbm/xercesc_utils.hpp>
 #include <sr/sr_camera.h>
 #include <controllers/me_ct_gaze.h>
 #include <controllers/me_ct_eyelid.h>
@@ -63,6 +64,8 @@
 #include <controllers/me_controller_tree_root.hpp>
 #include <sr/sr_sn_group.h>
 #include <sbm/GPU/SbmShader.h>
+#include <sbm/KinectProcessor.h>
+#include <sr/sr_sn_group.h>
 
 #ifndef WIN32
 #define _stricmp strcasecmp
@@ -83,9 +86,8 @@ SBScene::SBScene(void) : SBObject()
 
 void SBScene::initialize()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
-	mcu.reset();
 
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
@@ -164,7 +166,7 @@ void SBScene::initialize()
 	_rootGroup->ref();
 
 	_heightField = NULL;
-	mcu.kinectProcessor = new KinectProcessor();
+	_kinectProcessor = new KinectProcessor();
 
 	// Create default settings
 	createDefaultControllers();
@@ -271,20 +273,6 @@ void SBScene::cleanup()
 		service->stop();
 	}
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-
-	// remove the deformable meshes
-/*	for (std::map<std::string, DeformableMesh*>::iterator deformableIter =  mcu.deformableMeshMap.begin();
-		deformableIter !=  mcu.deformableMeshMap.end();
-		deformableIter++)
-	{
-		DeformableMesh* deformableMesh = (*deformableIter).second;
-		delete deformableMesh;
-	}
-	mcu.deformableMeshMap.clear();
-*/
-
-
 	removePendingCommands();
 
 	clearAttributes();
@@ -318,6 +306,8 @@ void SBScene::cleanup()
 	delete _commandManager;
 	delete _wspManager;
 
+	delete _kinectProcessor;
+
 	_sim = NULL;
 	_profiler = NULL;
 	_bml = NULL;
@@ -339,7 +329,9 @@ void SBScene::cleanup()
 	_speechManager = NULL;
 	_wspManager = NULL;
 
-	cameraTracking.clear();
+	_kinectProcessor = NULL;
+
+	_cameraTracking.clear();
 	
 	if (_heightField)
 	{
@@ -362,6 +354,57 @@ void SBScene::cleanup()
 		_vhmsgManager->send( "vrProcEnd sbm" );
 	
 	delete _vhmsgManager;	
+
+#ifndef SB_NO_PYTHON
+//	Py_Finalize();
+
+#if defined(WIN_BUILD)
+	{
+		// According to the python docs, .pyd files are not unloaded during Py_Finalize().
+		// This causes issues when trying to re-load the smartbody dll over and over.
+		// So, we force unload these .pyd files.  This list is all the standard .pyd files included in the Python26 DLLs folder.
+		// For reference:  http://docs.python.org/2/c-api/init.html  "Dynamically loaded extension modules loaded by Python are not unloaded"
+
+		// initPythonLibPath - eg:  "../../../../core/smartbody/Python26/Lib"
+		std::string pythonLibPath = Py_GetPythonHome();
+		HMODULE hmodule;
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/bz2.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/pyexpat.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/select.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/unicodedata.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/winsound.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_bsddb.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ctypes.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ctypes_test.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_elementtree.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_hashlib.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_msi.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_multiprocessing.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_socket.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_sqlite3.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ssl.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_testcapi.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_tkinter.pyd", pythonLibPath.c_str()).c_str());
+		FreeLibrary(hmodule);
+	}
+#endif  // WIN_BUILD
+#endif  // USE_PYTHON
 }
 
 SBScene::~SBScene(void)
@@ -398,7 +441,7 @@ SBScene::~SBScene(void)
 	delete _debuggerClient;
 	delete _debuggerUtility;
 
-//	mcuCBHandle& mcu = mcuCBHandle::singleton();
+//	
 	//mcu.reset();
 
 
@@ -455,7 +498,7 @@ const std::string& SBScene::getProcessId()
 
 void SBScene::update()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	// remote mode
 	if (isRemoteMode())
 	{
@@ -521,7 +564,7 @@ void SBScene::update()
 		{
 			int err = getCommandManager()->execute( cmd );
 			if( err != CMD_SUCCESS )	{
-				LOG( "mcuCBHandle::update ERR: execute FAILED: '%s'\n", cmd );
+				LOG( "update ERR: execute FAILED: '%s'\n", cmd );
 			}
 			delete [] cmd;
 		}
@@ -611,7 +654,7 @@ void SBScene::update()
 				 char_p->getSkeleton() && 
 				 char_p->bonebusCharacter)
 			{
-				getBoneBusManager()->NetworkSendSkeleton( char_p->bonebusCharacter, char_p->getSkeleton(), &mcu.param_map );
+				getBoneBusManager()->NetworkSendSkeleton( char_p->bonebusCharacter, char_p->getSkeleton(), &getGeneralParameters() );
 
 				const SkJoint * joint = char_p->get_world_offset_joint();
 
@@ -1048,7 +1091,7 @@ void SBScene::removeAllPawns()
 
 int SBScene::getNumCharacters() 
 {  
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 	return _characterMap.size(); 
 }
 
@@ -1166,13 +1209,13 @@ void SBScene::removePendingCommands()
 
 void SBScene::sendVHMsg(const std::string& message)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 	SmartBody::SBScene::getScene()->getVHMsgManager()->send(message.c_str());
 }
 
 void SBScene::sendVHMsg2(const std::string& message, const std::string& message2)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton(); 
+	 
 	SmartBody::SBScene::getScene()->getVHMsgManager()->send(message.c_str(), message2.c_str());
 }
 
@@ -1361,7 +1404,7 @@ SmartBody::SBFaceDefinition* SBScene::createFaceDefinition(const std::string& na
 
 void SBScene::removeFaceDefinition(const std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	// make sure the name doesn't already exist
 	std::map<std::string, SBFaceDefinition*>::iterator iter = _faceDefinitions.find(name);
@@ -2464,7 +2507,7 @@ SrCamera* SBScene::getActiveCamera()
 
 SrCamera* SBScene::getCamera(const std::string& name)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::map<std::string, SrCamera*>::iterator iter = _cameras.find(name);
 	if (iter == _cameras.end())
 	{
@@ -2821,48 +2864,48 @@ void SBScene::setCameraTrack(const std::string& characterName, const std::string
 	LOG("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
 	cameraTrack->targetToCamera = camera->getEye() - camera->getCenter();
 	LOG("Vector from target to eye is %f %f %f", cameraTrack->targetToCamera.x, cameraTrack->targetToCamera.y, cameraTrack->targetToCamera.z);				
-	cameraTracking.push_back(cameraTrack);
+	_cameraTracking.push_back(cameraTrack);
 	LOG("Object %s will now be tracked at joint %s.", characterName.c_str(), jointName.c_str());
 }
 
 void SBScene::removeCameraTrack()
 {
-	if (cameraTracking.size() > 0)
+	if (_cameraTracking.size() > 0)
 	{
-		for (std::vector<CameraTrack*>::iterator iter = cameraTracking.begin();
-			 iter != cameraTracking.end();
+		for (std::vector<CameraTrack*>::iterator iter = _cameraTracking.begin();
+			 iter != _cameraTracking.end();
 			 iter++)
 		{
 			CameraTrack* cameraTrack = (*iter);
 			delete cameraTrack;
 		}
-		cameraTracking.clear();
+		_cameraTracking.clear();
 		LOG("Removing current tracked object.");
 	}
 }
 
 bool SBScene::hasCameraTrack()
 {
-	return cameraTracking.size() > 0;
+	return _cameraTracking.size() > 0;
 }
 
 void SBScene::updateTrackedCameras()
 {
-	for (size_t x = 0; x < cameraTracking.size(); x++)
+	for (size_t x = 0; x < _cameraTracking.size(); x++)
 	{
 		// move the camera relative to the joint
-		SkJoint* joint = cameraTracking[x]->joint;
+		SkJoint* joint = _cameraTracking[x]->joint;
 		joint->skeleton()->update_global_matrices();
 		joint->update_gmat();
 		const SrMat& jointGmat = joint->gmat();
 		SrVec jointLoc(jointGmat[12], jointGmat[13], jointGmat[14]);
 		SrVec newJointLoc = jointLoc;
-		if (fabs(jointGmat[13] - cameraTracking[x]->yPos) < cameraTracking[x]->threshold)
-			newJointLoc.y = (float) cameraTracking[x]->yPos;
-		SrVec cameraLoc = newJointLoc + cameraTracking[x]->jointToCamera;
+		if (fabs(jointGmat[13] - _cameraTracking[x]->yPos) < _cameraTracking[x]->threshold)
+			newJointLoc.y = (float) _cameraTracking[x]->yPos;
+		SrVec cameraLoc = newJointLoc + _cameraTracking[x]->jointToCamera;
 		SrCamera* activeCamera = getActiveCamera();
 		activeCamera->setEye(cameraLoc.x, cameraLoc.y, cameraLoc.z);
-		SrVec targetLoc = cameraLoc - cameraTracking[x]->targetToCamera;
+		SrVec targetLoc = cameraLoc - _cameraTracking[x]->targetToCamera;
 		activeCamera->setCenter(targetLoc.x, targetLoc.y, targetLoc.z);
 	}	
 }
@@ -2909,6 +2952,16 @@ void SBScene::setOgreViewerFactory(SrViewerFactory* viewerFactory)
 	if (_ogreViewerFactory)
 		delete _ogreViewerFactory;
 	_ogreViewerFactory = viewerFactory;
+}
+
+KinectProcessor* SBScene::getKinectProcessor()
+{
+	return _kinectProcessor;
+}
+
+std::map<std::string, GeneralParam*>& SBScene::getGeneralParameters()
+{
+	return _generalParams;
 }
 
 };

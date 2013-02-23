@@ -161,7 +161,7 @@ double MeCtInterpolator::phaseDuration()
 
 void MeCtInterpolator::initKeys()
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	MeCtMotion* motionCt1 = dynamic_cast<MeCtMotion*> (child1);
 	MeCtMotion* motionCt2 = dynamic_cast<MeCtMotion*> (child2);
 	SkMotion* motion1 = motionCt1->motion();
@@ -317,7 +317,7 @@ void MeCtInterpolator::getTiming(double t, double& t1, double& t2)
 
 void MeCtInterpolator::adjustStartTime(double origW, double newW)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	std::vector<double> key;
 	std::vector<double> keyP;
 	double offset = key1[0] * origW + key2[0] * (1 - origW);

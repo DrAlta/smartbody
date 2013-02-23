@@ -5,7 +5,7 @@
 #include <sbm/sr_arg_buff.h>
 #include <sb/SBCommandManager.h>
 
-class mcuCBHandle;
+
 class SbmPawn;
 class SbmCharacter;
 

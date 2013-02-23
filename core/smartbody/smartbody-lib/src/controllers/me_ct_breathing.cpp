@@ -32,7 +32,7 @@
 #include <cstdio>
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
-#include <sbm/mcontrol_util.h>
+
 
 std::string MeCtBreathing::type_name = "Breathing";
 
@@ -408,7 +408,7 @@ void MeCtBreathing::notify(SBSubject* subject)
 		if (name == "breathing.motion")
 		{
 			SmartBody::StringAttribute* attr = dynamic_cast<SmartBody::StringAttribute*>(attribute);
-			mcuCBHandle& mcu = mcuCBHandle::singleton();
+			
 			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(attr->getValue());
 			if (!motion)
 			{

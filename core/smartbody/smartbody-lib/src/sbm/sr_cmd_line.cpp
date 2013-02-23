@@ -10,9 +10,9 @@
 #endif
 
 #include <vhcl_log.h>
-
 #include "sr_cmd_line.h"
-#include "sbm/mcontrol_util.h"
+#include <sbm/sbm_constants.h>
+
 
 #define ENABLE_NEW_PROMPT		1
 
@@ -682,7 +682,7 @@ int srCmdLine::pending_cmd( bool )	{
 
 		if( c == '\x09' ) // tab - use auto completion for commands
 		{
-			mcuCBHandle& mcu = mcuCBHandle::singleton();
+			
 			srHashMapBase* map = NULL;
 
 			// get the current partial command

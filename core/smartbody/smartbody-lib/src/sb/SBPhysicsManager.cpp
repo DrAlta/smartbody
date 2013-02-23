@@ -2,7 +2,7 @@
 #ifndef __native_client__
 #include <sb/SBPythonClass.h>
 #endif
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBPhysicsSim.h>
@@ -70,7 +70,7 @@ void SBPhysicsManager::beforeUpdate(double time)
 void SBPhysicsManager::update(double time)
 {
 	SBPhysicsSim* physicsEngine = getPhysicsEngine();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	static double prevTime = -1;
 	if (isEnable())
 	{
@@ -183,7 +183,7 @@ SmartBody::SBObject* SBPhysicsManager::getPhysicsPawn( std::string pawnName )
 
 SmartBody::SBObject* SBPhysicsManager::createPhysicsPawn( std::string pawnName, std::string geomType, SrVec geomSize )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBPawn* pawn = scene->getPawn(pawnName);
 	if (!pawn) return NULL;
@@ -202,7 +202,7 @@ SmartBody::SBObject* SBPhysicsManager::createPhysicsPawn( std::string pawnName, 
 
 SmartBody::SBObject* SBPhysicsManager::createPhysicsCharacter( std::string charName)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBCharacter* sbmChar = scene->getCharacter(charName);
 	if (!sbmChar) return NULL; // no character with the name
@@ -253,7 +253,7 @@ SmartBody::SBObject* SBPhysicsManager::createPhysicsCharacter( std::string charN
 
 void SBPhysicsManager::updatePhysicsPawn( std::string pawnName )
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBPhysicsSim* phyEngine = getPhysicsEngine();
 	SBPhysicsObj* phyObj = phyEngine->getPhysicsPawn(pawnName);

@@ -31,6 +31,7 @@
 #include "bml.hpp"
 #include "bml_exception.hpp"
 #include "bml_xml_consts.hpp"
+#include "bml_processor.hpp"
 #include "sbm/BMLDefs.h"
 #include <sb/SBScene.h>
 #include <sb/SBPhoneme.h>
@@ -123,7 +124,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 #else
 				if( XMLString::compareString( tag, BMLDefs::TAG_TM )==0 ) {
 #ifndef __ANDROID__
-					if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <tm>" << endl;
+					if(BML::LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <tm>" << endl;
 #endif
 #endif
 
@@ -153,7 +154,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 			}
 		} else if( XMLString::compareString( type, BMLDefs::VALUE_SSML )==0 ) {
 #ifndef __ANDROID__
-			if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): <speech type=\"" <<  BMLDefs::VALUE_SSML << "\">" << endl;
+			if(BML::LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): <speech type=\"" <<  BMLDefs::VALUE_SSML << "\">" << endl;
 #endif
 			// Search for <mark> sync_points
 			DOMElement* child = xml_utils::getFirstChildElement( xml );
@@ -161,7 +162,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 				const XMLCh* tag = child->getTagName();
 				if( tag && XMLString::compareString( tag, BMLDefs::TAG_MARK )==0 ) {
 #ifndef __ANDROID__
-					if(LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <mark>" << endl;
+					if(BML::LOG_SPEECH) wcout << "LOG: SpeechRequest::SpeechRequest(..): Found <mark>" << endl;
 #endif
 					const XMLCh* tdIdXml = child->getAttribute(BMLDefs::ATTR_NAME);
 					wstring tmId = xml_utils::xml_translate_wide(tdIdXml);
@@ -316,7 +317,7 @@ BML::SpeechRequest::SpeechRequest(
 	trigger( behav_syncs.sync_start()->sync()->trigger.lock() ),
 	policy(policyOverride)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	// Add SyncPoints for SpeechMarks
 	vector<SpeechMark>::const_iterator end = marks.end();
 	for( vector<SpeechMark>::const_iterator mark = marks.begin(); mark != end; ++mark ) {
@@ -883,7 +884,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	// behav_syncs.applyParentTimes()
 	// find set SyncPoints
 	// if more than one, warn and ignore least important
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 
 	// Convience references
 	SyncPointPtr sp_start( behav_syncs.sync_start()->sync() );
@@ -976,7 +977,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		vector<VisemeData*>::iterator cur = visemes.begin();
 		vector<VisemeData*>::iterator end = visemes.end();
 
-		if( LOG_SPEECH && cur==end )
+		if( BML::LOG_SPEECH && cur==end )
 		{
 			std::stringstream strstr;
 			strstr << "ERROR: BodyPlannerImpl::speechReply(): speech.getVisemes( " << speech_request_id << " ) is empty.";
@@ -986,7 +987,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		for( ; cur!=end; ++cur ) {
 			VisemeData* v = (*cur);
 
-			if( LOG_SPEECH ) {
+			if( BML::LOG_SPEECH ) {
 				//cout << "   " << (*v) << endl;  // Not linking
 				cout << "   VisemeData: " << v->id() << " (" << v->weight() << ") @ " << v->time() << endl;
 			}
@@ -1003,7 +1004,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		}
 	} else {
 
-		if( LOG_SPEECH )
+		if( BML::LOG_SPEECH )
 		{
 			std::stringstream strstr;
 			strstr << "WARNING: BodyPlannerImpl::speechReply(): speech.getVisemes( " << speech_request_id << " ) returned NULL.";
@@ -1100,7 +1101,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 			}
 			if( audioTime >= 0 ) {
 #ifndef __ANDROID__
-				if( LOG_SYNC_POINTS ) wcout << "   Wordbreak SyncPoint \"" << wb_id << "\" @ " << audioTime << endl;
+				if( BML::LOG_SYNC_POINTS ) wcout << "   Wordbreak SyncPoint \"" << wb_id << "\" @ " << audioTime << endl;
 #endif
 				cur->time = start_time + audioTime;
 			} else {
@@ -1110,7 +1111,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 			}
 		}
 	} else {
-		if( LOG_SYNC_POINTS )
+		if( BML::LOG_SYNC_POINTS )
 			cout << "   BodyPlannerImpl::speechReply(..): No speech bookmarks" << endl;
 	}
 }

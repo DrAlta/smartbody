@@ -29,7 +29,7 @@
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBMotion.h>
-#include <sbm/mcontrol_util.h>
+
 #include "ParamAnimBlock.h"
 #include "ParamAnimTransitionCreatorWidget.h"
 #include "ParameterVisualization.h"

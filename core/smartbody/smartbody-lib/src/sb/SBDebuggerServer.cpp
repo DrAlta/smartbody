@@ -46,7 +46,7 @@ void SBDebuggerServer::Init()
    bool ret = vhcl::SocketStartup();
    if (!ret)
    {
-      printf("SocketStartup() failed\n");
+      LOG("SocketStartup() failed for Debugger Server\n");
    }
 
 
@@ -60,7 +60,7 @@ void SBDebuggerServer::Init()
    if (m_sockTCP == -1)
 #endif
    {
-      printf( "SocketOpenTcp() failed\n" );
+      LOG( "SocketOpenTcp() failed for Debugger Server. \n" );
       vhcl::SocketShutdown();
       return;
    }
@@ -80,13 +80,13 @@ void SBDebuggerServer::Init()
          break;
       }
 
-      printf( "SocketBind() failed. Trying next port up.\n" );
+      LOG( "SocketBind() failed for Debugger Server. Trying next port up.\n" );
       portToTry++;
    }
 
    if (portToTry >= portMax)
    {
-      printf( "SocketBind() failed.\n" );
+      printf( "SocketBind() failed for Debugger Server\n" );
       vhcl::SocketClose(m_sockTCP);
       m_sockTCP = NULL;
       vhcl::SocketShutdown();

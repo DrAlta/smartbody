@@ -15,10 +15,6 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SmartBody-lib.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
- *      Ed Fast, USC
  */
 
 #include "vhcl.h"
@@ -30,6 +26,7 @@
 
 #include <sk/sk_skeleton.h>
 
+#include <controllers/me_ct_examples.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_blend.hpp>
 #include <controllers/me_ct_time_shift_warp.hpp>
@@ -37,7 +34,8 @@
 #include <controllers/me_ct_interpolator.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
-#include <sbm/mcontrol_util.h>
+#include <controllers/me_prune_policy.hpp>
+
 
 using namespace std;
 
@@ -453,7 +451,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 	double relaxAt  = syncPoints.sync_relax()->time();
 	double endAt    = syncPoints.sync_end()->time();
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	double now = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 
 	// if any of the sync points begin before the current time, 
@@ -644,7 +642,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct1, MeControll
 	double relaxAt  = syncPoints.sync_relax()->time();
 	double endAt    = syncPoints.sync_end()->time();
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	double now = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 
 	// if any of the sync points begin before the current time, 

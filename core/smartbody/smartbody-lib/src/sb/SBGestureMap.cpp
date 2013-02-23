@@ -1,5 +1,5 @@
 #include "SBGestureMap.h"
-#include <sbm/mcontrol_util.h>
+
 #include <sb/SBCharacter.h>
 #include <sb/SBScene.h>
 #include <sb/SBMotion.h>

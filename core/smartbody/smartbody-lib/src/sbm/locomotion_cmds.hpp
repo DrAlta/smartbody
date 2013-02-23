@@ -23,11 +23,10 @@
 #ifndef LOCOMOTION_CMDS_HPP
 #define LOCOMOTION_CMDS_HPP
 
-#include "sbm/mcontrol_util.h"
 //#include "controllers/me_ct_locomotion_analysis.hpp"
 
-int locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  );
+int locomotion_cmd_func( srArgBuffer& args);
 
-int test_locomotion_cmd_func( srArgBuffer& args, mcuCBHandle *mcu_p  );
+int test_locomotion_cmd_func( srArgBuffer& args);
 
 #endif // LOCOMOTION_CMDS_HPP

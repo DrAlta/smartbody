@@ -428,14 +428,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\sbm\mcontrol_util.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\sbm\mcontrol_util.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\sbm\MiscCommands.cpp"
 				>
 			</File>

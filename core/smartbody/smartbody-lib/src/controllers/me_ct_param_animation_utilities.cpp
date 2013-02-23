@@ -22,7 +22,7 @@
 
 #include "controllers/me_ct_param_animation_utilities.h"
 #include <sbm/gwiz_math.h>
-#include <sbm/mcontrol_util.h>
+
 #include <sr/sr_euler.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
@@ -879,7 +879,7 @@ void PAWoManager::getBaseMats(std::vector<SrMat>& mats, std::vector<double>& tim
 
 PABlendData::PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend, WrapMode wrap, ScheduleMode schedule, double blendOffset, double blendTrim, bool dplay)
 {
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	
 	blendStartOffset = (float)blendOffset;
 	blendEndTrim = (float)blendEndTrim;
 	directPlay = dplay;

@@ -15,21 +15,20 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SmartBody-lib.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
  */
 
 #ifndef BML_TARGET_HPP
 #define BML_TARGET_HPP
 
+#include <sb/SBScene.h>
+#include <sk/sk_joint.h>
 #include <xercesc/util/XMLStringTokenizer.hpp>
-#include "sbm/mcontrol_util.h"
+
 #include "sbm/xercesc_utils.hpp"
 
 
 // Forward Declaration
-class mcuCBHandle;
+
 
 namespace BML {
 	SkJoint* parse_target( const XMLCh* Attr, DOMElement* Elem, SmartBody::SBScene* scene );	

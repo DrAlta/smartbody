@@ -30,7 +30,7 @@
 #define BML_LOCOMOTION_TARGET_TYPE_DIRECTION 1 
 
 // Forward Declaration
-class mcuCBHandle;
+
 
 
 #pragma once
