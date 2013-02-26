@@ -785,6 +785,7 @@ int SBAssetManager::load_motion( const void* data, int sizeBytes, const char* mo
 	memcpy( dataCopy, data, sizeBytes );
 	dataCopy[ sizeBytes ] = 0;
 	SrInput input( dataCopy );
+	input.filename(motionName);  // to prevent crashes in debug logs that blindy call filename()
 	double scale = getDoubleAttribute("globalSkeletonScale");
 	int ret = load_me_motion_individual( input, motionName, _motions, scale );
 	delete [] dataCopy;
@@ -803,6 +804,7 @@ int SBAssetManager::load_skeleton( const void* data, int sizeBytes, const char* 
 	memcpy( dataCopy, data, sizeBytes );
 	dataCopy[ sizeBytes ] = 0;
 	SrInput input( dataCopy );
+	input.filename(skeletonName);  // to prevent crashes in debug logs that blindy call filename()
 	int ret = load_me_skeleton_individual( input, skeletonName, _skeletons, SmartBody::SBScene::getScene()->getAssetManager()->getGlobalSkeletonScale() );
 	delete [] dataCopy;
 	return ret;
