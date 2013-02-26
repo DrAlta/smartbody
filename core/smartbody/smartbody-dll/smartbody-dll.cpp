@@ -41,9 +41,7 @@ using std::string;
 
 
 #if (NACL_BUILD) 
-#define USE_SBPYTHON  0
-#else
-#define USE_SBPYTHON  0
+#define SB_NO_PYTHON  1
 #endif
 
 
@@ -540,7 +538,7 @@ bool Smartbody_dll::InitVHMsg()
 
 SMARTBODY_DLL_API bool Smartbody_dll::PythonCommandVoid( const std::string & command )
 {
-#if USE_SBPYTHON
+#ifndef SB_NO_PYTHON
 	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	return scene->run(command) == 1 ? true : false;
 #else
@@ -571,13 +569,14 @@ bool Smartbody_dll::PythonCommandBool( const std::string & command )
 
 int Smartbody_dll::PythonCommandInt( const std::string & command )
 {
-#if USE_SBPYTHON
+#ifndef SB_NO_PYTHON
    
    try
    {
-      boost::python::object obj = boost::python::exec(command.c_str(),mcu.mainDict);
-      int result = boost::python::extract<int>(mcu.mainDict["ret"]);
-      return result;
+		boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+		boost::python::object obj = boost::python::exec(command.c_str(), *mainDict);
+		int result = boost::python::extract<int>((*mainDict)["ret"]);
+		return result;
    }
    catch (...)
    {
@@ -591,12 +590,13 @@ int Smartbody_dll::PythonCommandInt( const std::string & command )
 
 float Smartbody_dll::PythonCommandFloat( const std::string & command )
 {
-#if USE_SBPYTHON
+#ifndef SB_NO_PYTHON
    
    try
    {
-      boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
-      float result = boost::python::extract<float>(mcu.mainDict["ret"]);
+	  boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+      boost::python::object obj = boost::python::exec(command.c_str(), *mainDict);
+      float result = boost::python::extract<float>((*mainDict)["ret"]);
       return result;
    }
    catch (...)
@@ -611,12 +611,12 @@ float Smartbody_dll::PythonCommandFloat( const std::string & command )
 
 std::string Smartbody_dll::PythonCommandString( const std::string & command )
 {
-#if USE_SBPYTHON
-   
+#ifndef SB_NO_PYTHON
    try
    {
-      boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
-      std::string result = boost::python::extract<std::string>(mcu.mainDict["ret"]);
+	  boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+      boost::python::object obj = boost::python::exec(command.c_str(), *mainDict);
+      std::string result = boost::python::extract<std::string>((*mainDict)["ret"]);
       return result;
    }
    catch (...)
