@@ -40,7 +40,7 @@
     An optional array A with atributes (color and size) can be used.
     Even if P is a public member, it is the user responsability to
     mantain the size of P equal to the size of A, if A!=0. */   
-class SrPoints
+class SBAPI SrPoints
  { public :
     SrArray<SrPnt> P;  //<! Array of used points
     struct Atrib { SrColor c; float s; };
@@ -50,37 +50,37 @@ class SrPoints
    public :
 
     /* Default constructor. */
-    SBAPI SrPoints ();
+    SrPoints ();
 
     /* Destructor . */
-    SBAPI virtual ~SrPoints ();
+    virtual ~SrPoints ();
 
     /*! Set the size of array P to zero. */
-    SBAPI void init ();
+    void init ();
 
     /*! Allocates A if needed, and set the size of array P and A to zero. */
-    SBAPI void init_with_attributes ();
+    void init_with_attributes ();
 
     /*! Returns true if P array is empty; false otherwise. */
-    SBAPI bool empty () const { return P.size()==0? true:false; }
+    bool empty () const { return P.size()==0? true:false; }
 
     /*! Compress array P and A. */
-    SBAPI void compress ();
+    void compress ();
 
     /*! Push in P a new point */
-    SBAPI void push ( const SrPnt& p );
-    SBAPI void push ( const SrPnt2& p );
-    SBAPI void push ( float x, float y, float z=0 );
+    void push ( const SrPnt& p );
+    void push ( const SrPnt2& p );
+    void push ( float x, float y, float z=0 );
 
     /*! Push in P a new point and push attributes in A. Only valid
         if init_with_attributes() was called before */
-    SBAPI void push ( const SrPnt& p, SrColor c, float size=1.0f );
-    SBAPI void push ( const SrPnt2& p, SrColor c, float size=1.0f );
-    SBAPI void push ( float x, float y, SrColor c, float size=1.0f );
-    SBAPI void push ( float x, float y, float z, SrColor c, float size=1.0f );
+    void push ( const SrPnt& p, SrColor c, float size=1.0f );
+    void push ( const SrPnt2& p, SrColor c, float size=1.0f );
+    void push ( float x, float y, SrColor c, float size=1.0f );
+    void push ( float x, float y, float z, SrColor c, float size=1.0f );
 
     /*! Returns the bounding box of all vertices used. The returned box can be empty. */
-    SBAPI void get_bounding_box ( SrBox &b ) const;
+    void get_bounding_box ( SrBox &b ) const;
  };
 
 

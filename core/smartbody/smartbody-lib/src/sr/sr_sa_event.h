@@ -33,15 +33,15 @@
     \brief propagates events in a scene
 
     sends an event to the scene graph */
-class SrSaEvent : public SrSa
+class SBAPI SrSaEvent : public SrSa
  { private :
     SrEvent _ev;
     int _result;
 
    public :
-    SBAPI SrSaEvent ( const SrEvent& e ) { _ev=e; _result=0; }
-    SBAPI SrEvent& get () { return _ev; }
-    SBAPI int result () const { return _result; }
+    SrSaEvent ( const SrEvent& e ) { _ev=e; _result=0; }
+    SrEvent& get () { return _ev; }
+    int result () const { return _result; }
 
    private : // virtual methods
     virtual bool editor_apply ( SrSnEditor* m );

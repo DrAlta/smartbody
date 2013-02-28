@@ -3916,6 +3916,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\sb\SBTypes.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\sb\SBVHMsgManager.cpp"
 				>
 			</File>

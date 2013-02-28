@@ -1,6 +1,7 @@
 #ifndef _SBCOLOBJECT_H_
 #define _SBCOLOBJECT_H_
 
+#include <sb/SBTypes.h>
 #include <sr/sr_mat.h>
 #include <sr/sr_quat.h>
 #include <sr/sr_vec.h>
@@ -16,19 +17,19 @@ public:
 	SrQuat rot;
 	SrVec  tran;
 public:
-	SBTransform();
-	SBTransform(const SrQuat& q, const SrVec& t) { rot = q; tran = t;}
-	SrVec localToGlobal(const SrVec& vLocal);
-	SrVec globalToLocal(const SrVec& vGlobal);
-	SrMat gmat() const;	
-	void  gmat(const SrMat& inMat);
-	void  add(const SBTransform& delta);	
-	static SBTransform diff(const SBTransform& r1, const SBTransform& r2);
-	static SBTransform mult(const SBTransform& r1, const SBTransform& r2);  // return r1*r2
-	static SBTransform blend(SBTransform& r1, SBTransform& r2, float weight );
-	static float             dist(const SBTransform& r1, const SBTransform& r2);
+	SBAPI SBTransform();
+	SBAPI SBTransform(const SrQuat& q, const SrVec& t) { rot = q; tran = t;}
+	SBAPI SrVec localToGlobal(const SrVec& vLocal);
+	SBAPI SrVec globalToLocal(const SrVec& vGlobal);
+	SBAPI SrMat gmat() const;	
+	SBAPI void  gmat(const SrMat& inMat);
+	SBAPI void  add(const SBTransform& delta);	
+	SBAPI static SBTransform diff(const SBTransform& r1, const SBTransform& r2);
+	SBAPI static SBTransform mult(const SBTransform& r1, const SBTransform& r2);  // return r1*r2
+	SBAPI static SBTransform blend(SBTransform& r1, SBTransform& r2, float weight );
+	SBAPI static float             dist(const SBTransform& r1, const SBTransform& r2);
 
-	SBTransform& operator= (const SBTransform& rt);
+	SBAPI SBTransform& operator= (const SBTransform& rt);
 };
 
 typedef SBTransform SRT;

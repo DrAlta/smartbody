@@ -37,7 +37,7 @@ class SrMat;
 
     SrTrackball maintains a rotation with methods implementing a
     trackball-like manipulations, and etc. */
-class SrTrackball
+class SBAPI SrTrackball
  { public :
     SrQuat rotation;    //!< current rotation
     SrQuat last_spin;
@@ -45,33 +45,33 @@ class SrTrackball
    public :
     
     /*! Initialize the trackball with the default parameters, see init(). */
-    SBAPI SrTrackball ();
+    SrTrackball ();
 
     /*! Copy constructor. */
-    SBAPI SrTrackball ( const SrTrackball& t );
+    SrTrackball ( const SrTrackball& t );
 
     /*! Set the parameters to their default values, which is a null rotation. */
-    SBAPI void init ();
+    void init ();
 
     /*! Set m to be the equivalent transformation matrix. A reference to m
         is returned. */
-    SBAPI SrMat& get_mat ( SrMat& m ) const;
+    SrMat& get_mat ( SrMat& m ) const;
 
     /*! Gets the rotation induced by a mouse displacement,
         according to the trackball metaphor. Window coordinates must be
         normalized in [-1,1]x[-1,1]. */
-    SBAPI static void get_spin_from_mouse_motion ( float lwinx, float lwiny, float winx, float winy, SrQuat& spin );
+    static void get_spin_from_mouse_motion ( float lwinx, float lwiny, float winx, float winy, SrQuat& spin );
 
     /*! Accumulates the rotation induced by a mouse displacement,
         according to the trackball metaphor. Window coordinates must be
         normalized in [-1,1]x[-1,1]. */
-    SBAPI void increment_from_mouse_motion ( float lwinx, float lwiny, float winx, float winy );
+    void increment_from_mouse_motion ( float lwinx, float lwiny, float winx, float winy );
 
     /*! Accumulates the rotation with the given quaternion (left-multiplied) */
-    SBAPI void increment_rotation ( const SrQuat& spin );
+    void increment_rotation ( const SrQuat& spin );
 
     /*! Outputs trackball data for inspection. */
-    SBAPI friend SrOutput& operator<< ( SrOutput& out, const SrTrackball& tb );
+    friend SrOutput& operator<< ( SrOutput& out, const SrTrackball& tb );
  };
 
 //================================ End of File =================================================

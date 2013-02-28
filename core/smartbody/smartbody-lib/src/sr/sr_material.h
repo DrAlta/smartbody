@@ -35,7 +35,7 @@
     \brief specifies a material
 
     Defines a material. */
-class SrMaterial
+class SBAPI SrMaterial
  { public :
     SrColor ambient;   //!< default in float coords: 0.2, 0.2, 0.2, 1.0
     SrColor diffuse;   //!< default in float coords: 0.8, 0.8, 0.8, 1.0
@@ -45,23 +45,23 @@ class SrMaterial
    public :
     
     /*! Initializes with the default values. */
-    SBAPI SrMaterial ();
+    SrMaterial ();
 
     /*! Set again the default values. Note that .2 is mapped
         to 51, and .8 to 204 in the SrColor format. */
-    SBAPI void init ();
+    void init ();
 
     /*! Exact comparison operator == */
-    SBAPI friend bool operator == ( const SrMaterial& m1, const SrMaterial& m2 );
+    friend bool operator == ( const SrMaterial& m1, const SrMaterial& m2 );
 
     /*! Exact comparison operator != */
-    SBAPI friend bool operator != ( const SrMaterial& m1, const SrMaterial& m2 );
+    friend bool operator != ( const SrMaterial& m1, const SrMaterial& m2 );
 
     /*! Outputs in format: "ar ag ab aa dr dg db da sr sg sb sa er eg eb ea s". */
-    SBAPI friend SrOutput& operator<< ( SrOutput& o, const SrMaterial& m );
+    friend SrOutput& operator<< ( SrOutput& o, const SrMaterial& m );
 
     /*! Inputs from format: "ar ag ab aa dr dg db da sr sg sb sa er eg eb ea s". */
-    SBAPI friend SrInput& operator>> ( SrInput& in, SrMaterial& m );
+    friend SrInput& operator>> ( SrInput& in, SrMaterial& m );
  };
 
 //================================ End of File =================================================

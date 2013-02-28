@@ -38,7 +38,7 @@
     SrSnMatrix accumulates the specified transformation matrix to the
     current transformation during traversals of the scene graph when
     an action is applied. */
-class SrSnMatrix : public SrSn
+class SBAPI SrSnMatrix : public SrSn
  { private :
     SrMat _mat;
 
@@ -51,16 +51,16 @@ class SrSnMatrix : public SrSn
 
    public :
     /*! Default constructor */
-    SBAPI SrSnMatrix ();
+    SrSnMatrix ();
 
     /*! Constructor receiving a matrix */
-    SBAPI SrSnMatrix ( const SrMat& m );
+    SrSnMatrix ( const SrMat& m );
 
     /*! Set the matrix. */
-    SBAPI void set ( const SrMat& m ) { _mat=m; }
+    void set ( const SrMat& m ) { _mat=m; }
 
     /*! Get the matrix. */
-    SBAPI SrMat& get () { return _mat; }
+    SrMat& get () { return _mat; }
  };
 
 

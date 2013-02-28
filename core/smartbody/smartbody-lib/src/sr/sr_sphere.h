@@ -36,7 +36,7 @@ class SrBox;
 
     SrSphere represents a sphere based on its center and radius.
     By default, the sphere has center (0,0,0) and radius 1*/
-class SrSphere
+class SBAPI SrSphere
  { public :
     SrPnt center;  
     float radius;
@@ -45,19 +45,19 @@ class SrSphere
    public :
 
     /*! Constructs as a sphere centered at (0,0,0) with radius 1 */
-    SBAPI SrSphere ();
+    SrSphere ();
 
     /*! Copy constructor */
-    SBAPI SrSphere ( const SrSphere& s );
+    SrSphere ( const SrSphere& s );
 
     /* Returns the bounding box of all vertices used. The returned box can be empty. */
-    SBAPI void get_bounding_box ( SrBox &b ) const;
+    void get_bounding_box ( SrBox &b ) const;
 
     /*! Outputs in format: "center radius". */
-    SBAPI friend SrOutput& operator<< ( SrOutput& o, const SrSphere& sph );
+    friend SrOutput& operator<< ( SrOutput& o, const SrSphere& sph );
 
     /*! Input from format: "center radius". */
-    SBAPI friend SrInput& operator>> ( SrInput& in, SrSphere& sph );
+    friend SrInput& operator>> ( SrInput& in, SrSphere& sph );
  };
 
 

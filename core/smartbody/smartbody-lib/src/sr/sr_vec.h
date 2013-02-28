@@ -291,10 +291,10 @@ class SBAPI SrVec
 
  };
 
- SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle);
+ SBAPI SrVec rotatePoint(SrVec point, SrVec origin, SrVec direction, float angle);
 
 
- class SrVec4i 
+ class SBAPI SrVec4i 
  {
  public:
 	 int data[4];

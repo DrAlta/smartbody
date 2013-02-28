@@ -34,23 +34,23 @@
     This class helps maintaining a list of file paths and
     opening input files according to the declared paths and
     absolute/relative path/filename cases. */
-class SrPathArray : public SrStringArray
+class SBAPI SrPathArray : public SrStringArray
  { private:
     SrString _basedir; // the basedir of relative filenames (has to have a slash in the end)
     
    public:
     /*! Access to the base dir */
-    SBAPI SrString& basedir () { return _basedir; }
+    SrString& basedir () { return _basedir; }
     
     /*! Set the basedir and ensures its validity, eg, adding a slash in the end if needed. */
-    SBAPI void basedir ( const char* bd )
+    void basedir ( const char* bd )
      { _basedir.make_valid_path(bd); }
     
     /*! Set the basedir, extracting it from a filename and ensuring its validity */
-    SBAPI void basedir_from_filename ( const char* file );
+    void basedir_from_filename ( const char* file );
 
     /*! Add a path to the array. No validity checks done. */
-    SBAPI void push ( const char* path ) { push_path(path); }
+    void push ( const char* path ) { push_path(path); }
 
     /*! Tries to open an input file:
         If the given filename has an absolute path in it, the method simply
@@ -64,12 +64,12 @@ class SrPathArray : public SrStringArray
         Returns true if the file could be open. In such case, the successfull full file
         name can be found in inp.filename(). False is returned in case of failure.
         Parameter mode is the fopen() mode: "rt", etc.  */
-    SBAPI bool open ( SrInput& inp, const char* filename ) { return open_file(inp,filename,"rt",_basedir); }
+    bool open ( SrInput& inp, const char* filename ) { return open_file(inp,filename,"rt",_basedir); }
 
     /*! Checks if file exists by testing all declared paths using the rules in open().
         Returns false if the file was not found, otherwise file will contain the 
         succesfull file name and true is returned */ 
-    SBAPI bool adjust_path ( SrString& file );
+    bool adjust_path ( SrString& file );
  };
 
 #endif // SR_PATH_ARRAY_H

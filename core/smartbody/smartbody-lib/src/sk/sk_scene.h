@@ -25,6 +25,7 @@
 
 //================================ SkScene =================================================
 
+#include <sb/SBTypes.h>
 # include <sr/sr_array.h>
 # include <sr/sr_sn_group.h>
 # include <sr/sr_sn_shape.h>
@@ -34,7 +35,7 @@ class SkJoint;
 class SkSkeleton;
 
 /*! Maintains a scene graph containing geometries to display a given SkSkeleton */
-class SkScene : public SrSnGroup
+class SBAPI SkScene : public SrSnGroup
  { private :
     SrArray<SrSnGroup*> _jgroup;
     float _cradius, _sfactor, _axislen;

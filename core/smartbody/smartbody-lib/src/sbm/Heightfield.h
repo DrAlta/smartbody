@@ -5,6 +5,7 @@
 #include <windows.h>
 #endif
 #include <stdio.h>
+#include <sb/SBTypes.h>
 
 #define TERRAIN_SCALE	2000.0f
 #define ELEVATION_SCALE 200.0f
@@ -12,17 +13,17 @@
 class Heightfield
 {
 	public:
-		Heightfield();
-		~Heightfield();
+		SBAPI Heightfield();
+		SBAPI ~Heightfield();
 		
-		void load( char* filename );
-		void set_scale( float x, float y, float z );
-		void set_origin( float x, float y, float z );
-		void set_auto_origin( void );
+		SBAPI void load( char* filename );
+		SBAPI void set_scale( float x, float y, float z );
+		SBAPI void set_origin( float x, float y, float z );
+		SBAPI void set_auto_origin( void );
 		
 //		void paste_img( void );
-		void render( int renderMode ); 
-		float get_elevation( float x, float z, float *normal_p = NULL );
+		SBAPI void render( int renderMode ); 
+		SBAPI float get_elevation( float x, float z, float *normal_p = NULL );
 
 	private:
 		void clear( void );

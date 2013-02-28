@@ -55,7 +55,7 @@ class SrSnColorSurf : public SrSnShapeBase
 
     /* Constructor may receive a SrModel to reference. If the
        given pointer is null (the default) a new one is used. */
-    SBAPI SrSnColorSurf ( SrModel* m=0 );
+   SBAPI SrSnColorSurf ( SrModel* m=0 );
 
     /* Destructor. */
    SBAPI ~SrSnColorSurf ();
