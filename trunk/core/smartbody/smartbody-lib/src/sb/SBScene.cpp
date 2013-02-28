@@ -200,8 +200,7 @@ void SBScene::initialize()
 	PyRun_SimpleString("sim = scene.getSimulationManager()");
 #endif
 #endif
-	*/
-
+	*/	
 	if (_viewer)	
 	{
 		if (_viewerFactory)
@@ -815,8 +814,7 @@ float SBScene::getScale()
 void SBScene::reset()
 {
 	cleanup();
-	initialize();
-
+	initialize();	
 }
 
 void SBScene::notify( SBSubject* subject )

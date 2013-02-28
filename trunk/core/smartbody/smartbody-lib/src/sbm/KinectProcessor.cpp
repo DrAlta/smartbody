@@ -1,4 +1,10 @@
 #include "KinectProcessor.h"
+#include <sb/SBSkeleton.h>
+#include <sb/SBJoint.h>
+#include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
+#include <sb/SBRetargetManager.h>
+#include <sb/SBRetarget.h>
 
 KinectProcessor::KinectProcessor()
 {
@@ -30,6 +36,7 @@ KinectProcessor::KinectProcessor()
 	//22		XN_SKEL_LEFT_FINGERTIP									
 	//23		XN_SKEL_RIGHT_FINGERTIP							
 
+	numOfKinectJoints = 20; // use only 20 joints
 	// default mapping, can be user defined too
 	boneMapping.push_back("base");			
 	boneMapping.push_back("spine2");	// should it be spine2 or base
@@ -57,11 +64,107 @@ KinectProcessor::KinectProcessor()
 	boneMapping.push_back("");
 	boneMapping.push_back("");
 
-
+	parentIndexMap.clear();
+	for (unsigned int i=0;i<boneMapping.size();i++)
+	{
+		if (i == 4 || i==8)
+			parentIndexMap[i] = 2;
+		else if (i == 12 || i== 16)			
+			parentIndexMap[i] = 0;
+		else if (i >= 20)
+			parentIndexMap[i] = 0;
+		else
+			parentIndexMap[i] = i-1;		
+	}
 	filterSize = 10;
 	rotationBuffer.resize(24);
 	for (int i = 0; i < 24; i++)
 		rotationBuffer[i].resize(24);
+}
+
+void KinectProcessor::inferJointOffsets( std::vector<SrVec>& gPos, std::vector<SrQuat>& gRot, std::vector<SrVec>& out, std::map<int, SrQuat>& bonePreRotMap )
+{
+	out.resize(numOfKinectJoints);
+	out.assign(numOfKinectJoints,SrVec(0,0,0)); // set to zero vector by default	
+	for (int i=0;i<numOfKinectJoints;i++)
+	{
+		int pindex = parentIndexMap[i];
+		if (pindex >= 0)
+		{
+			SrVec offset = gPos[i] - gPos[pindex]; // segment offset			
+			SrQuat quat = gRot[i];//*gRot[1].inverse();
+			SrQuat prot = gRot[i]*gRot[pindex].inverse();		
+			
+			//quat.x *= -1;
+			//SrVec newOffset = offset*gRot[pindex].inverse();//.inverse();
+			SrVec newOffset = offset*quat.inverse();//.inverse();
+			if (boneMapping[i] == "l_shoulder" || boneMapping[i] == "r_shoulder")
+			{
+				newOffset = newOffset*prot;
+				bonePreRotMap[i] = prot;
+			}
+			else if (boneMapping[i] == "l_hip" || boneMapping[i] == "r_hip")
+			{
+				newOffset = newOffset*prot;
+				bonePreRotMap[i] = prot;
+			}
+// 			else if (i>=5 && i<=7) // l_elbow, l_wrist, l_hand
+// 			{
+// 				newOffset = newOffset*bonePreRotMap[4];
+// 			}
+// 			else if (i>=9 && i<=11) // r_elbow, r_wrist, r_hand
+// 			{
+// 				newOffset = newOffset*bonePreRotMap[8];
+// 			}
+// 			else if (i>=13 && i<=15) // l_elbow, l_wrist, l_hand
+// 			{
+// 				newOffset = newOffset*bonePreRotMap[12];
+// 			}
+// 			else if (i>=17 && i<=19) // l_elbow, l_wrist, l_hand
+// 			{
+// 				newOffset = newOffset*bonePreRotMap[16];
+// 			}
+			out[i] = newOffset;
+		}
+	}
+}
+
+void KinectProcessor::initKinectSkeleton(std::vector<SrVec>& gPos, std::vector<SrQuat>& gRot)
+{
+	SmartBody::SBSkeleton* kinectSk = new SmartBody::SBSkeleton();
+	kinectSk->setName("kinect.sk");
+	kinectSk->setFileName("kinect.sk");
+	// only use the first 20 joints to build the skeleton
+	std::vector<SrVec> offsetVec;
+	std::map<int, SrQuat> bonePreRotMap;
+	inferJointOffsets(gPos,gRot,offsetVec,bonePreRotMap);
+	for (int i=0;i<numOfKinectJoints;i++)
+	{
+		std::string jname = boneMapping[i];
+		//SmartBody::SBJoint* sbJoint = dynamic_cast<SmartBody::SBJoint*>(kinectSk->add_joint(SkJoint::TypeQuat, parentIndexMap[i]));
+		SmartBody::SBJoint* sbJoint = dynamic_cast<SmartBody::SBJoint*>(kinectSk->add_joint(SkJoint::TypeQuat,  parentIndexMap[i]));
+		if (i==0) // root joint
+			sbJoint->quat()->prerot(gRot[i].inverse());
+		else if (bonePreRotMap.find(i) != bonePreRotMap.end())
+			sbJoint->quat()->prerot(bonePreRotMap[i]);
+		// set joint data
+		sbJoint->quat()->activate();
+		sbJoint->name(jname);
+		sbJoint->extName(jname);
+		sbJoint->extID(jname);
+		sbJoint->extSID(jname);			
+		kinectSk->channels().add(jname, SkChannel::XPos);
+		kinectSk->channels().add(jname, SkChannel::YPos);
+		kinectSk->channels().add(jname, SkChannel::ZPos);
+		sbJoint->pos()->limits(SkVecLimits::X, false);
+		sbJoint->pos()->limits(SkVecLimits::Y, false);
+		sbJoint->pos()->limits(SkVecLimits::Z, false);
+		kinectSk->channels().add(jname, SkChannel::Quat);
+		//sbJoint->offset(SrVec(0,0,10.f)); // default dummy value		
+		sbJoint->offset(offsetVec[i]);				
+	}	
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	assetManager->addSkeleton(kinectSk);	
 }
 
 KinectProcessor::~KinectProcessor()
@@ -156,18 +259,110 @@ void KinectProcessor::processGlobalRotation(std::vector<SrQuat>& quats)
 		quats[i].x *= -1.0f;
 }
 
+
+
+void KinectProcessor::processRetargetPosition( std::string targetSkelName, SrVec& inPos, SrVec& outPos )
+{
+	std::string kinectSkName = "kinect.sk";
+	SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();
+	SmartBody::SBRetarget* retarget = retargetManager->getRetarget(kinectSkName, targetSkelName);
+
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	if (!assetManager->getSkeleton(targetSkelName) || !assetManager->getSkeleton(kinectSkName))
+		return; // don't do anything
+
+	SmartBody::SBSkeleton* kinectSk = assetManager->getSkeleton(kinectSkName);
+	if (!retarget)
+	{
+		retarget = retargetManager->createRetarget(kinectSkName,targetSkelName);
+		std::vector<std::string> endJoints;
+		endJoints.push_back("l_forefoot");
+		endJoints.push_back("l_toe");
+		endJoints.push_back("l_wrist");
+		endJoints.push_back("r_forefoot");
+		endJoints.push_back("r_toe");	
+		endJoints.push_back("r_wrist");
+		std::vector<std::string> relativeJoints;
+		relativeJoints.push_back("spine1");
+		relativeJoints.push_back("spine2");
+		relativeJoints.push_back("spine3");
+		relativeJoints.push_back("spine4");
+		relativeJoints.push_back("spine5");
+		relativeJoints.push_back("r_sternoclavicular");
+		relativeJoints.push_back("l_sternoclavicular");
+		relativeJoints.push_back("r_acromioclavicular");
+		relativeJoints.push_back("l_acromioclavicular");
+		retarget->initRetarget(endJoints,relativeJoints);
+	}
+
+	for (int k=0;k<3;k++)
+		outPos[k] = retarget->applyRetargetJointTranslation(getSBJointName(0),inPos[k]);
+
+}
+
+
+void KinectProcessor::processRetargetRotation(std::string targetSkelName, std::vector<SrQuat>& quats, std::vector<SrQuat>& outQuat )
+{	
+	std::string kinectSkName = "kinect.sk";
+	SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();
+	SmartBody::SBRetarget* retarget = retargetManager->getRetarget(kinectSkName, targetSkelName);
+	
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	if (!assetManager->getSkeleton(targetSkelName) || !assetManager->getSkeleton(kinectSkName))
+		return; // don't do anything
+
+	SmartBody::SBSkeleton* kinectSk = assetManager->getSkeleton(kinectSkName);
+	if (!retarget)
+	{
+		retarget = retargetManager->createRetarget(kinectSkName,targetSkelName);
+		std::vector<std::string> endJoints;
+		endJoints.push_back("l_forefoot");
+		endJoints.push_back("l_toe");
+		endJoints.push_back("l_wrist");
+		endJoints.push_back("r_forefoot");
+		endJoints.push_back("r_toe");	
+		endJoints.push_back("r_wrist");
+		std::vector<std::string> relativeJoints;
+		relativeJoints.push_back("spine1");
+		relativeJoints.push_back("spine2");
+		relativeJoints.push_back("spine3");
+		relativeJoints.push_back("spine4");
+		relativeJoints.push_back("spine5");
+		relativeJoints.push_back("r_sternoclavicular");
+		relativeJoints.push_back("l_sternoclavicular");
+		relativeJoints.push_back("r_acromioclavicular");
+		relativeJoints.push_back("l_acromioclavicular");
+		retarget->initRetarget(endJoints,relativeJoints);
+	}	
+
+	//quats[0] = quats[1];
+	outQuat.resize(quats.size());
+	for (int i = 0; i < numOfKinectJoints; i++)
+	{
+		int pindex = parentIndexMap[i];
+		if (pindex < 0 || pindex == 0 || pindex == 2)
+			continue;		
+		
+		outQuat[pindex] = retarget->applyRetargetJointRotation(getSBJointName(pindex),quats[i]);
+		//outQuat[i] = retarget->applyRetargetJointRotation(getSBJointName(i),SrQuat());
+	}		
+
+	SmartBody::SBJoint* rootJoint = kinectSk->getJointByName(getSBJointName(0));
+	outQuat[0] = retarget->applyRetargetJointRotation(getSBJointName(0),rootJoint->quat()->prerot()*quats[0]);
+}
+
 void KinectProcessor::filterRotation(std::vector<SrQuat>& quats)
 {
 	while ((int)rotationBuffer[0].size() > filterSize)
 	{
-		for (int i = 0; i < 24; i++)
+		for (int i = 0; i < numOfKinectJoints; i++)
 			rotationBuffer[i].pop_front();
 	}
-	for (int i = 0; i < 24; i++)
+	for (int i = 0; i < numOfKinectJoints; i++)
 		rotationBuffer[i].push_back(quats[i]);
 
 	float weight = 1.0f / float(filterSize);
-	for (int i = 0; i < 24; i++)
+	for (int i = 0; i < numOfKinectJoints; i++)
 	{
 		std::list<SrQuat>::iterator iter = rotationBuffer[i].begin();
 		SrQuat temp = *iter;

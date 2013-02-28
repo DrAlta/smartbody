@@ -2247,7 +2247,7 @@ float VisemeRequest::getRampDown()
 }
 
 void VisemeRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
-{
+{	
 	// Get times from BehaviorSyncPoints
 	time_sec startAt  = behav_syncs.sync_start()->time();
 	time_sec readyAt  = behav_syncs.sync_ready()->time();

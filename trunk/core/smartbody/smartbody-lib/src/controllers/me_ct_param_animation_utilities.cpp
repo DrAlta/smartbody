@@ -481,21 +481,25 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 
 	SrVec vec = quat.axis() * quat.angle();
 	SrVec vec1 = vec * prerotMat;//prerotMat.inverse();
-	
+	//LOG("quat = %f %f %f %f, axis angle = %f %f %f", quat.w, quat.x, quat.y,quat.z, vec1[0],vec1[1],vec1[2]);
 	quat = SrQuat(vec1);	
 #if !NEW_EULER
 	SrMat mat;
 	quat.get_mat(mat);	
 	float rx, ry, rz;
 	sr_euler_angles(rotType, mat, rx, ry, rz);
+	//LOG("eu = %f %f %f", rx,ry,rz);
 	ry = 0.0;
 	sr_euler_mat(rotType, mat, rx, ry, rz);
 	SrQuat quatP = SrQuat(mat);
 #else
 	gwiz::euler_t eu = gwiz::euler_t(gwiz::quat_t(quat.w, quat.x,quat.y,quat.z));
+	//LOG("eu = %f %f %f", eu.x(), eu.y(), eu.z());
 	eu.y(0.f);
 	gwiz::quat_t gw_q = gwiz::quat_t(eu);
 	SrQuat quatP = SrQuat((float)gw_q.w(),(float)gw_q.x(),(float)gw_q.y(),(float)gw_q.z());
+	gwiz::euler_t euNew = gwiz::euler_t(gwiz::quat_t(quatP.w, quatP.x,quatP.y,quatP.z));
+	//LOG("euNew = %f %f %f", euNew.x(), euNew.y(), euNew.z());
 #endif	
 	vec1 = quatP.axis() * quatP.angle();	
 	

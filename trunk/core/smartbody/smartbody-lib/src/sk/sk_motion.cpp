@@ -1096,8 +1096,8 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 	{
 		std::string childName = childJointNameQueue.front(); childJointNameQueue.pop();
 		SkJoint* child = tempSrcSk->search_joint(childName.c_str());
-		if (std::find(endJoints.begin(),endJoints.end(),childName) != endJoints.end())
-			continue;
+		//if (std::find(endJoints.begin(),endJoints.end(),childName) != endJoints.end())
+		//	continue;
 		SkJoint* interSkChild = interSk->search_joint(childName.c_str());
 		if (interSkChild)
 		{

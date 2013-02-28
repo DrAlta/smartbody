@@ -72,6 +72,9 @@ XnBool g_bRecord = false;
 
 XnBool g_bQuit = false;
 
+bool g_initSkeleton = true;
+int  g_initSkeletonSampleCount = 0;
+
 //---------------------------------------------------------------------------
 // Code
 //---------------------------------------------------------------------------
@@ -123,8 +126,9 @@ void XN_CALLBACK_TYPE UserCalibration_CalibrationEnd(xn::SkeletonCapability& cap
 	if (bSuccess)
 	{
 		// Calibration succeeded
-		printf("Calibration complete, start tracking user %d\n", nId);
+		printf("Calibration complete, start tracking user %d\n", nId);		
 		g_UserGenerator.GetSkeletonCap().StartTracking(nId);
+		g_initSkeleton = false;
 	}
 	else
 	{
@@ -340,6 +344,8 @@ void glutDisplay (void)
 			g_UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(aUsers[i], XN_SKEL_LEFT_FINGERTIP, jointInfo[22]);
 			g_UserGenerator.GetSkeletonCap().GetSkeletonJointOrientation(aUsers[i], XN_SKEL_RIGHT_FINGERTIP, jointInfo[23]);
 
+			
+
 			// need a way to customize skeleton name here
 			std::string skeletonName;
 			if (i == 0)
@@ -348,13 +354,83 @@ void glutDisplay (void)
 			// switch to quaternion
 			float w, x, y, z;
 			std::stringstream command;
-			command << "skeleton " << skeletonName << " kinect rotations ";
-			for (int j = 0; j < 24; j++)
-			{
-				matrixToQuat(jointInfo[j], w, x, y, z);
-				command << w << " " << x << " " << y << " " << z << " ";
+			
+			if (!g_initSkeleton)
+			{							
+				g_initSkeletonSampleCount++;
+				// get global position info
+				XnSkeletonJointPosition posInfo[24];
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_WAIST, posInfo[0]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_TORSO, posInfo[1]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_NECK, posInfo[2]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_HEAD, posInfo[3]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_LEFT_SHOULDER, posInfo[4]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_LEFT_ELBOW, posInfo[5]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_LEFT_WRIST, posInfo[6]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_LEFT_HAND, posInfo[7]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_RIGHT_SHOULDER, posInfo[8]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_RIGHT_ELBOW, posInfo[9]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_RIGHT_WRIST, posInfo[10]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_RIGHT_HAND, posInfo[11]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_LEFT_HIP, posInfo[12]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_LEFT_KNEE, posInfo[13]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_LEFT_ANKLE, posInfo[14]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_LEFT_FOOT, posInfo[15]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_RIGHT_HIP, posInfo[16]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_RIGHT_KNEE, posInfo[17]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_RIGHT_ANKLE, posInfo[18]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_RIGHT_FOOT, posInfo[19]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_LEFT_COLLAR, posInfo[20]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_RIGHT_COLLAR, posInfo[21]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_LEFT_FINGERTIP, posInfo[22]);
+				g_UserGenerator.GetSkeletonCap().GetSkeletonJointPosition(aUsers[i], XN_SKEL_RIGHT_FINGERTIP, posInfo[23]);				
 				
+				if (g_initSkeletonSampleCount >= 50)
+				{
+					vhmsg::ttu_notify2("receiver", "echo init Kinect Skeleton...");	
+					command << "skeleton " << skeletonName << " kinect initsk ";
+					float px,py,pz;
+					for (int j = 0; j < 24; j++)
+					{
+						matrixToQuat(jointInfo[j], w, x, y, z);		
+						if (jointInfo[j].fConfidence < 0.f)
+						{
+							command<< 1.f << " " << 0.f << " " << 0.f << " " << 0.f << " ";
+						}
+						else
+						{
+							command << w << " " << x << " " << y << " " << z << " ";
+						}						
+						if (posInfo[j].fConfidence < 0.5)
+						{
+							//printf("joint %d, low confidence = %f, position = %f %f %f\n",j,posInfo[j].fConfidence, posInfo[j].position.X,posInfo[j].position.Y,posInfo[j].position.Z);
+							command << 0.f << " " << 0.f << " " << 0.f << " ";
+
+						}
+						else 
+						{
+							//printf("joint %d, high confidence = %f, position = %f %f %f\n",j,posInfo[j].fConfidence, posInfo[j].position.X,posInfo[j].position.Y,posInfo[j].position.Z);
+							command << posInfo[j].position.X << " " << posInfo[j].position.Y << " " << posInfo[j].position.Z << " ";
+						}
+					}
+				}
+				
+				if (g_initSkeletonSampleCount >= 80)
+				{
+					g_initSkeleton = true;
+					g_initSkeletonSampleCount = 0;
+				}				
 			}
+			else
+			{
+				command << "skeleton " << skeletonName << " kinect rotations ";
+				for (int j = 0; j < 24; j++)
+				{
+					matrixToQuat(jointInfo[j], w, x, y, z);
+					command << w << " " << x << " " << y << " " << z << " ";
+				}
+			}
+
 			vhmsg::ttu_notify2("receiver", command.str().c_str());
 #if 0
 			// translation data

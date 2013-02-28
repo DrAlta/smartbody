@@ -517,7 +517,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 			goal.desiredSpeed = desiredSpeed;
 			goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
 			goal.targetIsRandom = false;
-			goal.targetLocation = Util::Point(x1 * scene->getScale(), 0.0f, (z1 * scene->getScale() - 100.0f * scene->getScale()));
+			goal.targetLocation = Util::Point(x1 * scene->getScale(), 0.0f, (z1 * scene->getScale() - 1.0f * scene->getScale()));
 			agent->addGoal(goal);
 		}
 	}
