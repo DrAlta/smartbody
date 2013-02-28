@@ -49,26 +49,26 @@ protected:
 private:
 	// for singleton
 	static SbmShaderManager* _singleton;
-	SbmShaderManager(void);
-	~SbmShaderManager(void);
+	SBAPI SbmShaderManager(void);
+	SBAPI ~SbmShaderManager(void);
 public:
-	static SbmShaderManager& singleton() 
+	SBAPI static SbmShaderManager& singleton() 
 	{
 		if (!_singleton)
 			_singleton = new SbmShaderManager();
 		return *_singleton;			
 	}
 
-	static void destroy_singleton() {
+	SBAPI static void destroy_singleton() {
 		if( _singleton )
 			delete _singleton;
 		_singleton = NULL;
 	}
-	bool initOpenGL();
-	bool initGLExtension();	
-	void setViewer(SrViewer* vw);	
-	void addShader(const char* entryName,const char* vsName, const char* fsName, bool shaderFile = true);
-	SbmShaderProgram* getShader(const std::string& entryName);
-	void buildShaders();
-	static int getShaderSupport() { return shaderSupport; }
+	SBAPI bool initOpenGL();
+	SBAPI bool initGLExtension();	
+	SBAPI void setViewer(SrViewer* vw);	
+	SBAPI void addShader(const char* entryName,const char* vsName, const char* fsName, bool shaderFile = true);
+	SBAPI SbmShaderProgram* getShader(const std::string& entryName);
+	SBAPI void buildShaders();
+	SBAPI static int getShaderSupport() { return shaderSupport; }
 };

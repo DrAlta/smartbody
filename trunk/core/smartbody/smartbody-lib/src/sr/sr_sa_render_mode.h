@@ -33,7 +33,7 @@
     \brief changes the render mode
 
     changes the render mode of all nodes visited by the action */
-class SrSaRenderMode : public SrSa
+class SBAPI SrSaRenderMode : public SrSa
  { private :
     bool _override;
     srRenderMode _render_mode;
@@ -41,16 +41,16 @@ class SrSaRenderMode : public SrSa
    public :
 
     /*! Constructor that initializes the action to override the render mode to m */
-    SBAPI SrSaRenderMode ( srRenderMode m ) { set_mode(m); }
+    SrSaRenderMode ( srRenderMode m ) { set_mode(m); }
 
     /*! Constructor that initializes the action to restore the original render mode */
-    SBAPI SrSaRenderMode () { _render_mode=srRenderModeSmooth; _override=false; }
+    SrSaRenderMode () { _render_mode=srRenderModeSmooth; _override=false; }
 
     /*! Set the mode m to be overriden */
-    SBAPI void set_mode ( srRenderMode m ) { _render_mode=m; _override=true; }
+    void set_mode ( srRenderMode m ) { _render_mode=m; _override=true; }
 
     /*! Set the action to restore the original render mode */
-    SBAPI void restore_mode () { _override=false; }
+    void restore_mode () { _override=false; }
 
    private : // virtual methods
     virtual void mult_matrix ( const SrMat& mat ) {}

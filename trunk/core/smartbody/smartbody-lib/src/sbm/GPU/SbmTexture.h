@@ -6,6 +6,7 @@
 #endif
 #include <map>
 #include <string>
+#include <sb/SBTypes.h>
 
 class SbmTexture;
 
@@ -24,21 +25,21 @@ private:
 	SbmTextureManager(void);
 	~SbmTextureManager(void);
 public:
-	static SbmTextureManager& singleton() 
+	SBAPI static SbmTextureManager& singleton() 
 	{
 		if (!_singleton)
 			_singleton = new SbmTextureManager();
 		return *_singleton;			
 	}
 
-	static void destroy_singleton() {
+	SBAPI static void destroy_singleton() {
 		if( _singleton )
 			delete _singleton;
 		_singleton = NULL;
 	}
-	SbmTexture* findTexture(int type, const char* textureName);
-	void loadTexture(int type, const char* textureName, const char* fileName);
-	void updateTexture();
+	SBAPI SbmTexture* findTexture(int type, const char* textureName);
+	SBAPI void loadTexture(int type, const char* textureName, const char* fileName);
+	SBAPI void updateTexture();
 protected:
 	StrTextureMap& findMap(int type);
 };
@@ -55,16 +56,16 @@ protected:
 	GLuint texID;	
 	GLuint internal_format, texture_format;		
 public:
-	SbmTexture(const char* texName);
-	~SbmTexture(void);
-	bool hasBuild() { return finishBuild; }
-	const std::string& getName() { return textureName; }
-	GLuint getID() { return texID; }
-	void loadImage(const char* fileName);
-	void buildTexture();
+	SBAPI SbmTexture(const char* texName);
+	SBAPI ~SbmTexture(void);
+	SBAPI bool hasBuild() { return finishBuild; }
+	SBAPI const std::string& getName() { return textureName; }
+	SBAPI GLuint getID() { return texID; }
+	SBAPI void loadImage(const char* fileName);
+	SBAPI void buildTexture();
 
-	unsigned char* getBuffer() { return buffer; }
-	int getWidth() const { return width; }	
-	int getHeight() const { return height; }
-	int getNumChannels() const { return channels; }	
+	SBAPI unsigned char* getBuffer() { return buffer; }
+	SBAPI int getWidth() const { return width; }	
+	SBAPI int getHeight() const { return height; }
+	SBAPI int getNumChannels() const { return channels; }	
 };

@@ -35,93 +35,93 @@
     SrStringArray implements methods for managing a resizeable array
     of strings. It derives SrArray, rewriting all methods to correctly
     manage the allocation and deallocation of the strings. */
-class SrStringArray : private SrArray<char*>
+class SBAPI SrStringArray : private SrArray<char*>
  { public :
     /*! Default constructor */
-    SBAPI SrStringArray ( int s=0, int c=0 );
+    SrStringArray ( int s=0, int c=0 );
 
     /*! Copy constructor */
-    SBAPI SrStringArray ( const SrStringArray& a );
+    SrStringArray ( const SrStringArray& a );
 
     /*! Destructor */
-    SBAPI virtual ~SrStringArray ();
+    virtual ~SrStringArray ();
 
     /*! Returns true if the array has no elements, and false otherwise. */
-    SBAPI bool empty () const { return SrArray<char*>::empty(); }
+    bool empty () const { return SrArray<char*>::empty(); }
 
     /*! Returns the capacity of the array. */
-    SBAPI int capacity () const { return SrArray<char*>::capacity(); }
+    int capacity () const { return SrArray<char*>::capacity(); }
 
     /*! Returns the current size of the array. */
-    SBAPI int size () const { return SrArray<char*>::size(); }
+    int size () const { return SrArray<char*>::size(); }
 
     /*! Changes the size of the array. */
-    SBAPI void size ( int ns );
+    void size ( int ns );
 
     /*! Changes the capacity of the array. */
-    SBAPI void capacity ( int nc );
+    void capacity ( int nc );
 
     /*! Makes capacity to be equal to size. */
-    SBAPI void compress ();
+    void compress ();
 
     /*! Returns a valid index as if the given index references a circular
         array, ie, it returns index%size() for positive numbers. Negative
         numbers are also correctly mapped. */
-    SBAPI int validate ( int index ) const { return SrArray<char*>::validate(index); }
+    int validate ( int index ) const { return SrArray<char*>::validate(index); }
 
     /*! Sets all elements to s */
-    SBAPI void setall ( const char* s );
+    void setall ( const char* s );
 
     /*! Sets element i to become a copy of s. Index i must be a valid entry. */
-    SBAPI void set ( int i, const char* s );
+    void set ( int i, const char* s );
 
     /*! Gets a const pointer to the string index i. If that string was not
         defined it returns a pointer to a static empty string "", so that
         always a valid string is returned. */
-    SBAPI const char* get ( int i ) const;
+    const char* get ( int i ) const;
 
     /*! Operator version of get() */
-    SBAPI const char* operator[] ( int i ) const { return get(i); }
+    const char* operator[] ( int i ) const { return get(i); }
 
     /*! Returns a const pointer to the last element or 0 if the array is empty*/
-    SBAPI const char* top () const;
+    const char* top () const;
 
     /*! Pop and frees element size-1 if the array is not empty */
-    SBAPI void pop ();
+    void pop ();
 
     /*! Appends one element */
-    SBAPI void push ( const char* s );
+    void push ( const char* s );
 
     /*! Inserts dp positions, starting at pos i, and seting string s in
         each new position created. */
-    SBAPI void insert ( int i, const char* s, int dp=1 );
+    void insert ( int i, const char* s, int dp=1 );
 
     /*! Removes dp positions starting from pos i */
-    SBAPI void remove ( int i, int dp=1 );
+    void remove ( int i, int dp=1 );
 
     /*! Copy operator */
-    SBAPI void operator = ( const SrStringArray& a );
+    void operator = ( const SrStringArray& a );
 
     /*! Inserts one string, considering the array is sorted. Returns the inserted position, 
         or -1 if duplication occurs and allowdup is false. */
-    SBAPI int insort ( const char* s, bool allowdup=true );
+    int insort ( const char* s, bool allowdup=true );
 
     /*! Sort array */
-    SBAPI void sort ();
+    void sort ();
 
     /*! Linear search */
-    SBAPI int lsearch ( const char* s ) const;
+    int lsearch ( const char* s ) const;
 
     /*! Binary search for sorted arrays. Returns index of the element found, 
         or -1 if not found. If not found and pos is not 0, pos will have the 
         position to insert the element keeping the array sorted. */
-    SBAPI int bsearch ( const char* s, int* pos=0 );
+    int bsearch ( const char* s, int* pos=0 );
 
     /*! Validate path to be a valid path and push it to the string array.
         If the path is not valid (eg null), or is already in the array, nothing
         is done and -1 is returned. Case sensitive comparison is used.
         In case of success the position of the added path is returned. */
-    SBAPI int push_path ( const char* path );
+    int push_path ( const char* path );
 
     /*! Considers that the string array contains a list of paths and tries to locate
         and open a file by searching in these paths.
@@ -136,18 +136,18 @@ class SrStringArray : private SrArray<char*>
         Returns true if the file could be open. In such case, the successfull full file
         name can be found in inp.filename(). False is returned in case of failure.
         Parameter mode is the fopen() mode: "rt", etc.  */
-    SBAPI bool open_file ( SrInput& inp, const char* filename, const char* mode, const char* basedir );
+    bool open_file ( SrInput& inp, const char* filename, const char* mode, const char* basedir );
 
     /*! Frees the data of SrStringArray, and then makes SrStringArray be the
         given array a. After this, a is set to be a valid empty array. The data
         is moved without reallocation. */
-    SBAPI void take_data ( SrStringArray& a );
+    void take_data ( SrStringArray& a );
 
     /*! Outputs all elements of the array in format ["e0" "e1" ... "en"]. */
-    SBAPI friend SrOutput& operator<< ( SrOutput& o, const SrStringArray& a );
+    friend SrOutput& operator<< ( SrOutput& o, const SrStringArray& a );
 
     /*! Inputs elements in format ["e0" "e1" ... "en"]. */
-    SBAPI friend SrInput& operator>> ( SrInput& in, SrStringArray& a );
+    friend SrInput& operator>> ( SrInput& in, SrStringArray& a );
  };
 
 #endif // SR_STRING_ARRAY_H

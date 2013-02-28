@@ -25,6 +25,7 @@
 # ifndef SK_SKELETON_H
 # define SK_SKELETON_H
 
+#include <sb/SBTypes.h>
 # include <sr/sr_string.h>
 # include <sr/sr_hash_table.h>
 # include <sr/sr_shared_class.h>
@@ -67,92 +68,92 @@ class SkSkeleton : public SmartBody::SBAsset, public SrSharedClass
 
 	public :
     /*! Constructor */
-    SkSkeleton ();
+    SBAPI SkSkeleton ();
 
-	SkSkeleton(SkSkeleton* origSkel);
+	SBAPI SkSkeleton(SkSkeleton* origSkel);
 
     /*! Destructor is public but pay attention to the use of ref()/unref() */
-    virtual ~SkSkeleton ();
+    SBAPI virtual ~SkSkeleton ();
 
 	/*! Sets the filename used to load the skeleton, if any */
-    void skfilename ( const char* s ) { _skfilename = s; }
+    SBAPI void skfilename ( const char* s ) { _skfilename = s; }
 
     /*! Access to the .sk skeleton definiton, if any*/
-	const std::string& skfilename () { return _skfilename; }
+	SBAPI const std::string& skfilename () { return _skfilename; }
 
     /*! Deletes all data and set the skeleton to be an empty hierarchy */
-    void init ();
+    SBAPI void init ();
 	
-	std::vector<SkJoint*>& get_joint_array( void ) { return( _joints ); }
+	SBAPI std::vector<SkJoint*>& get_joint_array( void ) { return( _joints ); }
 
     /*! Adds a joint to the hierarchy. If parentid<0 (the default) the last
         joint in the joint list is used as parent (the joint becomes root
         if the list is empty) */
-    SkJoint* add_joint ( SkJoint::RotType rtype, int parentid=-1 );
+    SBAPI SkJoint* add_joint ( SkJoint::RotType rtype, int parentid=-1 );
 
     /*! Inserts a new joint above the previous root */
-    SkJoint* insert_new_root_joint ( SkJoint::RotType rtype );
+    SBAPI SkJoint* insert_new_root_joint ( SkJoint::RotType rtype );
 
     /*! Returns the collision detection id (or -1 if no id). */
-    int coldet_id () const { return _coldetid; }
+    SBAPI int coldet_id () const { return _coldetid; }
 
 	/*! Refresh the joints */
-	void refresh_joints();
+	SBAPI void refresh_joints();
 
     /*! Returns a flat list with all joints. Note that method
         SkJoint::index() returns the index of the joint in this list */
-    const std::vector<SkJoint*>& joints () const { return _joints; }
+    SBAPI const std::vector<SkJoint*>& joints () const { return _joints; }
 
     /*! Array with the pairs that should be deactivated for collision
         detection at connection time with SrColdet. The pairs can be
         declared in the skeleton .sk file */
-    std::vector<SkJoint*>& coldet_free_pairs () { return _coldet_free_pairs; }
+    SBAPI std::vector<SkJoint*>& coldet_free_pairs () { return _coldet_free_pairs; }
 
     /*! Returns the channel array of all the active channels */
-    SkChannelArray& channels () { return *_channels; }
+    SBAPI SkChannelArray& channels () { return *_channels; }
 
     /*! Returns the array of pre-defined postures loaded from the .sk file */
-    SrArray<SkPosture*>& postures () { return _postures; }
+    SBAPI SrArray<SkPosture*>& postures () { return _postures; }
 
     /*! Rebuilds the active channels according to the free channels in the joint hierarchy */
-    void make_active_channels () { _channels->get_active_channels(this); }
+    SBAPI void make_active_channels () { _channels->get_active_channels(this); }
     
     /*! Returns a pointer to the root joint of the skeleton */
-    SkJoint* root () const { return _root; }
+    SBAPI SkJoint* root () const { return _root; }
 
 	/*! Set the root joint pointer */
-	void root(SkJoint* r)	{_root = r;}
+	SBAPI void root(SkJoint* r)	{_root = r;}
 
 	/*! Returns the joint with name n. A hash table is used to perform the search.
         0 is returned in case the joint is not found.
         If the hash table is not up to date, it is automatically re-created. */
-    SkJoint* search_joint ( const char* n );
+    SBAPI SkJoint* search_joint ( const char* n );
 
-	void updateJointMap();
+	SBAPI void updateJointMap();
     /*! Returns the joint with name n performing a linear search.
         0 is returned in case the joint is not found.
         This method should be used if the joint list is being constructed,
         as it does not rely on the hash table. */
-    SkJoint* linear_search_joint ( const char* n ) const;
+    SBAPI SkJoint* linear_search_joint ( const char* n ) const;
 
     /*! Calls root()->update_gmat() only if it is required due to any
         changes to the local matrices in joints */
-    void update_global_matrices ();
+    SBAPI void update_global_matrices ();
 
-	void updateGlobalMatricesZero();
+	SBAPI void updateGlobalMatricesZero();
 
     /*! Returns true if all global matrices are up to date */
-    bool global_matrices_uptodate () { return _gmat_uptodate; }
+    SBAPI bool global_matrices_uptodate () { return _gmat_uptodate; }
 
     /*! Set the internal flag that controls global matrices update to false.
         This method is automatically called each time a joint value is changed */
-    void invalidate_global_matrices () { _gmat_uptodate=false; }
+    SBAPI void invalidate_global_matrices () { _gmat_uptodate=false; }
 
     /*! Compress all internal arrays */
-    void compress ();
+    SBAPI void compress ();
 
     /*! To fix geometries that were created in global coordinates */
-    void set_geo_local ();
+    SBAPI void set_geo_local ();
 
     /* Loads a skeleton hierarchy in .sk or .bvh format.
        Returns false if some error is encountered, otherwise true is returned.
@@ -161,37 +162,37 @@ class SkSkeleton : public SmartBody::SBAsset, public SrSharedClass
        and in the current directory. Also, relative paths in sk become relative to basedir.
        If basedir is not given (null), it is extracted from in.filename(), if available.
        Method compress() is called after the file is loaded. */
-    bool loadSk ( SrInput& in, double scale = 1.0, const char* basedir=0 );
+    SBAPI bool loadSk ( SrInput& in, double scale = 1.0, const char* basedir=0 );
 
     /*! Save in .sk format the current skeleton.
         Geometries are also exported if parameter geopath is provided, or if
         a valid path can be extracted from SrOutput::filename(). */
-    bool save ( SrOutput& out, const char* geopath=0 );
+    SBAPI bool save ( SrOutput& out, const char* geopath=0 );
 
     /*! Save joints definitions that can be merged into a skeleton */
-    bool export_joints ( SrOutput& out );
+    SBAPI bool export_joints ( SrOutput& out );
 
-	void copy(SkSkeleton* origSkel);
+	SBAPI void copy(SkSkeleton* origSkel);
 
 	/*! Computes the center of mass of the skeleton */
-	void compute_com () {}; 
+	SBAPI void compute_com () {}; 
 
 	/*! retrieves the center of mass of the skeleton */
-	SrVec& com () { return _com; };	
+	SBAPI SrVec& com () { return _com; };	
 	
-	float getBaseHeight(const std::string& baseName);
-	float getCurrentHeight();	
-	SrBox getBoundingBox();
+	SBAPI float getBaseHeight(const std::string& baseName);
+	SBAPI float getCurrentHeight();	
+	SBAPI SrBox getBoundingBox();
 	
-	void copy_joint(SkJoint* dest, SkJoint* src);
-	void create_joints(SkJoint* origParent, SkJoint* parent);	
-	void clearJointValues(); // reset all joint quat/pos values to zero
+	SBAPI void copy_joint(SkJoint* dest, SkJoint* src);
+	SBAPI void create_joints(SkJoint* origParent, SkJoint* parent);	
+	SBAPI void clearJointValues(); // reset all joint quat/pos values to zero
 
 
 	// get the global direction of a bone pair based on the current skeleton configuration
-	SrVec boneGlobalDirection(const std::string& srcJoint, const std::string& dstJoints); 
-	SrVec getFacingDirection();
-	void resetSearchJoint();
+	SBAPI SrVec boneGlobalDirection(const std::string& srcJoint, const std::string& dstJoints); 
+	SBAPI SrVec getFacingDirection();
+	SBAPI void resetSearchJoint();
 
    private :
     int _loadjdata ( SrInput& in, SkJoint* j, SrStringArray& paths );

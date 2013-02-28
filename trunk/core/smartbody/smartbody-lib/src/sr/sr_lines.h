@@ -46,7 +46,7 @@
     color for all vertices with indices >=i will be C[-j-1].
     The indices i appearing in the sequence of pairs (i,j) must appear ordered, so that
     'I' is just read once when drawing the lines. */   
-class SrLines
+class SBAPI SrLines
  { public :
     SrArray<SrPnt>   V; //<! Array of used vertices
     SrArray<SrColor> C; //<! Array of possibly used colors
@@ -56,44 +56,44 @@ class SrLines
    public :
 
     /* Default constructor. */
-    SBAPI SrLines ();
+    SrLines ();
 
     /* Destructor . */
-    SBAPI virtual ~SrLines ();
+    virtual ~SrLines ();
 
     /*! Set the sizes of arrays V, C, and I to zero. */
-    SBAPI void init ();
+    void init ();
 
     /*! Returns true if V array is empty; false otherwise. */
-    SBAPI bool empty () const { return V.size()==0? true:false; }
+    bool empty () const { return V.size()==0? true:false; }
 
     /*! Compress array V, C, and I. */
-    SBAPI void compress ();
+    void compress ();
 
     /*! Push in V the two points defining a new segment of line. */
-    SBAPI void push_line ( const SrVec &p1, const SrVec &p2 );
-    SBAPI void push_line ( const SrVec2 &p1, const SrVec2 &p2 );
-    SBAPI void push_line ( float ax, float ay, float az, float bx, float by, float bz );
-    SBAPI void push_line ( float ax, float ay, float bx, float by );
+    void push_line ( const SrVec &p1, const SrVec &p2 );
+    void push_line ( const SrVec2 &p1, const SrVec2 &p2 );
+    void push_line ( float ax, float ay, float az, float bx, float by, float bz );
+    void push_line ( float ax, float ay, float bx, float by );
 
     /*! Starts a definition of a polyline by pushing in 'I' the index V.size() */
-    SBAPI void begin_polyline ();
+    void begin_polyline ();
 
     /*! Finishes a definition of a polyline by pushing in 'I' the index V.size()-1 */
-    SBAPI void end_polyline ();
+    void end_polyline ();
 
     /*! Push in V a new vertex. */
-    SBAPI void push_vertex ( const SrVec& p );
-    SBAPI void push_vertex ( const SrVec2& p );
-    SBAPI void push_vertex ( float x, float y, float z=0 );
+    void push_vertex ( const SrVec& p );
+    void push_vertex ( const SrVec2& p );
+    void push_vertex ( float x, float y, float z=0 );
 
     /*! Push a new color to be considered for the new vertices that will be defined.
         This method pushes in I the pair ( V.size(), -C.size() ), and then
         pushes in C the given color c */
-    SBAPI void push_color ( const SrColor &c );
+    void push_color ( const SrColor &c );
 
     /*! Create a 2 dimensional cross of radius r and center c */
-    SBAPI void push_cross ( SrVec2 c, float r );
+    void push_cross ( SrVec2 c, float r );
 
     /*! Creates axis with desired parameters:
         orig gives the position of the axis center;
@@ -102,25 +102,25 @@ class SrLines
         string let must contain the letters to draw, e.g, "xyz" will draw all letters;
         rule (witch has default value of true) indicates wether to add marks in each unit;
         box, if !=0, will give precise min/max for each of the axis */
-    SBAPI void push_axis ( const SrPnt& orig, float len, int dim, const char* let,
+    void push_axis ( const SrPnt& orig, float len, int dim, const char* let,
                      bool rule=true, SrBox* box=0 );
 
     /*! Creates the 12 lines forming box b. If multicolor is true,
         colors red, green and blue are set to lines parallel to axis x, y, and z.
         Colors can be later on modified in the C array if required. */
-    SBAPI void push_box ( const SrBox& box, bool multicolor=false );
+    void push_box ( const SrBox& box, bool multicolor=false );
 
     /*! Push an array of points forming a polyline */
-    SBAPI void push_polyline ( const SrArray<SrVec2>& a );
+    void push_polyline ( const SrArray<SrVec2>& a );
 
     /*! Push an array of points forming a polygon */
-    SBAPI void push_polygon ( const SrArray<SrVec2>& a );
+    void push_polygon ( const SrArray<SrVec2>& a );
 
     /*! Push an array of points assumin each 2 consecutive points denote one line */
-    SBAPI void push_lines ( const SrArray<SrVec2>& a );
+    void push_lines ( const SrArray<SrVec2>& a );
 
     /*! Calls push_polygon() or push_polyline() according to p.open() */
-    SBAPI void push_polygon ( const SrPolygon& p )
+    void push_polygon ( const SrPolygon& p )
      { if (p.open()) push_polyline( (const SrArray<SrVec2>&)p );
          else push_polygon( (const SrArray<SrVec2>&)p );
      }
@@ -129,11 +129,11 @@ class SrLines
         center is the center point, center+radius gives the first point,
         normal is orthogonal to radius, and nvertices gives the number of
         vertices in the polyline */
-    SBAPI void push_circle_approximation ( const SrPnt& center, const SrVec& radius,
+    void push_circle_approximation ( const SrPnt& center, const SrVec& radius,
                                      const SrVec& normal, int nvertices );
 
     /*! Returns the bounding box of all vertices used. The returned box can be empty. */
-    SBAPI void get_bounding_box ( SrBox &b ) const;
+    void get_bounding_box ( SrBox &b ) const;
  };
 
 

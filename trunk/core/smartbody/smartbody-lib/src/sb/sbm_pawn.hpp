@@ -113,51 +113,51 @@ public:  // TODO - properly encapsulate / privatize the following
 
 public:	
 	//  Public Methods
-	SbmPawn();
-	SbmPawn( const char* name );
-	virtual ~SbmPawn();
+	SBAPI SbmPawn();
+	SBAPI SbmPawn( const char* name );
+	SBAPI virtual ~SbmPawn();
 
-	SkSkeleton* getSkeleton() const;
-	void setSkeleton(SkSkeleton* sk);	
-	virtual int init( SkSkeleton* skeleton_p );
+	SBAPI SkSkeleton* getSkeleton() const;
+	SBAPI void setSkeleton(SkSkeleton* sk);	
+	SBAPI virtual int init( SkSkeleton* skeleton_p );
 
-	const std::string& getGeomObjectName();
-	SBGeomObject* getGeomObject(); // get geometry object associated with the pawn
+	SBAPI const std::string& getGeomObjectName();
+	SBAPI SBGeomObject* getGeomObject(); // get geometry object associated with the pawn
 	//void setGeomObject(SBGeomObject* obj);
 
- 	void updateToColObject();
-	void updateToSteeringSpaceObject();
-	void initSteeringSpaceObject();
+ 	SBAPI void updateToColObject();
+	SBAPI void updateToSteeringSpaceObject();
+	SBAPI void initSteeringSpaceObject();
 
-	bool is_initialized();
+	SBAPI bool is_initialized();
 
-	void setHeight( float height )	{ _height = height; }
-	float getHeight( void ) 		{ return _height; }
-	SrBox getBoundingBox( void ) 		{ if (_skeleton) return _skeleton->getBoundingBox(); return SrBox(); }
+	SBAPI void setHeight( float height )	{ _height = height; }
+	SBAPI float getHeight( void ) 		{ return _height; }
+	SBAPI SrBox getBoundingBox( void ) 		{ if (_skeleton) return _skeleton->getBoundingBox(); return SrBox(); }
 
-	virtual int prune_controller_tree();  // removes unused or overwritten controllers
+	SBAPI virtual int prune_controller_tree();  // removes unused or overwritten controllers
 	
-	void reset_all_channels();
+	SBAPI void reset_all_channels();
 
-	const SkJoint* get_joint( const char* joint_name ) const;
-	const SkJoint* get_world_offset_joint() const
+	SBAPI const SkJoint* get_joint( const char* joint_name ) const;
+	SBAPI const SkJoint* get_world_offset_joint() const
 	{	return get_joint( WORLD_OFFSET_JOINT_NAME ); }
 
-	virtual SBTransform& getGlobalTransform();
-	virtual void setGlobalTransform(SBTransform& newGlobalTransform);
+	SBAPI virtual SBTransform& getGlobalTransform();
+	SBAPI virtual void setGlobalTransform(SBTransform& newGlobalTransform);
 
-	SrMat get_world_offset();
-	void get_world_offset( float& x, float& y, float& z,
+	SBAPI SrMat get_world_offset();
+	SBAPI void get_world_offset( float& x, float& y, float& z,
 		                   float& yaw, float& pitch, float& roll );
 
-	void setWorldOffset(const SrMat& newWorld);
-	void set_world_offset( float x, float y, float z,
+	SBAPI void setWorldOffset(const SrMat& newWorld);
+	SBAPI void set_world_offset( float x, float y, float z,
 		                   float yaw, float pitch, float roll );
 
-	virtual std::string getClassType();
-	virtual void setClassType(std::string classType);
+	SBAPI virtual std::string getClassType();
+	SBAPI virtual void setClassType(std::string classType);
 
-	virtual void notify(SBSubject* subject);
+	SBAPI virtual void notify(SBSubject* subject);
 
 #if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
 	virtual void register_controller_cleanup( MeController* ct, controller_cleanup_callback_fp func );

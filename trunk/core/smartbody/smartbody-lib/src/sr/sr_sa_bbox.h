@@ -32,14 +32,14 @@
     \brief bbox action
 
     Retrieves the bounding box of a scene */
-class SrSaBBox : public SrSa
+class SBAPI SrSaBBox : public SrSa
  { private :
     SrBox _box;
 
    public :
-    SBAPI void init () { _box.set_empty(); }
-    SBAPI void apply ( SrSn* n ) { init(); SrSa::apply(n); }
-    SBAPI const SrBox& get () const { return _box; }
+    void init () { _box.set_empty(); }
+    void apply ( SrSn* n ) { init(); SrSa::apply(n); }
+    const SrBox& get () const { return _box; }
 
    private : // virtual methods
     virtual bool shape_apply ( SrSnShapeBase* s );

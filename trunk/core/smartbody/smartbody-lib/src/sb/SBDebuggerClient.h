@@ -1,6 +1,7 @@
 #ifndef SBM_DEBUGGER_CLIENT_H_
 #define SBM_DEBUGGER_CLIENT_H_
 
+#include <sb/SBTypes.h>
 #include <vhcl_socket.h>
 #include <string>
 #include <vector>
@@ -20,26 +21,26 @@ private:
    NetRequestManager m_netRequestManager;
 
 public:
-   SBDebuggerClient();
-   virtual ~SBDebuggerClient();
+   SBAPI SBDebuggerClient();
+   SBAPI virtual ~SBDebuggerClient();
 
-   void QuerySbmProcessIds();
-   const std::vector<std::string> & GetSbmProcessIds() const { return m_processIdList; }
+   SBAPI void QuerySbmProcessIds();
+   SBAPI const std::vector<std::string> & GetSbmProcessIds() const { return m_processIdList; }
 
-   void Connect(const std::string & id);
-   void Disconnect();
-   bool GetConnectResult() { return m_connectResult; }
+   SBAPI void Connect(const std::string & id);
+   SBAPI void Disconnect();
+   SBAPI bool GetConnectResult() { return m_connectResult; }
 
-   void Init();
-   void Update();
-   void StartUpdates(double updateFrequencyS);
-   void EndUpdates();
+   SBAPI void Init();
+   SBAPI void Update();
+   SBAPI void StartUpdates(double updateFrequencyS);
+   SBAPI void EndUpdates();
 
-   void SendSBMCommand(int requestId, const std::string & command);
-   void SendSBMCommand(int requestId, const std::string & returnValue, const std::string & functionNameandParams,
+   SBAPI void SendSBMCommand(int requestId, const std::string & command);
+   SBAPI void SendSBMCommand(int requestId, const std::string & returnValue, const std::string & functionNameandParams,
       NetRequest::RequestCallback cb, void* callbackOwner = NULL);
 
-   void ProcessVHMsgs(const char * op, const char * args);
+   SBAPI void ProcessVHMsgs(const char * op, const char * args);
 };
 
 #endif

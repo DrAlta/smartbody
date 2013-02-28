@@ -46,7 +46,7 @@ enum srRenderMode { srRenderModeDefault,
     node types by means of typedefs, as for instance, SrSceneModel is
     a typedef of SrSnShape<SrModel> (note that, in the example,
     sr_model.h must be included before sr_scene.h) */
-class SrSnShapeBase : public SrSn
+class SBAPI SrSnShapeBase : public SrSn
  { public :
     class RenderLibData { public : virtual ~RenderLibData() {}; };
    private :
@@ -75,63 +75,63 @@ class SrSnShapeBase : public SrSn
         second time, false is returned and nothing is done.
         The pointer rdata should be allocated using operator new and SrSnShapeBase
         will delete it in its destructor */
-    SBAPI bool set_renderlib_data ( RenderLibData* rdata );
+    bool set_renderlib_data ( RenderLibData* rdata );
 
     /*! Retrieves the data related to the used rendering library */
-    SBAPI RenderLibData* get_renderlib_data () { return _renderlib_data; }
+    RenderLibData* get_renderlib_data () { return _renderlib_data; }
 
     /*! By default the render mode is srRenderModeDefault, that is specific to the
         shape type. For example a SrModel has as default smooth render mode, while
         SrLines has line mode as default. */
-    SBAPI srRenderMode render_mode () const { return (srRenderMode)_render_mode; }
-    SBAPI void render_mode ( srRenderMode m );
+    srRenderMode render_mode () const { return (srRenderMode)_render_mode; }
+    void render_mode ( srRenderMode m );
 
     /*! Saves the current render mode and then replaces it by m. If
         can_override_render_mode() is false, then nothing is done. */
-    SBAPI void override_render_mode ( srRenderMode m );
+    void override_render_mode ( srRenderMode m );
 
     /*! Restore the render mode that was used before overriding it. */
-    SBAPI void restore_render_mode ();
+    void restore_render_mode ();
 
     /*! If false, the render action will not be able to override the render mode
         of this shape node. Default is true. */
-    SBAPI void can_override_render_mode ( bool b ) { _can_override_render_mode = (char)b; }
-    SBAPI bool can_override_render_mode () { return _can_override_render_mode? true:false; }
+    void can_override_render_mode ( bool b ) { _can_override_render_mode = (char)b; }
+    bool can_override_render_mode () { return _can_override_render_mode? true:false; }
 
     /*! Saves the current material and then replaces it by m. */
-    SBAPI void override_material ( SrMaterial m );
+    void override_material ( SrMaterial m );
 
     /*! Restore the material that was used before overriding it. */
-    SBAPI void restore_material ();
+    void restore_material ();
 
     /*! Returns true if the material is being overrriden, and false otherwise. */
-    SBAPI bool material_is_overriden () { return _material_is_overriden? true:false; }
+    bool material_is_overriden () { return _material_is_overriden? true:false; }
 
     /*! The default resolution is 1, a greater value will render more accurate
         parametric objects, 0 represents the coarser possible representation.
         Values cannot be <0. */
-    SBAPI float resolution () const { return _resolution; }
-    SBAPI void resolution ( float r );
+    float resolution () const { return _resolution; }
+    void resolution ( float r );
 
     /*! Sets the material to be used for the shape */
-    SBAPI void material ( const SrMaterial& m );
-    SBAPI const SrMaterial& material () const { return _material; }
+    void material ( const SrMaterial& m );
+    const SrMaterial& material () const { return _material; }
 
     /*! Sets the diffuse color of the shape material. Note that when rendering
         shapes without lighting, only the diffuse color is used. */
-    SBAPI void color ( const SrColor& c );
-    SBAPI const SrColor& color () const { return _material.diffuse; }
+    void color ( const SrColor& c );
+    const SrColor& color () const { return _material.diffuse; }
 
     /*! Returns true if the node parameters have changed, requiring
         the re-generation of the associated render lists. */
-    SBAPI bool haschanged () const { return _changed? true:false; }
+    bool haschanged () const { return _changed? true:false; }
 
     /*! Sets the changed / unchanged state. If true, it will force the
         node to regenerate its render lists. */
-    SBAPI void changed ( bool b ) { _changed = (char)b; }
+    void changed ( bool b ) { _changed = (char)b; }
 
     /*! Calculates the bounding box of the shape. */
-    SBAPI virtual void get_bounding_box ( SrBox &box ) const=0;
+    virtual void get_bounding_box ( SrBox &box ) const=0;
  };
 
 //================================= SrSnShapeTpl ====================================

@@ -49,7 +49,7 @@
        scene graph, and node sharing is supported. A reference counter is
        used for automatically deleting unused nodes, see ref() and unref()
        methods in the parent class SrSharedClass. */
-class SrSn : public SrSharedClass
+class SBAPI SrSn : public SrSharedClass
  { public :
     enum Type { TypeMatrix, TypeGroup, TypeEditor, TypeShape };
 
@@ -76,23 +76,23 @@ class SrSn : public SrSharedClass
     /*! Returns a const string with the name of the instantiated node class.
         The convention is exactly the name of the instantiated class,
         without the leading "SrSn" word. */
-    SBAPI const char* inst_class_name () const { return _inst_class_name; }
+    const char* inst_class_name () const { return _inst_class_name; }
 
     /*! Returns the type of this node. The type is set at instantiation
         and cannot be changed later. */
-    SBAPI Type type () const { return (Type) _type; }
+    Type type () const { return (Type) _type; }
 
     /*! Gets the visible state of this node. */
-    SBAPI bool visible () const { return _visible? true:false; }
+    bool visible () const { return _visible? true:false; }
 
     /*! Changes the active state of this node. */
-    SBAPI void visible ( bool b ) { _visible = (char)b; }
+    void visible ( bool b ) { _visible = (char)b; }
 
     /*! Defines any label to be kept within the node. */
-    SBAPI void label ( const char* s );
+    void label ( const char* s );
 
     /*! Returns the associated label, or an empty string. */
-    SBAPI const char* label () const;
+    const char* label () const;
  };
 
 //================================ End of File =================================================

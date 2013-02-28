@@ -36,7 +36,7 @@
 
     SrEvent is used to describe a mouse or keyboard event, in a
     system-independent way. */
-class SrEvent 
+ class SBAPI SrEvent 
  { public :
     /*! Enumerators for the type of event. */
     enum EventType { EventNone,    //!< No event occured.
@@ -91,29 +91,29 @@ class SrEvent
    public : //--- methods :
 
     /*! Initialize as a None event type, by calling init(). */
-    SBAPI SrEvent ();
+    SrEvent ();
 
     /*! Makes the event as the None type, and puts all data with their default values of zero. */
-    SBAPI void init ();
+    void init ();
 
     /*! Puts mouse keyboard information to their default value, but saves the mouse
         values in the lmouse variables. */
-    SBAPI void init_lmouse ();
+    void init_lmouse ();
 
     /*! Returns a string with the name of the event type. */
-    SBAPI const char *type_name () const;
+    const char *type_name () const;
 
     /*! Returns the difference: mousex-lmousex. */
-    SBAPI float mousedx () const { return mouse.x-lmouse.x; }
+    float mousedx () const { return mouse.x-lmouse.x; }
 
     /*! Returns the difference: mousey-lmousey. */
-    SBAPI float mousedy () const { return mouse.y-lmouse.y; }
+    float mousedy () const { return mouse.y-lmouse.y; }
 
     /*! Returns true if the event type is push, drag, or release; and false otherwise. */
-    SBAPI bool mouse_event () const { return type==EventPush||type==EventDrag||type==EventRelease? true:false; }
+    bool mouse_event () const { return type==EventPush||type==EventDrag||type==EventRelease? true:false; }
 
     /*! Outputs data of this event for data inspection. */
-    SBAPI friend SrOutput& operator<< ( SrOutput& out, const SrEvent& e );
+    friend SrOutput& operator<< ( SrOutput& out, const SrEvent& e );
  };
 
 
