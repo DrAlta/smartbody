@@ -23,9 +23,12 @@ SrViewer* getViewer()
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	if (!scene->getViewer())
 	{
-		scene->setViewer(scene->getViewerFactory()->create(100, 100, 800, 600));
-		scene->getViewer()->label_viewer("Visual Debugger");
-		SmartBody::SBScene::getScene()->createCamera("cameraDefault");
+		if (scene->getViewerFactory())
+		{
+			scene->setViewer(scene->getViewerFactory()->create(100, 100, 800, 600));
+			scene->getViewer()->label_viewer("Visual Debugger");
+			SmartBody::SBScene::getScene()->createCamera("cameraDefault");
+		}
 	}
 	return scene->getViewer();
 }
