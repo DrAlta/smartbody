@@ -3782,7 +3782,11 @@ int triggerevent_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 int mcu_python_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	std::string command = args.read_remainder_raw();
-	return SmartBody::SBScene::getScene()->run(command.c_str());
+	bool val = SmartBody::SBScene::getScene()->run(command.c_str());
+	if (val)
+		return CMD_SUCCESS;
+	else
+		return CMD_FAILURE;
 }
 
 int mcu_pythonscript_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
@@ -5530,22 +5534,17 @@ int sb_main_func( srArgBuffer & args, SmartBody::SBCommandManager* cmdMgr )
    strstr << token;
    if (args_raw)
 	   strstr << " " << args_raw;
-   int result = SmartBody::SBScene::getScene()->run( strstr.str().c_str() );
-   switch( result )
+   bool resultOk = SmartBody::SBScene::getScene()->run( strstr.str().c_str() );
+   if (resultOk)
    {
-      case CMD_NOT_FOUND:
-         LOG( "Python error: command NOT FOUND: '%s %s'> ", token, args_raw );
-         break;
-      case CMD_FAILURE:
-         LOG( "Python error: command FAILED: '%s %s'> ", token, args_raw );
-         break;
-      case CMD_SUCCESS:
-         break;
-      default:
-         break;
+	   return CMD_SUCCESS;
+   }
+   else
+   {
+	     LOG( "Python error: command FAILED: '%s %s'> ", token, args_raw );
+		 return  CMD_FAILURE;
    }
 
-   return CMD_SUCCESS;
 }
 
 int sbm_main_func( srArgBuffer & args, SmartBody::SBCommandManager* cmdMgr )

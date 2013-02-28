@@ -77,7 +77,7 @@ static int inihandler(void* user, const char* section, const char* name,
     }
 	else if (MATCH("GENERAL", "DefaultPyFile"))
 	{
-		std::string temp = "pythonscript " + std::string(value);
+		std::string temp = "python scene.run(\"" + std::string(value) + "\")";
 		renderer->m_initialCommands.push_back(temp);
 	}
 	else if (MATCH("GENERAL", "ScriptPath"))

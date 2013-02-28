@@ -116,6 +116,7 @@
       <Command>if not exist .\bin mkdir .\bin
 copy /Y "$(TargetPath)" .\bin
 copy /Y ..\SmartBody\lib\SmartBody_d.dll .\bin
+copy /Y ..\smartbody-dll\lib\smartbody-dll_d.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin
@@ -169,6 +170,7 @@ copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
       <Command>if not exist .\bin mkdir .\bin
 copy /Y "$(TargetPath)" .\bin
 copy /Y ..\SmartBody\lib\SmartBody.dll .\bin
+copy /Y ..\smartbody-dll\lib\smartbody-dll.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin
