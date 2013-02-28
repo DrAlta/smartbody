@@ -335,7 +335,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
 	sim->setTime(timeInSeconds);
-	sim->update();
+	scene->update();
    
 	return true;
 }
