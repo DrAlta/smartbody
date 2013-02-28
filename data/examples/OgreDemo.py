@@ -66,7 +66,7 @@ camera.setNearPlane(0.1)
 camera.setAspectRatio(1.02)
 
 sim.start()
-bml.execBML(sinbadName, '<body posture="Sinbad.skeleton.xmlChrUtah_Idle001"/>')
+#bml.execBML(sinbadName, '<body posture="Sinbad.skeleton.xmlChrUtah_Idle001"/>')
 sim.resume()
 '''
 steeringGroup = []
