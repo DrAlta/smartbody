@@ -32,6 +32,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vhcl", "lib\vhcl\vhcl.vcxproj", "{662CF3EB-B816-4727-9D1D-4071C25A3312}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OgreViewer", "core\ogre-viewer\build\vs2008\OgreViewer.vcxproj", "{B19F5657-AA08-4D34-B3A3-58045074DBBB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D41370B8-B1B9-430D-8813-C296D7935F2B} = {D41370B8-B1B9-430D-8813-C296D7935F2B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "smartbody-dll", "core\smartbody\smartbody-dll\smartbody-dll.vcxproj", "{5C9A5F23-D57B-4B7A-A3E3-0489F9A4F147}"
 	ProjectSection(ProjectDependencies) = postProject
