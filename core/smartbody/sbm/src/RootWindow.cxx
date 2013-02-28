@@ -19,6 +19,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBVHMsgManager.h>
 #include <sbm/Heightfield.h>
+#include <sbm/KinectProcessor.h>
 #include <sb/SBPython.h>
 
 BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
@@ -466,6 +467,7 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	std::string path = fullfilename.substr(0, pos - 1);
 	scene->addAssetPath("script", path);
 	scene->runScript(filebasename);
+	scene->getVHMsgManager()->setEnable(true);	
 }
 
 void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
@@ -633,6 +635,7 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		scene->setViewer(window);
 		scene->getViewer()->root(scene->getRootGroup());
+		//mcu.kinectProcessor->initKinectSkeleton();
 		SbmShaderManager::singleton().setViewer(window);
 
 
@@ -650,8 +653,7 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 		setupPython();
 		
 
-		scene->getVHMsgManager()->setEnable(true);
-
+		scene->getVHMsgManager()->setEnable(true);	
 	}
 }
 

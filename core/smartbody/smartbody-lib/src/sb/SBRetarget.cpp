@@ -5,6 +5,7 @@
 #include <sk/sk_motion.h>
 #include <queue>
 
+#define ELITE_HACK 0
 
 namespace SmartBody {
 
@@ -114,6 +115,12 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 		std::string jname = srcJointNames[i];
 		SmartBody::SBJoint* srcJoint = tempSrcSk->getJointByName(jname);
 		SmartBody::SBJoint* tgtJoint = interSk->getJointByName(jname);		
+
+#if ELITE_HACK
+		if (jname == "r_sternoclavicular" || jname == "l_sternoclavicular" || jname == "r_acromioclavicular" || jname == "l_acromioclavicular")
+			jointSkipMap[jname] = true;//continue;
+#endif
+
 		if (srcJoint && tgtJoint ) //&& std::find(endJoints.begin(),endJoints.end(), jname) == endJoints.end())
 		{					
 			SrQuat gsrc = SrQuat(srcJoint->gmat());
@@ -124,6 +131,7 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 			SrQuat finalPreQuat = protDst*gdst.inverse()*gsrc*protSrc.inverse();
 			SrQuat finalPostQuat = gsrc.inverse()*gdst;
 			
+			SrQuat finalRot = finalPreQuat*finalPostQuat;
 			jointPrePostRotMap[jname] = QuatPair(finalPreQuat,finalPostQuat);
 
 
@@ -195,17 +203,28 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 
 SrQuat SBRetarget::applyRetargetJointRotation( std::string jointName, SrQuat& inQuat )
 {
-	SrQuat outQuat; // identity rotation 
+	SrQuat outQuat; // identity rotation 	
 	if (jointPrePostRotMap.find(jointName) != jointPrePostRotMap.end())
 	{
-		QuatPair& qpair = jointPrePostRotMap[jointName];
-		SrMat outMat, firstMat, secondMat, inMat;
-//		firstMat = qpair.first.get_mat(firstMat);
-// 		secondMat = qpair.second.get_mat(secondMat);
-// 		inMat = inQuat.get_mat(inMat);
-// 		outMat = secondMat*inMat*firstMat;
-// 		outQuat = SrQuat(outMat);
-		outQuat = qpair.first*inQuat*qpair.second;
+		QuatPair& qpair = jointPrePostRotMap[jointName];		
+#if ELITE_HACK
+		if (jointName == "l_shoulder" && jointAddRotMap.find("l_sternoclavicular") != jointAddRotMap.end())
+			inQuat = jointAddRotMap["l_sternoclavicular"]*inQuat;
+		if (jointName == "r_shoulder" && jointAddRotMap.find("r_sternoclavicular") != jointAddRotMap.end())
+			inQuat = jointAddRotMap["r_sternoclavicular"]*inQuat;
+#endif
+
+		if (jointSkipMap.find(jointName) != jointSkipMap.end())
+		{			
+			outQuat = qpair.first*qpair.second;
+#if ELITE_HACK
+			SrQuat newInQuat = SrQuat(inQuat.axisAngle()*0.7f);
+			jointAddRotMap[jointName] = newInQuat;
+#endif
+		}
+		else
+			outQuat = qpair.first*inQuat*qpair.second;
+		//outQuat = qpair.first*qpair.second;
 	}
 	return outQuat;
 }

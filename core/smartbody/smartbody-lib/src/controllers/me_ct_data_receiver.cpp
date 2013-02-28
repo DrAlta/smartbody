@@ -96,7 +96,8 @@ bool MeCtDataReceiver::controller_evaluate(double t, MeFrameData& frame)
 			//SrQuat quat_p = joint->quat()->prerot().inverse() * (quat * joint->gmatZero().inverse());
 			//SrQuat quat_p = (quat * joint->gmatZero().inverse()) * joint->quat()->prerot().inverse();
 
-			SrQuat quat_p =  joint->gmatZero().inverse() * quat * joint->gmatZero();
+			//SrQuat quat_p =  joint->gmatZero().inverse() * quat * joint->gmatZero();
+			SrQuat quat_p = quat;
 			//SrQuat quat_p = quat * joint->quat()->prerot().inverse();
 			//SrQuat quat_p = quat;
 			frame.buffer()[bufferId + 0] = quat_p.w;

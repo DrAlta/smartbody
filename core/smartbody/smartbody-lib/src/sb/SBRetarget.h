@@ -25,6 +25,8 @@ class SBRetarget
 		std::string srcSkName;
 		std::string tgtSkName;
 		std::map<std::string, QuatPair> jointPrePostRotMap;
+		std::map<std::string, bool> jointSkipMap;
+		std::map<std::string, SrQuat> jointAddRotMap;
 		float heightRatio;
 };
 
