@@ -348,7 +348,8 @@ void KinectProcessor::processRetargetRotation(std::string targetSkelName, std::v
 	}		
 
 	SmartBody::SBJoint* rootJoint = kinectSk->getJointByName(getSBJointName(0));
-	outQuat[0] = retarget->applyRetargetJointRotation(getSBJointName(0),rootJoint->quat()->prerot()*quats[0]);
+	SrQuat q = rootJoint->quat()->prerot()*quats[0];
+	outQuat[0] = retarget->applyRetargetJointRotation(getSBJointName(0), q);
 }
 
 void KinectProcessor::filterRotation(std::vector<SrQuat>& quats)
