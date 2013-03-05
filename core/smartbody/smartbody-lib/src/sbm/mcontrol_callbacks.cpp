@@ -3335,9 +3335,9 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "bool")
 	{
 		try {
-			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
-			boost::python::object obj = boost::python::exec(code.c_str(), *(mainDict));
-			bool result = boost::python::extract<bool>((*mainDict)["ret"]);
+			boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), mainDict);
+			bool result = boost::python::extract<bool>(mainDict["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
@@ -3350,9 +3350,9 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "int")
 	{
 		try {
-			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
-			boost::python::object obj = boost::python::exec(code.c_str(), *(mainDict));
-			int result = boost::python::extract<int>((*mainDict)["ret"]);
+			boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), mainDict);
+			int result = boost::python::extract<int>(mainDict["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
@@ -3365,9 +3365,9 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "float")
 	{
 		try {
-			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
-			boost::python::object obj = boost::python::exec(code.c_str(), *(SmartBody::SBScene::getScene()->getPythonMainDict()));
-			float result = boost::python::extract<float>((*mainDict)["ret"]);
+			boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), SmartBody::SBScene::getScene()->getPythonMainDict());
+			float result = boost::python::extract<float>(mainDict["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
@@ -3380,9 +3380,9 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "string")
 	{
 		try {
-			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
-			boost::python::object obj = boost::python::exec(code.c_str(), *(SmartBody::SBScene::getScene()->getPythonMainDict()));
-			std::string result = boost::python::extract<std::string>((*mainDict)["ret"]);
+			boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), SmartBody::SBScene::getScene()->getPythonMainDict());
+			std::string result = boost::python::extract<std::string>(mainDict["ret"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
@@ -3395,15 +3395,15 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "int-array")
 	{
 		try {
-			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
-			boost::python::object obj = boost::python::exec(code.c_str(), *(mainDict));
-			boost::python::object obj2 = boost::python::exec("size = len(ret)", *(mainDict));
-			int size =  boost::python::extract<int>((*mainDict)["size"]);
+			boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), mainDict);
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", mainDict);
+			int size =  boost::python::extract<int>(mainDict["size"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			for (int x = 0; x < size; x++)
 			{
-				int val =  boost::python::extract<int>((*mainDict)["ret"][x]);
+				int val =  boost::python::extract<int>(mainDict["ret"][x]);
 				strstr << " " << val;
 			}
 			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
@@ -3415,15 +3415,15 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "float-array")
 	{
 		try {
-			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
-			boost::python::object obj = boost::python::exec(code.c_str(), *(SmartBody::SBScene::getScene()->getPythonMainDict()));
-			boost::python::object obj2 = boost::python::exec("size = len(ret)", *(SmartBody::SBScene::getScene()->getPythonMainDict()));
-			int size =  boost::python::extract<int>((*mainDict)["size"]);
+			boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), SmartBody::SBScene::getScene()->getPythonMainDict());
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", SmartBody::SBScene::getScene()->getPythonMainDict());
+			int size =  boost::python::extract<int>(mainDict["size"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			for (int x = 0; x < size; x++)
 			{
-				float val =  boost::python::extract<float>((*mainDict)["ret"][x]);
+				float val =  boost::python::extract<float>(mainDict["ret"][x]);
 				strstr << " " << val;
 			}
 			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
@@ -3435,15 +3435,15 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	else if (returnType == "string-array")
 	{
 		try {
-			boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
-			boost::python::object obj = boost::python::exec(code.c_str(), *(SmartBody::SBScene::getScene()->getPythonMainDict()));
-			boost::python::object obj2 = boost::python::exec("size = len(ret)", *(SmartBody::SBScene::getScene()->getPythonMainDict()));
-			int size =  boost::python::extract<int>((*mainDict)["size"]);
+			boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+			boost::python::object obj = boost::python::exec(code.c_str(), SmartBody::SBScene::getScene()->getPythonMainDict());
+			boost::python::object obj2 = boost::python::exec("size = len(ret)", SmartBody::SBScene::getScene()->getPythonMainDict());
+			int size =  boost::python::extract<int>(mainDict["size"]);
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			for (int x = 0; x < size; x++)
 			{
-				std::string val =  boost::python::extract<std::string>((*mainDict)["ret"][x]);
+				std::string val =  boost::python::extract<std::string>(mainDict["ret"][x]);
 				strstr << " " << val;
 			}
 			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );

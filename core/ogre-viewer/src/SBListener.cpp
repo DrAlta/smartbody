@@ -23,7 +23,7 @@ void SBListener::OnPawnCreate( const std::string& name )
 	try
 	{
 		//Create character from characterType
-		ent = m_app->getSceneManager()->createEntity(name, "sphere2.mesh" );						
+		ent = m_app->getSceneManager()->createEntity(name, "sphere.mesh" );						
 	}
 	catch( Ogre::ItemIdentityException& )
 	{

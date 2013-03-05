@@ -573,9 +573,9 @@ int Smartbody_dll::PythonCommandInt( const std::string & command )
    
    try
    {
-		boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
-		boost::python::object obj = boost::python::exec(command.c_str(), *mainDict);
-		int result = boost::python::extract<int>((*mainDict)["ret"]);
+		boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+		boost::python::object obj = boost::python::exec(command.c_str(), mainDict);
+		int result = boost::python::extract<int>(mainDict["ret"]);
 		return result;
    }
    catch (...)
@@ -594,9 +594,9 @@ float Smartbody_dll::PythonCommandFloat( const std::string & command )
    
    try
    {
-	  boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
-      boost::python::object obj = boost::python::exec(command.c_str(), *mainDict);
-      float result = boost::python::extract<float>((*mainDict)["ret"]);
+	  boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+      boost::python::object obj = boost::python::exec(command.c_str(), mainDict);
+      float result = boost::python::extract<float>(mainDict["ret"]);
       return result;
    }
    catch (...)
@@ -614,9 +614,9 @@ std::string Smartbody_dll::PythonCommandString( const std::string & command )
 #ifndef SB_NO_PYTHON
    try
    {
-	  boost::python::object* mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
-      boost::python::object obj = boost::python::exec(command.c_str(), *mainDict);
-      std::string result = boost::python::extract<std::string>((*mainDict)["ret"]);
+	  boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+      boost::python::object obj = boost::python::exec(command.c_str(), mainDict);
+      std::string result = boost::python::extract<std::string>(mainDict["ret"]);
       return result;
    }
    catch (...)
