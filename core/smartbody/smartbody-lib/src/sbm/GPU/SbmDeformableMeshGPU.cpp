@@ -110,7 +110,7 @@ attribute vec3 tangent, binormal;\n\
 varying vec4 vPos;\n\
 varying vec3 normal,lightDir[4],halfVector[4];\n\
 varying vec3 tv,bv;\n\
-varying float dist[2];\n\
+varying float dist[4];\n\
 mat4 GetTransformation(float id)\n \
 { \n\
 int idx = int(id);\n \
@@ -158,6 +158,7 @@ vec3 posDir = vec3(gl_LightSource[i].position);\n\
 vec3 hv = vec3(gl_LightSource[i].halfVector.xyz);\n\
 lightDir[i] = normalize(posDir);\n\
 halfVector[i] = normalize(hv);\n\
+dist[i] = 0.0;\n\
 }\n\
 int colorIdx = int(gl_Vertex.w); \n\
 gl_TexCoord[0] = gl_MultiTexCoord0;\n\
@@ -197,7 +198,7 @@ uniform vec4 diffuseMaterial;\n\
 uniform vec4 specularMaterial;\n\
 uniform float  shineness;\n\
 //uniform vec3 specularColors;\n\
-varying float dist[2];\n\
+varying float dist[4];\n\
 float shadowCoef()\n\
 {\n\
 int index = 0;\n\
