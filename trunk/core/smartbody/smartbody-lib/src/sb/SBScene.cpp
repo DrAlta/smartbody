@@ -91,8 +91,8 @@ void SBScene::initialize()
 
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
-	_mainModule = NULL;
-	_mainDict = NULL;
+//	_mainModule = NULL;
+//	_mainDict = NULL;
 #endif
 #endif
 	_processId = "";
@@ -2801,22 +2801,22 @@ float SBScene::queryTerrain( float x, float z, float *normal_p )
 }
 
 #ifndef SB_NO_PYTHON
-void SBScene::setPythonMainModule(boost::python::object* pyobject)
+void SBScene::setPythonMainModule(boost::python::object pyobject)
 {
 	_mainModule = pyobject;
 }
 
-void SBScene::setPythonMainDict(boost::python::object* pyobject)
+void SBScene::setPythonMainDict(boost::python::object pyobject)
 {
 	_mainDict = pyobject;
 }
 
-boost::python::object* SBScene::getPythonMainModule()
+boost::python::object SBScene::getPythonMainModule()
 {
 	return _mainModule;
 }
 
-boost::python::object* SBScene::getPythonMainDict()
+boost::python::object SBScene::getPythonMainDict()
 {
 	return _mainDict;
 }

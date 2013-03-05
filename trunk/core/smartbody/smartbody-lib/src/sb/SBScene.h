@@ -217,10 +217,10 @@ class SBScene : public SBObject
 
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
-		SBAPI void setPythonMainModule(boost::python::object* pyobject);
-		SBAPI void setPythonMainDict(boost::python::object* pyobject);
-		SBAPI boost::python::object* getPythonMainModule();
-		SBAPI boost::python::object* getPythonMainDict();
+		SBAPI void setPythonMainModule(boost::python::object pyobject);
+		SBAPI void setPythonMainDict(boost::python::object pyobject);
+		SBAPI boost::python::object getPythonMainModule();
+		SBAPI boost::python::object getPythonMainDict();
 #endif
 #endif
 	
@@ -321,8 +321,8 @@ class SBScene : public SBObject
 		std::map<std::string, GeneralParam*> _generalParams;
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
-		boost::python::object* _mainModule;
-		boost::python::object* _mainDict;
+		boost::python::object _mainModule;
+		boost::python::object _mainDict;
 #endif
 #endif
 };

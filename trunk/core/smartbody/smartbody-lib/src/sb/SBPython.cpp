@@ -1833,10 +1833,11 @@ void initPython(std::string pythonLibPath)
 	
 	try {
 #ifndef SB_NO_PYTHON
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		boost::python::object module = boost::python::import("__main__");
-		SmartBody::SBScene::getScene()->setPythonMainModule(&module);
+		scene->setPythonMainModule(module);
 		boost::python::object dict  = module.attr("__dict__");
-		SmartBody::SBScene::getScene()->setPythonMainDict(&dict);
+		scene->setPythonMainDict(dict);
 
 		PyRun_SimpleString("import sys");
 #endif
