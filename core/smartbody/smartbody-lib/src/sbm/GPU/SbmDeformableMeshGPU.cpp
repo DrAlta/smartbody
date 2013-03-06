@@ -108,9 +108,8 @@ attribute vec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
 attribute vec3 tangent, binormal;\n\
 varying vec4 vPos;\n\
-varying vec3 normal,lightDir[4],halfVector[4];\n\
+varying vec3 normal,lightDir[2],halfVector[2];\n\
 varying vec3 tv,bv;\n\
-varying float dist[4];\n\
 mat4 GetTransformation(float id)\n \
 { \n\
 int idx = int(id);\n \
@@ -152,13 +151,12 @@ gl_Position = gl_ModelViewProjectionMatrix*vec4(skin[0].xyz,1.0);\n\
 //dist[1] = 0.0;//length(posDir);\n\
 //lightDir[0] = normalize((vec4(gl_LightSource[0].position.xyz,0.0)).xyz);\n\
 //halfVector[0] = normalize((vec4(gl_LightSource[0].halfVector.xyz,0.0)).xyz);\n\
-for (int i=0;i<4;i++)\n\
+for (int i=0;i<2;i++)\n\
 {\n\
 vec3 posDir = vec3(gl_LightSource[i].position);\n\
-vec3 hv = vec3(gl_LightSource[i].halfVector.xyz);\n\
+vec4 hv = vec4(gl_LightSource[i].halfVector);\n\
 lightDir[i] = normalize(posDir);\n\
-halfVector[i] = normalize(hv);\n\
-dist[i] = 0.0;\n\
+halfVector[i] = normalize(hv.xyz);\n\
 }\n\
 int colorIdx = int(gl_Vertex.w); \n\
 gl_TexCoord[0] = gl_MultiTexCoord0;\n\
@@ -191,14 +189,13 @@ uniform int  useTexture;\n\
 uniform int  useNormalMap;\n\
 uniform int  useSpecularMap;\n\
 uniform int  useShadowMap;\n\
-varying vec3 normal,lightDir[4],halfVector[4];\n\
+varying vec3 normal,lightDir[2],halfVector[2];\n\
 varying vec3 tv,bv;\n\
 varying vec4 vPos;\n\
 uniform vec4 diffuseMaterial;\n\
 uniform vec4 specularMaterial;\n\
 uniform float  shineness;\n\
 //uniform vec3 specularColors;\n\
-varying float dist[4];\n\
 float shadowCoef()\n\
 {\n\
 int index = 0;\n\
@@ -238,9 +235,9 @@ void main (void)\n\
 	{\n\
 		shadowWeight = shadowCoef();\n\
 	}\n\
-	for (int i=0;i<4;i++)\n\
+	for (int i=0;i<2;i++)\n\
 	{\n\
-		att = 1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
+		att = 1.0;//1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
 		NdotL = max(dot(n,lightDir[i]),0.0);\n\
 		if (NdotL > 0.0) {\n\
 		    //color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0)*att;\n\
