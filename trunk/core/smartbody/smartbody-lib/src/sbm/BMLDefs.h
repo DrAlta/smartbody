@@ -325,6 +325,8 @@ class BMLDefs
 		static XMLCh* ATTR_STATENAME;
 
 		static XMLCh* ATTR_POLICY;
+		static XMLCh* ATTR_PROCID;
+
 
 
 		static XMLCh* OGRE_BONE;

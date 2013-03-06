@@ -331,6 +331,7 @@ XMLCh* BMLDefs::ATTR_STYLE = NULL;
 XMLCh* BMLDefs::ATTR_STATENAME = NULL;
 
 XMLCh* BMLDefs::ATTR_POLICY = NULL;
+XMLCh* BMLDefs::ATTR_PROCID = NULL;
 
 XMLCh* BMLDefs::OGRE_BONE = NULL;
 XMLCh* BMLDefs::OGRE_PARENT = NULL;
@@ -705,6 +706,7 @@ BMLDefs::BMLDefs()
 	ATTR_STATENAME = XMLString::transcode("sbm:state-name");
 
 	ATTR_POLICY = XMLString::transcode("policy");
+	ATTR_PROCID = XMLString::transcode("procid");
 
 	OGRE_BONE = XMLString::transcode("bone");
 	OGRE_PARENT = XMLString::transcode("parent");

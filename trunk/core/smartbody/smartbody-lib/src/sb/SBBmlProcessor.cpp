@@ -169,9 +169,13 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 std::string SBBmlProcessor::execBML(std::string character, std::string bml)
 {
 	std::ostringstream entireBml;
-	entireBml	<< "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-				<< "<act>\n"
-				<< "\t<bml>\n"
+	entireBml	<< "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+	const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+	if (procId != "")
+		entireBml << "<act procid=\"" << procId << "\">\n";
+	else
+		entireBml << "<act>\n";
+	entireBml   << "\t<bml>\n"
 				<< "\t\t" << bml
 				<< "\t</bml>\n"
 				<< "</act>";	
