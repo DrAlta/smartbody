@@ -266,7 +266,23 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* sc
    const DOMDocument* xml = bpMsg.xml;
 	DOMElement* root = xml->getDocumentElement();  
 	if( XMLString::compareString( root->getTagName(), BMLDefs::TAG_ACT )!=0 )
+	{
 		LOG("WARNING: BodyPlanner: Expected <act> tag as XML root.");
+	}
+	else
+	{
+		std::string targetProcId = xml_utils::xml_parse_string( BMLDefs::ATTR_PROCID, root );
+		if (targetProcId != "")
+		{
+			const std::string& procId = scene->getProcessId();
+			if (procId != "" && 
+				procId != targetProcId)
+			{
+				// message intended for a different SmartBody instance
+				return;
+			}
+		}
+	}
 
 
 	DOMElement* child = xml_utils::getFirstChildElement( root );

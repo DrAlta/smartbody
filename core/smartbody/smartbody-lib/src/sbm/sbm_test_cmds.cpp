@@ -331,12 +331,22 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 			    << arg << " " << args.read_remainder_raw();
 			return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, bml.str() );
 		} else if( arg.compare(0,4,"<bml",4)==0 ) {
-			bml << "<?xml version=\"1.0\" ?>"
-			    << "<act>" << arg << " " << args.read_remainder_raw() << "</act>";
+			bml << "<?xml version=\"1.0\" ?>";
+			const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+			if (procId != "")
+				bml << "<act procid=\"" << procId << "\">";
+			else
+				bml << "<act>";
+			bml << arg << " " << args.read_remainder_raw() << "</act>";
 			return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, bml.str() );
 		} else {
-			bml << "<?xml version=\"1.0\" ?>"
-			    << "<act><bml>" << arg << " " << args.read_remainder_raw() << "</bml></act>";
+			bml << "<?xml version=\"1.0\" ?>";
+			const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+			if (procId != "")
+				bml << "<act procid=\"" << procId << "\">";
+			else
+				bml << "<act>";
+			bml << "<bml>" << arg << " " << args.read_remainder_raw() << "</bml></act>";
 			return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, bml.str() );
 		}
 	} else if( arg=="file") {
@@ -359,9 +369,13 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 			LOG("WARNING: Unknown animation \"%s\".", anim.c_str());
 
 		ostringstream bml;
-		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			<< "<act>\n"
-			<< "\t<bml>\n"
+		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+		if (procId != "")
+			bml << "<act procid=\"" << procId << "\">";
+		else
+			bml << "<act>\n";
+		bml << "\t<bml>\n"
 			<< "\t\t<sbm:animation name=\"" << anim << "\"/>\n"
 			<< "\t</bml>\n"
 			<< "</act>";
@@ -374,9 +388,13 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 		}
 
 		ostringstream bml;
-		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			<< "<act>\n"
-			<< "\t<bml>\n"
+		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+		if (procId != "")
+			bml << "<act procid=\"" << procId << "\">\n";
+		else
+			bml << "<act>\n";
+		bml << "\t<bml>\n"
 			<< "\t\t<body posture=\"" << posture << "\"/>\n"
 			<< "\t</bml>\n"
 			<< "</act>";
@@ -444,9 +462,13 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
 		ostringstream bml;
 		// First half of BML
-		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			<< "<act>\n"
-			<< "\t<bml>\n"
+		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+		if (procId != "")
+			bml << "<act procid=\"" << procId << "\">\n";
+		else
+			bml << "<act>\n";
+		bml << "\t<bml>\n"
 			<< "\t\t<gaze " << targetAttr << directionAttr << angleAttr << speedAttr << smoothAttr << "/>\n"
 			<< "\t</bml>\n"
 			<< "</act>";
@@ -503,9 +525,13 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 		}
 		ostringstream bml;
 		// First half of BML
-		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			<< "<act>\n"
-			<< "\t<bml>\n"
+		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+		if (procId != "")
+			bml << "<act procid=\"" << procId << "\">\n";
+		else
+			bml << "<act>\n";
+		bml << "\t<bml>\n"
 			<< "\t\t<head " << head_attrs.str() << "/>\n"
 			<< "\t</bml>\n"
 			<< "</act>";
@@ -545,9 +571,13 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 		}		
 
 		ostringstream bml;
-		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			<< "<act>\n"
-			<< "\t<bml>\n"
+		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+		if (procId != "")
+			bml << "<act procid=\"" << procId << "\">\n";
+		else
+			bml << "<act>\n";
+		bml << "\t<bml>\n"
 			<< "\t\t"<< speech_tag << speech << "</speech>\n"
 			<< "\t</bml>\n"
 			<< "</act>";
@@ -560,9 +590,13 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 		}
 
 		ostringstream bml;
-		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			<< "<act>\n"
-			<< "\t<bml>\n"
+		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+		if (procId != "")
+			bml << "<act procid=\"" << procId << "\">\n";
+		else
+			bml << "<act>\n";
+		bml << "\t<bml>\n"
 			<< "\t\t<sbm:interrupt act=\"" << act << "\"/>\n"
 			<< "\t</bml>\n"
 			<< "</act>";
@@ -589,9 +623,18 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 		}
 
 		ostringstream bml;
-		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			<< "<act>\n"
-			<< "\t<bml>\n"
+		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+		if (procId != "")
+			bml << "<act procid=\"" << procId << "\">\n";
+		else
+			bml << "<act>\n";
+		bml << "\t<bml>\n";
+		if (procId != "")
+			bml << "<act procid=\"" << procId << "\">";
+		else
+			bml << "<act>\n";
+		bml << "\t<bml>\n"
 			<< "\t\t<sbm:quickdraw target=\"" << target << "\"";
 		if( !roll.empty() )
 			bml << " roll=\"" << roll << "\"";
@@ -649,8 +692,13 @@ int test_fml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 			    << arg << args.read_remainder_raw();
 			return send_vrX( "vrExpress", char_id, recip_id, seq_id, echo, send, fml.str() );
 		} else if( arg.compare(0,4,"<fml",4)==0 ) {
-			fml << "<?xml version=\"1.0\" ?>"
-			    << "<act>" << arg << args.read_remainder_raw() << "</act>";
+			fml << "<?xml version=\"1.0\" ?>";
+			const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+			if (procId != "")
+				fml << "<act procid=\"" << procId << "\">\n";
+			else
+				fml << "<act>\n";
+			fml << arg << args.read_remainder_raw() << "</act>";
 			return send_vrX( "vrExpress", char_id, recip_id, seq_id, echo, send, fml.str() );
 		} else {
 			LOG("ERROR: test_fml_func: Unrecognized test FML command: \"%s\"", arg.c_str());
@@ -701,9 +749,13 @@ int test_fml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 		}
 
 		ostringstream fml;
-		fml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			<< "<act>\n"
-			<< "\t<participant id=\""<<char_id<<"\" role=\"actor\" />\n"
+		fml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		const std::string& procId = SmartBody::SBScene::getScene()->getProcessId();
+		if (procId != "")
+			fml << "<act procid=\"" << procId << "\">\n";
+		else
+			fml << "<act>\n";
+		fml << "\t<participant id=\""<<char_id<<"\" role=\"actor\" />\n"
 			<< "\t<bml>\n"
 			<< "\t\t"<< speech_tag << speech << "</speech>\n"
 			<< "\t</bml>\n"
