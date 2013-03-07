@@ -41,6 +41,8 @@ SBSimulationManager::SBSimulationManager()
 	internal_timer_p = NULL;
 	external_timer_p = NULL;
 	timer_p = NULL;
+	time = 0.0;
+	time_dt = 0.16;
 
 	_profiler = new SBProfiler();
 }
