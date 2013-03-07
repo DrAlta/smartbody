@@ -24,13 +24,11 @@
 #include <sb/SBCharacter.h>
 
 #include <FL/gl.h>
-#include <GL/glu.h>
 #include <FL/fl_draw.H>
 #include "ErrorVisualization.h"
 #include <controllers/me_ct_param_animation.h>
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
-
 
 
 VisualizationView::VisualizationView(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h)

@@ -35,8 +35,6 @@
 # include <Windows.h>
 # endif
 
-# include <GL/gl.h>
-
 //======================================= geometry ================================
 
 void glNormal ( const SrVec &v )

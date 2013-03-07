@@ -29,7 +29,6 @@
 # include "fltk_viewer.h"
 # include <FL/Fl.H>
 # include <FL/gl.h>
-# include <GL/glu.h>
 # include <FL/glut.H>
 //# include <fltk/visual.h>
 //# include <fltk/compat/FL/Fl_Menu_Item.H>

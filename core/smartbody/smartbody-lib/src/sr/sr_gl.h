@@ -40,10 +40,12 @@
 
 # ifdef __APPLE__
 # include <OpenGL/gl.h>
+# include <OpenGL/glu.h>
 #elif __native_client__
 #include <GLES2/gl2.h>
 # else
 # include <GL/gl.h>
+# include <GL/glu.h>
 # endif
 
 class SrVec;
