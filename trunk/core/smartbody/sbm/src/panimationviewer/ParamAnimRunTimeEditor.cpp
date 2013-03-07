@@ -23,7 +23,6 @@
 #include "vhcl.h"
 #include "ParamAnimRunTimeEditor.h"
 #include <FL/gl.h>
-#include <GL/glu.h>
 #include <FL/fl_draw.H>
 
 #include <controllers/me_ct_param_animation.h>

@@ -14,7 +14,6 @@
 #include <cstring>
 #include <FL/Fl.H>
 #include <FL/gl.h>
-#include <GL/glu.h>
 #include <FL/glut.H>
 #include <sr/sr_gl.h>
 #include <sr/sr_gl_render_funcs.h>

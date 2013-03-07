@@ -9,19 +9,12 @@
 #endif
 #endif
 
-//#include <windows.h> // standard Windows app include
-#if defined (SBM_IPHONE)
-#elif defined (__ANDROID__) || defined(__native_client__)
-#include <GLES2/gl2.h>
-#else
-#include <GL/gl.h> // standard OpenGL include
-#include <GL/glu.h> // OpenGL utilties
-#endif
-//#include <gl/glaux.h> // OpenGL auxiliary functions
+
 #include <cstdio>
 #include <cstdlib>
 #include <math.h>
 #include "sbm/lin_win.h"
+#include "sr/sr_gl.h"
 
 #define BITMAP_ID 0x4D42
 

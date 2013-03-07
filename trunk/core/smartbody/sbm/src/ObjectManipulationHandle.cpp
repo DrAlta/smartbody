@@ -2,10 +2,9 @@
 #include "ObjectManipulationHandle.h"
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
-//#include "fltk_viewer.h"
+#include <sr/sr_gl.h>
 
 #include <FL/gl.h>
-#include <GL/glu.h>
 
 ObjectManipulationHandle::ObjectManipulationHandle(void)
 {
