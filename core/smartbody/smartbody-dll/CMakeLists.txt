@@ -14,6 +14,7 @@ find_library (CORESERVICES_LIBRARY CoreServices)
 find_library (LIBSNDFILE sndfile )
 find_library (ALUT alut )
 find_library (OPENAL openal)
+find_library (GLEW GLEW)
 find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
 find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
 find_library (ESTSTRING eststring ../../..//lib/festival/speech_tools/lib)
@@ -39,6 +40,7 @@ set( MORE_LIBS
 	${LIBSNDFILE}
 	${ALUT}
 	${OPENAL}
+	${GLEW}
 	${FESTIVAL}
 	${ESTBASE}
 	${ESTSTRING}
@@ -80,7 +82,6 @@ target_link_libraries( smartbody-dll
 	blas
 	lapack
 	${OPENGL_LIBRARIES}
-	GLEW
 	activemq-cpp
 	steerlib
 	pprAI
