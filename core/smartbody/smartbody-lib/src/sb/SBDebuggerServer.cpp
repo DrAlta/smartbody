@@ -43,6 +43,10 @@ vector< vhcl::socket_t > m_sockConnectionsTCP;
 
 void SBDebuggerServer::Init()
 {
+#if __FLASHPLAYER__
+	return;
+#endif
+
    bool ret = vhcl::SocketStartup();
    if (!ret)
    {
@@ -109,6 +113,10 @@ void SBDebuggerServer::Init()
 
 void SBDebuggerServer::Close()
 {
+#if __FLASHPLAYER__
+	return;
+#endif
+
    if ( m_sockTCP )
    {
       vhcl::SocketClose(m_sockTCP);
@@ -131,6 +139,10 @@ const std::string& SBDebuggerServer::GetID()
 
 void SBDebuggerServer::Update()
 {
+#if __FLASHPLAYER__
+	return;
+#endif
+
    if (m_updateFrequencyS > 0)
    {
       double currentTime = m_timer.GetTime();

@@ -403,7 +403,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 				LOG("File %s does not contain <act> element. BML will not be processed.", filename.c_str());
 				return CMD_FAILURE;
 			}
-			root->setAttribute(L"procid", xml_utils::xmlch_translate(procId));
+			root->setAttribute(BML::BMLDefs::ATTR_PROCID, xml_utils::xmlch_translate(procId));
 			xml_utils::xmlToString(xml_utils::getFirstChildElement( xmlDoc ), xml);
 		}
 

@@ -116,6 +116,10 @@
 #include <google/heap-profiler.h>
 #endif
 
+#ifdef __FLASHPLAYER__
+#include "AS3/AS3.h"
+#endif
+
 using namespace std;
 
 #if USE_WSP
@@ -2869,7 +2873,23 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 
         if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
         {
+#if !defined(__FLASHPLAYER__)
         AUDIO_Play( soundFile.c_str() );			
+#else
+		std::string souldFileBase = boost::filesystem::basename(soundFile);
+		std::string soundFileBaseMP3 = souldFileBase + ".mp3";
+		LOG("Sound file name: %s", soundFileBaseMP3.c_str());
+			inline_as3(
+				"import flash.media.Sound;\n\
+				 import flash.net.URLRequest;\n\
+				 var fileString : String = CModule.readString(%0, %1);\n\
+				 var request:URLRequest = new URLRequest(fileString);\n\
+				 var soundFactory:Sound = new Sound();\n\
+				 soundFactory.load(request);\n\
+				 soundFactory.play();\n"
+				 : : "r"(soundFileBaseMP3.c_str()), "r"(strlen(soundFileBaseMP3.c_str()))
+				);
+#endif
         }
         else
         {

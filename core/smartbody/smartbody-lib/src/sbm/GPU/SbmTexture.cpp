@@ -122,7 +122,7 @@ void SbmTexture::loadImage( const char* fileName )
 
 void SbmTexture::buildTexture()
 {	
-#ifndef __native_client__
+#if !defined(__native_client__)
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:10");	
 	GLuint iType = GL_TEXTURE_2D;
 	glEnable(GL_TEXTURE_2D);
@@ -143,7 +143,11 @@ void SbmTexture::buildTexture()
 	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_CLAMP);
 
+#if !defined (__FLASHPLAYER__)
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+#else
+	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+#endif
 	glTexParameteri(iType, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:100");	
@@ -158,7 +162,12 @@ void SbmTexture::buildTexture()
 		texture_format = GL_RGBA;				
 	}
 	//glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);	
+#if !defined (__FLASHPLAYER__)
 	gluBuild2DMipmaps(iType, channels, width, height, texture_format, GL_UNSIGNED_BYTE, buffer );
+#else
+	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);
+#endif
+
 	//glGenerateMipmap(iType);
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:200");
 

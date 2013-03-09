@@ -55,7 +55,7 @@
 #endif
 #endif
 
-#if defined(__ANDROID__) || defined(SBM_IPHONE) || defined(__native_client__)
+#if defined(__ANDROID__) || defined(SBM_IPHONE) || defined(__native_client__) || defined(__FLASHPLAYER__)
 #include <sbm/sbm_deformable_mesh.h>
 #else
 #include <sbm/GPU/SbmDeformableMeshGPU.h>

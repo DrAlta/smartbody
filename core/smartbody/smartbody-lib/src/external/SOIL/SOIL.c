@@ -27,6 +27,8 @@
        #include <OpenGL/gl.h>
 //       #include <Carbon/Carbon.h>
        #define APIENTRY
+#elif defined(__FLASHPLAYER__)
+	#include <GL/gl.h>
 #else
 	#include <GL/gl.h>
 	#include <GL/glx.h>
@@ -1998,6 +2000,7 @@ int query_DXT_capability( void )
 				CFRelease( bundle );
 */
 				ext_addr = NULL;
+			#elif defined(__FLASHPLAYER__)
 			#else
 				ext_addr = (P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC)
 						glXGetProcAddressARB

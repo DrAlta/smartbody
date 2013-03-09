@@ -23,6 +23,7 @@ SbmShaderProgram::SbmShaderProgram()
 
 SbmShaderProgram::~SbmShaderProgram()
 {
+#if !defined(__FLASHPLAYER__)
 	if (programID > 0 )
 		glDeleteObjectARB(programID);
 	if (vsID > 0)
@@ -30,6 +31,7 @@ SbmShaderProgram::~SbmShaderProgram()
 	if (fsID > 0)
 		glDeleteObjectARB(fsID);
 	isBuilt = false;
+#endif
 }
 
 
@@ -67,6 +69,7 @@ void SbmShaderProgram::initShaderProgramStr( const char* shaderVS, const char* s
 
 void SbmShaderProgram::buildShader()
 {
+#if !defined(__FLASHPLAYER__)
 	// build the shader after there is an opengl context
 	vsID = -1;
 	fsID = -1;
@@ -94,6 +97,7 @@ void SbmShaderProgram::buildShader()
 	printProgramInfoLog(programID);
 	isBuilt = true;
 	//printOglError("linkProgram");
+#endif
 }
 
 
@@ -179,7 +183,9 @@ void SbmShaderProgram::printOglError(const char* tag)
 	glErr = glGetError();
 	while (glErr != GL_NO_ERROR)
 	{
+#if !defined(__FLASHPLAYER__)
 		LOG("glError %s: %s\n", tag,gluErrorString(glErr));
+#endif
 		retCode = 1;
 		glErr = glGetError();
 	}
@@ -239,7 +245,9 @@ bool SbmShaderManager::initGLExtension()
         static int counter = 0;
 
 	//viewer->makeGLContext();
+#if !defined(__FLASHPLAYER__)
 	glewInit();
+
 /*
 #if !defined(MAC_BUILD)	
     if (glewIsSupported("GL_VERSION_3_0"))
@@ -269,6 +277,9 @@ bool SbmShaderManager::initGLExtension()
 		return false;
     }
     //return false;
+#else
+	return false;
+#endif
 }
 
 void SbmShaderManager::addShader( const char* entryName,const char* vsName, const char* fsName, bool shaderFile )
