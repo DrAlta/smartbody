@@ -159,25 +159,43 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 			   glBindTexture(GL_TEXTURE_2D,tex->getID());	   	   
 			   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP);
 			   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP);
+#if !defined (__FLASHPLAYER__)
 			   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+#else
+			   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+#endif
 			   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 			   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	  
-			   //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);	 
+			   //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);	
+			   //printf("Texture bound[%d], start drawing %s\n", tex->getID(), mtlName.c_str());
 			   glBegin ( GL_TRIANGLES );
 			   //glColor3f(1.f,0.f,1.f);
 			   for (unsigned int k=0; k<mtlFaces.size(); k++ )
 			   {	
 				   int f = mtlFaces[k];
-				   //printf("texture coord = %f %f\n",T[Ft[f].a].x, T[Ft[f].a].y);
+				   int ft_a = Ft[f].a;
+				   int ft_b = Ft[f].b;
+				   int ft_c = Ft[f].c;
+				   if (ft_a >= T.size() || ft_b >= T.size() || ft_c >= T.size())
+				   {
+					   printf("(%s): ft %d %d %d is bigger than T size %d\n", mtlName.c_str(), ft_a, ft_b, ft_c, T.size());
+					   continue;
+				   }
+
 				   glNormal ( N[Fn[f].a] ); 
 				   //glColor3f(T[Ft[f].a].x, T[Ft[f].a].y, 0.f);
-				   glTexCoord2f(T[Ft[f].a].x, T[Ft[f].a].y); glVertex ( V[F[f].a] ); 
+				   glTexCoord2f(T[Ft[f].a].x, T[Ft[f].a].y); 
+				   glVertex ( V[F[f].a] );
+
 				   glNormal ( N[Fn[f].b] ); 
 				   //glColor3f(T[Ft[f].b].x, T[Ft[f].b].y, 0.f);
-				   glTexCoord2f(T[Ft[f].b].x, T[Ft[f].b].y); glVertex ( V[F[f].b] ); 
+				   glTexCoord2f(T[Ft[f].b].x, T[Ft[f].b].y); 
+				   glVertex ( V[F[f].b] ); 
+
 				   glNormal ( N[Fn[f].c] ); 
 				   //glColor3f(T[Ft[f].b].x, T[Ft[f].b].y, 0.f);
-				   glTexCoord2f(T[Ft[f].c].x, T[Ft[f].c].y); glVertex ( V[F[f].c] ); 		   
+				   glTexCoord2f(T[Ft[f].c].x, T[Ft[f].c].y); 
+				   glVertex ( V[F[f].c] ); 		   
 			   }
 			   glEnd (); 	   
 			   glBindTexture(GL_TEXTURE_2D, 0);	   

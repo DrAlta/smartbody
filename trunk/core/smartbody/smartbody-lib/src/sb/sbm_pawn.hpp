@@ -47,8 +47,13 @@ class srArgBuffer;
 
 class MeCtChannelWriter;
 class MeControllerTreeRoot;
+
+#if !defined(__FLASHPLAYER__)
 class DeformableMesh;
 class DeformableMeshInstance;
+#else
+#include <sbm/sbm_deformable_mesh.h>
+#endif
 
 
 #define SBM_PAWN_USE_WORLD_OFFSET_WRITER	(1)

@@ -20,7 +20,7 @@ using namespace SteerLib;
 using namespace Util;
 
 
-
+#if !defined(__FLASHPLAYER__)
 Clock::Clock()
 {
 	// default to a fixed frame rate of 20 fps, running as fast as possible.
@@ -129,5 +129,40 @@ void Clock::_waitForFrameSync(const unsigned long long & minDesiredTicks)
 		}
 	}
 }
+#else
+Clock::Clock()
+{
+}
 
+Clock::Clock(ClockModeEnum clockMode, float fixedFps, float minSimulationDt, float maxSimulationDt)
+{
+}
+
+Clock::~Clock()
+{
+}
+
+void Clock::reset()
+{
+}
+
+
+void Clock::advanceSimulationAndUpdateRealTime()
+{
+}
+
+void Clock::setClockMode(ClockModeEnum clockMode, float fixedFps, float minSimulationDt, float maxSimulationDt)
+{
+}
+
+
+void Clock::_updateFpsMeasurement()
+{
+}
+
+
+void Clock::_waitForFrameSync(const unsigned long long & minDesiredTicks)
+{
+}
+#endif
 

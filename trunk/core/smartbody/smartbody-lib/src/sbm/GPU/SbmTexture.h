@@ -1,8 +1,11 @@
 #pragma once
-#ifndef __native_client__
-#include "external/glew/glew.h"
-#else
+#if __native_client__
 #include <GLES2/gl2.h>
+#elif __FLASHPLAYER__
+#include <GL/gl.h>
+#include <GL/glu.h>
+#else
+#include "external/glew/glew.h"
 #endif
 #include <map>
 #include <string>

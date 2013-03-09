@@ -85,7 +85,7 @@
 #include <controllers/me_ct_physics_controller.h>
 
 // android does not use GPU shader for now
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__)
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #endif
 
@@ -325,6 +325,8 @@ void SbmCharacter::createStandardControllers()
 	if (!effector)
 		effector = sbSkel->getJointByName("r_wrist");
 
+
+#if !defined(__FLASHPLAYER__)
 	createReachEngine();
 	
 	if (effector)
@@ -355,7 +357,7 @@ void SbmCharacter::createStandardControllers()
 		rengineJump->init(MeCtReachEngine::LEFT_JUMP,effector);
 		(*this->reachEngineMap)[MeCtReachEngine::LEFT_JUMP] = rengineJump;
 	}
-
+#endif
 	
 
 	constraint_sched_p = CreateSchedulerCt( getName().c_str(), "constraint" );
@@ -1898,6 +1900,10 @@ void SbmCharacter::schedule_viseme_blend_ramp(
 
 void SbmCharacter::forward_visemes( double curTime )
 {
+#if __FLASHPLAYER__
+	return;
+#endif
+
 	SmartBody::SBCharacterListener *listener_p = SmartBody::SBScene::getScene()->getCharacterListener();
 
 	if( bonebusCharacter || listener_p )
@@ -1933,6 +1939,10 @@ void SbmCharacter::forward_visemes( double curTime )
 
 void SbmCharacter::forward_parameters( double curTime )
 {
+#if __FLASHPLAYER__
+	return;
+#endif
+
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBCharacterListener *listener_p = scene->getCharacterListener();
 
