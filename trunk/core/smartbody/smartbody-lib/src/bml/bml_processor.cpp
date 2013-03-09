@@ -1580,3 +1580,8 @@ int BML::Processor::print_func( srArgBuffer& args, SmartBody::SBCommandManager* 
         return CMD_NOT_FOUND;
 	}
 }
+
+XercesDOMParser* BML::Processor::getXMLParser()
+{
+	return xmlParser;
+}

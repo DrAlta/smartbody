@@ -211,10 +211,7 @@ namespace BML {
 		void (*requestcb)(BmlRequest* request, void* data);
 		void* requestData;
 
-
-		
-
-		
+		XercesDOMParser* getXMLParser();
 
 	protected:
 		//////////////////////////////////////////////////////////////////////////
