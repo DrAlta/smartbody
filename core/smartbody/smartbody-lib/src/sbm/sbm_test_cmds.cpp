@@ -37,7 +37,11 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCommandManager.h>
 #include <sb/SBVHMsgManager.h>
+#include <sb/SBBmlProcessor.h>
 #include <sb/SBAttribute.h>
+#include <boost/filesystem.hpp>
+#include <bml/bml_processor.hpp>
+#include <sbm/BMLDefs.h>
 
 
 using namespace std;
@@ -292,9 +296,11 @@ void print_test_bml_help() {
 }
 
 // Handles all "test bml ..." sbm commands.
-int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
-	string char_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultCharacter");
-	string recip_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultRecipient");
+int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	string char_id = scene->getStringAttribute("defaultCharacter");
+	string recip_id = scene->getStringAttribute("defaultRecipient");
 	string seq_id;
 	bool   echo = true;
 	bool   send = true;
@@ -310,7 +316,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 	
 	if (char_id != "*" )
 	{
-		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(char_id);
+		SmartBody::SBCharacter* character = scene->getCharacter(char_id);
 		if (!character)
 		{
 			LOG("No character named '%s'.", char_id.c_str());
@@ -356,7 +362,63 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 			filename.erase( 0, 1 );
 			filename.erase( filename.length()-1 );
 		}
-		return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, filename );
+		// find and load the contents of that file
+		DOMDocument* xmlDoc = NULL;
+		// check the cache to see if it exists first
+		boost::filesystem::path p(filename);
+		boost::filesystem::path abs_p = boost::filesystem::complete( p );
+		if (!boost::filesystem2::exists( abs_p ))
+		{
+			boost::filesystem::path finalPath(scene->getMediaPath());
+			finalPath /= p;
+			if (!boost::filesystem2::exists( finalPath ))
+			{
+				LOG("File %s was not found using media path %s. BML will not be processed.", filename.c_str(), scene->getMediaPath().c_str());
+				return CMD_FAILURE;
+			}
+			p = finalPath;
+		}
+
+		std::string absPathStr = p.string();
+		xmlDoc = xml_utils::parseMessageXml( scene->getBmlProcessor()->getBMLProcessor()->getXMLParser(), absPathStr.c_str() );
+		if (!xmlDoc)
+		{
+			LOG("File %s produced an empty document. BML will not be processed.", filename.c_str());
+			return CMD_FAILURE;
+		}
+
+		std::string procId = scene->getProcessId();
+		std::string xml = "";
+		if (procId == "")
+		{
+			// no process id, convert XML to text then forward directly to vrSpeak
+			xml_utils::xmlToString(xml_utils::getFirstChildElement( xmlDoc ), xml);
+		}
+		else
+		{
+			// add the process id to the document
+			DOMElement* root = xmlDoc->getDocumentElement();
+			if( XMLString::compareString( root->getTagName(), BML::BMLDefs::TAG_ACT ) !=0 )
+			{
+				LOG("File %s does not contain <act> element. BML will not be processed.", filename.c_str());
+				return CMD_FAILURE;
+			}
+			root->setAttribute(L"procid", xml_utils::xmlch_translate(procId));
+			xml_utils::xmlToString(xml_utils::getFirstChildElement( xmlDoc ), xml);
+		}
+
+		if (xmlDoc)
+			xmlDoc->release();
+
+
+
+		
+
+
+		// replace any <act> tag with <act procid="foo"> if the current instance has a proc id.
+
+
+		return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, xml );
 	} else if( arg=="anim" || arg=="animation") { //  anim[ation] <animation name>
 		string anim = args.read_token();
 		if( anim.length()==0 ) {
