@@ -126,15 +126,6 @@ using namespace std;
 using namespace WSP;
 #endif
 
-#ifdef __APPLE__
-#include "TargetConditionals.h"
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#ifndef SBM_IPHONE
-#define SBM_IPHONE
-#endif
-#endif
-#endif
-
 /////////////////////////////////////////////////////////////
 
 int mcu_help_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{

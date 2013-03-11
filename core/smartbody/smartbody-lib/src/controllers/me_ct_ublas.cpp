@@ -1,12 +1,3 @@
-#ifdef __APPLE__
-#include "TargetConditionals.h"
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#ifndef SBM_IPHONE
-#define SBM_IPHONE
-#endif
-#endif
-#endif
-
 //#include <boost/numeric/bindings/atlas/cblas.hpp>
 #include "controllers/me_ct_ublas.hpp"
 #include <boost/numeric/bindings/blas/blas.hpp>

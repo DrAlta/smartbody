@@ -85,7 +85,7 @@
 #include <controllers/me_ct_physics_controller.h>
 
 // android does not use GPU shader for now
-#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__)
+#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SBM_IPHONE)
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #endif
 

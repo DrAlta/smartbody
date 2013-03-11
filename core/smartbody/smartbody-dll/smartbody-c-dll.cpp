@@ -37,6 +37,13 @@ struct SBM_CallbackInfo
 };
 
 
+std::map< int, std::vector<SBM_CallbackInfo> > g_CreateCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo> > g_DeleteCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo> > g_ChangeCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo> > g_VisemeCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo> > g_ChannelCallbackInfo;
+std::map< int, std::vector<SBM_CallbackInfo> > g_LogCallbackInfo;
+
 class LogMessageListener : public vhcl::Log::Listener
 {
 public:
@@ -66,16 +73,8 @@ public:
 #endif
    }
 };
+
 LogMessageListener* g_pLogMessageListener = NULL;
-
-
-std::map< int, std::vector<SBM_CallbackInfo> > g_CreateCallbackInfo;
-std::map< int, std::vector<SBM_CallbackInfo> > g_DeleteCallbackInfo;
-std::map< int, std::vector<SBM_CallbackInfo> > g_ChangeCallbackInfo;
-std::map< int, std::vector<SBM_CallbackInfo> > g_VisemeCallbackInfo;
-std::map< int, std::vector<SBM_CallbackInfo> > g_ChannelCallbackInfo;
-std::map< int, std::vector<SBM_CallbackInfo> > g_LogCallbackInfo;
-
 LogMessageCallback g_LogMessageFunc = NULL;
 
 
