@@ -224,7 +224,8 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
    // if the voice code is an absolute path, use it and ignore the media path and audio path
    boost::filesystem::path abs_p( voiceCode );
-   boost::filesystem::path voicecodeabs_p = boost::filesystem::complete( abs_p );	
+   boost::filesystem::path voicecodeabs_p = boost::filesystem::complete( abs_p );
+   voicecodeabs_p /= std::string(ref + ".bml");
    if( !boost::filesystem2::exists( voicecodeabs_p ))
    {
 	    std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
