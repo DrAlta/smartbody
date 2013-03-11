@@ -63,7 +63,9 @@
 #include <sbm/KinectProcessor.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <sr/sr_sn_group.h>
+#if !defined(SBM_IPHONE)
 #include <sbm/GPU/SbmShader.h>
+#endif
 #include <sbm/KinectProcessor.h>
 #include <sr/sr_sn_group.h>
 

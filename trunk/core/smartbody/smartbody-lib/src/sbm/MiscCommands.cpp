@@ -28,7 +28,7 @@
 #include <controllers/me_ct_example_body_reach.hpp>
 #include <boost/filesystem/operations.hpp>
 // android does not use GPU shader for now
-#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__)
+#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SBM_IPHONE)
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #endif
 
@@ -1558,7 +1558,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								if (character->scene_p)
 									character->scene_p->set_visibility(0,0,0,0);
 								character->dMesh_p->set_visibility(1);
-							#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__)
+							#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SBM_IPHONE)
 								SbmDeformableMeshGPU::useGPUDeformableMesh = true;
 							#endif
 								if (character->dMeshInstance_p)
