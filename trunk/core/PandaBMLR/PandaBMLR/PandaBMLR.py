@@ -117,7 +117,7 @@ class PandaBMLR(DirectObject):
 		args = ConfigVariableString("SbmArgs", "").getValue()
 		initSeq = ConfigVariableString("SbmInitSeq", "").getValue()
 		if (len(initSeq) > 0):
-			initSeq = " -seq " + initSeq
+			initSeq = " -script " + initSeq
 	
 		if (0 != system("start /MIN /D" + path + " " + path+bin + " " + args + " " + initSeq)):
 			print ("ERROR STARTING SmartBody!")
