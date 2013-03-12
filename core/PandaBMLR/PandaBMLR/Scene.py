@@ -77,12 +77,12 @@ class Scene:
 		""" Processes bundle of requests for joint rotational changes from SmartBody """
 		
 		try:
-			character = self.Characters[charId]
+			character = self.Characters[int(charId)]
 			if (character != None):
 				for rotation in boneData:
 					# 0 = BoneID, 1-4 = q.wxyz
 					#character.SetJointQuat(rotation[0], Converter.Unreal2Panda_Quat(Vec4(rotation[1], rotation[2], rotation[3], rotation[4])))
-					character.SetJointQuat(time, rotation[0], Converter.Sbm2Panda_Quat(Vec4(rotation[2], rotation[3], rotation[4], rotation[1])))
+					character.SetJointQuat(int(time), int(rotation[0]), Converter.Sbm2Panda_Quat(Vec4(rotation[2], rotation[3], rotation[4], rotation[1])))
 		except:
 			print("Error parsing UDP packet")
 			print sys.exc_info()
@@ -91,25 +91,20 @@ class Scene:
 		""" Processes bundle of requests for joint positional changes from SmartBody """
 		
 		try:
-			character = self.Characters[charId]
+			character = self.Characters[int(charId)]
 			if (character != None):
 				for pos in boneData:
 					# 0 = BoneID, 1-3 = xyz
-					#character.SetJointPos(pos[0], Converter.Unreal2Panda_Pos(Vec3(pos[1], pos[2], pos[3]))) 
-					character.SetJointPos(time, pos[0], Converter.Sbm2Panda_Pos(Vec3(pos[1], pos[2], pos[3]))) 
+					character.SetJointPos(int(time), int(pos[0]), Converter.Sbm2Panda_Pos(Vec3(pos[1], pos[2], pos[3]))) 
 		except:
 			print("Error parsing UDP packet")
 			print sys.exc_info()
 	
 	def OnConnect(self, task = None):
 		""" Executed when a SmartBody process connects """
-		
 		if (not self.__BMLR.GetNet().IsConnected()):
 			return
-		
-		print("SmartBody connected!")
-		
-		
+				
 		self.__SmartBodyReady = True
 
 		for pawn in self.Pawns.values():
@@ -136,7 +131,6 @@ class Scene:
 
 	def ProcessCommands(self, buffer):
 		""" Processes a bundle of TCP commands, seperated by ; """
-		
 		tokens = buffer.split(";")
 		for token in tokens:
 			arguments = token.split("|")
@@ -146,8 +140,9 @@ class Scene:
 			
 	def ProcessCommand(self, command, arguments):
 		""" Processes a single TCP/UDP string command and it's arguments """
-		
+		#print "Command is " + command
 		if (command == "CreateActor"):
+			print "Actor created!"
 			if (len(arguments) > 3):
 				charID      = int(arguments[0])
 				charClass   = strip(arguments[1])
@@ -230,14 +225,13 @@ class Scene:
 					
 		elif (command == "SetBoneId"):
 			if (len(arguments) > 2):
-				id			= arguments[0]
-				boneName		= arguments[1]
+				charName	= arguments[0]
+				boneName	= arguments[1]
 				id 			= arguments[2]
-			
-				char = self.Characters.get(charName)
+				char = self.Characters.get(int(charName))
 				
-				if (char != None):			
-					char.AddBoneBusMap(boneName, id)
+				if (char != None):
+					char.AddBoneBusMap(boneName, int(id))
 			
 			"""
 		elif (command == "SetPawnPosHpr"):

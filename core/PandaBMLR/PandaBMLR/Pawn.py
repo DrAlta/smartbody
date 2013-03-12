@@ -11,7 +11,7 @@
 # #
 # #                   http://cadia.ru.is/
 # #
-# #  Redistribution and use in source and binary forms, with or without
+# #  Redistribution and uese in source and binary forms, with or without
 # #  modification, is permitted provided that the following conditions 
 # #  are met:
 # #
@@ -243,6 +243,7 @@ class Pawn(NodePath, DirectObject):
 		self.__NotValidMessage = False
 		
 		if (not self.__Registered):
+			print "Now sending command to register pawn " + self.GetName() + " with SmartBody..."
 			self.Scene.SendSbmCommand("pawn " + self.GetName() + " init")
 			self.__Registered = True
 			if (self.__GeomType == GEOMTYPE_STATIC_ANIMATED):

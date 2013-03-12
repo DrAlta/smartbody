@@ -87,7 +87,8 @@ class CharacterPawn(Pawn):
 		self.__TypeSbm = "char"
 		self.__BmlQueue = []
 		self.__boneBusMap = {}
-		self.__boneBusTimes = {}
+		self.__boneBusRotTimes = {}
+		self.__boneBusPosTimes = {}
 		self.InitSkeleton()
 		
 		taskMgr.add(self.__StepBML, "Char" + self.GetName() + "_BmlLoop")
@@ -235,13 +236,16 @@ class CharacterPawn(Pawn):
 	def SetJointQuat(self, time, boneBusjointID, quat):
 		""" Rotates a joint by quanternions """
 		# make sure the timing of the joint data is for a future time
-		if __boneBusTimes[boneId] > time:
+		val = self.__boneBusRotTimes.get(boneBusjointID, -100)
+		if val == -100:
 			return
-		__boneBusTimes[boneId] = time
+		if  val > time:
+			return
+		self.__boneBusRotTimes[boneBusjointID] = time
 		# get the mapped joint name
-		mappedName = GetBoneBusMap(boneBusjointID)
+		mappedName = self.GetBoneBusMap(boneBusjointID)
 		# now get the corresponding Panda character joint name
-		pandaJointID = JointNameToID(mappedName)
+		pandaJointID = self.JointNameToID(mappedName)
 		
 		joint = self.FindJoint(pandaJointID)
 		
@@ -255,13 +259,16 @@ class CharacterPawn(Pawn):
 	def SetJointPos(self, time, boneBusjointID, vec3):
 		""" Sets the position of a joint. Input is relative to the start position of that join  """
 		# make sure the timing of the joint data is for a future time
-		if __boneBusTimes[boneId] > time:
+		val = self.__boneBusPosTimes.get(boneBusjointID, -100)
+		if val == -100:
 			return
-		__boneBusTimes[boneId] = time
+		if  val > time:
+			return
+		self.__boneBusPosTimes[boneBusjointID] = time
 		# get the mapped joint name
-		mappedName = GetBoneBusMap(boneBusjointID)
+		mappedName = self.GetBoneBusMap(boneBusjointID)
 		# now get the corresponding Panda character joint name
-		pandaJointID = JointNameToID(mappedName)
+		pandaJointID = self.JointNameToID(mappedName)
 		
 		if (round(vec3.getX(), 3) == 0 and round(vec3.getY(), 3) == 0 and round(vec3.getZ(), 3) == 0): # No movement
 			return
@@ -280,6 +287,7 @@ class CharacterPawn(Pawn):
 			return
 		
 		if (not self.IsRegistered()):
+			print "Now sending command to register character " + self.GetName() + " with SmartBody..."
 			self.Scene.SendSbmCommand("char " + self.GetName() + " init common.sk " + self.GetCharClass())
 			self.Scene.SendSbmCommand("set character " + self.GetName() + " voice text " + self.GetName())
 			self.SetRegistered(True)
@@ -304,13 +312,14 @@ class CharacterPawn(Pawn):
 	
 	def AddBoneBusMap(self, boneName, boneId):
 		""" mapping between the bone name and the bone id """
-		__boneBusMap[boneId] = boneName
+		self.__boneBusMap[boneId] = boneName
 		# also seed the timings
-		__boneBusTimes[boneId] = -1
+		self.__boneBusRotTimes[boneId] = -1
+		self.__boneBusPosTimes[boneId] = -1
 		
 	def GetBoneBusMap(self, boneId):
 		""" retrieves the mapping between the bone name and the bone id """
-		x = __boneBusMap[boneId]
+		x = self.__boneBusMap[boneId]
 		return x
 	
 			
