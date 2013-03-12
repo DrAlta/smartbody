@@ -171,10 +171,10 @@ class NetHandler(DirectObject):
 				packetId = unpack("i", dg.getMessage()[:4])[0]
 				
 				if (packetId == 16):
-					# 0 = time, 1 = charid, 2 = numBoneRotations, 3 = unused bones
-					BulkBoneData = unpack("iiii", dg.getMessage()[4:20])
+					# 0 = time, 1 = charid, 2 = numBoneRotations
+					BulkBoneData = unpack("iii", dg.getMessage()[4:16])
 					BulkBoneItems = []
-					for i in range(20, dg.getLength(), 20):
+					for i in range(16, dg.getLength(), 20):
 						BulkBoneItems.append(unpack("iffff", dg.getMessage()[i:i+20]))
 					self.__Scene.ProcessJointRotations(BulkBoneData[1], BulkBoneItems)
 				elif (packetId == 17):
