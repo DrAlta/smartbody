@@ -1,7 +1,9 @@
 #pragma once
 
 #if __native_client__
-#include<GLES2/gl2.h>
+#include <GLES2/gl2.h>
+#elif defined(__ANDROID__)
+#include <GLES2/gl2.h>
 #elif __FLASHPLAYER__
 #include <GL/gl.h>
 #include <GL/glu.h>
