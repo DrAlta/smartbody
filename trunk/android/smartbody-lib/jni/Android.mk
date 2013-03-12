@@ -387,7 +387,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_barycentric_interpolation.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_inverse_interpolation.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_simple_gaze.cpp \
-	$(SBM_MY_DIR)/controllers/me_ct_step_turn.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_tether.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_ublas.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_noise_controller.cpp \
@@ -423,7 +422,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/PPRAISteeringAgent.cpp \
 	$(SBM_MY_DIR)/sbm/SteerSuiteEnginerDriver.cpp \
 	$(SBM_MY_DIR)/sb/sbm_character.cpp \
-	$(SBM_MY_DIR)/sb/sbm_pawn.cpp \	
+	$(SBM_MY_DIR)/sb/sbm_pawn.cpp \
 	$(SBM_MY_DIR)/sb/SBAttribute.cpp \
 	$(SBM_MY_DIR)/sb/SBAttributeManager.cpp \
 	$(SBM_MY_DIR)/sb/SBObject.cpp \
@@ -489,17 +488,16 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBRetargetManager.cpp \
 	$(SBM_MY_DIR)/sb/SBAsset.cpp \
 	$(SBM_MY_DIR)/sb/SBAssetManager.cpp \
-	$(SBM_MY_DIR)/sb/SBAsset.cpp \
 	$(SBM_MY_DIR)/sb/SBSpeechManager.cpp \
 	$(SBM_MY_DIR)/sb/SBVHMsgManager.cpp \
 	$(SBM_MY_DIR)/sb/SBCommandManager.cpp \
 	$(SBM_MY_DIR)/sb/SBWSPManager.cpp \
-	
-	
-LOCAL_LDLIBS    := -llog 
-#LOCAL_LDLIBS    := -llog -gstabs	  
-LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile python-prebuilt 
-#LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt 
+
+
+LOCAL_LDLIBS    := -llog
+#LOCAL_LDLIBS    := -llog -gstabs
+LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile python-prebuilt
+#LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
 include $(BUILD_STATIC_LIBRARY)
 #include $(BUILD_SHARED_LIBRARY)
