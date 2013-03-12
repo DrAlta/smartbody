@@ -86,6 +86,8 @@ class CharacterPawn(Pawn):
 		self.__TypeStr = "CharacterPawn"		
 		self.__TypeSbm = "char"
 		self.__BmlQueue = []
+		self.__boneBusMap = {}
+		self.__boneBusTimes = {}
 		self.InitSkeleton()
 		
 		taskMgr.add(self.__StepBML, "Char" + self.GetName() + "_BmlLoop")
@@ -230,10 +232,18 @@ class CharacterPawn(Pawn):
 			print("Joint control request for '" << _jointName << "' FAILED!\n")
 			return None;
 	
-	def SetJointQuat(self, jointID, quat):
+	def SetJointQuat(self, time, boneBusjointID, quat):
 		""" Rotates a joint by quanternions """
-
-		joint = self.FindJoint(jointID)
+		# make sure the timing of the joint data is for a future time
+		if __boneBusTimes[boneId] > time:
+			return
+		__boneBusTimes[boneId] = time
+		# get the mapped joint name
+		mappedName = GetBoneBusMap(boneBusjointID)
+		# now get the corresponding Panda character joint name
+		pandaJointID = JointNameToID(mappedName)
+		
+		joint = self.FindJoint(pandaJointID)
 		
 		if (joint != None):
 			if (LERP_ANIMS):
@@ -242,13 +252,21 @@ class CharacterPawn(Pawn):
 			else:
 				joint.setQuat(quat)
 						
-	def SetJointPos(self, jointID, vec3):
+	def SetJointPos(self, time, boneBusjointID, vec3):
 		""" Sets the position of a joint. Input is relative to the start position of that join  """
+		# make sure the timing of the joint data is for a future time
+		if __boneBusTimes[boneId] > time:
+			return
+		__boneBusTimes[boneId] = time
+		# get the mapped joint name
+		mappedName = GetBoneBusMap(boneBusjointID)
+		# now get the corresponding Panda character joint name
+		pandaJointID = JointNameToID(mappedName)
 		
 		if (round(vec3.getX(), 3) == 0 and round(vec3.getY(), 3) == 0 and round(vec3.getZ(), 3) == 0): # No movement
 			return
 		
-		joint = self.FindJoint(jointID)
+		joint = self.FindJoint(pandaJointID)
 		
 		if (joint != None):
 			joint.setPos(vec3)
@@ -283,6 +301,18 @@ class CharacterPawn(Pawn):
 				
 		elif(type == "speech"):
 			print("Speech is not implemented.")
+	
+	def AddBoneBusMap(self, boneName, boneId):
+		""" mapping between the bone name and the bone id """
+		__boneBusMap[boneId] = boneName
+		# also seed the timings
+		__boneBusTimes[boneId] = -1
+		
+	def GetBoneBusMap(self, boneId):
+		""" retrieves the mapping between the bone name and the bone id """
+		x = __boneBusMap[boneId]
+		return x
+	
 			
 class BubbleManager:
 	""" Handles the spawning and positioning of chat bubbles for a CharacterPawn instance """

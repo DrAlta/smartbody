@@ -176,7 +176,7 @@ class NetHandler(DirectObject):
 					BulkBoneItems = []
 					for i in range(16, dg.getLength(), 20):
 						BulkBoneItems.append(unpack("iffff", dg.getMessage()[i:i+20]))
-					self.__Scene.ProcessJointRotations(BulkBoneData[1], BulkBoneItems)
+					self.__Scene.ProcessJointRotations(BulkBoneData[0], BulkBoneData[1], BulkBoneItems)
 				elif (packetId == 17):
 					# 0 = time, 1= charid, 3 = numBonePositions
 					BulkBonePositions = unpack("iii", dg.getMessage()[4:16])
@@ -184,7 +184,7 @@ class NetHandler(DirectObject):
 					BulkBoneItems = []
 					for i in range(16, dg.getLength(), 16):
 						BulkBoneItems.append(unpack("ifff", dg.getMessage()[i:i+16]))
-					self.__Scene.ProcessJointPositions(BulkBonePositions[1], BulkBoneItems)					
+					self.__Scene.ProcessJointPositions(BulkBonePositions[0], BulkBonePositions[1], BulkBoneItems)					
 				elif (packetId == 18):
 					continue # This is not handled at the moment
 					# 0 = charId, 1 = visemeId, 2 = weight, 3 = blendTime

@@ -73,7 +73,7 @@ class Scene:
 	def CreateChar(self, charClass):		
 		return self.__ClassCacher.CreateChar(charClass)		
 
-	def ProcessJointRotations(self, charId, boneData):
+	def ProcessJointRotations(self, time, charId, boneData):
 		""" Processes bundle of requests for joint rotational changes from SmartBody """
 		
 		try:
@@ -82,12 +82,12 @@ class Scene:
 				for rotation in boneData:
 					# 0 = BoneID, 1-4 = q.wxyz
 					#character.SetJointQuat(rotation[0], Converter.Unreal2Panda_Quat(Vec4(rotation[1], rotation[2], rotation[3], rotation[4])))
-					character.SetJointQuat(rotation[0], Converter.Sbm2Panda_Quat(Vec4(rotation[2], rotation[3], rotation[4], rotation[1])))
+					character.SetJointQuat(time, rotation[0], Converter.Sbm2Panda_Quat(Vec4(rotation[2], rotation[3], rotation[4], rotation[1])))
 		except:
 			print("Error parsing UDP packet")
 			print sys.exc_info()
 	
-	def ProcessJointPositions(self, charId, boneData):
+	def ProcessJointPositions(self, time, charId, boneData):
 		""" Processes bundle of requests for joint positional changes from SmartBody """
 		
 		try:
@@ -96,7 +96,7 @@ class Scene:
 				for pos in boneData:
 					# 0 = BoneID, 1-3 = xyz
 					#character.SetJointPos(pos[0], Converter.Unreal2Panda_Pos(Vec3(pos[1], pos[2], pos[3]))) 
-					character.SetJointPos(pos[0], Converter.Sbm2Panda_Pos(Vec3(pos[1], pos[2], pos[3]))) 
+					character.SetJointPos(time, pos[0], Converter.Sbm2Panda_Pos(Vec3(pos[1], pos[2], pos[3]))) 
 		except:
 			print("Error parsing UDP packet")
 			print sys.exc_info()
@@ -227,6 +227,17 @@ class Scene:
 				
 				if (char != None):			
 					char.Speak(text, 0, bubbleID = id)
+					
+		elif (command == "SetBoneId"):
+			if (len(arguments) > 2):
+				id			= arguments[0]
+				boneName		= arguments[1]
+				id 			= arguments[2]
+			
+				char = self.Characters.get(charName)
+				
+				if (char != None):			
+					char.AddBoneBusMap(boneName, id)
 			
 			"""
 		elif (command == "SetPawnPosHpr"):
