@@ -21,8 +21,17 @@
 *      David Huang
 */
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+#ifndef SBM_IPHONE
+#define SBM_IPHONE
+#endif
+#endif
+#endif
+
 # include <sr/sr_sn_colorsurf.h>
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SBM_IPHONE)
 # include <sr/sr_gl.h>
 #endif
 
@@ -91,7 +100,7 @@ void SrSnColorSurf::gl_render_node(bool alphaBlend) const
 	if ( vsize!=msize )
 	{ printf("Materials size != vertices size in SrSnColorSurf !"); return; }
 
-#if !defined(__APPLE__) && !defined(__ANDROID__)
+#if !defined(__APPLE__) && !defined(__ANDROID__) && !defined(SBM_IPHONE)
 	if ( nsize<vsize ) glDisable ( GL_LIGHTING ); else glEnable ( GL_LIGHTING );
 
 	if(alphaBlend)

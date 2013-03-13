@@ -14,7 +14,9 @@
 #include <cstdlib>
 #include <math.h>
 #include "sbm/lin_win.h"
+#if !defined(SBM_IPHONE)
 #include "sr/sr_gl.h"
+#endif
 
 #define BITMAP_ID 0x4D42
 
