@@ -16,15 +16,12 @@
 		AA03674D142A80BC00DDDCA2 /* liblapack.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA03674A142A80BC00DDDCA2 /* liblapack.a */; };
 		AA12CB1914031DD50017A491 /* Window.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA12CB1814031DD50017A491 /* Window.xib */; };
 		AA12CB1C14031E040017A491 /* ApplicationViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = AA12CB1B14031E040017A491 /* ApplicationViewer.m */; };
-		AA38C2F413FD8DAD00233019 /* common.sk in Resources */ = {isa = PBXBuildFile; fileRef = AA38C2F313FD8DAD00233019 /* common.sk */; };
-		AA38C2FE13FDBD6200233019 /* HandsAtSide_Motex.skm in Resources */ = {isa = PBXBuildFile; fileRef = AA38C2FD13FDBD6200233019 /* HandsAtSide_Motex.skm */; };
-		AA38C30013FDD1F700233019 /* HandsAtSide_Arms_Sweep.skm in Resources */ = {isa = PBXBuildFile; fileRef = AA38C2FF13FDD1F700233019 /* HandsAtSide_Arms_Sweep.skm */; };
-		AA38C31613FF0E8500233019 /* default.seq in Resources */ = {isa = PBXBuildFile; fileRef = AA38C31513FF0E8500233019 /* default.seq */; };
 		AA5DF1B914203FEB002B8A17 /* Default-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = AA5DF1B714203FEB002B8A17 /* Default-Portrait.png */; };
 		AA5DF1BA14203FEB002B8A17 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = AA5DF1B814203FEB002B8A17 /* Icon-72.png */; };
 		AA813ABB140FFC130026D507 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA813ABA140FFC130026D507 /* MainWindow-iPad.xib */; };
 		AA813ABD140FFCBE0026D507 /* Window-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA813ABC140FFCBE0026D507 /* Window-iPad.xib */; };
 		AA9CDAAF141FFFB90064C27A /* minimalwrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CDAAD141FFFB90064C27A /* minimalwrapper.cpp */; };
+		AAA6ACD016EFF951006E8ACF /* assests in Resources */ = {isa = PBXBuildFile; fileRef = AAA6ACCF16EFF951006E8ACF /* assests */; };
 		AAC9AC50142010C000F56F9C /* libactivemq-cpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC40142010C000F56F9C /* libactivemq-cpp.a */; };
 		AAC9AC51142010C000F56F9C /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC41142010C000F56F9C /* libapr-1.a */; };
 		AAC9AC52142010C000F56F9C /* libaprutil-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC42142010C000F56F9C /* libaprutil-1.a */; };
@@ -65,16 +62,13 @@
 		AA12CB1814031DD50017A491 /* Window.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Window.xib; sourceTree = "<group>"; };
 		AA12CB1A14031E040017A491 /* ApplicationViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApplicationViewer.h; sourceTree = "<group>"; };
 		AA12CB1B14031E040017A491 /* ApplicationViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationViewer.m; sourceTree = "<group>"; };
-		AA38C2F313FD8DAD00233019 /* common.sk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = common.sk; sourceTree = "<group>"; };
-		AA38C2FD13FDBD6200233019 /* HandsAtSide_Motex.skm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HandsAtSide_Motex.skm; sourceTree = "<group>"; };
-		AA38C2FF13FDD1F700233019 /* HandsAtSide_Arms_Sweep.skm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HandsAtSide_Arms_Sweep.skm; sourceTree = "<group>"; };
-		AA38C31513FF0E8500233019 /* default.seq */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = default.seq; sourceTree = "<group>"; };
 		AA5DF1B714203FEB002B8A17 /* Default-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait.png"; sourceTree = "<group>"; };
 		AA5DF1B814203FEB002B8A17 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
 		AA813ABA140FFC130026D507 /* MainWindow-iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "MainWindow-iPad.xib"; path = "iPad/MainWindow-iPad.xib"; sourceTree = "<group>"; };
 		AA813ABC140FFCBE0026D507 /* Window-iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "Window-iPad.xib"; sourceTree = "<group>"; };
 		AA9CDAAD141FFFB90064C27A /* minimalwrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = minimalwrapper.cpp; sourceTree = "<group>"; };
 		AA9CDAAE141FFFB90064C27A /* minimalwrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = minimalwrapper.h; sourceTree = "<group>"; };
+		AAA6ACCF16EFF951006E8ACF /* assests */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assests; sourceTree = "<group>"; };
 		AAC9AC40142010C000F56F9C /* libactivemq-cpp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libactivemq-cpp.a"; path = "../../libs/iphoneos/libactivemq-cpp.a"; sourceTree = "<group>"; };
 		AAC9AC41142010C000F56F9C /* libapr-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libapr-1.a"; path = "../../libs/iphoneos/libapr-1.a"; sourceTree = "<group>"; };
 		AAC9AC42142010C000F56F9C /* libaprutil-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libaprutil-1.a"; path = "../../libs/iphoneos/libaprutil-1.a"; sourceTree = "<group>"; };
@@ -185,12 +179,9 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				AAA6ACCF16EFF951006E8ACF /* assests */,
 				AA5DF1B714203FEB002B8A17 /* Default-Portrait.png */,
 				AA5DF1B814203FEB002B8A17 /* Icon-72.png */,
-				AA38C31513FF0E8500233019 /* default.seq */,
-				AA38C2FF13FDD1F700233019 /* HandsAtSide_Arms_Sweep.skm */,
-				AA38C2FD13FDBD6200233019 /* HandsAtSide_Motex.skm */,
-				AA38C2F313FD8DAD00233019 /* common.sk */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 			);
@@ -284,15 +275,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
-				AA38C2F413FD8DAD00233019 /* common.sk in Resources */,
-				AA38C2FE13FDBD6200233019 /* HandsAtSide_Motex.skm in Resources */,
-				AA38C30013FDD1F700233019 /* HandsAtSide_Arms_Sweep.skm in Resources */,
-				AA38C31613FF0E8500233019 /* default.seq in Resources */,
 				AA12CB1914031DD50017A491 /* Window.xib in Resources */,
 				AA813ABB140FFC130026D507 /* MainWindow-iPad.xib in Resources */,
 				AA813ABD140FFCBE0026D507 /* Window-iPad.xib in Resources */,
 				AA5DF1B914203FEB002B8A17 /* Default-Portrait.png in Resources */,
 				AA5DF1BA14203FEB002B8A17 /* Icon-72.png in Resources */,
+				AAA6ACD016EFF951006E8ACF /* assests in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -319,6 +307,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -362,7 +351,7 @@
 					../../../lib/bonebus/include,
 				);
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../libs/iphoneos\"",
@@ -371,8 +360,9 @@
 				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = ../../libs/iphonesimulator;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = SBGLES;
+				PROVISIONING_PROFILE = "";
 				SYMROOT = $PROJECT_DIR/build;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 				VALID_ARCHS = "armv6 armv7 i386";
 			};
 			name = Debug;
@@ -382,6 +372,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Chases_Prefix.pch;
@@ -422,7 +413,7 @@
 					../../../lib/bonebus/include,
 				);
 				INFOPLIST_FILE = Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../libs/iphoneos\"",
@@ -431,8 +422,9 @@
 				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = ../../libs/iphonesimulator;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = SBGLES;
+				PROVISIONING_PROFILE = "";
 				SYMROOT = $PROJECT_DIR/build;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 				VALID_ARCHS = "armv6 armv7 i386";
 			};
 			name = Release;
@@ -457,7 +449,7 @@
 					/Users/yxu/trunk/lib/vhcl/include,
 					/Users/yxu/trunk/lib/wsp/wsp/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
 				SDKROOT = iphoneos;
@@ -484,7 +476,7 @@
 					/Users/yxu/trunk/lib/vhcl/include,
 					/Users/yxu/trunk/lib/wsp/wsp/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
 				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
 				SDKROOT = iphoneos;

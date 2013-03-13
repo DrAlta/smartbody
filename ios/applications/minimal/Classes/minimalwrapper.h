@@ -17,13 +17,10 @@ extern "C"
     unsigned short boneIdx[400];
     float jointPos1[600];
     int numJoints;
-    void mcu_register_callbacks();
-    void MCUInitialize();
-    void SBMInitialize(const char* mediaPath);
+    void SBInitialize(const char* path);
     void SBMUpdateX(float t);
     void SBMExecuteCmd(const char* command);
     void SBMExecutePythonCmd(const char* command);
-    float SBMGetCharacterWo(const char* character);
     void getBoneData();
     void getCamera(float x, float y, float prevX, float prevY, float curX, float curY, int mode);
     float* rotatePoint(float* point, float* origin, float* direction, float angle);

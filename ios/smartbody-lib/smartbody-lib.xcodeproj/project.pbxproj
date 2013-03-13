@@ -515,6 +515,14 @@
 		AA9CDA8D141FF8D10064C27A /* sr_vec2.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD848141FF8D10064C27A /* sr_vec2.h */; };
 		AA9CDA8E141FF8D10064C27A /* sr_viewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CD849141FF8D10064C27A /* sr_viewer.cpp */; };
 		AA9CDA8F141FF8D10064C27A /* sr_viewer.h in Headers */ = {isa = PBXBuildFile; fileRef = AA9CD84A141FF8D10064C27A /* sr_viewer.h */; };
+		AAA6ABC116EFB246006E8ACF /* Heightfield.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAA6ABBF16EFB246006E8ACF /* Heightfield.cpp */; };
+		AAA6ABC216EFB246006E8ACF /* Heightfield.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA6ABC016EFB246006E8ACF /* Heightfield.h */; };
+		AAA6ABC816EFB296006E8ACF /* SBPython.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAA6ABC416EFB296006E8ACF /* SBPython.cpp */; };
+		AAA6ABC916EFB296006E8ACF /* SBPython.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA6ABC516EFB296006E8ACF /* SBPython.h */; };
+		AAA6ABCA16EFB296006E8ACF /* SBPythonClass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAA6ABC616EFB296006E8ACF /* SBPythonClass.cpp */; };
+		AAA6ABCB16EFB296006E8ACF /* SBPythonClass.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA6ABC716EFB296006E8ACF /* SBPythonClass.h */; };
+		AAA6ABCE16EFCA40006E8ACF /* sr_sn_colorsurf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAA6ABCC16EFCA40006E8ACF /* sr_sn_colorsurf.cpp */; };
+		AAA6ABCF16EFCA40006E8ACF /* sr_sn_colorsurf.h in Headers */ = {isa = PBXBuildFile; fileRef = AAA6ABCD16EFCA40006E8ACF /* sr_sn_colorsurf.h */; };
 		AAB20E7B145393C9001542D3 /* SBBehavior.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAB20E77145393C9001542D3 /* SBBehavior.cpp */; };
 		AAB20E7C145393C9001542D3 /* SBBehavior.h in Headers */ = {isa = PBXBuildFile; fileRef = AAB20E78145393C9001542D3 /* SBBehavior.h */; };
 		AAC99D13143AA3270098208A /* local_speech.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAC99D11143AA3270098208A /* local_speech.cpp */; };
@@ -1150,6 +1158,14 @@
 		AA9CD848141FF8D10064C27A /* sr_vec2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_vec2.h; sourceTree = "<group>"; };
 		AA9CD849141FF8D10064C27A /* sr_viewer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_viewer.cpp; sourceTree = "<group>"; };
 		AA9CD84A141FF8D10064C27A /* sr_viewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_viewer.h; sourceTree = "<group>"; };
+		AAA6ABBF16EFB246006E8ACF /* Heightfield.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Heightfield.cpp; sourceTree = "<group>"; };
+		AAA6ABC016EFB246006E8ACF /* Heightfield.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Heightfield.h; sourceTree = "<group>"; };
+		AAA6ABC416EFB296006E8ACF /* SBPython.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPython.cpp; path = sb/SBPython.cpp; sourceTree = "<group>"; };
+		AAA6ABC516EFB296006E8ACF /* SBPython.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBPython.h; path = sb/SBPython.h; sourceTree = "<group>"; };
+		AAA6ABC616EFB296006E8ACF /* SBPythonClass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPythonClass.cpp; path = sb/SBPythonClass.cpp; sourceTree = "<group>"; };
+		AAA6ABC716EFB296006E8ACF /* SBPythonClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBPythonClass.h; path = sb/SBPythonClass.h; sourceTree = "<group>"; };
+		AAA6ABCC16EFCA40006E8ACF /* sr_sn_colorsurf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_sn_colorsurf.cpp; sourceTree = "<group>"; };
+		AAA6ABCD16EFCA40006E8ACF /* sr_sn_colorsurf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_sn_colorsurf.h; sourceTree = "<group>"; };
 		AAB20E77145393C9001542D3 /* SBBehavior.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBBehavior.cpp; path = sb/SBBehavior.cpp; sourceTree = "<group>"; };
 		AAB20E78145393C9001542D3 /* SBBehavior.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBBehavior.h; path = sb/SBBehavior.h; sourceTree = "<group>"; };
 		AAC99D11143AA3270098208A /* local_speech.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = local_speech.cpp; sourceTree = "<group>"; };
@@ -1750,6 +1766,7 @@
 		AA9CD5F7141FF8D00064C27A /* src */ = {
 			isa = PBXGroup;
 			children = (
+				AAA6ABC316EFB283006E8ACF /* python */,
 				AA73BC87146C633A00B199A1 /* BML */,
 				AA73BC88146C634000B199A1 /* controllers */,
 				AA9CD5F9141FF8D00064C27A /* external */,
@@ -1809,6 +1826,8 @@
 		AA9CD64E141FF8D00064C27A /* sbm */ = {
 			isa = PBXGroup;
 			children = (
+				AAA6ABBF16EFB246006E8ACF /* Heightfield.cpp */,
+				AAA6ABC016EFB246006E8ACF /* Heightfield.h */,
 				AACEF10116EE63DB0044DCC6 /* me_utilities.hpp */,
 				AACEF10216EE63DB0044DCC6 /* SteerPath.cpp */,
 				AACEF10316EE63DB0044DCC6 /* SteerPath.h */,
@@ -1931,6 +1950,8 @@
 		AA9CD7C3141FF8D10064C27A /* sr */ = {
 			isa = PBXGroup;
 			children = (
+				AAA6ABCC16EFCA40006E8ACF /* sr_sn_colorsurf.cpp */,
+				AAA6ABCD16EFCA40006E8ACF /* sr_sn_colorsurf.h */,
 				AA9CD7DD141FF8D10064C27A /* sr.cpp */,
 				AA9CD7DE141FF8D10064C27A /* sr.h */,
 				AA9CD7DF141FF8D10064C27A /* sr_alg.cpp */,
@@ -2035,6 +2056,17 @@
 				AA9CD84A141FF8D10064C27A /* sr_viewer.h */,
 			);
 			path = sr;
+			sourceTree = "<group>";
+		};
+		AAA6ABC316EFB283006E8ACF /* python */ = {
+			isa = PBXGroup;
+			children = (
+				AAA6ABC416EFB296006E8ACF /* SBPython.cpp */,
+				AAA6ABC516EFB296006E8ACF /* SBPython.h */,
+				AAA6ABC616EFB296006E8ACF /* SBPythonClass.cpp */,
+				AAA6ABC716EFB296006E8ACF /* SBPythonClass.h */,
+			);
+			name = python;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2364,6 +2396,10 @@
 				AACEF10616EE63DB0044DCC6 /* me_utilities.hpp in Headers */,
 				AACEF10816EE63DB0044DCC6 /* SteerPath.h in Headers */,
 				AACEF10916EE63DB0044DCC6 /* SteerSuiteEngineDriver.h in Headers */,
+				AAA6ABC216EFB246006E8ACF /* Heightfield.h in Headers */,
+				AAA6ABC916EFB296006E8ACF /* SBPython.h in Headers */,
+				AAA6ABCB16EFB296006E8ACF /* SBPythonClass.h in Headers */,
+				AAA6ABCF16EFCA40006E8ACF /* sr_sn_colorsurf.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2740,6 +2776,10 @@
 				AACEF0FF16EE63B70044DCC6 /* SBWSPManager.cpp in Sources */,
 				AACEF10716EE63DB0044DCC6 /* SteerPath.cpp in Sources */,
 				AACEF10A16EE63DB0044DCC6 /* SteerSuiteEnginerDriver.cpp in Sources */,
+				AAA6ABC116EFB246006E8ACF /* Heightfield.cpp in Sources */,
+				AAA6ABC816EFB296006E8ACF /* SBPython.cpp in Sources */,
+				AAA6ABCA16EFB296006E8ACF /* SBPythonClass.cpp in Sources */,
+				AAA6ABCE16EFCA40006E8ACF /* sr_sn_colorsurf.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

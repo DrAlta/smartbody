@@ -237,25 +237,11 @@
     static bool once = true;
     if (once)
     {
-        MCUInitialize();
         
-        NSString* filePath = [[NSBundle mainBundle] pathForResource:@"common" ofType:@"sk"];
-        NSString* dirPath = [filePath stringByDeletingLastPathComponent];
+        NSString *dirPath = [[[NSBundle mainBundle] resourcePath]
+                                   stringByAppendingPathComponent:@"assests"];
         const char* mediaPath = [dirPath UTF8String];
-
-        char command[250] = "load skeletons -R \"";
-        strcat(command, mediaPath);
-        strcat(command, "\"");
-        printf("%s\n", command);
-        SBMExecuteCmd(command);
-        
-        char command1[250] = "load motions -R \"";
-        strcat(command1, mediaPath);
-        strcat(command1, "\"");    
-        printf("%s\n", command1);
-        SBMExecuteCmd(command1);
-      
-        SBMInitialize(mediaPath);   
+        SBInitialize(mediaPath);
         once = false;
     }
     
