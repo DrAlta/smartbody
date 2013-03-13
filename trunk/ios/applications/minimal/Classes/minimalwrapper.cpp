@@ -7,25 +7,19 @@
 //
 
 #include "minimalwrapper.h"
-#include <sbm/mcontrol_util.h>
-#include <xercesc/sax/HandlerBase.hpp>
-#include <xercesc/parsers/XercesDOMParser.hpp>
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/sax/HandlerBase.hpp>
-#include <xercesc/sax/SAXException.hpp>
 #include <sbm/mcontrol_callbacks.h>
-#include <sbm/resource_cmds.h>
-#include <sbm/sbm_test_cmds.hpp>
-#include <sbm/locomotion_cmds.hpp>
+#include <sb/SBScene.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/filesystem/path.hpp>
+#include <sbm/xercesc_utils.hpp>
 #include <sr/sr_camera.h>
-#include "vhmsg.h"
+#include <sb/SBPython.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBSimulationManager.h>
+#include <sb/SBBmlProcessor.h>
 
-XERCES_CPP_NAMESPACE_USE
 using namespace boost::filesystem;
 
 #if __cplusplus
@@ -33,36 +27,26 @@ extern "C"
 {
 #endif
 
-void MCUInitialize()
+void SBInitialize(const char* mediapath)
 {
+    printf("media path %s\n", mediapath);
     XMLPlatformUtils::Initialize();
-    mcuCBHandle& mcu = mcuCBHandle::singleton();
-}
-        
-void SBMInitialize(const char* mediaPath)
-{
-    SBMExecuteCmd("char brad init common.sk"); 
-    SBMExecuteCmd("set character brad world_offset x -35 y 102 h -17");
-    SBMExecuteCmd("char doctor init common.sk");
-    SBMExecuteCmd("set character doctor world_offset x 35 y 102 h -17");    
-    SBMExecuteCmd("bml char brad <body posture=\"HandsAtSide_Motex\"/>");
-    SBMExecuteCmd("bml char doctor <body posture=\"HandsAtSide_Motex\"/>");
-}
-    
-void SBMLoad(const char* p)
-{
-    path pathname(p);
-    std::string command = "load skeletons -R " + pathname.root_directory();
-    printf("loading command is %s\n", command.c_str());
-    SBMExecuteCmd(command.c_str());
+    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+    initPython("../../Python26/Libs");
+    SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
+    sim->setupTimer();
+    printf("Timer setup!\n");
+    scene->setMediaPath(mediapath);
+	scene->addAssetPath("seq", "sbm-common/scripts");
+	scene->runScript("default-init.py");
+    printf("Run default-init.py\n");
 }
     
 void getBoneData()
 {
-    mcuCBHandle& mcu = mcuCBHandle::singleton();
-    SbmCharacter* char_p = mcu.getCharacter("brad");
-    SkSkeleton* sk = char_p->_skeleton;
-    SkSkeleton* sk1 = mcu.getCharacter("doctor")->_skeleton;
+    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+    SmartBody::SBSkeleton* sk = scene->getCharacter("brad")->getSkeleton();
+    SmartBody::SBSkeleton* sk1 = scene->getCharacter("doctor")->getSkeleton();
     sk->update_global_matrices(); 
     sk1->update_global_matrices();
     std::map<int,int> indexMap;
@@ -96,35 +80,22 @@ void getBoneData()
     
 void SBMUpdateX(float t)
 {
-    mcuCBHandle& mcu = mcuCBHandle::singleton();
-    bool updateSim = mcu.update_timer(t);
-    vhmsg::ttu_poll();
-    if (updateSim)        
-        mcu.update();
+    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+    SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
+    sim->update();
+    scene->update();
 }
     
 void SBMExecuteCmd(const char* command)
 {
-    mcuCBHandle& mcu = mcuCBHandle::singleton();
-    mcu.execute((char*) command);
+    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+    scene->command(command);
 }
     
 void SBMExecutePythonCmd(const char* command)
 {
-    mcuCBHandle& mcu = mcuCBHandle::singleton();
-    mcu.executePython((char*) command);    
-}
-    
-float SBMGetCharacterWo(const char* character)
-{
-    mcuCBHandle& mcu = mcuCBHandle::singleton();
-    SbmPawn* c = mcu.getCharacter(character);
-    if (!c)
-        return -1.0f;
-    
-    float x, y, z, p, h, r;
-    c->get_world_offset(x, y, z, p, h, r);
-    return y;
+    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+    scene->run(command);
 }
     
 float* rotatePoint(float* pointF, float* originF, float* directionF, float angle)
@@ -161,18 +132,17 @@ void getCamera(float x, float y, float prevX, float prevY, float curX, float cur
     static SrCamera _camera;
     if (mode == -1)
     {
-        _camera.init();
-        _camera.up = SrVec::j;    
-        _camera.center.set(0, 92, 0);
-        _camera.eye.set(0, 166, 300);
-        _camera.scale = 1.0f;
+        _camera.setUpVector(SrVec(0, 1, 0));
+        _camera.setCenter(0, 92, 0);
+        _camera.setEye(0, 166, 300);
+        _camera.setScale(1);
     }   
     if (mode == 0)  // dollying
     {
         printf("camera dollying, %f, %f\n", x, y);
         float amount = x / 100.0f;
-        SrVec cameraPos(_camera.eye);
-        SrVec targetPos(_camera.center);
+        SrVec cameraPos(_camera.getEye());
+        SrVec targetPos(_camera.getCenter());
         SrVec diff = targetPos - cameraPos;
         float distance = diff.len();
         diff.normalize();
@@ -183,10 +153,11 @@ void getCamera(float x, float y, float prevX, float prevY, float curX, float cur
         SrVec diffVector = diff;
         SrVec adjustment = diffVector * distance * amount;
         cameraPos += adjustment;
-        SrVec oldEyePos = _camera.eye;
-        _camera.eye = cameraPos;
-        SrVec cameraDiff = _camera.eye - oldEyePos;
-        _camera.center += cameraDiff;
+        SrVec oldEyePos = _camera.getEye();
+        _camera.setEye(cameraPos.x, cameraPos.y, cameraPos.z);
+        SrVec cameraDiff = _camera.getEye() - oldEyePos;
+        SrVec temp = _camera.getCenter() + cameraDiff;
+         _camera.setCenter(temp.x, temp.y, temp.z);
      }
     
     if (mode == 1)  // camera rotation
@@ -196,9 +167,9 @@ void getCamera(float x, float y, float prevX, float prevY, float curX, float cur
         deltaX *= 3.0f;
         deltaY *= 3.0f;
 
-		SrVec origUp = _camera.up;
-		SrVec origCenter = _camera.center;
-		SrVec origCamera = _camera.eye;
+		SrVec origUp = _camera.getUpVector();
+		SrVec origCenter = _camera.getCenter();
+		SrVec origCamera = _camera.getEye();
         
 		SrVec dirX = origUp;
 		SrVec  dirY;
@@ -208,7 +179,7 @@ void getCamera(float x, float y, float prevX, float prevY, float curX, float cur
 		SrVec camera = rotatePoint(origCamera, origCenter, dirX, -deltaX * float(M_PI));
 		camera = rotatePoint(camera, origCenter, dirY, deltaY * float(M_PI));
         
-		_camera.eye = camera;    
+		_camera.setEye(camera.x, camera.y, camera.z);
     }
         
     
