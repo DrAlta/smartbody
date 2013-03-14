@@ -109,7 +109,7 @@ class Pawn(NodePath, DirectObject):
 		rDelta = abs(self.getR(render) - self.__LastHpr.getX())
 		
 #		if ((posDelta > 3 or hDelta > 1 or pDelta > 1 or rDelta > 1) and self.IsRegistered()):
-		if (True):
+		if (False):
 			self.__LastPos = newPos
 			self.__LastHpr = self.getHpr(render)
 			self.RegisterPosHpr()
@@ -135,9 +135,9 @@ class Pawn(NodePath, DirectObject):
 		
 	def Destroy(self):
 		if (type(self) == Pawn):
-			self.Scene.SendSbmCommand("pawn " + self.GetName() + " remove")
+			self.Scene.SendSbmCommand("python scene.removePawn(\"" + self.GetName() + "\")")
 		else:
-			self.Scene.SendSbmCommand("char " + self.GetName() + " remove")
+			self.Scene.SendSbmCommand("python scene.removeCharacter(\"" + self.GetName() + "\")")
 		self.removeNode()
 		self.Scene.Pawns.pop(self.GetName())
 	
@@ -244,8 +244,9 @@ class Pawn(NodePath, DirectObject):
 		
 		if (not self.__Registered):
 			print "Now sending command to register pawn " + self.GetName() + " with SmartBody..."
-			self.Scene.SendSbmCommand("pawn " + self.GetName() + " init")
+			self.Scene.SendSbmCommand("python scene.createPawn(\"" + self.GetName() + "\")")
 			self.__Registered = True
+			self.RegisterPosHpr()
 			if (self.__GeomType == GEOMTYPE_STATIC_ANIMATED):
 				self.Anim.loop()
 		
@@ -264,9 +265,17 @@ class Pawn(NodePath, DirectObject):
 			return
 		self.__NotRegisteredMessage = False
 		
-		pos = Pos2Str(Panda2Sbm_Pos(self.getPos(render)))
-		hpr = Hpr2Str(Panda2Sbm_Hpr(self.getHpr(render)))
-		self.Scene.SendSbmCommand("set " + self.__TypeSbm + " " + self.GetName() + " world_offset " + pos + " " + hpr)
+		#pos = Pos2Str(Panda2Sbm_Pos(self.getPos(render)))
+		#hpr = Hpr2Str(Panda2Sbm_Hpr(self.getHpr(render)))
+		#self.Scene.SendSbmCommand("set " + self.__TypeSbm + " " + self.GetName() + " world_offset " + pos + " " + hpr)
+		hpr = self.getHpr(render)
+		pos = self.getPos(render)
+		typeCommand = "getPawn"
+		if self.__TypeStr == "CharacterPawn":
+			typeCommand = "getCharacter"
+		self.Scene.SendSbmCommand("python scene." + typeCommand + "(\"" + self.GetName() + "\").setHPR(SrVec(" + str(hpr.getX()) + ", " + str(hpr.getY()) + ", " + str(hpr.getZ()) + "))")
+		self.Scene.SendSbmCommand("python scene." + typeCommand + "(\"" + self.GetName() + "\").setPosition(SrVec(" + str(-pos.getX()) + ", " + str(pos.getZ()) + ", " + str(pos.getY()) + "))")
+		
 
 			
 	def SetValid(self, valid):
