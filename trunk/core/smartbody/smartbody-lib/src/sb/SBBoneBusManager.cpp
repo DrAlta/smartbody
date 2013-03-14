@@ -87,6 +87,12 @@ void SBBoneBusManager::start()
 
 void SBBoneBusManager::beforeUpdate(double time)
 {
+	// process commands received over BoneBus protocol
+	std::vector<std::string> commands = _boneBus.GetCommand();
+	for ( size_t i = 0; i < commands.size(); i++ )
+	{
+		SmartBody::SBScene::getScene()->command( (char *)commands[i].c_str() );
+	}
 }
 
 void SBBoneBusManager::update(double time)
