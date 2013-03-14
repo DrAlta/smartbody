@@ -104,11 +104,12 @@ class Scene:
 		""" Executed when a SmartBody process connects """
 		if (not self.__BMLR.GetNet().IsConnected()):
 			return
-				
+		
 		self.__SmartBodyReady = True
 
 		for pawn in self.Pawns.values():
 			pawn.RegisterInit()
+			print "Pawn registered..."
 			
 		messenger.send("SbmConnected")
 		self.Connected = True
@@ -230,8 +231,9 @@ class Scene:
 				id 			= arguments[2]
 				char = self.Characters.get(int(charName))
 				
-				if (char != None):
-					char.AddBoneBusMap(boneName, int(id))
+				if len(id) != 0:
+					if (char != None):
+						char.AddBoneBusMap(boneName, int(id))
 			
 			"""
 		elif (command == "SetPawnPosHpr"):

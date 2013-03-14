@@ -148,6 +148,7 @@ class NetHandler(DirectObject):
 				self.__HostName = conn.p().getAddress()
 				self.__Connection = conn
 				self.__Connected  = True
+				self.__Scene.OnConnect()				
 			
 		# Check if connection is OK
 		if  (self.__Connected):
@@ -211,7 +212,7 @@ class NetHandler(DirectObject):
 			return
 		
 		try:
-			#print(">> " + command)
+			print(">> " + command)
 			self.__writer.send(Datagram(command + "\r\r\r"), self.__Connection.p());
 		except:
 			print("Error sending command to SmartBody, connection is most likely down")

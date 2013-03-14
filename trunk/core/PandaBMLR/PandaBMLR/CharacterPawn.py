@@ -102,7 +102,8 @@ class CharacterPawn(Pawn):
 			while(len(self.__BmlQueue) > 0):
 				msg = self.__BmlQueue.pop(0)
 				# TODO USE VRSPEAK INSTEAD OF TEST BML
-				self.Scene.SendSbmCommand("test bml char " + self.GetName() + " " + msg)
+				cleanmsg = msg.replace('"', '\\"')
+				self.Scene.SendSbmCommand("python bml.execBML(\"" + self.GetName() + "\", \"" + cleanmsg + "\")")
 				
 		if (task != None):
 			return task.cont
@@ -288,8 +289,14 @@ class CharacterPawn(Pawn):
 		
 		if (not self.IsRegistered()):
 			print "Now sending command to register character " + self.GetName() + " with SmartBody..."
-			self.Scene.SendSbmCommand("char " + self.GetName() + " init common.sk " + self.GetCharClass())
-			self.Scene.SendSbmCommand("set character " + self.GetName() + " voice text " + self.GetName())
+			self.Scene.SendSbmCommand("python mychar = scene.createCharacter(\"" + self.GetName() + "\", \"" + self.GetCharClass() + "\")")
+			self.Scene.SendSbmCommand("python myskel = scene.createSkeleton(\"common.sk\")")
+			self.Scene.SendSbmCommand("python mychar.setSkeleton(myskel)")
+			self.Scene.SendSbmCommand("python mychar.createStandardControllers()")
+	
+			self.Scene.SendSbmCommand("python mychar.setVoice(\"text\")")
+			self.Scene.SendSbmCommand("python mychar.setVoiceCode(\"" + self.GetName() + "\")")
+			self.Scene.SendSbmCommand("python characterSetup(\"" + self.GetName() + "\")")
 			self.SetRegistered(True)
 			self.RegisterPosHpr()
 			
