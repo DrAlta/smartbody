@@ -145,95 +145,101 @@ class Scene:
 		if (command == "CreateActor"):
 			print "Actor created!"
 			if (len(arguments) > 3):
-				charID      = int(arguments[0])
-				charClass   = strip(arguments[1])
-				charName    = strip(arguments[2])
-				skelType    = arguments[3] # Not used
-				
-				found = False
-				for char in self.Pawns.values():
-					if (char.GetName() == charName):
-						char.SetID(charID)
-						found = True
-						break				
-				
-				if (not found):
-					CharacterPawn(self.__BMLR, charName, charClass, charID, registered = True)
+				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 and len(arguments[3]) > 0 ):
+					charID      = int(arguments[0])
+					charClass   = strip(arguments[1])
+					charName    = strip(arguments[2])
+					skelType    = arguments[3] # Not used
+					
+					found = False
+					for char in self.Pawns.values():
+						if (char.GetName() == charName):
+							char.SetID(charID)
+							found = True
+							break				
+					
+					if (not found):
+						CharacterPawn(self.__BMLR, charName, charClass, charID, registered = True)
 		if (command == "UpdateActor"):
 			if (len(arguments) > 3):
-				charID      = int(arguments[0])
-				charClass   = strip(arguments[1])
-				charName    = strip(arguments[2])
-				skelType    = arguments[3] # Not used
-				
-				found = False
-				for char in self.Pawns.values():
-					if (char.GetName() == charName):
-						char.SetID(charID)
-						found = True
-						break				
-				
-				if (not found):
-					CharacterPawn(self.__BMLR, charName, charClass, charID, registered = True)
+				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 and len(arguments[3]) > 0 ):
+					charID      = int(arguments[0])
+					charClass   = strip(arguments[1])
+					charName    = strip(arguments[2])
+					skelType    = arguments[3] # Not used
+					
+					found = False
+					for char in self.Pawns.values():
+						if (char.GetName() == charName):
+							char.SetID(charID)
+							found = True
+							break				
+					
+					if (not found):
+						CharacterPawn(self.__BMLR, charName, charClass, charID, registered = True)
 				
 		elif (command == "DeleteActor"):
 			if (len(arguments) > 0):
-				charID 			= int(arguments[0])
-			
-				char = self.Characters.get(charID)
-				if (char != None):
-					char.Destroy()
+				if (len(arguments[0]) > 0 ):
+					charID 			= int(arguments[0])
+				
+					char = self.Characters.get(charID)
+					if (char != None):
+						char.Destroy()
 				
 		elif (command == "SetActorPos"):
 			if (len(arguments) > 3):
-				charID 	= int(arguments[0])
-				x 		= float(arguments[1])
-				y 		= float(arguments[2])
-				z 		= float(arguments[3])
-				
-				char = self.Characters.get(charID)
+				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 and len(arguments[3]) > 0 ):
+					charID 	= int(arguments[0])
+					x 		= float(arguments[1])
+					y 		= float(arguments[2])
+					z 		= float(arguments[3])
+					
+					char = self.Characters.get(charID)
 
-				if (char != None):
-					if (not self.IgnorePawnPosRot(char)):						
-						#char.setPos(Converter.Unreal2Panda_Pos(Vec3(x, y, z)))
-						char.setPos(Converter.Sbm2Panda_Pos(Vec3(x, y, z)))
+					if (char != None):
+						if (not self.IgnorePawnPosRot(char)):						
+							#char.setPos(Converter.Unreal2Panda_Pos(Vec3(x, y, z)))
+							char.setPos(Converter.Sbm2Panda_Pos(Vec3(x, y, z)))
 		
 		elif (command == "SetActorRot"):
 			if (len(arguments) > 4):
 				
-				charID 	= int(arguments[0])
-				w 		= float(arguments[1])
-				x 		= float(arguments[2])
-				y 		= float(arguments[3])
-				z 		= float(arguments[4])
+				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 and len(arguments[3]) > 0 and len(arguments[4]) > 0):
+					charID 	= int(arguments[0])
+					w 		= float(arguments[1])
+					x 		= float(arguments[2])
+					y 		= float(arguments[3])
+					z 		= float(arguments[4])				
+					char = self.Characters.get(charID)
 				
-				char = self.Characters.get(charID)
-				
-				if (char != None):
-					if (not self.IgnorePawnPosRot(char)):						
-						char.SetRotQuat(Converter.Sbm2Panda_Quat(Quat(x, y, z, w)))
+					if (char != None):
+						if (not self.IgnorePawnPosRot(char)):						
+							char.SetRotQuat(Converter.Sbm2Panda_Quat(Quat(x, y, z, w)))
 					
 		elif (command == "SpeakText"):
 			if (len(arguments) > 2):
-				id			= arguments[0]
-				charName		= arguments[1]
-				text 			= arguments[2]
-			
-				char = self.Pawns.get(charName)
+				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 ):
+					id			= arguments[0]
+					charName		= arguments[1]
+					text 			= arguments[2]
 				
-				if (char != None):			
-					char.Speak(text, 0, bubbleID = id)
+					char = self.Pawns.get(charName)
+					
+					if (char != None):			
+						char.Speak(text, 0, bubbleID = id)
 					
 		elif (command == "SetBoneId"):
 			if (len(arguments) > 2):
-				charName	= arguments[0]
-				boneName	= arguments[1]
-				id 			= arguments[2]
-				char = self.Characters.get(int(charName))
-				
-				if len(id) != 0:
-					if (char != None):
-						char.AddBoneBusMap(boneName, int(id))
+				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0):
+					charName	= arguments[0]
+					boneName	= arguments[1]
+					id 			= arguments[2]
+					char = self.Characters.get(int(charName))
+					
+					if len(id) != 0:
+						if (char != None):
+							char.AddBoneBusMap(boneName, int(id))
 			
 			"""
 		elif (command == "SetPawnPosHpr"):
@@ -257,15 +263,16 @@ class Scene:
 			
 		elif (command == "CreatePawn"):
 			if (len(arguments) > 3):
-				name 	= arguments[0]
-				x 		= float(arguments[1])
-				y 		= float(arguments[2])
-				z 		= float(arguments[3])
-				
-				if (not self.Pawns.has_key(name)):
-					p = Pawn(self.__BMLR, name, registered = True, geom = "DEFAULT")									
-					if (p.IsValid()):
-						p.setPos(Converter.Sbm2Panda_Pos(Vec3(x, y, z)))
+				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 and len(arguments[3]) > 0 ):
+					name 	= arguments[0]
+					x 		= float(arguments[1])
+					y 		= float(arguments[2])
+					z 		= float(arguments[3])
+					
+					if (not self.Pawns.has_key(name)):
+						p = Pawn(self.__BMLR, name, registered = True, geom = "DEFAULT")									
+						if (p.IsValid()):
+							p.setPos(Converter.Sbm2Panda_Pos(Vec3(x, y, z)))
 		
 		elif (command == "vrAllCall"):
 			taskMgr.doMethodLater(4, self.OnConnect, "vrAllCall")
