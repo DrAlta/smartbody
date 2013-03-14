@@ -758,7 +758,7 @@ int main( int argc, char **argv )	{
 				// return -1
 			}
 		}
-		else if( s.compare( "-host=" ) == 0 )  // argument starts with -host=
+		else if( s.compare( 0, 6, "-host=" ) == 0 )  // argument starts with -host=
 		{
 			net_host = s;
 			net_host.erase(0, 6);
