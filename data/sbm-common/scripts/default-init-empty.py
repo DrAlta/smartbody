@@ -6,7 +6,8 @@ def characterSetup(charName):
 	sbChar = scene.getCharacter(charName)
 	# steering
 	steerManager = scene.getSteerManager()
-	setupSteerAgent(charName, 'all')	
+	setupSteerAgent(charName, 'all')
+	steerManager.setEnable(False)	
 	steerManager.setEnable(True)
 	
 	# reaching
