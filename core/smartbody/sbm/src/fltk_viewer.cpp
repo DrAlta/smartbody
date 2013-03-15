@@ -3512,10 +3512,13 @@ void FltkViewer::drawKinematicFootprints(int index)
 	float scale = curChar->getHeight()*0.1f;
 	for (int i=0;i<2;i++)
 	{
-		std::vector<SrVec>& footSteps = curChar->getFootSteps(i);
+		const std::vector<SrVec>& footSteps = curChar->getFootSteps(i);
 		for (unsigned int k=0;k<footSteps.size();k++)
 		{
-			drawArrow(footSteps[k], footSteps[k] +faceDir*scale, scale*0.5f, SrVec(1.f,0.f,0.f) );			
+			SrVec footStep = footSteps[k];
+			SrVec adjustedFootStep = footSteps[k] + faceDir * scale;
+			SrVec color = SrVec(1.f, 0.f, 0.f);
+			drawArrow(footStep, adjustedFootStep, scale*0.5f,color);			
 		}
 	}
 	//glEnable(GL_DEPTH_TEST);
