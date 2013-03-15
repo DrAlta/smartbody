@@ -3,6 +3,7 @@
 
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBCharacter.h>
 #include <sb/SBAnimationState.h>
 #include "me_ct_param_animation_utilities.h"
 #include "me_ct_motion_example.hpp"
@@ -26,10 +27,15 @@ struct LegCycleState
 	std::vector<SrVec> curSupportPos;
 	std::vector<SrVec> globalSupportPos;
 	std::vector<SrVec> stanceSupportPos;
+	float cycleTime;
+	float timeToNextCycle;
+	int prevCycle;	
+	bool newCycle;
 };
 
 struct LocomotionLegCycle
 {	
+	int cycleIdx;
 	float motionStartTime, motionEndTime;
 	float cycleStartTime, cycleEndTime;
 	float stanceTime;
@@ -65,7 +71,7 @@ protected:
 	float startTime, endTime;
 	std::map<int,LegCycleVec> legCycleMap;
 public:
-	std::vector<LegInfo*> legInfos;
+	std::vector<LegInfo*> legInfos;	
 public:
 	LocomotionAnalyzer();
 	~LocomotionAnalyzer();
@@ -85,12 +91,13 @@ protected:
 	std::vector<LegCycleState> legStates;
 	std::vector<LocomotionAnalyzer*> locoAnalyzers;
 	SmartBody::SBSkeleton* skelCopy;	
+	float skelBaseHeight;	
 public:
 	MotionAnalysis(void);
 	~MotionAnalysis(void);			
 	void init(std::string skeletonName, std::string baseJoint, SmartBody::SBAnimationBlend* locomotionBlend, const std::vector<std::string>& motions, std::string motionPrefix);
 	void initLegInfos();
-	void applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSkeleton* charSk, std::vector<double>& weights, PATimeManager* timeManager, SrMat worldOffsetMat, BodyMotionFrame& inputFrame, BodyMotionFrame& outFrame);
+	void applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCharacter* sbChar, std::vector<double>& weights, PATimeManager* timeManager, SrMat worldOffsetMat, SrVec velocity, float angSpeed, BodyMotionFrame& inputFrame, BodyMotionFrame& outFrame);
 };
 
 #endif

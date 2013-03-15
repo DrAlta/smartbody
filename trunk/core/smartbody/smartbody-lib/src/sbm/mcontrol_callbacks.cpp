@@ -1568,7 +1568,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 				for (int j = 0; j < meshModelVec[i]->N.size(); j++)
 				{
 					SrVec pt = SrVec(meshModelVec[i]->N[j].x, meshModelVec[i]->N[j].y, meshModelVec[i]->N[j].z);
-					SrVec ptp = pt * rotMat;
+					SrVec ptp = pt * rotMat.inverse();
 					meshModelVec[i]->N[j].x = ptp.x;
 					meshModelVec[i]->N[j].y = ptp.y;
 					meshModelVec[i]->N[j].z = ptp.z;
@@ -4683,15 +4683,16 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 			}
 		}
 
-		if (controlledCharacters.size() == 0)
-			return CMD_SUCCESS;
+		//if (controlledCharacters.size() == 0)
+		//	return CMD_SUCCESS;
 
 
 		std::string emitterName = args.read_token();
 		
 		float scale = 1.0f;
 		if (emitterName == "kinect")
-			scale = .1f;
+			//scale = .1f;
+			scale = 100.f;
 
 		std::string skeletonType = args.read_token();
 		if (skeletonType == "position")
@@ -4711,10 +4712,13 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 			{
 				SmartBody::SBCharacter* character = (*iter);
 				SrVec vec(x, y, z);
+				SrVec outVec;
+				scene->getKinectProcessor()->processRetargetPosition(character->getSkeleton()->getName(),vec, outVec);
+				
 				if (emitterName == "kinect")
-					character->datareceiver_ct->setGlobalPosition(jName, vec);
+					character->datareceiver_ct->setGlobalPosition(jName, outVec);
 				else
-					character->datareceiver_ct->setLocalPosition(jName, vec);
+					character->datareceiver_ct->setLocalPosition(jName, outVec);
 			}
 			
 			
@@ -4781,13 +4785,13 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 			if (emitterName == "kinect")
 			{
 				int numRemainTokens = args.calc_num_tokens();
-				if (numRemainTokens < 96)
+				if (numRemainTokens < 20*4)
 				{
 					LOG("Kinect skeleton %s rotation data is not valid.", skelName.c_str());
 					return CMD_FAILURE;
 				}
 				std::vector<SrQuat> quats;
-				for (int i = 0; i < 24; i++)
+				for (int i = 0; i < 20; i++)
 				{
 					SrQuat quat;
 					quat.w = args.read_float();
@@ -4796,27 +4800,72 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 					quat.z = args.read_float();
 					quat.normalize();
 					quats.push_back(quat);
+
+					// converte rotation axis for kinect
+					quats[i].z *= -1.0f;
+					quats[i].x *= -1.0f;					
 				}
-				KinectProcessor::processGlobalRotation(quats);
-	//			mcu->kinectProcessor->filterRotation(quats);
+				//KinectProcessor::processGlobalRotation(quats);
+				scene->getKinectProcessor()->filterRotation(quats);
+				std::vector<SrQuat> retargetQuats;
+				SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();				
 				for (std::vector<SmartBody::SBCharacter*>::iterator iter = controlledCharacters.begin();
 				 iter != controlledCharacters.end();
 				 iter++)
 				{
-					SmartBody::SBCharacter* character = (*iter);
-				
-					for (int i = 0; i < 24; i++)
+					SmartBody::SBCharacter* character = (*iter);					
+					scene->getKinectProcessor()->processRetargetRotation(character->getSkeleton()->getName(),quats, retargetQuats);
+					if (retargetQuats.size() >= 20)
 					{
-						if (quats[i].w != 0)
+						for (int i = 0; i < 20; i++)
 						{
-							const std::string& mappedJointName = scene->getKinectProcessor()->getSBJointName(i);
-							if (mappedJointName != "")
-								character->datareceiver_ct->setLocalRotation(mappedJointName, quats[i]);
+							if (retargetQuats[i].w != 0)
+							{
+								const std::string& mappedJointName = scene->getKinectProcessor()->getSBJointName(i);
+								if (mappedJointName != "")
+									character->datareceiver_ct->setLocalRotation(mappedJointName, retargetQuats[i]);
+							}
 						}
-					}
+					}					
 				}
 			}
 		}
+		else if (skeletonType == "initsk")
+		{
+			if (emitterName == "kinect")
+			{
+				SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+				SmartBody::SBSkeleton* kinectSk = assetManager->getSkeleton("kinect.sk");				
+				int numRemainTokens = args.calc_num_tokens();
+				if (numRemainTokens < 20*7)
+				{
+					LOG("Kinect skeleton %s rotation and position data is not valid.", skelName.c_str());
+					return CMD_FAILURE;
+				}
+				std::vector<SrQuat> quats;
+				std::vector<SrVec> trans;
+				for (int i = 0; i < 20; i++)
+				{
+					SrQuat quat;
+					quat.w = args.read_float();
+					quat.x = args.read_float();
+					quat.y = args.read_float();
+					quat.z = args.read_float();
+					quat.normalize();
+					quats.push_back(quat);
+					
+				
+					SrVec tran;
+					tran.x = args.read_float() * scale;
+					tran.y = args.read_float() * scale;
+					tran.z = args.read_float() * scale;
+					trans.push_back(tran);
+				}
+				if (!kinectSk)
+					scene->getKinectProcessor()->initKinectSkeleton(trans, quats);
+			}
+		}
+		
 	}
 	return CMD_SUCCESS;
 }

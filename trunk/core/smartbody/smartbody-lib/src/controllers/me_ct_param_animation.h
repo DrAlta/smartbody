@@ -128,7 +128,7 @@ class MeCtParamAnimation : public MeCtContainer
 		PABlendData* createStateModule(ScheduleUnit su);
 		void reset();
 		void updateWo(SrMat& mat, MeCtChannelWriter* wo, SrBuffer<float>& buffer);
-		void updateIK(PABlendData* curBlendData, SrMat& woMat, SrBuffer<float>& buff);
+		void updateIK(PABlendData* curBlendData, SrMat& woMat, SrMat& woDeltaMat, float dt, SrBuffer<float>& buff);
 		SrMat combineMat(SrMat& mat1, SrMat& mat2);
 		void updateMotionFrame(BodyMotionFrame& motionFrame, MeCtIKTreeScenario& ikScenario, SrBuffer<float>& buff, bool readData = true);
 
