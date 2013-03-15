@@ -100,6 +100,7 @@ const bool ENABLE_EYELID_CORRECTIVE_CT					= false;
 
 using namespace std;
 
+const int NumFootSteps = 4;
 
 #if 0
 static inline bool parse_float_or_error( float& var, const char* str, const string& var_name );
@@ -602,6 +603,12 @@ void SbmCharacter::initData()
 	locomotion_type = Basic;
 	statePrefix = "";
 
+	for (int i=0;i<2;i++)
+	{
+		footStepList[i].resize(NumFootSteps);
+		std::fill(footStepList[i].begin(),footStepList[i].end(),SrVec());
+		footStepIdx[i] = 0;
+	}
 }
 
 
@@ -2660,4 +2667,25 @@ void SbmCharacter::createReachEngine()
 		rengineJump->init(MeCtReachEngine::LEFT_JUMP,effector);
 		(*this->reachEngineMap)[MeCtReachEngine::LEFT_JUMP] = rengineJump;
 	}
+}
+
+void SbmCharacter::addFootStep( int iLeg, SrVec& footPos, bool Update /*= false*/ )
+{
+	if (iLeg <0 || iLeg >= 2) return; 
+
+	if (Update)
+	{
+		footStepList[iLeg][footStepIdx[iLeg]] = footPos;
+	}
+	else
+	{
+		footStepIdx[iLeg] = (footStepIdx[iLeg]+1)%NumFootSteps;
+		footStepList[iLeg][footStepIdx[iLeg]] = footPos;
+	}
+}
+
+std::vector<SrVec>& SbmCharacter::getFootSteps( int iLeg )
+{
+	if (iLeg <0 || iLeg >= 2) return footStepList[0]; // should not happen
+	return footStepList[iLeg];
 }

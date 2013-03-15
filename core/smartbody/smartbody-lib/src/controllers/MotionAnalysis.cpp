@@ -1,6 +1,7 @@
 #include "MotionAnalysis.h"
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>
+#include <sbm/Heightfield.h>
 /************************************************************************/
 /* Locomotion Leg Cycle                                                 */
 /************************************************************************/
@@ -116,6 +117,7 @@ void LocomotionAnalyzer::initLegCycles( const std::string& name, SmartBody::SBAn
 		{
 			legCycleVec.push_back(LocomotionLegCycle());
 			LocomotionLegCycle& legCycle = legCycleVec[i];
+			legCycle.cycleIdx = i;
 			legCycle.stanceTime = (float)getKeyTagTime("stance",i,keyTag);
 			legCycle.liftTime = (float)getKeyTagTime("lift",i,keyTag);
 			legCycle.liftoffTime = (float)getKeyTagTime("liftoff",i,keyTag);
@@ -213,7 +215,7 @@ void MotionAnalysis::init(std::string skeletonName, std::string baseJoint, Smart
 {		
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSkeleton* sbSkel = scene->getSkeleton(skeletonName);
-	skelCopy = new SmartBody::SBSkeleton(sbSkel);
+	skelCopy = new SmartBody::SBSkeleton(sbSkel);	
 	initLegInfos();
 	int numMotions = motions.size();	
 	for (int i=0;i<numMotions;i++)
@@ -270,10 +272,10 @@ void MotionAnalysis::initLegInfos()
 	//ikScenario.buildIKTreeFromJointRoot(skelCopy->getJointByName("base"),stopJoint);
 }
 
-void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSkeleton* charSk, std::vector<double>& weights, PATimeManager* timeManager, SrMat worldOffsetMat, BodyMotionFrame& inputFrame, BodyMotionFrame& outFrame )
+void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCharacter* sbChar, std::vector<double>& weights, PATimeManager* timeManager, SrMat worldOffsetMat, SrVec velocity, float angSpeed, BodyMotionFrame& inputFrame, BodyMotionFrame& outFrame )
 {
 	static SrQuat prevQuat;
-
+	SmartBody::SBSkeleton* charSk = sbChar->getSkeleton();
 	ikScenario.ikGlobalMat = worldOffsetMat;
 	ikScenario.ikTreeRootPos = inputFrame.rootPos;
 	ikScenario.setTreeNodeQuat(inputFrame.jointQuat, QUAT_INIT);
@@ -288,6 +290,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSke
 	SmartBody::SBJoint* srcBase = srcSk->getJointByName(baseName);
 	SmartBody::SBJoint* tgtBase = tgtSk->getJointByName(baseName);
 
+	float tgtBaseHeight = tgtSk->getBaseHeight(baseName); // to decide the terrain compensation offset
 	float scaleRatio = tgtSk->getBaseHeight(baseName)/srcSk->getBaseHeight(baseName);
 
 	for (unsigned int i=0;i<legInfos.size();i++)
@@ -312,11 +315,14 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSke
 	for (unsigned int k=0;k<legStates.size();k++)
 	{
 		std::vector<SrVec>& supPos = legStates[k].curSupportPos;
-		std::fill(supPos.begin(),supPos.end(),SrVec()); // clear the support position
+		std::fill(supPos.begin(),supPos.end(),SrVec()); // clear the support position	
+		legStates[k].cycleTime = 0.f;
+		legStates[k].timeToNextCycle = 0.f;
+		legStates[k].newCycle = false;
 	}
 	float transitionWeight = 0.0;
 	int maxWeightIndex = -1;
-	double maxBlendWeight = -1;
+	double maxBlendWeight = -1;	
 	for (unsigned int i=0;i<locoAnalyzers.size();i++) // weighted sum of local foot base
 	{
 		LocomotionAnalyzer* analyzer = locoAnalyzers[i];		
@@ -325,7 +331,19 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSke
 		{
 			LegCycleState& legState = legStates[k];
 			LocomotionLegCycle* legCycle = analyzer->getLegCycle(k,(float)moTime);
-			
+			float normalizeCycle = legCycle->getNormalizedCycleTime(moTime);
+			legStates[k].cycleTime += normalizeCycle*legCycle->cycleDuration*weights[i];
+			legStates[k].timeToNextCycle += (1.f-normalizeCycle)*legCycle->cycleDuration*weights[i];
+
+			if (i==0) // only test the first motion
+			{
+				if (legState.prevCycle != legCycle->cycleIdx)
+				{
+					legState.newCycle = true;					
+				}
+				legState.prevCycle = legCycle->cycleIdx;
+			}
+
 			for (unsigned int m=0;m<legState.curSupportPos.size();m++)
 			{
 				// get weighted sum 
@@ -338,6 +356,23 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSke
 			maxBlendWeight = weights[i];
 		}
 	}
+
+	SrVec vUp = SrVec(0,1,0);
+	SrVec rotCenter = cross(vUp,velocity)/(angSpeed*M_PI/180.f); // rotation center in character local frame
+	for (unsigned int k=0;k<legStates.size();k++)
+	{
+		LegCycleState& legState = legStates[k];
+		float nextStepAngle = angSpeed*legState.timeToNextCycle*M_PI/180.f;
+		SrQuat nextStepRotation = SrQuat(gmatBase.get_rotation())*SrQuat(vUp,nextStepAngle);
+		SrMat nextStepRotMat; nextStepRotation.get_mat(nextStepRotMat);
+		SrVec nextStepCharPos = rotCenter - rotCenter*SrQuat(vUp,nextStepAngle);
+		SrVec nextStepFootPos = gmatBase.get_translation() + nextStepCharPos + (legState.curSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*nextStepRotMat;
+		nextStepFootPos.y = 0.f; // set to ground height by default
+		sbChar->addFootStep(k,nextStepFootPos, !legState.newCycle);
+	}
+	
+	
+
 
 	LocomotionAnalyzer* dominantAnalyzer = locoAnalyzers[maxWeightIndex];
 	double dominantMotime = timeManager->motionTimes[maxWeightIndex];
@@ -370,6 +405,36 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBSke
 // 			legState.curSupportPos[m] = legState.curSupportPos[m]*transitionWeight + legState.stanceSupportPos[m]*(1.f-transitionWeight); 
 // 		}
 	}
+
+	// get the height offset 
+	float tnormal[3];
+	float terrainHeight = 0.0f;
+	float footOffset = 0.05f;
+	Heightfield* heightField = SmartBody::SBScene::getScene()->getHeightfield();
+	float minHeight = 1e30f;
+	float maxHeight = -1e30f;
+	if (heightField)
+	{
+		//terrainHeight = SmartBody::SBScene::getScene()->queryTerrain(x, z, tnormal);
+		for (unsigned int k=0;k<legStates.size();k++)
+		{
+			LegCycleState& legState = legStates[k];
+			for (unsigned int m=0;m<legState.curSupportPos.size();m++)
+			{
+				SrVec supPos = legState.globalSupportPos[m];
+				float height = SmartBody::SBScene::getScene()->queryTerrain(supPos.x, supPos.z, tnormal);
+				float supHeightOffset = (height + tgtBaseHeight) - gmatBase.get_translation().y; 
+				legState.globalSupportPos[m].y += supHeightOffset + footOffset;
+				if (minHeight > height)
+					minHeight = height;
+				if (maxHeight < height)
+					maxHeight = height;
+			}
+		}
+		float heightOffset = (minHeight + tgtBaseHeight) - gmatBase.get_translation().y; 
+		ikScenario.ikGlobalMat.set(13, ikScenario.ikGlobalMat.get(13) + heightOffset + footOffset);
+	}
+	
 	
 	// set ik constraint
 	for (unsigned int i=0;i<legInfos.size();i++)

@@ -1346,6 +1346,21 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
 		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
 	}	
+
+	if (_data->terrainMode == FltkViewer::ModeTerrain)
+	{
+		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
+		if (h)
+			h->render(0);		
+		if (h)
+			h->render(1);
+	}
+	else if (_data->terrainMode == FltkViewer::ModeTerrainWireframe)
+	{
+		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
+		if (h)
+			h->render(1);
+	}
 	
 #if USE_OGRE_VIEWER  < 1 // ogre will draw its own floor
 	if (_data->showFloor)
@@ -1487,18 +1502,7 @@ void FltkViewer::draw()
 	glEnable( GL_COLOR_MATERIAL );
 	glEnable( GL_NORMALIZE );
 
-	if (_data->terrainMode == FltkViewer::ModeTerrain)
-	{
-		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
-		if (h)
-			h->render(0);
-	}
-	else if (_data->terrainMode == FltkViewer::ModeTerrainWireframe)
-	{
-		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
-		if (h)
-			h->render(1);
-	}
+	
 
 	glDisable( GL_COLOR_MATERIAL );
 
@@ -1527,6 +1531,7 @@ void FltkViewer::draw()
 
 	drawMotionVectorFlow();
 	drawPlotMotion();
+	//drawKinematicFootprints(0);
 	
 
 	if (_data->showcollisiongeometry)
@@ -3448,6 +3453,7 @@ void FltkViewer::init_foot_print()
 
 void FltkViewer::drawKinematicFootprints(int index)
 {
+#if 0
 	int i = 0;
 	SrVec vertex;
 	SrMat mat, tmat;
@@ -3498,6 +3504,19 @@ void FltkViewer::drawKinematicFootprints(int index)
 		if( i == footprintstart) continue;
 		if(footprinttime[i][index] > fadeouttime) continue;
 		footprinttime[i][index] += 0.0166666f;
+	}
+#endif
+	SmartBody::SBCharacter* curChar = dynamic_cast<SmartBody::SBCharacter*>(getCurrentCharacter());
+	if (!curChar) return;
+	SrVec faceDir = curChar->getFacingDirection();
+	float scale = curChar->getHeight()*0.1f;
+	for (int i=0;i<2;i++)
+	{
+		std::vector<SrVec>& footSteps = curChar->getFootSteps(i);
+		for (unsigned int k=0;k<footSteps.size();k++)
+		{
+			drawArrow(footSteps[k], footSteps[k] +faceDir*scale, scale*0.5f, SrVec(1.f,0.f,0.f) );			
+		}
 	}
 	//glEnable(GL_DEPTH_TEST);
 }

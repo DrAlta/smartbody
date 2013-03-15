@@ -67,11 +67,10 @@ class SBCharacter : public SbmCharacter
 		SBAPI virtual SBFaceDefinition* getFaceDefinition();
 		SBAPI virtual void setFaceDefinition(SBFaceDefinition* face);
 
-		SBAPI void notify(SBSubject* subject);
-
+		SBAPI void notify(SBSubject* subject);	
+		
 	protected:
-		std::vector<SBBehavior*> _curBehaviors;
-
+		std::vector<SBBehavior*> _curBehaviors;		
 };
 
 };

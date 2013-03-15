@@ -156,6 +156,9 @@ protected:
 
 	SmartBody::Nvbg* _nvbg;
 	SmartBody::MiniBrain* _miniBrain;
+
+	std::vector<SrVec> footStepList[2];	
+	int footStepIdx[2];
 public:
 	//  Methods
 	SbmCharacter();
@@ -176,6 +179,8 @@ public:
 	//* Overrides SbmPawn::prune_controller_tree()
 	virtual int prune_controller_tree();
 
+	void addFootStep(int iLeg, SrVec& footPos, bool Update = false);
+	std::vector<SrVec>& getFootSteps(int ileg);
 
 	/**
 	 *  Sets the character's speech implementation.
