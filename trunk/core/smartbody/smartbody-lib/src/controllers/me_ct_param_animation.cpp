@@ -317,10 +317,10 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			if (!curStateData->isPartialBlending())
 				updateWo(curStateData->woManager->getBaseTransformMat(), woWriter, frame.buffer());
 #if 1 // disable IK post processing for now, until it is stable enough.
-			if (character && character->getBoolAttribute("ikPostFix"))
+			if (character && character->getBoolAttribute("ikPostFix") && curStateData->getStateName().find("Locomotion") != std::string::npos)
 			{
 				SrMat mat = character->get_world_offset();
-				updateIK(curStateData, mat, curStateData->woManager->getBaseTransformMat(), timeStep,frame.buffer());
+				updateIK(curStateData, mat, curStateData->woManager->getBaseTransformMat(), (float)timeStep,frame.buffer());
 				
 				character->setWorldOffset(ikScenario.ikGlobalMat);
 				float woYOffset = ikScenario.ikGlobalMat.get_translation().y;
@@ -927,7 +927,7 @@ void MeCtParamAnimation::updateIK( PABlendData* curBlendData, SrMat& woMat, SrMa
 		ikScenario.buildIKTreeFromJointRoot(character->getSkeleton()->getJointByName("base"),stopJoint);
 	}	
 	
-	float rotSpeed = SrQuat(woDeltaMat.get_rotation()).axisAngle().y*180.f/(dt*M_PI);
+	float rotSpeed = SrQuat(woDeltaMat.get_rotation()).axisAngle().y*180.f/(dt*(float)M_PI);
 	SrVec deltaTrans = woDeltaMat.get_translation()*woMat.get_rotation(); // rotate translation to global frame
 	deltaTrans.y = 0.f; 
 	SrVec velocity = deltaTrans/dt;		
