@@ -1021,8 +1021,8 @@ int mcu_time_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	}
 
 //		if( mcu.timer_p == NULL )	{
-		LOG( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
-		SmartBody::SBScene::getScene()->getSimulationManager()->switch_internal_timer(); 
+//		LOG( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
+//		SmartBody::SBScene::getScene()->getSimulationManager()->switch_internal_timer(); 
 //		}
 		
 	if( strcmp( time_cmd, "reset" ) == 0 ) {

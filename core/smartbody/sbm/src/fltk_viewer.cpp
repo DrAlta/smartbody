@@ -1347,20 +1347,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
 	}	
 
-	if (_data->terrainMode == FltkViewer::ModeTerrain)
-	{
-		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
-		if (h)
-			h->render(0);		
-		if (h)
-			h->render(1);
-	}
-	else if (_data->terrainMode == FltkViewer::ModeTerrainWireframe)
-	{
-		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
-		if (h)
-			h->render(1);
-	}
+	
 	
 #if USE_OGRE_VIEWER  < 1 // ogre will draw its own floor
 	if (_data->showFloor)
@@ -1532,6 +1519,26 @@ void FltkViewer::draw()
 	drawMotionVectorFlow();
 	drawPlotMotion();
 	//drawKinematicFootprints(0);
+
+
+	static GLfloat terrainMatDiffuse[] = { 0.8f,  0.8f,    0.5f,    1.f };
+	static GLfloat terrainMatSpecular[] = { 0.f,  0.f,    0.f,    1.f }; 
+	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, terrainMatDiffuse );	
+	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, terrainMatSpecular );
+	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
+	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+	if (_data->terrainMode == FltkViewer::ModeTerrain)
+	{
+		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();		
+		if (h)
+			h->render(0);
+	}
+	else if (_data->terrainMode == FltkViewer::ModeTerrainWireframe)
+	{
+		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
+		if (h)
+			h->render(1);
+	}
 	
 
 	if (_data->showcollisiongeometry)

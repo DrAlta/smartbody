@@ -64,6 +64,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	SmartBody::DoubleAttribute* diphoneSmoothWindow = createDoubleAttribute("diphoneSmoothWindow", .2, true, "Basic", 180, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
 
 	createBoolAttribute("ikPostFix", false, true, "Basic", 170, false, false, false, "Post-Processing IK to fix foot sliding.");
+	createBoolAttribute("terrainWalk", false, true, "Basic", 170, false, false, false, "Post-Processing to adjust the character for different terrain height. ikPostFix must be on for this to work.");
 	createBoolAttribute("onlineRetarget", true, true, "Basic", 170, false, false, false, "Use on-line retargeting to adjust joint angles when playing animation blend.");
 
 

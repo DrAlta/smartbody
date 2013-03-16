@@ -39,4 +39,5 @@ def mocapStartLeftSetup(origSkelName,skeletonName, baseJoint, preFix, statePreFi
 	points2.append(2.165) # ChrMarine@Idle01 2
 	points2.append(2.43) # ChrMarine@Idle01_ToWalk01_Turn90Lf01 2
 	points2.append(2.191) # ChrMarine@Idle01_ToWalk01_Turn180Lf01 2
-	stateChrMarineStartingLeft.addCorrespondencePoints(motions, points2)
+	stateChrMarineStartingLeft.addCorrespondencePoints(motions, points2)	
+	
