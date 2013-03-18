@@ -1110,11 +1110,13 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 	int numGoals = goalQueue.size();
 	if (numGoals == 0)
 	{
-		reachTarget = true;
+		reachTarget = true;		
 		character->_reachTarget = reachTarget;
 	}
 	if (_numSteeringGoal == 0 && numGoals != 0 && distToTarget < distThreshold)
+	{
 		stepAdjust = true;
+	}
 	if (distToTarget > distThreshold)
 		stepAdjust = false;
 
@@ -1228,7 +1230,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 			std::vector<double> weights;
 			character->param_animation_ct->schedule(NULL, weights);
 			if (!sentLocomotionEvent)
-				sendLocomotionEvent("success");
+				sendLocomotionEvent("success");			
 		}
 		else
 		{
@@ -1257,7 +1259,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 	//---If the facing angle is not correct, use idle turning
 
 	if (character->param_animation_ct->isIdle() && fabs(facingAngle) <= 180 && 
-		steeringConfig == STANDARD)
+		steeringConfig == STANDARD )
 	{
 		float diff = facingAngle - yaw;
 		normalizeAngle(diff);

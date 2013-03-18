@@ -188,7 +188,8 @@ void LocomotionAnalyzer::sampleLegCycle(LegInfo* legInfo, LocomotionLegCycle& le
 			legSample.supportPos[sup] = supJoint->gmat().get_translation()*baseJoint->gmat().inverse();
 		}		
 	}		
-	motion->apply(legCycle.stanceTime);
+	double nextStanceTime = legCycle.cycleEndTime;
+	motion->apply(nextStanceTime);
 	skel->update_global_matrices();
 	legCycle.stanceSupportPos.resize(legInfo->supportJoints.size());
 	for (unsigned int sup = 0; sup < legInfo->supportJoints.size(); sup++)
@@ -372,7 +373,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 		SrMat nextStepRotMat; nextStepRotation.get_mat(nextStepRotMat);
 		SrVec nextStepCharPos = velocity*legState.timeToNextCycle;//rotCenter - rotCenter*SrQuat(vUp,nextStepAngle);
 		//SrVec nextStepFootPos = gmatBase.get_translation() + nextStepCharPos + (legState.stanceSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*nextStepRotMat;
-		SrVec nextStepFootPos = gmatBase.get_translation() + (legState.curSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*gmatBase.get_rotation();
+		SrVec nextStepFootPos = gmatBase.get_translation() + nextStepCharPos + (legState.stanceSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*gmatBase.get_rotation();
 
 		//SrVec nextStepFootPos = (legState.curSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*gmatBase;
 		nextStepFootPos.y = 0.f; // set to ground height by default
