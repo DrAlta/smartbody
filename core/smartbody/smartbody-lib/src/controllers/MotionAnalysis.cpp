@@ -189,7 +189,7 @@ void LocomotionAnalyzer::sampleLegCycle(LegInfo* legInfo, LocomotionLegCycle& le
 		}		
 	}		
 	double nextStanceTime = legCycle.cycleEndTime;
-	motion->apply(nextStanceTime);
+	motion->apply((float)nextStanceTime);
 	skel->update_global_matrices();
 	legCycle.stanceSupportPos.resize(legInfo->supportJoints.size());
 	for (unsigned int sup = 0; sup < legInfo->supportJoints.size(); sup++)
