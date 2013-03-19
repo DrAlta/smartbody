@@ -745,8 +745,12 @@ int main( int argc, char **argv )	{
 		LOG( "SmartBody ARG[%d]: '%s'", i, argv[i] );
 		std::string s = argv[i];
 		std::string mediapathstr = "";
+		std::string fpsStr = "";
 		if (s.size() > 11)
 			mediapathstr = s.substr(0, 10);
+		if (s.size() > 5)
+			fpsStr = s.substr(0, 5);
+			
 
 		if( s == "-pythonpath" )  // argument -pythonpath
 		{
@@ -854,7 +858,7 @@ int main( int argc, char **argv )	{
 		{
 			lock_dt_mode = true;
 		}
-		else if( s.compare( "-fps=" ) == 0 )  // argument starts with -fps=
+		else if( fpsStr == "-fps="  )  // argument starts with -fps=
 		{
 			string fps = s;
 			fps.erase( 0, 5 );
@@ -914,11 +918,6 @@ int main( int argc, char **argv )	{
 
 
 
-	if (sleepFPS != -1.f)
-		scene->getSimulationManager()->setSleepFps( sleepFPS) ;
-	if (intervalAmount != -1.f)
-		scene->getSimulationManager()->printPerf(intervalAmount);
-
 	scene->getSimulationManager()->setupTimer();
 
 	scene->getSimulationManager()->setupProfiler();
@@ -926,6 +925,11 @@ int main( int argc, char **argv )	{
 	if( lock_dt_mode )	{ 
 		scene->getSimulationManager()->setSleepLock();
 	}
+
+	if (sleepFPS != -1.f)
+		scene->getSimulationManager()->setSleepFps( sleepFPS) ;
+	if (intervalAmount != -1.f)
+		scene->getSimulationManager()->printPerf(intervalAmount);
 
 	scene->setMediaPath(mediaPath);
 
