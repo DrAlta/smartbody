@@ -669,7 +669,7 @@ void VisemeViewerWindow::loadAudioFiles()
 //		LOG( "VisemeViewerWindow::loadAudioFiles: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
 		return;
 	}
-
+	_choiceAudioFile->clear();
 	boost::filesystem::directory_iterator end;
 	for( boost::filesystem::directory_iterator i(abs_p); i!=end; ++i ) 
 	{
