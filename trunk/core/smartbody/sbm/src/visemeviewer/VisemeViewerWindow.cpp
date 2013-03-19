@@ -9,9 +9,13 @@
 #include <sb/SBScene.h>
 #include <sb/SBFaceDefinition.h>
 #include <sb/SBPhonemeManager.h>
+#include <sb/SBAssetManager.h>
 #include <sb/SBBmlProcessor.h>
 #include <bml/bml_speech.hpp>
 #include <bml/bml_processor.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h)
 {
@@ -42,6 +46,8 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_buttonPlayAudioFile = new Fl_Button(40, 535, 70, 30, "Play Audio");
 	_buttonPlayAudioFile->callback(OnPlayAudioFileCB, this);
 	_inputAudioFile = new Fl_Input(115, 535, 435, 30);
+	_choiceAudioFile = new Fl_Choice(560, 535, 100, 30, "");
+	_choiceAudioFile->callback(OnAudioFileSelectCB, this);
 
 	_choiceCharacter = new Fl_Choice(70, 35, 100, 25, "Character");
 	_choiceCharacter->callback(OnCharacterSelectCB, this);
@@ -89,6 +95,7 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	this->end();
 
 	_inputAudioFile->deactivate();
+	_choiceAudioFile->deactivate();
 	_buttonPlayAudioFile->deactivate();
 	_inputUtterance->deactivate();
 	_buttonPlayDialog->deactivate();
@@ -637,6 +644,63 @@ void VisemeViewerWindow::OnPlayAudioFileCB(Fl_Widget* widget, void* data)
 	//viewer->OnCharacterRefreshCB(widget, data);
 }
 
+void VisemeViewerWindow::loadAudioFiles()
+{
+	SmartBody::SBCharacter* character = getCurrentCharacter();
+	if (!character)
+		return;
+
+	if (getUseRemote())
+		return;
+
+	// if an audio path is present, use it
+	bool useAudioPaths = true;
+	std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
+	std::string relativeAudioPath = "";
+	if (audioPaths.size() > 0)
+		relativeAudioPath = audioPaths[0];
+
+	boost::filesystem::path p(relativeAudioPath);
+	p /= character->getVoiceCode();
+	boost::filesystem::path abs_p = boost::filesystem::complete( p );	
+
+	if( !boost::filesystem2::exists( abs_p ))
+	{
+//		LOG( "VisemeViewerWindow::loadAudioFiles: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+		return;
+	}
+
+	boost::filesystem::directory_iterator end;
+	for( boost::filesystem::directory_iterator i(abs_p); i!=end; ++i ) 
+	{
+		const boost::filesystem::path& cur = *i;
+		if (boost::filesystem::is_directory(cur)) 
+		{
+			;	
+		} 
+		else 
+		{
+			std::string ext = boost::filesystem::extension(cur);
+			if (_stricmp(ext.c_str(), ".bml" ) == 0)
+			{
+				_choiceAudioFile->add(cur.stem().c_str());
+			}
+		}
+	}
+}
+
+void VisemeViewerWindow::OnAudioFileSelectCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	int audioFileIndex = viewer->_choiceAudioFile->value();
+	if (audioFileIndex >= 0)
+	{
+		const char* audioFileName = viewer->_choiceAudioFile->menu()[viewer->_choiceAudioFile->value()].label();
+		viewer->_inputAudioFile->value(audioFileName);	
+	}
+}
+
 void VisemeViewerWindow::OnSaveCB(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
@@ -823,6 +887,7 @@ void VisemeViewerWindow::setUseRemote(bool val)
 	if (_useRemote)
 	{
 		_inputAudioFile->deactivate();
+		_choiceAudioFile->deactivate();
 		_inputUtterance->activate();
 		_buttonPlayAudioFile->deactivate();
 		_buttonPlayDialog->activate();
@@ -830,6 +895,7 @@ void VisemeViewerWindow::setUseRemote(bool val)
 	else
 	{
 		_inputAudioFile->activate();
+		_choiceAudioFile->activate();
 		_inputUtterance->deactivate();
 		_buttonPlayAudioFile->activate();
 		_buttonPlayDialog->deactivate();
@@ -946,8 +1012,7 @@ void VisemeViewerWindow::OnCharacterRefreshCB(Fl_Widget* widget, void* data)
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 
 	viewer->OnCharacterSelectCB(widget, data);
-
-
+	viewer->loadAudioFiles();
 }
 
 void VisemeViewerWindow::OnDumpCB(Fl_Widget* widget, void* data)
