@@ -51,7 +51,6 @@ from CharacterPawn import *
 from ClassCacher import * 
 import Converter
 
-
 class Scene:
 	""" Handles a SmartBody "scene". Maintains a list of characters and
 		pawns and processes incoming commands from SmartBody """
@@ -145,7 +144,7 @@ class Scene:
 		if (command == "CreateActor"):
 			print "Actor created!"
 			if (len(arguments) > 3):
-				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 and len(arguments[3]) > 0 ):
+				try:
 					charID      = int(arguments[0])
 					charClass   = strip(arguments[1])
 					charName    = strip(arguments[2])
@@ -160,9 +159,11 @@ class Scene:
 					
 					if (not found):
 						CharacterPawn(self.__BMLR, charName, charClass, charID, registered = True)
+				except ValueError:
+					print "Bad CreateActor data"
 		if (command == "UpdateActor"):
 			if (len(arguments) > 3):
-				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 and len(arguments[3]) > 0 ):
+				try:
 					charID      = int(arguments[0])
 					charClass   = strip(arguments[1])
 					charName    = strip(arguments[2])
@@ -177,19 +178,23 @@ class Scene:
 					
 					if (not found):
 						CharacterPawn(self.__BMLR, charName, charClass, charID, registered = True)
+				except ValueError:
+					print "Bad UpdateActor data"
 				
 		elif (command == "DeleteActor"):
 			if (len(arguments) > 0):
-				if (len(arguments[0]) > 0 ):
+				try:
 					charID 			= int(arguments[0])
 				
 					char = self.Characters.get(charID)
 					if (char != None):
 						char.Destroy()
+				except ValueError:
+					print "Bad DeleteActor data"						
 				
 		elif (command == "SetActorPos"):
 			if (len(arguments) > 3):
-				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 and len(arguments[3]) > 0 ):
+				try:
 					charID 	= int(arguments[0])
 					x 		= float(arguments[1])
 					y 		= float(arguments[2])
@@ -199,13 +204,15 @@ class Scene:
 
 					if (char != None):
 						if (not self.IgnorePawnPosRot(char)):						
-							#char.setPos(Converter.Unreal2Panda_Pos(Vec3(x, y, z)))
+								#char.setPos(Converter.Unreal2Panda_Pos(Vec3(x, y, z)))
 							char.setPos(Converter.Sbm2Panda_Pos(Vec3(x, y, z)))
+				except ValueError:
+					print "Bad SetActorPos data"	
 		
 		elif (command == "SetActorRot"):
 			if (len(arguments) > 4):
 				
-				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 and len(arguments[3]) > 0 and len(arguments[4]) > 0):
+				try:
 					charID 	= int(arguments[0])
 					w 		= float(arguments[1])
 					x 		= float(arguments[2])
@@ -216,10 +223,13 @@ class Scene:
 					if (char != None):
 						if (not self.IgnorePawnPosRot(char)):						
 							char.SetRotQuat(Converter.Sbm2Panda_Quat(Quat(x, y, z, w)))
+				except ValueError:
+					print "Bad SetActorRot data"				
+				
 					
 		elif (command == "SpeakText"):
 			if (len(arguments) > 2):
-				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 ):
+				try:
 					id			= arguments[0]
 					charName		= arguments[1]
 					text 			= arguments[2]
@@ -228,10 +238,12 @@ class Scene:
 					
 					if (char != None):			
 						char.Speak(text, 0, bubbleID = id)
+				except ValueError:
+					print "Bad SpeakText data"						
 					
 		elif (command == "SetBoneId"):
 			if (len(arguments) > 2):
-				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0):
+				try:
 					charName	= arguments[0]
 					boneName	= arguments[1]
 					id 			= arguments[2]
@@ -240,6 +252,8 @@ class Scene:
 					if len(id) != 0:
 						if (char != None):
 							char.AddBoneBusMap(boneName, int(id))
+				except ValueError:
+					print "Bad SetBoneId data"								
 			
 			"""
 		elif (command == "SetPawnPosHpr"):
@@ -263,7 +277,7 @@ class Scene:
 			
 		elif (command == "CreatePawn"):
 			if (len(arguments) > 3):
-				if (len(arguments[0]) > 0 and len(arguments[1]) > 0 and len(arguments[2]) > 0 and len(arguments[3]) > 0 ):
+				try:
 					name 	= arguments[0]
 					x 		= float(arguments[1])
 					y 		= float(arguments[2])
@@ -273,6 +287,8 @@ class Scene:
 						p = Pawn(self.__BMLR, name, registered = True, geom = "DEFAULT")									
 						if (p.IsValid()):
 							p.setPos(Converter.Sbm2Panda_Pos(Vec3(x, y, z)))
+				except ValueError:
+					print "Bad SetBoneId data"	
 		
 		elif (command == "vrAllCall"):
 			taskMgr.doMethodLater(4, self.OnConnect, "vrAllCall")
