@@ -59,6 +59,7 @@ protected:
 	Fl_Button* _buttonDump;
 	Fl_Input* _inputUtterance;
 	Fl_Input* _inputAudioFile;
+	Fl_Choice* _choiceAudioFile;
 
 	Fl_Check_Button* _checkStats;
 	VisemeCurveEditor * _curveEditor;
@@ -70,6 +71,7 @@ protected:
 
 	void draw();
 	bool loadData();
+	void loadAudioFiles();
 	void selectViseme(const char * phoneme1, const char * phoneme2);
 	void selectPhonemes(const char * viseme);
 	void updateViseme();
@@ -94,6 +96,7 @@ protected:
 	static void OnEnableScrub(Fl_Widget* widget, void* data);
 	static void OnPlayDialogCB(Fl_Widget* widget, void* data);
 	static void OnPlayAudioFileCB(Fl_Widget* widget, void* data);
+	static void OnAudioFileSelectCB(Fl_Widget* widget, void* data);
 	static void OnSaveCB(Fl_Widget* widget, void* data);
 	static void OnBmlRequestCB(BML::BmlRequest* request, void* data);
 	static void OnShowStatsCB(Fl_Widget* widget, void* data);
