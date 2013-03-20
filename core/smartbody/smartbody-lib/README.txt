@@ -13,3 +13,4 @@ For detailed documentation, please see the SmartBody website:
 
 SmartBody was built by University of Southern California's Institute for
 Creative Technologies and Information Sciences Institute.
+
