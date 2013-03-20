@@ -83,6 +83,8 @@ target_link_libraries( smartbody-dll
 	pprAI
 	ode
 	python2.6
+	GL
+	glut
 )
 
 set( EXEC_LIST
