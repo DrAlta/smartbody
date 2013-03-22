@@ -69,6 +69,26 @@ set( SMARTBODY_LIB_EXT_PARSER_SRC
 )
 
 set( SMARTBODY_LIB_EXT_SOIL_SRC
+
+	external/recast/Recast.cpp
+	external/recast/RecastAlloc.cpp
+	external/recast/RecastArea.cpp
+	external/recast/RecastContour.cpp
+	external/recast/RecastFilter.cpp
+	external/recast/RecastLayers.cpp	
+	external/recast/RecastMesh.cpp	
+	external/recast/RecastMeshDetail.cpp	
+	external/recast/RecastRasterization.cpp	
+	external/recast/RecastRegion.cpp	
+	external/recast/DetourAlloc.cpp
+	external/recast/DetourCommon.cpp
+	external/recast/DetourNavMesh.cpp
+	external/recast/DetourNavMeshBuilder.cpp
+	external/recast/DetourNavMeshQuery.cpp
+	external/recast/DetourNode.cpp	
+)
+
+set( SMARTBODY_LIB_EXT_RECAST_SRC
 	
 	external/SOIL/image_DXT.c
 	external/SOIL/image_helper.c
@@ -370,6 +390,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/PABlend.cpp
 	sb/SBRetarget.cpp
 	sb/SBRetargetManager.cpp
+	sb/SBNavigationMesh.cpp
 	sb/SBAsset.cpp
 	sb/SBAssetManager.cpp
 	sb/SBAsset.cpp
@@ -412,6 +433,8 @@ add_library(
 	${SMARTBODY_LIB_EXT_SOIL_SRC}
 	
 	${SMARTBODY_LIB_EXT_PARSER_SRC}
+	
+	${SMARTBODY_LIB_EXT_RECAST_SRC}
 
 	${SMARTBODY_LIB_EXT_PERLIN_SRC}
 	
