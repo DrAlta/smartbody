@@ -17,6 +17,10 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
+#ifndef WIN32
+#define _stricmp strcasecmp
+#endif
+
 VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h)
 {
 	_phonemesSelected[0] = false;
@@ -554,6 +558,7 @@ void VisemeViewerWindow::OnCharacterSelectCB(Fl_Widget* widget, void* data)
 
 	SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
 	if (faceDefinition)
+
 	{
 		int numViseme = faceDefinition->getNumVisemes();
 		viewer->_browserViseme->clear();

@@ -219,6 +219,9 @@ target_link_libraries( sbm-fltk
 	python2.6
     	ncurses	
 	pthread
+	GLEW
+	Xft	
+	fontconfig
 	${MORE_LIBS}
 	${OGRE_LIBS}
 )

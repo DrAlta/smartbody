@@ -21,6 +21,7 @@
  */
 
 #include "GlChartViewArchive.hpp"
+#include <string.h>
 
 
 GlChartViewSeries::GlChartViewSeries()
