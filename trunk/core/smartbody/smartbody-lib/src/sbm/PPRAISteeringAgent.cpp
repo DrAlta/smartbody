@@ -56,6 +56,8 @@ PPRAISteeringAgent::PPRAISteeringAgent(SmartBody::SBCharacter* c) : SmartBody::S
 	currentSpeed = 1.0f;
 	velocity = forward * currentSpeed;
 
+	steerCurSpeed = steerCurAngle = steerCurScoot = 0.f;
+
 	stepTargetX = 0.0f;
 	stepTargetZ = 0.0f;
 	steppingMode = false;
@@ -644,6 +646,11 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		float curSpeed;
 		float curTurningAngle;
 		float curScoot;
+
+		curSpeed = steerCurSpeed;
+		curTurningAngle = steerCurAngle;
+		curScoot = steerCurScoot;
+
 		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);
 		curSteerPos = SrVec(x,0,z);
 		curSteerDir = SrVec(sin(degToRad(yaw)), 0, cos(degToRad(yaw)));
@@ -735,7 +742,10 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		else
 			curStateData->state->getWeightsFromParameters(newSpeed, nextTurningAngle, newScoot, weights);
 		character->param_animation_ct->updateWeights(weights);	
-		
+
+		steerCurSpeed = newSpeed;
+		steerCurAngle = nextTurningAngle;
+		steerCurScoot = newScoot;		
 	}
 	if (locomotionEnd)      // need to define when you want to end the locomotion
 	{
@@ -1639,6 +1649,10 @@ void PPRAISteeringAgent::locomotionHalt()
 	agent->clearGoals();
 	goalList.clear();
 	steerPath.clearPath();
+
+	steerCurSpeed = 0.f;
+	steerCurAngle = 0.f;
+	steerCurScoot = 0.f;
 }
 
 bool PPRAISteeringAgent::isInLocomotion()

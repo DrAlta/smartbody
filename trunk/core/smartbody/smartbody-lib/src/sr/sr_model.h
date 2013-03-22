@@ -103,6 +103,7 @@ class SrModel : public SrSharedClass
     SBAPI virtual ~SrModel ();
 
 	SBAPI void computeTangentBiNormal(); // build the tangent and binormal vectors for each vertex. Used for tangent space normal mapping
+	SBAPI void computeNormals();
 
     /*! Returns true if the model has no faces, and false otherwise */
     SBAPI bool empty () { return F.empty(); }
@@ -214,6 +215,8 @@ class SrModel : public SrSharedClass
         no face is found. In case several intersections are found, the closest
         to line.p1 is returned */
     SBAPI int pick_face ( const SrLine& line ) const;
+
+	SBAPI SrVec intersectLine( const SrLine& line) const;
 
 	SBAPI void saveOriginalVertices();
 	SBAPI void restoreOriginalVertices();

@@ -1128,6 +1128,34 @@ int SrModel::pick_face ( const SrLine& line ) const
    return closest;
  }
 
+
+SBAPI SrVec SrModel::intersectLine( const SrLine& line ) const
+{
+	int i;
+	float t, u, v;
+	SrArray<float> faces;
+	faces.capacity(16);
+	std::vector<SrVec> posList;
+	for ( i=0; i<F.size(); i++ )
+	{ const Face& f = F[i];
+	if ( line.intersects_triangle (V[f.a] , V[f.b], V[f.c], t, u, v ) )
+		{ faces.push() = (float)i;
+		faces.push() = t; // t==0:p1, t==1:p2
+		SrVec interPos = V[f.a]*(1.f-u-v) + V[f.b]*u +  V[f.c]*v;
+		posList.push_back(interPos);
+		}
+	}
+
+	int closest=-1;
+	for ( i=0; i<faces.size(); i+=2 )
+	{ if ( closest<0 || faces[i+1]<faces[closest+1] ) closest=i;
+	}
+
+	if ( closest>=0 ) return posList[closest/2];
+	return SrVec();
+
+}
+
 void SrModel::saveOriginalVertices()
 {
 	if (VOrig.size() != V.size())
@@ -1150,4 +1178,25 @@ void SrModel::restoreOriginalVertices()
 		}
 	}
 }
+
+SBAPI void SrModel::computeNormals()
+{
+	N.size(V.size()); // set normal vector to the same size
+	N.setall(SrPnt(0,0,0));
+	Fn.size(F.size());
+
+	for (int i=0;i<F.size();i++)
+	{
+		SrVec fn = face_normal(i);
+		Fn[i].set(F[i].a, F[i].b, F[i].c);
+		for (int j=0;j<3;j++)
+		{
+			N[F[i][j]] += fn;			
+		}
+	}
+
+	for (int i=0;i<N.size();i++)
+		N[i].normalize();
+}
+
 //================================ End of File =================================================

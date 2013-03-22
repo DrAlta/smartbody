@@ -74,6 +74,9 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Terrain/Shaded", 0, TerrainShadedCB, this, NULL);
 	menubar->add("&View/Terrain/Wireframe", 0, TerrainWireframeCB, this, NULL);
 	menubar->add("&View/Terrain/No Terrain", 0, TerrainNoneCB, this, NULL);	
+	menubar->add("&View/NavigationMesh/NoMesh", 0, NavigationMeshNoneCB, this, NULL);
+	menubar->add("&View/NavigationMesh/Show RawMesh", 0, NavigationMeshRawMeshCB, this, NULL);
+	menubar->add("&View/NavigationMesh/Show NaviMesh", 0, NavigationMeshNaviMeshCB, this, NULL);	
 	menubar->add("&View/Steer/Characters and Goals", 0, SteeringCharactersCB, this, NULL);
 	menubar->add("&View/Steer/All Steering", 0, SteeringAllCB, this, NULL);
 	menubar->add("&View/Steer/No Steering", 0, SteeringNoneCB, this, NULL);
@@ -1259,6 +1262,34 @@ void BaseWindow::TerrainNoneCB(Fl_Widget* w, void* data)
 #endif
 }
 
+void BaseWindow::NavigationMeshNaviMeshCB( Fl_Widget* w, void* data )
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (rootWindow->fltkViewer->getData()->navigationMeshMode != FltkViewer::ModeNavigationMesh)
+		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNavigationMesh, NULL);
+#endif
+}
+
+void BaseWindow::NavigationMeshRawMeshCB( Fl_Widget* w, void* data )
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (rootWindow->fltkViewer->getData()->navigationMeshMode != FltkViewer::ModeRawMesh)
+		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdRawMesh, NULL);
+#endif
+
+}
+
+void BaseWindow::NavigationMeshNoneCB( Fl_Widget* w, void* data )
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (rootWindow->fltkViewer->getData()->navigationMeshMode != FltkViewer::ModeNoNavigationMesh)
+		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoNavigationMesh, NULL);
+#endif
+}
+
 void BaseWindow::ShowPawns(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
@@ -1775,6 +1806,8 @@ void BaseWindow::ShowLightsCB( Fl_Widget* w, void* data )
 #endif
 
 }
+
+
 //== Viewer Factory ========================================================
 SrViewer* FltkViewerFactory::s_viewer = NULL;
 

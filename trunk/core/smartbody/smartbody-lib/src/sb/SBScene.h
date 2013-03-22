@@ -68,6 +68,8 @@ class SBController;
 class SBVHMsgManager;
 class SBCommandManager;
 class SBWSPManager;
+class SBNavigationMesh;
+
 
 class SBScene : public SBObject
 {
@@ -216,6 +218,9 @@ class SBScene : public SBObject
 		SBAPI void updatePawnNames();
 		SBAPI void updateCharacterNames();
 
+		SBAPI bool createNavigationMesh(const std::string& meshfilename);
+		SBAPI SBNavigationMesh* getNavigationMesh();
+		
 		SBAPI Heightfield* createHeightfield();
 		SBAPI void removeHeightfield();
 		SBAPI Heightfield* getHeightfield();
@@ -327,6 +332,7 @@ class SBScene : public SBObject
 
 		KinectProcessor* _kinectProcessor;
 		Heightfield* _heightField;
+		SBNavigationMesh* _navigationMesh;
 		std::map<std::string, GeneralParam*> _generalParams;
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__

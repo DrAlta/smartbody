@@ -83,6 +83,7 @@
 # include <sb/SBSimulationManager.h>
 # include <sb/SBAssetManager.h>
 # include <sb/SBBmlProcessor.h>
+# include <sb/SBNavigationMesh.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -378,6 +379,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->pawnmode = ModePawnShowAsSpheres;
    _data->shadowmode = ModeNoShadows;
    _data->terrainMode = ModeTerrain;
+   _data->navigationMeshMode = ModeNoNavigationMesh;
    _data->eyeBeamMode = ModeNoEyeBeams;
    _data->gazeLimitMode = ModeNoGazeLimit;
    _data->eyeLidMode = ModeNoEyeLids;
@@ -413,7 +415,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    _data->bcolor = SrColor(.63f, .63f, .63f);
    _data->floorColor = SrColor(0.5f,0.5f,0.5f);
-   _data->showFloor = true;
+   _data->showFloor = false;
 
    _data->scenebox = new SrSnLines;
    _data->sceneaxis = new SrSnLines;
@@ -572,6 +574,13 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
                        break;
       case CmdTerrain : _data->terrainMode = ModeTerrain;
                        break;
+	  case CmdNoNavigationMesh  : _data->navigationMeshMode = ModeNoNavigationMesh;             
+		  break;
+	  case CmdNavigationMesh : _data->navigationMeshMode = ModeNavigationMesh;
+		  break;
+	  case CmdRawMesh : _data->navigationMeshMode = ModeRawMesh;
+		  break;
+
 	  case CmdNoEyeBeams  : _data->eyeBeamMode = ModeNoEyeBeams;             
                        break;
       case CmdEyeBeams: _data->eyeBeamMode = ModeEyeBeams;
@@ -1502,6 +1511,7 @@ void FltkViewer::draw()
 	if (_data->shadowmode == ModeShadows && hasShaderSupport)
 		makeShadowMap();
 
+	drawNavigationMesh();
 	drawAllGeometries();		
    // draw the grid
 	//   if (gridList == -1)
@@ -1541,12 +1551,13 @@ void FltkViewer::draw()
 	}
 	
 
+
 	if (_data->showcollisiongeometry)
 		drawCharacterPhysicsObjs();
 	if (_data->showBoundingVolume)
 		drawCharacterBoundingVolumes();
 
-	drawInteractiveLocomotion();
+	drawInteractiveLocomotion();	
 	//_posControl.Draw();
 	_objManipulator.draw(*cam);
 	// feng : debugging draw for reach controller
@@ -1963,13 +1974,48 @@ int FltkViewer::handle ( int event )
 				ppraiAgent->setTargetAgent(NULL);
 				SrVec p1;
 				SrVec p2;
-				SmartBody::SBScene::getScene()->getActiveCamera()->get_ray(e.mouse.x, e.mouse.y, p1, p2);
-				SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
-				SrVec dest = ground.intersect(p1, p2);
-				dest.y = character->getHeight() / 100.0f;
-				std::stringstream command;
-				command << "steer move " << character->getName() << " normal " << dest.x << " " << dest.y << " " << dest.z;
-				SmartBody::SBScene::getScene()->command((char*)command.str().c_str());
+				SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+				scene->getActiveCamera()->get_ray(e.mouse.x, e.mouse.y, p1, p2);
+				bool intersectGround = true;
+				SrVec dest, src;				
+				if (scene->getNavigationMesh())				
+				{
+					std::vector<SrVec> pathList;
+					dest = scene->getNavigationMesh()->queryMeshPoint(p1,p2);
+					if (dest.x != 0.f || dest.y != 0.f || dest.z != 0.f)
+					{
+						intersectGround = false;
+						src = ppraiAgent->getCharacter()->getPosition();
+						scene->getNavigationMesh()->findPath(src,dest,pathList);
+						std::stringstream command;
+						command << "steer move " << character->getName() << " normal ";
+						for (unsigned int k=0; k < pathList.size(); k++)
+						{
+							SrVec& pt = pathList[k];
+							std::string xstr, ystr, zstr;
+							xstr = boost::lexical_cast<std::string>(pt.x);
+							ystr = boost::lexical_cast<std::string>(pt.y);
+							zstr = boost::lexical_cast<std::string>(pt.z);
+							command <<  xstr << " " << ystr << " " << zstr << " ";	
+							
+						}
+						//command <<  xstr << " 0 " << zstr << " ";
+						SmartBody::SBScene::getScene()->command((char*)command.str().c_str());
+					}							
+				}
+
+				if (intersectGround)
+				{
+					SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
+					dest = ground.intersect(p1, p2);
+					dest.y = character->getHeight() / 100.0f;
+					std::stringstream command;
+					command << "steer move " << character->getName() << " normal " << dest.x << " " << dest.y << " " << dest.z;
+					SmartBody::SBScene::getScene()->command((char*)command.str().c_str());
+				}			
+			
+				
+				
 			 }
 		 }
        } break;
@@ -3520,11 +3566,11 @@ void FltkViewer::drawKinematicFootprints(int index)
 	for (int i=0;i<2;i++)
 	{
 		const std::vector<SrVec>& footSteps = curChar->getFootSteps(i);
+		SrVec color = i == 0 ? SrVec(1.f,0.f,0.f) : SrVec(0.f, 1.f, 0.f);
 		for (unsigned int k=0;k<footSteps.size();k++)
 		{
 			SrVec footStep = footSteps[k];
-			SrVec adjustedFootStep = footSteps[k] + faceDir * scale;
-			SrVec color = SrVec(1.f, 0.f, 0.f);
+			SrVec adjustedFootStep = footSteps[k] + faceDir * scale;			
 			drawArrow(footStep, adjustedFootStep, scale*0.5f,color);			
 		}
 	}
@@ -4580,6 +4626,53 @@ void FltkViewer::makeShadowMap()
 	
 	//SbmShaderProgram::printOglError("shadowMapError");
 
+}
+
+void FltkViewer::drawNavigationMesh()
+{
+	if (_data->navigationMeshMode == ModeNoNavigationMesh) return;
+
+	SmartBody::SBNavigationMesh* navigationMesh = SmartBody::SBScene::getScene()->getNavigationMesh();
+	if (!navigationMesh) return;
+
+	SrModel* drawMesh = NULL;
+	SrModel* naviMesh = NULL;
+	SrSnModel model;
+	if (_data->navigationMeshMode == ModeRawMesh)
+	{
+		drawMesh = navigationMesh->getRawMesh();
+		
+	}
+	else if (_data->navigationMeshMode == ModeNavigationMesh)
+	{
+		naviMesh = navigationMesh->getNavigationMesh();
+		drawMesh = navigationMesh->getRawMesh();
+		//model.render_mode(srRenderModeLines);
+		model.color(SrColor::red);
+		
+	}
+
+	if (drawMesh)
+	{
+		glEnable(GL_LIGHTING);	
+		model.shape(*drawMesh);
+		//model.color(objColor);
+		model.color(SrColor::gray);
+		model.render_mode(srRenderModeSmooth);
+		SrGlRenderFuncs::render_model(&model);
+		glDisable(GL_LIGHTING);
+	}
+	if (naviMesh)
+	{
+		glEnable(GL_LIGHTING);	
+		model.shape(*naviMesh);
+		model.color(SrColor::red);
+		model.render_mode(srRenderModeLines);
+		//model.render_mode(srRenderModeSmooth);
+		SrGlRenderFuncs::render_model(&model);
+		glDisable(GL_LIGHTING);
+	}
+	
 }
 
 GestureVisualizationHandler::GestureVisualizationHandler()

@@ -31,6 +31,7 @@ struct LegCycleState
 	float timeToNextCycle;
 	int prevCycle;	
 	bool newCycle;
+	std::vector<int> prevMotionCycle;
 };
 
 struct LocomotionLegCycle
@@ -75,6 +76,7 @@ public:
 public:
 	LocomotionAnalyzer();
 	~LocomotionAnalyzer();
+	std::string getMotionName();
 	void initLegCycles(const std::string& name, SmartBody::SBAnimationBlend* locoBlend, KeyTagMap& keyTag, SmartBody::SBSkeleton* skelCopy);
 	LocomotionLegCycle* getLegCycle(int iLeg, float motionTime);	
 protected:

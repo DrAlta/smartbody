@@ -4196,7 +4196,7 @@ int motionmap_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 	if (!motion)
 	{
-		LOG("Cannot find motion name %s.", motion);
+		LOG("Cannot find motion name %s.", motionName);
 		return CMD_FAILURE;
 	}
 
@@ -4218,7 +4218,7 @@ int motionmap_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	// apply the map
 	jointMap->applyMotion(motion);
 
-	LOG("Applied bone map %s to motion %s.", mapname, motion);
+	LOG("Applied bone map %s to motion %s.", mapname, motionName);
 	
 	return CMD_SUCCESS;
 }
