@@ -50,6 +50,7 @@
 #include <sb/nvbg.h>
 #include <sb/SBJointMap.h>
 #include <sb/SBCharacterListener.h>
+#include <sb/SBNavigationMesh.h>
 #include <sbm/ParserBVH.h>
 #include <sbm/Heightfield.h>
 #include <sbm/action_unit.hpp>
@@ -168,6 +169,7 @@ void SBScene::initialize()
 	_rootGroup->ref();
 
 	_heightField = NULL;
+	_navigationMesh = NULL;
 	_kinectProcessor = new KinectProcessor();
 
 	// Create default settings
@@ -339,6 +341,12 @@ void SBScene::cleanup()
 		delete _heightField;
 	}
 	_heightField = NULL;
+
+	if (_navigationMesh)
+	{
+		delete _navigationMesh;
+	}
+	_navigationMesh = NULL;
 
 	_rootGroup->unref();
 	_rootGroup = NULL;
@@ -2964,4 +2972,31 @@ std::map<std::string, GeneralParam*>& SBScene::getGeneralParameters()
 	return _generalParams;
 }
 
+SBAPI bool SBScene::createNavigationMesh( const std::string& meshfilename )
+{
+	SrModel mesh;
+	bool loadSucess = mesh.import_obj(meshfilename.c_str());	
+	if (!loadSucess)
+	{
+		LOG("Error loading navigation mesh, filename = %s",meshfilename.c_str());
+		return false;
+	}
+	//mesh.scale(0.3f);
+	mesh.computeNormals();
+	if (_navigationMesh) 
+	{
+		delete _navigationMesh;
+		_navigationMesh = NULL;
+	}
+
+	_navigationMesh = new SBNavigationMesh();
+	_navigationMesh->buildNavigationMesh(mesh);
+
+	return true;
+}
+
+SBAPI SBNavigationMesh* SBScene::getNavigationMesh()
+{
+	return _navigationMesh;
+}
 };

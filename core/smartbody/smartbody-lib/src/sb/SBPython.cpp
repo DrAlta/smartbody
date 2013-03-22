@@ -1611,6 +1611,9 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getCharacterListener", &SBScene::getCharacterListener, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the listener for character and pawn events.")
 		.def("save", &SBScene::save, "Saves the SmartBody configuration. Returns a string containing Python commands representing the configuration.")
 		.def("exportScene", &SBScene::exportScene, "Saves the entire SmartBody configuration, including assets, into a given file location.")
+		.def("createNavigationMesh", &SBScene::createNavigationMesh, "Create navigation mesh from the input mesh.\n Input : OBJ file name")
+
+
 
 		// cameras
 		.def("createCamera", &SBScene::createCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a camera with a given name and returns it.")

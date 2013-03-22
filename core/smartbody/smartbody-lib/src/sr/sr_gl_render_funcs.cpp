@@ -99,9 +99,11 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 	   for (int k=0; k<F.size(); k++ )
 	   {	
 		   int f = k;
-		   glNormal ( N[Fn[f].a] ); glVertex ( V[F[f].a] );
-		   glNormal ( N[Fn[f].b] ); glVertex ( V[F[f].b] );
-		   glNormal ( N[Fn[f].c] ); glVertex ( V[F[f].c] );		   
+		   SrVec n1,n2,n3;
+		   n1 = N[Fn[f].a]; n2 = N[Fn[f].b]; n3 = N[Fn[f].c];
+		   glNormal ( n1 ); glVertex ( V[F[f].a] );
+		   glNormal ( n2 ); glVertex ( V[F[f].b] );
+		   glNormal ( n3 ); glVertex ( V[F[f].c] );		   
 	   }
 	   glEnd ();
    }

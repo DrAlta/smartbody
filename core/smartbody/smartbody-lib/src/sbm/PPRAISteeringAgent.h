@@ -167,6 +167,7 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 		std::list<float> speedCache;
 		std::list<float> angleCache;
 		std::list<float> scootCache;
+		float steerCurSpeed, steerCurAngle, steerCurScoot;
 
 		// heading over control to parameterized animation engine
 		bool inControl;

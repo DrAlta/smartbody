@@ -121,6 +121,11 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 					   ModeTerrain,
                 };
 
+	enum NavigationMeshMode { ModeNoNavigationMesh,
+		ModeRawMesh,
+		ModeNavigationMesh,
+	};
+
 	enum EyeBeamMode { ModeNoEyeBeams,
 					   ModeEyeBeams
                 };
@@ -190,6 +195,9 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 				   CmdNoTerrain,
 				   CmdTerrainWireframe,
 				   CmdTerrain,
+				   CmdNoNavigationMesh,
+				   CmdRawMesh,
+				   CmdNavigationMesh,
 				   CmdNoEyeBeams,
 				   CmdEyeBeams,
 				   CmdNoGazeLimit,
@@ -340,6 +348,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 	void drawColObject(SBGeomObject* colObj, SrMat& gmat);		
 	void drawMotionVectorFlow();
 	void drawPlotMotion();
+	void drawNavigationMesh();
 
 	void drawTetra(SrVec vtxPos[4], SrVec& color);
 	void drawArrow(SrVec& from, SrVec& to, float width, SrVec& color);
@@ -410,6 +419,7 @@ protected:
    FltkViewer::ReachRenderMode reachRenderMode;
    FltkViewer::SteerMode steerMode;
    FltkViewer::GridMode gridMode;
+   FltkViewer::NavigationMeshMode navigationMeshMode;
 
 
    bool iconized;      // to stop processing while the window is iconized

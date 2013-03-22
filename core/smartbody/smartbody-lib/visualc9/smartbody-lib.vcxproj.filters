@@ -997,6 +997,57 @@
     <ClCompile Include="..\src\sb\SBWSPManager.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sb\SBNavigationMesh.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\Recast.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\RecastAlloc.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\RecastArea.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\RecastContour.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\RecastFilter.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\RecastLayers.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\RecastMesh.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\RecastMeshDetail.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\RecastRasterization.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\RecastRegion.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\DetourAlloc.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\DetourCommon.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\DetourNavMesh.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\DetourNavMeshBuilder.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\DetourNavMeshQuery.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\external\recast\DetourNode.cpp">
+      <Filter>external\recast</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\controllers\me_controller.h">
@@ -2037,6 +2088,42 @@
     <ClInclude Include="..\src\sb\SBWSPManager.h">
       <Filter>sb</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\sb\SBNavigationMesh.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\recast\Recast.h">
+      <Filter>external\recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\recast\RecastAlloc.h">
+      <Filter>external\recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\recast\RecastAssert.h">
+      <Filter>external\recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\recast\DetourAlloc.h">
+      <Filter>external\recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\recast\DetourAssert.h">
+      <Filter>external\recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\recast\DetourCommon.h">
+      <Filter>external\recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\recast\DetourNavMesh.h">
+      <Filter>external\recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\recast\DetourNavMeshBuilder.h">
+      <Filter>external\recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\recast\DetourNavMeshQuery.h">
+      <Filter>external\recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\recast\DetourNode.h">
+      <Filter>external\recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\recast\DetourStatus.h">
+      <Filter>external\recast</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\sbm\sbm_deformable_mesh.cpp.bak">
@@ -2091,6 +2178,9 @@
     </Filter>
     <Filter Include="external\perlin">
       <UniqueIdentifier>{369d463a-1bdf-4121-bbd8-bc7504bf7f8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\recast">
+      <UniqueIdentifier>{85310d53-bd92-4a6f-8f60-a1c54f870956}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
