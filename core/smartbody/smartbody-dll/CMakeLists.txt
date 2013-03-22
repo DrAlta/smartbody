@@ -89,6 +89,7 @@ target_link_libraries( smartbody-dll
 	python2.6
 	ncurses
 	${MORE_LIBS}
+	GLEW
 )
 
 set( EXEC_LIST

@@ -2,6 +2,8 @@
 #include <external/recast/Recast.h>
 #include <external/recast/DetourNavMeshBuilder.h>
 #include <external/recast/DetourNavMeshQuery.h>
+#include <math.h>
+#include <string.h>
 
 const int MaxPolys = 255;
 
