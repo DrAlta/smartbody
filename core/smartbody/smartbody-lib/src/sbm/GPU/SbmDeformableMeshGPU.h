@@ -1,4 +1,5 @@
 #pragma once
+#include <sb/SBTypes.h>
 #include "SbmShader.h"
 #include "VBOData.h"
 #include "TBOData.h"
@@ -23,9 +24,9 @@ class SbmDeformableMeshGPU : public DeformableMesh
 {
 public:
 	static bool disableRendering;
-	static bool useGPUDeformableMesh;
-	static bool useShadowPass;	
-	static GLuint shadowMapID;
+	SBAPI static bool useGPUDeformableMesh;
+	SBAPI static bool useShadowPass;	
+	SBAPI static GLuint shadowMapID;
 	static bool initShader;
 protected:	
 	bool useGPU;	
@@ -41,7 +42,7 @@ protected:
 	std::vector<VBOVec3i*> subMeshTris;
 	std::vector<SrMat>  transformBuffer;	
 public:
-	SbmDeformableMeshGPU(void);
+	SBAPI SbmDeformableMeshGPU(void);
 	~SbmDeformableMeshGPU(void);	
 public:
 	virtual void update();
@@ -61,7 +62,7 @@ protected:
 	TBOData  *TBOTran; // bone transformation	
 	bool     bufferReady;
 public:
-	SbmDeformableMeshGPUInstance();
+	SBAPI SbmDeformableMeshGPUInstance();
 	~SbmDeformableMeshGPUInstance();
 	void updateTransformBuffer();
 	virtual void update();			

@@ -23,12 +23,12 @@
 #ifndef _GL_CHART_VIEW_ARCHIVE_H_
 #define _GL_CHART_VIEW_ARCHIVE_H_
 
+#include <vector>
 #include <string>
 #include <sr/sr_vec.h>
 #include <sr/sr_vec2.h>
 #include <sr/sr_quat.h>
 #include <sr/sr_mat.h>
-#include <sr/sr_array.h>
 #include <sr/sr_buffer.h>
 #include <sr/sr_string.h>
 
@@ -49,10 +49,10 @@ public:
 	bool bold;
 	float dt;
 
-	SrArray<float> x;
-	SrArray<float> y;
-	SrArray<float> z;
-	SrArray<float> w;
+	std::vector<float> x;
+	std::vector<float> y;
+	std::vector<float> z;
+	std::vector<float> w;
 
 protected:
 	int buffer_index;
@@ -111,7 +111,7 @@ protected:
 class GlChartViewArchive
 {
 public:
-	SrArray<GlChartViewSeries*> series_list;
+	std::vector<GlChartViewSeries*> series_list;
 
 public:
 	GlChartViewArchive();

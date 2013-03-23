@@ -41,7 +41,7 @@ class SrCylinder
  { public :
     SrPnt a, b;
     float radius;
-    static const char* class_name; //!< constain the static string "Cylinder"
+    SBAPI static const char* class_name; //!< constain the static string "Cylinder"
 
    public :
 

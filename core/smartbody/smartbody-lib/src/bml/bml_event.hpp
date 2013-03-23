@@ -23,6 +23,7 @@
 #ifndef BML_EVENT_HPP
 #define BML_EVENT_HPP
 
+#include <sb/SBTypes.h>
 #include "bml.hpp"
 
 
@@ -43,8 +44,8 @@ namespace BML {
 		
 			void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene );
 
-			const std::string getMessage();
-			std::string getSyncPointName();
+			SBAPI const std::string getMessage();
+			SBAPI std::string getSyncPointName();
 	};
 };
 

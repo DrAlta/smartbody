@@ -3,7 +3,7 @@
 
 /// @file SteerSuiteEngineDriver.h
 /// @brief Declares the SteerSuiteEngineDriver class
-
+#include <sb/SBTypes.h>
 #include <vhcl.h>
 #include <SteerLib.h>
 #include <PPRAgent.h>
@@ -17,10 +17,10 @@ public:
 
 
 	void init(SteerLib::SimulationOptions * options);
-	void finish();
+	SBAPI void finish();
 	void run();
 
-	bool isInitialized();
+	SBAPI bool isInitialized();
 	bool isDone();
 	void setDone(bool val);
 	void setStartTime(double time);

@@ -25,6 +25,8 @@
 #ifndef BML_SYNC_POINT_HPP
 #define BML_SYNC_POINT_HPP
 
+#include <sb/SBTypes.h>
+
 #include <string>
 #include <list>
 #include <map>
@@ -159,12 +161,12 @@ namespace BML {
 		/**
 		 * Default constructor.  Does not initialize standard SyncPoint fields.
 		 */
-		BehaviorSyncPoints();
+		SBAPI BehaviorSyncPoints();
 
 		/**
 		 * Copy constructor.
 		 */
-		BehaviorSyncPoints( const BehaviorSyncPoints& other );
+		SBAPI BehaviorSyncPoints( const BehaviorSyncPoints& other );
 
 		/**
 		 *  Returns the position of the first SyncPointPtr, or end() if empty.
@@ -245,7 +247,7 @@ namespace BML {
 		/** Prints SyncPoints in order, one per line, prefixed with a tab. */
 		void printSyncTimes();
 
-		const std::map<std::wstring, std::wstring>& getBehaviorToSyncNames() const;
+		SBAPI const std::map<std::wstring, std::wstring>& getBehaviorToSyncNames() const;
 
 	protected:
 		BehaviorSyncPoints::iterator parseSyncPointAttr( DOMElement* elem, const std::wstring& elem_id, const std::wstring& sync_attr, const BmlRequestPtr request, const std::string& behavior_id );

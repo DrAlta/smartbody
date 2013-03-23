@@ -55,11 +55,11 @@ class PATimeManager
 		int getNumKeys();
 		void updateLocalTimes(double time);
 		bool step(double timeStep);
-		void updateWeights();
+		SBAPI void updateWeights();
 		double getDuration();		
 		double getNormalizeLocalTime();
 		double getPrevNormalizeLocalTime();
-		void getParallelTimes(double time, std::vector<double>& times);
+		SBAPI void getParallelTimes(double time, std::vector<double>& times);
 		std::vector<double>& getKey();
 
 		void loadEvents();
@@ -170,10 +170,10 @@ class PABlendData
 		enum ScheduleMode { Now, Queued };
 
 	public:
-		PABlendData();
-		PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0, double blendTrim = 0.0, bool dplay = false);
-		PABlendData(PABlend* state, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0, double blendTrim = 0.0, bool dplay = false);
-		~PABlendData();
+		SBAPI PABlendData();
+		SBAPI PABlendData(const std::string& stateName, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0, double blendTrim = 0.0, bool dplay = false);
+		SBAPI PABlendData(PABlend* state, std::vector<double>& w, BlendMode blend = Overwrite, WrapMode wrap = Loop, ScheduleMode schedule = Queued, double blendOffset = 0.0, double blendTrim = 0.0, bool dplay = false);
+		SBAPI ~PABlendData();
 		virtual void evaluate(double timeStep, SrBuffer<float>& buffer);
 		virtual void evaluateTransition(double timeStep, SrBuffer<float>& buffer, bool tranIn);
 

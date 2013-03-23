@@ -24,6 +24,7 @@
 # ifndef SK_CHANNEL_ARRAY_H
 # define SK_CHANNEL_ARRAY_H
 
+#include <sb/SBTypes.h>
 # include <sr/sr_buffer.h>
 # include <sr/sr_shared_class.h>
 
@@ -147,7 +148,7 @@ public :
 	SkSkeleton* skeleton () const;
 
 	/*! Builds the channels from the active joints in the given skeleton */
-	void get_active_channels ( SkSkeleton* sk, bool connect=false );
+	SBAPI void get_active_channels ( SkSkeleton* sk, bool connect=false );
 
 	/*! Adds the channels from the active joints in the given skeleton */
 	void add_active_channels ( SkSkeleton* sk, bool connect=false );
@@ -161,7 +162,7 @@ public :
 	int floats () const { return _floats; }
 
 	/*! Counts and returns the position of the 1st value used by channel c */
-	int float_position ( int c ) const;
+	SBAPI int float_position ( int c ) const;
 
 	/*! Put in fp all the floats specified by the joints of the channel array */
 	void get_values ( float* fp );

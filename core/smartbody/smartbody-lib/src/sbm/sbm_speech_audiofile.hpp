@@ -24,6 +24,7 @@
 #ifndef SBM_SPEECH_AUDIOFILE_HPP
 #define SBM_SPEECH_AUDIOFILE_HPP
 
+#include <sb/SBTypes.h>
 //#include <hash_map>
 #include <map>
 
@@ -70,7 +71,7 @@ class AudioFileSpeech : public SpeechInterface
       virtual float getMarkTime( RequestId requestId, const XMLCh * markId );
       virtual void requestComplete( RequestId requestId );
 //	  stdext::hash_map< RequestId, SpeechRequestInfo >& getSpeechRequestInfo();
-	  std::map< RequestId, SpeechRequestInfo >& getSpeechRequestInfo();
+	  SBAPI std::map< RequestId, SpeechRequestInfo >& getSpeechRequestInfo();
 
 	  void setVisemeMode(bool mode) {visemeCurveMode = mode;}
 

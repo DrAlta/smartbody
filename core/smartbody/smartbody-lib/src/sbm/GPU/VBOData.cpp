@@ -1,7 +1,8 @@
+#include "vhcl.h"
 #include <cstring>
 #include <cstdio>
+#include "external/glew/glew.h"
 #include "VBOData.h"
-
 
 
 VBOData::~VBOData(void)

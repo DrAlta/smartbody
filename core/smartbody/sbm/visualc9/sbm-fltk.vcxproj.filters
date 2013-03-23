@@ -46,6 +46,9 @@
     <Filter Include="jointmapviewer">
       <UniqueIdentifier>{5c85f00a-4129-4993-aa40-cd28f3358310}</UniqueIdentifier>
     </Filter>
+    <Filter Include="glew">
+      <UniqueIdentifier>{c0320fe5-a593-4568-8e8d-c4a017caa66b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -457,6 +460,9 @@
     </ClInclude>
     <ClInclude Include="..\src\ExportWindow.h">
       <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\smartbody-lib\src\external\glew\glew.h">
+      <Filter>glew</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -508,7 +508,6 @@
     <ClCompile Include="..\src\external\ANN\kd_tree.cpp" />
     <ClCompile Include="..\src\external\ANN\kd_util.cpp" />
     <ClCompile Include="..\src\external\ANN\perf.cpp" />
-    <ClCompile Include="..\src\external\glew\glew.cpp" />
     <ClCompile Include="..\src\external\SOIL\image_DXT.c" />
     <ClCompile Include="..\src\external\SOIL\image_helper.c" />
     <ClCompile Include="..\src\external\SOIL\SOIL.c" />
@@ -979,7 +978,6 @@
     <ClInclude Include="..\src\external\ANN\pr_queue.h" />
     <ClInclude Include="..\src\external\ANN\pr_queue_k.h" />
     <ClInclude Include="..\src\external\glew\glew.h" />
-    <ClInclude Include="..\src\external\glew\wglew.h" />
     <ClInclude Include="..\src\external\SOIL\image_DXT.h" />
     <ClInclude Include="..\src\external\SOIL\image_helper.h" />
     <ClInclude Include="..\src\external\SOIL\SOIL.h" />

@@ -20,6 +20,7 @@
 
 #include "FL/Fl_Slider.H"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
 #include "vhcl.h"
+#include "external/glew/glew.h"
 //#include <FL/enumerations.H>
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
 #include "sbm/GPU/SbmShader.h"
@@ -170,7 +171,8 @@ class srSaSetShapesChanged : public SrSa
 static void menucb ( Fl_Widget* o, void* v ) 
  {
 	 Fl_Widget* widget = o->parent();
-	 
+	
+	 std::vector<Fl_Menu_Item>* pmenu = (std::vector<Fl_Menu_Item>*) v;
 	 FltkViewer* viewer = NULL;
 	 while (!viewer && widget && widget->parent() != NULL)
 	 {
@@ -188,7 +190,7 @@ const int NUM_REACH_TYPES = 2;
 
 static char gaze_on_target_menu_name[] = {"&gaze"};
 static char gaze_type_name[NUM_GAZE_TYPES][40] = {"&create EYE gaze","&create EYE NECK gaze","&create EYE CHEST gaze","&create EYE BACK gaze" }; 
-static SrArray<Fl_Menu_Item> gaze_submenus[NUM_GAZE_TYPES];
+static std::vector<Fl_Menu_Item> gaze_submenus[NUM_GAZE_TYPES];
 
 Fl_Menu_Item GazeMenuTable[] = 
 {
@@ -285,7 +287,7 @@ Fl_Menu_Item MenuTable[] =
  };
 
 
-static void get_pawn_submenus(void* user_data,SrArray<Fl_Menu_Item>& menu_list)
+static void get_pawn_submenus(void* user_data, std::vector<Fl_Menu_Item>& menu_list)
 {
 	std::vector<SbmPawn*> pawn_list;
 	ObjectManipulationHandle::get_pawn_list(pawn_list);
@@ -294,11 +296,11 @@ static void get_pawn_submenus(void* user_data,SrArray<Fl_Menu_Item>& menu_list)
 		SbmPawn* pawn = pawn_list[i];
 		//printf("pawn name = %s\n",pawn->name);
 		Fl_Menu_Item temp_pawn = { pawn->getName().c_str(), 0, MCB, user_data } ;
-		menu_list.push(temp_pawn);		
+		menu_list.push_back(temp_pawn);		
 	}
 
 	Fl_Menu_Item temp = {0};
-	menu_list.push(temp);
+	menu_list.push_back(temp);
 }
 
 
@@ -308,13 +310,13 @@ void FltkViewer::update_submenus()
 	{
 		Fl_Menu_Item& gaze_menu = GazeMenuTable[i];	
 		gaze_menu.flags |= FL_SUBMENU_POINTER;
-		SrArray<Fl_Menu_Item>& menu_list = gaze_submenus[i];
-		menu_list = SrArray<Fl_Menu_Item>();
+		std::vector<Fl_Menu_Item>& menu_list = gaze_submenus[i];
+		menu_list = std::vector<Fl_Menu_Item>();
 		int iCmd = FltkViewer::CmdGazeOnTargetType1+i;
 		Fl_Menu_Item select_pawn = { "selected pawn",   0, MCB,((void*)iCmd)  };
-		menu_list.push(select_pawn);			
+		menu_list.push_back(select_pawn);			
 		get_pawn_submenus(select_pawn.user_data(),menu_list);
-		const Fl_Menu_Item* pmenu = (const Fl_Menu_Item *)menu_list;
+		std::vector<Fl_Menu_Item>* pmenu = &menu_list;
 		gaze_menu.user_data((void*)pmenu);				
 	}
 }

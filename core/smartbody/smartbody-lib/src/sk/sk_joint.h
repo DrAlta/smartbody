@@ -25,6 +25,7 @@
 # ifndef SK_JOINT_H
 # define SK_JOINT_H
 
+#include <sb/SBTypes.h>
 # include <sr/sr_mat.h>
 # include <sr/sr_quat.h>
 # include <sr/sr_array.h>
@@ -217,11 +218,11 @@ public:
 	that the global matrix of the parent is up to date.
 	Note: whenever this method is called, the whole branch
 	under the joint is updated */
-	void update_gmat ();
+	SBAPI void update_gmat ();
 
 	/*! Same as update_gmat(), but it stops the recursive update
 	of chidren when joint in the last_joints arrays are reached */
-	void update_gmat ( std::vector<SkJoint*>& end_joints );
+	SBAPI void update_gmat ( std::vector<SkJoint*>& end_joints );
 
 	/*! Updates the local matrix and set the global matrix of this joint
 	to be the local matrix multiplied by the parent global matrix */
@@ -272,7 +273,7 @@ public:
 
 	void updateGmatZero(const SrMat& gmatZero);
 	const SrMat& gmatZero() { return _gmatZero; }
-	SrVec localGlobalAxis(int i);	
+	SBAPI SrVec localGlobalAxis(int i);	
 };
 
 //==================================== End of File ===========================================

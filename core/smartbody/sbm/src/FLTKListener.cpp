@@ -359,3 +359,9 @@ void FLTKListener::setOtherListener( SmartBody::SBCharacterListener* listener )
 {
 	otherListener = listener;
 }
+
+void FLTKListener::OnLogMessage( const std::string& message )
+{
+	LOG(message.c_str());
+}
+

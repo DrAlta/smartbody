@@ -25,6 +25,7 @@
 #ifndef ME_CT_GAZE_H
 #define ME_CT_GAZE_H
 
+#include <sb/SBTypes.h>
 #include <sk/sk_skeleton.h>
 #include <sb/SBController.h>
 
@@ -218,7 +219,7 @@ class MeCtGaze : public SmartBody::SBController	{
 		void set_offset_polar( float off_d, float off_a, float off_r = 0.0 ); // direction, radial angle, roll
 
 		// Ari: used in BehaviorWindow::processControllerRequest(...)
-		SkJoint* get_target_joint( float& x, float& y, float& z);
+		SBAPI SkJoint* get_target_joint( float& x, float& y, float& z);
 
 #endif
 	

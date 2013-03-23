@@ -55,7 +55,7 @@ class SrSphere;
 class SrModel : public SrSharedClass
  { public :
     /*! A static string containing the name "model" */
-    static const char* class_name;
+    SBAPI static const char* class_name;
 
     /*! The Face structure keeps 3 indices used to associate the
         information in V, N, and T to each face */

@@ -20,6 +20,8 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
+#include "vhcl.h"
+#include "external/glew/glew.h"
 # include <sr/sr_vec.h>
 # include <sr/sr_mat.h>
 # include <sr/sr_model.h>

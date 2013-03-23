@@ -1,3 +1,5 @@
+#include "vhcl.h"
+#include "external/glew/glew.h"
 #include "TBOData.h"
 #include "SbmShader.h"
 #include <cstring>

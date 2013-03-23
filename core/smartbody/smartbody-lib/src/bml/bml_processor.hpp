@@ -25,6 +25,8 @@
 #ifndef BML_PROCESSOR_HPP
 #define BML_PROCESSOR_HPP
 
+#include <sb/SBTypes.h>
+
 #include "sbm/sr_hash_map.h"
 #include "sbm/xercesc_utils.hpp"
 #include "bml.hpp"
@@ -104,7 +106,7 @@ namespace BML {
 		Processor();
 		virtual ~Processor();
 
-		void registerRequestCallback(void (*requestcb)(BmlRequest* request, void* data), void* data);
+		SBAPI void registerRequestCallback(void (*requestcb)(BmlRequest* request, void* data), void* data);
 
 		void reset();
 

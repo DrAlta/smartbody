@@ -155,28 +155,28 @@ class SrSnShape : public SrSnShapeBase
      { _data = pt? pt: new X; }
 
    public :
-    SBAPI SrSnShape() : SrSnShapeBase(X::class_name) { _data = new X; }
+    SrSnShape() : SrSnShapeBase(X::class_name) { _data = new X; }
 
     /* Virtual Destructor .*/
-    SBAPI virtual ~SrSnShape () { delete _data; }
+    virtual ~SrSnShape () { delete _data; }
 
     /*! Get a const reference to the shape data, without setting the state
         of the node as changed. */
-    SBAPI const X& const_shape () const { return *_data; }
+    const X& const_shape () const { return *_data; }
 
     /*! Get a reference to the shape data, and sets the state of the node
         as changed, implying that display lists should be regenerated. */
-    SBAPI X& shape () { changed(true); return *_data; }
+    X& shape () { changed(true); return *_data; }
 
     /*! Set data using the copy constructor of X. */
-    SBAPI void shape ( const X& data ) { changed(true); *_data=data; }
+    void shape ( const X& data ) { changed(true); *_data=data; }
 
     /*! Deletes the internal data and starts using the new one pt.
         Pointer pt must not be null. Use with care. */
-    SBAPI void replace_shape_pointer ( X* pt ) { changed(true); delete _data; _data=pt; }
+    void replace_shape_pointer ( X* pt ) { changed(true); delete _data; _data=pt; }
 
     /*! Calculates the bounding box of the shape. */
-    SBAPI virtual void get_bounding_box ( SrBox &box ) const { _data->get_bounding_box(box); }
+    virtual void get_bounding_box ( SrBox &box ) const { _data->get_bounding_box(box); }
  };
 
 /*! \class SrSnSharedShape sr_scene.h

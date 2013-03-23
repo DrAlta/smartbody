@@ -90,7 +90,7 @@ public:
 	Fl_Input* channel_filter;
 	Fl_Input* channel_monitored_filter;
 
-	SrArray<ChannelItem> Channel_item_list;
+	std::vector<ChannelItem> Channel_item_list;
 
 	int num_of_frames;
 	bool is_freezed;

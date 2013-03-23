@@ -195,6 +195,21 @@ int SBVHMsgManager::send( const char* message )
 	return( CMD_SUCCESS );
 }
 
+int SBVHMsgManager::poll()
+{
+#if LINK_VHMSG_CLIENT
+	if( isEnable() )
+	{
+		int ret = vhmsg::ttu_poll();
+		if ( ret == vhmsg::TTU_SUCCESS )
+			return CMD_SUCCESS;
+		else
+			return CMD_FAILURE;
+	}
+#endif
+	return CMD_SUCCESS;
+}
+
 void SBVHMsgManager::setPort(const std::string& port)
 {
 	_port = port;

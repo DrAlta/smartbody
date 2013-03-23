@@ -24,6 +24,7 @@
 #ifndef XERCESC_UTILS_HPP
 #define XERCESC_UTILS_HPP
 
+#include <sb/SBTypes.h>
 #include <string>
 #include <sstream>
 #include "vhcl.h"
@@ -52,7 +53,7 @@ namespace xml_utils {
 	// memory managed transcode
 	bool xml_translate( std::string *str_p, const XMLCh* xml_str );
 	
-	std::string xml_translate_string( const XMLCh* xml_str, std::string dfl = "" );
+	SBAPI std::string xml_translate_string( const XMLCh* xml_str, std::string dfl = "" );
 	std::wstring xml_translate_wide( const XMLCh* xml_str, std::string dfl = "" );
 
 	double xml_translate_double( const XMLCh* xml_str, double dfl = 0.0 );

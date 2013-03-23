@@ -796,9 +796,6 @@
     <ClCompile Include="..\src\external\parser\FullHist.cpp">
       <Filter>external\parser</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\external\glew\glew.cpp">
-      <Filter>external\glew</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\external\parser\GotIter.cpp">
       <Filter>external\parser</Filter>
     </ClCompile>
@@ -1955,9 +1952,6 @@
     </ClInclude>
     <ClInclude Include="..\src\external\parser\ValHeap.h">
       <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\external\glew\wglew.h">
-      <Filter>external\glew</Filter>
     </ClInclude>
     <ClInclude Include="..\src\external\parser\UnitRules.h">
       <Filter>external\parser</Filter>

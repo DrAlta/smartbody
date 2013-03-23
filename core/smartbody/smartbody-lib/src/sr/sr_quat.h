@@ -153,10 +153,10 @@ class SBAPI SrQuat
 
     /*! Given a vector v and a quaternion q, the result of applying the rotation
        in q to v is returned (in mathematical notation this is q v q^-1) . */
-    friend SrVec operator * ( const SrVec &v, const SrQuat &q );
+    SBAPI friend SrVec operator * ( const SrVec &v, const SrQuat &q );
 
     /*! rotation q1 followed by rotation q2 is equal to q2*q1 . */
-    friend SrQuat operator * ( const SrQuat &q1, const SrQuat &q2 );
+    SBAPI friend SrQuat operator * ( const SrQuat &q1, const SrQuat &q2 );
 
     /*! Comparison operator makes an exact comparison of the quaternion components. */
     friend bool operator == ( const SrQuat &q1, const SrQuat &q2 );

@@ -21,6 +21,7 @@
 */
 
 #pragma once
+#include <sb/SBTypes.h>
 #include <map>
 #include <sk/sk_skeleton.h>
 #include <sb/SBController.h>
@@ -63,8 +64,8 @@ protected:
 public:
 	FadingControl();
 	virtual ~FadingControl() {}	
-	void setFadeIn(float interval);
-	void setFadeOut(float interval);
+	SBAPI void setFadeIn(float interval);
+	SBAPI void setFadeOut(float interval);
 	bool updateFading(float dt);
 
 	void controlRestart();
@@ -77,7 +78,7 @@ class MeCtConstraint : public SmartBody::SBController, public FadingControl
 private:
 	static std::string CONTROLLER_TYPE;
 public:	
-	static bool useIKConstraint;
+	SBAPI static bool useIKConstraint;
 
 	
 	enum ConstraintType

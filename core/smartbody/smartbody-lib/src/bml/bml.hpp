@@ -30,7 +30,7 @@
 #include <map>
 #include <limits>
 
-
+#include <sb/SBTypes.h>
 #include "bml/bml_types.hpp"
 #include "bml/bml_sync_point.hpp"
 #include "bml/behavior_span.hpp"
@@ -187,10 +187,10 @@ namespace BML {
 		std::string command;
 		time_sec    time;
 
-		SbmCommand( std::string & command, time_sec time );
+		SBAPI SbmCommand( std::string & command, time_sec time );
 
 		//  Copy constructor and assignment operator
-		SbmCommand( SbmCommand& other );
+		SBAPI SbmCommand( SbmCommand& other );
 		SbmCommand& operator= (const SbmCommand& other );
 	};
 
@@ -514,10 +514,10 @@ namespace BML {
 			return this->viseme.c_str();
 		}
 
-		float getWeight();
-		time_sec getDuration();
-		float getRampUp();
-		float getRampDown();
+		SBAPI float getWeight();
+		SBAPI time_sec getDuration();
+		SBAPI float getRampUp();
+		SBAPI float getRampDown();
 
 		void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene );
 	};

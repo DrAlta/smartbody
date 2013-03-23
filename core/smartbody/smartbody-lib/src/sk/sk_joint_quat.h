@@ -24,6 +24,7 @@
 # ifndef SK_JOINT_QUAT_H
 # define SK_JOINT_QUAT_H
 
+#include <sb/SBTypes.h>
 # include <sr/sr_quat.h>
 
 class SkJoint;
@@ -63,14 +64,14 @@ class SkJointQuat
         only set if this object is active, ie, not frozen.
         Note: the given quaternion will become the final joint rotation, 
         even if pre/post rotations exist (they are only used by derived classes)*/
-    void value ( const SrQuat& q );
+    SBAPI void value ( const SrQuat& q );
 
     /*! Same value(q) method, but receiving a float pointer as input */
-    void value ( const float* f );
+    SBAPI void value ( const float* f );
 
     /*! Access the current quaternion. If a new rotation is available
         by derived classes, get_quat will be called. */
-    const SrQuat& value ();
+    SBAPI const SrQuat& value ();
 
 	const SrQuat& rawValue();
     

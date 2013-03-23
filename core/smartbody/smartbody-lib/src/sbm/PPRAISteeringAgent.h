@@ -24,6 +24,7 @@
 #ifndef _PPRAISteeringAgent_H_
 #define _PPRAISteeringAgent_H_
 
+#include <sb/SBTypes.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSteerAgent.h>
 #include <sbm/SteerPath.h>
@@ -42,11 +43,11 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 		void setCharacter(SbmCharacter* c);
 		void evaluate(double dt);
 
-		void setAgent(SteerLib::AgentInterface* a);
+		SBAPI void setAgent(SteerLib::AgentInterface* a);
 		SteerLib::AgentInterface* getAgent();
 		
 		
-		void setTargetAgent(SbmCharacter* tChar);
+		SBAPI void setTargetAgent(SbmCharacter* tChar);
 		SbmCharacter* getTargetAgent();
 		void startParameterTesting();
 		void updateSteerStateName();

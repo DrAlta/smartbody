@@ -19,11 +19,11 @@ class SBNavigationMesh
 		SBAPI SBNavigationMesh();		
 		SBAPI ~SBNavigationMesh();		
 		SBAPI bool buildNavigationMesh(SrModel& inMesh);	
-		SrModel* getRawMesh();
-		SrModel* getNavigationMesh();
+		SBAPI SrModel* getRawMesh();
+		SBAPI SrModel* getNavigationMesh();
 		SBAPI float queryFloorHeight(SrVec pos, SrVec searchSize);
 		SBAPI SrVec queryMeshPoint(SrVec& p1, SrVec& p2);
-		void findPath(SrVec& spos, SrVec& epos, std::vector<SrVec>& pathList);
+		SBAPI void findPath(SrVec& spos, SrVec& epos, std::vector<SrVec>& pathList);
 	protected:
 		float m_cellSize;
 		float m_cellHeight;
