@@ -200,7 +200,23 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/external/ANN/ANN.cpp \
 	$(SBM_MY_DIR)/external/parser/UnitRules.cpp \
 	$(SBM_MY_DIR)/external/parser/utils.cpp \
 	$(SBM_MY_DIR)/external/parser/ValHeap.cpp \
-	$(SBM_MY_DIR)/external/perlin/perlin.cpp 
+	$(SBM_MY_DIR)/external/perlin/perlin.cpp \
+	$(SBM_MY_DIR)/external/recast/Recast.cpp \
+	$(SBM_MY_DIR)/external/recast/RecastAlloc.cpp \
+	$(SBM_MY_DIR)/external/recast/RecastArea.cpp \
+	$(SBM_MY_DIR)/external/recast/RecastContour.cpp \
+	$(SBM_MY_DIR)/external/recast/RecastFilter.cpp \
+	$(SBM_MY_DIR)/external/recast/RecastLayers.cpp \
+	$(SBM_MY_DIR)/external/recast/RecastMesh.cpp \
+	$(SBM_MY_DIR)/external/recast/RecastMeshDetail.cpp \
+	$(SBM_MY_DIR)/external/recast/RecastRasterization.cpp \
+	$(SBM_MY_DIR)/external/recast/RecastRegion.cpp \
+	$(SBM_MY_DIR)/external/recast/DetourAlloc.cpp \
+	$(SBM_MY_DIR)/external/recast/DetourCommon.cpp \
+	$(SBM_MY_DIR)/external/recast/DetourNavMesh.cpp \
+	$(SBM_MY_DIR)/external/recast/DetourNavMeshBuilder.cpp \
+	$(SBM_MY_DIR)/external/recast/DetourNavMeshQuery.cpp \
+	$(SBM_MY_DIR)/external/recast/DetourNode.cpp \
 	
 	
 	
@@ -479,6 +495,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBPhoneme.cpp \
 	$(SBM_MY_DIR)/sb/SBBehaviorSet.cpp \
 	$(SBM_MY_DIR)/sb/SBBehaviorSetManager.cpp \
+	$(SBM_MY_DIR)/sb/SBNavigationMesh.cpp \
 	$(SBM_MY_DIR)/sbm/action_unit.cpp \
 	$(SBM_MY_DIR)/sbm/MiscCommands.cpp \
 	$(SBM_MY_DIR)/sb/SBColObject.cpp \
