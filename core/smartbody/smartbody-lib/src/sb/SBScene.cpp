@@ -2976,6 +2976,7 @@ SBAPI bool SBScene::createNavigationMesh( const std::string& meshfilename )
 {
 	SrModel mesh;
 	bool loadSucess = mesh.import_obj(meshfilename.c_str());	
+
 	if (!loadSucess)
 	{
 		LOG("Error loading navigation mesh, filename = %s",meshfilename.c_str());
