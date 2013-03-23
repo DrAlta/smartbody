@@ -23,6 +23,8 @@
 #ifndef SR_COMMAND_SEQUENCE_H
 #define SR_COMMAND_SEQUENCE_H
 
+
+#include <sb/SBTypes.h>
 #include <stdio.h>
 #include "sbm_constants.h"
 
@@ -40,7 +42,7 @@ class srCmdSeq	{
 	} sr_command_event_t;
 
 	public:
-		srCmdSeq(void);
+		SBAPI srCmdSeq(void);
 		virtual ~srCmdSeq(void);
 
 		void	print( FILE *fp = stdout );						/* print events */
@@ -50,7 +52,7 @@ class srCmdSeq	{
 		int		read_file( FILE *seq_fp );
 		int		read_file( char *seq_file, int report_open_fail = TRUE );
 
-		int		insert( float time, const char *cmd_ref );	/* copy (with new[]), sort by time */
+		SBAPI int		insert( float time, const char *cmd_ref );	/* copy (with new[]), sort by time */
 		int		insert_ref( float time, char *cmd_ref );	/* reference, sort by time */
 
 		/* HACK: Query duration of seq (i.e., time of last command) */

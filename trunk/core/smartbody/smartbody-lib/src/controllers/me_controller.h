@@ -29,6 +29,7 @@
 #include <list>
 #include <vector>
 
+#include <sb/SBTypes.h>
 #include <sr/sr_hash_table.h>
 #include <sr/sr_buffer.h>
 #include <sr/sr_shared_class.h>
@@ -275,7 +276,7 @@ public :
 	/*!
 	* Map from the local channels to the context.
 	*/
-	int getContextChannel(int index);
+	SBAPI int getContextChannel(int index);
    
     /*! Evaluates the controller at a local time t. */ 
     void evaluate ( double t, MeFrameData& frame );
@@ -290,9 +291,9 @@ public :
 	void record_stop(void);									//stop the recording
 
 	/*! Evaluates the controller changes */
-	void record_buffer_changes(bool val);				    // store the values of all channels changed by this controller
+	SBAPI void record_buffer_changes(bool val);				    // store the values of all channels changed by this controller
 	/*SrBuffer<float>& get_buffer_changes();					// gets the channel data changed by this controller*/
-	std::vector<float>& get_buffer_changes();
+	SBAPI std::vector<float>& get_buffer_changes();
 	bool is_record_buffer_changes() { return _buffer_changes_toggle; }
 
 	bool isEnabled() const;

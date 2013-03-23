@@ -1,3 +1,5 @@
+#include "vhcl.h"
+#include "external/glew/glew.h"
 #include "SbmShader.h"
 //#include <GL/glew.h>
 #include <stdio.h>
@@ -11,6 +13,22 @@
 /************************************************************************/
 /* Shader program class                                                 */
 /************************************************************************/
+
+
+SbmShaderManager& SbmShaderManager::singleton() 
+{
+	if (!_singleton)
+		_singleton = new SbmShaderManager();
+	return *_singleton;			
+}
+
+void SbmShaderManager::destroy_singleton() {
+	if( _singleton )
+		delete _singleton;
+	_singleton = NULL;
+}
+
+int SbmShaderManager::getShaderSupport() { return shaderSupport; }
 
 SbmShaderProgram::SbmShaderProgram()
 {

@@ -23,6 +23,7 @@
 # ifndef SK_JOINT_POS_H
 # define SK_JOINT_POS_H
 
+#include <sb/SBTypes.h>
 # include <sk/sk_vec_limits.h>
 
 class SkJoint;
@@ -41,7 +42,7 @@ class SkJointPos : public SkVecLimits
     /*! Set values per degree of freedom. In case joint limits are activated,
         values are bounded to the limits before inserted. The associated
         joint local matrix is set to changed if needed. */
-    void value ( int d, float val );
+    SBAPI void value ( int d, float val );
     
     /*! Simply calls the same method in the base class */
     float value ( int d ) const { return SkVecLimits::value(d); }

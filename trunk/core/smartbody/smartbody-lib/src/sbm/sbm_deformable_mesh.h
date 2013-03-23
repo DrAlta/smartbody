@@ -1,6 +1,7 @@
 #ifndef SBM_DEFORMABLE_MESH_H
 #define SBM_DEFORMABLE_MESH_H
 
+#include <sb/SBTypes.h>
 #include <vector>
 #include <string>
 #include <map>
@@ -74,8 +75,8 @@ public:
 
 public:
 	DeformableMesh();
-	~DeformableMesh();	
-	void setSkeleton(SkSkeleton* skel);
+	SBAPI ~DeformableMesh();	
+	SBAPI void setSkeleton(SkSkeleton* skel);
 	virtual void update();
 	SkinWeight* getSkinWeight(const std::string& skinSourceName);
 	int	getMesh(const std::string& meshName);				// get the postion given the mesh name
@@ -95,7 +96,7 @@ protected:
 	std::vector<SkJointList> _boneJointList;
 public:
 	DeformableMeshInstance();
-	~DeformableMeshInstance();
+	SBAPI ~DeformableMeshInstance();
 
 	virtual void setDeformableMesh(DeformableMesh* mesh);
 

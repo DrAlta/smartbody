@@ -63,7 +63,7 @@ public:
 
 	SBTransform& getLocalTransform() { return localTransform; }	
 	void          setLocalTransform(SBTransform& newLocalTran);	
-	SBTransform& getGlobalTransform();
+	SBAPI SBTransform& getGlobalTransform();
 	void          setGlobalTransform(SBTransform& newGlobalTran);
 
 	SBTransform& getCombineTransform();

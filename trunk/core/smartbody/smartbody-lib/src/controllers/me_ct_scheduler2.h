@@ -25,7 +25,7 @@
 #define ME_CT_SCHEDULER2_H
 
 //=================================== MeCtScheduler2 =====================================
-
+#include <sb/SBTypes.h>
 #include <map>
 #include <vector>
 
@@ -284,7 +284,7 @@ public:
 	/**
 	 *  Returns a current copy of the tracks.
 	 */
-	VecOfTrack tracks();
+	SBAPI VecOfTrack tracks();
 
 	///** Returns a reference to the track index i (0 is at the bottom). Use with care. */
 	//Track& track( int i ) { return _tracks.at(i); }

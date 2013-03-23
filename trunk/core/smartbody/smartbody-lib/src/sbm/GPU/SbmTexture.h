@@ -5,7 +5,10 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #else
-#include "external/glew/glew.h"
+//#include "external/glew/glew.h"
+#include <windows.h>
+# include <GL/gl.h>
+# include <GL/glu.h>
 #endif
 #include <map>
 #include <string>

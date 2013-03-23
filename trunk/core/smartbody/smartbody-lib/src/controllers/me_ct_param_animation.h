@@ -23,6 +23,7 @@
 #ifndef _ME_CT_PARAM_ANIMATION_H_
 #define _ME_CT_PARAM_ANIMATION_H_
 
+#include <sb/SBTypes.h>
 #include <controllers/me_ct_container.hpp>
 #include <sb/SBCharacter.h>
 #include <controllers/me_ct_param_animation_utilities.h>
@@ -106,20 +107,20 @@ class MeCtParamAnimation : public MeCtContainer
 		virtual bool controller_evaluate( double t, MeFrameData& frame );
 
 		void setBaseJointName(const std::string& name);
-		const std::string& getBaseJointName();
+		SBAPI const std::string& getBaseJointName();
 		
 		void schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0, double stateTimeOffset = 0.0, double stateTimeTrim = 0.0, double transitionLen = -1.0, bool directPlay = true);
 		void schedule(PABlend* state, const std::vector<double>& weights, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0, double stateTimeOffset = 0.0, double stateTimeTrim = 0.0, double transitionLen = -1.0, bool directPlay = true);
 		void schedule(PABlend* state, const std::vector<double>& weights, const ScheduleType& scType);
 		void unschedule();
-		void updateWeights(std::vector<double>& w);
-		void updateWeights();
+		SBAPI void updateWeights(std::vector<double>& w);
+		SBAPI void updateWeights();
 		
-		int getNumWeights();
+		SBAPI int getNumWeights();
 		
-		const std::string& getNextStateName();
+		SBAPI const std::string& getNextStateName();
 		const std::string& getCurrentStateName();
-		PABlendData* getCurrentPABlendData();
+		SBAPI PABlendData* getCurrentPABlendData();
 		bool hasPABlend(const std::string& stateName);
 		bool isIdle();
 

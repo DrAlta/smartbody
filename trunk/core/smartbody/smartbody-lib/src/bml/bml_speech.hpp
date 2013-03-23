@@ -23,6 +23,8 @@
 #ifndef BML_SPEECH_HPP
 #define BML_SPEECH_HPP
 
+#include <sb/SBTypes.h>
+
 #include <exception>
 
 #include "bml.hpp"
@@ -111,7 +113,7 @@ namespace BML {
 		 */
 		SyncPointPtr getWordBreakSync( const std::wstring& id );
 
-		MapOfSyncPoint& getWorkBreakSync();
+		SBAPI MapOfSyncPoint& getWorkBreakSync();
 
 		const std::vector<SpeechMark>& getMarks();
 

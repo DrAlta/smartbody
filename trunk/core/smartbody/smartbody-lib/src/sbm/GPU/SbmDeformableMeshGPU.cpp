@@ -1,4 +1,5 @@
 #include "vhcl.h"
+#include "external/glew/glew.h"
 #include "SbmDeformableMeshGPU.h"
 #include "SbmTexture.h"
 #include <string>

@@ -23,6 +23,7 @@
 # ifndef SK_CHANNEL_H
 # define SK_CHANNEL_H
 
+#include <sb/SBTypes.h>
 # include <sk/sk_joint.h>
 
 /*! SkChannel manipulates a joint according to the specified
@@ -59,7 +60,7 @@ class SkChannel
         are returned (can be 1, 2 or 4). It is the user responsibility to
         ensure that the used channel is compatible with the rotation type
         of the associated joint */
-    int get ( float* v );
+    SBAPI int get ( float* v );
 
 //    /*! Get random values for the specified channel, according to the 
 //        associated joint limits and parameterization type. The number of
@@ -89,14 +90,14 @@ class SkChannel
          { change_values ( type, values, mfactor, offset ); }
 
     /*! The size of a channel can be 1, 2(Swing), or 4 (Quat) */
-    static int size ( Type type );
+    SBAPI static int size ( Type type );
 
     /*! Member function version of size() */
     int size () const { return size(type); }
     
     /*! Returns a static string with the name of the channel type, 
         eg, "XPos", etc. If c is 'out of range', string "Undef" is returned */
-    static const char* type_name ( Type type );
+    SBAPI static const char* type_name ( Type type );
 
     /*! Member function version of type_name() */
     const char* type_name () const { return type_name(type); }

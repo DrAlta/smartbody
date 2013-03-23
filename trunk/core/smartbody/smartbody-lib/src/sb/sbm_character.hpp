@@ -27,6 +27,7 @@
 #ifndef SBM_CHARACTER_HPP
 #define SBM_CHARACTER_HPP
 
+#include <sb/SBTypes.h>
 #include <float.h>
 #include <iostream>
 #include <string>
@@ -180,7 +181,7 @@ public:
 	virtual int prune_controller_tree();
 
 	void addFootStep(int iLeg, SrVec& footPos, bool Update = false);
-	std::vector<SrVec>& getFootSteps(int ileg);
+	SBAPI std::vector<SrVec>& getFootSteps(int ileg);
 
 	/**
 	 *  Sets the character's speech implementation.
@@ -346,7 +347,7 @@ public:
 	float getDiphoneSmoothWindow( void ) const { return _diphoneSmoothWindow; }
 	void setDiphoneSmoothWindow( float val ) { _diphoneSmoothWindow = val; }
 
-	SrVec getFacingDirection() ;
+	SBAPI SrVec getFacingDirection() ;
 
 	void setMinVisemeTime(float minTime);
 	float getMinVisemeTime() const;

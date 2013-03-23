@@ -28,6 +28,7 @@
 #ifndef MCONTROL_CALLBACKS_H
 #define MCONTROL_CALLBACKS_H
 
+#include <sb/SBTypes.h>
 #include <sbm/sr_arg_buff.h>
 #include <sb/SBCommandManager.h>
 
@@ -87,7 +88,7 @@ int mcu_uscriptexec_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 int mcu_commapi_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 
 int mcu_vrKillComponent_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
-int mcu_vrAllCall_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
+SBAPI int mcu_vrAllCall_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr );
 int mcu_vrQuery_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr);
 
 //perception

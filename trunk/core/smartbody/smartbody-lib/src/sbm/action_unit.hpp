@@ -48,13 +48,13 @@ public:
 	ActionUnit(ActionUnit* source);
 	~ActionUnit();
 
-	bool is_bilateral() const;
+	SBAPI bool is_bilateral() const;
 	void reset_type();
 	void set_left();
 	void set_bilateral();
 	void set_right();
-	bool is_left() const;
-	bool is_right() const;
+	SBAPI bool is_left() const;
+	SBAPI bool is_right() const;
 	void set( SkMotion* motion );
 	void set( SkMotion* left, SkMotion* right );
 

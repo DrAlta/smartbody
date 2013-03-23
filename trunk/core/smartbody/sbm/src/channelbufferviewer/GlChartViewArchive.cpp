@@ -105,10 +105,10 @@ SrVec GlChartViewSeries::GetColor(int index)
 
 void GlChartViewSeries::Clear()
 {
-	x.capacity(0);
-	y.capacity(0);
-	z.capacity(0);
-	w.capacity(0);
+	x.clear();
+	y.clear();
+	z.clear();
+	w.clear();
 	Reset();
 }
 
@@ -207,25 +207,25 @@ int GlChartViewSeries::CheckIndex(int index)
 float GlChartViewSeries::GetValue(int index)
 {
 	index = CheckIndex(index);
-	return x.get(index);
+	return x[index];
 };
 
 SrVec2 GlChartViewSeries::GetVec2(int index)
 {
 	index = CheckIndex(index);
-	return SrVec2(x.get(index), y.get(index));
+	return SrVec2(x[index], y[index]);
 }
 
 SrVec GlChartViewSeries::GetVec3(int index)
 {
 	index = CheckIndex(index);
-	return SrVec(x.get(index), y.get(index), z.get(index));
+	return SrVec(x[index], y[index], z[index]);
 }
 
 SrVec GlChartViewSeries::GetEuler(int index)
 {
 	index = CheckIndex(index);
-	SrQuat quat(x.get(index), y.get(index), z.get(index), w.get(index));
+	SrQuat quat(x[index], y[index], z[index], w[index]);
 	return GetEulerFromQuaternion(quat);
 }
 
@@ -233,14 +233,14 @@ SrVec GlChartViewSeries::GetEuler(int index)
 SrVec GlChartViewSeries::GetSwingTwist( int index )
 {
 	index = CheckIndex(index);
-	SrQuat quat(x.get(index), y.get(index), z.get(index), w.get(index));
+	SrQuat quat(x[index], y[index], z[index], w[index]);
 	return GetSwingTwistFromQuaternion(quat);
 }
 
 SrQuat GlChartViewSeries::GetQuat(int index)
 {
 	index = CheckIndex(index);
-	return SrQuat(x.get(index), y.get(index), z.get(index), w.get(index));
+	return SrQuat(x[index], y[index], z[index], w[index]);
 }
 
 void GlChartViewSeries::Push(float x)
@@ -251,7 +251,7 @@ void GlChartViewSeries::Push(float x)
 	}
 	else ++current_ind;
 	if(size < max_size) ++size;
-	this->x.set(current_ind, x);
+	this->x[current_ind] = x;
 }
 
 void GlChartViewSeries::Push(float x, float y)
@@ -262,8 +262,8 @@ void GlChartViewSeries::Push(float x, float y)
 	}
 	else ++current_ind;
 	if(size < max_size) ++size;
-	this->x.set(current_ind, x);
-	this->y.set(current_ind, y);
+	this->x[current_ind] = x;
+	this->y[current_ind] =  y;
 }
 
 void GlChartViewSeries::Push(float x, float y, float z)
@@ -274,9 +274,9 @@ void GlChartViewSeries::Push(float x, float y, float z)
 	}
 	else ++current_ind;
 	if(size < max_size) ++size;
-	this->x.set(current_ind, x);
-	this->y.set(current_ind, y);
-	this->z.set(current_ind, z);
+	this->x[current_ind] = x;
+	this->y[current_ind] = y;
+	this->z[current_ind] = z;
 }
 
 void GlChartViewSeries::Push(float x, float y, float z, float w)
@@ -287,10 +287,10 @@ void GlChartViewSeries::Push(float x, float y, float z, float w)
 	}
 	else ++current_ind;
 	if(size < max_size) ++size;
-	this->x.set(current_ind, x);
-	this->y.set(current_ind, y);
-	this->z.set(current_ind, z);
-	this->w.set(current_ind, w);
+	this->x[current_ind] = x;
+	this->y[current_ind] = y;
+	this->z[current_ind] = z;
+	this->w[current_ind] = w;
 }
 
 void GlChartViewSeries::SetMaxSize(int max)
@@ -302,14 +302,10 @@ void GlChartViewSeries::SetMaxSize(int max)
 
 	if(size == 0)
 	{
-		this->x.capacity(max);
-		this->x.size(max);
-		this->y.capacity(max);
-		this->y.size(max);
-		this->z.capacity(max);
-		this->z.size(max);
-		this->w.capacity(max);
-		this->w.size(max);
+		this->x.resize(max);
+		this->y.resize(max);
+		this->z.resize(max);
+		this->w.resize(max);
 		this->max_size = max;
 		return;
 	}
@@ -320,14 +316,10 @@ void GlChartViewSeries::SetMaxSize(int max)
 	{
 		if(max > max_size)
 		{
-			this->x.capacity(max);
-			this->x.size(max);
-			this->y.capacity(max);
-			this->y.size(max);
-			this->z.capacity(max);
-			this->z.size(max);
-			this->w.capacity(max);
-			this->w.size(max);
+			this->x.resize(max);
+			this->y.resize(max);
+			this->z.resize(max);
+			this->w.resize(max);
 		}
 	
 		int start = this->max_size-1;
@@ -340,29 +332,25 @@ void GlChartViewSeries::SetMaxSize(int max)
 			{
 				int y = 0;
 			}
-			x.set(t_new, x.get(t_old));
-			y.set(t_new, y.get(t_old));
-			z.set(t_new, z.get(t_old));
-			w.set(t_new, w.get(t_old));
+			x[t_new] = x[t_old];
+			y[t_new] = y[t_old];
+			z[t_new] = z[t_old];
+			w[t_new] = w[t_old];
 		}
 		this->max_size = max;
 		if(this->size > max) this->size = max;
 		if(max_size > max)
 		{
-			this->x.capacity(max);
-			this->x.size(max);
-			this->y.capacity(max);
-			this->y.size(max);
-			this->z.capacity(max);
-			this->z.size(max);
-			this->w.capacity(max);
-			this->w.size(max);
+			this->x.resize(max);
+			this->y.resize(max);
+			this->z.resize(max);
+			this->w.resize(max);
 		}
 	}
 
 	else
 	{
-		for(int i = 0; i < max; ++i)
+		for(size_t i = 0; i < (size_t) max; ++i)
 		{
 			t_old = -r+i;
 			t_new = i;
@@ -370,22 +358,18 @@ void GlChartViewSeries::SetMaxSize(int max)
 			{
 				int y = 0;
 			}
-			x.set(t_new, x.get(t_old));
-			y.set(t_new, y.get(t_old));
-			z.set(t_new, z.get(t_old));
-			w.set(t_new, w.get(t_old));
+			x[t_new] = x[t_old];
+			y[t_new] = y[t_old];
+			z[t_new] = z[t_old];
+			w[t_new] = w[t_old];
 		}
 		current_ind = max-1;
 		this->size = max;
 		this->max_size = max;
-		this->x.capacity(max);
-		this->x.size(max);
-		this->y.capacity(max);
-		this->y.size(max);
-		this->z.capacity(max);
-		this->z.size(max);
-		this->w.capacity(max);
-		this->w.size(max);
+		this->x.resize(max);
+		this->y.resize(max);
+		this->z.resize(max);
+		this->w.resize(max);
 	}
 
 }
@@ -408,37 +392,37 @@ void GlChartViewSeries::Push(SrQuat& quat)
 
 void GlChartViewSeries::SetLast(float x)
 {
-	this->x.set(current_ind, x);
+	this->x[current_ind] = x;
 }
 
 void GlChartViewSeries::SetLast(float x, float y, float z)
 {
-	this->x.set(current_ind, x);
-	this->y.set(current_ind, y);
-	this->z.set(current_ind, z);
+	this->x[current_ind] = x;
+	this->y[current_ind] = y;
+	this->z[current_ind] = z;
 }
 
 void GlChartViewSeries::SetLast(float x, float y, float z, float w)
 {
-	this->x.set(current_ind, x);
-	this->y.set(current_ind, y);
-	this->z.set(current_ind, z);
-	this->w.set(current_ind, w);
+	this->x[current_ind] = x;
+	this->y[current_ind] = y;
+	this->z[current_ind] = z;
+	this->w[current_ind] = w;
 }
 
 void GlChartViewSeries::SetLast(SrVec& quat)
 {
-	this->x.set(current_ind, quat.x);
-	this->y.set(current_ind, quat.y);
-	this->z.set(current_ind, quat.z);
+	this->x[current_ind] = quat.x;
+	this->y[current_ind] = quat.y;
+	this->z[current_ind] = quat.z;
 }
 
 void GlChartViewSeries::SetLast(SrQuat& quat)
 {
-	this->x.set(current_ind, quat.x);
-	this->y.set(current_ind, quat.y);
-	this->z.set(current_ind, quat.z);
-	this->w.set(current_ind, quat.w);
+	this->x[current_ind] =quat.x;
+	this->y[current_ind] = quat.y;
+	this->z[current_ind] = quat.z;
+	this->w[current_ind] = quat.w;
 }
 
 
@@ -454,10 +438,11 @@ GlChartViewArchive::~GlChartViewArchive()
 	int num = series_list.size();
 	for(int i = 0; i < num; ++i)
 	{
-		series = series_list.pop();
+		series = series_list[i];
 		series->Clear();
 		delete series;
 	}
+	series_list.clear();
 
 }
 
@@ -470,25 +455,28 @@ void GlChartViewArchive::NewSeries(const char* title, int type, int buffer_index
 	if(series_list.size() == 0) series->SetRGBColor();
 	else series->SetColorOnBufferIndex();
 	series->SetMaxSize(0);
-	series_list.push() = series;
+	series_list.push_back(series);
 }
 
 void GlChartViewArchive::AddSeries(GlChartViewSeries* series)
 {
-	series_list.push() = series;
+	series_list.push_back(series);
 }
 
 void GlChartViewArchive::DeleteSeries(const char* title)
 {
 	GlChartViewSeries* series = NULL;
-	for(int i = 0; i < series_list.size(); ++i)
+	for (std::vector<GlChartViewSeries*>::iterator iter = series_list.begin();
+		 iter != series_list.end();
+		 iter++)
 	{
-		series = series_list.get(i);
+		series = (*iter);
 		if(strcmp(series->title.c_str(), title) == 0)
 		{
 			series->Clear();
 			delete series;
-			series_list.remove(i, 1);
+			series_list.erase(iter);
+			break;
 		}
 	}
 }
@@ -496,11 +484,21 @@ void GlChartViewArchive::DeleteSeries(const char* title)
 void GlChartViewArchive::DeleteSeries(int index)
 {
 	GlChartViewSeries* series = NULL;
-	series = series_list.get(index);
-	series->Clear();
-	delete series;
-	series_list.remove(index, 1);
-
+	int count = 0;
+	for (std::vector<GlChartViewSeries*>::iterator iter = series_list.begin();
+		 iter != series_list.end();
+		 iter++)
+	{
+		if (count == index)
+		{
+			series = (*iter);
+			series->Clear();
+			delete series;
+			series_list.erase(iter);
+			break;
+		}
+	}
+	
 }
 
 void GlChartViewArchive::ClearSeries()
@@ -509,16 +507,16 @@ void GlChartViewArchive::ClearSeries()
 	int num = series_list.size();
 	for(int i = 0; i < num; ++i)
 	{
-		series = series_list.get(i);
+		series = series_list[i];
 		series->Clear();
 		delete series;
 	}
-	series_list.size(0);
+	series_list.clear();
 }
 
 GlChartViewSeries* GlChartViewArchive::GetLastSeries()
 {
-	return series_list.get(series_list.size()-1);
+	return series_list[series_list.size()-1];
 }
 
 int GlChartViewArchive::GetSeriesCount()
@@ -528,14 +526,15 @@ int GlChartViewArchive::GetSeriesCount()
 
 GlChartViewSeries* GlChartViewArchive::GetSeries(int index)
 {
-	return series_list.get(index);
+	return series_list[index];
 }
 
 GlChartViewSeries* GlChartViewArchive::GetSeries(const char* title)
 {
-	for(int i = 0; i < series_list.size(); ++i)
+	for(size_t i = 0; i < series_list.size(); ++i)
 	{
-		if(strcmp(series_list.get(i)->title.c_str(), title) == 0) return series_list.get(i);
+		if(strcmp(series_list[i]->title.c_str(), title) == 0) 
+			return series_list[i];
 	}
 	return NULL;
 }
@@ -545,9 +544,9 @@ void GlChartViewArchive::Update(SrBuffer<float>& buffer)
 	GlChartViewSeries* series = NULL;
 	float x, y, z, w;
 	int buffer_index = 0;
-	for(int i = 0; i < series_list.size(); ++i)
+	for(size_t i = 0; i < series_list.size(); ++i)
 	{
-		series = series_list.get(i);
+		series = series_list[i];
 		buffer_index = series->GetBufferIndex();
 
 		if(series->data_type >= CHART_DATA_TYPE_VALUE) x = buffer[buffer_index];

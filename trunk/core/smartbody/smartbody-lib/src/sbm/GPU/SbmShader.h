@@ -8,7 +8,10 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #else
-#include "external/glew/glew.h"
+//#include "external/glew/glew.h"
+#include <windows.h>
+# include <GL/gl.h>
+# include <GL/glu.h>
 #endif
 #include <sr/sr_viewer.h>
 #include <vector>
@@ -57,23 +60,14 @@ private:
 	SBAPI SbmShaderManager(void);
 	SBAPI ~SbmShaderManager(void);
 public:
-	SBAPI static SbmShaderManager& singleton() 
-	{
-		if (!_singleton)
-			_singleton = new SbmShaderManager();
-		return *_singleton;			
-	}
+	SBAPI static SbmShaderManager& singleton();
+	SBAPI static void destroy_singleton();
 
-	SBAPI static void destroy_singleton() {
-		if( _singleton )
-			delete _singleton;
-		_singleton = NULL;
-	}
 	SBAPI bool initOpenGL();
 	SBAPI bool initGLExtension();	
 	SBAPI void setViewer(SrViewer* vw);	
 	SBAPI void addShader(const char* entryName,const char* vsName, const char* fsName, bool shaderFile = true);
 	SBAPI SbmShaderProgram* getShader(const std::string& entryName);
 	SBAPI void buildShaders();
-	SBAPI static int getShaderSupport() { return shaderSupport; }
+	SBAPI static int getShaderSupport();
 };

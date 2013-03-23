@@ -1,4 +1,4 @@
-
+#include <sb/SBTypes.h>
 #include <string>
 #include <vector>
 
@@ -40,12 +40,12 @@ public:
    void Close();
 
    void SetSBScene(SmartBody::SBScene * scene) { m_scene = scene; }
-   void SetID(const std::string & id);
-   const std::string& GetID();
+   SBAPI void SetID(const std::string & id);
+   SBAPI const std::string& GetID();
 
    void Update();
 
    void GenerateInitHierarchyMsg(SmartBody::SBJoint * root, std::string & msg, int tab);
 
-   void ProcessVHMsgs(const char * op, const char * args);
+   SBAPI void ProcessVHMsgs(const char * op, const char * args);
 };

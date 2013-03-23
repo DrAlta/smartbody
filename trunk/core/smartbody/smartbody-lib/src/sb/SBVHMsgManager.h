@@ -29,6 +29,8 @@ class SBVHMsgManager : public SBService
 		SBAPI int send(const char *op, const char* message);
 		SBAPI int send(const char* message);
 
+		SBAPI int poll();
+
 		SBAPI void setPort(const std::string& port);
 		SBAPI const std::string& getPort();
 		SBAPI void setServer(const std::string& server);

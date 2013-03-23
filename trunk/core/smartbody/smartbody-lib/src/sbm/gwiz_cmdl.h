@@ -1,6 +1,8 @@
 #ifndef GWIZ_CMDL_H
 #define GWIZ_CMDL_H
 
+#include <sb/SBTypes.h>
+
 #include	<string>
 #include	<list>
 
@@ -76,7 +78,7 @@ class line_editor	{
 		int query( bool v_key = false, bool v_tab = false );
 
 		void render_stats( void );
-		void render_line( bool diagnostic = false );
+		SBAPI void render_line( bool diagnostic = false );
 
 		std::string line;
 		int prev_len;
@@ -94,8 +96,8 @@ class cmdl : public line_editor	{
 	
 	public:
 
-		cmdl( void );
-		virtual ~cmdl( void );
+		SBAPI cmdl( void );
+		SBAPI virtual ~cmdl( void );
 
 		void set_verbose( bool key, bool line, bool tab, bool diagnostic )	{
 			verbose_key = key;
@@ -104,11 +106,11 @@ class cmdl : public line_editor	{
 			diagnostic_chars = diagnostic;
 		}
 
-		bool pending( std::string prompt = "> " );
+		SBAPI bool pending( std::string prompt = "> " );
 
 		std::string test_query( std::string src_str = "" );
 		std::string test_prompt( std::string src_str = "" );
-		std::string test_editor( std::string src_str = "" );
+		SBAPI std::string test_editor( std::string src_str = "" );
 
 		static std::string query_callback( std::string src_str )	{
 			cmdl cl; return( cl.test_query( src_str ) );
@@ -120,7 +122,7 @@ class cmdl : public line_editor	{
 			cmdl cl; return( cl.test_editor( src_str ) );
 		}
 
-		void render_prompt( std::string prompt = "> " );
+		SBAPI void render_prompt( std::string prompt = "> " );
 
 	private:
 

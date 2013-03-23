@@ -24,11 +24,12 @@
 #ifndef __SBM_AUDIO_H
 #define __SBM_AUDIO_H
 
+#include <sb/SBTypes.h>
 
-bool AUDIO_Init();
+SBAPI bool AUDIO_Init();
 void AUDIO_Play( const char * audio_file );
 void AUDIO_Stop( const char * audio_file );
-void AUDIO_Close();
+SBAPI void AUDIO_Close();
 
 
 #endif // __SBM_AUDIO_H

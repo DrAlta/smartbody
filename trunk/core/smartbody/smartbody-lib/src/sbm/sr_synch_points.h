@@ -23,6 +23,7 @@
 #ifndef SR_SYNCH_POINTS_H
 #define SR_SYNCH_POINTS_H
 
+#include <sb/SBTypes.h>
 #include <stdio.h>
 #include <vhcl_log.h>
 #include <sbm/sr_linear_curve.h>
@@ -166,8 +167,8 @@ class srSynchPoints	{
 		void set_stop( double at_time );
 
 	// queries:
-		bool set_time( int tag, double t );
-		double get_time( int tag, bool global = false );
+		SBAPI bool set_time( int tag, double t );
+		SBAPI double get_time( int tag, bool global = false );
 		double get_interval( int fr_tag, int to_tag );
 		double get_interval_to( int to_tag );
 		double get_interval_from( int fr_tag );

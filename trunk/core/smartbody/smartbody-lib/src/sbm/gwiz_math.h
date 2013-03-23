@@ -63,6 +63,9 @@
 */
 
 ////////////////////////////////
+
+#include <sb/SBTypes.h>
+
 #include <math.h>
 #include <stdio.h>
 
@@ -449,20 +452,20 @@ class quat_t {
 #endif
 
 	// CONSTRUCT
-        inline quat_t( void )
+        SBAPI quat_t( void )
             { W = 1.0; X = 0.0; Y = 0.0; Z = 0.0; }
-        inline quat_t( float w_in, float x_in, float y_in, float z_in )
+        SBAPI quat_t( float w_in, float x_in, float y_in, float z_in )
             { set( w_in, x_in, y_in, z_in ); }
-        inline quat_t( float_t w_in, float_t x_in, float_t y_in, float_t z_in )
+        SBAPI quat_t( float_t w_in, float_t x_in, float_t y_in, float_t z_in )
             { set( (float_t)w_in, (float_t)x_in, (float_t)y_in, (float_t)z_in ); }
-		quat_t( const vector_t& axis_angle );
+		SBAPI quat_t( const vector_t& axis_angle );
 		
-		quat_t( float_t angle, const vector_t& v, int use_radians = 0 );
-		quat_t( float_t swing_x, float_t swing_y, float_t twist, int use_radians = 0 );
-        quat_t( const vector_t& z_axis, const vector_t& y_axis_approx );
+		SBAPI quat_t( float_t angle, const vector_t& v, int use_radians = 0 );
+		SBAPI quat_t( float_t swing_x, float_t swing_y, float_t twist, int use_radians = 0 );
+        SBAPI quat_t( const vector_t& z_axis, const vector_t& y_axis_approx );
 
 	// CONVERT CONSTRUCT
-		quat_t( const euler_t& e );
+		SBAPI quat_t( const euler_t& e );
 
 	// WRITE
 		inline void set( float_t w_in, float_t x_in, float_t y_in, float_t z_in ) 
@@ -506,7 +509,7 @@ class quat_t {
 		inline quat_t shortest( const quat_t& q_ref ) const 
 			{ if( dot( q_ref ) < 0.0 ) return( complement() ); return( *this ); }
 
-		quat_t& normalize( void );
+		SBAPI quat_t& normalize( void );
 
 		quat_t lerp( float_t s, const quat_t& q ) const;
 		inline quat_t& lerp( float_t s, const quat_t& q0, const quat_t& q1 ) 
@@ -618,15 +621,15 @@ class euler_t {
 #endif
 
 	// CONSTRUCT
-        inline euler_t( void )
+        SBAPI euler_t( void )
             { X = 0.0; Y = 0.0; Z = 0.0; }
-        inline euler_t( float_t x_in, float_t y_in, float_t z_in )
+        SBAPI euler_t( float_t x_in, float_t y_in, float_t z_in )
             { X = x_in; Y = y_in; Z = z_in; }
-        euler_t( const vector_t& z_axis, float_t roll_deg ); // NOTE: flipped lookat
-        euler_t( const vector_t& z_axis, const vector_t& y_axis_approx ); // NOTE: flipped lookat
+        SBAPI euler_t( const vector_t& z_axis, float_t roll_deg ); // NOTE: flipped lookat
+        SBAPI euler_t( const vector_t& z_axis, const vector_t& y_axis_approx ); // NOTE: flipped lookat
 
 	// CONVERT CONSTRUCT
-		euler_t( const quat_t& q );
+		SBAPI euler_t( const quat_t& q );
 
 	// WRITE
 		inline void x( float_t x_in ) { X = x_in; }

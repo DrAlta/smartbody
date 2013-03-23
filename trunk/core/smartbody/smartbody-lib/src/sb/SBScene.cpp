@@ -82,6 +82,23 @@ bool SBScene::_firstTime = true;
 
 std::map<std::string, std::string> SBScene::_systemParameters;
 
+
+class ForwardLogListener : public vhcl::Log::Listener
+{
+    public:
+		ForwardLogListener() {}
+		virtual ~ForwardLogListener() {}
+
+        virtual void OnMessage( const std::string & message )
+		{
+			SBScene* scene = SmartBody::SBScene::getScene();
+			SmartBody::SBCharacterListener* listener = scene->getCharacterListener();
+			if (listener)
+				listener->OnLogMessage(message);
+		}
+};
+
+
 SBScene::SBScene(void) : SBObject()
 {
 	initialize();
@@ -89,9 +106,6 @@ SBScene::SBScene(void) : SBObject()
 
 void SBScene::initialize()
 {
-	
-
-
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
 //	_mainModule = NULL;
@@ -155,6 +169,12 @@ void SBScene::initialize()
 	createStringAttribute("defaultRecipient","ALL",true,"",550,false,false,false,"Default recipient when processing BML.");
 	createIntAttribute("queuedCommandsIndex",1,true,"",560,false,false,false,"Unique identifier when executing sequence commands.");
 	createIntAttribute("bmlIndex",1,true,"",560,false,false,false,"Unique identifier when executing BML commands.");
+	BoolAttribute* consoleAttr = createBoolAttribute("enableConsoleLogging",false,true,"",70,false,false,false,"Use SmartBody's internal audio player.");
+	
+	ForwardLogListener* forwardListener = new ForwardLogListener();
+	vhcl::Log::g_log.AddListener(forwardListener);
+
+	//consoleAttr->setValue(true); // set up the console logging
 	
 	_mediaPath = ".";
 		// re-initialize
@@ -843,6 +863,22 @@ void SBScene::notify( SBSubject* subject )
 			AUDIO_Init();
 		}
 		return;
+	}
+	else if (boolAttr && boolAttr->getName() == "enableConsoleLogging")
+	{
+		bool val = boolAttr->getValue();
+		if (val)
+		{
+			if (vhcl::Log::g_log.IsEnabled())
+				return;
+
+			vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
+			vhcl::Log::g_log.AddListener(listener);
+		}
+		else
+		{
+			vhcl::Log::g_log.RemoveAllListeners();
+		}
 	}
 
 	DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(subject);

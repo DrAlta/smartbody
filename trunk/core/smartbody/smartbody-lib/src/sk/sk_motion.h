@@ -26,6 +26,7 @@
 # ifndef SK_MOTION_H
 # define SK_MOTION_H
 
+#include <sb/SBTypes.h>
 # include <sr/sr_input.h>
 # include <sr/sr_shared_class.h>
 # include <sk/sk_channel_array.h>
@@ -184,13 +185,13 @@ public :
 	/*! Apply frame f to the attached skeleton or connected ChannelArray.
 	Only sucessfully matched channels are used. Parameter f can
 	be out of range to specify extreme postures. */
-	void apply_frame ( int f );
+	SBAPI void apply_frame ( int f );
 
 	/*! Apply frame f to the attached skeleton. Will only work if an
 	skeleton was connected to the motion with method connect.
 	Only sucessfully matched channels are used. Parameter f can
 	be out of range to specify extreme postures. */
-	void apply_frame ( int f, float* buffer, SrBuffer<int>* map_p, bool isAdditive = false );	
+	SBAPI void apply_frame ( int f, float* buffer, SrBuffer<int>* map_p, bool isAdditive = false );	
 
 	/*! Interpolation type used by apply */
 	enum InterpType { Linear, CubicSpline };
@@ -201,7 +202,7 @@ public :
 	serves as a starting point for the search, resulting in maximum efficiency.
 	To optimize evaluations from several controllers sharing a same motion file,
 	parameter lastframe can be used and will store the last frame used per controller. */
-	void apply ( float t, InterpType=Linear, int* lastframe=NULL, SmartBody::SBRetarget* retarget = NULL );
+	SBAPI void apply ( float t, InterpType=Linear, int* lastframe=NULL, SmartBody::SBRetarget* retarget = NULL );
 
 	/*! Evaluates and apply the motion at time t to any float* buffer (or channel joints if NULL).
 	Unless map_p is specified, the buffer is assumed to be in motion's channel order with all channels present.
@@ -210,7 +211,7 @@ public :
 	serves as a starting point for the search, resulting in maximum efficiency.
 	To optimize evaluations from several controllers sharing a same motion file,
 	parameter lastframe can be used and will store the last frame used per controller. */
-	void apply ( float t, float* buffer, SrBuffer<int>* map_p, InterpType=Linear, int* lastframe=NULL, bool isAdditive = false, SmartBody::SBRetarget* retarget = NULL );
+	SBAPI void apply ( float t, float* buffer, SrBuffer<int>* map_p, InterpType=Linear, int* lastframe=NULL, bool isAdditive = false, SmartBody::SBRetarget* retarget = NULL );
 
 	void applyNew ( float t, float* buffer, SrBuffer<int>* map_p, InterpType=Linear, int* lastframe=NULL, bool isAdditive = false, SmartBody::SBRetarget* retarget = NULL );
 
@@ -245,7 +246,7 @@ public :
 	SkMotion* buildSmoothMotionCycle(float timeInterval);
 
 	// retarget the motion from source skeleton to target skeleton
-	SkMotion* buildRetargetMotionV2(SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, 
+	SBAPI SkMotion* buildRetargetMotionV2(SkSkeleton* sourceSk, SkSkeleton* targetSk, std::vector<std::string>& endJoints, 
 									std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJoints);
 
 #if 0

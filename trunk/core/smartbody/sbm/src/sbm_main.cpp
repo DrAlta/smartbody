@@ -1144,8 +1144,8 @@ int main( int argc, char **argv )	{
 #if LINK_VHMSG_CLIENT
 		if (SmartBody::SBScene::getScene()->getVHMsgManager()->isEnable())
 		{
-			err = vhmsg::ttu_poll();
-			if( err == vhmsg::TTU_ERROR )	{
+			err = SmartBody::SBScene::getScene()->getVHMsgManager()->poll();
+			if( err == CMD_FAILURE )	{
 				fprintf( stderr, "ttu_poll ERROR\n" );
 			}
 		}

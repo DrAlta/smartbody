@@ -20,6 +20,7 @@ class FLTKListener : public SmartBody::SBCharacterListener, public SmartBody::SB
       virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime );
 	  virtual void OnChannel( const std::string & name, const std::string & channelName, const float value);
 	  virtual void OnReset();
+	  virtual void OnLogMessage( const std::string & message );
 
 	  virtual void notify(SmartBody::SBSubject* subject);
 
