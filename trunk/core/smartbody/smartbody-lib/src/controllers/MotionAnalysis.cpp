@@ -358,15 +358,16 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 			legState.cycleTime += normalizeCycle*legCycle->cycleDuration*(float)weights[i];
 			legState.timeToNextCycle += (1.f-normalizeCycle)*legCycle->cycleDuration*(float)weights[i];
 
-			if (legState.prevMotionCycle[i] != legCycle->cycleIdx)
+			if (k == 0 && legState.prevMotionCycle[i] != legCycle->cycleIdx)
 			{
-				LOG("motion %s, time = %f, prevCycle = %d, nextCycle = %d",analyzer->getMotionName().c_str(), timeManager->getNormalizeLocalTime(), legState.prevMotionCycle[i], legCycle->cycleIdx);
+				//LOG("motion %s, time = %f, prevCycle = %d, nextCycle = %d",analyzer->getMotionName().c_str(), timeManager->getNormalizeLocalTime(), legState.prevMotionCycle[i], legCycle->cycleIdx);
 			}
 			if (i==maxWeightIndex) // only test the motion with maximum weight
 			{
 				if (legState.prevCycle != legCycle->cycleIdx)
 				{
-					LOG("dominant motion %s, time = %f, prevCycle = %d, nextCylce = %d",analyzer->getMotionName().c_str(), timeManager->getNormalizeLocalTime(), legState.prevCycle, legCycle->cycleIdx);
+					//if (k==0)
+					//	LOG("dominant motion %s, time = %f, prevCycle = %d, nextCylce = %d",analyzer->getMotionName().c_str(), timeManager->getNormalizeLocalTime(), legState.prevCycle, legCycle->cycleIdx);
 					legState.newCycle = true;					
 				}
 				legState.prevCycle = legCycle->cycleIdx;
