@@ -92,6 +92,8 @@ class ForwardLogListener : public vhcl::Log::Listener
         virtual void OnMessage( const std::string & message )
 		{
 			SBScene* scene = SmartBody::SBScene::getScene();
+			if (!scene)
+				return;
 			SmartBody::SBCharacterListener* listener = scene->getCharacterListener();
 			if (listener)
 				listener->OnLogMessage(message);
@@ -171,6 +173,7 @@ void SBScene::initialize()
 	createIntAttribute("bmlIndex",1,true,"",560,false,false,false,"Unique identifier when executing BML commands.");
 	BoolAttribute* consoleAttr = createBoolAttribute("enableConsoleLogging",false,true,"",70,false,false,false,"Use SmartBody's internal audio player.");
 	
+	vhcl::Log::g_log.RemoveAllListeners();
 	ForwardLogListener* forwardListener = new ForwardLogListener();
 	vhcl::Log::g_log.AddListener(forwardListener);
 
