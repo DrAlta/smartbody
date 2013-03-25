@@ -44,6 +44,8 @@ SBVHMsgManager::SBVHMsgManager() : SBService()
 {
 	setEnable(false);
 
+	setName("VHMsg");
+
 	_port = "61616";
 	_server = "localhost";
 	_scope = "DEFAULT_SCOPE";

@@ -4,6 +4,19 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBPython.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBCharacterListener.h>
+
+class SimpleListener : public SmartBody::SBCharacterListener
+{
+   public:
+	   SimpleListener() {}
+	   ~SimpleListener() {}
+     
+	  virtual void OnLogMessage( const std::string & message )
+	  {
+		  LOG(message.c_str());
+	  }
+};
 
 int main( int argc, char ** argv )
 {
@@ -18,6 +31,8 @@ int main( int argc, char ** argv )
 
 	// get the scene object
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SimpleListener listener;
+	scene->setCharacterListener(&listener);
 
 	// set the mediapath which dictates the top-level asset directory
 	scene->setMediaPath("../../../../data");

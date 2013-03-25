@@ -91,6 +91,12 @@ static int inihandler(void* user, const char* section, const char* name,
 		// make sure that the media path is run first
 		renderer->m_initialCommands.insert(renderer->m_initialCommands.begin(), temp);
     }
+	else if (MATCH("GENERAL", "PythonLibPath"))
+	{
+		std::string temp = "python scene.setMediaPath(\"" + std::string(value) + "\")";
+		// make sure that the media path is run first
+		renderer->m_initialCommands.insert(renderer->m_initialCommands.begin(), temp);
+    }
 	else if (MATCH("GENERAL", "Scene"))
 	{
 		renderer->m_initialMeshName = std::string(value);
@@ -222,9 +228,10 @@ int main(int argc, char* argv[])
 			printf("\n");
 			printf("[GENERAL]\n");
 			printf("UseBoneBus=false\n");
-			printf("ScriptPath=../../../../data/sbm-common/scripts\n");
+			printf("ScriptPath=sbm-common/scripts\n");
 			printf("[DefaultPyFile=default-init.py\n");
-			printf("[MediaPath=.\n");
+			printf("[MediaPath=../../../../data\n");
+			printf("[PythonLibPath=.\n");
 			printf("[Scene=vh_basic_level.mesh\n");
 			
 			return 0;

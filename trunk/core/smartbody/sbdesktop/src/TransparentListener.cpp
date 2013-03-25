@@ -235,3 +235,9 @@ void TransparentListener::notify(SmartBody::SBSubject* subject)
 	}
 }
 
+void TransparentListener::OnLogMessage(const std::string& message)
+{
+	LOG(message.c_str());
+}
+
+
