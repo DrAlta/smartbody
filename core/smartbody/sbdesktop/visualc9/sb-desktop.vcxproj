@@ -102,8 +102,8 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\src;..\..\smartbody-lib\src;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk-1.3.0rc6;..\..\..\..\lib\xerces-c\include;..\..\..\..\lib\boost;..\..\sbm-ui\panimationviewer\src;..\..\sbm-ui\bmlviewer\src;..\..\sbm\src\channelbufferviewer;..\..\..\..\lib\ANN;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SB_EXPORTS;WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\src;..\..\..\..\core\smartbody\smartbody-lib\src;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\..\..\lib\xerces-c\include;..\..\..\..\lib\boost;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\..\core\smartbody\Python26\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -121,9 +121,9 @@
     </ProjectReference>
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libFestival.lib;libestbase.lib;libestools.lib;libeststring.lib;Smartbodyd.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc100-mt-gd-1_44.lib;boost_system-vc100-mt-gd-1_44.lib;boost_regex-vc100-mt-gd-1_44.lib;boost_python-vc100-mt-gd-1_44.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;fltkgld.lib;fltkd.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAId.lib;steerlibd.lib;ode_doubled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Smartbody_d.lib;glew32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc100-mt-gd-1_44.lib;boost_system-vc100-mt-gd-1_44.lib;boost_regex-vc100-mt-gd-1_44.lib;boost_python-vc100-mt-gd-1_44.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\bin\sbdesktopd.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\smartbody-lib\lib;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk-1.3.0rc6\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\sbm-ui\panimationviewer\lib;..\..\sbm-ui\bmlviewer\lib;..\..\ode\lib;..\..\clapack\lib;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug;..\..\..\..\core\smartbody\Python26\libs;C:\ICT\vh\trunk\core\nvb_generator\charniak-windows;..\..\..\..\lib\festival\festival\src\lib;..\..\..\..\lib\festival\speech_tools\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\SmartBody\lib;..\..\smartbody-lib\src\external\glew;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\..\..\core\smartbody\Python26\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -135,7 +135,9 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
+      <Command>copy /Y ..\..\..\..\core\smartbody\SmartBody\lib\SmartBody_d.dll ..\bin
+copy /Y ..\..\..\..\core\smartbody\smartbody-lib\src\external\glew\glew32.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\alut.dll ..\bin
@@ -195,7 +197,7 @@ copy /Y default.py ..\..\..\..\bin\smartbody\sbdesktop\bin
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>..\src;..\..\smartbody-lib\src;..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;..\..\fltk-1.3.0rc6;..\..\..\..\lib\xerces-c\include;..\..\..\..\lib\boost;..\..\sbm-ui\panimationviewer\src;..\..\sbm-ui\bmlviewer\src;..\..\sbm-ui\channelbufferviewer\src;..\..\sbm-ui\retargetviewer\src;..\..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python26\include;C:\ICT\vh\trunk\core\nvb_generator\charniak-windows\PARSE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SB_EXPORTS;WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>
@@ -213,9 +215,9 @@ copy /Y default.py ..\..\..\..\bin\smartbody\sbdesktop\bin
     </ProjectReference>
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libFestival.lib;libestbase.lib;libestools.lib;libeststring.lib;Smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;fltk.lib;fltkgl.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_44.lib;boost_system-vc100-mt-1_44.lib;boost_regex-vc100-mt-1_44.lib;boost_python-vc100-mt-1_44.lib;dbghelp.lib;opengl32.lib;glu32.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAI.lib;steerlib.lib;ode_double.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Smartbody.lib;glew32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_44.lib;boost_system-vc100-mt-1_44.lib;boost_regex-vc100-mt-1_44.lib;boost_python-vc100-mt-1_44.lib;dbghelp.lib;opengl32.lib;glu32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\bin\sbdesktop.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\smartbody-lib\lib;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk-1.3.0rc6\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\..\..\lib\festival\speech_tools\lib;..\..\..\..\lib\festival\festival\src\lib;..\..\sbm-ui\panimationviewer\lib;..\..\sbm-ui\bmlviewer\lib;..\..\sbm-ui\channelbufferviewer\lib;..\..\clapack\lib;..\..\ode\lib;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release;..\..\..\..\core\smartbody\Python26\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\SmartBody\lib;..\..\smartbody-lib\src\external\glew;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\..\..\core\smartbody\Python26\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -225,7 +227,9 @@ copy /Y default.py ..\..\..\..\bin\smartbody\sbdesktop\bin
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
+      <Command>copy /Y ..\..\..\..\core\smartbody\SmartBody\lib\SmartBody.dll ..\bin
+copy /Y ..\..\..\..\core\smartbody\smartbody-lib\src\external\glew\glew32.dll ..\bin
+copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\alut.dll ..\bin

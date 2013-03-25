@@ -21,7 +21,7 @@
 #include <sr/sr_camera.h>
 #include <sr/sr_light.h>
 #include <sr/sr_gl.h>
-# include <sr/sr_sn_group.h>
+#include <sr/sr_sn_group.h>
 #include <external/glew/wglew.h>
 #include <vector>
 #include <sbm/GPU/SbmShader.h>
