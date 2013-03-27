@@ -225,6 +225,21 @@ class Scene:
 							char.SetRotQuat(Converter.Sbm2Panda_Quat(Quat(x, y, z, w)))
 				except ValueError:
 					print "Bad SetActorRot data"				
+		elif (command == "SetActorViseme"):
+			if (len(arguments) > 3):
+				
+				try:
+					charID 	= int(arguments[0])
+					visemeId = int(arguments[1])
+					weight = float(arguments[2])
+					blendTime = float(arguments[3])
+					char = self.Characters.get(charID)
+				
+					if (char != None):
+						if (not self.IgnorePawnPosRot(char)):						
+							char.SetViseme(visemeId, weight, blendTime)
+				except ValueError:
+					print "Bad SetActorViseme data"									
 				
 					
 		elif (command == "SpeakText"):
@@ -253,7 +268,20 @@ class Scene:
 						if (char != None):
 							char.AddBoneBusMap(boneName, int(id))
 				except ValueError:
-					print "Bad SetBoneId data"								
+					print "Bad SetBoneId data"			
+		elif (command == "SetVisemeId"):
+			if (len(arguments) > 2):
+				try:
+					charName	= arguments[0]
+					visemeName	= arguments[1]
+					id 			= arguments[2]
+					char = self.Characters.get(int(charName))
+					
+					if len(id) != 0:
+						if (char != None):
+							char.AddVisemeMap(visemeName, int(id))
+				except ValueError:
+					print "Bad SetVisemeId data"											
 			
 			"""
 		elif (command == "SetPawnPosHpr"):
