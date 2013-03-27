@@ -90,11 +90,23 @@ class CharacterPawn(Pawn):
 		self.__boneBusRotTimes = {}
 		self.__boneBusPosTimes = {}
 		self.__visemeMap = {}
+		self.__morphTargetMap = {}
+		self.__morphTargetCounter = 0
 		self.InitSkeleton()
+		
 		
 		taskMgr.add(self.__StepBML, "Char" + self.GetName() + "_BmlLoop")
 		
 		print("Character '" + self.GetName() +  "' loaded in %2.3f sec" % (time.time() - t))
+		# add morph target map here:
+		#self.__morphTargetMap["blink"] = "BlendShapes.0"
+		#self.__morphTargetMap["D"] = "BlendShapes.1"
+		#self.__morphTargetMap["EE"] = "BlendShapes.2"
+		#self.__morphTargetMap["Er"] = "BlendShapes.3"
+		#self.__morphTargetMap["f"] = "BlendShapes.4"
+		#self.__morphTargetMap["j"] = "BlendShapes.5"
+		#self.__morphTargetMap["KG"] = "BlendShapes.6"
+		#self.__morphTargetMap["Ih"] = "BlendShapes.7"
 		
 	def __StepBML(self, task = None):
 		""" Checks if there is any BML in the queue and sends it out to SmartBody if we are connected """
@@ -283,9 +295,24 @@ class CharacterPawn(Pawn):
 	def SetViseme(self, visemeId, weight, blend):
 		# get the mapped viseme name
 		mappedViseme = self.GetVisemeMap(visemeId)
-		#print "Now playing " + mappedViseme + " with weight " + str(weight)
 		
-
+		try:
+			morphTarget = self.__morphTargetMap[mappedViseme]
+			# get the joint id
+			pandaJointID = self.JointNameToID(morphTarget)
+			
+			joint = self.FindJoint(pandaJointID)
+			if joint is not None:
+				joint.setX(weight)
+		except:
+			print "Cannot find morph target for viseme " + mappedViseme + " on character " + self.GetName()
+			# add a dummy value
+			self.__morphTargetMap[mappedViseme] = "unknown" + str(self.__morphTargetCounter)
+			self.__morphTargetCounter = self.__morphTargetCounter + 1
+			
+		
+	
+		
 	def RegisterInit(self):
 		""" Registers the character with a connected SmartBody client so
 			that the character is initialized in SB"""
