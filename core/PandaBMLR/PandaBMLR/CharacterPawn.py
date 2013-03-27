@@ -89,6 +89,7 @@ class CharacterPawn(Pawn):
 		self.__boneBusMap = {}
 		self.__boneBusRotTimes = {}
 		self.__boneBusPosTimes = {}
+		self.__visemeMap = {}
 		self.InitSkeleton()
 		
 		taskMgr.add(self.__StepBML, "Char" + self.GetName() + "_BmlLoop")
@@ -258,7 +259,7 @@ class CharacterPawn(Pawn):
 				joint.setQuat(quat)
 						
 	def SetJointPos(self, time, boneBusjointID, vec3):
-		""" Sets the position of a joint. Input is relative to the start position of that join  """
+		""" Sets the position of a joint. Input is relative to the start position of that joint  """
 		# make sure the timing of the joint data is for a future time
 		val = self.__boneBusPosTimes.get(boneBusjointID, -100)
 		if val == -100:
@@ -278,6 +279,12 @@ class CharacterPawn(Pawn):
 		
 		if (joint != None):
 			joint.setPos(vec3)
+			
+	def SetViseme(self, visemeId, weight, blend):
+		# get the mapped viseme name
+		mappedViseme = self.GetVisemeMap(visemeId)
+		#print "Now playing " + mappedViseme + " with weight " + str(weight)
+		
 
 	def RegisterInit(self):
 		""" Registers the character with a connected SmartBody client so
@@ -328,6 +335,15 @@ class CharacterPawn(Pawn):
 		""" retrieves the mapping between the bone name and the bone id """
 		x = self.__boneBusMap[boneId]
 		return x
+		
+	def AddVisemeMap(self, visemeName, visemeId):
+		""" mapping between the viseme name and the viseme id """
+		self.__visemeMap[visemeId] = visemeName
+		
+	def GetVisemeMap(self, visemeId):
+		""" retrieves the mapping between the viseme name and the viseme id """
+		x = self.__visemeMap[visemeId]
+		return x		
 	
 			
 class BubbleManager:
