@@ -56,6 +56,7 @@ struct LocomotionLegCycle
 	std::vector<LegCycleSample> samples;
 public:	
 	SrVec getSupportPos(float motionTime, int idx);	
+	SrVec getSupportPosNormalize(float normalizeTime, int idx);
 	SrVec getStanceSupportPos(int idx);	
 	float getTransitionWeight(float motionTime, int& phase);
 	float getNormalizedCycleTime(float motionTime);
@@ -79,6 +80,7 @@ public:
 	std::string getMotionName();
 	void initLegCycles(const std::string& name, SmartBody::SBAnimationBlend* locoBlend, KeyTagMap& keyTag, SmartBody::SBSkeleton* skelCopy);
 	LocomotionLegCycle* getLegCycle(int iLeg, float motionTime);	
+	LocomotionLegCycle* getLegCycleByIndex(int iLeg, int cycleIdx);
 protected:
 	double getKeyTagTime(const std::string& key, int iCycle, KeyTag& tag);
 	void sampleLegCycle(LegInfo* legInfo, LocomotionLegCycle& legCycle, SmartBody::SBMotion* motion, SmartBody::SBSkeleton* skel, int nSample);
