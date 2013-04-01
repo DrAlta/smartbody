@@ -804,7 +804,29 @@ void BaseWindow::CameraResetCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::CameraFrameCB(Fl_Widget* widget, void* data)
 {
-	SmartBody::SBScene::getScene()->command((char*)"camera frame");
+	//SmartBody::SBScene::getScene()->command((char*)"camera frame");
+	SrBox sceneBox;
+	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+	if (!camera) return;
+
+	const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
+		iter != pawnNames.end();
+		iter++)
+	{
+		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(*iter);
+		bool visible = pawn->getBoolAttribute("visible");
+		if (!visible)
+			continue;
+		SrBox box = pawn->getSkeleton()->getBoundingBox();
+		sceneBox.extend(box);
+	}
+	camera->view_all(sceneBox, camera->getFov());	
+	float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+	float znear = 0.01f*scale;
+	float zfar = 100.0f*scale;
+	camera->setNearPlane(znear);
+	camera->setFarPlane(zfar);
 }
 
 void BaseWindow::RotateSelectedCB(Fl_Widget* widget, void* data)
@@ -1486,12 +1508,13 @@ void BaseWindow::TrackCharacterCB(Fl_Widget* w, void* data)
 		return;
 
 	SkJoint* joint = character->getSkeleton()->joints()[0];
-	std::string trackCommand = "camera track ";
-	trackCommand.append(character->getName());
-	trackCommand.append(" ");
-	trackCommand.append(joint->name());
 
-	SmartBody::SBScene::getScene()->command((char*)trackCommand.c_str());
+// 	std::string trackCommand = "camera track ";
+// 	trackCommand.append(character->getName());
+// 	trackCommand.append(" ");
+// 	trackCommand.append(joint->name());
+	//SmartBody::SBScene::getScene()->command((char*)trackCommand.c_str());	
+	SmartBody::SBScene::getScene()->setCameraTrack(character->getName(), joint->name());
 }
 
 void BaseWindow::KinematicFootstepsCB(Fl_Widget* w, void* data)

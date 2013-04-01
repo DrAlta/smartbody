@@ -1530,7 +1530,7 @@ void FltkViewer::draw()
 
 	drawMotionVectorFlow();
 	drawPlotMotion();
-	//drawKinematicFootprints(0);
+	drawKinematicFootprints(0);
 
 
 	static GLfloat terrainMatDiffuse[] = { 0.8f,  0.8f,    0.5f,    1.f };
