@@ -25,6 +25,18 @@ SrVec LocomotionLegCycle::getStanceSupportPos( int idx )
 SrVec LocomotionLegCycle::getSupportPos( float motionTime, int idx )
 {	
 	float cycleTime = getNormalizedCycleTime(motionTime);
+// 	int index = (int)(cycleTime*(samples.size()-1));
+// 	float weight = cycleTime*(samples.size()-1) - index;
+// 
+// 	SrVec supportPos = samples[index].supportPos[idx]*(1.f-weight) + samples[(index+1)%samples.size()].supportPos[idx]*weight;
+// 	return supportPos;
+	return getSupportPosNormalize(cycleTime, idx);
+}
+
+
+SrVec LocomotionLegCycle::getSupportPosNormalize( float normalizeTime, int idx )
+{
+	float cycleTime = normalizeTime;
 	int index = (int)(cycleTime*(samples.size()-1));
 	float weight = cycleTime*(samples.size()-1) - index;
 
@@ -71,6 +83,15 @@ LocomotionAnalyzer::LocomotionAnalyzer()
 LocomotionAnalyzer::~LocomotionAnalyzer()
 {
 
+}
+
+
+LocomotionLegCycle* LocomotionAnalyzer::getLegCycleByIndex( int iLeg, int cycleIdx )
+{
+	LegCycleVec& legCycleVec = legCycleMap[iLeg];
+	if (cycleIdx >= 0 && cycleIdx < (int)legCycleVec.size())
+		return &legCycleVec[cycleIdx];
+	return NULL;
 }
 
 LocomotionLegCycle* LocomotionAnalyzer::getLegCycle( int iLeg, float motionTime )
@@ -205,6 +226,7 @@ std::string LocomotionAnalyzer::getMotionName()
 {
 	return motionName;
 }
+
 /************************************************************************/
 /* Motion Analysis                                                      */
 /************************************************************************/
@@ -346,39 +368,40 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 			maxWeightIndex = i;
 		}
 	}	
-	for (unsigned int i=0;i<locoAnalyzers.size();i++) // weighted sum of local foot base
+	// get normalize cycle from maxWeight locomotion
+	LocomotionAnalyzer* maxWeightAnalyzer = locoAnalyzers[maxWeightIndex];
+	for (unsigned int k=0;k<legStates.size();k++)
 	{
-		LocomotionAnalyzer* analyzer = locoAnalyzers[i];		
-		double moTime = timeManager->motionTimes[i];
-		for (unsigned int k=0;k<legStates.size();k++)
+		LegCycleState& legState = legStates[k];		
+		double maxMoTime = timeManager->motionTimes[maxWeightIndex];
+		LocomotionLegCycle* maxCycle = maxWeightAnalyzer->getLegCycle(k,(float)maxMoTime);		
+		float normalizeCycle = maxCycle->getNormalizedCycleTime((float)maxMoTime);
+		for (unsigned int i=0;i<locoAnalyzers.size();i++) // weighted sum of local foot base
 		{
-			LegCycleState& legState = legStates[k];
-			LocomotionLegCycle* legCycle = analyzer->getLegCycle(k,(float)moTime);
-			float normalizeCycle = legCycle->getNormalizedCycleTime((float)moTime);
+			LocomotionAnalyzer* analyzer = locoAnalyzers[i];		
+			double moTime = timeManager->motionTimes[i];
+			//LocomotionLegCycle* legCycle = analyzer->getLegCycle(k,(float)moTime);		
+			LocomotionLegCycle* legCycle = analyzer->getLegCycleByIndex(k,maxCycle->cycleIdx);		
 			legState.cycleTime += normalizeCycle*legCycle->cycleDuration*(float)weights[i];
 			legState.timeToNextCycle += (1.f-normalizeCycle)*legCycle->cycleDuration*(float)weights[i];
-
-			if (k == 0 && legState.prevMotionCycle[i] != legCycle->cycleIdx)
-			{
-				//LOG("motion %s, time = %f, prevCycle = %d, nextCycle = %d",analyzer->getMotionName().c_str(), timeManager->getNormalizeLocalTime(), legState.prevMotionCycle[i], legCycle->cycleIdx);
-			}
-			if (i==maxWeightIndex) // only test the motion with maximum weight
-			{
+ 			if ( i == maxWeightIndex ) //( weights[i] > 0.f ) // only test the motion with maximum weight
+			{			
 				if (legState.prevCycle != legCycle->cycleIdx)
 				{
-					//if (k==0)
-					//	LOG("dominant motion %s, time = %f, prevCycle = %d, nextCylce = %d",analyzer->getMotionName().c_str(), timeManager->getNormalizeLocalTime(), legState.prevCycle, legCycle->cycleIdx);
+					if (k==1)
+					    LOG("dominant motion %s, weight = %f, time = %f, prevCycle = %d, nextCylce = %d",analyzer->getMotionName().c_str(), weights[i], timeManager->getNormalizeLocalTime(), legState.prevCycle, legCycle->cycleIdx);
 					legState.newCycle = true;					
 				}
 				legState.prevCycle = legCycle->cycleIdx;
 			}
 
-			legState.prevMotionCycle[i] = legCycle->cycleIdx;
+			//legState.prevMotionCycle[i] = legCycle->cycleIdx;
 
 			for (unsigned int m=0;m<legState.curSupportPos.size();m++)
 			{
 				// get weighted sum 
-				legState.curSupportPos[m] += legCycle->getSupportPos((float)moTime,m)*(float)weights[i];	
+				//legState.curSupportPos[m] += legCycle->getSupportPos((float)moTime,m)*(float)weights[i];	
+				legState.curSupportPos[m] += legCycle->getSupportPosNormalize(normalizeCycle,m)*(float)weights[i];	
 				legState.stanceSupportPos[m] += legCycle->getStanceSupportPos(m)*(float)weights[i];
 			}			
 		}
