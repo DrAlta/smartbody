@@ -52,6 +52,8 @@
 #include <sb/SBCharacterListener.h>
 #include <sb/SBNavigationMesh.h>
 #include <sbm/ParserBVH.h>
+#include <sbm/ParserOpenCOLLADA.h>
+#include <sbm/ParserOgre.h>
 #include <sbm/Heightfield.h>
 #include <sbm/action_unit.hpp>
 #include <sbm/xercesc_utils.hpp>
@@ -3012,17 +3014,36 @@ std::map<std::string, GeneralParam*>& SBScene::getGeneralParameters()
 }
 
 SBAPI bool SBScene::createNavigationMesh( const std::string& meshfilename )
-{
-	SrModel mesh;
-	bool loadSucess = mesh.import_obj(meshfilename.c_str());	
-
-	if (!loadSucess)
+{	
+	std::vector<SrModel*> meshVec;
+	std::string ext = boost::filesystem2::extension(meshfilename);
+	std::string file = boost::filesystem::basename(meshfilename);	
+	bool loadSuccess = false;
+	if (ext == ".obj" || ext == ".OBJ")
+	{
+		SrModel *mesh = new SrModel();
+		loadSuccess = mesh->import_obj(meshfilename.c_str());		
+		meshVec.push_back(mesh);
+	}
+	else if ( ext == ".xml" || ext == ".XML" )
+	{
+		std::vector<SkinWeight*> tempWeights;
+		loadSuccess = ParserOgre::parseSkinMesh(meshVec,tempWeights,meshfilename,1.0,true,false);	
+	}
+	else if ( ext == ".dae" || ext == ".DAE" )
+	{
+		loadSuccess = ParserOpenCOLLADA::parseStaticMesh(meshVec, meshfilename);
+	}
+	
+	if (!loadSuccess || meshVec.size() == 0)
 	{
 		LOG("Error loading navigation mesh, filename = %s",meshfilename.c_str());
 		return false;
 	}
 	//mesh.scale(0.3f);
-	mesh.computeNormals();
+	SrModel* srMesh = meshVec[0];
+	srMesh->validate();
+	srMesh->computeNormals();
 	if (_navigationMesh) 
 	{
 		delete _navigationMesh;
@@ -3030,7 +3051,7 @@ SBAPI bool SBScene::createNavigationMesh( const std::string& meshfilename )
 	}
 
 	_navigationMesh = new SBNavigationMesh();
-	_navigationMesh->buildNavigationMesh(mesh);
+	_navigationMesh->buildNavigationMesh(*srMesh);
 
 	return true;
 }

@@ -63,7 +63,11 @@ class ParserOpenCOLLADA
 		static DOMNode* getNode(const std::string& nodeName, std::string fileName);
 		static std::string getNodeAttributeString(DOMNode* node, XMLCh* attrName);
 		static int         getNodeAttributeInt(DOMNode* node, XMLCh* attrName);
+		// parse from files
 		static bool parse(SkSkeleton& skeleton, SkMotion& motion, std::string fileName, float scale, bool doParseSkeleton, bool doParseMotion);
+		static bool parseStaticMesh(std::vector<SrModel*>& meshModelVecs, std::string fileName);
+
+		// parse nodes
 		static void parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name);
 		static void parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL);
 		static void parseLibraryAnimations(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, bool zaxis = false);

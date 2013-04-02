@@ -104,6 +104,7 @@ void SrModel::validate ()
    // check size of Fm
    if ( M.size()==0 )
     { Fm.size(0);
+	  mtlnames.size(0);
     }
    else if ( Fm.size()!=fsize )
     { j = Fm.size();

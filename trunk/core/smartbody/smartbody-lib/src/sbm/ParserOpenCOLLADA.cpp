@@ -2169,3 +2169,52 @@ void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string
 		}
 	}
 }
+
+bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, std::string fileName )
+{
+	DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", fileName, 2);
+	if (geometryNode)
+	{
+		// first from library visual scene retrieve the material id to name mapping (TODO: needs reorganizing the assets management)
+		std::map<std::string, std::string> materialId2Name;
+		DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", fileName, 2);
+		if (!visualSceneNode)
+			LOG("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
+		SkSkeleton skeleton;
+		SkMotion motion;
+		int order;
+		ParserOpenCOLLADA::parseLibraryVisualScenes(visualSceneNode, skeleton, motion, 1.0, order, materialId2Name);
+
+		// get picture id to file mapping
+		std::map<std::string, std::string> pictureId2File;
+		DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", fileName, 2);
+		if (imageNode)
+			ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File);
+
+		// start parsing mateiral
+		std::map<std::string, std::string> effectId2MaterialId;
+		DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", fileName, 2);
+		if (materialNode)
+			ParserOpenCOLLADA::parseLibraryMaterials(materialNode, effectId2MaterialId);
+
+		// start parsing effect
+		SrArray<SrMaterial> M;
+		SrStringArray mnames;
+		std::map<std::string,std::string> mtlTextMap;
+		std::map<std::string,std::string> mtlTextBumpMap;
+		std::map<std::string,std::string> mtlTextSpecularMap;
+		DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", fileName, 2);
+		if (effectNode)
+		{
+			ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
+		}
+		// parsing geometry
+		ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, fileName.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVecs, 1.0f);
+	}
+	else
+	{
+		LOG( "Could not load mesh from file '%s'", fileName.c_str());
+		return false;
+	}
+	return true;
+}
