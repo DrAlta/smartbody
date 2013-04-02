@@ -388,8 +388,8 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 			{			
 				if (legState.prevCycle != legCycle->cycleIdx)
 				{
-					if (k==1)
-					    LOG("dominant motion %s, weight = %f, time = %f, prevCycle = %d, nextCylce = %d",analyzer->getMotionName().c_str(), weights[i], timeManager->getNormalizeLocalTime(), legState.prevCycle, legCycle->cycleIdx);
+					//if (k==1)
+					//    LOG("dominant motion %s, weight = %f, time = %f, prevCycle = %d, nextCylce = %d",analyzer->getMotionName().c_str(), weights[i], timeManager->getNormalizeLocalTime(), legState.prevCycle, legCycle->cycleIdx);
 					legState.newCycle = true;					
 				}
 				legState.prevCycle = legCycle->cycleIdx;
@@ -420,10 +420,13 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 		float nextStepAngle = angSpeed*legState.timeToNextCycle*(float)M_PI/180.f;
 		SrQuat nextStepRotation = SrQuat(vUp,nextStepAngle)*SrQuat(gmatBase.get_rotation());
 		SrMat nextStepRotMat; nextStepRotation.get_mat(nextStepRotMat);
-		SrVec nextStepCharPos =  velocity*legState.timeToNextCycle;// rotCenter - rotCenter*SrQuat(vUp,nextStepAngle); //
-		//SrVec nextStepFootPos = gmatBase.get_translation() + nextStepCharPos + (legState.stanceSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*nextStepRotMat;
+		SrVec nextStepCharPos =  velocity*legState.timeToNextCycle;
+		if (angSpeed > 20.0)
+			nextStepCharPos = rotCenter - rotCenter*SrQuat(vUp,nextStepAngle); //
+		//SrVec nextStepCharPos =  rotCenter - rotCenter*SrQuat(vUp,nextStepAngle); //
+		SrVec nextStepFootPos = gmatBase.get_translation() + nextStepCharPos + (legState.stanceSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*nextStepRotMat;
 		//SrVec nextStepFootPos = gmatBase.get_translation() + nextStepCharPos + (legState.stanceSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*gmatBase.get_rotation(); //
-		SrVec nextStepFootPos = gmatBase.get_translation() + nextStepCharPos + (legState.stanceSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*gmatBase.get_rotation(); //
+		//SrVec nextStepFootPos = gmatBase.get_translation() + nextStepCharPos + (legState.stanceSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*gmatBase.get_rotation(); //
 		// 		
 // 		if (k==0 && legState.timeToNextCycle < 0.1f)
 // 		{

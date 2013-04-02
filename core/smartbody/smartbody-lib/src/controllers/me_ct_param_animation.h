@@ -147,5 +147,7 @@ class MeCtParamAnimation : public MeCtContainer
 		std::list<ScheduleUnit> waitingList;
 		BodyMotionFrame inputFrame, outputFrame;
 		MeCtIKTreeScenario ikScenario;
+		SrVec smoothVel;
+		float smoothAngVel;
 };
 #endif

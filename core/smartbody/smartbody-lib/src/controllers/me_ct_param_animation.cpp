@@ -67,6 +67,8 @@ MeCtParamAnimation::MeCtParamAnimation() : MeCtContainer(new MeCtParamAnimation:
 {
 	character = NULL;
 	woWriter = NULL;
+	smoothAngVel = 0.f;
+	smoothVel = SrVec();
 }
 
 MeCtParamAnimation::MeCtParamAnimation(SbmCharacter* c, MeCtChannelWriter* wo) : MeCtContainer(new MeCtParamAnimation::Context(this)), woWriter(wo)
@@ -77,7 +79,9 @@ MeCtParamAnimation::MeCtParamAnimation(SbmCharacter* c, MeCtChannelWriter* wo) :
 	nextStateData = NULL;
 	transitionManager = NULL;
 	waitingList.clear();
-	prevGlobalTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
+	prevGlobalTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
+	smoothAngVel = 0.f;
+	smoothVel = SrVec();
 }
 
 MeCtParamAnimation::~MeCtParamAnimation()
@@ -931,10 +935,14 @@ void MeCtParamAnimation::updateIK( PABlendData* curBlendData, SrMat& woMat, SrMa
 	SrVec deltaTrans = woDeltaMat.get_translation()*woMat.get_rotation(); // rotate translation to global frame
 	deltaTrans.y = 0.f; 
 	SrVec velocity = deltaTrans/dt;		
+	float smoothWeight = dt*10.f;
+	smoothAngVel = smoothAngVel*(1.f-smoothWeight) + rotSpeed*smoothWeight;
+	smoothVel = smoothVel*(1.f-smoothWeight) + velocity*smoothWeight;
 
 	updateMotionFrame(inputFrame, ikScenario, buff, true); // read data from frame
 
-	moAnalysis->applyIKFix(ikScenario, character, curBlendData->weights, curBlendData->timeManager, woMat, velocity, rotSpeed, inputFrame, outputFrame);
+	//moAnalysis->applyIKFix(ikScenario, character, curBlendData->weights, curBlendData->timeManager, woMat, velocity, rotSpeed, inputFrame, outputFrame);
+	moAnalysis->applyIKFix(ikScenario, character, curBlendData->weights, curBlendData->timeManager, woMat, smoothVel, smoothAngVel, inputFrame, outputFrame);
 
 	updateMotionFrame(outputFrame, ikScenario, buff, false);	
 }
