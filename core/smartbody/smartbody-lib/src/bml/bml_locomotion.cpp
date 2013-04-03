@@ -297,7 +297,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		SmartBody::SBScene::getScene()->getCommandManager()->execute_seq(seq);
 	}
 	std::string following = xml_parse_string(BMLDefs::ATTR_FOLLOW, elem);
-	SmartBody::SBCharacter* followingC = SmartBody::SBScene::getScene()->getCharacter(following);
+	SmartBody::SBPawn* followingC = SmartBody::SBScene::getScene()->getPawn(following);
 	ppraiAgent->setTargetAgent(followingC);
 
 	// parsing target

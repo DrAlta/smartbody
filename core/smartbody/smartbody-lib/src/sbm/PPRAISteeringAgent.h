@@ -47,8 +47,8 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 		SteerLib::AgentInterface* getAgent();
 		
 		
-		SBAPI void setTargetAgent(SbmCharacter* tChar);
-		SbmCharacter* getTargetAgent();
+		SBAPI void setTargetAgent(SmartBody::SBPawn* tChar);
+		SmartBody::SBPawn* getTargetAgent();
 		void startParameterTesting();
 		void updateSteerStateName();
 
@@ -90,7 +90,7 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 		
 		SteerLib::AgentInterface* agent;
 		SbmCharacter* character;
-		SbmCharacter* target;
+		SmartBody::SBPawn* target;
 
 	public:
 		enum SteeringParamType

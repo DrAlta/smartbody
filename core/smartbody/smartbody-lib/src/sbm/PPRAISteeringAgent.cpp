@@ -519,7 +519,11 @@ void PPRAISteeringAgent::evaluate(double dtime)
 			goal.desiredSpeed = desiredSpeed;
 			goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
 			goal.targetIsRandom = false;
-			goal.targetLocation = Util::Point(x1 * scene->getScale(), 0.0f, (z1 * scene->getScale() - 1.0f * scene->getScale()));
+			if (dynamic_cast<SmartBody::SBCharacter*>(target)) // if target is a character
+				goal.targetLocation = Util::Point(x1 * scene->getScale(), 0.0f, (z1 * scene->getScale() - 1.0f * scene->getScale()));
+			else 
+				goal.targetLocation = Util::Point(x1 * scene->getScale(), 0.0f, z1 * scene->getScale());
+
 			agent->addGoal(goal);
 		}
 	}
@@ -782,12 +786,12 @@ void PPRAISteeringAgent::setCharacter(SbmCharacter* c)
 }
 
 
-void PPRAISteeringAgent::setTargetAgent(SbmCharacter* tChar)
+void PPRAISteeringAgent::setTargetAgent(SmartBody::SBPawn* tChar)
 {
 	target = tChar;
 }
 
-SbmCharacter* PPRAISteeringAgent::getTargetAgent()
+SmartBody::SBPawn* PPRAISteeringAgent::getTargetAgent()
 {
 	return target;
 }
