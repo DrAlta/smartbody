@@ -109,8 +109,8 @@ class MeCtParamAnimation : public MeCtContainer
 		void setBaseJointName(const std::string& name);
 		SBAPI const std::string& getBaseJointName();
 		
-		void schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0, double stateTimeOffset = 0.0, double stateTimeTrim = 0.0, double transitionLen = -1.0, bool directPlay = true);
-		void schedule(PABlend* state, const std::vector<double>& weights, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0, double stateTimeOffset = 0.0, double stateTimeTrim = 0.0, double transitionLen = -1.0, bool directPlay = true);
+		void schedule(PABlend* state, double x, double y, double z, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0, double stateTimeOffset = 0.0, double stateTimeTrim = 0.0, double transitionLen = -1.0, bool directPlay = false);
+		void schedule(PABlend* state, const std::vector<double>& weights, PABlendData::WrapMode wrap = PABlendData::Loop, PABlendData::ScheduleMode schedule = PABlendData::Queued, PABlendData::BlendMode blend = PABlendData::Overwrite, std::string jName = "", double timeOffset = 0.0, double stateTimeOffset = 0.0, double stateTimeTrim = 0.0, double transitionLen = -1.0, bool directPlay = false);
 		void schedule(PABlend* state, const std::vector<double>& weights, const ScheduleType& scType);
 		void unschedule();
 		SBAPI void updateWeights(std::vector<double>& w);

@@ -8,6 +8,14 @@
 /************************************************************************/
 
 
+float LocomotionLegCycle::getNormalizedFlightTime( float motionTime )
+{
+	float normalizedTime = getNormalizedCycleTime(motionTime);
+	if (normalizedTime < liftTime) return 0.f;
+	if (normalizedTime > landTime) return 1.f;
+	return (normalizedTime-liftTime)/(landTime-liftTime);
+}
+
 float LocomotionLegCycle::getNormalizedCycleTime( float motionTime )
 {
 	float warpMotionTime = motionTime;
@@ -375,7 +383,8 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 		LegCycleState& legState = legStates[k];		
 		double maxMoTime = timeManager->motionTimes[maxWeightIndex];
 		LocomotionLegCycle* maxCycle = maxWeightAnalyzer->getLegCycle(k,(float)maxMoTime);		
-		float normalizeCycle = maxCycle->getNormalizedCycleTime((float)maxMoTime);
+		float normalizeCycle = maxCycle->getNormalizedCycleTime((float)maxMoTime);	
+		legState.flightTime = maxCycle->getNormalizedFlightTime((float)maxMoTime);
 		for (unsigned int i=0;i<locoAnalyzers.size();i++) // weighted sum of local foot base
 		{
 			LocomotionAnalyzer* analyzer = locoAnalyzers[i];		
@@ -390,7 +399,8 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 				{
 					//if (k==1)
 					//    LOG("dominant motion %s, weight = %f, time = %f, prevCycle = %d, nextCylce = %d",analyzer->getMotionName().c_str(), weights[i], timeManager->getNormalizeLocalTime(), legState.prevCycle, legCycle->cycleIdx);
-					legState.newCycle = true;					
+					legState.newCycle = true;	
+					legState.curStep = legState.nextStep;
 				}
 				legState.prevCycle = legCycle->cycleIdx;
 			}
@@ -436,6 +446,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 // 		}
 		//if (k==0) LOG("time to next cycle = %f", legState.timeToNextCycle);
 		//SrVec nextStepFootPos = (legState.curSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*gmatBase;
+		legState.nextStep = nextStepFootPos;
 		nextStepFootPos.y = 0.f; // set to ground height by default
 		sbChar->addFootStep(k,nextStepFootPos, !legState.newCycle);
 	}
