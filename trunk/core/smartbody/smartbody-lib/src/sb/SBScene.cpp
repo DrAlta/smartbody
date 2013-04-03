@@ -248,7 +248,7 @@ void SBScene::initialize()
 		_ogreViewer = NULL;
 	}
 
-
+	_logListener = NULL;
 
 
 }
@@ -1265,7 +1265,7 @@ void SBScene::sendVHMsg(const std::string& message)
 void SBScene::sendVHMsg2(const std::string& message, const std::string& message2)
 {
 	 
-	SmartBody::SBScene::getScene()->getVHMsgManager()->send(message.c_str(), message2.c_str());
+	SmartBody::SBScene::getScene()->getVHMsgManager()->send2(message.c_str(), message2.c_str());
 }
 
 bool SBScene::run(const std::string& command)
@@ -3060,4 +3060,19 @@ SBAPI SBNavigationMesh* SBScene::getNavigationMesh()
 {
 	return _navigationMesh;
 }
+
+void SBScene::startFileLogging(const std::string& filename)
+{
+	_logListener = new vhcl::Log::FileListener(filename.c_str());
+	vhcl::Log::g_log.AddListener(_logListener);
+}
+
+void SBScene::stopFileLogging()
+{
+	if (_logListener)
+		vhcl::Log::g_log.RemoveListener(_logListener);
+}
+
 };
+
+

@@ -3107,7 +3107,7 @@ int mcu_vrAllCall_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
         string message = "sbm ";
 		message += character->getName();
-        SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrComponent", message.c_str() );
+        SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "vrComponent", message.c_str() );
     }
 	return CMD_SUCCESS;
 }
@@ -3190,7 +3190,7 @@ int mcu_vrPerception_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 				//sending temp mesg just to make sure it works 
 				//SmartBody::SBScene::getScene()->getVHMsgManager()->send("test", messg);
 				//send the receiver message to orient the skullbase of brad as per the user's head orientation as detected by Gavam
-				SmartBody::SBScene::getScene()->getVHMsgManager()->send("sbm", messg);
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send2("sbm", messg);
 				//after sending the message, send a test message as confirmation
 				//SmartBody::SBScene::getScene()->getVHMsgManager()->send("testconfirmed", messg);
 			}
@@ -3329,7 +3329,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 		std::stringstream strstr;
 		strstr << instanceId << " " << messageId << " response-fail ";
 		strstr << "No Python code sent.";
-		SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "sbmdebugger", strstr.str().c_str() );
 		return CMD_FAILURE;
 	}
 
@@ -3352,7 +3352,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
-			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3367,7 +3367,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
-			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3382,7 +3382,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
-			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3397,7 +3397,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 			std::stringstream strstr;
 			strstr << instanceId << " " << messageId << " response ";
 			strstr << result;
-			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3417,7 +3417,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 				int val =  boost::python::extract<int>(mainDict["ret"][x]);
 				strstr << " " << val;
 			}
-			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3437,7 +3437,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 				float val =  boost::python::extract<float>(mainDict["ret"][x]);
 				strstr << " " << val;
 			}
-			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3457,7 +3457,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 				std::string val =  boost::python::extract<std::string>(mainDict["ret"][x]);
 				strstr << " " << val;
 			}
-			SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "sbmdebugger", strstr.str().c_str() );
 			return CMD_SUCCESS;
 		} catch (...) {
 			PyErr_Print();
@@ -3468,14 +3468,14 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 		std::stringstream strstr;
 		strstr << instanceId << " " << messageId << " response-fail ";
 		strstr << "Unknown return type: " << returnType;
-		SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "sbmdebugger", strstr.str().c_str() );
 		return CMD_FAILURE;
 	}
 
 	std::stringstream strstr;
 	strstr << instanceId << " " << messageId << " response-fail ";
 	strstr << "Problem executing code." << returnType;
-	SmartBody::SBScene::getScene()->getVHMsgManager()->send( "sbmdebugger", strstr.str().c_str() );
+	SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "sbmdebugger", strstr.str().c_str() );
 	return CMD_FAILURE;
 #endif	
 #endif
@@ -5644,7 +5644,7 @@ int sbm_vhmsg_send_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 {
 	char* cmdName = args.read_token();
 	char* cmdArgs = args.read_remainder_raw();
-	return SmartBody::SBScene::getScene()->getVHMsgManager()->send( cmdName, cmdArgs );
+	return SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmdName, cmdArgs );
 }
 
 int xmlcachedir_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )

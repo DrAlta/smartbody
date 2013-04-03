@@ -34,7 +34,7 @@ class VHMsgLogger : public vhcl::Log::Listener
 
         virtual void OnMessage( const std::string & message )
 		{
-			SmartBody::SBScene::getScene()->getVHMsgManager()->send("sbmlog", message.c_str());
+			SmartBody::SBScene::getScene()->getVHMsgManager()->send2("sbmlog", message.c_str());
 		}
 };
 
@@ -125,7 +125,7 @@ void SBVHMsgManager::disconnect()
 {
 }
 
-int SBVHMsgManager::send( const char *op, const char* message )
+int SBVHMsgManager::send2( const char *op, const char* message )
 {
 #if LINK_VHMSG_CLIENT
 	if( isEnable() )

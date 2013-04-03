@@ -527,6 +527,18 @@ bool Smartbody_dll::InitVHMsg()
 
    // TODO: need scene->SetVhmsgEnabled(true)
    scene;
+   SmartBody::SBVHMsgManager* vhmsgManager = scene->getVHMsgManager();
+   const char* envScope = getenv("VHMSG_SCOPE");
+   const char* envServer = getenv("VHMSG_SERVER");
+   if (envScope)
+   {
+	   vhmsgManager->setScope(envScope);
+   }
+   if (envServer)
+   {
+	   vhmsgManager->setServer(envServer);
+   }
+
    int err = vhmsg::ttu_open();
    if (err == vhmsg::TTU_SUCCESS)
 	   SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(true);

@@ -28,6 +28,7 @@
 #include <sb/SBReachManager.h>
 #include <sb/SBGestureMap.h>
 #include <sb/SBGestureMapManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBJointMap.h>
 #include <sb/SBJointMapManager.h>
@@ -1571,7 +1572,22 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getSkeletonNames", &SBAssetManager::getSkeletonNames, "Returns a list of all skeleton names.\n Input: NULL \nOutput: list of skeleton names")
 		;
 
+		boost::python::class_<SBVHMsgManager, boost::python::bases<SBService> >("SBVHMsgManager")
+		.def("connect", &SBVHMsgManager::connect, "Connects to the VH Message (ActiveMQ) server")
+		.def("disconnect", &SBVHMsgManager::disconnect, "Disconnects from the VH Message (ActiveMQ) server")
+		.def("send", &SBVHMsgManager::send, "Sends a VH message.")
+		.def("setPort", &SBVHMsgManager::setPort, "Sets the port on which the VH Message (ActiveMQ) server is running.")
+		.def("getPort", &SBVHMsgManager::getPort, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the VH Message (ActiveMQ) server port.")
+		.def("setServer", &SBVHMsgManager::setServer, "Sets the VH Message (ActiveMQ) server name or IP address.")
+		.def("getServer", &SBVHMsgManager::getServer, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the VH Message (ActiveMQ) server name or IP address.")
+		.def("setScope", &SBVHMsgManager::setScope, "Sets the ActiveMQ scope for VH messaging.")
+		.def("getScope", &SBVHMsgManager::getScope, boost::python::return_value_policy<boost::python::return_by_value>(),  "Returns the ActiveMQ scope used for VH messaging.")
+		.def("setEnableLogging", &SBVHMsgManager::setEnableLogging, "Enables logging over the VH Message bus. Messages will start with the prefix 'vhlog'")
+		.def("isEnableLogging", &SBVHMsgManager::isEnableLogging, "Disables logging over the VH Message bus.")
+		;
+
 	boost::python::class_<SBScene, boost::python::bases<SBObject> >("SBScene")
+		.def("update", &SBScene::update, "Updates the simulation at the given time.")
 		.def("setProcessId", &SBScene::setProcessId, "Sets the process id of the SmartBody instance.")
 		.def("getProcessId", &SBScene::getProcessId,  boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the process id of the SmartBody instance.")
 		.def("createCharacter", &SBScene::createCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new character given character name. \n Input: character name \nOutput: character object")
@@ -1612,9 +1628,10 @@ boost::python::class_<SBReach>("SBReach")
 		.def("save", &SBScene::save, "Saves the SmartBody configuration. Returns a string containing Python commands representing the configuration.")
 		.def("exportScene", &SBScene::exportScene, "Saves the entire SmartBody configuration, including assets, into a given file location.")
 		.def("createNavigationMesh", &SBScene::createNavigationMesh, "Create navigation mesh from the input mesh.\n Input : OBJ file name")
+		.def("startFileLogging", &SBScene::startFileLogging, "Starts logging SmartBody messages to a given log file.")
+		.def("stopFileLogging", &SBScene::stopFileLogging, "Stops logging SmartBody messages to the given log file.")
 
-
-
+		
 		// cameras
 		.def("createCamera", &SBScene::createCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a camera with a given name and returns it.")
 		.def("removeCamera", &SBScene::removeCamera, "Removes a camera.")
@@ -1649,6 +1666,7 @@ boost::python::class_<SBReach>("SBReach")
 		.def("getBehaviorSetManager", &SBScene::getBehaviorSetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the behavior set manager.")
 		.def("getRetargetManager", &SBScene::getRetargetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the retarget manager.")
 		.def("getAssetManager", &SBScene::getAssetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the asset manager.")
+		.def("getVHMsgManager", &SBScene::getVHMsgManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the VH message manager.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 
 		.def("setSystemParameter", &SBScene::setSystemParameter, "Sets a name/value pair that persists between scene sessions.")

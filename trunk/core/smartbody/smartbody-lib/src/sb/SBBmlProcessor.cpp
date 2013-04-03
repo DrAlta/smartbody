@@ -91,12 +91,12 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 				{
 					SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
 					msgId = build_vrX( msg, cmd, character->getName().c_str(), recip_id, bml, false );
-					SmartBody::SBScene::getScene()->getVHMsgManager()->send( cmd, msg.str().c_str() );
+					SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
 				}
 			} else {
 				msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
 				///////LOG("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
-				SmartBody::SBScene::getScene()->getVHMsgManager()->send( cmd, msg.str().c_str() );
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
 			}
 		}
 		return msgId;

@@ -1168,24 +1168,11 @@ int main( int argc, char **argv )	{
 
 				if( strlen( cmd ) )	{
 
-					int result = CMD_FAILURE;
-					result = SmartBody::SBScene::getScene()->run(cmd);
+					bool result = SmartBody::SBScene::getScene()->run(cmd);
 
-					switch( result ) {
-						case CMD_NOT_FOUND:
-							printf("SmartBody Error: command NOT FOUND: '%s'\n", cmd );
-							fprintf( stdout, "> " ); fflush( stdout );
-							break;
-						case CMD_FAILURE:
-							printf("SmartBody Error: command FAILED: '%s'\n", cmd );
-							fprintf( stdout, "> " ); fflush( stdout );
-							break;
-						case CMD_SUCCESS:						
-							break;
-						default:
-							printf("SmartBody Error: return value %d ERROR: '%s'\n", result, cmd );
-							fprintf( stdout, "> " ); fflush( stdout );
-							break;
+					if (!result)
+					{
+						printf("SmartBody Error: when running command: %s", cmd);
 					}
 				}
 			}
