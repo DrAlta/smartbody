@@ -122,6 +122,8 @@ class SBScene : public SBObject
 
 		SBAPI std::vector<std::string> getEventHandlerNames();
 
+		SBAPI void startFileLogging(const std::string& filename);
+		SBAPI void stopFileLogging();
 	
 		SBAPI bool run(const std::string& command);
 		SBAPI bool runScript(const std::string& script);
@@ -329,6 +331,8 @@ class SBScene : public SBObject
 		SrViewer* _ogreViewer;
 		SrViewerFactory* _viewerFactory;
 		SrViewerFactory* _ogreViewerFactory;
+
+		vhcl::Log::Listener* _logListener;
 
 		KinectProcessor* _kinectProcessor;
 		Heightfield* _heightField;

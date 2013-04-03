@@ -106,7 +106,7 @@ class cmdl : public line_editor	{
 			diagnostic_chars = diagnostic;
 		}
 
-		SBAPI bool pending( std::string prompt = "> " );
+		SBAPI bool pending( const std::string& prompt = "> " );
 
 		std::string test_query( std::string src_str = "" );
 		std::string test_prompt( std::string src_str = "" );

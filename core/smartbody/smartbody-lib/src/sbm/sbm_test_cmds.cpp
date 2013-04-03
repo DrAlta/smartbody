@@ -179,11 +179,11 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 				{
 					SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
 					build_vrX( msg, cmd, character->getName().c_str(), recip_id, bml, false );
-					SmartBody::SBScene::getScene()->getVHMsgManager()->send( cmd, msg.str().c_str() );
+					SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
 				}
 			} else {
 				build_vrX( msg, cmd, char_id, recip_id, bml, false );
-				SmartBody::SBScene::getScene()->getVHMsgManager()->send( cmd, msg.str().c_str() );
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
 			}
 		}
 		return CMD_SUCCESS;

@@ -1138,7 +1138,7 @@ void BmlRequest::unschedule( Processor* bp, SmartBody::SBScene* scene, time_sec 
 #else
 	buff << request->actorId << " " << request->msgId << " end interrupted";
 #endif
-	SmartBody::SBScene::getScene()->getVHMsgManager()->send( "vrAgentBML", buff.str().c_str() );
+	SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "vrAgentBML", buff.str().c_str() );
 
 
 	if( bp->get_auto_print_controllers() ) {

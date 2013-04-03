@@ -484,7 +484,7 @@ void gwiz::cmdl::render_prompt( std::string prompt ) {
 
 ///////////////////////////////////////////////////////////////////////////
 
-bool gwiz::cmdl::pending( std::string prompt )	{
+bool gwiz::cmdl::pending( const std::string& prompt )	{
 
 	int mode = query( verbose_key, verbose_tab );
 	fflush( stdout );

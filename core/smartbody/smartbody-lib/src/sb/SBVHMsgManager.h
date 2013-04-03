@@ -26,7 +26,7 @@ class SBVHMsgManager : public SBService
 		SBAPI bool connect();
 		SBAPI void disconnect();
 
-		SBAPI int send(const char *op, const char* message);
+		SBAPI int send2(const char *op, const char* message);
 		SBAPI int send(const char* message);
 
 		SBAPI int poll();
