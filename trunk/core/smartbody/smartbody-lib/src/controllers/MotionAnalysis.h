@@ -27,10 +27,13 @@ struct LegCycleState
 	std::vector<SrVec> curSupportPos;
 	std::vector<SrVec> globalSupportPos;
 	std::vector<SrVec> stanceSupportPos;
+	float heightOffset;
 	float cycleTime;
-	float timeToNextCycle;
+	float flightTime;
+	float timeToNextCycle;	
 	int prevCycle;	
 	bool newCycle;
+	SrVec curStep, nextStep;
 	std::vector<int> prevMotionCycle;
 };
 
@@ -60,6 +63,7 @@ public:
 	SrVec getStanceSupportPos(int idx);	
 	float getTransitionWeight(float motionTime, int& phase);
 	float getNormalizedCycleTime(float motionTime);
+	float getNormalizedFlightTime(float motionTime);
 };
 
 

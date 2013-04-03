@@ -101,6 +101,7 @@ char* srArgBuffer::read_token( void )	{
 	return( token );
 }
 
+
 char* srArgBuffer::read_remainder_raw( void )	{
 	token = peek_string();
 	return( token );

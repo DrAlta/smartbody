@@ -54,7 +54,7 @@ class SBAPI srArgBuffer	{
          *  Tokens returned are owned by the srArgBuffer, and should not be
          *  freed or deleted.
          */
-		char *read_token( void );
+		char *read_token( void );		
 
         /**
          *  Read the remainder of the argument buffer as a single string.

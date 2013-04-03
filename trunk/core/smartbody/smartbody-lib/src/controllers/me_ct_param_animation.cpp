@@ -53,7 +53,7 @@ ScheduleType::ScheduleType()
 	stateTimeOffset = 0.0;
 	stateTimeTrim = 0.0;
 	transitionLen = -1.0;
-	directPlay = true;
+	directPlay = false;
 	playSpeed = 1.0;
 	duration = -1.0;
 }

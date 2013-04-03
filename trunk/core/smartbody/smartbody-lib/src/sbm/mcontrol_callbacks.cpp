@@ -761,8 +761,25 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			std::string jointString = args.read_token();
 			if (jointString != "joint")
 				return CMD_FAILURE;
-			std::vector<double> weights;
 			std::string joint = args.read_token();
+
+
+			std::string directPlayStr = args.peek_string();			
+			std::vector<std::string> tokens;
+			vhcl::Tokenize(directPlayStr, tokens);
+			bool directPlay = false;
+			if (tokens.size() > 0 && tokens[0] == "direct-play")
+			{
+				directPlayStr = args.read_token();
+				std::string dplay = args.read_token();
+				if (dplay == "true") 
+					directPlay = true;
+				else if (dplay == "false")
+					directPlay = false;
+			}
+			
+
+			std::vector<double> weights;			
 			int numWeights = args.calc_num_tokens();
 			if (numWeights > 0)
 			{
@@ -774,11 +791,11 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			}
 			if (blend && numWeights < blend->getNumMotions())
 			{
-				character->param_animation_ct->schedule(blend, 0, 0, 0, wrap, schedule, blendMode, joint);
+				character->param_animation_ct->schedule(blend, 0, 0, 0, wrap, schedule, blendMode, joint, 0.0, 0.0, 0.0, -1.0, directPlay) ;
 			}
 			else
 			{
-				character->param_animation_ct->schedule(blend, weights, wrap, schedule, blendMode, joint);
+				character->param_animation_ct->schedule(blend, weights, wrap, schedule, blendMode, joint, 0.0, 0.0, 0.0, -1.0, directPlay);
 			}
 		}
 

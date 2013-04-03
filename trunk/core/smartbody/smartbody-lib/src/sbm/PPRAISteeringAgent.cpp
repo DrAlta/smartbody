@@ -1507,7 +1507,7 @@ void PPRAISteeringAgent::adjustFacingAngle( float angleDiff )
 		idleTurnState->getWeightsFromParameters(-angleDiff, weights);
 		std::stringstream command;
 		command << "panim schedule char " << character->getName();			
-		command << " state " << idleTurnName << " loop false playnow false additive false joint null ";
+		command << " state " << idleTurnName << " loop false playnow false additive false joint null direct-play true ";
 		for (int i = 0; i < idleTurnState->getNumMotions(); i++)
 			command << weights[i] << " ";
 		SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
