@@ -2,6 +2,7 @@
 #include "SBPython.h"
 #include "SBPythonClass.h"
 #include <sb/SBSimulationManager.h>
+#include <sb/SBAnimationState.h>
 #include <sb/SBAnimationTransitionRule.h>
 #include <sb/SBEvent.h>
 

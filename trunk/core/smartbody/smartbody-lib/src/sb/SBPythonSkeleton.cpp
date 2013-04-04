@@ -5,6 +5,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBScript.h>
 #include <sb/SBEvent.h>
+#include <sb/SBAnimationState.h>
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBAnimationTransitionRule.h>
 #include <boost/filesystem/operations.hpp>
