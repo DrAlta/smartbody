@@ -721,7 +721,7 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& 
 		float speed = fabs(smoothY[i] - smoothY[i + 1]) / fabs(smoothX[i] - smoothX[i + 1]);
 		if (speed > speedLimit)
 		{
-			LOG("[%d]: %f", i, speed);
+			//LOG("[%d]: %f", i, speed);
 			float sign = (smoothY[i] <= smoothY[i + 1]) ? 1.0f : -1.0f;
 			smoothY[i + 1] = fabs(smoothX[i] - smoothX[i + 1]) * windowSize * sign + smoothY[i];
 			if (i == smoothX.size() - 2)	// append one if last point has been changed
