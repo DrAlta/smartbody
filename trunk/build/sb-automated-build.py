@@ -339,7 +339,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
             buildSvnOutput.append(line.strip())
         p.wait()
     else:
-        p = subprocess.Popen("svn checkout --non-interactive --username {0} --password {1} https://smartbody.svn.sourceforge.net/svnroot/smartbody/trunk build.sandbox".format(svnUsername, svnPassword).split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        p = subprocess.Popen("svn checkout --non-interactive --username {0} --password {1} svn://svn.code.sf.net/p/smartbody/code/trunk build.sandbox".format(svnUsername, svnPassword).split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         buildSvnOutput = []
         for line in p.stdout:
             buildSvnOutput.append(line.strip())
@@ -607,7 +607,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
 
     # tag the repository with the email report
     if tagSvn:
-        p = subprocess.Popen("svn copy --non-interactive --username {0} --password {1} -r {2} {3} {4}/{5} -F ""{6}""".format(svnUsername, svnPassword, buildSvnRevision, "https://svn.ict.usc.edu/svn_repo/trunk", "https://svn.ict.usc.edu/svn_repo/tags/builds", buildFolderName, finalMailFile).split(" "))
+        p = subprocess.Popen("svn copy --non-interactive --username {0} --password {1} -r {2} {3} {4}/{5} -F ""{6}""".format(svnUsername, svnPassword, buildSvnRevision, "svn://svn.code.sf.net/p/smartbody/code/trunk", "svn://svn.code.sf.net/p/smartbody/code/tags/builds", buildFolderName, finalMailFile).split(" "))
         p.wait()
 
     if emailReport:
