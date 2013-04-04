@@ -595,8 +595,9 @@ void SbmCharacter::initData()
 	_visemePlateau = true;
 	_diphone = false;
 	_diphoneScale = 1.0f;
-	_diphoneSplineCurve = false;
-	_diphoneSmoothWindow = -1.0f;
+	_diphoneSplineCurve = true;
+	_diphoneSmoothWindow = 0.2f;
+	_diphoneSpeedLimit = 20.0f;
 	_nvbg = NULL;
 	_miniBrain = NULL;
 
@@ -1734,11 +1735,15 @@ void SbmCharacter::schedule_viseme_curve(
 				}
 				else
 				{
+#if 0
 					srSplineCurve spline( srSplineCurve::INSERT_NODES );
-					//srSplineCurve spline( srSplineCurve::INSERT_KEYS );
-					//spline.set_extensions( srSplineCurve::EXTEND_DECEL, srSplineCurve::EXTEND_DECEL );
 					spline.set_extensions( srSplineCurve::EXTEND_NONE, srSplineCurve::EXTEND_NONE );
 					spline.set_algorithm( srSplineCurve::ALG_HALTING );
+#else
+					srSplineCurve spline(srSplineCurve::INSERT_NODES);
+					spline.set_extensions(srSplineCurve::EXTEND_NONE, srSplineCurve::EXTEND_NONE);
+					spline.set_algorithm(srSplineCurve::ALG_CARDINAL_C);
+#endif
 
 					for (int i = 0; i < num_keys; i++)	{
 
@@ -1751,7 +1756,7 @@ void SbmCharacter::schedule_viseme_curve(
 						//if (i == num_keys - 1) spline.insert(t + .001, w);
 					}
 					spline.apply_extensions();
-					#define LINEAR_SPLINE_SEGS_PER_SEC 30.0
+					#define LINEAR_SPLINE_SEGS_PER_SEC 200.0
 					if (isDiphoneSplineCurve())
 						ct_p->insert_spline( spline, LINEAR_SPLINE_SEGS_PER_SEC );
 				}

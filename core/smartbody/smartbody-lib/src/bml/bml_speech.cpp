@@ -417,6 +417,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 	const std::string& diphoneMap = character->getStringAttribute("diphoneSetName");
 	VisemeData* curViseme = NULL;
 	VisemeData* prevViseme = NULL;
+	VisemeData* pprevViseme = NULL;
 	VisemeData* nextViseme = NULL;
 	std::vector<float> visemeTimeMarkers;
 	std::vector<VisemeData*> visemeRawData;
@@ -426,11 +427,14 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 			prevViseme = (*result_visemes)[i - 1];
 		if (i < ((*result_visemes).size() - 1))
 			nextViseme = (*result_visemes)[i + 1];
+		if (i > 1)
+			pprevViseme = (*result_visemes)[i - 2];
 		curViseme = (*result_visemes)[i];
 		visemeTimeMarkers.push_back(curViseme->time());
 		if (prevViseme != NULL)
 		{
 			SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(prevViseme->id(), curViseme->id(), diphoneMap);
+			// ideally blendIval should be from half way between pprevViseme and prevViseme to half way between curViseme and next Viseme
 			float blendIval = 0.0f;
 			if (nextViseme != NULL)
 				blendIval = nextViseme->time() - prevViseme->time();
@@ -524,222 +528,137 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 	for (size_t i = 0; i < visemeProcessedData.size(); i++)
 	{
 		VisemeData* newV = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
-		smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, character->getDiphoneSmoothWindow());
+		smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, character->getDiphoneSmoothWindow(), character->getDiphoneSpeedLimit());
 		newV->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
 		(*result_visemes).push_back(newV);
 	}
 }
 
+// line intersection reference: http://cboard.cprogramming.com/c-programming/154196-check-if-two-line-segments-intersect.html
+bool BML::SpeechRequest::getLineIntersection(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float& i_x, float& i_y)
+{
+	float s1_x, s1_y, s2_x, s2_y, sn, tn, sd, td, t;
+	s1_x = p1_x - p0_x;     s1_y = p1_y - p0_y;
+	s2_x = p3_x - p2_x;     s2_y = p3_y - p2_y;
+
+	sn = -s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y);
+	sd = -s2_x * s1_y + s1_x * s2_y;
+	tn =  s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x);
+	td = -s2_x * s1_y + s1_x * s2_y;
+
+	if (sn >= 0 && sn <= sd && tn >= 0 && tn <= td)
+	{
+		// Collision detected
+		t = tn / td;
+		i_x = p0_x + (tn * s1_x);
+		i_y = p0_y + (tn * s1_y);
+		return true;
+	}
+	return false; // No collision
+}
+
 std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::vector<float>& c2)
 {
+	std::vector<float> retc;
 	int size1 = c1.size();
 	int size2 = c2.size();
 	if (size1 == 0 || size2 == 0)
-	{
-		return std::vector<float>();
-	}
-#if 0
-	// copy original curve
-	std::vector<float> c3;	
+		return retc;
 
-	// handle stitching curve
-	// -- finding the boundry
-	int s1Id = -1;
-	int e1Id = -1;
-	int s2Id = -1;
-	int e2Id = -1;
-
-	for (int i = 0; i < size2 / 2; ++i)
+	// find the boundary of first curve
+	int boundary = -1;
+	for (int i = size1 / 2 - 2; i >= 0; i--)
 	{
-		if (c2[i] > c1[size1 / 2 - 1])
+		if (c1[i * 2] <= c2[0] && c1[(i + 1) * 2] > c2[0])
 		{
-			s2Id = 0;
-			e2Id = i;
+			boundary = i;
 			break;
 		}
 	}
-	for (int i = size1 / 2 - 1 ; i >= 0; --i)
+
+	// two curve does not overlap, just add them together
+	if (boundary < 0) 
 	{
-		if (c1[i] < c2[0])
-		{
-			s1Id = i;
-			s2Id = size1 / 2 - 1;
-			break;
-		}
-	}
-	bool notIntersect = ((s1Id >= 0) && (e1Id >= 0) && (s2Id >= 0) && (e2Id >= 0)) ? false : true;
-	if (notIntersect)
-	{
-		for (int i = 0; i < size1; i++)
-			c3.push_back(c1[i]);
-		for (int i = 0; i < size2; i++)
-			c3.push_back(c2[i]);
-		return c3;
+		for (int i = 0; i < size1; ++i)
+			retc.push_back(c1[i]);
+		for (int i = 0; i < size2; ++i)
+			retc.push_back(c2[i]);
+		return retc;
 	}
 
-	for (int i = 0; i < s1Id * 2; i++)	//push all the data before intersect
-		c3.push_back(c1[i]);
-	
-	int startingId = s1Id;
-	for (int i = s2Id; i <= e2Id; ++i)
+	// first fill in the non-overlapping curves
+	for (int i = 0; i < boundary; ++i)
 	{
-		for (int j = startingId; j < e1Id; ++j)
+		retc.push_back(c1[i * 2]);
+		retc.push_back(c1[i * 2 + 1]);
+	}
+
+	int id1 = boundary;
+	int id2 = 0;
+	int idi = 0;
+
+	// find the intersection of the overlapping curves (brute force algorithm, have room to improve)
+	for (int i = boundary; i < (size1 / 2) - 1; ++i)
+	{
+		for (int j = 0; j < (size2 / 2) - 1; ++j)
 		{
-			if (c1[j * 2] <= c2[i * 2] && c1[j * 2 + 2] >= c2[i * 2])
+			float ix, iy;
+			if (getLineIntersection(c1[i * 2], c1[i * 2 + 1], c1[(i + 1) * 2], c1[(i + 1) * 2 + 1], c2[j * 2], c2[j * 2 + 1], c2[(j + 1) * 2], c2[(j + 1) * 2 + 1], ix , iy))
 			{
-				// smooth and insert
-				float f = (c2[i * 2] - c1[j * 2]) / (c1[(j + 1) * 2] - c1[j * 2]);
-				float curY1 = f * (c1[(j + 1) * 2 + 1] - c1[j * 2 + 1]) + c1[j * 2 + 1];
-				float newY2 = curY1 > c2[i * 2 + 1] ? curY1 : c2[i * 2 + 1]; //(curY1 + y2[j]) * 0.5f;
-				c3.push_back(c1[j * 2]);
-				c3.push_back(c1[j * 2 + 1]);
-				c3.push_back(c2[i * 2]);
-				c3.push_back(newY2);
-
-				startingId = j + 1;
-				break;
+				if (c2[j * 2 + 1] <= c1[i * 2 + 1]) // insert c1
+				{
+					for (int k = id1; k <= i; ++k)
+					{
+						retc.push_back(c1[k * 2]);
+						retc.push_back(c1[k * 2 + 1]);
+					}
+				}
+				else						// insert c2
+				{
+					for (int k = id2; k <= j; ++k)
+					{
+						retc.push_back(c2[k * 2]);
+						retc.push_back(c2[k * 2 + 1]);
+					}
+				}
+				id1 = i + 1;
+				id2 = j + 1;
+				retc.push_back(ix);
+				retc.push_back(iy);
+				idi++;
 			}
 		}
 	}
 
-	for (int i = e2Id * 2; i < size2; i++)	//push all the data after intersect
-		c3.push_back(c2[i]);	
-
-	return c3;
-#else
-	std::vector<float> x1;
-	std::vector<float> y1;
-	std::vector<float> x2;
-	std::vector<float> y2;
-	for (int i = 0; i < size1; i++)
+	if (id1 < size1 / 2 || id2 < size2 / 2)
 	{
-		if ((i % 2) == 0)
-			x1.push_back(c1[i]);
-		else
-			y1.push_back(c1[i]);
-	}
-	for (int i = 0; i < size2; i++)
-	{
-		if ((i % 2) == 0)
-			x2.push_back(c2[i]);
-		else
-			y2.push_back(c2[i]);
-	}
-
-	std::vector<float> smoothedY1 = y1;
-	std::vector<float> smoothedY2 = y2;
-
-#if 1
-	// simple algorithm
-	// do for second curve
-	for (int i = ((int)x1.size() - 1); i > 0; i--)
-	{
-		if (x1[i] < x2[0])
-			break;
-
-		for (size_t j = 0; j < x2.size(); j++)
+		if (c2[id2 * 2 + 1] <= c1[id1 * 2 + 1])	// insert c1
 		{
-			if (x1[i] >= x2[j] && x1[i - 1] <= x2[j])
+			for (int k = id1; k < size1 / 2; ++k)
 			{
-				float f = (x2[j] - x1[i - 1])/ (x1[i] - x1[i - 1]);
-				float curY1 = f * (y1[i] - y1[i - 1]) + y1[i - 1];
-				float newY2 = curY1 > y2[j] ? curY1 : y2[j]; //(curY1 + y2[j]) * 0.5f;
-				smoothedY2[j] = newY2;
+				retc.push_back(c1[k * 2]);
+				retc.push_back(c1[k * 2 + 1]);
+			}
+		}
+		else									// insert c2
+		{
+			for (int k = id2; k < size2 / 2; ++k)
+			{
+				retc.push_back(c2[k * 2]);
+				retc.push_back(c2[k * 2 + 1]);
 			}
 		}
 	}
 
-	// do for first curve
-	for (size_t i = 0; i < (x2.size() - 1); i++)
-	{
-		for (int j = ((int)x1.size() - 1); j >= 0; j--)
-		{
-			if (x1[j] < x2[0])
-				break;
-
-			if (x2[i] <= x1[j] && x2[i + 1] >= x1[j])
-			{
-				float f = (x1[j] - x2[i])/ (x2[i + 1] - x2[i]);
-				float curY2 = f * (y2[i + 1] - y2[i]) + y2[i];
-				float newY1 = curY2 > y1[j] ? curY2 : y1[j]; //(curY2 + y1[j]) * 0.5f;
-				smoothedY1[j] = newY1;
-			}
-		}
-	}
-#else
-	for (size_t i = 0; i < x1.size() - 1; i++)
-	{
-		for (size_t j = 0; j < x2.size(); j++)
-		{
-			if (x1[i] <= x2[j] && x1[i + 1] >= x2[j])
-			{
-				float f = (x2[j] - x1[i])/ (x1[i + 1] - x1[i]);
-				float curY1 = f * (y1[i + 1] - y1[i]) + y1[i];
-				float newY2 = curY1 > y2[j] ? curY1 : y2[j]; //(curY1 + y2[j]) * 0.5f;
-				smoothedY2[j] = newY2;
-			}
-		}
-	}
-
-	// do for first curve
-	for (size_t i = 0; i < x2.size() - 1; i++)
-	{
-		for (size_t j = 0; j < x1.size(); j++)
-		{
-			if (x2[i] <= x1[j] && x2[i + 1] >= x1[j])
-			{
-				float f = (x1[j] - x2[i])/ (x2[i + 1] - x2[i]);
-				float curY2 = f * (y2[i + 1] - y2[i]) + y2[i];
-				float newY1 = curY2 > y1[j] ? curY2 : y1[j]; //(curY2 + y1[j]) * 0.5f;
-				smoothedY1[j] = newY1;
-			}
-		}
-	}
-#endif
-
-	std::vector<float> newX;
-	std::vector<float> newY;
-
-	for (size_t i = 0; i < x1.size(); i++)
-	{
-		newX.push_back(x1[i]);
-		newY.push_back(smoothedY1[i]);
-	}
-
-	for (size_t i = 0; i < x2.size(); i++)
-	{
-		bool isAppending = true;
-		for (size_t j = 0; j < newX.size(); j++)
-		{
-			if (newX[j] >= x2[i])
-			{
-				newX.insert(newX.begin() + j, x2[i]);
-				newY.insert(newY.begin() + j, smoothedY2[i]);
-				isAppending = false;
-				break;
-			}
-		}
-		if (isAppending)
-		{
-			newX.push_back(x2[i]);
-			newY.push_back(smoothedY2[i]);
-		}
-	}
-
-	std::vector<float> retFloats;
-	for (size_t i = 0; i < newX.size(); i++)
-	{
-		retFloats.push_back(newX[i]);
-		retFloats.push_back(newY[i]);
-	}
-	return retFloats;
-#endif
+	return retc;
 }
 
 
-void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& timeMarkers, float windowSize)
+void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& timeMarkers, float windowSize, float speedLimit)
 {
 	if (windowSize <= 0)
+		return;
+	if (speedLimit <= 0)
 		return;
 
 	std::vector<float> x;
@@ -756,127 +675,71 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& 
 			y.push_back(c[i]);
 	}
 
-	// local smoothing, by window size or phoneme intervals
-	for (size_t i = 1; i < timeMarkers.size() - 1; i++)
+
+	// global smoothing by window size
+	std::vector<int> localMaxId;
+	for (size_t i = 1; i < x.size() - 1; ++i)
 	{
-		// left&right time and window size
-		//float leftTime = timeMarkers[i - 1];
-		//float rightTime = timeMarkers[i + 1];
-		float leftTime = timeMarkers[i] - windowSize / 2;
-		float rightTime = timeMarkers[i] + windowSize / 2;
-
-		int leftId = 0;
-		int rightId = 0;
-		for (size_t j = 0; j < x.size(); j++)
+		if ((y[i] - y[i - 1]) > 0 &&
+			(y[i] - y[i + 1]) > 0)
 		{
-			if (x[j] >= leftTime)
-			{
-				leftId = j;
-				break;
-			}
-		}
-		for (size_t j = 0; j < x.size(); j++)
-		{
-			if (x[j] >= rightTime)
-			{
-				rightId = j;
-				break;
-			}
-		}
-
-		std::vector<int> localMaxId;
-		for (int j = (leftId + 1); j <= (rightId - 1); j++)
-		{
-			if ((y[j] - y[j - 1]) > 0 &&
-				(y[j] - y[j + 1]) > 0)
-			{
-				localMaxId.push_back(j);
-			}
-		}
-		if (localMaxId.size() >= 2)
-		{
-			for (size_t l = 0; l < (localMaxId.size() - 1); l++)
-			{
-				for (int markId = (localMaxId[l] + 1); markId < (localMaxId[l + 1]); markId++)
-					markDelete[markId] = true;
-			}
+			localMaxId.push_back(i);
 		}
 	}
 
-	// global smoothing(by windowsize or phoneme intervals
-	/*
-	if ((x[x.size() - 1] - x[0]) <=  windowSize)
+	size_t i = 0;
+	while (i < localMaxId.size() - 1)
 	{
-		std::vector<int> localMaxId;
-		for (size_t j = 1; j < (x.size() - 1); j++)
+		if (x[localMaxId[i + 1]] - x[localMaxId[i]] <= windowSize)
 		{
-			if ((y[j] - y[j - 1]) > 0 &&
-				(y[j] - y[j + 1]) > 0)
-			{
-				localMaxId.push_back(j);
-			}
-			if (localMaxId.size() >= 2)
-			{
-				for (size_t l = 0; l < (localMaxId.size() - 1); l++)
-				{
-					for (int markId = (localMaxId[l] + 1); markId < (localMaxId[l + 1]); markId++)
-						markDelete[markId] = true;
-				}
-			}
+			for (int markeId = (localMaxId[i] + 1); markeId < localMaxId[i + 1]; ++markeId)
+				markDelete[markeId] = true;
+			if (y[localMaxId[i + 1]] >= y[localMaxId[i]])	// remove first one
+				localMaxId.erase(localMaxId.begin() + i);
+			else
+				localMaxId.erase(localMaxId.begin() + i + 1);
+			i--;
 		}
+		i++;
 	}
-	else
-	{
-		for (size_t i = 0; i < x.size(); i++)
-		{
-			for (size_t t = 0; t < timeMarkers.size(); t++)
-			{
-				if (x[i] >= timeMarkers[t] && t < (timeMarkers.size() - 3))
-				{
-					windowSize = (timeMarkers[t + 3] - timeMarkers[t]);
-					break;
-				}
-			}
 
-			std::vector<int> localMaxId;
-			for (size_t j = i + 1; j < (x.size() - 1); j++)
-			{
-				if ((y[j] - y[j - 1]) > 0 &&
-					(y[j] - y[j + 1]) > 0)
-				{
-					localMaxId.push_back(j);
-				}
-
-				if ((x[j] - x[i]) > windowSize) // within the window, get rid of all the points between local max
-				{
-					if (localMaxId.size() >= 2)
-					{
-						for (size_t l = 0; l < (localMaxId.size() - 1); l++)
-						{
-							for (int markId = (localMaxId[l] + 1); markId < (localMaxId[l + 1]); markId++)
-								markDelete[markId] = true;
-						}
-		//				i = j;
-					}
-					break;
-				}
-			}
-		}
-	}
-	*/
-
-	std::vector<float> newCurve;
+	std::vector<float> smoothX;
+	std::vector<float> smoothY;
 	for (size_t i = 0; i < markDelete.size(); i++)
 	{
 		if (!markDelete[i])
 		{
-			newCurve.push_back(x[i]);
-			newCurve.push_back(y[i]);
+			smoothX.push_back(x[i]);
+			smoothY.push_back(y[i]);
 		}
 	}
+
+
+	// apply low pass filter
+	for (size_t i = 0; i < smoothX.size() - 1; ++i)
+	{
+		float speed = fabs(smoothY[i] - smoothY[i + 1]) / fabs(smoothX[i] - smoothX[i + 1]);
+		if (speed > speedLimit)
+		{
+			LOG("[%d]: %f", i, speed);
+			float sign = (smoothY[i] <= smoothY[i + 1]) ? 1.0f : -1.0f;
+			smoothY[i + 1] = fabs(smoothX[i] - smoothX[i + 1]) * windowSize * sign + smoothY[i];
+			if (i == smoothX.size() - 2)	// append one if last point has been changed
+			{
+				smoothX.push_back(smoothX[i] + 0.3f);	// 0.3 is adhoc
+				smoothY.push_back(0.0f);
+			}
+		}
+	}
+
+
+	// final stage
 	c.clear();
-	for (size_t i = 0; i < newCurve.size(); i++)
-		c.push_back(newCurve[i]);
+	for (size_t i = 0; i < smoothX.size(); i++)
+	{
+		c.push_back(smoothX[i]);
+		c.push_back(smoothY[i]);
+	}
 }
 
 void BML::SpeechRequest::schedule( time_sec now ) {

@@ -61,7 +61,8 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createDoubleAttribute("diphoneScale", 1, true, "Basic", 155, false, false, false, "Scale factor for diphone curves.");
 	createStringAttribute("diphoneSetName", "", true, "Basic", 160, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
 	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 170, false, false, false, "Use diphones spline/linear curve.");
-	SmartBody::DoubleAttribute* diphoneSmoothWindow = createDoubleAttribute("diphoneSmoothWindow", .2, true, "Basic", 180, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
+	createDoubleAttribute("diphoneSmoothWindow", .2, true, "Basic", 180, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
+	createDoubleAttribute("diphoneSpeedLimit", 20.0, true, "Basic", 181, false, false, false, "Speed Limit of mouth movement");
 
 	createBoolAttribute("ikPostFix", false, true, "Basic", 170, false, false, false, "Post-Processing IK to fix foot sliding.");
 	createBoolAttribute("terrainWalk", false, true, "Basic", 170, false, false, false, "Post-Processing to adjust the character for different terrain height. ikPostFix must be on for this to work.");
@@ -574,6 +575,11 @@ void SBCharacter::notify(SBSubject* subject)
 		{
 			SmartBody::DoubleAttribute* smoothWindowAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 			setDiphoneSmoothWindow((float)smoothWindowAttribute->getValue());
+		}
+		else if (attrName == "diphoneSpeedLimit")
+		{
+			SmartBody::DoubleAttribute* speedLimitAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			setDiphoneSpeedLimit((float)speedLimitAttribute->getValue());
 		}
 		else if (attrName == "deformableMesh")
 		{

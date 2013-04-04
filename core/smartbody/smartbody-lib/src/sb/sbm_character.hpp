@@ -346,6 +346,8 @@ public:
 	void setDiphoneSplineCurve( bool val ) { _diphoneSplineCurve = val; }
 	float getDiphoneSmoothWindow( void ) const { return _diphoneSmoothWindow; }
 	void setDiphoneSmoothWindow( float val ) { _diphoneSmoothWindow = val; }
+	float getDiphoneSpeedLimit( void ) const { return _diphoneSpeedLimit; }
+	void setDiphoneSpeedLimit( float val ) {_diphoneSpeedLimit = val; }
 
 	SBAPI SrVec getFacingDirection() ;
 
@@ -375,6 +377,7 @@ private:
 	float	_diphoneScale;
 	bool	_diphoneSplineCurve;
 	float	_diphoneSmoothWindow;
+	float	_diphoneSpeedLimit;
 
 protected:
 	/*!
