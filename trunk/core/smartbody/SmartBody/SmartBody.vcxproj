@@ -348,7 +348,16 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\smartbody-lib\src\sb\SBPython.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonAnimation.cpp" />
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonAttribute.cpp" />
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonCharacter.cpp" />
     <ClCompile Include="..\smartbody-lib\src\sb\SBPythonClass.cpp" />
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonMath.cpp" />
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonMotion.cpp" />
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonScene.cpp" />
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonSimulation.cpp" />
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonSkeleton.cpp" />
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonSystem.cpp" />
     <ClCompile Include="..\smartbody-lib\src\sb\SBReach.cpp" />
     <ClCompile Include="..\smartbody-lib\src\sb\SBReachManager.cpp" />
     <ClCompile Include="..\smartbody-lib\src\sb\SBRetarget.cpp" />
@@ -711,6 +720,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\smartbody-lib\src\sb\SBPhysicsSim.h" />
     <ClInclude Include="..\smartbody-lib\src\sb\SBPython.h" />
     <ClInclude Include="..\smartbody-lib\src\sb\SBPythonClass.h" />
+    <ClInclude Include="..\smartbody-lib\src\sb\SBPythonInternal.h" />
     <ClInclude Include="..\smartbody-lib\src\sb\SBReach.h" />
     <ClInclude Include="..\smartbody-lib\src\sb\SBReachManager.h" />
     <ClInclude Include="..\smartbody-lib\src\sb\SBRetarget.h" />

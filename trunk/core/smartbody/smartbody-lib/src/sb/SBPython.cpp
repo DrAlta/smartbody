@@ -1587,7 +1587,6 @@ boost::python::class_<SBReach>("SBReach")
 		;
 
 	boost::python::class_<SBScene, boost::python::bases<SBObject> >("SBScene")
-		.def("update", &SBScene::update, "Updates the simulation at the given time.")
 		.def("setProcessId", &SBScene::setProcessId, "Sets the process id of the SmartBody instance.")
 		.def("getProcessId", &SBScene::getProcessId,  boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the process id of the SmartBody instance.")
 		.def("createCharacter", &SBScene::createCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new character given character name. \n Input: character name \nOutput: character object")
@@ -1631,7 +1630,6 @@ boost::python::class_<SBReach>("SBReach")
 		.def("startFileLogging", &SBScene::startFileLogging, "Starts logging SmartBody messages to a given log file.")
 		.def("stopFileLogging", &SBScene::stopFileLogging, "Stops logging SmartBody messages to the given log file.")
 
-		
 		// cameras
 		.def("createCamera", &SBScene::createCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a camera with a given name and returns it.")
 		.def("removeCamera", &SBScene::removeCamera, "Removes a camera.")
@@ -1966,5 +1964,3 @@ void setupPython()
 	}
 #endif
 }
-
-

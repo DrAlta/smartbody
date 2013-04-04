@@ -400,6 +400,13 @@ set( SMARTBODY_LIB_SBM_SRC
 	sb/SBWSPManager.cpp
 
 	sb/SBPython.cpp
+	sb/SBPythonAnimation.cpp
+	sb/SBPythonAttribute.cpp
+	sb/SBPythonCharacter.cpp
+	sb/SBPythonMath.cpp
+	sb/SBPythonScene.cpp
+	sb/SBPythonSimulation.cpp
+	sb/SBPythonSkeleton.cpp
 	sb/SBPythonClass.cpp
 
 	sb/SBBehavior.cpp

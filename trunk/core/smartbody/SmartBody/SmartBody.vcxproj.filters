@@ -1047,6 +1047,33 @@
     <ClCompile Include="..\smartbody-lib\src\sb\SBNavigationMesh.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonMath.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonSkeleton.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonCharacter.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonMotion.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonSimulation.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonAttribute.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonScene.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonSystem.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPythonAnimation.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\smartbody-dll\include\smartbody-dll.h" />
@@ -2121,6 +2148,9 @@
     </ClInclude>
     <ClInclude Include="..\smartbody-lib\src\sb\SBNavigationMesh.h">
       <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\sb\SBPythonInternal.h">
+      <Filter>python</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
