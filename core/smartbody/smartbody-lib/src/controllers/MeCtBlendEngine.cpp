@@ -46,7 +46,6 @@ void MeCtBlendEngine::init(const std::string& paramFuncType)
 	{
 		MeCtIKTreeNode* node = nodeList[i];
 		SmartBody::SBJoint* joint = skeletonCopy->getJointByName(node->nodeName.c_str());		
-		SkJointQuat* skQuat = joint->quat();		
 		affectedJoints.push_back(joint);			
 	}
 
@@ -274,7 +273,6 @@ void MeCtBlendEngine::getBlendParameterFromWeights( dVector& outPara, std::vecto
 	}
 	interpMotion->weight = weight;
 	// a quick and dirty way to combine the parameters, but are they the right way ?
-	VecOfBodyMotionPtr& motions = *interpMotion->motionDataRef;
 	for (unsigned int i=0;i<weight.size();i++)
 	{
 		int index = weight[i].first;

@@ -721,7 +721,6 @@ void ReachStateInterface::updateMotionPoseInterpolation( ReachStateData* rd )
 	float timeScale = (rd->useRetiming && rd->useProfileInterpolation) ? (scaleFactor*(1.f - rd->retimingFactor) + rd->retimingFactor) : 1.f;//(pow(scaleFactor,rd->retimingFactor)) : 1.f;	
 	float reachStep = rd->linearVel*rd->dt*timeScale;
 	SRT diff = SRT::diff(estate.curBlendState,estate.ikTargetState);		
-	float difflenght = diff.tran.norm();
 	SrVec stepVec = diff.tran;		
 	if (stepVec.norm() > reachStep)
 	{
