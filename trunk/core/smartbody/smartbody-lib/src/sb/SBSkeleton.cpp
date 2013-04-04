@@ -83,7 +83,6 @@ bool SBSkeleton::load(std::string skeletonFile)
 
 bool SBSkeleton::save(std::string skeletonFile)
 {
-	SkSkeleton* myskel = dynamic_cast<SkSkeleton*>(this);
 	FILE *fp = NULL;
 	fp = fopen(skeletonFile.c_str(), "w");
 	if (fp == NULL )

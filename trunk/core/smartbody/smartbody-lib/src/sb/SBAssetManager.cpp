@@ -214,7 +214,6 @@ void SBAssetManager::addAssetPath(const std::string& type, const std::string& pa
 
 void SBAssetManager::removeAssetPath(const std::string& type, const std::string& path)
 {
-	bool ret = false;
 	if (type == "seq" || type == "script")
 	{
 		seq_paths->remove(const_cast<char *>(path.c_str()));
@@ -236,9 +235,6 @@ void SBAssetManager::removeAssetPath(const std::string& type, const std::string&
 
 void SBAssetManager::removeAllAssetPaths(const std::string& type)
 {
-	 
-
-	bool ret = false;
 	if (type == "seq" || type == "script")
 	{
 		seq_paths->removeAll();
@@ -518,7 +514,6 @@ std::vector<std::string> SBAssetManager::getSkeletonNames()
 		iter != _skeletons.end();
 		iter++)
 	{
-		SBSkeleton* skeleton = (*iter).second;
 		ret.push_back(std::string(iter->first));
 	}
 

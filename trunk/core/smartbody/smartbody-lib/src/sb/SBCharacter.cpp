@@ -477,14 +477,18 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 	SmartBody::SBSteerAgent* steerAgent = manager->getSteerAgent(this->getName());
 	if (steerAgent)
 	{
-		PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-		const SteerLib::AgentGoalInfo& goal = ppraiAgent->getAgent()->currentGoal();
-		Util::Point goalTarget = goal.targetLocation;
 		LocomotionBehavior* locoBehavior = new LocomotionBehavior();
-		SrVec target(goalTarget.x, 0.f, goalTarget.z);
-		bool reachTarget = _reachTarget && !_lastReachStatus;
-		locoBehavior->setLocomotionTarget(target);
-		locoBehavior->setReachTarget(reachTarget);
+		PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+		if (ppraiAgent->getAgent())
+		{
+			const SteerLib::AgentGoalInfo& goal = ppraiAgent->getAgent()->currentGoal();
+			Util::Point goalTarget = goal.targetLocation;
+		
+			SrVec target(goalTarget.x, 0.f, goalTarget.z);
+			bool reachTarget = _reachTarget && !_lastReachStatus;
+			locoBehavior->setLocomotionTarget(target);
+			locoBehavior->setReachTarget(reachTarget);
+		}
 		_curBehaviors.push_back(locoBehavior);
 	}
 

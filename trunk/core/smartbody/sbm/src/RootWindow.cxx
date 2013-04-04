@@ -572,6 +572,7 @@ void BaseWindow::LaunchBMLViewerCB(Fl_Widget* widget, void* data)
 	if (!rootWindow->bmlViewerWindow)
 	{
 		rootWindow->bmlViewerWindow = new BehaviorWindow(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "BML Viewer");
+		rootWindow->bmlViewerWindow->show_viewer();
 	}
 	rootWindow->bmlViewerWindow->show();
 }

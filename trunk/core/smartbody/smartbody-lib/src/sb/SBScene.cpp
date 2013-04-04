@@ -173,7 +173,7 @@ void SBScene::initialize()
 	createStringAttribute("defaultRecipient","ALL",true,"",550,false,false,false,"Default recipient when processing BML.");
 	createIntAttribute("queuedCommandsIndex",1,true,"",560,false,false,false,"Unique identifier when executing sequence commands.");
 	createIntAttribute("bmlIndex",1,true,"",560,false,false,false,"Unique identifier when executing BML commands.");
-	BoolAttribute* consoleAttr = createBoolAttribute("enableConsoleLogging",false,true,"",70,false,false,false,"Use SmartBody's internal audio player.");
+	createBoolAttribute("enableConsoleLogging",false,true,"",70,false,false,false,"Use SmartBody's internal audio player.");
 	
 	vhcl::Log::g_log.RemoveAllListeners();
 	ForwardLogListener* forwardListener = new ForwardLogListener();
@@ -206,7 +206,7 @@ void SBScene::initialize()
 
 	_debuggerServer->Init();
 	_debuggerServer->SetSBScene(_scene);
-	SmartBody::SBAnimationBlend0D* idleState = getBlendManager()->createBlend0D(PseudoIdleState);
+	getBlendManager()->createBlend0D(PseudoIdleState);
 
 	// reset timer & viewer window
 	getSimulationManager()->reset();
@@ -642,7 +642,7 @@ void SBScene::update()
 				{
 					// connection is bad, remove the bonebus character 
 					LOG("BoneBus cannot connect to server. Removing pawn %s", pawn->getName().c_str());
-					bool success = getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
+					getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
 					char_p->bonebusCharacter = NULL;
 					isClosingBoneBus = true;
 					if (getBoneBusManager()->getBoneBus().GetNumCharacters() == 0)
@@ -733,7 +733,7 @@ void SBScene::update()
 			SBPawn* pawn = getPawn(*iter);
 			if (pawn->bonebusCharacter)
 			{
-				bool success = getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
+				getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
 				pawn->bonebusCharacter = NULL;
 			}
 		}
@@ -1274,7 +1274,7 @@ bool SBScene::run(const std::string& command)
 	try {
 		//LOG("executePython = %s",command);
 
-		int result = PyRun_SimpleString(command.c_str());
+		PyRun_SimpleString(command.c_str());
 		//LOG("cmd result = %d",result);
 
 		return true;
@@ -2152,7 +2152,6 @@ void SBScene::saveBlends(std::stringstream& strstr, bool remoteSetup)
 	strstr << "# -------------------- blends and transitions\n";
 	// blends & transitions
 	SBAnimationBlendManager* blendManager = getBlendManager();
-	int numBlends = blendManager->getNumBlends();
 	std::vector<std::string> blends = blendManager->getBlendNames();
 	for (std::vector<std::string>::iterator blendIter = blends.begin();
 		 blendIter != blends.end();
@@ -2343,7 +2342,6 @@ void SBScene::saveLipSyncing(std::stringstream& strstr, bool remoteSetup)
 			const std::string& fromPhoneme = diphone->getFromPhonemeName();
 			const std::string& toPhoneme = diphone->getToPhonemeName();
 			strstr << "diphone = diphoneMapManager.createDiphone(\"" << fromPhoneme << "\", \"" << toPhoneme << "\", \"" << diphoneMapName << "\")\n";
-			int numVisemes = diphone->getNumVisemes();
 			std::vector<std::string> visemes = diphone->getVisemeNames();
 			for (std::vector<std::string>::iterator visemeIter = visemes.begin();
 				 visemeIter != visemes.end();
