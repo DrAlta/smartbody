@@ -1,4 +1,4 @@
-include_directories( /usr/local/include/OGRE )
+include_directories( /usr/include/OGRE )
 include_directories( ../smartbody/smartbody-dll/include )
 include_directories( ../../lib/bonebus/include )
 include_directories( /Users/feng/SmartBodyDev/SbmOSX/trunk/core/smartbody/sbm/Frameworks/Ogre.framework/Versions/1.7.4/Headers )
@@ -74,15 +74,16 @@ add_executable( ogreviewer
 
 target_link_libraries( ogreviewer
 
-	smartbody-dll
+	SmartBody
 	xerces-c
 	vhcl
 	vhmsg	
 	activemq-cpp
-	#OgreMain
-	#OIS
+	OgreMain
+	OIS
 	alut
 	sndfile
+	GLEW
 	${OGRE_LIBS}
 	bonebus
 	${MORE_LIBS}
