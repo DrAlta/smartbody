@@ -362,6 +362,8 @@ void FLTKListener::setOtherListener( SmartBody::SBCharacterListener* listener )
 
 void FLTKListener::OnLogMessage( const std::string& message )
 {
+#ifdef WIN32
 	LOG(message.c_str());
+#endif
 }
 

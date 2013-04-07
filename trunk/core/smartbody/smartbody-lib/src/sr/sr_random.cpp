@@ -1,6 +1,6 @@
 
-# include <SR/sr.h>
-# include <SR/sr_random.h>
+# include <sr/sr.h>
+# include <sr/sr_random.h>
 
 //========================= static methods =============================================
 

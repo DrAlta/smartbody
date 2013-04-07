@@ -215,7 +215,7 @@ void AgentMetricsCollector::_updateCollisionStats(GridDatabase2D * gridDB, Agent
 		// this way, collisionKey will be unique across all objects in the spatial database.
 		//unsigned int collisionKey = reinterpret_cast<unsigned int>((*neighbor));
 		SpatialDatabaseItemPtr item = (*neighbor);
-		intptr_t collisionKey = reinterpret_cast<intptr_t>(item);
+		unsigned long collisionKey = reinterpret_cast<unsigned long>(item);
 		float penetration = 0.0f;
 		penetration = (*neighbor)->computePenetration(_currentPosition, _radius);
 

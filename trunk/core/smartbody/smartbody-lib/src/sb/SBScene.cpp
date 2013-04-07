@@ -43,6 +43,7 @@
 #include <sb/SBDebuggerUtility.h>
 #include <sb/SBVHMsgManager.h>
 #include <sbm/sbm_audio.h>
+#include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
@@ -3014,7 +3015,11 @@ std::map<std::string, GeneralParam*>& SBScene::getGeneralParameters()
 SBAPI bool SBScene::createNavigationMesh( const std::string& meshfilename )
 {	
 	std::vector<SrModel*> meshVec;
+#if (BOOST_VERSION > 104400)
+	std::string ext = boost::filesystem::extension(meshfilename);
+#else
 	std::string ext = boost::filesystem2::extension(meshfilename);
+#endif
 	std::string file = boost::filesystem::basename(meshfilename);	
 	bool loadSuccess = false;
 	if (ext == ".obj" || ext == ".OBJ")

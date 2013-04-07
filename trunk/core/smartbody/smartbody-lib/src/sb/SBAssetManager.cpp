@@ -4,6 +4,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
 
+#include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -277,8 +278,20 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 	boost::filesystem::path p( mediaPath );
 	boost::filesystem::path assetP( assetPath );
 
-	boost::filesystem::path abs_p = boost::filesystem::complete( assetP );	
+#if (BOOST_VERSION > 104400)
+	boost::filesystem::path abs_p = boost::filesystem::absolute( assetP );	
+	if( boost::filesystem::exists( abs_p ))
+	{
+		p = assetP;
+	}
+	else
+	{
+		p /= assetP;
+	}
+	boost::filesystem::path final = boost::filesystem::absolute( p );
 
+#else
+	boost::filesystem::path abs_p = boost::filesystem::complete( assetP );	
 	if( boost::filesystem2::exists( abs_p ))
 	{
 		p = assetP;
@@ -288,7 +301,10 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 		p /= assetP;
 	}
 	boost::filesystem::path final = boost::filesystem::complete( p );
-	std::string finalPath = p.string();
+
+#endif
+
+		std::string finalPath = p.string();
 
 	// make sure the file exists and is readable
 	std::ifstream file(finalPath.c_str());
@@ -526,7 +542,11 @@ int SBAssetManager::load_me_motions( const char* pathname, std::map<std::string,
 	
 	boost::filesystem::path finalPath;
 
+#if (BOOST_VERSION > 104400)
+	std::string rootDir = motions_path.root_directory().string();
+#else
 	std::string rootDir = motions_path.root_directory();
+#endif
 	if (rootDir.size() == 0)
 	{	
 		std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
@@ -548,14 +568,24 @@ int SBAssetManager::load_me_motions( const char* pathname, std::map<std::string,
 
 int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathname, std::map<std::string, SmartBody::SBMotion*>& map, bool recurse_dirs, double scale, const char* error_prefix )
 {
-	if( !boost::filesystem::exists( pathname ) ) {
+	if( !boost::filesystem::exists( pathname ) )
+	{
+#if (BOOST_VERSION > 104400)
+		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.string().c_str());
+#else
 		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
+#endif
 		return CMD_FAILURE;
 	}
 
-	if( boost::filesystem::is_directory( pathname ) ) {
+	if( boost::filesystem::is_directory( pathname ) )
+	{
 		// ignore any '.' diretories
+#if (BOOST_VERSION > 104400)
+		std::string filebase = pathname.leaf().string();
+#else
 		std::string filebase = pathname.leaf();
+#endif
 		if (filebase.find(".") == 0 && filebase.size() > 1)
 		{
 			// ignore hidden directories
@@ -708,16 +738,29 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 
 				std::string filebase = boost::filesystem::basename( pathname );
 				const char* name = motion->getName().c_str();
-				if( name && _stricmp( filebase.c_str(), name ) ) {
+				if( name && _stricmp( filebase.c_str(), name ) )
+				{
+#if (BOOST_VERSION > 104400)
+					LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.string().c_str(), filebase.c_str());
+#else
 					LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.native_file_string().c_str(), filebase.c_str());
+#endif
 					//motion->setName( filebase.c_str() );
 				}
+#if (BOOST_VERSION > 104400)
+				motion->filename( pathname.string().c_str() );
+				SBMotion* existingMotion = getMotion(filebase);
+				if (existingMotion)
+				{
+					LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
+#else
 				motion->filename( pathname.native_file_string().c_str() );
-
 				SBMotion* existingMotion = getMotion(filebase);
 				if (existingMotion)
 				{
 					LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+#endif
+
 					delete motion;
 					return CMD_FAILURE;
 				}
@@ -923,8 +966,13 @@ SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srP
 //	char *full_filename = new char[_MAX_PATH]; // REALLY??
 	
 	boost::filesystem::path p( filename );
+#if (BOOST_VERSION > 104400)
+	boost::filesystem::path abs_p = boost::filesystem::absolute( p );
+    if ( boost::filesystem::exists( abs_p ) )	{
+#else
 	boost::filesystem::path abs_p = boost::filesystem::complete( p );
     if ( boost::filesystem2::exists( abs_p ) )	{
+#endif
 //		sprintf( full_filename, "%s", abs_p.string().c_str() );
 		
 	}
@@ -942,7 +990,11 @@ int SBAssetManager::load_me_skeletons_impl( const boost::filesystem::path& pathn
 {
 		
 	if( !exists( pathname ) ) {
+#if (BOOST_VERSION > 104400)
+		LOG("%s Skeleton path \"%s\" not found.", error_prefix,  pathname.string().c_str());
+#else
 		LOG("%s Skeleton path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
+#endif
 		return CMD_FAILURE;
 	}
 
@@ -1032,7 +1084,12 @@ int SBAssetManager::load_me_skeletons_impl( const boost::filesystem::path& pathn
 			{
 				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
+#if (BOOST_VERSION > 104400)
+
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
+#else
 					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+#endif
 					delete skeleton;
 					return CMD_FAILURE;
 				}
@@ -1057,7 +1114,11 @@ int SBAssetManager::load_me_skeletons_impl( const boost::filesystem::path& pathn
 			{
 				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
+#if (BOOST_VERSION > 104400)
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
+#else
 					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+#endif
 					delete skeleton;
 					return CMD_FAILURE;
 				}
@@ -1080,7 +1141,11 @@ int SBAssetManager::load_me_skeletons_impl( const boost::filesystem::path& pathn
 			{
 				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
+#if (BOOST_VERSION > 104400)
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
+#else
 					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+#endif
 					delete skeleton;
 					return CMD_FAILURE;
 				}
@@ -1103,7 +1168,11 @@ int SBAssetManager::load_me_skeletons_impl( const boost::filesystem::path& pathn
 			{
 				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
+#if (BOOST_VERSION > 104400)
+					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
+#else
 					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+#endif
 					delete skeleton;
 					return CMD_FAILURE;
 				}
@@ -1193,7 +1262,11 @@ int SBAssetManager::load_me_skeletons( const char* pathname, std::map<std::strin
 	boost::filesystem::path finalPath;
 	// include the media path in the pathname if applicable
 	
+#if (BOOST_VERSION > 104400)
+	std::string rootDir = motions_path.root_directory().string();
+#else
 	std::string rootDir = motions_path.root_directory();
+#endif
 	if (rootDir.size() == 0)
 	{		
 		finalPath = operator/(SmartBody::SBScene::getScene()->getMediaPath(), motions_path);

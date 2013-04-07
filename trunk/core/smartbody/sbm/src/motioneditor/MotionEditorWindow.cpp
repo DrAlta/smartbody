@@ -2,6 +2,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBBmlProcessor.h>
 #include <FL/Fl_File_Chooser.H>
+#include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
@@ -278,7 +279,11 @@ void MotionEditorWindow::OnButtonPlayMotionFolder(Fl_Widget* widget, void* data)
 
 	std::string motionFolderPath = editor->_inputFilePath->value();
 	boost::filesystem::path motionFolder(motionFolderPath);
+#if (BOOST_VERSION > 104400)
+	if (!boost::filesystem::is_directory(motionFolder))
+#else
 	if (!boost::filesystem2::is_directory(motionFolder))
+#endif
 	{
 		LOG("MotionEditorWindow::OnButtonPlayMotionFolder ERR: Please input a valid directory %s", motionFolderPath.c_str());
 		return;

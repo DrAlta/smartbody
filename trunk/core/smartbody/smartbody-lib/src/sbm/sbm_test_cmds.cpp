@@ -40,6 +40,7 @@
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBAttribute.h>
 #include <boost/filesystem.hpp>
+#include <boost/version.hpp>
 #include <bml/bml_processor.hpp>
 #include <sbm/BMLDefs.h>
 
@@ -366,12 +367,21 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		DOMDocument* xmlDoc = NULL;
 		// check the cache to see if it exists first
 		boost::filesystem::path p(filename);
+#if (BOOST_VERSION > 104400)
+		boost::filesystem::path abs_p = boost::filesystem::absolute( p );
+		if (!boost::filesystem::exists( abs_p ))
+		{
+			boost::filesystem::path finalPath(scene->getMediaPath());
+			finalPath /= p;
+			if (!boost::filesystem::exists( finalPath ))
+#else
 		boost::filesystem::path abs_p = boost::filesystem::complete( p );
 		if (!boost::filesystem2::exists( abs_p ))
 		{
 			boost::filesystem::path finalPath(scene->getMediaPath());
 			finalPath /= p;
 			if (!boost::filesystem2::exists( finalPath ))
+#endif
 			{
 				LOG("File %s was not found using media path %s. BML will not be processed.", filename.c_str(), scene->getMediaPath().c_str());
 				return CMD_FAILURE;

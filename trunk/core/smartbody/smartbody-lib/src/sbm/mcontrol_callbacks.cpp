@@ -37,6 +37,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <boost/version.hpp>
 #include <boost/tokenizer.hpp>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
@@ -164,7 +165,12 @@ char * mcn_return_full_filename_func( const char * current_path, const char * fi
 	boost::filesystem::path fullpath = current_path;
 	fullpath /= std::string(file_name);
 	printf("%s", fullpath.string().c_str());
+#if (BOOST_VERSION > 104400)
+	return (char*) fullpath.string().c_str();
+#else
 	return (char*) fullpath.native_file_string().c_str();
+#endif
+
 
 	if( file_name == NULL)	return NULL;
 	printf("CURRENT PATH=%s, file_name=%s", current_path, file_name);
@@ -1353,7 +1359,11 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBComma
 	}
 
 	// Here, detect which type of file it is
+#if (BOOST_VERSION > 104400)
+	std::string ext = boost::filesystem::extension(obj_file);
+#else
 	std::string ext = boost::filesystem2::extension(obj_file);
+#endif
 	std::string file = boost::filesystem::basename(obj_file);	
 	std::vector<SrModel*> meshModelVec;
 	if (ext == ".obj" || ext == ".OBJ")
@@ -1486,7 +1496,11 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 
 	// Here, detect which type of file it is
 	std::string filename = obj_file;
+#if (BOOST_VERSION > 104400)
+	std::string ext = boost::filesystem::extension(obj_file);
+#else
 	std::string ext = boost::filesystem2::extension(obj_file);
+#endif
 	std::string file = boost::filesystem::basename(obj_file);	
 	std::vector<SrModel*> meshModelVec;
 	if (ext == ".obj" || ext == ".OBJ")
@@ -1918,7 +1932,11 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 	ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
 	parser->setErrorHandler(errHandler);
 
+#if (BOOST_VERSION > 104400)
+	std::string ext = boost::filesystem::extension(skin_file);
+#else
 	std::string ext = boost::filesystem2::extension(skin_file);
+#endif
 	std::string file = boost::filesystem::basename(skin_file);	
 
 	try 
@@ -2867,11 +2885,19 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 				soundCacheDir = soundDir;
 
 		boost::filesystem::path p( soundCacheDir );
+#if (BOOST_VERSION > 104400)
+		boost::filesystem::path abs_p = boost::filesystem::absolute( p );
+#else
 		boost::filesystem::path abs_p = boost::filesystem::complete( p );
+#endif
 
 //            char full[ _MAX_PATH ];
 //            if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
+#if (BOOST_VERSION > 104400)
+        if ( boost::filesystem::exists( abs_p ) )
+#else
         if ( boost::filesystem2::exists( abs_p ) )
+#endif
         {
             //soundFile = string( full ) + string( "/" ) + soundFile;
 			p  /= soundFile;
@@ -2969,8 +2995,16 @@ int mcu_stop_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
         if ( !absolutePath )
         {
 		boost::filesystem::path p( "../../../../.." );
+#if (BOOST_VERSION > 104400)
+		boost::filesystem::path abs_p = boost::filesystem::absolute( p );
+#else
 		boost::filesystem::path abs_p = boost::filesystem::complete( p );
+#endif
+#if (BOOST_VERSION > 104400)
+        if ( boost::filesystem::exists( abs_p ) )
+#else
         if ( boost::filesystem2::exists( abs_p ) )
+#endif
         {
 			p  /= soundFile;
             soundFile = abs_p.string();
@@ -4139,7 +4173,11 @@ int motionmapdir_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	
 	boost::filesystem::path finalPath;
 	// include the media path in the pathname if applicable
+#if (BOOST_VERSION > 104400)
+	std::string rootDir = path.root_directory().string();
+#else
 	std::string rootDir = path.root_directory();
+#endif
 	if (rootDir.size() == 0)
 	{	
 		finalPath = operator/(mediaPath, path);
@@ -4169,7 +4207,11 @@ int motionmapdir_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		}
 		const std::string& fileName = motion->getMotionFileName();
 		boost::filesystem::path motionPath(fileName);
+#if (BOOST_VERSION > 104400)
+		std::string motionRootDir = motionPath.root_directory().string();
+#else
 		std::string motionRootDir = motionPath.root_directory();
+#endif
 		boost::filesystem::path finalMotionPath;
 //		if (motionRootDir.size() == 0)
 //		{
@@ -4183,7 +4225,11 @@ int motionmapdir_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		while (currentPath.has_parent_path())
 		{
 			boost::filesystem::path parentPath = currentPath.parent_path();
+#if (BOOST_VERSION > 104400)
+			if (boost::filesystem::equivalent(parentPath, finalPath))
+#else
 			if (boost::filesystem2::equivalent(parentPath, finalPath))
+#endif
 			{
 				std::stringstream strstr;
 				strstr << "motionmap " << motion->getName() << " " << mapName;
@@ -5731,5 +5777,6 @@ int xmlcache_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		return CMD_SUCCESS;
 	}
 	*/
+
 	return CMD_FAILURE;
 }

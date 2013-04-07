@@ -86,6 +86,7 @@
 # include <sb/SBBmlProcessor.h>
 # include <sb/SBNavigationMesh.h>
 
+#include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
@@ -1796,7 +1797,11 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		// load the new skeleton
 
 		boost::filesystem::path tempPath(retargetDir);
+#if (BOOST_VERSION > 104400)
+		boost::filesystem::path completePath = boost::filesystem::absolute( tempPath );	
+#else
 		boost::filesystem::path completePath = boost::filesystem::complete( tempPath );	
+#endif
  		scene->loadAsset(targetSkelFile);
 		
  		//boost::filesystem::copy_file()

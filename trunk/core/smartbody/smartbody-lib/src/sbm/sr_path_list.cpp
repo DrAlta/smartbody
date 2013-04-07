@@ -1,6 +1,7 @@
 #include "sr_path_list.h"
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <boost/version.hpp>
 #include <sb/SBScene.h>
 
 srPathList::srPathList()
@@ -72,7 +73,11 @@ std::string srPathList::next_path(bool withPrefix)
 	}
 
 	boost::filesystem::path finalPath(strstr.str());
+#if (BOOST_VERSION > 104400)
+	finalPath.normalize();
+#else
 	finalPath.canonize();
+#endif
 
 	_curIndex++;
 	
