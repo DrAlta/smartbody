@@ -31,6 +31,7 @@
 #include <sb/SBAssetManager.h>
 #include <sb/SBCommandManager.h>
 
+#include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
@@ -144,11 +145,17 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 
 	boost::filesystem::path p( relativeAudioPath );
 	p /= voiceCode;
+#if (BOOST_VERSION > 104400)
+	boost::filesystem::path abs_p = boost::filesystem::absolute( p );	
+	if( !boost::filesystem::exists( abs_p ))
+	{
+	  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
+#else
 	boost::filesystem::path abs_p = boost::filesystem::complete( p );	
-
 	if( !boost::filesystem2::exists( abs_p ))
 	{
 	  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+#endif
       return 0;
 	}
 
@@ -156,28 +163,50 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 	wavPath /= std::string(ref + ".wav");
 	boost::filesystem::path bmlPath = abs_p;
 	bmlPath /= std::string(ref + ".bml");
+#if (BOOST_VERSION > 104400)
+	std::string basePath = abs_p.string().c_str();
+	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.string().c_str();
+	string bmlFilename = bmlPath.string().c_str();
+#else
 	std::string basePath = abs_p.native_directory_string().c_str();
-
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.native_directory_string().c_str();
-
 	string bmlFilename = bmlPath.native_directory_string().c_str();
+#endif
+
+
 
 	rapidxml::file<char> bmlFile(bmlFilename.c_str());
 	rapidxml::xml_document<> bmldoc;
 	bmldoc.parse< rapidxml::parse_declaration_node>(bmlFile.data());
 
 	m_speechRequestInfo[ m_requestIdCounter ].visemeData.clear();
+#if (BOOST_VERSION > 104400)
+	ReadVisemeDataBMLFast( bmlPath.string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent, bmldoc );
+#else
 	ReadVisemeDataBMLFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent, bmldoc );
+#endif
 	if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
 	{
+#if (BOOST_VERSION > 104400)
+	  LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.string().c_str() );
+#else
 	  LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
+#endif
 	  return 0;
 	}
 
+#if (BOOST_VERSION > 104400)
+	ReadSpeechTimingFast( bmlPath.string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers, bmldoc );
+#else
 	ReadSpeechTimingFast( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers, bmldoc );
+#endif
 	if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
 	{
+#if (BOOST_VERSION > 104400)
+		LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.string().c_str() );
+#else
 		LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
+#endif
 		//mcu.mark("requestSpeechAudio");
 		//return 0;
 	}
@@ -224,9 +253,15 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 
    // if the voice code is an absolute path, use it and ignore the media path and audio path
    boost::filesystem::path abs_p( voiceCode );
+#if (BOOST_VERSION > 104400)
+   boost::filesystem::path voicecodeabs_p = boost::filesystem::absolute( abs_p );
+   voicecodeabs_p /= std::string(ref + ".bml");
+   if( !boost::filesystem::exists( voicecodeabs_p ))
+#else
    boost::filesystem::path voicecodeabs_p = boost::filesystem::complete( abs_p );
    voicecodeabs_p /= std::string(ref + ".bml");
    if( !boost::filesystem2::exists( voicecodeabs_p ))
+#endif
    {
 	    std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
 		std::string relativeAudioPath = "";
@@ -235,11 +270,18 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 	    
 		boost::filesystem::path p( relativeAudioPath );
 		p /= voiceCode;
+#if (BOOST_VERSION > 104400)
+		abs_p = boost::filesystem::absolute( p );	
+		if( !boost::filesystem::exists( abs_p ))
+		{
+		  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
+#else
 		abs_p = boost::filesystem::complete( p );	
-
 		if( !boost::filesystem2::exists( abs_p ))
 		{
 		  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+#endif
+
 		  return 0;
 		}
    }
@@ -248,21 +290,37 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 	wavPath /= std::string(ref + ".wav");
 	boost::filesystem::path bmlPath = abs_p;
 	bmlPath /= std::string(ref + ".bml");
+#if (BOOST_VERSION > 104400)
+	std::string basePath = abs_p.string().c_str();
+	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.string().c_str();
+ 	ReadVisemeDataBML( bmlPath.string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
+   if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
+   {
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.string().c_str() );
+      return 0;
+   }
+   ReadSpeechTiming( bmlPath.string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
+#else
 	std::string basePath = abs_p.native_directory_string().c_str();
-
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.native_directory_string().c_str();
-
    ReadVisemeDataBML( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
       LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read visemes from file: %s\n", bmlPath.native_directory_string().c_str() );
       return 0;
    }
-
    ReadSpeechTiming( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
+#endif
+
+
+
    if ( m_speechRequestInfo[ m_requestIdCounter ].timeMarkers.size() == 0 )
    {
-      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.native_directory_string().c_str() );
+#if (BOOST_VERSION > 104400)
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.string().c_str() );
+#else
+      LOG( "AudioFileSpeech::requestSpeechAudio ERR: could not read time markers file: %s\n", bmlPath.string().c_str() );
+#endif
       //return 0;
    }
 
@@ -521,7 +579,11 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 	if (SmartBody::SBScene::getScene()->getBoolAttribute("useXMLCache"))
 	{
 		boost::filesystem::path path(filename);
+#if (BOOST_VERSION > 104400)
+		boost::filesystem::path absPath = boost::filesystem::absolute(path);
+#else
 		boost::filesystem::path absPath = boost::filesystem::complete(path);
+#endif
 		std::string absPathStr = absPath.string();
 		std::map<std::string, DOMDocument*>::iterator iter = xmlCache.find(absPathStr);
 		if (iter !=  xmlCache.end())

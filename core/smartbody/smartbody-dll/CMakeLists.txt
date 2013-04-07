@@ -86,7 +86,7 @@ target_link_libraries( smartbody-dll
 	steerlib
 	pprAI
 	ode
-	python2.6
+	python2.7
 	ncurses
 	${MORE_LIBS}
 	GLEW

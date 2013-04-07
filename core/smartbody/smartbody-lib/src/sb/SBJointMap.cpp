@@ -6,6 +6,7 @@
 #include <sb/SBPawn.h>
 #include <sb/SBScene.h>
 #include <cstring>
+#include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <controllers/me_controller_tree_root.hpp>
@@ -49,7 +50,11 @@ void SBJointMap::applyMotionRecurse(const std::string& directory)
 	
 	boost::filesystem::path finalPath;
 	// include the media path in the pathname if applicable
+#if (BOOST_VERSION > 104400)
+	std::string rootDir = path.root_directory().string();
+#else
 	std::string rootDir = path.root_directory();
+#endif
 	if (rootDir.size() == 0)
 	{	
 		finalPath = operator/(mediaPath, path);
@@ -78,7 +83,11 @@ void SBJointMap::applyMotionRecurse(const std::string& directory)
 		}
 		const std::string& fileName = motion->getMotionFileName();
 		boost::filesystem::path motionPath(fileName);
+#if (BOOST_VERSION > 104400)
+		std::string motionRootDir = motionPath.root_directory().string();
+#else
 		std::string motionRootDir = motionPath.root_directory();
+#endif
 		boost::filesystem::path finalMotionPath;
 //		if (motionRootDir.size() == 0)
 //		{
@@ -92,7 +101,11 @@ void SBJointMap::applyMotionRecurse(const std::string& directory)
 		while (currentPath.has_parent_path())
 		{
 			boost::filesystem::path parentPath = currentPath.parent_path();
+#if (BOOST_VERSION > 104400)
+			if (boost::filesystem::equivalent(parentPath, finalPath))
+#else
 			if (boost::filesystem2::equivalent(parentPath, finalPath))
+#endif
 			{
 				applyMotion(motion);
 				break;

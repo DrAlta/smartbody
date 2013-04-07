@@ -13,6 +13,7 @@
 #include <sb/SBBmlProcessor.h>
 #include <bml/bml_speech.hpp>
 #include <bml/bml_processor.hpp>
+#include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -667,9 +668,14 @@ void VisemeViewerWindow::loadAudioFiles()
 
 	boost::filesystem::path p(relativeAudioPath);
 	p /= character->getVoiceCode();
-	boost::filesystem::path abs_p = boost::filesystem::complete( p );	
 
+#if (BOOST_VERSION > 104400)
+	boost::filesystem::path abs_p = boost::filesystem::absolute( p );	
+	if( !boost::filesystem::exists( abs_p ))
+#else
+	boost::filesystem::path abs_p = boost::filesystem::complete( p );	
 	if( !boost::filesystem2::exists( abs_p ))
+#endif
 	{
 //		LOG( "VisemeViewerWindow::loadAudioFiles: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
 		return;

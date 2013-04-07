@@ -195,28 +195,21 @@ target_link_libraries( sbm-fltk
 
 	#tcmalloc
 	#profiler
-	smartbody-lib
+	SmartBody
 	bonebus
 	vhmsg
 	vhcl
-	wsp
-	xerces-c
 	boost_filesystem
 	boost_system
 	boost_regex
 	boost_python
-	blas
-	lapack
 	${XFT}
 	fltk_images 
 	fltk 
 	fltk_gl 
 	${OPENGL_LIBRARIES}
 	activemq-cpp
-	ode
-	steerlib
-	pprAI
-	python2.6
+	python2.7
     	ncurses	
 	pthread
 	GLEW

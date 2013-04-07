@@ -14,7 +14,9 @@ class SimpleListener : public SmartBody::SBCharacterListener
      
 	  virtual void OnLogMessage( const std::string & message )
 	  {
+#ifdef WIN32
 		  LOG(message.c_str());
+#endif
 	  }
 };
 

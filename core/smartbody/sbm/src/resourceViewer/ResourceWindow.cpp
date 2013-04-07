@@ -10,6 +10,7 @@
 
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Scroll.H>
+#include <boost/version.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -534,7 +535,11 @@ void ResourceWindow::updateEventHandler( Fl_Tree_Item* tree, SmartBody::SBEventH
 
 void ResourceWindow::updateSkeleton( Fl_Tree_Item* tree, SmartBody::SBSkeleton* skel )
 {
+#if (BOOST_VERSION > 104400)
+	std::string ext = boost::filesystem::extension( skel->skfilename() );
+#else
 	std::string ext = boost::filesystem2::extension( skel->skfilename() );
+#endif
 	std::string filebase = boost::filesystem::basename(skel->skfilename());
 	Fl_Tree_Item* item = resourceTree->add(tree,(filebase+ext).c_str());
 	item->user_data((void*)ITEM_SKELETON);

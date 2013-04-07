@@ -27,6 +27,8 @@
 #include <controllers/MeCtReachEngine.h>
 #include <controllers/me_ct_example_body_reach.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/version.hpp>
+
 // android does not use GPU shader for now
 #if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SBM_IPHONE)
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
@@ -962,6 +964,18 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 		for (size_t m = 0; m < meshPaths.size(); m++)
 		{
 			std::string path = meshPaths[m];
+
+#if (BOOST_VERSION > 104400)
+			boost::filesystem::path curpath( path );
+			LOG("curpath = %s",curpath.string().c_str());
+			if (!boost::filesystem::is_directory(curpath))
+				continue;
+			curpath /= std::string(meshdir);			
+			bool isDir = boost::filesystem::is_directory(curpath);  
+			if (!isDir)
+			{
+				LOG("%s is not a directory.", curpath.string().c_str());
+#else
 			boost::filesystem2::path curpath( path );
 			LOG("curpath = %s",curpath.directory_string().c_str());
 			if (!boost::filesystem2::is_directory(curpath))
@@ -971,6 +985,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 			if (!isDir)
 			{
 				LOG("%s is not a directory.", curpath.directory_string().c_str());
+#endif
 				//return CMD_FAILURE;
 				continue;
 			}
@@ -983,12 +998,22 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 
 			std::vector<std::string> xmlFileList;
 			std::vector<std::string> objFileList;
+#if (BOOST_VERSION > 104400)
+			boost::filesystem::directory_iterator end;
+			for (boost::filesystem::directory_iterator iter(curpath); iter != end ; iter++)
+			{
+				const boost::filesystem::path& cur = *iter;
+				if (boost::filesystem::is_regular(cur))
+				{
+					std::string fileName = cur.string();
+#else
 			boost::filesystem2::directory_iterator end;
 			for (boost::filesystem2::directory_iterator iter(curpath); iter != end ; iter++)
 			{
 				if (boost::filesystem2::is_regular(*iter))
 				{
 					std::string fileName = (*iter).string();
+#endif
 					if (fileName.size() < 4)
 						continue;
 					std::string ext = fileName.substr(fileName.size() - 4);

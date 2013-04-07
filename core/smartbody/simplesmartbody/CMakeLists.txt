@@ -18,8 +18,9 @@ add_executable( simplesmartbody
 
 target_link_libraries( simplesmartbody 
 
-	smartbody-dll
+	SmartBody
 	pthread
+	GLEW
 #	tcmalloc
 #	profiler
 #	${CMAKE_REQUIRED_LIBRARIES} 

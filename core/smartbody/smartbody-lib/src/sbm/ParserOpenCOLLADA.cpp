@@ -22,6 +22,7 @@
 
 #include "ParserOpenCOLLADA.h"
 #include "sr/sr_euler.h"
+#include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
@@ -1971,7 +1972,11 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 				SrString mapKaName(imageFile.c_str());
 				std::string texFile = (const char*) mapKaName;
 				std::string mtlName = mnames.top();
+#if (BOOST_VERSION > 104400)
+				std::string fileExt = boost::filesystem::extension(texFile);
+#else
 				std::string fileExt = boost::filesystem2::extension(texFile);
+#endif
 				std::string fileName = boost::filesystem::basename(texFile);
 				if (diffuseTexture.find(imageId) != std::string::npos)
 					mtlTexMap[mtlName] = fileName + fileExt;	

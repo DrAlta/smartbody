@@ -20,6 +20,7 @@
 
 #include "ParserOgre.h"
 #include "sr/sr_euler.h"
+#include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>    
@@ -1406,14 +1407,26 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 
 bool ParserOgre::parseMeshMaterial( std::vector<SrModel*>& meshModelVec, std::string materialFilePath )
 {
+#if (BOOST_VERSION > 104400)
+	boost::filesystem::path curpath( materialFilePath );
+	boost::filesystem::directory_iterator end;
+	std::vector<std::string> materialFileList;
+	for (boost::filesystem::directory_iterator iter(curpath); iter != end ; iter++)
+	{
+		const boost::filesystem::path& cur = *iter;
+		if (boost::filesystem::is_regular(cur))
+		{
+			std::string fileName = (cur).string();			
+#else
 	boost::filesystem2::path curpath( materialFilePath );
 	boost::filesystem2::directory_iterator end;
 	std::vector<std::string> materialFileList;
 	for (boost::filesystem2::directory_iterator iter(curpath); iter != end ; iter++)
 	{
-		if (boost::filesystem2::is_regular(*iter))
+		if (boost::filesystem::is_regular(*iter))
 		{
 			std::string fileName = (*iter).string();			
+#endif
 			std::string ext = boost::filesystem::extension(fileName);
 			if (ext == ".material" || ext == ".MATERIAL")
 			{

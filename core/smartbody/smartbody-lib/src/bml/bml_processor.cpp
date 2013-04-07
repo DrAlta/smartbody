@@ -59,6 +59,7 @@
 #include "controllers/me_ct_pose.h"
 #include "sbm/BMLDefs.h"
 
+#include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <sb/SBAnimationState.h>
@@ -1220,7 +1221,11 @@ int BML::Processor::vrSpeak_func( srArgBuffer& args, SmartBody::SBCommandManager
 		if (scene->getBoolAttribute("useXMLCache"))
 		{
 			boost::filesystem::path path(xml);
+#if (BOOST_VERSION > 104400)
+			boost::filesystem::path absPath = boost::filesystem::absolute(path);
+#else
 			boost::filesystem::path absPath = boost::filesystem::complete(path);
+#endif
 			std::string absPathStr = absPath.string();
 			
 			xmlDoc = xml_utils::parseMessageXml( bp->xmlParser, xml );
