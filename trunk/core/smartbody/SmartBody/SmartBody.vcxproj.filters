@@ -1513,9 +1513,6 @@
     <ClInclude Include="..\smartbody-lib\src\external\ANN\pr_queue_k.h">
       <Filter>external\ANN</Filter>
     </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\glew\glew.h">
-      <Filter>external\glew</Filter>
-    </ClInclude>
     <ClInclude Include="..\smartbody-lib\src\external\SOIL\image_DXT.h">
       <Filter>external\SOIL</Filter>
     </ClInclude>
@@ -2168,9 +2165,6 @@
     </Filter>
     <Filter Include="external\ANN">
       <UniqueIdentifier>{6f8a96f7-4a1a-4e1d-aa93-6aff8a3915c1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="external\glew">
-      <UniqueIdentifier>{9e8f3c07-b7ed-45a6-a2b7-5fb33cc82504}</UniqueIdentifier>
     </Filter>
     <Filter Include="external\SOIL">
       <UniqueIdentifier>{c388505e-7ead-4350-8f86-36db47250b51}</UniqueIdentifier>

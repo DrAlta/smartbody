@@ -564,7 +564,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\smartbody-lib\src\external\ANN\kd_util.h" />
     <ClInclude Include="..\smartbody-lib\src\external\ANN\pr_queue.h" />
     <ClInclude Include="..\smartbody-lib\src\external\ANN\pr_queue_k.h" />
-    <ClInclude Include="..\smartbody-lib\src\external\glew\glew.h" />
     <ClInclude Include="..\smartbody-lib\src\external\parser\Bchart.h" />
     <ClInclude Include="..\smartbody-lib\src\external\parser\Bst.h" />
     <ClInclude Include="..\smartbody-lib\src\external\parser\ChartBase.h" />
