@@ -9,7 +9,7 @@
 #include <GL/glu.h>
 #else
 //#include "external/glew/glew.h"
-#ifdef _WIN32_
+#ifdef WIN32
 #include <windows.h>
 #endif
 # include <GL/gl.h>
