@@ -3,6 +3,7 @@
 #include "SBPythonClass.h"
 #include <sr/sr_camera.h>
 #include <sb/SBScene.h>
+#include <sb/SBAnimationState.h>
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBAnimationTransitionRule.h>
 #include <sb/SBEvent.h>
