@@ -460,9 +460,11 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonAttribute.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonCharacter.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonMath.cpp \
+	$(SBM_MY_DIR)/sb/SBPythonMotion.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonScene.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonSimulation.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonSkeleton.cpp \
+	$(SBM_MY_DIR)/sb/SBPythonSystem.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonClass.cpp \
 	$(SBM_MY_DIR)/sb/SBSimulationManager.cpp \
 	$(SBM_MY_DIR)/sb/SBBmlProcessor.cpp \
