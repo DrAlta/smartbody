@@ -356,10 +356,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\smartbody-lib\src\sb\SBPhonemeManager.cpp" />
     <ClCompile Include="..\smartbody-lib\src\sb\SBPhysicsManager.cpp" />
     <ClCompile Include="..\smartbody-lib\src\sb\SBPhysicsSim.cpp" />
-    <ClCompile Include="..\smartbody-lib\src\sb\SBPython.cpp">
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
-    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\sb\SBPython.cpp" />
     <ClCompile Include="..\smartbody-lib\src\sb\SBPythonAnimation.cpp" />
     <ClCompile Include="..\smartbody-lib\src\sb\SBPythonAttribute.cpp" />
     <ClCompile Include="..\smartbody-lib\src\sb\SBPythonCharacter.cpp" />
