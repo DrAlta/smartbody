@@ -1,7 +1,8 @@
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../smartbody-dll/include )
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../smartbody-lib/src)
-include_directories( core/smartbody/smartbody-dll/include )
-include_directories( core/smartbody/smartbody-lib/src)
+include_directories( ../smartbody-dll/include )
+include_directories( ../smartbody-lib/src)
+include_directories( /usr/include )
+
+add_definitions( "-DdDOUBLE" )
 
 set(SB_EXPORTS 1)
 set(SMARTBODY_DLL_EXPORTS 1)
