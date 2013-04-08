@@ -52,7 +52,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
-#ifdef USE_PYTHON
+#ifndef SB_NO_PYTHON
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp> 
 #include <boost/python/return_internal_reference.hpp>
 #include <boost/python/args.hpp>
@@ -66,7 +66,7 @@ typedef std::map<std::string,SrVec> VecMap;
 typedef std::map<std::string, std::string> StringMap;
 
 
-#ifdef USE_PYTHON
+#ifndef SB_NO_PYTHON
 
 
 namespace SmartBody
@@ -118,6 +118,66 @@ void pythonFuncsScene()
 		.def("createNavigationMesh", &SBScene::createNavigationMesh, "Create navigation mesh from the input mesh.\n Input : OBJ file name")
 		.def("startFileLogging", &SBScene::startFileLogging, "Starts logging SmartBody messages to a given log file.")
 		.def("stopFileLogging", &SBScene::stopFileLogging, "Stops logging SmartBody messages to the given log file.")
+
+		// cameras
+		.def("createCamera", &SBScene::createCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a camera with a given name and returns it.")
+		.def("removeCamera", &SBScene::removeCamera, "Removes a camera.")
+		.def("setActiveCamera", &SBScene::setActiveCamera, "Sets the camera to be used in the viewer.")
+		.def("getActiveCamera", &SBScene::getActiveCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the camera currently being used in the viewer.")
+		.def("getCamera", &SBScene::getCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a camera by name.")
+		.def("getNumCameras", &SBScene::getNumCameras, "Returns the number of cameras available.")
+		.def("getCameraNames", &SBScene::getCameraNames, "Gets the names of all the cameras available.")
+
+		// command processing
+		.def("command", &SBScene::command, "Runs an old-Style SmartBody command.")
+		.def("commandAt", &SBScene::commandAt, "Runs an old-style SmartBody command at a set time in the future.")
+		.def("vhmsg", &SBScene::sendVHMsg, "Sends a virtual human message.")
+		.def("vhmsg2", &SBScene::sendVHMsg2, "Sends a virtual human message.")
+		.def("run", &SBScene::runScript, "Runs a python script.")
+		// managers
+		.def("getEventManager", &SBScene::getEventManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event manager.")
+		.def("getSimulationManager", &SBScene::getSimulationManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the simulation manager object.")
+		.def("getProfiler", &SBScene::getProfiler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the  profiler object.")
+		.def("getBmlProcessor", &SBScene::getBmlProcessor, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the bml processor object.")
+		.def("getStateManager", &SBScene::getBlendManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the state manager object.")
+		.def("getBlendManager", &SBScene::getBlendManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the state manager object.")
+		.def("getReachManager", &SBScene::getReachManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the reach manager object.")
+		.def("getSteerManager", &SBScene::getSteerManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the steer manager object.")
+		.def("getServiceManager", &SBScene::getServiceManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the service manager object.")
+		.def("getPhysicsManager", &SBScene::getPhysicsManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the physics manager object.")
+		.def("getBoneBusManager", &SBScene::getBoneBusManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Bone Bus manager object.")
+		.def("getGestureMapManager", &SBScene::getGestureMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the gesture map manager object.")
+		.def("getJointMapManager", &SBScene::getJointMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint mapping manager object.")
+		.def("getCollisionManager", &SBScene::getCollisionManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the collision manager object.")
+		.def("getDiphoneManager", &SBScene::getDiphoneManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the diphone manager object.")
+		.def("getBehaviorSetManager", &SBScene::getBehaviorSetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the behavior set manager.")
+		.def("getRetargetManager", &SBScene::getRetargetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the retarget manager.")
+		.def("getAssetManager", &SBScene::getAssetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the asset manager.")
+		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
+
+		.def("setSystemParameter", &SBScene::setSystemParameter, "Sets a name/value pair that persists between scene sessions.")
+		.def("getSystemParameter", &SBScene::getSystemParameter, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a value for a given name.")
+		.def("removeSystemParameter", &SBScene::removeSystemParameter, "Removes a system parameter.")
+		.def("removeAllSystemParameters", &SBScene::removeSystemParameter, "Removes a system parameter.")
+		.def("getSystemParameterNames", &SBScene::getSystemParameterNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns names of all system parameters.")
+
+		// deprecated
+		.def("createSkeleton", &SBScene::createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.")
+		.def("getSkeleton", &SBScene::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object given its name. \n Input: skeleton name \nOutput: skeleton object")
+		.def("addAssetPath", &SBScene::addAssetPath, "Add path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL")
+		.def("removeAssetPath", &SBScene::removeAssetPath, "Removes a  path resource given path type and actual path string. \n Input: type(can be cript|motion|audio), path \n Output: NULL")
+		.def("removeAllAssetPaths", &SBScene::removeAllAssetPaths, "Removes all paths resource given path type and actual path string. \n Input: type(can be script|motion|audio), path \n Output: NULL")
+		.def("getAssetPaths", &SBScene::getAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type: seq, me, audio, mesh.")
+		.def("getLocalAssetPaths", &SBScene::getLocalAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type excluding the media path: seq, me, audio, mesh.")
+		.def("loadAssets", &SBScene::loadAssets, "Loads the skeletons and motions from the asset paths.")
+		.def("loadAssetsFromPath", &SBScene::loadAssetsFromPath, "Loads the skeletons and motions from a given path. The path will not be stored for later use.")
+		.def("addMotions", &SBScene::addMotions, "Add motion resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL")
+		.def("getMotion", &SBScene::getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.")
+		.def("getNumMotions", &SBScene::getNumMotions, "Returns the number of motions available.")
+		.def("getMotionNames", &SBScene::getMotionNames, "Returns the names of motions available.")
+		.def("getNumSkeletons", &SBScene::getNumSkeletons, "Returns the number of skeletons available.")
+		.def("getSkeletonNames", &SBScene::getSkeletonNames, "Returns a list of all skeleton names.\n Input: NULL \nOutput: list of skeleton names")
+
 	;
 }
 }

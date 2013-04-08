@@ -54,476 +54,12 @@
 #include <boost/filesystem/convenience.hpp>
 
 #ifndef SB_NO_PYTHON
-
-namespace SmartBody 
-{
-struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
-{
-	virtual void objectEvent(std::string character, std::string name, bool isAnimate, SrVec charPosition, SrVec charVelocity, SrVec objPosition, SrVec objVelocity, SrVec relativePosition, SrVec relativeVelocity)
-	{
-		if (boost::python::override o = this->get_override("objectEvent"))
-		{
-			try {
-				o(character, name, isAnimate, charPosition, charVelocity, objPosition, objVelocity, relativePosition, relativeVelocity);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_objectEvent(std::string character, std::string name, bool isAnimate, SrVec charPosition, SrVec charVelocity, SrVec objPosition, SrVec objVelocity, SrVec relativePosition, SrVec relativeVelocity)
-	{
-		return Nvbg::objectEvent(character, name, isAnimate, charPosition, charVelocity, objPosition, objVelocity, relativePosition, relativeVelocity);
-	}
-
-	virtual bool execute(std::string character, std::string to, std::string messageId, std::string xml)
-	{
-		if (boost::python::override o = this->get_override("execute"))
-		{
-			try {
-				return o(character, to, messageId, xml);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		return Nvbg::execute(character, to, messageId, xml);
-	}
-
-	bool default_execute(std::string character, std::string to, std::string messageId, std::string xml)
-	{
-		return Nvbg::execute(character, to, messageId, xml);
-	}
-
-	virtual bool executeEvent(std::string character, std::string messageId, std::string state)
-	{
-		if (boost::python::override o = this->get_override("executeEvent"))
-		{
-			try {
-				return o(character, messageId, state);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		return Nvbg::executeEvent(character, messageId, state);
-	}
-
-	bool default_executeEvent(std::string character, std::string messageId, std::string state)
-	{
-		return Nvbg::executeEvent(character, messageId, state);
-	}
-
-	virtual bool executeSpeech(std::string character, std::string speechStatus, std::string speechId, std::string speaker)
-	{
-		if (boost::python::override o = this->get_override("executeSpeech"))
-		{
-			try {
-				return o(character, speechStatus, speechId, speaker);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		return Nvbg::executeSpeech(character, speechStatus, speechId, speaker);
-	}
-
-	virtual bool executeSpeechRequest(std::vector<std::string> behaviors, std::vector<std::string> types, std::vector<float> times, std::vector<std::string> targets, std::vector<std::string> info)
-	{
-		if (boost::python::override o = this->get_override("executeSpeechRequest"))
-		{
-			try {
-				return o(behaviors, types, times, targets, info);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		return Nvbg::executeSpeechRequest(behaviors, types, times, targets, info);
-	}
-
-	bool default_executeSpeech(std::string character, std::string speechStatus, std::string speechId, std::string speaker)
-	{
-		return Nvbg::executeSpeech(character, speechStatus, speechId, speaker);
-	}
-
-	bool default_executeSpeechRequest(std::vector<std::string> behaviors, std::vector<std::string> types, std::vector<float> times, std::vector<std::string> targets, std::vector<std::string> info)
-	{
-		return Nvbg::executeSpeechRequest(behaviors, types, times, targets, info);
-	}
-
-	virtual void notifyAction(std::string name)
-	{
-		if (boost::python::override o = this->get_override("notifyAction"))
-		{
-			try {
-				o(name);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_notifyAction(std::string name)
-	{
-		notifyLocal(name);
-	}
-
-	virtual void notifyBool(std::string name, bool val)
-	{
-		if (boost::python::override o = this->get_override("notifyBool"))
-		{
-			try {
-				o(name, val);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_notifyBool(std::string name, bool val)
-	{
-		notifyLocal(name);
-	}
-
-	virtual void notifyInt(std::string name, int val)
-	{
-		if (boost::python::override o = this->get_override("notifyInt"))
-		{
-			try {
-				o(name, val);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_notifyInt(std::string name, int val)
-	{
-		notifyLocal(name);
-	}
-
-	virtual void notifyDouble(std::string name, double val)
-	{
-		if (boost::python::override o = this->get_override("notifyDouble"))
-		{
-			try {
-				o(name, val);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_notifyDouble(std::string name, double val)
-	{
-		notifyLocal(name);
-	}
-
-	virtual void notifyString(std::string name, std::string val)
-	{
-		if (boost::python::override o = this->get_override("notifyString"))
-		{
-			try {
-				o(name, val);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_notifyString(std::string name, std::string val)
-	{
-		notifyLocal(name);
-	}
-
-	virtual void notifyVec3(std::string name, SrVec val)
-	{
-		if (boost::python::override o = this->get_override("notifyVec3"))
-		{
-			try {
-				o(name, val);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_notifyVec3(std::string name, SrVec val)
-	{
-		notifyLocal(name);
-	}
-
-	virtual void notifyMatrix(std::string name, SrMat val)
-	{
-		if (boost::python::override o = this->get_override("notifyMatrix"))
-		{
-			try {
-				o(name, val);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_notifyMatrix(std::string name, SrMat val)
-	{
-		notifyLocal(name);
-	}
-
-
-};
-
-
-struct SBScriptWrap :  SBScript, boost::python::wrapper<SBScript>
-{
-	virtual void start()
-	{
-		if (boost::python::override o = this->get_override("start"))
-		{
-			try {
-				o();
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_start()
-	{
-		return SBScript::start();
-	}
-
-	virtual void stop()
-	{
-		if (boost::python::override o = this->get_override("stop"))
-		{
-			try {
-				o();
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_stop()
-	{
-		return SBScript::stop();
-	}
-
-	virtual void beforeUpdate(double time)
-	{
-		if (boost::python::override o = this->get_override("beforeUpdate"))
-		{
-			try {
-				o(time);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_beforeUpdate(double time)
-	{
-		return SBScript::beforeUpdate(time);
-	}
-
-	virtual void update(double time)
-	{
-		if (boost::python::override o = this->get_override("update"))
-		{
-			try {
-				o(time);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_update(double time)
-	{
-		return SBScript::update(time);
-	}
-
-	virtual void afterUpdate(double time)
-	{
-		if (boost::python::override o = this->get_override("afterUpdate"))
-		{
-			try {
-				o(time);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-	}
-
-	void default_afterUpdate(double time)
-	{
-		return SBScript::afterUpdate(time);
-	}
-};
-
-
-struct SBEventHandlerWrap :  SBEventHandler, boost::python::wrapper<SBEventHandler>
-{
-	virtual void executeAction(SBEvent* event)
-	{
-		if (boost::python::override o = this->get_override("executeAction"))
-		{
-			try {
-				o(event);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		return SBEventHandler::executeAction(event);
-	}
-
-	void default_executeAction(SBEvent* event)
-	{
-		SBEventHandler::executeAction(event);
-	}
-};
-
-
-struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrapper<SmartBody::PythonController>
-{
-	virtual void start()
-	{
-		if (boost::python::override o = this->get_override("start"))
-		{
-			try {
-				o();
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		return PythonController::start();
-	};
-
-	void default_start()
-	{
-		SmartBody::PythonController::start();
-	}
-
-	virtual void init()
-	{
-		if (boost::python::override o = this->get_override("init"))
-		{
-			try {
-				o();
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		return PythonController::init();
-	};
-
-	void default_init()
-	{
-		SmartBody::PythonController::init();
-	}
-
-	virtual void evaluate()
-	{
-		if (boost::python::override o = this->get_override("evaluate"))
-		{
-			try {
-				o();
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		return PythonController::evaluate();
-	};
-
-	void default_evaluate()
-	{
-		SmartBody::PythonController::evaluate();
-	}
-
-	virtual void stop()
-	{
-		if (boost::python::override o = this->get_override("stop"))
-		{
-			try {
-				o();
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		return PythonController::stop();
-	};
-
-	void default_stop()
-	{
-		SmartBody::PythonController::stop();
-	}
-};
-
-struct TransitionRuleWrap : SmartBody::SBAnimationTransitionRule, boost::python::wrapper<SmartBody::SBAnimationTransitionRule>
-{
-	virtual bool check(SmartBody::SBCharacter* character, SmartBody::SBAnimationBlend* blend)
-	{
-		if (boost::python::override o = this->get_override("check"))
-		{
-			try {
-				return o(character, blend);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		return SBAnimationTransitionRule::check(character, blend);
-	}
-
-	bool default_check(SmartBody::SBCharacter* character, SmartBody::SBAnimationBlend* blend)
-	{
-		return SBAnimationTransitionRule::check(character, blend);
-	}
-};
-
-}
-
-// wrapper for std::map
-template<class T>
-struct map_item
-{
-	typedef typename T::key_type K;
-	typedef typename T::mapped_type V;
-	static V get(T const& x, K const& i)
-	{
-		V temp;
-		if( x.find(i) != x.end() ) 
-			return x.find(i)->second;
-		PyErr_SetString(PyExc_KeyError, "Key not found");
-		return temp;		
-	}
-	static void set(T & x, K const& i, V const& v)
-	{
-		x[i]=v; // use map autocreation feature
-	}
-	static void del(T & x, K const& i)
-	{
-		if( x.find(i) != x.end() ) x.erase(i);
-		else PyErr_SetString(PyExc_KeyError, "Key not found");
-	}
-};
-
-#endif
-
-
-
-#ifndef SB_NO_PYTHON
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp> 
 #include <boost/python/return_internal_reference.hpp>
 #include <boost/python/args.hpp>
 #endif
+
+#include "SBPythonInternal.h"
 
 typedef std::map<std::string,SrQuat> QuatMap;
 typedef std::map<std::string,SrVec> VecMap;
@@ -533,6 +69,18 @@ typedef std::map<std::string, std::string> StringMap;
 namespace SmartBody 
 {
 #ifndef SB_NO_PYTHON
+
+void pythonFuncsAnimation();
+void pythonFuncsAttribute();
+void pythonFuncsCharacter();
+void pythonFuncsMath();
+void pythonFuncsMotion();
+void pythonFuncsScene();
+void pythonFuncsSimulation();
+void pythonFuncsSkeleton();
+void pythonFuncsSystem();
+
+
 BOOST_PYTHON_MODULE(SmartBody)
 {
 	boost::python::def("printlog", printLog, "Write to the log. \n Input: message string \n Output: NULL");
@@ -675,22 +223,7 @@ BOOST_PYTHON_MODULE(SmartBody)
 	// 
 
 
-	// viewers
-	boost::python::def("getCamera", getCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the camera object for the viewer. \n Input: NULL \n Output: camera object");
-	boost::python::def("getViewer", getViewer, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the visual debugger. \n Input: NULL \n Output: visual debugger");
-	
-
-	// assets
-//	boost::python::def("execScripts", execScripts, "Execute a chain of scripts. \n Input: list of script name string e.g. [\"script1 name\", \"script2 name\", ...] \n Output: NULL");
-//	boost::python::def("getScript", getScript, boost::python::return_value_policy<boost::python::manage_new_object>(), "Returns the sequence file object. \n Input: script name \n Output: script object");
-	
-
-
-	// system
-	boost::python::def("pythonexit", pythonExit, "Exits the Python interpreter. ");
-	boost::python::def("reset", reset, "Reset SBM. ");
-	boost::python::def("quit", quitSbm, "Quit SBM. ");	
-	boost::python::def("getScene", SBScene::getScene, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the SmartBody scene object.");
+	pythonFuncsSystem();
 
 
 
@@ -716,75 +249,8 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("notify", &SBObserver::notify, "Notifies the observer of the subject.")
 		;
 
-boost::python::class_<SBAttributeInfo>("SBAttributeInfo")
-		.def("getPriority", &SBAttributeInfo::getPriority, "Returns the priority of the attribute. Used for display purposes.")
-		.def("setPriority", &SBAttributeInfo::setPriority, "Sets the priority of the attribute. Used for display purposes.")
-		.def("getReadOnly", &SBAttributeInfo::getReadOnly, "Determines if the attribute is read-only and cannot be changed.")
-		.def("setReadOnly", &SBAttributeInfo::setReadOnly, "Sets the read-only status of the attribute. Attributes marked read-only cannot have their value's changed.")
-		.def("getHidden", &SBAttributeInfo::getHidden, "Determines if the attribute is hidden from view.")
-		.def("setHidden", &SBAttributeInfo::setHidden, "Sets the hidden status of the attribute. Hidden attributes typically aren't visible to the user.")
-		.def("setDescription", &SBAttributeInfo::setDescription, "Sets the description or help text associated with this attribute.")
-		.def("getDescription", &SBAttributeInfo::getDescription, "Gets the description or help text associated with this attribute.")
-	;
 
-boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribute")
-		.def("getName", &SBAttribute::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns an attribute of a given name")
-		.def("getAttributeInfo", &SBAttribute::getAttributeInfo, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the information associated with this attribute.")
-	;
-
-	boost::python::class_<ActionAttribute, boost::python::bases<SBAttribute> >("ActionAttribute")
-		.def("setValue", &ActionAttribute::setValue, "Activates action attribute.")
-	;
-
-	boost::python::class_<BoolAttribute, boost::python::bases<SBAttribute> >("BoolAttribute")
-		.def("getValue", &BoolAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the bool attribute.")
-		.def("setValue", &BoolAttribute::setValue, "Sets the value of the boolean attribute.")
-		.def("getDefaultValue", &BoolAttribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the bool attribute.")
-		.def("setDefaultValue", &BoolAttribute::setDefaultValue, "Sets the default value of the boolean attribute.")
-		.def("setValueFast", &BoolAttribute::setValueFast, "Sets the value of the boolean attribute without notifying observers.")
-	;
-
-	boost::python::class_<StringAttribute, boost::python::bases<SBAttribute> >("StringAttribute")
-		.def("getValue", &StringAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the string attribute.")
-		.def("setValue", &StringAttribute::setValue, "Sets the value of the string attribute.")
-		.def("getDefaultValue", &StringAttribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the string attribute.")
-		.def("setDefaultValue", &StringAttribute::setDefaultValue, "Sets the default value of the string attribute.")
-		.def("setValueFast", &StringAttribute::setValueFast, "Sets the value of the string attribute without notifying observers.")
-		.def("setValidValues", &StringAttribute::setValidValues, "Sets the valid values of the string attribute.")
-		.def("getValidValues", &StringAttribute::getValidValues, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the valid values of the string attribute.")
-	;
-
-	boost::python::class_<IntAttribute, boost::python::bases<SBAttribute> >("IntAttribute")
-		.def("getValue", &IntAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the int attribute.")
-		.def("setValue", &IntAttribute::setValue, "Sets the value of the integer attribute.")
-		.def("getDefaultValue", &IntAttribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the string attribute.")
-		.def("setDefaultValue", &IntAttribute::setDefaultValue, "Sets the default value of the string attribute.")
-		.def("setValueFast", &IntAttribute::setValueFast, "Sets the value of the integer attribute without notifying observers.")
-	;
-
-	boost::python::class_<DoubleAttribute, boost::python::bases<SBAttribute> >("DoubleAttribute")
-		.def("getValue", &DoubleAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the double attribute.")
-		.def("setValue", &DoubleAttribute::setValue, "Sets the value of the double attribute.")
-		.def("getDefaultValue", &DoubleAttribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the double attribute.")
-		.def("setDefaultValue", &DoubleAttribute::setDefaultValue, "Sets the default value of the double attribute.")
-		.def("setValueFast", &DoubleAttribute::setValueFast, "Sets the value of the double attribute without notifying observers.")
-	;
-
-	boost::python::class_<Vec3Attribute, boost::python::bases<SBAttribute> >("Vec3Attribute")
-		.def("getValue", &Vec3Attribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the vec3 attribute.")
-		.def("setValue", &Vec3Attribute::setValue, "Sets the value of the vec3 attribute.")
-		.def("getDefaultValue", &Vec3Attribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the vec3 attribute.")
-		.def("setDefaultValue", &Vec3Attribute::setDefaultValue, "Sets the default value of the vec3 attribute.")
-		.def("setValueFast", &Vec3Attribute::setValueFast, "Sets the value of the vec3 attribute without notifying observers.")
-	;
-
-	boost::python::class_<MatrixAttribute, boost::python::bases<SBAttribute> >("MatrixAttribute")
-		.def("getValue", &MatrixAttribute::getValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the value of the matrix attribute.")
-		.def("setValue", &MatrixAttribute::setValue, "Sets the value of the matrix attribute.")
-		.def("getDefaultValue", &MatrixAttribute::getDefaultValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the default value of the matrix attribute.")
-		.def("setDefaultValue", &MatrixAttribute::setDefaultValue, "Sets the default value of the matrix attribute.")
-		.def("setValueFast", &MatrixAttribute::setValueFast, "Sets the value of the matrix attribute.")
-	;
+	pythonFuncsAttribute();
 
 
 	boost::python::class_<SBObject>("SBObject")
@@ -830,43 +296,8 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		;
 
 
-	boost::python::class_<SBSimulationManager>("SBSimulationManager")
-		.def("isRunning", &SBSimulationManager::isRunning, "Returns true if the simulation is currently running.")
-		.def("isStarted", &SBSimulationManager::isStarted, "Returns true if the simulation has been started.")
-		.def("printInfo", &SBSimulationManager::printInfo, "Print all the timing statistics. ")
-		.def("printPerf", &SBSimulationManager::printPerf, "Print performance statistics calculated real time given a time period as input.")
-		.def("getTime", &SBSimulationManager::getTime, "Returns the current simulation time.")
-		.def("setTime", &SBSimulationManager::setTime, "Sets the current simulation time.")
-		.def("start", &SBSimulationManager::start, "Start the simulation.")
-		.def("stop", &SBSimulationManager::stop, "Stop the simulation.")
-		.def("reset", &SBSimulationManager::reset, "Set the clock time to 0. ")
-		.def("pause", &SBSimulationManager::pause, "Pause the clock. ")
-		.def("resume", &SBSimulationManager::resume, "Resume the clock. ")
-		.def("setupTimer", &SBSimulationManager::setupTimer, "Sets up a real time clock that will be used to update the system.")
-		.def("setSleepFps", &SBSimulationManager::setSleepFps, "Set the sleep fps. Sleep fps defines the target loop rate. \n Input: sleep fps \n Output: NULL")
-		.def("setEvalFps", &SBSimulationManager::setEvalFps, "Set the eval fps. Define the minimum interval to evaluate the frame. \n Input: evaluation fps \n Output: NULL")
-		.def("setSimFps", &SBSimulationManager::setSimFps, "Set the simulation fps. Add a fixed increment to output time every update. \n Input: simulation fps \n Output: NULL")
-		.def("setSleepDt", &SBSimulationManager::setSleepDt, "Set the sleep dt. \n Input: sleep dt \n Output: NULL")
-		.def("setEvalDt", &SBSimulationManager::setEvalDt, "Set the eval dt. \n Input: evaluation dt \n Output: NULL")
-		.def("setSimDt", &SBSimulationManager::setSimDt, "Set the sim dt. \n Input: simulation dt \n Output: NULL")
-		.def("setSpeed", &SBSimulationManager::setSpeed, "Set the speed for real clock time. Actual time would be real time times speed.")
-		;
+	pythonFuncsSimulation();
 
-	boost::python::class_<SBProfiler>("Profiler")
-		.def("printLegend", &SBProfiler::printLegend, "Print time profiler legend. ")
-		.def("printStats", &SBProfiler::printStats, "Print time profiler statistics. ")
-		;
-
-	
-	boost::python::class_<SrViewer>("Viewer")
-		.def("show", &SrViewer::show_viewer, "Shows the viewer.")
-		.def("hide", &SrViewer::hide_viewer, "Hides the viewer.")
-		;
-
-	boost::python::class_<GenericViewer>("GenericViewer")
-		.def("show", &GenericViewer::show_viewer, "Shows the viewer.")
-		.def("hide", &GenericViewer::hide_viewer, "Hides the viewer.")
-		;
 
 	boost::python::class_<SBBmlProcessor>("BmlProcessor")
 		.def("execBML", &SBBmlProcessor::execBML, boost::python::return_value_policy<boost::python::return_by_value>(), "Execute a generic BML instruction to a given character. Adds the <?xml..> and <act><bml>...</bml></act> elements.")
@@ -880,121 +311,9 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 
 		;
 
-	boost::python::class_<SBAnimationBlend>("SBAnimationBlend")
-		.def("addCorrespondencePoints", &SBAnimationBlend::addCorrespondencePoints, "Correspondence points for motions inside the blend.")
-		.def("addCorrespondancePoints", &SBAnimationBlend::addCorrespondencePoints, "Correspondence points for motions inside the blend.")
-		.def("setIncrementWorldOffsetY", &SBAnimationBlend::setIncrementWorldOffsetY, "Boolean flag that increment world offset y-axis value according to the base joint value.")
-		.def("getNumMotions", &SBAnimationBlend::getNumMotions, "Number of motions inside the blend.")
-		.def("getMotion", &SBAnimationBlend::getMotion, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the motion name given index. \n Input: index of motion \n Output: motion name")
-		.def("getNumCorrespondancePoints", &SBAnimationBlend::getNumCorrespondencePoints, "Number of correspondence points for the motions in the blend")
-		.def("getNumCorrespondencePoints", &SBAnimationBlend::getNumCorrespondencePoints, "Number of correspondence points for the motions in the blend")
-		.def("getCorrespondancePoints", &SBAnimationBlend::getCorrespondencePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondence points in one motion given the index. \n Input: index of motion \n Output: correspondence points vector of this motion")
-		.def("getCorrespondencePoints", &SBAnimationBlend::getCorrespondencePoints, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the correspondence points in one motion given the index. \n Input: index of motion \n Output: correspondence points vector of this motion")
-		.def("setCorrespondencePoints", &SBAnimationBlend::setCorrespondencePoints, "Sets the correspondence points given a motion index, a parameter index and a value.")
-		.def("getDimension", &SBAnimationBlend::getDimension, boost::python::return_value_policy<boost::python::return_by_value>(), "Return the dimension of the state. Dimension represents the number of parameter for each motion. 0D means no parameter, 1D means one parameter for each motion etc.")
-		.def("addEvent", &SBAnimationBlend::addEvent, "Adds an event to the blend at a specific local time for the given motion.")
-		.def("removeAllEvents", &SBAnimationBlend::removeAllEvents, "Removes all events from the blend at a specific local time for the given motion.")
-		.def("getNumEvents", &SBAnimationBlend::getNumEvents, "Returns the number of events associated with this blend.")
-		.def("getEvent", &SBAnimationBlend::getEvent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event of a given index.")
-		.def("removeEvent", &SBAnimationBlend::removeEvent, "Removes the event of a given index.") 
-		.def("buildVisSurfaces", &SBAnimationBlend::buildVisSurfaces, "Build a visualization surface. \n Input : Error Type, Surface Type, Num of Segements, Grid Resolutions \n Output: NULL")
-		.def("createMotionVectorFlow", &SBAnimationBlend::createMotionVectorFlow, "create Vector Flow visualization. \n Input: motion name. \n Output: NULL")
-		.def("clearMotionVectorFlow", &SBAnimationBlend::clearMotionVectorFlow, "clear Vector Flow visualization. \n Input: NULL. \n Output: NULL")
-		.def("plotMotion", &SBAnimationBlend::plotMotion, "Plot motion frames with stick skeleton. \n Input: motion name, intervals, ifClearAll \n Output: NULL")
-		.def("plotMotionFrameTime", &SBAnimationBlend::plotMotionFrameTime, "Plot one single motion frame (at given time) with stick skeleton. \n Input: motion name, time, ifClearAll \n Output: NULL")
-		.def("plotMotionJointTrajectory", &SBAnimationBlend::plotMotionJointTrajectory, "Plot joint trajectory over entire motion (at given time). \n Input: motion name, jointName, ifClearAll \n Output: NULL")
-		.def("clearPlotMotion", &SBAnimationBlend::clearPlotMotion, "clear Plotted motions. \n Input: NULL. \n Output: NULL")
-		.def("addKeyTagValue", &SBAnimationBlend::addKeyTagValue, "add the key time tag for motion analysis. \n Input : motion name, tag type, tag name, value. \n Output : NULL")
-		.def("buildMotionAnalysis", &SBAnimationBlend::buildMotionAnalysis, "build the motion analysis structure \n Input : NULL. \n Output : NULL")
-		.def("setBlendSkeleton", &SBAnimationBlend::setBlendSkeleton, "set the skeleton that should be associated with this animation blend")
-		;
 
-	boost::python::class_<SBAnimationBlend0D, boost::python::bases<SBAnimationBlend> >("SBAnimationBlend0D")
-		.def("addMotion", &SBAnimationBlend0D::addMotion, "Add motion to 0D state. \n Input: motion name. \n Output: NULL")
-	;
+	pythonFuncsAnimation();
 
-	boost::python::class_<SBAnimationBlend1D, boost::python::bases<SBAnimationBlend> >("SBAnimationBlend1D")
-		.def("addMotion", &SBAnimationBlend1D::addMotion, "Add motion and one parameter to 1D state. \n Input: motion name, parameter. \n Output: NULL")
-		.def("setParameter", &SBAnimationBlend1D::setParameter, "Set/Change the parameter for given motion. \n Input: motion name, parameter. \n Output: NULL")
-	;
-
-	boost::python::class_<SBAnimationBlend2D, boost::python::bases<SBAnimationBlend> >("SBAnimationBlend2D")
-		.def("addMotion", &SBAnimationBlend2D::addMotion, "Add motion and two parameters to 2D state. \n Input: motion name, parameter1, parameter2. \n Output: NULL")
-		.def("setParameter", &SBAnimationBlend2D::setParameter, "Set/Change the parameter for given motion. \n Input: motion name, parameter1, parameter2. \n Output: NULL")
-		.def("addTriangle", &SBAnimationBlend2D::addTriangle, "Add triangles to the state. By changing the point inside triangle, you can get different blending weights and different results")
-	;
-
-	boost::python::class_<SBAnimationBlend3D, boost::python::bases<SBAnimationBlend> >("SBAnimationBlend3D")
-		.def("addMotion", &SBAnimationBlend3D::addMotion, "Add motion and three parameters to 3D state. \n Input: motion name, parameter1, parameter2, parameter3. \n Output: NULL")
-		.def("setParameter", &SBAnimationBlend3D::setParameter, "Set/Change the parameter for given motion. \n Input: motion name, parameter1, parameter2, parameter3. \n Output: NULL")
-		.def("addTetrahedron", &SBAnimationBlend3D::addTetrahedron, "Add tetrahedrons to the state. By changing the point inside tetrahedron, you can get different blending weights and different results")
-	;
-
-	boost::python::class_<SBMotionBlendBase, boost::python::bases<SBAnimationBlend> >("SBMotionBlendBase")
-		.def("addMotion", &SBMotionBlendBase::addMotion, "Add motion and its parameters to animation state. \n Input: motion name, vector of parameters. \n Output: NULL")
-		.def("setParameter", &SBMotionBlendBase::setMotionParameter, "Set/Change the parameter for given motion. \n Input: motion name, vector of parameters. \n Output: NULL")
-		.def("getParameter", &SBMotionBlendBase::getMotionParameter, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the parameter of a given motion")
-		.def("buildBlendBase", &SBMotionBlendBase::buildBlendBase, "Initialize BlendBase. \n Input : Motion Parameter Name, Interpolator Type \n Output: NULL")
-		.def("addTetrahedron", &SBMotionBlendBase::addTetrahedron, "Add tetrahedrons to the state. By changing the point inside tetrahedron, you can get different blending weights and different results")
-		.def("getSkeleton", &SBMotionBlendBase::getSkeleton, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the skeleton used when constructing the blend")
-		.def("getInterpType", &SBMotionBlendBase::getInterpType, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the interpolation type of the blend.")
-		.def("getBlendType", &SBMotionBlendBase::getBlendType, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the type of blend, which dictates which joints are used for parameterization.")
-		.def("getNumDimensions", &SBMotionBlendBase::getNumDimensions, "Returns the number of dimensions for the blend.")
-		;
-
-	boost::python::class_<SBAnimationTransition>("SBAnimationTransition")
-		.def("set", &SBAnimationTransition::set, "")
-		.def("setSourceState", &SBAnimationTransition::setSourceBlend, "")
-		.def("getSourceState", &SBAnimationTransition::getSourceBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
-		.def("setSourceBlend", &SBAnimationTransition::setSourceBlend, "")
-		.def("getSourceBlend", &SBAnimationTransition::getSourceBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
-		.def("setDestinationState", &SBAnimationTransition::setDestinationBlend, "")
-		.def("getDestinationState", &SBAnimationTransition::getDestinationBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
-		.def("setDestinationBlend", &SBAnimationTransition::setDestinationBlend, "")
-		.def("getDestinationBlend", &SBAnimationTransition::getDestinationBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "")
-		.def("getSourceMotionName", &SBAnimationTransition::getSourceMotionName, boost::python::return_value_policy<boost::python::return_by_value>(), "")
-		.def("setEaseInInterval", &SBAnimationTransition::setEaseInInterval, "")
-		.def("addEaseOutInterval", &SBAnimationTransition::addEaseOutInterval, "")
-		.def("removeEaseOutInterval", &SBAnimationTransition::removeEaseOutInterval, "")
-		.def("getNumEaseOutIntervals", &SBAnimationTransition::getNumEaseOutIntervals, "")
-		.def("getEaseOutInterval", &SBAnimationTransition::getEaseOutInterval, boost::python::return_value_policy<boost::python::return_by_value>(), "")
-		.def("getDestinationMotionName", &SBAnimationTransition::getDestinationMotionName, boost::python::return_value_policy<boost::python::return_by_value>(), "")
-		.def("getEaseInStart", &SBAnimationTransition::getEaseInStart, "")
-		.def("getEaseInEnd", &SBAnimationTransition::getEaseInEnd, "")
-		.def("setEaseInStart", &SBAnimationTransition::setEaseInStart, "")
-		.def("setEaseInEnd", &SBAnimationTransition::setEaseInEnd, "")
-		.def("getTransitionRule", &SBAnimationTransition::getTransitionRule, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the rule associated with this transition.")
-		.def("setTransitionRule", &SBAnimationTransition::setTransitionRule, "Sets the rule associated with this transition.")
-		;
-
-	boost::python::class_<SBAnimationBlendManager>("SBAnimationBlendManager")
-		.def("createState0D", &SBAnimationBlendManager::createBlend0D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 1D blend.")
-		.def("createState1D", &SBAnimationBlendManager::createBlend1D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 1D blend.")
-		.def("createState2D", &SBAnimationBlendManager::createBlend2D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 2D blend.")
-		.def("createState3D", &SBAnimationBlendManager::createBlend3D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 3D blend.")
-		.def("createBlend0D", &SBAnimationBlendManager::createBlend0D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 1D blend.")
-		.def("createBlend1D", &SBAnimationBlendManager::createBlend1D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 1D blend.")
-		.def("createBlend2D", &SBAnimationBlendManager::createBlend2D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 2D blend.")
-		.def("createBlend3D", &SBAnimationBlendManager::createBlend3D, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a 3D blend.")
-		.def("createMotionBlendBase", &SBAnimationBlendManager::createMotionBlendBase, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a motion blend base.")
-		.def("createTransition", &SBAnimationBlendManager::createTransition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a transition.")
-		.def("getState", &SBAnimationBlendManager::getBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a blend of a given name.")
-		.def("getBlend", &SBAnimationBlendManager::getBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a blend of a given name.")
-		.def("getNumStates", &SBAnimationBlendManager::getNumBlends, "Returns the number of states.")
-		.def("getNumBlends", &SBAnimationBlendManager::getNumBlends, "Returns the number of states.")
-		.def("getStateNames", &SBAnimationBlendManager::getBlendNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the blend names.")
-		.def("getBlendNames", &SBAnimationBlendManager::getBlendNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the blend names.")
-		.def("getTransition", &SBAnimationBlendManager::getTransition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a transition with a given name.")
-		.def("getTransitionByIndex", &SBAnimationBlendManager::getTransitionByIndex, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a transition with a given name.")
-		.def("getNumTransitions", &SBAnimationBlendManager::getNumTransitions, "Returns the state names.")
-		.def("getTransitionNames", &SBAnimationBlendManager::getTransitionNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the blend names.")
-		.def("getCurrentState", &SBAnimationBlendManager::getCurrentBlend, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current blend name.")
-		.def("getCurrentStateParameters", &SBAnimationBlendManager::getCurrentBlendParameters, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current blend name.")
-		.def("getCurrentBlend", &SBAnimationBlendManager::getCurrentBlend, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current blend name.")
-		.def("getCurrentBlendParameters", &SBAnimationBlendManager::getCurrentBlendParameters, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the character's current blend name.")
-		.def("isStateScheduled", &SBAnimationBlendManager::isBlendScheduled, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns whether the character has the blend scheduled. Used to avoid scheduling the same blend.")
-		.def("isBlendScheduled", &SBAnimationBlendManager::isBlendScheduled, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns whether the character has the blend scheduled. Used to avoid scheduling the same blend.")
-		;
 
 	boost::python::class_<SBSteerManager, boost::python::bases<SBService> >("SBSteerManager")
 		.def("createSteerAgent", &SBSteerManager::createSteerAgent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a steer agent.")
@@ -1109,58 +428,7 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		;
 
 
-	
-
-
-	boost::python::class_<SBMotion, boost::python::bases<SBObject> >("SBMotion")
-		//.def(boost::python::init<std::string>())
-		.def("getMotionFileName", &SBMotion::getMotionFileName, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the motion file name. \n Input: NULL \n Output: motion file name")
-		.def("getNumFrames", &SBMotion::getNumFrames, "Returns the number of frames inside this motion. \n Input: NULL \n Output: number of frames in the motion")
-		.def("getFrameData", &SBMotion::getFrameData, "Returns the frame data given frame index. \n Input: frame index \n Output: a list of frame data")
-		.def("getFrameSize", &SBMotion::getFrameSize, "Returns the frame size. \n Input: NULL \n Output: frame size (how many data does one frame include)")
-		.def("getNumChannels", &SBMotion::getNumChannels, "Returns the number of channels for this motion. \n Input: NULL \n Output: number of channels for this motion")
-		.def("getChannels", &SBMotion::getChannels, "Returns the channels + type inside the skeleton. \n Input: NULL \n Output: channel name and type")
-		.def("checkSkeleton", &SBMotion::checkSkeleton, "Print out all the motion channels and compare it with the given skeleton channels. Mark '+' in front if the skeleton channel exists in the motion. \n Input: skeleton file name \n Output: NULL")
-		.def("connect", &SBMotion::connect, "Connect current motion to a skeleton object so the channels inside the motion are mapped to the channels inside skeleton. \n Input: Skeleton Object \n Output: NULL")
-		.def("disconnect", &SBMotion::disconnect, "Disconnect current motion with current skeleton object. ")
-		.def("mirror", &SBMotion::mirror, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Mirrors the motion.")
-		.def("mirrorChildren", &SBMotion::mirrorChildren, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Mirrors only the child joints of a specific parent joint.")
-		.def("retarget", &SBMotion::retarget, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Retarget the motion to a different skeleton.")
-		.def("footSkateCleanUp", &SBMotion::footSkateCleanUp, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Retarget the motion to a different skeleton.")
-		.def("constrain", &SBMotion::constrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Constrain the retargeted motion to based on the source skeleton and motion.")
-		.def("smoothCycle", &SBMotion::smoothCycle, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Build the smooth cycle the motion.")
-		.def("alignToEnd", &SBMotion::alignToEnd, "Cut the first x number of frames and stitch them to the end. x is the input number")
-		.def("alignToBegin", &SBMotion::alignToBegin, "Cut the last x number of frames and stitch them to the begin. x is the input number")
-		.def("duplicateCycle", &SBMotion::duplicateCycle, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Duplicate motion by x amount of cycles.")
-		.def("getJointSpeed", &SBMotion::getJointSpeed, "Get the accumulative joint speed. \n Input: SBJoint, start time, end time \n Output: joint speed(unit: same with the skeleton)")
-		.def("getJointSpeedAxis", &SBMotion::getJointSpeedAxis, "Get the accumulative joint speed of a given axis: X, Y or Z. \n Input: SBJoint, axis, start time, end time \n Output: joint speed(unit: same with the skeleton)")
-		.def("getJointAngularSpeed", &SBMotion::getJointAngularSpeed, "Get the joint accumulative angular speed. \n Input: SBJoint, start time, end time \n Output: joint angular speed(unit: degree/sec)")		
-		.def("getJointAngularSpeedAxis", &SBMotion::getJointAngularSpeedAxis, "Get the joint accumulative angular speed of a given axis: X, Y or Z. \n Input: SBJoint, axis, start time, end time \n Output: joint angular speed(unit: degree/sec)")		
-		.def("getJointTransition", &SBMotion::getJointTransition, "Get the joint transition vector. \n Input: SBJoint, start time, end time \n Output: joint transition vector containing x, y, z value (unit: same with the skeleton)")		
-		.def("getJointPosition", &SBMotion::getJointPosition, "Get the joint position. \n Input: SBJoint, time \n Output: joint position containing x, y, z value (unit: same with the skeleton)")		
-		.def("translate", &SBMotion::translate, "Translates the base joint name by x,y,z values.")		
-		.def("rotate", &SBMotion::rotate, "Rotates the base joint name by x,y,z axis.")			
-		.def("scale", &SBMotion::scale, "Scales all translations in skeleton by scale factor.")		
-		.def("trim", &SBMotion::trim, "Trims the starting and ending frames in the motion.")	
-		.def("saveToSkm", &SBMotion::saveToSkm, "Saves the file in .skm format to a given file name.")	
-		.def("getTimeStart", &SBMotion::getTimeStart, "Returns the start time of the motion.")
-		.def("getTimeReady", &SBMotion::getTimeReady, "Returns the ready time of the motion.")
-		.def("getTimeStrokeStart", &SBMotion::getTimeStrokeStart, "Returns the stroke start time of the motion.")
-		.def("getTimeStroke", &SBMotion::getTimeStroke, "Returns the stroke time of the motion.")
-		.def("getTimeStrokeEnd", &SBMotion::getTimeStrokeEnd, "Returns the stroke end time of the motion.")
-		.def("getTimeRelax", &SBMotion::getTimeRelax, "Returns the relax time of the motion.")
-		.def("getTimeStop", &SBMotion::getTimeStop, "Returns the stop time of the motion.")	
-		.def("getDuration", &SBMotion::getDuration, "Return the duration of the motion")
-		.def("setSyncPoint", &SBMotion::setSyncPoint, "Set the gestrure syncpoint for this motion")
-		.def("addEvent", &SBMotion::addEvent, "Adds an event associated with this motion that will be triggered at the given time. The last paramter determines if the event will be triggered only once, or every time the motion is looped.")
-		.def("addMetaData", &SBMotion::addMetaData, "Add a tagged metadata as string to the motion.")
-		.def("removeMetaData", &SBMotion::removeMetaData, "Remove a tagged metadata from the motion.")
-		.def("getMetaDataString", &SBMotion::getMetaDataString, "Get the first metadata based on tag name")
-		.def("getMetaDataDouble", &SBMotion::getMetaDataDouble, "Get the first metadata based on tag name")
-		.def("getMetaDataTags", &SBMotion::getMetaDataTags, "Get all tag names in the metadata map.")
-		.def("getMotionSkeletonName", &SBMotion::getMotionSkeletonName, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the skeleton associated with this motion.")
-		.def("setMotionSkeletonName", &SBMotion::setMotionSkeletonName, "Set the skeleton associated with this motion.")
-		;
+	pythonFuncsMotion();
 
 
 	boost::python::class_<SBController, boost::python::bases<SBObject> >("SBController")
@@ -1194,54 +462,9 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 	boost::python::class_<MeCtCurveWriter, boost::python::bases<SBController> > ("CurveWriterController")
 		;
 
-	boost::python::class_<SBSkeleton, boost::python::bases<SBObject> >("SBSkeleton")
-	//	.def(boost::python::init<>())
-		.def(boost::python::init<std::string>())
-		.def("load", &SBSkeleton::load, "Loads the skeleton definition from the given skeleton name.")
-		.def("save", &SBSkeleton::save, "Saves the skeleton definition with the given skeleton name.")
-		.def("loadFromString",  &SBSkeleton::loadFromString, "Loads the skeleton definition from a string.")
-		.def("rescale", &SBSkeleton::rescale, "Adjust the skeleton size to scale ratio")
-		.def("getName", &SBSkeleton::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the skeleton.")
-		.def("getFileName", &SBSkeleton::getFileName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the original filename where the skeleton was loaded from.")
-		.def("getNumJoints", &SBSkeleton::getNumJoints, "Returns the number of joints for this skeleton.")
-		.def("getJointNames", &SBSkeleton::getJointNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the joint names for this skeleton.")
-		.def("getJointByName", &SBSkeleton::getJointByName, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint of a given name.")
-		.def("getJoint", &SBSkeleton::getJoint, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint with a given index.")
-		.def("getNumChannels", &SBSkeleton::getNumChannels, "Returns the number of the channels inside the skeleton.")
-		.def("getChannelType", &SBSkeleton::getChannelType, "Returns the type of the channel of a given index.")
-		.def("getChannelSize", &SBSkeleton::getChannelSize, "Returns the size of the channel given index.")
-		.def("createSkelWithoutPreRot", &SBSkeleton::createSkelWithoutPreRot, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a new standard T-pose skel from source but without pre-rotations")	
-		.def("orientJointsLocalAxesToWorld", &SBSkeleton::orientJointsLocalAxesToWorld, "Orient skeleton joints local axes to match world coordinate axes (Y-up Z-front)")			
-		;
 
-	boost::python::class_<SBJoint, boost::python::bases<SBObject> >("SBJoint")
-		.def(boost::python::init<>())
-		.def("setName", &SBJoint::setName, "Set the name of the joint.")
-		.def("getName", &SBJoint::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the joint.")
-		.def("getParent", &SBJoint::getParent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the parent joint.")
-		.def("setParent", &SBJoint::setParent, "Sets the parent joint.")
-		.def("getNumChildren", &SBJoint::getNumChildren, "Returns the number of child joints.")
-		.def("getChild", &SBJoint::getChild, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the child joint with a given index.")
-		.def("getSkeleton", &SBJoint::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton.")
-		.def("setSkeleton", &SBJoint::setSkeleton, "Sets the skeleton.")
-		.def("getOffset", &SBJoint::getOffset, "Returns the offset of the joint from the parent joint.") 
-		.def("setOffset", &SBJoint::setOffset, "Sets the offset of the joint from the parent joint.")
-		.def("getIndex", &SBJoint::getIndex, "Returns the index of the joint in current skeleton.")
-		.def("getPosition", &SBJoint::getPosition, "Returns the current position of the joint in global coordinates.")
-		.def("getQuat", &SBJoint::getQuaternion, "Returns the current quaterion of the joint in global coordinates.")
-		.def("getMatrixGlobal", &SBJoint::getMatrixGlobal, "Returns the matrix of the joint in global coordinates.")
-		.def("getMatrixLocal", &SBJoint::getMatrixLocal, "Returns the matrix of the joint in local coordinates.")
-		.def("addChild", &SBJoint::addChild, "Add a child joint to current joint.")
-		.def("setUseRotation", &SBJoint::setUseRotation, "Allows the joint to use rotation channels.")	
-		.def("getUseRotation", &SBJoint::isUseRotation, "Determines if the joint uses rotation channels.")	
-		.def("setUsePosition", &SBJoint::setUsePosition, "Allows the joint to use position channels.")	
-		.def("isUsePosition", &SBJoint::isUsePosition, "Determines if the joint uses position channels.")	
-		.def("getMass", &SBJoint::getMass, "Gets the mass of the joint.")
-		.def("setMass", &SBJoint::setMass, "Sets the mass of the joint.")
-		.def("getPrerotation", &SBJoint::getPrerotation, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the prerotation values for the joint.")
-		.def("setPrerotation", &SBJoint::setPrerotation, "Sets the prerotation values for the joint.")
-		.def("getPostrotation", &SBJoint::getPostrotation, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the postrotation values for the joint.")
-		.def("setPostrotation", &SBJoint::setPostrotation, "Sets the postrotation values for the joint.")		;
+	pythonFuncsSkeleton();
+
 
 	boost::python::class_<SBBehavior, boost::python::bases<SBObject> >("SBBehavior")
 		//.def(boost::python::init<std::string, std::string>())
@@ -1272,84 +495,11 @@ boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribut
 		.def("getUtterance", &SpeechBehavior::getUtterance, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the current utterance.")
 	;
 
-	boost::python::class_<SBPawn, boost::python::bases<SBObject> >("SBPawn")
-		.def("getName", &SBPawn::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the pawn..")
-		.def("getSkeleton", &SBPawn::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object of the pawn.")
-		.def("setSkeleton", &SBPawn::setSkeleton, "Attaches the skeleton to the character.")
-		.def("setName", &SBPawn::setName, "Sets or changes the name of the character.")
-		.def("getPosition", &SBPawn::getPosition, "Returns the current position of the character's world offset.")
-		.def("getOrientation", &SBPawn::getOrientation, "Returns the current orientation of the character's world offset.")
-		.def("setPosition", &SBPawn::setPosition, "Sets the current position of the character's world offset.")
-		.def("setPositionSmooth", &SBPawn::setPositionSmooth, "Sets the current position of the character's world offset. The character will be translated smoothly overtime to avoid popping.")
-		.def("setOrientation", &SBPawn::setOrientation, "Set the current orientation of the character's world offset.")
-		.def("setHPR", &SBPawn::setHPR, "Sets the heading, pitch and roll of the character's world offset.")
-		.def("getHPR", &SBPawn::getHPR, "Gets the heading, pitch and roll of the character's world offset.")
-		.def("setHPRSmooth", &SBPawn::setHPRSmooth, "Sets the heading, pitch and roll of the character's world offset. The character will be rotated smoothly overtime to avoid popping.")
-	;
 
-	boost::python::class_<SrCamera, boost::python::bases<SBPawn> >("Camera")
-		.def("print", &SrCamera::print, "Shows all the camera statistics. ")
-		.def("reset", &SrCamera::reset, "Reset camera with camera eye (0 166 185), camera center (0 92 0). ")
-		.def("setEye", &SrCamera::setEye, "Set camera eye position. \n Input: camera eye position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
-		.def("getEye", &SrCamera::getEye, "Get camera eye position.")
-		.def("setCenter", &SrCamera::setCenter, "Set camera center. \n Input: camera center position(should only have three number in the input list) e.g. [0, 0, 0] \n Output: NULL")
-		.def("getCenter", &SrCamera::getCenter, "Get camera center.")
-		.def("setScale", &SrCamera::setScale, "Set camera scale. \n camera scale: NULL \n Output: NULL")
-		.def("getScale", &SrCamera::getScale, "Get camera scale.")
-		.def("setUpVector", &SrCamera::setUpVector, "Set camera up vector.")
-		.def("getUpVector", &SrCamera::getUpVector, "Returns the camera up vector.")
-		.def("setFov", &SrCamera::setFov, "Set's the camera's field of view.")
-		.def("getFov", &SrCamera::getFov, "Get's the camera's field of view.")
-		.def("setNearPlane", &SrCamera::setNearPlane, "Set's the camera's near plane.")
-		.def("getNearPlane", &SrCamera::getNearPlane, "Get's the camera's near plane.")
-		.def("setFarPlane", &SrCamera::setFarPlane, "Set's the camera's far plane.")
-		.def("getFarPlane", &SrCamera::getFarPlane, "Get's the camera's far plane.")
-		.def("setAspectRatio", &SrCamera::setAspectRatio, "Set's the camera's aspect ratio.")
-		.def("getAspectRatio", &SrCamera::getAspectRatio, "Get's the camera's aspect ratio.")
-		;
+	pythonFuncsCharacter();
 
-	boost::python::class_<SBCharacter, boost::python::bases<SBPawn, SBObject> >("SBCharacter")
-		//.def(boost::python::init<std::string, std::string>())
-		.def("setMeshMap", &SBCharacter::setMeshMap, "Set the OpenCollada file for the character which contains all the smoothbinding information.")
-		.def("addMesh", &SBCharacter::addMesh, "Add obj mesh to current character for smoothbinding.")
-		.def("isAutomaticPruning", &SBCharacter::isAutomaticPruning, "Returns true if the character's cotnroller are automatically pruned.")
-		.def("setAutomaticPruning", &SBCharacter::setAutomaticPruning, "Toggles the automatic pruning mechanism on or off.")
-		.def("pruneControllers", &SBCharacter::pruneControllers, "Prunes the controller tree.")
-		.def("startMotionRecord", &SBCharacter::startMotionRecord, "Start recording the output motion of this character.")
-		.def("stopMotionRecord", &SBCharacter::stopMotionRecord, "Stop the recording and output the motion to a .skm file.")
-		.def("setSoftEyes", &SBCharacter::setSoftEyes, "Sets the soft eyes feature.")
-		.def("isSoftEyes", &SBCharacter::isSoftEyes, "Returns the value of the soft eyes feature.")
-		.def("setUseVisemeCurves", &SBCharacter::setUseVisemeCurves, "Use curves when interpreting visemes.")
-		.def("isUseVisemeCurves", &SBCharacter::isUseVisemeCurves, "Are curves used when interpreting visemes.")
-		.def("setVisemeTimeOffset", &SBCharacter::setVisemeTimeOffset, "Set the time delay for viseme curve mode.")
-		.def("getVisemeTimeOffset", &SBCharacter::getVisemeTimeOffset, "Get the time delay for viseme curve mode.")
-		.def("getNumControllers", &SBCharacter::getNumControllers, "Returns number of top level controllers inside this character.")
-		.def("createStandardControllers", &SBCharacter::createStandardControllers, "Returns number of top level controllers inside this character.")		
-		//.def("getNumVisemes", &SBCharacter::getNumVisemes, "Returns the number of visemes.")
-		.def("getControllerByIndex", &SBCharacter::getControllerByIndex, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the ith controller.")
-		.def("getControllerByName", &SBCharacter::getControllerByName, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the controller with the given name.")
-		.def("getControllerNames", &SBCharacter::getControllerNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the controller name vector.")
-		.def("setVoice", &SBCharacter::setVoice, "Sets the voice type: remote, audiofile, text or none (use \"\").")
-		.def("setVoiceCode", &SBCharacter::setVoiceCode, "Sets the voice code. For audiofile type, this is a path.")
-		.def("setVoiceBackup", &SBCharacter::setVoiceBackup, "Sets the voice backup type: remote, audiofile, text or none (use \"\").")
-		.def("setVoiceBackupCode", &SBCharacter::setVoiceBackupCode, "Sets the voice backup code. For audiofile type, this is a path.")
-		.def("getVoice", &SBCharacter::getVoice, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the voice of the character..")
-		.def("getVoiceCode", &SBCharacter::getVoiceBackupCode, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the voice code. For audiofile type, this is a path.")
-		.def("getVoiceBackup", &SBCharacter::getVoiceBackup, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the voice backup type: remote, audiofile, text or none (use \"\").")
-		.def("setFaceDefinition", &SBCharacter::setFaceDefinition, "Sets face definition (visemes, action units) for a character.")
-		.def("getFaceDefinition", &SBCharacter::getFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets face definition (visemes, action units) for a character.")
-		.def("getHeight", &SBCharacter::getHeight, "Gets the height of the character.")
-		.def("getBoundingBox", &SBCharacter::getBoundingBox, "Gets the boundary dimensions of the character.")
-		.def("getNumBehaviors", &SBCharacter::getNumBehaviors, "Returns the number of behaviors of the character.")
-		.def("getBehavior", &SBCharacter::getBehavior, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the ith behavior of the character.")
-		//.def("getFaceDefinition", &SBCharacter::getFaceDefinition, "Gets face definition (visemes, action units) for a character.")
-		.def("setNvbg", &SBCharacter::setNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Sets the NVBG handler for this character.")
-		.def("getNvbg", &SBCharacter::getNvbg, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the NVBG handler for this character.")
-		.def("setMiniBrain", &SBCharacter::setMiniBrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Sets the mini brain handler for this character.")
-		.def("getMiniBrain", &SBCharacter::getMiniBrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the mini brain handler for this character.")
-		;
 
-boost::python::class_<SBReach>("SBReach")
+	boost::python::class_<SBReach>("SBReach")
 		.def("getCharacter", &SBReach::getCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character associated with this reach engine.")
 		.def("copy", &SBReach::copy, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Copies the reach engine.")
 		.def("addMotion", &SBReach::addMotion, "Adds a motion to the reach engine.")
@@ -1380,7 +530,7 @@ boost::python::class_<SBReach>("SBReach")
 
 
 	boost::python::class_<SBGestureMap::GestureInfo >("GestureInfo")
-    ;
+		;
 
 	boost::python::class_<SBGestureMap>("SBGestureMap")
 		.def("addGestureMapping", &SBGestureMap::addGestureMapping, "Add a gesture mapping. Input: name of the animation/state, type, posture, hand. Output: null")
@@ -1456,54 +606,9 @@ boost::python::class_<SBReach>("SBReach")
 		.def("isInitialized", &SBParser::isInitialized, "Return boolean telling if Charniak parser is initialized.")
 		;
 
-	boost::python::class_<SrVec>("SrVec")
-		.def(boost::python::init<>())
-		.def(boost::python::init<float, float, float>())
-		.def("getData", &SrVec::getData, "gets the x,y,z values")
-		.def("setData", &SrVec::setData, "sets the x,y,z values")
-		.def("len", &SrVec::norm, "gets the length of the vector")
-		.def("normalize", &SrVec::normalize, "normalizes the vector")
-		.def("isZero", &SrVec::iszero, "returns True if the vector is zero")
-		.def("rotY", &SrVec::rotY, "rotate vector around Y axis (radian)")
-		.def("vecAngle", &SrVec::vecAngle, "Returns the angle between v1 and v2 (radian)")
-		.def("vecYaw", &SrVec::vecYaw, "Returns Yaw angle on X-Z plane of given vec (radian)")
-		;
 
-	boost::python::class_<SrMat>("SrMat")
-		.def(boost::python::init<>())
-		.def("getData", &SrMat::getData, "gets the data in the matrix at r,c")
-		.def("setData", &SrMat::setData, "sets the data in the matrix at r,c")
-		.def("identity", &SrMat::identity, "sets the data in the matrix to an identity matrix")
-		.def("transpose", &SrMat::transpose, "transposes the data in the matrix")
-		;
+	pythonFuncsMath();
 
-	boost::python::class_<SrQuat>("SrQuat")
-		.def(boost::python::init<>())
-		.def(boost::python::init<float, float, float, float>())
-		.def(boost::python::init<SrVec, float>())
-		.def("getAxis", &SrQuat::axis, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the axis of the quaternion.")
-		.def("getAngle", &SrQuat::angle, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the angle of the quaternion.")
-		.def("getData", &SrQuat::getData, "gets the data in the quaterion at location indicated by the index w,x,y,z")
-		.def("setData", &SrQuat::setData, "sets the data in the quaterion at location indicated by the index w,x,y,z")
-		;	
-	
-	boost::python::class_<SrBox>("SrBox")
-		.def(boost::python::init<>())
-		.def(boost::python::init<SrVec, SrVec>())
-		.def(boost::python::init<SrBox>())
-		.def("setMinimum", &SrBox::setMinimum, "sets the minimum values of the box")
-		.def("setMaximum", &SrBox::setMaximum,  "sets the maximum values of the box")
-		.def("getMinimum", &SrBox::getMinimum, boost::python::return_value_policy<boost::python::return_by_value>(), "gets the minimum values of the box")
-		.def("getMaximum", &SrBox::getMaximum, boost::python::return_value_policy<boost::python::return_by_value>(), "gets the maximum values of the box")
-		.def("getCenter", &SrBox::getCenter, boost::python::return_value_policy<boost::python::return_by_value>(), "gets center of the box")
-		.def("getMinSize", &SrBox::min_size, "gets the minimum dimension of the box")
-		.def("getMaxSize", &SrBox::max_size, "gets the maximum dimension of the box")
-		.def("getSize", &SrBox::getSize, boost::python::return_value_policy<boost::python::return_by_value>(), "returns the size of each dimension")
-		.def("doesContain", &SrBox::contains, "returns the center of the box")
-		.def("doesIntersect", &SrBox::intersects, "returns the center of the box")
-		.def("getVolume", &SrBox::volume, "returns the volume of the box")
-		.def("isEmpty", &SrBox::empty, "returns true if the box is empty")
-		;
 
 	boost::python::class_<NvbgWrap, boost::python::bases<SBObject>, boost::noncopyable>("Nvbg")
 		.def("objectEvent", &Nvbg::objectEvent, &NvbgWrap::default_objectEvent, "An event indicating that an object of interest is present.")
@@ -1586,111 +691,10 @@ boost::python::class_<SBReach>("SBReach")
 		.def("isEnableLogging", &SBVHMsgManager::isEnableLogging, "Disables logging over the VH Message bus.")
 		;
 
-	boost::python::class_<SBScene, boost::python::bases<SBObject> >("SBScene")
-		.def("setProcessId", &SBScene::setProcessId, "Sets the process id of the SmartBody instance.")
-		.def("getProcessId", &SBScene::getProcessId,  boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the process id of the SmartBody instance.")
-		.def("createCharacter", &SBScene::createCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new character given character name. \n Input: character name \nOutput: character object")
-		.def("createPawn", &SBScene::createPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new pawn.")
-		.def("createFaceDefinition", &SBScene::createFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new face definition with a given name.")
-		.def("getFaceDefinition", &SBScene::getFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a face definition with a given name.")
-		.def("getNumFaceDefinitions", &SBScene::getNumFaceDefinitions, "Returns the number of face definitions.")
-		.def("getFaceDefinitionNames", &SBScene::getFaceDefinitionNames, "Return a list of all face definition names. \n Input: NULL \nOutput: list of face definition names.")
-		.def("removeCharacter", &SBScene::removeCharacter, "Remove the character given its name. \n Input: character name \n Output: NULL")
-		.def("removeAllCharacters", &SBScene::removeAllCharacters, "Removes all the characters.")
-		.def("removePawn", &SBScene::removePawn, "Remove the pawn given its name. \n Input: pawn name \n Output: NULL")
-		.def("removeAllPawns", &SBScene::removeAllPawns, "Removes all the pawns.")
-		.def("getNumPawns", &SBScene::getNumPawns, "Returns the number of pawns.\n Input: NULL \nOutput: number of pawns.")
-		.def("getNumCharacters", &SBScene::getNumCharacters, "Returns the number of characters.\n Input: NULL \nOutput: number of characters.")
-		.def("getPawn", &SBScene::getPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the pawn object given its name. \n Input: pawn name \nOutput: pawn object")
-		.def("getCharacter", &SBScene::getCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the character object given its name. \n Input: character name \nOutput: character object")
-		.def("getPawnNames", &SBScene::getPawnNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all character names.\n Input: NULL \nOutput: list of pawn names")
-		.def("getCharacterNames", &SBScene::getCharacterNames, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a list of all character names.\n Input: NULL \nOutput: list of character names")
-		.def("getEventHandlerNames", &SBScene::getEventHandlerNames, "Returns a list of names of all event handlers.\n Input: NULL \nOutput: list of event handler names")
-		.def("setMediaPath",&SBScene::setMediaPath, "Sets the media path.")
-		.def("getMediaPath",&SBScene::getMediaPath, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the media path.")
-		.def("setDefaultCharacter", &SBScene::setDefaultCharacter, "Sets the default character.")
-		.def("setDefaultRecipient", &SBScene::setDefaultRecipient, "Sets the default recipient.")
-		.def("addSkeletonDefinition", &SBScene::addSkeletonDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Add an new empty skeleton into system. \n Input: skeleton name \nOutput: skeleton object")
-		.def("addMotionDefinition", &SBScene::addMotionDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Add an new empty motion into system. \n Input: motion name, motion duration \nOutput: motion object")
-		.def("addScript", &SBScene::addScript, "Adds a script to the scene.")
-		.def("removeScript", &SBScene::removeScript, "Returns the number of scripts.")
-		.def("getNumScripts", &SBScene::getNumScripts, "Returns the number of scripts.")
-		.def("getScriptNames", &SBScene::getScriptNames, "Returns the names of all the scripts.")
-		.def("getScript", &SBScene::getScript, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a script.")
-		.def("getScale", &SBScene::getScale, "Returns the scene scale in meters (default is centimeters .01)")
-		.def("setScale", &SBScene::setScale, "Sets the scene scale in meters.")
-		.def("isRemoteMode", &SBScene::isRemoteMode, "Returns the boolean indicating whether scene is in remote mode.")
-		.def("setRemoteMode", &SBScene::setRemoteMode, "Sets the scene remote mode.")
-		.def("removePendingCommands", &SBScene::removePendingCommands, "Removes any commands stored in SmartBody awaiting execution.")
-		.def("setCharacterListener", &SBScene::setCharacterListener, "Sets the listener for character and pawn events.")
-		.def("getCharacterListener", &SBScene::getCharacterListener, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the listener for character and pawn events.")
-		.def("save", &SBScene::save, "Saves the SmartBody configuration. Returns a string containing Python commands representing the configuration.")
-		.def("exportScene", &SBScene::exportScene, "Saves the entire SmartBody configuration, including assets, into a given file location.")
-		.def("createNavigationMesh", &SBScene::createNavigationMesh, "Create navigation mesh from the input mesh.\n Input : OBJ file name")
-		.def("startFileLogging", &SBScene::startFileLogging, "Starts logging SmartBody messages to a given log file.")
-		.def("stopFileLogging", &SBScene::stopFileLogging, "Stops logging SmartBody messages to the given log file.")
 
-		// cameras
-		.def("createCamera", &SBScene::createCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a camera with a given name and returns it.")
-		.def("removeCamera", &SBScene::removeCamera, "Removes a camera.")
-		.def("setActiveCamera", &SBScene::setActiveCamera, "Sets the camera to be used in the viewer.")
-		.def("getActiveCamera", &SBScene::getActiveCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the camera currently being used in the viewer.")
-		.def("getCamera", &SBScene::getCamera, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a camera by name.")
-		.def("getNumCameras", &SBScene::getNumCameras, "Returns the number of cameras available.")
-		.def("getCameraNames", &SBScene::getCameraNames, "Gets the names of all the cameras available.")
+	pythonFuncsScene();
 
-		// command processing
-		.def("command", &SBScene::command, "Runs an old-Style SmartBody command.")
-		.def("commandAt", &SBScene::commandAt, "Runs an old-style SmartBody command at a set time in the future.")
-		.def("vhmsg", &SBScene::sendVHMsg, "Sends a virtual human message.")
-		.def("vhmsg2", &SBScene::sendVHMsg2, "Sends a virtual human message.")
-		.def("run", &SBScene::runScript, "Runs a python script.")
-		// managers
-		.def("getEventManager", &SBScene::getEventManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the event manager.")
-		.def("getSimulationManager", &SBScene::getSimulationManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the simulation manager object.")
-		.def("getProfiler", &SBScene::getProfiler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the  profiler object.")
-		.def("getBmlProcessor", &SBScene::getBmlProcessor, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the bml processor object.")
-		.def("getStateManager", &SBScene::getBlendManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the state manager object.")
-		.def("getBlendManager", &SBScene::getBlendManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the state manager object.")
-		.def("getReachManager", &SBScene::getReachManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the reach manager object.")
-		.def("getSteerManager", &SBScene::getSteerManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the steer manager object.")
-		.def("getServiceManager", &SBScene::getServiceManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the service manager object.")
-		.def("getPhysicsManager", &SBScene::getPhysicsManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the physics manager object.")
-		.def("getBoneBusManager", &SBScene::getBoneBusManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Bone Bus manager object.")
-		.def("getGestureMapManager", &SBScene::getGestureMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the gesture map manager object.")
-		.def("getJointMapManager", &SBScene::getJointMapManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the joint mapping manager object.")
-		.def("getCollisionManager", &SBScene::getCollisionManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the collision manager object.")
-		.def("getDiphoneManager", &SBScene::getDiphoneManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the diphone manager object.")
-		.def("getBehaviorSetManager", &SBScene::getBehaviorSetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the behavior set manager.")
-		.def("getRetargetManager", &SBScene::getRetargetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the retarget manager.")
-		.def("getAssetManager", &SBScene::getAssetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the asset manager.")
-		.def("getVHMsgManager", &SBScene::getVHMsgManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the VH message manager.")
-		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 
-		.def("setSystemParameter", &SBScene::setSystemParameter, "Sets a name/value pair that persists between scene sessions.")
-		.def("getSystemParameter", &SBScene::getSystemParameter, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a value for a given name.")
-		.def("removeSystemParameter", &SBScene::removeSystemParameter, "Removes a system parameter.")
-		.def("removeAllSystemParameters", &SBScene::removeSystemParameter, "Removes a system parameter.")
-		.def("getSystemParameterNames", &SBScene::getSystemParameterNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns names of all system parameters.")
-
-		// deprecated
-		.def("createSkeleton", &SBScene::createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.")
-		.def("getSkeleton", &SBScene::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object given its name. \n Input: skeleton name \nOutput: skeleton object")
-		.def("addAssetPath", &SBScene::addAssetPath, "Add path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL")
-		.def("removeAssetPath", &SBScene::removeAssetPath, "Removes a  path resource given path type and actual path string. \n Input: type(can be cript|motion|audio), path \n Output: NULL")
-		.def("removeAllAssetPaths", &SBScene::removeAllAssetPaths, "Removes all paths resource given path type and actual path string. \n Input: type(can be script|motion|audio), path \n Output: NULL")
-		.def("getAssetPaths", &SBScene::getAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type: seq, me, audio, mesh.")
-		.def("getLocalAssetPaths", &SBScene::getLocalAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type excluding the media path: seq, me, audio, mesh.")
-		.def("loadAssets", &SBScene::loadAssets, "Loads the skeletons and motions from the asset paths.")
-		.def("loadAssetsFromPath", &SBScene::loadAssetsFromPath, "Loads the skeletons and motions from a given path. The path will not be stored for later use.")
-		.def("addMotions", &SBScene::addMotions, "Add motion resource given filepath and recursive flag. \n Input: path, recursive flag(boolean variable indicating whether to tranverse all the children directories) \n Output: NULL")
-		.def("getMotion", &SBScene::getMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a the motion of given name.")
-		.def("getNumMotions", &SBScene::getNumMotions, "Returns the number of motions available.")
-		.def("getMotionNames", &SBScene::getMotionNames, "Returns the names of motions available.")
-		.def("getNumSkeletons", &SBScene::getNumSkeletons, "Returns the number of skeletons available.")
-		.def("getSkeletonNames", &SBScene::getSkeletonNames, "Returns a list of all skeleton names.\n Input: NULL \nOutput: list of skeleton names")
-
-	;
 #endif
 	}
 #endif
