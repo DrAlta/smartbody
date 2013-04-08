@@ -24,7 +24,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 
 #include "sbm/time_regulator.h"
 
