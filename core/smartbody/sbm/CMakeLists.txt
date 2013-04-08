@@ -83,6 +83,8 @@ set( MORE_LIBS
         ${ALUT}
         ${OPENAL}
 	rt
+	fontconfig
+	Xft
 )
 
 endif()
@@ -213,8 +215,6 @@ target_link_libraries( sbm-fltk
     	ncurses	
 	pthread
 	GLEW
-	Xft	
-	fontconfig
 	${MORE_LIBS}
 	${OGRE_LIBS}
 )
