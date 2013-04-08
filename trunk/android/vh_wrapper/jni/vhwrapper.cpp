@@ -63,6 +63,7 @@ typedef bool (*SBM_ReleaseCharacter_DEF)(SBM_SmartbodyCharacter *);
 typedef bool (*SBM_SetLogMessageCallback_DEF)(LogMessageCallback);
 typedef void (*SBM_LogMessage_DEF)(const char*, int);
 typedef bool (*SBM_IsCharacterCreated_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen );
+typedef bool (*SBM_IsLogMessageWaiting_DEF)( SBMHANDLE sbmHandle, char *logMessage, int maxLogMessageLen, int * messageType );
 typedef bool (*SBM_IsCharacterDeleted_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen );
 typedef bool (*SBM_IsCharacterChanged_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen );
 typedef bool (*SBM_IsVisemeSet_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime );
@@ -96,6 +97,7 @@ SBM_ReleaseCharacter_DEF           g_SBM_ReleaseCharacter = NULL;
 SBM_SetLogMessageCallback_DEF      g_SBM_SetLogMessageCallback = NULL;
 SBM_LogMessage_DEF                 g_SBM_LogMessage = NULL;
 SBM_IsCharacterCreated_DEF         g_SBM_IsCharacterCreated = NULL;
+SBM_IsLogMessageWaiting_DEF        g_SBM_IsLogMessageWaiting = NULL;
 SBM_IsCharacterDeleted_DEF         g_SBM_IsCharacterDeleted = NULL;
 SBM_IsCharacterChanged_DEF         g_SBM_IsCharacterChanged = NULL;
 SBM_IsVisemeSet_DEF                g_SBM_IsVisemeSet = NULL;
@@ -112,16 +114,16 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
 #ifdef WIN_BUILD
    if (releaseMode)
    {
-      g_SBM_HINST = LoadLibrary(TEXT("smartbody-dll.dll")); 
+      g_SBM_HINST = LoadLibrary(TEXT("SmartBody.dll"));
    }
    else
    {
-      g_SBM_HINST = LoadLibrary(TEXT("smartbody-dll_d.dll")); 
+      g_SBM_HINST = LoadLibrary(TEXT("SmartBody_d.dll"));
    }
 
    if (g_SBM_HINST == NULL)
    {
-      WRAPPER_SBM_LogMessage(vhcl::Format("ERROR: Failed to LoadLibrary '%s'", releaseMode ? "smartbody-dll.dll" : "smartbody-dll_d.dll").c_str(), 1);
+      WRAPPER_SBM_LogMessage(vhcl::Format("ERROR: Failed to LoadLibrary '%s'", releaseMode ? "SmartBody.dll" : "SmartBody_d.dll").c_str(), 1);
       return -1;
    }
 
@@ -148,6 +150,7 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    g_SBM_SetLogMessageCallback      = (SBM_SetLogMessageCallback_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetLogMessageCallback");
    g_SBM_LogMessage                 = (SBM_LogMessage_DEF)GetProcAddress(g_SBM_HINST, "SBM_LogMessage");
    g_SBM_IsCharacterCreated         = (SBM_IsCharacterCreated_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterCreated");
+   g_SBM_IsLogMessageWaiting        = (SBM_IsLogMessageWaiting_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsLogMessageWaiting");
    g_SBM_IsCharacterDeleted         = (SBM_IsCharacterDeleted_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterDeleted");
    g_SBM_IsCharacterChanged         = (SBM_IsCharacterChanged_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterChanged");
    g_SBM_IsVisemeSet                = (SBM_IsVisemeSet_DEF )GetProcAddress(g_SBM_HINST, "SBM_IsVisemeSet");
@@ -234,12 +237,12 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle )
    g_SBM_HINST = NULL;
    if (!freeSuccessful)
    {
-      WRAPPER_SBM_LogMessage("ERROR: Failed to FreeLibrary smartbody-dll.dll", 1);
+      WRAPPER_SBM_LogMessage("ERROR: Failed to FreeLibrary SmartBody.dll", 1);
       return false;
    }
    else
    {
-      //WRAPPER_SBM_LogMessage("SUCCESS!: FreeLibrary smartbody-dll.dll", 0);
+      //WRAPPER_SBM_LogMessage("SUCCESS!: FreeLibrary SmartBody.dll", 0);
    }
 
    return retVal;
@@ -467,6 +470,19 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char 
    return false;
 #else
    return SBM_IsCharacterCreated(sbmHandle, name, maxNameLen, objectClass, maxObjectClassLen);
+#endif
+}
+
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsLogMessageWaiting( SBMHANDLE sbmHandle, char * logMessage, int maxLogMessageLen, int * messageType)
+{
+#ifdef WIN_BUILD
+    if (g_SBM_IsLogMessageWaiting)
+    {
+        return g_SBM_IsLogMessageWaiting(sbmHandle, logMessage, maxLogMessageLen, messageType);
+    }
+    return false;
+#else
+    return SBM_IsLogMessageWaiting(sbmHandle, logMessage, maxLogMessageLen, messageType);
 #endif
 }
 
