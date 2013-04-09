@@ -1,24 +1,11 @@
 #pragma once
 
-#if __native_client__
-#include <GLES2/gl2.h>
-#elif defined(__ANDROID__)
-#include <GLES2/gl2.h>
-#elif __FLASHPLAYER__
-#include <GL/gl.h>
-#include <GL/glu.h>
-#else
-//#include "external/glew/glew.h"
-#ifdef WIN32
-#include <windows.h>
-#endif
-# include <GL/gl.h>
-# include <GL/glu.h>
-#endif
-#include <sr/sr_viewer.h>
 #include <vector>
 #include <string>
 #include <map>
+#include <sr/sr_gl.h>
+#include <sr/sr_viewer.h>
+
 
 class SbmShaderProgram
 {
