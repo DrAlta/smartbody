@@ -11,6 +11,8 @@
 #include <boost/filesystem/path.hpp>
 #include <controllers/me_controller_tree_root.hpp>
 
+#define USE_STL_MAP 0
+
 namespace SmartBody {
 
 SBJointMap::SBJointMap()
@@ -27,6 +29,9 @@ void SBJointMap::applyMotion(SmartBody::SBMotion* motion)
 		return;
 	
 	SkChannelArray& channels = motion->channels();
+	channels.setJointMapName(getName());
+	channels.rebuild_hash_table();
+#if 0
 	channels.startChannelNameChange();
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
@@ -36,6 +41,7 @@ void SBJointMap::applyMotion(SmartBody::SBMotion* motion)
 		std::string to = (*iter).second;
 		channels.changeChannelName(from, to);
 	}
+#endif
 
 	_mappedMotions.push_back(motion->getName());
 }
@@ -165,7 +171,7 @@ void SBJointMap::applySkeletonInverse( SmartBody::SBSkeleton* skeleton )
 		{
 			std::string to = (*iter).first;
 			std::string from = (*iter).second;
-			if (joints[j]->name() == from.c_str() && !jointUpdateTable[j])
+			if (joints[j]->jointName() == from.c_str() && !jointUpdateTable[j])
 			{
 				joints[j]->name(to);
 				jointUpdateTable[j] = true;
@@ -205,8 +211,10 @@ void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)
 	if (!skeleton)
 		return;
 	
-	std::vector<SkJoint*> joints = skeleton->joints();
+	
+#if 0
 	std::vector<bool> jointUpdateTable;
+	std::vector<SkJoint*> joints = skeleton->joints();
 	jointUpdateTable.resize(joints.size(),false);	
 	for (size_t j = 0; j < joints.size(); j++)
 	{
@@ -216,7 +224,7 @@ void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)
 		{
 			std::string from = (*iter).first;
 			std::string to = (*iter).second;
-			if (joints[j]->name() == from.c_str() && !jointUpdateTable[j])
+			if (joints[j]->jointName() == from.c_str() && !jointUpdateTable[j])
 			{
 				joints[j]->name(to);
 				jointUpdateTable[j] = true;
@@ -233,6 +241,11 @@ void SBJointMap::applySkeleton(SmartBody::SBSkeleton* skeleton)
 		std::string to = (*iter).second;
 		channels.changeChannelName(from, to);
 	}
+#else
+	skeleton->setJointMapName(getName());	
+	skeleton->channels().setJointMapName(getName());
+#endif
+
 	skeleton->resetSearchJoint();
 	skeleton->updateJointMap();
 
@@ -276,6 +289,7 @@ bool SBJointMap::isAppliedToSkeleton(const std::string& name)
 
 void SBJointMap::setMapping(const std::string& from, const std::string& to)
 {
+#if !USE_STL_MAP
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
 		iter++)
@@ -289,16 +303,24 @@ void SBJointMap::setMapping(const std::string& from, const std::string& to)
 	}
 
 	_map.push_back(std::pair<std::string, std::string>(from, to));
+#else
+ 	if (_jointMap.left.find(from) != _jointMap.left.end())
+ 		return;
+ 	//_jointMap[from] = to;
+	_jointMap.insert(StringBimap::value_type(from,to));	
+#endif	
 }
 
 void SBJointMap::clearMapping()
 {
 	_map.clear();
+	_jointMap.clear();
 }
 
 
 void SBJointMap::removeMapping(const std::string& from)
 {
+#if !USE_STL_MAP
 	std::vector<std::pair<std::string, std::string> > tempMap;
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
@@ -311,10 +333,17 @@ void SBJointMap::removeMapping(const std::string& from)
 		}
 	}
 	tempMap.swap(_map);
+#else
+	if (_jointMap.left.find(from) != _jointMap.left.end())
+	{
+		_jointMap.left.erase(from);
+	}
+#endif
 }
 
 void SBJointMap::removeMappingTo( const std::string& to )
 {
+#if !USE_STL_MAP
 	std::vector<std::pair<std::string, std::string> > tempMap;
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
@@ -327,10 +356,17 @@ void SBJointMap::removeMappingTo( const std::string& to )
 		}
 	}
 	tempMap.swap(_map);
+#else
+	if (_jointMap.right.find(to) != _jointMap.right.end())
+	{
+		_jointMap.right.erase(to);
+	}
+#endif
 }
 
 std::string SBJointMap::getMapSource(const std::string& to)
 {
+#if !USE_STL_MAP
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
 		iter++)
@@ -342,11 +378,18 @@ std::string SBJointMap::getMapSource(const std::string& to)
 			return f;
 		}
 	}
+#else
+	if (_jointMap.right.find(to) != _jointMap.right.end())
+	{
+		return _jointMap.right.find(to)->second;
+	}	
+#endif
 	return "";
 }
 
 std::string SBJointMap::getMapTarget(const std::string& from)
 {
+#if !USE_STL_MAP
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
 		iter++)
@@ -358,16 +401,29 @@ std::string SBJointMap::getMapTarget(const std::string& from)
 			return t;
 		}
 	}
+#else
+	if (_jointMap.left.find(from) != _jointMap.left.end())
+	{
+		return _jointMap.left.find(from)->second;
+	}	
+#endif
 	return "";
 }
 
 int SBJointMap::getNumMappings()
 {
+#if !USE_STL_MAP
 	return _map.size();
+#else
+	return _jointMap.size();
+#endif
 }
 
 std::string SBJointMap::getTarget(int num)
-{
+{	
+#if USE_STL_MAP
+	_map = getMappingList();
+#endif
 	if (_map.size() > (size_t) num)
 	{
 		return _map[num].second;
@@ -377,6 +433,9 @@ std::string SBJointMap::getTarget(int num)
 
 std::string SBJointMap::getSource(int num)
 {
+#if USE_STL_MAP
+	_map = getMappingList();
+#endif
 	if (_map.size() > (size_t) num)
 	{
 		return _map[num].first;
@@ -587,7 +646,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		newBase = newBase->parent();		
 	}
 	
-	if (newBase && newBase != base && base->name() != "base")
+	if (newBase && newBase != base && base->jointName() != "base")
 	{
 		setJointMap("base",newBase, prtMap);
 		setJointMap("base1",base, prtMap);
@@ -689,12 +748,12 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		guessLeftRightFromJntNames(ja, jb, l_acromioclavicular, r_acromioclavicular);
 
 		setJointMap("spine4", spine4, prtMap);
-		if (l_acromioclavicular->name() == "l_sternoclavicular")
+		if (l_acromioclavicular->jointName() == "l_sternoclavicular")
 			setJointMap("l_sternoclavicular", l_acromioclavicular, prtMap);
 		else
 			setJointMap("l_sternoclavicular", l_acromioclavicular, prtMap);
 
-		if (r_acromioclavicular->name() == "r_sternoclavicular")
+		if (r_acromioclavicular->jointName() == "r_sternoclavicular")
 			setJointMap("r_sternoclavicular", r_acromioclavicular, prtMap);
 		else
 			setJointMap("r_sternoclavicular", r_acromioclavicular, prtMap);
@@ -716,7 +775,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		for(unsigned int i=0; i<j_list.size(); i++)
 		{
 			SkJoint* j = j_list[i];
-			SrString jname(j->name().c_str());
+			SrString jname(j->jointName().c_str());
 			if(jname.search("head")>=0||jname.search("skull")>=0)
 			{
 				skullbase = j;
@@ -755,7 +814,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		for(unsigned int i=0; i<j_list.size(); i++)
 		{
 			SkJoint* j = j_list[i];
-			SrString jname(j->name().c_str());
+			SrString jname(j->jointName().c_str());
 			if(!j1 && jname.search("eye")>=0)
 			{
 				if(jname.search("lid")>=0||jname.search("brow")>=0||jname.search("lash")>=0) continue;
@@ -793,7 +852,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		{
 			j1 = j_listL[i];
 			j2 = j_listR[j];
-			SrString jname(j1->name().c_str());
+			SrString jname(j1->jointName().c_str());
 
 			if (j1->num_children() == 5)
 			{
@@ -826,7 +885,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 			j1 = getDeepestLevelJoint(j_list1); j2 = getDeepestLevelJoint(j_list2);
 			if(j1 && j2)
 			{
-				LOG("guessMap: Hand_End joints: %s, %s \n", j1->name().c_str(), j2->name().c_str());
+				LOG("guessMap: Hand_End joints: %s, %s \n", j1->jointName().c_str(), j2->jointName().c_str());
 				// try finding hand joints
 				ja = j1->parent();
 				jb = j2->parent();
@@ -902,7 +961,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 				setJointMap("r_shoulder", r_shoulder, prtMap);
 				SkJoint* ja = l_wrist->parent();
 				SkJoint* jb = r_wrist->parent();
-				SrString jname(ja->name().c_str());
+				SrString jname(ja->jointName().c_str());
 				if(jname.search("twist")>=0 || jname.search("roll")>=0)
 				{
 					l_forearm = ja;
@@ -925,7 +984,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 
 				l_shoulder = l_acromioclavicular->child(0);
 				r_shoulder = r_acromioclavicular->child(0);
-				if (l_shoulder->name() == "l_acromioclavicular" && r_shoulder->name() == "r_acromioclavicular")
+				if (l_shoulder->jointName() == "l_acromioclavicular" && r_shoulder->jointName() == "r_acromioclavicular")
 				// added by feng : special case for common.sk to account for both "sternoclavicular" and "acromioclavicular"
 				{
 					setJointMap("l_acromioclavicular", l_shoulder, prtMap);
@@ -1002,7 +1061,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 				setJointMap("r_shoulder", r_shoulder, prtMap);
 				SkJoint* ja = l_wrist->parent();
 				SkJoint* jb = r_wrist->parent();
-				SrString jname(ja->name().c_str());
+				SrString jname(ja->jointName().c_str());
 				if(jname.search("twist")>=0 || jname.search("roll")>=0)
 				{
 					l_forearm = ja;
@@ -1074,7 +1133,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 			{
 				j1 = j_listL[i];
 				j2 = j_listR[j];
-				SrString jname(j1->name().c_str());
+				SrString jname(j1->jointName().c_str());
 				if(jname.search("ankle")>=0 || jname.search("foot")>=0) // try search keyword "ankle" FIXME
 				{
 					ja = j1; jb = j2;
@@ -1200,8 +1259,8 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		{
 			SkJoint* ja = l_wrist->child(i);
 			SkJoint* jb = r_wrist->child(i);
-			SrString janame(ja->name().c_str());
-			SrString jbname(jb->name().c_str());
+			SrString janame(ja->jointName().c_str());
+			SrString jbname(jb->jointName().c_str());
 			// name search, alternative names from wiki
 			if(!l_thumb1 && (janame.search("thumb")>=0||janame.search("pollex")>=0||janame.search("finger0")>=0))
 				l_thumb1 = ja;
@@ -1454,26 +1513,26 @@ int SBJointMap::countChar(const char* string, char c, bool isCaseSensitive)
 void SBJointMap::guessLeftRightFromJntNames(SkJoint* ja, SkJoint* jb,
 											  SkJoint*& l_j, SkJoint*& r_j)
 {
-	if(countChar(ja->name().c_str(), 'l', false) > countChar(jb->name().c_str(), 'l', false))
+	if(countChar(ja->jointName().c_str(), 'l', false) > countChar(jb->jointName().c_str(), 'l', false))
 	{
 		l_j = ja; r_j = jb;
 	}
-	else if(countChar(ja->name().c_str(), 'l', false) < countChar(jb->name().c_str(), 'l', false))
+	else if(countChar(ja->jointName().c_str(), 'l', false) < countChar(jb->jointName().c_str(), 'l', false))
 	{
 		l_j = jb; r_j = ja;
 	}
-	else if(countChar(ja->name().c_str(), 'r', false) < countChar(jb->name().c_str(), 'r', false))
+	else if(countChar(ja->jointName().c_str(), 'r', false) < countChar(jb->jointName().c_str(), 'r', false))
 	{
 		l_j = ja; r_j = jb;
 	}
-	else if(countChar(ja->name().c_str(), 'r', false) > countChar(jb->name().c_str(), 'r', false))
+	else if(countChar(ja->jointName().c_str(), 'r', false) > countChar(jb->jointName().c_str(), 'r', false))
 	{
 		l_j = jb; r_j = ja;
 	}
 	else // can NOT figure out which is left/right from name (letter counting)
 	{
 		l_j = ja; r_j = jb; // 50% chance wrong
-		LOG("guessMap: 50 percent chance wrong: %s <=> %s \n", ja->name().c_str(), jb->name().c_str());
+		LOG("guessMap: 50 percent chance wrong: %s <=> %s \n", ja->jointName().c_str(), jb->jointName().c_str());
 	}
 }
 
@@ -1521,7 +1580,7 @@ void SBJointMap::setJointMap(const std::string& SB_jnt, SkJoint* j, bool prtMap)
 	SkSkeleton* sk = j->skeleton();
 	if (sk && sk->search_joint(SB_jnt.c_str()) && j->num_children() > 0) // the target name is already in the skeleton
 	{
-		if (j->name() != SB_jnt)
+		if (j->jointName() != SB_jnt)
 		{
 			// why would you want to mangle the joint names if the target name already exists ?
 			return;
@@ -1529,15 +1588,27 @@ void SBJointMap::setJointMap(const std::string& SB_jnt, SkJoint* j, bool prtMap)
 	}
 
 
-	setMapping(j->name().c_str(), SB_jnt); // set the mapping here
+	setMapping(j->jointName().c_str(), SB_jnt); // set the mapping here
 
 	if(prtMap)
 	{
 		LOG("%-15s <=> %-20s, %d chd(s), level %d \n",
-			SB_jnt.c_str(), j->name().c_str(),	j->num_children(), getJointHierarchyLevel(j));
+			SB_jnt.c_str(), j->jointName().c_str(),	j->num_children(), getJointHierarchyLevel(j));
 	}
 }
 
+SBAPI std::vector<std::pair<std::string, std::string> > SBJointMap::getMappingList()
+{
+	std::vector<std::pair<std::string, std::string> > outJointMap;
+	StringBimap::iterator mi;
+	for ( mi  = _jointMap.begin();
+		  mi != _jointMap.end();
+		  mi++)
+	{
+		outJointMap.push_back(std::pair<std::string,std::string>(mi->get_left_pair().first, mi->get_left_pair().second));
+	}
+	return outJointMap;
+}
 
 } // namespace SmartBody 
 

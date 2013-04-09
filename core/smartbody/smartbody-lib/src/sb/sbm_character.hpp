@@ -105,10 +105,12 @@ public:
 	std::map<int,MeCtReachEngine*>* reachEngineMap;
 	int            currentReachType;
 
+	std::vector<SrVec> footStepList[2];	
+	int footStepIdx[2];
+	SrVec          curFootIKPos[2];
+	float flightTime[2];
 
 protected:
-
-
 	// The implementation to be used for speech (NULL if unset) 
 	SmartBody::SpeechInterface* speech_impl;
 	// The voice code used by the implementation (empty string if unset) 
@@ -156,10 +158,7 @@ protected:
 	bool _isControllerPruning;
 
 	SmartBody::Nvbg* _nvbg;
-	SmartBody::MiniBrain* _miniBrain;
-
-	std::vector<SrVec> footStepList[2];	
-	int footStepIdx[2];
+	SmartBody::MiniBrain* _miniBrain;	
 public:
 	//  Methods
 	SbmCharacter();

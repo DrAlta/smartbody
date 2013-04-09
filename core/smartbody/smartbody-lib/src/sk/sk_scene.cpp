@@ -64,7 +64,7 @@ static SrSnGroup* make_joint_group ( const SkJoint* j, SkSkeleton* s, SrArray<Sr
    g->separator ( true );
    if (j->index() < 0)
    {
-	   LOG("Joint %s cannot be added to scene graph since joint index is %d", j->name().c_str(), j->index());
+	   LOG("Joint %s cannot be added to scene graph since joint index is %d", j->jointName().c_str(), j->index());
 	   return NULL;
    }
    _jgroup [ j->index() ] = g;

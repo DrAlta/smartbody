@@ -367,13 +367,13 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& ske
 				joint->extID(idAttr);
 				joint->extSID(idAttr);
 
-				skeleton.channels().add(joint->name(), SkChannel::XPos);
-				skeleton.channels().add(joint->name(), SkChannel::YPos);
-				skeleton.channels().add(joint->name(), SkChannel::ZPos);
+				skeleton.channels().add(joint->jointName(), SkChannel::XPos);
+				skeleton.channels().add(joint->jointName(), SkChannel::YPos);
+				skeleton.channels().add(joint->jointName(), SkChannel::ZPos);
 				joint->pos()->limits(SkVecLimits::X, false);
 				joint->pos()->limits(SkVecLimits::Y, false);
 				joint->pos()->limits(SkVecLimits::Z, false);
-				skeleton.channels().add(joint->name(), SkChannel::Quat);
+				skeleton.channels().add(joint->jointName(), SkChannel::Quat);
 				joint->quat()->activate();
 				float rotx = 0.0f;
 				float roty = 0.0f;
@@ -469,7 +469,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& ske
 	for (unsigned int i=0;i<skeleton.joints().size();i++)
 	{
 		SkJoint* joint = skeleton.joints()[i];
-		std::string jointName = joint->name();
+		std::string jointName = joint->jointName();
 		std::map<std::string, std::string>::iterator iter = parentHierarchy.find(jointName);
 		if (iter != parentHierarchy.end())
 		{

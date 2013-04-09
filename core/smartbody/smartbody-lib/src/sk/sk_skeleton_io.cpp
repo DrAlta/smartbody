@@ -595,7 +595,7 @@ SkJoint* SkSkeleton::_loadjlist ( SrInput& in, float scale, SrStringArray& paths
 	_joints.push_back(j);
 
 	j->name ( (const char*) in.last_token() );
-	j->extName( j->name() ); 
+	j->extName( j->jointName() ); 
 
 	in.get_token(); 
 	if ( in.last_token()[0]==':' )
@@ -624,7 +624,7 @@ SkJoint* SkSkeleton::_loadjlist ( SrInput& in, float scale, SrStringArray& paths
 	{ // find the parent joint of joint i:
 		for ( k=0; k<_joints.size(); k++ )
 		{ 
-			if ( sr_compare(pnames[i],_joints[k]->name().c_str())==0 )
+			if ( sr_compare(pnames[i],_joints[k]->jointName().c_str())==0 )
 				break;
 		}
 		// joint k is the parent of joint i:
@@ -669,7 +669,7 @@ static void outgeo ( SrOutput& out, const char* s, SkJoint* j, const char* geopa
 {
 	SrString name;
 	name << j->skeleton()->getName().c_str() << '_'
-		<< j->name().c_str() << '_'
+		<< j->jointName().c_str() << '_'
 		<< (const char*)(s[0]=='v'? "vis":"col" ) << ".srm";
 	name.lower ();        
 
@@ -759,7 +759,7 @@ static void write_joint ( SrOutput& out, SkJoint* j, int marg, const char* geopa
 
 	out.outm();
 	if ( j->parent() ) out << "joint "; else out << "root ";
-	out << j->name().c_str() << srnl;
+	out << j->jointName().c_str() << srnl;
 
 	// write offset :
 	out.outm();
@@ -863,7 +863,7 @@ bool SkSkeleton::save ( SrOutput& out, const char* geopath )
 	if ( _coldet_free_pairs.size()>0 )
 	{ out << "set_collision_free_pairs\n";
 	for (size_t i=0; i<_coldet_free_pairs.size(); i++ )
-	{ s.make_valid_string(_coldet_free_pairs[i]->name().c_str());
+	{ s.make_valid_string(_coldet_free_pairs[i]->jointName().c_str());
 	out << s;
 	if ( i%2==0 ) out<<srspc;
 	else if ( i+1==_coldet_free_pairs.size() ) out<<";\n\n";

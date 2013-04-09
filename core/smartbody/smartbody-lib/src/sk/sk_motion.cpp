@@ -597,7 +597,7 @@ void SkMotion::apply ( float t,
 				SrQuat add(newValue[0], newValue[1], newValue[2], newValue[3]);
 				SrQuat final = isAdditive ? orig*add : add; 	
 				if (retarget)
-					final = retarget->applyRetargetJointRotation(_channels.name(i),final);
+					final = retarget->applyRetargetJointRotation(_channels.mappedName(i),final);
 				for (int x = 0; x < 4; x++)
 					outValue[x] = final.getData(x);
 			}
@@ -607,7 +607,7 @@ void SkMotion::apply ( float t,
 				{
 					outValue[x] = isAdditive? origValue[x]+newValue[x] : newValue[x];
 					if (retarget)
-						outValue[x] = retarget->applyRetargetJointTranslation(_channels.name(i),outValue[x]);
+						outValue[x] = retarget->applyRetargetJointTranslation(_channels.mappedName(i),outValue[x]);
 				}
 			}
 			else
@@ -617,7 +617,7 @@ void SkMotion::apply ( float t,
 				{
 					outValue[x] = newValue[x];
 					if (retarget)
-						outValue[x] = retarget->applyRetargetJointTranslation(_channels.name(i),outValue[x]);
+						outValue[x] = retarget->applyRetargetJointTranslation(_channels.mappedName(i),outValue[x]);
 				}
 			}
 			if (buffer)
@@ -1005,7 +1005,7 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];
-			const std::string& jointName = mchan_arr.name(k);
+			const std::string& jointName = mchan_arr.mappedName(k);
 			int index = mchan_arr.float_position(k);			
 			{
 				for (int n=0;n<chan.size();n++)
@@ -1028,7 +1028,7 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];
-			const std::string& jointName = mchan_arr.name(k);
+			const std::string& jointName = mchan_arr.mappedName(k);
 			bool isPos = chan.type <= SkChannel::ZPos; 
 			if (jointName == "base") // we ignore the base when smoothing
 				continue;
@@ -1091,7 +1091,7 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 #else
 	std::queue<std::string> childJointNameQueue;
 	for (int i=0; i< srcjoint->num_children(); i++)
-		childJointNameQueue.push(srcjoint->child(i)->name());
+		childJointNameQueue.push(srcjoint->child(i)->getMappedJointName());
 	while (!childJointNameQueue.empty())
 	{
 		std::string childName = childJointNameQueue.front(); childJointNameQueue.pop();
@@ -1101,8 +1101,8 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		SkJoint* interSkChild = interSk->search_joint(childName.c_str());
 		if (interSkChild)
 		{
-			SrVec srcdir = tempSrcSk->boneGlobalDirection(pjoint->name(),childName);
-			SrVec dstdir = interSk->boneGlobalDirection(pjoint->name(),childName);	
+			SrVec srcdir = tempSrcSk->boneGlobalDirection(pjoint->getMappedJointName(),childName);
+			SrVec dstdir = interSk->boneGlobalDirection(pjoint->getMappedJointName(),childName);	
 			//LOG("pjoint = %s, childName = %s",pjoint->name().c_str(), childName.c_str());
 
 			//LOG("src dir = %f %f %f, dst dir = %f %f %f",srcdir[0],srcdir[1],srcdir[2], dstdir[0],dstdir[1],dstdir[2]);
@@ -1115,7 +1115,7 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		}
 		for (int k=0;k<child->num_children();k++)
 		{
-			childJointNameQueue.push(child->child(k)->name());
+			childJointNameQueue.push(child->child(k)->getMappedJointName());
 		}
 	}
 #endif	
@@ -1239,7 +1239,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 			// don't change the t-pose for these joints
 			for (int i=0;i<targetJoint->num_children();i++)
 			{					
-				jointQueues.push(targetJoint->child(i)->name());
+				jointQueues.push(targetJoint->child(i)->jointName());
 			}
 		}
 		else
@@ -1258,7 +1258,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 			{
 				//LOG("target joint = %s, child = %s",pjoint->name().c_str(), pjoint->child(i)->name().c_str());
 				SkJoint* child = pjoint->child(i);
-				jointQueues.push(child->name());
+				jointQueues.push(child->jointName());
 			}
 		}				
 	}
@@ -2048,7 +2048,7 @@ SkMotion* SkMotion::buildMirrorMotion( SkSkeleton* skeleton )
 	for (unsigned int i=0; i<skeleton->joints().size();i++)
 	{
 		SkJoint* joint = skeleton->joints()[i];
-		jointNameMap[joint->name()] = true;
+		jointNameMap[joint->getMappedJointName()] = true;
 	}
 	return buildMirrorMotionJoints(skeleton,jointNameMap);
 }
@@ -2070,7 +2070,7 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];
-			const std::string& jointName = mchan_arr.name(k);
+			const std::string& jointName = mchan_arr.mappedName(k);
 			bool mirrorJoint = true;
 			// not used joints
 			if (jointNameMap.find(jointName) == jointNameMap.end())
@@ -2155,7 +2155,7 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];
-			const std::string& jointName = mchan_arr.name(k);			
+			const std::string& jointName = mchan_arr.mappedName(k);			
 			if (jointNameMap.find(jointName) == jointNameMap.end()) // skip joint value swapping
 				continue;
 			int index = mchan_arr.float_position(k);

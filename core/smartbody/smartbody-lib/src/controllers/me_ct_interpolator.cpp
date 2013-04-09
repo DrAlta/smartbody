@@ -427,7 +427,7 @@ bool MeCtInterpolator::controller_evaluate(double t, MeFrameData& frame)
 			if (!joint)
 				continue;
 
-			int idMotion2 = motion2Chan.search(joint->name().c_str(), motion1Chan[i].type);
+			int idMotion2 = motion2Chan.search(joint->jointName().c_str(), motion1Chan[i].type);
 			if (idMotion2 < 0)
 				continue;
 

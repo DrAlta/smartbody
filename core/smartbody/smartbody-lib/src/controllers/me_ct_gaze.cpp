@@ -656,7 +656,7 @@ void MeCtGaze::set_time_hint( float head_sec )	{
 void MeCtGaze::inspect_skeleton_down( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
-		const char *name = joint_p->name().c_str();
+		const char *name = joint_p->jointName().c_str();
 		char indent[ 256 ];
 		int c, i, n;
 		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
@@ -671,7 +671,7 @@ void MeCtGaze::inspect_skeleton_down( SkJoint* joint_p, int depth )	{
 void MeCtGaze::inspect_skeleton_local_transform_down( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
-		const char *name = joint_p->name().c_str();
+		const char *name = joint_p->jointName().c_str();
 		gwiz::matrix_t M;
 		int i, j, c;
 
@@ -703,7 +703,7 @@ void MeCtGaze::inspect_skeleton_local_transform_down( SkJoint* joint_p, int dept
 void MeCtGaze::inspect_skeleton_world_transform_down( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
-		const char *name = joint_p->name().c_str();
+		const char *name = joint_p->jointName().c_str();
 		gwiz::matrix_t M;
 		int i, j, c;
 
@@ -736,7 +736,7 @@ void MeCtGaze::inspect_skeleton_world_transform_down( SkJoint* joint_p, int dept
 void MeCtGaze::inspect_skeleton_local_transform_up( SkJoint* joint_p, int depth )	{
 	
 	if( joint_p )	{
-		const char *name = joint_p->name().c_str();
+		const char *name = joint_p->jointName().c_str();
 		gwiz::matrix_t M;
 		int i, j, c;
 

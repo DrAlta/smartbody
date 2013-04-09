@@ -348,7 +348,7 @@ void PAMotions::setMotionContextMaps(MeControllerContext* context)
 		map.size(size);
 		for (int i = 0; i < size; i++)
 		{
-			int chanIndex = cChannels.search(mChannels.name(i), mChannels.type(i));
+			int chanIndex = cChannels.search(mChannels.mappedName(i), mChannels.type(i));
 			map[i] = context->toBufferIndex(chanIndex);
 		}
 		motionContextMaps.push_back(map);
@@ -573,7 +573,7 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 		int chanSize = motionChan.size();
 		for (int i = 0; i < chanSize; i++)
 		{
-			const std::string& chanName = motionChan.name(i);
+			const std::string& chanName = motionChan.mappedName(i);
 			for (int j = 1; j < numMotions; j++)
 			{
 				if (blendData->motionIndex.size() != blendData->state->motions.size())
@@ -657,7 +657,7 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 					origQ.x = buffer[buffId + 1];
 					origQ.y = buffer[buffId + 2];
 					origQ.z = buffer[buffId + 3];
-					SrQuat finalQ = blendData->retarget->applyRetargetJointRotation(bufChannels.name(i),origQ);
+					SrQuat finalQ = blendData->retarget->applyRetargetJointRotation(bufChannels.mappedName(i),origQ);
 					buffer[buffId + 0] = finalQ.w;
 					buffer[buffId + 1] = finalQ.x;
 					buffer[buffId + 2] = finalQ.y;
@@ -665,7 +665,7 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 				}
 				else if (bufChannels.type(i) <= SkChannel::ZPos) // xyz channel
 				{
-					buffer[buffId] = blendData->retarget->applyRetargetJointTranslation(bufChannels.name(i),buffer[buffId]);
+					buffer[buffId] = blendData->retarget->applyRetargetJointTranslation(bufChannels.mappedName(i),buffer[buffId]);
 				}
 			}
 		}
@@ -1045,7 +1045,7 @@ void PABlendData::updateMotionIndices()
 		int chanSize = motionChan.size();
 		for (int c = 0; c < chanSize; c++)
 		{
-			const std::string& chanName = motionChan.name(c);
+			const std::string& chanName = motionChan.mappedName(c);
 			motionIndex[m].push_back(motionChan.search(chanName, motionChan[c].type));
 		}
 	}
@@ -1263,7 +1263,7 @@ void PATransitionManager::bufferBlending(SrBuffer<float>& buffer, SrBuffer<float
 	SkChannelArray& channels = _context->channels();
 	for (int i = 0; i < channels.size(); i++)
 	{
-		const std::string& chanName = channels.name(i);
+		const std::string& chanName = channels.mappedName(i);
 		if (chanName == SbmPawn::WORLD_OFFSET_JOINT_NAME)
 			continue;
 

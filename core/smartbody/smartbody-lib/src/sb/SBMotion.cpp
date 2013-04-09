@@ -189,7 +189,7 @@ void SBMotion::checkSkeleton(std::string skel)
 		{				
 			std::stringstream outputInfo;
 			chan = mChanArray[i];
-			std::string jointName = chan.joint->name().c_str();
+			std::string jointName = chan.joint->jointName().c_str();
 			int	chanType = chan.type;
 			std::string chanTypeString;
 			switch (chanType)
@@ -210,7 +210,7 @@ void SBMotion::checkSkeleton(std::string skel)
 					chanTypeString = "Others";
 			}
 			int pos;
-			pos = skelChanArray.linear_search(chan.joint->name(), chan.type);
+			pos = skelChanArray.linear_search(chan.joint->jointName(), chan.type);
 			if (pos != -1)
 				outputInfo << "+ ";
 			if (pos == -1)	
@@ -635,7 +635,7 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 				SBJoint* pjoint = tgtJoint->getParent();
 				while (pjoint->getParent() != rootJoint)
 					pjoint = pjoint->getParent();
-				constraint->rootName = pjoint->name();
+				constraint->rootName = pjoint->jointName();
 			}			
 			consMap[jname] = constraint;
 		}
@@ -645,7 +645,7 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 	SrVec prevOffsetPos;
 	for (int iframe=0; iframe<frames(); iframe++)
 	{
-		int chanID = mchan_arr.search(rootJoint->name(),SkChannel::XPos);
+		int chanID = mchan_arr.search(rootJoint->jointName(),SkChannel::XPos);
 		float* cur_p = constraintMotion->posture(iframe);	
 		float* orig_p = this->posture(iframe);
 		int index = mchan_arr.float_position(chanID);
@@ -679,7 +679,7 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 	this->connected_skeleton()->update_global_matrices();
 	std::map<std::string, SrVec> prevPosMap;
 	ConstraintMap::iterator mi;
-	SBJoint* srcRoot = tempSrcSk->getJointByName(rootJoint->name());
+	SBJoint* srcRoot = tempSrcSk->getJointByName(rootJoint->jointName());
 	SBJoint* tgtRoot = rootJoint;
 	for ( mi  = consMap.begin();
 		  mi != consMap.end();
@@ -809,7 +809,7 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 		{
 			SBJoint* joint = skel->getJointByName(rec.jointNames[0]);
 			if (joint && joint->child(0))
-				rec.jointNames.push_back(joint->child(0)->name());
+				rec.jointNames.push_back(joint->child(0)->jointName());
 // 			if (joint && joint->child(0) && joint->child(0)->child(0))
 // 				rec.jointNames.push_back(joint->child(0)->child(0)->name());
 		}
@@ -832,7 +832,7 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 				constraint->efffectorName = rec.jointNames[k];
 				constraint->targetPos = rec.posVec[k];
 				SBJoint* pjoint = dynamic_cast<SBJoint*>(conJoint->getParent()->getParent()->getParent());
-				constraint->rootName = pjoint->name();
+				constraint->rootName = pjoint->jointName();
 				//LOG("effector = %s, root = %s, target pos = %f %f %f",rec.jointNames[k].c_str(),constraint->rootName.c_str(), rec.posVec[k][0],rec.posVec[k][1],rec.posVec[k][2]);
 				cons[rec.jointNames[k]] = constraint;
 			}				
@@ -981,7 +981,7 @@ SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, 
 	std::vector<SBJoint*> childJoints = pjoint->getDescendants();
 	for (unsigned int i=0;i<childJoints.size();i++)
 	{
-		jointNameMap[childJoints[i]->name()] = true;
+		jointNameMap[childJoints[i]->jointName()] = true;
 	}
 	
 	SkMotion* motion = buildMirrorMotionJoints(skeleton,jointNameMap);

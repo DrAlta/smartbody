@@ -477,7 +477,7 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
          if (j->extName() != "")
             jointName = j->extName();
          else
-            jointName = j->name();
+            jointName = j->jointName();
 
          if (hasChar)
          {

@@ -90,7 +90,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			//start collision event
 			//sprintf(eventMsg,"start %s %f %f %f",_character->getName().c_str(),hitPos[0],hitPos[1],hitPos[2]);
 			SmartBody::SBJoint* hitJoint = col.hitJointObj->getSBJoint();
-			sprintf(eventMsg,"start %s %s %s %f %f %f %f",_character->getName().c_str(),col.collider->getName().c_str(),hitJoint->name().c_str(),hitPos[0],hitPos[1],hitPos[2], col.momentum.len());			
+			sprintf(eventMsg,"start %s %s %s %f %f %f %f",_character->getName().c_str(),col.collider->getName().c_str(),hitJoint->jointName().c_str(),hitPos[0],hitPos[1],hitPos[2], col.momentum.len());			
 			LOG("eventMsg = %s",eventMsg);
 			std::string cmd = eventMsg;
 			SmartBody::SBMotionEvent motionEvent;

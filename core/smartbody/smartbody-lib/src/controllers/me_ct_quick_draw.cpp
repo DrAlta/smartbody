@@ -323,7 +323,7 @@ MeCtQuickDraw::joint_state_t MeCtQuickDraw::capture_joint_state( SkJoint *joint_
 			state.parent_rot = M.quat( COMP_M_TR );
 		}
 		else	{
-			const char *name = joint_p->name().c_str();
+			const char *name = joint_p->jointName().c_str();
 			LOG( "MeCtQuickDraw::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 	}

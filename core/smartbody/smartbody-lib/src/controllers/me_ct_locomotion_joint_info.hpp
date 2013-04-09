@@ -57,7 +57,7 @@ struct MeCtLocomotionJointInfo
 	int iterate(SkJoint* joint, std::vector<std::string>* limb_joint_name)
 	{
 		int sum = 0;
-		std::string name = joint->name();
+		std::string name = joint->jointName();
 		if(limb_joint_name != NULL)
 		{
 			for(size_t i = 0; i < limb_joint_name->size(); ++i)

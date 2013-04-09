@@ -1719,6 +1719,7 @@ void JointMapViewer::applyJointMap()
 	SmartBody::SBSkeleton* sceneSk = scene->getSkeleton(curChar->getSkeleton()->getName());
 	jointMap->applySkeleton(sceneSk);
 	jointMap->applySkeleton(curChar->getSkeleton());
+	
 	// in addition to update the skeleton, we also need to update the character controllers so all joint names are mapped correctly.
 	//curChar->ct_tree_p->child_channels_updated(NULL);
 }

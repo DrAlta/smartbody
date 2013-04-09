@@ -1,6 +1,7 @@
 #include "SBJoint.h"
 #include "SBSkeleton.h"
 #include "SBCharacter.h"
+#include "SBScene.h"
 #include <sk/sk_skeleton.h>
 
 #include <queue>
@@ -17,13 +18,15 @@ SBJoint::SBJoint( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i ) : SkJo
 }
 
 void SBJoint::setName(const std::string& str)
-{
+{	
 	name(str);
 }
 
 const std::string& SBJoint::getName()
-{
-	return name();
+{	
+	//m_name = jointName();
+	//return m_name;
+	return jointName();
 }
 
 void SBJoint::setParent(SBJoint* parent)

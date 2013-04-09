@@ -463,7 +463,7 @@ void MeCtExampleBodyReach::init(SbmPawn* pawn)
 	IKTreeNodeList& nodeList = currentReachEngine->ikTreeNodes();
 	MeCtIKTreeNode* rootNode = nodeList[0];
 	for (int i=0;i<3;i++)
-		_channels.add(rootNode->joint->name(), (SkChannel::Type)(SkChannel::XPos+i));
+		_channels.add(rootNode->joint->getMappedJointName(), (SkChannel::Type)(SkChannel::XPos+i));
 	affectedJoints.clear();
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
@@ -471,7 +471,7 @@ void MeCtExampleBodyReach::init(SbmPawn* pawn)
 		SkJoint* joint = node->joint;
 		SkJointQuat* skQuat = joint->quat();				
 		affectedJoints.push_back(joint);
-		_channels.add(joint->name(), SkChannel::Quat);		
+		_channels.add(joint->getMappedJointName(), SkChannel::Quat);		
 	}		
 	blendWeight = currentReachEngine->fadingWeight;
 	//LOG("init blend weight = %f\n",blendWeight);	

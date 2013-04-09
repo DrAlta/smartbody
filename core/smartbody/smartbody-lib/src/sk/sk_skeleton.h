@@ -62,9 +62,9 @@ class SkSkeleton : public SmartBody::SBAsset, public SrSharedClass
     // posture management:
     SkChannelArray* _channels;
     SrArray<SkPosture*> _postures;
-
 	// physical properties
 	SrVec _com;
+	std::string jointMap;
 
 	public :
     /*! Constructor */
@@ -193,6 +193,9 @@ class SkSkeleton : public SmartBody::SBAsset, public SrSharedClass
 	SBAPI SrVec boneGlobalDirection(const std::string& srcJoint, const std::string& dstJoints); 
 	SBAPI SrVec getFacingDirection();
 	SBAPI void resetSearchJoint();
+
+	void setJointMapName(const std::string& jointMapName);
+	std::string getJointMapName();
 
    private :
     int _loadjdata ( SrInput& in, SkJoint* j, SrStringArray& paths );

@@ -880,7 +880,7 @@ void SBAnimationBlend::createJointExclusionArray(const std::vector<SkJoint*>& or
 	for(unsigned int i=0; i<orig_list.size(); i++)
 	{
 		SkJoint* j = orig_list[i];
-		SrString jname(j->name().c_str());
+		SrString jname(j->jointName().c_str());
 		if(jname.search("face")>=0) { plot_excld_list.push_back(j); continue; }
 		if(jname.search("brow")>=0) { plot_excld_list.push_back(j); continue; }
 		if(jname.search("eye")>=0)  { plot_excld_list.push_back(j); continue; }

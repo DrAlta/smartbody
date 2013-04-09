@@ -29,6 +29,9 @@
 # include <sk/sk_posture.h>
 #include <queue>
 #include <sb/SBJoint.h>
+#include <sb/SBScene.h>
+#include <sb/SBJointMapManager.h>
+#include <sb/SBJointMap.h>
 
 //============================ SkSkeleton ============================
 
@@ -45,6 +48,7 @@ SkSkeleton::SkSkeleton () : SmartBody::SBAsset()
 
 SkSkeleton::SkSkeleton (SkSkeleton* origSkel)  : SmartBody::SBAsset()
 {
+	setJointMapName(origSkel->getJointMapName());
 	setName(origSkel->getName());
 	_skfilename = origSkel->skfilename();
 	if (!origSkel->root())
@@ -67,22 +71,24 @@ SkSkeleton::SkSkeleton (SkSkeleton* origSkel)  : SmartBody::SBAsset()
 	_gmat_uptodate = origSkel->global_matrices_uptodate();
 	_channels = new SkChannelArray;
 	_channels->ref();
-	SkChannelArray& origChannels = origSkel->channels();
+	SkChannelArray& origChannels = origSkel->channels();	
 	for (int c = 0; c < origChannels.size(); c++)
 	{
 		SkChannel& origChannel = origChannels.get(c);
 		SkJoint* origJoint = origChannels.joint(c);
 		if (origJoint)
 		{
-			SkJoint* joint = this->search_joint(origJoint->name().c_str());
+			SkJoint* joint = this->search_joint(origJoint->jointName().c_str());
 			_channels->add(joint, origChannel.type, true);
 		}
 	}
+	_channels->setJointMapName(origSkel->getJointMapName());
 	_channels->count_floats();
 	_com = origSkel->com();
 
 	compress ();
 	make_active_channels();
+	updateJointMap();
 }
 
 SkSkeleton::~SkSkeleton ()
@@ -120,11 +126,11 @@ void SkSkeleton::copy(SkSkeleton* origSkel)
 		SkJoint* origJoint = origChannels.joint(c);
 		if (!origJoint)
 			continue;
-		SkJoint* joint = this->search_joint(origJoint->name().c_str());
+		SkJoint* joint = this->search_joint(origJoint->jointName().c_str());
 		_channels->add(joint, origChannel.type, true);
 	}
 	_channels->count_floats();
-	_com = origSkel->com();
+	_com = origSkel->com();	
 
 	compress ();
 }
@@ -224,7 +230,7 @@ SkJoint* SkSkeleton::linear_search_joint ( const char* n ) const
 	std::string name(n);
 	for (size_t i=0; i<_joints.size(); i++ )
 	{ 
-		if (_joints[i]->name() == name )
+		if (_joints[i]->jointName() == name )
 			return _joints[i];
 	}
 	return 0;
@@ -388,7 +394,9 @@ SrBox SkSkeleton::getBoundingBox()
 
 void SkSkeleton::copy_joint(SkJoint* dest, SkJoint* src)
 {
-	dest->name(src->name());
+	src->copyTo(dest); // move copy joint to SkJoint as a member function
+#if 0
+	dest->name(src->jointName());
 	dest->extName(src->extName());
 	dest->extID(src->extID());
 	dest->extSID(src->extSID());
@@ -430,7 +438,8 @@ void SkSkeleton::copy_joint(SkJoint* dest, SkJoint* src)
 	destQuat->prerot(srcQuat->prerot());
 	destQuat->postrot(srcQuat->postrot());
 	destQuat->orientation(srcQuat->orientation());	
-	dest->mass(src->mass());		
+	dest->mass(src->mass());	
+#endif
 }
 
 void SkSkeleton::create_joints(SkJoint* origParent, SkJoint* parent)
@@ -476,9 +485,17 @@ void SkSkeleton::updateJointMap()
 {
 	_jointMap.clear();
 	int jointSize = _joints.size();
+	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(getJointMapName());	
 	for (int i = 0; i < jointSize; i++)
 	{
-		_jointMap.insert(std::pair<std::string, SkJoint*>(_joints[i]->name(), _joints[i]));
+		std::string jname = _joints[i]->jointName();
+		if (jointMap)
+		{
+			std::string mappedName = jointMap->getMapTarget(jname);	
+			if (mappedName != "")
+				jname = mappedName;
+		}
+		_jointMap.insert(std::pair<std::string, SkJoint*>(jname, _joints[i]));
 	}
 }
 SrVec SkSkeleton::getFacingDirection()
@@ -508,6 +525,16 @@ SrVec SkSkeleton::getFacingDirection()
 	defaultDir.y = 0.0;
 	defaultDir.normalize();
 	return defaultDir;
+}
+
+void SkSkeleton::setJointMapName( const std::string& jointMapName )
+{
+	jointMap = jointMapName;
+}
+
+std::string SkSkeleton::getJointMapName()
+{
+	return jointMap;
 }
 
 

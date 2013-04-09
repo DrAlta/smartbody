@@ -231,7 +231,7 @@ SmartBody::SBObject* SBPhysicsManager::createPhysicsCharacter( std::string charN
 	while (!tempJointList.empty())
 	{
 		SkJoint* joint = tempJointList.front(); tempJointList.pop();
-		std::string jName = joint->name();
+		std::string jName = joint->jointName();
 		if (joint->num_children() == 0) // don't process leaves
 			continue;
 		jointNameList.push_back(jName);
@@ -291,7 +291,7 @@ void SBPhysicsManager::updatePhysicsCharacter( std::string charName )
 	{
 		SbmJointObj* phyObj = mi->second;
 		SBJoint* joint = phyObj->getSBJoint();
-		const std::string& jointName = joint->name();		
+		const std::string& jointName = joint->jointName();		
 		bool kinematicRoot = (jointName == "base" || jointName == "JtPelvis") && phyChar->getBoolAttribute("kinematicRoot");	
 #if USE_PHYSICS_CHARACTER		
 		bool constraintObj = false;

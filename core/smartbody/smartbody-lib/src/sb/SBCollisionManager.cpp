@@ -108,7 +108,7 @@ void SBCollisionManager::start()
 				for(unsigned int i=0; i<origJnts.size(); i++)
 				{
 					SkJoint* j = origJnts[i];
-					SrString jname(j->name().c_str());
+					SrString jname(j->jointName().c_str());
 					if(jname.search("world_offset")>=0) { jnt_excld_list.push_back(j); continue; } // skip world_offset
 					if(jname.search("face")>=0) { jnt_excld_list.push_back(j); continue; }
 					if(jname.search("brow")>=0) { jnt_excld_list.push_back(j); continue; }
@@ -132,7 +132,7 @@ void SBCollisionManager::start()
 				{
 					SkJoint* j = origJnts[i];
 					if(isJointExcluded(j, jnt_excld_list)) continue;
-					SrString jname(j->name().c_str());
+					SrString jname(j->jointName().c_str());
 					for(int k=0; k<j->num_children(); k++)
 					{
 						SkJoint* j_ch = j->child(k);
@@ -141,7 +141,7 @@ void SBCollisionManager::start()
 						float offset_len = offset.norm();
 						float radius = offset_len / jointBVLenRadRatio;
 						if(offset_len < 0.03*chrHeight) continue; // skip short bones
-						std::string colObjName = chrName + ":" + j->name();
+						std::string colObjName = chrName + ":" + j->jointName();
 						if(k>0) colObjName = colObjName + ":" + boost::lexical_cast<std::string>(k);
 						SBGeomObject* obj = createCollisionObject(colObjName,"capsule",SrVec(0, radius, 0),SrVec::null,offset);
 						LOG("SBColMan: col primitive added: %s, len: %f, radius: %f", colObjName.c_str(), offset_len, radius);

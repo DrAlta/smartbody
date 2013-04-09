@@ -66,10 +66,10 @@ private :
 				name = c.name;
 				fmap = c.fmap;
 				SkChannel::operator=(c);
-			}
-
+			}					
+		int fmap;		
 		std::string name; 
-		int fmap;
+		std::string mappedName;
 	};
 	//SrArray<Channel> _channels;
 	//HashTable* _htable;
@@ -77,9 +77,10 @@ private :
 	bool _dirty;
 
 	std::map<std::string, std::map<SkChannel::Type, int> > _channelMap;
+	std::map<std::string, std::map<SkChannel::Type, int> > _channelMapedNameMap;
 	std::vector<Channel> _channelList;	
 	std::vector<bool>    _channelUpdateTable;
-
+	std::string jointMapName;
 public :
 	//////////////////////////////////////////////////////////////////////////
 	//  Public Methods
@@ -90,6 +91,10 @@ public :
 	/*! Destructor is public but be sure to check if unref() has to be used */
 	virtual ~SkChannelArray ();
 
+	void setJointMapName(const std::string& jmapName);
+	std::string getJointMapName() const ;
+
+	const std::string getMappedChannelName(const Channel& chan) const;
 	/*! Set the array as empty */
 	void init ();
 
@@ -129,10 +134,8 @@ public :
 
 	/*! Returns the declared joint name for the channel. It is the
 		user responsibility to ensure that 0<=i and i<size() */
-	const std::string& name ( int i ) const { 
-		const Channel& ch = _channelList[i];
-		return ch.name;
-	}
+	SBAPI const std::string name ( int i ) const;
+	SBAPI const std::string mappedName ( int i ) const;
 
 	/*! Returns the joint of channel i. The joint pointer will only be valid (i.e.!=0)
 		if the channel was succesfully connected to a skeleton joint.
@@ -190,6 +193,8 @@ public :
 		built, but if the channel array is changed after that, it is the user responsibility
 		to manually call method rebuild_hash_table(). */
 	int search ( const std::string& name, SkChannel::Type type );
+
+	
 
 	/*! An internal hash table is used to optimize search in two methods: search() and map().
 		Whenever the channel array is edited, the user must call this method to ensure the
