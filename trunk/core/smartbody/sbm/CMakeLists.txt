@@ -85,6 +85,7 @@ set( MORE_LIBS
 	rt
 	fontconfig
 	Xft
+	GLEW
 )
 
 endif()
@@ -214,7 +215,6 @@ target_link_libraries( sbm-fltk
 	python2.7
     	ncurses	
 	pthread
-	GLEW
 	${MORE_LIBS}
 	${OGRE_LIBS}
 )
