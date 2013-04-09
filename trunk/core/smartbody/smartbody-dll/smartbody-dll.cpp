@@ -235,6 +235,9 @@ SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
 	   SmartBody::SBScene::getScene()->getVHMsgManager()->send("vrProcEnd sbm");
    }
 
+   //SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(false);
+   vhmsg::ttu_close();
+
    XMLPlatformUtils::Terminate();
 
    std::map<std::string,SmartbodyCharacter*>::iterator mi; // m_dll->m_characters.find(name);
@@ -539,9 +542,9 @@ bool Smartbody_dll::InitVHMsg()
 	   vhmsgManager->setServer(envServer);
    }
 
-   int err = vhmsg::ttu_open();
-   if (err == vhmsg::TTU_SUCCESS)
-	   SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(true);
+   //int err = vhmsg::ttu_open();
+   //if (err == vhmsg::TTU_SUCCESS)
+   SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(true);
 
 #endif
    return true;
