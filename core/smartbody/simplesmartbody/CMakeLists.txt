@@ -16,11 +16,22 @@ add_executable( simplesmartbody
 	${SIMPLESMARTBODY_SRC}
 )
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+find_library (GLEW GLEW)
+set( MORE_LIBS
+	${GLEW}
+)
+else()
+set( MORE_LIBS
+	GLEW
+)
+endif()
+
 target_link_libraries( simplesmartbody 
 
 	SmartBody
 	pthread
-	GLEW
+	${MORE_LIBS}
 #	tcmalloc
 #	profiler
 #	${CMAKE_REQUIRED_LIBRARIES} 
