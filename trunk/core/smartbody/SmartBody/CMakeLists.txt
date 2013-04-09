@@ -456,6 +456,14 @@ set( SMARTBODY_LIB_SBM_SRC
         ../smartbody-lib/src/sb/SBWSPManager.cpp
 
         ../smartbody-lib/src/sb/SBPython.cpp
+        ../smartbody-lib/src/sb/SBPythonAnimation.cpp
+        ../smartbody-lib/src/sb/SBPythonCharacter.cpp
+        ../smartbody-lib/src/sb/SBPythonMath.cpp
+        ../smartbody-lib/src/sb/SBPythonMotion.cpp
+        ../smartbody-lib/src/sb/SBPythonScene.cpp
+        ../smartbody-lib/src/sb/SBPythonSimulation.cpp
+        ../smartbody-lib/src/sb/SBPythonSkeleton.cpp
+        ../smartbody-lib/src/sb/SBPythonSystem.cpp
         ../smartbody-lib/src/sb/SBPythonClass.cpp
 
         ../smartbody-lib/src/sb/SBBehavior.cpp
