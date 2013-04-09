@@ -255,15 +255,35 @@ def marineLocomotionSetup(origSkelName, skeletonName, baseJoint, preFix, statePr
 		#print "Motion " + motion.getName() + " (preFix+" + str(speed) + ", preFix+" + str(omega) + ", preFix+" + str(direction) + ")"
 		motion.disconnect()	
 	
+	
+	originalMotions.append("ChrMarine@Idle01")
+	originalMotions.append("ChrMarine@Jog01")
+	originalMotions.append("ChrMarine@Meander01")
+	originalMotions.append("ChrMarine@Run01")
+	originalMotions.append("ChrMarine@RunCircleLf01_smooth")
+	originalMotions.append("ChrMarine@RunCircleRt01_smooth")
+	originalMotions.append("ChrMarine@RunTightCircleLf01")
+	originalMotions.append("ChrMarine@RunTightCircleRt01")
+	originalMotions.append("ChrMarine@StrafeSlowLf01")
+	originalMotions.append("ChrMarine@StrafeSlowRt01")
+	originalMotions.append("ChrMarine@Walk01")
+	originalMotions.append("ChrMarine@WalkCircleLf01_smooth")
+	originalMotions.append("ChrMarine@WalkCircleRt01_smooth")
+	originalMotions.append("ChrMarine@WalkTightCircleLf01_smooth")
+	originalMotions.append("ChrMarine@WalkTightCircleRt01_smooth")
+	originalMotions.append("ChrMarine@Turn360Lf01")
+	originalMotions.append("ChrMarine@Turn360Rt01")
+	originalMotions.append("ChrMarine@StrafeFastLf01_smooth")
+	originalMotions.append("ChrMarine@StrafeFastRt01_smooth")
 	stanceArray = []
 	stanceArray.append([0.2, 0.7, 1.25, 1.80]) # idle
-	stanceArray.append([0.4, 0.05, 1.1, 0.75]) # jog
-	stanceArray.append([0.2, 0.75, 1.45, 1.95]) # meander
-	stanceArray.append([0.1, 0.3, 0.55, 0.85]) # run
+	stanceArray.append([0.4, 0.05,1.1,0.75]) # jog
+	stanceArray.append([0.75,0.2, 1.95, 1.45]) # meander
+	stanceArray.append([0.3, 0.1, 0.85, 0.55]) # run
 	stanceArray.append([0.4, 0.1, 1.25, 0.85]) # run circle lf
 	stanceArray.append([0.1, 0.4, 0.85, 1.25]) # run circle rt
 	stanceArray.append([0.1, 0.4, 0.74, 1.10]) # run tight circle lf
-	stanceArray.append([0.1, 0.4, 0.74, 1.10]) # run tight circle rt
+	stanceArray.append([0.4, 0.1, 1.10, 0.74]) # run tight circle rt
 	stanceArray.append([0.1, 0.75, 1.3, 1.85]) # strafe slow lf
 	stanceArray.append([0.75, 0.1, 1.85, 1.3]) # strafe slow rt
 	stanceArray.append([0.65, 0.15, 1.80, 1.25]) # walk
@@ -271,7 +291,7 @@ def marineLocomotionSetup(origSkelName, skeletonName, baseJoint, preFix, statePr
 	stanceArray.append([0.85, 0.15, 2.20, 1.55]) # walk circle rt
 	stanceArray.append([0.1, 1.0, 1.6, 2.45]) # walk tight circle lf
 	stanceArray.append([1.0, 0.1, 2.45, 1.6]) # walk tight circle rt
-	stanceArray.append([0.1, 0.7, 1.20, 1.75]) # turn 360 lf
+	stanceArray.append([0.7, 0.1, 1.75, 1.20]) # turn 360 lf
 	stanceArray.append([0.1, 0.7, 1.20, 1.75]) # turn 360 rt	
 	stanceArray.append([0.45, 0.1, 1.20, 0.85]) # strafe fast lf
 	stanceArray.append([0.1, 0.45, 0.85, 1.20]) # strafe fast rt
@@ -283,24 +303,25 @@ def marineLocomotionSetup(origSkelName, skeletonName, baseJoint, preFix, statePr
 		for j in range(0,2):
 			s1 = stanceArray[i][0+j]
 			s2 = stanceArray[i][2+j]
-			statemarineLocomotion.addKeyTagValue(motionName,j,"stance",s1);
-			statemarineLocomotion.addKeyTagValue(motionName,j,"stance",s2);	
+			leg = j
+			statemarineLocomotion.addKeyTagValue(motionName,leg,"stance",s1);
+			statemarineLocomotion.addKeyTagValue(motionName,leg,"stance",s2);	
 			lift1 = (s1+0.15)%motionDuration
 			lift2 = (s2+0.15)%motionDuration
-			statemarineLocomotion.addKeyTagValue(motionName,j,"lift",lift1);
-			statemarineLocomotion.addKeyTagValue(motionName,j,"lift",lift2);	
+			statemarineLocomotion.addKeyTagValue(motionName,leg,"lift",lift1);
+			statemarineLocomotion.addKeyTagValue(motionName,leg,"lift",lift2);	
 			land1 = (s2-0.15)%motionDuration
 			land2 = (s1-0.15)%motionDuration
-			statemarineLocomotion.addKeyTagValue(motionName,j,"land",land1);
-			statemarineLocomotion.addKeyTagValue(motionName,j,"land",land2);	
+			statemarineLocomotion.addKeyTagValue(motionName,leg,"land",land1);
+			statemarineLocomotion.addKeyTagValue(motionName,leg,"land",land2);	
 			off1 = (lift1+0.1)%motionDuration
 			off2 = (lift2+0.1)%motionDuration
-			statemarineLocomotion.addKeyTagValue(motionName,j,"lift-off",off1);
-			statemarineLocomotion.addKeyTagValue(motionName,j,"lift-off",off2);
+			statemarineLocomotion.addKeyTagValue(motionName,leg,"lift-off",off1);
+			statemarineLocomotion.addKeyTagValue(motionName,leg,"lift-off",off2);
 			str1 = (land1-0.15)%motionDuration
 			str2 = (land2-0.15)%motionDuration
-			statemarineLocomotion.addKeyTagValue(motionName,j,"strike",str1);
-			statemarineLocomotion.addKeyTagValue(motionName,j,"strike",str2);	
+			statemarineLocomotion.addKeyTagValue(motionName,leg,"strike",str1);
+			statemarineLocomotion.addKeyTagValue(motionName,leg,"strike",str2);	
 	
 	statemarineLocomotion.buildMotionAnalysis(origSkelName,baseJoint,originalMotions, preFix);		
 		
