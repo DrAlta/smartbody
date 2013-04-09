@@ -129,7 +129,7 @@ void SkeletonItemInfoWidget::updateSkeletonTree( Fl_Tree_Item* root, SmartBody::
 		return;
 	if (!skelRoot)
 		return;
-	root->label(skelRoot->name().c_str());	
+	root->label(skelRoot->jointName().c_str());	
 	for (int i=0;i<skelRoot->num_children();i++)
 	{
 		updateJointTree(root, skelRoot->child(i));
@@ -140,7 +140,7 @@ void SkeletonItemInfoWidget::updateJointTree( Fl_Tree_Item* root, SkJoint* node 
 {	
 	//skeletonTree->sortorder(FL_TREE_SORT_ASCENDING);	
 
-	Fl_Tree_Item* treeItem = skeletonTree->add(root,node->name().c_str());
+	Fl_Tree_Item* treeItem = skeletonTree->add(root,node->jointName().c_str());
 
 	std::string posName[3] = { "pos X", "pos Y", "pos Z" };
 	skeletonTree->sortorder(FL_TREE_SORT_NONE);

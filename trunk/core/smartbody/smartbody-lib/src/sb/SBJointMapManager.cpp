@@ -28,6 +28,7 @@ SmartBody::SBJointMap* SBJointMapManager::createJointMap(const std::string& name
 	{
 		SmartBody::SBJointMap* map = new SmartBody::SBJointMap();
 		_jointMaps[name] = map;
+		map->setName(name);
 		return map;
 	}
 	else

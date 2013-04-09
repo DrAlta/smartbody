@@ -82,14 +82,13 @@ void MeCtBlend::Context::remap_channels() {
 	ch_to_parent.clear();
 	ch_to_buffer.clear();
 	_local_channels.init();
-	_channels_logged.clear();
-
+	_channels_logged.clear();	
 	int ch_index = 0;
 	int buffer_index = 0;
 	if( _context && blend->count_children()==1 ) {
 		SkChannelArray& parent_channels = _context->channels();
 		SkChannelArray& child_channels   = blend->child(0)->controller_channels();
-
+		_local_channels.setJointMapName(parent_channels.getJointMapName());
 		// Set size and clear data
 		const int MAX_PARENT_CH = parent_channels.size();
 		const int MAX_CHILD_CH = child_channels.size();
@@ -106,7 +105,7 @@ void MeCtBlend::Context::remap_channels() {
 			set<int>::const_iterator i = context_logged_channels.begin();
 			for(; i!=context_logged_channels_end; ++i ) {
 				int index = *i;
-				const std::string& name = _context->channels().name(index);
+				const std::string& name = _context->channels().mappedName(index);
 				SkChannel::Type type = _context->channels().type(index);
 				oss <<'['<<index<<']'<<name
 					<<'('<<SkChannel::type_name(type)<<"), ";
@@ -118,7 +117,7 @@ void MeCtBlend::Context::remap_channels() {
 
 		//  Iterate through parent_channels, looking for matching child_channels
 		for( int parent_index=0; parent_index<MAX_PARENT_CH; ++parent_index ) {
-			const std::string& name = parent_channels.name( parent_index );
+			const std::string& name = parent_channels.mappedName( parent_index );
 			SkChannel::Type type = parent_channels.type( parent_index );
 #if DEBUG_INSPECT_CHANNELS
 			SkChannel::Type parent_ch_type = type;
@@ -128,7 +127,7 @@ void MeCtBlend::Context::remap_channels() {
 			if( child_index >= 0 ) {
 #if( DEBUG_INSPECT_CHANNELS || TRACE_BLEND_CONTEXT_REMAP )
 				SkChannel::Type child_ch_type = child_channels.type( child_index );
-				const char*     child_ch_name = (const char*)(child_channels.name( child_index ));
+				const char*     child_ch_name = (const char*)(child_channels.mappedName( child_index ));
 #endif
 
 #if TRACE_BLEND_CONTEXT_REMAP
@@ -154,7 +153,7 @@ void MeCtBlend::Context::remap_channels() {
 					_local_channels.add( name, type );
 				ch_to_parent[ch_index] = parent_index;
 				ch_to_buffer[ch_index] = buffer_index;
-
+				
 				if( context_logged_channels.find(parent_index)!=context_logged_channels_end )
 					_channels_logged.insert( ch_index );
 
@@ -307,10 +306,10 @@ void MeCtBlend::controller_map_updated() {
 		for( int child_index=0; child_index<MAX; ++child_index ) {
 			int local_index = child->_toContextCh[ child_index ];  // We're friends with all MeControllers
 			if( local_index >= 0 ) {
-				SkJointName child_ch_name     = child_channels.name( child_index );
+				SkJointName child_ch_name     = child_channels.mappedName( child_index );
 				SkChannel::Type child_ch_type = child_channels.type( child_index );
 
-				SkJointName local_ch_name     = local_channels.name( local_index );
+				SkJointName local_ch_name     = local_channels.mappedName( local_index );
 				SkChannel::Type local_ch_type = local_channels.type( local_index );
 
 				// Test child vs local
@@ -325,7 +324,7 @@ void MeCtBlend::controller_map_updated() {
 				//int parent_index = _toContextCh[ local_index ];  // Not used?
 				int parent_index = _local_ch_to_parent[ local_index ];
 				if( parent_index >= 0 ) {
-					SkJointName parent_ch_name     = parent_channels.name( parent_index );
+					SkJointName parent_ch_name     = parent_channels.mappedName( parent_index );
 					SkChannel::Type parent_ch_type = parent_channels.type( parent_index );
 
 					if( ( local_ch_name != parent_ch_name ) || (local_ch_type != parent_ch_type) ) {

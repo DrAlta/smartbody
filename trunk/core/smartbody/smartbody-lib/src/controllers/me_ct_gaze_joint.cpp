@@ -212,7 +212,7 @@ void MeCtGazeJoint::capture_joint_state( void ) {
 
 		}
 		else	{
-			const char *name = joint_p->name().c_str();
+			const char *name = joint_p->jointName().c_str();
 			LOG( "MeCtGazeJoint::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 #endif

@@ -11,9 +11,9 @@
 float LocomotionLegCycle::getNormalizedFlightTime( float motionTime )
 {
 	float normalizedTime = getNormalizedCycleTime(motionTime);
-	if (normalizedTime < liftTime) return 0.f;
-	if (normalizedTime > landTime) return 1.f;
-	return (normalizedTime-liftTime)/(landTime-liftTime);
+	if (normalizedTime < normalizedLiftTime) return 0.f;
+	if (normalizedTime > normalizedLandTime) return 1.f;
+	return (normalizedTime-normalizedLiftTime)/(normalizedLandTime-normalizedLiftTime);
 }
 
 float LocomotionLegCycle::getNormalizedCycleTime( float motionTime )
@@ -314,6 +314,30 @@ void MotionAnalysis::initLegInfos()
 	//ikScenario.buildIKTreeFromJointRoot(skelCopy->getJointByName("base"),stopJoint);
 }
 
+float MotionAnalysis::getTerrainYOffset( LegCycleState& state, float flightTime )
+{
+	Heightfield* heightField = SmartBody::SBScene::getScene()->getHeightfield();	
+	if (!heightField) return 0.f;
+	
+	SrVec startPt = state.curStep, endPt = state.nextStep;
+	SrVec startN, endN;
+	SrVec up = SrVec(0,1,0);
+	startPt.y = heightField->get_elevation(startPt.x, startPt.z, (float*)&startN);
+	endPt.y = heightField->get_elevation(endPt.x, endPt.z, (float*)&endN);
+
+	SrVec midPt = (startPt+endPt)*0.5f;
+	SrVec a = startPt - midPt;
+	SrVec b = endPt - midPt;
+	float startH = dot(a,startN)/dot(startN,up);
+	float endH = dot(b,endN)/dot(endN,up);	
+	//return max(startH,endH);
+	float hmax = max(startH,endH);
+	float flightTimeLift = sin(flightTime*M_PI);
+	//return 2.f*hmax/M_PI*flightTimeLift + startPt.y*(1.f-flightTime) + endPt.y*flightTime;
+	return  startPt.y*(1.f-flightTime) + endPt.y*flightTime;
+}
+
+
 void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCharacter* sbChar, std::vector<double>& weights, PATimeManager* timeManager, SrMat worldOffsetMat, SrVec velocity, float angSpeed, BodyMotionFrame& inputFrame, BodyMotionFrame& outFrame )
 {
 	static SrQuat prevQuat;
@@ -385,6 +409,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 		LocomotionLegCycle* maxCycle = maxWeightAnalyzer->getLegCycle(k,(float)maxMoTime);		
 		float normalizeCycle = maxCycle->getNormalizedCycleTime((float)maxMoTime);	
 		legState.flightTime = maxCycle->getNormalizedFlightTime((float)maxMoTime);
+		sbChar->flightTime[k] = legState.flightTime;
 		for (unsigned int i=0;i<locoAnalyzers.size();i++) // weighted sum of local foot base
 		{
 			LocomotionAnalyzer* analyzer = locoAnalyzers[i];		
@@ -422,6 +447,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 // 		}
 	}
 
+	Heightfield* heightField = SmartBody::SBScene::getScene()->getHeightfield();	
 	SrVec vUp = SrVec(0,1,0);
 	SrVec rotCenter = cross(vUp,velocity)/(angSpeed*(float)M_PI/180.f); // rotation center in character local frame
 	for (unsigned int k=0;k<legStates.size();k++)
@@ -447,8 +473,16 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 		//if (k==0) LOG("time to next cycle = %f", legState.timeToNextCycle);
 		//SrVec nextStepFootPos = (legState.curSupportPos[0]*scaleRatio + legInfos[k]->supportOffset[0])*gmatBase;
 		legState.nextStep = nextStepFootPos;
-		nextStepFootPos.y = 0.f; // set to ground height by default
-		sbChar->addFootStep(k,nextStepFootPos, !legState.newCycle);
+		// // set to ground height by default
+		if (heightField && sbChar->getBoolAttribute("terrainWalk"))
+		{
+			float tnormal[3];
+			nextStepFootPos.y = SmartBody::SBScene::getScene()->queryTerrain(nextStepFootPos.x, nextStepFootPos.z, tnormal);
+		}
+		else
+			nextStepFootPos.y = 0.f;
+
+		sbChar->addFootStep(k,nextStepFootPos, !legState.newCycle);		
 	}
 	
 	
@@ -488,19 +522,21 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 
 	// get the height offset 
 
-#if 0 // use height field
+#if 1 // use height field
 	float tnormal[3];
 	float terrainHeight = 0.0f;
 	float footOffset = 0.05f;
-	Heightfield* heightField = SmartBody::SBScene::getScene()->getHeightfield();	
+	heightField = SmartBody::SBScene::getScene()->getHeightfield();	
 	float minHeight = 1e30f;
-	float maxHeight = -1e30f;
+	float maxHeight = -1e30f;	
 	if (heightField && sbChar->getBoolAttribute("terrainWalk"))
 	{
 		//terrainHeight = SmartBody::SBScene::getScene()->queryTerrain(x, z, tnormal);
 		for (unsigned int k=0;k<legStates.size();k++)
 		{
 			LegCycleState& legState = legStates[k];
+#define NAIVE_IKFIX 0
+#if NAIVE_IKFIX
 			for (unsigned int m=0;m<legState.curSupportPos.size();m++)
 			{
 				SrVec supPos = legState.globalSupportPos[m];
@@ -512,9 +548,30 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 				if (maxHeight < height)
 					maxHeight = height;
 			}
+#else
+			
+			float hoffset = getTerrainYOffset(legState, legState.flightTime);
+			float supHeightOffset = (hoffset + tgtBaseHeight) - gmatBase.get_translation().y; 
+			for (unsigned int m=0;m<legState.curSupportPos.size();m++)
+			{				
+				SrVec supPos = legState.globalSupportPos[m];
+				float height = SmartBody::SBScene::getScene()->queryTerrain(supPos.x, supPos.z, tnormal);
+				if (minHeight > height)
+					minHeight = height;
+				if (maxHeight < height)
+					maxHeight = height;
+
+				legState.globalSupportPos[m].y += supHeightOffset + footOffset;
+				
+			}
+			sbChar->curFootIKPos[k] = legState.globalSupportPos[0];
+#endif
 		}
 		float heightOffset = (minHeight + tgtBaseHeight) - gmatBase.get_translation().y; 
 		ikScenario.ikGlobalMat.set(13, ikScenario.ikGlobalMat.get(13) + heightOffset + footOffset);
+
+
+
 	}
 #else // use navigation mesh
 	//float tnormal[3];
@@ -575,3 +632,4 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 	// write the result to output frame
 	ikScenario.getTreeNodeQuat(outFrame.jointQuat,QUAT_CUR); 		
 }
+

@@ -89,7 +89,7 @@ void MeCtMotionBlend::init(SbmPawn* pawn)
 	IKTreeNodeList& nodeList = currentBlendEngine->ikTreeNodes();
 	MeCtIKTreeNode* rootNode = nodeList[0];
 	for (int i=0;i<3;i++)
-		_channels.add(rootNode->joint->name(), (SkChannel::Type)(SkChannel::XPos+i));
+		_channels.add(rootNode->joint->jointName(), (SkChannel::Type)(SkChannel::XPos+i));
 	affectedJoints.clear();
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
@@ -97,7 +97,7 @@ void MeCtMotionBlend::init(SbmPawn* pawn)
 		SkJoint* joint = node->joint;
 		SkJointQuat* skQuat = joint->quat();				
 		affectedJoints.push_back(joint);
-		_channels.add(joint->name(), SkChannel::Quat);		
+		_channels.add(joint->jointName(), SkChannel::Quat);		
 	}			
 	MeController::init(pawn);	
 }

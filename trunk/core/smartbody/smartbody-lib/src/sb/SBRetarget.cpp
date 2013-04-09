@@ -83,7 +83,7 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 			// don't change the t-pose for these joints
 			for (int i=0;i<targetJoint->num_children();i++)
 			{					
-				jointQueues.push(targetJoint->child(i)->name());
+				jointQueues.push(targetJoint->child(i)->getMappedJointName());
 			}
 		}	
 		else if ( isEndJoint && targetJoint)
@@ -102,14 +102,14 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 			{
 				//LOG("target joint = %s, child = %s",pjoint->name().c_str(), pjoint->child(i)->name().c_str());
 				SkJoint* child = pjoint->child(i);
-				jointQueues.push(child->name());
+				jointQueues.push(child->getMappedJointName());
 			}
 		}				
 	}
 	heightRatio = (interSk->getBaseHeight("base")/tempSrcSk->getBaseHeight("base"));//*0.99f;
 	//LOG("height ratio = %f", heightRatio);
 
-	std::vector<std::string> srcJointNames = tempSrcSk->getJointNames();
+	std::vector<std::string> srcJointNames = tempSrcSk->getJointMappedNames();
 	for (unsigned int i=0;i<srcJointNames.size();i++)
 	{
 		std::string jname = srcJointNames[i];

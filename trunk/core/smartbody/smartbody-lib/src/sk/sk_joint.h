@@ -63,7 +63,7 @@ TypeViseme,
 TypeOther
 };
 
-private :
+protected:
 	SrModel* _visgeo; // the attached geometry to visualize this joint
 	SrModel* _colgeo; // the attached geometry used for collision detection
 	SkJoint* _parent;
@@ -73,6 +73,7 @@ private :
 	SrMat _lmat;           // local matrix: from this joint to its children
 	char  _lmat_uptodate;  // true if lmat is up to date
 	std::string _name;     // the given name
+	std::string _sbName;   // smartbody internal name after joint mapping
 	std::string _extName;  // external name for the bone
 	std::string _extID;    // external id from OpenCollada	
 	std::string _extSID;   // external sid from OpenCollada
@@ -96,6 +97,7 @@ public:
 	SkJoint ( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i );
 	virtual ~SkJoint ();
 
+	void copyTo(SkJoint* dest);
 
 	/*! Get a pointer for the attached geometry for visualization,
 	or null if no such geometry was loaded. The geometry pointers
@@ -136,7 +138,9 @@ public:
 
 	/*! Set the name of this joint */
 	void name ( const std::string& jn ) { _name=jn; }
-	const std::string& name () const { return _name; }
+	SBAPI const std::string& jointName () const;
+
+	std::string getMappedJointName();
 
 	/*! Set the name of this joint */
 	void extName ( const std::string& jn ) { _extName=jn; }

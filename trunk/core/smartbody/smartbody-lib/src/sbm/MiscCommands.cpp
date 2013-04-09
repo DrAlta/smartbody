@@ -52,7 +52,7 @@ int set_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args)
 			std::vector<SkJoint*>& joints = skeleton->get_joint_array();
 			for (size_t j = 0; j < joints.size(); j++)
 			{
-				LOG("%s : %f", joints[j]->name().c_str(), joints[j]->mass());
+				LOG("%s : %f", joints[j]->jointName().c_str(), joints[j]->mass());
 
 			}
 			return CMD_SUCCESS;
@@ -1206,7 +1206,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 									SkJoint* joint = channels.joint(c);
 									if (joint)
 									{
-										strstr << joint->name() << " ";
+										strstr << joint->jointName() << " ";
 									}
 									SkChannel& channel = channels[c];
 									int channelSize = channel.size();

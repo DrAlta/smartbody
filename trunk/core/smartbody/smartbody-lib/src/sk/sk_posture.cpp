@@ -49,7 +49,7 @@ int SkPostureDfJoints::search ( const char* jname )
    int i;
    for ( i=0; i<joints.size(); i++ )
     {
-		if ( sr_compare(joints[i]->name().c_str(),jname)==0 ) return i;
+		if ( sr_compare(joints[i]->jointName().c_str(),jname)==0 ) return i;
     }
    return -1;
  }

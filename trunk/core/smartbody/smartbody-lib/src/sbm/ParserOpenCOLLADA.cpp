@@ -404,13 +404,13 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 
 				bool hasTranslate = false;
 
-				skeleton.channels().add(joint->name(), SkChannel::XPos);
-				skeleton.channels().add(joint->name(), SkChannel::YPos);
-				skeleton.channels().add(joint->name(), SkChannel::ZPos);
+				skeleton.channels().add(joint->jointName(), SkChannel::XPos);
+				skeleton.channels().add(joint->jointName(), SkChannel::YPos);
+				skeleton.channels().add(joint->jointName(), SkChannel::ZPos);
 				joint->pos()->limits(SkVecLimits::X, false);
 				joint->pos()->limits(SkVecLimits::Y, false);
 				joint->pos()->limits(SkVecLimits::Z, false);
-				skeleton.channels().add(joint->name(), SkChannel::Quat);
+				skeleton.channels().add(joint->jointName(), SkChannel::Quat);
 				joint->quat()->activate();
 				float rotx = 0.0f;
 				float roty = 0.0f;
@@ -768,7 +768,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 		if (channelID != -1)
 		{
 			int quatIdx = motionChannels.float_position(channelID);
-			if (zaxis && jointName == skeleton.root()->name())
+			if (zaxis && jointName == skeleton.root()->jointName())
 				rootIdx = quatIdx;
 			quatIndices.push_back(quatIdx);
 		}		
@@ -797,7 +797,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 
 		if (zaxis) // rotate the root joints depending on up axis
 		{
-			std::string rootName = skeleton.root()->name();
+			std::string rootName = skeleton.root()->jointName();
 			SrVec newPos;
 			SrQuat newQuatRot;
 			SrVec xaxis(1, 0, 0);
@@ -2164,7 +2164,7 @@ void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string
 			//LOG("token1 = %s, token2 = %s",tokens[0].c_str(),tokens[1].c_str());
 			std::string jname = tokens[0];
 			SkJoint* joint = skeleton.search_joint(jname.c_str());
-			if (joint) jname = joint->name();
+			if (joint) jname = joint->jointName();
 			colChannel.targetJointName = jname;
 			colChannel.targetType = tokens[1];					
 		}

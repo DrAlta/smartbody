@@ -7,6 +7,11 @@
 #include <vector>
 #include <string>
 #include <sk/sk_joint.h>
+#include <sb/SBObject.h>
+#include <boost/bimap/bimap.hpp>
+
+
+typedef boost::bimaps::bimap<std::string, std::string> StringBimap;
 
 namespace SmartBody {
 
@@ -14,7 +19,7 @@ class SBMotion;
 class SBSkeleton;
 class SKJoint;
 
-class SBJointMap
+class SBJointMap : public SBObject
 {
 	public:
 		SBAPI SBJointMap();
@@ -42,13 +47,16 @@ class SBJointMap
 		SBAPI int getNumMappings();
 		SBAPI std::string getTarget(int num);
 		SBAPI std::string getSource(int num);
+		SBAPI std::vector<std::pair<std::string, std::string> > getMappingList();
 
 		// Automatic joint name matching to standard SmartBody names
 		SBAPI bool guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap=false);
 
 
 	private:
-		std::vector<std::pair<std::string, std::string> > _map;
+		//std::map<std::string, std::string> _jointMap;
+		StringBimap  _jointMap;
+		std::vector<std::pair<std::string, std::string> > _map;		
 		std::vector<std::string> _mappedMotions;
 		std::vector<std::string> _mappedSkeletons;
 

@@ -21,12 +21,14 @@
  *      Andrew n marshall, USC
  */
 
-# include <math.h>
-
-# include <sr/sr_model.h>
-
-# include <sk/sk_joint.h>
-# include <sk/sk_skeleton.h>
+#include <math.h>
+#include <sr/sr_model.h>
+#include <sk/sk_joint.h>
+#include <sk/sk_skeleton.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBScene.h>
+#include <sb/SBJointMapManager.h>
+#include <sb/SBJointMap.h>
 
 //============================= SkJoint ============================
 
@@ -312,4 +314,88 @@ void SkJoint::recursive_children(std::vector<SkJoint*>& joints, SkJoint* root)
 	}
 }
 
+
+std::string SkJoint::getMappedJointName()
+{
+	std::string outName = _name;
+	if (_skeleton)
+	{
+		SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(_skeleton->getJointMapName());
+		if (jointMap)
+		{
+			std::string target = jointMap->getMapTarget(_name);
+			if (target != "")
+				outName = target;
+		}		
+	}
+	return outName;
+}
+
+
+const std::string& SkJoint::jointName() const
+{
+	return _name;
+#if 0
+	std::string outName = _name;
+	if (_skeleton)
+	{
+		SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(_skeleton->getJointMapName());
+		if (jointMap)
+		{
+			std::string target = jointMap->getMapTarget(_name);
+			if (target != "")
+				outName = target;
+		}		
+	}
+	return outName;
+#endif
+}
+
+void SkJoint::copyTo( SkJoint* dest )
+{
+	dest->name(_name);
+	dest->extName(_extName);
+	dest->extID(_extID);
+	dest->extSID(_extSID);
+	dest->visgeo(_visgeo);
+	dest->colgeo(_colgeo);
+
+	SkJointPos* srcPos = pos();
+	SkJointPos* destPos = dest->pos();
+	if (!srcPos->frozen(SkVecLimits::X))
+	{
+		destPos->limits(SkVecLimits::X, srcPos->limits(SkVecLimits::X));
+		destPos->lower_limit(SkVecLimits::X, srcPos->lower_limit(SkVecLimits::X));
+		destPos->upper_limit(SkVecLimits::X, srcPos->upper_limit(SkVecLimits::X));
+	}
+	if (!srcPos->frozen(SkVecLimits::Y))
+	{
+		destPos->limits(SkVecLimits::Y, srcPos->limits(SkVecLimits::Y));
+		destPos->lower_limit(SkVecLimits::Y, srcPos->lower_limit(SkVecLimits::Y));
+		destPos->upper_limit(SkVecLimits::Y, srcPos->upper_limit(SkVecLimits::Y));
+	}
+	if (!srcPos->frozen(SkVecLimits::Z))
+	{
+		destPos->limits(SkVecLimits::Z, srcPos->limits(SkVecLimits::Z));
+		destPos->lower_limit(SkVecLimits::Z, srcPos->lower_limit(SkVecLimits::Z));
+		destPos->upper_limit(SkVecLimits::Z, srcPos->upper_limit(SkVecLimits::Z));
+	}
+
+
+
+	if (quat()->active())
+		dest->quat()->activate();
+
+	dest->offset(offset());
+	dest->updateGmatZero(gmatZero());	
+	SkJointQuat* srcQuat = this->quat();
+	SkJointQuat* destQuat = dest->quat();
+	//destQuat->value(srcQuat->value());
+	destQuat->value(srcQuat->rawValue()); // set the raw value here since value() may contain pre-rotation
+	destQuat->prerot(srcQuat->prerot());
+	destQuat->postrot(srcQuat->postrot());
+	destQuat->orientation(srcQuat->orientation());	
+	dest->mass(mass());		
+
+}
 //============================ End of File ============================

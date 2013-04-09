@@ -338,6 +338,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 	void drawGestures();
 	void drawJointLabels();
 
+	void drawText( const SrMat& mat, float textSize, std::string &text );
 	void drawGazeJointLimits();
 	void drawReach();
 	void drawInteractiveLocomotion();

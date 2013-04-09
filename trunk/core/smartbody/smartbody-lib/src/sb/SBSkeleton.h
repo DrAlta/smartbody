@@ -29,6 +29,7 @@ public:
 	SBAPI int getNumJoints();
 	SBAPI SBJoint* getJoint(int index);		
 	SBAPI SBJoint* getJointByName(const std::string& jointName);
+	SBAPI std::vector<std::string> getJointMappedNames();
 	SBAPI std::vector<std::string> getJointNames();
 	SBAPI std::vector<std::string> getJointOriginalNames();
 	SBAPI std::vector<std::string> getUpperBodyJointNames();
@@ -52,14 +53,13 @@ public:
 	// put TposeSk (source skel) into T-pose before running this! */
 	SBAPI void _createSkelWithoutPreRot(SBSkeleton* TposeSk, SBSkeleton* newSk, const char* new_name=0);
 	// same as above but for Python interface
-	SBAPI SBSkeleton* createSkelWithoutPreRot(const char* new_name);
+	SBAPI SBSkeleton* createSkelWithoutPreRot(const char* new_name);	
 
-	protected:
-		SrQuat _origRootPrerot;
-		bool _origRootChanged;
-		float _scale;
+protected:
+	SrQuat _origRootPrerot;
+	bool _origRootChanged;
+	float _scale;	
 };
-
 
 };
 

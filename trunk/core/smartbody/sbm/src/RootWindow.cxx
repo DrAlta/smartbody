@@ -59,7 +59,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 //	menubar->add("&View/Character/Locomotion/Locomotion Footsteps", 0, LocomotionFootstepsCB, this, NULL);
 //	menubar->add("&View/Character/Locomotion/Velocity", 0, VelocityCB, this, NULL);
 //	menubar->add("&View/Character/Locomotion/Trajectory", 0, TrajectoryCB, this, NULL);
-	menubar->add("&View/Character/Show Trajectory", 0, TrajectoryCB, this, NULL);
+	menubar->add("&View/Character/Show Trajectory", 0, TrajectoryCB, this, NULL);	
 	menubar->add("&View/Character/Show Gesture", 0, GestureCB, this, NULL);
 	menubar->add("&View/Character/Show Joint Labels", 0, JointLabelCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
@@ -1515,7 +1515,7 @@ void BaseWindow::TrackCharacterCB(Fl_Widget* w, void* data)
 // 	trackCommand.append(" ");
 // 	trackCommand.append(joint->name());
 	//SmartBody::SBScene::getScene()->command((char*)trackCommand.c_str());	
-	SmartBody::SBScene::getScene()->setCameraTrack(character->getName(), joint->name());
+	SmartBody::SBScene::getScene()->setCameraTrack(character->getName(), joint->jointName());
 }
 
 void BaseWindow::KinematicFootstepsCB(Fl_Widget* w, void* data)

@@ -25,6 +25,9 @@
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBRetargetManager.h>
+#include <sb/SBRetarget.h>
 
 std::string MeCtMotionPlayer::Context::CONTEXT_TYPE = "MeCtMotionPlayer::Context";
 std::string MeCtMotionPlayer::CONTROLLER_TYPE = "MeCtMotionPlayer";
@@ -140,9 +143,19 @@ bool MeCtMotionPlayer::controller_evaluate(double t, MeFrameData& frame)
 	MeCtMotion* mController = dynamic_cast<MeCtMotion*> (controller);
 	SkMotion* motion = mController->motion();
 
+	SmartBody::SBRetarget* retarget = NULL;
+	SmartBody::SBCharacter* _character = dynamic_cast<SmartBody::SBCharacter*>(character);
+	if (_character)
+	{
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(motion);
+		if (sbMotion)
+			retarget = scene->getRetargetManager()->getRetarget(sbMotion->getMotionSkeletonName(),_character->getSkeleton()->getName());		
+	}
+
 	double deltaT = motion->duration() / double(motion->frames() - 1);
 	double time = deltaT * frameNum;
 	int lastFrame = int(frameNum);
-	motion->apply((float)time, &frame.buffer()[0], &mController->get_context_map(), SkMotion::Linear, &lastFrame);
+	motion->apply((float)time, &frame.buffer()[0], &mController->get_context_map(), SkMotion::Linear, &lastFrame, false, retarget);
 	return true;
 }

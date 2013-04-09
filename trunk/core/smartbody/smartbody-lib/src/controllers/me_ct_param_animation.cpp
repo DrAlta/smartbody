@@ -805,7 +805,7 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 			SkJoint::recursive_children(jVec, j);
 			for (size_t i = 0; i < jVec.size(); i++)
 			{
-				joints.push_back(jVec[i]->name());
+				joints.push_back(jVec[i]->jointName());
 			}
 		}
 		module->interpolator->setBlendingJoints(joints);

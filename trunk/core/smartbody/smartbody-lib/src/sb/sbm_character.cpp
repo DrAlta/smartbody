@@ -436,6 +436,7 @@ void SbmCharacter::createStandardControllers()
 	motionplayer_ct->setName(mpName.c_str());
 	motionplayer_ct->setActive(false);
 
+
 	this->datareceiver_ct = new MeCtDataReceiver(this->_skeleton);
 	std::string datareceiverCtName = getName() + "_dataReceiverController";
 	this->datareceiver_ct->setName(datareceiverCtName.c_str());
@@ -482,6 +483,7 @@ void SbmCharacter::createStandardControllers()
 
 	ct_tree_p->add_controller( posture_sched_p );
 	//ct_tree_p->add_controller( locomotion_ct );
+	
 	ct_tree_p->add_controller( param_animation_ct );
 	ct_tree_p->add_controller( basic_locomotion_ct );
 	ct_tree_p->add_controller( motion_sched_p );
@@ -504,6 +506,7 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( motionplayer_ct );
 	ct_tree_p->add_controller( datareceiver_ct );
 	ct_tree_p->add_controller( record_ct );
+	
 
 	// get the default attributes from the default controllers
 	
@@ -1968,7 +1971,7 @@ void SbmCharacter::forward_parameters( double curTime )
 			SkJoint* joint = joints[j];
 			if (joint->getJointType() != SkJoint::TypeOther)
 				continue;
-			listener_p->OnChannel(getName(), joint->name(), joint->pos()->value(0)); 
+			listener_p->OnChannel(getName(), joint->jointName(), joint->pos()->value(0)); 
 		}
 	}
 }
@@ -1979,7 +1982,7 @@ void SbmCharacter::inspect_skeleton( SkJoint* joint_p, int depth )	{
 	int i, j, n;
 
 	if( joint_p )	{
-		const char *name = joint_p->name().c_str();
+		const char *name = joint_p->jointName().c_str();
 		for( j=0; j<depth; j++ ) { LOG( " " ); }
 		LOG( "%s\n", name );
 		n = joint_p->num_children();
@@ -1992,7 +1995,7 @@ void SbmCharacter::inspect_skeleton( SkJoint* joint_p, int depth )	{
 void SbmCharacter::inspect_skeleton_local_transform( SkJoint* joint_p, int depth )	{
 
 	if( joint_p )	{
-		const char *name = joint_p->name().c_str();
+		const char *name = joint_p->jointName().c_str();
 		gwiz::matrix_t M;
 		int i, j;
 
@@ -2022,7 +2025,7 @@ void SbmCharacter::inspect_skeleton_local_transform( SkJoint* joint_p, int depth
 void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth )	{
 
 	if( joint_p )	{
-		const char *name = joint_p->name().c_str();
+		const char *name = joint_p->jointName().c_str();
 		gwiz::matrix_t M;
 		int i, j;
 
@@ -2161,7 +2164,7 @@ int SbmCharacter::writeSkeletonHierarchy(std::string file, double scale)
 	ostream << "set_name " << this->getName().c_str() << "\n";
 	ostream << "\n";
 	ostream << "skeleton\n";
-	ostream << "root " << root->name() << "\n";
+	ostream << "root " << root->jointName() << "\n";
 	writeSkeletonHierarchyRecurse(root, ostream, scale, 0);
 	ostream << "\n";
 	ostream << "end\n";
@@ -2220,7 +2223,7 @@ void SbmCharacter::writeSkeletonHierarchyRecurse(SkJoint* joint, std::ofstream& 
 		SkJoint* child = joint->child(n);
 		// make sure that 
 		indent(indentLevel, ostream);
-		ostream << "joint " << child->name() << "\n";
+		ostream << "joint " << child->jointName() << "\n";
 		writeSkeletonHierarchyRecurse(child, ostream, scale, indentLevel);	
 	}
 

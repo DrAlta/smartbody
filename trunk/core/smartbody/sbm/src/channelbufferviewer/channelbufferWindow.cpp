@@ -501,7 +501,7 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 		else if(channel.type == SkChannel::ZPos) sprintf(ext, "_z");
 		else ext[0] = '\0';
 
-		sprintf(str, "%s%s (%d)", joint->name().c_str(), ext, channelSize);
+		sprintf(str, "%s%s (%d)", joint->jointName().c_str(), ext, channelSize);
 		ChannelItem& item = window->Channel_item_list[i];
 		item.channel_filtered = false;
 		item.motion_filtered = false;
@@ -509,7 +509,7 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 		item.not_in_search = false;
 		item.index = channel_index;
 		item.label->assign(str);
-		item.name->assign(joint->name());
+		item.name->assign(joint->jointName());
 		item.type = channel.type;
 		channel_index += channelSize;
 	}
@@ -585,7 +585,7 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 		for(int i = 0; i < channels.size(); ++i)
 		{
 			if(channels.joint(i) == NULL) continue;
-			std::string name = channels.joint(i)->name();
+			std::string name = channels.joint(i)->jointName();
 			SkChannel::Type type = channels.get(i).type;
 			for(j = 0; j < window->Channel_item_list.size(); ++j)
 			{
@@ -725,7 +725,7 @@ void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, 
 	for(index = 0; index < channels.size(); ++index)
 	{
 		if(channels[index].joint == NULL) continue;
-		std::string name = channels[index].joint->name().c_str();
+		std::string name = channels[index].joint->jointName().c_str();
 		if(strcmp(name.c_str(), item.name->c_str()) == 0 && item.type == channels[index].type)
 		{
 			break;

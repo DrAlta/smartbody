@@ -52,20 +52,20 @@ void MeCtMotionRecorder::init(SbmPawn* pawn)
 	SmartBody::SBSkeleton* skel = scene->getSkeleton(pawn->getSkeleton()->getName());	
 	if (!skel) return;
 	SkJoint* rootJoint = findRootJoint(skel);	
-	rootJointName = rootJoint->name();	
+	rootJointName = rootJoint->jointName();	
 	for (int i=0;i<skel->getNumJoints();i++)
 	{
 		SmartBody::SBJoint* jo = skel->getJoint(i);
 		if (jo->quat()->active()) // add quat channel
 		{
-			channels.add(jo->name(), (SkChannel::Type)(SkChannel::Quat));
+			channels.add(jo->jointName(), (SkChannel::Type)(SkChannel::Quat));
 		}
 		
 		for (int j=0;j<3;j++)
 		{
 			if (!jo->pos()->frozen(j))
 			{
-				channels.add(jo->name(), (SkChannel::Type)(SkChannel::XPos+j));
+				channels.add(jo->jointName(), (SkChannel::Type)(SkChannel::XPos+j));
 			}
 		}
 	}

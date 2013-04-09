@@ -28,6 +28,7 @@ SBSkeleton::SBSkeleton(std::string skelFile) : SkSkeleton()
 
 SBSkeleton::SBSkeleton(SBSkeleton* copySkel) : SkSkeleton(copySkel)
 {
+	//jointMap = copySkel->getJointMapName();
 }
 
 void SBSkeleton::setFileName(const std::string& fname)
@@ -151,13 +152,25 @@ SBJoint* SBSkeleton::getJointByName(const std::string& jointName)
 	}
 }
 
+
+std::vector<std::string> SBSkeleton::getJointMappedNames()
+{
+	std::vector<std::string> jointNames;
+	const std::vector<SkJoint*>& alljoints = joints();
+	for (size_t i = 0; i < alljoints.size(); i++)
+	{
+		jointNames.push_back(alljoints[i]->getMappedJointName());
+	}
+	return jointNames;
+}
+
 std::vector<std::string> SBSkeleton::getJointNames()
 {
 	std::vector<std::string> jointNames;
 	const std::vector<SkJoint*>& alljoints = joints();
 	for (size_t i = 0; i < alljoints.size(); i++)
 	{
-		jointNames.push_back(alljoints[i]->name());
+		jointNames.push_back(alljoints[i]->jointName());
 	}
 	return jointNames;
 }
@@ -185,7 +198,7 @@ std::vector<std::string> SBSkeleton::getUpperBodyJointNames()
 	std::vector<SkJoint*> alljoints;
 	SkJoint::recursive_children(alljoints, spine1);
 	for (size_t i = 0; i < alljoints.size(); ++i)
-		jointNames.push_back(alljoints[i]->name());
+		jointNames.push_back(alljoints[i]->jointName());
 
 	return jointNames;
 }
@@ -315,7 +328,7 @@ void SBSkeleton::_createSkelWithoutPreRot(SBSkeleton* TposeSk, SBSkeleton* newSk
 	{
 		SkJoint* new_j = new_jnts[i];
 		if(!new_j->parent()) continue;
-		SkJoint* src_j = TposeSk->search_joint(new_j->name().c_str());
+		SkJoint* src_j = TposeSk->search_joint(new_j->jointName().c_str());
 		if(!src_j) continue;
 		if(!src_j->parent()) continue;
 		SrVec new_offset = src_j->gmat().get_translation() -

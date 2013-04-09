@@ -1531,6 +1531,7 @@ void FltkViewer::draw()
 
 	drawMotionVectorFlow();
 	drawPlotMotion();
+
 	//drawKinematicFootprints(0);
 
 
@@ -2952,7 +2953,7 @@ void FltkViewer::drawCharacterBoundingVolumes()
 						const SrVec& offset = j_ch->offset();
 						float offset_len = offset.norm();
 						if(offset_len < 0.03*chrHeight) continue; // skip short bones
-						std::string colObjName = character->getGeomObjectName() + ":" + j->name();
+						std::string colObjName = character->getGeomObjectName() + ":" + j->jointName();
 						if(k>0) colObjName = colObjName + ":" + boost::lexical_cast<std::string>(k);
 						SBGeomObject* geomObj = colManager->getCollisionObject(colObjName);
 						if(!geomObj) continue;
@@ -3567,6 +3568,7 @@ void FltkViewer::drawKinematicFootprints(int index)
 	}
 #endif
 	SmartBody::SBCharacter* curChar = dynamic_cast<SmartBody::SBCharacter*>(getCurrentCharacter());
+	Heightfield* heightField = SmartBody::SBScene::getScene()->getHeightfield();	
 	if (!curChar) return;
 	SrVec faceDir = curChar->getFacingDirection();
 	float scale = curChar->getHeight()*0.1f;
@@ -3576,12 +3578,31 @@ void FltkViewer::drawKinematicFootprints(int index)
 		SrVec color = i == 0 ? SrVec(1.f,0.f,0.f) : SrVec(0.f, 1.f, 0.f);
 		for (unsigned int k=0;k<footSteps.size();k++)
 		{
-			SrVec footStep = footSteps[k];
-			SrVec adjustedFootStep = footSteps[k] + faceDir * scale;			
+			SrVec footStep = footSteps[k] + SrVec(0,0.05f*scale,0); // add a small height offset
+			SrVec adjustedFootStep = footStep + faceDir * scale;			
+			if (heightField)
+			{
+				SrVec tnormal;
+				heightField->get_elevation(footStep.x,footStep.z,(float*)tnormal);
+				SrVec sideVec = cross(faceDir,tnormal);
+				SrVec newDir = cross(tnormal,sideVec); newDir.normalize();
+				adjustedFootStep = footStep + newDir * scale;
+			}
 			drawArrow(footStep, adjustedFootStep, scale*0.5f,color);			
 		}
+		SrSnSphere sphere;
+		sphere.shape().center = curChar->curFootIKPos[i];
+		sphere.shape().radius = scale*0.3f;		
+		sphere.render_mode(srRenderModeLines);
+		sphere.color(SrColor(color.x,color.y,color.z,1.f));
+		SrGlRenderFuncs::render_sphere(&sphere);	
+		SrMat mat; mat.set_translation(curChar->curFootIKPos[i]);
+		std::string text = boost::lexical_cast<std::string>(curChar->flightTime[i]);
+		drawText(mat,scale*0.005,text);
 	}
 	//glEnable(GL_DEPTH_TEST);
+
+	
 }
 
 
@@ -3712,29 +3733,10 @@ void FltkViewer::drawJointLabels()
 	for (int j = 0; j < numJoints; j++)
 	{
 		SkJoint* joint = character->getSkeleton()->getJoint(j);
+		std::string text = joint->jointName();
 		const SrMat& mat = joint->gmat();
-		glPushMatrix();
-		glMultMatrixf((const float*) mat);
-		float modelview[16];
-		glGetFloatv(GL_MODELVIEW_MATRIX , modelview);
-		// undo all rotations
-		// beware all scaling is lost as well 
-		for( int a=0; a<3; a++ ) 
-		{
-			for( int b=0; b<3; b++ ) {
-				if ( a==b )
-					modelview[a*4+b] = 1.0;
-				else
-					modelview[a*4+b] = 0.0;
-			}
-		}
-		// set the modelview with no rotations
-		glLoadMatrixf(modelview);
+		drawText(mat, textSize, text);
 
-		glColor3f(1.0f, 1.0f, 0.0f);
-		glScalef(textSize, textSize, textSize);
-		glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char*) joint->name().c_str());
-		glPopMatrix();
 	}
 	glPopAttrib();	
 }
@@ -4680,6 +4682,32 @@ void FltkViewer::drawNavigationMesh()
 		glDisable(GL_LIGHTING);
 	}
 	
+}
+
+void FltkViewer::drawText( const SrMat& mat, float textSize, std::string &text )
+{
+	glPushMatrix();
+	glMultMatrixf((const float*) mat);
+	float modelview[16];
+	glGetFloatv(GL_MODELVIEW_MATRIX , modelview);
+	// undo all rotations
+	// beware all scaling is lost as well 
+	for( int a=0; a<3; a++ ) 
+	{
+		for( int b=0; b<3; b++ ) {
+			if ( a==b )
+				modelview[a*4+b] = 1.0;
+			else
+				modelview[a*4+b] = 0.0;
+		}
+	}
+	// set the modelview with no rotations
+	glLoadMatrixf(modelview);
+
+	glColor3f(1.0f, 1.0f, 0.0f);
+	glScalef(textSize, textSize, textSize);
+	glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char*) text.c_str());
+	glPopMatrix();
 }
 
 GestureVisualizationHandler::GestureVisualizationHandler()

@@ -279,7 +279,7 @@ void MeCtMotion::controller_map_updated() {
 		{
 			for( int i=0; i<size; ++i ) 
 			{
-				int chanIndex = cChannels.search( mChannels.name(i), mChannels.type(i) );
+				int chanIndex = cChannels.search( mChannels.mappedName(i), mChannels.type(i) );
 				_mChan_to_buff[ i ] = _context->toBufferIndex( chanIndex );
 			}
 		}

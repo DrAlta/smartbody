@@ -221,7 +221,7 @@ void MeCtIKTreeScenario::buildIKTreeFromJointRoot( SkJoint* root, std::vector<st
 	ikTreeRoot->joint = root;
 	ikTreeRoot->nodeIdx = ikTreeNodes.size();
 	ikTreeRoot->nodeLevel = 0;
-	ikTreeRoot->nodeName = root->name();
+	ikTreeRoot->nodeName = root->getMappedJointName();
 	ikTreeNodes.push_back(ikTreeRoot);
 	traverseJoint(root,ikTreeRoot,ikTreeNodes, stopJoints);
 	
@@ -240,7 +240,7 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		MeCtIKTreeNode* childNode = new MeCtIKTreeNode();
 		childNode->nodeLevel = jointNode->nodeLevel + 1;
 		childNode->joint = child;		
-		childNode->nodeName = child->name();
+		childNode->nodeName = child->getMappedJointName();
 		childNode->nodeIdx = nodeList.size();
 		childNode->parent = jointNode;
 		nodeList.push_back(childNode);
@@ -250,13 +250,13 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		if (prevNode)
 			prevNode->brother = childNode;
 
-		if ( strcmp(child->name().c_str(),"skullbase")==0)// || 
+		if ( strcmp(child->getMappedJointName().c_str(),"skullbase")==0)// || 
 // 			strcmp(child->name().get_string(),"l_wrist")==0 ||
 // 			strcmp(child->name().get_string(),"r_wrist")==0 )
 		{
 			nNodes += 1; // don't traverse their children
 		}
-		else if (std::find(stopJoints.begin(),stopJoints.end(), child->name()) != stopJoints.end()) // stop joints
+		else if (std::find(stopJoints.begin(),stopJoints.end(), child->jointName()) != stopJoints.end()) // stop joints
 		{
 			nNodes += 1;
 		}
@@ -320,7 +320,7 @@ int MeCtIKTreeScenario::findIKTreeNodeInList( const char* jointName, IKTreeNodeL
 	int iCount = 0;
 	BOOST_FOREACH(MeCtIKTreeNode* node, nodeList)
 	{
-		if (strcmp(node->joint->name().c_str(),jointName) == 0)
+		if (strcmp(node->joint->getMappedJointName().c_str(),jointName) == 0)
 			return iCount;		
 		iCount++;
 	}

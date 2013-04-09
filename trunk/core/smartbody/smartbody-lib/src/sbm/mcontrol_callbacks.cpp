@@ -3660,7 +3660,7 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 				continue;
 			}
 
-			std::string jointName = chan.joint->name();
+			std::string jointName = chan.joint->jointName();
 			int	chanType = chan.type;
 			std::string chanTypeString;
 			switch (chanType)
@@ -3683,12 +3683,12 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			int pos;
 			if (mode == 1)
 			{
-				pos = skelChanArray.search(chan.joint->name(), chan.type);
+				pos = skelChanArray.search(chan.joint->jointName(), chan.type);
 				//pos = skelChanArray.linear_search(chan.joint->name(), chan.type);
 			}
 			if (mode == 2)	
 			{
-				pos = mChanArray.search(chan.joint->name(), chan.type);
+				pos = mChanArray.search(chan.joint->jointName(), chan.type);
 				//pos = mChanArray.linear_search(chan.joint->name(), chan.type);
 			}
 			if (pos != -1)

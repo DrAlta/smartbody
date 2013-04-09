@@ -690,7 +690,7 @@ void MotionExampleSet::blendMotionFrameProfile( ResampleMotion* motion, BodyMoti
 	for (unsigned int i=0;i<affectedJoints.size();i++)
 	{
 		SkJoint* joint = affectedJoints[i];
- 		std::string chanName = joint->name();
+ 		std::string chanName = joint->jointName();
  		float interpW = weight;
 		if (interpProfileMap.find(chanName) != interpProfileMap.end())
 		{
@@ -734,7 +734,7 @@ float MotionExampleSet::blendMotionFrameEulerProfile( ResampleMotion* motion, Bo
 	for (unsigned int i=0;i<affectedJoints.size();i++)
 	{
 		SkJoint* joint = affectedJoints[i];
-		std::string chanName = joint->name();
+		std::string chanName = joint->jointName();
 		float interpW = weight;
 		SrVec startEuler = startFrame.jointQuat[i].getEuler();
 		SrVec endEuler = endFrame.jointQuat[i].getEuler();

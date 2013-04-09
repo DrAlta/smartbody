@@ -93,7 +93,7 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 	ikCCDScenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);	
 
 	EffectorConstantConstraint* cons = new EffectorConstantConstraint();
-	cons->efffectorName = reachEndEffector->name().c_str();
+	cons->efffectorName = reachEndEffector->getMappedJointName().c_str();
 
 	std::vector<std::string> consJointList;
 	//consJointList.push_back("sternoclavicular");
@@ -121,7 +121,7 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 	if (reachEndEffector->num_children() > 0 && reachEndEffector->child(0))
 	{
 		EffectorConstantConstraint* rotCons = new EffectorConstantConstraint();				
-		rotCons->efffectorName = reachEndEffector->name().c_str();
+		rotCons->efffectorName = reachEndEffector->getMappedJointName().c_str();
 		rotCons->rootName = consRootName;
 		reachRotConstraint[cons->efffectorName] = rotCons;
 	}	
@@ -156,8 +156,8 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 		affectedJoints.push_back(joint);			
 	}		
 
-	SmartBody::SBJoint* copyEffector = skeletonCopy->getJointByName(reachEndEffector->name());
-	SmartBody::SBJoint* copyRoot = skeletonCopy->getJointByName(rootJoint->parent()->name());
+	SmartBody::SBJoint* copyEffector = skeletonCopy->getJointByName(reachEndEffector->getMappedJointName());
+	SmartBody::SBJoint* copyRoot = skeletonCopy->getJointByName(rootJoint->parent()->getMappedJointName());
 	motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector,copyRoot);
 	motionExamples.initMotionExampleSet(motionParameter);	
 
@@ -169,7 +169,7 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 
 	SbmCharacter* curCharacter = character;
 
-	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name();
+	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->jointName();
 	SrVec initRootPosition = skeletonRef->getJointByName(rootName)->gmat().get_translation();
 
 	reachData = new ReachStateData();
@@ -185,7 +185,7 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 	
 
 	EffectorState& estate = reachData->effectorState;
-	estate.effectorName = reachEndEffector->name().c_str();
+	estate.effectorName = reachEndEffector->getMappedJointName().c_str();
 	estate.curIKTargetState = reachData->getPoseState(idleMotionFrame);
 	estate.gmatZero = copyEffector->gmatZero();
 
@@ -212,7 +212,7 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet, st
 		return;
 
 	// set world offset to zero	
-	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name();
+	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->getMappedJointName();
 	SkJoint* root = skeletonRef->search_joint(rootName.c_str());
 
 	if (root)
@@ -331,7 +331,7 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 	}		
 	EffectorState& estate = rd->effectorState;
 
-	EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachPosConstraint[reachEndEffector->name().c_str()]);
+	EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachPosConstraint[reachEndEffector->getMappedJointName().c_str()]);
 	cons->targetPos = estate.curIKTargetState.tran;	
 	
 // 	if (curReachState->curStateName() == "Start" || curReachState->curStateName() == "Complete" )
@@ -349,7 +349,7 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 
 	
 	{
-		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachRotConstraint[reachEndEffector->name().c_str()]);		
+		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachRotConstraint[reachEndEffector->getMappedJointName().c_str()]);		
 		if (!cons)
 			return;
 		cons->targetRot = estate.curIKTargetState.rot;//ikRotTrajectory;//ikRotTarget;//motionParameter->getMotionFrameJoint(interpMotionFrame,reachEndEffector->name().get_string())->gmat();//ikRotTarget;	
@@ -519,7 +519,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	skeletonRef->update_global_matrices();	
 	updateSkeletonCopy();	
 	// update reach data
-	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->name();
+	std::string rootName = ikScenario.ikTreeRoot->joint->parent()->getMappedJointName();
 	reachData->curTime = (float)t;
 	reachData->dt = dt;	
 	reachData->stateTime += dt;

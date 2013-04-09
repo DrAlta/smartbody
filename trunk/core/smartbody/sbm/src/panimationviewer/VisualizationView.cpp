@@ -224,7 +224,7 @@ void VisualizationView::refreshJointList()
 	const std::vector<SkJoint*>& jnts = sk->joints();
 	for(unsigned int i=0; i<jnts.size(); i++)
 	{
-		std::string jname = jnts[i]->name();
+		std::string jname = jnts[i]->jointName();
 		if(jname.compare("face")!=0) continue;
 		if(jname.compare("brow")!=0) continue;
 		if(jname.compare("eye")!=0)  continue;
@@ -240,7 +240,7 @@ void VisualizationView::refreshJointList()
 		if(jname.compare("middle")!=0) continue;
 		if(jname.compare("pinky")!=0)  continue;
 		if(jname.compare("ring")!=0)   continue;
-		plotJointChoice->add(jnts[i]->name().c_str());
+		plotJointChoice->add(jnts[i]->jointName().c_str());
 	}
 }
 void VisualizationView::refreshJointList(Fl_Widget* widget, void* data)
