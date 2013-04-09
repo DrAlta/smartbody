@@ -457,6 +457,7 @@ set( SMARTBODY_LIB_SBM_SRC
 
         ../smartbody-lib/src/sb/SBPython.cpp
         ../smartbody-lib/src/sb/SBPythonAnimation.cpp
+        ../smartbody-lib/src/sb/SBPythonAttribute.cpp
         ../smartbody-lib/src/sb/SBPythonCharacter.cpp
         ../smartbody-lib/src/sb/SBPythonMath.cpp
         ../smartbody-lib/src/sb/SBPythonMotion.cpp
