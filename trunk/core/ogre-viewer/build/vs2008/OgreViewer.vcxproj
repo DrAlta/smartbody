@@ -146,10 +146,6 @@
       <Project>{49840c67-5a25-4d7a-af21-5976735f7d7d}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\smartbody\smartbody-dll\smartbody-dll.vcxproj">
-      <Project>{5c9a5f23-d57b-4b7a-a3e3-0489f9a4f147}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

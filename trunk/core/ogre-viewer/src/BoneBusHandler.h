@@ -1,6 +1,7 @@
 #ifndef _BONEBUSHANDLER_H
 #define _BONEBUSHANDLER_H
 
+#include "vhcl.h"
 #include <string>
 #include "bonebus.h"
 

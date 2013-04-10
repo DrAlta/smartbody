@@ -24,7 +24,7 @@ copy /Y %OGRE_BIN%\OIS.dll %BIN_DIR%
 copy /Y %OGRE_BIN%\RenderSystem_Direct3D9.dll %BIN_DIR%
 copy /Y %OGRE_BIN%\RenderSystem_GL.dll %BIN_DIR%
 
-copy /Y ..\..\..\core\smartbody\smartbody-dll\lib\smartbody-dll.dll %BIN_DIR%
+copy /Y ..\..\..\core\smartbody\SmartBody\lib\SmartBody.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\alut.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\OpenAL32.dll %BIN_DIR%
@@ -80,7 +80,7 @@ copy /Y %OGRE_BIN%\OIS_d.dll %BIN_DIR%
 copy /Y %OGRE_BIN%\RenderSystem_Direct3D9_d.dll %BIN_DIR%
 copy /Y %OGRE_BIN%\RenderSystem_GL_d.dll %BIN_DIR%
 
-copy /Y ..\..\..\core\smartbody\smartbody-dll\lib\smartbody-dll_d.dll %BIN_DIR%
+copy /Y ..\..\..\core\smartbody\SmartBody\lib\SmartBody_d.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\alut.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll %BIN_DIR%
 copy /Y ..\..\..\lib\vhcl\openal\libs9\Win32\OpenAL32.dll %BIN_DIR%
