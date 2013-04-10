@@ -348,8 +348,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ../smartbody-lib/src/controllers/me_ct_motion_blend.cpp
         ../smartbody-lib/src/controllers/MotionAnalysis.cpp
 
-        ../smartbody-lib/src/sbm/ParserBVH.cpp
-        ../smartbody-lib/src/sbm/ParserASFAMC.cpp
+        ../smartbody-lib/src/sbm/ParserBVH.cxx
+        ../smartbody-lib/src/sbm/ParserASFAMC.cxx
         ../smartbody-lib/src/sbm/ParserFBX.cpp
         ../smartbody-lib/src/sbm/ParserOgre.cpp
         ../smartbody-lib/src/sbm/ParserOpenCOLLADA.cpp
