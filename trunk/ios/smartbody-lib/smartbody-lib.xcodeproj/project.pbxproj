@@ -616,6 +616,45 @@
 		AAF8C71414DA2D970075F2C2 /* SBGestureMapManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF8C71014DA2D970075F2C2 /* SBGestureMapManager.cpp */; };
 		AAF8C71514DA2D970075F2C2 /* SBGestureMapManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AAF8C71114DA2D970075F2C2 /* SBGestureMapManager.h */; };
 		AAF8C71914DA2DA20075F2C2 /* bml_gesture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAF8C71714DA2DA20075F2C2 /* bml_gesture.cpp */; };
+		C40B0F631715309C00F99C07 /* SBPythonAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F601715309C00F99C07 /* SBPythonAnimation.cpp */; };
+		C40B0F641715309C00F99C07 /* SBPythonAttribute.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F611715309C00F99C07 /* SBPythonAttribute.cpp */; };
+		C40B0F651715309C00F99C07 /* SBPythonCharacter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F621715309C00F99C07 /* SBPythonCharacter.cpp */; };
+		C40B0F6E171530B300F99C07 /* SBPythonInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F67171530B300F99C07 /* SBPythonInternal.h */; };
+		C40B0F6F171530B300F99C07 /* SBPythonMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F68171530B300F99C07 /* SBPythonMath.cpp */; };
+		C40B0F70171530B300F99C07 /* SBPythonMotion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F69171530B300F99C07 /* SBPythonMotion.cpp */; };
+		C40B0F71171530B300F99C07 /* SBPythonScene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F6A171530B300F99C07 /* SBPythonScene.cpp */; };
+		C40B0F72171530B300F99C07 /* SBPythonSimulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F6B171530B300F99C07 /* SBPythonSimulation.cpp */; };
+		C40B0F73171530B300F99C07 /* SBPythonSkeleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F6C171530B300F99C07 /* SBPythonSkeleton.cpp */; };
+		C40B0F74171530B300F99C07 /* SBPythonSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F6D171530B300F99C07 /* SBPythonSystem.cpp */; };
+		C40B0F77171530E400F99C07 /* SBNavigationMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F75171530E400F99C07 /* SBNavigationMesh.cpp */; };
+		C40B0F78171530E400F99C07 /* SBNavigationMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F76171530E400F99C07 /* SBNavigationMesh.h */; };
+		C40B0F991715328E00F99C07 /* DetourAlloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F7E1715328E00F99C07 /* DetourAlloc.cpp */; };
+		C40B0F9A1715328E00F99C07 /* DetourAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F7F1715328E00F99C07 /* DetourAlloc.h */; };
+		C40B0F9B1715328E00F99C07 /* DetourAssert.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F801715328E00F99C07 /* DetourAssert.h */; };
+		C40B0F9C1715328E00F99C07 /* DetourCommon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F811715328E00F99C07 /* DetourCommon.cpp */; };
+		C40B0F9D1715328E00F99C07 /* DetourCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F821715328E00F99C07 /* DetourCommon.h */; };
+		C40B0F9E1715328E00F99C07 /* DetourNavMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F831715328E00F99C07 /* DetourNavMesh.cpp */; };
+		C40B0F9F1715328E00F99C07 /* DetourNavMesh.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F841715328E00F99C07 /* DetourNavMesh.h */; };
+		C40B0FA01715328E00F99C07 /* DetourNavMeshBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F851715328E00F99C07 /* DetourNavMeshBuilder.cpp */; };
+		C40B0FA11715328E00F99C07 /* DetourNavMeshBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F861715328E00F99C07 /* DetourNavMeshBuilder.h */; };
+		C40B0FA21715328E00F99C07 /* DetourNavMeshQuery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F871715328E00F99C07 /* DetourNavMeshQuery.cpp */; };
+		C40B0FA31715328E00F99C07 /* DetourNavMeshQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F881715328E00F99C07 /* DetourNavMeshQuery.h */; };
+		C40B0FA41715328E00F99C07 /* DetourNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F891715328E00F99C07 /* DetourNode.cpp */; };
+		C40B0FA51715328E00F99C07 /* DetourNode.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F8A1715328E00F99C07 /* DetourNode.h */; };
+		C40B0FA61715328E00F99C07 /* DetourStatus.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F8B1715328E00F99C07 /* DetourStatus.h */; };
+		C40B0FA71715328E00F99C07 /* Recast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F8C1715328E00F99C07 /* Recast.cpp */; };
+		C40B0FA81715328E00F99C07 /* Recast.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F8D1715328E00F99C07 /* Recast.h */; };
+		C40B0FA91715328E00F99C07 /* RecastAlloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F8E1715328E00F99C07 /* RecastAlloc.cpp */; };
+		C40B0FAA1715328E00F99C07 /* RecastAlloc.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F8F1715328E00F99C07 /* RecastAlloc.h */; };
+		C40B0FAB1715328E00F99C07 /* RecastArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F901715328E00F99C07 /* RecastArea.cpp */; };
+		C40B0FAC1715328E00F99C07 /* RecastAssert.h in Headers */ = {isa = PBXBuildFile; fileRef = C40B0F911715328E00F99C07 /* RecastAssert.h */; };
+		C40B0FAD1715328E00F99C07 /* RecastContour.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F921715328E00F99C07 /* RecastContour.cpp */; };
+		C40B0FAE1715328E00F99C07 /* RecastFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F931715328E00F99C07 /* RecastFilter.cpp */; };
+		C40B0FAF1715328E00F99C07 /* RecastLayers.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F941715328E00F99C07 /* RecastLayers.cpp */; };
+		C40B0FB01715328E00F99C07 /* RecastMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F951715328E00F99C07 /* RecastMesh.cpp */; };
+		C40B0FB11715328E00F99C07 /* RecastMeshDetail.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F961715328E00F99C07 /* RecastMeshDetail.cpp */; };
+		C40B0FB21715328E00F99C07 /* RecastRasterization.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F971715328E00F99C07 /* RecastRasterization.cpp */; };
+		C40B0FB31715328E00F99C07 /* RecastRegion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C40B0F981715328E00F99C07 /* RecastRegion.cpp */; };
 		C4126A1115B60B7600D530A3 /* bml_gesture.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C4126A1015B60B7600D530A3 /* bml_gesture.hpp */; };
 		C4126A2315B6552200D530A3 /* SBPhoneme.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4126A1F15B6552200D530A3 /* SBPhoneme.cpp */; };
 		C4126A2415B6552200D530A3 /* SBPhoneme.h in Headers */ = {isa = PBXBuildFile; fileRef = C4126A2015B6552200D530A3 /* SBPhoneme.h */; };
@@ -1259,6 +1298,45 @@
 		AAF8C71014DA2D970075F2C2 /* SBGestureMapManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBGestureMapManager.cpp; path = sb/SBGestureMapManager.cpp; sourceTree = "<group>"; };
 		AAF8C71114DA2D970075F2C2 /* SBGestureMapManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBGestureMapManager.h; path = sb/SBGestureMapManager.h; sourceTree = "<group>"; };
 		AAF8C71714DA2DA20075F2C2 /* bml_gesture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bml_gesture.cpp; path = bml/bml_gesture.cpp; sourceTree = "<group>"; };
+		C40B0F601715309C00F99C07 /* SBPythonAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPythonAnimation.cpp; path = sb/SBPythonAnimation.cpp; sourceTree = "<group>"; };
+		C40B0F611715309C00F99C07 /* SBPythonAttribute.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPythonAttribute.cpp; path = sb/SBPythonAttribute.cpp; sourceTree = "<group>"; };
+		C40B0F621715309C00F99C07 /* SBPythonCharacter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPythonCharacter.cpp; path = sb/SBPythonCharacter.cpp; sourceTree = "<group>"; };
+		C40B0F67171530B300F99C07 /* SBPythonInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBPythonInternal.h; path = sb/SBPythonInternal.h; sourceTree = "<group>"; };
+		C40B0F68171530B300F99C07 /* SBPythonMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPythonMath.cpp; path = sb/SBPythonMath.cpp; sourceTree = "<group>"; };
+		C40B0F69171530B300F99C07 /* SBPythonMotion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPythonMotion.cpp; path = sb/SBPythonMotion.cpp; sourceTree = "<group>"; };
+		C40B0F6A171530B300F99C07 /* SBPythonScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPythonScene.cpp; path = sb/SBPythonScene.cpp; sourceTree = "<group>"; };
+		C40B0F6B171530B300F99C07 /* SBPythonSimulation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPythonSimulation.cpp; path = sb/SBPythonSimulation.cpp; sourceTree = "<group>"; };
+		C40B0F6C171530B300F99C07 /* SBPythonSkeleton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPythonSkeleton.cpp; path = sb/SBPythonSkeleton.cpp; sourceTree = "<group>"; };
+		C40B0F6D171530B300F99C07 /* SBPythonSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPythonSystem.cpp; path = sb/SBPythonSystem.cpp; sourceTree = "<group>"; };
+		C40B0F75171530E400F99C07 /* SBNavigationMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBNavigationMesh.cpp; path = sb/SBNavigationMesh.cpp; sourceTree = "<group>"; };
+		C40B0F76171530E400F99C07 /* SBNavigationMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBNavigationMesh.h; path = sb/SBNavigationMesh.h; sourceTree = "<group>"; };
+		C40B0F7E1715328E00F99C07 /* DetourAlloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DetourAlloc.cpp; path = recast/DetourAlloc.cpp; sourceTree = "<group>"; };
+		C40B0F7F1715328E00F99C07 /* DetourAlloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DetourAlloc.h; path = recast/DetourAlloc.h; sourceTree = "<group>"; };
+		C40B0F801715328E00F99C07 /* DetourAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DetourAssert.h; path = recast/DetourAssert.h; sourceTree = "<group>"; };
+		C40B0F811715328E00F99C07 /* DetourCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DetourCommon.cpp; path = recast/DetourCommon.cpp; sourceTree = "<group>"; };
+		C40B0F821715328E00F99C07 /* DetourCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DetourCommon.h; path = recast/DetourCommon.h; sourceTree = "<group>"; };
+		C40B0F831715328E00F99C07 /* DetourNavMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DetourNavMesh.cpp; path = recast/DetourNavMesh.cpp; sourceTree = "<group>"; };
+		C40B0F841715328E00F99C07 /* DetourNavMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DetourNavMesh.h; path = recast/DetourNavMesh.h; sourceTree = "<group>"; };
+		C40B0F851715328E00F99C07 /* DetourNavMeshBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DetourNavMeshBuilder.cpp; path = recast/DetourNavMeshBuilder.cpp; sourceTree = "<group>"; };
+		C40B0F861715328E00F99C07 /* DetourNavMeshBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DetourNavMeshBuilder.h; path = recast/DetourNavMeshBuilder.h; sourceTree = "<group>"; };
+		C40B0F871715328E00F99C07 /* DetourNavMeshQuery.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DetourNavMeshQuery.cpp; path = recast/DetourNavMeshQuery.cpp; sourceTree = "<group>"; };
+		C40B0F881715328E00F99C07 /* DetourNavMeshQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DetourNavMeshQuery.h; path = recast/DetourNavMeshQuery.h; sourceTree = "<group>"; };
+		C40B0F891715328E00F99C07 /* DetourNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DetourNode.cpp; path = recast/DetourNode.cpp; sourceTree = "<group>"; };
+		C40B0F8A1715328E00F99C07 /* DetourNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DetourNode.h; path = recast/DetourNode.h; sourceTree = "<group>"; };
+		C40B0F8B1715328E00F99C07 /* DetourStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DetourStatus.h; path = recast/DetourStatus.h; sourceTree = "<group>"; };
+		C40B0F8C1715328E00F99C07 /* Recast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Recast.cpp; path = recast/Recast.cpp; sourceTree = "<group>"; };
+		C40B0F8D1715328E00F99C07 /* Recast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Recast.h; path = recast/Recast.h; sourceTree = "<group>"; };
+		C40B0F8E1715328E00F99C07 /* RecastAlloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RecastAlloc.cpp; path = recast/RecastAlloc.cpp; sourceTree = "<group>"; };
+		C40B0F8F1715328E00F99C07 /* RecastAlloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RecastAlloc.h; path = recast/RecastAlloc.h; sourceTree = "<group>"; };
+		C40B0F901715328E00F99C07 /* RecastArea.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RecastArea.cpp; path = recast/RecastArea.cpp; sourceTree = "<group>"; };
+		C40B0F911715328E00F99C07 /* RecastAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RecastAssert.h; path = recast/RecastAssert.h; sourceTree = "<group>"; };
+		C40B0F921715328E00F99C07 /* RecastContour.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RecastContour.cpp; path = recast/RecastContour.cpp; sourceTree = "<group>"; };
+		C40B0F931715328E00F99C07 /* RecastFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RecastFilter.cpp; path = recast/RecastFilter.cpp; sourceTree = "<group>"; };
+		C40B0F941715328E00F99C07 /* RecastLayers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RecastLayers.cpp; path = recast/RecastLayers.cpp; sourceTree = "<group>"; };
+		C40B0F951715328E00F99C07 /* RecastMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RecastMesh.cpp; path = recast/RecastMesh.cpp; sourceTree = "<group>"; };
+		C40B0F961715328E00F99C07 /* RecastMeshDetail.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RecastMeshDetail.cpp; path = recast/RecastMeshDetail.cpp; sourceTree = "<group>"; };
+		C40B0F971715328E00F99C07 /* RecastRasterization.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RecastRasterization.cpp; path = recast/RecastRasterization.cpp; sourceTree = "<group>"; };
+		C40B0F981715328E00F99C07 /* RecastRegion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RecastRegion.cpp; path = recast/RecastRegion.cpp; sourceTree = "<group>"; };
 		C4126A1015B60B7600D530A3 /* bml_gesture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bml_gesture.hpp; path = bml/bml_gesture.hpp; sourceTree = "<group>"; };
 		C4126A1F15B6552200D530A3 /* SBPhoneme.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SBPhoneme.cpp; path = sb/SBPhoneme.cpp; sourceTree = "<group>"; };
 		C4126A2015B6552200D530A3 /* SBPhoneme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SBPhoneme.h; path = sb/SBPhoneme.h; sourceTree = "<group>"; };
@@ -1592,6 +1670,8 @@
 		AA73BC8B146C637E00B199A1 /* SB */ = {
 			isa = PBXGroup;
 			children = (
+				C40B0F75171530E400F99C07 /* SBNavigationMesh.cpp */,
+				C40B0F76171530E400F99C07 /* SBNavigationMesh.h */,
 				AACEF0AB16EE63B70044DCC6 /* DefaultAttributeTable.cpp */,
 				AACEF0AC16EE63B70044DCC6 /* DefaultAttributeTable.h */,
 				AACEF0AD16EE63B70044DCC6 /* MiniBrain.cpp */,
@@ -1782,6 +1862,7 @@
 		AA9CD5F9141FF8D00064C27A /* external */ = {
 			isa = PBXGroup;
 			children = (
+				C40B0F7C1715327500F99C07 /* recast */,
 				C42C3DA3160D394F00A7D1D4 /* perlin.cpp */,
 				C42C3DA4160D394F00A7D1D4 /* perlin.h */,
 				AA9CD5FA141FF8D00064C27A /* ANN */,
@@ -2061,12 +2142,56 @@
 		AAA6ABC316EFB283006E8ACF /* python */ = {
 			isa = PBXGroup;
 			children = (
+				C40B0F67171530B300F99C07 /* SBPythonInternal.h */,
+				C40B0F68171530B300F99C07 /* SBPythonMath.cpp */,
+				C40B0F69171530B300F99C07 /* SBPythonMotion.cpp */,
+				C40B0F6A171530B300F99C07 /* SBPythonScene.cpp */,
+				C40B0F6B171530B300F99C07 /* SBPythonSimulation.cpp */,
+				C40B0F6C171530B300F99C07 /* SBPythonSkeleton.cpp */,
+				C40B0F6D171530B300F99C07 /* SBPythonSystem.cpp */,
+				C40B0F601715309C00F99C07 /* SBPythonAnimation.cpp */,
+				C40B0F611715309C00F99C07 /* SBPythonAttribute.cpp */,
+				C40B0F621715309C00F99C07 /* SBPythonCharacter.cpp */,
 				AAA6ABC416EFB296006E8ACF /* SBPython.cpp */,
 				AAA6ABC516EFB296006E8ACF /* SBPython.h */,
 				AAA6ABC616EFB296006E8ACF /* SBPythonClass.cpp */,
 				AAA6ABC716EFB296006E8ACF /* SBPythonClass.h */,
 			);
 			name = python;
+			sourceTree = "<group>";
+		};
+		C40B0F7C1715327500F99C07 /* recast */ = {
+			isa = PBXGroup;
+			children = (
+				C40B0F7E1715328E00F99C07 /* DetourAlloc.cpp */,
+				C40B0F7F1715328E00F99C07 /* DetourAlloc.h */,
+				C40B0F801715328E00F99C07 /* DetourAssert.h */,
+				C40B0F811715328E00F99C07 /* DetourCommon.cpp */,
+				C40B0F821715328E00F99C07 /* DetourCommon.h */,
+				C40B0F831715328E00F99C07 /* DetourNavMesh.cpp */,
+				C40B0F841715328E00F99C07 /* DetourNavMesh.h */,
+				C40B0F851715328E00F99C07 /* DetourNavMeshBuilder.cpp */,
+				C40B0F861715328E00F99C07 /* DetourNavMeshBuilder.h */,
+				C40B0F871715328E00F99C07 /* DetourNavMeshQuery.cpp */,
+				C40B0F881715328E00F99C07 /* DetourNavMeshQuery.h */,
+				C40B0F891715328E00F99C07 /* DetourNode.cpp */,
+				C40B0F8A1715328E00F99C07 /* DetourNode.h */,
+				C40B0F8B1715328E00F99C07 /* DetourStatus.h */,
+				C40B0F8C1715328E00F99C07 /* Recast.cpp */,
+				C40B0F8D1715328E00F99C07 /* Recast.h */,
+				C40B0F8E1715328E00F99C07 /* RecastAlloc.cpp */,
+				C40B0F8F1715328E00F99C07 /* RecastAlloc.h */,
+				C40B0F901715328E00F99C07 /* RecastArea.cpp */,
+				C40B0F911715328E00F99C07 /* RecastAssert.h */,
+				C40B0F921715328E00F99C07 /* RecastContour.cpp */,
+				C40B0F931715328E00F99C07 /* RecastFilter.cpp */,
+				C40B0F941715328E00F99C07 /* RecastLayers.cpp */,
+				C40B0F951715328E00F99C07 /* RecastMesh.cpp */,
+				C40B0F961715328E00F99C07 /* RecastMeshDetail.cpp */,
+				C40B0F971715328E00F99C07 /* RecastRasterization.cpp */,
+				C40B0F981715328E00F99C07 /* RecastRegion.cpp */,
+			);
+			name = recast;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2400,6 +2525,19 @@
 				AAA6ABC916EFB296006E8ACF /* SBPython.h in Headers */,
 				AAA6ABCB16EFB296006E8ACF /* SBPythonClass.h in Headers */,
 				AAA6ABCF16EFCA40006E8ACF /* sr_sn_colorsurf.h in Headers */,
+				C40B0F6E171530B300F99C07 /* SBPythonInternal.h in Headers */,
+				C40B0F78171530E400F99C07 /* SBNavigationMesh.h in Headers */,
+				C40B0F9A1715328E00F99C07 /* DetourAlloc.h in Headers */,
+				C40B0F9B1715328E00F99C07 /* DetourAssert.h in Headers */,
+				C40B0F9D1715328E00F99C07 /* DetourCommon.h in Headers */,
+				C40B0F9F1715328E00F99C07 /* DetourNavMesh.h in Headers */,
+				C40B0FA11715328E00F99C07 /* DetourNavMeshBuilder.h in Headers */,
+				C40B0FA31715328E00F99C07 /* DetourNavMeshQuery.h in Headers */,
+				C40B0FA51715328E00F99C07 /* DetourNode.h in Headers */,
+				C40B0FA61715328E00F99C07 /* DetourStatus.h in Headers */,
+				C40B0FA81715328E00F99C07 /* Recast.h in Headers */,
+				C40B0FAA1715328E00F99C07 /* RecastAlloc.h in Headers */,
+				C40B0FAC1715328E00F99C07 /* RecastAssert.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2780,6 +2918,32 @@
 				AAA6ABC816EFB296006E8ACF /* SBPython.cpp in Sources */,
 				AAA6ABCA16EFB296006E8ACF /* SBPythonClass.cpp in Sources */,
 				AAA6ABCE16EFCA40006E8ACF /* sr_sn_colorsurf.cpp in Sources */,
+				C40B0F631715309C00F99C07 /* SBPythonAnimation.cpp in Sources */,
+				C40B0F641715309C00F99C07 /* SBPythonAttribute.cpp in Sources */,
+				C40B0F651715309C00F99C07 /* SBPythonCharacter.cpp in Sources */,
+				C40B0F6F171530B300F99C07 /* SBPythonMath.cpp in Sources */,
+				C40B0F70171530B300F99C07 /* SBPythonMotion.cpp in Sources */,
+				C40B0F71171530B300F99C07 /* SBPythonScene.cpp in Sources */,
+				C40B0F72171530B300F99C07 /* SBPythonSimulation.cpp in Sources */,
+				C40B0F73171530B300F99C07 /* SBPythonSkeleton.cpp in Sources */,
+				C40B0F74171530B300F99C07 /* SBPythonSystem.cpp in Sources */,
+				C40B0F77171530E400F99C07 /* SBNavigationMesh.cpp in Sources */,
+				C40B0F991715328E00F99C07 /* DetourAlloc.cpp in Sources */,
+				C40B0F9C1715328E00F99C07 /* DetourCommon.cpp in Sources */,
+				C40B0F9E1715328E00F99C07 /* DetourNavMesh.cpp in Sources */,
+				C40B0FA01715328E00F99C07 /* DetourNavMeshBuilder.cpp in Sources */,
+				C40B0FA21715328E00F99C07 /* DetourNavMeshQuery.cpp in Sources */,
+				C40B0FA41715328E00F99C07 /* DetourNode.cpp in Sources */,
+				C40B0FA71715328E00F99C07 /* Recast.cpp in Sources */,
+				C40B0FA91715328E00F99C07 /* RecastAlloc.cpp in Sources */,
+				C40B0FAB1715328E00F99C07 /* RecastArea.cpp in Sources */,
+				C40B0FAD1715328E00F99C07 /* RecastContour.cpp in Sources */,
+				C40B0FAE1715328E00F99C07 /* RecastFilter.cpp in Sources */,
+				C40B0FAF1715328E00F99C07 /* RecastLayers.cpp in Sources */,
+				C40B0FB01715328E00F99C07 /* RecastMesh.cpp in Sources */,
+				C40B0FB11715328E00F99C07 /* RecastMeshDetail.cpp in Sources */,
+				C40B0FB21715328E00F99C07 /* RecastRasterization.cpp in Sources */,
+				C40B0FB31715328E00F99C07 /* RecastRegion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
