@@ -3598,7 +3598,7 @@ void FltkViewer::drawKinematicFootprints(int index)
 		SrGlRenderFuncs::render_sphere(&sphere);	
 		SrMat mat; mat.set_translation(curChar->curFootIKPos[i]);
 		std::string text = boost::lexical_cast<std::string>(curChar->flightTime[i]);
-		drawText(mat,scale*0.005,text);
+		drawText(mat,scale*0.005f,text);
 	}
 	//glEnable(GL_DEPTH_TEST);
 
