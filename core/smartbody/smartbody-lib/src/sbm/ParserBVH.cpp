@@ -223,8 +223,8 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						else if (strncmp(str, "Xposition", strlen("Xposition")) == 0)
 						{
 							channelInfo->channels[c] = BVHXPOSITION;		
-							skChannels.add(cur->name(), SkChannel::XPos);
-							motionChannels.add(cur->name(), SkChannel::XPos);
+							skChannels.add(cur->jointName(), SkChannel::XPos);
+							motionChannels.add(cur->jointName(), SkChannel::XPos);
 							cur->pos()->limits( SkVecLimits::X, false );
 							channelInfo->numBVHChannels++;
 							curChannelIndex++;
@@ -232,8 +232,8 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						else if (strncmp(str, "Yposition", strlen("Yposition")) == 0)
 						{
 							channelInfo->channels[c] = BVHYPOSITION;		
-							skChannels.add(cur->name(), SkChannel::YPos);
-							motionChannels.add(cur->name(), SkChannel::YPos);
+							skChannels.add(cur->jointName(), SkChannel::YPos);
+							motionChannels.add(cur->jointName(), SkChannel::YPos);
 							cur->pos()->limits( SkVecLimits::Y, false );
 							channelInfo->numBVHChannels++;
 							curChannelIndex++;
@@ -241,8 +241,8 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						else if (strncmp(str, "Zposition", strlen("Zposition")) == 0)
 						{
 							channelInfo->channels[c] = BVHZPOSITION;	
-							skChannels.add(cur->name(), SkChannel::ZPos);
-							motionChannels.add(cur->name(), SkChannel::ZPos);
+							skChannels.add(cur->jointName(), SkChannel::ZPos);
+							motionChannels.add(cur->jointName(), SkChannel::ZPos);
 							cur->pos()->limits( SkVecLimits::Z, false );
 							channelInfo->numBVHChannels++;
 							curChannelIndex++;
@@ -260,8 +260,8 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					{
 						// determine the rotation order
 						channelInfo->order = determineRotationOrder(channelInfo->channels, channelInfo->numBVHChannels);
-						skChannels.add(cur->name(), SkChannel::Quat);
-						motionChannels.add(cur->name(), SkChannel::Quat);
+						skChannels.add(cur->jointName(), SkChannel::Quat);
+						motionChannels.add(cur->jointName(), SkChannel::Quat);
 						curChannelIndex += 4;
 					}
 					channelInfoMap.push_back(channelInfo);

@@ -186,35 +186,35 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 							if (strcasecmp(str, "tx") == 0)
 							{
 								cur->pos()->limits(SkVecLimits::X, false);
-								skeleton.channels().add(cur->name(), SkChannel::XPos);
+								skeleton.channels().add(cur->jointName(), SkChannel::XPos);
 							}
 							else if (strcasecmp(str, "ty") == 0)
 							{
 								cur->pos()->limits(SkVecLimits::Y, false);
-								skeleton.channels().add(cur->name(), SkChannel::YPos);
+								skeleton.channels().add(cur->jointName(), SkChannel::YPos);
 							}
 							else if (strcasecmp(str, "tz") == 0)
 							{
 								cur->pos()->limits(SkVecLimits::Z, false);
-								skeleton.channels().add(cur->name(), SkChannel::ZPos);
+								skeleton.channels().add(cur->jointName(), SkChannel::ZPos);
 							}
 							else if (strcasecmp(str, "rx") == 0)
 							{
-								int quatId = skeleton.channels().search(cur->name(), SkChannel::Quat);
+								int quatId = skeleton.channels().search(cur->jointName(), SkChannel::Quat);
 								if (quatId < 0)
-									skeleton.channels().add(cur->name(), SkChannel::Quat);
+									skeleton.channels().add(cur->jointName(), SkChannel::Quat);
 							}
 							else if (strcasecmp(str, "ry") == 0)
 							{
-								int quatId = skeleton.channels().search(cur->name(), SkChannel::Quat);
+								int quatId = skeleton.channels().search(cur->jointName(), SkChannel::Quat);
 								if (quatId < 0)
-									skeleton.channels().add(cur->name(), SkChannel::Quat);
+									skeleton.channels().add(cur->jointName(), SkChannel::Quat);
 							}
 							else if (strcasecmp(str, "rz") == 0)
 							{
-								int quatId = skeleton.channels().search(cur->name(), SkChannel::Quat);
+								int quatId = skeleton.channels().search(cur->jointName(), SkChannel::Quat);
 								if (quatId < 0)
-									skeleton.channels().add(cur->name(), SkChannel::Quat);
+									skeleton.channels().add(cur->jointName(), SkChannel::Quat);
 							}
 							else
 							{
@@ -497,7 +497,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 							}
 						}
 						if (hasRotation)
-							skeleton.channels().add(child->name(), SkChannel::Quat);
+							skeleton.channels().add(child->jointName(), SkChannel::Quat);
 					}
 				}
 				break;
