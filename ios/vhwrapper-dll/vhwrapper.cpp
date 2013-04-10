@@ -114,16 +114,16 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
 #ifdef WIN_BUILD
    if (releaseMode)
    {
-      g_SBM_HINST = LoadLibrary(TEXT("smartbody-dll.dll")); 
+      g_SBM_HINST = LoadLibrary(TEXT("SmartBody.dll"));
    }
    else
    {
-      g_SBM_HINST = LoadLibrary(TEXT("smartbody-dll_d.dll")); 
+      g_SBM_HINST = LoadLibrary(TEXT("SmartBody_d.dll"));
    }
 
    if (g_SBM_HINST == NULL)
    {
-      WRAPPER_SBM_LogMessage(vhcl::Format("ERROR: Failed to LoadLibrary '%s'", releaseMode ? "smartbody-dll.dll" : "smartbody-dll_d.dll").c_str(), 1);
+      WRAPPER_SBM_LogMessage(vhcl::Format("ERROR: Failed to LoadLibrary '%s'", releaseMode ? "SmartBody.dll" : "SmartBody_d.dll").c_str(), 1);
       return -1;
    }
 
@@ -237,12 +237,12 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle )
    g_SBM_HINST = NULL;
    if (!freeSuccessful)
    {
-      WRAPPER_SBM_LogMessage("ERROR: Failed to FreeLibrary smartbody-dll.dll", 1);
+      WRAPPER_SBM_LogMessage("ERROR: Failed to FreeLibrary SmartBody.dll", 1);
       return false;
    }
    else
    {
-      //WRAPPER_SBM_LogMessage("SUCCESS!: FreeLibrary smartbody-dll.dll", 0);
+      //WRAPPER_SBM_LogMessage("SUCCESS!: FreeLibrary SmartBody.dll", 0);
    }
 
    return retVal;
