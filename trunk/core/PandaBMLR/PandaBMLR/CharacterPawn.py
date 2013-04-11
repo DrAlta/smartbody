@@ -240,7 +240,7 @@ class CharacterPawn(Pawn):
 	
 		if (self.__Joints.controlJoint(jointName, jointNP.node())):
 			joint = self.__Joints.findChild(jointName)
-			jointNP.setMat(joint.getInitialValue())
+			jointNP.setMat(joint.getDefaultValue())
 			self.__JointMap[self.JointNameToID(jointName)] = jointNP
 			return jointNP
 		else:
