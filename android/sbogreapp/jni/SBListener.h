@@ -1,12 +1,13 @@
 #ifndef _SBLISTENER_H
 #define _SBLISTENER_H
 
+#include <vhcl.h>
 #include <string>
-#include <sbm/mcontrol_util.h>
+#include <sb/SBCharacterListener.h>
 
 class OgreFramework;
 
-class SBListener : public SBCharacterListener
+class SBListener : public SmartBody::SBCharacterListener
 {
 	public:
 		SBListener(OgreFramework* app);		

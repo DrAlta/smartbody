@@ -1,7 +1,6 @@
 #include "SBListener.h"
 #include "OgreFramework.h"
 #include <OgreTagPoint.h>
-#include <sbm/mcontrol_util.h>
 
 SBListener::SBListener(OgreFramework* app)
 {

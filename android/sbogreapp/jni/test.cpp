@@ -9,7 +9,10 @@
 #include "test.h"
 #include <SB/SBScene.h>
 #include <SB/SBSimulationManager.h>
+#include <SB/SBCommandManager.h>
+#include <SB/SBVHMsgManager.h>
 #include <SB/SBCharacter.h>
+#include <SB/SBSkeleton.h>
 
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
@@ -19,10 +22,8 @@
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/sax/SAXException.hpp>
 #include <sbm/mcontrol_callbacks.h>
-#include <sbm/resource_cmds.h>
-#include <sbm/sbm_test_cmds.hpp>
-#include <sbm/locomotion_cmds.hpp>
 #include <sr/sr_camera.h>
+#include <vhmsg-tt.h>
 
 
 #define ANDROID_PYTHON
@@ -36,9 +37,10 @@
 void sb_vhmsg_callback( const char *op, const char *args, void * user_data )
 {
 	LOG("vhmsg callback op=%s, args=%s\n",op,args);
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
     // Replace singleton with a user_data pointer
-    switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
+    switch( scene->getCommandManager()->execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
             LOG("SB ERR: command NOT FOUND: '%s' + '%s'", op, args );
             break;
@@ -51,14 +53,13 @@ void sb_vhmsg_callback( const char *op, const char *args, void * user_data )
 void endConnection()
 {
 	vhmsg::ttu_close();
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.vhmsg_enabled = false;
+	
+	SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(false);
 	LOG("TTU Closed, Disable VHMsg.");
 }
 
 void initConnection(const char* serverName, const char* portName)
 {
-    mcuCBHandle& mcu = mcuCBHandle::singleton();
     const char* scope = "DEFAULT_SCOPE";    
     int err;
     int openConnection = vhmsg::ttu_open(serverName,scope,portName);
@@ -78,7 +79,7 @@ void initConnection(const char* serverName, const char* portName)
         err = vhmsg::ttu_register( "vrKillComponent" );
         err = vhmsg::ttu_register( "wsp" );
         err = vhmsg::ttu_register( "receiver" );
-        mcu.vhmsg_enabled = true;
+        SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(true);
         LOG("TTU Open Success : server = %s, scope = %s, port = %s",serverName,scope,portName);
     }
     else

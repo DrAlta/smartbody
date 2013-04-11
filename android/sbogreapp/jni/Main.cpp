@@ -25,6 +25,7 @@
 -------------------------------------------------------------------------------
 */
 #include <jni.h>
+#include <vhcl.h>
 #include <stdlib.h>
 #include "AndroidLogListener.h"
 #include "test.h"
