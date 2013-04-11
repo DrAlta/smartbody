@@ -2,6 +2,7 @@
 #include "SBListener.h"
 #include "test.h"
 #include <iostream>
+#include <sb/SBScene.h>
 
 DemoApp::DemoApp()
 {

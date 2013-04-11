@@ -19,12 +19,14 @@
 #include <vhcl_log.h>
 #include <vhcl_string.h>
 #include <vhmsg-tt.h>
-#include <sbm/mcontrol_util.h>
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBVHMsgManager.h>
+#include <sb/SBCommandManager.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <boost/filesystem/operations.hpp>
+#include <sbm/time_regulator.h>
 #include <sr/sr_camera.h>
 
 #define ANDROID_PYTHON
@@ -72,7 +74,8 @@ void sb_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 	// Replace singleton with a user_data pointer
 	if (!mcuInit) return;
 	//LOG("VHMSG Callback : op = %s ,args = %s\n",op,args);
-	switch( mcuCBHandle::singleton().execute( op, (char *)args ) ) {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	switch( scene->getCommandManager()->execute( op, (char *)args ) ) {
 		case CMD_NOT_FOUND:
 			LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
 			break;
@@ -82,7 +85,7 @@ void sb_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 	}
 }
 
-void drawSB(mcuCBHandle& mcu)
+void drawSB()
 {
 	static SrVec jointPos[200];
 	static unsigned short boneIdx[400];
@@ -129,7 +132,7 @@ void drawSB(mcuCBHandle& mcu)
 void initConnection()
 {
 	if (!mcuInit) return;	
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	const char* serverName = "172.16.33.14";
 	const char* scope = "DEFAULT_SCOPE";
 	const char* port = "61616";
@@ -152,7 +155,7 @@ void initConnection()
 		err = vhmsg::ttu_register( "vrKillComponent" );
 		err = vhmsg::ttu_register( "wsp" );
 		err = vhmsg::ttu_register( "receiver" );
-		mcu.vhmsg_enabled = true;
+		scene->getVHMsgManager()->setEnable(true);
 		LOG("TTU Open Success : server = %s, scope = %s, port = %s",serverName,scope,port);
 	}
 	else
@@ -166,10 +169,10 @@ bool setupGraphics(int w, int h) {
 
 	SrCamera& cam = engine.camera;
 	cam.init();
-	cam.center = SrVec(0, 92, 0);
-	cam.up = SrVec::j;
-	cam.eye.set ( 0, 166, 185 );
-	cam.scale = 1.f;
+	cam.setCenter(0, 92, 0);
+	cam.setUpVector(SrVec::j);
+	cam.setEye( 0, 166, 185 );
+	cam.setScale(1.f);
 
     glViewport(0, 0, w, h);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
@@ -203,7 +206,6 @@ void renderFrame() {
 
 	//glScalef ( cam.scale, cam.scale, cam.scale );
 	//glDisable(GL_LIGHTING);
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	// draw a ground plane
 	float planeSize  = 300.f;
 	SrVec quad[4] = { SrVec(planeSize, 0.f, planeSize), SrVec(-planeSize, 0.f, planeSize), SrVec(-planeSize,0.f,-planeSize), SrVec(planeSize, 0.f, -planeSize) };
@@ -218,7 +220,7 @@ void renderFrame() {
 	glColorPointer(4, GL_FLOAT, 0, quadColor);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
 	glDisableClientState(GL_COLOR_ARRAY);
-	drawSB(mcu);
+	drawSB();
 	//eglSwapBuffers(engine->display, engine->surface);    
 }
 
@@ -291,8 +293,8 @@ JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_restart( JNIEnv * e
 	/*
 	if (!mcuInit) return;
 	mcuInit = false;
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	mcu.reset();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBScene::destroyScene();
 	initSmartBody();	
 	mcuInit = true;
 	*/
