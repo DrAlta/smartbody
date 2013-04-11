@@ -133,6 +133,7 @@ void SkSkeleton::copy(SkSkeleton* origSkel)
 	_com = origSkel->com();	
 
 	compress ();
+	updateJointMap();
 }
 
 void SkSkeleton::init ()
@@ -489,6 +490,7 @@ void SkSkeleton::updateJointMap()
 	for (int i = 0; i < jointSize; i++)
 	{
 		std::string jname = _joints[i]->jointName();
+		_joints[i]->updateMappedJointName();
 		if (jointMap)
 		{
 			std::string mappedName = jointMap->getMapTarget(jname);	
@@ -528,7 +530,7 @@ SrVec SkSkeleton::getFacingDirection()
 }
 
 void SkSkeleton::setJointMapName( const std::string& jointMapName )
-{
+{	
 	jointMap = jointMapName;
 }
 

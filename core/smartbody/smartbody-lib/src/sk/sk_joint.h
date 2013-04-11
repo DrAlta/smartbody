@@ -141,6 +141,7 @@ public:
 	SBAPI const std::string& jointName () const;
 
 	std::string getMappedJointName();
+	void updateMappedJointName();
 
 	/*! Set the name of this joint */
 	void extName ( const std::string& jn ) { _extName=jn; }
