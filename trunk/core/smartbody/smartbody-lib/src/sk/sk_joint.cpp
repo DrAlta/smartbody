@@ -314,10 +314,10 @@ void SkJoint::recursive_children(std::vector<SkJoint*>& joints, SkJoint* root)
 	}
 }
 
-
-std::string SkJoint::getMappedJointName()
+void SkJoint::updateMappedJointName()
 {
-	std::string outName = _name;
+#if 1
+	_sbName = _name;
 	if (_skeleton)
 	{
 		SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(_skeleton->getJointMapName());
@@ -325,10 +325,16 @@ std::string SkJoint::getMappedJointName()
 		{
 			std::string target = jointMap->getMapTarget(_name);
 			if (target != "")
-				outName = target;
+				_sbName = target;
 		}		
-	}
-	return outName;
+	}	
+#endif
+
+}
+
+std::string SkJoint::getMappedJointName()
+{
+	return _sbName;
 }
 
 
@@ -353,7 +359,7 @@ const std::string& SkJoint::jointName() const
 
 void SkJoint::copyTo( SkJoint* dest )
 {
-	dest->name(_name);
+	dest->name(_name);	
 	dest->extName(_extName);
 	dest->extID(_extID);
 	dest->extSID(_extSID);

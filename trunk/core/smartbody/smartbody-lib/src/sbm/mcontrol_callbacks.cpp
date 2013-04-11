@@ -4685,7 +4685,7 @@ int syncpoint_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 #ifdef USE_GOOGLE_PROFILER
 int startprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
-{
+{	
 	LOG("Starting the CPU Profiler...");
 	ProfilerStart("/tmp/smartbodyprofile");
 	return CMD_SUCCESS;
