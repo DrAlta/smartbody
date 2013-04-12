@@ -163,8 +163,8 @@ def jumpingSetup(origSkelName, skeletonName, baseJoint, prefix, statePreFix):
 	#for i in range(0, len(motions)):
 	#	blendjumping.addMotion(motions[i], paramsX[i], paramsY[i], paramsZ[i])	
 		
-	#blendjumping.buildBlendBase("jump", "RBF" ,True);	
+	blendjumping.buildBlendBase("jump", "RBF" ,True);	
 	#blendjumping.buildBlendBase("jump", "KNN" ,True);	
-	blendjumping.buildBlendBase("jump", "Inverse" ,True);	
+	#blendjumping.buildBlendBase("jump", "Inverse" ,True);	
 		
 

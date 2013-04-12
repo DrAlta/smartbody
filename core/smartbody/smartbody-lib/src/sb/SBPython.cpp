@@ -394,12 +394,16 @@ boost::python::class_<SBObserver>("SBObserver")
 	boost::python::class_<SBRetargetManager>("SBRetargetManager")
 		.def("createRetarget", &SBRetargetManager::createRetarget, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a retarget instance for the source/target skeleton pair.")
 		.def("getRetarget", &SBRetargetManager::getRetarget, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the retarget instance for the source/target skeleton pair.")
+		.def("getRetargetNames", &SBRetargetManager::getRetargetNames, "Get the names of all retarget instances.")
+
 		;
 
 	boost::python::class_<SBRetarget>("SBRetarget")
 		.def("initRetarget", &SBRetarget::initRetarget, "Initialize retarget instance.")
 		.def("applyRetargetJointRotation", &SBRetarget::applyRetargetJointRotation, "Apply retargeting on the joint rotation.")
 		.def("applyRetargetJointTranslation", &SBRetarget::applyRetargetJointTranslation, "Apply retargeting on the joint translation.")
+		.def("getEndJointNames", &SBRetarget::getEndJointNames, "Get the names of the joints that will be skipped during retargeting.")
+		.def("getRelativeJointNames", &SBRetarget::getRelativeJointNames, "Get the names of the joints that not be aligned during retargeting.")
 		;
 
 

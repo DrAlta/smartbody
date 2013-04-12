@@ -1733,9 +1733,10 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		bool hasSkeleton = false;
 		// copy the file over
 		std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
+		std::string retargetDir = mediaPath + "/" + "retarget/";
 		std::string meshBaseDir = "retarget/mesh/";
 		std::string meshDir = mediaPath + "/" + meshBaseDir ;		
-		std::string retargetDir = mediaPath + "/" + "retarget/";
+		std::string skeletonDir = mediaPath + "/" + "retarget/skeletons/";
 
 		SmartBody::SBAssetManager* assetManager = scene->getAssetManager();
 
@@ -1755,12 +1756,14 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		// create the folder if they do not exist
 		if (!boost::filesystem::exists(retargetDir))
 			boost::filesystem::create_directory(retargetDir);
+		if (!boost::filesystem::exists(skeletonDir))
+			boost::filesystem::create_directory(skeletonDir);
 		if (!boost::filesystem::exists(meshDir))
 			boost::filesystem::create_directory(meshDir);		
 		boost::filesystem::create_directory(meshDir+meshName);
 
 		std::string targetMeshFile = meshDir+meshName+"/"+filebasename+fileextension;
-		std::string targetSkelFile = retargetDir+"/"+filebasename+fileextension;
+		std::string targetSkelFile = skeletonDir+filebasename+fileextension;
 		
 		
 		if (!boost::filesystem::exists(targetMeshFile))

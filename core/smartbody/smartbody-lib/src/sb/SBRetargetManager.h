@@ -4,6 +4,7 @@
 #include <sb/SBTypes.h>
 #include <string>
 #include <map>
+#include <vector>
 
 namespace SmartBody {
 
@@ -19,6 +20,7 @@ class SBRetargetManager
 
 		SBAPI SBRetarget* createRetarget(std::string sourceSk, std::string targetSk);		
 		SBAPI SBRetarget* getRetarget(std::string sourceSk, std::string targetSk);
+		SBAPI std::vector<StringPair> getRetargetNames();
 
 	protected:
 		std::map<StringPair, SBRetarget*> _retargets;

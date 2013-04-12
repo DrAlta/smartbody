@@ -182,7 +182,8 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 
 		bool fastInitial;	// whether to use the transition animation
 		bool smoothing;
-		bool pathFollowing;
+		bool pathFollowing;	
+		bool facingDirectBlend;
 		bool facingAdjust;
 
 		protected:
