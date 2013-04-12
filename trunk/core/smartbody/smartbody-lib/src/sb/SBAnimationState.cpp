@@ -1261,6 +1261,7 @@ std::string SBAnimationBlend::saveToString()
 		}
 
 		strstr << "\n";
+		strstr << stateNameVariable << ".setBlendSkeleton(\"" << state->getBlendSkeleton() << "\")\n";
 		strstr << "motions = StringVec()\n";
 		for (int x = 0; x < state->getNumMotions(); x++)
 		{

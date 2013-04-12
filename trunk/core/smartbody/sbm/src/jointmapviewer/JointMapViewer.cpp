@@ -1411,6 +1411,7 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 		commonSk->ref();
 	}
 
+#if 0
 	std::string commonSkMotionName = "commonSkTest";
 	std::string motionExt = ".skm";
 	SmartBody::SBMotion* commonSkMotion = scene->getMotion(commonSkMotionName);
@@ -1419,9 +1420,9 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 		std::string mediaPath = scene->getMediaPath();		
 		std::string retargetDir = mediaPath + "/" + "behaviorsets/test/";
 		std::string targetMotionFile = retargetDir+"/"+commonSkMotionName + motionExt;
-		scene->loadAsset(targetMotionFile); // load motion
-		
+		scene->loadAsset(targetMotionFile); // load motion		
 	}
+#endif
 
 	Fl_Group* rightGroup = new Fl_Group(420, startY, w-420 , h - startY, "");
 	rightGroup->begin();	
@@ -1453,10 +1454,10 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 // 			input->setViewer(skeletonViewer);
 // 	}
 
-	testCommonSkMotion = scene->getMotion(commonSkMotionName);
+	//testCommonSkMotion = scene->getMotion(commonSkMotionName);
 	testTargetMotion = NULL;
 	standardSkeletonViewer->setSkeleton(commonSkName);
-	standardSkeletonViewer->setTestMotion(testCommonSkMotion);	
+	//standardSkeletonViewer->setTestMotion(testCommonSkMotion);	
 
 	updateTestMotions();
 	if (_choiceTestMotions->size() >= 1)
@@ -1907,6 +1908,8 @@ void JointMapViewer::testPlayMotion()
 	SmartBody::SBSkeleton* targetSk = targetSkeletonViewer->getSkeleton();
 	SmartBody::SBSkeleton* commonSk = standardSkeletonViewer->getSkeleton();
 	if (!targetSk || !commonSk) return;
+
+	if (!testCommonSkMotion) return;
 
 	testPlay = !testPlay;
 	if (testPlay)

@@ -38,6 +38,7 @@
 #include <sb/SBWSPManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
+#include <sb/SBRetarget.h>
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
 #include <sb/SBDebuggerUtility.h>
@@ -1671,6 +1672,7 @@ std::string SBScene::save(bool remoteSetup)
 	saveJointMaps(strstr, remoteSetup);
 	saveLipSyncing(strstr, remoteSetup);
 	saveBlends(strstr, remoteSetup);
+	saveRetargets(strstr, remoteSetup);
 	saveGestureMaps(strstr, remoteSetup);
 	savePawns(strstr, remoteSetup);
 	saveCharacters(strstr, remoteSetup);
@@ -1743,16 +1745,192 @@ void SBScene::saveScene(std::stringstream& strstr, bool remoteSetup)
 	
 }
 
+void SBScene::saveRetargets( std::stringstream& strstr, bool remoteSetup )
+{
+	strstr << "# -------------------- on-line retargeting setup\n";
+	SmartBody::SBRetargetManager* retargetManager = getRetargetManager();
+	strstr << "retargetManager = scene.getRetargetManager()\n";
+	std::vector<StringPair> retargetNames = retargetManager->getRetargetNames();
+	for (unsigned int i=0;i<retargetNames.size();i++)
+	{
+		StringPair& sp = retargetNames[i];
+		SmartBody::SBRetarget* retarget = retargetManager->getRetarget(sp.first, sp.second);
+		strstr << "retarget = retargetManager.createRetarget(\"" << sp.first << "\",\"" << sp.second << "\")\n";
+		std::vector<std::string> endJoints = retarget->getEndJointNames();
+		std::vector<std::string> relativeJoints = retarget->getRelativeJointNames();
+		strstr << "endJoints = StringVec()\n";
+		for (unsigned int k=0;k<endJoints.size();k++)
+			strstr << "endJoints.append(\"" << endJoints[k] << "\")\n";
+		strstr << "relativeJoints = StringVec()\n";
+		for (unsigned int k=0;k<endJoints.size();k++)
+			strstr << "relativeJoints.append(\"" << relativeJoints[k] << "\")\n";
+		
+		strstr << "retarget.initRetarget(endJoints, relativeJoints)\n";
+	}
+}
+
+/**
+ * https://svn.boost.org/trac/boost/ticket/1976#comment:2
+ * 
+ * "The idea: uncomplete(/foo/new, /foo/bar) => ../new
+ *  The use case for this is any time you get a full path (from an open dialog, perhaps)
+ *  and want to store a relative path so that the group of files can be moved to a different
+ *  directory without breaking the paths. An IDE would be a simple example, so that the
+ *  project file could be safely checked out of subversion."
+ * 
+ * ALGORITHM:
+ *  iterate path and base
+ * compare all elements so far of path and base
+ * whilst they are the same, no write to output
+ * when they change, or one runs out:
+ *   write to output, ../ times the number of remaining elements in base
+ *   write to output, the remaining elements in path
+ */
+boost::filesystem2::path
+naive_uncomplete(boost::filesystem2::path const p, boost::filesystem2::path const base) {
+
+    using boost::filesystem2::path;
+    using boost::filesystem2::dot;
+    using boost::filesystem2::slash;
+
+    if (p == base)
+        return "./";
+        /*!! this breaks stuff if path is a filename rather than a directory,
+             which it most likely is... but then base shouldn't be a filename so... */
+
+    boost::filesystem2::path from_path, from_base, output;
+
+    boost::filesystem2::path::iterator path_it = p.begin(),    path_end = p.end();
+    boost::filesystem2::path::iterator base_it = base.begin(), base_end = base.end();
+
+    // check for emptiness
+    if ((path_it == path_end) || (base_it == base_end))
+        throw std::runtime_error("path or base was empty; couldn't generate relative path");
+
+#ifdef WIN32
+    // drive letters are different; don't generate a relative path
+    if (*path_it != *base_it)
+        return p;
+
+    // now advance past drive letters; relative paths should only go up
+    // to the root of the drive and not past it
+    ++path_it, ++base_it;
+#endif
+
+    // Cache system-dependent dot, double-dot and slash strings
+    const std::string _dot  = std::string(1, dot<path>::value);
+    const std::string _dots = std::string(2, dot<path>::value);
+    const std::string _sep = std::string(1, slash<path>::value);
+
+    // iterate over path and base
+    while (true) {
+
+        // compare all elements so far of path and base to find greatest common root;
+        // when elements of path and base differ, or run out:
+        if ((path_it == path_end) || (base_it == base_end) || (*path_it != *base_it)) {
+
+            // write to output, ../ times the number of remaining elements in base;
+            // this is how far we've had to come down the tree from base to get to the common root
+            for (; base_it != base_end; ++base_it) {
+                if (*base_it == _dot)
+                    continue;
+                else if (*base_it == _sep)
+                    continue;
+
+                output /= "../";
+            }
+
+            // write to output, the remaining elements in path;
+            // this is the path relative from the common root
+            boost::filesystem2::path::iterator path_it_start = path_it;
+            for (; path_it != path_end; ++path_it) {
+
+                if (path_it != path_it_start)
+                    output /= "/";
+
+                if (*path_it == _dot)
+                    continue;
+                if (*path_it == _sep)
+                    continue;
+
+                output /= *path_it;
+            }
+
+            break;
+        }
+
+        // add directory level to both paths and continue iteration
+        from_path /= path(*path_it);
+        from_base /= path(*base_it);
+
+        ++path_it, ++base_it;
+    }
+
+    return output;
+}
+
+
 void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- media and asset paths\n";
 	// mediapath
 	std::string mediaPath = getMediaPath();
-	strstr << "scene.setMediaPath(\"" << mediaPath << "\")\n";
-
+	strstr << "scene.setMediaPath(\"" << mediaPath << "\")\n";	
 	// asset paths
 	std::vector<std::string>::iterator iter;
 	std::vector<std::string> motionPaths = getAssetPaths("motion");
+	std::vector<std::string> motionNames = getMotionNames();
+	std::vector<std::string> skelNames = getSkeletonNames();
+	std::set<std::string> extraAssetPathSet;
+
+	// feng : since we may have use "loadAssetsFromPath" to load the motions, we should infer all other motion paths from existing motions.
+	for (unsigned int i=0;i<motionNames.size();i++)
+	{
+		SmartBody::SBMotion* motion = getMotion(motionNames[i]);
+		boost::filesystem2::path motionFile(motion->filename());			
+		boost::filesystem2::path motionPath = motionFile.parent_path();
+		if (motionPath.empty()) // don't care about empty path
+			continue;
+
+		boost::filesystem2::path mePath(mediaPath);
+		boost::filesystem2::path diffPath = naive_uncomplete(motionPath,mePath);
+		LOG("motionpath = %s, mediapath = %s, diffpath = %s", motionFile.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
+
+		std::vector<std::string>::iterator st = std::find(motionPaths.begin(),motionPaths.end(),diffPath.directory_string());
+		if (st == motionPaths.end())
+		{
+			extraAssetPathSet.insert(diffPath.directory_string());
+		}
+	}
+
+	for (unsigned int i=0;i<skelNames.size();i++)
+	{
+		SmartBody::SBSkeleton* skel = getSkeleton(skelNames[i]);
+		boost::filesystem2::path skelFile(skel->getFileName());			
+		boost::filesystem2::path skelPath = skelFile.parent_path();
+		if (skelPath.empty()) // don't care about empty path
+			continue;
+
+		boost::filesystem2::path mePath(mediaPath);
+		boost::filesystem2::path diffPath = naive_uncomplete(skelPath,mePath);
+		//LOG("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
+
+		std::vector<std::string>::iterator st = std::find(motionPaths.begin(),motionPaths.end(),diffPath.directory_string());
+		if (st == motionPaths.end())
+		{
+			extraAssetPathSet.insert(diffPath.directory_string());
+		}
+	}
+
+	std::set<std::string>::iterator si;
+	for ( si  = extraAssetPathSet.begin();
+		  si != extraAssetPathSet.end();
+		  si++)
+	{
+		const std::string& path = (*si);
+		strstr << "scene.loadAssetsFromPath(\"" << path << "\")\n";
+	}
+
 	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
@@ -1843,21 +2021,29 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 		 iter++)
 	{
 		SBMotion* mirroredMotion = this->getMotion(*iter);
-		StringAttribute* mirroredMotionAttr = dynamic_cast<StringAttribute*>(mirroredMotion->getAttribute("mirrorMotion"));
-		if (mirroredMotionAttr)
+		StringAttribute* mirroredMotionAttr = dynamic_cast<StringAttribute*>(mirroredMotion->getAttribute("mirrorMotion"));	
+		if (mirroredMotionAttr) // the motion is generated from mirroring
 		{
 			strstr << "motion = scene.getMotion(\"" << mirroredMotionAttr->getValue() << "\")\n";
 			// make sure the skeleton exists
-			StringAttribute* mirroredSkeletonAttr = dynamic_cast<StringAttribute*>(mirroredMotion->getAttribute("mirrorSkeleton"));
-			if (mirroredSkeletonAttr)
+			StringAttribute* mirroredSkeletonAttr = dynamic_cast<StringAttribute*>(mirroredMotion->getAttribute("mirrorSkeleton"));			
+			if (mirroredSkeletonAttr) 
 			{
 				const std::string& skeletonName = mirroredSkeletonAttr->getValue();
 				strstr << "mirrorSkeleton = scene.getSkeleton(\"" << skeletonName << "\")\n";
 				strstr << "if mirrorSkeleton is not None:\n";
 				strstr << "\tmirroredMotion = motion.mirror(\"" << mirroredMotion->getName() << "\", \"" << skeletonName << "\")\n";
-			}
+			}			
+		}			
+	}
 
-		}
+	for (std::vector<std::string>::iterator iter = motions.begin();
+		iter != motions.end();
+		iter++)
+	{
+		SBMotion* motion = this->getMotion(*iter);
+		strstr << "tempMotion = scene.getMotion(\"" << *iter << "\")\n";
+		strstr << "tempMotion.setMotionSkeletonName(\"" << motion->getMotionSkeletonName() <<"\")\n";	
 	}
 	
 
@@ -1908,6 +2094,9 @@ void SBScene::savePawns(std::stringstream& strstr, bool remoteSetup)
 	{
 		SBPawn* pawn = getPawn((*pawnIter));
 		SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
+		SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(pawn);
+		if (sbChar) // we will handle character in saveCharacters
+			continue; 
 		if (camera)
 			continue; // already wrote out pawns
 		if (pawn->getName().find("light") == 0)
@@ -1920,7 +2109,7 @@ void SBScene::savePawns(std::stringstream& strstr, bool remoteSetup)
 		SrVec position = pawn->getPosition();
 		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
 		SrQuat orientation = pawn->getOrientation();
-		strstr << "obj.setOrientation(SrQuat(" << orientation.w << ", " << orientation.x << ", " << orientation.y << ", " << "orientation.z))\n";
+		strstr << "obj.setOrientation(SrQuat(" << orientation.w << ", " << orientation.x << ", " << orientation.y << ", " << orientation.z << "))\n";
 		// attributes
 		std::vector<std::string> attributeNames = pawn->getAttributeNames();
 		for (std::vector<std::string>::iterator iter = attributeNames.begin();
@@ -1991,7 +2180,7 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 		SrVec position = character->getPosition();
 		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
 		SrQuat orientation = character->getOrientation();
-		strstr << "obj.setOrientation(SrQuat(" << orientation.w << ", " << orientation.x << ", " << orientation.y << ", " << "orientation.z))\n";
+		strstr << "obj.setOrientation(SrQuat(" << orientation.w << ", " << orientation.x << ", " << orientation.y << ", " << orientation.z << "))\n";
 
 		// face definition
 		SBFaceDefinition* faceDef = character->getFaceDefinition();
@@ -2199,6 +2388,10 @@ void SBScene::saveJointMaps(std::stringstream& strstr, bool remoteSetup)
 	}
 
 	strstr << "# -------------------- applying joint maps\n";
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> mappedMotions = scene->getMotionNames();
+	std::vector<std::string> mappedSkeletons = scene->getSkeletonNames();
+
 	for (std::vector<std::string>::iterator iter = jointMapNames.begin(); iter != jointMapNames.end(); iter++)
 	{
 		const std::string& jointMapName = (*iter);
@@ -2206,6 +2399,10 @@ void SBScene::saveJointMaps(std::stringstream& strstr, bool remoteSetup)
 
 		strstr << "jointMap = scene.getJointMapManager().getJointMap(\"" << jointMapName << "\")\n";
 
+		
+
+
+#if 0
 		std::vector<std::string>& mappedMotions = jointMap->getMappedMotions();
 		for (std::vector<std::string>::iterator iter = mappedMotions.begin();
 			 iter != mappedMotions.end();
@@ -2221,6 +2418,25 @@ void SBScene::saveJointMaps(std::stringstream& strstr, bool remoteSetup)
 		{
 			strstr << "jointMap.applySkeleton(scene.getSkeleton(\"" << (*iter) << "\"))\n";
 		}
+#else	
+		for (std::vector<std::string>::iterator iter = mappedMotions.begin();
+			iter != mappedMotions.end();
+			iter++)
+		{
+			SmartBody::SBMotion* motion = scene->getMotion(*iter);
+			if (motion && motion->channels().getJointMapName() == jointMapName)
+				strstr << "jointMap.applyMotion(scene.getMotion(\"" << (*iter) << "\"))\n";
+		}
+
+		for (std::vector<std::string>::iterator iter = mappedSkeletons.begin();
+			iter != mappedSkeletons.end();
+			iter++)
+		{
+			SmartBody::SBSkeleton* skel = scene->getSkeleton(*iter);
+			if (skel && skel->getJointMapName() == jointMapName)
+				strstr << "jointMap.applySkeleton(scene.getSkeleton(\"" << (*iter) << "\"))\n";
+		}
+#endif
 	}
 }
 

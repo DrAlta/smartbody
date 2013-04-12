@@ -37,6 +37,9 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 	SmartBody::SBSkeleton* tempSrcSk = new SmartBody::SBSkeleton(sourceSk);
 	std::vector<std::string> stopJoints;	
 	stopJoints.push_back("skullbase");
+
+	retargetEndJoints = endJoints;
+	retargetRelativeJoints = relativeJoints;
 	
 	tempSrcSk->clearJointValues();
 	interSk->clearJointValues();
@@ -251,4 +254,13 @@ float SBRetarget::applyRetargetJointTranslation( std::string jointName, float in
 	return outPos;
 }
 
+SBAPI std::vector<std::string> SBRetarget::getEndJointNames()
+{
+	return retargetEndJoints;
+}
+
+SBAPI std::vector<std::string> SBRetarget::getRelativeJointNames()
+{
+	return retargetRelativeJoints;
+}
 }

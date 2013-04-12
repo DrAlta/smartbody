@@ -21,12 +21,17 @@ class SBRetarget
 		SBAPI SrQuat applyRetargetJointRotation(std::string jointName, SrQuat& inQuat);
 		SBAPI SrQuat applyRetargetJointRotationInverse(std::string jointName, SrQuat& inQuat);
 		SBAPI float  applyRetargetJointTranslation(std::string jointName, float inPos);
+		SBAPI std::vector<std::string> getEndJointNames();
+		SBAPI std::vector<std::string> getRelativeJointNames();
+
 	protected:
 		std::string srcSkName;
 		std::string tgtSkName;
 		std::map<std::string, QuatPair> jointPrePostRotMap;
 		std::map<std::string, bool> jointSkipMap;
 		std::map<std::string, SrQuat> jointAddRotMap;
+		std::vector<std::string> retargetEndJoints;
+		std::vector<std::string> retargetRelativeJoints;
 		float heightRatio;
 };
 

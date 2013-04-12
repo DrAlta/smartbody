@@ -261,6 +261,7 @@ class SBScene : public SBObject
 		void savePawns(std::stringstream& strstr, bool remoteSetup);
 		void saveCharacters(std::stringstream& strstr, bool remoteSetup);
 		void saveLights(std::stringstream& strstr, bool remoteSetup);
+		void saveRetargets(std::stringstream& strstr, bool remoteSetup);
 		void saveBlends(std::stringstream& strstr, bool remoteSetup);
 		void saveJointMaps(std::stringstream& strstr, bool remoteSetup);
 		void saveFaceDefinitions(std::stringstream& strstr, bool remoteSetup);

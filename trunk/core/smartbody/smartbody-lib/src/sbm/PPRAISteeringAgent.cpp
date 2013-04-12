@@ -175,6 +175,9 @@ void PPRAISteeringAgent::addSteeringAttributes()
 	if (!character->hasAttribute("steering.pathFollowingMode"))
 		character->createBoolAttribute("steering.pathFollowingMode", false, true, "steering", 390, false, false, false, "");
 
+	if (!character->hasAttribute("steering.facingDirectBlend"))
+		character->createBoolAttribute("steering.facingDirectBlend", true, true, "steering", 390, false, false, false, "");
+
 	if (!character->hasAttribute("steering.speedWindowSize"))
 		character->createIntAttribute("steering.speedWindowSize", 10, true, "steering", 400, false, false, false, ""); 
 
@@ -302,6 +305,11 @@ void PPRAISteeringAgent::initSteerParams()
 		pathFollowing = character->getBoolAttribute("steering.pathFollowingMode");
 	else
 		pathFollowing = false;
+
+	if (character && character->hasAttribute("steering.facingDirectBlend"))
+		facingDirectBlend = character->getBoolAttribute("steering.facingDirectBlend");
+	else
+		facingDirectBlend = true;
 	
 	if (character && character->hasAttribute("steering.speedWindowSize"))
 		speedWindowSize = character->getIntAttribute("steering.speedWindowSize");
@@ -1472,10 +1480,10 @@ void PPRAISteeringAgent::startLocomotion( float angleDiff )
 		}
 		//LOG("start turn command = %s",command.str().c_str());
 		
-		PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
-		const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
-		float desiredSpeed = steeringCommand.targetSpeed;
-		desiredSpeed *= 1.0f / SmartBody::SBScene::getScene()->getScale();
+		//PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
+		//const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
+		//float desiredSpeed = steeringCommand.targetSpeed;
+		//desiredSpeed *= 1.0f / SmartBody::SBScene::getScene()->getScale();
 
 		std::vector<double> weights;
 		SmartBody::SBAnimationBlendManager* stateManager = SmartBody::SBScene::getScene()->getBlendManager();
@@ -1510,8 +1518,11 @@ void PPRAISteeringAgent::adjustFacingAngle( float angleDiff )
 
 		idleTurnState->getWeightsFromParameters(-angleDiff, weights);
 		std::stringstream command;
-		command << "panim schedule char " << character->getName();			
-		command << " state " << idleTurnName << " loop false playnow false additive false joint null direct-play true ";
+		command << "panim schedule char " << character->getName();		
+		if (facingDirectBlend)
+			command << " state " << idleTurnName << " loop false playnow false additive false joint null direct-play true ";
+		else
+			command << " state " << idleTurnName << " loop false playnow false additive false joint null ";
 		for (int i = 0; i < idleTurnState->getNumMotions(); i++)
 			command << weights[i] << " ";
 		SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());

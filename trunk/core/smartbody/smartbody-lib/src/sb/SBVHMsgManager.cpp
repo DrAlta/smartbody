@@ -47,8 +47,14 @@ SBVHMsgManager::SBVHMsgManager() : SBService()
 	setName("VHMsg");
 
 	_port = "61616";
-	_server = "localhost";
-	_scope = "DEFAULT_SCOPE";
+	if (getenv( "VHMSG_SERVER" ))
+		_server = getenv( "VHMSG_SERVER" );
+	else
+		_server = "localhost";
+	if (getenv("VHMSG_SCOPE"))
+		_scope = getenv("VHMSG_SCOPE");
+	else
+		_scope = "DEFAULT_SCOPE";
 	_logListener = NULL;
 }
 

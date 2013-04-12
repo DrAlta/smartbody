@@ -39,4 +39,17 @@ SBAPI SBRetarget* SBRetargetManager::getRetarget( std::string sourceSk, std::str
 	return retarget;
 }
 
+SBAPI std::vector<StringPair> SBRetargetManager::getRetargetNames()
+{
+	std::vector<StringPair> retargetNames;
+	std::map<StringPair, SBRetarget*>::iterator ri;
+	for ( ri  = _retargets.begin();
+		  ri != _retargets.end();
+		  ri++)
+	{
+		retargetNames.push_back(ri->first);
+	}
+	return retargetNames;
+}
+
 }

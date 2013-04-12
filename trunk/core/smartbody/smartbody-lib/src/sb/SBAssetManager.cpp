@@ -361,8 +361,8 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 		if( skel->loadSk( input, 1.0) )
 		{
 			skeleton->ref();
-			skeleton->setFileName(fileName);
-			skeleton->setName(skeleton->getFileName());
+			skeleton->setFileName(finalPath);
+			skeleton->setName(fileName);
 			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skel->getName(), skeleton));
 		}
 		else
@@ -754,7 +754,7 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 				{
 					LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
 #else
-				motion->filename( pathname.native_file_string().c_str() );
+				motion->filename( pathname.native_file_string().c_str() );				
 				SBMotion* existingMotion = getMotion(filebase);
 				if (existingMotion)
 				{
