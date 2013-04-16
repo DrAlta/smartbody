@@ -211,7 +211,7 @@ void MeCtConstraint::init(SbmPawn* pawn, const char* rootJointName)
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		SkJoint* joint = nodeList[i]->joint;
-		_channels.add(joint->jointName(), SkChannel::Quat);	
+		_channels.add(joint->getMappedJointName(), SkChannel::Quat);	
 	}	
 
 	double ikReachRegion = characterHeight*0.02f;		

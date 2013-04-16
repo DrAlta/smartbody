@@ -3,11 +3,12 @@ print "|          Starting Constraint Demo          |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath('script', 'sbm-common/scripts')
 scene.loadAssets()
 
 # Runs the default viewer for camera
@@ -19,7 +20,7 @@ camera.setCenter(10, 150, 155.43)
 # Run motion retarget
 scene.run('motion-retarget.py')
 # Set up animation
-scene.run('init-param-animation.py')
+#scene.run('init-param-animation.py')
 
 # Set joint map for Brad
 print 'Setting up joint map for Brad'
@@ -53,7 +54,11 @@ for i in range(4):
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	# Retarget character
-	retargetCharacter(baseName, 'ChrBrad.sk')
+	if i== 0 : 
+		scene.run('BehaviorSetReaching.py')
+		setupBehaviorSet()
+	retargetBehaviorSet(baseName, 'ChrBrad.sk')
+	#retargetCharacter(baseName, 'ChrBrad.sk')
 	
 # Set camera position
 scene.getPawn('camera').setPosition(SrVec(0, -50, 0))
@@ -95,7 +100,7 @@ bml.execBMLAt(2, 'ChrBrad3', '<sbm:constraint effector="r_wrist" sbm:effector-ro
 bml.execBMLAt(2, 'ChrBrad3', '<sbm:constraint effector="l_wrist" sbm:effector-root="l_sternoclavicular" sbm:handle="cbrad3" target="pawn1" sbm:fade-in="0.5"/>')
 
 # Make all characters gaze at pawn2
-bml.execBMLAt(20, '*', '<gaze target="pawn2"/>')
+bml.execBMLAt(10, '*', '<gaze target="pawn2"/>')
 
 # Move pawn around
 gazeX = -200
