@@ -171,5 +171,5 @@ def retargetBehaviorSet(charName, skelName):
 		if sbMotion != None:
 			sbMotion.setMotionSkeletonName('common.sk')
 
-	scene.run("init-example-reach.py")
+	scene.run("init-reach.py")
 	reachSetup(charName, "KNN", 'common.sk', '')	

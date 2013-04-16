@@ -104,7 +104,7 @@ def reachSetup(characterName, interpolatorType, originalSkeleton, preFix):
 # handle grasp event
 # grasp event currently uses old-style command interface
 # by storing the command as the parameter of the event
-class GraspHandler(EventHandler):
+class GraspHandler(SBEventHandler):
 	def executeAction(this, event):
 		params = event.getParameters()
 		scene.command(params)
