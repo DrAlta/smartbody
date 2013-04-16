@@ -687,8 +687,9 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& 
 		}
 	}
 
-	size_t i = 0;
-	while (i < localMaxId.size() - 1)
+	//size_t i = 0;
+	//while (i < localMaxId.size() - 1)
+	for (size_t i = 0; i < localMaxId.size() - 1; i)
 	{
 		if (x[localMaxId[i + 1]] - x[localMaxId[i]] <= windowSize)
 		{
