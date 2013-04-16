@@ -23,6 +23,7 @@ class SBRetarget
 		SBAPI float  applyRetargetJointTranslation(std::string jointName, float inPos);
 		SBAPI std::vector<std::string> getEndJointNames();
 		SBAPI std::vector<std::string> getRelativeJointNames();
+		SBAPI float getHeightRatio();
 
 	protected:
 		std::string srcSkName;

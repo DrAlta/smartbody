@@ -54,19 +54,19 @@ def retargetBehaviorSet(charName, skelName):
 	#		retargetMotion(locoMotions[n], 'test_utah.sk', skelName, outDir + 'MaleLocomotion/');
 	createRetargetInstance('test_utah.sk', skelName)
 	# setup standard locomotion
-	scene.run("stateAllLocomotion.py")
+	scene.run("stateMaleLocomotion.py")
 	locomotionSetup('test_utah.sk', 'test_utah.sk', "base", '', 'all')
 	
 	# starting state, starting locomotion with different angle
-	scene.run("stateAllStarting.py")
+	scene.run("stateMaleStarting.py")
 	startingSetup('test_utah.sk', 'test_utah.sk', "base", '', 'all')
 
 	# idle turn state, facing adjusting
-	scene.run("stateAllIdleTurn.py")
+	scene.run("stateMaleIdleTurn.py")
 	idleTurnSetup('test_utah.sk', 'test_utah.sk', "base", '', 'all')
 
 	# step state, stepping adjusting
-	scene.run("stateAllStep.py")
+	scene.run("stateMaleStep.py")
 	stepSetup('test_utah.sk', 'test_utah.sk', "base", '', 'all')
 
 	# transitions
@@ -77,6 +77,6 @@ def retargetBehaviorSet(charName, skelName):
 	scene.run("init-steer-agents.py")
 	steerManager = scene.getSteerManager()
 	steerManager.setEnable(False)
-	setupSteerAgent(charName, skelName)	
+	setupSteerAgent(charName, 'all')	
 	steerManager.setEnable(True)
 	

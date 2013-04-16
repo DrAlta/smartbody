@@ -3,15 +3,15 @@ import math
 print "|--------------------------------------------|"
 print "|           Starting Crowd Demo              |"
 print "|--------------------------------------------|"
-
+	
 # Add asset paths
-scene.addAssetPath('script','sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
-scene.addAssetPath('motion', 'retarget\motion')
+#scene.addAssetPath('motion', 'retarget\motion')
 scene.addAssetPath('motion', 'sbm-common/common-sk')
-scene.addAssetPath('script', 'sbm-common/common-sk')
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath('script', 'sbm-common/scripts')
 scene.loadAssets()
 
 scene.setScale(1.0)
@@ -21,7 +21,7 @@ scene.getSimulationManager().setSimFps(60)
 # Run motion retarget
 scene.run('motion-retarget.py')
 # Set up animation
-scene.run('init-param-animation.py')
+#scene.run('init-param-animation.py')
 
 # Set joint map for Brad
 print 'Setting up joint map for Brad'
@@ -67,9 +67,14 @@ for i in range(amount):
 	brad.setDoubleAttribute('deformableMeshScale', .01)
 	brad.setStringAttribute('deformableMesh', 'ChrBrad')
 	# Retarget character
-	retargetCharacter(baseName, 'ChrBrad.sk', False)
+	#etargetCharacter(baseName, 'ChrBrad.sk', False)
+	# setup mocap locomotion
+	if i== 0 : 
+		scene.run('BehaviorSetMaleLocomotion.py')
+		setupBehaviorSet()
+	retargetBehaviorSet(baseName, 'ChrBrad.sk')
 	# Set up steering
-	setupSteerAgent(baseName, 'ChrBrad.sk')
+	#setupSteerAgent(baseName, 'ChrBrad.sk')
 	steerManager.setEnable(False)
 	brad.setBoolAttribute('steering.pathFollowingMode', False)
 	steerManager.setEnable(True)
@@ -100,7 +105,7 @@ class CrowdDemo(SBScript):
 		if bradReached:
 			for brad in bradList:
 				# Move character
-				bml.execBML(brad.getName(), '<locomotion speed="' +  str(random.uniform(1.2, 5)) + '" target="' +\
+				bml.execBML(brad.getName(), '<locomotion speed="' +  str(random.uniform(1.2, 5.0)) + '" target="' +\
 											vec2str(bradPath[bradCur]) + '" type="basic"/>')
 			bradCur = bradCur + 1
 			# If reaches max path, reset

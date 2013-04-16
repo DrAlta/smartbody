@@ -39,6 +39,8 @@
 #include <sb/SBAnimationState.h>
 
 #include <sb/SBEvent.h>
+#include <sb/SBRetargetManager.h>
+#include <sb/SBRetarget.h>
 #include <sbm/Heightfield.h>
 
 #define DebugInfo 0
@@ -652,26 +654,32 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		counter = 0;	
 	}
 
+	// always update current steering information
+	float curSpeed;
+	float curTurningAngle;
+	float curScoot;
+
+	curSpeed = steerCurSpeed;
+	curTurningAngle = steerCurAngle;
+	curScoot = steerCurScoot;
+
+	curSteerPos = SrVec(x,0,z);
+	curSteerDir = SrVec(sin(degToRad(yaw)), 0, cos(degToRad(yaw)));
+
+	SrMat rotMat; rotMat.roty(curTurningAngle*dt);
+	nextSteerDir = curSteerDir*rotMat;
+	float radius = fabs(curSpeed/curTurningAngle);
+	nextSteerPos = curSteerPos;// + curSteerDir*curSpeed*dt;//curSteerPos - curSteerDir*radius + nextSteerDir*radius; //
+
 	if (curStateName == locomotionName && steerPath.pathLength() != 0)
 	{
 		//locomotionEnd = true;
-		float curSpeed;
-		float curTurningAngle;
-		float curScoot;
+		
 
-		curSpeed = steerCurSpeed;
-		curTurningAngle = steerCurAngle;
-		curScoot = steerCurScoot;
-
-		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);
-		curSteerPos = SrVec(x,0,z);
-		curSteerDir = SrVec(sin(degToRad(yaw)), 0, cos(degToRad(yaw)));
+		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);		
 		// predict next position
 		//LOG("curSpeed = %f, curTurningAngle = %f, curScoot = %f",curSpeed,curTurningAngle,curScoot);
-		SrMat rotMat; rotMat.roty(curTurningAngle*dt);
-		nextSteerDir = curSteerDir*rotMat;
-		float radius = fabs(curSpeed/curTurningAngle);
-		nextSteerPos = curSteerPos;// + curSteerDir*curSpeed*dt;//curSteerPos - curSteerDir*radius + nextSteerDir*radius; //
+		
 		//SrVec nextPos = curPos + (curDir+nextDir)*0.5f*curSpeed*dt;
 		SrVec pathDir;
 		float pathDist;
@@ -1297,6 +1305,18 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 	else
 		inControl = true;
 
+	
+	SmartBody::SBAnimationBlend* blend = NULL;
+	if (curStateData)
+		blend = dynamic_cast<SmartBody::SBAnimationBlend*>(curStateData->state);
+
+	float parameterScale = 1.f;
+	if (character && blend)
+	{
+		SmartBody::SBRetarget* retarget = SmartBody::SBScene::getScene()->getRetargetManager()->getRetarget(blend->getBlendSkeleton(),character->getSkeleton()->getName());				
+		if (retarget)
+			parameterScale = 1.f/retarget->getHeightRatio();
+	}
 	//---update locomotion
 	float curSpeed = 0.0f;
 	float curTurningAngle = 0.0f;
@@ -1304,6 +1324,8 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 	float targetAngleDiff = 0.f;
 	if (curStateName == locomotionName && numGoals != 0)
 	{
+		
+
 		float tnormal[3];
 		Heightfield* heightField = SmartBody::SBScene::getScene()->getHeightfield();
 		if (heightField)
@@ -1312,7 +1334,8 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 		}
 		//LOG("current normal %f %f %f", tnormal[0], tnormal[1], tnormal[2]);
 
-		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);		
+		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);	
+		curSpeed /= parameterScale;
 		if (smoothing)
 		{
 			float addOnScoot = steeringCommand.scoot * paLocoScootGain;
@@ -1416,8 +1439,9 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 		{
 			std::vector<double> weights;
 			weights.resize(curStateData->state->getNumMotions());
-			//LOG("target Speed = %f, curSpeed = %f, angleDiff = %f, curTurningAngle = %f, curScoot = %f",targetSpeed, curSpeed, targetAngleDiff, curTurningAngle, curScoot);
-			curStateData->state->getWeightsFromParameters(curSpeed, curTurningAngle, curScoot, weights);
+			//LOG("Character name = %s",character->getName().c_str());
+			//LOG("target Speed = %f, curSpeed = %f, angleDiff = %f, curTurningAngle = %f, curScoot = %f",targetSpeed, curSpeed, targetAngleDiff, curTurningAngle, curScoot);			
+			curStateData->state->getWeightsFromParameters(curSpeed*parameterScale, curTurningAngle, curScoot, weights);
 			character->param_animation_ct->updateWeights(weights);
 		}
 	}
@@ -1494,7 +1518,16 @@ void PPRAISteeringAgent::startLocomotion( float angleDiff )
 			return;
 		}
 		weights.resize(state->getNumMotions());
-		state->getWeightsFromParameters(desiredSpeed, 0, 0, weights);
+
+		float parameterScale = 1.f;
+		if (character && state)
+		{
+			SmartBody::SBRetarget* retarget = SmartBody::SBScene::getScene()->getRetargetManager()->getRetarget(state->getBlendSkeleton(),character->getSkeleton()->getName());
+			if (retarget)
+				parameterScale = 1.f/retarget->getHeightRatio();
+		}
+
+		state->getWeightsFromParameters(desiredSpeed*parameterScale, 0, 0, weights);
 		std::stringstream command1;
 		command1 << "panim schedule char " << character->getName();
 		command1 << " state " << locomotionName << " loop true playnow false additive false joint null";

@@ -65,7 +65,7 @@ brad.createStandardControllers()
 
 # deformable mesh
 brad.setDoubleAttribute("deformableMeshScale", .01)
-brad.setStringAttribute("deformableMesh", "ChrBrad")
+#brad.setStringAttribute("deformableMesh", "ChrBrad")
 # lip syncing diphone setup
 brad.setStringAttribute("diphoneSetName", "default")
 brad.setBoolAttribute("useDiphone", True)
