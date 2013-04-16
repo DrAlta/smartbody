@@ -263,4 +263,9 @@ SBAPI std::vector<std::string> SBRetarget::getRelativeJointNames()
 {
 	return retargetRelativeJoints;
 }
+
+SBAPI float SBRetarget::getHeightRatio()
+{
+	return heightRatio;
+}
 }

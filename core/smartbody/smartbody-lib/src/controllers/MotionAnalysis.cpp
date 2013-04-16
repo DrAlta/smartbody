@@ -414,8 +414,8 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 		{
 			LocomotionAnalyzer* analyzer = locoAnalyzers[i];		
 			double moTime = timeManager->motionTimes[i];
-			//LocomotionLegCycle* legCycle = analyzer->getLegCycle(k,(float)moTime);		
-			LocomotionLegCycle* legCycle = analyzer->getLegCycleByIndex(k,maxCycle->cycleIdx);		
+			LocomotionLegCycle* legCycle = analyzer->getLegCycle(k,(float)moTime);		
+			//LocomotionLegCycle* legCycle = analyzer->getLegCycleByIndex(k,maxCycle->cycleIdx);		
 			legState.cycleTime += normalizeCycle*legCycle->cycleDuration*(float)weights[i];
 			legState.timeToNextCycle += (1.f-normalizeCycle)*legCycle->cycleDuration*(float)weights[i];
  			if ( i == maxWeightIndex ) //( weights[i] > 0.f ) // only test the motion with maximum weight
@@ -435,8 +435,8 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 			for (unsigned int m=0;m<legState.curSupportPos.size();m++)
 			{
 				// get weighted sum 
-				//legState.curSupportPos[m] += legCycle->getSupportPos((float)moTime,m)*(float)weights[i];	
-				legState.curSupportPos[m] += legCycle->getSupportPosNormalize(normalizeCycle,m)*(float)weights[i];	
+				legState.curSupportPos[m] += legCycle->getSupportPos((float)moTime,m)*(float)weights[i];	
+				//legState.curSupportPos[m] += legCycle->getSupportPosNormalize(normalizeCycle,m)*(float)weights[i];	
 				legState.stanceSupportPos[m] += legCycle->getStanceSupportPos(m)*(float)weights[i];
 			}			
 		}
@@ -535,7 +535,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 		for (unsigned int k=0;k<legStates.size();k++)
 		{
 			LegCycleState& legState = legStates[k];
-#define NAIVE_IKFIX 0
+#define NAIVE_IKFIX 1
 #if NAIVE_IKFIX
 			for (unsigned int m=0;m<legState.curSupportPos.size();m++)
 			{
@@ -548,8 +548,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 				if (maxHeight < height)
 					maxHeight = height;
 			}
-#else
-			
+#else			
 			float hoffset = getTerrainYOffset(legState, legState.flightTime);
 			float supHeightOffset = (hoffset + tgtBaseHeight) - gmatBase.get_translation().y; 
 			for (unsigned int m=0;m<legState.curSupportPos.size();m++)

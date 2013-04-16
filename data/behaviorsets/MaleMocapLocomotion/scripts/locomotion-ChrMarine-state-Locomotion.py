@@ -245,7 +245,7 @@ def marineLocomotionSetup(origSkelName, skeletonName, baseJoint, preFix, statePr
 		speed = motion.getJointSpeed(joint, 0, motion.getDuration())
 		#speedZ = motion.getJointSpeedAxis(joint, preFix+"Z", 0, motion.getDuration())
 		if (travelDirection[i] != 0):
-			direction = motion.getJointSpeedAxis(joint, "X", 0, motion.getDuration())
+			direction = -motion.getJointSpeedAxis(joint, "X", 0, motion.getDuration())
 		else:
 			direction = travelDirection[i]
 		
@@ -253,28 +253,8 @@ def marineLocomotionSetup(origSkelName, skeletonName, baseJoint, preFix, statePr
 		
 		statemarineLocomotion.setParameter(motions[i], speed, omega, direction)
 		#print "Motion " + motion.getName() + " (preFix+" + str(speed) + ", preFix+" + str(omega) + ", preFix+" + str(direction) + ")"
-		motion.disconnect()	
+		motion.disconnect()		
 	
-	
-	originalMotions.append("ChrMarine@Idle01")
-	originalMotions.append("ChrMarine@Jog01")
-	originalMotions.append("ChrMarine@Meander01")
-	originalMotions.append("ChrMarine@Run01")
-	originalMotions.append("ChrMarine@RunCircleLf01_smooth")
-	originalMotions.append("ChrMarine@RunCircleRt01_smooth")
-	originalMotions.append("ChrMarine@RunTightCircleLf01")
-	originalMotions.append("ChrMarine@RunTightCircleRt01")
-	originalMotions.append("ChrMarine@StrafeSlowLf01")
-	originalMotions.append("ChrMarine@StrafeSlowRt01")
-	originalMotions.append("ChrMarine@Walk01")
-	originalMotions.append("ChrMarine@WalkCircleLf01_smooth")
-	originalMotions.append("ChrMarine@WalkCircleRt01_smooth")
-	originalMotions.append("ChrMarine@WalkTightCircleLf01_smooth")
-	originalMotions.append("ChrMarine@WalkTightCircleRt01_smooth")
-	originalMotions.append("ChrMarine@Turn360Lf01")
-	originalMotions.append("ChrMarine@Turn360Rt01")
-	originalMotions.append("ChrMarine@StrafeFastLf01_smooth")
-	originalMotions.append("ChrMarine@StrafeFastRt01_smooth")
 	stanceArray = []
 	stanceArray.append([0.2, 0.7, 1.25, 1.80]) # idle
 	stanceArray.append([0.4, 0.05,1.1,0.75]) # jog
