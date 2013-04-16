@@ -43,6 +43,10 @@ def retargetBehaviorSet(charName, skelName):
 	locoMotions.append("ChrUtah_Idle01_StepForwardLf01")
 	locoMotions.append("ChrUtah_Idle01_StepSidewaysLf01")
 	
+	for i in range(0, len(locoMotions)):
+		motion = scene.getMotion(locoMotions[i])
+		motion.setMotionSkeletonName('test_utah.sk')
+		
 	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)

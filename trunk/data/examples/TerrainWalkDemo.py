@@ -49,6 +49,21 @@ scene.loadAssets()
 scene.command("skeletonmap ChrBrad.sk zebra2")
 scene.command("motionmapdir ChrBrad zebra2")
 
+scene.setScale(1.0)
+scene.setBoolAttribute('internalAudio', True)
+scene.run('default-viewer.py')
+camera = getCamera()
+camera.setEye(0, 1.71, 1.86)
+camera.setCenter(0, 1, 0.01)
+camera.setUpVector(SrVec(0, 1, 0))
+camera.setScale(1)
+camera.setFov(1.0472)
+camera.setFarPlane(100)
+camera.setNearPlane(0.1)
+camera.setAspectRatio(0.966897)
+cameraPos = SrVec(0, 1.6, 10)
+scene.getPawn('camera').setPosition(cameraPos)
+
 # Brad's face definition
 brad = scene.createCharacter("ChrBrad", "")
 bradSkeleton = scene.createSkeleton("ChrBrad.sk")
@@ -65,7 +80,7 @@ brad.createStandardControllers()
 
 # deformable mesh
 brad.setDoubleAttribute("deformableMeshScale", .01)
-#brad.setStringAttribute("deformableMesh", "ChrBrad")
+brad.setStringAttribute("deformableMesh", "ChrBrad")
 # lip syncing diphone setup
 brad.setStringAttribute("diphoneSetName", "default")
 brad.setBoolAttribute("useDiphone", True)
@@ -76,7 +91,7 @@ brad.setStringAttribute("gestureMap", "ChrBrad")
 brad.setBoolAttribute("gestureRequest.autoGestureTransition", True)
 brad.setBoolAttribute("ikPostFix", True)
 brad.setBoolAttribute("terrainWalk", True)
-
+scene.command("char ChrBrad viewer deformableGPU")
 scene.setDefaultCharacter("ChrBrad")
 
 # setup mocap locomotion

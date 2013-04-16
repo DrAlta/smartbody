@@ -4,13 +4,12 @@ print "|            Starting Reach Demo             |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
-scene.addAssetPath('motion', 'retarget\motion')
 scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath('script', 'sbm-common/scripts')
 scene.loadAssets()
 
 # Set scene parameters and camera
@@ -41,9 +40,9 @@ zebra2Map.applySkeleton(rachelSkeleton)
 zebra2Map.applyMotionRecurse('ChrRachel')
 
 # Retarget setup
-scene.run('motion-retarget.py')
+#scene.run('motion-retarget.py')
 # Animation setup
-scene.run('init-param-animation.py')
+#scene.run('init-param-animation.py')
 
 # Setting up Brads and Rachels
 print 'Setting up Brads'
@@ -59,7 +58,11 @@ for i in range(3):
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	# Retarget character
-	retargetCharacter(baseName, 'ChrBrad.sk')
+	#retargetCharacter(baseName, 'ChrBrad.sk')
+	if i== 0 : 
+		scene.run('BehaviorSetReaching.py')
+		setupBehaviorSet()
+	retargetBehaviorSet(baseName, 'ChrBrad.sk')
 	
 print 'Setting up Rachels'
 for i in range(2):
@@ -74,7 +77,8 @@ for i in range(2):
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 	# Retarget character
-	retargetCharacter(baseName, 'ChrRachel.sk')
+	#retargetCharacter(baseName, 'ChrRachel.sk')
+	retargetBehaviorSet(baseName, 'ChrRachel.sk')
 	
 # Setting character positions
 print 'Setting character positions'

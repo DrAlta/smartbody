@@ -48,6 +48,7 @@ def setupBehaviorSet():
 	locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn180Rt01")
 	for i in range(0, len(locoMotions)):
 		motion = scene.getMotion(locoMotions[i])
+		motion.setMotionSkeletonName('ChrBackovic.sk')
 		zebra2Map.applyMotion(motion)
 
 def retargetBehaviorSet(charName, skelName):

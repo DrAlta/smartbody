@@ -132,6 +132,7 @@ void SBJointMap::applyMotionInverse( SmartBody::SBMotion* motion )
 		return;
 
 	SkChannelArray& channels = motion->channels();
+#if 0
 	channels.startChannelNameChange();
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
@@ -141,6 +142,10 @@ void SBJointMap::applyMotionInverse( SmartBody::SBMotion* motion )
 		std::string to = (*iter).first;		
 		channels.changeChannelName(from, to);
 	}
+#else	
+	channels.setJointMapName(""); // remove joint map
+	channels.rebuild_hash_table();
+#endif
 
 	for (std::vector<std::string>::iterator iter = _mappedMotions.begin();
 		 iter != _mappedMotions.end();
@@ -159,7 +164,7 @@ void SBJointMap::applySkeletonInverse( SmartBody::SBSkeleton* skeleton )
 {
 	if (!skeleton)
 		return;
-
+#if 0
 	std::vector<SkJoint*> joints = skeleton->joints();
 	std::vector<bool> jointUpdateTable;
 	jointUpdateTable.resize(joints.size(),false);	
@@ -188,7 +193,13 @@ void SBJointMap::applySkeletonInverse( SmartBody::SBSkeleton* skeleton )
 		std::string from = (*iter).second;
 		channels.changeChannelName(from, to);
 	}
-	skeleton->resetSearchJoint();	
+#else
+	// remove joint map
+	skeleton->setJointMapName("");	
+	skeleton->channels().setJointMapName("");
+#endif
+	skeleton->resetSearchJoint();
+	skeleton->updateJointMap();	
 	for (std::vector<std::string>::iterator iter = _mappedSkeletons.begin();
 		 iter != _mappedSkeletons.end();
 		 iter++)
