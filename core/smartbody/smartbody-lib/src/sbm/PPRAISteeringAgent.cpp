@@ -601,6 +601,18 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 	float pathSpeedThreshold = speedThreshold*sceneScale;	
 	float smallDistThreshold = 0.05f*sceneScale;
 
+	SmartBody::SBAnimationBlend* blend = NULL;
+	if (curStateData)
+		blend = dynamic_cast<SmartBody::SBAnimationBlend*>(curStateData->state);
+
+	float parameterScale = 1.f;
+	if (character && blend)
+	{
+		SmartBody::SBRetarget* retarget = SmartBody::SBScene::getScene()->getRetargetManager()->getRetarget(blend->getBlendSkeleton(),character->getSkeleton()->getName());				
+		if (retarget)
+			parameterScale = 1.f/retarget->getHeightRatio();
+	}
+
 	//if (steerPath.pathLength() == 0) // do nothing if there is no steer path
 	//	return; 
 	if (character->param_animation_ct->isIdle() && steerPath.pathLength() > 0)    // need to define when you want to start the locomotion
@@ -677,6 +689,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		
 
 		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);		
+		curSpeed /= parameterScale;
 		// predict next position
 		//LOG("curSpeed = %f, curTurningAngle = %f, curScoot = %f",curSpeed,curTurningAngle,curScoot);
 		
@@ -758,9 +771,9 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		std::vector<double> weights;
 		weights.resize(curStateData->state->getNumMotions());
 		if (terrainMode)
-			curStateData->state->getWeightsFromParameters(newSpeed, nextTurningAngle, ang, weights);
+			curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, ang, weights);
 		else
-			curStateData->state->getWeightsFromParameters(newSpeed, nextTurningAngle, newScoot, weights);
+			curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, newScoot, weights);
 		character->param_animation_ct->updateWeights(weights);	
 
 		steerCurSpeed = newSpeed;

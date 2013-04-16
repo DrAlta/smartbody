@@ -4,10 +4,11 @@ print "|      Starting Multiple Character Demo      |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrRachel')
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath('script', 'sbm-common/scripts')
 scene.loadAssets()
 
 # Runs the default viewer for camera

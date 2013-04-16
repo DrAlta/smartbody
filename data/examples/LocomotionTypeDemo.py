@@ -4,13 +4,13 @@ print "|       Starting Locomotion Type Demo        |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
-scene.addAssetPath('motion', 'retarget\motion')
 scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath('script', 'sbm-common/scripts')
 scene.loadAssets()
 
 # Set scene parameters and camera
@@ -38,9 +38,9 @@ zebra2Map.applySkeleton(bradSkeleton)
 zebra2Map.applyMotionRecurse('ChrBrad')
 
 # Retarget setup
-scene.run('motion-retarget.py')
+#scene.run('motion-retarget.py')
 # Animation setup
-scene.run('init-param-animation.py')
+#scene.run('init-param-animation.py')
 
 # Set up 3 Brads
 print 'Adding characters into scene'
@@ -61,7 +61,11 @@ for i in range(3):
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	# Retarget character
-	retargetCharacter(baseName, 'ChrBrad.sk', False)
+	#retargetCharacter(baseName, 'ChrBrad.sk', False)
+	if i== 0 : 
+		scene.run('BehaviorSetMaleLocomotion.py')
+		setupBehaviorSet()
+	retargetBehaviorSet(baseName, 'ChrBrad.sk')
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():

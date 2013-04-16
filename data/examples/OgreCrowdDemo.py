@@ -5,18 +5,16 @@ print "|         Starting Ogre Crowd Demo           |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
-scene.addAssetPath('script', 'sbm-common/scripts/behaviorsets')
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'Ogre')
 scene.addAssetPath('motion', 'ChrBrad')
-scene.addAssetPath('motion', 'retarget/motion')
 scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath('script', 'behaviorsets')
+scene.addAssetPath('script', 'sbm-common/scripts')
 scene.loadAssets()
 
 # Set scene parameters and camera
-scene.setScale(0.01)
+scene.setScale(0.1)
 #scene.getPawn('camera').setPosition(SrVec(0, -5, 0))
 
 # Set joint map for Sinbad
@@ -29,31 +27,19 @@ ogreSk = scene.getSkeleton(sinbadSkName)
 sinbadMap.applySkeleton(ogreSk)
 
 # Behavior set setup
-scene.run('behaviorsetup.py')
+#scene.run('behaviorsetup.py')
 
 # Animation setup
-scene.run('init-param-animation.py')
+#scene.run('init-param-animation.py')
 steerManager = scene.getSteerManager()
 
-# Setting up Sinbad
-# print 'Setting up Sinbad'
-# sinbadName = 'sinbad'
-# sinbad = scene.createCharacter(sinbadName,'')
-# sinbadSk = scene.createSkeleton(sinbadSkName)
-# sinbad.setSkeleton(sinbadSk)
-# sinbadPos = SrVec(0,5.16, 0)
-# sinbad.setPosition(sinbadPos)
-# sinbad.createStandardControllers()
-# sinbad.setStringAttribute('deformableMesh', 'Sinbad')
-# scene.run('BehaviorSetMaleLocomotion.py')
-# setupBehaviorSet()
-# retargetBehaviorSet(sinbadName,sinbadSkName)
-# scene.command('char sinbad viewer deformableGPU')
+#scene.getPawn('camera').setPosition(SrVec(0, -5, 0))
 
 print 'Setting up Sinbads'
 amount = 20
 row = 0; column = 0; 
 offsetX = 0; offsetZ = 0;
+sinbadList = []
 for i in range(amount):
 	sinbadName = 'sinbad%s' % i
 	sinbad = scene.createCharacter(sinbadName,'')
@@ -70,84 +56,85 @@ for i in range(amount):
 	sinbad.setPosition(sinbadPos)
 	sinbad.createStandardControllers()
 	sinbad.setStringAttribute('deformableMesh', 'Sinbad')
-	scene.run('BehaviorSetMaleLocomotion.py')
-	setupBehaviorSet()
+	if i == 0 :
+		scene.run('BehaviorSetMaleLocomotion.py')
+		setupBehaviorSet()
 	retargetBehaviorSet(sinbadName,sinbadSkName)	
+	sinbadList.append(sinbad)
 	scene.command("char %s viewer deformableGPU" % sinbadName)	
 	# Play default animation
-	bml.execBML(sinbadName, '<body posture="Sinbad.skeleton.xmlChrUtah_Idle001"/>')
+	bml.execBML(sinbadName, '<body posture="ChrUtah_Idle001"/>')
 	
 steerManager.setEnable(False)
 steerManager.setEnable(True)
 
+# Set up list of Brads
 
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(0, 5.98, 13.44)
+camera.setEye(0, 80.98, 53.44)
 camera.setCenter(1.0, 1.7, -39.5)
 camera.setUpVector(SrVec(0, 1, 0))
 camera.setScale(1)
 camera.setFov(1.0472)
-camera.setFarPlane(100)
+camera.setFarPlane(500)
 camera.setNearPlane(0.1)
 camera.setAspectRatio(1.02)
 
 sim.start()
 sim.resume()
-'''
-steeringGroup = []
-pathfindingGroup = []
-# Assign groups
-print 'Assigning Brads in groups'
-for name in scene.getCharacterNames():
-	if 'ChrBrad' in name:
-		if len(steeringGroup) < amount/2:
-			steeringGroup.append(scene.getCharacter(name))
-		else:
-			# Set pathfinding on
-			scene.getCharacter(name).setBoolAttribute('steering.pathFollowingMode', True)
-			pathfindingGroup.append(scene.getCharacter(name))
 
-# Adding pawns to scene
-print 'Adding pawns to scene'
-target0 = scene.createPawn('target0')
-target0.setPosition(SrVec(-10, 0, -10))
-target1 = scene.createPawn('target1')
-target1.setPosition(SrVec(-4, 0, 10))
-			
-group1Reached = True
-group2Reached = True
+# Paths for characters
+sinbadPath = [SrVec(-120, -120, 0), SrVec(120, 120, 0), SrVec(120, -120, 0), SrVec(-120, 120, 0)]
+sinbadCur = 0
+pathAmt = len(sinbadPath)
+sinbadReached = True
 
-# Update to repeat paths
-last = 0
-canTime = True
-delay = 30
-class LocomotionDemo(SBScript):
+class CrowdDemo(SBScript):
 	def update(self, time):
-		global group1Reached, group2Reached, canTime, last
-		if canTime:
-			last = time
-			canTime = False
-			group1Reached = group2Reached = True
-		diff = time - last
-		if diff >= delay:
-			diff = 0
-			canTime = True
-		# Once group 1 completes path, do again
-		if group1Reached:
-			for brad in steeringGroup:
-				bml.execBML(brad.getName(), '<locomotion manner="run" target="-10 10 -4 -10 target1 target0"/>')
-			group1Reached = False
-		# Once group 2 completes path, do again
-		if group2Reached:
-			for brad in pathfindingGroup:
-				bml.execBML(brad.getName(), '<locomotion manner="run" target="10 10 4 -10 4 10 10 -10"/>')
-			group2Reached = False
-			
+		global sinbadReached, sinbadCur
+		# Once utah completes path, do again
+		if sinbadReached:
+			for sinbad in sinbadList:
+				# Move character
+				bml.execBML(sinbad.getName(), '<locomotion speed="' +  str(random.uniform(1.2, 5.0)) + '" target="' +\
+											vec2str(sinbadPath[sinbadCur]) + '" type="basic"/>')
+			sinbadCur = sinbadCur + 1
+			# If reaches max path, reset
+			if sinbadCur >= pathAmt:
+				sinbadCur = 0
+			sinbadReached = False
+		
 # Run the update script
-scene.removeScript('locomotiondemo')
-locomotiondemo = LocomotionDemo()
-scene.addScript('locomotiondemo', locomotiondemo)
-'''
+scene.removeScript('crowddemo')
+crowddemo = CrowdDemo()
+scene.addScript('crowddemo', crowddemo)
+
+reachCount = 0
+# Locomotion handler to check if characters have arrived
+class LocomotionHandler(SBEventHandler):
+	def executeAction(self, ev):
+		global sinbadReached, reachCount
+		params = ev.getParameters()
+		if 'success' in params:
+			if 'sinbad' in params:
+				reachCount = reachCount + 1
+				if reachCount >= 10:
+					sinbadReached = True	
+					reachCount = 0
+
+locomotionHdl = LocomotionHandler()
+evtMgr = scene.getEventManager()
+evtMgr.addEventHandler('locomotion', locomotionHdl)
+
+def vec2str(vec):
+	''' Converts SrVec to string '''
+	x = vec.getData(0)
+	y = vec.getData(1)
+	z = vec.getData(2)
+	if -0.0001 < x < 0.0001: x = 0
+	if -0.0001 < y < 0.0001: y = 0
+	if -0.0001 < z < 0.0001: z = 0
+	return "" + str(x) + " " + str(y) + " " + str(z) + ""

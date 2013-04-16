@@ -103,7 +103,7 @@ class PerlinNoiseDemo(SBScript):
 		global lastTime
 		timeDiff = time - lastTime
 		# When time's up, do action
-		if timeDiff >= 14:
+		if timeDiff >= 5:
 			lastTime = time
 			# Perlin noise can be added by adding sbm:joint-range="l_shoulder" sbm:frequency="0.03" sbm:scale="0.02" at the end 
 			# Perlin noise

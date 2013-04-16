@@ -3,11 +3,12 @@ print "|         Starting Character Demo            |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath('script', 'sbm-common/scripts')
 scene.loadAssets()
 
 # Set scene parameters and camera
@@ -40,12 +41,12 @@ print 'Establishing lip syncing data set'
 scene.run('init-diphoneDefault.py')
 
 # Set up animation
-print 'Setting up animation'
-scene.run('init-param-animation.py')
-''
+#print 'Setting up animation'
+#scene.run('init-param-animation.py')
+#''
 # Set up retargeting
-print 'Setting up retargeting'
-scene.run('motion-retarget.py')
+#print 'Setting up retargeting'
+#scene.run('motion-retarget.py')
 
 # Set gesture map for Brad
 print 'Setting gesture map for Brad'
@@ -168,7 +169,10 @@ brad.setVoiceCode('MicrosoftAnna')
 brad.setStringAttribute('gestureMap', 'ChrBrad')
 brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 # Retarget 
-retargetCharacter('ChrBrad', 'ChrBrad.sk')
+#retargetCharacter('ChrBrad', 'ChrBrad.sk')
+scene.run('BehaviorSetMaleLocomotion.py')
+setupBehaviorSet()
+retargetBehaviorSet('ChrBrad', 'ChrBrad.sk')
 # Idle pose
 bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
 # Turn on GPU deformable geometry
@@ -176,8 +180,6 @@ scene.command('char ChrBrad viewer deformableGPU')
 
 # Set up steering
 print 'Setting up steering'
-scene.run('init-steer-agents.py')
-setupSteerAgent('ChrBrad', 'ChrBrad.sk')
 steerManager = scene.getSteerManager()
 steerManager.setEnable(False)
 brad.setBoolAttribute('steering.pathFollowingMode', True)

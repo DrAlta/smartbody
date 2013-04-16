@@ -5,12 +5,12 @@ print "|         Starting Locomotion Demo           |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
-scene.addAssetPath('motion', 'retarget\motion')
 scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath('script', 'sbm-common/scripts')
 scene.loadAssets()
 
 # Set scene parameters and camera
@@ -38,9 +38,9 @@ zebra2Map.applySkeleton(bradSkeleton)
 zebra2Map.applyMotionRecurse('ChrBrad')
 
 # Retarget setup
-scene.run('motion-retarget.py')
+#scene.run('motion-retarget.py')
 # Animation setup
-scene.run('init-param-animation.py')
+#scene.run('init-param-animation.py')
 steerManager = scene.getSteerManager()
 
 # Setting up Brads
@@ -68,9 +68,13 @@ for i in range(amount):
 	brad.setDoubleAttribute('deformableMeshScale', .01)
 	brad.setStringAttribute('deformableMesh', 'ChrBrad')
 	# Retarget character
-	retargetCharacter(baseName, 'ChrBrad.sk', False)
+	#retargetCharacter(baseName, 'ChrBrad.sk', False)
+	if i== 0 : 
+		scene.run('BehaviorSetMaleLocomotion.py')
+		setupBehaviorSet()
+	retargetBehaviorSet(baseName, 'ChrBrad.sk')
 	# Set up steering
-	setupSteerAgent(baseName, 'ChrBrad.sk')
+	#setupSteerAgent(baseName, 'ChrBrad.sk')
 	steerManager.setEnable(False)
 	brad.setBoolAttribute('steering.pathFollowingMode', False)
 	steerManager.setEnable(True)
