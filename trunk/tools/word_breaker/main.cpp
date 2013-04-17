@@ -548,7 +548,7 @@ void init_XML()
 //	 <mark name="sp1:T8" />town
 //	 <mark name="sp1:T9" />
 //	 </speech>
-string create_tts_request( const string & utterance_id )
+string create_tts_request( const string & utterance_id, const string & voice )
 {
    Utterance * ut = &m_utterances[ utterance_id ];
 
@@ -571,7 +571,7 @@ string create_tts_request( const string & utterance_id )
       words_and_markers += marker1 + ut->words.at( i ) + marker2;
    }
 
-   string xml = "speak " + ut->speaker + " 1 M021 " + ut->utterance_id + ".wav <?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+   string xml = "speak " + ut->speaker + " 1 " + voice + " " + ut->utterance_id + ".wav <?xml version=\"1.0\" encoding=\"UTF-8\"?>"
       "<speech id=\"" + ut->speech_id + "\" ref=\"\" type=\"application/ssml+xml\">" + words_and_markers + "</speech>";
 
    return xml;
@@ -704,6 +704,7 @@ void parse_ltf_file( const string & ltf_file_name, Utterance & utterance )
 
 int main( int argc, char * argv[] )
 {
+   string voice = "MicrosoftAnna";
    string input_file = "";
    string ltf_dir = "";
    vector<string> error_utterances;
@@ -717,6 +718,11 @@ int main( int argc, char * argv[] )
          printf( "Missing argument for parameter %s.\n\nPress any key to exit.\n", argv[ i ] );
          _getch();
          exit(1);
+      }
+	   else if ( strcmp( argv[ i ], "-voice" ) == 0 )
+      {
+         printf( "Voice: %s\n", argv[ i + 1 ] );
+         voice = argv[ i + 1 ];
       }
       else if ( strcmp( argv[ i ], "-input" ) == 0 )
       {
@@ -738,6 +744,7 @@ int main( int argc, char * argv[] )
       {
          printf( "Unknown argument '%s'. \n\n"
             "Known arguments:\n"
+			"-voice <voice>, voice to use when querying TTS engine\n"
             "-input <input_file_name>, file with utterances text and ID tuples.\n"
             "-ltf <ltf_directory_name>, optionally parse Impersonator .ltf files to use for phoneme info.\n"
             "-output <output_directory_name>, location where word break boundary timing files will be saved.\n\n"
@@ -814,7 +821,7 @@ int main( int argc, char * argv[] )
          printf( "Text '%s'\n\n", it->second.text.c_str() );
 
          // Create xml request to send to TTS
-         xml_request = create_tts_request( it->second.utterance_id );
+         xml_request = create_tts_request( it->second.utterance_id, voice );
 
          // Send request to TTS
          vhmsg::ttu_notify2( m_request_message, xml_request.c_str() );
@@ -827,7 +834,7 @@ int main( int argc, char * argv[] )
          {
             Sleep( 100 );
             timer += 100;
-            if ( timer > 3000 )
+            if ( timer > 30000000 )
             {
                it->second.markers.clear();
 
