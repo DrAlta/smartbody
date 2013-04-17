@@ -123,6 +123,7 @@ class MeCtParamAnimation : public MeCtContainer
 		SBAPI PABlendData* getCurrentPABlendData();
 		bool hasPABlend(const std::string& stateName);
 		bool isIdle();
+		bool isInTransition();
 
 	private:
 		void autoScheduling(double time);

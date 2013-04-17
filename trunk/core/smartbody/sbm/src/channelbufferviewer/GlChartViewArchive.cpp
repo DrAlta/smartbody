@@ -22,6 +22,8 @@
 
 #include "GlChartViewArchive.hpp"
 #include <string.h>
+#include <sr/sr_euler.h>
+#include <vhcl_math.h>
 
 
 GlChartViewSeries::GlChartViewSeries()
@@ -55,10 +57,15 @@ void GlChartViewSeries::SetColor(int index, SrVec& color)
 
 SrVec GlChartViewSeries::GetEulerFromQuaternion(SrQuat& quat)
 {
+	const int rotType = 132;
 	SrVec euler;
-	euler.x = atan2(2.0f*(quat.w*quat.x+quat.y*quat.z), 1.0f-2.0f*(quat.x*quat.x+quat.y*quat.y))*180.0f/3.14159265f;
-	euler.y = asin(2.0f*(quat.w*quat.y - quat.z*quat.x))*180.0f/3.14159265f;
-	euler.z = atan2(2.0f*(quat.w*quat.z + quat.x*quat.y), 1.0f-2.0f*(quat.y*quat.y+quat.z*quat.z))*180.0f/3.14159265f;
+	//euler.x = atan2(2.0f*(quat.w*quat.x+quat.y*quat.z), 1.0f-2.0f*(quat.x*quat.x+quat.y*quat.y))*180.0f/3.14159265f;
+	//euler.y = asin(2.0f*(quat.w*quat.y - quat.z*quat.x))*180.0f/3.14159265f;
+	//euler.z = atan2(2.0f*(quat.w*quat.z + quat.x*quat.y), 1.0f-2.0f*(quat.y*quat.y+quat.z*quat.z))*180.0f/3.14159265f;
+	SrMat mat;
+	quat.get_mat(mat);		
+	sr_euler_angles(rotType, mat, euler.x, euler.y, euler.z);	
+	euler = euler*vhcl::RAD_TO_DEG();
 	return euler;
 }
 

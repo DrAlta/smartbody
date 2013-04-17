@@ -988,7 +988,9 @@ std::vector<SmartBody::SBMotionEvent*>& SkMotion::getMotionEvents()
 SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 {
 	SkChannelArray& mchan_arr = this->channels();
-	SkMotion *smooth_p = new SmartBody::SBMotion();
+	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
+	SmartBody::SBMotion *smooth_p = new SmartBody::SBMotion();
+	smooth_p->setMotionSkeletonName(originalMotion->getMotionSkeletonName());	
 	srSynchPoints sp(synch_points);
 	smooth_p->synch_points = sp;
 	smooth_p->init( mchan_arr );
@@ -2056,7 +2058,9 @@ SkMotion* SkMotion::buildMirrorMotion( SkSkeleton* skeleton )
 SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map<std::string,bool>& jointNameMap)
 {	
 	SkChannelArray& mchan_arr = this->channels();
-	SkMotion *mirror_p = new SmartBody::SBMotion();
+	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
+	SmartBody::SBMotion *mirror_p = new SmartBody::SBMotion();
+	mirror_p->setMotionSkeletonName(originalMotion->getMotionSkeletonName());	
 	srSynchPoints sp(synch_points);
 	mirror_p->synch_points = sp;
 	mirror_p->init( mchan_arr );

@@ -175,6 +175,8 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	}
 	else
 	{
+		//ppraiAgent->currentTargetSpeed = (float)c->getDoubleAttribute("steering.pathMaxSpeed");
+		ppraiAgent->desiredSpeed = (float)c->getDoubleAttribute("steering.pathMaxSpeed");
 		ppraiAgent->currentTargetSpeed = (float)c->getDoubleAttribute("steering.pathMaxSpeed");
 	}
 

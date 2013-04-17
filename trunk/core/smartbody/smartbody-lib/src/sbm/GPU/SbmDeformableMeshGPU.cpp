@@ -109,7 +109,7 @@ attribute vec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
 attribute vec3 tangent, binormal;\n\
 varying vec4 vPos;\n\
-varying vec3 normal,lightDir[2],halfVector[2];\n\
+varying vec3 normal,lightDir[4],halfVector[4];\n\
 varying vec3 tv,bv;\n\
 mat4 GetTransformation(float id)\n \
 { \n\
@@ -161,17 +161,17 @@ halfVector[i] = normalize(hv.xyz);\n\
 }\n\
 int colorIdx = int(gl_Vertex.w); \n\
 gl_TexCoord[0] = gl_MultiTexCoord0;\n\
-//if (useNormalMap == 1 )\n\
-//{\n\
-//normal = normalize(gl_NormalMatrix * skin[1].xyz);\n\
-//tv     = normalize(gl_NormalMatrix * skin[2].xyz);\n\
-//bv     = normalize(gl_NormalMatrix * skin[3].xyz);\n\
-//}\n\
-//else {\n\
+if (updateNormal == 1 )\n\
+{\n\
+normal = normalize(gl_NormalMatrix * skin[1].xyz);\n\
+tv     = normalize(gl_NormalMatrix * skin[2].xyz);\n\
+bv     = normalize(gl_NormalMatrix * skin[3].xyz);\n\
+}\n\
+else {\n\
 normal = normalize(gl_NormalMatrix * gl_Normal.xyz);\n\
 tv     = normalize(gl_NormalMatrix * tangent.xyz);\n\
 bv     = normalize(gl_NormalMatrix * binormal.xyz);\n\
-//}\n\
+}\n\
 }\n";
 
 std::string shaderBasicFS =
@@ -190,7 +190,7 @@ uniform int  useTexture;\n\
 uniform int  useNormalMap;\n\
 uniform int  useSpecularMap;\n\
 uniform int  useShadowMap;\n\
-varying vec3 normal,lightDir[2],halfVector[2];\n\
+varying vec3 normal,lightDir[4],halfVector[4];\n\
 varying vec3 tv,bv;\n\
 varying vec4 vPos;\n\
 uniform vec4 diffuseMaterial;\n\
@@ -385,9 +385,13 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	GLuint specularLoc = glGetUniformLocation(program,"specularMaterial");	
 	GLuint shinenessLoc = glGetUniformLocation(program,"shineness");
 	GLuint useTextureLoc = glGetUniformLocation(program,"useTexture");
+	GLuint updateNormalLoc = glGetUniformLocation(program,"updateNormal");
 	GLuint useNormalMapLoc = glGetUniformLocation(program,"useNormalMap");
 	GLuint useSpecularMapLoc = glGetUniformLocation(program,"useSpecularMap");
 	GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
+
+	// update normal vectors for the deformable mesh. it is significantly slower to do this. So turn off by default. 
+	//glUniform1i(updateNormalLoc,1);
 
 	GLuint idQuery;
 	GLuint count = 0;

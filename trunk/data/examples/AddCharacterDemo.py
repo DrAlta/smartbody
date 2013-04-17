@@ -170,11 +170,11 @@ brad.setStringAttribute('gestureMap', 'ChrBrad')
 brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 # Retarget 
 #retargetCharacter('ChrBrad', 'ChrBrad.sk')
-scene.run('BehaviorSetMaleLocomotion.py')
+scene.run('BehaviorSetMaleMocapLocomotion.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrBrad', 'ChrBrad.sk')
 # Idle pose
-bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
+
 # Turn on GPU deformable geometry
 scene.command('char ChrBrad viewer deformableGPU')
 
@@ -189,10 +189,8 @@ steerManager.setEnable(True)
 print 'Starting the simulation'
 sim.start()
 
-bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
-
+bml.execBML('ChrBrad', '<body posture="ChrMarine@Idle01"/>')
 bml.execBML('ChrBrad', '<saccade mode="listen"/>')
-
 bml.execBML('ChrBrad', '<gaze sbm:handle="brad" target="camera"/>')
 
 sim.resume()

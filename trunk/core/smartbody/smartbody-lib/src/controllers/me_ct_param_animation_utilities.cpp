@@ -31,7 +31,7 @@
 
 const double timeThreshold = 0.05;
 
-#define NEW_EULER 1
+#define NEW_EULER 0
 
 PATimeManager::PATimeManager()
 {
@@ -1209,8 +1209,10 @@ void PATransitionManager::update()
 		{
 			if (transition->getEaseOutStart()[i] < fromKey[0])
 			{
-				transition->getEaseOutStart()[i] += transition->getSourceBlend()->motions[id]->duration();
-				transition->getEaseOutEnd()[i] += transition->getSourceBlend()->motions[id]->duration();
+				transition->getEaseOutStart()[i] += from->getStateMotionDuration(id);//transition->getSourceBlend()->motions[id]->duration();
+				transition->getEaseOutEnd()[i] += from->getStateMotionDuration(id);//transition->getSourceBlend()->motions[id]->duration();
+				//transition->getEaseOutStart()[i] += transition->getSourceBlend()->
+
 			}
 			easeOutStarts.push_back(getTime(transition->getEaseOutStart()[i], fromKey, transition->getSourceBlend()->keys, from->weights));
 			easeOutEnds.push_back(getTime(transition->getEaseOutEnd()[i], fromKey, transition->getSourceBlend()->keys, from->weights));
@@ -1232,8 +1234,10 @@ void PATransitionManager::update()
 	{
 		if (transition->getEaseInStart() < toKey[0])
 		{
-			transition->setEaseInStart(transition->getEaseInStart() + transition->getDestinationBlend()->motions[id]->duration());
-			transition->setEaseInEnd(transition->getEaseInEnd() + transition->getDestinationBlend()->motions[id]->duration());
+			//transition->setEaseInStart(transition->getEaseInStart() + transition->getDestinationBlend()->motions[id]->duration());
+			//transition->setEaseInEnd(transition->getEaseInEnd() + transition->getDestinationBlend()->motions[id]->duration());
+			transition->setEaseInStart(transition->getEaseInStart() + to->getStateMotionDuration(id));
+			transition->setEaseInEnd(transition->getEaseInEnd() + to->getStateMotionDuration(id));
 		}
 	}
 	s2 = getTime(transition->getEaseInStart(), toKey, transition->getDestinationBlend()->keys, to->weights);
