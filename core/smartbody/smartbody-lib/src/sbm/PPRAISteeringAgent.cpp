@@ -145,7 +145,7 @@ void PPRAISteeringAgent::addSteeringAttributes()
 		character->createDoubleAttribute("steering.desiredSpeed", 1.0f, true, "steering", 310, false, false, false, ""); 	
 
 	if (!character->hasAttribute("steering.pathAngleAcc"))
-		character->createDoubleAttribute("steering.pathAngleAcc", 1000.f, true, "steering", 310, false, false, false, "");
+		character->createDoubleAttribute("steering.pathAngleAcc", 250.f, true, "steering", 310, false, false, false, "");
 
 	if (!character->hasAttribute("steering.pathMaxSpeed"))
 		character->createDoubleAttribute("steering.pathMaxSpeed", 1.5f, true, "steering", 310, false, false, false, "");	
@@ -590,7 +590,8 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 	std::string curStateName = "";
 	if (curStateData)
 		curStateName = curStateData->state->stateName;
-		
+
+	bool inTransition = character->param_animation_ct->isInTransition();
 	
 	bool locomotionEnd = false;
 	static int counter = 0;		
@@ -630,7 +631,8 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		float sceneScale = 1.f/SmartBody::SBScene::getScene()->getScale();
 		//LOG("pathfollowing:targetSpeed = %f",this->currentTargetSpeed);
 		float maxSpeed = this->currentTargetSpeed*sceneScale;//(float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
-		nextPtOnPath = steerPath.pathPoint(distOnPath+maxSpeed);		
+		nextPtOnPath = steerPath.pathPoint(distOnPath+maxSpeed);
+		
 		float targetAngle = radToDeg(atan2(nextPtOnPath.x - x, nextPtOnPath.z - z));
 		normalizeAngle(targetAngle);
 		//LOG("nextPtOnPath = %f %f, curePt = %f %f",nextPtOnPath.x,nextPtOnPath.z, x,z);
@@ -671,17 +673,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 	float curTurningAngle;
 	float curScoot;
 
-	curSpeed = steerCurSpeed;
-	curTurningAngle = steerCurAngle;
-	curScoot = steerCurScoot;
-
-	curSteerPos = SrVec(x,0,z);
-	curSteerDir = SrVec(sin(degToRad(yaw)), 0, cos(degToRad(yaw)));
-
-	SrMat rotMat; rotMat.roty(curTurningAngle*dt);
-	nextSteerDir = curSteerDir*rotMat;
-	float radius = fabs(curSpeed/curTurningAngle);
-	nextSteerPos = curSteerPos;// + curSteerDir*curSpeed*dt;//curSteerPos - curSteerDir*radius + nextSteerDir*radius; //
+	
 
 	if (curStateName == locomotionName && steerPath.pathLength() != 0)
 	{
@@ -690,9 +682,22 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 
 		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);		
 		curSpeed /= parameterScale;
+
+
+		//curSpeed = steerCurSpeed;
+		//curTurningAngle = steerCurAngle;
+		//curScoot = steerCurScoot;
+
+		curSteerPos = SrVec(x,0,z);
+		curSteerDir = SrVec(sin(degToRad(yaw)), 0, cos(degToRad(yaw)));
+
+		SrMat rotMat; rotMat.roty(curTurningAngle*dt);
+		nextSteerDir = curSteerDir*rotMat;
+		float radius = fabs(curSpeed/curTurningAngle);
+		nextSteerPos = curSteerPos;// + curSteerDir*curSpeed*dt;//curSteerPos - curSteerDir*radius + nextSteerDir*radius; //
 		// predict next position
 		//LOG("curSpeed = %f, curTurningAngle = %f, curScoot = %f",curSpeed,curTurningAngle,curScoot);
-		
+#if 1
 		//SrVec nextPos = curPos + (curDir+nextDir)*0.5f*curSpeed*dt;
 		SrVec pathDir;
 		float pathDist;
@@ -700,16 +705,16 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		nextPtOnPath = steerPath.closestPointOnNextGoal(nextSteerPos, pathDir, pathDist);
 		float distOnPath = steerPath.pathDistance(nextPtOnPath);
 		nextPtOnPath = steerPath.pathPoint(distOnPath+curSpeed);
-		SrVec ptDir = nextPtOnPath - curSteerPos; ptDir.normalize();
-		steerPath.advanceToNextGoal(distOnPath+curSpeed);
-		
+		//SrVec ptDir = nextPtOnPath - curSteerPos; ptDir.normalize();
+		SrVec ptDir = steerPath.pathGoalPoint() - curSteerPos; ptDir.normalize();		
+		steerPath.advanceToNextGoal(distOnPath+curSpeed);		
 		
 		float maxSpeed = this->currentTargetSpeed*sceneScale;//(float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
 		float minSpeed = (float)character->getDoubleAttribute("steering.pathMinSpeed")*sceneScale;
 		float angAcc = (float)character->getDoubleAttribute("steering.pathAngleAcc");
 		float detectSeg = maxSpeed*1.5f;
-		const float maxAcc = (maxSpeed)/2.f;//-minSpeed);///2.f;
-		const float maxDcc = -(maxSpeed)/2.f;
+		const float maxAcc = (maxSpeed)/5.f;//-minSpeed);///2.f;
+		const float maxDcc = -(maxSpeed)/5.f;
 
 		float pathCurvature = steerPath.pathCurvature(distOnPath-detectSeg*0.2f,distOnPath+detectSeg*0.8f)*2.0f;
 		if (pathCurvature > M_PI) pathCurvature = (float)M_PI;
@@ -717,7 +722,9 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		float curvSpeed = (1.f - pathCurvature/(float)M_PI)*(maxSpeed-minSpeed) + minSpeed;
 		float acc = (curSpeed > curvSpeed) ? maxDcc : maxAcc;
 		// do whatever you need to calculate
- 		float newSpeed = curSpeed + acc*dt; 
+ 		float newSpeed = curSpeed;
+		if (!inTransition)
+			newSpeed = curSpeed + acc*dt; 
 
 		float distToTarget = (curSteerPos - steerPath.pathPoint(steerPath.pathLength()-0.01f)).len();		
 		if (distToTarget < curSpeed * brakingGain && steerPath.atLastGoal()) // if close to target, slow down directly
@@ -730,19 +737,24 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		}
 
 		float newTurningAngle = radToDeg(asin(cross(curSteerDir,ptDir).y));
-		normalizeAngle(newTurningAngle);
-		newTurningAngle = newTurningAngle * (float)character->getDoubleAttribute("steering.paLocoAngleGain");
-		float nextTurningAngle;		
-		if (newTurningAngle > curTurningAngle)
+		float nextTurningAngle = curTurningAngle;
+		if (!inTransition)
 		{
-			nextTurningAngle = curTurningAngle + angAcc*dt;
-			if (nextTurningAngle > newTurningAngle) nextTurningAngle = newTurningAngle;
+			normalizeAngle(newTurningAngle);
+			newTurningAngle = newTurningAngle * (float)character->getDoubleAttribute("steering.paLocoAngleGain");			
+			if (newTurningAngle > curTurningAngle)
+			{
+				nextTurningAngle = curTurningAngle + angAcc*dt;
+				if (nextTurningAngle > newTurningAngle) nextTurningAngle = newTurningAngle;
+			}
+			else
+			{
+				nextTurningAngle = curTurningAngle - angAcc*dt;
+				if (nextTurningAngle < newTurningAngle) nextTurningAngle = newTurningAngle;
+			}
+
 		}
-		else
-		{
-			nextTurningAngle = curTurningAngle - angAcc*dt;
-			if (nextTurningAngle < newTurningAngle) nextTurningAngle = newTurningAngle;
-		}
+		
 				
 		//float newTurningAngle = normalizeAngle();//dt;
 		//float newTurningAngle = (asin(cross(curSteerDir,ptDir).y))/dt;
@@ -770,15 +782,16 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 
 		std::vector<double> weights;
 		weights.resize(curStateData->state->getNumMotions());
-		if (terrainMode)
-			curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, ang, weights);
-		else
-			curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, newScoot, weights);
+		//if (terrainMode)
+		//	curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, ang, weights);
+		//else		
+		curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, newScoot, weights);
+		//curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, 0.f, 0.f, weights);
 		character->param_animation_ct->updateWeights(weights);	
-
-		steerCurSpeed = newSpeed;
-		steerCurAngle = nextTurningAngle;
-		steerCurScoot = newScoot;		
+#endif
+		//steerCurSpeed = newSpeed;
+		//steerCurAngle = nextTurningAngle;
+		//steerCurScoot = newScoot;		
 	}
 	if (locomotionEnd)      // need to define when you want to end the locomotion
 	{

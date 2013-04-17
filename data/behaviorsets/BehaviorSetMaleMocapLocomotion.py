@@ -48,8 +48,10 @@ def setupBehaviorSet():
 	locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn180Rt01")
 	for i in range(0, len(locoMotions)):
 		motion = scene.getMotion(locoMotions[i])
-		motion.setMotionSkeletonName('ChrBackovic.sk')
-		zebra2Map.applyMotion(motion)
+		print 'motionName = ' + locoMotions[i]
+		if motion != None:
+			motion.setMotionSkeletonName('ChrBackovic.sk')
+			zebra2Map.applyMotion(motion)
 
 def retargetBehaviorSet(charName, skelName):
 
@@ -127,25 +129,31 @@ def retargetBehaviorSet(charName, skelName):
 	
 	'''
 	createRetargetInstance('ChrBackovic.sk', skelName)
-	# setup standard locomotion
-	scene.run("locomotion-ChrMarine-state-Locomotion.py")
-	marineLocomotionSetup('ChrBackovic.sk', 'ChrBackovic.sk', "base", '', 'mocap')	
-	
-	# starting state, starting locomotion with different angle
-	scene.run("locomotion-ChrMarine-state-StartingLeft.py")
-	mocapStartLeftSetup('ChrBackovic.sk','ChrBackovic.sk', "base", '', 'mocap')
-	
-	# starting state, starting locomotion with different angle
-	scene.run("locomotion-ChrMarine-state-StartingRight.py")
-	mocapStartRightSetup('ChrBackovic.sk','ChrBackovic.sk', "base", '', 'mocap')
+	stateManager = scene.getStateManager()
+	mocapLocomotionState = stateManager.getBlend('mocapLocomotion')
+	if mocapLocomotionState == None:
+		# setup standard locomotion
+		scene.run("locomotion-ChrMarine-state-Locomotion.py")
+		#marineLocomotionSetup('ChrBackovic.sk', 'ChrBackovic.sk', "base", '', 'mocap')	
+		
+		# starting state, starting locomotion with different angle
+		scene.run("locomotion-ChrMarine-state-StartingLeft.py")
+		#mocapStartLeftSetup('ChrBackovic.sk','ChrBackovic.sk', "base", '', 'mocap')
+		
+		# starting state, starting locomotion with different angle
+		scene.run("locomotion-ChrMarine-state-StartingRight.py")
+		#mocapStartRightSetup('ChrBackovic.sk','ChrBackovic.sk', "base", '', 'mocap')
 
-	# idle turn state, facing adjusting
-	scene.run("locomotion-ChrMarine-state-IdleTurn.py")
-	mocapIdleTurnSetup('ChrBackovic.sk','ChrBackovic.sk', "base", '', 'mocap')
+		# idle turn state, facing adjusting
+		scene.run("locomotion-ChrMarine-state-IdleTurn.py")
+		#mocapIdleTurnSetup('ChrBackovic.sk','ChrBackovic.sk', "base", '', 'mocap')
 
-	# step state, stepping adjusting
-	scene.run("locomotion-ChrMarine-state-Step.py")
-	mocapStepSetup('ChrBackovic.sk','ChrBackovic.sk', "base", '', 'mocap')
+		# step state, stepping adjusting
+		scene.run("locomotion-ChrMarine-state-Step.py")
+		#mocapStepSetup('ChrBackovic.sk','ChrBackovic.sk', "base", '', 'mocap')
+		
+		# setup transitions
+		scene.run("locomotion-ChrMarine-transitions.py")
 	
 		
 	# setup steering

@@ -77,7 +77,7 @@ void pythonFuncsMotion()
 
 	boost::python::class_<SBMotion, boost::python::bases<SBObject> >("SBMotion")
 		//.def(boost::python::init<std::string>())
-		.def("getMotionFileName", &SBMotion::getMotionFileName, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the motion file name. \n Input: NULL \n Output: motion file name")
+		.def("getMotionFileName", &SBMotion::getMotionFileName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the motion file name. \n Input: NULL \n Output: motion file name")
 		.def("getNumFrames", &SBMotion::getNumFrames, "Returns the number of frames inside this motion. \n Input: NULL \n Output: number of frames in the motion")
 		.def("getFrameData", &SBMotion::getFrameData, "Returns the frame data given frame index. \n Input: frame index \n Output: a list of frame data")
 		.def("getFrameSize", &SBMotion::getFrameSize, "Returns the frame size. \n Input: NULL \n Output: frame size (how many data does one frame include)")
@@ -121,7 +121,7 @@ void pythonFuncsMotion()
 		.def("getMetaDataString", &SBMotion::getMetaDataString, "Get the first metadata based on tag name")
 		.def("getMetaDataDouble", &SBMotion::getMetaDataDouble, "Get the first metadata based on tag name")
 		.def("getMetaDataTags", &SBMotion::getMetaDataTags, "Get all tag names in the metadata map.")
-		.def("getMotionSkeletonName", &SBMotion::getMotionSkeletonName, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the skeleton associated with this motion.")
+		.def("getMotionSkeletonName", &SBMotion::getMotionSkeletonName, boost::python::return_value_policy<boost::python::return_by_value>(),"Get the skeleton associated with this motion.")
 		.def("setMotionSkeletonName", &SBMotion::setMotionSkeletonName, "Set the skeleton associated with this motion.")
 		;
 

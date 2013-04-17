@@ -103,6 +103,17 @@ double MeCtParamAnimation::controller_duration()
 	return -1;
 }
 
+
+bool MeCtParamAnimation::isInTransition()
+{
+	if (transitionManager && transitionManager->active)
+	{
+		return true;
+	}
+	
+	return false;
+}
+
 bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 {	
 	
