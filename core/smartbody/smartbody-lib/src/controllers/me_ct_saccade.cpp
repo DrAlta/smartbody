@@ -388,8 +388,6 @@ void MeCtSaccade::initSaccade(MeFrameData& frame)
 			_localAxis[i] = lEyeJoint->localGlobalAxis(i);
 		}
 		
-
-
 		int idL = _context->channels().search(eyeballL, SkChannel::Quat);
 		_idL = frame.toBufferIndex(idL);
 		int idR = _context->channels().search(eyeballR, SkChannel::Quat);

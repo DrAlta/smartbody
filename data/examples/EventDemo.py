@@ -4,13 +4,10 @@ print "|           Starting Event Demo              |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('script', 'scripts')
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
-scene.addAssetPath('motion', 'retarget\motion')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
 scene.loadAssets()
 
 # Set scene parameters to fit new Brad and Rachel
@@ -42,8 +39,6 @@ zebra2Map.applyMotionRecurse('ChrRachel')
 
 # Establish lip syncing data set
 scene.run('init-diphoneDefault.py')
-# Animation setup
-scene.run('init-param-animation.py')
 
 # Set gesture map for Brad and Rachel
 print 'Setting gesture map for Brad and Rachel'

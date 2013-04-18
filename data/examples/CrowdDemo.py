@@ -6,22 +6,11 @@ print "|--------------------------------------------|"
 	
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
-#scene.addAssetPath('motion', 'retarget\motion')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
 scene.addAssetPath("script", "behaviorsets")
-scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
-
 scene.setScale(1.0)
-# Set simulation FPS to 60
-scene.getSimulationManager().setSimFps(60)
-
-# Run motion retarget
-scene.run('motion-retarget.py')
-# Set up animation
-#scene.run('init-param-animation.py')
 
 # Set joint map for Brad
 print 'Setting up joint map for Brad'
@@ -70,7 +59,7 @@ for i in range(amount):
 	#etargetCharacter(baseName, 'ChrBrad.sk', False)
 	# setup mocap locomotion
 	if i== 0 : 
-		scene.run('BehaviorSetMaleLocomotion.py')
+		scene.run('BehaviorSetMaleMocapLocomotion.py')
 		setupBehaviorSet()
 	retargetBehaviorSet(baseName, 'ChrBrad.sk')
 	# Set up steering
@@ -85,6 +74,7 @@ for i in range(amount):
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
 	scene.command("char %s viewer deformableGPU" % name)
+	#scene.command("char %s viewer axis" % name)
 
 # Set up list of Brads
 bradList = []
@@ -127,7 +117,7 @@ class LocomotionHandler(SBEventHandler):
 		if 'success' in params:
 			if 'ChrBrad' in params:
 				reachCount = reachCount + 1
-				if reachCount >= 15:
+				if reachCount >= 6:
 					bradReached = True	
 					reachCount = 0
 

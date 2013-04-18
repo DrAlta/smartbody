@@ -6,11 +6,9 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'Ogre')
-scene.addAssetPath('motion', 'ChrBrad')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath('motion', 'mesh/Ogre')
 scene.addAssetPath('script', 'behaviorsets')
-scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
 # Set scene parameters and camera
@@ -26,15 +24,7 @@ sinbadMap = jointMapManager.getJointMap('Sinbad.skeleton.xml')
 ogreSk = scene.getSkeleton(sinbadSkName)
 sinbadMap.applySkeleton(ogreSk)
 
-# Behavior set setup
-#scene.run('behaviorsetup.py')
-
-# Animation setup
-#scene.run('init-param-animation.py')
 steerManager = scene.getSteerManager()
-
-#scene.getPawn('camera').setPosition(SrVec(0, -5, 0))
-
 print 'Setting up Sinbads'
 amount = 20
 row = 0; column = 0; 
@@ -56,6 +46,7 @@ for i in range(amount):
 	sinbad.setPosition(sinbadPos)
 	sinbad.createStandardControllers()
 	sinbad.setStringAttribute('deformableMesh', 'Sinbad')
+	# Retarget character
 	if i == 0 :
 		scene.run('BehaviorSetMaleLocomotion.py')
 		setupBehaviorSet()
@@ -121,7 +112,7 @@ class LocomotionHandler(SBEventHandler):
 		if 'success' in params:
 			if 'sinbad' in params:
 				reachCount = reachCount + 1
-				if reachCount >= 10:
+				if reachCount >= 6:
 					sinbadReached = True	
 					reachCount = 0
 

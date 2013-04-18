@@ -285,7 +285,7 @@ statemarineLocomotion.buildMotionAnalysis("ChrBackovic.sk","base",motions, '');
 
 skeleton = scene.getSkeleton("ChrBackovic.sk")
 joint = skeleton.getJointByName("base")
-travelDirection = ([0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0 ,0, 0, 0, -1, 1 ])
+travelDirection = ([0, 0, 0, 0, 0, 0, 0, 0, -90, 90, 0, 0, 0, 0 ,0, 0, 0, -90, 90 ])
 
 for i in range(0, len(motions)):
 	motion = scene.getMotion(motions[i])
@@ -296,10 +296,10 @@ for i in range(0, len(motions)):
 	#omega = motion.getJointAngularSpeed(joint, correspondancePoints[0], correspondancePoints[lenCorrespondancePoints - 1])
 	speed = motion.getJointSpeed(joint, 0, motion.getDuration())
 	#speedZ = motion.getJointSpeedAxis(joint, "Z", 0, motion.getDuration())
-	if (travelDirection[i] != 0):
-		direction = motion.getJointSpeedAxis(joint, "X", 0, motion.getDuration())
-	else:
-		direction = travelDirection[i]
+	#if (travelDirection[i] != 0):
+	#	direction = motion.getJointSpeedAxis(joint, "X", 0, motion.getDuration())
+	#else:
+	direction = travelDirection[i]
 	
 	omega = motion.getJointAngularSpeed(joint, 0, motion.getDuration())
 	

@@ -5,10 +5,9 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrRachel')
 scene.addAssetPath("script", "behaviorsets")
-scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
 # Runs the default viewer for camera
@@ -16,6 +15,13 @@ scene.run('default-viewer.py')
 camera = getCamera()
 camera.setEye(0, 367.58, 574.66)
 camera.setCenter(0, 275, 395)
+
+print 'Setting up joint map and configuring Rachel\'s skeleton'
+scene.run('zebra2-map.py')
+zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
+bradSkeleton = scene.getSkeleton('ChrRachel.sk')
+zebra2Map.applySkeleton(bradSkeleton)
+zebra2Map.applyMotionRecurse('ChrRachel')
 
 # Set proper motion scale
 print 'Scaling motion to fit rescaled skeleton'
@@ -48,6 +54,7 @@ for i in range(amount):
 	rachel.setStringAttribute('deformableMesh', 'ChrRachel')
 	# Play default animation
 	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01_YouLf01"/>')
+	bml.execBML(baseName, '<saccade mode="listen"/>')
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():

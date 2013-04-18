@@ -4,11 +4,11 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
+#scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
+#scene.addAssetPath('motion', 'sbm-common/common-sk')
 scene.addAssetPath("script", "behaviorsets")
-scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
 # Set scene parameters and camera
@@ -171,6 +171,7 @@ brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 # Retarget 
 #retargetCharacter('ChrBrad', 'ChrBrad.sk')
 scene.run('BehaviorSetMaleMocapLocomotion.py')
+#scene.run('BehaviorSetMaleLocomotion.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrBrad', 'ChrBrad.sk')
 # Idle pose

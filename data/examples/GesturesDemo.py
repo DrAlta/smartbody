@@ -3,13 +3,10 @@ print "|          Starting Gestures Demo            |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
-scene.addAssetPath('motion', 'retarget\motion')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
 # Set scene parameters
@@ -38,9 +35,6 @@ zebra2Map.applyMotionRecurse('ChrBrad')
 rachelSkeleton = scene.getSkeleton('ChrRachel.sk')
 zebra2Map.applySkeleton(rachelSkeleton)
 zebra2Map.applyMotionRecurse('ChrRachel')
-
-# Animation setup
-scene.run('init-param-animation.py')
 
 # Set gesture map for Brad and Rachel
 print 'Setting gesture map for Brad and Rachel'
@@ -209,7 +203,7 @@ for name in scene.getCharacterNames():
 	scene.command("char %s viewer deformableGPU" % name)
 	
 last = 0
-delay = 15
+delay = 5
 class GesturesDemo(SBScript):
 	def update(self, time):
 		global last
