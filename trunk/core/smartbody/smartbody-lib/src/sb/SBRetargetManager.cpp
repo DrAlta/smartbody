@@ -18,7 +18,7 @@ SBAPI SBRetarget* SBRetargetManager::createRetarget( std::string sourceSk, std::
 {	
 	if (getRetarget(sourceSk, targetSk))
 	{
-		LOG("Retarget for skeleton pair (%s,%s) already exist.");
+		LOG("Retarget for skeleton pair (%s,%s) already exist.", sourceSk.c_str(), targetSk.c_str());
 		return NULL;			
 	}
 
