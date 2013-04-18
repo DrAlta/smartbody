@@ -4,7 +4,7 @@ print "|       Starting Facial Movement Demo        |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('script', 'scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('motion', 'ChrRachel')
 scene.loadAssets()

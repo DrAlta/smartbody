@@ -3,14 +3,11 @@ print "|             Starting Gaze Demo             |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script','examples')
-scene.addAssetPath('script','sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
-scene.addAssetPath('motion', 'retarget\motion')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath('script','scripts')
+scene.addAssetPath('script','examples')
 scene.loadAssets()
 
 # Set scene parameters and camera

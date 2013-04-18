@@ -6,15 +6,11 @@ print "|--------------------------------------------|"
 
 scene.setScale(0.1)
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
-#scene.addAssetPath('script', 'sbm-common/scripts/behaviorsets')
-scene.addAssetPath('script', 'behaviorsets')
+
 scene.addAssetPath('mesh', 'mesh')
-#scene.addAssetPath('mesh', 'retarget/mesh')
-scene.addAssetPath('motion', 'Ogre')
-scene.addAssetPath('motion', 'ChrBrad')
-#scene.addAssetPath('motion', 'retarget/motion')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath('motion', 'mesh/Ogre')
+scene.addAssetPath('script', 'scripts')
+scene.addAssetPath('script', 'behaviorsets')
 scene.loadAssets()
 
 # Set scene parameters and camera
@@ -53,7 +49,6 @@ scene.command('char sinbad viewer deformableGPU')
 
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
-scene.run('default-viewer.py')
 camera = getCamera()
 camera.setEye(0, 5.98, 13.44)
 camera.setCenter(1.0, 1.7, -39.5)

@@ -5,12 +5,10 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
 scene.addAssetPath("script", "behaviorsets")
-scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
 # Set scene parameters and camera
@@ -37,10 +35,6 @@ bradSkeleton = scene.getSkeleton('ChrBrad.sk')
 zebra2Map.applySkeleton(bradSkeleton)
 zebra2Map.applyMotionRecurse('ChrBrad')
 
-# Retarget setup
-#scene.run('motion-retarget.py')
-# Animation setup
-#scene.run('init-param-animation.py')
 
 # Set up 3 Brads
 print 'Adding characters into scene'
@@ -61,9 +55,8 @@ for i in range(3):
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	# Retarget character
-	#retargetCharacter(baseName, 'ChrBrad.sk', False)
 	if i== 0 : 
-		scene.run('BehaviorSetMaleLocomotion.py')
+		scene.run('BehaviorSetMaleMocapLocomotion.py')
 		setupBehaviorSet()
 	retargetBehaviorSet(baseName, 'ChrBrad.sk')
 

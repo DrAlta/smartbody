@@ -1,16 +1,15 @@
 print "|--------------------------------------------|"
 print "|        Starting Kinect Demo                |"
 print "|--------------------------------------------|"
+# Add asset paths
+scene.addAssetPath("script", 'sbm-common/scripts')
+scene.addAssetPath('seq', 'sbm-common/scripts')
+scene.addAssetPath('mesh', 'mesh')
 
 scene.run('default-viewer.py')
 camera = getCamera()
 camera.setEye(0, 166, 185)
 camera.setCenter(0, 92, 0)
-
-# Add asset paths
-scene.addAssetPath("script", 'sbm-common/scripts')
-scene.addAssetPath('seq', 'sbm-common/scripts')
-scene.addAssetPath('mesh', 'mesh')
 
 scene.run("init-common-assets.py")
 scene.run("init-common-face.py")

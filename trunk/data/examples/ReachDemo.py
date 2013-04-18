@@ -7,9 +7,8 @@ print "|--------------------------------------------|"
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
 scene.addAssetPath("script", "behaviorsets")
-scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
 # Set scene parameters and camera
@@ -46,7 +45,7 @@ zebra2Map.applyMotionRecurse('ChrRachel')
 
 # Setting up Brads and Rachels
 print 'Setting up Brads'
-for i in range(3):
+for i in range(2):
 	baseName = 'ChrBrad%s' % i
 	brad = scene.createCharacter(baseName, '')
 	bradSkeleton = scene.createSkeleton('ChrBrad.sk')
@@ -62,7 +61,8 @@ for i in range(3):
 	if i== 0 : 
 		scene.run('BehaviorSetReaching.py')
 		setupBehaviorSet()
-	retargetBehaviorSet(baseName, 'ChrBrad.sk')
+		
+	retargetBehaviorSet(baseName, 'ChrBrad.sk')		
 	
 print 'Setting up Rachels'
 for i in range(2):
@@ -79,12 +79,17 @@ for i in range(2):
 	# Retarget character
 	#retargetCharacter(baseName, 'ChrRachel.sk')
 	retargetBehaviorSet(baseName, 'ChrRachel.sk')
-	
+
+# add locomotion for ChrBrad2
+#scene.run('BehaviorSetMaleLocomotion.py')
+#setupBehaviorSet()
+#retargetBehaviorSet('ChrBrad2', 'ChrBrad.sk')
+
 # Setting character positions
 print 'Setting character positions'
 scene.getCharacter('ChrBrad0').setPosition(SrVec(-0.35, 0, -1))
 scene.getCharacter('ChrBrad1').setPosition(SrVec(-1.35, 0, -1))
-scene.getCharacter('ChrBrad2').setPosition(SrVec(1.35, 0, 0))
+#scene.getCharacter('ChrBrad2').setPosition(SrVec(1.35, 0, 0))
 scene.getCharacter('ChrRachel0').setPosition(SrVec(-1, 0, 1))
 scene.getCharacter('ChrRachel0').setHPR(SrVec(90, 0, 0))
 scene.getCharacter('ChrRachel1').setPosition(SrVec(-0.35, 0, 1))
@@ -148,7 +153,7 @@ class ReachDemo(SBScript):
 			bml.execBML('ChrBrad1', '<sbm:reach sbm:action="point-at" sbm:reach-duration="1" target="pointPawn"/>')
 			bml.execBML('ChrBrad1', '<gaze target="pointPawn" sbm:joint-range="EYES NECK"/>')
 			# Brad2 actions
-			checkBrad2()
+			#checkBrad2()
 		
 		global lastPass, canTimePass
 		if canTimePass:
@@ -162,24 +167,26 @@ class ReachDemo(SBScript):
 			checkPass()
 
 # Logic of picking up and putting down
+
 def checkBrad2():
 	global moving
 	if not area1PickUp and not moving:
-		bml.execBML('ChrBrad2', '<sbm:reach sbm:action="pick-up" sbm:reach-finish="true" target="pickupPawn" sbm:use-locomotion="true"/>')
+		bml.execBML('ChrBrad2', '<sbm:reach sbm:action="pick-up" sbm:reach-duration="0.2" target="pickupPawn" sbm:use-locomotion="true"/>')
 		bml.execBML('ChrBrad2', '<gaze target="pickupPawn" sbm:joint-range="EYES NECK"/>')
 		moving = True
 	if not area1PutDown and area1PickUp and not moving:
-		bml.execBML('ChrBrad2', '<sbm:reach sbm:action="put-down" sbm:reach-finish="true" sbm:target-pos="1.35 1 1" sbm:use-locomotion="true"/>')
+		bml.execBML('ChrBrad2', '<sbm:reach sbm:action="put-down" sbm:reach-duration="0.2" sbm:target-pos="1.35 1 1" sbm:use-locomotion="true"/>')
 		print 'Put down front'
 		moving = True
 	if not area2PickUp and area1PutDown and not moving:
-		bml.execBML('ChrBrad2', '<sbm:reach sbm:action="pick-up" sbm:reach-finish="true" target="pickupPawn" sbm:use-locomotion="true"/>')
+		bml.execBML('ChrBrad2', '<sbm:reach sbm:action="pick-up" sbm:reach-duration="0.2" target="pickupPawn" sbm:use-locomotion="true"/>')
 		bml.execBML('ChrBrad2', '<gaze target="pickupPawn" sbm:joint-range="EYES NECK"/>')
 		moving = True
 	if not area2PutDown and area2PickUp and not moving:
-		bml.execBML('ChrBrad2', '<sbm:reach sbm:action="put-down" sbm:reach-finish="true" sbm:target-pos="1.35 1.6 -1" sbm:use-locomotion="true"/>')
+		bml.execBML('ChrBrad2', '<sbm:reach sbm:action="put-down" sbm:reach-duration="0.2" sbm:target-pos="1.35 1.6 -1" sbm:use-locomotion="true"/>')
 		print 'Put down back'
 		moving = True
+
 
 # Passing variables
 currentTurn = 'ChrRachel0'

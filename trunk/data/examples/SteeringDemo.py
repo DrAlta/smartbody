@@ -5,13 +5,10 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
-#scene.addAssetPath('motion', 'retarget\motion')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
 scene.addAssetPath("script", "behaviorsets")
-scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
 # Set scene parameters and camera
@@ -42,12 +39,7 @@ zebra2Map.applySkeleton(rachelSkeleton)
 zebra2Map.applyMotionRecurse('ChrRachel')
 
 # Retarget setup
-#scene.run('motion-retarget.py')
-# Animation setup
-#scene.run('init-param-animation.py')
-# Steering manager
 steerManager = scene.getSteerManager()
-
 # Setting up group of Brads
 print 'Setting up Brads'
 bradList = []
@@ -72,7 +64,7 @@ for i in range(15):
 	# Retarget character
 	#retargetCharacter(baseName, 'ChrBrad.sk', False)
 	if i== 0 : 
-		scene.run('BehaviorSetMaleLocomotion.py')
+		scene.run('BehaviorSetMaleMocapLocomotion.py')
 		setupBehaviorSet()
 	retargetBehaviorSet(baseName, 'ChrBrad.sk')
 	# Add current Brad into list
@@ -115,19 +107,11 @@ bradPath = [SrVec(-9, -9, 0), SrVec(9, 9, 0)]
 rachelPath = [SrVec(9, 9, 0), SrVec(-9, -9, 0)]
 pathAmt = len(bradPath)
 
-'''
-# Enable collision
-collisionManager = getScene().getCollisionManager()
-collisionManager.setBoolAttribute('singleChrCapsuleMode', True)
-collisionManager.setStringAttribute('collisionResolutionType', 'default')
-collisionManager.setEnable(True)
-'''
-
 bradCur = 0
 rachelCur = 0
 canTime = True
 last = 0
-delay = 20
+delay = 10
 class LocomotionDemo(SBScript):
 	def update(self, time):
 		global bradCur, rachelCur, canTime, last

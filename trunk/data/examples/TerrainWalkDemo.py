@@ -32,8 +32,8 @@ def createRetargetInstance(srcSkelName, tgtSkelName):
 
 ### Load data/sbm-common assets
 scene.setMediaPath("../../../../data/")
-scene.addAssetPath("ME", "ChrBrad")
-scene.addAssetPath("script", "sbm-common/scripts")
+scene.addAssetPath("motion", "ChrBrad")
+scene.addAssetPath("script", "scripts")
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath("mesh", "mesh")
 scene.addAssetPath("audio", ".")

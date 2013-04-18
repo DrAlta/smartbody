@@ -3,7 +3,7 @@ print "|        Starting Speech/Face Demo           |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
+scene.addAssetPath('script', 'scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.loadAssets()

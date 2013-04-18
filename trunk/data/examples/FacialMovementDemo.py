@@ -6,11 +6,8 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
-scene.addAssetPath('motion', 'retarget\motion')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
-scene.addAssetPath('script', 'sbm-common/common-sk')
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
 # Runs the default viewer for camera
@@ -25,6 +22,13 @@ camera.setFov(1.0472)
 camera.setFarPlane(100)
 camera.setNearPlane(0.1)
 camera.setAspectRatio(0.966897)
+
+print 'Setting up joint map for Brad and Rachel'
+scene.run('zebra2-map.py')
+zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
+bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+zebra2Map.applySkeleton(bradSkeleton)
+zebra2Map.applyMotionRecurse('ChrBrad')
 
 # Setting up face definition
 print 'Setting up Brad\'s face definition'

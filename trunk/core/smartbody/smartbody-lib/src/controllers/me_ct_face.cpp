@@ -138,7 +138,7 @@ void MeCtFace::remove_joint( const char *joint_name ) {
 			SkChannelArray& mchan_arr = _base_pose_p->channels();
 			int size = mchan_arr.size();
 			for( int i = 0; i < size; i++ )	{
-				if( mchan_arr.name( i ) == joint_name ) {
+				if( mchan_arr.mappedName( i ) == joint_name ) {
 //					LOG( "MeCtFace::remove_joint: exclude[ %d ]: '%s:%s'\n", 
 //						i, mchan_arr.name( i ).get_string(), SkChannel::type_name( mchan_arr.type( i ) ) );
 					_include_chan_flag[ i ] = 0;
