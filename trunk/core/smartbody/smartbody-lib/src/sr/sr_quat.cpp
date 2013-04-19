@@ -320,6 +320,12 @@ SrVec SrQuat::getEuler() const
 	euler = SrVec(((float)eu.x()),((float)eu.y()),((float)eu.z()));
 	return euler;
 }
+
+SrVec SrQuat::multVec( const SrVec& v )
+{
+	return v*(*this);
+}
+
 //=================================== Friend Functions ===================================
 
 SrVec operator * ( const SrVec &v, const SrQuat &q )

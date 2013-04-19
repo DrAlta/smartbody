@@ -312,8 +312,7 @@ void SBScene::cleanup()
 	removeAllAssetPaths("script");
 	removeAllAssetPaths("motion");
 	removeAllAssetPaths("mesh");
-	removeAllAssetPaths("audio");
-
+	removeAllAssetPaths("audio");	
 
 	delete _sim;
 	delete _profiler;
@@ -1506,8 +1505,9 @@ void SBScene::addScript(const std::string& name, SBScript* script)
 	std::map<std::string, SBScript*>::iterator iter = _scripts.find(name);
 	if (iter != _scripts.end())
 	{
-		LOG("Script with name %s already exists.", name.c_str());
-		return;
+		LOG("Script with name %s already exists. Remove current script.", name.c_str());
+		//return;
+		_scripts.erase(iter);
 	}
 
 	_scripts.insert(std::pair<std::string, SBScript*>(name, script));

@@ -151,6 +151,8 @@ class SBAPI SrQuat
     /*! Gets the equivalent transformation matrix. */
     SrMat& get_mat ( SrMat& m ) const;
 
+	SrVec multVec(const SrVec& v);
+
     /*! Given a vector v and a quaternion q, the result of applying the rotation
        in q to v is returned (in mathematical notation this is q v q^-1) . */
     SBAPI friend SrVec operator * ( const SrVec &v, const SrQuat &q );

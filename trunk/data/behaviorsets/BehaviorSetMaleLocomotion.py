@@ -5,8 +5,7 @@ def setupBehaviorSet():
 	scene.loadAssetsFromPath("behaviorsets/MaleLocomotion/skeletons")
 	scene.loadAssetsFromPath("behaviorsets/MaleLocomotion/motions")
 	scene.addAssetPath("script", "behaviorsets/MaleLocomotion/scripts")
-
-def retargetBehaviorSet(charName, skelName):
+	
 	locoMotions = StringVec()
 	locoMotions.append("ChrUtah_Walk001")
 	locoMotions.append("ChrUtah_Idle001")
@@ -46,6 +45,8 @@ def retargetBehaviorSet(charName, skelName):
 	for i in range(0, len(locoMotions)):
 		motion = scene.getMotion(locoMotions[i])
 		motion.setMotionSkeletonName('test_utah.sk')
+
+def retargetBehaviorSet(charName, skelName):	
 		
 	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	if not os.path.exists(outDir):

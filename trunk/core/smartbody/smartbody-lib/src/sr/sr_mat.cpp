@@ -602,6 +602,11 @@ SrMat SrMat::get_rotation() const
 	return rotMat;
 }
 
+SrVec SrMat::multVec( const SrVec& v1 )
+{	
+	return v1*(*this);
+}
+
 SrMat operator - ( const SrMat &m1, const SrMat &m2 )
  {
    SrMat mat(SrMat::NotInitialized);

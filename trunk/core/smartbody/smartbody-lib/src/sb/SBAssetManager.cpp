@@ -44,12 +44,23 @@ SBAssetManager::SBAssetManager()
 
 SBAssetManager::~SBAssetManager()
 {
+	removeAllAssets();
+	delete seq_paths;
+	delete me_paths;
+	delete audio_paths;
+	delete mesh_paths;	
+}
+
+
+SBAPI void SBAssetManager::removeAllAssets()
+{
 	for (std::map<std::string, SBMotion*>::iterator iter = _motions.begin();
-		 iter != _motions.end();
-		 iter++)
+		iter != _motions.end();
+		iter++)
 	{
 		delete (*iter).second;
 	}
+	_motions.clear();
 
 	for (std::map<std::string, SBSkeleton*>::iterator iter = _skeletons.begin();
 		iter != _skeletons.end();
@@ -57,12 +68,14 @@ SBAssetManager::~SBAssetManager()
 	{
 		delete (*iter).second;
 	}
+	_skeletons.clear();
 
-	delete seq_paths;
-	delete me_paths;
-	delete audio_paths;
-	delete mesh_paths;
-
+	for (std::map<std::string, DeformableMesh*>::iterator iter = _deformableMeshMap.begin();
+		iter != _deformableMeshMap.end();
+		iter++)
+	{
+		delete (*iter).second;
+	}
 	_deformableMeshMap.clear();
 }
 
@@ -1394,6 +1407,7 @@ void SBAssetManager::removeDeformableMesh(const std::string& meshName)
 	std::map<std::string, DeformableMesh*>::iterator iter = _deformableMeshMap.find(meshName);
 	if (iter != _deformableMeshMap.end())
 	{
+		delete (*iter).second;		
 		_deformableMeshMap.erase(iter);
 	}
 }

@@ -54,7 +54,7 @@ for i in range(amount):
 	rachel.createStandardControllers()
 	# Set deformable mesh
 	rachel.setDoubleAttribute('deformableMeshScale', 1)
-	rachel.setStringAttribute('deformableMesh', 'ChrRachel')
+	#rachel.setStringAttribute('deformableMesh', 'ChrRachel')
 	if i== 0 : 
 		scene.run('BehaviorSetFemaleGestures.py')
 		setupBehaviorSet()
@@ -77,7 +77,7 @@ class RamdomGazeScript(SBScript):
 	isInitialized = False
 	names = []
 	
-	def beforeUpdate(self, time):
+	def start(self):
 		if self.isInitialized is True:
 			return
 		self.isInitialized = True
@@ -105,3 +105,5 @@ class RamdomGazeScript(SBScript):
 
 gazeScript = RamdomGazeScript()
 scene.addScript("randomgaze", gazeScript)
+sim.start()
+sim.resume()

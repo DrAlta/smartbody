@@ -289,6 +289,8 @@ class SBAPI SrMat
         is equal to to SrMat */
     void mult ( const SrMat &m1, const SrMat &m2 );
 
+	SrVec multVec( const SrVec& v1);
+
     /*! Sets SrMat to be the addition of m1 with m2. */
     void add ( const SrMat &m1, const SrMat &m2 );
 
