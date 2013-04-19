@@ -159,16 +159,13 @@ def retargetBehaviorSet(charName, skelName):
 	print 'outDir = ' + outDir ;
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)
-
-	# retarget gestures
-	for n in range(0, len(gestureMotions)):
-		curMotion = scene.getMotion(gestureMotions[n])
-		if curMotion is not None:
-			retargetMotion(gestureMotions[n], 'ChrConnor.sk', skelName, outDir + 'FemaleGestures/');
-		else:
-			print "Cannot find motion " + gestureMotions[n] + ", it will be excluded from the gesture setup..."
+	assetManager = scene.getAssetManager()	
+	for i in range(0, len(gestureMotions)):
+		sbMotion = assetManager.getMotion(gestureMotions[i])
+		if sbMotion != None:
+			sbMotion.setMotionSkeletonName("ChrConnor.sk")
 	
-				
+	createRetargetInstance('ChrConnor.sk', skelName)			
 	
 	# set up the gesture map
 	gestureMap = scene.getGestureMapManager().createGestureMap(charName)

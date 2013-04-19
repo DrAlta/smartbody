@@ -95,13 +95,12 @@ def retargetBehaviorSet(charName, skelName):
 	locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn180Rt01")
 	
 	
-		
+	'''	
 	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	if not os.path.exists(outDir):
 		os.makedirs(outDir)
 		
 	# retarget standard locomotions
-	'''
 	for n in range(0, len(locoMotions)):
 		curMotion = scene.getMotion(locoMotions[n])
 		if curMotion is not None:
