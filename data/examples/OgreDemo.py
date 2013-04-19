@@ -42,7 +42,12 @@ sinbadPos = SrVec(0,5.16, 0)
 sinbad.setPosition(sinbadPos)
 sinbad.createStandardControllers()
 sinbad.setStringAttribute('deformableMesh', 'Sinbad')
+# setup locomotion
 scene.run('BehaviorSetMaleLocomotion.py')
+setupBehaviorSet()
+retargetBehaviorSet(sinbadName,sinbadSkName)
+# setup reaching
+scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
 retargetBehaviorSet(sinbadName,sinbadSkName)
 scene.command('char sinbad viewer deformableGPU')

@@ -86,6 +86,7 @@ void pythonFuncsMath()
 		.def("rotY", &SrVec::rotY, "rotate vector around Y axis (radian)")
 		.def("vecAngle", &SrVec::vecAngle, "Returns the angle between v1 and v2 (radian)")
 		.def("vecYaw", &SrVec::vecYaw, "Returns Yaw angle on X-Z plane of given vec (radian)")
+		.def("addVec", &SrVec::operator+=, "Add the input SrVec to the current SrVec")
 		;
 
 	boost::python::class_<SrMat>("SrMat")
@@ -94,6 +95,7 @@ void pythonFuncsMath()
 		.def("setData", &SrMat::setData, "sets the data in the matrix at r,c")
 		.def("identity", &SrMat::identity, "sets the data in the matrix to an identity matrix")
 		.def("transpose", &SrMat::transpose, "transposes the data in the matrix")
+		.def("multVec", &SrMat::multVec, "multiply the matrix with a vector")
 		;
 
 	boost::python::class_<SrQuat>("SrQuat")
@@ -104,6 +106,7 @@ void pythonFuncsMath()
 		.def("getAngle", &SrQuat::angle, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the angle of the quaternion.")
 		.def("getData", &SrQuat::getData, "gets the data in the quaterion at location indicated by the index w,x,y,z")
 		.def("setData", &SrQuat::setData, "sets the data in the quaterion at location indicated by the index w,x,y,z")
+		.def("multVec", &SrQuat::multVec, "multiply the quaternion with a vector")
 		;	
 	
 	boost::python::class_<SrBox>("SrBox")

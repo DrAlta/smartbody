@@ -21,6 +21,7 @@ class SBAssetManager : public SBObject
 		SBAPI SBAssetManager();
 		SBAPI ~SBAssetManager();
 
+		SBAPI void removeAllAssets();
 		SBAPI double getGlobalMotionScale();
 		SBAPI void setGlobalMotionScale(double val);
 		SBAPI double getGlobalSkeletonScale();

@@ -3,46 +3,74 @@ print "|           Starting Blend Demo              |"
 print "|--------------------------------------------|"
 
 # Add asset paths
-scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'ChrRachel')
+scene.addAssetPath('motion', 'mesh/Ogre')
+scene.addAssetPath('script', 'behaviorsets')
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
 # Set scene parameters and camera
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
-scene.run('default-viewer.py')
-camera = getCamera()
-camera.setEye(-100, 318, 542)
-camera.setCenter(-100, 244, 357)
+
+
+
+
+print 'Setting up joint map for Brad and Rachel'
+scene.run('zebra2-map.py')
+zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
+bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+bradSkeleton.rescale(6)
+zebra2Map.applySkeleton(bradSkeleton)
+zebra2Map.applyMotionRecurse('ChrBrad')
+rachelSkeleton = scene.getSkeleton('ChrRachel.sk')
+rachelSkeleton.rescale(6)
+zebra2Map.applySkeleton(rachelSkeleton)
+zebra2Map.applyMotionRecurse('ChrRachel')
+
+scene.run('ogre-sinbad-map.py')
+sinbadSkName = 'Sinbad.skeleton.xml'
+jointMapManager = scene.getJointMapManager()
+sinbadMap = jointMapManager.getJointMap('Sinbad.skeleton.xml')
+ogreSk = scene.getSkeleton(sinbadSkName)
+sinbadMap.applySkeleton(ogreSk)
+
+scene.run('BehaviorSetMaleLocomotion.py')
+setupBehaviorSet()
 
 # Setting up characters
 print 'Setting up characters'
 # chr0D
 chr0D = scene.createCharacter('chr0D', '')
-chr0DSkeleton = scene.createSkeleton('common.sk')
+chr0DSkeleton = scene.createSkeleton('ChrBrad.sk')
 chr0D.setSkeleton(chr0DSkeleton)
-chr0D.setPosition(SrVec(-145, 102, 0))
+chr0D.setPosition(SrVec(-14.5, 0, 0))
 chr0D.createStandardControllers()
-chr0D.setStringAttribute('deformableMesh', 'brad')
-bml.execBML('chr0D', '<body posture="HandsAtSide_Motex"/>')
+chr0D.setDoubleAttribute('deformableMeshScale', 0.06)
+chr0D.setStringAttribute('deformableMesh', 'ChrBrad')
+createRetargetInstance('test_utah.sk','ChrBrad.sk')
+bml.execBML('chr0D', '<body posture="ChrUtah_Idle001"/>')
 # chr1D
 chr1D = scene.createCharacter('chr1D', '')
-chr1DSkeleton = scene.createSkeleton('common.sk')
+chr1DSkeleton = scene.createSkeleton(sinbadSkName)
 chr1D.setSkeleton(chr1DSkeleton)
-chr1D.setPosition(SrVec(-55, 102, 0))
+chr1D.setPosition(SrVec(-5.5, 5.16, 0))
 chr1D.createStandardControllers()
-chr1D.setStringAttribute('deformableMesh', 'elder')
-bml.execBML('chr1D', '<body posture="LHandOnHip_Motex"/>')
+chr1D.setStringAttribute('deformableMesh', 'sinbad')
+createRetargetInstance('test_utah.sk',sinbadSkName)
+bml.execBML('chr1D', '<body posture="ChrUtah_Idle001"/>')
 # chr2D
 chr2D = scene.createCharacter('chr2D', '')
-chr2DSkeleton = scene.createSkeleton('common.sk')
+chr2DSkeleton = scene.createSkeleton('ChrRachel.sk')
 chr2D.setSkeleton(chr2DSkeleton)
-chr2D.setPosition(SrVec(55, 102, 0))
+chr2D.setPosition(SrVec(5.5, 0, 0))
 chr2D.createStandardControllers()
-chr2D.setStringAttribute('deformableMesh', 'doctor')
-bml.execBML('chr2D', '<body posture="LHandOnHip_Motex"/>')
+chr2D.setDoubleAttribute('deformableMeshScale', 0.06)
+chr2D.setStringAttribute('deformableMesh', 'ChrRachel')
+createRetargetInstance('test_utah.sk','ChrRachel.sk')
+bml.execBML('chr2D', '<body posture="ChrUtah_Idle001"/>')
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
@@ -54,6 +82,7 @@ blendManager = scene.getBlendManager()
 # 0D Blend
 print 'Setting up 0D blend'
 blend0D = blendManager.createBlend0D('blend0D')
+blend0D.setBlendSkeleton('test_utah.sk')
 motions = StringVec()
 motions.append('ChrUtah_WalkInCircleRight001')
 blend0D.addMotion(motions[0])
@@ -61,6 +90,7 @@ blend0D.addMotion(motions[0])
 # 1D Blend
 print 'Setting up 1D blend'
 blend1D = blendManager.createBlend1D('blend1D')
+blend1D.setBlendSkeleton('test_utah.sk')
 motions = StringVec()
 motions.append('ChrUtah_Idle001')
 motions.append('ChrUtah_Turn90Lf01')
@@ -102,6 +132,7 @@ blend1D.addCorrespondencePoints(motions, points2)
 # 2D Blend
 print 'Setting up 2D blend'
 blend2D = blendManager.createBlend2D("blend2D")
+blend2D.setBlendSkeleton('test_utah.sk')
 
 motions = StringVec()
 motions.append("ChrUtah_Idle001")
@@ -166,6 +197,17 @@ blend2D.addTriangle("ChrUtah_Idle001", "ChrUtah_Idle01_StepForwardRt01", "ChrUta
 
 ''' MISSING 3D BLEND '''
 bml.execBML('chr0D', '<blend name="blend0D"/>')
+
+print 'Configuring scene parameters and camera'
+camera = getCamera()
+camera.setEye(-6, 7.98, 28.44)
+camera.setCenter(-6, 1.7, -39.5)
+camera.setUpVector(SrVec(0, 1, 0))
+camera.setScale(1)
+camera.setFov(1.0472)
+camera.setFarPlane(100)
+camera.setNearPlane(0.01)
+camera.setAspectRatio(1.02)
 
 last = 0
 canTime = True
