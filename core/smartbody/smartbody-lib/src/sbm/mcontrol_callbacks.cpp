@@ -4740,7 +4740,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 		{
 			SmartBody::SBCharacter* character = scene->getCharacter((*iter));
 			std::string receiverName = character->getStringAttribute("receiverName");
-			if (receiverName == skelName)
+			if (receiverName == skelName || character->getName() == skelName)
 			{
 				controlledCharacters.push_back(character);
 			}
