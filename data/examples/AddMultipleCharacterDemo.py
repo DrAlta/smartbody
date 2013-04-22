@@ -98,8 +98,8 @@ class RamdomGazeScript(SBScript):
 		curTime = sim.getTime()
 		for i in range(0, self.numCharacters):
 			if (curTime > self.nextTimes[i]):
-				self.nextTimes[i] = (sim.getTime() + 3 + random.randrange(0, 6, 1))
 				which = random.randrange(0, len(self.names), 1)
+				self.nextTimes[i] = (sim.getTime() + 3 + random.randrange(0, 6, 1))
 				if which != i:
 					bml.execBML("ChrRachel" + str(i), "<gaze target=\"ChrRachel" + str(which) + "\" sbm:joint-speed=\"500 500\" sbm:joint-range=\"chest eyes\"/><gesture name=\"ChrConnor@IdleStand01_ChopRt01\" start=\"1\"/>")
 

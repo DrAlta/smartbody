@@ -14,8 +14,8 @@ scene.setScale(1.0)
 scene.setBoolAttribute('internalAudio', True)
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(0.08, 1.55, 1.29)
-camera.setCenter(0.08, 1.44, 0.83)
+camera.setEye(0.08, 1.55, 0.79)
+camera.setCenter(0.08, 1.45, 0.0)
 camera.setUpVector(SrVec(0, 1, 0))
 camera.setScale(1)
 camera.setFov(1.0472)
@@ -34,8 +34,8 @@ zebra2Map.applyMotionRecurse('ChrBrad')
 
 # Set up 3 Brads
 print 'Adding characters into scene'
-posX = -55.0
-for i in range(3):
+posX = 0.0
+for i in range(1):
 	baseName = 'ChrBrad%s' % i
 	brad = scene.createCharacter(baseName, '')
 	bradSkeleton = scene.createSkeleton('ChrBrad.sk')
@@ -52,8 +52,8 @@ for i in range(3):
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	
 # Set proper facing angle
-scene.getCharacter('ChrBrad0').setHPR(SrVec(25, 0, 0))
-scene.getCharacter('ChrBrad2').setHPR(SrVec(-25, 0, 0))
+#scene.getCharacter('ChrBrad0').setHPR(SrVec(25, 0, 0))
+#scene.getCharacter('ChrBrad2').setHPR(SrVec(-25, 0, 0))
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
@@ -62,6 +62,6 @@ for name in scene.getCharacterNames():
 # Talk
 bml.execBML('ChrBrad0', '<saccade mode="talk"/>')
 # Listen
-bml.execBML('ChrBrad1', '<saccade mode="listen"/>')
+#bml.execBML('ChrBrad1', '<saccade mode="listen"/>')
 # Think
-bml.execBML('ChrBrad2', '<saccade mode="think"/>')
+#bml.execBML('ChrBrad2', '<saccade mode="think"/>')

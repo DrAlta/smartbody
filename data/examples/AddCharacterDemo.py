@@ -169,13 +169,15 @@ brad.setVoiceCode('MicrosoftAnna')
 brad.setStringAttribute('gestureMap', 'ChrBrad')
 brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 # Retarget 
-#retargetCharacter('ChrBrad', 'ChrBrad.sk')
+
+# setup locomotion
 scene.run('BehaviorSetMaleMocapLocomotion.py')
-#scene.run('BehaviorSetMaleLocomotion.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrBrad', 'ChrBrad.sk')
-# Idle pose
-
+# setup reach 
+scene.run('BehaviorSetReaching.py')
+setupBehaviorSet()
+retargetBehaviorSet('ChrBrad', 'ChrBrad.sk')
 # Turn on GPU deformable geometry
 scene.command('char ChrBrad viewer deformableGPU')
 
@@ -192,6 +194,6 @@ sim.start()
 
 bml.execBML('ChrBrad', '<body posture="ChrMarine@Idle01"/>')
 bml.execBML('ChrBrad', '<saccade mode="listen"/>')
-bml.execBML('ChrBrad', '<gaze sbm:handle="brad" target="camera"/>')
+#bml.execBML('ChrBrad', '<gaze sbm:handle="brad" target="camera"/>')
 
 sim.resume()

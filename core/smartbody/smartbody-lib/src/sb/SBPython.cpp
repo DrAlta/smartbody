@@ -629,7 +629,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("notifyMatrix", &Nvbg::notifyMatrix, &NvbgWrap::default_notifyMatrix, "Notifies NVBG processor of a matrix attribute.")
 		;
 
-	boost::python::class_<SBScriptWrap, boost::noncopyable>("SBScript")
+	boost::python::class_<SBScriptWrap, boost::noncopyable, boost::shared_ptr<SBScriptWrap> >("SBScript")
 		.def("start", &SBScript::start, &SBScriptWrap::default_start, "Script start.")
 		.def("beforeUpdate", &SBScript::beforeUpdate, &SBScriptWrap::default_beforeUpdate, "Script before update step.")
 		.def("update", &SBScript::update, &SBScriptWrap::default_update, "Script updates.")

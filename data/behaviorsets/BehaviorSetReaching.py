@@ -159,9 +159,7 @@ def retargetBehaviorSet(charName, skelName):
 	outDir = scene.getMediaPath() + 'retarget/motion/' + skelName + '/';
 	print 'outDir = ' + outDir ;
 	if not os.path.exists(outDir):
-		os.makedirs(outDir)
-
-	createRetargetInstance('common.sk', skelName)
+		os.makedirs(outDir)	
 	# retarget reaching
 	#for n in range(0, len(reachMotions)):
 	#	retargetMotion(reachMotions[n], 'common.sk', skelName, outDir + 'Reaching/');	
@@ -170,6 +168,8 @@ def retargetBehaviorSet(charName, skelName):
 		sbMotion = assetManager.getMotion(reachMotions[i])
 		if sbMotion != None:
 			sbMotion.setMotionSkeletonName('common.sk')
+	
+	createRetargetInstance('common.sk', skelName)
 
 	scene.run("init-reach.py")
 	reachSetup(charName, "KNN", 'common.sk', '')	

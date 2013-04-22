@@ -367,7 +367,7 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 	if (curHandActionState != POINT_AT_OBJECT)
 	{
 		ik.maxOffset = ikMaxOffset;
-		ik.dampJ = ikDamp*0.1f;
+		ik.dampJ = ikDamp*0.5f;
 		ik.refDampRatio = 0.05;
 		for (int i=0;i<10;i++)
 		{
