@@ -84,7 +84,7 @@ gazeX = -2
 gazeZ = 2
 dirX = 1
 dirZ = 1
-speed = 0.001
+speed = 0.03
 lastTime = -8
 class GazeDemo(SBScript):
 	def update(self, time):
