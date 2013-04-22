@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <boost/foreach.hpp>
 #include <sbm/gwiz_math.h>
+#include <sb/SBScene.h>
 
 const float PI_CONST = 3.14159265358979323846f;
 const MeCtIKJointLimit limb_joint_limit[] = { 							
@@ -386,6 +387,21 @@ SrMat MeCtIKTreeScenario::getLocalMat( const SkJoint* joint, const SrQuat& q, co
 	return lMat;
 }
 
+float MeCtIKTreeScenario::getIKChainLength( const char* chainRoot, const char* chainEffector )
+{
+	MeCtIKTreeNode *rootNode, *effectorNode;
+	rootNode = findIKTreeNode(chainRoot);
+	effectorNode = findIKTreeNode(chainEffector);
+	if (!rootNode || !effectorNode) return -1.f;
+	float chainLength = 0.f;
+	MeCtIKTreeNode* tempNode = effectorNode;
+	while (tempNode != rootNode && tempNode->parent)
+	{
+		chainLength += (tempNode->getGlobalPos() - tempNode->parent->getGlobalPos()).len();
+		tempNode = tempNode->parent;
+	}	
+	return chainLength;
+}
 /************************************************************************/
 /* Jacobian based IK                                                    */
 /************************************************************************/
@@ -463,16 +479,28 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 	// plus rotation
 	dS.resize(s->ikPosEffectors->size()*3 + s->ikRotEffectors->size()*3);	
 	ConstraintMap::iterator ci;
-	int posCount = 0;
+	int posCount = 0;	
 	// fill in entries for positional constraint
  	//for (unsigned int i=0;i<s->ikPosEffectors.size();i++)
 	for (ci = s->ikPosEffectors->begin(); ci != s->ikPosEffectors->end(); ci++)
 	{
 		EffectorConstraint* cons = ci->second;
 		MeCtIKTreeNode* endNode = s->findIKTreeNode(cons->efffectorName.c_str());
+		MeCtIKTreeNode* rootNode = s->findIKTreeNode(cons->rootName.c_str());
+		// find the length of IK chain
+
 		const SrMat& endMat = endNode->gmat;
 		SrVec endPos = endMat.get_translation();
-		SrVec offset = cons->getPosConstraint() - endPos;			
+		SrVec constraintPos = cons->getPosConstraint();				
+		SrVec constraintOffset = constraintPos - rootNode->getGlobalPos();
+		SrVec constraintDir = constraintOffset; constraintDir.normalize();
+		float chainLength = s->getIKChainLength(cons->rootName.c_str(), cons->efffectorName.c_str());
+ 		if (constraintOffset.len() > chainLength)
+ 		{
+ 			constraintPos = rootNode->getGlobalPos() + constraintDir*chainLength*0.995f; // make sure the target position is not out of reach 			
+ 		}	
+
+		SrVec offset = constraintPos - endPos;				
 		SrVec targetPos;	
 		//sr_out << "effector offset = " << srnl;
 		if (offset.len() > maxOffset)

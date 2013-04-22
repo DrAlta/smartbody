@@ -96,6 +96,7 @@ public:
 	void updateNodeGlobalMat(MeCtIKTreeNode* jointNode, NodeQuatType quatType = QUAT_INIT);	
 	MeCtIKTreeNode* findIKTreeNode(const char* jointName);	
 	static int findIKTreeNodeInList(const char* jointName, IKTreeNodeList& nodeList);	
+	float getIKChainLength(const char* chainRoot, const char* chainEffector);
 protected:
 	void clearNodes();
 	int traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode, std::vector<MeCtIKTreeNode*>& nodeList, std::vector<std::string>& stopJoints);		
