@@ -48,9 +48,9 @@ def setupBehaviorSet():
 
 def retargetBehaviorSet(charName, skelName):	
 		
-	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
-	if not os.path.exists(outDir):
-		os.makedirs(outDir)
+	#outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
+	#if not os.path.exists(outDir):
+	#	os.makedirs(outDir)
 		
 	# retarget standard locomotions
 	#for n in range(0, len(locoMotions)):
