@@ -60,7 +60,7 @@ class SBAPI SrSn : public SrSharedClass
     char* _label;
     const char* _inst_class_name;
 
-   protected :
+   public :
     /* Constructor requires the definition of the node type, and a const string
        containing the name of the instantiated node. The convention for the class_name
        is to take exactly the name of the class, without the leading "SrSn"

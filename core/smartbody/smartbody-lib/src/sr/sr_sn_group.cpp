@@ -92,7 +92,9 @@ SrSn *SrSnGroup::remove ( int pos )
     }
 
    int oldref = sn->getref();
-   sn->unref();
+   //delete sn;
+   //return NULL;
+   sn->unref();   
    return oldref>1? sn:0;
  }
 
@@ -116,6 +118,8 @@ SrSn *SrSnGroup::replace ( int pos, SrSn *sn )
    int oldref = old->getref();
    old->unref();
    return oldref>1? old:0;
+   //delete old;
+   //return NULL;   
  }
 
 void SrSnGroup::remove_all ()

@@ -70,12 +70,12 @@ public:
 	std::vector<SrVec4>         boneIDBuf_f[2];
 	std::vector<SrVec4>         boneWeightBuf[2];
 	std::map<std::string,int>   boneJointIdxMap;
-	std::vector<SkJoint*>    boneJointList;	
+	std::vector<SkJoint*>		boneJointList;	
 	std::vector<SrMat>          bindPoseMatList;
 
 public:
 	DeformableMesh();
-	SBAPI ~DeformableMesh();	
+	SBAPI virtual ~DeformableMesh();	
 	SBAPI void setSkeleton(SkSkeleton* skel);
 	virtual void update();
 	SkinWeight* getSkinWeight(const std::string& skinSourceName);
@@ -96,7 +96,7 @@ protected:
 	std::vector<SkJointList> _boneJointList;
 public:
 	DeformableMeshInstance();
-	SBAPI ~DeformableMeshInstance();
+	SBAPI virtual ~DeformableMeshInstance();
 
 	virtual void setDeformableMesh(DeformableMesh* mesh);
 

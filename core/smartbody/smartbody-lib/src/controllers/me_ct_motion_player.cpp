@@ -47,7 +47,10 @@ MeCtMotionPlayer::MeCtMotionPlayer(SbmCharacter* c) : MeCtContainer(new MeCtMoti
 MeCtMotionPlayer::~MeCtMotionPlayer()
 {
 	if (controller)
-		controller->unref();
+	{
+		//controller->unref();
+		delete controller;
+	}
 	controller = NULL;
 }
 
@@ -61,12 +64,11 @@ void MeCtMotionPlayer::init(SbmPawn* pawn, std::string name, double n)
 	if (controller != NULL)
 	{
 		_sub_context->remove_controller(controller);
-		controller->unref();
+		//controller->unref();
+		delete controller;
 	}
-
-	 
+		 
 	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(name);
-
 	motionName = name;
 	motion->connect(character->getSkeleton());
 	controller = new MeCtMotion();
