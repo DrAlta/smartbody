@@ -45,7 +45,7 @@ class SBAPI SrSnMatrix : public SrSn
    public :
     static const char* class_name;
 
-   protected :
+   public :
     /*! Destructor only accessible through unref() */
     virtual ~SrSnMatrix ();
 

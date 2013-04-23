@@ -332,6 +332,16 @@ typedef std::pair<int,int> IntPair;
 SbmDeformableMeshGPU::SbmDeformableMeshGPU(void)
 {
 	useGPU = false;	
+	VBOPos = NULL;
+	VBOTangent = NULL;
+	VBOBiNormal = NULL;
+	VBOTexCoord = NULL;
+	VBOTri = NULL;
+	VBOBoneID1 = NULL;
+	VBOBoneID2 = NULL;
+	VBOWeight1 = NULL;
+	VBOWeight2 = NULL;
+	TBOTran = NULL;
 }
 
 SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
@@ -347,6 +357,11 @@ SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 	if (VBOWeight1) delete VBOWeight1;
 	if (VBOWeight2) delete VBOWeight2;
 	if (TBOTran) delete TBOTran;
+	for (unsigned int i=0;i<subMeshTris.size();i++)
+	{
+		delete subMeshTris[i];
+	}
+	subMeshTris.clear();
 
 	for (unsigned int i=0;i<meshSubset.size();i++)
 		delete meshSubset[i];
@@ -1098,7 +1113,8 @@ SbmDeformableMeshGPUInstance::SbmDeformableMeshGPUInstance()
 
 SbmDeformableMeshGPUInstance::~SbmDeformableMeshGPUInstance()
 {
-
+	if (TBOTran)
+		delete TBOTran;
 }
 
 void SbmDeformableMeshGPUInstance::updateTransformBuffer()

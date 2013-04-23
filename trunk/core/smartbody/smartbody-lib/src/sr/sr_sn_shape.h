@@ -60,7 +60,7 @@ class SBAPI SrSnShapeBase : public SrSn
     SrMaterial _overriden_material;
     char _material_is_overriden;
 
-   protected :
+   public :
 
     /*! Constructor requires the name of the derived class. */
     SrSnShapeBase ( const char* name );

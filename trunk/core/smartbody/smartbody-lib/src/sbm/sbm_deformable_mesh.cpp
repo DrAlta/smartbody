@@ -63,12 +63,18 @@ DeformableMesh::DeformableMesh()
 
 DeformableMesh::~DeformableMesh() 
 {
-//	skeleton->unref();
+	skeleton->unref();
 	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
 		dMeshDynamic_p[i]->unref();
+		//delete dMeshDynamic_p[i];
+	}
 	dMeshDynamic_p.clear();
 	for (unsigned int i = 0; i < dMeshStatic_p.size(); i++)
+	{
 		dMeshStatic_p[i]->unref();
+		//delete dMeshStatic_p[i];
+	}
 	dMeshStatic_p.clear();
 	for (unsigned int i = 0; i < skinWeights.size(); i++)
 	{
@@ -78,7 +84,7 @@ DeformableMesh::~DeformableMesh()
 			delete sw;
 			sw = NULL;
 		}
-	}
+	}	
 	skinWeights.clear();
 }
 
@@ -590,6 +596,7 @@ void DeformableMeshInstance::cleanUp()
 
 		SmartBody::SBScene::getScene()->getRootGroup()->remove(dynamicMesh[i]);
 		dynamicMesh[i]->unref();		
+		//delete dynamicMesh[i];
 	}
 	dynamicMesh.clear();
 }

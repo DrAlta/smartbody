@@ -45,7 +45,7 @@ class SBAPI SrSnGroup : public SrSn
    public :
     static const char* class_name;
 
-   protected :
+   public :
     /*! The destructor will remove all children in the subtree.
         Only accessible through unref(). */
     virtual ~SrSnGroup ();

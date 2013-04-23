@@ -108,6 +108,11 @@ void KinectProcessor::inferJointOffsets( std::vector<SrVec>& gPos, std::vector<S
 				newOffset = newOffset*prot;
 				bonePreRotMap[i] = prot;
 			}
+			else if (boneMapping[i] == "spine2")
+			{
+				newOffset = newOffset*prot;
+				bonePreRotMap[i] = prot;
+			}
 // 			else if (i>=5 && i<=7) // l_elbow, l_wrist, l_hand
 // 			{
 // 				newOffset = newOffset*bonePreRotMap[4];
