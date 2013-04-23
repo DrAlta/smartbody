@@ -1786,22 +1786,30 @@ void SBScene::saveRetargets( std::stringstream& strstr, bool remoteSetup )
  *   write to output, ../ times the number of remaining elements in base
  *   write to output, the remaining elements in path
  */
+#if (BOOST_VERSION > 104400)
+boost::filesystem::path
+naive_uncomplete(boost::filesystem::path const p, boost::filesystem::path const base) {
+    using boost::filesystem::path;
+    //using boost::filesystem::dot;
+    //using boost::filesystem::slash;
+#else
 boost::filesystem2::path
 naive_uncomplete(boost::filesystem2::path const p, boost::filesystem2::path const base) {
-
     using boost::filesystem2::path;
-    using boost::filesystem2::dot;
-    using boost::filesystem2::slash;
+    //using boost::filesystem2::dot;
+    //using boost::filesystem2::slash;
+#endif
+
 
     if (p == base)
         return "./";
         /*!! this breaks stuff if path is a filename rather than a directory,
              which it most likely is... but then base shouldn't be a filename so... */
 
-    boost::filesystem2::path from_path, from_base, output;
+    path from_path, from_base, output;
 
-    boost::filesystem2::path::iterator path_it = p.begin(),    path_end = p.end();
-    boost::filesystem2::path::iterator base_it = base.begin(), base_end = base.end();
+    path::iterator path_it = p.begin(),    path_end = p.end();
+    path::iterator base_it = base.begin(), base_end = base.end();
 
     // check for emptiness
     if ((path_it == path_end) || (base_it == base_end))
@@ -1818,9 +1826,9 @@ naive_uncomplete(boost::filesystem2::path const p, boost::filesystem2::path cons
 #endif
 
     // Cache system-dependent dot, double-dot and slash strings
-    const std::string _dot  = std::string(1, dot<path>::value);
-    const std::string _dots = std::string(2, dot<path>::value);
-    const std::string _sep = std::string(1, slash<path>::value);
+    const std::string _dot  = ".";//std::string(1, dot<path>::value);
+    const std::string _dots = "..";//std::string(2, dot<path>::value);
+    const std::string _sep = "/";//std::string(1, slash<path>::value);
 
     // iterate over path and base
     while (true) {
@@ -1842,7 +1850,7 @@ naive_uncomplete(boost::filesystem2::path const p, boost::filesystem2::path cons
 
             // write to output, the remaining elements in path;
             // this is the path relative from the common root
-            boost::filesystem2::path::iterator path_it_start = path_it;
+            path::iterator path_it_start = path_it;
             for (; path_it != path_end; ++path_it) {
 
                 if (path_it != path_it_start)
@@ -1883,42 +1891,52 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 	std::vector<std::string> skelNames = getSkeletonNames();
 	std::set<std::string> extraAssetPathSet;
 
+#if (BOOST_VERSION > 104400)
+    using boost::filesystem::path;
+    //using boost::filesystem::dot;
+    //using boost::filesystem::slash;
+#else
+    using boost::filesystem2::path;
+    //using boost::filesystem2::dot;
+    //using boost::filesystem2::slash;
+#endif
+
 	// feng : since we may have use "loadAssetsFromPath" to load the motions, we should infer all other motion paths from existing motions.
 	for (unsigned int i=0;i<motionNames.size();i++)
 	{
 		SmartBody::SBMotion* motion = getMotion(motionNames[i]);
-		boost::filesystem2::path motionFile(motion->filename());			
-		boost::filesystem2::path motionPath = motionFile.parent_path();
+		path motionFile(motion->filename());			
+		path motionPath = motionFile.parent_path();
 		if (motionPath.empty()) // don't care about empty path
 			continue;
 
-		boost::filesystem2::path mePath(mediaPath);
-		boost::filesystem2::path diffPath = naive_uncomplete(motionPath,mePath);
-		LOG("motionpath = %s, mediapath = %s, diffpath = %s", motionFile.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
+		path mePath(mediaPath);
+		path diffPath = naive_uncomplete(motionPath,mePath);
+		//LOG("motionpath = %s, mediapath = %s, diffpath = %s", motionFile.directory_string().c_str(), mePath.string().c_str(), diffPath.string().c_str());
 
-		std::vector<std::string>::iterator st = std::find(motionPaths.begin(),motionPaths.end(),diffPath.directory_string());
+		std::vector<std::string>::iterator st = std::find(motionPaths.begin(),motionPaths.end(),diffPath.string());
 		if (st == motionPaths.end())
 		{
-			extraAssetPathSet.insert(diffPath.directory_string());
+			extraAssetPathSet.insert(diffPath.string());
 		}
 	}
 
 	for (unsigned int i=0;i<skelNames.size();i++)
 	{
 		SmartBody::SBSkeleton* skel = getSkeleton(skelNames[i]);
-		boost::filesystem2::path skelFile(skel->getFileName());			
-		boost::filesystem2::path skelPath = skelFile.parent_path();
+		path skelFile(skel->getFileName());			
+		path skelPath = skelFile.parent_path();
 		if (skelPath.empty()) // don't care about empty path
 			continue;
 
-		boost::filesystem2::path mePath(mediaPath);
-		boost::filesystem2::path diffPath = naive_uncomplete(skelPath,mePath);
+		path mePath(mediaPath);
+		path diffPath = naive_uncomplete(skelPath,mePath);
 		//LOG("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
 
-		std::vector<std::string>::iterator st = std::find(motionPaths.begin(),motionPaths.end(),diffPath.directory_string());
+		std::vector<std::string>::iterator st = std::find(motionPaths.begin(),motionPaths.end(),diffPath.string());
 		if (st == motionPaths.end())
 		{
-			extraAssetPathSet.insert(diffPath.directory_string());
+			extraAssetPathSet.insert(diffPath.string());
 		}
 	}
 
