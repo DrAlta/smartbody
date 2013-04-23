@@ -618,7 +618,7 @@ void CSkeletalViewerApp::Nui_DrawBone( const NUI_SKELETON_DATA & skel, NUI_SKELE
 void CSkeletalViewerApp::processAndSendSkeleton( const NUI_SKELETON_DATA & skel )
 {
 	// get orienatation data
-	std::string skeletonName = "kinect1";	
+	std::string skeletonName = "kinect1";		
 	NUI_SKELETON_BONE_ORIENTATION boneOrientations[NUI_SKELETON_POSITION_COUNT];
 
 	NuiSkeletonCalculateBoneOrientations(&skel, boneOrientations);
