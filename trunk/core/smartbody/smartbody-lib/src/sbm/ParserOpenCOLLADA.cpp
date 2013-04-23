@@ -195,9 +195,14 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node)
 	int type = node->getNodeType();
 	if (type ==  DOMNode::ELEMENT_NODE)
 	{
-		std::string name = XMLString::transcode(node->getNodeName());
-		if (name == nodeName)
+		char* name = XMLString::transcode(node->getNodeName());
+		std::string strname = name;
+		if (strname == nodeName)
+		{	
+			XMLString::release( &name );
 			return node;
+		}
+		XMLString::release( &name );
 	}
 
 	DOMNode* child = NULL;
@@ -216,9 +221,14 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node, 
 	int type = node->getNodeType();
 	if (type ==  DOMNode::ELEMENT_NODE)
 	{
-		std::string name = XMLString::transcode(node->getNodeName());
-		if (name == nodeName)
+		char* name = XMLString::transcode(node->getNodeName());
+		std::string strname = name;
+		if (strname == nodeName)
+		{
+			XMLString::release( &name );
 			return node;
+		}
+		XMLString::release( &name );
 	}
 
 	if (maximumDepth > -1 &&
