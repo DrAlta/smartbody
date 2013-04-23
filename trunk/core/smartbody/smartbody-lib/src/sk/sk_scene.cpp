@@ -179,7 +179,7 @@ void SkScene::init ( SkSkeleton* s, float scale )
          g->add ( sphere ); 	
 	  }
     }
-   sphere->unref();
+   //sphere->unref();
    axis->unref();
    update ();
  }
@@ -453,7 +453,7 @@ SrSnSphere* SkScene::createSphere(float scaleFactor )
 	sphere->color(SrColor::white);   
 	sphere->shape().radius = scaleFactor * _cradius * _sfactor;
 	sphere->visible ( true );
-	sphere->ref();	
+	//sphere->ref();	
 	return sphere;
 }
 //============================= EOF ===================================
