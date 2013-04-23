@@ -4708,6 +4708,7 @@ int stopheapprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 {
 	LOG("Stopping the heap Profiler...");
 	HeapProfilerStop();
+	HeapProfilerDump("/tmp/smartbodyheapprofile");
 	return CMD_SUCCESS;
 }
 #endif
