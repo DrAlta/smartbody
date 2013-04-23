@@ -1,4 +1,4 @@
-#add_definitions ( -DUSE_GOOGLE_PROFILER )
+add_definitions ( -DUSE_GOOGLE_PROFILER )
 
 include_directories(
 	steersuite-1.3/steerlib/include

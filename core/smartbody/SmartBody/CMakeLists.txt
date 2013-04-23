@@ -505,8 +505,8 @@ add_library(
 
 target_link_libraries( SmartBody
 
-#	tcmalloc
-#	profiler
+	tcmalloc
+	profiler
 	bonebus
 	vhmsg
 	vhcl
