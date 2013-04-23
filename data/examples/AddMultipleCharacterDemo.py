@@ -54,7 +54,7 @@ for i in range(amount):
 	rachel.createStandardControllers()
 	# Set deformable mesh
 	rachel.setDoubleAttribute('deformableMeshScale', 1)
-	#rachel.setStringAttribute('deformableMesh', 'ChrRachel')
+	rachel.setStringAttribute('deformableMesh', 'ChrRachel')
 	if i== 0 : 
 		scene.run('BehaviorSetFemaleGestures.py')
 		setupBehaviorSet()

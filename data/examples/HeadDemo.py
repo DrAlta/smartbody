@@ -70,7 +70,7 @@ def nextHead():
 	# Random repeats, velocity and amount
 	repeats = random.uniform(0.1, 2)
 	velocity = random.uniform(0.1, 1)
-	amount = random.uniform(0.1, 1)
+	amount = random.uniform(0.1, 1) / 2.0
 	# Perform BML command
 	bml.execBML('*', '<head type="' + headChoice + '" amount="' + str(amount) + '" repeats="' + str(repeats) + '" velocity="' + str(velocity) + '"/>')
 	# Increment index, reset when hit max
