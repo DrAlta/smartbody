@@ -94,7 +94,8 @@ scene.getCharacter('ChrBrad1').setHPR(SrVec(-17, 0, 0))
 scene.command('char ChrBrad0 viewer deformableGPU')
 scene.command('char ChrBrad1 viewer deformableGPU')
 
-lastTime = 0
+lastTime = -5
+import random
 class PerlinNoiseDemo(SBScript):
 	def update(self, time):
 		global lastTime
@@ -102,16 +103,18 @@ class PerlinNoiseDemo(SBScript):
 		# When time's up, do action
 		if timeDiff >= 5:
 			lastTime = time
+			which = random.randrange(0, 3, 1)
 			# Perlin noise can be added by adding sbm:joint-range="l_shoulder" sbm:frequency="0.03" sbm:scale="0.02" at the end 
 			# Perlin noise
-			bml.execBML('ChrBrad0', '<gesture lexeme="DEICTIC" type="YOU" stroke="0" relax="2" sbm:joint-range="l_shoulder l_elbow" sbm:frequency="0.09" sbm:scale="0.04"/>')
-			bml.execBML('ChrBrad0', '<gesture lexeme="METAPHORIC" type="OBLIGATION" mode="LEFT_HAND" stroke="5" relax="7" sbm:joint-range="l_shoulder l_elbow" sbm:frequency="0.09" sbm:scale="0.04"/>')
-			bml.execBML('ChrBrad0', '<gesture lexeme="DEICTIC" type="ME" stroke="10" relax="12" sbm:joint-range="l_shoulder l_elbow" sbm:frequency="0.09" sbm:scale="0.04"/>')
-			
-			# No Perlin noise
-			bml.execBML('ChrBrad1', '<gesture lexeme="DEICTIC" type="YOU" stroke="0" relax="2"/>')
-			bml.execBML('ChrBrad1', '<gesture lexeme="METAPHORIC" type="OBLIGATION" mode="LEFT_HAND" stroke="5" relax="7"/>')
-			bml.execBML('ChrBrad1', '<gesture lexeme="DEICTIC" type="ME" stroke="10" relax="12"/>')
+			if which == 0:
+				bml.execBML('ChrBrad0', '<gesture lexeme="DEICTIC" type="YOU" poststroke_hold="2" sbm:joint-range="l_shoulder l_elbow" sbm:frequency="0.05" sbm:scale="0.02"/>')
+				bml.execBML('ChrBrad1', '<gesture lexeme="DEICTIC" type="YOU" poststroke_hold="2"/>')
+			elif which == 1:
+				bml.execBML('ChrBrad0', '<gesture lexeme="METAPHORIC" type="OBLIGATION" mode="LEFT_HAND" poststroke_hold="2" sbm:joint-range="l_shoulder l_elbow" sbm:frequency="0.05" sbm:scale="0.02"/>')
+				bml.execBML('ChrBrad1', '<gesture lexeme="METAPHORIC" type="OBLIGATION" mode="LEFT_HAND" poststroke_hold="2"/>')
+			elif which == 2:
+				bml.execBML('ChrBrad0', '<gesture lexeme="DEICTIC" type="ME" poststroke_hold="2" sbm:joint-range="l_shoulder l_elbow" sbm:frequency="0.05" sbm:scale="0.02"/>')
+				bml.execBML('ChrBrad1', '<gesture lexeme="DEICTIC" type="ME" poststroke_hold="2"/>')					
 			
 # Run the update script
 scene.removeScript('perlinnoisedemo')

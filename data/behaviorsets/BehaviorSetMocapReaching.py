@@ -196,10 +196,10 @@ def retargetBehaviorSet(charName, skelName):
 	grabMotions.append("HandsAtSide_LArm_GestureYou")
 	grabMotions.append("HandsAtSide_RArm_GestureYou")
 	
-	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
-	print 'outDir = ' + outDir ;
-	if not os.path.exists(outDir):
-		os.makedirs(outDir)
+	#outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
+	#print 'outDir = ' + outDir ;
+	#if not os.path.exists(outDir):
+	#	os.makedirs(outDir)
 		
 	createRetargetInstance('ChrGarza.sk', skelName)
 	

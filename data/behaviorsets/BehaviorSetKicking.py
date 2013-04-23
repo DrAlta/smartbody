@@ -67,9 +67,9 @@ def retargetBehaviorSet(charName, skelName):
 	kickMotions.append("ChrGarza@IdleFight01_KickRightSideMedium01")
 	
 	
-	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
-	if not os.path.exists(outDir):
-		os.makedirs(outDir)
+	#outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
+	#if not os.path.exists(outDir):
+	#	os.makedirs(outDir)
 	'''	
 	# retarget kicking
 	for n in range(0, len(kickMotions)):

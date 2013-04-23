@@ -155,10 +155,10 @@ def retargetBehaviorSet(charName, skelName):
 	gestureMotions.append("ChrConnor@IdleStand01_YouLeftRt01Lf")
 	gestureMotions.append("ChrConnor@IdleStand01_YouRightRt01Lf")
 	
-	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
-	print 'outDir = ' + outDir ;
-	if not os.path.exists(outDir):
-		os.makedirs(outDir)
+	#outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
+	#print 'outDir = ' + outDir ;
+	#if not os.path.exists(outDir):
+	#	os.makedirs(outDir)
 	assetManager = scene.getAssetManager()	
 	for i in range(0, len(gestureMotions)):
 		sbMotion = assetManager.getMotion(gestureMotions[i])

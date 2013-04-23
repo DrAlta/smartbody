@@ -156,10 +156,10 @@ def retargetBehaviorSet(charName, skelName):
 	
 	
 	
-	outDir = scene.getMediaPath() + 'retarget/motion/' + skelName + '/';
-	print 'outDir = ' + outDir ;
-	if not os.path.exists(outDir):
-		os.makedirs(outDir)	
+	#outDir = scene.getMediaPath() + 'retarget/motion/' + skelName + '/';
+	#print 'outDir = ' + outDir ;
+	#if not os.path.exists(outDir):
+	#	os.makedirs(outDir)	
 	# retarget reaching
 	#for n in range(0, len(reachMotions)):
 	#	retargetMotion(reachMotions[n], 'common.sk', skelName, outDir + 'Reaching/');	
