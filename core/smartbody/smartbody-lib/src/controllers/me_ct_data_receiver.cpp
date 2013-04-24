@@ -7,7 +7,7 @@ std::string MeCtDataReceiver::CONTROLLER_TYPE = "DataReceiver";
 MeCtDataReceiver::MeCtDataReceiver(SkSkeleton* skel) : SmartBody::SBController()
 {
 	_skeleton = skel;
-	skel->ref();
+	//skel->ref();
 
 	_valid = true;
 	_prevTime = 0.0;
@@ -16,7 +16,8 @@ MeCtDataReceiver::MeCtDataReceiver(SkSkeleton* skel) : SmartBody::SBController()
 
 MeCtDataReceiver::~MeCtDataReceiver()
 {
-	_skeleton->unref();
+	//_skeleton->unref();
+	delete _skeleton;
 	_posMap.clear();
 	_startingPos.clear();
 	_quatMap.clear();

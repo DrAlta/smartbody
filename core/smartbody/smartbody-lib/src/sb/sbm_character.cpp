@@ -202,7 +202,7 @@ _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 //  Destructor
 SbmCharacter::~SbmCharacter( void )	{
 
-	printf("delete character %s\n",this->getName().c_str());
+	//printf("delete character %s\n",this->getName().c_str());
 
 	if (_faceDefinition)
 		delete _faceDefinition;

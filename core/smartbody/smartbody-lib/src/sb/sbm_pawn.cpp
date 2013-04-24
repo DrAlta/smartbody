@@ -138,7 +138,10 @@ void SbmPawn::initData()
 {
 	bonebusCharacter = NULL;
 	if (_skeleton)
-		_skeleton->unref();
+	{
+		delete _skeleton;
+		//_skeleton->unref();
+	}
 	_skeleton = new SmartBody::SBSkeleton();
 	_skeleton->ref();
 	ct_tree_p = MeControllerTreeRoot::create();
@@ -192,7 +195,8 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 	if (_skeleton)
 	{		
 		ct_tree_p->remove_skeleton( _skeleton->getName() );
-		_skeleton->unref();
+		//_skeleton->unref();
+		delete _skeleton;
 	}
 	_skeleton = sk;
 	_skeleton->ref();	
@@ -211,13 +215,14 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 		
 	float height = _skeleton->getCurrentHeight();	
 	setHeight(height);
-	_skeleton->ref();
+	//_skeleton->ref();
 }
 
 int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 	if( _skeleton ) {
 		ct_tree_p->remove_skeleton( _skeleton->getName() );
-		_skeleton->unref();
+		//_skeleton->unref();
+		delete _skeleton;
 	}
 	_skeleton = new_skeleton_p;
 	if( _skeleton ) {
@@ -421,10 +426,8 @@ SbmPawn::~SbmPawn()	{
 
 	if (scene_p)
 		scene_p->unref();
-	if( _skeleton )
-		_skeleton->unref();
-	ct_tree_p->unref();
 	
+	ct_tree_p->unref();	
 	if (steeringSpaceObj_p)
 	{
 		if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
@@ -445,6 +448,13 @@ SbmPawn::~SbmPawn()	{
 	if (dMeshInstance_p)
 	{
 		delete dMeshInstance_p;
+	}
+
+	if( _skeleton )
+	{
+		//LOG("skeleton ref count = %d",_skeleton->getref());
+		//_skeleton->unref();
+		delete _skeleton;
 	}
 
 	SmartBody::SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();

@@ -292,7 +292,7 @@ MeCtScheduler2::MeCtScheduler2 ()
 
 MeCtScheduler2::~MeCtScheduler2 () {
 
-	LOG("delete scheduler %s\n",this->getName().c_str());
+   //LOG("delete scheduler %s\n",this->getName().c_str());
    stop (SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
    _sub_sched_context->unref();
    //clear();

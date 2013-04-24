@@ -93,7 +93,9 @@ SkSkeleton::SkSkeleton (SkSkeleton* origSkel)  : SmartBody::SBAsset()
 
 SkSkeleton::~SkSkeleton ()
 {
+	//LOG("delete skeleton %s",getName().c_str());
 	init ();
+	//LOG("channel ref count = %d",_channels->getref());
 	_channels->unref();
 }
 
