@@ -78,7 +78,9 @@ void MeCtBlendEngine::init(const std::string& paramFuncType)
 
 MeCtBlendEngine::~MeCtBlendEngine( void )
 {	
-	skeletonCopy->unref();
+	//skeletonCopy->unref();
+	if (skeletonCopy)
+		delete skeletonCopy;
 }
 
 

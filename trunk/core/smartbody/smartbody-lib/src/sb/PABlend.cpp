@@ -1328,7 +1328,8 @@ MotionParameters::~MotionParameters()
 {
 	motion->disconnect();
 	if (skeleton)
-		skeleton->unref();
+		delete skeleton;
+		//skeleton->unref();
 }
 
 

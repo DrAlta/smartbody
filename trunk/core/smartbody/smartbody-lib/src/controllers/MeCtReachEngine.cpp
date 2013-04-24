@@ -72,7 +72,9 @@ MeCtReachEngine::~MeCtReachEngine( void )
 	{
 		delete reachData;
 	}
-	skeletonCopy->unref();
+	//skeletonCopy->unref();
+	if (skeletonCopy)
+		delete skeletonCopy;
 //	if (dataInterpolator)
 //		delete dataInterpolator;
 //	if (interpMotion)
