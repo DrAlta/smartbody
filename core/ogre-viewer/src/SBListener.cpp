@@ -77,7 +77,7 @@ void SBListener::OnCharacterCreate( const  std::string & name, const  std::strin
 		if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) 
 		{
 			//Default to existing Brad character
-			ent = m_app->getSceneManager()->createEntity(name, "Brad.mesh" );
+			ent = m_app->getSceneManager()->createEntity(name, "ChrBrad.mesh" );
 		}
 	}
 		
