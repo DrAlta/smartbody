@@ -540,6 +540,7 @@ void SBCharacter::setFaceDefinition(SBFaceDefinition* face)
 void SBCharacter::notify(SBSubject* subject)
 {
 	SBAttribute* attribute = dynamic_cast<SBAttribute*>(subject);
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	if (attribute)
 	{
 		if (attribute->getName() == "createPhysics")
@@ -633,6 +634,29 @@ void SBCharacter::notify(SBSubject* subject)
 				ppraiAgent->setSteerParamsDirty(true);
 			}
 		}
+#if 1 // rocket box test		
+		if (attrName == "_1testHead")
+		{
+			scene->run("testHead('"+getName()+"',0.0)");		
+		}
+		else if (attrName == "_2testGaze")
+		{
+			scene->run("testGaze('"+getName()+"',0.0)");		
+		}
+		else if (attrName == "_3testGesture")
+		{
+			scene->run("testGesture('"+getName()+"',0.0)");		
+		}
+		else if (attrName == "_4testReach")
+		{
+			scene->run("testReach('"+getName()+"',0.0)");		
+		}
+		else if (attrName == "_5testLocomotion")
+		{
+			scene->run("testLocomotion('"+getName()+"',0.0)");		
+		}
+		
+#endif
 	}
 
 	SbmCharacter::notify(subject);

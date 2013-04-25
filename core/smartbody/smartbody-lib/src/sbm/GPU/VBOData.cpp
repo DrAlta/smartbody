@@ -9,7 +9,7 @@ VBOData::~VBOData(void)
 {
 	if (m_iVBO_ID)
 		glDeleteBuffers(1,&m_iVBO_ID);
-	printf("%10s (%d) is now destroied",m_Name,m_iVBO_ID);
+	//printf("%10s (%d) is now destroied",m_Name,m_iVBO_ID);
 }
 
 void VBOData::BindBuffer()

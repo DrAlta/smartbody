@@ -94,7 +94,8 @@ MeCtHand::MeCtHand( SmartBody::SBSkeleton* sk, SmartBody::SBJoint* wrist)
 
 MeCtHand::~MeCtHand( void )
 {
-	
+	if (skeletonCopy)
+		delete skeletonCopy;
 }
 
 SbmPawn* MeCtHand::getAttachedPawn()

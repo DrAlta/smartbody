@@ -34,8 +34,8 @@
 #include <sb/SBRetarget.h>
 
 #define LoopHandle 0
-const int rotType = 132;
-//const int rotType = 231;
+//const int rotType = 132;
+const int rotType = 312;
 const double defaultTransition = 0.3;
 
 struct JointChannelId 

@@ -1866,6 +1866,17 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 				LOG("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
 			}
 		}
+#define TEST_ROCKETBOX 1
+#if TEST_ROCKETBOX
+		scene->addAssetPath("script", "scripts");
+		scene->run("scene.run('characterUnitTest.py')");
+		
+		character->createActionAttribute("_1testHead", true, "TestHead", 300, false, false, false, "Test Head");
+		character->createActionAttribute("_2testGaze", true, "TestHead", 300, false, false, false, "Test Head");
+		character->createActionAttribute("_3testGesture", true, "TestHead", 300, false, false, false, "Test Head");
+		character->createActionAttribute("_4testReach", true, "TestHead", 300, false, false, false, "Test Head");
+		character->createActionAttribute("_5testLocomotion", true, "TestHead", 300, false, false, false, "Test Head");
+#endif
 
 		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1024, 500, "Retarget Step Window");
 		_retargetStepWindow->setApplyType(true);

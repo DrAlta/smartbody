@@ -253,6 +253,57 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node, 
 	return child;
 }
 
+
+XercesDOMParser* ParserOpenCOLLADA::getParserFromFile( std::string fileName )
+{
+	try 
+	{
+		XMLPlatformUtils::Initialize();
+	}
+	catch (const XMLException& toCatch) 
+	{
+		std::string message = "";
+		xml_utils::xml_translate(&message, toCatch.getMessage());
+		std::cout << "Error during initialization! :\n" << message << "\n";
+		return NULL;
+	}
+
+	XercesDOMParser* parser = new XercesDOMParser();
+	parser->setValidationScheme(XercesDOMParser::Val_Always);
+	parser->setDoNamespaces(true);    // optional
+
+	ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
+	parser->setErrorHandler(errHandler);
+
+	try 
+	{
+		std::string filebasename = boost::filesystem::basename(fileName);
+		parser->parse(fileName.c_str());		
+		return parser;
+	}
+	catch (const XMLException& toCatch) 
+	{
+		std::string message = "";
+		xml_utils::xml_translate(&message, toCatch.getMessage());
+		LOG("Exception message is: %s", message.c_str());
+		delete parser;
+		return NULL;
+	}
+	catch (const DOMException& toCatch) {
+		std::string message = "";
+		xml_utils::xml_translate(&message, toCatch.msg);
+		LOG("Exception message is: %s", message.c_str());
+		delete parser;
+		return NULL;
+	}
+	catch (...) {
+		LOG("Unexpected Exception in ParserOpenCOLLADA::getNode()");
+		delete parser;
+		return NULL;
+	}
+	
+}
+
 DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, std::string fileName, int maximumDepth)
 {
 	try 
@@ -2192,12 +2243,24 @@ void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string
 
 bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, std::string fileName )
 {
-	DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", fileName, 2);
+	XercesDOMParser* parser = ParserOpenCOLLADA::getParserFromFile(fileName);
+	if (!parser)
+	{
+		LOG("Could not load from file %s",fileName.c_str());
+		return false;
+	}
+
+	//DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", fileName, 2);	
+	DOMDocument* doc = parser->getDocument();
+	int depth = 0;
+	DOMNode* geometryNode = getNode("library_geometries", doc, depth, 2);		 
 	if (geometryNode)
 	{
 		// first from library visual scene retrieve the material id to name mapping (TODO: needs reorganizing the assets management)
 		std::map<std::string, std::string> materialId2Name;
-		DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", fileName, 2);
+		//DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", fileName, 2);
+		depth = 0;
+		DOMNode* visualSceneNode = getNode("library_visual_scenes", doc, depth, 2);	
 		if (!visualSceneNode)
 			LOG("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
 		SkSkeleton skeleton;
@@ -2207,13 +2270,17 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 
 		// get picture id to file mapping
 		std::map<std::string, std::string> pictureId2File;
-		DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", fileName, 2);
+		//DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", fileName, 2);
+		depth = 0;
+		DOMNode* imageNode = getNode("library_images", doc, depth, 2);	
 		if (imageNode)
 			ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File);
 
 		// start parsing mateiral
 		std::map<std::string, std::string> effectId2MaterialId;
-		DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", fileName, 2);
+		//DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", fileName, 2);
+		depth = 0;
+		DOMNode* materialNode = getNode("library_materials", doc, depth, 2);	
 		if (materialNode)
 			ParserOpenCOLLADA::parseLibraryMaterials(materialNode, effectId2MaterialId);
 
@@ -2223,7 +2290,9 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 		std::map<std::string,std::string> mtlTextMap;
 		std::map<std::string,std::string> mtlTextBumpMap;
 		std::map<std::string,std::string> mtlTextSpecularMap;
-		DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", fileName, 2);
+		//DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", fileName, 2);
+		depth = 0;
+		DOMNode* effectNode = getNode("library_effects", doc, depth, 2);	
 		if (effectNode)
 		{
 			ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
@@ -2234,7 +2303,11 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 	else
 	{
 		LOG( "Could not load mesh from file '%s'", fileName.c_str());
+		if (parser)
+			delete parser;
 		return false;
 	}
+	if (parser)
+		delete parser;
 	return true;
 }
