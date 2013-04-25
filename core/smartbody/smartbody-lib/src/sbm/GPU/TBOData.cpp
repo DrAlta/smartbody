@@ -47,7 +47,7 @@ TBOData::~TBOData(void)
 {
 	if (m_iTBO_ID)
 		glDeleteBuffers(1,&m_iTBO_ID);
-	printf("%10s (%d) is now destroied",m_Name,m_iTBO_ID);
+	//printf("%10s (%d) is now destroied",m_Name,m_iTBO_ID);
 }
 
 void TBOData::CreateTBO( float* pData, int Size )
