@@ -107,7 +107,7 @@ class ForwardLogListener : public vhcl::Log::Listener
 
 SBScene::SBScene(void) : SBObject()
 {
-	initialize();
+	//initialize();
 }
 
 void SBScene::initialize()

@@ -147,12 +147,19 @@ void SkSkeleton::init ()
 		SkPosture* posture = _postures.pop();
 		delete posture;
 	}
+/*
 	while ( _joints.size()>0 ) 
 	{
 		SkJoint* joint = _joints[_joints.size() - 1];
 		delete joint;
 		_joints.pop_back();
 	}
+*/
+	for (unsigned int i=0;i<_joints.size();i++)
+	{
+		delete _joints[i];
+	}
+	_joints.clear();
 	_jointMap.clear();
 	_root = 0;
 	_gmat_uptodate = false;
