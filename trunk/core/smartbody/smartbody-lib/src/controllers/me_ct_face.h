@@ -82,7 +82,7 @@ class MeCtFace : public SmartBody::SBController	{
 		
 		void clear( void );
 		
-		void init(SmartBody::SBFaceDefinition* faceDefinition);
+		virtual void init (SbmPawn* pawn);
 		void remove_joint( const char *joint_name );
 		void remove_channel( const char *joint_name, SkChannel::Type ch_type );
 		void add_key( const char *weight_key, SkMotion* key_pose_p );

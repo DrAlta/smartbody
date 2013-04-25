@@ -27,7 +27,8 @@
 #include <vhcl_log.h>
 #include <sstream>
 #include <sbm/action_unit.hpp>
-
+#include <sb/sbm_pawn.hpp>
+#include <sb/sbm_character.hpp>
 //////////////////////////////////////////////////////////////////////////////////
 
 std::string MeCtFace::type_name = "Face";
@@ -59,11 +60,13 @@ void MeCtFace::clear( void )	{
 	_baseChannelToBufferIndex.clear();
 }
 
-void MeCtFace::init(SmartBody::SBFaceDefinition* faceDefinition) {
+void MeCtFace::init (SbmPawn* pawn) {
 	
 	clear();
 	MeController::init(NULL);
 
+	SbmCharacter* sbmCharacter = dynamic_cast<SbmCharacter*>(pawn);
+	SmartBody::SBFaceDefinition* faceDefinition = sbmCharacter->getFaceDefinition();
 	if (!faceDefinition || !faceDefinition->getFaceNeutral())
 		return;
 
@@ -110,6 +113,7 @@ void MeCtFace::init(SmartBody::SBFaceDefinition* faceDefinition) {
 	if ( faceNeutral )	{
 		_base_pose_p = faceNeutral;
 		_base_pose_p->move_keytimes( 0.0 ); // make sure motion starts at 0
+		_channels.setJointMapName(_base_pose_p->channels().getJointMapName());
 
 		SkChannelArray& mchan_arr = _base_pose_p->channels();
 		int size = mchan_arr.size();
@@ -229,7 +233,7 @@ void MeCtFace::finish_adding( void )	{
 		for (int c = 0; c < size; c++)
 		{
 			SkChannel& channel = nextKey->channels()[c];
-			std::string jointName = nextKey->channels().name(c);
+			std::string jointName = nextKey->channels().mappedName(c);
 			int baseChannelIndex = _base_pose_p->channels().search(jointName, channel.type);
 			if (baseChannelIndex >= 0)
 			{
@@ -279,7 +283,7 @@ void MeCtFace::controller_map_updated( void ) {
 
 			SkChannelArray& cChannels = _context->channels();
 			for( int i=0; i<num_base_chans; ++i ) {
-				int chan_index = cChannels.search( base_channels.name( i ), base_channels.type( i ) );
+				int chan_index = cChannels.search( base_channels.mappedName( i ), base_channels.type( i ) );
 				// NOTE: check for -1 : report not found? NOT NECESSARILY
 				_bChan_to_buff[ i ] = _context->toBufferIndex( chan_index );
 			}
