@@ -427,7 +427,6 @@ SbmPawn::~SbmPawn()	{
 	if (scene_p)
 		scene_p->unref();
 	
-	ct_tree_p->unref();	
 	if (steeringSpaceObj_p)
 	{
 		if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
@@ -461,6 +460,11 @@ SbmPawn::~SbmPawn()	{
 	colManager->removeCollisionObject(collisionObjName);
 // 	if (_collisionObject)
 // 		delete _collisionObject;
+	//printf("ct_tree ref count = %d",ct_tree_p->getref());
+	//ct_tree_p->unref();	 
+	// just delete ct_tree_p
+	if (ct_tree_p)
+		delete ct_tree_p;
 }
 
 

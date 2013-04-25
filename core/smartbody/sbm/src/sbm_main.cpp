@@ -478,6 +478,12 @@ void mcu_register_callbacks( void ) {
 
 void cleanup( void )	{
 	{
+		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+		if (rootWindow)
+		{
+		   printf("Delete SBGUI Window\n");
+		   delete rootWindow;
+		}
 
 		
 		if (SmartBody::SBScene::getScene()->getSimulationManager()->isStopped())
@@ -1235,7 +1241,10 @@ int main( int argc, char **argv )	{
 			scene->getOgreViewer()->render();
 	
 	}	
+	
 	cleanup();
+	delete viewerFactory;
+	
 	//vhcl::Log::g_log.RemoveAllListeners();
 	//delete listener;
 //	delete sbmWindow;

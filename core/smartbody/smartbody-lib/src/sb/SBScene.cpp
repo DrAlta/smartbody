@@ -44,6 +44,7 @@
 #include <sb/SBDebuggerUtility.h>
 #include <sb/SBVHMsgManager.h>
 #include <sbm/sbm_audio.h>
+#include <sbm/GPU/SbmTexture.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -389,6 +390,9 @@ void SBScene::cleanup()
 		_vhmsgManager->send( "vrProcEnd sbm" );
 	
 	delete _vhmsgManager;	
+
+	// remove textures
+	SbmTextureManager::destroy_singleton();
 
 #ifndef SB_NO_PYTHON
 //	Py_Finalize();

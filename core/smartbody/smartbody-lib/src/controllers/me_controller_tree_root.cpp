@@ -212,14 +212,16 @@ public:
 
 	// Destructor
 	~MeControllerTreeRootImpl() {
+		/*
 		vector< controller_ptr >::iterator ct_iter = _controllers.begin();
-		vector< controller_ptr >::iterator ct_end = _controllers.begin();
+		vector< controller_ptr >::iterator ct_end = _controllers.end();
 		while( ct_iter != ct_end ) {
 			(*ct_iter)->unref();
 			(*ct_iter) = NULL;
 
 			++ct_iter;
-		}
+		}*/
+		//printf("after remove controllers\n");
 
 		if( _skeletonName != "" )
 			remove_skeleton( _skeletonName );
@@ -312,8 +314,8 @@ public:
 
 
 		// Remove skeletons
-		if( _skeleton )  // only one in this implementation
-			remove_skeleton( _skeleton->getName() );
+		//if( _skeleton )  // only one in this implementation
+		//	remove_skeleton( _skeleton->getName() );
 	}
 
 	SbmPawn* getPawn()
@@ -363,11 +365,11 @@ public:
 		{
 			if (_controllers[x]->handle() == handle)
 			{
-				return _controllers[x].get();
+				return _controllers[x];
 			}
 			else
 			{
-				MeCtContainer* container = dynamic_cast<MeCtContainer*>(_controllers[x].get());
+				MeCtContainer* container = dynamic_cast<MeCtContainer*>(_controllers[x]);
 				if (container)
 				{
 					MeController* controller = container->findControllerByHandle(handle);
@@ -389,7 +391,7 @@ public:
 	 *  Returns a pointer to a controller currently in the tree.
 	 */
     MeController* controller( unsigned int n ) 
-    { return (0<=n && n<_controllers.size())? _controllers[n].get(): NULL; }
+    { return (0<=n && n<_controllers.size())? _controllers[n]: NULL; }
 
 	/**
 	 *  Evaluates all the controllers.
