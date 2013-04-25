@@ -21,6 +21,7 @@ class SBJoint : public SkJoint, public SBTransformObjInterface
 	public:
 		SBAPI SBJoint();
 		SBAPI SBJoint( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i );
+		~SBJoint();
 
 		SBAPI void setName(const std::string& name);
 		SBAPI const std::string& getName();

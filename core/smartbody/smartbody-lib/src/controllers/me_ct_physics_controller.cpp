@@ -20,7 +20,8 @@ MeCtPhysicsController::MeCtPhysicsController(SbmCharacter* character) : SmartBod
 
 MeCtPhysicsController::~MeCtPhysicsController()
 {
-	
+	if (_skeletonCopy)
+		delete _skeletonCopy;	
 }
 
 

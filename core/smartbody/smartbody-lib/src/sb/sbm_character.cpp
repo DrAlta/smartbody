@@ -247,6 +247,13 @@ SbmCharacter::~SbmCharacter( void )	{
 	if (saccade_ct)
 		saccade_ct->unref();
 
+	if (physics_ct)
+		physics_ct->unref();
+	if (noise_ct)
+		noise_ct->unref();
+
+	
+
 	std::map<int,MeCtReachEngine*>::iterator mi;
 	for ( mi  = reachEngineMap->begin();
 		mi != reachEngineMap->end();
@@ -329,7 +336,7 @@ void SbmCharacter::createStandardControllers()
 
 #if !defined(__FLASHPLAYER__)
 	createReachEngine();
-	
+	/*
 	if (effector)
 	{
 		MeCtReachEngine* rengine = new MeCtReachEngine(this,sbSkel);
@@ -358,6 +365,7 @@ void SbmCharacter::createStandardControllers()
 		rengineJump->init(MeCtReachEngine::LEFT_JUMP,effector);
 		(*this->reachEngineMap)[MeCtReachEngine::LEFT_JUMP] = rengineJump;
 	}
+	*/
 #endif
 	
 

@@ -20,6 +20,8 @@ MeCtNoiseController::MeCtNoiseController(SbmCharacter* character) : SmartBody::S
 
 MeCtNoiseController::~MeCtNoiseController()
 {
+	if (_skeletonCopy)
+		delete _skeletonCopy;
 	
 }
 

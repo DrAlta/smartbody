@@ -108,6 +108,8 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		if (!skNode)
 		{
 			LOG("ParserOpenCOLLADA::parse ERR: no skeleton info contained in this file");
+			delete parser;
+			delete errHandler;
 			return false;
 		}
 		std::map<std::string, std::string> materialId2Name;
@@ -137,6 +139,8 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		if (!skmNode)
 		{
 		//	LOG("ParserOpenCOLLADA::parse WARNING: no motion info contained in this file");
+			delete parser;
+			delete errHandler;
 			return true;
 		}
 		if (doParseMotion)
@@ -277,6 +281,7 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, std::string fil
 		DOMDocument* doc = parser->getDocument();
 		
 		int depth = 0;
+		//delete parser;
 		return getNode(nodeName, doc, depth, maximumDepth);
 	}
 	catch (const XMLException& toCatch) 

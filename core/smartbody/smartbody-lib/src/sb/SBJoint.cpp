@@ -17,6 +17,11 @@ SBJoint::SBJoint( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i ) : SkJo
 {
 }
 
+SBJoint::~SBJoint() 
+{
+	//printf("joint %s is deleted\n", jointName().c_str());	
+}
+
 void SBJoint::setName(const std::string& str)
 {	
 	name(str);

@@ -500,7 +500,8 @@ void cleanup( void )	{
 #endif
 	}
 
-	
+	// explicitly delete SBScene singleton
+	//delete SmartBody::SBScene::getScene();	
 	XMLPlatformUtils::Terminate();
 
 	LOG( "SBM: terminated gracefully." );
@@ -1238,7 +1239,8 @@ int main( int argc, char **argv )	{
 	//vhcl::Log::g_log.RemoveAllListeners();
 	//delete listener;
 //	delete sbmWindow;
-
+	// finally, delete SBScene
+	SmartBody::SBScene::destroyScene();
 //	return( 0 ); // NOT NEEDED ??
 }
 
