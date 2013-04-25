@@ -815,7 +815,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 	// Self reference to pass on...
 
 	VecOfBehaviorRequest::iterator behav_end = behaviors.end();
-	time_sec now = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
+	time_sec now = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 	this->bml_start->time = now;
 
 	if( LOG_BML_BEHAVIOR_SCHEDULE ) {

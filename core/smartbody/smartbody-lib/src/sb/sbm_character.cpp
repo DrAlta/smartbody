@@ -487,7 +487,7 @@ void SbmCharacter::createStandardControllers()
 	constraint_sched_p->init(this);
 
 	head_sched_p->init(this);
-	face_ct->init( getFaceDefinition() );
+	face_ct->init( this );
 
 	ct_tree_p->add_controller( posture_sched_p );
 	//ct_tree_p->add_controller( locomotion_ct );
@@ -574,6 +574,7 @@ void SbmCharacter::initData()
 	saccade_ct = NULL;	
 	noise_ct = NULL;
 	record_ct = NULL;
+	physics_ct = NULL;
 
 	speech_impl = NULL;
 	speech_impl_backup = NULL;
@@ -2404,7 +2405,7 @@ void SbmCharacter::updateFaceDefinition()
 	// make sure that the face controller has been updated
 	if (face_ct)
 	{
-		face_ct->init( _faceDefinition );
+		face_ct->init( this );
 	}
 }
 

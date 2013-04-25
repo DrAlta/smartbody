@@ -96,6 +96,14 @@ double SBSimulationManager::getTime()
 	return time;
 }
 
+double SBSimulationManager::queryTime()
+{
+	if (timer_p)
+		return timer_p->get_time();
+	else
+		return time;
+}
+
 double SBSimulationManager::getTimeDt()
 {
 	return time_dt;

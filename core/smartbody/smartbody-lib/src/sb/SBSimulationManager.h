@@ -36,6 +36,7 @@ class SBSimulationManager
 		SBAPI void printInfo();
 		SBAPI void printPerf(float v);
 		SBAPI double getTime();
+		SBAPI double queryTime();
 		SBAPI double getTimeDt();
 		SBAPI void setTime(double time);
 		SBAPI void start();
