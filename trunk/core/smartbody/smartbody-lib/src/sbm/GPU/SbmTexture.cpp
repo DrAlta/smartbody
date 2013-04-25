@@ -15,7 +15,38 @@ SbmTextureManager::SbmTextureManager( void )
 
 SbmTextureManager::~SbmTextureManager( void )
 {
+	releaseAllTextures();
+}
 
+void SbmTextureManager::releaseAllTextures()
+{
+	StrTextureMap::iterator vi;
+	for ( vi  = textureMap.begin();
+		  vi != textureMap.end();
+		  vi++)
+	{
+		SbmTexture* tex = vi->second;
+		delete tex;		
+	}
+
+	for ( vi  = normalTexMap.begin();
+		  vi != normalTexMap.end();
+		  vi++)
+	{
+		SbmTexture* tex = vi->second;
+		delete tex;		
+	}
+
+	for ( vi  = specularTexMap.begin();
+		vi != specularTexMap.end();
+		vi++)
+	{
+		SbmTexture* tex = vi->second;
+		delete tex;
+	}
+	textureMap.clear();
+	normalTexMap.clear();
+	specularTexMap.clear();	
 }
 
 StrTextureMap& SbmTextureManager::findMap( int type )
@@ -96,6 +127,10 @@ SbmTexture::SbmTexture( const char* texName )
 
 SbmTexture::~SbmTexture(void)
 {
+	if (buffer)
+      	   delete [] buffer;
+	if (texID != 0)
+	   glDeleteTextures(1,&texID);	
 }
 
 void SbmTexture::loadImage( const char* fileName )

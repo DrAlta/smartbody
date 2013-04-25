@@ -46,7 +46,8 @@ namespace boost {
 
 // Convience Typedefs
 class MeController;
-typedef boost::intrusive_ptr<MeController> controller_ptr;
+//typedef boost::intrusive_ptr<MeController> controller_ptr;
+typedef MeController* controller_ptr;
 
 
 #endif // SR_SHARED_PTR_HPP
