@@ -217,7 +217,9 @@ BML::Processor::~Processor()
 {
 //	xmlErrorHandler->release();
 //	delete xmlErrorHandler;
-//	xmlErrorHandler = NULL;
+//	xmlErrorHandler = NULL;	
+	if (xmlParser)
+		delete xmlParser; 
 }
 
 
