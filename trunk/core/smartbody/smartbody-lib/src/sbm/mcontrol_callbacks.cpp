@@ -1525,13 +1525,25 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 	}
 	else if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
 	{
-		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file, 2);
+		//DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file, 2);
+		XercesDOMParser* parser = ParserOpenCOLLADA::getParserFromFile(obj_file);
+		if (!parser)
+		{
+			LOG("Could not load from file %s",obj_file);
+			return false;
+		}
+		//DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", fileName, 2);	
+		DOMDocument* doc = parser->getDocument();
+		int depth = 0;
+		DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", doc, depth, 2);	
 		if (geometryNode)
 		{
 			// first from library visual scene retrieve the material id to name mapping (TODO: needs reorganizing the assets management)
 			std::map<std::string, std::string> materialId2Name;
 			
-			DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", obj_file, 2);
+			//DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", obj_file, 2);
+			depth = 0;
+			DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", doc, depth, 2);	
 			if (!visualSceneNode)
 				LOG("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
 			SkSkeleton skeleton;
@@ -1542,14 +1554,18 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			// get picture id to file mapping
 			std::map<std::string, std::string> pictureId2File;
 			
-			DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", obj_file, 2);
+			//DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", obj_file, 2);
+			depth = 0;
+			DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", doc, depth, 2);	
 			if (imageNode)
 				ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File);
 
 			// start parsing mateiral
 			std::map<std::string, std::string> effectId2MaterialId;
 			
-			DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", obj_file, 2);
+			//DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", obj_file, 2);
+			depth = 0;
+			DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", doc, depth, 2);
 			if (materialNode)
 				ParserOpenCOLLADA::parseLibraryMaterials(materialNode, effectId2MaterialId);
 
@@ -1560,7 +1576,9 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			std::map<std::string,std::string> mtlTextBumpMap;
 			std::map<std::string,std::string> mtlTextSpecularMap;
 			
-			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file, 2);
+			//DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file, 2);
+			depth = 0;
+			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", doc, depth, 2);
 			if (effectNode)
 			{
 				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
@@ -1572,6 +1590,8 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 		else
 		{
 			LOG( "Could not load mesh from file '%s'", obj_file);
+			if (parser)
+				delete parser;
 			return CMD_FAILURE;
 		}
 
@@ -1608,6 +1628,8 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 		}
 #endif
 //		delete geometryNode;
+		if (parser)
+			delete parser;
 	}	
 	for (unsigned int i = 0; i < meshModelVec.size(); i++)
 	{

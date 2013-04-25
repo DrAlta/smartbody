@@ -1319,7 +1319,8 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 			}
 		}		
 	}	
-
+	delete tempSrcSk;
+	delete interSk;
 	return retarget_p;
 }
 

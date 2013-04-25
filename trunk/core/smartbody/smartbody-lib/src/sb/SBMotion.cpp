@@ -772,6 +772,8 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 	}
 	constraintMotion->disconnect();
 	this->disconnect();
+	delete interSk;
+	delete tempSrcSk;
 	return constraintMotion;
 }
 
@@ -1714,6 +1716,7 @@ SBMotion* SBMotion::footSkateCleanUp( std::string name, std::vector<std::string>
 		cleanUpMotion->setName(motionName.c_str());
 		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(cleanUpMotion);
 	}
+	delete skelCopy;
 	return cleanUpMotion;
 }
 

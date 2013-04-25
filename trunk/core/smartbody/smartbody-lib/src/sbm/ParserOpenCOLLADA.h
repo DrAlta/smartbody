@@ -61,6 +61,7 @@ class ParserOpenCOLLADA
 		static DOMNode* getNode(const std::string& nodeName, DOMNode* node);
 		static DOMNode* getNode(const std::string& nodeName, std::string fileName, int maximumDepth);
 		static DOMNode* getNode(const std::string& nodeName, std::string fileName);
+		static XercesDOMParser* getParserFromFile(std::string fileName);
 		static std::string getNodeAttributeString(DOMNode* node, XMLCh* attrName);
 		static int         getNodeAttributeInt(DOMNode* node, XMLCh* attrName);
 		// parse from files
