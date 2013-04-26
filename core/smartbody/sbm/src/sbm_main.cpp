@@ -478,12 +478,7 @@ void mcu_register_callbacks( void ) {
 
 void cleanup( void )	{
 	{
-		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
-		if (rootWindow)
-		{
-		   printf("Delete SBGUI Window\n");
-		   delete rootWindow;
-		}
+
 
 		
 		if (SmartBody::SBScene::getScene()->getSimulationManager()->isStopped())
@@ -504,6 +499,13 @@ void cleanup( void )	{
 			SmartBody::SBScene::getScene()->getVHMsgManager()->disconnect();
 		}
 #endif
+
+		/*BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+		if (rootWindow)
+		{
+		   printf("Delete SBGUI Window\n");
+		   delete rootWindow;
+		}*/
 	}
 
 	// explicitly delete SBScene singleton
