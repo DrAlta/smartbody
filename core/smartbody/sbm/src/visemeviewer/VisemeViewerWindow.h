@@ -18,13 +18,13 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Input.H>
 
-#include "VisemeCurveEditor.h"
 #include <sb/SBCharacter.h>
 #include <sb/SBPhoneme.h>
 #include <bml/bml.hpp>
 
 
 class VisemeCurveEditor;
+class VisemeRunTimeWindow;
 
 class VisemeViewerWindow : public Fl_Double_Window{
 public:
@@ -59,7 +59,9 @@ protected:
 	Fl_Button* _buttonDump;
 	Fl_Input* _inputUtterance;
 	Fl_Input* _inputAudioFile;
+	Fl_Button* _buttonRunTimeCurves;
 	Fl_Choice* _choiceAudioFile;
+	VisemeRunTimeWindow* _windowVisemeRunTime;
 
 	Fl_Check_Button* _checkStats;
 	VisemeCurveEditor * _curveEditor;
@@ -104,6 +106,6 @@ protected:
 	static void OnGatherStatsCB(Fl_Widget* widget, void* data);
 	static void OnCharacterRefreshCB(Fl_Widget* widget, void* data);
 	static void OnDumpCB(Fl_Widget* widget, void* data);
-
+	static void OnRunTimeCurvesCB(Fl_Widget* widget, void* data);
 };
 #endif

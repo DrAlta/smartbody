@@ -59,14 +59,58 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createBoolAttribute("reach.useLocomotion", false, true, "Basic", 110, false, false, false, "Whether to use locomotion for reach by default.");
 	createBoolAttribute("useDiphone", false, true, "Basic", 150, false, false, false, "Use diphones.");
 	createDoubleAttribute("diphoneScale", 1, true, "Basic", 155, false, false, false, "Scale factor for diphone curves.");
-	createStringAttribute("diphoneSetName", "", true, "Basic", 160, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
-	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 170, false, false, false, "Use diphones spline/linear curve.");
-	createDoubleAttribute("diphoneSmoothWindow", .2, true, "Basic", 180, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
-	createDoubleAttribute("diphoneSpeedLimit", 20.0, true, "Basic", 181, false, false, false, "Speed Limit of mouth movement");
+	createStringAttribute("diphoneSetName", "", true, "Basic", 155, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
+	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 156, false, false, false, "Use diphones spline/linear curve.");
+	createDoubleAttribute("diphoneSmoothWindow", .2, true, "Basic", 157, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
+	createDoubleAttribute("diphoneSpeedLimit", 8.0f, true, "Basic", 158, false, false, false, "Speed Limit of mouth movement");
+	
+#if 0	// Dom
+	createDoubleAttribute("jaw_rot_min", -4.0, true, "Basic", 159, false, false, false, "");
+	createDoubleAttribute("jaw_rot_max", 13, true, "Basic", 160, false, false, false, "");
+	createDoubleAttribute("jaw_rot_default", 0.21, true, "Basic", 161, false, false, false, "");
 
-	createBoolAttribute("ikPostFix", false, true, "Basic", 170, false, false, false, "Post-Processing IK to fix foot sliding.");
-	createBoolAttribute("terrainWalk", false, true, "Basic", 170, false, false, false, "Post-Processing to adjust the character for different terrain height. ikPostFix must be on for this to work.");
-	createBoolAttribute("onlineRetarget", true, true, "Basic", 170, false, false, false, "Use on-line retargeting to adjust joint angles when playing animation blend.");
+	createDoubleAttribute("lower_lip_ftuck_min", -15, true, "Basic", 162, false, false, false, "");
+	createDoubleAttribute("lower_lip_ftuck_max", 10, true, "Basic", 163, false, false, false, "");
+
+	createDoubleAttribute("upper_lip_raise_min", -30, true, "Basic", 164, false, false, false, "");
+	createDoubleAttribute("upper_lip_raise_max", 20, true, "Basic", 165, false, false, false, "");
+	createDoubleAttribute("upper_lip_raise_default", -2.96, true, "Basic", 166, false, false, false, "");
+
+	createDoubleAttribute("cheek_hollow_min", -1.5, true, "Basic", 167, false, false, false, "");
+	createDoubleAttribute("cheek_hollow_max", 1.5, true, "Basic", 168, false, false, false, "");
+
+	createDoubleAttribute("lower_lip_roll_min", -20, true, "Basic", 169, false, false, false, "");
+	createDoubleAttribute("lower_lip_roll_max", 40, true, "Basic", 170, false, false, false, "");
+
+	createDoubleAttribute("jaw_thrust_min", -10, true, "Basic", 171, false, false, false, "");
+	createDoubleAttribute("jaw_thrust_max", 30, true, "Basic", 172, false, false, false, "");
+
+	createDoubleAttribute("lip_corner_zip_min", -20, true, "Basic", 173, false, false, false, "");
+	createDoubleAttribute("lip_corner_zip_max", 30, true, "Basic", 174, false, false, false, "");
+
+	createDoubleAttribute("lower_lip_raise_min", -25, true, "Basic", 175, false, false, false, "");
+	createDoubleAttribute("lower_lip_raise_max", 15, true, "Basic", 176, false, false, false, "");
+
+	createDoubleAttribute("lip_rounding_min", 0, true, "Basic", 177, false, false, false, "");
+	createDoubleAttribute("lip_rounding_max", 20, true, "Basic", 178, false, false, false, "");
+	createDoubleAttribute("lip_rounding_default", 6.106, true, "Basic", 179, false, false, false, "");
+
+	createDoubleAttribute("lip_retraction_min", 0, true, "Basic", 180, false, false, false, "");
+	createDoubleAttribute("lip_retraction_max", 15, true, "Basic", 181, false, false, false, "");
+	createDoubleAttribute("lip_retraction_default", 2.809, true, "Basic", 182, false, false, false, "");
+
+	createDoubleAttribute("tongue_tip_y_min", -2, true, "Basic", 180, false, false, false, "");
+	createDoubleAttribute("tongue_tip_y_max", 2, true, "Basic", 181, false, false, false, "");
+
+	createDoubleAttribute("tongue_tip_z_min", -2, true, "Basic", 182, false, false, false, "");
+	createDoubleAttribute("tongue_tip_z_max", 2, true, "Basic", 183, false, false, false, "");
+
+	createBoolAttribute("handtune", true, true, "Basic", 184, false, false, false, "");
+#endif
+
+	createBoolAttribute("ikPostFix", false, true, "Basic", 200, false, false, false, "Post-Processing IK to fix foot sliding.");
+	createBoolAttribute("terrainWalk", false, true, "Basic", 200, false, false, false, "Post-Processing to adjust the character for different terrain height. ikPostFix must be on for this to work.");
+	createBoolAttribute("onlineRetarget", true, true, "Basic", 200, false, false, false, "Use on-line retargeting to adjust joint angles when playing animation blend.");
 
 
 	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");

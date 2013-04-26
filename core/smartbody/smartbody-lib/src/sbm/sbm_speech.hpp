@@ -130,6 +130,9 @@ namespace SmartBody {
 		/** Get the curve information. */
 		const char* getCurveInfo() {return _curveInfo.c_str();}
 
+		/** Set the curve information. */
+		void setCurveInfo(const char* info) { _curveInfo = info;}
+
 		/** Get the viseme Mode. */
 		bool isCurveMode() {return _curveMode;}
 

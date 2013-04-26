@@ -412,6 +412,12 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 {
 	if (result_visemes == NULL)
 		return;
+	
+	for (size_t i = 0; i < debugVisemeCurves.size(); ++i)
+	{
+		delete debugVisemeCurves[i];
+	}
+	debugVisemeCurves.clear();
 
 	SBCharacter* character = dynamic_cast<SBCharacter*>(request->actor);
 	const std::string& diphoneMap = character->getStringAttribute("diphoneSetName");
@@ -419,6 +425,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 	VisemeData* prevViseme = NULL;
 	VisemeData* pprevViseme = NULL;
 	VisemeData* nextViseme = NULL;
+	VisemeData* nnextViseme = NULL;
 	std::vector<float> visemeTimeMarkers;
 	std::vector<VisemeData*> visemeRawData;
 	for ( size_t i = 0; i < (*result_visemes).size(); i++ )
@@ -429,21 +436,23 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 			nextViseme = (*result_visemes)[i + 1];
 		if (i > 1)
 			pprevViseme = (*result_visemes)[i - 2];
+		if (i < ((*result_visemes).size() - 2))
+			nnextViseme = (*result_visemes)[i + 2];
 		curViseme = (*result_visemes)[i];
 		visemeTimeMarkers.push_back(curViseme->time());
 		if (prevViseme != NULL)
 		{
 			SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(prevViseme->id(), curViseme->id(), diphoneMap);
-			// ideally blendIval should be from half way between pprevViseme and prevViseme to half way between curViseme and next Viseme
 			float blendIval = 0.0f;
+
 			if (nextViseme != NULL)
 				blendIval = nextViseme->time() - prevViseme->time();
 			else
 				blendIval = 2.0f * (curViseme->time() - prevViseme->time());
 
 			// ad-hoc, blend interval should not be less than 0.1f
-//			if (blendIval < 0.2f)
-//				blendIval = 0.2f;
+			if (blendIval < 0.2f)
+				blendIval = 0.2f;
 
 			if (diphone)
 			{
@@ -464,11 +473,22 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 							curve[k] *= scale;
 							if (curve[k] > 1.0f)	//clamp to 1
 								curve[k] = 1.0f;
+							if (curve[k] < 0.05)	// clamp to 0.0
+								curve[k] = 0.0f;
 						}
 					}
+
 					VisemeData* vcopy = new VisemeData( visemeNames[v], 0.0f);
 					vcopy->setFloatCurve(curve, curve.size() / 2, 2);
 					visemeRawData.push_back(vcopy);
+
+					// debug
+					std::stringstream debugNameSS;
+					debugNameSS << "[" << i << "]" << diphone->getFromPhonemeName() << "-" << diphone->getToPhonemeName() << "-" << visemeNames[v];
+					VisemeData* debugDiphoneVisemeCurve = new VisemeData(debugNameSS.str(), 0.0f);
+					debugDiphoneVisemeCurve->setFloatCurve(curve, curve.size() / 2, 2);
+					debugDiphoneVisemeCurve->setCurveInfo("0");
+					debugVisemeCurves.push_back(debugDiphoneVisemeCurve);
 				}
 			}
 		}
@@ -514,6 +534,12 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 			std::vector<float>& origCurve = visemeProcessedData[index]->getFloatCurve();
 			std::vector<float> newCurve(stitchCurve(origCurve, stitchingCurve));
 			visemeProcessedData[index]->setFloatCurve(newCurve, newCurve.size() / 2, 2);
+			std::stringstream debugNameSS;
+			debugNameSS << "stitching-" << visemeProcessedData[index]->id() << i;
+			VisemeData* debugStitch = new VisemeData(debugNameSS.str(), visemeProcessedData[index]->time());
+			debugStitch->setCurveInfo("1");
+			debugStitch->setFloatCurve(newCurve, newCurve.size() / 2, 2);
+			debugVisemeCurves.push_back(debugStitch);
 		}
 	}
 
@@ -524,34 +550,49 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 	}
 	(*result_visemes).clear();
 	//(*result_visemes) = visemeProcessedData;
-	
+
 	for (size_t i = 0; i < visemeProcessedData.size(); i++)
 	{
+		VisemeData* debugVwoSmoothing = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
+		debugVwoSmoothing->setCurveInfo("2");
+		debugVwoSmoothing->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
+
+		smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, character->getDiphoneSmoothWindow());
+		VisemeData* debugVwSmoothing = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
+		debugVwSmoothing->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
+		debugVwSmoothing->setCurveInfo("3");
+
+		filterCurve(visemeProcessedData[i]->getFloatCurve(), character->getDiphoneSpeedLimit());
+		VisemeData* debugVwFiltering = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
+		debugVwFiltering->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
+		debugVwFiltering->setCurveInfo("4");
+
 		VisemeData* newV = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
-		smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, character->getDiphoneSmoothWindow(), character->getDiphoneSpeedLimit());
 		newV->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
 		(*result_visemes).push_back(newV);
+
+
+		debugVisemeCurves.push_back(debugVwoSmoothing);
+		debugVisemeCurves.push_back(debugVwSmoothing);
+		debugVisemeCurves.push_back(debugVwFiltering);
 	}
 }
 
 // line intersection reference: http://cboard.cprogramming.com/c-programming/154196-check-if-two-line-segments-intersect.html
 bool BML::SpeechRequest::getLineIntersection(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float& i_x, float& i_y)
 {
-	float s1_x, s1_y, s2_x, s2_y, sn, tn, sd, td, t;
+	float s1_x, s1_y, s2_x, s2_y;
 	s1_x = p1_x - p0_x;     s1_y = p1_y - p0_y;
 	s2_x = p3_x - p2_x;     s2_y = p3_y - p2_y;
 
-	sn = -s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y);
-	sd = -s2_x * s1_y + s1_x * s2_y;
-	tn =  s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x);
-	td = -s2_x * s1_y + s1_x * s2_y;
+	float s, t;
+	s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+	t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
 
-	if (sn >= 0 && sn <= sd && tn >= 0 && tn <= td)
+	if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
 	{
-		// Collision detected
-		t = tn / td;
-		i_x = p0_x + (tn * s1_x);
-		i_y = p0_y + (tn * s1_y);
+		i_x = p0_x + (t * s1_x);
+		i_y = p0_y + (t * s1_y);
 		return true;
 	}
 	return false; // No collision
@@ -567,17 +608,22 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 
 	// find the boundary of first curve
 	int boundary = -1;
-	for (int i = size1 / 2 - 2; i >= 0; i--)
+	if (c1[0] > c2[0])	// curve1 is actually starting from right side of curve2 ...
 	{
-		if (c1[i * 2] <= c2[0] && c1[(i + 1) * 2] > c2[0])
+		boundary = 0;
+	}
+	else
+	{	
+		for (int i = size1 / 2 - 2; i >= 0; i--)
 		{
-			boundary = i;
-			break;
+			if (c1[i * 2] <= c2[0] && c1[(i + 1) * 2] > c2[0])
+			{
+				boundary = i;
+				break;
+			}
 		}
 	}
-
-	// two curve does not overlap, just add them together
-	if (boundary < 0) 
+	if (boundary < 0) 	// two curve does not overlap, just add them together
 	{
 		for (int i = 0; i < size1; ++i)
 			retc.push_back(c1[i]);
@@ -593,11 +639,13 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 		retc.push_back(c1[i * 2 + 1]);
 	}
 
+	
 	int id1 = boundary;
 	int id2 = 0;
 	int idi = 0;
+	bool insertFirst = true;
 
-	// find the intersection of the overlapping curves (brute force algorithm, have room to improve)
+	// find the intersection of the overlapping curves (O(n2))
 	for (int i = boundary; i < (size1 / 2) - 1; ++i)
 	{
 		for (int j = 0; j < (size2 / 2) - 1; ++j)
@@ -605,13 +653,22 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 			float ix, iy;
 			if (getLineIntersection(c1[i * 2], c1[i * 2 + 1], c1[(i + 1) * 2], c1[(i + 1) * 2 + 1], c2[j * 2], c2[j * 2 + 1], c2[(j + 1) * 2], c2[(j + 1) * 2 + 1], ix , iy))
 			{
-				if (c2[j * 2 + 1] <= c1[i * 2 + 1]) // insert c1
+				if (idi == 0)
+				{
+					if (c1[boundary * 2] <= c2[0])
+						insertFirst = true;
+					else
+						insertFirst = false;
+				}
+
+				if (insertFirst) // insert c1
 				{
 					for (int k = id1; k <= i; ++k)
 					{
 						retc.push_back(c1[k * 2]);
 						retc.push_back(c1[k * 2 + 1]);
 					}
+					insertFirst = false;
 				}
 				else						// insert c2
 				{
@@ -620,6 +677,7 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 						retc.push_back(c2[k * 2]);
 						retc.push_back(c2[k * 2 + 1]);
 					}
+					insertFirst = true;
 				}
 				id1 = i + 1;
 				id2 = j + 1;
@@ -630,9 +688,10 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 		}
 	}
 
+	// left overs
 	if (id1 < size1 / 2 || id2 < size2 / 2)
 	{
-		if (c2[id2 * 2 + 1] <= c1[id1 * 2 + 1])	// insert c1
+		if (c1[size1 - 2] >= c2[size2 - 2])						// insert c1
 		{
 			for (int k = id1; k < size1 / 2; ++k)
 			{
@@ -640,7 +699,7 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 				retc.push_back(c1[k * 2 + 1]);
 			}
 		}
-		else									// insert c2
+		else													// insert c2
 		{
 			for (int k = id2; k < size2 / 2; ++k)
 			{
@@ -653,11 +712,8 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 	return retc;
 }
 
-
-void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& timeMarkers, float windowSize, float speedLimit)
+void BML::SpeechRequest::filterCurve(std::vector<float>&c, float speedLimit)
 {
-	if (windowSize <= 0)
-		return;
 	if (speedLimit <= 0)
 		return;
 
@@ -667,68 +723,24 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& 
 	for (size_t i = 0; i < c.size(); i++)
 	{
 		if ((i % 2) == 0)
-		{
 			x.push_back(c[i]);
-			markDelete.push_back(false);
-		}
 		else
 			y.push_back(c[i]);
 	}
 
-
-	// global smoothing by window size
-	std::vector<int> localMaxId;
-	for (size_t i = 1; i < x.size() - 1; ++i)
-	{
-		if ((y[i] - y[i - 1]) > 0 &&
-			(y[i] - y[i + 1]) > 0)
-		{
-			localMaxId.push_back(i);
-		}
-	}
-
-	//size_t i = 0;
-	//while (i < localMaxId.size() - 1)
-	for (size_t i = 0; i < localMaxId.size() - 1; i)
-	{
-		if (x[localMaxId[i + 1]] - x[localMaxId[i]] <= windowSize)
-		{
-			for (int markeId = (localMaxId[i] + 1); markeId < localMaxId[i + 1]; ++markeId)
-				markDelete[markeId] = true;
-			if (y[localMaxId[i + 1]] >= y[localMaxId[i]])	// remove first one
-				localMaxId.erase(localMaxId.begin() + i);
-			else
-				localMaxId.erase(localMaxId.begin() + i + 1);
-			i--;
-		}
-		i++;
-	}
-
-	std::vector<float> smoothX;
-	std::vector<float> smoothY;
-	for (size_t i = 0; i < markDelete.size(); i++)
-	{
-		if (!markDelete[i])
-		{
-			smoothX.push_back(x[i]);
-			smoothY.push_back(y[i]);
-		}
-	}
-
-
 	// apply low pass filter
-	for (size_t i = 0; i < smoothX.size() - 1; ++i)
+	for (size_t i = 0; i < x.size() - 1; ++i)
 	{
-		float speed = fabs(smoothY[i] - smoothY[i + 1]) / fabs(smoothX[i] - smoothX[i + 1]);
+		float speed = fabs(y[i] - y[i + 1]) / fabs(x[i] - x[i + 1]);
 		if (speed > speedLimit)
 		{
 			//LOG("[%d]: %f", i, speed);
-			float sign = (smoothY[i] <= smoothY[i + 1]) ? 1.0f : -1.0f;
-			smoothY[i + 1] = fabs(smoothX[i] - smoothX[i + 1]) * windowSize * sign + smoothY[i];
-			if (i == smoothX.size() - 2)	// append one if last point has been changed
+			float sign = (y[i] <= y[i + 1]) ? 1.0f : -1.0f;
+			y[i + 1] = fabs(x[i] - x[i + 1]) * speedLimit * sign + y[i];
+			if (i == x.size() - 2)	// append one if last point has been changed
 			{
-				smoothX.push_back(smoothX[i] + 0.3f);	// 0.3 is adhoc
-				smoothY.push_back(0.0f);
+				x.push_back(x[i] + 0.3f);	// 0.3 is adhoc
+				y.push_back(0.0f);
 			}
 		}
 	}
@@ -736,11 +748,80 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& 
 
 	// final stage
 	c.clear();
-	for (size_t i = 0; i < smoothX.size(); i++)
+	for (size_t i = 0; i < x.size(); i++)
 	{
-		c.push_back(smoothX[i]);
-		c.push_back(smoothY[i]);
+		c.push_back(x[i]);
+		c.push_back(y[i]);
 	}
+}
+
+
+void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& timeMarkers, float windowSize)
+{
+	if (windowSize <= 0)
+		return;
+
+	bool keepSmoothing = true;
+	int numIter = 0;
+
+	while (keepSmoothing)
+	{
+		numIter++;
+		std::vector<float> x;
+		std::vector<float> y;
+		std::vector<bool> markDelete;
+		for (size_t i = 0; i < c.size(); i++)
+		{
+			if ((i % 2) == 0)
+			{
+				x.push_back(c[i]);
+				markDelete.push_back(false);
+			}
+			else
+				y.push_back(c[i]);
+		}
+
+
+		// global smoothing by window size
+		std::vector<int> localMaxId;
+		for (size_t i = 1; i < x.size() - 1; ++i)
+		{
+			if ((y[i] - y[i - 1]) >= 0 &&
+				(y[i] - y[i + 1]) >= 0)
+			{
+				localMaxId.push_back(i);
+			}
+		}
+
+		for (size_t i = 0; i < localMaxId.size() - 1; ++i)
+		{
+			if (x[localMaxId[i + 1]] - x[localMaxId[i]] <= windowSize)
+			{
+				for (int markeId = (localMaxId[i] + 1); markeId < localMaxId[i + 1]; ++markeId)
+				{
+					float toDeleteY = y[markeId];
+					float ratio = (x[markeId] - x[localMaxId[i]]) / (x[localMaxId[i +1]] - x[localMaxId[i]]);
+					float actualY = ratio * (y[localMaxId[i + 1]] - y[localMaxId[i]]) + y[localMaxId[i]];
+					if (actualY >= toDeleteY)
+						markDelete[markeId] = true;
+				}
+			}
+		}
+
+		c.clear();
+		for (size_t i = 0; i < markDelete.size(); i++)
+		{
+			if (!markDelete[i])
+			{
+				c.push_back(x[i]);
+				c.push_back(y[i]);
+			}
+		}
+
+		if (c.size() == x.size() * 2)
+			keepSmoothing = false;
+	}
+//	LOG("Number of smoothing iteration %d", numIter);
 }
 
 void BML::SpeechRequest::schedule( time_sec now ) {
@@ -1087,6 +1168,45 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 				delete [] curve_info;
 
 #else
+				
+#if 0		// Dom
+				std::vector<std::string> cTokens;
+				vhcl::Tokenize(v->getCurveInfo(), cTokens);
+				std::vector<float> cValue;
+				cValue.resize(cTokens.size());
+				for (size_t i = 0; i < cTokens.size(); ++i)
+				{
+					cValue[i] = (float)atof(cTokens[i].c_str());
+				}
+				if (cTokens.size() == 4 * v->getNumKeys())
+				{
+					std::stringstream ss;
+
+					for (size_t i = 0; i < cValue.size(); ++i)
+					{
+						if (i % 4 == 1)
+						{
+							if (!SmartBody::SBScene::getScene()->getCharacter(actor_id)->hasAttribute(std::string(v->id())))
+							{
+								LOG("Error! doesn't have attribute %s", v->id());
+								continue;
+							}
+							double attr = SmartBody::SBScene::getScene()->getCharacter(actor_id)->getDoubleAttribute(std::string(v->id()));
+							std::string defaultAttrString = std::string(v->id()) + "_default";
+							double defaultAttr = SmartBody::SBScene::getScene()->getCharacter(actor_id)->getDoubleAttribute(defaultAttrString);
+							if (attr == 0)
+								attr = 1.0;
+							cValue[i] /= (float)(attr - defaultAttr);
+						}
+						ss << cValue[i] << " ";
+					}
+					v->setCurveInfo(ss.str().c_str());
+				}
+				else
+				{
+					LOG("Bad input data!");
+				}		
+#endif 
 				command.str( "" );
 				command << "char " << actor_id << " viseme " << v->id() << " curve " << v->getNumKeys() << ' ' << v->getCurveInfo();
 				string cmd_str = command.str();
