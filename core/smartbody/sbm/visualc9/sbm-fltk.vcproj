@@ -931,6 +931,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\visemeviewer\VisemeRTCurveViewer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\visemeviewer\VisemeRTCurveViewer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\visemeviewer\VisemeRunTimeWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\visemeviewer\VisemeRunTimeWindow.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\visemeviewer\VisemeViewerWindow.cpp"
 				>
 			</File>
