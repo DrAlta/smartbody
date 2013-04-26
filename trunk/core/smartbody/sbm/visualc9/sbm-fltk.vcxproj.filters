@@ -256,6 +256,12 @@
     <ClCompile Include="..\src\ExportWindow.cpp">
       <Filter>viewer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\visemeviewer\VisemeRunTimeWindow.cpp">
+      <Filter>diphoneviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\visemeviewer\VisemeRTCurveViewer.cpp">
+      <Filter>diphoneviewer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -463,6 +469,12 @@
     </ClInclude>
     <ClInclude Include="..\..\smartbody-lib\src\external\glew\glew.h">
       <Filter>glew</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\visemeviewer\VisemeRunTimeWindow.h">
+      <Filter>diphoneviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\visemeviewer\VisemeRTCurveViewer.h">
+      <Filter>diphoneviewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

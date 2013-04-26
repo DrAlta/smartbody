@@ -69,7 +69,8 @@ namespace BML {
 		
 
 		VecOfVisemeData	visemes;
-		VecOfVisemeData	phonemes;	   
+		VecOfVisemeData	phonemes;
+		VecOfVisemeData debugVisemeCurves;	// viseme curves that's stored for display and debugging purpose
 	    VecOfSbmCommand	sbm_commands;
 
 		// Equivalent to BehaviorRequest fields
@@ -165,12 +166,17 @@ namespace BML {
 		VecOfVisemeData& getVisemes() { return visemes; }
 
 		/**
-		* Returns the visemes and timings
+		* Returns the phonemes and timings
 		*/
 		VecOfVisemeData& getPhonemes() { return phonemes; }
 
 		/**
-		* Process the visemes by diphone
+		* Returns the debugging viseme curves
+		*/
+		VecOfVisemeData& getDebugVisemeCurves() { return debugVisemeCurves; }
+
+		/**
+		* Process the visemes by Di-phone
 		*/
 		void processVisemes(std::vector<SmartBody::VisemeData*>* visemes, BmlRequestPtr request, float scale = 1.0f);
 
@@ -181,7 +187,9 @@ namespace BML {
 
 		std::vector<float> stitchCurve(std::vector<float>& c1, std::vector<float>& c2);
 
-		void smoothCurve(std::vector<float>& c, std::vector<float>& timeMarkers, float windowSize, float speedLimit);
+		void smoothCurve(std::vector<float>& c, std::vector<float>& timeMarkers, float windowSize);
+
+		void filterCurve(std::vector<float>&c, float speedLimit);
 
 		bool getLineIntersection(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float& i_x, float& i_y);
 

@@ -1,5 +1,4 @@
 #include <vhcl.h>
-#include "VisemeViewerWindow.h"
 #include <algorithm>
 #include <cctype>
 #include <stdlib.h>
@@ -17,11 +16,15 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include "VisemeViewerWindow.h"
+#include "VisemeCurveEditor.h"
+#include "VisemeRunTimeWindow.h"
+
 
 #ifndef WIN32
 #define _stricmp strcasecmp
 #endif
-
+ 
 VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h)
 {
 	_phonemesSelected[0] = false;
@@ -47,6 +50,8 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_buttonPlayDialog = new Fl_Button(40, 500, 70, 30, "Speak");
 	_buttonPlayDialog->callback(OnPlayDialogCB, this);
 	_inputUtterance = new Fl_Input(115, 500, 435, 30);
+	_buttonRunTimeCurves = new Fl_Button(560, 500, 100, 30, "RunTime Curves");
+	_buttonRunTimeCurves->callback(OnRunTimeCurvesCB, this);
 
 	_buttonPlayAudioFile = new Fl_Button(40, 535, 70, 30, "Play Audio");
 	_buttonPlayAudioFile->callback(OnPlayAudioFileCB, this);
@@ -108,11 +113,18 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_gatherStats = false;
 	_useRemote = true;
 
+	_windowVisemeRunTime = NULL;
+
 	loadData();
 }
 
 VisemeViewerWindow::~VisemeViewerWindow()
 {
+	if (_windowVisemeRunTime != NULL)
+	{
+		delete _windowVisemeRunTime;
+		_windowVisemeRunTime = NULL;
+	}
 }
 
 void VisemeViewerWindow::show()
@@ -180,6 +192,7 @@ bool  VisemeViewerWindow::loadData()
 
 	for (int x = 0; x < 2; x++)
 	{
+		_browserPhoneme[x]->clear();
 		for (size_t p = 0; p < commonPhonemes.size(); p++)
 		{
 			std::string lowerCasePhoneme = commonPhonemes[p];
@@ -189,6 +202,7 @@ bool  VisemeViewerWindow::loadData()
 		_browserPhoneme[x]->deselect();
 	}
 
+	_choiceCharacter->clear();
 	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (size_t i = 0; i < characterNames.size(); i++)
 	{
@@ -200,7 +214,7 @@ bool  VisemeViewerWindow::loadData()
 		OnCharacterSelectCB(this->_choiceCharacter, this);
 	}
 	initializeVisemes();
-	
+	update();
 	return true;
 }
 
@@ -764,6 +778,9 @@ void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 
+	if (viewer->_windowVisemeRunTime)
+		viewer->_windowVisemeRunTime->retrievingCurveData(request);
+
 	std::string utterance = viewer->_inputUtterance->value(); 	
 
 	if(utterance == viewer->_lastUtterance && viewer->_useRemote)
@@ -1022,8 +1039,10 @@ void VisemeViewerWindow::OnCharacterRefreshCB(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 
+	viewer->loadData();
 	viewer->OnCharacterSelectCB(widget, data);
 	viewer->loadAudioFiles();
+	viewer->redraw();
 }
 
 void VisemeViewerWindow::OnDumpCB(Fl_Widget* widget, void* data)
@@ -1097,3 +1116,14 @@ void VisemeViewerWindow::OnDumpCB(Fl_Widget* widget, void* data)
 	file.close();	
 }
 
+
+void VisemeViewerWindow::OnRunTimeCurvesCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	if (viewer->_windowVisemeRunTime == NULL)
+	{
+		viewer->_windowVisemeRunTime = new VisemeRunTimeWindow(150, 150, 800, 600, "Diphone Runtime Window");
+	}
+	viewer->_windowVisemeRunTime->show();
+}
