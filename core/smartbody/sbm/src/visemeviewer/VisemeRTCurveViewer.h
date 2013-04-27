@@ -4,7 +4,7 @@
 #include <FL/Fl_Gl_Window.H>
 #include <sr/sr_event.h>
 #include <sr/sr_camera.h>
-#include < sr/sr_vec2.h>
+#include <sr/sr_vec2.h>
 #ifdef WIN32
 #include "glfont2.h"
 using namespace glfont;
@@ -35,7 +35,9 @@ public:
 	float getMaxX();
 
 public:
+#ifdef WIN32
 	GLFont label;				// label
+#endif
 	float xSpan;				// default xSpan of the camera window
 	float xShift;				// shift of camera center on x axis
 	float maxGridX;				// what's the max grid 
