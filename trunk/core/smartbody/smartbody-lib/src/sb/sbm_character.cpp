@@ -474,6 +474,9 @@ void SbmCharacter::createStandardControllers()
 	head_sched_p->ref();
 	face_ct->ref();
 	param_sched_p->ref();
+	reach_sched_p->ref();
+	grab_sched_p->ref();
+	constraint_sched_p->ref();
 
 	posture_sched_p->init(this);
 	motion_sched_p->init(this);

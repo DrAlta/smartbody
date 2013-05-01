@@ -411,9 +411,12 @@ public:
 
 		if( _logger )
 			_logger->context_pre_evaluate( time, *this, _frame_data );
-		for_each( _controllers.begin(), 
-		          _controllers.end(),
-		          Evaluate_Func( time, _frame_data ) );
+		//for_each( _controllers.begin(), 
+		//          _controllers.end(),
+		//          Evaluate_Func( time, _frame_data ) );
+		for (unsigned int i=0;i<_controllers.size();i++)
+			_controllers[i]->evaluate(time,_frame_data);
+
 		if( _logger )
 			_logger->context_post_evaluate( time, *this, _frame_data );
 	}

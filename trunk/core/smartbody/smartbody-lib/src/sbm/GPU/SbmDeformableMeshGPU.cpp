@@ -384,6 +384,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	glDisable(GL_COLOR_MATERIAL);
 	glUseProgram(program);	
 
+	
 	int iActiveTex = 0;	
 
 	GLuint diffuse_sampler_location = glGetUniformLocation(program,"diffuseTexture");	
@@ -425,6 +426,8 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 		GLuint transformLocation = glGetUniformLocation(program,"Transform");
 		glUniformMatrix4fv(transformLocation,tranBuffer.size(),true,(GLfloat*)getPtr(tranBuffer));
 	}
+
+	
 	glEnableClientState(GL_VERTEX_ARRAY);	
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -432,31 +435,33 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	//SbmShaderProgram::printOglError("after bind buffer\n");
 	glVertexPointer( 3, GL_FLOAT, 0, 0);
 	//SbmShaderProgram::printOglError("after vertex pointer\n");
-
+	
 	glEnableVertexAttribArray(weight_loc1);
 	VBOWeight1->VBO()->BindBuffer();
 	glVertexAttribPointer(weight_loc1,4,GL_FLOAT,0,0,0);	
 	//glBindAttribLocation(program,VBOWeight1->VBO()->m_ArrayType,"BoneWeight1");
 	//glVertexAttribPointer(VBOWeight1->VBO()->m_ArrayType,4,GL_FLOAT,0,0,0);	
-
+	
 	glEnableVertexAttribArray(bone_loc1);
 	VBOBoneID1->VBO()->BindBuffer();
 	//glVertexAttribIPointer(bone_loc1,4,GL_INT,0,0);	
 	glVertexAttribPointer(bone_loc1,4,GL_FLOAT,0,0,0);	
 	//glBindAttribLocation(program,VBOBoneID1->VBO()->m_ArrayType,"BoneID1");
 	//glVertexAttribPointer(VBOBoneID1->VBO()->m_ArrayType,4,GL_FLOAT,0,0,0);	
-
+	
 	glEnableVertexAttribArray(weight_loc2);
 	VBOWeight2->VBO()->BindBuffer();
 	glVertexAttribPointer(weight_loc2,4,GL_FLOAT,0,0,0);	
 	//glBindAttribLocation(program,VBOWeight2->VBO()->m_ArrayType,"BoneWeight2");
 	//glVertexAttribPointer(VBOWeight2->VBO()->m_ArrayType,4,GL_FLOAT,0,0,0);
 	// 
+	
 	glEnableVertexAttribArray(bone_loc2);
 	VBOBoneID2->VBO()->BindBuffer();
 	//glVertexAttribIPointer(bone_loc2,4,GL_INT,0,0);	
 	glVertexAttribPointer(bone_loc2,4,GL_FLOAT,0,0,0);	
-
+	
+	
 	glEnableVertexAttribArray(tangent_loc);
 	VBOTangent->VBO()->BindBuffer();
 	glVertexAttribPointer(tangent_loc,3,GL_FLOAT,0,0,0);	
@@ -465,11 +470,14 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	VBOBiNormal->VBO()->BindBuffer();
 	glVertexAttribPointer(binormal_loc,3,GL_FLOAT,0,0,0);	
 
+	
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
 	VBONormal->VBO()->BindBuffer();
 	glNormalPointer(GL_FLOAT,0,0);
 	VBOTexCoord->VBO()->BindBuffer();
 	glTexCoordPointer(2,GL_FLOAT,0,0);
+	
+	
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{	
 		SbmSubMesh* mesh = subMeshList[i];
@@ -547,7 +555,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 		glBindTexture(GL_TEXTURE_2D,0);
 		glActiveTexture(GL_TEXTURE3_ARB);
 		glBindTexture(GL_TEXTURE_2D,0);
-	}	
+	}		
 
 	// 	VBOTri->VBO()->BindBuffer();
 	// 	glDrawElements(GL_TRIANGLES,3*numTotalTris,GL_UNSIGNED_INT,0);
@@ -556,18 +564,33 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 
 	VBOTexCoord->VBO()->UnbindBuffer();
 	VBONormal->VBO()->UnbindBuffer();
+	
 	VBOBiNormal->VBO()->UnbindBuffer();
 	VBOTangent->VBO()->UnbindBuffer();
-	VBOBoneID2->VBO()->UnbindBuffer();
-	VBOWeight2->VBO()->UnbindBuffer();
-	VBOBoneID1->VBO()->UnbindBuffer();
+	
+
+	VBOBoneID2->VBO()->UnbindBuffer();	
+	VBOWeight2->VBO()->UnbindBuffer();	
+	VBOBoneID1->VBO()->UnbindBuffer();	
 	VBOWeight1->VBO()->UnbindBuffer();
+	
 	VBOPos->VBO()->UnbindBuffer();
+	glDisableVertexAttribArray(bone_loc2);
+	glDisableVertexAttribArray(bone_loc1);
+	glDisableVertexAttribArray(weight_loc2);
+	glDisableVertexAttribArray(weight_loc1);
+	glDisableVertexAttribArray(binormal_loc);
+	glDisableVertexAttribArray(tangent_loc);
+	glDisableClientState(GL_VERTEX_ARRAY);	
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glUseProgram(0);		
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_ALPHA_TEST) ;
 	glDisable(GL_BLEND);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glActiveTexture(GL_TEXTURE0);
 }
 
 
