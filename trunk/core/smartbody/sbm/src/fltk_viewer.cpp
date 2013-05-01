@@ -99,7 +99,13 @@
 #include "jointmapviewer/RetargetStepWindow.h"
 
 #include <sbm/PPRAISteeringAgent.h>
+#include "SBGUIManager.h"
 
+#define USE_CEGUI 1
+#if USE_CEGUI
+#include <CEGUI.h>
+#include "RendererModules/OpenGL/CEGUIOpenGLRenderer.h"
+#endif
 //#include <sbm/SbmShader.h>
 
 //#include "Heightfield.h"
@@ -166,6 +172,11 @@ class srSaSetShapesChanged : public SrSa
     virtual bool shape_apply ( SrSnShapeBase* s ) { s->changed(true); return true; }
  };
 
+bool testCEGUIButtonPush( const CEGUI::EventArgs& /*e*/ )
+{
+	LOG("CEGUI_PushButton");
+	return true;
+}
 
 //================================= popup menu ===================================================
 
@@ -451,6 +462,10 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
 	manager->addEventHandler("bmlstatus", gv);
 
+	//CEGUI::OpenGLRenderer* myRenderer = 
+	//	new CEGUI::OpenGLRenderer( 0 );
+	
+	//make_current();	
 }
 
 void FltkViewer::create_popup_menus()
@@ -1408,24 +1423,28 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 void FltkViewer::draw() 
 {	
 	if ( !visible() ) return;
-
-	if ( !valid() ) 
-	{
-		init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
-		//hasShaderSupport = SbmShaderManager::initGLExtension();	   
-	} 	
-
-	 SrCamera* cam = SmartBody::SBScene::getScene()->getActiveCamera();
-
+	
+	SrCamera* cam = SmartBody::SBScene::getScene()->getActiveCamera();
 	SbmShaderManager& ssm = SbmShaderManager::singleton();
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 
 	if (!context_valid())
-	{		
+	{			
 		bool hasShaderSupport = ssm.initGLExtension();
         if (hasShaderSupport)
 		    initShadowMap();
+
+		SBGUIManager::singleton().init();
 	}
+
+	if ( !valid() ) 
+	{
+		// window resize				
+		init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
+		//hasShaderSupport = SbmShaderManager::initGLExtension();	   
+		SBGUIManager::singleton().resize(w(),h());
+	} 	
+
 	
 
 	//make_current();
@@ -1588,6 +1607,10 @@ void FltkViewer::draw()
    {
 	   _retargetStepWindow->redraw();
    }
+
+   // draw UI
+   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+   CEGUI::System::getSingleton().renderGUI();
    //----- Fltk will then flush and swap buffers -----------------------------
  }
 
@@ -1920,7 +1943,8 @@ int FltkViewer::handle ( int event )
    translate_keyboard_state();   
    int ret = 0;
    std::string dndText;
-   static float dndX,dndY;
+   static float dndX,dndY;   
+   SBGUIManager::singleton().handleEvent(event);
    switch ( event )
    {   
 	   case FL_DND_RELEASE:
@@ -1956,7 +1980,17 @@ int FltkViewer::handle ( int event )
        case FL_PUSH:
        { //SR_TRACE1 ( "Mouse Push : but="<<Fl::event_button()<<" ("<<Fl::event_x()<<", "<<Fl::event_y()<<")" <<" Ctrl:"<<Fl::event_state(FL_CTRL) );
          translate_event ( e, SrEvent::EventPush, w(), h(), this );
-         if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::EventNone; }
+//          if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::EventNone; }
+// 		 // Mouse Button Push Handling for CEGUI
+//         
+// 		 if (e.button == 1) 
+// 			 ceguiButton = CEGUI::LeftButton;
+// 		 else if (e.button == 2)
+// 			 ceguiButton = CEGUI::MiddleButton;
+// 		 else if (e.button == 3)
+// 			 ceguiButton = CEGUI::RightButton;
+// 		 
+// 		 CEGUI::System::getSingleton().injectMouseButtonDown(ceguiButton);
 		 // process picking
 		 //printf("Mouse Push\n");
 
@@ -2040,12 +2074,23 @@ int FltkViewer::handle ( int event )
 				
 			 }
 		 }
-       } break;
+       } 
+	   ret = 1; // in order to receive FL_DRAG event
+	   break;
 
       case FL_RELEASE:
         //SR_TRACE1 ( "Mouse Release : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
          //            <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
-        translate_event ( e, SrEvent::EventRelease, w(), h(), this);
+        //translate_event ( e, SrEvent::EventRelease, w(), h(), this);		
+// 		if (e.button == 1) 
+// 			ceguiButton = CEGUI::LeftButton;
+// 		else if (e.button == 2)
+// 			ceguiButton = CEGUI::MiddleButton;
+// 		else if (e.button == 3)
+// 			ceguiButton = CEGUI::RightButton;
+// 
+// 		//LOG("Mouse Release %d",e.button);
+// 		CEGUI::System::getSingleton().injectMouseButtonUp(ceguiButton);
 		// process picking
 		//if (!e.button1)	
 		//printf("Mouse Release\n");
@@ -2054,15 +2099,16 @@ int FltkViewer::handle ( int event )
 
       case FL_MOVE:
         //SR_TRACE2 ( "Move buts: "<<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
+		//LOG("Move mouse cursor to %f %f",e.mouseCoord.x, e.mouseCoord.y);
+		//translate_event ( e, SrEvent::EventNone, w(), h(), this );
+		//CEGUI::System::getSingleton().injectMousePosition(e.mouseCoord.x, e.mouseCoord.y);
         if ( !Fl::event_state(FL_BUTTON1) && !Fl::event_state(FL_BUTTON2) ) break;
         // otherwise, this is a drag: enter in the drag case.
         // not sure if this is a hack or a feature.
       case FL_DRAG:
         //SR_TRACE2 ( "Mouse Drag : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
         //             <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
-        translate_event ( e, SrEvent::EventDrag, w(), h(), this );
-		
-		
+        translate_event ( e, SrEvent::EventDrag, w(), h(), this );		
         break;
 
       case FL_SHORTCUT: // not sure the relationship between a shortcut and keyboard event...
@@ -2155,10 +2201,12 @@ int FltkViewer::handle ( int event )
         break;	 
       // Other events :
       case FL_ENTER:          
-		  //SR_TRACE2 ( "Enter" );         
+		  //SR_TRACE2 ( "Enter" );    
+		  ret = 1;
 		  break;
       case FL_LEAVE:          
-		  //SR_TRACE2 ( "Leave" );         
+		  //SR_TRACE2 ( "Leave" ); 
+		  ret = 1;
 		  break;
       case FL_FOCUS:          
 		  //SR_TRACE2 ( "Focus" );         
@@ -4723,6 +4771,7 @@ void FltkViewer::drawText( const SrMat& mat, float textSize, std::string &text )
 	glutStrokeString(GLUT_STROKE_ROMAN, (const unsigned char*) text.c_str());
 	glPopMatrix();
 }
+
 
 GestureVisualizationHandler::GestureVisualizationHandler()
 {
