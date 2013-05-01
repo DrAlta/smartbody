@@ -1168,45 +1168,45 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 				delete [] curve_info;
 
 #else
-				
-#if 0		// Dom
-				std::vector<std::string> cTokens;
-				vhcl::Tokenize(v->getCurveInfo(), cTokens);
-				std::vector<float> cValue;
-				cValue.resize(cTokens.size());
-				for (size_t i = 0; i < cTokens.size(); ++i)
+				if (SmartBody::SBScene::getScene()->getCharacter(actor_id)->getBoolAttribute("dominancecurve"))
 				{
-					cValue[i] = (float)atof(cTokens[i].c_str());
-				}
-				if (cTokens.size() == 4 * v->getNumKeys())
-				{
-					std::stringstream ss;
-
-					for (size_t i = 0; i < cValue.size(); ++i)
+					std::vector<std::string> cTokens;
+					vhcl::Tokenize(v->getCurveInfo(), cTokens);
+					std::vector<float> cValue;
+					cValue.resize(cTokens.size());
+					for (size_t i = 0; i < cTokens.size(); ++i)
 					{
-						if (i % 4 == 1)
-						{
-							if (!SmartBody::SBScene::getScene()->getCharacter(actor_id)->hasAttribute(std::string(v->id())))
-							{
-								LOG("Error! doesn't have attribute %s", v->id());
-								continue;
-							}
-							double attr = SmartBody::SBScene::getScene()->getCharacter(actor_id)->getDoubleAttribute(std::string(v->id()));
-							std::string defaultAttrString = std::string(v->id()) + "_default";
-							double defaultAttr = SmartBody::SBScene::getScene()->getCharacter(actor_id)->getDoubleAttribute(defaultAttrString);
-							if (attr == 0)
-								attr = 1.0;
-							cValue[i] /= (float)(attr - defaultAttr);
-						}
-						ss << cValue[i] << " ";
+						cValue[i] = (float)atof(cTokens[i].c_str());
 					}
-					v->setCurveInfo(ss.str().c_str());
+					if (cTokens.size() == 4 * v->getNumKeys())
+					{
+						std::stringstream ss;
+
+						for (size_t i = 0; i < cValue.size(); ++i)
+						{
+							if (i % 4 == 1)
+							{
+								if (!SmartBody::SBScene::getScene()->getCharacter(actor_id)->hasAttribute(std::string(v->id())))
+								{
+									LOG("Error! doesn't have attribute %s", v->id());
+									continue;
+								}
+								double attr = SmartBody::SBScene::getScene()->getCharacter(actor_id)->getDoubleAttribute(std::string(v->id()));
+								std::string defaultAttrString = std::string(v->id()) + "_default";
+								double defaultAttr = SmartBody::SBScene::getScene()->getCharacter(actor_id)->getDoubleAttribute(defaultAttrString);
+								if (attr == 0)
+									attr = 1.0;
+								cValue[i] /= (float)(attr - defaultAttr);
+							}
+							ss << cValue[i] << " ";
+						}
+						v->setCurveInfo(ss.str().c_str());
+					}
+					else
+					{
+						LOG("Bad input data!");
+					}		
 				}
-				else
-				{
-					LOG("Bad input data!");
-				}		
-#endif 
 				command.str( "" );
 				command << "char " << actor_id << " viseme " << v->id() << " curve " << v->getNumKeys() << ' ' << v->getCurveInfo();
 				string cmd_str = command.str();
