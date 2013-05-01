@@ -101,11 +101,13 @@
 #include <sbm/PPRAISteeringAgent.h>
 #include "SBGUIManager.h"
 
+/*
 #define USE_CEGUI 1
 #if USE_CEGUI
 #include <CEGUI.h>
 #include "RendererModules/OpenGL/CEGUIOpenGLRenderer.h"
 #endif
+*/
 //#include <sbm/SbmShader.h>
 
 //#include "Heightfield.h"
@@ -171,12 +173,6 @@ class srSaSetShapesChanged : public SrSa
  { public :
     virtual bool shape_apply ( SrSnShapeBase* s ) { s->changed(true); return true; }
  };
-
-bool testCEGUIButtonPush( const CEGUI::EventArgs& /*e*/ )
-{
-	LOG("CEGUI_PushButton");
-	return true;
-}
 
 //================================= popup menu ===================================================
 
@@ -1610,7 +1606,7 @@ void FltkViewer::draw()
 
    // draw UI
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-   CEGUI::System::getSingleton().renderGUI();
+   SBGUIManager::singleton().update();
    //----- Fltk will then flush and swap buffers -----------------------------
  }
 

@@ -1,5 +1,7 @@
 include_directories( ./src )
 include_directories( ../smartbody-lib/src )
+include_directories( /usr/local/include/CEGUI )
+link_directories( /usr/local/lib )
 
 # never build ogre if in osx
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -182,6 +184,7 @@ set( SBM_FLTK_SRC
 
 	src/faceviewer/FaceViewer.cpp
 	src/FLTKListener.cpp
+	src/SBGUIManager.cpp
 
 )
 
@@ -219,6 +222,8 @@ target_link_libraries( sbm-fltk
 	pthread
 	${MORE_LIBS}
 	${OGRE_LIBS}
+	CEGUIBase
+	CEGUIOpenGLRenderer
 )
 
 set( EXEC_LIST
