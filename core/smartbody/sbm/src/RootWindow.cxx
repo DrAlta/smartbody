@@ -103,7 +103,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	
 
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
-	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
+//	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
 	menubar->add("&Window/Blend Viewer", 0, LaunchParamAnimViewerCB, this, NULL);
 	menubar->add("&Window/Resource Viewer", 0, LaunchResourceViewerCB, this, NULL);
 	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
@@ -592,7 +592,7 @@ void BaseWindow::LaunchDataViewerCB(Fl_Widget* widget, void* data)
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (!rootWindow->dataViewerWindow)
 	{
-		rootWindow->dataViewerWindow = new ChannelBufferWindow(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "Blend Viewer");
+		rootWindow->dataViewerWindow = new ChannelBufferWindow(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "Data Viewer");
 	}
 	rootWindow->dataViewerWindow->show();
 }
