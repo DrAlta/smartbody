@@ -1897,7 +1897,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		character->createActionAttribute("_5testLocomotion", true, "TestHead", 300, false, false, false, "Test Head");
 #endif
 
-		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1024, 500, "Retarget Step Window");
+		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1024, 500, "Retarget Viewer");
 		_retargetStepWindow->setApplyType(true);
 		_retargetStepWindow->show();			
 		_retargetStepWindow->setCharacterName(charName);
