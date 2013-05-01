@@ -113,7 +113,9 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 	}
 #if 1 //!USE_OGRE_VIEWER
 	// make sure the character isn't associated with the viewer
-	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	BaseWindow* window = dynamic_cast<BaseWindow*>(scene->getViewer());
 	if (window)
 	{
 		if (window->fltkViewer->_objManipulator.get_selected_pawn() == character)
