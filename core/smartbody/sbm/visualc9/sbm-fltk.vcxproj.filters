@@ -49,6 +49,9 @@
     <Filter Include="glew">
       <UniqueIdentifier>{c0320fe5-a593-4568-8e8d-c4a017caa66b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cegui">
+      <UniqueIdentifier>{0b599e4c-36b7-405c-bb79-1db58577a9cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -261,6 +264,9 @@
     </ClCompile>
     <ClCompile Include="..\src\visemeviewer\VisemeRTCurveViewer.cpp">
       <Filter>diphoneviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SBGUIManager.cpp">
+      <Filter>cegui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -475,6 +481,9 @@
     </ClInclude>
     <ClInclude Include="..\src\visemeviewer\VisemeRTCurveViewer.h">
       <Filter>diphoneviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SBGUIManager.h">
+      <Filter>cegui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

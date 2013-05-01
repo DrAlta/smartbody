@@ -46,8 +46,8 @@
 #include "jointmapviewer/RetargetStepWindow.h"
 #include <sb/SBMotionBlendBase.h>
 #include <sb/SBEvent.h>
-
 #include "ObjectManipulationHandle.h"
+//#include <CEGUI.h>
 
 class SBGeomObject;
 class SrQuat;
@@ -68,6 +68,7 @@ class MeCtExampleBodyReach;
 class JointMapViewer;
 class RetargetStepWindow;
 class PALocomotionData;
+
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
@@ -296,7 +297,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
     /*! draw() sets the viewer options and render the scene root.
         This is a derived FLTK method and should not be called directly.
         To draw the window contents, use render() instead. */
-    virtual void draw ();
+    virtual void draw ();	
 
     /*! Called to initialize opengl and to set the viewport to (w,h). This
         method is called also each time the window is reshaped. */
@@ -386,7 +387,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 	ObjectManipulationHandle _objManipulator; // a hack for testing. 
 
 public:
-	RetargetStepWindow* _retargetStepWindow;
+	RetargetStepWindow* _retargetStepWindow;	
 protected:
 	
 	void drawJointLimitCone(SmartBody::SBJoint* joint, float coneSize, float pitchUpLimit, float pitchDownLimit, float headLimit);
@@ -394,12 +395,15 @@ protected:
 	void set_reach_target(int itype, const char* targetname);	
 	void update_submenus();
 	void create_popup_menus();	
+	//bool testCEGUIButtonPush(const CEGUI::EventArgs& /*e*/);
 	MeCtExampleBodyReach* getCurrentCharacterBodyReachController();
 	MeCtConstraint*    getCurrentCharacterConstraintController();
 	SbmCharacter*        getCurrentCharacter();
 	std::vector<SrLight> _lights;
 
 	SmartBody::SBAnimationBlend* getCurrentCharacterAnimationBlend(); // for visualization plots	
+
+	
 	
  };
 
