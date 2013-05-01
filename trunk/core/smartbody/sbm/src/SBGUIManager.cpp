@@ -1,7 +1,7 @@
+#include <CEGUI.h>
+#include "SBGUIManager.h"
 #include <FL/Fl.H>
 #include <sb/SBScene.h>
-#include "SBGUIManager.h"
-#include <CEGUI.h>
 #include "RendererModules/OpenGL/CEGUIOpenGLRenderer.h"
 
 SBGUIManager* SBGUIManager::_singleton = NULL;
@@ -14,6 +14,11 @@ SBGUIManager::SBGUIManager()
 SBGUIManager::~SBGUIManager()
 {
 
+}
+
+void SBGUIManager::update()
+{
+	CEGUI::System::getSingleton().renderGUI();
 }
 
 void SBGUIManager::handleEvent(int eventID)
@@ -42,7 +47,7 @@ void SBGUIManager::handleEvent(int eventID)
 
 void SBGUIManager::init()
 {
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
 	scene->run("from PyCEGUI import *");
 	scene->run("from PyCEGUIOpenGLRenderer import *");
 
