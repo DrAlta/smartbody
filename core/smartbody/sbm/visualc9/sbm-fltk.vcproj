@@ -51,7 +51,7 @@
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				WarnAsError="true"
+				WarnAsError="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -1020,6 +1020,18 @@
 			</File>
 			<File
 				RelativePath="..\src\jointmapviewer\RetargetStepWindow.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="cegui"
+			>
+			<File
+				RelativePath="..\src\SBGUIManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\SBGUIManager.h"
 				>
 			</File>
 		</Filter>

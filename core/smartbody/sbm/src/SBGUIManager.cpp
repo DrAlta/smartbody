@@ -1,16 +1,17 @@
-#ifdef WIN32
+#define USE_CEGUI 0
+#if USE_CEGUI
 #include <CEGUI.h>
 #include "RendererModules/OpenGL/CEGUIOpenGLRenderer.h"
-#endif
-#include "SBGUIManager.h"
 #include <FL/Fl.H>
 #include <sb/SBScene.h>
+#endif
+
+#include "SBGUIManager.h"
 
 SBGUIManager* SBGUIManager::_singleton = NULL;
 SBGUIManager::SBGUIManager()
 {
 	initialized = false;
-
 }
 
 SBGUIManager::~SBGUIManager()
@@ -20,7 +21,7 @@ SBGUIManager::~SBGUIManager()
 
 void SBGUIManager::update()
 {
-#ifdef WIN32
+#if USE_CEGUI
 	CEGUI::System::getSingleton().renderGUI();
 #endif
 }
@@ -28,7 +29,7 @@ void SBGUIManager::update()
 void SBGUIManager::handleEvent(int eventID)
 {	
 	if (!initialized) return; 
-#ifdef WIN32
+#if USE_CEGUI
 	CEGUI::MouseButton ceguiButtons[3] = {CEGUI::LeftButton, CEGUI::RightButton, CEGUI::MiddleButton };
 
 	int button = Fl::event_button();
@@ -53,17 +54,21 @@ void SBGUIManager::handleEvent(int eventID)
 
 void SBGUIManager::init()
 {
-#ifdef WIN32
+	if (initialized) return; // don't init twice	
+#if USE_CEGUI
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
 	scene->run("from PyCEGUI import *");
 	scene->run("from PyCEGUIOpenGLRenderer import *");
 
 	guiRenderer = &CEGUI::OpenGLRenderer::bootstrapSystem();
+	//LOG("After bootstrap system");	
 
 	// initialize all resources
-	CEGUI::DefaultResourceProvider* rp = static_cast<CEGUI::DefaultResourceProvider*>
+	CEGUI::DefaultResourceProvider* rp = dynamic_cast<CEGUI::DefaultResourceProvider*>
 		(CEGUI::System::getSingleton().getResourceProvider());
 	std::string mediaPath = scene->getMediaPath();
+
+	LOG("setResourceGroupDirectory");
 	rp->setResourceGroupDirectory("schemes", mediaPath+"/cegui/datafiles/schemes/");
 	rp->setResourceGroupDirectory("imagesets", mediaPath+"/cegui/datafiles/imagesets/");
 	rp->setResourceGroupDirectory("fonts", mediaPath+"/cegui/datafiles/fonts/");
@@ -95,16 +100,19 @@ void SBGUIManager::init()
 	CEGUI::Window *sheet = winMgr.createWindow("DefaultWindow", "SBGUI");
 	//sheet->setMinSize(CEGUI::UVector2(CEGUI::UDim(0.0, 1920), CEGUI::UDim(0.0, 1200)));
 	CEGUI::System::getSingleton().setGUISheet( sheet );
+
+	
 	initialized = true;
+	
 	// create other widgets on screen
 	
 	//Create the quit button
-	/*
-	CEGUI::Window *quit = winMgr.createWindow("OgreTray/Button", "CEGUIDemo/QuitButton");
+	
+	CEGUI::Window *quit = winMgr.createWindow("TaharezLook/Button", "CEGUIDemo/QuitButton");
 	quit->setText("Quit");
 	quit->setSize(CEGUI::UVector2(CEGUI::UDim(0.0, 200), CEGUI::UDim(0.0, 60)));
 	sheet->addChildWindow(quit);
-	*/
+		
 	/*
 	CEGUI::Window *button = winMgr.createWindow("OgreTray/StaticText", "CEGUIDemo/Button2");
 	button->setText("Button2 Text");	
@@ -123,7 +131,7 @@ void SBGUIManager::init()
 
 void SBGUIManager::resize( int w, int h )
 {
-#ifdef WIN32
+#if USE_CEGUI
 	CEGUI::System::getSingleton().notifyDisplaySizeChanged(CEGUI::Size((float)w,(float)h));
 #endif
 }
