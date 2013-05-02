@@ -927,7 +927,7 @@ void BML::Processor::interrupt( SbmCharacter* actor, time_sec duration, SmartBod
 
 // Interrupt BML Performance (usually via message from InterruptBehavior)
 int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performance_id, time_sec duration, SmartBody::SBScene* scene ) {
-	std::string request_id = buildRequestId( actor, performance_id );
+	std::string request_id = performance_id; //buildRequestId( actor, performance_id );
 	MapOfBmlRequest::iterator result = bml_requests.find( request_id );
 	if( result != bml_requests.end() ) {
 		BmlRequestPtr request = result->second;
