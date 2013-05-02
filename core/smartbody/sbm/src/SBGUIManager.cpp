@@ -1,8 +1,10 @@
+#ifdef WIN32
 #include <CEGUI.h>
+#include "RendererModules/OpenGL/CEGUIOpenGLRenderer.h"
+#endif
 #include "SBGUIManager.h"
 #include <FL/Fl.H>
 #include <sb/SBScene.h>
-#include "RendererModules/OpenGL/CEGUIOpenGLRenderer.h"
 
 SBGUIManager* SBGUIManager::_singleton = NULL;
 SBGUIManager::SBGUIManager()
@@ -18,12 +20,15 @@ SBGUIManager::~SBGUIManager()
 
 void SBGUIManager::update()
 {
+#ifdef WIN32
 	CEGUI::System::getSingleton().renderGUI();
+#endif
 }
 
 void SBGUIManager::handleEvent(int eventID)
 {	
 	if (!initialized) return; 
+#ifdef WIN32
 	CEGUI::MouseButton ceguiButtons[3] = {CEGUI::LeftButton, CEGUI::RightButton, CEGUI::MiddleButton };
 
 	int button = Fl::event_button();
@@ -43,10 +48,12 @@ void SBGUIManager::handleEvent(int eventID)
 		//else if (eventID == FL_DRAG) LOG("Mouse is dragged to %d %d", Fl::event_x(), Fl::event_y());
 		CEGUI::System::getSingleton().injectMousePosition((float)Fl::event_x(), (float)Fl::event_y());
 	}
+#endif
 }
 
 void SBGUIManager::init()
 {
+#ifdef WIN32
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
 	scene->run("from PyCEGUI import *");
 	scene->run("from PyCEGUIOpenGLRenderer import *");
@@ -111,9 +118,12 @@ void SBGUIManager::init()
 	//quit->subscribeEvent(CEGUI::PushButton::EventClicked, &testCEGUIButtonPush);
 	//LOG("Finish create CEGUI");
 	
+#endif
 }
 
 void SBGUIManager::resize( int w, int h )
 {
+#ifdef WIN32
 	CEGUI::System::getSingleton().notifyDisplaySizeChanged(CEGUI::Size((float)w,(float)h));
+#endif
 }
