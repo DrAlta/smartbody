@@ -122,10 +122,10 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 		if (std::find(endJoints.begin(),endJoints.end(), jname) != endJoints.end())
 			isEndJoint = true;
 
-//#if ELITE_HACK
+#if ELITE_HACK
 		if (jname == "r_sternoclavicular" || jname == "l_sternoclavicular" || jname == "r_acromioclavicular" || jname == "l_acromioclavicular")
 			jointSkipMap[jname] = true;//continue;
-//#endif
+#endif
 
 		if (srcJoint && tgtJoint ) //&& std::find(endJoints.begin(),endJoints.end(), jname) == endJoints.end())
 		{					
@@ -222,8 +222,8 @@ SrQuat SBRetarget::applyRetargetJointRotation( std::string jointName, SrQuat& in
 
 		if (jointSkipMap.find(jointName) != jointSkipMap.end())
 		{			
-			outQuat = qpair.first*qpair.second;
-			//outQuat = SrQuat();
+			//outQuat = qpair.first*qpair.second;
+			outQuat = SrQuat();
 #if ELITE_HACK
 			SrQuat newInQuat = SrQuat(inQuat.axisAngle()*0.7f);
 			jointAddRotMap[jointName] = newInQuat;
