@@ -76,7 +76,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const std
 	//mcu.mark("requestSpeechAudio", 0, "begin");
 	string encoding = "";
 	xml_utils::xml_translate( &encoding, node->getOwnerDocument()->getXmlEncoding() );
-	string version = "";
+	string version = "1.0";
 	xml_utils::xml_translate( &version, node->getOwnerDocument()->getXmlVersion () );
 
    // overwrites encoding? Why do we do this?
