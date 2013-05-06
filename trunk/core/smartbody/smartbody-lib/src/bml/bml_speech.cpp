@@ -860,7 +860,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	}
 
 	audioPlay = speech_impl->getSpeechPlayCommand( speech_request_id, actor );
-	audioStop = "";//speech_impl->getSpeechStopCommand( speech_request_id, actor );
+	audioStop = speech_impl->getSpeechStopCommand( speech_request_id, actor );
 	if( LOG_AUDIO ) {
 		cout << "DEBUG: BML::SpeechRequest::processReply(): audioPlay = " << audioPlay << endl;
 		cout << "DEBUG: BML::SpeechRequest::processReply(): audioStop = " << audioStop << endl;
