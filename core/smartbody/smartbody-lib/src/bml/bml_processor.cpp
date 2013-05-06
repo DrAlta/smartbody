@@ -913,14 +913,14 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 
 void BML::Processor::interrupt( SbmCharacter* actor, time_sec duration, SmartBody::SBScene* scene )
 {
-	for (std::map<std::string, BmlRequestPtr>::iterator iter = bml_requests.begin();
-		 iter != bml_requests.end();
-		 iter++)
+	BML::MapOfBmlRequest::iterator iter = bml_requests.begin();
+	for ( ; iter != bml_requests.end(); iter++)
 	{
 		BmlRequestPtr request = iter->second;
 		if (request->actor == actor)
 		{
-			interrupt(actor, iter->first, duration, scene);
+			if (interrupt(actor, iter->first, duration, scene) == CMD_SUCCESS)
+				bml_requests.erase(iter++);
 		}
 	}
 }
@@ -935,7 +935,8 @@ int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performan
 		if( BML_LOG_INTERRUPT )
 			std::cout << "LOG: BML::Processor::interrupt(..): Found BehaviorRequest for \"" << performance_id << "\"." << std::endl;
 		request->unschedule( this, scene, duration );
-		bml_requests.erase( result );
+		//bml_requests.erase( result );
+		return CMD_SUCCESS;
 	} else {
 		// add this interrupt requests to a map of pending interrupt requests
 		pendingInterrupts[request_id] = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
@@ -963,7 +964,7 @@ int BML::Processor::interrupt( SbmCharacter* actor, const std::string& performan
 		// ignore without error
 	}
 
-	return CMD_SUCCESS;
+	return CMD_FAILURE;
 }
 
 // Cleanup Callback
