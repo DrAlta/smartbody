@@ -109,12 +109,12 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
 	menubar->add("&Window/BML Creator", 0, LaunchBMLCreatorCB, this, NULL);
 	menubar->add("&Window/Face Viewer", 0, LaunchFaceViewerCB, this, NULL);
-	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
 	menubar->add("&Window/Lip Sync Viewer", 0, LaunchVisemeViewerCB, this, NULL);
 	//menubar->add("&Window/Retarget Creator", 0, LaunchRetargetCreatorCB, this, NULL);
 	//menubar->add("&Window/Behavior Sets", 0, LaunchBehaviorSetsCB, this, NULL);
 	menubar->add("&Window/Motion Editor", 0, LaunchMotionEditorCB, this, NULL);
 	menubar->add("&Window/Retarget Viewer", 0, LaunchJointMapViewerCB, this, NULL);
+	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
 	menubar->add("&Help/Documentation", 0, DocumentationCB, this, NULL);
 	menubar->add("&Help/Create Python API", 0, CreatePythonAPICB, this, NULL);
 	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);

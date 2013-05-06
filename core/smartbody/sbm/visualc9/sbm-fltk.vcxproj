@@ -23,7 +23,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>sbm-fltk-1.3</ProjectName>
+    <ProjectName>sbgui</ProjectName>
     <ProjectGuid>{2C18CD04-407B-420A-8CDC-1C6325F87072}</ProjectGuid>
     <RootNamespace>sbm-fltk-1.3</RootNamespace>
   </PropertyGroup>
@@ -103,9 +103,9 @@
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sbm-fltkd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sbguid</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">sbm-fltkd</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sbm-fltk</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sbgui</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">sbm-fltk</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

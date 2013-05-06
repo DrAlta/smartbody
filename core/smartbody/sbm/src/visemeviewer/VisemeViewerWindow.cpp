@@ -31,7 +31,7 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_phonemesSelected[1] = false;
 	_lastUtterance = "";
 	
-	this->label("Diphone Viewer");
+	this->label("Lip Sync Viewer");
 	this->begin();
 
 	_sliderCurveAnimation = new Fl_Value_Slider(115, 460, 435, 30);
