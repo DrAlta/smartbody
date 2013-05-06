@@ -35,7 +35,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OgreViewer", "core\ogre-vie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsSpeechRelay", "core\MsSpeechRelay\MsSpeechRelay.csproj", "{406544EA-6FBB-4ABD-A6E8-ECC9B80F4E20}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sbm-fltk-1.3", "core\smartbody\sbm\visualc9\sbm-fltk.vcxproj", "{2C18CD04-407B-420A-8CDC-1C6325F87072}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sbgui", "core\smartbody\sbm\visualc9\sbm-fltk.vcxproj", "{2C18CD04-407B-420A-8CDC-1C6325F87072}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8BBCFC4A-6B52-461E-8BBA-A86DE3FAD6F6} = {8BBCFC4A-6B52-461E-8BBA-A86DE3FAD6F6}
 	EndProjectSection

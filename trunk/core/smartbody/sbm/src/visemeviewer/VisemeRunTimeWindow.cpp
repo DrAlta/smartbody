@@ -48,7 +48,7 @@ VisemeRunTimeWindow::VisemeRunTimeWindow(int x, int y, int w, int h, char* name)
 {
 	_data = new RunTimeCurveData();
 
-	this->label("Diphone Runtime Window");
+	this->label("Lip Sync Runtime Window");
 	this->begin();
 		_inputCurveFilter = new Fl_Input(60, 10, 150, 20, "Curves:");
 		_inputCurveFilter->callback(OnChangeFilter, this);
