@@ -5224,8 +5224,8 @@ int mcu_vhmsg_connect_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdM
 
 	// disconnect first in case we are already connected
 	vhmsgManager->setServer(vhmsgServer);
-	vhmsgManager->setPort(vhmsgServer);
-	vhmsgManager->setScope(vhmsgServer);
+	vhmsgManager->setPort(vhmsgPort);
+	vhmsgManager->setScope(vhmsgScope);
 	bool success = vhmsgManager->connect();
 
 	if (success)

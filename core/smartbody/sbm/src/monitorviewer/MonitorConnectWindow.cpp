@@ -7,6 +7,7 @@
 #include <sb/SBDebuggerClient.h>
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBPythonClass.h>
+#include <sb/SBVHMsgManager.h>
 
 MonitorConnectWindow::MonitorConnectWindow(int x, int y, int w, int h, char* label) : Fl_Double_Window(x, y, w, h, label)
 {
@@ -55,7 +56,7 @@ void MonitorConnectWindow::loadProcesses()
 	SBDebuggerServer* s = sbScene->getDebuggerServer();
 	c->QuerySbmProcessIds();
 	vhcl::Sleep(2);
-	vhmsg::ttu_poll();
+	sbScene->getVHMsgManager()->poll();
 	_browserSBProcesses->clear();
 	std::vector<std::string> ids = c->GetSbmProcessIds();
 	for (size_t i = 0; i < ids.size(); i++)
