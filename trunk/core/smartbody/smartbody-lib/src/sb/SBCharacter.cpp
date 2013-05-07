@@ -55,6 +55,12 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	StringAttribute* gesturePolicyAttr = createStringAttribute("gesturePolicy", "random", true, "Basic", 60, false, false, false, "Gesture policy to be used");
 	gesturePolicyAttr->setValidValues(gesturePolicyVec);
 
+
+
+	SmartBody::DoubleAttribute* bmlDelayAttr = createDoubleAttribute("bmlscheduledelay", 0.0, true, "Basic", 98, false, false, false, "Delay all bml schedules by a fixed amount.");
+	bmlDelayAttr->setMin(0.0);
+	SmartBody::DoubleAttribute* visemeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 99, false, false, false, "Delay visemes by a fixed amount.");
+	visemeDelayAttr->setMin(0.0);
 	createBoolAttribute("visemecurve", false, true, "Basic", 100, false, false, false, "Use curve-based visemes instead of discrete visemes (FaceFX).");
 	createBoolAttribute("dominancecurve", false, true, "Basic", 101, false, false, false, "Use donimance curve instead of FaceFX curve");
 	createBoolAttribute("reach.useLocomotion", false, true, "Basic", 110, false, false, false, "Whether to use locomotion for reach by default.");
@@ -114,9 +120,6 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createBoolAttribute("terrainWalk", false, true, "Basic", 200, false, false, false, "Post-Processing to adjust the character for different terrain height. ikPostFix must be on for this to work.");
 	createBoolAttribute("onlineRetarget", true, true, "Basic", 200, false, false, false, "Use on-line retargeting to adjust joint angles when playing animation blend.");
 
-
-	SmartBody::DoubleAttribute* timeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 210, false, false, false, "Delay visemes by a fixed amount.");
-	timeDelayAttr->setMin(0.0);
 	createStringAttribute("deformableMesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
 	createDoubleAttribute("deformableMeshScale", 1, true, "Basic", 230, false, false, false, "Scale factor when loading mesh.");
 	createStringAttribute("receiverName", "kinect1", true, "Basic", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
