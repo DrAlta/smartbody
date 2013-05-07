@@ -875,6 +875,16 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			}
 		}
 
+		// offset everything by bml schedule delay (idea is to put all the computation before bml get scheduled)
+		for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) {
+			BehaviorRequestPtr behavior = *i;
+
+			BehaviorSyncPoints::iterator syncs_end = behavior->behav_syncs.end();
+			for( BehaviorSyncPoints::iterator j = behavior->behav_syncs.begin(); j != syncs_end; ++j ) {
+				j->sync()->time += actor->getDoubleAttribute("bmlscheduledelay");
+			}
+		}
+
 		// determine the character's utterance policy and either:
 		// 1) ignore this block
 		// 2) queue this block
@@ -1800,7 +1810,7 @@ void MeControllerRequest::unschedule( SmartBody::SBScene* scene,
 		{
 			MeCtBlend* blend = static_cast<MeCtBlend*>(unary_blend_ct);
 			srLinearCurve& blend_curve = blend->get_curve();
-			double t = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
+			double t = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 #if 0
 			blend_curve.clear_after( t );
 			if( duration > 0 ) {

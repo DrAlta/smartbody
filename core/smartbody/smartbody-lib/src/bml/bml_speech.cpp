@@ -37,8 +37,11 @@
 #include <sb/SBPhoneme.h>
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBCommandManager.h>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBCharacter.h>
 #include <sbm/sbm_speech_audiofile.hpp>
+#include <controllers/me_ct_scheduler2.h>
+#include <controllers/me_ct_blend.hpp>
 
 using namespace std;
 using namespace BML;
@@ -1207,12 +1210,23 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 						LOG("Bad input data!");
 					}		
 				}
+				/*
+				// Comment out old way of realizing visemes. There's no need to use commands as intermediate layer
 				command.str( "" );
-				command << "char " << actor_id << " viseme " << v->id() << " curve " << v->getNumKeys() << ' ' << v->getCurveInfo();
+				command << "char " << actor_id << " viseme " << v->id() << " curve " << v->getNumKeys() << ' ' << v->getCurveInfo();			
 				string cmd_str = command.str();
 				SbmCommand *cmd = new SbmCommand( cmd_str, time );
 				sbm_commands.push_back( cmd );
-//				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
+				*/
+
+				// directly schedule into head_schedule_ct
+				std::vector<std::string> tokens;
+				vhcl::Tokenize(v->getCurveInfo(), tokens);
+				int numKeyParam = tokens.size() / v->getNumKeys();
+				float* curve = new float[tokens.size()];
+				for (size_t i = 0; i < tokens.size(); ++i)
+					curve[i] = (float)atof(tokens[i].c_str());
+				request->actor->schedule_viseme_curve(v->id(), time, curve, v->getNumKeys(), numKeyParam, 0.0f, 0.0f);
 #endif
 				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
 			}
@@ -1258,10 +1272,29 @@ void BML::SpeechRequest::unschedule(  SmartBody::SBScene* scene,
 {
 	unschedule_sequence( scene );
 
+	/*
 	// Clear visemes
 	ostringstream cmd;
 	cmd << "char " << request->actor->getName() << " viseme ALL 0 " << duration;
 	SmartBody::SBScene::getScene()->getCommandManager()->execute_later( cmd.str().c_str(), 0 );
+	*/
+	MeCtSchedulerClass::VecOfTrack tracks = request->actor->head_sched_p->tracks();
+	for (size_t i = 0; i < tracks.size(); ++i)
+	{
+		MeCtSchedulerClass::TrackPtr track = tracks[i];
+		MeCtUnary* unary_blend_ct = track->blending_ct();
+		if( unary_blend_ct &&
+			unary_blend_ct->controller_type() == MeCtBlend::CONTROLLER_TYPE )
+		{
+			MeCtBlend* blend = static_cast<MeCtBlend*>(unary_blend_ct);
+			srLinearCurve& blend_curve = blend->get_curve();
+			double t = scene->getSimulationManager()->getTime();
+			double v = blend_curve.evaluate( t );
+			blend_curve.clear_after( t );
+			blend_curve.insert( t, v );
+			blend_curve.insert( t + duration, 0.0 );
+		}
+	}
 
 	if( !audioStop.empty() )
 		SmartBody::SBScene::getScene()->getCommandManager()->execute_later( audioStop.c_str(), request->actor->get_viseme_sound_delay() );
