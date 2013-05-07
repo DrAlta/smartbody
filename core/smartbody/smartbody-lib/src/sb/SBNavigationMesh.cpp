@@ -389,7 +389,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMesh( SrModel& inMesh )
 		{
 			m_ctx->log(RC_LOG_ERROR, "Could not init Detour navmesh query");
 			return false;
-		}
+		}		
 	}	
 	return true;
 }

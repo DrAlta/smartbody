@@ -88,7 +88,7 @@ void SrQuat::set ( const SrVec& axisangle )
 
 void SrQuat::set ( const SrMat& m )
  {
-/*
+
    # define E(i)   m.get(i)
    # define M(i,j) m.get(i,j)
    # define Q(i)   *((&x)+i)
@@ -124,8 +124,8 @@ void SrQuat::set ( const SrMat& m )
 	  # undef E
 	  # undef M
 	  # undef Q
-	*/
-
+	
+/*
 	#define M(i,j) m.get(i,j)
 	register float ww, xx, yy, rcp, qx, qy, qz, qw;
 	ww = 0.25f * (1.0f + M(0,0) + M(1,1)+ M(2,2));
@@ -171,6 +171,7 @@ void SrQuat::set ( const SrMat& m )
 	y = qy * inv_mag;
 	z = qz * inv_mag;
 	#undef M
+	*/
  }
 
 void SrQuat::set( float ex, float ey, float ez )

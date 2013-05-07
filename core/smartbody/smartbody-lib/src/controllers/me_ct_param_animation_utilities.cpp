@@ -447,10 +447,16 @@ void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 	SrMat mat;
 	quat.get_mat(mat);	
 	float rx, ry, rz;
-	sr_euler_angles(rotType, mat, rx, ry, rz);	
+	int eulerRotType = rotType;
+	sr_euler_angles(eulerRotType, mat, rx, ry, rz);	
+// 	if (fabs(rx) > M_PI*0.8f || fabs(ry) > M_PI*0.8f || fabs(rz) > M_PI*0.8f) // swtich rotation order if it's close to singularity
+// 	{
+// 		eulerRotType = 312;
+// 		sr_euler_angles(eulerRotType, mat, rx, ry, rz);
+// 	}	
 	rx = 0.0;
 	rz = 0.0;
-	sr_euler_mat(rotType, mat, rx, ry, rz);
+	sr_euler_mat(eulerRotType, mat, rx, ry, rz);
 	//quatP.get_mat(dest);
 	dest = mat;
 #else
@@ -487,10 +493,21 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 	SrMat mat;
 	quat.get_mat(mat);	
 	float rx, ry, rz;
-	sr_euler_angles(rotType, mat, rx, ry, rz);
+	int eulerRotType = rotType;
+	sr_euler_angles(eulerRotType, mat, rx, ry, rz);	 
+
+ 	if (fabs(rx) > M_PI*0.90f || fabs(ry) > M_PI*0.90f || fabs(rz) > M_PI*0.90f) // swtich rotation order if it's close to singularity
+ 	{
+		//LOG("mat = %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f", mat.get(0,0),mat.get(0,1), mat.get(0,2), mat.get(1,0), mat.get(1,1), mat.get(1,2), mat.get(2,0), mat.get(2,1), mat.get(2,2));
+		//LOG("quat = %f %f %f %f",quat.x,quat.y,quat.z,quat.w);
+		//LOG("rx = %f, ry = %f, rz = %f\n", rx, ry, rz);
+ 		eulerRotType = 312;
+ 		sr_euler_angles(eulerRotType, mat, rx, ry, rz);
+		//LOG("new rx = %f, ry = %f, rz = %f", rx, ry, rz);
+ 	}	
 	//LOG("eu = %f %f %f", rx,ry,rz);
 	ry = 0.0;
-	sr_euler_mat(rotType, mat, rx, ry, rz);
+	sr_euler_mat(eulerRotType, mat, rx, ry, rz);
 	SrQuat quatP = SrQuat(mat);
 #else
 	gwiz::euler_t eu = gwiz::euler_t(gwiz::quat_t(quat.w, quat.x,quat.y,quat.z));
@@ -739,6 +756,10 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 			if (timeDiffs[id] > 0)
 				//baseTransformMat = currentBaseMats[id] * baseMats[id].inverse();
 				baseTransformMat = currentBaseMats[id] * baseMats[id].rigidInverse();
+			else
+			{
+				//LOG("loop back to beginning");
+			}
 	#if LoopHandle
 			else
 			{
@@ -758,6 +779,10 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 				SrMat mat;
 				if (timeDiffs[indices[i]] > 0)
 					mat = currentBaseMats[indices[i]] * baseMats[indices[i]].inverse();
+				else
+				{
+					//LOG("loop back to beginning");
+				}
 	#if LoopHandle
 				else
 				{
