@@ -23,6 +23,7 @@
 # include <sr/sr_euler.h>
 # include <sr/sr_mat.h>
 # include <math.h>
+#include "sbm/gwiz_math.h"
 
 //# define SR_USE_TRACE1
 //# include <sr/sr_trace.h>
@@ -50,6 +51,9 @@ void sr_euler_angles ( int order, const SrMat& m, float& rx, float& ry, float& r
       case 321: sr_euler_angles_zyx(m,rx,ry,rz); break;
       default: rx=ry=rz=0;
     }
+//    if (rx < 0.f) rx += M_PI*2.f;
+//    if (ry < 0.f) ry += M_PI*2.f;
+//    if (rz < 0.f) rz += M_PI*2.f;
  }
 
 void sr_euler_angles_xyz ( const SrMat& m, float& rx, float& ry, float& rz )
