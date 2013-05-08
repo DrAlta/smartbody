@@ -14,7 +14,7 @@ devenv vs2010.sln /build Release
 
 @rem Android build
 
-set NDK_EXE="c:\android-ndk-r8b\ndk-build.cmd"
+set NDK_EXE="c:\android-ndk-r8e\ndk-build.cmd"
 if defined ANDROID_NDK set NDK_EXE="%ANDROID_NDK%\ndk-build.cmd"
 
 pushd android\vh_wrapper\jni
