@@ -15,16 +15,21 @@
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBSpeechManager.h>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
+#include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_gaze.h>
 #include <controllers/me_controller_tree_root.hpp>
+#include <controllers/me_ct_curve_writer.hpp>
+#include <controllers/me_ct_channel_writer.hpp>
 #include <sbm/remote_speech.h>
 #include <sbm/local_speech.h>
 #include <sbm/text_speech.h>
 #include <sbm/sbm_speech_audiofile.hpp>
 #include <bml/bml_processor.hpp>
+#include <sk/sk_channel_array.h>
 
 namespace SmartBody {
 
@@ -710,6 +715,51 @@ void SBCharacter::notify(SBSubject* subject)
 
 	SbmCharacter::notify(subject);
 	SBPawn::notify(subject);
+}
+
+void SBCharacter::interruptFace(double seconds)
+{
+	if (!head_sched_p)
+		return;
+	
+	SmartBody::SBFaceDefinition* faceDefinition = this->getFaceDefinition();
+	if (!faceDefinition)
+		return;
+
+	// retrieve any action units being executed
+	std::vector<MeCtScheduler2::TrackPtr> tracks = head_sched_p->tracks();
+
+	for (unsigned int t = 0; t < tracks.size(); t++)
+	{
+		MeCtScheduler2::TrackPtr track = tracks[t];
+		MeController* controller = track->animation_ct();
+		// determine the facial unit associated with this track
+		MeCtCurveWriter* curveController = dynamic_cast<MeCtCurveWriter*>(controller);
+		if (!curveController)
+		{
+			MeCtChannelWriter* channelWriterController = dynamic_cast<MeCtChannelWriter*>(controller);
+			if (!channelWriterController)
+				continue;
+		}
+		const std::string& controllerName = controller->getName();
+		// find a face definition match
+		bool visemeExists = faceDefinition->hasViseme(controllerName);
+		if (visemeExists)
+		{
+			this->schedule_viseme_trapezoid(controllerName.c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), 1, 0, float(seconds), float(seconds));
+			this->pruneControllers();
+		}
+		else
+		{
+			ActionUnit* au = faceDefinition->getAUByName(controllerName);
+			if (au)
+			{
+				this->schedule_viseme_trapezoid(controllerName.c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), 0, 0, float(seconds), float(seconds));
+				this->pruneControllers();
+			}
+		}
+	}
+	
 }
 
 };

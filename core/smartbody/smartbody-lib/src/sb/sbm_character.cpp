@@ -80,7 +80,6 @@
 #include <controllers/me_ct_reach.hpp>
 #include <controllers/me_ct_example_body_reach.hpp>
 
-
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_physics_controller.h>
 
@@ -1723,7 +1722,7 @@ void SbmCharacter::schedule_viseme_curve(
 				float timeDelay = this->get_viseme_time_delay();
 
 				ostringstream ct_name;
-				ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+				ct_name << visemeNames[nCount];
 				if (faceDefinition)
 				{
 					if (faceDefinition->hasViseme(visemeNames[nCount]))
@@ -1875,7 +1874,7 @@ void SbmCharacter::schedule_viseme_blend_curve(
 				float timeDelay = this->get_viseme_time_delay();
 
 				ostringstream ct_name;
-				ct_name << "Viseme \"" << visemeNames[nCount] << "\", Channel \"" << visemeNames[nCount] << "\"";
+				ct_name << visemeNames[nCount];
 
 				if (faceDefinition)
 				{
