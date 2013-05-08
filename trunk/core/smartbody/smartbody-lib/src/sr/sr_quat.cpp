@@ -120,7 +120,7 @@ void SrQuat::set ( const SrMat& m )
       w    = (M(j,k) - M(k,j)) * s;
       Q(j) = (M(i,j) + M(j,i)) * s;
       Q(k) = (M(i,k) + M(k,i)) * s;
-	}
+	}    
 	  # undef E
 	  # undef M
 	  # undef Q

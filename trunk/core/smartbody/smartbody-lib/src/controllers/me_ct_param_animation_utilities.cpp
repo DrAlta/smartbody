@@ -28,10 +28,11 @@
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBEvent.h>
 #include <sb/SBScene.h>
+#include <math.h>
 
 const double timeThreshold = 0.05;
 
-#define NEW_EULER 0
+#define NEW_EULER 1
 
 PATimeManager::PATimeManager()
 {
@@ -449,17 +450,21 @@ void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 	float rx, ry, rz;
 	int eulerRotType = rotType;
 	sr_euler_angles(eulerRotType, mat, rx, ry, rz);	
-// 	if (fabs(rx) > M_PI*0.8f || fabs(ry) > M_PI*0.8f || fabs(rz) > M_PI*0.8f) // swtich rotation order if it's close to singularity
-// 	{
-// 		eulerRotType = 312;
-// 		sr_euler_angles(eulerRotType, mat, rx, ry, rz);
-// 	}	
+ 	if (fabs(rx) > M_PI*0.5f*0.9f || fabs(ry) > M_PI*0.5f*0.9f || fabs(rz) > M_PI*0.5f*0.9f) // swtich rotation order if it's close to singularity
+ 	{
+ 		eulerRotType = 312;
+ 		sr_euler_angles(eulerRotType, mat, rx, ry, rz);
+ 	}	
 	rx = 0.0;
 	rz = 0.0;
 	sr_euler_mat(eulerRotType, mat, rx, ry, rz);
 	//quatP.get_mat(dest);
 	dest = mat;
 #else
+	SrQuat yRotQuat =SrQuat(SrVec(0,vec1.y,0)); // extract only the y-component
+	SrMat yRotMat; yRotQuat.get_mat(yRotMat);
+	dest = yRotMat;
+	/*
 	gwiz::euler_t eu = gwiz::euler_t(gwiz::quat_t(quat.w, quat.x,quat.y,quat.z));
 	eu.x(0.f);
 	eu.z(0.f);
@@ -467,6 +472,7 @@ void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 	//vec1.x = 0.0; vec1.z = 0.0;
 	SrQuat newQ = SrQuat((float)gw_q.w(),(float)gw_q.x(),(float)gw_q.y(),(float)gw_q.z());	
 	dest = newQ.get_mat(dest);
+	*/
 #endif
 	
 	
@@ -489,27 +495,25 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 	SrVec vec1 = vec * prerotMat;//prerotMat.inverse();
 	//LOG("quat = %f %f %f %f, axis angle = %f %f %f", quat.w, quat.x, quat.y,quat.z, vec1[0],vec1[1],vec1[2]);
 	quat = SrQuat(vec1);	
-#if !NEW_EULER
 	SrMat mat;
 	quat.get_mat(mat);	
+#if !NEW_EULER	
 	float rx, ry, rz;
 	int eulerRotType = rotType;
-	sr_euler_angles(eulerRotType, mat, rx, ry, rz);	 
-
- 	if (fabs(rx) > M_PI*0.90f || fabs(ry) > M_PI*0.90f || fabs(rz) > M_PI*0.90f) // swtich rotation order if it's close to singularity
- 	{
-		//LOG("mat = %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f", mat.get(0,0),mat.get(0,1), mat.get(0,2), mat.get(1,0), mat.get(1,1), mat.get(1,2), mat.get(2,0), mat.get(2,1), mat.get(2,2));
-		//LOG("quat = %f %f %f %f",quat.x,quat.y,quat.z,quat.w);
-		//LOG("rx = %f, ry = %f, rz = %f\n", rx, ry, rz);
- 		eulerRotType = 312;
- 		sr_euler_angles(eulerRotType, mat, rx, ry, rz);
-		//LOG("new rx = %f, ry = %f, rz = %f", rx, ry, rz);
- 	}	
-	//LOG("eu = %f %f %f", rx,ry,rz);
+	sr_euler_angles(eulerRotType, mat, rx, ry, rz);	 		
 	ry = 0.0;
 	sr_euler_mat(eulerRotType, mat, rx, ry, rz);
 	SrQuat quatP = SrQuat(mat);
 #else
+	
+	SrQuat yRotQuat =SrQuat(SrVec(0,vec1.y,0)); // extract only the y-component
+	SrMat yRotMat; yRotQuat.get_mat(yRotMat);
+	SrMat xzRotMat = mat*yRotMat.inverse();
+	SrQuat quatP = SrQuat(xzRotMat);
+	quatP.normalize();
+	//LOG("state = %s, y rotation = %f",this->blendData->state->stateName.c_str(), vec1.y);
+	//LOG("xzQuat = %f %f %f %f",quatP.x, quatP.y,quatP.z,quatP.w);
+	/*	
 	gwiz::euler_t eu = gwiz::euler_t(gwiz::quat_t(quat.w, quat.x,quat.y,quat.z));
 	//LOG("eu = %f %f %f", eu.x(), eu.y(), eu.z());
 	eu.y(0.f);
@@ -517,6 +521,7 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 	SrQuat quatP = SrQuat((float)gw_q.w(),(float)gw_q.x(),(float)gw_q.y(),(float)gw_q.z());
 	gwiz::euler_t euNew = gwiz::euler_t(gwiz::quat_t(quatP.w, quatP.x,quatP.y,quatP.z));
 	//LOG("euNew = %f %f %f", euNew.x(), euNew.y(), euNew.z());
+	*/
 #endif	
 	vec1 = quatP.axis() * quatP.angle();	
 	
@@ -846,7 +851,6 @@ void PAWoManager::matInterp(SrMat& ret, SrMat& mat1, SrMat& mat2, float w)
 	SrQuat quat1 = SrQuat(mat1);
 	SrQuat quat2 = SrQuat(mat2);
 	SrQuat quat = slerp(quat1, quat2, 1 - w);
-
 	quat.get_mat(ret);
 	float posX = mat1.get(12) * w + mat2.get(12) * (1 - w);
 	float posY = mat1.get(13) * w + mat2.get(13) * (1 - w);
@@ -1317,6 +1321,12 @@ void PATransitionManager::bufferBlending(SrBuffer<float>& buffer, SrBuffer<float
 			SkChannel::interp(channels[i].type, v, v1, v2, float(1 - w)); 
 			for (int j = 0; j < 4; j++)
 				buffer[_context->toBufferIndex(i) + j] = v[j];
+
+// 			if (channels.mappedName(i) == "base")
+// 			{
+// 				LOG("quat1 = %.3f %.3f %.3f %.3f, quat2 = %.3f %.3f %.3f %.3f, combine quat = %.3f %.3f %.3f %.3f", v1[0],v1[1],v1[2],v1[3],v2[0],v2[1],v2[2],v2[3], v[0],v[1],v[2],v[3]);
+// 			}
+
 		}
 	}	
 }
