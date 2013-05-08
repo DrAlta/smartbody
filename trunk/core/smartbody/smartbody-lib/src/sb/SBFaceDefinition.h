@@ -66,6 +66,7 @@ class SBFaceDefinition
 
 
 		SBAPI bool hasAU(int auNum);
+		SBAPI ActionUnit* getAUByName(const std::string& auName);
 		SBAPI void setAU(int auNum, const std::string& side, const std::string& motion);
 		SBAPI int getNumAUs();
 		SBAPI int getNumAUChannels();

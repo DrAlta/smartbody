@@ -67,6 +67,8 @@ class SBCharacter : public SbmCharacter
 		SBAPI virtual SBFaceDefinition* getFaceDefinition();
 		SBAPI virtual void setFaceDefinition(SBFaceDefinition* face);
 
+		SBAPI void interruptFace(double seconds);
+
 		SBAPI void notify(SBSubject* subject);	
 		
 	protected:

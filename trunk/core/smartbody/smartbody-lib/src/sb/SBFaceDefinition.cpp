@@ -114,6 +114,50 @@ bool SBFaceDefinition::hasAU(int auNum)
 	}
 }
 
+ActionUnit* SBFaceDefinition::getAUByName(const std::string& auName)
+{
+	int index = auName.find("au_");
+	if (index == std::string::npos)
+		return NULL;
+
+	std::string remainder = auName.substr(index + 3);
+
+	int leftIndex = remainder.find("_left");
+	if (leftIndex != std::string::npos)
+	{
+		std::string numStr = remainder.substr(0, leftIndex);
+		int num = atoi(numStr.c_str());
+		ActionUnit* au = this->getAU(num);
+		if (!au)
+			return NULL;
+		if (!au->is_left())
+			return NULL;
+		else
+			return au;
+	}
+
+	int rightIndex = remainder.find("_right");
+	if (rightIndex != std::string::npos)
+	{
+		std::string numStr = remainder.substr(0, leftIndex);
+		int num = atoi(numStr.c_str());
+		ActionUnit* au = this->getAU(num);
+		if (!au)
+			return NULL;
+		if (!au->is_left())
+			return NULL;
+		else
+			return au;
+	}
+
+	int num = atoi(remainder.c_str());
+	ActionUnit* au = this->getAU(num);
+	if (au->is_bilateral())
+		return au;
+	return NULL;
+
+}
+
 void SBFaceDefinition::setAU(int auNum, const std::string& side, const std::string& motionName)
 {
 	if (side != "left" &&
