@@ -86,8 +86,13 @@ BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& un
 	std::string msg  = xml_parse_string( BMLDefs::ATTR_MESSAGE, elem, "");	
 
 	std::string spName = xml_parse_string( BMLDefs::ATTR_STROKE, elem, "");	
-	std::string localId  = xml_parse_string( BMLDefs::ATTR_ID, elem, "");	
-	
+	std::string localId  = xml_parse_string( BMLDefs::ATTR_ID, elem, "");
+
+	 const XMLCh* messageData = elem->getTextContent();
+	 if (messageData)
+	 {
+		 msg = xml_utils::asciiString(messageData);
+	 }
 
 	if (msg != "" )
 	{	
