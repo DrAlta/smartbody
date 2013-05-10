@@ -427,7 +427,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 		// replace any <act> tag with <act procid="foo"> if the current instance has a proc id.
 
-
+		xml.insert(0, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"); 
 		return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, xml );
 	} else if( arg=="anim" || arg=="animation") { //  anim[ation] <animation name>
 		string anim = args.read_token();
