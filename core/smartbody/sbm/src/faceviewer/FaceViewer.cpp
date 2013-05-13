@@ -135,9 +135,12 @@ void FaceViewer::ResetCB(Fl_Widget* widget, void* data)
 			Fl_Value_Slider* slider = dynamic_cast<Fl_Value_Slider*>(faceViewer->bottomGroup->child(c));
 			if (slider)
 			{
-				slider->value(0);
 				std::string name = slider->label();
-				std::string message = vhcl::Format("char %s viseme %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), name.c_str(), slider->value());
+				if (name.find(" weight") == std::string::npos)
+					slider->value(0);
+
+				//std::string message = vhcl::Format("char %s viseme %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), name.c_str(), slider->value());
+				std::string message = vhcl::Format("char %s viseme clear", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label());
 				if (!SmartBody::SBScene::getScene()->isRemoteMode())
 				{
 					SmartBody::SBScene::getScene()->command(message);
