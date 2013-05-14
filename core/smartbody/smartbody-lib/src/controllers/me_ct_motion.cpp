@@ -92,8 +92,8 @@ void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, double time_offset, double t
 	_offset = time_offset;
 #endif
 
-	motionTime = 0.0;
-
+	motionTime = synch_points.get_time( srSynchPoints::START);
+	controlRestart();
 	_lastCycle = -1;
 	loadMotionEvents();
 }
@@ -319,14 +319,16 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 //		LOG( "no-dur: %s", name() );
 //	}
 	updateDt(t);
-	//motionTime += dt;	
-	motionTime = t;
+	motionTime += dt;	
+	//motionTime = t;
+	double curMotionTime = motionTime;
 	if ( _loop ) {
 		double x = motionTime/dur;
 		int cycleNum = int(x);
+		//LOG("x = %f, cycle Num = %d",x , cycleNum);
 		if ( x > 1.0 )
 		{
-			motionTime = dur *( x - cycleNum );
+			curMotionTime = dur *( x - cycleNum );
 			if (cycleNum != _lastCycle)
 			{
 				loadMotionEvents(); // reload any motion events during loop
@@ -351,7 +353,8 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	//	            &(frame.buffer()[0]),  // pointer to buffer's float array
 	//				&_mChan_to_buff,
 	//	            _play_mode, &_last_apply_frame );	
-	_motion->apply( float(motionTime),
+	//LOG("dt = %f, motionTime = %f, curMotionTime = %f, dur = %f, continue = %d",dt, motionTime, curMotionTime, dur, continuing);
+	_motion->apply( float(curMotionTime),
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
 		            _play_mode, &_last_apply_frame, false, retarget );
@@ -402,7 +405,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	}
 
 
-	checkMotionEvents(t);
+	checkMotionEvents(curMotionTime);
 
 	return continuing;
 }
