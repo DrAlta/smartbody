@@ -61,7 +61,7 @@ FadingControl::FadingControl()
 {
 	fadeMode = FADING_MODE_OFF;
 	blendWeight = 0.0;
-	prev_time = -1.0;
+	prev_time = 0.0;
 	restart = false;
 }
 
@@ -132,7 +132,7 @@ void FadingControl::updateDt( float curTime )
 {
 	if (restart)
 	{
-		dt = 0.001f;
+		dt = 0.f;
 		restart = false;
 	}
 	else
