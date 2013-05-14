@@ -4376,6 +4376,7 @@ int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	}
 	else if (command == "move")
 	{
+		//LOG("run steer move command");
 		std::string characterName = args.read_token();
 		std::string mode = args.read_token();
 		int num = args.calc_num_tokens();
@@ -4406,6 +4407,7 @@ int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 					if (mode == "normal")
 					{
+
 						if (ppraiAgent->getAgent())
 						{
 							const SteerLib::AgentGoalInfo& curGoal = ppraiAgent->getAgent()->currentGoal();
@@ -4416,6 +4418,7 @@ int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 							ppraiAgent->sendLocomotionEvent("interrupt");
 						}
 						ppraiAgent->goalList.clear();
+						//LOG("steer move : add agent goals. Num goal = %d",num);
 						for (int i = 0; i < num; i++)
 						{
 							float v = args.read_float();

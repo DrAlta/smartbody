@@ -52,7 +52,11 @@ void BML::EventRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene*
 	VecOfSbmCommand commands;
 
 	ostringstream cmd;
+#ifdef VHMSG_EVENT
 	cmd << "send " << message;
+#else
+	cmd << message; // should just run the event locally !!
+#endif
 
 	if( LOG_EVENT_COMMAND ) {
 		cout << "DEBUG: EventRequest::realize_impl(): Scheduling \"" << unique_id << "\" command: " << endl << "\t" << cmd.str() << endl;

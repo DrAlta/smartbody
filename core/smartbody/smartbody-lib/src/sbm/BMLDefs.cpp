@@ -226,6 +226,7 @@ XMLCh* BMLDefs::ATTR_TWARP = NULL;
 
 XMLCh* BMLDefs::ATTR_TRUE = NULL;
 XMLCh* BMLDefs::ATTR_FALSE = NULL;
+XMLCh* BMLDefs::ATTR_RESET = NULL;
 
 XMLCh* BMLDefs::ATTR_SHAKE  = NULL;
 XMLCh* BMLDefs::ATTR_TOSS   = NULL;
@@ -602,6 +603,7 @@ BMLDefs::BMLDefs()
 
 	ATTR_TRUE   = XMLString::transcode("true");
 	ATTR_FALSE   = XMLString::transcode("false");
+	ATTR_RESET   = XMLString::transcode("reset");
 
 	ATTR_SHAKE  = XMLString::transcode("shake");
 	ATTR_TOSS   = XMLString::transcode("toss");

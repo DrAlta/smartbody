@@ -128,7 +128,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 	PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
 
-	// Enable/disable locomotion controller
+	// Enable/disable locomotion controller	
 	attrEnable = elem->getAttribute( BMLDefs::ATTR_ENABLE );
 	if( attrEnable && *attrEnable != 0 ) 
 	{
@@ -139,6 +139,10 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		else if( XMLString::compareIString( attrEnable, BMLDefs::ATTR_FALSE )==0 )
 		{
 			ppraiAgent->locomotionHalt();
+		}
+		else if (XMLString::compareIString(attrEnable, BMLDefs::ATTR_RESET) ==0 )
+		{
+			ppraiAgent->locomotionReset();
 		}
 	}
 
@@ -304,6 +308,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 	// parsing target
 	std::string targetString = xml_parse_string(BMLDefs::ATTR_TARGET, elem);
+	//LOG("target string = %s",targetString.c_str());
 	std::vector<std::string> tokens;
 	vhcl::Tokenize(targetString, tokens, " ");
 	int tokenSize = tokens.size();
@@ -334,13 +339,16 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 					stepTargetZ = z;
 				}
 				else
-					command << "sbm steer move " << c->getName() << " normal " << x << " 0 " << z;
+				{
+					command << "steer move " << c->getName() << " normal " << x << " 0 " << z;
+					//SmartBody::SBScene::getScene()->getCommandManager()->execute((char*)command.str().c_str());
+				}
 			}
 		}
 	}
 	else
 	{
-		command << "sbm steer move " << c->getName() << " normal ";
+		command << "steer move " << c->getName() << " normal ";
 #define PAWN_WAY_POINTS 1
 #ifndef PAWN_WAY_POINTS
 		if (tokens.size() % 2 != 0)
@@ -376,6 +384,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			}
 		}
 #endif
+		//SmartBody::SBScene::getScene()->getCommandManager()->execute((char*)command.str().c_str());
 	}
 
 	// step mode attributes
@@ -418,7 +427,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			}
 		}
 	}
-
+	//LOG("behavior sync stroke =  %f",behav_syncs.sync_stroke()->time());
 	return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
 }
 

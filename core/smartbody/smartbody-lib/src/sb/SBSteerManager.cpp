@@ -94,6 +94,11 @@ void SBSteerManager::update(double time)
 				getEngineDriver()->setLastUpdateTime(SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - _maxUpdateFrequency - .01);
 			}
 
+			double maxFrequency = getDoubleAttribute("maxUpdateFrequency");
+			if (maxFrequency != 0.0)
+				_maxUpdateFrequency = 1.0 / maxFrequency;
+			else
+				_maxUpdateFrequency = .016;
 			double timeDiff = SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - getEngineDriver()->getLastUpdateTime();
 			if (timeDiff >= _maxUpdateFrequency)
 			{ // limit steering to 60 fps
@@ -284,9 +289,9 @@ void SBSteerManager::start()
 	SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->startSimulation();
 	SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->setStartTime(0.0f);
 
-	_maxUpdateFrequency = getDoubleAttribute("maxUpdateFrequency");
-	if (_maxUpdateFrequency != 0.0)
-		_maxUpdateFrequency = 1.0 / _maxUpdateFrequency;
+	double maxFrequency = getDoubleAttribute("maxUpdateFrequency");
+	if (maxFrequency != 0.0)
+		_maxUpdateFrequency = 1.0 / maxFrequency;
 	else
 		_maxUpdateFrequency = .016;
 }

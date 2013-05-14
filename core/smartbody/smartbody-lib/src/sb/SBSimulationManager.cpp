@@ -1,7 +1,7 @@
 #include "SBSimulationManager.h"
-
 #include <sb/SBScene.h>
 #include <sb/SBScript.h>
+#include <sb/SBSteerManager.h>
 #include <sbm/time_regulator.h>
 #include <sbm/time_profiler.h>
 
@@ -111,7 +111,7 @@ double SBSimulationManager::getTimeDt()
 
 void SBSimulationManager::setTime(double time)
 {
-	updateTimer(time);
+	updateTimer(time);	
 }
 
 void SBSimulationManager::update()
@@ -388,6 +388,12 @@ bool SBSimulationManager::updateTimer( double in_time)
 	return( true );
 }
 
+SBAPI void SBSimulationManager::stepDt( double dt )
+{
+	double newTime = time + dt;
+	updateTimer(newTime);
+	//time_dt = dt;	
+}
 
 }
 

@@ -398,6 +398,7 @@ SrVec PPRAISteeringAgent::getCollisionFreeGoal( SrVec targetPos, SrVec curPos )
 
 void PPRAISteeringAgent::evaluate(double dtime)
 {
+	//LOG("evaluate PPRAISteeringAgent, time = %f",dtime);
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSteerManager* manager = scene->getSteerManager();
 	
@@ -622,6 +623,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		SrVec pathDir;
 		float pathDist;		
 		curSteerPos = SrVec(x,0,z);
+		
 		//float distToTarget = (curSteerPos - steerPath.pathPoint(steerPath.pathLength()-0.01f)).len();
 		float distToTarget = (curSteerPos - steerPath.pathGoalPoint()).len();
 		float distToPathEnd = (curSteerPos - steerPath.pathPoint(steerPath.pathLength()-0.01f)).len();
@@ -647,6 +649,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 			if (character->getBoolAttribute("steering.pathStartStep"))// && distToTarget > distThreshold*10.f)
 				//if (0)
 			{
+				LOG("Path following, start locomotion, diff = %f",diff);
 				startLocomotion(diff);
 			}
 			else
@@ -673,7 +676,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 	float curTurningAngle;
 	float curScoot;
 
-	
+	//LOG("dt = %f, curSteerPos = %f %f, dir = %f",dt, x,z, yaw);
 
 	if (curStateName == locomotionName && steerPath.pathLength() != 0)
 	{
@@ -786,6 +789,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		//	curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, ang, weights);
 		//else		
 		curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, newScoot, weights);
+		//LOG("dt = %f, newSpeed = %f, newTurningAngle = %f, newScoot = %f",dt, newSpeed,nextTurningAngle,newScoot);
 		//curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, 0.f, 0.f, weights);
 		character->param_animation_ct->updateWeights(weights);	
 #endif
@@ -1161,6 +1165,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 			getAgent()->clearGoals();
 			sendLocomotionEvent("success");
 			sentLocomotionEvent = true;
+			//LOG("dist close to target. stop locomotion");
 		}
 	}
 	int numGoals = goalQueue.size();
@@ -1263,6 +1268,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 			fastInitial = false;
 		if (!fastInitial)
 		{
+			//LOG("start locomotion %f",diff);
 			startLocomotion(diff);	
 		}
 		else
@@ -1286,7 +1292,9 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 			std::vector<double> weights;
 			character->param_animation_ct->schedule(NULL, weights);
 			if (!sentLocomotionEvent)
-				sendLocomotionEvent("success");			
+				sendLocomotionEvent("success");	
+			facingAdjust = true;	
+			//LOG("no next goal now. stop locomotion");
 		}
 		else
 		{
@@ -1315,7 +1323,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 	//---If the facing angle is not correct, use idle turning
 
 	if (character->param_animation_ct->isIdle() && fabs(facingAngle) <= 180 && 
-		steeringConfig == STANDARD )
+		steeringConfig == STANDARD && facingAdjust)
 	{
 		float diff = facingAngle - yaw;
 		normalizeAngle(diff);
@@ -1712,17 +1720,35 @@ bool PPRAISteeringAgent::isSteerParamsDirty()
 	return _dirty;
 }
 
+
+
+void PPRAISteeringAgent::locomotionReset()
+{
+	//LOG("reset locomotion");
+	locomotionHalt();
+	if (character->param_animation_ct)
+	{			
+		character->param_animation_ct->reset();
+	}
+}
+
 void PPRAISteeringAgent::locomotionHalt()
 {
+	//LOG("halt locomotion");
 	std::vector<double> weights;
 	ScheduleType sc;
-	sc.schedule = PABlendData::Now;
-	character->param_animation_ct->schedule(NULL, weights,sc);
+	if (character->param_animation_ct)
+	{		
+		sc.schedule = PABlendData::Now;
+		character->param_animation_ct->schedule(NULL, weights,sc);		
+	}
 	sendLocomotionEvent("success");
 	character->trajectoryGoalList.clear();
 	agent->clearGoals();
 	goalList.clear();
 	steerPath.clearPath();
+	facingAdjust = false; // stop facing adjustment as well
+	
 
 	steerCurSpeed = 0.f;
 	steerCurAngle = 0.f;

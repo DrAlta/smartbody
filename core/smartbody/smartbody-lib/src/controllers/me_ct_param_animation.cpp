@@ -116,8 +116,6 @@ bool MeCtParamAnimation::isInTransition()
 
 bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 {	
-	
-
 	double timeStep = t - prevGlobalTime;
 	prevGlobalTime = t;
 
@@ -129,7 +127,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 		!curStateData)
 	{
 		if (!hasPABlend(PseudoIdleState))
-		{
+		{			
 			std::vector<double> weights;
 			schedule(NULL, weights);
 			return true;
@@ -144,6 +142,7 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 		{			
 			if (!hasPABlend(PseudoIdleState))
 			{
+				//LOG("no current state, and the state is about to finish, scedule NULL state");
 				std::vector<double> weights;
 				ScheduleType scType;
 				scType.transitionLen = curStateData->transitionLength;

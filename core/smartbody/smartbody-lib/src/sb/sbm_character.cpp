@@ -506,7 +506,7 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( constraint_sched_p );	
 	ct_tree_p->add_controller( eyelid_reg_ct_p );
 	ct_tree_p->add_controller( head_sched_p );
-	ct_tree_p->add_controller( head_param_anim_ct );
+	//ct_tree_p->add_controller( head_param_anim_ct );
 	ct_tree_p->add_controller( face_ct );
 	ct_tree_p->add_controller( param_sched_p );
 #if USE_PHYSICS_CHARACTER

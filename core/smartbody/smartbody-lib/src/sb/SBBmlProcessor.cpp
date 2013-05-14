@@ -72,7 +72,7 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 	std::ostringstream msg;
 	std::string msgId = "";
 	bool all_characters = ( char_id=="*" );
-
+	//LOG("send_vrX cmd =  %s, bml = %s", cmd, bml.c_str());
 	if( seq_id.length()==0 ) {
 		if( echo ) {
 			msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
@@ -90,15 +90,18 @@ std::string SBBmlProcessor::send_vrX( const char* cmd, const std::string& char_i
 					iter++)
 				{
 					SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
-					msgId = build_vrX( msg, cmd, character->getName().c_str(), recip_id, bml, false );
-					SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
+					msgId = build_vrX( msg, cmd, character->getName().c_str(), recip_id, bml, false );	
+					//LOG("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
+					//SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
+					SmartBody::SBScene::getScene()->getCommandManager()->execute(cmd, const_cast<char*>(msg.str().c_str()));
 				}
 			} else {
 				msgId = build_vrX( msg, cmd, char_id, recip_id, bml, false );
-				///////LOG("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
-				SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
+				//LOG("vvmsg cmd =  %s, msg = %s", cmd, msg.str().c_str());
+				//SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmd, msg.str().c_str() );
+				SmartBody::SBScene::getScene()->getCommandManager()->execute(cmd, const_cast<char*>(msg.str().c_str()));
 			}
-		}
+		}		
 		return msgId;
 	}else {
 		// Command sequence to trigger vrSpeak
@@ -178,9 +181,9 @@ std::string SBBmlProcessor::execBML(std::string character, std::string bml)
 	entireBml   << "\t<bml>\n"
 				<< "\t\t" << bml
 				<< "\t</bml>\n"
-				<< "</act>";	
+				<< "</act>";		
 	//return send_vrX( "vrSpeak", character, "ALL", "", true, true, entireBml.str() );
-	return send_vrX( "vrSpeak", character, "ALL", "", false, true, entireBml.str() );
+	return send_vrX( "vrSpeak", character, "ALL", "", false, true, entireBml.str() );	
 }
 
 std::string SBBmlProcessor::execBMLFile(std::string character, std::string filename)
@@ -196,6 +199,8 @@ std::string SBBmlProcessor::execXML(std::string character, std::string xml)
 				<< xml;
 	//return send_vrX( "vrSpeak", character, "ALL", "", true, true, entireXML.str() );
 	return send_vrX( "vrSpeak", character, "ALL", "", false, true, entireXML.str() );
+	// do not send out VHMsg command, run it directly in this SmartBody instance.
+	//return send_vrX( "vrSpeak", character, "ALL", "", false, false, entireXML.str() );
 }
 
 void SBBmlProcessor::execBMLAt(double time, std::string character, std::string bml)
