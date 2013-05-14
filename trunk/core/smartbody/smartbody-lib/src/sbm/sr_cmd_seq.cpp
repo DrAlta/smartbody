@@ -286,9 +286,9 @@ int srCmdSeq::insert_ref( float time, char *cmd_ref )	{
 char *srCmdSeq::pop( float time )	{
 	sr_command_event_t *event;
 	float offset_time = time - event_offset;
-	
 	event = handle->next;
 	if( event != NULL )	{
+		//LOG("event time = %f, time = %f",event->time, time);
 		if( event->time <= offset_time )	{
 			handle->next = event->next;
 			char *cmd = event->cmd;

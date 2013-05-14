@@ -39,6 +39,7 @@ class SBSimulationManager
 		SBAPI double queryTime();
 		SBAPI double getTimeDt();
 		SBAPI void setTime(double time);
+		SBAPI void stepDt(double dt);
 		SBAPI void start();
 		SBAPI void stop();
 		SBAPI void reset();

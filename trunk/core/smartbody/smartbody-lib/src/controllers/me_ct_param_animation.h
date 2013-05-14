@@ -124,11 +124,11 @@ class MeCtParamAnimation : public MeCtContainer
 		bool hasPABlend(const std::string& stateName);
 		bool isIdle();
 		bool isInTransition();
+		void reset();
 
 	private:
 		void autoScheduling(double time);
-		PABlendData* createStateModule(ScheduleUnit su);
-		void reset();
+		PABlendData* createStateModule(ScheduleUnit su);		
 		void updateWo(SrMat& mat, MeCtChannelWriter* wo, SrBuffer<float>& buffer);
 		void updateIK(PABlendData* curBlendData, SrMat& woMat, SrMat& woDeltaMat, float dt, SrBuffer<float>& buff);
 		SrMat combineMat(SrMat& mat1, SrMat& mat2);

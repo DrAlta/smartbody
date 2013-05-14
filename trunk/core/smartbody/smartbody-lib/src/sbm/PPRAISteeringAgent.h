@@ -58,6 +58,7 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 		void addSteeringAttributes();
 		void sendLocomotionEvent(const std::string& status);
 		void locomotionHalt();
+		void locomotionReset();
 
 		bool isInLocomotion();		// include starting moving and ending
 		bool isHittingOnTarget();	// is sending out reaching target signal (one time)

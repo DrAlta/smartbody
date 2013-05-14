@@ -601,6 +601,7 @@ void SBScene::update()
 		char *cmd;
 		while( cmd = seq->pop( (float) getSimulationManager()->getTime() ) )
 		{
+			//LOG("execute command = %s",cmd);
 			int err = getCommandManager()->execute( cmd );
 			if( err != CMD_SUCCESS )	{
 				LOG( "update ERR: execute FAILED: '%s'\n", cmd );

@@ -230,6 +230,7 @@ class BMLDefs
 
 		static XMLCh* ATTR_TRUE;
 		static XMLCh* ATTR_FALSE;
+		static XMLCh* ATTR_RESET;
 
 		static XMLCh* ATTR_ARMLEFT;
 		static XMLCh* ATTR_ARMRIGHT;

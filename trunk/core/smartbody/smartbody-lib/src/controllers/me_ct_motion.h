@@ -36,6 +36,8 @@
 #include <sb/SBCharacter.h>
 #include <queue>
 
+#include "me_ct_constraint.hpp"
+
 namespace SmartBody {
 
 class SBMotionEvent;
@@ -46,7 +48,7 @@ class SBMotionEvent;
     an attached SkMotion. Besides few extra functionality such as
     time warping, loop, etc; it also efficiently supports the
     creation of several MeCtMotions sharing a same SkMotion. */
-class MeCtMotion : public SmartBody::SBController
+class MeCtMotion : public SmartBody::SBController, public FadingControl
  { private :
     SkMotion*            _motion;    // the motion,
     SkMotion::InterpType _play_mode; // its play mode
@@ -62,6 +64,7 @@ class MeCtMotion : public SmartBody::SBController
 	std::vector<std::string>	_joints;	// Joints that motion data would be applied to. Empty means applying all.
 	int					 _lastCycle;
 	SmartBody::SBCharacter* _character;
+	double motionTime;
 
    public :
 	   static std::string type_name;

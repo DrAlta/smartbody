@@ -384,6 +384,8 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			BehaviorSyncPoints behav_syncs;  // TODO: rename (previous this was a TimeMarkers class)	
 			behav_syncs.parseStandardSyncPoints( child, request, unique_id );
 
+			//LOG("parse behaviorSyncPoints : stroke time = %f",behav_syncs.sync_stroke()->time());
+
 			BehaviorRequestPtr behavior;
 
 			// Parse behavior specifics

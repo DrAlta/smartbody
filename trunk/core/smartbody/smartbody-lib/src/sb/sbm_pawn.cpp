@@ -543,9 +543,10 @@ void SbmPawn::set_world_offset( float x, float y, float z,
 	if (!world_offset_writer_p)
 		return;
 	world_offset_writer_p->set_data( data );
-	return;
-
+	// should also write to the joint ?
 	SkJoint* woj = _skeleton->search_joint( WORLD_OFFSET_JOINT_NAME );
+	if (!woj) return;
+
 	SkJointPos* woj_pos = woj->pos();
 	woj_pos->value( SkJointPos::X, x );
 	woj_pos->value( SkJointPos::Y, y );

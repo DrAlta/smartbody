@@ -338,8 +338,15 @@ SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
 	sim->setTime(timeInSeconds);
-	scene->update();
-   
+	//sim->stepDt(timeInSeconds);
+	static double prevTime = -1;
+	//if (timeInSeconds != prevTime)
+	//if (timeInSeconds > 0.0)
+	//{
+		//LOG("SmartBody DLL Update, dt = %f, time = %f",timeInSeconds, sim->getTime());
+		//prevTime = timeInSeconds;	
+	scene->update();	
+	//}   
 	return true;
 }
 
@@ -483,13 +490,8 @@ SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string 
          {
             SmartbodyJoint& joint = c.m_joints[i];
             joint.m_name = jointName;			
-            SrQuat jointQ = j->quat()->value();
-            // if (i==136)
-            // {
-            //    //sr_out << "eyeball quat = " << jointQ << srnl;
-            //    LOG("eyeball quat = %f %f %f %f\n",jointQ.x,jointQ.y,jointQ.z,jointQ.w);
-            // }
-
+			SrQuat jointQ = j->quat()->value();
+			
             joint.x = posx;
             joint.y = posy;
             joint.z = posz;
