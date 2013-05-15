@@ -1751,8 +1751,12 @@ void SBScene::saveScene(std::stringstream& strstr, bool remoteSetup)
 }
 
 void SBScene::saveRetargets( std::stringstream& strstr, bool remoteSetup )
-{
+{	
 	strstr << "# -------------------- on-line retargeting setup\n";
+	strstr << "print \"Save Retargets\"\n";
+	if (remoteSetup) // don't save retarget instance for remote setup
+		return;
+
 	SmartBody::SBRetargetManager* retargetManager = getRetargetManager();
 	strstr << "retargetManager = scene.getRetargetManager()\n";
 	std::vector<StringPair> retargetNames = retargetManager->getRetargetNames();
@@ -1887,6 +1891,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- media and asset paths\n";
 	// mediapath
+	strstr << "print \"Save Assets\"\n";
 	std::string mediaPath = getMediaPath();
 	strstr << "scene.setMediaPath(\"" << mediaPath << "\")\n";	
 	// asset paths
@@ -1945,15 +1950,6 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 		}
 	}
 
-	std::set<std::string>::iterator si;
-	for ( si  = extraAssetPathSet.begin();
-		  si != extraAssetPathSet.end();
-		  si++)
-	{
-		const std::string& path = (*si);
-		strstr << "scene.loadAssetsFromPath(\"" << path << "\")\n";
-	}
-
 	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
@@ -2002,6 +1998,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 				//skelSaveStr.replace('\n',)
 				boost::replace_all(skelSaveStr,"\n","\\n");
 				boost::replace_all(skelSaveStr,"\"","");
+				LOG("Skeleton %s :\n%s",skelName.c_str(),skelSaveStr.c_str());
 				strstr << "tempSkel.loadFromString(\"" << skelSaveStr << "\")\n";
 				charSkelMap[skelName] = charName;
 			}
@@ -2031,8 +2028,17 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 			}
 		}
 	}
-	else
+	else // loading the actual assets
 	{
+		std::set<std::string>::iterator si;
+		for ( si  = extraAssetPathSet.begin();
+			si != extraAssetPathSet.end();
+			si++)
+		{
+			const std::string& path = (*si);
+			strstr << "scene.loadAssetsFromPath(\"" << path << "\")\n";
+		}
+
 		strstr << "# -------------------- load assets\n";
 		strstr << "scene.loadAssets()\n";
 	}	
@@ -2074,7 +2080,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 void SBScene::saveCameras(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- cameras\n";
-
+	strstr << "print \"Save Cameras\"\n";
 	// save all default cameras
 	std::vector<std::string> cameras = getCameraNames();
 	for (std::vector<std::string>::iterator cameraIter = cameras.begin();
@@ -2109,6 +2115,7 @@ void SBScene::saveCameras(std::stringstream& strstr, bool remoteSetup)
 void SBScene::savePawns(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- pawns and characters\n";
+	strstr << "print \"Save Pawns\"\n";
 	// pawns
 	const std::vector<std::string>& pawns = getPawnNames();
 	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
@@ -2149,6 +2156,7 @@ void SBScene::savePawns(std::stringstream& strstr, bool remoteSetup)
 void SBScene::savePositions(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- pawn positions\n";
+	strstr << "print \"Save Positions\"\n";
 	const std::vector<std::string>& pawns = getPawnNames();
 	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		 pawnIter != pawns.end();
@@ -2190,6 +2198,7 @@ void SBScene::savePositions(std::stringstream& strstr, bool remoteSetup)
 void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 {
 	// characters
+	strstr << "print \"Save Characters\"\n";
 	const std::vector<std::string>& characters = getCharacterNames();
 	for (std::vector<std::string>::const_iterator characterIter = characters.begin();
 		 characterIter != characters.end();
@@ -2326,6 +2335,7 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 void SBScene::saveLights(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- lights\n";
+	strstr << "print \"Save Lights\"\n";
 	// lights
 	const std::vector<std::string>& pawns = getPawnNames();
 	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
@@ -2345,7 +2355,7 @@ void SBScene::saveLights(std::stringstream& strstr, bool remoteSetup)
 		SrVec position = pawn->getPosition();
 		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
 		SrQuat orientation = pawn->getOrientation();
-		strstr << "obj.setOrientation(SrQuat(" << orientation.w << ", " << orientation.x << ", " << orientation.y << ", " << "orientation.z))\n";
+		strstr << "obj.setOrientation(SrQuat(" << orientation.w << ", " << orientation.x << ", " << orientation.y << ", " << orientation.z << "))\n";
 
 		// attributes
 		std::vector<std::string> attributeNames = pawn->getAttributeNames();
@@ -2363,6 +2373,7 @@ void SBScene::saveLights(std::stringstream& strstr, bool remoteSetup)
 void SBScene::saveBlends(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- blends and transitions\n";
+	strstr << "print \"Save Blends\"\n";
 	// blends & transitions
 	SBAnimationBlendManager* blendManager = getBlendManager();
 	std::vector<std::string> blends = blendManager->getBlendNames();
@@ -2390,7 +2401,7 @@ void SBScene::saveBlends(std::stringstream& strstr, bool remoteSetup)
 void SBScene::saveJointMaps(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- joint maps\n";
-
+	strstr << "print \"Save Joint Maps\"\n";
 	// joint maps
 	SBJointMapManager* jointMapManager = getJointMapManager();
 	std::vector<std::string> jointMapNames = jointMapManager->getJointMapNames();
@@ -2466,6 +2477,7 @@ void SBScene::saveJointMaps(std::stringstream& strstr, bool remoteSetup)
 void SBScene::saveFaceDefinitions(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- face definitions\n";
+	strstr << "print \"Save Face Definitions\"\n";
 	// face definitions
 	std::vector<std::string> faceDefinitions = getFaceDefinitionNames();
 	for (std::vector<std::string>::iterator iter = faceDefinitions.begin(); iter != faceDefinitions.end(); iter++)
@@ -2543,6 +2555,7 @@ void SBScene::saveFaceDefinitions(std::stringstream& strstr, bool remoteSetup)
 void SBScene::saveGestureMaps(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- gesture maps\n";
+	strstr << "print \"Save Gesture Maps\"\n";
 	const std::vector<std::string>& gestureMapNames = this->getGestureMapManager()->getGestureMapNames();
 	for (std::vector<std::string>::const_iterator iter = gestureMapNames.begin();
 		 iter != gestureMapNames.end();
@@ -2565,7 +2578,7 @@ void SBScene::saveGestureMaps(std::stringstream& strstr, bool remoteSetup)
 void SBScene::saveLipSyncing(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- lip syncing\n";
-
+	strstr << "print \"Save Lip Syncing\"\n";
 	// diphones
 	SBDiphoneManager* diphoneManager = getDiphoneManager();
 	std::vector<std::string> diphoneMapNames = diphoneManager->getDiphoneMapNames();
