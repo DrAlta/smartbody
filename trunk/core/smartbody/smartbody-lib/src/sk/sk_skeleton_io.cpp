@@ -480,9 +480,7 @@ bool SkSkeleton::loadSk ( SrInput& in, double skScale, const char* basedir )
 	else if ( s=="set_name" || s=="name" )
 	{ in.get_token();
 	SrString tmpName = in.last_token();
-
 	setName((const char*)tmpName);
-
 	}
 	else if ( s=="set_scale" )
 	{ in >> scale;
@@ -502,7 +500,8 @@ bool SkSkeleton::loadSk ( SrInput& in, double skScale, const char* basedir )
 	}
 	else if ( s=="skeleton" || s=="HIERARCHY" )
 	{ KeyWord kw = read_keyword(in);
-	if ( kw!=ROOT ) return false;
+	//if ( kw!=ROOT ) return false;
+	if (kw != ROOT) continue; // maybe just another token which happens to be "skeleton"
 	_root = _loadj ( in, 0, paths, false /*no merge*/ ); // 0 (null) is the root parent
 	}
 	else if ( s=="joint_list" )

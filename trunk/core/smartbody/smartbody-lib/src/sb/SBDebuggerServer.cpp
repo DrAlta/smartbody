@@ -369,7 +369,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 						 //fclose(fp);
 						 vhmsg::ttu_notify1(message.c_str());
 
-#if 1
+#if 0
 						 std::vector<string> skeletonNames = m_scene->getSkeletonNames();
 						for (size_t i = 0; i < skeletonNames.size(); ++i)
 						{
