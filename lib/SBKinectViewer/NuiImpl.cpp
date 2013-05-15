@@ -641,8 +641,8 @@ void CSkeletalViewerApp::processAndSendSkeleton( const NUI_SKELETON_DATA & skel 
 		{	
 			
 			// send out skeleton information
-			vhmsg::ttu_notify2("receiver", "echo init Kinect Skeleton...");	
-			command << "skeleton " << skeletonName << " kinect initsk ";
+			vhmsg::ttu_notify2("sbm", "receiver echo init Kinect Skeleton...");	
+			command << "receiver skeleton " << skeletonName << " kinect initsk ";
 			for (int k=0; k < NUI_SKELETON_POSITION_COUNT; k++)
 			{
 				int jidx = m_skeletonJointMapping[k];
@@ -665,7 +665,7 @@ void CSkeletalViewerApp::processAndSendSkeleton( const NUI_SKELETON_DATA & skel 
 	{		
 		// send out skeleton information
 		//vhmsg::ttu_notify2("receiver", "echo init Kinect Skeleton...");	
-		command << "skeleton " << skeletonName << " kinect rotations ";
+		command << "receiver skeleton " << skeletonName << " kinect rotations ";
 		for (int k=0; k < NUI_SKELETON_POSITION_COUNT; k++)
 		{
 			int jidx = m_skeletonJointMapping[k];
@@ -677,11 +677,11 @@ void CSkeletalViewerApp::processAndSendSkeleton( const NUI_SKELETON_DATA & skel 
 		// send out global position
 		std::stringstream command1;
 		const Vector4& jp = skel.SkeletonPositions[0];
-		command1 << "skeleton " << skeletonName << " kinect position 0 ";
+		command1 << "receiver skeleton " << skeletonName << " kinect position 0 ";
 		command1 << jp.x << " " << jp.y << " " << jp.z;
-		vhmsg::ttu_notify2("receiver", command1.str().c_str());
+		vhmsg::ttu_notify2("sbm", command1.str().c_str());
 	}
-	vhmsg::ttu_notify2("receiver", command.str().c_str());
+	vhmsg::ttu_notify2("sbm", command.str().c_str());
 
 	
 	
