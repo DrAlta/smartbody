@@ -50,13 +50,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\lib\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\lib\boost;..\..\..\lib\vhcl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\..\\lib\boost\lib;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>boost_filesystem-vc100-mt-gd-1_44.lib;boost_system-vc100-mt-gd-1_44.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\lib\vhcl\lib;..\..\..\lib\boost\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>boost_filesystem-vc100-mt-gd-1_44.lib;boost_system-vc100-mt-gd-1_44.lib;vhcl_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -68,20 +68,24 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\lib\boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\lib\boost; ..\..\..\lib\vhcl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\..\..\lib\boost\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>boost_filesystem-vc100-mt-1_44.lib;boost_system-vc100-mt-1_44.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\lib\boost\lib; ..\..\..\lib\vhcl\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>boost_filesystem-vc100-mt-1_44.lib;boost_system-vc100-mt-1_44.lib;vhcl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/verbose:lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="converter.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="converter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
