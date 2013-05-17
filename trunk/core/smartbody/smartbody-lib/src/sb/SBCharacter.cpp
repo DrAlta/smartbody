@@ -60,7 +60,11 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	StringAttribute* gesturePolicyAttr = createStringAttribute("gesturePolicy", "random", true, "Basic", 60, false, false, false, "Gesture policy to be used");
 	gesturePolicyAttr->setValidValues(gesturePolicyVec);
 
-
+	/*
+	SmartBody::DoubleAttribute* motionAttr = createDoubleAttribute("emotion", 0, true, "Basic", 70, false, false, false, "Current emotion state, 0 is neutral, 1 is extreme angry");
+	motionAttr->setMin(0.0);
+	createBoolAttribute("emotion_automatic", 0, false, "Basic", 71, false, false, false, "");
+	*/
 
 	SmartBody::DoubleAttribute* bmlDelayAttr = createDoubleAttribute("bmlscheduledelay", 0.0, true, "Basic", 98, false, false, false, "Delay all bml schedules by a fixed amount.");
 	bmlDelayAttr->setMin(0.0);
@@ -70,11 +74,20 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createBoolAttribute("dominancecurve", false, true, "Basic", 101, false, false, false, "Use donimance curve instead of FaceFX curve");
 	createBoolAttribute("reach.useLocomotion", false, true, "Basic", 110, false, false, false, "Whether to use locomotion for reach by default.");
 	createBoolAttribute("useDiphone", true, true, "Basic", 150, false, false, false, "Use diphones.");
-	createDoubleAttribute("diphoneScale", 1, true, "Basic", 155, false, false, false, "Scale factor for diphone curves.");
-	createStringAttribute("diphoneSetName", "", true, "Basic", 155, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
-	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 156, false, false, false, "Use diphones spline/linear curve.");
-	createDoubleAttribute("diphoneSmoothWindow", .15, true, "Basic", 157, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
-	createDoubleAttribute("diphoneSpeedLimit", 8.0f, true, "Basic", 158, false, false, false, "Speed Limit of mouth movement");
+	createBoolAttribute("diphoneRule", true, true, "Basic", 151, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneRuleFV", true, true, "Basic", 152, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneRulePBM", true, true, "Basic", 153, false, false, false, "Use diphones.");
+	createDoubleAttribute("pbmOpenConstrain", 0.5, true, "Basic", 154, false, false, false, "Use diphones.");
+	createDoubleAttribute("fvOpenConstrain", 0.7, true, "Basic", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("diphoneScale", 1, true, "Basic", 156, false, false, false, "Scale factor for diphone curves.");
+	createStringAttribute("diphoneSetName", "", true, "Basic", 157, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
+	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 158, false, false, false, "Use diphones spline/linear curve.");
+	createDoubleAttribute("diphoneSmoothWindow", .18, true, "Basic", 159, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
+	setDiphoneSmoothWindow(.18);
+	createDoubleAttribute("diphoneSmoothWindow-PBM", .1, true, "Basic", 160, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
+	createDoubleAttribute("diphoneSmoothWindow-FV", .1, true, "Basic", 161, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
+	createDoubleAttribute("diphoneSpeedLimit", 6.0f, true, "Basic", 162, false, false, false, "Speed Limit of mouth movement");
+	setDiphoneSpeedLimit(6.0f);
 	
 // Dominance curve attributes
 	int startingPos = 500;
