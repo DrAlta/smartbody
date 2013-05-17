@@ -7,10 +7,10 @@
 
 void CSLUConverter::generateDiphoneBML(const std::string& iFileName, const std::string& oFileName, const std::string& ntpFileName, const std::string& txtFileName, const std::string& baseFileName, const std::map<std::string, std::string> mapping)
 {
-	std::ifstream ifile(iFileName);
-	std::ifstream ntpFile(ntpFileName);
-	std::ifstream txtFile(txtFileName);
-	std::ofstream ofile(oFileName);
+	std::ifstream ifile(iFileName.c_str());
+	std::ifstream ntpFile(ntpFileName.c_str());
+	std::ifstream txtFile(txtFileName.c_str());
+	std::ofstream ofile(oFileName.c_str());
 
 	if (!ifile.good() || !ofile.good() || !ntpFile.good())
 		return;
@@ -155,7 +155,7 @@ void CSLUConverter::convertFromCSLUToBML(const std::string& rootDirectory, const
 {
 	// get mapping
 	std::map<std::string, std::string> worldbet2diphone;
-	std::ifstream mappingFile(mappingFileFullPath);
+	std::ifstream mappingFile(mappingFileFullPath.c_str());
 	std::string line;
 	while (mappingFile.good())
 	{
