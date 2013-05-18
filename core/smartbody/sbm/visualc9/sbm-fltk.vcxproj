@@ -79,10 +79,8 @@
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\obj\sbm_debug\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\obj\sbm_release\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'">$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">..\bin\</OutDir>
@@ -137,7 +135,7 @@
     </ProjectReference>
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>glew32.lib;Smartbody_d.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc100-mt-gd-1_44.lib;boost_system-vc100-mt-gd-1_44.lib;boost_regex-vc100-mt-gd-1_44.lib;boost_python-vc100-mt-gd-1_44.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;fltkgld.lib;fltkd.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAId.lib;steerlibd.lib;ode_doubled.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;SmartBody_d.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc100-mt-gd-1_44.lib;boost_system-vc100-mt-gd-1_44.lib;boost_regex-vc100-mt-gd-1_44.lib;boost_python-vc100-mt-gd-1_44.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;fltkgld.lib;fltkd.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAId.lib;steerlibd.lib;ode_doubled.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\smartbody-lib\src\external\glew;..\..\smartbody\lib;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;..\..\fltk-1.3.0rc6\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\sbm-ui\panimationviewer\lib;..\..\sbm-ui\bmlviewer\lib;..\..\ode\lib;..\..\clapack\lib;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug;..\..\..\..\core\smartbody\Python26\libs;C:\ICT\vh\trunk\core\nvb_generator\charniak-windows;..\..\..\..\lib\festival\festival\src\lib;..\..\..\..\lib\festival\speech_tools\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
