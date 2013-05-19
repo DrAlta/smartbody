@@ -2366,10 +2366,10 @@ void FltkViewer::create_pawn()
 	const char* pawn_name = fl_input("Input Pawn Name","foo");
 	if (!pawn_name) // no name is input
 		return;
-	
+
 	char cmd_pawn[256];
-	sprintf(cmd_pawn,"pawn %s init",pawn_name);
-	SmartBody::SBScene::getScene()->command(cmd_pawn);
+	sprintf(cmd_pawn,"scene.createPawn(\"%s\")", pawn_name);
+	SmartBody::SBScene::getScene()->run(cmd_pawn);
 }
 
 
