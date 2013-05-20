@@ -163,6 +163,7 @@ void SBScene::initialize()
 	_debuggerClient = new SBDebuggerClient();
 	_debuggerUtility = new SBDebuggerUtility();
 	_isRemoteMode = false;
+   _isCameraLocked = false;
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 	createStringAttribute("speechRelaySoundCacheDir","../../../..",true,"",20,false,false,false,"Directory where sound files from speech relays will be placed. ");
@@ -2815,6 +2816,16 @@ SrCamera* SBScene::getCamera(const std::string& name)
 		return NULL;
 	}
 	return (*iter).second;
+}
+
+void SBScene::SetCameraLocked(bool locked)
+{
+   _isCameraLocked = locked;
+}
+
+bool SBScene::IsCameraLocked()
+{
+   return _isCameraLocked;
 }
 
 int SBScene::getNumCameras()

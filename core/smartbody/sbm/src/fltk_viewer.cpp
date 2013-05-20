@@ -398,6 +398,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    _data->reachRenderMode = ModeNoExamples;
    _data->steerMode = ModeNoSteer;
    _data->gridMode = ModeShowGrid;
+   _data->cameraMode = Default;
 
    _data->iconized    = false;
    _data->statistics  = false;
@@ -1961,6 +1962,7 @@ int FltkViewer::handle ( int event )
 		   dndY = e.mouse.y;
 		   ret = 1;
 		   break;
+
 	   case FL_DND_LEAVE:
 		   //LOG("DND Leave");
 		   ret = 1;
@@ -2113,6 +2115,8 @@ int FltkViewer::handle ( int event )
         //break;
 
 	  case FL_KEYDOWN:
+         e.type = SrEvent::EventKeyboard;
+         e.key = Fl::event_key();
 		  switch (Fl::event_key())
 		  {
 			case 'f': // frame selected object
@@ -2277,7 +2281,7 @@ int FltkViewer::handle_event ( const SrEvent &e )
  {
    int res=0;   
 
-   if ( e.alt && e.mouse_event() )
+   if ( (/*e.alt && */e.mouse_event() || e.type == SrEvent::EventKeyboard) && !e.ctrl && !e.shift)
     { 
         res = handle_examiner_manipulation ( e );
 
@@ -2467,7 +2471,28 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 
 int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
  {
-	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+    SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+    switch (getData()->cameraMode)
+    {
+    case Default:
+       handle_default_camera_manipulation(e, camera);
+       break;
+
+    case FreeLook:
+       handle_freelook_camera_manipulation(e, camera);
+       break;
+
+    case FollowRenderer:
+
+       break;
+    }
+	
+  
+   return 1;
+ }
+
+int FltkViewer::handle_default_camera_manipulation ( const SrEvent &e, SrCamera* camera )
+{
    if ( e.type==SrEvent::EventDrag )
     { 
       float dx = e.mousedx() * camera->getAspectRatio();
@@ -2566,9 +2591,91 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
    else if ( e.type==SrEvent::EventRelease )
     { 
     }
-   return 1;
- }
 
+   return 1;
+}
+
+int FltkViewer::handle_freelook_camera_manipulation ( const SrEvent &e, SrCamera* camera )
+{
+   bool needRedraw = false;
+   if ( e.type==SrEvent::EventDrag )
+    { 
+      float deltaX = -(e.mouseCoord.x - e.origMouse.x) / e.width;
+		float deltaY = -(e.mouseCoord.y -  e.origMouse.y) / e.height;
+		if (deltaX == 0.0 && deltaY == 0.0)
+			return 1;
+      
+		SrVec origUp = e.origUp;
+		SrVec origCenter = e.origCenter;
+		SrVec origCamera = e.origEye;
+
+		SrVec dirX = origUp;
+		SrVec  dirY;
+		dirY.cross(origUp, (origCenter - origCamera));
+		dirY /= dirY.len();
+
+		SrVec cameraPoint = rotatePoint(origCamera, origCenter, dirX, -deltaX * float(M_PI));
+		cameraPoint = rotatePoint(cameraPoint, origCenter, dirY, deltaY * float(M_PI));
+		camera->setEye(cameraPoint.x, cameraPoint.y, cameraPoint.z);
+      needRedraw = true;
+   }
+
+   const float MovementSpeed = 0.02f;
+   SrVec newEye, newCenter, posDiff;
+   SrVec forwardVec = camera->getForwardVector();
+   SrVec oldEyePos = camera->getEye();
+   SrVec rightVec = camera->getRightVector();
+   if (e.type == SrEvent::EventKeyboard) // keyboard handling
+   {
+      if (e.key == 'w')
+      { 
+         newEye = camera->getEye() + (forwardVec * MovementSpeed);
+         camera->setEye(newEye.x, newEye.y, newEye.z);
+         posDiff = newEye - oldEyePos;
+         SrVec tempCenter = camera->getCenter() + posDiff;
+         camera->setCenter(tempCenter.x, tempCenter.y, tempCenter.z);
+      }
+      else if (e.key == 's')
+      { 
+         newEye = camera->getEye() + (forwardVec * -MovementSpeed);
+         camera->setEye(newEye.x, newEye.y, newEye.z);
+         posDiff = newEye - oldEyePos;
+         SrVec tempCenter = camera->getCenter() + posDiff; 
+         camera->setCenter(tempCenter.x, tempCenter.y, tempCenter.z);
+      }
+
+      if (e.key == 'a')
+      { 
+         newEye = camera->getEye() + (rightVec * MovementSpeed);
+         camera->setEye(newEye.x, newEye.y, newEye.z);
+         posDiff = newEye - oldEyePos;
+         SrVec tempCenter = camera->getCenter() + posDiff;
+         camera->setCenter(tempCenter.x, tempCenter.y, tempCenter.z);
+      }
+      else if (e.key == 'd')
+      { 
+         newEye = camera->getEye() + (rightVec * -MovementSpeed);
+         camera->setEye(newEye.x, newEye.y, newEye.z);
+         posDiff = newEye - oldEyePos;
+         SrVec tempCenter = camera->getCenter() + posDiff;
+         camera->setCenter(tempCenter.x, tempCenter.y, tempCenter.z);
+      }
+
+      needRedraw = true;
+   }
+
+   if (needRedraw)
+   {
+      redraw();
+   }
+
+   return 1;
+}
+
+int FltkViewer::handle_followrenderer_camera_manipulation ( const SrEvent &e, SrCamera* camera  )
+{
+   return 1;
+}
 //== Apply Scene action ==========================================================
 
 int FltkViewer::handle_scene_event ( const SrEvent& e )

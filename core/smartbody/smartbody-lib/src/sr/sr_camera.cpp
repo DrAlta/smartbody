@@ -172,6 +172,18 @@ SrVec SrCamera::getUpVector()
 	return up;
 }
 
+SrVec SrCamera::getForwardVector()
+{
+   SrVec forward = (center - eye);
+   forward.normalize();
+   return forward;
+}
+
+SrVec SrCamera::getRightVector()
+{
+   return cross(getUpVector(), getForwardVector());
+}
+
 void SrCamera::setFov(float fov)
 {
 	fovy = fov;

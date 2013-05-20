@@ -78,6 +78,7 @@ class SrCamera : public SmartBody::SBPawn
 	SBAPI void copyCamera(const SrCamera* c);
 	SBAPI void setScale(float scale);
 	SBAPI float getScale();
+   
 	SBAPI void setEye(float x, float y, float z);
 
 	SBAPI void updateOrientation();
@@ -86,6 +87,8 @@ class SrCamera : public SmartBody::SBPawn
 	SBAPI SrVec getCenter();
 	SBAPI void setUpVector(SrVec up);
 	SBAPI SrVec getUpVector();
+   SBAPI SrVec getForwardVector();
+   SBAPI SrVec getRightVector();
 	SBAPI void setFov(float fov);
 	SBAPI float getFov();
 	SBAPI void setNearPlane(float n);

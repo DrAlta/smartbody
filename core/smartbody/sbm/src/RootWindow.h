@@ -153,6 +153,9 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void CameraFrameCB(Fl_Widget* widget, void* data);
 		static void FaceCameraCB(Fl_Widget* widget, void* data);
 		static void RotateSelectedCB(Fl_Widget* widget, void* data);
+      static void SetDefaultCamera(Fl_Widget* widget, void* data);
+      static void SetFreeLookCamera(Fl_Widget* widget, void* data);
+      static void SetFollowRendererCamera(Fl_Widget* widget, void* data);
 		static void RunScriptCB(Fl_Widget* w, void* data);
 		static void ReloadScriptsCB(Fl_Widget* w, void* data);
 		static void SetScriptDirCB(Fl_Widget* w, void* data);

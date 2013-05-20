@@ -205,8 +205,23 @@ void MotionEditorWindow::OnButtonPlayMotion(Fl_Widget* widget, void* data)
 	if (!curChar)	return;
 	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
 	if (!curMotion)	return;
+   
 	std::string bml = "<animation name=\"" + curMotion->getName() + "\"/>";
-	SmartBody::SBScene::getScene()->getBmlProcessor()->execBML(curChar->getName(), bml);
+
+   // this now works for remote mode
+   SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
+	if (!sbScene->isRemoteMode())
+	{
+      SmartBody::SBScene::getScene()->getBmlProcessor()->execBML(curChar->getName(), bml);
+	}
+	else
+	{
+      std::stringstream ss;
+      ss << "send sb " << "bml.execBML(\'" << curChar->getName() << "\', \'" << bml << "\')";
+      std::string sendStr = ss.str();
+      LOG("%s", sendStr.c_str());
+		SmartBody::SBScene::getScene()->command(sendStr);
+	}
 }
 
 void MotionEditorWindow::OnCheckButtonPlayMotion(Fl_Widget* widget, void* data)

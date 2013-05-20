@@ -100,6 +100,9 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Camera/Face Camera", 0, FaceCameraCB, this, NULL);
 	menubar->add("&Camera/Track Character", 0, TrackCharacterCB, this, NULL);
 	menubar->add("&Camera/Rotate Around Selected", 0, RotateSelectedCB, this, NULL);	
+   menubar->add("&Camera/Modes/Default", 0, SetDefaultCamera, this, NULL);	
+   menubar->add("&Camera/Modes/Free Look", 0, SetFreeLookCamera, this, NULL);	
+   menubar->add("&Camera/Modes/Follow Renderer", 0, SetFollowRendererCamera, this, NULL);	
 	
 
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
@@ -852,6 +855,35 @@ void BaseWindow::RotateSelectedCB(Fl_Widget* widget, void* data)
 #endif
 }
 
+void BaseWindow::SetDefaultCamera(Fl_Widget* widget, void* data)
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->getData()->cameraMode = FltkViewer::Default;
+   SmartBody::SBScene::getScene()->SetCameraLocked(false);
+#endif
+}
+
+void BaseWindow::SetFreeLookCamera(Fl_Widget* widget, void* data)
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->getData()->cameraMode = FltkViewer::FreeLook;
+   SmartBody::SBScene::getScene()->SetCameraLocked(false);
+#endif
+}
+
+void BaseWindow::SetFollowRendererCamera(Fl_Widget* widget, void* data)
+{
+#if !NO_OGRE_VIEWER_CMD
+   if (SmartBody::SBScene::getScene()->isRemoteMode())
+   {
+      BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	   rootWindow->fltkViewer->getData()->cameraMode = FltkViewer::FollowRenderer;
+      SmartBody::SBScene::getScene()->SetCameraLocked(true);
+   }
+#endif
+}
 
 void BaseWindow::FaceCameraCB(Fl_Widget* widget, void* data)
 {

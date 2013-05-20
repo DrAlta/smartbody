@@ -186,6 +186,8 @@ class SBScene : public SBObject
 		SBAPI void setActiveCamera(SrCamera* camera);
 		SBAPI SrCamera* getActiveCamera();
 		SBAPI SrCamera* getCamera(const std::string& name);
+      SBAPI void SetCameraLocked(bool locked);
+      SBAPI bool IsCameraLocked();
 		SBAPI int getNumCameras();
 		SBAPI std::vector<std::string> getCameraNames();
 		SBAPI std::vector<SBController*>& getDefaultControllers();
@@ -304,6 +306,7 @@ class SBScene : public SBObject
 		std::map<std::string, SBScript*> _scripts;
 		float _scale;
 		bool _isRemoteMode;
+      bool _isCameraLocked;
 		static bool _firstTime;
 
 		SBDebuggerServer*	_debuggerServer;
