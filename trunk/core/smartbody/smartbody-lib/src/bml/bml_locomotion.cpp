@@ -414,7 +414,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			{
 				std::stringstream command1;
 				command1 << "panim schedule char " << c->getName();
-				command1 << " state " << ppraiAgent->stepStateName << " loop false playnow false ";
+				command1 << " state " << ppraiAgent->stepStateName << " loop false playnow false additive false joint null ";
 				if (stepDirection == "forward")
 					command1 << "0 0 1 0 0 0 0";
 				if (stepDirection == "backward")
