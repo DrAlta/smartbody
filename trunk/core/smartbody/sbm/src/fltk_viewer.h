@@ -155,7 +155,11 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 					    ModeShowLocomotionFootprints,
 						ModeInteractiveLocomotion
                 };
-
+   enum CameraMode {
+                  Default,
+                  FreeLook,
+                  FollowRenderer
+                 };
 	enum GridMode { 
 						ModeShowGrid,
 						ModeNoGrid
@@ -321,6 +325,9 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
         If the event is not used, it is passed to the scene by calling
         handle_scene_event(). */
     virtual int handle_examiner_manipulation ( const SrEvent &e );
+    virtual int handle_default_camera_manipulation ( const SrEvent &e, SrCamera* camera );
+    virtual int handle_freelook_camera_manipulation ( const SrEvent &e, SrCamera* camera  );
+    virtual int handle_followrenderer_camera_manipulation ( const SrEvent &e, SrCamera* camera );
 
     /*! Applies an event action to the scene */
     virtual int handle_scene_event ( const SrEvent &e );
@@ -423,6 +430,7 @@ protected:
    FltkViewer::LocomotionMode locomotionMode;   // locomotion mode
    FltkViewer::ReachRenderMode reachRenderMode;
    FltkViewer::SteerMode steerMode;
+   FltkViewer::CameraMode cameraMode;
    FltkViewer::GridMode gridMode;
    FltkViewer::NavigationMeshMode navigationMeshMode;
 

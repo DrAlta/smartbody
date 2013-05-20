@@ -175,7 +175,7 @@ void SBDebuggerUtility::updateCamera(float& eyePosX, float& eyePosY, float& eyeP
 {
 	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
 
-	if (!camera)
+	if (!camera || !SmartBody::SBScene::getScene()->IsCameraLocked())
 		return;
 
 	camera->setEye(eyePosX, eyePosY, eyePosZ);

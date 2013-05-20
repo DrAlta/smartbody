@@ -255,11 +255,11 @@ void SBDebuggerClient::Update()
                      float aspect = vhcl::ToFloat(split[i + 11]);
                      float zNear  = vhcl::ToFloat(split[i + 12]);
                      float zFar   = vhcl::ToFloat(split[i + 13]);
-					 string center  = split[i + 14];
-					 float centerX = vhcl::ToFloat(split[i + 15]);
-					 float centerY = vhcl::ToFloat(split[i + 16]);
-					 float centerZ = vhcl::ToFloat(split[i + 17]);
-					 //SmartBody::SBScene::getScene()->getDebuggerUtility()->updateCamera(posX, posY, posZ, centerX, centerY, centerZ, fovY, aspect, zNear, zFar);
+					       string center  = split[i + 14];
+					       float centerX = vhcl::ToFloat(split[i + 15]);
+					       float centerY = vhcl::ToFloat(split[i + 16]);
+					       float centerZ = vhcl::ToFloat(split[i + 17]);
+					       SmartBody::SBScene::getScene()->getDebuggerUtility()->updateCamera(posX, posY, posZ, centerX, centerY, centerZ, fovY, aspect, zNear, zFar);
                   }
                }
 
