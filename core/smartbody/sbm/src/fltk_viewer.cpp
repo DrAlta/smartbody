@@ -2595,81 +2595,97 @@ int FltkViewer::handle_default_camera_manipulation ( const SrEvent &e, SrCamera*
    return 1;
 }
 
+#include "vhcl_math.h"
+
 int FltkViewer::handle_freelook_camera_manipulation ( const SrEvent &e, SrCamera* camera )
 {
+   // mouse rotation
    bool needRedraw = false;
-   if ( e.type==SrEvent::EventDrag )
-    { 
-      float deltaX = -(e.mouseCoord.x - e.origMouse.x) / e.width;
+   if ( e.type==SrEvent::EventDrag && e.button3)
+   { 
+		float deltaX = -(e.mouseCoord.x - e.origMouse.x) / e.width;
 		float deltaY = -(e.mouseCoord.y -  e.origMouse.y) / e.height;
-		if (deltaX == 0.0 && deltaY == 0.0)
-			return 1;
-      
 		SrVec origUp = e.origUp;
 		SrVec origCenter = e.origCenter;
 		SrVec origCamera = e.origEye;
+		if (deltaX == 0.0 && deltaY == 0.0)
+			return 1;
 
-		SrVec dirX = origUp;
-		SrVec  dirY;
-		dirY.cross(origUp, (origCenter - origCamera));
-		dirY /= dirY.len();
+		SrVec forward =origCenter - origCamera; 		   
+		SrQuat q = SrQuat(origUp, vhcl::DEG_TO_RAD()*deltaX*150.f);			   
+		forward = forward*q;
+		SrVec tmp = get_camera()->getEye() + forward;
+		camera->setCenter(tmp.x, tmp.y, tmp.z);
 
-		SrVec cameraPoint = rotatePoint(origCamera, origCenter, dirX, -deltaX * float(M_PI));
-		cameraPoint = rotatePoint(cameraPoint, origCenter, dirY, deltaY * float(M_PI));
-		camera->setEye(cameraPoint.x, cameraPoint.y, cameraPoint.z);
+		SrVec cameraRight = cross(forward,origUp);
+		cameraRight.normalize();		   
+		q = SrQuat(cameraRight, vhcl::DEG_TO_RAD()*deltaY*150.f);	
+		camera->setUpVector(origUp*q);
+		forward = forward*q;
+		SrVec tmpCenter = camera->getEye() + forward;
+		camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);		  
+
       needRedraw = true;
+		//redraw();
    }
 
-   const float MovementSpeed = 0.02f;
-   SrVec newEye, newCenter, posDiff;
-   SrVec forwardVec = camera->getForwardVector();
-   SrVec oldEyePos = camera->getEye();
-   SrVec rightVec = camera->getRightVector();
+   const float MovementSpeed = 0.1f;
    if (e.type == SrEvent::EventKeyboard) // keyboard handling
    {
+      // forward/back
       if (e.key == 'w')
       { 
-         newEye = camera->getEye() + (forwardVec * MovementSpeed);
-         camera->setEye(newEye.x, newEye.y, newEye.z);
-         posDiff = newEye - oldEyePos;
-         SrVec tempCenter = camera->getCenter() + posDiff;
-         camera->setCenter(tempCenter.x, tempCenter.y, tempCenter.z);
+         translate_camera(camera, camera->getForwardVector() * MovementSpeed);
+         needRedraw = true;
       }
       else if (e.key == 's')
       { 
-         newEye = camera->getEye() + (forwardVec * -MovementSpeed);
-         camera->setEye(newEye.x, newEye.y, newEye.z);
-         posDiff = newEye - oldEyePos;
-         SrVec tempCenter = camera->getCenter() + posDiff; 
-         camera->setCenter(tempCenter.x, tempCenter.y, tempCenter.z);
+         translate_camera(camera, camera->getForwardVector() * -MovementSpeed);
+         needRedraw = true;
       }
 
+      // left/right
       if (e.key == 'a')
       { 
-         newEye = camera->getEye() + (rightVec * MovementSpeed);
-         camera->setEye(newEye.x, newEye.y, newEye.z);
-         posDiff = newEye - oldEyePos;
-         SrVec tempCenter = camera->getCenter() + posDiff;
-         camera->setCenter(tempCenter.x, tempCenter.y, tempCenter.z);
+            translate_camera(camera, camera->getRightVector() * MovementSpeed);
+            needRedraw = true;
       }
       else if (e.key == 'd')
       { 
-         newEye = camera->getEye() + (rightVec * -MovementSpeed);
-         camera->setEye(newEye.x, newEye.y, newEye.z);
-         posDiff = newEye - oldEyePos;
-         SrVec tempCenter = camera->getCenter() + posDiff;
-         camera->setCenter(tempCenter.x, tempCenter.y, tempCenter.z);
+         translate_camera(camera, camera->getRightVector() * -MovementSpeed);
+         needRedraw = true;
       }
 
-      needRedraw = true;
-   }
+      // up/down
+      if (e.key == 'e')
+      { 
+         translate_camera(camera, camera->getUpVector() * MovementSpeed);
+         needRedraw = true;
+      }
+      else if (e.key == 'q')
+      { 
+         translate_camera(camera, camera->getUpVector() * -MovementSpeed);
+         needRedraw = true;
+      }
 
-   if (needRedraw)
-   {
-      redraw();
+      if (needRedraw)
+      {
+         redraw();
+      } 
    }
 
    return 1;
+}
+
+void FltkViewer::translate_camera( SrCamera* camera, SrVec& displacement)
+{
+   // need to move both the eye (camera pos) and the camera's look at position (center)
+   SrVec oldEye = camera->getEye();
+   SrVec newEye = camera->getEye() + displacement;
+   camera->setEye(newEye.x, newEye.y, newEye.z);
+   SrVec posDiff = newEye - oldEye;
+   SrVec tempCenter = camera->getCenter() + posDiff;
+   camera->setCenter(tempCenter.x, tempCenter.y, tempCenter.z);
 }
 
 int FltkViewer::handle_followrenderer_camera_manipulation ( const SrEvent &e, SrCamera* camera  )
