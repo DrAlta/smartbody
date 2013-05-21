@@ -35,11 +35,12 @@ namespace BML {
 
 	class EventRequest : public SequenceRequest {
 		protected:
-			const std::string message;
+			const std::string oldMessage;
+			const std::string pythonMessage;
 			std::string syncPointName;
 		
 		public:
-			EventRequest( const std::string& unique_id, const std::string& localId, const char* message,
+			EventRequest( const std::string& unique_id, const std::string& localId, const std::string& oldStyleMessage, const std::string& pythonMessage,
 						  const BehaviorSyncPoints& syncs_in, std::string spName );
 		
 			void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene );

@@ -50,5 +50,5 @@ BehaviorRequestPtr BML::parse_bml_noise( DOMElement* elem, const std::string& un
 		}
 	}
 
-	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
+	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", "", behav_syncs, ""));
 }
