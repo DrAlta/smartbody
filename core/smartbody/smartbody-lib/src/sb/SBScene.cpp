@@ -392,8 +392,10 @@ void SBScene::cleanup()
 	
 	delete _vhmsgManager;	
 
+#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
 	// remove textures
 	SbmTextureManager::destroy_singleton();
+#endif
 
 #ifndef SB_NO_PYTHON
 //	Py_Finalize();
