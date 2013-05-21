@@ -9,7 +9,7 @@
 #include <sb/SBPythonClass.h>
 #include <sb/SBVHMsgManager.h>
 
-MonitorConnectWindow::MonitorConnectWindow(int x, int y, int w, int h, char* label) : Fl_Double_Window(x, y, w, h, label)
+MonitorConnectWindow::MonitorConnectWindow(int x, int y, int w, int h, char* label, bool quickConnect) : Fl_Double_Window(x, y, w, h, label)
 {
 	set_modal();
 	this->label("Monitor Connect");
@@ -31,6 +31,23 @@ MonitorConnectWindow::MonitorConnectWindow(int x, int y, int w, int h, char* lab
 	_buttonCancel = new Fl_Button(120, 300, 100, 20, "Cancel");
 	_buttonCancel->callback(OnCancelCB, this);
 	this->end();
+
+   if (quickConnect)
+   {
+      OnFefreshCB(NULL, this);
+      
+	   if (_browserSBProcesses->value() <= 0)
+	   {
+		   fl_alert("There are currently no running SmartBody processed to connect to");
+		   return;
+	   }
+      else
+      {
+         // there is an actively running sb process. Connect to it
+         std::string processId = _browserSBProcesses->text(_browserSBProcesses->value());
+         OnConfirmCB(NULL, this);
+      }
+   }
 }
 
 MonitorConnectWindow::~MonitorConnectWindow()
@@ -64,6 +81,11 @@ void MonitorConnectWindow::loadProcesses()
 		if (s->GetID() != ids[i])
 			_browserSBProcesses->add(ids[i].c_str());
 	}
+
+   if (ids.size() > 0)
+   {
+      _browserSBProcesses->select(1);
+   }
 }
 
 void MonitorConnectWindow::OnConfirmCB(Fl_Widget* widget, void* data)

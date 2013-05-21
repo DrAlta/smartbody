@@ -36,6 +36,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&File/Load...", 0, LoadCB, this, NULL);
 	menubar->add("&File/Save Scene Setting", 0, SaveSceneSettingCB, this, NULL);	
 	menubar->add("&File/Load Scene Setting...", 0, LoadSceneSettingCB, this, NULL);	
+   menubar->add("&File/Quick Connect", 0, QuickConnectCB, this, NULL);
 	menubar->add("&File/Connect...", 0, LaunchConnectCB, this, NULL);
 	menubar->add("&File/Disconnect", 0, DisconnectRemoteCB, this, NULL);
 	menubar->add("&File/&Quit", 0, QuitCB, this, NULL);
@@ -673,12 +674,21 @@ void BaseWindow::QuitCB(Fl_Widget* widget, void* data)
 	}
 }
 
+void BaseWindow::QuickConnectCB(Fl_Widget* widget, void* data)
+{
+   BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->monitorConnectWindow)
+	{
+		rootWindow->monitorConnectWindow = new MonitorConnectWindow(150, 150, 320, 400, "Monitor Connect", true);
+	}
+}
+
 void BaseWindow::LaunchConnectCB(Fl_Widget* widget, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (!rootWindow->monitorConnectWindow)
 	{
-		rootWindow->monitorConnectWindow = new MonitorConnectWindow(150, 150, 320, 400, "Monitor Connect");
+		rootWindow->monitorConnectWindow = new MonitorConnectWindow(150, 150, 320, 400, "Monitor Connect", false);
 	}
 
 	rootWindow->monitorConnectWindow->show();	
