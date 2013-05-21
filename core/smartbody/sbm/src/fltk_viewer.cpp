@@ -2595,8 +2595,6 @@ int FltkViewer::handle_default_camera_manipulation ( const SrEvent &e, SrCamera*
    return 1;
 }
 
-#include "vhcl_math.h"
-
 int FltkViewer::handle_freelook_camera_manipulation ( const SrEvent &e, SrCamera* camera )
 {
    // mouse rotation
