@@ -1,25 +1,9 @@
 #pragma once
-#if __native_client__
-#include <GLES2/gl2.h>
-#elif __FLASHPLAYER__
-#include <GL/gl.h>
-#include <GL/glu.h>
-#else
-//#include "external/glew/glew.h"
-#ifdef WIN32
-#include <windows.h>
-#endif
-#ifdef __APPLE__
-# include <OpenGL/gl.h>
-# include <OpenGL/glu.h>
-#else
-# include <GL/gl.h>
-# include <GL/glu.h>
-#endif
-#endif
+
 #include <map>
 #include <string>
 #include <sb/SBTypes.h>
+#include <sr/sr_gl.h>
 
 class SbmTexture;
 
