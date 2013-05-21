@@ -109,12 +109,12 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	if (!SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
 	{
 		LOG("Steering Engine not started. Call \"steer start\" first");
-		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
+		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", "", behav_syncs, ""));
 	}
 	if (!SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine)
 	{
 		LOG("Steering Engine not started. Call \"steer start\" first");
-		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
+		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", "", behav_syncs, ""));
 	}
 	std::stringstream command;
 	SmartBody::SBSteerManager* manager = SmartBody::SBScene::getScene()->getSteerManager();
@@ -123,7 +123,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	if (!steerAgent)
 	{
 		LOG("Steering Agent not attached. Check initialization");
-		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));	
+		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", "", behav_syncs, ""));	
 	}
 
 	PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
@@ -218,7 +218,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			if (c->param_animation_ct)
 			{
 				if (c->param_animation_ct->hasPABlend(ppraiAgent->jumpName))
-					return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
+					return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), "", behav_syncs, ""));
 				std::stringstream command1;
 				if (c->param_animation_ct->getCurrentPABlendData()->state->stateName == ppraiAgent->locomotionName)
 				{
@@ -230,7 +230,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 					command1 << "bml char " << c->getName() << " <sbm:states loop=\"false\" name=\"" << ppraiAgent->jumpName << "\" sbm:startnow=\"true\"/>";
 				}
 				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*)command1.str().c_str());
-				return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
+				return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), "", behav_syncs, ""));
 			}
 		}
 		else 
@@ -428,7 +428,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		}
 	}
 	//LOG("behavior sync stroke =  %f",behav_syncs.sync_stroke()->time());
-	return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), behav_syncs, ""));
+	return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), "", behav_syncs, ""));
 }
 
 void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int type, int id)

@@ -34,48 +34,51 @@ using namespace std;
 using namespace BML;
 using namespace xml_utils;
 
-const bool LOG_EVENT_COMMAND = false;
 
-
-BML::EventRequest::EventRequest( const std::string& unique_id, const std::string& localId, const char* message,	const BehaviorSyncPoints& syncs_in, std::string spName )
+BML::EventRequest::EventRequest( const std::string& unique_id, const std::string& localId, 
+								 const std::string& oldStyleMessage, const std::string& message, 
+								 const BehaviorSyncPoints& syncs_in, std::string spName )
 						:	SequenceRequest( unique_id, localId, syncs_in,
 						    /* Default Timing */ 0, 0, 0, 0, 0 ),
-							message( message ),
+							oldMessage( oldStyleMessage ),
+							pythonMessage( message ),
 							syncPointName( spName )
 {
 }
 	
 void BML::EventRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
-	time_sec strokeAt = behav_syncs.sync_stroke()->time();
+	// for backwards compatibility, there are two possible behaviors:
+	// 1) using stroke and old-style commands sent via vhmsg, or
+	// 2) using start and python commands
+	time_sec eventTime = behav_syncs.sync_stroke()->time();
+	if (pythonMessage.size() > 0)
+		eventTime = behav_syncs.sync_start()->time();
 
 	VecOfSbmCommand commands;
 
 	ostringstream cmd;
-#ifdef VHMSG_EVENT
-	cmd << "send " << message;
-#else
-	cmd << message; // should just run the event locally !!
-#endif
-
-	if( LOG_EVENT_COMMAND ) {
-		cout << "DEBUG: EventRequest::realize_impl(): Scheduling \"" << unique_id << "\" command: " << endl << "\t" << cmd.str() << endl;
-
-		ostringstream echo;
-		echo << "echo DEBUG: EventRequest::realize_impl(): Sending \"" << unique_id << "\" command: " << endl << "\t" << cmd.str();
-		string str = echo.str();
-		commands.push_back( new SbmCommand( str, (float)strokeAt ) );
+	if (oldMessage.size() > 0)
+	{
+		cmd << "send " << oldMessage;
+	}
+	else
+	{
+		cmd << "python " << pythonMessage;
 	}
 
 	string str = cmd.str();
-	commands.push_back( new SbmCommand( str, (float)strokeAt ) );
+	commands.push_back( new SbmCommand( str, (float) eventTime ) );
 
 	realize_sequence( commands, scene );
 }
 
 const std::string BML::EventRequest::getMessage() 
 { 
-	return message; 
+	if (pythonMessage.size() > 0)
+		return pythonMessage; 
+	else
+		return oldMessage;
 }
 
 std::string BML::EventRequest::getSyncPointName() 
@@ -87,20 +90,36 @@ std::string BML::EventRequest::getSyncPointName()
 BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& unique_id, BehaviorSyncPoints& behav_syncs, bool required, BmlRequestPtr request, SmartBody::SBScene* scene ) {
 
     const XMLCh* tag      = elem->getTagName();
+
+	// message (the event behavior) can be retrieved either via the attribute, or via the text content.
 	std::string msg  = xml_parse_string( BMLDefs::ATTR_MESSAGE, elem, "");	
 
-	std::string spName = xml_parse_string( BMLDefs::ATTR_STROKE, elem, "");	
+	std::string spNameOld = xml_parse_string( BMLDefs::ATTR_STROKE, elem, ""); // if 'stroke' is used, assume old-style command sent via VHMSG	
+	std::string spNameNew = xml_parse_string( BMLDefs::ATTR_START, elem, ""); // if 'start' is used, assume Python style internally only
 	std::string localId  = xml_parse_string( BMLDefs::ATTR_ID, elem, "");
 
 	 const XMLCh* messageData = elem->getTextContent();
-	 if (messageData)
+	 
+	 std::string textMsg;
+	 xml_translate(&textMsg, messageData); 
+	 if (textMsg.size() > 0)
 	 {
+		 // if there is text content, this takes priority over the message attribute
 		 msg = xml_utils::asciiString(messageData);
 	 }
 
 	if (msg != "" )
 	{	
-		return BehaviorRequestPtr( new EventRequest( unique_id, localId, msg.c_str(), behav_syncs, spName ) );
+		if (spNameNew.size() > 0)
+		{
+			// new style event sent via Python
+			return BehaviorRequestPtr( new EventRequest( unique_id, localId, "", msg, behav_syncs, spNameNew ) );
+		}
+		else
+		{
+			// old style command send via vhmsg
+			return BehaviorRequestPtr( new EventRequest( unique_id, localId, msg, "", behav_syncs, spNameOld ) );
+		}
 	} 
 	else
 	{

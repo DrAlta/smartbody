@@ -80,7 +80,7 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 	if (!saccade_ct->getUseModel())
 	{
 		saccade_ct->spawnOnce(direction, magnitude, duration);
-		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
+		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", "", behav_syncs, ""));
 	}
 
 	//-----
@@ -142,5 +142,5 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 		}
 	}
 
-	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
+	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", "", behav_syncs, ""));
 }

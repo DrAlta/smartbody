@@ -149,5 +149,5 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 		character->param_animation_ct->updateWeights(weights);
 	}
 
-	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", behav_syncs, ""));
+	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", "", behav_syncs, ""));
 }
