@@ -386,7 +386,7 @@ SkJoint* SkSkeleton::_loadj ( SrInput& in, SkJoint* p, SrStringArray& paths, boo
 		name.set("\0");
 		continue;
 	}
-	if ( name.len()>0 ) name << '_';
+	if ( name.len()>0 ) name << ' ';
 	name << in.last_token();
 	}
 
