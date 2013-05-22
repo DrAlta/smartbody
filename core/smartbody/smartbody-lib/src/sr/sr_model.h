@@ -60,12 +60,30 @@ class SrModel : public SrSharedClass
     /*! The Face structure keeps 3 indices used to associate the
         information in V, N, and T to each face */
     struct Face 
-     { int a, b, c;
-       void set ( int i, int j, int k ) { a=i; b=j; c=k; }
+     { 
+#ifdef __ANDROID__
+       unsigned short a,b,c;
+       void validate () { }
+       unsigned short& operator[] ( int i ) { return *((&a)+i); }
+       friend SrOutput& operator<< ( SrOutput& o, const Face& f ) { 
+                int ia,ib,ic; ia = f.a; ib = f.b; ic = f.c;
+		return o<<ia<<srspc<<ib<<srspc<<ic; 
+       }
+       friend SrInput& operator>> ( SrInput& i, Face& f ) { 
+          int ia,ib,ic;
+          //return i>>f.a>>f.b>>f.c; 
+          SrInput& t = i>>ia>>ib>>ic; 
+          f.a = ia; f.b = ib; f.c = ic;
+          return t;
+       }
+#else
+       int a, b, c;
        void validate () { if (a<0) a=-a; if (b<0) b=-b; if (c<0) c=-c; }
-	   int& operator[] ( int i ) { return *((&a)+i); }
+       int& operator[] ( int i ) { return *((&a)+i); }
        friend SrOutput& operator<< ( SrOutput& o, const Face& f ) { return o<<f.a<<srspc<<f.b<<srspc<<f.c; }
        friend SrInput& operator>> ( SrInput& i, Face& f ) { return i>>f.a>>f.b>>f.c; }
+#endif   
+       void set ( int i, int j, int k ) { a=i; b=j; c=k; }    
      };
 
     SrArray<SrMaterial> M;  //!< Used materials

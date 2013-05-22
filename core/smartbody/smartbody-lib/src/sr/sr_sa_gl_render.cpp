@@ -18,7 +18,7 @@
  *  CONTRIBUTORS:
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
-
+#include "vhcl.h"
 # include <sr/sr_gl.h>
 # include <sr/sr_sn.h>
 # include <sr/sr_gl_render_funcs.h>
@@ -38,28 +38,43 @@ struct SrOGLData : public SrSnShapeBase::RenderLibData
     SrSaGlRender::render_function rfunc;
    public :
     SrOGLData ( SrSnShapeBase* s );
-   ~SrOGLData () { glDeleteLists(list,1); }
+   ~SrOGLData () { 
+#if !GLES_RENDER
+	glDeleteLists(list,1); 
+#endif
+   }
  };
 
 SrOGLData::SrOGLData ( SrSnShapeBase* s )
  {
+   //LOG("SrOGLData constructor");
    int i;
    SrArray<SrSaGlRender::RegData>& rfuncs = SrSaGlRender::_rfuncs;
 
    //SR_TRACE2 ( "Initializing render data for "<<s->inst_class_name() );
+   
    s->changed ( true );
+   //LOG("s->changed");
    s->set_renderlib_data ( this );
+   //LOG("s->set_render_lib_data()");
 
    // we could use here a sorted array, but as the number of registered classes
    // is normally low (<10), the overhead is not worth.
    for ( i=0; i<rfuncs.size(); i++ )
      if ( sr_compare(rfuncs[i].class_name,s->inst_class_name())==0 ) break;
+   //LOG("after sr_compare, rfunc size = %d",rfuncs.size());
    if ( i==rfuncs.size() )
+   {
+     LOG("SrSaGlRender: shape [%s] not registered!",s->inst_class_name());
      sr_out.fatal_error("SrSaGlRender: shape [%s] not registered!",s->inst_class_name());
+   }
 
    rfunc = rfuncs[i].rfunc;
+#if !GLES_RENDER
    list = glGenLists ( 1 ); // creates one list
 // sr_out<<"is list: "<<glIsList(list)<<srnl;
+#endif
+
  }
 
 //=============================== SrSaGlRender ====================================
@@ -78,13 +93,16 @@ void register_render_function ( const char* class_name, SrSaGlRender::render_fun
 
    rf[i].class_name = class_name;
    rf[i].rfunc = rfunc;
+   //LOG("render function %s is set to %d, _rfuncs size = %d",class_name, i, rf.size());
  }
 
 SrSaGlRender::SrSaGlRender () 
  { 
    //SR_TRACE1 ( "Constructor" );
-   if ( _rfuncs.size()==0 ) // no functions registered
-    { register_render_function ( "model",    SrGlRenderFuncs::render_model );
+   if ( _rfuncs.size()==0 ) // no functions registered	
+   {  
+      //LOG("register render functions");
+      register_render_function ( "model",    SrGlRenderFuncs::render_model );
       register_render_function ( "lines",    SrGlRenderFuncs::render_lines );
       register_render_function ( "points",   SrGlRenderFuncs::render_points );
       register_render_function ( "box",      SrGlRenderFuncs::render_box );
@@ -97,6 +115,7 @@ SrSaGlRender::SrSaGlRender ()
 
 SrSaGlRender::~SrSaGlRender ()
  {
+   
    //SR_TRACE1 ( "Destructor" );
  }
 
@@ -153,17 +172,21 @@ void SrSaGlRender::pop_matrix ()
 bool SrSaGlRender::shape_apply ( SrSnShapeBase* s )
  {
    // 1. Ensures that render data is initialized
+   //LOG("SrSAGLRender::shape_apply(), s = %d",s);
    SrOGLData* ogl = (SrOGLData*) s->get_renderlib_data();
+   //LOG("after s->get_renderlib_data(), ogl = %d", ogl);
    if ( !ogl ) {	   
 	   ogl = new SrOGLData ( s );
    }
-   
+   //LOG("check ogl");
    // 2. Render only if needed
-   if ( !s->visible() ) return true;
+   //if ( !s->visible() ) return true;
 
   
    bool isSrModel = sr_compare(s->inst_class_name(),"model") == 0;
+   //LOG("check isSrModel");
    // 3. Check if lists are up to date
+#if !GLES_RENDER // no display list for OpenGL ES Rendering
    if ( !s->haschanged() && !isSrModel)
    { //SR_TRACE2 ( "Calling list..." );	  
       glCallList ( ogl->list ); 
@@ -181,7 +204,9 @@ bool SrSaGlRender::shape_apply ( SrSnShapeBase* s )
 	   s->changed(false);
    }
    else
+#endif
    {
+	   //LOG("ogl->rfunc");
 	   ogl->rfunc(s);
    }   
 

@@ -64,7 +64,19 @@ SBAPI bool SBNavigationMesh::buildNavigationMesh( SrModel& inMesh )
 	const float* bmax = &bBox.b[0];
 	const float* verts = &inMesh.V.get(0)[0];
  	const int nverts = inMesh.V.size();
- 	const int* tris = &inMesh.F.get(0)[0];
+#ifdef __ANDROID__
+ 	//const int* tris = &inMesh.F.get(0)[0];
+        // need to convert to integer array
+        int* tris = new int[inMesh.F.size()*3];
+	for (int i=0;i<inMesh.F.size();i++)
+	{
+              tris[i*3+0] = inMesh.F.get(i)[0];
+              tris[i*3+1] = inMesh.F.get(i)[1];
+              tris[i*3+2] = inMesh.F.get(i)[2];
+        }
+#else
+	const int* tris = &inMesh.F.get(0)[0];
+#endif
  	const int ntris = inMesh.F.size();
 
 	bool m_keepInterResults = true;

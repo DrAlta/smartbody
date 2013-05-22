@@ -41,7 +41,7 @@
 #endif
 #endif
 
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined(SBM_IPHONE)
 #include <sbm/GPU/SbmTexture.h>
 #endif
 
@@ -1803,7 +1803,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 			path.extract_file_name(filename);
 			SrStringArray paths;
 			paths.push ( path );
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined(SBM_IPHONE)
 			for (int i = 0; i < newModel->M.size(); i++)
 			{
 			   std::string matName = newModel->mtlnames[i];
@@ -1874,7 +1874,7 @@ void ParserOpenCOLLADA::setModelVertexSource( std::string& sourceName, std::stri
 
 void ParserOpenCOLLADA::load_texture(int type, const char* file, const SrStringArray& paths)
 {
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined(SBM_IPHONE)
 	SrString s;
 	SrInput in;
 	std::string imageFile = file;

@@ -35,10 +35,12 @@
 # include <Windows.h>
 # endif
 
+
 //======================================= geometry ================================
 
+#if !defined(GLES_RENDER)
 void glNormal ( const SrVec &v )
- {
+{
    glNormal3fv ( (const float*) v );
  }
 
@@ -126,8 +128,14 @@ void glDrawBox ( const SrVec& a, const SrVec& b )
 
    glEnd ();
  }
-
 //====================================== appearance ================================
+
+void glColor ( const SrColor& c )
+ {
+   glColor4ubv ( (const GLubyte*)&c );
+ }
+
+#endif
 
 void glClearColor ( const SrColor& c )
  {
@@ -135,11 +143,6 @@ void glClearColor ( const SrColor& c )
                   float(c.g)/255.0f,
                   float(c.b)/255.0f,
                   float(c.a)/255.0f );
- }
-
-void glColor ( const SrColor& c )
- {
-   glColor4ubv ( (const GLubyte*)&c );
  }
 
 void glLight ( int id, const SrLight& l, bool bind_pos )
@@ -198,7 +201,11 @@ void glMaterial ( const SrMaterial &m )
    m.ambient.get(f);  glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,f);
    m.specular.get(f); glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,f);
    m.emission.get(f); glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,f);
+#if GLES_RENDER
+   glMaterialf ( GL_FRONT_AND_BACK, GL_SHININESS, m.shininess);
+#else
    glMateriali ( GL_FRONT_AND_BACK, GL_SHININESS, int(m.shininess) );
+#endif
  }
 
 //==================================== matrices ==============================
@@ -241,6 +248,15 @@ void glPerspective ( float fovy, float aspect, float znear, float zfar )
  {
    GLdouble ymax = (GLdouble)znear * tan ( fovy/2 );
 
+#if GLES_RENDER
+   glFrustumf( (GLdouble) ((-ymax)*(GLdouble)aspect), // xmin
+               (GLdouble) (( ymax)*(GLdouble)aspect), // xmax
+               (GLdouble) (-ymax),                    // ymin
+               (GLdouble) ymax, 
+               (GLdouble) znear, 
+               (GLdouble) zfar   
+             );
+#else
    glFrustum ( (GLdouble) ((-ymax)*(GLdouble)aspect), // xmin
                (GLdouble) (( ymax)*(GLdouble)aspect), // xmax
                (GLdouble) (-ymax),                    // ymin
@@ -248,6 +264,7 @@ void glPerspective ( float fovy, float aspect, float znear, float zfar )
                (GLdouble) znear, 
                (GLdouble) zfar   
              );
+#endif
  }
 
 void glGetViewMatrix ( SrMat &m )
@@ -287,38 +304,18 @@ void glPrintInfo ( SrOutput &o )
 
    o << "Last Error : " << sr_error_string() << srnl;
 
+#if !GLES_RENDER
    glGetIntegerv(GL_STEREO,&i);
    o<<"GL_STEREO : " << (int)i << '\n';
-
-   glGetIntegerv(GL_MAX_LIGHTS,&i);  
-   o<<"GL_MAX_LIGHTS : " << (int)i << '\n';
-
    glGetIntegerv(GL_MAX_LIST_NESTING,&i);  
+
    o<<"GL_MAX_LIST_NESTING : " << (int)i << '\n';
-
-   glGetIntegerv(GL_MAX_VIEWPORT_DIMS,v);  
-   o<<"GL_MAX_VIEWPORT_DIMS : (" << v[0] <<","<<v[1] << ")\n";
-
-   glGetIntegerv(GL_MAX_MODELVIEW_STACK_DEPTH,&i); 
-   o<<"GL_MAX_MODELVIEW_STACK_DEPTH (>=32) : " << (int)i << '\n';
-
-   glGetIntegerv(GL_MAX_PROJECTION_STACK_DEPTH,&i);  
-   o<<"GL_MAX_PROJECTION_STACK_DEPTH : " << (int)i << '\n';
 
    glGetIntegerv(GL_MAX_ATTRIB_STACK_DEPTH,&i); 
    o<<"GL_MAX_ATTRIB_STACK_DEPTH : " << (int)i << '\n';
 
    glGetIntegerv(GL_MAX_NAME_STACK_DEPTH,&i);  
    o<<"GL_MAX_NAME_STACK_DEPTH : " << (int)i << '\n';
-
-   glGetIntegerv(GL_MAX_TEXTURE_STACK_DEPTH,&i);  
-   o<<"GL_MAX_TEXTURE_STACK_DEPTH : " << (int)i << '\n';
-
-   glGetIntegerv(GL_MAX_TEXTURE_SIZE,&i);  
-   o<<"GL_MAX_TEXTURE_SIZE : " << (int)i << '\n';
-
-   glGetIntegerv(GL_MAX_CLIP_PLANES,&i);  
-   o<<"GL_MAX_CLIP_PLANES : " << (int)i << '\n';
 
    glGetIntegerv(GL_MAX_EVAL_ORDER,&i);  
    o<<"GL_MAX_EVAL_ORDER : " << (int)i << '\n';
@@ -337,6 +334,28 @@ void glPrintInfo ( SrOutput &o )
 
    glGetIntegerv(GL_ACCUM_ALPHA_BITS ,&i); 
    o<<"GL_ACCUM_ALPHA_BITS : " << (int)i << '\n';
+#endif
+
+   glGetIntegerv(GL_MAX_LIGHTS,&i);  
+   o<<"GL_MAX_LIGHTS : " << (int)i << '\n';   
+
+   glGetIntegerv(GL_MAX_VIEWPORT_DIMS,v);  
+   o<<"GL_MAX_VIEWPORT_DIMS : (" << v[0] <<","<<v[1] << ")\n";
+
+   glGetIntegerv(GL_MAX_MODELVIEW_STACK_DEPTH,&i); 
+   o<<"GL_MAX_MODELVIEW_STACK_DEPTH (>=32) : " << (int)i << '\n';
+
+   glGetIntegerv(GL_MAX_PROJECTION_STACK_DEPTH,&i);  
+   o<<"GL_MAX_PROJECTION_STACK_DEPTH : " << (int)i << '\n';   
+
+   glGetIntegerv(GL_MAX_TEXTURE_STACK_DEPTH,&i);  
+   o<<"GL_MAX_TEXTURE_STACK_DEPTH : " << (int)i << '\n';
+
+   glGetIntegerv(GL_MAX_TEXTURE_SIZE,&i);  
+   o<<"GL_MAX_TEXTURE_SIZE : " << (int)i << '\n';
+
+   glGetIntegerv(GL_MAX_CLIP_PLANES,&i);  
+   o<<"GL_MAX_CLIP_PLANES : " << (int)i << '\n';   
 
    o << "GL_VENDOR : "     << (char*) glGetString (GL_VENDOR) << '\n';
    o << "GL_RENDERER : "   << (char*) glGetString (GL_RENDERER) << '\n';

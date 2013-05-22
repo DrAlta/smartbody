@@ -21,7 +21,11 @@
  */
 
 #include "vhcl.h"
+#ifdef __ANDROID__
+#include <GLES/gl.h>
+#else
 #include "external/glew/glew.h"
+#endif
 # include <sr/sr_vec.h>
 # include <sr/sr_mat.h>
 # include <sr/sr_model.h>
@@ -32,7 +36,6 @@
 # include <sr/sr_cylinder.h>
 # include <sr/sr_polygons.h>
 #include <sbm/GPU/SbmTexture.h>
-#include <sbm/GPU/SbmShader.h>
 
 # include <sr/sr_sn.h>
 # include <sr/sr_sn_shape.h>
@@ -41,10 +44,12 @@
 # include <sr/sr_gl.h>
 
 
+
 //=============================== render_model ====================================
 
 void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
  {	
+   //LOG("Render Model");
    SrModel& model = ((SrSnModel*)shape)->shape();
 
    //SR_TRACE1 ( "Render Model faces="<<model.F.size() );
@@ -59,6 +64,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    SrArray<SrPnt2>&        T = model.T;
    SrArray<SrMaterial>&    M = model.M;
 
+   //LOG("F = %d, V = %d",F.size(), V.size());
    int fsize = F.size();
    int fmsize = Fm.size();
    if ( fsize==0 ) return;
@@ -77,6 +83,59 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    SrVec fn(SrVec::i);
    int fmIndex = Fm.size() > 0? Fm[0] : -1;
    SrMaterial curmtl = fmsize>0 && fmIndex >= 0? M[Fm[0]]:shape->material();
+   glMaterial ( curmtl ); 
+
+#if GLES_RENDER  
+
+   std::string mtlName = "defaultMaterial";
+   if (model.mtlnames.size() > 0)
+   {
+      mtlName = model.mtlnames[0]; 
+   }
+   std::string texName = "none";
+   if (model.mtlTextureNameMap.find(mtlName) != model.mtlTextureNameMap.end())
+       texName = model.mtlTextureNameMap[mtlName];
+   SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,texName.c_str());   
+
+   if (tex && T.size() != 0) // apply textures
+   {
+      glEnable ( GL_ALPHA_TEST );
+      glEnable (GL_BLEND);
+      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      glAlphaFunc ( GL_GREATER, 0.3f ) ;
+   
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);   
+
+      glDisable(GL_COLOR_MATERIAL);	   
+      glActiveTexture(GL_TEXTURE0);
+      glEnable(GL_TEXTURE_2D);	 	
+      glBindTexture(GL_TEXTURE_2D,tex->getID());	   	      
+      //LOG("mtlName = %s, has texture = %s, texID = %d", mtlName.c_str(), texName.c_str(), tex->getID());
+#if !defined (__FLASHPLAYER__)
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+#else
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+#endif
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+      glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
+      
+      glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&T[0]);          
+   }
+   if (N.size() != 0) // has normal array
+   {
+      glEnableClientState(GL_NORMAL_ARRAY);
+      glNormalPointer(GL_FLOAT, 0, (GLfloat*)&N[0]);
+   }
+   glEnableClientState(GL_VERTEX_ARRAY);
+   glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&V[0]);  
+
+   glDrawElements(GL_TRIANGLES, F.size()*3, GL_UNSIGNED_SHORT, &F[0]);
+   
+   glDisableClientState(GL_VERTEX_ARRAY);
+   glDisableClientState(GL_NORMAL_ARRAY);
+   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+#else
    switch ( shape->render_mode() )
     { case srRenderModeDefault :
       case srRenderModeSmooth :
@@ -92,9 +151,8 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
       case srRenderModePoints :
            glPolygonMode ( GL_FRONT_AND_BACK, GL_POINT );
            break;
-    }
-   
-   glMaterial ( curmtl );    
+    }    
+
    if (model.mtlnames.size() == 0)
    {
 	   glBegin ( GL_TRIANGLES ); // some cards do require begin/end for each triangle!
@@ -236,12 +294,14 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 //     }
 
    //SR_TRACE1 ( "End Render Model." );
+#endif
  }
 
 //============================= render_lines ====================================
 
 void SrGlRenderFuncs::render_lines ( SrSnShapeBase* shape )
  {
+#if !GLES_RENDER
    //SR_TRACE1 ( "Render lines" );
 
    SrLines& l = ((SrSnLines*)shape)->shape();
@@ -297,12 +357,14 @@ void SrGlRenderFuncs::render_lines ( SrSnShapeBase* shape )
    }
 
    glLineWidth(1.0f);
+#endif
 }
 
 //============================= render_points ====================================
 
 void SrGlRenderFuncs::render_points ( SrSnShapeBase* shape )
 {
+#if !GLES_RENDER
 	//SR_TRACE1 ( "Render points" );
 
 	SrPoints& p = ((SrSnPoints*)shape)->shape();
@@ -344,12 +406,14 @@ void SrGlRenderFuncs::render_points ( SrSnShapeBase* shape )
 	}
 
 	glPointSize(1.0f);
+#endif
 }
 
 //=============================== render_box ====================================
 
 void SrGlRenderFuncs::render_box ( SrSnShapeBase* shape )
  {
+#if !GLES_RENDER
    //SR_TRACE1 ( "Render box" );
 
    SrBox& b = ((SrSnBox*)shape)->shape();
@@ -404,12 +468,14 @@ void SrGlRenderFuncs::render_box ( SrSnShapeBase* shape )
            glEnd ();
            break;
     }
+#endif
  }
 
 //=============================== render_sphere ====================================
 
 void SrGlRenderFuncs::render_sphere ( SrSnShapeBase* shape )
  {
+#if !GLES_RENDER
    //return;
    //SR_TRACE1 ( "Render sphere" );
 
@@ -551,12 +617,14 @@ void SrGlRenderFuncs::render_sphere ( SrSnShapeBase* shape )
       glEnd ();
     }
    glPopMatrix ();
+#endif
  }
 
 //=============================== render_cylinder ====================================
 
 void SrGlRenderFuncs::render_cylinder ( SrSnShapeBase* shape )
  {
+#if !GLES_RENDER
    //SR_TRACE1 ( "Render cylinder" );
    //return;
 
@@ -643,12 +711,14 @@ void SrGlRenderFuncs::render_cylinder ( SrSnShapeBase* shape )
       for ( i=1; i<vlist.size(); i+=2 ) glVertex ( vlist[i] );
       glEnd ();
     }
+#endif
  }
 
 //============================= render_polygon ====================================
 
 static void render_polygon ( SrPolygon& p, srRenderMode rm, float res )
  {
+#if !GLES_RENDER
    //SR_TRACE1 ( "Render polygon" );
 
    int i;
@@ -680,10 +750,12 @@ static void render_polygon ( SrPolygon& p, srRenderMode rm, float res )
       for ( i=0; i<p.size(); i++ ) glVertex ( p[i] );
       glEnd ();
     }
+#endif
  }
 
 void SrGlRenderFuncs::render_polygon ( SrSnShapeBase* shape )
  {
+#if !GLES_RENDER
    SrPolygon& p = ((SrSnPolygon*)shape)->shape();
    if ( p.size()==0 ) return;
 
@@ -694,12 +766,14 @@ void SrGlRenderFuncs::render_polygon ( SrSnShapeBase* shape )
    glLineWidth ( resolution ); // default is 1.0
 
    ::render_polygon ( p, shape->render_mode(), resolution );
+#endif
  }
 
 //============================= render_polygons ====================================
 
 void SrGlRenderFuncs::render_polygons ( SrSnShapeBase* shape )
  {
+#if !GLES_RENDER
    SrPolygons& p = ((SrSnPolygons*)shape)->shape();
 
    if ( p.size()==0 ) return;
@@ -712,6 +786,7 @@ void SrGlRenderFuncs::render_polygons ( SrSnShapeBase* shape )
    int i;
    for ( i=0; i<p.size(); i++ )
     ::render_polygon ( p[i], shape->render_mode(), resolution );
+#endif
  }
 
 //======================================= EOF ====================================

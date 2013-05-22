@@ -44,7 +44,6 @@
 #include <sb/SBDebuggerUtility.h>
 #include <sb/SBVHMsgManager.h>
 #include <sbm/sbm_audio.h>
-#include <sbm/GPU/SbmTexture.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -69,8 +68,11 @@
 #include <sbm/KinectProcessor.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <sr/sr_sn_group.h>
-#if !defined(SBM_IPHONE)
+#if !defined(SBM_IPHONE) && !defined(__ANDROID__)
 #include <sbm/GPU/SbmShader.h>
+#endif
+#if !defined(SBM_IPHONE)
+#include <sbm/GPU/SbmTexture.h>
 #endif
 #include <sbm/KinectProcessor.h>
 #include <sr/sr_sn_group.h>
@@ -392,8 +394,7 @@ void SBScene::cleanup()
 	
 	delete _vhmsgManager;	
 
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
-	// remove textures
+#if !defined(SBM_IPHONE)
 	SbmTextureManager::destroy_singleton();
 #endif
 

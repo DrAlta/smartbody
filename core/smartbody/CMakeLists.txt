@@ -14,7 +14,7 @@ include_directories(
 )
 else()
 include_directories(
-	/usr/include/python2.7
+	/usr/include/python2.6
 )
 endif()
 
