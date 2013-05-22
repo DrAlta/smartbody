@@ -48,6 +48,8 @@ BML::EventRequest::EventRequest( const std::string& unique_id, const std::string
 	
 void BML::EventRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
+	if (oldStyleMessage == "" && message == "")
+		return;
 	// for backwards compatibility, there are two possible behaviors:
 	// 1) using stroke and old-style commands sent via vhmsg, or
 	// 2) using start and python commands
