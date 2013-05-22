@@ -180,7 +180,7 @@ bool SrSaGlRender::shape_apply ( SrSnShapeBase* s )
    }
    //LOG("check ogl");
    // 2. Render only if needed
-   //if ( !s->visible() ) return true;
+   if ( !s->visible() ) return true;
 
   
    bool isSrModel = sr_compare(s->inst_class_name(),"model") == 0;
