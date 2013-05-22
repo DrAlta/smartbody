@@ -83,7 +83,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 			faceViewer->bottomGroup->add(slider);
 
 			// for visemes, add a viseme weight
-			if (jointName.find_first_of("au_") != 0)
+			if (jointName.find("au_") != 0)
 			{
 				std::string weightLabel = strstr.str() + " weight";
 				Fl_Value_Slider* weightSlider = new Fl_Value_Slider(330, curY, 100, 25, _strdup(weightLabel.c_str()));
