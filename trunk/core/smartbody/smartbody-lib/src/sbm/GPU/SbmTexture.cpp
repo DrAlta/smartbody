@@ -158,27 +158,32 @@ void SbmTexture::loadImage( const char* fileName )
 void SbmTexture::buildTexture()
 {	
 #if !defined(__native_client__)
-	//SbmShaderProgram::printOglError("SbmTexture.cpp:10");	
+	//SbmShaderProgram::printOglError("SbmTexture.cpp:10");		
 	GLuint iType = GL_TEXTURE_2D;
 	glEnable(GL_TEXTURE_2D);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glEnable(iType);	
 	glGenTextures(1,&texID);
 	glBindTexture(iType,texID);
-
+#if !defined(__ANDROID__)
 	if (!glIsTexture(texID))
 	{
 		SbmShaderProgram::printOglError("SbmTexture.cpp:100");
 	}
+#endif
 
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:50");	
-
+#ifdef __ANDROID__
+#define GL_CLAMP GL_CLAMP_TO_EDGE
+#define GL_RGB8 GL_RGB
+#define GL_RGBA8 GL_RGBA
+#endif
 	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-#if !defined (__FLASHPLAYER__)
+#if !defined (__FLASHPLAYER__) && !defined(__ANDROID__)
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 #else
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
@@ -197,7 +202,7 @@ void SbmTexture::buildTexture()
 		texture_format = GL_RGBA;				
 	}
 	//glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);	
-#if !defined (__FLASHPLAYER__)
+#if !defined (__FLASHPLAYER__) && !defined(__ANDROID__)
 	gluBuild2DMipmaps(iType, channels, width, height, texture_format, GL_UNSIGNED_BYTE, buffer );
 #else
 	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);
@@ -205,9 +210,10 @@ void SbmTexture::buildTexture()
 
 	//glGenerateMipmap(iType);
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:200");
-
+#if !defined(__ANDROID__)
 	GLclampf iPrority = 1.0;
 	glPrioritizeTextures(1,&texID,&iPrority);
+#endif
 	//TextureDebug();	
 	glBindTexture(iType,0);	
 	finishBuild = true;

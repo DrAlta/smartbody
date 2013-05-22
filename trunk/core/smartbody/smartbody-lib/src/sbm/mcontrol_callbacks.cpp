@@ -1919,7 +1919,7 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 int mcu_character_load_skinweights( const char* char_name, const char* skin_file, SmartBody::SBCommandManager* cmdMgr, float scaleFactor, const char* prefix )
 {
 
-#if defined(__ANDROID__) || defined(SBM_IPHONE) || defined(__native_client__)
+#if defined(SBM_IPHONE) || defined(__native_client__)
 	return ( CMD_SUCCESS );	
 #endif
 

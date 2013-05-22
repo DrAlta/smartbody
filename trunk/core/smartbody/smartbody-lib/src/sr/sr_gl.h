@@ -44,7 +44,7 @@
 #elif __native_client__
 #include <GLES2/gl2.h>
 #elif defined(__ANDROID__)
-#include <GLES2/gl2.h>
+#include <GLES/gl.h>
 # else
 # include <GL/gl.h>
 # include <GL/glu.h>
@@ -58,8 +58,13 @@ class SrLight;
 class SrOutput;
 class SrMaterial;
 
-//======================================= geometry ================================
+#ifdef __ANDROID__
+#define GLES_RENDER 1
+#define GLdouble GLfloat
+#endif
 
+#if !defined(GLES_RENDER)
+//======================================= geometry ================================
 SBAPI void glNormal ( const SrVec &v );
 
 SBAPI void glVertex ( const SrVec &v );
@@ -72,9 +77,10 @@ SBAPI void glVertex ( float x, float y );
 SBAPI void glDrawBox ( const SrVec& a, const SrVec& b ); //!< Send quads with normals forming the box
 
 //====================================== appearance ================================
+SBAPI void glColor ( const SrColor& c );
+#endif
 
 SBAPI void glClearColor ( const SrColor& c );
-SBAPI void glColor ( const SrColor& c );
 SBAPI void glLight ( int id, const SrLight& l, bool bind_pos = true ); //!< id = x E {0,...,7}, from GL_LIGHTx
 SBAPI void glLightPos( int id, const SrLight& l );
 SBAPI void glMaterial ( const SrMaterial &m ); //!< Sets material for GL_FRONT_AND_BACK

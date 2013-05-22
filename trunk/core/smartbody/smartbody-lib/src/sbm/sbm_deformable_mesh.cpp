@@ -616,6 +616,7 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 		srSnModelDynamic->shape().name = srSnModel->shape().name;	
 		dynamicMesh.push_back(srSnModelDynamic);
 		srSnModelDynamic->ref();
+		LOG("rootGroup add mesh %d, vtx = %d, face = %d",i, dynamicMesh[i]->shape().V.size(), dynamicMesh[i]->shape().F.size());
 		SmartBody::SBScene::getScene()->getRootGroup()->add(dynamicMesh[i]);
 	}	
 	updateJointList();

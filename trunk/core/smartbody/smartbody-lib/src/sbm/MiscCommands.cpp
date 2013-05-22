@@ -1092,12 +1092,13 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 				}
 			}
 		}	
-
+		LOG("set dynamic mesh for character, dynamicmesh = %d, skinweight = %d", character->dMesh_p->dMeshDynamic_p.size() > 0, character->dMesh_p->skinWeights.size());
 		if (character->dMesh_p->dMeshDynamic_p.size() > 0 && character->dMesh_p->skinWeights.size() > 0) // successfully loaded all skin mesh data
 		{
-			// insert mesh map
+			// insert mesh map	
 			character->dMesh_p->meshName = meshName;
 			scene->getAssetManager()->addDeformableMesh(meshName, character->dMesh_p);
+			LOG("character %s, set deformable mesh",character->getName().c_str());
 			character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
 
 		}

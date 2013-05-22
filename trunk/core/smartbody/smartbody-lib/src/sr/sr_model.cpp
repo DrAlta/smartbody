@@ -698,8 +698,13 @@ static void insertv ( SrTree<VertexNode>& t, SrArray<int>& vi, int v, int f )
 int SrModel::common_vertices_of_faces ( int i1, int i2 )
  {
    int i, j, c=0;
+#ifdef __ANDROID__
+   unsigned short *f1 = &(F[i1].a);
+   unsigned short *f2 = &(F[i2].a);
+#else
    int *f1 = &(F[i1].a);
    int *f2 = &(F[i2].a);
+#endif
    for ( i=0; i<3; i++ )
     { for ( j=0; j<3; j++ )
        { if ( f1[i]==f2[j] ) c++; //sr_out<<i<<","<<j<<srspc;

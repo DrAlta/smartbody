@@ -29,6 +29,8 @@
        #define APIENTRY
 #elif defined(__FLASHPLAYER__)
 	#include <GL/gl.h>
+#elif defined(__ANDROID__)
+	#include <GLES/gl.h>
 #else
 	#include <GL/gl.h>
 	#include <GL/glx.h>
@@ -82,8 +84,16 @@ int query_DXT_capability( void );
 #define SOIL_RGBA_S3TC_DXT1		0x83F1
 #define SOIL_RGBA_S3TC_DXT3		0x83F2
 #define SOIL_RGBA_S3TC_DXT5		0x83F3
-typedef void (APIENTRY * P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid * data);
+
+#ifdef __ANDROID__
+#define GL_CLAMP GL_CLAMP_TO_EDGE;
+#endif
+
+#if !defined(__ANDROID__)
+typedef void (APIENTRY* P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid * data);
 P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC soilGlCompressedTexImage2D = NULL;
+#endif
+
 unsigned int SOIL_direct_load_DDS(
 		const char *filename,
 		unsigned int reuse_texture_ID,
@@ -981,6 +991,7 @@ void check_for_GL_errors( const char *calling_location )
 }
 #endif
 
+
 unsigned int
 	SOIL_internal_create_OGL_texture
 	(
@@ -993,9 +1004,11 @@ unsigned int
 		unsigned int texture_check_size_enum
 	)
 {
+
 	/*	variables	*/
 	unsigned char* img;
 	unsigned int tex_id;
+#if !defined(__ANDROID__)
 	unsigned int internal_texture_format = 0, original_texture_format = 0;
 	int DXT_mode = SOIL_CAPABILITY_UNKNOWN;
 	int max_supported_size;
@@ -1347,7 +1360,9 @@ unsigned int
 		} else
 		{
 			/*	unsigned int clamp_mode = SOIL_CLAMP_TO_EDGE;	*/
+
 			unsigned int clamp_mode = GL_CLAMP;
+
 			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_S, clamp_mode );
 			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_T, clamp_mode );
 			if( opengl_texture_type == SOIL_TEXTURE_CUBE_MAP )
@@ -1365,8 +1380,10 @@ unsigned int
 		result_string_pointer = "Failed to generate an OpenGL texture name; missing OpenGL context?";
 	}
 	SOIL_free_image_data( img );
+#endif
 	return tex_id;
 }
+
 
 int
 	SOIL_save_screenshot
@@ -1742,10 +1759,12 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 					S3TC_type, GL_UNSIGNED_BYTE, DDS_data );
 			} else
 			{
+#if !defined(__ANDROID__)
 				soilGlCompressedTexImage2D(
 					cf_target, 0,
 					S3TC_type, width, height, 0,
 					DDS_main_size, DDS_data );
+#endif
 			}
 			/*	upload the mipmaps, if we have them	*/
 			for( i = 1; i <= mipmaps; ++i )
@@ -1771,11 +1790,13 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 						S3TC_type, GL_UNSIGNED_BYTE, &DDS_data[byte_offset] );
 				} else
 				{
+#if !defined(__ANDROID__)
 					mip_size = ((w+3)/4)*((h+3)/4)*block_size;
 					soilGlCompressedTexImage2D(
 						cf_target, i,
 						S3TC_type, w, h, 0,
 						mip_size, &DDS_data[byte_offset] );
+#endif
 				}
 				/*	and move to the next mipmap	*/
 				byte_offset += mip_size;
@@ -1967,7 +1988,11 @@ int query_DXT_capability( void )
 		} else
 		{
 			/*	and find the address of the extension function	*/
+			#if !defined(__ANDROID__)
 			P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC ext_addr = NULL;
+			#else
+			void* ext_addr = NULL;
+			#endif
 			#ifdef WIN32
 				ext_addr = (P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC)
 						wglGetProcAddress
@@ -2000,7 +2025,7 @@ int query_DXT_capability( void )
 				CFRelease( bundle );
 */
 				ext_addr = NULL;
-			#elif defined(__FLASHPLAYER__)
+			#elif defined(__FLASHPLAYER__) || defined(__ANDROID__)			
 			#else
 				ext_addr = (P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC)
 						glXGetProcAddressARB
@@ -2021,8 +2046,10 @@ int query_DXT_capability( void )
 			} else
 			{
 				/*	all's well!	*/
+			#if !defined(__ANDROID__)
 				soilGlCompressedTexImage2D = ext_addr;
 				has_DXT_capability = SOIL_CAPABILITY_PRESENT;
+			#endif
 			}
 		}
 	}
