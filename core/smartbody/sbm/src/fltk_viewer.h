@@ -327,7 +327,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
     virtual int handle_examiner_manipulation ( const SrEvent &e );
     virtual int handle_default_camera_manipulation ( const SrEvent &e, SrCamera* camera );
     virtual int handle_freelook_camera_manipulation ( const SrEvent &e, SrCamera* camera  );
-    virtual void translate_camera( SrCamera* camera, SrVec& displacement);
+    virtual void translate_camera( SrCamera* camera, const SrVec& displacement);
     virtual int handle_followrenderer_camera_manipulation ( const SrEvent &e, SrCamera* camera );
 
     /*! Applies an event action to the scene */
