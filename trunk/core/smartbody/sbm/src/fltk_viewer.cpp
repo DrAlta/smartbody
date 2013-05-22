@@ -2675,7 +2675,7 @@ int FltkViewer::handle_freelook_camera_manipulation ( const SrEvent &e, SrCamera
    return 1;
 }
 
-void FltkViewer::translate_camera( SrCamera* camera, SrVec& displacement)
+void FltkViewer::translate_camera( SrCamera* camera, const SrVec& displacement)
 {
    // need to move both the eye (camera pos) and the camera's look at position (center)
    SrVec oldEye = camera->getEye();
