@@ -168,7 +168,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 	   glEnd ();
    }
    else
-   {
+   {	   
 	   for (int i=0;i<model.mtlnames.size();i++)
 	   {
 		   std::string mtlName = model.mtlnames[i];
@@ -242,7 +242,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 				   {
 					   printf("(%s): ft %d %d %d is bigger than T size %d\n", mtlName.c_str(), ft_a, ft_b, ft_c, T.size());
 					   continue;
-				   }
+				   }				   
 
 				   glNormal ( N[Fn[f].a] ); 
 				   //glColor3f(T[Ft[f].a].x, T[Ft[f].a].y, 0.f);
