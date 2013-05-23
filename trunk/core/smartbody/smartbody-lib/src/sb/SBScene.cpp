@@ -180,6 +180,7 @@ void SBScene::initialize()
 	createIntAttribute("queuedCommandsIndex",1,true,"",560,false,false,false,"Unique identifier when executing sequence commands.");
 	createIntAttribute("bmlIndex",1,true,"",560,false,false,false,"Unique identifier when executing BML commands.");
 	createBoolAttribute("enableConsoleLogging",false,true,"",70,false,false,false,"Use SmartBody's internal audio player.");
+	createBoolAttribute("enableFaceShader",false,true,"",70,false,false,false,"Enable the face shader for higher quality rendering.");
 	
 	vhcl::Log::g_log.RemoveAllListeners();
 	ForwardLogListener* forwardListener = new ForwardLogListener();

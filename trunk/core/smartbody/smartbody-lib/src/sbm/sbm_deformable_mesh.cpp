@@ -124,8 +124,8 @@ void DeformableMesh::update()
 					if (i >= (int) skinWeight->numInfJoints.size())
 						continue;
 					int numOfInfJoints = skinWeight->numInfJoints[i];
-					if (numOfInfJoints > maxJoint)
-						maxJoint = numOfInfJoints;
+					//if (numOfInfJoints > maxJoint)
+					//	maxJoint = numOfInfJoints;
 					SrVec& skinLocalVec = dMeshStatic->shape().V[i];					
 					SrVec finalVec;
 					//printf("Vtx bind pose = \n");
@@ -195,7 +195,7 @@ bool DeformableMesh::buildVertexBuffer()
 	std::vector<std::set<IntPair> > vtxNormalIdxMap;
 	std::vector<std::set<int> > vtxMaterialIdxMap;
 	std::map<IntPair,int> ntNewVtxIdxMap;	
-	std::map<int,std::vector<int> > vtxNewVtxIdxMap;
+	
 	std::map<int,std::vector<int> > meshSubsetMap;	
 
 	SrColor colorArray[6] = { SrColor::blue, SrColor::red, SrColor::green, SrColor::magenta, SrColor::gray, SrColor::yellow};
@@ -277,6 +277,7 @@ bool DeformableMesh::buildVertexBuffer()
 	SrModel::Face defaultIdx;
 	defaultIdx.a = defaultIdx.b = defaultIdx.c = -1;
 	boneJointIdxMap.clear();
+	
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
 		SkinWeight* skinWeight = skinWeights[skinCounter];		
@@ -391,7 +392,7 @@ bool DeformableMesh::buildVertexBuffer()
 	iFace = 0;
 	iFaceIdxOffset = 0;
 	iNormalIdxOffset = 0;
-	iTextureIdxOffset = 0;
+	iTextureIdxOffset = 0;	
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
 		SkinWeight* skinWeight = skinWeights[skinCounter];		
@@ -555,7 +556,9 @@ bool DeformableMesh::buildVertexBuffer()
 		mesh->triBuf.resize(faceIdxList.size());		
 		for (unsigned int k=0;k<faceIdxList.size();k++)
 		{
-			mesh->triBuf[k] = triBuf[faceIdxList[k]];
+			mesh->triBuf[k][0] = triBuf[faceIdxList[k]][0];
+			mesh->triBuf[k][1] = triBuf[faceIdxList[k]][1];
+			mesh->triBuf[k][2] = triBuf[faceIdxList[k]][2];
 		}
 
 		subMeshList.push_back(mesh);
@@ -605,7 +608,8 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 {
 	if (!mesh) return;
 	_mesh = mesh;	
-	cleanUp(); // remove all previous dynamic mes
+	cleanUp(); // remove all previous dynamic mesh
+	_mesh->buildVertexBuffer(); // make sure the deformable mesh has vertex buffer
 	for (unsigned int i=0;i<_mesh->dMeshStatic_p.size();i++)
 	{
 		SrSnModel* srSnModel = _mesh->dMeshStatic_p[i];
@@ -616,9 +620,10 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 		srSnModelDynamic->shape().name = srSnModel->shape().name;	
 		dynamicMesh.push_back(srSnModelDynamic);
 		srSnModelDynamic->ref();
-		LOG("rootGroup add mesh %d, vtx = %d, face = %d",i, dynamicMesh[i]->shape().V.size(), dynamicMesh[i]->shape().F.size());
-		SmartBody::SBScene::getScene()->getRootGroup()->add(dynamicMesh[i]);
+		//LOG("rootGroup add mesh %d, vtx = %d, face = %d",i, dynamicMesh[i]->shape().V.size(), dynamicMesh[i]->shape().F.size());
+		//SmartBody::SBScene::getScene()->getRootGroup()->add(dynamicMesh[i]);
 	}	
+	_deformPosBuf.resize(_mesh->posBuf.size()); // initialized deformation posBuffer
 	updateJointList();
 }
 
@@ -660,6 +665,8 @@ void DeformableMeshInstance::update()
 	int maxJoint = -1;
 	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
 	if (skinWeights.size() != _boneJointList.size()) updateJointList();
+	std::map<int,std::vector<int> >& vtxNewVtxIdxMap = _mesh->vtxNewVtxIdxMap;
+	int iVtx = 0;
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
 		SkinWeight* skinWeight = skinWeights[skinCounter];
@@ -700,7 +707,18 @@ void DeformableMeshInstance::update()
 						globalCounter ++;
 						finalVec = finalVec + (float(jointWeight) * (skinLocalVec * skinWeight->bindShapeMat * invBMat  * gMat));						
 					}
-					dMeshDynamic->shape().V[i] = finalVec;
+					_deformPosBuf[iVtx] = finalVec;
+					if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
+					{
+						std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
+						// copy related vtx components 
+						for (unsigned int k=0;k<idxMap.size();k++)
+						{
+							_deformPosBuf[idxMap[k]] = finalVec;							
+						}
+					}					
+					iVtx++;
+					//dMeshDynamic->shape().V[i] = finalVec;
 				}
 				dMeshDynamic->changed(true);	
 			}

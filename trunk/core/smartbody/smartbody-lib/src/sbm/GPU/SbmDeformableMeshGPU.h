@@ -46,7 +46,7 @@ public:
 	~SbmDeformableMeshGPU(void);	
 public:
 	virtual void update();
-	bool buildGPUVertexBuffer();	
+	virtual bool buildVertexBuffer();	
 	void skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOData* tranTBO);
 	static void initShaderProgram();	
 protected:

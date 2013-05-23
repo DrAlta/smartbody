@@ -5,6 +5,7 @@
 #include <string>
 #include <set>
 #include <algorithm>
+#include <sb/SBScene.h>
 
 typedef std::pair<int,float> IntFloatPair;
 
@@ -18,6 +19,7 @@ const char* ShaderDir = "../../smartbody-lib/src/sbm/GPU/shaderFiles/";
 const char* VSName = "vs_skin_pos.vert";
 const char* FSName = "fs_skin_render.frag";
 const std::string shaderName = "Skin_Basic";
+const std::string shaderFaceName = "Skin_Face";
 const std::string shadowShaderName = "Skin_Shadow";
 bool SbmDeformableMeshGPU::initShader = false;
 bool SbmDeformableMeshGPU::useGPUDeformableMesh = false;
@@ -254,6 +256,96 @@ void main (void)\n\
 	//gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
 }";
 
+std::string shaderFSFace =
+	"const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));\n\
+	const vec3 sssColor = vec3(0.6,0.6,0.6);\n\
+	const float aspExp = 5.0;\n\
+	const float aspIntensity = 1.0;\n\
+	uniform sampler2D diffuseTexture;\n\
+	uniform sampler2D normalTexture;\n\
+	uniform sampler2D specularTexture;\n\
+	uniform sampler2D tex;\n\
+	uniform int  useTexture;\n\
+	uniform int  useNormalMap;\n\
+	uniform int  useSpecularMap;\n\
+	uniform int  useShadowMap;\n\
+	varying vec3 normal,lightDir[4],halfVector[4];\n\
+	varying vec3 tv,bv;\n\
+	varying vec4 vPos;\n\
+	uniform vec4 diffuseMaterial;\n\
+	uniform vec4 specularMaterial;\n\
+	uniform float  shineness;\n\
+	//uniform vec3 specularColors;\n\
+	float shadowCoef()\n\
+	{\n\
+	int index = 0;\n\
+	vec4 shadow_coord = vPos/vPos.w;\n\
+	shadow_coord.z += 0.000005;\n\
+	float shadow_d = texture2D(tex, shadow_coord.st).x;\n\
+	float diff = 1.0;\n\
+	diff = (shadow_d - shadow_coord.z);\n\
+	return clamp( diff*850.0 + 1.0, 0.0, 1.0);//(shadow_d-0.9)*10;//clamp( diff*250.0 + 1.0, 0.0, 1.0);\n\
+	}\n\
+	vec3 diffuseReflection(vec3 normalVec, vec3 lightVec, vec3 viewVec, vec3 diffuseColor)\n\
+	{\n\
+		float dotValue = dot(normalVec, lightVec);\n\
+		vec3 dotVec = vec3(dotValue,dotValue,dotValue);\n\
+		return pow(clamp((1.0-dotVec)*sssColor + dotVec,0.0, 1.0), sssColor*4.0 + 1.0) * diffuseColor;\n\
+	}\n\
+	vec3 specularReflection(vec3 normalVec, vec3 lightVec, vec3 viewVec, vec3 halfVec, vec3 specularColor)\n\
+	{\n\
+	float asperity = 1.125 * max(0.0,dot(normalVec,halfVec));\n\
+	float asperityStrength = pow(min(1.0,1.0 - dot(normalVec,viewVec)),aspExp);\n\
+	float np = pow(2,shineness);\n\
+	float npNorm = np*0.125 + 1.0;\n\
+	float fresnel = pow(min(1, 1- dot(normalVec,viewVec)), 5)*0.92f + 0.08f;\n\
+	float blinnPhong = npNorm*pow(max(0.0,dot(normalVec,halfVec)), np);\n\
+	float blinnPhongStrength = min(fresnel, 1-asperityStrength);\n\
+	return specularColor*(blinnPhong * blinnPhongStrength + asperity*asperityStrength)*max(0.0,dot(normalVec,lightVec));\n\
+	}\n\
+	void main (void)\n\
+	{  \n\
+	vec3 n,halfV;\n\
+	float NdotL,NdotHV;\n\
+	float att;\n\
+	vec4 color = vec4(ambient,1.0);	\n\
+	vec3 newtv = normalize(tv - bv*dot(tv,bv));\n\
+	vec3 newbv = normalize(bv);\n\
+	vec3 newn  = normalize(normal);//normalize(cross(tv,bv));\n\
+	vec4 texColor = texture2D(diffuseTexture,gl_TexCoord[0].st);\n\
+	vec3 normalColor = normalize(texture2D(normalTexture,gl_TexCoord[0].st).xyz* 2.0 - 1.0);\n\
+	vec3 normalMapN = normalize(-newtv*normalColor.x-newbv*normalColor.y+newn*normalColor.z); \n\
+	vec3 specularColor = texture2D(specularTexture, gl_TexCoord[0].st).xyz;\n\
+	vec3 specMat = specularMaterial.rgb;\n\
+	if (useTexture == 0) \n\
+	texColor = diffuseMaterial;//vec4(matColor,1.0);\n\
+	color.a = texColor.a*diffuseMaterial.a;\n\
+	n = normalize(normal);\n\
+	if (useNormalMap == 1 && dot(normalMapN,n) > 0.0)\n\
+	{\n\
+	n = normalMapN;\n\
+	}\n\
+	if (useSpecularMap == 1)\n\
+	specMat = specularColor;\n\
+	float shadowWeight = 1.0;\n\
+	if (useShadowMap == 1)\n\
+	{\n\
+	shadowWeight = shadowCoef();\n\
+	}\n\
+	for (int i=0;i<2;i++)\n\
+	{\n\
+	att = 1.0;//1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
+	halfV = normalize(halfVector[i]);\n\
+	vec3 viewDir = halfV*dot(halfV,lightDir[i])*2.0f - lightDir[i];\n\
+	color += vec4(diffuseReflection(n,lightDir[i],viewDir,texColor.rgb), 0.0);\n\
+	color += vec4(specularReflection(n,lightDir[i],viewDir, halfV,specMat.rgb), 0.0);\n\
+	}\n\
+	const float shadow_ambient = 1.0;\n\
+	gl_FragColor = vec4(color.rgb*shadowWeight*shadow_ambient,color.a);//color*shadow_ambient*shadowWeight;//vec4(color.rgb*shadowWeight,color.a);//color*shadowWeight;\n\
+	//gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
+	}";
+
+
 /*
 std::string shaderFSSimple =
 	"const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));\n\
@@ -371,6 +463,9 @@ SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOData* tranTBO)
 {
 	std::string activeShader = shaderName;//SbmDeformableMeshGPU::useShadowPass ? shadowShaderName : shaderName;
+	if (SmartBody::SBScene::getScene()->getBoolAttribute("enableFaceShader"))
+		activeShader = shaderFaceName;
+	//std::string activeShader = shaderFaceName;
 	GLuint program = SbmShaderManager::singleton().getShader(activeShader)->getShaderProgram();		
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );	
 
@@ -609,11 +704,13 @@ void SbmDeformableMeshGPU::initShaderProgram()
 	{
 		SbmShaderManager::singleton().addShader(shadowShaderName.c_str(),shaderVS.c_str(),shaderBasicFS.c_str(),false);
 		SbmShaderManager::singleton().addShader(shaderName.c_str(),shaderVS.c_str(),shaderFS.c_str(),false);
+		SbmShaderManager::singleton().addShader(shaderFaceName.c_str(),shaderVS.c_str(),shaderFSFace.c_str(),false);
 	}
 	else if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_2_0)
 	{
-		SbmShaderManager::singleton().addShader(shadowShaderName.c_str(),shaderVS_2.c_str(),shaderBasicFS.c_str(),false);
+		SbmShaderManager::singleton().addShader(shadowShaderName.c_str(),shaderVS_2.c_str(),shaderBasicFS.c_str(),false);		
 		SbmShaderManager::singleton().addShader(shaderName.c_str(),shaderVS_2.c_str(),shaderFS.c_str(),false);
+		SbmShaderManager::singleton().addShader(shaderFaceName.c_str(),shaderVS_2.c_str(),shaderFSFace.c_str(),false);
 	}
 	else
 	{
@@ -1012,7 +1109,7 @@ void SbmDeformableMeshGPU::update()
 	if (!useGPU && hasGLContext && program && program->finishBuild())
 	{
 		// initialize 
-		useGPU = buildGPUVertexBuffer();
+		useGPU = buildVertexBuffer();
 	}
 
 	if (!useGPU || !hasGLContext)
@@ -1056,12 +1153,11 @@ void SbmDeformableMeshGPU::updateTransformBuffer()
 
 
 
-bool SbmDeformableMeshGPU::buildGPUVertexBuffer()
+bool SbmDeformableMeshGPU::buildVertexBuffer()
 {
 	if (skinWeights.size() == 0 )
 		return false;
 	if (initVertexBuffer) return true;
-
 	DeformableMesh::buildVertexBuffer();
 	GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
 	VBOPos = new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuf);		
@@ -1171,7 +1267,7 @@ void SbmDeformableMeshGPUInstance::update()
 
 	if (!SbmDeformableMeshGPU::useGPUDeformableMesh)
 	{
-		DeformableMeshInstance::update();
+		DeformableMeshInstance::update();		
 		return;
 	}	
 
@@ -1209,7 +1305,7 @@ void SbmDeformableMeshGPUInstance::update()
 bool SbmDeformableMeshGPUInstance::initBuffer()
 {	
 	SbmDeformableMeshGPU* gpuMesh = dynamic_cast<SbmDeformableMeshGPU*>(_mesh);
-	bool hasVertexBuffer = gpuMesh->buildGPUVertexBuffer();	
+	bool hasVertexBuffer = gpuMesh->buildVertexBuffer();	
 	if (!hasVertexBuffer) return false;
 	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_3_0)
 	{

@@ -115,7 +115,7 @@ void SkScene::init ( SkSkeleton* s, float scale )
    g->separator ( true );
   
    float height = s->getCurrentHeight();
-   scaleFactor =  height / 175.0f;
+   scaleFactor =  height / 175.0f * 1.0f;
    if (scaleFactor == 0.0f)
 	   scaleFactor = scale;
    axis = new SrSnLines; // shared axis
@@ -141,7 +141,7 @@ void SkScene::init ( SkSkeleton* s, float scale )
 	  SrSnGroup* group_p = _jgroup[i];
       group_p->add ( gaxis, AxisPos );
 
-	  sphere = createSphere(scaleFactor);	 
+	  sphere = createSphere(scaleFactor*1.0f);	 
 	  group_p->add ( new SrSnMatrix, MatrixPos );
 	  group_p->add ( sphere, SpherePos );
 	  
@@ -173,7 +173,7 @@ void SkScene::init ( SkSkeleton* s, float scale )
 	  {
 		 SrSnSphere* sphere = new SrSnSphere;
 		 sphere->color(SrColor::white);
-		 sphere->shape().radius = scaleFactor * _cradius * _sfactor * 0.75f;
+		 sphere->shape().radius = scaleFactor * _cradius * _sfactor ;
 		 sphere->visible ( true );
 //		 sphere->ref();
          g->add ( sphere ); 	
