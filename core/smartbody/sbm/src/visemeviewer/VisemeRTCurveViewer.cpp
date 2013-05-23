@@ -53,6 +53,7 @@ void VisemeRTCurveViewer::draw()
 	glOrtho((-0.1 + xShift) * zoom, (xSpan + 0.1 + xShift) * zoom, -1.1, 1.1, -1, 1);
 	drawAxisNGrid();
 	drawCurves();
+	drawPhonemeLines();
 }
 
 
@@ -130,7 +131,7 @@ int VisemeRTCurveViewer::handle(int event)
 			{
 				float deltaX = (float)Fl::event_x() - prevMouseCoord.x;
 				float deltaY = (float)Fl::event_y() - prevMouseCoord.y;
-				xShift -= deltaX * 0.002f;
+				xShift -= deltaX * 0.01f / zoom;
 			}
 			prevMouseCoord.x = (float)Fl::event_x();
 			prevMouseCoord.y = (float)Fl::event_y();
@@ -207,9 +208,10 @@ float VisemeRTCurveViewer::getMaxX()
 	maxGridX = -1.0f;
 	if (_data)
 	{
-		if (_data->_phonemeTimes.size() > 0)
+		for (size_t i = 0; i < _data->_phonemeTimes.size(); ++i)
 		{
-			maxGridX = (float)_data->_phonemeTimes[_data->_phonemeTimes.size() - 1];
+			if (maxGridX <= (float)_data->_phonemeTimes[i])
+				maxGridX = (float)_data->_phonemeTimes[i];
 		}
 	}
 	float maxX = maxGridX > xSpan * zoom ? maxGridX : xSpan * zoom;
@@ -322,6 +324,17 @@ void VisemeRTCurveViewer::drawPhonemeNames()
 		prevSizeX = size.x + prevX;
 	}
 	glDisable(GL_TEXTURE_2D);
+#endif
+}
+
+void VisemeRTCurveViewer::drawPhonemeLines()
+{
+#ifdef WIN32
+	if (_data == NULL)
+		return;
+
+	if (_data->_phonemeNames.size() == 0)
+		return;
 
 	glDisable(GL_LIGHTING);
 	glColor3f(0.8f, 0.8f, 0.8f);

@@ -25,6 +25,7 @@ public:
 	void resetCamera();
 	void drawLabel();
 	void drawPhonemeNames();
+	void drawPhonemeLines();
 	void drawAxisNGrid();
 	void drawCurves();
 	void setZoomRes(float val);
