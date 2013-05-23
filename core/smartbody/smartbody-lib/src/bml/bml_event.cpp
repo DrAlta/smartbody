@@ -100,15 +100,22 @@ BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& un
 	std::string spNameNew = xml_parse_string( BMLDefs::ATTR_START, elem, ""); // if 'start' is used, assume Python style internally only
 	std::string localId  = xml_parse_string( BMLDefs::ATTR_ID, elem, "");
 
-	 const XMLCh* messageData = elem->getTextContent();
-	 
-	 std::string textMsg;
-	 xml_translate(&textMsg, messageData); 
-	 if (textMsg.size() > 0)
-	 {
-		 // if there is text content, this takes priority over the message attribute
-		 msg = xml_utils::asciiString(messageData);
-	 }
+	DOMNode* child = elem->getFirstChild();
+	while (child)
+	{
+		DOMNode::NodeType type = child->getNodeType();
+		if (type == DOMNode::TEXT_NODE)
+		{
+			child->normalize();
+			DOMText* textNode = dynamic_cast<DOMText*>(child);
+			const XMLCh* messageData = textNode->getNodeValue();
+			msg = xml_utils::xml_translate_string(messageData);
+
+			break;
+		}
+	
+		child = child->getNextSibling();
+	}
 
 	if (msg != "" )
 	{	
