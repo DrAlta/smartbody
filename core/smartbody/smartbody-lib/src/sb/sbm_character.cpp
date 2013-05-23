@@ -1770,7 +1770,7 @@ void SbmCharacter::schedule_viseme_curve(
 						//if (i == num_keys - 1) spline.insert(t + .001, w);
 					}
 					spline.apply_extensions();
-					#define LINEAR_SPLINE_SEGS_PER_SEC 200.0
+					#define LINEAR_SPLINE_SEGS_PER_SEC 30.0
 					if (isDiphoneSplineCurve())
 						ct_p->insert_spline( spline, LINEAR_SPLINE_SEGS_PER_SEC );
 				}
