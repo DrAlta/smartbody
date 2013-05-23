@@ -38,7 +38,11 @@ public:
 	std::string normalMapName;
 	std::string specularMapName;
 	int numTri;
+#ifdef __ANDROID__
+	std::vector<SrModel::Face> triBuf;
+#else
 	std::vector<SrVec3i> triBuf;
+#endif
 };
 
 class DeformableMeshInstance;
@@ -71,7 +75,8 @@ public:
 	std::vector<SrVec4>         boneWeightBuf[2];
 	std::map<std::string,int>   boneJointIdxMap;
 	std::vector<SkJoint*>		boneJointList;	
-	std::vector<SrMat>          bindPoseMatList;
+	std::vector<SrMat>          bindPoseMatList;	
+	std::map<int,std::vector<int> > vtxNewVtxIdxMap;
 
 public:
 	DeformableMesh();
@@ -94,16 +99,18 @@ protected:
 	SkSkeleton*			  _skeleton;
 	bool				  _updateMesh;
 	std::vector<SkJointList> _boneJointList;
+
+public:
+	std::vector<SrVec> _deformPosBuf;		
 public:
 	DeformableMeshInstance();
 	SBAPI virtual ~DeformableMeshInstance();
-
 	virtual void setDeformableMesh(DeformableMesh* mesh);
-
 	void updateJointList();
 	virtual void setSkeleton(SkSkeleton* skel);	
 	virtual void setVisibility(int deformableMesh);
 	virtual void update();
+	DeformableMesh* getDeformableMesh() { return _mesh; }
 
 protected:
 	void cleanUp();

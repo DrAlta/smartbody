@@ -36,6 +36,7 @@
 # include <sr/sr_cylinder.h>
 # include <sr/sr_polygons.h>
 #include <sbm/GPU/SbmTexture.h>
+#include <sbm/sbm_deformable_mesh.h>
 
 # include <sr/sr_sn.h>
 # include <sr/sr_sn_shape.h>
@@ -46,6 +47,46 @@
 
 
 //=============================== render_model ====================================
+
+void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
+{
+	DeformableMesh* mesh = shape->getDeformableMesh();
+	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);	
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);      	
+	glEnable(GL_TEXTURE_2D);
+	glEnable ( GL_ALPHA_TEST );
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	for (unsigned int i=0;i<subMeshList.size();i++)
+	{	
+		SbmSubMesh* mesh = subMeshList[i];	
+		glMaterial(mesh->material);
+		//LOG("mat color = %f %f %f\n",color[0],color[1],color[2]);
+		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,mesh->texName.c_str());
+		if (tex)
+		{
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D,tex->getID());			
+		}
+#if GLES_RENDER
+		glDrawElements(GL_TRIANGLES, mesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &mesh->triBuf[0]);
+#else
+		glDrawElements(GL_TRIANGLES, mesh->triBuf.size()*3, GL_UNSIGNED_INT, &mesh->triBuf[0]);
+#endif
+	}	
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
+}
 
 void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
  {	
@@ -509,7 +550,7 @@ void SrGlRenderFuncs::render_sphere ( SrSnShapeBase* shape )
    float botWidth, topWidth, yTop, yBot, tmp;
    SrVec vec;
 
-   tmp = shape->resolution()*2.0f;
+   tmp = shape->resolution()*4.0f;
    int depth = SR_ROUND(tmp);
    if ( depth<1 ) depth=1;
    SrArray<SrPnt> array(0,depth*2);
@@ -656,7 +697,7 @@ void SrGlRenderFuncs::render_cylinder ( SrSnShapeBase* shape )
 
    //int nfaces = int(shape->resolution()*10.0f);
    //if ( nfaces<3 ) nfaces = 3;
-   int nfaces = 3;
+   int nfaces = 12;
    
    float dang = sr2pi/float(nfaces);
    SrVec va = cyl.b-cyl.a; 

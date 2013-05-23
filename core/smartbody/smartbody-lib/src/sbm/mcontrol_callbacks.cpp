@@ -4750,12 +4750,12 @@ int stopheapprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 // currently position is for global and rotation is for local
 int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	
+	//LOG("in data receiver function");
 	std::string operation = args.read_token();
 	if (operation == "echo")
 		LOG("%s", args.read_remainder_raw());
 	if (operation == "skeleton")
-	{
+	{		
 		std::string skelName = args.read_token();
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		const std::vector<std::string>& characterNames = scene->getCharacterNames();
