@@ -678,7 +678,7 @@ int main( int argc, char **argv )	{
 
 	FLTKListener fltkListener;
 
-	
+	Fl::scheme("gtk+");
 	
 	
 
