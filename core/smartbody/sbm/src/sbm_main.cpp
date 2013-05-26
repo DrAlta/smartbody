@@ -678,10 +678,12 @@ int main( int argc, char **argv )	{
 
 	FLTKListener fltkListener;
 
+#ifdef __APPLE__
+	Fl::scheme("plastic");
+#else
 	Fl::scheme("gtk+");
+#endif
 	
-	
-
 	std::string python_lib_path = "../../../../core/smartbody/Python26/Lib";
 	std::string festivalLibDir = "../../../../lib/festival/festival/lib/";
 	std::string festivalCacheDir = "../../../../data/cache/festival/";
