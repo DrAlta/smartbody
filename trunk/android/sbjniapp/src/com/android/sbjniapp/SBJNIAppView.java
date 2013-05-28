@@ -85,7 +85,7 @@ class SBJNIAppView extends GLSurfaceView {
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-        	SBJNIAppLib.init(width, height);
+        	SBJNIAppLib.init(width, height);        	
         }
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
