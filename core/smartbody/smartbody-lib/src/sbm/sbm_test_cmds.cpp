@@ -363,9 +363,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			filename.erase( 0, 1 );
 			filename.erase( filename.length()-1 );
 		}
-		// find and load the contents of that file
-		DOMDocument* xmlDoc = NULL;
-		// check the cache to see if it exists first
+
 		boost::filesystem::path p(filename);
 #if (BOOST_VERSION > 104400)
 		boost::filesystem::path abs_p = boost::filesystem::absolute( p );
@@ -390,44 +388,36 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		}
 
 		std::string absPathStr = p.string();
-		xmlDoc = xml_utils::parseMessageXml( scene->getBmlProcessor()->getBMLProcessor()->getXMLParser(), absPathStr.c_str() );
-		if (!xmlDoc)
+
+		std::string xml;
+		std::ifstream in(absPathStr, std::ios::in | std::ios::binary);
+		if (in)
 		{
-			LOG("File %s produced an empty document. BML will not be processed.", filename.c_str());
-			return CMD_FAILURE;
+			in.seekg(0, std::ios::end);
+			xml.resize(in.tellg());
+			in.seekg(0, std::ios::beg);
+			in.read(&xml[0], xml.size());
+			in.close();
 		}
 
 		std::string procId = scene->getProcessId();
-		std::string xml = "";
-		if (procId == "")
+		if (procId != "")
 		{
-			// no process id, convert XML to text then forward directly to vrSpeak
-			xml_utils::xmlToString(xml_utils::getFirstChildElement( xmlDoc ), xml);
-		}
-		else
-		{
-			// add the process id to the document
-			DOMElement* root = xmlDoc->getDocumentElement();
-			if( XMLString::compareString( root->getTagName(), BML::BMLDefs::TAG_ACT ) !=0 )
+			// replace any <act> tag with <act procid="foo"> if the current instance has a proc id.
+			size_t location = xml.find("<act>");
+			if (location != std::string::npos)
 			{
-				LOG("File %s does not contain <act> element. BML will not be processed.", filename.c_str());
-				return CMD_FAILURE;
+				std::stringstream strstr;
+				strstr << " procid=\"" << procId << "\"";
+				xml.insert(location + 4, strstr.str());
 			}
-			root->setAttribute(BML::BMLDefs::ATTR_PROCID, xml_utils::xmlch_translate(procId));
-			xml_utils::xmlToString(xml_utils::getFirstChildElement( xmlDoc ), xml);
 		}
-
-		if (xmlDoc)
-			xmlDoc->release();
-
-
-
+		size_t headerLocation = xml.find("<?xml");
+		if (headerLocation == std::string::npos)
+		{
+			xml.insert(0, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"); 
+		}
 		
-
-
-		// replace any <act> tag with <act procid="foo"> if the current instance has a proc id.
-
-		xml.insert(0, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"); 
 		return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, xml );
 	} else if( arg=="anim" || arg=="animation") { //  anim[ation] <animation name>
 		string anim = args.read_token();
