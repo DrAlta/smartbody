@@ -51,6 +51,7 @@
 void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 {
 	DeformableMesh* mesh = shape->getDeformableMesh();
+	if (!mesh) return; // no deformable mesh
 	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
 
 	glEnableClientState(GL_VERTEX_ARRAY);
