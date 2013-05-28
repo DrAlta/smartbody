@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 
@@ -25,6 +26,12 @@ import java.io.File;
 
 
 public class SBJNIAppActivity extends Activity {
+	
+	protected boolean wantsMultitouch = false;
+    protected float multiData[];
+    protected static final int MULTI_DATA_STRIDE = 5;
+    protected static final int MULTI_MAX_INPUTS = 10;
+    
     @Override protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);        
         setContentView(R.layout.main);
@@ -37,6 +44,48 @@ public class SBJNIAppActivity extends Activity {
         super.onPause();
         SBJNIAppLib.executeSB("sim.pause()"); 
         //mView.onPause();
+    }
+    
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        boolean ret = super.onTouchEvent(event);
+        if (!ret)
+        {
+        	if (wantsMultitouch)
+        	{
+	        	// marshal up the data.
+	        	int numEvents = event.getPointerCount();
+	        	for (int i=0; i<numEvents; i++)
+	        	{
+	        		int j = i*MULTI_DATA_STRIDE;
+	        		// put x and y FIRST, so if people just want that data, there's nothing else
+	        		// to jump over...
+	        		multiData[j + 0] = (float)event.getX(i);
+	        		multiData[j + 1] = (float)event.getY(i);
+	        		multiData[j + 2] = (float)event.getPointerId(i);
+	        		multiData[j + 3] = (float)event.getSize(i);
+	        		multiData[j + 4] = (float)event.getPressure(i);
+	        	}
+	            ret = multitouchEvent(event.getAction(), numEvents, multiData, MULTI_DATA_STRIDE, event);
+        	}
+        	else // old style input.
+        	{
+                ret = inputEvent(event.getAction(), event.getX(), event.getY(), event);
+        	}
+        }
+        return ret;
+    }
+    
+    public boolean multitouchEvent(int action, int numInputs, float data[], int dataStride, MotionEvent event)
+    {
+    	
+    	return true;
+    }
+    
+    public boolean inputEvent(int action, float x, float y, MotionEvent event) 
+    { 
+    	return SBJNIAppLib.handleInputEvent(action,x,y,event);
     }
 
     @Override protected void onResume() {
@@ -75,10 +124,10 @@ public class SBJNIAppActivity extends Activity {
         	showDialog(0);
         	break;
         case R.id.Connect:
-        	SBJNIAppLib.openConnection();
+        	SBJNIAppLib.openConnection();        	
             break;
         case R.id.Disconnect:
-        	SBJNIAppLib.closeConnection();
+        	SBJNIAppLib.closeConnection();        	
             break;
         }
         return super.onOptionsItemSelected(item);

@@ -16,6 +16,9 @@
 
 // OpenGL ES 2.0 code
 
+#include <jni.h>
+
+
 #include <vhcl_log.h>
 #include <vhcl_string.h>
 #include <vhmsg-tt.h>
@@ -27,15 +30,18 @@
 #include <sb/SBSkeleton.h>
 #include <boost/filesystem/operations.hpp>
 #include <sbm/time_regulator.h>
+#include <sbm/sbm_deformable_mesh.h>
+#include <sbm/GPU/SbmTexture.h>
+#include <sr/sr_sa_gl_render.h>
+#include <sr/sr_gl.h>
+#include <sr/sr_light.h>
 #include <sr/sr_camera.h>
+#include <sr/sr_gl_render_funcs.h>
 
 #define ANDROID_PYTHON
 #ifdef ANDROID_PYTHON
 #include <sb/SBPython.h>
 #endif
-
-#include <jni.h>
-#include <android/log.h>
 
 #include <EGL/egl.h>
 #include <GLES/gl.h>
@@ -44,20 +50,27 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include <android/log.h>
 #define  LOG_TAG    "libsbjniapp"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+#define  LOG_FOOT   LOGI("%s %s %d", __FILE__, __FUNCTION__, __LINE__)
 
+#if 1
 struct Engine
 {
-	SrCamera camera;
+	//SrCamera camera;
 	TimeRegulator timer;
 	vhcl::Log::AndroidListener androidListener;
 };
 
 Engine engine;
-bool mcuInit = false;
+static SrLight light1;
+static SrLight light2;
+#endif 
 
+#if 1
+bool mcuInit = false;
 static void printGLString(const char *name, GLenum s) {
     const char *v = (const char *) glGetString(s);
     LOGI("GL %s = %s\n", name, v);
@@ -84,9 +97,12 @@ void sb_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 			break;
 	}
 }
+#endif
 
+#if 1
 void drawSB()
 {
+#if DRAW_STICK_FIGURE
 	static SrVec jointPos[200];
 	static unsigned short boneIdx[400];
 
@@ -127,6 +143,28 @@ void drawSB()
 		glDrawElements(GL_LINES,skeleton->joints().size()*2,GL_UNSIGNED_SHORT, boneIdx);
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
+#endif
+// update and render deformable mesh
+
+	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
+		pawnIter != pawns.end();
+		pawnIter++)
+	{
+		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
+		if(pawn->dMesh_p && pawn->dMeshInstance_p)
+		{
+			pawn->dMesh_p->set_visibility(1);
+			pawn->dMeshInstance_p->setVisibility(1);
+			pawn->dMeshInstance_p->update();
+			SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p);
+		}
+	}
+
+	static SrSaGlRender* render_action = NULL;
+	if (!render_action)
+	     render_action = new SrSaGlRender();	
+	//render_action->apply(SmartBody::SBScene::getScene()->getRootGroup());
 }
 
 void initConnection()
@@ -167,18 +205,44 @@ void initConnection()
 
 bool setupGraphics(int w, int h) {
 
-	SrCamera& cam = engine.camera;
-	cam.init();
+	//SrCamera& cam = engine.camera;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SrCamera& camera = *scene->createCamera("defaultCamera");	
+	camera.init();
+/*
 	cam.setCenter(0, 92, 0);
 	cam.setUpVector(SrVec::j);
 	cam.setEye( 0, 166, 185 );
 	cam.setScale(1.f);
+*/
 
-    glViewport(0, 0, w, h);
+	float aspectRatio = ((float)w)/h;
+	camera.setCenter(0.0, 1.60887, 0.0);
+	camera.setUpVector(SrVec(0, 1, 0));
+	camera.setEye(0, 1.0478, 3.69259);
+	camera.setScale(1);
+	camera.setFov(1.0);
+	camera.setFarPlane(100);
+	camera.setNearPlane(0.1);
+	camera.setAspectRatio(aspectRatio);
+	//camera.setAspectRatio(0.966897);
+
+        glViewport(0, 0, w, h);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
 	glEnable(GL_CULL_FACE);
 	glShadeModel(GL_SMOOTH);
 	glDisable(GL_DEPTH_TEST);
+
+	// light
+	light1.directional = true;
+	light1.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
+	light1.position = SrVec( 100.0, 250.0, 400.0 );
+	//light1.constant_attenuation = 1.0f;
+
+	light2 = light1;
+	light2.directional = true;
+	light2.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
+	light2.position = SrVec( 100.0, 500.0, -1000.0 );
 
     return true;
 }
@@ -188,13 +252,20 @@ const GLfloat gTriangleVertices[] = { 0.0f, 0.5f, -0.5f, -0.5f,
 
 void renderFrame() {
 
-	SrCamera& cam = engine.camera;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SrCamera& cam = *scene->getCamera("defaultCamera");
 
 	// Just fill the screen with a color.
-	glClearColor(1.03f,0.03f,0.03f,1);
+	glClearColor(0.6f,0.6f,0.6f,1);
 	//glClearColor(((float)engine->state.x)/engine->width, engine->state.angle,
 	//        ((float)engine->state.y)/engine->height, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+	
+	glLight(0, light1);
+	glLight(1, light2);
+	glEnable(GL_TEXTURE_2D);
 
 	SrMat mat;
 	glMatrixMode ( GL_PROJECTION );
@@ -204,42 +275,149 @@ void renderFrame() {
 	glMatrixMode ( GL_MODELVIEW );
 	glLoadMatrixf ( (const float*)cam.get_view_mat(mat) );
 
+        SbmTextureManager& texm = SbmTextureManager::singleton();
+        texm.updateTexture();
+
 	//glScalef ( cam.scale, cam.scale, cam.scale );
 	//glDisable(GL_LIGHTING);
 	// draw a ground plane
 	float planeSize  = 300.f;
 	SrVec quad[4] = { SrVec(planeSize, 0.f, planeSize), SrVec(-planeSize, 0.f, planeSize), SrVec(-planeSize,0.f,-planeSize), SrVec(planeSize, 0.f, -planeSize) };
+	SrVec quadN[4] = { SrVec(0.f, 1.f, 0.f), SrVec(0.f, 1.f, 0.f), SrVec(0.f, 1.f, 0.f), SrVec(0.f, 1.f, 0.f) };
 	GLfloat quadColor[16] = { 0.2f,0.2f, 0.2f, 1.f , 0.3f,0.3f,0.3f, 1.f, 0.5f,0.5f,0.5f,1.f, 0.25f,0.25f,0.25f,1.f };
 	unsigned short indices[] = {0,1,2, 0,2,3};
 
 	glShadeModel(GL_SMOOTH);
 	glDisable(GL_CULL_FACE);
 	glEnableClientState(GL_VERTEX_ARRAY);
+	//glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&quad[0]);
 	glColorPointer(4, GL_FLOAT, 0, quadColor);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&quadN[0]);
+//	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+	//glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
+
+	glEnable(GL_LIGHTING);
 	drawSB();
 	//eglSwapBuffers(engine->display, engine->surface);    
 }
 
+
 extern "C" {
+    //JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_test(JNIEnv * env, jobject obj);
     JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_init(JNIEnv * env, jobject obj,  jint width, jint height);
-	JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_restart(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_restart(JNIEnv * env, jobject obj);
     JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_step(JNIEnv * env, jobject obj);
-	JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_openConnection(JNIEnv * env, jobject obj);
-	JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_closeConnection(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_openConnection(JNIEnv * env, jobject obj);
+    JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_closeConnection(JNIEnv * env, jobject obj);
     JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd);
     JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd);
-	JNIEXPORT jstring JNICALL Java_com_android_sbjniapp_SBJNIAppLib_getLog(JNIEnv * env, jobject obj);
+    JNIEXPORT jstring JNICALL Java_com_android_sbjniapp_SBJNIAppLib_getLog(JNIEnv * env, jobject obj);   
+    JNIEXPORT jboolean JNICALL Java_com_android_sbjniapp_SBJNIAppLib_handleInputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my);
 };
+
+#endif
+
+#if 0
+void closeConnection(JNIEnv* env, jobject thiz)
+{
+	LOGI("Close connection");
+	//endConnection();
+}
+
+jint JNI_OnLoad(JavaVM* vm, void* reserved)
+{
+    LOG_FOOT;
+    JNIEnv *env;
+
+    LOGI("JNI_OnLoad called");
+    if (vm->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK)
+    {
+    	LOGE("Failed to get the environment using GetEnv()");
+        return -1;
+    }
+
+    JNINativeMethod methods[] =
+    {
+		{
+		            "closeConnection",
+		            "()V",
+		            (void *) closeConnection
+		},		
+    };
+    jclass k;
+    k = (env)->FindClass ("com/android/sbjniapp/SBJNIAppLib");
+    (env)->RegisterNatives(k, methods, 1);
+
+    return JNI_VERSION_1_4;
+}
+#endif
+
+#if 1
+
+void initCharacterScene()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	// for some reason couldn't get flash listener working properly, following code is supposed to replace character listener
+	std::vector<std::string> charNames = scene->getCharacterNames();
+	for (size_t i = 0; i < charNames.size(); i++)
+	{
+		SmartBody::SBCharacter* character = scene->getCharacter(charNames[i]);
+		if (!character)
+			continue;
+
+		// add skeletons and mesh
+		
+		if (character->scene_p)
+		{
+			SmartBody::SBScene::getScene()->getRootGroup()->remove(character->scene_p);
+			character->scene_p->unref();
+			character->scene_p = NULL;
+		}
+		/*
+		character->scene_p = new SkScene();
+		character->scene_p->ref();
+		character->scene_p->init(character->getSkeleton());
+		bool visible = character->getBoolAttribute("visible");
+		if (visible)
+			character->scene_p->visible(true);
+		else
+			character->scene_p->visible(false);
+		scene->getRootGroup()->add(character->scene_p);
+		*/
+		LOG("Character %s's skeleton added to the scene.", charNames[i].c_str());
+
+		if (character->dMesh_p)
+		{
+			for (size_t i = 0; i < character->dMesh_p->dMeshDynamic_p.size(); i++)
+			{
+				SmartBody::SBScene::getScene()->getRootGroup()->remove( character->dMesh_p->dMeshDynamic_p[i] );
+			}
+			delete character->dMesh_p;
+			character->dMesh_p = NULL;
+		}
+		character->dMesh_p = new DeformableMesh();
+		character->dMeshInstance_p =  new DeformableMeshInstance();
+		character->dMesh_p->setSkeleton(character->getSkeleton());
+		character->dMeshInstance_p->setSkeleton(character->getSkeleton());
+		LOG("Character %s's deformable mesh reset.", charNames[i].c_str());
+
+		std::string dMeshAttrib = character->getStringAttribute("deformableMesh");
+		character->setStringAttribute("deformableMesh", dMeshAttrib);
+		LOG("Character %s's deformable mesh %s added to the scene.", charNames[i].c_str(), dMeshAttrib.c_str());
+	}
+}
+
 
 void initSmartBody()
 {
 	mcuInit = true;
 	std::string python_lib_path = "/sdcard/sbmmedia/python";
+	LOGI("Before init python");
 	initPython(python_lib_path);
+	LOGI("Before init SBScene");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
 	scene->getSimulationManager()->setupTimer();
@@ -247,7 +425,108 @@ void initSmartBody()
 	scene->getSimulationManager()->start();
 
 	scene->addAssetPath("script", "/sdcard/sbjniappdir");
-	scene->runScript("default.py");
+	scene->runScript("brad.py");
+	initCharacterScene();
+}
+
+bool touchEvent(int action, float x, float y)
+{
+	static bool firstTime = true;
+	static float prevx = 0.f, prevy = 0.f;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SrCamera* cam = scene->getCamera("defaultCamera");
+	if (!cam) return false;
+	float deltaX, deltaY;
+	deltaX = x - prevx; 
+	deltaY = y - prevy;
+	if (firstTime)
+	{
+		deltaX = 0.f;
+		deltaY = 0.f;
+		firstTime = false;		
+	}
+	prevx = x; 
+	prevy = y;
+
+	float dx = deltaX * cam->getAspectRatio() * 0.01;
+	float dy = deltaY * cam->getAspectRatio() * 0.01;
+
+	enum { Touch_Pressed = 0, Touch_Released, Touch_Moved, Touch_Cancelled, Touch_None };
+	int touchAction = Touch_None;
+	switch(action)
+	{
+	case 0:
+		//state.touchType = OIS::MT_Pressed;
+		touchAction = Touch_Pressed;
+		break;
+	case 1:
+		//state.touchType = OIS::MT_Released;
+		touchAction = Touch_Released;
+		break;
+	case 2:
+		//state.touchType = OIS::MT_Moved;
+		touchAction = Touch_Moved;
+		break;
+	case 3:
+		//state.touchType = OIS::MT_Cancelled;
+		touchAction = Touch_Cancelled;
+		break;
+	default:
+		//state.touchType = OIS::MT_None;
+		touchAction = Touch_None;
+		break;
+	}
+	
+#if 0
+	if (touchAction == Touch_Moved)	// zoom
+	{
+		LOG("touchAction = Touch_Moved");
+		float tmpFov = cam->getFov() + (-dx + dy);
+		cam->setFov(SR_BOUND(tmpFov, 0.001f, srpi));
+	}
+#endif
+	static SrVec origUp, origCenter, origCamera;
+	static float origX, origY;
+	if (touchAction == Touch_Pressed)
+	{
+		LOG("touchAction = Pressed");
+		origUp = cam->getUpVector();
+		origCenter = cam->getCenter();
+		origCamera = cam->getEye();		
+		origX = x;
+		origY = y;
+	}
+	else if (touchAction == Touch_Released)
+	{
+		origX = -1;
+		origY = -1;		
+	}
+	else if (touchAction == Touch_Moved) // rotate
+	{
+		LOG("touchAction = Moved");
+		float camDx = (x-origX) * cam->getAspectRatio() * 0.01;
+		float camDy = (y-origY) * cam->getAspectRatio() * 0.01;
+		SrVec forward = origCenter - origCamera; 		   
+		SrQuat q = SrQuat(origUp, vhcl::DEG_TO_RAD()*camDx*20.f);			   
+		forward = forward*q;
+		SrVec tmp = cam->getEye() + forward;
+		cam->setCenter(tmp.x, tmp.y, tmp.z);
+
+		SrVec cameraRight = cross(forward,origUp);
+		cameraRight.normalize();		   
+		q = SrQuat(cameraRight, vhcl::DEG_TO_RAD()*camDy*20.f);	
+		cam->setUpVector(origUp*q);
+		forward = forward*q;
+		SrVec tmpCenter = cam->getEye() + forward;
+		cam->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);
+	}
+	
+	
+}
+
+JNIEXPORT jboolean JNICALL Java_com_android_sbjniapp_SBJNIAppLib_handleInputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my)
+{
+	return touchEvent(action,mx,my);
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_init(JNIEnv * env, jobject obj,  jint width, jint height)
@@ -255,10 +534,11 @@ JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_init(JNIEnv * env, 
 	if (mcuInit)
 		return;
 
+	setupGraphics(width, height);    
 	initSmartBody();
 	vhcl::Log::g_log.AddListener(&engine.androidListener);
 	
-	setupGraphics(width, height);    
+	
 
 }
 
@@ -268,8 +548,9 @@ JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_step(JNIEnv * env, 
 
 	int err = vhmsg::ttu_poll();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	scene->getSimulationManager()->update();
-    renderFrame();
+	scene->getSimulationManager()->updateTimer();
+	scene->update();
+	renderFrame();
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd)
@@ -288,16 +569,17 @@ JNIEXPORT jstring JNICALL Java_com_android_sbjniapp_SBJNIAppLib_getLog( JNIEnv *
 	return env->NewStringUTF(logStr.c_str());
 }
 
+
 JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_restart( JNIEnv * env, jobject obj )
-{
-	/*
+{	
+#if 0
 	if (!mcuInit) return;
 	mcuInit = false;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBScene::destroyScene();
 	initSmartBody();	
 	mcuInit = true;
-	*/
+#endif	
 }
 
 
@@ -311,3 +593,5 @@ JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_closeConnection( JN
 {	
 	vhmsg::ttu_close();
 }
+
+#endif
