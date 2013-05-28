@@ -16,7 +16,7 @@ SBM_ANDROID_LOCAL_PATH := $(call my-dir)
 IOS_PATH := ../../../ios/vhwrapper-dll/
 SBM_PATH := ../../../core/smartbody/smartbody-lib/
 
-include $(SBM_ANDROID_LOCAL_PATH)/../../smartbody-lib/jni/Android.mk
+include $(SBM_ANDROID_LOCAL_PATH)/../../smartbody/jni/Android.mk
 
 LOCAL_PATH = $(SBM_ANDROID_LOCAL_PATH)
 include $(CLEAR_VARS)
@@ -43,9 +43,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/$(IOS_PATH)/
 #LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti
 LOCAL_CFLAGS    := -O3 
-LOCAL_SRC_FILES := $(SBM_PATH)/../smartbody-dll/smartbody-dll.cpp \
-       	           $(SBM_PATH)/../smartbody-dll/smartbody-c-dll.cpp \
-		   $(IOS_PATH)/vhwrapper.cpp
+LOCAL_SRC_FILES := $(IOS_PATH)/vhwrapper.cpp
                    
 			
 #LOCAL_LDLIBS    := -llog -lOpenSLES  -fuse-ld=gold
