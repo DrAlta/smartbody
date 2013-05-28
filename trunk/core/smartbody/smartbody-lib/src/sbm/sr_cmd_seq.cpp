@@ -263,14 +263,14 @@ int srCmdSeq::read_file( char *seq_file, int report_open_fail )	{
 //////////////////////////////////////////////////////////////////////////////////
 
 int srCmdSeq::insert( float time, const char *cmd_ref )	{
-	sr_command_event_t *event;
+	sr_command_event_t *eventSeq;
 
-	event = new sr_command_event_t;
-	event->next = NULL;
-	event->time = time;
-	event->cmd = new char[ strlen( cmd_ref ) + 1 ];
-	sprintf( event->cmd, "%s", cmd_ref );
-	return( insert( event ) );
+	eventSeq = new sr_command_event_t;
+	eventSeq->next = NULL;
+	eventSeq->time = time;
+	eventSeq->cmd = new char[ strlen( cmd_ref ) + 1 ];
+	sprintf( eventSeq->cmd, "%s", cmd_ref );
+	return( insert( eventSeq ) );
 }
 
 int srCmdSeq::insert_ref( float time, char *cmd_ref )	{
