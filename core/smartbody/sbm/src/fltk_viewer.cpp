@@ -1329,6 +1329,8 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		{
 			//pawn->dMesh_p->update();
 			pawn->dMeshInstance_p->update();
+			if (!SbmDeformableMeshGPU::useGPUDeformableMesh)
+				SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p);
 		}
 	}
 	
