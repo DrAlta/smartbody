@@ -183,7 +183,7 @@ gl_FragColor = vec4(1,1,1,1);\n\
 }";
 
 std::string shaderFS =
-"const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));\n\
+"const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.0)*(vec3(0.2,0.2,0.2));\n\
 uniform sampler2D diffuseTexture;\n\
 uniform sampler2D normalTexture;\n\
 uniform sampler2D specularTexture;\n\
@@ -257,7 +257,7 @@ void main (void)\n\
 }";
 
 std::string shaderFSFace =
-	"const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.f)*(vec3(0.2,0.2,0.2));\n\
+	"const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.0)*(vec3(0.2,0.2,0.2));\n\
 	const vec3 sssColor = vec3(0.6,0.6,0.6);\n\
 	const float aspExp = 5.0;\n\
 	const float aspIntensity = 1.0;\n\
@@ -296,11 +296,11 @@ std::string shaderFSFace =
 	{\n\
 	float asperity = 1.125 * max(0.0,dot(normalVec,halfVec));\n\
 	float asperityStrength = pow(min(1.0,1.0 - dot(normalVec,viewVec)),aspExp);\n\
-	float np = pow(2,shineness);\n\
+	float np = pow(2.0,shineness);\n\
 	float npNorm = np*0.125 + 1.0;\n\
-	float fresnel = pow(min(1, 1- dot(normalVec,viewVec)), 5)*0.92f + 0.08f;\n\
+	float fresnel = pow(min(1.0, 1.0- dot(normalVec,viewVec)), 5.0)*0.92 + 0.08;\n\
 	float blinnPhong = npNorm*pow(max(0.0,dot(normalVec,halfVec)), np);\n\
-	float blinnPhongStrength = min(fresnel, 1-asperityStrength);\n\
+	float blinnPhongStrength = min(fresnel, 1.0-asperityStrength);\n\
 	return specularColor*(blinnPhong * blinnPhongStrength + asperity*asperityStrength)*max(0.0,dot(normalVec,lightVec));\n\
 	}\n\
 	void main (void)\n\
@@ -336,7 +336,7 @@ std::string shaderFSFace =
 	{\n\
 	att = 1.0;//1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
 	halfV = normalize(halfVector[i]);\n\
-	vec3 viewDir = halfV*dot(halfV,lightDir[i])*2.0f - lightDir[i];\n\
+	vec3 viewDir = halfV*dot(halfV,lightDir[i])*2.0 - lightDir[i];\n\
 	color += vec4(diffuseReflection(n,lightDir[i],viewDir,texColor.rgb), 0.0);\n\
 	color += vec4(specularReflection(n,lightDir[i],viewDir, halfV,specMat.rgb), 0.0);\n\
 	}\n\
