@@ -649,7 +649,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 			if (character->getBoolAttribute("steering.pathStartStep"))// && distToTarget > distThreshold*10.f)
 				//if (0)
 			{
-				LOG("Path following, start locomotion, diff = %f",diff);
+				//LOG("Path following, start locomotion, diff = %f",diff);
 				startLocomotion(diff);
 			}
 			else

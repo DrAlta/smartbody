@@ -946,11 +946,11 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SmartBody::SBM
 
 bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelVec, float scaleFactor )
 {
-	LOG("ParseOgre::parseMesh");
+	//LOG("ParseOgre::parseMesh");
 	DOMNode* subMeshNode = getNode("submeshes",meshNode);
 	if (!subMeshNode) return false;
 	const DOMNodeList* subMeshList = subMeshNode->getChildNodes();
-	LOG("Num of submeshes = %d",subMeshList->getLength());
+	//LOG("Num of submeshes = %d",subMeshList->getLength());
 	for (unsigned int i=0;i<subMeshList->getLength(); i++)
 	{
 		DOMNode* subMesh = subMeshList->item(i);	
@@ -975,7 +975,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 			model->mtlnames.push(materialName.c_str());
 
 		meshModelVec.push_back(model);
-		LOG("SubMesh %d ... ",i);
+		//LOG("SubMesh %d ... ",i);
 		const DOMNodeList* subMeshChildren = subMesh->getChildNodes();
 		for (unsigned int a = 0; a < subMeshChildren->getLength(); a++)
 		{
@@ -984,7 +984,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 			xml_utils::xml_translate(&childNodeStr, subMeshChild->getNodeName());
 			if (childNodeStr == "geometry")
 			{
-				LOG("parse geometry");
+				//LOG("parse geometry");
 				DOMNamedNodeMap* childAttr = subMeshChild->getAttributes();
 				int vertexCount = 0;
 				if (childAttr)
@@ -1003,7 +1003,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 					xml_utils::xml_translate(&bufferNodeStr, bufferNode->getNodeName());
 					if (bufferNodeStr != "vertexbuffer")
 						continue;
-					LOG("vertex buffer %d ...",b);
+					//LOG("vertex buffer %d ...",b);
 					const DOMNodeList* vertexList = bufferNode->getChildNodes();
 					for (unsigned int v = 0; v < vertexList->getLength(); v++)
 					{
@@ -1071,12 +1071,12 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 						
 					}
 				}
-				LOG("parse geometry complete");
+				//LOG("parse geometry complete");
 
 			}
 			else if (childNodeStr == "faces")
 			{
-				LOG("parse faces");
+				//LOG("parse faces");
 				const DOMNodeList* faceList = subMeshChild->getChildNodes();
 				for (unsigned int f = 0; f < faceList->getLength(); f++)
 				{
@@ -1112,17 +1112,17 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 						model->Fn.push().set(v1,v2,v3);
 					}					
 				}
-				LOG("parse faces complete");
+				//LOG("parse faces complete");
 			}
 		}
 	}
-	LOG("ParseOgre::parseMesh complete");
+	//LOG("ParseOgre::parseMesh complete");
 	return true;
 }
 
 bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& skinWeights, float scaleFactor )
 {
-	LOG("ParseOgre::parseSkinWeight");
+	//LOG("ParseOgre::parseSkinWeight");
 	DOMNode* subMeshNode = getNode("submeshes",meshNode);
 	if (!subMeshNode) return false;
 	const DOMNodeList* subMeshList = subMeshNode->getChildNodes();
@@ -1198,7 +1198,7 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 		}			
 	}
 
-	LOG("ParseOgre::parseSkinWeight Complete");
+	//LOG("ParseOgre::parseSkinWeight Complete");
 	return true;
 }
 
