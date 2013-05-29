@@ -164,6 +164,13 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	utterancePolicyTypes.push_back("interrupt");	
 	StringAttribute* utterancePolicyAttribute = createStringAttribute("utterancePolicy", "none", true, "Basic", 500, false, false, false, "How utterances are handled when the character is already performing an utterance. Valid values are: ignore (ignores the new utterance and any associated behaviors), queue (plays the new utterance and associated behavior when the old utterance has finished), interrupt (stops the existing utterance and associated behaviors and plays the new one)");
 	utterancePolicyAttribute->setValidValues(utterancePolicyTypes);
+
+	std::vector<std::string> saccadePolicy;
+	saccadePolicy.push_back("stopinutterance");
+	saccadePolicy.push_back("alwayson");
+	StringAttribute* saccadePolicyAttribute = createStringAttribute("saccadePolicy", "stopinutterance", true, "Basic", 501, false, false, false, "How saccade is handled during utterance");
+	saccadePolicyAttribute->setValidValues(saccadePolicy);
+
 }
 
 

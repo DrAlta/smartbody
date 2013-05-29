@@ -430,7 +430,7 @@ void SbmCharacter::createStandardControllers()
 	ct_name << getName() << "_eyelidController";
 	eyelid_reg_ct_p->setName( ct_name.str().c_str() );
 
-	this->saccade_ct = new MeCtSaccade(this->_skeleton);
+	this->saccade_ct = new MeCtSaccade(this);
 	this->saccade_ct->init(this);
 	std::string saccadeCtName = getName() + "_eyeSaccadeController";
 	this->saccade_ct->setName(saccadeCtName.c_str());
