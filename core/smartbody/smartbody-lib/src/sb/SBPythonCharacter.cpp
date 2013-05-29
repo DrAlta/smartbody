@@ -151,7 +151,7 @@ void pythonFuncsCharacter()
 		.def("setMiniBrain", &SBCharacter::setMiniBrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Sets the mini brain handler for this character.")
 		.def("getMiniBrain", &SBCharacter::getMiniBrain, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the mini brain handler for this character.")
 		.def("interruptFace", &SBCharacter::interruptFace, "Stops any action units or lip syncing movements on a character by fading them out over a period of seconds specified.")
-		
+		.def("hasSpeechBehavior", &SBCharacter::hasSpeechBehavior, "Returns speech behavior msg id if any, otherwise return empty string.")
 		;
 
 }
