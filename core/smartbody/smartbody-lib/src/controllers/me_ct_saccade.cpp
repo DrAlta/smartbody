@@ -27,20 +27,21 @@
 
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBCharacter.h>
 
 using namespace gwiz;
 std::string MeCtSaccade::CONTROLLER_TYPE = "Saccade";
 std::string eyeballL = "eyeball_left";
 std::string eyeballR = "eyeball_right";
 
-MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : SmartBody::SBController()
+MeCtSaccade::MeCtSaccade(SbmCharacter* c) : SmartBody::SBController()
 {
-	_skeleton = skel;
-	if (skel) 
-		skel->ref();
+	_character = c;
 
 	_useModel = true;
 	_valid = false;
+	_validByPolicy = true;
 	_initialized = false;
 	_idL = -1;
 	_idR = -1;
@@ -115,8 +116,7 @@ MeCtSaccade::MeCtSaccade(SkSkeleton* skel) : SmartBody::SBController()
 
 MeCtSaccade::~MeCtSaccade()
 {
-	if (_skeleton)
-		_skeleton->unref();
+	_character = NULL;
 }
 
 void MeCtSaccade::spawnOnce(float dir, float amplitude, float dur)
@@ -379,8 +379,8 @@ void MeCtSaccade::initSaccade(MeFrameData& frame)
 	if (!_initialized)
 	{
 
-		SkJoint* lEyeJoint = _skeleton->search_joint(eyeballL.c_str());
-		SkJoint* rEyeJoint = _skeleton->search_joint(eyeballR.c_str());
+		SkJoint* lEyeJoint = _character->getSkeleton()->getJointByName(eyeballL.c_str());
+		SkJoint* rEyeJoint = _character->getSkeleton()->getJointByName(eyeballR.c_str());
 		if (lEyeJoint && rEyeJoint)
 		{
 			_leftRightRot = SrQuat(lEyeJoint->gmatZero()*rEyeJoint->gmatZero().inverse());
@@ -408,9 +408,24 @@ bool MeCtSaccade::controller_evaluate(double t, MeFrameData& frame)
 		_dt = t - _prevTime;
 		_prevTime = t;
 	}
+
+	SmartBody::SBCharacter* sbCharacter = dynamic_cast<SmartBody::SBCharacter*> (_character);
+	if (sbCharacter->getStringAttribute("saccadePolicy") == "stopinutterance")
+	{
+		if (sbCharacter->hasSpeechBehavior() != "")
+		{
+			_validByPolicy = false;
+		}
+		else
+		{
+			_validByPolicy = true;
+		}
+	}
+
+
 	SrBuffer<float>& buff = frame.buffer();
 	initSaccade(frame);
-	if (_valid)
+	if (_valid && _validByPolicy)
 	{
 		if (_useModel)
 			spawning(t);

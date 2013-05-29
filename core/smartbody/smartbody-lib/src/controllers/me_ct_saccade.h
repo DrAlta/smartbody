@@ -24,6 +24,7 @@
 #define _ME_CT_SACCADE_H_
 
 #include <sb/SBController.h>
+#include <sb/sbm_character.hpp>
 #include <sk/sk_skeleton.h>
 #include "sbm/gwiz_math.h"
 #include "sbm/sr_linear_curve.h"
@@ -41,11 +42,12 @@ class MeCtSaccade : public SmartBody::SBController
 		double			_dt;
 		float 			_duration;
 		SkChannelArray	_channels;
-		SkSkeleton* 	_skeleton;
+		SbmCharacter*	_character;
 		int				_idL;
 		int				_idR;
 		bool			_initialized;
 		bool			_valid;
+		bool			_validByPolicy;
 		bool			_useModel;
 
 		// saccade information
@@ -104,7 +106,7 @@ class MeCtSaccade : public SmartBody::SBController
 		float			_slope;
 
 	public:
-		MeCtSaccade(SkSkeleton* skel);
+		MeCtSaccade(SbmCharacter* sbChar);
 		~MeCtSaccade();
 
 		// set and get
