@@ -429,7 +429,7 @@ SrModel* SBNavigationMesh::getNavigationMesh()
 	return naviMesh;
 }
 
-SBAPI SrVec SBNavigationMesh::queryMeshPointByRayCast( SrVec& p1, SrVec& p2 )
+SrVec SBNavigationMesh::queryMeshPointByRayCast( SrVec& p1, SrVec& p2 )
 {
 	if (naviMesh)
 	{

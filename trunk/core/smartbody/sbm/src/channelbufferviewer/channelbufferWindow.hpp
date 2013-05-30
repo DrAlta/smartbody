@@ -66,6 +66,8 @@ public:
 	void updateGUI();
 	void show();  
 
+	void reset();
+
 	void generateBML(Fl_Widget* widget, void* data);
 
 public:

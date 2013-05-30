@@ -87,7 +87,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, NULL);
 	menubar->add("&Create/Light...", 0, CreateLightCB, this, NULL);
 	menubar->add("&Create/Camera...", 0, CreateCameraCB, this, NULL);
-	menubar->add("&Create/Terrain...", 0, CreateTerrainCB, this, NULL);
+	//menubar->add("&Create/Terrain...", 0, CreateTerrainCB, this, NULL); // should replace it with create navigation mesh.
 	
 	setResolutionMenuIndex = menubar->add("&Settings/Set Resolution", 0, 0, 0, FL_SUBMENU_POINTER);
 	menubar->add("&Settings/Default Media Path", 0, SettingsDefaultMediaPathCB, this, NULL);
@@ -351,89 +351,90 @@ void BaseWindow::resetWindow()
 {
 	if (commandWindow)
 	{
+		commandWindow->hide();
 		delete commandWindow;
 		commandWindow = NULL;
 	}
 	if (bmlCreatorWindow)
 	{
+		bmlCreatorWindow->hide();
 		delete bmlCreatorWindow;
 		bmlCreatorWindow = NULL;
 	}
 	if (retargetCreatorWindow)
 	{
+		retargetCreatorWindow->hide();
 		delete retargetCreatorWindow;
 		retargetCreatorWindow = NULL;
 	}
 	if (visemeViewerWindow)
 	{
+		visemeViewerWindow->hide();
 		delete visemeViewerWindow;
 		visemeViewerWindow = NULL;
 	}
 	if (monitorConnectWindow)
 	{
+		monitorConnectWindow->hide();
 		delete monitorConnectWindow;
 		monitorConnectWindow = NULL;
 	}
 	if (motionEditorWindow)
 	{
+		motionEditorWindow->hide();
 		delete motionEditorWindow;
 		motionEditorWindow = NULL;
 	}
 
 	if (characterCreator)
 	{
+		characterCreator->hide();
 		delete characterCreator;
 		characterCreator = NULL;
 	}
 	if (visemeViewerWindow)
 	{
+		visemeViewerWindow->hide();
 		delete visemeViewerWindow;
 		visemeViewerWindow = NULL;
 	}
 
-	if (monitorConnectWindow)
-	{
-		delete monitorConnectWindow;
-		monitorConnectWindow = NULL;
-	}
-	if (motionEditorWindow)
-	{
-		delete motionEditorWindow;
-		motionEditorWindow = NULL;
-	}
-
 	if (faceViewerWindow)
 	{
+		faceViewerWindow->hide();
 		delete faceViewerWindow;
 		faceViewerWindow = NULL;
 	}
 	if (bmlViewerWindow)
 	{
+		bmlViewerWindow->hide();
 		delete bmlViewerWindow;
 		bmlViewerWindow = NULL;
 	}
 	if (dataViewerWindow)
 	{
+		dataViewerWindow->hide();
 		delete dataViewerWindow;
 		dataViewerWindow = NULL;
 	}
 	if (resourceWindow)
 	{
+		resourceWindow->hide();
 		delete resourceWindow;
 		resourceWindow = NULL;
 	}
 	if (panimationWindow)
 	{
+		panimationWindow->hide();
 		delete panimationWindow;
 		panimationWindow = NULL;
 	}
 	if (exportWindow)
 	{
+		exportWindow->hide();
 		delete exportWindow;
 		exportWindow = NULL;
 	}
-
-
 }
 
 void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
@@ -444,6 +445,8 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	const char* seqFile = fl_file_chooser("Load file:", "*.py", mediaPath.c_str());
 	if (!seqFile)
 		return;
+
+	window->resetWindow();
 
 	SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
 	SmartBody::SBScene::destroyScene();
@@ -1430,11 +1433,12 @@ void BaseWindow::CreateCharacterCB(Fl_Widget* w, void* data)
 	
 	if (!rootWindow->characterCreator)
 		rootWindow->characterCreator = new CharacterCreatorWindow(rootWindow->x() + 20, rootWindow->y() + 20, 480, 150, strdup("Create a Character"));
-
-	rootWindow->characterCreator->setSkeletons(skeletonNames);
-
-	rootWindow->characterCreator->show();
 	
+	
+	std::string characterName = "char" + boost::lexical_cast<std::string>(rootWindow->characterCreator->numCharacter);
+	rootWindow->characterCreator->inputName->value(characterName.c_str());
+	rootWindow->characterCreator->setSkeletons(skeletonNames);
+	rootWindow->characterCreator->show();	
 }
 
 void BaseWindow::CreatePawnCB(Fl_Widget* w, void* data)

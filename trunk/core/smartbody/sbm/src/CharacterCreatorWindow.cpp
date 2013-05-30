@@ -8,6 +8,7 @@
 
 CharacterCreatorWindow::CharacterCreatorWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {
+	numCharacter = 0;
 	begin();
 		choiceSkeletons = new Fl_Choice(100, 30, 300, 25, "Skeleton");
 		choiceSkeletons->when(FL_WHEN_CHANGED);
@@ -65,6 +66,7 @@ void CharacterCreatorWindow::CreateCB(Fl_Widget* w, void* data)
 	}
 	character->setSkeleton(skeleton);
 	character->createStandardControllers();
+	creator->numCharacter++;
 }
 
 ResolutionWindow::ResolutionWindow( int x, int y, int w, int h, char* name ): Fl_Double_Window(x, y, w, h, name)

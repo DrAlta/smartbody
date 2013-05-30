@@ -1427,9 +1427,10 @@ void FltkViewer::draw()
 	SbmShaderManager& ssm = SbmShaderManager::singleton();
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 
+	bool hasShaderSupport = false;
 	if (!context_valid())
 	{			
-		bool hasShaderSupport = ssm.initGLExtension();
+		hasShaderSupport = ssm.initGLExtension();
         if (hasShaderSupport)
 		    initShadowMap();
 
@@ -1443,23 +1444,17 @@ void FltkViewer::draw()
 		//hasShaderSupport = SbmShaderManager::initGLExtension();	   
 		SBGUIManager::singleton().resize(w(),h());
 	} 	
-
-	
-
 	//make_current();
 	//wglMakeCurrent(fl_GetDC(fl_xid(this)),(HGLRC)context());
-	//LOG("viewer GL context = %d, current context = %d",context(), wglGetCurrentContext());
-
-	
+	//LOG("viewer GL context = %d, current context = %d",context(), wglGetCurrentContext());	
    
-   bool hasOpenGL        = ssm.initOpenGL();
-   bool hasShaderSupport = false;
+   bool hasOpenGL = ssm.initOpenGL();   
    // init OpenGL extension
    if (hasOpenGL)
    {
 	   hasShaderSupport = ssm.initGLExtension();		
-   }
-   // update the shader map
+   }   
+   // update the shader map  
    if (hasShaderSupport)
    {
 	   ssm.buildShaders();
@@ -1723,8 +1718,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		boost::filesystem::path dndPath(dndMsg);
 		std::string fullPathName = dndMsg;
 		std::string filebasename = boost::filesystem::basename(dndMsg);
-		std::string fileextension = boost::filesystem::extension(dndMsg);	
-		
+		std::string fileextension = boost::filesystem::extension(dndMsg);			
 		std::string skelName = filebasename+fileextension;
 		std::string meshName = filebasename;
 		std::string fullPath = dndPath.parent_path().string();
@@ -1745,6 +1739,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 				LOG("WARNING: can not load cam file!");
 			return;
 		}
+		
 
 		LOG("path name = %s, base name = %s, extension = %s",fullPath.c_str(), filebasename.c_str(), fileextension.c_str());
 		bool hasMesh = false;
@@ -1901,29 +1896,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		_retargetStepWindow->show();			
 		_retargetStepWindow->setCharacterName(charName);
 		_retargetStepWindow->setSkeletonName(skelName);
-		_retargetStepWindow->setJointMapName(skelName);
-		/*
-		if (_jointMapViewer)
-		{
-			delete _jointMapViewer;
-		}
-
-		_jointMapViewer = new JointMapViewer(this->x(), this->y(), 450, 600, "Joint Map Viewer");
-		_jointMapViewer->setJointMapName(skelName);
-		_jointMapViewer->setCharacterName(charName);
-		_jointMapViewer->show();
-		
-		// launch the retargetting window 
-		if (_retargetViewer)
-		{
-			delete _retargetViewer;
-		}
-		_retargetViewer = new RetargetViewer(this->x() + 50, this->y() + 50, 320, 320, "Behavior Sets");
-		_retargetViewer->setCharacterName(charName);
-		_retargetViewer->setSkeletonName(skelName);		
-
-		_retargetViewer->show();		
-		*/
+		_retargetStepWindow->setJointMapName(skelName);		
 	}
 }
 
@@ -2365,13 +2338,17 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 
 void FltkViewer::create_pawn()
 {
-	const char* pawn_name = fl_input("Input Pawn Name","foo");
+	static int numPawn = 0;
+	std::string pawnName = "pawn" + boost::lexical_cast<std::string>(numPawn);
+	
+	const char* pawn_name = fl_input("Input Pawn Name",pawnName.c_str());
 	if (!pawn_name) // no name is input
 		return;
 
 	char cmd_pawn[256];
 	sprintf(cmd_pawn,"scene.createPawn(\"%s\")", pawn_name);
 	SmartBody::SBScene::getScene()->run(cmd_pawn);
+	numPawn++;
 }
 
 

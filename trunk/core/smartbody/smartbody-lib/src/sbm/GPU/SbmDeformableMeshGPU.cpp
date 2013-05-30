@@ -434,6 +434,7 @@ SbmDeformableMeshGPU::SbmDeformableMeshGPU(void)
 	VBOWeight1 = NULL;
 	VBOWeight2 = NULL;
 	TBOTran = NULL;
+	initGPUVertexBuffer = false;
 }
 
 SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
@@ -480,6 +481,8 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	glUseProgram(program);	
 
 	
+
+	
 	int iActiveTex = 0;	
 
 	GLuint diffuse_sampler_location = glGetUniformLocation(program,"diffuseTexture");	
@@ -521,7 +524,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 		GLuint transformLocation = glGetUniformLocation(program,"Transform");
 		glUniformMatrix4fv(transformLocation,tranBuffer.size(),true,(GLfloat*)getPtr(tranBuffer));
 	}
-
+	
 	
 	glEnableClientState(GL_VERTEX_ARRAY);	
 	glEnableClientState(GL_NORMAL_ARRAY);
@@ -1153,13 +1156,15 @@ void SbmDeformableMeshGPU::updateTransformBuffer()
 
 
 
-bool SbmDeformableMeshGPU::buildVertexBuffer()
+bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 {
+	bool hasGLContext = SbmShaderManager::singleton().initOpenGL() && SbmShaderManager::singleton().initGLExtension();
+	if (!hasGLContext) return false;
 	if (skinWeights.size() == 0 )
 		return false;
-	if (initVertexBuffer) return true;
+	if (initGPUVertexBuffer) return true;
 	DeformableMesh::buildVertexBuffer();
-	GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
+	//GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
 	VBOPos = new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuf);		
 	VBOTangent = new VBOVec3f((char*)"Tangent",VERTEX_TANGENT, tangentBuf);
 	VBOBiNormal = new VBOVec3f((char*)"BiNormal",VERTEX_BINORMAL, binormalBuf);
@@ -1185,12 +1190,13 @@ bool SbmDeformableMeshGPU::buildVertexBuffer()
 		int colorSize = DeformableMesh::dMeshDynamic_p.size()*3;
 		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 	}
+	initGPUVertexBuffer = true;
 	return true;
 }
 
 bool SbmDeformableMeshGPU::initBuffer()
 {
-	this->buildVertexBuffer();
+	this->buildVertexBufferGPU();
 
 	GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
 
@@ -1270,20 +1276,21 @@ void SbmDeformableMeshGPUInstance::update()
 		DeformableMeshInstance::update();		
 		return;
 	}	
+	
+	SbmShaderProgram* program = SbmShaderManager::singleton().getShader(shaderName);	
+	bool hasGLContext = SbmShaderManager::singleton().initOpenGL() && SbmShaderManager::singleton().initGLExtension();	
 
-	if (!SbmDeformableMeshGPU::initShader)
+	if (!SbmDeformableMeshGPU::initShader && hasGLContext)
 	{
 		SbmDeformableMeshGPU::initShaderProgram();
 	}
-
-	SbmShaderProgram* program = SbmShaderManager::singleton().getShader(shaderName);	
-	bool hasGLContext = SbmShaderManager::singleton().initOpenGL() && SbmShaderManager::singleton().initGLExtension();	
+	
 	if (!bufferReady && hasGLContext && program && program->finishBuild())
 	{
 		// initialize 
 		bufferReady = initBuffer();
 	}
-
+	
 	if (!bufferReady || !hasGLContext)
 	{	
 		DeformableMeshInstance::setVisibility(true);
@@ -1297,7 +1304,7 @@ void SbmDeformableMeshGPUInstance::update()
 		DeformableMeshInstance::setVisibility(false);
 		_updateMesh = true;
 		_skeleton->update_global_matrices();
-		updateTransformBuffer();
+		updateTransformBuffer();		
 		gpuMesh->skinTransformGPU(transformBuffer,TBOTran);
 	}
 }
@@ -1305,7 +1312,7 @@ void SbmDeformableMeshGPUInstance::update()
 bool SbmDeformableMeshGPUInstance::initBuffer()
 {	
 	SbmDeformableMeshGPU* gpuMesh = dynamic_cast<SbmDeformableMeshGPU*>(_mesh);
-	bool hasVertexBuffer = gpuMesh->buildVertexBuffer();	
+	bool hasVertexBuffer = gpuMesh->buildVertexBufferGPU();	
 	if (!hasVertexBuffer) return false;
 	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_3_0)
 	{

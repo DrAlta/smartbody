@@ -136,8 +136,17 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 	this->size_range(800, 480);
 }
 
+
+void ChannelBufferWindow::reset()
+{
+	refreshCharacters(NULL, this);
+	refreshCharacters(NULL, this);
+	resetCamera(NULL, this);	
+}
+
 ChannelBufferWindow::~ChannelBufferWindow()
 {
+	LOG("ChannelBufferWindow::destructor");
 	clearChannelItem(this);
 }
 
