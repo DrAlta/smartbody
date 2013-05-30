@@ -390,7 +390,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		std::string absPathStr = p.string();
 
 		std::string xml;
-		std::ifstream in(absPathStr);
+		std::ifstream in(absPathStr.c_str());
 		if (in)
 		{
 			in.seekg(0, std::ios::end);
