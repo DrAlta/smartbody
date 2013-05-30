@@ -41,12 +41,13 @@ protected:
 	TBOData  *TBOTran; // bone transformation		
 	std::vector<VBOVec3i*> subMeshTris;
 	std::vector<SrMat>  transformBuffer;	
+	bool initGPUVertexBuffer;
 public:
 	SBAPI SbmDeformableMeshGPU(void);
 	~SbmDeformableMeshGPU(void);	
 public:
 	virtual void update();
-	virtual bool buildVertexBuffer();	
+	virtual bool buildVertexBufferGPU();	
 	void skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOData* tranTBO);
 	static void initShaderProgram();	
 protected:

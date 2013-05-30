@@ -34,8 +34,8 @@
 
 GlChartView::GlChartView(int x, int y, int w, int h, char* name) : Fl_Gl_Window( x, y, w, h, name ), SrViewer(x, y, w, h, name)
 {
-	initGL(w, h);
-	initFont();
+	//initGL(w, h);
+	//initFont();
 	init_camera(0);
 	th = 0;
 	//max_buffer_size = 800;
@@ -50,6 +50,9 @@ GlChartView::GlChartView(int x, int y, int w, int h, char* name) : Fl_Gl_Window(
 
 GlChartView::~GlChartView()
 {
+	LOG("GlChartView::destructor");	
+	//make_current();
+	//glDeleteTextures(1, &fontTextureName);
 }
 
 void GlChartView::set_max_buffer_size(int max_size)
@@ -60,6 +63,7 @@ void GlChartView::set_max_buffer_size(int max_size)
 
 void GlChartView::initGL(int width, int height)
 {
+	make_current();
 	//float pos1[4] = {1500.0, 1500.0, 1500.0, 1.0};
 	float pos0[4] = {-15000.0f, -12000.0f, 15000.0f, 1.0f};
 	float ambient[4] = {0.2f, 0.2f, 0.2f, 1.0f};
@@ -94,23 +98,23 @@ void GlChartView::initGL(int width, int height)
 
 void GlChartView::initFont()
 {
+	make_current();
 	GLint src;
 	glGetIntegerv(GL_BLEND_SRC, &src);
 	GLint dest;
 	glGetIntegerv(GL_BLEND_DST, &dest);
 
-	glPushAttrib(GL_ENABLE_BIT);
-	GLuint textureName;	
+	glPushAttrib(GL_ENABLE_BIT);	
 	glEnable(GL_TEXTURE_2D);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glGenTextures(1, &textureName);
+	glGenTextures(1, &fontTextureName);
 
 #ifdef WIN32
 	std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
 	std::string fontPath = mediaPath + "/" +  "fonts/font.glf";
-	if (!label.Create(fontPath.c_str(), textureName))
+	if (!label.Create(fontPath.c_str(), fontTextureName))
 	{
-		if(!label.Create(".font.glf", textureName))
+		if(!label.Create(".font.glf", fontTextureName))
 			LOG("GlChartViewCoordinate::InitFont(): Error: Cannot load font file\n");
 	}
 #endif
@@ -145,6 +149,7 @@ void GlChartView::init_camera(int type)
 
 void GlChartView::reshape(int width, int height)
 {
+	make_current();
 	glViewport(0, 0, width, height);
 	// transform
 	glMatrixMode(GL_PROJECTION);
@@ -160,7 +165,16 @@ void GlChartView::render()
 
 void GlChartView::draw()
 {
+	
 	make_current();
+	if (!valid())
+	{
+		initGL(w(),h());
+	}
+	if (!context_valid())
+	{
+		initFont();
+	}
 	//LOG("data viewer GL context = %d",wglGetCurrentContext());
 	glViewport ( 0, 0, w(), h() );
 	SrLight light1;
@@ -193,7 +207,9 @@ void GlChartView::draw()
 	glEnable ( GL_LIGHTING );
 	glLight ( 0, light1 );
 	glLight ( 1, light2 );
+	
 
+	
 	glEnable(GL_TEXTURE_2D);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -214,8 +230,7 @@ void GlChartView::draw()
 	draw_series();
 	
 	glDisable(GL_TEXTURE_2D);
-	glPopAttrib();
-	
+	glPopAttrib();		
 }
 
 void GlChartView::draw_coordinate()

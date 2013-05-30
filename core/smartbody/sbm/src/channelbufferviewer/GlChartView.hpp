@@ -31,6 +31,7 @@
 #include <sr/sr_viewer.h>
 #include "GlChartViewCoordinate.hpp"
 #include "GlChartViewArchive.hpp"
+#include <FL/gl.h>
 
 #ifdef WIN32
 #include "glfont2.h"
@@ -53,6 +54,7 @@ public:
 	GlChartViewCoordinate coordinate;
 	GlChartViewArchive archive;
 
+	GLuint fontTextureName;	
 	int quat_shown_type; //0: quaternion; 1: euler angle;
 
 	bool show_x; // if show x value when shown as quaternion or euler angle

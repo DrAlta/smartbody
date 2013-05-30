@@ -22,6 +22,7 @@ class CharacterCreatorWindow : public Fl_Double_Window
 		Fl_Choice* choiceSkeletons;
 		Fl_Input* inputName;
 		Fl_Button* buttonCreate;
+		int numCharacter;
 };
 
 class ResolutionWindow : public Fl_Double_Window
