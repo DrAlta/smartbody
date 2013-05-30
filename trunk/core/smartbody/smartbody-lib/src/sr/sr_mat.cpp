@@ -22,6 +22,7 @@
 # include <math.h>
 
 # include <sr/sr_mat.h>
+#include <boost/lexical_cast.hpp>
 //# include <sr/sr_utils.h>
 
 //================================== Static Data ===================================
@@ -605,6 +606,16 @@ SrMat SrMat::get_rotation() const
 SrVec SrMat::multVec( const SrVec& v1 )
 {	
 	return v1*(*this);
+}
+
+std::string SrMat::toString()
+{
+	std::stringstream o;
+	o << '[' << boost::lexical_cast<std::string>(get(0,0)) <<' '<< boost::lexical_cast<std::string>(get(0,1)) <<' '<< boost::lexical_cast<std::string>(get(0,2)) << ' ' << boost::lexical_cast<std::string>(get(0,3)) << '\n';
+	o << ' ' << boost::lexical_cast<std::string>(get(1,0)) <<' '<< boost::lexical_cast<std::string>(get(1,1)) <<' '<< boost::lexical_cast<std::string>(get(1,2)) << ' ' << boost::lexical_cast<std::string>(get(1,3)) << '\n';
+	o << ' ' << boost::lexical_cast<std::string>(get(2,0)) <<' '<< boost::lexical_cast<std::string>(get(2,1)) <<' '<< boost::lexical_cast<std::string>(get(2,2)) << ' ' << boost::lexical_cast<std::string>(get(2,3)) << '\n';
+	o << ' ' << boost::lexical_cast<std::string>(get(3,0)) <<' '<< boost::lexical_cast<std::string>(get(3,1)) <<' '<< boost::lexical_cast<std::string>(get(3,2)) << ' ' << boost::lexical_cast<std::string>(get(3,3)) << ']';
+	return o.str();
 }
 
 SrMat operator - ( const SrMat &m1, const SrMat &m2 )

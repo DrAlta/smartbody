@@ -21,6 +21,8 @@
 
 # include <sr/sr_quat.h>
 #include <sbm/gwiz_math.h>
+#include <boost/lexical_cast.hpp>
+#include <string>
 
 //============================== Static Data ====================================
 
@@ -327,6 +329,12 @@ SrVec SrQuat::multVec( const SrVec& v )
 	return v*(*this);
 }
 
+std::string SrQuat::toString()
+{
+	std::stringstream o;
+	o <<  boost::lexical_cast<std::string>(w) << ' ' << boost::lexical_cast<std::string>(x) <<' '<< boost::lexical_cast<std::string>(y) <<' '<< boost::lexical_cast<std::string>(z);
+	return o.str();
+}
 //=================================== Friend Functions ===================================
 
 SrVec operator * ( const SrVec &v, const SrQuat &q )

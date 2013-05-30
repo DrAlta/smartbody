@@ -317,7 +317,8 @@ SBAPI bool SBNavigationMesh::buildNavigationMesh( SrModel& inMesh )
 			}
 		}
 
-		naviMesh->computeNormals();				
+		naviMesh->computeNormals();		
+		naviMesh->remove_redundant_materials();
 		//naviMesh->export_iv("../../../../data/test.iv");
 	}
 
@@ -428,7 +429,7 @@ SrModel* SBNavigationMesh::getNavigationMesh()
 	return naviMesh;
 }
 
-SBAPI SrVec SBNavigationMesh::queryMeshPoint( SrVec& p1, SrVec& p2 )
+SBAPI SrVec SBNavigationMesh::queryMeshPointByRayCast( SrVec& p1, SrVec& p2 )
 {
 	if (naviMesh)
 	{
@@ -438,7 +439,7 @@ SBAPI SrVec SBNavigationMesh::queryMeshPoint( SrVec& p1, SrVec& p2 )
 	return SrVec();
 }
 
-void SBNavigationMesh::findPath( SrVec& spos, SrVec& epos, std::vector<SrVec>& pathList )
+std::vector<SrVec> SBNavigationMesh::findPath( SrVec& spos, SrVec& epos )
 {
 	static SrVec polyPickExt = SrVec(2,4,2);
 	static dtQueryFilter filter;
@@ -449,8 +450,7 @@ void SBNavigationMesh::findPath( SrVec& spos, SrVec& epos, std::vector<SrVec>& p
 	int nPolys = 0;
 	dtPolyRef startPoly = 0, endPoly = 0;
 
-
-	
+	std::vector<SrVec> pathList;	
 	m_navQuery->findNearestPoly(&spos[0], &polyPickExt[0], &filter, &startPoly, 0);
 	m_navQuery->findNearestPoly(&epos[0], &polyPickExt[0], &filter, &endPoly, 0);	
 
@@ -474,6 +474,7 @@ void SBNavigationMesh::findPath( SrVec& spos, SrVec& epos, std::vector<SrVec>& p
 				pathList.push_back(m_straightPath[i]);
 		}
 	}
+	return pathList;
 }
 
 }

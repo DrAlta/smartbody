@@ -3313,7 +3313,8 @@ SBAPI bool SBScene::createNavigationMesh( const std::string& meshfilename )
 	//mesh.scale(0.3f);
 	SrModel* srMesh = meshVec[0];
 	for (unsigned int i=1;i<meshVec.size();i++)
-		srMesh->add_model(*meshVec[i]); // adding all mesh together
+		srMesh->add_model(*meshVec[i]); // adding all mesh together	
+	srMesh->remove_redundant_materials();
 	srMesh->validate();
 	srMesh->computeNormals();
 	if (_navigationMesh) 

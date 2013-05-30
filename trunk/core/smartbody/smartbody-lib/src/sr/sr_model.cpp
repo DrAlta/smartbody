@@ -111,6 +111,8 @@ void SrModel::validate ()
       Fm.size ( fsize );
       for ( i=j; i<fsize; i++ ) Fm[i]=0;
     }
+
+   mtlFaceIndices.clear(); // remove all mtlFaceIndices
    for (int i=0;i<Fm.size();i++)
    {
 	   int matIdx = Fm[i];
@@ -122,7 +124,7 @@ void SrModel::validate ()
 	   if (mtlFaceIndices.find(matName) == mtlFaceIndices.end())
 		   mtlFaceIndices[matName] = std::vector<int>();
 	   mtlFaceIndices[matName].push_back(i);
-   }
+   }   
  }
 
 void SrModel::remove_redundant_materials ()
@@ -143,14 +145,19 @@ void SrModel::remove_redundant_materials ()
       // remove references to duplicated materials
       int msize = M.size();
       for ( i=0; i<msize; i++ ) 
-       { for ( j=i+1; j<msize; j++ ) 
-          { if ( M[i]==M[j] && mtlnames[i] == mtlnames[j])
-             { //SR_TRACE2 ( "Detected material "<<i<<" equal to "<<j );
-               for ( k=0; k<fsize; k++ ) // replace references to j by i
-                 if ( Fm[k]==j ) Fm[k]=i;
-             }
-          }
-       }
+      { 
+		  for ( j=i+1; j<msize; j++ ) 	      
+          {  
+			  std::string m1,m2;
+			  m1 = mtlnames[i];
+			  m2 = mtlnames[j];
+			  if ( M[i]==M[j] && m1 == m2)
+              { //SR_TRACE2 ( "Detected material "<<i<<" equal to "<<j );
+                for ( k=0; k<fsize; k++ ) // replace references to j by i
+                  if ( Fm[k]==j ) Fm[k]=i;
+              }
+          }       
+	  }
 
       // check for nonused materials
       iarray.size ( M.size() );
@@ -948,20 +955,21 @@ void SrModel::add_model ( const SrModel& m )
        }
     }
 
+   // add material names
    // add the materials:
    if ( m.Fm.size()>0 )
     { M.size ( origm+m.M.size() );
       for ( i=0; i<m.M.size(); i++ ) M[origm+i] = m.M.get(i);
-
       Fm.size ( origf+mfsize );
       for ( i=0; i<mfsize; i++ )
        { Fm[origf+i] = m.Fm[i]+origm;
        }
     }
-
-   // add material names
    for ( i=0; i<m.mtlnames.size(); i++ )
-     mtlnames.push ( m.mtlnames[i] );
+   {
+	   bool newMat = true;
+	   mtlnames.push ( m.mtlnames[i] );
+   }   
     
 //    save(sr_out);
  }

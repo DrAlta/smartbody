@@ -433,7 +433,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 	int numGoals = goalQueue.size();
 
 	// make sure the character is within the grid
-	if (manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(x * scene->getScale(), z * scene->getScale()) == -1)
+	if (!pathFollowing && manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(x * scene->getScale(), z * scene->getScale()) == -1)
 	{
 		if (numGoals > 0)
 		{
@@ -467,7 +467,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 		// compute a collision free goal toward the target
 		goal.targetLocation = Util::Point(newGoal.x , 0.0f, newGoal.z);
 		// make sure that the desired goal is within the bounds of the steering grid
-		if (manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(goal.targetLocation.x, goal.targetLocation.z) == -1)
+		if (!pathFollowing && manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(goal.targetLocation.x, goal.targetLocation.z) == -1)
 		{
 			LOG("Goal (%f, %f) for character %s is out of range of grid.", goal.targetLocation.x, goal.targetLocation.z, character->getName().c_str());
 		}
