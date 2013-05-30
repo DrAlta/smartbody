@@ -344,6 +344,7 @@ class SBAPI SrMat
 
     /*! Reads 16 float numbers from the input. */
     SBAPI friend SrInput&  operator>> ( SrInput& in, SrMat& m );
+	std::string toString();
   };
 
 //============================== end of file ===============================

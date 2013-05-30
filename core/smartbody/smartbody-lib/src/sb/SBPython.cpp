@@ -44,6 +44,7 @@
 #include <sb/SBRetargetManager.h>
 #include <sb/SBEvent.h>
 #include <sb/SBCharacterListener.h>
+#include <sb/SBNavigationMesh.h>
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
 #include <stdlib.h>
@@ -64,6 +65,7 @@
 typedef std::map<std::string,SrQuat> QuatMap;
 typedef std::map<std::string,SrVec> VecMap;
 typedef std::map<std::string, std::string> StringMap;
+typedef std::vector<SrVec> VecArray;
 
 
 namespace SmartBody 
@@ -94,6 +96,10 @@ BOOST_PYTHON_MODULE(SmartBody)
 	boost::python::class_<std::vector<float> >("FloatVec")
         .def(boost::python::vector_indexing_suite<std::vector<float> >())
     ;
+
+	boost::python::class_<std::vector<SrVec> >("VecArray")
+		.def(boost::python::vector_indexing_suite<std::vector<SrVec> >())
+	;
 
 	//boost::python::class_<std::vector<int> >("IntVec")
     //    .def(boost::python::vector_indexing_suite<std::vector<int> >())
@@ -694,6 +700,12 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("setEnableLogging", &SBVHMsgManager::setEnableLogging, "Enables logging over the VH Message bus. Messages will start with the prefix 'vhlog'")
 		.def("isEnableLogging", &SBVHMsgManager::isEnableLogging, "Disables logging over the VH Message bus.")
 		;
+
+		boost::python::class_<SBNavigationMesh>("SBNavigationMesh")			
+			.def("findPath", &SBNavigationMesh::findPath, boost::python::return_value_policy<boost::python::return_by_value>(), "Find a path from start position to end position.")
+			.def("queryMeshPointByRayCast", &SBNavigationMesh::queryMeshPointByRayCast, boost::python::return_value_policy<boost::python::return_by_value>(), "Query the position on navigation mesh by ray casting.")
+			.def("queryFloorHeight", &SBNavigationMesh::queryFloorHeight, boost::python::return_value_policy<boost::python::return_by_value>(), "Query the height of floor on navigation mesh given a position and search radius.")
+			;
 
 
 	pythonFuncsScene();

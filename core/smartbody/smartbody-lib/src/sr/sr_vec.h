@@ -29,6 +29,7 @@
 #include <sb/SBTypes.h>
 # include <sr/sr_input.h> 
 # include <sr/sr_output.h> 
+#include <string>
 
 class SrVec;
 class SrVec2;
@@ -288,6 +289,7 @@ class SBAPI SrVec
 
 	/*! Returns the Yaw angle value of given vector on X-Z plane, in radian, not normalized. - David Huang */
 	float vecYaw(const SrVec& v);
+	std::string toString();
 
  };
 

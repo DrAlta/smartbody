@@ -50,6 +50,7 @@
 
 void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 {
+	
 	DeformableMesh* mesh = shape->getDeformableMesh();
 	if (!mesh) return; // no deformable mesh
 	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
@@ -64,29 +65,34 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{	
 		SbmSubMesh* mesh = subMeshList[i];	
 		glMaterial(mesh->material);
-		//LOG("mat color = %f %f %f\n",color[0],color[1],color[2]);
+		//LOG("mat color = %f %f %f\n",color[0],color[1],color[2]);		
 		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,mesh->texName.c_str());
 		if (tex)
 		{
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D,tex->getID());			
 		}
+		
 #if GLES_RENDER
 		glDrawElements(GL_TRIANGLES, mesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &mesh->triBuf[0]);
 #else
 		glDrawElements(GL_TRIANGLES, mesh->triBuf.size()*3, GL_UNSIGNED_INT, &mesh->triBuf[0]);
 #endif
+		glBindTexture(GL_TEXTURE_2D,0);
 	}	
+	
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_BLEND);
+	glDisable(GL_BLEND);	
+	
 }
 
 void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )

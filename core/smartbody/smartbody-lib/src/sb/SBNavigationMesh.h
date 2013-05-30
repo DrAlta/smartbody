@@ -22,8 +22,8 @@ class SBNavigationMesh
 		SBAPI SrModel* getRawMesh();
 		SBAPI SrModel* getNavigationMesh();
 		SBAPI float queryFloorHeight(SrVec pos, SrVec searchSize);
-		SBAPI SrVec queryMeshPoint(SrVec& p1, SrVec& p2);
-		SBAPI void findPath(SrVec& spos, SrVec& epos, std::vector<SrVec>& pathList);
+		SBAPI SrVec queryMeshPointByRayCast(SrVec& p1, SrVec& p2);
+		SBAPI std::vector<SrVec> findPath(SrVec& spos, SrVec& epos);
 	protected:
 		float m_cellSize;
 		float m_cellHeight;

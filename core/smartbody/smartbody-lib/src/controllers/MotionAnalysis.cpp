@@ -522,7 +522,7 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 
 	// get the height offset 
 
-#if 1 // use height field
+#if 0 // use height field
 	float tnormal[3];
 	float terrainHeight = 0.0f;
 	float footOffset = 0.05f;

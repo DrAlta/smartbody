@@ -1410,7 +1410,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	}	
 #endif
 
-	drawPawns();
+	
 	
 	glDisable(GL_LIGHTING);
 	
@@ -1518,25 +1518,21 @@ void FltkViewer::draw()
 	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
 	glEnable( GL_COLOR_MATERIAL );
 	glEnable( GL_NORMALIZE );
-
-	
-
-	glDisable( GL_COLOR_MATERIAL );
-
-
-	
-
    //----- Render user scene -------------------------------------------
-
+	glDisable( GL_COLOR_MATERIAL );
 	//glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	if (_data->shadowmode == ModeShadows && hasShaderSupport)
 		makeShadowMap();
 
-	drawNavigationMesh();
-	drawAllGeometries();		
-   // draw the grid
+	// real surface geometries
+	drawAllGeometries();	
+
+	drawPawns();
+    // draw the grid
 	//   if (gridList == -1)
 	//	   initGridList();	
+	drawNavigationMesh();
+	
 	drawGrid();
 	drawSteeringInfo();
 	drawEyeBeams();
@@ -1549,7 +1545,7 @@ void FltkViewer::draw()
 
 	drawMotionVectorFlow();
 	drawPlotMotion();
-
+	
 	//drawKinematicFootprints(0);
 
 
@@ -2037,12 +2033,12 @@ int FltkViewer::handle ( int event )
 				if (scene->getNavigationMesh())				
 				{
 					std::vector<SrVec> pathList;
-					dest = scene->getNavigationMesh()->queryMeshPoint(p1,p2);
+					dest = scene->getNavigationMesh()->queryMeshPointByRayCast(p1,p2);
 					if (dest.x != 0.f || dest.y != 0.f || dest.z != 0.f)
 					{
 						intersectGround = false;
 						src = ppraiAgent->getCharacter()->getPosition();
-						scene->getNavigationMesh()->findPath(src,dest,pathList);
+						pathList = scene->getNavigationMesh()->findPath(src,dest);
 						std::stringstream command;
 						command << "steer move " << character->getName() << " normal ";
 						for (unsigned int k=0; k < pathList.size(); k++)
@@ -4085,20 +4081,24 @@ void FltkViewer::drawLocomotion()
 				iter1++;
 				if (iter1 != character->trajectoryBuffer.end())
 				{
-					glVertex3f(iter->x, 0.5f, iter->z);
-					glVertex3f(iter1->x, 0.5f, iter1->z);
+					//glVertex3f(iter->x, 0.5f, iter->z);
+					//glVertex3f(iter1->x, 0.5f, iter1->z);
+					glVertex3f(iter->x, iter->y, iter->z);
+					glVertex3f(iter1->x, iter1->y, iter1->z);
 				}
 			}
 			glEnd();
 
-			glColor3f(1.0f, 0.0f, 0.0f);
+			glColor3f(1.0f, 0.0f, 1.0f);
 			glBegin(GL_LINES);
 			int num = int(character->trajectoryGoalList.size() / 3) - 1;
 			if (num >= 1)
 				for (int i = 0; i < num; i++)
 				{
-					glVertex3f(character->trajectoryGoalList[(size_t)i * 3 + 0], 0.5f, character->trajectoryGoalList[(size_t)i * 3 + 2]);
-					glVertex3f(character->trajectoryGoalList[((size_t)i + 1) * 3 + 0], 0.5f, character->trajectoryGoalList[((size_t)i + 1) * 3 + 2]);
+					//glVertex3f(character->trajectoryGoalList[(size_t)i * 3 + 0], 0.5f, character->trajectoryGoalList[(size_t)i * 3 + 2]);
+					//glVertex3f(character->trajectoryGoalList[((size_t)i + 1) * 3 + 0], 0.5f, character->trajectoryGoalList[((size_t)i + 1) * 3 + 2]);
+					glVertex3f(character->trajectoryGoalList[(size_t)i * 3 + 0],character->trajectoryGoalList[(size_t)i * 3 + 1], character->trajectoryGoalList[(size_t)i * 3 + 2]);
+					glVertex3f(character->trajectoryGoalList[((size_t)i + 1) * 3 + 0], character->trajectoryGoalList[((size_t)i + 1) * 3 + 1], character->trajectoryGoalList[((size_t)i + 1) * 3 + 2]);
 				}
 			glEnd();
 			glEnable(GL_LIGHTING);

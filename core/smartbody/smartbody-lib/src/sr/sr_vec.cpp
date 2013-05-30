@@ -23,6 +23,7 @@
 # include <math.h>
 # include <sr/sr_vec.h>
 # include <sr/sr_vec2.h>
+#include <boost/lexical_cast.hpp>
 
 //===========================================================================
 
@@ -188,6 +189,13 @@ float SrVec::vecYaw(const SrVec& v)
 	if (v.x == 0.0f && v.z == 0.0f)
 		return 0.0f;
     return (float) -(atan2(v.z, v.x) - SR_PIDIV2);
+}
+
+std::string SrVec::toString()
+{
+	std::stringstream o;
+	o << boost::lexical_cast<std::string>(x) <<' '<< boost::lexical_cast<std::string>(y) <<' '<< boost::lexical_cast<std::string>(z);
+	return o.str();
 }
 
 float dot ( const SrVec& v1, const SrVec& v2 )
