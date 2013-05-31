@@ -96,11 +96,13 @@ public:
 	std::map<std::string, GeneralParam*>*   param_map;
 
 		// reach motion database for example-based IK reaching
+#if 0
 	std::set<std::pair<int,SkMotion*> >*      reachMotionData;
 	std::set<std::pair<int,SkMotion*> >*      reachHandData;
 	std::set<std::pair<int,SkMotion*> >*      grabHandData;
 	std::set<std::pair<int,SkMotion*> >*      releaseHandData;
 	std::set<std::pair<int,SkMotion*> >*      pointHandData;
+#endif
 		// reach engine map
 	std::map<int,MeCtReachEngine*>* reachEngineMap;
 	int            currentReachType;
@@ -301,8 +303,10 @@ public:
 
 
 public:
-	static SkMotion* findTagSkMotion(int tag, const std::set<std::pair<int,SkMotion*> >& motionSet);
+	
 	static void addTagSkMotion(int tag, SkMotion* motion, std::set<std::pair<int,SkMotion*> >& motionSet);
+
+	/*
 	bool addReachMotion(int tag, SkMotion* motion);
 	bool removeReachMotion(int tag, SkMotion* motion);
 	SkMotion* getReachMotion(int index);
@@ -312,6 +316,7 @@ public:
 	const std::set<std::pair<int,SkMotion*> >& getGrabHandData() const { return *grabHandData;}
 	const std::set<std::pair<int,SkMotion*> >& getReachHandData() const { return *reachHandData;}
 	const std::set<std::pair<int,SkMotion*> >& getReleaseHandData() const { return *releaseHandData;}
+	*/
 	std::map<int,MeCtReachEngine*>& getReachEngineMap() { return *reachEngineMap; }
 	int   getCurrentReachType() { return currentReachType; }
 	void   setCurrentReachType(int type) { currentReachType = type; }

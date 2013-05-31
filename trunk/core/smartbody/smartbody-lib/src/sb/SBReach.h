@@ -4,11 +4,15 @@
 #include <sb/SBTypes.h>
 #include <string>
 #include <vector>
+#include <set>
 
 namespace SmartBody {
 
 class SBCharacter;
 class SBMotion;
+
+typedef std::pair<int,SmartBody::SBMotion*> TagMotion; // pair the motion with a tag
+typedef std::set<TagMotion> MotionDataSet;
 
 class SBReach
 {
@@ -39,10 +43,24 @@ class SBReach
 		SBAPI void setReachHandMotion(std::string type,SBMotion* reachMotion);
 		SBAPI SBMotion* getReachHandMotion(std::string type);
 
+		const std::set<std::pair<int,SBMotion*> >& getReachMotionDataSet() const { return reachMotionData;}
+
+		const std::set<std::pair<int,SBMotion*> >& getPointHandData() const { return pointHandData;}
+		const std::set<std::pair<int,SBMotion*> >& getGrabHandData() const { return grabHandData;}
+		const std::set<std::pair<int,SBMotion*> >& getReachHandData() const { return reachHandData;}
+		const std::set<std::pair<int,SBMotion*> >& getReleaseHandData() const { return releaseHandData;}
+		static SBMotion* findTagMotion(int tag, const MotionDataSet& motionSet);
+
 	protected:
 
 		SBCharacter* _character;
 		std::string interpolatorType;
+
+		std::set<std::pair<int,SBMotion*> >      reachMotionData;
+		std::set<std::pair<int,SBMotion*> >      reachHandData;
+		std::set<std::pair<int,SBMotion*> >      grabHandData;
+		std::set<std::pair<int,SBMotion*> >      releaseHandData;
+		std::set<std::pair<int,SBMotion*> >      pointHandData;
 };
 
 }

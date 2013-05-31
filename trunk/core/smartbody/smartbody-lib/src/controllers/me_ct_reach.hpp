@@ -23,11 +23,12 @@
 #pragma once
 #include <sk/sk_skeleton.h>
 #include <sb/SBController.h>
+#include <sb/SBMotion.h>
 #include "me_ct_limb.hpp"
 #include "me_ct_reach_IK.hpp"
 #include "sbm/gwiz_math.h"
 
-typedef std::pair<int,SkMotion*> TagMotion; // pair the motion with a tag
+typedef std::pair<int,SmartBody::SBMotion*> TagMotion; // pair the motion with a tag
 typedef std::set<TagMotion> MotionDataSet;
 
 class MeCtReach : public SmartBody::SBController

@@ -6,6 +6,7 @@
 #include <time.h>
 #include <boost/foreach.hpp>
 #include <sb/sbm_character.hpp>
+#include <sb/SBReach.h>
 
 #include "controllers/MeCtReachEngine.h"
 using namespace boost;
@@ -226,10 +227,10 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 		_channels.add(joint->jointName(), SkChannel::Quat);		
 	}	
 	SmartBody::SBMotion *releaseHand, *grabHand, *reachHand, *pointHand;
-	releaseHand = dynamic_cast<SmartBody::SBMotion*>(SbmCharacter::findTagSkMotion(type,releasePose));
-	grabHand = dynamic_cast<SmartBody::SBMotion*>(SbmCharacter::findTagSkMotion(type,grabPose));
-	reachHand = dynamic_cast<SmartBody::SBMotion*>(SbmCharacter::findTagSkMotion(type,reachPose));
-	pointHand = dynamic_cast<SmartBody::SBMotion*>(SbmCharacter::findTagSkMotion(type, pointPose));	
+	releaseHand = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBReach::findTagMotion(type,releasePose));
+	grabHand = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBReach::findTagMotion(type,grabPose));
+	reachHand = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBReach::findTagMotion(type,reachPose));
+	pointHand = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBReach::findTagMotion(type, pointPose));	
 
 	if (releaseHand)
 		releaseFrame.setMotionPose((float)releaseHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,releaseHand);

@@ -8,13 +8,13 @@ namespace SmartBody {
 SBReach::SBReach()
 {
 	_character = NULL;
-	interpolatorType = "KNN";
+	interpolatorType = "KNN";	
 }
 
 SBReach::SBReach(SBCharacter* character)
 {
 	_character = character;
-	interpolatorType = "KNN";
+	interpolatorType = "KNN";	
 }
 
 SBReach::~SBReach()
@@ -45,7 +45,12 @@ void SBReach::addMotion(std::string type, SBMotion* motion)
 	int reachType = MeCtReachEngine::getReachType(type);
 	if (reachType != -1)
 	{
-		_character->addReachMotion(reachType,motion);
+		//_character->addReachMotion(reachType,motion);
+		TagMotion tagMotion = TagMotion(reachType, motion);
+		if (reachMotionData.find(tagMotion) == reachMotionData.end()) 
+		{
+			reachMotionData.insert(tagMotion);			
+		}		
 	}
 	else
 	{
@@ -65,7 +70,11 @@ void SBReach::removeMotion(std::string type, SBMotion* motion)
 	int reachType = MeCtReachEngine::getReachType(type);
 	if (reachType != -1)
 	{
-		_character->removeReachMotion(reachType,motion);
+		TagMotion tagMotion = TagMotion(reachType, motion);
+		if (reachMotionData.find(tagMotion) != reachMotionData.end()) 
+		{
+			reachMotionData.erase(tagMotion);			
+		}		
 	}	
 	else
 	{
@@ -79,13 +88,14 @@ int SBReach::getNumMotions()
 	if (!_character)
 		return 0;
 
-	return _character->getReachMotionDataSet().size();
+	return reachMotionData.size();
 }
 
 std::vector<std::string> SBReach::getMotionNames(std::string type)
 {
 	std::vector<std::string> motionNames;
-	MotionDataSet& motionSet = const_cast<MotionDataSet&>(_character->getReachMotionDataSet());
+	//MotionDataSet& motionSet = const_cast<MotionDataSet&>(_character->getReachMotionDataSet());
+	MotionDataSet& motionSet = reachMotionData;
 	MotionDataSet::iterator vi;
 	for ( vi  = motionSet.begin();
 		  vi != motionSet.end();
@@ -113,7 +123,7 @@ void SBReach::build(SBCharacter* character)
 		MeCtReachEngine* re = mi->second;
 		if (re)
 		{
-			re->updateMotionExamples(character->getReachMotionDataSet(), interpolatorType);
+			re->updateMotionExamples(reachMotionData, interpolatorType);
 		}
 	}
 }
@@ -144,7 +154,7 @@ void SBReach::setPointHandMotion( std::string type, SBMotion* pointMotion )
 {
 	if (!_character)
 		return;
-	MotionDataSet& pointMotionSet = const_cast<MotionDataSet&>(_character->getPointHandData());
+	MotionDataSet& pointMotionSet = pointHandData;
 	int reachType = MeCtReachEngine::getReachType(type);
 	if (reachType != -1)
 	{
@@ -161,10 +171,9 @@ void SBReach::setPointHandMotion( std::string type, SBMotion* pointMotion )
 
 SBMotion* SBReach::getPointHandMotion( std::string type )
 {
-	MotionDataSet& pointMotionSet = const_cast<MotionDataSet&>(_character->getPointHandData());
+	MotionDataSet& pointMotionSet = pointHandData;
 	int reachType = MeCtReachEngine::getReachType(type);
-	SkMotion* skMotion = SbmCharacter::findTagSkMotion(reachType,pointMotionSet);
-	SBMotion* sbMotion = dynamic_cast<SBMotion*>(skMotion);
+	SBMotion* sbMotion = SBReach::findTagMotion(reachType,pointMotionSet);	
 	return sbMotion;
 }
 
@@ -172,7 +181,7 @@ void SBReach::setGrabHandMotion(std::string type, SBMotion* grabMotion)
 {
 	if (!_character)
 		return;
-	MotionDataSet& grabMotionSet = const_cast<MotionDataSet&>(_character->getGrabHandData());
+	MotionDataSet& grabMotionSet = grabHandData;
 	int reachType = MeCtReachEngine::getReachType(type);
 	if (reachType != -1)
 	{
@@ -188,10 +197,9 @@ void SBReach::setGrabHandMotion(std::string type, SBMotion* grabMotion)
 
 SBMotion* SBReach::getGrabHandMotion(std::string type)
 {
-	MotionDataSet& grabMotionSet = const_cast<MotionDataSet&>(_character->getGrabHandData());
+	MotionDataSet& grabMotionSet = grabHandData;
 	int reachType = MeCtReachEngine::getReachType(type);
-	SkMotion* skMotion = SbmCharacter::findTagSkMotion(reachType,grabMotionSet);
-	SBMotion* sbMotion = dynamic_cast<SBMotion*>(skMotion);
+	SBMotion* sbMotion = SBReach::findTagMotion(reachType,grabMotionSet);	
 	return sbMotion;
 }
 
@@ -199,7 +207,7 @@ void SBReach::setReleaseHandMotion(std::string type, SBMotion* releasebMotion)
 {
 	if (!_character)
 		return;
-	MotionDataSet& releaseMotionSet = const_cast<MotionDataSet&>(_character->getReleaseHandData());
+	MotionDataSet& releaseMotionSet = releaseHandData;
 	int reachType = MeCtReachEngine::getReachType(type);
 	if (reachType != -1)
 	{
@@ -215,10 +223,9 @@ void SBReach::setReleaseHandMotion(std::string type, SBMotion* releasebMotion)
 
 SBMotion* SBReach::getReleaseHandMotion(std::string type)
 {
-	MotionDataSet& releaseMotionSet = const_cast<MotionDataSet&>(_character->getReleaseHandData());
+	MotionDataSet& releaseMotionSet = releaseHandData;
 	int reachType = MeCtReachEngine::getReachType(type);
-	SkMotion* skMotion = SbmCharacter::findTagSkMotion(reachType,releaseMotionSet);
-	SBMotion* sbMotion = dynamic_cast<SBMotion*>(skMotion);
+	SBMotion* sbMotion = SBReach::findTagMotion(reachType,releaseMotionSet);	
 	return sbMotion;
 }
 
@@ -226,7 +233,7 @@ void SBReach::setReachHandMotion(std::string type, SBMotion* reachMotion)
 {
 	if (!_character)
 		return;
-	MotionDataSet& reachMotionSet = const_cast<MotionDataSet&>(_character->getReachHandData());
+	MotionDataSet& reachMotionSet = reachHandData;
 	int reachType = MeCtReachEngine::getReachType(type);
 	if (reachType != -1)
 	{
@@ -242,10 +249,9 @@ void SBReach::setReachHandMotion(std::string type, SBMotion* reachMotion)
 
 SBMotion* SBReach::getReachHandMotion(std::string type)
 {
-	MotionDataSet& reachMotionSet = const_cast<MotionDataSet&>(_character->getReachHandData());
+	MotionDataSet& reachMotionSet = reachHandData;
 	int reachType = MeCtReachEngine::getReachType(type);
-	SkMotion* skMotion = SbmCharacter::findTagSkMotion(reachType,reachMotionSet);
-	SBMotion* sbMotion = dynamic_cast<SBMotion*>(skMotion);
+	SBMotion* sbMotion  = SBReach::findTagMotion(reachType,reachMotionSet);	
 	return sbMotion;
 }
 
@@ -259,5 +265,18 @@ std::string& SBReach::getInterpolatorType()
 	return interpolatorType;
 }
 
+SBMotion* SBReach::findTagMotion( int tag, const MotionDataSet& motionSet )
+{
+	MotionDataSet::const_iterator vi;
+	for ( vi  = motionSet.begin();
+		vi != motionSet.end();
+		vi++)
+	{
+		TagMotion tagMotion = *vi;
+		if (tagMotion.first == tag)
+			return tagMotion.second;
+	}
+	return NULL;
+}
 
 }

@@ -17,6 +17,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCommandManager.h>
 #include <sb/SBBmlProcessor.h>
+#include <sb/SBReach.h>
 #include <bml/bml_processor.hpp>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_blend.hpp>
@@ -902,7 +903,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 {
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	
+	SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(character);
 	if (cmd == "mesh")
 	{
 		if (!character->dMesh_p)
@@ -1934,6 +1935,8 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											std::string motion_name = args.read_token();
 											std::string tagName = args.read_token();
 											SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motion_name);
+
+											SmartBody::SBReach* reach = sbChar->getReach();
 											//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
 											int reachType = MeCtReachEngine::getReachType(tagName);//
 											if (reachType == -1)
@@ -1943,11 +1946,11 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 												//addReachMotion(motion);
 												TagMotion tagMotion = TagMotion(reachType,motion);
 												if (hand_cmd == "grabhand")
-													character->grabHandData->insert(tagMotion);
+													reach->setGrabHandMotion(tagName,motion);
 												else if (hand_cmd == "reachhand")
-													character->reachHandData->insert(tagMotion);
+													reach->setReachHandMotion(tagName,motion);
 												else if (hand_cmd == "releasehand")
-													character->releaseHandData->insert(tagMotion);
+													reach->setReleaseHandMotion(tagName,motion);
 
 												return CMD_SUCCESS;
 											}
@@ -1962,6 +1965,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 									{
 										std::string reach_cmd = args.read_token();		
 										bool print_track = false;
+										SmartBody::SBReach* reach = sbChar->getReach();
 										if (reach_cmd == "add")
 										{			
 											string motion_name = args.read_token();		
@@ -1971,10 +1975,10 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 												reachType = MeCtReachEngine::RIGHT_ARM;
 											SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motion_name);
 											//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
-											if (motion)
+											if (motion && reach)
 											{
 												// assume the right hand motion and mirror the left hand motion
-												character->addReachMotion(reachType,motion);
+												reach->addMotion(tagName,motion);
 												return CMD_SUCCESS;
 											}
 											else
@@ -1985,12 +1989,15 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 										}
 										else if (reach_cmd == "list")
 										{
+#if 0
 											int motion_num = character->reachMotionData->size();
 											//SkMotion* motion = getReachMotion(motion_num);
-											for (int c = 0; c < motion_num; c++)
+											std::vector<std::string> reachMotionNames = reach->getMotionNames();
+											for (unsigned int c = 0; c < reachMotionNames.size(); c++)
 											{
-												LOG( "%s", character->getReachMotion(c)->getName().c_str() );
+												LOG( "%s", reachMotionNames[c].c_str() );
 											}
+#endif
 											return CMD_SUCCESS;
 										}
 										else if (reach_cmd == "build")
@@ -2000,6 +2007,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 												LOG("character %s, reach engine is not initialized.", character->getName().c_str());
 												return CMD_FAILURE;
 											}				
+											SmartBody::SBReach* reach = sbChar->getReach();
 											ReachEngineMap::iterator mi;
 											for ( mi  = character->reachEngineMap->begin();
 												mi != character->reachEngineMap->end();
@@ -2009,13 +2017,14 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 												if (re)
 												{
 													//re->updateMotionExamples(getReachMotionDataSet(),"KNN");
-													re->updateMotionExamples(character->getReachMotionDataSet(),"Inverse");
+													re->updateMotionExamples(reach->getReachMotionDataSet(),"Inverse");
 												}
 											}
 											return (CMD_SUCCESS);
 										}			
 										else if (reach_cmd == "play")
 										{
+#if 0
 											int motion_num = args.read_int();
 											SkMotion* motion = character->getReachMotion(motion_num);
 											if (motion)
@@ -2025,6 +2034,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 												sprintf(cmd,"bml char %s <body posture=\"%s\"/>", character->getName().c_str(),motion->getName().c_str());
 												SmartBody::SBScene::getScene()->getCommandManager()->execute(cmd);
 											}			
+#endif
 											return CMD_SUCCESS;
 										}
 										return CMD_FAILURE;
