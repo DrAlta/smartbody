@@ -145,12 +145,7 @@ SbmCharacter::SbmCharacter( const char* character_name, std::string type)
 	SbmCharacter::initData();
 	setClassType(type);
 
-	reachEngineMap = new ReachEngineMap();
-	reachMotionData = new MotionDataSet();
-	reachHandData = new MotionDataSet();
-	grabHandData = new MotionDataSet();
-	releaseHandData = new MotionDataSet();
-	pointHandData = new MotionDataSet();
+	reachEngineMap = new ReachEngineMap();	
 }
 
 //  Constructor
@@ -189,12 +184,7 @@ _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 	param_sched_p->ref();
 	eyelid_ct->ref();	
 
-	reachEngineMap = new ReachEngineMap();
-	reachMotionData = new MotionDataSet();
-	reachHandData = new MotionDataSet();
-	grabHandData = new MotionDataSet();
-	releaseHandData = new MotionDataSet();
-	pointHandData = new MotionDataSet();
+	reachEngineMap = new ReachEngineMap();	
 }
 
 
@@ -263,13 +253,7 @@ SbmCharacter::~SbmCharacter( void )	{
 	}
 	reachEngineMap->clear();
 	delete reachEngineMap;
-
-	delete reachMotionData;
-	delete reachHandData;
-	delete grabHandData;
-	delete releaseHandData;
-	delete pointHandData;
-
+	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	
 	if (scene->getCharacterListener())
@@ -298,12 +282,7 @@ void SbmCharacter::copy( SbmCharacter* origChar )
 	if (getSkeleton()->getName() != origChar->getSkeleton()->getName())
 	{
 		getSkeleton()->copy(origChar->getSkeleton());
-	}
-	reachMotionData = origChar->reachMotionData;
-	reachHandData = origChar->reachHandData;
-	grabHandData = origChar->grabHandData;
-	releaseHandData = origChar->releaseHandData;
-	pointHandData = origChar->pointHandData;
+	}	
 	// locomotion 
 	locomotion_type = origChar->locomotion_type;
 	statePrefix = origChar->statePrefix;
@@ -2121,7 +2100,7 @@ bool SbmCharacter::is_face_controller_enabled() {
 ///////////////////////////////////////////////////////////////////////////
 
 
-
+#if 0
 
 
 bool SbmCharacter::removeReachMotion( int tag, SkMotion* motion )
@@ -2161,7 +2140,7 @@ SkMotion* SbmCharacter::getReachMotion( int index )
 	}
 	return NULL;
 }
-
+#endif
 void SbmCharacter::setMinVisemeTime(float minTime)
 {
 	_minVisemeTime = minTime;
@@ -2663,6 +2642,7 @@ bool SbmCharacter::checkExamples()
 	return false;
 }
 
+#if 0
 SkMotion* SbmCharacter::findTagSkMotion( int tag, const MotionDataSet& motionSet )
 {
 	MotionDataSet::const_iterator vi;
@@ -2676,6 +2656,7 @@ SkMotion* SbmCharacter::findTagSkMotion( int tag, const MotionDataSet& motionSet
 	}
 	return NULL;
 }
+#endif
 
 void SbmCharacter::createReachEngine()
 {

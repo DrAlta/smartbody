@@ -41,6 +41,7 @@
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/BMLDefs.h"
 #include <sb/SBSkeleton.h>
+#include <sb/SBReach.h>
 
 #define TEST_GAZE_LOCOMOTION 0 // set to 1 if want to test gaze+locomotion control when reaching
 
@@ -130,10 +131,17 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	{
 		handCt = new MeCtHand(sbSkel, wristJoint);		
 		handCt->handle(handle);
-		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
-		
-		handCt->init(grabType,chr->getReachHandData(),chr->getGrabHandData(),chr->getReleaseHandData(), chr->getPointHandData());				
-		bCreateNewController = true;
+		SmartBody::SBCharacter* chr = dynamic_cast<SmartBody::SBCharacter*>(request->actor);
+		if (chr->getReach())
+		{
+			SmartBody::SBReach* reach = chr->getReach();
+			handCt->init(grabType,reach->getReachHandData(),reach->getGrabHandData(),reach->getReleaseHandData(), reach->getPointHandData());				
+			bCreateNewController = true;
+		}
+		else
+		{
+			// error, no reach controller is initialized
+		}
 	}
 
 	std::string attrGrabState = xml_parse_string(BMLDefs::ATTR_GRAB_STATE,elem,"",false);
