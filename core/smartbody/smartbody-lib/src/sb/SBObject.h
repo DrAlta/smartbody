@@ -45,6 +45,9 @@ class SBObject : public SBObserver, public SBSubject
 		SBAPI void clearAttributes();
 		SBAPI int getNumAttributes();
 
+		// copy all attributes from original object to this object
+		SBAPI void copyAllAttributes(SBObject* origObj); 
+
 		SBAPI std::vector<std::string> getAttributeNames();
 
 		SBAPI BoolAttribute* createBoolAttribute(const std::string& name, bool value, bool notifySelf, const std::string& groupName, int priority, 

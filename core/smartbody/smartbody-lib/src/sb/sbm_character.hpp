@@ -366,6 +366,8 @@ public:
 	virtual SmartBody::MiniBrain* getMiniBrain();
 	int writeSkeletonHierarchy(std::string file, double scale);
 
+	virtual void copy(SbmCharacter* origChar);
+
 
 private:
 

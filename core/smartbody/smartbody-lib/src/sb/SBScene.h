@@ -99,6 +99,7 @@ class SBScene : public SBObject
 		SBAPI void sendVHMsg2(const std::string&, const std::string& encodedMessage);		
 
 		SBAPI SBCharacter* createCharacter(const std::string&, const std::string&);
+		SBAPI SBCharacter* copyCharacter(const std::string& origCharacter, const std::string& newCharacter);
 		SBAPI SBPawn* createPawn(const std::string& pawnName);
 		SBAPI void removeAllCharacters();
 		SBAPI void removeCharacter(const std::string& charName);

@@ -122,6 +122,8 @@ public:
 	SBAPI SbmPawn( const char* name );
 	SBAPI virtual ~SbmPawn();
 
+	SBAPI virtual void copy(SbmPawn* orignalPawn);
+
 	SBAPI SkSkeleton* getSkeleton() const;
 	SBAPI void setSkeleton(SkSkeleton* sk);	
 	SBAPI virtual int init( SkSkeleton* skeleton_p );

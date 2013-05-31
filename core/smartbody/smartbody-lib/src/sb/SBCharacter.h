@@ -11,6 +11,7 @@ class SBBehavior;
 class SBSteerAgent;
 class SBController;
 class SBDiphone;
+class SBReach;
 
 class SBCharacter : public SbmCharacter
 {
@@ -70,9 +71,13 @@ class SBCharacter : public SbmCharacter
 		SBAPI void interruptFace(double seconds);
 
 		SBAPI void notify(SBSubject* subject);	
+	    void copy(SBCharacter* origChar);
+		void setReach(SmartBody::SBReach* reach);
+		SmartBody::SBReach* getReach();
 		
 	protected:
-		std::vector<SBBehavior*> _curBehaviors;		
+		std::vector<SBBehavior*> _curBehaviors;	
+		SmartBody::SBReach* _reach;
 };
 
 };

@@ -913,4 +913,8 @@ void SbmPawn::notify(SBSubject* subject)
 
 }
 
+SBAPI void SbmPawn::copy( SbmPawn* orignalPawn )
+{
+
+}
 
