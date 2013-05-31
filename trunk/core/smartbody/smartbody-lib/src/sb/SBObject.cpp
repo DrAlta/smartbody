@@ -42,6 +42,31 @@ const std::string& SBObject::getName()
 }
 
 
+void SBObject::copyAllAttributes( SBObject* origObj )
+{
+	std::map<std::string, SBAttribute*>& attrList = origObj->getAttributeList();
+	std::map<std::string, SBAttribute*>::iterator vi;
+	for ( vi  = attrList.begin();
+		  vi != attrList.end();
+		  vi++)
+	{
+		std::string attrName = vi->first;
+		SBAttribute* attr = vi->second;
+		SBAttribute* existAttr = getAttribute(attrName);
+		if (existAttr) // copy over the value
+		{
+			existAttr->copyAttrValue(attr); // this ensure observer get notify
+		}
+		else // create a new copy 
+		{
+			SBAttribute* attrCopy = attr->copy();		
+			attrCopy->registerObserver(this);
+			addAttribute(attrCopy);
+		}
+	}	
+}
+
+
 void SBObject::addAttribute(SBAttribute* attr)
 {
 	 // check for the existence of the attribute
@@ -536,7 +561,6 @@ void SBObject::afterUpdate(double time)
 void SBObject::stop()
 {
 }
-
 
 };
   

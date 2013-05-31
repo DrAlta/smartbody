@@ -905,6 +905,46 @@ void SBScene::notify( SBSubject* subject )
 	}
 }
 
+
+SBAPI SBCharacter* SBScene::copyCharacter( const std::string& origCharName, const std::string& copyCharName )
+{
+	SmartBody::SBCharacter* origChar = getCharacter(origCharName);
+	if (!origChar)
+	{
+		LOG("Character '%s' does not exists !", origCharName.c_str());
+		return NULL;
+	}
+	else
+	{
+		SmartBody::SBCharacter* copyChar = createCharacter(copyCharName,"");
+		if (!copyChar)
+		{
+			LOG("Can not copy to existing character '%s'",copyCharName.c_str());
+			return NULL;
+		}
+		// successfully create a new character
+		SmartBody::SBSkeleton* sk = new SmartBody::SBSkeleton(origChar->getSkeleton());
+		copyChar->setSkeleton(sk);
+		copyChar->createStandardControllers();
+		copyChar->copy(origChar);
+		SmartBody::SBSteerManager* steerManager = getSteerManager();
+		SmartBody::SBSteerAgent* origAgent = steerManager->getSteerAgent(origCharName);
+		if (origAgent) // the original character has steering
+		{
+			SmartBody::SBSteerAgent* agent = steerManager->createSteerAgent(copyCharName);
+			agent->setSteerType(origAgent->getSteerType());
+			agent->setSteerStateNamePrefix(origAgent->getSteerStateNamePrefix());
+			bool steerEnable = steerManager->isEnable();
+			if (steerEnable)
+			{
+				steerManager->setEnable(false);
+				steerManager->setEnable(true);
+			}			
+		}
+		return copyChar;
+	}
+}
+
 SBCharacter* SBScene::createCharacter(const std::string& charName, const std::string& metaInfo)
 {	
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);

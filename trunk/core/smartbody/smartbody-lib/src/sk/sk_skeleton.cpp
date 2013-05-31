@@ -133,7 +133,7 @@ void SkSkeleton::copy(SkSkeleton* origSkel)
 	}
 	_channels->count_floats();
 	_com = origSkel->com();	
-
+	setJointMapName(origSkel->getJointMapName());
 	compress ();
 	updateJointMap();
 }

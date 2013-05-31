@@ -245,6 +245,9 @@ void MeCtBreathing::immediate_breaths_per_minute(float bpm)
 }
 void MeCtBreathing::immediate_motion(SkMotion* motion)
 {
+	if (!motion)
+		return;
+
 	if ( _motion ) {
 		if( motion == _motion ) {
 			// Minimal init()
@@ -412,7 +415,7 @@ void MeCtBreathing::notify(SBSubject* subject)
 			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(attr->getValue());
 			if (!motion)
 			{
-				LOG("No motion named %s found.", motion->getName().c_str());
+				LOG("No motion named '%s' found.", attr->getValue().c_str());
 			}
 			else
 			{

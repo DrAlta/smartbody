@@ -17,6 +17,7 @@
 #include <sb/SBSpeechManager.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
+#include <sb/SBReach.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -171,6 +172,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	StringAttribute* saccadePolicyAttribute = createStringAttribute("saccadePolicy", "stopinutterance", true, "Basic", 501, false, false, false, "How saccade is handled during utterance");
 	saccadePolicyAttribute->setValidValues(saccadePolicy);
 
+	_reach = NULL;
 }
 
 
@@ -782,4 +784,24 @@ void SBCharacter::interruptFace(double seconds)
 	
 }
 
+void SBCharacter::copy( SmartBody::SBCharacter* origChar )
+{
+	SbmCharacter::copy(origChar);
+	if (origChar->getReach()) // original character has reach set
+	{
+		LOG("Build reach for character %s",getName().c_str());
+		origChar->getReach()->build(this);
+	}
+	SBObject::copyAllAttributes(origChar);	
+}
+
+void SBCharacter::setReach( SmartBody::SBReach* reach )
+{
+	_reach = reach;
+}
+
+SmartBody::SBReach* SBCharacter::getReach()
+{
+	return _reach;
+}
 };

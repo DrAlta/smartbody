@@ -253,6 +253,11 @@ SBObject* SBAttribute::getObject()
 	return m_object;
 }
 
+void SBAttribute::copyAttrValue( SBAttribute* inAttr )
+{
+
+}
+
 BoolAttribute::BoolAttribute() : SBAttribute()
 {
 	m_value = false;
@@ -344,6 +349,14 @@ SBAttribute* BoolAttribute::copy()
 	a->setValue(getValue());
 	a->setDefaultValue(getDefaultValue());
 	return a;
+}
+
+void BoolAttribute::copyAttrValue( SBAttribute* inAttr )
+{
+	BoolAttribute* boolAttr = dynamic_cast<BoolAttribute*>(inAttr);
+	if (!boolAttr) return; // do nothing
+	setValue(boolAttr->getValue());
+	setDefaultValue(boolAttr->getDefaultValue());
 }
 
 //////////////////////////////////////////////////
@@ -475,6 +488,13 @@ SBAttribute* IntAttribute::copy()
 	return a;
 }
 
+void IntAttribute::copyAttrValue( SBAttribute* inAttr )
+{
+	IntAttribute* intAttr = dynamic_cast<IntAttribute*>(inAttr);
+	if (!intAttr) return; // do nothing
+	setValue(intAttr->getValue());
+	setDefaultValue(intAttr->getDefaultValue());
+}
 //////////////////////////////////////////////////
 
 DoubleAttribute::DoubleAttribute() : SBAttribute()
@@ -605,6 +625,13 @@ SBAttribute* DoubleAttribute::copy()
 	return a;
 }
 
+void DoubleAttribute::copyAttrValue( SBAttribute* inAttr )
+{
+	DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(inAttr);
+	if (!doubleAttr) return; // do nothing
+	setValue(doubleAttr->getValue());
+	setDefaultValue(doubleAttr->getDefaultValue());
+}
 //////////////////////////////////////////////////
 
 StringAttribute::StringAttribute() : SBAttribute()
@@ -730,6 +757,13 @@ SBAttribute* StringAttribute::copy()
 	return a;
 }
 
+void StringAttribute::copyAttrValue( SBAttribute* inAttr )
+{
+	StringAttribute* strAttr = dynamic_cast<StringAttribute*>(inAttr);
+	if (!strAttr) return; // do nothing
+	setValue(strAttr->getValue());
+	setDefaultValue(strAttr->getDefaultValue());
+}
 
 //////////////////////////////////////////////////
 
@@ -828,6 +862,13 @@ SBAttribute* Vec3Attribute::copy()
 	return a;
 }
 
+void Vec3Attribute::copyAttrValue( SBAttribute* inAttr )
+{
+	Vec3Attribute* vec3Attr = dynamic_cast<Vec3Attribute*>(inAttr);
+	if (!vec3Attr) return; // do nothing
+	setValue(vec3Attr->getValue());
+	setDefaultValue(vec3Attr->getDefaultValue());
+}
 MatrixAttribute::MatrixAttribute()
 {
 	m_value.identity();
@@ -929,6 +970,14 @@ SBAttribute* MatrixAttribute::copy()
 	a->setDefaultValue(getDefaultValue());
 		
 	return a;
+}
+
+void MatrixAttribute::copyAttrValue( SBAttribute* inAttr )
+{
+	MatrixAttribute* matAttr = dynamic_cast<MatrixAttribute*>(inAttr);
+	if (!matAttr) return; // do nothing
+	setValue(matAttr->getValue());
+	setDefaultValue(matAttr->getDefaultValue());
 }
 
 ActionAttribute::ActionAttribute()

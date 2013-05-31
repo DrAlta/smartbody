@@ -292,6 +292,35 @@ SbmCharacter::~SbmCharacter( void )	{
 		delete _miniBrain;
 }
 
+void SbmCharacter::copy( SbmCharacter* origChar )
+{	
+	// no matching skeleton ?
+	if (getSkeleton()->getName() != origChar->getSkeleton()->getName())
+	{
+		getSkeleton()->copy(origChar->getSkeleton());
+	}
+	reachMotionData = origChar->reachMotionData;
+	reachHandData = origChar->reachHandData;
+	grabHandData = origChar->grabHandData;
+	releaseHandData = origChar->releaseHandData;
+	pointHandData = origChar->pointHandData;
+	// locomotion 
+	locomotion_type = origChar->locomotion_type;
+	statePrefix = origChar->statePrefix;
+	
+	// speech
+	this->set_speech_impl(origChar->get_speech_impl());
+	this->set_speech_impl_backup(origChar->get_speech_impl_backup());	
+	voice_code = origChar->get_voice_code();
+	voice_code_backup = origChar->get_voice_code_backup();	
+	this->setFaceDefinition(origChar->getFaceDefinition());
+	this->setNvbg(origChar->getNvbg());
+	//this->setSoftEyes(origChar->isSoftEyes());
+	this->setVisemePlateau(origChar->isVisemePlateau());
+	this->setMinVisemeTime(origChar->getMinVisemeTime());	
+	//this->setMiniBrain(origChar->getMiniBrain());
+}
+
 void SbmCharacter::createStandardControllers()
 {
 	posture_sched_p = CreateSchedulerCt( getName().c_str(), "posture" );

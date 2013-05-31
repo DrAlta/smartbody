@@ -701,11 +701,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("isEnableLogging", &SBVHMsgManager::isEnableLogging, "Disables logging over the VH Message bus.")
 		;
 
-		boost::python::class_<SBNavigationMesh>("SBNavigationMesh")			
-			.def("findPath", &SBNavigationMesh::findPath, boost::python::return_value_policy<boost::python::return_by_value>(), "Find a path from start position to end position.")
-			.def("queryMeshPointByRayCast", &SBNavigationMesh::queryMeshPointByRayCast, boost::python::return_value_policy<boost::python::return_by_value>(), "Query the position on navigation mesh by ray casting.")
-			.def("queryFloorHeight", &SBNavigationMesh::queryFloorHeight, boost::python::return_value_policy<boost::python::return_by_value>(), "Query the height of floor on navigation mesh given a position and search radius.")
-			;
+		
 
 
 	pythonFuncsScene();

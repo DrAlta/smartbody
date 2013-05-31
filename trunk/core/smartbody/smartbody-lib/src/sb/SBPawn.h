@@ -37,6 +37,7 @@ class SBPawn : public SbmPawn
 
 		SBAPI virtual void afterUpdate(double time);
 		SBAPI virtual void notify(SBSubject* subject);
+		SBAPI virtual void copy(SBPawn* orignalPawn);
 
 	private:
 		SmartBody::DoubleAttribute* _posX;

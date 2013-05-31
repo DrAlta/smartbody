@@ -352,5 +352,11 @@ SBPhysicsObj* SBPawn::getPhysicsObject()
 	return phyEngine->getPhysicsPawn(getName());	
 }
 
+void SBPawn::copy( SBPawn* orignalPawn )
+{
+	
+		
+}
+
 };
 

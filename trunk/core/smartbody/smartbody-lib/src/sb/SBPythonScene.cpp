@@ -75,11 +75,18 @@ namespace SmartBody
 
 void pythonFuncsScene()
 {
+		boost::python::class_<SBNavigationMesh>("SBNavigationMesh")			
+		.def("findPath", &SBNavigationMesh::findPath, boost::python::return_value_policy<boost::python::return_by_value>(), "Find a path from start position to end position.")
+		.def("queryMeshPointByRayCast", &SBNavigationMesh::queryMeshPointByRayCast, boost::python::return_value_policy<boost::python::return_by_value>(), "Query the position on navigation mesh by ray casting.")
+		.def("queryFloorHeight", &SBNavigationMesh::queryFloorHeight, boost::python::return_value_policy<boost::python::return_by_value>(), "Query the height of floor on navigation mesh given a position and search radius.")
+		;
+
 		boost::python::class_<SBScene, boost::python::bases<SBObject> >("SBScene")
 		.def("update", &SBScene::update, "Updates the simulation at the given time.")
 		.def("setProcessId", &SBScene::setProcessId, "Sets the process id of the SmartBody instance.")
 		.def("getProcessId", &SBScene::getProcessId,  boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the process id of the SmartBody instance.")
 		.def("createCharacter", &SBScene::createCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new character given character name. \n Input: character name \nOutput: character object")
+		.def("copyCharacter", &SBScene::copyCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a new character copied from an existing character. \n Input: original character name, copy character name \nOutput: character object")
 		.def("createPawn", &SBScene::createPawn, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new pawn.")
 		.def("createFaceDefinition", &SBScene::createFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new face definition with a given name.")
 		.def("getFaceDefinition", &SBScene::getFaceDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns a face definition with a given name.")

@@ -99,20 +99,21 @@ std::vector<std::string> SBReach::getMotionNames(std::string type)
 }
 void SBReach::build(SBCharacter* character)
 {
-	if (!_character)
+	if (!character)
 		return;
 
 	// create the reach engine if the character does not have one.
-	_character->createReachEngine();
+	character->createReachEngine();
+	character->setReach(this);
 
-	for (ReachEngineMap::iterator mi = _character->getReachEngineMap().begin();
-		mi != _character->getReachEngineMap().end();
+	for (ReachEngineMap::iterator mi = character->getReachEngineMap().begin();
+		mi != character->getReachEngineMap().end();
 		mi++)
 	{
 		MeCtReachEngine* re = mi->second;
 		if (re)
 		{
-			re->updateMotionExamples(_character->getReachMotionDataSet(), interpolatorType);
+			re->updateMotionExamples(character->getReachMotionDataSet(), interpolatorType);
 		}
 	}
 }
