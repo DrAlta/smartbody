@@ -47,7 +47,7 @@ LOCAL_SRC_FILES := $(IOS_PATH)/vhwrapper.cpp
                    
 			
 #LOCAL_LDLIBS    := -llog -lOpenSLES  -fuse-ld=gold
-LOCAL_LDLIBS    := -llog -lOpenSLES
+LOCAL_LDLIBS    := -llog -lOpenSLES -lEGL -lGLESv1_CM
 #LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt 
 LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt python-prebuilt 
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
