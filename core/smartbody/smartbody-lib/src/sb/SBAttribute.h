@@ -23,7 +23,7 @@ class SBAttribute : public SBSubject
 		SBAPI virtual ~SBAttribute();
 		SBAPI void setName(const std::string& name);
 		SBAPI const std::string& getName();
-		SBAPI virtual std::string write();
+		SBAPI virtual std::string write();	
 		SBAPI virtual void read();
 		SBAPI SBAttributeInfo* getAttributeInfo();
 

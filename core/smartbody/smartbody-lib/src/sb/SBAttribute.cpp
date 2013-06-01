@@ -330,10 +330,11 @@ std::string BoolAttribute::write()
 	strstr << ")\n";
 
 	bool val = getDefaultValue();
+	bool curVal = getValue();
 	strstr << "attr.setDefaultValue(";
 	val? strstr << "True)\n" : strstr << "False)\n"; 
 	//strstr << "attr.setValue(";
-	//val? strstr << "True)\n" : strstr << "False)\n"; 
+	//curVal? strstr << "True)\n" : strstr << "False)\n"; 
 
 	return strstr.str();
 }
@@ -467,8 +468,9 @@ std::string IntAttribute::write()
 	strstr << ")\n";
 
 	int val = getDefaultValue();
+	int curVal = getValue();
 	strstr << "attr.setDefaultValue(" << val << ")\n";
-	//strstr << "attr.setValue(" << val << ")\n";
+	//strstr << "attr.setValue(" << curVal << ")\n";
 
 	return strstr.str();
 }
@@ -605,8 +607,9 @@ std::string DoubleAttribute::write()
 	strstr << ")\n";
 
 	double val = getDefaultValue();
+	double curVal = getValue();
 	strstr << "attr.setDefaultValue(" << val << ")\n";
-	//strstr << "attr.setValue(" << val << ")\n";
+	//strstr << "attr.setValue(" << curVal << ")\n";
 	return strstr.str();
 }
 
@@ -708,16 +711,16 @@ std::string StringAttribute::write()
 	strstr << ")\n";
 
 	const std::string& defaultVal = getDefaultValue();
+	const std::string& curVal = getValue();
 	if (defaultVal == "")
 	{
-		strstr << "attr.setDefaultValue(\"\")\n";
-		//strstr << "attr.setValue(\"\")\n";
+		strstr << "attr.setDefaultValue(\"\")\n";		
 	}
 	else
 	{
-		strstr << "attr.setDefaultValue(\"" << defaultVal << "\")\n";
-		//strstr << "attr.setValue(\"" << defaultVal << "\")\n";
+		strstr << "attr.setDefaultValue(\"" << defaultVal << "\")\n";		
 	}
+	//strstr << "attr.setValue(\"" << curVal << "\")\n";
 	strstr << "validValues = StringVec()\n";
 	const std::vector<std::string>& values = getValidValues();
 	for (std::vector<std::string>::const_iterator iter = values.begin();
@@ -837,12 +840,14 @@ std::string Vec3Attribute::write()
 	strstr << ")\n";
 
 	const SrVec& val = getDefaultValue();
+	const SrVec& curVal = getValue();
 	strstr << "vec = SrVec()\n";
 	strstr << "vec.setData(0, " << val.x << ")\n";
-	strstr << "vec.setData(1, " << val.x << ")\n";
-	strstr << "vec.setData(2, " << val.x << ")\n";
+	strstr << "vec.setData(1, " << val.y << ")\n";
+	strstr << "vec.setData(2, " << val.z << ")\n";
 	strstr << "attr.setDefaultValue(vec)\n";
-	//strstr << "attr.setValue(vec)\n";
+	//strstr << "vec1 = SrVec(" << curVal.x << ", " << curVal.y << ", " << curVal.z << ")\n";
+	//strstr << "attr.setValue(vec1)\n";
 
 	return strstr.str();
 }
@@ -952,8 +957,14 @@ std::string MatrixAttribute::write()
 	for (int r = 0; r < 4; r++)
 		for (int c = 0; c < 4; c++)
 			strstr << "defMat.setData(" << defMat.getData(r, c) << ")\n";
+
+	const SrMat& curMat = getDefaultValue();
+	strstr << "curMat = SrMat()\n";
+	for (int r = 0; r < 4; r++)
+		for (int c = 0; c < 4; c++)
+			strstr << "curMat.setData(" << curMat.getData(r, c) << ")\n";
 	strstr << "attr.setDefaultValue(defMat)\n";
-	//strstr << "attr.setValue(defMat)\n";
+	//strstr << "attr.setValue(curMat)\n";
 
 	return strstr.str();
 }
