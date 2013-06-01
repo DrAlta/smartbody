@@ -809,6 +809,8 @@ void BaseWindow::PauseCB(Fl_Widget* widget, void* data)
 void BaseWindow::ResetCB(Fl_Widget* widget, void* data)
 {
 	SmartBody::SBScene::getScene()->command((char*)"reset");
+	BaseWindow* window = (BaseWindow*) data;
+	window->resetWindow();
 }
 
 void BaseWindow::CameraResetCB(Fl_Widget* widget, void* data)

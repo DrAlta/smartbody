@@ -159,7 +159,7 @@ std::vector<std::string> SBAssetManager::getAssetPaths(const std::string& type)
 	while (nextPath != "")
 	{
 		list.push_back(nextPath);
-		nextPath = path->next_path(false);
+		nextPath = path->next_path(true);
 	}
 	return list;
 }

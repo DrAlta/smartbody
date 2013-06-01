@@ -1941,7 +1941,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 	strstr << "scene.setMediaPath(\"" << mediaPath << "\")\n";	
 	// asset paths
 	std::vector<std::string>::iterator iter;
-	std::vector<std::string> motionPaths = getAssetPaths("motion");
+	std::vector<std::string> motionPaths = getLocalAssetPaths("motion");
 	std::vector<std::string> motionNames = getMotionNames();
 	std::vector<std::string> skelNames = getSkeletonNames();
 	std::set<std::string> extraAssetPathSet;
@@ -2001,21 +2001,21 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 		strstr << "scene.addAssetPath(\"motion\", \"" << path << "\")\n";
 	}
 	
-	std::vector<std::string> scriptPaths = getAssetPaths("script");
+	std::vector<std::string> scriptPaths = getLocalAssetPaths("script");
 	for (iter = scriptPaths.begin(); iter != scriptPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"script\", \"" << path << "\")\n";
 	}
 
-	std::vector<std::string> audioPaths = getAssetPaths("audio");
+	std::vector<std::string> audioPaths = getLocalAssetPaths("audio");
 	for (iter = audioPaths.begin(); iter != audioPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"audio\", \"" << path << "\")\n";
 	}
 
-	std::vector<std::string> meshPaths = getAssetPaths("mesh");
+	std::vector<std::string> meshPaths = getLocalAssetPaths("mesh");
 	for (iter = meshPaths.begin(); iter != meshPaths.end(); iter++)
 	{
 		const std::string& path = (*iter);
@@ -2194,7 +2194,7 @@ void SBScene::savePawns(std::stringstream& strstr, bool remoteSetup)
 			SmartBody::SBAttribute* attr = pawn->getAttribute((*iter));
 			std::string attrWrite = attr->write();
 			strstr << attrWrite;
-		}
+		}	
 	}
 }
 

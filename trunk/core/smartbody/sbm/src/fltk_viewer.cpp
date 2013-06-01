@@ -1712,7 +1712,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		sprintf(cmdStr,"set pawn defaultPawn%d world_offset x %f y %f z %f",pawnCount,dest.x,dest.y,dest.z);
 		SmartBody::SBScene::getScene()->command(cmdStr);
 		pawnCount++;
-	}
+	}	
 	else // drag a file from explorer
 	{	
 		boost::filesystem::path dndPath(dndMsg);
@@ -1739,6 +1739,14 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 				LOG("WARNING: can not load cam file!");
 			return;
 		}
+
+		if ( boost::iequals(fileextension,".skm") || boost::iequals(fileextension,".bvh") || boost::iequals(fileextension,".amc") ) // a motion extension
+		{
+			SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+			assetManager->loadAsset(fullPathName);
+			return;
+		}
+		
 		
 
 		LOG("path name = %s, base name = %s, extension = %s",fullPath.c_str(), filebasename.c_str(), fileextension.c_str());
