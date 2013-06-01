@@ -33,6 +33,7 @@
 #include <sb/SBJointMapManager.h>
 #include <sb/SBParser.h>
 #include <sb/SBBoneBusManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBCollisionManager.h>
 #include <sb/SBSteerAgent.h>
 #include <sb/SBPhoneme.h>
@@ -162,6 +163,7 @@ void pythonFuncsScene()
 		.def("getBehaviorSetManager", &SBScene::getBehaviorSetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the behavior set manager.")
 		.def("getRetargetManager", &SBScene::getRetargetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the retarget manager.")
 		.def("getAssetManager", &SBScene::getAssetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the asset manager.")
+		.def("getVHMsgManager", &SBScene::getVHMsgManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the VH message manager.")
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 
 		.def("setSystemParameter", &SBScene::setSystemParameter, "Sets a name/value pair that persists between scene sessions.")
