@@ -104,6 +104,23 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
 			_buttonDeleteMetaEntry->callback(OnButtonDeleteMetaEntry, this);
 		_groupMetaInfo->end();
 		_groupMetaInfo->box(FL_BORDER_BOX);
+
+      _groupGazeInfo = new Fl_Group(10, 675, 400, 30, "Gaze");
+      _groupGazeInfo->begin();
+		   int groupGazeInfoX = _groupGazeInfo->x();
+		   int groupGazeInfoY = _groupGazeInfo->y();
+
+         _choiceGazeTargetList = new Fl_Choice(groupGazeInfoX + 85, groupGazeInfoY + 5, 100, 20, "Gaze Targets");
+		   _choiceGazeTargetList->callback(OnChoiceCharacterList, this);
+
+         _buttonGazeAt = new Fl_Button(groupGazeInfoX + 190, groupGazeInfoY + 5, 100, 20, "Gaze At");
+		   _buttonGazeAt->callback(OnButtonGazeAt, this);
+
+         _buttonStopGaze = new Fl_Button(groupGazeInfoX + 295, groupGazeInfoY + 5, 100, 20, "Stop Gaze");
+		   _buttonStopGaze->callback(OnButtonStopGaze, this);
+
+      _groupGazeInfo->end();
+		_groupGazeInfo->box(FL_BORDER_BOX);
 	this->end();
 
 	loadCharacters();
@@ -133,8 +150,16 @@ void MotionEditorWindow::loadCharacters()
 	for (size_t i = 0; i < charNames.size(); ++i)
 	{
 		_choiceCharacaterList->add(charNames[i].c_str());
+      _choiceGazeTargetList->add(charNames[i].c_str());
 	}
 	_choiceCharacaterList->value(0);
+   _choiceGazeTargetList->value(0);
+
+   const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+   for (size_t i = 0; i < pawnNames.size(); ++i)
+	{
+      _choiceGazeTargetList->add(pawnNames[i].c_str());
+	}
 }
 
 SmartBody::SBCharacter* MotionEditorWindow::getCurrentCharacter()
@@ -251,6 +276,38 @@ void MotionEditorWindow::OnButtonSetPosture(Fl_Widget* widget, void* data)
    }
 }
 
+void MotionEditorWindow::OnButtonGazeAt(Fl_Widget* widget, void* data)
+{
+   MotionEditorWindow* editor = (MotionEditorWindow*) data;
+   if (editor->getCurrentCharacterName() == "*")
+   {
+      for (int i = 1; i < editor->_choiceCharacaterList->size() - 1; i++) // start at 1 to get past *
+      {
+         editor->GazeAt(editor->_choiceCharacaterList->text(i), editor->_choiceGazeTargetList->text());
+      }
+   }
+   else
+   {
+      editor->GazeAt(editor->getCurrentCharacterName(), editor->_choiceGazeTargetList->text());
+   }
+}
+
+void MotionEditorWindow::OnButtonStopGaze(Fl_Widget* widget, void* data)
+{
+   MotionEditorWindow* editor = (MotionEditorWindow*) data;
+   if (editor->getCurrentCharacterName() == "*")
+   {
+      for (int i = 1; i < editor->_choiceCharacaterList->size() - 1; i++) // start at 1 to get past *
+      {
+         editor->StopGaze(editor->_choiceCharacaterList->text(i));
+      }
+   }
+   else
+   {
+      editor->StopGaze(editor->getCurrentCharacterName());
+   }
+}
+
 void MotionEditorWindow::PlayAnimation(const std::string& characterName, const std::string& animName, bool setAsPosture)
 {
    if (characterName.length() == 0 || animName.length() == 0)
@@ -272,6 +329,45 @@ void MotionEditorWindow::PlayAnimation(const std::string& characterName, const s
 	{
       std::stringstream ss;
       ss << "send sb " << "bml.execBML(\'" << characterName << "\', \'" << bml << "\')";
+      std::string sendStr = ss.str();
+      LOG("%s", sendStr.c_str());
+		SmartBody::SBScene::getScene()->command(sendStr);
+	}
+}
+
+void MotionEditorWindow::GazeAt(const std::string& characterName, const std::string& gazeTarget)
+{
+   std::string commandType = "gaze target=";
+	std::string bml = "<" + commandType + "\"" + gazeTarget + "\"/>";
+
+   // this now works for remote mode
+   SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
+	if (!sbScene->isRemoteMode())
+	{
+      SmartBody::SBScene::getScene()->getBmlProcessor()->execBML(characterName, bml);
+	}
+	else
+	{
+      std::stringstream ss;
+      ss << "send sb " << "bml.execBML(\'" << characterName << "\', \'" << bml << "\')";
+      std::string sendStr = ss.str();
+      LOG("%s", sendStr.c_str());
+		SmartBody::SBScene::getScene()->command(sendStr);
+   }
+}
+
+void MotionEditorWindow::StopGaze(const std::string& characterName)
+{
+   std::string cmd = "char " + characterName + " gazefade out 1";
+   SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
+   if (!sbScene->isRemoteMode())
+	{
+      SmartBody::SBScene::getScene()->command(cmd);
+	}
+	else
+	{
+      std::stringstream ss;
+      ss << "send sb scene.command(\'" << cmd <<"\')";
       std::string sendStr = ss.str();
       LOG("%s", sendStr.c_str());
 		SmartBody::SBScene::getScene()->command(sendStr);
