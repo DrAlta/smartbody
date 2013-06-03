@@ -43,6 +43,8 @@ public:
 	static void OnCheckButtonPlayMotion(Fl_Widget* widget, void* data);
 	static void OnSliderMotionFrame(Fl_Widget* widget, void* data);
 	static void OnButtonPlayMotionFolder(Fl_Widget* widget, void* data);
+   static void OnButtonGazeAt(Fl_Widget* widget, void* data);
+   static void OnButtonStopGaze(Fl_Widget* widget, void* data);
 
 	void updateSyncPointsUI();
 	void updateMotionSyncPoints(const std::string& type);
@@ -58,6 +60,8 @@ public:
 	
 
    void PlayAnimation(const std::string& characterName, const std::string& animName, bool setAsPosture);
+   void GazeAt(const std::string& characterName, const std::string& gazeTarget);
+   void StopGaze(const std::string& characterName);
 
 public:
 	// common
@@ -74,6 +78,7 @@ public:
 
 	// meta information
 	Fl_Group*			_groupMetaInfo;
+   Fl_Group*         _groupGazeInfo;
 	Fl_Value_Slider*	_sliderStart;
 	Fl_Button*			_buttonGetStartTime;
 	Fl_Value_Slider*	_sliderReady;
@@ -94,5 +99,11 @@ public:
 	Fl_Input*			_inputMetaValues;
 	Fl_Button*			_buttonAddMetaEntry;
 	Fl_Button*			_buttonDeleteMetaEntry;
+
+   // gaze informations
+   Fl_Choice*			_choiceGazeTargetList;
+   Fl_Button*        _buttonGazeAt;
+   Fl_Button*        _buttonStopGaze;
+
 };
 #endif

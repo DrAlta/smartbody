@@ -769,7 +769,7 @@ void BaseWindow::LaunchMotionEditorCB(Fl_Widget* widget, void* data)
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (!rootWindow->motionEditorWindow)
 	{
-		rootWindow->motionEditorWindow = new MotionEditorWindow(150, 150, 450, 700, "Motion Editor");
+		rootWindow->motionEditorWindow = new MotionEditorWindow(150, 150, 425, 725, "Motion Editor");
 	}
 	rootWindow->motionEditorWindow->show();
 }
