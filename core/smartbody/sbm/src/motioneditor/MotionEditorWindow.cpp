@@ -18,8 +18,10 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
 		_buttonSaveMotion->callback(OnButtonSaveMotion, this);
 		_browserMotionList = new Fl_Hold_Browser(10, 40, 300, 180, "Motion List");
 		_browserMotionList->callback(OnBrowserMotionList, this);
-		_buttonPlayMotion = new Fl_Button(320, 190, 80, 20, "Play");
+		_buttonPlayMotion = new Fl_Button(320, 165, 80, 20, "Play");
 		_buttonPlayMotion->callback(OnButtonPlayMotion, this);
+      _buttonPlayMotion = new Fl_Button(320, 190, 80, 20, "Set Posture");
+		_buttonPlayMotion->callback(OnButtonSetPosture, this);
 		_checkButtonPlayMotion = new Fl_Check_Button(10, 240, 50, 20, "Scrub");
 		_checkButtonPlayMotion->callback(OnCheckButtonPlayMotion, this);
 		_sliderMotionFrame = new Fl_Value_Slider(60, 240, 300, 20);
@@ -127,6 +129,7 @@ void MotionEditorWindow::hide()
 void MotionEditorWindow::loadCharacters()
 {
 	const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+   _choiceCharacaterList->add("*");
 	for (size_t i = 0; i < charNames.size(); ++i)
 	{
 		_choiceCharacaterList->add(charNames[i].c_str());
@@ -159,6 +162,24 @@ SmartBody::SBMotion* MotionEditorWindow::getCurrentMotion()
 		}
 	}
 	return NULL;
+}
+
+std::string MotionEditorWindow::getCurrentCharacterName()
+{
+   return _choiceCharacaterList->text();
+}
+
+std::string MotionEditorWindow::getCurrentMotionName()
+{
+   int v = _browserMotionList->value();
+   if (v > 0 && v < _browserMotionList->size())
+   {
+      return _browserMotionList->text(_browserMotionList->value());
+   }
+   else
+   {
+      return "";
+   }
 }
 
 void MotionEditorWindow::OnChoiceCharacterList(Fl_Widget* widget, void* data)
@@ -200,24 +221,57 @@ void MotionEditorWindow::OnBrowserMotionList(Fl_Widget* widget, void* data)
 
 void MotionEditorWindow::OnButtonPlayMotion(Fl_Widget* widget, void* data)
 {
-	MotionEditorWindow* editor = (MotionEditorWindow*) data;
-	SmartBody::SBCharacter* curChar = editor->getCurrentCharacter();
-	if (!curChar)	return;
-	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
-	if (!curMotion)	return;
-   
-	std::string bml = "<animation name=\"" + curMotion->getName() + "\"/>";
+   MotionEditorWindow* editor = (MotionEditorWindow*) data;
+   if (editor->getCurrentCharacterName() == "*")
+   {
+      for (int i = 1; i < editor->_choiceCharacaterList->size() - 1; i++) // start at 1 to get past *
+      {
+         editor->PlayAnimation(editor->_choiceCharacaterList->text(i), editor->getCurrentMotionName(), false);
+      }
+   }
+   else
+   {
+      editor->PlayAnimation(editor->getCurrentCharacterName(), editor->getCurrentMotionName(), false);
+   }
+}
+
+void MotionEditorWindow::OnButtonSetPosture(Fl_Widget* widget, void* data)
+{
+   MotionEditorWindow* editor = (MotionEditorWindow*) data;
+   if (editor->getCurrentCharacterName() == "*")
+   {
+      for (int i = 1; i < editor->_choiceCharacaterList->size() - 1; i++) // start at 1 to get past *
+      {
+         editor->PlayAnimation(editor->_choiceCharacaterList->text(i), editor->getCurrentMotionName(), true);
+      }
+   }
+   else
+   {
+      editor->PlayAnimation(editor->getCurrentCharacterName(), editor->getCurrentMotionName(), true);
+   }
+}
+
+void MotionEditorWindow::PlayAnimation(const std::string& characterName, const std::string& animName, bool setAsPosture)
+{
+   if (characterName.length() == 0 || animName.length() == 0)
+   {
+      LOG("failed to play animation %s on character %s", animName.c_str(), characterName.c_str());
+      return;
+   }
+
+   std::string commandType = setAsPosture ? "body posture=" : "animation name=";
+	std::string bml = "<" + commandType + "\"" + animName + "\"/>";
 
    // this now works for remote mode
    SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
 	if (!sbScene->isRemoteMode())
 	{
-      SmartBody::SBScene::getScene()->getBmlProcessor()->execBML(curChar->getName(), bml);
+      SmartBody::SBScene::getScene()->getBmlProcessor()->execBML(characterName, bml);
 	}
 	else
 	{
       std::stringstream ss;
-      ss << "send sb " << "bml.execBML(\'" << curChar->getName() << "\', \'" << bml << "\')";
+      ss << "send sb " << "bml.execBML(\'" << characterName << "\', \'" << bml << "\')";
       std::string sendStr = ss.str();
       LOG("%s", sendStr.c_str());
 		SmartBody::SBScene::getScene()->command(sendStr);

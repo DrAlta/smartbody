@@ -31,12 +31,15 @@ public:
 	SmartBody::SBCharacter* getCurrentCharacter();
 	void loadMotions();
 	SmartBody::SBMotion* getCurrentMotion();
+   std::string getCurrentCharacterName();
+   std::string getCurrentMotionName();
 
 	static void OnChoiceCharacterList(Fl_Widget* widget, void* data);
 	static void OnButtonRefresh(Fl_Widget* widget, void* data);
 	static void OnButtonSaveMotion(Fl_Widget* widget, void* data);
 	static void OnBrowserMotionList(Fl_Widget* widget, void* data);
 	static void OnButtonPlayMotion(Fl_Widget* widget, void* data);
+   static void OnButtonSetPosture(Fl_Widget* widget, void* data);
 	static void OnCheckButtonPlayMotion(Fl_Widget* widget, void* data);
 	static void OnSliderMotionFrame(Fl_Widget* widget, void* data);
 	static void OnButtonPlayMotionFolder(Fl_Widget* widget, void* data);
@@ -54,6 +57,7 @@ public:
 	static void OnButtonDeleteMetaEntry(Fl_Widget* widget, void* data);
 	
 
+   void PlayAnimation(const std::string& characterName, const std::string& animName, bool setAsPosture);
 
 public:
 	// common
@@ -62,6 +66,7 @@ public:
 	Fl_Button*			_buttonSaveMotion;
 	Fl_Hold_Browser*	_browserMotionList;
 	Fl_Button*			_buttonPlayMotion;
+   Fl_Button*        _buttonSetPosture;
 	Fl_Check_Button*	_checkButtonPlayMotion;
 	Fl_Value_Slider*	_sliderMotionFrame;
 	Fl_Input*			_inputFilePath;
@@ -89,6 +94,5 @@ public:
 	Fl_Input*			_inputMetaValues;
 	Fl_Button*			_buttonAddMetaEntry;
 	Fl_Button*			_buttonDeleteMetaEntry;
-
 };
 #endif
