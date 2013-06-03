@@ -1719,7 +1719,7 @@ std::string SBScene::save(bool remoteSetup)
 	saveCameras(strstr, remoteSetup);
 	saveLights(strstr, remoteSetup);
 	saveFaceDefinitions(strstr, remoteSetup);
-	saveJointMaps(strstr, remoteSetup);
+	//saveJointMaps(strstr, remoteSetup); // need to apply joint map before apply any motion operations
 	saveLipSyncing(strstr, remoteSetup);
 	saveBlends(strstr, remoteSetup);
 	saveRetargets(strstr, remoteSetup);
@@ -2088,8 +2088,11 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 		strstr << "scene.loadAssets()\n";
 	}	
 
+	// this is a hack to save joint map here, should probably move motion transformation into another function ?
+	saveJointMaps(strstr, remoteSetup);
 	// create any mirrored assets
 	std::vector<std::string> motions = this->getMotionNames();
+#if 0	
 	for (std::vector<std::string>::iterator iter = motions.begin();
 		 iter != motions.end();
 		 iter++)
@@ -2110,6 +2113,53 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 			}			
 		}			
 	}
+#else
+	std::vector<SmartBody::SBMotion*> motionList;
+	for (unsigned int i=0;i<motions.size();i++)
+		motionList.push_back(getMotion(motions[i]));
+	// sort motion array according to its transformation depth level
+	std::sort(motionList.begin(),motionList.end(),SmartBody::motionComp);
+	// process motion from low depth to high depth to capture all dependency of motion operations
+	for (unsigned int i=0;i<motionList.size();i++)
+	{
+		SBMotion* motion = motionList[i];
+		StringAttribute* mirroredMotionAttr = dynamic_cast<StringAttribute*>(motion->getAttribute("mirrorMotion"));	
+		StringAttribute* smoothedMotionAttr = dynamic_cast<StringAttribute*>(motion->getAttribute("smoothMotion"));	
+		if (mirroredMotionAttr)
+		{
+			strstr << "motion = scene.getMotion(\"" << mirroredMotionAttr->getValue() << "\")\n";
+			// make sure the skeleton exists
+			StringAttribute* mirroredSkeletonAttr = dynamic_cast<StringAttribute*>(motion->getAttribute("mirrorSkeleton"));			
+			if (mirroredSkeletonAttr) 
+			{
+				const std::string& skeletonName = mirroredSkeletonAttr->getValue();
+				strstr << "mirrorSkeleton = scene.getSkeleton(\"" << skeletonName << "\")\n";
+				strstr << "if mirrorSkeleton is not None:\n";
+				strstr << "\tmirroredMotion = motion.mirror(\"" << motion->getName() << "\", \"" << skeletonName << "\")\n";
+			}
+		}
+		else if (smoothedMotionAttr)
+		{
+			strstr << "motion = scene.getMotion(\"" << smoothedMotionAttr->getValue() << "\")\n";
+			DoubleAttribute* smoothIntervalAttr = dynamic_cast<DoubleAttribute*>(motion->getAttribute("smoothInterval"));
+			if (smoothIntervalAttr)
+			{
+				strstr << "smoothMotion = motion.smoothCycle(\"" << motion->getName() << "\", " << boost::lexical_cast<std::string>(smoothIntervalAttr->getValue()) << ")\n";
+			}
+		}
+	}
+
+	std::vector<SBSkeleton*> skeletonList;	
+	for (unsigned int i=0;i<skelNames.size();i++)
+	{
+		std::string skName = skelNames[i];
+		SBSkeleton* sbSk = getSkeleton(skName);
+		// rescale the skeleton to right size if necessary
+		strstr << "sbSk = scene.getSkeleton(\"" << skName << "\")\n";
+		strstr << "sbSk.rescale(" << boost::lexical_cast<std::string>(sbSk->getScale()) << ")\n";
+	}
+	
+#endif
 
 	for (std::vector<std::string>::iterator iter = motions.begin();
 		iter != motions.end();
@@ -2253,6 +2303,7 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 		strstr << "\n# ---- character: " << character->getName() << "\n";
 		strstr << "obj = scene.createCharacter(\"" << character->getName() << "\", \"" << character->getType() << "\")\n";
 		strstr << "skeleton = scene.createSkeleton(\"" << character->getSkeleton()->getName() << "\")\n";
+		strstr << "skeleton.rescale(" <<  character->getSkeleton()->getScale() << ")\n";
 		strstr << "obj.setSkeleton(skeleton)\n";
 		SrVec position = character->getPosition();
 		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
@@ -2276,6 +2327,11 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 			std::string attrWrite = attr->write();
 			strstr << attrWrite;
 		}
+
+		// save deformable mesh 
+		std::string meshName = character->getStringAttribute("deformableMesh");
+		//character->setDeformableMeshName(meshName);
+		strstr << "obj.setDeformableMeshName(\"" << meshName << "\")\n";
 
 		// reach
 		strstr << "# -------------------- reaching for character " << character->getName() << "\n";
@@ -2368,6 +2424,8 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 		{
 			strstr << "# --- no steering for character " << character->getName() << "\n";
 		}
+		// set character posture
+		strstr << "bml.execBML('" << character->getName() << "', '<body posture=\"" << character->getPostureName() <<"\"/>')\n";
 	}
 
 	// enable steering

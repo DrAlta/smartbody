@@ -64,28 +64,28 @@ void FootStepRecord::updateJointAveragePosition( SBSkeleton* skel, SBMotion* mot
 SBMotion::SBMotion() : SkMotion()
 {
 	_motionFile = "";
-
 	alignIndex = 0; 
-
+	transformDepth = 0;
 	_motionType = Unknown;
+	_scale = 1.f;
 }
 
 SBMotion::SBMotion(const SBMotion& motion)
 {
 	//...
-
 	alignIndex = 0;
-
+	transformDepth = 0;
 	_motionType = Unknown;
+	_scale = 1.f;
 }
 
 SBMotion::SBMotion(std::string file) : SkMotion()
 {
 	_motionFile = file;
-
 	alignIndex = 0;
-
+	transformDepth = 0;
 	_motionType = Unknown;
+	_scale = 1.f;
 }
 
 SBMotion::~SBMotion()
@@ -534,6 +534,7 @@ SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 	copyMotion->setFrameOffset(copyFrameOffset);
 	copyMotion->setFrameOrientation(copyFrameOrientation);
 	copyMotion->unregisterAnimation();
+	copyMotion->setTransformDepth(getTransformDepth()+1);
 
 	return copyMotion;
 }
@@ -963,8 +964,9 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 
 	// create a trail indicating that this motion was mirrored
 	sbmotion->createStringAttribute("mirrorMotion", this->getName(), false, "mirroring", 110, false, false, false, "Which motion has this motion been mirrored from");
-	sbmotion->createStringAttribute("mirrorSkeleton", skeletonName, false, "mirroring", 120, false, false, false, "Which skeleton has this motion been mirrored from");
+	sbmotion->createStringAttribute("mirrorSkeleton", skeletonName, false, "mirroring", 120, false, false, false, "Which skeleton has this motion been mirrored from");	
 
+	sbmotion->setTransformDepth(getTransformDepth()+1); // increment the depth counter 
 	return sbmotion;
 }
 
@@ -1002,6 +1004,7 @@ SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, 
 		sbmotion->setName(motionName.c_str());
 
 		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
+		sbmotion->setTransformDepth(getTransformDepth()+1); // increment the depth counter 
 	}
 	return sbmotion;
 }
@@ -1023,8 +1026,12 @@ SBMotion* SBMotion::smoothCycle( std::string name, float timeInterval )
 		else
 			motionName = name;
 		sbmotion->setName(motionName.c_str());
-		 SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
+		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
+		sbmotion->setTransformDepth(getTransformDepth()+1); // increment the depth counter 
 	}
+	sbmotion->createStringAttribute("smoothMotion", this->getName(), false, "smoothing", 110, false, false, false, "Which motion has this motion been smoothed from");
+	sbmotion->createDoubleAttribute("smoothInterval", timeInterval, false, "smoothing", 120, false, false, false, "how long is the smooth time interval");	
+
 	return sbmotion;
 }
 
@@ -2036,4 +2043,11 @@ SBAPI const std::string& SBMotion::getMotionSkeletonName()
 {
 	return _motionSkeleton;
 }
+
+bool motionComp(const SBMotion *a, const SBMotion *b)
+{
+	return a->getTransformDepth() < b->getTransformDepth();
+}
+
+
 };

@@ -99,9 +99,11 @@ void SBJoint::setOffset(SrVec vec)
 {
 	offset(vec);
 
+#if 0 // not sure if this is necessary, but seems to cause problems when connecting with skin weight
 	SBSkeleton* skel = getSkeleton();
 	if (skel)
 		skel->update();
+#endif
 }
 
 int SBJoint::getIndex()
