@@ -664,8 +664,10 @@ void SBCharacter::notify(SBSubject* subject)
 		}
 		else if (attrName == "deformableMesh")
 		{
+
 			SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 			std::stringstream strstr;
+#if 0
 			strstr << "char " << getName() << " mesh " << meshAttribute->getValue();
 			SmartBody::DoubleAttribute* meshScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("deformableMeshScale"));
 			if (meshScaleAttribute && meshScaleAttribute->getValue() !=  1.0)
@@ -678,6 +680,9 @@ void SBCharacter::notify(SBSubject* subject)
 			{
 				LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
 			}
+#else
+			setDeformableMeshName(meshAttribute->getValue());
+#endif
 		}
 		else if (attrName == "voice")
 		{
@@ -804,4 +809,49 @@ SmartBody::SBReach* SBCharacter::getReach()
 {
 	return _reach;
 }
+
+void SBCharacter::setDeformableMeshName( std::string meshName )
+{
+	SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(getAttribute("deformableMesh"));
+	if (meshAttribute->getValue() != meshName)
+		meshAttribute->setValueFast(meshName); // don't notify the observer
+	std::stringstream strstr;
+	strstr << "char " << getName() << " mesh " << meshName;
+	SmartBody::DoubleAttribute* meshScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("deformableMeshScale"));
+	if (meshScaleAttribute && meshScaleAttribute->getValue() !=  1.0)
+	{
+		strstr << " -scale " << meshScaleAttribute->getValue();
+	}
+
+	int success = SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) strstr.str().c_str());
+	if (success != CMD_SUCCESS)
+	{
+		LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
+	}
+}
+
+void SBCharacter::setDeformableMeshScale( double meshScale )
+{
+	SmartBody::DoubleAttribute* meshScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("deformableMeshScale"));
+	if (meshScaleAttribute)
+	{
+		meshScaleAttribute->setValue(meshScale);
+	}
+}
+
+std::string SBCharacter::getPostureName()
+{
+	MeCtScheduler2::VecOfTrack tracks = posture_sched_p->tracks();
+	for (unsigned int i=0;i<tracks.size();i++)
+	{
+		MeCtScheduler2::TrackPtr tr = tracks[i];
+		MeCtMotion* motionCt = dynamic_cast<MeCtMotion*>(tr->animation_ct());
+		if (motionCt)
+		{
+			return motionCt->motion()->getName();
+		}
+	}
+	return "";
+}
+
 };

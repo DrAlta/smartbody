@@ -28,6 +28,7 @@ SBSkeleton::SBSkeleton(std::string skelFile) : SkSkeleton()
 
 SBSkeleton::SBSkeleton(SBSkeleton* copySkel) : SkSkeleton(copySkel)
 {
+	_scale = copySkel->getScale();	
 	//jointMap = copySkel->getJointMapName();
 }
 

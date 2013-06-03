@@ -71,7 +71,7 @@ class SBMotion : public SkMotion
 
 		SBAPI bool translate(float x, float y, float z, const std::string& baseJointName);
 		SBAPI bool rotate(float xaxis, float yaxis, float zaxis, const std::string& baseJointName);
-		SBAPI bool scale(float factor);
+		SBAPI bool scale(float factor);		
 		SBAPI bool retime(float factor);
 		SBAPI bool trim(int numFramesFromFront, int numFramesFromBack);
 	//	bool move(int startFrame, int endFrame, int position);
@@ -121,20 +121,26 @@ class SBMotion : public SkMotion
 		SBAPI double      getMetaDataDouble(const std::string& tagName);
 		SBAPI std::vector<std::string> getMetaDataTags();
 		SBAPI void addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly);
-
+		int getTransformDepth() const { return transformDepth; }		
+		void setTransformDepth(int depth) { transformDepth = depth; }
 	protected:
 		void alignToSide(int numFrames, int direction = 0);
 
 		static bool kMeansClustering1D(int num, std::vector<double>& inputPoints, std::vector<double>& outMeans);
 		static void calculateMeans(std::vector<double>&inputPoints, std::vector<double>& means, double convergentValue);
 
+		// the counter used to keep track of how deep this motion is under consecutive transformation ( mirror, smooth, etc )
+		int transformDepth;
 		std::string _motionFile;
 		std::string _emptyString;
 		std::string _motionSkeleton;
 		int alignIndex;
 		std::map<std::string, std::string> tagAttrMap; // store the tagged attributes in a map
 		MotionType _motionType;
+		float _scale;
 };
+
+bool motionComp(const SBMotion *a, const SBMotion *b);
 
 };
 
