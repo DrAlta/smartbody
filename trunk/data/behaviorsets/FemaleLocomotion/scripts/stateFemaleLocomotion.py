@@ -7,6 +7,7 @@ def femaleLocomotionSetup(skeletonName, baseJoint, prefix, statePreFix):
 	if (stateManager.getBlend(stateName) != None): # don't create duplicate state
 		return		
 	state = stateManager.createState3D(stateName)
+	state.setBlendSkeleton('ChrHarmony.sk')
 
 	# add motions
 	motions = StringVec()

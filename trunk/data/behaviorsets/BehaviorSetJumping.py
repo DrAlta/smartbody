@@ -88,7 +88,7 @@ def retargetBehaviorSet(charName, skelName):
 	#outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	#if not os.path.exists(outDir):
 	#	os.makedirs(outDir)
-	scene.loadAssetsFromPath(outDir+"jumping/")
+	scene.loadAssetsFromPath("jumping")
 		
 	createRetargetInstance('ChrGarza.sk', skelName)
 	# retarget jumping

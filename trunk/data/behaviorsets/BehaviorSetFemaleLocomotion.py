@@ -44,7 +44,9 @@ def setupBehaviorSet():
 	
 	for i in range(0, len(locoMotions)):
 		motion = scene.getMotion(locoMotions[i])
-		zebra2Map.applyMotion(motion)	
+		if motion != None:
+			motion.setMotionSkeletonName('ChrBackovic.sk')
+			zebra2Map.applyMotion(motion)	
 
 def retargetBehaviorSet(charName, skelName):
 	locoMotions = StringVec()
@@ -83,32 +85,34 @@ def retargetBehaviorSet(charName, skelName):
 	#	os.makedirs(outDir)
 		
 	# retarget female locomotions
-	for n in range(0, len(locoMotions)):
-		retargetMotion(locoMotions[n], 'ChrHarmony.sk', skelName, outDir + 'FemaleLocomotion/');
+	#for n in range(0, len(locoMotions)):
+	#	retargetMotion(locoMotions[n], 'ChrHarmony.sk', skelName, outDir + 'FemaleLocomotion/');
 
+	createRetargetInstance('ChrHarmony.sk', skelName)
+	
 	# setup standard locomotion
 	scene.run("stateFemaleLocomotion.py")
-	femaleLocomotionSetup(skelName, "base", skelName, skelName)
+	femaleLocomotionSetup(skelName, "base", '', 'female')
 	
 	# starting state, starting locomotion with different angle
 	scene.run("stateFemaleStarting.py")
-	femaleStartingSetup(skelName, "base", skelName, skelName)
+	femaleStartingSetup(skelName, "base", '', 'female')
 
 	# idle turn state, facing adjusting
 	scene.run("stateFemaleIdleTurn.py")
-	femaleIdleTurnSetup(skelName, "base", skelName, skelName)
+	femaleIdleTurnSetup(skelName, "base", '', 'female')
 
 	# step state, stepping adjusting
 	scene.run("stateFemaleStep.py")
-	femaleStepSetup(skelName, "base", skelName, skelName)
+	femaleStepSetup(skelName, "base", '', 'female')
 
 	# transitions
 	scene.run("transitionsFemale.py")
-	femaleTransitionSetup(skelName, skelName)
+	femaleTransitionSetup('', 'female')
 	
 	# setup steering
 	scene.run("init-steer-agents.py")
 	steerManager = scene.getSteerManager()
 	steerManager.setEnable(False)
-	setupSteerAgent(charName, skelName)	
+	setupSteerAgent(charName, 'female')	
 	steerManager.setEnable(True)

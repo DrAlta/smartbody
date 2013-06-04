@@ -1399,9 +1399,10 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBComma
 
 			// get picture id to file mapping
 			std::map<std::string, std::string> pictureId2File;
+			std::map<std::string, std::string> pictureId2Name;
 			DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", obj_file, 2);
 			if (imageNode)
-				ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File);
+				ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File, pictureId2Name);
 
 			// start parsing mateiral
 			std::map<std::string, std::string> effectId2MaterialId;
@@ -1418,7 +1419,7 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBComma
 			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file, 2);
 			if (effectNode)
 			{
-				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
+				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
 			}
 			// parsing geometry
 			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f);
@@ -1549,16 +1550,22 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			SkSkeleton skeleton;
 			SkMotion motion;
 			int order;
+			//LOG("ParseOpenCOLLADA::parseLibraryVisualScenes");
 			ParserOpenCOLLADA::parseLibraryVisualScenes(visualSceneNode, skeleton, motion, 1.0, order, materialId2Name);
 
 			// get picture id to file mapping
 			std::map<std::string, std::string> pictureId2File;
+			std::map<std::string, std::string> pictureId2Name;
+
 			
 			//DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", obj_file, 2);
 			depth = 0;
 			DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", doc, depth, 2);	
 			if (imageNode)
-				ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File);
+			{
+				//LOG("ParseOpenCOLLADA::parseLibraryImages");
+				ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File, pictureId2Name);
+			}
 
 			// start parsing mateiral
 			std::map<std::string, std::string> effectId2MaterialId;
@@ -1567,7 +1574,10 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			depth = 0;
 			DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", doc, depth, 2);
 			if (materialNode)
+			{
+				//LOG("ParseOpenCOLLADA::parseLibraryMaterials");
 				ParserOpenCOLLADA::parseLibraryMaterials(materialNode, effectId2MaterialId);
+			}
 
 			// start parsing effect
 			SrArray<SrMaterial> M;
@@ -1581,10 +1591,12 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", doc, depth, 2);
 			if (effectNode)
 			{
-				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
+				//LOG("ParseOpenCOLLADA::parseLibraryEffects");
+				ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
 			}
 
 			// parsing geometry
+			//LOG("ParseOpenCOLLADA::parseLibraryGeometries");
 			ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames,  materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f); 
 		}
 		else

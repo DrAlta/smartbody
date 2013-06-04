@@ -224,6 +224,7 @@ def retargetBehaviorSet(charName, skelName):
 
 	scene.run("init-example-reach-mocap.py")
 	reachSetup(charName, "KNN", 'ChrGarza.sk', '')
+		
 
 
 		

@@ -1466,7 +1466,7 @@ int SBJointMap::getJointHierarchyLevel(SkJoint* j, SkJoint* j_top)
 		j_top = j->skeleton()->root();
 
 	int level = 0;
-	while(j != j_top)
+	while(j != j_top && j->parent())
 	{
 		level ++;
 		j = j->parent();

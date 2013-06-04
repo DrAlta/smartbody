@@ -14,7 +14,7 @@ if scene.getMotion('ChrMarine@WalkCircleLf01') == None:
 	smoothMotion.smoothCycle("ChrMarine@Turn180Rt01_smooth",0.1);
 
 	#locomotion mirror
-	print 'locomotion mirror'
+	#print 'locomotion mirror'
 	mirrorMotion = scene.getMotion("ChrMarine@WalkCircleRt01")
 	mirrorMotion.mirror("ChrMarine@WalkCircleLf01", "ChrBackovic.sk")
 	mirrorMotion = scene.getMotion("ChrMarine@WalkTightCircleRt01")
@@ -29,7 +29,7 @@ if scene.getMotion('ChrMarine@WalkCircleLf01') == None:
 	mirrorMotion.mirror("ChrMarine@RunTightCircleLf01", "ChrBackovic.sk")
 	
 	#idle turn
-	print 'idle turn mirror'
+	#print 'idle turn mirror'
 	mirrorMotion = scene.getMotion("ChrMarine@Turn90Rt01")
 	mirrorMotion.mirror("ChrMarine@Turn90Lf01", "ChrBackovic.sk")
 	mirrorMotion1 = scene.getMotion("ChrMarine@Turn180Rt01_smooth")
@@ -57,7 +57,7 @@ if scene.getMotion('ChrMarine@WalkCircleLf01') == None:
 	mirrorMotion.mirror("ChrMarine@Idle01_ToWalk01_Turn180Lf01", "ChrBackovic.sk")
 
 	#step mirror
-	print 'step mirror'
+	#print 'step mirror'
 	mirrorMotion = scene.getMotion("ChrMarine@Idle01_StepBackwardsRt01")
 	mirrorMotion.mirror("ChrMarine@Idle01_StepBackwardsLf01", "ChrBackovic.sk")
 	mirrorMotion = scene.getMotion("ChrMarine@Idle01_StepForwardRt01")
