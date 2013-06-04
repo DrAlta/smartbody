@@ -61,6 +61,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		void reloadScripts(std::string scriptsDir);
 		void reloadScriptsByDir(std::string scriptsDir, std::string parentStr);
 		SbmCharacter* getSelectedCharacter();
+      void ResetScene();
 
 #if USE_OGRE_VIEWER > 0
 		FLTKOgreWindow* fltkViewer;

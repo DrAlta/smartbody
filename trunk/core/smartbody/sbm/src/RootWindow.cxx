@@ -437,16 +437,10 @@ void BaseWindow::resetWindow()
 	}
 }
 
-void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
+void BaseWindow::ResetScene()
 {
-	BaseWindow* window = (BaseWindow*) data;
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
-
-	const char* seqFile = fl_file_chooser("Load file:", "*.py", mediaPath.c_str());
-	if (!seqFile)
-		return;
-
-	window->resetWindow();
+	resetWindow();
 
 	SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
 	SmartBody::SBScene::destroyScene();
@@ -455,9 +449,9 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->setCharacterListener(listener);
 
-	SmartBody::SBScene::getScene()->setViewer(window);
+	SmartBody::SBScene::getScene()->setViewer(this);
 	SmartBody::SBScene::getScene()->getViewer()->root(SmartBody::SBScene::getScene()->getRootGroup());
-	SbmShaderManager::singleton().setViewer(window);
+	SbmShaderManager::singleton().setViewer(this);
 
 	scene->getSimulationManager()->setupTimer();
 
@@ -467,17 +461,30 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	std::string pythonLibPath = SmartBody::SBScene::getSystemParameter("pythonlibpath");
 	setupPython();
 
-
 	if (mediaPath != "")
 		SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
+
+	scene->getVHMsgManager()->setEnable(true);	
+}
+
+void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
+{
+	BaseWindow* window = (BaseWindow*) data;
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+
+	const char* seqFile = fl_file_chooser("Load file:", "*.py", mediaPath.c_str());
+	if (!seqFile)
+		return;
+
+   window->ResetScene();
+
 	std::string filebasename = boost::filesystem::basename(seqFile);
 	std::string fileextension = boost::filesystem::extension(seqFile);
 	std::string fullfilename = std::string(seqFile);
 	size_t pos = fullfilename.find(filebasename);
 	std::string path = fullfilename.substr(0, pos - 1);
-	scene->addAssetPath("script", path);
-	scene->runScript(filebasename);
-	scene->getVHMsgManager()->setEnable(true);	
+	SmartBody::SBScene::getScene()->addAssetPath("script", path);
+	SmartBody::SBScene::getScene()->runScript(filebasename);
 }
 
 void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
@@ -699,8 +706,9 @@ void BaseWindow::LaunchConnectCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::DisconnectRemoteCB(Fl_Widget* widget, void* data)
 {
+   BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	SmartBody::SBScene::getScene()->getDebuggerClient()->Disconnect();
-	SmartBody::SBScene::destroyScene();
+	rootWindow->ResetScene();
 }
 
 void BaseWindow::LaunchConsoleCB(Fl_Widget* widget, void* data)
