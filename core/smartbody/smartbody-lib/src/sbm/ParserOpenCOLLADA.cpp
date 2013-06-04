@@ -181,8 +181,10 @@ void ParserOpenCOLLADA::getChildNodes(const std::string& nodeName, DOMNode* node
 	if (name == nodeName && node->getNodeType() ==  DOMNode::ELEMENT_NODE)
 		childs.push_back(node);
 
+	//if (!node->hasChildNodes()) // no child nodes
+	//	return;
 	DOMNode* child = NULL;
-	const DOMNodeList* list = node->getChildNodes();
+	const DOMNodeList* list = node->getChildNodes();	
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
 		getChildNodes(nodeName,list->item(c), childs);
@@ -460,13 +462,15 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 			{
 				int index = -1;
 				if (parent != NULL)	
-					index = parent->index();				
+					index = parent->index();
+
 				SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, index);
 				joint->quat()->activate();
 				joint->name(nameAttr);
 				joint->extName(nameAttr);
 				joint->extID(idAttr);
 				joint->extSID(sidAttr);
+
 
 				bool hasTranslate = false;
 
@@ -1497,11 +1501,13 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 	std::map<std::string,bool> vertexSemantics;
 	for (unsigned int c = 0; c < list->getLength(); c++)
 	{
+		//LOG("parseLibraryGeometries, iter %d", c);
 		DOMNode* node = list->item(c);
 		std::string nodeName;
 		xml_utils::xml_translate(&nodeName ,node->getNodeName());	
 		if (nodeName == "geometry")
 		{
+			//LOG("nodeName = geometry");
 			std::map<std::string, std::string> verticesArrayMap;
 			std::map<std::string, std::vector<SrVec> > floatArrayMap;	
 
@@ -1527,6 +1533,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 				
 				if (nodeName1 == "source")
 				{
+					//LOG("nodeName1 = source");
 					DOMNamedNodeMap* sourceAttr = node1->getAttributes();
 					DOMNode* idNode = sourceAttr->getNamedItem(BML::BMLDefs::ATTR_ID);
 					std::string idString;
@@ -1622,6 +1629,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 				}			
 				if (nodeName1 == "vertices")
 				{
+					//LOG("nodeName1 = vertices");
 					vertexSemantics.clear();
 					for (unsigned int c2 = 0; c2 < node1->getChildNodes()->getLength(); c2++)
 					{
@@ -1643,6 +1651,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 
 				if (nodeName1 == "triangles" || nodeName1 == "polylist")
 				{
+					//LOG("nodeName1 = %s", nodeName1.c_str());
 					int curmtl = -1;
 					DOMNamedNodeMap* nodeAttr1 = node1->getAttributes();
 					DOMNode* countNode = nodeAttr1->getNamedItem(BML::BMLDefs::ATTR_COUNT);
@@ -1817,7 +1826,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 			   }
 			   if (newModel->mtlSpecularTexNameMap.find(matName) != newModel->mtlSpecularTexNameMap.end())
 			   {
-				   LOG("Load specular map = %s",newModel->mtlSpecularTexNameMap[matName].c_str());
+				   //LOG("Load specular map = %s",newModel->mtlSpecularTexNameMap[matName].c_str());
 				   ParserOpenCOLLADA::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, newModel->mtlSpecularTexNameMap[matName].c_str(), paths);	   
 			   }
 			}
@@ -1928,7 +1937,7 @@ void ParserOpenCOLLADA::parseLibraryMaterials(DOMNode* node, std::map<std::strin
 	}
 }
 
-void ParserOpenCOLLADA::parseLibraryImages(DOMNode* node, std::map<std::string, std::string>& pictureId2File)
+void ParserOpenCOLLADA::parseLibraryImages(DOMNode* node, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name)
 {
 	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int c = 0; c < list->getLength(); c++)
@@ -1945,15 +1954,22 @@ void ParserOpenCOLLADA::parseLibraryImages(DOMNode* node, std::map<std::string, 
 			DOMNode* initFromNode = ParserOpenCOLLADA::getNode("init_from", node);
 			std::string imageFile;
 			xml_utils::xml_translate(&imageFile, initFromNode->getTextContent());
+
+			DOMNode* nameNode = imageAttr->getNamedItem(BML::BMLDefs::ATTR_NAME);
+			std:string imageName;
+			xml_utils::xml_translate(&imageName, nameNode->getTextContent());
 			if (pictureId2File.find(imageId) == pictureId2File.end())
+			{
 				pictureId2File.insert(std::make_pair(imageId, imageFile));
+				pictureId2Name.insert(std::make_pair(imageId, imageName));
+			}
 			else
 				LOG("ParserOpenCOLLADA::parseLibraryImages ERR: two image files mapped to same image id %s", imageId.c_str());
 		}
 	}
 }
 
-void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
+void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
 {
 	const DOMNodeList* list = node->getChildNodes();
 	for (unsigned int c = 0; c < list->getLength(); c++)
@@ -2034,6 +2050,10 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 				std::string imageId;
 				DOMNode* initFromNode = initNodes[i];
 				xml_utils::xml_translate(&imageId, initFromNode->getTextContent());
+				std::string imageName = imageId;
+				if (pictureId2Name.find(imageId) != pictureId2Name.end())
+					imageName = pictureId2Name[imageId];
+
 				std::string imageFile = pictureId2File[imageId];
 				SrString mapKaName(imageFile.c_str());
 				std::string texFile = (const char*) mapKaName;
@@ -2044,11 +2064,11 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 				std::string fileExt = boost::filesystem2::extension(texFile);
 #endif
 				std::string fileName = boost::filesystem::basename(texFile);
-				if (diffuseTexture.find(imageId) != std::string::npos)
+				if (diffuseTexture.find(imageName) != std::string::npos)
 					mtlTexMap[mtlName] = fileName + fileExt;	
-				else if (normalTexture.find(imageId) != std::string::npos)
+				else if (normalTexture.find(imageName) != std::string::npos)
 					mtlTexBumpMap[mtlName] = fileName + fileExt;
-				else if (specularTexture.find(imageId) != std::string::npos)
+				else if (specularTexture.find(imageName) != std::string::npos)
 					mtlTexSpecularMap[mtlName] = fileName + fileExt;				
 			}
 
@@ -2270,11 +2290,12 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 
 		// get picture id to file mapping
 		std::map<std::string, std::string> pictureId2File;
+		std::map<std::string, std::string> pictureId2Name;
 		//DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", fileName, 2);
 		depth = 0;
 		DOMNode* imageNode = getNode("library_images", doc, depth, 2);	
 		if (imageNode)
-			ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File);
+			ParserOpenCOLLADA::parseLibraryImages(imageNode, pictureId2File,pictureId2Name);
 
 		// start parsing mateiral
 		std::map<std::string, std::string> effectId2MaterialId;
@@ -2295,7 +2316,7 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 		DOMNode* effectNode = getNode("library_effects", doc, depth, 2);	
 		if (effectNode)
 		{
-			ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
+			ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
 		}
 		// parsing geometry
 		ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, fileName.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVecs, 1.0f);

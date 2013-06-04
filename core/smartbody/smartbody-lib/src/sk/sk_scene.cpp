@@ -77,6 +77,12 @@ static SrSnGroup* make_joint_group ( const SkJoint* j, SkSkeleton* s, SrArray<Sr
 	      g->add ( group );
    }
 
+   for (int i=0;i<_jgroup.size();i++)
+   {
+	   if (_jgroup[i] == NULL)
+		   _jgroup[i] = new SrSnGroup; // create dummy group for dangling joints
+   }
+
    return g;
  }
 
@@ -101,6 +107,7 @@ void SkScene::init ( SkSkeleton* s, float scale )
 
    const std::vector<SkJoint*>& joints = s->joints ();
    _jgroup.size ( joints.size() );
+   _jgroup.setall(NULL);
 
    SkJoint* root = s->root();
    if (!root)

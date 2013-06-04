@@ -195,9 +195,11 @@ SkJoint* SkSkeleton::add_joint ( SkJoint::RotType rtype, int parentid )
 
 	SkJoint* parent=0;
 	if ( parentid < 0 ) {
+#if 0   // is there a reason whey we want to attach unparent joint to the last joint ? it doesn't make sense and will most likely break the structure of skeleton.
 		if( _joints.size()>0 )
 			parent =_joints[_joints.size() - 1];
 		else
+#endif
 			parent=NULL;
 	} 	
 	else if (parentid > (int)_joints.size())
@@ -211,8 +213,9 @@ SkJoint* SkSkeleton::add_joint ( SkJoint::RotType rtype, int parentid )
 	SkJoint* j = new SmartBody::SBJoint ( this, parent, rtype, _joints.size() );
 	_joints.push_back(j);
 
-	if ( parent==NULL )
-		_root=j;
+	// should set the root explicitly
+	//if ( parent==NULL )
+	//	_root=j;
 
 	return j;
 }

@@ -11,6 +11,7 @@ def femaleStepSetup(skeletonName, baseJoint, preFix, statePreFix):
 	print "** State: harmonyStep"
 	stateName = statePreFix + "Step"
 	state = stateManager.createState2D(stateName)
+	state.setBlendSkeleton('ChrHarmony.sk')
 
 	# add motions
 	motions = StringVec()

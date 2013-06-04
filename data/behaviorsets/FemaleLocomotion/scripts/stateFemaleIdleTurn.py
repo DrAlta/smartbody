@@ -10,6 +10,7 @@ def femaleIdleTurnSetup(skeletonName, baseJoint, prefix, statePreFix):
 	print "** State: harmonyIdleTurn"
 	stateName = statePreFix + "IdleTurn"
 	state = stateManager.createState1D(stateName)
+	state.setBlendSkeleton('ChrHarmony.sk')
 	motions = StringVec()
 	motions.append(prefix + "ChrHarmony@IdleHandOnHip01")
 	motions.append(prefix + "ChrHarmony@Turn90Lf01")

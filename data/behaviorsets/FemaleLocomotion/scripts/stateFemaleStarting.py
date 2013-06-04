@@ -11,6 +11,7 @@ def femaleStartingSetup(skeletonName, baseJoint, preFix, statePreFix):
 
 	print "** State: allStartingLeft"
 	state1 = stateManager.createState1D(statePreFix + "StartingLeft")
+	state1.setBlendSkeleton('ChrHarmony.sk')
 	motions1 = StringVec()
 	motions1.append(preFix + "ChrHarmony@Idle01_ToWalkLf01")
 	motions1.append(preFix + "ChrHarmony@Idle01_ToWalk01_Turn90Lf01")
@@ -47,6 +48,7 @@ def femaleStartingSetup(skeletonName, baseJoint, preFix, statePreFix):
 
 	print "** State: allStartingRight"
 	state2 = stateManager.createState1D(statePreFix + "StartingRight")
+	state2.setBlendSkeleton('ChrHarmony.sk')
 	motions2 = StringVec()
 	motions2.append(preFix + "ChrHarmony@Idle01_ToWalkRt01")
 	motions2.append(preFix + "ChrHarmony@Idle01_ToWalk01_Turn90Rt01")

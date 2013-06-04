@@ -304,7 +304,7 @@ for i in range(0, len(motions)):
 	omega = motion.getJointAngularSpeed(joint, 0, motion.getDuration())
 	
 	statemarineLocomotion.setParameter(motions[i], speed, omega, direction)
-	print "Motion " + motion.getName() + " (" + str(speed) + ", " + str(omega) + ", " + str(direction) + ")"
+	#print "Motion " + motion.getName() + " (" + str(speed) + ", " + str(omega) + ", " + str(direction) + ")"
 	motion.disconnect()
 	
 	
