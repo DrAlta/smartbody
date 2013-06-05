@@ -313,7 +313,7 @@ extern "C" {
     JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_openConnection(JNIEnv * env, jobject obj);
     JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_closeConnection(JNIEnv * env, jobject obj);
     JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd);
-    JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd);
+    //JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd);
     JNIEXPORT jstring JNICALL Java_com_android_sbjniapp_SBJNIAppLib_getLog(JNIEnv * env, jobject obj);   
     JNIEXPORT jboolean JNICALL Java_com_android_sbjniapp_SBJNIAppLib_handleInputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my);
 };
