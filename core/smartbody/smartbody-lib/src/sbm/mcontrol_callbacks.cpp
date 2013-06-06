@@ -876,9 +876,11 @@ int mcu_motion_player_func(srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 		else if (next == "off")
 			character->motionplayer_ct->setActive(false);
 		else
-		{
+		{			
 			double frameNumber = args.read_double();
+			//LOG("before motionplayer_ct->init(), next = %s, frameNumber = %f", next.c_str(), frameNumber);
 			character->motionplayer_ct->init(character,next, frameNumber);
+			//LOG("after motionplayer_ct->init()");
 		}
 		return CMD_SUCCESS;
 	}

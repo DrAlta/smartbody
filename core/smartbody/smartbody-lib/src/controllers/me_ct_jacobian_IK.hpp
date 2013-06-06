@@ -31,7 +31,7 @@ public:
 	~MeCtIKTreeNode();
 	SrVec getCoMPos(); 
 	SrVec getParentGlobalPos();
-	SrVec getGlobalPos();
+	SBAPI SrVec getGlobalPos();
 	SrQuat& getQuat(NodeQuatType type = QUAT_CUR);
 	bool setQuat(const SrQuat& q, NodeQuatType type = QUAT_CUR);
 };

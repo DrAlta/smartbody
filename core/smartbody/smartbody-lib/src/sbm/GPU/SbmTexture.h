@@ -21,6 +21,7 @@
 #endif
 #include <map>
 #include <string>
+#include <vector>
 #include <sb/SBTypes.h>
 #include <sr/sr_gl.h>
 
@@ -68,6 +69,7 @@ protected:
 	int width, height;
 	int channels; // num of channels in the iamge	
 	unsigned char* buffer;
+	std::vector<unsigned char> imgBuffer;
 	bool finishBuild;
 
 	GLuint texID;	

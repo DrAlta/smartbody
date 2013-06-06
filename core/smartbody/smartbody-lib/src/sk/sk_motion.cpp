@@ -531,20 +531,25 @@ void SkMotion::apply ( float t,
 
 	if ( f==_frames.size() ) {
 		// Apply last frame
-		apply_frame( f-1, buffer, map_p );
-		return;
-	}
+		//apply_frame( f-1, buffer, map_p );
+		//return;
+		t = _frames[_frames.size()-1].keytime;
+		f = _frames.size()-1;
+	}	
 
-	f--;
+	if (_frames.size() > 1)
+	{
+		f--;
+	}	
 	_last_apply_frame = f;
 	if ( lastframe )
 		*lastframe = _last_apply_frame;
+	int nxtFrame = _frames.size() > 1 ? f+1 : f;
 
 	float* fp1 = _frames[f].posture;
-	float* fp2 = _frames[f+1].posture;
-
+	float* fp2 = _frames[nxtFrame].posture;
 	// convert t to [0,1] according to the keytimes:
-	t = (t-_frames[f].keytime) / (_frames[f+1].keytime-_frames[f].keytime);
+	t = _frames.size() > 1 ? (t-_frames[f].keytime) / (_frames[f+1].keytime-_frames[f].keytime) : 0.f;
 
 #if DEBUG_T
 	if ( t<0.0 )	{
