@@ -73,11 +73,12 @@ void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, double time_offset, double t
 //	_duration = _motion->duration() / _twarp;
 
 	MeController::init (pawn);
-
+	//LOG("before if (_context)");
 	if( _context ) {
 		// Notify _context of channel change.
 		_context->child_channels_updated( this );
 	}
+	//LOG("after if (_context)");
 
 	synch_points.copy_points( m_p->synch_points, time_offset, time_scale );
 #if 1
@@ -337,7 +338,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 		}
 	} else {
 		//LOG("MeCtMotion::controller_evaluate %s time %f, duration %f", this->getName().c_str(), t, dur);
-		continuing = motionTime < dur;
+		continuing = motionTime <= dur;
 	}	
 	SmartBody::SBRetarget* retarget = NULL;
 	if (_character)

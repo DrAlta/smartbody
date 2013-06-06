@@ -153,6 +153,11 @@ void SbmTexture::loadImage( const char* fileName )
 			++index2;
 		}
 	}
+	imgBuffer.resize(width*height*channels);
+	for (int i=0;i<width*height*channels;i++)
+	{
+		imgBuffer[i] = buffer[i];
+	}
 }
 
 void SbmTexture::buildTexture()

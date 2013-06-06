@@ -58,8 +58,7 @@ protected:
 	float                 ikReachRegion, ikMaxOffset;	
 
 	MeCtJacobianIK        ik;
-	MeCtCCDIK             ikCCD;
-	MeCtIKTreeScenario    ikScenario, ikCCDScenario;
+	MeCtCCDIK             ikCCD;	
 	ReachStateData*       reachData;	
 public:
 	vector<SrVec>         examplePts,resamplePts;
@@ -67,6 +66,7 @@ public:
 	float                 fadingWeight, ikDefaultVelocity;
 	float                 reachCompleteDuration;
 	bool                  footIKFix;
+	MeCtIKTreeScenario    ikScenario, ikCCDScenario;
 
 public:
 	MeCtReachEngine(SbmCharacter* sbmChar, SmartBody::SBSkeleton* sk);

@@ -78,13 +78,14 @@ SrVec MeCtIKTreeNode::getParentGlobalPos()
 {
 	SrVec gPos = SrVec(0,0,0);
 	if (parent)
-		gPos = parent->joint->gmat().get_translation();	
+		//gPos = parent->joint->gmat().get_translation();	
+		gPos = parent->gmat.get_translation();
 	return gPos;
 }
 
 SrVec MeCtIKTreeNode::getGlobalPos()
 {
-	return joint->gmat().get_translation();
+	return gmat.get_translation();//joint->gmat().get_translation();
 }
 /************************************************************************/
 /* IK Tree scenario to hold data/parameters for full-body IK            */
@@ -495,10 +496,11 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 		SrVec constraintOffset = constraintPos - rootNode->getGlobalPos();
 		SrVec constraintDir = constraintOffset; constraintDir.normalize();
 		float chainLength = s->getIKChainLength(cons->rootName.c_str(), cons->efffectorName.c_str());
- 		if (constraintOffset.len() > chainLength)
- 		{
- 			constraintPos = rootNode->getGlobalPos() + constraintDir*chainLength*0.995f; // make sure the target position is not out of reach 			
- 		}	
+		//LOG("rootNodePos = %s, constarintDir = %s, chainLength = %f",rootNode->getGlobalPos().toString().c_str(), constraintDir.toString().c_str(), chainLength);
+  		if (constraintOffset.len() > chainLength)
+  		{
+  			constraintPos = rootNode->getGlobalPos() + constraintDir*chainLength*0.995f; // make sure the target position is not out of reach 			
+  		}	
 
 		SrVec offset = constraintPos - endPos;				
 		SrVec targetPos;	

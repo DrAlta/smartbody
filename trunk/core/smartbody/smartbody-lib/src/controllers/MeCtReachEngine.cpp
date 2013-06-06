@@ -335,15 +335,17 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 
 	EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachPosConstraint[reachEndEffector->getMappedJointName().c_str()]);
 	cons->targetPos = estate.curIKTargetState.tran;	
+	//LOG("constraint position = %f %f %f",cons->targetPos[0],cons->targetPos[1], cons->targetPos[2]);
 	
 // 	if (curReachState->curStateName() == "Start" || curReachState->curStateName() == "Complete" )
 // 	{
 // 		SrVec ikTarget = rd->reachTarget.getTargetState().tran;
 // 		//LOG("state time = %f",rd->stateTime);
-// 		//LOG("ikTarget = %f %f %f",ikTarget[0],ikTarget[1],ikTarget[2]);
+// 		LOG("ikTarget = %f %f %f",ikTarget[0],ikTarget[1],ikTarget[2]);
 // 		//LOG("targetPos = %f %f %f",cons->targetPos[0],cons->targetPos[1],cons->targetPos[2]);	
 // 	}
-
+	//LOG("gmat %s",rd->gmat.toString().c_str());
+	//LOG("rootPos = %s", refFrame.rootPos.toString().c_str());
 	ikScenario.ikGlobalMat = rd->gmat;//skeletonRef->search_joint(rootName)->gmat();//ikScenario.ikTreeRoot->joint->parent()->gmat();	
 	ikScenario.ikTreeRootPos = refFrame.rootPos;
 	ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_REF);		
@@ -473,7 +475,7 @@ DataInterpolator* MeCtReachEngine::createInterpolator(std::string interpolatorTy
 	if (interpolatorType == "KNN")
 	{
 
-		KNNInterpolator* knnInterpolator = new KNNInterpolator(5000,ikReachRegion*1.f);
+		KNNInterpolator* knnInterpolator = new KNNInterpolator(3000,ikReachRegion*1.f);
 		resampleData = &knnInterpolator->resampleData;	
 		interpolator = knnInterpolator;
 	}

@@ -4388,8 +4388,8 @@ MeCtConstraint* FltkViewer::getCurrentCharacterConstraintController()
 // visualize example data and other relevant information for reach controller
 void FltkViewer::drawReach()
 {	
-	if (_data->reachRenderMode == ModeNoExamples)
-		return;
+	//if (_data->reachRenderMode == ModeNoExamples)
+	//	return;
 	
 	glPushAttrib(GL_LIGHTING_BIT | GL_POINT_BIT);
 	glDisable(GL_LIGHTING);
@@ -4419,8 +4419,8 @@ void FltkViewer::drawReach()
 
 		ReachStateData* rd = re->getReachData();
 		if (!rd)
-			return;
-		
+			return;		
+
 		SkJoint* root = character->getSkeleton()->root();
 		SrMat rootMat = rd->gmat;//root->gmat();
 		//rootMat.translation(root->gmat().get(12),root->gmat().get(13),root->gmat().get(14));
@@ -4527,6 +4527,14 @@ void FltkViewer::drawReach()
 		PositionControl::drawSphere(ikTraj,sphereSize,SrVec(1,0,1));
 		SrVec ikTarget = es.ikTargetState.tran;
 		
+		MeCtIKTreeScenario& ikTree = re->ikScenario;
+
+		for (unsigned int i=0;i<ikTree.ikValidNodes.size();i++)
+		{
+			MeCtIKTreeNode* node = ikTree.ikValidNodes[i];
+			SrVec nodePos = node->getGlobalPos();
+			PositionControl::drawSphere(nodePos,sphereSize,SrVec(0,1,1));
+		}
 
 // 		glColor3f(1.0, 0.0, 0.0);
 // 		glBegin(GL_LINES);
