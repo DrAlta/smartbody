@@ -42,6 +42,7 @@
 #include <sbm/sbm_speech_audiofile.hpp>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_blend.hpp>
+#include <controllers/me_ct_face.h>
 
 using namespace std;
 using namespace BML;
@@ -220,12 +221,14 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	{	
 		bool visemeMode = request->actor->get_viseme_curve_mode();
 		audioSpeechImpl->setVisemeMode(visemeMode);
+		audioSpeechImpl->setMotionMode(request->actor->getBoolAttribute("useCustomizedLipSyncIfPresent"));
 	}
 	AudioFileSpeech* audioSpeechImplBackup = dynamic_cast<AudioFileSpeech*>(cur_speech_impl_backup);
 	if (audioSpeechImplBackup)
 	{	
 		bool visemeMode = request->actor->get_viseme_curve_mode();
 		audioSpeechImplBackup->setVisemeMode(visemeMode);
+		audioSpeechImpl->setMotionMode(request->actor->getBoolAttribute("useCustomizedLipSyncIfPresent"));
 	}
 
 	// Found speech implementation.  Making request.
@@ -1081,7 +1084,9 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 			// drop any visemes that don't exceed the viseme threshold
 			if (v->duration() < actor->getMinVisemeTime() && !actor->isDiphone())
 				continue;
-			if (!v->isCurveMode() && !v->isTrapezoidMode() && !v->isFloatCurveMode())
+			if (v->isMotionMode())
+				visemes.push_back(new VisemeData(v->id()));
+			else if (!v->isCurveMode() && !v->isTrapezoidMode() && !v->isFloatCurveMode())
 				visemes.push_back( new VisemeData( v->id(), v->weight(), v->time() ) );
 			else if (v->isTrapezoidMode() && !v->isFloatCurveMode())
 				visemes.push_back( new VisemeData( v->id(), v->weight(), v->time(), v->duration(), v->rampin(), v->rampout() ) );
@@ -1278,7 +1283,15 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 		for( size_t i=0; i<viseme_count; i++ ) { //adds visemes for audio into sequence file
 			VisemeData* v = visemes.at(i);
 			time_sec time = (time_sec)( v->time() + startAt );
-			if (v->isFloatCurveMode())
+			if (v->isMotionMode())
+			{
+				// calling face controller directly
+				if (request->actor->face_ct)
+				{
+					request->actor->face_ct->customizeMotion(v->id(), time);
+				}
+			}
+			else if (v->isFloatCurveMode())
 			{
 				command.str( "" );
 				std::vector<float>& data = v->getFloatCurve();

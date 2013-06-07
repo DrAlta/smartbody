@@ -29,6 +29,7 @@
 #include <sbm/action_unit.hpp>
 #include <sb/sbm_pawn.hpp>
 #include <sb/sbm_character.hpp>
+#include <sb/SBScene.h>
 //////////////////////////////////////////////////////////////////////////////////
 
 std::string MeCtFace::type_name = "Face";
@@ -39,6 +40,9 @@ MeCtFace::MeCtFace( void )	{
    _base_pose_p = NULL;
    _skeleton_ref_p = NULL;
    _useVisemeClamping = true;
+
+   _customized_motion = NULL;
+   _motionStartTime = -1;
 }
 
 MeCtFace::~MeCtFace( void )	{
@@ -58,6 +62,29 @@ void MeCtFace::clear( void )	{
 
 	_visemeChannelMap.clear();
 	_baseChannelToBufferIndex.clear();
+}
+
+void MeCtFace::customizeMotion(const std::string& motionName, double startTime)
+{
+	_motionStartTime = startTime;
+	_customized_motion = (SkMotion*)SmartBody::SBScene::getScene()->getMotion(motionName);
+
+	SkChannelArray& mChannels = _customized_motion->channels();
+	int size = mChannels.size();
+	_mChan_to_buff.size( size );
+	if( _context ) 
+	{
+		SkChannelArray& cChannels = _context->channels();
+		for (int i = 0; i < size; ++i) 
+		{
+			int chanIndex = cChannels.search(mChannels.mappedName(i), mChannels.type(i));
+			_mChan_to_buff[i] = _context->toBufferIndex(chanIndex);
+		}
+	}
+	else 
+	{
+		_mChan_to_buff.setall( -1 );
+	}	
 }
 
 void MeCtFace::init (SbmPawn* pawn) {
@@ -311,12 +338,37 @@ void MeCtFace::controller_start( void )	{
 
 }
 
+bool MeCtFace::updateMotion(double t, MeFrameData& frame)
+{
+	if (_customized_motion == NULL)
+		return false;
+
+	double localTime = t - _motionStartTime;
+	if (localTime > _customized_motion->duration())
+	{
+		_customized_motion = NULL;
+		return false;
+	}
+
+	int frameNum = int(localTime * _customized_motion->frames() / _customized_motion->duration());
+	_customized_motion->apply(float(localTime),
+		&(frame.buffer()[0]),  // pointer to buffer's float array
+		&_mChan_to_buff,
+		SkMotion::Linear, &frameNum, true, 0);
+
+	return true;
+}
+
 bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 	bool continuing = true;
 	continuing = t < _duration;
 	if( t < 0.0 )	{
 		return( continuing );
 	}
+
+	// check customized motion
+	if (updateMotion(t, frame))
+		return continuing;
 
 	float *fbuffer = &( frame.buffer()[0] );
 	SkChannelArray& base_channels = _base_pose_p->channels();

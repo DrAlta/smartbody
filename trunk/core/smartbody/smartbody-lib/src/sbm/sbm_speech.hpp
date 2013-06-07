@@ -55,31 +55,36 @@ namespace SmartBody {
 		bool _curveMode;
 		bool _trapezoidMode;
 		bool _floatCurveMode;
+		bool _motionMode;
 		float _rampin;
 		float _rampout;
 		std::vector<float> _curveData;
 		int _floatsPerKey;
 
 	public:
+		VisemeData( const std::string& id)
+			: _id( id ), _weight( 1.0f ), _time(0.0f), _duration( 0.0f ), _rampin(0.0f), _rampout(0.0f),  _numKeys(0), _floatsPerKey(0), _curveMode(false), _trapezoidMode(false), _floatCurveMode(false), _motionMode(true)
+		{
+		}
 		VisemeData( const std::string& id, float weight, float time )
-			: _id( id ), _weight( weight ), _time( time ), _duration( 0 ),  _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false), _floatCurveMode(false)
+			: _id( id ), _weight( weight ), _time( time ), _duration( 0 ),  _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false), _floatCurveMode(false), _motionMode(false)
 		{
 		}
 		
 		VisemeData( const std::string& id, float weight, float time, float duration )
-			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false), _floatCurveMode(false)
+			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(0), _rampout(0), _numKeys( 0 ), _curveInfo( "" ), _curveMode(false), _trapezoidMode(false), _floatCurveMode(false), _motionMode(false)
 		{
 		}
 
 		VisemeData( const std::string& id, int numKeys, const std::string& curveInfo );
 
 		VisemeData( const std::string& id, float startTime)
-			: _id( id ), _weight( 1.0f ), _time( startTime ), _duration( 0.0f ), _rampin(0.0f), _rampout(0.0f),  _numKeys(0), _floatsPerKey(0), _curveMode(false), _trapezoidMode(false), _floatCurveMode(true)
+			: _id( id ), _weight( 1.0f ), _time( startTime ), _duration( 0.0f ), _rampin(0.0f), _rampout(0.0f),  _numKeys(0), _floatsPerKey(0), _curveMode(false), _trapezoidMode(false), _floatCurveMode(true), _motionMode(false)
 		{
 		}
 
 		VisemeData( const std::string& id, float weight, float time, float duration, float rampin, float rampout)
-			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(rampin), _rampout(rampout), _numKeys( 0 ), _curveInfo( "" ), _trapezoidMode(true), _curveMode(false), _floatCurveMode(false)
+			: _id( id ), _weight( weight ), _time( time ), _duration( duration ), _rampin(rampin), _rampout(rampout), _numKeys( 0 ), _curveInfo( "" ), _trapezoidMode(true), _curveMode(false), _floatCurveMode(false), _motionMode(false)
 		{
 		}
 
@@ -132,6 +137,12 @@ namespace SmartBody {
 
 		/** Set the curve information. */
 		void setCurveInfo(const char* info) { _curveInfo = info;}
+
+		/** Get the viseme Mode. */
+		bool isMotionMode()	{return _motionMode;}
+
+		/** Set the viseme Mode. */
+		void setMotionMode(bool val) {_motionMode = val;}
 
 		/** Get the viseme Mode. */
 		bool isCurveMode() {return _curveMode;}
