@@ -70,6 +70,10 @@ class MeCtFace : public SmartBody::SBController	{
 		std::map<std::string, std::vector<int> > _visemeChannelMap;
 		std::vector<int> _baseChannelToBufferIndex;
 		bool				_useVisemeClamping;
+
+		SkMotion*			_customized_motion;
+		double				_motionStartTime;
+		SrBuffer<int>        _mChan_to_buff; // motion's channels to context's buffer index
 		
 	public:
 		static std::string type_name;
@@ -81,6 +85,8 @@ class MeCtFace : public SmartBody::SBController	{
 		virtual ~MeCtFace( void );
 		
 		void clear( void );
+
+		void customizeMotion(const std::string& motionName, double startTime);
 		
 		virtual void init (SbmPawn* pawn);
 		void remove_joint( const char *joint_name );
@@ -91,6 +97,7 @@ class MeCtFace : public SmartBody::SBController	{
 		virtual double controller_duration ();
 
 	private:
+		bool updateMotion(double t, MeFrameData& frame);
 
 		// callbacks for the base class
 		virtual void context_updated( void );

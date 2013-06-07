@@ -53,6 +53,8 @@ class AudioFileSpeech : public SpeechInterface
       HandlerBase * m_xmlHandler;
       int m_requestIdCounter;
 	  bool visemeCurveMode;
+	  bool useMotionByDefault;
+	  bool useMotion;
 
 //      stdext::hash_map< RequestId, SpeechRequestInfo > m_speechRequestInfo;
       std::map< RequestId, SpeechRequestInfo > m_speechRequestInfo;
@@ -74,10 +76,12 @@ class AudioFileSpeech : public SpeechInterface
 	  SBAPI std::map< RequestId, SpeechRequestInfo >& getSpeechRequestInfo();
 
 	  void setVisemeMode(bool mode) {visemeCurveMode = mode;}
+	  void setMotionMode(bool mode) {useMotionByDefault = mode;}
 
    protected:
       virtual void ReadVisemeDataLTF( const char * filename, std::vector< VisemeData > & visemeData );
       virtual void ReadVisemeDataBML( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character );
+	  virtual void ReadMotionDataBML( const char * filename, std::vector< VisemeData > & visemeData);
 //      virtual void ReadSpeechTiming( const char * filename, stdext::hash_map< std::string, float > & timeMarkers );
       virtual void ReadSpeechTiming( const char * filename, std::map< std::string, float > & timeMarkers );
 	  virtual void ReadSpeechTimingFast( const char * filename, std::map< std::string, float > & timeMarkers, rapidxml::xml_document<>& bmlDoc);

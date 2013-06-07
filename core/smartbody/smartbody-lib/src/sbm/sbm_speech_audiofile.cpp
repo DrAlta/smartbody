@@ -51,6 +51,8 @@ AudioFileSpeech::AudioFileSpeech()
    m_xmlParser->setErrorHandler( m_xmlHandler );
 
    m_requestIdCounter = 1;  // start with 1, in case 0 is a special case
+   useMotion = false;
+   useMotionByDefault = true;
 }
 
 
@@ -293,6 +295,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 #if (BOOST_VERSION > 104400)
 	std::string basePath = abs_p.string().c_str();
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.string().c_str();
+	ReadMotionDataBML(bmlPath.native_directory_string().c_str(),  m_speechRequestInfo[ m_requestIdCounter ].visemeData);
  	ReadVisemeDataBML( bmlPath.string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
@@ -303,6 +306,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 #else
 	std::string basePath = abs_p.native_directory_string().c_str();
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.native_directory_string().c_str();
+	ReadMotionDataBML(bmlPath.native_directory_string().c_str(),  m_speechRequestInfo[ m_requestIdCounter ].visemeData);
    ReadVisemeDataBML( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
@@ -331,7 +335,6 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    return m_requestIdCounter++;
 }
 
-
 vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId, SbmCharacter* character )
 {
    // TODO: Change the return type data structure, so that I can simply do this:
@@ -345,7 +348,9 @@ vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId, SbmChar
       for ( size_t i = 0; i < it->second.visemeData.size(); i++ )
       {
          VisemeData & v = it->second.visemeData[ i ];
-		 if (!v.isCurveMode() && !v.isTrapezoidMode())
+		 if (v.isMotionMode())
+			 visemeCopy->push_back(new VisemeData(v.id()));
+		 else if (!v.isCurveMode() && !v.isTrapezoidMode())
 			 visemeCopy->push_back( new VisemeData( v.id(), v.weight(), v.time() ) );
 		 else if (v.isTrapezoidMode())
 			 visemeCopy->push_back( new VisemeData( v.id(), v.weight(), v.time(), v.duration(), v.rampin(), v.rampout() ) );
@@ -572,12 +577,72 @@ void AudioFileSpeech::ReadVisemeDataLTF( const char * filename, std::vector< Vis
    fclose( f );
 }
 
+void AudioFileSpeech::ReadMotionDataBML(const char * filename, std::vector< VisemeData > & visemeData)
+{
+	visemeData.clear();
+	useMotion = false;
+	if (!useMotionByDefault)
+		return;
+
+	DOMDocument* xmlDoc = NULL;
+	if (SmartBody::SBScene::getScene()->getBoolAttribute("useXMLCache"))
+	{
+		boost::filesystem::path path(filename);
+#if (BOOST_VERSION > 104400)
+		boost::filesystem::path absPath = boost::filesystem::absolute(path);
+#else
+		boost::filesystem::path absPath = boost::filesystem::complete(path);
+#endif
+		std::string absPathStr = absPath.string();
+		std::map<std::string, DOMDocument*>::iterator iter = xmlCache.find(absPathStr);
+		if (iter !=  xmlCache.end())
+		{
+			xmlDoc = (*iter).second;
+		}
+		else
+		{
+			xmlDoc = xml_utils::parseMessageXml( m_xmlParser, filename );
+			if (SmartBody::SBScene::getScene()->getBoolAttribute("useXMLCacheAuto"))
+			{
+				// add to the cache if in auto cache mode
+				xmlCache.insert(std::pair<std::string, DOMDocument*>(absPathStr, xmlDoc));
+			}
+		}
+	}
+	else
+	{
+		xmlDoc = xml_utils::parseMessageXml(m_xmlParser, filename);
+	}
+
+	if ( xmlDoc == NULL )
+	{
+		return;
+	}
+
+	DOMElement * bml = xmlDoc->getDocumentElement();
+
+	DOMNodeList* motionNodeList = bml->getElementsByTagName(XMLString::transcode("motion"));
+	int motionNodeLength = motionNodeList->getLength();
+	if (motionNodeLength == 0)
+		return;
+
+	useMotion = true;
+	for (int i = 0; i < motionNodeLength; ++i)
+	{
+		DOMElement* e = (DOMElement*)motionNodeList->item(i);
+		string motionName = "";
+		xml_utils::xml_translate(&motionName, e->getAttribute(BML::BMLDefs::ATTR_NAME));
+
+		visemeData.push_back(VisemeData(motionName));
+	}
+}
 
 void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character )
 {
-   visemeData.clear();
+	if (useMotion)
+		return;
 
-    
+   visemeData.clear();
 
 	DOMDocument* xmlDoc = NULL;
 	if (SmartBody::SBScene::getScene()->getBoolAttribute("useXMLCache"))
@@ -618,7 +683,6 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
 
    // TODO: make sure it's "bml"
 
-  
    // <lips viseme="Ih" articulation="1.0" start="0.17" ready="0.17" relax="0.31" end="0.31" />
    bool useVisemeCurveMode = visemeCurveMode;
    if (useVisemeCurveMode)

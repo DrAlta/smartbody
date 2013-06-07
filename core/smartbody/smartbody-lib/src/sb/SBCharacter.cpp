@@ -41,8 +41,8 @@ SBCharacter::SBCharacter() : SbmCharacter()
 
 SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name.c_str(), type)
 {
-	
-	
+	createBoolAttribute("useCustomizedLipSyncIfPresent", true, true, "Basic", 70, false, false, false, "If motion name exists inside pre-recorded audio file bml, use it by default"); 
+
 	createBoolAttribute("gestureRequest.autoGestureTransition", true, true, "Basic", 89, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
 	createBoolAttribute("gestureRequest.matchingHandness", true, true, "Basic", 90, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
 	createBoolAttribute("gestureRequest.enableTransitionToStroke", false, true, "Basic", 91, false, false, false, "Enable Transition to stroke posture directly if time is too limited."); 
