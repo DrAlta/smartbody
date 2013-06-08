@@ -2011,7 +2011,19 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 					std::string texID;
 					xml_utils::xml_translate(&texID, texAttrNode->getNodeValue());
 					diffuseTexture = texID;
-				}			
+				}
+				DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", diffuseNode);
+				if (colorNode)
+				{
+					std::string color;
+					xml_utils::xml_translate(&color, colorNode->getTextContent());
+					std::vector<std::string> tokens;
+					vhcl::Tokenize(color, tokens, " \n");
+					float w = 1;
+					if (tokens.size() == 4)
+						w = (float)atof(tokens[3].c_str());
+					M.top().diffuse = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
+				}
 			}
 
 			if (bumpNode)
@@ -2128,7 +2140,8 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 									colorVec[i] = (float)atof(tokens[i].c_str());
 								}
 							}
-							alpha = 1.f - colorVec.norm();		
+							alpha = 1.f - (colorVec[0]+colorVec[1]+colorVec[2])/3;
+							//alpha = 1.f - colorVec.norm();		
 						}
 														
 					}
