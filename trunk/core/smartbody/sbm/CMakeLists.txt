@@ -62,6 +62,7 @@ find_library (OPENAL openal)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 link_directories(/usr/X11R6/lib)
+link_directories(/usr/local/lib)
 set( MORE_LIBS
         ${COREAUDIO_LIBRARY}
         ${AUDIOUNIT_LIBRARY}
@@ -188,7 +189,7 @@ set( SBM_FLTK_SRC
 
 )
 
-add_executable( sbm-fltk
+add_executable( sbgui
 
 	${SBM_FLTK_SRC}
 )
@@ -199,7 +200,7 @@ else()
 set ( XFT "" ) 
 endif()
 
-target_link_libraries( sbm-fltk
+target_link_libraries( sbgui
 
 	#tcmalloc
 	#profiler
@@ -228,7 +229,7 @@ target_link_libraries( sbm-fltk
 
 set( EXEC_LIST
 
-	sbm-fltk
+	sbgui
 )
 
 set( APP_LIBRARY_BINARY_PATHS
