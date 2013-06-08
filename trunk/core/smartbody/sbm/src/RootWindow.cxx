@@ -367,6 +367,14 @@ void BaseWindow::resetWindow()
 		delete retargetCreatorWindow;
 		retargetCreatorWindow = NULL;
 	}
+
+	if (fltkViewer->_retargetStepWindow)
+	{
+		fltkViewer->_retargetStepWindow->hide();
+		delete fltkViewer->_retargetStepWindow;
+		fltkViewer->_retargetStepWindow = NULL;
+	}
+
 	if (visemeViewerWindow)
 	{
 		visemeViewerWindow->hide();
@@ -648,6 +656,7 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 	if (confirm == 1)
 	{
 		SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
+		window->resetWindow();
 		SmartBody::SBScene::destroyScene();
 
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();

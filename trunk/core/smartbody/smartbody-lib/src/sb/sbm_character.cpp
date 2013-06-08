@@ -1681,6 +1681,9 @@ void SbmCharacter::schedule_viseme_curve(
 	float ramp_out 
 	) {
 
+		SmartBody::SBFaceDefinition* faceDefinition = getFaceDefinition();
+		if (!faceDefinition) return; // no face definition
+
 		std::vector<std::string> visemeNames;
 		std::map<std::string, std::vector<std::string> >::iterator iter;
 
@@ -1691,9 +1694,7 @@ void SbmCharacter::schedule_viseme_curve(
 				visemeNames.push_back(iter->second[nCount]);
 		}
 		else
-			visemeNames.push_back(viseme);
-
-		SmartBody::SBFaceDefinition* faceDefinition = getFaceDefinition();
+			visemeNames.push_back(viseme);		
 		// patch for AU (both)
 		if (strlen(viseme) >= 4)
 		{

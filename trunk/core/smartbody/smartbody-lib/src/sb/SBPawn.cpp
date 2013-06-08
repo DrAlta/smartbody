@@ -354,8 +354,8 @@ SBPhysicsObj* SBPawn::getPhysicsObject()
 
 void SBPawn::copy( SBPawn* orignalPawn )
 {
-	
-		
+	SbmPawn::copy(orignalPawn);
+	SBObject::copyAllAttributes(orignalPawn);		
 }
 
 };

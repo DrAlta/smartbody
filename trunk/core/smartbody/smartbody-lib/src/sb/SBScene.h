@@ -101,6 +101,8 @@ class SBScene : public SBObject
 		SBAPI SBCharacter* createCharacter(const std::string&, const std::string&);
 		SBAPI SBCharacter* copyCharacter(const std::string& origCharacter, const std::string& newCharacter);
 		SBAPI SBPawn* createPawn(const std::string& pawnName);
+		SBAPI SBPawn* copyPawn(const std::string& origPawn, const std::string& newPawn);
+
 		SBAPI void removeAllCharacters();
 		SBAPI void removeCharacter(const std::string& charName);
 		SBAPI void removePawn(const std::string& pawnName);

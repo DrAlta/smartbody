@@ -48,13 +48,13 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	_scrollGroup = new Fl_Scroll(10, curY, this->w() - 20, scrollHeight, "");
 	_scrollGroup->type(Fl_Scroll::VERTICAL);
 	_scrollGroup->begin();
-
+	int itemWidth = this->w() - 40 - 20;
 	for (std::map<std::string, SmartBody::SBBehaviorSet*>::iterator iter = behavSets.begin();
 		 iter != behavSets.end();
 		 iter++)
 	{
 		std::string name = (*iter).first;
-		Fl_Check_Button* check = new Fl_Check_Button(40, curY, 100, 20, _strdup(name.c_str()));
+		Fl_Check_Button* check = new Fl_Check_Button(40, curY, itemWidth, 20, _strdup(name.c_str()));
 		curY += 25;
 	}
 	_scrollGroup->end();

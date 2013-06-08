@@ -4388,8 +4388,8 @@ MeCtConstraint* FltkViewer::getCurrentCharacterConstraintController()
 // visualize example data and other relevant information for reach controller
 void FltkViewer::drawReach()
 {	
-	//if (_data->reachRenderMode == ModeNoExamples)
-	//	return;
+	if (_data->reachRenderMode == ModeNoExamples)
+		return;
 	
 	glPushAttrib(GL_LIGHTING_BIT | GL_POINT_BIT);
 	glDisable(GL_LIGHTING);

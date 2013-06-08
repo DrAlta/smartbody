@@ -56,6 +56,7 @@ retargetMotionWithGuessMap('ChrBrad@Guitar01', 'ChrBrad.sk', 'common.sk', scene.
 output = 'common.skChrBrad@Guitar01'
 retargetedMotion = scene.getMotion(output)
 retargetedMotion.scale(.01)
+remapMotion('ChrBrad.sk',output,'ChrBrad.sk')
 	
 last = 0
 canTime = True

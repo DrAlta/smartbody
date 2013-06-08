@@ -1280,7 +1280,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 		for (int k=0;k<mchan_arr.size();k++)
 		{
 			SkChannel& chan = mchan_arr[k];			
-			const std::string& jointName = mchan_arr.name(k);				
+			const std::string& jointName = mchan_arr.mappedName(k);				
 			// map pre-rotation
 			int index = mchan_arr.float_position(k);
 			if (chan.type == SkChannel::Quat)

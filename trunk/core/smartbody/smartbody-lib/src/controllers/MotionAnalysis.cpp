@@ -521,90 +521,90 @@ void MotionAnalysis::applyIKFix(MeCtIKTreeScenario& ikScenario, SmartBody::SBCha
 	}
 
 	// get the height offset 
-
-#if 0 // use height field
-	float tnormal[3];
-	float terrainHeight = 0.0f;
-	float footOffset = 0.05f;
+ // use height field
+	
 	heightField = SmartBody::SBScene::getScene()->getHeightfield();	
-	float minHeight = 1e30f;
-	float maxHeight = -1e30f;	
-	if (heightField && sbChar->getBoolAttribute("terrainWalk"))
+	SmartBody::SBNavigationMesh* navMesh = SmartBody::SBScene::getScene()->getNavigationMesh();	
+	if (heightField && !navMesh)
 	{
-		//terrainHeight = SmartBody::SBScene::getScene()->queryTerrain(x, z, tnormal);
-		for (unsigned int k=0;k<legStates.size();k++)
+		float tnormal[3];
+		float terrainHeight = 0.0f;
+		float footOffset = 0.05f;	
+		float minHeight = 1e30f;
+		float maxHeight = -1e30f;	
+		if (heightField && sbChar->getBoolAttribute("terrainWalk"))
 		{
-			LegCycleState& legState = legStates[k];
+			//terrainHeight = SmartBody::SBScene::getScene()->queryTerrain(x, z, tnormal);
+			for (unsigned int k=0;k<legStates.size();k++)
+			{
+				LegCycleState& legState = legStates[k];
 #define NAIVE_IKFIX 1
 #if NAIVE_IKFIX
-			for (unsigned int m=0;m<legState.curSupportPos.size();m++)
-			{
-				SrVec supPos = legState.globalSupportPos[m];
-				float height = SmartBody::SBScene::getScene()->queryTerrain(supPos.x, supPos.z, tnormal);
-				float supHeightOffset = (height + tgtBaseHeight) - gmatBase.get_translation().y; 
-				legState.globalSupportPos[m].y += supHeightOffset + footOffset;
-				if (minHeight > height)
-					minHeight = height;
-				if (maxHeight < height)
-					maxHeight = height;
-			}
+				for (unsigned int m=0;m<legState.curSupportPos.size();m++)
+				{
+					SrVec supPos = legState.globalSupportPos[m];
+					float height = SmartBody::SBScene::getScene()->queryTerrain(supPos.x, supPos.z, tnormal);
+					float supHeightOffset = (height + tgtBaseHeight) - gmatBase.get_translation().y; 
+					legState.globalSupportPos[m].y += supHeightOffset + footOffset;
+					if (minHeight > height)
+						minHeight = height;
+					if (maxHeight < height)
+						maxHeight = height;
+				}
 #else			
-			float hoffset = getTerrainYOffset(legState, legState.flightTime);
-			float supHeightOffset = (hoffset + tgtBaseHeight) - gmatBase.get_translation().y; 
-			for (unsigned int m=0;m<legState.curSupportPos.size();m++)
-			{				
-				SrVec supPos = legState.globalSupportPos[m];
-				float height = SmartBody::SBScene::getScene()->queryTerrain(supPos.x, supPos.z, tnormal);
-				if (minHeight > height)
-					minHeight = height;
-				if (maxHeight < height)
-					maxHeight = height;
+				float hoffset = getTerrainYOffset(legState, legState.flightTime);
+				float supHeightOffset = (hoffset + tgtBaseHeight) - gmatBase.get_translation().y; 
+				for (unsigned int m=0;m<legState.curSupportPos.size();m++)
+				{				
+					SrVec supPos = legState.globalSupportPos[m];
+					float height = SmartBody::SBScene::getScene()->queryTerrain(supPos.x, supPos.z, tnormal);
+					if (minHeight > height)
+						minHeight = height;
+					if (maxHeight < height)
+						maxHeight = height;
 
-				legState.globalSupportPos[m].y += supHeightOffset + footOffset;
-				
-			}
-			sbChar->curFootIKPos[k] = legState.globalSupportPos[0];
+					legState.globalSupportPos[m].y += supHeightOffset + footOffset;
+
+				}
+				sbChar->curFootIKPos[k] = legState.globalSupportPos[0];
 #endif
+			}
+			float heightOffset = (minHeight + tgtBaseHeight) - gmatBase.get_translation().y; 
+			ikScenario.ikGlobalMat.set(13, ikScenario.ikGlobalMat.get(13) + heightOffset + footOffset);
 		}
-		float heightOffset = (minHeight + tgtBaseHeight) - gmatBase.get_translation().y; 
-		ikScenario.ikGlobalMat.set(13, ikScenario.ikGlobalMat.get(13) + heightOffset + footOffset);
-
-
-
 	}
-#else // use navigation mesh
-	//float tnormal[3];
-	float terrainHeight = 0.0f;
-	float footOffset = 0.05f;
-	SmartBody::SBNavigationMesh* navMesh = SmartBody::SBScene::getScene()->getNavigationMesh();	
-	float minHeight = 1e30f;
-	float maxHeight = -1e30f;
-	SrVec searchSize = SrVec(sbChar->getHeight()*0.3f, sbChar->getHeight(), sbChar->getHeight()*0.3f);	
-	if (navMesh && sbChar->getBoolAttribute("terrainWalk"))
+	else if (navMesh && !heightField)
 	{
-		//terrainHeight = SmartBody::SBScene::getScene()->queryTerrain(x, z, tnormal);
-		for (unsigned int k=0;k<legStates.size();k++)
+		// use navigation mesh
+		//float tnormal[3];
+		float terrainHeight = 0.0f;
+		float footOffset = 0.05f;
+		float minHeight = 1e30f;
+		float maxHeight = -1e30f;
+		SrVec searchSize = SrVec(sbChar->getHeight()*0.3f, sbChar->getHeight(), sbChar->getHeight()*0.3f);	
+		if (navMesh && sbChar->getBoolAttribute("terrainWalk"))
 		{
-			LegCycleState& legState = legStates[k];
-			for (unsigned int m=0;m<legState.curSupportPos.size();m++)
+			//terrainHeight = SmartBody::SBScene::getScene()->queryTerrain(x, z, tnormal);
+			for (unsigned int k=0;k<legStates.size();k++)
 			{
-				SrVec supPos = legState.globalSupportPos[m];
-				//float height = SmartBody::SBScene::getScene()->queryTerrain(supPos.x, supPos.z, tnormal);
-				float height = navMesh->queryFloorHeight(supPos,searchSize);
-				float supHeightOffset = (height + tgtBaseHeight) - gmatBase.get_translation().y; 
-				legState.globalSupportPos[m].y += supHeightOffset + footOffset;
-				if (minHeight > height)
-					minHeight = height;
-				if (maxHeight < height)
-					maxHeight = height;
+				LegCycleState& legState = legStates[k];
+				for (unsigned int m=0;m<legState.curSupportPos.size();m++)
+				{
+					SrVec supPos = legState.globalSupportPos[m];
+					//float height = SmartBody::SBScene::getScene()->queryTerrain(supPos.x, supPos.z, tnormal);
+					float height = navMesh->queryFloorHeight(supPos,searchSize);
+					float supHeightOffset = (height + tgtBaseHeight) - gmatBase.get_translation().y; 
+					legState.globalSupportPos[m].y += supHeightOffset + footOffset;
+					if (minHeight > height)
+						minHeight = height;
+					if (maxHeight < height)
+						maxHeight = height;
+				}
 			}
+			float heightOffset = (minHeight + tgtBaseHeight) - gmatBase.get_translation().y; 
+			ikScenario.ikGlobalMat.set(13, ikScenario.ikGlobalMat.get(13) + heightOffset + footOffset);
 		}
-		float heightOffset = (minHeight + tgtBaseHeight) - gmatBase.get_translation().y; 
-		ikScenario.ikGlobalMat.set(13, ikScenario.ikGlobalMat.get(13) + heightOffset + footOffset);
-	}
-#endif
-	
-	
+	}	
 	// set ik constraint
 	for (unsigned int i=0;i<legInfos.size();i++)
 	{

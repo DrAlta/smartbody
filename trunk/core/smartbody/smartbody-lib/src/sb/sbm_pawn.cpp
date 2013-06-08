@@ -915,6 +915,8 @@ void SbmPawn::notify(SBSubject* subject)
 
 SBAPI void SbmPawn::copy( SbmPawn* orignalPawn )
 {
-
+	globalTransform = orignalPawn->globalTransform;
+	_classType = orignalPawn->_classType;
+	steeringSpaceObjSize = orignalPawn->steeringSpaceObjSize;
 }
 
