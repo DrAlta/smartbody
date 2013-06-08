@@ -295,7 +295,12 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 #if (BOOST_VERSION > 104400)
 	std::string basePath = abs_p.string().c_str();
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.string().c_str();
+
+#if (BOOST_VERSION > 104400)
+	ReadMotionDataBML(bmlPath.string().c_str(),  m_speechRequestInfo[ m_requestIdCounter ].visemeData);
+#else
 	ReadMotionDataBML(bmlPath.native_directory_string().c_str(),  m_speechRequestInfo[ m_requestIdCounter ].visemeData);
+#endif
  	ReadVisemeDataBML( bmlPath.string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].visemeData, agent );
    if ( m_speechRequestInfo[ m_requestIdCounter ].visemeData.size() == 0 )
    {
