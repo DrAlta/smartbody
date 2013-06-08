@@ -945,6 +945,31 @@ SBAPI SBCharacter* SBScene::copyCharacter( const std::string& origCharName, cons
 	}
 }
 
+
+SBAPI SBPawn* SBScene::copyPawn( const std::string& origPawnName, const std::string& copyPawnName )
+{
+	SmartBody::SBPawn* origPawn = getPawn(origPawnName);
+	if (!origPawn)
+	{
+		LOG("Pawn '%s' does not exists !", origPawnName.c_str());
+		return NULL;
+	}
+	else
+	{
+		SmartBody::SBPawn* copyPawn = createPawn(copyPawnName);
+		if (!copyPawn)
+		{
+			LOG("Can not copy to existing pawn '%s'",copyPawnName.c_str());
+			return NULL;
+		}
+		// successfully create a new character
+		SmartBody::SBSkeleton* sk = new SmartBody::SBSkeleton(origPawn->getSkeleton());
+		copyPawn->setSkeleton(sk);		
+		copyPawn->copy(origPawn);		
+		return copyPawn;
+	}
+}
+
 SBCharacter* SBScene::createCharacter(const std::string& charName, const std::string& metaInfo)
 {	
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);

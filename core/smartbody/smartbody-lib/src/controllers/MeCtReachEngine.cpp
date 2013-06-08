@@ -470,11 +470,9 @@ SmartBody::SBJoint* MeCtReachEngine::findRootJoint( SmartBody::SBSkeleton* sk )
 
 DataInterpolator* MeCtReachEngine::createInterpolator(std::string interpolatorType)
 {
-	DataInterpolator* interpolator = NULL;
-	
+	DataInterpolator* interpolator = NULL;	
 	if (interpolatorType == "KNN")
 	{
-
 		KNNInterpolator* knnInterpolator = new KNNInterpolator(3000,ikReachRegion*1.f);
 		resampleData = &knnInterpolator->resampleData;	
 		interpolator = knnInterpolator;
