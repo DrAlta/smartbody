@@ -10,9 +10,23 @@ def setupBehaviorSet():
 	zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
 	harmonySkeleton = scene.getSkeleton("ChrHarmony.sk")
 	zebra2Map.applySkeleton(harmonySkeleton)
+		
+	mirrorMotion1 = scene.getMotion("ChrHarmony@WalkCircleRt01")
+	if scene.getMotion("ChrHarmony@WalkCircleLf01") == None:
+		zebra2Map.applyMotion(mirrorMotion1)	
+		mirrorMotion1.mirror("ChrHarmony@WalkCircleLf01", "ChrHarmony.sk")
+		
+	mirrorMotion1 = scene.getMotion("ChrHarmony@WalkTightCircleRt01")
+	if scene.getMotion("ChrHarmony@WalkTightCircleLf01") == None:
+		zebra2Map.applyMotion(mirrorMotion1)	
+		mirrorMotion1.mirror("ChrHarmony@WalkTightCircleLf01", "ChrHarmony.sk")
+		
+	mirrorMotion1 = scene.getMotion("ChrHarmony@StrafeSlowRt01")
+	if scene.getMotion("ChrHarmony@StrafeSlowLf01") == None:
+		zebra2Map.applyMotion(mirrorMotion1)	
+		mirrorMotion1.mirror("ChrHarmony@StrafeSlowLf01", "ChrHarmony.sk")
 	
-	locoMotions = StringVec()
-	
+	locoMotions = StringVec()	
 	locoMotions.append("ChrHarmony@Idle01_StepBackwardLf01")	
 	locoMotions.append("ChrHarmony@Idle01_StepBackwardRt01")
 	locoMotions.append("ChrHarmony@Idle01_StepForwardLf01")
@@ -40,12 +54,12 @@ def setupBehaviorSet():
 	locoMotions.append("ChrHarmony@WalkCircleLf01")
 	locoMotions.append("ChrHarmony@WalkCircleRt01")
 	locoMotions.append("ChrHarmony@WalkTightCircleLf01")
-	locoMotions.append("ChrHarmony@WalkTightCircleRt01")
+	locoMotions.append("ChrHarmony@WalkTightCircleRt01")	
 	
 	for i in range(0, len(locoMotions)):
 		motion = scene.getMotion(locoMotions[i])
 		if motion != None:
-			motion.setMotionSkeletonName('ChrBackovic.sk')
+			motion.setMotionSkeletonName('ChrHarmony.sk')
 			zebra2Map.applyMotion(motion)	
 
 def retargetBehaviorSet(charName, skelName):

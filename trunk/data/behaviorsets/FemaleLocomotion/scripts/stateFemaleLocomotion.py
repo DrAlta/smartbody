@@ -1,7 +1,7 @@
 
 def femaleLocomotionSetup(skeletonName, baseJoint, prefix, statePreFix):
 	print "** State: harmonyLocomotion"
-
+	
 	stateManager = scene.getStateManager()
 	stateName = statePreFix + "Locomotion"
 	if (stateManager.getBlend(stateName) != None): # don't create duplicate state
