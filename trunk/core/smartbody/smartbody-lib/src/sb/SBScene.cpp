@@ -2861,6 +2861,7 @@ SrCamera* SBScene::createCamera(const std::string& name)
 	}
 
 	_pawnMap.insert(std::pair<std::string, SbmPawn*>(camera->getName(), camera));
+	_pawnNames.push_back(camera->getName());
 	
 	if (getCharacterListener())
 		getCharacterListener()->OnPawnCreate( camera->getName().c_str() );

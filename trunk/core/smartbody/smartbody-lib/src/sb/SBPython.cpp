@@ -701,11 +701,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("isEnableLogging", &SBVHMsgManager::isEnableLogging, "Disables logging over the VH Message bus.")
 		;
 
-		
-
-
 	pythonFuncsScene();
-
 
 #endif
 	}

@@ -36,6 +36,7 @@ SkChannelArray SkChannelArray::EMPTY_CHANNELS = SkChannelArray();
 SkChannelArray::SkChannelArray ()
 {
 	_floats = 0;
+	jointMapName = "";
 
 }
 
@@ -48,8 +49,7 @@ void SkChannelArray::init()
 	_floats = 0;
 	_channelMap.clear();
 	_channelMapedNameMap.clear();
-	_channelList.clear();
-	jointMapName = "";
+	_channelList.clear();	
 }
 
 bool SkChannelArray::doesChannelExist(std::string name, SkChannel::Type t)

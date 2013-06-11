@@ -6,6 +6,8 @@ sscale = 1.0/scene.getScale()
 camera = getCamera()
 camera.setEye(0*sscale, 1.66*sscale, 1.85*sscale)
 camera.setCenter(0, .92*sscale, 0)
+camera.setFarPlane(100)
+camera.setNearPlane(0.1)
 
 cameraPawn = scene.createPawn("camera")
 cameraPos = SrVec(0, 1.66*sscale, 1.85*sscale)

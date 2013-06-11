@@ -36,7 +36,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&File/Load...", 0, LoadCB, this, NULL);
 	menubar->add("&File/Save Scene Setting", 0, SaveSceneSettingCB, this, NULL);	
 	menubar->add("&File/Load Scene Setting...", 0, LoadSceneSettingCB, this, NULL);	
-   menubar->add("&File/Quick Connect", 0, QuickConnectCB, this, NULL);
+    menubar->add("&File/Quick Connect", 0, QuickConnectCB, this, NULL);
 	menubar->add("&File/Connect...", 0, LaunchConnectCB, this, NULL);
 	menubar->add("&File/Disconnect", 0, DisconnectRemoteCB, this, NULL);
 	menubar->add("&File/&Quit", 0, QuitCB, this, NULL);
