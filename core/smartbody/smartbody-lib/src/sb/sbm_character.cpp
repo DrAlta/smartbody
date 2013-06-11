@@ -2287,12 +2287,11 @@ void SbmCharacter::updateFaceDefinition()
 
 	if (!getSkeleton())
 		return;
-
+	
 	getSkeleton()->make_active_channels();
 
 	SkSkeleton* skeleton = getSkeleton();
 	SkChannelArray& skelChannelArray = skeleton->channels();
-
 
 	// add the action units (AUs)
 	int numAUs = _faceDefinition->getNumAUs();
@@ -2302,7 +2301,6 @@ void SbmCharacter::updateFaceDefinition()
 		ActionUnit* au = _faceDefinition->getAU(auNum);
 		this->addActionUnitChannel(auNum, au);
 	}
-
 	// add the visemes
 	int numVisemes = _faceDefinition->getNumVisemes();
 	for (int v = 0; v < numVisemes; v++)
@@ -2311,7 +2309,6 @@ void SbmCharacter::updateFaceDefinition()
 		SkMotion* motion = _faceDefinition->getVisemeMotion(visemeName);
 		this->addVisemeChannel(visemeName, motion);
 	}
-
 	// look for the start and end position of the viseme channels
 	std::vector<SkJoint*>& joints = skeleton->get_joint_array();
 	viseme_channel_start_pos = -1;
@@ -2412,7 +2409,6 @@ void SbmCharacter::updateFaceDefinition()
 	all_viseme.push_back("fe127_yawn");
 	all_viseme.push_back("fe129_angry");
 	viseme_name_patch.insert(make_pair("ALL",all_viseme));
-
 	// make sure that the face controller has been updated
 	if (face_ct)
 	{
