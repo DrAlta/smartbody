@@ -1128,21 +1128,23 @@ float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endT
 	{
 		apply_frame(i);
 		connected_skeleton()->update_global_matrices();
-		const SrMat& srcMat = joint->gmat();
+		SrMat srcMat = joint->gmat();
 		float rx, ry, rz;
 		
-		sr_euler_angles(132, srcMat, rx, ry, rz);
+		//sr_euler_angles(132, srcMat, rx, ry, rz);
 		float srcRotY = ry;
 		apply_frame(i + 1);
 		connected_skeleton()->update_global_matrices();
-		const SrMat& destMat = joint->gmat();
-		sr_euler_angles(132, destMat, rx, ry, rz);
-		float destRotY = ry;
+		SrMat destMat = joint->gmat();
+		//sr_euler_angles(132, destMat, rx, ry, rz);
+		//float destRotY = ry;
 		float diff;
-		if (destRotY * srcRotY < 0 && fabs(destRotY) > 1.0f)
-			diff = - destRotY - srcRotY;
-		else
-			diff = destRotY - srcRotY;
+		//if (destRotY * srcRotY < 0 && fabs(destRotY) > 1.0f)
+		//	diff = - destRotY - srcRotY;
+		//else
+		//	diff = destRotY - srcRotY;
+		sr_euler_angles(132, destMat*srcMat.inverse(), rx, ry, rz);
+		diff = ry;
 		diffRotY += diff;
 	}
 	float accAngularSpd = diffRotY / (endTime - startTime);
