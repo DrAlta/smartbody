@@ -70,8 +70,8 @@ def femaleLocomotionSetup(skeletonName, baseJoint, prefix, statePreFix):
 		motion.disconnect()
 										 
 	# add tetrahedrons (need automatic way to generate)
-	state.addTetrahedron(prefix + "ChrHarmony@IdleHandOnHip01", prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@WalkCircleLf01", prefix + "ChrHarmony@WalkTightCircleLf01")
-	state.addTetrahedron(prefix + "ChrHarmony@IdleHandOnHip01", prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@WalkCircleRt01", prefix + "ChrHarmony@WalkTightCircleRt01")
+	#state.addTetrahedron(prefix + "ChrHarmony@IdleHandOnHip01", prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@WalkCircleLf01", prefix + "ChrHarmony@WalkTightCircleLf01")
+	#state.addTetrahedron(prefix + "ChrHarmony@IdleHandOnHip01", prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@WalkCircleRt01", prefix + "ChrHarmony@WalkTightCircleRt01")
 	
 	state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowLf01", prefix + "ChrHarmony@WalkCircleLf01", prefix + "ChrHarmony@WalkTightCircleLf01")
 	state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowRt01", prefix + "ChrHarmony@WalkCircleRt01", prefix + "ChrHarmony@WalkTightCircleRt01")
@@ -79,11 +79,11 @@ def femaleLocomotionSetup(skeletonName, baseJoint, prefix, statePreFix):
 	state.addTetrahedron(prefix + "ChrHarmony@IdleHandOnHip01", prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowLf01", prefix + "ChrHarmony@WalkTightCircleLf01")
 	state.addTetrahedron(prefix + "ChrHarmony@IdleHandOnHip01", prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowRt01", prefix + "ChrHarmony@WalkTightCircleRt01")
 	
-	state.addTetrahedron(prefix + "ChrHarmony@IdleHandOnHip01", prefix + "ChrHarmony@StrafeSlowLf01", prefix + "ChrHarmony@WalkCircleLf01", prefix + "ChrHarmony@WalkTightCircleLf01")
-	state.addTetrahedron(prefix + "ChrHarmony@IdleHandOnHip01", prefix + "ChrHarmony@StrafeSlowRt01", prefix + "ChrHarmony@WalkCircleRt01", prefix + "ChrHarmony@WalkTightCircleRt01")
+	#state.addTetrahedron(prefix + "ChrHarmony@IdleHandOnHip01", prefix + "ChrHarmony@StrafeSlowLf01", prefix + "ChrHarmony@WalkCircleLf01", prefix + "ChrHarmony@WalkTightCircleLf01")
+	#state.addTetrahedron(prefix + "ChrHarmony@IdleHandOnHip01", prefix + "ChrHarmony@StrafeSlowRt01", prefix + "ChrHarmony@WalkCircleRt01", prefix + "ChrHarmony@WalkTightCircleRt01")
 	
-	state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowLf01", prefix + "ChrHarmony@WalkCircleLf01", prefix + "ChrHarmony@IdleHandOnHip01")
-	state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowRt01", prefix + "ChrHarmony@WalkCircleRt01", prefix + "ChrHarmony@IdleHandOnHip01")
+	#state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowLf01", prefix + "ChrHarmony@WalkCircleLf01", prefix + "ChrHarmony@IdleHandOnHip01")
+	#state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowRt01", prefix + "ChrHarmony@WalkCircleRt01", prefix + "ChrHarmony@IdleHandOnHip01")
 	
 	state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowLf01", prefix + "ChrHarmony@WalkCircleRt01", prefix + "ChrHarmony@WalkTightCircleRt01")
 	state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowRt01", prefix + "ChrHarmony@WalkCircleLf01", prefix + "ChrHarmony@WalkTightCircleLf01")
@@ -91,6 +91,6 @@ def femaleLocomotionSetup(skeletonName, baseJoint, prefix, statePreFix):
 	state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowLf01", prefix + "ChrHarmony@WalkCircleRt01", prefix + "ChrHarmony@IdleHandOnHip01")
 	state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowRt01", prefix + "ChrHarmony@WalkCircleLf01", prefix + "ChrHarmony@IdleHandOnHip01")
 	
-	state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowLf01", prefix + "ChrHarmony@WalkTightCircleRt01", prefix + "ChrHarmony@IdleHandOnHip01")
-	state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowRt01", prefix + "ChrHarmony@WalkTightCircleLf01", prefix + "ChrHarmony@IdleHandOnHip01")
+	#state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowLf01", prefix + "ChrHarmony@WalkTightCircleRt01", prefix + "ChrHarmony@IdleHandOnHip01")
+	#state.addTetrahedron(prefix + "ChrHarmony@Walk01", prefix + "ChrHarmony@StrafeSlowRt01", prefix + "ChrHarmony@WalkTightCircleLf01", prefix + "ChrHarmony@IdleHandOnHip01")
 	
