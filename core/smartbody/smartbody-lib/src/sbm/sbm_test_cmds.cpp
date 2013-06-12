@@ -391,14 +391,13 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 		std::string xml;
 		std::ifstream in(absPathStr.c_str());
-		if (in)
-		{
-			in.seekg(0, std::ios::end);
-			xml.resize(in.tellg());
-			in.seekg(0, std::ios::beg);
-			in.read(&xml[0], xml.size());
-			in.close();
-		}
+
+		in.seekg(0, std::ios::end);   
+		xml.reserve(in.tellg());
+		in.seekg(0, std::ios::beg);
+		
+		xml.assign((std::istreambuf_iterator<char>(in)),
+                 std::istreambuf_iterator<char>());
 
 		std::string procId = scene->getProcessId();
 		if (procId != "")
