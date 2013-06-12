@@ -465,14 +465,22 @@ SBAPI void SBAssetManager::addSkeleton(SmartBody::SBSkeleton* skeleton)
 	_skeletons[skeleton->getName()] = skeleton;
 }
 
-SBMotion* SBAssetManager::addMotionDefinition(const std::string& motionName, double duration )
+SBMotion* SBAssetManager::addMotionDefinition(const std::string& motionName, double duration, int motionFrames )
 {
 	SBMotion* sbMotion = new SBMotion();
-	if (duration > 0)
+	if (motionFrames <= 2 && duration > 0)
 	{
 		sbMotion->insert_frame(0,0.f);
 		sbMotion->insert_frame(1,(float)duration);
 	}	
+	else if (motionFrames > 2 && duration > 0)// motion frame > 2
+	{
+		float deltaT = duration/(motionFrames-1);
+		for (int i=0;i<motionFrames;i++)
+		{
+			sbMotion->insert_frame(i,deltaT*i);			
+		}
+	}
 	sbMotion->setName(motionName);	
 	//mcuCBHandle::singleton().motion_map.insert(std::pair<std::string, SkMotion*>(motionName, sbMotion));
 	_motions[motionName] = sbMotion;

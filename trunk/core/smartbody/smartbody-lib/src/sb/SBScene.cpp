@@ -1333,8 +1333,7 @@ void SBScene::removePendingCommands()
 }
 
 void SBScene::sendVHMsg(const std::string& message)
-{
-	 
+{	 
 	SmartBody::SBScene::getScene()->getVHMsgManager()->send(message.c_str());
 }
 
@@ -2052,6 +2051,23 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 		std::vector<std::string> skeletonNames = getSkeletonNames();
 		const std::vector<std::string>& charNames = getCharacterNames();
 		std::map<std::string, std::string> charSkelMap;
+		for (unsigned int i=0;i<skeletonNames.size();i++)
+		{
+			std::string skelName = skeletonNames[i];
+			SBSkeleton* skel = getSkeleton(skelName);
+			if (skel)
+			{
+				std::string skelStr = skel->saveToString();
+				strstr << "tempSkel = scene.addSkeletonDefinition(\"" << skelName << "\")\n";	
+				std::string skelSaveStr = skel->saveToString();
+				//skelSaveStr.replace('\n',)
+				boost::replace_all(skelSaveStr,"\n","\\n");
+				boost::replace_all(skelSaveStr,"\"","");
+				LOG("Skeleton %s :\n%s",skelName.c_str(),skelSaveStr.c_str());
+				strstr << "tempSkel.loadFromString(\"" << skelSaveStr << "\")\n";
+				charSkelMap[skelName] = skelName;
+			}			
+		}
 		for (unsigned int i=0;i<charNames.size(); i++)
 		{
 			std::string charName = charNames[i];
@@ -2081,7 +2097,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 			if (motion)
 			{
 				// add motion definition
-				strstr << "tempMotion = scene.addMotionDefinition(\"" << moName << "\"," << motion->getDuration() << ")\n";	
+				strstr << "tempMotion = scene.addMotionDefinition(\"" << moName << "\"," << motion->getDuration() << "," << motion->getNumFrames() << ")\n";	
 				// add sync points
 				strstr << "tempMotion.setSyncPoint(\"start\"," << motion->getTimeStart() <<")\n";
 				strstr << "tempMotion.setSyncPoint(\"ready\"," << motion->getTimeReady() <<")\n";
@@ -2181,6 +2197,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 		SBSkeleton* sbSk = getSkeleton(skName);
 		// rescale the skeleton to right size if necessary
 		strstr << "sbSk = scene.getSkeleton(\"" << skName << "\")\n";
+		strstr << "print 'numSkeleton = ' + str(scene.getNumSkeletons())\n";
 		strstr << "sbSk.rescale(" << boost::lexical_cast<std::string>(sbSk->getScale()) << ")\n";
 	}
 	
@@ -2327,6 +2344,7 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 		SBCharacter* character = getCharacter((*characterIter));
 		strstr << "\n# ---- character: " << character->getName() << "\n";
 		strstr << "obj = scene.createCharacter(\"" << character->getName() << "\", \"" << character->getType() << "\")\n";
+		strstr << "print 'character skeleton rescale'\n";
 		strstr << "skeleton = scene.createSkeleton(\"" << character->getSkeleton()->getName() << "\")\n";
 		strstr << "skeleton.rescale(" <<  character->getSkeleton()->getScale() << ")\n";
 		strstr << "obj.setSkeleton(skeleton)\n";
@@ -3063,11 +3081,11 @@ SBSkeleton* SBScene::addSkeletonDefinition(const std::string& skelName )
 	return getAssetManager()->addSkeletonDefinition(skelName);
 }
 
-SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double duration )
+SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double duration, int motionFrame )
 {
 	if (SHOW_DEPRECATION_MESSAGES)
 		LOG("DEPRECATED: Use AssetManager.addMotionDefinition() instead.");
-	return getAssetManager()->addMotionDefinition(motionName, duration);
+	return getAssetManager()->addMotionDefinition(motionName, duration, motionFrame);
 }
 
 void SBScene::addMotions(const std::string& path, bool recursive)

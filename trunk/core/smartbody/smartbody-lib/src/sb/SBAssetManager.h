@@ -48,7 +48,7 @@ class SBAssetManager : public SBObject
 		SBAPI void addMotion(SmartBody::SBMotion* motion);
 		SBAPI void removeMotion(SmartBody::SBMotion* motion);
 		SBAPI void addMotions(const std::string& path, bool recursive);
-		SBAPI SBMotion* addMotionDefinition(const std::string& motionName, double duration);
+		SBAPI SBMotion* addMotionDefinition(const std::string& motionName, double duration, int motionFrames = -1);
 		SBAPI SBMotion* getMotion(const std::string& name);
 		SBAPI int getNumMotions();
 		SBAPI std::vector<std::string> getMotionNames();

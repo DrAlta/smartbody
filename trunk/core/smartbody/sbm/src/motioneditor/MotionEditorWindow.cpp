@@ -380,6 +380,7 @@ void MotionEditorWindow::OnCheckButtonPlayMotion(Fl_Widget* widget, void* data)
 	SmartBody::SBCharacter* curChar = editor->getCurrentCharacter();
 	if (!curChar)	return;
 	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
+	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
 	if (!curMotion)	
 	{
 		const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
@@ -387,6 +388,10 @@ void MotionEditorWindow::OnCheckButtonPlayMotion(Fl_Widget* widget, void* data)
 		for (size_t i = 0; i < charNames.size(); ++i)
 		{
 			ss.str("");
+			if (sbScene->isRemoteMode())
+			{
+				ss << "send sbm ";
+			}
 			ss << "motionplayer " << charNames[i] << " off";
 			SmartBody::SBScene::getScene()->command(ss.str());
 		}
@@ -398,17 +403,29 @@ void MotionEditorWindow::OnCheckButtonPlayMotion(Fl_Widget* widget, void* data)
 		editor->_sliderMotionFrame->activate();
 		double playTime = editor->_sliderMotionFrame->value();
 		double delta = curMotion->duration() / double(curMotion->frames() - 1);
-		int frameNumber = int(playTime / delta);
+		int frameNumber = int(playTime / delta);		
 		std::stringstream ss;
-		ss << "motionplayer " << curChar->getName() << " on";
+		if (sbScene->isRemoteMode())
+		{
+			ss << "send sbm ";
+		}
+		ss << "motionplayer " << curChar->getName() << " on";		
 		SmartBody::SBScene::getScene()->command(ss.str());
 		ss.str("");
+		if (sbScene->isRemoteMode())
+		{
+			ss << "send sbm ";
+		}
 		ss << "motionplayer " << curChar->getName() << " " << curMotion->getName() << " " << frameNumber;
 		SmartBody::SBScene::getScene()->command(ss.str());
 	}
-	if (editor->_checkButtonPlayMotion->value() == 0)
-	{
+	else if (editor->_checkButtonPlayMotion->value() == 0)
+	{		
 		std::stringstream ss;
+		if (sbScene->isRemoteMode())
+		{
+			ss << "send sbm ";
+		}
 		ss << "motionplayer " << curChar->getName() << " off";
 		SmartBody::SBScene::getScene()->command(ss.str());
 		editor->_sliderMotionFrame->deactivate();
@@ -428,6 +445,11 @@ void MotionEditorWindow::OnSliderMotionFrame(Fl_Widget* widget, void* data)
 	double delta = curMotion->duration() / double(curMotion->frames() - 1);
 	int frameNumber = int(playTime / delta);
 	std::stringstream ss;
+	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
+	if (sbScene->isRemoteMode())
+	{
+		ss << "send sbm ";
+	}
 	ss << "motionplayer " << curChar->getName() << " " << curMotion->getName() << " " << frameNumber;
 	SmartBody::SBScene::getScene()->command(ss.str());
 }

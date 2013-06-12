@@ -31,6 +31,7 @@ FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x
 
 
 	end();
+	this->resizable(bottomGroup);
 
 	FaceViewer::RefreshCB(this, this);
 
@@ -110,9 +111,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 void FaceViewer::RefreshCB(Fl_Widget* widget, void* data)
 {
 	FaceViewer* faceViewer = (FaceViewer*) data;
-
-	faceViewer->choiceCharacters->clear();
-
+	faceViewer->choiceCharacters->clear();	
 	const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (size_t i = 0; i < charNames.size(); i++)
 	{
