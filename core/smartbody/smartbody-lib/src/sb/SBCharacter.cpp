@@ -171,6 +171,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	saccadePolicy.push_back("alwayson");
 	StringAttribute* saccadePolicyAttribute = createStringAttribute("saccadePolicy", "stopinutterance", true, "Basic", 501, false, false, false, "How saccade is handled during utterance");
 	saccadePolicyAttribute->setValidValues(saccadePolicy);
+	createDoubleAttribute("saccadeTurnOnDelay", 2, true, "Basic", 502, false, false, false, "delay saccade turn on after utterance.");
 
 	_reach = NULL;
 }

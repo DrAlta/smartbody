@@ -140,6 +140,15 @@ void MeCtSaccade::spawnOnce(float dir, float amplitude, float dur)
 	_time = (float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime();;
 }
 
+void MeCtSaccade::reset(double t)
+{
+	_fixedRotation = SrQuat(_axis, 0.0f);
+	_lastFixedRotation = _fixedRotation;
+	_rotation = SrQuat();
+
+	_time = (float)t + (float)_character->getDoubleAttribute("saccadeTurnOnDelay");
+}
+
 void MeCtSaccade::spawning(double t)
 {
 	float time = float(t);
@@ -408,13 +417,13 @@ bool MeCtSaccade::controller_evaluate(double t, MeFrameData& frame)
 		_dt = t - _prevTime;
 		_prevTime = t;
 	}
-
 	SmartBody::SBCharacter* sbCharacter = dynamic_cast<SmartBody::SBCharacter*> (_character);
 	if (sbCharacter->getStringAttribute("saccadePolicy") == "stopinutterance")
 	{
 		if (sbCharacter->hasSpeechBehavior() != "")
 		{
 			_validByPolicy = false;
+			reset(t);
 		}
 		else
 		{
@@ -425,7 +434,7 @@ bool MeCtSaccade::controller_evaluate(double t, MeFrameData& frame)
 
 	SrBuffer<float>& buff = frame.buffer();
 	initSaccade(frame);
-	if (_valid && _validByPolicy)
+	if (_valid)
 	{
 		if (_useModel)
 			spawning(t);
