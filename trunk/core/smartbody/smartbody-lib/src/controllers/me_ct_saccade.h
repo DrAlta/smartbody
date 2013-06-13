@@ -123,6 +123,7 @@ class MeCtSaccade : public SmartBody::SBController
 		void setGaussianParameter(float mean, float variant);
 
 	private:
+		void reset(double t);
 		void spawning(double t);
 		void processing(double t, MeFrameData& frame);
 
