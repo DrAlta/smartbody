@@ -1132,7 +1132,7 @@ float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endT
 		float rx, ry, rz;
 		
 		//sr_euler_angles(132, srcMat, rx, ry, rz);
-		float srcRotY = ry;
+		//float srcRotY = ry;
 		apply_frame(i + 1);
 		connected_skeleton()->update_global_matrices();
 		SrMat destMat = joint->gmat();

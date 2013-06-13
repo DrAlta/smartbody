@@ -1998,7 +1998,7 @@ int FltkViewer::handle ( int event )
 		
 			 SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
 			 SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(selectedPawn);
-			 if (!selectedPawn)
+			 if (!character)
 				 return ret;
 			 SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(character->getName());
 			 if (steerAgent)
@@ -2212,11 +2212,7 @@ int FltkViewer::handle ( int event )
 
    //SR_TRACE3 ( e );
 
-	if (ret == 1)  // a drag and drop event
-	{	
-		//LOG("ret == 1");
-		return ret;
-	}
+	
 
    if ( e.type == SrEvent::EventNone ) return 0; // not an interesting event
 
@@ -2248,10 +2244,18 @@ int FltkViewer::handle ( int event )
 		 interactivePoint = e.lmousep;
          //sr_out << "pixel_size: " << e.pixel_size <<srnl;
        }
-    }
+    }  
+   int ret2 = handle_event ( e );    
 
-   
-    return handle_event ( e );
+   if (ret == 1)  // a drag and drop event
+   {	
+	   //LOG("ret == 1");
+	   return ret;
+   }
+   else
+   {
+	   return ret2;
+   }
 }
 
 //== handle sr event =======================================================
@@ -2260,7 +2264,8 @@ int FltkViewer::handle_event ( const SrEvent &e )
  {
    int res=0;   
 
-   if ( (/*e.alt && */e.mouse_event() || e.type == SrEvent::EventKeyboard) && !e.ctrl && !e.shift)
+   //if ( (e.alt && e.mouse_event() || e.type == SrEvent::EventKeyboard) && !e.ctrl )
+   if (e.alt && e.mouse_event() && !e.ctrl )
     { 
         res = handle_examiner_manipulation ( e );
 
@@ -2481,40 +2486,7 @@ int FltkViewer::handle_default_camera_manipulation ( const SrEvent &e, SrCamera*
       float dx = e.mousedx() * camera->getAspectRatio();
       float dy = e.mousedy() / camera->getAspectRatio();
 
-		if ( ZOOMING(e) )
-		{
-			float tmpFov = camera->getFov() + (-dx+dy);//40.0f;
-			camera->setFov(SR_BOUND ( tmpFov, 0.001f, srpi ));
-			redraw();
-		}
-		else if ( DOLLYING(e) )
-		{ 
-			float amount = dx-dy;
-			SrVec cameraPos(camera->getEye());
-			SrVec targetPos(camera->getCenter());
-			SrVec diff = targetPos - cameraPos;
-			float distance = diff.len();
-			diff.normalize();
-
-			if (amount >= distance)
-				amount = distance - .000001f;
-
-			SrVec diffVector = diff;
-			SrVec adjustment = diffVector * distance * amount;
-			cameraPos += adjustment;
-			SrVec oldEyePos = camera->getEye();
-			camera->setEye(cameraPos.x, cameraPos.y, cameraPos.z);
-			SrVec cameraDiff = camera->getEye() - oldEyePos;
-			SrVec tmpCenter = camera->getCenter();
-			tmpCenter += cameraDiff;
-			camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);
-			redraw();
-		}
-      else if ( TRANSLATING(e) )
-       { camera->apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
-		redraw();
-       }
-      else if ( ROTATING(e) )
+		if ( ROTATING(e) )
        { 
 #if 1
 		   float deltaX = -(e.mouseCoord.x - e.origMouse.x) / e.width;
@@ -2570,7 +2542,40 @@ int FltkViewer::handle_default_camera_manipulation ( const SrEvent &e, SrCamera*
 		camera->setEye(cameraPoint.x, cameraPoint.y, cameraPoint.z);
 		redraw();
 	  }
-    }
+	  else if ( TRANSLATING(e) )
+	  { camera->apply_translation_from_mouse_motion ( e.lmouse.x, e.lmouse.y, e.mouse.x, e.mouse.y );
+	  redraw();
+	  }	  
+	  else if ( ZOOMING(e) )
+	  {
+		  float tmpFov = camera->getFov() + (-dx+dy);//40.0f;
+		  camera->setFov(SR_BOUND ( tmpFov, 0.001f, srpi ));
+		  redraw();
+	  }
+	  else if ( DOLLYING(e) )
+	  { 
+		  float amount = dx-dy;
+		  SrVec cameraPos(camera->getEye());
+		  SrVec targetPos(camera->getCenter());
+		  SrVec diff = targetPos - cameraPos;
+		  float distance = diff.len();
+		  diff.normalize();
+
+		  if (amount >= distance)
+			  amount = distance - .000001f;
+
+		  SrVec diffVector = diff;
+		  SrVec adjustment = diffVector * distance * amount;
+		  cameraPos += adjustment;
+		  SrVec oldEyePos = camera->getEye();
+		  camera->setEye(cameraPos.x, cameraPos.y, cameraPos.z);
+		  SrVec cameraDiff = camera->getEye() - oldEyePos;
+		  SrVec tmpCenter = camera->getCenter();
+		  tmpCenter += cameraDiff;
+		  camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);
+		  redraw();
+	  }
+    }   
    else if ( e.type==SrEvent::EventRelease )
     { 
     }

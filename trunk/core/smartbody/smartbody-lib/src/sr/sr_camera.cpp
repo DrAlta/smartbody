@@ -30,6 +30,7 @@
 #include <sbm/gwiz_math.h>
 #include <sb/SBSubject.h>
 #include <sb/SBAttribute.h>
+#include <sb/SBScene.h>
 
 //=================================== SrCamera ===================================
 
@@ -423,8 +424,14 @@ void SrCamera::print()
 void SrCamera::reset()
 {
 	init();
-	setEye(0, 166, 185);
-	setCenter(0, 92, 0);
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+	setEye(0, 1.66*scale, 1.85*scale);
+	setCenter(0, 0.92*scale, 0);
+	float znear = 0.01f*scale;
+	float zfar = 100.0f*scale;
+	setNearPlane(znear);
+	setFarPlane(zfar);
 }
 
 void SrCamera::notify(SmartBody::SBSubject* subject)

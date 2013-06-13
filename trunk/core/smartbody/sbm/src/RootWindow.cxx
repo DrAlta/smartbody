@@ -835,7 +835,7 @@ void BaseWindow::CameraResetCB(Fl_Widget* widget, void* data)
 	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
 	if (!camera)
 		return;
-	camera->reset();
+	camera->reset();	
 }
 
 void BaseWindow::CameraFrameCB(Fl_Widget* widget, void* data)
@@ -884,6 +884,11 @@ void BaseWindow::RotateSelectedCB(Fl_Widget* widget, void* data)
 	float x,y,z,h,p,r;
 	pawn->get_world_offset(x, y, z, h, p, r);
 	camera->setCenter(x, y, z);
+	float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+	float znear = 0.01f*scale;
+	float zfar = 100.0f*scale;
+	camera->setNearPlane(znear);
+	camera->setFarPlane(zfar);
 #endif
 }
 
@@ -933,9 +938,9 @@ void BaseWindow::FaceCameraCB(Fl_Widget* widget, void* data)
 
 	SkSkeleton* skeleton = character->getSkeleton();
 	float height = skeleton->getCurrentHeight();
-	SkJoint* joint = skeleton->linear_search_joint("eyeball_left");
-	SkJoint* joint2 = skeleton->linear_search_joint("eyeball_right");
-	SkJoint* baseJoint = skeleton->linear_search_joint("base");
+	SkJoint* joint = skeleton->search_joint("eyeball_left");
+	SkJoint* joint2 = skeleton->search_joint("eyeball_right");
+	SkJoint* baseJoint = skeleton->search_joint("base");
 
 	skeleton->update_global_matrices();
 	if (joint && joint2 && baseJoint)
@@ -965,6 +970,11 @@ void BaseWindow::FaceCameraCB(Fl_Widget* widget, void* data)
 		camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);
 		SrVec tmp = camera->getCenter() + height / 4.0f * facingVector;
 		camera->setEye(tmp.x, tmp.y, tmp.z);
+		float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+		float znear = 0.01f*scale;
+		float zfar = 100.0f*scale;
+		camera->setNearPlane(znear);
+		camera->setFarPlane(zfar);
 	}
 	else
 	{
