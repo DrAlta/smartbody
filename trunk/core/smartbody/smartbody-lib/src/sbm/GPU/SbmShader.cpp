@@ -171,7 +171,7 @@ void SbmShaderProgram::printShaderInfoLog( GLuint obj )
 	{
 		infoLog = (char *)malloc(infologLength);
 		glGetShaderInfoLog(obj, infologLength, &charsWritten, infoLog);
-		printf("Shader LOG = %s\n",infoLog);
+		LOG("%s\n",infoLog);
 		free(infoLog);
 	}
 }
