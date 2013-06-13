@@ -48,7 +48,12 @@ void CharacterCreatorWindow::CreateCB(Fl_Widget* w, void* data)
 		fl_alert("Character name already exists.");
 		return;
 	}
-
+	int skeletonValue = creator->choiceSkeletons->value();	
+	if (skeletonValue < 0)
+	{
+		fl_alert("Please select a valid skeleton.");
+		return;
+	}
 	std::string skel = creator->choiceSkeletons->menu()[creator->choiceSkeletons->value()].label();
 	
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->createCharacter(creator->inputName->value(), skel);
@@ -67,6 +72,7 @@ void CharacterCreatorWindow::CreateCB(Fl_Widget* w, void* data)
 	character->setSkeleton(skeleton);
 	character->createStandardControllers();
 	creator->numCharacter++;
+	creator->hide();
 }
 
 ResolutionWindow::ResolutionWindow( int x, int y, int w, int h, char* name ): Fl_Double_Window(x, y, w, h, name)

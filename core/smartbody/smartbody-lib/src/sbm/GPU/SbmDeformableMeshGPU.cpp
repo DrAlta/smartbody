@@ -223,7 +223,7 @@ void main (void)\n\
 	vec3 newn  = normalize(normal);//normalize(cross(tv,bv));\n\
 	vec4 texColor = texture2D(diffuseTexture,gl_TexCoord[0].st);\n\
 	vec3 normalColor = normalize(texture2D(normalTexture,gl_TexCoord[0].st).xyz* 2.0 - 1.0);\n\
-	vec3 normalMapN = normalColor;//normalize(-newtv*normalColor.x-newbv*normalColor.y+newn*normalColor.z); \n\
+	vec3 normalMapN = normalize(-newtv*normalColor.x-newbv*normalColor.y+newn*normalColor.z); \n\
 	vec3 specularColor = texture2D(specularTexture, gl_TexCoord[0].st).xyz;\n\
 	vec3 specMat = specularMaterial.rgb;\n\
 	if (useTexture == 0) \n\
@@ -231,7 +231,6 @@ void main (void)\n\
 	color.a = texColor.a*diffuseMaterial.a;\n\
     //color.rgb = texColor.rgb;\n\
 	n = normalize(normal);\n\
-    n = normalMapN;\n\
 	if (useNormalMap == 1 && dot(normalMapN,n) > 	0.0)\n\
 	{\n\
 		n = normalMapN;\n\
@@ -252,7 +251,7 @@ void main (void)\n\
 		    //color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0)*att;\n\
 			color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0);\n\
             //color += vec4(texColor.xyz*NdotL,0);\n\
-			//halfV = normalize(halfVector[i]);\n\
+			halfV = normalize(halfVector[i]);\n\
 			NdotHV = max(dot(n,halfV),0.0);\n\
 			color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0);\n\
 			//color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0)*att;\n\
