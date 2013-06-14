@@ -425,6 +425,14 @@ void SBDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
             }
          }
       }
+      else if (split[0] == "sbmlog")
+      {
+         if (split[1] == "MotionFile")
+         {
+            //split[split.size() - 1];
+            //SmartBody::SBScene::getScene()->addAssetPath();
+         }
+      }
       else if (split[0] == "vrAllCall")
       {
          vhmsg::ttu_notify1("vrComponent sbmdebugger");
