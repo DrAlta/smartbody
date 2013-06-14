@@ -55,16 +55,23 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 	if (!mesh) return; // no deformable mesh
 	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
 
+	glEnable(GL_TEXTURE_2D);
+	glEnable ( GL_ALPHA_TEST );
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);	
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	glDisable(GL_COLOR_MATERIAL);	  	
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
 	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);      	
-	glEnable(GL_TEXTURE_2D);
-	glEnable ( GL_ALPHA_TEST );
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 	
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{	
@@ -72,6 +79,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 		glMaterial(mesh->material);
 		//LOG("mat color = %f %f %f\n",color[0],color[1],color[2]);		
 		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,mesh->texName.c_str());
+		//LOG("texManager size = %d, tex = %d, texName= %s",SbmTextureManager::singleton(),tex, mesh->texName.c_str());
 		if (tex)
 		{
 			glActiveTexture(GL_TEXTURE0);

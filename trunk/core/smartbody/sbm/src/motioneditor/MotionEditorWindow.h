@@ -40,7 +40,7 @@ public:
 	static void OnButtonRefresh(Fl_Widget* widget, void* data);
 	static void OnButtonSaveMotion(Fl_Widget* widget, void* data);
 	static void OnBrowserMotionList(Fl_Widget* widget, void* data);
-   static void MotionEditorWindow::OnButtonQueryAnims(Fl_Widget* widget, void* data);
+   static void OnButtonQueryAnims(Fl_Widget* widget, void* data);
 	static void OnButtonPlayMotion(Fl_Widget* widget, void* data);
    static void OnButtonSetPosture(Fl_Widget* widget, void* data);
 	static void OnCheckButtonPlayMotion(Fl_Widget* widget, void* data);
