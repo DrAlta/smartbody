@@ -18,6 +18,16 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
 		_buttonSaveMotion->callback(OnButtonSaveMotion, this);
 		_browserMotionList = new Fl_Hold_Browser(10, 40, 300, 180, "Motion List");
 		_browserMotionList->callback(OnBrowserMotionList, this);
+
+      _animationSearchFilterLabel = new Fl_Box(320, 40, 80, 20, "Search Filter");
+      _animationSearchFilter  = new Fl_Input(320, 60, 80, 20, "");
+      _animationSearchFilter->callback(OnAnimationFilterTextChanged, this);
+
+      if (SmartBody::SBScene::getScene()->isRemoteMode())
+      {
+         _buttonQueryAnims = new Fl_Button(320, 140, 80, 20, "Query Anims");
+		   _buttonQueryAnims->callback(OnButtonQueryAnims, this);
+      }
 		_buttonPlayMotion = new Fl_Button(320, 165, 80, 20, "Play");
 		_buttonPlayMotion->callback(OnButtonPlayMotion, this);
       _buttonPlayMotion = new Fl_Button(320, 190, 80, 20, "Set Posture");
@@ -177,6 +187,24 @@ void MotionEditorWindow::loadMotions()
 	}
 }
 
+void MotionEditorWindow::loadMotions(const std::string& filterString)
+{
+   // force it to lower
+   std::string filter = filterString;
+   std::transform(filterString.begin(), filterString.end(), filter.begin(), ::tolower);
+   const std::vector<std::string>& motionNames = SmartBody::SBScene::getScene()->getMotionNames();
+	for (size_t i = 0; i < motionNames.size(); ++i)
+	{
+      // case insensitive comparison
+      std::string motionNameLower = motionNames[i];
+      std::transform(motionNameLower.begin(), motionNameLower.end(), motionNameLower.begin(), ::tolower);
+      if (motionNameLower.find(filter) != std::string::npos)
+      {
+         _browserMotionList->add(motionNames[i].c_str());
+      }
+	}
+}
+
 SmartBody::SBMotion* MotionEditorWindow::getCurrentMotion()
 {
 	for (int i = 0; i < _browserMotionList->size(); ++i)
@@ -244,6 +272,20 @@ void MotionEditorWindow::OnBrowserMotionList(Fl_Widget* widget, void* data)
 	editor->redraw();
 }
 
+void MotionEditorWindow::OnButtonQueryAnims(Fl_Widget* widget, void* data)
+{
+   std::stringstream ss;
+	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
+	if (sbScene->isRemoteMode())
+	{
+		ss << "send sbm vhmsg log on";
+      sbScene->command(ss.str());
+      ss.clear();
+      ss << "send sbm resource motion";
+      sbScene->command(ss.str());
+	}
+}
+
 void MotionEditorWindow::OnButtonPlayMotion(Fl_Widget* widget, void* data)
 {
    MotionEditorWindow* editor = (MotionEditorWindow*) data;
@@ -306,6 +348,13 @@ void MotionEditorWindow::OnButtonStopGaze(Fl_Widget* widget, void* data)
    {
       editor->StopGaze(editor->getCurrentCharacterName());
    }
+}
+
+void MotionEditorWindow::OnAnimationFilterTextChanged(Fl_Widget* widget, void* data)
+{
+   MotionEditorWindow* editor = (MotionEditorWindow*) data;
+   editor->_browserMotionList->clear();
+   editor->loadMotions(editor->_animationSearchFilter->value());
 }
 
 void MotionEditorWindow::PlayAnimation(const std::string& characterName, const std::string& animName, bool setAsPosture)

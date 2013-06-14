@@ -7,6 +7,7 @@
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Value_Slider.H>
 #include <FL/Fl_Multi_Browser.H>
+#include <FL/Fl_Box.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Input.H>
 #include <sb/SBCharacter.h>
@@ -30,6 +31,7 @@ public:
 	void loadCharacters();
 	SmartBody::SBCharacter* getCurrentCharacter();
 	void loadMotions();
+   void loadMotions(const std::string& filterString);
 	SmartBody::SBMotion* getCurrentMotion();
    std::string getCurrentCharacterName();
    std::string getCurrentMotionName();
@@ -38,6 +40,7 @@ public:
 	static void OnButtonRefresh(Fl_Widget* widget, void* data);
 	static void OnButtonSaveMotion(Fl_Widget* widget, void* data);
 	static void OnBrowserMotionList(Fl_Widget* widget, void* data);
+   static void MotionEditorWindow::OnButtonQueryAnims(Fl_Widget* widget, void* data);
 	static void OnButtonPlayMotion(Fl_Widget* widget, void* data);
    static void OnButtonSetPosture(Fl_Widget* widget, void* data);
 	static void OnCheckButtonPlayMotion(Fl_Widget* widget, void* data);
@@ -45,6 +48,7 @@ public:
 	static void OnButtonPlayMotionFolder(Fl_Widget* widget, void* data);
    static void OnButtonGazeAt(Fl_Widget* widget, void* data);
    static void OnButtonStopGaze(Fl_Widget* widget, void* data);
+   static void OnAnimationFilterTextChanged(Fl_Widget* widget, void* data);
 
 	void updateSyncPointsUI();
 	void updateMotionSyncPoints(const std::string& type);
@@ -69,11 +73,14 @@ public:
 	Fl_Button*			_buttonRefresh;
 	Fl_Button*			_buttonSaveMotion;
 	Fl_Hold_Browser*	_browserMotionList;
+   Fl_Button*        _buttonQueryAnims;
 	Fl_Button*			_buttonPlayMotion;
    Fl_Button*        _buttonSetPosture;
 	Fl_Check_Button*	_checkButtonPlayMotion;
 	Fl_Value_Slider*	_sliderMotionFrame;
 	Fl_Input*			_inputFilePath;
+   Fl_Box*           _animationSearchFilterLabel;
+   Fl_Input*			_animationSearchFilter;
 	Fl_Button*			_buttonPlayMotionFolder;
 
 	// meta information
