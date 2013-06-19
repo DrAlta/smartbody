@@ -63,7 +63,7 @@ def setupBehaviorSet():
 		
 
 
-def retargetBehaviorSet(charName, skelName):
+def retargetBehaviorSet(charName):
 	gestureMotions = StringVec()
 	gestureMotions.append("ChrBrad@Idle01")
 	gestureMotions.append("ChrBrad@Idle01_ArmStretch01")
@@ -110,12 +110,18 @@ def retargetBehaviorSet(charName, skelName):
 	gestureMotions.append("ChrBrad@Idle01_WeightShift02")
 	gestureMotions.append("ChrBrad@Idle01_YouLf01")
 	
+	sbChar = scene.getCharacter(charName)
+	if sbChar == None:
+		return
+	skelName = sbChar.getSkeleton().getName()
+	
 	motions = StringVec()
 	assetManager = scene.getAssetManager()
 	for i in range(0, len(gestureMotions)):
 		sbMotion = assetManager.getMotion(gestureMotions[i])
 		if sbMotion != None:
-			sbMotion.setMotionSkeletonName("ChrBrad.sk")
+			sbMotion.setMotionSkeletonName("ChrBrad.sk")		
+			
 	
 	createRetargetInstance('ChrBrad.sk', skelName)
 	

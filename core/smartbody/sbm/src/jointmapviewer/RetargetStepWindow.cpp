@@ -4,7 +4,8 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
-
+#include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
 #include <bml/bml.hpp>
 #include <sb/SBSkeleton.h>
 
@@ -15,9 +16,9 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	int xOffset = 10;
 
 	int tabGroupX = 10;
-	int tabGroupY = 10;
+	int tabGroupY = 50;
 	int tabGroupW = w - 20;
-	int tabGroupH = h - 80;
+	int tabGroupH = h - 120;
 
 	int childGroupX = 0;
 	int childGroupY = 3 * yDis ;
@@ -28,6 +29,12 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	int windowGroupY = 1 * yDis ;
 	int windowGroupW = tabGroupW- 30;
 	int windowGroupH = tabGroupH - 5 * yDis;
+
+	_choiceCharacters = new Fl_Choice(110, yDis, 150, 20, "Character");
+	_choiceCharacters->callback(CharacterCB, this);
+	updateCharacterList();
+
+	//_choiceCharacters->callback(CharacterCB,this);
 
 	tabGroup = new Fl_Tabs(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
 	//tabGroup->callback(changeTabGroup, this);
@@ -52,15 +59,18 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	jointMapViewer->rootWindow = this;
 	retargetViewer->rootWindow = this;
 
-	int curY = tabGroupH + 20;	
+	int curY = tabGroupH + 60;	
 	_buttonApplyAll = new Fl_Button(100, curY, 120, 25, "Apply All");
 	_buttonApplyAll->callback(ApplyCB, this);
 // 	_buttonApplyMap = new Fl_Button(100, curY, 120, 25, "Apply Joint Map");
 // 	_buttonApplyMap->callback(ApplyJointMapCB,this);
 // 	_buttonApplyBehaviorSet = new Fl_Button(220, curY, 120, 25, "Apply Behavior Set");
 // 	_buttonApplyBehaviorSet->callback(ApplyBehaviorSetCB,this);			
-	_buttonCancel = new Fl_Button(360, curY, 120, 25, "Cancel");
+	_buttonCancel = new Fl_Button(260, curY, 120, 25, "Cancel");
 	_buttonCancel->callback(CancelCB, this);
+
+	_buttonRefresh = new Fl_Button(420, curY, 120, 25, "Refresh");
+	_buttonRefresh->callback(RefreshCB, this);
 
 	retargetViewer->setShowButton(false);
 	jointMapViewer->setShowButton(false);
@@ -82,8 +92,32 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	//secondGroup->resizable(retargetViewer);
 	//this->resizable(secondGroup);
 	//this->size_range(800, 480);
+	
+	for (int c = 0; c < _choiceCharacters->size(); c++)
+	{
+		if (_choiceCharacters->text(c))
+		{
+			_choiceCharacters->value(c);
+			setCharacterName(_choiceCharacters->text());
+			break;
+		}
+	}
 }
 
+
+void RetargetStepWindow::RefreshCB( Fl_Widget* widget, void* data )
+{
+	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
+	viewer->refreshAll();
+}
+
+
+void RetargetStepWindow::refreshAll()
+{
+	updateCharacterList();
+	jointMapViewer->updateUI();
+	retargetViewer->updateBehaviorSet();
+}
 
 void RetargetStepWindow::setApplyType( bool applyAll )
 {
@@ -106,7 +140,6 @@ void RetargetStepWindow::setApplyType( bool applyAll )
 		//_buttonApplyBehaviorSet->show();
 		//_buttonApplyMap->show();
 	}
-
 }
 
 RetargetStepWindow::~RetargetStepWindow()
@@ -114,17 +147,42 @@ RetargetStepWindow::~RetargetStepWindow()
 
 }
 
+void RetargetStepWindow::updateCharacterList()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	int oldValue = _choiceCharacters->value();
+	const std::vector<std::string>& characters = scene->getCharacterNames();
+	_choiceCharacters->clear();
+	for (size_t c = 0; c < characters.size(); c++)
+	{
+		_choiceCharacters->add(characters[c].c_str());
+	}
+	if (oldValue < _choiceCharacters->size() && oldValue >= 0)
+	{
+		_choiceCharacters->value(oldValue);
+	}
+}
+
 void RetargetStepWindow::setCharacterName( std::string charName )
 {
-	jointMapViewer->setCharacterName(charName);
-	retargetViewer->setCharacterName(charName);
+	_charName = charName;
+	for (int c = 0; c < _choiceCharacters->size(); c++)
+	{
+		if (charName == _choiceCharacters->text(c))
+		{
+			_choiceCharacters->value(c);
+			break;
+		}
+	}
 
+	jointMapViewer->setCharacterName(_charName);
+	retargetViewer->setCharacterName(_charName);
 }
 
-void RetargetStepWindow::setSkeletonName( std::string skName )
-{
-	retargetViewer->setSkeletonName(skName);
-}
+// void RetargetStepWindow::setSkeletonName( std::string skName )
+// {
+// 	retargetViewer->setSkeletonName(skName);
+// }
 
 void RetargetStepWindow::setJointMapName( std::string jointMapName )
 {
@@ -135,6 +193,14 @@ void RetargetStepWindow::applyRetargetSteps()
 {
 	jointMapViewer->applyJointMap();
 	retargetViewer->RetargetCB(NULL,retargetViewer);
+}
+
+
+void RetargetStepWindow::CharacterCB( Fl_Widget* widget, void* data )
+{
+	RetargetStepWindow* viewer = (RetargetStepWindow*) data;	
+	Fl_Choice* charChoice = dynamic_cast<Fl_Choice*>(widget);	
+	viewer->setCharacterName(charChoice->text());
 }
 
 void RetargetStepWindow::ApplyCB( Fl_Widget* widget, void* data )

@@ -45,11 +45,11 @@ sinbad.setStringAttribute('deformableMesh', 'Sinbad')
 # setup locomotion
 scene.run('BehaviorSetMaleLocomotion.py')
 setupBehaviorSet()
-retargetBehaviorSet(sinbadName,sinbadSkName)
+retargetBehaviorSet(sinbadName)
 # setup reaching
 scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
-retargetBehaviorSet(sinbadName,sinbadSkName)
+retargetBehaviorSet(sinbadName)
 scene.command('char sinbad viewer deformableGPU')
 
 print 'Configuring scene parameters and camera'

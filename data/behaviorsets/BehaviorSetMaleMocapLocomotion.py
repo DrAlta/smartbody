@@ -53,7 +53,7 @@ def setupBehaviorSet():
 			motion.setMotionSkeletonName('ChrBackovic.sk')
 			zebra2Map.applyMotion(motion)
 
-def retargetBehaviorSet(charName, skelName):
+def retargetBehaviorSet(charName):
 
 	scene.run('locomotion-ChrMarine-init.py')
 	
@@ -127,6 +127,11 @@ def retargetBehaviorSet(charName, skelName):
 	mocapStepSetup(skelName, "base", skelName, skelName)
 	
 	'''
+	
+	sbChar = scene.getCharacter(charName)
+	if sbChar == None:
+		return
+	skelName = sbChar.getSkeleton().getName()
 	createRetargetInstance('ChrBackovic.sk', skelName)
 	stateManager = scene.getStateManager()
 	mocapLocomotionState = stateManager.getBlend('mocapLocomotion')

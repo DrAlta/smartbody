@@ -24,25 +24,33 @@ public:
 	virtual void draw();
 	void setApplyType(bool applyAll);
 	void setCharacterName(std::string charName);
-	void setSkeletonName(std::string skName);
+	//void setSkeletonName(std::string skName);
 	void setJointMapName(std::string jointMapName);
 	void applyRetargetSteps();
 
+	void updateCharacterList();
+	void refreshAll();
+
+	static void CharacterCB(Fl_Widget* widget, void* data);
 	static void ApplyJointMapCB(Fl_Widget* widget, void* data);
 	static void ApplyBehaviorSetCB(Fl_Widget* widget, void* data);
 	static void ApplyCB(Fl_Widget* widget, void* data);
 	static void CancelCB(Fl_Widget* widget, void* data);
+	static void RefreshCB(Fl_Widget* widget, void* data);
 
 public:
 	JointMapViewer* jointMapViewer;
 	RetargetViewer* retargetViewer;
 
 protected:
+	Fl_Choice* _choiceCharacters;
 	Fl_Tabs*	tabGroup;	
 	Fl_Button* _buttonApplyMap;
 	Fl_Button* _buttonApplyBehaviorSet;
 	Fl_Button* _buttonApplyAll;
 	Fl_Button* _buttonCancel;
+	Fl_Button* _buttonRefresh;
+	std::string _charName;
 };
 
 

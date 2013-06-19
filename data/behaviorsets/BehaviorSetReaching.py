@@ -88,7 +88,7 @@ def setupBehaviorSet():
 		mirrorMotion1.mirror(leftHandMotions[i], 'common.sk')		
 	
 	
-def retargetBehaviorSet(charName, skelName):
+def retargetBehaviorSet(charName):
 	reachMotions = StringVec()
 	reachMotions.append("ChrHarmony_Relax001_ArmReachRtHigh")
 	reachMotions.append("ChrHarmony_Relax001_ArmReachRtMidHigh")
@@ -169,6 +169,10 @@ def retargetBehaviorSet(charName, skelName):
 		if sbMotion != None:
 			sbMotion.setMotionSkeletonName('common.sk')
 	
+	sbChar = scene.getCharacter(charName)
+	if sbChar == None:
+		return
+	skelName = sbChar.getSkeleton().getName()
 	createRetargetInstance('common.sk', skelName)
 
 	scene.run("init-reach.py")

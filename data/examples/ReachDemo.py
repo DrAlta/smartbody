@@ -62,7 +62,7 @@ for i in range(2):
 		scene.run('BehaviorSetReaching.py')
 		setupBehaviorSet()
 		
-	retargetBehaviorSet(baseName, 'ChrBrad.sk')		
+	retargetBehaviorSet(baseName)		
 	
 print 'Setting up Rachels'
 for i in range(2):
@@ -78,7 +78,7 @@ for i in range(2):
 	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 	# Retarget character
 	#retargetCharacter(baseName, 'ChrRachel.sk')
-	retargetBehaviorSet(baseName, 'ChrRachel.sk')
+	retargetBehaviorSet(baseName)
 
 # add locomotion for ChrBrad2
 #scene.run('BehaviorSetMaleLocomotion.py')

@@ -62,7 +62,7 @@ def setupBehaviorSet():
 			motion.setMotionSkeletonName('ChrHarmony.sk')
 			zebra2Map.applyMotion(motion)	
 
-def retargetBehaviorSet(charName, skelName):
+def retargetBehaviorSet(charName):
 	locoMotions = StringVec()
 	
 	locoMotions.append("ChrHarmony@Idle01_StepBackwardLf01")	
@@ -102,23 +102,27 @@ def retargetBehaviorSet(charName, skelName):
 	#for n in range(0, len(locoMotions)):
 	#	retargetMotion(locoMotions[n], 'ChrHarmony.sk', skelName, outDir + 'FemaleLocomotion/');
 
-	createRetargetInstance('ChrHarmony.sk', skelName)
+	sbChar = scene.getCharacter(charName)
+	if sbChar == None:
+		return
+	charSkelName = sbChar.getSkeleton().getName()
+	createRetargetInstance('ChrHarmony.sk', charSkelName)
 	
 	# setup standard locomotion
 	scene.run("stateFemaleLocomotion.py")
-	femaleLocomotionSetup(skelName, "base", '', 'female')
+	femaleLocomotionSetup(charSkelName, "base", '', 'female')
 	
 	# starting state, starting locomotion with different angle
 	scene.run("stateFemaleStarting.py")
-	femaleStartingSetup(skelName, "base", '', 'female')
+	femaleStartingSetup(charSkelName, "base", '', 'female')
 
 	# idle turn state, facing adjusting
 	scene.run("stateFemaleIdleTurn.py")
-	femaleIdleTurnSetup(skelName, "base", '', 'female')
+	femaleIdleTurnSetup(charSkelName, "base", '', 'female')
 
 	# step state, stepping adjusting
 	scene.run("stateFemaleStep.py")
-	femaleStepSetup(skelName, "base", '', 'female')
+	femaleStepSetup(charSkelName, "base", '', 'female')
 
 	# transitions
 	scene.run("transitionsFemale.py")

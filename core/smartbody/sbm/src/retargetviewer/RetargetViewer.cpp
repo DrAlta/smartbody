@@ -19,71 +19,79 @@ RetargetViewer::RetargetViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 
 	int curY = 10;
 
-	_choiceCharacters = new Fl_Choice(110, curY, 150, 20, "Character");
+	//_choiceCharacters = new Fl_Choice(110, curY, 150, 20, "Character");
 //	choiceCharacters->callback(CharacterCB, this);
-	const std::vector<std::string>& characters = scene->getCharacterNames();
-	for (size_t c = 0; c < characters.size(); c++)
-	{
-		_choiceCharacters->add(characters[c].c_str());
-	}
-	_choiceCharacters->callback(CharacterCB,this);
+	//updateCharacterList();
+
+	//_choiceCharacters->callback(CharacterCB,this);
+ 	//curY += 25;
+// 
+// 	_choiceSkeletons = new Fl_Choice(110, curY, 150, 20, "Skeleton");
+// //	choiceSkeleton->callback(SkeletonCB, this);
+// 	updateSkeletonList();
+//	_choiceSkeletons->callback(SkeletonCB,this);
 	curY += 25;
+	//int choiceSize = _choiceSkeletons->size();
 
-	_choiceSkeletons = new Fl_Choice(110, curY, 150, 20, "Skeleton");
-//	choiceSkeleton->callback(SkeletonCB, this);
-	std::vector<std::string> skeletons = scene->getSkeletonNames();
-	for (size_t c = 0; c < skeletons.size(); c++)
-	{
-		_choiceSkeletons->add(skeletons[c].c_str());
-	}
-	_choiceSkeletons->callback(SkeletonCB,this);
-	curY += 45;
-	int choiceSize = _choiceSkeletons->size();
-
-
-	SmartBody::SBBehaviorSetManager* behavMgr = SmartBody::SBScene::getScene()->getBehaviorSetManager();
-	std::map<std::string, SmartBody::SBBehaviorSet*>& behavSets = behavMgr->getBehaviorSets();
-
+	behaviorSetCurY = curY;
+	
 	int scrollHeight = this->h() - curY - 50;
 	_scrollGroup = new Fl_Scroll(10, curY, this->w() - 20, scrollHeight, "");
 	_scrollGroup->type(Fl_Scroll::VERTICAL);
-	_scrollGroup->begin();
-	int itemWidth = this->w() - 40 - 20;
-	for (std::map<std::string, SmartBody::SBBehaviorSet*>::iterator iter = behavSets.begin();
-		 iter != behavSets.end();
-		 iter++)
-	{
-		std::string name = (*iter).first;
-		Fl_Check_Button* check = new Fl_Check_Button(40, curY, itemWidth, 20, _strdup(name.c_str()));
-		curY += 25;
-	}
-	_scrollGroup->end();
-
+	_scrollGroup->begin();	
+	_scrollGroup->end();	
+	end();
+	updateBehaviorSet();
+	curY += scrollHeight;
 	_retargetButton = new Fl_Button(40, curY, 120, 20, "Retarget");
 	_retargetButton->callback(RetargetCB, this);
+	this->add(_retargetButton);
 	_cancelButton = new Fl_Button(180, curY, 120, 20, "Cancel");
 	_cancelButton->callback(CancelCB, this);
+	this->add(_cancelButton);
 
-	end();
+	
 }
 
 RetargetViewer::~RetargetViewer()
 {
 }
 
+
+
+int RetargetViewer::updateBehaviorSet()
+{
+	int widgetY = behaviorSetCurY;
+	int itemWidth = this->w() - 40 - 20;
+	SmartBody::SBBehaviorSetManager* behavMgr = SmartBody::SBScene::getScene()->getBehaviorSetManager();
+	std::map<std::string, SmartBody::SBBehaviorSet*>& behavSets = behavMgr->getBehaviorSets();
+	_scrollGroup->clear();
+	for (std::map<std::string, SmartBody::SBBehaviorSet*>::iterator iter = behavSets.begin();
+		iter != behavSets.end();
+		iter++)
+	{
+		std::string name = (*iter).first;
+		Fl_Check_Button* check = new Fl_Check_Button(40, widgetY, itemWidth, 20, _strdup(name.c_str()));
+		_scrollGroup->add(check);
+		widgetY += 25;
+	}
+	return widgetY;
+}
+
 void RetargetViewer::setCharacterName(const std::string& name)
 {
 	_charName = name;	
-	for (int c = 0; c < _choiceCharacters->size()-1; c++)
-	{
-		if (name == _choiceCharacters->text(c))
-		{
-			_choiceCharacters->value(c);
-			break;
-		}
-	}
+// 	for (int c = 0; c < _choiceCharacters->size()-1; c++)
+// 	{
+// 		if (name == _choiceCharacters->text(c))
+// 		{
+// 			_choiceCharacters->value(c);
+// 			break;
+// 		}
+// 	}
 }
 
+/*
 void RetargetViewer::setSkeletonName(const std::string& name)
 {
 	_skelName = name;	
@@ -97,16 +105,19 @@ void RetargetViewer::setSkeletonName(const std::string& name)
 		}
 	}
 }
+*/
 
 const std::string& RetargetViewer::getCharacterName()
 {
 	return _charName;
 }
 
+/*
 const std::string& RetargetViewer::getSkeletonName()
 {
 	return _skelName;
 }
+*/
 
 void RetargetViewer::setShowButton(bool showButton)
 {
@@ -139,16 +150,16 @@ void RetargetViewer::RetargetCB(Fl_Widget* widget, void* data)
 			if (check->value())
 			{
 				SmartBody::SBBehaviorSet* behavSet = behavMgr->getBehaviorSet(check->label());				
-				if (behavSet && viewer->getCharacterName() != "" && viewer->getSkeletonName() != "")
+				if (behavSet && viewer->getCharacterName() != "")
 				{
-					LOG("Retargetting %s on %s with %s...", check->label(), viewer->getCharacterName().c_str(), viewer->getSkeletonName().c_str());
+					LOG("Retargetting %s on %s ...", check->label(), viewer->getCharacterName().c_str());
 					const std::string& script = behavSet->getScript();
 					SmartBody::SBScene::getScene()->runScript(script.c_str());
 					std::stringstream strstr;
 					strstr << "setupBehaviorSet()";
 					SmartBody::SBScene::getScene()->run(strstr.str());
 					std::stringstream strstr2;
-					strstr2 << "retargetBehaviorSet('" << viewer->getCharacterName() << "', '" << viewer->getSkeletonName() << "')";
+					strstr2 << "retargetBehaviorSet('" << viewer->getCharacterName() << "')";
 					SmartBody::SBScene::getScene()->run(strstr2.str());
 				}
 			}
@@ -171,16 +182,36 @@ void RetargetViewer::CancelCB(Fl_Widget* widget, void* data)
 	//viewer->hide();
 }
 
-void RetargetViewer::CharacterCB( Fl_Widget* widget, void* data )
-{
-	RetargetViewer* viewer = (RetargetViewer*) data;	
-	Fl_Choice* charChoice = dynamic_cast<Fl_Choice*>(widget);	
-	viewer->setCharacterName(charChoice->text());
-}
+// void RetargetViewer::CharacterCB( Fl_Widget* widget, void* data )
+// {
+// 	RetargetViewer* viewer = (RetargetViewer*) data;	
+// 	Fl_Choice* charChoice = dynamic_cast<Fl_Choice*>(widget);	
+// 	viewer->setCharacterName(charChoice->text());
+// }
+// 
+// void RetargetViewer::SkeletonCB( Fl_Widget* widget, void* data )
+// {
+// 	RetargetViewer* viewer = (RetargetViewer*) data;	
+// 	Fl_Choice* skelChoice = dynamic_cast<Fl_Choice*>(widget);	
+// 	viewer->setSkeletonName(skelChoice->text());
+// }
 
-void RetargetViewer::SkeletonCB( Fl_Widget* widget, void* data )
-{
-	RetargetViewer* viewer = (RetargetViewer*) data;	
-	Fl_Choice* skelChoice = dynamic_cast<Fl_Choice*>(widget);	
-	viewer->setSkeletonName(skelChoice->text());
-}
+// void RetargetViewer::updateCharacterList()
+// {
+// 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+// 	const std::vector<std::string>& characters = scene->getCharacterNames();
+// 	for (size_t c = 0; c < characters.size(); c++)
+// 	{
+// 		_choiceCharacters->add(characters[c].c_str());
+// 	}
+// }
+
+// void RetargetViewer::updateSkeletonList()
+// {
+// 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+// 	std::vector<std::string> skeletons = scene->getSkeletonNames();
+// 	for (size_t c = 0; c < skeletons.size(); c++)
+// 	{
+// 		_choiceSkeletons->add(skeletons[c].c_str());
+// 	}
+// }

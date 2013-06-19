@@ -50,7 +50,7 @@ for i in range(amount):
 	if i == 0 :
 		scene.run('BehaviorSetMaleLocomotion.py')
 		setupBehaviorSet()
-	retargetBehaviorSet(sinbadName,sinbadSkName)	
+	retargetBehaviorSet(sinbadName)	
 	sinbadList.append(sinbad)
 	scene.command("char %s viewer deformableGPU" % sinbadName)	
 	# Play default animation

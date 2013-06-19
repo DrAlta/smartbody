@@ -97,7 +97,7 @@ scene.setDefaultCharacter("ChrBrad")
 # setup mocap locomotion
 scene.run('BehaviorSetMaleMocapLocomotion.py')
 setupBehaviorSet()
-retargetBehaviorSet('ChrBrad', 'ChrBrad.sk')
+retargetBehaviorSet('ChrBrad')
 
 # steering
 scene.run("init-steer-agents.py")

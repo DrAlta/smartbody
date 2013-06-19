@@ -53,7 +53,7 @@ def setupBehaviorSet():
 			mirrorMotion.mirror(mirroredMotions[i]+"Rt", "ChrGarza.sk")
 
 
-def retargetBehaviorSet(charName, skelName):
+def retargetBehaviorSet(charName):
 	jumpMotions = StringVec()
 	
 	jumpMotions.append("ChrGarza@IdleStand01")	
@@ -89,7 +89,12 @@ def retargetBehaviorSet(charName, skelName):
 	#if not os.path.exists(outDir):
 	#	os.makedirs(outDir)
 	scene.loadAssetsFromPath("jumping")
-		
+
+	sbChar = scene.getCharacter(charName)
+	if sbChar == None:
+		return
+	skelName = sbChar.getSkeleton().getName()
+	
 	createRetargetInstance('ChrGarza.sk', skelName)
 	# retarget jumping
 	#for n in range(0, len(jumpMotions)):

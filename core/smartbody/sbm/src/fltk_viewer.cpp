@@ -1903,11 +1903,12 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		character->createActionAttribute("_5testLocomotion", true, "TestHead", 300, false, false, false, "Test Head");
 #endif
 
-		_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1024, 500, "Retarget Viewer");
+		if (!_retargetStepWindow)
+			_retargetStepWindow = new RetargetStepWindow(this->x(), this->y(), 1024, 500, "Retarget Viewer");
+		_retargetStepWindow->refreshAll();
 		_retargetStepWindow->setApplyType(true);
 		_retargetStepWindow->show();			
-		_retargetStepWindow->setCharacterName(charName);
-		_retargetStepWindow->setSkeletonName(skelName);
+		_retargetStepWindow->setCharacterName(charName);		
 		_retargetStepWindow->setJointMapName(skelName);		
 	}
 }
