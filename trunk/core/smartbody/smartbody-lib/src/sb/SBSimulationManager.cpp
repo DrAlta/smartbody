@@ -122,9 +122,6 @@ void SBSimulationManager::update()
 		if (!doUpdate)
 			return;
 	}
-	
-	
-
 }
 
 bool SBSimulationManager::isStarted()

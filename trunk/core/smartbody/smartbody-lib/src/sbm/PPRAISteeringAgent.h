@@ -81,7 +81,9 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 		void parameterTesting();
 		void cacheParameter(std::list<float>& sampleData, float data, int size);
 		float getFilteredParameter(std::list<float>& sampleData);
-		void startLocomotion(float angleDiff);
+		void startIdleToWalkState(float angleDiff);
+
+		void startLocomotionState();
 		void adjustFacingAngle(float angleDiff);
 		SrVec getCollisionFreeGoal(SrVec target, SrVec curPos);
 
