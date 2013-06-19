@@ -108,7 +108,7 @@ def setupBehaviorSet():
 	zebra2Map.applyMotion(scene.getMotion("ChrGarza@IdleStand01"))
 
 
-def retargetBehaviorSet(charName, skelName):
+def retargetBehaviorSet(charName):
 	mocapReachMotions = StringVec();
 	mocapReachMotions.append("ChrGarza@IdleStand01")
 	mocapReachMotions.append("ChrGarza@IdleStand01_ReachBackFloor01")
@@ -200,7 +200,11 @@ def retargetBehaviorSet(charName, skelName):
 	#print 'outDir = ' + outDir ;
 	#if not os.path.exists(outDir):
 	#	os.makedirs(outDir)
-		
+	sbChar = scene.getCharacter(charName)
+	if sbChar == None:
+		return
+	skelName = sbChar.getSkeleton().getName()
+	
 	createRetargetInstance('ChrGarza.sk', skelName)
 	
 	assetManager = scene.getAssetManager()

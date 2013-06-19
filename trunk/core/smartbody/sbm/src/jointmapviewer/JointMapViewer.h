@@ -93,6 +93,8 @@ class JointMapViewer : public Fl_Double_Window
 	public:
 		JointMapViewer(int x, int y, int w, int h, char* name);
 
+		void updateJointMapList();
+		//void updateCharacterList();
 		void updateTestMotions();
 		~JointMapViewer();
 		
@@ -135,7 +137,7 @@ class JointMapViewer : public Fl_Double_Window
 	public:
 		Fl_Choice* _buttonJointLabel;
 		Fl_Choice* _choiceJointMaps;
-		Fl_Choice* _choiceCharacters;
+		//Fl_Choice* _choiceCharacters;
 		Fl_Choice* _choiceTestMotions;
 		Fl_Scroll* _scrollGroup;
 		Fl_Button* _buttonApply;

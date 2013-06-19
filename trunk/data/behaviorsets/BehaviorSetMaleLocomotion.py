@@ -46,8 +46,7 @@ def setupBehaviorSet():
 		motion = scene.getMotion(locoMotions[i])
 		motion.setMotionSkeletonName('test_utah.sk')
 
-def retargetBehaviorSet(charName, skelName):	
-		
+def retargetBehaviorSet(charName):			
 	#outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	#if not os.path.exists(outDir):
 	#	os.makedirs(outDir)
@@ -57,6 +56,11 @@ def retargetBehaviorSet(charName, skelName):
 	#	curMotion = scene.getMotion(locoMotions[n])
 	#	if curMotion is not None:
 	#		retargetMotion(locoMotions[n], 'test_utah.sk', skelName, outDir + 'MaleLocomotion/');
+	sbChar = scene.getCharacter(charName)
+	if sbChar == None:
+		return
+	skelName = sbChar.getSkeleton().getName()
+
 	createRetargetInstance('test_utah.sk', skelName)
 	# setup standard locomotion
 	scene.run("stateMaleLocomotion.py")

@@ -61,7 +61,7 @@ for i in range(amount):
 	if i== 0 : 
 		scene.run('BehaviorSetMaleMocapLocomotion.py')
 		setupBehaviorSet()
-	retargetBehaviorSet(baseName, 'ChrBrad.sk')
+	retargetBehaviorSet(baseName)
 	# Set up steering
 	#setupSteerAgent(baseName, 'ChrBrad.sk')
 	steerManager.setEnable(False)

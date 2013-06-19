@@ -20,6 +20,7 @@
 #include <sr/sr_sphere.h>
 #include <sr/sr_sn_shape.h>
 #include <sbm/gwiz_math.h>
+#include <boost/algorithm/string/replace.hpp>
 
 #ifndef WIN32
 #define _strdup strdup
@@ -1331,7 +1332,7 @@ const std::string rightLegJointNames[5] = { "r_hip", "r_knee", "r_ankle", "r_for
 JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {
 	rootWindow = NULL;
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	
 	begin();	
 	int curY = 10;
 	int startY = 10;
@@ -1339,27 +1340,23 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	_jointMapName = "";
 	_skelName = "";
 
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
 	Fl_Group* leftGroup	= new Fl_Group(10, startY, 400, h - startY, "");
 	leftGroup->begin();
-	_choiceCharacters = new Fl_Choice(110, curY, 150, 20, "Character");
-	//choiceCharacters->callback(CharacterCB, this);
-	const std::vector<std::string>& characters = scene->getCharacterNames();
-	for (size_t c = 0; c < characters.size(); c++)
-	{
-		_choiceCharacters->add(characters[c].c_str());
-	}	
-	_choiceCharacters->callback(SelectCharacterCB,this);
-	curY += 25;
+// 	_choiceCharacters = new Fl_Choice(110, curY, 150, 20, "Character");
+// 	//choiceCharacters->callback(CharacterCB, this);
+// 	_choiceCharacters->callback(SelectCharacterCB,this);
+// 
+// 	updateCharacterList();
+// 
+// 	curY += 25;
 
 	_choiceJointMaps = new Fl_Choice(110, curY, 150, 20, "JointMaps");
 	//choiceCharacters->callback(CharacterCB, this);
 	//std::vector<std::string> characters = scene->getCharacterNames();
-	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
-	std::vector<std::string> jointMapNames = jointMapManager->getJointMapNames();	
-	for (size_t c = 0; c < jointMapNames.size(); c++)
-	{
-		_choiceJointMaps->add(jointMapNames[c].c_str());
-	}
+	updateJointMapList();
+
 	_choiceJointMaps->callback(SelectMapCB,this);
 
 	curY += 35;	
@@ -1463,13 +1460,10 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	if (_choiceTestMotions->size() >= 1)
 		_choiceTestMotions->value(0);
 
-	if (characters.size() > 0)
-	{		
-		_choiceCharacters->value(0);	
-		setCharacterName(_choiceCharacters->text());
-		//updateCharacter();
-	}
 
+
+	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
+	std::vector<std::string> jointMapNames = jointMapManager->getJointMapNames();
 	if (jointMapNames.size() > 0) 
 	{
 		_choiceJointMaps->value(0);
@@ -1549,14 +1543,14 @@ void JointMapViewer::setShowButton(bool showButton)
 void JointMapViewer::setCharacterName( std::string charName )
 {
 	_charName = charName;
-	for (int c = 0; c < _choiceCharacters->size(); c++)
-	{
-		if (charName == _choiceCharacters->text(c))
-		{
-			_choiceCharacters->value(c);
-			break;
-		}
-	}
+// 	for (int c = 0; c < _choiceCharacters->size(); c++)
+// 	{
+// 		if (charName == _choiceCharacters->text(c))
+// 		{
+// 			_choiceCharacters->value(c);
+// 			break;
+// 		}
+// 	}
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBCharacter* sbChar = scene->getCharacter(charName);
 	if (sbChar && targetSkeletonViewer)
@@ -1702,7 +1696,7 @@ void JointMapViewer::applyJointMap()
 	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
 	SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);
 
-	SmartBody::SBCharacter* curChar = scene->getCharacter(_choiceCharacters->text());
+	SmartBody::SBCharacter* curChar = scene->getCharacter(_charName);
 	if (!curChar || !jointMap) return;
 	int numChildren = _scrollGroup->children();
 	jointMap->clearMapping();
@@ -1735,13 +1729,13 @@ void JointMapViewer::SelectMapCB( Fl_Widget* widget, void* data )
 }
 
 
-void JointMapViewer::SelectCharacterCB( Fl_Widget* widget, void* data )
-{
-	JointMapViewer* viewer = (JointMapViewer*) data;	
-	Fl_Choice* charChoice = dynamic_cast<Fl_Choice*>(widget);	
-	viewer->setCharacterName(charChoice->text());
-	//viewer->updateCharacter();	
-}
+// void JointMapViewer::SelectCharacterCB( Fl_Widget* widget, void* data )
+// {
+// 	JointMapViewer* viewer = (JointMapViewer*) data;	
+// 	Fl_Choice* charChoice = dynamic_cast<Fl_Choice*>(widget);	
+// 	viewer->setCharacterName(charChoice->text());
+// 	//viewer->updateCharacter();	
+// }
 
 void JointMapViewer::AddJointMapCB( Fl_Widget* widget, void* data )
 {
@@ -1981,7 +1975,10 @@ void JointMapViewer::updateTestMotions()
 	std::vector<std::string> motionNames = scene->getMotionNames();
 	_choiceTestMotions->clear();
 	for (unsigned int i=0;i<motionNames.size();i++)
-		_choiceTestMotions->add(motionNames[i].c_str());
+	{
+		std::string moName = motionNames[i];		
+		_choiceTestMotions->add(moName.c_str());
+	}
 }
 
 void JointMapViewer::setTestMotion( std::string motionName )
@@ -1992,6 +1989,41 @@ void JointMapViewer::setTestMotion( std::string motionName )
 		testCommonSkMotion = motion;
 }
 
+void JointMapViewer::updateUI()
+{
+	updateTestMotions();
+	//updateCharacterList();
+	updateJointMapList();
+}
+
+// void JointMapViewer::updateCharacterList()
+// {
+// 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+// 	const std::vector<std::string>& characters = scene->getCharacterNames();
+// 	_choiceCharacters->clear();
+// 	for (size_t c = 0; c < characters.size(); c++)
+// 	{
+// 		_choiceCharacters->add(characters[c].c_str());
+// 	}
+// }
+
+void JointMapViewer::updateJointMapList()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
+	std::vector<std::string> jointMapNames = jointMapManager->getJointMapNames();	
+	int oldValue = _choiceJointMaps->value();
+	_choiceJointMaps->clear();
+	for (size_t c = 0; c < jointMapNames.size(); c++)
+	{
+		_choiceJointMaps->add(jointMapNames[c].c_str());
+	}
+
+	if (oldValue < _choiceJointMaps->size() && oldValue >= 0)
+	{
+		_choiceJointMaps->value(oldValue);
+	}
+}
 JointMapInputChoice::JointMapInputChoice( int x, int y, int w, int h, char* name ) : Fl_Input_Choice(x,y,w,h,name)
 {
 	skelViewer = NULL;

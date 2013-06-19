@@ -58,7 +58,7 @@ def setupBehaviorSet():
 	'''
 
 
-def retargetBehaviorSet(charName, skelName):
+def retargetBehaviorSet(charName):
 	punchMotions = StringVec()
 	
 	punchMotions.append("ChrGarza@IdleFight01")	
@@ -88,6 +88,10 @@ def retargetBehaviorSet(charName, skelName):
 	#outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
 	#if not os.path.exists(outDir):
 	#	os.makedirs(outDir)
+	sbChar = scene.getCharacter(charName)
+	if sbChar == None:
+		return
+	skelName = sbChar.getSkeleton().getName()
 
 	createRetargetInstance('ChrGarza.sk', skelName)
 	

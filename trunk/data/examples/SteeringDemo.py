@@ -66,7 +66,7 @@ for i in range(15):
 	if i== 0 : 
 		scene.run('BehaviorSetMaleMocapLocomotion.py')
 		setupBehaviorSet()
-	retargetBehaviorSet(baseName, 'ChrBrad.sk')
+	retargetBehaviorSet(baseName)
 	# Add current Brad into list
 	bradList.append(brad)
 	
@@ -92,7 +92,7 @@ for i in range(15):
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 	# Retarget character
-	retargetBehaviorSet(baseName, 'ChrRachel.sk')
+	retargetBehaviorSet(baseName)
 	#retargetCharacter(baseName, 'ChrRachel.sk', False)
 	# Add Rachel into list
 	rachelList.append(rachel)

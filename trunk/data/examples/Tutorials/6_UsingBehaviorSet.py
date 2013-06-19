@@ -37,11 +37,11 @@ scene.addAssetPath("script", "behaviorsets") # add search path for behavior set
 # locomotion
 scene.run('BehaviorSetMaleMocapLocomotion.py') 
 setupBehaviorSet()
-retargetBehaviorSet('ChrBrad', 'ChrBrad.sk')
+retargetBehaviorSet('ChrBrad')
 # jump
 scene.run('BehaviorSetJumping.py') 
 setupBehaviorSet()
-retargetBehaviorSet('ChrBrad', 'ChrBrad.sk')
+retargetBehaviorSet('ChrBrad')
 
 # Starting the simulation
 sim.start()

@@ -127,6 +127,20 @@ using std::vector;
 using std::string;
 
 int snapshotCounter = 0;
+int G_usesymbols = 0;
+
+// Global FLTK callback for drawing all label text
+void MyDraw(const Fl_Label *o, int X, int Y, int W, int H, Fl_Align a) {
+	fl_font(o->font, o->size);
+	fl_color((Fl_Color)o->color);
+	fl_draw(o->value, X, Y, W, H, a, o->image, G_usesymbols);
+}
+
+// Global FLTK callback for measuring all labels
+void MyMeasure(const Fl_Label *o, int &W, int &H) {
+	fl_font(o->font, o->size);
+	fl_measure(o->value, W, H, G_usesymbols);
+}
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -647,7 +661,7 @@ int main( int argc, char **argv )	{
 
 	
 	
-	
+	Fl::set_labeltype(FL_NORMAL_LABEL, MyDraw, MyMeasure);
 
 	// init glew to use OpenGL extension
 	//bool hasShaderSupport = SbmShader::initShader();

@@ -50,7 +50,7 @@ for i in range(4):
 	if i== 0 : 
 		scene.run('BehaviorSetReaching.py')
 		setupBehaviorSet()
-	retargetBehaviorSet(baseName, 'ChrBrad.sk')	
+	retargetBehaviorSet(baseName)	
 	
 # Set camera position
 scene.getPawn('camera').setPosition(SrVec(0, -50, 0))

@@ -49,7 +49,7 @@ def setupBehaviorSet():
 	'''
 
 
-def retargetBehaviorSet(charName, skelName):
+def retargetBehaviorSet(charName):
 	kickMotions = StringVec()
 	
 	kickMotions.append("ChrGarza@IdleFight01")	
@@ -74,13 +74,14 @@ def retargetBehaviorSet(charName, skelName):
 	# retarget kicking
 	for n in range(0, len(kickMotions)):
 		retargetMotion(kickMotions[n], 'ChrGarza.sk', skelName, outDir + 'kicking/');
-		
-
-
 	# setup standard locomotion
 	scene.run("stateKicking.py")
 	kickingSetup(skelName, "base", skelName, skelName)
 	'''
+	sbChar = scene.getCharacter(charName)
+	if sbChar == None:
+		return
+	skelName = sbChar.getSkeleton().getName()	
 	createRetargetInstance('ChrGarza.sk', skelName)
 	scene.run("stateKicking.py")
 	kickingSetup('ChrGarza.sk','ChrGarza.sk', "base", '', '')

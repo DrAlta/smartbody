@@ -64,7 +64,7 @@ for i in range(amount):
 	if i== 0 : 
 		scene.run('BehaviorSetMaleLocomotion.py')
 		setupBehaviorSet()
-	retargetBehaviorSet(baseName, 'ChrBrad.sk')
+	retargetBehaviorSet(baseName)
 	# Set up steering	
 	steerManager.setEnable(False)
 	brad.setBoolAttribute('steering.pathFollowingMode', False)
