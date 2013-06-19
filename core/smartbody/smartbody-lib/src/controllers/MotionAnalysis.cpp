@@ -332,7 +332,7 @@ float MotionAnalysis::getTerrainYOffset( LegCycleState& state, float flightTime 
 	float endH = dot(b,endN)/dot(endN,up);	
 	//return max(startH,endH);
 	float hmax = max(startH,endH);
-	float flightTimeLift = sin(flightTime*M_PI);
+	float flightTimeLift = (float)sin(flightTime*M_PI);
 	//return 2.f*hmax/M_PI*flightTimeLift + startPt.y*(1.f-flightTime) + endPt.y*flightTime;
 	return  startPt.y*(1.f-flightTime) + endPt.y*flightTime;
 }

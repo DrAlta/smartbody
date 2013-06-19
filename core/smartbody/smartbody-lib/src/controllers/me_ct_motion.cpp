@@ -319,7 +319,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 //	if( dur < 0.0 )	{
 //		LOG( "no-dur: %s", name() );
 //	}
-	updateDt(t);
+	updateDt((float)t);
 	motionTime += dt;	
 	//motionTime = t;
 	double curMotionTime = motionTime;

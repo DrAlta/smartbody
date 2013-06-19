@@ -475,7 +475,7 @@ SBMotion* SBAssetManager::addMotionDefinition(const std::string& motionName, dou
 	}	
 	else if (motionFrames > 2 && duration > 0)// motion frame > 2
 	{
-		float deltaT = duration/(motionFrames-1);
+		float deltaT = (float)duration/(motionFrames-1);
 		for (int i=0;i<motionFrames;i++)
 		{
 			sbMotion->insert_frame(i,deltaT*i);			
