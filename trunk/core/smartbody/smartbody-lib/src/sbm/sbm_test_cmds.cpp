@@ -393,7 +393,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		std::ifstream in(absPathStr.c_str());
 
 		in.seekg(0, std::ios::end);   
-		xml.reserve(in.tellg());
+		xml.reserve((size_t)in.tellg());
 		in.seekg(0, std::ios::beg);
 		
 		xml.assign((std::istreambuf_iterator<char>(in)),
