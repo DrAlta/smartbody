@@ -2218,7 +2218,7 @@ int FltkViewer::handle ( int event )
 
 	
 
-   if ( e.type == SrEvent::EventNone ) return 0; // not an interesting event
+   if ( e.type == SrEvent::EventNone && ret == 0 ) return 0; // not an interesting event
 
    if ( event==FL_PUSH || event==FL_DRAG )
     { 
