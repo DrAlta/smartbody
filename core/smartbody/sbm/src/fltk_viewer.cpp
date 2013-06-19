@@ -1413,8 +1413,8 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	
 	
 	glDisable(GL_LIGHTING);
-	
-	glUseProgram(0);	
+	if (_data->shadowmode == ModeShadows && !shadowPass)
+			glUseProgram(0);	
 }
 
 

@@ -24,6 +24,7 @@ class SBSteerAgent
 		SBAPI void setSteerType(std::string type);
 		SBAPI const std::string& getSteerType();
 
+
 	private:
 		std::string _steerType;
 		std::string _stateNamePrefix;

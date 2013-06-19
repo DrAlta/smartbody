@@ -650,14 +650,15 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 				//if (0)
 			{
 				//LOG("Path following, start locomotion, diff = %f",diff);
-				startLocomotion(diff);
+				startIdleToWalkState(diff);
 			}
 			else
 			{
-				std::stringstream command;
-				command << "panim schedule char " << character->getName();
-				command << " state " << locomotionName << " loop true playnow true";
-				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());  
+// 				std::stringstream command;
+// 				command << "panim schedule char " << character->getName();
+// 				command << " state " << locomotionName << " loop true playnow true";
+// 				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());  
+				startLocomotionState();
 			}	
 		}
 		else
@@ -1269,7 +1270,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 		if (!fastInitial)
 		{
 			//LOG("start locomotion %f",diff);
-			startLocomotion(diff);	
+			startIdleToWalkState(diff);	
 		}
 		else
 		{
@@ -1483,7 +1484,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 }
 
 
-void PPRAISteeringAgent::startLocomotion( float angleDiff )
+void PPRAISteeringAgent::startIdleToWalkState( float angleDiff )
 {
 	//		if (character->steeringConfig == character->STANDARD)
 	{
@@ -1538,41 +1539,8 @@ void PPRAISteeringAgent::startLocomotion( float angleDiff )
 		}
 		//LOG("start turn command = %s",command.str().c_str());
 		
-		PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
-		const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
-		float desiredSpeed = steeringCommand.targetSpeed;
-		desiredSpeed *= 1.0f / SmartBody::SBScene::getScene()->getScale();
-
-		std::vector<double> weights;
-		SmartBody::SBAnimationBlendManager* stateManager = SmartBody::SBScene::getScene()->getBlendManager();
-		SmartBody::SBAnimationBlend* state = stateManager->getBlend(locomotionName);
-		if (!state)
-		{
-			LOG("No state named %s found for character %s. Cannot start locomotion.", locomotionName.c_str(), character->getName().c_str());
-			return;
-		}
-		weights.resize(state->getNumMotions());
-
-		float parameterScale = 1.f;
-		if (character && state)
-		{
-			SmartBody::SBRetarget* retarget = SmartBody::SBScene::getScene()->getRetargetManager()->getRetarget(state->getBlendSkeleton(),character->getSkeleton()->getName());
-			if (retarget)
-				parameterScale = 1.f/retarget->getHeightRatio();
-		}
-
-		//LOG("desired speed = %f, parameter scale = %f",desiredSpeed,parameterScale);
-		state->getWeightsFromParameters(desiredSpeed*parameterScale, 0, 0, weights);
-		std::stringstream command1;
-		command1 << "panim schedule char " << character->getName();
-		command1 << " state " << locomotionName << " loop true playnow false additive false joint null";
-		for (size_t x = 0; x < weights.size(); x++)
-		{
-			//if (weights[x] > 0.0001f)
-			//	LOG("weight %d = %f", x, weights[x]);
-			command1 << " " << weights[x];
-		}
-		SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command1.str().c_str());
+		startLocomotionState();
+		return;
 	}
 }
 
@@ -1770,4 +1738,43 @@ bool PPRAISteeringAgent::isInLocomotion()
 bool PPRAISteeringAgent::isHittingOnTarget()
 {
 	return (character->_reachTarget && !character->_lastReachStatus);
+}
+
+void PPRAISteeringAgent::startLocomotionState()
+{
+	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
+	const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
+	float desiredSpeed = steeringCommand.targetSpeed;
+	desiredSpeed *= 1.0f / SmartBody::SBScene::getScene()->getScale();
+
+	std::vector<double> weights;
+	SmartBody::SBAnimationBlendManager* stateManager = SmartBody::SBScene::getScene()->getBlendManager();
+	SmartBody::SBAnimationBlend* state = stateManager->getBlend(locomotionName);
+	if (!state)
+	{
+		LOG("No state named %s found for character %s. Cannot start locomotion.", locomotionName.c_str(), character->getName().c_str());
+		return;
+	}
+	weights.resize(state->getNumMotions());
+
+	float parameterScale = 1.f;
+	if (character && state)
+	{
+		SmartBody::SBRetarget* retarget = SmartBody::SBScene::getScene()->getRetargetManager()->getRetarget(state->getBlendSkeleton(),character->getSkeleton()->getName());
+		if (retarget)
+			parameterScale = 1.f/retarget->getHeightRatio();
+	}
+
+	//LOG("desired speed = %f, parameter scale = %f",desiredSpeed,parameterScale);
+	state->getWeightsFromParameters(desiredSpeed*parameterScale, 0, 0, weights);
+	std::stringstream command1;
+	command1 << "panim schedule char " << character->getName();
+	command1 << " state " << locomotionName << " loop true playnow false additive false joint null";
+	for (size_t x = 0; x < weights.size(); x++)
+	{
+		//if (weights[x] > 0.0001f)
+		//	LOG("weight %d = %f", x, weights[x]);
+		command1 << " " << weights[x];
+	}
+	SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command1.str().c_str());
 }
