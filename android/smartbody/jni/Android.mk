@@ -309,7 +309,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sr/sr_gl.cpp \
 	$(SBM_MY_DIR)/sr/sr_gl_render_funcs.cpp \
 	$(SBM_MY_DIR)/sr/sr_sa_gl_render.cpp \
-	$(SBM_MY_DIR)/sr/sr_sa_render_mode.cpp \
 	$(SBM_MY_DIR)/sr/sr_viewer.cpp \
 	$(SBM_MY_DIR)/sk/sk_channel.cpp \
 	$(SBM_MY_DIR)/sk/sk_channel_array.cpp \
