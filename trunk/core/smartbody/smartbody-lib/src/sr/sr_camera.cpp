@@ -426,8 +426,8 @@ void SrCamera::reset()
 	init();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
-	setEye(0, 1.66*scale, 1.85*scale);
-	setCenter(0, 0.92*scale, 0);
+	setEye(0, 1.66f*scale, 1.85f*scale);
+	setCenter(0, 0.92f*scale, 0);
 	float znear = 0.01f*scale;
 	float zfar = 100.0f*scale;
 	setNearPlane(znear);

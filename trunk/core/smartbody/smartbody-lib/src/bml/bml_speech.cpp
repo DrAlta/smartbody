@@ -577,9 +577,9 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		debugVwoSmoothing->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
 
 		if (strcmp(visemeProcessedData[i]->id(), "PBM") == 0)
-			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, character->getDoubleAttribute("diphoneSmoothWindow-PBM"));
+			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("diphoneSmoothWindow-PBM"));
 		else if (strcmp(visemeProcessedData[i]->id(), "FV") == 0)
-			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, character->getDoubleAttribute("diphoneSmoothWindow-FV"));
+			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("diphoneSmoothWindow-FV"));
 		else
 			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, character->getDiphoneSmoothWindow());
 		VisemeData* debugVwSmoothing = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
@@ -609,9 +609,9 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		if (openIndex >= 0)
 		{
 			if (bmpIndex >= 0 && character->getBoolAttribute("diphoneRulePBM"))
-				processOpenCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[bmpIndex]->getFloatCurve(), character->getDoubleAttribute("pbmOpenConstrain"));
+				processOpenCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[bmpIndex]->getFloatCurve(), (float)character->getDoubleAttribute("pbmOpenConstrain"));
 			if (fvIndex >= 0 && character->getBoolAttribute("diphoneRuleFV"))
-				processOpenCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[fvIndex]->getFloatCurve(), character->getDoubleAttribute("fvOpenConstrain"));
+				processOpenCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[fvIndex]->getFloatCurve(), (float)character->getDoubleAttribute("fvOpenConstrain"));
 
 			VisemeData* debugProcessOpenCurve = new VisemeData(visemeProcessedData[openIndex]->id(), visemeProcessedData[openIndex]->time());
 			debugProcessOpenCurve->setCurveInfo("4");
@@ -925,7 +925,7 @@ void BML::SpeechRequest::processOpenCurve(std::vector<float>& openCurve, std::ve
 				if (openX[j] < otherX[secStartId] || openX[j] > otherX[secEndId])
 					continue;
 
-				for (size_t k = secStartId; k < secEndId - 1; ++k)
+				for (int k = secStartId; k < secEndId - 1; ++k)
 				{
 					if (openX[j] >= otherX[k] && openX[j] <= otherX[k + 1])
 					{
@@ -940,7 +940,7 @@ void BML::SpeechRequest::processOpenCurve(std::vector<float>& openCurve, std::ve
 			}
 
 			// looping through other curve points
-			for (size_t j = secStartId + 1; j < secEndId; ++j)
+			for (int j = secStartId + 1; j < secEndId; ++j)
 			{
 				for (size_t k = 0; k < openX.size() - 1; ++k)
 				{

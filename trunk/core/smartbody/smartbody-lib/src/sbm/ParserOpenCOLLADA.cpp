@@ -1956,7 +1956,7 @@ void ParserOpenCOLLADA::parseLibraryImages(DOMNode* node, std::map<std::string, 
 			xml_utils::xml_translate(&imageFile, initFromNode->getTextContent());
 
 			DOMNode* nameNode = imageAttr->getNamedItem(BML::BMLDefs::ATTR_NAME);
-			std:string imageName = imageId;
+			std::string imageName = imageId;
 			if (nameNode)
 				xml_utils::xml_translate(&imageName, nameNode->getTextContent());
 			if (pictureId2File.find(imageId) == pictureId2File.end())

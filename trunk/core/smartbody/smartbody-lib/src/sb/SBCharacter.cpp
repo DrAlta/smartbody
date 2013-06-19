@@ -84,7 +84,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createStringAttribute("diphoneSetName", "", true, "Basic", 157, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
 	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 158, false, false, false, "Use diphones spline/linear curve.");
 	createDoubleAttribute("diphoneSmoothWindow", .18, true, "Basic", 159, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
-	setDiphoneSmoothWindow(.18);
+	setDiphoneSmoothWindow(0.18f);
 	createDoubleAttribute("diphoneSmoothWindow-PBM", .1, true, "Basic", 160, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
 	createDoubleAttribute("diphoneSmoothWindow-FV", .1, true, "Basic", 161, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
 	createDoubleAttribute("diphoneSpeedLimit", 6.0f, true, "Basic", 162, false, false, false, "Speed Limit of mouth movement");
