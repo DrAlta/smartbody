@@ -6,6 +6,7 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#include "vhcl.h"
 #include "minimalwrapper.h"
 #include <sbm/mcontrol_callbacks.h>
 #include <sb/SBScene.h>
@@ -19,66 +20,236 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
+#include <sbm/sbm_deformable_mesh.h>
+#include <sbm/GPU/SbmTexture.h>
+#include <sr/sr_sa_gl_render.h>
+#include <sr/sr_gl.h>
+#include <sr/sr_light.h>
+#include <sr/sr_camera.h>
+#include <sr/sr_gl_render_funcs.h>
+
+#import <OpenGLES/ES1/gl.h>
+#import <OpenGLES/ES1/glext.h>
 
 using namespace boost::filesystem;
+/*
+    Known issue for smartbody ios:
+    - vhcl log OnMessage doesn't seem to work inside static libraries, it only works on this application level, need to look more into it. Now I used printf before OnMessage function inside vhcl_log.cpp
+ */
+
 
 #if __cplusplus
 extern "C"
 {
 #endif
 
+static SrLight light1;
+static SrLight light2;
+static SrCamera* cameraReset;
+static vhcl::Log::StdoutListener listener;
+void SBSetupDrawing(int w, int h)
+{   
+    glViewport(0, 0, w, h);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+	glEnable(GL_CULL_FACE);
+	glShadeModel(GL_SMOOTH);
+	glDisable(GL_DEPTH_TEST);
+    
+	// light
+	light1.directional = true;
+	light1.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
+	light1.position = SrVec( 100.0, 250.0, 400.0 );
+	//light1.constant_attenuation = 1.0f;
+    
+	light2 = light1;
+	light2.directional = true;
+	light2.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
+	light2.position = SrVec( 100.0, 500.0, -1000.0 );
+}
+    
+void initCharacterScene()
+{
+ 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	// for some reason couldn't get flash listener working properly, following code is supposed to replace character listener
+	std::vector<std::string> charNames = scene->getCharacterNames();
+	for (size_t i = 0; i < charNames.size(); i++)
+	{
+		SmartBody::SBCharacter* character = scene->getCharacter(charNames[i]);
+		if (!character)
+			continue;
+        
+        LOG("init character %s", charNames[i].c_str());
+        
+		// add skeletons and mesh
+		
+		if (character->scene_p)
+		{
+			SmartBody::SBScene::getScene()->getRootGroup()->remove(character->scene_p);
+			character->scene_p->unref();
+			character->scene_p = NULL;
+		}
+		LOG("Character %s's skeleton added to the scene.", charNames[i].c_str());
+        
+		if (character->dMesh_p)
+		{
+			for (size_t i = 0; i < character->dMesh_p->dMeshDynamic_p.size(); i++)
+			{
+				SmartBody::SBScene::getScene()->getRootGroup()->remove( character->dMesh_p->dMeshDynamic_p[i] );
+			}
+			delete character->dMesh_p;
+			character->dMesh_p = NULL;
+		}
+		character->dMesh_p = new DeformableMesh();
+		character->dMeshInstance_p =  new DeformableMeshInstance();
+		character->dMesh_p->setSkeleton(character->getSkeleton());
+		character->dMeshInstance_p->setSkeleton(character->getSkeleton());
+		LOG("Character %s's deformable mesh reset.", charNames[i].c_str());
+        
+		std::string dMeshAttrib = character->getStringAttribute("deformableMesh");
+		character->setStringAttribute("deformableMesh", dMeshAttrib);
+		LOG("Character %s's deformable mesh %s added to the scene.", charNames[i].c_str(), dMeshAttrib.c_str());
+	}
+}
+    
 void SBInitialize(const char* mediapath)
 {
-    printf("media path %s\n", mediapath);
+    vhcl::Log::g_log.AddListener(&listener);
     XMLPlatformUtils::Initialize();
+    LOG("media path%s", mediapath);
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+    SrCamera& cam = *scene->createCamera("activeCamera");
+    cam.init();
     initPython("../../Python26/Libs");
     SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
     sim->setupTimer();
-    printf("Timer setup!\n");
     scene->setMediaPath(mediapath);
 	scene->addAssetPath("seq", "sbm-common/scripts");
 	scene->runScript("default-init.py");
-    printf("Run default-init.py\n");
+    initCharacterScene();
+    
+    // store the camera information for resetting
+    cameraReset = new SrCamera(cam);
 }
     
-void getBoneData()
+void SBDrawFrame(int width, int height)
 {
-    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-    SmartBody::SBSkeleton* sk = scene->getCharacter("brad")->getSkeleton();
-    SmartBody::SBSkeleton* sk1 = scene->getCharacter("doctor")->getSkeleton();
-    sk->update_global_matrices(); 
-    sk1->update_global_matrices();
-    std::map<int,int> indexMap;
-    numJoints = sk->joints().size();
-    for (int i=0;i<sk->joints().size();i++)
-    {
-        SkJoint* joint = sk->joints()[i];
-        SkJoint* joint1 = sk1->joints()[i];
-        SrVec pos = joint->gmat().get_translation();
-        SrVec pos1 = joint1->gmat().get_translation();
-        jointPos[i * 3 + 0] = pos.x;
-        jointPos[i * 3 + 1] = pos.y;
-        jointPos[i * 3 + 2] = pos.z;
-        jointPos1[i * 3 + 0] = pos1.x;
-        jointPos1[i * 3 + 1] = pos1.y;
-        jointPos1[i * 3 + 2] = pos1.z;        
-        indexMap[joint->index()] = i;
-        boneIdx[i*2+0] = joint->index();
-        if (joint->parent())
-            boneIdx[i*2+1] = joint->parent()->index();
-        else
-            boneIdx[i*2+1] = joint->index();
-    }
-   
-    for (int i=0;i<sk->joints().size();i++)
-    {
-        boneIdx[i*2] = indexMap[boneIdx[i*2]];
-        boneIdx[i*2+1] = indexMap[boneIdx[i*2+1]];
-    }
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+    SrCamera& cam = *scene->getActiveCamera();
+    
+    // lighting
+	glLight(0, light1);
+	glLight(1, light2);
+
+    
+	// clear background
+	glClearColor(0.7f,0.7f,0.7f,1);
+	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    
+    // setup view
+	SrMat mat;
+	glMatrixMode ( GL_PROJECTION );
+    glLoadIdentity();
+	glLoadMatrixf ( (const float*)cam.get_perspective_mat(mat) );
+	glMatrixMode ( GL_MODELVIEW );
+    glLoadIdentity();
+	glLoadMatrixf ( (const float*)cam.get_view_mat(mat) );
+	glScalef ( cam.getScale(), cam.getScale(), cam.getScale());
+    glViewport( 0, 0, width, height);
+
+    // update texture
+    glEnable(GL_TEXTURE_2D);
+    SbmTextureManager& texm = SbmTextureManager::singleton();
+    texm.updateTexture();
+    
+    // draw a ground plane
+	glDisable(GL_LIGHTING);
+	float planeSize  = 300.f;
+	SrVec quad[4] = { SrVec(planeSize, 0.f, planeSize), SrVec(-planeSize, 0.f, planeSize), SrVec(-planeSize,0.f,-planeSize), SrVec(planeSize, 0.f, -planeSize) };
+	SrVec quadN[4] = { SrVec(0.f, 1.f, 0.f), SrVec(0.f, 1.f, 0.f), SrVec(0.f, 1.f, 0.f), SrVec(0.f, 1.f, 0.f) };
+	GLfloat quadColor[16] = { 0.2f,0.2f, 0.2f, 1.f , 0.3f,0.3f,0.3f, 1.f, 0.5f,0.5f,0.5f,1.f, 0.25f,0.25f,0.25f,1.f };
+	unsigned short indices[] = {0,1,2, 0,2,3};
+	glShadeModel(GL_SMOOTH);
+	glDisable(GL_CULL_FACE);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&quad[0]);
+	glColorPointer(4, GL_FLOAT, 0, quadColor);
+	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&quadN[0]);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
+	glEnable(GL_LIGHTING);
+  
+    // draw characters
+    SBDrawCharacters();
 }
     
-void SBMUpdateX(float t)
+void SBDrawCharacters()
+{
+    
+#if 0   // draw bone figure
+    const std::vector<std::string>& chars = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (std::vector<std::string>::const_iterator charIter = chars.begin();
+         charIter != chars.end();
+         charIter++)
+	{
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter((*charIter));
+        float jointPos[600];
+        unsigned short boneIdx[400];
+        int numJoints;
+        SmartBody::SBSkeleton* sk = character->getSkeleton();
+        sk->update_global_matrices();
+        std::map<int,int> indexMap;
+        numJoints = sk->joints().size();
+        for (int i=0;i<sk->joints().size();i++)
+        {
+            SkJoint* joint = sk->joints()[i];
+            SrVec pos = joint->gmat().get_translation();
+            jointPos[i * 3 + 0] = pos.x;
+            jointPos[i * 3 + 1] = pos.y;
+            jointPos[i * 3 + 2] = pos.z;
+            indexMap[joint->index()] = i;
+            boneIdx[i*2+0] = joint->index();
+            if (joint->parent())
+                boneIdx[i*2+1] = joint->parent()->index();
+            else
+                boneIdx[i*2+1] = joint->index();
+        }
+        for (int i=0;i<sk->joints().size();i++)
+        {
+            boneIdx[i*2] = indexMap[boneIdx[i*2]];
+            boneIdx[i*2+1] = indexMap[boneIdx[i*2+1]];
+        }
+        glPointSize(2.0f);
+        glLineWidth(1.0f);
+        glColor4f(1, 1, 1, 1);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, (const GLfloat*)&jointPos[0]);
+        glDrawArrays(GL_POINTS, 0, numJoints);
+        glDrawElements(GL_LINES,numJoints*2,GL_UNSIGNED_SHORT, boneIdx);
+        glDisableClientState(GL_VERTEX_ARRAY);
+    }
+#else   // draw CPU deformable mesh
+	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
+         pawnIter != pawns.end();
+         pawnIter++)
+	{
+		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
+		if(pawn->dMesh_p && pawn->dMeshInstance_p)
+		{
+			pawn->dMesh_p->set_visibility(1);
+			pawn->dMeshInstance_p->setVisibility(1);
+			pawn->dMeshInstance_p->update();
+			SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p);
+		}
+	}
+#endif
+}
+    
+void SBUpdate(float t)
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
@@ -86,114 +257,74 @@ void SBMUpdateX(float t)
     scene->update();
 }
     
-void SBMExecuteCmd(const char* command)
+void SBExecuteCmd(const char* command)
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->command(command);
 }
     
-void SBMExecutePythonCmd(const char* command)
+void SBExecutePythonCmd(const char* command)
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->run(command);
 }
     
-float* rotatePoint(float* pointF, float* originF, float* directionF, float angle)
+    
+void SBCameraOperation(float dx, float dy)
 {
-    SrVec point = SrVec(pointF[0], pointF[1], pointF[2]);
-    SrVec origin = SrVec(originF[0], originF[1], originF[2]);
-    SrVec direction = SrVec(directionF[0], directionF[1], directionF[2]);
-    SrVec v = direction;
-    SrVec o = origin;
-    SrVec p = point;
-    float c = cos(angle);
-    float s = sin(angle);
-    float C = 1.0f - c;
+    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SrCamera* cam = scene->getActiveCamera();
     
-    SrMat mat;
-    mat.e11() = v[0] * v[0] * C + c;
-    mat.e12() = v[0] * v[1] * C - v[2] * s;
-    mat.e13() = v[0] * v[2] * C + v[1] * s;
-    mat.e21() = v[1] * v[0] * C + v[2] * s;
-    mat.e22() = v[1] * v[1] * C + c;
-    mat.e23() = v[1] * v[2] * C - v[0] * s;
-    mat.e31() = v[2] * v[0] * C - v[1] * s;
-    mat.e32() = v[2] * v[1] * C + v[0] * s;
-    mat.e33() = v[2] * v[2] * C + c;
+    float camDx = dx * cam->getAspectRatio() * 0.01f;
+    float camDy = dy * cam->getAspectRatio() * 0.01f;
     
-    mat.transpose();
-    
-    SrVec result = origin + mat * (point - origin);
-    return result;
-}
-
-void getCamera(float x, float y, float prevX, float prevY, float curX, float curY, int mode)
-{
-    static SrCamera _camera;
-    if (mode == -1)
+    if (cameraMode == 0) // zoom
     {
-        _camera.setUpVector(SrVec(0, 1, 0));
-        _camera.setCenter(0, 92, 0);
-        _camera.setEye(0, 166, 300);
-        _camera.setScale(1);
-    }   
-    if (mode == 0)  // dollying
+		float tmpFov = cam->getFov() + (-camDx + camDy);
+		cam->setFov(SR_BOUND(tmpFov, 0.001f, srpi));
+    }
+    else if (cameraMode == 1) // rotation
+    {   
+        SrVec origUp = cam->getUpVector();
+		SrVec origCenter = cam->getCenter();
+		SrVec origCamera = cam->getEye();
+		
+        SrVec dirX = origUp;
+        SrVec dirY;
+        dirY.cross(origUp, (origCenter - origCamera));
+        dirY /= dirY.len();
+        
+        SrVec cameraPoint = rotatePoint(origCamera, origCenter, dirX, -camDx * float(M_PI));
+        //cameraPoint = rotatePoint(origCamera, origCenter, dirX, -camDy * float(M_PI));
+        cam->setEye(cameraPoint.x, cameraPoint.y, cameraPoint.z);
+    }
+    else if (cameraMode == 2) // reset
     {
-        printf("camera dollying, %f, %f\n", x, y);
-        float amount = x / 100.0f;
-        SrVec cameraPos(_camera.getEye());
-        SrVec targetPos(_camera.getCenter());
+        cam->copyCamera(cameraReset);
+    }
+    else if (cameraMode == 3) // dolly
+    {
+        float amount = camDx - camDy;
+        SrVec cameraPos(cam->getEye());
+        SrVec targetPos(cam->getCenter());
         SrVec diff = targetPos - cameraPos;
         float distance = diff.len();
         diff.normalize();
         
-        if (amount >= distance)
-            amount = distance - .000001f;
+        if (amount >= distance);
+        amount = distance - 0.00001f;
         
         SrVec diffVector = diff;
         SrVec adjustment = diffVector * distance * amount;
         cameraPos += adjustment;
-        SrVec oldEyePos = _camera.getEye();
-        _camera.setEye(cameraPos.x, cameraPos.y, cameraPos.z);
-        SrVec cameraDiff = _camera.getEye() - oldEyePos;
-        SrVec temp = _camera.getCenter() + cameraDiff;
-         _camera.setCenter(temp.x, temp.y, temp.z);
-     }
-    
-    if (mode == 1)  // camera rotation
-    {   
- 		float deltaX = -x / swidth;
-		float deltaY = -y / sheight;
-        deltaX *= 3.0f;
-        deltaY *= 3.0f;
-
-		SrVec origUp = _camera.getUpVector();
-		SrVec origCenter = _camera.getCenter();
-		SrVec origCamera = _camera.getEye();
-        
-		SrVec dirX = origUp;
-		SrVec  dirY;
-		dirY.cross(origUp, (origCenter - origCamera));
-		dirY /= dirY.len();
-        
-		SrVec camera = rotatePoint(origCamera, origCenter, dirX, -deltaX * float(M_PI));
-		camera = rotatePoint(camera, origCenter, dirY, deltaY * float(M_PI));
-        
-		_camera.setEye(camera.x, camera.y, camera.z);
-    }
-        
-    
-    SrMat mat;
-    _camera.get_perspective_mat(mat);
-    SrMat mat1;
-    _camera.get_view_mat(mat1);
-    for (int i = 0; i < 16; i++)
-    {
-        projection[i] = mat.get(i);
-        modelview[i] = mat1.get(i);
+        SrVec oldEyePos = cam->getEye();
+        cam->setEye(cameraPos.x, cameraPos.y, cameraPos.z);
+        SrVec cameraDiff = cam->getEye() - oldEyePos;
+        SrVec tmpCenter = cam->getCenter();
+        tmpCenter += cameraDiff;
+        cam->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);
     }
 }
-    
 #if __cplusplus
 }
 #endif

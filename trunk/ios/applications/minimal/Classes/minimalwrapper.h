@@ -6,26 +6,21 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+
 #if __cplusplus
 extern "C"
 {
 #endif
-    float swidth;
-    float sheight;
     int cameraMode;
-    float jointPos[600];
-    unsigned short boneIdx[400];
-    float jointPos1[600];
-    int numJoints;
     void SBInitialize(const char* path);
-    void SBMUpdateX(float t);
-    void SBMExecuteCmd(const char* command);
-    void SBMExecutePythonCmd(const char* command);
-    void getBoneData();
-    void getCamera(float x, float y, float prevX, float prevY, float curX, float curY, int mode);
-    float* rotatePoint(float* point, float* origin, float* direction, float angle);
-    float projection[16];
-    float modelview[16];
+    void SBSetupDrawing(int w, int h);
+    void SBDrawFrame(int w, int h);
+    void SBDrawCharacters();
+    void initCharacterScene();
+    void SBUpdate(float t);
+    void SBExecuteCmd(const char* command);
+    void SBExecutePythonCmd(const char* command);
+    void SBCameraOperation(float dx, float dy);
 #if __cplusplus
 }
 #endif

@@ -40,18 +40,17 @@
 {
     const char* command = [text.text UTF8String];
     printf("command is %s \n", command);
-    SBMExecuteCmd(command);
+    SBExecutePythonCmd(command);
 }
 
 - (IBAction)segmentedControlIndexChanged
 {
     int id = segmentedControl.selectedSegmentIndex;
-    if (id == 2)
+    cameraMode = id;
+    if (id == 2)    // reset camera
     {
-        getCamera(0, 0, 0, 0, 0, 0, -1);
+        SBCameraOperation(0, 0);
     }
-    else
-        cameraMode = id;
 }
 
 @end

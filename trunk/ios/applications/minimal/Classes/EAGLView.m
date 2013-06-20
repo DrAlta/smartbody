@@ -67,57 +67,15 @@
 {    
     static double timer = 0.0;
     timer += 0.016;
-	SBMUpdateX(timer); 
-   
-    glClearColor(0.5f,0.5f,0.5f,1);
-	glClear(GL_COLOR_BUFFER_BIT);
-    glViewport( 0, 0, width, height);
-	
+	SBUpdate(timer);
+    
     [EAGLContext setCurrentContext:context];
     glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
-		
-	glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glLoadMatrixf (projection);
-//	glOrthof(left, right, bottom, top, near, far);
-	
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-    glLoadMatrixf (modelview);
-//	glTranslatef(xposition, yposition, zposition);	// move things into view
     
-    getBoneData();
-    
-/*
-    // draw a plane first
-    GLfloat planeSize  = 200.0f;
-    GLfloat quad[12] = { planeSize, 0.f, planeSize, -planeSize, 0.f, planeSize, -planeSize,0.f,-planeSize, planeSize, 0.f, -planeSize };
-    GLubyte indices[] = {0,2,1, 0,3,2};
-    
-    glColor4f(1, 1, 0, 1);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, &quad[0]);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
-    glDisableClientState(GL_VERTEX_ARRAY);
-    
-*/
-    // draw bones
-    glPointSize(2.0f);
-    glLineWidth(1.0f);
-    glColor4f(1, 1, 1, 1);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, (const GLfloat*)&jointPos[0]);
-    glDrawArrays(GL_POINTS, 0, numJoints);
-    glDrawElements(GL_LINES,numJoints*2,GL_UNSIGNED_SHORT, boneIdx);
-    glDisableClientState(GL_VERTEX_ARRAY);   
-    
-    
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, (const GLfloat*)&jointPos1[0]);
-    glDrawArrays(GL_POINTS, 0, numJoints);
-    glDrawElements(GL_LINES,numJoints*2,GL_UNSIGNED_SHORT, boneIdx);
-    glDisableClientState(GL_VERTEX_ARRAY);     
-
+    CGRect rect = [[UIScreen mainScreen] bounds];
+	width = rect.size.width;
+	height = rect.size.height;
+    SBDrawFrame(width, height);
 	
 	glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
     [context presentRenderbuffer:GL_RENDERBUFFER_OES];
@@ -217,7 +175,6 @@
     CGPoint diff;
     diff.x = endPoint.x - startPoint.x;
     diff.y = endPoint.y - startPoint.y;    
-    getCamera(diff.y, diff.y, startPoint.x, startPoint.y, endPoint.y, endPoint.y, cameraMode);    
 }
 
 
@@ -229,55 +186,29 @@
     diff.x = currentPoint.x - prevPoint.x;
     diff.y = currentPoint.y - prevPoint.y;
     prevPoint = currentPoint;
+    
+    SBCameraOperation(diff.x, diff.y);
 }
 
 
 - (void)setupView
-{
+{   
+	// get screen dimensions
+	CGRect rect = [[UIScreen mainScreen] bounds];
+	width = rect.size.width;
+	height = rect.size.height;
+
     static bool once = true;
     if (once)
     {
         
         NSString *dirPath = [[[NSBundle mainBundle] resourcePath]
-                                   stringByAppendingPathComponent:@"assests"];
+                             stringByAppendingPathComponent:@"assests"];
         const char* mediaPath = [dirPath UTF8String];
         SBInitialize(mediaPath);
+        SBSetupDrawing(width, height);
         once = false;
     }
-    
-    getCamera(0, 0, 0, 0, 0, 0, -1);
-    cameraMode = 0;
-    
-	// get screen dimensions
-	CGRect rect = [[UIScreen mainScreen] bounds];
-	width = rect.size.width;
-	height = rect.size.height;
-	
-	// world dimensions
-	left = -width/2.0;							// divide by 2 to center everything
-	right = width/2.0;
-	bottom = -height/2.0;	
-	top = height/2.0;
-	//near = 1.0f;
-	//far =  300.0f;
-	near = 100.0f;
-	far = -100.0f;
-	//near = -1.0f;
-    //far = -300.0f;
-	
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-    glEnable(GL_CULL_FACE);
-    glShadeModel(GL_SMOOTH);
-    glDisable(GL_DEPTH_TEST);	
-		
-	// init world location
-	xposition = 0.0;
-	yposition = 0.0;
-	zposition = -2.0;
-    
-    swidth = width;
-    sheight = height;
-	
 }
 
 
