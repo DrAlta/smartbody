@@ -45,7 +45,7 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 	Fl_Group* firstGroup = new Fl_Group(xOffset, yOffset, w - 20, h/4 - 20, "");
 	firstGroup->begin();
 		character = new Fl_Choice(60 + xOffset, 20 + yOffset, w/8, 20, "Character");
-		loadCharacters(character);
+		loadCharacters(this);
 		character->callback(refreshChannels, this);
 
 		refresh = new Fl_Button(60+w/8+5 + xOffset, 20 + yOffset, w/16, 20, "Refresh");
@@ -399,9 +399,11 @@ void ChannelBufferWindow::loadMotions(ChannelBufferWindow* window)
 	window->motion->value(0);
 }
 
-void ChannelBufferWindow::loadCharacters(Fl_Choice* characterChoice)
-{
+void ChannelBufferWindow::loadCharacters(ChannelBufferWindow* window)
+{	
+	Fl_Choice* characterChoice = window->character;
 	characterChoice->clear();
+	characterChoice->add(window->no_motion.c_str());
 	const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (size_t i = 0; i < charNames.size(); i++)
 	{
@@ -413,12 +415,15 @@ void ChannelBufferWindow::loadCharacters(Fl_Choice* characterChoice)
 }
 
 void ChannelBufferWindow::loadControllers(Fl_Choice* controller, Fl_Choice* character)
-{
-	controller->clear();
-
+{	
+	if (!character || !controller)
+		return;
 	if(character->mvalue()== NULL) return;
 
+	controller->clear();
 	SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter(character->mvalue()->label());
+
+	if (!actor) return;
 
 	controller->add("All controllers");
 
@@ -485,11 +490,21 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 	Fl_Choice* character = window->character;
 	if(character->mvalue()== NULL) return;
 	SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter(character->mvalue()->label());
-	SkSkeleton* skeleton = actor->getSkeleton();
+	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(window->motion->mvalue()->label());
+	if (!actor && !motion) return;
+	
+	SkChannelArray* pchannel = NULL;
+	if (actor)
+	{
+		pchannel = &actor->ct_tree_p->channels(); 
+	}
+	else if (motion)
+	{
+		pchannel = &motion->channels();
+	}
 
-	SkChannelArray& channels = actor->ct_tree_p->channels(); //skeleton->channels();
+	SkChannelArray& channels = *pchannel;//skeleton->channels();
 	int numChannels = channels.size();
-
 	clearChannelItem(window);
 	initChannelItem(window, numChannels);
 
@@ -500,9 +515,9 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 
 	for (int i = 0; i < numChannels; i++)
 	{
-		joint = channels.joint(i);
-		if(joint == NULL) continue;
-
+		//joint = channels.joint(i);
+		//if(joint == NULL) continue;
+		
 		SkChannel& channel = channels[i];
 		int channelSize = channel.size();
 		if(channel.type == SkChannel::XPos) sprintf(ext, "_x");
@@ -510,7 +525,8 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 		else if(channel.type == SkChannel::ZPos) sprintf(ext, "_z");
 		else ext[0] = '\0';
 
-		sprintf(str, "%s%s (%d)", joint->jointName().c_str(), ext, channelSize);
+		//sprintf(str, "%s%s (%d)", joint->jointName().c_str(), ext, channelSize);
+		sprintf(str, "%s%s (%d)", channels.mappedName(i).c_str(), ext, channelSize);
 		ChannelItem& item = window->Channel_item_list[i];
 		item.channel_filtered = false;
 		item.motion_filtered = false;
@@ -518,7 +534,8 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 		item.not_in_search = false;
 		item.index = channel_index;
 		item.label->assign(str);
-		item.name->assign(joint->jointName());
+		//item.name->assign(joint->jointName());
+		item.name->assign(channels.mappedName(i));
 		item.type = channel.type;
 		channel_index += channelSize;
 	}
@@ -537,7 +554,7 @@ const char* ChannelBufferWindow::getSelectedCharacterName()
 void ChannelBufferWindow::refreshCharacters(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
-	loadCharacters(window->character);
+	loadCharacters(window);
 	loadControllers(window->controller, window->character);
 	loadMotions(window);
 }
@@ -552,6 +569,7 @@ void ChannelBufferWindow::refreshChannels(Fl_Widget* widget, void* data)
 {
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	loadChannels(window);
+	loadControllers(window->controller,window->character);
 	window->chartview->get_archive()->ClearSeries();
 	refreshChannelsWidget(window);
 	refreshMonitoredChannelsWidget(window);
@@ -584,7 +602,8 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 	SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(window->motion->mvalue()->label());
 	if (motion)
 	{
-		motion->connect(actor->getSkeleton());
+		loadChannels(window);
+		//motion->connect(actor->getSkeleton());
 		refreshMaxSize(window, motion->frames());
 		SkChannelArray& channels = motion->channels();
 		for(size_t i = 0; i < window->Channel_item_list.size(); ++i)
@@ -593,6 +612,7 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 		}
 		for(int i = 0; i < channels.size(); ++i)
 		{
+#if 0
 			if(channels.joint(i) == NULL) continue;
 			std::string name = channels.joint(i)->jointName();
 			SkChannel::Type type = channels.get(i).type;
@@ -607,6 +627,22 @@ void ChannelBufferWindow::refreshMotionChannels(Fl_Widget* widget, void* data)
 					break;
 				}
 			}
+#else
+			//if(channels.mappedName(i) == NULL) continue;
+			std::string name = channels.mappedName(i);//joint(i)->jointName();
+			SkChannel::Type type = channels.get(i).type;
+			for(j = 0; j < window->Channel_item_list.size(); ++j)
+			{
+				if(strcmp(window->Channel_item_list[j].name->c_str(), name.c_str()) == 0
+					&& window->Channel_item_list[j].type == type)
+				{
+					window->Channel_item_list[j].motion_filtered = false;
+					if(window->Channel_item_list[j].monitored) 
+						fillSeriesWithMotionData(window, motion, NULL, window->Channel_item_list[j]);
+					break;
+				}
+			}
+#endif
 		}
 	}
 	refreshChannelsWidget(window);
@@ -621,6 +657,9 @@ void ChannelBufferWindow::refreshHideOtherChannels(Fl_Widget* widget, void* data
 
 void ChannelBufferWindow::refreshControllerVisibilities(ChannelBufferWindow* window)
 {
+	if (!window->motion->mvalue() || !window->controller->mvalue())
+		return;
+
 	if(strcmp(window->motion->mvalue()->label(), window->no_motion.c_str()) == 0)
 	{
 		window->controller->activate();
@@ -671,7 +710,8 @@ void ChannelBufferWindow::refreshControllerChannels(Fl_Widget* widget, void* dat
 			for(int j = 0; j < channelsInUse.size(); ++j)
 			{
 				int index = actor->ct_tree_p->controller(i)->getContextChannel(j);
-				window->Channel_item_list[index].channel_filtered = false;
+				if (index >= 0 && index < window->Channel_item_list.size())
+					window->Channel_item_list[index].channel_filtered = false;
 			}
 		}
 	}
@@ -683,12 +723,13 @@ void ChannelBufferWindow::addMonitoredChannel(Fl_Widget* widget, void* data)
 	ChannelBufferWindow* window = (ChannelBufferWindow*) data;
 	GlChartViewSeries* series = NULL;
 	std::map<std::string, SkMotion*>::iterator motionIter;
-	SkMotion* motion = NULL;
+	SmartBody::SBMotion * motion = NULL;
 	if(window->mode == 2)
 	{
 		SmartBody::SBCharacter* actor = SmartBody::SBScene::getScene()->getCharacter(window->character->mvalue()->label());
-		SmartBody::SBMotion * motion = SmartBody::SBScene::getScene()->getMotion(window->motion->mvalue()->label());
-		if (motion)
+		std::string moName = window->motion->mvalue()->label();
+		motion = SmartBody::SBScene::getScene()->getMotion(moName);
+		if (motion && actor)
 		{
 			motion->connect(actor->getSkeleton());
 		}
@@ -723,7 +764,8 @@ void ChannelBufferWindow::addMonitoredChannel(Fl_Widget* widget, void* data)
 
 void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, SkMotion* motion, GlChartViewSeries* series, ChannelItem& item)
 {
-	if(motion == NULL || motion->connected_skeleton() == NULL) return;
+	if(motion == NULL) return;
+
 	if(series == NULL)
 	{
 		series = window->chartview->get_archive()->GetSeries(item.label->c_str());
@@ -733,8 +775,8 @@ void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, 
 	SkChannelArray& channels = motion->channels();
 	for(index = 0; index < channels.size(); ++index)
 	{
-		if(channels[index].joint == NULL) continue;
-		std::string name = channels[index].joint->jointName().c_str();
+		//if(channels[index].joint == NULL) continue;
+		std::string name = channels.mappedName(index);//channels[index].joint->jointName().c_str();
 		if(strcmp(name.c_str(), item.name->c_str()) == 0 && item.type == channels[index].type)
 		{
 			break;
@@ -749,8 +791,9 @@ void ChannelBufferWindow::fillSeriesWithMotionData(ChannelBufferWindow* window, 
 	series->dt = motionDt;
 	for(int k = 0; k < window->num_of_frames; ++k)
 	{
-		motion->apply_frame(k);
-		channels[index].get(val);
+		//motion->apply_frame(k);			
+		//channels[index].get(val);
+		motion->getChannelValueAtFrame(k,index,val); // provide a more direct API for getting the channel values
 		if(series->data_type == 1)
 		{
 			series->Push(val[0]);
@@ -868,7 +911,7 @@ void ChannelBufferWindow::update()
 				SrBuffer<float>& buffer = char_p->ct_tree_p->getLastFrame().buffer();
 				chartview->get_archive()->Update(buffer);
 			}
-			if(mode == 1)
+			if(mode == 1 && controller->mvalue())
 			{
 				int buff_counter = 0;
 				int ct_num = actor->ct_tree_p->count_controllers();
@@ -881,6 +924,9 @@ void ChannelBufferWindow::update()
 						for(int j = 0; j < channelsInUse.size(); ++j)
 						{
 							int index = actor->ct_tree_p->controller(i)->getContextChannel(j);
+							if (index < 0 || index >= Channel_item_list.size())
+								continue;
+
 							if(Channel_item_list[index].monitored)
 							{
 								if(Channel_item_list[index].type == SkChannel::XPos

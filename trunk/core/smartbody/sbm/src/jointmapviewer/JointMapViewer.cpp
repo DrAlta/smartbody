@@ -1457,8 +1457,12 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	//standardSkeletonViewer->setTestMotion(testCommonSkMotion);	
 
 	updateTestMotions();
+
 	if (_choiceTestMotions->size() >= 1)
+	{
 		_choiceTestMotions->value(0);
+		setTestMotion(_choiceTestMotions->text());
+	}	
 
 
 

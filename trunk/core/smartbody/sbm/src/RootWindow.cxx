@@ -775,7 +775,7 @@ void BaseWindow::LaunchJointMapViewerCB( Fl_Widget* widget, void* data )
 	{
 		rootWindow->fltkViewer->_retargetStepWindow = new RetargetStepWindow(150, 150, 1024, 500, "Joint Map Viewer");
 	}
-	rootWindow->fltkViewer->_retargetStepWindow->setApplyType(true);
+	rootWindow->fltkViewer->_retargetStepWindow->setApplyType(false);
 	rootWindow->fltkViewer->_retargetStepWindow->show();
 }
 
