@@ -191,6 +191,27 @@ void SkMotion::connect ( float* buffer )
 void SkMotion::apply_frame ( int f ) {
 	apply_frame( f, _floatbuffer, NULL );
 }
+
+
+void SkMotion::getChannelValueAtFrame( int f, int index, float* val )
+{
+	if ( _frames.size()==0 )
+		return;
+	if (f > _frames.size()-1 || f < 0)
+		return;
+	if (index > _channels.size()-1 || index < 0)
+		return;
+	
+	int i = _frames.size()-1;
+	f = SR_BOUND(f,0,i);
+	float* fp = _frames[f].posture;
+	
+	SkChannel& chan = _channels[index];
+	int fidx = _channels.float_position(index);
+	for (int i=0;i<chan.size();i++)
+		val[i] = fp[fidx+i];
+}
+
 void SkMotion::apply_frame ( int f, float* buffer, SrBuffer<int>* map_p, bool isAdditive ) {
 	if ( _frames.size()==0 )
 		return;
@@ -488,6 +509,7 @@ void SkMotion::applyNew ( float t,
 		}
 	}
 }
+
 
 
 void SkMotion::apply ( float t,  

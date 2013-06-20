@@ -193,6 +193,9 @@ public :
 	be out of range to specify extreme postures. */
 	SBAPI void apply_frame ( int f, float* buffer, SrBuffer<int>* map_p, bool isAdditive = false );	
 
+	SBAPI void getChannelValueAtFrame(int f, int index, float* val);
+
+	
 	/*! Interpolation type used by apply */
 	enum InterpType { Linear, CubicSpline };
 

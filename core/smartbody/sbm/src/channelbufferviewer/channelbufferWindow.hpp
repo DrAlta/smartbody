@@ -110,7 +110,7 @@ public:
 protected:
 	static void clearChannelItem(ChannelBufferWindow* window);
 	static void initChannelItem(ChannelBufferWindow* window, int num);
-	static void loadCharacters(Fl_Choice* character);
+	static void loadCharacters(ChannelBufferWindow* window);
 	static void loadControllers(Fl_Choice* controller, Fl_Choice* character);
 	static void loadChannels(ChannelBufferWindow* window);
 	static void loadMotions(ChannelBufferWindow* window);
