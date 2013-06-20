@@ -1,3 +1,4 @@
+#include <sb/SBTypes.h>
 #include <sb/SBNavigationMesh.h>
 #include <external/recast/Recast.h>
 #include <external/recast/DetourNavMeshBuilder.h>
@@ -64,7 +65,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMesh( SrModel& inMesh )
 	const float* bmax = &bBox.b[0];
 	const float* verts = &inMesh.V.get(0)[0];
  	const int nverts = inMesh.V.size();
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
  	//const int* tris = &inMesh.F.get(0)[0];
         // need to convert to integer array
         int* tris = new int[inMesh.F.size()*3];

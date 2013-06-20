@@ -38,9 +38,13 @@
 # include <Windows.h>
 # endif
 
-# ifdef __APPLE__
-# include <OpenGL/gl.h>
-# include <OpenGL/glu.h>
+
+#if defined(SB_IPHONE)
+#include <OpenGLES/ES1/gl.h>
+#include <OpenGLES/ES1/glext.h>
+#elif __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 #elif __native_client__
 #include <GLES2/gl2.h>
 #elif defined(__ANDROID__)
@@ -58,7 +62,7 @@ class SrLight;
 class SrOutput;
 class SrMaterial;
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 #define GLES_RENDER 1
 #define GLdouble GLfloat
 #endif

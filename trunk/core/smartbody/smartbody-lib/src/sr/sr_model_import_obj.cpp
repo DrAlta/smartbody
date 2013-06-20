@@ -19,19 +19,11 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-# include <sr/sr_string_array.h>
-# include <sr/sr_model.h>
+#include <sr/sr_string_array.h>
+#include <sr/sr_model.h>
+#include <sb/SBTypes.h>
 
-#ifdef __APPLE__
-#include "TargetConditionals.h"
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#ifndef SBM_IPHONE
-#define SBM_IPHONE
-#endif
-#endif
-#endif
-
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE)
 #include <sbm/GPU/SbmTexture.h>
 #endif
 
@@ -75,7 +67,7 @@ static SrColor read_color ( SrInput& in )
 
 static void load_texture(int type, const char* file, const SrStringArray& paths)
 {
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE)
 	SrString s;
 	SrInput in;
 	std::string imageFile = file;
@@ -301,7 +293,7 @@ bool SrModel::import_obj ( const char* file )
    compress ();
 
    // after remove all redundant materials, load the corresponding textures   
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE)
    for (int i=0;i<M.size();i++)
    {
 	   std::string matName = mtlnames[i];

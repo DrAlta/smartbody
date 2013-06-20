@@ -21,8 +21,11 @@
  */
 
 #include "vhcl.h"
+#include <sb/SBTypes.h>
 #ifdef __ANDROID__
 #include <GLES/gl.h>
+#elif defined(SB_IPHONE)
+#include <OpenGLES/ES1/gl.h>
 #else
 #include "external/glew/glew.h"
 #endif
@@ -50,20 +53,21 @@
 
 void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 {
-	
 	DeformableMesh* mesh = shape->getDeformableMesh();
-	if (!mesh) return; // no deformable mesh
+	if (!mesh)
+    {
+        LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
+        return; // no deformable mesh
+    }
 	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
-
 	glEnable(GL_TEXTURE_2D);
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
 	glEnableClientState(GL_NORMAL_ARRAY);
-	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);	
+	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glDisable(GL_COLOR_MATERIAL);	  	
@@ -72,18 +76,20 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
 	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);      	
 	
-	
+	//LOG("size of sub mesh list %d", subMeshList.size());
+    
+    glDisable(GL_LIGHTING);
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{	
-		SbmSubMesh* mesh = subMeshList[i];	
+		SbmSubMesh* mesh = subMeshList[i];
 		glMaterial(mesh->material);
-		//LOG("mat color = %f %f %f\n",color[0],color[1],color[2]);		
+		//LOG("mat color = %f %f %f\n",color[0],color[1],color[2]);
 		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,mesh->texName.c_str());
 		//LOG("texManager size = %d, tex = %d, texName= %s",SbmTextureManager::singleton(),tex, mesh->texName.c_str());
 		if (tex)
 		{
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D,tex->getID());			
+			glBindTexture(GL_TEXTURE_2D,tex->getID());
 		}
 		
 #if GLES_RENDER
@@ -93,7 +99,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 #endif
 		glBindTexture(GL_TEXTURE_2D,0);
 	}	
-	
+	glEnable(GL_LIGHTING);
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);

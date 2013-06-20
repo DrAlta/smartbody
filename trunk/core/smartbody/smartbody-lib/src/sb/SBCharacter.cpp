@@ -813,6 +813,7 @@ SmartBody::SBReach* SBCharacter::getReach()
 
 void SBCharacter::setDeformableMeshName( std::string meshName )
 {
+    LOG("set deformable mesh name to be %s", meshName.c_str());
 	SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(getAttribute("deformableMesh"));
 	if (meshAttribute->getValue() != meshName)
 		meshAttribute->setValueFast(meshName); // don't notify the observer

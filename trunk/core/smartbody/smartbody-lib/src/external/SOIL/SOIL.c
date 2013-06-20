@@ -15,6 +15,8 @@
 
 #define SOIL_CHECK_FOR_GL_ERRORS 0
 
+#include <sb/SBTypes.h>
+
 #ifdef WIN32
 	//#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
@@ -23,6 +25,9 @@
 #elif defined(BUILD_ANDROID)
 	#include <GLES2/gl2.h>
 	#include <GLES2/gl2ext.h>
+#elif defined(SB_IPHONE)
+    #include <OpenGLES/ES1/gl.h>
+    #include <OpenGLES/ES1/glext.h>
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
        #include <OpenGL/gl.h>
 //       #include <Carbon/Carbon.h>
@@ -85,11 +90,11 @@ int query_DXT_capability( void );
 #define SOIL_RGBA_S3TC_DXT3		0x83F2
 #define SOIL_RGBA_S3TC_DXT5		0x83F3
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 #define GL_CLAMP GL_CLAMP_TO_EDGE;
 #endif
 
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 typedef void (APIENTRY* P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid * data);
 P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC soilGlCompressedTexImage2D = NULL;
 #endif
@@ -1008,7 +1013,7 @@ unsigned int
 	/*	variables	*/
 	unsigned char* img;
 	unsigned int tex_id;
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	unsigned int internal_texture_format = 0, original_texture_format = 0;
 	int DXT_mode = SOIL_CAPABILITY_UNKNOWN;
 	int max_supported_size;
@@ -1759,7 +1764,7 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 					S3TC_type, GL_UNSIGNED_BYTE, DDS_data );
 			} else
 			{
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 				soilGlCompressedTexImage2D(
 					cf_target, 0,
 					S3TC_type, width, height, 0,
@@ -1988,7 +1993,7 @@ int query_DXT_capability( void )
 		} else
 		{
 			/*	and find the address of the extension function	*/
-			#if !defined(__ANDROID__)
+			#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 			P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC ext_addr = NULL;
 			#else
 			void* ext_addr = NULL;
@@ -2025,7 +2030,7 @@ int query_DXT_capability( void )
 				CFRelease( bundle );
 */
 				ext_addr = NULL;
-			#elif defined(__FLASHPLAYER__) || defined(__ANDROID__)			
+			#elif defined(__FLASHPLAYER__) || defined(__ANDROID__) || defined(SB_IPHONE)
 			#else
 				ext_addr = (P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC)
 						glXGetProcAddressARB
@@ -2046,7 +2051,7 @@ int query_DXT_capability( void )
 			} else
 			{
 				/*	all's well!	*/
-			#if !defined(__ANDROID__)
+			#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 				soilGlCompressedTexImage2D = ext_addr;
 				has_DXT_capability = SOIL_CAPABILITY_PRESENT;
 			#endif

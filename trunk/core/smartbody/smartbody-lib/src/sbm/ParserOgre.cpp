@@ -33,17 +33,10 @@
 #include <sbm/BMLDefs.h>
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBTypes.h>
 
-#ifdef __APPLE__
-#include "TargetConditionals.h"
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#ifndef SBM_IPHONE
-#define SBM_IPHONE
-#endif
-#endif
-#endif
 
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE)
 #include <sbm/GPU/SbmTexture.h>
 #endif
 
@@ -1365,7 +1358,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 	{
 		std::string matName = mi->first;
 		std::string textureName = "";
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE)
 		if (materialTextureMap.find(matName) != materialTextureMap.end())
 		{
 			 textureName = materialTextureMap[matName];
@@ -1443,7 +1436,7 @@ bool ParserOgre::parseMeshMaterial( std::vector<SrModel*>& meshModelVec, std::st
 
 void ParserOgre::loadTexture( int type, std::string texFileName, const SrStringArray& paths )
 {
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE)
 	SrString s;
 	SrInput in;
 	std::string imageFile = texFileName;

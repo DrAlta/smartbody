@@ -18,6 +18,8 @@
 */
 
 #include "vhcl.h"
+
+#include <sb/SBTypes.h>
 #include "sb/sbm_character.hpp"
 
 #include <stdio.h>
@@ -84,7 +86,7 @@
 #include <controllers/me_ct_physics_controller.h>
 
 // android does not use GPU shader for now
-#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SBM_IPHONE)
+#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #endif
 

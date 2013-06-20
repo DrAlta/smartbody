@@ -705,7 +705,7 @@ static void insertv ( SrTree<VertexNode>& t, SrArray<int>& vi, int v, int f )
 int SrModel::common_vertices_of_faces ( int i1, int i2 )
  {
    int i, j, c=0;
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
    unsigned short *f1 = &(F[i1].a);
    unsigned short *f2 = &(F[i2].a);
 #else

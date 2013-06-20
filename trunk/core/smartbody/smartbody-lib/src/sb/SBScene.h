@@ -16,15 +16,6 @@
 #endif
 #endif
 
-#ifdef __APPLE__
-#include "TargetConditionals.h"
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#ifndef SBM_IPHONE
-#define SBM_IPHONE
-#endif
-#endif
-#endif
-
 class SBDebuggerServer;
 class SBDebuggerClient;
 class SBDebuggerUtility;

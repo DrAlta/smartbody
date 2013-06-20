@@ -18,6 +18,7 @@
 #include <sb/SBCommandManager.h>
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBReach.h>
+#include <sb/SBTypes.h>
 #include <bml/bml_processor.hpp>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_blend.hpp>
@@ -31,7 +32,7 @@
 #include <boost/version.hpp>
 
 // android does not use GPU shader for now
-#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SBM_IPHONE)
+#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #endif
 
@@ -1099,7 +1100,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 			// insert mesh map	
 			character->dMesh_p->meshName = meshName;
 			scene->getAssetManager()->addDeformableMesh(meshName, character->dMesh_p);
-			//LOG("character %s, set deformable mesh",character->getName().c_str());
+			LOG("character %s, set deformable mesh",character->getName().c_str());
 			character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
 
 		}
@@ -1585,7 +1586,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								if (character->scene_p)
 									character->scene_p->set_visibility(0,0,0,0);
 								character->dMesh_p->set_visibility(1);
-							#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SBM_IPHONE)
+							#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)
 								SbmDeformableMeshGPU::useGPUDeformableMesh = true;
 							#endif
 								if (character->dMeshInstance_p)

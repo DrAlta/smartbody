@@ -31,19 +31,7 @@
 #include <cctype>
 #include <string>
 #include <sbm/BMLDefs.h>
-
-#ifdef __APPLE__
-#include "TargetConditionals.h"
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#ifndef SBM_IPHONE
-#define SBM_IPHONE
-#endif
-#endif
-#endif
-
-#if !defined(SBM_IPHONE)
 #include <sbm/GPU/SbmTexture.h>
-#endif
 
 
 bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::string pathName, float scale, bool doParseSkeleton, bool doParseMotion)
@@ -1812,7 +1800,6 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 			path.extract_file_name(filename);
 			SrStringArray paths;
 			paths.push ( path );
-#if !defined(SBM_IPHONE)
 			for (int i = 0; i < newModel->M.size(); i++)
 			{
 			   std::string matName = newModel->mtlnames[i];
@@ -1830,7 +1817,6 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 				   ParserOpenCOLLADA::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, newModel->mtlSpecularTexNameMap[matName].c_str(), paths);	   
 			   }
 			}
-#endif
 		}
 	}	
 }
@@ -1883,7 +1869,6 @@ void ParserOpenCOLLADA::setModelVertexSource( std::string& sourceName, std::stri
 
 void ParserOpenCOLLADA::load_texture(int type, const char* file, const SrStringArray& paths)
 {
-#if !defined(SBM_IPHONE)
 	SrString s;
 	SrInput in;
 	std::string imageFile = file;
@@ -1899,7 +1884,6 @@ void ParserOpenCOLLADA::load_texture(int type, const char* file, const SrStringA
 	if (!in.valid()) return;		
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
 	texManager.loadTexture(type,file,s);	
-#endif
 }
 
 
