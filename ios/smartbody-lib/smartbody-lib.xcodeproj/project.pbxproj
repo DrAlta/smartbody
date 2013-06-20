@@ -28,6 +28,36 @@
 		AA07BE0A14D245850073B99A /* me_ct_physics_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA07BE0814D245850073B99A /* me_ct_physics_controller.cpp */; };
 		AA07BE0B14D245850073B99A /* me_ct_physics_controller.h in Headers */ = {isa = PBXBuildFile; fileRef = AA07BE0914D245850073B99A /* me_ct_physics_controller.h */; };
 		AA2193CD143147D400187A71 /* action_unit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA2193CC143147D400187A71 /* action_unit.cpp */; };
+		AA54F2F1176FB783000F6F8B /* sr_gl_render_funcs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA54F2EB176FB783000F6F8B /* sr_gl_render_funcs.cpp */; };
+		AA54F2F2176FB783000F6F8B /* sr_gl_render_funcs.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F2EC176FB783000F6F8B /* sr_gl_render_funcs.h */; };
+		AA54F2F3176FB783000F6F8B /* sr_gl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA54F2ED176FB783000F6F8B /* sr_gl.cpp */; };
+		AA54F2F4176FB783000F6F8B /* sr_gl.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F2EE176FB783000F6F8B /* sr_gl.h */; };
+		AA54F2F5176FB783000F6F8B /* sr_sa_gl_render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA54F2EF176FB783000F6F8B /* sr_sa_gl_render.cpp */; };
+		AA54F2F6176FB783000F6F8B /* sr_sa_gl_render.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F2F0176FB783000F6F8B /* sr_sa_gl_render.h */; };
+		AA54F34E176FBFAC000F6F8B /* mat2.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F33B176FBFAC000F6F8B /* mat2.h */; };
+		AA54F34F176FBFAC000F6F8B /* mat3.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F33C176FBFAC000F6F8B /* mat3.h */; };
+		AA54F350176FBFAC000F6F8B /* mat4.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F33D176FBFAC000F6F8B /* mat4.h */; };
+		AA54F351176FBFAC000F6F8B /* vec2.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F33E176FBFAC000F6F8B /* vec2.h */; };
+		AA54F352176FBFAC000F6F8B /* vec3.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F33F176FBFAC000F6F8B /* vec3.h */; };
+		AA54F353176FBFAC000F6F8B /* vec4.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F340176FBFAC000F6F8B /* vec4.h */; };
+		AA54F355176FBFAC000F6F8B /* SbmDeformableMeshGPU.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F342176FBFAC000F6F8B /* SbmDeformableMeshGPU.h */; };
+		AA54F357176FBFAC000F6F8B /* SbmShader.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F344176FBFAC000F6F8B /* SbmShader.h */; };
+		AA54F358176FBFAC000F6F8B /* SbmTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA54F345176FBFAC000F6F8B /* SbmTexture.cpp */; };
+		AA54F359176FBFAC000F6F8B /* SbmTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F346176FBFAC000F6F8B /* SbmTexture.h */; };
+		AA54F35A176FBFAC000F6F8B /* fs_skin_render.frag in Sources */ = {isa = PBXBuildFile; fileRef = AA54F348176FBFAC000F6F8B /* fs_skin_render.frag */; };
+		AA54F35B176FBFAC000F6F8B /* vs_skin_pos.vert in Sources */ = {isa = PBXBuildFile; fileRef = AA54F349176FBFAC000F6F8B /* vs_skin_pos.vert */; };
+		AA54F35D176FBFAC000F6F8B /* TBOData.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F34B176FBFAC000F6F8B /* TBOData.h */; };
+		AA54F35F176FBFAC000F6F8B /* VBOData.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F34D176FBFAC000F6F8B /* VBOData.h */; };
+		AA54F36C1770D850000F6F8B /* image_DXT.c in Sources */ = {isa = PBXBuildFile; fileRef = AA54F3611770D850000F6F8B /* image_DXT.c */; };
+		AA54F36D1770D850000F6F8B /* image_DXT.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F3621770D850000F6F8B /* image_DXT.h */; };
+		AA54F36E1770D850000F6F8B /* image_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = AA54F3631770D850000F6F8B /* image_helper.c */; };
+		AA54F36F1770D850000F6F8B /* image_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F3641770D850000F6F8B /* image_helper.h */; };
+		AA54F3701770D850000F6F8B /* SOIL.c in Sources */ = {isa = PBXBuildFile; fileRef = AA54F3651770D850000F6F8B /* SOIL.c */; };
+		AA54F3711770D850000F6F8B /* SOIL.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F3661770D850000F6F8B /* SOIL.h */; };
+		AA54F3721770D850000F6F8B /* stb_image_aug.c in Sources */ = {isa = PBXBuildFile; fileRef = AA54F3671770D850000F6F8B /* stb_image_aug.c */; };
+		AA54F3731770D850000F6F8B /* stb_image_aug.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F3681770D850000F6F8B /* stb_image_aug.h */; };
+		AA54F3741770D850000F6F8B /* stbi_DDS_aug.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F3691770D850000F6F8B /* stbi_DDS_aug.h */; };
+		AA54F3751770D850000F6F8B /* stbi_DDS_aug_c.h in Headers */ = {isa = PBXBuildFile; fileRef = AA54F36A1770D850000F6F8B /* stbi_DDS_aug_c.h */; };
 		AA563F5E14D3AF2900D4A91D /* AnsHeap.C in Sources */ = {isa = PBXBuildFile; fileRef = AA563F1214D3AF2900D4A91D /* AnsHeap.C */; };
 		AA563F5F14D3AF2900D4A91D /* AnsHeap.h in Headers */ = {isa = PBXBuildFile; fileRef = AA563F1314D3AF2900D4A91D /* AnsHeap.h */; };
 		AA563F6014D3AF2900D4A91D /* AnswerTree.C in Sources */ = {isa = PBXBuildFile; fileRef = AA563F1414D3AF2900D4A91D /* AnswerTree.C */; };
@@ -708,6 +738,36 @@
 		AA07BE0814D245850073B99A /* me_ct_physics_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_physics_controller.cpp; sourceTree = "<group>"; };
 		AA07BE0914D245850073B99A /* me_ct_physics_controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = me_ct_physics_controller.h; sourceTree = "<group>"; };
 		AA2193CC143147D400187A71 /* action_unit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = action_unit.cpp; sourceTree = "<group>"; };
+		AA54F2EB176FB783000F6F8B /* sr_gl_render_funcs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_gl_render_funcs.cpp; sourceTree = "<group>"; };
+		AA54F2EC176FB783000F6F8B /* sr_gl_render_funcs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_gl_render_funcs.h; sourceTree = "<group>"; };
+		AA54F2ED176FB783000F6F8B /* sr_gl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_gl.cpp; sourceTree = "<group>"; };
+		AA54F2EE176FB783000F6F8B /* sr_gl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_gl.h; sourceTree = "<group>"; };
+		AA54F2EF176FB783000F6F8B /* sr_sa_gl_render.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_sa_gl_render.cpp; sourceTree = "<group>"; };
+		AA54F2F0176FB783000F6F8B /* sr_sa_gl_render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_sa_gl_render.h; sourceTree = "<group>"; };
+		AA54F33B176FBFAC000F6F8B /* mat2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mat2.h; sourceTree = "<group>"; };
+		AA54F33C176FBFAC000F6F8B /* mat3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mat3.h; sourceTree = "<group>"; };
+		AA54F33D176FBFAC000F6F8B /* mat4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mat4.h; sourceTree = "<group>"; };
+		AA54F33E176FBFAC000F6F8B /* vec2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec2.h; sourceTree = "<group>"; };
+		AA54F33F176FBFAC000F6F8B /* vec3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec3.h; sourceTree = "<group>"; };
+		AA54F340176FBFAC000F6F8B /* vec4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec4.h; sourceTree = "<group>"; };
+		AA54F342176FBFAC000F6F8B /* SbmDeformableMeshGPU.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmDeformableMeshGPU.h; sourceTree = "<group>"; };
+		AA54F344176FBFAC000F6F8B /* SbmShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmShader.h; sourceTree = "<group>"; };
+		AA54F345176FBFAC000F6F8B /* SbmTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SbmTexture.cpp; sourceTree = "<group>"; };
+		AA54F346176FBFAC000F6F8B /* SbmTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmTexture.h; sourceTree = "<group>"; };
+		AA54F348176FBFAC000F6F8B /* fs_skin_render.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = fs_skin_render.frag; sourceTree = "<group>"; };
+		AA54F349176FBFAC000F6F8B /* vs_skin_pos.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = vs_skin_pos.vert; sourceTree = "<group>"; };
+		AA54F34B176FBFAC000F6F8B /* TBOData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TBOData.h; sourceTree = "<group>"; };
+		AA54F34D176FBFAC000F6F8B /* VBOData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VBOData.h; sourceTree = "<group>"; };
+		AA54F3611770D850000F6F8B /* image_DXT.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image_DXT.c; sourceTree = "<group>"; };
+		AA54F3621770D850000F6F8B /* image_DXT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image_DXT.h; sourceTree = "<group>"; };
+		AA54F3631770D850000F6F8B /* image_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image_helper.c; sourceTree = "<group>"; };
+		AA54F3641770D850000F6F8B /* image_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image_helper.h; sourceTree = "<group>"; };
+		AA54F3651770D850000F6F8B /* SOIL.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SOIL.c; sourceTree = "<group>"; };
+		AA54F3661770D850000F6F8B /* SOIL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SOIL.h; sourceTree = "<group>"; };
+		AA54F3671770D850000F6F8B /* stb_image_aug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image_aug.c; sourceTree = "<group>"; };
+		AA54F3681770D850000F6F8B /* stb_image_aug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_aug.h; sourceTree = "<group>"; };
+		AA54F3691770D850000F6F8B /* stbi_DDS_aug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_DDS_aug.h; sourceTree = "<group>"; };
+		AA54F36A1770D850000F6F8B /* stbi_DDS_aug_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_DDS_aug_c.h; sourceTree = "<group>"; };
 		AA563F1214D3AF2900D4A91D /* AnsHeap.C */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AnsHeap.C; path = parser/AnsHeap.C; sourceTree = "<group>"; };
 		AA563F1314D3AF2900D4A91D /* AnsHeap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AnsHeap.h; path = parser/AnsHeap.h; sourceTree = "<group>"; };
 		AA563F1414D3AF2900D4A91D /* AnswerTree.C */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AnswerTree.C; path = parser/AnswerTree.C; sourceTree = "<group>"; };
@@ -1380,6 +1440,60 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AA54F339176FBFAC000F6F8B /* GPU */ = {
+			isa = PBXGroup;
+			children = (
+				AA54F33A176FBFAC000F6F8B /* gfx */,
+				AA54F342176FBFAC000F6F8B /* SbmDeformableMeshGPU.h */,
+				AA54F344176FBFAC000F6F8B /* SbmShader.h */,
+				AA54F345176FBFAC000F6F8B /* SbmTexture.cpp */,
+				AA54F346176FBFAC000F6F8B /* SbmTexture.h */,
+				AA54F347176FBFAC000F6F8B /* shaderFiles */,
+				AA54F34B176FBFAC000F6F8B /* TBOData.h */,
+				AA54F34D176FBFAC000F6F8B /* VBOData.h */,
+			);
+			path = GPU;
+			sourceTree = "<group>";
+		};
+		AA54F33A176FBFAC000F6F8B /* gfx */ = {
+			isa = PBXGroup;
+			children = (
+				AA54F33B176FBFAC000F6F8B /* mat2.h */,
+				AA54F33C176FBFAC000F6F8B /* mat3.h */,
+				AA54F33D176FBFAC000F6F8B /* mat4.h */,
+				AA54F33E176FBFAC000F6F8B /* vec2.h */,
+				AA54F33F176FBFAC000F6F8B /* vec3.h */,
+				AA54F340176FBFAC000F6F8B /* vec4.h */,
+			);
+			path = gfx;
+			sourceTree = "<group>";
+		};
+		AA54F347176FBFAC000F6F8B /* shaderFiles */ = {
+			isa = PBXGroup;
+			children = (
+				AA54F348176FBFAC000F6F8B /* fs_skin_render.frag */,
+				AA54F349176FBFAC000F6F8B /* vs_skin_pos.vert */,
+			);
+			path = shaderFiles;
+			sourceTree = "<group>";
+		};
+		AA54F3601770D850000F6F8B /* SOIL */ = {
+			isa = PBXGroup;
+			children = (
+				AA54F3611770D850000F6F8B /* image_DXT.c */,
+				AA54F3621770D850000F6F8B /* image_DXT.h */,
+				AA54F3631770D850000F6F8B /* image_helper.c */,
+				AA54F3641770D850000F6F8B /* image_helper.h */,
+				AA54F3651770D850000F6F8B /* SOIL.c */,
+				AA54F3661770D850000F6F8B /* SOIL.h */,
+				AA54F3671770D850000F6F8B /* stb_image_aug.c */,
+				AA54F3681770D850000F6F8B /* stb_image_aug.h */,
+				AA54F3691770D850000F6F8B /* stbi_DDS_aug.h */,
+				AA54F36A1770D850000F6F8B /* stbi_DDS_aug_c.h */,
+			);
+			path = SOIL;
+			sourceTree = "<group>";
+		};
 		AA563F1114D3AE0700D4A91D /* parser */ = {
 			isa = PBXGroup;
 			children = (
@@ -1862,6 +1976,7 @@
 		AA9CD5F9141FF8D00064C27A /* external */ = {
 			isa = PBXGroup;
 			children = (
+				AA54F3601770D850000F6F8B /* SOIL */,
 				C40B0F7C1715327500F99C07 /* recast */,
 				C42C3DA3160D394F00A7D1D4 /* perlin.cpp */,
 				C42C3DA4160D394F00A7D1D4 /* perlin.h */,
@@ -1907,6 +2022,7 @@
 		AA9CD64E141FF8D00064C27A /* sbm */ = {
 			isa = PBXGroup;
 			children = (
+				AA54F339176FBFAC000F6F8B /* GPU */,
 				AAA6ABBF16EFB246006E8ACF /* Heightfield.cpp */,
 				AAA6ABC016EFB246006E8ACF /* Heightfield.h */,
 				AACEF10116EE63DB0044DCC6 /* me_utilities.hpp */,
@@ -2031,6 +2147,12 @@
 		AA9CD7C3141FF8D10064C27A /* sr */ = {
 			isa = PBXGroup;
 			children = (
+				AA54F2EB176FB783000F6F8B /* sr_gl_render_funcs.cpp */,
+				AA54F2EC176FB783000F6F8B /* sr_gl_render_funcs.h */,
+				AA54F2ED176FB783000F6F8B /* sr_gl.cpp */,
+				AA54F2EE176FB783000F6F8B /* sr_gl.h */,
+				AA54F2EF176FB783000F6F8B /* sr_sa_gl_render.cpp */,
+				AA54F2F0176FB783000F6F8B /* sr_sa_gl_render.h */,
 				AAA6ABCC16EFCA40006E8ACF /* sr_sn_colorsurf.cpp */,
 				AAA6ABCD16EFCA40006E8ACF /* sr_sn_colorsurf.h */,
 				AA9CD7DD141FF8D10064C27A /* sr.cpp */,
@@ -2538,6 +2660,26 @@
 				C40B0FA81715328E00F99C07 /* Recast.h in Headers */,
 				C40B0FAA1715328E00F99C07 /* RecastAlloc.h in Headers */,
 				C40B0FAC1715328E00F99C07 /* RecastAssert.h in Headers */,
+				AA54F2F2176FB783000F6F8B /* sr_gl_render_funcs.h in Headers */,
+				AA54F2F4176FB783000F6F8B /* sr_gl.h in Headers */,
+				AA54F2F6176FB783000F6F8B /* sr_sa_gl_render.h in Headers */,
+				AA54F34E176FBFAC000F6F8B /* mat2.h in Headers */,
+				AA54F34F176FBFAC000F6F8B /* mat3.h in Headers */,
+				AA54F350176FBFAC000F6F8B /* mat4.h in Headers */,
+				AA54F351176FBFAC000F6F8B /* vec2.h in Headers */,
+				AA54F352176FBFAC000F6F8B /* vec3.h in Headers */,
+				AA54F353176FBFAC000F6F8B /* vec4.h in Headers */,
+				AA54F355176FBFAC000F6F8B /* SbmDeformableMeshGPU.h in Headers */,
+				AA54F357176FBFAC000F6F8B /* SbmShader.h in Headers */,
+				AA54F359176FBFAC000F6F8B /* SbmTexture.h in Headers */,
+				AA54F35D176FBFAC000F6F8B /* TBOData.h in Headers */,
+				AA54F35F176FBFAC000F6F8B /* VBOData.h in Headers */,
+				AA54F36D1770D850000F6F8B /* image_DXT.h in Headers */,
+				AA54F36F1770D850000F6F8B /* image_helper.h in Headers */,
+				AA54F3711770D850000F6F8B /* SOIL.h in Headers */,
+				AA54F3731770D850000F6F8B /* stb_image_aug.h in Headers */,
+				AA54F3741770D850000F6F8B /* stbi_DDS_aug.h in Headers */,
+				AA54F3751770D850000F6F8B /* stbi_DDS_aug_c.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2944,6 +3086,16 @@
 				C40B0FB11715328E00F99C07 /* RecastMeshDetail.cpp in Sources */,
 				C40B0FB21715328E00F99C07 /* RecastRasterization.cpp in Sources */,
 				C40B0FB31715328E00F99C07 /* RecastRegion.cpp in Sources */,
+				AA54F2F1176FB783000F6F8B /* sr_gl_render_funcs.cpp in Sources */,
+				AA54F2F3176FB783000F6F8B /* sr_gl.cpp in Sources */,
+				AA54F2F5176FB783000F6F8B /* sr_sa_gl_render.cpp in Sources */,
+				AA54F358176FBFAC000F6F8B /* SbmTexture.cpp in Sources */,
+				AA54F35A176FBFAC000F6F8B /* fs_skin_render.frag in Sources */,
+				AA54F35B176FBFAC000F6F8B /* vs_skin_pos.vert in Sources */,
+				AA54F36C1770D850000F6F8B /* image_DXT.c in Sources */,
+				AA54F36E1770D850000F6F8B /* image_helper.c in Sources */,
+				AA54F3701770D850000F6F8B /* SOIL.c in Sources */,
+				AA54F3721770D850000F6F8B /* stb_image_aug.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
