@@ -67,7 +67,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createBoolAttribute("emotion_automatic", 0, false, "Basic", 71, false, false, false, "");
 	*/
 
-	SmartBody::DoubleAttribute* bmlDelayAttr = createDoubleAttribute("bmlscheduledelay", 0.0, true, "Basic", 98, false, false, false, "Delay all bml schedules by a fixed amount.");
+	SmartBody::DoubleAttribute* bmlDelayAttr = createDoubleAttribute("bmlscheduledelay", 0.3, true, "Basic", 98, false, false, false, "Delay all bml schedules by a fixed amount.");
 	bmlDelayAttr->setMin(0.0);
 	SmartBody::DoubleAttribute* visemeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 99, false, false, false, "Delay visemes by a fixed amount.");
 	visemeDelayAttr->setMin(0.0);
