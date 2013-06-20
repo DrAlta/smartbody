@@ -6,6 +6,7 @@
 #include <direct.h>
 #endif
 
+#include <sb/SBTypes.h>
 #include <sb/SBObject.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBMotion.h>
@@ -68,10 +69,10 @@
 #include <sbm/KinectProcessor.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <sr/sr_sn_group.h>
-#if !defined(SBM_IPHONE) && !defined(__ANDROID__)
+#if !defined(SB_IPHONE) && !defined(__ANDROID__)
 #include <sbm/GPU/SbmShader.h>
 #endif
-#if !defined(SBM_IPHONE)
+#if !defined(SB_IPHONE)
 #include <sbm/GPU/SbmTexture.h>
 #endif
 #include <sbm/KinectProcessor.h>
@@ -242,7 +243,7 @@ void SBScene::initialize()
 		if (_viewerFactory)
 			_viewerFactory->reset(_viewer);
 		_viewer = NULL;
-#if !defined (__ANDROID__) && !defined(SBM_IPHONE) && !defined(__native_client__)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE) && !defined(__native_client__)
 		SbmShaderManager::singleton().setViewer(NULL);
 #endif
 	}
@@ -395,7 +396,7 @@ void SBScene::cleanup()
 	
 	delete _vhmsgManager;	
 
-#if !defined(SBM_IPHONE)
+#if !defined(SB_IPHONE)
 	SbmTextureManager::destroy_singleton();
 #endif
 

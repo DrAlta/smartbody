@@ -29,7 +29,7 @@
 class SrCylinder;
 class SrSphere;
 
-#include <sb/SBTypes.h>
+# include <sb/SBTypes.h>
 # include <sr/sr_box.h>
 # include <sr/sr_vec.h>
 # include <sr/sr_mat.h>
@@ -61,7 +61,7 @@ class SrModel : public SrSharedClass
         information in V, N, and T to each face */
     struct Face 
      { 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
        unsigned short a,b,c;
        void validate () { }
        unsigned short& operator[] ( int i ) { return *((&a)+i); }

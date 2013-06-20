@@ -11,15 +11,6 @@
 #include <sb/SBController.h>
 #include <sr/sr_viewer.h>
 
-#ifdef __APPLE__
-#include "TargetConditionals.h"
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#ifndef SBM_IPHONE
-#define SBM_IPHONE
-#endif
-#endif
-#endif
-
 //#if !defined (__ANDROID__)
 #ifndef USE_PYTHON
 #define USE_PYTHON

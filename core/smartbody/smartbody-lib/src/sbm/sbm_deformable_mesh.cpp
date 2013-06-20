@@ -187,7 +187,7 @@ bool DeformableMesh::buildVertexBuffer()
 	// feng : the CPU version of deformable mesh consists of some mesh segments, with their corresponding bone weights loosely stored.
 	// this is very bad for GPU processing. Thus I reorganize the data into a single array, to avoid redundancy in memory storage.
 	if (skinWeights.size() == 0 )
-		return false;	
+		return false;
 
 	if (initVertexBuffer) return true;
 
@@ -352,7 +352,6 @@ bool DeformableMesh::buildVertexBuffer()
 		return false;
 
 	//printf("orig vtxs = %d\n",nTotalVtxs);
-
 	for (unsigned int i=0;i<vtxNormalIdxMap.size();i++)
 	{
 		std::set<IntPair>& idxMap = vtxNormalIdxMap[i];
@@ -371,7 +370,6 @@ bool DeformableMesh::buildVertexBuffer()
 			}
 		}
 	}
-
 	//printf("new vtxs = %d\n",nTotalVtxs);
 
 	// temporary storage 
@@ -413,7 +411,7 @@ bool DeformableMesh::buildVertexBuffer()
 					continue;
 				int numOfInfJoints = skinWeight->numInfJoints[i];				
 				SrVec& lv = dMeshStatic->shape().V[i];					
-				posBuf[iVtx] = lv*skinWeight->bindShapeMat;  
+				posBuf[iVtx] = lv*skinWeight->bindShapeMat;
 				SrVec& lt =	dMeshStatic->shape().Tangent[i];		
 				SrVec& lb = dMeshStatic->shape().BiNormal[i];
 				tangentBuf[iVtx] = lt*skinWeight->bindShapeMat;
@@ -439,7 +437,7 @@ bool DeformableMesh::buildVertexBuffer()
 					weightList.push_back(IntFloatPair(jointIndex,jointWeight));							
 					globalCounter ++;									
 				}
-				std::sort(weightList.begin(),weightList.end(),intFloatComp); // sort for minimum weight				
+				std::sort(weightList.begin(),weightList.end(),intFloatComp); // sort for minimum weight
 				int numWeight = numOfInfJoints > 8 ? 8 : numOfInfJoints;
 				float weightSum = 0.f;
 				for (int j=0;j<numWeight;j++)
@@ -536,7 +534,9 @@ bool DeformableMesh::buildVertexBuffer()
 			iNormalIdxOffset += numNormals;
 			iTextureIdxOffset += numTexCoords;
 		}			
-	}		
+	}
+    
+    int group = 0;
 	std::map<int,std::vector<int> >::iterator vi;
 	for (vi  = meshSubsetMap.begin();
 		 vi != meshSubsetMap.end();
@@ -560,7 +560,6 @@ bool DeformableMesh::buildVertexBuffer()
 			mesh->triBuf[k][1] = triBuf[faceIdxList[k]][1];
 			mesh->triBuf[k][2] = triBuf[faceIdxList[k]][2];
 		}
-
 		subMeshList.push_back(mesh);
 	}		
 	initVertexBuffer = true;
@@ -606,8 +605,8 @@ void DeformableMeshInstance::cleanUp()
 
 void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 {
-	if (!mesh) return;
-	_mesh = mesh;	
+    //LOG("setDeformableMesh to be %s", mesh->meshName.c_str());
+	_mesh = mesh;
 	cleanUp(); // remove all previous dynamic mesh
 	_mesh->buildVertexBuffer(); // make sure the deformable mesh has vertex buffer
 	for (unsigned int i=0;i<_mesh->dMeshStatic_p.size();i++)
@@ -657,7 +656,7 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 }
 
 void DeformableMeshInstance::update()
-{	
+{
 	//return;
 	if (!_updateMesh)	return;
 	if (!_skeleton || !_mesh) return;	
@@ -714,7 +713,7 @@ void DeformableMeshInstance::update()
 						// copy related vtx components 
 						for (unsigned int k=0;k<idxMap.size();k++)
 						{
-							_deformPosBuf[idxMap[k]] = finalVec;							
+							_deformPosBuf[idxMap[k]] = finalVec;
 						}
 					}					
 					iVtx++;

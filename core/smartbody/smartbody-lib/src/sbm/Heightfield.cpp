@@ -1,22 +1,10 @@
 #include "Heightfield.h"
-
-#ifdef __APPLE__
-#include "TargetConditionals.h"
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#ifndef SBM_IPHONE
-#define SBM_IPHONE
-#endif
-#endif
-#endif
-
-
+#include <sb/SBTypes.h>
 #include <cstdio>
 #include <cstdlib>
 #include <math.h>
 #include "sbm/lin_win.h"
-#if !defined(SBM_IPHONE)
 #include "sr/sr_gl.h"
-#endif
 
 #define BITMAP_ID 0x4D42
 
@@ -134,7 +122,7 @@ void Heightfield::paste_img( void )	{
 #endif
 
 void Heightfield::render( int renderMode )	{
-#if defined (__ANDROID__) || defined (SBM_IPHONE) || defined(__native_client__)
+#if defined (__ANDROID__) || defined (SB_IPHONE) || defined(__native_client__)
 #else
 	if( vertex_arr && color_arr )	{
 

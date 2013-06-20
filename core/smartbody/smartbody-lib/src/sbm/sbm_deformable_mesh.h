@@ -38,7 +38,7 @@ public:
 	std::string normalMapName;
 	std::string specularMapName;
 	int numTri;
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 	std::vector<SrModel::Face> triBuf;
 #else
 	std::vector<SrVec3i> triBuf;

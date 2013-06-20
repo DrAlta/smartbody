@@ -35,13 +35,13 @@ using namespace Util;
 #ifdef __APPLE__
 #include "TargetConditionals.h"
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#ifndef SBM_IPHONE
-#define SBM_IPHONE
+#ifndef SB_IPHONE
+#define SB_IPHONE
 #endif
 #endif
 #endif
 
-#if defined(SBM_IPHONE) || defined(__ANDROID__) || defined(__FLASHPLAYER__)
+#if defined(SB_IPHONE) || defined(__ANDROID__) || defined(__FLASHPLAYER__)
 #include "PPRAIModule.h"
 #endif
 
@@ -666,7 +666,7 @@ SteerLib::ModuleMetaInformation * SimulationEngine::_loadModule(const std::strin
 
 	if (newModule == NULL) {
 		// In this case, the module was not built-in.
-#if defined(SBM_IPHONE) || defined(__ANDROID__)
+#if defined(SB_IPHONE) || defined(__ANDROID__)
         newModule = new PPRAIModule;
 #else
         

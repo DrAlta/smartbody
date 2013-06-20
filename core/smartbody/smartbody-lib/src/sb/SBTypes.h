@@ -32,6 +32,19 @@
 #define USE_WSP 1
 #endif
 
+#ifdef __APPLE__
+#include "TargetConditionals.h"
+#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
+    #ifndef SB_IPHONE
+    #define SB_IPHONE
+    #endif
+#else
+    #ifndef SB_MAC
+    #define SB_MAC
+    #endif
+#endif
+#endif
+
 
 #endif
 

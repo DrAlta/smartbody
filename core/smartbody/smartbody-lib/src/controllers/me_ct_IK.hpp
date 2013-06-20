@@ -26,10 +26,11 @@
 
 #include <controllers/me_controller.h>
 #include "controllers/me_ct_IK_scenario.hpp"
+#include <sb/SBTypes.h>
 
 #pragma once
 
-#if defined (__ANDROID__) || defined (SBM_IPHONE)
+#if defined (__ANDROID__) || defined(SB_IPHONE)
 #define SBM_INLINE
 #else
 #define SBM_INLINE inline

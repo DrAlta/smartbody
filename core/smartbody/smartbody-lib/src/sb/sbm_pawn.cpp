@@ -23,6 +23,7 @@
 */
 
 #include "vhcl.h"
+#include <sb/SBTypes.h>
 
 #include "sbm_pawn.hpp"
 #include <sb/SBSimulationManager.h>
@@ -46,16 +47,7 @@
 #include <sbm/sr_arg_buff.h>
 #include "sbm/sbm_deformable_mesh.h"
 
-#ifdef __APPLE__
-#include "TargetConditionals.h"
-#if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
-#ifndef SBM_IPHONE
-#define SBM_IPHONE
-#endif
-#endif
-#endif
-
-#if defined(__ANDROID__) || defined(SBM_IPHONE) || defined(__native_client__) || defined(__FLASHPLAYER__)
+#if defined(__ANDROID__) || defined(SB_IPHONE) || defined(__native_client__) || defined(__FLASHPLAYER__)
 #include <sbm/sbm_deformable_mesh.h>
 #else
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
@@ -112,7 +104,7 @@ scene_p( NULL )
 // Constructor
 SbmPawn::SbmPawn( const char * name ) : SmartBody::SBObject(),
 scene_p( NULL ),
-#ifdef __ANDROID__ // don't use the GPU version in android
+#if defined(__ANDROID__) || defined(SB_IPHONE) // don't use the GPU version in android
 dMesh_p( NULL) ,
 dMeshInstance_p(NULL),
 #else

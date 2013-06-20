@@ -1,6 +1,7 @@
 #include "SbmTexture.h"
 #include "SbmShader.h"
 #include "external/SOIL/SOIL.h"
+#include <sb/SBTypes.h>
 //#include "external/imdebug/imdebug.h"
 
 /************************************************************************/
@@ -170,7 +171,7 @@ void SbmTexture::buildTexture()
 	glEnable(iType);	
 	glGenTextures(1,&texID);
 	glBindTexture(iType,texID);
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	if (!glIsTexture(texID))
 	{
 		SbmShaderProgram::printOglError("SbmTexture.cpp:100");
@@ -178,7 +179,7 @@ void SbmTexture::buildTexture()
 #endif
 
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:50");	
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 #define GL_CLAMP GL_CLAMP_TO_EDGE
 #define GL_RGB8 GL_RGB
 #define GL_RGBA8 GL_RGBA
@@ -188,7 +189,7 @@ void SbmTexture::buildTexture()
 	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-#if !defined (__FLASHPLAYER__) && !defined(__ANDROID__)
+#if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 #else
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
@@ -207,15 +208,15 @@ void SbmTexture::buildTexture()
 		texture_format = GL_RGBA;				
 	}
 	//glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);	
-#if !defined (__FLASHPLAYER__) && !defined(__ANDROID__)
+#if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
 	gluBuild2DMipmaps(iType, channels, width, height, texture_format, GL_UNSIGNED_BYTE, buffer );
 #else
 	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);
 #endif
 
 	//glGenerateMipmap(iType);
-	//SbmShaderProgram::printOglError("SbmTexture.cpp:200");
-#if !defined(__ANDROID__)
+	//SbmShaderProgram::printOglError("Sb!defined(SB_IPHONE)mTexture.cpp:200");
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 	GLclampf iPrority = 1.0;
 	glPrioritizeTextures(1,&texID,&iPrority);
 #endif
