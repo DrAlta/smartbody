@@ -8,14 +8,12 @@ scene.addAssetPath("script", "sbm-common/scripts")
 scene.addAssetPath("mesh", "mesh")
 scene.addAssetPath("audio", ".")
 
-scene.setScale(1.0)
 scene.setBoolAttribute("internalAudio", True)
 
 camera = scene.getActiveCamera()
-camera.setEye(0, 2.0478, 4.69259)
-camera.setCenter(0.012, 1.60887, 2.75628)
+camera.setEye(0, 2.0478, 8)
+camera.setCenter(0, 0.58, 0)
 camera.setUpVector(SrVec(0, 1, 0))
-camera.setScale(1)
 camera.setFov(0.4)
 camera.setFarPlane(100)
 camera.setNearPlane(0.1)
@@ -96,8 +94,5 @@ sim.start()
 bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
 bml.execBML('ChrBrad', '<saccade mode="listen"/>')
 sim.resume()
-
-bml.execBML('ChrBrad', '<gaze sbm:handle="flash" sbm:target-pos="0 0 0"/>')
-bml.execBML('ChrBrad', '<gaze sbm:handle="flash" sbm:fade-out="0.2"/>')
 
 
