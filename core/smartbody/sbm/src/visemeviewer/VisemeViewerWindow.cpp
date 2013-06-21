@@ -708,7 +708,11 @@ void VisemeViewerWindow::loadAudioFiles()
 			std::string ext = boost::filesystem::extension(cur);
 			if (_stricmp(ext.c_str(), ".bml" ) == 0)
 			{
+#if (BOOST_VERSION > 104400)
+				_choiceAudioFile->add(cur.stem().string().c_str());
+#else
 				_choiceAudioFile->add(cur.stem().c_str());
+#endif
 			}
 		}
 	}
