@@ -752,9 +752,13 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 				getcwd(CurrentPath, _MAX_PATH);
 #endif
 				std::string filename;
-			
+
+#if (BOOST_VERSION > 104400)
+				filename = pathname.filename().string();			
+#else
 				filename = pathname.filename().c_str();
-			
+#endif
+
 				//filename = mcn_return_full_filename_func( CurrentPath, finalPath.string().c_str() );
 
 				std::string filebase = boost::filesystem::basename( pathname );
