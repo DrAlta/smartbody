@@ -94,7 +94,7 @@ sinbad.setDoubleAttribute('deformableMeshScale', 1)
 sinbad.setStringAttribute('deformableMesh', 'Sinbad')
 scene.run('BehaviorSetMaleLocomotion.py')
 setupBehaviorSet()
-retargetBehaviorSet(sinbadName,sinbadSkName)
+retargetBehaviorSet(sinbadName)
 bml.execBML('target', '<body posture="ChrBrad@Idle01"/>')
 scene.command('char target viewer deformableGPU')
 

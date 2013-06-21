@@ -279,7 +279,12 @@ for i in range(0, len(motions)):
 		str1 = (land1-0.15)%motionDuration
 		str2 = (land2-0.15)%motionDuration
 		statemarineLocomotion.addKeyTagValue(motionName,leg,"strike",str1);
-		statemarineLocomotion.addKeyTagValue(motionName,leg,"strike",str2);	
+		statemarineLocomotion.addKeyTagValue(motionName,leg,"strike",str2);		
+		# add motion event, only for walk motion
+		if i == 10 and leg == 0: 
+			statemarineLocomotion.addEvent(motionName, s1, 'footstep', str(leg) + '-1', False)
+			statemarineLocomotion.addEvent(motionName, s2, 'footstep', str(leg) + '-2', False)
+
 
 statemarineLocomotion.buildMotionAnalysis("ChrBackovic.sk","base",motions, '');		
 
