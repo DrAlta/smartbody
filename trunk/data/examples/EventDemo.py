@@ -331,6 +331,7 @@ eventdemo = EventDemo()
 scene.addScript('eventdemo', eventdemo)
 
 class MyEventHandler(SBEventHandler):
+	
 	def executeAction(self, event):
 		params = event.getParameters()
 		# Do action depending on message received from event handler
