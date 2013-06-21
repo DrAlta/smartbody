@@ -324,7 +324,7 @@ bool MeCtReachEngine::hasEffectorRotConstraint( ReachStateData* rd )
 
 void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 {	
-	BodyMotionFrame& refFrame = rd->currentRefFrame;
+	BodyMotionFrame& refFrame = motionData.size() != 0 ? rd->currentRefFrame : inputMotionFrame;
 	if (!ikInit)
 	{			
 		ikScenario.setTreeNodeQuat(refFrame.jointQuat,QUAT_INIT);
@@ -360,7 +360,7 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 		cons->constraintWeight = 0.f;//1.f - rd->blendWeight;
 
 		//if (rd->curHandAction == handActionTable[PICK_UP_OBJECT] || rd->curHandAction == handActionTable[PUT_DOWN_OBJECT])
-		if (hasEffectorRotConstraint(rd))
+		if (hasEffectorRotConstraint(rd) && motionData.size() != 0)
 			ikScenario.ikRotEffectors = &reachRotConstraint;
 		//else if (rd->curHandAction == handActionTable[TOUCH_OBJECT])
 		else
