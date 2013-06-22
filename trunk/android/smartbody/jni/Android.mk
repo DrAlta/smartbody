@@ -150,6 +150,7 @@ include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := ann
 LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions 
+LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) 
 LOCAL_SRC_FILES := $(SBM_MY_DIR)/external/ANN/ANN.cpp \
 	$(SBM_MY_DIR)/external/ANN/bd_fix_rad_search.cpp \
 	$(SBM_MY_DIR)/external/ANN/bd_pr_search.cpp \
