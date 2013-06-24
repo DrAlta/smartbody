@@ -833,7 +833,7 @@ bool ReachStateInterface::interpTargetReached( ReachStateData* rd )
 	if (rd->useInterpolation())
 		return (curStatePercentTime(rd,rd->curRefTime) >= 1.f);
 	else
-		return ikTargetReached(rd);
+		return true;//ikTargetReached(rd);
 }
 
 bool ReachStateInterface::poseTargetReached( ReachStateData* rd, float ratio /*= 0.1f*/ )
