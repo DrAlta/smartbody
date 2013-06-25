@@ -181,6 +181,7 @@ void SBScene::initialize()
 	createIntAttribute("queuedCommandsIndex",1,true,"",560,false,false,false,"Unique identifier when executing sequence commands.");
 	createIntAttribute("bmlIndex",1,true,"",560,false,false,false,"Unique identifier when executing BML commands.");
 	createBoolAttribute("enableConsoleLogging",false,true,"",70,false,false,false,"Use SmartBody's internal audio player.");
+	createBoolAttribute("warnDeprecatedCommands",false,true,"",600,false,false,false,"Shows a warning when a deprecated command is being used.");
 	createBoolAttribute("enableFaceShader",false,true,"",70,false,false,false,"Enable the face shader for higher quality rendering.");
 	
 	vhcl::Log::g_log.RemoveAllListeners();
@@ -1309,6 +1310,11 @@ SBEventManager* SBScene::getEventManager()
 
 bool SBScene::command(const std::string& command)
 {
+	if (this->getBoolAttribute("warnDeprecatedCommands"))
+	{
+		LOG("Warning: Deprecated command [%s]", command.c_str());
+	}
+
 	int ret = getCommandManager()->execute((char*) command.c_str());
 
 	if (ret == CMD_SUCCESS)
@@ -1319,6 +1325,11 @@ bool SBScene::command(const std::string& command)
 
 bool SBScene::commandAt(float seconds, const std::string& command)
 {
+	if (this->getBoolAttribute("warnDeprecatedCommands"))
+	{
+		LOG("Warning: Deprecated command [%f] [%s]", seconds, command.c_str());
+	}
+
 	int ret = getCommandManager()->execute_later((char*) command.c_str(), seconds);
 
 	if (ret == CMD_SUCCESS)
