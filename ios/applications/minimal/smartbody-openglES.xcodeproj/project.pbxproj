@@ -38,10 +38,10 @@
 		AAD2C3FE1552000C0053C478 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD2C3FD1552000C0053C478 /* UIKit.framework */; };
 		AAD2C400155200120053C478 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD2C3FF155200120053C478 /* QuartzCore.framework */; };
 		AAD2C402155201450053C478 /* libpython2.6.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD2C401155201450053C478 /* libpython2.6.a */; };
-		AAD5A24A1779148D0056CDD4 /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD5A2461779148D0056CDD4 /* libboost_filesystem.a */; };
-		AAD5A24B1779148D0056CDD4 /* libboost_python.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD5A2471779148D0056CDD4 /* libboost_python.a */; };
-		AAD5A24C1779148D0056CDD4 /* libboost_regex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD5A2481779148D0056CDD4 /* libboost_regex.a */; };
-		AAD5A24D1779148D0056CDD4 /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD5A2491779148D0056CDD4 /* libboost_system.a */; };
+		AAD5A308177A39F70056CDD4 /* libboost_filesystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD5A304177A39F70056CDD4 /* libboost_filesystem.a */; };
+		AAD5A309177A39F70056CDD4 /* libboost_python.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD5A305177A39F70056CDD4 /* libboost_python.a */; };
+		AAD5A30A177A39F70056CDD4 /* libboost_regex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD5A306177A39F70056CDD4 /* libboost_regex.a */; };
+		AAD5A30B177A39F70056CDD4 /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD5A307177A39F70056CDD4 /* libboost_system.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -83,10 +83,10 @@
 		AAD2C3FD1552000C0053C478 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		AAD2C3FF155200120053C478 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AAD2C401155201450053C478 /* libpython2.6.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpython2.6.a; path = ../../libs/iphoneos/libpython2.6.a; sourceTree = "<group>"; };
-		AAD5A2461779148D0056CDD4 /* libboost_filesystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libboost_filesystem.a; sourceTree = "<group>"; };
-		AAD5A2471779148D0056CDD4 /* libboost_python.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libboost_python.a; sourceTree = "<group>"; };
-		AAD5A2481779148D0056CDD4 /* libboost_regex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libboost_regex.a; sourceTree = "<group>"; };
-		AAD5A2491779148D0056CDD4 /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libboost_system.a; sourceTree = "<group>"; };
+		AAD5A304177A39F70056CDD4 /* libboost_filesystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_filesystem.a; path = ../../libs/iphoneos/libboost_filesystem.a; sourceTree = "<group>"; };
+		AAD5A305177A39F70056CDD4 /* libboost_python.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_python.a; path = ../../libs/iphoneos/libboost_python.a; sourceTree = "<group>"; };
+		AAD5A306177A39F70056CDD4 /* libboost_regex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_regex.a; path = ../../libs/iphoneos/libboost_regex.a; sourceTree = "<group>"; };
+		AAD5A307177A39F70056CDD4 /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../../libs/iphoneos/libboost_system.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,10 +115,10 @@
 				AAD2C3FE1552000C0053C478 /* UIKit.framework in Frameworks */,
 				AAD2C400155200120053C478 /* QuartzCore.framework in Frameworks */,
 				AAD2C402155201450053C478 /* libpython2.6.a in Frameworks */,
-				AAD5A24A1779148D0056CDD4 /* libboost_filesystem.a in Frameworks */,
-				AAD5A24B1779148D0056CDD4 /* libboost_python.a in Frameworks */,
-				AAD5A24C1779148D0056CDD4 /* libboost_regex.a in Frameworks */,
-				AAD5A24D1779148D0056CDD4 /* libboost_system.a in Frameworks */,
+				AAD5A308177A39F70056CDD4 /* libboost_filesystem.a in Frameworks */,
+				AAD5A309177A39F70056CDD4 /* libboost_python.a in Frameworks */,
+				AAD5A30A177A39F70056CDD4 /* libboost_regex.a in Frameworks */,
+				AAD5A30B177A39F70056CDD4 /* libboost_system.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,10 +185,10 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				AAD5A2461779148D0056CDD4 /* libboost_filesystem.a */,
-				AAD5A2471779148D0056CDD4 /* libboost_python.a */,
-				AAD5A2481779148D0056CDD4 /* libboost_regex.a */,
-				AAD5A2491779148D0056CDD4 /* libboost_system.a */,
+				AAD5A304177A39F70056CDD4 /* libboost_filesystem.a */,
+				AAD5A305177A39F70056CDD4 /* libboost_python.a */,
+				AAD5A306177A39F70056CDD4 /* libboost_regex.a */,
+				AAD5A307177A39F70056CDD4 /* libboost_system.a */,
 				AAD2C401155201450053C478 /* libpython2.6.a */,
 				AA036748142A80BC00DDDCA2 /* libblas.a */,
 				AA036749142A80BC00DDDCA2 /* libf2c.a */,
