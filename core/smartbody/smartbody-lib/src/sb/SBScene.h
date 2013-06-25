@@ -266,6 +266,8 @@ class SBScene : public SBObject
 		void saveServices(std::stringstream& strstr, bool remoteSetup);
 		void savePositions(std::stringstream& strstr, bool remoteSetup);
 
+		void exportAssetFiles(std::string outDir);
+
 		void createDefaultControllers();
 		void removeDefaultControllers();
 

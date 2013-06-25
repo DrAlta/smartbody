@@ -1848,6 +1848,90 @@ void SBScene::saveRetargets( std::stringstream& strstr, bool remoteSetup )
 	}
 }
 
+
+#if (BOOST_VERSION > 104400)
+bool copyDir(boost::filesystem::path const & source,boost::filesystem::path const & destination)
+{
+	namespace fs = boost::filesystem;
+#else
+bool copyDir(boost::filesystem2::path const & source,boost::filesystem2::path const & destination)
+{
+	namespace fs = boost::filesystem2;
+#endif
+	try
+	{
+		// Check whether the function call is valid
+		if(
+			!fs::exists(source) ||
+			!fs::is_directory(source)
+			)
+		{
+			std::cerr << "Source directory " << source.string()
+				<< " does not exist or is not a directory." << std::endl
+				;
+			return false;
+		}
+		if(fs::exists(destination))
+		{
+			// still try to overwrite ?
+// 			std::cerr << "Destination directory " << destination.string()
+// 				<< " already exists." << std::endl
+// 				;
+// 			return false;
+		}
+		else if(!fs::create_directories(destination)) // create destination dir
+		{
+			std::cerr << "Unable to create destination directory"
+				<< destination.string() << std::endl
+				;
+			return false;
+		}
+	}
+	catch(fs::filesystem_error const & e)
+	{
+		std::cerr << e.what() << std::endl;
+		return false;
+	}
+	// Iterate through the source directory
+	for(
+		fs::directory_iterator file(source);
+		file != fs::directory_iterator(); ++file
+		)
+	{
+		try
+		{
+			fs::path current(file->path());
+			if(fs::is_directory(current))
+			{
+				// Found directory: Recursion
+				if(
+					!copyDir(
+					current,
+					destination / current.filename()
+					)
+					)
+				{
+					return false;
+				}
+			}
+			else if (!fs::exists(destination / current.filename()))
+			{
+				// Found file: Copy
+
+				fs::copy_file(
+					current,
+					destination / current.filename()
+					);
+			}
+		}
+		catch(fs::filesystem_error const & e)
+		{
+			std:: cerr << e.what() << std::endl;
+		}
+	}
+	return true;
+}
+
 /**
  * https://svn.boost.org/trac/boost/ticket/1976#comment:2
  * 
@@ -1957,6 +2041,116 @@ naive_uncomplete(boost::filesystem2::path const p, boost::filesystem2::path cons
 }
 
 
+void SBScene::exportAssetFiles( std::string outDir )
+{
+	std::string mediaPath = getMediaPath();
+	std::vector<std::string> motionNames = getMotionNames();
+	std::vector<std::string> skelNames = getSkeletonNames();
+
+
+#if (BOOST_VERSION > 104400)
+	using boost::filesystem::path;
+	using namespace boost::filesystem;
+	//using boost::filesystem::dot;
+	//using boost::filesystem::slash;
+#else
+	using boost::filesystem2::path;
+	using namespace boost::filesystem2;
+	//using boost::filesystem2::dot;
+	//using boost::filesystem2::slash;
+#endif
+	path newOutPath(outDir);
+	if (!exists(newOutPath))
+	{
+		create_directories(newOutPath);
+	}
+		
+	// save motions
+	for (unsigned int i=0;i<motionNames.size();i++)
+	{
+		SmartBody::SBMotion* motion = getMotion(motionNames[i]);
+		path motionFile(motion->filename());			
+		path motionPath = motionFile.parent_path();
+		
+		if (motionPath.empty()) // don't care about empty path
+			continue;
+		if (motion->getTransformDepth() > 0) // not an original motion
+			continue;
+
+		path mePath(mediaPath);
+		path diffPath = naive_uncomplete(motionPath,mePath);
+
+		path newPath(outDir+diffPath.string());
+		if (!exists(newPath))
+		{
+			create_directories(newPath);
+		}
+		std::string newFileName = newPath.string()+"/"+motionFile.filename();
+		//LOG("motionpath = %s, mediapath = %s, diffpath = %s, filename = %s", motionFile.directory_string().c_str(), mePath.string().c_str(), diffPath.string().c_str(), motionFile.filename().c_str());		
+		//LOG("new Path = %s, newFileName = %s",newPath.string().c_str(), newFileName.c_str());
+		motion->saveToSkm(newFileName);
+	}
+
+	// save skeletons
+	for (unsigned int i=0;i<skelNames.size();i++)
+	{
+		SmartBody::SBSkeleton* skel = getSkeleton(skelNames[i]);
+		path skelFile(skel->getFileName());			
+		path skelPath = skelFile.parent_path();
+		if (skelPath.empty()) // don't care about empty path
+			continue;
+
+		path mePath(mediaPath);
+		path diffPath = naive_uncomplete(skelPath,mePath);
+
+		path newPath(outDir+diffPath.string());
+		if (!exists(newPath))
+		{
+			create_directories(newPath);
+		}
+		std::string newFileName = newPath.string()+"/"+skelFile.filename();
+		//LOG("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
+		skel->save(newFileName);
+	}
+
+	// save character meshes
+	const std::vector<std::string>& characters = getCharacterNames();
+	for (unsigned int i=0;i<characters.size();i++)
+	{
+		std::string charName = characters[i];
+		SmartBody::SBCharacter* sbChar = getCharacter(charName);
+		if (!sbChar) continue; 
+		
+		std::string meshDir = sbChar->getStringAttribute("deformableMesh");
+
+		std::vector<std::string> meshPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("mesh");
+		for (size_t m = 0; m < meshPaths.size(); m++)
+		{
+			std::string meshPath = meshPaths[m];
+			path curpath( meshPath + "/" + meshDir );
+			if (!boost::filesystem::is_directory(curpath))
+				continue;
+			//curpath /= std::string(meshDir);	
+
+			path mePath(mediaPath);		
+			path diffPath = naive_uncomplete(curpath,mePath);
+			path newMeshPath(outDir+"/"+diffPath.string());
+
+			bool isDir = boost::filesystem::is_directory(curpath);  
+			if (!isDir)
+			{
+				continue;
+				//LOG("%s is not a directory.", curpath.string().c_str());
+			}
+			//LOG("curPath = %s, newMeshPath = %s", curpath.string().c_str(), newMeshPath.string().c_str());
+
+			//path targetPath()
+			// copy dir
+			copyDir(curpath,newMeshPath);						
+		}
+	}
+}
+
 void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- media and asset paths\n";
@@ -1971,6 +2165,8 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 	std::vector<std::string> skelNames = getSkeletonNames();
 	std::set<std::string> extraAssetPathSet;
 
+	//exportAssetFiles("../../../../temp/");
+
 #if (BOOST_VERSION > 104400)
     using boost::filesystem::path;
     //using boost::filesystem::dot;
@@ -1984,7 +2180,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 	// feng : since we may have use "loadAssetsFromPath" to load the motions, we should infer all other motion paths from existing motions.
 	for (unsigned int i=0;i<motionNames.size();i++)
 	{
-		SmartBody::SBMotion* motion = getMotion(motionNames[i]);
+		SmartBody::SBMotion* motion = getMotion(motionNames[i]);	
 		path motionFile(motion->filename());			
 		path motionPath = motionFile.parent_path();
 		if (motionPath.empty()) // don't care about empty path
