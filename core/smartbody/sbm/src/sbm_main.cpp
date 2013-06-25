@@ -15,7 +15,7 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SBM.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- */
+ */ 
 
 #define ENABLE_CMDL_TEST		0
 #define ENABLE_808_TEST			0
@@ -526,7 +526,7 @@ void cleanup( void )	{
 	//delete SmartBody::SBScene::getScene();	
 	XMLPlatformUtils::Terminate();
 
-	LOG( "SBM: terminated gracefully." );
+	LOG( "sbgui terminated gracefully." );
 
 
 #if SBM_REPORT_MEMORY_LEAKS
