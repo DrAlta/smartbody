@@ -2085,7 +2085,11 @@ void SBScene::exportAssetFiles( std::string outDir )
 		{
 			create_directories(newPath);
 		}
+#if (BOOST_VERSION > 104400)
+		std::string newFileName = newPath.string()+"/"+motionFile.filename().string();
+#else
 		std::string newFileName = newPath.string()+"/"+motionFile.filename();
+#endif
 		//LOG("motionpath = %s, mediapath = %s, diffpath = %s, filename = %s", motionFile.directory_string().c_str(), mePath.string().c_str(), diffPath.string().c_str(), motionFile.filename().c_str());		
 		//LOG("new Path = %s, newFileName = %s",newPath.string().c_str(), newFileName.c_str());
 		motion->saveToSkm(newFileName);
@@ -2108,7 +2112,11 @@ void SBScene::exportAssetFiles( std::string outDir )
 		{
 			create_directories(newPath);
 		}
+#if (BOOST_VERSION > 104400)
+		std::string newFileName = newPath.string()+"/"+skelFile.filename().string();
+#else
 		std::string newFileName = newPath.string()+"/"+skelFile.filename();
+#endif
 		//LOG("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
 		skel->save(newFileName);
 	}
