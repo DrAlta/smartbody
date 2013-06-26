@@ -572,7 +572,7 @@ std::string BaseWindow::directoryChooser( std::string& chooserTitle, std::string
 void BaseWindow::ExportPackageCB( Fl_Widget* widget, void* data )
 {
 	//const char* saveFile = fl_file_chooser("Save file:", "*.py", mediaPath.c_str());
-	int useZip = (int)data;
+	int useZip = (long)data;
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
