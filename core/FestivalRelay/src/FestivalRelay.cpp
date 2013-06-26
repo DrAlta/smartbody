@@ -121,8 +121,8 @@ bool isDone = false;
 
 
 #if !defined(WIN32) && !defined(__APPLE__)
-	SpeechRequestData xmlMetaData;
-	std::map<std::string, std::pair<std::string, double> > phonemeToViseme;
+	extern SpeechRequestData xmlMetaData;
+	extern std::map<std::string, std::pair<std::string, double> > phonemeToViseme;
 	std::string mapping;
 #else 
 #if defined(__APPLE__)
