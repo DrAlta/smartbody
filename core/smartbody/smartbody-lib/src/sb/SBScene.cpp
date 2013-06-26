@@ -77,7 +77,8 @@
 #endif
 #include <sbm/KinectProcessor.h>
 #include <sr/sr_sn_group.h>
-
+#include <fstream>
+#include <sstream>
 // for minizip compression
 #include <external/zlib-1.2.5/zip.h>
 
@@ -2098,15 +2099,20 @@ void writeDirToZip(zipFile& zf, std::string sourceFolder, std::string folderName
 		try
 		{
 			fs::path current(file->path());
+#if (BOOST_VERSION > 104400)
+			std::string curFileName = current.filename().string();
+#else
+			std::string curFileName = current.filename();
+#endif
 			if(fs::is_directory(current))
 			{
 				// Found directory: Recursion
-				writeDirToZip(zf,current.string(), folderNameInZip + "/" + current.filename());				
+				writeDirToZip(zf,current.string(), folderNameInZip + "/" + curFileName);				
 			}
 			else
 			{
 				// Found file: Copy
-				writeFileToZip(zf, current.string(), folderNameInZip + "/" + current.filename());					
+				writeFileToZip(zf, current.string(), folderNameInZip + "/" + curFileName);					
 			}
 		}
 		catch(fs::filesystem_error const & e)
@@ -2148,7 +2154,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 	std::string fileString = scene->save();
 	std::string initScriptFile = "initScene.py";
 	std::string scriptFileLocation = outDir + "/" + initScriptFile;
-	std::ofstream file(scriptFileLocation);
+	std::ofstream file(scriptFileLocation.c_str());
 	if (file.good())
 	{
 		file << fileString;
