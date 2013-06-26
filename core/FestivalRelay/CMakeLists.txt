@@ -41,6 +41,7 @@ target_link_libraries( festivalrelay
 	vhmsg	
 	activemq-cpp
 	ncurses
+	pthread
 	${MORE_LIBS}
 )
 
