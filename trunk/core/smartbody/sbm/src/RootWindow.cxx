@@ -40,8 +40,9 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&File/Save Scene Setting", 0, SaveSceneSettingCB, this, NULL);	
 	menubar->add("&File/Load Scene Setting...", 0, LoadSceneSettingCB, this, NULL);	
 #if TEST_EXPORT_SMARTBODY_PACKAGE
-	menubar->add("&File/Export Scene Package", 0, ExportPackageCB, this, NULL);	
-	menubar->add("&File/Import Scene Package", 0, LoadPackageCB, this, NULL);
+	menubar->add("&File/Export as Folder", 0, ExportPackageCB, (void*)0, NULL);
+	menubar->add("&File/Export as .ZIP", 0, ExportPackageCB, (void*)1, NULL);
+	menubar->add("&File/Import Folder", 0, LoadPackageCB, this, NULL);
 #endif
     menubar->add("&File/Quick Connect", 0, QuickConnectCB, this, NULL);
 	menubar->add("&File/Connect...", 0, LaunchConnectCB, this, NULL);
@@ -571,14 +572,32 @@ std::string BaseWindow::directoryChooser( std::string& chooserTitle, std::string
 void BaseWindow::ExportPackageCB( Fl_Widget* widget, void* data )
 {
 	//const char* saveFile = fl_file_chooser("Save file:", "*.py", mediaPath.c_str());
+	int useZip = (int)data;
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
 	std::string chooserTitle = "Choose Output Directory";
-	std::string fileName = directoryChooser(chooserTitle, mediaPath);
+	std::string fileName = ""; 
+	if (!useZip)
+	{
+		fileName = directoryChooser(chooserTitle, mediaPath);
+	}
+	else
+	{
+		fileName = fl_file_chooser("Save Scene File:", "*.zip", mediaPath.c_str());
+	}
 	if (fileName != "")
 	{
-		LOG("Select filename = %s",fileName.c_str());
-		scene->exportScenePackage(fileName);				
+		//LOG("Select filename = %s",fileName.c_str());
+		if (!useZip)
+		{
+			scene->exportScenePackage(fileName);				
+		}
+		else
+		{
+			boost::filesystem::path filePath(fileName);
+			scene->exportScenePackage(filePath.parent_path().string(),boost::filesystem::basename(fileName)+".zip");
+		}
 	}
 }
 
