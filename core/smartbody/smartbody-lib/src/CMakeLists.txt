@@ -68,6 +68,29 @@ set( SMARTBODY_LIB_EXT_PARSER_SRC
 
 )
 
+set( SMARTBODY_LIB_EXT_ZLIB_SRC
+	
+	external/zlib-1.2.5/adler32.c
+	external/zlib-1.2.5/compress.c
+	external/zlib-1.2.5/crc32.c
+	external/zlib-1.2.5/deflate.c
+	external/zlib-1.2.5/example.c
+	external/zlib-1.2.5/gzclose.c
+	external/zlib-1.2.5/gzlib.c
+	external/zlib-1.2.5/gzread.c
+	external/zlib-1.2.5/gzwrite.c
+	external/zlib-1.2.5/infback.c
+	external/zlib-1.2.5/inffast.c
+	external/zlib-1.2.5/inflate.c
+	external/zlib-1.2.5/inftrees.c
+	external/zlib-1.2.5/ioapi.c
+	external/zlib-1.2.5/trees.c
+	external/zlib-1.2.5/uncompr.c
+	external/zlib-1.2.5/unzip.c
+	external/zlib-1.2.5/zip.c
+	external/zlib-1.2.5/zutil.c
+)
+
 set( SMARTBODY_LIB_EXT_SOIL_SRC
 
 	external/recast/Recast.cpp
