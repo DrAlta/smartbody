@@ -222,6 +222,25 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/external/ANN/ANN.cpp \
 	$(SBM_MY_DIR)/external/SOIL/image_helper.c \
 	$(SBM_MY_DIR)/external/SOIL/SOIL.c \
 	$(SBM_MY_DIR)/external/SOIL/stb_image_aug.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/adler32.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/compress.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/crc32.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/deflate.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/example.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/gzclose.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/gzlib.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/gzread.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/gzwrite.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/infback.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/inffast.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/inflate.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/inftrees.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/ioapi.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/trees.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/uncompr.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/unzip.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/zip.c \
+	$(SBM_MY_DIR)/external/zlib-1.2.5/zutil.c \
 	
 	
 	
