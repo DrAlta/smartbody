@@ -122,7 +122,11 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void ChooseCameraCB(Fl_Widget* widget, void* data);
 	
 		static void LoadCB(Fl_Widget* widget, void* data);
+		static void LoadPackageCB(Fl_Widget* widget, void* data);
 		static void SaveCB(Fl_Widget* widget, void* data);
+		static void ExportPackageCB(Fl_Widget* widget, void* data);
+
+		static std::string directoryChooser(std::string& chooserTitle, std::string &mediaPath );
 		static void ExportCB(Fl_Widget* widget, void* data);
 		static void SaveSceneSettingCB(Fl_Widget* widget, void* data);
 		static void LoadSceneSettingCB(Fl_Widget* widget, void* data);

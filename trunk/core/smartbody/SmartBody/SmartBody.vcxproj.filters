@@ -1074,6 +1074,66 @@
     <ClCompile Include="..\smartbody-lib\src\sb\SBPythonAnimation.cpp">
       <Filter>python</Filter>
     </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\adler32.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\compress.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\crc32.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\deflate.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\example.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\gzclose.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\gzlib.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\gzread.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\gzwrite.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\infback.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\inffast.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\inflate.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\inftrees.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\ioapi.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\iowin32.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\trees.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\uncompr.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\unzip.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\zip.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\zutil.c">
+      <Filter>external\zlib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\smartbody-dll\include\smartbody-dll.h" />
@@ -2149,6 +2209,54 @@
     <ClInclude Include="..\smartbody-lib\src\sb\SBPythonInternal.h">
       <Filter>python</Filter>
     </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\crc32.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\crypt.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\deflate.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\gzguts.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\inffast.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\inffixed.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\inflate.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\inftrees.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\ioapi.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\iowin32.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\trees.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\unzip.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\zconf.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\zip.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\zlib.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\zutil.h">
+      <Filter>external\zlib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">
@@ -2192,6 +2300,9 @@
     </Filter>
     <Filter Include="external\recastdetour">
       <UniqueIdentifier>{7f8de578-92ae-47c7-9442-ea1f41e44529}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\zlib">
+      <UniqueIdentifier>{7b13f61f-722c-4873-8470-0e16023106b2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

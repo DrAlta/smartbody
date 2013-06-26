@@ -78,6 +78,9 @@
 #include <sbm/KinectProcessor.h>
 #include <sr/sr_sn_group.h>
 
+// for minizip compression
+#include <external/zlib-1.2.5/zip.h>
+
 #ifndef WIN32
 #define _stricmp strcasecmp
 #endif
@@ -1928,7 +1931,6 @@ bool copyDir(boost::filesystem2::path const & source,boost::filesystem2::path co
 			else if (!fs::exists(destination / current.filename()))
 			{
 				// Found file: Copy
-
 				fs::copy_file(
 					current,
 					destination / current.filename()
@@ -2051,85 +2053,203 @@ naive_uncomplete(boost::filesystem2::path const p, boost::filesystem2::path cons
     return output;
 }
 
+void writeFileToZip(zipFile& zf, std::string readFileName, std::string fileNameInZip)
+{
+	const int bufferSize = 16384;
+	int size_buf = bufferSize;
+	void* buf = NULL; 
+	buf = (void*)malloc(size_buf);	
+	zip_fileinfo zi;
+	zi.tmz_date.tm_sec = zi.tmz_date.tm_min = zi.tmz_date.tm_hour =	zi.tmz_date.tm_mday = zi.tmz_date.tm_mon = zi.tmz_date.tm_year = 0;
+	zi.dosDate = 0;
+	zi.internal_fa = 0;
+	zi.external_fa = 0;
+	FILE* fp = fopen(readFileName.c_str(),"rb");	
+	int err = zipOpenNewFileInZip(zf,fileNameInZip.c_str(),&zi,NULL,0,NULL,0,NULL,0,Z_DEFAULT_COMPRESSION);
+	int size_read = 0;
+	do
+	{
+		err = ZIP_OK;
+		size_read = (int)fread(buf,1,size_buf,fp);
+		if (size_read>0)
+		{
+			err = zipWriteInFileInZip (zf,buf,size_read);
+		}
 
-void SBScene::exportAssetFiles( std::string outDir )
+	} while ((err == ZIP_OK) && (size_read>0));
+	err = zipCloseFileInZip(zf);
+	fclose(fp);
+	free(buf);
+}
+
+void writeDirToZip(zipFile& zf, std::string sourceFolder, std::string folderNameInZip)
+{
+#if (BOOST_VERSION > 104400)	
+		namespace fs = boost::filesystem;
+#else	
+		namespace fs = boost::filesystem2;
+#endif
+	fs::path source(sourceFolder);
+	for(
+		fs::directory_iterator file(source);
+		file != fs::directory_iterator(); ++file
+		)
+	{
+		try
+		{
+			fs::path current(file->path());
+			if(fs::is_directory(current))
+			{
+				// Found directory: Recursion
+				writeDirToZip(zf,current.string(), folderNameInZip + "/" + current.filename());				
+			}
+			else
+			{
+				// Found file: Copy
+				writeFileToZip(zf, current.string(), folderNameInZip + "/" + current.filename());					
+			}
+		}
+		catch(fs::filesystem_error const & e)
+		{
+			std:: cerr << e.what() << std::endl;
+		}
+	}
+	
+}
+
+void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveName )
 {
 	std::string mediaPath = getMediaPath();
 	std::vector<std::string> motionNames = getMotionNames();
 	std::vector<std::string> skelNames = getSkeletonNames();
 
 
-#if (BOOST_VERSION > 104400)
-	using boost::filesystem::path;
-	using namespace boost::filesystem;
+#if (BOOST_VERSION > 104400)	
+	namespace fs =  boost::filesystem;
 	//using boost::filesystem::dot;
 	//using boost::filesystem::slash;
-#else
-	using boost::filesystem2::path;
-	using namespace boost::filesystem2;
+#else	
+	namespace fs = boost::filesystem2;
 	//using boost::filesystem2::dot;
 	//using boost::filesystem2::slash;
 #endif
-	path newOutPath(outDir);
-	if (!exists(newOutPath))
+
+	bool writeToZip = false;
+	if (outZipArchiveName != "")
+		writeToZip = true;
+
+	fs::path newOutPath(outDir);
+	if (!fs::exists(newOutPath))
 	{
-		create_directories(newOutPath);
+		fs::create_directories(newOutPath);
 	}
-		
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string fileString = scene->save();
+	std::string initScriptFile = "initScene.py";
+	std::string scriptFileLocation = outDir + "/" + initScriptFile;
+	std::ofstream file(scriptFileLocation);
+	if (file.good())
+	{
+		file << fileString;
+		file.close();
+	}
+	else
+	{
+		LOG("Fail to save scene. Abort export operation");
+		file.close();
+		return;
+	}
+	
+
+
+	zipFile zf;	
+	if (writeToZip)
+	{
+		zf = zipOpen((outDir+"/"+outZipArchiveName).c_str(),0);		
+		writeFileToZip(zf,scriptFileLocation,initScriptFile);
+	}		
 	// save motions
 	for (unsigned int i=0;i<motionNames.size();i++)
 	{
 		SmartBody::SBMotion* motion = getMotion(motionNames[i]);
-		path motionFile(motion->filename());			
-		path motionPath = motionFile.parent_path();
+		fs::path motionFile(motion->filename());			
+		fs::path motionPath = motionFile.parent_path();
 		
 		if (motionPath.empty()) // don't care about empty path
 			continue;
 		if (motion->getTransformDepth() > 0) // not an original motion
 			continue;
 
-		path mePath(mediaPath);
-		path diffPath = naive_uncomplete(motionPath,mePath);
-
-		path newPath(outDir+diffPath.string());
-		if (!exists(newPath))
-		{
-			create_directories(newPath);
-		}
-#if (BOOST_VERSION > 104400)
-		std::string newFileName = newPath.string()+"/"+motionFile.filename().string();
-#else
-		std::string newFileName = newPath.string()+"/"+motionFile.filename();
-#endif
+		fs::path mePath(mediaPath);
+		fs::path diffPath = naive_uncomplete(motionPath,mePath);
+		fs::path newPath(outDir+diffPath.string());	
+		
 		//LOG("motionpath = %s, mediapath = %s, diffpath = %s, filename = %s", motionFile.directory_string().c_str(), mePath.string().c_str(), diffPath.string().c_str(), motionFile.filename().c_str());		
 		//LOG("new Path = %s, newFileName = %s",newPath.string().c_str(), newFileName.c_str());
-		motion->saveToSkm(newFileName);
+		//motion->saveToSkm(newFileName);
+		if (!writeToZip)
+		{
+			if (!fs::exists(newPath))
+			{
+				fs::create_directories(newPath);
+			}
+#if (BOOST_VERSION > 104400)
+			std::string newFileName = newPath.string()+"/"+motionFile.filename().string();
+#else
+			std::string newFileName = newPath.string()+"/"+motionFile.filename();
+#endif
+			fs::copy_file(motionFile,fs::path(newFileName));
+		}
+		else
+		{
+#if (BOOST_VERSION > 104400)
+			std::string zipFileName = diffPath.string()+"/"+motionFile.filename().string();
+#else
+			std::string zipFileName = diffPath.string()+"/"+motionFile.filename();
+#endif			
+			writeFileToZip(zf, motionFile.string(), zipFileName);
+		}		
 	}
 
 	// save skeletons
 	for (unsigned int i=0;i<skelNames.size();i++)
 	{
 		SmartBody::SBSkeleton* skel = getSkeleton(skelNames[i]);
-		path skelFile(skel->getFileName());			
-		path skelPath = skelFile.parent_path();
+		fs::path skelFile(skel->getFileName());			
+		fs::path skelPath = skelFile.parent_path();
 		if (skelPath.empty()) // don't care about empty path
 			continue;
 
-		path mePath(mediaPath);
-		path diffPath = naive_uncomplete(skelPath,mePath);
+		fs::path mePath(mediaPath);
+		fs::path diffPath = naive_uncomplete(skelPath,mePath);
+		fs::path newPath(outDir+diffPath.string());		
+		  //LOG("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
+		//skel->save(newFileName);
+		//copy_file(path(skelFile),path(newFileName));
 
-		path newPath(outDir+diffPath.string());
-		if (!exists(newPath))
-		{
-			create_directories(newPath);
-		}
+		if (!writeToZip)
+		{	
+			if (!fs::exists(newPath))
+			{
+				fs::create_directories(newPath);
+			}
 #if (BOOST_VERSION > 104400)
-		std::string newFileName = newPath.string()+"/"+skelFile.filename().string();
+			std::string newFileName = newPath.string()+"/"+skelFile.filename().string();
 #else
-		std::string newFileName = newPath.string()+"/"+skelFile.filename();
+			std::string newFileName = newPath.string()+"/"+skelFile.filename();
 #endif
-		//LOG("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
-		skel->save(newFileName);
+			fs::copy_file(skelFile,fs::path(newFileName));
+		}
+		else
+		{
+#if (BOOST_VERSION > 104400)
+			std::string zipFileName = diffPath.string()+"/"+skelFile.filename().string();
+#else
+			std::string zipFileName = diffPath.string()+"/"+skelFile.filename();
+#endif			
+			writeFileToZip(zf, skelFile.string(), zipFileName);
+		}		
 	}
 
 	// save character meshes
@@ -2141,31 +2261,46 @@ void SBScene::exportAssetFiles( std::string outDir )
 		if (!sbChar) continue; 
 		
 		std::string meshDir = sbChar->getStringAttribute("deformableMesh");
-
+		if (meshDir == "") // otherwise we will copy all mesh directories ...
+			continue;
 		std::vector<std::string> meshPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("mesh");
 		for (size_t m = 0; m < meshPaths.size(); m++)
 		{
 			std::string meshPath = meshPaths[m];
-			path curpath( meshPath + "/" + meshDir );
+			fs::path curpath( meshPath + "/" + meshDir );
 			if (!boost::filesystem::is_directory(curpath))
 				continue;
 			//curpath /= std::string(meshDir);	
 
-			path mePath(mediaPath);		
-			path diffPath = naive_uncomplete(curpath,mePath);
-			path newMeshPath(outDir+"/"+diffPath.string());
-
-			bool isDir = boost::filesystem::is_directory(curpath);  
+			fs::path mePath(mediaPath);		
+			fs::path diffPath = naive_uncomplete(curpath,mePath);
+			fs::path newMeshPath(outDir+"/"+diffPath.string());
+			bool isDir = fs::is_directory(curpath);  
 			if (!isDir)
 			{
 				continue;
 				//LOG("%s is not a directory.", curpath.string().c_str());
 			}
 			//LOG("curPath = %s, newMeshPath = %s", curpath.string().c_str(), newMeshPath.string().c_str());
-
 			//path targetPath()
 			// copy dir
-			copyDir(curpath,newMeshPath);						
+			if (!writeToZip)
+			{
+				copyDir(curpath,newMeshPath);						
+			}
+			else
+			{
+				writeDirToZip(zf,curpath.string(),diffPath.string());
+			}
+		}
+	}
+	if (writeToZip)
+	{
+		int errClose = zipClose(zf,NULL);
+		fs::path initScrptPath(scriptFileLocation);
+		if (fs::exists(initScrptPath))
+		{
+			fs::remove(initScrptPath);			
 		}
 	}
 }
@@ -2184,7 +2319,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 	std::vector<std::string> skelNames = getSkeletonNames();
 	std::set<std::string> extraAssetPathSet;
 
-	//exportAssetFiles("../../../../temp/");
+	//exportScenePackage("../../../../temp/","test1.zip");
 
 #if (BOOST_VERSION > 104400)
     using boost::filesystem::path;
