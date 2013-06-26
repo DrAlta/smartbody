@@ -121,6 +121,28 @@ set( SMARTBODY_LIB_EXT_PARSER_SRC
         ../smartbody-lib/src/external/parser/ValHeap.cpp
 )
 
+set( SMARTBODY_LIB_EXT_ZLIB_SRC
+	
+	../smartbody-lib/src/external/zlib-1.2.5/adler32.c
+	../smartbody-lib/src/external/zlib-1.2.5/compress.c
+	../smartbody-lib/src/external/zlib-1.2.5/crc32.c
+	../smartbody-lib/src/external/zlib-1.2.5/deflate.c
+	../smartbody-lib/src/external/zlib-1.2.5/example.c
+	../smartbody-lib/src/external/zlib-1.2.5/gzclose.c
+	../smartbody-lib/src/external/zlib-1.2.5/gzlib.c
+	../smartbody-lib/src/external/zlib-1.2.5/gzread.c
+	../smartbody-lib/src/external/zlib-1.2.5/gzwrite.c
+	../smartbody-lib/src/external/zlib-1.2.5/infback.c
+	../smartbody-lib/src/external/zlib-1.2.5/inffast.c
+	../smartbody-lib/src/external/zlib-1.2.5/inflate.c
+	../smartbody-lib/src/external/zlib-1.2.5/inftrees.c
+	../smartbody-lib/src/external/zlib-1.2.5/ioapi.c
+	../smartbody-lib/src/external/zlib-1.2.5/trees.c
+	../smartbody-lib/src/external/zlib-1.2.5/uncompr.c
+	../smartbody-lib/src/external/zlib-1.2.5/unzip.c
+	../smartbody-lib/src/external/zlib-1.2.5/zip.c
+	../smartbody-lib/src/external/zlib-1.2.5/zutil.c
+)
 
 set( SMARTBODY_LIB_EXT_SOIL_SRC
 
@@ -482,6 +504,8 @@ add_library(
 	${SMARTBODY_LIB_EXT_ANN_SRC}
 
         ${SMARTBODY_LIB_EXT_SOIL_SRC}
+
+	${SMARTBODY_LIB_EXT_ZLIB_SRC}
 
         ${SMARTBODY_LIB_EXT_PARSER_SRC}
 

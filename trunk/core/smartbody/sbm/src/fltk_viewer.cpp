@@ -1651,7 +1651,7 @@ static void translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, Fl
    if ( Fl::event_state(FL_BUTTON3) ) e.button3 = 1;
 
 #ifdef LINUX_BUILD
-   if ( Fl::event_state(FL_CAPS_LOCK)   ) e.alt = 1;
+   if ( Fl::event_state(FL_ALT)   ) e.alt = 1;
 #else
    if ( Fl::event_state(FL_ALT)   ) e.alt = 1;
 #endif
