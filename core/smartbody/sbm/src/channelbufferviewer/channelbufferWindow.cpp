@@ -710,7 +710,7 @@ void ChannelBufferWindow::refreshControllerChannels(Fl_Widget* widget, void* dat
 			for(int j = 0; j < channelsInUse.size(); ++j)
 			{
 				int index = actor->ct_tree_p->controller(i)->getContextChannel(j);
-				if (index >= 0 && index < window->Channel_item_list.size())
+				if (index >= 0 && index < (int)window->Channel_item_list.size())
 					window->Channel_item_list[index].channel_filtered = false;
 			}
 		}
@@ -924,7 +924,7 @@ void ChannelBufferWindow::update()
 						for(int j = 0; j < channelsInUse.size(); ++j)
 						{
 							int index = actor->ct_tree_p->controller(i)->getContextChannel(j);
-							if (index < 0 || index >= Channel_item_list.size())
+							if (index < 0 || index >= (int)Channel_item_list.size())
 								continue;
 
 							if(Channel_item_list[index].monitored)

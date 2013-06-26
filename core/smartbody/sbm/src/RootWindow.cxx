@@ -4,6 +4,7 @@
 #include "CharacterCreatorWindow.h"
 #include <FL/Fl_Pack.H>
 #include <FL/fl_ask.H>
+//#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_File_Chooser.H>
 #include <sstream>
 #include <FL/filename.H>
@@ -22,6 +23,8 @@
 #include <sbm/KinectProcessor.h>
 #include <sb/SBPython.h>
 
+#define TEST_EXPORT_SMARTBODY_PACKAGE 1
+
 BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {
 	commandWindow = NULL;
@@ -31,11 +34,15 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar = new Fl_Menu_Bar(0, 0, w, 30); 
 	menubar->labelsize(10);
 	menubar->add("&File/New", 0, NewCB, this, NULL);	
-	menubar->add("&File/Save", 0, SaveCB, this, NULL);	
+	menubar->add("&File/Save Scene Script", 0, SaveCB, this, NULL);		
 	menubar->add("&File/Export...", 0, ExportCB, this, NULL);	
-	menubar->add("&File/Load...", 0, LoadCB, this, NULL);
+	menubar->add("&File/Load Scene Script", 0, LoadCB, this, NULL);
 	menubar->add("&File/Save Scene Setting", 0, SaveSceneSettingCB, this, NULL);	
 	menubar->add("&File/Load Scene Setting...", 0, LoadSceneSettingCB, this, NULL);	
+#if TEST_EXPORT_SMARTBODY_PACKAGE
+	menubar->add("&File/Export Scene Package", 0, ExportPackageCB, this, NULL);	
+	menubar->add("&File/Import Scene Package", 0, LoadPackageCB, this, NULL);
+#endif
     menubar->add("&File/Quick Connect", 0, QuickConnectCB, this, NULL);
 	menubar->add("&File/Connect...", 0, LaunchConnectCB, this, NULL);
 	menubar->add("&File/Disconnect", 0, DisconnectRemoteCB, this, NULL);
@@ -475,6 +482,28 @@ void BaseWindow::ResetScene()
 	scene->getVHMsgManager()->setEnable(true);	
 }
 
+
+void BaseWindow::LoadPackageCB( Fl_Widget* widget, void* data )
+{
+	namespace fs = boost::filesystem;
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+	std::string chooserTitle = "Choose Package Directory";
+	std::string dirName = directoryChooser(chooserTitle, mediaPath);
+	std::string initScriptName = dirName+"/initScene.py";
+	if (!fs::exists(fs::path(initScriptName)))
+	{
+		LOG("Package directory doesn't have 'initScene.py'. Abort loading.");
+		return;
+	}
+	
+	BaseWindow* window = (BaseWindow*) data;
+	window->ResetScene();
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->setMediaPath(dirName);
+	scene->addAssetPath("script", dirName);
+	scene->runScript("initScene");	
+}
+
 void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 {
 	BaseWindow* window = (BaseWindow*) data;
@@ -484,7 +513,7 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	if (!seqFile)
 		return;
 
-   window->ResetScene();
+    window->ResetScene();
 
 	std::string filebasename = boost::filesystem::basename(seqFile);
 	std::string fileextension = boost::filesystem::extension(seqFile);
@@ -522,6 +551,35 @@ void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
 	scenePrompt.append(saveFile);
 	scenePrompt.append("'");
 	fl_message(scenePrompt.c_str());
+}
+
+std::string BaseWindow::directoryChooser( std::string& chooserTitle, std::string &mediaPath )
+{
+	Fl_File_Chooser fnfc(mediaPath.c_str(),                        // directory
+		"*",                        // filter
+		Fl_File_Chooser::DIRECTORY,     // chooser type
+		chooserTitle.c_str());
+
+	fnfc.show();
+	while(fnfc.shown())
+	{ Fl::wait(); }
+	std::string filename = "";
+	if (fnfc.value()) filename = fnfc.value();
+	return filename;
+}
+
+void BaseWindow::ExportPackageCB( Fl_Widget* widget, void* data )
+{
+	//const char* saveFile = fl_file_chooser("Save file:", "*.py", mediaPath.c_str());
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string chooserTitle = "Choose Output Directory";
+	std::string fileName = directoryChooser(chooserTitle, mediaPath);
+	if (fileName != "")
+	{
+		LOG("Select filename = %s",fileName.c_str());
+		scene->exportScenePackage(fileName);				
+	}
 }
 
 void BaseWindow::ExportCB(Fl_Widget* widget, void* data)
