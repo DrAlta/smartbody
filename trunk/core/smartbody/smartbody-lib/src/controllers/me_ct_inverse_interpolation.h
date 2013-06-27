@@ -24,9 +24,7 @@
 class InverseInterpolation : public KNNBaseInterpolator
 {
 protected:
-	// still need to build a KNN for existing examples
-	ANNpointArray dataPts; // data points	
-	ANNkd_tree* kdTree;    // search structure	
+	// still need to build a KNN for existing examples	
 	VecOfInterpWeight prevWeight; // stored the previous weight	
 public:
 	InverseInterpolation();
