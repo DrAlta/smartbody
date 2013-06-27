@@ -152,9 +152,10 @@ void MeCtMotion::warp_limits ( float wmin, float wmax ) {
 }
 */
 
-//void MeCtMotion::offset ( double amount ) { 
-//	_offset = amount;
-//}
+void MeCtMotion::offset ( double amount )
+{
+	_offset = amount;
+}
 
 void MeCtMotion::twarp ( float tw ) {
 	// put in/out back to their original values:
@@ -319,9 +320,13 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 //	if( dur < 0.0 )	{
 //		LOG( "no-dur: %s", name() );
 //	}
+
+#if 1
 	updateDt((float)t);
 	motionTime += dt;	
-	//motionTime = t;
+#else
+	motionTime = t;
+#endif
 	double curMotionTime = motionTime;
 	if ( _loop ) {
 		double x = motionTime/dur;
@@ -337,7 +342,8 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 			}
 		}
 	} else {
-		//LOG("MeCtMotion::controller_evaluate %s time %f, duration %f", this->getName().c_str(), t, dur);
+		//LOG("MeCtMotion::controller_evaluate %s time %f, duration %f", this->motion()->getName().c_str(), t, dur);
+		//LOG("%s time %f, motion time %f", this->motion()->getName().c_str(), t, curMotionTime);
 		continuing = motionTime <= dur;
 	}	
 	SmartBody::SBRetarget* retarget = NULL;
@@ -355,7 +361,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	//				&_mChan_to_buff,
 	//	            _play_mode, &_last_apply_frame );	
 	//LOG("dt = %f, motionTime = %f, curMotionTime = %f, dur = %f, continue = %d",dt, motionTime, curMotionTime, dur, continuing);
-	_motion->apply( float(curMotionTime),
+	_motion->apply( float(curMotionTime + _offset),
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
 		            _play_mode, &_last_apply_frame, false, retarget );

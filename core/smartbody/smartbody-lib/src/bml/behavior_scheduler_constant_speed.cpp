@@ -156,7 +156,7 @@ void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, 
 	double controllerIntervals[6] = {	readyTime - startTime,
 										strokeStartTime - readyTime,
 										strokeTime - strokeStartTime,
-										strokeEndTime - strokeStartTime,
+										strokeEndTime - strokeTime,
 										relaxTime - strokeEndTime,
 										endTime - relaxTime
 									   };
@@ -275,12 +275,16 @@ void BehaviorSchedulerConstantSpeed::schedule( BehaviorSyncPoints& behav_syncs, 
 					intervalScale.push_back(scale);
 				}
 			}
-			else
+			else		// heuristic... code has to be changed later
 			{
 				for (int x = lastScaleIndex; x < end - 1; x++)
 				{
 					intervalScale.push_back(1.0f);
 				}
+				if ((rawTimes[end] - rawTimes[end - 1]) != 0)
+					scale = ((syncTimes[end] - syncTimes[start]) - (rawTimes[end - 1] - rawTimes[start])) / (rawTimes[end] - rawTimes[end - 1]);
+				else
+					scale = 0.0f;
 				intervalScale.push_back(scale);
 			}
 			lastScaleIndex = end;
