@@ -22,6 +22,7 @@ bool InverseInterpolation::buildInterpolator()
 {
 	// we will use k-nearest neighbor as a starting point for optimization
 	// so a KD-tree is still built for all examples.
+	VecOfInterpExample& exampleData = exampleSet->getExamples();
 #if USE_ANN
 	VecOfInterpExample& exampleData = exampleSet->getExamples();
 	// build KD-tree for KNN search
@@ -36,6 +37,11 @@ bool InverseInterpolation::buildInterpolator()
 		dataPts, // the data points
 		nPts, // number of points
 		dim); // dimension of space	 
+#else
+	kdPtSet.dim = exampleSet->parameterDim();
+	kdPtSet.pts = exampleData;
+	kdTree = new SBKDTree(exampleSet->parameterDim(),kdPtSet);
+	kdTree->buildIndex();
 #endif
 
 	prevWeight.clear();
@@ -53,9 +59,7 @@ void InverseInterpolation::predictInterpWeights( const dVector& para, VecOfInter
 
 	//LOG("numKNN = %d",numKNN);
 	// calculate the initial weights
-#if USE_ANN
 	kdTreeKNN(kdTree,para,numKNN,tempWeight);
-#endif
 	pairToVec(tempWeight,KNNIdx,KNNDists);
 	generateDistWeights(KNNDists,KNNWeights);
 	//generateRandomWeight(numKNN, KNNWeights);
