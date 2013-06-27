@@ -384,48 +384,6 @@
     <ClCompile Include="..\smartbody-lib\src\external\parser\ValHeap.cpp">
       <Filter>external\parser</Filter>
     </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\ANN.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\bd_fix_rad_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\bd_pr_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\bd_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\bd_tree.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\brute.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\kd_dump.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\kd_fix_rad_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\kd_pr_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\kd_search.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\kd_split.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\kd_tree.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\kd_util.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
-    <ClCompile Include="..\smartbody-lib\src\external\ANN\perf.cpp">
-      <Filter>external\ANN</Filter>
-    </ClCompile>
     <ClCompile Include="..\smartbody-lib\src\external\SOIL\image_DXT.c">
       <Filter>external\SOIL</Filter>
     </ClCompile>
@@ -1537,42 +1495,6 @@
     <ClInclude Include="..\smartbody-lib\src\external\parser\Wrd.h">
       <Filter>external\parser</Filter>
     </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\ANN.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\ANNperf.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\ANNx.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\bd_tree.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\kd_fix_rad_search.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\kd_pr_search.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\kd_search.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\kd_split.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\kd_tree.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\kd_util.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\pr_queue.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
-    <ClInclude Include="..\smartbody-lib\src\external\ANN\pr_queue_k.h">
-      <Filter>external\ANN</Filter>
-    </ClInclude>
     <ClInclude Include="..\smartbody-lib\src\external\SOIL\image_DXT.h">
       <Filter>external\SOIL</Filter>
     </ClInclude>
@@ -2270,9 +2192,6 @@
     </Filter>
     <Filter Include="external\parser">
       <UniqueIdentifier>{5388eaa8-48cf-4d44-9bfd-c184e7ef92a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="external\ANN">
-      <UniqueIdentifier>{6f8a96f7-4a1a-4e1d-aa93-6aff8a3915c1}</UniqueIdentifier>
     </Filter>
     <Filter Include="external\SOIL">
       <UniqueIdentifier>{c388505e-7ead-4350-8f86-36db47250b51}</UniqueIdentifier>
