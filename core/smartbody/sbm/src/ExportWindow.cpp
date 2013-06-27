@@ -66,7 +66,10 @@ void ExportWindow::ExportCB(Fl_Widget* widget, void* data)
 {
 	ExportWindow* window = (ExportWindow*) data;
 
-	std::ofstream file(window->inputFile->value());
+	const char* fname = window->inputFile->value();
+	if (!fname)
+		return;
+	std::ofstream file(fname);
 	if (!file.good())
 	{
 		fl_alert("Cannot save to file '%s'. No export done.", window->inputFile->value());
@@ -87,6 +90,8 @@ void ExportWindow::ExportCB(Fl_Widget* widget, void* data)
 	std::string exportData = SmartBody::SBScene::getScene()->exportScene(aspects, false);
 	file << exportData;
 	file.close();
+
+	fl_alert("Saved to: %s", fname);
 
 	window->hide();
 
