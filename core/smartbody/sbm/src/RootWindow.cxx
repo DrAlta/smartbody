@@ -34,8 +34,8 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar = new Fl_Menu_Bar(0, 0, w, 30); 
 	menubar->labelsize(10);
 	menubar->add("&File/New", 0, NewCB, this, NULL);	
-	menubar->add("&File/Load Scene", 0, LoadCB, this, NULL);
-	menubar->add("&File/Save Scene", 0, SaveCB, this, NULL);		
+	menubar->add("&File/Load from script", 0, LoadCB, this, NULL);
+	menubar->add("&File/Save to script", 0, SaveCB, this, NULL);		
 	menubar->add("&File/Run Script...", 0, LoadSceneSettingCB, this, FL_MENU_DIVIDER);	
 //	menubar->add("&File/Save Scene Settings", 0, SaveSceneSettingCB, this, NULL);	
 	menubar->add("&File/Export...", 0, ExportCB, this, NULL);
