@@ -73,13 +73,12 @@ void SBObject::addAttribute(SBAttribute* attr)
 	std::map<std::string, SBAttribute*>::iterator iter = m_attributeList.find(attr->getName());
 	if (iter != m_attributeList.end()) // attribute exists, remove the old attribute 
 	{
-		SBAttribute* attr = iter->second;
+		SBAttribute* rmattr = iter->second;
 
 		// notify the attribute manager of the change
-		this->getAttributeManager()->notifyRemoveAttribute(attr);
-
-		m_attributeList.erase(iter);
-		delete attr;
+		this->getAttributeManager()->notifyRemoveAttribute(rmattr);
+		m_attributeList.erase(iter);		
+		delete rmattr;
 	}
 
 	m_attributeList[attr->getName()] = attr;
@@ -195,6 +194,7 @@ std::vector<std::string> SBObject::getAttributeNames()
   BoolAttribute* SBObject::createBoolAttribute(const std::string& name, bool value, bool notifySelf, const std::string& groupName, int priority, 
 											  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description)
  {
+
 	 BoolAttribute* boolAttr = new BoolAttribute();
 	 boolAttr->setName(name);
 	 boolAttr->setValue(value);

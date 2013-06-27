@@ -60,6 +60,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
         return; // no deformable mesh
     }
 	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
+	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
@@ -68,17 +69,11 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-	glDisable(GL_COLOR_MATERIAL);	  	
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
-	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);      	
-	
-	//LOG("size of sub mesh list %d", subMeshList.size());
-    
-    glDisable(GL_LIGHTING);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
+	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);      			
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{	
 		SbmSubMesh* mesh = subMeshList[i];
@@ -99,8 +94,6 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 #endif
 		glBindTexture(GL_TEXTURE_2D,0);
 	}	
-	glEnable(GL_LIGHTING);
-
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
