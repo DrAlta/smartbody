@@ -151,21 +151,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := ann
 LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions 
 LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) 
-LOCAL_SRC_FILES := $(SBM_MY_DIR)/external/ANN/ANN.cpp \
-	$(SBM_MY_DIR)/external/ANN/bd_fix_rad_search.cpp \
-	$(SBM_MY_DIR)/external/ANN/bd_pr_search.cpp \
-	$(SBM_MY_DIR)/external/ANN/bd_search.cpp \
-	$(SBM_MY_DIR)/external/ANN/bd_tree.cpp \
-	$(SBM_MY_DIR)/external/ANN/brute.cpp \
-	$(SBM_MY_DIR)/external/ANN/kd_dump.cpp \
-	$(SBM_MY_DIR)/external/ANN/kd_fix_rad_search.cpp \
-	$(SBM_MY_DIR)/external/ANN/kd_pr_search.cpp \
-	$(SBM_MY_DIR)/external/ANN/kd_search.cpp \
-	$(SBM_MY_DIR)/external/ANN/kd_split.cpp \
-	$(SBM_MY_DIR)/external/ANN/kd_tree.cpp \
-	$(SBM_MY_DIR)/external/ANN/kd_util.cpp \
-	$(SBM_MY_DIR)/external/ANN/perf.cpp \
-	$(SBM_MY_DIR)/external/parser/Bchart.cpp \
+LOCAL_SRC_FILES := $(SBM_MY_DIR)/external/parser/Bchart.cpp \
 	$(SBM_MY_DIR)/external/parser/BchartSm.cpp \
 	$(SBM_MY_DIR)/external/parser/Bst.cpp \
 	$(SBM_MY_DIR)/external/parser/ChartBase.cpp \
