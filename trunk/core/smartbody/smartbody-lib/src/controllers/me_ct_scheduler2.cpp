@@ -593,6 +593,8 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 				time_warp.insert( strokeEndAt,		skMotion->time_stroke_end() );
 				time_warp.insert( relaxAt,			skMotion->time_relax() );
 				time_warp.insert(endAt, skMotion->duration());
+
+				motionController->offset(cut);
 			}
 			else
 			{

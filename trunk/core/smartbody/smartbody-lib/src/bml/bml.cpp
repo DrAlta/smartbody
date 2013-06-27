@@ -439,7 +439,9 @@ void BmlRequest::gestureRequestProcess()
 			float currRWristSpeed = -1;
 			float prevLMotionSpeed = prevSBMotion->getJointSpeed(lWrist, (float)prevMotion->time_start(), (float)prevMotion->time_stop());
 			float prevRMotionSpeed = prevSBMotion->getJointSpeed(rWrist, (float)prevMotion->time_start(), (float)prevMotion->time_stop());
-			const std::vector<std::string>& currGestureList = gestures[i]->gestureList;	
+			std::vector<std::string> currGestureList = gestures[i]->gestureList;
+			if (currGestureList.size() == 0)
+				currGestureList.push_back(sbMotion->getName());
 			for (size_t l = 0; l < currGestureList.size(); ++l)
 			{
 				SBMotion *motionInList = SmartBody::SBScene::getScene()->getMotion(currGestureList[l]);
@@ -490,13 +492,17 @@ void BmlRequest::gestureRequestProcess()
 			}
 			if (closestMotion == NULL)
 			{
+				LOG("gestureRequestProcess ERR: cannot find any transition motion");
+				/*
 				closestMotion = sbMotion;
 				minSpeedDiffL = 0;
 				minSpeedDiffR = 0;
 				lWristTransitionDistance = 0;
 				rWristTransitionDistance = 0;
+				sbMotion->connect(actor->getSkeleton());
 				currLWristSpeed = sbMotion->getJointSpeed(lWrist, (float)sbMotion->time_stroke_start(), (float)sbMotion->time_stroke_end());
 				currRWristSpeed = sbMotion->getJointSpeed(rWrist, (float)sbMotion->time_stroke_start(), (float)sbMotion->time_stroke_end());
+				*/
 			}
 			else if (closestMotion->getName() != sbMotion->getName())
 			{
