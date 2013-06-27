@@ -34,19 +34,19 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar = new Fl_Menu_Bar(0, 0, w, 30); 
 	menubar->labelsize(10);
 	menubar->add("&File/New", 0, NewCB, this, NULL);	
-	menubar->add("&File/Save Scene Script", 0, SaveCB, this, NULL);		
-	menubar->add("&File/Export...", 0, ExportCB, this, NULL);	
-	menubar->add("&File/Load Scene Script", 0, LoadCB, this, NULL);
-	menubar->add("&File/Save Scene Setting", 0, SaveSceneSettingCB, this, NULL);	
-	menubar->add("&File/Load Scene Setting...", 0, LoadSceneSettingCB, this, NULL);	
+	menubar->add("&File/Load Scene", 0, LoadCB, this, NULL);
+	menubar->add("&File/Save Scene", 0, SaveCB, this, NULL);		
+	menubar->add("&File/Run Script...", 0, LoadSceneSettingCB, this, FL_MENU_DIVIDER);	
+//	menubar->add("&File/Save Scene Settings", 0, SaveSceneSettingCB, this, NULL);	
+	menubar->add("&File/Export...", 0, ExportCB, this, NULL);
 #if TEST_EXPORT_SMARTBODY_PACKAGE
-	menubar->add("&File/Export as Folder", 0, ExportPackageCB, (void*)0, NULL);
-	menubar->add("&File/Export as .ZIP", 0, ExportPackageCB, (void*)1, NULL);
-	menubar->add("&File/Import Folder", 0, LoadPackageCB, this, NULL);
+	menubar->add("&File/Export to folder", 0, ExportPackageCB, (void*)0, NULL);
+	menubar->add("&File/Export to .zip", 0, ExportPackageCB, (void*)1, NULL);
+	menubar->add("&File/Import folder", 0, LoadPackageCB, this, FL_MENU_DIVIDER);
 #endif
-    menubar->add("&File/Quick Connect", 0, QuickConnectCB, this, NULL);
-	menubar->add("&File/Connect...", 0, LaunchConnectCB, this, NULL);
-	menubar->add("&File/Disconnect", 0, DisconnectRemoteCB, this, NULL);
+    menubar->add("&File/Remote Quick Connect", 0, QuickConnectCB, this, NULL);
+	menubar->add("&File/Remote Connect...", 0, LaunchConnectCB, this, NULL);
+	menubar->add("&File/Remote Disconnect", 0, DisconnectRemoteCB, this, FL_MENU_DIVIDER);
 	menubar->add("&File/&Quit", 0, QuitCB, this, NULL);
 //	menubar->add("&File/Save Configuration...", 0, NULL, 0, NULL);
 //	menubar->add("&File/Run Script...", 0, NULL, 0, NULL);
@@ -584,7 +584,10 @@ void BaseWindow::ExportPackageCB( Fl_Widget* widget, void* data )
 	}
 	else
 	{
-		fileName = fl_file_chooser("Save Scene File:", "*.zip", mediaPath.c_str());
+		char* fname = fl_file_chooser("Save Scene File:", "*.zip", mediaPath.c_str());
+		if (!fname)
+			return;
+		fileName = fname;
 	}
 	if (fileName != "")
 	{
