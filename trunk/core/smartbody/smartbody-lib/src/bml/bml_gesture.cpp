@@ -123,21 +123,12 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	{
 		MeCtMotion* motionCt = new MeCtMotion();
 
-		// validate gesture timing input (stroke && relax)
-		float motionStrokeToRelax = float(motion->synch_points.get_time(srSynchPoints::RELAX) - motion->synch_points.get_time(srSynchPoints::STROKE));
-		float inputStrokeToRelax = behav_syncs.sync_relax()->offset() - behav_syncs.sync_stroke()->offset();
-		if (inputStrokeToRelax > 0 && inputStrokeToRelax < motionStrokeToRelax)
-		{
-			float gap = motionStrokeToRelax - inputStrokeToRelax;
-			behav_syncs.sync_relax()->set_offset(behav_syncs.sync_relax()->offset() + gap);
-			behav_syncs.sync_end()->set_offset(behav_syncs.sync_end()->offset() + gap);
-		}
-
 		// Name controller with behavior unique_id
 		ostringstream name;
 		name << unique_id << ' ' << motion->getName();
 		motionCt->setName(name.str().c_str());  // TODO: include BML act and behavior ids
-		// Handle stroke hold
+		
+		// pre stroke hold
 		SkMotion* mForCt = motion;
 		float prestrokehold = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_PRESTROKE_HOLD, elem, -1.0);
 		std::string prestrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_PRESTROKE_HOLD_IDLEMOTION, elem);
@@ -148,13 +139,13 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		std::string poststrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_POSTSTROKE_HOLD_IDLEMOTION, elem);
 		SkMotion* postIdleMotion = (SkMotion*)SmartBody::SBScene::getScene()->getMotion(poststrokehold_idlemotion);
 		
+		// post stroke hold (it's alternative to setting stroke and relax time)
 		std::string joints = xml_utils::xml_parse_string(BMLDefs::ATTR_JOINT_RANGE, elem);
 		float scale = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_SCALE, elem, 0.02f);
 		float freq = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_FREQUENCY, elem, 0.03f);
 		std::string strokeString = xml_utils::xml_parse_string(BMLDefs::ATTR_STROKE, elem);
-		std::string strokeEndString = xml_utils::xml_parse_string(BMLDefs::ATTR_STROKE_END, elem);
 		std::string relaxString = xml_utils::xml_parse_string(BMLDefs::ATTR_RELAX, elem);
-		if (poststrokehold > 0 && relaxString == "" && strokeEndString == "")
+		if (poststrokehold > 0 && (strokeString == "" || relaxString == ""))
 		{
 			std::vector<std::string> jointVec;
 			vhcl::Tokenize(joints, jointVec);
@@ -163,7 +154,8 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 			if (sbMForCT)
 				sbMForCT->setMotionSkeletonName(motion->getMotionSkeletonName());
 		}
-		//motionCt->init(const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0);
+
+		// gesture + locomotion
 		SmartBody::SBCharacter* sbCharacter = dynamic_cast<SmartBody::SBCharacter*>(request->actor);
 		bool isInLocomotion = false;
 		SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();

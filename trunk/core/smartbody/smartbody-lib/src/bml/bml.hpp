@@ -36,6 +36,7 @@
 #include "bml/behavior_span.hpp"
 #include "bml/behavior_scheduler.hpp"
 #include "bml/behavior_scheduler_constant_speed.hpp" // temporary, for BEHAVIOR_TIMING_BY_DURATION macro
+#include "bml/behavior_scheduler_gesture.hpp"
 
 
 #include "sb/sbm_character.hpp"

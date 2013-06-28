@@ -493,16 +493,6 @@ void BmlRequest::gestureRequestProcess()
 			if (closestMotion == NULL)
 			{
 				LOG("gestureRequestProcess ERR: cannot find any transition motion");
-				/*
-				closestMotion = sbMotion;
-				minSpeedDiffL = 0;
-				minSpeedDiffR = 0;
-				lWristTransitionDistance = 0;
-				rWristTransitionDistance = 0;
-				sbMotion->connect(actor->getSkeleton());
-				currLWristSpeed = sbMotion->getJointSpeed(lWrist, (float)sbMotion->time_stroke_start(), (float)sbMotion->time_stroke_end());
-				currRWristSpeed = sbMotion->getJointSpeed(rWrist, (float)sbMotion->time_stroke_start(), (float)sbMotion->time_stroke_end());
-				*/
 			}
 			else if (closestMotion->getName() != sbMotion->getName())
 			{
@@ -1705,8 +1695,6 @@ void GestureRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* sc
 		{
 			motion_ct->init(const_cast<SbmCharacter*>(request->actor), holdM, 0.0, 1.0);
 		}
-		BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController(motion_ct);
-		set_scheduler(scheduler);
 	}
 	MeControllerRequest::realize_impl(request, scene);
 }
@@ -1875,11 +1863,12 @@ GestureRequest::GestureRequest( const std::string& unique_id, const std::string&
 						 local,
                          motion_ct,
 						 schedule_ct,
-						 syncs_in )
+						 syncs_in, 
+						 MANUAL )
 {
-	BehaviorSchedulerConstantSpeed* sched = dynamic_cast<BehaviorSchedulerConstantSpeed*> (scheduler.get());
-	if (sched)
-		sched->constant = false;
+
+	BehaviorSchedulerGesturePtr scheduler = buildGestureSchedulerForController(motion_ct);
+	set_scheduler(scheduler);
 
 	gestureList = gl;
 	filtered = false;

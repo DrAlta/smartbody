@@ -294,6 +294,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ../smartbody-lib/src/bml/behavior_scheduler_constant_speed.cpp
         ../smartbody-lib/src/bml/behavior_scheduler.cpp
         ../smartbody-lib/src/bml/behavior_scheduler_fixed.cpp
+		../smartbody-lib/src/bml/behavior_scheduler_gesture.cpp
         ../smartbody-lib/src/bml/behavior_span.cpp
         ../smartbody-lib/src/bml/bml_animation.cpp
         ../smartbody-lib/src/bml/bml_gesture.cpp
