@@ -760,7 +760,7 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 #endif
 
 				//filename = mcn_return_full_filename_func( CurrentPath, finalPath.string().c_str() );
-
+				//LOG("motion filename = %s, pathname string = %s, pathname nativestring = %s",filename.c_str(), pathname.string().c_str(), pathname.native_file_string().c_str());
 				std::string filebase = boost::filesystem::basename( pathname );
 				const char* name = motion->getName().c_str();
 				if( name && _stricmp( filebase.c_str(), name ) )
@@ -812,6 +812,7 @@ int SBAssetManager::load_me_motion_individual( SrInput & input, const std::strin
 	std::string filename = motionName;
 
 	std::string filebase = boost::filesystem::basename( motionName );
+	//LOG("loadMotionIndividual, filename = %s, filebase = %s",filename.c_str(), filebase.c_str());
 	const char* name = motion->getName().c_str();
 	if( name && _stricmp( filebase.c_str(), name ) )
 	{
@@ -1265,18 +1266,15 @@ int SBAssetManager::load_me_skeleton_individual( SrInput & input, const std::str
 	}
 	else
 	{
-		skeleton->setName(skeletonName);
+		skeleton->skfilename(skeletonName.c_str());
+		std::string filebasename = boost::filesystem::basename(skeleton->skfilename());
+		std::string fileextension = boost::filesystem::extension(skeleton->skfilename());
+		skeleton->setName(filebasename+fileextension);	
 		SmartBody::SBSkeleton* sbskel = dynamic_cast<SmartBody::SBSkeleton*>(skeleton);
 		sbskel->setFileName(skeletonName);
-		map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(skeletonName, skeleton));
+		map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(skeleton->getName(), skeleton));
 	}
-
-
-	skeleton->skfilename(skeletonName.c_str());
-	std::string filebasename = boost::filesystem::basename(skeleton->skfilename());
-	std::string fileextension = boost::filesystem::extension(skeleton->skfilename());
-	skeleton->setName(filebasename+fileextension);	
-
+	//LOG("skeleton %s, filename = %s, skfilename = %s",skeleton->getName().c_str(),skeleton->getFileName().c_str(), skeleton->skfilename().c_str());
 
 	return CMD_SUCCESS;
 }
