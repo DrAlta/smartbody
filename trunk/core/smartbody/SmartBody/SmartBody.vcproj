@@ -397,6 +397,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\smartbody-lib\src\bml\behavior_scheduler_gesture.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\smartbody-lib\src\bml\behavior_scheduler_gesture.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\smartbody-lib\src\bml\behavior_span.cpp"
 				>
 			</File>
