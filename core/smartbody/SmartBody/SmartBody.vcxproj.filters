@@ -1092,6 +1092,9 @@
     <ClCompile Include="..\smartbody-lib\src\external\zlib-1.2.5\zutil.c">
       <Filter>external\zlib</Filter>
     </ClCompile>
+    <ClCompile Include="..\smartbody-lib\src\bml\behavior_scheduler_gesture.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\smartbody-dll\include\smartbody-dll.h" />
@@ -2178,6 +2181,9 @@
     </ClInclude>
     <ClInclude Include="..\smartbody-lib\src\external\zlib-1.2.5\zutil.h">
       <Filter>external\zlib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\smartbody-lib\src\bml\behavior_scheduler_gesture.hpp">
+      <Filter>bml</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

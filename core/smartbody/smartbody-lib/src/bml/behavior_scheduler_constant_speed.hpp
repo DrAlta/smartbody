@@ -52,8 +52,6 @@ namespace BML {
 			time_sec endTime;
 
 	        time_sec speed; 
-			
-			bool constant;
 
 		public:
 	        // preferred "local times" of sync points
