@@ -2056,6 +2056,7 @@ naive_uncomplete(boost::filesystem2::path const p, boost::filesystem2::path cons
 
 void writeFileToZip(zipFile& zf, std::string readFileName, std::string fileNameInZip)
 {
+	//LOG("writeFileToZip, srcFile = %s, fileInZip = %s",readFileName.c_str(),fileNameInZip.c_str());
 	const int bufferSize = 16384;
 	int size_buf = bufferSize;
 	void* buf = NULL; 
@@ -2176,12 +2177,21 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		writeFileToZip(zf,scriptFileLocation,initScriptFile);
 	}		
 	// save motions
+	//LOG("Num of motionNames = %d",motionNames.size());
 	for (unsigned int i=0;i<motionNames.size();i++)
 	{
 		SmartBody::SBMotion* motion = getMotion(motionNames[i]);
+		//LOG("motionName = %s",motionNames[i].c_str());
+
+		if (!motion)
+		{
+			LOG("Motion %s cannot be found.", motionNames[i].c_str());
+			continue;
+		}
+	
 		fs::path motionFile(motion->filename());			
 		fs::path motionPath = motionFile.parent_path();
-		
+		//LOG("motion %d, motionName = %s, filename = %s",motionNames[i].c_str(), motion->filename().c_str());
 		if (motionPath.empty()) // don't care about empty path
 			continue;
 		if (motion->getTransformDepth() > 0) // not an original motion
@@ -2191,7 +2201,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		fs::path diffPath = naive_uncomplete(motionPath,mePath);
 		fs::path newPath(outDir+diffPath.string());	
 		
-		//LOG("motionpath = %s, mediapath = %s, diffpath = %s, filename = %s", motionFile.directory_string().c_str(), mePath.string().c_str(), diffPath.string().c_str(), motionFile.filename().c_str());		
+		//LOG("motionpath = %s, mediapath = %s, diffpath = %s, filename = %s", motionFile.directory_string().c_str(), mePath.native_directory_string().c_str(), diffPath.string().c_str(), motionFile.filename().c_str());		
 		//LOG("new Path = %s, newFileName = %s",newPath.string().c_str(), newFileName.c_str());
 		//motion->saveToSkm(newFileName);
 		if (!writeToZip)

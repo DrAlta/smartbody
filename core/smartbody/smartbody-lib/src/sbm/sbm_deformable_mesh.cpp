@@ -596,7 +596,7 @@ void DeformableMeshInstance::cleanUp()
 	for (unsigned int i = 0; i < dynamicMesh.size(); i++)
 	{
 
-		SmartBody::SBScene::getScene()->getRootGroup()->remove(dynamicMesh[i]);
+		//SmartBody::SBScene::getScene()->getRootGroup()->remove(dynamicMesh[i]);
 		dynamicMesh[i]->unref();		
 		//delete dynamicMesh[i];
 	}
