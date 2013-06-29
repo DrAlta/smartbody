@@ -8,6 +8,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/algorithm/string.hpp>
 #include <sbm/ParserBVH.h>
 #include <sbm/ParserOpenCOLLADA.h>
 #include <sbm/ParserOgre.h>
@@ -557,7 +558,7 @@ std::vector<std::string> SBAssetManager::getSkeletonNames()
 	return ret;	
 }
 
-int SBAssetManager::load_me_motions( const char* pathname, std::map<std::string, SBMotion*>& map, bool recurse_dirs, double scale )
+int SBAssetManager::load_me_motions( const char* pathname, bool recurse_dirs, double scale )
 {
 	boost::filesystem::path motions_path(pathname);
 	
@@ -579,7 +580,7 @@ int SBAssetManager::load_me_motions( const char* pathname, std::map<std::string,
 	}
 
 	if (1) {
-		return load_me_motions_impl( finalPath, map, recurse_dirs, scale, "ERROR: " );
+		return load_me_motions_impl( finalPath, recurse_dirs, scale, "ERROR: " );
 	} else {
 		LOG("ERROR: Invalid motion path \"%s\".", finalPath.string().c_str());
 		return CMD_FAILURE;
@@ -587,8 +588,9 @@ int SBAssetManager::load_me_motions( const char* pathname, std::map<std::string,
 }
 
 
-int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathname, std::map<std::string, SmartBody::SBMotion*>& map, bool recurse_dirs, double scale, const char* error_prefix )
+int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathname, bool recurse_dirs, double scale, const char* error_prefix )
 {
+
 	if( !boost::filesystem::exists( pathname ) )
 	{
 #if (BOOST_VERSION > 104400)
@@ -599,7 +601,7 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 		return CMD_FAILURE;
 	}
 
-	if( boost::filesystem::is_directory( pathname ) )
+	if( boost::filesystem::is_directory( pathname ) ) // path indicates a directory
 	{
 		// ignore any '.' diretories
 #if (BOOST_VERSION > 104400)
@@ -621,7 +623,7 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 
 			if( boost::filesystem::is_directory( cur ) ) {
 				if( recurse_dirs )
-					load_me_motions_impl( cur, map, recurse_dirs, scale, "WARNING: " );
+					load_me_motions_impl( cur, recurse_dirs, scale, "WARNING: " );
 			} else {
 				std::string ext = boost::filesystem::extension( cur );
 #if ENABLE_FBX_PARSER
@@ -639,27 +641,34 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 					_stricmp( ext.c_str(), ".amc" ) == 0)
 #endif
 				{
-					load_me_motions_impl( cur, map, recurse_dirs, scale, "WARNING: " );
+					load_me_motions_impl( cur, false, scale, "WARNING: " );
 				} 
 				else if( DEBUG_LOAD_PATHS2 ) {
 					LOG("DEBUG: load_me_motion_impl(): Skipping \"%s\".  Extension \"%s\" does not match MOTION_EXT.", cur.string().c_str(), ext.c_str() );
 				}
 			}
 		}
-	} else {
+	} 
+	else // path indicates a file
+	{
 
 		std::vector<SBMotion*> motions;
 		std::string ext = boost::filesystem::extension( pathname );
 		SmartBody::SBMotion* motion = new SmartBody::SBMotion();
 		bool parseSuccessful = false;
 
+		std::string convertedPath = pathname.string();
+#ifdef WIN32
+		boost::replace_all(convertedPath, "\\", "/");
+#endif
 		if (ext == ".skm" || ext == ".SKM")
 		{
-			SrInput in( pathname.string().c_str(), "rt" );
+			
+			SrInput in( convertedPath.c_str(), "rt" );
 			SrString fullin_string;
 			in.getall( fullin_string );
 			SrInput fullin( (const char *)fullin_string );
-			fullin.filename( pathname.string().c_str() ); // copy filename for error message
+			fullin.filename( convertedPath.c_str() ); // copy filename for error message
 			
 			parseSuccessful = motion->load( fullin, scale );
 			if (parseSuccessful)
@@ -667,17 +676,17 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 		}
 		else if (ext == ".bvh" || ext == ".BVH")
 		{
-			std::ifstream filestream( pathname.string().c_str() );
+			std::ifstream filestream( convertedPath.c_str() );
 			
 			SkSkeleton skeleton;
-			parseSuccessful = ParserBVH::parse(skeleton, *motion, pathname.string(), filestream, float(scale));
+			parseSuccessful = ParserBVH::parse(skeleton, *motion, convertedPath, filestream, float(scale));
 			if (parseSuccessful)
 				motions.push_back(motion);
 		}
 		else if (ext == ".dae" || ext == ".DAE")
 		{			
 			SBSkeleton skeleton;
-			parseSuccessful = ParserOpenCOLLADA::parse(skeleton, *motion, pathname.string(), float(scale), true, true);		
+			parseSuccessful = ParserOpenCOLLADA::parse(skeleton, *motion, convertedPath, float(scale), true, true);		
 			// now there's adjust for the channels by default
 			//animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
 			SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(motion);
@@ -693,7 +702,7 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 		else if (ext == ".xml" || ext == ".XML")
 		{			
 			SBSkeleton skeleton;
-			parseSuccessful = ParserOgre::parse(skeleton, motions, pathname.string(), float(scale), true, true);			
+			parseSuccessful = ParserOgre::parse(skeleton, motions, convertedPath, float(scale), true, true);			
 		}
 		else if (ext == ".amc" || ext == ".AMC")
 		{
@@ -702,8 +711,8 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 			boost::filesystem::directory_iterator end;
 			std::string filebase = boost::filesystem::basename(pathname);
 			std::string fileext = boost::filesystem::extension(pathname);
-			int dirSize = pathname.string().size() - filebase.size() - fileext.size() - 1;
-			std::string directory = pathname.string().substr(0, dirSize);
+			int dirSize = convertedPath.size() - filebase.size() - fileext.size() - 1;
+			std::string directory = convertedPath.substr(0, dirSize);
 			for( boost::filesystem::directory_iterator i( directory ); i!=end; ++i ) 
 			{
 				const boost::filesystem::path& cur = *i;
@@ -718,7 +727,7 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 				}
 			}
 			std::ifstream metafilestream(asf.c_str());
-			std::ifstream filestream(pathname.string().c_str());
+			std::ifstream filestream(convertedPath.c_str());
 			SBSkeleton skeleton;
 			parseSuccessful = ParserASFAMC::parse(skeleton, *motion, metafilestream, filestream, float(scale));
 			motion->setName(filebase.c_str());
@@ -729,7 +738,7 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 		else if (ext == ".fbx" || ext == ".FBX")
 		{
 			SkSkeleton skeleton;
-			LOG("FBX motion parse: %s", pathname.string().c_str());
+			LOG("FBX motion parse: %s", convertedPath.c_str());
 			parseSuccessful = ParserFBX::parse(skeleton, *motion, pathname.string(), float(scale));	
 			if (parseSuccessful)
 				motions.push_back(motion);
@@ -754,7 +763,10 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 				std::string filename;
 
 #if (BOOST_VERSION > 104400)
-				filename = pathname.filename().string();			
+				filename = pathname.filename().string();		
+#ifdef WIN32
+		boost::replace_all(filename, "\\", "/");
+#endif
 #else
 				filename = pathname.filename().c_str();
 #endif
@@ -773,11 +785,11 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 					//motion->setName( filebase.c_str() );
 				}
 #if (BOOST_VERSION > 104400)
-				motion->filename( pathname.string().c_str() );
+				motion->filename( convertedPath.c_str() );
 				SBMotion* existingMotion = getMotion(filebase);
 				if (existingMotion)
 				{
-					LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
+	//				LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
 #else
 				motion->filename( pathname.native_file_string().c_str() );				
 				SBMotion* existingMotion = getMotion(filebase);
@@ -838,7 +850,7 @@ int SBAssetManager::load_me_motion_individual( SrInput & input, const std::strin
 int SBAssetManager::load_motions( const char* pathname, bool recursive )
 {
 	double scale = getDoubleAttribute("globalMotionScale");
-	return load_me_motions( pathname, _motions, recursive, scale );
+	return load_me_motions( pathname, recursive, scale );
 }
 
 int SBAssetManager::load_motion( const void* data, int sizeBytes, const char* motionName )

@@ -2,6 +2,7 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
+#include <boost/algorithm/string.hpp>
 #include <sb/SBScene.h>
 
 srPathList::srPathList()
@@ -79,9 +80,16 @@ std::string srPathList::next_path(bool withPrefix)
 	finalPath.canonize();
 #endif
 
+#ifdef WIN32
+	std::string convertedPath = finalPath.string();
+	boost::replace_all(convertedPath, "\\", "/");
 	_curIndex++;
-	
+	return convertedPath;
+#else
+	_curIndex++;
 	return finalPath.string();
+#endif
+
 }
 
 std::string srPathList::next_filename(char *buffer, const char *name)

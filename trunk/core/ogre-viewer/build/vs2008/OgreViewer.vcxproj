@@ -55,7 +55,7 @@
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\core\smartbody\smartbody-dll\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\OgreSDK\include\OGRE;..\..\..\..\lib\OgreSDK\include;..\..\..\..\lib\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -68,7 +68,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>glew32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;SmartBody_d.lib;OIS_d.lib;OgreMain_d.lib;pthreadVSE2.lib;activemq-cppd.lib;OpenAL32.lib;ws2_32.lib;rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;SmartBody_d.lib;OIS_d.lib;OgreMain_d.lib;pthreadVSE2.lib;activemq-cppd.lib;OpenAL32.lib;ws2_32.lib;rpcrt4.lib;winmm.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\..\core\smartbody\SmartBody\lib;..\..\..\..\core\smartbody\smartbody-lib\src\external\glew;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib\debug;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)OgreViewer_d.pdb</ProgramDatabaseFile>
@@ -87,7 +87,7 @@
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>..\..\..\..\lib\vhcl\include;..\..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\..\core\smartbody\smartbody-dll\include;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\OgreSDK\include\OGRE;..\..\..\..\lib\OgreSDK\include;..\..\..\..\lib\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -101,7 +101,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>vhcl.lib;vhmsg.lib;bonebus.lib;SmartBody.lib;glew32.lib;OIS.lib;OgreMain.lib;pthreadVSE2.lib;activemq-cpp.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;ws2_32.lib;rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vhcl.lib;vhmsg.lib;bonebus.lib;SmartBody.lib;glew32.lib;OIS.lib;OgreMain.lib;pthreadVSE2.lib;activemq-cpp.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;ws2_32.lib;rpcrt4.lib;winmm.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\..\core\smartbody\SmartBody\lib;..\..\..\..\core\smartbody\smartbody-lib\src\external\glew;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib\release;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>

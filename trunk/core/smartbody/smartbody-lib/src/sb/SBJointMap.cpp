@@ -10,6 +10,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <controllers/me_controller_tree_root.hpp>
+#include<boost/algorithm/string/replace.hpp>
 
 #define USE_STL_MAP 0
 
@@ -91,6 +92,10 @@ void SBJointMap::applyMotionRecurse(const std::string& directory)
 		boost::filesystem::path motionPath(fileName);
 #if (BOOST_VERSION > 104400)
 		std::string motionRootDir = motionPath.root_directory().string();
+#ifdef WIN32
+		boost::replace_all(motionRootDir, "\\", "/");
+#endif
+
 #else
 		std::string motionRootDir = motionPath.root_directory();
 #endif

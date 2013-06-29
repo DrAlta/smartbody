@@ -71,8 +71,8 @@ protected:
 		int load_skeletons( const char* pathname, bool recursive );
 		int load_motions( const char* pathname, bool recursive );
 
-		int load_me_motions( const char* pathname, std::map<std::string, SBMotion*>& map, bool recurse_dirs, double scale );
-		int load_me_motions_impl( const boost::filesystem::path& pathname, std::map<std::string, SmartBody::SBMotion*>& map, bool recurse_dirs, double scale, const char* error_prefix);
+		int load_me_motions( const char* pathname, bool recurse_dirs, double scale );
+		int load_me_motions_impl( const boost::filesystem::path& pathname, bool recurse_dirs, double scale, const char* error_prefix);
 		int load_me_motion_individual( SrInput & input, const std::string & motionName, std::map<std::string, SBMotion*>& map, double scale );
 
 		int load_me_skeleton_individual( SrInput & input, const std::string & skeletonName, std::map<std::string, SmartBody::SBSkeleton*>& map, double scale = 1.0 );
