@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\smartbody-dll\include&quot;;&quot;..\smartbody-lib\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include"
-				PreprocessorDefinitions="SB_EXPORTS;dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
+				AdditionalIncludeDirectories="&quot;..\smartbody-dll\include&quot;;&quot;..\smartbody-lib\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include"
+				PreprocessorDefinitions="SB_EXPORTS;dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -63,10 +63,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="glew32.lib glu32.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib activemq-cppd.lib xerces-c_3D.lib boost_filesystem-vc90-mt-gd-1_44.lib boost_system-vc90-mt-gd-1_44.lib boost_regex-vc90-mt-gd-1_44.lib boost_python-vc90-mt-gd-1_44.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlibd.lib pprAId.lib ode_doubled.lib"
+				AdditionalDependencies="glew32.lib glu32.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib activemq-cppd.lib xerces-c_3D.lib boost_filesystem-vc90-mt-gd-1_51.lib boost_system-vc90-mt-gd-1_51.lib boost_regex-vc90-mt-gd-1_51.lib boost_python-vc90-mt-gd-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlibd.lib pprAId.lib ode_doubled.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\smartbody-lib\lib&quot;;&quot;..\sbm-debugger\lib\Debug&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\core\smartbody\ode\lib9;..\..\..\core\smartbody\Python26\libs9;..\..\..\lib\festival\speech_tools\lib9;..\..\..\lib\festival\festival\src\lib9;&quot;..\smartbody-lib\src\external\glew&quot;"
+				AdditionalLibraryDirectories="&quot;..\smartbody-lib\lib&quot;;&quot;..\sbm-debugger\lib\Debug&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\core\smartbody\ode\lib9;..\..\..\core\smartbody\Python27\libs9;..\..\..\lib\festival\speech_tools\lib9;..\..\..\lib\festival\festival\src\lib9;&quot;..\smartbody-lib\src\external\glew&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -124,8 +124,8 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="&quot;..\smartbody-dll\include&quot;;&quot;..\smartbody-lib\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include"
-				PreprocessorDefinitions="SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
+				AdditionalIncludeDirectories="&quot;..\smartbody-dll\include&quot;;&quot;..\smartbody-lib\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include"
+				PreprocessorDefinitions="SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -146,9 +146,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_44.lib boost_system-vc90-mt-1_44.lib boost_regex-vc90-mt-1_44.lib boost_python-vc90-mt-1_44.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlib.lib pprAI.lib ode_double.lib glu32.lib glew32.lib"
+				AdditionalDependencies="vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_51.lib boost_system-vc90-mt-1_51.lib boost_regex-vc90-mt-1_51.lib boost_python-vc90-mt-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlib.lib pprAI.lib ode_double.lib glu32.lib glew32.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\smartbody-lib\src\external\glew&quot;;&quot;..\smartbody-lib\lib&quot;;&quot;..\sbm-debugger\lib\Release&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\..\..\lib\festival\festival\src\lib9;..\..\..\lib\festival\speech_tools\lib9;..\ode\lib9;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\core\smartbody\Python26\libs9"
+				AdditionalLibraryDirectories="&quot;..\smartbody-lib\src\external\glew&quot;;&quot;..\smartbody-lib\lib&quot;;&quot;..\sbm-debugger\lib\Release&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\..\..\lib\festival\festival\src\lib9;..\..\..\lib\festival\speech_tools\lib9;..\ode\lib9;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\core\smartbody\Python27\libs9"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -1837,110 +1837,10 @@
 			Name="external"
 			>
 			<Filter
-				Name="ANN"
+				Name="nanoflann"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\ANN.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\ANN.h"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\ANNperf.h"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\ANNx.h"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\bd_fix_rad_search.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\bd_pr_search.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\bd_search.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\bd_tree.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\bd_tree.h"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\brute.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_dump.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_fix_rad_search.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_fix_rad_search.h"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_pr_search.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_pr_search.h"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_search.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_search.h"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_split.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_split.h"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_tree.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_tree.h"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_util.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\kd_util.h"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\perf.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\pr_queue.h"
-					>
-				</File>
-				<File
-					RelativePath="..\smartbody-lib\src\external\ANN\pr_queue_k.h"
+					RelativePath="..\smartbody-lib\src\external\nonoflann\nanoflann.hpp"
 					>
 				</File>
 			</Filter>
@@ -2413,6 +2313,154 @@
 				</File>
 				<File
 					RelativePath="..\smartbody-lib\src\external\recast\RecastRegion.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="zlib"
+				>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\adler32.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\compress.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\crc32.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\crc32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\crypt.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\deflate.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\deflate.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\example.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\gzclose.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\gzguts.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\gzlib.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\gzread.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\gzwrite.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\infback.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inffast.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inffast.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inffixed.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inflate.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inflate.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inftrees.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inftrees.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\ioapi.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\ioapi.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\iowin32.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\iowin32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\trees.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\trees.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\uncompr.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\unzip.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\unzip.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zconf.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zip.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zip.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zlib.h"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zutil.c"
+					>
+				</File>
+				<File
+					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zutil.h"
 					>
 				</File>
 			</Filter>

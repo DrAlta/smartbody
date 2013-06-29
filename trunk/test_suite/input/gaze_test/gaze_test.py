@@ -1,3 +1,5 @@
+getViewer().show()
+
 scene.setScale(1.0)
 scene.setMediaPath('../../../../data')
 scene.addAssetPath('script','sbm-common/scripts')
