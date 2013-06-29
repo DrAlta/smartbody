@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 
 #include "sbm/xercesc_utils.hpp"
@@ -482,7 +483,10 @@ DOMDocument* xml_utils::parseMessageXml( XercesDOMParser* xmlParser, const char 
 			}
 		} else {
 			if (USELOG) LOG("Parsing XML from file \"%s\"", str);
-			xmlParser->parse( str );
+			std::ifstream ifs(str);
+			std::string content( (std::istreambuf_iterator<char>(ifs) ),
+								 (std::istreambuf_iterator<char>()    ) );
+			int numErrors = xml_utils::parseCString(content.c_str(), xmlParser );
 		}
 		int errorCount = xmlParser->getErrorCount();
 		if( errorCount > 0 ) {

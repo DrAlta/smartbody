@@ -39,6 +39,7 @@
 #include <string>
 #include <boost/version.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBMotion.h>
@@ -4245,6 +4246,9 @@ int motionmapdir_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		boost::filesystem::path motionPath(fileName);
 #if (BOOST_VERSION > 104400)
 		std::string motionRootDir = motionPath.root_directory().string();
+#ifdef WIN32
+		boost::replace_all(motionRootDir, "\\", "/");
+#endif
 #else
 		std::string motionRootDir = motionPath.root_directory();
 #endif

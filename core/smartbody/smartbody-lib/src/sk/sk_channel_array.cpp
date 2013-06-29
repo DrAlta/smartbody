@@ -570,13 +570,53 @@ SrInput& operator>> ( SrInput& in, SkChannelArray& ca )
 
 	ca.init ();
 	ca._channelList.reserve(256); // reserve 256 entries
+/*
+	std::vector<std::string> tokens;
+	SrString curTok;
+	bool firstTime = true;
+	int curLine = in.curline();
+	int tmpLine = 0;
+	while ( n >= 0 )
+	{
+		in.get_token (curTok);
+		int tmpLine = in.curline();
+		if (firstTime)
+		{
+			curLine= tmpLine;
+			firstTime = false;
+		}
+		if (tmpLine > curLine && !firstTime)
+		{
+			std::string name;
+			for (unsigned int i = 0; i < tokens.size() - 1; i++)
+			{
+				if (i > 0)
+					name.append(" ");
+				name.append(tokens[i]);
+			}
+			ca.add ( name, SkChannel::get_type(tokens[tokens.size() - 1].c_str()) );
+			n--;
+			tokens.clear();
+			tokens.push_back(std::string(curTok));
+			curLine = tmpLine;
+		}
+		else
+		{
+			tokens.push_back(std::string(curTok));
+		}
+
+
+	}
+
+	in.unget_token();
+*/
 
 	SrString name;
 	while ( (n--) > 0 )
 	{ in.get_token ( name );
 	in.get_token ();
 	ca.add ( std::string(name), SkChannel::get_type(in.last_token()) );
-	}         
+	}
 
 	//   ca.compress();
 

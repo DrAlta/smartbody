@@ -929,7 +929,7 @@ int main( int argc, char **argv )	{
 
 #ifndef SB_NO_PYTHON
 	// initialize python
-	LOG("Initializing Pyton with libraries at location: %s", python_lib_path.c_str());
+	LOG("Initializing Python with libraries at location: %s", python_lib_path.c_str());
 
 	SmartBody::SBScene::setSystemParameter("pythonlibpath", python_lib_path);
 	initPython(python_lib_path);
