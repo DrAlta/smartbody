@@ -4,6 +4,14 @@ include_directories( /usr/include )
 
 add_definitions( "-DdDOUBLE" )
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
+add_definitions( "-Dfopen64=fopen" )
+add_definitions( "-Dfseeko64=fseeko" )
+add_definitions( "-Dftello64=ftello" )
+endif()
+
+
+
 set(SB_EXPORTS 1)
 set(SMARTBODY_DLL_EXPORTS 1)
 set(SMARTBODY_C_DLL_EXPORTS 1)
@@ -131,7 +139,7 @@ set( SMARTBODY_LIB_EXT_ZLIB_SRC
 	../smartbody-lib/src/external/zlib-1.2.5/zutil.c
 )
 
-set( SMARTBODY_LIB_EXT_SOIL_SRC
+set( SMARTBODY_LIB_EXT_RECAST_SRC
 
         ../smartbody-lib/src/external/recast/Recast.cpp
         ../smartbody-lib/src/external/recast/RecastAlloc.cpp
@@ -151,13 +159,13 @@ set( SMARTBODY_LIB_EXT_SOIL_SRC
         ../smartbody-lib/src/external/recast/DetourNode.cpp
 )
 
-set( SMARTBODY_LIB_EXT_RECAST_SRC
+set( SMARTBODY_LIB_EXT_SOIL_SRC
 
         ../smartbody-lib/src/external/SOIL/image_DXT.c
         ../smartbody-lib/src/external/SOIL/image_helper.c
         ../smartbody-lib/src/external/SOIL/SOIL.c
         ../smartbody-lib/src/external/SOIL/stb_image_aug.c
-#       ../smartbody-lib/src/external/SOIL/stbi_DDS_aug_c.h
+       ../smartbody-lib/src/external/SOIL/stbi_DDS_aug_c.h
 )
 
 set( SMARTBODY_LIB_EXT_PERLIN_SRC
