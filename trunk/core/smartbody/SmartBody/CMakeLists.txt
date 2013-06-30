@@ -62,22 +62,9 @@ endif()
 find_package(OpenGL REQUIRED)
 
 
-set( SMARTBODY_LIB_EXT_ANN_SRC
+set( SMARTBODY_LIB_EXT_NANOFLANN_SRC
 
-        ../smartbody-lib/src/external/ANN/ANN.cpp
-        ../smartbody-lib/src/external/ANN/bd_fix_rad_search.cpp
-        ../smartbody-lib/src/external/ANN/bd_pr_search.cpp
-        ../smartbody-lib/src/external/ANN/bd_search.cpp
-        ../smartbody-lib/src/external/ANN/bd_tree.cpp
-        ../smartbody-lib/src/external/ANN/brute.cpp
-        ../smartbody-lib/src/external/ANN/kd_dump.cpp
-        ../smartbody-lib/src/external/ANN/kd_fix_rad_search.cpp
-        ../smartbody-lib/src/external/ANN/kd_pr_search.cpp
-        ../smartbody-lib/src/external/ANN/kd_search.cpp
-        ../smartbody-lib/src/external/ANN/kd_split.cpp
-        ../smartbody-lib/src/external/ANN/kd_tree.cpp
-        ../smartbody-lib/src/external/ANN/kd_util.cpp
-        ../smartbody-lib/src/external/ANN/perf.cpp
+        ../smartbody-lib/src/external/nanoflann/nanoflann.hpp
 
 )
 
@@ -502,7 +489,7 @@ add_library(
 	SmartBody
 	SHARED 
 
-	${SMARTBODY_LIB_EXT_ANN_SRC}
+	${SMARTBODY_LIB_EXT_NANOFLANN_SRC}
 
         ${SMARTBODY_LIB_EXT_SOIL_SRC}
 
