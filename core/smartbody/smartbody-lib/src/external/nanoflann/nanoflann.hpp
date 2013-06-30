@@ -50,6 +50,8 @@
 # endif
 #endif
 
+void* poolMalloc(const size_t req_size);
+
 namespace nanoflann
 {
 /** @addtogroup nanoflann_grp nanoflann C++ library for ANN
