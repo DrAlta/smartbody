@@ -418,7 +418,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 {
 	if (result_visemes == NULL)
 		return;
-	
+
 	for (size_t i = 0; i < debugVisemeCurves.size(); ++i)
 	{
 		delete debugVisemeCurves[i];
@@ -580,8 +580,10 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("diphoneSmoothWindow-PBM"));
 		else if (strcmp(visemeProcessedData[i]->id(), "FV") == 0)
 			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("diphoneSmoothWindow-FV"));
+		else if (strcmp(visemeProcessedData[i]->id(), "tRoof") == 0)
+			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("diphoneSmoothWindow-FV"));
 		else
-			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, character->getDiphoneSmoothWindow());
+			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("diphoneSmoothWindow"));
 		VisemeData* debugVwSmoothing = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
 		debugVwSmoothing->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
 		debugVwSmoothing->setCurveInfo("3");
@@ -596,28 +598,100 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		int openIndex = -1;
 		int bmpIndex = -1;
 		int fvIndex = -1;
+		int wIndex = -1;
+		int wideIndex = -1;
+		int shchIndex = -1;
 		for (size_t i = 0; i < visemeProcessedData.size(); i++)
 		{
+			//LOG("viseme name %s", visemeProcessedData[i]->id());
 			if (strcmp(visemeProcessedData[i]->id(), "open") == 0)
 				openIndex = i;
 			if (strcmp(visemeProcessedData[i]->id(), "PBM") == 0)
 				bmpIndex = i;
 			if (strcmp(visemeProcessedData[i]->id(), "FV") == 0)
 				fvIndex = i;
+			if (strcmp(visemeProcessedData[i]->id(), "W") == 0)
+				wIndex = i;
+			if (strcmp(visemeProcessedData[i]->id(), "ShCh") == 0)
+				shchIndex = i;
+			if (strcmp(visemeProcessedData[i]->id(), "wide") == 0)
+				wideIndex = i;
 		}
 
-		if (openIndex >= 0)
+
+		if (character->getBoolAttribute("diphoneRulePBM") && bmpIndex >= 0)
 		{
-			if (bmpIndex >= 0 && character->getBoolAttribute("diphoneRulePBM"))
-				processOpenCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[bmpIndex]->getFloatCurve(), (float)character->getDoubleAttribute("pbmOpenConstrain"));
-			if (fvIndex >= 0 && character->getBoolAttribute("diphoneRuleFV"))
-				processOpenCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[fvIndex]->getFloatCurve(), (float)character->getDoubleAttribute("fvOpenConstrain"));
+			if (openIndex >= 0)
+			{
+				constrainCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[bmpIndex]->getFloatCurve(), (float)character->getDoubleAttribute("openConstraintByPBM"));
+			}
+			if (wideIndex >= 0)
+			{
+				constrainCurve(visemeProcessedData[wideIndex]->getFloatCurve(), visemeProcessedData[bmpIndex]->getFloatCurve(), (float)character->getDoubleAttribute("wideConstraintByPBM"));
+			}
+			if (shchIndex >= 0)
+			{
+				constrainCurve(visemeProcessedData[shchIndex]->getFloatCurve(), visemeProcessedData[bmpIndex]->getFloatCurve(), (float)character->getDoubleAttribute("shchConstraintByPBM"));
+			}
+		}
+		if (character->getBoolAttribute("diphoneRuleFV") && fvIndex >= 0)
+		{
+			if (openIndex >= 0)
+			{
+				constrainCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[fvIndex]->getFloatCurve(), (float)character->getDoubleAttribute("openConstraintByFV"));
+			}
+			if (wideIndex > 0)
+			{
+				constrainCurve(visemeProcessedData[wideIndex]->getFloatCurve(), visemeProcessedData[fvIndex]->getFloatCurve(), (float)character->getDoubleAttribute("wideConstraintByFV"));
+			}
+		}
+		if (character->getBoolAttribute("diphoneRuleShCh") && shchIndex >= 0)
+		{
+			if (openIndex >= 0)
+			{
+				constrainCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[shchIndex]->getFloatCurve(), (float)character->getDoubleAttribute("openConstraintByShCh"));
+			}
+		}
+		if (character->getBoolAttribute("diphoneRuleW") && wIndex >= 0)
+		{
+			if (openIndex >= 0)
+			{
+				constrainCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[wIndex]->getFloatCurve(), (float)character->getDoubleAttribute("openConstraintByW"));
+			}
+		}
+		if (character->getBoolAttribute("diphoneRuleWide") && wideIndex >= 0)
+		{
+			if (openIndex >= 0)
+			{
+				constrainCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[wideIndex]->getFloatCurve(), (float)character->getDoubleAttribute("openConstraintByWide"));
+			}
+		}
 
-			VisemeData* debugProcessOpenCurve = new VisemeData(visemeProcessedData[openIndex]->id(), visemeProcessedData[openIndex]->time());
-			debugProcessOpenCurve->setCurveInfo("4");
-			debugProcessOpenCurve->setFloatCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[openIndex]->getFloatCurve().size() / 2, 2);
-			debugVisemeCurves.push_back(debugProcessOpenCurve);
+		VisemeData* debugconstrainCurve = new VisemeData(visemeProcessedData[openIndex]->id(), visemeProcessedData[openIndex]->time());
+		debugconstrainCurve->setCurveInfo("4");
+		debugconstrainCurve->setFloatCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[openIndex]->getFloatCurve().size() / 2, 2);
+		debugVisemeCurves.push_back(debugconstrainCurve);
 
+		if (wideIndex >= 0)
+		{
+			VisemeData* debugProcessWideCurve = new VisemeData(visemeProcessedData[wideIndex]->id(), visemeProcessedData[wideIndex]->time());
+			debugProcessWideCurve->setCurveInfo("4");
+			debugProcessWideCurve->setFloatCurve(visemeProcessedData[wideIndex]->getFloatCurve(), visemeProcessedData[wideIndex]->getFloatCurve().size() / 2, 2);
+			debugVisemeCurves.push_back(debugProcessWideCurve);
+		}
+		if (wIndex >= 0)
+		{
+			VisemeData* debugProcessWCurve = new VisemeData(visemeProcessedData[wIndex]->id(), visemeProcessedData[wIndex]->time());
+			debugProcessWCurve->setCurveInfo("4");
+			debugProcessWCurve->setFloatCurve(visemeProcessedData[wIndex]->getFloatCurve(), visemeProcessedData[wIndex]->getFloatCurve().size() / 2, 2);
+			debugVisemeCurves.push_back(debugProcessWCurve);
+		}
+		if (shchIndex >= 0)
+		{
+			VisemeData* debugProcessShChCurve = new VisemeData(visemeProcessedData[shchIndex]->id(), visemeProcessedData[shchIndex]->time());
+			debugProcessShChCurve->setCurveInfo("4");
+			debugProcessShChCurve->setFloatCurve(visemeProcessedData[shchIndex]->getFloatCurve(), visemeProcessedData[shchIndex]->getFloatCurve().size() / 2, 2);
+			debugVisemeCurves.push_back(debugProcessShChCurve);
 		}
 	}
 
@@ -794,12 +868,31 @@ void BML::SpeechRequest::filterCurve(std::vector<float>&c, float speedLimit)
 		{
 			//LOG("[%d]: %f", i, speed);
 			float sign = (y[i] <= y[i + 1]) ? 1.0f : -1.0f;
+
+			bool isZero = false;
+			// if the point is 0, append a 0 after it
+			if (fabs(y[i + 1]) < gwiz::epsilon4())
+				isZero = true;
+
 			y[i + 1] = fabs(x[i] - x[i + 1]) * speedLimit * sign + y[i];
+
+			if (isZero && i < (x.size() - 2))	// append one if y[i + 1] is zero
+			{
+				if ((x[i + 2] - x[i + 1]) > 0.1)	// 0.1 is adhoc
+				{
+					x.insert(x.begin() + i + 2, x[i + 1] + 0.1f);
+					y.insert(y.begin() + i + 2, 0.0f);
+					i = i + 2;
+					continue;
+				}
+			}
+
 			if (i == x.size() - 2)	// append one if last point has been changed
 			{
 				x.push_back(x[i] + 0.3f);	// 0.3 is adhoc
 				y.push_back(0.0f);
 			}
+
 		}
 	}
 
@@ -882,7 +975,7 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& 
 //	LOG("Number of smoothing iteration %d", numIter);
 }
 
-void BML::SpeechRequest::processOpenCurve(std::vector<float>& openCurve, std::vector<float>& otherCurve, float ratio)
+void BML::SpeechRequest::constrainCurve(std::vector<float>& openCurve, std::vector<float>& otherCurve, float ratio)
 {
 	std::vector<float> openX;
 	std::vector<float> openY;
