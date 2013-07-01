@@ -41,7 +41,7 @@ SBCharacter::SBCharacter() : SbmCharacter()
 
 SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name.c_str(), type)
 {
-	createBoolAttribute("useCustomizedLipSyncIfPresent", true, true, "Basic", 70, false, false, false, "If motion name exists inside pre-recorded audio file bml, use it by default"); 
+	createBoolAttribute("useCustomizedLipSyncIfPresent", true, true, "Basic", 60, false, false, false, "If motion name exists inside pre-recorded audio file bml, use it by default"); 
 
 	createBoolAttribute("gestureRequest.autoGestureTransition", true, true, "Basic", 89, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
 	createBoolAttribute("gestureRequest.matchingHandness", true, true, "Basic", 90, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
@@ -77,9 +77,18 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createBoolAttribute("useDiphone", true, true, "Basic", 150, false, false, false, "Use diphones.");
 	createBoolAttribute("diphoneRule", true, true, "Basic", 151, false, false, false, "Use diphones.");
 	createBoolAttribute("diphoneRuleFV", true, true, "Basic", 152, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneRuleW", true, true, "Basic", 152, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneRuleWide", false, true, "Basic", 152, false, false, false, "Use diphones.");
 	createBoolAttribute("diphoneRulePBM", true, true, "Basic", 153, false, false, false, "Use diphones.");
-	createDoubleAttribute("pbmOpenConstrain", 0.5, true, "Basic", 154, false, false, false, "Use diphones.");
-	createDoubleAttribute("fvOpenConstrain", 0.7, true, "Basic", 155, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneRuleShCh", true, true, "Basic", 153, false, false, false, "Use diphones.");
+	createDoubleAttribute("openConstraintByPBM", 0.5, true, "Basic", 154, false, false, false, "Use diphones.");
+	createDoubleAttribute("wideConstraintByPBM", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("shchConstraintByPBM", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("openConstraintByFV", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("wideConstraintByFV", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("openConstraintByShCh", 0.7, true, "Basic", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("openConstraintByW", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("openConstraintByWide", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
 	createDoubleAttribute("diphoneScale", 1, true, "Basic", 156, false, false, false, "Scale factor for diphone curves.");
 	createStringAttribute("diphoneSetName", "", true, "Basic", 157, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
 	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 158, false, false, false, "Use diphones spline/linear curve.");
