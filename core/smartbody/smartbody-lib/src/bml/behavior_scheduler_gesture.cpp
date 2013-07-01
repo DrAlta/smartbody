@@ -188,7 +188,7 @@ void BehaviorSchedulerGesture::schedule( BehaviorSyncPoints& behav_syncs, time_s
 			double gap = (syncTimes[5] - syncTimes[3]) - (rawTimes[5] - rawTimes[3]);
 			if (gap < 0)
 			{
-				LOG("sync time stroke->relax time is shorter than motion stroke->relax time by %f, re-adjust...", gap);
+				//LOG("sync time stroke->relax time is shorter than motion stroke->relax time by %f, re-adjust...", gap);
 				syncTimes[5] += fabs(gap);
 				syncTimes[6] += fabs(gap);
 			}
