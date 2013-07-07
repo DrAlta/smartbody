@@ -53,13 +53,14 @@ std::vector<std::string> SBJointMapManager::getJointMapNames()
 void SBJointMapManager::removeJointMap(const std::string& name)
 {
 	std::map<std::string, SmartBody::SBJointMap*>::iterator iter = _jointMaps.find(name);
-	if (iter == _jointMaps.end())
+	if (iter != _jointMaps.end())
 	{
 		SmartBody::SBJointMap* map = (*iter).second;
 		_jointMaps.erase(iter);
 		delete map;
 		return;
 	}
+	
 
 	LOG("Cannot find joint map %s, will not be erased.", name.c_str());
 }
