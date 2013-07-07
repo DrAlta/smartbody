@@ -915,6 +915,7 @@ void BML::Processor::speechReply( SbmCharacter* actor, SmartBody::RequestId requ
 
 void BML::Processor::interrupt( SbmCharacter* actor, time_sec duration, SmartBody::SBScene* scene )
 {
+	std::vector<std::string> keysToErase;
 	BML::MapOfBmlRequest::iterator iter = bml_requests.begin();
 	for ( ; iter != bml_requests.end(); iter++)
 	{
@@ -922,8 +923,19 @@ void BML::Processor::interrupt( SbmCharacter* actor, time_sec duration, SmartBod
 		if (request->actor == actor)
 		{
 			if (interrupt(actor, iter->first, duration, scene) == CMD_SUCCESS)
-				bml_requests.erase(iter++);
+			{
+				keysToErase.push_back(iter->first);
+			}
 		}
+	}
+
+	for (std::vector<std::string>::iterator iter = keysToErase.begin();
+		 iter != keysToErase.end();
+		 iter++)
+	{
+		BML::MapOfBmlRequest::iterator requestIter = bml_requests.find((*iter));
+		if (requestIter != bml_requests.end())
+			bml_requests.erase((*iter));
 	}
 }
 

@@ -1431,7 +1431,7 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	_buttonJointLabel->add("Mapped Name");
 	_buttonJointLabel->value(0);
 	_buttonJointLabel->callback(CheckShowJointLabelCB,this);
-	_buttonAddMapping = new Fl_Button(420 + 10 + 150, h - 50 + 10, 90, 30, "Add Maping");
+	_buttonAddMapping = new Fl_Button(420 + 10 + 150, h - 50 + 10, 90, 30, "Add Mapping");
 	_buttonAddMapping->callback(AddJointMapCB,this);	
 	_choiceTestMotions = new Fl_Choice(420 + 10 + 350, h - 50 + 10, 90, 30, "Test Motions");
 	_choiceTestMotions->callback(ChangeTestMotionCB,this);
