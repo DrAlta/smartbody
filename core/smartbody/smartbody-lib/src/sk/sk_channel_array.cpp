@@ -628,8 +628,8 @@ void SkChannelArray::changeChannelName(std::string oldName, std::string newName)
 {
 	bool channelFound = false;
 	for (size_t c = 0; c < _channelList.size(); c++)
-	{		
-		if (oldName == _channelList[c].name && !_channelUpdateTable[c])
+	{	
+		if ( (oldName == _channelList[c].name || oldName == _channelList[c].mappedName) && !_channelUpdateTable[c])
 		{
 			_channelList[c].name = newName;
 			channelFound = true;

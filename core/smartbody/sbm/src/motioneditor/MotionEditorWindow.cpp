@@ -225,7 +225,7 @@ std::string MotionEditorWindow::getCurrentCharacterName()
 std::string MotionEditorWindow::getCurrentMotionName()
 {
    int v = _browserMotionList->value();
-   if (v > 0 && v < _browserMotionList->size())
+   if (v > 0 && v <= _browserMotionList->size())
    {
       return _browserMotionList->text(_browserMotionList->value());
    }

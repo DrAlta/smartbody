@@ -490,11 +490,8 @@ SBScene::~SBScene(void)
 	delete _debuggerServer;  // TODO: should delete these in reverse order?
 	delete _debuggerClient;
 	delete _debuggerUtility;
-
 //	
 	//mcu.reset();
-
-
 }
 
 SBDebuggerServer* SBScene::getDebuggerServer()
