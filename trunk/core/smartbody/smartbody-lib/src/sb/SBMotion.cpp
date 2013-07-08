@@ -539,6 +539,46 @@ SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 	return copyMotion;
 }
 
+
+
+void SBMotion::removeMotionChannels( std::vector<std::string> channelNames )
+{
+	int chanCount = 0;
+	_channels.startChannelNameChange();
+	for (unsigned int i=0;i<channelNames.size();i++)
+	{
+		std::string newChanName = "deletedChan" + boost::lexical_cast<std::string>(chanCount++);
+		_channels.changeChannelName(channelNames[i],newChanName);
+	}	
+	_channels.rebuild_hash_table();
+}
+
+
+void SBMotion::removeMotionChannelsByEndJoints( std::string skelName, std::vector<std::string>& endJoints )
+{
+	SBSkeleton* srcSkeleton = SmartBody::SBScene::getScene()->getSkeleton(skelName);
+	if (!srcSkeleton)
+	{
+		LOG("No skeleton named %s found. Can not match joint names and descendents", skelName.c_str());
+		return;
+	}
+	std::vector<std::string> removeJoints;
+	for (unsigned int i=0;i<endJoints.size();i++)
+	{
+		SmartBody::SBJoint* eJoint = srcSkeleton->getJointByName(endJoints[i]);
+		if (eJoint)
+		{
+			std::vector<SBJoint*> descendents = eJoint->getDescendants();
+			for (unsigned int j=0;j<descendents.size();j++)
+			{
+				removeJoints.push_back(descendents[j]->getName());
+			}
+			removeJoints.push_back(eJoint->getName());
+		}		
+	}
+	this->removeMotionChannels(removeJoints);
+}
+
 SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJointMap)
 {
 	 
@@ -563,7 +603,9 @@ SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std
 	}
 	
 	//SkMotion* motion = buildRetargetMotion(srcSkeleton,dstSkeleton, endJoints, relativeJoints, offsetJointMap);
-	SkMotion* motion = buildRetargetMotionV2(srcSkeleton,dstSkeleton, endJoints, relativeJoints, offsetJointMap);
+	SkMotion* motion = buildRetargetMotionV2(srcSkeleton,dstSkeleton, endJoints, relativeJoints, offsetJointMap);	
+	
+	
 	SBMotion* sbmotion = dynamic_cast<SBMotion*>(motion);
 	if (sbmotion)
 	{
@@ -577,8 +619,6 @@ SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std
 		else
 			motionName = name;
 		sbmotion->setName(motionName.c_str());
-
-
 		//mcu.motion_map.insert(std::pair<std::string, SkMotion*>(motionName, motion));
 		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
 	}

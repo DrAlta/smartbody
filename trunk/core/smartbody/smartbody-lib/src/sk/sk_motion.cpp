@@ -1232,7 +1232,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 	tempSrcSk->root()->quat()->prerot(offsetRot);
 #endif
 	
-	SkMotion *retarget_p = new SmartBody::SBMotion();
+	SkMotion *retarget_p = new SmartBody::SBMotion();	
 	//srSynchPoints sp(synch_points);
 	retarget_p->synch_points.copy_points(synch_points);// = sp;
 	retarget_p->init( mchan_arr ); // use the target channels instead
