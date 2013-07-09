@@ -224,7 +224,7 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 		SmartBody::SBJoint* joint = skeletonCopy->getJointByName(node->nodeName);
 		SkJointQuat* skQuat = joint->quat();		
 		affectedJoints.push_back(joint);	
-		_channels.add(joint->jointName(), SkChannel::Quat);		
+		_channels.add(joint->getMappedJointName(), SkChannel::Quat);		
 	}	
 	SmartBody::SBMotion *releaseHand, *grabHand, *reachHand, *pointHand;
 	releaseHand = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBReach::findTagMotion(type,releasePose));
