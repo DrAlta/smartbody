@@ -2107,6 +2107,8 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 			// not used joints
 			if (jointNameMap.find(jointName) == jointNameMap.end())
 				mirrorJoint = false;
+			else
+				mirrorJoint = jointNameMap.find(jointName)->second;
 
 			int index = mchan_arr.float_position(k);
 			if (chan.type == SkChannel::XPos)

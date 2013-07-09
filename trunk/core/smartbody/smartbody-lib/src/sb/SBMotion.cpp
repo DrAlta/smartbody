@@ -543,11 +543,10 @@ SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 
 void SBMotion::removeMotionChannels( std::vector<std::string> channelNames )
 {
-	int chanCount = 0;
 	_channels.startChannelNameChange();
 	for (unsigned int i=0;i<channelNames.size();i++)
 	{
-		std::string newChanName = "deletedChan" + boost::lexical_cast<std::string>(chanCount++);
+		std::string newChanName = "deletedChan" + channelNames[i];
 		_channels.changeChannelName(channelNames[i],newChanName);
 	}	
 	_channels.rebuild_hash_table();
@@ -1025,7 +1024,7 @@ SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, 
 	std::vector<SBJoint*> childJoints = pjoint->getDescendants();
 	for (unsigned int i=0;i<childJoints.size();i++)
 	{
-		jointNameMap[childJoints[i]->jointName()] = true;
+		jointNameMap[childJoints[i]->getMappedJointName()] = true;
 	}
 	
 	SkMotion* motion = buildMirrorMotionJoints(skeleton,jointNameMap);
