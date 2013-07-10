@@ -491,14 +491,35 @@ void VisemeCurveEditor::generateCurves(int count)
 
 
 
-void VisemeCurveEditor::changeCurve(int viseme, std::vector<float>& curveData)
+void VisemeCurveEditor::changeCurve(int viseme, std::vector<float>& curveData, const std::vector<float>& phonemeCurve1, const std::vector<float>& phonemeCurve2)
 {
 	if (curveData.size() == 0) // generate three points as default
 	{
-		_curves[viseme].clear();
-		_curves[viseme].push_back(SrVec(0.1f, 0, 0));
-		_curves[viseme].push_back(SrVec(0.5f, 1.0f, 0));
-		_curves[viseme].push_back(SrVec(0.9f, 0, 0));
+		if (phonemeCurve1.size() > 0 || phonemeCurve2.size() > 0)
+		{
+			_curves[viseme].clear();
+			if (phonemeCurve1.size() > 0)
+			{
+				for (size_t i = 0; i < phonemeCurve1.size() / 2; i++)
+				{
+					_curves[viseme]. push_back(SrVec(phonemeCurve1[i * 2 + 0] * 0.5f, phonemeCurve1[i * 2 + 1], 0.0f));
+				}
+			}
+			if (phonemeCurve2.size() > 0)
+			{
+				for (size_t i = 0; i < phonemeCurve2.size() / 2; i++)
+				{
+					_curves[viseme]. push_back(SrVec(phonemeCurve2[i * 2 + 0] * 0.5f + 0.5, phonemeCurve2[i * 2 + 1], 0.0f));
+				}
+			}
+		}
+		else
+		{
+			_curves[viseme].clear();
+			_curves[viseme].push_back(SrVec(0.1f, 0, 0));
+			_curves[viseme].push_back(SrVec(0.5f, 1.0f, 0));
+			_curves[viseme].push_back(SrVec(0.9f, 0, 0));
+		}
 	}
 	else
 	{

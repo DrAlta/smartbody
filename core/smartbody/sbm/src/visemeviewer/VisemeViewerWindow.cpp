@@ -77,28 +77,32 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_buttonDump = new Fl_Button(620, 35, 100, 25, "Dump Diphones");
 	_buttonDump->callback(OnDumpCB, this);
 
-	_browserPhoneme[0] = new Fl_Hold_Browser(10, 80, 70, 350, "Phoneme 1");
+	_browserPhoneme[0] = new Fl_Hold_Browser(10, 80, 70, 350, "Phoneme1");
 	_browserPhoneme[0]->align(FL_ALIGN_TOP);
 	_browserPhoneme[0]->callback(OnPhoneme1SelectCB, this);
 
-	_browserPhoneme[1] = new  Fl_Hold_Browser(85, 80, 70, 350, "Phoneme 2");
+	_browserPhoneme[1] = new  Fl_Hold_Browser(85, 80, 70, 350, "Phoneme2");
 	_browserPhoneme[1]->align(FL_ALIGN_TOP);
 	_browserPhoneme[1]->callback(OnPhoneme2SelectCB, this);
+
+	_browserSinglePhoneme = new Fl_Hold_Browser(160, 80, 70, 350, "Single Phoneme");
+	_browserSinglePhoneme->align(FL_ALIGN_TOP);
+	_browserSinglePhoneme->callback(OnSinglePhonemeSelectCB, this);
 	
 	Fl_Menu_Bar* menuBar = new Fl_Menu_Bar(0, 0, w, 30);
 	//menuBar->menu(menu_);
 	menuBar->add("&File/Save", 0, OnSaveCB, this, NULL);
 	//menuBar->callback(OnMenuSelectCB, this);
 
-	_curveEditor = new VisemeCurveEditor(160, 80, 395, 355, "Animation Curve");
+	_curveEditor = new VisemeCurveEditor(235, 80, 395, 355, "Animation Curve");
 	_curveEditor->setVisemeWindow(this);
 	_curveEditor->color(FL_GRAY0, FL_GRAY0);
 
-	_browserViseme = new Fl_Multi_Browser(575, 80, 70, 350, "Visemes");
+	_browserViseme = new Fl_Multi_Browser(650, 80, 70, 350, "Visemes");
 	_browserViseme->align(FL_ALIGN_TOP);
 	_browserViseme->callback(OnVisemeSelectCB, this);
 
-	_browserDiphone = new Fl_Hold_Browser(650, 80, 70, 350, "Diphones");
+	_browserDiphone = new Fl_Hold_Browser(725, 80, 70, 350, "Diphones");
 	_browserDiphone->align(FL_ALIGN_TOP); 
 	_browserDiphone->callback(OnDiphoneSelectCB, this);
 
@@ -193,6 +197,7 @@ bool  VisemeViewerWindow::loadData()
 	for (int x = 0; x < 2; x++)
 	{
 		_browserPhoneme[x]->clear();
+		
 		for (size_t p = 0; p < commonPhonemes.size(); p++)
 		{
 			std::string lowerCasePhoneme = commonPhonemes[p];
@@ -201,6 +206,15 @@ bool  VisemeViewerWindow::loadData()
 		}		
 		_browserPhoneme[x]->deselect();
 	}
+
+	_browserSinglePhoneme->clear();
+	for (size_t p = 0; p < commonPhonemes.size(); p++)
+	{
+		std::string lowerCasePhoneme = commonPhonemes[p];
+		std::transform(lowerCasePhoneme.begin(), lowerCasePhoneme.end(), lowerCasePhoneme.begin(), ::tolower);
+		_browserSinglePhoneme->add(lowerCasePhoneme.c_str());
+	}
+	_browserSinglePhoneme->deselect();
 
 	_choiceCharacter->clear();
 	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
@@ -267,17 +281,23 @@ std::string VisemeViewerWindow::getCurrentCharacterName()
 
 SmartBody::SBDiphone* VisemeViewerWindow::getCurrentDiphone()
 {
-	if (_browserPhoneme[0]->value() <= 0)
-		return NULL;
+	std::string phoneme1 = "";
+	std::string phoneme2 = "";
+	if (_browserSinglePhoneme->value() > 0)
+	{
+		phoneme1 = _browserSinglePhoneme->text(_browserSinglePhoneme->value());
+		phoneme2 = "-";
+	}
+	else if (_browserPhoneme[0]->value() > 0 && _browserPhoneme[1]->value() > 0)
+	{
+		phoneme1 = _browserPhoneme[0]->text(_browserPhoneme[0]->value());
+		phoneme2 = _browserPhoneme[1]->text(_browserPhoneme[1]->value());
+	}
 
-	if (_browserPhoneme[1]->value() <= 0)
+	if (phoneme1 == "" || phoneme2 == "")
 		return NULL;
-
-	std::string phoneme1 = _browserPhoneme[0]->text(_browserPhoneme[0]->value());
-	std::string phoneme2 = _browserPhoneme[1]->text(_browserPhoneme[1]->value());
 
 	const std::string& diphoneMap = SmartBody::SBScene::getScene()->getCharacter(getCurrentCharacterName())->getStringAttribute("diphoneSetName");
-
 	SmartBody::SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(phoneme1, phoneme2, diphoneMap);
 	return diphone;
 }
@@ -302,22 +322,21 @@ void VisemeViewerWindow::refreshData()
 	{
 		int value1 = _browserPhoneme[0]->value();
 		int value2 = _browserPhoneme[1]->value();
+		int value = _browserSinglePhoneme->value();
+		std::string phoneme1 = "";
+		std::string phoneme2 = "";
 
-		if (value1 <= 0 || value1 > _browserPhoneme[0]->size())
+		if (value1 > 0 && value2 > 0)
 		{
-			LOG("First phoneme is out of range, cannot create diphone.");
-			return;
+			phoneme1 = _browserPhoneme[0]->text(value1);
+			phoneme2 = _browserPhoneme[1]->text(value2);
 		}
-		if (value2 <= 0 || value2 > _browserPhoneme[1]->size())
+		else if (value > 0)
 		{
-			LOG("Second phoneme is out of range, cannot create diphone.");
-			return;
+			phoneme1 = _browserSinglePhoneme->text(value);
+			phoneme2 = "-";
 		}
-		std::string phoneme1 = _browserPhoneme[0]->text(value1);
-		std::string phoneme2 = _browserPhoneme[1]->text(value2);
-
 		const std::string& diphoneMap = SmartBody::SBScene::getScene()->getCharacter(getCurrentCharacterName())->getStringAttribute("diphoneSetName");
-
 		diphone = diphoneManager->createDiphone(phoneme1, phoneme2, diphoneMap);
 	}
 	else
@@ -367,10 +386,12 @@ void VisemeViewerWindow::OnPhoneme1SelectCB(Fl_Widget* widget, void* data)
 	}
 
 	viewer->_browserDiphone->deselect();
+	
 
 	if(viewer->_phonemesSelected[0] && viewer->_phonemesSelected[1]){
 		int lineSelected1 = viewer->_browserPhoneme[0]->value();
 		int lineSelected2 = viewer->_browserPhoneme[1]->value();
+		viewer->_browserSinglePhoneme->deselect();
 		viewer->selectViseme(viewer->_browserPhoneme[0]->text(lineSelected1), viewer->_browserPhoneme[1]->text(lineSelected2));
 	}
 	viewer->resetViseme();
@@ -393,6 +414,7 @@ void VisemeViewerWindow::OnPhoneme2SelectCB(Fl_Widget* widget, void* data)
 	if(viewer->_phonemesSelected[0] && viewer->_phonemesSelected[1]){
 		int lineSelected1 = viewer->_browserPhoneme[0]->value();
 		int lineSelected2 = viewer->_browserPhoneme[1]->value();
+		viewer->_browserSinglePhoneme->deselect();
 		viewer->selectViseme(viewer->_browserPhoneme[0]->text(lineSelected1), viewer->_browserPhoneme[1]->text(lineSelected2));
 	}
 	viewer->resetViseme();
@@ -406,17 +428,26 @@ void VisemeViewerWindow::OnVisemeSelectCB(Fl_Widget* widget, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 	
-	if(viewer->_browserPhoneme[0]->value() < 1 &&
-		viewer->_browserPhoneme[1]->value() < 1)
+	bool shouldContinue = false;
+	if (viewer->_browserSinglePhoneme->value() > 0)
+		shouldContinue = true;
+
+	if (viewer->_browserPhoneme[0]->value() > 0 ||
+		viewer->_browserPhoneme[1]->value() > 0)
+	{
+		shouldContinue = true;
+	}
+
+	if (!shouldContinue)
 	{
 		viewer->_browserViseme->deselect();
 		return;
 	}
 
-
 	int viseme = viewer->_browserViseme->value();
 	std::vector<float> curveData;
-
+	std::vector<float> phonemeCurve1;
+	std::vector<float> phonemeCurve2;
 	SmartBody::SBDiphone* diphone = viewer->getCurrentDiphone();
 	if (diphone)
 	{
@@ -432,7 +463,7 @@ void VisemeViewerWindow::OnVisemeSelectCB(Fl_Widget* widget, void* data)
 		}
 	}
 
-	viewer->_curveEditor->changeCurve(viseme - 1, curveData);
+	viewer->_curveEditor->changeCurve(viseme - 1, curveData, phonemeCurve1, phonemeCurve2);
 	viewer->refreshData();
 	viewer->_curveEditor->refresh();
 
@@ -476,31 +507,91 @@ void VisemeViewerWindow::selectViseme(const char * phoneme1, const char * phonem
 	const std::string& diphoneMap = SmartBody::SBScene::getScene()->getCharacter(getCurrentCharacterName())->getStringAttribute("diphoneSetName");
 
 	SmartBody::SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(p1, p2, diphoneMap);
+	SmartBody::SBDiphone* diphone1 = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(p1, "-", diphoneMap);
+	SmartBody::SBDiphone* diphone2 = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(p2, "-", diphoneMap);
+	
+	_browserViseme->deselect();
+	bool shouldProcess = true;
 	if (diphone)
 	{
-		_browserViseme->deselect();
-		const std::vector<std::string>& visemeNames = diphone->getVisemeNames();
-		for (int i = 0; i < _browserViseme->size(); i++)
+		if (diphone->getNumVisemes() > 0)
 		{
-			for (size_t j = 0; j < visemeNames.size(); j++)
+			shouldProcess = false;
+			const std::vector<std::string>& visemeNames = diphone->getVisemeNames();
+			for (int i = 0; i < _browserViseme->size(); i++)
 			{
-				if (visemeNames[j] == _browserViseme->text(i + 1))
+				for (size_t j = 0; j < visemeNames.size(); j++)
 				{
-					_browserViseme->select(i + 1);
-
-					_curveEditor->changeCurve(i, diphone->getKeys(visemeNames[j]));
-					// set the curve visible
-					_curveEditor->setVisibility(i, true);
-					_curveEditor->selectLine(i);
-					break;
+					if (visemeNames[j] == _browserViseme->text(i + 1))
+					{
+						_browserViseme->select(i + 1);
+						std::vector<float> phonemeCurve1;
+						std::vector<float> phonemeCurve2;
+						_curveEditor->changeCurve(i, diphone->getKeys(visemeNames[j]), phonemeCurve1, phonemeCurve2);
+						// set the curve visible
+						_curveEditor->setVisibility(i, true);
+						_curveEditor->selectLine(i);
+						break;
+					}
 				}
 			}
 		}
 	}
-	else
+
+	if (shouldProcess)
 	{
-		_browserViseme->deselect();
+		if (!diphone)
+			diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->createDiphone(p1, p2, diphoneMap);
+		// need to improve the performance later
+		if (diphone1)	// compose the diphone
+		{
+			const std::vector<std::string>& visemeNames = diphone1->getVisemeNames();
+			for (int i = 0; i < _browserViseme->size(); i++)
+			{
+				for (size_t j = 0; j < visemeNames.size(); j++)
+				{
+					if (visemeNames[j] == _browserViseme->text(i + 1))
+					{
+						_browserViseme->select(i + 1);
+						std::vector<float> phonemeCurve1 = diphone1->getKeys(visemeNames[j]);
+						std::vector<float> phonemeCurve2;
+						if (diphone2)
+							phonemeCurve2 = diphone2->getKeys(visemeNames[j]);
+						_curveEditor->changeCurve(i, diphone->getKeys(visemeNames[j]), phonemeCurve1, phonemeCurve2);
+						// set the curve visible
+						_curveEditor->setVisibility(i, true);
+						_curveEditor->selectLine(i);
+						break;
+					}
+				}
+			}
+		}
+		if (diphone2)	// compose the diphone
+		{
+			const std::vector<std::string>& visemeNames = diphone2->getVisemeNames();
+			for (int i = 0; i < _browserViseme->size(); i++)
+			{
+				for (size_t j = 0; j < visemeNames.size(); j++)
+				{
+					if (visemeNames[j] == _browserViseme->text(i + 1))
+					{
+						_browserViseme->select(i + 1);
+						std::vector<float> phonemeCurve2 = diphone2->getKeys(visemeNames[j]);
+						std::vector<float> phonemeCurve1;
+						if (diphone1)
+							phonemeCurve1 = diphone1->getKeys(visemeNames[j]);
+						_curveEditor->changeCurve(i, diphone->getKeys(visemeNames[j]), phonemeCurve1, phonemeCurve2);
+						// set the curve visible
+						_curveEditor->setVisibility(i, true);
+						_curveEditor->selectLine(i);
+						break;
+					}
+				}
+			}
+		}
+		refreshData();
 	}
+
 
 	/*
 	int viseme = rand() % _browserViseme->size() + 1;
@@ -894,6 +985,7 @@ void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
 	if(viewer->_phonemesSelected[0] && viewer->_phonemesSelected[1]){
 		int lineSelected1 = viewer->_browserPhoneme[0]->value();
 		int lineSelected2 = viewer->_browserPhoneme[1]->value();
+		viewer->_browserSinglePhoneme->deselect();
 		viewer->selectViseme(viewer->_browserPhoneme[0]->text(lineSelected1), viewer->_browserPhoneme[1]->text(lineSelected2));
 	}
 	viewer->resetViseme();
@@ -1130,4 +1222,23 @@ void VisemeViewerWindow::OnRunTimeCurvesCB(Fl_Widget* widget, void* data)
 		viewer->_windowVisemeRunTime = new VisemeRunTimeWindow(150, 150, 800, 600, "Diphone Runtime Window");
 	}
 	viewer->_windowVisemeRunTime->show();
+}
+
+// single phoneme means selecting a diphone with phoneme1 and "-"
+void VisemeViewerWindow::OnSinglePhonemeSelectCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	int lineSelected = viewer->_browserSinglePhoneme->value();
+	if (lineSelected > 0)
+	{
+		viewer->_browserPhoneme[0]->deselect();
+		viewer->_browserPhoneme[1]->deselect();	
+		viewer->_browserDiphone->deselect();
+		viewer->selectViseme(viewer->_browserSinglePhoneme->text(lineSelected), "-");
+	}
+	viewer->resetViseme();
+	viewer->updateViseme();
+	//	viewer->_curveEditor->redraw();
+	viewer->redraw();
 }
