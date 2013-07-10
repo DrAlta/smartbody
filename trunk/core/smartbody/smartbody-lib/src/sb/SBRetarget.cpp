@@ -218,7 +218,12 @@ SrQuat SBRetarget::applyRetargetJointRotation( std::string jointName, SrQuat& in
 			inQuat = jointAddRotMap["l_sternoclavicular"]*inQuat;
 		if (jointName == "r_shoulder" && jointAddRotMap.find("r_sternoclavicular") != jointAddRotMap.end())
 			inQuat = jointAddRotMap["r_sternoclavicular"]*inQuat;
-#endif
+#endif	
+		// add joint rotation offset
+		if (jointRotOffsetMap.find(jointName) != jointRotOffsetMap.end())
+		{
+			inQuat = jointRotOffsetMap[jointName]*inQuat;
+		}
 
 		if (jointSkipMap.find(jointName) != jointSkipMap.end())
 		{			
@@ -230,8 +235,7 @@ SrQuat SBRetarget::applyRetargetJointRotation( std::string jointName, SrQuat& in
 #endif
 		}
 		else
-			outQuat = qpair.first*inQuat*qpair.second;
-		//outQuat = qpair.first*qpair.second;
+			outQuat = qpair.first*inQuat*qpair.second;	
 	}
 	return outQuat;
 }
@@ -271,5 +275,10 @@ SBAPI std::vector<std::string> SBRetarget::getRelativeJointNames()
 SBAPI float SBRetarget::getHeightRatio()
 {
 	return heightRatio;
+}
+
+SBAPI void SBRetarget::addJointRotOffset( std::string jointName, SrQuat& inQuat )
+{
+	jointRotOffsetMap[jointName] = inQuat;
 }
 }
