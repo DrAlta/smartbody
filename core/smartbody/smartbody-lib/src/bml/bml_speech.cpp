@@ -457,8 +457,8 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 				blendIval = 2.0f * (curViseme->time() - prevViseme->time());
 
 			// ad-hoc, blend interval should not be less than 0.1f
-			if (blendIval < 0.2f)
-				blendIval = 0.2f;
+			//if (blendIval < 0.2f)
+			//	blendIval = 0.2f;
 
 			if (diphone)
 			{
