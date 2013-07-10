@@ -46,6 +46,7 @@ protected:
 	Fl_Hold_Browser *_browserPhoneme[2];
 	Fl_Multi_Browser *_browserViseme;
 	Fl_Hold_Browser* _browserDiphone;
+	Fl_Hold_Browser* _browserSinglePhoneme;
 	Fl_Value_Slider *_sliderCurveAnimation;
 	Fl_Button *_buttonPlay;
 	Fl_Check_Button* _checkEnableScrub;
@@ -107,5 +108,6 @@ protected:
 	static void OnCharacterRefreshCB(Fl_Widget* widget, void* data);
 	static void OnDumpCB(Fl_Widget* widget, void* data);
 	static void OnRunTimeCurvesCB(Fl_Widget* widget, void* data);
+	static void OnSinglePhonemeSelectCB(Fl_Widget* widget, void* data);
 };
 #endif

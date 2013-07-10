@@ -24,7 +24,7 @@ class VisemeCurveEditor : public Fl_Widget
 		void selectLine(int viseme);
 		//Temporary
 		void generateCurves(int count);
-		void changeCurve(int viseme, std::vector<float>& curveData);
+		void changeCurve(int viseme, std::vector<float>& curveData, const std::vector<float>& phonemeCurve1, const std::vector<float>& phonemeCurve2);
 		SrVec mapCurveData(SrVec& origData);
 		SrVec mapDrawData(SrVec& origData);
 		std::vector<VisemeCurve>& getCurves();
