@@ -441,7 +441,10 @@ void BmlRequest::gestureRequestProcess()
 			float prevRMotionSpeed = prevSBMotion->getJointSpeed(rWrist, (float)prevMotion->time_start(), (float)prevMotion->time_stop());
 			std::vector<std::string> currGestureList = gestures[i]->gestureList;
 			if (currGestureList.size() == 0)
+			{
 				currGestureList.push_back(sbMotion->getName());
+				closestMotion = sbMotion;
+			}
 			for (size_t l = 0; l < currGestureList.size(); ++l)
 			{
 				SBMotion *motionInList = SmartBody::SBScene::getScene()->getMotion(currGestureList[l]);
