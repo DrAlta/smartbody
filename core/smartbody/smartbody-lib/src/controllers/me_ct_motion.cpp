@@ -352,7 +352,14 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(_motion);
 		if (sbMotion)
-			retarget = scene->getRetargetManager()->getRetarget(sbMotion->getMotionSkeletonName(),_character->getSkeleton()->getName());		
+			retarget = scene->getRetargetManager()->getRetarget(sbMotion->getMotionSkeletonName(),_character->getSkeleton()->getName());	
+		if (retarget)
+		{
+			SrVec leftSholderRot = _character->getVec3Attribute("leftSholderOffset");
+			SrVec rightSholderRot = _character->getVec3Attribute("rightSholderOffset");
+			retarget->addJointRotOffset("l_shoulder",SrQuat(leftSholderRot));
+			retarget->addJointRotOffset("r_shoulder",SrQuat(rightSholderRot));
+		}
 	}
 
 	// Controller Context and FrameData set, use the new available buffer

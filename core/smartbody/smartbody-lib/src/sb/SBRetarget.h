@@ -24,6 +24,7 @@ class SBRetarget
 		SBAPI std::vector<std::string> getEndJointNames();
 		SBAPI std::vector<std::string> getRelativeJointNames();
 		SBAPI float getHeightRatio();
+		SBAPI void addJointRotOffset(std::string jointName, SrQuat& inQuat);
 
 	protected:
 		std::string srcSkName;
@@ -31,8 +32,9 @@ class SBRetarget
 		std::map<std::string, QuatPair> jointPrePostRotMap;
 		std::map<std::string, bool> jointSkipMap;
 		std::map<std::string, SrQuat> jointAddRotMap;
+		std::map<std::string, SrQuat> jointRotOffsetMap;
 		std::vector<std::string> retargetEndJoints;
-		std::vector<std::string> retargetRelativeJoints;
+		std::vector<std::string> retargetRelativeJoints;		
 		float heightRatio;
 };
 

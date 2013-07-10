@@ -151,6 +151,9 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createStringAttribute("deformableMesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
 	createDoubleAttribute("deformableMeshScale", 1, true, "Basic", 230, false, false, false, "Scale factor when loading mesh.");
 	createStringAttribute("receiverName", "kinect1", true, "Basic", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
+	createVec3Attribute("leftSholderOffset",0.f,0.f,0.f,true, "Basic", 320, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+	createVec3Attribute("rightSholderOffset",0.f,0.f,0.f,true, "Basic", 340, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+
 
 	std::vector<std::string> voiceTypes;
 	voiceTypes.push_back("");

@@ -106,7 +106,23 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 	if (reachType == LEFT_ARM || reachType == LEFT_JUMP)
 		preFix = "l_";	
 	std::string consRootName = preFix + consJointList[0];	
-		
+
+	std::string thumbName = preFix+"thumb1";
+	SmartBody::SBJoint* thumbJoint = skeletonCopy->getJointByName(thumbName);
+	SmartBody::SBJoint* effectorParent = effectorJoint->getParent();
+	SrVec effectorUp = SrVec(0,1,0);
+	if (thumbJoint && effectorParent) // find up-axis for effector joint
+	{
+		SrVec v1 = thumbJoint->gmatZero().get_translation() - effectorParent->gmatZero().get_translation();
+		SrVec v2 = effectorJoint->gmatZero().get_translation() - effectorParent->gmatZero().get_translation();
+		effectorUp = cross(v2,v1); 
+		effectorUp.normalize();
+		if (preFix == "l_")
+			effectorUp = -effectorUp;
+	}
+
+	SrQuat offsetQuat = SrQuat(effectorUp,SrVec(0,1,0));
+	SrMat offsetMat; offsetQuat.get_mat(offsetMat);
 	
  	for (unsigned int i=0;i<consJointList.size();i++)
  	{		
@@ -189,7 +205,7 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 	EffectorState& estate = reachData->effectorState;
 	estate.effectorName = reachEndEffector->getMappedJointName().c_str();
 	estate.curIKTargetState = reachData->getPoseState(idleMotionFrame);
-	estate.gmatZero = copyEffector->gmatZero();
+	estate.gmatZero = copyEffector->gmatZero()*offsetMat;
 
 
 	stateTable["Idle"] = new ReachStateIdle();
@@ -473,7 +489,7 @@ DataInterpolator* MeCtReachEngine::createInterpolator(std::string interpolatorTy
 	DataInterpolator* interpolator = NULL;	
 	if (interpolatorType == "KNN")
 	{
-		KNNInterpolator* knnInterpolator = new KNNInterpolator(3000,ikReachRegion*1.f);
+		KNNInterpolator* knnInterpolator = new KNNInterpolator(500,ikReachRegion*1.f);
 		resampleData = &knnInterpolator->resampleData;	
 		interpolator = knnInterpolator;
 	}
