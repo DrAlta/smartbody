@@ -667,10 +667,13 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 			}
 		}
 
-		VisemeData* debugconstrainCurve = new VisemeData(visemeProcessedData[openIndex]->id(), visemeProcessedData[openIndex]->time());
-		debugconstrainCurve->setCurveInfo("4");
-		debugconstrainCurve->setFloatCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[openIndex]->getFloatCurve().size() / 2, 2);
-		debugVisemeCurves.push_back(debugconstrainCurve);
+		if (openIndex >= 0)
+		{
+			VisemeData* debugconstrainCurve = new VisemeData(visemeProcessedData[openIndex]->id(), visemeProcessedData[openIndex]->time());
+			debugconstrainCurve->setCurveInfo("4");
+			debugconstrainCurve->setFloatCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[openIndex]->getFloatCurve().size() / 2, 2);
+			debugVisemeCurves.push_back(debugconstrainCurve);
+		}
 
 		if (wideIndex >= 0)
 		{
