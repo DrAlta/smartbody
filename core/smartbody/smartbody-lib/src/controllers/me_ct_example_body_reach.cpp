@@ -10,6 +10,7 @@
 #include <sb/SBCommandManager.h>
 #include <sb/SBEvent.h>
 #include <sb/sbm_character.hpp>
+#include <sb/SBCharacter.h>
 #include "me_ct_example_body_reach.hpp"
 #include "me_ct_barycentric_interpolation.h"
 
@@ -17,7 +18,6 @@
 #include <sb/SBSteerManager.h>
 #include <controllers/me_ct_example_body_reach.hpp>
 #include <sbm/SteerSuiteEngineDriver.h>
-
 
 using namespace boost;
 
@@ -428,11 +428,17 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	// blending the input frame with ikFrame based on current fading
 	bool finishFadeOut = updateFading(dt);
 	
+	SmartBody::SBCharacter* curCharacter = dynamic_cast<SmartBody::SBCharacter*>(currentReachEngine->getCharacter());
 	if (currentReachEngine->getCurrentState()->curStateName() != "Idle" || currentReachData->startReach )
 	{
 		
 		//LOG("update reach");
-		currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);		
+		currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);	
+		curCharacter->setBoolAttribute("isReaching", true);		
+	}
+	else
+	{
+		curCharacter->setBoolAttribute("isReaching",false);
 	}
 	
 	//printf("blend weight = %f\n",blendWeight);
