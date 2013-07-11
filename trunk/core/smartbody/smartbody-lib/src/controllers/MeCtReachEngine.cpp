@@ -554,15 +554,6 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	{		
 		reachData->locomotionComplete = (curCharacter->_reachTarget && !curCharacter->_lastReachStatus);		
 	}
-
-	if (curReachState != stateTable["Idle"])
-	{
-		curCharacter->setBoolAttribute("isReaching", true);		
-	}
-	else
-	{
-		curCharacter->setBoolAttribute("isReaching",false);
-	}
 	
 	//reachData->hasSteering = (SmartBody::SBScene::getScene()->getSteerManager()->isInitialized());
 
