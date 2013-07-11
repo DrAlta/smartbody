@@ -12,6 +12,7 @@
 #include <sb/SBEvent.h>
 #include "MeCtBodyReachState.h"
 #include <sb/sbm_character.hpp>
+#include <sb/SBCharacter.h>
 
 
 
@@ -533,7 +534,7 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 	inputMotionFrame = inputFrame;
 	reachData->idleRefFrame = inputFrame;
 
-	SbmCharacter* curCharacter = character;
+	SmartBody::SBCharacter* curCharacter = dynamic_cast<SmartBody::SBCharacter*>(character);
 	skeletonRef->update_global_matrices();	
 	updateSkeletonCopy();	
 	// update reach data
@@ -554,6 +555,14 @@ void MeCtReachEngine::updateReach(float t, float dt, BodyMotionFrame& inputFrame
 		reachData->locomotionComplete = (curCharacter->_reachTarget && !curCharacter->_lastReachStatus);		
 	}
 
+	if (curReachState != stateTable["Idle"])
+	{
+		curCharacter->setBoolAttribute("isReaching", true);		
+	}
+	else
+	{
+		curCharacter->setBoolAttribute("isReaching",false);
+	}
 	
 	//reachData->hasSteering = (SmartBody::SBScene::getScene()->getSteerManager()->isInitialized());
 

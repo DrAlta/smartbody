@@ -6,6 +6,9 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
 #include <sr/sr_sn_group.h>
+#include <boost/algorithm/string.hpp>
+
+#define TEST_HAIR_RENDER 1
 
 typedef std::pair<int,int> IntPair;
 typedef std::pair<int,float> IntFloatPair;
@@ -204,14 +207,16 @@ bool DeformableMesh::buildVertexBuffer()
 	std::vector<SrMaterial> allMatList;
 	//std::vector<SrColor> allMatList;
 	std::vector<std::string> allTexNameList;
+	std::vector<std::string> allMatNameList;
 	std::vector<std::string> allNormalTexNameList;
-	std::vector<std::string> allSpecularTexNameList;
+	std::vector<std::string> allSpecularTexNameList;	
 	SrMaterial defaultMaterial;
 	defaultMaterial.diffuse = SrColor(0.6f,0.6f,0.6f);//SrColor::gray;	
 	defaultMaterial.specular = SrColor(101,101,101);//SrColor::gray;
 	defaultMaterial.shininess = 29;
 
 	allMatList.push_back(defaultMaterial);
+	allMatNameList.push_back("defaultMaterial");
 	allTexNameList.push_back("");
 	allNormalTexNameList.push_back("");
 	allSpecularTexNameList.push_back("");
@@ -237,7 +242,7 @@ bool DeformableMesh::buildVertexBuffer()
 				std::string mtlName = dMeshDynamic->shape().mtlnames[j];
 				if (mtlTexMap.find(mtlName) != mtlTexMap.end())
 				{
-					allTexNameList.push_back(mtlTexMap[mtlName]);
+					allTexNameList.push_back(mtlTexMap[mtlName]);					
 				}
 				else
 				{
@@ -262,6 +267,7 @@ bool DeformableMesh::buildVertexBuffer()
 					allSpecularTexNameList.push_back("");
 				}
 				allMatList.push_back(mat);
+				allMatNameList.push_back(mtlName);
 				//colorArray[j%6].get(fcolor);				
 				meshSubsetMap[nMaterial] = std::vector<int>(); 
 				nMaterial++;
@@ -537,6 +543,7 @@ bool DeformableMesh::buildVertexBuffer()
 	}
     
     int group = 0;
+	std::vector<SbmSubMesh*> hairMeshList;
 	std::map<int,std::vector<int> >::iterator vi;
 	for (vi  = meshSubsetMap.begin();
 		 vi != meshSubsetMap.end();
@@ -548,7 +555,8 @@ bool DeformableMesh::buildVertexBuffer()
 		if (faceIdxList.size() == 0)
 			continue;		
 		SbmSubMesh* mesh = new SbmSubMesh();
-		mesh->material = allMatList[iMaterial];
+		mesh->isHair = false;
+		mesh->material = allMatList[iMaterial];		
 		mesh->texName  = allTexNameList[iMaterial];
 		mesh->normalMapName = allNormalTexNameList[iMaterial];		
 		mesh->specularMapName = allSpecularTexNameList[iMaterial];
@@ -560,8 +568,25 @@ bool DeformableMesh::buildVertexBuffer()
 			mesh->triBuf[k][1] = triBuf[faceIdxList[k]][1];
 			mesh->triBuf[k][2] = triBuf[faceIdxList[k]][2];
 		}
+#if TEST_HAIR_RENDER
+		mesh->matName = allMatNameList[iMaterial];
+		std::string lowMatName = mesh->matName;
+		boost::algorithm::to_lower(lowMatName);
+		if (lowMatName.find("hair") != std::string::npos)
+		{
+			// is a hair mesh, based on a rough name searching
+			mesh->isHair = true;
+			hairMeshList.push_back(mesh);
+		}
+		else
+		{
+			subMeshList.push_back(mesh);
+		}
+#else
 		subMeshList.push_back(mesh);
-	}		
+#endif			
+	}	
+	subMeshList.insert(subMeshList.end(),hairMeshList.begin(),hairMeshList.end());
 	initVertexBuffer = true;
 	return true;
 }

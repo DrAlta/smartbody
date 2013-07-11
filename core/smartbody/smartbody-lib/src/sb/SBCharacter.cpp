@@ -153,6 +153,8 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createStringAttribute("receiverName", "kinect1", true, "Basic", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
 	createVec3Attribute("leftSholderOffset",0.f,0.f,0.f,true, "Basic", 320, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
 	createVec3Attribute("rightSholderOffset",0.f,0.f,0.f,true, "Basic", 340, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+	createBoolAttribute("isReaching", false, true, "Basic", 158, false, false, false, "Whether a character is reaching.");
+
 
 
 	std::vector<std::string> voiceTypes;
