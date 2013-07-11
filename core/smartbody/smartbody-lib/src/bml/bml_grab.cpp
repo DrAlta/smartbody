@@ -42,6 +42,8 @@
 #include "sbm/BMLDefs.h"
 #include <sb/SBSkeleton.h>
 #include <sb/SBReach.h>
+#include <sb/SBScene.h>
+#include <sb/SBSimulationManager.h>
 
 #define TEST_GAZE_LOCOMOTION 0 // set to 1 if want to test gaze+locomotion control when reaching
 
@@ -66,7 +68,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
 			MeController* controller = controllerTree->findControllerByHandle(handle);
 
-			handCt = dynamic_cast<MeCtHand*>(controller);
+			handCt = dynamic_cast<MeCtHand*>(controller);			
 		}
 
 		if (!handCt)
@@ -200,6 +202,8 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 	ct_request.reset();
 	//if (bCreateNewController)
 	{
+		SmartBody::SBSimulationManager* simManager = SmartBody::SBScene::getScene()->getSimulationManager();
+		//LOG("parse_bml_grab, time = %f",simManager->getTime());
 		ct_request.reset( new MeControllerRequest( unique_id, localId, handCt, request->actor->grab_sched_p, behav_syncs ) );
 		ct_request->set_persistent( true );
 	}	

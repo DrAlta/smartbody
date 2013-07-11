@@ -372,9 +372,10 @@ void MeCtReachEngine::solveIK( ReachStateData* rd, BodyMotionFrame& outFrame )
 	{
 		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(reachRotConstraint[reachEndEffector->getMappedJointName().c_str()]);		
 		if (!cons)
-			return;
+			return;		
 		cons->targetRot = estate.curIKTargetState.rot;//ikRotTrajectory;//ikRotTarget;//motionParameter->getMotionFrameJoint(interpMotionFrame,reachEndEffector->name().get_string())->gmat();//ikRotTarget;	
-		cons->constraintWeight = 0.f;//1.f - rd->blendWeight;
+		cons->constraintWeight = 0.f;//1.f - rd->blendWeight;	
+		cons->gmatZero = estate.gmatZero;
 
 		//if (rd->curHandAction == handActionTable[PICK_UP_OBJECT] || rd->curHandAction == handActionTable[PUT_DOWN_OBJECT])
 		if (hasEffectorRotConstraint(rd) && motionData.size() != 0)

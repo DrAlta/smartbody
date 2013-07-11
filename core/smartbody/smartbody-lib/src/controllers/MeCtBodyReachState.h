@@ -121,7 +121,8 @@ public:
 	BodyMotionFrame idleRefFrame, startRefFrame, targetRefFrame, currentRefFrame;		
 	BodyMotionFrame curMotionFrame; 
 	EffectorState   effectorState;
-	ReachTarget     reachTarget;	
+	ReachTarget     reachTarget;
+	SRT             desireHandState;
 	// flags for state transition
 	float           autoReturnTime;
 	float           characterHeight;

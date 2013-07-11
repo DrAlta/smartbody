@@ -172,6 +172,7 @@ void MeCtHand::setGrabState( GrabState state )
 		}
 	}
 	currentGrabState = state;
+	//LOG("current grab state = %d",currentGrabState);
 }
 
 void MeCtHand::setGrabTargetObject( SbmPawn* targetObj )
@@ -232,14 +233,15 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 	reachHand = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBReach::findTagMotion(type,reachPose));
 	pointHand = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBReach::findTagMotion(type, pointPose));	
 
+	bool useRetarget = true;
 	if (releaseHand)
-		releaseFrame.setMotionPose((float)releaseHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,releaseHand);
+		releaseFrame.setMotionPose((float)releaseHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,releaseHand,useRetarget);
 	if (grabHand)
-		grabFrame.setMotionPose((float)grabHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,grabHand);
+		grabFrame.setMotionPose((float)grabHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,grabHand,useRetarget);
 	if (reachHand)
-		reachFrame.setMotionPose((float)reachHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,reachHand);
+		reachFrame.setMotionPose((float)reachHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,reachHand,useRetarget);
 	if (pointHand)
-		pointFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,pointHand);
+		pointFrame.setMotionPose((float)pointHand->time_stroke_emphasis(),skeletonCopy,affectedJoints,pointHand,useRetarget);
 //	if (releaseHand && grabHand && reachHand)
 //	{
 		//printf("set example hand pose\n");		
@@ -295,10 +297,12 @@ BodyMotionFrame& MeCtHand::findTargetFrame( GrabState state )
 {
 	if (state == GRAB_START)
 	{
+		//LOG("grabStartFrame");
 		return grabFrame;
 	}
 	else if (state == GRAB_REACH)
 	{
+		//LOG("grabReachFrame");
 		return grabFrame;
 	}
 	else if (state == GRAB_FINISH)
@@ -320,6 +324,7 @@ BodyMotionFrame& MeCtHand::findTargetFrame( GrabState state )
 bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 {	
 	//float dt = 0.001f;
+	//LOG("MeCtHand::controller_evaluate");
 	float du = 0.0;
 	if (prev_time == -1.f) // first start
 	{
@@ -337,7 +342,8 @@ bool MeCtHand::controller_evaluate( double t, MeFrameData& frame )
 		ikScenario.setTreeNodeQuat(currentFrame.jointQuat,QUAT_CUR);		
 		bInit = true;
 	}		
-	
+
+	//LOG("hand controller, t = %f",t);
 	
 	updateChannelBuffer(frame,tempFrame,true);
 	currentFrame.jointQuat[0] = tempFrame.jointQuat[0];

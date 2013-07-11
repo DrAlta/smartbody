@@ -580,9 +580,12 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 	{
 		EffectorConstraint* cons = ci->second;
 		MeCtIKTreeNode* endNode = s->findIKTreeNode(cons->efffectorName.c_str());
-		const SrMat& endMat = endNode->gmat;	
+		SrMat& endMat = endNode->gmat;	
+		//SrMat consMat; cons->getRotConstraint().get_mat(consMat);
+		//SrMat zeroConsMat = consMat;//cons->gmatZero.inverse()*consMat*cons->gmatZero;
 		SrVec targetRot;
 		SrQuat quatOffset = cons->getRotConstraint()*SrQuat(endNode->gmat.inverse());//SrQuat(endNode->parent->gmat.inverse());		
+		//SrQuat quatOffset = SrQuat(zeroConsMat)*SrQuat(endMat.inverse());
 		quatOffset.normalize();
 		//sr_out << "Quat Offset = " << quatOffset << srnl;
 		float angle = quatOffset.angle();				
