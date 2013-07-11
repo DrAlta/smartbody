@@ -34,6 +34,8 @@ class SbmSubMesh
 {
 public:
 	SrMaterial  material;
+	bool isHair;
+	std::string matName;
 	std::string texName;
 	std::string normalMapName;
 	std::string specularMapName;

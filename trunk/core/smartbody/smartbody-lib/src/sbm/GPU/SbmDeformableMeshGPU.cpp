@@ -104,15 +104,17 @@ void main()\n \
 	bv     = normalize(gl_NormalMatrix * binormal.xyz);\n\
 }\n";
 
+
 std::string shaderVS_2 = 
 "#version 120 \n\
+const int NumLight =2;\n\
 uniform mat4 Transform[120]; \n\
 uniform int  updateNormal;\n\
 attribute vec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
 attribute vec3 tangent, binormal;\n\
 varying vec4 vPos;\n\
-varying vec3 normal,lightDir[2],halfVector[2];\n\
+varying vec3 normal,lightDir[NumLight],halfVector[NumLight];\n\
 varying vec3 tv,bv;\n\
 mat4 GetTransformation(float id)\n \
 { \n\
@@ -156,7 +158,7 @@ gl_Position = gl_ModelViewProjectionMatrix*vec4(skin[0].xyz,1.0);\n\
 //dist[1] = 0.0;//length(posDir);\n\
 //lightDir[0] = normalize((vec4(gl_LightSource[0].position.xyz,0.0)).xyz);\n\
 //halfVector[0] = normalize((vec4(gl_LightSource[0].halfVector.xyz,0.0)).xyz);\n\
-for (int i=0;i<2;i++)\n\
+for (int i=0;i<NumLight;i++)\n\
 {\n\
 vec3 posDir = vec3(gl_LightSource[i].position);\n\
 vec4 hv = vec4(gl_LightSource[i].halfVector);\n\
@@ -186,6 +188,7 @@ gl_FragColor = vec4(1,1,1,1);\n\
 
 std::string shaderFS =
 "#version 120\n\
+const int NumLight = 2;\n\
 const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.0)*(vec3(0.2,0.2,0.2));\n\
 uniform sampler2D diffuseTexture;\n\
 uniform sampler2D normalTexture;\n\
@@ -195,7 +198,7 @@ uniform int  useTexture;\n\
 uniform int  useNormalMap;\n\
 uniform int  useSpecularMap;\n\
 uniform int  useShadowMap;\n\
-varying vec3 normal,lightDir[2],halfVector[2];\n\
+varying vec3 normal,lightDir[NumLight],halfVector[NumLight];\n\
 varying vec3 tv,bv;\n\
 varying vec4 vPos;\n\
 uniform vec4 diffuseMaterial;\n\
@@ -242,7 +245,7 @@ void main (void)\n\
 	{\n\
 		shadowWeight = shadowCoef();\n\
 	}\n\
-	for (int i=0;i<2;i++)\n\
+	for (int i=0;i<NumLight;i++)\n\
 	{\n\
 		//att = 1.0;//1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
         vec3 posDir = lightDir[i];//normalize(vec3(gl_LightSource[i].position));\n\
@@ -264,7 +267,8 @@ void main (void)\n\
 }";
 
 std::string shaderFSFace =
-	"const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.0)*(vec3(0.2,0.2,0.2));\n\
+	"const int NumLight = 2;\n\
+	const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.0)*(vec3(0.2,0.2,0.2));\n\
 	const vec3 sssColor = vec3(0.6,0.6,0.6);\n\
 	const float aspExp = 5.0;\n\
 	const float aspIntensity = 1.0;\n\
@@ -276,7 +280,7 @@ std::string shaderFSFace =
 	uniform int  useNormalMap;\n\
 	uniform int  useSpecularMap;\n\
 	uniform int  useShadowMap;\n\
-	varying vec3 normal,lightDir[2],halfVector[2];\n\
+	varying vec3 normal,lightDir[NumLight],halfVector[NumLight];\n\
 	varying vec3 tv,bv;\n\
 	varying vec4 vPos;\n\
 	uniform vec4 diffuseMaterial;\n\
@@ -339,7 +343,7 @@ std::string shaderFSFace =
 	{\n\
 	shadowWeight = shadowCoef();\n\
 	}\n\
-	for (int i=0;i<2;i++)\n\
+	for (int i=0;i<NumLight;i++)\n\
 	{\n\
 	att = 1.0;//1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
 	halfV = normalize(halfVector[i]);\n\
@@ -543,18 +547,14 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );	
 
 	glDisable(GL_POLYGON_SMOOTH);
+	glEnable(GL_LIGHTING);
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glAlphaFunc ( GL_GREATER, 0.3f ) ;
-
+	glAlphaFunc ( GL_GREATER, 0.05f ) ;
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_COLOR_MATERIAL);
-	glUseProgram(program);	
-
-	
-
-	
+	glUseProgram(program);		
 	int iActiveTex = 0;	
 
 	GLuint diffuse_sampler_location = glGetUniformLocation(program,"diffuseTexture");	
@@ -716,7 +716,30 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 		}
 
 		subMeshTris[i]->VBO()->BindBuffer();
-		glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
+		if (mesh->isHair)
+		{
+			glAlphaFunc ( GL_GEQUAL, 1.f ) ; // discard all fragments with alpha value smaller than 1
+			glDisable(GL_CULL_FACE);
+			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
+
+			glAlphaFunc ( GL_LESS, 1.f ) ; // discard all fragments with alpha value smaller than 1
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_FRONT);
+			glDepthMask(GL_FALSE);
+			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
+
+			glCullFace(GL_BACK);
+			//glDepthMask(GL_TRUE);
+			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
+
+			glDepthMask(GL_TRUE);
+			glAlphaFunc( GL_GREATER, 0.05f );			
+			glEnable(GL_DEPTH_TEST);
+		}
+		else
+		{
+			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
+		}		
 		subMeshTris[i]->VBO()->UnbindBuffer();
 
 		glActiveTexture(GL_TEXTURE1_ARB);
