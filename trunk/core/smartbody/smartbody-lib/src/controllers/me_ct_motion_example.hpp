@@ -32,7 +32,7 @@ public:
 	BodyMotionFrame() {};
 	virtual ~BodyMotionFrame() {};
 	BodyMotionFrame& operator=(const BodyMotionFrame& rhs);
-	void setMotionPose(float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& affectedJoints, SmartBody::SBMotion* motion);
+	void setMotionPose(float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& affectedJoints, SmartBody::SBMotion* motion, bool retarget = false);
 };
 
 class BodyMotionInterface

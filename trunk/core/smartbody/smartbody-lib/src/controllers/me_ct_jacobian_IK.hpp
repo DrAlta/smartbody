@@ -46,6 +46,7 @@ public:
 	float           constraintWeight; // 
 	std::string     efffectorName;
 	std::string     rootName; // root of influence for this constraint		
+	SrMat           gmatZero;
 public:
 	EffectorConstraint() { constraintWeight = 1.f; }
 	~EffectorConstraint() {}	

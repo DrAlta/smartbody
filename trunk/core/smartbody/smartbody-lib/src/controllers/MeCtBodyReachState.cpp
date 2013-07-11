@@ -185,6 +185,7 @@ SRT ReachHandAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalS
 	{
 		float grabOffset = rd->characterHeight*0.01f;
 		SRT handState = rd->reachTarget.getGrabTargetState(naturalState,grabOffset);	
+		rd->desireHandState = handState;
 		return SRT::diff(naturalState,handState);
 	}	
 	else
@@ -240,7 +241,7 @@ void ReachHandAction::reachCompleteAction( ReachStateData* rd )
 	cmd = generateGrabCmd(charName,targetName,"reach",rd->reachType, rd->grabSpeed);
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:wrist=\"r_wrist\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\"sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
-
+	//LOG("send out grab command = %s",cmd.c_str());
 	sendReachEvent("reach",cmd);
 
 	cmd = "bml char " + charName + " reach-complete: " + reachType;
@@ -561,7 +562,7 @@ ReachStateData::ReachStateData()
 	curHandAction = NULL;
 
 	linearVel = 70.f;
-	grabSpeed = 50.f;
+	grabSpeed = 80.f;
 }
 
 ReachStateData::~ReachStateData()
@@ -703,6 +704,9 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 	SrQuat newRot = SrQuat(rd->effectorState.gmatZero.inverse()*tsBlendGlobal.gmat());
 	tsBlendGlobal.rot = newRot;
 	SRT offset = rd->curHandAction->getHandTargetStateOffset(rd,tsBlendGlobal);	
+	SrQuat quatZero = SrQuat(rd->effectorState.gmatZero);
+	SrQuat newOffsetRot = quatZero*offset.rot*quatZero.inverse();
+	offset.rot = newOffsetRot;
 	tsBlend.add(offset);		
 	//LOG("reach target after offset = %f %f %f\n",tsBlend.tran[0],tsBlend.tran[1],tsBlend.tran[2]);
 	estate.ikTargetState = tsBlend;

@@ -308,8 +308,8 @@ bool SBGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos
 	graspAxis = graspAxis*getCombineTransform().rot;
 	SrVec rotAxis = cross(yAxis,graspAxis); rotAxis.normalize();
 	SrQuat alignRot = SrQuat(rotAxis,minAngle);
-	
-	outHandRot = alignRot*naturalRot;
+
+	outHandRot = alignRot*naturalRot;	
 	outHandPos = getCenter() + SrVec(0,objSize+offsetDist,0)*outHandRot;
 	
 	return true;

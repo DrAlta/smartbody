@@ -4408,10 +4408,10 @@ void FltkViewer::drawReach()
 
 	MeCtExampleBodyReach* reachCt = getCurrentCharacterBodyReachController();
 	
-	SbmCharacter* character = getCurrentCharacter();
+	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(getCurrentCharacter());
 	if (!character)
 		return;
-	float sphereSize = character->getHeight() / 50.0f;	
+	float sphereSize = character->getHeight() / 80.0f;	
 	if (reachCt)
 	{	
 		// draw reach Example data
@@ -4437,6 +4437,7 @@ void FltkViewer::drawReach()
 		const std::vector<SrVec>& exampleData = re->examplePts;
 		const std::vector<SrVec>& resampleData = re->resamplePts;		
 
+#if 0
 		SrPoints srExamplePts;	
 		srExamplePts.init_with_attributes();
 		for (unsigned int i=0;i<exampleData.size();i++)
@@ -4483,6 +4484,7 @@ void FltkViewer::drawReach()
 			drawPoint(gPos[0],gPos[1],gPos[2],1.5, yaxis);
 			//PositionControl::drawSphere(gPos,1.0f);			
 		}	
+#endif
 // 		if (reachCt->posPlanner && reachCt->posPlanner->path())
 // 		{
 // 			if (reachCt->posPlanner->path())
@@ -4536,7 +4538,32 @@ void FltkViewer::drawReach()
 		SrVec ikTraj = es.curIKTargetState.tran;		
 		PositionControl::drawSphere(ikTraj,sphereSize,SrVec(1,0,1));
 		SrVec ikTarget = es.ikTargetState.tran;
-		
+		std::string effectorJointName = rd->effectorState.effectorName;
+		SmartBody::SBJoint* effectorJoint = character->getSkeleton()->getJointByName(effectorJointName);
+		if (effectorJoint)
+		{
+			SrVec pos = effectorJoint->gmat().get_translation();
+			SrQuat rot = SrQuat(rd->effectorState.gmatZero.inverse()*effectorJoint->gmat().get_rotation());
+			SrQuat desireRot = SrQuat(rd->desireHandState.gmat());
+			SrVec yaxis = SrVec(0,1,0)*rot;
+			SrVec xaxis = SrVec(1,0,0)*rot;
+			SrVec zaxis = SrVec(0,0,1)*rot;
+
+			SrVec desireAxis = SrVec(0,1,0)*desireRot;
+			float lineScale = character->getHeight() / 30.0f;	
+			SrSnLines effectorUpLine;
+			SrLines& line = effectorUpLine.shape();
+			line.push_color(SrColor(0.f,0.f,1.f,1.f));
+			line.push_line(pos, pos+zaxis*lineScale);
+			line.push_color(SrColor(0.f,1.f,0.f,1.f));
+			line.push_line(pos, pos+yaxis*lineScale);
+			line.push_color(SrColor(1.f,0.f,0.f,1.f));
+			line.push_line(pos, pos+xaxis*lineScale);
+			line.push_color(SrColor(1.f,0.f,1.f,1.f));
+			line.push_line(pos, pos+desireAxis*lineScale);
+			SrGlRenderFuncs::render_lines(&effectorUpLine);			
+			
+		}
 		MeCtIKTreeScenario& ikTree = re->ikScenario;
 
 		for (unsigned int i=0;i<ikTree.ikValidNodes.size();i++)
@@ -4573,7 +4600,7 @@ void FltkViewer::drawColObject( SBGeomObject* colObj, SrMat& gmat )
 	//SrMat gMat = colObj->worldState.gmat();
 	SrColor objColor;
 	objColor.set(colObj->color.c_str());
-	objColor.a = (srbyte)64;
+	objColor.a = (srbyte)255;
 	
 
 	glEnable ( GL_ALPHA_TEST );

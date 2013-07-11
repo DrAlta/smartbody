@@ -29,7 +29,7 @@ BodyMotionFrame& BodyMotionFrame::operator=( const BodyMotionFrame& rhs )
 	return *this;
 }
 
-void BodyMotionFrame::setMotionPose( float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& affectedJoints,SmartBody::SBMotion* motion )
+void BodyMotionFrame::setMotionPose( float time, SmartBody::SBSkeleton* skel, const vector<SmartBody::SBJoint*>& affectedJoints,SmartBody::SBMotion* motion, bool retarget)
 {
 	SkJoint* rootJoint = affectedJoints[0];
 	motion->connect(skel);	
@@ -39,6 +39,12 @@ void BodyMotionFrame::setMotionPose( float time, SmartBody::SBSkeleton* skel, co
 	if (jointQuat.size() != affectedJoints.size())
 		jointQuat.resize(affectedJoints.size());
 
+	SmartBody::SBRetarget* sbRetarget = NULL;
+	if (retarget)
+	{
+		SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();
+		sbRetarget = retargetManager->getRetarget(motion->getMotionSkeletonName(),skel->getName());		
+	}
 	for (unsigned int i=0;i<affectedJoints.size();i++)
 	{
 		SkJoint* joint = affectedJoints[i];
@@ -46,6 +52,8 @@ void BodyMotionFrame::setMotionPose( float time, SmartBody::SBSkeleton* skel, co
 		if (joint->quat()->active())
 			jq = affectedJoints[i]->quat()->rawValue();	
 
+		if (sbRetarget)
+			jq = sbRetarget->applyRetargetJointRotation(joint->getMappedJointName(),jq);
 		jointQuat[i] = jq;			
 	}	
 	rootPos.set(rootJoint->pos()->value());
