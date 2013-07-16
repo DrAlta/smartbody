@@ -67,6 +67,7 @@
 #include "sr/sr_model.h"
 #include "sr/sr_euler.h"
 #include <sb/SBSkeleton.h>
+#include <sr/sr_sn_matrix.h>
 
 using namespace std;
 
@@ -124,6 +125,9 @@ wo_cache_timestamp( -std::numeric_limits<float>::max() )
 	_skeleton->ref();
 
 	SbmPawn::initData();
+
+	blendMeshGroup = new SrSnGroup();
+	blendMeshGroup->add(new SrSnMatrix, 0);
 }
 
 void SbmPawn::initData()

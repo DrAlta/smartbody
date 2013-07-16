@@ -100,6 +100,61 @@ void DeformableMesh::setSkeleton(SkSkeleton* skel)
 	skel->ref();
 }
 
+void DeformableMesh::blendShapes()
+{
+	for (size_t i = 0; i < dMeshBlend_p.size(); ++i)
+	{
+		delete dMeshBlend_p[i];
+	}
+	dMeshBlend_p.clear();
+
+	std::vector<SrSnModel*>& neutralModel = visemeShapeMap["neutral"];
+	for (size_t i = 0; i < neutralModel.size(); ++i)
+	{
+		SrArray<SrPnt>& neutralV = neutralModel[i]->shape().V;
+		SrArray<SrPnt>& neutralN = neutralModel[i]->shape().N;
+		SrArray<SrPnt> newV = neutralV;
+		SrArray<SrPnt> newN = neutralN;
+
+		bool isBlending = false;
+		std::map<std::string, float>::iterator iter;
+		for (iter = visemeWeightMap.begin(); iter != visemeWeightMap.end(); ++iter)
+		{
+			if (iter->second > 0.01f && iter->first != "neutral")
+			{
+				isBlending = true;
+				SrArray<SrPnt>& visemeV = visemeShapeMap[iter->first][i]->shape().V;
+				SrArray<SrPnt>& visemeN = visemeShapeMap[iter->first][i]->shape().N;
+				if (visemeV.size() != neutralV.size())
+					LOG("number of vertices for %s is not same as neutral", iter->first.c_str());
+				for (int j = 0; j < visemeV.size(); ++j)
+				{
+					SrPnt diff = visemeV[j] - neutralV[j];
+					newV[j] = newV[j] + diff * iter->second;
+				}
+				for (int j = 0; j < visemeN.size(); ++j)
+				{
+					SrPnt diff = visemeN[j] - neutralN[j];
+					newN[j] = newN[j] + diff * iter->second;
+				}
+			}
+		}
+		for (int j = 0; j < newN.size(); ++j)
+		{
+			newN[j].normalize();
+		}
+
+		SrSnModel* blendedModel = new SrSnModel();
+		blendedModel->shape(neutralModel[i]->shape());
+		if (isBlending)
+		{
+			blendedModel->shape().V = newV;
+			blendedModel->shape().N = newN;
+		}
+		dMeshBlend_p.push_back(blendedModel);
+	}
+}
+
 void DeformableMesh::update()
 {
 	if (!binding)	return;

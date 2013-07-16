@@ -34,6 +34,7 @@
 #include <sb/SBFaceDefinition.h>
 #include "sbm/sr_hash_map.h"
 #include "sb/SBController.h"
+#include "sb/SBCharacter.h"
 #include <vector>
 
 /*
@@ -65,6 +66,7 @@ class MeCtFace : public SmartBody::SBController	{
 		srHashMap <SkMotion>	_key_pose_map;
 		
 		SkSkeleton* 	    _skeleton_ref_p;
+		SmartBody::SBCharacter* _character;
 
 		SrBuffer<bool>			_include_chan_flag; // key channels to exclude from calculation
 		std::map<std::string, std::vector<int> > _visemeChannelMap;
