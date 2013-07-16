@@ -30,6 +30,7 @@
 #include <sb/sbm_pawn.hpp>
 #include <sb/sbm_character.hpp>
 #include <sb/SBScene.h>
+#include <sbm/sbm_deformable_mesh.h>
 //////////////////////////////////////////////////////////////////////////////////
 
 std::string MeCtFace::type_name = "Face";
@@ -93,6 +94,7 @@ void MeCtFace::init (SbmPawn* pawn) {
 	MeController::init(NULL);
 
 	SbmCharacter* sbmCharacter = dynamic_cast<SbmCharacter*>(pawn);
+	_character = dynamic_cast<SmartBody::SBCharacter*>(pawn);
 	SmartBody::SBFaceDefinition* faceDefinition = sbmCharacter->getFaceDefinition();
 	if (!faceDefinition || !faceDefinition->getFaceNeutral())
 		return;
@@ -375,6 +377,59 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 	if (_base_pose_p == NULL)
 	{
 		continuing = false;
+		return continuing;
+	}
+
+	if (_character->getBoolAttribute("blendshape"))
+	{
+		std::vector<std::string> visemeChannels;
+#if 1
+		visemeChannels.push_back("open");
+		visemeChannels.push_back("W");
+		visemeChannels.push_back("ShCh");
+		visemeChannels.push_back("PBM");
+		visemeChannels.push_back("FV");
+		visemeChannels.push_back("wide");
+		visemeChannels.push_back("tBack");
+		visemeChannels.push_back("tRoof");
+		visemeChannels.push_back("tTeeth");
+
+		visemeChannels.push_back("au_1");
+		visemeChannels.push_back("au_2");
+		visemeChannels.push_back("au_4");
+		visemeChannels.push_back("au_5");
+		visemeChannels.push_back("au_6");
+		visemeChannels.push_back("au_7");
+		visemeChannels.push_back("au_9");
+#endif
+
+		std::map<std::string, float>::iterator iter = _character->dMesh_p->visemeWeightMap.begin();
+		for (; iter != _character->dMesh_p->visemeWeightMap.end(); ++iter)
+		{
+			iter->second = 0.0f;
+			if (iter->first == "neutral")
+				iter->second = 1.0f;
+		}
+
+		for (size_t i = 0; i < visemeChannels.size(); ++i)
+		{
+			std::string& visemeChannelName = visemeChannels[i];
+			int chanid = frame.context()->channels().search(visemeChannels[i], SkChannel::XPos);
+			if (chanid >= 0)
+			{
+				double v = frame.buffer()[frame.toBufferIndex(chanid)];
+				if (v < 0)
+					v = 0;
+				if (v > 1)
+					v = 1;
+
+				_character->dMesh_p->visemeWeightMap[visemeChannels[i]] = v;
+			}
+			else
+			{
+				LOG("channel not found %s", visemeChannelName.c_str());
+			}
+		}
 		return continuing;
 	}
 	int nchan = base_channels.size();

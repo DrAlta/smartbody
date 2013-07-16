@@ -102,6 +102,7 @@ public:  // TODO - properly encapsulate / privatize the following
 	SkScene*		scene_p;	 // Skeleton Scene and Rigid Mesh		
 	DeformableMesh*	dMesh_p;	 // Deformable Mesh using smooth skinning	
 	DeformableMeshInstance* dMeshInstance_p;
+	SrSnGroup* blendMeshGroup;
 	SteerLib::ObstacleInterface* steeringSpaceObj_p;
 	SrVec			steeringSpaceObjSize;
 	std::string _classType;

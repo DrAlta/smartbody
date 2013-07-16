@@ -80,6 +80,11 @@ public:
 	std::vector<SrMat>          bindPoseMatList;	
 	std::map<int,std::vector<int> > vtxNewVtxIdxMap;
 
+	// blend shape
+	std::map<std::string, std::vector<SrSnModel*> >	visemeShapeMap;
+	std::map<std::string, float>	visemeWeightMap;
+	std::vector<SrSnModel*>		dMeshBlend_p;
+
 public:
 	DeformableMesh();
 	SBAPI virtual ~DeformableMesh();	
@@ -91,6 +96,7 @@ public:
         The integers mean 1:show, 0:hide, and -1:don't change the visibility state. */
 	void set_visibility(int deformableMesh);
 	virtual bool buildVertexBuffer(); // unrolled all models inside this deformable mesh into a GPU-friendly format
+	SBAPI void blendShapes();
 };
 
 class DeformableMeshInstance

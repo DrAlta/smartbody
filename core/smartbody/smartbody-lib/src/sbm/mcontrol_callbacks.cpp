@@ -1480,22 +1480,22 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 		LOG( "mcu_character_load_mesh ERR: SbmCharacter '%s' NOT FOUND\n", char_name ); 
 		return( CMD_FAILURE );
 	}
+	std::string visemeName = "";
 	float factor = 1.f;
 	if (option)
 	{
-		if (strcmp(option,"-m") == 0)
+	
+		std::vector<std::string> tokens;
+		vhcl::Tokenize(option, tokens);
+		for (size_t i = 0; i < tokens.size(); ++i)
 		{
-			factor = 0.01f;
+			if (tokens[i] == "-m")
+				factor == 0.01f;
+			else if (tokens[i] == "-scale" && i < (tokens.size() - 1))
+				factor = (float)atof(tokens[i + 1].c_str());
+			else if (tokens[i] == "-viseme" && i < (tokens.size() - 1))
+				visemeName = tokens[i + 1];
 		}
-		else
-		{
-			std::string optionStr = option;
-			if (optionStr.find("-scale ") == 0)
-			{
-				std::string scaleFactor = optionStr.substr(7);
-				factor = (float) atof(scaleFactor.c_str());
-			}
-		}			 
 	}
 
 	// Here, detect which type of file it is
@@ -1662,6 +1662,15 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 		srSnModelDynamic->shape().name = meshModelVec[i]->name;
 		if (char_p->dMesh_p)
 		{
+			if (visemeName != "")
+			{
+				if (char_p->dMesh_p->visemeShapeMap.find(visemeName) == char_p->dMesh_p->visemeShapeMap.end())
+				{
+					std::vector<SrSnModel*> emptyVec;
+					char_p->dMesh_p->visemeShapeMap.insert(std::make_pair(visemeName, emptyVec));
+				}
+				char_p->dMesh_p->visemeShapeMap[visemeName].push_back(srSnModelDynamic);
+			}
 			char_p->dMesh_p->dMeshDynamic_p.push_back(srSnModelDynamic);
 			char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
 			srSnModelDynamic->ref();

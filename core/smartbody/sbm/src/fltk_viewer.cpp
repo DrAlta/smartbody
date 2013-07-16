@@ -54,6 +54,7 @@
 # include <sr/sr_color.h>
 # include <sr/sr_points.h>
 
+# include <sr/sr_sn_matrix.h>
 # include <sr/sr_sn.h>
 # include <sr/sr_sn_group.h>
 
@@ -100,6 +101,7 @@
 
 #include <sbm/PPRAISteeringAgent.h>
 #include "SBGUIManager.h"
+#include <sbm/sbm_deformable_mesh.h>
 
 /*
 #define USE_CEGUI 1
@@ -1329,8 +1331,34 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		{
 			//pawn->dMesh_p->update();
 			pawn->dMeshInstance_p->update();
-			if (_data->charactermode == ModeShowDeformableGeometry && !SbmDeformableMeshGPU::useGPUDeformableMesh)			
+			if (_data->charactermode == ModeShowDeformableGeometry && !SbmDeformableMeshGPU::useGPUDeformableMesh)
+			{
+#if 0
 				SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p);
+#else
+				bool useBlendShape = false;
+				SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (pawn);
+				if (character)
+				{
+					useBlendShape = character->getBoolAttribute("blendshape");
+				}
+				if (useBlendShape)
+				{
+					character->dMesh_p->blendShapes();
+					for (int i = 0; i < pawn->dMesh_p->dMeshBlend_p.size(); ++i)
+					{
+						SrGlRenderFuncs::render_model(pawn->dMesh_p->dMeshBlend_p[i]);
+					}
+				}
+				else
+				{
+					for (int i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); ++i)
+					{
+						SrGlRenderFuncs::render_model(pawn->dMesh_p->dMeshDynamic_p[i]);
+					}
+				}
+#endif
+			}
 		}
 	}
 	
