@@ -644,16 +644,12 @@ void BaseWindow::SaveSceneSettingCB( Fl_Widget* widget, void* data )
 
 void BaseWindow::LoadSceneSettingCB( Fl_Widget* widget, void* data )
 {
-	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
-
 	const char* seqFile = fl_file_chooser("Load file:", "*.py", mediaPath.c_str());
 	if (!seqFile)
 		return;
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
-	if (mediaPath != "")
-		scene->setMediaPath(mediaPath);
 	std::string filebasename = boost::filesystem::basename(seqFile);
 	std::string fileextension = boost::filesystem::extension(seqFile);
 	std::string fullfilename = std::string(seqFile);
