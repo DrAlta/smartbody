@@ -57,7 +57,8 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := boost-filesystem-prebuilt
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_filesystem.a
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_filesystem.a
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_filesystem-gcc-mt-1_53.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -243,7 +244,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := smartbody
 #LOCAL_CFLAGS    :=  -gstabs -g -DBUILD_ANDROID -frtti 
 #$(SBM_LOCAL_PATH)/../../cerevoice/cerevoice_eng/include \
-LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions 
+LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions -g
 LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../pythonLib/include/python2.6 \
 					$(SBM_LOCAL_PATH)/../../boost \
@@ -352,6 +353,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sbm/BMLDefs.cpp \
 	$(SBM_MY_DIR)/bml/behavior_scheduler_constant_speed.cpp \
 	$(SBM_MY_DIR)/bml/behavior_scheduler.cpp \
+	$(SBM_MY_DIR)/bml/behavior_scheduler_gesture.cpp \
 	$(SBM_MY_DIR)/bml/behavior_scheduler_fixed.cpp \
 	$(SBM_MY_DIR)/bml/behavior_span.cpp \
 	$(SBM_MY_DIR)/bml/bml_animation.cpp \
