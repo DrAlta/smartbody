@@ -109,6 +109,7 @@ void pythonFuncsCharacter()
 		.def("getFarPlane", &SrCamera::getFarPlane, "Get's the camera's far plane.")
 		.def("setAspectRatio", &SrCamera::setAspectRatio, "Set's the camera's aspect ratio.")
 		.def("getAspectRatio", &SrCamera::getAspectRatio, "Get's the camera's aspect ratio.")
+		.def("setCameraParameterSmooth", &SrCamera::setCameraParameterSmooth, "Smoothly interpolate the current camera to target camera within given time.")		
 		;
 
 	boost::python::class_<SBCharacter, boost::python::bases<SBPawn, SBObject> >("SBCharacter")

@@ -430,8 +430,7 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	
 	SmartBody::SBCharacter* curCharacter = dynamic_cast<SmartBody::SBCharacter*>(currentReachEngine->getCharacter());
 	if (currentReachEngine->getCurrentState()->curStateName() != "Idle" || currentReachData->startReach )
-	{
-		
+	{		
 		//LOG("update reach");
 		currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);	
 		curCharacter->setBoolAttribute("isReaching", true);		

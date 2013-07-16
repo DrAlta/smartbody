@@ -164,6 +164,12 @@ class SrCamera : public SmartBody::SBPawn
 
 	SBAPI virtual void notify(SmartBody::SBSubject* subject);
 
+	SBAPI virtual void afterUpdate(double time);
+
+	SBAPI void setCameraParameterSmooth(std::string camName, float smoothTime);
+
+	
+
  protected:
     SrPnt  eye;    //!< position of the eye, default is (0,0,2).
     SrPnt  center; //!< position where the eye is looking to, default is (0,0,0).
@@ -174,6 +180,12 @@ class SrCamera : public SmartBody::SBPawn
     float  aspect; //!< normally is set to the screen width/heigh, default is 1.
     float  scale;  //!< a scale factor to be applied between the view matrix and the scene
 
+	SrPnt initialEye, initialCenter, initialUp;
+	float initialFovy;	
+	float camStartTime;
+	float camEndTime;		
+	bool  smoothTargetCam;
+	std::string targetCam;
  };
 
 //================================ End of File =================================================

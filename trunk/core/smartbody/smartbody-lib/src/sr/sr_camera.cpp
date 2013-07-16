@@ -31,6 +31,7 @@
 #include <sb/SBSubject.h>
 #include <sb/SBAttribute.h>
 #include <sb/SBScene.h>
+#include <sb/SBSimulationManager.h>
 
 //=================================== SrCamera ===================================
 
@@ -527,4 +528,54 @@ void SrCamera::notify(SmartBody::SBSubject* subject)
 	}
 }
 
+SBAPI  void SrCamera::afterUpdate( double time )
+{	
+	if (smoothTargetCam)
+	{
+		SrCamera* cam = SmartBody::SBScene::getScene()->getCamera(targetCam);
+		if (!cam) 
+		{
+			//LOG("Target camera '%s' does not exists.",camName.c_str());
+			return;
+		}
+		if (time >= camStartTime && time <= camEndTime && camStartTime != camEndTime)
+		{
+			float weight = (float)(time-camStartTime)/(float)(camEndTime - camStartTime);
+			SrVec newEye = initialEye*(1.f-weight) + cam->getEye()*(weight);
+			SrVec newCenter = initialCenter*(1.f-weight) + cam->getCenter()*(weight);
+			SrVec newUp = initialUp*(1.f-weight) + cam->getUpVector()*(weight);
+			float newFov = initialFovy*(1.f-weight) + cam->getFov()*(weight);
+
+			setEye(newEye.x,newEye.y,newEye.z);
+			setCenter(newCenter.x,newCenter.y,newCenter.z);
+			setUpVector(newUp);
+			setFov(newFov);
+		}
+		else
+		{
+			smoothTargetCam = false;
+		}
+	}
+	SBPawn::afterUpdate(time);
+}
+
+SBAPI void SrCamera::setCameraParameterSmooth( std::string camName, float smoothTime )
+{
+	SrCamera* cam = SmartBody::SBScene::getScene()->getCamera(camName);
+	if (!cam) 
+	{
+		LOG("Target camera '%s' does not exists.",camName.c_str());
+		return;
+	}
+
+	camStartTime = (float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
+	camEndTime = camStartTime + smoothTime;
+
+	initialEye = eye;
+	initialCenter = center;
+	initialUp = up;
+	initialFovy = fovy;
+	targetCam = camName;
+	smoothTargetCam = true;
+}
 //================================ End of File =========================================
