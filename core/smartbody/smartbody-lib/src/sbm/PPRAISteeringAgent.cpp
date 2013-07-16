@@ -1499,7 +1499,7 @@ void PPRAISteeringAgent::startIdleToWalkState( float angleDiff )
 		std::stringstream command;
 		double w;
 		float maxRotAngle = 180;
-		
+		std::string stateName;
 		//LOG("angleDiff = %f",angleDiff);
 		if (angleDiff > 0)
 		{
@@ -1507,17 +1507,18 @@ void PPRAISteeringAgent::startIdleToWalkState( float angleDiff )
 			{
 				if (angleDiff > maxRotAngle) angleDiff = maxRotAngle;
 				w = (angleDiff - 90) / (maxRotAngle-90);				
-				command << "panim schedule char " << character->getName();			
-				command << " state " << startingLName << " loop false playnow false additive false joint null " << " 0 " << 1 - w << " " << w;
-				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());				
+				//command << "panim schedule char " << character->getName();			
+				//command << " state " << startingLName << " loop false playnow false additive false joint null " << " 0 " << 1 - w << " " << w;
+				//SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());				
 			}
 			else
 			{
 				w = angleDiff / 90;				
-				command << "panim schedule char " << character->getName();					
-				command << " state " << startingLName << " loop false playnow false additive false joint null " << 1 - w << " " << w << " " << " 0 ";
-				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
+				//command << "panim schedule char " << character->getName();					
+				//command << " state " << startingLName << " loop false playnow false additive false joint null " << 1 - w << " " << w << " " << " 0 ";
+				//SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
 			}
+			stateName = startingLName;
 		}		
 		else		
 		{
@@ -1525,19 +1526,37 @@ void PPRAISteeringAgent::startIdleToWalkState( float angleDiff )
 			{
 				if (angleDiff < -maxRotAngle) angleDiff = -maxRotAngle;
 				w = (angleDiff + maxRotAngle) / (maxRotAngle-90);				
-				command << "panim schedule char " << character->getName();
-				command << " state " << startingRName << " loop false playnow false additive false joint null " << " 0 " << w << " " << 1 - w;
-				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
+				//command << "panim schedule char " << character->getName();
+				//command << " state " << startingRName << " loop false playnow false additive false joint null " << " 0 " << w << " " << 1 - w;
+				//SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
 			}
 			else
 			{
 				w = -angleDiff / 90;					
-				command << "panim schedule char " << character->getName();
-				command << " state " << startingRName << " loop false playnow false additive false joint null " << 1 - w << " " << w << " 0 ";
-				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
-			}				
+				//command << "panim schedule char " << character->getName();
+				//command << " state " << startingRName << " loop false playnow false additive false joint null " << 1 - w << " " << w << " 0 ";
+				//SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
+			}	
+			stateName = startingRName;
 		}
-		//LOG("start turn command = %s",command.str().c_str());
+
+		std::vector<double> weights;
+		SmartBody::SBAnimationBlendManager* blendManager = SmartBody::SBScene::getScene()->getBlendManager();
+		SmartBody::SBAnimationBlend* blend = blendManager->getBlend(stateName);
+		if (blend)
+		{
+			weights.resize(blend->getNumMotions());
+			blend->getWeightsFromParameters(angleDiff,weights);
+			command << "panim schedule char " << character->getName();
+			command << " state " << stateName << " loop false playnow false additive false joint null ";// << 1 - w << " " << w << " 0 ";
+			for (unsigned k=0;k<weights.size()-1;k++)
+				command << weights[k] << " ";
+			if (weights.size() >= 1)
+				command << weights[weights.size()-1];
+			SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());
+			//LOG("start turn command = %s",command.str().c_str());
+		}
+		
 		
 		startLocomotionState();
 		return;

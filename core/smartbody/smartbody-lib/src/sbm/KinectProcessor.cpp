@@ -151,7 +151,7 @@ void KinectProcessor::initKinectSkeleton(std::vector<SrVec>& gPos, std::vector<S
 		if (i==0) // root joint
 			sbJoint->quat()->prerot(gRot[i].inverse());
 		else if (bonePreRotMap.find(i) != bonePreRotMap.end())
-			sbJoint->quat()->prerot(bonePreRotMap[i]);
+			sbJoint->quat()->prerot(bonePreRotMap[i]);		
 		// set joint data
 		sbJoint->quat()->activate();
 		sbJoint->name(jname);
@@ -167,7 +167,11 @@ void KinectProcessor::initKinectSkeleton(std::vector<SrVec>& gPos, std::vector<S
 		kinectSk->channels().add(jname, SkChannel::Quat);
 		//sbJoint->offset(SrVec(0,0,10.f)); // default dummy value		
 		sbJoint->offset(offsetVec[i]);				
-	}	
+
+		// add root joint
+		if (jname == "base")
+			kinectSk->root(sbJoint);
+	}		
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	assetManager->addSkeleton(kinectSk);	
 }

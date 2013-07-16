@@ -3322,7 +3322,7 @@ SrCamera* SBScene::getCamera(const std::string& name)
 	std::map<std::string, SrCamera*>::iterator iter = _cameras.find(name);
 	if (iter == _cameras.end())
 	{
-		LOG("No camera with name '%s' found.", name.c_str());
+		//LOG("No camera with name '%s' found.", name.c_str());
 		return NULL;
 	}
 	return (*iter).second;
