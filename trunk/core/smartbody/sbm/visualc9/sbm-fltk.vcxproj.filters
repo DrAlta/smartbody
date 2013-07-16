@@ -31,9 +31,6 @@
     <Filter Include="retargetcreator">
       <UniqueIdentifier>{56361f18-4f18-4cc4-b99b-6afd39fa8ac8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="diphoneviewer">
-      <UniqueIdentifier>{2b51ee1f-542b-4db5-8b62-afe631bec4b8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="monitorviewer">
       <UniqueIdentifier>{6f962f55-7281-489e-ad9b-4c381c001a85}</UniqueIdentifier>
     </Filter>
@@ -51,6 +48,9 @@
     </Filter>
     <Filter Include="cegui">
       <UniqueIdentifier>{0b599e4c-36b7-405c-bb79-1db58577a9cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lipsyncviewer">
+      <UniqueIdentifier>{2b51ee1f-542b-4db5-8b62-afe631bec4b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -215,13 +215,13 @@
       <Filter>retargetcreator</Filter>
     </ClCompile>
     <ClCompile Include="..\src\visemeviewer\VisemeViewerWindow.cpp">
-      <Filter>diphoneviewer</Filter>
+      <Filter>lipsyncviewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\visemeviewer\VisemeCurveEditor.cpp">
-      <Filter>diphoneviewer</Filter>
+      <Filter>lipsyncviewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\visemeviewer\VisemeCurve.cpp">
-      <Filter>diphoneviewer</Filter>
+      <Filter>lipsyncviewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\panimationviewer\VisualizationView.cpp">
       <Filter>panimationviewer</Filter>
@@ -260,10 +260,10 @@
       <Filter>viewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\visemeviewer\VisemeRunTimeWindow.cpp">
-      <Filter>diphoneviewer</Filter>
+      <Filter>lipsyncviewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\visemeviewer\VisemeRTCurveViewer.cpp">
-      <Filter>diphoneviewer</Filter>
+      <Filter>lipsyncviewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\SBGUIManager.cpp">
       <Filter>cegui</Filter>
@@ -429,13 +429,13 @@
       <Filter>retargetcreator</Filter>
     </ClInclude>
     <ClInclude Include="..\src\visemeviewer\VisemeViewerWindow.h">
-      <Filter>diphoneviewer</Filter>
+      <Filter>lipsyncviewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\visemeviewer\VisemeCurveEditor.h">
-      <Filter>diphoneviewer</Filter>
+      <Filter>lipsyncviewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\visemeviewer\VisemeCurve.h">
-      <Filter>diphoneviewer</Filter>
+      <Filter>lipsyncviewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\panimationviewer\VisualizationView.h">
       <Filter>panimationviewer</Filter>
@@ -477,10 +477,10 @@
       <Filter>glew</Filter>
     </ClInclude>
     <ClInclude Include="..\src\visemeviewer\VisemeRunTimeWindow.h">
-      <Filter>diphoneviewer</Filter>
+      <Filter>lipsyncviewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\visemeviewer\VisemeRTCurveViewer.h">
-      <Filter>diphoneviewer</Filter>
+      <Filter>lipsyncviewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SBGUIManager.h">
       <Filter>cegui</Filter>
