@@ -357,8 +357,10 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 		{
 			SrVec leftSholderRot = _character->getVec3Attribute("leftSholderOffset");
 			SrVec rightSholderRot = _character->getVec3Attribute("rightSholderOffset");
-			retarget->addJointRotOffset("l_shoulder",SrQuat(leftSholderRot));
-			retarget->addJointRotOffset("r_shoulder",SrQuat(rightSholderRot));
+			SrQuat lShlderQuat(leftSholderRot);
+			SrQuat rShlderQuat(rightSholderRot);
+			retarget->addJointRotOffset("l_shoulder",lShlderQuat);
+			retarget->addJointRotOffset("r_shoulder",rShlderQuat);
 		}
 	}
 
