@@ -108,6 +108,18 @@ void DeformableMesh::blendShapes()
 	}
 	dMeshBlend_p.clear();
 
+	for (size_t i = 0; i < dMeshStatic_p.size(); ++i)
+	{
+		delete dMeshStatic_p[i];
+	}
+	dMeshStatic_p.clear();
+
+	if (visemeShapeMap.find("neutral") == visemeShapeMap.end())
+	{
+		LOG("neutral blend shape has not been defined!");
+		return;
+	}
+
 	std::vector<SrSnModel*>& neutralModel = visemeShapeMap["neutral"];
 	for (size_t i = 0; i < neutralModel.size(); ++i)
 	{
@@ -122,26 +134,40 @@ void DeformableMesh::blendShapes()
 		{
 			if (iter->second > 0.01f && iter->first != "neutral")
 			{
-				isBlending = true;
-				SrArray<SrPnt>& visemeV = visemeShapeMap[iter->first][i]->shape().V;
-				SrArray<SrPnt>& visemeN = visemeShapeMap[iter->first][i]->shape().N;
-				if (visemeV.size() != neutralV.size())
-					LOG("number of vertices for %s is not same as neutral", iter->first.c_str());
-				for (int j = 0; j < visemeV.size(); ++j)
+				for (size_t j = 0; j < visemeShapeMap[iter->first].size(); j++)
 				{
-					SrPnt diff = visemeV[j] - neutralV[j];
-					newV[j] = newV[j] + diff * iter->second;
-				}
-				for (int j = 0; j < visemeN.size(); ++j)
-				{
-					SrPnt diff = visemeN[j] - neutralN[j];
-					newN[j] = newN[j] + diff * iter->second;
+					if (visemeShapeMap[iter->first][j]->shape().name != neutralModel[i]->shape().name)
+						continue;
+
+					isBlending = true;
+					SrArray<SrPnt>& visemeV = visemeShapeMap[iter->first][j]->shape().V;
+					SrArray<SrPnt>& visemeN = visemeShapeMap[iter->first][j]->shape().N;
+					if (visemeV.size() != neutralV.size())
+					{
+						LOG("number of vertices for %s is not same as neutral", iter->first.c_str());
+						continue;
+					}
+					if (visemeN.size() != neutralN.size())
+					{
+						LOG("number of normals for %s is not same as neutral", iter->first.c_str());
+						continue;
+					}
+					for (int v = 0; v < visemeV.size(); ++v)
+					{
+						SrPnt diff = visemeV[v] - neutralV[v];
+						newV[v] = newV[v] + diff * iter->second;
+					}
+					for (int n = 0; n < visemeN.size(); ++n)
+					{
+						SrPnt diff = visemeN[n] - neutralN[n];
+						newN[n] = newN[n] + diff * iter->second;
+					}
 				}
 			}
 		}
-		for (int j = 0; j < newN.size(); ++j)
+		for (int n = 0; n < newN.size(); ++n)
 		{
-			newN[j].normalize();
+			newN[n].normalize();
 		}
 
 		SrSnModel* blendedModel = new SrSnModel();
@@ -151,7 +177,7 @@ void DeformableMesh::blendShapes()
 			blendedModel->shape().V = newV;
 			blendedModel->shape().N = newN;
 		}
-		dMeshBlend_p.push_back(blendedModel);
+		dMeshStatic_p.push_back(blendedModel);
 	}
 }
 

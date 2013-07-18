@@ -1330,34 +1330,25 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		if(pawn->dMesh_p && pawn->dMeshInstance_p)
 		{
 			//pawn->dMesh_p->update();
+			bool useBlendShape = false;
+			SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (pawn);
+			if (character)
+			{
+				useBlendShape = character->getBoolAttribute("blendshape");
+			}
+			if (useBlendShape)
+			{
+				character->dMesh_p->blendShapes();
+				character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
+			}
 			pawn->dMeshInstance_p->update();
 			if (_data->charactermode == ModeShowDeformableGeometry && !SbmDeformableMeshGPU::useGPUDeformableMesh)
 			{
-#if 0
+				//for (int i = 0; i < character->dMesh_p->dMeshStatic_p.size(); ++i)
+				//{
+				//	SrGlRenderFuncs::render_model(character->dMesh_p->dMeshStatic_p[i]);
+				//}
 				SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p);
-#else
-				bool useBlendShape = false;
-				SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (pawn);
-				if (character)
-				{
-					useBlendShape = character->getBoolAttribute("blendshape");
-				}
-				if (useBlendShape)
-				{
-					character->dMesh_p->blendShapes();
-					for (int i = 0; i < pawn->dMesh_p->dMeshBlend_p.size(); ++i)
-					{
-						SrGlRenderFuncs::render_model(pawn->dMesh_p->dMeshBlend_p[i]);
-					}
-				}
-				else
-				{
-					for (int i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); ++i)
-					{
-						SrGlRenderFuncs::render_model(pawn->dMesh_p->dMeshDynamic_p[i]);
-					}
-				}
-#endif
 			}
 		}
 	}

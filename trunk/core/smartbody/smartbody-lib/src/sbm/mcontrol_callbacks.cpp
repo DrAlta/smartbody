@@ -1660,6 +1660,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 		srSnModelDynamic->visible(false);
 		srSnModelStatic->shape().name = meshModelVec[i]->name;
 		srSnModelDynamic->shape().name = meshModelVec[i]->name;
+
 		if (char_p->dMesh_p)
 		{
 			if (visemeName != "")
@@ -1669,7 +1670,10 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 					std::vector<SrSnModel*> emptyVec;
 					char_p->dMesh_p->visemeShapeMap.insert(std::make_pair(visemeName, emptyVec));
 				}
-				char_p->dMesh_p->visemeShapeMap[visemeName].push_back(srSnModelDynamic);
+				SrSnModel* srSnModelBlendShape = new SrSnModel();
+				srSnModelBlendShape->shape(*meshModelVec[i]);
+				char_p->dMesh_p->visemeShapeMap[visemeName].push_back(srSnModelBlendShape);
+				//LOG("push back to visemeShapeMap[%s]: %s", visemeName.c_str(), (const char*)srSnModelBlendShape->shape().name);
 			}
 			char_p->dMesh_p->dMeshDynamic_p.push_back(srSnModelDynamic);
 			char_p->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
