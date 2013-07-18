@@ -55,7 +55,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createStringAttribute("gestureMap", "", true, "Basic", 50, false, false, false, "Name of the gesture map to use.");
 	createStringAttribute("gestureMapMeek", "", true, "Basic", 51, false, false, false, "Name of the gesture map to use that is meek.");
 	createStringAttribute("gestureMapEmphatic", "", true, "Basic", 52, false, false, false, "Name of the gesture map to use that is emphatic.");
-
+	createStringAttribute("gestureMapFurious", "", true, "Basic", 53, false, false, false, "Name of the gesture map to use that is furious.");
 
 	std::vector<std::string> gesturePolicyVec;
 	gesturePolicyVec.push_back("random");

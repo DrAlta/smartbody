@@ -1648,7 +1648,8 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 					int count = atoi(temp.c_str());
 					DOMNode* materialNode = nodeAttr1->getNamedItem(BML::BMLDefs::ATTR_MATERIAL);
 					std::string materialName;
-					xml_utils::xml_translate(&materialName, materialNode->getNodeValue());
+					if (materialNode)
+						xml_utils::xml_translate(&materialName, materialNode->getNodeValue());
 					std::string materialID = materialName;
 					if (materialId2Name.find(materialName) != materialId2Name.end())
 						materialID = materialId2Name[materialName];
