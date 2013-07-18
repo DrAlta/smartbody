@@ -360,7 +360,7 @@ namespace BML {
 
 	class GestureRequest : public MeControllerRequest {
 	public:
-		enum EmotionTag {NEUTRAL, MEEK, EMPHATIC};
+		enum EmotionTag {NEUTRAL, MEEK, EMPHATIC, FURIOUS};
 	public:
 		GestureRequest( const std::string& unique_id, const std::string& localId, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
 			const BehaviorSyncPoints& behav_syncs, std::vector<std::string>& gl, const std::string& js = "", float s = 0.03f, float freq = 0.02f, int priority = 0, EmotionTag emo = NEUTRAL);

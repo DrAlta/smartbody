@@ -58,6 +58,8 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		tag = GestureRequest::MEEK;
 	else if (emotion == "angry")
 		tag = GestureRequest::EMPHATIC;
+	else if (emotion == "furious")
+		tag = GestureRequest::FURIOUS;
 	else
 		tag = GestureRequest::NEUTRAL;
 
@@ -67,6 +69,8 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		gestureMapName = character->getStringAttribute("gestureMapEmphatic");
 	if (tag == GestureRequest::MEEK)
 		gestureMapName = character->getStringAttribute("gestureMapMeek");
+	if (tag == GestureRequest::FURIOUS)
+		gestureMapName = character->getStringAttribute("gestureMapFurious");
 	if (gestureMapName == "")
 		gestureMapName = character->getStringAttribute("gestureMap");
 
