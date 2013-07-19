@@ -529,8 +529,7 @@ void DoubleAttribute::setValue(const double& val)
 	else if (val > getMax())
 		m_value = getMax();
 	else
-		m_value = val;
-
+		m_value = val;	
 	notifyObservers();
 }
 
@@ -542,6 +541,7 @@ void DoubleAttribute::setValueFast(const double& val)
 		m_value = getMax();
 	else
 		m_value = val;
+	
 }
 
 void DoubleAttribute::setDefaultValue(const double& defaultVal)

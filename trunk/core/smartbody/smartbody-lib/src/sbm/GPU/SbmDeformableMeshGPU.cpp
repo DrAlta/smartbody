@@ -577,7 +577,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
 
 	// update normal vectors for the deformable mesh. it is significantly slower to do this. So turn off by default. 
-	//glUniform1i(updateNormalLoc,1);
+	glUniform1i(updateNormalLoc,1);
 
 	GLuint idQuery;
 	GLuint count = 0;

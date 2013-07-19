@@ -171,11 +171,12 @@ void DeformableMesh::blendShapes()
 		}
 
 		SrSnModel* blendedModel = new SrSnModel();
+		//SrSnModel* blendedModel = dMeshStatic_p[i];
 		blendedModel->shape(neutralModel[i]->shape());
 		if (isBlending)
 		{
 			blendedModel->shape().V = newV;
-			blendedModel->shape().N = newN;
+			blendedModel->shape().N = newN;			
 		}
 		dMeshStatic_p.push_back(blendedModel);
 	}
@@ -763,7 +764,6 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 
 void DeformableMeshInstance::update()
 {
-	//return;
 	if (!_updateMesh)	return;
 	if (!_skeleton || !_mesh) return;	
 	_skeleton->update_global_matrices();

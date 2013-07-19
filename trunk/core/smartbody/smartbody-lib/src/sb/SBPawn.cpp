@@ -222,13 +222,20 @@ void SBPawn::afterUpdate(double time)
 			smoothTargetHPR = false;
 		}
 	}
-	get_world_offset(x, y, z, h, p, r);
-	_posX->setValueFast(x);
-	_posY->setValueFast(y);
-	_posZ->setValueFast(z);
-	_rotX->setValueFast(p);
-	_rotY->setValueFast(h);
-	_rotZ->setValueFast(r);
+	get_world_offset(x, y, z, h, p, r);	
+	setDoubleAttribute("posX",x);
+	setDoubleAttribute("posY",y);
+	setDoubleAttribute("posZ",z);
+
+	setDoubleAttribute("rotX",p);
+	setDoubleAttribute("rotY",h);
+	setDoubleAttribute("rotZ",r);
+// 	_posX->setValueFast(x);
+// 	_posY->setValueFast(y);
+// 	_posZ->setValueFast(z);
+// 	_rotX->setValueFast(p);
+// 	_rotY->setValueFast(h);
+// 	_rotZ->setValueFast(r);
 }
 
 void SBPawn::notify(SBSubject* subject)

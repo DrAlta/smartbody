@@ -1490,7 +1490,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 		for (size_t i = 0; i < tokens.size(); ++i)
 		{
 			if (tokens[i] == "-m")
-				factor == 0.01f;
+				factor = 0.01f;
 			else if (tokens[i] == "-scale" && i < (tokens.size() - 1))
 				factor = (float)atof(tokens[i + 1].c_str());
 			else if (tokens[i] == "-viseme" && i < (tokens.size() - 1))

@@ -59,6 +59,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
         LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
         return; // no deformable mesh
     }
+
 	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
 	glEnable(GL_LIGHTING);
 	glEnable(GL_TEXTURE_2D);
