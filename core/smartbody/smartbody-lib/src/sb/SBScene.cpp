@@ -1846,7 +1846,9 @@ void SBScene::saveRetargets( std::stringstream& strstr, bool remoteSetup )
 	{
 		StringPair& sp = retargetNames[i];
 		SmartBody::SBRetarget* retarget = retargetManager->getRetarget(sp.first, sp.second);
-		strstr << "retarget = retargetManager.createRetarget(\"" << sp.first << "\",\"" << sp.second << "\")\n";
+		strstr << "retarget = retargetManager.getRetarget(\"" << sp.first << "\",\"" << sp.second << "\")\n";
+		strstr << "if retarget == None:\n";
+		strstr << "\tretarget = retargetManager.createRetarget(\"" << sp.first << "\",\"" << sp.second << "\")\n";
 		std::vector<std::string> endJoints = retarget->getEndJointNames();
 		std::vector<std::string> relativeJoints = retarget->getRelativeJointNames();
 		strstr << "endJoints = StringVec()\n";
@@ -2636,7 +2638,9 @@ void SBScene::savePawns(std::stringstream& strstr, bool remoteSetup)
 			continue;
 		}
 		strstr << "\n# ---- pawn: " << pawn->getName() << "\n";
-		strstr << "obj = scene.createPawn(\"" << pawn->getName() << "\")\n";
+		strstr << "obj = scene.getPawn(\"" << pawn->getName() << "\")\n";
+		strstr << "if obj == None:\n";
+		strstr << "\tobj = scene.createPawn(\"" << pawn->getName() << "\")\n";
 		SrVec position = pawn->getPosition();
 		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
 		SrQuat orientation = pawn->getOrientation();
@@ -2707,7 +2711,9 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 	{
 		SBCharacter* character = getCharacter((*characterIter));
 		strstr << "\n# ---- character: " << character->getName() << "\n";
-		strstr << "obj = scene.createCharacter(\"" << character->getName() << "\", \"" << character->getType() << "\")\n";
+		strstr << "obj = scene.getCharacter(\"" << character->getName() << "\")\n";
+		strstr << "if obj == None:\n";
+		strstr << "\tobj = scene.createCharacter(\"" << character->getName() << "\", \"" << character->getType() << "\")\n";
 		strstr << "print 'character skeleton rescale'\n";
 		strstr << "skeleton = scene.createSkeleton(\"" << character->getSkeleton()->getName() << "\")\n";
 		strstr << "skeleton.rescale(" <<  character->getSkeleton()->getScale() << ")\n";
@@ -2861,7 +2867,9 @@ void SBScene::saveLights(std::stringstream& strstr, bool remoteSetup)
 			continue;
 		}
 		strstr << "\n# ---- light: " << pawn->getName() << "\n";
-		strstr << "obj = scene.createPawn(\"" << pawn->getName() << "\")\n";
+		strstr << "obj = scene.getPawn(\"" << pawn->getName() << "\")\n";
+		strstr << "if obj == None:\n";
+		strstr << "\tobj = scene.createPawn(\"" << pawn->getName() << "\")\n";
 		SrVec position = pawn->getPosition();
 		strstr << "obj.setPosition(SrVec(" << position[0] << ", " << position[1] << ", " << position[2] << "))\n";
 		SrQuat orientation = pawn->getOrientation();
@@ -2920,7 +2928,9 @@ void SBScene::saveJointMaps(std::stringstream& strstr, bool remoteSetup)
 		const std::string& jointMapName = (*iter);
 		SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);
 
-		strstr << "jointMap = scene.getJointMapManager().createJointMap(\"" << jointMapName << "\")\n";
+		strstr << "jointMap = scene.getJointMapManager().getJointMap(\"" << jointMapName << "\")\n";
+		strstr << "if jointMap == None:\n";
+		strstr << "\tjointMap = scene.getJointMapManager().createJointMap(\"" << jointMapName << "\")\n";
 
 		int numMappings = jointMap->getNumMappings();
 		for (int m = 0; m < numMappings; m++)
