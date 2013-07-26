@@ -61,27 +61,27 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	//    new Ogre::LogManager();
 
 	m_pLog = Ogre::LogManager::getSingleton().getDefaultLog();//Ogre::LogManager::getSingleton().createLog("OgreLogfile.log", true, true, false);
-	LOGI("m_pLog = %d",m_pLog);
+	//LOGI("m_pLog = %d",m_pLog);
 	//m_pLog->setDebugOutputEnabled(true);
     
     	String pluginsPath;
     // only use plugins.cfg if not static
     	String cfgFile = m_ResourcePath  + "ogre.cfg";
 	String logFile = m_ResourcePath  + "ogre.log";
-	LOGI("Before create Root");
-	LOGI("pluginPath = %s, cfg = %s, log = %s",pluginsPath.c_str(), cfgFile.c_str(), logFile.c_str());
+	//LOGI("Before create Root");
+	//LOGI("pluginPath = %s, cfg = %s, log = %s",pluginsPath.c_str(), cfgFile.c_str(), logFile.c_str());
 	m_pRoot = new Ogre::Root(pluginsPath, cfgFile, logFile);
-	LOGI("After create Root");
+	//LOGI("After create Root");
 	m_StaticPluginLoader.load();
-    	LOGI("Before Init Root");
+    //LOGI("Before Init Root");
 	if(!m_pRoot->showConfigDialog())
 		return false;
 	m_pRoot->initialise(false);
-	LOGI("After Init Root");
+	//LOGI("After Init Root");
 
-	LOGI("before createRenderWindow");
+	//LOGI("before createRenderWindow");
 	m_pRenderWnd = Ogre::Root::getSingleton().createRenderWindow("SmartBody Ogre App",resX,resY,true);
-    	LOGI("before createSceneManager");
+    //LOGI("before createSceneManager");
 	m_pSceneMgr = m_pRoot->createSceneManager(ST_GENERIC, "SceneManager");
 	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(0.7f, 0.7f, 0.7f));
 
@@ -92,7 +92,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	m_pCamera->lookAt(Vector3(0, 166, 0));
 	m_pCamera->setFarClipDistance(1000);
 	m_pCamera->setNearClipDistance(5);
-    	LOGI("before addViewPort");
+    //LOGI("before addViewPort");
 	m_pViewport = m_pRenderWnd->addViewport(m_pCamera);
 	m_pViewport->setBackgroundColour(ColourValue(0.8f, 0.7f, 0.6f, 1.0f));
     

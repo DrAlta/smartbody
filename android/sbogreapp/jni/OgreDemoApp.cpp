@@ -126,13 +126,13 @@ OIS::AndroidInputManager* DemoApp::getInputManager()
 
 void DemoApp::startDemo(int width, int height)
 {
-	LOGI("startDemo");
+	//LOGI("startDemo");
 	new OgreFramework();
 	if(!OgreFramework::getSingletonPtr()->initOgre("DemoApp v1.0", this, 0,width,height))
 		return;
-	LOGI("after new OgreFramework()");
+	//LOGI("after new OgreFramework()");
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Demo initialized!");
-	LOGI("after logMessage");		    
+	//LOGI("after logMessage");
 	m_bShutdown = false;    	
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Demo initialized!");
 	m_pInputManagerRef = OgreFramework::getSingletonPtr()->m_pInputMgr;
