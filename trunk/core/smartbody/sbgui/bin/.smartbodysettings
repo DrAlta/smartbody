@@ -1,2 +1,2 @@
 mediapath=../../../../data
-pythonlibpath=../../Python27/Lib
+pythonlibpath=../../../../core/smartbody/Python27/Lib
