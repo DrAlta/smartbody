@@ -1,8 +1,18 @@
 #include "OgreFramework.h"
 
 #include "test.h"
+#include <android/log.h>
 
 using namespace Ogre; 
+
+#ifndef ANDROID_LOG
+#define ANDROID_LOG
+#define LOG_TAG    "OgreKit"
+#define LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+#define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+#define LOG_FOOT   LOGI("%s %s %d", __FILE__, __FUNCTION__, __LINE__)
+#endif
+
 
 namespace Ogre
 {
@@ -51,20 +61,27 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	//    new Ogre::LogManager();
 
 	m_pLog = Ogre::LogManager::getSingleton().getDefaultLog();//Ogre::LogManager::getSingleton().createLog("OgreLogfile.log", true, true, false);
+	LOGI("m_pLog = %d",m_pLog);
 	//m_pLog->setDebugOutputEnabled(true);
     
-    String pluginsPath;
+    	String pluginsPath;
     // only use plugins.cfg if not static
-    
-    m_pRoot = new Ogre::Root(pluginsPath, m_ResourcePath  + "/ogre.cfg");
-    m_StaticPluginLoader.load();
-    
+    	String cfgFile = m_ResourcePath  + "ogre.cfg";
+	String logFile = m_ResourcePath  + "ogre.log";
+	LOGI("Before create Root");
+	LOGI("pluginPath = %s, cfg = %s, log = %s",pluginsPath.c_str(), cfgFile.c_str(), logFile.c_str());
+	m_pRoot = new Ogre::Root(pluginsPath, cfgFile, logFile);
+	LOGI("After create Root");
+	m_StaticPluginLoader.load();
+    	LOGI("Before Init Root");
 	if(!m_pRoot->showConfigDialog())
 		return false;
 	m_pRoot->initialise(false);
+	LOGI("After Init Root");
 
+	LOGI("before createRenderWindow");
 	m_pRenderWnd = Ogre::Root::getSingleton().createRenderWindow("SmartBody Ogre App",resX,resY,true);
-    
+    	LOGI("before createSceneManager");
 	m_pSceneMgr = m_pRoot->createSceneManager(ST_GENERIC, "SceneManager");
 	m_pSceneMgr->setAmbientLight(Ogre::ColourValue(0.7f, 0.7f, 0.7f));
 
@@ -75,7 +92,7 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
 	m_pCamera->lookAt(Vector3(0, 166, 0));
 	m_pCamera->setFarClipDistance(1000);
 	m_pCamera->setNearClipDistance(5);
-    
+    	LOGI("before addViewPort");
 	m_pViewport = m_pRenderWnd->addViewport(m_pCamera);
 	m_pViewport->setBackgroundColour(ColourValue(0.8f, 0.7f, 0.6f, 1.0f));
     
@@ -89,8 +106,9 @@ bool OgreFramework::initOgre(Ogre::String wndTitle, OIS::KeyListener *pKeyListen
     
 	paramList.insert(OIS::ParamList::value_type("WINDOW", Ogre::StringConverter::toString(hWnd)));
     
-	m_pInputMgr = OIS::InputManager::createInputSystem(paramList);
-    
+	//m_pInputMgr = OIS::InputManager::createInputSystem(paramList);
+	m_pInputMgr = new OIS::AndroidInputManager();
+    	LOGI("after create AndroidInputManager");
 #if !defined(__ANDROID__)
        m_pKeyboard = static_cast<OIS::Keyboard*>(m_pInputMgr->createInputObject(OIS::OISKeyboard, true));
 	m_pMouse = static_cast<OIS::Mouse*>(m_pInputMgr->createInputObject(OIS::OISMouse, true));

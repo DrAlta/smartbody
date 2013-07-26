@@ -41,10 +41,13 @@
 
 #include "OgreDemoApp.h"
 
+#ifndef ANDROID_LOG
+#define ANDROID_LOG
 #define LOG_TAG    "OgreKit"
 #define LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 #define LOG_FOOT   LOGI("%s %s %d", __FILE__, __FUNCTION__, __LINE__)
+#endif
 
 Ogre::Log* ogreLog = NULL;
 Ogre::Root* root = NULL;
@@ -63,12 +66,19 @@ vhcl::Log::AndroidListener sbLogListener;
 
 jboolean init(JNIEnv* env, jobject thiz, jstring arg, jint width, jint height)
 {
-	LOG_FOOT;
+	//LOG_FOOT;
+	//sleep(10);
+	LOGI("Init sbOgreApp");
 	new Ogre::LogManager();
+	LOGI("After LogManager()");
 	ogreLog = Ogre::LogManager::getSingleton().createLog("OgreLogFile.log",true,true,false);
+	LOGI("After createLog()");
 	Ogre::LogManager::getSingleton().getDefaultLog()->addListener(&gLogListener);
+	LOGI("After addListener()");
 	ogreApp.startDemo(width, height);
+	LOGI("After startDemo()");
 	vhcl::Log::g_log.AddListener(&sbLogListener);
+	LOGI("After vhcl::Log()");
 	mcuInit = true;
 
 /*

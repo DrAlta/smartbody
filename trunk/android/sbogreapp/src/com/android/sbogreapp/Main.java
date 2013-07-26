@@ -26,7 +26,6 @@
 */
 
 package com.android.sbogreapp;
-
 import com.nvidia.devtech.NvGLES2Activity;
 import com.nvidia.devtech.NvGLESActivity;
 import com.nvidia.devtech.NvActivity;
