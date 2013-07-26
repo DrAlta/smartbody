@@ -1342,7 +1342,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 				character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
 			}
 			pawn->dMeshInstance_p->update();
-			if (_data->charactermode == ModeShowDeformableGeometry && !SbmDeformableMeshGPU::useGPUDeformableMesh)
+			if (!SbmDeformableMeshGPU::useGPUDeformableMesh)
 			{
 				//for (int i = 0; i < character->dMesh_p->dMeshStatic_p.size(); ++i)
 				//{

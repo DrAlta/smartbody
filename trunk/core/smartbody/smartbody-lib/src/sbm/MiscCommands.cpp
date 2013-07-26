@@ -1580,6 +1580,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								character->dMesh_p->set_visibility(1);
 								if (character->dMeshInstance_p)
 									character->dMeshInstance_p->setVisibility(1);
+								SbmDeformableMeshGPU::useGPUDeformableMesh = false;
 							}
 							else if (viewType == "5" || viewType == "deformableGPU")
 							{
