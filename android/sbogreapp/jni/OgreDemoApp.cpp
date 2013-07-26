@@ -3,6 +3,15 @@
 #include "test.h"
 #include <iostream>
 #include <sb/SBScene.h>
+#include <android/log.h>
+
+#ifndef ANDROID_LOG
+#define ANDROID_LOG
+#define LOG_TAG    "OgreKit"
+#define LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
+#define LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
+#define LOG_FOOT   LOGI("%s %s %d", __FILE__, __FUNCTION__, __LINE__)
+#endif
 
 DemoApp::DemoApp()
 {
@@ -112,17 +121,19 @@ void DemoApp::finalizeRTShaderSystem()
 
 OIS::AndroidInputManager* DemoApp::getInputManager()
 {
-	return dynamic_cast<OIS::AndroidInputManager*>(m_pInputManagerRef);
+	return m_pInputManagerRef;
 }
 
 void DemoApp::startDemo(int width, int height)
 {
+	LOGI("startDemo");
 	new OgreFramework();
 	if(!OgreFramework::getSingletonPtr()->initOgre("DemoApp v1.0", this, 0,width,height))
 		return;
-    
-	m_bShutdown = false;
-    
+	LOGI("after new OgreFramework()");
+	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Demo initialized!");
+	LOGI("after logMessage");		    
+	m_bShutdown = false;    	
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Demo initialized!");
 	m_pInputManagerRef = OgreFramework::getSingletonPtr()->m_pInputMgr;
 	

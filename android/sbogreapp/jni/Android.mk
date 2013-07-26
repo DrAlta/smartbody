@@ -15,51 +15,57 @@
 SBM_ANDROID_LOCAL_PATH := $(call my-dir)
 SBM_PATH := ../../../core/smartbody/smartbody-lib/
 ANDROID_LIB_DIR := ../../lib
+#OGRE_DIR := ../../ogreSDK/
 OGRE_DIR := ../../ogre/
-
+#OGRE_LIB_DIR := $(OGRE_DIR)/Ogre/lib/armeabi-v7a/
+OGRE_LIB_DIR := $(ANDROID_LIB_DIR)
+#OGRE_DEP_LIB_DIR := $(OGRE_DIR)/Dependencies/lib/armeabi-v7a/
+OGRE_DEP_LIB_DIR := $(ANDROID_LIB_DIR)
 LOCAL_PATH = $(SBM_ANDROID_LOCAL_PATH)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := libogre
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libOgreMainStatic.a
+LOCAL_SRC_FILES := $(OGRE_LIB_DIR)/libOgreMainStatic.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := librts
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libOgreRTShaderSystem.a
+#LOCAL_SRC_FILES := $(OGRE_LIB_DIR)/libOgreRTShaderSystemStatic.a
+LOCAL_SRC_FILES := $(OGRE_LIB_DIR)/libOgreRTShaderSystem.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := plugin_particle
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libPlugin_ParticleFXStatic.a
+LOCAL_SRC_FILES := $(OGRE_LIB_DIR)/libPlugin_ParticleFXStatic.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := rs_gles2
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libRenderSystem_GLES2Static.a
+LOCAL_SRC_FILES := $(OGRE_LIB_DIR)/libRenderSystem_GLES2Static.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := libois
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libOIS.a
+LOCAL_SRC_FILES := $(OGRE_DEP_LIB_DIR)/libOIS.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := libzzip
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libZZipLib.a
+#LOCAL_SRC_FILES := $(OGRE_DEP_LIB_DIR)/libzzip.a
+LOCAL_SRC_FILES := $(OGRE_DEP_LIB_DIR)/libZZipLib.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := libfreeimage
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libFreeImage.a
+LOCAL_SRC_FILES := $(OGRE_DEP_LIB_DIR)/libFreeImage.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := libfreetype
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libfreetype.a
+LOCAL_SRC_FILES := $(OGRE_DEP_LIB_DIR)/libfreetype.a
 include $(PREBUILT_STATIC_LIBRARY)
 
-include $(SBM_ANDROID_LOCAL_PATH)/../../smartbody-lib/jni/Android.mk
+include $(SBM_ANDROID_LOCAL_PATH)/../../smartbody/jni/Android.mk
 
 LOCAL_PATH = $(SBM_ANDROID_LOCAL_PATH)
 include $(CLEAR_VARS)
@@ -81,11 +87,18 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/$(OGRE_DIR)/OgreMain/include \
 					$(LOCAL_PATH)/$(OGRE_DIR)/RenderSystems/GLES2/include \
 					$(LOCAL_PATH)/$(OGRE_DIR)/Dependencies/OIS/include
+					#$(LOCAL_PATH)/$(OGRE_DIR)/Ogre/include/Components/RTShaderSystem \
+					#$(LOCAL_PATH)/$(OGRE_DIR)/Ogre/include/Components/Overlay \
+					#$(LOCAL_PATH)/$(OGRE_DIR)/Ogre/include/OgreMain \
+					#$(LOCAL_PATH)/$(OGRE_DIR)/Ogre/include/Build \
+					#$(LOCAL_PATH)/$(OGRE_DIR)/Ogre/include/RenderSystems/GLES2 \
+					#$(LOCAL_PATH)/$(OGRE_DIR)/Dependencies/include/OIS
 #LOCAL_CFLAGS    := -gstabs -g -DBUILD_ANDROID -frtti
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions
-LOCAL_SRC_FILES := Main.cpp AndroidLogListener.cpp OgreDemoApp.cpp OgreFramework.cpp test.cpp SBListener.cpp
-LOCAL_LDLIBS    := -llog -lEGL -lGLESv2
+LOCAL_SRC_FILES := Main.cpp OgreDemoApp.cpp OgreFramework.cpp test.cpp SBListener.cpp AndroidLogListener.cpp AndroidInputManager.cpp
+LOCAL_LDLIBS    := -landroid -llog -lEGL -lGLESv2
 #LOCAL_LDLIBS    := -llog -lEGL -lGLESv2 -gstabs
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
-LOCAL_STATIC_LIBRARIES := libogre rs_gles2 librts libois libfreeimage libfreetype libzzip smartbody xerces-prebuilt python-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt
+LOCAL_STATIC_LIBRARIES := rs_gles2 libogre cpufeatures  librts libois libfreeimage libfreetype libzzip smartbody xerces-prebuilt python-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt
 include $(BUILD_SHARED_LIBRARY) 
+$(call import-module,android/cpufeatures)

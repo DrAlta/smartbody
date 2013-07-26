@@ -15,7 +15,7 @@
 
 #ifdef USE_RTSHADER_SYSTEM
 #include "OgreRTShaderSystem.h"
-#include <android/AndroidInputManager.h>
+#include "AndroidInputManager.h"
 
 /** This class demonstrates basic usage of the RTShader system.
  It sub class the material manager listener class and when a target scheme callback
@@ -104,10 +104,10 @@ private:
     bool initializeRTShaderSystem(Ogre::SceneManager* sceneMgr);
     void finalizeRTShaderSystem();
 
-	Ogre::SceneNode*			m_pCubeNode;
-	Ogre::Entity*				m_pCubeEntity;
-	OIS::InputManager*                 m_pInputManagerRef;
-       SBListener*                m_sbListener;
+    Ogre::SceneNode*			m_pCubeNode;
+    Ogre::Entity*				m_pCubeEntity;
+    OIS::AndroidInputManager*                 m_pInputManagerRef;
+    SBListener*                m_sbListener;
     int  resX, resY;
     
 	bool					m_bShutdown;

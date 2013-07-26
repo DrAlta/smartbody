@@ -4,7 +4,7 @@
 // Email:           tegradev@nvidia.com
 // Forum:           http://developer.nvidia.com/tegra/forums/tegra-forums/android-development
 //
-// Copyright 2010-2011 NVIDIA® Corporation 
+// Copyright 2010-2011 NVIDIAï¿½ Corporation 
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@
 //----------------------------------------------------------------------------------
 package com.nvidia.devtech;
 
-import java.util.HashMap;
-
 import android.app.Activity;
 import android.os.Environment;
+
+import java.util.HashMap;
 
 /**
  * A helper class used to aid native code.

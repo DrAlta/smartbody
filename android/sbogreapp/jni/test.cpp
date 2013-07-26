@@ -7,12 +7,12 @@
 //
 
 #include "test.h"
-#include <SB/SBScene.h>
-#include <SB/SBSimulationManager.h>
-#include <SB/SBCommandManager.h>
-#include <SB/SBVHMsgManager.h>
-#include <SB/SBCharacter.h>
-#include <SB/SBSkeleton.h>
+#include <sb/SBScene.h>
+#include <sb/SBSimulationManager.h>
+#include <sb/SBCommandManager.h>
+#include <sb/SBVHMsgManager.h>
+#include <sb/SBCharacter.h>
+#include <sb/SBSkeleton.h>
 
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
@@ -109,6 +109,7 @@ void SBInitialize(const char* mediaPath)
 
 	initSBPython();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->getSimulationManager()->setupTimer();	
 	scene->getSimulationManager()->setTime(0.0);
 	scene->addAssetPath("script", "/sdcard/sbogreappdir");
 	scene->runScript("initOgre.py");
@@ -127,7 +128,9 @@ void SBUpdateX(float t)
 	}
 
 	scene->getSimulationManager()->setTime(t);
-	scene->getSimulationManager()->update();
+	//scene->getSimulationManager()->update();
+	//scene->getSimulationManager()->updateTimer();
+	scene->update();
 }
     
 void SBExecuteCmd(const char* command)
@@ -165,14 +168,16 @@ void getJointRotation(const char* charname, const char* jointname, float& w, flo
 	if (!sbchar)
 		return;
 
-    const SkJoint * joint = sbchar->getSkeleton()->search_joint(jointname);
+    SmartBody::SBJoint * joint = sbchar->getSkeleton()->getJointByName(jointname);
     if (joint)
     {
-        const SrQuat & q = ((SkJoint *)joint)->quat()->value();
+	joint->update_gmat();
+        const SrQuat & q = joint->quat()->value();
         w = q.w;
         x = q.x;
         y = q.y;
         z = q.z;
+	//LOG("joint %s, rotation =  %f %f %f %f",jointname, q.w,q.x,q.y,q.z);
     }
 }
 

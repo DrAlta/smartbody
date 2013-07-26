@@ -22,7 +22,7 @@
 #include <OISInputManager.h>
 #include <OISKeyboard.h>
 #include <OISMouse.h>
-#include <android/AndroidInputManager.h>
+#include "AndroidInputManager.h"
 
 #ifdef OGRE_STATIC_LIB
 #  define OGRE_STATIC_GL
@@ -120,7 +120,7 @@ public:
 	Ogre::Log*                  m_pLog;
 	Ogre::Timer*				m_pTimer;
 	
-	OIS::InputManager*			m_pInputMgr;
+	OIS::AndroidInputManager*			m_pInputMgr;
 	OIS::Keyboard*			m_pKeyboard;
 #ifdef __ANDROID__
 	OIS::MultiTouch*			m_pMouse;
