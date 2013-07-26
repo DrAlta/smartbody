@@ -68,17 +68,17 @@ jboolean init(JNIEnv* env, jobject thiz, jstring arg, jint width, jint height)
 {
 	//LOG_FOOT;
 	//sleep(10);
-	LOGI("Init sbOgreApp");
+	//LOGI("Init sbOgreApp");
 	new Ogre::LogManager();
-	LOGI("After LogManager()");
+	//LOGI("After LogManager()");
 	ogreLog = Ogre::LogManager::getSingleton().createLog("OgreLogFile.log",true,true,false);
-	LOGI("After createLog()");
+	//LOGI("After createLog()");
 	Ogre::LogManager::getSingleton().getDefaultLog()->addListener(&gLogListener);
-	LOGI("After addListener()");
+	//LOGI("After addListener()");
 	ogreApp.startDemo(width, height);
-	LOGI("After startDemo()");
+	//LOGI("After startDemo()");
 	vhcl::Log::g_log.AddListener(&sbLogListener);
-	LOGI("After vhcl::Log()");
+	//LOGI("After vhcl::Log()");
 	mcuInit = true;
 
 /*
