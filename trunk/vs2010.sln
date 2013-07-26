@@ -92,7 +92,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qt", "lib\qt\qt.vcxproj", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioProcess", "core\AudioProcess\AudioProcess.vcxproj", "{515F1C34-7854-47E9-A97A-CE568B3D7972}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sbgui", "core\smartbody\sbgui\visualc9\sbm-fltk.vcxproj", "{2C18CD04-407B-420A-8CDC-1C6325F87072}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sbgui", "core\smartbody\sbgui\visualc9\sbgui.vcxproj", "{2C18CD04-407B-420A-8CDC-1C6325F87072}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4559341E-D53D-45E5-A67C-43D7C5956636} = {4559341E-D53D-45E5-A67C-43D7C5956636}
+		{A8E03E2E-B9AE-4574-81A2-F661819322E1} = {A8E03E2E-B9AE-4574-81A2-F661819322E1}
+		{8BBCFC4A-6B52-461E-8BBA-A86DE3FAD6F6} = {8BBCFC4A-6B52-461E-8BBA-A86DE3FAD6F6}
+		{662CF3EB-B816-4727-9D1D-4071C25A3312} = {662CF3EB-B816-4727-9D1D-4071C25A3312}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
