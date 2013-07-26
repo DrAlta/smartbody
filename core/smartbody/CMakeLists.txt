@@ -25,4 +25,4 @@ add_subdirectory( SmartBody )
 add_subdirectory( steersuite-1.3 )
 
 add_subdirectory( simplesmartbody)
-add_subdirectory( sbm )
+add_subdirectory( sbgui )
