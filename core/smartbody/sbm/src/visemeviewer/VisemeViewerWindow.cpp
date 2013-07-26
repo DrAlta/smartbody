@@ -858,7 +858,7 @@ void VisemeViewerWindow::OnSaveCB(Fl_Widget* widget, void* data)
 	}
 
 	// save to the file
-	std::ofstream file(fileName);
+	std::ofstream file(fileName);	
 	if (file.is_open() != true)
 	{
 		fl_alert("Problem writing to file %s, diphone was not saved.", fileName);
