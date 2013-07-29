@@ -224,24 +224,24 @@ MeCtGaze::MeCtGaze( void )	: SmartBody::SBController() {
 	joint_arr = NULL;
 
 	// gaze settings
-	addDefaultAttributeDouble("gaze.speedEyes", 5000);
-	addDefaultAttributeDouble("gaze.speedNeck", 5000);
-	addDefaultAttributeDouble("gaze.limitPitchUpEyes", -35.0);
-	addDefaultAttributeDouble("gaze.limitPitchDownEyes", 35.0);
-	addDefaultAttributeDouble("gaze.limitHeadingEyes", 40.0);
-	addDefaultAttributeDouble("gaze.limitRollEyes", 0.0);
-	addDefaultAttributeDouble("gaze.limitPitchUpNeck", -45.0);
-	addDefaultAttributeDouble("gaze.limitPitchDownNeck", 45.0);
-	addDefaultAttributeDouble("gaze.limitHeadingNeck",  90.0);
-	addDefaultAttributeDouble("gaze.limitRollNeck", 35.0);
-	addDefaultAttributeDouble("gaze.limitPitchUpChest", -6.0);
-	addDefaultAttributeDouble("gaze.limitPitchDownChest", 6.0);
-	addDefaultAttributeDouble("gaze.limitHeadingChest", 15.0);
-	addDefaultAttributeDouble("gaze.limitRollChest", 5.0);
-	addDefaultAttributeDouble("gaze.limitPitchUpBack", -15.0);
-	addDefaultAttributeDouble("gaze.limitPitchDownBack", 15.0);
-	addDefaultAttributeDouble("gaze.limitHeadingBack", 30.0);
-	addDefaultAttributeDouble("gaze.limitRollBack", 10.0);
+	addDefaultAttributeDouble("gaze.speedEyes", 5000, "Gaze");
+	addDefaultAttributeDouble("gaze.speedNeck", 5000, "Gaze");
+	addDefaultAttributeDouble("gaze.limitPitchUpEyes", -35.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitPitchDownEyes",35.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitHeadingEyes", 40.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitRollEyes",  0.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitPitchUpNeck", -45.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitPitchDownNeck", 45.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitHeadingNeck",  90.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitRollNeck", 35.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitPitchUpChest", -6.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitPitchDownChest",  6.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitHeadingChest", 15.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitRollChest", 5.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitPitchUpBack", -15.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitPitchDownBack", 15.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitHeadingBack", 30.0, "Gaze");
+	addDefaultAttributeDouble("gaze.limitRollBack", 10.0, "Gaze");
 }
 
 MeCtGaze::~MeCtGaze( void )	{

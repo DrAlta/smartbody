@@ -41,26 +41,26 @@ SBCharacter::SBCharacter() : SbmCharacter()
 
 SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name.c_str(), type)
 {
-	createBoolAttribute("useCustomizedLipSyncIfPresent", true, true, "Basic", 60, false, false, false, "If motion name exists inside pre-recorded audio file bml, use it by default"); 
+	createBoolAttribute("useCustomizedLipSyncIfPresent", true, true, "Lip Sync", 60, false, false, false, "If motion name exists inside pre-recorded audio file bml, use it by default"); 
 	
-	createBoolAttribute("blendshape", 0, true, "Basic", 69, false, false, false, "");	
+	createBoolAttribute("blendshape", 0, true, "Blendshapes", 69, false, false, false, "");	
 
-	createBoolAttribute("gestureRequest.autoGestureTransition", true, true, "Basic", 89, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
-	createBoolAttribute("gestureRequest.matchingHandness", true, true, "Basic", 90, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
-	createBoolAttribute("gestureRequest.enableTransitionToStroke", false, true, "Basic", 91, false, false, false, "Enable Transition to stroke posture directly if time is too limited."); 
-	createBoolAttribute("gestureRequest.gestureLog", false, true, "Basic", 92, false, false, false, "Toggle for logging the gesture request process."); 
-	createBoolAttribute("gestureRequest.matchingSpeed", true, true, "Basic", 93, false, false, false, "Holding previous gesture if necessary to match up with current gesture stroke speed."); 
-	createDoubleAttribute("gestureRequest.gestureSpeedThreshold", 1.5, true, "Basic", 95, false, false, false, "The speed threshold used to determine whether it's suitable to transition from one gesture to another"); 
-	createDoubleAttribute("gestureRequest.gestureWristActiveThreshold", 0.15, true, "Basic", 96, false, false, false, "The speed threshold used to determine if this hand moving."); 
-	createStringAttribute("gestureMap", "", true, "Basic", 50, false, false, false, "Name of the gesture map to use.");
-	createStringAttribute("gestureMapMeek", "", true, "Basic", 51, false, false, false, "Name of the gesture map to use that is meek.");
-	createStringAttribute("gestureMapEmphatic", "", true, "Basic", 52, false, false, false, "Name of the gesture map to use that is emphatic.");
-	createStringAttribute("gestureMapFurious", "", true, "Basic", 53, false, false, false, "Name of the gesture map to use that is furious.");
+	createBoolAttribute("gestureRequest.autoGestureTransition", true, true, "Gestures", 89, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
+	createBoolAttribute("gestureRequest.matchingHandness", true, true, "Gestures", 90, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
+	createBoolAttribute("gestureRequest.enableTransitionToStroke", false, true, "Gestures", 91, false, false, false, "Enable Transition to stroke posture directly if time is too limited."); 
+	createBoolAttribute("gestureRequest.gestureLog", false, true, "Gestures", 92, false, false, false, "Toggle for logging the gesture request process."); 
+	createBoolAttribute("gestureRequest.matchingSpeed", true, true, "Gestures", 93, false, false, false, "Holding previous gesture if necessary to match up with current gesture stroke speed."); 
+	createDoubleAttribute("gestureRequest.gestureSpeedThreshold", 1.5, true, "Gestures", 95, false, false, false, "The speed threshold used to determine whether it's suitable to transition from one gesture to another"); 
+	createDoubleAttribute("gestureRequest.gestureWristActiveThreshold", 0.15, true, "Gestures", 96, false, false, false, "The speed threshold used to determine if this hand moving."); 
+	createStringAttribute("gestureMap", "", true, "Gestures", 50, false, false, false, "Name of the gesture map to use.");
+	createStringAttribute("gestureMapMeek", "", true, "Gestures", 51, false, false, false, "Name of the gesture map to use that is meek.");
+	createStringAttribute("gestureMapEmphatic", "", true, "Gestures", 52, false, false, false, "Name of the gesture map to use that is emphatic.");
+	createStringAttribute("gestureMapFurious", "", true, "Gestures", 53, false, false, false, "Name of the gesture map to use that is furious.");
 
 	std::vector<std::string> gesturePolicyVec;
 	gesturePolicyVec.push_back("random");
 	gesturePolicyVec.push_back("first");
-	StringAttribute* gesturePolicyAttr = createStringAttribute("gesturePolicy", "random", true, "Basic", 60, false, false, false, "Gesture policy to be used");
+	StringAttribute* gesturePolicyAttr = createStringAttribute("gesturePolicy", "random", true, "Gestures", 60, false, false, false, "Gesture policy to be used");
 	gesturePolicyAttr->setValidValues(gesturePolicyVec);
 
 	/*
@@ -69,92 +69,92 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createBoolAttribute("emotion_automatic", 0, false, "Basic", 71, false, false, false, "");
 	*/
 
-	SmartBody::DoubleAttribute* bmlDelayAttr = createDoubleAttribute("bmlscheduledelay", 0.3, true, "Basic", 98, false, false, false, "Delay all bml schedules by a fixed amount.");
+	SmartBody::DoubleAttribute* bmlDelayAttr = createDoubleAttribute("bmlscheduledelay", 0.3, true, "Behaviors", 98, false, false, false, "Delay all bml schedules by a fixed amount.");
 	bmlDelayAttr->setMin(0.0);
-	SmartBody::DoubleAttribute* visemeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Basic", 99, false, false, false, "Delay visemes by a fixed amount.");
+	SmartBody::DoubleAttribute* visemeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Behaviors", 99, false, false, false, "Delay visemes by a fixed amount.");
 	visemeDelayAttr->setMin(0.0);
-	createBoolAttribute("visemecurve", false, true, "Basic", 100, false, false, false, "Use curve-based visemes instead of discrete visemes (FaceFX).");
-	createBoolAttribute("dominancecurve", false, true, "Basic", 101, false, false, false, "Use donimance curve instead of FaceFX curve");
-	createBoolAttribute("reach.useLocomotion", false, true, "Basic", 110, false, false, false, "Whether to use locomotion for reach by default.");
-	createBoolAttribute("useDiphone", true, true, "Basic", 150, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRule", true, true, "Basic", 151, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRuleFV", true, true, "Basic", 152, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRuleW", true, true, "Basic", 152, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRuleWide", false, true, "Basic", 152, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRulePBM", true, true, "Basic", 153, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRuleShCh", true, true, "Basic", 153, false, false, false, "Use diphones.");
-	createDoubleAttribute("openConstraintByPBM", 0.5, true, "Basic", 154, false, false, false, "Use diphones.");
-	createDoubleAttribute("wideConstraintByPBM", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("shchConstraintByPBM", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("openConstraintByFV", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("wideConstraintByFV", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("openConstraintByShCh", 0.7, true, "Basic", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("openConstraintByW", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("openConstraintByWide", 0.5, true, "Basic", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("diphoneScale", 1, true, "Basic", 156, false, false, false, "Scale factor for diphone curves.");
-	createStringAttribute("diphoneSetName", "", true, "Basic", 157, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
-	createBoolAttribute("diphoneSplineCurve", true, true, "Basic", 158, false, false, false, "Use diphones spline/linear curve.");
-	createDoubleAttribute("diphoneSmoothWindow", .18, true, "Basic", 159, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
+	createBoolAttribute("visemecurve", false, true, "Lip Sync", 100, false, false, false, "Use curve-based visemes instead of discrete visemes (FaceFX).");
+	createBoolAttribute("dominancecurve", false, true, "Lip Sync", 101, false, false, false, "Use donimance curve instead of FaceFX curve");
+	createBoolAttribute("reach.useLocomotion", false, true, "Reaching", 110, false, false, false, "Whether to use locomotion for reach by default.");
+	createBoolAttribute("useDiphone", true, true, "Lip Sync", 150, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneRule", true, true, "Lip Sync", 151, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneRuleFV", true, true, "Lip Sync", 152, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneRuleW", true, true, "Lip Sync", 152, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneRuleWide", false, true, "Lip Sync", 152, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneRulePBM", true, true, "Lip Sync", 153, false, false, false, "Use diphones.");
+	createBoolAttribute("diphoneRuleShCh", true, true, "Lip Sync", 153, false, false, false, "Use diphones.");
+	createDoubleAttribute("openConstraintByPBM", 0.5, true, "Lip Sync", 154, false, false, false, "Use diphones.");
+	createDoubleAttribute("wideConstraintByPBM", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("shchConstraintByPBM", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("openConstraintByFV", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("wideConstraintByFV", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("openConstraintByShCh", 0.7, true, "Lip Sync", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("openConstraintByW", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("openConstraintByWide", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
+	createDoubleAttribute("diphoneScale", 1, true, "Lip Sync", 156, false, false, false, "Scale factor for diphone curves.");
+	createStringAttribute("diphoneSetName", "", true, "Lip Sync", 157, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
+	createBoolAttribute("diphoneSplineCurve", true, true, "Lip Sync", 158, false, false, false, "Use diphones spline/linear curve.");
+	createDoubleAttribute("diphoneSmoothWindow", .18, true, "Lip Sync", 159, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
 	setDiphoneSmoothWindow(0.18f);
-	createDoubleAttribute("diphoneSmoothWindow-PBM", .1, true, "Basic", 160, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
-	createDoubleAttribute("diphoneSmoothWindow-FV", .1, true, "Basic", 161, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
-	createDoubleAttribute("diphoneSpeedLimit", 6.0f, true, "Basic", 162, false, false, false, "Speed Limit of mouth movement");
+	createDoubleAttribute("diphoneSmoothWindow-PBM", .1, true, "Lip Sync", 160, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
+	createDoubleAttribute("diphoneSmoothWindow-FV", .1, true, "Lip Sync", 161, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
+	createDoubleAttribute("diphoneSpeedLimit", 6.0f, true, "Lip Sync", 162, false, false, false, "Speed Limit of mouth movement");
 	setDiphoneSpeedLimit(6.0f);
 	
 // Dominance curve attributes
 	int startingPos = 500;
-	createDoubleAttribute("jaw_rot_min", -4.0, true, "Basic", startingPos + 0, false, false, false, "");
-	createDoubleAttribute("jaw_rot_max", 13, true, "Basic", startingPos + 1, false, false, false, "");
-	createDoubleAttribute("jaw_rot_default", 0.21, true, "Basic", startingPos + 2, false, false, false, "");
+	createDoubleAttribute("jaw_rot_min", -4.0, true, "Baldi Lip Sync", startingPos + 0, false, false, false, "");
+	createDoubleAttribute("jaw_rot_max", 13, true, "Baldi Lip Sync", startingPos + 1, false, false, false, "");
+	createDoubleAttribute("jaw_rot_default", 0.21, true, "Baldi Lip Sync", startingPos + 2, false, false, false, "");
 
-	createDoubleAttribute("lower_lip_ftuck_min", -15, true, "Basic", startingPos + 3, false, false, false, "");
-	createDoubleAttribute("lower_lip_ftuck_max", 10, true, "Basic", startingPos + 4, false, false, false, "");
+	createDoubleAttribute("lower_lip_ftuck_min", -15, true, "Baldi Lip Sync", startingPos + 3, false, false, false, "");
+	createDoubleAttribute("lower_lip_ftuck_max", 10, true, "Baldi Lip Sync", startingPos + 4, false, false, false, "");
 
-	createDoubleAttribute("upper_lip_raise_min", -30, true, "Basic", startingPos + 5, false, false, false, "");
-	createDoubleAttribute("upper_lip_raise_max", 20, true, "Basic", startingPos + 6, false, false, false, "");
-	createDoubleAttribute("upper_lip_raise_default", -2.96, true, "Basic", startingPos + 7, false, false, false, "");
+	createDoubleAttribute("upper_lip_raise_min", -30, true, "Baldi Lip Sync", startingPos + 5, false, false, false, "");
+	createDoubleAttribute("upper_lip_raise_max", 20, true, "Baldi Lip Sync", startingPos + 6, false, false, false, "");
+	createDoubleAttribute("upper_lip_raise_default", -2.96, true, "Baldi Lip Sync", startingPos + 7, false, false, false, "");
 
-	createDoubleAttribute("cheek_hollow_min", -1.5, true, "Basic", startingPos + 8, false, false, false, "");
-	createDoubleAttribute("cheek_hollow_max", 1.5, true, "Basic", startingPos + 9, false, false, false, "");
+	createDoubleAttribute("cheek_hollow_min", -1.5, true, "Baldi Lip Sync", startingPos + 8, false, false, false, "");
+	createDoubleAttribute("cheek_hollow_max", 1.5, true, "Baldi Lip Sync", startingPos + 9, false, false, false, "");
 
-	createDoubleAttribute("lower_lip_roll_min", -20, true, "Basic", startingPos + 10, false, false, false, "");
-	createDoubleAttribute("lower_lip_roll_max", 40, true, "Basic", startingPos + 11, false, false, false, "");
+	createDoubleAttribute("lower_lip_roll_min", -20, true, "Baldi Lip Sync", startingPos + 10, false, false, false, "");
+	createDoubleAttribute("lower_lip_roll_max", 40, true, "Baldi Lip Sync", startingPos + 11, false, false, false, "");
 
-	createDoubleAttribute("jaw_thrust_min", -10, true, "Basic", startingPos + 12, false, false, false, "");
-	createDoubleAttribute("jaw_thrust_max", 30, true, "Basic", startingPos + 13, false, false, false, "");
+	createDoubleAttribute("jaw_thrust_min", -10, true, "Baldi Lip Sync", startingPos + 12, false, false, false, "");
+	createDoubleAttribute("jaw_thrust_max", 30, true, "Baldi Lip Sync", startingPos + 13, false, false, false, "");
 
-	createDoubleAttribute("lip_corner_zip_min", -20, true, "Basic", startingPos + 14, false, false, false, "");
-	createDoubleAttribute("lip_corner_zip_max", 30, true, "Basic", startingPos + 15, false, false, false, "");
+	createDoubleAttribute("lip_corner_zip_min", -20, true, "Baldi Lip Sync", startingPos + 14, false, false, false, "");
+	createDoubleAttribute("lip_corner_zip_max", 30, true, "Baldi Lip Sync", startingPos + 15, false, false, false, "");
 
-	createDoubleAttribute("lower_lip_raise_min", -25, true, "Basic", startingPos + 16, false, false, false, "");
-	createDoubleAttribute("lower_lip_raise_max", 15, true, "Basic", startingPos + 17, false, false, false, "");
+	createDoubleAttribute("lower_lip_raise_min", -25, true, "Baldi Lip Sync", startingPos + 16, false, false, false, "");
+	createDoubleAttribute("lower_lip_raise_max", 15, true, "Baldi Lip Sync", startingPos + 17, false, false, false, "");
 
-	createDoubleAttribute("lip_rounding_min", 0, true, "Basic", startingPos + 18, false, false, false, "");
-	createDoubleAttribute("lip_rounding_max", 20, true, "Basic", startingPos + 19, false, false, false, "");
-	createDoubleAttribute("lip_rounding_default", 6.106, true, "Basic", startingPos + 20, false, false, false, "");
+	createDoubleAttribute("lip_rounding_min", 0, true, "Baldi Lip Sync", startingPos + 18, false, false, false, "");
+	createDoubleAttribute("lip_rounding_max", 20, true, "Baldi Lip Sync", startingPos + 19, false, false, false, "");
+	createDoubleAttribute("lip_rounding_default", 6.106, true, "Baldi Lip Sync", startingPos + 20, false, false, false, "");
 
-	createDoubleAttribute("lip_retraction_min", 0, true, "Basic", startingPos + 21, false, false, false, "");
-	createDoubleAttribute("lip_retraction_max", 15, true, "Basic", startingPos + 22, false, false, false, "");
-	createDoubleAttribute("lip_retraction_default", 2.809, true, "Basic", startingPos + 23, false, false, false, "");
+	createDoubleAttribute("lip_retraction_min", 0, true, "Baldi Lip Sync", startingPos + 21, false, false, false, "");
+	createDoubleAttribute("lip_retraction_max", 15, true, "Baldi Lip Sync", startingPos + 22, false, false, false, "");
+	createDoubleAttribute("lip_retraction_default", 2.809, true, "Baldi Lip Sync", startingPos + 23, false, false, false, "");
 
-	createDoubleAttribute("tongue_tip_y_min", -2, true, "Basic", startingPos + 24, false, false, false, "");
-	createDoubleAttribute("tongue_tip_y_max", 2, true, "Basic", startingPos + 25, false, false, false, "");
+	createDoubleAttribute("tongue_tip_y_min", -2, true, "Baldi Lip Sync", startingPos + 24, false, false, false, "");
+	createDoubleAttribute("tongue_tip_y_max", 2, true, "Baldi Lip Sync", startingPos + 25, false, false, false, "");
 
-	createDoubleAttribute("tongue_tip_z_min", -2, true, "Basic", startingPos + 26, false, false, false, "");
-	createDoubleAttribute("tongue_tip_z_max", 2, true, "Basic", startingPos + 27, false, false, false, "");
+	createDoubleAttribute("tongue_tip_z_min", -2, true, "Baldi Lip Sync", startingPos + 26, false, false, false, "");
+	createDoubleAttribute("tongue_tip_z_max", 2, true, "Baldi Lip Sync", startingPos + 27, false, false, false, "");
 
 	createBoolAttribute("handtune", true, true, "Basic", startingPos + 28, false, false, false, "");
 //-------------------
 
-	createBoolAttribute("ikPostFix", false, true, "Basic", 200, false, false, false, "Post-Processing IK to fix foot sliding.");
-	createBoolAttribute("terrainWalk", false, true, "Basic", 200, false, false, false, "Post-Processing to adjust the character for different terrain height. ikPostFix must be on for this to work.");
-	createBoolAttribute("onlineRetarget", true, true, "Basic", 200, false, false, false, "Use on-line retargeting to adjust joint angles when playing animation blend.");
+	createBoolAttribute("ikPostFix", false, true, "Retargeting", 200, false, false, false, "Post-Processing IK to fix foot sliding.");
+	createBoolAttribute("terrainWalk", false, true, "Retargeting", 200, false, false, false, "Post-Processing to adjust the character for different terrain height. ikPostFix must be on for this to work.");
+	createBoolAttribute("onlineRetarget", true, true, "Retargeting", 200, false, false, false, "Use on-line retargeting to adjust joint angles when playing animation blend.");
 
-	createStringAttribute("deformableMesh", "", true, "Basic", 220, false, false, false, "Directory that contains mesh information.");
-	createDoubleAttribute("deformableMeshScale", 1, true, "Basic", 230, false, false, false, "Scale factor when loading mesh.");
-	createStringAttribute("receiverName", "kinect1", true, "Basic", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
-	createVec3Attribute("leftSholderOffset",0.f,0.f,0.f,true, "Basic", 320, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
-	createVec3Attribute("rightSholderOffset",0.f,0.f,0.f,true, "Basic", 340, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+	createStringAttribute("deformableMesh", "", true, "Display", 220, false, false, false, "Directory that contains mesh information.");
+	createDoubleAttribute("deformableMeshScale", 1, true, "Display", 230, false, false, false, "Scale factor when loading mesh.");
+	createStringAttribute("receiverName", "kinect1", true, "Remote", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
+	createVec3Attribute("leftSholderOffset",0.f,0.f,0.f,true, "Retargeting", 320, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
+	createVec3Attribute("rightSholderOffset",0.f,0.f,0.f,true, "Retargeting", 340, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
 	createBoolAttribute("isReaching", false, true, "Basic", 158, false, false, false, "Whether a character is reaching.");
 
 
@@ -166,28 +166,28 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	voiceTypes.push_back("local");	
 	voiceTypes.push_back("text");
 
-	StringAttribute* voiceAttribute = createStringAttribute("voice", "remote", true, "Basic", 400, false, false, false, "How the voice is created - local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
+	StringAttribute* voiceAttribute = createStringAttribute("voice", "remote", true, "Voice", 400, false, false, false, "How the voice is created - local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
 	voiceAttribute->setValidValues(voiceTypes);
 
-	createStringAttribute("voiceCode", "voice_kal_diphone", true, "Basic", 410, false, false, false, "For local and remote voices, the name of the voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
-	StringAttribute* voiceBackupAttribute = createStringAttribute("voiceBackup", "audiofile", true, "Basic", 420, false, false, false, "How the voice is created if the primary voice fails. local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
+	createStringAttribute("voiceCode", "voice_kal_diphone", true, "Voice", 410, false, false, false, "For local and remote voices, the name of the voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
+	StringAttribute* voiceBackupAttribute = createStringAttribute("voiceBackup", "audiofile", true, "Voice", 420, false, false, false, "How the voice is created if the primary voice fails. local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
 	voiceBackupAttribute->setValidValues(voiceTypes);
-	createStringAttribute("voiceBackupCode", ".", true, "Basic", 430, false, false, false, "For local and remote voices, the name of the backup voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
+	createStringAttribute("voiceBackupCode", ".", true, "Voice", 430, false, false, false, "For local and remote voices, the name of the backup voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
 	
 	std::vector<std::string> utterancePolicyTypes;
 	utterancePolicyTypes.push_back("none");
 	utterancePolicyTypes.push_back("ignore");
 	utterancePolicyTypes.push_back("queue");
 	utterancePolicyTypes.push_back("interrupt");	
-	StringAttribute* utterancePolicyAttribute = createStringAttribute("utterancePolicy", "none", true, "Basic", 500, false, false, false, "How utterances are handled when the character is already performing an utterance. Valid values are: ignore (ignores the new utterance and any associated behaviors), queue (plays the new utterance and associated behavior when the old utterance has finished), interrupt (stops the existing utterance and associated behaviors and plays the new one)");
+	StringAttribute* utterancePolicyAttribute = createStringAttribute("utterancePolicy", "none", true, "Speech", 500, false, false, false, "How utterances are handled when the character is already performing an utterance. Valid values are: ignore (ignores the new utterance and any associated behaviors), queue (plays the new utterance and associated behavior when the old utterance has finished), interrupt (stops the existing utterance and associated behaviors and plays the new one)");
 	utterancePolicyAttribute->setValidValues(utterancePolicyTypes);
 
 	std::vector<std::string> saccadePolicy;
 	saccadePolicy.push_back("stopinutterance");
 	saccadePolicy.push_back("alwayson");
-	StringAttribute* saccadePolicyAttribute = createStringAttribute("saccadePolicy", "stopinutterance", true, "Basic", 501, false, false, false, "How saccade is handled during utterance");
+	StringAttribute* saccadePolicyAttribute = createStringAttribute("saccadePolicy", "stopinutterance", true, "Speech", 501, false, false, false, "How saccade is handled during utterance");
 	saccadePolicyAttribute->setValidValues(saccadePolicy);
-	createDoubleAttribute("saccadeTurnOnDelay", 2, true, "Basic", 502, false, false, false, "delay saccade turn on after utterance.");
+	createDoubleAttribute("saccadeTurnOnDelay", 2, true, "Speech", 502, false, false, false, "delay saccade turn on after utterance.");
 
 	_reach = NULL;
 }

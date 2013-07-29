@@ -6,6 +6,7 @@
 #include <sb/SBSubject.h>
 #include <string>
 #include <vector>
+#include <map>
 #include <limits>
 #include <sr/sr_vec.h>
 #include <sr/sr_mat.h>
@@ -51,9 +52,14 @@ class SBAttributeGroup
 		SBAPI void setPriority(int val);
 		SBAPI int getPriority();
 
+		SBAPI void addAttribute(SBAttribute* attr);
+		SBAPI void removeAttribute(SBAttribute* attr);
+		SBAPI std::map<std::string, SBAttribute*>& getAttributes();
+
 	protected:
 		std::string m_name;
 		int m_priority;
+		std::map<std::string, SBAttribute*> m_attributeMap;
 };
 
 

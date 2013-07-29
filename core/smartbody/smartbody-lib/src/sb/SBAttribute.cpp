@@ -31,6 +31,40 @@ int SBAttributeGroup::getPriority()
 	return m_priority;
 }
 
+
+void SBAttributeGroup::addAttribute(SBAttribute* attr)
+{
+	std::map<std::string, SBAttribute*>::iterator iter = m_attributeMap.find(attr->getName());
+	if (iter == m_attributeMap.end())
+	{
+		m_attributeMap.insert(std::pair<std::string, SBAttribute*>(attr->getName(), attr));	
+	}
+	else
+	{
+		LOG("Attribute info for %s already exists in attribute group %s!", attr->getName().c_str(), this->getName().c_str());
+	}
+}
+
+void  SBAttributeGroup::removeAttribute(SBAttribute* attr)
+{
+	std::map<std::string, SBAttribute*>::iterator iter = m_attributeMap.find(attr->getName());
+	if (iter == m_attributeMap.end())
+	{
+		LOG("Attribute info for %s does not exists in attribute group %s!", attr->getName().c_str(), this->getName().c_str());
+	}
+	else
+	{
+		m_attributeMap.erase(iter);
+	}
+}
+
+std::map<std::string, SBAttribute*>& SBAttributeGroup::getAttributes()
+{
+	return m_attributeMap;
+}
+
+
+
 // remove the min/max definition for windows systems
 // so that there is no conflict between the min or max macros
 // and the min() or max() functions in numeric_limits
@@ -46,6 +80,8 @@ SBAttributeInfo::SBAttributeInfo()
 
 SBAttributeInfo::~SBAttributeInfo()
 {
+	if (m_group)
+		m_group->removeAttribute(this->getAttribute());
 }
 
 void SBAttributeInfo::setAttribute(SBAttribute* attr)
@@ -104,7 +140,17 @@ bool SBAttributeInfo::getHidden()
 
 void SBAttributeInfo::setGroup(SBAttributeGroup* group)
 {
+	// remove from old group if any
+	if (m_group)
+	{
+		m_group->removeAttribute(this->getAttribute());
+	}
 	m_group = group;
+	if (group)
+	{
+		m_group->addAttribute(this->getAttribute());
+	}
+
 }
 
 void SBAttributeInfo::setDescription(const std::string& description)

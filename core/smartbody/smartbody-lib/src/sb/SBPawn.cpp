@@ -17,15 +17,15 @@ namespace SmartBody {
 
 SBPawn::SBPawn() : SbmPawn()
 {
-	createBoolAttribute("visible", true, true, "Basic", 5, false, false, false, "");
+	createBoolAttribute("visible", true, true, "Display", 5, false, false, false, "");
 	_posX = createDoubleAttribute("posX", 0.0, true, "transform", 10, false, false, false, "X position");
 	_posY = createDoubleAttribute("posY", 0.0, true, "transform", 20, false, false, false, "Y position");
 	_posZ = createDoubleAttribute("posZ", 0.0, true, "transform", 30, false, false, false, "Z position");
 	_rotX = createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
 	_rotY = createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
 	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
-	createStringAttribute("mesh", "", true, "Basic", 400, false, false, false, "Geometry/mesh");
-	createDoubleAttribute("meshScale", 1.0, true, "Basic", 410, false, false, false, "Scale of geometry/mesh");
+	createStringAttribute("mesh", "", true, "Display", 400, false, false, false, "Geometry/mesh");
+	createDoubleAttribute("meshScale", 1.0, true, "Display", 410, false, false, false, "Scale of geometry/mesh");
 	createActionAttribute("createPhysics", true, "Physics", 300, false, false, false, "Initializes the pawn as a physics object.");
 	createBoolAttribute("enablePhysics", false, true, "Physics", 310, false, false, false, "Enables or disables physics for this pawn.");
 	std::vector<std::string> shapes;
