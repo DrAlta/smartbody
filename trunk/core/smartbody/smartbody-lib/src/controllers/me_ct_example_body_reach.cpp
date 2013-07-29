@@ -46,11 +46,11 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 	reachVelocityScale = 1.f; 
 	desireLinearVel = -1.f;
 	desireGrabSpeed = -1.f;
-	addDefaultAttributeFloat("reach.autoReturnDuration",-1.f,&autoReturnDuration);
-	addDefaultAttributeFloat("reach.velocityScale",1.f,&reachVelocityScale);
-	addDefaultAttributeBool("reach.footIK",true,&footIKFix);
-	addDefaultAttributeBool("reach.useProfileInterpolation",false,&useProfileInterpolation);
-	addDefaultAttributeBool("reach.useRetiming",false,&useRetiming);
+	addDefaultAttributeFloat("reach.autoReturnDuration",-1.f, "Reaching", &autoReturnDuration);
+	addDefaultAttributeFloat("reach.velocityScale",1.f,"Reaching", &reachVelocityScale);
+	addDefaultAttributeBool("reach.footIK",true, "Reaching", &footIKFix);
+	addDefaultAttributeBool("reach.useProfileInterpolation",false, "Reaching", &useProfileInterpolation);
+	addDefaultAttributeBool("reach.useRetiming",false, "Reaching", &useRetiming);
 
 	reachEngineMap = reMap;
 	ReachEngineMap::iterator mi;

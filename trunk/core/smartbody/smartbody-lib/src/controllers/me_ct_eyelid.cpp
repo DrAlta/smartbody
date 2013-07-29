@@ -232,16 +232,16 @@ MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
 
 
 	// blinking settings
-	addDefaultAttributeFloat("eyelid.blinkPeriodMin", 4.0f);
-	addDefaultAttributeFloat("eyelid.blinkPeriodMax", 8.0f);
+	addDefaultAttributeFloat("eyelid.blinkPeriodMin", 4.0f, "Eyelids");
+	addDefaultAttributeFloat("eyelid.blinkPeriodMax", 8.0f, "Eyelids");
 
 	// softeyes settings
-	addDefaultAttributeBool("eyelid.softeyes", true);
-	addDefaultAttributeFloat("eyelid.rangeUpperMin", -30.0f);
-	addDefaultAttributeFloat("eyelid.rangeUpperMax", 30.0f);
-	addDefaultAttributeFloat("eyelid.tightWeightUpper", 0.f);
-	addDefaultAttributeFloat("eyelid.delayUpper", .3f);
-	addDefaultAttributeFloat("eyelid.closeAngle", 30.0f);
+	addDefaultAttributeBool("eyelid.softeyes", true, "Eyelids");
+	addDefaultAttributeFloat("eyelid.rangeUpperMin", -30.0f, "Eyelids");
+	addDefaultAttributeFloat("eyelid.rangeUpperMax", 30.0f, "Eyelids");
+	addDefaultAttributeFloat("eyelid.tightWeightUpper", 0.f, "Eyelids");
+	addDefaultAttributeFloat("eyelid.delayUpper", .3f, "Eyelids");
+	addDefaultAttributeFloat("eyelid.closeAngle", 30.0f, "Eyelids");
 
 }
 

@@ -60,9 +60,9 @@ MeCtBreathing::MeCtBreathing () : SmartBody::SBController()
 	_blendChannelBreathingMotion = NULL;
 
 	// breathing settings
-	addDefaultAttributeString("breathing.motion", "");
-	addDefaultAttributeBool("breathing.useBlendChannels", false);
-	addDefaultAttributeDouble("breathing.bpm", 15);
+	addDefaultAttributeString("breathing.motion", "", "Breathing");
+	addDefaultAttributeBool("breathing.useBlendChannels", false, "Breathing");
+	addDefaultAttributeDouble("breathing.bpm", 15, "Breathing");
 }
 
 MeCtBreathing::~MeCtBreathing ()
@@ -400,9 +400,9 @@ const std::string& MeCtBreathing::controller_type () const
 
 void MeCtBreathing::notify(SBSubject* subject)
 {
-	addDefaultAttributeString("breathing.motion", "");
-	addDefaultAttributeBool("breathing.useBlendChannels", false);
-	addDefaultAttributeFloat("breathing.bpm", 15);
+	addDefaultAttributeString("breathing.motion", "", "Breathing");
+	addDefaultAttributeBool("breathing.useBlendChannels", false, "Breathing");
+	addDefaultAttributeFloat("breathing.bpm", 15, "Breathing");
 
 	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attribute)
