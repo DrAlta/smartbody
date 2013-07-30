@@ -25,7 +25,7 @@
 
 SBM_LOCAL_PATH := $(call my-dir)
 LOCAL_PATH := $(SBM_LOCAL_PATH)
-SBM_MY_DIR := ../../../core/smartbody/smartbody-lib/src
+SBM_MY_DIR := ../../../core/smartbody/SmartBody/src
 ANDROID_LIB_DIR := ../../lib
 CEREVOICE_LIB_DIR := ../../cerevoice/libs
 LIB_DIR := ../../../lib
@@ -535,8 +535,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBVHMsgManager.cpp \
 	$(SBM_MY_DIR)/sb/SBCommandManager.cpp \
 	$(SBM_MY_DIR)/sb/SBWSPManager.cpp \
-	$(SBM_MY_DIR)/../../smartbody-dll/smartbody-dll.cpp \
-        $(SBM_MY_DIR)/../../smartbody-dll/smartbody-c-dll.cpp \
+	$(SBM_MY_DIR)/sb/smartbody-dll.cpp \
+        $(SBM_MY_DIR)/sb/smartbody-c-dll.cpp \
 
 
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv1_CM
