@@ -438,7 +438,7 @@ SbmPawn::~SbmPawn()	{
 
 	if (dMesh_p)
 	{
-		delete dMesh_p;
+		//delete dMesh_p;
 	}
 	if (dMeshInstance_p)
 	{

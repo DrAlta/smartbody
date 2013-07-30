@@ -70,6 +70,7 @@ endif()
 find_package(OpenGL REQUIRED)
 
 
+
 set( SMARTBODY_LIB_EXT_NANOFLANN_SRC
 
         ./src/external/nanoflann/nanoflann.hpp
@@ -501,9 +502,7 @@ add_library(
 	SmartBody
 	SHARED 
 
-	${SMARTBODY_LIB_EXT_NANOFLANN_SRC}
-
-        ${SMARTBODY_LIB_EXT_SOIL_SRC}
+	${SMARTBODY_LIB_EXT_SOIL_SRC}
 
 	${SMARTBODY_LIB_EXT_ZLIB_SRC}
 

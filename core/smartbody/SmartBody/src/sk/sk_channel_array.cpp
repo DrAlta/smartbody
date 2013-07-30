@@ -365,6 +365,7 @@ int SkChannelArray::search ( const std::string& name, SkChannel::Type type )
 void SkChannelArray::rebuild_hash_table()
 {
 	_channelMapedNameMap.clear();
+        _channelMap.clear();
 	_floats = 0;
 
 	int index = 0;
