@@ -72,7 +72,7 @@ find_package(OpenGL REQUIRED)
 
 set( SMARTBODY_LIB_EXT_NANOFLANN_SRC
 
-        external/nanoflann/nanoflann.hpp
+        ./src/external/nanoflann/nanoflann.hpp
 
 )
 
