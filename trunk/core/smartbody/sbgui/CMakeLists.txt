@@ -1,5 +1,5 @@
 include_directories( ./src )
-include_directories( ../smartbody-lib/src )
+include_directories( ../SmartBody/src )
 #include_directories( /usr/local/include/CEGUI )
 link_directories( /usr/local/lib )
 
