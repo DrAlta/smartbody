@@ -1,7 +1,7 @@
 
 include_directories( 
 
-	../smartbody-lib/src
+	../SmartBody/src
 	../smartbody-dll/include
 )
 
