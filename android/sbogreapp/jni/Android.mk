@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 SBM_ANDROID_LOCAL_PATH := $(call my-dir)
-SBM_PATH := ../../../core/smartbody/smartbody-lib/
+SBM_PATH := ../../../core/smartbody/SmartBody/
 ANDROID_LIB_DIR := ../../lib
 #OGRE_DIR := ../../ogreSDK/
 OGRE_DIR := ../../ogre/
