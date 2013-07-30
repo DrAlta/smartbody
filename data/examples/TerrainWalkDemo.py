@@ -82,8 +82,8 @@ brad.createStandardControllers()
 brad.setDoubleAttribute("deformableMeshScale", .01)
 brad.setStringAttribute("deformableMesh", "ChrBrad")
 # lip syncing diphone setup
-brad.setStringAttribute("diphoneSetName", "default")
-brad.setBoolAttribute("useDiphone", True)
+brad.setStringAttribute("lipSyncSetName", "default")
+brad.setBoolAttribute("usePhoneBigram", True)
 brad.setVoice("remote")
 brad.setVoiceCode("Festival_voice_kal_diphone")
 # gesture map setup
