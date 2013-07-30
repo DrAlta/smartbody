@@ -488,6 +488,9 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\ExportWindow.cpp" />
     <ClCompile Include="..\src\FLTKListener.cpp" />
     <ClCompile Include="..\src\fltk_viewer.cpp" />
+    <ClCompile Include="..\src\flu\FluSimpleString.cpp" />
+    <ClCompile Include="..\src\flu\Flu_Button.cpp" />
+    <ClCompile Include="..\src\flu\Flu_Collapsable_Group.cpp" />
     <ClCompile Include="..\src\jointmapviewer\JointMapViewer.cpp" />
     <ClCompile Include="..\src\jointmapviewer\RetargetStepWindow.cpp" />
     <ClCompile Include="..\src\monitorviewer\MonitorConnectWindow.cpp" />
@@ -565,6 +568,11 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClInclude Include="..\src\ExportWindow.h" />
     <ClInclude Include="..\src\FLTKListener.h" />
     <ClInclude Include="..\src\fltk_viewer.h" />
+    <ClInclude Include="..\src\flu\FluSimpleString.h" />
+    <ClInclude Include="..\src\flu\Flu_Button.h" />
+    <ClInclude Include="..\src\flu\Flu_Collapsable_Group.h" />
+    <ClInclude Include="..\src\flu\Flu_Enumerations.h" />
+    <ClInclude Include="..\src\flu\flu_export.h" />
     <ClInclude Include="..\src\jointmapviewer\JointMapViewer.h" />
     <ClInclude Include="..\src\jointmapviewer\RetargetStepWindow.h" />
     <ClInclude Include="..\src\monitorviewer\MonitorConnectWindow.h" />

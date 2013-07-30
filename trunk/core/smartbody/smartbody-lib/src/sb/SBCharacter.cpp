@@ -41,6 +41,15 @@ SBCharacter::SBCharacter() : SbmCharacter()
 
 SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name.c_str(), type)
 {
+	setAttributeGroupPriority("Voice", 170);
+	setAttributeGroupPriority("Lip Sync", 180);
+	setAttributeGroupPriority("Gestures", 190);
+	setAttributeGroupPriority("Behaviors", 200);
+	setAttributeGroupPriority("Speech", 205);
+	setAttributeGroupPriority("Retargeting", 210);
+	setAttributeGroupPriority("Reaching", 220);
+	setAttributeGroupPriority("Baldi Lip Sync", 2000);
+
 	createBoolAttribute("useCustomizedLipSyncIfPresent", true, true, "Lip Sync", 60, false, false, false, "If motion name exists inside pre-recorded audio file bml, use it by default"); 
 	
 	createBoolAttribute("blendshape", 0, true, "Blendshapes", 69, false, false, false, "");	
@@ -155,7 +164,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createStringAttribute("receiverName", "kinect1", true, "Remote", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
 	createVec3Attribute("leftSholderOffset",0.f,0.f,0.f,true, "Retargeting", 320, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
 	createVec3Attribute("rightSholderOffset",0.f,0.f,0.f,true, "Retargeting", 340, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
-	createBoolAttribute("isReaching", false, true, "Basic", 158, false, false, false, "Whether a character is reaching.");
+	createBoolAttribute("isReaching", false, true, "Reaching", 158, false, false, false, "Whether a character is reaching.");
 
 
 
