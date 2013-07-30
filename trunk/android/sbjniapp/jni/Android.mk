@@ -37,7 +37,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/pprAI/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../android/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/src
-LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions 
+LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions -g
 LOCAL_SRC_FILES := sbjniapp.cpp
 LOCAL_LDLIBS    := -landroid -llog -lEGL -lGLESv1_CM 
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
