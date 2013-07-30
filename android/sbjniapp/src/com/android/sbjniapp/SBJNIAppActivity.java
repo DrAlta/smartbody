@@ -31,6 +31,7 @@ public class SBJNIAppActivity extends Activity {
     protected float multiData[];
     protected static final int MULTI_DATA_STRIDE = 5;
     protected static final int MULTI_MAX_INPUTS = 10;
+    protected SBJNIAppView sbView;
     
     @Override protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);        
@@ -38,11 +39,14 @@ public class SBJNIAppActivity extends Activity {
         
         Button button = (Button)findViewById(R.id.SbmButton);        
         button.setOnClickListener(sbmListenser);
+        sbView = (SBJNIAppView)findViewById(R.id.surfaceView1);    	
+        //sbView.setPreserveEGLContextOnPause(true);
     }
 
     @Override protected void onPause() {
         super.onPause();
         SBJNIAppLib.executeSB("sim.pause()"); 
+        sbView.onPause();
         //mView.onPause();
     }
     
@@ -101,6 +105,7 @@ public class SBJNIAppActivity extends Activity {
     	*/
         super.onResume();
         SBJNIAppLib.executeSB("sim.resume()"); 
+        sbView.onResume();
         //mView.onResume();
     }
     
@@ -120,6 +125,9 @@ public class SBJNIAppActivity extends Activity {
         case R.id.PauseSim:
         	onPause();
             break;
+        case R.id.RestartSim:   
+        	sbView.restartSB();
+        	break;
         case R.id.ShowLog:   
         	showDialog(0);
         	break;

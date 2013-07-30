@@ -67,10 +67,11 @@ struct Engine
 Engine engine;
 static SrLight light1;
 static SrLight light2;
+static int curH = -1, curW = -1;
 #endif 
 
 #if 1
-bool mcuInit = false;
+static bool mcuInit = false;
 static void printGLString(const char *name, GLenum s) {
     const char *v = (const char *) glGetString(s);
     LOGI("GL %s = %s\n", name, v);
@@ -161,9 +162,9 @@ void drawSB()
 		}
 	}
 
-	static SrSaGlRender* render_action = NULL;
-	if (!render_action)
-	     render_action = new SrSaGlRender();	
+	//static SrSaGlRender* render_action = NULL;
+	//if (!render_action)
+	//     render_action = new SrSaGlRender();	
 	//render_action->apply(SmartBody::SBScene::getScene()->getRootGroup());
 }
 
@@ -205,28 +206,11 @@ void initConnection()
 
 bool setupGraphics(int w, int h) {
 
-	//SrCamera& cam = engine.camera;
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	SrCamera& camera = *scene->createCamera("defaultCamera");	
-	camera.init();
-/*
-	cam.setCenter(0, 92, 0);
-	cam.setUpVector(SrVec::j);
-	cam.setEye( 0, 166, 185 );
-	cam.setScale(1.f);
-*/
-
-	float aspectRatio = ((float)w)/h;
-	camera.setCenter(0.0, 1.60887, 0.0);
-	camera.setUpVector(SrVec(0, 1, 0));
-	camera.setEye(0, 1.0478, 3.69259);
-	camera.setScale(1);
-	camera.setFov(1.0);
-	camera.setFarPlane(100);
-	camera.setNearPlane(0.1);
-	camera.setAspectRatio(aspectRatio);
+	
+	//SrCamera& cam = engine.camera;	
 	//camera.setAspectRatio(0.966897);
-
+	curW = w;
+	curH = h;
         glViewport(0, 0, w, h);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
 	glEnable(GL_CULL_FACE);
@@ -244,16 +228,42 @@ bool setupGraphics(int w, int h) {
 	light2.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
 	light2.position = SrVec( 100.0, 500.0, -1000.0 );
 
-    return true;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
+	SrCamera& camera = *scene->createCamera("defaultCamera");	
+	camera.init();
+/*
+	cam.setCenter(0, 92, 0);
+	cam.setUpVector(SrVec::j);
+	cam.setEye( 0, 166, 185 );
+	cam.setScale(1.f);
+*/
+	camera.setCenter(0.0, 1.60887, 0.0);
+	camera.setUpVector(SrVec(0, 1, 0));
+	camera.setEye(0, 1.0478, 3.69259);
+	camera.setScale(1);
+	camera.setFov(1.0);
+	camera.setFarPlane(100);
+	camera.setNearPlane(0.1);
+	float aspectRatio = ((float)w)/h;
+	camera.setAspectRatio(aspectRatio);	
+        return true;
 }
 
 const GLfloat gTriangleVertices[] = { 0.0f, 0.5f, -0.5f, -0.5f,
         0.5f, -0.5f };
 
 void renderFrame() {
-
+	//LOG("renderFrame");
+	if (!mcuInit) 
+	{
+		LOG("mcu is not initialized now. skip rendering");
+		return;
+	}
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	SrCamera& cam = *scene->getCamera("defaultCamera");
+	SrCamera* defaultCam = scene->getCamera("defaultCamera");
+	if (!defaultCam) return;
+
+	SrCamera& cam = *defaultCam;
 
 	// Just fill the screen with a color.
 	glClearColor(0.6f,0.6f,0.6f,1);
@@ -426,7 +436,9 @@ void initSmartBody()
 
 	scene->addAssetPath("script", "/sdcard/sbjniappdir");
 	scene->runScript("brad.py");
-	initCharacterScene();
+	initCharacterScene();	
+	//if (curW != -1 && curH != -1)
+	//    setupGraphics(curW,curH);	
 }
 
 bool touchEvent(int action, float x, float y)
@@ -489,7 +501,7 @@ bool touchEvent(int action, float x, float y)
 	static float origX, origY;
 	if (touchAction == Touch_Pressed)
 	{
-		LOG("touchAction = Pressed");
+		//LOG("touchAction = Pressed");
 		origUp = cam->getUpVector();
 		origCenter = cam->getCenter();
 		origCamera = cam->getEye();		
@@ -503,7 +515,7 @@ bool touchEvent(int action, float x, float y)
 	}
 	else if (touchAction == Touch_Moved) // rotate
 	{
-		LOG("touchAction = Moved");
+		//LOG("touchAction = Moved");
 		float camDx = (x-origX) * cam->getAspectRatio() * 0.01;
 		float camDy = (y-origY) * cam->getAspectRatio() * 0.01;
 		SrVec forward = origCenter - origCamera; 		   
@@ -572,13 +584,19 @@ JNIEXPORT jstring JNICALL Java_com_android_sbjniapp_SBJNIAppLib_getLog( JNIEnv *
 
 JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_restart( JNIEnv * env, jobject obj )
 {	
-#if 0
+#if 1
+	
 	if (!mcuInit) return;
+	LOG("before Restart");
 	mcuInit = false;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	LOG("before destroyScene");
 	SmartBody::SBScene::destroyScene();
+	LOG("after destroyScene");
 	initSmartBody();	
+	setupGraphics(curW,curH);
 	mcuInit = true;
+	LOG("after Restart");
 #endif	
 }
 

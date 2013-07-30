@@ -47,7 +47,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 class SBJNIAppView extends GLSurfaceView {
     private static String TAG = "GL2JNIView";
-    private static final boolean DEBUG = false;    
+    private static boolean sbRestart = false;
 
     public SBJNIAppView(Context context) {
         super(context);
@@ -63,6 +63,11 @@ class SBJNIAppView extends GLSurfaceView {
     public SBJNIAppView(Context context, boolean translucent, int depth, int stencil) {
         super(context);
         init(translucent, depth, stencil);
+    }
+    
+    public void restartSB()
+    {
+    	sbRestart = true;    	
     }
 
     private void init(boolean translucent, int depth, int stencil) {
@@ -81,6 +86,11 @@ class SBJNIAppView extends GLSurfaceView {
 
     private static class Renderer implements GLSurfaceView.Renderer {
         public void onDrawFrame(GL10 gl) {
+        	if (sbRestart)
+        	{
+        		SBJNIAppLib.restart();
+        		sbRestart = false;
+        	}
             SBJNIAppLib.step();
         }
 
