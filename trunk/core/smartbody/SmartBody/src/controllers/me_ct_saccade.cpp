@@ -185,6 +185,8 @@ void MeCtSaccade::spawning(double t)
 
 void MeCtSaccade::processing(double t, MeFrameData& frame)
 {
+        if (_idL < 0 || _idR < 0)
+            return;
 	float time = float(t);
 	float dt = (float) SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt();;
 	if (_time == -1.0f)
@@ -402,7 +404,10 @@ void MeCtSaccade::initSaccade(MeFrameData& frame)
 		int idR = _context->channels().search(eyeballR, SkChannel::Quat);
 		_idR = frame.toBufferIndex(idR);
 		if (_idL < 0 || _idR < 0)
+                {
 			LOG("MeCtSaccade::initBufferIndex ERR: channel id not correct!");
+                        _valid = false;
+                }
 
 		_initialized = true;
 	}  

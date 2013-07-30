@@ -54,9 +54,9 @@
 void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 {
 	DeformableMesh* mesh = shape->getDeformableMesh();
-	if (!mesh)
+    if (!mesh)
     {
-        LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
+        //LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
         return; // no deformable mesh
     }
 
