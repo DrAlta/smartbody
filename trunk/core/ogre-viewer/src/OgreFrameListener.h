@@ -3,7 +3,7 @@
 
 #include "vhcl.h"
 #include "bonebus.h"
-#include "smartbody-dll.h"
+#include "sb/smartbody-dll.h"
 #include "ExampleApplication.h"
 
 // Event handler to animate
