@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\smartbody-dll\include&quot;;&quot;..\smartbody-lib\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include"
+				AdditionalIncludeDirectories="&quot;..\smartbody-dll\include&quot;;&quot;..\SmartBody\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include"
 				PreprocessorDefinitions="SB_EXPORTS;dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -66,7 +66,7 @@
 				AdditionalDependencies="glew32.lib glu32.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib activemq-cppd.lib xerces-c_3D.lib boost_filesystem-vc90-mt-gd-1_51.lib boost_system-vc90-mt-gd-1_51.lib boost_regex-vc90-mt-gd-1_51.lib boost_python-vc90-mt-gd-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlibd.lib pprAId.lib ode_doubled.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\smartbody-lib\lib&quot;;&quot;..\sbm-debugger\lib\Debug&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\core\smartbody\ode\lib9;..\..\..\core\smartbody\Python27\libs9;..\..\..\lib\festival\speech_tools\lib9;..\..\..\lib\festival\festival\src\lib9;&quot;..\smartbody-lib\src\external\glew&quot;"
+				AdditionalLibraryDirectories="&quot;..\SmartBody\lib&quot;;&quot;..\sbm-debugger\lib\Debug&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\core\smartbody\ode\lib9;..\..\..\core\smartbody\Python27\libs9;..\..\..\lib\festival\speech_tools\lib9;..\..\..\lib\festival\festival\src\lib9;&quot;..\SmartBody\src\external\glew&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -124,7 +124,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="&quot;..\smartbody-dll\include&quot;;&quot;..\smartbody-lib\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include"
+				AdditionalIncludeDirectories="&quot;..\smartbody-dll\include&quot;;&quot;..\SmartBody\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include"
 				PreprocessorDefinitions="SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -148,7 +148,7 @@
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_51.lib boost_system-vc90-mt-1_51.lib boost_regex-vc90-mt-1_51.lib boost_python-vc90-mt-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlib.lib pprAI.lib ode_double.lib glu32.lib glew32.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\smartbody-lib\src\external\glew&quot;;&quot;..\smartbody-lib\lib&quot;;&quot;..\sbm-debugger\lib\Release&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\..\..\lib\festival\festival\src\lib9;..\..\..\lib\festival\speech_tools\lib9;..\ode\lib9;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\core\smartbody\Python27\libs9"
+				AdditionalLibraryDirectories="&quot;..\SmartBody\src\external\glew&quot;;&quot;..\SmartBody\lib&quot;;&quot;..\sbm-debugger\lib\Release&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\..\..\lib\festival\festival\src\lib9;..\..\..\lib\festival\speech_tools\lib9;..\ode\lib9;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\core\smartbody\Python27\libs9"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -228,7 +228,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".\include;&quot;..\smartbody-lib\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include"
+				AdditionalIncludeDirectories=".\include;&quot;..\SmartBody\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include"
 				PreprocessorDefinitions="SB_EXPORTS;dDOUBLE;ENABLE_FBX_PARSER;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -253,7 +253,7 @@
 				AdditionalDependencies="smartbodyd.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib activemq-cppd.lib xerces-c_3D.lib boost_filesystem-vc90-mt-gd-1_44.lib boost_system-vc90-mt-gd-1_44.lib boost_regex-vc90-mt-gd-1_44.lib boost_python-vc90-mt-gd-1_44.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlibd.lib pprAId.lib ode_doubled.lib wininet.lib fbxsdk-2012.1-mdd.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\smartbody-lib\lib&quot;;&quot;..\sbm-debugger\lib\Debug&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\core\smartbody\ode\lib9;..\..\..\core\smartbody\Python26\libs9;..\..\..\lib\fbxsdk\lib\vs2008\x86;&quot;$(ProgramW6432)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86&quot;;&quot;$(FBXSDK)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86&quot;"
+				AdditionalLibraryDirectories="&quot;..\SmartBody\lib&quot;;&quot;..\sbm-debugger\lib\Debug&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\core\smartbody\ode\lib9;..\..\..\core\smartbody\Python26\libs9;..\..\..\lib\fbxsdk\lib\vs2008\x86;&quot;$(ProgramW6432)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86&quot;;&quot;$(FBXSDK)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -311,7 +311,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories=".\include;&quot;..\smartbody-lib\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include"
+				AdditionalIncludeDirectories=".\include;&quot;..\SmartBody\src&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python26\include"
 				PreprocessorDefinitions="SB_EXPORTS;dDOUBLE;ENABLE_FBX_PARSER;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -335,7 +335,7 @@
 				LinkLibraryDependencies="false"
 				AdditionalDependencies="smartbody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_44.lib boost_system-vc90-mt-1_44.lib boost_regex-vc90-mt-1_44.lib boost_python-vc90-mt-1_44.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlib.lib pprAI.lib ode_double.lib wininet.lib fbxsdk-2012.1-md.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\smartbody-lib\lib&quot;;&quot;..\sbm-debugger\lib\Release&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib&quot;;..\..\..\lib\boost\lib;..\ode\lib9;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\core\smartbody\Python26\libs9;..\..\..\lib\fbxsdk\lib\vs2008\x86;&quot;$(ProgramW6432)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86&quot;;&quot;$(FBXSDK)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86&quot;"
+				AdditionalLibraryDirectories="&quot;..\SmartBody\lib&quot;;&quot;..\sbm-debugger\lib\Release&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib&quot;;..\..\..\lib\boost\lib;..\ode\lib9;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\core\smartbody\Python26\libs9;..\..\..\lib\fbxsdk\lib\vs2008\x86;&quot;$(ProgramW6432)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86&quot;;&quot;$(FBXSDK)\Autodesk\FBX\FbxSdk\2012.1\lib\vs2008\x86&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -373,235 +373,235 @@
 			Name="BML"
 			>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\behavior_scheduler.cpp"
+				RelativePath="..\SmartBody\src\bml\behavior_scheduler.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\behavior_scheduler.hpp"
+				RelativePath="..\SmartBody\src\bml\behavior_scheduler.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\behavior_scheduler_constant_speed.cpp"
+				RelativePath="..\SmartBody\src\bml\behavior_scheduler_constant_speed.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\behavior_scheduler_constant_speed.hpp"
+				RelativePath="..\SmartBody\src\bml\behavior_scheduler_constant_speed.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\behavior_scheduler_fixed.cpp"
+				RelativePath="..\SmartBody\src\bml\behavior_scheduler_fixed.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\behavior_scheduler_fixed.hpp"
+				RelativePath="..\SmartBody\src\bml\behavior_scheduler_fixed.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\behavior_scheduler_gesture.cpp"
+				RelativePath="..\SmartBody\src\bml\behavior_scheduler_gesture.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\behavior_scheduler_gesture.hpp"
+				RelativePath="..\SmartBody\src\bml\behavior_scheduler_gesture.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\behavior_span.cpp"
+				RelativePath="..\SmartBody\src\bml\behavior_span.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\behavior_span.hpp"
+				RelativePath="..\SmartBody\src\bml\behavior_span.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml.cpp"
+				RelativePath="..\SmartBody\src\bml\bml.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml.hpp"
+				RelativePath="..\SmartBody\src\bml\bml.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_animation.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_animation.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_animation.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_animation.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_bodyreach.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_bodyreach.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_bodyreach.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_bodyreach.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_constraint.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_constraint.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_constraint.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_constraint.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_event.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_event.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_event.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_event.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_exception.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_exception.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_face.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_face.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_face.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_face.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_gaze.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_gaze.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_gaze.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_gaze.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_general_param.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_general_param.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_general_param.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_general_param.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_gesture.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_gesture.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_gesture.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_gesture.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_grab.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_grab.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_grab.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_grab.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_interrupt.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_interrupt.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_interrupt.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_interrupt.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_locomotion.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_locomotion.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_locomotion.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_locomotion.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_noise.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_noise.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_noise.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_noise.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_processor.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_processor.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_processor.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_processor.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_quickdraw.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_quickdraw.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_quickdraw.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_quickdraw.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_reach.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_reach.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_reach.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_reach.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_saccade.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_saccade.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_saccade.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_saccade.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_schedule.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_schedule.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_speech.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_speech.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_speech.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_speech.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_states.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_states.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_states.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_states.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_sync_point.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_sync_point.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_sync_point.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_sync_point.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_target.cpp"
+				RelativePath="..\SmartBody\src\bml\bml_target.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_target.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_target.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_types.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_types.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\bml\bml_xml_consts.hpp"
+				RelativePath="..\SmartBody\src\bml\bml_xml_consts.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\BMLDefs.cpp"
+				RelativePath="..\SmartBody\src\sbm\BMLDefs.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\BMLDefs.h"
+				RelativePath="..\SmartBody\src\sbm\BMLDefs.h"
 				>
 			</File>
 		</Filter>
@@ -609,497 +609,497 @@
 			Name="sr"
 			>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr.cpp"
+				RelativePath="..\SmartBody\src\sr\sr.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr.h"
+				RelativePath="..\SmartBody\src\sr\sr.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_alg.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_alg.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_alg.h"
+				RelativePath="..\SmartBody\src\sr\sr_alg.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_array.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_array.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_array.h"
+				RelativePath="..\SmartBody\src\sr\sr_array.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_box.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_box.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_box.h"
+				RelativePath="..\SmartBody\src\sr\sr_box.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_buffer.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_buffer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_buffer.h"
+				RelativePath="..\SmartBody\src\sr\sr_buffer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_camera.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_camera.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_camera.h"
+				RelativePath="..\SmartBody\src\sr\sr_camera.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_class_manager.h"
+				RelativePath="..\SmartBody\src\sr\sr_class_manager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_color.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_color.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_color.h"
+				RelativePath="..\SmartBody\src\sr\sr_color.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_cylinder.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_cylinder.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_cylinder.h"
+				RelativePath="..\SmartBody\src\sr\sr_cylinder.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_euler.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_euler.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_euler.h"
+				RelativePath="..\SmartBody\src\sr\sr_euler.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_event.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_event.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_event.h"
+				RelativePath="..\SmartBody\src\sr\sr_event.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_geo2.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_geo2.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_geo2.h"
+				RelativePath="..\SmartBody\src\sr\sr_geo2.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_gl.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_gl.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_gl.h"
+				RelativePath="..\SmartBody\src\sr\sr_gl.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_gl_render_funcs.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_gl_render_funcs.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_gl_render_funcs.h"
+				RelativePath="..\SmartBody\src\sr\sr_gl_render_funcs.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_hash_table.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_hash_table.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_hash_table.h"
+				RelativePath="..\SmartBody\src\sr\sr_hash_table.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_heap.h"
+				RelativePath="..\SmartBody\src\sr\sr_heap.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_input.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_input.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_input.h"
+				RelativePath="..\SmartBody\src\sr\sr_input.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_light.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_light.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_light.h"
+				RelativePath="..\SmartBody\src\sr\sr_light.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_line.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_line.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_line.h"
+				RelativePath="..\SmartBody\src\sr\sr_line.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_lines.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_lines.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_lines.h"
+				RelativePath="..\SmartBody\src\sr\sr_lines.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_mat.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_mat.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_mat.h"
+				RelativePath="..\SmartBody\src\sr\sr_mat.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_material.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_material.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_material.h"
+				RelativePath="..\SmartBody\src\sr\sr_material.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_model.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_model.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_model.h"
+				RelativePath="..\SmartBody\src\sr\sr_model.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_model_export_iv.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_model_export_iv.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_model_import_obj.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_model_import_obj.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_output.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_output.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_output.h"
+				RelativePath="..\SmartBody\src\sr\sr_output.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_path_array.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_path_array.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_path_array.h"
+				RelativePath="..\SmartBody\src\sr\sr_path_array.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_plane.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_plane.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_plane.h"
+				RelativePath="..\SmartBody\src\sr\sr_plane.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_points.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_points.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_points.h"
+				RelativePath="..\SmartBody\src\sr\sr_points.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_polygon.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_polygon.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_polygon.h"
+				RelativePath="..\SmartBody\src\sr\sr_polygon.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_polygons.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_polygons.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_polygons.h"
+				RelativePath="..\SmartBody\src\sr\sr_polygons.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_quat.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_quat.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_quat.h"
+				RelativePath="..\SmartBody\src\sr\sr_quat.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_random.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_random.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_random.h"
+				RelativePath="..\SmartBody\src\sr\sr_random.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sa.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_sa.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sa.h"
+				RelativePath="..\SmartBody\src\sr\sr_sa.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sa_bbox.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_sa_bbox.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sa_bbox.h"
+				RelativePath="..\SmartBody\src\sr\sr_sa_bbox.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sa_event.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_sa_event.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sa_event.h"
+				RelativePath="..\SmartBody\src\sr\sr_sa_event.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sa_gl_render.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_sa_gl_render.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sa_gl_render.h"
+				RelativePath="..\SmartBody\src\sr\sr_sa_gl_render.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sa_render_mode.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_sa_render_mode.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sa_render_mode.h"
+				RelativePath="..\SmartBody\src\sr\sr_sa_render_mode.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_shared_class.h"
+				RelativePath="..\SmartBody\src\sr\sr_shared_class.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_shared_ptr.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_shared_ptr.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_shared_ptr.hpp"
+				RelativePath="..\SmartBody\src\sr\sr_shared_ptr.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sn.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_sn.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sn.h"
+				RelativePath="..\SmartBody\src\sr\sr_sn.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sn_colorsurf.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_sn_colorsurf.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sn_colorsurf.h"
+				RelativePath="..\SmartBody\src\sr\sr_sn_colorsurf.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sn_group.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_sn_group.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sn_group.h"
+				RelativePath="..\SmartBody\src\sr\sr_sn_group.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sn_matrix.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_sn_matrix.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sn_matrix.h"
+				RelativePath="..\SmartBody\src\sr\sr_sn_matrix.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sn_shape.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_sn_shape.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sn_shape.h"
+				RelativePath="..\SmartBody\src\sr\sr_sn_shape.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sphere.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_sphere.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_sphere.h"
+				RelativePath="..\SmartBody\src\sr\sr_sphere.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_spline.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_spline.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_spline.h"
+				RelativePath="..\SmartBody\src\sr\sr_spline.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_string.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_string.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_string.h"
+				RelativePath="..\SmartBody\src\sr\sr_string.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_string_array.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_string_array.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_string_array.h"
+				RelativePath="..\SmartBody\src\sr\sr_string_array.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_timer.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_timer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_timer.h"
+				RelativePath="..\SmartBody\src\sr\sr_timer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_trackball.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_trackball.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_trackball.h"
+				RelativePath="..\SmartBody\src\sr\sr_trackball.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_tree.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_tree.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_tree.h"
+				RelativePath="..\SmartBody\src\sr\sr_tree.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_triangle.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_triangle.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_triangle.h"
+				RelativePath="..\SmartBody\src\sr\sr_triangle.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_vec.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_vec.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_vec.h"
+				RelativePath="..\SmartBody\src\sr\sr_vec.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_vec2.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_vec2.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_vec2.h"
+				RelativePath="..\SmartBody\src\sr\sr_vec2.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_viewer.cpp"
+				RelativePath="..\SmartBody\src\sr\sr_viewer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sr\sr_viewer.h"
+				RelativePath="..\SmartBody\src\sr\sr_viewer.h"
 				>
 			</File>
 			<Filter
 				Name="planner"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\sr\planner\sr_cfg_manager.cpp"
+					RelativePath="..\SmartBody\src\sr\planner\sr_cfg_manager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sr\planner\sr_cfg_manager.h"
+					RelativePath="..\SmartBody\src\sr\planner\sr_cfg_manager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sr\planner\sr_cfg_path.cpp"
+					RelativePath="..\SmartBody\src\sr\planner\sr_cfg_path.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sr\planner\sr_cfg_path.h"
+					RelativePath="..\SmartBody\src\sr\planner\sr_cfg_path.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sr\planner\sr_cfg_planner.cpp"
+					RelativePath="..\SmartBody\src\sr\planner\sr_cfg_planner.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sr\planner\sr_cfg_planner.h"
+					RelativePath="..\SmartBody\src\sr\planner\sr_cfg_planner.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sr\planner\sr_cfg_planner_lazy.cpp"
+					RelativePath="..\SmartBody\src\sr\planner\sr_cfg_planner_lazy.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sr\planner\sr_cfg_tree.cpp"
+					RelativePath="..\SmartBody\src\sr\planner\sr_cfg_tree.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sr\planner\sr_cfg_tree.h"
+					RelativePath="..\SmartBody\src\sr\planner\sr_cfg_tree.h"
 					>
 				</File>
 				<Filter
 					Name="PositionPlanner"
 					>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_pos_cfg.cpp"
+						RelativePath="..\SmartBody\src\sr\planner\sk_pos_cfg.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_pos_cfg.h"
+						RelativePath="..\SmartBody\src\sr\planner\sk_pos_cfg.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_pos_cfg_manager.cpp"
+						RelativePath="..\SmartBody\src\sr\planner\sk_pos_cfg_manager.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_pos_cfg_manager.h"
+						RelativePath="..\SmartBody\src\sr\planner\sk_pos_cfg_manager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_pos_planner.cpp"
+						RelativePath="..\SmartBody\src\sr\planner\sk_pos_planner.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_pos_planner.h"
+						RelativePath="..\SmartBody\src\sr\planner\sk_pos_planner.h"
 						>
 					</File>
 				</Filter>
@@ -1107,27 +1107,27 @@
 					Name="BlendPlanner"
 					>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_blend_cfg.cpp"
+						RelativePath="..\SmartBody\src\sr\planner\sk_blend_cfg.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_blend_cfg.h"
+						RelativePath="..\SmartBody\src\sr\planner\sk_blend_cfg.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_blend_cfg_manager.cpp"
+						RelativePath="..\SmartBody\src\sr\planner\sk_blend_cfg_manager.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_blend_cfg_manager.h"
+						RelativePath="..\SmartBody\src\sr\planner\sk_blend_cfg_manager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_blend_planner.cpp"
+						RelativePath="..\SmartBody\src\sr\planner\sk_blend_planner.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sr\planner\sk_blend_planner.h"
+						RelativePath="..\SmartBody\src\sr\planner\sk_blend_planner.h"
 						>
 					</File>
 				</Filter>
@@ -1137,142 +1137,142 @@
 			Name="controllers"
 			>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_controller.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_controller.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_controller.h"
+				RelativePath="..\SmartBody\src\controllers\me_controller.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_controller_context.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_controller_context.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_controller_context.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_controller_context.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_controller_context_proxy.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_controller_context_proxy.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_controller_context_proxy.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_controller_context_proxy.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_controller_tree_root.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_controller_tree_root.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_controller_tree_root.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_controller_tree_root.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_adshr_envelope.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_ct_adshr_envelope.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_adshr_envelope.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_ct_adshr_envelope.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_curve_writer.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_ct_curve_writer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_curve_writer.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_ct_curve_writer.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_lifecycle_test.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_ct_lifecycle_test.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_lifecycle_test.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_ct_lifecycle_test.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_timewarp.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_timewarp.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_timewarp.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_timewarp.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_periodic_replay.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_ct_periodic_replay.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_periodic_replay.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_ct_periodic_replay.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_pose.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_ct_pose.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_ct_pose.h"
+				RelativePath="..\SmartBody\src\controllers\me_ct_pose.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_default_prune_policy.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_default_prune_policy.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_default_prune_policy.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_default_prune_policy.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_evaluation_logger.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_evaluation_logger.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_prune_policy.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_prune_policy.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_spline_1d.cpp"
+				RelativePath="..\SmartBody\src\controllers\me_spline_1d.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\controllers\me_spline_1d.hpp"
+				RelativePath="..\SmartBody\src\controllers\me_spline_1d.hpp"
 				>
 			</File>
 			<Filter
 				Name="semiprocedurallocomotion"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_IK.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_IK.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_IK.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_IK.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_IK_scenario.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_IK_scenario.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_IK_scenario.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_IK_scenario.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_interpolator.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_interpolator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_interpolator.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_interpolator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_locomotion_func.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_locomotion_func.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_locomotion_func.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_locomotion_func.hpp"
 					>
 				</File>
 			</Filter>
@@ -1280,43 +1280,43 @@
 				Name="gaze"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_blend_cover.h"
+					RelativePath="..\SmartBody\src\controllers\me_blend_cover.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_gaze.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_gaze.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_gaze.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_gaze.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_gaze_alg.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_alg.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_gaze_alg.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_alg.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_gaze_joint.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_joint.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_gaze_joint.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_joint.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_gaze_keymap.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_keymap.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_gaze_sensor.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_sensor.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_gaze_target.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_target.cpp"
 					>
 				</File>
 			</Filter>
@@ -1324,11 +1324,11 @@
 				Name="eyelid"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_eyelid.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_eyelid.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_eyelid.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_eyelid.h"
 					>
 				</File>
 			</Filter>
@@ -1336,11 +1336,11 @@
 				Name="face"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_face.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_face.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_face.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_face.h"
 					>
 				</File>
 			</Filter>
@@ -1348,11 +1348,11 @@
 				Name="tether"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_tether.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_tether.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_tether.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_tether.h"
 					>
 				</File>
 			</Filter>
@@ -1360,11 +1360,11 @@
 				Name="quickdraw"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_quick_draw.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_quick_draw.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_quick_draw.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_quick_draw.h"
 					>
 				</File>
 			</Filter>
@@ -1372,11 +1372,11 @@
 				Name="nodshake"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_examples.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_examples.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_examples.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_examples.h"
 					>
 				</File>
 			</Filter>
@@ -1384,11 +1384,11 @@
 				Name="simplegaze"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_simple_gaze.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_simple_gaze.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_simple_gaze.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_simple_gaze.h"
 					>
 				</File>
 			</Filter>
@@ -1396,11 +1396,11 @@
 				Name="motion"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_motion.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_motion.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_motion.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_motion.h"
 					>
 				</File>
 			</Filter>
@@ -1412,11 +1412,11 @@
 				Name="scheduler"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_scheduler2.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_scheduler2.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_scheduler2.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_scheduler2.h"
 					>
 				</File>
 			</Filter>
@@ -1424,11 +1424,11 @@
 				Name="replay"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\me\me_ct_periodic_replay.cpp"
+					RelativePath="..\SmartBody\src\me\me_ct_periodic_replay.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\me\me_ct_periodic_replay.hpp"
+					RelativePath="..\SmartBody\src\me\me_ct_periodic_replay.hpp"
 					>
 				</File>
 			</Filter>
@@ -1440,11 +1440,11 @@
 				Name="timewarp"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_time_shift_warp.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_time_shift_warp.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_time_shift_warp.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_time_shift_warp.hpp"
 					>
 				</File>
 			</Filter>
@@ -1452,11 +1452,11 @@
 				Name="channelwriter"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_channel_writer.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_channel_writer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_channel_writer.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_channel_writer.hpp"
 					>
 				</File>
 			</Filter>
@@ -1468,11 +1468,11 @@
 				Name="container"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_container.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_container.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_container.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_container.hpp"
 					>
 				</File>
 			</Filter>
@@ -1480,11 +1480,11 @@
 				Name="unary"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_unary.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_unary.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_unary.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_unary.hpp"
 					>
 				</File>
 			</Filter>
@@ -1492,46 +1492,46 @@
 				Name="reach"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_data_driven_reach.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_data_driven_reach.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_data_driven_reach.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_data_driven_reach.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_limb.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_limb.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_limb.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_limb.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_reach.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_reach.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_reach.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_reach.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_reach_IK.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_reach_IK.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_reach_IK.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_reach_IK.hpp"
 					>
 				</File>
 				<Filter
 					Name="Constraint"
 					>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_constraint.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_constraint.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_constraint.hpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_constraint.hpp"
 						>
 					</File>
 				</Filter>
@@ -1539,27 +1539,27 @@
 					Name="BodyReach"
 					>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_example_body_reach.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_example_body_reach.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_example_body_reach.hpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_example_body_reach.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\MeCtBodyReachState.cpp"
+						RelativePath="..\SmartBody\src\controllers\MeCtBodyReachState.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\MeCtBodyReachState.h"
+						RelativePath="..\SmartBody\src\controllers\MeCtBodyReachState.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\MeCtReachEngine.cpp"
+						RelativePath="..\SmartBody\src\controllers\MeCtReachEngine.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\MeCtReachEngine.h"
+						RelativePath="..\SmartBody\src\controllers\MeCtReachEngine.h"
 						>
 					</File>
 				</Filter>
@@ -1567,11 +1567,11 @@
 					Name="Hand"
 					>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_hand.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_hand.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_hand.hpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_hand.hpp"
 						>
 					</File>
 				</Filter>
@@ -1580,11 +1580,11 @@
 				Name="blend"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_blend.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_blend.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_blend.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_blend.hpp"
 					>
 				</File>
 			</Filter>
@@ -1592,11 +1592,11 @@
 				Name="motionplayer"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_player.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_motion_player.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_player.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_motion_player.h"
 					>
 				</File>
 			</Filter>
@@ -1607,51 +1607,51 @@
 					Name="MotionInterpolation"
 					>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_barycentric_interpolation.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_barycentric_interpolation.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_barycentric_interpolation.h"
+						RelativePath="..\SmartBody\src\controllers\me_ct_barycentric_interpolation.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_data_interpolation.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_data_interpolation.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_data_interpolation.h"
+						RelativePath="..\SmartBody\src\controllers\me_ct_data_interpolation.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_inverse_interpolation.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_inverse_interpolation.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_inverse_interpolation.h"
+						RelativePath="..\SmartBody\src\controllers\me_ct_inverse_interpolation.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_example.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_motion_example.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_example.hpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_motion_example.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_parameter.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_motion_parameter.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_parameter.h"
+						RelativePath="..\SmartBody\src\controllers\me_ct_motion_parameter.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_profile.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_motion_profile.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_profile.h"
+						RelativePath="..\SmartBody\src\controllers\me_ct_motion_profile.h"
 						>
 					</File>
 				</Filter>
@@ -1659,19 +1659,19 @@
 					Name="IK"
 					>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_ccd_IK.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_ccd_IK.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_ccd_IK.hpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_ccd_IK.hpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_jacobian_IK.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_jacobian_IK.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_jacobian_IK.hpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_jacobian_IK.hpp"
 						>
 					</File>
 				</Filter>
@@ -1679,11 +1679,11 @@
 					Name="ublas"
 					>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_ublas.cpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_ublas.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\me_ct_ublas.hpp"
+						RelativePath="..\SmartBody\src\controllers\me_ct_ublas.hpp"
 						>
 					</File>
 				</Filter>
@@ -1692,11 +1692,11 @@
 				Name="saccade"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_saccade.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_saccade.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_saccade.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_saccade.h"
 					>
 				</File>
 			</Filter>
@@ -1704,11 +1704,11 @@
 				Name="basiclocomotion"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_basic_locomotion.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_basic_locomotion.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_basic_locomotion.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_basic_locomotion.h"
 					>
 				</File>
 			</Filter>
@@ -1716,11 +1716,11 @@
 				Name="datareceiver"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_data_receiver.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_data_receiver.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_data_receiver.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_data_receiver.h"
 					>
 				</File>
 			</Filter>
@@ -1728,19 +1728,19 @@
 				Name="breathing"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_breathing.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_breathing.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_breathing.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_breathing.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_breathing_interface.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_breathing_interface.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_breathing_interface.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_breathing_interface.h"
 					>
 				</File>
 			</Filter>
@@ -1748,30 +1748,30 @@
 				Name="paramanimation"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_param_animation.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_param_animation.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_param_animation.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_param_animation.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_param_animation_utilities.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_param_animation_utilities.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_param_animation_utilities.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_param_animation_utilities.h"
 					>
 				</File>
 				<Filter
 					Name="LocomotionPostProcessing"
 					>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\MotionAnalysis.cpp"
+						RelativePath="..\SmartBody\src\controllers\MotionAnalysis.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\controllers\MotionAnalysis.h"
+						RelativePath="..\SmartBody\src\controllers\MotionAnalysis.h"
 						>
 					</File>
 				</Filter>
@@ -1780,11 +1780,11 @@
 				Name="physics"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_physics_controller.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_physics_controller.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_physics_controller.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_physics_controller.h"
 					>
 				</File>
 			</Filter>
@@ -1792,19 +1792,19 @@
 				Name="motionblend"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_blend.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_motion_blend.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_blend.hpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_motion_blend.hpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\MeCtBlendEngine.cpp"
+					RelativePath="..\SmartBody\src\controllers\MeCtBlendEngine.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\MeCtBlendEngine.h"
+					RelativePath="..\SmartBody\src\controllers\MeCtBlendEngine.h"
 					>
 				</File>
 			</Filter>
@@ -1812,11 +1812,11 @@
 				Name="noise"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_noise_controller.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_noise_controller.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_noise_controller.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_noise_controller.h"
 					>
 				</File>
 			</Filter>
@@ -1824,11 +1824,11 @@
 				Name="motionrecorder"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_recorder.cpp"
+					RelativePath="..\SmartBody\src\controllers\me_ct_motion_recorder.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\controllers\me_ct_motion_recorder.h"
+					RelativePath="..\SmartBody\src\controllers\me_ct_motion_recorder.h"
 					>
 				</File>
 			</Filter>
@@ -1840,7 +1840,7 @@
 				Name="nanoflann"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\external\nonoflann\nanoflann.hpp"
+					RelativePath="..\SmartBody\src\external\nonoflann\nanoflann.hpp"
 					>
 				</File>
 			</Filter>
@@ -1848,11 +1848,11 @@
 				Name="glew"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\external\glew\glew.h"
+					RelativePath="..\SmartBody\src\external\glew\glew.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\glew\wglew.h"
+					RelativePath="..\SmartBody\src\external\glew\wglew.h"
 					>
 				</File>
 			</Filter>
@@ -1860,43 +1860,43 @@
 				Name="SOIL"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\external\SOIL\image_DXT.c"
+					RelativePath="..\SmartBody\src\external\SOIL\image_DXT.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\SOIL\image_DXT.h"
+					RelativePath="..\SmartBody\src\external\SOIL\image_DXT.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\SOIL\image_helper.c"
+					RelativePath="..\SmartBody\src\external\SOIL\image_helper.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\SOIL\image_helper.h"
+					RelativePath="..\SmartBody\src\external\SOIL\image_helper.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\SOIL\SOIL.c"
+					RelativePath="..\SmartBody\src\external\SOIL\SOIL.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\SOIL\SOIL.h"
+					RelativePath="..\SmartBody\src\external\SOIL\SOIL.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\SOIL\stb_image_aug.c"
+					RelativePath="..\SmartBody\src\external\SOIL\stb_image_aug.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\SOIL\stb_image_aug.h"
+					RelativePath="..\SmartBody\src\external\SOIL\stb_image_aug.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\SOIL\stbi_DDS_aug.h"
+					RelativePath="..\SmartBody\src\external\SOIL\stbi_DDS_aug.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\SOIL\stbi_DDS_aug_c.h"
+					RelativePath="..\SmartBody\src\external\SOIL\stbi_DDS_aug_c.h"
 					>
 				</File>
 			</Filter>
@@ -1904,291 +1904,291 @@
 				Name="parser"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Bchart.cpp"
+					RelativePath="..\SmartBody\src\external\parser\Bchart.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Bchart.h"
+					RelativePath="..\SmartBody\src\external\parser\Bchart.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\BchartSm.cpp"
+					RelativePath="..\SmartBody\src\external\parser\BchartSm.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Bst.cpp"
+					RelativePath="..\SmartBody\src\external\parser\Bst.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Bst.h"
+					RelativePath="..\SmartBody\src\external\parser\Bst.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ChartBase.cpp"
+					RelativePath="..\SmartBody\src\external\parser\ChartBase.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ChartBase.h"
+					RelativePath="..\SmartBody\src\external\parser\ChartBase.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ClassRule.cpp"
+					RelativePath="..\SmartBody\src\external\parser\ClassRule.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ClassRule.h"
+					RelativePath="..\SmartBody\src\external\parser\ClassRule.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\CntxArray.cpp"
+					RelativePath="..\SmartBody\src\external\parser\CntxArray.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\CntxArray.h"
+					RelativePath="..\SmartBody\src\external\parser\CntxArray.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\CombineBests.cpp"
+					RelativePath="..\SmartBody\src\external\parser\CombineBests.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\CombineBests.h"
+					RelativePath="..\SmartBody\src\external\parser\CombineBests.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ECArgs.cpp"
+					RelativePath="..\SmartBody\src\external\parser\ECArgs.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ECArgs.h"
+					RelativePath="..\SmartBody\src\external\parser\ECArgs.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ECString.h"
+					RelativePath="..\SmartBody\src\external\parser\ECString.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Edge.cpp"
+					RelativePath="..\SmartBody\src\external\parser\Edge.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Edge.h"
+					RelativePath="..\SmartBody\src\external\parser\Edge.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\EdgeHeap.cpp"
+					RelativePath="..\SmartBody\src\external\parser\EdgeHeap.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\EdgeHeap.h"
+					RelativePath="..\SmartBody\src\external\parser\EdgeHeap.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\edgeSubFns.cpp"
+					RelativePath="..\SmartBody\src\external\parser\edgeSubFns.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\edgeSubFns.h"
+					RelativePath="..\SmartBody\src\external\parser\edgeSubFns.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\EgsFromTree.cpp"
+					RelativePath="..\SmartBody\src\external\parser\EgsFromTree.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ewDciTokStrm.cpp"
+					RelativePath="..\SmartBody\src\external\parser\ewDciTokStrm.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ewDciTokStrm.h"
+					RelativePath="..\SmartBody\src\external\parser\ewDciTokStrm.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\extraMain.cpp"
+					RelativePath="..\SmartBody\src\external\parser\extraMain.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\extraMain.h"
+					RelativePath="..\SmartBody\src\external\parser\extraMain.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\FBinaryArray.cpp"
+					RelativePath="..\SmartBody\src\external\parser\FBinaryArray.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\FBinaryArray.h"
+					RelativePath="..\SmartBody\src\external\parser\FBinaryArray.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Feat.cpp"
+					RelativePath="..\SmartBody\src\external\parser\Feat.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Feat.h"
+					RelativePath="..\SmartBody\src\external\parser\Feat.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Feature.cpp"
+					RelativePath="..\SmartBody\src\external\parser\Feature.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Feature.h"
+					RelativePath="..\SmartBody\src\external\parser\Feature.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\FeatureTree.cpp"
+					RelativePath="..\SmartBody\src\external\parser\FeatureTree.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\FeatureTree.h"
+					RelativePath="..\SmartBody\src\external\parser\FeatureTree.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\fhSubFns.cpp"
+					RelativePath="..\SmartBody\src\external\parser\fhSubFns.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\fhSubFns.h"
+					RelativePath="..\SmartBody\src\external\parser\fhSubFns.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Field.cpp"
+					RelativePath="..\SmartBody\src\external\parser\Field.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Field.h"
+					RelativePath="..\SmartBody\src\external\parser\Field.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\FullHist.cpp"
+					RelativePath="..\SmartBody\src\external\parser\FullHist.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\FullHist.h"
+					RelativePath="..\SmartBody\src\external\parser\FullHist.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\GotIter.cpp"
+					RelativePath="..\SmartBody\src\external\parser\GotIter.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\GotIter.h"
+					RelativePath="..\SmartBody\src\external\parser\GotIter.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\headFinder.cpp"
+					RelativePath="..\SmartBody\src\external\parser\headFinder.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\headFinder.h"
+					RelativePath="..\SmartBody\src\external\parser\headFinder.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\headFinderCh.cpp"
+					RelativePath="..\SmartBody\src\external\parser\headFinderCh.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\headFinderCh.h"
+					RelativePath="..\SmartBody\src\external\parser\headFinderCh.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\InputTree.cpp"
+					RelativePath="..\SmartBody\src\external\parser\InputTree.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\InputTree.h"
+					RelativePath="..\SmartBody\src\external\parser\InputTree.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Item.cpp"
+					RelativePath="..\SmartBody\src\external\parser\Item.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Item.h"
+					RelativePath="..\SmartBody\src\external\parser\Item.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Link.cpp"
+					RelativePath="..\SmartBody\src\external\parser\Link.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Link.h"
+					RelativePath="..\SmartBody\src\external\parser\Link.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\MeChart.cpp"
+					RelativePath="..\SmartBody\src\external\parser\MeChart.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\MeChart.h"
+					RelativePath="..\SmartBody\src\external\parser\MeChart.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Params.cpp"
+					RelativePath="..\SmartBody\src\external\parser\Params.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Params.h"
+					RelativePath="..\SmartBody\src\external\parser\Params.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ParseStats.cpp"
+					RelativePath="..\SmartBody\src\external\parser\ParseStats.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ParseStats.h"
+					RelativePath="..\SmartBody\src\external\parser\ParseStats.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\SentRep.cpp"
+					RelativePath="..\SmartBody\src\external\parser\SentRep.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\SentRep.h"
+					RelativePath="..\SmartBody\src\external\parser\SentRep.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Term.cpp"
+					RelativePath="..\SmartBody\src\external\parser\Term.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Term.h"
+					RelativePath="..\SmartBody\src\external\parser\Term.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\TimeIt.cpp"
+					RelativePath="..\SmartBody\src\external\parser\TimeIt.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\TimeIt.h"
+					RelativePath="..\SmartBody\src\external\parser\TimeIt.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\UnitRules.cpp"
+					RelativePath="..\SmartBody\src\external\parser\UnitRules.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\UnitRules.h"
+					RelativePath="..\SmartBody\src\external\parser\UnitRules.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\utils.cpp"
+					RelativePath="..\SmartBody\src\external\parser\utils.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\utils.h"
+					RelativePath="..\SmartBody\src\external\parser\utils.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ValHeap.cpp"
+					RelativePath="..\SmartBody\src\external\parser\ValHeap.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\ValHeap.h"
+					RelativePath="..\SmartBody\src\external\parser\ValHeap.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\parser\Wrd.h"
+					RelativePath="..\SmartBody\src\external\parser\Wrd.h"
 					>
 				</File>
 			</Filter>
@@ -2196,11 +2196,11 @@
 				Name="perlin"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\external\perlin\perlin.cpp"
+					RelativePath="..\SmartBody\src\external\perlin\perlin.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\perlin\perlin.h"
+					RelativePath="..\SmartBody\src\external\perlin\perlin.h"
 					>
 				</File>
 			</Filter>
@@ -2208,111 +2208,111 @@
 				Name="recastdetour"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourAlloc.cpp"
+					RelativePath="..\SmartBody\src\external\recast\DetourAlloc.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourAlloc.h"
+					RelativePath="..\SmartBody\src\external\recast\DetourAlloc.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourAssert.h"
+					RelativePath="..\SmartBody\src\external\recast\DetourAssert.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourCommon.cpp"
+					RelativePath="..\SmartBody\src\external\recast\DetourCommon.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourCommon.h"
+					RelativePath="..\SmartBody\src\external\recast\DetourCommon.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourNavMesh.cpp"
+					RelativePath="..\SmartBody\src\external\recast\DetourNavMesh.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourNavMesh.h"
+					RelativePath="..\SmartBody\src\external\recast\DetourNavMesh.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourNavMeshBuilder.cpp"
+					RelativePath="..\SmartBody\src\external\recast\DetourNavMeshBuilder.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourNavMeshBuilder.h"
+					RelativePath="..\SmartBody\src\external\recast\DetourNavMeshBuilder.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourNavMeshQuery.cpp"
+					RelativePath="..\SmartBody\src\external\recast\DetourNavMeshQuery.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourNavMeshQuery.h"
+					RelativePath="..\SmartBody\src\external\recast\DetourNavMeshQuery.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourNode.cpp"
+					RelativePath="..\SmartBody\src\external\recast\DetourNode.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourNode.h"
+					RelativePath="..\SmartBody\src\external\recast\DetourNode.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\DetourStatus.h"
+					RelativePath="..\SmartBody\src\external\recast\DetourStatus.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\Recast.cpp"
+					RelativePath="..\SmartBody\src\external\recast\Recast.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\Recast.h"
+					RelativePath="..\SmartBody\src\external\recast\Recast.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\RecastAlloc.cpp"
+					RelativePath="..\SmartBody\src\external\recast\RecastAlloc.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\RecastAlloc.h"
+					RelativePath="..\SmartBody\src\external\recast\RecastAlloc.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\RecastArea.cpp"
+					RelativePath="..\SmartBody\src\external\recast\RecastArea.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\RecastAssert.h"
+					RelativePath="..\SmartBody\src\external\recast\RecastAssert.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\RecastContour.cpp"
+					RelativePath="..\SmartBody\src\external\recast\RecastContour.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\RecastFilter.cpp"
+					RelativePath="..\SmartBody\src\external\recast\RecastFilter.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\RecastLayers.cpp"
+					RelativePath="..\SmartBody\src\external\recast\RecastLayers.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\RecastMesh.cpp"
+					RelativePath="..\SmartBody\src\external\recast\RecastMesh.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\RecastMeshDetail.cpp"
+					RelativePath="..\SmartBody\src\external\recast\RecastMeshDetail.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\RecastRasterization.cpp"
+					RelativePath="..\SmartBody\src\external\recast\RecastRasterization.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\recast\RecastRegion.cpp"
+					RelativePath="..\SmartBody\src\external\recast\RecastRegion.cpp"
 					>
 				</File>
 			</Filter>
@@ -2320,147 +2320,147 @@
 				Name="zlib"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\adler32.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\adler32.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\compress.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\compress.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\crc32.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\crc32.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\crc32.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\crc32.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\crypt.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\crypt.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\deflate.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\deflate.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\deflate.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\deflate.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\example.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\example.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\gzclose.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\gzclose.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\gzguts.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\gzguts.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\gzlib.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\gzlib.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\gzread.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\gzread.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\gzwrite.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\gzwrite.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\infback.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\infback.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inffast.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\inffast.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inffast.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\inffast.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inffixed.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\inffixed.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inflate.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\inflate.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inflate.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\inflate.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inftrees.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\inftrees.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\inftrees.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\inftrees.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\ioapi.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\ioapi.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\ioapi.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\ioapi.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\iowin32.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\iowin32.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\iowin32.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\iowin32.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\trees.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\trees.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\trees.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\trees.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\uncompr.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\uncompr.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\unzip.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\unzip.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\unzip.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\unzip.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zconf.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\zconf.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zip.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\zip.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zip.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\zip.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zlib.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\zlib.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zutil.c"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\zutil.c"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\external\zlib-1.2.5\zutil.h"
+					RelativePath="..\SmartBody\src\external\zlib-1.2.5\zutil.h"
 					>
 				</File>
 			</Filter>
@@ -2469,59 +2469,59 @@
 			Name="python"
 			>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPython.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPython.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPython.h"
+				RelativePath="..\SmartBody\src\sb\SBPython.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonAnimation.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPythonAnimation.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonAttribute.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPythonAttribute.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonCharacter.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPythonCharacter.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonClass.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPythonClass.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonClass.h"
+				RelativePath="..\SmartBody\src\sb\SBPythonClass.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonInternal.h"
+				RelativePath="..\SmartBody\src\sb\SBPythonInternal.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonMath.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPythonMath.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonMotion.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPythonMotion.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonScene.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPythonScene.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonSimulation.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPythonSimulation.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonSkeleton.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPythonSkeleton.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPythonSystem.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPythonSystem.cpp"
 				>
 			</File>
 		</Filter>
@@ -2529,503 +2529,503 @@
 			Name="sb"
 			>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\DefaultAttributeTable.cpp"
+				RelativePath="..\SmartBody\src\sb\DefaultAttributeTable.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\DefaultAttributeTable.h"
+				RelativePath="..\SmartBody\src\sb\DefaultAttributeTable.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\MiniBrain.cpp"
+				RelativePath="..\SmartBody\src\sb\MiniBrain.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\MiniBrain.h"
+				RelativePath="..\SmartBody\src\sb\MiniBrain.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\NetRequest.h"
+				RelativePath="..\SmartBody\src\sb\NetRequest.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\nvbg.cpp"
+				RelativePath="..\SmartBody\src\sb\nvbg.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\nvbg.h"
+				RelativePath="..\SmartBody\src\sb\nvbg.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\PABlend.cpp"
+				RelativePath="..\SmartBody\src\sb\PABlend.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\PABlend.h"
+				RelativePath="..\SmartBody\src\sb\PABlend.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAnimationState.cpp"
+				RelativePath="..\SmartBody\src\sb\SBAnimationState.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAnimationState.h"
+				RelativePath="..\SmartBody\src\sb\SBAnimationState.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAnimationStateManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBAnimationStateManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAnimationStateManager.h"
+				RelativePath="..\SmartBody\src\sb\SBAnimationStateManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAnimationTransition.cpp"
+				RelativePath="..\SmartBody\src\sb\SBAnimationTransition.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAnimationTransition.h"
+				RelativePath="..\SmartBody\src\sb\SBAnimationTransition.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAnimationTransitionRule.cpp"
+				RelativePath="..\SmartBody\src\sb\SBAnimationTransitionRule.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAnimationTransitionRule.h"
+				RelativePath="..\SmartBody\src\sb\SBAnimationTransitionRule.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAsset.cpp"
+				RelativePath="..\SmartBody\src\sb\SBAsset.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAsset.h"
+				RelativePath="..\SmartBody\src\sb\SBAsset.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAssetManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBAssetManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAssetManager.h"
+				RelativePath="..\SmartBody\src\sb\SBAssetManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAttribute.cpp"
+				RelativePath="..\SmartBody\src\sb\SBAttribute.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAttribute.h"
+				RelativePath="..\SmartBody\src\sb\SBAttribute.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAttributeManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBAttributeManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBAttributeManager.h"
+				RelativePath="..\SmartBody\src\sb\SBAttributeManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBBehavior.cpp"
+				RelativePath="..\SmartBody\src\sb\SBBehavior.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBBehavior.h"
+				RelativePath="..\SmartBody\src\sb\SBBehavior.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBBehaviorSet.cpp"
+				RelativePath="..\SmartBody\src\sb\SBBehaviorSet.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBBehaviorSet.h"
+				RelativePath="..\SmartBody\src\sb\SBBehaviorSet.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBBehaviorSetManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBBehaviorSetManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBBehaviorSetManager.h"
+				RelativePath="..\SmartBody\src\sb\SBBehaviorSetManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBBmlProcessor.cpp"
+				RelativePath="..\SmartBody\src\sb\SBBmlProcessor.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBBmlProcessor.h"
+				RelativePath="..\SmartBody\src\sb\SBBmlProcessor.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBBoneBusManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBBoneBusManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBBoneBusManager.h"
+				RelativePath="..\SmartBody\src\sb\SBBoneBusManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBCharacter.cpp"
+				RelativePath="..\SmartBody\src\sb\SBCharacter.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBCharacter.h"
+				RelativePath="..\SmartBody\src\sb\SBCharacter.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBCollisionManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBCollisionManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBCollisionManager.h"
+				RelativePath="..\SmartBody\src\sb\SBCollisionManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBColObject.cpp"
+				RelativePath="..\SmartBody\src\sb\SBColObject.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBColObject.h"
+				RelativePath="..\SmartBody\src\sb\SBColObject.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBCommandManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBCommandManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBCommandManager.h"
+				RelativePath="..\SmartBody\src\sb\SBCommandManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBController.cpp"
+				RelativePath="..\SmartBody\src\sb\SBController.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBController.h"
+				RelativePath="..\SmartBody\src\sb\SBController.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBDebuggerClient.cpp"
+				RelativePath="..\SmartBody\src\sb\SBDebuggerClient.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBDebuggerClient.h"
+				RelativePath="..\SmartBody\src\sb\SBDebuggerClient.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBDebuggerServer.cpp"
+				RelativePath="..\SmartBody\src\sb\SBDebuggerServer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBDebuggerServer.h"
+				RelativePath="..\SmartBody\src\sb\SBDebuggerServer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBDebuggerUtility.cpp"
+				RelativePath="..\SmartBody\src\sb\SBDebuggerUtility.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBDebuggerUtility.h"
+				RelativePath="..\SmartBody\src\sb\SBDebuggerUtility.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBEvent.cpp"
+				RelativePath="..\SmartBody\src\sb\SBEvent.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBEvent.h"
+				RelativePath="..\SmartBody\src\sb\SBEvent.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBFaceDefinition.cpp"
+				RelativePath="..\SmartBody\src\sb\SBFaceDefinition.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBFaceDefinition.h"
+				RelativePath="..\SmartBody\src\sb\SBFaceDefinition.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBGestureMap.cpp"
+				RelativePath="..\SmartBody\src\sb\SBGestureMap.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBGestureMap.h"
+				RelativePath="..\SmartBody\src\sb\SBGestureMap.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBGestureMapManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBGestureMapManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBGestureMapManager.h"
+				RelativePath="..\SmartBody\src\sb\SBGestureMapManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBJoint.cpp"
+				RelativePath="..\SmartBody\src\sb\SBJoint.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBJoint.h"
+				RelativePath="..\SmartBody\src\sb\SBJoint.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBJointMap.cpp"
+				RelativePath="..\SmartBody\src\sb\SBJointMap.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBJointMap.h"
+				RelativePath="..\SmartBody\src\sb\SBJointMap.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBJointMapManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBJointMapManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBJointMapManager.h"
+				RelativePath="..\SmartBody\src\sb\SBJointMapManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\sbm_character.cpp"
+				RelativePath="..\SmartBody\src\sb\sbm_character.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\sbm_character.hpp"
+				RelativePath="..\SmartBody\src\sb\sbm_character.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\sbm_pawn.cpp"
+				RelativePath="..\SmartBody\src\sb\sbm_pawn.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\sbm_pawn.hpp"
+				RelativePath="..\SmartBody\src\sb\sbm_pawn.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBMotion.cpp"
+				RelativePath="..\SmartBody\src\sb\SBMotion.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBMotion.h"
+				RelativePath="..\SmartBody\src\sb\SBMotion.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBMotionBlendBase.cpp"
+				RelativePath="..\SmartBody\src\sb\SBMotionBlendBase.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBMotionBlendBase.h"
+				RelativePath="..\SmartBody\src\sb\SBMotionBlendBase.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBNavigationMesh.cpp"
+				RelativePath="..\SmartBody\src\sb\SBNavigationMesh.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBNavigationMesh.h"
+				RelativePath="..\SmartBody\src\sb\SBNavigationMesh.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBObject.cpp"
+				RelativePath="..\SmartBody\src\sb\SBObject.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBObject.h"
+				RelativePath="..\SmartBody\src\sb\SBObject.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBObserver.cpp"
+				RelativePath="..\SmartBody\src\sb\SBObserver.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBObserver.h"
+				RelativePath="..\SmartBody\src\sb\SBObserver.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBParseNode.cpp"
+				RelativePath="..\SmartBody\src\sb\SBParseNode.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBParseNode.h"
+				RelativePath="..\SmartBody\src\sb\SBParseNode.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBParser.cpp"
+				RelativePath="..\SmartBody\src\sb\SBParser.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBParser.h"
+				RelativePath="..\SmartBody\src\sb\SBParser.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPawn.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPawn.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPawn.h"
+				RelativePath="..\SmartBody\src\sb\SBPawn.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPhoneme.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPhoneme.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPhoneme.h"
+				RelativePath="..\SmartBody\src\sb\SBPhoneme.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPhonemeManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPhonemeManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPhonemeManager.h"
+				RelativePath="..\SmartBody\src\sb\SBPhonemeManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPhysicsManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPhysicsManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPhysicsManager.h"
+				RelativePath="..\SmartBody\src\sb\SBPhysicsManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPhysicsSim.cpp"
+				RelativePath="..\SmartBody\src\sb\SBPhysicsSim.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBPhysicsSim.h"
+				RelativePath="..\SmartBody\src\sb\SBPhysicsSim.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBReach.cpp"
+				RelativePath="..\SmartBody\src\sb\SBReach.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBReach.h"
+				RelativePath="..\SmartBody\src\sb\SBReach.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBReachManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBReachManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBReachManager.h"
+				RelativePath="..\SmartBody\src\sb\SBReachManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBRetarget.cpp"
+				RelativePath="..\SmartBody\src\sb\SBRetarget.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBRetarget.h"
+				RelativePath="..\SmartBody\src\sb\SBRetarget.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBRetargetManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBRetargetManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBRetargetManager.h"
+				RelativePath="..\SmartBody\src\sb\SBRetargetManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBScene.cpp"
+				RelativePath="..\SmartBody\src\sb\SBScene.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBScene.h"
+				RelativePath="..\SmartBody\src\sb\SBScene.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBScript.cpp"
+				RelativePath="..\SmartBody\src\sb\SBScript.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBScript.h"
+				RelativePath="..\SmartBody\src\sb\SBScript.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBService.cpp"
+				RelativePath="..\SmartBody\src\sb\SBService.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBService.h"
+				RelativePath="..\SmartBody\src\sb\SBService.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBServiceManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBServiceManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBServiceManager.h"
+				RelativePath="..\SmartBody\src\sb\SBServiceManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBSimulationManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBSimulationManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBSimulationManager.h"
+				RelativePath="..\SmartBody\src\sb\SBSimulationManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBSkeleton.cpp"
+				RelativePath="..\SmartBody\src\sb\SBSkeleton.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBSkeleton.h"
+				RelativePath="..\SmartBody\src\sb\SBSkeleton.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBSpeechManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBSpeechManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBSteerAgent.cpp"
+				RelativePath="..\SmartBody\src\sb\SBSteerAgent.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBSteerAgent.h"
+				RelativePath="..\SmartBody\src\sb\SBSteerAgent.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBSteerManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBSteerManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBSteerManager.h"
+				RelativePath="..\SmartBody\src\sb\SBSteerManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBSubject.cpp"
+				RelativePath="..\SmartBody\src\sb\SBSubject.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBSubject.h"
+				RelativePath="..\SmartBody\src\sb\SBSubject.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBTypes.h"
+				RelativePath="..\SmartBody\src\sb\SBTypes.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBVHMsgManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBVHMsgManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBVHMsgManager.h"
+				RelativePath="..\SmartBody\src\sb\SBVHMsgManager.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBWSPManager.cpp"
+				RelativePath="..\SmartBody\src\sb\SBWSPManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sb\SBWSPManager.h"
+				RelativePath="..\SmartBody\src\sb\SBWSPManager.h"
 				>
 			</File>
 		</Filter>
@@ -3033,107 +3033,107 @@
 			Name="sk"
 			>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_channel.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_channel.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_channel.h"
+				RelativePath="..\SmartBody\src\sk\sk_channel.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_channel_array.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_channel_array.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_channel_array.h"
+				RelativePath="..\SmartBody\src\sk\sk_channel_array.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_joint.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_joint.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_joint.h"
+				RelativePath="..\SmartBody\src\sk\sk_joint.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_joint_euler.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_joint_euler.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_joint_euler.h"
+				RelativePath="..\SmartBody\src\sk\sk_joint_euler.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_joint_pos.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_joint_pos.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_joint_pos.h"
+				RelativePath="..\SmartBody\src\sk\sk_joint_pos.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_joint_quat.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_joint_quat.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_joint_quat.h"
+				RelativePath="..\SmartBody\src\sk\sk_joint_quat.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_joint_swing_twist.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_joint_swing_twist.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_joint_swing_twist.h"
+				RelativePath="..\SmartBody\src\sk\sk_joint_swing_twist.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_motion.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_motion.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_motion.h"
+				RelativePath="..\SmartBody\src\sk\sk_motion.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_motion_io.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_motion_io.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_posture.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_posture.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_posture.h"
+				RelativePath="..\SmartBody\src\sk\sk_posture.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_scene.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_scene.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_scene.h"
+				RelativePath="..\SmartBody\src\sk\sk_scene.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_skeleton.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_skeleton.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_skeleton.h"
+				RelativePath="..\SmartBody\src\sk\sk_skeleton.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_skeleton_io.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_skeleton_io.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_vec_limits.cpp"
+				RelativePath="..\SmartBody\src\sk\sk_vec_limits.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sk\sk_vec_limits.h"
+				RelativePath="..\SmartBody\src\sk\sk_vec_limits.h"
 				>
 			</File>
 		</Filter>
@@ -3141,369 +3141,369 @@
 			Name="sbm"
 			>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\action_unit.cpp"
+				RelativePath="..\SmartBody\src\sbm\action_unit.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\action_unit.hpp"
+				RelativePath="..\SmartBody\src\sbm\action_unit.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\general_param_setting.h"
+				RelativePath="..\SmartBody\src\sbm\general_param_setting.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\GenericViewer.cpp"
+				RelativePath="..\SmartBody\src\sbm\GenericViewer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\GenericViewer.h"
+				RelativePath="..\SmartBody\src\sbm\GenericViewer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\gwiz_cmdl.cpp"
+				RelativePath="..\SmartBody\src\sbm\gwiz_cmdl.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\gwiz_cmdl.h"
+				RelativePath="..\SmartBody\src\sbm\gwiz_cmdl.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\gwiz_math.cpp"
+				RelativePath="..\SmartBody\src\sbm\gwiz_math.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\gwiz_math.h"
+				RelativePath="..\SmartBody\src\sbm\gwiz_math.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\gwiz_spline.cpp"
+				RelativePath="..\SmartBody\src\sbm\gwiz_spline.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\Heightfield.cpp"
+				RelativePath="..\SmartBody\src\sbm\Heightfield.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\Heightfield.h"
+				RelativePath="..\SmartBody\src\sbm\Heightfield.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\KinectProcessor.cpp"
+				RelativePath="..\SmartBody\src\sbm\KinectProcessor.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\KinectProcessor.h"
+				RelativePath="..\SmartBody\src\sbm\KinectProcessor.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\lin_win.cpp"
+				RelativePath="..\SmartBody\src\sbm\lin_win.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\lin_win.h"
+				RelativePath="..\SmartBody\src\sbm\lin_win.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\local_speech.cpp"
+				RelativePath="..\SmartBody\src\sbm\local_speech.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\local_speech.h"
+				RelativePath="..\SmartBody\src\sbm\local_speech.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\mcontrol_callbacks.cpp"
+				RelativePath="..\SmartBody\src\sbm\mcontrol_callbacks.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\mcontrol_callbacks.h"
+				RelativePath="..\SmartBody\src\sbm\mcontrol_callbacks.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\MiscCommands.cpp"
+				RelativePath="..\SmartBody\src\sbm\MiscCommands.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\MiscCommands.h"
+				RelativePath="..\SmartBody\src\sbm\MiscCommands.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\ParserASFAMC.cxx"
+				RelativePath="..\SmartBody\src\sbm\ParserASFAMC.cxx"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\ParserASFAMC.h"
+				RelativePath="..\SmartBody\src\sbm\ParserASFAMC.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\ParserBVH.cxx"
+				RelativePath="..\SmartBody\src\sbm\ParserBVH.cxx"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\ParserBVH.h"
+				RelativePath="..\SmartBody\src\sbm\ParserBVH.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\ParserFBX.cpp"
+				RelativePath="..\SmartBody\src\sbm\ParserFBX.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\ParserFBX.h"
+				RelativePath="..\SmartBody\src\sbm\ParserFBX.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\ParserOgre.cpp"
+				RelativePath="..\SmartBody\src\sbm\ParserOgre.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\ParserOgre.h"
+				RelativePath="..\SmartBody\src\sbm\ParserOgre.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\ParserOpenCOLLADA.cpp"
+				RelativePath="..\SmartBody\src\sbm\ParserOpenCOLLADA.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\ParserOpenCOLLADA.h"
+				RelativePath="..\SmartBody\src\sbm\ParserOpenCOLLADA.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\PPRAISteeringAgent.cpp"
+				RelativePath="..\SmartBody\src\sbm\PPRAISteeringAgent.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\PPRAISteeringAgent.h"
+				RelativePath="..\SmartBody\src\sbm\PPRAISteeringAgent.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\remote_speech.cpp"
+				RelativePath="..\SmartBody\src\sbm\remote_speech.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\remote_speech.h"
+				RelativePath="..\SmartBody\src\sbm\remote_speech.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sbm_audio.cpp"
+				RelativePath="..\SmartBody\src\sbm\sbm_audio.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sbm_audio.h"
+				RelativePath="..\SmartBody\src\sbm\sbm_audio.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sbm_constants.h"
+				RelativePath="..\SmartBody\src\sbm\sbm_constants.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sbm_deformable_mesh.cpp"
+				RelativePath="..\SmartBody\src\sbm\sbm_deformable_mesh.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sbm_deformable_mesh.h"
+				RelativePath="..\SmartBody\src\sbm\sbm_deformable_mesh.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sbm_speech.cpp"
+				RelativePath="..\SmartBody\src\sbm\sbm_speech.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sbm_speech.hpp"
+				RelativePath="..\SmartBody\src\sbm\sbm_speech.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sbm_speech_audiofile.cpp"
+				RelativePath="..\SmartBody\src\sbm\sbm_speech_audiofile.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sbm_speech_audiofile.hpp"
+				RelativePath="..\SmartBody\src\sbm\sbm_speech_audiofile.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sbm_test_cmds.cpp"
+				RelativePath="..\SmartBody\src\sbm\sbm_test_cmds.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sbm_test_cmds.hpp"
+				RelativePath="..\SmartBody\src\sbm\sbm_test_cmds.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\SbmCharacterListener.h"
+				RelativePath="..\SmartBody\src\sbm\SbmCharacterListener.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_arg_buff.cpp"
+				RelativePath="..\SmartBody\src\sbm\sr_arg_buff.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_arg_buff.h"
+				RelativePath="..\SmartBody\src\sbm\sr_arg_buff.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_cmd_line.cpp"
+				RelativePath="..\SmartBody\src\sbm\sr_cmd_line.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_cmd_line.h"
+				RelativePath="..\SmartBody\src\sbm\sr_cmd_line.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_cmd_map.h"
+				RelativePath="..\SmartBody\src\sbm\sr_cmd_map.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_cmd_seq.cpp"
+				RelativePath="..\SmartBody\src\sbm\sr_cmd_seq.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_cmd_seq.h"
+				RelativePath="..\SmartBody\src\sbm\sr_cmd_seq.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_curve_builder.h"
+				RelativePath="..\SmartBody\src\sbm\sr_curve_builder.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_hash_map.cpp"
+				RelativePath="..\SmartBody\src\sbm\sr_hash_map.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_hash_map.h"
+				RelativePath="..\SmartBody\src\sbm\sr_hash_map.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_linear_curve.cpp"
+				RelativePath="..\SmartBody\src\sbm\sr_linear_curve.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_linear_curve.h"
+				RelativePath="..\SmartBody\src\sbm\sr_linear_curve.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_path_list.cpp"
+				RelativePath="..\SmartBody\src\sbm\sr_path_list.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_path_list.h"
+				RelativePath="..\SmartBody\src\sbm\sr_path_list.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_spline_curve.cpp"
+				RelativePath="..\SmartBody\src\sbm\sr_spline_curve.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_spline_curve.h"
+				RelativePath="..\SmartBody\src\sbm\sr_spline_curve.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_synch_points.cpp"
+				RelativePath="..\SmartBody\src\sbm\sr_synch_points.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\sr_synch_points.h"
+				RelativePath="..\SmartBody\src\sbm\sr_synch_points.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\text_speech.cpp"
+				RelativePath="..\SmartBody\src\sbm\text_speech.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\text_speech.h"
+				RelativePath="..\SmartBody\src\sbm\text_speech.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\time_profiler.cpp"
+				RelativePath="..\SmartBody\src\sbm\time_profiler.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\time_profiler.h"
+				RelativePath="..\SmartBody\src\sbm\time_profiler.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\time_regulator.cpp"
+				RelativePath="..\SmartBody\src\sbm\time_regulator.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\time_regulator.h"
+				RelativePath="..\SmartBody\src\sbm\time_regulator.h"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\xercesc_utils.cpp"
+				RelativePath="..\SmartBody\src\sbm\xercesc_utils.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\smartbody-lib\src\sbm\xercesc_utils.hpp"
+				RelativePath="..\SmartBody\src\sbm\xercesc_utils.hpp"
 				>
 			</File>
 			<Filter
 				Name="GPU"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\GPU\SbmDeformableMeshGPU.cpp"
+					RelativePath="..\SmartBody\src\sbm\GPU\SbmDeformableMeshGPU.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\GPU\SbmDeformableMeshGPU.h"
+					RelativePath="..\SmartBody\src\sbm\GPU\SbmDeformableMeshGPU.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\GPU\SbmShader.cpp"
+					RelativePath="..\SmartBody\src\sbm\GPU\SbmShader.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\GPU\SbmShader.h"
+					RelativePath="..\SmartBody\src\sbm\GPU\SbmShader.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\GPU\SbmTexture.cpp"
+					RelativePath="..\SmartBody\src\sbm\GPU\SbmTexture.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\GPU\SbmTexture.h"
+					RelativePath="..\SmartBody\src\sbm\GPU\SbmTexture.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\GPU\TBOData.cpp"
+					RelativePath="..\SmartBody\src\sbm\GPU\TBOData.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\GPU\TBOData.h"
+					RelativePath="..\SmartBody\src\sbm\GPU\TBOData.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\GPU\VBOData.cpp"
+					RelativePath="..\SmartBody\src\sbm\GPU\VBOData.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\GPU\VBOData.h"
+					RelativePath="..\SmartBody\src\sbm\GPU\VBOData.h"
 					>
 				</File>
 				<Filter
 					Name="gfx"
 					>
 					<File
-						RelativePath="..\smartbody-lib\src\sbm\GPU\gfx\mat2.h"
+						RelativePath="..\SmartBody\src\sbm\GPU\gfx\mat2.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sbm\GPU\gfx\mat3.h"
+						RelativePath="..\SmartBody\src\sbm\GPU\gfx\mat3.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sbm\GPU\gfx\mat4.h"
+						RelativePath="..\SmartBody\src\sbm\GPU\gfx\mat4.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sbm\GPU\gfx\vec2.h"
+						RelativePath="..\SmartBody\src\sbm\GPU\gfx\vec2.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sbm\GPU\gfx\vec3.h"
+						RelativePath="..\SmartBody\src\sbm\GPU\gfx\vec3.h"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sbm\GPU\gfx\vec4.h"
+						RelativePath="..\SmartBody\src\sbm\GPU\gfx\vec4.h"
 						>
 					</File>
 				</Filter>
@@ -3511,11 +3511,11 @@
 					Name="shaderFiles"
 					>
 					<File
-						RelativePath="..\smartbody-lib\src\sbm\GPU\shaderFiles\fs_skin_render.frag"
+						RelativePath="..\SmartBody\src\sbm\GPU\shaderFiles\fs_skin_render.frag"
 						>
 					</File>
 					<File
-						RelativePath="..\smartbody-lib\src\sbm\GPU\shaderFiles\vs_skin_pos.vert"
+						RelativePath="..\SmartBody\src\sbm\GPU\shaderFiles\vs_skin_pos.vert"
 						>
 					</File>
 				</Filter>
@@ -3524,11 +3524,11 @@
 				Name="Physics"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\ODEPhysicsSim.cpp"
+					RelativePath="..\SmartBody\src\sbm\ODEPhysicsSim.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\ODEPhysicsSim.h"
+					RelativePath="..\SmartBody\src\sbm\ODEPhysicsSim.h"
 					>
 				</File>
 			</Filter>
@@ -3536,19 +3536,19 @@
 				Name="steering"
 				>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\SteerPath.cpp"
+					RelativePath="..\SmartBody\src\sbm\SteerPath.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\SteerPath.h"
+					RelativePath="..\SmartBody\src\sbm\SteerPath.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\SteerSuiteEngineDriver.h"
+					RelativePath="..\SmartBody\src\sbm\SteerSuiteEngineDriver.h"
 					>
 				</File>
 				<File
-					RelativePath="..\smartbody-lib\src\sbm\SteerSuiteEnginerDriver.cpp"
+					RelativePath="..\SmartBody\src\sbm\SteerSuiteEnginerDriver.cpp"
 					>
 				</File>
 			</Filter>
