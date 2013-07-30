@@ -52,6 +52,7 @@ that is distributed: */
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Choice.H>
+#include "../flu/Flu_Collapsable_Group.h"
 
 class SBObject;
 
@@ -95,7 +96,10 @@ public:
 	bool dirty;
 	std::map<std::string, Fl_Widget*> widgetMap;
 	std::map<Fl_Widget*, std::string> reverseWidgetMap;
+	std::map<std::string, Flu_Collapsable_Group*> widgetGroupMap;
+	std::map<Fl_Widget*, std::string> reverseWidgetGroupMap;
 	Fl_Scroll* mainGroup;
+	Fl_Pack* mainPack;
 	int _offset;
 };
 

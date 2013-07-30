@@ -62,7 +62,7 @@ struct prioritySort
 {
   bool operator()(SBAttributeGroup* a, SBAttributeGroup* b)
   {
-	  return a->getName() < b->getName();
+	  return a->getPriority() < b->getPriority();
   }
 };
 
@@ -76,11 +76,8 @@ void SBAttributeManager::resortGroups()
 		m_groupsByPriority.push_back((*iter).second);
 	}
 
-	// for now, sort alphabetically and then assign the priority numbers later
-	// in the future, set the priority manually
 	std::sort(m_groupsByPriority.begin(), m_groupsByPriority.end(), prioritySort());
-	for (size_t g = 0; g < m_groupsByPriority.size(); g++)
-		m_groupsByPriority[g]->setPriority(g);
+	
 }
 
 std::map<std::string, SBAttributeGroup*>& SBAttributeManager::getGroups()

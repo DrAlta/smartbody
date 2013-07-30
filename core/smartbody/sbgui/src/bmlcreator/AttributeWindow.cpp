@@ -49,6 +49,7 @@ that is distributed: */
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Roller.H>
 #include <FL/Fl_Slider.H>
+#include <FL/Fl_Pack.H>
 #include <FL/Fl_Float_Input.H>
 #include <limits>
 #include <algorithm>
@@ -57,6 +58,7 @@ that is distributed: */
 #include <sb/SBAttribute.h>
 #include <sb/SBAttributeManager.h>
 #include "TextEditor.h"
+#include "../flu/Flu_Collapsable_Group.h"
 
 #ifndef WIN32
 #define _strdup strdup
@@ -70,12 +72,14 @@ AttributeWindow::AttributeWindow(SmartBody::SBObject* obj, int x, int y, int w, 
 	setOffset(100);
 	setObject(obj);
 	this->begin();		
-		mainGroup = new Fl_Scroll( x + 10,  y + 10, w -20, h -20);	
+		mainGroup = new Fl_Scroll( x + 10,  y + 10, w - 20, h - 20);	
 		//mainGroup->label(s);
 		mainGroup->type(Fl_Scroll::VERTICAL_ALWAYS);
 		if (upDownBox)
 			mainGroup->box(FL_UP_BOX);
 		mainGroup->begin();
+		mainPack = new Fl_Pack(x + 10, y + 10,  w - 20, h - 20, "");
+		mainGroup->add(mainPack);
 		mainGroup->end();
 	if (upDownBox)
 		this->box(FL_DOWN_BOX);
@@ -195,6 +199,15 @@ void AttributeWindow::setAttributeInfo(Fl_Widget* widget, SmartBody::SBAttribute
 	}
 }
 
+bool AttributeGroupPriorityPredicate(const SmartBody::SBAttributeGroup* d1, const SmartBody::SBAttributeGroup* d2)
+{
+	SmartBody::SBAttributeGroup* a = const_cast<SmartBody::SBAttributeGroup*>(d1);
+	SmartBody::SBAttributeGroup* b = const_cast<SmartBody::SBAttributeGroup*>(d2);
+
+	return a->getPriority() > b->getPriority();
+}
+
+
 bool AttributePriorityPredicate(const SmartBody::SBAttribute* d1, const SmartBody::SBAttribute* d2)
 {
 	SmartBody::SBAttribute* a = const_cast<SmartBody::SBAttribute*>(d1);
@@ -217,6 +230,7 @@ bool AttributePriorityPredicate(const SmartBody::SBAttribute* d1, const SmartBod
 
 void AttributeWindow::reorderAttributes()
 {
+	/*
 	std::vector<SmartBody::SBAttribute*> list;
 	std::map<std::string, SmartBody::SBAttribute*>& attributes = object->getAttributeList();
 	for (std::map<std::string, SmartBody::SBAttribute*>::iterator iter = attributes.begin();
@@ -259,15 +273,15 @@ void AttributeWindow::reorderAttributes()
 				numOutOfOrder++;
 			}
 			childNum++;
-			/*
-			int curY = widget->y();
-			if (curY != startY) // make sure the widget is in the right place
-			{
-				widget->y(startY);
-				numOutOfOrder++;
-			}
-			startY += widgetHeight;
-			*/
+			
+			//int curY = widget->y();
+			//if (curY != startY) // make sure the widget is in the right place
+			//{
+			//	widget->y(startY);
+			//	numOutOfOrder++;
+			//}
+			//startY += widgetHeight;
+			
 		}
 	}
 
@@ -276,35 +290,15 @@ void AttributeWindow::reorderAttributes()
 		this->dirty = true;
 		this->damage(1);
 	}
+	*/
 }
 
 void AttributeWindow::draw()
 {
 	if (dirty) 
 	{
-		std::vector<SmartBody::SBAttributeGroup*>& attributeGroups = object->getAttributeManager()->getAttributeGroups();
-		for (size_t g = 0; g < attributeGroups.size(); g++)
-		{
-		}
-
-
 		int widgetHeight = 25;
-		int startY = 10 + widgetHeight * widgetMap.size(); // start position for the next widget to be added
-		std::map<std::string, SmartBody::SBAttribute*>& attributes = object->getAttributeList();
 		
-		// sort the attribute list by priority
-		std::vector<SmartBody::SBAttribute*> sortedAttributes;
-		for (std::map<std::string, SmartBody::SBAttribute*>::iterator iter = attributes.begin();
-			iter != attributes.end();
-			iter++)
-		{
-			if (!iter->second->getAttributeInfo()->getHidden())
-				sortedAttributes.push_back(iter->second);
-		}
-
-		std::sort(sortedAttributes.begin(), sortedAttributes.end(), AttributePriorityPredicate);
-
-		// compare the existing sorted attribute list to the widget list
 		std::map<std::string, int> attributeStatus;
 		for (std::map<std::string, Fl_Widget*>::iterator mapIter = widgetMap.begin();
 			 mapIter != widgetMap.end();
@@ -312,299 +306,428 @@ void AttributeWindow::draw()
 		{
 			attributeStatus[mapIter->first] = 0;
 		}
-		
-		for (std::vector<SmartBody::SBAttribute*>::iterator iter = sortedAttributes.begin();
-			iter != sortedAttributes.end();
-			iter++)
+
+		std::map<std::string, int> attributeGroupStatus;
+		for (std::map<std::string, Flu_Collapsable_Group*>::iterator mapGroupIter = widgetGroupMap.begin();
+			 mapGroupIter != widgetGroupMap.end();
+			 mapGroupIter++)
 		{
-			SmartBody::SBAttribute* attr = (*iter);
-			std::string name = (*iter)->getName();
-			std::map<std::string, Fl_Widget*>::iterator mapIter = widgetMap.find(name);
-								
-			if (mapIter == widgetMap.end()) // widget not found, create it
+			attributeGroupStatus[mapGroupIter->first] = 0;
+		}
+
+		std::vector<SmartBody::SBAttributeGroup*> sortedAttributeGroups;
+		std::vector<SmartBody::SBAttributeGroup*>& attributeGroups = object->getAttributeManager()->getAttributeGroups();
+		for (size_t g = 0; g < attributeGroups.size(); g++)
+		{
+			sortedAttributeGroups.push_back(attributeGroups[g]);
+		}
+		std::sort(attributeGroups.begin(), attributeGroups.end(), AttributeGroupPriorityPredicate);
+		
+		int startY = 10;
+
+		// now we have the sorted attribute groups, get the attributes for each group and sort and display them accordingly
+		for (size_t g = 0; g < sortedAttributeGroups.size(); g++)
+		{
+			SmartBody::SBAttributeGroup* attributeGroup = sortedAttributeGroups[g];
+			
+			// get the attributes associated with that attribute group
+			std::map<std::string, SmartBody::SBAttribute*>& attributes = attributeGroup->getAttributes();
+			// sort the attribute list by priority
+			std::vector<SmartBody::SBAttribute*> sortedAttributes;
+			for (std::map<std::string, SmartBody::SBAttribute*>::iterator iter = attributes.begin();
+				iter != attributes.end();
+				iter++)
 			{
-				attributeStatus[name] = 2; // attribute widget created
+				if (!iter->second->getAttributeInfo()->getHidden())
+					sortedAttributes.push_back(iter->second);
+			}
 
-				SmartBody::SBAttributeInfo* attrInfo = attr->getAttributeInfo();
-
-				// action -> button
-				SmartBody::ActionAttribute* actionAttr = dynamic_cast<SmartBody::ActionAttribute*>(attr);
-				if (actionAttr) 
-				{
-					actionAttr->registerObserver(this);
-					Fl_Button* button = new Fl_Button(mainGroup->x() + _offset, mainGroup->y() + startY, 40, 20, _strdup(name.c_str()));
-					if (attrInfo->getDescription() != "")
-						button->tooltip(_strdup(attrInfo->getDescription().c_str()));
-					button->align(FL_ALIGN_LEFT);
-					startY += widgetHeight; // make sure the next widget starts lower
-					button->callback(ActionCB, this);
-					setAttributeInfo(button, attrInfo);
-					mainGroup->add(button);
-					widgetMap[name] = button;
-					reverseWidgetMap[button] = name;
-					continue;
-				}
-				// bool -> checkbox
-				SmartBody::BoolAttribute* boolAttr = dynamic_cast<SmartBody::BoolAttribute*>(attr);
-				if (boolAttr) 
-				{
-					boolAttr->registerObserver(this);
-					Fl_Check_Button* check = new Fl_Check_Button(mainGroup->x() + _offset, mainGroup->y() + startY, 150, 20, _strdup(name.c_str()));
-					if (attrInfo->getDescription() != "")
-						check->tooltip(_strdup(attrInfo->getDescription().c_str()));
-					check->align(FL_ALIGN_LEFT);
-					check->value(boolAttr->getValue());
-					startY += widgetHeight; // make sure the next widget starts lower
-					check->callback(BoolCB, this);
-					setAttributeInfo(check, attrInfo);
-					mainGroup->add(check);
-					widgetMap[name] = check;
-					reverseWidgetMap[check] = name;
-					continue;
-				}
-				// int -> input
-				SmartBody::IntAttribute* intAttr = dynamic_cast<SmartBody::IntAttribute*>(attr);
-				if (intAttr) 
-				{
-					intAttr->registerObserver(this);
-					Fl_Group* intGroup = new Fl_Group(mainGroup->x() + 0, mainGroup->y() + startY, 300, 20);
-					intGroup->end();
-					intGroup->align(FL_ALIGN_LEFT);
-					Fl_Float_Input* input = new Fl_Float_Input(mainGroup->x() + _offset + 0, mainGroup->y() + startY, 60, 20, _strdup(name.c_str()));
-					if (attrInfo->getDescription() != "")
-						input->tooltip(_strdup(attrInfo->getDescription().c_str()));
-					std::stringstream str;
-					str << intAttr->getValue();
-					input->value(str.str().c_str());
-					input->callback(IntCB, this);
-					intGroup->add(input);
-					// show a wheel is there is no limit
-					// show a slider if there is a limit
-					if (intAttr->getMin() == -std::numeric_limits<int>::max() || 
-						intAttr->getMax() == std::numeric_limits<int>::max())
-					{
-						Fl_Roller* wheel = new Fl_Roller(mainGroup->x() + _offset + 70, mainGroup->y() + startY, 100, 20);
-						if (attrInfo->getDescription() != "")
-							wheel->tooltip(_strdup(attrInfo->getDescription().c_str()));
-						wheel->type(FL_HORIZONTAL);
-						wheel->step(1);
-						wheel->range(intAttr->getMin(), intAttr->getMax());
-						wheel->value(intAttr->getValue());
-						wheel->callback(IntCB, this);
-						intGroup->add(wheel);
-					}
-					else
-					{
-						Fl_Slider* slider = new Fl_Slider(mainGroup->x() + 70, mainGroup->y() + startY, 100, 20);
-						if (attrInfo->getDescription() != "")
-							slider->tooltip(_strdup(attrInfo->getDescription().c_str()));
-						//slider->type(Fl_Slider::Fl_Slider::LINEAR);
-						slider->step(1.0);
-						slider->range(intAttr->getMin(), intAttr->getMax());
-						slider->value(intAttr->getValue());
-						slider->callback(IntCB, this);
-						intGroup->add(slider);
-					}
-					
-					startY += widgetHeight; // make sure the next widget starts lower
-					
-					setAttributeInfo(input, attrInfo);
-					mainGroup->add(intGroup);
-					widgetMap[name] = intGroup;
-					reverseWidgetMap[intGroup] = name;
-					continue;
-				}
-				// double -> floatinput
-				SmartBody::DoubleAttribute* doubleAttr = dynamic_cast<SmartBody::DoubleAttribute*>(attr);
-				if (doubleAttr) 
-				{
-					doubleAttr->registerObserver(this);
-					Fl_Group* doubleGroup = new Fl_Group(mainGroup->x() + 0, mainGroup->y() + startY, 300, 20);
-					doubleGroup->end();
-					//doubleGroup->flags(FL_ALIGN_LEFT);
-					Fl_Float_Input* input = new Fl_Float_Input(mainGroup->x() +  _offset, mainGroup->y() + startY, 60, 20, _strdup(name.c_str()));
-					if (attrInfo->getDescription() != "")
-						input->tooltip(_strdup(attrInfo->getDescription().c_str()));
-					std::stringstream strstr;
-					strstr << doubleAttr->getValue();
-					input->value(strstr.str().c_str());
-					input->callback(DoubleCB, this);
-					doubleGroup->add(input);
-					// show a wheel is there is no limit
-					// show a slider if there is a limit
-					if (doubleAttr->getMin() == -std::numeric_limits<double>::max() ||
-						doubleAttr->getMax() == std::numeric_limits<double>::max())
-					{
-						Fl_Roller* wheel = new Fl_Roller(mainGroup->x() + _offset + 70, mainGroup->y() + startY, 100, 20);
-						if (attrInfo->getDescription() != "")
-							wheel->tooltip(_strdup(attrInfo->getDescription().c_str()));
-						wheel->type(FL_HORIZONTAL);
-						wheel->step(.01);
-						wheel->range(doubleAttr->getMin(), doubleAttr->getMax());
-						wheel->value(doubleAttr->getValue());
-						wheel->callback(DoubleCB, this);
-						doubleGroup->add(wheel);
-					}
-					else
-					{
-						Fl_Slider* slider = new Fl_Slider(mainGroup->x() + 70, mainGroup->y() + startY, 100, 20);
-						if (attrInfo->getDescription() != "")
-							slider->tooltip(_strdup(attrInfo->getDescription().c_str()));
-						//slider->type(FL_LINEAR);
-						slider->step(.01);
-						slider->range(doubleAttr->getMin(), doubleAttr->getMax());
-						slider->value(doubleAttr->getValue());
-						slider->callback(DoubleCB, this);
-						doubleGroup->add(slider);
-					}
-					
-					startY += widgetHeight; // make sure the next widget starts lower
-					
-					setAttributeInfo(doubleGroup, attrInfo);
-					mainGroup->add(doubleGroup);
-					widgetMap[name] = doubleGroup;
-					reverseWidgetMap[doubleGroup] = name;
-					continue;
-				}
-				// string -> input, or string -> choice
-				SmartBody::StringAttribute* stringAttr = dynamic_cast<SmartBody::StringAttribute*>(attr);
-				if (stringAttr) 
-				{
-					stringAttr->registerObserver(this);
-					if (stringAttr->getValidValues().size() == 0)
-					{
-						Fl_Input* input = new Fl_Input(mainGroup->x() + _offset, mainGroup->y() + startY, 150, 20, _strdup(name.c_str()));
-						Fl_Button* edit = new Fl_Button(mainGroup->x() + _offset + 160, mainGroup->y() + startY, 20, 20, ".");
-						edit->tooltip(stringAttr->getName().c_str());
-						edit->callback(EditStringCB, stringAttr);
-						if (attrInfo->getDescription() != "")
-							input->tooltip(_strdup(attrInfo->getDescription().c_str()));
-						input->value(stringAttr->getValue().c_str());
-						startY += widgetHeight; // make sure the next widget starts lower
-						input->callback(StringCB, this);
-						mainGroup->add(input);
-						mainGroup->add(edit);
-						widgetMap[name] = input;
-						reverseWidgetMap[input] = name;
-					}
-					else
-					{
-						Fl_Choice* choice = new Fl_Choice(mainGroup->x() + _offset, mainGroup->y() + startY, 150, 20, _strdup(name.c_str()));
-						if (attrInfo->getDescription() != "")
-							choice->tooltip(_strdup(attrInfo->getDescription().c_str()));
-						// add all the options
-						choice->add("-----");
-						const std::vector<std::string>& values = stringAttr->getValidValues();
-						int selected = -1;
-						for (size_t i = 0; i < values.size(); i++)
-						{
-							addChoice(choice, values[i]);
-							if (stringAttr->getValue() == values[i])
-								choice->value(i + 1);
-						}
-						if (stringAttr->getValue() == "")
-							choice->value(0);
-						startY += widgetHeight; // make sure the next widget starts lower
-						choice->callback(StringCB, this);
-						mainGroup->add(choice);
-						widgetMap[name] = choice;
-						reverseWidgetMap[choice] = name;
-					}
-					continue;
-				}
-				// vec3 -> 3 float inputs
-				SmartBody::Vec3Attribute* vec3Attr = dynamic_cast<SmartBody::Vec3Attribute*>(attr);
-				if (vec3Attr) 
-				{
-					vec3Attr->registerObserver(this);
-					Fl_Group* vec3Group = new Fl_Group(mainGroup->x() + _offset, mainGroup->y() + startY, 200, 20, _strdup(name.c_str()));
-					vec3Group->align(FL_ALIGN_LEFT);
-					vec3Group->end();
-					if (attrInfo->getDescription() != "")
-						vec3Group->tooltip(_strdup(attrInfo->getDescription().c_str()));
-					//vec3Group->flags(FL_ALIGN_LEFT);
-					SrVec val = vec3Attr->getValue();
-					for (int c = 0; c < 3; c++)
-					{
-						Fl_Float_Input* finput = new Fl_Float_Input(mainGroup->x() + _offset + c * 50, mainGroup->y() +  startY, 60, 20);
-						if (attrInfo->getDescription() != "")
-							finput->tooltip(_strdup(attrInfo->getDescription().c_str()));
-						std::stringstream strstr;
-						strstr << val[c];
-						finput->value(strstr.str().c_str());
-						finput->callback(Vec3CB, this);
-						vec3Group->add(finput);
-					}						
-					startY += widgetHeight; // make sure the next widget starts lower
-					setAttributeInfo(vec3Group, attrInfo);
-					mainGroup->add(vec3Group);
-					widgetMap[name] = vec3Group;
-					reverseWidgetMap[vec3Group] = name;
-					continue;
-				}
+			// check to see if this group widget exists
+			Flu_Collapsable_Group* attGroupWidget = NULL;
+			std::string groupName = "group_";
+			groupName += attributeGroup->getName();
+			std::map<std::string, Flu_Collapsable_Group*>::iterator mapGroupIter = widgetGroupMap.find(groupName);
+			if (mapGroupIter == widgetGroupMap.end()) // widget not found, create it
+			{
+				attributeGroupStatus[groupName] = 2; // attribute group widget created
+				attGroupWidget = new Flu_Collapsable_Group(mainPack->x() + 10, mainPack->y() + startY, mainPack->w() - 50, 25 * sortedAttributes.size() + 20, attributeGroup->getName().c_str());
+				attGroupWidget->collapse_time(.05f);
+				mainPack->add(attGroupWidget);
+				widgetGroupMap[groupName] = attGroupWidget;
+				reverseWidgetGroupMap[attGroupWidget] = groupName;
 			}
 			else
 			{
-				attributeStatus[mapIter->first] = 1; // attribute widget found
+				attributeGroupStatus[mapGroupIter->first] = 1;
+				attGroupWidget = (*mapGroupIter).second;
+			}
+			
+			startY += 25 * sortedAttributes.size() + 20;
+	
+			int localY = 20;
+			std::sort(sortedAttributes.begin(), sortedAttributes.end(), AttributePriorityPredicate);
+			for (std::vector<SmartBody::SBAttribute*>::iterator iter = sortedAttributes.begin();
+				iter != sortedAttributes.end();
+				iter++)
+			{
+				SmartBody::SBAttribute* attr = (*iter);
+				std::string name = (*iter)->getName();
 
-				// check the string widgets to make sure that the valid values haven't changes
-				SmartBody::StringAttribute* stringAttr = dynamic_cast<SmartBody::StringAttribute*>(attr);
-				if (stringAttr) 
+				std::map<std::string, Fl_Widget*>::iterator mapIter = widgetMap.find(name);
+								
+				if (mapIter == widgetMap.end()) // widget not found, create it
 				{
-					const std::vector<std::string>& validValues = stringAttr->getValidValues();
-					if (validValues.size() > 0)
+					attributeStatus[name] = 2; // attribute widget created
+					SmartBody::SBAttributeInfo* attrInfo = attr->getAttributeInfo();
+
+					// action -> button
+					SmartBody::ActionAttribute* actionAttr = dynamic_cast<SmartBody::ActionAttribute*>(attr);
+					if (actionAttr) 
 					{
-						bool resetChoiceList = false;
-						Fl_Choice* choice = dynamic_cast<Fl_Choice*>(mapIter->second);
-						if (choice)
+						actionAttr->registerObserver(this);
+						Fl_Button* button = new Fl_Button(attGroupWidget->x() + _offset, attGroupWidget->y() + localY, 40, 20, _strdup(name.c_str()));
+						if (attrInfo->getDescription() != "")
+							button->tooltip(_strdup(attrInfo->getDescription().c_str()));
+						button->align(FL_ALIGN_LEFT);
+						localY += widgetHeight; // make sure the next widget starts lower
+						button->callback(ActionCB, this);
+						setAttributeInfo(button, attrInfo);
+						attGroupWidget->add(button);
+						widgetMap[name] = button;
+						reverseWidgetMap[button] = name;
+						continue;
+					}
+					// bool -> checkbox
+					SmartBody::BoolAttribute* boolAttr = dynamic_cast<SmartBody::BoolAttribute*>(attr);
+					if (boolAttr) 
+					{
+						boolAttr->registerObserver(this);
+						Fl_Check_Button* check = new Fl_Check_Button(attGroupWidget->x() + _offset, attGroupWidget->y() + localY, 150, 20, _strdup(name.c_str()));
+						if (attrInfo->getDescription() != "")
+							check->tooltip(_strdup(attrInfo->getDescription().c_str()));
+						check->align(FL_ALIGN_LEFT);
+						check->value(boolAttr->getValue());
+						localY += widgetHeight; // make sure the next widget starts lower
+						check->callback(BoolCB, this);
+						setAttributeInfo(check, attrInfo);
+
+						attGroupWidget->add(check);
+
+						widgetMap[name] = check;
+						reverseWidgetMap[check] = name;
+						continue;
+					}
+					// int -> input
+					SmartBody::IntAttribute* intAttr = dynamic_cast<SmartBody::IntAttribute*>(attr);
+					if (intAttr) 
+					{
+						intAttr->registerObserver(this);
+						Fl_Group* intGroup = new Fl_Group(attGroupWidget->x() + 0, attGroupWidget->y() + localY, 300, 20);
+						intGroup->end();
+						intGroup->align(FL_ALIGN_LEFT);
+						Fl_Float_Input* input = new Fl_Float_Input(attGroupWidget->x() + _offset + 0, attGroupWidget->y() + localY, 60, 20, _strdup(name.c_str()));
+						if (attrInfo->getDescription() != "")
+							input->tooltip(_strdup(attrInfo->getDescription().c_str()));
+						std::stringstream str;
+						str << intAttr->getValue();
+						input->value(str.str().c_str());
+						input->callback(IntCB, this);
+						intGroup->add(input);
+						// show a wheel is there is no limit
+						// show a slider if there is a limit
+						if (intAttr->getMin() == -std::numeric_limits<int>::max() || 
+							intAttr->getMax() == std::numeric_limits<int>::max())
 						{
-							if (validValues.size() != choice->size())
+							Fl_Roller* wheel = new Fl_Roller(attGroupWidget->x() + _offset + 70, attGroupWidget->y() + localY, 100, 20);
+							if (attrInfo->getDescription() != "")
+								wheel->tooltip(_strdup(attrInfo->getDescription().c_str()));
+							wheel->type(FL_HORIZONTAL);
+							wheel->step(1);
+							wheel->range(intAttr->getMin(), intAttr->getMax());
+							wheel->value(intAttr->getValue());
+							wheel->callback(IntCB, this);
+							intGroup->add(wheel);
+						}
+						else
+						{
+							Fl_Slider* slider = new Fl_Slider(attGroupWidget->x() + 70, attGroupWidget->y() + localY, 100, 20);
+							if (attrInfo->getDescription() != "")
+								slider->tooltip(_strdup(attrInfo->getDescription().c_str()));
+							//slider->type(Fl_Slider::Fl_Slider::LINEAR);
+							slider->step(1.0);
+							slider->range(intAttr->getMin(), intAttr->getMax());
+							slider->value(intAttr->getValue());
+							slider->callback(IntCB, this);
+							intGroup->add(slider);
+						}
+					
+						localY += widgetHeight; // make sure the next widget starts lower
+					
+						setAttributeInfo(input, attrInfo);
+						attGroupWidget->add(intGroup);
+						widgetMap[name] = intGroup;
+						reverseWidgetMap[intGroup] = name;
+						continue;
+					}
+					// double -> floatinput
+					SmartBody::DoubleAttribute* doubleAttr = dynamic_cast<SmartBody::DoubleAttribute*>(attr);
+					if (doubleAttr) 
+					{
+						doubleAttr->registerObserver(this);
+						Fl_Group* doubleGroup = new Fl_Group(attGroupWidget->x() + 0, attGroupWidget->y() + localY, 300, 20);
+						doubleGroup->end();
+						//doubleGroup->flags(FL_ALIGN_LEFT);
+						Fl_Float_Input* input = new Fl_Float_Input(attGroupWidget->x() +  _offset, attGroupWidget->y() + localY, 60, 20, _strdup(name.c_str()));
+						if (attrInfo->getDescription() != "")
+							input->tooltip(_strdup(attrInfo->getDescription().c_str()));
+						std::stringstream strstr;
+						strstr << doubleAttr->getValue();
+						input->value(strstr.str().c_str());
+						input->callback(DoubleCB, this);
+						doubleGroup->add(input);
+						// show a wheel is there is no limit
+						// show a slider if there is a limit
+						if (doubleAttr->getMin() == -std::numeric_limits<double>::max() ||
+							doubleAttr->getMax() == std::numeric_limits<double>::max())
+						{
+							Fl_Roller* wheel = new Fl_Roller(attGroupWidget->x() + _offset + 70, attGroupWidget->y() + localY, 100, 20);
+							if (attrInfo->getDescription() != "")
+								wheel->tooltip(_strdup(attrInfo->getDescription().c_str()));
+							wheel->type(FL_HORIZONTAL);
+							wheel->step(.01);
+							wheel->range(doubleAttr->getMin(), doubleAttr->getMax());
+							wheel->value(doubleAttr->getValue());
+							wheel->callback(DoubleCB, this);
+							doubleGroup->add(wheel);
+						}
+						else
+						{
+							Fl_Slider* slider = new Fl_Slider(attGroupWidget->x() + 70, attGroupWidget->y() + localY, 100, 20);
+							if (attrInfo->getDescription() != "")
+								slider->tooltip(_strdup(attrInfo->getDescription().c_str()));
+							//slider->type(FL_LINEAR);
+							slider->step(.01);
+							slider->range(doubleAttr->getMin(), doubleAttr->getMax());
+							slider->value(doubleAttr->getValue());
+							slider->callback(DoubleCB, this);
+							doubleGroup->add(slider);
+						}
+					
+						localY += widgetHeight; // make sure the next widget starts lower
+					
+						setAttributeInfo(doubleGroup, attrInfo);
+						attGroupWidget->add(doubleGroup);
+						widgetMap[name] = doubleGroup;
+						reverseWidgetMap[doubleGroup] = name;
+						continue;
+					}
+					// string -> input, or string -> choice
+					SmartBody::StringAttribute* stringAttr = dynamic_cast<SmartBody::StringAttribute*>(attr);
+					if (stringAttr) 
+					{
+						stringAttr->registerObserver(this);
+						if (stringAttr->getValidValues().size() == 0)
+						{
+							Fl_Input* input = new Fl_Input(attGroupWidget->x() + _offset, attGroupWidget->y() + localY, 150, 20, _strdup(name.c_str()));
+							Fl_Button* edit = new Fl_Button(attGroupWidget->x() + _offset + 160, attGroupWidget->y() + localY, 20, 20, ".");
+							edit->tooltip(stringAttr->getName().c_str());
+							edit->callback(EditStringCB, stringAttr);
+							if (attrInfo->getDescription() != "")
+								input->tooltip(_strdup(attrInfo->getDescription().c_str()));
+							input->value(stringAttr->getValue().c_str());
+							localY += widgetHeight; // make sure the next widget starts lower
+							input->callback(StringCB, this);
+							attGroupWidget->add(input);
+							attGroupWidget->add(edit);
+							widgetMap[name] = input;
+							reverseWidgetMap[input] = name;
+						}
+						else
+						{
+							Fl_Choice* choice = new Fl_Choice(attGroupWidget->x() + _offset, attGroupWidget->y() + localY, 150, 20, _strdup(name.c_str()));
+							if (attrInfo->getDescription() != "")
+								choice->tooltip(_strdup(attrInfo->getDescription().c_str()));
+							// add all the options
+							choice->add("-----");
+							const std::vector<std::string>& values = stringAttr->getValidValues();
+							int selected = -1;
+							for (size_t i = 0; i < values.size(); i++)
 							{
-								resetChoiceList = true;
+								addChoice(choice, values[i]);
+								if (stringAttr->getValue() == values[i])
+									choice->value(i + 1);
 							}
-							else 
+							if (stringAttr->getValue() == "")
+								choice->value(0);
+							localY += widgetHeight; // make sure the next widget starts lower
+							choice->callback(StringCB, this);
+							attGroupWidget->add(choice);
+							widgetMap[name] = choice;
+							reverseWidgetMap[choice] = name;
+						}
+						continue;
+					}
+					// vec3 -> 3 float inputs
+					SmartBody::Vec3Attribute* vec3Attr = dynamic_cast<SmartBody::Vec3Attribute*>(attr);
+					if (vec3Attr) 
+					{
+						vec3Attr->registerObserver(this);
+						Fl_Group* vec3Group = new Fl_Group(attGroupWidget->x() + _offset, attGroupWidget->y() + localY, 200, 20, _strdup(name.c_str()));
+						vec3Group->align(FL_ALIGN_LEFT);
+						vec3Group->end();
+						if (attrInfo->getDescription() != "")
+							vec3Group->tooltip(_strdup(attrInfo->getDescription().c_str()));
+						//vec3Group->flags(FL_ALIGN_LEFT);
+						SrVec val = vec3Attr->getValue();
+						for (int c = 0; c < 3; c++)
+						{
+							Fl_Float_Input* finput = new Fl_Float_Input(attGroupWidget->x() + _offset + c * 50, attGroupWidget->y() +  localY, 60, 20);
+							if (attrInfo->getDescription() != "")
+								finput->tooltip(_strdup(attrInfo->getDescription().c_str()));
+							std::stringstream strstr;
+							strstr << val[c];
+							finput->value(strstr.str().c_str());
+							finput->callback(Vec3CB, this);
+							vec3Group->add(finput);
+						}						
+						localY += widgetHeight; // make sure the next widget starts lower
+						setAttributeInfo(vec3Group, attrInfo);
+						attGroupWidget->add(vec3Group);
+						widgetMap[name] = vec3Group;
+						reverseWidgetMap[vec3Group] = name;
+						continue;
+					}
+				}
+				else
+				{
+					attributeStatus[mapIter->first] = 1; // attribute widget found
+
+					// check the string widgets to make sure that the valid values haven't changes
+					SmartBody::StringAttribute* stringAttr = dynamic_cast<SmartBody::StringAttribute*>(attr);
+					if (stringAttr) 
+					{
+						const std::vector<std::string>& validValues = stringAttr->getValidValues();
+						if (validValues.size() > 0)
+						{
+							bool resetChoiceList = false;
+							Fl_Choice* choice = dynamic_cast<Fl_Choice*>(mapIter->second);
+							if (choice)
 							{
-								for (int c = 0; c < choice->size(); c++)
+								if (validValues.size() != choice->size())
 								{
-									if (validValues[c] != choice->menu()[c].label())
+									resetChoiceList = true;
+								}
+								else 
+								{
+									for (int c = 0; c < choice->size(); c++)
 									{
-										resetChoiceList = true;
-										break;
+										if (validValues[c] != choice->menu()[c].label())
+										{
+											resetChoiceList = true;
+											break;
+										}
 									}
 								}
-							}
-							if (resetChoiceList)
-							{
-								for (int c = choice->size() - 1; c >= 0; c--)
+								if (resetChoiceList)
 								{
-									choice->remove(c);
+									for (int c = choice->size() - 1; c >= 0; c--)
+									{
+										choice->remove(c);
+									}
+									choice->add("-----");
+									for (size_t i = 0; i < validValues.size(); i++)
+									{
+										addChoice(choice, validValues[i]);
+										if (stringAttr->getValue() == validValues[i])
+											choice->value(i + 1);
+									}
+									if (stringAttr->getValue() == "")
+										choice->value(0);
+									choice->callback(StringCB, this); // is this necessary?
 								}
-								choice->add("-----");
-								for (size_t i = 0; i < validValues.size(); i++)
-								{
-									addChoice(choice, validValues[i]);
-									if (stringAttr->getValue() == validValues[i])
-										choice->value(i + 1);
-								}
-								if (stringAttr->getValue() == "")
-									choice->value(0);
-								choice->callback(StringCB, this); // is this necessary?
 							}
 						}
 					}
 				}
+				
 			}
+			
 		}
-
+		
+		
 		// remove any unused attributes
+		std::vector<std::string> attrToDelete;
 		for (std::map<std::string, Fl_Widget*>::iterator mapIter = widgetMap.begin();
 			 mapIter != widgetMap.end();
 			 mapIter++)
 		{
 			if (attributeStatus[mapIter->first] == 0) 
 			{
-				mainGroup->remove(mapIter->second);
+				// find the group widget
+				std::string groupName = "group_";
+				// get the attribute
+				SmartBody::SBAttribute* attribute = getObject()->getAttribute(mapIter->first);
+				if (attribute)
+				{
+					SmartBody::SBAttributeGroup* group = attribute->getAttributeInfo()->getGroup();
+					if (group)
+					{
+						groupName += group->getName();
+						std::map<std::string, Flu_Collapsable_Group*>::iterator groupIter = widgetGroupMap.find(group->getName());
+						if (groupIter != widgetGroupMap.end())
+						{
+							Flu_Collapsable_Group* group = (*groupIter).second;
+							Fl_Widget* widget = (*mapIter).second;
+							group->remove(*widget);
+						}
+						attrToDelete.push_back(mapIter->first);
+					}
+				}				
 			}
+		}
+
+		for (size_t d = 0; d < attrToDelete.size(); d++)
+		{
+			std::map<std::string, Fl_Widget*>::iterator mapIter = widgetMap.find(attrToDelete[d]);
+			if (mapIter != widgetMap.end())
+				widgetMap.erase(mapIter);
+		}
+
+		// remove any unused groups attributes
+		std::vector<std::string> groupToDelete;
+		for (std::map<std::string, Flu_Collapsable_Group*>::iterator mapGroupIter = widgetGroupMap.begin();
+			 mapGroupIter != widgetGroupMap.end();
+			 mapGroupIter++)
+		{
+			if (attributeGroupStatus[mapGroupIter->first] == 0) 
+			{
+				// find the group widget
+				std::string groupName = "group_";
+				// get the attribute
+				SmartBody::SBAttribute* attribute = getObject()->getAttribute(mapGroupIter->first);
+				if (attribute)
+				{
+					SmartBody::SBAttributeGroup* group = attribute->getAttributeInfo()->getGroup();
+					if (group)
+					{
+						groupName += group->getName();
+						std::map<std::string, Flu_Collapsable_Group*>::iterator groupIter = widgetGroupMap.find(group->getName());
+						if (groupIter != widgetGroupMap.end())
+						{
+							widgetGroupMap.erase(groupIter);
+							groupToDelete.push_back(mapGroupIter->first);
+						}
+
+					}
+				}
+			}
+		}
+
+		for (size_t d = 0; d < groupToDelete.size(); d++)
+		{
+			std::map<std::string, Flu_Collapsable_Group*>::iterator mapGroupIter = widgetGroupMap.find(groupToDelete[d]);
+			if (mapGroupIter != widgetGroupMap.end())
+				widgetGroupMap.erase(mapGroupIter);
 		}
 
 		reorderAttributes();
@@ -1091,10 +1214,22 @@ void AttributeWindow::notify(SmartBody::SBSubject* subject)
 				if (!input)
 				{ // widget used to be a list of values, so erase that widget and have it remade automatically
 					// remove the widget from the attribute window
-					mainGroup->remove(*(iter->second));
-					// remove the widget from the attribute map
-					widgetMap.erase(iter);
-					dirty = true;
+					// find the group widget
+					std::string groupName = "group_";
+					SmartBody::SBAttributeGroup* group = sattr->getAttributeInfo()->getGroup();
+					if (group)
+					{
+						groupName += group->getName();
+						std::map<std::string, Flu_Collapsable_Group*>::iterator groupIter = widgetGroupMap.find(group->getName());
+						if (groupIter != widgetGroupMap.end())
+						{
+							Flu_Collapsable_Group* group = (*groupIter).second;
+							group->remove(*widget);
+							// remove the widget from the attribute map
+							widgetMap.erase(iter);
+							dirty = true;
+						}
+					}
 					return;
 				}
 				input->value(sattr->getValue().c_str());
@@ -1106,10 +1241,22 @@ void AttributeWindow::notify(SmartBody::SBSubject* subject)
 				if (!choice)
 				{ // widget used to be an input, so erase that widget and have it remade automatically
 					// remove the widget from the attribute window
-					mainGroup->remove(*(iter->second));
-					// remove the widget from the attribute map
-					widgetMap.erase(iter);
-					dirty = true;
+					SmartBody::SBAttributeGroup* group = sattr->getAttributeInfo()->getGroup();
+					if (group)
+					{
+						std::string groupName = "group_";
+						groupName += group->getName();
+						std::map<std::string, Flu_Collapsable_Group*>::iterator groupIter = widgetGroupMap.find(group->getName());
+						if (groupIter != widgetGroupMap.end())
+						{
+							Flu_Collapsable_Group* group = (*groupIter).second;
+							group->remove(*widget);
+							// remove the widget from the attribute map
+							widgetMap.erase(iter);
+							dirty = true;
+						}
+					}
+
 					return;
 				}
 				// check to see if the choice list needs to be reset
@@ -1201,7 +1348,9 @@ void AttributeWindow::cleanUpWidgets()
 		mainGroup->remove(mi->second);
 	}
 	widgetMap.clear();
-	reverseWidgetMap.clear();	
+	reverseWidgetMap.clear();
+	widgetGroupMap.clear();
+	reverseWidgetGroupMap.clear();
 }
 
 void AttributeWindow::addChoice(Fl_Choice* choice, const std::string& val)

@@ -361,6 +361,25 @@ IntAttribute* SBObject::createIntAttribute(const std::string& name, int value, b
 	 return actionAttr;
  }
 
+void SBObject::setAttributeGroupPriority(const std::string& name, int value)
+{
+	 SBAttributeGroup* group = this->getAttributeManager()->getGroup(name, true);
+	 group->setPriority(value);
+}
+
+int SBObject::getAttributeGroupPriority(const std::string& name)
+{
+	SBAttributeGroup* group = this->getAttributeManager()->getGroup(name, false);
+	if (!group)
+	{
+		LOG("No group named '%s' found, cannot set priority.", name.c_str());
+	}
+	else
+	{
+		return group->getPriority();
+	}
+	
+}
 
   std::map<std::string, SBAttribute*>& SBObject::getAttributeList()
  {

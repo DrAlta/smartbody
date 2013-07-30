@@ -52,6 +52,9 @@
     <Filter Include="lipsyncviewer">
       <UniqueIdentifier>{2b51ee1f-542b-4db5-8b62-afe631bec4b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="flu">
+      <UniqueIdentifier>{0ad6220e-f19d-4e3e-a049-a98e2cc0077e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -267,6 +270,15 @@
     </ClCompile>
     <ClCompile Include="..\src\SBGUIManager.cpp">
       <Filter>cegui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\flu\Flu_Collapsable_Group.cpp">
+      <Filter>flu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\flu\FluSimpleString.cpp">
+      <Filter>flu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\flu\Flu_Button.cpp">
+      <Filter>flu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -484,6 +496,21 @@
     </ClInclude>
     <ClInclude Include="..\src\SBGUIManager.h">
       <Filter>cegui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\flu\Flu_Button.h">
+      <Filter>flu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\flu\Flu_Collapsable_Group.h">
+      <Filter>flu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\flu\Flu_Enumerations.h">
+      <Filter>flu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\flu\flu_export.h">
+      <Filter>flu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\flu\FluSimpleString.h">
+      <Filter>flu</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

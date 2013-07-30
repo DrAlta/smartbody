@@ -83,7 +83,7 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 
 	treeItemList[ITEM_SKELETON] = resourceTree->add("Skeletons");
 	treeItemList[ITEM_JOINT_MAP] = resourceTree->add("Character Maps");
-	treeItemList[ITEM_DIPHONES] = resourceTree->add("Diphones");
+	treeItemList[ITEM_DIPHONES] = resourceTree->add("Lip Syncing");
 	treeItemList[ITEM_MOTION] =  resourceTree->add("Motions");	
 
 	treeItemList[ITEM_FACE_DEFINITION] = resourceTree->add("Face Definitions");

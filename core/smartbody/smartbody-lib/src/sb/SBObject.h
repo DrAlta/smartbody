@@ -66,6 +66,9 @@ class SBObject : public SBObserver, public SBSubject
 		SBAPI ActionAttribute* createActionAttribute(const std::string& name, bool notifySelf, const std::string& groupName, int priority, 
 													  bool isReadOnly, bool isLocked, bool isHidden, const std::string& description = "");
 
+		SBAPI void setAttributeGroupPriority(const std::string& name, int value);
+		SBAPI int getAttributeGroupPriority(const std::string& name);
+
 		SBAPI void setBoolAttribute(const std::string& name, bool value);
 		SBAPI void setIntAttribute(const std::string& name, int value);
 		SBAPI void setDoubleAttribute(const std::string& name, double value);
