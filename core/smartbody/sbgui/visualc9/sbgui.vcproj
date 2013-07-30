@@ -1035,6 +1035,42 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="flu"
+			>
+			<File
+				RelativePath="..\src\flu\Flu_Button.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\flu\Flu_Button.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\flu\Flu_Collapsable_Group.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\flu\Flu_Collapsable_Group.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\flu\Flu_Enumerations.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\flu\flu_export.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\flu\FluSimpleString.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\flu\FluSimpleString.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\src\glfont2.cpp"
 			>

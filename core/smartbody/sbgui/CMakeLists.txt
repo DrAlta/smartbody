@@ -186,7 +186,11 @@ set( SBM_FLTK_SRC
 	src/faceviewer/FaceViewer.cpp
 	src/FLTKListener.cpp
 	src/SBGUIManager.cpp
-
+	
+	src/flu/Flu_Button.cpp
+	src/flu/Flu_Collapsable_Group.cpp
+	src/flu/Flu_Enumerations.cpp
+	src/flu/FluSimpleString.cpp
 )
 
 add_executable( sbgui
