@@ -216,15 +216,26 @@ bool  VisemeViewerWindow::loadData()
 	}
 	_browserSinglePhoneme->deselect();
 
+	std::string curSelectedCharacter = "";
+	int curSelectedId = -1;
+	if (_choiceCharacter->value() > -1)
+	{
+		curSelectedCharacter = _choiceCharacter->text(_choiceCharacter->value());
+	}
 	_choiceCharacter->clear();
 	const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (size_t i = 0; i < characterNames.size(); i++)
 	{
 		_choiceCharacter->add(characterNames[i].c_str());
+		if (curSelectedCharacter == characterNames[i])
+			curSelectedId = i;
 	}
 	if (characterNames.size() > 0)
 	{
-		_choiceCharacter->value(0);
+		if (curSelectedId < 0)
+			curSelectedId = 0;
+		_choiceCharacter->value(curSelectedId);
+
 		OnCharacterSelectCB(this->_choiceCharacter, this);
 	}
 	initializeVisemes();
