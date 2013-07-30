@@ -1,5 +1,4 @@
 include_directories( /usr/include/OGRE )
-include_directories( ../smartbody/smartbody-dll/include )
 include_directories( ../../lib/bonebus/include )
 include_directories( /Users/feng/SmartBodyDev/SbmOSX/trunk/core/smartbody/sbm/Frameworks/Ogre.framework/Versions/1.7.4/Headers )
 include_directories( /Users/feng/SmartBodyDev/OgreSDK_1.7/include/ )
