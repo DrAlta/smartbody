@@ -79,6 +79,19 @@ AttributeWindow::AttributeWindow(SmartBody::SBObject* obj, int x, int y, int w, 
 			mainGroup->box(FL_UP_BOX);
 		mainGroup->begin();
 		mainPack = new Fl_Pack(x + 10, y + 10,  w - 20, h - 20, "");
+		
+		Fl_Group* buttonGroup = new Fl_Group(x + 10, y + 10, w - 20, 20);
+		Fl_Button* buttonExpandAll = new Fl_Button(x + 340, y + 10, 20, 20, "+");
+		buttonExpandAll->callback(ExpandAllCB, mainPack);
+		buttonExpandAll->tooltip("Expand all attribute groups");
+		buttonGroup->add(buttonExpandAll);
+		Fl_Button* buttonCollapseAll = new Fl_Button(x + 360, y + 10, 20, 20, "-");
+		buttonCollapseAll->callback(CollapseAllCB, mainPack);
+		buttonCollapseAll->tooltip("Collapse all attribute groups");
+		buttonGroup->add(buttonCollapseAll);
+
+		mainPack->add(buttonGroup);
+		
 		mainGroup->add(mainPack);
 		mainGroup->end();
 	if (upDownBox)
@@ -323,7 +336,7 @@ void AttributeWindow::draw()
 		}
 		std::sort(attributeGroups.begin(), attributeGroups.end(), AttributeGroupPriorityPredicate);
 		
-		int startY = 10;
+		int startY = 30;
 
 		// now we have the sorted attribute groups, get the attributes for each group and sort and display them accordingly
 		for (size_t g = 0; g < sortedAttributeGroups.size(); g++)
@@ -755,6 +768,41 @@ void AttributeWindow::setObject(SmartBody::SBObject* g)
 	object = g;
 	object->getAttributeManager()->registerObserver(this);
 }
+
+void AttributeWindow::ExpandAllCB(Fl_Widget* w, void *data)
+{
+	Fl_Pack* pack = (Fl_Pack*) data;
+
+	int numChildren = pack->children();
+	for (int c = 0; c < numChildren; c++)
+	{
+		Fl_Widget* widget = pack->child(c);
+		Flu_Collapsable_Group* cGroup = dynamic_cast<Flu_Collapsable_Group*>(widget);
+		if (cGroup)
+		{
+			cGroup->open(true);
+		}
+
+	}
+}
+
+void AttributeWindow::CollapseAllCB(Fl_Widget* w, void *data)
+{
+	Fl_Pack* pack = (Fl_Pack*) data;
+
+	int numChildren = pack->children();
+	for (int c = 0; c < numChildren; c++)
+	{
+		Fl_Widget* widget = pack->child(c);
+		Flu_Collapsable_Group* cGroup = dynamic_cast<Flu_Collapsable_Group*>(widget);
+		if (cGroup)
+		{
+			cGroup->open(false);
+		}
+
+	}
+}
+
 
 void AttributeWindow::ActionCB(Fl_Widget *w, void *data)
 {

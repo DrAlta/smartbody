@@ -46,7 +46,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\smartbody-dll\include;.\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <MinimalRebuild>false</MinimalRebuild>
@@ -75,7 +75,7 @@ copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\smartbody-dll\include;.\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <WarningLevel>Level3</WarningLevel>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -104,8 +104,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\smartbody-dll\smartbody-c-dll.cpp" />
-    <ClCompile Include="..\smartbody-dll\smartbody-dll.cpp" />
     <ClCompile Include="..\SmartBody\src\bml\behavior_scheduler_gesture.cpp" />
     <ClCompile Include="..\SmartBody\src\external\zlib-1.2.5\adler32.c" />
     <ClCompile Include="..\SmartBody\src\external\zlib-1.2.5\compress.c" />
@@ -473,10 +471,10 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\sr\sr_vec.cpp" />
     <ClCompile Include="..\SmartBody\src\sr\sr_vec2.cpp" />
     <ClCompile Include="..\SmartBody\src\sr\sr_viewer.cpp" />
+    <ClCompile Include="src\sb\smartbody-c-dll.cpp" />
+    <ClCompile Include="src\sb\smartbody-dll.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\smartbody-dll\include\smartbody-c-dll.h" />
-    <ClInclude Include="..\smartbody-dll\include\smartbody-dll.h" />
     <ClInclude Include="..\SmartBody\src\bml\behavior_scheduler.hpp" />
     <ClInclude Include="..\SmartBody\src\bml\behavior_scheduler_constant_speed.hpp" />
     <ClInclude Include="..\SmartBody\src\bml\behavior_scheduler_fixed.hpp" />
@@ -839,6 +837,8 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\SmartBody\src\sr\sr_vec.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_vec2.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_viewer.h" />
+    <ClInclude Include="src\sb\smartbody-c-dll.h" />
+    <ClInclude Include="src\sb\smartbody-dll.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SmartBody\src\sbm\GPU\shaderFiles\fs_skin_render.frag">
