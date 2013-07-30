@@ -224,8 +224,8 @@ brad.createStandardControllers()
 brad.setDoubleAttribute("deformableMeshScale", .01)
 brad.setStringAttribute("deformableMesh", "ChrBrad")
 # lip syncing diphone setup
-brad.setStringAttribute("diphoneSetName", "default")
-brad.setBoolAttribute("useDiphone", True)
+brad.setStringAttribute("lipSyncSetName", "default")
+brad.setBoolAttribute("usePhoneBigram", True)
 brad.setVoice("remote")
 brad.setVoiceCode("Festival_voice_kal_diphone")
 # gesture map setup
@@ -283,8 +283,8 @@ rachel.createStandardControllers()
 rachel.setDoubleAttribute("deformableMeshScale", .01)
 rachel.setStringAttribute("deformableMesh", "ChrRachel")
 # lip syncing diphone setup
-rachel.setStringAttribute("diphoneSetName", "default")
-rachel.setBoolAttribute("useDiphone", True)
+rachel.setStringAttribute("lipSyncSetName", "default")
+rachel.setBoolAttribute("usePhoneBigram", True)
 rachel.setVoice("remote")
 rachel.setVoiceCode("MicrosoftAnna")
 # gesture map setup

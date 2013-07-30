@@ -84,29 +84,29 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	visemeDelayAttr->setMin(0.0);
 	createBoolAttribute("visemecurve", false, true, "Lip Sync", 100, false, false, false, "Use curve-based visemes instead of discrete visemes.");
 	createBoolAttribute("reach.useLocomotion", false, true, "Reaching", 110, false, false, false, "Whether to use locomotion for reach by default.");
-	createBoolAttribute("useDiphone", true, true, "Lip Sync", 150, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRule", true, true, "Lip Sync", 151, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRuleFV", true, true, "Lip Sync", 152, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRuleW", true, true, "Lip Sync", 152, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRuleWide", false, true, "Lip Sync", 152, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRulePBM", true, true, "Lip Sync", 153, false, false, false, "Use diphones.");
-	createBoolAttribute("diphoneRuleShCh", true, true, "Lip Sync", 153, false, false, false, "Use diphones.");
-	createDoubleAttribute("openConstraintByPBM", 0.5, true, "Lip Sync", 154, false, false, false, "Use diphones.");
-	createDoubleAttribute("wideConstraintByPBM", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("shchConstraintByPBM", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("openConstraintByFV", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("wideConstraintByFV", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("openConstraintByShCh", 0.7, true, "Lip Sync", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("openConstraintByW", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("openConstraintByWide", 0.5, true, "Lip Sync", 155, false, false, false, "Use diphones.");
-	createDoubleAttribute("diphoneScale", 1, true, "Lip Sync", 156, false, false, false, "Scale factor for diphone curves.");
-	createStringAttribute("diphoneSetName", "", true, "Lip Sync", 157, false, false, false, "Name of the diphone set to be used when using diphone-based lip-syncing.");
-	createBoolAttribute("diphoneSplineCurve", true, true, "Lip Sync", 158, false, false, false, "Use diphones spline/linear curve.");
-	createDoubleAttribute("diphoneSmoothWindow", .18, true, "Lip Sync", 159, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
+	createBoolAttribute("usePhoneBigram", true, true, "Lip Sync", 150, false, false, false, "Use phone bigram method.");
+	createBoolAttribute("lipSyncConstraint", true, true, "Lip Sync", 151, false, false, false, "Use constrains on facial shapes.");
+	createBoolAttribute("constrainFV", true, true, "Lip Sync", 152, false, false, false, "Constrain facial shape FV.");
+	createBoolAttribute("constrainW", true, true, "Lip Sync", 152, false, false, false, "Constrain facial shape W.");
+	createBoolAttribute("constrainWide", false, true, "Lip Sync", 152, false, false, false, "Constrain facial shape Wide.");
+	createBoolAttribute("constrainPBM", true, true, "Lip Sync", 153, false, false, false, "Constrain facial shape PBM.");
+	createBoolAttribute("constrainShCh", true, true, "Lip Sync", 153, false, false, false, "Constrain facial shape ShCh.");
+	createDoubleAttribute("openConstraintByPBM", 0.5, true, "Lip Sync", 154, false, false, false, "Open facial shape constraint by PBM facial shape.");
+	createDoubleAttribute("wideConstraintByPBM", 0.5, true, "Lip Sync", 155, false, false, false, "Wide facial shape constraint by PBM facial shape.");
+	createDoubleAttribute("shchConstraintByPBM", 0.5, true, "Lip Sync", 155, false, false, false, "ShCh facial shape constraint by PBM facial shape.");
+	createDoubleAttribute("openConstraintByFV", 0.5, true, "Lip Sync", 155, false, false, false, "Open facial shape constraint by FV facial shape.");
+	createDoubleAttribute("wideConstraintByFV", 0.5, true, "Lip Sync", 155, false, false, false, "Wide facial shape constraint by FV facial shape.");
+	createDoubleAttribute("openConstraintByShCh", 0.7, true, "Lip Sync", 155, false, false, false, "Open facial shape constraint by ShCh facial shape.");
+	createDoubleAttribute("openConstraintByW", 0.5, true, "Lip Sync", 155, false, false, false, "Open facial shape constraint by W facial shape.");
+	createDoubleAttribute("openConstraintByWide", 0.5, true, "Lip Sync", 155, false, false, false, "Open facial shape constraint by Wide facial shape.");
+	createDoubleAttribute("lipSyncScale", 1, true, "Lip Sync", 156, false, false, false, "Scale factor for lip sync curves.");
+	createStringAttribute("lipSyncSetName", "", true, "Lip Sync", 157, false, false, false, "Name of the lip sync set to be used when using phone bigram method.");
+	createBoolAttribute("lipSyncSplineCurve", true, true, "Lip Sync", 158, false, false, false, "Use spline/linear curve.");
+	createDoubleAttribute("lipSyncSmoothWindow", .18, true, "Lip Sync", 159, false, false, false, "Smooth window size. If it's less than 0, don't do smooth.");
 	setDiphoneSmoothWindow(0.18f);
-	createDoubleAttribute("diphoneSmoothWindow-PBM", .1, true, "Lip Sync", 160, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
-	createDoubleAttribute("diphoneSmoothWindow-FV", .1, true, "Lip Sync", 161, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
-	createDoubleAttribute("diphoneSpeedLimit", 6.0f, true, "Lip Sync", 162, false, false, false, "Speed Limit of mouth movement");
+	createDoubleAttribute("lipSyncSmoothWindow-PBM", .1, true, "Lip Sync", 160, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
+	createDoubleAttribute("lipSyncSmoothWindow-FV", .1, true, "Lip Sync", 161, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
+	createDoubleAttribute("lipSyncSpeedLimit", 6.0f, true, "Lip Sync", 162, false, false, false, "Speed Limit of facial shape movement");
 	setDiphoneSpeedLimit(6.0f);
 	
 // Dominance curve attributes
@@ -663,27 +663,27 @@ void SBCharacter::notify(SBSubject* subject)
 			SmartBody::DoubleAttribute* timeDelayAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 			set_viseme_time_delay((float) timeDelayAttribute->getValue());
 		}
-		else if (attrName == "useDiphone")
+		else if (attrName == "usePhoneBigram")
 		{
 			SmartBody::BoolAttribute* diphoneAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
 			this->setDiphone(diphoneAttribute->getValue());
 		}
-		else if (attrName == "diphoneScale")
+		else if (attrName == "lipSyncScale")
 		{
 			SmartBody::DoubleAttribute* diphoneScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 			this->setDiphoneScale((float)diphoneScaleAttribute->getValue());
 		}
-		else if (attrName == "diphoneSplineCurve")
+		else if (attrName == "lipSyncSplineCurve")
 		{
 			SmartBody::BoolAttribute* splineCurveAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
 			this->setDiphoneSplineCurve(splineCurveAttribute->getValue());
 		}
-		else if (attrName == "diphoneSmoothWindow")
+		else if (attrName == "lipSyncSmoothWindow")
 		{
 			SmartBody::DoubleAttribute* smoothWindowAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 			setDiphoneSmoothWindow((float)smoothWindowAttribute->getValue());
 		}
-		else if (attrName == "diphoneSpeedLimit")
+		else if (attrName == "lipSyncSpeedLimit")
 		{
 			SmartBody::DoubleAttribute* speedLimitAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 			setDiphoneSpeedLimit((float)speedLimitAttribute->getValue());

@@ -237,8 +237,8 @@ brad.setFaceDefinition(bradFace)
 brad.setDoubleAttribute('deformableMeshScale', .01)
 brad.setStringAttribute('deformableMesh', 'ChrBrad')
 # Lip syncing diphone setup
-brad.setStringAttribute('diphoneSetName', 'default')
-brad.setBoolAttribute('useDiphone', True)
+brad.setStringAttribute('lipSyncSetName', 'default')
+brad.setBoolAttribute('usePhoneBigram', True)
 brad.setVoice('remote')
 brad.setVoiceCode('MicrosoftAnna')
 # Gesture map setup
@@ -261,8 +261,8 @@ rachel.setFaceDefinition(rachelFace)
 rachel.setDoubleAttribute('deformableMeshScale', .01)
 rachel.setStringAttribute('deformableMesh', 'ChrRachel')
 # Lip syncing diphone setup
-rachel.setStringAttribute('diphoneSetName', 'default')
-rachel.setBoolAttribute('useDiphone', True)
+rachel.setStringAttribute('lipSyncSetName', 'default')
+rachel.setBoolAttribute('usePhoneBigram', True)
 rachel.setVoice('remote')
 rachel.setVoiceCode('MicrosoftAnna')
 # Gesture map setup

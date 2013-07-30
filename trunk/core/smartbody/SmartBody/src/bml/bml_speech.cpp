@@ -426,7 +426,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 	debugVisemeCurves.clear();
 
 	SBCharacter* character = dynamic_cast<SBCharacter*>(request->actor);
-	const std::string& diphoneMap = character->getStringAttribute("diphoneSetName");
+	const std::string& diphoneMap = character->getStringAttribute("lipSyncSetName");
 	VisemeData* curViseme = NULL;
 	VisemeData* prevViseme = NULL;
 	VisemeData* pprevViseme = NULL;
@@ -577,13 +577,11 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		debugVwoSmoothing->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
 
 		if (strcmp(visemeProcessedData[i]->id(), "PBM") == 0)
-			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("diphoneSmoothWindow-PBM"));
+			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("lipSyncSmoothWindow-PBM"));
 		else if (strcmp(visemeProcessedData[i]->id(), "FV") == 0)
-			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("diphoneSmoothWindow-FV"));
-		else if (strcmp(visemeProcessedData[i]->id(), "tRoof") == 0)
-			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("diphoneSmoothWindow-FV"));
+			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("lipSyncSmoothWindow-FV"));
 		else
-			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("diphoneSmoothWindow"));
+			smoothCurve(visemeProcessedData[i]->getFloatCurve(), visemeTimeMarkers, (float)character->getDoubleAttribute("lipSyncSmoothWindow"));
 		VisemeData* debugVwSmoothing = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
 		debugVwSmoothing->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
 		debugVwSmoothing->setCurveInfo("3");
@@ -592,7 +590,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		debugVisemeCurves.push_back(debugVwSmoothing);
 	}
 
-	if (character->getBoolAttribute("diphoneRule"))
+	if (character->getBoolAttribute("lipSyncConstraint"))
 	{
 		// rule based 'open' curve processing, pbm
 		int openIndex = -1;
@@ -619,7 +617,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		}
 
 
-		if (character->getBoolAttribute("diphoneRulePBM") && bmpIndex >= 0)
+		if (character->getBoolAttribute("constrainPBM") && bmpIndex >= 0)
 		{
 			if (openIndex >= 0)
 			{
@@ -634,7 +632,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 				constrainCurve(visemeProcessedData[shchIndex]->getFloatCurve(), visemeProcessedData[bmpIndex]->getFloatCurve(), (float)character->getDoubleAttribute("shchConstraintByPBM"));
 			}
 		}
-		if (character->getBoolAttribute("diphoneRuleFV") && fvIndex >= 0)
+		if (character->getBoolAttribute("constrainFV") && fvIndex >= 0)
 		{
 			if (openIndex >= 0)
 			{
@@ -645,21 +643,21 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 				constrainCurve(visemeProcessedData[wideIndex]->getFloatCurve(), visemeProcessedData[fvIndex]->getFloatCurve(), (float)character->getDoubleAttribute("wideConstraintByFV"));
 			}
 		}
-		if (character->getBoolAttribute("diphoneRuleShCh") && shchIndex >= 0)
+		if (character->getBoolAttribute("constrainShCh") && shchIndex >= 0)
 		{
 			if (openIndex >= 0)
 			{
 				constrainCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[shchIndex]->getFloatCurve(), (float)character->getDoubleAttribute("openConstraintByShCh"));
 			}
 		}
-		if (character->getBoolAttribute("diphoneRuleW") && wIndex >= 0)
+		if (character->getBoolAttribute("constrainW") && wIndex >= 0)
 		{
 			if (openIndex >= 0)
 			{
 				constrainCurve(visemeProcessedData[openIndex]->getFloatCurve(), visemeProcessedData[wIndex]->getFloatCurve(), (float)character->getDoubleAttribute("openConstraintByW"));
 			}
 		}
-		if (character->getBoolAttribute("diphoneRuleWide") && wideIndex >= 0)
+		if (character->getBoolAttribute("constrainWide") && wideIndex >= 0)
 		{
 			if (openIndex >= 0)
 			{

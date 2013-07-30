@@ -237,8 +237,8 @@ brad.createStandardControllers()
 brad.setDoubleAttribute('deformableMeshScale', .01)
 brad.setStringAttribute('deformableMesh', 'ChrBrad')
 # Lip syncing diphone setup
-brad.setStringAttribute('diphoneSetName', 'default')
-brad.setBoolAttribute('useDiphone', True)
+brad.setStringAttribute('lipSyncSetName', 'default')
+brad.setBoolAttribute('usePhoneBigram', True)
 brad.setVoice('remote')
 brad.setVoiceCode('MicrosoftAnna')
 # Gesture map setup
