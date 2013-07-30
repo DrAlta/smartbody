@@ -1,6 +1,6 @@
 #include "OgreFrameListener.h"
 #include "vhmsg-tt.h"
-#include "smartbody-c-dll.h"
+#include "sb/smartbody-c-dll.h"
 
 OgreFrameListener::OgreFrameListener(RenderWindow * win, Camera * cam, const std::string & debugText, SceneManager * mgr, 
 									 bonebus::BoneBusServer * bonebus, Smartbody_dll* sbmdll, std::vector<std::string>& initialCommands) 

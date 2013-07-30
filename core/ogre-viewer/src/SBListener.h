@@ -2,7 +2,7 @@
 #define _SBLISTENER_H
 
 #include "vhcl.h"
-#include "smartbody-dll.h"
+#include "sb/smartbody-dll.h"
 #include <string>
 
 class OgreRenderer;
