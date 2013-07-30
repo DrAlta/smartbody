@@ -82,8 +82,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	bmlDelayAttr->setMin(0.0);
 	SmartBody::DoubleAttribute* visemeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Behaviors", 99, false, false, false, "Delay visemes by a fixed amount.");
 	visemeDelayAttr->setMin(0.0);
-	createBoolAttribute("visemecurve", false, true, "Lip Sync", 100, false, false, false, "Use curve-based visemes instead of discrete visemes (FaceFX).");
-	createBoolAttribute("dominancecurve", false, true, "Lip Sync", 101, false, false, false, "Use donimance curve instead of FaceFX curve");
+	createBoolAttribute("visemecurve", false, true, "Lip Sync", 100, false, false, false, "Use curve-based visemes instead of discrete visemes.");
 	createBoolAttribute("reach.useLocomotion", false, true, "Reaching", 110, false, false, false, "Whether to use locomotion for reach by default.");
 	createBoolAttribute("useDiphone", true, true, "Lip Sync", 150, false, false, false, "Use diphones.");
 	createBoolAttribute("diphoneRule", true, true, "Lip Sync", 151, false, false, false, "Use diphones.");
@@ -112,6 +111,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	
 // Dominance curve attributes
 	int startingPos = 500;
+	createBoolAttribute("dominancecurve", false, true, "Baldi Lip Sync", 500, false, false, false, "Use dominance curve instead of predefined curves for lip syncing.");
 	createDoubleAttribute("jaw_rot_min", -4.0, true, "Baldi Lip Sync", startingPos + 0, false, false, false, "");
 	createDoubleAttribute("jaw_rot_max", 13, true, "Baldi Lip Sync", startingPos + 1, false, false, false, "");
 	createDoubleAttribute("jaw_rot_default", 0.21, true, "Baldi Lip Sync", startingPos + 2, false, false, false, "");
