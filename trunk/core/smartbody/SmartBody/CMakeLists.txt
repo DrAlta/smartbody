@@ -491,6 +491,10 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBDebuggerUtility.cpp
         ./src/sbm/SteerPath.cpp
         ./src/sbm/MiscCommands.cpp
+		
+		./src/sb/smartbody-dll.cpp
+		./src/sb/smartbody-c-dll.cpp
+		
 )
 
 add_library(
@@ -518,8 +522,7 @@ add_library(
         ${SMARTBODY_LIB_SBM_SRC}
 
 	
-	../smartbody-dll/smartbody-dll.cpp
-	../smartbody-dll/smartbody-c-dll.cpp
+
 )
 
 

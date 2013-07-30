@@ -28,9 +28,6 @@
     <Filter Include="bmlcreator">
       <UniqueIdentifier>{fbaae2c9-1e25-4b03-b1cf-0b767bb24300}</UniqueIdentifier>
     </Filter>
-    <Filter Include="retargetcreator">
-      <UniqueIdentifier>{56361f18-4f18-4cc4-b99b-6afd39fa8ac8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="monitorviewer">
       <UniqueIdentifier>{6f962f55-7281-489e-ad9b-4c381c001a85}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,9 @@
     </Filter>
     <Filter Include="flu">
       <UniqueIdentifier>{0ad6220e-f19d-4e3e-a049-a98e2cc0077e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="jointmapviewer\retargetcreator">
+      <UniqueIdentifier>{56361f18-4f18-4cc4-b99b-6afd39fa8ac8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -215,7 +215,7 @@
       <Filter>panimationviewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\retargetcreator\RetargetCreatorWindow.cpp">
-      <Filter>retargetcreator</Filter>
+      <Filter>jointmapviewer\retargetcreator</Filter>
     </ClCompile>
     <ClCompile Include="..\src\visemeviewer\VisemeViewerWindow.cpp">
       <Filter>lipsyncviewer</Filter>
@@ -438,7 +438,7 @@
       <Filter>panimationviewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\retargetcreator\RetargetCreatorWindow.h">
-      <Filter>retargetcreator</Filter>
+      <Filter>jointmapviewer\retargetcreator</Filter>
     </ClInclude>
     <ClInclude Include="..\src\visemeviewer\VisemeViewerWindow.h">
       <Filter>lipsyncviewer</Filter>

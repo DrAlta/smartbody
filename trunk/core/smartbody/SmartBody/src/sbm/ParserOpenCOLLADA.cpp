@@ -34,6 +34,98 @@
 #include <sbm/GPU/SbmTexture.h>
 
 
+class TextLineSplitter
+{
+public:
+
+    TextLineSplitter( const size_t max_line_len );
+
+    ~TextLineSplitter();
+
+    void            SplitLine( const char *line,
+                               const char sep_char = ','
+                             );
+
+    inline size_t   NumTokens( void ) const
+    {
+        return mNumTokens;
+    }
+
+    const char *    GetToken( const size_t token_idx ) const
+    {
+        assert( token_idx < mNumTokens );
+        return mTokens[ token_idx ];
+    }
+
+private:
+    const size_t    mStorageSize;
+
+    char           *mBuff;
+    char          **mTokens;
+    size_t          mNumTokens;
+
+    inline void     ResetContent( void )
+    {
+        memset( mBuff, 0, mStorageSize );
+        // mark all items as empty:
+        memset( mTokens, 0, mStorageSize * sizeof( char* ) );
+        // reset counter for found items:
+        mNumTokens = 0L;
+    }
+};
+
+TextLineSplitter::TextLineSplitter( const size_t max_line_len ):
+    mStorageSize ( max_line_len + 1L )
+{
+    // allocate memory
+    mBuff   = new char  [ mStorageSize ];
+    mTokens = new char* [ mStorageSize ];
+
+    ResetContent();
+}
+
+TextLineSplitter::~TextLineSplitter()
+{
+    delete [] mBuff;
+    delete [] mTokens;
+}
+
+
+void TextLineSplitter::SplitLine( const char *line,
+                                  const char sep_char   /* = ',' */
+                                )
+{
+    assert( sep_char != '\0' );
+
+    ResetContent();
+    strncpy( mBuff, line, mStorageSize );
+
+    size_t idx       = 0L; // running index for characters
+
+    do
+    {
+        assert( idx < mStorageSize );
+
+        const char chr = line[ idx ]; // retrieve current character
+
+        if( mTokens[ mNumTokens ] == NULL )
+        {
+            mTokens[ mNumTokens ] = &mBuff[ idx ];
+        } // if
+
+        if( chr == sep_char || chr == '\0' )
+        { // item or line finished
+            // overwrite separator with a 0-terminating character:
+            mBuff[ idx ] = '\0';
+            // count-up items:
+            mNumTokens ++;
+        } // if
+
+    } while( line[ idx++ ] );
+}
+
+
+
 bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::string pathName, float scale, bool doParseSkeleton, bool doParseMotion)
 {
 	
@@ -988,8 +1080,10 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 							int counter = atoi(temp.c_str());
 							std::string arrayString;
 							xml_utils::xml_translate(&arrayString, node3->getTextContent());
-							std::vector<std::string> tokens;
-							vhcl::Tokenize(arrayString, tokens, " \n");
+							//std::vector<std::string> tokens;
+							//vhcl::Tokenize(arrayString, tokens, " \n");
+							TextLineSplitter spl(counter);
+							spl.SplitLine(arrayString.c_str(), ' ');
 						
 							if (op == "input")
 							{
@@ -999,7 +1093,8 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 								{
 									for (int frameCt = 0; frameCt < counter; frameCt++)
 									{
-										motion.insert_frame(frameCt, (float)atof(tokens[frameCt].c_str()));
+										//motion.insert_frame(frameCt, (float)atof(tokens[frameCt].c_str()));
+										motion.insert_frame(frameCt, (float)atof(spl.GetToken(frameCt)));
 										for (int postureCt = 0; postureCt < motion.posture_size(); postureCt++)
 											motion.posture(frameCt)[postureCt] = 0.0f;										
 									}								
@@ -1036,7 +1131,8 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 									{
 										for (int m = 0; m < stride; m++)
 										{
-											tran[m] = (float)atof(tokens[frameCt*stride+m].c_str());
+											//tran[m] = (float)atof(tokens[frameCt*stride+m].c_str());
+											tran[m] = (float)atof(spl.GetToken(frameCt*stride+m));
 										}
  										tran.transpose();
 										jointTransformMap[jName][frameCt] = tran;
@@ -1076,9 +1172,11 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 										{
 											for (int strideCt = 0; strideCt < stride; strideCt++)
 											{
-												if (tokens.size() <= (unsigned int)frameCt) continue;
+												//if (tokens.size() <= (unsigned int)frameCt) continue;
+												if (spl.NumTokens() <= (unsigned int)frameCt) continue;
 
-												float v = (float)atof(tokens[frameCt*stride+strideCt].c_str());
+												//float v = (float)atof(tokens[frameCt*stride+strideCt].c_str());
+												float v = (float)atof(spl.GetToken(frameCt*stride+strideCt));
 												motion.posture(frameCt)[channelId + strideCt] = v * scale;
 											}
 										}
