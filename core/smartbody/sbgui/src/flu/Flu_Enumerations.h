@@ -15,7 +15,7 @@
 #ifndef _FLU_ENUMERATIONS_H
 #define _FLU_ENUMERATIONS_H
 
-#include "FLU/flu_export.h"
+#include "flu_export.h"
 
 /* these enums are all global to conform to the fltk standard */
 

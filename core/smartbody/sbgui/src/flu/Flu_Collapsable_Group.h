@@ -25,8 +25,8 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Box.H>
 
-#include "FLU/FluSimpleString.h"
-#include "FLU/Flu_Button.h"
+#include "FluSimpleString.h"
+#include "Flu_Button.h"
 
 //! This widget implements a collapsable group with a configurable framerate
 /*! This class is a group with a button and an \b Fl_Group inside (both publicly exposed). The \b Fl_Group
