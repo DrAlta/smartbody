@@ -163,10 +163,6 @@ std::string SBAttributeInfo::getDescription()
 	return m_description;
 }
 
-void SBAttributeInfo::setGroup(const std::string& groupName)
-{
-}
-
 SBAttributeGroup* SBAttributeInfo::getGroup()
 {
 	return m_group;
@@ -395,6 +391,13 @@ SBAttribute* BoolAttribute::copy()
 	a->setName(getName());
 	a->setValue(getValue());
 	a->setDefaultValue(getDefaultValue());
+
+	a->getAttributeInfo()->setPriority(this->getAttributeInfo()->getPriority());
+	a->getAttributeInfo()->setReadOnly(this->getAttributeInfo()->getReadOnly());
+	a->getAttributeInfo()->setLocked(this->getAttributeInfo()->getLocked());
+	a->getAttributeInfo()->setHidden(this->getAttributeInfo()->getHidden());
+	a->getAttributeInfo()->setDescription(this->getAttributeInfo()->getDescription());
+	 
 	return a;
 }
 
@@ -533,6 +536,13 @@ SBAttribute* IntAttribute::copy()
 	a->setDefaultValue(getDefaultValue());
 	a->setMin(getMin());
 	a->setMax(getMax());
+
+	a->getAttributeInfo()->setPriority(this->getAttributeInfo()->getPriority());
+	a->getAttributeInfo()->setReadOnly(this->getAttributeInfo()->getReadOnly());
+	a->getAttributeInfo()->setLocked(this->getAttributeInfo()->getLocked());
+	a->getAttributeInfo()->setHidden(this->getAttributeInfo()->getHidden());
+	a->getAttributeInfo()->setDescription(this->getAttributeInfo()->getDescription());
+	 
 	return a;
 }
 
@@ -671,6 +681,13 @@ SBAttribute* DoubleAttribute::copy()
 	a->setDefaultValue(getDefaultValue());
 	a->setMin(getMin());
 	a->setMax(getMax());
+
+	a->getAttributeInfo()->setPriority(this->getAttributeInfo()->getPriority());
+	a->getAttributeInfo()->setReadOnly(this->getAttributeInfo()->getReadOnly());
+	a->getAttributeInfo()->setLocked(this->getAttributeInfo()->getLocked());
+	a->getAttributeInfo()->setHidden(this->getAttributeInfo()->getHidden());
+	a->getAttributeInfo()->setDescription(this->getAttributeInfo()->getDescription());
+	
 	return a;
 }
 
@@ -802,6 +819,12 @@ SBAttribute* StringAttribute::copy()
 	a->setValue(getValue());
 	a->setDefaultValue(getDefaultValue());
 	a->setValidValues(getValidValues());
+
+	a->getAttributeInfo()->setPriority(this->getAttributeInfo()->getPriority());
+	a->getAttributeInfo()->setReadOnly(this->getAttributeInfo()->getReadOnly());
+	a->getAttributeInfo()->setLocked(this->getAttributeInfo()->getLocked());
+	a->getAttributeInfo()->setHidden(this->getAttributeInfo()->getHidden());
+	a->getAttributeInfo()->setDescription(this->getAttributeInfo()->getDescription());
 		
 	return a;
 }
@@ -909,7 +932,14 @@ SBAttribute* Vec3Attribute::copy()
 	a->setName(getName());
 	a->setValue(getValue());
 	a->setDefaultValue(getDefaultValue());
-		
+
+
+	a->getAttributeInfo()->setPriority(this->getAttributeInfo()->getPriority());
+	a->getAttributeInfo()->setReadOnly(this->getAttributeInfo()->getReadOnly());
+	a->getAttributeInfo()->setLocked(this->getAttributeInfo()->getLocked());
+	a->getAttributeInfo()->setHidden(this->getAttributeInfo()->getHidden());
+	a->getAttributeInfo()->setDescription(this->getAttributeInfo()->getDescription());
+	 
 	return a;
 }
 
@@ -1025,7 +1055,13 @@ SBAttribute* MatrixAttribute::copy()
 	a->setName(getName());
 	a->setValue(getValue());
 	a->setDefaultValue(getDefaultValue());
-		
+
+	a->getAttributeInfo()->setPriority(this->getAttributeInfo()->getPriority());
+	a->getAttributeInfo()->setReadOnly(this->getAttributeInfo()->getReadOnly());
+	a->getAttributeInfo()->setLocked(this->getAttributeInfo()->getLocked());
+	a->getAttributeInfo()->setHidden(this->getAttributeInfo()->getHidden());
+	a->getAttributeInfo()->setDescription(this->getAttributeInfo()->getDescription());
+	 
 	return a;
 }
 
@@ -1093,6 +1129,13 @@ void ActionAttribute::read()
 SBAttribute* ActionAttribute::copy()
 {
 	ActionAttribute* a = new ActionAttribute();
+
+	a->getAttributeInfo()->setPriority(this->getAttributeInfo()->getPriority());
+	a->getAttributeInfo()->setReadOnly(this->getAttributeInfo()->getReadOnly());
+	a->getAttributeInfo()->setLocked(this->getAttributeInfo()->getLocked());
+	a->getAttributeInfo()->setHidden(this->getAttributeInfo()->getHidden());
+	a->getAttributeInfo()->setDescription(this->getAttributeInfo()->getDescription());
+	 
 	return a;
 }
 

@@ -8,13 +8,57 @@ DefaultAttributeTable::~DefaultAttributeTable(void)
 {
 }
 
+void DefaultAttributeTable::setDefaultAttributeGroupPriority(const std::string& groupName, int priority)
+{
+	SmartBody::SBAttributeGroup* curGroup = NULL;
+	std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.find(groupName);
+	if (iter == _defaultGroups.end())
+	{
+		curGroup = new SmartBody::SBAttributeGroup(groupName);
+		_defaultGroups.insert(std::pair<std::string, SmartBody::SBAttributeGroup*>(groupName, curGroup));
+	}
+	else
+	{
+		curGroup = (*iter).second;
+	}
+	curGroup->setPriority(priority);
+}
+
+int DefaultAttributeTable::setDefaultAttributeGroupPriority(const std::string& groupName)
+{
+	SmartBody::SBAttributeGroup* curGroup = NULL;
+	std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.find(groupName);
+	if (iter == _defaultGroups.end())
+	{
+		LOG("No default attribute group named '%s' found.", groupName.c_str());
+		return 0;
+	}
+	else
+	{
+		return (*iter).second->getPriority();
+	}
+}
+
+
 void DefaultAttributeTable::addDefaultAttributeDouble( const std::string& name, double defaultValue, const std::string& attributeGroup, double* varPtr )
 {
 	SmartBody::DoubleAttribute* hf = new SmartBody::DoubleAttribute(name);
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 
-	hf->getAttributeInfo()->setGroup(attributeGroup);
+	SmartBody::SBAttributeGroup* curGroup = NULL;
+	std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.find(attributeGroup);
+	if (iter == _defaultGroups.end())
+	{
+		curGroup = new SmartBody::SBAttributeGroup(attributeGroup);
+		_defaultGroups.insert(std::pair<std::string, SmartBody::SBAttributeGroup*>(attributeGroup, curGroup));
+	}
+	else
+	{
+		curGroup = (*iter).second;
+	}
+
+	hf->getAttributeInfo()->setGroup(curGroup);
 
 	VariablePointer var;
 	var.varType = VariablePointer::TYPE_DOUBLE;
@@ -28,7 +72,19 @@ void DefaultAttributeTable::addDefaultAttributeFloat( const std::string& name, f
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 
-	hf->getAttributeInfo()->setGroup(attributeGroup);
+	SmartBody::SBAttributeGroup* curGroup = NULL;
+	std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.find(attributeGroup);
+	if (iter == _defaultGroups.end())
+	{
+		curGroup = new SmartBody::SBAttributeGroup(attributeGroup);
+		_defaultGroups.insert(std::pair<std::string, SmartBody::SBAttributeGroup*>(attributeGroup, curGroup));
+	}
+	else
+	{
+		curGroup = (*iter).second;
+	}
+
+	hf->getAttributeInfo()->setGroup(curGroup);
 
 	VariablePointer var;
 	var.varType = VariablePointer::TYPE_FLOAT;
@@ -42,7 +98,17 @@ void DefaultAttributeTable::addDefaultAttributeInt( const std::string& name, int
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 
-	hf->getAttributeInfo()->setGroup(attributeGroup);
+	SmartBody::SBAttributeGroup* curGroup = NULL;
+	std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.find(attributeGroup);
+	if (iter == _defaultGroups.end())
+	{
+		curGroup = new SmartBody::SBAttributeGroup(attributeGroup);
+		_defaultGroups.insert(std::pair<std::string, SmartBody::SBAttributeGroup*>(attributeGroup, curGroup));
+	}
+	else
+	{
+		curGroup = (*iter).second;
+	}
 
 	VariablePointer var;
 	var.varType = VariablePointer::TYPE_INT;
@@ -56,7 +122,19 @@ void DefaultAttributeTable::addDefaultAttributeBool( const std::string& name, bo
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 
-	hf->getAttributeInfo()->setGroup(attributeGroup);
+	SmartBody::SBAttributeGroup* curGroup = NULL;
+	std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.find(attributeGroup);
+	if (iter == _defaultGroups.end())
+	{
+		curGroup = new SmartBody::SBAttributeGroup(attributeGroup);
+		_defaultGroups.insert(std::pair<std::string, SmartBody::SBAttributeGroup*>(attributeGroup, curGroup));
+	}
+	else
+	{
+		curGroup = (*iter).second;
+	}
+
+	hf->getAttributeInfo()->setGroup(curGroup);
 
 	VariablePointer var;
 	var.varType = VariablePointer::TYPE_BOOL;
@@ -70,7 +148,19 @@ void DefaultAttributeTable::addDefaultAttributeString( const std::string& name, 
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 
-	hf->getAttributeInfo()->setGroup(attributeGroup);
+	SmartBody::SBAttributeGroup* curGroup = NULL;
+	std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.find(attributeGroup);
+	if (iter == _defaultGroups.end())
+	{
+		curGroup = new SmartBody::SBAttributeGroup(attributeGroup);
+		_defaultGroups.insert(std::pair<std::string, SmartBody::SBAttributeGroup*>(attributeGroup, curGroup));
+	}
+	else
+	{
+		curGroup = (*iter).second;
+	}
+
+	hf->getAttributeInfo()->setGroup(curGroup);
 
 	VariablePointer var;
 	var.varType = VariablePointer::TYPE_STRING;
@@ -84,7 +174,19 @@ void DefaultAttributeTable::addDefaultAttributeVec3( const std::string& name, Sr
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 
-	hf->getAttributeInfo()->setGroup(attributeGroup);
+	SmartBody::SBAttributeGroup* curGroup = NULL;
+	std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.find(attributeGroup);
+	if (iter == _defaultGroups.end())
+	{
+		curGroup = new SmartBody::SBAttributeGroup(attributeGroup);
+		_defaultGroups.insert(std::pair<std::string, SmartBody::SBAttributeGroup*>(attributeGroup, curGroup));
+	}
+	else
+	{
+		curGroup = (*iter).second;
+	}
+
+	hf->getAttributeInfo()->setGroup(curGroup);
 
 	VariablePointer var;
 	var.varType = VariablePointer::TYPE_VEC3;
@@ -98,7 +200,19 @@ void DefaultAttributeTable::addDefaultAttributeMatrix( const std::string& name, 
 	hf->setDefaultValue(defaultValue);
 	hf->setValue(defaultValue);
 
-	hf->getAttributeInfo()->setGroup(attributeGroup);
+	SmartBody::SBAttributeGroup* curGroup = NULL;
+	std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.find(attributeGroup);
+	if (iter == _defaultGroups.end())
+	{
+		curGroup = new SmartBody::SBAttributeGroup(attributeGroup);
+		_defaultGroups.insert(std::pair<std::string, SmartBody::SBAttributeGroup*>(attributeGroup, curGroup));
+	}
+	else
+	{
+		curGroup = (*iter).second;
+	}
+
+	hf->getAttributeInfo()->setGroup(curGroup);
 
 	VariablePointer var;
 	var.varType = VariablePointer::TYPE_MATRIX;

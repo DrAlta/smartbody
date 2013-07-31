@@ -224,6 +224,7 @@ MeCtGaze::MeCtGaze( void )	: SmartBody::SBController() {
 	joint_arr = NULL;
 
 	// gaze settings
+	setDefaultAttributeGroupPriority("Gaze", 400);
 	addDefaultAttributeDouble("gaze.speedEyes", 5000, "Gaze");
 	addDefaultAttributeDouble("gaze.speedNeck", 5000, "Gaze");
 	addDefaultAttributeDouble("gaze.limitPitchUpEyes", -35.0, "Gaze");
