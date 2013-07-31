@@ -373,6 +373,9 @@ Methods defined here:<br>
 <dl><dt><a name="Camera-setAspectRatio"><strong>setAspectRatio</strong></a>(...)</dt><dd><tt><a href="#Camera-setAspectRatio">setAspectRatio</a>(&nbsp;(<a href="#Camera">Camera</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Set's&nbsp;the&nbsp;camera's&nbsp;aspect&nbsp;ratio.</tt></dd></dl>
 
+<dl><dt><a name="Camera-setCameraParameterSmooth"><strong>setCameraParameterSmooth</strong></a>(...)</dt><dd><tt><a href="#Camera-setCameraParameterSmooth">setCameraParameterSmooth</a>(&nbsp;(<a href="#Camera">Camera</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Smoothly&nbsp;interpolate&nbsp;the&nbsp;current&nbsp;camera&nbsp;to&nbsp;target&nbsp;camera&nbsp;within&nbsp;given&nbsp;time.</tt></dd></dl>
+
 <dl><dt><a name="Camera-setCenter"><strong>setCenter</strong></a>(...)</dt><dd><tt><a href="#Camera-setCenter">setCenter</a>(&nbsp;(<a href="#Camera">Camera</a>)arg1,&nbsp;(float)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Set&nbsp;camera&nbsp;center.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;camera&nbsp;center&nbsp;position(should&nbsp;only&nbsp;have&nbsp;three&nbsp;number&nbsp;in&nbsp;the&nbsp;input&nbsp;list)&nbsp;e.g.&nbsp;[0,&nbsp;0,&nbsp;0]&nbsp;<br>
@@ -402,7 +405,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 448</dl>
+<dl><dt><strong>__instance_size__</strong> = 528</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBPawn">SBPawn</a>:<br>
@@ -3026,7 +3029,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 84</dl>
+<dl><dt><strong>__instance_size__</strong> = 88</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -5153,6 +5156,14 @@ Methods defined here:<br>
 <dl><dt><a name="SBMotion-removeMetaData"><strong>removeMetaData</strong></a>(...)</dt><dd><tt><a href="#SBMotion-removeMetaData">removeMetaData</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Remove&nbsp;a&nbsp;tagged&nbsp;metadata&nbsp;from&nbsp;the&nbsp;motion.</tt></dd></dl>
 
+<dl><dt><a name="SBMotion-removeMotionChannels"><strong>removeMotionChannels</strong></a>(...)</dt><dd><tt><a href="#SBMotion-removeMotionChannels">removeMotionChannels</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(<a href="#StringVec">StringVec</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Remove&nbsp;the&nbsp;motion&nbsp;channels&nbsp;based&nbsp;on&nbsp;input&nbsp;joint&nbsp;names.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;:&nbsp;names&nbsp;of&nbsp;channels&nbsp;to&nbsp;be&nbsp;removed</tt></dd></dl>
+
+<dl><dt><a name="SBMotion-removeMotionChannelsByEndJoints"><strong>removeMotionChannelsByEndJoints</strong></a>(...)</dt><dd><tt><a href="#SBMotion-removeMotionChannelsByEndJoints">removeMotionChannelsByEndJoints</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#StringVec">StringVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Remove&nbsp;all&nbsp;the&nbsp;motion&nbsp;channels&nbsp;corresponding&nbsp;to&nbsp;the&nbsp;descendents&nbsp;of&nbsp;end&nbsp;joints.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;:&nbsp;skeleton&nbsp;name,&nbsp;end&nbsp;joint&nbsp;names</tt></dd></dl>
+
 <dl><dt><a name="SBMotion-retarget"><strong>retarget</strong></a>(...)</dt><dd><tt><a href="#SBMotion-retarget">retarget</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(str)arg4,&nbsp;(<a href="#StringVec">StringVec</a>)arg5,&nbsp;(<a href="#StringVec">StringVec</a>)arg6,&nbsp;(<a href="#VecMap">VecMap</a>)arg7)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Retarget&nbsp;the&nbsp;motion&nbsp;to&nbsp;a&nbsp;different&nbsp;skeleton.</tt></dd></dl>
 
@@ -6184,7 +6195,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 148</dl>
+<dl><dt><strong>__instance_size__</strong> = 164</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -6317,7 +6328,10 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;new&nbsp;skeleton&nbsp;given&nbsp;a&nbsp;skeleton&nbsp;definition.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-exportScene"><strong>exportScene</strong></a>(...)</dt><dd><tt><a href="#SBScene-exportScene">exportScene</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#StringVec">StringVec</a>)arg2,&nbsp;(bool)arg3)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;entire&nbsp;SmartBody&nbsp;configuration,&nbsp;including&nbsp;assets,&nbsp;into&nbsp;a&nbsp;given&nbsp;file&nbsp;location.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;entire&nbsp;SmartBody&nbsp;configuration,&nbsp;including&nbsp;assets&nbsp;paths&nbsp;as&nbsp;a&nbsp;python&nbsp;script&nbsp;into&nbsp;a&nbsp;given&nbsp;file&nbsp;location.</tt></dd></dl>
+
+<dl><dt><a name="SBScene-exportScenePackage"><strong>exportScenePackage</strong></a>(...)</dt><dd><tt><a href="#SBScene-exportScenePackage">exportScenePackage</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;entire&nbsp;SmartBody&nbsp;configuration&nbsp;and&nbsp;all&nbsp;assets&nbsp;into&nbsp;a&nbsp;given&nbsp;folder,&nbsp;or&nbsp;into&nbsp;a&nbsp;.zip&nbsp;archive</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getActiveCamera"><strong>getActiveCamera</strong></a>(...)</dt><dd><tt><a href="#SBScene-getActiveCamera">getActiveCamera</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#Camera">Camera</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;camera&nbsp;currently&nbsp;being&nbsp;used&nbsp;in&nbsp;the&nbsp;viewer.</tt></dd></dl>
@@ -8186,7 +8200,7 @@ Methods defined here:<br>
 
 <dl><dt><a name="StringVec-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#StringVec-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
 
-<dl><dt><a name="StringVec-__iter__"><strong>__iter__</strong></a>(...)</dt><dd><tt><a href="#StringVec-__iter__">__iter__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;iterator</tt></dd></dl>
+<dl><dt><a name="StringVec-__iter__"><strong>__iter__</strong></a>(...)</dt><dd><tt><a href="#StringVec-__iter__">__iter__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;object</tt></dd></dl>
 
 <dl><dt><a name="StringVec-__len__"><strong>__len__</strong></a>(...)</dt><dd><tt><a href="#StringVec-__len__">__len__</a>(&nbsp;(<a href="#StringVec">StringVec</a>)arg1)&nbsp;-&gt;&nbsp;int</tt></dd></dl>
 
