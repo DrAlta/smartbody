@@ -231,6 +231,7 @@ MeCtEyeLidRegulator::MeCtEyeLidRegulator( void )	{
 	lower_lid_smooth = 0.9f;
 
 
+	setDefaultAttributeGroupPriority("Eyelids", 410);
 	// blinking settings
 	addDefaultAttributeFloat("eyelid.blinkPeriodMin", 4.0f, "Eyelids");
 	addDefaultAttributeFloat("eyelid.blinkPeriodMax", 8.0f, "Eyelids");

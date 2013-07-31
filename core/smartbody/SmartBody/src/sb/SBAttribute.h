@@ -80,7 +80,6 @@ class SBAttributeInfo
 		SBAPI bool getHidden();
 		SBAPI void setGroup(SBAttributeGroup* group);
 		SBAPI SBAttributeGroup* getGroup();
-		SBAPI void setGroup(const std::string& groupName);
 		SBAPI void setDescription(const std::string& description);
 		SBAPI std::string getDescription();
 

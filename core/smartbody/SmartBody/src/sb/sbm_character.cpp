@@ -540,7 +540,7 @@ void SbmCharacter::createStandardControllers()
 		{
 			SmartBody::SBAttribute* attribute = defaultAttributes[a].first;
 			SmartBody::SBAttribute* attributeCopy = attribute->copy();
-			this->addAttribute(attributeCopy);
+			this->addAttribute(attributeCopy, attribute->getAttributeInfo()->getGroup()->getName());
 			// if the controller isn't a scheduler, then add the controller as an observer
 			MeCtScheduler2* scheduler = dynamic_cast<MeCtScheduler2*>(controller);
 			if (!scheduler)

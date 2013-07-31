@@ -60,6 +60,7 @@ MeCtBreathing::MeCtBreathing () : SmartBody::SBController()
 	_blendChannelBreathingMotion = NULL;
 
 	// breathing settings
+	setDefaultAttributeGroupPriority("Breathing", 450);
 	addDefaultAttributeString("breathing.motion", "", "Breathing");
 	addDefaultAttributeBool("breathing.useBlendChannels", false, "Breathing");
 	addDefaultAttributeDouble("breathing.bpm", 15, "Breathing");

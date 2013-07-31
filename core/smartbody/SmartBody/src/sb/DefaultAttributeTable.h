@@ -23,9 +23,13 @@ class DefaultAttributeTable
 {
 protected:
 	std::vector<AttributeVarPair> _defaultAttributes;	
+	std::map<std::string, SmartBody::SBAttributeGroup*> _defaultGroups;
 public:
 	DefaultAttributeTable(void);
 	~DefaultAttributeTable(void);
+
+	void setDefaultAttributeGroupPriority(const std::string& groupName, int priority);
+	int setDefaultAttributeGroupPriority(const std::string& groupName);
 
 	void addDefaultAttributeDouble(const std::string& name, double defaultValue, const std::string& attributeGroup, double* varPtr = NULL);
 	void addDefaultAttributeFloat(const std::string& name, float defaultValue, const std::string& attributeGroup, float* varPtr = NULL);
@@ -35,7 +39,8 @@ public:
 	void addDefaultAttributeVec3(const std::string&name, SrVec& defaultValue, const std::string& attributeGroup, SrVec* varPtr = NULL);
 	void addDefaultAttributeMatrix(const std::string& name, SrMat& defaultValue, const std::string& attributeGroup, SrMat* varPtr = NULL);
 
-	std::vector<AttributeVarPair>& getDefaultAttributes();	
+	std::vector<AttributeVarPair>& getDefaultAttributes();
+	std::map<std::string, SmartBody::SBAttributeGroup*>& getDefaultGroups();	
 };
 
 #endif
