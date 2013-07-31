@@ -13,7 +13,7 @@
 
 
 
-#include "FLU/FluSimpleString.h"
+#include "FluSimpleString.h"
 
 FluSimpleString :: FluSimpleString()
 {

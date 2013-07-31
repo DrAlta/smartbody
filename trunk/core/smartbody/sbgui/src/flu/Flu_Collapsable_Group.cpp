@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <FL/Fl_Window.H>
-#include "FLU/Flu_Collapsable_Group.h"
+#include "Flu_Collapsable_Group.h"
 
 #define _BUTTON_HEIGHT 16
 

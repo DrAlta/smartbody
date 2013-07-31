@@ -14,7 +14,7 @@
 
 
 #include <FL/Fl.H>
-#include "FLU/Flu_Button.h"
+#include "Flu_Button.h"
 
 #include <FL/fl_draw.H>
 
