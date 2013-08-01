@@ -1389,12 +1389,23 @@ void AttributeWindow::cleanUpWidgets()
 {
 	cleanUpAttributesInfo();
 	std::map<std::string, Fl_Widget*>::iterator mi;
+	std::map<std::string, Flu_Collapsable_Group*>::iterator gi;
+
+	for ( gi  = widgetGroupMap.begin();
+		  gi != widgetGroupMap.end();
+		  gi++ )
+	{
+		mainPack->remove(gi->second);		
+	}
+
+
 	for ( mi  = widgetMap.begin();
 		  mi != widgetMap.end();
 		  mi++ )
 	{
 		mainGroup->remove(mi->second);
 	}
+	
 	widgetMap.clear();
 	reverseWidgetMap.clear();
 	widgetGroupMap.clear();

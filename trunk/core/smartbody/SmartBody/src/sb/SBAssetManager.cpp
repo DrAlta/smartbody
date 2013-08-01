@@ -354,8 +354,15 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 		bool parseSuccessful = ParserBVH::parse(*skeleton, *motion, finalPath, file, 1.0);
 		if (parseSuccessful)
 		{
+			if (skeleton)
+			{
+				skeleton->setName(fileName);
+				skeleton->setFileName(finalPath);
+			}
+			if (motion)
+				motion->setName(baseName);
 			_motions.insert(std::pair<std::string, SBMotion*>(motion->getName(), motion));
-			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skeleton->getName(), skeleton));
+			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skeleton->getName(), skeleton));			
 		}
 		else
 		{

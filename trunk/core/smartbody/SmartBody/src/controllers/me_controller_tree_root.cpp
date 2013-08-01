@@ -233,7 +233,7 @@ public:
 	// Implement MeControllerContext
     SkChannelArray& channels() {
 #if 0
-		if( _state!=State::VALID )
+		if( _state!=State::VALID ) 
 			LOG("ERROR: MeControllerTreeRoot::channels() called while invalid");
 #endif
 		if( _state==INVALID )
@@ -293,6 +293,7 @@ public:
 		_skeleton->ref();
 
 		_state = INVALID;
+		
 	}
 
     /**
