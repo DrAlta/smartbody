@@ -269,6 +269,6 @@ set_target_properties(
 install(
 
   	TARGETS ${EXEC_LIST}
-	RUNTIME DESTINATION core/smartbody/sbm/bin
+	RUNTIME DESTINATION core/smartbody/sbgui/bin
 )
 
