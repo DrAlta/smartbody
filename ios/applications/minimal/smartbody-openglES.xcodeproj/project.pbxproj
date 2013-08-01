@@ -42,6 +42,10 @@
 		AAD5A309177A39F70056CDD4 /* libboost_python.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD5A305177A39F70056CDD4 /* libboost_python.a */; };
 		AAD5A30A177A39F70056CDD4 /* libboost_regex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD5A306177A39F70056CDD4 /* libboost_regex.a */; };
 		AAD5A30B177A39F70056CDD4 /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAD5A307177A39F70056CDD4 /* libboost_system.a */; };
+		AAE74E4F1798E6E300D36911 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAE74E4E1798E6E300D36911 /* libsndfile.a */; };
+		AAE74E531798E70600D36911 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAE74E511798E70600D36911 /* CoreAudio.framework */; };
+		AAE74E551798EEF300D36911 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAE74E541798EEF300D36911 /* OpenAL.framework */; };
+		AAE74E5B1798F6CD00D36911 /* libalut.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAE74E5A1798F6CD00D36911 /* libalut.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -87,6 +91,11 @@
 		AAD5A305177A39F70056CDD4 /* libboost_python.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_python.a; path = ../../libs/iphoneos/libboost_python.a; sourceTree = "<group>"; };
 		AAD5A306177A39F70056CDD4 /* libboost_regex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_regex.a; path = ../../libs/iphoneos/libboost_regex.a; sourceTree = "<group>"; };
 		AAD5A307177A39F70056CDD4 /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../../libs/iphoneos/libboost_system.a; sourceTree = "<group>"; };
+		AAE74E4E1798E6E300D36911 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = ../../libs/iphoneos/libsndfile.a; sourceTree = "<group>"; };
+		AAE74E501798E70600D36911 /* freealut.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = freealut.framework; path = "../../../../../Downloads/MacTorcs-master/Frameworks/freealut.framework"; sourceTree = "<group>"; };
+		AAE74E511798E70600D36911 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		AAE74E541798EEF300D36911 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		AAE74E5A1798F6CD00D36911 /* libalut.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libalut.a; path = "../../../../../Downloads/freealut-1.1.0/build/libalut.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +128,10 @@
 				AAD5A309177A39F70056CDD4 /* libboost_python.a in Frameworks */,
 				AAD5A30A177A39F70056CDD4 /* libboost_regex.a in Frameworks */,
 				AAD5A30B177A39F70056CDD4 /* libboost_system.a in Frameworks */,
+				AAE74E4F1798E6E300D36911 /* libsndfile.a in Frameworks */,
+				AAE74E531798E70600D36911 /* CoreAudio.framework in Frameworks */,
+				AAE74E551798EEF300D36911 /* OpenAL.framework in Frameworks */,
+				AAE74E5B1798F6CD00D36911 /* libalut.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +198,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AAE74E5A1798F6CD00D36911 /* libalut.a */,
+				AAE74E4E1798E6E300D36911 /* libsndfile.a */,
 				AAD5A304177A39F70056CDD4 /* libboost_filesystem.a */,
 				AAD5A305177A39F70056CDD4 /* libboost_python.a */,
 				AAD5A306177A39F70056CDD4 /* libboost_regex.a */,
@@ -206,6 +221,9 @@
 				AAC9AC4D142010C000F56F9C /* libvhmsg.a */,
 				AAC9AC4E142010C000F56F9C /* libwsp.a */,
 				AAC9AC4F142010C000F56F9C /* libxerces-c.a */,
+				AAE74E541798EEF300D36911 /* OpenAL.framework */,
+				AAE74E501798E70600D36911 /* freealut.framework */,
+				AAE74E511798E70600D36911 /* CoreAudio.framework */,
 				AAD2C3FF155200120053C478 /* QuartzCore.framework */,
 				AAD2C3F91551FFF30053C478 /* Foundation.framework */,
 				AAD2C3FD1552000C0053C478 /* UIKit.framework */,
@@ -305,6 +323,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../../../../../Downloads/MacTorcs-master/Frameworks\"",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -353,6 +372,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../libs/iphoneos\"",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../../../../../Downloads/freealut-1.1.0/build\"",
 				);
 				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = ../../libs/iphoneos;
 				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = ../../libs/iphonesimulator;
@@ -376,12 +396,14 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../../../../../Downloads/MacTorcs-master/Frameworks\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Chases_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
+					/usr/include/python2.6,
 					"../../python/Python-2.6.5",
 					"../../python/Python-2.6.5/_install/include/python2.6",
 					../../boost/boost_1_51_0,
@@ -421,6 +443,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../libs/iphoneos\"",
 					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../../../../../Downloads/freealut-1.1.0/build\"",
 				);
 				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = ../../libs/iphoneos;
 				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = ../../libs/iphonesimulator;
