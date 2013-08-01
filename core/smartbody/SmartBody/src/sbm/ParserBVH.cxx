@@ -122,6 +122,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						root->quat()->activate();
 						jointCounter++;
 						root->name(strstr.str());
+						skeleton.root(root);
 						//skeleton.make_active_channels();
 						cur = root;
 						state = 2;
@@ -295,7 +296,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						if (pos != std::string::npos)
 							trimmedname = trimmedname.substr(pos + 1, trimmedname.size() - pos + 1);
 						SkJoint* parent = stack.top();
-						SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, parent->index());
+						SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, parent->index());						
 						joint->quat()->activate();
 						jointCounter++;
 						joint->name(trimmedname);
