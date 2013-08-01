@@ -43,8 +43,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "zlib.h"
+#include <sb/SBTypes.h>
 
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 #define USE_FILE32API
 #endif
 
