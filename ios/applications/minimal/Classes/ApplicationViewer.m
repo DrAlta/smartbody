@@ -25,8 +25,6 @@
 - (void)dealloc 
 {
 	[self viewDidUnload];
-    [glView release]; 	
-    [super dealloc];
 }
 
 

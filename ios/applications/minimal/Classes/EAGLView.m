@@ -53,7 +53,6 @@
         context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
         
         if (!context || ![EAGLContext setCurrentContext:context]) {
-            [self release];
             return nil;
         }
         
@@ -220,8 +219,6 @@
         [EAGLContext setCurrentContext:nil];
     }
     
-    [context release];  
-    [super dealloc];
 }
 
 @end
