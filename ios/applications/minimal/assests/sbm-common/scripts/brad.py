@@ -77,12 +77,13 @@ bradHPR = SrVec(0, 0, 0)
 brad.setHPR(bradHPR)
 brad.createStandardControllers()
 # deformable mesh
+#brad.setDoubleAttribute("deformableMeshScale", 0.01)
 brad.setStringAttribute("deformableMesh", "ChrBrad")
 # lip syncing diphone setup
-brad.setStringAttribute("diphoneSetName", "default")
-brad.setBoolAttribute("useDiphone", True)
+brad.setStringAttribute("lipSyncSetName", "default")
+brad.setBoolAttribute("usePhoneBigram", True)
 brad.setVoice("audiofile")
-brad.setVoiceCode("Sounds")
+#brad.setVoiceCode("Sounds")
 # gesture map setup
 brad.setStringAttribute("gestureMap", "ChrBrad")
 brad.setStringAttribute("gestureMapMeek", "ChrBradSad")

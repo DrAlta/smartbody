@@ -58,13 +58,13 @@ void SBSetupDrawing(int w, int h)
 	// light
 	light1.directional = true;
 	light1.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
-	light1.position = SrVec( 100.0, 250.0, 400.0 );
+	light1.position = SrVec( 0.0, 5.0, 10.0f );
 	//light1.constant_attenuation = 1.0f;
     
 	light2 = light1;
 	light2.directional = true;
 	light2.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
-	light2.position = SrVec( 100.0, 500.0, -1000.0 );
+	light2.position = SrVec( 0.0, -5.0f, 10.0f );
 }
     
 void initCharacterScene()
@@ -147,6 +147,7 @@ void SBDrawFrame(int width, int height)
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
     // setup view
+    cam.setAspectRatio(float(width) / float(height));
 	SrMat mat;
 	glMatrixMode ( GL_PROJECTION );
     glLoadIdentity();
