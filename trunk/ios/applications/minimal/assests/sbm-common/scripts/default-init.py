@@ -3,4 +3,4 @@ print "|  data/sbm-common/scripts/default-init.py   |"
 print "|--------------------------------------------|"
 
 scene.addAssetPath("script", "sbm-common/scripts")
-scene.run("brad.py")
+scene.run("rachel.py")
