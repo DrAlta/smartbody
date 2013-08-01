@@ -30,9 +30,4 @@
     [window makeKeyAndVisible]; 
 }
 
-- (void)dealloc {
-	[window release];
-	[m_rootViewController release];
-	[super dealloc];
-}
 @end

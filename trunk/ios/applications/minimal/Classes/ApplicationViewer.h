@@ -18,9 +18,9 @@
     UISegmentedControl *segmentedControl;
 }
 
-@property (nonatomic, retain) IBOutlet EAGLView* glView;
-@property (nonatomic, retain) IBOutlet UITextField* text;
-@property (nonatomic, retain) IBOutlet UISegmentedControl* segmentedControl;
+@property (nonatomic, strong) IBOutlet EAGLView* glView;
+@property (nonatomic, strong) IBOutlet UITextField* text;
+@property (nonatomic, strong) IBOutlet UISegmentedControl* segmentedControl;
 
 
 - (IBAction)changeCommand;

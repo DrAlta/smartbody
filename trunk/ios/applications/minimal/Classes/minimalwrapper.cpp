@@ -142,7 +142,7 @@ void SBDrawFrame(int width, int height)
 
     
 	// clear background
-	glClearColor(0.7f,0.7f,0.7f,1);
+	glClearColor(0.0f,0.0f,0.0f,1);
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
@@ -162,6 +162,7 @@ void SBDrawFrame(int width, int height)
     SbmTextureManager& texm = SbmTextureManager::singleton();
     texm.updateTexture();
     
+    /*
     // draw a ground plane
 	glDisable(GL_LIGHTING);
 	float planeSize  = 300.f;
@@ -181,7 +182,8 @@ void SBDrawFrame(int width, int height)
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 	glEnable(GL_LIGHTING);
-  
+     */
+    
     // draw characters
     SBDrawCharacters();
 }

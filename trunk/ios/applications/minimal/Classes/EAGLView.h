@@ -33,7 +33,7 @@ Note that setting the view non-opaque will only work if the EAGL surface has an 
     /* OpenGL name for the depth buffer that is attached to viewFramebuffer, if it exists (0 if it does not exist) */
     GLuint depthRenderbuffer;
     
-    NSTimer *animationTimer;
+    NSTimer *__weak animationTimer;
     NSTimeInterval animationInterval;
 	
 	//screen dimensions
@@ -46,8 +46,8 @@ Note that setting the view non-opaque will only work if the EAGL surface has an 
 }
 
 @property NSTimeInterval animationInterval;
-@property (nonatomic, retain) EAGLContext *context;
-@property (nonatomic, assign) NSTimer *animationTimer;
+@property (nonatomic, strong) EAGLContext *context;
+@property (nonatomic, weak) NSTimer *animationTimer;
 
 
 
