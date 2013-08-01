@@ -5,9 +5,6 @@
       location = "group:bonebus/bonebus.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:smartbody-dll/smartbody-dll.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:smartbody-lib/smartbody-lib.xcodeproj">
    </FileRef>
    <FileRef
