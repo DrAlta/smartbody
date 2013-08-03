@@ -216,7 +216,7 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 		for ( size_t i = 0; i < m_characterList.size(); i++ )
 		{
 			std::string& name = m_characterList[i];
-			SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 			if (!mSceneMgr->hasEntity(name))
 				continue;
 			if (!character)
@@ -252,11 +252,11 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 			std::map<std::string, Ogre::Vector3>& intialBonePositionMap = m_initialBonePositions[name];
 			Ogre::Skeleton* skel = ent->getSkeleton();			
 			if (!skel) continue;
-			SBSkeleton* sbSkel = character->getSkeleton();
+			SmartBody::SBSkeleton* sbSkel = character->getSkeleton();
 			for (int jId = 0; jId < sbSkel->getNumJoints(); jId++)
 			{
-				SBJoint* joint = sbSkel->getJoint(jId);
-				const std::string& jointName = joint->name();
+				SmartBody::SBJoint* joint = sbSkel->getJoint(jId);
+				const std::string& jointName = joint->getName();
 				if (jointName == "")
 					continue;
 

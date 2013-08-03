@@ -29,6 +29,9 @@ public:
 	void finishRender();
 	void setCharacterVisibility(bool bVisible);
 	bool getCharacterVisiblility();
+	void updateOgreLights();
+	void updateOgreCharacterRenderMode();
+	void resetOgreScene();
 
 	Ogre::SceneManager* getSceneManager() { return ogreSceneMgr; }
 	Ogre::RenderWindow* getRenderWindow() { return ogreWnd; }
@@ -39,9 +42,11 @@ public:
 	void addSBSkeleton(SmartBody::SBSkeleton* skel); // convert a SB skeleton to ogre
 	void addDeformableMesh(std::string meshName, DeformableMesh* mesh);
 	void addTexture(std::string texName);	
+	
 
 protected:
 	static unsigned long getCurrentGLContext();	
+	void setCharacterVisible(bool bVisible, std::string charName);
 protected:
 	Ogre::Root*           ogreRoot;
 	Ogre::RenderWindow*   ogreWnd;

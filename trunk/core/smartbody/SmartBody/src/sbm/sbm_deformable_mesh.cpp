@@ -263,7 +263,7 @@ void DeformableMesh::set_visibility(int deformableMesh)
 		for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
 			dMeshDynamic_p[i]->visible(deformableMesh? true:false );
 
-		binding = deformableMesh? true:false;
+		binding = deformableMesh? true:false;		
 	}
 }
 
@@ -759,6 +759,7 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 		for (unsigned int i = 0; i < dynamicMesh.size(); i++)
 			dynamicMesh[i]->visible(deformableMesh? true:false );
 		_updateMesh = deformableMesh? true:false;
+		meshVisible = deformableMesh? true:false;
 	}
 }
 
@@ -831,4 +832,9 @@ void DeformableMeshInstance::update()
 				continue;
 		}
 	}
+}
+
+bool DeformableMeshInstance::getVisibility()
+{
+	return meshVisible;
 }

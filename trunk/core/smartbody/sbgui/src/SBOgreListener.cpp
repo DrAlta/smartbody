@@ -39,6 +39,8 @@ void OgreListener::OnCharacterDelete( const std::string & name )
 void OgreListener::OnCharacterUpdate( const std::string & name, const std::string & objectClass )
 {
 	SceneNode * node = (SceneNode *)ogreInterface->getSceneManager()->getRootSceneNode()->getChild(name);
+	if (!node) return;
+
 	node->detachAllObjects();
 	ogreInterface->getSceneManager()->destroyEntity(name);
 	ogreInterface->getSceneManager()->getRootSceneNode()->removeAndDestroyChild(name);
@@ -104,8 +106,7 @@ void OgreListener::OnCharacterChangeMesh( const std::string& name )
 	{
 		LOG("Can not create character %s ..., no mesh or skeleton exist",sbChar->getName().c_str());
 		return;
-	}	
-
+	}		
 	// Add entity to the scene node	
 	SceneNode * mSceneNode = ogreInterface->getSceneManager()->getRootSceneNode()->createChildSceneNode(name);
 	mSceneNode->attachObject(ent);

@@ -22,6 +22,7 @@ public:
 	virtual void hide_viewer();	
 	virtual void resize(int x, int y, int w, int h);
 	virtual void menu_cmd ( MenuCmd c, const char* label );
+	virtual void resetViewer();
 	// handle fltk mouse events ?		
 protected:
 	void initOgreWindow();
@@ -30,6 +31,7 @@ protected:
 	EmbeddedOgre* ogreInterface;	
 };
 
+#if 0
 class OgreViewerFactory : public SrViewerFactory
 {
 public:
@@ -40,7 +42,7 @@ public:
 	virtual void remove(SrViewer* viewer);
 private:
 	static SrViewer* s_viewer;
-
 };
+#endif
 
 # endif // FLTK_VIEWER_H

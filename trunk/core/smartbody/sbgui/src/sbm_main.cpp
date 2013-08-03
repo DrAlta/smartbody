@@ -964,10 +964,6 @@ int main( int argc, char **argv )	{
 	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
 	//viewerFactory->setFltkViewer(viewer);
 	SmartBody::SBScene::getScene()->setViewerFactory(viewerFactory);
-#if USE_OGRE_VIEWER > 0
-	SmartBody::SBScene::getScene()->setOgreViewerFactory(new OgreViewerFactory());
-#endif
-
 
 	SmartBody::SBScene::getScene()->getSpeechManager()->festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
 	SmartBody::SBScene::getScene()->getSpeechManager()->cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);

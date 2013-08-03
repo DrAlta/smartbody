@@ -1385,7 +1385,7 @@ void prune_schedule( SbmCharacter*   actor,
 									} 
 #endif
 									else if (dynamic_cast<MeCtConstraint*>(anim_source)) {
-										MeCtConstraint* ct_constraint = dynamic_cast<MeCtConstraint*>(anim_source);
+										MeCtConstraint* ct_constraint = dynamic_cast<MeCtConstraint*>(anim_source);										
 										if (hasConstraint)
 										{
 											in_use = false;

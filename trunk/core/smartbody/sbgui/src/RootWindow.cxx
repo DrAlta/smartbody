@@ -457,6 +457,7 @@ void BaseWindow::ResetScene()
 {
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 	resetWindow();
+	fltkViewer->resetViewer();
 
 	SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
 	SmartBody::SBScene::destroyScene();
@@ -480,7 +481,7 @@ void BaseWindow::ResetScene()
 	if (mediaPath != "")
 		SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
 
-	scene->getVHMsgManager()->setEnable(true);	
+	scene->getVHMsgManager()->setEnable(true);			
 }
 
 
@@ -735,8 +736,12 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 	int confirm = fl_choice("This will reset the current session.\nContinue?", "No", "Yes", NULL);
 	if (confirm == 1)
 	{
+#if 1
+		window->ResetScene(); // should call the same function to be consistent
+#else
 		SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
 		window->resetWindow();
+		
 		SmartBody::SBScene::destroyScene();
 
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -761,6 +766,7 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 		
 
 		scene->getVHMsgManager()->setEnable(true);	
+#endif
 	}
 }
 
@@ -905,9 +911,10 @@ void BaseWindow::PauseCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::ResetCB(Fl_Widget* widget, void* data)
 {
-	SmartBody::SBScene::getScene()->command((char*)"reset");
+	//SmartBody::SBScene::getScene()->command((char*)"reset");
 	BaseWindow* window = (BaseWindow*) data;
-	window->resetWindow();
+	//window->resetWindow();	
+	window->ResetScene();
 }
 
 void BaseWindow::CameraResetCB(Fl_Widget* widget, void* data)
@@ -1592,7 +1599,8 @@ void BaseWindow::CreateLightCB(Fl_Widget* w, void* data)
 	strstr << "light.createDoubleAttribute(\"lightConstantAttenuation\", 1, True, \"LightParameters\", 270, False, False, False, \"Constant attenuation\")\n";
 	strstr << "light.createDoubleAttribute(\"lightLinearAttenuation\", 1, True, \"LightParameters\", 280, False, False, False, \" Linear attenuation.\")\n";
 	strstr << "light.createDoubleAttribute(\"lightQuadraticAttenuation\", 0, True, \"LightParameters\", 290, False, False, False, \"Quadratic attenuation\")\n";
-	strstr << "light.setBoolAttribute(\"visible\", false)\n";
+	strstr << "light.createBoolAttribute(\"lightCastShadow\", True, True, \"LightParameters\", 300, False, False, False, \"Does the light cast shadow?\")\n";
+	strstr << "light.setBoolAttribute(\"visible\", false)\n";	
 	scene->run(strstr.str());
 #endif
 }

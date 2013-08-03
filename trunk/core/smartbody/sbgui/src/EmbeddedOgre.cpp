@@ -3,12 +3,14 @@
 #include <sb/SBJoint.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBCharacter.h>
+#include <sb/SBAttribute.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmTexture.h>
 #if !defined(WIN32)
 #include <GL/glx.h>
 #endif
 #include "OgreFrameListener.h"
+#include "SBOgreListener.h"
 #include "EmbeddedOgre.h"
 #include <boost/lexical_cast.hpp>
 
@@ -65,6 +67,32 @@ void EmbeddedOgre::setupResource()
 	ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
 
+
+void EmbeddedOgre::resetOgreScene()
+{
+	Ogre::TextureManager& ogreTexManager = Ogre::TextureManager::getSingleton();	
+	Ogre::MeshManager& meshManager = Ogre::MeshManager::getSingleton();	
+	Ogre::SkeletonManager& skelManager = Ogre::SkeletonManager::getSingleton();
+	
+	ogreSceneMgr->getRootSceneNode()->detachAllObjects();
+	ogreSceneMgr->destroyAllEntities();	
+	ogreSceneMgr->clearScene();
+	
+	meshManager.unloadAll();
+	meshManager.removeAll();
+	ogreTexManager.unloadAll();
+	skelManager.unloadAll();
+	skelManager.removeAll();		
+
+// 	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+// 	for (unsigned int i=0;i<characterNames.size();i++)
+// 	{
+// 		ogreListener->OnCharacterUpdate(characterNames[i],"character");
+// 	}		
+
+	createDefaultScene();
+}
+
 void EmbeddedOgre::setCharacterVisibility( bool bVisible )
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -81,18 +109,101 @@ void EmbeddedOgre::setCharacterVisibility( bool bVisible )
 	}
 }
 
+
+
+void EmbeddedOgre::setCharacterVisible( bool bVisible, std::string charName )
+{
+	if (ogreSceneMgr->hasSceneNode(charName))
+	{
+		SceneNode* node = ogreSceneMgr->getSceneNode(charName);
+		node->setVisible(bVisible);
+	}		
+}
+
 bool EmbeddedOgre::getCharacterVisiblility()
 {
 	return ogreCharacterVisible;
+}
+
+
+void EmbeddedOgre::updateOgreLights()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	float inverseScale = 1.0/scene->getScale();
+	ogreSceneMgr->destroyAllLights();
+	const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
+		iter != pawnNames.end();
+		iter++)
+	{
+		SmartBody::SBPawn* sbpawn = SmartBody::SBScene::getScene()->getPawn(*iter);
+		const std::string& name = sbpawn->getName();
+		if (name.find("light") == 0)
+		{
+			Light * light;
+			SrVec pos = sbpawn->getPosition();
+			light = ogreSceneMgr->createLight( name );			
+			SmartBody::BoolAttribute* directionalAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightIsDirectional"));
+			if (directionalAttr)
+			{
+				if (directionalAttr->getValue())
+				{
+					light->setType(Light::LT_DIRECTIONAL);
+					light->setDirection(-pos.x,-pos.y,-pos.z);
+				}
+				else
+				{
+					light->setType(Light::LT_POINT);
+					light->setPosition(pos.x,pos.y,pos.z);
+				}			
+			}
+			else
+			{
+				light->setType(Light::LT_POINT);
+				light->setDirection(pos.x,pos.y,pos.z);				
+			}
+
+			SmartBody::BoolAttribute* castShadowAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightCastShadow"));
+			if (castShadowAttr)
+			{
+				light->setCastShadows(castShadowAttr->getValue());				
+			}
+
+			SmartBody::Vec3Attribute* diffuseColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightDiffuseColor"));
+			if (diffuseColorAttr)
+			{
+				const SrVec& color = diffuseColorAttr->getValue();
+				//light.diffuse = SrColor( color.x, color.y, color.z );
+				light->setDiffuseColour(color.x,color.y,color.z);
+			}
+			else
+			{
+				light->setDiffuseColour( 1.0f, 0.95f, 0.8f );
+			}			
+			SmartBody::Vec3Attribute* specularColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightSpecularColor"));
+			if (specularColorAttr)
+			{
+				const SrVec& color = specularColorAttr->getValue();
+				light->setSpecularColour(color.x,color.y,color.z);
+			}
+			else
+			{
+				light->setSpecularColour( 0.0f, 0.0f, 0.0f );
+			}					
+		}
+	}
+	ogreSceneMgr->setShadowFarDistance(30.f*inverseScale);
+	ogreSceneMgr->setShadowDirectionalLightExtrusionDistance(30.f*inverseScale);
 }
 
 void EmbeddedOgre::createDefaultScene()
 {
 	ogreSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_MODULATIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
-	ogreSceneMgr->setShadowTextureSize( 2048 );
-	ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );
-
+	ogreSceneMgr->setShadowTextureCount(4);
+	ogreSceneMgr->setShadowTextureSize( 4096 );
+	ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );	
+	
 	// Setup animation default
 	Animation::setDefaultInterpolationMode( Animation::IM_LINEAR );
 	Animation::setDefaultRotationInterpolationMode( Animation::RIM_LINEAR );
@@ -106,8 +217,8 @@ void EmbeddedOgre::createDefaultScene()
 	Vector3 dir;
 
 	light1 = ogreSceneMgr->createLight( "WhiteLight" );
-	light1->setType( Light::LT_POINT );
-	light1->setPosition( -150.0f, 450.0f, 800.0f );
+	light1->setType( Light::LT_DIRECTIONAL );
+	light1->setDirection( -1.5f, -4.5f, -8.0f );
 	//light1->setSpotlightRange(Degree(30.0f), Degree(50.0f));
 	//l->setCastShadows( true );
 	//light1->setPowerScale( 1.0 );
@@ -155,10 +266,10 @@ void EmbeddedOgre::createDefaultScene()
 
 	Ogre::Light* directionalLight = ogreSceneMgr->createLight("directionalLight");
 	directionalLight->setType(Ogre::Light::LT_DIRECTIONAL);
-	directionalLight->setDiffuseColour(Ogre::ColourValue(0.3f, 0.3f, 0.3f));
-	directionalLight->setSpecularColour(Ogre::ColourValue(0.6f, 0.6f, 0.6f));
-	directionalLight->setDirection(Ogre::Vector3( -100.f, -500.f, 200.f ));		
-
+	directionalLight->setDiffuseColour(Ogre::ColourValue(1.f, 1.f, 1.f));
+	directionalLight->setSpecularColour(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
+	directionalLight->setDirection(Ogre::Vector3( 1.f, -2.f, 5.f ));		
+	
 #endif
 
 	// Position the camera
@@ -360,7 +471,7 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 	std::string meshName = sbChar->getStringAttribute("deformableMesh");
 	if (meshName == "") meshName = sbChar->getName();
 
-	SBSkeleton* charSkel = SBScene::getScene()->getSkeleton(skeletonName);
+	SmartBody::SBSkeleton* charSkel = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
 	addSBSkeleton(charSkel);
 	addDeformableMesh(meshName, sbChar->dMesh_p);
 	Ogre::SkeletonPtr ogreSkel = Ogre::SkeletonManager::getSingleton().getByName(skeletonName);
@@ -397,28 +508,37 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 		}	
 		subMesh->_compileBoneAssignments();
 	}	
-#else
+#else	
+	ogreMesh->clearBoneAssignments();
 	for (unsigned int j=0;j<ogreMesh->sharedVertexData->vertexCount;j++)
 	{
-		Ogre::VertexBoneAssignment vba;
-		// The index of the vertex in the vertex buffer
-		vba.vertexIndex = static_cast<unsigned int>(j);					
 		for (unsigned int m=0;m<2;m++)
 		{
 			for (unsigned int k=0;k<4;k++)
 			{
+				Ogre::VertexBoneAssignment vba;
+				// The index of the vertex in the vertex buffer
+				vba.vertexIndex = static_cast<unsigned int>(j);							
 				int origBoneID = deformMesh->boneIDBuf[m][j][k];
-				std::string jName = deformMesh->boneJointList[origBoneID]->name();
+				std::string jName = deformMesh->boneJointList[origBoneID]->getName();
+				//vba.boneIndex = (ogreSkel->getBone(jName)->getHandle()+2)%ogreSkel->getNumBones();				o
 				vba.boneIndex = ogreSkel->getBone(jName)->getHandle();
+				//if (origBoneID != vba.boneIndex)
+				//vba.boneIndex = origBoneID;
 				vba.weight    = deformMesh->boneWeightBuf[m][j][k];			
-				ogreMesh->addBoneAssignment(vba);		
+				if (vba.weight > 0)
+				{
+					ogreMesh->addBoneAssignment(vba);		
+					//LOG("jName = %s, origID = %d, ogreBoneID = %d, weight = %f",jName.c_str(),origBoneID,vba.boneIndex, vba.weight);
+				}
 			}	
 		}			
 	}
-	ogreMesh->_compileBoneAssignments();
+	ogreMesh->_compileBoneAssignments();	
 #endif
 	ogreMesh->load();
 	outChar = ogreSceneMgr->createEntity(sbChar->getName(),meshName);	
+	//outChar->setDisplaySkeleton(true);
 	return outChar;
 }
 
@@ -440,9 +560,8 @@ void EmbeddedOgre::addSBSkeleton( SmartBody::SBSkeleton* skel )
 		SrQuat q = joint->quat()->prerot();
 		ogBone->setOrientation(q.w,q.x,q.y,q.z);
 		ogBone->setManuallyControlled(true);
-		ogBone->setInitialState();
+		ogBone->setInitialState();		
 	}
-
 	// setup the hierarchy
 	for (int i=0;i<skel->getNumJoints();i++)
 	{
@@ -454,7 +573,7 @@ void EmbeddedOgre::addSBSkeleton( SmartBody::SBSkeleton* skel )
 			ogBone->addChild(childBone);
 		}
 	}
-	ogreSkel->load(); // load the skeleton
+	ogreSkel->load(); // load the skeleton	
 }
 
 void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh )
@@ -700,4 +819,19 @@ void EmbeddedOgre::addTexture( std::string texName )
 		}	
 	pixelBuffer->unlock();
 	ogreTex->load();	
+}
+
+void EmbeddedOgre::updateOgreCharacterRenderMode()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string> charNames = scene->getCharacterNames();
+	for (unsigned int i=0;i<charNames.size();i++)
+	{
+		SmartBody::SBCharacter* sbChar = scene->getCharacter(charNames[i]);
+		if (sbChar)
+		{
+			setCharacterVisible(sbChar->dMeshInstance_p->getVisibility(),charNames[i]);			
+		}
+	}
+
 }

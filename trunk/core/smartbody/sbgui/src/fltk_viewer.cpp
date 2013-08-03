@@ -4940,6 +4940,10 @@ void FltkViewer::drawText( const SrMat& mat, float textSize, std::string &text )
 	glPopMatrix();
 }
 
+void FltkViewer::resetViewer()
+{
+
+}
 
 GestureVisualizationHandler::GestureVisualizationHandler()
 {
