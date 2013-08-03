@@ -1580,10 +1580,10 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								character->dMesh_p->set_visibility(1);
 								if (character->dMeshInstance_p)
 									character->dMeshInstance_p->setVisibility(1);
-                                                        #if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)
+                                #if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)
 							
 								SbmDeformableMeshGPU::useGPUDeformableMesh = false;
-                                                        #endif          
+                                #endif          
 							}
 							else if (viewType == "5" || viewType == "deformableGPU")
 							{

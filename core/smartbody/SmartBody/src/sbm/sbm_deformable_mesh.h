@@ -107,6 +107,7 @@ protected:
 	SkSkeleton*			  _skeleton;
 	bool				  _updateMesh;
 	std::vector<SkJointList> _boneJointList;
+	bool meshVisible;
 
 public:
 	std::vector<SrVec> _deformPosBuf;		
@@ -117,6 +118,7 @@ public:
 	void updateJointList();
 	virtual void setSkeleton(SkSkeleton* skel);	
 	virtual void setVisibility(int deformableMesh);
+	SBAPI bool    getVisibility();
 	virtual void update();
 	DeformableMesh* getDeformableMesh() { return _mesh; }
 

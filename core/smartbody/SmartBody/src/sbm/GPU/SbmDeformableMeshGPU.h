@@ -23,7 +23,7 @@ class SbmDeformableMeshGPUInstance;
 class SbmDeformableMeshGPU : public DeformableMesh
 {
 public:
-	static bool disableRendering;
+	SBAPI static bool disableRendering;
 	SBAPI static bool useGPUDeformableMesh;
 	SBAPI static bool useShadowPass;	
 	SBAPI static GLuint shadowMapID;

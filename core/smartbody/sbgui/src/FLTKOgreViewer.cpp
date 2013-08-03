@@ -1,4 +1,4 @@
-#include <sbm/mcontrol_util.h>
+#include <sb/SBScene.h>
 #include "FLTKListener.h"
 
 #ifdef INTMAX_C 
@@ -14,6 +14,7 @@
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #include <FL/x.H>
 #include <sr/sr_gl.h>
+#include <sbm/Heightfield.h>
 
 
 FLTKOgreWindow::FLTKOgreWindow( int x, int y, int w, int h, const char *label/*=0 */ ) : FltkViewer(x,y,w,h,label)//Fl_Gl_Window(x,y,w,h,label), SrViewer(x, y, w, h)
@@ -57,8 +58,8 @@ void FLTKOgreWindow::initOgreWindow()
 	ogreInterface = new EmbeddedOgre();
 	ogreInterface->createOgreWindow(flHwnd, flParentHwnd, fltkGLContext, w(), h(), "OgreWindow");	
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
-	FLTKListener* fltkListener = dynamic_cast<FLTKListener*>(mcu.sbm_character_listener);
+	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
+	FLTKListener* fltkListener = dynamic_cast<FLTKListener*>(sbScene->getCharacterListener());
 	OgreListener* ogreListener = NULL;
 	if (fltkListener)
 	{
@@ -67,7 +68,7 @@ void FLTKOgreWindow::initOgreWindow()
 	}
 	if (ogreListener)
 	{
-		SBScene* sbScene = SBScene::getScene();
+		
 		std::vector<std::string> charNames = sbScene->getCharacterNames();
 		for (unsigned int i=0;i<charNames.size();i++)
 		{
@@ -100,6 +101,8 @@ void FLTKOgreWindow::draw()
 		glMatrixMode( GL_MODELVIEW );
 		glPushMatrix();		
 		updateOgreCamera();
+		ogreInterface->updateOgreLights();
+		ogreInterface->updateOgreCharacterRenderMode();
 		ogreInterface->update(); // do Ogre rendering for deformable characters
 		// pop everything!
 		glMatrixMode( GL_COLOR );
@@ -123,21 +126,23 @@ void FLTKOgreWindow::draw()
 
 void FLTKOgreWindow::updateOgreCamera()
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	Ogre::Camera* ogreCam = ogreInterface->getCamera();
-	SrCamera& cam = *FltkViewer::_data->camera;
+	//SrCamera& cam = *FltkViewer::_data->camera;
+	SrCamera& cam = *scene->getActiveCamera();
 	// override the ogre camera with fltk camera
 	SrMat viewMat;
 	cam.get_view_mat(viewMat);	
 	SrQuat q = SrQuat(viewMat);
-	SrVec  p = cam.eye;
+	SrVec  p = cam.getEye();
 	ogreCam->setOrientation(Ogre::Quaternion(q.w,q.x,q.y,q.z).Inverse());
 	ogreCam->setPosition(Ogre::Vector3(p.x,p.y,p.z));			
 	//ogreCam->setOrientation()	
-	//ogreCam->setFarClipDistance(cam.zfar);
-	//ogreCam->setNearClipDistance(cam.znear);
-	cam.zfar = ogreCam->getFarClipDistance();
-	cam.znear = ogreCam->getNearClipDistance();
-	ogreCam->setFOVy(Ogre::Radian(cam.fovy));
+	ogreCam->setFarClipDistance(cam.getFarPlane());
+	ogreCam->setNearClipDistance(cam.getNearPlane());
+	//cam.zfar = ogreCam->getFarClipDistance();
+	//cam.znear = ogreCam->getNearClipDistance();
+	ogreCam->setFOVy(Ogre::Radian(cam.getFov()));
 }
 
 
@@ -145,17 +150,17 @@ void FLTKOgreWindow::fltkRender()
 {
 	//FltkViewer::draw();
     //return;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	glEnable(GL_DEPTH_TEST);
 	if (_objManipulator.hasPicking())
 	{
 		SrVec2 pick_loc = _objManipulator.getPickLoc();
-		_objManipulator.picking(pick_loc.x,pick_loc.y, _data->camera);	   
+		_objManipulator.picking(pick_loc.x,pick_loc.y, scene->getActiveCamera());	   
 	}  
 
-	mcuCBHandle& mcu = mcuCBHandle::singleton();
 	glViewport ( 0, 0, w(), h() );
 	SrLight &light = _data->light;
-	SrCamera &cam  = *_data->camera;
+	SrCamera &cam  = *scene->getActiveCamera();
 	SrMat mat ( SrMat::NotInitialized );
     
     
@@ -164,7 +169,7 @@ void FLTKOgreWindow::fltkRender()
     //glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 	//----- Set Projection ----------------------------------------------
-	cam.aspect = (float)w()/(float)h();
+	cam.setAspectRatio((float)w()/(float)h());
 
 	glMatrixMode ( GL_PROJECTION );
 	glLoadMatrix ( cam.get_perspective_mat(mat) );
@@ -173,19 +178,14 @@ void FLTKOgreWindow::fltkRender()
 	glMatrixMode ( GL_MODELVIEW );
 	glLoadMatrix ( cam.get_view_mat(mat) );
 
-	glScalef ( cam.scale, cam.scale, cam.scale );
+	glScalef ( cam.getScale(), cam.getScale(), cam.getScale() );
 
 	updateLights();
 	glEnable ( GL_LIGHTING );
 	for (size_t x = 0; x < _lights.size(); x++)
 	{
 		glLight ( x, _lights[x] );		
-	}
-
-	glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.0f);
-	glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.2f);
-	glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.08f);	
-
+	}	
 	static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
 	static GLfloat mat_ambient[] = { 0.0,  0.0,    0.0,    1.0 };
 	static GLfloat mat_diffuse[] = { 1.0,  1.0,    1.0,    1.0 };
@@ -200,24 +200,28 @@ void FLTKOgreWindow::fltkRender()
 	glEnable( GL_NORMALIZE );
 
 	if (_data->terrainMode == FltkViewer::ModeTerrain)
-		mcu.render_terrain(0);
+	{
+		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();		
+		if (h)
+			h->render(0);
+	}
 	else if (_data->terrainMode == FltkViewer::ModeTerrainWireframe)
-		mcu.render_terrain(1);
+	{
+		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();		
+		if (h)
+			h->render(1);
+	}		
 
 	glDisable( GL_COLOR_MATERIAL );
-	
-
 	//drawAllGeometries();		
- 	if( _data->root )	{		
- 		_data->render_action.apply ( _data->root );
- 	}
+	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
+		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
+	} 
 	drawPawns();
 	// draw the grid
 	//   if (gridList == -1)
 	//	   initGridList();
-
 	drawGrid();
-
 	drawSteeringInfo();
 	drawEyeBeams();
 	drawEyeLids();
@@ -231,8 +235,6 @@ void FLTKOgreWindow::fltkRender()
 	_objManipulator.draw(cam);
 	// feng : debugging draw for reach controller
 	drawReach();
-
-
 }
 
 void FLTKOgreWindow::render()
@@ -256,7 +258,7 @@ void FLTKOgreWindow::resize( int x, int y, int w, int h )
 void FLTKOgreWindow::menu_cmd( MenuCmd c, const char* label )
 {
 	// override the GPU deformable model to let Ogre3D do the rendering
-	if (c == CmdCharacterShowDeformableGeometryGPU)
+	if (c == CmdCharacterShowDeformableGeometryGPU || c == CmdCharacterShowDeformableGeometry)
 	{
 		SbmDeformableMeshGPU::disableRendering = true;
 		_data->charactermode = ModeShowDeformableGeometryGPU;				
@@ -270,7 +272,7 @@ void FLTKOgreWindow::menu_cmd( MenuCmd c, const char* label )
 	}	
 	else
 	{
-		if (c ==  CmdCharacterShowGeometry || c == 	CmdCharacterShowCollisionGeometry || c == CmdCharacterShowDeformableGeometry
+		if (c ==  CmdCharacterShowGeometry || c == 	CmdCharacterShowCollisionGeometry 
 			|| c == CmdCharacterShowBones || c == CmdCharacterShowAxis)
 		{
 			SbmDeformableMeshGPU::disableRendering = false;
@@ -280,6 +282,13 @@ void FLTKOgreWindow::menu_cmd( MenuCmd c, const char* label )
 	}
 	//FltkViewer::menu_cmd(c,label);
 }
+
+void FLTKOgreWindow::resetViewer()
+{
+	ogreInterface->resetOgreScene();
+}
+
+#if 0
 // Ogre viewer factory
 SrViewer* OgreViewerFactory::s_viewer = NULL;
 OgreViewerFactory::OgreViewerFactory()
@@ -299,3 +308,4 @@ void OgreViewerFactory::remove(SrViewer* viewer)
 		viewer->hide_viewer();
 	}
 }
+#endif

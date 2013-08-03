@@ -388,6 +388,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 	virtual void show_viewer();
 	virtual void hide_viewer();
 	virtual void makeGLContext();
+	virtual void resetViewer();
 
     FltkViewerData* _data;
 	GestureData* _gestureData;

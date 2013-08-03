@@ -448,7 +448,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& ske
 									//LOG("axis = %f %f %f, angle = %f",axis.x,axis.y,axis.z,angle);
 									SrQuat orientation(axis, angle);	
 									SkJointQuat* jointQuat = joint->quat();
-									jointQuat->orientation(orientation);
+									jointQuat->prerot(orientation);
 								}
 							}
 						}
@@ -1127,7 +1127,7 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 		xml_utils::xml_translate(&subMeshStr, subMesh->getNodeName());
 		if (subMeshStr != "submesh")
 			continue;
-		SrModel* model = new SrModel();
+		//SrModel* model = new SrModel();
 		std::string meshName = subMeshStr + boost::lexical_cast<std::string>(i);
 		const DOMNodeList* subMeshChildren = subMesh->getChildNodes();
 		for (unsigned int a = 0; a < subMeshChildren->getLength(); a++)
