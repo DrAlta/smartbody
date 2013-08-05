@@ -36,7 +36,6 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/external/ \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/steerlib/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/pprAI/include \
-					$(LOCAL_PATH)/$(SBM_PATH)/../smartbody-dll/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../android/include \
 					$(LOCAL_PATH)/../../../core/smartbody/sbm-debugger/lib \
 					$(LOCAL_PATH)/$(SBM_PATH)/src \
