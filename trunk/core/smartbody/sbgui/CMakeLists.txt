@@ -2,7 +2,9 @@ include_directories( ./src )
 include_directories( ../SmartBody/src )
 #include_directories( /usr/local/include/CEGUI )
 link_directories( /usr/local/lib )
+link_directories( /usr/lib )                                                           
 
+set (BUILD_OGRE FALSE)
 # never build ogre if in osx
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set (BUILD_OGRE FALSE)
@@ -35,7 +37,7 @@ find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
 endif()
 
 if (${BUILD_OGRE})
-include_directories( /usr/local/include/OGRE )
+include_directories( /usr/include/OGRE )
 set (OGREMAINLIB OgreMain)
 set (OISLIB OIS)
 set (OGRE_LIBS
