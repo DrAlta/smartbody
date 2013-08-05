@@ -353,10 +353,14 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		}
 		ogreRoot->loadPlugin(pluginName);
 		//ogreRoot->loadPlugin(sceneManagerPlugin);
-
+#if 1 //OGRE_VERSION_MINOR > 7 && OGRE_VERSION_MAJOR == 1
 		const Ogre::RenderSystemList& lRenderSystemList = (ogreRoot->getAvailableRenderers());
-
 		Ogre::RenderSystem *lRenderSystem = lRenderSystemList[0];		
+#else
+                const Ogre::RenderSystemList* lRenderSystemList = (ogreRoot->getAvailableRenderers());
+                Ogre::RenderSystem *lRenderSystem = (*lRenderSystemList)[0];
+#endif
+
 		ogreRoot->setRenderSystem(lRenderSystem);
 				
 		ogreWnd = ogreRoot->initialise( false );
