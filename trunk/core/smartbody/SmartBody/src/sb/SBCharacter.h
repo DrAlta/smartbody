@@ -72,11 +72,11 @@ class SBCharacter : public SbmCharacter
 
 		SBAPI void notify(SBSubject* subject);	
 		SBAPI void setDeformableMeshName(std::string meshName);
-		std::string getPostureName(); // get the current posture of character
-		void setDeformableMeshScale(double meshScale);
-	    void copy(SBCharacter* origChar);
-		void setReach(SmartBody::SBReach* reach);
-		SmartBody::SBReach* getReach();
+		SBAPI std::string getPostureName(); // get the current posture of character
+		SBAPI void setDeformableMeshScale(double meshScale);
+	    SBAPI void copy(SBCharacter* origChar);
+		SBAPI void setReach(SmartBody::SBReach* reach);
+		SBAPI SmartBody::SBReach* getReach();
 		
 	protected:
 		std::vector<SBBehavior*> _curBehaviors;	
