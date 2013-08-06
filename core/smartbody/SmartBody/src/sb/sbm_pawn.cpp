@@ -288,7 +288,7 @@ int SbmPawn::setup() {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	if ( scene->getCharacterListener() )
 	{
-		scene->getCharacterListener()->OnCharacterUpdate( getName(), getClassType() );
+		scene->getCharacterListener()->OnCharacterChanged( getName() );
 	}
 	return( CMD_SUCCESS ); 
 }
