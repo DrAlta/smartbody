@@ -189,17 +189,59 @@ bool ParserOgre::parse(SmartBody::SBSkeleton& skeleton, std::vector<SmartBody::S
 		if (doParseSkeleton)
 		{
 			DOMNode* skeletonNode = getNode("skeleton", doc);
+			bool foundSkeleton = false;
 			if (!skeletonNode)
 			{
-				// is this a COLLADA file? 
-				DOMNode* colladaNode = getNode("library_visual_scenes", doc);
-				if (colladaNode)
+				DOMNode* skeletonLinkNode = getNode("skeletonlink", doc);
+				if (skeletonLinkNode)
 				{
-					LOG("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
+					DOMNamedNodeMap* childAttr = skeletonLinkNode->getAttributes();
+					const DOMNode* nameNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_NAME);
+					std::string nameAttr = "";
+					if (nameNode)
+					{
+						xml_utils::xml_translate(&nameAttr, nameNode->getNodeValue());
+						// if the reference is to a .skeleton file, transform it into a .skeleton.xml file
+						if (nameAttr.find(".skeleton") == nameAttr.size() - 9)
+						{
+							nameAttr.append(".xml");
+						}
+						// make sure that file exists
+						if (boost::filesystem::exists(nameAttr))
+						{
+							delete parser;
+							parser = new XercesDOMParser();
+							XercesDOMParser* parser = new XercesDOMParser();
+							parser->setValidationScheme(XercesDOMParser::Val_Always);
+							parser->setDoNamespaces(true);    // optional
+
+							ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
+							parser->setErrorHandler(errHandler);
+							parser->parse(nameAttr.c_str());
+							DOMDocument* doc = parser->getDocument();
+							skeletonNode = getNode("skeleton", doc);	
+							if (skeletonNode)
+								foundSkeleton = true;
+						}
+						else
+						{
+							LOG("Skeleton linked in file %s, which does not exist", nameAttr.c_str());
+						}	
+					}
+
+				}
+				if (!foundSkeleton)
+				{
+					// is this a COLLADA file? 
+					DOMNode* colladaNode = getNode("library_visual_scenes", doc);
+					if (colladaNode)
+					{
+						LOG("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
+						return false;
+					}
+					LOG("<skeleton> was not found in file %s.", pathName.c_str());
 					return false;
 				}
-				LOG("<skeleton> was not found in file %s.", pathName.c_str());
-				return false;
 			}
 			parseOk = parseSkeleton(skeletonNode, skeleton, pathName, scale);
 		}
