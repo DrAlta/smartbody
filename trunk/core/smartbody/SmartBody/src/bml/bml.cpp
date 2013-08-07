@@ -2090,6 +2090,17 @@ GazeRequest::GazeRequest(   float interval, int mode, const std::string& unique_
 
 void GazeRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
+	// if this is a gaze with a handle and it is already running, don't do anything
+	const SbmCharacter* character = request->actor;
+	if (character)
+	{
+		MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+		MeController* controller = controllerTree->findControllerByHandle(anim_ct->handle());
+		MeCtGaze* gazeCt = dynamic_cast<MeCtGaze*>( controller );
+		if (gazeCt)
+			return;
+	}
+
 	double startAt  = (double)behav_syncs.sync_start()->time();
 	double readyAt  = (double)behav_syncs.sync_ready()->time();
 	double strokeAt = (double)behav_syncs.sync_stroke()->time();
