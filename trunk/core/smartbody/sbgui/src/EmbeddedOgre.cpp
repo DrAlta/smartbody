@@ -12,6 +12,7 @@
 #include "OgreFrameListener.h"
 #include "SBOgreListener.h"
 #include "EmbeddedOgre.h"
+
 #include <boost/lexical_cast.hpp>
 
 #ifdef INTMAX_C 
@@ -21,7 +22,7 @@
 #undef UINTMAX_C
 #endif
 
-
+#define USE_RTSHADER_SYSTEM 
 
 using namespace Ogre;
 
@@ -101,6 +102,11 @@ void EmbeddedOgre::setCharacterVisibility( bool bVisible )
 	for (unsigned int i=0;i<charNames.size();i++)
 	{
 		std::string name = charNames[i];
+		SmartBody::SBCharacter* sbChar = scene->getCharacter(charNames[i]);
+		if (sbChar)
+		{
+			sbChar->dMeshInstance_p->setVisibility(true);
+		}
 		if (ogreSceneMgr->hasSceneNode(name))
 		{
 			SceneNode* node = ogreSceneMgr->getSceneNode(name);
@@ -116,7 +122,9 @@ void EmbeddedOgre::setCharacterVisible( bool bVisible, std::string charName )
 	if (ogreSceneMgr->hasSceneNode(charName))
 	{
 		SceneNode* node = ogreSceneMgr->getSceneNode(charName);
+		Ogre::Entity* ogreChar = dynamic_cast<Ogre::Entity*>(node->getAttachedObject(charName));
 		node->setVisible(bVisible);
+
 	}		
 }
 
@@ -283,7 +291,8 @@ void EmbeddedOgre::createDefaultScene()
 	Ogre::MeshPtr planeMesh = MeshManager::getSingleton().createPlane( "Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 3500, 3500, 100, 100, true, 1, 60, 60, Vector3::UNIT_Z );
 	std::string materialName = "MyplaneMat";
     
-	Ogre::MaterialPtr ogreMat = Ogre::MaterialManager::getSingleton().create(materialName, "General");
+	Ogre::MaterialManager& matManager = Ogre::MaterialManager::getSingleton();
+	Ogre::MaterialPtr ogreMat = matManager.create(materialName, "General", true);
 	Ogre::Pass* pass = ogreMat->getTechnique(0)->getPass(0);			
 	pass->setDiffuse(0.3f,0.3f,0.3f,1.f);	
 	pass->setShadingMode(SO_PHONG);
@@ -342,8 +351,12 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 	//LOG("embeddedOgre, current GL context = %lu, input GL context = %lu, winHandle = %lu",oldGLContext, glContext, winHandle);
 	try 
 	{		
-		ogreRoot = new Ogre::Root();
+		ogreRoot = OGRE_NEW Ogre::Root();
+
+		Ogre::MaterialManager& matManager = Ogre::MaterialManager::getSingleton();
+
 		ogreRoot->restoreConfig();
+		LogManager::getSingletonPtr()->setLogDetail(LL_BOREME);
 		Ogre::String pluginName = "RenderSystem_GL";	
 		Ogre::String sceneManagerPlugin = "Plugin_OctreeSceneManager";
 		bool lIsInDebugMode = OGRE_DEBUG_MODE;
@@ -351,7 +364,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		{
 			pluginName.append("_d");
 		}
-		ogreRoot->loadPlugin(pluginName);
+		ogreRoot->loadPlugin(pluginName);		
 		//ogreRoot->loadPlugin(sceneManagerPlugin);
 #if 1 //OGRE_VERSION_MINOR > 7 && OGRE_VERSION_MAJOR == 1
 		const Ogre::RenderSystemList& lRenderSystemList = (ogreRoot->getAvailableRenderers());
@@ -362,7 +375,13 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 #endif
 
 		ogreRoot->setRenderSystem(lRenderSystem);
-				
+
+		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/materials/programs","FileSystem");
+		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/materials/scripts","FileSystem");
+		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/materials/textures","FileSystem");
+		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/RTShaderLib/","FileSystem");
+		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/RTShaderLib/materials/","FileSystem");
+
 		ogreWnd = ogreRoot->initialise( false );
 		Ogre::NameValuePairList params;
 		//if (parentHandle)
@@ -386,6 +405,30 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		params["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)winHandle);				                
 		ogreWnd = ogreRoot->createRenderWindow( windowName, width, height, false, &params );
 		ogreGLContext = (unsigned long)getCurrentGLContext();
+
+
+#if defined(USE_RTSHADER_SYSTEM) 	
+		if (Ogre::RTShader::ShaderGenerator::initialize())
+		{
+			ResourceGroupManager::getSingleton().initialiseAllResourceGroups();		
+			// Grab the shader generator pointer.
+			ogreShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
+			//Add the hardware skinning to the shader generator default render state
+			ogreSrsHardwareSkinning = ogreShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
+			Ogre::RTShader::RenderState* renderState = ogreShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+			renderState->addTemplateSubRenderState(ogreSrsHardwareSkinning);
+
+			Ogre::MaterialManager& matManager = Ogre::MaterialManager::getSingleton();
+
+// 			Ogre::MaterialPtr pCast1 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_1weight");
+// 			Ogre::MaterialPtr pCast2 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_2weight");
+// 			Ogre::MaterialPtr pCast3 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_3weight");
+// 			Ogre::MaterialPtr pCast4 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_4weight");			
+// 			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
+// 				Ogre::RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
+		}
+
+#endif
 		
 
 		// setup scene manager
@@ -516,7 +559,7 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 	ogreMesh->clearBoneAssignments();
 	for (unsigned int j=0;j<ogreMesh->sharedVertexData->vertexCount;j++)
 	{
-		for (unsigned int m=0;m<2;m++)
+		for (unsigned int m=0;m<1;m++)
 		{
 			for (unsigned int k=0;k<4;k++)
 			{
@@ -542,6 +585,54 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 #endif
 	ogreMesh->load();
 	outChar = ogreSceneMgr->createEntity(sbChar->getName(),meshName);	
+
+#if 1	//outChar->setMaterialName("Ogre/RTShader/shadow_caster_dq_skinning_4weight");	
+/*
+	for (unsigned int i=0;i<outChar->getNumSubEntities();i++)
+	{
+		MaterialPtr entityMaterial = outChar->getSubEntity(i)->getMaterial();
+		if(!entityMaterial.isNull())
+		{
+			Technique* bestTechnique = entityMaterial->getBestTechnique();
+			if(bestTechnique)
+			{
+				Pass* pass = bestTechnique->getPass(0);
+				if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) 
+				{
+					LOG("Entity %d, Has Hardware Skinning",i);
+				}
+				else
+				{
+					LOG("Entity %d, Has Software Skinning",i);
+				}
+			}
+		}
+	}
+
+	if (outChar->isHardwareAnimationEnabled())
+	{
+		LOG("outChar has hardware skinning");
+	}
+	else
+	{
+		LOG("outChar has software skinning");
+	}
+	*/
+	//RTShader::HardwareSkinningFactory::getSingleton().setMaxCalculableBoneCount(150);
+	//RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(outChar, Ogre::RTShader::ST_DUAL_QUATERNION, true, false);
+	//The following line is needed only because the Jaiqua model material has shaders and
+	//as such is not automatically reflected in the RTSS system
+// 	for (unsigned int i=0;i<outChar->getNumSubEntities();i++)
+// 	{
+// 		RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
+// 			outChar->getSubEntity(i)->getMaterialName(),
+// 			Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
+// 			Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
+// 			true);
+// 		ogreShaderGenerator->validateMaterial(Ogre::MaterialManager::DEFAULT_SCHEME_NAME,outChar->getSubEntity(i)->getMaterialName());
+// 		outChar->getSubEntity(i)->getMaterial()->compile();		
+// 	}			
+#endif
 	//outChar->setDisplaySkeleton(true);
 	return outChar;
 }
@@ -682,7 +773,8 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 	Ogre::HardwareVertexBufferSharedPtr vbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
 		decl->getVertexSize(0),                     // This value is the size of a vertex in memory
 		vtxData->vertexCount,                       // The number of vertices you'll put into this buffer
-		Ogre::HardwareBuffer::HBU_STATIC // Properties
+		Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, // Properties
+		true
 		);	
 	float* tempFloatArray;
 	tempFloatArray = new float[vtxData->vertexCount*6];
@@ -710,7 +802,8 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 	Ogre::HardwareVertexBufferSharedPtr tbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
 		decl->getVertexSize(1),                     // This value is the size of a vertex in memory
 		vtxData->vertexCount,                       // The number of vertices you'll put into this buffer
-		Ogre::HardwareBuffer::HBU_STATIC // Properties
+		Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, // Properties
+		true
 		);		
 	tempFloatArray = new float[vtxData->vertexCount*2];
 	for (unsigned int j=0;j<vtxData->vertexCount;j++)
@@ -738,7 +831,8 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 		Ogre::HardwareIndexBufferSharedPtr ibuf = Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(
 			Ogre::HardwareIndexBuffer::IT_32BIT,        // You can use several different value types here
 			subModel->numTri*3,                       // The number of indices you'll put in that buffer
-			Ogre::HardwareBuffer::HBU_STATIC // Properties
+			Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, // Properties
+			true
 			);
 		ibuf->writeData(0, ibuf->getSizeInBytes(), tempUIntArray, true);
 		ogSubMesh->indexData->indexBuffer = ibuf;
@@ -768,17 +862,19 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 		mat.specular.get(color);	
 		pass->setSpecular(color[0],color[1],color[2],color[3]);
 		pass->setShininess(mat.shininess);
-		pass->setAlphaRejectSettings(CMPF_GREATER,60);
+		pass->setAlphaRejectSettings(CMPF_GREATER,0);
 		pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
 		pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);
 		pass->setShadingMode(SO_PHONG);
+		//pass->setShadowCasterVertexProgram("Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs");
+		//pass->setVertexProgram("Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs");		
 		//pass->setVertexProgram("Ogre/HardwareSkinningFourWeightsGLSL");
 		//pass->setShadowCasterVertexProgram("Ogre/HardwareSkinningFourWeightsShadowCasterGLSL");
- 		ogSubMesh->setMaterialName(materialName);
+ 		ogSubMesh->setMaterialName(materialName);		
 		//ogSubMesh->setMaterialName("smartbody");
 	}
 	ogreMesh->_setBounds(AxisAlignedBox(bbMin[0],bbMin[1],bbMin[2],bbMax[0],bbMax[1],bbMax[2]));
-	ogreMesh->_setBoundingSphereRadius(Math::Sqrt(3*10*10));
+	ogreMesh->_setBoundingSphereRadius(Math::Sqrt(3*10*10));	
 	ogreMesh->load(); // load the mesh
 #endif	
 }

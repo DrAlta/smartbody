@@ -15,6 +15,7 @@
 #include <FL/x.H>
 #include <sr/sr_gl.h>
 #include <sbm/Heightfield.h>
+#include "SBGUIManager.h"
 
 
 FLTKOgreWindow::FLTKOgreWindow( int x, int y, int w, int h, const char *label/*=0 */ ) : FltkViewer(x,y,w,h,label)//Fl_Gl_Window(x,y,w,h,label), SrViewer(x, y, w, h)
@@ -31,9 +32,10 @@ void FLTKOgreWindow::show_viewer()
 {
 	show();
 	if (!ogreInterface)
+	{
 		initOgreWindow();
-
-
+		SBGUIManager::singleton().init();
+	}
 }
 
 void FLTKOgreWindow::hide_viewer()
@@ -235,6 +237,9 @@ void FLTKOgreWindow::fltkRender()
 	_objManipulator.draw(cam);
 	// feng : debugging draw for reach controller
 	drawReach();
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	SBGUIManager::singleton().update();
 }
 
 void FLTKOgreWindow::render()
@@ -252,6 +257,7 @@ void FLTKOgreWindow::resize( int x, int y, int w, int h )
 		win->resize(w,h);		
 		win->windowMovedOrResized();
 	}
+	SBGUIManager::singleton().resize(w,h);
 	redraw();
 }
 
@@ -266,9 +272,9 @@ void FLTKOgreWindow::menu_cmd( MenuCmd c, const char* label )
 		_data->showcollisiongeometry = false;
 		_data->showdeformablegeometry = false;
 		_data->showbones = false;
-		_data->showaxis = false;
-		ogreInterface->setCharacterVisibility(true);
+		_data->showaxis = false;		
 		applyToCharacters();
+		ogreInterface->setCharacterVisibility(true);
 	}	
 	else
 	{
