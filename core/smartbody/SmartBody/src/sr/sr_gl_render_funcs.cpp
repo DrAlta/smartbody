@@ -66,14 +66,18 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	/*
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
+	*/
+
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
 	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);      			
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{	
@@ -84,7 +88,10 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 		//LOG("texManager size = %d, tex = %d, texName= %s",SbmTextureManager::singleton(),tex, mesh->texName.c_str());
 		if (tex)
 		{
-			glActiveTexture(GL_TEXTURE0);
+			GLint activeTexture = -1;
+			glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+			if (activeTexture != GL_TEXTURE0)
+				glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D,tex->getID());
 		}
 		
