@@ -46,6 +46,9 @@ that is distributed: */
 #include <sstream>
 #include <cstdlib>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 #include <map>
 #include "sr/sr_mat.h"
 #include "sr/sr_quat.h"
@@ -64,7 +67,10 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 		return false;
 	}
 	char line[8192];
-	//skeleton.setName(name);
+	boost::filesystem::path motionPath(name);
+	std::string baseName = boost::filesystem::basename(motionPath);
+	motion.setName(baseName);
+	skeleton.setName(baseName);
 	int state = 0;
 	char* str = NULL;
 	stack<SkJoint*> stack;
