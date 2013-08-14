@@ -145,19 +145,19 @@ class Smartbody_dll_SBCharacterListener_Internal : public SmartBody::SBCharacter
       }
 };
 
-SMARTBODY_DLL_API Smartbody_dll::Smartbody_dll() :
+SBAPI Smartbody_dll::Smartbody_dll() :
    m_internalListener( NULL )
 {
    vhcl::Log::g_log.AddListener( new vhcl::Log::DebuggerListener() );
 }
 
 
-SMARTBODY_DLL_API Smartbody_dll::~Smartbody_dll()
+SBAPI Smartbody_dll::~Smartbody_dll()
 {
 }
 
 
-SMARTBODY_DLL_API void Smartbody_dll::SetSpeechAudiofileBasePath( const std::string & basePath )
+SBAPI void Smartbody_dll::SetSpeechAudiofileBasePath( const std::string & basePath )
 {
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
@@ -165,7 +165,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetSpeechAudiofileBasePath( const std::str
    scene->addAssetPath("audio", basePath);
 }
 
-SMARTBODY_DLL_API void Smartbody_dll::SetProcessId( const std::string & processId )
+SBAPI void Smartbody_dll::SetProcessId( const std::string & processId )
 {
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	
@@ -173,14 +173,14 @@ SMARTBODY_DLL_API void Smartbody_dll::SetProcessId( const std::string & processI
 }
 
 
-SMARTBODY_DLL_API void Smartbody_dll::SetMediaPath( const std::string & path )
+SBAPI void Smartbody_dll::SetMediaPath( const std::string & path )
 {
   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
   scene->setMediaPath(path);
 }
 
 
-SMARTBODY_DLL_API bool Smartbody_dll::Init(const std::string& pythonLibPath, bool logToFile)
+SBAPI bool Smartbody_dll::Init(const std::string& pythonLibPath, bool logToFile)
 {
    m_internalListener = new Smartbody_dll_SBCharacterListener_Internal( this );
    
@@ -229,7 +229,7 @@ void Smartbody_dll::InitLocalSpeechRelay()
 #endif
 }
 
-SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
+SBAPI bool Smartbody_dll::Shutdown()
 {
    {
 	   SmartBody::SBScene::getScene()->getVHMsgManager()->send("vrProcEnd sbm");
@@ -257,21 +257,21 @@ SMARTBODY_DLL_API bool Smartbody_dll::Shutdown()
 }
 
 
-SMARTBODY_DLL_API bool Smartbody_dll::LoadSkeleton( const void * data, int sizeBytes, const char * skeletonName )
+SBAPI bool Smartbody_dll::LoadSkeleton( const void * data, int sizeBytes, const char * skeletonName )
 {
     int ret = SmartBody::SBScene::getScene()->getAssetManager()->load_skeleton( data, sizeBytes, skeletonName );
     return ret == CMD_SUCCESS;
 }
 
 
-SMARTBODY_DLL_API bool Smartbody_dll::LoadMotion( const void * data, int sizeBytes, const char * motionName )
+SBAPI bool Smartbody_dll::LoadMotion( const void * data, int sizeBytes, const char * motionName )
 {
 	int ret = SmartBody::SBScene::getScene()->getAssetManager()->load_motion( data, sizeBytes, motionName );
     return ret == CMD_SUCCESS;
 }
 
 
-SMARTBODY_DLL_API bool Smartbody_dll::MapSkeleton( const char * mapName, const char * skeletonName )
+SBAPI bool Smartbody_dll::MapSkeleton( const char * mapName, const char * skeletonName )
 {
    SmartBody::SBSkeleton* sbskeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skeletonName);
 
@@ -301,7 +301,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::MapSkeleton( const char * mapName, const c
     //return ret == CMD_SUCCESS;
 }
 
-SMARTBODY_DLL_API bool Smartbody_dll::MapMotion( const char * mapName, const char * motionName )
+SBAPI bool Smartbody_dll::MapMotion( const char * mapName, const char * motionName )
 {
     SmartBody::SBMotion* sbmotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 	if (!sbmotion)
@@ -327,13 +327,13 @@ SMARTBODY_DLL_API bool Smartbody_dll::MapMotion( const char * mapName, const cha
 }
 
 
-SMARTBODY_DLL_API void Smartbody_dll::SetListener( SmartbodyListener * listener )
+SBAPI void Smartbody_dll::SetListener( SmartbodyListener * listener )
 {
    m_listener = listener;
 }
 
 
-SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
+SBAPI bool Smartbody_dll::Update( const double timeInSeconds )
 {
 	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
@@ -351,7 +351,7 @@ SMARTBODY_DLL_API bool Smartbody_dll::Update( const double timeInSeconds )
 }
 
 
-SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerId( const std::string & id )
+SBAPI void Smartbody_dll::SetDebuggerId( const std::string & id )
 {
 	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
@@ -359,7 +359,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerId( const std::string & id )
 }
 
 
-SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerCameraValues( double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
+SBAPI void Smartbody_dll::SetDebuggerCameraValues( double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
 {
    SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.x = x;
    SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.y = y;
@@ -375,7 +375,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerCameraValues( double x, double 
 }
 
 
-SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerRendererRightHanded( bool enabled )
+SBAPI void Smartbody_dll::SetDebuggerRendererRightHanded( bool enabled )
 {
   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
@@ -383,7 +383,7 @@ SMARTBODY_DLL_API void Smartbody_dll::SetDebuggerRendererRightHanded( bool enabl
 }
 
 
-SMARTBODY_DLL_API bool Smartbody_dll::ProcessVHMsgs( const char * op, const char * args )
+SBAPI bool Smartbody_dll::ProcessVHMsgs( const char * op, const char * args )
 {
 	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
@@ -395,20 +395,20 @@ SMARTBODY_DLL_API bool Smartbody_dll::ProcessVHMsgs( const char * op, const char
    return true;
 }
 
-SMARTBODY_DLL_API bool Smartbody_dll::ExecutePython( const char * command )
+SBAPI bool Smartbody_dll::ExecutePython( const char * command )
 {
 	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	return scene->run(command);
 }
 
-SMARTBODY_DLL_API int Smartbody_dll::GetNumberOfCharacters()
+SBAPI int Smartbody_dll::GetNumberOfCharacters()
 {
   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
   return scene->getNumCharacters();
 }
 
 
-SMARTBODY_DLL_API SmartbodyCharacter& Smartbody_dll::GetCharacter( const string & name )
+SBAPI SmartbodyCharacter& Smartbody_dll::GetCharacter( const string & name )
 {
 	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
@@ -553,7 +553,7 @@ bool Smartbody_dll::InitVHMsg()
 }
 
 
-SMARTBODY_DLL_API bool Smartbody_dll::PythonCommandVoid( const std::string & command )
+SBAPI bool Smartbody_dll::PythonCommandVoid( const std::string & command )
 {
 #ifndef SB_NO_PYTHON
 	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
