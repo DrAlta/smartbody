@@ -208,8 +208,8 @@ void EmbeddedOgre::createDefaultScene()
 {
 	ogreSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_MODULATIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
-	ogreSceneMgr->setShadowTextureCount(4);
-	ogreSceneMgr->setShadowTextureSize( 4096 );
+	ogreSceneMgr->setShadowTextureCount(1);
+	ogreSceneMgr->setShadowTextureSize( 1024 );
 	ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );	
 	
 	// Setup animation default
@@ -420,12 +420,12 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 
 			Ogre::MaterialManager& matManager = Ogre::MaterialManager::getSingleton();
 
-// 			Ogre::MaterialPtr pCast1 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_1weight");
-// 			Ogre::MaterialPtr pCast2 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_2weight");
-// 			Ogre::MaterialPtr pCast3 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_3weight");
-// 			Ogre::MaterialPtr pCast4 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_4weight");			
-// 			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
-// 				Ogre::RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
+			Ogre::MaterialPtr pCast1 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_1weight");
+			Ogre::MaterialPtr pCast2 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_2weight");
+			Ogre::MaterialPtr pCast3 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_3weight");
+			Ogre::MaterialPtr pCast4 = matManager.getByName("Ogre/RTShader/shadow_caster_dq_skinning_4weight");			
+			Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
+				Ogre::RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
 		}
 
 #endif
@@ -618,10 +618,10 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 		LOG("outChar has software skinning");
 	}
 	*/
-	//RTShader::HardwareSkinningFactory::getSingleton().setMaxCalculableBoneCount(150);
-	//RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(outChar, Ogre::RTShader::ST_DUAL_QUATERNION, true, false);
-	//The following line is needed only because the Jaiqua model material has shaders and
-	//as such is not automatically reflected in the RTSS system
+// 	RTShader::HardwareSkinningFactory::getSingleton().setMaxCalculableBoneCount(150);
+// 	RTShader::HardwareSkinningFactory::getSingleton().prepareEntityForSkinning(outChar, Ogre::RTShader::ST_DUAL_QUATERNION, true, false);
+// 	//The following line is needed only because the Jaiqua model material has shaders and
+// 	//as such is not automatically reflected in the RTSS system
 // 	for (unsigned int i=0;i<outChar->getNumSubEntities();i++)
 // 	{
 // 		RTShader::ShaderGenerator::getSingleton().createShaderBasedTechnique(
@@ -631,7 +631,7 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 // 			true);
 // 		ogreShaderGenerator->validateMaterial(Ogre::MaterialManager::DEFAULT_SCHEME_NAME,outChar->getSubEntity(i)->getMaterialName());
 // 		outChar->getSubEntity(i)->getMaterial()->compile();		
-// 	}			
+//  	}			
 #endif
 	//outChar->setDisplaySkeleton(true);
 	return outChar;
@@ -652,7 +652,7 @@ void EmbeddedOgre::addSBSkeleton( SmartBody::SBSkeleton* skel )
 		Bone* ogBone = ogreSkel->createBone(joint->getName());
 		SrVec p = joint->getOffset();
 		ogBone->setPosition(p.x,p.y,p.z);
-		SrQuat q = joint->quat()->prerot();
+		SrQuat q = joint->quat()->orientation()*joint->quat()->prerot();
 		ogBone->setOrientation(q.w,q.x,q.y,q.z);
 		ogBone->setManuallyControlled(true);
 		ogBone->setInitialState();		
@@ -870,7 +870,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 		//pass->setVertexProgram("Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs");		
 		//pass->setVertexProgram("Ogre/HardwareSkinningFourWeightsGLSL");
 		//pass->setShadowCasterVertexProgram("Ogre/HardwareSkinningFourWeightsShadowCasterGLSL");
- 		ogSubMesh->setMaterialName(materialName);		
+ 		ogSubMesh->setMaterialName(materialName);				
 		//ogSubMesh->setMaterialName("smartbody");
 	}
 	ogreMesh->_setBounds(AxisAlignedBox(bbMin[0],bbMin[1],bbMin[2],bbMax[0],bbMax[1],bbMax[2]));
@@ -885,7 +885,7 @@ void EmbeddedOgre::addTexture( std::string texName )
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
 	SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE,texName.c_str());
 	Ogre::TextureManager& ogreTexManager = Ogre::TextureManager::getSingleton();	
-	Ogre::TexturePtr ogreTex = ogreTexManager.getByName(texName);
+	Ogre::TexturePtr ogreTex = ogreTexManager.getByName(texName);	
 	if (!ogreTex.isNull()) return; // the texture already exist in ogre
 	if (!tex) return; // the texture not exist in SmartBody
 	PixelFormat pixelFormat = PF_R8G8B8;
@@ -919,6 +919,7 @@ void EmbeddedOgre::addTexture( std::string texName )
 		}	
 	pixelBuffer->unlock();
 	ogreTex->load();	
+	
 }
 
 void EmbeddedOgre::updateOgreCharacterRenderMode()
