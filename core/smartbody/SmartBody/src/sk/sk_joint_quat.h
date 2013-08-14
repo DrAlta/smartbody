@@ -115,7 +115,7 @@ class SkJointQuat
 
 	void orientation(const SrQuat& q);
 
-	const SrQuat& orientation();
+	SBAPI const SrQuat& orientation();
 
 	/*! convert local rot into world aligned rot (added by David Huang 2012-06)
 	// for applying directly on world-aligned (MotionBuilder standard) T-pose skel
