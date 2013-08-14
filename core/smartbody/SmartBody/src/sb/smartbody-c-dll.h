@@ -2,6 +2,10 @@
 #ifndef SMARTBODY_C_DLL_H
 #define SMARTBODY_C_DLL_H
 
+#ifndef WIN32
+#define __stdcall
+#endif
+
 #include "vhcl_public.h"
 
 #include <sb/SBTypes.h>
