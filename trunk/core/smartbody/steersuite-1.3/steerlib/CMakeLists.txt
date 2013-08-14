@@ -48,16 +48,30 @@ add_library(
 	../external/tinyxml/tinyxmlerror.cpp
 )
 
+
+set( EXEC_LIST
+
+       steerlib
+)
+
+
 target_link_libraries( steerlib
-	
 	${OPENGL_LIBRARIES}
 	dl
 )
 
 
+set_target_properties(
+	${EXEC_LIST}
+	PROPERTIES
+	## link with install tree:
+	INSTALL_RPATH                   "${APP_LIBRARY_SOURCE_PATHS}"
+	BUILD_WITH_INSTALL_RPATH        TRUE
+)
+
 install(
 
-  	TARGETS steerlib
-	LIBRARY DESTINATION core/smartbody/sbm/bin
+  	TARGETS ${EXEC_LIST}
+	DESTINATION core/smartbody/sbgui/bin
 )
 

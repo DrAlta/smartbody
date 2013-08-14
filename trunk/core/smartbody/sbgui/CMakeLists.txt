@@ -242,7 +242,7 @@ set( APP_LIBRARY_BINARY_PATHS
 #	${PROJECT_BINARY_DIR}/core/smartbody/steersuite-1.3/pprAI ;
 #	${PROJECT_BINARY_DIR}/core/smartbody/steersuite-1.3/steerlib
 
-	${PROJECT_BINARY_DIR}/core/smartbody/sbm/bin
+	${PROJECT_BINARY_DIR}/core/smartbody/sbgui/bin
 )
 
 set( APP_LIBRARY_SOURCE_PATHS
@@ -250,7 +250,7 @@ set( APP_LIBRARY_SOURCE_PATHS
 #	${PROJECT_SOURCE_DIR}/core/smartbody/steersuite-1.3/pprAI/bin ;
 #	${PROJECT_SOURCE_DIR}/core/smartbody/steersuite-1.3/steerlib/bin
 
-	${PROJECT_SOURCE_DIR}/core/smartbody/sbm/bin
+	${PROJECT_SOURCE_DIR}/core/smartbody/sbgui/bin
 )
 
 set_target_properties( 

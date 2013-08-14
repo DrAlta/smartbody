@@ -44,12 +44,12 @@ set( EXEC_LIST
 
 set( APP_LIBRARY_BINARY_PATHS
 
-        ${PROJECT_BINARY_DIR}/core/smartbody/sbm/bin
+        ${PROJECT_BINARY_DIR}/core/smartbody/sbgui/bin
 )
 	
 set( APP_LIBRARY_SOURCE_PATHS
 
-        ${PROJECT_SOURCE_DIR}/core/smartbody/sbm/bin
+        ${PROJECT_SOURCE_DIR}/core/smartbody/sbgui/bin
 )
 	
 
@@ -67,5 +67,5 @@ set_target_properties(
 
 install( 
 	TARGETS ${EXEC_LIST}
-	RUNTIME DESTINATION core/smartbody/sbm/bin
+	RUNTIME DESTINATION core/smartbody/sbgui/bin
 )

@@ -557,7 +557,7 @@ set( EXEC_LIST
 
 set( APP_LIBRARY_SOURCE_PATHS
 
-${PROJECT_SOURCE_DIR}/core/smartbody/sbm/bin
+${PROJECT_SOURCE_DIR}/core/smartbody/sbgui/bin
 )       
 
 set_target_properties(
@@ -571,6 +571,6 @@ set_target_properties(
 install(
 
         TARGETS ${EXEC_LIST}
-	DESTINATION core/smartbody/sbm/bin
+	DESTINATION core/smartbody/sbgui/bin
 )
 
