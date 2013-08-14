@@ -2,32 +2,25 @@
 #ifndef SMARTBODY_DLL_H
 #define SMARTBODY_DLL_H
 
-#ifdef WIN32
-#ifdef SMARTBODY_DLL_EXPORTS
-#define SMARTBODY_DLL_API __declspec(dllexport)
-#else
-#define SMARTBODY_DLL_API __declspec(dllimport)
-#endif
-#else
-#define SMARTBODY_DLL_API 
-#endif
-
 #include "vhcl_public.h"
+
 #include <string>
 #include <queue>
 #include <map>
+
+#include <sb/SBTypes.h>
 
 
 // Listener class that executables should derive from to get Smartbody related notifications.
 class SmartbodyListener
 {
    public:
-      SMARTBODY_DLL_API virtual void OnCharacterCreate( const std::string& name, const std::string& objectClass ) {}
-      SMARTBODY_DLL_API virtual void OnCharacterDelete( const std::string& name ) {}
-      SMARTBODY_DLL_API virtual void OnCharacterChanged( const std::string& name ) {}
-      SMARTBODY_DLL_API virtual void OnPawnCreate( const std::string& name ) {}
-      SMARTBODY_DLL_API virtual void OnViseme( const std::string& name, const std::string& visemeName, const float weight, const float blendTime ) {}
-      SMARTBODY_DLL_API virtual void OnChannel( const std::string& name, const std::string& channelName, const float value ) {}
+      SBAPI virtual void OnCharacterCreate( const std::string& name, const std::string& objectClass ) {}
+      SBAPI virtual void OnCharacterDelete( const std::string& name ) {}
+      SBAPI virtual void OnCharacterChanged( const std::string& name ) {}
+      SBAPI virtual void OnPawnCreate( const std::string& name ) {}
+      SBAPI virtual void OnViseme( const std::string& name, const std::string& visemeName, const float weight, const float blendTime ) {}
+      SBAPI virtual void OnChannel( const std::string& name, const std::string& channelName, const float value ) {}
 };
 
 
@@ -75,42 +68,42 @@ class Smartbody_dll
       std::map<std::string, SmartbodyCharacter*> m_characters;
 
    public:
-      SMARTBODY_DLL_API Smartbody_dll();
-      SMARTBODY_DLL_API virtual ~Smartbody_dll();
+      SBAPI Smartbody_dll();
+      SBAPI virtual ~Smartbody_dll();
 
-      SMARTBODY_DLL_API void SetSpeechAudiofileBasePath( const std::string & basePath );
-      SMARTBODY_DLL_API void SetProcessId( const std::string & processId );
-      SMARTBODY_DLL_API void SetMediaPath( const std::string & path );
+      SBAPI void SetSpeechAudiofileBasePath( const std::string & basePath );
+      SBAPI void SetProcessId( const std::string & processId );
+      SBAPI void SetMediaPath( const std::string & path );
 
-      SMARTBODY_DLL_API bool Init(const std::string& pythonLibPath, bool logToFile);
-      SMARTBODY_DLL_API bool Shutdown();
+      SBAPI bool Init(const std::string& pythonLibPath, bool logToFile);
+      SBAPI bool Shutdown();
 
-      SMARTBODY_DLL_API bool LoadSkeleton( const void * data, int sizeBytes, const char * skeletonName );
-      SMARTBODY_DLL_API bool LoadMotion( const void * data, int sizeBytes, const char * motionName );
+      SBAPI bool LoadSkeleton( const void * data, int sizeBytes, const char * skeletonName );
+      SBAPI bool LoadMotion( const void * data, int sizeBytes, const char * motionName );
 
-      SMARTBODY_DLL_API bool MapSkeleton( const char * mapName, const char * skeletonName );
-      SMARTBODY_DLL_API bool MapMotion( const char * mapName, const char * motionName );
+      SBAPI bool MapSkeleton( const char * mapName, const char * skeletonName );
+      SBAPI bool MapMotion( const char * mapName, const char * motionName );
 
-      SMARTBODY_DLL_API void SetListener( SmartbodyListener * listener );
+      SBAPI void SetListener( SmartbodyListener * listener );
 
-      SMARTBODY_DLL_API bool Update( const double timeInSeconds );
+      SBAPI bool Update( const double timeInSeconds );
 
-      SMARTBODY_DLL_API void SetDebuggerId( const std::string & id );
-      SMARTBODY_DLL_API void SetDebuggerCameraValues( double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar );
-      SMARTBODY_DLL_API void SetDebuggerRendererRightHanded( bool enabled );
+      SBAPI void SetDebuggerId( const std::string & id );
+      SBAPI void SetDebuggerCameraValues( double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar );
+      SBAPI void SetDebuggerRendererRightHanded( bool enabled );
 
-      SMARTBODY_DLL_API bool ProcessVHMsgs( const char * op, const char * args );
-      SMARTBODY_DLL_API bool ExecutePython( const char * command);
+      SBAPI bool ProcessVHMsgs( const char * op, const char * args );
+      SBAPI bool ExecutePython( const char * command);
 
-      SMARTBODY_DLL_API int GetNumberOfCharacters();
+      SBAPI int GetNumberOfCharacters();
 
-      SMARTBODY_DLL_API SmartbodyCharacter& GetCharacter( const std::string & name );
+      SBAPI SmartbodyCharacter& GetCharacter( const std::string & name );
 
-      SMARTBODY_DLL_API bool PythonCommandVoid( const std::string & command );
-      SMARTBODY_DLL_API bool PythonCommandBool( const std::string & command );
-      SMARTBODY_DLL_API int PythonCommandInt( const std::string & command );
-      SMARTBODY_DLL_API float PythonCommandFloat( const std::string & command );
-      SMARTBODY_DLL_API std::string PythonCommandString( const std::string & command );
+      SBAPI bool PythonCommandVoid( const std::string & command );
+      SBAPI bool PythonCommandBool( const std::string & command );
+      SBAPI int PythonCommandInt( const std::string & command );
+      SBAPI float PythonCommandFloat( const std::string & command );
+      SBAPI std::string PythonCommandString( const std::string & command );
 
    protected:
       bool InitVHMsg();

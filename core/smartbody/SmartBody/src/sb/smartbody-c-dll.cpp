@@ -78,7 +78,7 @@ LogMessageListener* g_pLogMessageListener = NULL;
 LogMessageCallback g_LogMessageFunc = NULL;
 
 
-SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb)
+SBAPI bool SBM_SetLogMessageCallback(LogMessageCallback cb)
 {
    g_LogMessageFunc = cb;
 
@@ -93,7 +93,7 @@ SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb)
 }
 
 
-SMARTBODY_C_DLL_API void SBM_LogMessage(const char* message, int messageType)
+SBAPI void SBM_LogMessage(const char* message, int messageType)
 {
    // 0 = normal, 1 = error, 2 = warning
    if (g_LogMessageFunc)
@@ -196,7 +196,7 @@ std::map< int, Smartbody_dll * > g_smartbodyInstances;
 int g_handleId_DLL = 0;
 
 
-SMARTBODY_C_DLL_API SBMHANDLE SBM_CreateSBM()
+SBAPI SBMHANDLE SBM_CreateSBM()
 {
    g_handleId_DLL++;
    g_smartbodyInstances[ g_handleId_DLL ] = new Smartbody_dll();
@@ -204,7 +204,7 @@ SMARTBODY_C_DLL_API SBMHANDLE SBM_CreateSBM()
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, const char * basePath )
+SBAPI bool SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, const char * basePath )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -215,7 +215,7 @@ SMARTBODY_C_DLL_API bool SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, co
    return true;
 }
 
-SMARTBODY_C_DLL_API bool SBM_SetProcessId( SBMHANDLE sbmHandle, const char * processId )
+SBAPI bool SBM_SetProcessId( SBMHANDLE sbmHandle, const char * processId )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -227,7 +227,7 @@ SMARTBODY_C_DLL_API bool SBM_SetProcessId( SBMHANDLE sbmHandle, const char * pro
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * path )
+SBAPI bool SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * path )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -239,7 +239,7 @@ SMARTBODY_C_DLL_API bool SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * pat
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle, const char* pythonLibPath, bool logToFile )
+SBAPI bool SBM_Init( SBMHANDLE sbmHandle, const char* pythonLibPath, bool logToFile )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -250,7 +250,7 @@ SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle, const char* pythonLibPat
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle )
+SBAPI bool SBM_Shutdown( SBMHANDLE sbmHandle )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -275,7 +275,7 @@ SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle )
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName )
+SBAPI bool SBM_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -286,7 +286,7 @@ SMARTBODY_C_DLL_API bool SBM_LoadSkeleton( SBMHANDLE sbmHandle, const void * dat
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName )
+SBAPI bool SBM_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -297,7 +297,7 @@ SMARTBODY_C_DLL_API bool SBM_LoadMotion( SBMHANDLE sbmHandle, const void * data,
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_MapSkeleton( SBMHANDLE sbmHandle, const char * mapName, const char * skeletonName )
+SBAPI bool SBM_MapSkeleton( SBMHANDLE sbmHandle, const char * mapName, const char * skeletonName )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -307,7 +307,7 @@ SMARTBODY_C_DLL_API bool SBM_MapSkeleton( SBMHANDLE sbmHandle, const char * mapN
    return g_smartbodyInstances[ sbmHandle ]->MapSkeleton(mapName, skeletonName);
 }
 
-SMARTBODY_C_DLL_API bool SBM_MapMotion( SBMHANDLE sbmHandle, const char * mapName, const char * motionName )
+SBAPI bool SBM_MapMotion( SBMHANDLE sbmHandle, const char * mapName, const char * motionName )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -318,7 +318,7 @@ SMARTBODY_C_DLL_API bool SBM_MapMotion( SBMHANDLE sbmHandle, const char * mapNam
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB )
+SBAPI bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -331,7 +331,7 @@ SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateChara
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
+SBAPI bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -342,7 +342,7 @@ SMARTBODY_C_DLL_API bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
 }
 
 
-SMARTBODY_C_DLL_API void SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id )
+SBAPI void SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -353,7 +353,7 @@ SMARTBODY_C_DLL_API void SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id
 }
 
 
-SMARTBODY_C_DLL_API void SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
+SBAPI void SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -364,7 +364,7 @@ SMARTBODY_C_DLL_API void SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, doubl
 }
 
 
-SMARTBODY_C_DLL_API void SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled )
+SBAPI void SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -375,7 +375,7 @@ SMARTBODY_C_DLL_API void SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args )
+SBAPI bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -385,7 +385,7 @@ SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op
    return g_smartbodyInstances[ sbmHandle ]->ProcessVHMsgs( op, args );
 }
 
-SMARTBODY_C_DLL_API bool SBM_ExecutePython( SBMHANDLE sbmHandle, const char * command )
+SBAPI bool SBM_ExecutePython( SBMHANDLE sbmHandle, const char * command )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -396,7 +396,7 @@ SMARTBODY_C_DLL_API bool SBM_ExecutePython( SBMHANDLE sbmHandle, const char * co
 }
 
 
-SMARTBODY_C_DLL_API int SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle )
+SBAPI int SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -407,7 +407,7 @@ SMARTBODY_C_DLL_API int SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle )
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character )
+SBAPI bool SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -439,7 +439,7 @@ SMARTBODY_C_DLL_API bool SBM_InitCharacter( SBMHANDLE sbmHandle, const char * na
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character )
+SBAPI bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -456,7 +456,7 @@ SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * nam
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character )
+SBAPI bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character )
 {
    if ( !character )
    {
@@ -573,7 +573,7 @@ void SBM_CharToCSbmChar( const SmartbodyCharacter * sbmChar, SBM_SmartbodyCharac
    }
 }
 
-SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen )
+SBAPI bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen )
 {
     if ( !SBM_HandleExists( sbmHandle ) || g_CreateCallbackInfo[sbmHandle].size() == 0)
     {
@@ -588,7 +588,7 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * nam
     return true;
 }
 
-SMARTBODY_C_DLL_API bool SBM_IsLogMessageWaiting( SBMHANDLE sbmHandle, char *logMessage, int maxLogMessageLen, int* logMessageType)
+SBAPI bool SBM_IsLogMessageWaiting( SBMHANDLE sbmHandle, char *logMessage, int maxLogMessageLen, int* logMessageType)
 {
     if (g_LogCallbackInfo[0].size() == 0)
     {
@@ -603,7 +603,7 @@ SMARTBODY_C_DLL_API bool SBM_IsLogMessageWaiting( SBMHANDLE sbmHandle, char *log
     return true;
 }
 
-SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, char * name, int maxNameLen )
+SBAPI bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, char * name, int maxNameLen )
 {
     if ( !SBM_HandleExists( sbmHandle ) || g_DeleteCallbackInfo[sbmHandle].size() == 0)
     {
@@ -617,7 +617,7 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, char * nam
     return true;
 }
 
-SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char * name, int maxNameLen )
+SBAPI bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char * name, int maxNameLen )
 {
     if ( !SBM_HandleExists( sbmHandle ) || g_ChangeCallbackInfo[sbmHandle].size() == 0)
     {
@@ -631,7 +631,7 @@ SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char * nam
     return true;
 }
 
-SMARTBODY_C_DLL_API bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime )
+SBAPI bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime )
 {
     if ( !SBM_HandleExists( sbmHandle ) || g_VisemeCallbackInfo[sbmHandle].size() == 0)
     {
@@ -649,7 +649,7 @@ SMARTBODY_C_DLL_API bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int 
     return true;
 }
 
-SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * channelName, int maxChannelNameLen, float * value )
+SBAPI bool SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * channelName, int maxChannelNameLen, float * value )
 {
     if ( !SBM_HandleExists( sbmHandle ) || g_ChannelCallbackInfo[sbmHandle].size() == 0)
     {
@@ -667,7 +667,7 @@ SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int
 }
 
 
-SMARTBODY_C_DLL_API bool SBM_PythonCommandVoid( SBMHANDLE sbmHandle, const char * command)
+SBAPI bool SBM_PythonCommandVoid( SBMHANDLE sbmHandle, const char * command)
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -677,7 +677,7 @@ SMARTBODY_C_DLL_API bool SBM_PythonCommandVoid( SBMHANDLE sbmHandle, const char 
    return g_smartbodyInstances[ sbmHandle ]->PythonCommandVoid( command );
 }
 
-SMARTBODY_C_DLL_API bool SBM_PythonCommandBool( SBMHANDLE sbmHandle,  const char * command )
+SBAPI bool SBM_PythonCommandBool( SBMHANDLE sbmHandle,  const char * command )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -687,7 +687,7 @@ SMARTBODY_C_DLL_API bool SBM_PythonCommandBool( SBMHANDLE sbmHandle,  const char
    return g_smartbodyInstances[ sbmHandle ]->PythonCommandBool( command );
 }
 
-SMARTBODY_C_DLL_API int SBM_PythonCommandInt( SBMHANDLE sbmHandle,  const char * command )
+SBAPI int SBM_PythonCommandInt( SBMHANDLE sbmHandle,  const char * command )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -697,7 +697,7 @@ SMARTBODY_C_DLL_API int SBM_PythonCommandInt( SBMHANDLE sbmHandle,  const char *
    return g_smartbodyInstances[ sbmHandle ]->PythonCommandInt( command );
 }
 
-SMARTBODY_C_DLL_API float SBM_PythonCommandFloat( SBMHANDLE sbmHandle,  const char * command )
+SBAPI float SBM_PythonCommandFloat( SBMHANDLE sbmHandle,  const char * command )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -707,7 +707,7 @@ SMARTBODY_C_DLL_API float SBM_PythonCommandFloat( SBMHANDLE sbmHandle,  const ch
    return g_smartbodyInstances[ sbmHandle ]->PythonCommandFloat( command );
 }
 
-SMARTBODY_C_DLL_API char * SBM_PythonCommandString( SBMHANDLE sbmHandle,  const char * command, char * output, int maxLen)
+SBAPI char * SBM_PythonCommandString( SBMHANDLE sbmHandle,  const char * command, char * output, int maxLen)
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -727,47 +727,47 @@ SMARTBODY_C_DLL_API char * SBM_PythonCommandString( SBMHANDLE sbmHandle,  const 
 #if 0
 // stubs used for testing dll usage on other platforms
 int unused = 0;
-SMARTBODY_C_DLL_API SBMHANDLE SBM_CreateSBM() { unused++; return unused; }
+SBAPI SBMHANDLE SBM_CreateSBM() { unused++; return unused; }
 
-SMARTBODY_C_DLL_API bool SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, const char * basePath ) { return true; }
-SMARTBODY_C_DLL_API bool SBM_SetProcessId( SBMHANDLE sbmHandle, const char * processId ) { return true; }
-SMARTBODY_C_DLL_API bool SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * path ) { return true; }
+SBAPI bool SBM_SetSpeechAudiofileBasePath( SBMHANDLE sbmHandle, const char * basePath ) { return true; }
+SBAPI bool SBM_SetProcessId( SBMHANDLE sbmHandle, const char * processId ) { return true; }
+SBAPI bool SBM_SetMediaPath( SBMHANDLE sbmHandle, const char * path ) { return true; }
 
-SMARTBODY_C_DLL_API bool SBM_Init( SBMHANDLE sbmHandle, const char* pythonLibPath, bool logToFile ) { return true; }
-SMARTBODY_C_DLL_API bool SBM_Shutdown( SBMHANDLE sbmHandle ) { return true; }
+SBAPI bool SBM_Init( SBMHANDLE sbmHandle, const char* pythonLibPath, bool logToFile ) { return true; }
+SBAPI bool SBM_Shutdown( SBMHANDLE sbmHandle ) { return true; }
 
-SMARTBODY_C_DLL_API bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB ) { return true; }
+SBAPI bool SBM_SetListener( SBMHANDLE sbmHandle, SBM_OnCreateCharacterCallback createCB, SBM_OnCharacterDeleteCallback deleteCB, SBM_OnCharacterChangeCallback changedCB, SBM_OnVisemeCallback visemeCB, SBM_OnChannelCallback channelCB ) { return true; }
 
-SMARTBODY_C_DLL_API bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds ) { return true; }
+SBAPI bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds ) { return true; }
 
-SMARTBODY_C_DLL_API void SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id ) { return; }
-SMARTBODY_C_DLL_API void SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar ) { return; }
-SMARTBODY_C_DLL_API void SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled ) { return; }
+SBAPI void SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id ) { return; }
+SBAPI void SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar ) { return; }
+SBAPI void SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled ) { return; }
 
-SMARTBODY_C_DLL_API bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args ) { return true; }
-SMARTBODY_C_DLL_API bool SBM_ExecutePython( SBMHANDLE sbmHandle, const char * command ) { return true; }
+SBAPI bool SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args ) { return true; }
+SBAPI bool SBM_ExecutePython( SBMHANDLE sbmHandle, const char * command ) { return true; }
 
-SMARTBODY_C_DLL_API int  SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle ) { return 42; }
-SMARTBODY_C_DLL_API bool SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character ) { return true; }
-SMARTBODY_C_DLL_API bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character ) { return true; }
-SMARTBODY_C_DLL_API bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character ) { return true; }
-SMARTBODY_C_DLL_API bool SBM_SetLogMessageCallback(LogMessageCallback cb) { return true; }
-SMARTBODY_C_DLL_API void SBM_LogMessage(const char * message, int messageType) { return; }
+SBAPI int  SBM_GetNumberOfCharacters( SBMHANDLE sbmHandle ) { return 42; }
+SBAPI bool SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character ) { return true; }
+SBAPI bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_SmartbodyCharacter * character ) { return true; }
+SBAPI bool SBM_ReleaseCharacter( SBM_SmartbodyCharacter * character ) { return true; }
+SBAPI bool SBM_SetLogMessageCallback(LogMessageCallback cb) { return true; }
+SBAPI void SBM_LogMessage(const char * message, int messageType) { return; }
 
 // used for polling on iOS since callbacks aren't allowed
-SMARTBODY_C_DLL_API bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen ) { return false; }
-SMARTBODY_C_DLL_API bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, char * name, int maxNameLen ) { return false; }
-SMARTBODY_C_DLL_API bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char * name, int maxNameLen ) { return false; }
-SMARTBODY_C_DLL_API bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime ) { return false; }
-SMARTBODY_C_DLL_API bool SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * channelName, int maxChannelNameLen, float * value ) { return false; }
-SMARTBODY_C_DLL_API bool SBM_IsLogMessageWaiting( SBMHANDLE sbmHandle, char *logMessage, int maxLogMessageLen, int* logMessageType ) { return false; }
+SBAPI bool SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen ) { return false; }
+SBAPI bool SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, char * name, int maxNameLen ) { return false; }
+SBAPI bool SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char * name, int maxNameLen ) { return false; }
+SBAPI bool SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime ) { return false; }
+SBAPI bool SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * channelName, int maxChannelNameLen, float * value ) { return false; }
+SBAPI bool SBM_IsLogMessageWaiting( SBMHANDLE sbmHandle, char *logMessage, int maxLogMessageLen, int* logMessageType ) { return false; }
 
 // python usage functions
 // functions can't be distinguished by return type alone so they are named differently
-SMARTBODY_C_DLL_API bool SBM_PythonCommandVoid( SBMHANDLE sbmHandle,  const char * command ) { return true; }
-SMARTBODY_C_DLL_API bool SBM_PythonCommandBool( SBMHANDLE sbmHandle,  const char * command ) { return true; }
-SMARTBODY_C_DLL_API int SBM_PythonCommandInt( SBMHANDLE sbmHandle,  const char * command ) { return 42; }
-SMARTBODY_C_DLL_API float SBM_PythonCommandFloat( SBMHANDLE sbmHandle,  const char * command )  { return 42; }
-SMARTBODY_C_DLL_API char * SBM_PythonCommandString( SBMHANDLE sbmHandle, const char * command, char * output, int maxLen) { return "test"; }
+SBAPI bool SBM_PythonCommandVoid( SBMHANDLE sbmHandle,  const char * command ) { return true; }
+SBAPI bool SBM_PythonCommandBool( SBMHANDLE sbmHandle,  const char * command ) { return true; }
+SBAPI int SBM_PythonCommandInt( SBMHANDLE sbmHandle,  const char * command ) { return 42; }
+SBAPI float SBM_PythonCommandFloat( SBMHANDLE sbmHandle,  const char * command )  { return 42; }
+SBAPI char * SBM_PythonCommandString( SBMHANDLE sbmHandle, const char * command, char * output, int maxLen) { return "test"; }
 
 #endif
