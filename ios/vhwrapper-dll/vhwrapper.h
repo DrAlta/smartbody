@@ -8,7 +8,7 @@
 
 #include "vhcl_public.h"
 
-#include "smartbody-c-dll.h"
+#include "sb/smartbody-c-dll.h"
 
 #ifdef ENABLE_VHMSG_WRAPPER
 #include "vhmsg.h"
