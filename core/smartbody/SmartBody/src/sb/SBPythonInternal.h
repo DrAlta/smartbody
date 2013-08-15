@@ -3,6 +3,7 @@
 
 #include <string>
 #include <sb/SBScript.h>
+#include <sb/SBCharacterListener.h>
 #include <sr/sr_vec.h>
 
 #ifndef SB_NO_PYTHON
@@ -439,6 +440,200 @@ struct TransitionRuleWrap : SmartBody::SBAnimationTransitionRule, boost::python:
 		return SBAnimationTransitionRule::check(character, blend);
 	}
 };
+
+struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wrapper<SmartBody::SBCharacterListener>
+{
+	virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass )
+	{
+		if (boost::python::override o = this->get_override("OnCharacterCreate"))
+		{
+			try {
+				o(name, objectClass);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return SBCharacterListener::OnCharacterCreate(name, objectClass);
+	}
+
+	void default_OnCharacterCreate( const std::string & name, const std::string & objectClass ) \
+	{
+		SBCharacterListener::OnCharacterCreate(name, objectClass);
+	}
+
+	virtual void OnCharacterDelete( const std::string & name )
+	{
+		if (boost::python::override o = this->get_override("OnCharacterDelete"))
+		{
+			try {
+				o(name);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		SBCharacterListener::OnCharacterDelete(name);
+	
+	}
+	void default_OnCharacterDelete( const std::string & name )
+	{
+		SBCharacterListener::OnCharacterDelete(name);
+	}
+
+	virtual void OnCharacterUpdate( const std::string & name, const std::string & objectClass )
+	{
+		if (boost::python::override o = this->get_override("OnCharacterUpdate"))
+		{
+			try {
+				o(name);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		SBCharacterListener::OnCharacterUpdate(name, objectClass);
+	}
+	void default_OnCharacterUpdate( const std::string & name, const std::string & objectClass )
+	{
+		SBCharacterListener::OnCharacterUpdate(name, objectClass);
+	}
+
+	virtual void OnCharacterChanged( const std::string& name )
+	{
+		if (boost::python::override o = this->get_override("OnCharacterChanged"))
+		{
+			try {
+				o(name);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		SBCharacterListener::OnCharacterChanged(name);
+	}
+
+	void default_OnCharacterChanged( const std::string& name )
+	{
+		SBCharacterListener::OnCharacterChanged(name);
+	}
+
+
+	virtual void OnCharacterChangeMesh( const std::string& name )
+	{
+		if (boost::python::override o = this->get_override("OnCharacterChangeMesh"))
+		{
+			try {
+				o(name);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		SBCharacterListener::OnCharacterChangeMesh(name);
+	
+	}
+
+	void default_OnCharacterChangeMesh( const std::string& name )
+	{
+		SBCharacterListener::OnCharacterChangeMesh(name);
+	}
+
+	virtual void OnPawnCreate( const std::string & name )
+	{
+		if (boost::python::override o = this->get_override("OnPawnCreate"))
+		{
+			try {
+				o(name);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		SBCharacterListener::OnPawnCreate(name);
+	}
+	
+	void default_OnPawnCreate( const std::string & name )
+	{
+		SBCharacterListener::OnPawnCreate(name);
+	}
+
+	virtual void OnPawnDelete( const std::string & name )
+	{
+		if (boost::python::override o = this->get_override("OnPawnDelete"))
+		{
+			try {
+				o(name);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		SBCharacterListener::OnPawnDelete(name);
+	}
+	
+	void default_OnPawnDelete( const std::string & name )
+	{
+		SBCharacterListener::OnPawnDelete(name);
+	}
+
+	virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
+	{
+		if (boost::python::override o = this->get_override("OnViseme"))
+		{
+			try {
+				o(name, visemeName, weight, blendTime);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		SBCharacterListener::OnViseme(name, visemeName, weight, blendTime);
+	}
+	
+	void default_OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
+	{
+		SBCharacterListener::OnViseme(name, visemeName, weight, blendTime);
+	}
+
+	virtual void OnChannel( const std::string & name, const std::string & channelName, const float value)
+	{
+		if (boost::python::override o = this->get_override("OnChannel"))
+		{
+			try {
+				o(name, channelName, value);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		SBCharacterListener::OnChannel(name, channelName, value);
+	}
+	
+	void default_OnChannel( const std::string & name, const std::string & channelName, const float value)
+	{
+		SBCharacterListener::OnChannel(name, channelName, value);
+	}
+
+	virtual void OnLogMessage( const std::string & message)
+	{
+		if (boost::python::override o = this->get_override("OnLogMessage"))
+		{
+			try {
+				o(message);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+		SBCharacterListener::OnLogMessage(message);
+	}
+	
+	void default_OnLogMessage( const std::string & message)
+	{
+		SBCharacterListener::OnLogMessage(message);
+	}
+};
+
 }
 
 
