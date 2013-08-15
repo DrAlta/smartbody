@@ -657,7 +657,7 @@ boost::python::class_<SBObserver>("SBObserver")
 	boost::python::class_<TransitionRuleWrap, boost::noncopyable>("TransitionRule")
 		.def("check", &SBAnimationTransitionRule::check, &TransitionRuleWrap::default_check, "Determines if the transition rule should be triggered.")
 		;
-
+	
 	boost::python::class_<SBCharacterListener>("SBCharacterListener")
 		.def("OnCharacterCreate", &SBCharacterListener::OnCharacterCreate, "Triggered when a character is created.")
 		.def("OnCharacterDelete", &SBCharacterListener::OnCharacterDelete, "Triggered when a character is deleted.")
@@ -667,6 +667,19 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("OnPawnCreate", &SBCharacterListener::OnPawnCreate, "Triggered when a pawn is created.")
 		.def("OnPawnDelete", &SBCharacterListener::OnPawnDelete, "Triggered when a pawn is deleted.")
 		.def("OnViseme", &SBCharacterListener::OnViseme, "Visemes sent every frame.")
+		;
+
+	boost::python::class_<CharacterListenerWrap, boost::noncopyable>("CharacterListener")
+		.def("OnCharacterCreate", &SBCharacterListener::OnCharacterCreate, &CharacterListenerWrap::default_OnCharacterCreate, "Triggered when a character is created.")
+		.def("OnCharacterDelete", &SBCharacterListener::OnCharacterDelete, &CharacterListenerWrap::default_OnCharacterDelete, "Triggered when a character is deleted.")
+		.def("OnCharacterUpdate", &SBCharacterListener::OnCharacterUpdate, &CharacterListenerWrap::default_OnCharacterUpdate, "Triggered when a character is updated.")
+		.def("OnCharacterChanged", &SBCharacterListener::OnCharacterChanged, &CharacterListenerWrap::default_OnCharacterChanged, "Triggered when a character is changed.")
+		.def("OnCharacterChangeMesh", &SBCharacterListener::OnCharacterChangeMesh, &CharacterListenerWrap::default_OnCharacterChangeMesh, "Triggered when a character mesh is deleted.")
+		.def("OnPawnCreate", &SBCharacterListener::OnPawnCreate, &CharacterListenerWrap::default_OnPawnCreate, "Triggered when a pawn is created.")
+		.def("OnPawnDelete", &SBCharacterListener::OnPawnDelete, &CharacterListenerWrap::default_OnPawnDelete, "Triggered when a pawn is deleted.")
+		.def("OnViseme", &SBCharacterListener::OnViseme, &CharacterListenerWrap::default_OnViseme, "Triggered when a viseme is triggered.")
+		.def("OnChannel", &SBCharacterListener::OnChannel, &CharacterListenerWrap::default_OnChannel, "Channel data.")
+		.def("OnLogMessage", &SBCharacterListener::OnLogMessage, &CharacterListenerWrap::default_OnLogMessage, "Log message.")
 		;
 
 	boost::python::class_<SBAssetManager, boost::python::bases<SBObject> >("SBAssetManager")

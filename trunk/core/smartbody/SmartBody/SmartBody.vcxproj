@@ -39,7 +39,7 @@
     <OutDir>$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>$(ProjectName)_d</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
     <OutDir>$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -837,6 +837,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\SmartBody\src\sr\sr_vec.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_vec2.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_viewer.h" />
+    <ClInclude Include="src\sb\SBCharacterListener.h" />
     <ClInclude Include="src\sb\smartbody-c-dll.h" />
     <ClInclude Include="src\sb\smartbody-dll.h" />
   </ItemGroup>

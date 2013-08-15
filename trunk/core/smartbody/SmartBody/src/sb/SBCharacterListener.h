@@ -1,6 +1,7 @@
 #ifndef  __SBM_CHARACTER_LISTENER__
 #define  __SBM_CHARACTER_LISTENER__
 #include <string>
+#include <sb/SBTypes.h>
 
 namespace SmartBody
 {
@@ -9,16 +10,18 @@ namespace SmartBody
 class SBCharacterListener
 {
 public:
-	virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass ) {}
-	virtual void OnCharacterDelete( const std::string & name ) {}
-	virtual void OnCharacterUpdate( const std::string & name, const std::string & objectClass ) {}
-	virtual void OnCharacterChanged( const std::string& name ) {}
-	virtual void OnCharacterChangeMesh( const std::string& name ) {}
-	virtual void OnPawnCreate( const std::string & name ) {}
-	virtual void OnPawnDelete( const std::string & name ) {}
-	virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime ) {}
-	virtual void OnChannel( const std::string & name, const std::string & channelName, const float value) {}
-	virtual void OnLogMessage( const std::string & message) {}
+	SBAPI SBCharacterListener() {}
+	virtual SBAPI ~SBCharacterListener() {}
+	virtual SBAPI void OnCharacterCreate( const std::string & name, const std::string & objectClass ) {}
+	virtual SBAPI void OnCharacterDelete( const std::string & name ) {}
+	virtual SBAPI void OnCharacterUpdate( const std::string & name, const std::string & objectClass ) {}
+	virtual SBAPI void OnCharacterChanged( const std::string& name ) {}
+	virtual SBAPI void OnCharacterChangeMesh( const std::string& name ) {}
+	virtual SBAPI void OnPawnCreate( const std::string & name ) {}
+	virtual SBAPI void OnPawnDelete( const std::string & name ) {}
+	virtual SBAPI void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime ) {}
+	virtual SBAPI void OnChannel( const std::string & name, const std::string & channelName, const float value) {}
+	virtual SBAPI void OnLogMessage( const std::string & message) {}
 };
 
 }

@@ -45,6 +45,7 @@
 #include <sb/SBEvent.h>
 #include <sb/SBCharacterListener.h>
 #include <sb/SBNavigationMesh.h>
+#include <sb/SBCharacterListener.h>
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
 #include <stdlib.h>
@@ -73,6 +74,7 @@ typedef std::map<std::string, std::string> StringMap;
 
 namespace SmartBody
 { 
+
 
 void pythonFuncsScene()
 {

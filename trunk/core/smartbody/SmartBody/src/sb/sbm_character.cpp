@@ -1993,7 +1993,7 @@ void SbmCharacter::forward_parameters( double curTime )
 			SkJoint* joint = joints[j];
 			if (joint->getJointType() != SkJoint::TypeOther)
 				continue;
-			listener_p->OnChannel(getName(), joint->jointName(), joint->pos()->value(0)); 
+			//listener_p->OnChannel(getName(), joint->jointName(), joint->pos()->value(0)); 
 		}
 	}
 }
