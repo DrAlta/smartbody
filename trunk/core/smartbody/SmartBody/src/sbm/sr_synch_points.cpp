@@ -37,6 +37,7 @@ int srSynchPoints::tag_index( const char *label )	{
 		if( _stricmp( label, "stroke_stop" ) == 0 ) 	return( STROKE_STOP );
 		if( _stricmp( label, "relax" ) == 0 )			return( RELAX );
 		if( _stricmp( label, "stop" ) == 0 )			return( STOP );
+		if( _stricmp( label, "end" ) == 0 )				return( STOP );
 	}
 	return( -1 ); // default err
 }
@@ -50,7 +51,7 @@ const char * srSynchPoints::tag_label( const int index ) {
 		case STROKE:		return( "stroke" );
 		case STROKE_STOP:	return( "stroke_stop" );
 		case RELAX: 		return( "relax" );
-		case STOP:			return( "stop" );
+		case STOP:			return( "end" );
 	}
 	return( "UNKNOWN" ); // default err
 }
