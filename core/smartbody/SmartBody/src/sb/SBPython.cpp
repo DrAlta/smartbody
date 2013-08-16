@@ -804,7 +804,7 @@ void initPython(std::string pythonLibPath)
 	std::string libPath = getenv("LD_LIBRARY_PATH");
 	LOG("LD_LIBRARY_PATH  = %s", libPath.c_str());	
 #endif
-
+	Py_NoSiteFlag = 1;
 #ifndef SB_NO_PYTHON
 #ifdef __ANDROID__
 	Py_SetProgramName((char*)pythonHome.c_str());
