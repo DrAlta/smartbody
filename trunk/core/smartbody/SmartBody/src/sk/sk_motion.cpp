@@ -197,7 +197,7 @@ void SkMotion::getChannelValueAtFrame( int f, int index, float* val )
 {
 	if ( _frames.size()==0 )
 		return;
-	if (f > _frames.size()-1 || f < 0)
+	if (int(f) > _frames.size()-1 || f < 0)
 		return;
 	if (index > _channels.size()-1 || index < 0)
 		return;
