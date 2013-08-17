@@ -423,7 +423,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 				if (v > 1)
 					v = 1;
 
-				_character->dMesh_p->visemeWeightMap[visemeChannels[i]] = v;
+				_character->dMesh_p->visemeWeightMap[visemeChannels[i]] = float(v);
 			}
 			else
 			{
