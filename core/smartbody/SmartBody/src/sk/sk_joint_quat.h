@@ -89,10 +89,10 @@ class SkJointQuat
     
     /*! Specifies a pre-multiplied frame rotation adjustment to help placing the
         derived class rotation parameterization frame of reference as needed */
-    void prerot ( const SrQuat& q );
+    SBAPI void prerot ( const SrQuat& q );
 
     /*! Specifies a post-multiplied frame rotation adjustment for the derived class */
-    void postrot ( const SrQuat& q );
+   SBAPI void postrot ( const SrQuat& q );
 
     /*! Options for method adjust_prepost() */
     enum AlignType { AlignPre, AlignPost, AlignPrePost, AlignPreInv, AlignPostInv };
@@ -107,13 +107,13 @@ class SkJointQuat
     
     /*! returns the current pre-multiplied rotation adjustment for the derived class
         note: quat.w is 1 if no rotation */
-    const SrQuat& prerot () const { return _prepost? _prepost->pre:SrQuat::null; }
+    SBAPI const SrQuat& prerot () const { return _prepost? _prepost->pre:SrQuat::null; }
 
     /*! returns the current pos-multiplied rotation adjustment for the derived class
         note: quat.w is 1 if no rotation */
-    const SrQuat& postrot () const { return _prepost? _prepost->post:SrQuat::null; }
+    SBAPI const SrQuat& postrot () const { return _prepost? _prepost->post:SrQuat::null; }
 
-	void orientation(const SrQuat& q);
+	SBAPI void orientation(const SrQuat& q);
 
 	SBAPI const SrQuat& orientation();
 
