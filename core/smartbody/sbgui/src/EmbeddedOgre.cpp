@@ -357,6 +357,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 
 		ogreRoot->restoreConfig();
 		LogManager::getSingletonPtr()->setLogDetail(LL_BOREME);
+#ifdef WIN32
 		Ogre::String pluginName = "RenderSystem_GL";	
 		Ogre::String sceneManagerPlugin = "Plugin_OctreeSceneManager";
 		bool lIsInDebugMode = OGRE_DEBUG_MODE;
@@ -364,6 +365,10 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		{
 			pluginName.append("_d");
 		}
+#else
+		Ogre::String sceneManagerPlugin = "/usr/lib/x86_64-linux-gnu/OGRE-1.8.0/Plugin_OctreeSceneManager";
+		Ogre::String pluginName = "/usr/lib/x86_64-linux-gnu/OGRE-1.8.0/RenderSystem_GL";	
+#endif
 		ogreRoot->loadPlugin(pluginName);		
 		//ogreRoot->loadPlugin(sceneManagerPlugin);
 #if 1 //OGRE_VERSION_MINOR > 7 && OGRE_VERSION_MAJOR == 1
@@ -376,11 +381,19 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 
 		ogreRoot->setRenderSystem(lRenderSystem);
 
+#ifdef WIN32
 		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/materials/programs","FileSystem");
 		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/materials/scripts","FileSystem");
 		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/materials/textures","FileSystem");
 		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/RTShaderLib/","FileSystem");
 		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/RTShaderLib/materials/","FileSystem");
+#else
+		ogreRoot->addResourceLocation("/usr/share/OGRE-1.8.0/media/materials/programs","FileSystem");
+		ogreRoot->addResourceLocation("/usr/share/OGRE-1.8.0/media/materials/scripts","FileSystem");
+		ogreRoot->addResourceLocation("/usr/share/OGRE-1.8.0/media/materials/textures","FileSystem");
+		ogreRoot->addResourceLocation("/usr/share/OGRE-1.8.0/media/RTShaderLib/","FileSystem");
+		ogreRoot->addResourceLocation("/usr/share/OGRE-1.8.0/media/RTShaderLib/materials/","FileSystem");
+#endif
 
 		ogreWnd = ogreRoot->initialise( false );
 		Ogre::NameValuePairList params;
