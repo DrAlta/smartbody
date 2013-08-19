@@ -35,7 +35,7 @@ class MeCtSaccade : public SmartBody::SBController
 		static std::string CONTROLLER_TYPE;
 		
 		enum IntervalMode {Mutual, Away};
-		enum BehaviorMode {Talking, Listening, Thinking};
+		enum BehaviorMode {Talking, Listening, Thinking, Custom};
 
 	private:
 		double			_prevTime;
@@ -46,17 +46,16 @@ class MeCtSaccade : public SmartBody::SBController
 		int				_idL;
 		int				_idR;
 		bool			_initialized;
+		bool			_attributeInitialized;
 		bool			_valid;
 		bool			_validByPolicy;
 		bool			_useModel;
 
-		// saccade information
+		// controller information
 		float			_time;
 		float			_dur;
 		float			_magnitude;
 		float			_direction;
-		IntervalMode	_intervalMode;
-		BehaviorMode	_behaviorMode;
 		SrVec			_axis;
 		SrQuat			_lastFixedRotation;
 		SrQuat			_fixedRotation;
@@ -65,6 +64,8 @@ class MeCtSaccade : public SmartBody::SBController
 		SrVec           _localAxis[3];
 
 		//--- saccade statistics
+		IntervalMode	_intervalMode;
+		BehaviorMode	_behaviorMode;
 		// direction stat
 		float			_percentBin0;
 		float			_percentBin45;
@@ -74,32 +75,14 @@ class MeCtSaccade : public SmartBody::SBController
 		float			_percentBin225;
 		float			_percentBin270;
 		float			_percentBin315;
-		float			_thinkingPercentBin0;
-		float			_thinkingPercentBin45;
-		float			_thinkingPercentBin90;
-		float			_thinkingPercentBin135;
-		float			_thinkingPercentBin180;
-		float			_thinkingPercentBin225;
-		float			_thinkingPercentBin270;
-		float			_thinkingPercentBin315;
 		// magnitude stat
-		float			_talkingLimit;
-		float			_listeningLimit;
-		float			_thinkingLimit;
+		float			_magnitudeLimit;
 		// interval stat
-		float			_listeningPercentMutual;
-		float			_talkingPercentMutual;
-		float			_thinkingPercentMutual;
-		float			_talkingMutualMean;
-		float			_talkingMutualVariant;
-		float			_talkingAwayMean;
-		float			_talkingAwayVariant;
-		float			_listeningMutualMean;
-		float			_listeningMutualVariant;
-		float			_listeningAwayMean;
-		float			_listeningAwayVariant;
-		float			_thinkingMean;
-		float			_thinkingVariant;
+		float			_percentMutual;
+		float			_mutualMean;
+		float			_mutualVariant;
+		float			_awayMean;
+		float			_awayVariant;
 		float			_minInterval;
 		// duration stat
 		float			_intercept;
@@ -112,15 +95,18 @@ class MeCtSaccade : public SmartBody::SBController
 		// set and get
 		bool getValid()						{return _valid;}
 		void setValid(bool v)				{_valid = v;}
-		void setBehaviorMode(BehaviorMode m){_behaviorMode = m;}
-		BehaviorMode getBehaviorMode()		{return _behaviorMode;}
+		void setBehaviorMode(BehaviorMode m);
+		MeCtSaccade::BehaviorMode getBehaviorMode();
 		bool getUseModel()					{return _useModel;}
 		void setUseModel(bool v)			{_useModel = v;}
+		void spawnOnce(float dir, float amplitude, float dur);
+
+		// deprecated by attributes ...
 		void setAngleLimit(float angle);
 		float getAngleLimit();
-		void spawnOnce(float dir, float amplitude, float dur);
 		void setPercentageBins(float b0, float b45, float b90, float b135, float b180, float b225, float b270, float b315);
 		void setGaussianParameter(float mean, float variant);
+		// ---
 
 	private:
 		void reset(double t);
@@ -134,6 +120,7 @@ class MeCtSaccade : public SmartBody::SBController
 		float intervalRandom();				// unit: sec
 		float duration(float amplitude);	// unit: sec
 
+		void initAttributes();
 		void initSaccade(MeFrameData& frame);
 		virtual bool controller_evaluate(double t, MeFrameData& frame);
 		virtual SkChannelArray& controller_channels()	{ return(_channels); }

@@ -174,12 +174,14 @@ brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 scene.run('BehaviorSetMaleMocapLocomotion.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrBrad')
-# setup reach 
+# setup reach
+"""
 scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrBrad')
+"""
 # Turn on GPU deformable geometry
-scene.command('char ChrBrad viewer deformableGPU')
+#scene.command('char ChrBrad viewer deformableGPU')
 
 # Set up steering
 print 'Setting up steering'
