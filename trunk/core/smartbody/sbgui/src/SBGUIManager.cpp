@@ -114,6 +114,21 @@ int SBGUIManager::handleEvent(int eventID)
 	return ret;
 }
 
+void SBGUIManager::resetGUI()
+{
+#if USE_CEGUI
+	CEGUI::WindowManager& winMgr = CEGUI::WindowManager::getSingleton();
+	CEGUI::Window* oldRootWin = CEGUI::System::getSingleton().getDefaultGUIContext().getRootWindow();
+	if (oldRootWin)
+	{
+		winMgr.destroyWindow(oldRootWin);
+	}	
+	CEGUI::Window *sheet = winMgr.createWindow("DefaultWindow", "SBGUI");
+	//sheet->setMinSize(CEGUI::UVector2(CEGUI::UDim(0.0, 1920), CEGUI::UDim(0.0, 1200)));
+	CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow( sheet );
+#endif
+}
+
 void SBGUIManager::init()
 {
 	if (initialized) return; // don't init twice	
@@ -167,9 +182,9 @@ void SBGUIManager::init()
 	
 	//CEGUI::Font& font = CEGUI::FontManager.getSingleton().get("")
 	//CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
-	CEGUI::Window *sheet = winMgr.createWindow("DefaultWindow", "SBGUI");
-	//sheet->setMinSize(CEGUI::UVector2(CEGUI::UDim(0.0, 1920), CEGUI::UDim(0.0, 1200)));
-	CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow( sheet );
+
+	resetGUI();
+
 		
 	initialized = true;
 	
@@ -193,10 +208,11 @@ void SBGUIManager::init()
 	sheet->addChildWindow(button);
 	*/
 	//quit->subscribeEvent(CEGUI::PushButton::EventClicked, &testCEGUIButtonPush);
-	//LOG("Finish create CEGUI");
-	
+	//LOG("Finish create CEGUI");	
 #endif
 }
+
+
 
 void SBGUIManager::resize( int w, int h )
 {

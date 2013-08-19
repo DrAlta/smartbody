@@ -23,6 +23,8 @@
 #include <sbm/KinectProcessor.h>
 #include <sb/SBPython.h>
 
+#include "SBGUIManager.h"
+
 #define TEST_EXPORT_SMARTBODY_PACKAGE 1
 
 BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
@@ -457,6 +459,7 @@ void BaseWindow::ResetScene()
 {
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 	resetWindow();
+	SBGUIManager::singleton().resetGUI();
 	fltkViewer->resetViewer();
 
 	SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();

@@ -152,7 +152,7 @@ void SkJointQuat::orientation(const SrQuat& q)
 	ask_new ();
 }
 
-const SrQuat& SkJointQuat::orientation()
+const SrQuat& SkJointQuat::orientation() 
 {
 	return _jorientation;
 }
