@@ -46,6 +46,7 @@ MeCtMotion::MeCtMotion ()
    _loop = false;
    _last_apply_frame = 0;
    _offset = 0;
+   _isAdditive = false;
  }
 
 MeCtMotion::~MeCtMotion ()
@@ -373,7 +374,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	_motion->apply( float(curMotionTime + _offset),
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
-		            _play_mode, &_last_apply_frame, false, retarget );
+		            _play_mode, &_last_apply_frame, _isAdditive, retarget );
 
 	SkChannelArray& allChannels = _motion->channels();
 

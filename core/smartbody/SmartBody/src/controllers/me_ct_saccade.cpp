@@ -35,83 +35,32 @@ std::string MeCtSaccade::CONTROLLER_TYPE = "Saccade";
 std::string eyeballL = "eyeball_left";
 std::string eyeballR = "eyeball_right";
 
+
 MeCtSaccade::MeCtSaccade(SbmCharacter* c) : SmartBody::SBController()
 {
 	_character = c;
 
+	// controllers
 	_useModel = true;
 	_valid = false;
 	_validByPolicy = true;
 	_initialized = false;
+	_attributeInitialized = false;
 	_idL = -1;
 	_idR = -1;
 	_prevTime = 0.0;
-
 	_dur = 0.0f;
 	_time = -1.0f;
 	_direction = 0.0f;
+
+	// saccade
 	_intervalMode = Mutual;
-	_behaviorMode = Listening;//											expose
-
-
-	//--- saccade statistics
-	// direction stat
-	// percentage for listening and talking
-	_percentBin0 = 15.54f;				// unit: percentage
-	_percentBin45 = 6.46f;
-	_percentBin90 = 17.69f;
-	_percentBin135 = 7.44f;
-	_percentBin180 = 16.80f;
-	_percentBin225 = 7.89f;
-	_percentBin270 = 20.38f;
-	_percentBin315 = 7.79f;
-	// percentage for thinking
-	_thinkingPercentBin0 = 5.46f;		// unit: percentage
-	_thinkingPercentBin45 = 10.54f;
-	_thinkingPercentBin90 = 24.69f;
-	_thinkingPercentBin135 = 6.44f;
-	_thinkingPercentBin180 = 6.89f;
-	_thinkingPercentBin225 = 12.80f;
-	_thinkingPercentBin270 = 26.38f;
-	_thinkingPercentBin315 = 6.79f;
-
-	// magnitude stat
-//	_talkingLimit =	27.5f;		// unit: degree
-//	_listeningLimit = 22.7f;
-	_talkingLimit =	12.0f;			// unit: degree							expose
-	_listeningLimit = 10.0f;			//										expose
-	_thinkingLimit = _talkingLimit;	// make up data
-
-	// inter-saccadic interval stat
-	_listeningPercentMutual = 75.0f;		// mutual gaze or gaze away
-	_talkingPercentMutual = 41.0f;
-	_thinkingPercentMutual = _talkingPercentMutual;
-	_talkingMutualMean = 93.9f;		// unit: second
-	_talkingMutualVariant = 94.9f;	
-	_talkingAwayMean = 27.8f;
-	_talkingAwayVariant = 24.0f;
-	_listeningMutualMean = 237.5f;
-	_listeningMutualVariant = 47.1f;
-	_listeningAwayMean = 13.0f;
-	_listeningAwayVariant = 7.1f;
-	_thinkingMean = 180.0f;
-	_thinkingVariant = 47.0f;  
+	_behaviorMode = Listening;
 	_minInterval = 0.001f;
-	
-	// duration stat
-	_intercept = 0.025f;		// unit: sec
-	_slope = 0.0024f;		// unit: sec/degree
+	_intercept = 0.025f;				// unit: sec
+	_slope = 0.0024f;					// unit: sec/degree
 
-	srand((unsigned int)time(0));
-
-	//DoubleAttribute* hf = new DoubleAttribute("saccade.talkingLimit");
-	//hf->setDefaultValue(5.0);
-	//hf->setValue(5.0);
-	//_defaultAttributes.push_back(hf);
-	//addDefaultAttributeDouble("saccade.talkingLimit", 5, &_talkingLimit);	
-	//addDefaultAttributeFloat("saccade.talkingLimit", 5.f, &_talkingLimit);
-	//addDefaultAttributeFloat("saccade.talkingPercentMutual", 41.0f, &_talkingPercentMutual);
-	
+	srand((unsigned int)time(0));	
 }
 
 MeCtSaccade::~MeCtSaccade()
@@ -119,12 +68,73 @@ MeCtSaccade::~MeCtSaccade()
 	_character = NULL;
 }
 
+/*
+	Saccade parameters per mode (Reference: Eye Alive)
+		- percentage bin for different mode
+		- magnitude limit
+		- percentage between gaze mutual and gaze away for different mode
+		- mean and variant for different mode and different gaze type
+*/
+
+void MeCtSaccade::initAttributes()
+{
+	if (!_attributeInitialized)
+	{
+		// Data from papar "eyes alive" - listening mode
+		_character->createDoubleAttribute("saccade.listening.percentage0", 15.54f, true, "Saccade", 2, false, false, false, "listening mode, percentage bin for 0 degree.");
+		_character->createDoubleAttribute("saccade.listening.percentage45", 6.46f, true, "Saccade", 3, false, false, false, "listening mode, percentage bin for 45 degree.");
+		_character->createDoubleAttribute("saccade.listening.percentage90", 17.69f, true, "Saccade", 4, false, false, false, "listening mode, percentage bin for 90 degree.");
+		_character->createDoubleAttribute("saccade.listening.percentage135", 7.44f, true, "Saccade", 5, false, false, false, "listening mode, percentage bin for 135 degree.");
+		_character->createDoubleAttribute("saccade.listening.percentage180", 16.80f, true, "Saccade", 6, false, false, false, "listening mode, percentage bin for 180 degree.");
+		_character->createDoubleAttribute("saccade.listening.percentage225", 7.89f, true, "Saccade", 7, false, false, false, "listening mode, percentage bin for 225 degree.");
+		_character->createDoubleAttribute("saccade.listening.percentage270", 20.38f, true, "Saccade", 8, false, false, false, "listening mode, percentage bin for 270 degree.");
+		_character->createDoubleAttribute("saccade.listening.percentage315", 7.79f, true, "Saccade", 9, false, false, false, "listening mode, percentage bin for 315 degree.");
+		_character->createDoubleAttribute("saccade.listening.magnitudeLimit", 10.0f, true, "Saccade", 10, false, false, false, "listening mode, magnitude limit.");
+		_character->createDoubleAttribute("saccade.listening.percentageMutual", 75.0f, true, "Saccade", 11, false, false, false, "listening mode, percentage for gaze mutual.");
+		_character->createDoubleAttribute("saccade.listening.mutualMean", 237.5f, true, "Saccade", 12, false, false, false, "listening mode, Gaussian mean for gaze mutual.");
+		_character->createDoubleAttribute("saccade.listening.mutualVariant", 47.1f, true, "Saccade", 13, false, false, false, "listening mode, Gaussian variant for gaze mutual.");
+		_character->createDoubleAttribute("saccade.listening.awayMean", 13.0f, true, "Saccade", 14, false, false, false, "listening mode, Gaussian mean for gaze away.");
+		_character->createDoubleAttribute("saccade.listening.awayVariant", 7.1f, true, "Saccade", 15, false, false, false, "listening mode, Gaussian variant for gaze away.");
+
+		// Data from papar "eyes alive" - talking mode
+		_character->createDoubleAttribute("saccade.talking.percentage0", 15.54f, true, "Saccade", 20, false, false, false, "talking mode, percentage bin for 0 degree.");
+		_character->createDoubleAttribute("saccade.talking.percentage45", 6.46f, true, "Saccade", 21, false, false, false, "talking mode, percentage bin for 45 degree.");
+		_character->createDoubleAttribute("saccade.talking.percentage90", 17.69f, true, "Saccade", 22, false, false, false, "talking mode, percentage bin for 90 degree.");
+		_character->createDoubleAttribute("saccade.talking.percentage135", 7.44f, true, "Saccade", 23, false, false, false, "talking mode, percentage bin for 135 degree.");
+		_character->createDoubleAttribute("saccade.talking.percentage180", 16.80f, true, "Saccade", 24, false, false, false, "talking mode, percentage bin for 180 degree.");
+		_character->createDoubleAttribute("saccade.talking.percentage225", 7.89f, true, "Saccade", 25, false, false, false, "talking mode, percentage bin for 225 degree.");
+		_character->createDoubleAttribute("saccade.talking.percentage270", 20.38f, true, "Saccade", 26, false, false, false, "talking mode, percentage bin for 270 degree.");
+		_character->createDoubleAttribute("saccade.talking.percentage315", 7.79f, true, "Saccade", 27, false, false, false, "talking mode, percentage bin for 315 degree.");
+		_character->createDoubleAttribute("saccade.talking.magnitudeLimit", 12.0f, true, "Saccade", 28, false, false, false, "talking mode, magnitude limit.");
+		_character->createDoubleAttribute("saccade.talking.percentageMutual", 41.0f, true, "Saccade", 29, false, false, false, "talking mode, percentage for mutual gaze.");
+		_character->createDoubleAttribute("saccade.talking.mutualMean", 93.9f, true, "Saccade", 30, false, false, false, "talking mode, Gaussian mean for gaze mutual.");
+		_character->createDoubleAttribute("saccade.talking.mutualVariant", 94.9f, true, "Saccade", 31, false, false, false, "talking mode, Gaussian variant for gaze mutual.");
+		_character->createDoubleAttribute("saccade.talking.awayMean", 27.8f, true, "Saccade", 32, false, false, false, "talking mode, Gaussian mean for gaze away.");
+		_character->createDoubleAttribute("saccade.talking.awayVariant", 24.0f, true, "Saccade", 33, false, false, false, "talking mode, Gaussian variant for gaze away.");
+
+		// Thinking mode data is ad-hoc - thinking mode
+		_character->createDoubleAttribute("saccade.thinking.percentage0", 5.46f, true, "Saccade", 40, false, false, false, "thinking mode, percentage bin for 0 degree.");
+		_character->createDoubleAttribute("saccade.thinking.percentage45", 10.54f, true, "Saccade", 41, false, false, false, "thinking mode, percentage bin for 45 degree.");
+		_character->createDoubleAttribute("saccade.thinking.percentage90", 24.69f, true, "Saccade", 42, false, false, false, "thinking mode, percentage bin for 90 degree.");
+		_character->createDoubleAttribute("saccade.thinking.percentage135", 6.44f, true, "Saccade", 43, false, false, false, "thinking mode, percentage bin for 135 degree.");
+		_character->createDoubleAttribute("saccade.thinking.percentage180", 6.89f, true, "Saccade", 44, false, false, false, "thinking mode, percentage bin for 180 degree.");
+		_character->createDoubleAttribute("saccade.thinking.percentage225", 12.80f, true, "Saccade", 45, false, false, false, "thinking mode, percentage bin for 225 degree.");
+		_character->createDoubleAttribute("saccade.thinking.percentage270", 26.38f, true, "Saccade", 46, false, false, false, "thinking mode, percentage bin for 270 degree.");
+		_character->createDoubleAttribute("saccade.thinking.percentage315", 6.79f, true, "Saccade", 47, false, false, false, "thinking mode, percentage bin for 315 degree.");
+		_character->createDoubleAttribute("saccade.thinking.magnitudeLimit", 12.0f, true, "Saccade", 48, false, false, false, "thinking mode, magnitude limit.");
+		_character->createDoubleAttribute("saccade.thinking.percentageMutual", 20.0f, true, "Saccade", 49, false, false, false, "thinking mode, percentage for mutual gaze.");
+		_character->createDoubleAttribute("saccade.thinking.mutualMean", 180.0f, true, "Saccade", 50, false, false, false, "thinking mode, Gaussian mean for gaze mutual.");
+		_character->createDoubleAttribute("saccade.thinking.mutualVariant", 47.0f, true, "Saccade", 51, false, false, false, "thinking mode, Gaussian variant for gaze mutual.");
+		_character->createDoubleAttribute("saccade.thinking.awayMean", 180.0f, true, "Saccade", 52, false, false, false, "thinking mode, Gaussian mean for gaze away.");
+		_character->createDoubleAttribute("saccade.thinking.awayVariant", 47.0f, true, "Saccade", 53, false, false, false, "thinking mode, Gaussian variant for gaze away.");
+
+		_attributeInitialized = true;
+		setBehaviorMode(Listening);
+	}
+}
+
 void MeCtSaccade::spawnOnce(float dir, float amplitude, float dur)
 {
-//	if ((float)mcuCBHandle::singleton().time < (_time + _dur))
-//		return;
-
-	
 	_direction = dir;
 	_magnitude = amplitude;
 	_dur = dur;
@@ -274,28 +284,14 @@ float MeCtSaccade::gaussianRandom(float mean, float variant)
 float MeCtSaccade::directionRandom()
 {
 	float bound0, bound45, bound90, bound135, bound180, bound225, bound270, bound315;
-	if (_behaviorMode == Talking || _behaviorMode == Listening)
-	{
-		bound0 = _percentBin0;
-		bound45 = bound0 + _percentBin45;
-		bound90 = bound45 + _percentBin90;
-		bound135 = bound90 + _percentBin135;
-		bound180 = bound135 + _percentBin180;
-		bound225 = bound180 + _percentBin225;
-		bound270 = bound225 + _percentBin270;
-		bound315 = bound270 + _percentBin315;
-	}
-	if (_behaviorMode == Thinking)
-	{
-		bound0 = _thinkingPercentBin0;
-		bound45 = bound0 + _thinkingPercentBin45;
-		bound90 = bound45 + _thinkingPercentBin90;
-		bound135 = bound90 + _thinkingPercentBin135;
-		bound180 = bound135 + _thinkingPercentBin180;
-		bound225 = bound180 + _thinkingPercentBin225;
-		bound270 = bound225 + _thinkingPercentBin270;
-		bound315 = bound270 + _thinkingPercentBin315;	
-	}
+	bound0 = _percentBin0;
+	bound45 = bound0 + _percentBin45;
+	bound90 = bound45 + _percentBin90;
+	bound135 = bound90 + _percentBin135;
+	bound180 = bound135 + _percentBin180;
+	bound225 = bound180 + _percentBin225;
+	bound270 = bound225 + _percentBin270;
+	bound315 = bound270 + _percentBin315;
 
 	float dir = 0.0f;
 	float binIndex = floatRandom(0.0f, 100.0f);
@@ -322,17 +318,11 @@ float MeCtSaccade::magnitudeRandom()
 {
 	float f = floatRandom(0.0f, 15.0f);
 	float a = -6.9f * log(f / 15.7f);
-	float limit;
-	if (_behaviorMode == Talking)
-		limit = _talkingLimit;
-	if (_behaviorMode == Listening)
-		limit = _listeningLimit;
-	if (_behaviorMode == Thinking)
-		limit = _thinkingLimit;
+	float limit = _magnitudeLimit;
 
-	// below is adhoc
+	// 0.5f, 0.75f are regulated by the eye shape
 	// direction 0 and 180 is moving up and down, it should have a limit
-	if (_direction == 90.0f || _direction == 270.0f)		
+	if (_direction == 90.0f || _direction == 270.0f)
 		limit *= 0.5f;
 	if (_direction == 45.0f || _direction == 135.0f || _direction == 225.0f || _direction == 315.0f)
 		limit *= 0.75f;
@@ -345,13 +335,7 @@ float MeCtSaccade::magnitudeRandom()
 float MeCtSaccade::intervalRandom()
 {
 	float f = floatRandom(0.0f, 100.0f);
-	float mutualPercent = 0.0f;
-	if (_behaviorMode == Listening)
-		mutualPercent = _listeningPercentMutual;
-	if (_behaviorMode == Talking)
-		mutualPercent = _talkingPercentMutual;
-	if (_behaviorMode == Thinking)
-		mutualPercent = _thinkingPercentMutual;
+	float mutualPercent = _percentMutual;
 
 	if (f >= 0.0f && f <= mutualPercent)
 		_intervalMode = Mutual;
@@ -360,16 +344,10 @@ float MeCtSaccade::intervalRandom()
 	float interval = -1.0f;
 	while (interval < _minInterval)
 	{
-		if (_intervalMode == Mutual && _behaviorMode == Talking)
-			interval = gaussianRandom(_talkingMutualMean * (float)_dt, _talkingMutualVariant * (float)_dt);
-		if (_intervalMode == Away && _behaviorMode == Talking)
-			interval = gaussianRandom(_talkingAwayMean * (float)_dt, _talkingAwayVariant * (float)_dt);
-		if (_intervalMode == Mutual && _behaviorMode == Listening)
-			interval = gaussianRandom(_listeningMutualMean * (float)_dt, _listeningMutualVariant * (float)_dt);
-		if (_intervalMode == Away && _behaviorMode == Listening)
-			interval = gaussianRandom(_listeningAwayMean * (float)_dt, _listeningAwayVariant * (float)_dt);
-		if (_behaviorMode == Thinking)
-			interval = gaussianRandom(_thinkingMean * (float)_dt, _thinkingVariant * (float)_dt);
+		if (_intervalMode == Mutual)
+			interval = gaussianRandom(_mutualMean * (float)_dt, _mutualVariant * (float)_dt);
+		if (_intervalMode == Away)
+			interval = gaussianRandom(_awayMean * (float)_dt, _awayVariant * (float)_dt);
 	}
 	return interval;
 }
@@ -438,6 +416,7 @@ bool MeCtSaccade::controller_evaluate(double t, MeFrameData& frame)
 
 
 	SrBuffer<float>& buff = frame.buffer();
+	initAttributes();
 	initSaccade(frame);
 	if (_valid)
 	{
@@ -448,86 +427,88 @@ bool MeCtSaccade::controller_evaluate(double t, MeFrameData& frame)
 	return true;
 }
 
-// P.S: I am defintely coming back to refactoring this controller code. Now it's so stupid organized... 
 void MeCtSaccade::setPercentageBins(float b0, float b45, float b90, float b135, float b180, float b225, float b270, float b315)
 {
 	b315 = 100 - b0 - b45 - b135 - b180 - b225 - b270;
-	if (_behaviorMode == Talking || _behaviorMode == Listening)
-	{
-		_percentBin0 = b0;
-		_percentBin45 = b45;
-		_percentBin90 = b90;
-		_percentBin135 = b135;
-		_percentBin180 = b180;
-		_percentBin225 = b225;
-		_percentBin270 = b270;
-		_percentBin315 = b315;
-	}
-	if (_behaviorMode == Thinking)
-	{
-		_thinkingPercentBin0 = b0;
-		_thinkingPercentBin45 = b45;
-		_thinkingPercentBin90 = b90;
-		_thinkingPercentBin135 = b135;
-		_thinkingPercentBin180 = b180;
-		_thinkingPercentBin225 = b225;
-		_thinkingPercentBin270 = b270;
-		_thinkingPercentBin315 = b315;	
-	}
+	_percentBin0 = b0;
+	_percentBin45 = b45;
+	_percentBin90 = b90;
+	_percentBin135 = b135;
+	_percentBin180 = b180;
+	_percentBin225 = b225;
+	_percentBin270 = b270;
+	_percentBin315 = b315;
 }
 
 void MeCtSaccade::setGaussianParameter(float mean, float variant)
 {
-	if (_behaviorMode == Talking)
-	{
-		_talkingMutualMean = mean;
-		_talkingMutualVariant = variant;
-		_talkingAwayMean = mean;
-		_talkingAwayVariant = variant;
-	}
-	if (_behaviorMode == Listening)
-	{
-		_listeningMutualMean = mean;
-		_listeningMutualVariant = variant;
-		_listeningAwayMean = mean;
-		_listeningAwayVariant = variant;
-	}
-	if (_behaviorMode == Thinking)
-	{
-		_thinkingMean = mean;
-		_thinkingVariant = variant;
-	}
+	_mutualMean = mean;
+	_mutualVariant = variant;
+	_awayMean = mean;
+	_awayVariant = variant;
 }
 
 void MeCtSaccade::setAngleLimit(float angle)
 {
-	if (_behaviorMode == Talking)
-	{
-		_talkingLimit = angle;
-	}
-	if (_behaviorMode == Listening)
-	{
-		_listeningLimit = angle;
-	}
-	if (_behaviorMode == Thinking)
-	{
-		_thinkingLimit = angle;
-	}
+	_magnitudeLimit = angle;
 }
 
 float MeCtSaccade::getAngleLimit()
 {
+	return _magnitudeLimit;
+}
+
+
+void MeCtSaccade::setBehaviorMode(BehaviorMode m)
+{
+	_behaviorMode = m;
+	std::string modeString = "";
 	if (_behaviorMode == Talking)
 	{
-		return _talkingLimit;
+		modeString = "talking";
 	}
 	if (_behaviorMode == Listening)
 	{
-		return _listeningLimit;
+		modeString = "listening";
 	}
 	if (_behaviorMode == Thinking)
 	{
-		return _thinkingLimit;
+		modeString = "thinking";
 	}
-	return 0;
+	if (modeString == "")
+		return;
+
+	LOG("Saccade mode set to %s", modeString.c_str());
+
+	std::string percentage0 = "saccade." + modeString + ".percentage0";
+	std::string percentage45 = "saccade." + modeString + ".percentage45";
+	std::string percentage90 = "saccade." + modeString + ".percentage90";
+	std::string percentage135 = "saccade." + modeString + ".percentage135";
+	std::string percentage180 = "saccade." + modeString + ".percentage180";
+	std::string percentage225 = "saccade." + modeString + ".percentage225";
+	std::string percentage270 = "saccade." + modeString + ".percentage270";
+	std::string percentage315 = "saccade." + modeString + ".percentage315";
+	std::string magnitudeLimit = "saccade." + modeString + ".magnitudeLimit";
+	std::string percentageMutual = "saccade." + modeString + ".percentageMutual";
+	std::string mutualMean = "saccade." + modeString + ".mutualMean";
+	std::string mutualVariant = "saccade." + modeString + ".mutualVariant";
+	std::string awayMean = "saccade." + modeString + ".awayMean";
+	std::string awayVariant = "saccade." + modeString + ".awayVariant";
+
+	setPercentageBins(	(float)_character->getDoubleAttribute(percentage0), (float)_character->getDoubleAttribute(percentage45),
+						(float)_character->getDoubleAttribute(percentage90), (float)_character->getDoubleAttribute(percentage135),
+						(float)_character->getDoubleAttribute(percentage180), (float)_character->getDoubleAttribute(percentage225),
+						(float)_character->getDoubleAttribute(percentage270), (float)_character->getDoubleAttribute(percentage315)
+						);
+	_magnitudeLimit = (float)_character->getDoubleAttribute(magnitudeLimit);
+	_percentMutual = (float)_character->getDoubleAttribute(percentageMutual);
+	_mutualMean = (float)_character->getDoubleAttribute(mutualMean);
+	_mutualVariant = (float)_character->getDoubleAttribute(mutualVariant);
+	_awayMean = (float)_character->getDoubleAttribute(awayMean);
+	_awayVariant = (float)_character->getDoubleAttribute(awayVariant);
+}
+
+MeCtSaccade::BehaviorMode MeCtSaccade::getBehaviorMode()
+{
+	return _behaviorMode;
 }

@@ -322,7 +322,7 @@ int SkChannelArray::linear_search (const std::string& name, SkChannel::Type type
 	for (int i = 0; i < chs; i++)
 	{ 
 		if ( _channelList[i].type == type && 
-			_channelList[i].mappedName == name)
+			(_channelList[i].mappedName == name) || (_channelList[i].name == name))
 		{ 
 			return i;
 		}

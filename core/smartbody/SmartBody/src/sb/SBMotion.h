@@ -70,6 +70,7 @@ class SBMotion : public SkMotion
 		SBAPI void removeMotionChannelsByEndJoints(std::string skelName, std::vector<std::string>& endJoints);
 		SBAPI void removeMotionChannels(std::vector<std::string> channelNames);
 
+		SBAPI SBMotion* getOffset(std::string motionName = "");
 
 		SBAPI bool translate(float x, float y, float z, const std::string& baseJointName);
 		SBAPI bool rotate(float xaxis, float yaxis, float zaxis, const std::string& baseJointName);
@@ -140,6 +141,8 @@ class SBMotion : public SkMotion
 		std::map<std::string, std::string> tagAttrMap; // store the tagged attributes in a map
 		MotionType _motionType;
 		float _scale;
+
+		SBMotion* _offsetMotion;
 };
 
 bool motionComp(const SBMotion *a, const SBMotion *b);

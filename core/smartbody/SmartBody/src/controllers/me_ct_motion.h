@@ -65,6 +65,7 @@ class MeCtMotion : public SmartBody::SBController, public FadingControl
 	int					 _lastCycle;
 	SmartBody::SBCharacter* _character;
 	double motionTime;
+	bool				_isAdditive;
 
    public :
 	   static std::string type_name;
@@ -121,6 +122,9 @@ class MeCtMotion : public SmartBody::SBController, public FadingControl
     /*! Change the loop state. If in loop, the duration of the controller will 
         be undetermined, ie -1 */
     void loop ( bool b ) { _loop=b; }
+
+	/*! Change the motion apply state. Additive or Overwrite */
+	void isAdditive(bool b) { _isAdditive = b; }
 
     /*! This method will return the fixed total duration time that the controller
         will take, or will return -1 if the controller is looped */

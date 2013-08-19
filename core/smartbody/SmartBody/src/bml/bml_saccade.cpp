@@ -59,23 +59,23 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 	float duration = 0.03f;
 	float magnitude = 3.0f;
 	float direction = 45.0f;
-	float dur = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_DURATION));
-	if (dur != 0.0f)
+	std::string dur = xml_utils::xml_translate_string(elem->getAttribute(BMLDefs::ATTR_DURATION));
+	if (dur != "")
 	{
 		saccade_ct->setUseModel(false);
-		duration = dur;
+		duration = (float)atof(dur.c_str());
 	}
-	float  mag = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_MAGNITUDE));
-	if (mag != 0.0f)
+	std::string mag = xml_utils::xml_translate_string(elem->getAttribute(BMLDefs::ATTR_MAGNITUDE));
+	if (mag != "")
 	{
 		saccade_ct->setUseModel(false);
-		magnitude = mag;
+		magnitude = (float)atof(mag.c_str());
 	}
-	float dir = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_DIRECTION));
-	if (dir != 0.0f)
+	std::string dir = xml_utils::xml_translate_string(elem->getAttribute(BMLDefs::ATTR_DIRECTION));
+	if (dir != "")
 	{
 		saccade_ct->setUseModel(false);
-		direction = dir;
+		direction = (float)atof(dir.c_str());
 	}
 	if (!saccade_ct->getUseModel())
 	{
@@ -101,6 +101,8 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 		}
 	}
 
+	/*
+	// deprecated by attributes
 	float bin0 = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN0));
 	float bin45 = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN45));
 	float bin90 = xml_utils::xml_translate_float(elem->getAttribute(BMLDefs::ATTR_PERCENTAGE_BIN90));
@@ -128,6 +130,7 @@ BehaviorRequestPtr BML::parse_bml_saccade( DOMElement* elem, const std::string& 
 		float angle = limitAngle;
 		saccade_ct->setAngleLimit(angle);
 	}
+	*/
 
 	std::string finishFlag;
 	xml_utils::xml_translate(&finishFlag, elem->getAttribute(BMLDefs::ATTR_FINISH));

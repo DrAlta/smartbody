@@ -68,6 +68,7 @@ SBMotion::SBMotion() : SkMotion()
 	transformDepth = 0;
 	_motionType = Unknown;
 	_scale = 1.f;
+	_offsetMotion = NULL;
 }
 
 SBMotion::SBMotion(const SBMotion& motion)
@@ -77,6 +78,7 @@ SBMotion::SBMotion(const SBMotion& motion)
 	transformDepth = 0;
 	_motionType = Unknown;
 	_scale = 1.f;
+	_offsetMotion = NULL;
 }
 
 SBMotion::SBMotion(std::string file) : SkMotion()
@@ -1342,6 +1344,134 @@ SBJointMap* SBMotion::getJointMap()
 			return jointMap;
 	}
 	return NULL;
+}
+
+/*
+// subtract current motion with base motion 
+SBAPI SBMotion* SBMotion::getOffset(SBMotion* baseMotion, std::string motionName)
+{
+	if (baseMotion == NULL)
+		return NULL;
+
+	if (baseMotion->frames() == 0)
+		return NULL;
+
+	SkChannelArray& ch = channels();
+	SkChannelArray& baseCh = baseMotion->channels();
+	int numFrames = frames();
+	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
+	SmartBody::SBMotion* offsetMotion = new SmartBody::SBMotion();
+	offsetMotion->setMotionSkeletonName(originalMotion->getMotionSkeletonName());	
+	if (motionName == "")
+		motionName = originalMotion->getName() + "_offset_" + baseMotion->getName();
+	offsetMotion->setName(motionName);
+	srSynchPoints sp(synch_points);
+	offsetMotion->synch_points = sp;
+	offsetMotion->init(ch);
+	float* baseP = baseMotion->posture(0);
+	for (int f = 0; f < numFrames; f++)
+	{
+		offsetMotion->insert_frame(f, this->keytime(f));
+		float* p = posture(f);
+		for (int c = 0; c < ch.size(); c++)
+		{
+			//if (ch.mappedName(c) == "base")
+			//	continue;
+
+			SkChannel& channel = ch[c];
+			// find corresponding channel from base motion
+			int baseC = baseCh.linear_search(ch.name(c), channel.type);
+			if (baseC >= 0)
+			{
+				int floatPos = ch.float_position(c);
+				int baseFloatPos = baseCh.float_position(baseC);
+				if (channel.type == SkChannel::XPos ||
+					channel.type == SkChannel::YPos ||
+					channel.type == SkChannel::ZPos)
+				{
+					float v = p[floatPos] - baseP[baseFloatPos];
+					offsetMotion->posture(f)[floatPos] = v;
+				}
+				else
+				{
+					SrQuat q = SrQuat(p[floatPos + 0], p[floatPos + 1], p[floatPos + 2], p[floatPos + 3]);
+					SrQuat baseQ = SrQuat(baseP[baseFloatPos + 0], baseP[baseFloatPos + 1], baseP[baseFloatPos + 2], baseP[baseFloatPos + 3]);
+					SrQuat diff = q.inverse() * baseQ;
+					//SrQuat diff = baseQ.inverse() * q;
+					offsetMotion->posture(f)[floatPos + 0] = diff.w;
+					offsetMotion->posture(f)[floatPos + 1] = diff.x;
+					offsetMotion->posture(f)[floatPos + 2] = diff.y;
+					offsetMotion->posture(f)[floatPos + 3] = diff.z;
+				}
+			}
+		}
+	}
+	if (offsetMotion != NULL)
+	{
+		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(offsetMotion);
+		LOG("Add motion %s to scene", offsetMotion->getName().c_str());
+	}
+
+	return offsetMotion;
+}
+*/
+SBAPI SBMotion* SBMotion::getOffset(std::string motionName)
+{
+	if (_offsetMotion)
+	{
+		return _offsetMotion;
+	}
+	SkChannelArray& ch = channels();
+	int numFrames = frames();
+	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
+	SmartBody::SBMotion* offsetMotion = new SmartBody::SBMotion();
+	offsetMotion->setMotionSkeletonName(originalMotion->getMotionSkeletonName());	
+	if (motionName == "")
+		motionName = originalMotion->getName() + "_offset";
+	offsetMotion->setName(motionName);
+	srSynchPoints sp(synch_points);
+	offsetMotion->synch_points = sp;
+	offsetMotion->init(ch);
+	float* baseP = this->posture(0);
+	for (int f = 0; f < numFrames; f++)
+	{
+		offsetMotion->insert_frame(f, this->keytime(f));
+		float* p = posture(f);
+		for (int c = 0; c < ch.size(); c++)
+		{
+			SkChannel& channel = ch[c];
+			
+			int floatPos = ch.float_position(c);
+			if (channel.type == SkChannel::XPos ||
+				channel.type == SkChannel::YPos ||
+				channel.type == SkChannel::ZPos)
+			{
+				float v = p[floatPos] - baseP[floatPos];
+				offsetMotion->posture(f)[floatPos] = v;
+			}
+			else
+			{
+				SrQuat q = SrQuat(p[floatPos + 0], p[floatPos + 1], p[floatPos + 2], p[floatPos + 3]);
+				SrQuat baseQ = SrQuat(baseP[floatPos + 0], baseP[floatPos + 1], baseP[floatPos + 2], baseP[floatPos + 3]);
+				//SrQuat diff = q.inverse() * baseQ;
+				SrQuat diff = baseQ.inverse() * q;
+				offsetMotion->posture(f)[floatPos + 0] = diff.w;
+				offsetMotion->posture(f)[floatPos + 1] = diff.x;
+				offsetMotion->posture(f)[floatPos + 2] = diff.y;
+				offsetMotion->posture(f)[floatPos + 3] = diff.z;
+			}
+
+		}
+	}
+
+	if (offsetMotion != NULL)
+	{
+		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(offsetMotion);
+		LOG("Add motion %s to scene", offsetMotion->getName().c_str());
+	}
+
+	_offsetMotion = offsetMotion;
+	return _offsetMotion;
 }
 
 bool SBMotion::translate(float x, float y, float z, const std::string& baseJointName)

@@ -18,6 +18,8 @@ BMLSaccadeObject::BMLSaccadeObject() : BMLObject()
 	modes.push_back("think");
 	modeAttr->setValidValues(modes);
 
+	/*
+	// deprecated by attributes
 	createStringAttribute("angle-limit", "", true, "Basic", 30, false, false, false, "angle limit, default is 12 deg for talking mode, 10 deg for listening mode");
 	createStringAttribute("sbm:bin0", "", true, "Basic", 40, false, false, false, "percentage for 0 deg, would only take effect if all 8 bins are assigned value");
 	createStringAttribute("sbm:bin45", "", true, "Basic", 50, false, false, false, "percentage for 45 deg, would only take effect if all 8 bins are assigned value");
@@ -29,6 +31,7 @@ BMLSaccadeObject::BMLSaccadeObject() : BMLObject()
 	createStringAttribute("sbm:bin315", "", true, "Basic", 110, false, false, false, "percentage for 315 deg, would only take effect if all 8 bins are assigned value");
 	createStringAttribute("sbm:mean", "", true, "Basic", 120, false, false, false, "gaussian distribution mean, recommended value is 100. Would only take effect if both mean and variant are set");
 	createStringAttribute("sbm:variant", "", true, "Basic", 130, false, false, false, "gaussian distribution variant, recommended value is 50. Would only take effect if both mean and variant are set");
+	*/
 
 	createStringAttribute("sbm:duration", "", true, "Basic", 200, false, false, false, "duration, only used for explicitly define a saccade");
 	createStringAttribute("direction", "", true, "Basic", 200, false, false, false, "direction on a 2D plane, valid value is from -180deg to 180deg, only used for explicitly define a saccade");
