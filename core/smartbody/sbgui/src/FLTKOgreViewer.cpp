@@ -115,11 +115,10 @@ void FLTKOgreWindow::draw()
 		glPopMatrix();
 		glMatrixMode( GL_MODELVIEW );
 		glPopMatrix();
- 		glPopClientAttrib();
-        
- 		//glPopAttrib();
- 		
+ 		glPopClientAttrib();        
+ 		//glPopAttrib(); 		
  		fltkRender(); // let old fltk viewer render rest of stuffs
+		SBGUIManager::singleton().update();
  		ogreInterface->finishRender();
 	}
 	Ogre::WindowEventUtilities::messagePump();

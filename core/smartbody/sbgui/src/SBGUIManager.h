@@ -40,7 +40,7 @@ class SBGUIManager // wrapper class for CEGUI library
 		void init();
 		void update();
 		void resize(int w, int h); 
-		void handleEvent(int eventID);
+		int handleEvent(int eventID);
 	protected:		
 		CEGUI::OpenGLRenderer* guiRenderer;
 		bool initialized;
