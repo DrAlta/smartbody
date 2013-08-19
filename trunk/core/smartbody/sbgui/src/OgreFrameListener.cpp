@@ -195,6 +195,7 @@ bool OgreFrameListener::processUnbufferedMouseInput( const FrameEvent & evt )
 
 bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 {
+	//return true;
 	if (mQuit)
 	{
 		return false;
@@ -270,16 +271,16 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 				{
 					Ogre::Bone* bone = skel->getBone(jointName);
 					if (bone)
-					{
+					{						
 						if (!bone->isManuallyControlled())
 							bone->setManuallyControlled(true);
 						Ogre::Vector3& vec = intialBonePositionMap[jointName];
 						float x = joint->pos()->value(0)+ vec.x;
 						float y = joint->pos()->value(1) + vec.y;
 						float z = joint->pos()->value(2) + vec.z;
-						bone->setPosition(x, y, z);
-						const SrQuat& q = joint->quat()->value();
-						bone->setOrientation(q.w, q.x, q.y, q.z);
+ 						bone->setPosition(x, y, z);
+ 						const SrQuat& q = joint->quat()->value();
+ 						bone->setOrientation(q.w, q.x, q.y, q.z);
 					}
 				}
 				//catch (ItemIdentityException&)

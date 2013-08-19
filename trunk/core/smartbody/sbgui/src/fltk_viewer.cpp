@@ -1936,15 +1936,13 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 int FltkViewer::handle ( int event ) 
  {
    # define POPUP_MENU(e) e.ctrl && e.button3
-
    SrEvent &e = _data->event;
-   e.type = SrEvent::EventNone;
-  
-   translate_keyboard_state();   
-   int ret = 0;
+   e.type = SrEvent::EventNone;   
+   translate_keyboard_state();  
+
+   int ret = SBGUIManager::singleton().handleEvent(event);  
    std::string dndText;
-   static float dndX,dndY;   
-   SBGUIManager::singleton().handleEvent(event);
+   static float dndX,dndY;      
    switch ( event )
    {   
 	   case FL_DND_RELEASE:
@@ -2118,6 +2116,7 @@ int FltkViewer::handle ( int event )
         //break;
 
 	  case FL_KEYDOWN:
+		 //LOG("Receiving FL_KEYDOWN");
          e.type = SrEvent::EventKeyboard;
          e.key = Fl::event_key();
 		  switch (Fl::event_key())
