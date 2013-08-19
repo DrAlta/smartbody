@@ -101,9 +101,9 @@ BOOST_PYTHON_MODULE(SmartBody)
 		.def(boost::python::vector_indexing_suite<std::vector<SrVec> >())
 	;
 
-	//boost::python::class_<std::vector<int> >("IntVec")
-    //    .def(boost::python::vector_indexing_suite<std::vector<int> >())
-    //;
+	boost::python::class_<std::vector<int> >("IntVec")
+        .def(boost::python::vector_indexing_suite<std::vector<int> >())
+    ;
 
 	boost::python::class_<std::vector<double> >("DoubleVec")
         .def(boost::python::vector_indexing_suite<std::vector<double> >())
