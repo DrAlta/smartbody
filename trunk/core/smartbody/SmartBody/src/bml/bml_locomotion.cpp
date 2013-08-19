@@ -428,7 +428,9 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 		}
 	}
 	//LOG("behavior sync stroke =  %f",behav_syncs.sync_stroke()->time());
-	return BehaviorRequestPtr( new EventRequest(unique_id, localId, command.str().c_str(), "", behav_syncs, ""));
+	std::stringstream strstr;
+	strstr << "scene.command(\"" << command.str() << "\")";
+	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", strstr.str(), behav_syncs, ""));
 }
 
 void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int type, int id)
