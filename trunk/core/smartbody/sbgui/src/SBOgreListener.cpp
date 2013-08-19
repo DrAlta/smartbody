@@ -1,3 +1,4 @@
+#include "SBOgreListener.h"
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
@@ -11,7 +12,7 @@
 
 #include "EmbeddedOgre.h"
 #include "OgreFrameListener.h"
-#include "SBOgreListener.h"
+
 
 using namespace Ogre;
 using namespace SmartBody;

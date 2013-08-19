@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SBOGRELISTENER_H
+#define SBOGRELISTENER_H
 #include <sb/SBCharacterListener.h>
 
 class EmbeddedOgre;
@@ -21,3 +22,5 @@ public:
 protected:
 	EmbeddedOgre* ogreInterface;	
 };
+
+#endif

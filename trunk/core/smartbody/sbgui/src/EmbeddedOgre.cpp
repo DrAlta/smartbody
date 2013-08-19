@@ -137,7 +137,7 @@ bool EmbeddedOgre::getCharacterVisiblility()
 void EmbeddedOgre::updateOgreLights()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	float inverseScale = 1.0/scene->getScale();
+	float inverseScale = float(1.0/scene->getScale());
 	ogreSceneMgr->destroyAllLights();
 	const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();

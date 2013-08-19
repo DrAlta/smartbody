@@ -2,8 +2,8 @@
 #ifdef WIN32_LEAN_AND_MEAN
 #undef WIN32_LEAN_AND_MEAN
 #endif
-#include <Ogre.h>
-#include <RTShaderSystem/OgreRTShaderSystem.h>
+#include <OGRE/Ogre.h>
+#include <OGRE/RTShaderSystem/OgreRTShaderSystem.h>
 //#include <sbm/SBSkeleton.h>
 //#include <sbm/SBCharacter.h>
 //#include <sbm/sbm_deformable_mesh.h>
