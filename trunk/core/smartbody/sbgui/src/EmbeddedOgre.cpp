@@ -138,7 +138,6 @@ void EmbeddedOgre::updateOgreLights()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	float inverseScale = float(1.0/scene->getScale());
-	ogreSceneMgr->destroyAllLights();
 	const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		iter != pawnNames.end();
@@ -148,16 +147,31 @@ void EmbeddedOgre::updateOgreLights()
 		const std::string& name = sbpawn->getName();
 		if (name.find("light") == 0)
 		{
+			if (firstTime)
+			{
+				ogreSceneMgr->destroyAllLights();
+				firstTime = false;
+			}
 			Light * light;
 			SrVec pos = sbpawn->getPosition();
-			light = ogreSceneMgr->createLight( name );			
+			try {
+				light =  ogreSceneMgr->getLight(name);
+			} catch( Ogre::Exception& e ) {
+				light = ogreSceneMgr->createLight( name );
+			}
 			SmartBody::BoolAttribute* directionalAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightIsDirectional"));
 			if (directionalAttr)
 			{
 				if (directionalAttr->getValue())
 				{
-					light->setType(Light::LT_DIRECTIONAL);
-					light->setDirection(-pos.x,-pos.y,-pos.z);
+					if (light->getType() != Light::LT_DIRECTIONAL)
+						light->setType(Light::LT_DIRECTIONAL);
+					
+					const Ogre::Vector3& direction = light->getDirection();
+					if (direction.x != -pos.x || 
+						direction.y != -pos.y || 
+						direction.z != -pos.z)
+						light->setDirection(-pos.x,-pos.y,-pos.z);
 				}
 				else
 				{
@@ -174,42 +188,82 @@ void EmbeddedOgre::updateOgreLights()
 			SmartBody::BoolAttribute* castShadowAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightCastShadow"));
 			if (castShadowAttr)
 			{
-				light->setCastShadows(castShadowAttr->getValue());				
+				if (light->getCastShadows() != castShadowAttr->getValue())
+					light->setCastShadows(castShadowAttr->getValue());				
+			}
+
+			SmartBody::IntAttribute* shadowMapSize = dynamic_cast<SmartBody::IntAttribute*>(sbpawn->getAttribute("lightShadowMapSize"));
+			if (shadowMapSize)
+			{
+				int numShadowTextures = ogreSceneMgr->getShadowTextureCount();
+				for (int s = 0; s < numShadowTextures; s++)
+				{
+					const Ogre::TexturePtr& texturePtr = ogreSceneMgr->getShadowTexture(s);
+					int textureSize = (*texturePtr).getSize();
+					if (textureSize != shadowMapSize->getValue())
+					{
+						ogreSceneMgr->setShadowTextureSize(shadowMapSize->getValue());
+					}
+				}
+
+				//ogreSceneMgr->setShadowTextureSize(shadowMapSize->getValue());			
 			}
 
 			SmartBody::Vec3Attribute* diffuseColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightDiffuseColor"));
 			if (diffuseColorAttr)
 			{
-				const SrVec& color = diffuseColorAttr->getValue();
-				//light.diffuse = SrColor( color.x, color.y, color.z );
-				light->setDiffuseColour(color.x,color.y,color.z);
+				const SrVec& color = diffuseColorAttr->getValue();				
+				const Ogre::ColourValue& diffuse = light->getDiffuseColour();
+				Ogre::ARGB rgb = diffuse.getAsARGB();
+				if (diffuse.r != color[0] || 
+					diffuse.g != color[1] || 
+					diffuse.b != color[2])
+					light->setDiffuseColour(color.x,color.y,color.z);
 			}
 			else
 			{
-				light->setDiffuseColour( 1.0f, 0.95f, 0.8f );
+				const Ogre::ColourValue& diffuse = light->getDiffuseColour();
+				Ogre::ARGB rgb = diffuse.getAsARGB();
+				if (diffuse.r != 1.0f || 
+					diffuse.g != 0.95f || 
+					diffuse.b != 0.8f )
+					light->setDiffuseColour( 1.0f, 0.95f, 0.8f );
 			}			
 			SmartBody::Vec3Attribute* specularColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightSpecularColor"));
 			if (specularColorAttr)
 			{
-				const SrVec& color = specularColorAttr->getValue();
-				light->setSpecularColour(color.x,color.y,color.z);
+				const SrVec& color = diffuseColorAttr->getValue();				
+				const Ogre::ColourValue& specular = light->getSpecularColour();
+				Ogre::ARGB rgb = specular.getAsARGB();
+				if (specular.r != color[0] || 
+					specular.g != color[1] || 
+					specular.b != color[2])
+					light->setSpecularColour(color.x,color.y,color.z);
 			}
 			else
 			{
+				const SrVec& color = diffuseColorAttr->getValue();				
+				const Ogre::ColourValue& specular = light->getSpecularColour();
+				Ogre::ARGB rgb = specular.getAsARGB();
+				if (specular.r != 0.0f || 
+					specular.g != 0.0f || 
+					specular.b != 0.0f)
 				light->setSpecularColour( 0.0f, 0.0f, 0.0f );
 			}					
 		}
 	}
-	ogreSceneMgr->setShadowFarDistance(30.f*inverseScale);
-	ogreSceneMgr->setShadowDirectionalLightExtrusionDistance(30.f*inverseScale);
+	if (ogreSceneMgr->getShadowFarDistance() != 30.f*inverseScale)
+		ogreSceneMgr->setShadowFarDistance(30.f*inverseScale);
+	if (ogreSceneMgr->getShadowDirectionalLightExtrusionDistance() != 30.f*inverseScale)
+		ogreSceneMgr->setShadowDirectionalLightExtrusionDistance(30.f*inverseScale);
 }
 
 void EmbeddedOgre::createDefaultScene()
 {
 	ogreSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_MODULATIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
-	ogreSceneMgr->setShadowTextureCount(1);
-	ogreSceneMgr->setShadowTextureSize( 1024 );
+	ogreSceneMgr->setShadowTextureCount(4);
+	ogreSceneMgr->setShadowTextureSize( 4096 );
 	ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );	
 	
 	// Setup animation default
@@ -331,6 +385,8 @@ void EmbeddedOgre::createDefaultScene()
 // 	sceneEntity = ogreSceneMgr->createEntity("world_entity_vh","vh_basic_level.mesh");
 // 	sceneNode->attachObject(sceneEntity);
 // 	sceneNode->setVisible(true);
+
+	firstTime = true;
 }
 
 

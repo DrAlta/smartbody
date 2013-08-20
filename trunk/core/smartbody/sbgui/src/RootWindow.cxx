@@ -1603,7 +1603,8 @@ void BaseWindow::CreateLightCB(Fl_Widget* w, void* data)
 	strstr << "light.createDoubleAttribute(\"lightLinearAttenuation\", 1, True, \"LightParameters\", 280, False, False, False, \" Linear attenuation.\")\n";
 	strstr << "light.createDoubleAttribute(\"lightQuadraticAttenuation\", 0, True, \"LightParameters\", 290, False, False, False, \"Quadratic attenuation\")\n";
 	strstr << "light.createBoolAttribute(\"lightCastShadow\", True, True, \"LightParameters\", 300, False, False, False, \"Does the light cast shadow?\")\n";
-	strstr << "light.setBoolAttribute(\"visible\", false)\n";	
+	strstr << "light.createIntAttribute(\"lightShadowMapSize\", 1024, True, \"LightParameters\", 310, False, False, False, \"Size of the shadow map\")\n";
+	strstr << "light.setBoolAttribute(\"visible\", False)\n";	
 	scene->run(strstr.str());
 #endif
 }
