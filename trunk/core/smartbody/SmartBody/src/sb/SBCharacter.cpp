@@ -25,6 +25,7 @@
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_curve_writer.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
+#include <controllers/me_ct_saccade.h>
 #include <sbm/remote_speech.h>
 #include <sbm/local_speech.h>
 #include <sbm/text_speech.h>
@@ -764,6 +765,22 @@ void SBCharacter::notify(SBSubject* subject)
 		}
 		
 #endif
+
+		if (attrName.find("saccade.listening.") == 0)
+		{
+			if (saccade_ct)
+				saccade_ct->setBehaviorMode(MeCtSaccade::Listening);
+		}
+		if (attrName.find("saccade.talking.") == 0)
+		{
+			if (saccade_ct)
+				saccade_ct->setBehaviorMode(MeCtSaccade::Talking);
+		}
+		if (attrName.find("saccade.thinking.") == 0)
+		{
+			if (saccade_ct)
+				saccade_ct->setBehaviorMode(MeCtSaccade::Thinking);
+		}
 	}
 
 	SbmCharacter::notify(subject);
