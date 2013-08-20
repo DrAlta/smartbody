@@ -22,7 +22,7 @@
 #undef UINTMAX_C
 #endif
 
-#define USE_RTSHADER_SYSTEM 
+#define USE_RTSHADER_SYSTEM
 
 using namespace Ogre;
 
@@ -262,8 +262,8 @@ void EmbeddedOgre::createDefaultScene()
 {
 	ogreSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_MODULATIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
-	ogreSceneMgr->setShadowTextureCount(4);
-	ogreSceneMgr->setShadowTextureSize( 4096 );
+	ogreSceneMgr->setShadowTextureCount(1);
+	ogreSceneMgr->setShadowTextureSize( 1024 );
 	ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );	
 	
 	// Setup animation default
@@ -426,7 +426,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		Ogre::String pluginName = "/usr/lib/x86_64-linux-gnu/OGRE-1.8.0/RenderSystem_GL";	
 #endif
 		ogreRoot->loadPlugin(pluginName);		
-		//ogreRoot->loadPlugin(sceneManagerPlugin);
+		ogreRoot->loadPlugin(sceneManagerPlugin);
 #if 1 //OGRE_VERSION_MINOR > 7 && OGRE_VERSION_MAJOR == 1
 		const Ogre::RenderSystemList& lRenderSystemList = (ogreRoot->getAvailableRenderers());
 		Ogre::RenderSystem *lRenderSystem = lRenderSystemList[0];		
@@ -501,8 +501,8 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		
 
 		// setup scene manager
-		//ogreSceneMgr= ogreRoot->createSceneManager("OctreeSceneManager", "MyFirstSceneManager");
-		ogreSceneMgr= ogreRoot->createSceneManager("DefaultSceneManager", "MyFirstSceneManager");
+		ogreSceneMgr= ogreRoot->createSceneManager("OctreeSceneManager", "MyFirstSceneManager");
+		//ogreSceneMgr= ogreRoot->createSceneManager("DefaultSceneManager", "MyFirstSceneManager");
 
 		LOG("Scene Manager Type = %s",ogreSceneMgr->getTypeName().c_str());
 		// The 'root SceneNode' is the only scenenode at the beginning in the SceneManager.
