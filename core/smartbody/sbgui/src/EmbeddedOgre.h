@@ -59,4 +59,5 @@ protected:
 	OgreListener*         ogreListener;
 	unsigned long         ogreGLContext;
 	bool                  ogreCharacterVisible;
+	bool				  firstTime;
 };
