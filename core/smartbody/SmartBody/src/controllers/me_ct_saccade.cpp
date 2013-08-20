@@ -478,7 +478,7 @@ void MeCtSaccade::setBehaviorMode(BehaviorMode m)
 	if (modeString == "")
 		return;
 
-	LOG("Saccade mode set to %s", modeString.c_str());
+	//LOG("Saccade mode set to %s", modeString.c_str());
 
 	std::string percentage0 = "saccade." + modeString + ".percentage0";
 	std::string percentage45 = "saccade." + modeString + ".percentage45";
