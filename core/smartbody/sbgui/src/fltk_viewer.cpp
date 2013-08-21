@@ -384,54 +384,14 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    resizable(this);
 
    _data = new FltkViewerData();
+   _data->setupData();
+   
    _gestureData = new GestureData();
 
-   _data->rendermode = ModeAsIs;
-   _data->charactermode = ModeShowGeometry;
-   _data->pawnmode = ModePawnShowAsSpheres;
-   _data->shadowmode = ModeNoShadows;
-   _data->terrainMode = ModeTerrain;
-   _data->navigationMeshMode = ModeNoNavigationMesh;
-   _data->eyeBeamMode = ModeNoEyeBeams;
-   _data->gazeLimitMode = ModeNoGazeLimit;
-   _data->eyeLidMode = ModeNoEyeLids;
-   _data->dynamicsMode = ModeNoDynamics;
-   _data->locomotionMode = ModeEnableLocomotion;
-   _data->reachRenderMode = ModeNoExamples;
-   _data->steerMode = ModeNoSteer;
-   _data->gridMode = ModeShowGrid;
-   _data->cameraMode = Default;
-
-   _data->iconized    = false;
-   _data->statistics  = false;
-   _data->displayaxis = false;
-   _data->boundingbox = false;
-   _data->scene_received_event = false;
-   _data->showgeometry = false;
-   _data->showcollisiongeometry = false;
-   _data->showbones = true;
-   _data->showaxis = false;
-   _data->showmasses = false;
-   _data->showBoundingVolume = false;
-   _data->showJointLabels = false;
-   _data->showlocomotionall = false;
-   _data->showvelocity = false;
-   _data->showorientation = false;
-   _data->showselection = false;
-   _data->showlocofootprints = false;
-   _data->showkinematicfootprints = false;
-   _data->interactiveLocomotion = false;
-   _data->showtrajectory = false;
-   _data->showgesture = false;
+   
    
    _data->light.init();
 
-   _data->bcolor = SrColor(.63f, .63f, .63f);
-   _data->floorColor = SrColor(0.5f,0.5f,0.5f);
-   _data->showFloor = true;
-
-   _data->scenebox = new SrSnLines;
-   _data->sceneaxis = new SrSnLines;
 
    user_data ( (void*)(this) ); // to be retrieved by the menu callback
 
@@ -4944,7 +4904,7 @@ void FltkViewer::drawText( const SrMat& mat, float textSize, std::string &text )
 
 void FltkViewer::resetViewer()
 {
-
+	_data->setupData();
 }
 
 void FltkViewer::updateOptions()
@@ -5080,5 +5040,56 @@ void GestureData::reset()
 }
 
 
+FltkViewerData::FltkViewerData()
+{
+}
+
+void FltkViewerData::setupData()
+{
+	rendermode = FltkViewer::ModeAsIs;
+	charactermode = FltkViewer::ModeShowGeometry;
+	pawnmode = FltkViewer::ModePawnShowAsSpheres;
+	shadowmode = FltkViewer::ModeNoShadows;
+	terrainMode = FltkViewer::ModeTerrain;
+	navigationMeshMode = FltkViewer::ModeNoNavigationMesh;
+	eyeBeamMode = FltkViewer::ModeNoEyeBeams;
+	gazeLimitMode = FltkViewer::ModeNoGazeLimit;
+	eyeLidMode = FltkViewer::ModeNoEyeLids;
+	dynamicsMode = FltkViewer::ModeNoDynamics;
+	locomotionMode = FltkViewer::ModeEnableLocomotion;
+	reachRenderMode = FltkViewer::ModeNoExamples;
+	steerMode = FltkViewer::ModeNoSteer;
+	gridMode = FltkViewer::ModeShowGrid;
+	cameraMode = FltkViewer::Default;
+
+	iconized    = false;
+	statistics  = false;
+	displayaxis = false;
+	boundingbox = false;
+	scene_received_event = false;
+	showgeometry = false;
+	showcollisiongeometry = false;
+	showbones = true;
+	showaxis = false;
+	showmasses = false;
+	showBoundingVolume = false;
+	showJointLabels = false;
+	showlocomotionall = false;
+	showvelocity = false;
+	showorientation = false;
+	showselection = false;
+	showlocofootprints = false;
+	showkinematicfootprints = false;
+	interactiveLocomotion = false;
+	showtrajectory = false;
+	showgesture = false;
+
+	bcolor = SrColor(.63f, .63f, .63f);
+	floorColor = SrColor(0.5f,0.5f,0.5f);
+	showFloor = true;
+
+	scenebox = new SrSnLines;
+	sceneaxis = new SrSnLines;
+}
 
 //================================ End of File =================================================
