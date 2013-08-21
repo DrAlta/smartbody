@@ -260,11 +260,15 @@ void EmbeddedOgre::updateOgreLights()
 
 void EmbeddedOgre::createDefaultScene()
 {
+	
 	ogreSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_MODULATIVE );
+	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_ADDITIVE );
+	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_MODULATIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
-	ogreSceneMgr->setShadowTextureCount(1);
-	ogreSceneMgr->setShadowTextureSize( 1024 );
-	ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );	
+	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_NONE );
+	//ogreSceneMgr->setShadowTextureCount(1);
+	//ogreSceneMgr->setShadowTextureSize( 1024 );
+	//ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );	
 	
 	// Setup animation default
 	Animation::setDefaultInterpolationMode( Animation::IM_LINEAR );
@@ -450,11 +454,12 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		params["externalGLContext"] = Ogre::StringConverter::toString( (unsigned long)getCurrentGLContext() );
         
 #endif
-		params["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)winHandle);				                
+		params["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)winHandle);	
+		
 		ogreWnd = ogreRoot->createRenderWindow( windowName, width, height, false, &params );
 		ogreGLContext = (unsigned long)getCurrentGLContext();
 
-
+		
 #if defined(USE_RTSHADER_SYSTEM) 	
 		if (Ogre::RTShader::ShaderGenerator::initialize())
 		{
@@ -523,9 +528,10 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		// I want my window to be active
 		ogreWnd->setActive(true);
 		// I want to update myself the content of the window, not automatically.
-		ogreWnd->setAutoUpdated(false);		
+		ogreWnd->setAutoUpdated(false);	
+		
 		//setupResource();
-		createDefaultScene();
+		//createDefaultScene();
 	}
 	catch( Ogre::Exception& e )
 	{
@@ -544,11 +550,8 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 
 void EmbeddedOgre::update()
 {
-	
-
 	ogreWnd->update(false);	
-	bool lVerticalSynchro = true;
-	ogreWnd->swapBuffers(lVerticalSynchro);
+	
 	// This update some internal counters and listeners.
 	// Each render surface (window/rtt/mrt) that is 'auto-updated' has got its 'update' function called.
 	ogreRoot->renderOneFrame();
@@ -556,7 +559,8 @@ void EmbeddedOgre::update()
 
 void EmbeddedOgre::finishRender()
 {
-		
+	bool lVerticalSynchro = true;	
+	ogreWnd->swapBuffers(lVerticalSynchro);		
 }
 
 Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar )

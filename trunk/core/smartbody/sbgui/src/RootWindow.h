@@ -27,7 +27,7 @@
 class SbmCharacter;
 
 #ifdef WIN_BUILD
-#define USE_OGRE_VIEWER 0
+#define USE_OGRE_VIEWER 1
 #elif LINUX_BUILD
 #define USE_OGRE_VIEWER 0
 #else
@@ -178,6 +178,9 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void ModeGazeLimitCB(Fl_Widget* w, void* data);
 		static void ModeEyelidCalibrationCB(Fl_Widget* w, void* data);
 		static void ShadowsCB(Fl_Widget* w, void* data);
+		static void ShadowsNoneCB(Fl_Widget* w, void* data);
+		static void ShadowsMapCB(Fl_Widget* w, void* data);
+		static void ShadowsStencilCB(Fl_Widget* w, void* data);
 		static void TerrainShadedCB(Fl_Widget* w, void* data);
 		static void TerrainWireframeCB(Fl_Widget* w, void* data);
 		static void TerrainNoneCB(Fl_Widget* w, void* data);

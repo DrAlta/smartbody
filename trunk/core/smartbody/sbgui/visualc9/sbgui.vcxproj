@@ -171,6 +171,7 @@ copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OgreMain_d.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OIS_d.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\RenderSystem_GL_d.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OgreRTShaderSystem_d.dll ..\bin
+copy /Y ..\..\..\..\lib\OgreSDK\bin\release\Plugin_OctreeSceneManager_d.dll ..\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll  ..\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll  ..\bin
 copy /Y ..\..\..\..\core\smartbody\python27\libs\python27.dll  ..\bin
@@ -209,6 +210,7 @@ copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OgreMain_d.dll ..\..\..\..\bin\smartbo
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OIS_d.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\RenderSystem_GL_d.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OgreRTShaderSystem_d.dll ..\..\..\..\bin\smartbody\sbgui\bin
+copy /Y ..\..\..\..\lib\OgreSDK\bin\release\Plugin_OctreeSceneManager_d.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\core\smartbody\SmartBody\lib\SmartBody_d.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\core\smartbody\SmartBody\src\external\glew\glew32.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll ..\..\..\..\bin\smartbody\sbgui\bin
@@ -292,6 +294,7 @@ copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OgreMain.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OIS.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\RenderSystem_GL.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OgreRTShaderSystem.dll ..\bin
+copy /Y ..\..\..\..\lib\OgreSDK\bin\release\Plugin_OctreeSceneManager.dll ..\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll  ..\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll  ..\bin
 copy /Y ..\..\..\..\core\smartbody\python27\libs\python27.dll  ..\bin
@@ -333,6 +336,7 @@ copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OgreMain.dll ..\..\..\..\bin\smartbo
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OIS.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\RenderSystem_GL.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OgreRTShaderSystem.dll ..\..\..\..\bin\smartbody\sbgui\bin
+copy /Y ..\..\..\..\lib\OgreSDK\bin\release\Plugin_OctreeSceneManager.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\core\smartbody\python27\libs\python27.dll ..\..\..\..\bin\smartbody\sbgui\bin

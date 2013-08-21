@@ -76,7 +76,9 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Show Cameras", 0, ShowCamerasCB, this, NULL);
 	menubar->add("&View/Show Lights", 0, ShowLightsCB, this, NULL);
-	menubar->add("&View/Shadows", 0, ShadowsCB, this, NULL);
+	menubar->add("&View/Shadows/Shadow Map", 0, ShadowsMapCB, this, NULL);
+	menubar->add("&View/Shadows/Stencil Shadow", 0, ShadowsStencilCB, this, NULL);
+	menubar->add("&View/Shadows/Disable Shadow", 0, ShadowsNoneCB, this, NULL);
 	menubar->add("&View/Grid", 0, GridCB, this, NULL);
 	menubar->add("&View/Background Color", 0, BackgroundColorCB, this, NULL);
 	menubar->add("&View/Floor/Show Floor", 0, FloorCB, this, NULL);
@@ -1393,6 +1395,28 @@ void BaseWindow::ShadowsCB(Fl_Widget* w, void* data)
 	else
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoShadows, NULL);
 #endif
+}
+
+
+void BaseWindow::ShadowsNoneCB( Fl_Widget* w, void* data )
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->getData()->shadowmode = FltkViewer::ModeNoShadows;
+	rootWindow->fltkViewer->updateOptions();
+}
+
+void BaseWindow::ShadowsMapCB( Fl_Widget* w, void* data )
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->getData()->shadowmode = FltkViewer::ModeShadowMap;
+	rootWindow->fltkViewer->updateOptions();
+}
+
+void BaseWindow::ShadowsStencilCB( Fl_Widget* w, void* data )
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->getData()->shadowmode = FltkViewer::ModeShadowStencil;
+	rootWindow->fltkViewer->updateOptions();
 }
 
 void BaseWindow::FloorCB( Fl_Widget* w, void* data )

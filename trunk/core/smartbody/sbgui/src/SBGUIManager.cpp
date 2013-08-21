@@ -1,4 +1,4 @@
-#define USE_CEGUI 0
+#define USE_CEGUI 1
 #if USE_CEGUI
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/OpenGL/GLRenderer.h>
@@ -22,7 +22,10 @@ SBGUIManager::~SBGUIManager()
 void SBGUIManager::update()
 {
 #if USE_CEGUI
+	if (!initialized)
+		return;
 	glDisable(GL_DEPTH_TEST);
+	//glEnable(GL_TEXTURE_2D);
 	CEGUI::System::getSingleton().renderAllGUIContexts();
 	glEnable(GL_DEPTH_TEST);
 #endif
@@ -117,6 +120,7 @@ int SBGUIManager::handleEvent(int eventID)
 void SBGUIManager::resetGUI()
 {
 #if USE_CEGUI
+
 	CEGUI::WindowManager& winMgr = CEGUI::WindowManager::getSingleton();
 	CEGUI::Window* oldRootWin = CEGUI::System::getSingleton().getDefaultGUIContext().getRootWindow();
 	if (oldRootWin)
@@ -142,7 +146,7 @@ void SBGUIManager::init()
 	scene->run("from PyCEGUIOpenGLRenderer import *");
 #endif
 
-	guiRenderer = &CEGUI::OpenGLRenderer::bootstrapSystem();
+	guiRenderer = &CEGUI::OpenGLRenderer::bootstrapSystem(CEGUI::OpenGLRenderer::TTT_NONE);
 	//LOG("After bootstrap system");	
 
 	// initialize all resources
@@ -217,6 +221,7 @@ void SBGUIManager::init()
 void SBGUIManager::resize( int w, int h )
 {
 #if USE_CEGUI
-	CEGUI::System::getSingleton().notifyDisplaySizeChanged(CEGUI::Sizef((float)w,(float)h));
+	if (initialized)
+		CEGUI::System::getSingleton().notifyDisplaySizeChanged(CEGUI::Sizef((float)w,(float)h));
 #endif
 }
