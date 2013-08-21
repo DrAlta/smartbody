@@ -305,8 +305,9 @@ void FLTKOgreWindow::menu_cmd( MenuCmd c, const char* label )
 
 void FLTKOgreWindow::resetViewer()
 {
-	//return;
+	FltkViewer::resetViewer();
 	ogreInterface->resetOgreScene();
+	updateOptions();
 }
 
 void FLTKOgreWindow::fltkRender2()

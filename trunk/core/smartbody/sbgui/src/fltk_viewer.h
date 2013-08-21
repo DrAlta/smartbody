@@ -423,6 +423,9 @@ protected:
 
  class FltkViewerData
  { public :
+	FltkViewerData();
+	void setupData();
+
    FltkViewer::RenderMode rendermode; // render mode
    FltkViewer::CharacterMode charactermode; // character mode
    FltkViewer::JointMode jointmode; // character mode
