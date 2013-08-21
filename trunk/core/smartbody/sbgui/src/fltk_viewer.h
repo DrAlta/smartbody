@@ -395,6 +395,8 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 	float _arrowTime;
 	ObjectManipulationHandle _objManipulator; // a hack for testing. 
 
+	virtual void updateOptions();
+
 public:
 	RetargetStepWindow* _retargetStepWindow;	
 protected:

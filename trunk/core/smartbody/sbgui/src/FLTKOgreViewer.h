@@ -23,6 +23,8 @@ public:
 	virtual void resize(int x, int y, int w, int h);
 	virtual void menu_cmd ( MenuCmd c, const char* label );
 	virtual void resetViewer();
+
+	void updateOptions();
 	// handle fltk mouse events ?		
 protected:
 	void initOgreWindow();

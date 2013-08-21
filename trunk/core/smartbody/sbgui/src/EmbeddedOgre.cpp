@@ -420,6 +420,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		if(lIsInDebugMode)
 		{
 			pluginName.append("_d");
+			sceneManagerPlugin.append("_d");
 		}
 #else
 		Ogre::String sceneManagerPlugin = "/usr/lib/x86_64-linux-gnu/OGRE-1.8.0/Plugin_OctreeSceneManager";
