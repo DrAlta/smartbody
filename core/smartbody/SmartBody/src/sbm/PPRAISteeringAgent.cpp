@@ -1116,7 +1116,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 
 	rightSide = rightSideInXZPlane(newForward);
 
-	pprAgent->updateDesiredForward(forward);
+//	pprAgent->updateDesiredForward(forward);
 	// WJ added end
 	//---------------------------------------------------------------------------
 

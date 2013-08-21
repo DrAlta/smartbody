@@ -1344,14 +1344,12 @@ void BaseWindow::ModeAxisCB(Fl_Widget* w, void* data)
 
 void BaseWindow::ModeEyebeamsCB(Fl_Widget* w, void* data)
 {
-#if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
 	if (rootWindow->fltkViewer->getData()->eyeBeamMode)
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoEyeBeams, NULL);
 	else
 		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdEyeBeams, NULL);
-#endif
 }
 
 void BaseWindow::ModeGazeLimitCB(Fl_Widget* w, void* data)
@@ -1399,10 +1397,9 @@ void BaseWindow::ShadowsCB(Fl_Widget* w, void* data)
 
 void BaseWindow::FloorCB( Fl_Widget* w, void* data )
 {
-#if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->getData()->showFloor = !rootWindow->fltkViewer->getData()->showFloor;
-#endif
+	rootWindow->fltkViewer->updateOptions();
 }
 
 void BaseWindow::FloorColorCB( Fl_Widget* w, void* data )

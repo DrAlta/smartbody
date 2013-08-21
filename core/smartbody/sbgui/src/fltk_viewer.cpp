@@ -428,7 +428,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 
    _data->bcolor = SrColor(.63f, .63f, .63f);
    _data->floorColor = SrColor(0.5f,0.5f,0.5f);
-   _data->showFloor = false;
+   _data->showFloor = true;
 
    _data->scenebox = new SrSnLines;
    _data->sceneaxis = new SrSnLines;
@@ -3329,7 +3329,7 @@ void FltkViewer::drawPawns()
 		else
 		{
 			// draw default sphere
-			glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT);
+			glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT  | GL_POLYGON_BIT);
 			glDisable(GL_LIGHTING);
 			glPushMatrix();
 			glMultMatrixf((const float*) gmat);
@@ -4068,9 +4068,9 @@ void FltkViewer::drawLocomotion()
 		}
 		if (_data->showtrajectory)
 		{
-			glDisable(GL_LIGHTING);
 			if (!character->param_animation_ct)
 				return;
+			glPushAttrib(GL_LIGHTING_BIT);
 			glDisable(GL_LIGHTING);
 			std::string baseJointName = character->param_animation_ct->getBaseJointName();
 			SkJoint* baseJ = character->getSkeleton()->search_joint(baseJointName.c_str());
@@ -4105,7 +4105,7 @@ void FltkViewer::drawLocomotion()
 			glColor3f(1.0f, 0.0f, 1.0f);
 			glBegin(GL_LINES);
 			int num = int(character->trajectoryGoalList.size() / 3) - 1;
-			if (num >= 1)
+			if (num >= 2) // only show multi-goal paths
 				for (int i = 0; i < num; i++)
 				{
 					//glVertex3f(character->trajectoryGoalList[(size_t)i * 3 + 0], 0.5f, character->trajectoryGoalList[(size_t)i * 3 + 2]);
@@ -4114,9 +4114,7 @@ void FltkViewer::drawLocomotion()
 					glVertex3f(character->trajectoryGoalList[((size_t)i + 1) * 3 + 0], character->trajectoryGoalList[((size_t)i + 1) * 3 + 1], character->trajectoryGoalList[((size_t)i + 1) * 3 + 2]);
 				}
 			glEnd();
-			glEnable(GL_LIGHTING);
 
-			glDisable(GL_LIGHTING);
 			float scale = (float)1.0/SmartBody::SBScene::getScene()->getScale(); // if it's in meters
 			SmartBody::SBSteerAgent* steerAgent = SmartBody::SBScene::getScene()->getSteerManager()->getSteerAgent(character->getName());
 			if (steerAgent)
@@ -4135,7 +4133,7 @@ void FltkViewer::drawLocomotion()
 				SrVec color3(1.f,0.f,0.f);
 				drawCircle(ppraiAgent->nextPtOnPath.x, ppraiAgent->nextPtOnPath.y, ppraiAgent->nextPtOnPath.z, 0.3f*scale, 72, color3);											
 			}
-			glEnable(GL_LIGHTING);
+			glPopAttrib();
 		}
 	}
 }
@@ -4613,6 +4611,7 @@ void FltkViewer::makeGLContext()
 
 void FltkViewer::drawColObject( SBGeomObject* colObj, SrMat& gmat )
 {
+	glPushAttrib(GL_ENABLE_BIT);
 	glEnable(GL_LIGHTING);
 	glPushMatrix();
 	//SrMat gMat = colObj->worldState.gmat();
@@ -4688,6 +4687,7 @@ void FltkViewer::drawColObject( SBGeomObject* colObj, SrMat& gmat )
 	glDisable(GL_LIGHTING);
 	glDisable(GL_ALPHA_TEST) ;
 	glDisable(GL_BLEND);
+	glPopAttrib();
 }
 
 
@@ -4706,7 +4706,7 @@ void FltkViewer::drawSteeringInfo()
 	glDisable(GL_LIGHTING);
 
 	glTranslatef(0.0f, 0.5f, 0.0f);
-	glScalef(1.0 / scene->getScale(), 1.0 / scene->getScale(), 1.0 / scene->getScale());
+	glScalef(1.0f / scene->getScale(), 1.0f / scene->getScale(), 1.0f / scene->getScale());
 
 	//comment out for now, have to take a look at the steering code
 	const std::vector<SteerLib::AgentInterface*>& agents = scene->getSteerManager()->getEngineDriver()->_engine->getAgents();
@@ -4943,6 +4943,10 @@ void FltkViewer::drawText( const SrMat& mat, float textSize, std::string &text )
 void FltkViewer::resetViewer()
 {
 
+}
+
+void FltkViewer::updateOptions()
+{
 }
 
 GestureVisualizationHandler::GestureVisualizationHandler()

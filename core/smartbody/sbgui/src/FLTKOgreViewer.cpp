@@ -218,11 +218,13 @@ void FLTKOgreWindow::fltkRender()
 	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
 		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
 	} 
+
 	drawPawns();
 	// draw the grid
 	//   if (gridList == -1)
 	//	   initGridList();
 	drawGrid();
+	glDisable(GL_BLEND);
 	drawSteeringInfo();
 	drawEyeBeams();
 	drawEyeLids();
@@ -293,6 +295,16 @@ void FLTKOgreWindow::resetViewer()
 	ogreInterface->resetOgreScene();
 }
 
+void FLTKOgreWindow::updateOptions()
+{
+	try {
+		Ogre::Entity * pPlaneEnt = ogreInterface->getSceneManager()->getEntity( "plane" );	
+		pPlaneEnt->setVisible(_data->showFloor);
+	} catch ( Ogre::Exception& e) {
+	}
+
+}
+
 #if 0
 // Ogre viewer factory
 SrViewer* OgreViewerFactory::s_viewer = NULL;
@@ -313,4 +325,7 @@ void OgreViewerFactory::remove(SrViewer* viewer)
 		viewer->hide_viewer();
 	}
 }
+
+
+
 #endif
