@@ -544,6 +544,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 			  SrColor c = background(); 
 			  fl_color_chooser("Set background color:", c.r, c.g, c.b);
 			  background(c);
+			   updateOptions();
 		  } break;
 
 	  case CmdFloorColor:
@@ -551,6 +552,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 			  SrColor c = _data->floorColor;
 			  fl_color_chooser("Set floor color:", c.r, c.g, c.b);
 			  _data->floorColor = c;
+			  updateOptions();
 		  } break;
 
       case CmdAsIs   : _data->rendermode = ModeAsIs;

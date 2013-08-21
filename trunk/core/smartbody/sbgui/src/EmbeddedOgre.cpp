@@ -364,28 +364,6 @@ void EmbeddedOgre::createDefaultScene()
 	ogreSceneMgr->getRootSceneNode()->createChildSceneNode("plane_node", Vector3( 0, 0, 0 ) )->attachObject( pPlaneEnt );
 	ogreSceneMgr->getSceneNode("plane_node")->setVisible(true);
 
-	// adding diagnostic scene to measure in feet
-	//Ogre::SceneNode * sceneNode;
-	//Ogre::Entity * sceneEntity;
-
-//  	sceneNode = ogreSceneMgr->getRootSceneNode()->createChildSceneNode("world_scene_ft");
-//  	sceneEntity = ogreSceneMgr->createEntity("world_entity_ft","Diagnostic_Level(ft).mesh");
-///  	sceneNode->attachObject(sceneEntity);
-//  	sceneNode->setVisible(true);
-
-	// adding diagnostic scene to measure in cm
-// 	sceneNode = ogreSceneMgr->getRootSceneNode()->createChildSceneNode("world_scene_cm");
-// 	sceneEntity = ogreSceneMgr->createEntity("world_entity_cm","Diagnostic_Level(meter_in_cm).mesh");
-// 	sceneEntity->setCastShadows(false);
-// 	sceneNode->attachObject(sceneEntity);
-// 	sceneNode->setVisible(true);
-
-	// adding generic VH scene 
-// 	sceneNode = ogreSceneMgr->getRootSceneNode()->createChildSceneNode("world_scene_vh");
-// 	sceneEntity = ogreSceneMgr->createEntity("world_entity_vh","vh_basic_level.mesh");
-// 	sceneNode->attachObject(sceneEntity);
-// 	sceneNode->setVisible(true);
-
 	firstTime = true;
 }
 
