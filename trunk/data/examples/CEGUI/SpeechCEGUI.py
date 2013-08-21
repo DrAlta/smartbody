@@ -308,7 +308,7 @@ class GUIHandler:
 guiHandler = GUIHandler()
 #gui.createComboBox('bradCombo',bradSentences,100,15, 300)
 speechBtn = gui.createButton('speechBtn','Say It', 430, 15, 60)
-speechBtn.subscribeEvent(PushButton.EventClicked, guiHandler, 'handleSpeechButton')
+speechBtn.subscribeEvent(PushButton.EventClicked, guiHandler.handleSpeechButton)
 
 
 
