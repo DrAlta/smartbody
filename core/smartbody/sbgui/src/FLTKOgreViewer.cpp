@@ -297,8 +297,15 @@ void FLTKOgreWindow::resetViewer()
 
 void FLTKOgreWindow::updateOptions()
 {
+	// background color
+	Ogre::Viewport* vp = ogreInterface->getRenderWindow()->getViewport(0);
+	vp->setBackgroundColour(Ogre::ColourValue(background().r / 255.0f, background().g / 255.0f, background().b / 255.0f));
+
+	// floor
 	try {
 		Ogre::Entity * pPlaneEnt = ogreInterface->getSceneManager()->getEntity( "plane" );	
+		Ogre::MaterialPtr mat = pPlaneEnt->getSubEntity(0)->getMaterial();
+		mat->setDiffuse(Ogre::ColourValue(_data->floorColor.r / 255.0f, _data->floorColor.g / 255.0f, _data->floorColor.b / 255.0f));
 		pPlaneEnt->setVisible(_data->showFloor);
 	} catch ( Ogre::Exception& e) {
 	}
