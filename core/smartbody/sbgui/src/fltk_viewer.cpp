@@ -4701,11 +4701,12 @@ void FltkViewer::drawSteeringInfo()
 		!scene->getSteerManager()->getEngineDriver()->_engine)
 		return;
 
-	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
+	glPushAttrib( GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
 	glPushMatrix();
 	glDisable(GL_LIGHTING);
 
-	glScalef(1 / scene->getScale(), 1 / scene->getScale(), 1 / scene->getScale());
+	glTranslatef(0.0f, 0.5f, 0.0f);
+	glScalef(1.0 / scene->getScale(), 1.0 / scene->getScale(), 1.0 / scene->getScale());
 
 	//comment out for now, have to take a look at the steering code
 	const std::vector<SteerLib::AgentInterface*>& agents = scene->getSteerManager()->getEngineDriver()->_engine->getAgents();
