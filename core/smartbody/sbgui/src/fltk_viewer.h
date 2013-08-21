@@ -93,6 +93,8 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
                     };
 
 	enum ShadowMode { ModeNoShadows,
+					  ModeShadowMap,
+					  ModeShadowStencil,
 					  ModeShadows
                 };
 

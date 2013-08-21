@@ -42,6 +42,7 @@ D:        Step right
 #include "OGRE/OgreStringConverter.h"
 #include "OGRE/OgreException.h"
 #include "OGRE/OgreOverlay.h"
+//#include "OGRE/OgreOverlay.h"
 
 //Use this define to signify OIS will be used as a DLL
 //(so that dll import/export macros are in effect)

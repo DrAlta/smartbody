@@ -29,6 +29,7 @@ public:
 protected:
 	void initOgreWindow();
 	void fltkRender();
+	void fltkRender2();
 	// ogre related stuff
 	EmbeddedOgre* ogreInterface;	
 };
