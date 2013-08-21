@@ -19,28 +19,34 @@ class GUIManager:
 		self.chkBoxHeight = 25
 		self.comboWidth = 150
 		self.comboHeight = 100
-		#self.listBoxItem1 = ListboxTextItem('gdsajglkajglksag')
-		#self.listBoxItem2 = ListboxTextItem('aaaaaaaaaaaaasfsf')
-		#self.listBoxItem3 = ListboxTextItem('bbbbbbbbbdgfsfdsf')
+		self.listBoxItem1 = ListboxTextItem('gdsajglkajglksag')
+		self.listBoxItem2 = ListboxTextItem('aaaaaaaaaaaaasfsf')
+		self.listBoxItem3 = ListboxTextItem('bbbbbbbbbdgfsfdsf')
 		
 		self.GUIRowHeight = 560		
 		self.GUIRowWidth = 500
-		self.ButtonType = "OgreTray/Button"
-		self.TextType = "OgreTray/StaticText"
-		self.SliderType = "OgreTray/Slider"
-		self.CheckBoxType = "OgreTray/Checkbox"
-		self.ComboBoxType = "OgreTray/Combobox"
-		self.EditBoxType = "OgreTray/Editbox"
+		
+		self.GUISkinType = 'OgreTray/'
+		
+		self.ButtonType = self.GUISkinType+"Button"
+		self.TextType = self.GUISkinType+"StaticText"
+		self.SliderType = self.GUISkinType+"Slider"
+		self.CheckBoxType = self.GUISkinType+"Checkbox"
+		self.ComboBoxType = self.GUISkinType+"Combobox"
+		self.EditBoxType = self.GUISkinType+"Editbox"
 		'''
 		self.ButtonType = "TaharezLook/Button"
 		self.TextType = "TaharezLook/StaticText"
 		self.SliderType = "TaharezLook/Slider"
-		self.CheckBoxType = "TaharezLook/CheckBox"
+		self.CheckBoxType = "TaharezLook/CheckBox"		
+		
+		self.ButtonType = "WindowsLook/Button"
+		self.TextType = "WindowsLook/StaticText"
+		self.SliderType = "WindowsLook/Slider"
+		self.CheckBoxType = "WindowsLook/CheckBox"
+		self.ComboBoxType = "WindowsLook/Combobox"
+		self.EditBoxType = "WindowsLook/Editbox"
 		'''
-		#self.ButtonType = "WindowsLook/Button"
-		#self.TextType = "WindowsLook/StaticText"
-		#self.SliderType = "WindowsLook/Slider"
-		#self.CheckBoxType = "WindowsLook/CheckBox"
 		
 	def setWidgetPosition(self, widget, x,y):
 		widget.setPosition(UVector2(UDim(0.0, x), UDim(0.0, y)))	
@@ -78,14 +84,11 @@ class GUIManager:
 
 	def createComboBox(self, comboName, comboTextList, posX = -1, posY = -1, width = -1):
 		winManager = WindowManager.getSingleton()	
-		combo = winManager.createWindow(self.ComboBoxType, comboName)
-		combo.setSize(USize(UDim(0.0, self.comboWidth), UDim(0.0, self.comboHeight)))		
-		
-		
+		combo = winManager.createWindow(self.ComboBoxType, comboName)		
 		comboWidth = self.comboWidth
 		if width != -1:
 			comboWidth = width
-		combo.setSize(USize(UDim(0.0, comboWidth), UDim(0.0, self.buttonHeight)))		
+		combo.setSize(USize(UDim(0.0, comboWidth), UDim(0.0, self.comboHeight)))		
 		if posX != -1 and posY != -1:
 			self.setWidgetPosition(combo,posX,posY)
 		else:
@@ -103,9 +106,9 @@ class GUIManager:
 			#combo.clearAllSelections()
 			#combo.addItem(boxItem)
 		
-		#combo.addItem(self.listBoxItem1)
-		#combo.addItem(self.listBoxItem2)
-		#combo.addItem(self.listBoxItem3)
+		combo.addItem(self.listBoxItem1)
+		combo.addItem(self.listBoxItem2)
+		combo.addItem(self.listBoxItem3)
 		
 		self.rootWindow.addChild(combo)				
 		self.comboList.append(combo)
