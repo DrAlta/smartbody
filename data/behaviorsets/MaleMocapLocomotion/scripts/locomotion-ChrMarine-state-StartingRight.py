@@ -12,8 +12,8 @@ motions.append("ChrMarine@Idle01_ToWalk01_Turn180Rt01")
 
 paramsX = DoubleVec()
 paramsX.append(0) # ChrMarine@Idle01 X
-paramsX.append(-90) # ChrMarine@Idle01_ToWalk01_Turn90Rt01 X
-paramsX.append(-165) # ChrMarine@Idle01_ToWalk01_Turn180Rt01 X
+paramsX.append(90) # ChrMarine@Idle01_ToWalk01_Turn90Rt01 X
+paramsX.append(165) # ChrMarine@Idle01_ToWalk01_Turn180Rt01 X
 for i in range(0, len(motions)):
 	stateChrMarineStartingRight.addMotion(motions[i], paramsX[i])
 
