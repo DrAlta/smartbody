@@ -40,7 +40,7 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 		PPRAISteeringAgent(SmartBody::SBCharacter* c);
 		~PPRAISteeringAgent();
 
-		void setCharacter(SbmCharacter* c);
+		void setCharacter(SmartBody::SBCharacter* c);
 		void evaluate(double dt);
 
 		SBAPI void setAgent(SteerLib::AgentInterface* a);
@@ -87,12 +87,14 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 		void adjustFacingAngle(float angleDiff);
 		SrVec getCollisionFreeGoal(SrVec target, SrVec curPos);
 
+		void adjustLocomotionBlend(SmartBody::SBCharacter* character, const std::string& blendName, int blendDimension, double x, double y, double z, bool directPlay, bool queued);
+
 	private:
 		
 		int	_numSteeringGoal;
 		
 		SteerLib::AgentInterface* agent;
-		SbmCharacter* character;
+		SmartBody::SBCharacter* character;
 		SmartBody::SBPawn* target;
 
 	public:
