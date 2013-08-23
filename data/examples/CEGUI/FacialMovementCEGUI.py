@@ -103,7 +103,7 @@ class GUIHandler:
 			slider = sliderList[i]
 			slider.setCurrentValue(0.0)
 		
-		
+alphaVal = 0.5		
 guiHandler = GUIHandler()
 auNums = bradFace.getAUNumbers()
 for i in range(0,len(auNums)):
@@ -124,6 +124,7 @@ for i in range(0,len(auNums)):
 		auSlider = gui.createSlider(auNames[j],1.0,0.0)
 		auSlider.setText(auNames[j])		
 		auSlider.subscribeEvent(Slider.EventValueChanged, guiHandler.handleFaceAUSlider)
+		auSlider.setAlpha(alphaVal)
 		sliderList.append(auSlider)
 		
 visemeNames = bradFace.getVisemeNames()
@@ -132,9 +133,12 @@ for i in range(0,len(visemeNames)):
 		visemeSlider = gui.createSlider(viName,1.0,0.0)
 		visemeSlider.setText(viName)
 		visemeSlider.subscribeEvent(Slider.EventValueChanged, guiHandler.handleFaceVisemeSlider)
+		visemeSlider.setAlpha(alphaVal)
 		sliderList.append(visemeSlider)
 		
 faceResetBtn = gui.createButton('resetFace','Reset Face')	
 faceResetBtn.subscribeEvent(PushButton.EventClicked, guiHandler.handleFaceResetButton)
+faceResetBtn.setAlpha(alphaVal)
+
 
 

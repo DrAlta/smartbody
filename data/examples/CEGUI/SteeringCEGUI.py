@@ -134,7 +134,7 @@ class GUIHandler:
 	def handleRachelSpeedSlider(self,args):		
 		slider = args.window				
 		rachelSpeed = slider.getCurrentValue()	
-		
+alphaVal = 0.5		
 guiHandler = GUIHandler()	
 wayPt = [SrVec(0,0,0), SrVec(-9, 0, -9), SrVec(9, 0, 9), SrVec(9, 0, -9), SrVec(-9, 0, 9)]
 buttonSize = 80
@@ -149,15 +149,18 @@ gui.createStaticText('bradText',"Brad Goto", bradBtnXOffset, bradBtnYOffset-20)
 for i in range(0,len(wayPt)):
 	gotoBtn = gui.createButton('bradBtn'+str(i),'wayPt'+str(i),buttonPosX[i]+bradBtnXOffset, buttonPosY[i]+bradBtnYOffset, buttonSize)
 	gotoBtn.subscribeEvent(PushButton.EventClicked, guiHandler.handleBradSteerButton)
+	gotoBtn.setAlpha(alphaVal)
 bradSlider = gui.createSlider('bradSpeed',4.0,0.0, bradBtnXOffset, bradBtnYOffset+160)
 bradSlider.subscribeEvent(Slider.EventValueChanged, guiHandler.handleBradSpeedSlider)
-
+bradSlider.setAlpha(alphaVal)
 rachelBtnXOffset = 10
 rachelBtnYOffset = 280
 gui.createStaticText('rachelText',"Rachel Goto", rachelBtnXOffset, rachelBtnYOffset-20)
 for i in range(0,len(wayPt)):
 	gotoBtn = gui.createButton('rachelBtn'+str(i),'wayPt'+str(i),buttonPosX[i]+rachelBtnXOffset, buttonPosY[i]+rachelBtnYOffset, buttonSize)
 	gotoBtn.subscribeEvent(PushButton.EventClicked, guiHandler.handleRachelSteerButton)
+	gotoBtn.setAlpha(alphaVal)
 	
 bradSlider = gui.createSlider('rachelSpeed',4.0,0.0, rachelBtnXOffset, rachelBtnYOffset+160)
 bradSlider.subscribeEvent(Slider.EventValueChanged, guiHandler.handleRachelSpeedSlider)
+bradSlider.setAlpha(alphaVal)

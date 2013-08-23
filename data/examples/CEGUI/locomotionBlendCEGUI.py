@@ -229,19 +229,25 @@ class GUIHandler:
 		#bml.execBML('ChrBrad', '<blend mode="update" name="mocapLocomotion" sbm:schedule-mode="Now" sbm:wrap-mode="Loop" z="'+str(strafeDir)+'"/>')
 		bml.execBML('ChrBrad', '<blend mode="update" name="mocapLocomotion" sbm:schedule-mode="Now" sbm:wrap-mode="Loop" x="'+str(self.speed)+'" y="'+str(self.turnAngle)+'" z="' +str(self.strafeDir)+ '"/>')		
 
+alphaVal = 0.5
 guiHandler = GUIHandler()
 startLocoBtn = gui.createButton('startLocoBtn','Start Locomotion')
 startLocoBtn.subscribeEvent(PushButton.EventClicked, guiHandler.handleStartLocoButton)
+startLocoBtn.setAlpha(alphaVal)
 stopLocoBtn = gui.createButton('stopLocoBtn','Stop Locomotion')
 stopLocoBtn.subscribeEvent(PushButton.EventClicked, guiHandler.handleStopLocoButton)
+stopLocoBtn.setAlpha(alphaVal)
 
 #text1 = gui.createStaticText('text1','Speed')
 speedSlider = gui.createSlider('speedSlider',4.0,0.0)
 speedSlider.subscribeEvent(Slider.EventValueChanged, guiHandler.handleSpeedSlider)
+speedSlider.setAlpha(alphaVal)
 turnSlider = gui.createSlider('turnSlider',360.0,180.0)
 turnSlider.subscribeEvent(Slider.EventValueChanged, guiHandler.handleTurnSlider)
+turnSlider.setAlpha(alphaVal)
 strafeSlider = gui.createSlider('strafeSlider',180.0,90.0)
 strafeSlider.subscribeEvent(Slider.EventValueChanged, guiHandler.handleStrafeSlider)
+strafeSlider.setAlpha(alphaVal)
 
 
 # Start the simulation

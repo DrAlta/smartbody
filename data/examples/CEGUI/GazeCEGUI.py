@@ -115,6 +115,7 @@ buttonPosX = [ 80, 10, 140, 140, 10]
 buttonPosY = [ 50, 10, 90, 10, 90]
 gazeBtnXOffset = 10
 gazeBtnYOffset = 30
+alphaVal = 0.5
 for i in range(0,len(wayPt)):
 	wayPtPawn = scene.createPawn('wayPt'+str(i))
 	wayPtPawn.setPosition(wayPt[i])
@@ -122,6 +123,7 @@ gui.createStaticText('bradText',"Brad Gaze At", gazeBtnXOffset, gazeBtnYOffset-2
 for i in range(0,len(wayPt)):
 	gotoBtn = gui.createButton('gazeBtn'+str(i),'wayPt'+str(i),buttonPosX[i]+gazeBtnXOffset, buttonPosY[i]+gazeBtnYOffset, buttonSize)
 	gotoBtn.subscribeEvent(PushButton.EventClicked, guiHandler.handleBradGazeButton)
+	gotoBtn.setAlpha(alphaVal)
 
 gotoBtnXOffset = 10
 gotoBtnYOffset = 200
@@ -129,8 +131,10 @@ gui.createStaticText('rachelText',"Brad Goto", gotoBtnXOffset, gotoBtnYOffset-20
 for i in range(0,len(wayPt)):
 	gotoBtn = gui.createButton('gotoBtn'+str(i),'wayPt'+str(i),buttonPosX[i]+gotoBtnXOffset, buttonPosY[i]+gotoBtnYOffset, buttonSize)
 	gotoBtn.subscribeEvent(PushButton.EventClicked, guiHandler.handleBradSteerButton)
+	gotoBtn.setAlpha(alphaVal)
 targetMoveBtn = gui.createCheckBox('moveTarget','moveTarget')
 targetMoveBtn.subscribeEvent(ToggleButton.EventSelectStateChanged, guiHandler.handleGazeTargetMove)
+targetMoveBtn.setAlpha(alphaVal)
 
 gazeX = -3
 gazeZ = 3
