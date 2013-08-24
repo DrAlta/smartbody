@@ -200,7 +200,7 @@ BehaviorRequestPtr BML::parse_bml_grab( DOMElement* elem, const std::string& uni
 
 	boost::shared_ptr<MeControllerRequest> ct_request;
 	ct_request.reset();
-	//if (bCreateNewController)
+	if (bCreateNewController)
 	{
 		SmartBody::SBSimulationManager* simManager = SmartBody::SBScene::getScene()->getSimulationManager();
 		//LOG("parse_bml_grab, time = %f",simManager->getTime());
