@@ -151,7 +151,8 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		bodyReachCt = new MeCtExampleBodyReach(curCharacter->getReachEngineMap(),curCharacter->getCurrentReachType());
 		bodyReachCt->handle(handle);
 		bodyReachCt->init(curCharacter);
-		bCreateNewController = true;		
+		bCreateNewController = true;
+
 	}
 
 	bodyReachCt->setDefaultReachType(reachType);
@@ -262,10 +263,11 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 
 	boost::shared_ptr<MeControllerRequest> ct_request;
 	ct_request.reset();
+	if (bCreateNewController)
 	{
 		ct_request.reset( new MeControllerRequest( unique_id, localId, bodyReachCt, request->actor->reach_sched_p, behav_syncs ) );
 		ct_request->set_persistent( true );
-	}		
+	}
 
 	return ct_request;
 }
