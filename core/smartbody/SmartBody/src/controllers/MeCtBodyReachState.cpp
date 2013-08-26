@@ -72,6 +72,19 @@ SRT ReachTarget::getTargetState()
 	return st;	
 }
 
+
+SRT ReachTarget::getParaTargetState()
+{
+	if (targetIsPawn() || targetIsJoint())
+	{
+		return getTargetState();
+	}
+	else
+	{
+		return paraTargetState;
+	}
+}
+
 bool ReachTarget::targetIsPawn()
 {
 	return (useTargetPawn && getTargetPawn());
@@ -133,6 +146,7 @@ ReachTarget::ReachTarget()
 void ReachTarget::setTargetState( SRT& ts )
 {
 	targetState = ts;
+	paraTargetState = ts;
 	targetPawnName = "";
 	targetJoint = NULL;
 	useTargetPawn = false;
@@ -335,7 +349,11 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 	
 	cmd = "pawn " + targetName + " physics off";
 	rd->curHandAction->sendReachEvent("reach",cmd);	
-	rd->reachTarget.setTargetState(rd->effectorState.curIKTargetState);
+	SRT prevParaState = rd->reachTarget.getParaTargetState();
+	rd->reachTarget.setTargetState(rd->effectorState.ikTargetState);	
+	rd->reachTarget.paraTargetState = prevParaState;
+	//rd->reachTarget.setTargetState(rd->reachTarget.getTargetState());
+	//rd->effectorState.ikTargetState = rd->effectorState.curIKTargetState;
 }
 
 void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
@@ -692,8 +710,9 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 
 	if (rd->useInterpolation())
 	{
+		SRT paraTarget = rtarget.getParaTargetState();
 		float stime = (float)rd->interpMotion->strokeEmphasisTime();
-		estate.paraTarget = ts.tran;			
+		estate.paraTarget = paraTarget.tran;			
 		rd->updateBlendWeight(estate.paraTarget);
 		tsBlend = rd->getBlendPoseState(estate.paraTarget,stime);		
 		rd->getInterpFrame(stime,rd->targetRefFrame);

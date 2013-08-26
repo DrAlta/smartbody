@@ -9,6 +9,7 @@ class ReachTarget
 {
 public:
 	SRT      targetState;
+	SRT      paraTargetState;
 	//SbmPawn* targetPawn;
 	std::string targetPawnName;
 	SkJoint* targetJoint;
@@ -24,6 +25,7 @@ public:
 	void setTargetPawnName(std::string pawnName);
 	void setTargetJoint(SkJoint* tjoint);
 	SRT getTargetState(); // the return state is based on target's state
+	SRT getParaTargetState(); // the return state is based on target's state
 	SRT getGrabTargetState(SRT& naturalState, float offset = 0.f); 
 	SmartBody::SBPawn* getTargetPawn();
 	std::string getTargetPawnName() { return targetPawnName; }

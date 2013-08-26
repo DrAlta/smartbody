@@ -135,6 +135,7 @@ void MeCtHand::attachPawnTarget( SbmPawn* pawn, std::string jointName )
 		return;
 	}
 	//attachMat = attachedPawn->get_world_offset_joint()->gmat()*attachJoint->gmat().inverse();	
+	skeletonRef->update_global_matrices();
 	attachMat = attachedPawn->get_world_offset()*attachJoint->gmat().inverse();	
 }
 
@@ -189,7 +190,7 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 	if (type == -1)
 		type = MeCtReachEngine::RIGHT_ARM;
 
-	grabType = type;
+	this->grabType = type;
 	std::vector<std::string> stopJoints;
 	ikScenario.buildIKTreeFromJointRoot(wristJoint,stopJoints);
 	fingerChains.resize(MeCtHand::F_NUM_FINGERS);
