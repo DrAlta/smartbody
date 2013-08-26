@@ -163,7 +163,7 @@ def cleanBuild():
     # revert modified files, delete unversioned and ignored files when doing incremental builds
     if os.path.exists("build.sandbox"):
         print "--- Cleaning build.sandbox folder"
-        if os.name == "nt":
+        if platform.system() == "Windows":
             p = subprocess.Popen("tortoiseproc /path:build.sandbox /command:cleanup /noui /noprogressui /nodlg /revert /delunversioned /delignored /externals".split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             cleanSandboxOutput = []
             for line in p.stdout:
@@ -285,10 +285,12 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
 
     svnUsername = "iabuild"
     destinationFolder = ""
-    if os.name == "nt":
+    if platform.system() == "Windows":
         destinationFolder = "D:/SBM-Builds"
-    else:
+    elif platform.system() == "Darwin":
         destinationFolder = "/Users/fast/build/sbm-builds"
+    else:
+        destinationFolder = "/build/sbm-builds"
     tagSvn = False
     emailReport = True
 
@@ -380,12 +382,15 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
         buildDir = "build.sandbox"
 
     p = None
-    if os.name == "nt":
+    if platform.system() == "Windows":
         os.chdir(buildDir)
         p = subprocess.Popen("compile-sbm.bat", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    else:
+    elif platform.system() == "Darwin":
         os.chdir(buildDir)
         p = subprocess.Popen("./build/sb-compile.sh", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    else:
+        os.chdir(buildDir)
+        p = subprocess.Popen("./build/sb-compile-nix.sh", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     buildCompileOutput = []
     for line in p.stdout:
         buildCompileOutput.append(line.strip())
@@ -521,7 +526,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
     numDirsTotal = 0
     for dirpath, dirnames, filenames in os.walk(buildFolder):
         for filename in filenames:
-            if os.name == "nt":
+            if platform.system() == "Windows":
                 dirSizeTotal += os.path.getsize(os.path.join(dirpath,filename))
             numFilesTotal += 1
 
@@ -550,12 +555,15 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
     finalMailFile = os.path.join(buildFolder, "FinalMail.txt")
 
     buildServerShareName = ""
-    if os.name == "nt":
+    if platform.system() == "Windows":
         buildServerShareName = "\\\\vhbuild\\SBM-builds\\"
         emailSubjectPrefix = "[SB]"
-    else:
+    elif platform.system() == "Darwin":
         buildServerShareName = "\\\\roscoemini\\sbm-builds\\"
         emailSubjectPrefix = "[SB-MAC]"
+    else:
+        buildServerShareName = "\\\\vhbuild3\\sbm-builds\\"
+        emailSubjectPrefix = "[SB-NIX]"
 
     if not doFreshBuild:
         buildServerShareName = buildServerShareName + "incremental\\"
@@ -764,7 +772,7 @@ def checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBui
         # delete build
         # loop until enough space is left
 
-        if os.name == "nt":
+        if platform.system() == "Windows":
             minFreeSpaceRequiredForBuild = minFreeSpaceRequiredForBuildGig * 1000 * 1000 * 1000;  # ~gigs
 
             while getFreeSpace(buildDrive) < minFreeSpaceRequiredForBuild:
