@@ -1,0 +1,858 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8BBCFC4A-6B52-461E-8BBA-A86DE3FAD6F6}</ProjectGuid>
+    <RootNamespace>SmartBody</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\bin\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>$(ProjectName)_d</TargetName>
+    <OutDir>..\bin\</OutDir>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\include\bonebus;..\include\;..\include\steersuite;..\include\vhcl;..\include\vhmsg;..\include\wsp;..\include\xercesc;..\python27\include;..\src\SmartBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <DisableSpecificWarnings>4355;4503</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\lib;..\python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>..\bin\$(TargetName)$(TargetExt)</OutputFile>
+      <ImportLibrary>..\lib\$(TargetName).lib</ImportLibrary>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\include\bonebus;..\include\;..\include\steersuite;..\include\vhcl;..\include\vhmsg;..\include\wsp;..\include\xercesc;..\python27\include;..\src\SmartBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
+      <WarningLevel>Level3</WarningLevel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <DisableSpecificWarnings>4355;4503</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>..\lib;..\python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <PerUserRedirection>true</PerUserRedirection>
+      <OutputFile>..\bin\$(TargetName)$(TargetExt)</OutputFile>
+      <ImportLibrary>..\lib\$(TargetName).lib</ImportLibrary>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\SmartBody\bml\behavior_scheduler_gesture.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\adler32.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\compress.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\crc32.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\deflate.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\example.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\gzclose.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\gzlib.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\gzread.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\gzwrite.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\infback.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\inffast.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\inflate.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\inftrees.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\ioapi.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\iowin32.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\trees.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\uncompr.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\unzip.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\zip.c" />
+    <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\zutil.c" />
+    <ClCompile Include="..\src\SmartBody\sb\DefaultAttributeTable.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\MiniBrain.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\nvbg.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\PABlend.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAnimationState.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAnimationStateManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAnimationTransition.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAnimationTransitionRule.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAsset.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAssetManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAttribute.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAttributeManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBBehavior.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBBehaviorSet.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBBehaviorSetManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBBmlProcessor.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBBoneBusManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBCharacter.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBCollisionManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBColObject.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBCommandManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBController.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBDebuggerClient.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBDebuggerServer.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBDebuggerUtility.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBEvent.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBFaceDefinition.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBGestureMap.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBGestureMapManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBJoint.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBJointMap.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBJointMapManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBMotion.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBMotionBlendBase.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\sbm_character.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\sbm_pawn.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBNavigationMesh.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBObject.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBObserver.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBParseNode.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBParser.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPawn.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPhoneme.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPhonemeManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPhysicsManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPhysicsSim.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPython.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonAnimation.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonAttribute.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonCharacter.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonClass.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonMath.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonMotion.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonScene.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonSimulation.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonSkeleton.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonSystem.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBReach.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBReachManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBRetarget.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBRetargetManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBScene.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBScript.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBService.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBServiceManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBSimulationManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBSkeleton.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBSpeechManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBSteerAgent.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBSteerManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBSubject.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBVHMsgManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBWSPManager.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\behavior_scheduler.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\behavior_scheduler_constant_speed.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\behavior_scheduler_fixed.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\behavior_span.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_animation.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_bodyreach.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_constraint.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_event.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_face.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_gaze.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_general_param.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_gesture.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_grab.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_interrupt.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_locomotion.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_noise.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_processor.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_quickdraw.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_reach.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_saccade.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_speech.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_states.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_sync_point.cpp" />
+    <ClCompile Include="..\src\SmartBody\bml\bml_target.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\MeCtBlendEngine.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\MeCtBodyReachState.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\MeCtReachEngine.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_controller.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_controller_context.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_controller_context_proxy.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_controller_tree_root.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_adshr_envelope.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_barycentric_interpolation.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_basic_locomotion.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_blend.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_breathing.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_breathing_interface.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_ccd_IK.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_channel_writer.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_constraint.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_container.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_curve_writer.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_data_driven_reach.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_data_interpolation.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_data_receiver.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_examples.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_example_body_reach.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_eyelid.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_face.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_gaze.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_gaze_alg.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_gaze_joint.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_gaze_keymap.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_gaze_target.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_hand.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_IK.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_IK_scenario.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_interpolator.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_inverse_interpolation.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_jacobian_IK.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_limb.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_locomotion_func.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion_blend.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion_example.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion_parameter.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion_player.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion_profile.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion_recorder.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion_timewarp.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_noise_controller.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_param_animation.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_param_animation_utilities.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_periodic_replay.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_physics_controller.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_pose.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_quick_draw.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_reach.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_reach_IK.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_saccade.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_scheduler2.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_simple_gaze.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_tether.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_time_shift_warp.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_ublas.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_unary.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_default_prune_policy.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_spline_1d.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\MotionAnalysis.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\Bchart.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\BchartSm.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\Bst.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\ChartBase.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\ClassRule.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\CntxArray.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\CombineBests.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\ECArgs.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\Edge.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\EdgeHeap.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\edgeSubFns.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\EgsFromTree.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\ewDciTokStrm.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\extraMain.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\FBinaryArray.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\Feat.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\Feature.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\FeatureTree.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\fhSubFns.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\Field.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\FullHist.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\GotIter.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\headFinder.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\headFinderCh.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\InputTree.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\Item.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\Link.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\MeChart.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\Params.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\ParseStats.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\SentRep.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\Term.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\TimeIt.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\UnitRules.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\utils.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\parser\ValHeap.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\perlin\perlin.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\DetourAlloc.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\DetourCommon.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\DetourNavMesh.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\DetourNavMeshBuilder.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\DetourNavMeshQuery.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\DetourNode.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\Recast.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\RecastAlloc.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\RecastArea.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\RecastContour.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\RecastFilter.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\RecastLayers.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\RecastMesh.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\RecastMeshDetail.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\RecastRasterization.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\recast\RecastRegion.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\SOIL\image_DXT.c" />
+    <ClCompile Include="..\src\SmartBody\external\SOIL\image_helper.c" />
+    <ClCompile Include="..\src\SmartBody\external\SOIL\SOIL.c" />
+    <ClCompile Include="..\src\SmartBody\external\SOIL\stb_image_aug.c" />
+    <ClCompile Include="..\src\SmartBody\sbm\action_unit.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\BMLDefs.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\GenericViewer.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\GPU\SbmDeformableMeshGPU.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\GPU\SbmShader.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\GPU\SbmTexture.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\GPU\TBOData.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\GPU\VBOData.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\gwiz_cmdl.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\gwiz_math.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\gwiz_spline.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\Heightfield.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\KinectProcessor.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\lin_win.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\local_speech.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\mcontrol_callbacks.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\MiscCommands.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\ODEPhysicsSim.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\ParserASFAMC.cxx" />
+    <ClCompile Include="..\src\SmartBody\sbm\ParserBVH.cxx" />
+    <ClCompile Include="..\src\SmartBody\sbm\ParserFBX.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\ParserOgre.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\ParserOpenCOLLADA.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\PPRAISteeringAgent.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\remote_speech.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sbm_audio.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sbm_deformable_mesh.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sbm_speech.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sbm_speech_audiofile.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sbm_speech_impl_skeleton.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sbm_test_cmds.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sr_arg_buff.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sr_cmd_line.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sr_cmd_seq.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sr_hash_map.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sr_linear_curve.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sr_path_list.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sr_spline_curve.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\sr_synch_points.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\SteerPath.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\SteerSuiteEnginerDriver.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\text_speech.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\time_profiler.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\time_regulator.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\xercesc_utils.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\smartbody-c-dll.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\smartbody-dll.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_channel.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_channel_array.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_joint.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_joint_euler.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_joint_pos.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_joint_quat.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_joint_swing_twist.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_motion.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_motion_io.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_posture.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_scene.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_skeleton.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_skeleton_io.cpp" />
+    <ClCompile Include="..\src\SmartBody\sk\sk_vec_limits.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\planner\sk_blend_cfg.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\planner\sk_blend_cfg_manager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\planner\sk_blend_planner.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\planner\sk_pos_cfg.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\planner\sk_pos_cfg_manager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\planner\sk_pos_planner.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\planner\sr_cfg_manager.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\planner\sr_cfg_path.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\planner\sr_cfg_planner.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\planner\sr_cfg_planner_lazy.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\planner\sr_cfg_tree.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_alg.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_array.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_box.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_buffer.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_camera.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_color.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_cylinder.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_euler.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_event.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_geo2.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_gl.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_gl_render_funcs.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_hash_table.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_input.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_light.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_line.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_lines.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_mat.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_material.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_model.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_model_export_iv.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_model_import_obj.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_output.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_path_array.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_plane.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_points.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_polygon.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_polygons.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_quat.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_random.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_sa.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_sa_bbox.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_sa_event.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_sa_gl_render.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_sa_render_mode.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_shared_ptr.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_sn.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_sn_colorsurf.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_sn_group.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_sn_matrix.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_sn_shape.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_sphere.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_spline.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_string.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_string_array.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_timer.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_trackball.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_tree.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_triangle.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_vec.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_vec2.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_viewer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\SmartBody\bml\behavior_scheduler.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\behavior_scheduler_constant_speed.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\behavior_scheduler_fixed.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\behavior_scheduler_gesture.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\behavior_span.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_animation.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_bodyreach.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_constraint.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_event.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_exception.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_face.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_gaze.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_general_param.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_gesture.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_grab.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_interrupt.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_locomotion.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_noise.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_processor.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_quickdraw.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_reach.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_saccade.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_schedule.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_speech.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_states.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_sync_point.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_target.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_types.hpp" />
+    <ClInclude Include="..\src\SmartBody\bml\bml_xml_consts.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\MeCtBlendEngine.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\MeCtBodyReachState.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\MeCtReachEngine.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_blend_cover.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_controller.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_controller_context.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_controller_context_proxy.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_controller_tree_root.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_adshr_envelope.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_barycentric_interpolation.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_basic_locomotion.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_blend.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_breathing.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_breathing_interface.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_ccd_IK.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_channel_writer.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_constraint.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_container.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_curve_writer.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_data_driven_reach.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_data_interpolation.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_data_receiver.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_examples.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_example_body_reach.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_eyelid.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_face.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_gaze.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_gaze_alg.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_gaze_joint.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_gaze_sensor.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_hand.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_IK.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_IK_scenario.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_interpolator.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_inverse_interpolation.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_jacobian_IK.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_limb.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_locomotion_func.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_blend.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_example.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_parameter.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_player.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_profile.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_recorder.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_timewarp.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_noise_controller.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_param_animation.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_param_animation_utilities.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_periodic_replay.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_physics_controller.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_pose.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_quick_draw.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_reach.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_reach_IK.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_saccade.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_scheduler2.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_simple_gaze.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_tether.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_time_shift_warp.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_ublas.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_unary.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_default_prune_policy.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_evaluation_logger.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_prune_policy.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_spline_1d.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\MotionAnalysis.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\Bchart.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\Bst.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\ChartBase.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\ClassRule.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\CntxArray.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\CombineBests.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\ECArgs.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\ECString.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\Edge.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\EdgeHeap.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\edgeSubFns.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\ewDciTokStrm.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\extraMain.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\FBinaryArray.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\Feat.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\Feature.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\FeatureTree.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\fhSubFns.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\Field.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\FullHist.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\GotIter.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\headFinder.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\headFinderCh.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\InputTree.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\Item.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\Link.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\MeChart.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\Params.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\ParseStats.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\SentRep.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\Term.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\TimeIt.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\UnitRules.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\utils.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\ValHeap.h" />
+    <ClInclude Include="..\src\SmartBody\external\parser\Wrd.h" />
+    <ClInclude Include="..\src\SmartBody\external\perlin\perlin.h" />
+    <ClInclude Include="..\src\SmartBody\external\recast\DetourAlloc.h" />
+    <ClInclude Include="..\src\SmartBody\external\recast\DetourAssert.h" />
+    <ClInclude Include="..\src\SmartBody\external\recast\DetourCommon.h" />
+    <ClInclude Include="..\src\SmartBody\external\recast\DetourNavMesh.h" />
+    <ClInclude Include="..\src\SmartBody\external\recast\DetourNavMeshBuilder.h" />
+    <ClInclude Include="..\src\SmartBody\external\recast\DetourNavMeshQuery.h" />
+    <ClInclude Include="..\src\SmartBody\external\recast\DetourNode.h" />
+    <ClInclude Include="..\src\SmartBody\external\recast\DetourStatus.h" />
+    <ClInclude Include="..\src\SmartBody\external\recast\Recast.h" />
+    <ClInclude Include="..\src\SmartBody\external\recast\RecastAlloc.h" />
+    <ClInclude Include="..\src\SmartBody\external\recast\RecastAssert.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\image_DXT.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\image_helper.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\SOIL.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug_c.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\stb_image_aug.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\crc32.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\crypt.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\deflate.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\gzguts.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\inffast.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\inffixed.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\inflate.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\inftrees.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\ioapi.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\iowin32.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\trees.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\unzip.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\zconf.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\zip.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\zlib.h" />
+    <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\zutil.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\action_unit.hpp" />
+    <ClInclude Include="..\src\SmartBody\sbm\BMLDefs.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\general_param_setting.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GenericViewer.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\gfx\mat2.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\gfx\mat3.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\gfx\mat4.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\gfx\vec2.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\gfx\vec3.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\gfx\vec4.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\SbmDeformableMeshGPU.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\SbmShader.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\SbmTexture.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\TBOData.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\VBOData.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\gwiz_cmdl.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\gwiz_math.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\Heightfield.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\KinectProcessor.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\lin_win.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\local_speech.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\mcontrol_callbacks.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\MiscCommands.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\ODEPhysicsSim.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\ParserASFAMC.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\ParserBVH.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\ParserFBX.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\ParserOgre.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\ParserOpenCOLLADA.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\PPRAISteeringAgent.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\remote_speech.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sbm_audio.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sbm_constants.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sbm_deformable_mesh.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sbm_speech.hpp" />
+    <ClInclude Include="..\src\SmartBody\sbm\sbm_speech_audiofile.hpp" />
+    <ClInclude Include="..\src\SmartBody\sbm\sbm_speech_impl_skeleton.hpp" />
+    <ClInclude Include="..\src\SmartBody\sbm\sbm_test_cmds.hpp" />
+    <ClInclude Include="..\src\SmartBody\sbm\sr_arg_buff.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sr_cmd_line.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sr_cmd_map.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sr_cmd_seq.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sr_curve_builder.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sr_hash_map.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sr_linear_curve.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sr_path_list.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sr_spline_curve.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\sr_synch_points.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\SteerPath.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\SteerSuiteEngineDriver.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\text_speech.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\time_profiler.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\time_regulator.h" />
+    <ClInclude Include="..\src\SmartBody\sbm\xercesc_utils.hpp" />
+    <ClInclude Include="..\src\SmartBody\sb\DefaultAttributeTable.h" />
+    <ClInclude Include="..\src\SmartBody\sb\MiniBrain.h" />
+    <ClInclude Include="..\src\SmartBody\sb\NetRequest.h" />
+    <ClInclude Include="..\src\SmartBody\sb\nvbg.h" />
+    <ClInclude Include="..\src\SmartBody\sb\PABlend.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAnimationState.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAnimationStateManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAnimationTransition.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAnimationTransitionRule.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAsset.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAssetManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAttribute.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAttributeManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBBehavior.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBBmlProcessor.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBBoneBusManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBCharacter.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBCollisionManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBColObject.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBCommandManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBController.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBDebuggerClient.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBDebuggerServer.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBDebuggerUtility.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBEvent.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBFaceDefinition.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBGestureMap.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBGestureMapManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBJoint.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBJointMap.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBJointMapManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBMotion.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBMotionBlendBase.h" />
+    <ClInclude Include="..\src\SmartBody\sb\sbm_character.hpp" />
+    <ClInclude Include="..\src\SmartBody\sb\sbm_pawn.hpp" />
+    <ClInclude Include="..\src\SmartBody\sb\SBNavigationMesh.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBObject.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBObserver.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBParseNode.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBParser.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBPawn.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBPhoneme.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBPhonemeManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBPhysicsManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBPhysicsSim.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBPython.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBPythonClass.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBPythonInternal.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBReach.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBReachManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBRetarget.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBRetargetManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBScene.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBScript.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBService.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBServiceManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBSimulationManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBSkeleton.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBSpeechManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBSteerAgent.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBSteerManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBSubject.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBTypes.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBVHMsgManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBWSPManager.h" />
+    <ClInclude Include="..\src\SmartBody\sb\smartbody-c-dll.h" />
+    <ClInclude Include="..\src\SmartBody\sb\smartbody-dll.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_channel.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_channel_array.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_joint.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_joint_euler.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_joint_pos.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_joint_quat.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_joint_swing_twist.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_motion.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_posture.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_scene.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_skeleton.h" />
+    <ClInclude Include="..\src\SmartBody\sk\sk_vec_limits.h" />
+    <ClInclude Include="..\src\SmartBody\sr\planner\sk_blend_cfg.h" />
+    <ClInclude Include="..\src\SmartBody\sr\planner\sk_blend_cfg_manager.h" />
+    <ClInclude Include="..\src\SmartBody\sr\planner\sk_blend_planner.h" />
+    <ClInclude Include="..\src\SmartBody\sr\planner\sk_pos_cfg.h" />
+    <ClInclude Include="..\src\SmartBody\sr\planner\sk_pos_cfg_manager.h" />
+    <ClInclude Include="..\src\SmartBody\sr\planner\sk_pos_planner.h" />
+    <ClInclude Include="..\src\SmartBody\sr\planner\sr_cfg_manager.h" />
+    <ClInclude Include="..\src\SmartBody\sr\planner\sr_cfg_path.h" />
+    <ClInclude Include="..\src\SmartBody\sr\planner\sr_cfg_planner.h" />
+    <ClInclude Include="..\src\SmartBody\sr\planner\sr_cfg_tree.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_alg.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_array.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_box.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_buffer.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_camera.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_class_manager.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_color.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_cylinder.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_euler.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_event.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_geo2.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_gl.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_gl_render_funcs.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_hash_table.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_heap.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_input.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_light.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_line.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_lines.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_mat.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_material.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_model.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_output.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_path_array.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_plane.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_points.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_polygon.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_polygons.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_quat.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_random.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_sa.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_sa_bbox.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_sa_event.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_sa_gl_render.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_sa_render_mode.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_shared_class.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_shared_ptr.hpp" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_sn.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_sn_colorsurf.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_sn_group.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_sn_matrix.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_sn_shape.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_sphere.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_spline.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_string.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_string_array.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_timer.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_trackball.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_tree.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_triangle.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_vec.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_vec2.h" />
+    <ClInclude Include="..\src\SmartBody\sr\sr_viewer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\SmartBody\sbm\GPU\shaderFiles\fs_skin_render.frag">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\src\SmartBody\sbm\GPU\shaderFiles\vs_skin_pos.vert">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\src\SmartBody\sbm\sbm_deformable_mesh.cpp.bak">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
