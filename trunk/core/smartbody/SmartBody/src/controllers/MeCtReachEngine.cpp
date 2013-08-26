@@ -491,7 +491,7 @@ DataInterpolator* MeCtReachEngine::createInterpolator(std::string interpolatorTy
 	DataInterpolator* interpolator = NULL;	
 	if (interpolatorType == "KNN")
 	{
-		KNNInterpolator* knnInterpolator = new KNNInterpolator(500,ikReachRegion*1.f);
+		KNNInterpolator* knnInterpolator = new KNNInterpolator(5000,ikReachRegion*1.f);
 		resampleData = &knnInterpolator->resampleData;	
 		interpolator = knnInterpolator;
 	}

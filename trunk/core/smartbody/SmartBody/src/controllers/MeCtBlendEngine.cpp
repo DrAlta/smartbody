@@ -197,7 +197,7 @@ DataInterpolator* MeCtBlendEngine::createInterpolator(std::string interpolatorTy
 	if (interpolatorType == "KNN")
 	{
 		float sampleRadius = 0.001f;//skeletonCopy->getCurrentHeight()*0.02f;
-		KNNInterpolator* knnInterpolator = new KNNInterpolator(5000,sampleRadius);
+		KNNInterpolator* knnInterpolator = new KNNInterpolator(100,sampleRadius);
 		resampleData = &knnInterpolator->resampleData;	
 		interpolator = knnInterpolator;
 	}
