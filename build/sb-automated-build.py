@@ -387,7 +387,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
         p = subprocess.Popen("compile-sbm.bat", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     elif platform.system() == "Darwin":
         os.chdir(buildDir)
-        p = subprocess.Popen("./build/sb-compile.sh", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        p = subprocess.Popen("./build/sb-compile-osx.sh", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     else:
         os.chdir(buildDir)
         p = subprocess.Popen("./build/sb-compile-nix.sh", stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
