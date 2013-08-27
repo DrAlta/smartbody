@@ -1,4 +1,8 @@
+#ifdef WIN32
 #define USE_CEGUI 1
+#else
+#define USE_CEGUI
+#endif
 #if USE_CEGUI
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/OpenGL/GLRenderer.h>
