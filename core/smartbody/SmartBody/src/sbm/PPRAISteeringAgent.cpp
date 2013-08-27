@@ -105,8 +105,11 @@ void PPRAISteeringAgent::addSteeringAttributes()
 	if (!character)
 		return;
 	
+	if (!character->hasAttribute("steering.useDirectControl"))
+		character->createDoubleAttribute("steering.useDirectControl", false, true, "steering", 200, false, false, false, ""); 
+
 	if (!character->hasAttribute("steering.basicLocoAngleGain"))
-		character->createDoubleAttribute("steering.basicLocoAngleGain", 2.0f, true, "steering", 200, false, false, false, ""); 
+		character->createDoubleAttribute("steering.basicLocoAngleGain", 2.0f, true, "steering", 205, false, false, false, ""); 
 	
 	if (!character->hasAttribute("steering.basicLocoScootGain"))
 		character->createDoubleAttribute("steering.basicLocoScootGain", 10.0f, true, "steering", 210, false, false, false, ""); 
@@ -548,7 +551,10 @@ void PPRAISteeringAgent::evaluate(double dtime)
 	{
 		if (!character->basic_locomotion_ct)
 			return;
-		newSpeed = evaluateBasicLoco(dt, x, y, z, yaw);
+		if (character->getBoolAttribute("steering.useDirectControl"))
+				newSpeed = evaluateBasicLocoDirect(dt, x, y, z, yaw);
+		else
+			newSpeed = evaluateBasicLoco(dt, x, y, z, yaw);
 	}
 
 	// Example-Based Locomotion Evaluation
@@ -856,6 +862,200 @@ void PPRAISteeringAgent::normalizeAngle(float& angle)
 	- The proximity is decided by Steering Suite
 	- Facing not supported
 */
+float PPRAISteeringAgent::evaluateBasicLocoDirect(float dt, float x, float y, float z, float yaw)
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	
+ 	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
+	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
+	const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
+
+	character->basic_locomotion_ct->setScootSpd(0.0f);
+	character->basic_locomotion_ct->setMovingSpd(0.0f);
+	character->basic_locomotion_ct->setTurningSpd(0.0f);
+
+
+	//--------------------------------------------------------
+	// WJ added start
+	// TODO: define/initialize these vars properly:
+	Util::Vector totalSteeringForce;
+	Util::Vector newForward;
+
+	//
+	// choose the new orientation of the agent
+	//
+	if (!steeringCommand.aimForTargetDirection) {
+		// simple turning case "turn left" or "turn right"
+		newForward = forward + PED_MAX_TURNING_RATE * steeringCommand.turningAmount * rightSide;
+	}
+	else {
+		// turn to face "targetDirection" - magnitude of targetDirection doesn't matter
+		float initialDot = dot(steeringCommand.targetDirection, rightSide);
+		float turningRate = (initialDot > 0.0f) ? PED_MAX_TURNING_RATE : -PED_MAX_TURNING_RATE;  // positive rate is right-turn
+		newForward = forward + turningRate * fabsf(steeringCommand.turningAmount) * rightSide;
+		float newDot = dot(steeringCommand.targetDirection, rightSideInXZPlane(newForward)); // dot with the new side vector
+		if (initialDot*newDot <= 0.0f) {
+			// if the two dot products are different signs, that means we turned too much, so just set the new forward to the goal vector.
+			// NOTE that above condition is less than **OR EQUALS TO** - that is because initialDot will be zero when the agent is 
+			// pointing already in the exact correct direction.  If we used strictly less than, the pedestrian oscillates between a 
+			// small offset direction and the actual target direction.
+
+			//
+			// TODO: known bug here: if agent is facing exactly opposite its goal, it completely flips around because of this condition.
+			//   ironically, because of the equals sign above...
+			//   proper solution is to add extra conditions that verify the original direction of forward was not opposite of targetDirection.
+			//
+			// WJ: need to change here
+			newForward = Util::Vector(steeringCommand.targetDirection.x, 0.0f, steeringCommand.targetDirection.z);
+
+		}
+	}
+
+	//
+	// set the orientation
+	//
+	newForward = normalize(newForward);
+	forward = newForward;
+	rightSide = rightSideInXZPlane(newForward);
+
+	// This next line is specific to command-based steering, but is not physically based.
+	// everything else in command-based steering, however, is physcially based.
+	velocity = newForward * currentSpeed;
+
+	//
+	// choose the force of the agent.  In command-based mode, the force is always aligned 
+	// with the agent's forward facing direction, so we can use scalars until we add 
+	// side-to-side scoot at the end.
+	//
+	assert(fabsf(steeringCommand.acceleration) <= 1.0f); // -1.0f <= acceleration <= 1.0f;
+	if (!steeringCommand.aimForTargetSpeed) {
+		// simple "speed up" or "slow down"
+		totalSteeringForce = PED_MAX_FORCE * steeringCommand.acceleration * forward;
+	}
+	else {
+		// accelerate towards a target speed
+		// do it the naive greedy way;
+		//
+		// the most force you can apply without making velocity direction flip:
+		// (force / mass) * time-step = delta-speed
+		// if delta-speed == -speed
+		// force * mass * time-step = -speed
+		//
+		float maxBackwardsForce = (-PED_BRAKING_RATE * fabsf(currentSpeed) * 60.0f/* * _mass / _dt*/);
+		float scalarForce = (steeringCommand.targetSpeed - currentSpeed) * 8.0f; // crudely trying to make accelerations quicker...
+		if (scalarForce > PED_MAX_FORCE) scalarForce = PED_MAX_FORCE;
+		if (scalarForce < maxBackwardsForce) scalarForce = maxBackwardsForce;
+		totalSteeringForce = scalarForce * forward; // forward is a unit vector, normalized during turning just above.
+	}
+
+	// TODO: should we clamp scoot?
+	// add the side-to-side motion to the planned steering force.
+	totalSteeringForce = totalSteeringForce + PED_SCOOT_RATE * steeringCommand.scoot * rightSide;
+
+	// WJ added end
+	//---------------------------------------------------------------------------
+
+
+	float angleGlobal = radToDeg(atan2(steeringCommand.targetDirection.x, steeringCommand.targetDirection.z));
+	normalizeAngle(angleGlobal);
+	normalizeAngle(yaw);
+	float angleDiff = angleGlobal - yaw;
+	//LOG("turning Rate= %f\n",angleDiff/dt);
+	normalizeAngle(angleDiff);
+
+	float newSpeed = desiredSpeed;
+
+	int numGoals = goalQueue.size();
+	if (numGoals == 0)
+	{
+		character->_reachTarget = true;
+		character->basic_locomotion_ct->setValid(false);
+		character->basic_locomotion_ct->setMovingSpd(0.0f);
+		character->basic_locomotion_ct->setTurningSpd(0.0f);
+		character->basic_locomotion_ct->setScootSpd(0.0f);
+		newSpeed = 0.0f;
+	}
+	else
+	{
+		character->basic_locomotion_ct->setValid(true);
+		float curSpeed = character->basic_locomotion_ct->getMovingSpd() * scene->getScale();
+		if (steeringCommand.aimForTargetSpeed)
+		{
+			if (curSpeed < steeringCommand.targetSpeed)
+			{
+				curSpeed += acceleration * dt;
+				if (curSpeed > steeringCommand.targetSpeed)
+					curSpeed = steeringCommand.targetSpeed;
+			}
+			else
+			{
+				curSpeed -= acceleration * dt;
+				if (curSpeed < steeringCommand.targetSpeed)
+					curSpeed = steeringCommand.targetSpeed;
+			}
+		}
+		else
+			curSpeed += acceleration * dt;
+		newSpeed = curSpeed;
+		curSpeed = curSpeed / scene->getScale();
+		character->basic_locomotion_ct->setMovingSpd(curSpeed);	
+
+
+		//-------------------------------
+		// WJ added start
+
+		// do euler step with force
+		// compute acceleration and velocity by a simple Euler step
+		const Util::Vector clippedForce = clamp(totalSteeringForce, PED_MAX_FORCE);
+		Util::Vector acceleration = (clippedForce/* / _mass*/);
+		velocity = velocity + (dt*acceleration);
+		velocity = clamp(velocity, PED_MAX_SPEED);  // clamp _velocity to the max speed
+		currentSpeed = velocity.length();
+		forward = Util::normalize(velocity);
+		angleGlobal = radToDeg(atan2(forward.x, forward.z));
+		normalizeAngle(angleGlobal);
+
+		curSpeed = currentSpeed / scene->getScale();
+		newSpeed = currentSpeed;
+		character->basic_locomotion_ct->setMovingSpd(curSpeed);
+		character->basic_locomotion_ct->setDesiredHeading(angleGlobal); // affective setting
+
+		// WJ added end
+		//------------------------------------
+
+
+		character->basic_locomotion_ct->setTurningSpd(angleDiff * basicLocoAngleGain);
+		float curScoot = character->basic_locomotion_ct->getScootSpd() / basicLocoScootGain;
+		if (steeringCommand.scoot != 0.0)
+		{
+			if (curScoot < steeringCommand.scoot)
+				curScoot += scootAcceleration * dt;
+			else
+				curScoot -= scootAcceleration * dt;	
+		}
+		else
+		{
+			if (fabs(curScoot) < scootThreshold)
+				curScoot = 0.0f;
+			else
+			{
+				if (curScoot > 0.0f)
+				{
+					curScoot -= scootAcceleration * dt;
+					if (curScoot < 0.0)	curScoot = 0.0;
+				}
+				else
+				{
+					curScoot += scootAcceleration * dt;
+					if (curScoot > 0.0)	curScoot = 0.0;
+				}
+			}
+		}
+		character->basic_locomotion_ct->setScootSpd(curScoot * basicLocoScootGain);
+	}
+	return newSpeed;
+}
+
 float PPRAISteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z, float yaw)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -1045,7 +1245,6 @@ float PPRAISteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z,
 	}
 	return newSpeed;
 }
-
 
 
 /*
@@ -1754,6 +1953,8 @@ void PPRAISteeringAgent::adjustLocomotionBlend(SmartBody::SBCharacter* character
 	{
 		PABlendData::WrapMode wrap = PABlendData::Loop;
 		PABlendData::ScheduleMode schedule = PABlendData::Now;
+		if (queued)
+			schedule = PABlendData::Queued;
 		PABlendData::BlendMode blendMode = PABlendData::Overwrite;
 
 		character->param_animation_ct->schedule(blend, weights, wrap, schedule, blendMode, "null", 0.0, 0.0, 0.0, -1.0, directPlay);
