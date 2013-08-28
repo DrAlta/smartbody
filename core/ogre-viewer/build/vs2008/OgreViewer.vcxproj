@@ -68,7 +68,7 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>glew32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;SmartBody_d.lib;OIS_d.lib;OgreMain_d.lib;OgreRTShaderSystem_d;pthreadVSE2.lib;activemq-cppd.lib;OpenAL32.lib;ws2_32.lib;rpcrt4.lib;winmm.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;SmartBody_d.lib;OIS_d.lib;OgreMain_d.lib;OgreRTShaderSystem_d.lib;pthreadVSE2.lib;activemq-cppd.lib;OpenAL32.lib;ws2_32.lib;rpcrt4.lib;winmm.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\..\core\smartbody\SmartBody\lib;..\..\..\..\core\smartbody\SmartBody\src\external\glew;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib\debug;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)OgreViewer_d.pdb</ProgramDatabaseFile>
