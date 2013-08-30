@@ -408,12 +408,14 @@ void FLTKOgreWindow::fltkRender2()
 	//glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	//if (_data->shadowmode == ModeShadows && hasShaderSupport)
 	//	makeShadowMap();
-
+	
+	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
+		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
+	} 
 	// real surface geometries
 	//drawAllGeometries();	
 	glDisable(GL_LIGHTING);
 	glBindBuffer( GL_ARRAY_BUFFER, 0);
-
 
 	drawPawns();
 	// draw the grid

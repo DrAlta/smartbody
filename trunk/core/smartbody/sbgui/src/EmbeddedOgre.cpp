@@ -394,7 +394,8 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		Ogre::MaterialManager& matManager = Ogre::MaterialManager::getSingleton();
 
 		ogreRoot->restoreConfig();
-		LogManager::getSingletonPtr()->setLogDetail(LL_BOREME);
+		//LogManager::getSingletonPtr()->setLogDetail(LL_BOREME);
+		Ogre::LogManager::getSingleton().setLogDetail(Ogre::LL_LOW);
 #ifdef WIN32
 		Ogre::String pluginName = "RenderSystem_GL";	
 		Ogre::String sceneManagerPlugin = "Plugin_OctreeSceneManager";

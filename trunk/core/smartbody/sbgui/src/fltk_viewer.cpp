@@ -1408,14 +1408,13 @@ void FltkViewer::draw()
 	SbmShaderManager& ssm = SbmShaderManager::singleton();
 	SbmTextureManager& texm = SbmTextureManager::singleton();
 
+	
 	bool hasShaderSupport = false;
 	if (!context_valid())
 	{			
 		hasShaderSupport = ssm.initGLExtension();
         if (hasShaderSupport)
-		    initShadowMap();
-
-		SBGUIManager::singleton().init();
+		    initShadowMap();		
 	}
 
 	if ( !valid() ) 
@@ -1441,7 +1440,7 @@ void FltkViewer::draw()
 	   ssm.buildShaders();
 	   texm.updateTexture();
    }	
-
+   
    if (_objManipulator.hasPicking())
    {
 		SrVec2 pick_loc = _objManipulator.getPickLoc();
@@ -1497,8 +1496,8 @@ void FltkViewer::draw()
    //----- Render user scene -------------------------------------------
 	glDisable( GL_COLOR_MATERIAL );
 	//glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-	if (_data->shadowmode == ModeShadows && hasShaderSupport)
-		makeShadowMap();
+	//if (_data->shadowmode == ModeShadows && hasShaderSupport)
+	//	makeShadowMap();
 
 	// real surface geometries
 	drawAllGeometries();	
@@ -2682,9 +2681,10 @@ void FltkViewer::label_viewer(const char* str)
 }
 
 void FltkViewer::show_viewer()
-{
-	
+{	
 	show();
+	make_current();
+	SBGUIManager::singleton().init();	
 }
 
 void FltkViewer::hide_viewer()
