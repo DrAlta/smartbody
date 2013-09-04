@@ -1451,6 +1451,13 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBComma
 			pawn->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
 			srSnModelStatic->ref();
 		}
+		else
+		{
+			pawn->dMesh_p = new DeformableMesh();
+			pawn->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
+			srSnModelStatic->ref();
+		}
+
 		SrSnGroup* meshGroup = new SrSnGroup();
 		meshGroup->separator(true);
 		meshGroup->add(srSnModelStatic);
@@ -2022,6 +2029,11 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 					SkinWeight* sw = sbmChar->dMesh_p->skinWeights[i];
 					SmartBody::SBSkeleton* sbSkeleton = sbmChar->getSkeleton();		
 					SmartBody::SBSkeleton* sbOrigSk = SmartBody::SBScene::getScene()->getSkeleton(sbSkeleton->getName());
+					if (!sbOrigSk)
+					{
+						LOG("Can't find original skeleton '%s'", sbSkeleton->getName().c_str());
+						continue;
+					}
 					for (int k=0;k<sbOrigSk->getNumJoints();k++)
 					{
 						// manually add all joint names

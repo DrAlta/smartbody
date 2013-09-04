@@ -1175,6 +1175,7 @@ void SrModel::saveOriginalVertices()
 	if (VOrig.size() != V.size())
 	{
 		VOrig.capacity(V.capacity());
+		VOrig.size(V.capacity());
 		for (int x = 0; x < V.size(); x++)
 		{
 			VOrig[x] = V[x];
