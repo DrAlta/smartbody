@@ -3,8 +3,10 @@ project( SmartBody )
 SET(CMAKE_SYSTEM_NAME Darwin)
 
 set( CMAKE_INSTALL_PREFIX "../" )
-#add_definitions(	-g3 -fPIC )
-add_definitions(	-fPIC )
+#release
+add_definitions(	-g3 -fPIC )
+#debug
+#add_definitions(	-fPIC )
 
 include_directories(
 	/System/Library/Frameworks/Python.framework/Headers/
