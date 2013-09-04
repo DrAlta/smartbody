@@ -469,6 +469,7 @@ void BaseWindow::ResetScene()
 
 	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->startFileLogging("./smartbody.log");
 	scene->setCharacterListener(listener);
 
 	SmartBody::SBScene::getScene()->setViewer(this);
@@ -1437,11 +1438,9 @@ void BaseWindow::FloorColorCB( Fl_Widget* w, void* data )
 
 void BaseWindow::BackgroundColorCB( Fl_Widget* w, void* data )
 {
-#if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdBackground, NULL);	
-#endif
-
+	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdBackground, NULL);
+	rootWindow->fltkViewer->updateOptions();
 }
 
 void BaseWindow::TerrainShadedCB(Fl_Widget* w, void* data)
