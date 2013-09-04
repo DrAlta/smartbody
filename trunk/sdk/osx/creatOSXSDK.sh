@@ -2,7 +2,11 @@
 mkdir -p sdk
 
 # copy include
-rsync -ap --exclude=".svn" ./include ./sdk
+mkdir -p sdk/include
+rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/fltk-1.3.2/FL ./sdk/include/FL/
+rsync -ap --exclude=".svn" ../../core/smartbody/ode/include/ode ./sdk/include/ode/
+rsync -ap --exclude=".svn" ../../lib/boost/boost ./sdk/include/boost/
+rsync -ap --exclude=".svn" ../../lib/xerces-c/include/xercesc ./sdk/include/xerces/
 rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/include/*.h ./sdk/include/vhmsg/
 rsync -ap --exclude=".svn" ../../lib/wsp/wsp/include/*.h ./sdk/include/wsp/
 rsync -ap --exclude=".svn" ../../lib/bonebus/include/*.h ./sdk/include/bonebus/
