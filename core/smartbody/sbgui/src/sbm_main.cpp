@@ -675,10 +675,6 @@ int main( int argc, char **argv )	{
 	vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
 	vhcl::Log::g_log.AddListener(listener);
 
-	vhcl::Log::Listener* fileListener = new vhcl::Log::FileListener("./smartbody.log");
-	vhcl::Log::g_log.AddListener(fileListener);
-
-
 	int err;
 	string net_host;
 	vector<string> seq_paths;
@@ -944,7 +940,7 @@ int main( int argc, char **argv )	{
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->setCharacterListener(&fltkListener);
 
-
+	scene->startFileLogging("./smartbody.log");
 
 	scene->getSimulationManager()->setupTimer();
 
