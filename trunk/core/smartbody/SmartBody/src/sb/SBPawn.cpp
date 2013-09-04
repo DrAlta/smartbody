@@ -227,6 +227,7 @@ void SBPawn::afterUpdate(double time)
 		}
 	}
 	get_world_offset(x, y, z, h, p, r);	
+/*	
 	setDoubleAttribute("posX",x);
 	setDoubleAttribute("posY",y);
 	setDoubleAttribute("posZ",z);
@@ -234,12 +235,13 @@ void SBPawn::afterUpdate(double time)
 	setDoubleAttribute("rotX",p);
 	setDoubleAttribute("rotY",h);
 	setDoubleAttribute("rotZ",r);
-// 	_posX->setValueFast(x);
-// 	_posY->setValueFast(y);
-// 	_posZ->setValueFast(z);
-// 	_rotX->setValueFast(p);
-// 	_rotY->setValueFast(h);
-// 	_rotZ->setValueFast(r);
+	*/
+ 	_posX->setValueFast(x);
+ 	_posY->setValueFast(y);
+ 	_posZ->setValueFast(z);
+ 	_rotX->setValueFast(p);
+ 	_rotY->setValueFast(h);
+ 	_rotZ->setValueFast(r);
 }
 
 void SBPawn::notify(SBSubject* subject)
@@ -340,6 +342,7 @@ void SBPawn::notify(SBSubject* subject)
 				{
 					SrSnModel* srSnmodel = this->dMesh_p->dMeshStatic_p[x];
 					SrModel& model = srSnmodel->shape();
+					model.restoreOriginalVertices();
 					model.scale((float) meshAttr->getValue());
 				}
 			}
