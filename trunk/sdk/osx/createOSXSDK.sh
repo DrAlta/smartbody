@@ -56,4 +56,4 @@ rsync -ap --exclude=".svn" ../../data/scripts/* ./sdk/data/scripts/
 rsync -ap --exclude=".svn" ../../data/mesh/ChrBrad/* ./sdk/data/mesh/ChrBrad/
 rsync -ap --exclude=".svn" ../../data/mesh/ChrRachel/* ./sdk/data/mesh/ChrRachel/
 rsync -ap --exclude=".svn" ../../data/mesh/Sinbad/* ./sdk/data/mesh/Sinbad/
-rsync -ap --exclude=".svn" ../../data/mesh/Orge/* ./sdk/data/mesh/Orge/
+rsync -ap --exclude=".svn" ../../data/mesh/Ogre/* ./sdk/data/mesh/Ogre/
