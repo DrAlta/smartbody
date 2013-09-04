@@ -23,8 +23,10 @@
 #pragma once
 #include <sb/SBTypes.h>
 #include <map>
-#include <sk/sk_skeleton.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBJoint.h>
 #include <sb/SBController.h>
+#include <sb/SBCharacter.h>
 #include "me_ct_limb.hpp"
 #include "me_ct_jacobian_IK.hpp"
 #include "sbm/gwiz_math.h"
@@ -32,9 +34,9 @@
 class EffectorJointConstraint : public EffectorConstraint
 {
 public:	
-	SkJoint*        targetJoint;	
-	SrQuat          rotOffset;
-	SrVec           posOffset;	
+	SmartBody::SBJoint*        targetJoint;	
+	SrQuat					   rotOffset;
+	SrVec					   posOffset;	
 public:
 	EffectorJointConstraint();
 	~EffectorJointConstraint() {}
@@ -89,29 +91,25 @@ public:
 	};
 
 public:	
-	MeCtConstraint(SkSkeleton* skeleton);
+	MeCtConstraint(SmartBody::SBSkeleton* skeleton);
 	~MeCtConstraint(void);
 
 protected:	
 	MeCtJacobianIK       ik;
 	MeCtIKTreeScenario   ik_scenario;
-	SkSkeleton*     _skeleton;
+	SmartBody::SBSkeleton*     _skeleton;
+	SmartBody::SBCharacter*    _sbChar;
 	float 			_duration;
-	SkChannelArray	_channels;
-	SkJoint        *target_joint_ref;
-	std::vector<SkJoint*> targetJointList;
-	//ConstraintList  rotConstraint;
-	//ConstraintList  posConstraint;
+	SkChannelArray	_channels;	
 
 	ConstraintMap   rotConstraint;
 	ConstraintMap   posConstraint;
 
-public:
-	float           characterHeight;
+public:	
 	double          ikDamp;
 public:			
-	void init (SbmPawn* pawn, const char* rootName);
-	bool addEffectorJointPair(SkJoint* targetJoint, const char* effectorName, const char* effectorRootName, const SrVec& posOffset , const SrQuat& rotOffset , ConstraintType cType = CONSTRAINT_POS);
+	void init (SmartBody::SBCharacter* pawn, const char* rootName);
+	bool addEffectorJointPair(SmartBody::SBJoint* targetJoint, const char* effectorName, const char* effectorRootName, const SrVec& posOffset , const SrQuat& rotOffset , ConstraintType cType = CONSTRAINT_POS);
 	virtual void controller_map_updated();
 	virtual void controller_start();	
 	virtual bool controller_evaluate( double t, MeFrameData& frame );

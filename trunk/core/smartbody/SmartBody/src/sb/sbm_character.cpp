@@ -81,6 +81,7 @@
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_reach.hpp>
 #include <controllers/me_ct_example_body_reach.hpp>
+#include <controllers/me_ct_pose_postprocessing.hpp>
 
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_physics_controller.h>
@@ -383,6 +384,9 @@ void SbmCharacter::createStandardControllers()
 	grab_sched_p = CreateSchedulerCt( getName().c_str(), "grab" );
 	param_sched_p = CreateSchedulerCt( getName().c_str(), "param" );
 
+	postprocess_ct = new MeCtPosePostProcessing(sbSkel);
+	postprocess_ct->setName(getName() + "_postprocessController");
+	
 	breathing_p = new MeCtBreathing();
 	breathing_p->setName(getName() + "_breathingController");
 	// add two channels for blendshape-based breathing
@@ -490,6 +494,8 @@ void SbmCharacter::createStandardControllers()
 	posture_sched_p->init(this);
 	motion_sched_p->init(this);
 	param_sched_p->init(this);
+
+	postprocess_ct->init(dynamic_cast<SmartBody::SBCharacter*>(this),"base");
 	//locomotion_ct->init(this);
 	breathing_p->init(this);
 	gaze_sched_p->init(this);
@@ -507,7 +513,7 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( param_animation_ct );
 	ct_tree_p->add_controller( basic_locomotion_ct );
 	ct_tree_p->add_controller( motion_sched_p );
-
+	ct_tree_p->add_controller( postprocess_ct );	
 	ct_tree_p->add_controller( reach_sched_p );	
 	ct_tree_p->add_controller( grab_sched_p );
 	ct_tree_p->add_controller( breathing_p );

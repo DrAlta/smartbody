@@ -61,6 +61,25 @@ void FootStepRecord::updateJointAveragePosition( SBSkeleton* skel, SBMotion* mot
 	motion->disconnect();			
 }
 
+
+JointTrajectory::JointTrajectory()
+{
+
+}
+
+JointTrajectory::~JointTrajectory()
+{
+
+}
+
+JointTrajectory& JointTrajectory::operator=( const JointTrajectory& rt )
+{
+	effectorName = rt.effectorName;
+	refJointName = rt.refJointName ;
+	jointTrajectory = rt.jointTrajectory ;
+	return *this;
+}
+
 SBMotion::SBMotion() : SkMotion()
 {
 	_motionFile = "";
@@ -2215,6 +2234,92 @@ SBAPI const std::string& SBMotion::getMotionSkeletonName()
 	return _motionSkeleton;
 }
 
+SBAPI void SBMotion::buildJointTrajectory( std::string effectorName, std::string refJointName /*= "base" */ )
+{
+	SBSkeleton* motionSkel = SBScene::getScene()->getSkeleton(getMotionSkeletonName());
+	if (!motionSkel)
+	{
+		LOG("Motion skeleton doesn't exist. Cannot compute effector trajectory");
+		return;
+	}
+	SBSkeleton* skelCopy = new SmartBody::SBSkeleton(motionSkel);
+	if (!skelCopy->getJointByName(effectorName) || !skelCopy->getJointByName(refJointName))
+	{
+		LOG("Effector joint '%s' or reference joint '%s' does not exist.", effectorName.c_str(), refJointName.c_str());
+	}
+	JointTrajectory* traj = new JointTrajectory();
+	traj->effectorName = effectorName;
+	traj->refJointName = refJointName;
+	connect(skelCopy);
+	SmartBody::SBJoint* effector = skelCopy->getJointByName(effectorName); // find the global position of end effector
+	SmartBody::SBJoint* refJoint = skelCopy->getJointByName(refJointName); // compute offset relative to ref joint
+	SmartBody::SBJoint* baseJoint = skelCopy->getJointByName("base"); // use base rotation as local frame
+	for (int i=0;i<getNumFrames();i++)
+	{
+		float keyTime = keytime(i);
+		apply(keyTime);		
+		skelCopy->update_global_matrices();
+		SrVec effPos = effector->gmat().get_translation();
+		SrVec refPos = refJoint->gmat().get_translation();
+		SrMat baseRot = baseJoint->gmat().get_rotation();		
+		SrVec trajPos = (effPos-refPos)*baseRot.inverse();
+		traj->jointTrajectory.push_back(trajPos);
+	}
+	disconnect();	
+	trajMap[effectorName] = traj;
+	delete skelCopy; 
+}
+
+SBAPI JointTrajectory* SBMotion::getJointTrajectory( std::string effectorName )
+{
+	if (trajMap.find(effectorName) == trajMap.end())
+	{
+		return NULL;
+	}	
+	return trajMap[effectorName];
+}
+
+
+SBAPI bool SBMotion::getTrajPosition( std::string effectorName, float time, SrVec& outPos )
+{	
+	JointTrajectory* traj = getJointTrajectory(effectorName);
+	if (!traj) return false;
+	int f1,f2;
+	float weight;
+	bool validTime = getInterpolationFrames(time, f1,f2,weight);
+	if (!validTime) return false;
+	if (f1 >= traj->jointTrajectory.size() || f2 >= traj->jointTrajectory.size()) return false;
+	
+	outPos = traj->jointTrajectory[f1]*(1-weight) + traj->jointTrajectory[f2]*weight;
+	return true;
+}
+
+bool SBMotion::getInterpolationFrames( float time, int& f1, int& f2, float& weight )
+{
+	if ( time!= 0.f && time<=_frames[0].keytime )	{
+		return false;
+	}
+
+	float dt = duration() / float(getNumFrames() - 1);
+	int frameId = int(time / dt);	
+	float t1,t2;
+	if (frameId == getNumFrames() -1 ) // last frame
+	{
+		time = _frames[getNumFrames()-1].keytime;		
+		t1 = time;
+		t2 = time+1.f;
+		f1 = f2 = frameId;
+	}
+	else
+	{
+		t1 = _frames[frameId].keytime;	
+		t2 = _frames[frameId+1].keytime;		
+		f1 = frameId;
+		f2 = frameId+1;
+	}	
+	weight = (time - t1)/(t2-t1);
+	return true;	
+}
 bool motionComp(const SBMotion *a, const SBMotion *b)
 {
 	return a->getTransformDepth() < b->getTransformDepth();

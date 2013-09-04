@@ -3,6 +3,7 @@
 #include <sb/SBJoint.h>
 #include <sb/SBScene.h>
 #include <sk/sk_motion.h>
+#include <sb/SBMotion.h>
 #include <queue>
 
 #define ELITE_HACK 0
@@ -262,6 +263,15 @@ float SBRetarget::applyRetargetJointTranslation( std::string jointName, float in
 	return outPos;
 }
 
+
+SBAPI SrVec SBRetarget::applyRetargetJointTrajectory( TrajectoryRecord& trajRecord, SrMat& baseGmat )
+{
+	SrVec outPos = trajRecord.refJointGlobalPos;
+	SrVec outOffset = trajRecord.jointTrajLocalOffset*getHeightRatio();
+	trajRecord.jointTrajGlobalPos = outPos + outOffset*baseGmat.get_rotation();	
+	return trajRecord.jointTrajGlobalPos;
+}
+
 SBAPI std::vector<std::string> SBRetarget::getEndJointNames()
 {
 	return retargetEndJoints;
@@ -281,4 +291,17 @@ SBAPI void SBRetarget::addJointRotOffset( std::string jointName, SrQuat& inQuat 
 {
 	jointRotOffsetMap[jointName] = inQuat;
 }
+
+void SBRetarget::computeJointLengthRatio( std::string jointName, std::string refJointName )
+{
+	SmartBody::SBSkeleton* srcSkel = SmartBody::SBScene::getScene()->getSkeleton(srcSkName);
+	SmartBody::SBSkeleton* tgtSkel = SmartBody::SBScene::getScene()->getSkeleton(tgtSkName);
+	if (!srcSkel || !tgtSkel)
+		return; 
+	SmartBody::SBJoint* srcJoint = srcSkel->getJointByName(jointName);
+	SmartBody::SBJoint* tgtJoint = tgtSkel->getJointByName(jointName);
+
+	// to-do : compute joint length ratio between source skeleton and target skeleton
+}
+
 }

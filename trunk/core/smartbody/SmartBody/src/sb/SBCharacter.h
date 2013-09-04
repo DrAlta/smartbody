@@ -3,6 +3,7 @@
 
 #include <sb/SBTypes.h>
 #include <sb/sbm_character.hpp>
+#include <sb/SBMotion.h>
 
 namespace SmartBody {
 
@@ -77,10 +78,19 @@ class SBCharacter : public SbmCharacter
 	    SBAPI void copy(SBCharacter* origChar);
 		SBAPI void setReach(SmartBody::SBReach* reach);
 		SBAPI SmartBody::SBReach* getReach();
+
+		SBAPI void addJointTrajectoryConstraint(std::string jointName, std::string refJointName);
+		SBAPI TrajectoryRecord* getJointTrajectoryConstraint(std::string jointName);	
+		SBAPI std::vector<std::string> getJointConstraintNames();
+		float getJointTrajBlendWeight() const { return jointTrajBlendWeight; }
+		void setJointTrajBlendWeight(float val) { jointTrajBlendWeight = val; }
 		
 	protected:
 		std::vector<SBBehavior*> _curBehaviors;	
 		SmartBody::SBReach* _reach;
+		std::map<std::string, TrajectoryRecord*> jointTrajMap;
+		float jointTrajBlendWeight;
+		
 };
 
 };

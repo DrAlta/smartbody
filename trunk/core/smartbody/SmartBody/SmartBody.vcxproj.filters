@@ -1099,6 +1099,9 @@
     <ClCompile Include="src\sb\smartbody-dll.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2195,6 +2198,9 @@
     </ClInclude>
     <ClInclude Include="src\sb\SBCharacterListener.h">
       <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp">
+      <Filter>controllers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
