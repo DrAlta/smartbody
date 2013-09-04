@@ -52,6 +52,11 @@ def setupBehaviorSet():
 		if motion != None:
 			motion.setMotionSkeletonName('ChrBackovic.sk')
 			zebra2Map.applyMotion(motion)
+			#motion.buildJointTrajectory('l_forefoot','base')
+			#motion.buildJointTrajectory('r_forefoot','base')
+			#motion.buildJointTrajectory('l_ankle','base')
+			#motion.buildJointTrajectory('r_ankle','base')
+
 
 def retargetBehaviorSet(charName):
 
@@ -94,6 +99,15 @@ def retargetBehaviorSet(charName):
 	locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn90Rt01")
 	locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn180Rt01")
 	
+	for i in range(0, len(locoMotions)):
+		motion = scene.getMotion(locoMotions[i])
+		#print 'motionName = ' + locoMotions[i]
+		if motion != None:
+			motion.buildJointTrajectory('l_forefoot','base')
+			motion.buildJointTrajectory('r_forefoot','base')
+			motion.buildJointTrajectory('l_ankle','base')
+			motion.buildJointTrajectory('r_ankle','base')
+			
 	
 	'''	
 	outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';

@@ -45,6 +45,10 @@ def setupBehaviorSet():
 	for i in range(0, len(locoMotions)):
 		motion = scene.getMotion(locoMotions[i])
 		motion.setMotionSkeletonName('test_utah.sk')
+		motion.buildJointTrajectory('l_forefoot','base')
+		motion.buildJointTrajectory('r_forefoot','base')
+		motion.buildJointTrajectory('l_ankle','base')
+		motion.buildJointTrajectory('r_ankle','base')
 
 def retargetBehaviorSet(charName):			
 	#outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';
