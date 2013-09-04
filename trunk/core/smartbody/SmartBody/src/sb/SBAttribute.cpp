@@ -1090,6 +1090,10 @@ void ActionAttribute::setValue()
 	notifyObservers();
 }
 
+void ActionAttribute::setValueFast()
+{
+}
+
 std::string ActionAttribute::write()
 {
 	SBAttributeInfo* info = this->getAttributeInfo();

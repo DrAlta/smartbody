@@ -260,6 +260,7 @@ class ActionAttribute : public SBAttribute
 		SBAPI ~ActionAttribute();
 
 		SBAPI void setValue();
+		SBAPI void setValueFast();
 
 		SBAPI virtual std::string write();
 		SBAPI virtual void read();

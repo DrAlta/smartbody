@@ -30,6 +30,8 @@ SBPawn::SBPawn() : SbmPawn()
 	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
 	createStringAttribute("mesh", "", true, "Display", 400, false, false, false, "Geometry/mesh");
 	createDoubleAttribute("meshScale", 1.0, true, "Display", 410, false, false, false, "Scale of geometry/mesh");
+	createVec3Attribute("meshTranslate", 0.0, 0.0, 0.0, true, "Display", 420, false, false, false, "Mesh translation offset");
+	createVec3Attribute("meshRotation", 0.0, 0.0, 0.0, true, "Display", 430, false, false, false,  "Mesh rotation offset");
 	createActionAttribute("createPhysics", true, "Physics", 300, false, false, false, "Initializes the pawn as a physics object.");
 	createBoolAttribute("enablePhysics", false, true, "Physics", 310, false, false, false, "Enables or disables physics for this pawn.");
 	std::vector<std::string> shapes;
@@ -60,6 +62,8 @@ SBPawn::SBPawn(const char* name) : SbmPawn(name)
 	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
 	createStringAttribute("mesh", "", true, "Display", 400, false, false, false, "Geometry/mesh");
 	createDoubleAttribute("meshScale", 1.0, true, "Display", 410, false, false, false, "Scale of geometry/mesh");
+	createVec3Attribute("meshTranslation", 0.0, 0.0, 0.0, true, "Display", 420, false, false, false, "Mesh translation offset");
+	createVec3Attribute("meshRotation", 0.0, 0.0, 0.0, true, "Display", 430, false, false, false,  "Mesh rotation offset");
 	createActionAttribute("createPhysics", true, "Physics", 300, false, false, false, "Initializes the pawn as a physics object.");
 	createBoolAttribute("enablePhysics", false, true, "Physics", 310, false, false, false, "Enables or disables physics for this pawn.");
 	std::vector<std::string> shapes;
@@ -342,8 +346,37 @@ void SBPawn::notify(SBSubject* subject)
 				{
 					SrSnModel* srSnmodel = this->dMesh_p->dMeshStatic_p[x];
 					SrModel& model = srSnmodel->shape();
-					model.restoreOriginalVertices();
+					if (model.VOrig.size() == 0)
+						model.saveOriginalVertices();
+					else
+						model.restoreOriginalVertices();
 					model.scale((float) meshAttr->getValue());
+				}
+			}
+		}
+		else if (attribute->getName() == "meshTranslation")
+		{
+			SmartBody::Vec3Attribute* meshAttr = dynamic_cast<SmartBody::Vec3Attribute*>(attribute);
+			if (this->dMesh_p)
+			{
+				for (size_t x = 0; x < this->dMesh_p->dMeshStatic_p.size(); x++)
+				{
+					SrSnModel* srSnmodel = this->dMesh_p->dMeshStatic_p[x];
+					SrModel& model = srSnmodel->shape();
+					model.translate(meshAttr->getValue());
+				}
+			}
+		}
+		else if (attribute->getName() == "meshRotation")
+		{
+			SmartBody::Vec3Attribute* meshAttr = dynamic_cast<SmartBody::Vec3Attribute*>(attribute);
+			if (this->dMesh_p)
+			{
+				for (size_t x = 0; x < this->dMesh_p->dMeshStatic_p.size(); x++)
+				{
+					SrSnModel* srSnmodel = this->dMesh_p->dMeshStatic_p[x];
+					SrModel& model = srSnmodel->shape();
+					// need to add rotation
 				}
 			}
 		}
