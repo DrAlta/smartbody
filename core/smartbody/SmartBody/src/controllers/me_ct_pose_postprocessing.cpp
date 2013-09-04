@@ -68,6 +68,11 @@ bool MeCtPosePostProcessing::controller_evaluate( double t, MeFrameData& frame )
 
 	prev_time = (float)t;	
 
+	std::vector<std::string> consNames = _sbChar->getJointConstraintNames();
+	if (consNames.size() == 0) // if the character doesn't have any constraints, don't solve IK
+		return true;
+
+
 	updatePoseConstraint(); // update the joint trajectory as constraints
 
 	ConstraintMap::iterator ci;
