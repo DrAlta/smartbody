@@ -164,6 +164,7 @@ set( SMARTBODY_LIB_ME_SRC
         ./SmartBody/controllers/me_ct_unary.cpp
         ./SmartBody/controllers/me_default_prune_policy.cpp
         ./SmartBody/controllers/me_spline_1d.cpp
+	./SmartBody/controllers/me_ct_pose_postprocessing.cpp
 )
 
 set( SMARTBODY_LIB_SK_SRC
