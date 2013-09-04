@@ -1,7 +1,7 @@
 # make using standard cmake
 mkdir -p buildCMake
 cd buildCMake
-cmake ..
+/usr/local/bin/cmake ..
 make
 make install
 cd ..
