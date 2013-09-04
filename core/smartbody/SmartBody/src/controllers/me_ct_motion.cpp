@@ -348,10 +348,10 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 		continuing = motionTime <= dur;
 	}	
 	SmartBody::SBRetarget* retarget = NULL;
+	SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(_motion);
 	if (_character)
 	{
-		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-		SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(_motion);
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();		
 		if (sbMotion)
 			retarget = scene->getRetargetManager()->getRetarget(sbMotion->getMotionSkeletonName(),_character->getSkeleton()->getName());	
 		if (retarget)
@@ -371,51 +371,46 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	//				&_mChan_to_buff,
 	//	            _play_mode, &_last_apply_frame );	
 	//LOG("dt = %f, motionTime = %f, curMotionTime = %f, dur = %f, continue = %d",dt, motionTime, curMotionTime, dur, continuing);
-	_motion->apply( float(curMotionTime + _offset),
+	float motionTime = float(curMotionTime + _offset);
+	_motion->apply( motionTime,
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
 		            _play_mode, &_last_apply_frame, _isAdditive, retarget );
 
-	SkChannelArray& allChannels = _motion->channels();
-
-#define TEST_ONLINE_RETARGET 0
-#if TEST_ONLINE_RETARGET
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	SmartBody::SBRetarget* retarget = scene->getRetargetManager()->getRetarget("ChrBrad.sk","player.dae");	
-	if (retarget)
+#if 0 // disable IK post-processing for posture/motion by default
+	if (retarget && sbMotion)
 	{
-		for (int i=0; i< allChannels.size();i++)
+		std::vector<std::string> jointConsNames = _character->getJointConstraintNames();
+		SmartBody::SBJoint* baseJoint = _character->getSkeleton()->getJointByName("base");
+		SrMat baseGmat;
+		if (baseJoint)
+			baseGmat = baseJoint->gmat();		
+		for (unsigned int i=0;i<jointConsNames.size();i++)
 		{
-			SkChannel& chan = allChannels[i];		
-			std::string cname = allChannels.name(i);
-			int index = _mChan_to_buff[i];	
-			if (index >=0 && index < frame.buffer().size())
-			{
-				if (chan.type == SkChannel::Quat)
-				{
-					SrQuat finalQ, initQ;
+			SmartBody::TrajectoryRecord* trajRecord = _character->getJointTrajectoryConstraint(jointConsNames[i]);
+			if (!trajRecord)
+				continue;
+			
+			SmartBody::SBJoint* refJoint = _character->getSkeleton()->getJointByName(trajRecord->refJointName);
+			if (!refJoint)
+				continue;			
 
-					initQ.w = frame.buffer()[ index + 0 ] ;
-					initQ.x = frame.buffer()[ index + 1 ] ;
-					initQ.y = frame.buffer()[ index + 2 ] ;
-					initQ.z = frame.buffer()[ index + 3 ] ;
-
-					//initQ = SrQuat();
-					finalQ = retarget->applyRetargetJointRotation(cname,initQ);
-
-					frame.buffer()[ index + 0 ] = (float)finalQ.w;
-					frame.buffer()[ index + 1 ] = (float)finalQ.x;
-					frame.buffer()[ index + 2 ] = (float)finalQ.y;
-					frame.buffer()[ index + 3 ] = (float)finalQ.z;
-				}
-				else if (chan.type == SkChannel::XPos || chan.type == SkChannel::YPos || chan.type == SkChannel::ZPos)
-				{
-					frame.buffer()[ index ] = retarget->applyRetargetJointTranslation(cname,frame.buffer()[index]);
-				}
-			}					
+			SrVec trajOffset;
+			bool hasTraj = sbMotion->getTrajPosition(jointConsNames[i],motionTime,trajOffset);
+			if (!hasTraj)
+			{	
+				trajRecord->isEnable = false;
+				continue;
+			}
+			trajRecord->isEnable = true;
+			trajRecord->jointTrajLocalOffset = trajOffset;
+			trajRecord->refJointGlobalPos = refJoint->gmat().get_translation(); 
+			retarget->applyRetargetJointTrajectory(*trajRecord,baseGmat);			
 		}
 	}
 #endif
+
+	SkChannelArray& allChannels = _motion->channels();
 	for (int i = 0; i < allChannels.size(); ++i)
 	{		
 		frame.channelUpdated(i);

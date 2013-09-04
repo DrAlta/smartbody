@@ -124,6 +124,7 @@ class PAWoManager : public PAMotions
 		bool firstTime;
 		std::vector<SrMat>	baseMats;
 		std::vector<SrMat>	baseTransitionMats;
+		std::vector<SrMat>  baseDiffMats;
 		bool intializeTransition;
 		SrMat baseTransformMat;
 		SrMat firstBaseTransformMat;
@@ -151,6 +152,7 @@ class PAInterpolator : public PAMotions
 		~PAInterpolator();
 
 		std::vector<std::string> joints;	// joints to be blended, if this is defined which means partial, world offset would be ignored
+		std::vector<SrMat> processedBaseMats;
 
 	public:
 		void blending(std::vector<double>& times, SrBuffer<float>& buff);
@@ -158,7 +160,7 @@ class PAInterpolator : public PAMotions
 		void setBlendingJoints(std::vector<std::string>& j);
 
 	private:
-		void handleBaseMatForBuffer(SrBuffer<float>& buff);
+		SrMat handleBaseMatForBuffer(SrBuffer<float>& buff);
 };
 
 class PABlend;
@@ -184,6 +186,8 @@ class PABlendData
 
 		bool isPartialBlending();
 		bool isZeroDState();
+		SBAPI bool getTrajPosition(std::string effectorName, float time, SrVec& outPos);
+
 		std::vector<double> weights;
 
 		PATimeManager* timeManager;
@@ -220,6 +224,7 @@ class PATransitionManager
 		void update();
 		double getSlope();
 		int getNumEaseOut();
+		float getCurrentTransitionWeight();
 		bool blendingMode;
 		bool active;
 		bool startTransition;

@@ -275,12 +275,50 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 			
 				transitionManager->blending(frame.buffer(), buffer1, buffer2, transformMat, curBaseMat, nextBaseMat, timeStep, _context, directPlay);
 				transitionManager->step(timeStep*playSpeed);
+
+				// a hack to also transition the IK post-processing results from/to pseudo-idle pose
+				if (curStateData->getStateName() == PseudoIdleState)
+				{
+					character->setJointTrajBlendWeight(1.f - transitionManager->getCurrentTransitionWeight());
+					updateJointTrajectory(nextStateData);	
+				}
+				else if (nextStateData->getStateName() == PseudoIdleState)
+				{
+					character->setJointTrajBlendWeight(transitionManager->getCurrentTransitionWeight());	
+					updateJointTrajectory(curStateData);	
+				}
+				else // blend the joint trajectory from current state to next state
+				{
+					updateJointTrajectory(curStateData);
+					std::vector<SrVec> curStatePosList;
+					std::vector<std::string> jointConsNames = character->getJointConstraintNames();
+					for (unsigned int i=0;i<jointConsNames.size();i++)
+					{
+						SmartBody::TrajectoryRecord* traj = character->getJointTrajectoryConstraint(jointConsNames[i]);
+						curStatePosList.push_back(traj->jointTrajGlobalPos);
+					}
+					updateJointTrajectory(nextStateData);
+
+					float transitionWeight = transitionManager->getCurrentTransitionWeight();
+					for (unsigned int i=0;i<jointConsNames.size();i++)
+					{
+						SmartBody::TrajectoryRecord* traj = character->getJointTrajectoryConstraint(jointConsNames[i]);
+						traj->jointTrajGlobalPos = traj->jointTrajGlobalPos*(1.f-transitionWeight) + curStatePosList[i]*transitionWeight;
+					}
+				}
+
+
 				if (!curStateData->isPartialBlending() && !nextStateData->isPartialBlending())
 					updateWo(transformMat, woWriter, frame.buffer());
 				return true;
 			}
-			else
+			else // finish transition
 			{
+				//if (curStateData->getStateName() == PseudoIdleState)
+				//	character->setJointTrajBlendWeight(1.f);
+				//else if (nextStateData->getStateName() == PseudoIdleState)
+				//	character->setJointTrajBlendWeight(0.f);
+
 				delete transitionManager;
 				transitionManager = NULL;
 				delete curStateData;
@@ -342,8 +380,13 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				JointChannelId baseChanID, baseBuffId;
 				baseChanID.y = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::YPos);	
 				baseBuffId.y = _context->toBufferIndex(baseChanID.y);	
-				frame.buffer()[baseBuffId.y] = woYOffset;				
+				frame.buffer()[baseBuffId.y] = woYOffset;	
+
+					
 			}
+
+			// update IK trajectory			
+			updateJointTrajectory(curStateData);		
 #endif				
 			return true;
 		}
@@ -955,6 +998,54 @@ void MeCtParamAnimation::updateIK( PABlendData* curBlendData, SrMat& woMat, SrMa
 	moAnalysis->applyIKFix(ikScenario, character, curBlendData->weights, curBlendData->timeManager, woMat, smoothVel, smoothAngVel, inputFrame, outputFrame);
 
 	updateMotionFrame(outputFrame, ikScenario, buff, false);	
+}
+
+void MeCtParamAnimation::updateJointTrajectory( PABlendData* blendData )
+{	
+	std::vector<std::string> jointConsNames = character->getJointConstraintNames();
+	SmartBody::SBJoint* baseJoint = character->getSkeleton()->getJointByName("base");
+	SrMat baseGmat;
+	character->getSkeleton()->update_global_matrices();
+	if (baseJoint && baseJoint->getParent())
+	{		
+		baseGmat = baseJoint->gmat();//baseJoint->getParent()->gmat();		
+	}
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
+	SmartBody::SBAnimationBlend* animBlend = dynamic_cast<SmartBody::SBAnimationBlend*>(blendData->state);
+
+	SmartBody::SBRetarget* retarget = NULL;
+	if (animBlend)
+	{
+		SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();			
+		retarget = retargetManager->getRetarget(animBlend->getBlendSkeleton(),character->getSkeleton()->getName());
+	}
+	
+	if (!retarget)
+		return;
+
+	for (unsigned int i=0;i<jointConsNames.size();i++)
+	{
+		SmartBody::TrajectoryRecord* trajRecord = character->getJointTrajectoryConstraint(jointConsNames[i]);
+		if (!trajRecord)
+			continue;
+
+		SmartBody::SBJoint* refJoint = character->getSkeleton()->getJointByName(trajRecord->refJointName);
+		if (!refJoint)
+			continue;			
+		SrVec trajOffset;
+		bool hasTraj = blendData->getTrajPosition(jointConsNames[i],0.f,trajOffset);
+		if (!hasTraj)
+		{	
+			trajRecord->isEnable = false;
+			continue;
+		}
+		trajRecord->isEnable = true;
+		trajRecord->jointTrajLocalOffset = trajOffset;
+		trajRecord->refJointGlobalPos = baseGmat.get_translation();//refJoint->gmat().get_translation(); 
+		if (retarget)
+			retarget->applyRetargetJointTrajectory(*trajRecord,baseGmat);			
+	}
 }
 
 void MeCtParamAnimation::updateMotionFrame( BodyMotionFrame& motionFrame, MeCtIKTreeScenario& ikScenario, SrBuffer<float>& buff, bool readData /*= true*/ )

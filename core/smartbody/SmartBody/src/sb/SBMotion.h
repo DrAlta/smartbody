@@ -6,6 +6,9 @@
 #include <string>
 #include <sk/sk_motion.h>
 
+
+
+
 namespace SmartBody {
 
 class SBJoint;
@@ -27,7 +30,28 @@ class FootStepRecord
 		std::vector<SrVec> posVec; // desired positions for these joints
 		float startTime;
 		float endTime;	
+};
 
+class JointTrajectory
+{	
+public:
+	JointTrajectory();
+	~JointTrajectory();
+	JointTrajectory& operator= ( const JointTrajectory& rt);
+	std::vector<SrVec> jointTrajectory;
+	std::string effectorName;
+	std::string refJointName; // joint trajectory is computed as the offset vector relative to the refJoint position
+};
+
+class TrajectoryRecord
+{
+public:
+	SrVec jointTrajLocalOffset;
+	SrVec jointTrajGlobalPos;
+	SrVec refJointGlobalPos;
+	std::string effectorName;
+	std::string refJointName;
+	bool isEnable;
 };
 
 class SBMotion : public SkMotion
@@ -126,9 +150,13 @@ class SBMotion : public SkMotion
 		SBAPI void addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly);
 		int getTransformDepth() const { return transformDepth; }		
 		void setTransformDepth(int depth) { transformDepth = depth; }
+		SBAPI void buildJointTrajectory(std::string effectorName, std::string refJointName = "base" );
+		SBAPI JointTrajectory* getJointTrajectory(std::string effectorName);
+		SBAPI bool getTrajPosition(std::string effectorName, float time, SrVec& outPos);		
+
 	protected:
 		void alignToSide(int numFrames, int direction = 0);
-
+		bool getInterpolationFrames(float time, int& f1, int& f2, float& weight);
 		static bool kMeansClustering1D(int num, std::vector<double>& inputPoints, std::vector<double>& outMeans);
 		static void calculateMeans(std::vector<double>&inputPoints, std::vector<double>& means, double convergentValue);
 
@@ -139,6 +167,8 @@ class SBMotion : public SkMotion
 		std::string _motionSkeleton;
 		int alignIndex;
 		std::map<std::string, std::string> tagAttrMap; // store the tagged attributes in a map
+		std::map<std::string, JointTrajectory*> trajMap;
+		
 		MotionType _motionType;
 		float _scale;
 

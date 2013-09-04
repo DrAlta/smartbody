@@ -28,6 +28,7 @@
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBEvent.h>
 #include <sb/SBScene.h>
+#include <sb/SBMotion.h>
 #include <math.h>
 
 const double timeThreshold = 0.05;
@@ -543,6 +544,9 @@ PAInterpolator::PAInterpolator()
 
 PAInterpolator::PAInterpolator(PABlendData* data) : PAMotions(data)
 {
+	int numMotions = getNumMotions();
+	if (numMotions > 0)
+		processedBaseMats.resize(numMotions);
 }
 
 PAInterpolator::~PAInterpolator()
@@ -559,9 +563,11 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 			indices.push_back(i);
 	}
 
-	SrBuffer<float> buffer;
-	buffer.size(buff.size());
+	
 
+	SrBuffer<float> buffer;
+	buffer.size(buff.size());	
+	processedBaseMats.clear();
 	if (indices.size() == 0 && blendData->getStateName() == PseudoIdleState)
 	{
 		handleBaseMatForBuffer(buff);
@@ -573,6 +579,7 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 		int id = indices[0];
 		double time = times[id];
 		getBuffer(blendData->state->motions[id], time, motionContextMaps[id], buffer);
+		//processedBaseMats[0] = handleBaseMatForBuffer(buffer);
 		handleBaseMatForBuffer(buffer);
 	}
 	else
@@ -588,6 +595,7 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 			b.size(buff.size());
 			b = buff;
 			getBuffer(blendData->state->motions[indices[i]], times[indices[i]], motionContextMaps[indices[i]], b);
+			//processedBaseMats[i] = handleBaseMatForBuffer(b);
 			handleBaseMatForBuffer(b);
 		}
 		buffer = buffers[0];
@@ -706,12 +714,13 @@ void PAInterpolator::setBlendingJoints(std::vector<std::string>& j)
 }
 
 
-void PAInterpolator::handleBaseMatForBuffer(SrBuffer<float>& buffer)
+SrMat PAInterpolator::handleBaseMatForBuffer(SrBuffer<float>& buffer)
 {
 	SrMat baseMat = getBaseMatFromBuffer(buffer);
 	SrMat processedBaseMat;
 	getProcessedMat(processedBaseMat, baseMat);
 	setBufferByBaseMat(processedBaseMat, buffer);
+	return processedBaseMat;
 }
 
 PAWoManager::PAWoManager()
@@ -726,6 +735,7 @@ PAWoManager::PAWoManager(PABlendData* data) : PAMotions(data)
 		SrMat mat;
 		baseMats.push_back(mat);
 	}
+	baseDiffMats.resize(baseMats.size());
 	intializeTransition = false;
 }
 
@@ -759,8 +769,11 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 		{
 			int id = indices[0];
 			if (timeDiffs[id] > 0)
+			{
 				//baseTransformMat = currentBaseMats[id] * baseMats[id].inverse();
 				baseTransformMat = currentBaseMats[id] * baseMats[id].rigidInverse();
+				baseDiffMats[id] = baseTransformMat;
+			}
 			else
 			{
 				//LOG("loop back to beginning");
@@ -775,7 +788,7 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 		}
 		else
 		{
-			std::vector<SrMat> mats;
+			//std::vector<SrMat> mats;
 			int numMotions = indices.size();
 			if (numMotions == 0)
 				return;
@@ -795,9 +808,10 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 					mat = newCurrentBase * baseMats[indices[i]].inverse();
 				}
 	#endif
-				mats.push_back(mat);
+				//mats.push_back(mat);
+				baseDiffMats[i] = mat;
 			}
-			SrMat tempMat = mats[0];
+			SrMat tempMat = baseDiffMats[0];
 			for (int i = 1; i < numMotions; i++)
 			{
 				double prevWeight = 0.0;
@@ -805,7 +819,7 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 					prevWeight += blendData->weights[indices[j]];
 				double w = prevWeight / (blendData->weights[indices[i]] + prevWeight);
 				SrMat mat = tempMat;
-				matInterp(tempMat, mat, mats[i], (float)(w));
+				matInterp(tempMat, mat, baseDiffMats[i], (float)(w));
 			}
 			baseTransformMat = tempMat;					
 		}
@@ -980,6 +994,24 @@ PABlendData::~PABlendData()
 	woManager = NULL;
 }
 
+
+SBAPI bool PABlendData::getTrajPosition( std::string effectorName, float time, SrVec& outPos )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	outPos = SrVec(0,0,0);	
+	for (unsigned int i=0;i<weights.size();i++)
+	{
+		SmartBody::SBMotion* sbMotion = scene->getMotion(state->getMotionName(i));
+		SrVec moPos;
+		bool hasTraj = sbMotion->getTrajPosition(effectorName,timeManager->motionTimes[i],moPos);
+		if (!hasTraj)
+			return false;
+		//moPos = moPo;
+		outPos += moPos*weights[i];				
+	}	
+	return true;
+}
+
 void PABlendData::evaluateTransition( double timeStep, SrBuffer<float>& buffer, bool tranIn )
 {
 	if (state && getStateName() == PseudoIdleState) // transition 
@@ -1085,6 +1117,7 @@ bool PABlendData::isZeroDState()
 	SmartBody::SBAnimationBlend0D* zeroBlend = dynamic_cast<SmartBody::SBAnimationBlend0D*>(state);
 	return (zeroBlend != NULL);
 }
+
 
 PATransitionManager::PATransitionManager(float transitionLen)
 {
@@ -1212,6 +1245,12 @@ void PATransitionManager::blending( SrBuffer<float>& buffer, SrBuffer<float>&buf
 		mat = mat1*mat2;
 	else
 		PAWoManager::matInterp(mat, mat1, mat2, (float)w);		
+}
+
+
+float PATransitionManager::getCurrentTransitionWeight()
+{
+	return (float)curve->evaluate(localTime);
 }
 
 void PATransitionManager::update()

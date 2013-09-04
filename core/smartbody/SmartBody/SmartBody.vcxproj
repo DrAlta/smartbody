@@ -473,6 +473,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\sr\sr_vec.cpp" />
     <ClCompile Include="..\SmartBody\src\sr\sr_vec2.cpp" />
     <ClCompile Include="..\SmartBody\src\sr\sr_viewer.cpp" />
+    <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp" />
     <ClCompile Include="src\sb\smartbody-c-dll.cpp" />
     <ClCompile Include="src\sb\smartbody-dll.cpp" />
   </ItemGroup>
@@ -839,6 +840,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\SmartBody\src\sr\sr_vec.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_vec2.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_viewer.h" />
+    <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp" />
     <ClInclude Include="src\sb\SBCharacterListener.h" />
     <ClInclude Include="src\sb\smartbody-c-dll.h" />
     <ClInclude Include="src\sb\smartbody-dll.h" />

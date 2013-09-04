@@ -36,6 +36,7 @@
 
 #include "controllers/me_ct_constraint.hpp"
 #include "controllers/me_controller_tree_root.hpp"
+#include <sb/SBCharacter.h>
 
 #include "bml_target.hpp"
 #include "bml_xml_consts.hpp"
@@ -117,12 +118,11 @@ BehaviorRequestPtr BML::parse_bml_constraint( DOMElement* elem, const std::strin
 	bool bCreateNewController = false;
 	if (!constraintCt)
 	{
-		constraintCt = new MeCtConstraint(request->actor->_skeleton);	
-		SbmCharacter* chr = const_cast<SbmCharacter*>(request->actor);
-		float characterHeight = chr->getHeight();
-		constraintCt->characterHeight = characterHeight;
+		SmartBody::SBCharacter* chr = dynamic_cast<SmartBody::SBCharacter*>(const_cast<SbmCharacter*>(request->actor));
+		constraintCt = new MeCtConstraint(chr->getSkeleton());			
+		float characterHeight = chr->getHeight();		
 		constraintCt->handle(handle);
-		constraintCt->init( const_cast<SbmCharacter*>(request->actor),rootJointName.c_str() );
+		constraintCt->init( chr,rootJointName.c_str() );
 		bCreateNewController = true;
 	}
 
@@ -138,7 +138,7 @@ BehaviorRequestPtr BML::parse_bml_constraint( DOMElement* elem, const std::strin
 		}
 		
 		constraintCt->addEffectorJointPair(
-			const_cast<SkJoint*>(target_joint),
+			dynamic_cast<SmartBody::SBJoint*>(const_cast<SkJoint*>(target_joint)),
 			effectorName.c_str(),
 			effectorRootName.c_str(),
 			posOffset,

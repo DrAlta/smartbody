@@ -8,9 +8,14 @@
 #include <vector>
 #include <map>
 
+
+
 namespace SmartBody {
 
 typedef std::pair<SrQuat,SrQuat> QuatPair;
+typedef std::pair<std::string,std::string> StringPair;
+class TrajectoryRecord;
+
 class SBRetarget
 {
 	public:
@@ -20,12 +25,14 @@ class SBRetarget
 		SBAPI bool initRetarget(std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints);
 		SBAPI SrQuat applyRetargetJointRotation(std::string jointName, SrQuat& inQuat);
 		SBAPI SrQuat applyRetargetJointRotationInverse(std::string jointName, SrQuat& inQuat);
-		SBAPI float  applyRetargetJointTranslation(std::string jointName, float inPos);
+		SBAPI float  applyRetargetJointTranslation(std::string jointName, float inPos);		
+		SBAPI SrVec  applyRetargetJointTrajectory(TrajectoryRecord& trajRecord, SrMat& baseGmat);
 		SBAPI std::vector<std::string> getEndJointNames();
 		SBAPI std::vector<std::string> getRelativeJointNames();
 		SBAPI float getHeightRatio();
 		SBAPI void addJointRotOffset(std::string jointName, SrQuat& inQuat);
-
+	protected:
+		void computeJointLengthRatio(std::string jointName, std::string refJointName);
 	protected:
 		std::string srcSkName;
 		std::string tgtSkName;
@@ -36,6 +43,7 @@ class SBRetarget
 		std::vector<std::string> retargetEndJoints;
 		std::vector<std::string> retargetRelativeJoints;		
 		float heightRatio;
+		std::map<StringPair, float> jointLengthRatioMap;
 };
 
 }

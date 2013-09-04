@@ -198,7 +198,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	StringAttribute* saccadePolicyAttribute = createStringAttribute("saccadePolicy", "stopinutterance", true, "Speech", 501, false, false, false, "How saccade is handled during utterance");
 	saccadePolicyAttribute->setValidValues(saccadePolicy);
 	createDoubleAttribute("saccadeTurnOnDelay", 2, true, "Speech", 502, false, false, false, "delay saccade turn on after utterance.");
-
+	jointTrajBlendWeight = 0.f;
 	_reach = NULL;
 }
 
@@ -898,4 +898,37 @@ std::string SBCharacter::getPostureName()
 	return "";
 }
 
+SBAPI void SBCharacter::addJointTrajectoryConstraint( std::string jointName, std::string refJointName )
+{
+	if (jointTrajMap.find(jointName) == jointTrajMap.end())
+	{
+		jointTrajMap[jointName] = new TrajectoryRecord();
+	}
+	TrajectoryRecord* trajRecord = jointTrajMap[jointName];
+	trajRecord->effectorName = jointName;
+	trajRecord->refJointName = refJointName;
+	trajRecord->isEnable = true;
+}
+
+SBAPI TrajectoryRecord* SBCharacter::getJointTrajectoryConstraint( std::string jointName )
+{
+	if (jointTrajMap.find(jointName) == jointTrajMap.end())
+	{
+		return NULL;
+	}
+	return jointTrajMap[jointName];
+}
+
+SBAPI std::vector<std::string> SBCharacter::getJointConstraintNames()
+{
+	std::map<std::string, TrajectoryRecord*>::iterator mi;
+	std::vector<std::string> jointConsNames;
+	for ( mi  = jointTrajMap.begin();
+		  mi != jointTrajMap.end();
+		  mi++)
+	{
+		jointConsNames.push_back(mi->first);
+	}
+	return jointConsNames;
+}
 };

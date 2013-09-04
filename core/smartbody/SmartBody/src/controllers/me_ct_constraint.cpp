@@ -143,7 +143,7 @@ void FadingControl::updateDt( float curTime )
 }
 
 
-MeCtConstraint::MeCtConstraint( SkSkeleton* skeleton )  : FadingControl()
+MeCtConstraint::MeCtConstraint( SmartBody::SBSkeleton* skeleton )  : FadingControl()
 {
 	_skeleton = skeleton;
 	prev_time = -1.0;	
@@ -191,21 +191,21 @@ void MeCtConstraint::updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>
 }
 
 
-void MeCtConstraint::init(SbmPawn* pawn, const char* rootJointName)
+void MeCtConstraint::init(SmartBody::SBCharacter* sbChar, const char* rootJointName)
 {
 	assert(_skeleton);	
 	// root is "world_offset", so we use root->child to get the base joint.
-	SkJoint* rootJoint = _skeleton->search_joint(rootJointName);//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("base"); // test for now
+	SmartBody::SBJoint* rootJoint = _skeleton->getJointByName(rootJointName);//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("base"); // test for now
 	if (!rootJoint)
-		rootJoint = _skeleton->root()->child(0); // use base joint by default
+		rootJoint = dynamic_cast<SmartBody::SBJoint*>(_skeleton->root()->child(0)); // use base joint by default
 
+	_sbChar = sbChar;
 	std::vector<std::string> stopJoints;
 	ik_scenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);
 	ik_scenario.ikPosEffectors = &posConstraint;
 	ik_scenario.ikRotEffectors = &rotConstraint;
 
-	const IKTreeNodeList& nodeList = ik_scenario.ikTreeNodes;	
-
+	const IKTreeNodeList& nodeList = ik_scenario.ikTreeNodes;		
 // 	for (int i=0;i<3;i++)
 // 		_channels.add(rootJoint->name().get_string(), (SkChannel::Type)(SkChannel::XPos+i));
 	for (unsigned int i=0;i<nodeList.size();i++)
@@ -214,9 +214,9 @@ void MeCtConstraint::init(SbmPawn* pawn, const char* rootJointName)
 		_channels.add(joint->getMappedJointName(), SkChannel::Quat);	
 	}	
 
-	double ikReachRegion = characterHeight*0.02f;		
+	double ikReachRegion = _sbChar->getHeight()*0.02f;		
 	ikDamp        = ikReachRegion*ikReachRegion*14.0;
-	MeController::init(pawn);
+	MeController::init(sbChar);
 }
 
 void MeCtConstraint::controller_map_updated() 
@@ -333,7 +333,7 @@ void MeCtConstraint::print_state(int tabs)
 {
 }
 
-bool MeCtConstraint::addEffectorJointPair( SkJoint* targetJoint, const char* effectorName, const char* effectorRootName, const SrVec& posOffset, const SrQuat& rotOffset, ConstraintType cType )
+bool MeCtConstraint::addEffectorJointPair( SmartBody::SBJoint* targetJoint, const char* effectorName, const char* effectorRootName, const SrVec& posOffset, const SrQuat& rotOffset, ConstraintType cType )
 {
 	MeCtIKTreeNode* node = ik_scenario.findIKTreeNode(effectorName);
 	MeCtIKTreeNode* rootNode = ik_scenario.findIKTreeNode(effectorRootName);	

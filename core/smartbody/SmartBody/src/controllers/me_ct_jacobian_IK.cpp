@@ -497,10 +497,10 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 		SrVec constraintDir = constraintOffset; constraintDir.normalize();
 		float chainLength = s->getIKChainLength(cons->rootName.c_str(), cons->efffectorName.c_str());
 		//LOG("rootNodePos = %s, constarintDir = %s, chainLength = %f",rootNode->getGlobalPos().toString().c_str(), constraintDir.toString().c_str(), chainLength);
-  		if (constraintOffset.len() > chainLength)
-  		{
-  			constraintPos = rootNode->getGlobalPos() + constraintDir*chainLength*0.995f; // make sure the target position is not out of reach 			
-  		}	
+//   		if (constraintOffset.len() > chainLength)
+//   		{
+//   			constraintPos = rootNode->getGlobalPos() + constraintDir*chainLength*0.995f; // make sure the target position is not out of reach 			
+//   		}	
 
 		SrVec offset = constraintPos - endPos;				
 		SrVec targetPos;	
@@ -524,6 +524,7 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 		if (endNode->nodeName == cons->rootName)
 			bStop = true;
 
+		float consWeight = cons->constraintWeight;
 		while(node && node->parent && !bStop) // no root node
 		{
 			int idx = node->validNodeIdx;			
@@ -550,7 +551,7 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 			//parentMat = parentMat*prerot;
 
 			SrVec nodePos = SrVec(nodeMat.get(12),nodeMat.get(13),nodeMat.get(14));
-			SrVec axis[3];
+			SrVec axis[3];			
 			for (int k=0;k<3;k++)
 			{				
 				//axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->parent()->gmatZero().get_rotation()*node->joint->gmatZero().get_rotation().inverse();				
@@ -558,9 +559,9 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 				//axis[k] = SrVec(parentMat.get(k,0),parentMat.get(k,1),parentMat.get(k,2))*node->joint->gmatZero().get_rotation()*node->joint->parent()->gmatZero().get_rotation().inverse();
 				
 				SrVec jVec = cross(axis[k],(endPos-nodePos));
-				matJ(posCount*3+0,idx*3+k) = jVec[0]*nodeWeight;
-				matJ(posCount*3+1,idx*3+k) = jVec[1]*nodeWeight;	
-				matJ(posCount*3+2,idx*3+k) = jVec[2]*nodeWeight;							
+				matJ(posCount*3+0,idx*3+k) = jVec[0]*nodeWeight*consWeight;
+				matJ(posCount*3+1,idx*3+k) = jVec[1]*nodeWeight*consWeight;	
+				matJ(posCount*3+2,idx*3+k) = jVec[2]*nodeWeight*consWeight;							
 			}		
 			if (node->nodeName == cons->rootName)
 				bStop = true;
