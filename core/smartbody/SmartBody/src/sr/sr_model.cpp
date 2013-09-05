@@ -40,6 +40,7 @@ const char* SrModel::class_name = "Model";
 SrModel::SrModel ()
  {
    culling = true;
+   _scale = 1.0;
  }
 
 SrModel::~SrModel ()
@@ -634,57 +635,48 @@ void SrModel::get_bounding_box ( SrBox &box ) const
 
 void SrModel::translate ( const SrVec &tr )
  {
-   saveOriginalVertices();
+	saveOriginalVertices();
 
-   _translation = tr;
+	_translation = tr;
 
-   SrVec xaxis(1, 0, 0);
-   SrVec yaxis(0, 1, 0);
-   SrVec zaxis(0, 0, 1);
-
-   SrQuat xrot(xaxis, _rotation[0]);
-   SrQuat yrot(yaxis, _rotation[1]);
-   SrQuat zrot(zaxis, _rotation[2]);
-
-	SrQuat finalRot = xrot * yrot * zrot;
-
-   int i, s=V.size();
-   for ( i=0; i<s; i++ ) 
-	   V[i] = (VOrig[i] * finalRot) + _translation;
+	recalculateVertices();
  }
 
 void SrModel::rotate( const SrVec &r )
  {
-   saveOriginalVertices();
+	saveOriginalVertices();
 
-   _rotation = r;
+	_rotation = r;
 
-   SrVec xaxis(1, 0, 0);
-   SrVec yaxis(0, 1, 0);
-   SrVec zaxis(0, 0, 1);
-
-   SrQuat xrot(xaxis, _rotation[0]);
-   SrQuat yrot(yaxis, _rotation[1]);
-   SrQuat zrot(zaxis, _rotation[2]);
-
-   SrQuat finalRot = xrot * yrot * zrot;
-
-   int i, s=V.size();
-   for ( i=0; i<s; i++ ) 
-	   V[i] = (VOrig[i] * finalRot) + _translation;
+	recalculateVertices();
  }
-
-
-
 
 void SrModel::scale ( float factor )
  {
    saveOriginalVertices();
 
-   int i, s=V.size();
-   for ( i=0; i<s; i++ ) 
-	   V[i] = VOrig[i] * factor;
+   _scale = factor;
+
+	recalculateVertices();
  }
+
+void SrModel::recalculateVertices()
+{
+	SrVec xaxis(1, 0, 0);
+	SrVec yaxis(0, 1, 0);
+	SrVec zaxis(0, 0, 1);
+
+	SrQuat xrot(xaxis, _rotation[0]);
+	SrQuat yrot(yaxis, _rotation[1]);
+	SrQuat zrot(zaxis, _rotation[2]);
+
+	SrQuat finalRot = xrot * yrot * zrot;
+
+	int i, s=V.size();
+	for ( i=0; i<s; i++ ) 
+		V[i] = (VOrig[i] * _scale * finalRot) + _translation;
+}
+
 
 void SrModel::centralize ()
  {
