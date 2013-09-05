@@ -105,6 +105,7 @@ class SrModel : public SrSharedClass
 
 	SrVec _translation;
 	SrVec _rotation;
+	float _scale;
 
     /*! Will be set to true (the default) if back face culling
         should be applied, and false othrwise */
@@ -244,6 +245,8 @@ class SrModel : public SrSharedClass
 
 	SBAPI void saveOriginalVertices();
 	SBAPI void restoreOriginalVertices();
+
+	SBAPI void recalculateVertices();
  };
 
 //================================ End of File =================================================
