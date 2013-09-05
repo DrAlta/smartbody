@@ -103,6 +103,9 @@ class SrModel : public SrSharedClass
 	std::map<std::string,std::string> mtlSpecularTexNameMap;
 	std::map<std::string,std::vector<int> > mtlFaceIndices;
 
+	SrVec _translation;
+	SrVec _rotation;
+
     /*! Will be set to true (the default) if back face culling
         should be applied, and false othrwise */
     bool culling;
@@ -169,6 +172,9 @@ class SrModel : public SrSharedClass
 
     /*! Translate the position of each vertex of the model. */
     SBAPI void translate ( const SrVec &tr );
+
+	/*! Rotatee the position of each vertex of the model. */
+    SBAPI void rotate ( const SrVec &tr );
 
     /*! Scale each vertex of the model. */
     SBAPI void scale ( float factor );

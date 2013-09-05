@@ -372,11 +372,14 @@ void SBPawn::notify(SBSubject* subject)
 			SmartBody::Vec3Attribute* meshAttr = dynamic_cast<SmartBody::Vec3Attribute*>(attribute);
 			if (this->dMesh_p)
 			{
+				SrVec r(meshAttr->getValue());
+				r *= 3.14159 / 180.0;
+				LOG("Rotating by %f %f %f", r[0], r[1], r[2]);
 				for (size_t x = 0; x < this->dMesh_p->dMeshStatic_p.size(); x++)
 				{
 					SrSnModel* srSnmodel = this->dMesh_p->dMeshStatic_p[x];
-					SrModel& model = srSnmodel->shape();
-					// need to add rotation
+					SrModel& model = srSnmodel->shape();				
+					model.rotate(r);
 				}
 			}
 		}

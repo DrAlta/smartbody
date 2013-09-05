@@ -27,6 +27,7 @@
 # include <sr/sr_cylinder.h>
 # include <sr/sr_string_array.h>
 #include <set>
+# include <sr/sr_quat.h>
 
 //# define SR_USE_TRACE1 // IO
 //# define SR_USE_TRACE2 // Validation of normals materials, etc
@@ -635,10 +636,46 @@ void SrModel::translate ( const SrVec &tr )
  {
    saveOriginalVertices();
 
+   _translation = tr;
+
+   SrVec xaxis(1, 0, 0);
+   SrVec yaxis(0, 1, 0);
+   SrVec zaxis(0, 0, 1);
+
+   SrQuat xrot(xaxis, _rotation[0]);
+   SrQuat yrot(yaxis, _rotation[1]);
+   SrQuat zrot(zaxis, _rotation[2]);
+
+	SrQuat finalRot = xrot * yrot * zrot;
+
    int i, s=V.size();
    for ( i=0; i<s; i++ ) 
-	   V[i] = VOrig[i] + tr;
+	   V[i] = (VOrig[i] * finalRot) + _translation;
  }
+
+void SrModel::rotate( const SrVec &r )
+ {
+   saveOriginalVertices();
+
+   _rotation = r;
+
+   SrVec xaxis(1, 0, 0);
+   SrVec yaxis(0, 1, 0);
+   SrVec zaxis(0, 0, 1);
+
+   SrQuat xrot(xaxis, _rotation[0]);
+   SrQuat yrot(yaxis, _rotation[1]);
+   SrQuat zrot(zaxis, _rotation[2]);
+
+   SrQuat finalRot = xrot * yrot * zrot;
+
+   int i, s=V.size();
+   for ( i=0; i<s; i++ ) 
+	   V[i] = (VOrig[i] * finalRot) + _translation;
+ }
+
+
+
 
 void SrModel::scale ( float factor )
  {
