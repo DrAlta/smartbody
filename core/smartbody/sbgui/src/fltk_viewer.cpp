@@ -5049,7 +5049,7 @@ void FltkViewerData::setupData()
 	rendermode = FltkViewer::ModeAsIs;
 	charactermode = FltkViewer::ModeShowGeometry;
 	pawnmode = FltkViewer::ModePawnShowAsSpheres;
-	shadowmode = FltkViewer::ModeNoShadows;
+	shadowmode = FltkViewer::ModeShadowMap;
 	terrainMode = FltkViewer::ModeTerrain;
 	navigationMeshMode = FltkViewer::ModeNoNavigationMesh;
 	eyeBeamMode = FltkViewer::ModeNoEyeBeams;
