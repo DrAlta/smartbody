@@ -6,6 +6,7 @@
 #include <sr/sr_quat.h>
 #include <sr/sr_vec.h>
 #include <sr/sr_model.h>
+#include <sr/sr_color.h>
 #include <vector>
 #include <list>
 #include <map>
@@ -48,7 +49,7 @@ public:
 class SBGeomObject
 {
 public:
-	std::string  color;	
+	SrColor  color;	
 protected:	
 	// a SBGeomObject can be attached to a pawn or physics object as needed
 	SBTransformObjInterface* attachedObj;

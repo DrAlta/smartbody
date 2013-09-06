@@ -3165,6 +3165,9 @@ void FltkViewer::drawCharacterPhysicsObjs()
 				sphere.shape().center = jointPos;//SrVec(0,-cap->extent,0);
 				sphere.shape().radius = character->getHeight()*0.022f;
 				float axisScale = character->getHeight()*0.01f;
+
+			
+
 				sphere.color(SrColor(1.f,0.f,0.f));
 				glEnable(GL_LIGHTING);
 				sphere.render_mode(srRenderModeSmooth);
@@ -3286,6 +3289,7 @@ void FltkViewer::drawPawns()
 			//	gmat = pawn->getPhysicsObject()->getGlobalTransform().gmat();
 			//}
 			//SrMat gmatPhy = pawn->getPhysicsObject()->getGlobalTransform().gmat();
+
 			drawColObject(pawn->getGeomObject(),gmat);
 		}
 		else
@@ -3295,10 +3299,23 @@ void FltkViewer::drawPawns()
 			glDisable(GL_LIGHTING);
 			glPushMatrix();
 			glMultMatrixf((const float*) gmat);
-			if (camera)
-				glColor3f(1.0, 1.0, 0.0);
+			SmartBody::SBAttribute* attr = pawn->getAttribute("color");
+			if (attr)
+			{
+				SmartBody::Vec3Attribute* colorAttribute = dynamic_cast<SmartBody::Vec3Attribute*>(attr);
+				if (colorAttribute)
+				{
+					const SrVec& color = colorAttribute->getValue();
+					glColor3f(color.x, color.y, color.z);
+				}
+			}
 			else
-				glColor3f(1.0, 0.0, 0.0);
+			{
+				if (camera)
+					glColor3f(1.0, 1.0, 0.0);
+				else
+					glColor3f(1.0, 0.0, 0.0);
+			}
 			SrSnSphere sphere;
 			glPushMatrix();
 			sphere.shape().center = SrPnt(0, 0, 0);
@@ -4578,7 +4595,7 @@ void FltkViewer::drawColObject( SBGeomObject* colObj, SrMat& gmat )
 	glPushMatrix();
 	//SrMat gMat = colObj->worldState.gmat();
 	SrColor objColor;
-	objColor.set(colObj->color.c_str());
+	objColor = colObj->color;
 	objColor.a = (srbyte)255;
 	
 
