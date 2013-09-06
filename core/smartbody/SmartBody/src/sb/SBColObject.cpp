@@ -89,8 +89,7 @@ SBTransform::SBTransform()
 
 SBGeomObject::SBGeomObject(void)
 {
-	color = "r";
-		
+	color.set(1.0f, 0.0f, 0.0f, 1.0f);
 }
 
 SBGeomObject::~SBGeomObject(void)

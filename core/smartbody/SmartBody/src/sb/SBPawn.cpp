@@ -53,7 +53,8 @@ SBPawn::SBPawn() : SbmPawn()
 
 SBPawn::SBPawn(const char* name) : SbmPawn(name)
 {
-	createBoolAttribute("visible", true, true, "Display", 5, false, false, false, "");
+	createBoolAttribute("visible", true, true, "Display", 5, false, false, false, "Whether the object is visible.");
+	createVec3Attribute("color", 1.0, 0.0, 0.0, true, "Display", 6, false, false, false, "Object color.");
 	_posX = createDoubleAttribute("posX", 0.0, true, "transform", 10, false, false, false, "X position");
 	_posY = createDoubleAttribute("posY", 0.0, true, "transform", 20, false, false, false, "Y position");
 	_posZ = createDoubleAttribute("posZ", 0.0, true, "transform", 30, false, false, false, "Z position");
@@ -297,15 +298,29 @@ void SBPawn::notify(SBSubject* subject)
 		}
 		else if (attribute->getName() == "collisionShape")
 		{
-			SBGeomObject* object = getGeomObject();
+			SBGeomObject* geomObject = getGeomObject();
 			std::string shapeName = getStringAttribute("collisionShape");
 			LOG("collisionShape = %s",shapeName.c_str());
-			if (shapeName != object->geomType())
+			if (shapeName != geomObject->geomType())
 			{
 				SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
 				SrVec size = getVec3Attribute("collisionShapeScale");
 				SBGeomObject* obj = colManager->createCollisionObject(collisionObjName,shapeName,size);
-				if (obj) obj->attachToObj(this);
+				if (obj) 
+				{
+					obj->attachToObj(this);				
+					SmartBody::SBAttribute* attr = this->getAttribute("color");
+					if (attr)
+					{
+						SmartBody::Vec3Attribute* colorAttribute = dynamic_cast<SmartBody::Vec3Attribute*>(attr);
+						if (colorAttribute)
+						{
+							const SrVec& color = colorAttribute->getValue();
+							obj->color.set(color.x, color.y, color.z, 1.0f);
+						}
+					}
+				}
+				
 			}
 			else
 			{
@@ -373,7 +388,7 @@ void SBPawn::notify(SBSubject* subject)
 			if (this->dMesh_p)
 			{
 				SrVec r(meshAttr->getValue());
-				r *= 3.14159 / 180.0;
+				r *= 3.14159f / 180.0f;
 				LOG("Rotating by %f %f %f", r[0], r[1], r[2]);
 				for (size_t x = 0; x < this->dMesh_p->dMeshStatic_p.size(); x++)
 				{
@@ -392,6 +407,15 @@ void SBPawn::notify(SBSubject* subject)
 				this->scene_p->visible(true);
 			else
 				this->scene_p->visible(false);
+		}
+		else if (attribute->getName() == "color")
+		{
+			if (this->getGeomObject())
+			{
+				SmartBody::Vec3Attribute* colorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(attribute);
+				const SrVec& c = colorAttr->getValue();
+				this->getGeomObject()->color.set(c.x, c.y, c.z); 
+			}
 		}
 	}
 }
