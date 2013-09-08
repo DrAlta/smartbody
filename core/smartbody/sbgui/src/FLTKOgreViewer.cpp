@@ -327,6 +327,8 @@ void FLTKOgreWindow::fltkRender2()
 			initShadowMap();		
 	}
 
+	glPushAttrib(GL_ENABLE_BIT);
+	
 	if ( !valid() ) 
 	{
 		// window resize				
@@ -337,7 +339,7 @@ void FLTKOgreWindow::fltkRender2()
 	//make_current();
 	//wglMakeCurrent(fl_GetDC(fl_xid(this)),(HGLRC)context());
 	//LOG("viewer GL context = %d, current context = %d",context(), wglGetCurrentContext());	
-
+	
 	bool hasOpenGL = ssm.initOpenGL();   
 	// init OpenGL extension
 	if (hasOpenGL)
@@ -412,6 +414,8 @@ void FLTKOgreWindow::fltkRender2()
 	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
 		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
 	} 
+
+
 	// real surface geometries
 	//drawAllGeometries();	
 	glDisable(GL_LIGHTING);
@@ -504,6 +508,8 @@ void FLTKOgreWindow::fltkRender2()
 	glDisable(GL_TEXTURE_GEN_R);
 	glDisable(GL_TEXTURE_GEN_Q);
 	SBGUIManager::singleton().update();
+
+	glPopAttrib();
 }
 
 void FLTKOgreWindow::updateOptions()
