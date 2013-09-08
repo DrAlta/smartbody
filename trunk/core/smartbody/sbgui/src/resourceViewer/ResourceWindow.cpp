@@ -718,19 +718,19 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	TreeItemInfoWidget* widget = NULL;
 	if (itemType == ITEM_SKELETON)
 	{
-		widget = new SkeletonItemInfoWidget(x,y,w,h,name,treeItem,itemType);
+		widget = new SkeletonItemInfoWidget(x,y,w,h,name,treeItem,itemType, this);
 	}
 	else if (itemType == ITEM_SEQ_PATH || itemType == ITEM_ME_PATH || itemType == ITEM_AUDIO_PATH || itemType == ITEM_MESH_PATH)
 	{
-		widget = new PathItemInfoWidget(x,y,w,h,name,treeItem,itemType);
+		widget = new PathItemInfoWidget(x,y,w,h,name,treeItem,itemType, this);
 	}
 	else if (itemType == ITEM_SEQ_FILES)
 	{
-		widget = new SeqItemInfoWidget(x,y,w,h,name,treeItem,itemType);
+		widget = new SeqItemInfoWidget(x,y,w,h,name,treeItem,itemType, this);
 	}
 	else if (itemType == ITEM_MOTION)
 	{
-		widget = new MotionItemInfoWidget(x,y,w,h,name,treeItem,itemType);
+		widget = new MotionItemInfoWidget(x,y,w,h,name,treeItem,itemType, this);
 	}
 	else if (itemType == ITEM_PAWN)
 	{
@@ -842,7 +842,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 
 void ResourceWindow::notify( SmartBody::SBSubject* subject )
 {
-
+	this->refreshUI(this, this);
 }
 /************************************************************************/
 /* Resource Viewer Factory                                              */

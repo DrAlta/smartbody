@@ -59,6 +59,9 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 
 		void resetWindow();
 
+		static std::string chooseFile(const std::string& label, const std::string& filter, const std::string& defaultDirectory);
+		static std::string chooseDirectory(const std::string& label, const std::string& defaultDirectory);
+
 		void runScript(std::string filename);
 		void reloadScripts(std::string scriptsDir);
 		void reloadScriptsByDir(std::string scriptsDir, std::string parentStr);
@@ -128,7 +131,6 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void SaveCB(Fl_Widget* widget, void* data);
 		static void ExportPackageCB(Fl_Widget* widget, void* data);
 
-		static std::string directoryChooser(std::string& chooserTitle, std::string &mediaPath );
 		static void ExportCB(Fl_Widget* widget, void* data);
 		static void SaveSceneSettingCB(Fl_Widget* widget, void* data);
 		static void LoadSceneSettingCB(Fl_Widget* widget, void* data);

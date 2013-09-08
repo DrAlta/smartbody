@@ -35,6 +35,7 @@
 #include "ParameterVisualization.h"
 #include "Parameter3DVisualization.h"
 #include "ParamAnimEditorWidget.h"
+#include "RootWindow.h"
 
 
 PATransitionEditor2::PATransitionEditor2(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
@@ -724,10 +725,10 @@ void PATransitionEditor2::save(Fl_Widget* widget, void* data)
 		return;
 	}
 
-	//std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
+	std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
 
-	const char* transitionFileName = fl_file_chooser("Transition file:", "*.py", NULL);
-	if (!transitionFileName)
+	std::string transitionFileName = BaseWindow::chooseFile("Transition File:", "Python\t*.py\n", mediaPath);
+	if (transitionFileName == "")
 		return;
 
 	std::string state1Name = editor->state1List->text();

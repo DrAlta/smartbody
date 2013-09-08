@@ -11,6 +11,7 @@
 
 #include "ResourceWindow.h"
 #include "channelbufferviewer/GlChartViewArchive.hpp"
+#include "RootWindow.h"
 
 
 const int Pad = 10;
@@ -36,7 +37,7 @@ TreeItemInfoWidget::TreeItemInfoWidget( int x, int y, int w, int h, const char* 
 /* Skeleton Info                                                        */
 /************************************************************************/
 
-SkeletonItemInfoWidget::SkeletonItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type ) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
+SkeletonItemInfoWidget::SkeletonItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
 {
 	jointInfoObject = new TreeInfoObject();
 	this->begin();
@@ -177,7 +178,7 @@ void SkeletonItemInfoWidget::treeCallBack( Fl_Widget* widget, void* data )
 /*  Motion Item Info Widget                                             */
 /************************************************************************/
 
-MotionItemInfoWidget::MotionItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type ) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
+MotionItemInfoWidget::MotionItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
 {
 	channelInfoObject = new TreeInfoObject();
 	this->begin();
@@ -286,12 +287,12 @@ void MotionItemInfoWidget::updateChannelAttributes()
 /************************************************************************/
 /* Path Info Widget                                                     */
 /************************************************************************/
-PathItemInfoWidget::PathItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type ) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
+PathItemInfoWidget::PathItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
 {
+	observer = observerWindow;
 	this->begin();
-	std::string pathChooserTitle = "Add Path for ";
-	pathChooserTitle = pathChooserTitle + name;
-	pathChooser = new Fl_File_Chooser(".", "*", Fl_File_Chooser::DIRECTORY, pathChooserTitle.c_str());
+	pathName = name;
+	
 	Fl_Button* dirButton = new Fl_Button( x + 20 , y + 10 , 100, 20, "Add Path");
 	dirButton->callback(addDirectoryCallback, this);
 	this->end();	
@@ -305,46 +306,42 @@ void PathItemInfoWidget::addDirectoryCallback( Fl_Widget* widget, void* data )
 
 void PathItemInfoWidget::addDirectory( const char* dirName )
 {
-	pathChooser->show();
-	while (pathChooser->visible())
-	{
-		Fl::wait();
-	}
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+	
+	std::string str = "Add path for " + pathName;
+	std::string directory = BaseWindow::chooseDirectory(str, mediaPath);
+	if (directory == "")
+		return;
+	
 	char relativePath[256];
-	int count = pathChooser->count();
-	if (count > 0)
-	{
-		for (int i = 1; i <= count; i ++)
-		{
-			if (!pathChooser->value(i))
-				break;
+	fl_filename_relative(relativePath, sizeof(relativePath), directory.c_str());
 
-			fl_filename_relative(relativePath, sizeof(relativePath), pathChooser->value(i));
+	std::string paraType = getTypeParameter(itemType);
 
-			std::string paraType = getTypeParameter(itemType);
-			std::string pathCmd = "path ";
-			pathCmd = pathCmd + paraType + relativePath;
-			SmartBody::SBScene::getScene()->command(pathCmd);
-		}
-	}
+	SmartBody::SBScene::getScene()->addAssetPath(paraType, relativePath);
+	updateWidget();
+	observer->notify(NULL);
+
+
+
 }
 
 std::string PathItemInfoWidget::getTypeParameter( int type )
 {
-	std::string paraType = "seq ";
+	std::string paraType = "script";
 	switch (type)
 	{
 	case ResourceWindow::ITEM_SEQ_PATH :
-		paraType = "seq ";
+		paraType = "script";
 		break;
 	case ResourceWindow::ITEM_AUDIO_PATH :
-		paraType = "audio ";
+		paraType = "audio";
 		break;
 	case ResourceWindow::ITEM_ME_PATH :
-		paraType = "me ";
+		paraType = "motion";
 		break;
 	case ResourceWindow::ITEM_MESH_PATH :
-		paraType = "mesh ";
+		paraType = "mesh";
 		break;
 	}
 	return paraType;
@@ -353,7 +350,7 @@ std::string PathItemInfoWidget::getTypeParameter( int type )
 /************************************************************************/
 /* Seq Item Info Widget                                                 */
 /************************************************************************/
-SeqItemInfoWidget::SeqItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type ) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
+SeqItemInfoWidget::SeqItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
 {
 	seqFilename = inputItem->label();
 	this->begin();
@@ -444,7 +441,7 @@ void SeqItemInfoWidget::editSeqCallback( Fl_Widget* widget, void* data )
 /* Event Item Info Widget                                                 */
 /************************************************************************/
 
-EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type )
+EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow)
 : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
 {
 	eventInfoObject = new TreeInfoObject();

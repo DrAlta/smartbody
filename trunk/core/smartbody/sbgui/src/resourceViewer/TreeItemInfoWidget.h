@@ -37,7 +37,7 @@ protected:
 	std::string      skeletonName;
 	std::string      charName;
 public:
-	SkeletonItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type);	
+	SkeletonItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
 	virtual void updateWidget();
 	void updateJointAttributes(std::string jointName);
 	static void treeCallBack(Fl_Widget* widget, void* data);
@@ -58,7 +58,7 @@ protected:
 	int              motionFrame;
 	int              channelIndex;
 public:
-	MotionItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type);	
+	MotionItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
 	virtual void updateWidget();
 	void updateChannelAttributes();
 	void setMotionFrame(int frame) { motionFrame = frame; }
@@ -69,14 +69,14 @@ public:
 
 class PathItemInfoWidget : public TreeItemInfoWidget
 {
-protected:
-	Fl_File_Chooser* pathChooser;
 public:
-	PathItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type);	
+	PathItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow);
 	static void addDirectoryCallback(Fl_Widget* widget, void* data);
 	void addDirectory(const char* dirName );
 protected:
 	std::string getTypeParameter(int type);
+	std::string pathName;
+	SmartBody::SBObserver* observer;
 };
 
 class SeqItemInfoWidget : public TreeItemInfoWidget
@@ -89,7 +89,7 @@ protected:
 	Fl_Button*          runSeqButton;
 	Fl_Button*          editSeqButton;
 public:
-	SeqItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type);
+	SeqItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
 	static void runSeqCallback(Fl_Widget* widget, void* data);
 	static void editSeqCallback(Fl_Widget* widget, void* data);
 	virtual void updateWidget();
@@ -105,7 +105,7 @@ protected:
 	TreeInfoObject* eventInfoObject;
 	std::string     eventName;
 public:
-	EventItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type);	
+	EventItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
 	static void addEventCallback(Fl_Widget* widget, void* data);
 	void addNewEvent();
 	void removeEvent();

@@ -35,6 +35,7 @@
 #include "Parameter3DVisualization.h"
 #include "ParamAnimEditorWidget.h"
 #include "ParamAnimAutoMarkingEditor.h"
+#include "RootWindow.h"
 
 PABlendEditor::PABlendEditor(int x, int y, int w, int h, PanimationWindow* window) : Fl_Group(x, y, w, h), paWindow(window)
 {
@@ -992,9 +993,9 @@ void PABlendEditor::save(Fl_Widget* widget, void* data)
 {
 	PABlendEditor* editor = (PABlendEditor*) data;
 
-	//std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
-	const char* stateFileName = fl_file_chooser("Blend file:", "*.py", NULL);
-	if (!stateFileName)
+	std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
+	std::string stateFileName = BaseWindow::chooseFile("Blend File:", "Python\t*.py\n", mediaPath);
+	if (stateFileName == "")
 		return;
 
 	std::string stateName = editor->stateList->text();
