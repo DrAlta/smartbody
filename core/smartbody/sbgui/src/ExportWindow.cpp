@@ -5,6 +5,7 @@
 #include <FL/Fl_File_Chooser.H>
 #include <fstream>
 #include <sbm/lin_win.h>
+#include "RootWindow.h"
 
 ExportWindow::ExportWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h, name)
 {
@@ -56,10 +57,9 @@ void ExportWindow::FileCB(Fl_Widget* widget, void* data)
 	ExportWindow* window = (ExportWindow*) data;
 
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
-	const char* fileName = fl_file_chooser("Save to:", "*.py", mediaPath.c_str());
+	std::string fileName = BaseWindow::chooseFile("Save To:", "Python\t*.py\n", mediaPath);
 
-	if (fileName)
-		window->inputFile->value(fileName);
+	window->inputFile->value(fileName.c_str());
 }
 
 void ExportWindow::ExportCB(Fl_Widget* widget, void* data)

@@ -1,10 +1,10 @@
 #include <vhcl.h>
+#include <FL/Fl_Native_File_Chooser.H>
 #include <sbm/GPU/SbmShader.h>
 #include "RootWindow.h"
 #include "CharacterCreatorWindow.h"
 #include <FL/Fl_Pack.H>
 #include <FL/fl_ask.H>
-//#include <FL/Fl_Native_File_Chooser.H>
 #include <FL/Fl_File_Chooser.H>
 #include <sstream>
 #include <FL/filename.H>
@@ -117,12 +117,11 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
    menubar->add("&Camera/Modes/Free Look", 0, SetFreeLookCamera, this, NULL);	
    menubar->add("&Camera/Modes/Follow Renderer", 0, SetFollowRendererCamera, this, NULL);	
 	
-
+	menubar->add("&Window/Resource Viewer", 0, LaunchResourceViewerCB, this, NULL);
+	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 //	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
 	menubar->add("&Window/Blend Viewer", 0, LaunchParamAnimViewerCB, this, NULL);
-	menubar->add("&Window/Resource Viewer", 0, LaunchResourceViewerCB, this, NULL);
-	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
 	menubar->add("&Window/BML Creator", 0, LaunchBMLCreatorCB, this, NULL);
 	menubar->add("&Window/Face Viewer", 0, LaunchFaceViewerCB, this, NULL);
 	menubar->add("&Window/Lip Sync Viewer", 0, LaunchVisemeViewerCB, this, NULL);
@@ -301,6 +300,59 @@ BaseWindow::~BaseWindow() {
 	if (panimationWindow)
 		delete panimationWindow;
 
+}
+
+std::string BaseWindow::chooseFile(const std::string& label, const std::string& filter, const std::string& defaultDirectory)
+{
+	Fl_Native_File_Chooser fnfc;
+	fnfc.title(label.c_str());
+	fnfc.type(Fl_Native_File_Chooser::BROWSE_FILE);
+	fnfc.filter(filter.c_str());
+	fnfc.directory(defaultDirectory.c_str()); 
+
+	std::string ret = "";
+
+	switch ( fnfc.show() )
+	{
+	case -1: 
+		return "";
+		break;
+	case  1: 
+		return "";
+		break;
+		
+	default: 
+		ret = fnfc.filename(); 
+		break;  
+	}
+
+	return ret;
+}
+
+std::string BaseWindow::chooseDirectory(const std::string& label, const std::string& defaultDirectory)
+{
+	Fl_Native_File_Chooser fnfc;
+	fnfc.title(label.c_str());
+	fnfc.type(Fl_Native_File_Chooser::BROWSE_DIRECTORY);
+	fnfc.directory(defaultDirectory.c_str()); 
+
+	std::string ret = "";
+
+	switch ( fnfc.show() )
+	{
+	case -1: 
+		return "";
+		break;
+	case  1: 
+		return "";
+		break;
+		
+	default: 
+		ret = fnfc.filename(); 
+		break;  
+	}
+
+	return ret;
 }
 
 
@@ -493,10 +545,12 @@ void BaseWindow::ResetScene()
 
 void BaseWindow::LoadPackageCB( Fl_Widget* widget, void* data )
 {
+	BaseWindow* window = (BaseWindow*) data;
+
 	namespace fs = boost::filesystem;
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 	std::string chooserTitle = "Choose Package Directory";
-	std::string dirName = directoryChooser(chooserTitle, mediaPath);
+	std::string dirName = window->chooseDirectory(chooserTitle, mediaPath);
 	std::string initScriptName = dirName+"/initScene.py";
 	if (!fs::exists(fs::path(initScriptName)))
 	{
@@ -504,7 +558,6 @@ void BaseWindow::LoadPackageCB( Fl_Widget* widget, void* data )
 		return;
 	}
 	
-	BaseWindow* window = (BaseWindow*) data;
 	window->ResetScene();
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->setMediaPath(dirName);
@@ -517,15 +570,15 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	BaseWindow* window = (BaseWindow*) data;
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 
-	const char* seqFile = fl_file_chooser("Load file:", "*.py", mediaPath.c_str());
-	if (!seqFile)
+	std::string file = window->chooseFile("Load File:", "Python\t*.py\n", mediaPath);
+	if (file == "")
 		return;
 
     window->ResetScene();
 
-	std::string filebasename = boost::filesystem::basename(seqFile);
-	std::string fileextension = boost::filesystem::extension(seqFile);
-	std::string fullfilename = std::string(seqFile);
+	std::string filebasename = boost::filesystem::basename(file);
+	std::string fileextension = boost::filesystem::extension(file);
+	std::string fullfilename = std::string(file);
 	size_t pos = fullfilename.find(filebasename);
 	std::string path = fullfilename.substr(0, pos - 1);
 	SmartBody::SBScene::getScene()->addAssetPath("script", path);
@@ -534,10 +587,12 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
 {
+	BaseWindow* window = (BaseWindow*) data;
+
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 
-	const char* saveFile = fl_file_chooser("Save file:", "*.py", mediaPath.c_str());
-	if (!saveFile)
+	std::string saveFile = window->chooseFile("Save File:", "Python\t*.py\n", mediaPath);
+	if (saveFile == "")
 		return;
 	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -561,24 +616,9 @@ void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
 	fl_message(scenePrompt.c_str());
 }
 
-std::string BaseWindow::directoryChooser( std::string& chooserTitle, std::string &mediaPath )
-{
-	Fl_File_Chooser fnfc(mediaPath.c_str(),                        // directory
-		"*",                        // filter
-		Fl_File_Chooser::DIRECTORY,     // chooser type
-		chooserTitle.c_str());
-
-	fnfc.show();
-	while(fnfc.shown())
-	{ Fl::wait(); }
-	std::string filename = "";
-	if (fnfc.value()) filename = fnfc.value();
-	return filename;
-}
-
 void BaseWindow::ExportPackageCB( Fl_Widget* widget, void* data )
 {
-	//const char* saveFile = fl_file_chooser("Save file:", "*.py", mediaPath.c_str());
+	BaseWindow* window = (BaseWindow*) data;
 	int useZip = (long)data;
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -587,13 +627,14 @@ void BaseWindow::ExportPackageCB( Fl_Widget* widget, void* data )
 	std::string fileName = ""; 
 	if (!useZip)
 	{
-		fileName = directoryChooser(chooserTitle, mediaPath);
+		fileName = BaseWindow::chooseDirectory(chooserTitle, mediaPath);
 	}
 	else
 	{
-		char* fname = fl_file_chooser("Save Scene File:", "*.zip", mediaPath.c_str());
-		if (!fname)
+		std::string fname = window->chooseFile("Save Scene File:", "Zip files\t*.zip\n", mediaPath);
+		if (fname == "")
 			return;
+
 		fileName = fname;
 	}
 	if (fileName != "")
@@ -623,11 +664,14 @@ void BaseWindow::ExportCB(Fl_Widget* widget, void* data)
 
 void BaseWindow::SaveSceneSettingCB( Fl_Widget* widget, void* data )
 {
+	BaseWindow* window = (BaseWindow*) data;
+	
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 
-	const char* saveFile = fl_file_chooser("Save file:", "*.py", mediaPath.c_str());
-	if (!saveFile)
+	std::string saveFile = window->chooseFile("Save File:", "Python\t*.py\n", mediaPath);
+	if (saveFile == "")
 		return;
+
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string fileString = scene->saveSceneSetting();
 
@@ -651,19 +695,20 @@ void BaseWindow::SaveSceneSettingCB( Fl_Widget* widget, void* data )
 
 void BaseWindow::LoadSceneSettingCB( Fl_Widget* widget, void* data )
 {
+	BaseWindow* window = (BaseWindow*) data;
+	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string mediaPath = scene->getMediaPath();
 
-	const char* seqFile = fl_file_chooser("Load file:", "*.py", mediaPath.c_str());
-	if (!seqFile)
+	std::string file = window->chooseFile("Load File:", "Python\t*.py\n", mediaPath);
+	if (file == "")
 		return;
-
 
 	if (mediaPath != "")
 		scene->setMediaPath(mediaPath);
-	std::string filebasename = boost::filesystem::basename(seqFile);
-	std::string fileextension = boost::filesystem::extension(seqFile);
-	std::string fullfilename = std::string(seqFile);
+	std::string filebasename = boost::filesystem::basename(file);
+	std::string fileextension = boost::filesystem::extension(file);
+	std::string fullfilename = std::string(file);
 	size_t pos = fullfilename.find(filebasename);
 	std::string path = fullfilename.substr(0, pos - 1);
 	scene->addAssetPath("script", path);
@@ -1665,19 +1710,19 @@ void BaseWindow::CreateCameraCB(Fl_Widget* w, void* data)
 
 void BaseWindow::CreateTerrainCB(Fl_Widget* w, void* data)
 {
-	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	const char* terrainFile = fl_file_chooser("Load terrain:", "*.ppm", NULL);
-	if (terrainFile)
+	BaseWindow* window = static_cast<BaseWindow*>(data);
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+	std::string terrainFile = window->chooseFile("Load Terrain:", "PPM files\t*.ppm\n", mediaPath);
+	if (terrainFile == "")
+		return;
+
+	std::string terrainCommand = "terrain load ";
+	terrainCommand.append(terrainFile);
+	SmartBody::SBScene::getScene()->command((char*)terrainCommand.c_str());
+	if (SmartBody::SBScene::getScene()->getHeightfield())
 	{
-		
-		std::string terrainCommand = "terrain load ";
-		terrainCommand.append(terrainFile);
-		SmartBody::SBScene::getScene()->command((char*)terrainCommand.c_str());
-		if (SmartBody::SBScene::getScene()->getHeightfield())
-		{
-			SmartBody::SBScene::getScene()->getHeightfield()->set_scale( 5000.0f, 300.0f, 5000.0f );
-			SmartBody::SBScene::getScene()->getHeightfield()->set_auto_origin();
-		}
+		SmartBody::SBScene::getScene()->getHeightfield()->set_scale( 5000.0f, 300.0f, 5000.0f );
+		SmartBody::SBScene::getScene()->getHeightfield()->set_auto_origin();
 	}
 }
 
@@ -1801,10 +1846,11 @@ void BaseWindow::ShowPoseExamples( Fl_Widget* w, void* data )
 
 void BaseWindow::CreatePythonAPICB(Fl_Widget* widget, void* data)
 {
-	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-
-	const char* docFile = fl_file_chooser("Save documentation to:", "*.html", NULL);
-	if (!docFile)
+	BaseWindow* window = static_cast<BaseWindow*>(data);
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+	
+	std::string docFile = window->chooseFile("Save documentation to:", "HTML files\t*.{html,htm}\n", mediaPath);
+	if (docFile == "")
 		return;
 
 	std::stringstream strstr;
