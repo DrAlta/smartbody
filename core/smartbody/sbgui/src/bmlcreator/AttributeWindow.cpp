@@ -55,8 +55,11 @@ that is distributed: */
 #include <algorithm>
 #include <sstream>
 #include <cstring>
+#include <sb/SBScene.h>
 #include <sb/SBAttribute.h>
 #include <sb/SBAttributeManager.h>
+#include <sb/SBVHMsgManager.h>
+#include <sb/SBCharacter.h>
 #include "TextEditor.h"
 #include "../flu/Flu_Collapsable_Group.h"
 
@@ -822,7 +825,19 @@ void AttributeWindow::ActionCB(Fl_Widget *w, void *data)
 		SmartBody::ActionAttribute* aattr = dynamic_cast<SmartBody::ActionAttribute*>(attr);
 		if (aattr)
 		{
-			aattr->setValue();
+			if (!SmartBody::SBScene::getScene()->isRemoteMode())
+			{
+				aattr->setValue();
+			}
+			else
+			{
+				SmartBody::SBObject* object = attr->getObject();
+				SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(object);
+				
+				std::string sendStr = "sb scene.getCharacter(\"" + character->getName() + "\").setActionAttribute(\"" + attr->getName() + "\")";
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
+				aattr->setValueFast();
+			}
 		}
 		else
 		{
@@ -853,7 +868,19 @@ void AttributeWindow::BoolCB(Fl_Widget *w, void *data)
 		SmartBody::BoolAttribute* battr = dynamic_cast<SmartBody::BoolAttribute*>(attr);
 		if (battr)
 		{
-			battr->setValue(check->value()? true : false);
+			if (!SmartBody::SBScene::getScene()->isRemoteMode())
+			{
+				battr->setValue(check->value()? true : false);
+			}
+			else
+			{
+				SmartBody::SBObject* object = attr->getObject();
+				SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(object);
+				std::string str = check->value()? "True" : "False";
+				std::string sendStr = "sb scene.getCharacter(\"" + character->getName() + "\").setBoolAttribute(\"" + attr->getName() + "\", " + str + ")";
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
+				battr->setValueFast(check->value()? true : false);
+			}
 		}
 		else
 		{
@@ -904,7 +931,21 @@ void AttributeWindow::IntCB(Fl_Widget *w, void *data)
 			{
 				val = int(slider->value());
 			}
-			iattr->setValue(val);
+			
+			if (!SmartBody::SBScene::getScene()->isRemoteMode())
+			{
+				iattr->setValue(val);
+			}
+			else
+			{
+				SmartBody::SBObject* object = attr->getObject();
+				SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(object);
+				std::stringstream strstr;
+				strstr << val;
+				std::string sendStr = "sb scene.getCharacter(\"" + character->getName() + "\").setIntAttribute(\"" + attr->getName() + "\", " + strstr.str() + ")";
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
+				iattr->setValueFast(val);
+			}
 		}
 		else
 		{
@@ -954,7 +995,20 @@ void AttributeWindow::DoubleCB(Fl_Widget *w, void *data)
 			{
 				val = slider->value();
 			}
-			dattr->setValue(val);
+			if (!SmartBody::SBScene::getScene()->isRemoteMode())
+			{
+				dattr->setValue(val);
+			}
+			else
+			{
+				SmartBody::SBObject* object = attr->getObject();
+				SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(object);
+				std::stringstream strstr;
+				strstr << val;
+				std::string sendStr = "sb scene.getCharacter(\"" + character->getName() + "\").setDoubleAttribute(\"" + attr->getName() + "\", " + strstr.str() + ")";
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
+				dattr->setValueFast(val);
+			}
 		}
 		else
 		{
@@ -988,16 +1042,31 @@ void AttributeWindow::StringCB(Fl_Widget *w, void *data)
 		SmartBody::StringAttribute* strattr = dynamic_cast<SmartBody::StringAttribute*>(attr);
 		if (strattr)
 		{
+			std::string finalValue = "";
 			if (input)
 			{
-				strattr->setValue(input->value());
+				finalValue = input->value();
 			}
 			else
 			{
 				std::string choiceValue = choice->menu()[choice->value()].label();
 				if (choiceValue == "-----")
 					choiceValue = "";
-				strattr->setValue(choiceValue);
+				finalValue = choiceValue;
+			}
+
+			if (!SmartBody::SBScene::getScene()->isRemoteMode())
+			{
+				strattr->setValue(finalValue);
+			}
+			else
+			{
+				SmartBody::SBObject* object = attr->getObject();
+				SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(object);
+				std::stringstream strstr;
+				strstr << "sb scene.getCharacter(\"" << character->getName() << "\").setStringAttribute(\"" << attr->getName() << "\", \"" << finalValue << "\")";
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
+				strattr->setValueFast(finalValue);
 			}
 		}
 		else
@@ -1039,7 +1108,21 @@ void AttributeWindow::Vec3CB(Fl_Widget *w, void *data)
 				finput[x] = (Fl_Float_Input*) group->child(x);
 				val[x] = (float) atof(finput[x]->value());
 			}
-			vec3attr->setValue(val);
+			
+
+			if (!SmartBody::SBScene::getScene()->isRemoteMode())
+			{
+				vec3attr->setValue(val);
+			}
+			else
+			{
+				SmartBody::SBObject* object = attr->getObject();
+				SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(object);
+				std::stringstream strstr;
+				strstr << "sb scene.getCharacter(\"" << character->getName() << "\").setStringAttribute(\"" << attr->getName() << "\", SrVec(\"" <<  val.x <<  ", " << val.y << ", " << val.z << "))";
+				SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
+				vec3attr->setValueFast(val);
+			}
 		}
 		else
 		{
