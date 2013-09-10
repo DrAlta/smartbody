@@ -343,6 +343,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& ske
 			std::string parentAttr = "";
 			if (parentNode)
 				xml_utils::xml_translate(&parentAttr, parentNode->getNodeValue());
+			//LOG("bone node = %s, parent node = %s",boneAttr.c_str(),parentAttr.c_str());
 			if (boneNode && parentNode)
 				parentHierarchy.insert(std::pair<std::string, std::string>(boneAttr, parentAttr));
 		}
@@ -1040,13 +1041,18 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 						continue;
 					//LOG("vertex buffer %d ...",b);
 					const DOMNodeList* vertexList = bufferNode->getChildNodes();
-					for (unsigned int v = 0; v < vertexList->getLength(); v++)
+					DOMNode* vertexNode = bufferNode->getFirstChild();
+					//for (unsigned int v = 0; v < vertexList->getLength(); v++)
+					while (vertexNode)
 					{
-						DOMNode* vertexNode = vertexList->item(v);
+						//DOMNode* vertexNode = vertexList->item(v);
 						std::string vertexStr;
 						xml_utils::xml_translate(&vertexStr, vertexNode->getNodeName());
 						if (vertexStr != "vertex")
+						{
+							vertexNode = vertexNode->getNextSibling();
 							continue;
+						}
 						//LOG("vertex %d ... ",v);
 						const DOMNodeList* vertexDataList = vertexNode->getChildNodes();
 						for (unsigned int j = 0; j < vertexDataList->getLength(); j++)
@@ -1098,12 +1104,11 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 									if (yNode)
 										xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
 									offset.y = 1.f - (float) atof(yAttr.c_str());	
-									model->T.push(offset);
+									model->T.push(offset);									
 								}
-
 							}						
 						}
-						
+						vertexNode = vertexNode->getNextSibling();
 					}
 				}
 				//LOG("parse geometry complete");
@@ -1113,13 +1118,23 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 			{
 				//LOG("parse faces");
 				const DOMNodeList* faceList = subMeshChild->getChildNodes();
-				for (unsigned int f = 0; f < faceList->getLength(); f++)
+				DOMNode* faceNode = subMeshChild->getFirstChild();
+				//std::map<int,int> infJointCount;
+				//LOG("weight list size = %d",weightList->getLength());
+				//for (unsigned int w = 0; w < weightList->getLength(); w++)
+				//{
+				int w = 0;
+				while (faceNode)
+				//for (unsigned int f = 0; f < faceList->getLength(); f++)
 				{
-					DOMNode* faceNode = faceList->item(f);
+					//DOMNode* faceNode = faceList->item(f);
 					std::string faceStr;
 					xml_utils::xml_translate(&faceStr, faceNode->getNodeName());
 					if (faceStr != "face")
+					{
+						faceNode = faceNode->getNextSibling();
 						continue;
+					}
 					DOMNamedNodeMap* faceAttr = faceNode->getAttributes();
 					if (faceAttr)
 					{
@@ -1145,13 +1160,14 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 						model->F.push().set(v1,v2,v3);
 						model->Ft.push().set(v1,v2,v3);
 						model->Fn.push().set(v1,v2,v3);
-					}					
+					}	
+					faceNode = faceNode->getNextSibling();
 				}
 				//LOG("parse faces complete");
 			}
 		}
 	}
-	//LOG("ParseOgre::parseMesh complete");
+	LOG("ParseOgre::parseMesh complete");
 	return true;
 }
 
@@ -1182,14 +1198,18 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 				SkinWeight* sw = new SkinWeight();
 				sw->sourceMesh = meshName;
 				skinWeights.push_back(sw);
-				const DOMNodeList* weightList = subMeshChild->getChildNodes();
+				const DOMNodeList* weightList = subMeshChild->getChildNodes();				
 				int prevVtxIdx = -1;
 				int infJointCount = 0;
-				
+				DOMNode* weightNode = subMeshChild->getFirstChild();
 				//std::map<int,int> infJointCount;
-				for (unsigned int w = 0; w < weightList->getLength(); w++)
+				//LOG("weight list size = %d",weightList->getLength());
+				//for (unsigned int w = 0; w < weightList->getLength(); w++)
+				//{
+				int w = 0;
+				while (weightNode)
 				{
-					DOMNode* weightNode = weightList->item(w);
+					//DOMNode* weightNode = weightList->item(w);
 					DOMNamedNodeMap* weightAttr = weightNode->getAttributes();
 					if (weightAttr)
 					{
@@ -1226,6 +1246,8 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 						sw->jointNameIndex.push_back(boneIdx);	
 						//sw->bindPoseMat.push_back(SrMat::id);
 					}					
+					weightNode = weightNode->getNextSibling();
+					w++;
 				}	
 				sw->numInfJoints.push_back(infJointCount); // add the last set of infJoints
 				sw->normalizeWeights();
@@ -1233,7 +1255,7 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 		}			
 	}
 
-	//LOG("ParseOgre::parseSkinWeight Complete");
+	LOG("ParseOgre::parseSkinWeight Complete");
 	return true;
 }
 
