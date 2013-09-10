@@ -61,7 +61,6 @@ class SBCommandManager;
 class SBWSPManager;
 class SBNavigationMesh;
 
-
 class SBScene : public SBObject
 {
 	public:
@@ -345,6 +344,7 @@ class SBScene : public SBObject
 };
 
 SBScene* getScene();
+const std::string& getVersion();
 
 };
 

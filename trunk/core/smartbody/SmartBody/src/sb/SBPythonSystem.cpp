@@ -48,6 +48,7 @@ void pythonFuncsSystem()
 	boost::python::def("reset", reset, "Reset SBM. ");
 	boost::python::def("quit", quitSbm, "Quit SBM. ");	
 	boost::python::def("getScene", SBScene::getScene, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the SmartBody scene object.");
+	boost::python::def("getVersion", SBScene::getVersion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the SmartBody version.");
 
 }
 }
