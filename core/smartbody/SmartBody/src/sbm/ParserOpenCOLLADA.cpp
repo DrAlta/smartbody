@@ -264,10 +264,13 @@ void ParserOpenCOLLADA::getChildNodes(const std::string& nodeName, DOMNode* node
 	//if (!node->hasChildNodes()) // no child nodes
 	//	return;
 	DOMNode* child = NULL;
-	const DOMNodeList* list = node->getChildNodes();	
-	for (unsigned int c = 0; c < list->getLength(); c++)
+	//const DOMNodeList* list = node->getChildNodes();
+	DOMNode* curNode = node->getFirstChild();
+	//for (unsigned int c = 0; c < list->getLength(); c++)
+	while (curNode)
 	{
-		getChildNodes(nodeName,list->item(c), childs);
+		getChildNodes(nodeName,curNode, childs);
+		curNode = curNode->getNextSibling();
 		//child = getNode(nodeName, list->item(c));
 		//if (child)
 		//	break;
@@ -292,12 +295,16 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node)
 	}
 
 	DOMNode* child = NULL;
-	const DOMNodeList* list = node->getChildNodes();
-	for (unsigned int c = 0; c < list->getLength(); c++)
+	//const DOMNodeList* list = node->getChildNodes();
+	DOMNode* curNode = node->getFirstChild();
+	while (curNode)
+	//for (unsigned int c = 0; c < list->getLength(); c++)
 	{
-		child = getNode(nodeName, list->item(c));
+		//child = getNode(nodeName, list->item(c));
+		child = getNode(nodeName, curNode);
 		if (child)
 			break;
+		curNode = curNode->getNextSibling();
 	}
 	return child;
 }
@@ -325,12 +332,15 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node, 
 	
 
 	DOMNode* child = NULL;
-	const DOMNodeList* list = node->getChildNodes();
-	for (unsigned int c = 0; c < list->getLength(); c++)
+	//const DOMNodeList* list = node->getChildNodes();
+	DOMNode* curNode = node->getFirstChild();
+	while (curNode)
+	//for (unsigned int c = 0; c < list->getLength(); c++)
 	{
-		child = getNode(nodeName, list->item(c), curDepth, maximumDepth);
+		child = getNode(nodeName, curNode, curDepth, maximumDepth);
 		if (child)
 			break;
+		curNode = curNode->getNextSibling();
 	}
 	return child;
 }
@@ -495,23 +505,30 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, std::string fil
 
 void ParserOpenCOLLADA::parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name)
 {
-	const DOMNodeList* list1 = node->getChildNodes();
-	for (unsigned int c = 0; c < list1->getLength(); c++)
+	//const DOMNodeList* list1 = node->getChildNodes();
+	DOMNode* curNode1 = node->getFirstChild();
+	while (curNode1)
+	//for (unsigned int c = 0; c < list1->getLength(); c++)
 	{
-		DOMNode* node1 = list1->item(c);
+		//DOMNode* node1 = list1->item(c);
+		DOMNode* node1 = curNode1;
 		std::string nodeName;
 		xml_utils::xml_translate(&nodeName, node1->getNodeName());
 		if (nodeName == "visual_scene")
 			parseJoints(node1, skeleton, motion, scale, order, materialId2Name, NULL);
+		curNode1 = curNode1->getNextSibling();
 	}	
 }
 
 void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent)
 {
-	const DOMNodeList* list = node->getChildNodes();
-	for (unsigned int i = 0; i < list->getLength(); i++)
+	//const DOMNodeList* list = node->getChildNodes();
+	DOMNode* curNode = node->getFirstChild();
+	while (curNode)
+	//for (unsigned int i = 0; i < list->getLength(); i++)
 	{
-		DOMNode* childNode = list->item(i);
+		//DOMNode* childNode = list->item(i);
+		DOMNode* childNode = curNode;
 		std::string nodeName;
 		xml_utils::xml_translate(&nodeName, childNode->getNodeName());
 		if (nodeName == "node")
@@ -575,11 +592,13 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				if (parent == NULL && !skeleton.root())
 					skeleton.root(joint);
 
-				const DOMNodeList* infoList = childNode->getChildNodes();
-				for (unsigned int j = 0; j < infoList->getLength(); j++)
+				//const DOMNodeList* infoList = childNode->getChildNodes();
+				DOMNode* infoCurNode = childNode->getFirstChild();
+				while (infoCurNode)
+				//for (unsigned int j = 0; j < infoList->getLength(); j++)
 				{
-					
-					DOMNode* infoNode = infoList->item(j);
+					//DOMNode* infoNode = infoList->item(j);
+					DOMNode* infoNode = infoCurNode;
 					std::string infoNodeName;
 					xml_utils::xml_translate(&infoNodeName, infoNode->getNodeName());
 					if (infoNodeName == "matrix")
@@ -674,6 +693,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 								orderVec.push_back(sidAttr.substr(8, 1));
 						}
 					}
+					infoCurNode = infoCurNode->getNextSibling();
 				}
 				order = getRotationOrder(orderVec);
 				if (order == -1)
@@ -705,7 +725,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				jointQuat->prerot(quat);
 				SrQuat jorientQ = SrQuat(jorientMat);
 				jointQuat->orientation(jorientQ);
-				parseJoints(list->item(i), skeleton, motion, scale, order, materialId2Name, joint);
+				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, joint);
 			}
 			else if (typeAttr == "NODE" || tempMaterialNode)
 			{
@@ -715,10 +735,13 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					DOMNode* techniqueCommonNode = ParserOpenCOLLADA::getNode("technique_common", materialNode);
 					if (techniqueCommonNode)
 					{
-						const DOMNodeList* materialList = techniqueCommonNode->getChildNodes();
-						for (unsigned int ml = 0; ml < materialList->getLength(); ml++)
+						//const DOMNodeList* materialList = techniqueCommonNode->getChildNodes();
+						DOMNode* materialCurNode = techniqueCommonNode->getFirstChild();
+						while (materialCurNode)
+						//for (unsigned int ml = 0; ml < materialList->getLength(); ml++)
 						{
-							DOMNode* childNode = materialList->item(ml);
+							//DOMNode* childNode = materialList->item(ml);
+							DOMNode* childNode = materialCurNode;
 							std::string nodeName;
 							xml_utils::xml_translate(&nodeName, childNode->getNodeName());
 							if (nodeName == "instance_material")
@@ -740,14 +763,17 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 									materialId2Name.insert(std::make_pair(materialName, targetName));
 
 							}
+							materialCurNode = materialCurNode->getNextSibling();
 						}
 					}
 				}
-				parseJoints(list->item(i), skeleton, motion, scale, order, materialId2Name, parent);
+				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, parent);
 			}
 			else
-				parseJoints(list->item(i), skeleton, motion, scale, order, materialId2Name, parent);
+				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, parent);
 		}
+
+		curNode = curNode->getNextSibling();
 	}
 }
 
@@ -764,17 +790,21 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 
 	std::map<std::string,std::vector<std::string> > jointRotationOrderMap;
 
-	const DOMNodeList* list = node->getChildNodes();
+	//const DOMNodeList* list = node->getChildNodes();
+	DOMNode* curNode = node->getFirstChild();
 	// load all array of floats with corresponding channel names and sample rates
-	for (unsigned int i = 0; i < list->getLength(); i++)
+	while (curNode)
+	//for (unsigned int i = 0; i < list->getLength(); i++)
 	{
-		DOMNode* node1 = list->item(i);		
+		//DOMNode* node1 = list->item(i);	
+		DOMNode* node1 = curNode;
 		std::string node1Name;
 		xml_utils::xml_translate(&node1Name, node1->getNodeName());
 		if (node1Name == "animation")
 		{			
 			parseNodeAnimation(node1, floatArrayMap, scale, samplerMap, channelSamplerNameMap, skeleton);
 		}
+		curNode = curNode->getNextSibling();
 	}
 
 	std::vector<ColladChannel>::iterator mi;
@@ -1005,10 +1035,13 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 	std::map<std::string,std::vector<SrMat> > jointTransformMap;
 	std::map<std::string,std::vector<std::string> > jointRotationOrderMap;
 
-	const DOMNodeList* list = node->getChildNodes();
-	for (unsigned int i = 0; i < list->getLength(); i++)
+	//const DOMNodeList* list = node->getChildNodes();
+	DOMNode* curNode = node->getFirstChild();
+	while (curNode)
+	//for (unsigned int i = 0; i < list->getLength(); i++)
 	{
-		DOMNode* node1 = list->item(i);
+		//DOMNode* node1 = list->item(i);
+		DOMNode* node1 = curNode;
 		std::string node1Name;
 		xml_utils::xml_translate(&node1Name, node1->getNodeName());
 		if (node1Name == "animation")
@@ -1047,10 +1080,13 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 			if (channelType == "translateZ")
 				channelsForAdjusting.add(jointName.c_str(), SkChannel::ZPos);
 			
-			const DOMNodeList* list1 = node1->getChildNodes();
-			for (unsigned int j = 0; j < list1->getLength(); j++)
+			//const DOMNodeList* list1 = node1->getChildNodes();
+			DOMNode* curNode1 = node1->getFirstChild();
+			while (curNode1)
+			//for (unsigned int j = 0; j < list1->getLength(); j++)
 			{
-				DOMNode* node2 = list1->item(j);
+				//DOMNode* node2 = list1->item(j);
+				DOMNode* node2 = curNode1;
 				std::string node2Name;
 				xml_utils::xml_translate(&node2Name, node2->getNodeName());
 				if (node2Name == "source")
@@ -1064,11 +1100,13 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 					if (sourceIdAttr.find("input") != std::string::npos) op = "input";
 					else if (sourceIdAttr.find("output") != std::string::npos) op = "output";
 
-					const DOMNodeList* list2 = node2->getChildNodes();
-					
-					for (unsigned int k = 0; k < list2->getLength(); k++)
+					//const DOMNodeList* list2 = node2->getChildNodes();
+					DOMNode* curNode2 = node2->getFirstChild();
+					while (curNode2)
+					//for (unsigned int k = 0; k < list2->getLength(); k++)
 					{
-						DOMNode* node3 = list2->item(k);
+						//DOMNode* node3 = list2->item(k);
+						DOMNode* node3 = curNode2;
 						std::string node3Name;
 						xml_utils::xml_translate(&node3Name, node3->getNodeName());
 						if (node3Name == "float_array")
@@ -1184,11 +1222,13 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 								}								
 							}
 						}
+						curNode2 = curNode2->getNextSibling();
 					}
-					
 				}
+				curNode1 = curNode1->getNextSibling();
 			}
 		}
+		curNode = curNode->getNextSibling();
 	}
 
 // 	for (std::map<std::string,std::vector<SrMat> >::iterator mi  = jointTransformMap.begin();
@@ -1582,13 +1622,15 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 
 void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale )
 {
-	const DOMNodeList* list = node->getChildNodes();
-
 	std::map<std::string,bool> vertexSemantics;
-	for (unsigned int c = 0; c < list->getLength(); c++)
+	//const DOMNodeList* list = node->getChildNodes();
+	DOMNode* curNode = node->getFirstChild();
+	while (curNode)
+	//for (unsigned int c = 0; c < list->getLength(); c++)
 	{
 		//LOG("parseLibraryGeometries, iter %d", c);
-		DOMNode* node = list->item(c);
+		//DOMNode* node = list->item(c);
+		DOMNode* node = curNode;
 		std::string nodeName;
 		xml_utils::xml_translate(&nodeName ,node->getNodeName());	
 		if (nodeName == "geometry")
@@ -1611,9 +1653,12 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 			newModel->name = SrString(idString.c_str());
 			DOMNode* meshNode = ParserOpenCOLLADA::getNode("mesh", node);
 			if (!meshNode)	continue;
-			for (unsigned int c1 = 0; c1 < meshNode->getChildNodes()->getLength(); c1++)
+			DOMNode* meshCurNode = meshNode->getFirstChild();
+			while (meshCurNode)
+			//for (unsigned int c1 = 0; c1 < meshNode->getChildNodes()->getLength(); c1++)
 			{
-				DOMNode* node1 = meshNode->getChildNodes()->item(c1);
+				//DOMNode* node1 = meshNode->getChildNodes()->item(c1);
+				DOMNode* node1 = meshCurNode;
 				std::string nodeName1;
 				xml_utils::xml_translate(&nodeName1, node1->getNodeName());
 				
@@ -1712,14 +1757,18 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 						}
 					}
 #endif
+					meshCurNode = meshCurNode->getNextSibling();
 				}			
 				if (nodeName1 == "vertices")
 				{
 					//LOG("nodeName1 = vertices");
 					vertexSemantics.clear();
-					for (unsigned int c2 = 0; c2 < node1->getChildNodes()->getLength(); c2++)
+					DOMNode* verticeCurNode = node1->getFirstChild();
+					while (verticeCurNode)
+					//for (unsigned int c2 = 0; c2 < node1->getChildNodes()->getLength(); c2++)
 					{
-						DOMNode* inputNode = node1->getChildNodes()->item(c2);
+						//DOMNode* inputNode = node1->getChildNodes()->item(c2);
+						DOMNode* inputNode = verticeCurNode;
 						if (XMLString::compareString(inputNode->getNodeName(), BML::BMLDefs::ATTR_INPUT) == 0)
 						{
 							DOMNamedNodeMap* inputNodeAttr = inputNode->getAttributes();
@@ -1731,7 +1780,8 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 							DOMNode* sourceNameNode = inputNodeAttr->getNamedItem(BML::BMLDefs::ATTR_SOURCE);
 							std::string sourceName = xml_utils::xml_translate_string(sourceNameNode->getNodeValue());
 							setModelVertexSource(sourceName,inputSemantic,newModel,floatArrayMap);
-						}						
+						}
+						verticeCurNode = verticeCurNode->getNextSibling();
 					}										
 				}
 
@@ -1756,9 +1806,12 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 					std::map<int, std::string> inputMap;
 					int pStride = 0;
 					std::vector<int> vcountList;
-					for (unsigned int c2 = 0; c2 < node1->getChildNodes()->getLength(); c2++)
+					DOMNode* triangleCurNode = node1->getFirstChild();
+					while (triangleCurNode)
+					//for (unsigned int c2 = 0; c2 < node1->getChildNodes()->getLength(); c2++)
 					{
-						DOMNode* inputNode = node1->getChildNodes()->item(c2);
+						//DOMNode* inputNode = node1->getChildNodes()->item(c2);
+						DOMNode* inputNode = triangleCurNode;
 						if (XMLString::compareString(inputNode->getNodeName(), BML::BMLDefs::ATTR_INPUT) == 0)
 						{
 							DOMNamedNodeMap* inputNodeAttr = inputNode->getAttributes();
@@ -1806,6 +1859,8 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 							for (int i = 0; i < count; i++)
 								vcountList.push_back(atoi(tokens[i].c_str()));
 						}
+
+						triangleCurNode = triangleCurNode->getNextSibling();
 					}
 					int totalVertex = 0;
 					for (size_t i = 0; i < vcountList.size(); i++)
@@ -1880,6 +1935,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 						LOG("ParserOpenCOLLADA::parseLibraryGeometries ERR: parsing <p> list uncorrectly (%s)!", nameAttr.c_str());
 						*/
 				}
+				meshCurNode = meshCurNode->getNextSibling();
 			}
 
 			newModel->mtlTextureNameMap = mtlTexMap;
@@ -1917,6 +1973,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 			   }
 			}
 		}
+		curNode = curNode->getNextSibling();
 	}	
 }
 
@@ -1988,10 +2045,13 @@ void ParserOpenCOLLADA::load_texture(int type, const char* file, const SrStringA
 
 void ParserOpenCOLLADA::parseLibraryMaterials(DOMNode* node, std::map<std::string, std::string>& effectId2MaterialId)
 {
-	const DOMNodeList* list = node->getChildNodes();
-	for (unsigned int c = 0; c < list->getLength(); c++)
+	//const DOMNodeList* list = node->getChildNodes();
+	DOMNode* curNode = node->getFirstChild();
+	while (curNode)
+	//for (unsigned int c = 0; c < list->getLength(); c++)
 	{
-		DOMNode* node = list->item(c);
+		//DOMNode* node = list->item(c);
+		DOMNode* node = curNode;
 		std::string nodeName;
 		xml_utils::xml_translate(&nodeName, node->getNodeName());
 		if (nodeName == "material")
@@ -2017,15 +2077,19 @@ void ParserOpenCOLLADA::parseLibraryMaterials(DOMNode* node, std::map<std::strin
 					LOG("ParserOpenCOLLADA::parseLibraryMaterials ERR: two effects mapped to material %s", materialId.c_str());
 			}
 		}
+		curNode = curNode->getNextSibling();
 	}
 }
 
 void ParserOpenCOLLADA::parseLibraryImages(DOMNode* node, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name)
 {
-	const DOMNodeList* list = node->getChildNodes();
-	for (unsigned int c = 0; c < list->getLength(); c++)
+	//const DOMNodeList* list = node->getChildNodes();
+	DOMNode* curNode = node->getFirstChild();
+	while (curNode)
+	//for (unsigned int c = 0; c < list->getLength(); c++)
 	{
-		DOMNode* node = list->item(c);
+		//DOMNode* node = list->item(c);
+		DOMNode* node = curNode;
 		std::string nodeName;
 		xml_utils::xml_translate(&nodeName, node->getNodeName());
 		if (nodeName == "image")
@@ -2050,15 +2114,19 @@ void ParserOpenCOLLADA::parseLibraryImages(DOMNode* node, std::map<std::string, 
 			else
 				LOG("ParserOpenCOLLADA::parseLibraryImages ERR: two image files mapped to same image id %s", imageId.c_str());
 		}
+		curNode = curNode->getNextSibling();
 	}
 }
 
 void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
 {
-	const DOMNodeList* list = node->getChildNodes();
-	for (unsigned int c = 0; c < list->getLength(); c++)
+	//const DOMNodeList* list = node->getChildNodes();
+	DOMNode* curNode = node->getFirstChild();
+	while (curNode)
+	//for (unsigned int c = 0; c < list->getLength(); c++)
 	{
-		DOMNode* node = list->item(c);
+		//DOMNode* node = list->item(c);
+		DOMNode* node = curNode;
 		std::string nodeName;
 		xml_utils::xml_translate(&nodeName, node->getNodeName());
 		if (nodeName == "effect")
@@ -2233,6 +2301,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 				M.top().diffuse.a = (srbyte) ( alpha*255.0f );
 			}
 		}
+		curNode = curNode->getNextSibling();
 	}
 }
 
@@ -2255,19 +2324,25 @@ int ParserOpenCOLLADA::getNodeAttributeInt( DOMNode* node, XMLCh* attrName )
 void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string, ColladaFloatArray > &floatArrayMap, float scale, std::map<std::string, ColladaSampler > &samplerMap, std::vector<ColladChannel> &channelSamplerNameMap, SkSkeleton &skeleton )
 {
 	std::string idAttr = getNodeAttributeString(node1,BML::BMLDefs::ATTR_ID);
-	const DOMNodeList* list1 = node1->getChildNodes();			
-	for (unsigned int j = 0; j < list1->getLength(); j++)
+	//const DOMNodeList* list1 = node1->getChildNodes();	
+	DOMNode* curNode1 = node1->getFirstChild();	
+	while (curNode1)
+	//for (unsigned int j = 0; j < list1->getLength(); j++)
 	{
-		DOMNode* node2 = list1->item(j);
+		//DOMNode* node2 = list1->item(j);
+		DOMNode* node2 = curNode1;
 		std::string node2Name;
 		xml_utils::xml_translate(&node2Name, node2->getNodeName());
 		if (node2Name == "source")
 		{							
 			std::string sourceIdAttr = getNodeAttributeString(node2,BML::BMLDefs::ATTR_ID);
-			const DOMNodeList* list2 = node2->getChildNodes();
-			for (unsigned int k = 0; k < list2->getLength(); k++)
+			//const DOMNodeList* list2 = node2->getChildNodes();
+			DOMNode* curNode2 = node2->getFirstChild();
+			while (curNode2)
+			//for (unsigned int k = 0; k < list2->getLength(); k++)
 			{
-				DOMNode* node3 = list2->item(k);
+				//DOMNode* node3 = list2->item(k);
+				DOMNode* node3 = curNode2;
 				std::string node3Name;
 				xml_utils::xml_translate(&node3Name, node3->getNodeName());
 				// parse float array
@@ -2301,21 +2376,25 @@ void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string
 							colFloatArray.accessorParam = getNodeAttributeString(paramNode,BML::BMLDefs::ATTR_NAME);
 						}
 					}
-				}								
+				}
+				curNode2 = curNode2->getNextSibling();
 			}
 		}
 		else if (node2Name == "sampler")
 		{
-			const DOMNodeList* list2 = node2->getChildNodes();
 			std::string samplerID = getNodeAttributeString(node2,BML::BMLDefs::ATTR_ID);
 			if (samplerMap.find(samplerID) == samplerMap.end())
 			{
 				samplerMap[samplerID] = ColladaSampler();
 			}
 			ColladaSampler& sampler = samplerMap[samplerID];
-			for (unsigned int k = 0; k < list2->getLength(); k++)
+			//const DOMNodeList* list2 = node2->getChildNodes();
+			DOMNode* curNode2 = node2->getFirstChild();
+			while (curNode2)
+			//for (unsigned int k = 0; k < list2->getLength(); k++)
 			{
-				DOMNode* node3 = list2->item(k);
+				//DOMNode* node3 = list2->item(k);
+				DOMNode* node3 = curNode2;
 				std::string node3Name;
 				xml_utils::xml_translate(&node3Name, node3->getNodeName());						
 				if (node3Name == "input")
@@ -2332,6 +2411,7 @@ void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string
 						//LOG("sampelr input name = %s",sampler.outputName.c_str());
 					}
 				}
+				curNode2 = curNode2->getNextSibling();
 			}
 		} 
 		else if (node2Name == "channel")
@@ -2355,6 +2435,7 @@ void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string
 		{
 			parseNodeAnimation(node2,floatArrayMap,scale,samplerMap,channelSamplerNameMap,skeleton);
 		}
+		curNode1 = curNode1->getNextSibling();
 	}
 }
 
