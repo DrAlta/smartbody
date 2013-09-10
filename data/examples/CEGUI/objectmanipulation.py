@@ -6,7 +6,6 @@ print "|--------------------------------------------|"
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('motion', 'ChrBrad')
-scene.addAssetPath('motion', 'ChrRachel')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
@@ -17,24 +16,25 @@ scene.setScale(1.0)
 scene.setBoolAttribute('internalAudio', True)
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(0, 3.45, 5.02)
-camera.setCenter(0, 2.46, 3.29)
+
+camera.setEye(-3.31565, 6.04572, 8.35714)
+camera.setCenter(-2.11867, 5.04335, 7.11799)
 camera.setUpVector(SrVec(0, 1, 0))
 camera.setScale(1)
 camera.setFov(1.0472)
 camera.setFarPlane(100)
 camera.setNearPlane(0.1)
-camera.setAspectRatio(0.966897)
+camera.setAspectRatio(1.39286)
+
 scene.getPawn('camera').setPosition(SrVec(0, -2, 0))
 
-# Set joint map for Brad and Rachel
-print 'Setting up joint map for Brad and Rachel'
+# Set joint map for Brad'
+print 'Setting up joint map for Brad'
 scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
 bradSkeleton = scene.getSkeleton('ChrBrad.sk')
 zebra2Map.applySkeleton(bradSkeleton)
 zebra2Map.applyMotionRecurse('ChrBrad')
-
 
 # Setting up Brad
 print 'Setting up Brad'
@@ -44,10 +44,10 @@ brad = scene.createCharacter(baseName, '')
 bradSkeleton = scene.createSkeleton('ChrBrad.sk')
 brad.setSkeleton(bradSkeleton)
 brad.createStandardControllers()
-	# Set deformable mesh
+# Set deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', 0.01)
 brad.setStringAttribute('deformableMesh', 'ChrBrad')
-	# Play idle animation
+# Play idle animation
 bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
@@ -57,8 +57,12 @@ scene.run('BehaviorSetMaleMocapLocomotion.py')
 setupBehaviorSet()
 retargetBehaviorSet(baseName)
 
+# make the lights invisible
+scene.getPawn("light0").setBoolAttribute("visible", False)
+scene.getPawn("light1").setBoolAttribute("visible", False)
 
-#set gravity correctly
+
+# set gravity 
 phyManager = scene.getPhysicsManager()
 phyManager.getPhysicsEngine().setDoubleAttribute('gravity',9.80)
 
@@ -67,62 +71,61 @@ phyManager.getPhysicsEngine().setDoubleAttribute('gravity',9.80)
 print 'Setting character positions'
 scene.getCharacter('ChrBrad1').setPosition(SrVec(0, 0, 1))
 
+# Turn on GPU deformable geomtery for all
+for name in scene.getCharacterNames():
+	scene.command("char %s viewer deformableGPU" % name)
 
 # Set up pawns in scene
 print 'Adding pawns to scene'
 numPawns = 0
 
-baseName = 'phy%s' % numPawns
 shapeList = ['sphere', 'box', 'capsule']
-size = random.randrange(5, 30)
-pawn = scene.createPawn(baseName)
-pawn.setStringAttribute('collisionShape', random.choice(shapeList))
-pawn.getAttribute('collisionShapeScale').setValue(SrVec(0.1, 0.1, 0.1))
-pawn.setPosition(SrVec(-0.4, 6.6, 1.35))
-numPawns += 1
+
+
+# add the initial set of objects
+for o in range(0, 1):
+	baseName = 'object%s' % numPawns
+	size = random.randrange(5, 20)
+	pawn = scene.createPawn(baseName)
+	pawn.setStringAttribute('collisionShape', random.choice(shapeList))
+	pawn.getAttribute('collisionShapeScale').setValue(SrVec(0.1, 0.1, 0.1))
+	pawn.setPosition(SrVec(-0.4, 6.6, 1.35))
+	numPawns += 1
+	pawn = scene.getPawn(baseName)
+					
+	pawn.getAttribute('color').setValue(SrVec( random.random(), random.random(), random.random()))
+	# Append all pawn to list
+	pawnList = []
+	for name in scene.getPawnNames():
+		if 'object' in name:
+			pawnList.append(scene.getPawn(name))
+			print scene.getPawn(name)
+			
+	# Setup pawn physics	
+	print 'Setting up object physics'
+	phyManager = scene.getPhysicsManager()
+	phyManager.getPhysicsEngine().setBoolAttribute('enable', True)
+
+	for pawn in pawnList:
+		pawn.getAttribute('createPhysics').setValue()
+		phyManager.getPhysicsPawn(pawn.getName()).setDoubleAttribute('mass', 1)
+
+	for pawn in pawnList:
+		pawn.setBoolAttribute('enablePhysics', True)
+
 
 	
-#set first pawn to yellow
-baseName = 'phy%s' % 0
-pawn = scene.getPawn(baseName)
-pawn.getAttribute('color').setValue(SrVec( 1, 1, 0))
-				
-# Append all pawn to list
-pawnList = []
-for name in scene.getPawnNames():
-	if 'phy' in name:
-		pawnList.append(scene.getPawn(name))
-		print scene.getPawn(name)
-		
-
-# Setup pawn physics	
-print 'Setting up pawn physics'
-phyManager = scene.getPhysicsManager()
-phyManager.getPhysicsEngine().setBoolAttribute('enable', True)
-
-for pawn in pawnList:
-	pawn.getAttribute('createPhysics').setValue()
-	phyManager.getPhysicsPawn(pawn.getName()).setDoubleAttribute('mass', 1)
-
-for pawn in pawnList:
-	pawn.setBoolAttribute('enablePhysics', True)
-	
-	
-# Turn on GPU deformable geomtery for all
-for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
-
-	
-	
-# ---- pawn: pawn3 mesh pawn
-baseName = 'pawn3'
+# ---- pawn: shelf pawn
+baseName = 'shelf'
 pawn = scene.createPawn(baseName)
 
 pawn.setPosition(SrVec( 5, 0, 5))
-pawn.setStringAttribute("mesh" , "../../../../data/mesh/shelf.dae")
-pawn.setDoubleAttribute("meshScale",0.15)
+#pawn.setStringAttribute("mesh" , "../../../../data/mesh/shelf.dae")
+#pawn.setDoubleAttribute("meshScale",0.15)
+pawn.setStringAttribute('collisionShape', 'box')
+pawn.getAttribute('collisionShapeScale').setValue(SrVec( 0.5, 1.5, 0.2))
 pawn.setDoubleAttribute('rotY' , 90)
-	
+pawn.setBoolAttribute('visible', False)
 	
 # ---- pawn: pawnTop
 baseName = 'pawnTop'
@@ -132,8 +135,6 @@ pawn.getAttribute('collisionShapeScale').setValue(SrVec( 0.2, 0.02, 0.5))
 pawn.setPosition(SrVec( 4.93, 1.22, 4.93))
 pawn.getAttribute('createPhysics').setValue()
 
-
-
 # ---- pawn: pawnMid
 baseName = 'pawnMid'
 pawn = scene.createPawn(baseName)
@@ -141,9 +142,6 @@ pawn.setStringAttribute('collisionShape', 'box')
 pawn.getAttribute('collisionShapeScale').setValue(SrVec( 0.2, 0.02, 0.5))
 pawn.setPosition(SrVec( 4.93, 0.62, 4.93))
 pawn.getAttribute('createPhysics').setValue()
-
-
-
 	
 # ---- pawn: pawnBot
 baseName = 'pawnBot'
@@ -156,9 +154,9 @@ pawn.getAttribute('createPhysics').setValue()
 
 
 curTime = 0
-lastPass =0
+lastPass = 0
 delay = 3
-onAction =False
+onAction = False
 
 
 class ReachDemo(SBScript):
@@ -203,24 +201,10 @@ class ReachingHandler(SBEventHandler):
 			elif 'pawn-released' in params and grabbed :
 				grabbed = False
 				canOtherAction =True
-				baseName = 'phy%s' % (currentPawnNum - 1)
-				pawn = scene.getPawn(baseName)	
-				#pawn.getAttribute('color').setValue(SrVec( 1, 0, 0))
-				baseName = 'phy%s' % (currentPawnNum)
-				pawn = scene.getPawn(baseName)	
-				pawn.getAttribute('color').setValue(SrVec( 1, 1, 0))
-				
-		
-		
-		
 		
 evtMgr = scene.getEventManager()
 reachingHdl = ReachingHandler()
 evtMgr.addEventHandler('reachNotifier', reachingHdl)
-
-
-
-
 
 print 'Setting up GUI'
 scene.run('GUIUtil.py')
@@ -238,7 +222,7 @@ class GUIHandler:
 		
 		if(not onAction and canOtherAction):
 			print 'try touching pawn'
-			baseName = 'phy%s' % currentPawnNum
+			baseName = 'object%s' % currentPawnNum
 			onAction = True
 			delay = 2
 			bml.execBML('ChrBrad1', '<sbm:reach sbm:action="touch" target="'+baseName+'" sbm:reach-finish="true"/>')
@@ -250,7 +234,7 @@ class GUIHandler:
 		global onAction , delay,canOtherAction,currentPawnNum
 		if(not onAction and canOtherAction):
 			print 'try pointing pawn'
-			baseName = 'phy%s' % currentPawnNum
+			baseName = 'object%s' % currentPawnNum
 			delay = 3
 			bml.execBML('ChrBrad1', '<sbm:reach sbm:action="point-at" sbm:reach-duration="1" target="'+baseName+'"/>')
 			bml.execBML('ChrBrad1', '<gaze target="touchPawn" sbm:joint-range="EYES NECK"/>')
@@ -265,7 +249,7 @@ class GUIHandler:
 			canOtherAction=False
 			onAction = True
 			delay = 2
-			baseName = 'phy%s' % currentPawnNum
+			baseName = 'object%s' % currentPawnNum
 			bml.execBML('ChrBrad1', '<sbm:reach sbm:action="pick-up" sbm:reach-finish="true" sbm:reach-duration="2" target="'+baseName+'" sbm:use-locomotion="true"/>')	
 			bml.execBML('ChrBrad1', '<gaze target="'+baseName+'" sbm:joint-range="EYES NECK"/>')		
 		
@@ -274,7 +258,7 @@ class GUIHandler:
 		global pawn1 , onAction , delay,currentPawnNum ,numPawns,grabbed,released,canOtherAction
 		if(not onAction and grabbed and not released):
 			print 'putting it somewhere else'
-			baseName = 'phy%s' % currentPawnNum
+			baseName = 'object%s' % currentPawnNum
 			if(currentPawnNum <=numPawns):
 				currentPawnNum += 1
 				
@@ -300,7 +284,7 @@ class GUIHandler:
 		global pawn1 , onAction , delay,currentPawnNum ,numPawns,grabbed,released,canOtherAction
 		if(not onAction and grabbed and not released):
 			print 'putting it somewhere else'
-			baseName = 'phy%s' % currentPawnNum
+			baseName = 'object%s' % currentPawnNum
 			if(currentPawnNum <=numPawns):
 				currentPawnNum += 1
 			canOtherAction = False
@@ -316,7 +300,7 @@ class GUIHandler:
 		global pawn1 , onAction , delay,currentPawnNum ,numPawns,grabbed,released,canOtherAction
 		if(not onAction and grabbed and not released):
 			print 'putting it somewhere else'
-			baseName = 'phy%s' % currentPawnNum
+			baseName = 'object%s' % currentPawnNum
 			if(currentPawnNum <=numPawns):
 				currentPawnNum += 1
 			canOtherAction = False
@@ -331,7 +315,7 @@ class GUIHandler:
 		global pawn1 , onAction , delay,currentPawnNum ,numPawns,grabbed,released,canOtherAction
 		if(not onAction and grabbed and not released):
 			print 'putting it somewhere else'
-			baseName = 'phy%s' % currentPawnNum
+			baseName = 'object%s' % currentPawnNum
 			if(currentPawnNum <=numPawns):
 				currentPawnNum += 1
 			canOtherAction = False
@@ -344,7 +328,7 @@ class GUIHandler:
 		
 	def addPawnButton(self,args):
 		global numPawns
-		baseName = 'phy%s' % numPawns
+		baseName = 'object%s' % numPawns
 		shapeList = ['sphere', 'box', 'capsule']
 		size = random.randrange(5, 30)
 		
@@ -353,6 +337,8 @@ class GUIHandler:
 		pawn.setPosition(SrVec(0, 6.6, 0))
 		pawn.setStringAttribute('collisionShape', random.choice(shapeList))
 		pawn.getAttribute('collisionShapeScale').setValue(SrVec(0.1, 0.1, 0.1))
+		pawn.getAttribute('color').setValue(SrVec( random.random(), random.random(), random.random()))
+	
 		
 		numPawns += 1
 		speechTextBox.setText("number of Pawn:"+str(numPawns))
@@ -361,13 +347,7 @@ class GUIHandler:
 		phyManager.getPhysicsPawn(scene.getPawn(baseName).getName()).setDoubleAttribute('mass', 1)
 		
 		scene.getPawn(baseName).setBoolAttribute('enablePhysics', True)
-		
-		
 
-	
-		
-
-	
 
 		
 guiHandler = GUIHandler()	
@@ -380,16 +360,16 @@ pointButton.subscribeEvent(PushButton.EventClicked, guiHandler.handlePointButton
 grabButton = gui.createButton('grabBtn','Grab Object')
 grabButton.subscribeEvent(PushButton.EventClicked, guiHandler.handleGrabButton)
 
-grabMoveButton = gui.createButton('grabMoveBtn','Place on shelf')
+grabMoveButton = gui.createButton('grabMoveBtn','Place somewhere on shelf')
 grabMoveButton.subscribeEvent(PushButton.EventClicked, guiHandler.handleGrabMoveButton)
 
-grabMoveTopButton = gui.createButton('grabMoveTopBtn','Place on TopShelf')
+grabMoveTopButton = gui.createButton('grabMoveTopBtn','Place on high shelf')
 grabMoveTopButton.subscribeEvent(PushButton.EventClicked, guiHandler.handleGrabMoveTopButton)
 
-grabMoveMidButton = gui.createButton('grabMoveMidBtn','Place on Midshelf')
+grabMoveMidButton = gui.createButton('grabMoveMidBtn','Place on mid shelf')
 grabMoveMidButton.subscribeEvent(PushButton.EventClicked, guiHandler.handleGrabMoveMidButton)
 
-grabMoveBotButton = gui.createButton('grabMoveBotBtn','Place on Bottomshelf')
+grabMoveBotButton = gui.createButton('grabMoveBotBtn','Place on low shelf')
 grabMoveBotButton.subscribeEvent(PushButton.EventClicked, guiHandler.handleGrabMoveBotButton)
 
 addPawnButton = gui.createButton('addPawnBtn','Add object')
