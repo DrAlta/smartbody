@@ -205,7 +205,7 @@ class ReachingHandler(SBEventHandler):
 				canOtherAction =True
 				baseName = 'phy%s' % (currentPawnNum - 1)
 				pawn = scene.getPawn(baseName)	
-				pawn.getAttribute('color').setValue(SrVec( 1, 0, 0))
+				#pawn.getAttribute('color').setValue(SrVec( 1, 0, 0))
 				baseName = 'phy%s' % (currentPawnNum)
 				pawn = scene.getPawn(baseName)	
 				pawn.getAttribute('color').setValue(SrVec( 1, 1, 0))
@@ -360,7 +360,6 @@ class GUIHandler:
 		scene.getPawn(baseName).getAttribute('createPhysics').setValue()
 		phyManager.getPhysicsPawn(scene.getPawn(baseName).getName()).setDoubleAttribute('mass', 1)
 		
-		sin.step(1)
 		scene.getPawn(baseName).setBoolAttribute('enablePhysics', True)
 		
 		
