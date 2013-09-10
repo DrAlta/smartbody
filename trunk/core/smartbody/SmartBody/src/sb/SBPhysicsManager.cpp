@@ -197,6 +197,7 @@ SmartBody::SBObject* SBPhysicsManager::createPhysicsPawn( std::string pawnName, 
 	//phyObj->changeGeometry(geomType,geomSize);
 	getPhysicsEngine()->addPhysicsObj(phyObj);
 	getPhysicsEngine()->updatePhyObjGeometry(phyObj);
+	updatePhysicsPawn(pawnName);
 	return phyObj;
 }
 
