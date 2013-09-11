@@ -92,7 +92,6 @@
 		AAD5A306177A39F70056CDD4 /* libboost_regex.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_regex.a; path = ../../libs/iphoneos/libboost_regex.a; sourceTree = "<group>"; };
 		AAD5A307177A39F70056CDD4 /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = ../../libs/iphoneos/libboost_system.a; sourceTree = "<group>"; };
 		AAE74E4E1798E6E300D36911 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = ../../libs/iphoneos/libsndfile.a; sourceTree = "<group>"; };
-		AAE74E501798E70600D36911 /* freealut.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = freealut.framework; path = "../../../../../Downloads/MacTorcs-master/Frameworks/freealut.framework"; sourceTree = "<group>"; };
 		AAE74E511798E70600D36911 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		AAE74E541798EEF300D36911 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		AAE74E5A1798F6CD00D36911 /* libalut.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libalut.a; path = "../../../../../Downloads/freealut-1.1.0/build/libalut.a"; sourceTree = "<group>"; };
@@ -222,7 +221,6 @@
 				AAC9AC4E142010C000F56F9C /* libwsp.a */,
 				AAC9AC4F142010C000F56F9C /* libxerces-c.a */,
 				AAE74E541798EEF300D36911 /* OpenAL.framework */,
-				AAE74E501798E70600D36911 /* freealut.framework */,
 				AAE74E511798E70600D36911 /* CoreAudio.framework */,
 				AAD2C3FF155200120053C478 /* QuartzCore.framework */,
 				AAD2C3F91551FFF30053C478 /* Foundation.framework */,
@@ -320,6 +318,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
@@ -393,6 +392,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",

@@ -16,15 +16,18 @@
 	UIViewController* m_currentController;
     IBOutlet UITextField *text;    
     UISegmentedControl *segmentedControl;
+    UISwitch *toggleAliasing;
 }
 
 @property (nonatomic, strong) IBOutlet EAGLView* glView;
 @property (nonatomic, strong) IBOutlet UITextField* text;
 @property (nonatomic, strong) IBOutlet UISegmentedControl* segmentedControl;
+@property (nonatomic, strong) IBOutlet UISwitch* toggleAliasing;
 
 
 - (IBAction)changeCommand;
 - (IBAction)segmentedControlIndexChanged;
+- (IBAction)turnOnAntiAliasing;
 
 @end
 
