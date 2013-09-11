@@ -345,6 +345,9 @@ class BMLDefs
 		static XMLCh* OGRE_V1;
 		static XMLCh* OGRE_V2;
 		static XMLCh* OGRE_V3;
+		static XMLCh* OGRE_T1;
+		static XMLCh* OGRE_T2;
+		static XMLCh* OGRE_T3;
 		static XMLCh* OGRE_ANGLE;
 		static XMLCh* OGRE_AXIS;
 		static XMLCh* OGRE_ANIMATION;
