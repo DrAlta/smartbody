@@ -1,5 +1,8 @@
 viewer = getViewer()
-viewer.show()
+if viewer is not None:
+	viewer.show()
+else:
+	return
 
 sscale = 1.0/scene.getScale()
 
@@ -25,6 +28,7 @@ light0.createDoubleAttribute("lightSpotCutoff", 180.0, True, "LightAttributes", 
 light0.createDoubleAttribute("lightConstantAttenuation", 1.0, True, "LightAttributes", 70, False, False, False, "Constant attenuation")
 light0.createDoubleAttribute("lightLinearAttenuation", 0.0, True, "LightAttributes", 80, False, False, False, "Linear attenuation")
 light0.createDoubleAttribute("lightQuadraticAttenuation", 0.0, True, "LightAttributes", 90, False, False, False, "Quadratic attenuation")
+light0.createIntAttribute("lightShadowMap", 1024, True, "LightAttributes", 100, False, False, False, "Shadow map size.")
 
 
 light1 = scene.createPawn("light1")
@@ -41,5 +45,6 @@ light1.createDoubleAttribute("lightSpotCutoff", 180.0, True, "LightAttributes", 
 light1.createDoubleAttribute("lightConstantAttenuation", 1.0, True, "LightAttributes", 70, False, False, False, "Constant attenuation")
 light1.createDoubleAttribute("lightLinearAttenuation", 0.0, True, "LightAttributes", 80, False, False, False, "Linear attenuation")
 light1.createDoubleAttribute("lightQuadraticAttenuation", 0.0, True, "LightAttributes", 90, False, False, False, "Quadratic attenuation")
+light1.createIntAttribute("lightShadowMap", 1024, True, "LightAttributes", 100, False, False, False, "Shadow map size.")
 
 

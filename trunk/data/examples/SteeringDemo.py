@@ -44,7 +44,7 @@ steerManager = scene.getSteerManager()
 print 'Setting up Brads'
 bradList = []
 bradPosX = -500.0
-for i in range(15):
+for i in range(10):
 	baseName = 'ChrBrad%s' % i
 	brad = scene.createCharacter(baseName, '')
 	bradSkeleton = scene.createSkeleton('ChrBrad.sk')

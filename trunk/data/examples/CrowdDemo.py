@@ -33,7 +33,7 @@ steerManager = scene.getSteerManager()
 
 # Setting up Brads
 print 'Setting up Brads'
-amount = 30
+amount = 2
 row = 0; column = 0; 
 offsetX = 0; offsetZ = 0;
 for i in range(amount):
@@ -59,7 +59,8 @@ for i in range(amount):
 	#etargetCharacter(baseName, 'ChrBrad.sk', False)
 	# setup mocap locomotion
 	if i== 0 : 
-		scene.run('BehaviorSetMaleMocapLocomotion.py')
+#		scene.run('BehaviorSetMaleMocapLocomotion.py')
+		scene.run('BehaviorSetMaleLocomotion.py')
 		setupBehaviorSet()
 	retargetBehaviorSet(baseName)
 	# Set up steering
@@ -94,9 +95,12 @@ class CrowdDemo(SBScript):
 		# Once utah completes path, do again
 		if bradReached:
 			for brad in bradList:
+				print "Moving Brad " + brad.getName()
 				# Move character
-				bml.execBML(brad.getName(), '<locomotion speed="' +  str(random.uniform(1.2, 5.0)) + '" target="' +\
-											vec2str(bradPath[bradCur]) + '" type="basic"/>')
+				print  '<locomotion speed="' +  str(random.uniform(1.20, 5.0)) + '" target="' +\
+											vec2str(bradPath[bradCur]) + '"/>'
+				bml.execBML(brad.getName(), '<locomotion speed="' +  str(random.uniform(1.20, 5.0)) + '" target="' +\
+											vec2str(bradPath[bradCur]) + '"/>')
 			bradCur = bradCur + 1
 			# If reaches max path, reset
 			if bradCur >= pathAmt:
@@ -133,4 +137,4 @@ def vec2str(vec):
 	if -0.0001 < x < 0.0001: x = 0
 	if -0.0001 < y < 0.0001: y = 0
 	if -0.0001 < z < 0.0001: z = 0
-	return "" + str(x) + " " + str(y) + " " + str(z) + ""
+	return "" + str(x) + " " + str(y) + ""

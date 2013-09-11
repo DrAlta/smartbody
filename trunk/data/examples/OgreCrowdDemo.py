@@ -26,9 +26,8 @@ sinbadMap.applySkeleton(ogreSk)
 
 steerManager = scene.getSteerManager()
 print 'Setting up Sinbads'
-amount = 20
+amount = 40
 row = 0; column = 0; 
-offsetX = 0; offsetZ = 0;
 sinbadList = []
 for i in range(amount):
 	sinbadName = 'sinbad%s' % i
@@ -36,13 +35,9 @@ for i in range(amount):
 	sinbadSk = scene.createSkeleton(sinbadSkName)
 	sinbad.setSkeleton(sinbadSk)
 	# Set position logic
-	posX = (-10 * (5/2)) + 10 * column
-	posZ = ((-10 / math.sqrt(amount)) * (amount/2)) + 10 * row	
-	column = column + 1
-	if column >= 5:
-		column = 0
-		row = row + 1
-	sinbadPos = SrVec((posX + offsetX), 5.16, (posZ + offsetZ))
+	posX = math.cos(360.0 / amount * i) * 100.0
+	posZ = math.sin(360.0 / amount * i) * 100.0
+	sinbadPos = SrVec(posX, 5.16, posZ)
 	sinbad.setPosition(sinbadPos)
 	sinbad.createStandardControllers()
 	sinbad.setStringAttribute('deformableMesh', 'Sinbad')
@@ -55,6 +50,11 @@ for i in range(amount):
 	scene.command("char %s viewer deformableGPU" % sinbadName)	
 	# Play default animation
 	bml.execBML(sinbadName, '<body posture="ChrUtah_Idle001"/>')
+	
+	#steerManager = scene.getSteerManager()
+	#steerManager.removeSteerAgent(sinbadName)
+	#steerAgent = steerManager.createSteerAgent(sinbadName)
+	#steerAgent.setSteerType("basic")
 	
 steerManager.setEnable(False)
 steerManager.setEnable(True)

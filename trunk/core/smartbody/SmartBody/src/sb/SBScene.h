@@ -81,6 +81,9 @@ class SBScene : public SBObject
 		SBAPI static SBScene* getScene();		
 		SBAPI static void destroyScene();
 
+		SBAPI static std::string getVersion();
+
+
 		SBAPI void setScale(float val);
 		SBAPI float getScale();
 
@@ -343,8 +346,6 @@ class SBScene : public SBObject
 #endif
 };
 
-SBScene* getScene();
-const std::string& getVersion();
 
 };
 
