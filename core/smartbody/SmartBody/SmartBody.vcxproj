@@ -69,6 +69,9 @@ copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
+    <PreBuildEvent>
+      <Command>rem if exist "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" src src\sb\SBVersionTemplate.hpp src\sb\SBVersion.hpp</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -104,6 +107,9 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
+    <PreBuildEvent>
+      <Command>rem if exist "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" src src\sb\SBVersionTemplate.hpp src\sb\SBVersion.hpp</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\SmartBody\src\bml\behavior_scheduler_gesture.cpp" />

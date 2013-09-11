@@ -9,6 +9,7 @@
 #include <sb/SBEvent.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <sb/SBVersion.hpp>
 
 #ifndef SB_NO_PYTHON
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp> 
@@ -48,7 +49,7 @@ void pythonFuncsSystem()
 	boost::python::def("reset", reset, "Reset SBM. ");
 	boost::python::def("quit", quitSbm, "Quit SBM. ");	
 	boost::python::def("getScene", SBScene::getScene, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the SmartBody scene object.");
-	boost::python::def("getVersion", SBScene::getVersion, "Gets the SmartBody version.");
+	boost::python::def("getVersion", getVersion, "Gets the SmartBody version.");
 
 }
 }
