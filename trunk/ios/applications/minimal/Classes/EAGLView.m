@@ -57,6 +57,7 @@
         }
         
         animationInterval = 15.0 / 60.0;
+        antialiasing = NO;
 		[self setupView];
     }
     return self;
@@ -69,17 +70,43 @@
 	SBUpdate(timer);
     
     [EAGLContext setCurrentContext:context];
-    glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
+
+    if (antialiasing)
+    {
+        glBindFramebufferOES(GL_FRAMEBUFFER_OES, msaaFramebuffer);
+        glViewport(0, 0, width, height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
     
     CGRect rect = [[UIScreen mainScreen] bounds];
 	width = rect.size.width;
 	height = rect.size.height;
     SBDrawFrame(width, height);
-	
-	glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
-    [context presentRenderbuffer:GL_RENDERBUFFER_OES];
-
-
+    
+    if (!antialiasing)
+    {
+        glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
+        glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
+        [context presentRenderbuffer:GL_RENDERBUFFER_OES];
+    }
+    else
+    {
+        // Apple (and the khronos group) encourages you to discard depth
+        // render buffer contents whenever is possible
+         GLenum attachments[] = {GL_DEPTH_ATTACHMENT_OES};
+         glDiscardFramebufferEXT(GL_READ_FRAMEBUFFER_APPLE, 1, attachments);
+        
+        //Bind both MSAA and View FrameBuffers.
+        glBindFramebufferOES(GL_READ_FRAMEBUFFER_APPLE, msaaFramebuffer);
+        glBindFramebufferOES(GL_DRAW_FRAMEBUFFER_APPLE, viewFramebuffer);
+        
+        // Call a resolve to combine both buffers
+        glResolveMultisampleFramebufferAPPLE();
+        
+        // Present final image to screen
+        glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
+        [context presentRenderbuffer:GL_RENDERBUFFER_OES];
+    }
 }
 
 - (void)layoutSubviews {
@@ -109,7 +136,26 @@
         glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, backingWidth, backingHeight);
         glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, depthRenderbuffer);
     }
+
+    //Generate our MSAA Frame and Render buffers
+    glGenFramebuffersOES(1, &msaaFramebuffer);
+    glGenRenderbuffersOES(1, &msaaRenderBuffer);
     
+    //Bind our MSAA buffers
+    glBindFramebufferOES(GL_FRAMEBUFFER_OES, msaaFramebuffer);
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, msaaRenderBuffer);
+    
+    // Generate the msaaDepthBuffer.
+    // 4 will be the number of pixels that the MSAA buffer will use in order to make one pixel on the render buffer.
+    glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER_OES, 4, GL_RGB5_A1_OES, backingWidth, backingHeight);
+    glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, msaaRenderBuffer);
+    glGenRenderbuffersOES(1, &msaaDepthBuffer);
+    
+    //Bind the msaa depth buffer.
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, msaaDepthBuffer);
+    glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER_OES, 4, GL_DEPTH_COMPONENT16_OES, backingWidth , backingHeight);
+    glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, msaaDepthBuffer);
+
     if(glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES) {
         NSLog(@"failed to make complete framebuffer object %x", glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES));
         return NO;
@@ -125,10 +171,20 @@
     viewFramebuffer = 0;
     glDeleteRenderbuffersOES(1, &viewRenderbuffer);
     viewRenderbuffer = 0;
+    glDeleteFramebuffersOES(1, &msaaFramebuffer);
+    msaaFramebuffer = 0;
+    glDeleteRenderbuffersOES(1, &msaaRenderBuffer);
+    msaaRenderBuffer = 0;
+    
     
     if(depthRenderbuffer) {
         glDeleteRenderbuffersOES(1, &depthRenderbuffer);
         depthRenderbuffer = 0;
+    }
+    if(msaaDepthBuffer)
+    {
+        glDeleteRenderbuffersOES(1, &msaaDepthBuffer);
+        msaaDepthBuffer = 0;
     }
 }
 

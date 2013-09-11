@@ -14,6 +14,7 @@
 @synthesize glView;
 @synthesize text;
 @synthesize segmentedControl;
+@synthesize toggleAliasing;
 
 - (void)viewDidLoad 
 {
@@ -48,6 +49,18 @@
     if (id == 2)    // reset camera
     {
         SBCameraOperation(0, 0);
+    }
+}
+
+- (IBAction)turnOnAntiAliasing
+{
+    if (toggleAliasing.on)
+    {
+        glView->antialiasing = YES;
+    }
+    else
+    {
+        glView->antialiasing = NO;
     }
 }
 

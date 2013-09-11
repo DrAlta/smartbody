@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA93021517E02E3000958769 /* me_ct_pose_postprocessing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA93021317E02E3000958769 /* me_ct_pose_postprocessing.cpp */; };
+		AA93021617E02E3000958769 /* me_ct_pose_postprocessing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA93021417E02E3000958769 /* me_ct_pose_postprocessing.hpp */; };
 		AA9CD5E8141FF8610064C27A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9CD5E7141FF8610064C27A /* Foundation.framework */; };
 		AAD45B0E17A98E5C005905B2 /* behavior_scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD457CC17A98E5A005905B2 /* behavior_scheduler.cpp */; };
 		AAD45B0F17A98E5C005905B2 /* behavior_scheduler.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AAD457CD17A98E5A005905B2 /* behavior_scheduler.hpp */; };
@@ -739,6 +741,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AA93021317E02E3000958769 /* me_ct_pose_postprocessing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_pose_postprocessing.cpp; sourceTree = "<group>"; };
+		AA93021417E02E3000958769 /* me_ct_pose_postprocessing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_pose_postprocessing.hpp; sourceTree = "<group>"; };
 		AA9CD5E4141FF8610064C27A /* libsmartbody-lib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libsmartbody-lib.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA9CD5E7141FF8610064C27A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		AA9CD5EB141FF8610064C27A /* smartbody-lib-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "smartbody-lib-Prefix.pch"; sourceTree = "<group>"; };
@@ -1607,6 +1611,8 @@
 		AAD4580417A98E5B005905B2 /* controllers */ = {
 			isa = PBXGroup;
 			children = (
+				AA93021317E02E3000958769 /* me_ct_pose_postprocessing.cpp */,
+				AA93021417E02E3000958769 /* me_ct_pose_postprocessing.hpp */,
 				AAD4580517A98E5B005905B2 /* me_blend_cover.h */,
 				AAD4580617A98E5B005905B2 /* me_controller.cpp */,
 				AAD4580717A98E5B005905B2 /* me_controller.h */,
@@ -2765,6 +2771,7 @@
 				AAD45E3817A98E5D005905B2 /* sr_vec.h in Headers */,
 				AAD45E3A17A98E5D005905B2 /* sr_vec2.h in Headers */,
 				AAD45E3C17A98E5D005905B2 /* sr_viewer.h in Headers */,
+				AA93021617E02E3000958769 /* me_ct_pose_postprocessing.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3192,6 +3199,7 @@
 				AAD45E3717A98E5D005905B2 /* sr_vec.cpp in Sources */,
 				AAD45E3917A98E5D005905B2 /* sr_vec2.cpp in Sources */,
 				AAD45E3B17A98E5D005905B2 /* sr_viewer.cpp in Sources */,
+				AA93021517E02E3000958769 /* me_ct_pose_postprocessing.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
