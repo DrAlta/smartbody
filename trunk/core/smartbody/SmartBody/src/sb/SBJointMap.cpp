@@ -670,15 +670,21 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 	
 	//-------------------------------------------------------------------------
 	// CONTINUE with spine1, try finding spine3, spine4, l/r_acromioclavicular
-	for(unsigned int i=getJointIndex(spine1); i<jnts.size(); i++)
+// 	for(unsigned int i=getJointIndex(spine1); i<jnts.size(); i++)
+// 	{
+// 		SkJoint* j = jnts[i];		
+// 		if(j->num_children()>=2)
+// 		{
+// 			spine3 = j;
+// 			break;
+// 		}
+// 	}
+	spine3 = spine1->child(0);
+	while (spine3->num_children() < 2 && spine3->num_children() > 0)
 	{
-		SkJoint* j = jnts[i];
-		if(j->num_children()>=2)
-		{
-			spine3 = j;
-			break;
-		}
+		spine3 = spine3->child(0);
 	}
+
 	if(!spine3)
 	{
 		LOG("guessMap: spine3 joint NOT found, aborting...\n");

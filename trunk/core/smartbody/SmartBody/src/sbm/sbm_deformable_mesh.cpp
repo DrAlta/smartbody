@@ -6,6 +6,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
 #include <sr/sr_sn_group.h>
+#include <sr/sr_random.h>
 #include <boost/algorithm/string.hpp>
 
 #define TEST_HAIR_RENDER 1
@@ -466,6 +467,7 @@ bool DeformableMesh::buildVertexBuffer()
 	tangentBuf.resize(nTotalVtxs); 
 	binormalBuf.resize(nTotalVtxs);
 	texCoordBuf.resize(nTotalVtxs);
+	skinColorBuf.resize(nTotalVtxs);
 	triBuf.resize(nTotalTris);
 	for (int i=0;i<2;i++)
 	{
@@ -479,6 +481,21 @@ bool DeformableMesh::buildVertexBuffer()
 	iFaceIdxOffset = 0;
 	iNormalIdxOffset = 0;
 	iTextureIdxOffset = 0;	
+	std::vector<SrVec> boneColorMap;
+	float step = 1.f/boneJointList.size();
+	float floatBuf[4];
+	SrRandom random;	
+	for (unsigned int i=0;i<boneJointList.size();i++)
+	{
+		//SrColor boneColor = SrColor::interphue(random.getf());
+		SrColor boneColor = SrColor::interphue(i*step);
+		boneColor.get(floatBuf);
+		if (i == 3)
+			boneColorMap.push_back(SrVec(1.f,0.f,0.f));
+		else
+			boneColorMap.push_back(SrVec(floatBuf[0],floatBuf[1],floatBuf[2]));				
+	}
+	
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
 		SkinWeight* skinWeight = skinWeights[skinCounter];		
@@ -528,6 +545,7 @@ bool DeformableMesh::buildVertexBuffer()
 				std::sort(weightList.begin(),weightList.end(),intFloatComp); // sort for minimum weight
 				int numWeight = numOfInfJoints > 8 ? 8 : numOfInfJoints;
 				float weightSum = 0.f;
+				SrVec skinColor;
 				for (int j=0;j<numWeight;j++)
 				{
 					IntFloatPair& w = weightList[j];
@@ -544,7 +562,14 @@ bool DeformableMesh::buildVertexBuffer()
 						boneIDBuf_f[1][iVtx][j-4] = (float)w.first;
 						boneWeightBuf[1][iVtx][j-4] = w.second;
 					}	
+					
+					if (w.first >= 0 && w.first < boneJointList.size())
+					{
+						skinColor += boneColorMap[w.first]*w.second;
+					}
 				}
+				skinColorBuf[iVtx] = skinColor;
+
 				for (int j=0;j<4;j++)
 				{
 					boneWeightBuf[0][iVtx][j] /= weightSum;
