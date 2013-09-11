@@ -1104,6 +1104,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 									if (yNode)
 										xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
 									offset.y = 1.f - (float) atof(yAttr.c_str());	
+									//offset.y = (float) atof(yAttr.c_str());	
 									model->T.push(offset);									
 								}
 							}						
@@ -1154,11 +1155,34 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 						if (zNode)
 							xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
 						v3 = atoi(zAttr.c_str());
+
+						int t1,t2,t3;
+
+						const DOMNode* txNode = faceAttr->getNamedItem(BML::BMLDefs::OGRE_T1);
+						std::string txAttr = "-1";
+						if (txNode)
+							xml_utils::xml_translate(&txAttr, txNode->getNodeValue());
+						t1 = atoi(txAttr.c_str());
+						const DOMNode* tyNode = faceAttr->getNamedItem(BML::BMLDefs::OGRE_T2);
+						std::string tyAttr = "-1";
+						if (tyNode)
+							xml_utils::xml_translate(&tyAttr, tyNode->getNodeValue());
+						t2 = atoi(tyAttr.c_str());
+						const DOMNode* tzNode = faceAttr->getNamedItem(BML::BMLDefs::OGRE_T3);
+						std::string tzAttr = "-1";
+						if (tzNode)
+							xml_utils::xml_translate(&tzAttr, tzNode->getNodeValue());
+						t3 = atoi(tzAttr.c_str());
+
+						if (t1 == -1 || t2 == -1 || t3 == -1)
+						{
+							t1 = v1; t2 = v2; t3 = v3;
+						}
 						
 						// no material for now.
 						model->Fm.push(0); // use first material
 						model->F.push().set(v1,v2,v3);
-						model->Ft.push().set(v1,v2,v3);
+						model->Ft.push().set(t1,t2,t3);
 						model->Fn.push().set(v1,v2,v3);
 					}	
 					faceNode = faceNode->getNextSibling();
