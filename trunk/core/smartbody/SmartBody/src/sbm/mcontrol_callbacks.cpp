@@ -1705,10 +1705,13 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 	boost::char_separator<char> sep(" \n");
 
 	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->getCharacter( char_name );
-	const DOMNodeList* list = node->getChildNodes();
-	for (unsigned int c = 0; c < list->getLength(); c++)
+	//const DOMNodeList* list = node->getChildNodes();
+	DOMNode* curNode = node->getFirstChild();
+	while (curNode)
+	//for (unsigned int c = 0; c < list->getLength(); c++)
 	{
-		DOMNode* node = list->item(c);
+		//DOMNode* node = list->item(c);
+		DOMNode* node = curNode;
 		int type = node->getNodeType();
 		std::string name;
 		nodeStr(node->getNodeName(), name);
@@ -1724,10 +1727,13 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 			nodeStr(idNode->getNodeValue(), skinId);
 			if (node->hasChildNodes())
 			{
-				const DOMNodeList* childrenList = node->getChildNodes();
-				for (unsigned int cc = 0; cc < childrenList->getLength(); cc++)
+				//const DOMNodeList* childrenList = node->getChildNodes();
+				DOMNode* childrenCurNode = node->getFirstChild();
+				while (childrenCurNode)
+				//for (unsigned int cc = 0; cc < childrenList->getLength(); cc++)
 				{
-					DOMNode* childNode = childrenList->item(cc);
+					//DOMNode* childNode = childrenList->item(cc);
+					DOMNode* childNode = childrenCurNode;
 					std::string childName;
 					nodeStr(childNode->getNodeName(), childName);
 					if (childName == "skin")	// parsing skinning weights
@@ -1740,11 +1746,14 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 						SkinWeight* skinWeight = new SkinWeight();
 						skinWeight->sourceMesh = skinSource;
 
-						// futhur for children
-						const DOMNodeList* childListOfSkin = childNode->getChildNodes();
-						for (unsigned int cSkin = 0; cSkin < childListOfSkin->getLength(); cSkin++)
+						// further for children
+						//const DOMNodeList* childListOfSkin = childNode->getChildNodes();
+						DOMNode* childOfSkinCurNode = childNode->getFirstChild();
+						while (childOfSkinCurNode)
+						//for (unsigned int cSkin = 0; cSkin < childListOfSkin->getLength(); cSkin++)
 						{
-							DOMNode* childNodeOfSkin = childListOfSkin->item(cSkin);
+							//DOMNode* childNodeOfSkin = childListOfSkin->item(cSkin);
+							DOMNode* childNodeOfSkin = childOfSkinCurNode;
 							std::string childNameOfSkin;
 							nodeStr(childNodeOfSkin->getNodeName(), childNameOfSkin);
 							std::string bindJointName = skinSource + "-skin-joints";
@@ -1778,7 +1787,6 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 							if (childNameOfSkin == "source")
 							{
 								DOMNamedNodeMap* sourceAttributes = childNodeOfSkin->getAttributes();
-								DOMNodeList* realContentNodeList = childNodeOfSkin->getChildNodes();
 								std::string sourceId;
 								nodeStr(sourceAttributes->getNamedItem(BML::BMLDefs::ATTR_ID)->getNodeValue(), sourceId);								
 								boost::algorithm::to_lower(sourceId);
@@ -1786,9 +1794,13 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 								bool isBindWeights = (sourceId.find("weights") != std::string::npos);
 								bool isBindPoseMatrices = (sourceId.find("bind_poses") != std::string::npos || sourceId.find("matrices") != std::string::npos);
 
-								for (unsigned int cSource = 0; cSource < realContentNodeList->getLength(); cSource++)
+								//DOMNodeList* realContentNodeList = childNodeOfSkin->getChildNodes();
+								DOMNode* realContentCurNode = childNodeOfSkin->getFirstChild();
+								while (realContentCurNode)
+								//for (unsigned int cSource = 0; cSource < realContentNodeList->getLength(); cSource++)
 								{
-									DOMNode* realContentNode = realContentNodeList->item(cSource);
+									//DOMNode* realContentNode = realContentNodeList->item(cSource);
+									DOMNode* realContentNode = realContentCurNode;
 									std::string realNodeName;
 									nodeStr(realContentNode->getNodeName(), realNodeName);		
 
@@ -1839,15 +1851,19 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 												skinWeight->bindPoseMat.push_back(newMat);
 											}
 										}
-									}																		
+									}
+									realContentCurNode = realContentCurNode->getNextSibling();
 								}								
 							} // end of if (childNameOfSkin == "source")
 							if (childNameOfSkin == "vertex_weights")
 							{
-								DOMNodeList* indexNodeList = childNodeOfSkin->getChildNodes();
-								for (unsigned int cVertexWeights = 0; cVertexWeights < indexNodeList->getLength(); cVertexWeights++)
+								//DOMNodeList* indexNodeList = childNodeOfSkin->getChildNodes();
+								DOMNode* indexCurNode = childNodeOfSkin->getFirstChild();
+								while (indexCurNode)
+								//for (unsigned int cVertexWeights = 0; cVertexWeights < indexNodeList->getLength(); cVertexWeights++)
 								{
-									DOMNode* indexNode = indexNodeList->item(cVertexWeights);
+									//DOMNode* indexNode = indexNodeList->item(cVertexWeights);
+									DOMNode* indexNode = indexCurNode;
 									std::string indexNodeName;
 									nodeStr(indexNode->getNodeName(), indexNodeName);
 									std::string tokenBlock;
@@ -1877,10 +1893,13 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 									}
 									else
 									{
+										indexCurNode = indexCurNode->getNextSibling();
 										continue;
 									}
+									indexCurNode = indexCurNode->getNextSibling();
 								}
 							}
+							childOfSkinCurNode = childOfSkinCurNode->getNextSibling();
 						}
 						if (char_p && char_p->dMesh_p)
 							char_p->dMesh_p->skinWeights.push_back(skinWeight);
@@ -1895,18 +1914,24 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 						std::string morphFullName = morphName + "-morph";
 						
 						// futhur for children
-						const DOMNodeList* childListOfMorph = childNode->getChildNodes();
-						for (unsigned int cMorph = 0; cMorph < childListOfMorph->getLength(); cMorph++)
+						//const DOMNodeList* childListOfMorph = childNode->getChildNodes();
+						DOMNode* childOfMorphCurNode = childNode->getFirstChild();
+						while (childOfMorphCurNode)
+						//for (unsigned int cMorph = 0; cMorph < childListOfMorph->getLength(); cMorph++)
 						{
-							DOMNode* childNodeOfMorph = childListOfMorph->item(cMorph);
+							//DOMNode* childNodeOfMorph = childListOfMorph->item(cMorph);
+							DOMNode* childNodeOfMorph = childOfMorphCurNode;
 							std::string childNameOfMorph;
 							nodeStr(childNodeOfMorph->getNodeName(), childNameOfMorph);
 							if (childNameOfMorph == "source")
 							{
-								const DOMNodeList* childListOfSource = childNodeOfMorph->getChildNodes();
-								for (size_t cMorphSource = 0; cMorphSource < childListOfSource->getLength(); cMorphSource++)
+								//const DOMNodeList* childListOfSource = childNodeOfMorph->getChildNodes();
+								DOMNode* childOfSourceCurNode = childNodeOfMorph->getFirstChild();
+								while (childOfSourceCurNode)
+								//for (size_t cMorphSource = 0; cMorphSource < childListOfSource->getLength(); cMorphSource++)
 								{
-									DOMNode* childNodeOfSource = childListOfSource->item(cMorphSource);
+									//DOMNode* childNodeOfSource = childListOfSource->item(cMorphSource);
+									DOMNode* childNodeOfSource = childOfSourceCurNode;
 									std::string childNameOfSource;
 									nodeStr(childNodeOfSource->getNodeName(), childNameOfSource);
 									if (childNameOfSource == "IDREF_array")
@@ -1925,13 +1950,17 @@ void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFa
 										refMesh.push_back(morphName);
 										char_p->dMesh_p->morphTargets.insert(make_pair(morphFullName, refMesh));
 									}
+									childOfSourceCurNode = childOfSourceCurNode->getNextSibling();
 								}
 							}
+							childOfMorphCurNode = childOfMorphCurNode->getNextSibling();
 						}
 					} // end of if (childName == "morph")
+					childrenCurNode = childrenCurNode->getNextSibling();
 				}
 			}
 		}
+		curNode = curNode->getNextSibling();
 	}
 
 	// cache the joint names for each skin weight
