@@ -130,6 +130,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Motion Editor", 0, LaunchMotionEditorCB, this, NULL);
 	menubar->add("&Window/Retarget Viewer", 0, LaunchJointMapViewerCB, this, NULL);
 	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, NULL);
+	menubar->add("&Help/About", 0, HelpCB, this, NULL);
 	menubar->add("&Help/Documentation", 0, DocumentationCB, this, NULL);
 	menubar->add("&Help/Create Python API", 0, CreatePythonAPICB, this, NULL);
 	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
@@ -1853,12 +1854,21 @@ void BaseWindow::CreatePythonAPICB(Fl_Widget* widget, void* data)
 	if (docFile == "")
 		return;
 
+#if (BOOST_VERSION > 104400)
+	boost::filesystem::path file = boost::filesystem::absolute( docFile );
+#else
+	boost::filesystem::path file = boost::filesystem::complete( docFile );
+#endif
+	
+	std::string outFile = file.string();
+	std::string cleanedFile = vhcl::Replace(outFile, "\\", "/");
+
 	std::stringstream strstr;
 	strstr << "from pydoc import *\n";
 	strstr << "d = HTMLDoc()\n";
 	strstr << "content = d.docmodule(sys.modules[\"SmartBody\"])\n";
 	strstr << "import io\n";
-	strstr << "f = io.open('" << docFile << "', 'w')\n";
+	strstr << "f = io.open('" << cleanedFile << "', 'w')\n";
 	strstr << "f.write(unicode(content))\n";
 	strstr << "f.close()\n";
 
@@ -1877,6 +1887,20 @@ void BaseWindow::DocumentationCB(Fl_Widget* widget, void* data)
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->run(strstr.str());
+}
+
+void BaseWindow::HelpCB(Fl_Widget* widget, void* data)
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+
+	std::string version = SmartBody::SBScene::getScene()->getVersion();
+
+	std::stringstream strstr;
+	strstr << "SmartBody\n";
+	strstr << "\n" << version;
+
+	fl_alert("%s", strstr.str().c_str());
+	return;
 }
 
 void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)

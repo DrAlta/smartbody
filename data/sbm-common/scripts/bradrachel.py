@@ -1,7 +1,7 @@
 print "|--------------------------------------------|"
 print "|  data/sbm-common/scripts/bradrachel.py  |"
 print "|--------------------------------------------|"
-
+scene.addAssetPath("audio", "C:/ICT/vhtoolkit/core/vhtoolkitUnity/Assets/")
 scene.run("motion-retarget.py")
 ### Load data/sbm-common assets
 scene.addAssetPath("script", "sbm-common/scripts")
@@ -287,11 +287,76 @@ rachel.setStringAttribute("lipSyncSetName", "default")
 rachel.setBoolAttribute("usePhoneBigram", True)
 rachel.setVoice("remote")
 rachel.setVoiceCode("MicrosoftAnna")
+#rachel.setVoice("audiofile")
+#rachel.setVoiceCode("Sounds2")
 # gesture map setup
 rachel.setStringAttribute("gestureMap", "ChrRachel")
 rachel.setBoolAttribute("gestureRequest.autoGestureTransition", True)
 # retarget
 retargetCharacter("ChrRachel", "ChrRachel.sk")
+
+
+############################# Rachel
+rachel2Skeleton = scene.getSkeleton("ChrRachel.sk")
+zebra2Map.applySkeleton(rachel2Skeleton)
+zebra2Map.applyMotionRecurse("ChrRachel")
+
+# Rachel2's face definition
+rachel2Face = scene.createFaceDefinition("ChrRachel2")
+rachel2Face.setFaceNeutral("ChrEllieDcaps@face_neutral")
+
+rachel2Face.setAU(1,  "left",  "ChrRachel@001_inner_brow_raiser_lf")
+rachel2Face.setAU(1,  "right", "ChrRachel@001_inner_brow_raiser_rt")
+rachel2Face.setAU(2,  "left",  "ChrRachel@002_outer_brow_raiser_lf")
+rachel2Face.setAU(2,  "right", "ChrRachel@002_outer_brow_raiser_rt")
+rachel2Face.setAU(4,  "left",  "ChrRachel@004_brow_lowerer_lf")
+rachel2Face.setAU(4,  "right", "ChrRachel@004_brow_lowerer_rt")
+rachel2Face.setAU(5,  "both",  "ChrRachel@005_upper_lid_raiser")
+rachel2Face.setAU(6,  "both",  "ChrRachel@006_cheek_raiser")
+rachel2Face.setAU(7,  "both",  "ChrRachel@007_lid_tightener")
+rachel2Face.setAU(10, "both",  "ChrRachel@010_upper_lip_raiser")
+rachel2Face.setAU(12, "left",  "ChrRachel@012_lip_corner_puller_lf")
+rachel2Face.setAU(12, "right", "ChrRachel@012_lip_corner_puller_rt")
+rachel2Face.setAU(25, "both",  "ChrRachel@025_lips_part")
+rachel2Face.setAU(26, "both",  "ChrRachel@026_jaw_drop")
+#rachel2Face.setAU(45, "left",  "ChrRachel@045_blink_lf")
+#rachel2Face.setAU(45, "right", "ChrRachel@045_blink_rt")
+
+rachel2Face.setViseme("open",    "ChrEllieDcaps@open")
+rachel2Face.setViseme("W",       "ChrEllieDcaps@W")
+rachel2Face.setViseme("ShCh",    "ChrEllieDcaps@ShCh")
+rachel2Face.setViseme("PBM",     "ChrEllieDcaps@PBM")
+rachel2Face.setViseme("FV",      "ChrEllieDcaps@FV")
+rachel2Face.setViseme("wide",    "ChrEllieDcaps@wide")
+rachel2Face.setViseme("tBack",   "ChrEllieDcaps@tBack")
+rachel2Face.setViseme("tRoof",   "ChrEllieDcaps@tRoof")
+rachel2Face.setViseme("tTeeth",  "ChrEllieDcaps@tTeeth")
+
+rachel2 = scene.createCharacter("ChrRachel2", "")
+rachel2Skeleton = scene.createSkeleton("ChrRachel.sk")
+rachel2.setSkeleton(rachel2Skeleton)
+rachel2.setFaceDefinition(rachel2Face)
+rachel2Pos = SrVec(-1, 0, 0)
+rachel2.setPosition(rachel2Pos)
+rachel2HPR = SrVec(17, 0, 0)
+rachel2.setHPR(rachel2HPR)
+rachel2.createStandardControllers()
+# deformable mesh
+rachel2.setDoubleAttribute("deformableMeshScale", .01)
+rachel2.setStringAttribute("deformableMesh", "ChrRachel")
+# lip syncing diphone setup
+rachel2.setStringAttribute("diphoneSetName", "default")
+rachel2.setBoolAttribute("useDiphone", True)
+rachel2.setVoice("remote")
+rachel2.setVoiceCode("MicrosoftAnna")
+#rachel2.setVoice("audiofile")
+#rachel2.setVoiceCode("Sounds2")
+# gesture map setup
+rachel2.setStringAttribute("gestureMap", "ChrRachel")
+rachel2.setBoolAttribute("gestureRequest.autoGestureTransition", True)
+# retarget
+retargetCharacter("ChrRachel", "ChrRachel.sk")
+
 
 scene.setDefaultCharacter("ChrBrad")
 scene.setDefaultRecipient("ChrRachel")
@@ -311,12 +376,14 @@ sim.start()
 
 bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
 bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01" start="1"/>')
-
+bml.execBML('ChrRachel2', '<body posture="ChrRachel_ChrBrad@Idle01" start="1"/>')
 bml.execBML('ChrBrad', '<saccade mode="listen"/>')
 bml.execBML('ChrRachel', '<saccade mode="listen"/>')
+bml.execBML('ChrRachel2', '<saccade mode="listen"/>')
 
 bml.execBML('ChrBrad', '<gaze sbm:handle="brad" target="camera"/>')
 bml.execBML('ChrRachel', '<gaze sbm:handle="rachel" target="camera"/>')
+bml.execBML('ChrRachel2', '<gaze sbm:handle="rachel" target="camera"/>')
 
 sim.resume()
 

@@ -220,6 +220,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void ShowLightsCB(Fl_Widget* w, void* data);
 		static void BackgroundColorCB(Fl_Widget* w, void* data);	
 		static void CreatePythonAPICB(Fl_Widget* widget, void* data);
+		static void HelpCB(Fl_Widget* widget, void* data);
 		static void DocumentationCB(Fl_Widget* widget, void* data);
 		static void ResizeWindowCB(Fl_Widget* widget, void* data);
 
