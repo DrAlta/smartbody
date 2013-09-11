@@ -522,7 +522,7 @@ SBScene* SBScene::getScene()
 
 	return _scene;
 }
-
+ 
 std::string SBScene::getVersion()
 {
 	return "SmartBody $Rev$ $LastChangedDate$";
