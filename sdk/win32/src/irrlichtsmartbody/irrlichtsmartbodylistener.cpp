@@ -9,8 +9,6 @@ IrrlichtSmartBodyListener::IrrlichtSmartBodyListener(irr::scene::ISceneManager* 
 	mSceneMgr = sceneMgr;
 	map = characterMap;
 	id = 1;
-
-
 }
 
 IrrlichtSmartBodyListener::~IrrlichtSmartBodyListener()
@@ -20,12 +18,8 @@ IrrlichtSmartBodyListener::~IrrlichtSmartBodyListener()
 void IrrlichtSmartBodyListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
 	std::stringstream strstr;
-	//strstr << "../irrlicht-1.8/media/" << objectClass << ".mesh.xml";
-	//strstr << "../irrlicht-1.8/media/" << "Sinbad" << ".mesh";
-	//strstr << "../irrlicht-1.8/media/" << objectClass << ".mesh.xml";
 	strstr << "../irrlicht-1.8/media/" << objectClass<< ".mesh";
 
-	//irr::scene::IAnimatedMesh* mesh = mSceneMgr->getMesh(strstr.str().c_str());
 	irr::scene::ISkinnedMesh* mesh = (irr::scene::ISkinnedMesh*)mSceneMgr->getMesh(strstr.str().c_str());
 
 	if (!mesh)
@@ -78,47 +72,16 @@ void IrrlichtSmartBodyListener::OnCharacterCreate( const std::string & name, con
 
 	node->setScale(irr::core::vector3df(10,10,10));
 	node->setMaterialFlag(irr::video::EMF_NORMALIZE_NORMALS , true);
-	
-	
-	
-	
 
 }
 
 void IrrlichtSmartBodyListener::OnCharacterDelete( const std::string & name )
 {
-	/*
-	if (!ogreSB->getSceneManager()->hasEntity(name))
-	{
-	std::cout << "An entity named '" << name << "' does not exist, ignoring delete..." << std::endl;
-	return;
-	}
-
-	Ogre::SceneNode * node = (Ogre::SceneNode *)ogreSB->getSceneManager()->getRootSceneNode()->getChild(name);
-	node->detachAllObjects();
-	ogreSB->getSceneManager()->destroyEntity(name);
-	ogreSB->getSceneManager()->getRootSceneNode()->removeAndDestroyChild(name);
-	*/
 }
 
 void IrrlichtSmartBodyListener::OnCharacterChanged( const std::string& name )
 {
-	/*
-	if (!ogreSB->getSceneManager()->hasEntity(name))
-	{
-	std::cout << "An entity named '" << name << "' does not exist, ignoring update..." << std::endl;
-	return;
-	}
 
-	Ogre::Entity* entity = ogreSB->getSceneManager()->getEntity(name);
-	Ogre::Skeleton* meshSkel = entity->getSkeleton();
-	Ogre::Skeleton::BoneIterator it = meshSkel->getBoneIterator(); 
-	while ( it.hasMoreElements() ) 
-	{ 
-	Ogre::Bone* bone = it.getNext();
-	bone->setManuallyControlled(true);
-	}
-	*/
 }
 
 void IrrlichtSmartBodyListener::OnLogMessage( const std::string & message )

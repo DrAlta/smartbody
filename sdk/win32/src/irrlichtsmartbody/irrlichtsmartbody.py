@@ -27,6 +27,9 @@ scene.run('default-behavior-sets.py')
 # Set up Sinbad
 print 'Setting up Sinbad'
 
+# add behaviors to Sinbad: locomotion
+scene.run('BehaviorSetMaleMocapLocomotion.py')
+setupBehaviorSet()
 
 numCharacters = 5
 for c in range(0, numCharacters):
@@ -34,13 +37,9 @@ for c in range(0, numCharacters):
 	sinbad = scene.createCharacter(sinbadName,'sinbad')
 	sinbadSk = scene.createSkeleton(sinbadSkName)
 	sinbad.setSkeleton(sinbadSk)
-	sinbadPos = SrVec(0 + c * 5, 5.16, 0 + c * 5)
+	sinbadPos = SrVec(0 + c * 5, 4.50, 0 + c * 5)
 	sinbad.setPosition(sinbadPos)
 	sinbad.createStandardControllers()
-
-	# add behaviors to Sinbad: locomotion
-	scene.run('BehaviorSetMaleLocomotion.py')
-	setupBehaviorSet()
 	retargetBehaviorSet(sinbadName)
 
 	#sinbad.setBoolAttribute("steering.pathFollowingMode", True)
@@ -51,7 +50,9 @@ scene.setBoolAttribute('internalAudio', True)
 sim.start()
 for c in range(0, numCharacters):
 	sinbadName = 'sinbad' + str(c)
-	bml.execBML(sinbadName, '<body posture="ChrUtah_Idle001"/>')
+#	bml.execBML(sinbadName, '<body posture="ChrUtah_Idle001"/>')
+	bml.execBML(sinbadName, '<body posture="ChrMarine@Idle0"/>')
+	1
 sim.resume()
 
 
