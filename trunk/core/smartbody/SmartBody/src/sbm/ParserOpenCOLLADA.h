@@ -64,16 +64,19 @@ class ParserOpenCOLLADA
 		static XercesDOMParser* getParserFromFile(std::string fileName);
 		static std::string getNodeAttributeString(DOMNode* node, XMLCh* attrName);
 		static int         getNodeAttributeInt(DOMNode* node, XMLCh* attrName);
+		static void nodeStr(const XMLCh* s, std::string& out);
+
 		// parse from files
 		static bool parse(SkSkeleton& skeleton, SkMotion& motion, std::string fileName, float scale, bool doParseSkeleton, bool doParseMotion);
 		static bool parseStaticMesh(std::vector<SrModel*>& meshModelVecs, std::string fileName);
 
 		// parse nodes
+		static void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFactor, std::string jointPrefix);
 		static void parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name);
 		static void parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL);
 		static void parseLibraryAnimations(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, bool zaxis = false);
 
-		static void parseNodeAnimation( DOMNode* node1, std::map<std::string, ColladaFloatArray > &floatArrayMap, float scale, std::map<std::string, ColladaSampler > &samplerMap, std::vector<ColladChannel> &channelSamplerNameMap, SkSkeleton &skeleton );
+		static void parseNodeAnimation(DOMNode* node1, std::map<std::string, ColladaFloatArray > &floatArrayMap, float scale, std::map<std::string, ColladaSampler > &samplerMap, std::vector<ColladChannel> &channelSamplerNameMap, SkSkeleton &skeleton );
 		static void parseLibraryAnimations2(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order);
 	
 		static void animationPostProcess(SkSkeleton& skeleton, SkMotion& motion);
