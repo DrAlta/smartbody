@@ -1,5 +1,3 @@
-
-
 #include <irrlicht.h>
 #include <string>
 #include <map>
@@ -18,7 +16,6 @@
 
 
 using namespace irr;
-
 
 using namespace core;
 using namespace scene;
@@ -56,9 +53,6 @@ int main()
 
 	guienv->addStaticText(L"Hello World! This is the SmartBody Irrlicht Software renderer!",
 		rect<s32>(10,10,260,22), true);
-
-	
-	
 
 
 	// set up SmartBody
@@ -99,11 +93,6 @@ int main()
    // Insert it into the scene
    terrain_node->setPosition(vector3df(0,-5,0));
 
-  
-
-
-
-
 	scene::ISceneNode* node = 0;
 	scene::IAnimatedMesh* mesh = 0;
 
@@ -121,35 +110,17 @@ int main()
 	node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
 	node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8/media/particlewhite.bmp"));
 
-
-
-
-
-
-
 	smgr->setShadowColor(video::SColor(150,0,0,0));
 
-
-
-
-	// disable mouse cursor
-	device->getCursorControl()->setVisible(false);
-
-
-
+	device->getCursorControl()->setVisible(true);
 
 	smgr->addCameraSceneNodeFPS();
-	//smgr->addCameraSceneNode(0, vector3df(0,100,400), vector3df(0,0,0));
+	smgr->addCameraSceneNode(0, vector3df(0,200,400), vector3df(0,0,0));
 	smgr->getActiveCamera()->setFarValue(10000.0f);
 
-
-
-
-
+	
 	while(device->run())
 	{
-
-
 
 		//smartbody stuff
 		SmartBody::SBSimulationManager* sim = m_pScene->getSimulationManager();
@@ -162,8 +133,6 @@ int main()
 			return true;
 
 		const std::vector<std::string>& characterNames = m_pScene->getCharacterNames();
-
-
 
 		for (size_t n = 0; n < characterNames.size(); n++)
 		{
@@ -189,11 +158,9 @@ int main()
 			SrVec pos = character->getPosition();
 			SrVec hpr = character->getHPR();
 
-
 			//-x to rotate anbd move the whole mesh the correct way due to smartbody Right hand system
 			// *10 for synchronizing scaling it by 10 initially
 			animatedMeshNode->setPosition(irr::core::vector3df(-pos.x*10, pos.y*10,pos.z*10));
-			//animatedMeshNode->setPosition(irr::core::vector3df(10, 10,-10));
 			animatedMeshNode->setRotation(irr::core::vector3df(hpr.z,-hpr.x, hpr.y ));
 
 
@@ -227,10 +194,6 @@ int main()
 				irr::f32 z = irr::core::radToDeg(irrlichrot.Z);
 
 				iJoint->setRotation(irr::core::vector3df(x,y,z));	
-
-				//use for debug
-				//found++;
-
 
 			}		
 
