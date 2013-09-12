@@ -1,6 +1,6 @@
 import random
 print "|--------------------------------------------|"
-print "|            Starting GrabTouchCEGui Demo             |"
+print "|            Starting GrabTouchCEGui Demo    |"
 print "|--------------------------------------------|"
 
 # Add asset paths
@@ -120,8 +120,6 @@ baseName = 'shelf'
 pawn = scene.createPawn(baseName)
 
 pawn.setPosition(SrVec( 5, 0, 5))
-#pawn.setStringAttribute("mesh" , "../../../../data/mesh/shelf.dae")
-#pawn.setDoubleAttribute("meshScale",0.15)
 pawn.setStringAttribute('collisionShape', 'box')
 pawn.getAttribute('collisionShapeScale').setValue(SrVec( 0.5, 1.5, 0.2))
 pawn.setDoubleAttribute('rotY' , 90)
@@ -211,7 +209,6 @@ scene.run('GUIUtil.py')
 gui = GUIManager()
 
 
-speechTextBox = gui.createStaticText('editBox', "number of Pawn:"+str(numPawns), 100, 15, 300)
 class GUIHandler:
 	def __init__(self):
 		print "init"
@@ -252,38 +249,10 @@ class GUIHandler:
 			baseName = 'object%s' % currentPawnNum
 			bml.execBML('ChrBrad1', '<sbm:reach sbm:action="pick-up" sbm:reach-finish="true" sbm:reach-duration="2" target="'+baseName+'" sbm:use-locomotion="true"/>')	
 			bml.execBML('ChrBrad1', '<gaze target="'+baseName+'" sbm:joint-range="EYES NECK"/>')		
-		
-	def handleGrabMoveButton(self,args):
-		
-		global pawn1 , onAction , delay,currentPawnNum ,numPawns,grabbed,released,canOtherAction
-		if(not onAction and grabbed and not released):
-			print 'putting it somewhere else'
-			baseName = 'object%s' % currentPawnNum
-			if(currentPawnNum <=numPawns):
-				currentPawnNum += 1
 				
-			canOtherAction = False
-			released = True
-			layer = random.randint(1, 3)
-			
-			if(layer is 1):
-				bml.execBML('ChrBrad1', '<sbm:reach sbm:action="put-down" sbm:reach-finish="true" sbm:target-pos="' + '%s %s %s' % (4.9, 1.6, 4.9) + '" sbm:use-locomotion="true"/>')
-				bml.execBML('ChrBrad1', '<gaze target="'+baseName+'" sbm:joint-range="EYES NECK"/>')
-			if (layer is 2):
-				bml.execBML('ChrBrad1', '<sbm:reach sbm:action="put-down" sbm:reach-finish="true" sbm:target-pos="' + '%s %s %s' % (4.9, 0.9, 4.9) + '" sbm:use-locomotion="true"/>')
-				bml.execBML('ChrBrad1', '<gaze target="'+baseName+'" sbm:joint-range="EYES NECK"/>')
-			if (layer is 3):
-				bml.execBML('ChrBrad1', '<sbm:reach sbm:action="put-down" sbm:reach-finish="true" sbm:target-pos="' + '%s %s %s' % (4.9, 0.3, 4.9) + '" sbm:use-locomotion="true"/>')
-				bml.execBML('ChrBrad1', '<gaze target="'+baseName+'" sbm:joint-range="EYES NECK"/>')
-				
-			delay = 3
-			onAction=True
-			
-			
 	def handleGrabMoveTopButton(self,args):	
 		global pawn1 , onAction , delay,currentPawnNum ,numPawns,grabbed,released,canOtherAction
 		if(not onAction and grabbed and not released):
-			print 'putting it somewhere else'
 			baseName = 'object%s' % currentPawnNum
 			if(currentPawnNum <=numPawns):
 				currentPawnNum += 1
@@ -299,7 +268,6 @@ class GUIHandler:
 	def handleGrabMoveMidButton(self,args):
 		global pawn1 , onAction , delay,currentPawnNum ,numPawns,grabbed,released,canOtherAction
 		if(not onAction and grabbed and not released):
-			print 'putting it somewhere else'
 			baseName = 'object%s' % currentPawnNum
 			if(currentPawnNum <=numPawns):
 				currentPawnNum += 1
@@ -314,7 +282,6 @@ class GUIHandler:
 	def handleGrabMoveBotButton(self,args):
 		global pawn1 , onAction , delay,currentPawnNum ,numPawns,grabbed,released,canOtherAction
 		if(not onAction and grabbed and not released):
-			print 'putting it somewhere else'
 			baseName = 'object%s' % currentPawnNum
 			if(currentPawnNum <=numPawns):
 				currentPawnNum += 1
@@ -341,7 +308,6 @@ class GUIHandler:
 	
 		
 		numPawns += 1
-		speechTextBox.setText("number of Pawn:"+str(numPawns))
 		pawnList.append(scene.getPawn(baseName))
 		scene.getPawn(baseName).getAttribute('createPhysics').setValue()
 		phyManager.getPhysicsPawn(scene.getPawn(baseName).getName()).setDoubleAttribute('mass', 1)
@@ -349,7 +315,6 @@ class GUIHandler:
 		scene.getPawn(baseName).setBoolAttribute('enablePhysics', True)
 
 
-		
 guiHandler = GUIHandler()	
 touchButton = gui.createButton('touchBtn','Touch object')
 touchButton.subscribeEvent(PushButton.EventClicked, guiHandler.handleTouchButton)
@@ -359,9 +324,6 @@ pointButton.subscribeEvent(PushButton.EventClicked, guiHandler.handlePointButton
 
 grabButton = gui.createButton('grabBtn','Grab Object')
 grabButton.subscribeEvent(PushButton.EventClicked, guiHandler.handleGrabButton)
-
-grabMoveButton = gui.createButton('grabMoveBtn','Place somewhere on shelf')
-grabMoveButton.subscribeEvent(PushButton.EventClicked, guiHandler.handleGrabMoveButton)
 
 grabMoveTopButton = gui.createButton('grabMoveTopBtn','Place on high shelf')
 grabMoveTopButton.subscribeEvent(PushButton.EventClicked, guiHandler.handleGrabMoveTopButton)
@@ -374,5 +336,4 @@ grabMoveBotButton.subscribeEvent(PushButton.EventClicked, guiHandler.handleGrabM
 
 addPawnButton = gui.createButton('addPawnBtn','Add object')
 addPawnButton.subscribeEvent(PushButton.EventClicked, guiHandler.addPawnButton)
-
 
