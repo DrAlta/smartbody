@@ -1441,7 +1441,11 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBComma
 		{
 			meshModelVec[i]->V[j] *= factor;
 		}
-
+		
+		if (meshModelVec[i]->Fn.size() == 0)
+		{
+			meshModelVec[i]->computeNormals();
+		}
 
 		SrSnModel* srSnModelStatic = new SrSnModel();
 		srSnModelStatic->shape(*meshModelVec[i]);

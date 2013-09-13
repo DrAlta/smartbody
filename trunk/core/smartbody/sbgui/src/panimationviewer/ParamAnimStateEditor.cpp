@@ -1231,7 +1231,7 @@ void PABlendEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 			{
 				int lastMotionIndex = currentState->getMotionId(editor->lastSelectedMotion);
 				double curTime = editor->sliderScrub->value();
-				double localTime = currentState->getLocalTime(curTime, lastMotionIndex);
+				double localTime = currentState-> getLocalTime(curTime, lastMotionIndex);
 				std::vector<double> weights(currentState->getNumMotions());
 				for (size_t x = 0; x < weights.size(); x++)
 				{

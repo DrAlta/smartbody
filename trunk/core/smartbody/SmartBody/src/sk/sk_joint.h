@@ -274,7 +274,7 @@ public:
 	int getJointType() { return _jointType; };
 	void setJointType(int jtype) {  _jointType = jtype; };
 
-	void add_child ( SkJoint* child );
+	SBAPI void add_child ( SkJoint* child );
 
 	void updateGmatZero(const SrMat& gmatZero);
 	const SrMat& gmatZero() { return _gmatZero; }

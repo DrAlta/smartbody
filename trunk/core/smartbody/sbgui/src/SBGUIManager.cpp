@@ -199,11 +199,12 @@ void SBGUIManager::init()
 	// create other widgets on screen
 	
 	//Create the quit button
-	
-// 	CEGUI::Window *quit = winMgr.createWindow("TaharezLook/Button", "CEGUIDemo/QuitButton");
-// 	quit->setText("Quit");
-// 	quit->setSize(CEGUI::UVector2(CEGUI::UDim(0.0, 200), CEGUI::UDim(0.0, 60)));
-// 	sheet->addChildWindow(quit);
+// 	CEGUI::Window *sheet = CEGUI::System::getSingleton().getDefaultGUIContext().getRootWindow();
+//  	CEGUI::Window *quit = winMgr.createWindow("TaharezLook/Button", "CEGUIDemo/QuitButton");
+//  	//quit->setText("Quit");
+//  	quit->setSize(CEGUI::USize(CEGUI::UDim(0.0, 200), CEGUI::UDim(0.0, 60)));
+// 	quit->setAlpha(0.3);
+//  	sheet->addChild(quit);
 		
 	/*
 	CEGUI::Window *button = winMgr.createWindow("OgreTray/StaticText", "CEGUIDemo/Button2");

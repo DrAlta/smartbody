@@ -101,6 +101,7 @@
 
 #include <sbm/PPRAISteeringAgent.h>
 #include "SBGUIManager.h"
+#include <autorig/SBAutoRigManager.h>
 #include <sbm/sbm_deformable_mesh.h>
 
 /*
@@ -1702,9 +1703,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		boost::filesystem::path dndPath(dndMsg);
 		std::string fullPathName = dndMsg;
 		std::string filebasename = boost::filesystem::basename(dndMsg);
-		std::string fileextension = boost::filesystem::extension(dndMsg);			
-		std::string skelName = filebasename+fileextension;
-		std::string meshName = filebasename;
+		std::string fileextension = boost::filesystem::extension(dndMsg);					
 		std::string fullPath = dndPath.parent_path().string();
 
 		if(fileextension == ".camera") // camera config file, load camera
@@ -1730,10 +1729,16 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 			assetManager->loadAsset(fullPathName);
 			return;
 		}
-		
-		
 
+
+		
+		
+		// process mesh or skeleton
 		LOG("path name = %s, base name = %s, extension = %s",fullPath.c_str(), filebasename.c_str(), fileextension.c_str());
+
+		std::string skelName = filebasename+fileextension;
+		std::string meshName = filebasename;
+
 		bool hasMesh = false;
 		bool hasSkeleton = false;
 		// copy the file over
@@ -1767,15 +1772,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 			boost::filesystem::create_directory(meshDir);		
 		boost::filesystem::create_directory(meshDir+meshName);
 
-		std::string targetMeshFile = meshDir+meshName+"/"+filebasename+fileextension;
-		std::string targetSkelFile = skeletonDir+filebasename+fileextension;
 		
-		
-		if (!boost::filesystem::exists(targetMeshFile))
-			boost::filesystem::copy_file(fullPathName,targetMeshFile);
-		if (!boost::filesystem::exists(targetSkelFile))
-			boost::filesystem::copy_file(fullPathName,targetSkelFile);
-
 		boost::filesystem::directory_iterator dirIter(dndPath.parent_path());
 		boost::filesystem::directory_iterator endIter;
 		cout << " dirIter initial : " << dirIter->path().string() << "\n";
@@ -1811,7 +1808,40 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 #else
 		boost::filesystem::path completePath = boost::filesystem::complete( tempPath );	
 #endif
- 		scene->loadAsset(targetSkelFile);
+
+		bool doAutoRigging = false;		
+		if (boost::iequals(fileextension,".obj")) // a mesh model file, create a pawn and attach the model to the pawn
+		{
+			std::stringstream strstr;
+			strstr << "defaultPawn";
+			strstr << pawnCount;
+			pawnCount++;
+			SmartBody::SBPawn* pawn = scene->createPawn(strstr.str());
+			//SrModel model; 
+			//model.import_obj(fullPathName.c_str());
+			pawn->addMesh(fullPathName);			
+
+// 			skelName = filebasename+".sk"; // reset back to .sk extension
+// 			SBAutoRigManager& autoRigManager = SBAutoRigManager::singleton();
+// 			SrModel model; 
+// 			model.import_obj(fullPathName.c_str());
+// 			autoRigManager.buildAutoRigging(model,skelName, meshName);
+// 			doAutoRigging = true;
+			return;
+		}
+		else // load the mesh skeleton
+		{
+			// copy the mesh/skeleton file to retarget directory
+			std::string targetSkelFile = skeletonDir+filebasename+fileextension;
+			std::string targetMeshFile = meshDir+meshName+"/"+filebasename+fileextension;
+			if (!boost::filesystem::exists(targetSkelFile))
+				boost::filesystem::copy_file(fullPathName,targetSkelFile);			
+			if (!boost::filesystem::exists(targetMeshFile))
+				boost::filesystem::copy_file(fullPathName,targetMeshFile);
+			scene->loadAsset(targetSkelFile);
+		}
+
+		
 		
  		//boost::filesystem::copy_file()
 
@@ -3736,6 +3766,8 @@ void FltkViewer::drawKinematicFootprints(int index)
 		footprinttime[i][index] += 0.0166666f;
 	}
 #endif
+
+#if 0
 	SmartBody::SBCharacter* curChar = dynamic_cast<SmartBody::SBCharacter*>(getCurrentCharacter());
 	Heightfield* heightField = SmartBody::SBScene::getScene()->getHeightfield();	
 	if (!curChar) return;
@@ -3769,6 +3801,25 @@ void FltkViewer::drawKinematicFootprints(int index)
 		std::string text = boost::lexical_cast<std::string>(curChar->flightTime[i]);
 		drawText(mat,scale*0.005f,text);
 	}
+#endif
+	glDisable(GL_LIGHTING);
+	SmartBody::SBCharacter* curChar = dynamic_cast<SmartBody::SBCharacter*>(getCurrentCharacter());
+	if (!curChar) return;
+	SrVec faceDir = curChar->getFacingDirection();
+	float scale = curChar->getHeight()*0.1f;	
+	std::vector<std::string> jointConsNames = curChar->getJointConstraintNames();
+	SrVec color = SrVec(1.f,0.f,0.f);
+	for (unsigned int i=0;i<jointConsNames.size();i++)
+	{
+		SmartBody::TrajectoryRecord* traj = curChar->getJointTrajectoryConstraint(jointConsNames[i]);		
+		SrSnSphere sphere;
+		sphere.shape().center = traj->jointTrajGlobalPos;
+		sphere.shape().radius = scale*0.3f;		
+		sphere.render_mode(srRenderModeLines);
+		sphere.color(SrColor(color.x,color.y,color.z,1.f));
+		SrGlRenderFuncs::render_sphere(&sphere);			
+	}
+
 	//glEnable(GL_DEPTH_TEST);
 
 	

@@ -410,12 +410,17 @@ void FLTKOgreWindow::fltkRender2()
 	//glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	//if (_data->shadowmode == ModeShadows && hasShaderSupport)
 	//	makeShadowMap();
-	
+
+	glDisable(GL_TEXTURE_GEN_S);
+	glDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_GEN_R);
+	glDisable(GL_TEXTURE_GEN_Q);
+
 	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
 		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
 	} 
-
-
+	
+	
 	// real surface geometries
 	//drawAllGeometries();	
 	glDisable(GL_LIGHTING);
@@ -502,11 +507,7 @@ void FLTKOgreWindow::fltkRender2()
 	glDisable(GL_LIGHTING);
 	glBindBuffer( GL_ARRAY_BUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D,0);
-	glUseProgram(0);
-	glDisable(GL_TEXTURE_GEN_S);
-	glDisable(GL_TEXTURE_GEN_T);
-	glDisable(GL_TEXTURE_GEN_R);
-	glDisable(GL_TEXTURE_GEN_Q);
+	glUseProgram(0);	
 	SBGUIManager::singleton().update();
 
 	glPopAttrib();

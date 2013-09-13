@@ -44,8 +44,7 @@ class ResolutionWindow;
 
 class  BaseWindow : public SrViewer, public Fl_Double_Window
 {
-	public:
-	
+	public:	
 		BaseWindow(int x, int y, int w, int h, const char* name);
 		~BaseWindow();
 

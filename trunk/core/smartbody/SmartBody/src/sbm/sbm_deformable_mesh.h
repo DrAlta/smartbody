@@ -25,9 +25,9 @@ public:
 	std::vector<unsigned int>	jointNameIndex;	// looking up the joint name according to this index
 
 public:
-	SkinWeight();
-	~SkinWeight();
-	void normalizeWeights();
+	SBAPI SkinWeight();
+	SBAPI ~SkinWeight();
+	SBAPI void normalizeWeights();
 };
 
 class SbmSubMesh

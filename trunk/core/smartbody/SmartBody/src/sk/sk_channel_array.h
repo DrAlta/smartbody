@@ -108,7 +108,7 @@ public :
 
 	/*! Add in the end of the array a new channel, by giving
 		only its name and type; the joint is set to null (disconnected) */
-	void add ( std::string name, SkChannel::Type t ) { _add(0,name,t,false); }
+	SBAPI void add ( std::string name, SkChannel::Type t ) { _add(0,name,t,false); }
 
 	/*! Add in the end of the array a new channel */
 	void add ( SkJoint* j, SkChannel::Type t, bool connect=false )
