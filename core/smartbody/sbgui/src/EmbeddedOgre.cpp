@@ -544,7 +544,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 	ogreFrameListener = new OgreFrameListener(ogreWnd,ogreCamera,"Create Ogre Frame Listener", ogreSceneMgr, this);
 	ogreRoot->addFrameListener(ogreFrameListener);
 	//LOG("Before setup default scene");
-		
+	createDefaultScene();	
 	//LOG("After setup default scene");	
 
 }
@@ -844,7 +844,8 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 				bbMax[k] = mesh->posBuf[j][k];
 			if (bbMin[k] > mesh->posBuf[j][k])
 				bbMin[k] = mesh->posBuf[j][k];
-		}			
+		}		
+		//LOG("vtx %d, mesh normal = %f %f %f", j, mesh->normalBuf[j][0], mesh->normalBuf[j][1], mesh->normalBuf[j][2]);
 	}
 	vbuf->writeData(0, vbuf->getSizeInBytes(), tempFloatArray, true);
 	Ogre::VertexBufferBinding* bind = vtxData->vertexBufferBinding;
@@ -909,10 +910,13 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 		//LOG("diffuse material = %f %f %f %f",mat.diffuse.r,mat.diffuse.g,mat.diffuse.b,mat.diffuse.a);
 		float color[4];
 		mat.ambient.get(color);	
-		pass->setAmbient(color[0],color[1],color[2]);
+		//LOG("ambient color = %f %f %f",color[0],color[1],color[2]);
+		//pass->setAmbient(color[0],color[1],color[2]);
 		mat.diffuse.get(color);	
+		//LOG("diffuse color = %f %f %f %f",color[0],color[1],color[2],color[3]);
 		pass->setDiffuse(color[0],color[1],color[2],color[3]);
 		mat.specular.get(color);	
+		//LOG("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
 		pass->setSpecular(color[0],color[1],color[2],color[3]);
 		pass->setShininess(mat.shininess);
 		pass->setAlphaRejectSettings(CMPF_GREATER,0);

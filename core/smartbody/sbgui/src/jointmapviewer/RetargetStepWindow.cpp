@@ -6,8 +6,17 @@
 #include <algorithm>
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
+#include <sb/SBPawn.h>
+#include <sbm/sbm_deformable_mesh.h>
 #include <bml/bml.hpp>
 #include <sb/SBSkeleton.h>
+#include <sb/SBJointMap.h>
+#include <sb/SBJointMapManager.h>
+#include <sb/SBBehaviorSet.h>
+#include <sb/SBBehaviorSetManager.h>
+
+#include <autorig/SBAutoRigManager.h>
+#include <boost/filesystem.hpp>
 
 RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name)
 {	
@@ -34,6 +43,12 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	_choiceCharacters->callback(CharacterCB, this);
 	updateCharacterList();
 
+	_choicePawns = new Fl_Choice(410, yDis, 150, 20, "Mesh Pawn");
+	//_choicePawns->callback(CharacterCB, this);
+	updatePawnList();
+
+	_buttonAutoRig = new Fl_Button(570, yDis, 120, 25, "Apply AutoRig");
+	_buttonAutoRig->callback(ApplyAutoRigCB, this);
 	//_choiceCharacters->callback(CharacterCB,this);
 
 	tabGroup = new Fl_Tabs(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
@@ -105,6 +120,7 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 }
 
 
+
 void RetargetStepWindow::RefreshCB( Fl_Widget* widget, void* data )
 {
 	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
@@ -114,6 +130,7 @@ void RetargetStepWindow::RefreshCB( Fl_Widget* widget, void* data )
 
 void RetargetStepWindow::refreshAll()
 {
+	updatePawnList();
 	updateCharacterList();
 	jointMapViewer->updateUI();
 	retargetViewer->updateBehaviorSet();
@@ -163,6 +180,27 @@ void RetargetStepWindow::updateCharacterList()
 	}
 }
 
+void RetargetStepWindow::updatePawnList()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	int oldValue = _choicePawns->value();
+	const std::vector<std::string>& pawns = scene->getPawnNames();
+	_choicePawns->clear();
+	for (size_t c = 0; c < pawns.size(); c++)
+	{
+		SmartBody::SBPawn* pawn = scene->getPawn(pawns[c]);
+		SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(pawn);
+		if (!sbChar && pawn->dMesh_p && pawn->dMesh_p->dMeshStatic_p.size() > 0) // only add pawns that has attached mesh
+		{
+			_choicePawns->add(pawns[c].c_str());
+		}		
+	}
+	if (oldValue < _choicePawns->size() && oldValue >= 0)
+	{
+		_choicePawns->value(oldValue);
+	}
+}
+
 void RetargetStepWindow::setCharacterName( std::string charName )
 {
 	_charName = charName;
@@ -179,6 +217,7 @@ void RetargetStepWindow::setCharacterName( std::string charName )
 	retargetViewer->setCharacterName(_charName);
 }
 
+
 // void RetargetStepWindow::setSkeletonName( std::string skName )
 // {
 // 	retargetViewer->setSkeletonName(skName);
@@ -188,6 +227,92 @@ void RetargetStepWindow::setJointMapName( std::string jointMapName )
 {
 	jointMapViewer->setJointMapName(jointMapName);
 }
+
+
+void RetargetStepWindow::applyAutoRig()
+{
+	if (!_choicePawns->text())
+		return;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string pawnName = _choicePawns->text();
+	SmartBody::SBPawn* sbPawn = scene->getPawn(pawnName);	
+	if (!sbPawn || sbPawn->dMesh_p->dMeshStatic_p.size() == 0)
+	{
+		LOG("AutoRigging Fail : No pawn is selected, or the selected pawn does not contain 3D mesh for rigging.");
+		return;
+	}
+	
+	SBAutoRigManager& autoRigManager = SBAutoRigManager::singleton();
+	SrModel& model = sbPawn->dMesh_p->dMeshStatic_p[0]->shape();
+	std::string modelName = model.name;
+	std::string filebasename = boost::filesystem::basename(modelName);
+	std::string fileextension = boost::filesystem::extension(modelName);
+	std::string skelName = filebasename+".sk";
+	std::string deformMeshName = filebasename;
+	autoRigManager.buildAutoRigging(model, skelName, deformMeshName);
+
+	std::string charName = sbPawn->getName()+"autoRig";
+
+	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
+	SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(skelName);
+	if (!jointMap)
+	{
+		jointMap = jointMapManager->createJointMap(skelName);
+		jointMap->guessMapping(scene->getSkeleton(skelName), false);
+	}
+
+	SmartBody::SBSkeleton* skel = scene->createSkeleton(skelName);
+
+	SmartBody::SBCharacter* character = scene->createCharacter(charName, "");
+	character->setSkeleton(skel);
+	character->createStandardControllers();
+	character->setStringAttribute("deformableMesh",deformMeshName);
+
+	SrVec dest = sbPawn->getPosition();
+	float yOffset = -skel->getBoundingBox().a.y;
+	dest.y = yOffset;		
+	character->setPosition(SrVec(dest.x,dest.y,dest.z));
+
+
+	// setup behavior set
+	SmartBody::SBBehaviorSetManager* manager = scene->getBehaviorSetManager();
+	if (manager->getNumBehaviorSets() == 0)
+	{
+		// look for the behavior set directory under the media path
+		scene->addAssetPath("script", "behaviorsets");
+		scene->runScript("default-behavior-sets.py");
+
+		if (manager->getNumBehaviorSets() == 0)
+		{
+			LOG("Can not find any behavior sets under path %s/behaviorsets.", scene->getMediaPath().c_str());
+		}
+		else
+		{
+			LOG("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
+		}
+	}
+#define TEST_ROCKETBOX 1
+#if TEST_ROCKETBOX
+	scene->addAssetPath("script", "scripts");
+	scene->run("scene.run('characterUnitTest.py')");
+
+	character->createActionAttribute("_1testHead", true, "TestHead", 300, false, false, false, "Test Head");
+	character->createActionAttribute("_2testGaze", true, "TestHead", 300, false, false, false, "Test Head");
+	character->createActionAttribute("_3testGesture", true, "TestHead", 300, false, false, false, "Test Head");
+	character->createActionAttribute("_4testReach", true, "TestHead", 300, false, false, false, "Test Head");
+	character->createActionAttribute("_5testLocomotion", true, "TestHead", 300, false, false, false, "Test Head");
+#endif
+
+	//updateCharacterList();
+	this->refreshAll();
+	this->setApplyType(true);
+	setCharacterName(charName);
+	setJointMapName(skelName);
+	scene->removePawn(pawnName);
+	//autoRigManager.buildAutoRigging(model )
+	
+}
+
 
 void RetargetStepWindow::applyRetargetSteps()
 {
@@ -202,6 +327,7 @@ void RetargetStepWindow::CharacterCB( Fl_Widget* widget, void* data )
 	Fl_Choice* charChoice = dynamic_cast<Fl_Choice*>(widget);	
 	viewer->setCharacterName(charChoice->text());
 }
+
 
 void RetargetStepWindow::ApplyCB( Fl_Widget* widget, void* data )
 {
@@ -235,4 +361,10 @@ void RetargetStepWindow::ApplyBehaviorSetCB( Fl_Widget* widget, void* data )
 	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
 	viewer->retargetViewer->RetargetCB(NULL,viewer->retargetViewer);
 	viewer->hide();
+}
+
+void RetargetStepWindow::ApplyAutoRigCB( Fl_Widget* widget, void* data )
+{
+	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
+	viewer->applyAutoRig();
 }

@@ -22,6 +22,7 @@
 #include <sbm/Heightfield.h>
 #include <sbm/KinectProcessor.h>
 #include <sb/SBPython.h>
+#include <sb/SBVersion.hpp>
 
 #include "SBGUIManager.h"
 
@@ -913,7 +914,7 @@ void BaseWindow::LaunchJointMapViewerCB( Fl_Widget* widget, void* data )
 	{
 		rootWindow->fltkViewer->_retargetStepWindow = new RetargetStepWindow(150, 150, 1024, 500, "Joint Map Viewer");
 	}
-	rootWindow->fltkViewer->_retargetStepWindow->setApplyType(false);
+	rootWindow->fltkViewer->_retargetStepWindow->setApplyType(true);
 	rootWindow->fltkViewer->_retargetStepWindow->show();
 }
 
@@ -1893,7 +1894,8 @@ void BaseWindow::HelpCB(Fl_Widget* widget, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
-	std::string version = SmartBody::SBScene::getScene()->getVersion();
+	//std::string version = SmartBody::SBScene::getScene()->getVersion();
+	std::string version = SmartBody::getVersion();
 
 	std::stringstream strstr;
 	strstr << "SmartBody\n";

@@ -77,8 +77,13 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape )
 	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);
+	//glEnableClientState(GL_COLOR_ARRAY);
+	//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->skinColorBuf[0]);
+	//glDisable(GL_LIGHTING);
+	
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
-	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);      			
+	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);      
+	
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{	
 		SbmSubMesh* mesh = subMeshList[i];

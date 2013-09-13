@@ -55,6 +55,9 @@
     <Filter Include="jointmapviewer\retargetcreator">
       <UniqueIdentifier>{56361f18-4f18-4cc4-b99b-6afd39fa8ac8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="autorig">
+      <UniqueIdentifier>{b54e54a0-5a9f-47fc-8798-b82bebd2cf85}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -294,6 +297,9 @@
     </ClCompile>
     <ClCompile Include="..\src\OgreFrameListener.cpp">
       <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\autorig\SBAutoRigManager.cpp">
+      <Filter>autorig</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -541,6 +547,9 @@
     </ClInclude>
     <ClInclude Include="..\src\OgreFrameListener.h">
       <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\autorig\SBAutoRigManager.h">
+      <Filter>autorig</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

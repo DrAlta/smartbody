@@ -1568,7 +1568,7 @@ void JointMapViewer::setCharacterName( std::string charName )
 }
 
 void JointMapViewer::setJointMapName( std::string jointMapName )
-{
+{	
 	_jointMapName = jointMapName;
 	for (int c = 0; c < _choiceJointMaps->size(); c++)
 	{
