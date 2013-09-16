@@ -57,7 +57,7 @@
         }
         
         animationInterval = 15.0 / 60.0;
-        antialiasing = NO;
+        antialiasing = YES;
 		[self setupView];
     }
     return self;

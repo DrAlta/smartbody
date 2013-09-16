@@ -342,6 +342,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ./SmartBody/sbm/ParserFBX.cpp
         ./SmartBody/sbm/ParserOgre.cpp
         ./SmartBody/sbm/ParserOpenCOLLADA.cpp
+        ./SmartBody/sbm/ParserCOLLADAFast.cpp
+        ./SmartBody/sbm/remote_speech.cpp
         ./SmartBody/sbm/remote_speech.cpp
         ./SmartBody/sbm/sbm_audio.cpp
         ./SmartBody/controllers/MeCtBodyReachState.cpp

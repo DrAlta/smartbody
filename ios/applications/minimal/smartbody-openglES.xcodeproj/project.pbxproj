@@ -18,6 +18,7 @@
 		AA12CB1C14031E040017A491 /* ApplicationViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = AA12CB1B14031E040017A491 /* ApplicationViewer.m */; };
 		AA813ABB140FFC130026D507 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA813ABA140FFC130026D507 /* MainWindow-iPad.xib */; };
 		AA813ABD140FFCBE0026D507 /* Window-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = AA813ABC140FFCBE0026D507 /* Window-iPad.xib */; };
+		AA9AC3B617E7A7280077D800 /* libalut.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9AC3B517E7A7280077D800 /* libalut.a */; };
 		AA9CDAAF141FFFB90064C27A /* minimalwrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CDAAD141FFFB90064C27A /* minimalwrapper.cpp */; };
 		AAA6ACD016EFF951006E8ACF /* assests in Resources */ = {isa = PBXBuildFile; fileRef = AAA6ACCF16EFF951006E8ACF /* assests */; };
 		AAC9AC50142010C000F56F9C /* libactivemq-cpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC40142010C000F56F9C /* libactivemq-cpp.a */; };
@@ -45,7 +46,6 @@
 		AAE74E4F1798E6E300D36911 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAE74E4E1798E6E300D36911 /* libsndfile.a */; };
 		AAE74E531798E70600D36911 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAE74E511798E70600D36911 /* CoreAudio.framework */; };
 		AAE74E551798EEF300D36911 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAE74E541798EEF300D36911 /* OpenAL.framework */; };
-		AAE74E5B1798F6CD00D36911 /* libalut.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAE74E5A1798F6CD00D36911 /* libalut.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +66,7 @@
 		AA12CB1B14031E040017A491 /* ApplicationViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplicationViewer.m; sourceTree = "<group>"; };
 		AA813ABA140FFC130026D507 /* MainWindow-iPad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = "MainWindow-iPad.xib"; path = "iPad/MainWindow-iPad.xib"; sourceTree = "<group>"; };
 		AA813ABC140FFCBE0026D507 /* Window-iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "Window-iPad.xib"; sourceTree = "<group>"; };
+		AA9AC3B517E7A7280077D800 /* libalut.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libalut.a; path = ../../libs/iphoneos/libalut.a; sourceTree = "<group>"; };
 		AA9CDAAD141FFFB90064C27A /* minimalwrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = minimalwrapper.cpp; sourceTree = "<group>"; };
 		AA9CDAAE141FFFB90064C27A /* minimalwrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = minimalwrapper.h; sourceTree = "<group>"; };
 		AAA6ACCF16EFF951006E8ACF /* assests */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assests; sourceTree = "<group>"; };
@@ -94,7 +95,6 @@
 		AAE74E4E1798E6E300D36911 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsndfile.a; path = ../../libs/iphoneos/libsndfile.a; sourceTree = "<group>"; };
 		AAE74E511798E70600D36911 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		AAE74E541798EEF300D36911 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
-		AAE74E5A1798F6CD00D36911 /* libalut.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libalut.a; path = "../../../../../Downloads/freealut-1.1.0/build/libalut.a"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,7 +130,7 @@
 				AAE74E4F1798E6E300D36911 /* libsndfile.a in Frameworks */,
 				AAE74E531798E70600D36911 /* CoreAudio.framework in Frameworks */,
 				AAE74E551798EEF300D36911 /* OpenAL.framework in Frameworks */,
-				AAE74E5B1798F6CD00D36911 /* libalut.a in Frameworks */,
+				AA9AC3B617E7A7280077D800 /* libalut.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,7 +197,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				AAE74E5A1798F6CD00D36911 /* libalut.a */,
+				AA9AC3B517E7A7280077D800 /* libalut.a */,
 				AAE74E4E1798E6E300D36911 /* libsndfile.a */,
 				AAD5A304177A39F70056CDD4 /* libboost_filesystem.a */,
 				AAD5A305177A39F70056CDD4 /* libboost_python.a */,
@@ -461,6 +461,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -488,6 +489,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
