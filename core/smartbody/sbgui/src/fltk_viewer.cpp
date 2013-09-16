@@ -1882,6 +1882,9 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		mcu.executePythonFile("drag-and-drop.py");
 		mcu.executePython(cmdStr);
 		*/		
+		std::stringstream strCmd;
+		strCmd << "char " << charName << " viewer deformableGPU";				
+		scene->command(strCmd.str());
 
 
 		// load the behavior sets if they have not yet been loaded

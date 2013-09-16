@@ -180,6 +180,55 @@ HumanSkeleton::HumanSkeleton()
     setFat("head");
 }
 
+SmartBodySkeleton::SmartBodySkeleton()
+{
+	//order of makeJoint calls is very important
+	makeJoint("shoulders",  Vector3(0., 0.5, 0.));                          //0
+	makeJoint("spine3",       Vector3(0., 0.25, 0.),      "shoulders");       //1
+	makeJoint("spine2",       Vector3(0., 0.10, 0.),      "spine3");       //2
+	makeJoint("back",       Vector3(0., 0.05, 0.),      "spine2");       //3
+	makeJoint("hips",       Vector3(0., 0., 0.),        "back");            //4
+	makeJoint("neck",       Vector3(0., 0.55, 0.),       "shoulders");       //5
+	makeJoint("head",       Vector3(0., 0.7, 0.),       "neck");       //6
+
+	makeJoint("lthigh",     Vector3(-0.1, 0., 0.),      "hips");            //7
+	makeJoint("lknee",      Vector3(-0.15, -0.35, 0.),  "lthigh");          //8
+	makeJoint("lankle",      Vector3(-0.15, -0.8, 0.),  "lknee");           //9
+	makeJoint("lfoot",      Vector3(-0.15, -0.8, 0.1),  "lankle");          //10
+
+	makeJoint("rthigh",     Vector3(0.1, 0., 0.),       "hips");            //11
+	makeJoint("rknee",      Vector3(0.15, -0.35, 0.),   "rthigh");          //12
+	makeJoint("rankle",      Vector3(0.15, -0.8, 0.),   "rknee");           //13
+	makeJoint("rfoot",      Vector3(0.15, -0.8, 0.1),   "rankle");          //14
+
+	makeJoint("lshoulder",  Vector3(-0.2, 0.5, 0.),     "shoulders");       //15
+	makeJoint("lelbow",     Vector3(-0.4, 0.25, 0.075), "lshoulder");       //16
+	makeJoint("lhand",      Vector3(-0.6, 0.0, 0.15),   "lelbow");          //17
+
+	makeJoint("rshoulder",  Vector3(0.2, 0.5, 0.),      "shoulders");       //18
+	makeJoint("relbow",     Vector3(0.4, 0.25, 0.075),  "rshoulder");       //19
+	makeJoint("rhand",      Vector3(0.6, 0.0, 0.15),    "relbow");          //20
+
+	//symmetry
+	makeSymmetric("lthigh", "rthigh");
+	makeSymmetric("lknee", "rknee");
+	makeSymmetric("lankle", "rankle");
+	makeSymmetric("lfoot", "rfoot");
+
+	makeSymmetric("lshoulder", "rshoulder");
+	makeSymmetric("lelbow", "relbow");
+	makeSymmetric("lhand", "rhand");
+
+	initCompressed();
+
+	setFoot("lfoot");
+	setFoot("rfoot");
+
+	setFat("hips");
+	setFat("shoulders");
+	setFat("head");
+}
+
 QuadSkeleton::QuadSkeleton()
 {
     //order of makeJoint calls is very important
