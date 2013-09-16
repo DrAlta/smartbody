@@ -88,15 +88,15 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, const std
    xmlConverted += "encoding=\"" + encoding.substr( 0, 7 ) + "\"?>";
 
    xml_utils::xmlToString( node, xmlConverted ); //Xml to string recursively searches DOM tree and returns a string of the xml document
-   if (!SmartBody::SBScene::getScene()->getBoolAttribute("useFastXMLParsing"))
+   if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastSpeechParsing"))
    {
 	  // mcu.mark("requestSpeechAudio");
-	   return requestSpeechAudio( agentName, voiceCode, xmlConverted, callbackCmd );
+	   return requestSpeechAudioFast( agentName, voiceCode, xmlConverted, callbackCmd );
    }
    else
    {
 	   //mcu.mark("requestSpeechAudio");
-	   return requestSpeechAudioFast( agentName, voiceCode, xmlConverted, callbackCmd );
+	   return requestSpeechAudio( agentName, voiceCode, xmlConverted, callbackCmd );
    }
 }
 
