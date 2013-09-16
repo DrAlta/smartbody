@@ -371,6 +371,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sbm/ParserASFAMC.cxx
         ./src/sbm/ParserFBX.cpp
         ./src/sbm/ParserOgre.cpp
+        ./src/sbm/ParserCOLLADAFast.cpp
         ./src/sbm/ParserOpenCOLLADA.cpp
         ./src/sbm/remote_speech.cpp
         ./src/sbm/sbm_audio.cpp

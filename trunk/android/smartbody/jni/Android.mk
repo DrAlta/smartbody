@@ -426,6 +426,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtBlendEngine.cpp \
 	$(SBM_MY_DIR)/controllers/MotionAnalysis.cpp \
 	$(SBM_MY_DIR)/sbm/ParserFBX.cpp \
+	$(SBM_MY_DIR)/sbm/ParserCOLLADAFast.cpp \
 	$(SBM_MY_DIR)/sbm/ParserOpenCOLLADA.cpp \
 	$(SBM_MY_DIR)/sbm/ParserOgre.cpp \
 	$(SBM_MY_DIR)/sbm/remote_speech.cpp \

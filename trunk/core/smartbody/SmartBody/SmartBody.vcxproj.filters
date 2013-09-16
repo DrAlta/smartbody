@@ -1102,6 +1102,9 @@
     <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
+    <ClCompile Include="src\sbm\ParserCOLLADAFast.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2201,6 +2204,9 @@
     </ClInclude>
     <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp">
       <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sbm\ParserCOLLADAFast.h">
+      <Filter>sbm</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
