@@ -903,8 +903,9 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 		if (!texPtr.isNull())
 		{
  			Ogre::TextureUnitState* texUnit = pass->createTextureUnitState();
- 			texUnit->setTextureName(texPtr->getName());	
-		}
+ 			texUnit->setTextureName(texPtr->getName());				
+			texUnit->setAlphaOperation(LBX_MODULATE, LBS_TEXTURE, LBS_CURRENT);//, 1.0, 0.1);
+		}		
  		//pass->setDiffuse(1.0,1.0,1.0,1.0);
 		SrMaterial& mat = subModel->material;
 		//LOG("diffuse material = %f %f %f %f",mat.diffuse.r,mat.diffuse.g,mat.diffuse.b,mat.diffuse.a);
@@ -919,10 +920,11 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 		//LOG("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
 		pass->setSpecular(color[0],color[1],color[2],color[3]);
 		pass->setShininess(mat.shininess);
-		pass->setAlphaRejectSettings(CMPF_GREATER,0);
+		pass->setAlphaRejectSettings(CMPF_GREATER, 0, true);		
 		pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
-		pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);
-		pass->setShadingMode(SO_PHONG);
+		pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);	
+		//pass->setSceneBlending(Ogre::SBF_ONE, Ogre::SBF_ONE_MINUS_SOURCE_ALPHA);;
+		//pass->setShadingMode(SO_PHONG);
 		//pass->setShadowCasterVertexProgram("Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs");
 		//pass->setVertexProgram("Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs");		
 		//pass->setVertexProgram("Ogre/HardwareSkinningFourWeightsGLSL");
@@ -946,7 +948,7 @@ void EmbeddedOgre::addTexture( std::string texName )
 	if (!ogreTex.isNull()) return; // the texture already exist in ogre
 	if (!tex) return; // the texture not exist in SmartBody
 	PixelFormat pixelFormat = PF_R8G8B8;
-	if (tex->getNumChannels() == 4) pixelFormat = PF_R8G8B8A8;
+	if (tex->getNumChannels() == 4) pixelFormat = PF_R8G8B8A8;	
 	// initialze the texture
 	ogreTex = TextureManager::getSingleton().createManual(
 		texName, // name
@@ -969,7 +971,11 @@ void EmbeddedOgre::addTexture( std::string texName )
 			int idx = i*tex->getWidth()*tex->getNumChannels()+j*tex->getNumChannels();
 			int idx1 = i*tex->getWidth()*4+j*4;
 			pDest[idx1+3] = 255;
-			if (tex->getNumChannels() == 4) pDest[idx1+3] = tex->getBuffer()[idx+3];
+			if (tex->getNumChannels() == 4) 
+			{
+				unsigned char alpha = tex->getBuffer()[idx+3];
+				pDest[idx1+3] = alpha;
+			}
 			pDest[idx1] = tex->getBuffer()[idx+2];
 			pDest[idx1+1] = tex->getBuffer()[idx+1];
 			pDest[idx1+2] = tex->getBuffer()[idx+0];
