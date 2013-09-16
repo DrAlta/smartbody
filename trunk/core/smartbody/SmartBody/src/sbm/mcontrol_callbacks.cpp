@@ -1391,29 +1391,48 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBComma
 	{
 		if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastXMLParsing"))
 		{
-			rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("library_geometries", obj_file, 2);
+			rapidxml::xml_document<> doc;
+			rapidxml::file<char>* rapidFile = ParserCOLLADAFast::getParserDocumentFile(obj_file, &doc);
+			if (!rapidFile)
+			{
+				LOG("Problem parsing file '%s'", obj_file);
+				return CMD_FAILURE;
+			}
+			rapidxml::xml_node<>* colladaNode = doc.first_node("COLLADA");
+			if (!colladaNode)
+			{
+				LOG("Problem parsing file '%s': not a COLLADA file.", obj_file);
+				delete rapidFile;
+				return CMD_FAILURE;
+			}
+			int curDepth = 0;
+			rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("library_geometries", colladaNode, curDepth, 1);
 			if (geometryNode)
 			{
 				// first from library visual scene retrieve the material id to name mapping (TODO: needs reorganizing the assets management)
 				std::map<std::string, std::string> materialId2Name;
-				rapidxml::xml_node<>* visualSceneNode = ParserCOLLADAFast::getNode("library_visual_scenes", obj_file, 2);
+				curDepth = 0;
+				rapidxml::xml_node<>* visualSceneNode = ParserCOLLADAFast::getNode("library_visual_scenes", colladaNode, curDepth, 1);
 				if (!visualSceneNode)
 					LOG("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
 				SkSkeleton skeleton;
 				SkMotion motion;
 				int order;
+				curDepth = 0;
 				ParserCOLLADAFast::parseLibraryVisualScenes(visualSceneNode, skeleton, motion, 1.0, order, materialId2Name);
 
 				// get picture id to file mapping
 				std::map<std::string, std::string> pictureId2File;
 				std::map<std::string, std::string> pictureId2Name;
-				rapidxml::xml_node<>* imageNode = ParserCOLLADAFast::getNode("library_images", obj_file, 2);
+				curDepth = 0;
+				rapidxml::xml_node<>* imageNode = ParserCOLLADAFast::getNode("library_images", colladaNode, curDepth, 1);
 				if (imageNode)
 					ParserCOLLADAFast::parseLibraryImages(imageNode, pictureId2File, pictureId2Name);
 
 				// start parsing mateiral
 				std::map<std::string, std::string> effectId2MaterialId;
-				rapidxml::xml_node<>* materialNode = ParserCOLLADAFast::getNode("library_materials", obj_file, 2);
+				curDepth = 0;
+				rapidxml::xml_node<>* materialNode = ParserCOLLADAFast::getNode("library_materials", colladaNode, curDepth, 1);
 				if (materialNode)
 					ParserCOLLADAFast::parseLibraryMaterials(materialNode, effectId2MaterialId);
 
@@ -1423,17 +1442,22 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBComma
 				std::map<std::string,std::string> mtlTextMap;
 				std::map<std::string,std::string> mtlTextBumpMap;
 				std::map<std::string,std::string> mtlTextSpecularMap;
-				rapidxml::xml_node<>* effectNode = ParserCOLLADAFast::getNode("library_effects", obj_file, 2);
+				curDepth = 0;
+				rapidxml::xml_node<>* effectNode = ParserCOLLADAFast::getNode("library_effects", colladaNode, curDepth, 1);
 				if (effectNode)
 				{
 					ParserCOLLADAFast::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
 				}
 				// parsing geometry
 				ParserCOLLADAFast::parseLibraryGeometries(geometryNode, obj_file, M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f);
+				if (rapidFile)
+					delete rapidFile;
 			}
 			else
 			{
 				LOG( "Could not load mesh from file '%s'", obj_file);
+				if (rapidFile)
+					delete rapidFile;
 				return CMD_FAILURE;
 			}
 		}
@@ -1597,7 +1621,12 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 		if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastXMLParsing"))
 		{
 			rapidxml::xml_document<> doc;
-			ParserCOLLADAFast::getParserDocumentFile(obj_file, &doc);
+			rapidxml::file<char>* rapidFile = ParserCOLLADAFast::getParserDocumentFile(obj_file, &doc);
+			if (!rapidFile)
+			{
+				LOG("Problem parsing file '%s'.", obj_file);
+				return CMD_FAILURE;
+			}
 			int depth = 0;
 			rapidxml::xml_node<>* firstNode = doc.first_node("COLLADA");
 			rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("library_geometries", firstNode, depth, 2);	
@@ -1666,9 +1695,13 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			else
 			{
 				LOG( "Could not load mesh from file '%s'", obj_file);
+				if (rapidFile)
+					delete rapidFile;
 		
 				return CMD_FAILURE;
 			}
+			if (rapidFile)
+				delete rapidFile;
 		}
 		else
 		{
@@ -1862,10 +1895,15 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 		std::string file = boost::filesystem::basename(skin_file);	
 
 		rapidxml::xml_document<> doc;
-		ParserCOLLADAFast::getParserDocumentFile(skin_file, &doc);
-		rapidxml::xml_node<>* node = doc.first_node("COLLADA");
+		rapidxml::file<char>* rapidFile = ParserCOLLADAFast::getParserDocumentFile(skin_file, &doc);
+		if (!rapidFile)
+		{
+			LOG("Problem parsing file '%s'", skin_file);
+			return CMD_FAILURE;
+		}
 		if (ext == ".dae" || ext == ".DAE")
 		{
+			rapidxml::xml_node<>* node = doc.first_node("COLLADA");
 			int depth = 0;
 			rapidxml::xml_node<>* controllerNode = ParserCOLLADAFast::getNode("library_controllers", node, depth, 2);		
 			if (!controllerNode)
@@ -1912,7 +1950,8 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 			}
 			*/
 		}
-		
+		if (rapidFile)
+			delete rapidFile;
 	
 		return( CMD_SUCCESS );	
 

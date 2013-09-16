@@ -60,9 +60,11 @@ class ParserCOLLADAFast
 		static void getChildNodes(const std::string& nodeName, rapidxml::xml_node<>* node, std::vector<rapidxml::xml_node<>*>& children );
 		static rapidxml::xml_node<>* getNode(const std::string& nodeName, rapidxml::xml_node<>* node, int& curDepth, int maximumDepth);
 		static rapidxml::xml_node<>* getNode(const std::string& nodeName, rapidxml::xml_node<>* node);
-		static rapidxml::xml_node<>* getNode(const std::string& nodeName, std::string fileName, int maximumDepth);
-		static rapidxml::xml_node<>* getNode(const std::string& nodeName, std::string fileName);
-		static void getParserDocumentFile(std::string fileName, rapidxml::xml_document<>* doc);
+
+		//static rapidxml::xml_node<>* getNode(const std::string& nodeName, std::string fileName, int maximumDepth);
+		//static rapidxml::xml_node<>* getNode(const std::string& nodeName, std::string fileName);
+
+		static rapidxml::file<char>* getParserDocumentFile(std::string fileName, rapidxml::xml_document<>* doc);
 		static std::string getNodeAttributeString(rapidxml::xml_node<>* node, std::string attrName);
 		static int getNodeAttributeInt(rapidxml::xml_node<>* node, std::string attrName);
 		static void nodeStr(const std::string s, std::string& out);

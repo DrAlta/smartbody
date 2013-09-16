@@ -129,7 +129,7 @@ void TextLineSplitterFast::SplitLine( const char *line,
 bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::string pathName, float scale, bool doParseSkeleton, bool doParseMotion)
 {
 	bool zaxis = false;
-
+	rapidxml::file<char>* rapidFile = NULL;
 	try 
 	{
 		int order;
@@ -143,7 +143,7 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 			strstr << filebasename << "." << fileextension;
 		skeleton.setName(strstr.str().c_str());
 		
-		rapidxml::file<char>* rapidFile = new rapidxml::file<char>(pathName.c_str());
+		rapidFile = new rapidxml::file<char>(pathName.c_str());
 		rapidxml::xml_document<> doc;
 		doc.parse< rapidxml::parse_declaration_node>(rapidFile->data());
 		rapidxml::xml_node<>* node = doc.first_node("COLLADA"); 
@@ -168,6 +168,8 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		if (!skNode)
 		{
 			LOG("ParserCOLLADAFast::parse ERR: no skeleton info contained in this file");
+			if (rapidFile)
+				delete rapidFile;
 			return false;
 		}
 		std::map<std::string, std::string> materialId2Name;
@@ -197,6 +199,8 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		if (!skmNode)
 		{
 		//	LOG("ParserCOLLADAFast::parse WARNING: no motion info contained in this file");
+			if (rapidFile)
+				delete rapidFile;
 			return true;
 		}
 		if (doParseMotion)
@@ -209,19 +213,27 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		std::string message = "";
 		xml_utils::xml_translate(&message, toCatch.getMessage());
 		std::cout << "Exception message is: \n" << message << "\n";
+		if (rapidFile)
+			delete rapidFile;
 		return false;
 	}
 	catch (const DOMException& toCatch) {
 		std::string message = "";
 		xml_utils::xml_translate(&message, toCatch.msg);
 		std::cout << "Exception message is: \n" << message << "\n";
+		if (rapidFile)
+			delete rapidFile;
 		return false;
 	}
 	catch (...) {
 		LOG("Unexpected Exception in ParseOpenCollada::parse()");
+		if (rapidFile)
+			delete rapidFile;
 		return false;
 	}
 
+	if (rapidFile)
+		delete rapidFile;
 	return true;
 }
 
@@ -295,18 +307,21 @@ rapidxml::xml_node<>* ParserCOLLADAFast::getNode(const std::string& nodeName, ra
 }
 
 
-void ParserCOLLADAFast::getParserDocumentFile(std::string fileName, rapidxml::xml_document<>* doc)
+rapidxml::file<char>* ParserCOLLADAFast::getParserDocumentFile(std::string fileName, rapidxml::xml_document<>* doc)
 {
 	//std::string filebasename = boost::filesystem::basename(fileName);
 
 	try {
 		rapidxml::file<char>* rapidFile = new rapidxml::file<char>(fileName.c_str());
 		doc->parse< rapidxml::parse_declaration_node>(rapidFile->data());
+		return rapidFile;
 	} catch (std::exception &e) {
 		LOG(e.what());
 	}
+	return NULL;
 }
 
+/*
 rapidxml::xml_node<>* ParserCOLLADAFast::getNode(const std::string& nodeName, std::string fileName, int maximumDepth)
 {
 	rapidxml::file<char>* rapidFile = new rapidxml::file<char>(fileName.c_str());
@@ -319,6 +334,7 @@ rapidxml::xml_node<>* ParserCOLLADAFast::getNode(const std::string& nodeName, st
 }
 
 
+
 rapidxml::xml_node<>* ParserCOLLADAFast::getNode(const std::string& nodeName, std::string fileName)
 {
 
@@ -329,7 +345,7 @@ rapidxml::xml_node<>* ParserCOLLADAFast::getNode(const std::string& nodeName, st
 
 	return getNode(nodeName, node);
 }
-
+*/
 void ParserCOLLADAFast::nodeStr(const std::string s, std::string& out)
 {
 	out = s;
@@ -1819,7 +1835,8 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 						}
 					}
 #endif
-					meshCurNode = meshCurNode->next_sibling();
+					// duplication???
+					//meshCurNode = meshCurNode->next_sibling();
 				}			
 				if (nodeName1 == "vertices")
 				{
@@ -1832,7 +1849,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 						//rapidxml::xml_node<>* inputNode = node1->getChildNodes()->item(c2);
 						rapidxml::xml_node<>* inputNode = verticeCurNode;
 
-						if (inputNode->name() == "input")
+						if (strcmp(inputNode->name(), "input") == 0)
 						{
 							rapidxml::xml_attribute<>* semanticNode = inputNode->first_attribute("semantic");
 							std::string inputSemantic = semanticNode->value();
@@ -1871,7 +1888,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					{
 						//rapidxml::xml_node<>* inputNode = node1->getChildNodes()->item(c2);
 						rapidxml::xml_node<>* inputNode = triangleCurNode;
-						if (inputNode->name() == "input")
+						if (strcmp(inputNode->name(), "input") == 0)
 						{
 							rapidxml::xml_attribute<>* semanticNode = inputNode->first_attribute("semantic");
 							std::string inputSemantic = semanticNode->value();
@@ -1906,7 +1923,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 									inputMap.insert(std::make_pair(offset, "null"));
 							}
 						}
-						if (inputNode->name() == "vcount")
+						if (strcmp(inputNode->name(), "vcount") == 0)
 						{
 							std::string vcountString = inputNode->value();
 							std::vector<std::string> tokens;
@@ -2473,14 +2490,13 @@ void ParserCOLLADAFast::parseNodeAnimation(rapidxml::xml_node<>* node1, std::map
 bool ParserCOLLADAFast::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, std::string fileName )
 {
 	rapidxml::xml_document<> doc;
-	ParserCOLLADAFast::getParserDocumentFile(fileName, &doc);
-	rapidxml::xml_node<>* node = doc.first_node();
-	while (node)
+	rapidxml::file<char>* rapidFile = ParserCOLLADAFast::getParserDocumentFile(fileName, &doc);
+	if (!rapidFile)
 	{
-		if (strcmp(node->name(), "COLLADA") == 0)
-		break;
-		node = node->next_sibling();
+		LOG("Problem parsing file '%s", fileName.c_str());
+		return false;
 	}
+	rapidxml::xml_node<>* node = doc.first_node("COLLADA");
 	
 	//rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("library_geometries", fileName, 2);	
 	int depth = 0;
@@ -2535,8 +2551,12 @@ bool ParserCOLLADAFast::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 	else
 	{
 		LOG( "Could not load mesh from file '%s'", fileName.c_str());
+		if (rapidFile)
+			delete rapidFile;
 		return false;
 	}
 
+	if (rapidFile)
+		delete rapidFile;
 	return true;
 }
