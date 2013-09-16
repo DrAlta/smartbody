@@ -2047,17 +2047,12 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 			newModel->M = M;
 			newModel->mtlnames = mnames;
 
-			LOG("Time to finish geometry parsing: %lf", timer.t());
 			newModel->validate();
 
-			LOG("Time to validate: %lf", timer.t());
-
 			newModel->remove_redundant_materials();
-			LOG("Time to remove redundant materials: %lf", timer.t());
 
 //			newModel->remove_redundant_normals();
 			newModel->compress();
-			LOG("Time to compress: %lf", timer.t());
 			meshModelVec.push_back(newModel);
 
 			SrString path = file;
@@ -2071,18 +2066,15 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 			   if (newModel->mtlTextureNameMap.find(matName) != newModel->mtlTextureNameMap.end())
 			   {
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_DIFFUSE, newModel->mtlTextureNameMap[matName].c_str(), paths);	   
-				   LOG("Time to parse diffuse texture %s : %lf", matName.c_str(), timer.t());
 			   }	
 			   if (newModel->mtlNormalTexNameMap.find(matName) != newModel->mtlNormalTexNameMap.end())
 			   {
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_NORMALMAP, newModel->mtlNormalTexNameMap[matName].c_str(), paths);	   
-				   LOG("Time to parse normal map %s : %lf", matName.c_str(), timer.t());
 			   }
 			   if (newModel->mtlSpecularTexNameMap.find(matName) != newModel->mtlSpecularTexNameMap.end())
 			   {
 				   //LOG("Load specular map = %s",newModel->mtlSpecularTexNameMap[matName].c_str());
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, newModel->mtlSpecularTexNameMap[matName].c_str(), paths);	   
-				   LOG("Time to parse specular map %s : %lf", matName.c_str(), timer.t());
 			   }
 			}
 		}

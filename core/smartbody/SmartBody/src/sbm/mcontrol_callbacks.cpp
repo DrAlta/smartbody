@@ -1621,11 +1621,8 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 	{
 		if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastCOLLADAParsing"))
 		{
-			SrTimer timer;
-			timer.start();
 			rapidxml::xml_document<> doc;
 			rapidxml::file<char>* rapidFile = ParserCOLLADAFast::getParserDocumentFile(obj_file, &doc);
-LOG("Time to construct file: %lf", timer.t());
 			if (!rapidFile)
 			{
 				LOG("Problem parsing file '%s'.", obj_file);
@@ -1634,7 +1631,6 @@ LOG("Time to construct file: %lf", timer.t());
 			int depth = 0;
 			rapidxml::xml_node<>* firstNode = doc.first_node("COLLADA");
 			rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("library_geometries", firstNode, depth, 2);	
-LOG("Time to find library_geometries: %lf", timer.t());
 
 			if (geometryNode)
 			{
@@ -1652,7 +1648,6 @@ LOG("Time to find library_geometries: %lf", timer.t());
 				int order;
 				//LOG("ParseOpenCOLLADA::parseLibraryVisualScenes");
 				ParserCOLLADAFast::parseLibraryVisualScenes(visualSceneNode, skeleton, motion, 1.0, order, materialId2Name);
-LOG("Time to parse library_visual_scenes: %lf", timer.t());
 
 				// get picture id to file mapping
 				std::map<std::string, std::string> pictureId2File;
@@ -1666,7 +1661,6 @@ LOG("Time to parse library_visual_scenes: %lf", timer.t());
 				{
 					//LOG("ParseOpenCOLLADA::parseLibraryImages");
 					ParserCOLLADAFast::parseLibraryImages(imageNode, pictureId2File, pictureId2Name);
-LOG("Time to parse library_images: %lf", timer.t());
 				}
 
 				// start parsing mateiral
@@ -1679,7 +1673,6 @@ LOG("Time to parse library_images: %lf", timer.t());
 				{
 					//LOG("ParseOpenCOLLADA::parseLibraryMaterials");
 					ParserCOLLADAFast::parseLibraryMaterials(materialNode, effectId2MaterialId);
-LOG("Time to parse library_materials: %lf", timer.t());
 				}
 
 				// start parsing effect
@@ -1696,16 +1689,12 @@ LOG("Time to parse library_materials: %lf", timer.t());
 				{
 					//LOG("ParseOpenCOLLADA::parseLibraryEffects");
 					ParserCOLLADAFast::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
-LOG("Time to parse library_effects: %lf", timer.t());
 				}
 
 				// parsing geometry
 				//LOG("ParseOpenCOLLADA::parseLibraryGeometries");
 				ParserCOLLADAFast::parseLibraryGeometries(geometryNode, obj_file, M, mnames,  materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f); 
-LOG("Time to parse geometry: %lf", timer.t());
 
-				timer.stop();
-				LOG("Parsed COLLADA file using rapidxml parser in time: %lf", timer.t());
 			}
 			else
 			{
