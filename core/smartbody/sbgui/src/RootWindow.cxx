@@ -1894,14 +1894,9 @@ void BaseWindow::HelpCB(Fl_Widget* widget, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
-	//std::string version = SmartBody::SBScene::getScene()->getVersion();
 	std::string version = SmartBody::getVersion();
 
-	std::stringstream strstr;
-	strstr << "SmartBody\n";
-	strstr << "\n" << version;
-
-	fl_alert("%s", strstr.str().c_str());
+	fl_alert("%s", version.c_str());
 	return;
 }
 

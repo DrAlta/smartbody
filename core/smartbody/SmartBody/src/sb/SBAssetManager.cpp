@@ -11,6 +11,7 @@
 #include <boost/algorithm/string.hpp>
 #include <sbm/ParserBVH.h>
 #include <sbm/ParserOpenCOLLADA.h>
+#include <sbm/ParserCOLLADAFast.h>
 #include <sbm/ParserOgre.h>
 #include <sbm/ParserASFAMC.h>
 #include <sbm/ParserFBX.h>
@@ -397,7 +398,12 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 	{
 		SmartBody::SBSkeleton*skeleton =  new SmartBody::SBSkeleton();					
 		SkMotion motion;
-		bool ok = ParserOpenCOLLADA::parse(*skeleton, motion, finalPath, 1.f, true, false);
+		bool ok = false;
+		if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastXMLParsing"))
+			ok = ParserCOLLADAFast::parse(*skeleton, motion, finalPath, 1.f, true, false);
+		else
+			ok = ParserOpenCOLLADA::parse(*skeleton, motion, finalPath, 1.f, true, false);
+
 		if (ok)
 		{
 			std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = _skeletons.find(fileName);
@@ -693,7 +699,10 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 		else if (ext == ".dae" || ext == ".DAE")
 		{			
 			SBSkeleton skeleton;
-			parseSuccessful = ParserOpenCOLLADA::parse(skeleton, *motion, convertedPath, float(scale), true, true);		
+			if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastXMLParsing"))
+				parseSuccessful = ParserCOLLADAFast::parse(skeleton, *motion, convertedPath, float(scale), true, true);		
+			else
+				parseSuccessful = ParserOpenCOLLADA::parse(skeleton, *motion, convertedPath, float(scale), true, true);		
 			// now there's adjust for the channels by default
 			//animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
 			SmartBody::SBMotion* sbMotion = dynamic_cast<SmartBody::SBMotion*>(motion);
@@ -963,7 +972,10 @@ SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srP
 	{
 		fclose(fp);
 		SmartBody::SBMotion motion;
-		ParserOpenCOLLADA::parse(*skeleton_p, motion, filename, float(scale), true, false);
+		if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastXMLParsing"))
+			ParserCOLLADAFast::parse(*skeleton_p, motion, filename, float(scale), true, false);
+		else
+			ParserOpenCOLLADA::parse(*skeleton_p, motion, filename, float(scale), true, false);
 		skeleton_p->skfilename(filename.c_str());
 		skeleton_p->setName(skel_file);
 	}
@@ -1181,7 +1193,11 @@ int SBAssetManager::load_me_skeletons_impl( const boost::filesystem::path& pathn
 			skeleton->skfilename(fullName.c_str());				
 			skeleton->setName(fullName.c_str());
 			SkMotion motion;
-			bool ok = ParserOpenCOLLADA::parse(*skeleton, motion, pathname.string(), float(scale), true, false);
+			bool ok = false;
+			if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastXMLParsing"))
+				ok = ParserCOLLADAFast::parse(*skeleton, motion, pathname.string(), float(scale), true, false);
+			else
+				ok = ParserOpenCOLLADA::parse(*skeleton, motion, pathname.string(), float(scale), true, false);
 			if (ok)
 			{
 				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
