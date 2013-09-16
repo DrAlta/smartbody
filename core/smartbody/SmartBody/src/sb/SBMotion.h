@@ -103,6 +103,7 @@ class SBMotion : public SkMotion
 		SBAPI bool trim(int numFramesFromFront, int numFramesFromBack);
 	//	bool move(int startFrame, int endFrame, int position);
 		SBAPI void saveToSkm(const std::string& fileName);
+		SBAPI void saveToSkmByFrames(const std::string& fileName, int startFrame, int endFrame);
 
 		SBAPI float getJointSpeed(SBJoint* joint, float startTime, float endTime);
 		SBAPI float getJointSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
