@@ -2042,7 +2042,8 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 						}
 					}
 #endif
-					meshCurNode = meshCurNode->getNextSibling();
+					// duplication???
+					//meshCurNode = meshCurNode->getNextSibling();
 				}			
 				if (nodeName1 == "vertices")
 				{
