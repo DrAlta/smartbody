@@ -20,6 +20,7 @@
 
 #include "ParserCOLLADAFast.h"
 #include "sr/sr_euler.h"
+#include "sr/sr_timer.h"
 #include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -1707,6 +1708,9 @@ std::string ParserCOLLADAFast::getGeometryType(std::string idString)
 
 void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale )
 {
+	SrTimer timer;
+	timer.start();
+
 	std::map<std::string,bool> vertexSemantics;
 	//const DOMNodeList* list = node->getChildNodes();
 	rapidxml::xml_node<>* curNode = node->first_node();
@@ -1761,13 +1765,19 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					rapidxml::xml_attribute<>* strideNode = accessorNode->first_attribute("stride");
 					int count = atoi(countNode->value());
 					int stride = atoi(strideNode->value());				
-					//int strde = atoi()		
-					std::string floatString = floatNode->value();
+					//int strde = atoi()	
+					const char* allfloats = floatNode->value();
 
+					//TextLineSplitterFast splitter(strlen(allfloats));
+					//splitter.SplitLine(allfloats, ' ');
+					//size_t numTokens = splitter.NumTokens();
+					
+					std::string floatString = floatNode->value();
 					boost::char_separator<char> sep(" \n");
 					boost::tokenizer<boost::char_separator<char> > tokens(floatString, sep);
-					int i = 0;
+					
 					floatArrayMap[sourceID] = std::vector<SrVec>();			
+					//for (size_t c = 0; c < numTokens; c++)
 					for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
 							it != tokens.end();
 							)
@@ -1777,7 +1787,12 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 						for (int k=0;k<nstep;k++)
 						{
 							tempV[k] = (float)atof((*it).c_str());
+							//tempV[k] = (float)atof(splitter.GetToken(c));
+
 							it++;
+							//c++;
+							//if (c >= numTokens)
+								//break;
 						}
 						floatArrayMap[sourceID].push_back(tempV);
 					}
@@ -1945,6 +1960,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					}
 					rapidxml::xml_node<>* pNode = ParserCOLLADAFast::getNode("p", node1);
 					std::string pString = pNode->value();
+					//const char* pString = pNode->value();
 
 					/*
 					std::vector<std::string> tokens;
@@ -1958,14 +1974,20 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					boost::char_separator<char> sep(" \n");
 					boost::tokenizer<boost::char_separator<char> > tokens(pString, sep);
 					boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
+					//TextLineSplitterFast splitter(strlen(pString));
+					//splitter.SplitLine(pString, ' ');
 					int index = 0;
 					for (int i = 0; i < count; i++)
 					{
 						std::vector<int> fVec;
 						std::vector<int> ftVec;
 						std::vector<int> fnVec;
+						if (i >= count)
+							break;
 						for (int j = 0; j < vcountList[i]; j++)
 						{
+							//if (i >= count)
+								//break;
 							for (int k = 0; k < pStride; k++)
 							{
 								std::string semantic = inputMap[k];
@@ -1973,17 +1995,27 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 								{
 									if (vertexSemantics.find("POSITION") != vertexSemantics.end())																								
 										fVec.push_back(atoi((*it).c_str()));
+										//fVec.push_back(atoi(splitter.GetToken(i)));
+
 									if (vertexSemantics.find("NORMAL") != vertexSemantics.end())
 										fnVec.push_back(atoi((*it).c_str()));									
+										//fnVec.push_back(atoi(splitter.GetToken(i)));									
 								}
 								if (semantic == "TEXCOORD")
 									ftVec.push_back(atoi((*it).c_str()));
+									//ftVec.push_back(atoi(splitter.GetToken(i)));
 
 								if (semantic == "NORMAL" && vertexSemantics.find("NORMAL") == vertexSemantics.end())
 									fnVec.push_back(atoi((*it).c_str()));
+									//fnVec.push_back(atoi(splitter.GetToken(i)));
 								it++;
+								//i++;
+								//if (i >= count)
+									//break;
 								index++;
 							}
+							//if (i >= count)
+								//break;
 						}
 
 						// process each polylist
@@ -2015,10 +2047,17 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 			newModel->M = M;
 			newModel->mtlnames = mnames;
 
+			LOG("Time to finish geometry parsing: %lf", timer.t());
 			newModel->validate();
+
+			LOG("Time to validate: %lf", timer.t());
+
 			newModel->remove_redundant_materials();
+			LOG("Time to remove redundant materials: %lf", timer.t());
+
 //			newModel->remove_redundant_normals();
 			newModel->compress();
+			LOG("Time to compress: %lf", timer.t());
 			meshModelVec.push_back(newModel);
 
 			SrString path = file;
@@ -2032,15 +2071,18 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 			   if (newModel->mtlTextureNameMap.find(matName) != newModel->mtlTextureNameMap.end())
 			   {
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_DIFFUSE, newModel->mtlTextureNameMap[matName].c_str(), paths);	   
+				   LOG("Time to parse diffuse texture %s : %lf", matName.c_str(), timer.t());
 			   }	
 			   if (newModel->mtlNormalTexNameMap.find(matName) != newModel->mtlNormalTexNameMap.end())
 			   {
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_NORMALMAP, newModel->mtlNormalTexNameMap[matName].c_str(), paths);	   
+				   LOG("Time to parse normal map %s : %lf", matName.c_str(), timer.t());
 			   }
 			   if (newModel->mtlSpecularTexNameMap.find(matName) != newModel->mtlSpecularTexNameMap.end())
 			   {
 				   //LOG("Load specular map = %s",newModel->mtlSpecularTexNameMap[matName].c_str());
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, newModel->mtlSpecularTexNameMap[matName].c_str(), paths);	   
+				   LOG("Time to parse specular map %s : %lf", matName.c_str(), timer.t());
 			   }
 			}
 		}

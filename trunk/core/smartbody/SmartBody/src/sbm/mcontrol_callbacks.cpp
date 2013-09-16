@@ -65,6 +65,7 @@
 #include <sbm/Heightfield.h>
 #include <sbm/KinectProcessor.h>
 #include <sbm/local_speech.h>
+#include <sr/sr_timer.h>
 
 #include <sbm/action_unit.hpp>
 #include <vhmsg.h>
@@ -1389,7 +1390,7 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBComma
 	}
 	else if (ext == ".dae" || ext == ".DAE")// || ext == ".xml" || ext == ".XML")
 	{
-		if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastXMLParsing"))
+		if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastCOLLADAParsing"))
 		{
 			rapidxml::xml_document<> doc;
 			rapidxml::file<char>* rapidFile = ParserCOLLADAFast::getParserDocumentFile(obj_file, &doc);
@@ -1618,10 +1619,13 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 	}
 	else if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
 	{
-		if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastXMLParsing"))
+		if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastCOLLADAParsing"))
 		{
+			SrTimer timer;
+			timer.start();
 			rapidxml::xml_document<> doc;
 			rapidxml::file<char>* rapidFile = ParserCOLLADAFast::getParserDocumentFile(obj_file, &doc);
+LOG("Time to construct file: %lf", timer.t());
 			if (!rapidFile)
 			{
 				LOG("Problem parsing file '%s'.", obj_file);
@@ -1630,6 +1634,8 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			int depth = 0;
 			rapidxml::xml_node<>* firstNode = doc.first_node("COLLADA");
 			rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("library_geometries", firstNode, depth, 2);	
+LOG("Time to find library_geometries: %lf", timer.t());
+
 			if (geometryNode)
 			{
 				// first from library visual scene retrieve the material id to name mapping (TODO: needs reorganizing the assets management)
@@ -1637,7 +1643,8 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			
 				//DOMNode* visualSceneNode = ParserOpenCOLLADA::getNode("library_visual_scenes", obj_file, 2);
 				depth = 0;
-				rapidxml::xml_node<>* visualSceneNode = ParserCOLLADAFast::getNode("library_visual_scenes", firstNode, depth, 2);	
+				rapidxml::xml_node<>* visualSceneNode = ParserCOLLADAFast::getNode("library_visual_scenes", firstNode, depth, 1);	
+
 				if (!visualSceneNode)
 					LOG("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
 				SkSkeleton skeleton;
@@ -1645,6 +1652,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 				int order;
 				//LOG("ParseOpenCOLLADA::parseLibraryVisualScenes");
 				ParserCOLLADAFast::parseLibraryVisualScenes(visualSceneNode, skeleton, motion, 1.0, order, materialId2Name);
+LOG("Time to parse library_visual_scenes: %lf", timer.t());
 
 				// get picture id to file mapping
 				std::map<std::string, std::string> pictureId2File;
@@ -1653,11 +1661,12 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			
 				//DOMNode* imageNode = ParserOpenCOLLADA::getNode("library_images", obj_file, 2);
 				depth = 0;
-				rapidxml::xml_node<>* imageNode = ParserCOLLADAFast::getNode("library_images", firstNode, depth, 2);	
+				rapidxml::xml_node<>* imageNode = ParserCOLLADAFast::getNode("library_images", firstNode, depth, 1);	
 				if (imageNode)
 				{
 					//LOG("ParseOpenCOLLADA::parseLibraryImages");
 					ParserCOLLADAFast::parseLibraryImages(imageNode, pictureId2File, pictureId2Name);
+LOG("Time to parse library_images: %lf", timer.t());
 				}
 
 				// start parsing mateiral
@@ -1665,11 +1674,12 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			
 				//DOMNode* materialNode = ParserOpenCOLLADA::getNode("library_materials", obj_file, 2);
 				depth = 0;
-				rapidxml::xml_node<>* materialNode = ParserCOLLADAFast::getNode("library_materials", firstNode, depth, 2);
+				rapidxml::xml_node<>* materialNode = ParserCOLLADAFast::getNode("library_materials", firstNode, depth, 1);
 				if (materialNode)
 				{
 					//LOG("ParseOpenCOLLADA::parseLibraryMaterials");
 					ParserCOLLADAFast::parseLibraryMaterials(materialNode, effectId2MaterialId);
+LOG("Time to parse library_materials: %lf", timer.t());
 				}
 
 				// start parsing effect
@@ -1681,16 +1691,21 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			
 				//DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", obj_file, 2);
 				depth = 0;
-				rapidxml::xml_node<>* effectNode = ParserCOLLADAFast::getNode("library_effects", firstNode, depth, 2);
+				rapidxml::xml_node<>* effectNode = ParserCOLLADAFast::getNode("library_effects", firstNode, depth, 1);
 				if (effectNode)
 				{
 					//LOG("ParseOpenCOLLADA::parseLibraryEffects");
 					ParserCOLLADAFast::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
+LOG("Time to parse library_effects: %lf", timer.t());
 				}
 
 				// parsing geometry
 				//LOG("ParseOpenCOLLADA::parseLibraryGeometries");
 				ParserCOLLADAFast::parseLibraryGeometries(geometryNode, obj_file, M, mnames,  materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f); 
+LOG("Time to parse geometry: %lf", timer.t());
+
+				timer.stop();
+				LOG("Parsed COLLADA file using rapidxml parser in time: %lf", timer.t());
 			}
 			else
 			{
@@ -1706,6 +1721,8 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 		else
 		{
 				//DOMNode* geometryNode = ParserOpenCOLLADA::getNode("library_geometries", obj_file, 2);
+			SrTimer timer;
+			timer.start();
 			XercesDOMParser* parser = ParserOpenCOLLADA::getParserFromFile(obj_file);
 			if (!parser)
 			{
@@ -1777,6 +1794,8 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 				// parsing geometry
 				//LOG("ParseOpenCOLLADA::parseLibraryGeometries");
 				ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames,  materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f); 
+				timer.stop();
+				LOG("Parsed COLLADA file using xerces parser in time: %lf", timer.t());
 			}
 			else
 			{
@@ -1867,7 +1886,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 int mcu_character_load_skinweights( const char* char_name, const char* skin_file, SmartBody::SBCommandManager* cmdMgr, float scaleFactor, const char* prefix )
 {
 
-	if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastXMLParsing"))
+	if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastCOLLADAParsing"))
 	{
 
 	#if defined(__native_client__)
