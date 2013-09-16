@@ -10,6 +10,9 @@
 #include <controllers/me_ct_jacobian_IK.hpp>
 #include <controllers/me_ct_ccd_IK.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 #include <sbm/sbm_constants.h>
 
 namespace SmartBody {
@@ -1648,6 +1651,36 @@ void SBMotion::saveToSkm(const std::string& fileName)
 
 	this->save(*out);
 	delete out;
+}
+
+void SBMotion::saveToSkmByFrames(const std::string& fileName, int startFrame, int endFrame)
+{
+	SBMotion* newMotion = new SBMotion();
+	SkChannelArray& ch = channels();
+	int numFrames = frames();
+	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
+	newMotion->setMotionSkeletonName(originalMotion->getMotionSkeletonName());
+	std::string filebase = boost::filesystem::basename(fileName);
+	newMotion->setName(filebase);
+	newMotion->filename(filebase.c_str());
+	newMotion->init(ch);
+	//float* baseP = this->posture(0);
+	for (int f = 0; f < (endFrame - startFrame + 1); f++)
+	{
+		newMotion->insert_frame(f, this->keytime(f + startFrame) - this->keytime(startFrame));
+		float* ref_p = posture(f + startFrame);
+		float *new_p = newMotion->posture(f);
+		memcpy(new_p,ref_p,sizeof(float)*posture_size());
+	}
+	newMotion->setSyncPoint("start", 0);
+	newMotion->setSyncPoint("ready", newMotion->duration() * 0.25);
+	newMotion->setSyncPoint("stroke_start", newMotion->duration() * 0.5);
+	newMotion->setSyncPoint("stroke", newMotion->duration() * 0.5);
+	newMotion->setSyncPoint("stroke_stop", newMotion->duration() * 0.5);
+	newMotion->setSyncPoint("relax", newMotion->duration() * 0.75);
+	newMotion->setSyncPoint("stop", newMotion->duration());
+	newMotion->saveToSkm(fileName);
+	delete newMotion;
 }
 
 /*
