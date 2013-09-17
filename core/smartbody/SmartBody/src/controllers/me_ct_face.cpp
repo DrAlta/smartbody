@@ -179,7 +179,7 @@ void MeCtFace::remove_joint( const char *joint_name ) {
 				}
 			}
 			if( !found )	{
-				LOG( "MeCtFace::remove_joint ERR: joint '%s' NOT FOUND\n", joint_name );
+				LOG( "MeCtFace::remove_joint Warning: joint '%s' NOT FOUND\n", joint_name );
 			}
 		}
 		else	{
@@ -427,7 +427,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 			}
 			else
 			{
-				LOG("channel not found %s", visemeChannelName.c_str());
+				;//LOG("channel not found %s", visemeChannelName.c_str());
 			}
 		}
 		return continuing;

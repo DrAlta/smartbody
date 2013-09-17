@@ -1693,8 +1693,32 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 
 				// parsing geometry
 				//LOG("ParseOpenCOLLADA::parseLibraryGeometries");
-				ParserCOLLADAFast::parseLibraryGeometries(geometryNode, obj_file, M, mnames,  materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f); 
+				ParserCOLLADAFast::parseLibraryGeometries(geometryNode, obj_file, M, mnames,  materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f);
 
+				// assign geometry to joint visgeo if needed
+				if (char_p)
+				{
+					for (size_t j = 0; j < char_p->getSkeleton()->joints().size(); ++j)
+					{
+						if (char_p->getSkeleton()->joints()[j]->visgeo())
+						{
+							for (size_t i = 0; i < meshModelVec.size(); ++i)
+							{
+								if (meshModelVec[i]->name == char_p->getSkeleton()->joints()[j]->visgeo()->name)
+								{
+									std::string meshName = meshModelVec[i]->name;
+									LOG("Assign static geometry %s to character %s's joint %s", meshName.c_str(), char_p->getName().c_str(), char_p->getSkeleton()->joints()[j]->getName().c_str());
+									SrModel* orig = char_p->getSkeleton()->joints()[j]->visgeo();
+									SrModel* newM = new SrModel(*meshModelVec[i]);
+									newM->translate(orig->translate());
+									char_p->getSkeleton()->joints()[j]->visgeo(newM);
+									delete orig;
+									char_p->scene_p->init(char_p->getSkeleton());
+								}
+							}
+						}
+					}
+				}
 			}
 			else
 			{
@@ -1785,6 +1809,32 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 				ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, obj_file, M, mnames,  materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f); 
 				timer.stop();
 				LOG("Parsed COLLADA file using xerces parser in time: %lf", timer.t());
+
+				// assign static geometry to joint visgeo if needed
+				if (char_p)
+				{
+					for (size_t j = 0; j < char_p->getSkeleton()->joints().size(); ++j)
+					{
+						if (char_p->getSkeleton()->joints()[j]->visgeo())
+						{
+							for (size_t i = 0; i < meshModelVec.size(); ++i)
+							{
+								if (meshModelVec[i]->name == char_p->getSkeleton()->joints()[j]->visgeo()->name)
+								{
+									std::string meshName = meshModelVec[i]->name;
+									LOG("Assign static geometry %s to character %s's joint %s", meshName.c_str(), char_p->getName().c_str(), char_p->getSkeleton()->joints()[j]->getName().c_str());
+									SrModel* orig = char_p->getSkeleton()->joints()[j]->visgeo();
+									SrModel* newM = new SrModel(*meshModelVec[i]);
+									newM->translate(orig->translate());
+									delete orig;
+									char_p->getSkeleton()->joints()[j]->visgeo(newM);
+									char_p->scene_p->init(char_p->getSkeleton());
+									char_p->scene_p->set_visibility(1,0,0,0);
+								}
+							}
+						}
+					}
+				}
 			}
 			else
 			{

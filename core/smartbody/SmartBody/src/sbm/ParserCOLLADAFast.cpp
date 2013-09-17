@@ -829,6 +829,31 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 			}
 			else if (typeAttr == "NODE" || tempMaterialNode)
 			{
+				rapidxml::xml_node<>* translateNode = ParserCOLLADAFast::getNode("translate", childNode);
+				SrVec offset;
+				if (translateNode)
+				{
+					std::string offsetString = translateNode->value();
+					std::vector<std::string> tokens;
+					vhcl::Tokenize(offsetString, tokens, " \n");
+					offset.x = (float)atof(tokens[0].c_str()) * scale;
+					offset.y = (float)atof(tokens[1].c_str()) * scale;
+					offset.z = (float)atof(tokens[2].c_str()) * scale;
+				}
+				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode);
+				if (geometryNode)	// might need to add support for rotation as well later when the case showed up
+				{
+					rapidxml::xml_attribute<>* geometryNodeAt= geometryNode->first_attribute("url");
+					std::string sidAttr = geometryNodeAt->value();
+					sidAttr = sidAttr.substr(1);
+					//LOG("translate: %f, %f, %f", offset.x, offset.y, offset.z);
+					//LOG("instance_geometry: %s", sidAttr.c_str());
+					SrModel* newModel = new SrModel();
+					newModel->name = SrString(sidAttr.c_str());
+					newModel->translate(offset);
+					parent->visgeo(newModel);
+				}
+
 				rapidxml::xml_node<>* materialNode = ParserCOLLADAFast::getNode("bind_material", childNode);
 				if (materialNode)
 				{

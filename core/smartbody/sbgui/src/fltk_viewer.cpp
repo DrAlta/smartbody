@@ -1301,8 +1301,8 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	
 	bool updateSim = SmartBody::SBScene::getScene()->getSimulationManager()->updateTimer();
 	SbmDeformableMeshGPU::useShadowPass = shadowPass;
-	drawDeformableModels();
 
+	drawDeformableModels();
 	
 
 	_data->fcounter.start();
@@ -4996,11 +4996,9 @@ void FltkViewer::drawDeformableModels()
 			pawn->dMeshInstance_p->update();
 			if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && _data->showdeformablegeometry) || _data->showSkinWeight)
 			{
-				//for (int i = 0; i < character->dMesh_p->dMeshStatic_p.size(); ++i)
-				//{
-				//	SrGlRenderFuncs::render_model(character->dMesh_p->dMeshStatic_p[i]);
-				//}
 				SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p, _data->showSkinWeight);
+				character->scene_p->set_visibility(0,1,0,0);
+				_data->render_action.apply(character->scene_p);
 			}
 		}
 	}

@@ -1014,6 +1014,33 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 			}
 			else if (typeAttr == "NODE" || tempMaterialNode)
 			{
+				DOMNode* translateNode = ParserOpenCOLLADA::getNode("translate", childNode);
+				SrVec offset;
+				if (translateNode)
+				{
+					std::string offsetString;
+					xml_utils::xml_translate(&offsetString, translateNode->getTextContent());
+					std::vector<std::string> tokens;
+					vhcl::Tokenize(offsetString, tokens, " \n");
+					offset.x = (float)atof(tokens[0].c_str()) * scale;
+					offset.y = (float)atof(tokens[1].c_str()) * scale;
+					offset.z = (float)atof(tokens[2].c_str()) * scale;
+				}
+				DOMNode* geometryNode = ParserOpenCOLLADA::getNode("instance_geometry", childNode);
+				if (geometryNode)	// might need to add support for rotation as well later when it happens
+				{
+					DOMNamedNodeMap* geometryNodeAttr = geometryNode->getAttributes();
+					DOMNode* urlAttr = geometryNodeAttr->getNamedItem(BML::BMLDefs::ATTR_URL);
+					std::string sidAttr;
+					xml_utils::xml_translate(&sidAttr, urlAttr->getNodeValue());
+					sidAttr = sidAttr.substr(1);
+					//LOG("translate: %f, %f, %f", offset.x, offset.y, offset.z);
+					//LOG("instance_geometry: %s", sidAttr.c_str());
+					SrModel* newModel = new SrModel();
+					newModel->name = SrString(sidAttr.c_str());
+					newModel->translate(offset);
+					parent->visgeo(newModel);
+				}
 				DOMNode* materialNode = ParserOpenCOLLADA::getNode("bind_material", childNode);
 				if (materialNode)
 				{
@@ -1258,6 +1285,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations( DOMNode* node, SkSkeleton& skele
 			motion.posture(frameCt)[quatId + 1] = quat.x;
 			motion.posture(frameCt)[quatId + 2] = quat.y;
 			motion.posture(frameCt)[quatId + 3] = quat.z;
+			//LOG("w = %f, x = %f, y = %f, z = %f",quat.w, quat.x, quat.y, quat.z);
 		}
 
 		if (zaxis) // rotate the root joints depending on up axis

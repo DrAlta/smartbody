@@ -38,6 +38,8 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
 		_sliderMotionFrame->type(FL_HORIZONTAL);
 		_sliderMotionFrame->callback(OnSliderMotionFrame, this);
 		_sliderMotionFrame->deactivate();
+		_outputMotionFrameNumber = new Fl_Output(360, 240, 30, 20);
+		_outputMotionFrameNumber->value("0");
 		_buttonPlayMotionFolder = new Fl_Button(10, 260, 80, 20, "Play Folder");
 		_buttonPlayMotionFolder->callback(OnButtonPlayMotionFolder, this);
 		_inputFilePath = new Fl_Input(90, 260, 270, 20, "");
@@ -479,6 +481,7 @@ void MotionEditorWindow::OnCheckButtonPlayMotion(Fl_Widget* widget, void* data)
 		SmartBody::SBScene::getScene()->command(ss.str());
 		editor->_sliderMotionFrame->deactivate();
 		editor->_sliderMotionFrame->value(0);
+		editor->_outputMotionFrameNumber->value("0");
 	}
 }
 
@@ -501,6 +504,9 @@ void MotionEditorWindow::OnSliderMotionFrame(Fl_Widget* widget, void* data)
 	}
 	ss << "motionplayer " << curChar->getName() << " " << curMotion->getName() << " " << frameNumber;
 	SmartBody::SBScene::getScene()->command(ss.str());
+	std::stringstream ss1;
+	ss1 << frameNumber;
+	editor->_outputMotionFrameNumber->value(ss1.str().c_str());
 }
 
 /*
