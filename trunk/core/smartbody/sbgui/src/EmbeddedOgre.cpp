@@ -985,16 +985,16 @@ void EmbeddedOgre::addTexture( std::string texName )
 	
 }
 
-void EmbeddedOgre::updateOgreCharacterRenderMode()
+void EmbeddedOgre::updateOgreCharacterRenderMode(bool renderSkinWeight)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::vector<std::string> charNames = scene->getCharacterNames();
 	for (unsigned int i=0;i<charNames.size();i++)
 	{
 		SmartBody::SBCharacter* sbChar = scene->getCharacter(charNames[i]);
-		if (sbChar)
+		if (sbChar && !renderSkinWeight)
 		{
-			setCharacterVisible(sbChar->dMeshInstance_p->getVisibility(),charNames[i]);			
+			setCharacterVisible(sbChar->dMeshInstance_p->getVisibility() ,charNames[i]);			
 		}
 	}
 

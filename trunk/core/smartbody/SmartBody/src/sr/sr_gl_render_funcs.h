@@ -38,7 +38,7 @@ class DeformableMeshInstance;
 class SBAPI SrGlRenderFuncs
  { public:
 	
-	static void renderDeformableMesh( DeformableMeshInstance* shape );
+	static void renderDeformableMesh( DeformableMeshInstance* shape, bool showSkinWeight = false );
     static void render_model ( SrSnShapeBase* shape );
 
     static void render_lines ( SrSnShapeBase* shape );

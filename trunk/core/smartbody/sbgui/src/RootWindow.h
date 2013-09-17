@@ -172,6 +172,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void ModeBonesCB(Fl_Widget* w, void* data);
 		static void ModeGeometryCB(Fl_Widget* w, void* data);
 		static void ModeCollisionGeometryCB(Fl_Widget* w, void* data);
+		static void ModeSkinWeightCB(Fl_Widget* w, void* data);
 		static void ModeDeformableGeometryCB(Fl_Widget* w, void* data);
 		static void ModeGPUDeformableGeometryCB(Fl_Widget* w, void* data);
 		static void ModeAxisCB(Fl_Widget* w, void* data);
