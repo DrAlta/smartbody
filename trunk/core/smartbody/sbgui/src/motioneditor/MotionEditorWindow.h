@@ -10,6 +10,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Input.H>
+#include <FL/Fl_Output.H>
 #include <sb/SBCharacter.h>
 #include <sb/SBMotion.h>
 
@@ -78,6 +79,7 @@ public:
    Fl_Button*        _buttonSetPosture;
 	Fl_Check_Button*	_checkButtonPlayMotion;
 	Fl_Value_Slider*	_sliderMotionFrame;
+	Fl_Output*			_outputMotionFrameNumber;
 	Fl_Input*			_inputFilePath;
    Fl_Box*           _animationSearchFilterLabel;
    Fl_Input*			_animationSearchFilter;

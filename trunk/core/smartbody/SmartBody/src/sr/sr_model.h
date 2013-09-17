@@ -173,6 +173,7 @@ class SrModel : public SrSharedClass
 
     /*! Translate the position of each vertex of the model. */
     SBAPI void translate ( const SrVec &tr );
+	SBAPI SrVec& translate () {return _translation;};
 
 	/*! Rotatee the position of each vertex of the model. */
     SBAPI void rotate ( const SrVec &tr );

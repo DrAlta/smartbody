@@ -383,7 +383,7 @@ void MeCtSaccade::initSaccade(MeFrameData& frame)
 		_idR = frame.toBufferIndex(idR);
 		if (_idL < 0 || _idR < 0)
                 {
-			LOG("MeCtSaccade::initBufferIndex ERR: channel id not correct!");
+			LOG("MeCtSaccade::initBufferIndex Warning: channel id not correct!");
                         _valid = false;
                 }
 
