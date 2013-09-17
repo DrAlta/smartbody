@@ -31,7 +31,7 @@ public:
 	void setCharacterVisibility(bool bVisible);
 	bool getCharacterVisiblility();
 	void updateOgreLights();
-	void updateOgreCharacterRenderMode();
+	void updateOgreCharacterRenderMode(bool renderSkinWeight);
 	void resetOgreScene();
 
 	Ogre::SceneManager* getSceneManager() { return ogreSceneMgr; }

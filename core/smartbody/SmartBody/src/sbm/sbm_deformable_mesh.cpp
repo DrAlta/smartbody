@@ -593,6 +593,7 @@ bool DeformableMesh::buildVertexBuffer()
 						boneIDBuf_f[1][idxMap[k]] = boneIDBuf_f[1][iVtx];
 						boneWeightBuf[0][idxMap[k]] = boneWeightBuf[0][iVtx];
 						boneWeightBuf[1][idxMap[k]] = boneWeightBuf[1][iVtx];
+						skinColorBuf[idxMap[k]] = skinColorBuf[iVtx];;
 					}
 				}
 				iVtx++;

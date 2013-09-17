@@ -644,6 +644,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  _data->showdeformablegeometry = false;
 		  _data->showbones = false;
 		  _data->showaxis = false;
+		  _data->showSkinWeight = false;
 		  applyToCharacter = true;
 		  break;
 	  case CmdCharacterShowCollisionGeometry: 
@@ -653,6 +654,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  _data->showdeformablegeometry = false;
 		  _data->showbones = false;
 		  _data->showaxis = false;
+		  _data->showSkinWeight = false;
 		  applyToCharacter = true;
 		  break;
 	  case CmdCharacterShowDeformableGeometry: 
@@ -661,10 +663,23 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  _data->showgeometry = false;
 		  _data->showcollisiongeometry = false;
 		  _data->showdeformablegeometry = true;
+		  _data->showSkinWeight = false;
 		  _data->showbones = false;
 		  _data->showaxis = false;
 		  applyToCharacter = true;
 		  break;
+	  case CmdCharacterShowSkinWeight: 
+// 		  _data->charactermode = ModeShowDeformableGeometry;		
+ 		  SbmDeformableMeshGPU::useGPUDeformableMesh = false;
+ 		  _data->showgeometry = false;
+ 		  _data->showcollisiongeometry = false;
+ 		  _data->showdeformablegeometry = true;
+ 		  _data->showSkinWeight = true;
+ 		  _data->showbones = false;
+ 		  _data->showaxis = false;
+		  applyToCharacter = true;
+		  break;
+
 	  case CmdCharacterShowDeformableGeometryGPU: 
 		  _data->charactermode = ModeShowDeformableGeometryGPU;		
 		  SbmDeformableMeshGPU::useGPUDeformableMesh = true;
@@ -673,6 +688,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  _data->showdeformablegeometry = true;
 		  _data->showbones = false;
 		  _data->showaxis = false;
+		  _data->showSkinWeight = false;
 		  applyToCharacter = true;
 		  break;
 	  case CmdCharacterShowBones: 
@@ -680,6 +696,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  _data->showgeometry = false;
 		  _data->showcollisiongeometry = false;
 		  _data->showdeformablegeometry = false;
+		  _data->showSkinWeight = false;
 		  _data->showbones = true;
 		  _data->showaxis = false;
 		  applyToCharacter = true;
@@ -1284,37 +1301,8 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	
 	bool updateSim = SmartBody::SBScene::getScene()->getSimulationManager()->updateTimer();
 	SbmDeformableMeshGPU::useShadowPass = shadowPass;
-	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
-	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
-		pawnIter != pawns.end();
-		pawnIter++)
-	{
-		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
-		if(pawn->dMesh_p && pawn->dMeshInstance_p)
-		{
-			//pawn->dMesh_p->update();
-			bool useBlendShape = false;
-			SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (pawn);
-			if (character)
-			{
-				useBlendShape = character->getBoolAttribute("blendshape");
-			}
-			if (useBlendShape)
-			{
-				character->dMesh_p->blendShapes();
-				character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
-			}
-			pawn->dMeshInstance_p->update();
-			if (!SbmDeformableMeshGPU::useGPUDeformableMesh)
-			{
-				//for (int i = 0; i < character->dMesh_p->dMeshStatic_p.size(); ++i)
-				//{
-				//	SrGlRenderFuncs::render_model(character->dMesh_p->dMeshStatic_p[i]);
-				//}
-				SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p);
-			}
-		}
-	}
+	drawDeformableModels();
+
 	
 
 	_data->fcounter.start();
@@ -1883,7 +1871,8 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		mcu.executePython(cmdStr);
 		*/		
 		std::stringstream strCmd;
-		strCmd << "char " << charName << " viewer deformableGPU";				
+		strCmd << "char " << charName << " viewer deformableGPU";		
+		//strCmd << "char " << charName << " viewer deformable";	
 		scene->command(strCmd.str());
 
 
@@ -4982,6 +4971,40 @@ void FltkViewer::updateOptions()
 {
 }
 
+void FltkViewer::drawDeformableModels()
+{
+	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
+		pawnIter != pawns.end();
+		pawnIter++)
+	{
+		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
+		if(pawn->dMesh_p && pawn->dMeshInstance_p)
+		{
+			//pawn->dMesh_p->update();
+			bool useBlendShape = false;
+			SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (pawn);
+			if (character)
+			{
+				useBlendShape = character->getBoolAttribute("blendshape");
+			}
+			if (useBlendShape)
+			{
+				character->dMesh_p->blendShapes();
+				character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
+			}
+			pawn->dMeshInstance_p->update();
+			if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && _data->showdeformablegeometry) || _data->showSkinWeight)
+			{
+				//for (int i = 0; i < character->dMesh_p->dMeshStatic_p.size(); ++i)
+				//{
+				//	SrGlRenderFuncs::render_model(character->dMesh_p->dMeshStatic_p[i]);
+				//}
+				SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p, _data->showSkinWeight);
+			}
+		}
+	}
+}
 GestureVisualizationHandler::GestureVisualizationHandler()
 {
 	_gestureData = NULL;
@@ -5140,6 +5163,7 @@ void FltkViewerData::setupData()
 	scene_received_event = false;
 	showgeometry = false;
 	showcollisiongeometry = false;
+	showSkinWeight = false;
 	showbones = true;
 	showaxis = false;
 	showmasses = false;

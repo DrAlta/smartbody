@@ -107,7 +107,7 @@ void FLTKOgreWindow::draw()
 		glPushMatrix();		
 		updateOgreCamera();
 		ogreInterface->updateOgreLights();
-		ogreInterface->updateOgreCharacterRenderMode();
+		ogreInterface->updateOgreCharacterRenderMode(_data->showSkinWeight);
 		ogreInterface->update(); // do Ogre rendering for deformable characters
 		// pop everything!
 		glMatrixMode( GL_COLOR );
@@ -280,20 +280,21 @@ void FLTKOgreWindow::menu_cmd( MenuCmd c, const char* label )
 	// override the GPU deformable model to let Ogre3D do the rendering
 	if (c == CmdCharacterShowDeformableGeometryGPU || c == CmdCharacterShowDeformableGeometry)
 	{
-		SbmDeformableMeshGPU::disableRendering = true;
+		SbmDeformableMeshGPU::disableRendering = true;		
 		_data->charactermode = ModeShowDeformableGeometryGPU;				
 		_data->showgeometry = false;
 		_data->showcollisiongeometry = false;
 		_data->showdeformablegeometry = false;
 		_data->showbones = false;
-		_data->showaxis = false;		
+		_data->showaxis = false;	
+		_data->showSkinWeight = false;
 		applyToCharacters();
 		ogreInterface->setCharacterVisibility(true);
 	}	
 	else
 	{
 		if (c ==  CmdCharacterShowGeometry || c == 	CmdCharacterShowCollisionGeometry 
-			|| c == CmdCharacterShowBones || c == CmdCharacterShowAxis)
+			|| c == CmdCharacterShowBones || c == CmdCharacterShowAxis || c == CmdCharacterShowSkinWeight)
 		{
 			SbmDeformableMeshGPU::disableRendering = false;
 			ogreInterface->setCharacterVisibility(false);
@@ -421,10 +422,18 @@ void FLTKOgreWindow::fltkRender2()
 	} 
 	
 	
+	glBindBuffer( GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	// real surface geometries
 	//drawAllGeometries();	
+	if (_data->showSkinWeight)
+	{
+		drawDeformableModels();
+		//drawAllGeometries();
+	}
+
 	glDisable(GL_LIGHTING);
-	glBindBuffer( GL_ARRAY_BUFFER, 0);
+	
 
 	drawPawns();
 	// draw the grid
@@ -444,6 +453,8 @@ void FLTKOgreWindow::fltkRender2()
 
 	drawMotionVectorFlow();
 	drawPlotMotion();
+
+
 
 	//drawKinematicFootprints(0);
 
@@ -506,6 +517,7 @@ void FLTKOgreWindow::fltkRender2()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glDisable(GL_LIGHTING);
 	glBindBuffer( GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D,0);
 	glUseProgram(0);	
 	SBGUIManager::singleton().update();

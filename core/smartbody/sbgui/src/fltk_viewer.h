@@ -180,6 +180,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 				   CmdShadows,	
 				   CmdCharacterShowGeometry,
 				   CmdCharacterShowCollisionGeometry,
+				   CmdCharacterShowSkinWeight,
 				   CmdCharacterShowDeformableGeometry,
 				   CmdCharacterShowDeformableGeometryGPU,
 				   CmdCharacterShowBones,
@@ -341,6 +342,8 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 	void processDragAndDrop(std::string dndMsg, float x, float y);
 	void initGridList();	
 	void drawAllGeometries(bool shadowPass = false); // draw all objects with geometry ( so no debug rendering included )
+
+	void drawDeformableModels();
 	void drawGrid();
 	void drawEyeBeams();
 	void drawEyeLids();
@@ -453,6 +456,7 @@ protected:
    bool showgeometry;
    bool showcollisiongeometry;
    bool showdeformablegeometry;
+   bool showSkinWeight;
    bool showFloor;   
    bool showbones;
    bool showaxis;
