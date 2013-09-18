@@ -1706,7 +1706,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 							{
 								if (meshModelVec[i]->name == char_p->getSkeleton()->joints()[j]->visgeo()->name)
 								{
-									std::string meshName = meshModelVec[i]->name;
+									std::string meshName = (const char*) meshModelVec[i]->name;
 									LOG("Assign static geometry %s to character %s's joint %s", meshName.c_str(), char_p->getName().c_str(), char_p->getSkeleton()->joints()[j]->getName().c_str());
 									SrModel* orig = char_p->getSkeleton()->joints()[j]->visgeo();
 									SrModel* newM = new SrModel(*meshModelVec[i]);
@@ -1821,7 +1821,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 							{
 								if (meshModelVec[i]->name == char_p->getSkeleton()->joints()[j]->visgeo()->name)
 								{
-									std::string meshName = meshModelVec[i]->name;
+									std::string meshName = (const char*) meshModelVec[i]->name;
 									LOG("Assign static geometry %s to character %s's joint %s", meshName.c_str(), char_p->getName().c_str(), char_p->getSkeleton()->joints()[j]->getName().c_str());
 									SrModel* orig = char_p->getSkeleton()->joints()[j]->visgeo();
 									SrModel* newM = new SrModel(*meshModelVec[i]);
