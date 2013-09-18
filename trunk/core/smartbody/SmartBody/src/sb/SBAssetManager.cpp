@@ -571,6 +571,21 @@ std::vector<std::string> SBAssetManager::getSkeletonNames()
 	return ret;	
 }
 
+
+std::vector<std::string> SBAssetManager::getDeformableMeshNames()
+{
+	std::vector<std::string> ret;
+
+	for(std::map<std::string, DeformableMesh*>::iterator iter = _deformableMeshMap.begin();
+		iter != _deformableMeshMap.end();
+		iter++)
+	{
+		ret.push_back(std::string(iter->first));
+	}
+
+	return ret;	
+}
+
 int SBAssetManager::load_me_motions( const char* pathname, bool recurse_dirs, double scale )
 {
 	boost::filesystem::path motions_path(pathname);

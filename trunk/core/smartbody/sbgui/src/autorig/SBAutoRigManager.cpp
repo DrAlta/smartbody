@@ -23,27 +23,28 @@ SBAutoRigManager::~SBAutoRigManager()
 
 }
 
-void SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
+bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
 	Mesh m;
 	//Skeleton sk = HumanSkeleton(); // default human skeleton from Pinocchio. Should define our own custom skeleton to account for gaze and other behavior
 	Skeleton sk = SmartBodySkeleton();
 	inModel.computeNormals();
 	bool isValidModel = SrModelToMesh(inModel,m);
-	if (!isValidModel) return; // no auto-rigging if the model is not valid
+	if (!isValidModel) return false; // no auto-rigging if the model is not valid
+	PinocchioOutput out = autorig(sk,m);	
+	if (out.embedding.size() == 0)
+		return false; // no embedding
 
-	PinocchioOutput out = autorig(sk,m);
 	for(int i = 0; i < (int)out.embedding.size(); ++i)
 		out.embedding[i] = (out.embedding[i] - m.toAdd) / m.scale;
-
 	SmartBody::SBSkeleton* sbSk = new SmartBody::SBSkeleton();
-	sbSk->setName("testAutoRig.sk");
+	//sbSk->setName("testAutoRig.sk");
 	//sbSk->setFileName()
-	bool isValidSkeleton = AutoRigToSBSk(out, sk, *sbSk);
-	LOG("autoRig result, num joints = %d",out.embedding.size());
-	LOG("AutoRig Skeleton = %s", sbSk->saveToString().c_str());
+	bool isValidSkeleton = AutoRigToSBSk(out, sk, *sbSk);	
+	//LOG("autoRig result, num joints = %d",out.embedding.size());
+	//LOG("AutoRig Skeleton = %s", sbSk->saveToString().c_str());
 	SbmDeformableMeshGPU* deformMesh = new SbmDeformableMeshGPU();
-	deformMesh->meshName = outDeformableMeshName;
+	deformMesh->meshName = outDeformableMeshName;	
 	bool isValidDeformableMesh = AutoRigToDeformableMesh(out, inModel, *sbSk, *deformMesh);
 
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
@@ -51,6 +52,7 @@ void SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName
 	sbSk->ref();
 	sbSk->skfilename(outSkName.c_str());				
 	sbSk->setName(outSkName.c_str());
+	deformMesh->skeletonName = outSkName;
 
 	assetManager->addSkeleton(sbSk);
 	assetManager->addDeformableMesh(outDeformableMeshName, deformMesh);

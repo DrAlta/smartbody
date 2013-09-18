@@ -249,7 +249,13 @@ void RetargetStepWindow::applyAutoRig()
 	std::string fileextension = boost::filesystem::extension(modelName);
 	std::string skelName = filebasename+".sk";
 	std::string deformMeshName = filebasename;
-	autoRigManager.buildAutoRigging(model, skelName, deformMeshName);
+	bool autoRigSuccess = autoRigManager.buildAutoRigging(model, skelName, deformMeshName);
+
+	if (!autoRigSuccess)
+	{
+		LOG("AutoRigging Fail : The input mesh must be a single component and water tight mesh.");
+		return;
+	}
 
 	std::string charName = sbPawn->getName()+"autoRig";
 

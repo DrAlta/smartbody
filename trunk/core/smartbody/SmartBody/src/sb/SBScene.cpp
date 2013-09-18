@@ -2269,6 +2269,9 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		}		
 	}
 
+	SmartBody::SBAssetManager* assetManager = getAssetManager();
+	
+#if 1
 	// save character meshes
 	const std::vector<std::string>& characters = getCharacterNames();
 	for (unsigned int i=0;i<characters.size();i++)
@@ -2277,16 +2280,20 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		SmartBody::SBCharacter* sbChar = getCharacter(charName);
 		if (!sbChar) continue; 
 		
-		std::string meshDir = sbChar->getStringAttribute("deformableMesh");
+		std::string meshDir = sbChar->getStringAttribute("deformableMesh");		
 		if (meshDir == "") // otherwise we will copy all mesh directories ...
 			continue;
 		std::vector<std::string> meshPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("mesh");
+		bool hasMeshPath = false;
 		for (size_t m = 0; m < meshPaths.size(); m++)
 		{
 			std::string meshPath = meshPaths[m];
 			fs::path curpath( meshPath + "/" + meshDir );
 			if (!boost::filesystem::is_directory(curpath))
+			{
+				// should we write out the mesh instead ?
 				continue;
+			}
 			//curpath /= std::string(meshDir);	
 
 			fs::path mePath(mediaPath);		
@@ -2301,6 +2308,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 			//LOG("curPath = %s, newMeshPath = %s", curpath.string().c_str(), newMeshPath.string().c_str());
 			//path targetPath()
 			// copy dir
+			hasMeshPath = true;
 			if (!writeToZip)
 			{
 				copyDir(curpath,newMeshPath);						
@@ -2311,6 +2319,48 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 			}
 		}
 	}
+#else
+	std::vector<std::string> meshNames = assetManager->getDeformableMeshNames();
+	for (unsigned int i=0;i<meshNames.size();i++)
+	{
+		std::string meshName = meshNames[i];
+		DeformableMesh* mesh = assetManager->getDeformableMesh(meshName);
+		std::vector<std::string> meshPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("mesh");
+		bool hasMeshPath = false;
+		fs::path curpath, curMeshPath;
+		for (size_t m = 0; m < meshPaths.size(); m++)
+		{
+			std::string meshPath = meshPaths[m];
+			curpath = fs::path( meshPath + "/" + meshName );			
+			if (boost::filesystem::is_directory(curpath))
+			{	
+				curMeshPath = curpath;
+				hasMeshPath = true;
+				break;
+			}
+		}	
+
+		if (!hasMeshPath) // file does not exist
+		{
+			curMeshPath = fs::path(getMediaPath()+ "/temp/" + meshName); // create a temp directory to write out the mesh
+			fs::create_directory(curMeshPath);
+			ParserOgre::exportOgreXMLMesh(mesh, meshName, curMeshPath.string());
+		}
+
+		fs::path mePath(mediaPath);		
+		fs::path diffPath = naive_uncomplete(curpath,mePath);
+		fs::path newMeshPath(outDir+"/"+diffPath.string());
+
+		if (!writeToZip)
+		{
+			copyDir(curMeshPath,newMeshPath);						
+		}
+		else
+		{
+			writeDirToZip(zf,curMeshPath.string(),diffPath.string());
+		}
+	}
+#endif
 	if (writeToZip)
 	{
 		int errClose = zipClose(zf,NULL);

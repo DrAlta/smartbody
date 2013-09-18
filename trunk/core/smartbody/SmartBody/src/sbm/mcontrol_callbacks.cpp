@@ -2088,6 +2088,7 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 						return CMD_FAILURE;
 					}
 					ParserOgre::parseSkinWeight(controllerNode,sbmChar->dMesh_p->skinWeights,scaleFactor);
+					sbmChar->dMesh_p->skeletonName = sbmChar->getSkeleton()->getName();
 					for (unsigned int i=0; i< sbmChar->dMesh_p->skinWeights.size(); i++)
 					{
 						SkinWeight* sw = sbmChar->dMesh_p->skinWeights[i];

@@ -34,7 +34,7 @@ class SBAutoRigManager // build auto rigging given a static character mesh
 			_singleton = NULL;
 		}		
 
-		void buildAutoRigging(SrModel& inModel, std::string outSkName, std::string outDeformableMeshName);
+		bool buildAutoRigging(SrModel& inModel, std::string outSkName, std::string outDeformableMeshName);
 		
 		
 };

@@ -30,10 +30,12 @@
 #include <cctype>
 #include <string>
 #include <fstream>
+#include <stdio.h>
 #include <sbm/BMLDefs.h>
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBTypes.h>
+#include <sb/SBScene.h>
 
 
 #if !defined (__ANDROID__) && !defined(SB_IPHONE)
@@ -1543,4 +1545,88 @@ void ParserOgre::loadTexture( int type, std::string texFileName, const SrStringA
 #endif
 }
 
+bool ParserOgre::exportOgreXMLMesh( DeformableMesh* defMesh, std::string meshName, std::string outPathName )
+{
+	std::string meshFileName = outPathName + "/" + meshName + ".mesh.xml";
+	std::string materialFileName = outPathName + "/" + meshName + ".material";
+	std::vector<std::string> textureFileNames;
+	SmartBody::SBSkeleton* skel = SmartBody::SBScene::getScene()->getSkeleton(defMesh->skeletonName);
+	if (!skel)
+		return false;
+
+	// write out mesh file
+	FILE* fp = fopen(meshFileName.c_str(),"wt");
+	fprintf(fp,"<mesh>\n");
+	fprintf(fp,"<submeshes>\n"); 
+	std::vector<SkinWeight*>& skinWeights = defMesh->skinWeights;
+	std::vector<SrSnModel*>& models = defMesh->dMeshStatic_p;
+	
+	for (unsigned int i=0;i<skinWeights.size();i++)
+	{
+		SkinWeight* weight = skinWeights[i];
+		SrModel& model = models[i]->shape();
+		SrMaterial mat;
+		std::string matName = "defaultMat";	
+		std::string textureName = "";
+		if (model.M.size() > 0)
+		{
+			matName = model.mtlnames[0];						
+			mat = model.M[0];
+		}
+		fprintf(fp,"<submesh material=\"%s\">\n", matName.c_str());
+
+		// export vertices
+		fprintf(fp,"<geometry vertexcount=\"%d\">\n",model.V.size());
+		if (model.V.size() != model.N.size())
+			model.computeNormals();
+		fprintf(fp,"<vertexbuffer positions=\"true\" normals=\"true\">\n");
+		for (unsigned int k=0;k<model.V.size();k++)
+		{
+			SrVec& p = model.V[k];
+			SrVec& n = model.N[k];
+			fprintf(fp,"<vertex>\n");
+			fprintf(fp,"<position x=\"%f\" y=\"%f\" z=\"%f\" />\n",p[0],p[1],p[2]);			
+			fprintf(fp,"<normal x=\"%f\" y=\"%f\" z=\"%f\" />\n",n[0],n[1],n[2]);
+			fprintf(fp,"</vertex>\n");
+		}
+		fprintf(fp,"</vertexbuffer>\n");
+
+		if (model.T.size() == model.V.size())
+		{
+			fprintf(fp,"<vertexbuffer texture_coord_dimensions_0=\"2\" texture_coords=\"1\">\n");
+			for (unsigned int k=0;k<model.T.size();k++)
+			{
+				//const Vector3 &p = m.vertices[i].pos;
+				SrPnt2& tex = model.T[k];
+				fprintf(fp,"<vertex>\n");
+				fprintf(fp,"<texcoord u=\"%f\" v=\"%f\" />\n",tex[0],1.f - tex[1]);		
+				fprintf(fp,"</vertex>\n");
+			}
+			fprintf(fp,"</vertexbuffer>\n");
+		}		
+		fprintf(fp,"</geometry>\n");
+		fprintf(fp,"<boneassignments>\n");
+		int counter = 0;
+		for (unsigned int k=0;k<weight->numInfJoints.size();k++)
+		{
+			int nw = weight->numInfJoints[k];
+			for (int w = 0; w < nw; w++)
+			{
+				int widx = weight->weightIndex[counter];
+				int bidx = weight->jointNameIndex[counter];
+				//std::string& boneName = weight->infJointName[bidx];				
+				fprintf(fp,"<vertexboneassignment vertexindex=\"%d\" boneindex=\"%d\" weight=\"%f\" />\n",k,weight->bindWeight[widx],bidx);
+				counter++;
+			}			
+		}
+		fprintf(fp,"</boneassignments>\n");
+		fprintf(fp,"</submesh>\n");
+	}
+
+	fprintf(fp,"</submeshes>\n"); 
+	fprintf(fp,"<skeletonlink name=\"%s\" />\n",defMesh->skeletonName.c_str());
+	fprintf(fp,"</mesh>\n");
+	fclose(fp);
+	return true;
+}
 
