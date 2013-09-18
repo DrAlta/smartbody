@@ -60,8 +60,9 @@ public:
 	std::vector<SrSnModel*>		dMeshStatic_p;
 	std::vector<SkinWeight*>	skinWeights;
 	std::map<std::string, std::vector<std::string> > morphTargets;
+	std::string                 skeletonName; // binding skeleton for this deformable model
 	SkSkeleton*					skeleton;			// pointer to current skeleton
-	bool						binding;			// whether in deformable mesh mode		
+	bool						binding;			// whether in deformable mesh mode
 	// unrolled all vertices into a single buffer for faster GPU rendering
 	bool initVertexBuffer;	
 	std::vector<SrVec>          posBuf;	

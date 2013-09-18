@@ -62,6 +62,7 @@ class SBAssetManager : public SBObject
 		SBAPI void addDeformableMesh(const std::string& meshName, DeformableMesh* mesh);
 		SBAPI void removeDeformableMesh(const std::string& meshName);
 		SBAPI DeformableMesh* getDeformableMesh(const std::string& meshName);
+		SBAPI std::vector<std::string> getDeformableMeshNames();
 		SBAPI void removeAllDeformableMeshes();
 		
 protected:

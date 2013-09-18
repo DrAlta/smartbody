@@ -774,7 +774,8 @@ void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, const char* char_
 
 	// cache the joint names for each skin weight
 	if (char_p && char_p->dMesh_p)
-	{
+	{	
+		char_p->dMesh_p->skeletonName = char_p->getSkeleton()->getName();
 		for (size_t x = 0; x < char_p->dMesh_p->skinWeights.size(); x++)
 		{
 			SkinWeight* skinWeight = char_p->dMesh_p->skinWeights[x];
