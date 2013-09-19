@@ -601,7 +601,7 @@ void BaseWindow::SaveCB(Fl_Widget* widget, void* data)
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string fileString = scene->save();
 
-	std::ofstream file(saveFile);
+	std::ofstream file(saveFile.c_str());
 	if (!file.good())
 	{
 		std::string message = "Cannot save to file '";
@@ -678,7 +678,7 @@ void BaseWindow::SaveSceneSettingCB( Fl_Widget* widget, void* data )
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string fileString = scene->saveSceneSetting();
 
-	std::ofstream file(saveFile);
+	std::ofstream file(saveFile.c_str());
 	if (!file.good())
 	{
 		std::string message = "Cannot save to file '";
