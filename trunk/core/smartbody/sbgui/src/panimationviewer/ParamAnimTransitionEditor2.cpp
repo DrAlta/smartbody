@@ -752,10 +752,10 @@ void PATransitionEditor2::save(Fl_Widget* widget, void* data)
 	}
 
 	// save to the file
-	std::ofstream transitionFile(transitionFileName);
+	std::ofstream transitionFile(transitionFileName.c_str());
 	if (transitionFile.is_open() != true)
 	{
-		fl_alert("Problem writing to file %s, transition was not saved.", transitionFileName);
+		fl_alert("Problem writing to file %s, transition was not saved.", transitionFileName.c_str());
 		return;
 	}
 	transitionFile << strstr.str();
