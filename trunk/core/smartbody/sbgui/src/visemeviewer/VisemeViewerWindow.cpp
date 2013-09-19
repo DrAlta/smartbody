@@ -870,10 +870,10 @@ void VisemeViewerWindow::OnSaveCB(Fl_Widget* widget, void* data)
 	}
 
 	// save to the file
-	std::ofstream file(fileName);	
+	std::ofstream file(fileName.c_str());	
 	if (file.is_open() != true)
 	{
-		fl_alert("Problem writing to file %s, diphone was not saved.", fileName);
+		fl_alert("Problem writing to file %s, diphone was not saved.", fileName.c_str());
 		return;
 	}
 	file << strstr.str();
@@ -1117,10 +1117,10 @@ void VisemeViewerWindow::OnShowStatsCB(Fl_Widget* widget, void* data)
 	}
 
 
-	std::ofstream file(filename);
+	std::ofstream file(filename.c_str());
 	if (file.is_open() != true)
 	{
-		fl_alert("Problem writing to file %s, diphone stats were not saved.", filename);
+		fl_alert("Problem writing to file %s, diphone stats were not saved.", filename.c_str());
 		return;
 	}
 	file << strstr.str();
@@ -1161,10 +1161,10 @@ void VisemeViewerWindow::OnDumpCB(Fl_Widget* widget, void* data)
 	if (filename == "")
 		return;
 
-	std::ofstream file(filename);
+	std::ofstream file(filename.c_str());
 	if (file.is_open() != true)
 	{
-		fl_alert("Problem writing to file %s, diphone stats were not saved.", filename);
+		fl_alert("Problem writing to file %s, diphone stats were not saved.", filename.c_str());
 		return;
 	}
 
