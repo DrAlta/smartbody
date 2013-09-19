@@ -244,7 +244,7 @@ void RetargetStepWindow::applyAutoRig()
 	
 	SBAutoRigManager& autoRigManager = SBAutoRigManager::singleton();
 	SrModel& model = sbPawn->dMesh_p->dMeshStatic_p[0]->shape();
-	std::string modelName = model.name;
+	std::string modelName = (const char*) model.name;
 	std::string filebasename = boost::filesystem::basename(modelName);
 	std::string fileextension = boost::filesystem::extension(modelName);
 	std::string skelName = filebasename+".sk";
