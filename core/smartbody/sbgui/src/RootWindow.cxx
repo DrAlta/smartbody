@@ -11,6 +11,7 @@
 #include "boost/filesystem.hpp"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/version.hpp>
 #include "sbm/sbm_audio.h"
 #include <fstream>
 #include "CommandWindow.h"
