@@ -86,6 +86,12 @@ def retargetBehaviorSet(charName):
 	scene.run("transitions.py")
 	transitionSetup('', 'all')
 	
+	# add IK constraint for foot automatically
+	sbChar.addJointTrajectoryConstraint('l_forefoot','base')
+	sbChar.addJointTrajectoryConstraint('r_forefoot','base')
+	sbChar.addJointTrajectoryConstraint('l_ankle','base')
+	sbChar.addJointTrajectoryConstraint('r_ankle','base')	
+	
 	# setup steering
 	scene.run("init-steer-agents.py")
 	steerManager = scene.getSteerManager()
