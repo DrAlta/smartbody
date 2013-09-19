@@ -423,6 +423,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_ublas.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_noise_controller.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_recorder.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_pose_postprocessing.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtBlendEngine.cpp \
 	$(SBM_MY_DIR)/controllers/MotionAnalysis.cpp \
 	$(SBM_MY_DIR)/sbm/ParserFBX.cpp \
