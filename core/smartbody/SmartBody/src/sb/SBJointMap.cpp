@@ -502,6 +502,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 	SkJoint *spine2 = 0;
 	SkJoint *spine3 = 0; // chest
 	SkJoint *spine4 = 0; // neck
+	SkJoint *spine5 = 0;
 	SkJoint *skullbase = 0; // head
 	SkJoint *eyeball_left=0,		*eyeball_right=0;
 	SkJoint *l_acromioclavicular=0,	*r_acromioclavicular=0; // shoulder
@@ -680,17 +681,26 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 // 		}
 // 	}
 	spine3 = spine1->child(0);
+	int spineCount = 2;
+	char spineName[10];
 	while (spine3->num_children() < 2 && spine3->num_children() > 0)
 	{
+		sprintf(spineName,"spine%d",spineCount);		
+		setJointMap(spineName,spine3, prtMap);
 		spine3 = spine3->child(0);
+		spineCount++;
 	}
+
 
 	if(!spine3)
 	{
 		LOG("guessMap: spine3 joint NOT found, aborting...\n");
 		return false;
 	}
-	setJointMap("spine3", spine3, prtMap);
+	sprintf(spineName,"spine%d",spineCount);	
+	setJointMap(spineName, spine3, prtMap);
+	spineCount++;
+	//setJointMap("spine3", spine3, prtMap);
 
 	if(spine3->num_children() == 2)
 	{
@@ -720,7 +730,9 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		// guess left/right shoulder from the names
 		guessLeftRightFromJntNames(ja, jb, l_acromioclavicular, r_acromioclavicular);
 
-		setJointMap("spine4", spine4, prtMap);
+		sprintf(spineName,"spine%d",spineCount);	
+		setJointMap(spineName, spine4, prtMap);
+		//setJointMap("spine4", spine4, prtMap);
 		if (l_acromioclavicular->getName() == "l_sternoclavicular")
 			setJointMap("l_sternoclavicular", r_acromioclavicular, prtMap);
 		else
@@ -769,7 +781,10 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 		// guess left/right shoulder from the names
 		guessLeftRightFromJntNames(ja, jb, l_acromioclavicular, r_acromioclavicular);
 
-		setJointMap("spine4", spine4, prtMap);
+		//setJointMap("spine4", spine4, prtMap);
+		sprintf(spineName,"spine%d",spineCount);	
+		setJointMap(spineName, spine4, prtMap);
+
 		if (l_acromioclavicular->jointName() == "l_sternoclavicular")
 			setJointMap("l_sternoclavicular", l_acromioclavicular, prtMap);
 		else
