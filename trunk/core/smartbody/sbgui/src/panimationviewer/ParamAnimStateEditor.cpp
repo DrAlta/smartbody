@@ -1149,10 +1149,10 @@ void PABlendEditor::save(Fl_Widget* widget, void* data)
 	}
 
 	// save to the file
-	std::ofstream stateFile(stateFileName);
+	std::ofstream stateFile(stateFileName.c_str());
 	if (stateFile.is_open() != true)
 	{
-		fl_alert("Problem writing to file %s, blend was not saved.", stateFileName);
+		fl_alert("Problem writing to file %s, blend was not saved.", stateFileName.c_str());
 		return;
 	}
 	stateFile << strstr.str();
