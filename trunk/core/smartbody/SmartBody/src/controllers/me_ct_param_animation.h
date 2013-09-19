@@ -134,6 +134,8 @@ class MeCtParamAnimation : public MeCtContainer
 		void updateJointTrajectory(PABlendData* blendData);
 		SrMat combineMat(SrMat& mat1, SrMat& mat2);
 		void updateMotionFrame(BodyMotionFrame& motionFrame, MeCtIKTreeScenario& ikScenario, SrBuffer<float>& buff, bool readData = true);
+		void getCharacterJointTrajectory( std::vector<SrVec> &curStatePosList );
+
 
 	private:
 
