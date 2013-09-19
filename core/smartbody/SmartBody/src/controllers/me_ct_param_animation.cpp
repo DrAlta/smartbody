@@ -277,33 +277,52 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 				transitionManager->step(timeStep*playSpeed);
 
 				// a hack to also transition the IK post-processing results from/to pseudo-idle pose
-				if (curStateData->getStateName() == PseudoIdleState)
-				{
-					character->setJointTrajBlendWeight(1.f - transitionManager->getCurrentTransitionWeight());
+				float currentTrajBlendWeight = character->getJointTrajBlendWeight();
+
+				if (curStateData->getStateName() == PseudoIdleState && currentTrajBlendWeight == 0.f) // transition from idle pose, and poseture doesn't provide IK traj
+				{	
+					character->setJointTrajBlendWeight(1.f - transitionManager->getCurrentTransitionWeight());										
 					updateJointTrajectory(nextStateData);	
 				}
-				else if (nextStateData->getStateName() == PseudoIdleState)
+				else if (nextStateData->getStateName() == PseudoIdleState && currentTrajBlendWeight == 0.f) // transition to idle pose, and poseture doesn't provide IK traj
 				{
 					character->setJointTrajBlendWeight(transitionManager->getCurrentTransitionWeight());	
 					updateJointTrajectory(curStateData);	
-				}
+				}		
 				else // blend the joint trajectory from current state to next state
 				{
-					updateJointTrajectory(curStateData);
-					std::vector<SrVec> curStatePosList;
-					std::vector<std::string> jointConsNames = character->getJointConstraintNames();
-					for (unsigned int i=0;i<jointConsNames.size();i++)
-					{
-						SmartBody::TrajectoryRecord* traj = character->getJointTrajectoryConstraint(jointConsNames[i]);
-						curStatePosList.push_back(traj->jointTrajGlobalPos);
-					}
-					updateJointTrajectory(nextStateData);
+					std::vector<SrVec> poseStatePosList; 
+					std::vector<SrVec> curStatePosList, nextStatePostList;
 
+					getCharacterJointTrajectory(poseStatePosList);
+				
+					if (curStateData->getStateName() != PseudoIdleState)
+					{
+						updateJointTrajectory(curStateData);
+						getCharacterJointTrajectory(curStatePosList);
+					}										
+					else
+					{
+						curStatePosList = poseStatePosList;
+					}
+					
+					if (nextStateData->getStateName() != PseudoIdleState)
+					{
+						updateJointTrajectory(nextStateData);
+						getCharacterJointTrajectory(nextStatePostList);
+					}
+					else
+					{
+						nextStatePostList = poseStatePosList;
+					}
+					
+
+					std::vector<std::string> jointConsNames = character->getJointConstraintNames();
 					float transitionWeight = transitionManager->getCurrentTransitionWeight();
 					for (unsigned int i=0;i<jointConsNames.size();i++)
 					{
 						SmartBody::TrajectoryRecord* traj = character->getJointTrajectoryConstraint(jointConsNames[i]);
-						traj->jointTrajGlobalPos = traj->jointTrajGlobalPos*(1.f-transitionWeight) + curStatePosList[i]*transitionWeight;
+						traj->jointTrajGlobalPos = nextStatePostList[i]*(1.f-transitionWeight) + curStatePosList[i]*transitionWeight;
 					}
 				}
 
@@ -1112,4 +1131,14 @@ SrMat MeCtParamAnimation::combineMat( SrMat& mat1, SrMat& mat2 )
 	SrVec newTranslation = mat1.get_translation() + mat2.get_translation();
 	newMat.set_translation(newTranslation);
 	return newMat;	
+}
+
+void MeCtParamAnimation::getCharacterJointTrajectory( std::vector<SrVec> &curStatePosList )
+{
+	std::vector<std::string> jointConsNames = character->getJointConstraintNames();					
+	for (unsigned int i=0;i<jointConsNames.size();i++)
+	{
+		SmartBody::TrajectoryRecord* traj = character->getJointTrajectoryConstraint(jointConsNames[i]);
+		curStatePosList.push_back(traj->jointTrajGlobalPos);
+	}
 }

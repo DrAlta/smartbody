@@ -377,9 +377,10 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 					&_mChan_to_buff,
 		            _play_mode, &_last_apply_frame, _isAdditive, retarget );
 
-#if 0 // disable IK post-processing for posture/motion by default
+#if 1 // disable IK post-processing for posture/motion by default
 	if (retarget && sbMotion)
 	{
+		bool hasCharacterTraj = false;
 		std::vector<std::string> jointConsNames = _character->getJointConstraintNames();
 		SmartBody::SBJoint* baseJoint = _character->getSkeleton()->getJointByName("base");
 		SrMat baseGmat;
@@ -402,11 +403,16 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 				trajRecord->isEnable = false;
 				continue;
 			}
+			hasCharacterTraj = true;
 			trajRecord->isEnable = true;
 			trajRecord->jointTrajLocalOffset = trajOffset;
 			trajRecord->refJointGlobalPos = refJoint->gmat().get_translation(); 
 			retarget->applyRetargetJointTrajectory(*trajRecord,baseGmat);			
 		}
+		if (hasCharacterTraj)
+			_character->setJointTrajBlendWeight(1.f);
+		else
+			_character->setJointTrajBlendWeight(0.f);
 	}
 #endif
 
