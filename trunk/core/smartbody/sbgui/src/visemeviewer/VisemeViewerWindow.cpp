@@ -68,13 +68,16 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_checkStats = new Fl_Check_Button(300, 35, 100, 25, "Gather Stats");
 	_checkStats->callback(OnGatherStatsCB, this);
 
-	_buttonReset = new Fl_Button(400, 35, 100, 25, "Reset Stats");
+	_buttonReset = new Fl_Button(400, 35, 60, 25, "Reset Stats");
 	_buttonReset->callback(OnStatsResetCB, this);
 
-	_buttonShowStats = new Fl_Button(500, 35, 100, 25, "Save Stats");
+	_buttonShowStats = new Fl_Button(470, 35, 60, 25, "Save Stats");
 	_buttonShowStats->callback(OnShowStatsCB, this);
 
-	_buttonDump = new Fl_Button(620, 35, 100, 25, "Dump Phoneme Pairs");
+	_buttonNormalize = new Fl_Button(590, 35, 80, 25, "Normalize");
+	_buttonNormalize->callback(OnNormalizeCB, this);
+	
+	_buttonDump = new Fl_Button(660, 35, 80, 25, "Dump");
 	_buttonDump->callback(OnDumpCB, this);
 
 	_browserPhoneme[0] = new Fl_Hold_Browser(10, 80, 70, 350, "Phoneme1");
@@ -1226,6 +1229,27 @@ void VisemeViewerWindow::OnDumpCB(Fl_Widget* widget, void* data)
 	file.close();	
 }
 
+void VisemeViewerWindow::OnNormalizeCB(Fl_Widget* widget, void* data)
+{
+	int confirm = fl_choice("This will normalize the phone bigrames.\nContinue?", "No", "Yes", NULL);
+	if (confirm != 1)
+	{
+		return;
+	}
+
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	// construct the entire list of diphones
+	SmartBody::SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(viewer->getCurrentCharacterName());
+	if (!character)
+		return;
+
+	std::string curDiphoneSet = character->getStringAttribute("lipSyncSetName");
+	diphoneManager->normalizeCurves(curDiphoneSet);
+	viewer->redraw();
+
+}
 
 void VisemeViewerWindow::OnRunTimeCurvesCB(Fl_Widget* widget, void* data)
 {

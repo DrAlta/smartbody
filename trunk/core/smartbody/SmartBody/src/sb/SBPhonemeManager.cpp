@@ -120,10 +120,94 @@ std::vector<std::string> SBDiphoneManager::getDiphoneMapNames()
 		 iter++)
 	{
 		diphoneMaps.push_back((*iter).first);
+		
 	}
 
 	return diphoneMaps;
 
 }
+
+void SBDiphoneManager::normalizeCurves(const std::string& name)
+{
+	std::map<std::string, std::vector<SBDiphone*> >::iterator iter = _diphoneMap.find(name);
+	if (iter != _diphoneMap.end())
+	{
+		// iterate through the phone bigrams
+		for (std::map<std::string, std::vector<SBDiphone*> >::iterator iter2 = _diphoneMap.begin();
+			 iter2 != _diphoneMap.end();
+			 iter2++)
+		{
+			// get the phone bigram
+			std::vector<SBDiphone*>& diphones = getDiphones(iter->first);
+			for (std::vector<SBDiphone*>::iterator diphoneIter = diphones.begin();
+				 diphoneIter != diphones.end();
+				 diphoneIter++)
+			{
+				SBDiphone* diphone = (*diphoneIter);
+				// get the keys and find the largest value in the list
+				float maxVal = -1.0f;
+				std::vector<std::string> visemes = diphone->getVisemeNames();
+				for (std::vector<std::string>::iterator visemeIter = visemes.begin();
+					 visemeIter != visemes.end();
+					 visemeIter++)
+				{
+					const std::string& viseme = (*visemeIter);
+					std::vector<float>& keys = diphone->getKeys(viseme);
+					bool isTime = true;
+					for (std::vector<float>::iterator keyIter = keys.begin();
+						 keyIter != keys.end();
+						 keyIter++)
+					{
+						float& val = (*keyIter);
+						if (isTime)
+						{
+							isTime = false;
+						}
+						else
+						{
+							if (val > maxVal)
+								maxVal = val;
+							isTime = true;
+						}
+					}
+				}
+
+				if (maxVal <= -0.0f )
+				{
+					continue;
+				}
+
+				// normalize the values according the the scale
+				LOG("Normalize scale is %f", maxVal);
+				float scale = 1.0f / ((1.0f + maxVal) / 2.0);
+				for (std::vector<std::string>::iterator visemeIter = visemes.begin();
+					 visemeIter != visemes.end();
+					 visemeIter++)
+				{
+					const std::string& viseme = (*visemeIter);
+					std::vector<float>& keys = diphone->getKeys(viseme);
+					bool isTime = true;
+					for (std::vector<float>::iterator keyIter = keys.begin();
+						 keyIter != keys.end();
+						 keyIter++)
+					{
+						float& val = (*keyIter);
+						if (isTime)
+						{
+							isTime = false;
+						}
+						else
+						{
+							val *= scale;
+							isTime = true;
+						}
+					}
+				}
+
+			}
+		}
+	}
+}
+
 
 }
