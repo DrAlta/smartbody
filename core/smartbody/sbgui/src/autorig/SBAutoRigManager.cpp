@@ -1,5 +1,7 @@
 #include "SBAutoRigManager.h"
+#ifdef WIN32
 #include "pinocchioApi.h"
+#endif
 #include <vhcl.h>
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
@@ -8,9 +10,11 @@
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 
+#ifdef WIN32
 bool SrModelToMesh( SrModel& model, Mesh& mesh );
 bool AutoRigToSBSk( PinocchioOutput& out, Skeleton& sk, SmartBody::SBSkeleton& sbSk);
 bool AutoRigToDeformableMesh(PinocchioOutput& out, SrModel& m, SmartBody::SBSkeleton& sbSk, DeformableMesh& deformMesh);
+#endif
 
 SBAutoRigManager* SBAutoRigManager::_singleton = NULL;
 SBAutoRigManager::SBAutoRigManager()
@@ -25,6 +29,7 @@ SBAutoRigManager::~SBAutoRigManager()
 
 bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
+#ifdef WIN32
 	Mesh m;
 	//Skeleton sk = HumanSkeleton(); // default human skeleton from Pinocchio. Should define our own custom skeleton to account for gaze and other behavior
 	Skeleton sk = SmartBodySkeleton();
@@ -56,10 +61,11 @@ bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName
 
 	assetManager->addSkeleton(sbSk);
 	assetManager->addDeformableMesh(outDeformableMeshName, deformMesh);
+#endif
 }
 
 
-
+#ifdef WIN32
 bool AutoRigToDeformableMesh( PinocchioOutput& out, SrModel& m, SmartBody::SBSkeleton& sbSk, DeformableMesh& deformMesh )
 {
 	//deformMesh.dMeshStatic_p.push_back()
@@ -230,3 +236,5 @@ bool SrModelToMesh( SrModel& model, Mesh& mesh )
 	mesh.computeVertexNormals();
 	return true;
 }
+#endif
+
