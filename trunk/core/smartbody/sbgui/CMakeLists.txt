@@ -179,6 +179,7 @@ set( SBM_FLTK_SRC
 
 	./src/retargetviewer/RetargetViewer.cpp
 	./src/retargetcreator/RetargetCreatorWindow.cpp
+	./src/autorig/SBAutoRigManager.cpp
 
 	./src/monitorviewer/MonitorConnectWindow.cpp 
 	./src/motioneditor/MotionEditorWindow.cpp
