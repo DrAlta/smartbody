@@ -56,6 +56,7 @@ protected:
 	Fl_Button* _buttonPlayAudioFile;
 	Fl_Button* _buttonReset;
 	Fl_Button* _buttonShowStats;
+	Fl_Button* _buttonNormalize;
 	Fl_Button* _buttonRefreshCharacter;
 	Fl_Button* _buttonDump;
 	Fl_Input* _inputUtterance;
@@ -107,6 +108,7 @@ protected:
 	static void OnGatherStatsCB(Fl_Widget* widget, void* data);
 	static void OnCharacterRefreshCB(Fl_Widget* widget, void* data);
 	static void OnDumpCB(Fl_Widget* widget, void* data);
+	static void OnNormalizeCB(Fl_Widget* widget, void* data);
 	static void OnRunTimeCurvesCB(Fl_Widget* widget, void* data);
 	static void OnSinglePhonemeSelectCB(Fl_Widget* widget, void* data);
 };
