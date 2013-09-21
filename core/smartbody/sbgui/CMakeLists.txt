@@ -227,6 +227,7 @@ target_link_libraries( sbgui
 	python2.7
     	ncurses	
 	pthread
+	pinocchio
 	${MORE_LIBS}
 	${OGRE_LIBS}
 	#CEGUIBase
