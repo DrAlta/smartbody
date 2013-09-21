@@ -230,17 +230,18 @@ namespace _VectorPrivate {
 template <int Dim>
 class VecOp
 {
-private:
+public:
+    template<class R, class R1, int D>
+    static void assign(const VRD1 &from, VRD &to) { to[last] = from[last]; Next::assign(from, to); }
+    template<class R, class R1, int D>
+    static void assign(const R1 &from, VRD &to) { to[last] = from; Next::assign(from, to); }
+
     static const int last = Dim - 1;
     typedef VecOp<Dim - 1> Next;
     template<int D> friend class VecOp;
     template<class R, int D> friend class Vector;
 
-    template<class R, class R1, int D>
-    static void assign(const VRD1 &from, VRD &to) { to[last] = from[last]; Next::assign(from, to); }
 
-    template<class R, class R1, int D>
-    static void assign(const R1 &from, VRD &to) { to[last] = from; Next::assign(from, to); }
 
     template<class R, int D, class F>
     static Vector<typename F::result_type, D> apply(const F &func, const VRD &v)
@@ -270,7 +271,7 @@ private:
 template <>
 class VecOp<1>
 {
-private:
+public:
     template<int D> friend class VecOp;
 
     template<class R, class R1, int D> static void assign(const VRD1 &from, VRD &to) { to[0] = from[0]; }
