@@ -1040,7 +1040,16 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					SrModel* newModel = new SrModel();
 					newModel->name = SrString(sidAttr.c_str());
 					newModel->translate(offset);
-					parent->visgeo(newModel);
+					if (!parent)
+					{
+						LOG("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
+						delete newModel;
+					}
+					else
+					{
+						parent->visgeo(newModel);
+					}
+					
 				}
 				DOMNode* materialNode = ParserOpenCOLLADA::getNode("bind_material", childNode);
 				if (materialNode)
