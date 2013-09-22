@@ -851,7 +851,16 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 					SrModel* newModel = new SrModel();
 					newModel->name = SrString(sidAttr.c_str());
 					newModel->translate(offset);
-					parent->visgeo(newModel);
+					newModel->translate(offset);
+					if (!parent)
+					{
+						LOG("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
+						delete newModel;
+					}
+					else
+					{
+						parent->visgeo(newModel);
+					}
 				}
 
 				rapidxml::xml_node<>* materialNode = ParserCOLLADAFast::getNode("bind_material", childNode);
