@@ -2,6 +2,7 @@
 #include "SbmShader.h"
 #include "external/SOIL/SOIL.h"
 #include <sb/SBTypes.h>
+#include <vhcl_log.h>
 //#include "external/imdebug/imdebug.h"
 
 /************************************************************************/
@@ -184,10 +185,8 @@ void SbmTexture::buildTexture()
 #define GL_RGB8 GL_RGB
 #define GL_RGBA8 GL_RGBA
 #endif
-	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 #if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
@@ -213,6 +212,8 @@ void SbmTexture::buildTexture()
 #else
 	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);
 #endif
+
+	//LOG("texture id = %d, texture name = %s, width = %d, height = %d, channel = %d",texID, textureName.c_str(), width, height, channels);
 
 	//glGenerateMipmap(iType);
 	//SbmShaderProgram::printOglError("Sb!defined(SB_IPHONE)mTexture.cpp:200");
