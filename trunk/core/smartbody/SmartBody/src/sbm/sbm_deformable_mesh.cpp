@@ -7,6 +7,7 @@
 #include <sb/SBScene.h>
 #include <sr/sr_sn_group.h>
 #include <sr/sr_random.h>
+#include <sbm/GPU/SbmTexture.h>
 #include <boost/algorithm/string.hpp>
 
 #define TEST_HAIR_RENDER 1
@@ -678,12 +679,17 @@ bool DeformableMesh::buildVertexBuffer()
 		}
 #if TEST_HAIR_RENDER
 		mesh->matName = allMatNameList[iMaterial];
+		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,mesh->texName.c_str());
 		std::string lowMatName = mesh->matName;
 		boost::algorithm::to_lower(lowMatName);
 		if (lowMatName.find("hair") != std::string::npos)
 		{
 			// is a hair mesh, based on a rough name searching
 			mesh->isHair = true;
+			hairMeshList.push_back(mesh);
+		}
+		else if (tex && tex->isTransparent())
+		{
 			hairMeshList.push_back(mesh);
 		}
 		else
