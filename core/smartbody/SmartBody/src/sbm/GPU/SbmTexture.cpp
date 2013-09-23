@@ -125,6 +125,7 @@ SbmTexture::SbmTexture( const char* texName )
 	texID = 0;
 	buffer = NULL;
 	finishBuild = false;
+	transparentTexture = false;
 }
 
 SbmTexture::~SbmTexture(void)
@@ -153,6 +154,11 @@ void SbmTexture::loadImage( const char* fileName )
 			buffer[index2] = temp;
 			++index1;
 			++index2;
+			if ( channels == 4 && i%channels == 3) // alpha channel
+			{
+				if (temp == 0) // transparent
+					transparentTexture = true;
+			}
 		}
 	}
 	imgBuffer.resize(width*height*channels);
@@ -185,6 +191,7 @@ void SbmTexture::buildTexture()
 #define GL_RGB8 GL_RGB
 #define GL_RGBA8 GL_RGBA
 #endif
+	
 	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_REPEAT);
 
@@ -213,7 +220,7 @@ void SbmTexture::buildTexture()
 	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);
 #endif
 
-	//LOG("texture id = %d, texture name = %s, width = %d, height = %d, channel = %d",texID, textureName.c_str(), width, height, channels);
+	LOG("texture id = %d, texture name = %s, width = %d, height = %d, channel = %d",texID, textureName.c_str(), width, height, channels);
 
 	//glGenerateMipmap(iType);
 	//SbmShaderProgram::printOglError("Sb!defined(SB_IPHONE)mTexture.cpp:200");

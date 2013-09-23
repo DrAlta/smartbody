@@ -52,6 +52,7 @@ protected:
 	unsigned char* buffer;
 	std::vector<unsigned char> imgBuffer;
 	bool finishBuild;
+	bool transparentTexture;
 
 	GLuint texID;	
 	GLuint internal_format, texture_format;		
@@ -59,6 +60,7 @@ public:
 	SBAPI SbmTexture(const char* texName);
 	SBAPI ~SbmTexture(void);
 	SBAPI bool hasBuild() { return finishBuild; }
+	SBAPI bool isTransparent() { return transparentTexture; }
 	SBAPI const std::string& getName() { return textureName; }
 	SBAPI GLuint getID() { return texID; }
 	SBAPI void loadImage(const char* fileName);
