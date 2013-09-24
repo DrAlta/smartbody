@@ -57,6 +57,18 @@ void SBDiphone::addKey(const std::string& viseme, float time, float weight)
 	}
 }
 
+void SBDiphone::setKey(const std::string& viseme, std::vector<float>& keys)
+{
+	std::map<std::string, std::vector<float> >::iterator iter = _visemeKeysMap.find(viseme);
+	if (iter == _visemeKeysMap.end())
+	{
+		std::vector<float> newFloat;
+		_visemeKeysMap.insert(std::make_pair(viseme, newFloat));
+	}
+
+	_visemeKeysMap[viseme] = keys;
+}
+
 std::vector<float>& SBDiphone::getKeys(const std::string& viseme)
 {
 	std::map<std::string, std::vector<float> >::iterator iter = _visemeKeysMap.find(viseme);

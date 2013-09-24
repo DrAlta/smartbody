@@ -576,8 +576,49 @@ void SBMotion::removeMotionChannels( std::vector<std::string> channelNames )
 	_channels.rebuild_hash_table();
 }
 
+void SBMotion::pertainMotionChannelsByEndJoints( std::string skelName, std::vector<std::string>& endJoints )
+{
+	SBSkeleton* srcSkeleton = SmartBody::SBScene::getScene()->getSkeleton(skelName);
+	if (!srcSkeleton)
+	{
+		LOG("No skeleton named %s found. Can not match joint names and descendents", skelName.c_str());
+		return;
+	}
+	std::vector<std::string> pertainJoints;
+	for (unsigned int i=0;i<endJoints.size();i++)
+	{
+		SmartBody::SBJoint* eJoint = srcSkeleton->getJointByName(endJoints[i]);
+		if (eJoint)
+		{
+			std::vector<SBJoint*> descendents = eJoint->getDescendants();
+			for (unsigned int j=0;j<descendents.size();j++)
+			{
+				pertainJoints.push_back(descendents[j]->getName());
+			}
+			pertainJoints.push_back(eJoint->getName());
+		}		
+	}
+	std::vector<std::string> removeJoints;
+	for (unsigned int i = 0; i < srcSkeleton->getJointNames().size(); ++i)
+	{
+		std::string jname = srcSkeleton->getJointNames()[i];
+		bool shouldRemove = true;
+		for (unsigned int j = 0; j < pertainJoints.size(); j++)
+		{
+			if (pertainJoints[j] == jname)
+			{
+				shouldRemove = false;
+				break;
+			}
+		}
+		if (shouldRemove)
+			removeJoints.push_back(jname);
+	}
+	this->removeMotionChannels(removeJoints);
+}
 
-void SBMotion::removeMotionChannelsByEndJoints( std::string skelName, std::vector<std::string>& endJoints )
+
+void SBMotion::removeMotionChannelsByEndJoints(std::string skelName, std::vector<std::string>& endJoints)
 {
 	SBSkeleton* srcSkeleton = SmartBody::SBScene::getScene()->getSkeleton(skelName);
 	if (!srcSkeleton)
