@@ -19,6 +19,7 @@ public:
 	SBAPI const std::string& getToPhonemeName();
 
 	SBAPI void addKey(const std::string& viseme, float time, float weight);
+	SBAPI void setKey(const std::string& viseme, std::vector<float>& keys);
 	SBAPI std::vector<float>& getKeys(const std::string& viseme);
 	SBAPI std::vector<std::string> getVisemeNames();
 	SBAPI int getNumVisemes();

@@ -92,6 +92,7 @@ class SBMotion : public SkMotion
 		SBAPI SBMotion* smoothCycle(std::string name, float timeInterval);
 		SBAPI SBMotion* retarget(std::string name, std::string srcSkeletonName, std::string dstSkeletonName, std::vector<std::string>& endJoints, std::vector<std::string>& relativeJoints, std::map<std::string, SrVec>& offsetJointMap);	
 		SBAPI void removeMotionChannelsByEndJoints(std::string skelName, std::vector<std::string>& endJoints);
+		SBAPI void pertainMotionChannelsByEndJoints(std::string skelName, std::vector<std::string>& endJoints);
 		SBAPI void removeMotionChannels(std::vector<std::string> channelNames);
 
 		SBAPI SBMotion* getOffset(std::string motionName = "");
