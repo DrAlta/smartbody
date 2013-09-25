@@ -808,6 +808,18 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 	if(spine4 && spine4->num_children()>0)
 	{
 		std::vector<SkJoint*> j_list;
+		for (unsigned int i=0;i<spine4->num_children();i++)
+		{
+			SkJoint* j = spine4->child(i);
+			SrString jname(j->jointName().c_str());
+			if (jname.search("neck") >=0 || jname.search("spine") >= 0) // spine5 ?
+			{
+				spine5 = j;
+				break;
+			}
+		}
+		if (spine5)
+			setJointMap("spine5",spine5, prtMap);
 		listChildrenJoints(spine4, j_list);
 		for(unsigned int i=0; i<j_list.size(); i++)
 		{
