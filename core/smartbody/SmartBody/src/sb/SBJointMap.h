@@ -41,12 +41,12 @@ class SBJointMap : public SBObject
 
 		SBAPI void clearMapping(); // remove all mapings
 
-		SBAPI std::string getMapTarget(const std::string& to);
-		SBAPI std::string getMapSource(const std::string& from);
+		SBAPI const std::string& getMapTarget(const std::string& to);
+		SBAPI const std::string& getMapSource(const std::string& from);
 
 		SBAPI int getNumMappings();
-		SBAPI std::string getTarget(int num);
-		SBAPI std::string getSource(int num);
+		SBAPI const std::string& getTarget(int num);
+		SBAPI const std::string& getSource(int num);
 		SBAPI std::vector<std::pair<std::string, std::string> > getMappingList();
 
 		// Automatic joint name matching to standard SmartBody names
@@ -59,6 +59,7 @@ class SBJointMap : public SBObject
 		std::vector<std::pair<std::string, std::string> > _map;		
 		std::vector<std::string> _mappedMotions;
 		std::vector<std::string> _mappedSkeletons;
+		std::string emptyString;
 
 	protected:
 

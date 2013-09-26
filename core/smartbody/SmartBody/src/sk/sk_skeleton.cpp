@@ -505,7 +505,7 @@ void SkSkeleton::updateJointMap()
 		_joints[i]->updateMappedJointName();
 		if (jointMap)
 		{
-			std::string mappedName = jointMap->getMapTarget(jname);	
+			const std::string& mappedName = jointMap->getMapTarget(jname);	
 			if (mappedName != "")
 				jname = mappedName;
 		}

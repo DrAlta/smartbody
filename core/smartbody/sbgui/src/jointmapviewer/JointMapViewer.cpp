@@ -1679,7 +1679,7 @@ void JointMapViewer::updateSelectMap()
 		if (input)
 		{
 			std::string sourceName = input->label();
-			std::string targetName = jointMap->getMapTarget(sourceName);
+			const std::string& targetName = jointMap->getMapTarget(sourceName);
 			if (targetName == "")
 			{
 				input->value("");

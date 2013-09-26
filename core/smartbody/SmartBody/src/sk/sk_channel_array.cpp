@@ -661,11 +661,11 @@ const std::string SkChannelArray::getMappedChannelName( const Channel& chan ) co
 	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(jointMapName);
 	if (jointMap)
 	{
-		std::string target = jointMap->getMapTarget(chan.name);
+		const std::string target = jointMap->getMapTarget(chan.name);
 		if (target != "")
-			outName = target;
+			return target;
 	}
-	return outName;
+	return chan.name;
 	//return chan.name;
 }
 

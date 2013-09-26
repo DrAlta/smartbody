@@ -323,7 +323,7 @@ void SkJoint::updateMappedJointName()
 		SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(_skeleton->getJointMapName());
 		if (jointMap)
 		{
-			std::string target = jointMap->getMapTarget(_name);
+			const std::string& target = jointMap->getMapTarget(_name);
 			if (target != "")
 				_sbName = target;
 		}		
@@ -348,7 +348,7 @@ const std::string& SkJoint::jointName() const
 		SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(_skeleton->getJointMapName());
 		if (jointMap)
 		{
-			std::string target = jointMap->getMapTarget(_name);
+			const std::string& target = jointMap->getMapTarget(_name);
 			if (target != "")
 				outName = target;
 		}		
