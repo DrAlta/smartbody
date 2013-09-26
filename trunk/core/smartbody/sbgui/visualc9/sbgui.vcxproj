@@ -150,7 +150,9 @@
       </StackReserveSize>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y ..\..\..\..\core\smartbody\SmartBody\lib\SmartBody_d.dll ..\bin
+      <Command>rem update the version file so that it will be modified for checkin
+copy /b  ..\..\..\..\core\smartbody\SmartBody\src\sb\SBVersionTemplate.hpp +,,
+copy /Y ..\..\..\..\core\smartbody\SmartBody\lib\SmartBody_d.dll ..\bin
 copy /Y ..\..\..\..\core\smartbody\SmartBody\src\external\glew\glew32.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\bin
@@ -275,7 +277,10 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbgui\bin
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y ..\..\..\..\core\smartbody\SmartBody\lib\SmartBody.dll ..\bin
+      <Command>rem update the version file so that it will be modified for checkin
+copy /b  ..\..\..\..\core\smartbody\SmartBody\src\sb\SBVersionTemplate.hpp +,,
+
+copy /Y ..\..\..\..\core\smartbody\SmartBody\lib\SmartBody.dll ..\bin
 copy /Y ..\..\..\..\core\smartbody\SmartBody\src\external\glew\glew32.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\bin

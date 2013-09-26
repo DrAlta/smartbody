@@ -18,6 +18,7 @@ namespace SmartBody {
 
 SBJointMap::SBJointMap()
 {
+	emptyString = "";
 }
 
 SBJointMap::~SBJointMap()
@@ -380,17 +381,17 @@ void SBJointMap::removeMappingTo( const std::string& to )
 #endif
 }
 
-std::string SBJointMap::getMapSource(const std::string& to)
+const std::string& SBJointMap::getMapSource(const std::string& to)
 {
 #if !USE_STL_MAP
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
 		iter++)
 	{
-		std::string t = (*iter).second;
+		const std::string& t = (*iter).second;
 		if (to == t)
 		{
-			std::string f = (*iter).first;
+			const std::string& f = (*iter).first;
 			return f;
 		}
 	}
@@ -400,20 +401,20 @@ std::string SBJointMap::getMapSource(const std::string& to)
 		return _jointMap.right.find(to)->second;
 	}	
 #endif
-	return "";
+	return emptyString;
 }
 
-std::string SBJointMap::getMapTarget(const std::string& from)
+const std::string& SBJointMap::getMapTarget(const std::string& from)
 {
 #if !USE_STL_MAP
 	for (std::vector<std::pair<std::string, std::string> >::iterator iter = _map.begin();
 		iter != _map.end();
 		iter++)
 	{
-		std::string f = (*iter).first;
+		const std::string& f = (*iter).first;
 		if (from == f)
 		{
-			std::string t = (*iter).second;
+			const std::string& t = (*iter).second;
 			return t;
 		}
 	}
@@ -423,7 +424,7 @@ std::string SBJointMap::getMapTarget(const std::string& from)
 		return _jointMap.left.find(from)->second;
 	}	
 #endif
-	return "";
+	return emptyString;
 }
 
 int SBJointMap::getNumMappings()
@@ -435,7 +436,7 @@ int SBJointMap::getNumMappings()
 #endif
 }
 
-std::string SBJointMap::getTarget(int num)
+const std::string& SBJointMap::getTarget(int num)
 {	
 #if USE_STL_MAP
 	_map = getMappingList();
@@ -444,10 +445,10 @@ std::string SBJointMap::getTarget(int num)
 	{
 		return _map[num].second;
 	}
-	return "";
+	return emptyString;
 }
 
-std::string SBJointMap::getSource(int num)
+const std::string& SBJointMap::getSource(int num)
 {
 #if USE_STL_MAP
 	_map = getMappingList();
@@ -456,7 +457,7 @@ std::string SBJointMap::getSource(int num)
 	{
 		return _map[num].first;
 	}
-	return "";
+	return emptyString;
 }
 
 
