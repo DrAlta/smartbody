@@ -362,7 +362,9 @@ class MeCtGaze : public SmartBody::SBController	{
 		float			fading_normal;
 		bool			fading_complete;
 		int 			fading_mode;
-		
+		float			initialNeckSpeed;
+		float			initialEyeSpeed;
+
 		double			scheduled_time;
 		int				scheduled_fade_mode;
 		float			scheduled_fade_interval;

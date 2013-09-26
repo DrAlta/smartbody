@@ -357,15 +357,16 @@ void MeCtGaze::init( SbmPawn* pawn, int key_fr, int key_to )	{
 	
 	set_task_priority( key_max );
 	//set_speed( DFL_GAZE_HEAD_SPEED, DFL_GAZE_EYE_SPEED ); // initializes timing_mode = TASK_SPEED;
-	float speedEyes = DEFAULT_SPEED_EYES;
-	float speedNeck = DEFAULT_SPEED_HEAD;
+	
+	initialEyeSpeed = DEFAULT_SPEED_EYES;
+	initialNeckSpeed = DEFAULT_SPEED_HEAD;
 
 	if (pawn->getAttribute("gaze.speedEyes") != NULL)
-		speedEyes = (float) pawn->getDoubleAttribute("gaze.speedEyes");
+		initialEyeSpeed = (float) pawn->getDoubleAttribute("gaze.speedEyes");
 	if (pawn->getAttribute("gaze.speedNeck") != NULL)
-		speedNeck = (float) pawn->getDoubleAttribute("gaze.speedNeck");
-	
-	set_speed( speedNeck, speedEyes );
+		initialNeckSpeed = (float) pawn->getDoubleAttribute("gaze.speedNeck");
+
+	set_speed( initialNeckSpeed, initialEyeSpeed );
 
 	//set_smooth( 0.3f, 0.1f, 0.0f );
 	set_smooth( DEFAULT_SMOOTHING_LUMBAR, DEFAULT_SMOOTHING_CERVICAL, DEFAULT_SMOOTHING_EYEBALL );
@@ -1247,6 +1248,9 @@ bool MeCtGaze::update_fading( float dt )	{
 				}
 				fading_normal = 1.0f;
 				fading_mode = FADING_MODE_OFF;
+				set_speed( initialNeckSpeed, initialEyeSpeed );
+
+
 //				LOG( "MeCtGaze::update_fading FULL WEIGHT" );
 			}
 
@@ -1279,6 +1283,8 @@ bool MeCtGaze::update_fading( float dt )	{
 					fading_normal = 0.0f;
 					fading_complete = true;
 					fading_mode = FADING_MODE_OFF;
+					set_speed( initialNeckSpeed, initialEyeSpeed );
+
 //					LOG( "MeCtGaze::update_fading ZERO WEIGHT" );
 				}
 			}
@@ -1289,6 +1295,7 @@ bool MeCtGaze::update_fading( float dt )	{
 
 bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	
+
 	float dt;
 	if( getStart() ) {
 		setStart(0);
