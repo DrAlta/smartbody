@@ -359,8 +359,8 @@ void BmlRequest::gestureRequestProcess()
 	if (gestures.size() <= 1)
 		return;
 	
-	SBJoint* lWrist = actor->getSkeleton()->getJointByName("l_wrist");
-	SBJoint* rWrist = actor->getSkeleton()->getJointByName("r_wrist");
+	SBJoint* lWrist = actor->getSkeleton()->getJointByMappedName("l_wrist");
+	SBJoint* rWrist = actor->getSkeleton()->getJointByMappedName("r_wrist");
 	for (size_t i = 0; i < gestures.size(); ++i)
 	{
 		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
@@ -731,8 +731,8 @@ void BML::BmlRequest::speechRequestProcess()
 		if (gestureRequest)
 		{
 			if (gestureRequest->filtered)	continue;
-			SBJoint* l_wrist = actor->getSkeleton()->getJointByName("l_wrist");
-			SBJoint* r_wrist = actor->getSkeleton()->getJointByName("r_wrist");
+			SBJoint* l_wrist = actor->getSkeleton()->getJointByMappedName("l_wrist");
+			SBJoint* r_wrist = actor->getSkeleton()->getJointByMappedName("r_wrist");
 			if (l_wrist && r_wrist)
 			{
 				MeCtMotion* motionCt = dynamic_cast<MeCtMotion*> (gestureRequest->anim_ct);
@@ -2097,7 +2097,7 @@ void GazeRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene
 		MeControllerTreeRoot* controllerTree = character->ct_tree_p;
 		MeController* controller = controllerTree->findControllerByHandle(anim_ct->handle());
 		MeCtGaze* gazeCt = dynamic_cast<MeCtGaze*>( controller );
-		if (gazeCt)
+		if (gazeCt && gazeFadeInterval <= 0.0f)
 			return;
 	}
 
