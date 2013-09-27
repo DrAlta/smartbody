@@ -311,7 +311,7 @@ void MotionAnalysis::initLegInfos()
 		legStates[i].globalSupportPos.resize(2);
 		legStates[i].stanceSupportPos.resize(2);		
 	}	
-	//ikScenario.buildIKTreeFromJointRoot(skelCopy->getJointByName("base"),stopJoint);
+	//ikScenario.buildIKTreeFromJointRoot(skelCopy->getJointByMappedName("base"),stopJoint);
 }
 
 float MotionAnalysis::getTerrainYOffset( LegCycleState& state, float flightTime )

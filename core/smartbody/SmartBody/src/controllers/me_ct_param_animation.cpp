@@ -1000,7 +1000,7 @@ void MeCtParamAnimation::updateIK( PABlendData* curBlendData, SrMat& woMat, SrMa
 	{
 		std::vector<std::string> stopJoint;
 		stopJoint.push_back("spine1");
-		ikScenario.buildIKTreeFromJointRoot(character->getSkeleton()->getJointByName("base"),stopJoint);
+		ikScenario.buildIKTreeFromJointRoot(character->getSkeleton()->getJointByMappedName("base"),stopJoint);
 	}	
 	
 	float rotSpeed = SrQuat(woDeltaMat.get_rotation()).axisAngle().y*180.f/(dt*(float)M_PI);
@@ -1022,7 +1022,7 @@ void MeCtParamAnimation::updateIK( PABlendData* curBlendData, SrMat& woMat, SrMa
 void MeCtParamAnimation::updateJointTrajectory( PABlendData* blendData )
 {	
 	std::vector<std::string> jointConsNames = character->getJointConstraintNames();
-	SmartBody::SBJoint* baseJoint = character->getSkeleton()->getJointByName("base");
+	SmartBody::SBJoint* baseJoint = character->getSkeleton()->getJointByMappedName("base");
 	SrMat baseGmat;
 	character->getSkeleton()->update_global_matrices();
 	if (baseJoint && baseJoint->getParent())
