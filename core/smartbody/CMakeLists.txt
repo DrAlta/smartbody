@@ -1,4 +1,4 @@
-#add_definitions ( -DUSE_GOOGLE_PROFILER )
+add_definitions ( -DUSE_GOOGLE_PROFILER )
 
 include_directories(
 	steersuite-1.3/steerlib/include
@@ -18,5 +18,5 @@ add_subdirectory( steersuite-1.3 )
 
 add_subdirectory( simplesmartbody)
 add_subdirectory( sbgui )
-add_subdirectory( sbgui/external/Pinocchio )
+#add_subdirectory( sbgui/external/Pinocchio )
 
