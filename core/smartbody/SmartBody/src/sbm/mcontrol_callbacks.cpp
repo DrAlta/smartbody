@@ -1972,18 +1972,36 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 			ParserCOLLADAFast::parseLibraryControllers(controllerNode, char_name, scaleFactor, jointNamePrefix);
 		}	
 		else if (ext == ".xml" || ext == ".XML")
-		{
-			/*
+		{	
+
+			XercesDOMParser* parser = new XercesDOMParser();
+			parser->setValidationScheme(XercesDOMParser::Val_Always);
+			parser->setDoNamespaces(true);    // optional
+
+			ErrorHandler* errHandler = (ErrorHandler*) new HandlerBase();
+			parser->setErrorHandler(errHandler);
+
+#if (BOOST_VERSION > 104400)
+			std::string ext = boost::filesystem::extension(skin_file);
+#else
+			std::string ext = boost::filesystem2::extension(skin_file);
+#endif
+			std::string file = boost::filesystem::basename(skin_file);	
+
+			parser->parse(skin_file);
+			DOMDocument* doc = parser->getDocument();
+
 			SmartBody::SBCharacter* sbmChar = SmartBody::SBScene::getScene()->getCharacter(char_name);
 			if (sbmChar && sbmChar->dMesh_p)
 			{
-				rapidxml::xml_node<>* controllerNode = ParserCOLLADAFast::getNode("mesh", node);		
+				DOMNode* controllerNode = ParserOpenCOLLADA::getNode("mesh", doc);		
 				if (!controllerNode)
 				{
 					LOG("mcu_character_load_skinweights ERR: no ogre mesh info contained");
 					return CMD_FAILURE;
 				}
 				ParserOgre::parseSkinWeight(controllerNode,sbmChar->dMesh_p->skinWeights,scaleFactor);
+				sbmChar->dMesh_p->skeletonName = sbmChar->getSkeleton()->getName();
 				for (unsigned int i=0; i< sbmChar->dMesh_p->skinWeights.size(); i++)
 				{
 					SkinWeight* sw = sbmChar->dMesh_p->skinWeights[i];
@@ -2004,9 +2022,7 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 						sw->bindPoseMat.push_back(gmatZeroInv);
 					}
 				}
-				
-			}
-			*/
+			}	
 		}
 		if (rapidFile)
 			delete rapidFile;
