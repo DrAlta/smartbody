@@ -4,7 +4,7 @@ include_directories( ../SmartBody/src )
 link_directories( /usr/local/lib )
 link_directories( /usr/lib )                                                           
 
-set (BUILD_OGRE FALSE)
+set (BUILD_OGRE TRUE)
 # never build ogre if in osx
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set (BUILD_OGRE FALSE)
@@ -29,13 +29,14 @@ find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
 #find_library (FOUNDATION_LIBRARY Foundation)
 #find_library (COCOA_LIBRARY Cocoa)
 #find_library (X11_LIBRARY X11)
-#find_library (OGREMAIN Ogre /Users/feng/SmartBodyDev/ogre_src_v1-8-0/build/lib/relwithdebinfo/) 
-#find_library (OGREMAIN Ogre /Users/feng/SmartBodyDev/OgreSDK/lib/release/) 
-#find_library (OGREMAIN_17 Ogre /Users/feng/SmartBodyDev/OgreSDK_1.7/lib/release/) 
-#find_library (OGREMAIN_17_r Ogre /Users/feng/SmartBodyDev/ogre_src_v1-7-4/build/lib/RelWithDebInfo/)
-#find_library (OISLIB OIS /Users/feng/SmartBodyDev/ogre_src_v1-8-0/build/lib/relwithdebinfo/)
+
 endif()
 
+if (${BUILD_OGRE})
+find_library (OGREMAIN Ogre)
+find_library (OISLIB OIS)
+find_library (RTSHADERLIB OgreRTShaderSystem)
+endif()
 if (${BUILD_OGRE})
 include_directories( /usr/include/OGRE )
 set (OGREMAINLIB OgreMain)
@@ -43,7 +44,9 @@ set (OISLIB OIS)
 set (OGRE_LIBS
 	${OGREMAINLIB}	
 	${OISLIB}		
+	${RTSHADERLIB}		
 )
+
 set (OGRE_SRCS
 	src/EmbeddedOgre.cpp
 	src/ExampleFrameListener.cpp	
@@ -208,8 +211,8 @@ endif()
 
 target_link_libraries( sbgui
 
-	#tcmalloc
-	#profiler
+	tcmalloc
+	profiler
 	SmartBody
 	bonebus
 	vhmsg
@@ -227,7 +230,7 @@ target_link_libraries( sbgui
 	python2.7
     	ncurses	
 	pthread
-	pinocchio
+	#pinocchio
 	${MORE_LIBS}
 	${OGRE_LIBS}
 	#CEGUIBase
