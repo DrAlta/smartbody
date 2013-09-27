@@ -2755,7 +2755,7 @@ void FltkViewer::drawGrid()
 	float adjustedGridStep = gridStep;
 	if (sceneScale > 0.f)
 	{
-		adjustedGridStep *= sceneScale / .01f;
+		adjustedGridStep *= .01f / sceneScale;
 	}
 
 	for (float x = -gridSize; x <= gridSize; x += adjustedGridStep)
@@ -2773,7 +2773,7 @@ void FltkViewer::drawGrid()
 		}
 
 	}
-	for (float x = -gridSize; x <= gridSize; x += gridStep)
+	for (float x = -gridSize; x <= gridSize; x += adjustedGridStep)
 	{
 		if (x == 0) {
 			colorChanged = true;
