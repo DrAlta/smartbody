@@ -141,6 +141,11 @@ int SBSkeleton::getNumJoints()
 
 SBJoint* SBSkeleton::getJointByName(const std::string& jointName)
 {
+	return getJointByMappedName(jointName);
+}
+
+SBAPI SBJoint* SBSkeleton::getJointByMappedName(const std::string& jointName)
+{
 	SkJoint* j = search_joint(jointName.c_str());
 	if (j)
 	{

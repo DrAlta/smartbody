@@ -29,6 +29,7 @@ public:
 	SBAPI int getNumJoints();
 	SBAPI SBJoint* getJoint(int index);		
 	SBAPI SBJoint* getJointByName(const std::string& jointName);
+	SBAPI SBJoint* getJointByMappedName(const std::string& jointName);
 	SBAPI std::vector<std::string> getJointMappedNames();
 	SBAPI std::vector<std::string> getJointNames();
 	SBAPI std::vector<std::string> getJointOriginalNames();

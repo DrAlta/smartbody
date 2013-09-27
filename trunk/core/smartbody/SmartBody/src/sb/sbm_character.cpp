@@ -336,12 +336,12 @@ void SbmCharacter::createStandardControllers()
 	this->head_param_anim_ct->ref();
 
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
-	SmartBody::SBJoint* effector = sbSkel->getJointByName("r_middle1");
+	SmartBody::SBJoint* effector = sbSkel->getJointByMappedName("r_middle1");
 	if (!effector) 
-		effector =sbSkel->getJointByName("r_index1");
+		effector =sbSkel->getJointByMappedName("r_index1");
 	
 	if (!effector)
-		effector = sbSkel->getJointByName("r_wrist");
+		effector = sbSkel->getJointByMappedName("r_wrist");
 
 
 #if !defined(__FLASHPLAYER__)
@@ -358,13 +358,13 @@ void SbmCharacter::createStandardControllers()
 		(*this->reachEngineMap)[MeCtReachEngine::RIGHT_JUMP] = rengineJump;	
 	}	
 
-	SmartBody::SBJoint* leftEffector = sbSkel->getJointByName("l_middle1");
+	SmartBody::SBJoint* leftEffector = sbSkel->getJointByMappedName("l_middle1");
 
 	if (!leftEffector) 
-		leftEffector = sbSkel->getJointByName("l_index1");
+		leftEffector = sbSkel->getJointByMappedName("l_index1");
 
 	if (!leftEffector)
-		leftEffector = sbSkel->getJointByName("l_wrist");
+		leftEffector = sbSkel->getJointByMappedName("l_wrist");
 	if (leftEffector)
 	{
 		MeCtReachEngine* rengine = new MeCtReachEngine(this,sbSkel);
@@ -2666,12 +2666,12 @@ SkMotion* SbmCharacter::findTagSkMotion( int tag, const MotionDataSet& motionSet
 void SbmCharacter::createReachEngine()
 {
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
-	SmartBody::SBJoint* effector = sbSkel->getJointByName("r_middle1");
+	SmartBody::SBJoint* effector = sbSkel->getJointByMappedName("r_middle1");
 	if (!effector) 
-		effector = sbSkel->getJointByName("r_index1");
+		effector = sbSkel->getJointByMappedName("r_index1");
 
 	if (!effector)
-		effector = sbSkel->getJointByName("r_wrist");
+		effector = sbSkel->getJointByMappedName("r_wrist");
 
 	if (effector && reachEngineMap->find(MeCtReachEngine::RIGHT_ARM) == reachEngineMap->end())
 	{
@@ -2684,13 +2684,13 @@ void SbmCharacter::createReachEngine()
 		(*this->reachEngineMap)[MeCtReachEngine::RIGHT_JUMP] = rengineJump;	
 	}	
 
-	SmartBody::SBJoint* leftEffector = sbSkel->getJointByName("l_middle1");
+	SmartBody::SBJoint* leftEffector = sbSkel->getJointByMappedName("l_middle1");
 
 	if (!leftEffector) 
-		leftEffector = sbSkel->getJointByName("l_index1");
+		leftEffector = sbSkel->getJointByMappedName("l_index1");
 
 	if (!leftEffector)
-		leftEffector = sbSkel->getJointByName("l_wrist");
+		leftEffector = sbSkel->getJointByMappedName("l_wrist");
 	if (leftEffector && reachEngineMap->find(MeCtReachEngine::LEFT_ARM) == reachEngineMap->end())
 	{
 		MeCtReachEngine* rengine = new MeCtReachEngine(this,sbSkel);

@@ -272,8 +272,8 @@ void MeCtEyeLidRegulator::init(SbmPawn* pawn,  bool tracking_pitch)	{
 		SmartBody::SBSkeleton* skel = c->getSkeleton();
 		if (skel)
 		{
-			SmartBody::SBJoint* lEyeJoint = skel->getJointByName("eyeball_left");
-			SmartBody::SBJoint* rEyeJoint = skel->getJointByName("eyeball_right");
+			SmartBody::SBJoint* lEyeJoint = skel->getJointByMappedName("eyeball_left");
+			SmartBody::SBJoint* rEyeJoint = skel->getJointByMappedName("eyeball_right");
 			if (lEyeJoint && rEyeJoint)
 			{
 				_leftPreRot = lEyeJoint->quat()->prerot();

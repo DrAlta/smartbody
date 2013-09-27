@@ -382,7 +382,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	{
 		bool hasCharacterTraj = false;
 		std::vector<std::string> jointConsNames = _character->getJointConstraintNames();
-		SmartBody::SBJoint* baseJoint = _character->getSkeleton()->getJointByName("base");
+		SmartBody::SBJoint* baseJoint = _character->getSkeleton()->getJointByMappedName("base");
 		SrMat baseGmat;
 		if (baseJoint)
 			baseGmat = baseJoint->gmat();		

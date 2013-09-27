@@ -701,8 +701,8 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 	interSk->update_global_matrices();	
 
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SBJoint*>(interSk->root());
-	if (interSk->getJointByName("base"))
-		rootJoint = interSk->getJointByName("base");
+	if (interSk->getJointByMappedName("base"))
+		rootJoint = interSk->getJointByMappedName("base");
 	SmartBody::SBMotion* constraintMotion = dynamic_cast<SBMotion*>(targetMotion->copyMotion()); // copy the motion first	
 	MeCtIKTreeScenario ikScenario;
 	std::vector<std::string> stopJoints;

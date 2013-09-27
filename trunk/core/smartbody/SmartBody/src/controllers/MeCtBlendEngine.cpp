@@ -51,7 +51,7 @@ void MeCtBlendEngine::init(const std::string& paramFuncType)
 
 	if (paramFuncType == "reach")
 	{
-		SmartBody::SBJoint* copyEffector = skeletonCopy->getJointByName("r_wrist");
+		SmartBody::SBJoint* copyEffector = skeletonCopy->getJointByMappedName("r_wrist");
 		SmartBody::SBJoint* copyRoot = skeletonCopy->getJointByName("base");
 		motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector,copyRoot);
 	}
@@ -61,8 +61,8 @@ void MeCtBlendEngine::init(const std::string& paramFuncType)
 	}
 	else if (paramFuncType == "kick")
 	{
-		SmartBody::SBJoint* copyEffector = skeletonCopy->getJointByName("r_ankle");
-		SmartBody::SBJoint* copyRoot = skeletonCopy->getJointByName("base");
+		SmartBody::SBJoint* copyEffector = skeletonCopy->getJointByMappedName("r_ankle");
+		SmartBody::SBJoint* copyRoot = skeletonCopy->getJointByMappedName("base");
 		motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector,copyRoot);
 	}
 	else if (paramFuncType == "punch")

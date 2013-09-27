@@ -139,6 +139,8 @@ SbmTexture::~SbmTexture(void)
 void SbmTexture::loadImage( const char* fileName )
 {
 	buffer = SOIL_load_image(fileName,&width,&height,&channels,SOIL_LOAD_AUTO);	
+	if (width < 0 || height < 0 || channels < 0)
+		return;
 	std::string testOutFileName = fileName;
 	//testOutFileName += ".bmp";
 	//SOIL_save_image(testOutFileName.c_str(),SOIL_SAVE_TYPE_BMP,width,height,channels,buffer);

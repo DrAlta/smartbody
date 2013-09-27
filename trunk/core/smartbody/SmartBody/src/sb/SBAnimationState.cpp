@@ -421,7 +421,7 @@ void SBAnimationBlend::buildVisSurfaces( const std::string& errorType, const std
 	//SBSkeleton* sbSkel = SBScene::getScene()->getSkeleton(skeletonName);
 	SrVec center = SrVec(0,0,0);
 	//if (sbSkel && surfaceType == "curve")
-	//	center = sbSkel->getJointByName("base")->gmat().get_translation();
+	//	center = sbSkel->getJointByMappedName("base")->gmat().get_translation();
 	createErrorSurfaces(surfaceType, center, segments, dimensions, surfaces);
 	for (unsigned int i=0;i<surfaces.size();i++)
 	{
