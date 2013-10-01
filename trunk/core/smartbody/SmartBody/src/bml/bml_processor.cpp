@@ -74,6 +74,7 @@
 
 using namespace BML;
 using namespace SmartBody;
+using namespace xml_utils;
 
 
 const bool LOG_METHODS				= false;
@@ -306,6 +307,16 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* sc
 #else
 		BmlRequestPtr request( createBmlRequest( bpMsg.actor, bpMsg.actorId, bpMsg.requestId, std::string(bpMsg.msgId), xml ) );
 #endif
+		// Added by Yuyu (09-30-2013) to record the whole bml message.
+		DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(XMLString::transcode("core"));
+		DOMLSSerializer* pSerializer = ((DOMImplementationLS*)pDOMImplementation)->createLSSerializer();
+		DOMConfiguration* dc = pSerializer->getDomConfig(); 
+		dc->setParameter( XMLUni::fgDOMWRTDiscardDefaultContent,true); 
+		dc->setParameter( XMLUni::fgDOMWRTEntities,true);
+		XMLCh* theXMLString_Unicode = pSerializer->writeToString(xml); 
+		std::string xmlBodyString = xml_utils::xml_translate_string(theXMLString_Unicode);
+		request->xmlBody = xmlBodyString;
+
 		try {
  			parseBML( bmlElem, request, scene );
 			// make sure that the request id isn't in the pending interrupt list

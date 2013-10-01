@@ -60,6 +60,7 @@
 #include <sb/SBSteerAgent.h>
 #include <sb/SBCommandManager.h>
 #include <sbm/PPRAISteeringAgent.h>
+#include <sbm/ParserOpenCOLLADA.h>
 
 using namespace std;
 using namespace BML;
@@ -1117,6 +1118,81 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 
 		LOG("DEBUG: BML::BmlRequest::realize(..): Sequence \"%s\": ", cleanup_seq_name.c_str());
 		cleanup_seq->print();
+	}
+
+
+	// Hacks for remove unnecessary gesture bmls and append real motion name to gesture bml, need to do it in a proper way.
+	// Added by Yuyu - (09-30-2013)
+	if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBML"))
+	{
+		//LOG("xml body: %s", request->xmlBody.c_str());
+		std::vector<std::string> gestureBMLAnimations;
+		std::vector<bool>		skippedGestures;
+		// fill all the informations for the behaviors
+		for( VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behav_end;  ++i ) 
+		{
+			BehaviorRequest* behavior = (*i).get();
+			GestureRequest* gRequest = dynamic_cast<GestureRequest*> (behavior);
+			if (!gRequest)
+				continue;
+
+			MeCtMotion* motionCt = dynamic_cast<MeCtMotion*> (gRequest->anim_ct);
+			gestureBMLAnimations.push_back(motionCt->motion()->getName());
+			//LOG("gesture final animation: %s, %s", motionCt->motion()->getName().c_str(), gRequest->filtered? "true" : "false");
+			skippedGestures.push_back(gRequest->filtered);
+		}
+
+		DOMDocument* xmlDoc = xml_utils::parseMessageXml(bp->getXMLParser(), xmlBody.c_str());
+		DOMNode* bmlNode = ParserOpenCOLLADA::getNode("bml", xmlDoc);
+		const DOMNodeList* nodeList = bmlNode->getChildNodes();
+		int numGestures = 0;
+		for (unsigned int i = 0; i < nodeList->getLength(); i++)
+		{
+			DOMElement* curNode = dynamic_cast<DOMElement*> (nodeList->item(i));
+			if (!curNode)
+				continue;
+			if (xml_utils::xml_translate_string(curNode->getNodeName()) == "gesture")
+			{
+				XMLCh* nameValue = xml_utils::xmlch_translate(gestureBMLAnimations[numGestures]);
+				curNode->setAttribute(L"name", nameValue);
+				if (skippedGestures[numGestures])
+				{
+					//LOG("remove gesture with motion name %s", gestureBMLAnimations[numGestures].c_str());
+					bmlNode->removeChild(curNode);
+				}
+				numGestures++;
+			}
+		}
+
+		//LOG("number of gestures: %d %d", gestureBMLAnimations.size(), numGestures);
+		DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(XMLString::transcode("core"));
+		DOMLSSerializer* pSerializer = ((DOMImplementationLS*)pDOMImplementation)->createLSSerializer();
+		DOMConfiguration* dc = pSerializer->getDomConfig(); 
+		dc->setParameter( XMLUni::fgDOMWRTDiscardDefaultContent,true); 
+		dc->setParameter( XMLUni::fgDOMWRTEntities,true);
+		XMLCh* outputFile = XMLString::transcode(SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
+		DOMLSOutput* xmlstream = ((DOMImplementationLS*)pDOMImplementation)->createLSOutput();
+		xmlstream->setSystemId(outputFile);
+		try
+		{
+			if (!pSerializer->write(xmlDoc, xmlstream))
+			{
+				LOG("There was a problem writing processed BML file: %s", SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
+			}
+			xmlstream->release();
+		}
+		catch (...)
+		{
+			LOG("When writing file %s, an exception occurred.", SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
+			delete xmlstream;
+		}
+		
+		/*
+		XMLCh* theXMLString_Unicode = pSerializer->writeToString(xmlDoc); 
+		std::string outputString = xml_translate_string(theXMLString_Unicode);
+		LOG("Saved out xml is: %s", outputString.c_str());
+		*/
+		pSerializer->release();
 	}
 }
 

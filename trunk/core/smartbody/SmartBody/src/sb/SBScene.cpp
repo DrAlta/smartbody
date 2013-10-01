@@ -189,7 +189,9 @@ void SBScene::initialize()
 	createBoolAttribute("enableConsoleLogging",false,true,"",70,false,false,false,"Use SmartBody's internal audio player.");
 	createBoolAttribute("warnDeprecatedCommands",false,true,"",600,false,false,false,"Shows a warning when a deprecated command is being used.");
 	createBoolAttribute("enableFaceShader",false,true,"",70,false,false,false,"Enable the face shader for higher quality rendering.");
-	
+	createBoolAttribute("enableExportProcessedBML",true,true,"",80,false,false,false,"Enable exporting of bml after realization.");
+	createStringAttribute("processedBMLPath","./processedXML.xml",true,"",90,false,false,false,"path of exported bml file after realization.");
+
 	vhcl::Log::g_log.RemoveAllListeners();
 	ForwardLogListener* forwardListener = new ForwardLogListener();
 	vhcl::Log::g_log.AddListener(forwardListener);
