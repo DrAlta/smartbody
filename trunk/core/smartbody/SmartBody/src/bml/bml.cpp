@@ -1154,7 +1154,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			if (xml_utils::xml_translate_string(curNode->getNodeName()) == "gesture")
 			{
 				XMLCh* nameValue = xml_utils::xmlch_translate(gestureBMLAnimations[numGestures]);
-				curNode->setAttribute(L"name", nameValue);
+				curNode->setAttribute( BMLDefs::ATTR_NAME, nameValue);
 				if (skippedGestures[numGestures])
 				{
 					//LOG("remove gesture with motion name %s", gestureBMLAnimations[numGestures].c_str());
