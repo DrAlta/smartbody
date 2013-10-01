@@ -102,6 +102,7 @@ namespace BML {
 #if VRAGENTBML_USES_RECIPIENT
 		const std::string    recipientId;
 #endif
+		std::string			 xmlBody;
 		const std::string    msgId;
 		std::string          localId;
 		const XERCES_CPP_NAMESPACE::DOMDocument*		 doc;
