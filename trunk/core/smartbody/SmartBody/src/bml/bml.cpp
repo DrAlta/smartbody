@@ -364,17 +364,18 @@ void BmlRequest::gestureRequestProcess()
 	SBJoint* rWrist = actor->getSkeleton()->getJointByMappedName("r_wrist");
 	for (size_t i = 0; i < gestures.size(); ++i)
 	{
-		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
-		{
-			LOG("...");
-			LOG("Processing %s", gestures[i]->anim_ct->getName().c_str());
-		}
 		// get motion information	
 		MeCtMotion* motion_ct = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
 		SkMotion* motion = motion_ct->motion();
 		SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
 		double motionStroke = motion->time_stroke_emphasis();
 		double motionRelax = motion->time_relax();
+
+		if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+		{
+			LOG("...");
+			LOG("Processing %s (motion name %s)", gestures[i]->anim_ct->getName().c_str(), motion->getName().c_str());
+		}
 
 		// step 1: adjust gesture's relax time
 		double currGestureStartAt = (double)gestures[i]->behav_syncs.sync_start()->time();
@@ -644,7 +645,8 @@ void BmlRequest::gestureRequestProcess()
 		{
 //			if (gestures[i]->filtered)
 //				continue;
-			LOG("Gesture %s's timing: %f, %f, %f, %f, %f, %f, %f", gestures[i]->anim_ct->getName().c_str(), 
+			MeCtMotion* final_motion_ct = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
+			LOG("Gesture %s's (%s) timing: %f, %f, %f, %f, %f, %f, %f", final_motion_ct->motion()->getName().c_str(), gestures[i]->anim_ct->getName().c_str(), 
 				gestures[i]->behav_syncs.sync_start()->time(), gestures[i]->behav_syncs.sync_ready()->time(),
 				gestures[i]->behav_syncs.sync_stroke_start()->time(), gestures[i]->behav_syncs.sync_stroke()->time(), gestures[i]->behav_syncs.sync_stroke_end()->time(),
 				gestures[i]->behav_syncs.sync_relax()->time(), gestures[i]->behav_syncs.sync_end()->time());
@@ -1138,7 +1140,8 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 
 			MeCtMotion* motionCt = dynamic_cast<MeCtMotion*> (gRequest->anim_ct);
 			gestureBMLAnimations.push_back(motionCt->motion()->getName());
-			//LOG("gesture final animation: %s, %s", motionCt->motion()->getName().c_str(), gRequest->filtered? "true" : "false");
+			if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBMLLOG"))
+				LOG("BML gesture use animation: %s, filtered: %s)", motionCt->motion()->getName().c_str(), gRequest->filtered? "true" : "false");
 			skippedGestures.push_back(gRequest->filtered);
 		}
 
@@ -1151,20 +1154,30 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			DOMElement* curNode = dynamic_cast<DOMElement*> (nodeList->item(i));
 			if (!curNode)
 				continue;
+
+			if (xml_translate_string(curNode->getAttribute(BMLDefs::ATTR_FILTERED)) == "true")
+			{
+				bmlNode->removeChild(curNode);
+				continue;
+			}
+
 			if (xml_utils::xml_translate_string(curNode->getNodeName()) == "gesture")
 			{
 				XMLCh* nameValue = xml_utils::xmlch_translate(gestureBMLAnimations[numGestures]);
 				curNode->setAttribute( BMLDefs::ATTR_NAME, nameValue);
 				if (skippedGestures[numGestures])
 				{
-					//LOG("remove gesture with motion name %s", gestureBMLAnimations[numGestures].c_str());
+					if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBMLLOG"))
+						LOG("remove gesture with motion name %s", gestureBMLAnimations[numGestures].c_str());
 					bmlNode->removeChild(curNode);
 				}
 				numGestures++;
 			}
 		}
-
-		//LOG("number of gestures: %d %d", gestureBMLAnimations.size(), numGestures);
+		if (gestureBMLAnimations.size() != numGestures)
+		{
+			LOG("ERROR saving out processsed bmls. Number of gestures: %d %d", gestureBMLAnimations.size(), numGestures);
+		}
 		DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(XMLString::transcode("core"));
 		DOMLSSerializer* pSerializer = ((DOMImplementationLS*)pDOMImplementation)->createLSSerializer();
 		DOMConfiguration* dc = pSerializer->getDomConfig(); 
@@ -1744,6 +1757,7 @@ void GestureRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* sc
 		}
 		vhcl::Tokenize(joints, jointVec);
 		SkMotion* holdM = motion->buildPoststrokeHoldMotion((float)holdTime, jointVec, scale, freq, NULL);
+		holdM->setName(motion->getName());	// even after holding, the name should be the same
 		SmartBody::SBMotion* sbHoldM = dynamic_cast<SmartBody::SBMotion*>(holdM);
 		if (sbHoldM)
 			sbHoldM->setMotionSkeletonName(sbMotion->getMotionSkeletonName());

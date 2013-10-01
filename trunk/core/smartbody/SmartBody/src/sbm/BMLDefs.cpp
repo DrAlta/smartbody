@@ -10,6 +10,7 @@ XMLCh* BMLDefs::ATTR_NAME = NULL;
 XMLCh* BMLDefs::ATTR_LEVEL = NULL;
 XMLCh* BMLDefs::ATTR_HANDLE = NULL;
 XMLCh* BMLDefs::ATTR_LEXEME = NULL;
+XMLCh* BMLDefs::ATTR_FILTERED = NULL;
 
 XMLCh* BMLDefs::ATTR_START = NULL;
 XMLCh* BMLDefs::ATTR_READY = NULL;
@@ -375,6 +376,7 @@ BMLDefs::BMLDefs()
 	ATTR_LEVEL = XMLString::transcode("level");
 	ATTR_HANDLE = XMLString::transcode("sbm:handle");
 	ATTR_LEXEME = XMLString::transcode("lexeme");
+	ATTR_FILTERED = XMLString::transcode("filtered");
 
 	ATTR_START = XMLString::transcode("start");
 	ATTR_READY = XMLString::transcode("ready");

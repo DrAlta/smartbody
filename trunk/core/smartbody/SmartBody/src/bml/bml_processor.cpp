@@ -307,18 +307,22 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* sc
 #else
 		BmlRequestPtr request( createBmlRequest( bpMsg.actor, bpMsg.actorId, bpMsg.requestId, std::string(bpMsg.msgId), xml ) );
 #endif
-		// Added by Yuyu (09-30-2013) to record the whole bml message.
-		DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(XMLString::transcode("core"));
-		DOMLSSerializer* pSerializer = ((DOMImplementationLS*)pDOMImplementation)->createLSSerializer();
-		DOMConfiguration* dc = pSerializer->getDomConfig(); 
-		dc->setParameter( XMLUni::fgDOMWRTDiscardDefaultContent,true); 
-		dc->setParameter( XMLUni::fgDOMWRTEntities,true);
-		XMLCh* theXMLString_Unicode = pSerializer->writeToString(xml); 
-		std::string xmlBodyString = xml_utils::xml_translate_string(theXMLString_Unicode);
-		request->xmlBody = xmlBodyString;
 
 		try {
  			parseBML( bmlElem, request, scene );
+
+			// Added by Yuyu (09-30-2013) to record the whole bml message after parsing
+			DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(XMLString::transcode("core"));
+			DOMLSSerializer* pSerializer = ((DOMImplementationLS*)pDOMImplementation)->createLSSerializer();
+			DOMConfiguration* dc = pSerializer->getDomConfig(); 
+			dc->setParameter( XMLUni::fgDOMWRTDiscardDefaultContent,true); 
+			dc->setParameter( XMLUni::fgDOMWRTEntities,true);
+			XMLCh* theXMLString_Unicode = pSerializer->writeToString(xml); 
+			std::string xmlBodyString = xml_utils::xml_translate_string(theXMLString_Unicode);
+			request->xmlBody = xmlBodyString;
+			if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBMLLOG"))
+				LOG("xmlbody %s", xmlBodyString.c_str());
+
 			// make sure that the request id isn't in the pending interrupt list
 			std::map<std::string, double>::iterator isPendingInterruptIter = pendingInterrupts.find(bpMsg.requestId);
 			if (isPendingInterruptIter != pendingInterrupts.end())
@@ -533,6 +537,11 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				err_msg << "> (behavior #"<<behavior_ordinal<<") failed to parse.";
 
 				throw BML::BmlException( err_msg.str().c_str() );
+			}
+			else
+			{
+				// Added by Yuyu 10-01-2013, if the behavior is NULL, filter out
+				child->setAttribute(L"filtered", L"true");
 			}
 		}
 
