@@ -1183,7 +1183,20 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		DOMConfiguration* dc = pSerializer->getDomConfig(); 
 		dc->setParameter( XMLUni::fgDOMWRTDiscardDefaultContent,true); 
 		dc->setParameter( XMLUni::fgDOMWRTEntities,true);
-		XMLCh* outputFile = XMLString::transcode(SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
+		std::stringstream ss;
+		int xmlCounter = bp->getExportXMLCounter();
+		xmlCounter++;
+		bp->setExportXMLCounter(xmlCounter);
+		unsigned foundExtension = SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").rfind(".xml");
+		if (foundExtension != std::string::npos)
+		{
+			int strLength = SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").size();
+			std::string fileNameWOExt = SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").substr(0, strLength - 4);
+			ss << fileNameWOExt << "_" << xmlCounter << ".xml";
+		}
+		else
+			LOG("export BML path is not right %s",SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
+		XMLCh* outputFile = XMLString::transcode(ss.str().c_str());
 		DOMLSOutput* xmlstream = ((DOMImplementationLS*)pDOMImplementation)->createLSOutput();
 		xmlstream->setSystemId(outputFile);
 		try

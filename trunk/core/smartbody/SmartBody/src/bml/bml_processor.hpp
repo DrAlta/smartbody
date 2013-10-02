@@ -99,6 +99,7 @@ namespace BML {
 		float ct_speed_max;
 
 		int idCounter;
+		int exportXMLCounter;
 
 	public:
 		//////////////////////////////////////////////////////////////////////////
@@ -214,6 +215,9 @@ namespace BML {
 		void* requestData;
 
 		XercesDOMParser* getXMLParser();
+
+		void setExportXMLCounter(int i)	{ exportXMLCounter = i; }
+		int getExportXMLCounter()	{ return exportXMLCounter; }
 
 	protected:
 		//////////////////////////////////////////////////////////////////////////
