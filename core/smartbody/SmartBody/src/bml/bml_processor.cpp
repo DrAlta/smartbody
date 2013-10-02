@@ -204,6 +204,8 @@ BML::Processor::Processor()
 	} catch(...) {
 		LOG("ERROR: BML Processor:  UNKNOWN EXCEPTION DURING CONSTRUCTOR.     <<==================");
 	}
+
+	exportXMLCounter = 0;
 }
 
 void BML::Processor::registerRequestCallback(void (*cb)(BmlRequest* request, void* data), void* data)
@@ -321,7 +323,10 @@ void BML::Processor::bml_request( BMLProcessorMsg& bpMsg, SmartBody::SBScene* sc
 			std::string xmlBodyString = xml_utils::xml_translate_string(theXMLString_Unicode);
 			request->xmlBody = xmlBodyString;
 			if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBMLLOG"))
+			{
+				LOG("%s, %s", request->msgId.c_str(), request->localId.c_str());
 				LOG("xmlbody %s", xmlBodyString.c_str());
+			}
 
 			// make sure that the request id isn't in the pending interrupt list
 			std::map<std::string, double>::iterator isPendingInterruptIter = pendingInterrupts.find(bpMsg.requestId);
