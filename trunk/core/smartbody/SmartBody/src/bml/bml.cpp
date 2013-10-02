@@ -1145,11 +1145,18 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 			skippedGestures.push_back(gRequest->filtered);
 		}
 
+
+		DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(XMLString::transcode("core"));
+		DOMLSSerializer* pSerializer = ((DOMImplementationLS*)pDOMImplementation)->createLSSerializer();
+		DOMConfiguration* dc = pSerializer->getDomConfig(); 
+		dc->setParameter( XMLUni::fgDOMWRTDiscardDefaultContent,true); 
+		dc->setParameter( XMLUni::fgDOMWRTEntities,true);
+
 		DOMDocument* xmlDoc = xml_utils::parseMessageXml(bp->getXMLParser(), xmlBody.c_str());
 		DOMNode* bmlNode = ParserOpenCOLLADA::getNode("bml", xmlDoc);
 		const DOMNodeList* nodeList = bmlNode->getChildNodes();
 		int numGestures = 0;
-		for (unsigned int i = 0; i < nodeList->getLength(); i++)
+		for (unsigned int i = 0; i < nodeList->getLength(); ++i)
 		{
 			DOMElement* curNode = dynamic_cast<DOMElement*> (nodeList->item(i));
 			if (!curNode)
@@ -1157,7 +1164,9 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 
 			if (xml_translate_string(curNode->getAttribute(BMLDefs::ATTR_FILTERED)) == "true")
 			{
-				bmlNode->removeChild(curNode);
+				XMLCh* curNodeString = pSerializer->writeToString(curNode);
+				DOMComment* commentNode = xmlDoc->createComment(curNodeString);
+				bmlNode->replaceChild(commentNode, curNode);
 				continue;
 			}
 
@@ -1169,20 +1178,20 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 				{
 					if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBMLLOG"))
 						LOG("remove gesture with motion name %s", gestureBMLAnimations[numGestures].c_str());
-					bmlNode->removeChild(curNode);
+					XMLCh* curNodeString = pSerializer->writeToString(curNode);
+					DOMComment* commentNode = xmlDoc->createComment(curNodeString);
+					bmlNode->replaceChild(commentNode, curNode);
 				}
 				numGestures++;
+				continue;
 			}
 		}
+
 		if (gestureBMLAnimations.size() != numGestures)
 		{
 			LOG("ERROR saving out processsed bmls. Number of gestures: %d %d", gestureBMLAnimations.size(), numGestures);
 		}
-		DOMImplementation* pDOMImplementation = DOMImplementationRegistry::getDOMImplementation(XMLString::transcode("core"));
-		DOMLSSerializer* pSerializer = ((DOMImplementationLS*)pDOMImplementation)->createLSSerializer();
-		DOMConfiguration* dc = pSerializer->getDomConfig(); 
-		dc->setParameter( XMLUni::fgDOMWRTDiscardDefaultContent,true); 
-		dc->setParameter( XMLUni::fgDOMWRTEntities,true);
+
 		std::stringstream ss;
 		int xmlCounter = bp->getExportXMLCounter();
 		xmlCounter++;
