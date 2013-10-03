@@ -281,7 +281,7 @@ rapidxml::xml_node<>* ParserCOLLADAFast::getNode(const std::string& nodeName, ra
 	return NULL;
 }
 
-rapidxml::xml_node<>* ParserCOLLADAFast::getNode(const std::string& nodeName, rapidxml::xml_node<>* node, int& curDepth, int maximumDepth)
+rapidxml::xml_node<>* ParserCOLLADAFast::getNode(const std::string& nodeName, rapidxml::xml_node<>* node, int curDepth, int maximumDepth)
 {
 	if (node && strcmp(node->name(), nodeName.c_str()) == 0)
 		return node;
@@ -629,7 +629,7 @@ void ParserCOLLADAFast::parseLibraryVisualScenes(rapidxml::xml_node<>* node, SkS
 	}	
 }
 
-void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent)
+void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent, bool hasRootJoint)
 {
 	//const DOMNodeList* list = node->getChildNodes();
 	rapidxml::xml_node<>* curNode = node->first_node();
@@ -661,11 +661,27 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 			if (typeAt)
 				typeAttr = typeAt->value();
 			
-			rapidxml::xml_node<>* tempMaterialNode = ParserCOLLADAFast::getNode("bind_material", childNode);
+			int curDepth = 0;
+			rapidxml::xml_node<>* tempMaterialNode = ParserCOLLADAFast::getNode("bind_material", childNode, curDepth, 2);
 			
-
-			if (typeAttr == "JOINT" || (nameAttr.find("Bip")!= std::string::npos && skeleton.root() == NULL) )
+			// process this node as a joint if it's a non-geometry node
+			bool treatAsJoint = false;
+			if (typeAttr == "NODE" && hasRootJoint)
 			{
+				if (nameAttr == "hair3")
+				{
+					int y = 0;
+				}
+				treatAsJoint = true;
+				curDepth = 0;
+				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, curDepth, 1);
+				if (geometryNode)
+					treatAsJoint = false;
+			}
+			if (treatAsJoint || typeAttr == "JOINT" || (nameAttr.find("Bip")!= std::string::npos && skeleton.root() == NULL) )
+			{
+				hasRootJoint = true;
+
 				int index = -1;
 				if (parent != NULL)	
 					index = parent->index();
@@ -825,11 +841,12 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 				jointQuat->prerot(quat);
 				SrQuat jorientQ = SrQuat(jorientMat);
 				jointQuat->orientation(jorientQ);
-				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, joint);
+				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, joint, hasRootJoint);
 			}
 			else if (typeAttr == "NODE" || tempMaterialNode)
 			{
-				rapidxml::xml_node<>* translateNode = ParserCOLLADAFast::getNode("translate", childNode);
+				int curDepth = 0;
+				rapidxml::xml_node<>* translateNode = ParserCOLLADAFast::getNode("translate", childNode, curDepth, 1);
 				SrVec offset;
 				if (translateNode)
 				{
@@ -840,7 +857,8 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 					offset.y = (float)atof(tokens[1].c_str()) * scale;
 					offset.z = (float)atof(tokens[2].c_str()) * scale;
 				}
-				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode);
+				curDepth = 0;
+				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, curDepth, 1);
 				if (geometryNode)	// might need to add support for rotation as well later when the case showed up
 				{
 					rapidxml::xml_attribute<>* geometryNodeAt= geometryNode->first_attribute("url");
@@ -863,7 +881,8 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 					}
 				}
 
-				rapidxml::xml_node<>* materialNode = ParserCOLLADAFast::getNode("bind_material", childNode);
+				curDepth = 0;
+				rapidxml::xml_node<>* materialNode = ParserCOLLADAFast::getNode("bind_material", childNode, curDepth, 2);
 				if (materialNode)
 				{
 					rapidxml::xml_node<>* techniqueCommonNode = ParserCOLLADAFast::getNode("technique_common", materialNode);
@@ -897,10 +916,10 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 						}
 					}
 				}
-				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, parent);
+				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, parent, hasRootJoint);
 			}
 			else
-				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, parent);
+				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, parent, hasRootJoint);
 		}
 
 		curNode = curNode->next_sibling();

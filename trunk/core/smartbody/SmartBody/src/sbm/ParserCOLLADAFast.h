@@ -58,7 +58,7 @@ class ParserCOLLADAFast
 {
 	public:
 		static void getChildNodes(const std::string& nodeName, rapidxml::xml_node<>* node, std::vector<rapidxml::xml_node<>*>& children );
-		static rapidxml::xml_node<>* getNode(const std::string& nodeName, rapidxml::xml_node<>* node, int& curDepth, int maximumDepth);
+		static rapidxml::xml_node<>* getNode(const std::string& nodeName, rapidxml::xml_node<>* node, int curDepth, int maximumDepth);
 		static rapidxml::xml_node<>* getNode(const std::string& nodeName, rapidxml::xml_node<>* node);
 
 		//static rapidxml::xml_node<>* getNode(const std::string& nodeName, std::string fileName, int maximumDepth);
@@ -76,7 +76,7 @@ class ParserCOLLADAFast
 		// parse nodes
 		static void parseLibraryControllers(rapidxml::xml_node<>* node, const char* char_name, float scaleFactor, std::string jointPrefix);
 		static void parseLibraryVisualScenes(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name);
-		static void parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL);
+		static void parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL, bool hasRootJoint = false);
 		static void parseLibraryAnimations(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, bool zaxis = false);
 
 		static void parseNodeAnimation(rapidxml::xml_node<>* node1, std::map<std::string, ColladaFloatArrayFast > &floatArrayMap, float scale, std::map<std::string, ColladaSamplerFast > &samplerMap, std::vector<ColladChannelFast> &channelSamplerNameMap, SkSkeleton &skeleton );
