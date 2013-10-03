@@ -310,7 +310,7 @@ DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node)
 	return child;
 }
 
-DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node, int& curDepth, int maximumDepth)
+DOMNode* ParserOpenCOLLADA::getNode(const std::string& nodeName, DOMNode* node, int curDepth, int maximumDepth)
 {
 	int type = node->getNodeType();
 	if (type ==  DOMNode::ELEMENT_NODE)
@@ -806,7 +806,7 @@ void ParserOpenCOLLADA::parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skel
 	}	
 }
 
-void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent)
+void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent, bool hasRootJoint)
 {
 	//const DOMNodeList* list = node->getChildNodes();
 	DOMNode* curNode = node->getFirstChild();
@@ -838,11 +838,29 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 			DOMNode* typeNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_TYPE);
 			std::string typeAttr = "";
 			
-			DOMNode* tempMaterialNode = ParserOpenCOLLADA::getNode("bind_material", childNode);
 			if (typeNode)
 				xml_utils::xml_translate(&typeAttr, typeNode->getNodeValue());
-			if (typeAttr == "JOINT" || (nameAttr.find("Bip")!= std::string::npos && skeleton.root() == NULL) )
+
+			DOMNode* tempMaterialNode = ParserOpenCOLLADA::getNode("bind_material", childNode, 0, 2);
+
+			// process this node as a joint if it's a non-geometry node
+			bool treatAsJoint = false;
+			if (typeAttr == "NODE" && hasRootJoint)
 			{
+				if (nameAttr == "hair3")
+				{
+					int y = 0;
+				}
+				treatAsJoint = true;
+				DOMNode* geometryNode = ParserOpenCOLLADA::getNode("instance_geometry", childNode, 0, 1);
+				if (geometryNode)
+					treatAsJoint = false;
+			}
+
+
+			if (treatAsJoint || typeAttr == "JOINT" || (nameAttr.find("Bip")!= std::string::npos && skeleton.root() == NULL) )
+			{
+				hasRootJoint = true;
 				int index = -1;
 				if (parent != NULL)	
 					index = parent->index();
@@ -1011,11 +1029,11 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				jointQuat->prerot(quat);
 				SrQuat jorientQ = SrQuat(jorientMat);
 				jointQuat->orientation(jorientQ);
-				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, joint);
+				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, joint, hasRootJoint);
 			}
 			else if (typeAttr == "NODE" || tempMaterialNode)
 			{
-				DOMNode* translateNode = ParserOpenCOLLADA::getNode("translate", childNode);
+				DOMNode* translateNode = ParserOpenCOLLADA::getNode("translate", childNode, 0, 1);
 				SrVec offset;
 				if (translateNode)
 				{
@@ -1027,7 +1045,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					offset.y = (float)atof(tokens[1].c_str()) * scale;
 					offset.z = (float)atof(tokens[2].c_str()) * scale;
 				}
-				DOMNode* geometryNode = ParserOpenCOLLADA::getNode("instance_geometry", childNode);
+				DOMNode* geometryNode = ParserOpenCOLLADA::getNode("instance_geometry", childNode, 0, 1);
 				if (geometryNode)	// might need to add support for rotation as well later when it happens
 				{
 					DOMNamedNodeMap* geometryNodeAttr = geometryNode->getAttributes();
@@ -1051,7 +1069,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					}
 					
 				}
-				DOMNode* materialNode = ParserOpenCOLLADA::getNode("bind_material", childNode);
+				DOMNode* materialNode = ParserOpenCOLLADA::getNode("bind_material", childNode, 0, 2);
 				if (materialNode)
 				{
 					DOMNode* techniqueCommonNode = ParserOpenCOLLADA::getNode("technique_common", materialNode);
@@ -1089,10 +1107,10 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 						}
 					}
 				}
-				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, parent);
+				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, parent, hasRootJoint);
 			}
 			else
-				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, parent);
+				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, parent, hasRootJoint);
 		}
 
 		curNode = curNode->getNextSibling();

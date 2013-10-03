@@ -57,7 +57,7 @@ class ParserOpenCOLLADA
 {
 	public:
 		static void getChildNodes(const std::string& nodeName, DOMNode* node, std::vector<DOMNode*>& childs );
-		static DOMNode* getNode(const std::string& nodeName, DOMNode* node, int& curDepth, int maximumDepth);
+		static DOMNode* getNode(const std::string& nodeName, DOMNode* node, int curDepth, int maximumDepth);
 		static DOMNode* getNode(const std::string& nodeName, DOMNode* node);
 		static DOMNode* getNode(const std::string& nodeName, std::string fileName, int maximumDepth);
 		static DOMNode* getNode(const std::string& nodeName, std::string fileName);
@@ -73,7 +73,7 @@ class ParserOpenCOLLADA
 		// parse nodes
 		static void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFactor, std::string jointPrefix);
 		static void parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name);
-		static void parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL);
+		static void parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL, bool hasRootJoint = false);
 		static void parseLibraryAnimations(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, bool zaxis = false);
 
 		static void parseNodeAnimation(DOMNode* node1, std::map<std::string, ColladaFloatArray > &floatArrayMap, float scale, std::map<std::string, ColladaSampler > &samplerMap, std::vector<ColladChannel> &channelSamplerNameMap, SkSkeleton &skeleton );
