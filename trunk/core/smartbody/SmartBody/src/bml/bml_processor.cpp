@@ -546,7 +546,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 			else
 			{
 				// Added by Yuyu 10-01-2013, if the behavior is NULL, filter out
-				child->setAttribute(L"filtered", L"true");
+				child->setAttribute(BMLDefs::ATTR_FILTERED, BMLDefs::ATTR_TRUE);
 			}
 		}
 
