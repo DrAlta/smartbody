@@ -2461,7 +2461,9 @@ int ParserCOLLADAFast::getNodeAttributeInt( rapidxml::xml_node<>* node, const st
 void ParserCOLLADAFast::parseNodeAnimation(rapidxml::xml_node<>* node1, std::map<std::string, ColladaFloatArrayFast > &floatArrayMap, float scale, std::map<std::string, ColladaSamplerFast > &samplerMap, std::vector<ColladChannelFast> &channelSamplerNameMap, SkSkeleton &skeleton )
 {
 	rapidxml::xml_attribute<>* attribute = node1->first_attribute("id");
-	std::string idAttr = attribute->value();
+	std::string idAttr = "";
+	if (attribute)
+		idAttr = attribute->value();
 
 	//const DOMNodeList* list1 = node1->getChildNodes();	
 	rapidxml::xml_node<>* curNode1 = node1->first_node();	
