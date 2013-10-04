@@ -2357,8 +2357,8 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 					imageName = pictureId2Name[imageId];
 
 				std::string imageFile = pictureId2File[imageId];
-				SrString mapKaName(imageFile.c_str());
-				std::string texFile = (const char*) mapKaName;
+				std::string mapKaName = imageFile;
+				std::string texFile = mapKaName;
 				std::string mtlName = mnames.top();
 #if (BOOST_VERSION > 104400)
 				std::string fileExt = boost::filesystem::extension(texFile);
@@ -2391,13 +2391,16 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 			if (ambientNode)
 			{
 				rapidxml::xml_node<>* colorNode = ParserCOLLADAFast::getNode("color", ambientNode);
-				std::string color = colorNode->value();
-				std::vector<std::string> tokens;
-				vhcl::Tokenize(color, tokens, " \n");
-				float w = 1;
-				if (tokens.size() == 4)
-					w = (float)atof(tokens[3].c_str());
-				M.top().ambient = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
+				if (colorNode)
+				{
+					std::string color = colorNode->value();
+					std::vector<std::string> tokens;
+					vhcl::Tokenize(color, tokens, " \n");
+					float w = 1;
+					if (tokens.size() == 4)
+						w = (float)atof(tokens[3].c_str());
+					M.top().ambient = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
+				}
 			}
 			rapidxml::xml_node<>* transparentNode = ParserCOLLADAFast::getNode("transparent", node);
 			if (transparentNode)
