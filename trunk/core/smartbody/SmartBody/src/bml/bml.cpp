@@ -1196,6 +1196,9 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		int xmlCounter = bp->getExportXMLCounter();
 		xmlCounter++;
 		bp->setExportXMLCounter(xmlCounter);
+
+#if 0
+		// It's better to add the counter from outside inside from inside SmartBody
 		unsigned foundExtension = SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").rfind(".xml");
 		if (foundExtension != std::string::npos)
 		{
@@ -1206,6 +1209,8 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		else
 			LOG("export BML path is not right %s",SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
 		XMLCh* outputFile = XMLString::transcode(ss.str().c_str());
+#endif
+		XMLCh* outputFile = XMLString::transcode(SmartBody::SBScene::getScene()->getStringAttribute("processedBMLPath").c_str());
 		DOMLSOutput* xmlstream = ((DOMImplementationLS*)pDOMImplementation)->createLSOutput();
 		xmlstream->setSystemId(outputFile);
 		try
