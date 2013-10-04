@@ -359,6 +359,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, cons
 	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->getCharacter( char_name );
 	//const DOMNodeList* list = node->getChildNodes();
 	rapidxml::xml_node<>* curNode = node->first_node();
+	std::map<std::string,std::string> morphTargetMeshMap;
 	while (curNode)
 		//for (unsigned int c = 0; c < list->getLength(); c++)
 	{
@@ -391,6 +392,11 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, cons
 						std::string skinSource = skinAttr->value();
 						skinSource = skinSource.substr(1, skinSource.size() - 1);
 						SkinWeight* skinWeight = new SkinWeight();
+
+						// if there is a morph target for this skinSource name, use the source mesh from that morph target instead
+						if (morphTargetMeshMap.find(skinSource) != morphTargetMeshMap.end())
+							skinSource = morphTargetMeshMap[skinSource];
+
 						skinWeight->sourceMesh = skinSource;
 
 						// further for children
@@ -549,7 +555,8 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, cons
 						std::string morphName = morphAttr->value();
 						morphName = morphName.substr(1, morphName.size() - 1);
 						std::string morphFullName = morphName + "-morph";
-
+						// store the source mesh name for the morph
+						morphTargetMeshMap[skinId] = morphName;
 						// futhur for children
 						//const DOMNodeList* childListOfMorph = childNode->getChildNodes();
 						rapidxml::xml_node<>* childOfMorphCurNode = childNode->first_node();
