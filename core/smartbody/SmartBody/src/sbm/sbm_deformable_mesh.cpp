@@ -248,6 +248,29 @@ SkinWeight* DeformableMesh::getSkinWeight(const std::string& skinSourceName)
 	return NULL;
 }
 
+int DeformableMesh::getValidSkinMesh(const std::string& meshName)
+{
+	std::string sourceMeshName = meshName;
+	std::map<std::string, std::vector<std::string> >::iterator iter = morphTargets.find(sourceMeshName);
+	if (iter != morphTargets.end())
+	{
+		int morphSize = iter->second.size();	
+		for (size_t morphCounter = 0; morphCounter < morphSize; morphCounter++)
+		{	
+			int pos;
+			int globalCounter = 0;
+			pos = getMesh(iter->second[morphCounter]);
+			if (pos != -1)
+			{
+				return pos;
+			}
+		}
+	}
+	else
+		return getMesh(sourceMeshName);
+	
+}
+
 int	DeformableMesh::getMesh(const std::string& meshName)
 {
 	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
@@ -310,7 +333,8 @@ bool DeformableMesh::buildVertexBuffer()
 		SkinWeight* skinWeight = skinWeights[skinCounter];		
 		int pos;
 		int globalCounter = 0;
-		pos = this->getMesh(skinWeight->sourceMesh);
+		//pos = this->getMesh(skinWeight->sourceMesh);
+		pos = this->getValidSkinMesh(skinWeight->sourceMesh);
 		if (pos != -1)
 		{
 			SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
@@ -373,7 +397,8 @@ bool DeformableMesh::buildVertexBuffer()
 		SkinWeight* skinWeight = skinWeights[skinCounter];		
 		int pos;
 		int globalCounter = 0;		
-		pos = this->getMesh(skinWeight->sourceMesh);
+		//pos = this->getMesh(skinWeight->sourceMesh);
+		pos = this->getValidSkinMesh(skinWeight->sourceMesh);
 		if (pos != -1)
 		{
 			SrSnModel* dMeshStatic = dMeshStatic_p[pos];
@@ -502,7 +527,8 @@ bool DeformableMesh::buildVertexBuffer()
 		SkinWeight* skinWeight = skinWeights[skinCounter];		
 		int pos;
 		int globalCounter = 0;
-		pos = this->getMesh(skinWeight->sourceMesh);
+		//pos = this->getMesh(skinWeight->sourceMesh);
+		pos = this->getValidSkinMesh(skinWeight->sourceMesh);
 		if (pos != -1)
 		{
 			SrSnModel* dMeshStatic = dMeshStatic_p[pos];

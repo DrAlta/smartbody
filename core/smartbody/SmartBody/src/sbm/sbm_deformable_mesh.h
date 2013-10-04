@@ -94,6 +94,7 @@ public:
 	virtual void update();
 	SkinWeight* getSkinWeight(const std::string& skinSourceName);
 	int	getMesh(const std::string& meshName);				// get the postion given the mesh name
+	int getValidSkinMesh(const std::string& meshName);
     /*! Set the visibility state of the deformable geometry,
         The integers mean 1:show, 0:hide, and -1:don't change the visibility state. */
 	void set_visibility(int deformableMesh);
