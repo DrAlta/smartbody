@@ -515,6 +515,7 @@ void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, const char* char_
 
 	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->getCharacter( char_name );
 	//const DOMNodeList* list = node->getChildNodes();
+	std::map<std::string,std::string> morphTargetMeshMap;
 	DOMNode* curNode = node->getFirstChild();
 	while (curNode)
 		//for (unsigned int c = 0; c < list->getLength(); c++)
@@ -553,6 +554,11 @@ void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, const char* char_
 						nodeStr(skinNode->getNodeValue(), skinSource);
 						skinSource = skinSource.substr(1, skinSource.size() - 1);
 						SkinWeight* skinWeight = new SkinWeight();
+
+						// if there is a morph target for this skinSource name, use the source mesh from that morph target instead
+						if (morphTargetMeshMap.find(skinSource) != morphTargetMeshMap.end())
+							skinSource = morphTargetMeshMap[skinSource];
+
 						skinWeight->sourceMesh = skinSource;
 
 						// further for children
@@ -721,7 +727,7 @@ void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, const char* char_
 						nodeStr(morphNode->getNodeValue(), morphName);
 						morphName = morphName.substr(1, morphName.size() - 1);
 						std::string morphFullName = morphName + "-morph";
-
+						morphTargetMeshMap[skinId] = morphName;
 						// futhur for children
 						//const DOMNodeList* childListOfMorph = childNode->getChildNodes();
 						DOMNode* childOfMorphCurNode = childNode->getFirstChild();
