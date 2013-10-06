@@ -167,7 +167,7 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		DOMDocument* doc = parser->getDocument();
 
 
-		DOMNode* asset = getNode("asset", doc);
+		DOMNode* asset = getNode("asset", doc, 0, 1);
 		if (asset)
 		{
 			DOMNode* upNode = getNode("up_axis", asset);
@@ -184,8 +184,7 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 			}
 		}
 
-		int depth = 0;
-		DOMNode* skNode = getNode("library_visual_scenes", doc, depth, 2);
+		DOMNode* skNode = getNode("library_visual_scenes", doc, 0, 2);
 		if (!skNode)
 		{
 			LOG("ParserOpenCOLLADA::parse ERR: no skeleton info contained in this file");
@@ -215,8 +214,7 @@ bool ParserOpenCOLLADA::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 			}
 		}		
 		skeleton.updateGlobalMatricesZero();
-		depth = 0;
-		DOMNode* skmNode = getNode("library_animations", doc, depth, 2);
+		DOMNode* skmNode = getNode("library_animations", doc, 0, 2);
 		if (!skmNode)
 		{
 		//	LOG("ParserOpenCOLLADA::parse WARNING: no motion info contained in this file");
@@ -848,10 +846,6 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 			bool treatAsJoint = false;
 			if (typeAttr == "NODE" && hasRootJoint)
 			{
-				if (nameAttr == "hair3")
-				{
-					int y = 0;
-				}
 				treatAsJoint = true;
 				DOMNode* geometryNode = ParserOpenCOLLADA::getNode("instance_geometry", childNode, 0, 1);
 				if (geometryNode)
@@ -1030,6 +1024,70 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 				jointQuat->prerot(quat);
 				SrQuat jorientQ = SrQuat(jorientMat);
 				jointQuat->orientation(jorientQ);
+
+				DOMNode* geometryNode = ParserOpenCOLLADA::getNode("instance_geometry", childNode, 0, 1);
+				if (geometryNode)	// might need to add support for rotation as well later when it happens
+				{
+					DOMNamedNodeMap* geometryNodeAttr = geometryNode->getAttributes();
+					DOMNode* urlAttr = geometryNodeAttr->getNamedItem(BML::BMLDefs::ATTR_URL);
+					std::string sidAttr;
+					xml_utils::xml_translate(&sidAttr, urlAttr->getNodeValue());
+					sidAttr = sidAttr.substr(1);
+					//LOG("translate: %f, %f, %f", offset.x, offset.y, offset.z);
+					//LOG("instance_geometry: %s", sidAttr.c_str());
+					SrModel* newModel = new SrModel();
+					newModel->name = SrString(sidAttr.c_str());
+					newModel->translate(offset);
+					if (!parent)
+					{
+						LOG("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
+						delete newModel;
+					}
+					else
+					{
+						parent->visgeo(newModel);
+					}
+					
+				}
+				DOMNode* materialNode = ParserOpenCOLLADA::getNode("bind_material", childNode, 0, 2);
+				if (materialNode)
+				{
+					DOMNode* techniqueCommonNode = ParserOpenCOLLADA::getNode("technique_common", materialNode);
+					if (techniqueCommonNode)
+					{
+						//const DOMNodeList* materialList = techniqueCommonNode->getChildNodes();
+						DOMNode* materialCurNode = techniqueCommonNode->getFirstChild();
+						while (materialCurNode)
+						//for (unsigned int ml = 0; ml < materialList->getLength(); ml++)
+						{
+							//DOMNode* childNode = materialList->item(ml);
+							DOMNode* childNode = materialCurNode;
+							std::string nodeName;
+							xml_utils::xml_translate(&nodeName, childNode->getNodeName());
+							if (nodeName == "instance_material")
+							{
+								DOMNamedNodeMap* materialAttr = childNode->getAttributes();
+								DOMNode* symbolNode = materialAttr->getNamedItem(BML::BMLDefs::ATTR_SYMBOL);
+								std::string materialName;
+								xml_utils::xml_translate(&materialName, symbolNode->getNodeValue());
+
+								DOMNode* targetNode = materialAttr->getNamedItem(BML::BMLDefs::ATTR_TARGET);
+								std::string targetNameString;
+								xml_utils::xml_translate(&targetNameString, targetNode->getNodeValue());
+								std::string targetName = "";
+								if (targetNameString.length() > 0)
+									targetName = targetNameString.substr(1);
+// 								if (materialId2Name.find(targetName) == materialId2Name.end() && targetName != "")
+// 									materialId2Name.insert(std::make_pair(targetName, materialName));
+								if (materialId2Name.find(materialName) == materialId2Name.end() && materialName != "")
+									materialId2Name.insert(std::make_pair(materialName, targetName));
+
+							}
+							materialCurNode = materialCurNode->getNextSibling();
+						}
+					}
+				}
+
 				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, joint, hasRootJoint);
 			}
 			else if (typeAttr == "NODE" || tempMaterialNode)
