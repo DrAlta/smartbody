@@ -148,7 +148,7 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		rapidxml::xml_document<> doc;
 		doc.parse< rapidxml::parse_declaration_node>(rapidFile->data());
 		rapidxml::xml_node<>* node = doc.first_node("COLLADA"); 
-		rapidxml::xml_node<>* asset = getNode("asset", node);
+		rapidxml::xml_node<>* asset = getNode("asset", node, 0, 1);
 		if (asset)
 		{
 			rapidxml::xml_node<>* upNode = getNode("up_axis", asset);
@@ -661,23 +661,18 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 			if (typeAt)
 				typeAttr = typeAt->value();
 			
-			int curDepth = 0;
-			rapidxml::xml_node<>* tempMaterialNode = ParserCOLLADAFast::getNode("bind_material", childNode, curDepth, 2);
+			rapidxml::xml_node<>* tempMaterialNode = ParserCOLLADAFast::getNode("bind_material", childNode, 0, 2);
 			
 			// process this node as a joint if it's a non-geometry node
 			bool treatAsJoint = false;
 			if (typeAttr == "NODE" && hasRootJoint)
 			{
-				if (nameAttr == "hair3")
-				{
-					int y = 0;
-				}
 				treatAsJoint = true;
-				curDepth = 0;
-				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, curDepth, 1);
+				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, 0, 1);
 				if (geometryNode)
 					treatAsJoint = false;
 			}
+			
 			if (treatAsJoint || typeAttr == "JOINT" || (nameAttr.find("Bip")!= std::string::npos && skeleton.root() == NULL) )
 			{
 				hasRootJoint = true;
@@ -841,24 +836,9 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 				jointQuat->prerot(quat);
 				SrQuat jorientQ = SrQuat(jorientMat);
 				jointQuat->orientation(jorientQ);
-				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, joint, hasRootJoint);
-			}
-			else if (typeAttr == "NODE" || tempMaterialNode)
-			{
-				int curDepth = 0;
-				rapidxml::xml_node<>* translateNode = ParserCOLLADAFast::getNode("translate", childNode, curDepth, 1);
-				SrVec offset;
-				if (translateNode)
-				{
-					std::string offsetString = translateNode->value();
-					std::vector<std::string> tokens;
-					vhcl::Tokenize(offsetString, tokens, " \n");
-					offset.x = (float)atof(tokens[0].c_str()) * scale;
-					offset.y = (float)atof(tokens[1].c_str()) * scale;
-					offset.z = (float)atof(tokens[2].c_str()) * scale;
-				}
-				curDepth = 0;
-				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, curDepth, 1);
+
+
+				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, 0, 1);
 				if (geometryNode)	// might need to add support for rotation as well later when the case showed up
 				{
 					rapidxml::xml_attribute<>* geometryNodeAt= geometryNode->first_attribute("url");
@@ -881,8 +861,81 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 					}
 				}
 
-				curDepth = 0;
-				rapidxml::xml_node<>* materialNode = ParserCOLLADAFast::getNode("bind_material", childNode, curDepth, 2);
+				rapidxml::xml_node<>* materialNode = ParserCOLLADAFast::getNode("bind_material", childNode);
+				if (materialNode)
+				{
+					rapidxml::xml_node<>* techniqueCommonNode = ParserCOLLADAFast::getNode("technique_common", materialNode);
+					if (techniqueCommonNode)
+					{
+						//const DOMNodeList* materialList = techniqueCommonNode->getChildNodes();
+						rapidxml::xml_node<>* materialCurNode = techniqueCommonNode->first_node();
+						while (materialCurNode)
+						//for (unsigned int ml = 0; ml < materialList->getLength(); ml++)
+						{
+							//rapidxml::xml_node<>* childNode = materialList->item(ml);
+							rapidxml::xml_node<>* childNode = materialCurNode;
+							std::string nodeName = childNode->name();
+							if (nodeName == "instance_material")
+							{
+								rapidxml::xml_attribute<>* symbolAt = childNode->first_attribute("symbol");
+								std::string materialName = symbolAt->value();
+
+								rapidxml::xml_attribute<>* targetAt= childNode->first_attribute("target");
+								std::string targetNameString = targetAt->value();
+								std::string targetName = "";
+								if (targetNameString.length() > 0)
+									targetName = targetNameString.substr(1);
+// 								if (materialId2Name.find(targetName) == materialId2Name.end() && targetName != "")
+// 									materialId2Name.insert(std::make_pair(targetName, materialName));
+								if (materialId2Name.find(materialName) == materialId2Name.end() && materialName != "")
+									materialId2Name.insert(std::make_pair(materialName, targetName));
+
+							}
+							materialCurNode = materialCurNode->next_sibling();
+						}
+					}
+				}
+
+
+				parseJoints(curNode, skeleton, motion, scale, order, materialId2Name, joint, hasRootJoint);
+			}
+			else if (typeAttr == "NODE" || tempMaterialNode)
+			{
+				rapidxml::xml_node<>* translateNode = ParserCOLLADAFast::getNode("translate", childNode, 0, 1);
+				SrVec offset;
+				if (translateNode)
+				{
+					std::string offsetString = translateNode->value();
+					std::vector<std::string> tokens;
+					vhcl::Tokenize(offsetString, tokens, " \n");
+					offset.x = (float)atof(tokens[0].c_str()) * scale;
+					offset.y = (float)atof(tokens[1].c_str()) * scale;
+					offset.z = (float)atof(tokens[2].c_str()) * scale;
+				}
+				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, 0, 1);
+				if (geometryNode)	// might need to add support for rotation as well later when the case showed up
+				{
+					rapidxml::xml_attribute<>* geometryNodeAt= geometryNode->first_attribute("url");
+					std::string sidAttr = geometryNodeAt->value();
+					sidAttr = sidAttr.substr(1);
+					//LOG("translate: %f, %f, %f", offset.x, offset.y, offset.z);
+					//LOG("instance_geometry: %s", sidAttr.c_str());
+					SrModel* newModel = new SrModel();
+					newModel->name = SrString(sidAttr.c_str());
+					newModel->translate(offset);
+					newModel->translate(offset);
+					if (!parent)
+					{
+						LOG("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
+						delete newModel;
+					}
+					else
+					{
+						parent->visgeo(newModel);
+					}
+				}
+
+				rapidxml::xml_node<>* materialNode = ParserCOLLADAFast::getNode("bind_material", childNode, 0, 2);
 				if (materialNode)
 				{
 					rapidxml::xml_node<>* techniqueCommonNode = ParserCOLLADAFast::getNode("technique_common", materialNode);
