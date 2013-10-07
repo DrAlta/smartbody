@@ -1122,6 +1122,11 @@ void FltkViewer::updateLights()
 		if (name.find("light") == 0)
 		{
 			SrLight light;
+
+			SmartBody::BoolAttribute* enabledAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("enabled"));
+			if (enabledAttr && !enabledAttr->getValue())
+				continue;
+
 			light.position = sbpawn->getPosition();
 			SmartBody::BoolAttribute* directionalAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightIsDirectional"));
 			if (directionalAttr)
@@ -1223,7 +1228,7 @@ void FltkViewer::updateLights()
 		}
 	}
 	//LOG("light size = %d\n",_lights.size());
-	
+	/*
 	if (_lights.size() == 0)
 	{
 		SrLight light;		
@@ -1242,6 +1247,7 @@ void FltkViewer::updateLights()
 	//	light2.linear_attenuation = 2.0f;
 		_lights.push_back(light2);
 	}
+	*/
 	
 }
 
@@ -1465,9 +1471,61 @@ void FltkViewer::draw()
 
     updateLights();
 	glEnable ( GL_LIGHTING );
+	int maxLight = -1;
 	for (size_t x = 0; x < _lights.size(); x++)
 	{
-		glLight ( x, _lights[x] );		
+		glLight ( x, _lights[x] );	
+		maxLight++;
+	}
+
+	if (maxLight < 0)
+	{
+		glDisable(GL_LIGHT0);
+	}
+	if (maxLight < 1)
+	{
+		glDisable(GL_LIGHT1);
+	}
+	if (maxLight < 2)
+	{
+		glDisable(GL_LIGHT2);
+	}
+	if (maxLight < 3)
+	{
+		glDisable(GL_LIGHT3);
+	}
+	if (maxLight < 4)
+	{
+		glDisable(GL_LIGHT4);
+	}
+	if (maxLight < 5)
+	{
+		glDisable(GL_LIGHT5);
+	}
+
+	if (maxLight > 0)
+	{
+		glEnable(GL_LIGHT0);
+	}
+	if (maxLight > 1)
+	{
+		glEnable(GL_LIGHT1);
+	}
+	if (maxLight > 2)
+	{
+		glEnable(GL_LIGHT2);
+	}
+	if (maxLight > 3)
+	{
+		glEnable(GL_LIGHT3);
+	}
+	if (maxLight > 4)
+	{
+		glEnable(GL_LIGHT4);
+	}
+	if (maxLight > 5)
+	{
+		glEnable(GL_LIGHT5);
 	}
 
 	static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
