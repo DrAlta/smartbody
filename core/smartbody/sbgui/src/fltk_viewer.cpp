@@ -1128,6 +1128,8 @@ void FltkViewer::updateLights()
 				continue;
 
 			light.position = sbpawn->getPosition();
+
+			SrQuat orientation = sbpawn->getOrientation();
 			SmartBody::BoolAttribute* directionalAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightIsDirectional"));
 			if (directionalAttr)
 			{
@@ -1136,6 +1138,10 @@ void FltkViewer::updateLights()
 			else
 			{
 				light.directional = true;
+			}
+			if (light.directional)
+			{
+				light.position = -SrVec(0, 1, 0) * orientation;
 			}
 			
 			SmartBody::Vec3Attribute* diffuseColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightDiffuseColor"));
@@ -1182,6 +1188,8 @@ void FltkViewer::updateLights()
 			{
 				const SrVec& direction = spotDirectionAttr->getValue();
 				light.spot_direction = direction;
+				// override the explicit direction with orientation
+				light.spot_direction = SrVec(0, 1, 0) * orientation;
 			}
 			else
 			{
@@ -1190,7 +1198,11 @@ void FltkViewer::updateLights()
 			SmartBody::DoubleAttribute* spotCutOffAttr = dynamic_cast<SmartBody::DoubleAttribute*>(sbpawn->getAttribute("lightSpotCutoff"));
 			if (spotExponentAttr)
 			{
-				light.spot_cutoff = (float) spotCutOffAttr->getValue();
+				if (light.directional)
+					light.spot_cutoff = 180.0f;
+				else
+					light.spot_cutoff = (float) spotCutOffAttr->getValue();
+
 			}
 			else
 			{
@@ -3396,6 +3408,12 @@ void FltkViewer::drawPawns()
 				else
 					glColor3f(1.0, 0.0, 0.0);
 			}
+			glPushMatrix();
+			glBegin(GL_LINES);
+			glVertex3f(0.0f, 0.0f, 0.0f);
+			glVertex3f(0.0f, 2.0f * pawnSize, 0.0f);
+			glEnd();
+			glPopMatrix();
 			SrSnSphere sphere;
 			glPushMatrix();
 			sphere.shape().center = SrPnt(0, 0, 0);

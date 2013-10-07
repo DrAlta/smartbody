@@ -86,6 +86,7 @@ public:
 	std::map<std::string, std::vector<SrSnModel*> >	visemeShapeMap;
 	std::map<std::string, float>	visemeWeightMap;
 	std::vector<SrSnModel*>		dMeshBlend_p;
+	
 
 public:
 	DeformableMesh();
@@ -111,7 +112,7 @@ protected:
 	bool				  _updateMesh;
 	std::vector<SkJointList> _boneJointList;
 	bool meshVisible;
-
+	bool _recomputeNormal;
 public:
 	std::vector<SrVec> _deformPosBuf;		
 public:
