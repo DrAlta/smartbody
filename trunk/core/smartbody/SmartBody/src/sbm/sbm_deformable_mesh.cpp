@@ -740,6 +740,7 @@ DeformableMeshInstance::DeformableMeshInstance()
 	_mesh = NULL;
 	_skeleton = NULL;
 	_updateMesh = false;
+	_recomputeNormal = false;
 }
 
 DeformableMeshInstance::~DeformableMeshInstance()
@@ -823,6 +824,7 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 
 void DeformableMeshInstance::update()
 {
+#define RECOMPUTE_NORMAL 1	
 	if (!_updateMesh)	return;
 	if (!_skeleton || !_mesh) return;	
 	_skeleton->update_global_matrices();
@@ -831,6 +833,11 @@ void DeformableMeshInstance::update()
 	if (skinWeights.size() != _boneJointList.size()) updateJointList();
 	std::map<int,std::vector<int> >& vtxNewVtxIdxMap = _mesh->vtxNewVtxIdxMap;
 	int iVtx = 0;
+
+#ifdef RECOMPUTE_NORMAL
+	int iNormalVtx = 0;
+#endif
+
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
 		SkinWeight* skinWeight = skinWeights[skinCounter];
@@ -882,14 +889,40 @@ void DeformableMeshInstance::update()
 						}
 					}					
 					iVtx++;
-					//dMeshDynamic->shape().V[i] = finalVec;
+#if RECOMPUTE_NORMAL
+					if (!_recomputeNormal)
+						dMeshDynamic->shape().V[i] = finalVec;
+#endif
 				}
+#if RECOMPUTE_NORMAL
+				if (!_recomputeNormal)
+				{
+					dMeshDynamic->shape().computeNormals();
+					for (int i = 0; i < numVertices; i++)
+					{
+						SrVec finalN = dMeshDynamic->shape().N[i];
+						_mesh->normalBuf[iNormalVtx] = finalN;
+						if (vtxNewVtxIdxMap.find(iNormalVtx) != vtxNewVtxIdxMap.end())
+						{
+							std::vector<int>& idxMap = vtxNewVtxIdxMap[iNormalVtx];
+							// copy related vtx components 
+							for (unsigned int k=0;k<idxMap.size();k++)
+							{
+								_mesh->normalBuf[idxMap[k]] = finalN;
+							}
+						}
+						iNormalVtx++;
+					}
+					
+				}
+#endif
 				dMeshDynamic->changed(true);	
 			}
 			else
 				continue;
 		}
 	}
+	_recomputeNormal = false;
 }
 
 bool DeformableMeshInstance::getVisibility()
