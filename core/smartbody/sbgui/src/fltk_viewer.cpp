@@ -1112,6 +1112,7 @@ void FltkViewer::updateLights()
 	// get any pawns called 'light#' 
 	// if none exist, use the standard lights
 	_lights.clear();
+	int numLightsInScene = 0;
 	const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		 iter != pawnNames.end();
@@ -1121,11 +1122,13 @@ void FltkViewer::updateLights()
 		const std::string& name = sbpawn->getName();
 		if (name.find("light") == 0)
 		{
-			SrLight light;
-
+			numLightsInScene++;
 			SmartBody::BoolAttribute* enabledAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("enabled"));
 			if (enabledAttr && !enabledAttr->getValue())
+			{
 				continue;
+			}
+			SrLight light;
 
 			light.position = sbpawn->getPosition();
 
@@ -1240,8 +1243,8 @@ void FltkViewer::updateLights()
 		}
 	}
 	//LOG("light size = %d\n",_lights.size());
-	/*
-	if (_lights.size() == 0)
+	
+	if (_lights.size() == 0 && numLightsInScene == 0)
 	{
 		SrLight light;		
 		light.directional = true;
@@ -1259,8 +1262,6 @@ void FltkViewer::updateLights()
 	//	light2.linear_attenuation = 2.0f;
 		_lights.push_back(light2);
 	}
-	*/
-	
 }
 
 void cameraInverse(float* dst, float* src)
