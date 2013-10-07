@@ -211,8 +211,8 @@ endif()
 
 target_link_libraries( sbgui
 
-	tcmalloc
-	profiler
+	#tcmalloc
+	#profiler
 	SmartBody
 	bonebus
 	vhmsg
