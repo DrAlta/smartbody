@@ -17,6 +17,7 @@ extern "C"
     void SBDrawFrame(int w, int h);
     void SBDrawCharacters();
     void initCharacterScene();
+    void drawLights();
     void SBUpdate(float t);
     void SBExecuteCmd(const char* command);
     void SBExecutePythonCmd(const char* command);

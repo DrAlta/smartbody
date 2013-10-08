@@ -20,6 +20,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
+#include <sb/SBAttribute.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmTexture.h>
 #include <sr/sr_sa_gl_render.h>
@@ -32,6 +33,7 @@
 #import <OpenGLES/ES1/glext.h>
 
 using namespace boost::filesystem;
+using namespace SmartBody;
 /*
     Known issue for smartbody ios:
     - vhcl log OnMessage doesn't seem to work inside static libraries, it only works on this application level, need to look more into it. Now I used printf before OnMessage function inside vhcl_log.cpp
@@ -43,10 +45,9 @@ extern "C"
 {
 #endif
 
-static SrLight light1;
-static SrLight light2;
 static SrCamera* cameraReset;
 static vhcl::Log::StdoutListener listener;
+std::vector<SrLight> _lights;
 void SBSetupDrawing(int w, int h)
 {   
     glViewport(0, 0, w, h);
@@ -54,17 +55,219 @@ void SBSetupDrawing(int w, int h)
 	glEnable(GL_CULL_FACE);
 	glShadeModel(GL_SMOOTH);
 	glDisable(GL_DEPTH_TEST);
+}
     
-	// light
-	light1.directional = true;
-	light1.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
-	light1.position = SrVec( 0.0, 5.0, 10.0f );
-	//light1.constant_attenuation = 1.0f;
+void drawLights()
+{
+    _lights.clear();
+    const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
+    for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
+         iter != pawnNames.end();
+         iter++)
+    {
+        SmartBody::SBPawn* sbpawn = SmartBody::SBScene::getScene()->getPawn(*iter);
+        const std::string& name = sbpawn->getName();
+        if (name.find("light") == 0)
+        {
+            SrLight light;
+            
+            SmartBody::BoolAttribute* enabledAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("enabled"));
+            if (enabledAttr && !enabledAttr->getValue())
+                continue;
+            
+            light.position = sbpawn->getPosition();
+            
+            SrQuat orientation = sbpawn->getOrientation();
+            SmartBody::BoolAttribute* directionalAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightIsDirectional"));
+            if (directionalAttr)
+            {
+                light.directional = directionalAttr->getValue();
+            }
+            else
+            {
+                light.directional = true;
+            }
+            if (light.directional)
+            {
+                light.position = -SrVec(0, 1, 0) * orientation;
+            }
+            
+            SmartBody::Vec3Attribute* diffuseColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightDiffuseColor"));
+            if (diffuseColorAttr)
+            {
+                const SrVec& color = diffuseColorAttr->getValue();
+                light.diffuse = SrColor( color.x, color.y, color.z );
+            }
+            else
+            {
+                light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
+            }
+            SmartBody::Vec3Attribute* ambientColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightAmbientColor"));
+            if (ambientColorAttr)
+            {
+                const SrVec& color = ambientColorAttr->getValue();
+                light.ambient = SrColor( color.x, color.y, color.z );
+            }
+            else
+            {
+                light.ambient = SrColor( 0.0f, 0.0f, 0.0f );
+            }
+            SmartBody::Vec3Attribute* specularColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightSpecularColor"));
+            if (specularColorAttr)
+            {
+                const SrVec& color = specularColorAttr->getValue();
+                light.specular = SrColor( color.x, color.y, color.z );
+            }
+            else
+            {
+                light.specular = SrColor( 0.0f, 0.0f, 0.0f );
+            }
+            SmartBody::DoubleAttribute* spotExponentAttr = dynamic_cast<SmartBody::DoubleAttribute*>(sbpawn->getAttribute("lightSpotExponent"));
+            if (spotExponentAttr)
+            {
+                light.spot_exponent = (float) spotExponentAttr->getValue();
+            }
+            else
+            {
+                light.spot_exponent = 0.0f;
+            }
+            SmartBody::Vec3Attribute* spotDirectionAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightSpotDirection"));
+            if (spotDirectionAttr)
+            {
+                const SrVec& direction = spotDirectionAttr->getValue();
+                light.spot_direction = direction;
+                // override the explicit direction with orientation
+                light.spot_direction = SrVec(0, 1, 0) * orientation;
+            }
+            else
+            {
+                light.spot_direction = SrVec( 0.0f, 0.0f, -1.0f );
+            }
+            SmartBody::DoubleAttribute* spotCutOffAttr = dynamic_cast<SmartBody::DoubleAttribute*>(sbpawn->getAttribute("lightSpotCutoff"));
+            if (spotExponentAttr)
+            {
+                if (light.directional)
+                    light.spot_cutoff = 180.0f;
+                else
+                    light.spot_cutoff = (float) spotCutOffAttr->getValue();
+                
+            }
+            else
+            {
+                light.spot_cutoff = 180.0f;
+            }
+            SmartBody::DoubleAttribute* constantAttentuationAttr = dynamic_cast<SmartBody::DoubleAttribute*>(sbpawn->getAttribute("lightConstantAttenuation"));
+            if (constantAttentuationAttr)
+            {
+                light.constant_attenuation = (float) constantAttentuationAttr->getValue();
+            }
+            else
+            {
+                light.constant_attenuation = 1.0f;
+            }
+            SmartBody::DoubleAttribute* linearAttentuationAttr = dynamic_cast<SmartBody::DoubleAttribute*>(sbpawn->getAttribute("lightLinearAttenuation"));
+            if (linearAttentuationAttr)
+            {
+                light.linear_attenuation = (float) linearAttentuationAttr->getValue();
+            }
+            else
+            {
+                light.linear_attenuation = 0.0f;
+            }
+            SmartBody::DoubleAttribute* quadraticAttentuationAttr = dynamic_cast<SmartBody::DoubleAttribute*>(sbpawn->getAttribute("lightQuadraticAttenuation"));
+            if (quadraticAttentuationAttr)
+            {
+                light.quadratic_attenuation = (float) quadraticAttentuationAttr->getValue();
+            }
+            else
+            {
+                light.quadratic_attenuation = 0.0f;
+            }
+            
+            _lights.push_back(light);
+        }
+    }
+
+    //LOG("light size = %d\n",_lights.size());
+	
+	if (_lights.size() == 0 && numLightsInScene == 0)
+	{
+		SrLight light;
+		light.directional = true;
+		light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
+		light.position = SrVec( 100.0, 250.0, 400.0 );
+        //	light.constant_attenuation = 1.0f/cam.scale;
+		light.constant_attenuation = 1.0f;
+		_lights.push_back(light);
+        
+		SrLight light2 = light;
+		light2.directional = true;
+		light2.diffuse = SrColor( 0.8f, 0.8f, 0.8f );
+		light2.position = SrVec( 100.0, 500.0, -1000.0 );
+        //	light2.constant_attenuation = 1.0f;
+        //	light2.linear_attenuation = 2.0f;
+		_lights.push_back(light2);
+	}
     
-	light2 = light1;
-	light2.directional = true;
-	light2.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
-	light2.position = SrVec( 0.0, -5.0f, 10.0f );
+    
+    glEnable(GL_LIGHTING);
+	int maxLight = -1;
+	for (size_t x = 0; x < _lights.size(); x++)
+	{
+		glLight ( x, _lights[x] );
+		maxLight++;
+	}
+    
+	if (maxLight < 0)
+	{
+		glDisable(GL_LIGHT0);
+	}
+	if (maxLight < 1)
+	{
+		glDisable(GL_LIGHT1);
+	}
+	if (maxLight < 2)
+	{
+		glDisable(GL_LIGHT2);
+	}
+	if (maxLight < 3)
+	{
+		glDisable(GL_LIGHT3);
+	}
+	if (maxLight < 4)
+	{
+		glDisable(GL_LIGHT4);
+	}
+	if (maxLight < 5)
+	{
+		glDisable(GL_LIGHT5);
+	}
+    
+	if (maxLight > 0)
+	{
+		glEnable(GL_LIGHT0);
+	}
+	if (maxLight > 1)
+	{
+		glEnable(GL_LIGHT1);
+	}
+	if (maxLight > 2)
+	{
+		glEnable(GL_LIGHT2);
+	}
+	if (maxLight > 3)
+	{
+		glEnable(GL_LIGHT3);
+	}
+	if (maxLight > 4)
+	{
+		glEnable(GL_LIGHT4);
+	}
+	if (maxLight > 5)
+	{
+		glEnable(GL_LIGHT5);
+	}
+    
 }
     
 void initCharacterScene()
@@ -136,11 +339,6 @@ void SBDrawFrame(int width, int height)
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     SrCamera& cam = *scene->getActiveCamera();
     
-    // lighting
-	glLight(0, light1);
-	glLight(1, light2);
-
-    
 	// clear background
 	glClearColor(1.0f,1.0f,1.0f,1);
 	glEnable(GL_DEPTH_TEST);
@@ -158,6 +356,9 @@ void SBDrawFrame(int width, int height)
 	glScalef ( cam.getScale(), cam.getScale(), cam.getScale());
     glViewport( 0, 0, width, height);
 
+    // draw lights
+    drawLights();
+    
     // update texture
     glEnable(GL_TEXTURE_2D);
     SbmTextureManager& texm = SbmTextureManager::singleton();

@@ -10,6 +10,8 @@ scene.addAssetPath("audio", ".")
 
 scene.setBoolAttribute("internalAudio", True)
 
+scene.run("default-viewer.py")
+
 camera = scene.getActiveCamera()
 camera.setEye(0, 1.7, 2)
 camera.setCenter(0.0, 1.4, 0)
@@ -17,6 +19,7 @@ camera.setUpVector(SrVec(0, 1, 0))
 camera.setFov(0.4)
 camera.setFarPlane(100)
 camera.setNearPlane(0.1)
+
 
 # map to the SmartBody standard
 scene.run("zebra2-map.py")
