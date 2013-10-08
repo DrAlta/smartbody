@@ -24,7 +24,7 @@ obj = scene.getPawn("light0")
 if obj == None:
 	obj = scene.createPawn("light0")
 obj.setPosition(SrVec(5, 0, 5))
-obj.setOrientation(SrQuat(0.716119, -0.672356, 0.128259, 0.136607))
+obj.setOrientation(SrQuat(0.585059, -0.552663, 0.434825, 0.403976))
 attr = obj.createStringAttribute("collisionShape",  "null", True, "Physics", 350, False, False, False, "Initializes the pawn as a physics object.")
 attr.setDefaultValue("null")
 validValues = StringVec()
