@@ -3,7 +3,7 @@ project( SmartBody )
 
 set( CMAKE_INSTALL_PREFIX "../" )
 set( BUILD_OGRE FALSE)
-set( FLASCC_SDK "E:/Downloads1/flascc/sdk")
+set( FLASCC_SDK "E:/flascc/sdk")
 
 add_definitions(-O4)
 

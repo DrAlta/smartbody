@@ -10,34 +10,47 @@ scene.addAssetPath("audio", ".")
 
 scene.setScale(1.0)
 scene.setBoolAttribute("internalAudio", True)
+#1.1sec
+# camera = scene.getActiveCamera()
+# camera.setEye(0, 2.0478, 4.69259)
+# camera.setCenter(0.012, 1.60887, 2.75628)
+# camera.setUpVector(SrVec(0, 1, 0))
+# camera.setScale(1)
+# camera.setFov(0.4)
+# camera.setFarPlane(100)
+# camera.setNearPlane(0.1)
+# camera.setAspectRatio(0.966897)
 
-camera = scene.getActiveCamera()
-camera.setEye(0, 2.0478, 4.69259)
-camera.setCenter(0.012, 1.60887, 2.75628)
+
+camera =  scene.getActiveCamera()
+camera.setEye(0, 1.71, 1.86)
+camera.setCenter(0, 1, 0.01)
 camera.setUpVector(SrVec(0, 1, 0))
 camera.setScale(1)
-camera.setFov(0.4)
+camera.setFov(1.0472)
 camera.setFarPlane(100)
 camera.setNearPlane(0.1)
 camera.setAspectRatio(0.966897)
+cameraPos = SrVec(0, 1.6, 10)
+#0.7sec
 
 # map to the SmartBody standard
 scene.run("zebra2-map.py")
 zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
-
+# 1sec
 scene.addAssetPath("motion", "ChrBrad")
 scene.loadAssets()
-
+#9sec
 # establish lip syncing data set
 scene.run("init-diphoneDefault.py")
-
+# 10.7sec
 scene.run("gestureMap.py")
-
+#11sec
 ############################# Brad
 bradSkeleton = scene.getSkeleton("ChrBrad.sk")
 zebra2Map.applySkeleton(bradSkeleton)
 zebra2Map.applyMotionRecurse("ChrBrad")
-
+#27 sec
 # Brad's face definition
 bradFace = scene.createFaceDefinition("ChrBrad")
 bradFace.setFaceNeutral("ChrBrad@face_neutral")
@@ -68,21 +81,36 @@ bradFace.setViseme("wide",    "ChrBrad@wide")
 bradFace.setViseme("tBack",   "ChrBrad@tBack")
 bradFace.setViseme("tRoof",   "ChrBrad@tRoof")
 bradFace.setViseme("tTeeth",  "ChrBrad@tTeeth")
+#27
 
 brad = scene.createCharacter("ChrBrad", "")
 bradSkeleton = scene.createSkeleton("ChrBrad.sk")
 brad.setSkeleton(bradSkeleton)
 brad.setFaceDefinition(bradFace)
-bradPos = SrVec(0, 0, 0)
+bradPos = SrVec(0.3, 0, -0.2)
 brad.setPosition(bradPos)
 bradHPR = SrVec(0, 0, 0)
 brad.setHPR(bradHPR)
+#37.5
 brad.createStandardControllers()
+#40 sec
+# brad2 = scene.createCharacter("ChrBrad2", "")
+# brad2.setSkeleton(bradSkeleton)
+# brad2.setFaceDefinition(bradFace)
+# bradPos = SrVec(0, 0, 0)
+# brad2.setPosition(bradPos)
+# bradHPR = SrVec(0, 0, 0)
+# brad2.setHPR(bradHPR)
+# brad2.createStandardControllers()
+
+
 # deformable mesh
 brad.setStringAttribute("deformableMesh", "ChrBrad")
+#47sec
+# brad2.setStringAttribute("deformableMesh", "ChrBrad")
 # lip syncing diphone setup
-brad.setStringAttribute("diphoneSetName", "default")
-brad.setBoolAttribute("useDiphone", True)
+brad.setStringAttribute("lipSyncSetName", "default")
+brad.setBoolAttribute("usePhoneBigram", True)
 brad.setVoice("audiofile")
 brad.setVoiceCode("Sounds")
 # gesture map setup
@@ -99,5 +127,6 @@ sim.resume()
 
 bml.execBML('ChrBrad', '<gaze sbm:handle="flash" sbm:target-pos="0 0 0"/>')
 bml.execBML('ChrBrad', '<gaze sbm:handle="flash" sbm:fade-out="0.2"/>')
+#51sec
 
 
