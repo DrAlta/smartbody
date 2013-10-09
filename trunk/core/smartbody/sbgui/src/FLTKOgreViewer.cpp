@@ -81,6 +81,7 @@ void FLTKOgreWindow::initOgreWindow()
 		}
 	}
      
+		updateOptions();
      
     
 	//fl_set_gl_context(this,ogreInterface->getGLContext());	

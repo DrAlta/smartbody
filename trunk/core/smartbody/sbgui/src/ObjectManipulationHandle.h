@@ -9,7 +9,7 @@ public:
 protected:
 	PawnPosControl pawnPosControl;	
 	PawnRotationControl pawnRotControl;
-	PawnControl  *active_control;
+	
 	bool bHasPicking;
 	SrVec2 pick_loc;
 	ControlType pickType;
@@ -26,6 +26,7 @@ public:
 
 	//bool has_active_control() { return (active_control!=NULL); }
 	PawnControl* get_active_control() { return active_control; }
+
 	void removeActiveControl() { active_control = NULL; }
 	SbmPawn* get_selected_pawn();
 	void set_selected_pawn(SbmPawn* pawn);
@@ -37,6 +38,8 @@ public:
 
 	static void get_pawn_list(std::vector<SbmPawn*>& pawn_list);
 	PawnControl* getPawnControl(ControlType type);
+
+	PawnControl  *active_control;
 protected:	
 	std::vector<int>  process_hit(unsigned int *pickbuffer,int nhits);
 	

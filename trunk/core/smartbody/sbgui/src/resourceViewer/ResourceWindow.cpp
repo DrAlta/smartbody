@@ -52,18 +52,34 @@
 // 	ITEM_SIZE };
 
 
-std::string ResourceWindow::ItemNameList[ITEM_SIZE] = { "SCENE", "SERVICES",  
-														"SEQ_PATH", "ME_PATH", "AUDIO_PATH", "MESH_PATH", "SEQ_FILES", 
-														"SKELETON", "BONE MAP", "MOTION",  
-														"FACE DEFINITION", "EVENT HANDLERS",
-														"PAWN", "CHARACTER", "CONTROLLER", "PHYSICS", 
-														"NEUTRAL MOTION", "AU MAP", "VISEME MAP", "DEFAULT"} ;
 
 ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {
 	int rightPanelWidth = 450;
 	itemInfoWidget = NULL;
 	lastClickedItemPath = " ";
+
+	ItemNameList.push_back("SCENE");
+	ItemNameList.push_back("SERVICES");
+	ItemNameList.push_back("SEQ_PATH");
+	ItemNameList.push_back("ME_PATH");
+	ItemNameList.push_back("AUDIO_PATH");
+	ItemNameList.push_back("MESH_PATH");
+	ItemNameList.push_back("SEQ_FILES");
+	ItemNameList.push_back("SKELETON");
+	ItemNameList.push_back("BONE MAP");
+	ItemNameList.push_back("MOTION");
+	ItemNameList.push_back("FACE DEFINITION");
+	ItemNameList.push_back("EVENT HANDLERS");
+	ItemNameList.push_back("PAWN");
+	ItemNameList.push_back("CHARACTER");
+	ItemNameList.push_back("CONTROLLER");
+	ItemNameList.push_back("PHYSICS");
+	ItemNameList.push_back("NEUTRAL MOTION");
+	ItemNameList.push_back("AU MAP");
+	ItemNameList.push_back("VISEME MAP");
+	ItemNameList.push_back("DEFAULT");
+
 
 	for (int i=0;i<ITEM_SIZE;i++)
 		treeItemList[i] = NULL;
@@ -691,8 +707,11 @@ int ResourceWindow::findTreeItemType( Fl_Tree_Item* treeItem )
 void ResourceWindow::updateTreeItemInfo( Fl_Tree_Item* treeItem, long itemType )
 {
 	if (!treeItem || itemType < 0) return;		
+
 	char pathName[128];	
 	resourceTree->item_pathname(pathName,128,treeItem);
+	if (lastClickedItemPath == pathName)
+		return;
 	lastClickedItemPath = pathName;	
 	clearInfoWidget();	
 	itemInfoWidget = createInfoWidget(resourceInfoGroup->x(),resourceInfoGroup->y(),resourceInfoGroup->w(),resourceInfoGroup->h(),ItemNameList[itemType].c_str(),treeItem,itemType);
@@ -839,6 +858,40 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 	}
 	return widget;
 }
+
+void ResourceWindow::selectPawn(const std::string& name)
+{
+	Fl_Tree_Item* tree = treeItemList[ITEM_PAWN];
+
+	for (int c = 0; c < tree->children(); c++)
+	{
+		Fl_Tree_Item* child = tree->child(c);
+		if (strcmp(child->label(), name.c_str()) == 0)
+		{
+			this->updateTreeItemInfo(child, ITEM_PAWN);
+			resourceTree->deselect_all();
+			child->select();
+			resourceTree->redraw();
+			return;
+		}
+	}
+
+	tree = treeItemList[ITEM_CHARACTER];
+	for (int c = 0; c < tree->children(); c++)
+	{
+		Fl_Tree_Item* child = tree->child(c);
+		if (strcmp(child->label(), name.c_str()) == 0)
+		{
+			this->updateTreeItemInfo(child, ITEM_CHARACTER);
+			resourceTree->deselect_all();
+			child->select();
+			resourceTree->redraw();
+			return;
+		}
+	}
+
+}
+
 
 void ResourceWindow::notify( SmartBody::SBSubject* subject )
 {

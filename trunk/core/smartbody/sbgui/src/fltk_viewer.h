@@ -419,6 +419,8 @@ protected:
 
 	SmartBody::SBAnimationBlend* getCurrentCharacterAnimationBlend(); // for visualization plots	
 
+	int _transformMode;
+
 	
 	
  };

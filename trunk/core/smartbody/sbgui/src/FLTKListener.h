@@ -22,6 +22,8 @@ class FLTKListener : public SmartBody::SBCharacterListener, public SmartBody::SB
 	  virtual void OnReset();
 	  virtual void OnLogMessage( const std::string & message );
 
+	  virtual void OnObjectSelected(const std::string& objectName);
+
 	  virtual void notify(SmartBody::SBSubject* subject);
 
 	  void setOtherListener(SBCharacterListener* listener);

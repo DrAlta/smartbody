@@ -103,6 +103,7 @@
 #include "SBGUIManager.h"
 #include <autorig/SBAutoRigManager.h>
 #include <sbm/sbm_deformable_mesh.h>
+#include "FLTKListener.h"
 
 /*
 #define USE_CEGUI 1
@@ -411,6 +412,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 //   gridStep = 50.0;
    gridList = -1;
    _arrowTime = 0.0f;
+   _transformMode = 0;
 
    init_foot_print();
    _lastSelectedCharacter = "";   
@@ -1262,6 +1264,7 @@ void FltkViewer::updateLights()
 	//	light2.linear_attenuation = 2.0f;
 		_lights.push_back(light2);
 	}
+	
 }
 
 void cameraInverse(float* dst, float* src)
@@ -1686,6 +1689,8 @@ static void translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, Fl
    }
 
 
+
+
    if ( Fl::event_state(FL_BUTTON1) ) e.button1 = 1;
    if ( Fl::event_state(FL_BUTTON2) ) e.button2 = 1;
    if ( Fl::event_state(FL_BUTTON3) ) e.button3 = 1;
@@ -2056,10 +2061,14 @@ int FltkViewer::handle ( int event )
 				 SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
 				 if (selectedPawn)
 				 {
-					 SbmCharacter* isCharacter = dynamic_cast<SbmCharacter*> (selectedPawn);
-					 if (isCharacter)
+					 // if the resource window is open, select that item
+					 FLTKListener* listener = dynamic_cast<FLTKListener*>(SmartBody::SBScene::getScene()->getCharacterListener());
+					 if (listener)
+						 listener->OnObjectSelected(selectedPawn->getName());
+					 SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (selectedPawn);
+					 if (character)
 					 {
-						 _lastSelectedCharacter = isCharacter->getName();
+						 _lastSelectedCharacter = character->getName();
 					 }
 				 }
 			 }			 
@@ -2175,6 +2184,35 @@ int FltkViewer::handle ( int event )
          e.key = Fl::event_key();
 		  switch (Fl::event_key())
 		  {
+			case 'w': // translate mode
+				_transformMode = 0;
+				{
+					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
+					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
+					if (rotControl->get_attach_pawn())
+					{
+						posControl->attach_pawn(rotControl->get_attach_pawn());
+						rotControl->detach_pawn();
+						 _objManipulator.active_control = posControl;
+					}					
+				}
+				return ret;
+			case 'e': // rotate mode
+ 				_transformMode = 1;
+				{
+					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
+					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
+					if (posControl->get_attach_pawn())
+					{
+						rotControl->attach_pawn(posControl->get_attach_pawn());
+						posControl->detach_pawn();
+						 _objManipulator.active_control = rotControl;
+					}
+				}
+				return ret;
+			//case 't': // scale mode - not yet supported
+				//_transformMode = 2;
+				//return ret;
 			case 'f': // frame selected object
 				{
 				SrBox sceneBox;
@@ -2349,13 +2387,13 @@ int FltkViewer::handle_event ( const SrEvent &e )
       if ( res ) return res;
     }
    
-   if (e.ctrl && e.mouse_event() )
+   if (e.mouse_event() )
    {
 	   res = handle_object_manipulation ( e );
 	   if ( res ) return res;
    }
 
-   if (e.shift && e.mouse_event() )
+   if (e.mouse_event() )
    {
 	   res = handle_object_manipulation ( e );
 	   if ( res ) return res;
@@ -2379,10 +2417,15 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 			 //_objManipulator.hasPicking(true);
 			SrVec2 mouseVec(e.mouse.x, e.mouse.y);
 			 _objManipulator.setPicking(mouseVec);
-			 if (e.ctrl)
+			 if (this->_transformMode == 0)
+			 {
 				 _objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_POS);
-			 else if (e.shift)
+					
+			 }
+			 else if (this->_transformMode == 1)
+			 {
 				 _objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_ROT);
+			 }
 		 }
 		 if (e.button3 && e.shift)
 		 {

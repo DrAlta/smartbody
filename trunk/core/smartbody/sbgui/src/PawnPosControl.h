@@ -17,6 +17,8 @@ protected:
 #endif
 
 public:	
+	PawnControl();
+	~PawnControl();
 	void attach_pawn(SbmPawn* ap);
 	void detach_pawn();
 	SbmPawn* get_attach_pawn() { return pawn; }
@@ -54,6 +56,8 @@ public:
 class PawnRotationControl : public RotationControl, public PawnControl
 {
 public:
+	PawnRotationControl();
+	~PawnRotationControl();
 	virtual void renderControl(SrCamera& cam);
 	virtual void updateControl(SrCamera& cam, float fx, float fy, float tx, float ty);	
 	virtual SrQuat getWorldRot();
