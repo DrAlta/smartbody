@@ -24,6 +24,8 @@ using namespace gwiz;
 #include <vhcl_log.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
+#include <sb/SBPawn.h>
+#include <sb/SBSkeleton.h>
 #include <sb/sbm_pawn.hpp>
 
 //#define DFL_GAZE_HEAD_SPEED 180.0
@@ -1166,6 +1168,19 @@ void MeCtGaze::set_fade_out( float interval )	{
 	}
 }
 
+void MeCtGaze::setGazeSchedule(double time, GazeScheduleInfo g)
+{
+	GazeScheduleInfo s;
+	s.hasTargetJoint = g.hasTargetJoint;
+	s.targetJoint = g.targetJoint;
+	s.hasTargetPosition = g.hasTargetPosition;
+	s.targetPosition = g.targetPosition;
+	s.direction = g.direction;
+	s.sweepAngle = g.sweepAngle;
+	s.roll = g.roll;
+
+	gazeSchedules.insert(std::make_pair(time, s));
+}
 
 void MeCtGaze::set_fade_in_scheduled(float interval, double time)
 {
@@ -1293,6 +1308,97 @@ bool MeCtGaze::update_fading( float dt )	{
 	return( fading_complete );
 }
 
+void MeCtGaze::updateGazeSchedules( float dt )
+{
+	int numFound = 1;
+	while (numFound > 0)
+	{
+		numFound--;
+		std::map<double, GazeScheduleInfo>::iterator iter = gazeSchedules.begin();
+		for (; iter != gazeSchedules.end(); ++iter)
+		{
+			GazeScheduleInfo& s = (*iter).second;
+			if (SmartBody::SBScene::getScene()->getSimulationManager()->getTime() >= iter->first)
+			{
+				this->set_offset_polar( s.direction, s.sweepAngle, s.roll );
+				if (s.hasTargetJoint)
+				{
+					size_t pos = s.targetJoint.find_first_of(":");
+					if (pos != std::string::npos)
+					{
+						std::string t = s.targetJoint.substr(0, pos);
+						std::string joint = s.targetJoint.substr(pos + 1);
+						SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(t);
+						if (!pawn)
+						{
+							LOG("Gaze cannot be switched to %s, does not exist.", s.targetJoint.c_str());
+						}
+						else
+						{
+							SmartBody::SBJoint* sbjoint = dynamic_cast<SmartBody::SBJoint*>(pawn->getSkeleton()->getJointByMappedName(joint));
+							if (!sbjoint)
+							{
+								LOG("Gaze cannot be switched to %s/%s - joint does not exist.", s.targetJoint.c_str(), joint.c_str());
+							}
+							else
+							{
+								if (s.hasTargetPosition)
+								{
+									this->set_target_joint( s.targetPosition.x, s.targetPosition.y, s.targetPosition.z, sbjoint );
+								}
+								else
+								{
+									this->set_target_joint( 0.0f, 0.0f, 0.0f, sbjoint );
+								}
+							}
+
+						}
+					}
+					else
+					{
+						SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(s.targetJoint.c_str());
+						if (!pawn)
+						{
+							LOG("Gaze cannot be switched to %s, does not exist.", s.targetJoint.c_str());
+						}
+						else
+						{
+							SmartBody::SBJoint* sbjoint = dynamic_cast<SmartBody::SBJoint*>(pawn->getSkeleton()->getJointByMappedName("eyeball_left"));
+							if (!sbjoint)
+							{
+								sbjoint = dynamic_cast<SmartBody::SBJoint*>(pawn->getSkeleton()->getJointByMappedName(SbmPawn::WORLD_OFFSET_JOINT_NAME));
+								if (!sbjoint)
+								{
+									LOG("Target character does not have joint named left_eyeball or %s, cannot switch gaze.", SbmPawn::WORLD_OFFSET_JOINT_NAME);
+								}
+								else
+								{
+									if (s.hasTargetPosition)
+									{
+										this->set_target_joint( s.targetPosition.x, s.targetPosition.y, s.targetPosition.z, sbjoint );
+									}
+								}
+							}
+						
+						}
+
+					}
+				}
+				else
+				{
+					if (s.hasTargetPosition)
+					{
+						this->set_target(s.targetPosition.x, s.targetPosition.y, s.targetPosition.z);
+					}
+				}
+				gazeSchedules.erase(iter);
+				numFound++;
+				break;
+			}
+		}
+	}
+}
+
 bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	
 
@@ -1339,6 +1445,8 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 	if( update_fading( dt ) )	{
 		return( TRUE );
 	}
+
+	updateGazeSchedules(dt);
 
 	update_skeleton_gmat();
 	

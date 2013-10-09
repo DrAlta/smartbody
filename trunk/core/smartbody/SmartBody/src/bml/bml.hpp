@@ -31,6 +31,7 @@
 #include <limits>
 
 #include <sb/SBTypes.h>
+#include <controllers/me_ct_gaze.h>
 #include "bml/bml_types.hpp"
 #include "bml/bml_sync_point.hpp"
 #include "bml/behavior_span.hpp"
@@ -453,10 +454,12 @@ namespace BML {
 	private:
 		float gazeFadeInterval;
 		int gazeFadeMode;
+		MeCtGaze::GazeScheduleInfo gazeSchedule;
+		bool hasGazeSchedule;
 
 	public:
 		GazeRequest(   float interval, int mode, const std::string& unique_id, const std::string& localId, MeController* gaze, MeCtSchedulerClass* schedule_ct,
-			           const BehaviorSyncPoints& behav_syncs );
+			           const BehaviorSyncPoints& behav_syncs, MeCtGaze::GazeScheduleInfo g, bool hasSchedule );
 		virtual void realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene );
 	};
 

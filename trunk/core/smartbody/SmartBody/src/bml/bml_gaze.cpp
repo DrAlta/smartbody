@@ -337,6 +337,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	// need the target and some other options
 
 	const XMLCh* attrTarget = elem->getAttribute( BMLDefs::ATTR_TARGET );
+	std::string rawTargetName = xml_utils::xml_parse_string(BMLDefs::ATTR_TARGET, elem, "", false);
 	if( !gaze_ct && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {
 		std::wstringstream wstrstr;
         wstrstr << "WARNING: BML::parse_bml_gaze(): <"<<tag<<"> BML tag missing "<< BMLDefs::ATTR_TARGET <<"= attribute.";
@@ -633,32 +634,44 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 				<< "\tgaze_fade_out_ival = " << gaze_fade_out_ival << endl
 				<< "\tgaze_fade_in_ival = " << gaze_fade_in_ival << endl
 				<< "\tgaze_time_hint = " << gaze_time_hint << endl;
-	}
-
+	}	
+	bool usesHandle = true;
 	if (!gaze_ct) {
+		usesHandle = false;
 		gaze_ct = new MeCtGaze();
 		gaze_ct->handle(handle);
 		gaze_ct->init(const_cast<SbmCharacter*>(request->actor), low_key_index, high_key_index );
 		gaze_ct->set_task_priority( priority_key_index );
 	}
-	if( target_joint )	{
+
+	bool hasTargetJoint = false;
+	std::string targetJoint;
+	bool hasTargetPosition = false;
+	SrVec targetPosition;
+
+
+	// codepath for non-handled gazes
+
+	if( target_joint && !usesHandle)	{
 		gaze_ct->set_target_joint( 0, 0, 0, const_cast<SkJoint*>( target_joint ) );
 	}
-	else if (validTargetPos)
+	else if (validTargetPos  && !usesHandle)
 	{
 		gaze_ct->set_target(targetPos.x,targetPos.y,targetPos.z);
 	}
 
-	if( gaze_time_hint > 0.0 )	{
+	if( gaze_time_hint > 0.0  && !usesHandle)	{
 		gaze_ct->set_time_hint( gaze_time_hint );
 	}
 	else	{
+		if (!usesHandle)
 		gaze_ct->set_speed( gaze_speed_head, gaze_speed_eyeball );
 	}
-	gaze_ct->set_smooth( gaze_smooth_lumbar, gaze_smooth_cervical, gaze_smooth_eyeball );
+	if (!usesHandle)
+		gaze_ct->set_smooth( gaze_smooth_lumbar, gaze_smooth_cervical, gaze_smooth_eyeball );
 	float pitch_minimum, pitch_maximum;
 
-	if( has_key_data ) {    //if there is key data
+	if( has_key_data &&  !usesHandle) {    //if there is key data
 		if( key_data[ low_key_index ]==NULL ) {  
 			key_data[ low_key_index ] = new Gaze::KeyData();  
 		}
@@ -742,49 +755,73 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	}
 
 	float roll = xml_utils::xml_parse_float( BMLDefs::ATTR_SBM_ROLL, elem, 0.0f );
-
+	XMLStringTokenizer tokenizer( elem->getAttribute( BMLDefs::ATTR_DIRECTION ) );
+	float dir_angle = 0.0f;
+	float sweep_angle = 0.0f;
+	int num_toks = tokenizer.countTokens();
+	if( num_toks )
 	{
-		XMLStringTokenizer tokenizer( elem->getAttribute( BMLDefs::ATTR_DIRECTION ) );
-		int num_toks = tokenizer.countTokens();
-		if( num_toks )	{
 
-			float dir_angle = 0.0f;
-			std::string tok = xml_utils::xml_translate_string( tokenizer.nextToken() );
-			if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_POLAR ) ) {
 
-				dir_angle = xml_utils::xml_translate_float( tokenizer.nextToken(), dir_angle );
+		std::string tok = xml_utils::xml_translate_string( tokenizer.nextToken() );
+		if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_POLAR ) ) {
 
-			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_UP ) )	{
-				dir_angle = 0.0f;
-			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_UPRIGHT ) )	{
-				dir_angle = 45.0f;
-			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_RIGHT ) )	{
-				dir_angle = 90.0f;
-			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_DOWNRIGHT ) )	{
-				dir_angle = 135.0f;
-			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_DOWN ) )	{
-				dir_angle = 180.0f;
-			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_DOWNLEFT ) )	{
-				dir_angle = 225.0f;
-			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_LEFT ) )	{
-				dir_angle = 270.0f;
-			} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_UPLEFT ) )	{
-				dir_angle = 315.0f;
-			} else	{
-				LOG( "WARNING: direction '%s' not recognized", tok.c_str() );
-			}
-			// sweep_angle = 30.0f; reasonable default, of not further specified.
-			float sweep_angle = xml_utils::xml_parse_float( BMLDefs::ATTR_ANGLE, elem, 30.0f );
+			dir_angle = xml_utils::xml_translate_float( tokenizer.nextToken(), dir_angle );
 
-			gaze_ct->set_offset_polar( dir_angle, sweep_angle, roll );
+		} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_UP ) )	{
+			dir_angle = 0.0f;
+		} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_UPRIGHT ) )	{
+			dir_angle = 45.0f;
+		} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_RIGHT ) )	{
+			dir_angle = 90.0f;
+		} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_DOWNRIGHT ) )	{
+			dir_angle = 135.0f;
+		} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_DOWN ) )	{
+			dir_angle = 180.0f;
+		} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_DOWNLEFT ) )	{
+			dir_angle = 225.0f;
+		} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_LEFT ) )	{
+			dir_angle = 270.0f;
+		} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_UPLEFT ) )	{
+			dir_angle = 315.0f;
+		} else	{
+			LOG( "WARNING: direction '%s' not recognized", tok.c_str() );
 		}
+		// sweep_angle = 30.0f; reasonable default, of not further specified.
+		sweep_angle = xml_utils::xml_parse_float( BMLDefs::ATTR_ANGLE, elem, 30.0f );
+		if (!usesHandle)
+			gaze_ct->set_offset_polar( dir_angle, sweep_angle, roll );
 	}
 
 
 	std::string localId;
 	xml_utils::xml_parse_string(&localId, BMLDefs::ATTR_ID, elem );
 
-	boost::shared_ptr<GazeRequest> ct_request( new GazeRequest(gaze_fade_ival, gaze_fade_mode, unique_id, localId, gaze_ct, request->actor->gaze_sched_p, behav_syncs ) );
-	ct_request->set_persistent( true );
-	return ct_request;
+	MeCtGaze::GazeScheduleInfo g;
+	if (usesHandle)
+	{
+		if (target_joint)
+		{
+			g.hasTargetJoint = true;
+			g.targetJoint = rawTargetName;
+			g.hasTargetPosition = false;
+		}
+		if (validTargetPos)
+		{
+			g.hasTargetPosition = true;
+			g.targetPosition = targetPos;
+		}
+		g.direction = dir_angle;
+		g.sweepAngle = sweep_angle;
+		g.roll = roll;
+		boost::shared_ptr<GazeRequest> ct_request( new GazeRequest(gaze_fade_ival, gaze_fade_mode, unique_id, localId, gaze_ct, request->actor->gaze_sched_p, behav_syncs,  g, true) );
+		ct_request->set_persistent( true );
+		return ct_request;
+	}
+	else
+	{
+		boost::shared_ptr<GazeRequest> ct_request( new GazeRequest(gaze_fade_ival, gaze_fade_mode, unique_id, localId, gaze_ct, request->actor->gaze_sched_p, behav_syncs, g, false ) );
+		ct_request->set_persistent( true );
+		return ct_request;
+	}
 }
