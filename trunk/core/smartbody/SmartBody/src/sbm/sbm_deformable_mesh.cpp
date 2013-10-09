@@ -122,6 +122,8 @@ void DeformableMesh::blendShapes()
 		return;
 	}
 
+
+
 	std::vector<SrSnModel*>& neutralModel = visemeShapeMap["neutral"];
 	for (size_t i = 0; i < neutralModel.size(); ++i)
 	{
@@ -134,6 +136,11 @@ void DeformableMesh::blendShapes()
 		std::map<std::string, float>::iterator iter;
 		for (iter = visemeWeightMap.begin(); iter != visemeWeightMap.end(); ++iter)
 		{
+				for (size_t j = 0; j < visemeShapeMap[iter->first].size(); j++)
+				{
+					LOG("Shape %s", (const char*)visemeShapeMap[iter->first][j]->shape().name);
+				}
+				LOG("%s", (const char*) neutralModel[i]->shape().name);
 			if (iter->second > 0.01f && iter->first != "neutral")
 			{
 				for (size_t j = 0; j < visemeShapeMap[iter->first].size(); j++)
@@ -827,7 +834,7 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 
 void DeformableMeshInstance::update()
 {
-#define RECOMPUTE_NORMAL 1	
+#define RECOMPUTE_NORMAL 1
 	if (!_updateMesh)	return;
 	if (!_skeleton || !_mesh) return;	
 	_skeleton->update_global_matrices();
@@ -873,8 +880,9 @@ void DeformableMeshInstance::update()
 					{
 						//std::string jointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];	
 						int jointIndex = skinWeight->jointNameIndex[globalCounter];
-						const SkJoint* curJoint = jointList[jointIndex];//skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
+						SkJoint* curJoint = jointList[jointIndex];//skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
 						if (curJoint == NULL) continue;
+						
 						const SrMat& gMat = curJoint->gmat();
 						SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
 						double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];

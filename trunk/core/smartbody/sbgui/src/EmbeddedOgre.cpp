@@ -137,6 +137,7 @@ bool EmbeddedOgre::getCharacterVisiblility()
 void EmbeddedOgre::updateOgreLights()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	int numLightsInScene = 0;
 	float inverseScale = float(1.0/scene->getScale());
 	const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
@@ -147,6 +148,7 @@ void EmbeddedOgre::updateOgreLights()
 		const std::string& name = sbpawn->getName();
 		if (name.find("light") == 0)
 		{
+			numLightsInScene++;
 			if (firstTime)
 			{
 				ogreSceneMgr->destroyAllLights();
@@ -159,6 +161,18 @@ void EmbeddedOgre::updateOgreLights()
 			} catch( Ogre::Exception& e ) {
 				light = ogreSceneMgr->createLight( name );
 			}
+			SmartBody::BoolAttribute* enabledAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("enabled"));
+			if (enabledAttr && !enabledAttr->getValue())
+			{
+				light->setVisible(false);
+			}
+			else
+			{
+				light->setVisible(true);
+			}
+			SrVec up(1,0,0);
+			SrQuat orientation  = sbpawn->getOrientation();
+			SrVec lightDirection = up * orientation;
 			SmartBody::BoolAttribute* directionalAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightIsDirectional"));
 			if (directionalAttr)
 			{
@@ -167,22 +181,25 @@ void EmbeddedOgre::updateOgreLights()
 					if (light->getType() != Light::LT_DIRECTIONAL)
 						light->setType(Light::LT_DIRECTIONAL);
 					
+					
 					const Ogre::Vector3& direction = light->getDirection();
-					if (direction.x != -pos.x || 
-						direction.y != -pos.y || 
-						direction.z != -pos.z)
-						light->setDirection(-pos.x,-pos.y,-pos.z);
+					if (direction.x != -lightDirection.x || 
+						direction.y != -lightDirection.y || 
+						direction.z != -lightDirection.z)
+						light->setDirection(-lightDirection.x,-lightDirection.y,-lightDirection.z);
 				}
 				else
 				{
 					light->setType(Light::LT_POINT);
 					light->setPosition(pos.x,pos.y,pos.z);
+					light->setDirection(lightDirection.x,lightDirection.y,lightDirection.z);				
 				}			
 			}
 			else
 			{
 				light->setType(Light::LT_POINT);
-				light->setDirection(pos.x,pos.y,pos.z);				
+				light->setPosition(pos.x,pos.y,pos.z);
+				light->setDirection(lightDirection.x,lightDirection.y,lightDirection.z);				
 			}
 
 			SmartBody::BoolAttribute* castShadowAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightCastShadow"));
@@ -256,6 +273,13 @@ void EmbeddedOgre::updateOgreLights()
 		ogreSceneMgr->setShadowFarDistance(30.f*inverseScale);
 	if (ogreSceneMgr->getShadowDirectionalLightExtrusionDistance() != 30.f*inverseScale)
 		ogreSceneMgr->setShadowDirectionalLightExtrusionDistance(30.f*inverseScale);
+
+
+	if (numLightsInScene == 0)
+	{
+		// add in default Ogre lighting here
+	}
+
 }
 
 void EmbeddedOgre::createDefaultScene()
@@ -266,8 +290,8 @@ void EmbeddedOgre::createDefaultScene()
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_MODULATIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_NONE );
-	//ogreSceneMgr->setShadowTextureCount(1);
-	//ogreSceneMgr->setShadowTextureSize( 1024 );
+	//ogreSceneMgr->setShadowTextureCount(2);
+	//ogreSceneMgr->setShadowTextureSize( 2048 );
 	//ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );	
 	
 	// Setup animation default
@@ -437,6 +461,39 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 
 		ogreWnd = ogreRoot->initialise( false );
 		Ogre::NameValuePairList params;
+	
+		/*
+		// determine system capabilities
+		Ogre::ConfigOptionMap& configMap = lRenderSystem->getConfigOptions();
+		for (Ogre::ConfigOptionMap::iterator optionIter = configMap.begin();
+			 optionIter != configMap.end();
+			 optionIter++)
+		{
+			Ogre::String name = (*optionIter).first;
+			LOG("[%s]", name.c_str());
+			Ogre::ConfigOption& option = (*optionIter).second;
+			for (int x = 0; x < option.possibleValues.size(); x++)
+			{
+				LOG("%s ", option.possibleValues[x].c_str());
+			}
+			
+		}
+		
+		// determine antialiasing support
+		Ogre::ConfigOptionMap::iterator opt = configMap.find("FSAA");
+		std::string lastFSAAVal = "0";
+		if (opt != configMap.end())
+		{
+			Ogre::ConfigOption& option = (*opt).second;
+			for (int x = 0; x < option.possibleValues.size(); x++)
+			{
+				lastFSAAVal = option.possibleValues[x];
+			}
+		}
+		params["FSAA"] = lastFSAAVal;
+		LOG("Using FSAA level %s", lastFSAAVal.c_str());
+		*/
+		
 		//if (parentHandle)
 		//	params["parentWindowHandle"] = Ogre::StringConverter::toString((size_t)parentHandle);	
         
@@ -456,6 +513,8 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
         
 #endif
 		params["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)winHandle);	
+
+
 		
 		ogreWnd = ogreRoot->createRenderWindow( windowName, width, height, false, &params );
 		ogreGLContext = (unsigned long)getCurrentGLContext();
