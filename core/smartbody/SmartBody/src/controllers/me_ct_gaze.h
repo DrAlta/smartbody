@@ -119,6 +119,16 @@ class MeCtGaze : public SmartBody::SBController	{
 #endif
 
 	public:
+		struct GazeScheduleInfo
+		{
+			bool hasTargetJoint;
+			std::string targetJoint;
+			bool hasTargetPosition;
+			SrVec targetPosition;
+			float direction;
+			float sweepAngle;
+			float roll;
+		};
 	
 #if GAZE_KEY_COMBINE_HEAD_AND_NECK
 		enum gaze_key_enum_set	{
@@ -274,6 +284,8 @@ class MeCtGaze : public SmartBody::SBController	{
 		void set_fade_in_scheduled(float interval, double time);
 		void set_fade_out_scheduled(float interval, double time);
 
+		void setGazeSchedule(double time, GazeScheduleInfo g);
+
 		// LIMIT: key-group rotation limit
 		void set_limit( int key, float p, float h, float r );
 		void set_limit( int key, float p_up, float p_dn, float h, float r );
@@ -327,6 +339,7 @@ class MeCtGaze : public SmartBody::SBController	{
 			float fadingInterval;
 		};
 
+
 		double	prev_time;
 		int 	foostart;	// to initialize prev_time, dt
 		int 	started;
@@ -370,6 +383,8 @@ class MeCtGaze : public SmartBody::SBController	{
 		float			scheduled_fade_interval;
 		std::map<double, FadingInfo> fadingSchedules;
 
+		std::map<double, GazeScheduleInfo> gazeSchedules;
+
 		int 			joint_key_count;
 		int*			joint_key_map;
 		int*			joint_key_top_map;
@@ -390,7 +405,8 @@ class MeCtGaze : public SmartBody::SBController	{
 		MeCtGazeJoint*	joint_arr;
 
 		bool 		update_fading( float dt );
-		
+		void		updateGazeSchedules(float dt);
+
 		void		inspect_skeleton_down( SkJoint* joint_p, int depth = 0 );
 		void		inspect_skeleton_local_transform_down( SkJoint* joint_p, int depth = 0 );
 		void		inspect_skeleton_world_transform_down( SkJoint* joint_p, int depth = 0 );

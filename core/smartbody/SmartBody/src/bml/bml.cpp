@@ -2198,10 +2198,12 @@ BehaviorSpan PostureRequest::getBehaviorSpan()
 
 
 GazeRequest::GazeRequest(   float interval, int mode, const std::string& unique_id, const std::string& localId, MeController* gaze, MeCtSchedulerClass* schedule_ct,
-							const BehaviorSyncPoints& behav_syncs )
+							const BehaviorSyncPoints& behav_syncs, MeCtGaze::GazeScheduleInfo g, bool hasSchedule )
 :	MeControllerRequest( unique_id, localId, gaze, schedule_ct, behav_syncs ),
     gazeFadeInterval(interval),
-	gazeFadeMode(mode)
+	gazeFadeMode(mode),
+	gazeSchedule(g),
+	hasGazeSchedule(hasSchedule)
 {
 }
 
@@ -2214,7 +2216,7 @@ void GazeRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene
 		MeControllerTreeRoot* controllerTree = character->ct_tree_p;
 		MeController* controller = controllerTree->findControllerByHandle(anim_ct->handle());
 		MeCtGaze* gazeCt = dynamic_cast<MeCtGaze*>( controller );
-		if (gazeCt && gazeFadeInterval <= 0.0f)
+		if (gazeCt && gazeFadeInterval <= 0.0f && !hasGazeSchedule)
 			return;
 	}
 
@@ -2256,9 +2258,29 @@ void GazeRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene
 					gazeCt->set_fade_in(gazeFadeInterval);
 			}
 		}
+		if (hasGazeSchedule)
+		{
+			gazeCt->setGazeSchedule(timeOffset, gazeSchedule);
+		}
+	}
+	else if (hasGazeSchedule)
+	{
+		MeCtGaze* gazeCt = NULL;
+		const SbmCharacter* character = request->actor;
+		if (character)	{
+			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+			MeController* controller = controllerTree->findControllerByHandle(anim_ct->handle());
+			gazeCt = dynamic_cast<MeCtGaze*>( controller );
+			if (gazeCt)
+				gazeCt->setGazeSchedule(timeOffset + curTime, gazeSchedule);
+
+		}
+		
 	}
 	else
+	{
 		MeControllerRequest::realize_impl(request, scene);
+	}
 }
 
 
