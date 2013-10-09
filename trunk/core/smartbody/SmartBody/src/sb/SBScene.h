@@ -80,6 +80,7 @@ class SBScene : public SBObject
 
 		#if !defined(__FLASHPLAYER__)
 		SBAPI void exportScenePackage(std::string outDir, std::string outZipArchiveName = "");
+		SBAPI void exportCharacter(std::string charName, std::string outDir);
 		#endif
 
 		SBAPI static SBScene* getScene();		

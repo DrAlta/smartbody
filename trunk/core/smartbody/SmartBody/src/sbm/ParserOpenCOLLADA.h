@@ -24,9 +24,11 @@
 #define _PARSER_OPENCOLLADA_H_
 
 #include <fstream>
+#include <stdio.h>
 #include "sbm/xercesc_utils.hpp"
 #include "sk/sk_skeleton.h"
 #include "sk/sk_motion.h"
+#include <sb/SBJoint.h>
 #include <sr/sr_material.h>
 
 #include "sbm/gwiz_math.h"
@@ -87,6 +89,15 @@ class ParserOpenCOLLADA
 		static void parseLibraryImages(DOMNode* node, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name);
 		static void parseLibraryEffects(DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap);
 
+		// exporting functionality
+		static bool exportCollada(std::string outPathname, std::string skeletonName, std::string deformMeshName, std::vector<std::string> motionNames, bool exportSk, bool exportMesh, bool exportMotion);
+		static bool exportSkeleton(FILE* fp, std::string skeletonName);
+		static bool exportSkinMesh(FILE* fp, std::string deformMeshName);
+		static bool exportMaterials(FILE* fp, std::string deformMeshName);		
+		static bool exportMotions(FILE* fp, std::vector<std::string> motionNames);
+
+
+
 	private:
 		static int getMotionChannelId(SkChannelArray& channels, const std::string&  sourceName);
 		static int getMotionChannelId(SkChannelArray& channels, std::string& jointName, std::string& targetType);
@@ -94,6 +105,8 @@ class ParserOpenCOLLADA
 		static int getRotationOrder(std::vector<std::string> orderVec);
 		static std::string getGeometryType(std::string s);
 		static void setModelVertexSource(std::string& sourceName, std::string& semanticName, SrModel* model, VecListMap& vecMap);		
+		static void writeJointNode(FILE* fp, SmartBody::SBJoint* joint);
+		static std::string exportMaerialTexParam( FILE* fp, std::string texName );
 };
 
 #endif

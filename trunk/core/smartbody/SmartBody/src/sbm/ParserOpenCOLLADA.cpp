@@ -33,6 +33,9 @@
 #include <sbm/BMLDefs.h>
 #include <sbm/GPU/SbmTexture.h>
 #include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
 #include <sbm/sbm_deformable_mesh.h>
 
 
@@ -2910,4 +2913,437 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 	if (parser)
 		delete parser;
 	return true;
+}
+
+
+
+bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skeletonName, std::string deformMeshName, std::vector<std::string> motionNames, bool exportSk, bool exportMesh, bool exportMotion )
+{	
+	std::string colladaName = deformMeshName + ".dae";
+	std::string fullColladaPathName = outPathname + "/" + colladaName;
+	FILE* fp = fopen(fullColladaPathName.c_str(),"wt");
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	fprintf(fp,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+	fprintf(fp,"<COLLADA>\n");
+
+#if (BOOST_VERSION > 104400)	
+	namespace fs =  boost::filesystem;
+	//using boost::filesystem::dot;
+	//using boost::filesystem::slash;
+#else	
+	namespace fs = boost::filesystem2;
+	//using boost::filesystem2::dot;
+	//using boost::filesystem2::slash;
+#endif
+
+	DeformableMesh* defMesh = assetManager->getDeformableMesh(deformMeshName);
+	if (exportMesh && defMesh)
+	{		
+		ParserOpenCOLLADA::exportMaterials(fp,deformMeshName);
+		ParserOpenCOLLADA::exportSkinMesh(fp,deformMeshName);
+		SbmTextureManager& texManager = SbmTextureManager::singleton();
+		for (unsigned int i=0;i<defMesh->subMeshList.size();i++)
+		{
+			SbmSubMesh* subMesh = defMesh->subMeshList[i];
+			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE,subMesh->texName.c_str());
+			if (tex) // copy texture
+			{
+				std::string ext = boost::filesystem::extension( tex->getFileName() );
+				std::string texBaseName = boost::filesystem::basename( tex->getFileName() );
+				std::string newFileName = outPathname + "/" + texBaseName + ext;
+				if (!fs::exists(fs::path(newFileName)))
+					fs::copy_file(fs::path(tex->getFileName()),fs::path(newFileName));
+			}
+		}
+	}
+	if (exportSk)
+	{
+		ParserOpenCOLLADA::exportSkeleton(fp,skeletonName);
+	}
+	fprintf(fp,"</COLLADA>\n");
+	fclose(fp);
+	return true;
+}
+
+bool ParserOpenCOLLADA::exportMaterials( FILE* fp, std::string deformMeshName )
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	DeformableMesh* defMesh = assetManager->getDeformableMesh(deformMeshName);
+	if (!defMesh) return false;
+	
+	// write-out material -> effect map
+	fprintf(fp,"<library_materials>\n");
+	for (unsigned int i=0;i<defMesh->subMeshList.size();i++)
+	{
+		SbmSubMesh* subMesh = defMesh->subMeshList[i];
+		std::string& matName = subMesh->matName;
+		std::string effectName = matName+"-fx";
+		fprintf(fp,"<material id=\"%s\" name=\"%s\">\n",matName.c_str(),matName.c_str());
+		fprintf(fp,"<instance_effect url=\"#%s\"/>\n",effectName.c_str());
+		fprintf(fp,"</material>\n");
+	}
+	fprintf(fp,"</library_materials>\n");
+	SbmTextureManager& texManger = SbmTextureManager::singleton();
+	fprintf(fp,"<library_effects>\n");
+	for (unsigned int i=0;i<defMesh->subMeshList.size();i++)
+	{
+		SbmSubMesh* subMesh = defMesh->subMeshList[i];
+		std::string effectID = subMesh->matName + "-fx";
+		fprintf(fp,"<effect id=\"%s\">\n",effectID.c_str());
+		fprintf(fp,"<profile_COMMON>\n");
+		SbmTexture* diffTex = texManger.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());
+		//SbmTexture* bumpTex = texManger.findTexture(SbmTextureManager::TEXTURE_NORMALMAP, subMesh->normalMapName.c_str());
+		//SbmTexture* specTex = texManger.findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, subMesh->specularMapName.c_str());
+
+		std::string diffuseTexSamplerID = "";
+		if (diffTex) // only export diffuse texture for now
+		{
+			std::string texName = diffTex->getName();
+			diffuseTexSamplerID = exportMaerialTexParam(fp, texName);
+		}
+		// write out material technique
+		fprintf(fp,"<technique sid=\"common\">\n");
+		// color component
+		fprintf(fp,"<phong>\n");
+		SrMaterial& mat = subMesh->material;		
+		float color[4];		
+		mat.emission.get(color);
+		fprintf(fp,"<emission><color>%f %f %f %f</color></emission>\n",color[0],color[1],color[2],color[3]);
+		mat.ambient.get(color);
+		fprintf(fp,"<ambient><color>%f %f %f %f</color></ambient>\n",color[0],color[1],color[2],color[3]);
+		fprintf(fp,"<diffuse>\n");
+		if (diffuseTexSamplerID != "") // write-out texture sampler
+		{
+			fprintf(fp,"<texture texture=\"%s\" texcoord=\"TEX0\">\n",diffuseTexSamplerID.c_str());
+			fprintf(fp,"</texture>\n");
+		}
+		else // write-out diffuse color
+		{
+			mat.diffuse.get(color);
+			fprintf(fp,"<color>%f %f %f %f</color>\n",color[0],color[1],color[2],color[3]);
+		}
+		fprintf(fp,"</diffuse>\n");
+
+		mat.specular.get(color);
+		fprintf(fp,"<specular><color>%f %f %f %f</color></specular>\n",color[0],color[1],color[2],color[3]);
+		float shininess = mat.shininess;
+		fprintf(fp,"<shininess><float>%f</float></shininess>\n",shininess);
+		fprintf(fp,"</phong>\n");
+		fprintf(fp,"</technique>\n");		
+
+		fprintf(fp,"</profile_COMMON>\n");
+		fprintf(fp,"</effect>\n");		
+	}
+	fprintf(fp,"</library_effects>\n");
+
+	// write-out images
+	fprintf(fp,"<library_images>\n");
+	for (unsigned int i=0;i<defMesh->subMeshList.size();i++)
+	{
+		SbmSubMesh* subMesh = defMesh->subMeshList[i];
+		SbmTexture* diffTex = texManger.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());
+		if (diffTex) 
+		{
+			fprintf(fp,"<image id=\"%s\" name=\"%s\">\n",diffTex->getName().c_str(), diffTex->getName().c_str());
+			fprintf(fp,"<init_from>%s</init_from>\n",diffTex->getFileName().c_str());
+			fprintf(fp,"</image>\n");
+		}		
+	}
+	fprintf(fp,"</library_images>\n");
+	return true;
+}
+
+
+bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	DeformableMesh* defMesh = assetManager->getDeformableMesh(deformMeshName);
+	if (!defMesh) return false;
+
+	fprintf(fp,"<library_geometries>\n");
+	// export geometry
+	for (unsigned int i=0;i<defMesh->dMeshStatic_p.size();i++)
+	{		
+		SrModel& model = defMesh->dMeshStatic_p[i]->shape();
+		bool hasNormal = false, hasTexCoord = false;
+		if (model.N.size() > 0 && model.Fn.size() == model.F.size()) hasNormal = true; // export normal
+		if (model.T.size() > 0 && model.Ft.size() == model.F.size()) hasTexCoord = true;
+		std::string modelName = model.name;
+
+		if (modelName == "") // no model name
+		{
+			modelName = "shape"+boost::lexical_cast<std::string>(i);
+		}
+		fprintf(fp,"<geometry id=\"%s\" name=\"%s\">\n",modelName.c_str(),modelName.c_str());
+		fprintf(fp,"<mesh>\n");
+		// write-out position array
+		std::string positionID = modelName + "-positions";
+		std::string positionArrayID = positionID+"-array";
+
+		{
+			fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",positionID.c_str(),positionID.c_str());
+			fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", positionArrayID.c_str(),model.V.size()*3);
+			for (int k=0;k<model.V.size();k++)
+				fprintf(fp,"%f %f %f ",model.V[k][0],model.V[k][1],model.V[k][2]);
+			fprintf(fp,"</float_array>\n");
+			fprintf(fp,"<technique_common>\n");
+			fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n",positionArrayID.c_str(),model.V.size(),3);
+			fprintf(fp,"<param name=\"X\" type=\"float\"/>\n");
+			fprintf(fp,"<param name=\"Y\" type=\"float\"/>\n");
+			fprintf(fp,"<param name=\"Z\" type=\"float\"/>\n");
+			fprintf(fp,"</accessor>\n");
+			fprintf(fp,"</technique_common>\n");
+			fprintf(fp,"</source>\n");
+		}
+
+		// write-out normal array
+		std::string normalID = modelName + "-normal";
+		std::string normalArrayID = normalID+"-array";
+		hasNormal = model.N.size() > 0;
+		if (hasNormal) // has vertex normals
+		{
+			fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",normalID.c_str(),normalID.c_str());
+			fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", normalArrayID.c_str(),model.N.size()*3);
+			for (int k=0;k<model.N.size();k++)
+				fprintf(fp,"%f %f %f ",model.N[k][0],model.N[k][1],model.N[k][2]);
+			fprintf(fp,"</float_array>\n");
+			fprintf(fp,"<technique_common>\n");
+			fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n",normalArrayID.c_str(),model.N.size(),3);
+			fprintf(fp,"<param name=\"X\" type=\"float\"/>\n");
+			fprintf(fp,"<param name=\"Y\" type=\"float\"/>\n");
+			fprintf(fp,"<param name=\"Z\" type=\"float\"/>\n");
+			fprintf(fp,"</accessor>\n");
+			fprintf(fp,"</technique_common>\n");
+			fprintf(fp,"</source>\n");
+		}
+
+		// write-out texcoord array
+		std::string texCoordID = modelName + "-map1";
+		std::string texCoordArrayID = texCoordID+"-array";
+		hasTexCoord = model.T.size() > 0;
+		if (hasTexCoord) // has vertex normals
+		{
+			fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",texCoordID.c_str(),texCoordID.c_str());
+			fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", texCoordArrayID.c_str(),model.T.size()*2);
+			for (int k=0;k<model.T.size();k++)
+				fprintf(fp,"%f %f ",model.T[k][0],model.T[k][1]);
+			fprintf(fp,"</float_array>\n");
+			fprintf(fp,"<technique_common>\n");
+			fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n",texCoordArrayID.c_str(),model.T.size(),2);
+			fprintf(fp,"<param name=\"U\" type=\"float\"/>\n");
+			fprintf(fp,"<param name=\"V\" type=\"float\"/>\n");			
+			fprintf(fp,"</accessor>\n");
+			fprintf(fp,"</technique_common>\n");
+			fprintf(fp,"</source>\n");
+		}
+
+		// write out vertices semantic
+		std::string vertexID = modelName+"-vertices";
+		fprintf(fp,"<vertices id=\"%s\" name=\"%s\">\n",vertexID.c_str(),vertexID.c_str());
+		fprintf(fp,"<input semantic=\"POSITION\" source=\"#%s\"/>\n",positionID.c_str());
+		fprintf(fp,"</vertices>\n");
+
+		// write out triangles
+		std::string matName = "defaultMat";
+		std::map<std::string,std::vector<int> >::iterator mi;
+		for ( mi  = model.mtlFaceIndices.begin();
+			  mi != model.mtlFaceIndices.end();
+			  mi++)
+		{
+			matName = mi->first;
+			std::vector<int>& mtlFaces = mi->second;
+			int offset = 0;
+			fprintf(fp,"<triangles material=\"%s\" count=\"%d\">\n",matName.c_str(),mtlFaces.size());
+			fprintf(fp,"<input semantic=\"VERTEX\" source=\"#%s\" offset=\"%d\"/>\n",vertexID.c_str(),offset++);
+			if (hasNormal)
+			{
+				fprintf(fp,"<input semantic=\"NORMAL\" source=\"#%s\" offset=\"%d\"/>\n",normalID.c_str(),offset++);
+			}
+			if (hasTexCoord)
+			{
+				fprintf(fp,"<input semantic=\"TEXCOORD\" source=\"#%s\" offset=\"%d\"/>\n",texCoordID.c_str(),offset++);
+			}
+			fprintf(fp,"<p>");			
+			for (int k=0;k<mtlFaces.size();k++)
+			{
+				int fidx = mtlFaces[k];
+				SrModel::Face* f = &model.F[fidx];
+				SrModel::Face *fn = NULL, *ft = NULL;
+				if (hasNormal)
+					fn =  &model.Fn[fidx];
+				if (hasTexCoord)
+					ft = &model.Ft[fidx];
+				
+				for (int j=0;j<3;j++)
+				{
+					fprintf(fp,"%d ",(*f)[j]);
+					if (hasNormal)
+						fprintf(fp,"%d ",(*fn)[j]);
+					if (hasTexCoord)
+						fprintf(fp,"%d ",(*ft)[j]);
+				}
+			}
+			fprintf(fp,"</p>\n");
+			fprintf(fp,"</triangles>\n");
+		}
+		fprintf(fp,"</mesh>\n");
+		fprintf(fp,"</geometry>\n");
+	}
+	fprintf(fp,"</library_geometries>\n");
+
+	// export skin binding
+	fprintf(fp,"<library_controllers>\n");
+	for (unsigned int i=0;i<defMesh->skinWeights.size();i++)
+	{
+		SkinWeight* skinWeight = defMesh->skinWeights[i];
+		std::string skinID = skinWeight->sourceMesh+"-skin";
+		fprintf(fp,"<controller id=\"%d\"  name=\"%s\">\n",skinID.c_str(),skinID.c_str());
+		fprintf(fp,"<skin source=\"#%s\">\n",skinWeight->sourceMesh.c_str());
+		SrMat& bm = skinWeight->bindShapeMat;
+		SrMat bmT = bm; bmT.transpose();
+		fprintf(fp,"<bind_shape_matrix>");
+		for (int k=0;k<16;k++)
+			fprintf(fp,"%f ",bmT.get(k));
+		fprintf(fp,"</bind_shape_matrix>\n");
+		// output joint array
+		std::string skinJointID = skinID + "-joints";
+		std::string skinJointArrayID = skinJointID + "-array";
+		fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",skinJointID.c_str(),skinJointID.c_str());
+		fprintf(fp,"<Name_array id=\"%s\" count=\"%d\">", skinJointArrayID.c_str(), skinWeight->infJointName.size());
+		for (int k=0;k<skinWeight->infJointName.size();k++)
+			fprintf(fp,"%s ",skinWeight->infJointName[k].c_str());
+		fprintf(fp,"</Name_array>\n");
+		fprintf(fp,"<technique_common>\n");
+		fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"1\">\n",skinJointArrayID.c_str(),skinWeight->infJointName.size());
+		fprintf(fp,"<param name=\"JOINT\" type=\"name\"/>\n");
+		fprintf(fp,"</accessor>\n");
+		fprintf(fp,"</technique_common>\n");
+		fprintf(fp,"</source>\n");
+		
+		// output bind pose array
+		std::string skinBindPoseID = skinID + "-bind_poses";
+		std::string skinBindPoseArrayID = skinBindPoseID + "-array";
+		fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",skinBindPoseID.c_str(),skinBindPoseID.c_str());
+		fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", skinBindPoseArrayID.c_str(), skinWeight->bindPoseMat.size()*16);
+		
+		for (int k=0;k<skinWeight->bindPoseMat.size();k++)
+		{
+			SrMat bpT = skinWeight->bindPoseMat[k]; bpT.transpose();
+			for (int j=0;j<16;j++)
+				fprintf(fp,"%f ",bpT.get(j));
+		}
+		fprintf(fp,"</float_array>\n");
+		fprintf(fp,"<technique_common>\n");
+		fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"16\">\n",skinBindPoseArrayID.c_str(),skinWeight->bindPoseMat.size());
+		fprintf(fp,"<param name=\"TRANSFORM\" type=\"float4x4\"/>\n");
+		fprintf(fp,"</accessor>\n");
+		fprintf(fp,"</technique_common>\n");
+		fprintf(fp,"</source>\n");
+
+		// output skin weights
+		std::string skinWeightID = skinID + "-weights";
+		std::string skinWeightArrayID = skinWeightID + "-array";
+		fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",skinWeightID.c_str(),skinWeightID.c_str());
+		fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", skinWeightArrayID.c_str(), skinWeight->bindWeight.size());
+		for (int k=0;k<skinWeight->bindWeight.size();k++)
+			fprintf(fp,"%f ",skinWeight->bindWeight[k]);
+		fprintf(fp,"</float_array>\n");
+
+		fprintf(fp,"<technique_common>\n");
+		fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"1\">\n",skinWeightArrayID.c_str(),skinWeight->bindWeight.size());
+		fprintf(fp,"<param name=\"WEIGHT\" type=\"float\"/>\n");
+		fprintf(fp,"</accessor>\n");
+		fprintf(fp,"</technique_common>\n");
+		fprintf(fp,"</source>\n");
+
+		// output joints semantics
+		fprintf(fp,"<joints>\n");
+		fprintf(fp,"<input semantic=\"JOINT\" source=\"#%s\"/>\n",skinJointID.c_str());
+		fprintf(fp,"<input semantic=\"INV_BIND_MATRIX\" source=\"#%s\"/>\n",skinBindPoseID.c_str());
+		fprintf(fp,"</joints>\n");
+		// output vertex weights semantics
+		fprintf(fp,"<vertex_weights count=\"%d\">\n",skinWeight->numInfJoints.size());
+		fprintf(fp,"<input semantic=\"JOINT\" source=\"#%s\" offset=\"0\"/>\n", skinJointID.c_str());
+		fprintf(fp,"<input semantic=\"WEIGHT\" source=\"#%s\" offset=\"1\"/>\n", skinWeightID.c_str());
+		
+		fprintf(fp,"<vcount>"); // inf joint counts
+		for (unsigned int k=0;k<skinWeight->numInfJoints.size();k++)
+			fprintf(fp,"%d ",skinWeight->numInfJoints[k]);
+		fprintf(fp,"</vcount>\n");
+		fprintf(fp,"<v>"); // actual joint name index and weight index
+		for (unsigned int k=0;k<skinWeight->jointNameIndex.size();k++)
+		{
+			fprintf(fp,"%d %d ",skinWeight->jointNameIndex[k], skinWeight->weightIndex[k]);
+		}
+		fprintf(fp,"</v>\n");
+		fprintf(fp,"</vertex_weights>\n");
+		fprintf(fp,"</skin>\n");
+		fprintf(fp,"</controller>\n");
+	}
+
+	fprintf(fp,"</library_controllers>\n");
+
+	return true;
+}
+
+bool ParserOpenCOLLADA::exportSkeleton( FILE* fp, std::string skeletonName )
+{
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	SmartBody::SBSkeleton* sbSk = assetManager->getSkeleton(skeletonName);
+	if (!sbSk) return false;
+	fprintf(fp,"<library_visual_scenes>\n");
+	fprintf(fp,"<visual_scene id=\"RootNode\" name=\"RootNode\">\n");
+	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSk->root());
+	writeJointNode(fp,rootJoint);
+	fprintf(fp,"</visual_scene>\n");
+	fprintf(fp,"</library_visual_scenes>\n");
+	return true;
+}
+
+void ParserOpenCOLLADA::writeJointNode( FILE* fp, SmartBody::SBJoint* joint )
+{
+	if (!joint) return;
+	// write out the joint name as node id
+	fprintf(fp,"<node id=\"%s\" name=\"%s\" type=\"JOINT\">\n",joint->getName().c_str(), joint->getName().c_str());
+	// output joint local translation
+	SrVec pos = joint->getOffset();
+	fprintf(fp,"<translate sid=\"translate\">%f %f %f</translate>\n", pos[0],pos[1],pos[2]);
+	// output joint pre-rotation & orientation
+	SrQuat quat = joint->quat()->prerot();
+	SrVec eulerPrerot = quat.getEuler();
+	fprintf(fp,"<rotate sid=\"rotateY\">0 1 0 %f</rotate>\n",eulerPrerot[1]);	
+	fprintf(fp,"<rotate sid=\"rotateX\">1 0 0 %f</rotate>\n",eulerPrerot[0]);	
+	fprintf(fp,"<rotate sid=\"rotateZ\">0 0 1 %f</rotate>\n",eulerPrerot[2]);	
+	SrQuat jorient = joint->quat()->orientation();
+	SrVec eulerOrient = jorient.getEuler();
+	fprintf(fp,"<rotate sid=\"jointOrientY\">0 1 0 %f</rotate>\n",eulerOrient[1]);	
+	fprintf(fp,"<rotate sid=\"jointOrientX\">1 0 0 %f</rotate>\n",eulerOrient[0]);	
+	fprintf(fp,"<rotate sid=\"jointOrientZ\">0 0 1 %f</rotate>\n",eulerOrient[2]);	
+
+	// recursively output child joints
+	for (int i=0;i<joint->getNumChildren();i++)
+	{
+		writeJointNode(fp,joint->getChild(i));
+	}
+
+	fprintf(fp,"</node>\n");
+}
+
+std::string ParserOpenCOLLADA::exportMaerialTexParam( FILE* fp, std::string texName )
+{
+	std::string texSurfaceID = texName + "-surface";
+	std::string texSamplerID = texName + "-sampler";
+	fprintf(fp,"<newparam sid=\"%s\">\n",texSurfaceID.c_str());
+	fprintf(fp,"<surface type=\"2D\">\n");
+	fprintf(fp,"<init_from>%s</init_from>",texName.c_str());
+	fprintf(fp,"</surface>\n");
+	fprintf(fp,"</newparam>\n");
+
+	fprintf(fp,"<newparam sid=\"%s\">\n",texSamplerID.c_str());
+	fprintf(fp,"<sampler2D>\n");
+	fprintf(fp,"<source>%s</source>",texSurfaceID.c_str());
+	fprintf(fp,"</sampler2D>\n");
+	fprintf(fp,"</newparam>\n");
+
+	return texSamplerID;
 }
