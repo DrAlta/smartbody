@@ -144,6 +144,7 @@ void SbmTexture::loadImage( const char* fileName )
 	std::string testOutFileName = fileName;
 	//testOutFileName += ".bmp";
 	//SOIL_save_image(testOutFileName.c_str(),SOIL_SAVE_TYPE_BMP,width,height,channels,buffer);
+	int transparentPixel = 0;
 	// invert the image in y-axis
 	for(int j = 0; j*2 < height; ++j )
 	{
@@ -155,19 +156,33 @@ void SbmTexture::loadImage( const char* fileName )
 			buffer[index1] = buffer[index2];
 			buffer[index2] = temp;
 			++index1;
-			++index2;
-			if ( channels == 4 && i%channels == 3) // alpha channel
+			++index2;			
+		}
+	}
+
+	if (channels == 4)
+	{
+		for (int j=0;j<height;j++)
+		{
+			for (int i=0;i<width;i++)
 			{
-				if (temp == 0) // transparent
-					transparentTexture = true;
+				unsigned char alphaVal = buffer[j*width*channels+i*channels+3];
+				if (alphaVal < 250)
+					transparentPixel++;
 			}
 		}
 	}
+	
+
+	if (transparentPixel*20 > height*width)
+		transparentTexture = true;
 	imgBuffer.resize(width*height*channels);
 	for (int i=0;i<width*height*channels;i++)
 	{
 		imgBuffer[i] = buffer[i];
 	}
+	// set the texture file name
+	textureFileName = fileName;
 }
 
 void SbmTexture::buildTexture()

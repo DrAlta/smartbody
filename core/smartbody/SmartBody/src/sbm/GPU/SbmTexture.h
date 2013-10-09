@@ -47,6 +47,7 @@ class SbmTexture // simple place holder for OpenGL texture
 {
 protected:
 	std::string textureName;
+	std::string textureFileName;
 	int width, height;
 	int channels; // num of channels in the iamge	
 	unsigned char* buffer;
@@ -62,8 +63,9 @@ public:
 	SBAPI bool hasBuild() { return finishBuild; }
 	SBAPI bool isTransparent() { return transparentTexture; }
 	SBAPI const std::string& getName() { return textureName; }
+	SBAPI const std::string& getFileName() { return textureFileName; }
 	SBAPI GLuint getID() { return texID; }
-	SBAPI void loadImage(const char* fileName);
+	SBAPI void loadImage(const char* fileName);	
 	SBAPI void buildTexture();
 
 	SBAPI unsigned char* getBuffer() { return buffer; }

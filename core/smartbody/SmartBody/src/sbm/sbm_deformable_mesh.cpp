@@ -708,6 +708,8 @@ bool DeformableMesh::buildVertexBuffer()
 		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,mesh->texName.c_str());
 		std::string lowMatName = mesh->matName;
 		boost::algorithm::to_lower(lowMatName);
+		//if (lowMatName.find("hair") != std::string::npos || lowMatName.find("lash") != std::string::npos 
+		//	|| lowMatName.find("shadow") != std::string::npos || lowMatName.find("shell") != std::string::npos)
 		if (lowMatName.find("hair") != std::string::npos)
 		{
 			// is a hair mesh, based on a rough name searching
@@ -716,6 +718,7 @@ bool DeformableMesh::buildVertexBuffer()
 		}
 		else if (tex && tex->isTransparent())
 		{
+			mesh->isHair = true;
 			hairMeshList.push_back(mesh);
 		}
 		else
