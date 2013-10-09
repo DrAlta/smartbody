@@ -2194,10 +2194,11 @@ void ParserCOLLADAFast::setModelVertexSource( std::string& sourceName, std::stri
 	std::vector<SrVec>* sourceArray = NULL;
 	if (srcName[0] == '#') 
 	{
-		srcName.erase(0,1);
-		if (vecMap.find(srcName) != vecMap.end())
-			sourceArray = &vecMap[srcName];
+		srcName.erase(0,1);		
 	}
+
+	if (vecMap.find(srcName) != vecMap.end())
+		sourceArray = &vecMap[srcName];
 
 	if ( semanticName == "POSITION" && sourceArray && model->V.size() == 0)
 	{
