@@ -334,6 +334,16 @@ void FLTKListener::OnReset()
 {
 }
 
+void FLTKListener::OnObjectSelected(const std::string& objectName)
+{
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (window->resourceWindow)
+	{
+		window->resourceWindow->selectPawn(objectName);
+	}
+}
+
+
 void FLTKListener::notify(SmartBody::SBSubject* subject)
 {
 	SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(subject);

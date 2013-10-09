@@ -13,6 +13,15 @@
 #include <sb/SBScene.h>
 #include <sbm/gwiz_math.h>
 
+PawnControl::PawnControl()
+{
+}
+
+PawnControl::~PawnControl()
+{
+}
+
+
 void PawnControl::init_font()
 {	
 	GLuint textureName;	
@@ -180,6 +189,14 @@ void PawnPosControl::setWorldPt(SrVec& newPt)
 }
 
 
+PawnRotationControl::PawnRotationControl(void) : RotationControl()
+{
+	pawn = NULL;
+}
+
+PawnRotationControl::~PawnRotationControl()
+{
+}
 
 void PawnRotationControl::renderControl( SrCamera& cam )
 {

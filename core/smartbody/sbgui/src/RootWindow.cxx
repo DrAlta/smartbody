@@ -123,7 +123,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Resource Viewer", 0, LaunchResourceViewerCB, this, NULL);
 	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
-//	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
+	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
 	menubar->add("&Window/Blend Viewer", 0, LaunchParamAnimViewerCB, this, NULL);
 	menubar->add("&Window/BML Creator", 0, LaunchBMLCreatorCB, this, NULL);
 	menubar->add("&Window/Face Viewer", 0, LaunchFaceViewerCB, this, NULL);
@@ -1670,7 +1670,8 @@ void BaseWindow::CreateLightCB(Fl_Widget* w, void* data)
 	}
 	std::stringstream strstr;
 	strstr << "light = scene.createPawn(\"light" << highestLightNum << "\")\n";
-	strstr << "light.createBoolAttribute(\"lightIsDirectional\", True, True, \"LightParameters\", 200, False, False, False, \"Is the light directional?\")\n";
+	strstr << "light.createBoolAttribute(\"enabled\", True, True, \"LightParameters\", 200, False, False, False, \"Is the light enabled?\")\n";
+	strstr << "light.createBoolAttribute(\"lightIsDirectional\", True, True, \"LightParameters\", 205, False, False, False, \"Is the light directional?\")\n";
 	strstr << "light.createVec3Attribute(\"lightDiffuseColor\", 1, .95, .8, True, \"LightParameters\", 210, False, False, False, \" Diffuse light color\")\n";
 	strstr << "light.createVec3Attribute(\"lightAmbientColor\", 0, 0, 0, True, \"LightParameters\", 220, False, False, False, \" Ambient light color\")\n";
 	strstr << "light.createVec3Attribute(\"lightSpecularColor\", 0, 0, 0, True, \"LightParameters\", 230, False, False, False, \"Specular light color\")\n";

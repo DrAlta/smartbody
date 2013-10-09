@@ -51,7 +51,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 			   ITEM_VISEME_MAP,			   
 			   ITEM_DEFAULT,
 			   ITEM_SIZE };
-		static std::string ItemNameList[ITEM_SIZE];
+		std::vector<std::string> ItemNameList;
 
 		ResourceWindow(int x, int y, int w, int h, char* name);
 		~ResourceWindow();
@@ -68,6 +68,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		void resize(int x, int y, int w, int h);
 		void update();
         
+		void selectPawn(const std::string& name);
 		void updateGUI();				
 		void updateTreeItemInfo(Fl_Tree_Item* treeItem, long itemType);
 		static void refreshUI(Fl_Widget* widget, void* data);
