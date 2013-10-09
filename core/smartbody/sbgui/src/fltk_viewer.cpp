@@ -53,6 +53,7 @@
 # include <sr/sr_lines.h>
 # include <sr/sr_color.h>
 # include <sr/sr_points.h>
+# include <sr/sr_euler.h>
 
 # include <sr/sr_sn_matrix.h>
 # include <sr/sr_sn.h>
@@ -1251,7 +1252,12 @@ void FltkViewer::updateLights()
 		SrLight light;		
 		light.directional = true;
 		light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
-		light.position = SrVec( 100.0, 250.0, 400.0 );
+		SrMat mat;
+		sr_euler_mat_xyz (mat, -72, 180, -165);
+		SrQuat orientation(mat);
+		SrVec up(0,1,0);
+		SrVec lightDirection = up * orientation;
+		light.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
 	//	light.constant_attenuation = 1.0f/cam.scale;
 		light.constant_attenuation = 1.0f;
 		_lights.push_back(light);
@@ -1259,7 +1265,10 @@ void FltkViewer::updateLights()
 		SrLight light2 = light;
 		light2.directional = true;
 		light2.diffuse = SrColor( 0.8f, 0.8f, 0.8f );
-		light2.position = SrVec( 100.0, 500.0, -1000.0 );
+		sr_euler_mat_xyz (mat, 1.34, 7.07, -144);
+		SrQuat orientation2(mat);
+		lightDirection = up * orientation2;
+		light2.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
 	//	light2.constant_attenuation = 1.0f;
 	//	light2.linear_attenuation = 2.0f;
 		_lights.push_back(light2);

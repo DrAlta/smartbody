@@ -4,6 +4,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBPython.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBBmlProcessor.h>
 #include <sb/SBCharacterListener.h>
 
 class SimpleListener : public SmartBody::SBCharacterListener
@@ -29,7 +30,7 @@ int main( int argc, char ** argv )
 	LOG("Loading Python...");
 
 	// initialize the Python libraries
-	initPython("../../Python26/Libs");
+	initPython("../Python27/Libs");
 
 	// get the scene object
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -37,13 +38,13 @@ int main( int argc, char ** argv )
 	scene->setCharacterListener(&listener);
 
 	// set the mediapath which dictates the top-level asset directory
-	scene->setMediaPath("../../../../data");
+	scene->setMediaPath("../data");
 
 	// indicate where different assets will be located
 	// "motion" = animations and skeletons
 	// "script" = Python scripts to be executed
 	// "mesh" = models and textures
-	scene->addAssetPath("motion", "sbm-common/common-sk");
+	scene->addAssetPath("motion", "ChrBrad");
 
 	// load the assets from the indicated locations
 	LOG("Loading Assets...");
@@ -56,7 +57,7 @@ int main( int argc, char ** argv )
 	SmartBody::SBCharacter* character = scene->createCharacter("mycharacter", "");
 
 	// load the skeleton from one of the available skeleton types
-	SmartBody::SBSkeleton* skeleton = scene->createSkeleton("common.sk");
+	SmartBody::SBSkeleton* skeleton = scene->createSkeleton("ChrBrad.sk");
 
 	// attach the skeleton to the character
 	character->setSkeleton(skeleton);
@@ -75,9 +76,12 @@ int main( int argc, char ** argv )
 	}
 	else
 	{
-		// otherwise, set the times manually:
+		// otherwise, the time will run according
 		sim->setTime(0.0);
 	}
+
+	// make the character do something
+	scene->getBmlProcessor()->execBML("mycharacter", "<body posture=\"ChrBrad@Idle01\"/>");
 	
 	LOG("Starting the simulation...");
 	double lastPrint = 0;
@@ -93,12 +97,23 @@ int main( int argc, char ** argv )
 
 		if (sim->getTime() > lastPrint)
 		{
-			printf("Simulation is at time: %5.2f\n", sim->getTime());
+			LOG("Simulation is at time: %5.2f\n", sim->getTime());
 			lastPrint = sim->getTime() + 10;
+		}
+
+		const std::vector<std::string>& characterNames = scene->getCharacterNames();
+		for (size_t c = 0; c < characterNames.size(); c++)
+		{
+			SmartBody::SBCharacter* character = scene->getCharacter(characterNames[c]);
+			SmartBody::SBJoint* joint = character->getSkeleton()->getJoint(0);
+			SrVec position = joint->getPosition();
+			LOG("Character %s first joint is at position (%f, %f, %f)", character->getName().c_str(), position.x, position.y, position.z);
 		}
 	}
 
 	sim->stop();
+
+	
 	
 	return 0;
 }
