@@ -12,6 +12,7 @@
 package com.adobe.flascc.preloader
 {
     import flash.display.MovieClip;
+	import flash.display.Loader;
     import flash.events.Event;
     import flash.events.ProgressEvent;
     import flash.text.TextField;
@@ -60,6 +61,7 @@ package com.adobe.flascc.preloader
         datazip1.addEventListener(IOErrorEvent.IO_ERROR, onError)
         datazip1.addEventListener(Event.COMPLETE, onComplete)
         datazip1.addEventListener(ProgressEvent.PROGRESS, onProgress1)
+		
     }
 
     private var p1:int,p4:int;

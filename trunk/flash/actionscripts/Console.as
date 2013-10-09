@@ -57,6 +57,9 @@ package com.adobe.flascc
     {
       addDirectory("/root")
       addDirectory("/root/data")
+
+
+	  
     }
 
     public function addZip(data:ByteArray) {
@@ -266,7 +269,7 @@ package com.adobe.flascc
 			CModule.vfs.addBackingStore(zfs, null)
 			
 			// for some weird reasons, addBackingStore didn't mount the folder correctly, i still need to explicitly mount directories
-			var paths = zfs.getPaths()
+			/*var paths = zfs.getPaths()
 			for (var i = 0; i < paths.length; i++)
 			{
 				var path:String = paths[i]
@@ -279,6 +282,7 @@ package com.adobe.flascc
 					CModule.vfs.addDirectory(path)
 				}
 			}			
+			*/
 			
 			
 			CModule.startAsync(this, null)
