@@ -81,7 +81,10 @@
 #include <fstream>
 #include <sstream>
 // for minizip compression
+
+#if !defined(__FLASHPLAYER__)
 #include <external/zlib-1.2.5/zip.h>
+#endif
 
 #ifndef WIN32
 #define _stricmp strcasecmp
@@ -1012,8 +1015,8 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 		_characterMap.insert(std::pair<std::string, SbmCharacter*>(character->getName(), character));
 		_characterNames.push_back(character->getName());
 
-		if (getCharacterListener() )
-			getCharacterListener()->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
+		//if (getCharacterListener() )
+		//	getCharacterListener()->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
 		SBSkeleton* skeleton = new SBSkeleton();		
 		character->setSkeleton(skeleton);
 //		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
@@ -2058,6 +2061,7 @@ naive_uncomplete(boost::filesystem2::path const p, boost::filesystem2::path cons
     return output;
 }
 
+#if !defined(__FLASHPLAYER__)
 void writeFileToZip(zipFile& zf, std::string readFileName, std::string fileNameInZip)
 {
 	//LOG("writeFileToZip, srcFile = %s, fileInZip = %s",readFileName.c_str(),fileNameInZip.c_str());
@@ -2374,7 +2378,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		}
 	}
 }
-
+#endif
 void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 {
 	strstr << "# -------------------- media and asset paths\n";

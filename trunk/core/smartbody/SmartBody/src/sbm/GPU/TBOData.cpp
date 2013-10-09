@@ -1,5 +1,7 @@
 #include "vhcl.h"
+#if !defined(__FLASHPLAYER__)
 #include "external/glew/glew.h"
+#endif
 #include "TBOData.h"
 #include "SbmShader.h"
 #include <cstring>

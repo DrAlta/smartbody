@@ -27,7 +27,9 @@
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>
 #else
+#if !defined(__FLASHPLAYER__)
 #include "external/glew/glew.h"
+#endif
 #endif
 # include <sr/sr_vec.h>
 # include <sr/sr_mat.h>
