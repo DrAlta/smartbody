@@ -1,5 +1,7 @@
 #include "vhcl.h"
+#if !defined(__FLASHPLAYER__)
 #include "external/glew/glew.h"
+#endif
 #include "SbmShader.h"
 //#include <GL/glew.h>
 #include <stdio.h>

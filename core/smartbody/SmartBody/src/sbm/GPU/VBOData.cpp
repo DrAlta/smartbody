@@ -1,7 +1,9 @@
 #include "vhcl.h"
 #include <cstring>
 #include <cstdio>
+#if !defined(__FLASHPLAYER__)
 #include "external/glew/glew.h"
+#endif
 #include "VBOData.h"
 
 
