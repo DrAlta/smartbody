@@ -788,7 +788,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 
 		if (l_acromioclavicular->jointName() == "l_sternoclavicular")
 			setJointMap("l_sternoclavicular", l_acromioclavicular, prtMap);
-		else
+		else 
 			setJointMap("l_sternoclavicular", l_acromioclavicular, prtMap);
 
 		if (r_acromioclavicular->jointName() == "r_sternoclavicular")

@@ -2132,6 +2132,30 @@ void writeDirToZip(zipFile& zf, std::string sourceFolder, std::string folderName
 	
 }
 
+
+void SBScene::exportCharacter( std::string charName, std::string outDir )
+{
+	SmartBody::SBCharacter* sbChar = getCharacter(charName);
+	if (!sbChar) return;
+#if (BOOST_VERSION > 104400)	
+	namespace fs =  boost::filesystem;
+	//using boost::filesystem::dot;
+	//using boost::filesystem::slash;
+#else	
+	namespace fs = boost::filesystem2;
+	//using boost::filesystem2::dot;
+	//using boost::filesystem2::slash;
+#endif
+	fs::path newOutPath(outDir);
+	if (!fs::exists(newOutPath))
+	{
+		fs::create_directories(newOutPath);
+	}
+	std::vector<std::string> motions;	
+	ParserOpenCOLLADA::exportCollada(outDir, sbChar->getSkeleton()->getName(), sbChar->getStringAttribute("deformableMesh"), motions, true, true, false);
+
+}
+
 void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveName )
 {
 	std::string mediaPath = getMediaPath();

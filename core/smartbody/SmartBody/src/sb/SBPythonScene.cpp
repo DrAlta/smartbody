@@ -129,6 +129,7 @@ void pythonFuncsScene()
 		.def("exportScene", &SBScene::exportScene, "Saves the entire SmartBody configuration, including assets paths as a python script into a given file location.")
 		#if !defined(__FLASHPLAYER__)
 		.def("exportScenePackage", &SBScene::exportScenePackage, "Saves the entire SmartBody configuration and all assets into a given folder, or into a .zip archive")
+		.def("exportCharacter", &SBScene::exportCharacter, "Saves the character's skeleton, skinned mesh and all other assets into a given folder in Collada format. ")
 		#endif
 		.def("createNavigationMesh", &SBScene::createNavigationMesh, "Create navigation mesh from the input mesh.\n Input : OBJ file name")
 		.def("getNavigationMesh", &SBScene::getNavigationMesh, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the navigation mesh in the scene")
