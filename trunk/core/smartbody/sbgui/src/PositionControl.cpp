@@ -127,10 +127,11 @@ SrVec ObjectControl::screenToWorld( const SrCamera& cam, const SrVec& win )
 SrVec ObjectControl::mouseToWorld( SrCamera& cam, float fx, float fy, float tx, float ty )
 {
 	SrVec p1, p2, x, inc;	
-	SrVec center = cam.getCenter();//getWorldPt();
-	//sr_out << "old center = " << center << "  ";
+	SrVec center = cam.getCenter();//getWorldPt();	
 	SrVec eye = cam.getEye();
-	SrPlane plane ( center, eye-cam.getCenter() );
+	SrVec eyeDir = eye-cam.getCenter();
+	eyeDir.normalize();
+	SrPlane plane ( center,  eyeDir);
 	cam.get_ray ( fx, fy, p1, x );
 	p1 = plane.intersect ( p1, x );
 	cam.get_ray ( tx, ty, p2, x );
@@ -158,6 +159,12 @@ PositionControl::PositionControl(void) : ObjectControl()
 	colors[0]=SrVec(1,0,0);
 	colors[1]=SrVec(0,154.0f/255.0f,82.0f/255.0f);
 	colors[2]=SrVec(0,0,1);
+
+	base=60;
+	r=8;
+	len=r*4;
+	s_len=15;
+	ss_len=3;	
 }
 
 PositionControl::~PositionControl(void)
@@ -200,6 +207,10 @@ void PositionControl::hitOPS(SrCamera& cam)
 	glDisable(GL_LIGHTING);
 	glPushName(0xffffffff);
 
+	float hitScale = 1.0;	
+	float lineScale = 1.0;
+	float centerScale = 1.0;
+	glLineWidth(lineScale);
 	glLoadName(3);
 	//draw center square
 	SrVec center= getWorldPt();
@@ -207,49 +218,66 @@ void PositionControl::hitOPS(SrCamera& cam)
 	SrVec dirx,diry;
 	screenParallelPlane(cam,center,dirx,diry);
 	float ratio= dirx.norm();
-	
+
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	glBegin(GL_QUADS);
-	glVertex3fv(center-s_len*dirx-s_len*diry);
-	glVertex3fv(center+s_len*dirx-s_len*diry);
-	glVertex3fv(center+s_len*dirx+s_len*diry);
-	glVertex3fv(center-s_len*dirx+s_len*diry);
+	glVertex3fv(center-s_len*hitScale*dirx-s_len*hitScale*diry);
+	glVertex3fv(center+s_len*hitScale*dirx-s_len*hitScale*diry);
+	glVertex3fv(center+s_len*hitScale*dirx+s_len*hitScale*diry);
+	glVertex3fv(center-s_len*hitScale*dirx+s_len*hitScale*diry);
 	glEnd();
 
 	//drawShadowSquare(center[0],center[1],center[2],dirx,diry,s_len,GL_QUADS);
-	drawSphere(center,ratio*s_len);
+	drawSphere(center,ratio*s_len*hitScale);
 
 	glPushMatrix();
 	glTranslatef(center[0],center[1],center[2]);
 
 	glLoadName(0);
 	glPushMatrix();
+	glBegin(GL_LINES);
+	glColor3fv(colors[0]);
+	glVertex3f(0,0,0);
+	glVertex3f(base*ratio,0,0);
+	glEnd();
+
 	glTranslatef(base*ratio,0,0);
 	glRotatef(90,0,1,0);
 	GLUquadricObj *arx=gluNewQuadric();
-	gluCylinder(arx,r*ratio,0,len*ratio,10,10);
-	gluDeleteQuadric(arx);
+	gluCylinder(arx,r*ratio*hitScale,0,len*ratio,10,10);
+	gluDeleteQuadric(arx);	
 	glPopMatrix();
 
 	glLoadName(1);
 	glPushMatrix();
+	glBegin(GL_LINES);
+	glColor3fv(colors[0]);
+	glVertex3f(0,0,0);
+	glVertex3f(0,base*ratio,0);
+	glEnd();
+
 	glTranslatef(0,base*ratio,0);
 	glRotatef(-90,1,0,0);
 	GLUquadricObj *ary=gluNewQuadric();
-	gluCylinder(ary,r*ratio,0,len*ratio,10,10);
+	gluCylinder(ary,r*ratio*hitScale,0,len*ratio,10,10);
 	gluDeleteQuadric(ary);
 	glPopMatrix();
 
 	glLoadName(2);
 	glPushMatrix();
+	glBegin(GL_LINES);
+	glColor3fv(colors[0]);
+	glVertex3f(0,0,0);
+	glVertex3f(0,0,base*ratio);
+	glEnd();
 	glTranslatef(0,0,base*ratio);
 	GLUquadricObj *arz=gluNewQuadric();
-	gluCylinder(arz,r*ratio,0,len*ratio,10,10);
+	gluCylinder(arz,r*ratio*hitScale,0,len*ratio,10,10);
 	gluDeleteQuadric(arz);
 	glPopMatrix();
 	glPopMatrix();
-	
-
 	glPopName();
+	glLineWidth(1.0);
 }
 
 void PositionControl::draw(SrCamera& cam)
@@ -476,6 +504,7 @@ bool PositionControl::drag(SrCamera& cam,  float fx, float fy, float tx, float t
 	{
 		inc = mouseToWorld(cam,fx,fy,tx,ty);
 		ratio = -worldToEye(cam,center).z/(cam.getCenter()-cam.getEye()).norm();
+		//LOG("opdir = %d, ratio = %f",opdir, ratio);
 		inc *= ratio;
 	}
 	else
@@ -484,6 +513,8 @@ bool PositionControl::drag(SrCamera& cam,  float fx, float fy, float tx, float t
 		SrVec dirx,diry;
 		screenParallelPlane(cam,center,dirx,diry);
 		float ratio=dirx.norm();
+
+		//LOG("opdir = %d, ratio = %f",opdir, ratio);
 
 		SrVec t(center[0],center[1],center[2]);
 		t[opdir]+=ratio*base;

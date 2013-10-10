@@ -82,7 +82,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 
 	//gluPickMatrix(cursorX,viewport[3]-cursorY,100,100,viewport);
 	//printf("cursorX = %d, cursorY = %d\n",cursorX,cursorY);
-	gluPickMatrix(cursorX,cursorY,5,5,viewport);
+	gluPickMatrix(cursorX,cursorY,20,20,viewport);
 	ratio = (viewport[2]+0.0f) / viewport[3];	
 	glMultMatrixf ( (const float*)cam->get_perspective_mat(mat) );	
 	glMatrixMode(GL_MODELVIEW);
@@ -129,7 +129,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 			//FltkViewer::drawColObject(pawn->getGeomObject(), gmat);
 		}
 		else
-		{
+		{		
 			PositionControl::drawSphere(pawn_pos, pawnSize);				
 		}		
 		glPopName();			
@@ -141,7 +141,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 	glMatrixMode(GL_MODELVIEW);
 	glFlush();
 	hits = glRenderMode(GL_RENDER);
-
+	LOG("num of hits = %d",hits);
 	SbmPawn* selectPawn = NULL;
 	if (hits != 0){
 		//processHits2(hits,selectBuf,0);

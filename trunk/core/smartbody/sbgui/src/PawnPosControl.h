@@ -44,7 +44,7 @@ class PawnPosControl : public PositionControl, public PawnControl
 public:
 	PawnPosControl(void);
 	~PawnPosControl(void);
-
+	
 	virtual void renderControl(SrCamera& cam);
 	virtual void updateControl(SrCamera& cam, float fx, float fy, float tx, float ty);
 	virtual SrVec getWorldPt(); // get world position ( from the attached object ? )

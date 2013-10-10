@@ -39,15 +39,15 @@ RotationControl::~RotationControl(void)
 void RotationControl::identify( std::vector<int>& path )
 {
 	opdir=path[1];	
-	//printf("opdir = %d\n",opdir);
+	printf("opdir = %d\n",opdir);
 	prevPt = getWorldPt();
 	resetColor();
 }
 
 void RotationControl::hitOPS(SrCamera& cam)
 {
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	glDisable(GL_LIGHTING);
-	glLineWidth(3.0);
 	glPushName(0xffffffff);
 
 	SrVec center=getWorldPt();
@@ -59,18 +59,56 @@ void RotationControl::hitOPS(SrCamera& cam)
 	//	glMultMatrixd(::transpose(pm->t_matrix));
 	glTranslatef(center[0],center[1],center[2]);
 
-	glLoadName(3);
-	glBegin(GL_LINE_LOOP);
-	for (int i=0;i<seg;i++)
-		glVertex3fv(radius[0]*(dirx*circle[i][0]+diry*circle[i][1]));
-	glEnd();
-
-	glLoadName(4);
-	glBegin(GL_POLYGON);
-	for (int i=0;i<seg;i++)
-		glVertex3fv(radius[1]*(dirx*circle[i][0]+diry*circle[i][1]));
-	glEnd();
+// 	glLoadName(3);
+// 	glBegin(GL_LINE_LOOP);
+// 	for (int i=0;i<seg;i++)
+// 		glVertex3fv(radius[0]*(dirx*circle[i][0]+diry*circle[i][1]));
+// 	glEnd();
+// 
+// 	glLoadName(4);
+// 	glBegin(GL_LINE_LOOP);
+// 	for (int i=0;i<seg;i++)
+// 		glVertex3fv(radius[1]*(dirx*circle[i][0]+diry*circle[i][1]));
+// 	glEnd();
 	
+	double lineWidth = 20.0;
+	
+	SrVec nm=cam.getEye() - cam.getCenter();//cross(diry,dirx);
+	nm.normalize();
+	std::vector<SrVec> circle_copy;
+	circle_copy.resize(seg);
+	SrVec zero(0,0,0);
+	//	Mat3f m=(dragging)?unit_quat_to_matrix(debug_quat)*unit_quat_to_matrix(hdl->quat):
+	//		unit_quat_to_matrix(hdl->quat);
+	SrMat m;
+	getWorldRot().get_mat(m);
+	//	Mat3f m=unit_quat_to_matrix(debug_quat)*unit_quat_to_matrix(hdl->quat);
+	glLoadName(0);
+	for (int i=0;i<seg;i++)
+		//		circle_copy[i]=pm->r_matrix*(radius[1]*ratio*(Vec3f(0,circle[i][0],circle[i][1])));
+		circle_copy[i]=(radius[1]*ratio*(SrVec(0,circle[i][0],circle[i][1])))*m;
+	glColor3fv(colors[0]);	
+	
+	glLineWidth((GLfloat)lineWidth); // use very thick line to ease the rotation selection
+	drawVisibleCircle(circle_copy, zero,nm);
+
+	glLoadName(1);
+	for (int i=0;i<seg;i++)
+		//		circle_copy[i]=pm->r_matrix*(radius[1]*ratio*(Vec3f(circle[i][1],0,circle[i][0])));
+		circle_copy[i]=(radius[1]*ratio*(SrVec(circle[i][1],0,circle[i][0])))*m;
+	glColor3fv(colors[1]);
+	glLineWidth((GLfloat)lineWidth); 
+	drawVisibleCircle(circle_copy, zero, nm);
+
+	glLoadName(2);
+	for (int i=0;i<seg;i++)
+		//		circle_copy[i]=pm->r_matrix*(radius[1]*ratio*(Vec3f(circle[i][0],circle[i][1],0)));
+		circle_copy[i]=(radius[1]*ratio*(SrVec(circle[i][0],circle[i][1],0)))*m;
+	glColor3fv(colors[2]);
+	glLineWidth((GLfloat)lineWidth); 
+	drawVisibleCircle(circle_copy, zero, nm);
+	
+#if 0
 	SrQuat rot = getWorldRot();
 	SrMat mat;
 	GLdouble m[16];
@@ -93,6 +131,7 @@ void RotationControl::hitOPS(SrCamera& cam)
 	for (int i=0;i<seg;i++)
 		glVertex3fv(radius[1]*ratio*(SrVec(circle[i][0],circle[i][1],0)));
 	glEnd();
+#endif
 
 	glPopMatrix();
 	glPopName();
@@ -105,12 +144,13 @@ void RotationControl::draw(SrCamera& cam)
 {
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
-	double lineWidth[5] = { 1.0, 1.0, 1.0, 1.0, 1.0} ;
-	lineWidth[opdir] = 3.0;	
+	//double lineWidth[5] = { 1.0, 1.0, 1.0, 1.0, 1.0} ;
+	double lineWidth[5] = { 2.0, 2.0, 2.0, 2.0, 2.0} ;
+
+	lineWidth[opdir] = 4.0;	
 	SrVec zero(0,0,0);
 	
 	//if (active)
-		
 	{
 		SrVec center=getWorldPt();
 		SrVec dirx,diry;
