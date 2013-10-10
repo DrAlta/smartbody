@@ -2208,6 +2208,9 @@
     <ClInclude Include="src\sbm\ParserCOLLADAFast.h">
       <Filter>sbm</Filter>
     </ClInclude>
+    <ClInclude Include="src\sb\SBVersion.hpp">
+      <Filter>sb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">

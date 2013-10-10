@@ -110,50 +110,9 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createDoubleAttribute("lipSyncSpeedLimit", 6.0f, true, "Lip Sync", 162, false, false, false, "Speed Limit of facial shape movement");
 	setDiphoneSpeedLimit(6.0f);
 	
-// Dominance curve attributes
-	int startingPos = 500;
+	// Dominance curve attributes (other attributes will be created if the "dominancecurve" attribute is selected
 	createBoolAttribute("dominancecurve", false, true, "Baldi Lip Sync", 500, false, false, false, "Use dominance curve instead of predefined curves for lip syncing.");
-	createDoubleAttribute("jaw_rot_min", -4.0, true, "Baldi Lip Sync", startingPos + 0, false, false, false, "");
-	createDoubleAttribute("jaw_rot_max", 13, true, "Baldi Lip Sync", startingPos + 1, false, false, false, "");
-	createDoubleAttribute("jaw_rot_default", 0.21, true, "Baldi Lip Sync", startingPos + 2, false, false, false, "");
 
-	createDoubleAttribute("lower_lip_ftuck_min", -15, true, "Baldi Lip Sync", startingPos + 3, false, false, false, "");
-	createDoubleAttribute("lower_lip_ftuck_max", 10, true, "Baldi Lip Sync", startingPos + 4, false, false, false, "");
-
-	createDoubleAttribute("upper_lip_raise_min", -30, true, "Baldi Lip Sync", startingPos + 5, false, false, false, "");
-	createDoubleAttribute("upper_lip_raise_max", 20, true, "Baldi Lip Sync", startingPos + 6, false, false, false, "");
-	createDoubleAttribute("upper_lip_raise_default", -2.96, true, "Baldi Lip Sync", startingPos + 7, false, false, false, "");
-
-	createDoubleAttribute("cheek_hollow_min", -1.5, true, "Baldi Lip Sync", startingPos + 8, false, false, false, "");
-	createDoubleAttribute("cheek_hollow_max", 1.5, true, "Baldi Lip Sync", startingPos + 9, false, false, false, "");
-
-	createDoubleAttribute("lower_lip_roll_min", -20, true, "Baldi Lip Sync", startingPos + 10, false, false, false, "");
-	createDoubleAttribute("lower_lip_roll_max", 40, true, "Baldi Lip Sync", startingPos + 11, false, false, false, "");
-
-	createDoubleAttribute("jaw_thrust_min", -10, true, "Baldi Lip Sync", startingPos + 12, false, false, false, "");
-	createDoubleAttribute("jaw_thrust_max", 30, true, "Baldi Lip Sync", startingPos + 13, false, false, false, "");
-
-	createDoubleAttribute("lip_corner_zip_min", -20, true, "Baldi Lip Sync", startingPos + 14, false, false, false, "");
-	createDoubleAttribute("lip_corner_zip_max", 30, true, "Baldi Lip Sync", startingPos + 15, false, false, false, "");
-
-	createDoubleAttribute("lower_lip_raise_min", -25, true, "Baldi Lip Sync", startingPos + 16, false, false, false, "");
-	createDoubleAttribute("lower_lip_raise_max", 15, true, "Baldi Lip Sync", startingPos + 17, false, false, false, "");
-
-	createDoubleAttribute("lip_rounding_min", 0, true, "Baldi Lip Sync", startingPos + 18, false, false, false, "");
-	createDoubleAttribute("lip_rounding_max", 20, true, "Baldi Lip Sync", startingPos + 19, false, false, false, "");
-	createDoubleAttribute("lip_rounding_default", 6.106, true, "Baldi Lip Sync", startingPos + 20, false, false, false, "");
-
-	createDoubleAttribute("lip_retraction_min", 0, true, "Baldi Lip Sync", startingPos + 21, false, false, false, "");
-	createDoubleAttribute("lip_retraction_max", 15, true, "Baldi Lip Sync", startingPos + 22, false, false, false, "");
-	createDoubleAttribute("lip_retraction_default", 2.809, true, "Baldi Lip Sync", startingPos + 23, false, false, false, "");
-
-	createDoubleAttribute("tongue_tip_y_min", -2, true, "Baldi Lip Sync", startingPos + 24, false, false, false, "");
-	createDoubleAttribute("tongue_tip_y_max", 2, true, "Baldi Lip Sync", startingPos + 25, false, false, false, "");
-
-	createDoubleAttribute("tongue_tip_z_min", -2, true, "Baldi Lip Sync", startingPos + 26, false, false, false, "");
-	createDoubleAttribute("tongue_tip_z_max", 2, true, "Baldi Lip Sync", startingPos + 27, false, false, false, "");
-
-	createBoolAttribute("handtune", true, true, "Basic", startingPos + 28, false, false, false, "");
 //-------------------
 
 	createBoolAttribute("ikPostFix", false, true, "Retargeting", 200, false, false, false, "Post-Processing IK to fix foot sliding.");
@@ -730,6 +689,59 @@ void SBCharacter::notify(SBSubject* subject)
 		{
 			SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 			this->setVoiceBackupCode(strAttribute->getValue());
+		}
+		else if (attrName == "dominancecurve")
+		{
+			SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			if (boolAttribute->getValue())
+			{
+				if (!this->getAttribute("jaw_rot_min"))
+				{
+					// create the attributes for Baldi lip syncing
+					int startingPos = 500;
+					createDoubleAttribute("jaw_rot_min", -4.0, true, "Baldi Lip Sync", startingPos + 0, false, false, false, "");
+					createDoubleAttribute("jaw_rot_max", 13, true, "Baldi Lip Sync", startingPos + 1, false, false, false, "");
+					createDoubleAttribute("jaw_rot_default", 0.21, true, "Baldi Lip Sync", startingPos + 2, false, false, false, "");
+
+					createDoubleAttribute("lower_lip_ftuck_min", -15, true, "Baldi Lip Sync", startingPos + 3, false, false, false, "");
+					createDoubleAttribute("lower_lip_ftuck_max", 10, true, "Baldi Lip Sync", startingPos + 4, false, false, false, "");
+
+					createDoubleAttribute("upper_lip_raise_min", -30, true, "Baldi Lip Sync", startingPos + 5, false, false, false, "");
+					createDoubleAttribute("upper_lip_raise_max", 20, true, "Baldi Lip Sync", startingPos + 6, false, false, false, "");
+					createDoubleAttribute("upper_lip_raise_default", -2.96, true, "Baldi Lip Sync", startingPos + 7, false, false, false, "");
+
+					createDoubleAttribute("cheek_hollow_min", -1.5, true, "Baldi Lip Sync", startingPos + 8, false, false, false, "");
+					createDoubleAttribute("cheek_hollow_max", 1.5, true, "Baldi Lip Sync", startingPos + 9, false, false, false, "");
+
+					createDoubleAttribute("lower_lip_roll_min", -20, true, "Baldi Lip Sync", startingPos + 10, false, false, false, "");
+					createDoubleAttribute("lower_lip_roll_max", 40, true, "Baldi Lip Sync", startingPos + 11, false, false, false, "");
+
+					createDoubleAttribute("jaw_thrust_min", -10, true, "Baldi Lip Sync", startingPos + 12, false, false, false, "");
+					createDoubleAttribute("jaw_thrust_max", 30, true, "Baldi Lip Sync", startingPos + 13, false, false, false, "");
+
+					createDoubleAttribute("lip_corner_zip_min", -20, true, "Baldi Lip Sync", startingPos + 14, false, false, false, "");
+					createDoubleAttribute("lip_corner_zip_max", 30, true, "Baldi Lip Sync", startingPos + 15, false, false, false, "");
+
+					createDoubleAttribute("lower_lip_raise_min", -25, true, "Baldi Lip Sync", startingPos + 16, false, false, false, "");
+					createDoubleAttribute("lower_lip_raise_max", 15, true, "Baldi Lip Sync", startingPos + 17, false, false, false, "");
+
+					createDoubleAttribute("lip_rounding_min", 0, true, "Baldi Lip Sync", startingPos + 18, false, false, false, "");
+					createDoubleAttribute("lip_rounding_max", 20, true, "Baldi Lip Sync", startingPos + 19, false, false, false, "");
+					createDoubleAttribute("lip_rounding_default", 6.106, true, "Baldi Lip Sync", startingPos + 20, false, false, false, "");
+
+					createDoubleAttribute("lip_retraction_min", 0, true, "Baldi Lip Sync", startingPos + 21, false, false, false, "");
+					createDoubleAttribute("lip_retraction_max", 15, true, "Baldi Lip Sync", startingPos + 22, false, false, false, "");
+					createDoubleAttribute("lip_retraction_default", 2.809, true, "Baldi Lip Sync", startingPos + 23, false, false, false, "");
+
+					createDoubleAttribute("tongue_tip_y_min", -2, true, "Baldi Lip Sync", startingPos + 24, false, false, false, "");
+					createDoubleAttribute("tongue_tip_y_max", 2, true, "Baldi Lip Sync", startingPos + 25, false, false, false, "");
+
+					createDoubleAttribute("tongue_tip_z_min", -2, true, "Baldi Lip Sync", startingPos + 26, false, false, false, "");
+					createDoubleAttribute("tongue_tip_z_max", 2, true, "Baldi Lip Sync", startingPos + 27, false, false, false, "");
+					createBoolAttribute("handtune", true, true, "Basic", startingPos + 28, false, false, false, "");
+				}
+			}
+
 		}
 		if (attrName.find("steering.") == 0)
 		{

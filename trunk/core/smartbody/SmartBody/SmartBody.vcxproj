@@ -70,7 +70,7 @@ copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>rem if exist "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" src src\sb\SBVersionTemplate.hpp src\sb\SBVersion.hpp</Command>
+      <Command>if exist "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" src src\sb\SBVersionTemplate.hpp src\sb\SBVersion.hpp</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -850,6 +850,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp" />
     <ClInclude Include="src\sbm\ParserCOLLADAFast.h" />
     <ClInclude Include="src\sb\SBCharacterListener.h" />
+    <ClInclude Include="src\sb\SBVersion.hpp" />
     <ClInclude Include="src\sb\smartbody-c-dll.h" />
     <ClInclude Include="src\sb\smartbody-dll.h" />
   </ItemGroup>
