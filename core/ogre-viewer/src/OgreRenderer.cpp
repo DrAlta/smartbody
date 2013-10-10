@@ -34,7 +34,7 @@ void OgreRenderer::destroyScene(void)
 void OgreRenderer::createDefaultScene(std::string meshName)
 {
 	mSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_MODULATIVE );
-	mSceneMgr->setShadowTextureSize( 4048 );
+	mSceneMgr->setShadowTextureSize( 2048 );
 	mSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );
 
 	// Setup animation default
