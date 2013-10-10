@@ -199,6 +199,47 @@ int ResourceWindow::handle( int event )
 			}			
 			break;
 		}
+		case FL_KEYDOWN:  
+		{
+		  switch (Fl::event_key())
+		  {
+			case FL_Delete:
+				{
+					// check pawns and characters for selection
+					Fl_Tree_Item* tree = treeItemList[ITEM_PAWN];
+					int numChildren = tree->children();
+					for (int c = 0; c < numChildren; c++)
+					{
+						Fl_Tree_Item* child = tree->child(c);
+						if (child->is_selected())
+						{
+							const char* name = child->label();
+							SmartBody::SBScene::getScene()->removePawn(name);
+							updateGUI();
+							return 1;
+						}
+					}
+
+					tree = treeItemList[ITEM_CHARACTER];
+					numChildren = tree->children();
+					for (int c = 0; c < numChildren; c++)
+					{
+						Fl_Tree_Item* child = tree->child(c);
+						if (child->is_selected())
+						{
+							const char* name = child->label();
+							SmartBody::SBScene::getScene()->removeCharacter(name);
+							updateGUI();
+							return 1;
+						}
+					}
+				
+				}
+				break;
+			default:
+				break;
+		  }
+		}
 	}
 	return ret;
 }
