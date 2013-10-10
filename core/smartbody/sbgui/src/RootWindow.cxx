@@ -123,7 +123,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Resource Viewer", 0, LaunchResourceViewerCB, this, NULL);
 	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
-	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
+//	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
 	menubar->add("&Window/Blend Viewer", 0, LaunchParamAnimViewerCB, this, NULL);
 	menubar->add("&Window/BML Creator", 0, LaunchBMLCreatorCB, this, NULL);
 	menubar->add("&Window/Face Viewer", 0, LaunchFaceViewerCB, this, NULL);
