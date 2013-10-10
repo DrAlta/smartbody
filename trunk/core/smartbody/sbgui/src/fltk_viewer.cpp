@@ -407,7 +407,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    gridHighlightColor[0] = .6f;
    gridHighlightColor[1] = .6f;
    gridHighlightColor[2] = .6f;
-   gridSize = 200.0;
+   gridSize = 400.0;
    gridStep = 20.0;
 //   gridSize = 400.0;
 //   gridStep = 50.0;
@@ -2858,7 +2858,7 @@ void FltkViewer::drawGrid()
 		return;
 	}
 
-	GLfloat floor_height = 0.0f;
+	GLfloat gridHeight = 0.0f;
 
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
 	bool colorChanged = false;
@@ -2876,19 +2876,20 @@ void FltkViewer::drawGrid()
 	glBegin(GL_LINES);
 	float sceneScale = SmartBody::SBScene::getScene()->getScale();
 	float adjustedGridStep = gridStep;
+	float adjustGridSize = gridSize * .01f / sceneScale;
 	if (sceneScale > 0.f)
 	{
 		adjustedGridStep *= .01f / sceneScale;
 	}
 
-	for (float x = -gridSize; x <= gridSize; x += adjustedGridStep)
+	for (float x = -adjustGridSize; x <= adjustGridSize + .001; x += adjustedGridStep)
 	{
 		if (x == 0.0) {
 			colorChanged = true;
 			glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f);
 		}
-		glVertex3f(x, floor_height, -gridSize);
-		glVertex3f(x, floor_height, gridSize);
+		glVertex3f(x, gridHeight, -adjustGridSize);
+		glVertex3f(x, gridHeight, adjustGridSize);
 		
 		if (colorChanged) {
 			colorChanged = false;
@@ -2896,14 +2897,14 @@ void FltkViewer::drawGrid()
 		}
 
 	}
-	for (float x = -gridSize; x <= gridSize; x += adjustedGridStep)
+	for (float x = -adjustGridSize; x <= adjustGridSize + .001; x += adjustedGridStep)
 	{
 		if (x == 0) {
 			colorChanged = true;
 			glColor4f(gridHighlightColor[0], gridHighlightColor[1], gridHighlightColor[2], 1.0f );
 		}
-		glVertex3f(-gridSize, floor_height, x);
-		glVertex3f(gridSize, floor_height, x);
+		glVertex3f(-adjustGridSize, gridHeight, x);
+		glVertex3f(adjustGridSize, gridHeight, x);
 		if (colorChanged) {
 			colorChanged = false;
 			glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
