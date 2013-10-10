@@ -6,6 +6,8 @@
 #include <sb/SBAttribute.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmTexture.h>
+#include <sr/sr_euler.h>
+
 #if !defined(WIN32)
 #include <GL/glx.h>
 #endif
@@ -277,7 +279,53 @@ void EmbeddedOgre::updateOgreLights()
 
 	if (numLightsInScene == 0)
 	{
+		Light* light;
 		// add in default Ogre lighting here
+		try {
+			light =  ogreSceneMgr->getLight("defaultLight0");
+		} catch( Ogre::Exception& e ) {
+			light = ogreSceneMgr->createLight( "defaultLight0" );
+			light->setType(Light::LT_DIRECTIONAL);
+		}
+
+		SrMat mat;
+		sr_euler_mat_xyz (mat, SR_TORAD(-72), SR_TORAD(180), SR_TORAD(-165));
+		SrQuat orientation(mat);
+		SrVec up(0,1,0);
+		SrVec lightDirection = up * orientation;
+		light->setDirection(-lightDirection[0], -lightDirection[1], -lightDirection[2]);  
+		light->setDiffuseColour(1.0f, 1.0f, 1.0f);
+		light->setVisible(true);
+
+		// add the second default light
+		try {
+			light =  ogreSceneMgr->getLight("defaultLight1");
+		} catch( Ogre::Exception& e ) {
+			light = ogreSceneMgr->createLight( "defaultLight1" );
+			light->setType(Light::LT_DIRECTIONAL);
+		}
+
+		sr_euler_mat_xyz (mat, SR_TORAD(1.34), SR_TORAD(7.07), SR_TORAD(-144));
+		SrQuat orientation2(mat);
+		SrVec lightDirection2 = up * orientation2;
+		light->setDirection(-lightDirection2[0], -lightDirection2[1], -lightDirection2[2]);  
+		light->setDiffuseColour(1.0f, 1.0f, 1.0f);
+		light->setVisible(true);
+
+	}
+	else
+	{
+		Light* light;
+		try {
+			light =  ogreSceneMgr->getLight("defaultLight0");
+			light->setVisible(false);
+		} catch( Ogre::Exception& e ) {
+		}
+		try {
+			light =  ogreSceneMgr->getLight("defaultLight1");
+			light->setVisible(false);
+		} catch( Ogre::Exception& e ) {
+		}
 	}
 
 }

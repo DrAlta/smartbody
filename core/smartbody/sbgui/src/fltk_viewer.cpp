@@ -1253,7 +1253,7 @@ void FltkViewer::updateLights()
 		light.directional = true;
 		light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
 		SrMat mat;
-		sr_euler_mat_xyz (mat, -72, 180, -165);
+		sr_euler_mat_xyz (mat, SR_TORAD(-72), SR_TORAD(180), SR_TORAD(-165));
 		SrQuat orientation(mat);
 		SrVec up(0,1,0);
 		SrVec lightDirection = up * orientation;
@@ -1265,7 +1265,7 @@ void FltkViewer::updateLights()
 		SrLight light2 = light;
 		light2.directional = true;
 		light2.diffuse = SrColor( 0.8f, 0.8f, 0.8f );
-		sr_euler_mat_xyz (mat, 1.34, 7.07, -144);
+		sr_euler_mat_xyz (mat, SR_TORAD(1.34), SR_TORAD(7.07), SR_TORAD(-144));
 		SrQuat orientation2(mat);
 		lightDirection = up * orientation2;
 		light2.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
