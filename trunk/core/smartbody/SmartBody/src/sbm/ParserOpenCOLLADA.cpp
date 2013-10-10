@@ -3086,7 +3086,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
 		bool hasNormal = false, hasTexCoord = false;
 		if (model.N.size() > 0 && model.Fn.size() == model.F.size()) hasNormal = true; // export normal
 		if (model.T.size() > 0 && model.Ft.size() == model.F.size()) hasTexCoord = true;
-		std::string modelName = model.name;
+		std::string modelName = (const char*) model.name;
 
 		if (modelName == "") // no model name
 		{
