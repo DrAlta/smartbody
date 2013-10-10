@@ -220,7 +220,7 @@ bool AttributeGroupPriorityPredicate(const SmartBody::SBAttributeGroup* d1, cons
 	SmartBody::SBAttributeGroup* a = const_cast<SmartBody::SBAttributeGroup*>(d1);
 	SmartBody::SBAttributeGroup* b = const_cast<SmartBody::SBAttributeGroup*>(d2);
 
-	return a->getPriority() > b->getPriority();
+	return a->getPriority() < b->getPriority();
 }
 
 
@@ -337,7 +337,7 @@ void AttributeWindow::draw()
 		{
 			sortedAttributeGroups.push_back(attributeGroups[g]);
 		}
-		std::sort(attributeGroups.begin(), attributeGroups.end(), AttributeGroupPriorityPredicate);
+		std::sort(sortedAttributeGroups.begin(), sortedAttributeGroups.end(), AttributeGroupPriorityPredicate);
 		
 		int startY = 30;
 
