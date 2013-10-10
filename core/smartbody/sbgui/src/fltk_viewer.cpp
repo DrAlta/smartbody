@@ -1461,11 +1461,11 @@ void FltkViewer::draw()
 	   texm.updateTexture();
    }	
    
-   if (_objManipulator.hasPicking())
-   {
-		SrVec2 pick_loc = _objManipulator.getPickLoc();
-		_objManipulator.picking(pick_loc.x,pick_loc.y, cam);	   
-   }  
+//    if (_objManipulator.hasPicking())
+//    {
+// 		SrVec2 pick_loc = _objManipulator.getPickLoc();
+// 		_objManipulator.picking(pick_loc.x,pick_loc.y, cam);	   
+//    }  
 
    
    glViewport ( 0, 0, w(), h() );
@@ -2193,29 +2193,31 @@ int FltkViewer::handle ( int event )
          e.key = Fl::event_key();
 		  switch (Fl::event_key())
 		  {
-			case 'w': // translate mode
-				_transformMode = 0;
+			case 'w': // translate mode				
 				{
 					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
 					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
+					_transformMode = 0;
 					if (rotControl->get_attach_pawn())
-					{
+					{						
 						posControl->attach_pawn(rotControl->get_attach_pawn());
 						rotControl->detach_pawn();
-						 _objManipulator.active_control = posControl;
+						_objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_POS);
+						_objManipulator.active_control = posControl;
 					}					
 				}
 				return ret;
-			case 'e': // rotate mode
- 				_transformMode = 1;
+			case 'e': // rotate mode 				
 				{
 					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
 					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
+					_transformMode = 1;
 					if (posControl->get_attach_pawn())
-					{
+					{						
 						rotControl->attach_pawn(posControl->get_attach_pawn());
 						posControl->detach_pawn();
-						 _objManipulator.active_control = rotControl;
+						_objManipulator.active_control = rotControl;
+						_objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_ROT);
 					}
 				}
 				return ret;
@@ -2402,11 +2404,11 @@ int FltkViewer::handle_event ( const SrEvent &e )
 	   if ( res ) return res;
    }
 
-   if (e.mouse_event() )
-   {
-	   res = handle_object_manipulation ( e );
-	   if ( res ) return res;
-   }
+//    if (e.mouse_event() )
+//    {
+// 	   res = handle_object_manipulation ( e );
+// 	   if ( res ) return res;
+//    }
 
    if ( e.mouse_event() ) return handle_scene_event ( e );
 
@@ -5128,7 +5130,7 @@ void FltkViewer::drawDeformableModels()
 			{
 				SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p, _data->showSkinWeight);
 				character->scene_p->set_visibility(0,1,0,0);
-				_data->render_action.apply(character->scene_p);
+				//_data->render_action.apply(character->scene_p);
 			}
 		}
 	}
