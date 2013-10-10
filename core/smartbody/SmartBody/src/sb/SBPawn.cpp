@@ -17,8 +17,8 @@ namespace SmartBody {
 
 SBPawn::SBPawn() : SbmPawn()
 {
+	setAttributeGroupPriority("transform", 80);
 	setAttributeGroupPriority("Display", 100);
-	setAttributeGroupPriority("transform", 150);
 	setAttributeGroupPriority("Physics", 300);
 
 	createBoolAttribute("visible", true, true, "Display", 5, false, false, false, "");
@@ -53,6 +53,10 @@ SBPawn::SBPawn() : SbmPawn()
 
 SBPawn::SBPawn(const char* name) : SbmPawn(name)
 {
+	setAttributeGroupPriority("transform", 80);
+	setAttributeGroupPriority("Display", 100);
+	setAttributeGroupPriority("Physics", 300);
+	
 	createBoolAttribute("visible", true, true, "Display", 5, false, false, false, "Whether the object is visible.");
 	createVec3Attribute("color", 1.0, 0.0, 0.0, true, "Display", 6, false, false, false, "Object color.");
 	_posX = createDoubleAttribute("posX", 0.0, true, "transform", 10, false, false, false, "X position");
