@@ -91,7 +91,7 @@ class ParserOpenCOLLADA
 
 		// exporting functionality
 		static bool exportCollada(std::string outPathname, std::string skeletonName, std::string deformMeshName, std::vector<std::string> motionNames, bool exportSk, bool exportMesh, bool exportMotion);
-		static bool exportSkeleton(FILE* fp, std::string skeletonName);
+		static bool exportVisualScene(FILE* fp, std::string skeletonName, std::string defMeshName);
 		static bool exportSkinMesh(FILE* fp, std::string deformMeshName);
 		static bool exportMaterials(FILE* fp, std::string deformMeshName);		
 		static bool exportMotions(FILE* fp, std::vector<std::string> motionNames);

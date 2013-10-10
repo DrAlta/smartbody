@@ -2926,6 +2926,20 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 	fprintf(fp,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 	fprintf(fp,"<COLLADA>\n");
 
+	fprintf(fp,"<asset>\n");
+	fprintf(fp,"<contributor>\n");
+	fprintf(fp,"<author>SmartBody</author>\n");
+	fprintf(fp,"<authoring_tool>COLLADA SmartBody exporter</authoring_tool>\n");
+	fprintf(fp,"<comments></comments>\n");
+	fprintf(fp,"</contributor>\n");
+	//fprintf(fp,"<created>2012-06-01T21:28:15Z</created>\");
+	//fprintf(fp,"<modified>2012-06-01T21:28:15Z</modified>\n");
+	fprintf(fp,"<revision></revision>\n");
+	fprintf(fp,"<title></title>\n");
+	fprintf(fp,"<unit meter=\"0.01\"/>\n");
+	fprintf(fp,"<up_axis>Y_UP</up_axis>\n");
+	fprintf(fp,"</asset>\n");
+
 #if (BOOST_VERSION > 104400)	
 	namespace fs =  boost::filesystem;
 	//using boost::filesystem::dot;
@@ -2958,7 +2972,11 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 	}
 	if (exportSk)
 	{
-		ParserOpenCOLLADA::exportSkeleton(fp,skeletonName);
+		// decide whether to export instance of geometry as well
+		std::string defMeshName = "";
+		if (exportMesh)
+			defMeshName = deformMeshName;
+		ParserOpenCOLLADA::exportVisualScene(fp,skeletonName, defMeshName);
 	}
 	fprintf(fp,"</COLLADA>\n");
 	fclose(fp);
@@ -3197,7 +3215,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
 	{
 		SkinWeight* skinWeight = defMesh->skinWeights[i];
 		std::string skinID = skinWeight->sourceMesh+"-skin";
-		fprintf(fp,"<controller id=\"%d\"  name=\"%s\">\n",skinID.c_str(),skinID.c_str());
+		fprintf(fp,"<controller id=\"%s\"  name=\"%s\">\n",skinID.c_str(),skinID.c_str());
 		fprintf(fp,"<skin source=\"#%s\">\n",skinWeight->sourceMesh.c_str());
 		SrMat& bm = skinWeight->bindShapeMat;
 		SrMat bmT = bm; bmT.transpose();
@@ -3286,17 +3304,55 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
 	return true;
 }
 
-bool ParserOpenCOLLADA::exportSkeleton( FILE* fp, std::string skeletonName )
+bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, std::string defMeshName )
 {
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	SmartBody::SBSkeleton* sbSk = assetManager->getSkeleton(skeletonName);
+	DeformableMesh* defMesh = assetManager->getDeformableMesh(defMeshName);
 	if (!sbSk) return false;
 	fprintf(fp,"<library_visual_scenes>\n");
 	fprintf(fp,"<visual_scene id=\"RootNode\" name=\"RootNode\">\n");
+	// write-out skeleton hierarchy
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSk->root());
 	writeJointNode(fp,rootJoint);
+	// write-out instance of skinned mesh, if it exists
+	if (defMesh)
+	{
+		fprintf(fp,"<node id=\"SkinnedMesh\" name=\"SkinnedMesh\" type=\"NODE\">\n");
+		std::string rootJointName = rootJoint->getName();
+		for (unsigned int i=0;i<defMesh->skinWeights.size();i++)
+		{
+			SkinWeight* skinWeight = defMesh->skinWeights[i];
+			std::string meshID = skinWeight->sourceMesh;
+			std::string controllerID = skinWeight->sourceMesh+"-skin";
+			int validMeshIdx = defMesh->getValidSkinMesh(skinWeight->sourceMesh);
+			SrModel& model = defMesh->dMeshStatic_p[validMeshIdx]->shape();
+			std::string matName = "default";
+			if (model.mtlnames.size() > 0)
+				matName = model.mtlnames[0];
+			std::string matID = matName+"_SG";
+			
+			fprintf(fp,"<node id=\"%s\" name=\"%s\" type=\"NODE\">\n",meshID.c_str(),meshID.c_str());
+			fprintf(fp,"<translate side=\"translate\">0 0 0</translate>\n");
+			fprintf(fp,"<instance_controller url=\"#%s\">\n",controllerID.c_str());
+			fprintf(fp,"<skeleton>#%s</skeleton>\n",rootJointName.c_str());
+			// write-out bind material for this mesh
+			fprintf(fp,"<bind_material>\n");
+			fprintf(fp,"<technique_common>\n");
+			fprintf(fp,"<instance_material symbol=\"%s\" target=\"#%s\"/>\n",matID.c_str(),matName.c_str());
+			fprintf(fp,"</technique_common>\n");
+			fprintf(fp,"</bind_material>\n");
+			fprintf(fp,"</instance_controller>\n");
+			fprintf(fp,"</node>\n");
+		}
+		fprintf(fp,"</node>\n");
+	}
+
 	fprintf(fp,"</visual_scene>\n");
 	fprintf(fp,"</library_visual_scenes>\n");
+	fprintf(fp,"<scene>\n");
+	fprintf(fp,"<instance_visual_scene url=\"#RootNode\"/>\n");
+	fprintf(fp,"</scene>\n");
 	return true;
 }
 
@@ -3304,7 +3360,7 @@ void ParserOpenCOLLADA::writeJointNode( FILE* fp, SmartBody::SBJoint* joint )
 {
 	if (!joint) return;
 	// write out the joint name as node id
-	fprintf(fp,"<node id=\"%s\" name=\"%s\" type=\"JOINT\">\n",joint->getName().c_str(), joint->getName().c_str());
+	fprintf(fp,"<node id=\"%s\" name=\"%s\" sid=\"%s\" type=\"JOINT\">\n",joint->getName().c_str(), joint->getName().c_str(), joint->getName().c_str());
 	// output joint local translation
 	SrVec pos = joint->getOffset();
 	fprintf(fp,"<translate sid=\"translate\">%f %f %f</translate>\n", pos[0],pos[1],pos[2]);
