@@ -318,13 +318,11 @@ void RetargetStepWindow::applyAutoRig()
 #endif
 
 	//updateCharacterList();
-	this->refreshAll();
+	scene->removePawn(pawnName);
+	this->refreshAll();		
 	this->setApplyType(true);
 	setCharacterName(charName);
-	setJointMapName(skelName);
-	scene->removePawn(pawnName);
-	//autoRigManager.buildAutoRigging(model )
-	
+	setJointMapName(skelName);	
 }
 
 

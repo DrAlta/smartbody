@@ -296,6 +296,7 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 		editor->shapeList->clear();
 
 		editor->createStateButton->label("Edit Blend");
+		SmartBody::SBMotionBlendBase* blendBase = dynamic_cast<SmartBody::SBMotionBlendBase*>(currentState);
 		// determine the state type
 		SmartBody::SBAnimationBlend0D* state0d = dynamic_cast<SmartBody::SBAnimationBlend0D*>(currentState);
 		if (state0d)
@@ -373,7 +374,9 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 			editor->triangleVisualization->redraw();
 		}
 		SmartBody::SBAnimationBlend3D* state3d = dynamic_cast<SmartBody::SBAnimationBlend3D*>(currentState);
-		if (state3d)
+		
+		bool use3DVisualization = state3d || (blendBase && blendBase->getNumDimensions() == 3);
+		if (use3DVisualization)
 		{
 			editor->choiceStateType->value(4);
 			editor->shapeList->activate();
