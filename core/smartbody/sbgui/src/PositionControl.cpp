@@ -56,7 +56,7 @@ void ObjectControl::setColor(const SrVec &color)
 	glColorMaterial(GL_FRONT,GL_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
 	glColor3fv(color);
-	glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHTING);
 }
 
 void ObjectControl::screenParallelPlane(
@@ -184,13 +184,17 @@ void PositionControl::drawSphere(SrVec& pos, float fRadius, SrVec color)
 	glDisable(GL_LIGHTING);
 }
 
-
-void PositionControl::drawBox( SrBox& box )
+void PositionControl::drawBox( SrBox& box, bool wireFrame /*= false*/, SrVec color /*= SrVec(0.f,1.f,1.f)*/ )
 {
+	glDisable(GL_LIGHTING);	
 	SrSnBox sbox;					
 	sbox.shape().a = box.a;
 	sbox.shape().b = box.b;	
-	sbox.render_mode(srRenderModeSmooth);
+	if (wireFrame)
+		sbox.render_mode(srRenderModeLines);
+	else
+		sbox.render_mode(srRenderModeSmooth);
+	sbox.color(SrColor(color[0],color[1],color[2]));
 	SrGlRenderFuncs::render_box(&sbox);
 }
 
@@ -316,7 +320,7 @@ void PositionControl::draw(SrCamera& cam)
 
 
 			//draw arrow
-			glEnable(GL_LIGHTING);
+			//glEnable(GL_LIGHTING);
 			setColor(colors[0]);
 			//glColor3fv(colors[0]);
 			glPushMatrix();
@@ -369,7 +373,7 @@ void PositionControl::draw(SrCamera& cam)
 					glVertex3f(base*ratio,0,0);
 					glEnd();
 					//head
-					glEnable(GL_LIGHTING);
+					//glEnable(GL_LIGHTING);
 					setColor(colors[0]);
 					glPushMatrix();
 					glTranslated(base*ratio,0,0);
@@ -390,7 +394,7 @@ void PositionControl::draw(SrCamera& cam)
 					glVertex3f(0,base*ratio,0);
 					glEnd();
 					//head
-					glEnable(GL_LIGHTING);
+					//glEnable(GL_LIGHTING);
 					setColor(colors[1]);
 					glPushMatrix();
 					glTranslatef(0,base*ratio,0);
@@ -411,7 +415,7 @@ void PositionControl::draw(SrCamera& cam)
 					glVertex3f(0,0,base*ratio);
 					glEnd();
 					//head
-					glEnable(GL_LIGHTING);
+					//glEnable(GL_LIGHTING);
 					setColor(colors[2]);
 					glPushMatrix();
 					glTranslated(0,0,base*ratio);

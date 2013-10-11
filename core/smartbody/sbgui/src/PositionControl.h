@@ -57,7 +57,7 @@ public:
 	virtual void identify(std::vector<int>& path);
 
 	static void drawSphere(SrVec& pos, float fRadius = 1.0, SrVec color = SrVec(1.f,0,0));
-	static void drawBox(SrBox& box);
+	static void drawBox(SrBox& box, bool wireFrame = false, SrVec color = SrVec(0.f,1.f,1.f));
 	void drawShadowSquare(float x,float y,float z,SrVec& dirx,SrVec& diry,float sz,unsigned int mode);	
 protected:
 	void drawCenter();		
