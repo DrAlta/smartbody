@@ -487,6 +487,11 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBPythonSkeleton.cpp
         ./src/sb/SBPythonSystem.cpp
         ./src/sb/SBPythonClass.cpp
+		
+        ./src/sb/SBAssetHandler.cpp
+        ./src/sb/SBAssetHandlerCOLLADA.cpp
+        ./src/sb/SBAssetHandlerSk.cpp
+        ./src/sb/SBAssetHandlerSkm.cpp
 
         ./src/sb/SBBehavior.cpp
         ./src/sb/SBDebuggerServer.cpp
