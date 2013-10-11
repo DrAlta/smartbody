@@ -249,7 +249,15 @@ void RetargetStepWindow::applyAutoRig()
 	std::string fileextension = boost::filesystem::extension(modelName);
 	std::string skelName = filebasename+".sk";
 	std::string deformMeshName = filebasename;
-	bool autoRigSuccess = autoRigManager.buildAutoRigging(model, skelName, deformMeshName);
+
+
+	bool autoRigSuccess = false;
+#if 1 // test voxel build
+	autoRigSuccess = autoRigManager.buildAutoRiggingVoxels(model,skelName,deformMeshName);
+	//return;
+#else
+	autoRigSuccess = autoRigManager.buildAutoRigging(model, skelName, deformMeshName);
+#endif
 
 	if (!autoRigSuccess)
 	{
