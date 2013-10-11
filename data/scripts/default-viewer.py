@@ -16,7 +16,7 @@ cameraPawn.setPosition(cameraPos)
 light0 = scene.createPawn("light0")
 light0Pos = SrVec(1.00*sscale, 2.50*sscale, 4.00*sscale)
 light0.setPosition(light0Pos)
-light0.setRotation(SrVec(-50, 180, 180))
+light0.setHPR(SrVec(180, -50, 180))
 
 light0.createBoolAttribute("lightCastShadow", True, True, "LightAttributes", 8, False, False, False, "Does the light cast shadow")
 light0.createBoolAttribute("lightIsDirectional", True, True, "LightAttributes", 5, False, False, False, "Is the light a directional light")
@@ -34,7 +34,7 @@ light0.createDoubleAttribute("lightQuadraticAttenuation", 0.0, True, "LightAttri
 light1 = scene.createPawn("light1")
 light1Pos = SrVec(1.00*sscale, 5.00*sscale, -10.00*sscale)
 light1.setPosition(light1Pos)
-light1.setRotation(SrVec(61, 180, 180))
+light1.setHPR(SrVec(180, 61, 180))
 
 light1.createBoolAttribute("lightCastShadow", True, True, "LightAttributes", 8, False, False, False, "Does the light cast shadow")
 light1.createBoolAttribute("lightIsDirectional", True, True, "LightAttributes", 5, False, False, False, "Is the light a directional light")

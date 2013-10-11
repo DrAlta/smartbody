@@ -45,7 +45,10 @@ void ObjectManipulationHandle::draw(SrCamera& cam)
 	{
 		active_control->renderControl(cam);
 		if (renderSelectedBoundingBox)
-			PositionControl::drawBox(active_control->get_attach_pawn()->getBoundingBox(),true);
+		{
+			SrBox box = active_control->get_attach_pawn()->getBoundingBox();
+			PositionControl::drawBox(box,true);
+		}
 	}
 	//pawn_control.draw();
 	
