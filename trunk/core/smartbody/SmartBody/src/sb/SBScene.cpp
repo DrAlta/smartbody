@@ -1061,8 +1061,8 @@ SBPawn* SBScene::createPawn(const std::string& pawnName)
 		SBPawn* pawn = new SBPawn(pawnName.c_str());
 		SBSkeleton* skeleton = new SBSkeleton();
 		pawn->setSkeleton(skeleton);
-		SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
-		joint->setName("world_offset");
+		//SkJoint* joint = skeleton->add_joint(SkJoint::TypeQuat);
+		//joint->setName("world_offset");
 
 		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(pawn->getName());
 		if (iter != _pawnMap.end())
