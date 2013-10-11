@@ -252,7 +252,7 @@ void RetargetStepWindow::applyAutoRig()
 
 
 	bool autoRigSuccess = false;
-#if 1 // test voxel build
+#if 0 // test voxel build
 	autoRigSuccess = autoRigManager.buildAutoRiggingVoxels(model,skelName,deformMeshName);
 	//return;
 #else
