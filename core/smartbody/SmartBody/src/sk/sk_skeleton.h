@@ -38,12 +38,14 @@
 class SrStringArray;
 class SrVarTable;
 class SkColdet;
-
+namespace SmartBody {
+	class SBSkeleton;
+}
 //================================ SkSkeleton =================================================
 
 /*! A Skeleton defined as a hierarchy of joints */
 class SkSkeleton : public SmartBody::SBAsset, public SrSharedClass
- { private :
+ { protected :
     // basic data:
 	std::string _skfilename;
     SkJoint* _root;
@@ -197,7 +199,7 @@ class SkSkeleton : public SmartBody::SBAsset, public SrSharedClass
 	void setJointMapName(const std::string& jointMapName);
 	std::string getJointMapName();
 
-   private :
+   protected :
     int _loadjdata ( SrInput& in, SkJoint* j, SrStringArray& paths );
     SkJoint* _loadj ( SrInput& in, SkJoint* p, SrStringArray& paths, bool merge );
     SkJoint* _loadjlist ( SrInput& in, float scale, SrStringArray& paths );

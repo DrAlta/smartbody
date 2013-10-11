@@ -3,7 +3,8 @@
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
-
+#include <sb/SBAssetHandlerSkm.h>
+#include <sb/SBAssetHandlerSk.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -41,7 +42,10 @@ SBAssetManager::SBAssetManager()
 
 	createDoubleAttribute("globalSkeletonScale", 1,true,"",30,false,false,false,"Multiplier when loading all skeletons. ");
 	createDoubleAttribute("globalMotionScale", 1,true,"",30,false,false,false,"Multiplier when loading all motions.");
-	
+
+	addAssetHandler(new SBAssetHandlerSkm());
+	addAssetHandler(new SBAssetHandlerSk());	
+	uniqueSkeletonId = 0;
 }
 
 SBAssetManager::~SBAssetManager()
@@ -104,6 +108,20 @@ void SBAssetManager::setGlobalSkeletonScale(double val)
 SBSkeleton* SBAssetManager::createSkeleton(const std::string& skeletonDefinition)
 {
 	SBSkeleton* skeleton = NULL;
+	if (skeletonDefinition == "")
+	{
+		SBSkeleton* skeleton = new SBSkeleton();
+		std::stringstream strstr;
+		strstr << "skeleton" << uniqueSkeletonId;
+		uniqueSkeletonId++;
+		skeleton->setName(strstr.str());
+		skeleton->skfilename(strstr.str().c_str());
+		_skeletons[strstr.str()] = skeleton;
+
+		return skeleton;
+
+	}
+
 	SBSkeleton* templateSkeleton = this->getSkeleton(skeletonDefinition);
 	if (templateSkeleton)
 	{
@@ -1486,6 +1504,78 @@ DeformableMesh* SBAssetManager::getDeformableMesh(const std::string& meshName)
 void SBAssetManager::removeAllDeformableMeshes()
 {
 	_deformableMeshMap.clear();
+}
+
+void SBAssetManager::addAssetHandler(SBAssetHandler* handler)
+{
+	if (!handler)
+		return;
+
+	// make sure the handler doesn't exist already
+	std::vector<SBAssetHandler*>::iterator iter = std::find(_assetHandlers.begin(), _assetHandlers.end(), handler);
+	if (iter != _assetHandlers.end())
+		return;
+
+	// add the asset types to the map
+	std::vector<std::string> assetTypes = handler->getAssetTypes();
+	for (std::vector<std::string>::iterator iter = assetTypes.begin();
+		 iter != assetTypes.end();
+		 iter++)
+	{
+		std::map<std::string, std::vector<SBAssetHandler*> >::iterator mapIter = _assetHandlerMap.find((*iter));
+		if (mapIter == _assetHandlerMap.end())
+		{
+			std::vector<SBAssetHandler*> h;
+			h.push_back(handler);
+			_assetHandlerMap[(*iter)] = h;
+		}
+		else
+		{
+			_assetHandlerMap[(*iter)].push_back(handler);
+		}
+	}
+}
+
+void SBAssetManager::removeAssetHandler(SBAssetHandler* handler)
+{
+	if (!handler)
+		return;
+
+	// make sure the handler exists
+	std::vector<SBAssetHandler*>::iterator iter = std::find(_assetHandlers.begin(), _assetHandlers.end(), handler);
+	if (iter == _assetHandlers.end())
+		return;
+
+	// remove the handler from the handler list
+	_assetHandlers.erase(iter);
+
+	// remove the handler from the map
+	// add the asset types to the map
+	std::vector<std::string> assetTypes = handler->getAssetTypes();
+	for (std::vector<std::string>::iterator iter = assetTypes.begin();
+		 iter != assetTypes.end();
+		 iter++)
+	{
+		std::map<std::string, std::vector<SBAssetHandler*> >::iterator mapIter = _assetHandlerMap.find((*iter));
+		std::vector<SBAssetHandler*>::iterator assetIter = std::find((*mapIter).second.begin(), (*mapIter).second.end(), handler);
+	
+		(*mapIter).second.erase(assetIter);
+	}
+
+}
+
+std::vector<SBAssetHandler*>& SBAssetManager::getAssetHandlers()
+{
+	return _assetHandlers;
+}
+
+std::vector<SBAssetHandler*> SBAssetManager::getAssetHandlers(const std::string& assetTypes)
+{
+	std::map<std::string, std::vector<SBAssetHandler*> >::iterator mapIter = _assetHandlerMap.find(assetTypes);
+	if (mapIter == _assetHandlerMap.end())
+		return std::vector<SBAssetHandler*>();
+	else
+		return (*mapIter).second;
 }
 
 }

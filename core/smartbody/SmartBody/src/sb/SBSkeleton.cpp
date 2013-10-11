@@ -32,6 +32,31 @@ SBSkeleton::SBSkeleton(SBSkeleton* copySkel) : SkSkeleton(copySkel)
 	//jointMap = copySkel->getJointMapName();
 }
 
+SBAPI SBJoint* SBSkeleton::createJoint(const std::string& name, SBJoint* parent)
+{
+	if (this->getJointByName(name))
+	{
+		LOG("Joint %s already created.", name.c_str());
+		return NULL;
+	}
+	SBJoint* joint = new SBJoint();
+	joint->setName(name);
+	int parentId = -1;
+	if (parent)
+	{
+		joint->setParent(parent);
+	}
+	else
+	{
+		this->root(joint);
+	}
+	
+	_joints.push_back(joint);
+	joint->index(_joints.size() - 1);
+	
+	return joint;
+}
+
 void SBSkeleton::setFileName(const std::string& fname)
 {
 	skfilename(fname.c_str());
@@ -144,7 +169,7 @@ SBJoint* SBSkeleton::getJointByName(const std::string& jointName)
 	return getJointByMappedName(jointName);
 }
 
-SBAPI SBJoint* SBSkeleton::getJointByMappedName(const std::string& jointName)
+SBJoint* SBSkeleton::getJointByMappedName(const std::string& jointName)
 {
 	SkJoint* j = search_joint(jointName.c_str());
 	if (j)

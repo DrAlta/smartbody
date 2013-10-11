@@ -7,6 +7,7 @@
 #include <map>
 #include <boost/filesystem/path.hpp>
 #include <sbm/sbm_deformable_mesh.h>
+#include <sb/SBAssetHandler.h>
 
 class srPathList;
 
@@ -36,7 +37,6 @@ class SBAssetManager : public SBObject
 		SBAPI void loadAsset(const std::string& assetPath);
 		SBAPI void loadAssetsFromPath(const std::string& assetPath);
 
-
 		SBAPI SBSkeleton* createSkeleton(const std::string&char_name);
 		SBAPI SBSkeleton* getSkeleton(const std::string& name);
 		SBAPI SBSkeleton* addSkeletonDefinition(const std::string& skelName);
@@ -65,6 +65,12 @@ class SBAssetManager : public SBObject
 		SBAPI std::vector<std::string> getDeformableMeshNames();
 		SBAPI void removeAllDeformableMeshes();
 		
+		SBAPI void addAssetHandler(SBAssetHandler* handler);
+		SBAPI void removeAssetHandler(SBAssetHandler* handler);
+		SBAPI std::vector<SBAssetHandler*>& getAssetHandlers();
+		SBAPI std::vector<SBAssetHandler*> getAssetHandlers(const std::string& assetTypes);
+
+		
 protected:
 
 		SmartBody::SBSkeleton* load_skeleton( const char *filename, srPathList &path_list, double scale = 1.0 );
@@ -91,6 +97,9 @@ protected:
 		srPathList*	mesh_paths;
 
 		std::map<std::string, DeformableMesh*> _deformableMeshMap;
+		std::vector<SBAssetHandler*> _assetHandlers;
+		std::map<std::string, std::vector<SBAssetHandler*> > _assetHandlerMap;
+		int uniqueSkeletonId;
 
 };
 

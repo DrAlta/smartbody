@@ -156,6 +156,7 @@ public:
 	/*! Returns the index of this joint in the SkSkeleton list
 	of joints */
 	int index () const { return _index; }
+	void index (int index)  { _index = index; }
 
 	void set_index(int id)	{_index = id;}
 
