@@ -291,6 +291,8 @@ void PositionControl::draw(SrCamera& cam)
 		float ratio=(dirx).norm();
 		//draw center square
 		glDisable(GL_LIGHTING);
+		glDisable(GL_COLOR_MATERIAL);
+		glDisable(GL_BLEND);
 		glColor3fv(colors[3]);
 		drawShadowSquare(center[0],center[1],center[2],dirx,diry,s_len,GL_LINE_LOOP);
 
@@ -299,7 +301,7 @@ void PositionControl::draw(SrCamera& cam)
 			glTranslatef(center[0],center[1],center[2]);
 
 			//draw axis
-			glDisable(GL_LIGHTING);
+			glDisable(GL_LIGHTING);			
 			glBegin(GL_LINES);
 			glColor3fv(colors[0]);
 			glVertex3f(0,0,0);

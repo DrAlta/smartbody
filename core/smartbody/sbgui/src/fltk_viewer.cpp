@@ -413,7 +413,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 //   gridStep = 50.0;
    gridList = -1;
    _arrowTime = 0.0f;
-   _transformMode = 0;
+   _transformMode = ObjectManipulationHandle::CONTROL_POS;
 
    init_foot_print();
    _lastSelectedCharacter = "";   
@@ -2197,7 +2197,7 @@ int FltkViewer::handle ( int event )
 				{
 					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
 					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
-					_transformMode = 0;
+					_transformMode = ObjectManipulationHandle::CONTROL_POS;
 					if (rotControl->get_attach_pawn())
 					{						
 						posControl->attach_pawn(rotControl->get_attach_pawn());
@@ -2211,7 +2211,7 @@ int FltkViewer::handle ( int event )
 				{
 					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
 					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
-					_transformMode = 1;
+					_transformMode = ObjectManipulationHandle::CONTROL_ROT;
 					if (posControl->get_attach_pawn())
 					{						
 						rotControl->attach_pawn(posControl->get_attach_pawn());
@@ -2428,12 +2428,12 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 			 //_objManipulator.hasPicking(true);
 			SrVec2 mouseVec(e.mouse.x, e.mouse.y);
 			 _objManipulator.setPicking(mouseVec);
-			 if (this->_transformMode == 0)
+			 if (this->_transformMode == ObjectManipulationHandle::CONTROL_POS)
 			 {
 				 _objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_POS);
 					
 			 }
-			 else if (this->_transformMode == 1)
+			 else if (this->_transformMode == ObjectManipulationHandle::CONTROL_ROT)
 			 {
 				 _objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_ROT);
 			 }
