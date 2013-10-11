@@ -336,10 +336,18 @@ void FLTKListener::OnReset()
 
 void FLTKListener::OnObjectSelected(const std::string& objectName)
 {
-	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	SmartBody::SBScene* scene =	SmartBody::SBScene::getScene();
+	BaseWindow* window = dynamic_cast<BaseWindow*>(scene->getViewer());
 	if (window->resourceWindow)
 	{
 		window->resourceWindow->selectPawn(objectName);
+	}
+
+	if (window->fltkViewer)
+	{
+		PawnControl* tempControl = window->fltkViewer->_objManipulator.getPawnControl(window->fltkViewer->_transformMode);
+		window->fltkViewer->_objManipulator.active_control = tempControl;
+		window->fltkViewer->_objManipulator.set_selected_pawn(scene->getPawn(objectName));
 	}
 }
 

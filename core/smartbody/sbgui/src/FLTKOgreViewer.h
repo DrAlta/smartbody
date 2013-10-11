@@ -24,6 +24,8 @@ public:
 	virtual void menu_cmd ( MenuCmd c, const char* label );
 	virtual void resetViewer();
 
+	virtual void notify(SmartBody::SBSubject* subject);
+
 	void updateOptions();
 	// handle fltk mouse events ?		
 protected:

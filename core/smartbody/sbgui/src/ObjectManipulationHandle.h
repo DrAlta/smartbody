@@ -5,7 +5,7 @@
 class ObjectManipulationHandle
 {
 public:
-	enum ControlType { CONTROL_POS = 0, CONTROL_ROT };
+	enum ControlType { CONTROL_SELECTION = 0, CONTROL_POS, CONTROL_ROT };
 protected:
 	PawnPosControl pawnPosControl;	
 	PawnRotationControl pawnRotControl;

@@ -185,10 +185,10 @@ void EmbeddedOgre::updateOgreLights()
 					
 					
 					const Ogre::Vector3& direction = light->getDirection();
-					if (direction.x != -lightDirection.x || 
-						direction.y != -lightDirection.y || 
-						direction.z != -lightDirection.z)
-						light->setDirection(-lightDirection.x,-lightDirection.y,-lightDirection.z);
+					if (direction.x != lightDirection.x || 
+						direction.y != lightDirection.y || 
+						direction.z != lightDirection.z)
+						light->setDirection(lightDirection.x,lightDirection.y,lightDirection.z);
 				}
 				else
 				{
@@ -293,7 +293,7 @@ void EmbeddedOgre::updateOgreLights()
 		SrQuat orientation(mat);
 		SrVec up(0,1,0);
 		SrVec lightDirection = up * orientation;
-		light->setDirection(-lightDirection[0], -lightDirection[1], -lightDirection[2]);  
+		light->setDirection(lightDirection[0], lightDirection[1], lightDirection[2]);  
 		light->setDiffuseColour(1.0f, 1.0f, 1.0f);
 		light->setVisible(true);
 
@@ -308,7 +308,7 @@ void EmbeddedOgre::updateOgreLights()
 		sr_euler_mat_xyz (mat, SR_TORAD(1.34), SR_TORAD(7.07), SR_TORAD(-144));
 		SrQuat orientation2(mat);
 		SrVec lightDirection2 = up * orientation2;
-		light->setDirection(-lightDirection2[0], -lightDirection2[1], -lightDirection2[2]);  
+		light->setDirection(lightDirection2[0], lightDirection2[1], lightDirection2[2]);  
 		light->setDiffuseColour(1.0f, 1.0f, 1.0f);
 		light->setVisible(true);
 

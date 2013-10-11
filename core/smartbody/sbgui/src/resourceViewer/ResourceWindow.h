@@ -83,6 +83,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		Fl_Group     *resourceInfoGroup;
 		TreeItemInfoWidget* itemInfoWidget;
 		std::string lastClickedItemPath;
+		std::vector<TreeItemInfoWidget*> widgetsToDelete;
 
 		
 	protected:
@@ -100,7 +101,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		void updateEventHandler(Fl_Tree_Item* tree, SmartBody::SBEventHandler* handler);
 		
 		int  findTreeItemType(Fl_Tree_Item* treeItem);
-		void clearInfoWidget();
+		void clearInfoWidget(TreeItemInfoWidget* lastWidget);
 		TreeItemInfoWidget* createInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* treeItem, int itemType );
 };
 
