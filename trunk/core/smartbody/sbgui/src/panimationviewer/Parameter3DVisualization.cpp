@@ -23,6 +23,7 @@ VisualizationBase::VisualizationBase(int x, int y, int w, int h, char* name) : F
 
 	lastMouseX = -1;
 	lastMouseY = -1;
+	viewScale = 1.f;
 }
 
 VisualizationBase::~VisualizationBase()
@@ -288,7 +289,7 @@ void VisualizationBase::mouse_event(SrEvent& e)
 				amount = distance - .000001f;
 
 			SrVec diffVector = diff;
-			SrVec adjustment = diffVector * distance * amount;
+			SrVec adjustment = diffVector * distance * amount ;
 			cameraPos += adjustment;
 			SrVec oldEyePos = cam.getEye();
 			cam.setEye(cameraPos.x, cameraPos.y, cameraPos.z);
@@ -344,13 +345,14 @@ void VisualizationBase::drawGrid()
 	glLineWidth(1);
 	glBegin(GL_LINES);
 
-	for (float x = -gridSize; x <= gridSize; x += gridStep)
+	float gridStepScale = gridStep*viewScale;
+	for (float x = -gridSize; x <= gridSize; x += gridStepScale)
 	{
 		glVertex3f(x, -gridSize, floorHeight);
 		glVertex3f(x, gridSize, floorHeight);
 	}
 
-	for (float x = -gridSize; x <= gridSize; x += gridStep)
+	for (float x = -gridSize; x <= gridSize; x += gridStepScale)
 	{
 		glVertex3f(-gridSize, x, floorHeight);
 		glVertex3f(gridSize, x, floorHeight);
@@ -363,7 +365,7 @@ void VisualizationBase::drawGrid()
 
 
 
-Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, char* name, PABlendData* s, ParameterGroup* window) : VisualizationBase(x, y, w, h, name), blendData(s), paramGroup(window)
+Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, char* name, PABlendData* s, ParameterGroup* window) : VisualizationBase(x, y, w, h, name), paramGroup(window)
 {	
 	this->begin();
 	this->end();
@@ -374,12 +376,15 @@ Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, c
 	gridSize = 700;
 	gridStep = 40;
 	floorHeight = 0;
-
-
 	for (int t = 0; t < 4; t++)
 		tet.push_back(SrVec());
 
 	blendData = s;
+	SrVec scale;
+	float largestScale;
+	scale = determineScale(largestScale);
+	viewScale = largestScale/300.f;
+	cam.setEye(300*viewScale, -300*viewScale, 400*viewScale);
 
 	lastMouseX = -1;
 	lastMouseY = -1;
@@ -472,7 +477,7 @@ void Parameter3DVisualization::draw()
 
 
 
-SrVec Parameter3DVisualization::determineScale()
+SrVec Parameter3DVisualization::determineScale(float& largestScale)
 {
 	SrVec min(99999, 99999, 99999);
 	SrVec max(-99999, -99999, -99999);
@@ -532,7 +537,7 @@ SrVec Parameter3DVisualization::determineScale()
 				scale[1] = sizes[2] / sizes[1];
 		}
 	}
-
+	largestScale = largest;
 	return scale;
 }
 
@@ -550,8 +555,8 @@ void Parameter3DVisualization::setSelectedParameters(std::vector<bool>& selected
 
 void Parameter3DVisualization::drawTetrahedrons()
 {
-	SrVec scale = determineScale();
-
+	float largestScale = 1.f;
+	SrVec scale = determineScale(largestScale);
 	glColor3f(1.0f, 1.0f, 0.0f);
 	glPointSize(5.0f);
 	glBegin(GL_POINTS);
@@ -672,7 +677,8 @@ void Parameter3DVisualization::drawParameter()
 	if (!paramGroup)
 		return;
 
-	SrVec scale = determineScale();
+	float largestScale = 1.f;
+	SrVec scale = determineScale(largestScale);
 
 	SrVec vec;
 	PABlendData* curStateData = paramGroup->getCurrentPABlendData();
