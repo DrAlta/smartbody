@@ -124,6 +124,7 @@ void FLTKOgreWindow::draw()
  		//glPopAttrib(); 		
 		glViewport ( 0, 0, w(), h() );
 		glClearColor ( _data->bcolor );
+		
 		//glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		fltkRender2(); // let old fltk viewer render rest of stuffs
 		
@@ -434,7 +435,7 @@ void FLTKOgreWindow::fltkRender2()
 	}
 
 	glDisable(GL_LIGHTING);
-	
+	glDisable(GL_BLEND);
 
 	drawPawns();
 	// draw the grid

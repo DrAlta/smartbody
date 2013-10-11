@@ -142,6 +142,9 @@ void RotationControl::hitOPS(SrCamera& cam)
 
 void RotationControl::draw(SrCamera& cam)
 {
+	glDisable(GL_BLEND);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_COLOR_MATERIAL);
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 	//double lineWidth[5] = { 1.0, 1.0, 1.0, 1.0, 1.0} ;
@@ -157,9 +160,7 @@ void RotationControl::draw(SrCamera& cam)
 		screenParallelPlane(cam,center,dirx,diry);
 		float ratio=(dirx).norm();
 		SrVec nm=cam.getEye() - cam.getCenter();//cross(diry,dirx);
-		nm.normalize();
-
-		glDisable(GL_LIGHTING);
+		nm.normalize();		
 		glPushMatrix();
 		//	glMultMatrixd(::transpose(pm->t_matrix));
 		glTranslatef(center[0],center[1],center[2]);
