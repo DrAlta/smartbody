@@ -140,7 +140,8 @@ void EmbeddedOgre::updateOgreLights()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	int numLightsInScene = 0;
-	float inverseScale = float(1.0/scene->getScale());
+	int numShadowLight = 0;
+	float inverseScale = float(1.0/scene->getScale());	
 	const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		iter != pawnNames.end();
@@ -205,10 +206,16 @@ void EmbeddedOgre::updateOgreLights()
 			}
 
 			SmartBody::BoolAttribute* castShadowAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("lightCastShadow"));
+			bool lightCastShadow = false;
 			if (castShadowAttr)
 			{
 				if (light->getCastShadows() != castShadowAttr->getValue())
-					light->setCastShadows(castShadowAttr->getValue());				
+					light->setCastShadows(castShadowAttr->getValue());		
+				if (castShadowAttr->getValue())
+				{
+					lightCastShadow = true;
+					numShadowLight++;
+				}
 			}
 
 			SmartBody::IntAttribute* shadowMapSize = dynamic_cast<SmartBody::IntAttribute*>(sbpawn->getAttribute("lightShadowMapSize"));
@@ -219,12 +226,11 @@ void EmbeddedOgre::updateOgreLights()
 				{
 					const Ogre::TexturePtr& texturePtr = ogreSceneMgr->getShadowTexture(s);
 					int textureSize = (*texturePtr).getSize();
-					if (textureSize != shadowMapSize->getValue())
-					{
+					if (textureSize != shadowMapSize->getValue()) // set the nth shadow map to correct size
+					{				
 						ogreSceneMgr->setShadowTextureSize(shadowMapSize->getValue());
 					}
 				}
-
 				//ogreSceneMgr->setShadowTextureSize(shadowMapSize->getValue());			
 			}
 
@@ -334,14 +340,28 @@ void EmbeddedOgre::createDefaultScene()
 {
 	
 	ogreSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_MODULATIVE );
+	//ogreSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_TEXTURE_ADDITIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_MODULATIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_NONE );
-	//ogreSceneMgr->setShadowTextureCount(2);
-	//ogreSceneMgr->setShadowTextureSize( 2048 );
-	//ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );	
+	ogreSceneMgr->setShadowTextureCount(2);
+	MovablePlane* shadowPlane;
+	shadowPlane = new MovablePlane(Vector3::UNIT_Y,Ogre::Vector3(0,0,0));
 	
+
+	Ogre::LiSPSMShadowCameraSetup* LiSPSMSetup = new LiSPSMShadowCameraSetup();
+	LiSPSMSetup->setOptimalAdjustFactor(0.8);
+	LiSPSMSetup->setUseSimpleOptimalAdjust(false);
+	LiSPSMSetup->setUseAggressiveFocusRegion(true);
+	LiSPSMSetup->setCameraLightDirectionThreshold(Ogre::Degree(60));
+
+	Ogre::PlaneOptimalShadowCameraSetup* POptimalSetup = new PlaneOptimalShadowCameraSetup(shadowPlane);
+	Ogre::ShadowCameraSetupPtr shadowCameraSetup = Ogre::ShadowCameraSetupPtr(LiSPSMSetup);
+	//Ogre::ShadowCameraSetupPtr shadowCameraSetup = Ogre::ShadowCameraSetupPtr(POptimalSetup);
+	ogreSceneMgr->setShadowCameraSetup(shadowCameraSetup);
+	//ogreSceneMgr->setShadowTextureSize( shadowCameraSetup );
+	//ogreSceneMgr->setShadowColour( ColourValue( 0.3f, 0.3f, 0.3f ) );		
 	// Setup animation default
 	Animation::setDefaultInterpolationMode( Animation::IM_LINEAR );
 	Animation::setDefaultRotationInterpolationMode( Animation::RIM_LINEAR );
