@@ -78,9 +78,11 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_
 			runTimeEditor = new PARunTimeEditor(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
 			runTimeEditor->begin();
 			runTimeEditor->end();
+#if 0
 			visView = new VisualizationView(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, this);
 			visView->begin();
 			visView->end();
+#endif
 		tabGroup->end();
 	this->end();
 	this->resizable(tabGroup);

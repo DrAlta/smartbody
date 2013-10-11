@@ -2860,7 +2860,9 @@ void FltkViewer::drawGrid()
 		return;
 	}
 
-	GLfloat gridHeight = 0.0f;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	
+	GLfloat gridHeight = 0.0f + 0.001f/scene->getScale();
 
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
 	bool colorChanged = false;
@@ -2873,7 +2875,7 @@ void FltkViewer::drawGrid()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-	glLineWidth(1);
+	glLineWidth(3.f);
 //	glLineStipple(1, 0xAAAA);
 	glBegin(GL_LINES);
 	float sceneScale = SmartBody::SBScene::getScene()->getScale();
