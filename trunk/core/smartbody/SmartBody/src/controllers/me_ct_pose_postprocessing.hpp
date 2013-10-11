@@ -43,4 +43,5 @@ public:
 protected:
 	void updatePoseConstraint();
 	MeCtCCDIK ikCCD;
+	bool firstIKSolve;
 };

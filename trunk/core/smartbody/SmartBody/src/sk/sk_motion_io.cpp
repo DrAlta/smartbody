@@ -538,7 +538,7 @@ bool SkMotion::save ( SrOutput& out )
 	   
 		if (jointMap)
 		{
-			std::string source = jointMap->getMapSource(chanName);
+			const std::string& source = jointMap->getMapSource(chanName);
 			if (source == "")
 				out << chanName.c_str();
 			else

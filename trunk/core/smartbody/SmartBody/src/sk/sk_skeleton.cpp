@@ -392,7 +392,7 @@ SrBox SkSkeleton::getBoundingBox()
 {
 	SrBox initialBoundingBox;
 	update_global_matrices();
-	std::vector<SkJoint*>& joints = get_joint_array();
+	std::vector<SkJoint*>& joints = get_joint_array();	
 	for (size_t j = 0; j < joints.size(); j++)
 	{
 		if (joints[j]->getJointType() == SkJoint::TypeOther)
