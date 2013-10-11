@@ -34,8 +34,9 @@ public:
 	float floorHeight;
 	int lastMouseX;
 	int lastMouseY;
-private:
-	PABlendData* blendData;		
+protected:
+	PABlendData* blendData;	
+	float viewScale;
 };
 
 
@@ -52,16 +53,15 @@ class Parameter3DVisualization : public VisualizationBase
 		void setSelectedParameters(std::vector<bool>& selected);
 		void drawTetrahedrons();		
 		void drawParameter();
-		SrVec determineScale();
+		SrVec determineScale(float& largestScale);
 
 	public:		
 		std::vector<bool> selectedTetrahedrons;
 		std::vector<bool> selectedParameters;		
 
-	private:
-		PABlendData* blendData;
+	protected:		
 		ParameterGroup* paramGroup;
-		std::vector<SrVec> tet;
+		std::vector<SrVec> tet;		
 };
 
 #endif
