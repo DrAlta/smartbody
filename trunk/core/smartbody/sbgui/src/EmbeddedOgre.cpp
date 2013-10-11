@@ -142,6 +142,34 @@ void EmbeddedOgre::updateOgreLights()
 	int numLightsInScene = 0;
 	int numShadowLight = 0;
 	float inverseScale = float(1.0/scene->getScale());	
+
+	SmartBody::IntAttribute* shadowMapSizeAttr = dynamic_cast<SmartBody::IntAttribute*>(scene->getAttribute("shadowMapSize"));
+	SmartBody::IntAttribute* shadowMapCountAttr = dynamic_cast<SmartBody::IntAttribute*>(scene->getAttribute("shadowMapCount"));
+	
+	if (shadowMapSizeAttr)
+	{				
+		bool changeShadowMapSize = false;
+		int numShadowTextures = ogreSceneMgr->getShadowTextureCount();
+		for (int s = 0; s < numShadowTextures; s++)
+		{
+			const Ogre::TexturePtr& texturePtr = ogreSceneMgr->getShadowTexture(s);
+			int textureSize = (*texturePtr).getSize();
+			if (textureSize != shadowMapSizeAttr->getValue()) // set the nth shadow map to correct size
+			{				
+				//ogreSceneMgr->setShadowTextureSize(shadowMapSize->getValue());
+				changeShadowMapSize = true;
+			}
+		}
+		if (changeShadowMapSize)
+			ogreSceneMgr->setShadowTextureSize(shadowMapSizeAttr->getValue());			
+	}
+
+	if (shadowMapCountAttr)
+	{
+		if (shadowMapCountAttr->getValue() != ogreSceneMgr->getShadowTextureCount())
+			ogreSceneMgr->setShadowTextureCount(shadowMapCountAttr->getValue());
+	}
+
 	const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		iter != pawnNames.end();
@@ -217,10 +245,10 @@ void EmbeddedOgre::updateOgreLights()
 					numShadowLight++;
 				}
 			}
-
+#if 0 // disable this since this is a global parameter, should be set in SBScene instead
 			SmartBody::IntAttribute* shadowMapSize = dynamic_cast<SmartBody::IntAttribute*>(sbpawn->getAttribute("lightShadowMapSize"));
 			if (shadowMapSize)
-			{
+			{				
 				int numShadowTextures = ogreSceneMgr->getShadowTextureCount();
 				for (int s = 0; s < numShadowTextures; s++)
 				{
@@ -233,6 +261,7 @@ void EmbeddedOgre::updateOgreLights()
 				}
 				//ogreSceneMgr->setShadowTextureSize(shadowMapSize->getValue());			
 			}
+#endif
 
 			SmartBody::Vec3Attribute* diffuseColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightDiffuseColor"));
 			if (diffuseColorAttr)
@@ -351,7 +380,7 @@ void EmbeddedOgre::createDefaultScene()
 	
 
 	Ogre::LiSPSMShadowCameraSetup* LiSPSMSetup = new LiSPSMShadowCameraSetup();
-	LiSPSMSetup->setOptimalAdjustFactor(0.8);
+	LiSPSMSetup->setOptimalAdjustFactor(3.0);
 	LiSPSMSetup->setUseSimpleOptimalAdjust(false);
 	LiSPSMSetup->setUseAggressiveFocusRegion(true);
 	LiSPSMSetup->setCameraLightDirectionThreshold(Ogre::Degree(60));
