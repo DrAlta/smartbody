@@ -237,7 +237,7 @@ void SbmTexture::buildTexture()
 	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);
 #endif
 
-	LOG("texture id = %d, texture name = %s, width = %d, height = %d, channel = %d",texID, textureName.c_str(), width, height, channels);
+	//LOG("texture id = %d, texture name = %s, width = %d, height = %d, channel = %d",texID, textureName.c_str(), width, height, channels);
 
 	//glGenerateMipmap(iType);
 	//SbmShaderProgram::printOglError("Sb!defined(SB_IPHONE)mTexture.cpp:200");
