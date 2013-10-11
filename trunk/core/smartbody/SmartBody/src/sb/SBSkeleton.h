@@ -19,6 +19,8 @@ public:
 	SBAPI SBSkeleton(std::string skelFile);
 	SBAPI SBSkeleton(SBSkeleton* copySkel);
 
+	SBAPI SBJoint* createJoint(const std::string& name, SBJoint* parent);
+
 	SBAPI virtual bool load(std::string skeletonFile);
 	SBAPI virtual bool save(std::string skeletonFile);
 	SBAPI std::string saveToString();
