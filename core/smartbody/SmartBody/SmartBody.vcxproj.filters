@@ -1105,6 +1105,18 @@
     <ClCompile Include="src\sbm\ParserCOLLADAFast.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandler.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandlerSkm.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandlerSk.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandlerCOLLADA.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2208,7 +2220,16 @@
     <ClInclude Include="src\sbm\ParserCOLLADAFast.h">
       <Filter>sbm</Filter>
     </ClInclude>
-    <ClInclude Include="src\sb\SBVersion.hpp">
+    <ClInclude Include="src\sb\SBAssetHandler.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBAssetHandlerSkm.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBAssetHandlerSk.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBAssetHandlerCOLLADA.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
