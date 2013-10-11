@@ -10,7 +10,7 @@ std::string MeCtPosePostProcessing::CONTROLLER_TYPE = "PostProcessing";
 
 MeCtPosePostProcessing::MeCtPosePostProcessing( SmartBody::SBSkeleton* skeleton ) : MeCtConstraint(skeleton)
 {
-		
+	firstIKSolve = true;			
 }
 
 MeCtPosePostProcessing::~MeCtPosePostProcessing(void)
@@ -51,6 +51,8 @@ void MeCtPosePostProcessing::updatePoseConstraint()
 
 bool MeCtPosePostProcessing::controller_evaluate( double t, MeFrameData& frame )
 {	
+	static int counter = 0;
+
 	std::vector<SrQuat> tempQuatList; tempQuatList.resize(ik_scenario.ikTreeNodes.size());
 	if (prev_time == -1.0) // first start
 	{		
@@ -61,6 +63,7 @@ bool MeCtPosePostProcessing::controller_evaluate( double t, MeFrameData& frame )
 		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_PREVREF);
 		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_CUR);
 	}
+
 	updateDt((float)t);
 
 	updateChannelBuffer(frame,tempQuatList,true);
@@ -75,14 +78,18 @@ bool MeCtPosePostProcessing::controller_evaluate( double t, MeFrameData& frame )
 
 	updatePoseConstraint(); // update the joint trajectory as constraints
 
+	bool hasConstraint = false;
 	ConstraintMap::iterator ci;
+	//LOG("Counter = %d",counter);
 	for (ci = posConstraint.begin(); ci != posConstraint.end(); ci++)
 	{
 		EffectorConstraint* cons = ci->second;//posConstraint[i];
 		MeCtIKTreeNode* node = ik_scenario.findIKTreeNode(cons->efffectorName.c_str());				
-		node->targetPos = cons->getPosConstraint();		
+		node->targetPos = cons->getPosConstraint();				
+		//if (counter < 10)
+		//	LOG("node %s : target pos = %f %f %f", node->nodeName.c_str(),node->targetPos[0],node->targetPos[1],node->targetPos[2]);
 	}	
-
+	counter++;
 
 	_skeleton->update_global_matrices();
 	ik_scenario.ikTreeRoot->joint->parent()->update_gmat_up(); // update world offset global transformation	
@@ -99,9 +106,19 @@ bool MeCtPosePostProcessing::controller_evaluate( double t, MeFrameData& frame )
 	if (finishFadeOut)
 		useIKConstraint = false;
 
-	if (useIKConstraint) //&& ik_scenario.ikEndEffectors.size() != 0)	
-	{
-		float transitionWeight = _sbChar->getJointTrajBlendWeight();
+	float transitionWeight = _sbChar->getJointTrajBlendWeight();
+	if (useIKConstraint && transitionWeight > 0.0) //&& ik_scenario.ikEndEffectors.size() != 0)	
+	{	
+		if (firstIKSolve)
+		{
+			updateChannelBuffer(frame,tempQuatList,true);			
+			ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_INIT);
+			ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_PREVREF);
+			ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_CUR);
+		}
+
+
+		if (!firstIKSolve)
 		{
 			//sr_out << "global offset mat = " << ik_scenario.ikGlobalMat << srnl;
 			ik.dampJ = ikDamp;
@@ -128,9 +145,10 @@ bool MeCtPosePostProcessing::controller_evaluate( double t, MeFrameData& frame )
 				tempQuatList[i] = slerp(qInit,qEval,transitionWeight);	
 				//tempQuatList[i].normalize();
 				//node->setQuat(tempQuatList[i],QUAT_INIT);
-			}			
+			}	
+			updateChannelBuffer(frame,tempQuatList);	
 		}
-		updateChannelBuffer(frame,tempQuatList);		
+		firstIKSolve = false;			
 	}	
 	return true;
 }
