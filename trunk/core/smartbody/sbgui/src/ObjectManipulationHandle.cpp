@@ -6,6 +6,8 @@
 
 #include <FL/gl.h>
 
+bool ObjectManipulationHandle::renderSelectedBoundingBox = true;
+
 ObjectManipulationHandle::ObjectManipulationHandle(void)
 {
 	active_control = NULL;
@@ -40,8 +42,13 @@ SbmPawn* ObjectManipulationHandle::get_selected_pawn()
 void ObjectManipulationHandle::draw(SrCamera& cam)
 {
 	if (active_control)
+	{
 		active_control->renderControl(cam);
+		if (renderSelectedBoundingBox)
+			PositionControl::drawBox(active_control->get_attach_pawn()->getBoundingBox(),true);
+	}
 	//pawn_control.draw();
+	
 }
 
 
@@ -119,8 +126,9 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 			active_control->hitTest(*cam);
 		}
 		else if (curChar) // the selected pawn is actually a character
-		{
+		{			
 			SrBox bbox = curChar->getBoundingBox();
+			//LOG("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",curChar->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
 			PositionControl::drawBox(bbox);						
 		}
 		else if (sbpawn->getPhysicsObject())

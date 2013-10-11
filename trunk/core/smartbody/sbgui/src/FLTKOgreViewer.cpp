@@ -167,11 +167,11 @@ void FLTKOgreWindow::fltkRender()
     //return;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	glEnable(GL_DEPTH_TEST);
-	if (_objManipulator.hasPicking())
-	{
-		SrVec2 pick_loc = _objManipulator.getPickLoc();
-		_objManipulator.picking(pick_loc.x,pick_loc.y, scene->getActiveCamera());	   
-	}  
+// 	if (_objManipulator.hasPicking())
+// 	{
+// 		SrVec2 pick_loc = _objManipulator.getPickLoc();
+// 		_objManipulator.picking(pick_loc.x,pick_loc.y, scene->getActiveCamera());	   
+// 	}  
 
 	glViewport ( 0, 0, w(), h() );
 	SrLight &light = _data->light;
@@ -356,11 +356,11 @@ void FLTKOgreWindow::fltkRender2()
 		texm.updateTexture();
 	}	
 
-	if (_objManipulator.hasPicking())
-	{
-		SrVec2 pick_loc = _objManipulator.getPickLoc();
-		_objManipulator.picking(pick_loc.x,pick_loc.y, cam);	   
-	}  
+// 	if (_objManipulator.hasPicking())
+// 	{
+// 		SrVec2 pick_loc = _objManipulator.getPickLoc();
+// 		_objManipulator.picking(pick_loc.x,pick_loc.y, cam);	   
+// 	}  
 
 
 	//glViewport ( 0, 0, w(), h() );

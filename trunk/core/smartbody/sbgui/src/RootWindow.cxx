@@ -76,6 +76,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Show Trajectory", 0, TrajectoryCB, this, NULL);	
 	menubar->add("&View/Character/Show Gesture", 0, GestureCB, this, NULL);
 	menubar->add("&View/Character/Show Joint Labels", 0, JointLabelCB, this, NULL);
+	menubar->add("&View/Character/Show Selected Character", 0, ShowSelectedCharacterCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Show Cameras", 0, ShowCamerasCB, this, NULL);
 	menubar->add("&View/Show Lights", 0, ShowLightsCB, this, NULL);
@@ -2097,6 +2098,13 @@ void BaseWindow::ShowLightsCB( Fl_Widget* w, void* data )
 
 }
 
+
+void BaseWindow::ShowSelectedCharacterCB( Fl_Widget* w, void* data )
+{
+	static bool showSelected = true;
+	showSelected = !showSelected;
+	ObjectManipulationHandle::renderSelectedBoundingBox = showSelected;
+}
 
 //== Viewer Factory ========================================================
 SrViewer* FltkViewerFactory::s_viewer = NULL;

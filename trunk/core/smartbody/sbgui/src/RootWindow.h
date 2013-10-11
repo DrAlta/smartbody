@@ -190,6 +190,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void NavigationMeshRawMeshCB(Fl_Widget* w, void* data);
 		static void NavigationMeshNoneCB(Fl_Widget* w, void* data);
 		static void ShowPawns(Fl_Widget* w, void* data);
+		static void ShowSelectedCharacterCB(Fl_Widget* w, void* data);
 		static void ShowPoseExamples(Fl_Widget* w, void* data);
 		static void ModeDynamicsCOMCB(Fl_Widget* w, void* data);
 		static void ModeDynamicsSupportPolygonCB(Fl_Widget* w, void* data);

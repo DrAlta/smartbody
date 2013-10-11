@@ -40,6 +40,7 @@ public:
 	PawnControl* getPawnControl(ControlType type);
 
 	PawnControl  *active_control;
+	static bool renderSelectedBoundingBox;
 protected:	
 	std::vector<int>  process_hit(unsigned int *pickbuffer,int nhits);
 	
