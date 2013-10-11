@@ -404,6 +404,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 
 public:
 	RetargetStepWindow* _retargetStepWindow;	
+	ObjectManipulationHandle::ControlType _transformMode;
 protected:
 	
 	void drawJointLimitCone(SmartBody::SBJoint* joint, float coneSize, float pitchUpLimit, float pitchDownLimit, float headLimit);
@@ -419,7 +420,7 @@ protected:
 
 	SmartBody::SBAnimationBlend* getCurrentCharacterAnimationBlend(); // for visualization plots	
 
-	int _transformMode;
+
 
 	
 	

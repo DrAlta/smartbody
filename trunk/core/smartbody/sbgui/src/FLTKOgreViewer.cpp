@@ -18,7 +18,7 @@
 #include <sr/sr_gl.h>
 #include <sbm/Heightfield.h>
 #include "SBGUIManager.h"
-
+#include <sb/SBAttribute.h>
 
 FLTKOgreWindow::FLTKOgreWindow( int x, int y, int w, int h, const char *label/*=0 */ ) : FltkViewer(x,y,w,h,label)//Fl_Gl_Window(x,y,w,h,label), SrViewer(x, y, w, h)
 {
@@ -524,6 +524,32 @@ void FLTKOgreWindow::fltkRender2()
 	SBGUIManager::singleton().update();
 
 	glPopAttrib();
+}
+
+void FLTKOgreWindow::notify(SmartBody::SBSubject* subject)
+{
+	FltkViewer::notify(subject);
+
+	SmartBody::SBAttribute* attr = dynamic_cast<SmartBody::SBAttribute*>(subject);
+	if (attr)
+	{
+		if (attr->getObject() == SmartBody::SBScene::getScene())
+		{
+			SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attr);
+			if (boolAttribute->getName() == "scale")
+			{
+				try {
+					Ogre::Entity * pPlaneEnt = ogreInterface->getSceneManager()->getEntity( "plane" );
+					Ogre::MeshPtr planeMesh = pPlaneEnt->getMesh();
+					// modify the scale of the plane mesh. Can this be done?
+					// ...
+					// ...
+				} catch ( Ogre::Exception& e) {
+				}
+
+			}
+		}
+	}
 }
 
 void FLTKOgreWindow::updateOptions()

@@ -177,7 +177,12 @@ void PawnPosControl::updateControl( SrCamera& cam, float fx, float fy, float tx,
 
 SrVec PawnPosControl::getWorldPt()
 {
-	assert(pawn);
+	if (!pawn)
+	{
+		LOG("No pawn attached. Check code.");
+		return SrVec();
+	}
+
 	return get_pawn_pos(pawn);
 }
 

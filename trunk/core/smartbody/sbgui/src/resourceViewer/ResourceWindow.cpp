@@ -30,6 +30,7 @@
 #include <sbm/action_unit.hpp>
 #include <sbm/sr_path_list.h>
 #include <sb/sbm_character.hpp>
+#include "FLTKListener.h"
 
 
 // enum {
@@ -264,7 +265,7 @@ void ResourceWindow::update()
 }
 
 void ResourceWindow::draw()
-{		
+{	
 	Fl_Double_Window::draw();
 }
 
@@ -414,7 +415,8 @@ void ResourceWindow::updateGUI()
 	}
 	else
 	{
-		clearInfoWidget();
+		clearInfoWidget(itemInfoWidget);
+		itemInfoWidget = NULL;
 	}
 }
 
@@ -722,6 +724,12 @@ void ResourceWindow::treeCallBack( Fl_Widget* widget, void* data )
 		{
 			//LOG("Item Type =%s",ItemNameList[itemType].c_str());				
 			window->updateTreeItemInfo(item,itemType);
+			if (itemType == ITEM_PAWN || itemType == ITEM_CHARACTER)
+			{
+				FLTKListener* listener = dynamic_cast<FLTKListener*>(SmartBody::SBScene::getScene()->getCharacterListener());
+				if (listener)
+					listener->OnObjectSelected(item->label());
+			}
 		}
 	}	
 	if (tree->callback_reason() == FL_TREE_REASON_DESELECTED)
@@ -751,24 +759,24 @@ void ResourceWindow::updateTreeItemInfo( Fl_Tree_Item* treeItem, long itemType )
 
 	char pathName[128];	
 	resourceTree->item_pathname(pathName,128,treeItem);
-	if (lastClickedItemPath == pathName)
+	if (strcmp(pathName, lastClickedItemPath.c_str()) == 0)
 		return;
 	lastClickedItemPath = pathName;	
-	clearInfoWidget();	
+	TreeItemInfoWidget* lastWidget = itemInfoWidget;
 	itemInfoWidget = createInfoWidget(resourceInfoGroup->x(),resourceInfoGroup->y(),resourceInfoGroup->w(),resourceInfoGroup->h(),ItemNameList[itemType].c_str(),treeItem,itemType);
 	resourceInfoGroup->add(itemInfoWidget);
+	clearInfoWidget(lastWidget);	
 	resourceInfoGroup->show();
 	itemInfoWidget->show();
 	resourceInfoGroup->redraw();
 }
 
-void ResourceWindow::clearInfoWidget()
+void ResourceWindow::clearInfoWidget(TreeItemInfoWidget* lastWidget)
 {
-	if (itemInfoWidget)
+	if (lastWidget)
 	{
-		resourceInfoGroup->remove(itemInfoWidget);
-		delete itemInfoWidget;
-		itemInfoWidget = NULL;
+		resourceInfoGroup->remove(lastWidget);
+		widgetsToDelete.push_back(lastWidget); // need to delete these - causes memory leak
 	}
 }
 
@@ -800,7 +808,7 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 		else 
 			widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
 		*/
-		widget = new AttributeItemWidget(curPawn, x, y, w, h, name, treeItem, itemType, this);
+		widget = new AttributeItemWidget(curPawn, x, y, w, h, strdup(name), treeItem, itemType, this);
 	}
 	else if (itemType == ITEM_CHARACTER)
 	{
@@ -909,6 +917,8 @@ void ResourceWindow::selectPawn(const std::string& name)
 		Fl_Tree_Item* child = tree->child(c);
 		if (strcmp(child->label(), name.c_str()) == 0)
 		{
+			if (child->is_selected())
+				return;
 			this->updateTreeItemInfo(child, ITEM_PAWN);
 			resourceTree->deselect_all();
 			child->select();
@@ -923,6 +933,8 @@ void ResourceWindow::selectPawn(const std::string& name)
 		Fl_Tree_Item* child = tree->child(c);
 		if (strcmp(child->label(), name.c_str()) == 0)
 		{
+			if (child->is_selected())
+				return;
 			this->updateTreeItemInfo(child, ITEM_CHARACTER);
 			resourceTree->deselect_all();
 			child->select();
