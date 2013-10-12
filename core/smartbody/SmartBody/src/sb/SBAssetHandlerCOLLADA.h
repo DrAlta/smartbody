@@ -3,10 +3,11 @@
 #include <sb/SBTypes.h>
 #include <vector>
 #include <sb/SBAsset.h>
+#include <sb/SBAssetHandler.h>
 
 namespace SmartBody {
 
-class SBAssetHandlerCOLLADA
+class SBAssetHandlerCOLLADA : public SBAssetHandler
 {
 	public:
 		SBAPI SBAssetHandlerCOLLADA();
@@ -14,8 +15,6 @@ class SBAssetHandlerCOLLADA
 
 		SBAPI virtual std::vector<SBAsset*> getAssets(const std::string& path);
 
-	protected:
-		std::vector<std::string> assetTypes;
 };
 
 

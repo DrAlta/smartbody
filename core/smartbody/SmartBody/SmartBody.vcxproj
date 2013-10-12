@@ -482,6 +482,8 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp" />
     <ClCompile Include="src\sbm\ParserCOLLADAFast.cpp" />
     <ClCompile Include="src\sb\SBAssetHandler.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerAmc.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerAsf.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerCOLLADA.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSk.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkm.cpp" />
@@ -854,6 +856,8 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp" />
     <ClInclude Include="src\sbm\ParserCOLLADAFast.h" />
     <ClInclude Include="src\sb\SBAssetHandler.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerAmc.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerAsf.h" />
     <ClInclude Include="src\sb\SBAssetHandlerCOLLADA.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSk.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSkm.h" />

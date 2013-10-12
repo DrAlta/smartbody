@@ -31,6 +31,7 @@
 #include <sr/sr_material.h>
 
 #include "sbm/gwiz_math.h"
+#include <sbm/sbm_deformable_mesh.h>
 
 typedef std::map<std::string, std::vector<SrVec> > VecListMap;
 
@@ -74,7 +75,7 @@ class ParserCOLLADAFast
 		static bool parseStaticMesh(std::vector<SrModel*>& meshModelVecs, std::string fileName);
 
 		// parse nodes
-		static void parseLibraryControllers(rapidxml::xml_node<>* node, const char* char_name, float scaleFactor, std::string jointPrefix);
+		static void parseLibraryControllers(rapidxml::xml_node<>* node, DeformableMesh* mesh, float scaleFactor, std::string jointPrefix);
 		static void parseLibraryVisualScenes(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name);
 		static void parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL, bool hasRootJoint = false);
 		static void parseLibraryAnimations(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, bool zaxis = false);

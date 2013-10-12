@@ -70,6 +70,8 @@ class SBAssetManager : public SBObject
 		SBAPI std::vector<SBAssetHandler*>& getAssetHandlers();
 		SBAPI std::vector<SBAssetHandler*> getAssetHandlers(const std::string& assetTypes);
 
+		SBAPI std::string getAssetNameVariation(SBAsset* asset);
+
 		
 protected:
 
@@ -90,16 +92,18 @@ protected:
 
 		std::map<std::string, SBSkeleton*> _skeletons;
 		std::map<std::string, SBMotion*> _motions;
+		std::map<std::string, DeformableMesh*> _deformableMeshMap;
 
 		srPathList*	seq_paths;
 		srPathList*	me_paths;
 		srPathList*	audio_paths;
 		srPathList*	mesh_paths;
 
-		std::map<std::string, DeformableMesh*> _deformableMeshMap;
 		std::vector<SBAssetHandler*> _assetHandlers;
 		std::map<std::string, std::vector<SBAssetHandler*> > _assetHandlerMap;
 		int uniqueSkeletonId;
+		int _motionCounter;
+		int _skeletonCounter;
 
 };
 

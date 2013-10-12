@@ -8,6 +8,7 @@
 #include <sr/sr_sn_shape.h>
 #include <sk/sk_skeleton.h>
 #include <sr/sr_model.h>
+#include <sb/SBAsset.h>
 
 typedef std::vector<SkJoint*> SkJointList;
 
@@ -52,7 +53,7 @@ class DeformableMeshInstance;
 /* This class is used to simulate and represent deformed mesh
    for Smartbody Characters.
 */
-class DeformableMesh
+class DeformableMesh : public SmartBody::SBAsset
 {
 public:
 	std::string                 meshName;

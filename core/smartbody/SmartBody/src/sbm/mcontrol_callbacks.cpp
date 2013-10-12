@@ -1969,7 +1969,8 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 				LOG("mcu_character_load_skinweights ERR: no binding info contained");
 				return CMD_FAILURE;
 			}
-			ParserCOLLADAFast::parseLibraryControllers(controllerNode, char_name, scaleFactor, jointNamePrefix);
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(char_name);
+			ParserCOLLADAFast::parseLibraryControllers(controllerNode, character->dMesh_p, scaleFactor, jointNamePrefix);
 		}	
 		else if (ext == ".xml" || ext == ".XML")
 		{	

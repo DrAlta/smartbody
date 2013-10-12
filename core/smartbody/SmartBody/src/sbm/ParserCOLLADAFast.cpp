@@ -352,11 +352,10 @@ void ParserCOLLADAFast::nodeStr(const std::string s, std::string& out)
 	out = s;
 }
 
-void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, const char* char_name, float scaleFactor, std::string jointPrefix)
+void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, DeformableMesh* mesh, float scaleFactor, std::string jointPrefix)
 {
 	boost::char_separator<char> sep(" \n");
 
-	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->getCharacter( char_name );
 	//const DOMNodeList* list = node->getChildNodes();
 	rapidxml::xml_node<>* curNode = node->first_node();
 	while (curNode)
@@ -467,11 +466,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, cons
 												jointName.erase(0, jointPrefix.size());
 											}
 											//cout << "joint name = " << jointName << endl;	
-											SmartBody::SBJoint* joint = char_p->getSkeleton()->getJointByName(jointName);
-											if (joint)
-												skinWeight->infJointName.push_back(joint->getName());
-											else
-												skinWeight->infJointName.push_back(jointName);
+											skinWeight->infJointName.push_back(jointName);
 
 										}
 										//if ( sourceId == bindWeightName && realNodeName == "float_array") // joint weights
@@ -541,8 +536,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, cons
 							}
 							childOfSkinCurNode = childOfSkinCurNode->next_sibling();
 						}
-						if (char_p && char_p->dMesh_p)
-							char_p->dMesh_p->skinWeights.push_back(skinWeight);
+						mesh->skinWeights.push_back(skinWeight);
 					} // end of if (childName == "skin")
 					if (childName == "morph")	// parsing morph targets
 					{
@@ -582,7 +576,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, cons
 											refMesh.push_back((*it));
 										}
 										refMesh.push_back(morphName);
-										char_p->dMesh_p->morphTargets.insert(make_pair(morphFullName, refMesh));
+										mesh->morphTargets.insert(make_pair(morphFullName, refMesh));
 									}
 									childOfSourceCurNode = childOfSourceCurNode->next_sibling();
 								}
@@ -597,6 +591,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, cons
 		curNode = curNode->next_sibling();
 	}
 
+	/*
 	// cache the joint names for each skin weight
 	if (char_p && char_p->dMesh_p)
 	{
@@ -611,6 +606,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, cons
 			}
 		}
 	}
+	*/
 }
 
 void ParserCOLLADAFast::parseLibraryVisualScenes(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name)
@@ -2124,7 +2120,8 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 								//break;
 						}
 
-						// process each polylist
+						// process each polylis
+							
 						for (size_t x = 2; x < fVec.size(); x++)
 						{
 							newModel->F.push().set(fVec[0], fVec[x - 1], fVec[x]);
@@ -2132,11 +2129,11 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 							if (ftVec.size() > x)
 								newModel->Ft.push().set(ftVec[0], ftVec[x - 1], ftVec[x]);
 							else
-								newModel->Ft.push().set(0, 0, 0);
+								newModel->Ft.push().set(ftVec[0], ftVec[1], ftVec[2]);
 							if (fnVec.size() > x)
 								newModel->Fn.push().set(fnVec[0], fnVec[x - 1], fnVec[x]);
 							else
-								newModel->Fn.push().set(0, 1, 0);
+								newModel->Fn.push().set(fnVec[0], fnVec[1], fnVec[2]);
 						}
 					}
 					/*
@@ -2159,7 +2156,9 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 
 //			newModel->remove_redundant_normals();
 			newModel->compress();
+			
 			meshModelVec.push_back(newModel);
+			//LOG("Added model %s", (const char*) newModel->name);
 
 			SrString path = file;
 			SrString filename;

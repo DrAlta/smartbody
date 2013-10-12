@@ -18,6 +18,9 @@ class SBAssetHandler
 		SBAPI virtual std::vector<SBAsset*> getAssets(const std::string& path);
 
 	protected:
+		std::string checkPath(const std::string& path);
+
+	protected:
 		std::vector<std::string> assetTypes;
 };
 

@@ -1117,6 +1117,12 @@
     <ClCompile Include="src\sb\SBAssetHandlerCOLLADA.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandlerAmc.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandlerAsf.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2230,6 +2236,13 @@
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="src\sb\SBAssetHandlerCOLLADA.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBVersion.hpp" />
+    <ClInclude Include="src\sb\SBAssetHandlerAmc.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBAssetHandlerAsf.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>

@@ -13,6 +13,7 @@
 #include <sb/SBSteerAgent.h>
 #include <sb/SBPhoneme.h>
 #include <sb/SBPhonemeManager.h>
+#include <sb/SBAssetManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBSpeechManager.h>
 #include <sb/SBSimulationManager.h>
@@ -871,6 +872,38 @@ void SBCharacter::setDeformableMeshName( std::string meshName )
 	SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(getAttribute("deformableMesh"));
 	if (meshAttribute->getValue() != meshName)
 		meshAttribute->setValueFast(meshName); // don't notify the observer
+
+	// check assets for existence of that mesh
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SBAssetManager* assetManager = scene->getAssetManager();
+	DeformableMesh* mesh = assetManager->getDeformableMesh(meshName);
+	if (mesh)
+	{
+		this->dMesh_p = mesh;
+		this->dMeshInstance_p->setDeformableMesh(mesh);
+	}
+	else
+	{
+		// load the assets from the mesh directories
+		std::vector<std::string> meshPaths = assetManager->getAssetPaths("mesh");
+		for (size_t m = 0; m < meshPaths.size(); m++)
+		{
+			assetManager->loadAssetsFromPath(meshPaths[m] + "/" + meshName);
+		}
+		
+		DeformableMesh* mesh = assetManager->getDeformableMesh(meshName);
+		if (mesh)
+		{
+			this->dMesh_p = mesh;
+			this->dMeshInstance_p->setDeformableMesh(mesh);
+		}
+		else
+		{
+			LOG("Could not assign mesh %s to character %s: mesh not found", meshName.c_str(), this->getName().c_str());
+		}
+	}
+
+	/*
 	std::stringstream strstr;
 	strstr << "char " << getName() << " mesh " << meshName;
 	SmartBody::DoubleAttribute* meshScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("deformableMeshScale"));
@@ -884,6 +917,7 @@ void SBCharacter::setDeformableMeshName( std::string meshName )
 	{
 		LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
 	}
+	*/
 }
 
 void SBCharacter::setDeformableMeshScale( double meshScale )
