@@ -125,6 +125,16 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				srSnModelStatic->shape().name = meshModelVec[i]->name;
 				mesh->dMeshStatic_p.push_back(srSnModelStatic);
 				srSnModelStatic->ref();
+
+				SrSnModel* srSnModelDynamic = new SrSnModel();
+				srSnModelDynamic->shape(*meshModelVec[i]);
+				srSnModelDynamic->changed(true);
+				srSnModelDynamic->visible(false);
+				srSnModelDynamic->shape().name = meshModelVec[i]->name;
+				mesh->dMeshDynamic_p.push_back(srSnModelDynamic);
+				srSnModelDynamic->ref();
+
+
 			
 				/* perform this when the character wants to attach to the mesh
 				SrSnGroup* meshGroup = new SrSnGroup();

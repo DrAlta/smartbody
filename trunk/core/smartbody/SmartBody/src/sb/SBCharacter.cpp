@@ -19,6 +19,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBReach.h>
+#include <sb/SBCharacterListener.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -881,6 +882,11 @@ void SBCharacter::setDeformableMeshName( std::string meshName )
 	{
 		this->dMesh_p = mesh;
 		this->dMeshInstance_p->setDeformableMesh(mesh);
+		this->dMeshInstance_p->setSkeleton(this->getSkeleton());
+		if ( scene->getCharacterListener() )
+		{		
+				scene->getCharacterListener()->OnCharacterChangeMesh( this->getName() );
+		}		
 	}
 	else
 	{
@@ -896,6 +902,11 @@ void SBCharacter::setDeformableMeshName( std::string meshName )
 		{
 			this->dMesh_p = mesh;
 			this->dMeshInstance_p->setDeformableMesh(mesh);
+			this->dMeshInstance_p->setSkeleton(this->getSkeleton());
+			if ( scene->getCharacterListener() )
+			{		
+					scene->getCharacterListener()->OnCharacterChangeMesh( this->getName() );
+			}		
 		}
 		else
 		{
