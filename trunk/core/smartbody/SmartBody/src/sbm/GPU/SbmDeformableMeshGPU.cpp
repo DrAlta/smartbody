@@ -499,7 +499,7 @@ std::string shaderFSSimple =
 
 typedef std::pair<int,int> IntPair;
 
-SbmDeformableMeshGPU::SbmDeformableMeshGPU(void)
+SbmDeformableMeshGPU::SbmDeformableMeshGPU(void) : DeformableMesh()
 {
 	useGPU = false;	
 	VBOPos = NULL;

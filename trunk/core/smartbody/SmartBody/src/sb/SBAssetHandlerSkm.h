@@ -16,8 +16,6 @@ class SBAssetHandlerSkm : public SBAssetHandler
 
 		SBAPI virtual std::vector<SBAsset*> getAssets(const std::string& path);
 
-	protected:
-		std::vector<std::string> assetTypes;
 };
 
 

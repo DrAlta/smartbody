@@ -57,7 +57,7 @@ void SkinWeight::normalizeWeights()
 	}
 }
 
-DeformableMesh::DeformableMesh() 
+DeformableMesh::DeformableMesh() : SBAsset()
 {
 	meshName = "null";
 	binding = false;
