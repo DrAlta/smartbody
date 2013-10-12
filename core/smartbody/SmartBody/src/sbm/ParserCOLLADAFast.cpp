@@ -2092,7 +2092,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 								//break;
 							for (int k = 0; k < pStride; k++)
 							{
-								std::string semantic = inputMap[k];
+								std::string& semantic = inputMap[k];
 								if (semantic == "VERTEX")
 								{
 									if (vertexSemantics.find("POSITION") != vertexSemantics.end())																								

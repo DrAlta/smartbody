@@ -398,6 +398,20 @@ bool DeformableMesh::buildVertexBuffer()
 	SrModel::Face defaultIdx;
 	defaultIdx.a = defaultIdx.b = defaultIdx.c = -1;
 	boneJointIdxMap.clear();
+
+
+	for (size_t x = 0; x < this->skinWeights.size(); x++)
+	{
+		SkinWeight* skinWeight = this->skinWeights[x];
+		for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
+		{
+			std::string& jointName = skinWeight->infJointName[j];
+			SkJoint* curJoint = skeleton->search_joint(jointName.c_str());
+			skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
+		}
+	}
+
+
 	
 	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 	{
@@ -813,7 +827,7 @@ void DeformableMeshInstance::updateJointList()
 		SkJointList jlist;
 		for (unsigned int k=0;k<skinWeight->infJointName.size();k++)
 		{
-			std::string jname = skinWeight->infJointName[k];
+			std::string& jname = skinWeight->infJointName[k];
 			SkJoint* joint = _skeleton->search_joint(jname.c_str());
 			jlist.push_back(joint);				
 		}
