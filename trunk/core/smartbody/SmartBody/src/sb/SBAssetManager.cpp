@@ -557,28 +557,50 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 
 void SBAssetManager::loadAssetsFromPath(const std::string& assetPath)
 {
-	/*
+	std::vector<boost::filesystem::path> dirs;
 	boost::filesystem::path path(assetPath);
-	if (boost::filesystem::exists
-	#define foreach BOOST_FOREACH
-namespace fs = boost::filesystem;
-
-fs::recursive_directory_iterator it(top), eod;
-foreach (fs::path const & p, std::make_pair(it, eod)) {
-    if (is_directory(p)) {
-        ...
-    } else if (is_regular_file(p)) {
-        ...
-    } else if (is_symlink(p)) {
-        ...
-    }
-}
-*/
+	if (boost::filesystem::exists(path))
+	{
+		if (boost::filesystem::is_directory(path))
+		{
+			dirs.push_back(path);
+			while (dirs.size() > 0)
+			{
+				boost::filesystem::path curPath = dirs[0];
+				dirs.erase(dirs.begin());
+				for (boost::filesystem::directory_iterator it(curPath), eit; it != eit; ++it)
+				{
+					if (boost::filesystem::is_directory(it->path()))
+					{
+						// ignore directories that start with a '.'
+						if (it->path().string().find(".") == 0)
+							continue;
+						dirs.push_back(it->path());
+					}
+					else if (boost::filesystem::is_regular_file(it->path()))
+					{
+						loadAsset(it->path().string());
+					} 
+					/*
+					else if (boost::filesystem::is_symlink(p))
+					{
+						loadAsset(p.string());
+					}
+					*/
+				}
+			}
+		}
+		else
+		{
+			loadAsset(assetPath);
+		}
+	}
 	
-	loadAsset(assetPath);
-
-	//load_motions(assetPath.c_str(), true);
-	//load_skeletons(assetPath.c_str(), true);
+	
+/*
+	load_motions(assetPath.c_str(), true);
+	load_skeletons(assetPath.c_str(), true);
+*/
 }
 
 SBSkeleton* SBAssetManager::addSkeletonDefinition(const std::string& skelName )
