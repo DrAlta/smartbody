@@ -297,6 +297,102 @@ void SBAssetManager::removeAllAssetPaths(const std::string& type)
 	}
 }
 
+std::string SBAssetManager::findAsset(const std::string& type, const std::string& assetName)
+{
+	// load the assets from the mesh directories
+	std::vector<std::string> meshPaths = this->getAssetPaths(type);
+	for (size_t m = 0; m < meshPaths.size(); m++)
+	{
+		std::string location = this->findAssetFromLocation(meshPaths[m], assetName);
+		if (location != "")
+			return location;
+	}
+	return "";
+}
+
+std::string SBAssetManager::findAssetFromLocation(const std::string& filepath, const std::string& assetName)
+{
+	boost::filesystem::path path(filepath);
+
+	const std::string& mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
+	if (mediaPath.size() > 0)
+	{
+		// if the path already contains the media path, ignore it
+		if (filepath.find(mediaPath) == 0)
+		{
+			 // do nothing
+		}
+		else
+		{
+			if (boost::filesystem::exists(path))
+			{
+				// do nothing
+			}
+			else
+			{
+				boost::filesystem::path finalPath(mediaPath);
+				finalPath /= path;
+				if (boost::filesystem::exists(finalPath))
+					path = finalPath;
+				else
+				{
+					LOG("Could not load assets from %s, does not exist", finalPath.string().c_str());
+					return "";
+				}
+			}
+		}
+
+	}
+
+	if (boost::filesystem::is_regular_file(path))
+	{
+		std::string base = boost::filesystem::basename(path);
+		std::string ext = boost::filesystem::basename(path);
+		if (assetName == base + ext)
+			return filepath;
+	}
+
+	std::vector<boost::filesystem::path> dirs;
+	dirs.push_back(path);
+	while (dirs.size() > 0)
+	{
+		boost::filesystem::path curPath = dirs[0];
+		dirs.erase(dirs.begin());
+		for (boost::filesystem::directory_iterator it(curPath), eit; it != eit; ++it)
+		{
+			if (boost::filesystem::is_directory(it->path()))
+			{
+				// ignore directories that start with a '.'
+				std::string basename = boost::filesystem::basename(it->path());
+				std::string extension = boost::filesystem::extension(it->path());
+				if (basename.size() == 0 && extension.find(".") == 0)
+					continue;
+				dirs.push_back(it->path());
+			}
+			else if (boost::filesystem::is_regular_file(it->path()))
+			{
+				std::string base = boost::filesystem::basename(it->path());
+				std::string ext = boost::filesystem::basename(it->path());
+				if (assetName == base + ext)
+					return filepath;
+			} 
+			/*
+			else if (boost::filesystem::is_symlink(p))
+			{
+				loadAsset(p.string());
+			}
+			*/
+		}
+	}
+	for (size_t d = 0; d < dirs.size(); d++)
+	{
+		std::string location = findAssetFromLocation(dirs[d].string(), assetName);
+		if (location != "")
+			return location;
+	}
+	return "";
+}
+
 void SBAssetManager::loadAssets()
 {
 	me_paths->reset();

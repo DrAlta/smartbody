@@ -36,6 +36,7 @@ class SBAssetManager : public SBObject
 		SBAPI void loadAssets();
 		SBAPI void loadAsset(const std::string& assetPath);
 		SBAPI void loadAssetsFromPath(const std::string& assetPath);
+		SBAPI std::string findAsset(const std::string& type, const std::string& assetName);
 
 		SBAPI SBSkeleton* createSkeleton(const std::string&char_name);
 		SBAPI SBSkeleton* getSkeleton(const std::string& name);
@@ -77,6 +78,7 @@ class SBAssetManager : public SBObject
 		
 protected:
 
+		std::string findAssetFromLocation(const std::string& filepath, const std::string& assetName);
 		SmartBody::SBSkeleton* load_skeleton( const char *filename, srPathList &path_list, double scale = 1.0 );
 	
 		int load_skeletons( const char* pathname, bool recursive );
