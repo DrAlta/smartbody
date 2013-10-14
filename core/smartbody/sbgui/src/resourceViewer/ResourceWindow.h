@@ -9,7 +9,7 @@
 #include <sb/SBFaceDefinition.h>
 #include <sb/SBService.h>
 #include <sb/SBPhysicsSim.h>
-
+#include <sb/SBSceneListener.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBJointMap.h>
 #include <sbm/GenericViewer.h>
@@ -22,6 +22,30 @@ class srPathList;
 class BoneMap;
 class EventHandler;
 
+class ResourceWindow;
+
+class ResourceWindowListener : public SmartBody::SBSceneListener
+{
+	public:
+		ResourceWindowListener(ResourceWindow* window);
+
+		virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
+		virtual void OnCharacterDelete( const std::string & name );
+		virtual void OnCharacterUpdate( const std::string & name );
+      
+		virtual void OnPawnCreate( const std::string & name );
+		virtual void OnPawnDelete( const std::string & name );
+
+		virtual void OnReset();
+
+		virtual void OnSimulationStart();
+		virtual void OnSimulationEnd();
+		virtual void OnSimulationUpdate();
+	
+	private:
+		ResourceWindow* _window;
+
+};
 
 class ResourceWindow : public Fl_Double_Window, public GenericViewer, public SmartBody::SBObserver
 {
@@ -63,7 +87,8 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 
 		virtual void notify(SmartBody::SBSubject* subject);
 		int handle(int event);
-        void show();      
+        virtual void show();      
+		virtual void hide(); 
         void draw();
 		void resize(int x, int y, int w, int h);
 		void update();
@@ -103,6 +128,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		int  findTreeItemType(Fl_Tree_Item* treeItem);
 		void clearInfoWidget(TreeItemInfoWidget* lastWidget);
 		TreeItemInfoWidget* createInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* treeItem, int itemType );
+		ResourceWindowListener* _listener;
 };
 
  class ResourceViewerFactory : public GenericViewerFactory

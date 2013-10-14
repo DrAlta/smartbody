@@ -53,6 +53,53 @@
 // 	ITEM_SIZE };
 
 
+ResourceWindowListener::ResourceWindowListener(ResourceWindow* window)
+{
+	_window = window;
+}
+
+void ResourceWindowListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
+{
+	_window->updateGUI();
+}
+
+void ResourceWindowListener::OnCharacterDelete( const std::string & name )
+{
+	_window->updateGUI();
+}
+
+void ResourceWindowListener::OnCharacterUpdate( const std::string & name )
+{
+	_window->updateGUI();
+}
+      
+void ResourceWindowListener::OnPawnCreate( const std::string & name )
+{
+	_window->updateGUI();
+}
+
+void ResourceWindowListener::OnPawnDelete( const std::string & name )
+{
+	_window->updateGUI();
+}
+
+void ResourceWindowListener::OnReset()
+{
+	_window->updateGUI();
+}
+
+void ResourceWindowListener::OnSimulationStart()
+{
+}
+
+void ResourceWindowListener::OnSimulationEnd()
+{
+}
+
+void ResourceWindowListener::OnSimulationUpdate()
+{
+}
+
 
 ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {
@@ -133,16 +180,32 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 		if (treeItemList[i])
 			treeItemList[i]->close();
 	}
+
+	_listener = new ResourceWindowListener(this);
+	
 }
 
 ResourceWindow::~ResourceWindow()
 {
-	
+	SmartBody::SBScene::getScene()->removeSceneListener(_listener);
+	delete _listener;
 }
 
 void ResourceWindow::label_viewer( std::string name )
 {
 	this->label(strdup(name.c_str()));
+}
+
+void ResourceWindow::show()
+{
+	SmartBody::SBScene::getScene()->addSceneListener(_listener);
+	Fl_Double_Window::show();
+}
+
+void ResourceWindow::hide()
+{
+	SmartBody::SBScene::getScene()->removeSceneListener(_listener);
+	Fl_Double_Window::hide();
 }
 
 void ResourceWindow::show_viewer()
@@ -245,11 +308,6 @@ int ResourceWindow::handle( int event )
 	return ret;
 }
 
-void ResourceWindow::show()
-{
-	Fl_Double_Window::show();
-}
-
 void ResourceWindow::update()
 {
 		
@@ -277,7 +335,6 @@ void ResourceWindow::resize( int x, int y, int w, int h )
 
 void ResourceWindow::updateGUI()
 {
-	
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
