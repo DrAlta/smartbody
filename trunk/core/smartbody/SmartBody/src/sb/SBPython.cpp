@@ -43,7 +43,7 @@
 #include <sb/SBRetarget.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBEvent.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sb/SBNavigationMesh.h>
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
@@ -658,24 +658,24 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("check", &SBAnimationTransitionRule::check, &TransitionRuleWrap::default_check, "Determines if the transition rule should be triggered.")
 		;
 	
-	boost::python::class_<SBCharacterListener>("SBCharacterListener")
-		.def("OnCharacterCreate", &SBCharacterListener::OnCharacterCreate, "Triggered when a character is created.")
-		.def("OnCharacterDelete", &SBCharacterListener::OnCharacterDelete, "Triggered when a character is deleted.")
-		.def("OnCharacterUpdate", &SBCharacterListener::OnCharacterUpdate, "Triggered when a character is updated.")
-		.def("OnPawnCreate", &SBCharacterListener::OnPawnCreate, "Triggered when a pawn is created.")
-		.def("OnPawnDelete", &SBCharacterListener::OnPawnDelete, "Triggered when a pawn is deleted.")
-		.def("OnViseme", &SBCharacterListener::OnViseme, "Visemes sent every frame.")
+	boost::python::class_<SBSceneListener>("SBSceneListener")
+		.def("OnCharacterCreate", &SBSceneListener::OnCharacterCreate, "Triggered when a character is created.")
+		.def("OnCharacterDelete", &SBSceneListener::OnCharacterDelete, "Triggered when a character is deleted.")
+		.def("OnCharacterUpdate", &SBSceneListener::OnCharacterUpdate, "Triggered when a character is updated.")
+		.def("OnPawnCreate", &SBSceneListener::OnPawnCreate, "Triggered when a pawn is created.")
+		.def("OnPawnDelete", &SBSceneListener::OnPawnDelete, "Triggered when a pawn is deleted.")
+		.def("OnViseme", &SBSceneListener::OnViseme, "Visemes sent every frame.")
 		;
 
 	boost::python::class_<CharacterListenerWrap, boost::noncopyable>("CharacterListener")
-		.def("OnCharacterCreate", &SBCharacterListener::OnCharacterCreate, &CharacterListenerWrap::default_OnCharacterCreate, "Triggered when a character is created.")
-		.def("OnCharacterDelete", &SBCharacterListener::OnCharacterDelete, &CharacterListenerWrap::default_OnCharacterDelete, "Triggered when a character is deleted.")
-		.def("OnCharacterUpdate", &SBCharacterListener::OnCharacterUpdate, &CharacterListenerWrap::default_OnCharacterUpdate, "Triggered when a character is updated.")
-		.def("OnPawnCreate", &SBCharacterListener::OnPawnCreate, &CharacterListenerWrap::default_OnPawnCreate, "Triggered when a pawn is created.")
-		.def("OnPawnDelete", &SBCharacterListener::OnPawnDelete, &CharacterListenerWrap::default_OnPawnDelete, "Triggered when a pawn is deleted.")
-		.def("OnViseme", &SBCharacterListener::OnViseme, &CharacterListenerWrap::default_OnViseme, "Triggered when a viseme is triggered.")
-		.def("OnChannel", &SBCharacterListener::OnChannel, &CharacterListenerWrap::default_OnChannel, "Channel data.")
-		.def("OnLogMessage", &SBCharacterListener::OnLogMessage, &CharacterListenerWrap::default_OnLogMessage, "Log message.")
+		.def("OnCharacterCreate", &SBSceneListener::OnCharacterCreate, &CharacterListenerWrap::default_OnCharacterCreate, "Triggered when a character is created.")
+		.def("OnCharacterDelete", &SBSceneListener::OnCharacterDelete, &CharacterListenerWrap::default_OnCharacterDelete, "Triggered when a character is deleted.")
+		.def("OnCharacterUpdate", &SBSceneListener::OnCharacterUpdate, &CharacterListenerWrap::default_OnCharacterUpdate, "Triggered when a character is updated.")
+		.def("OnPawnCreate", &SBSceneListener::OnPawnCreate, &CharacterListenerWrap::default_OnPawnCreate, "Triggered when a pawn is created.")
+		.def("OnPawnDelete", &SBSceneListener::OnPawnDelete, &CharacterListenerWrap::default_OnPawnDelete, "Triggered when a pawn is deleted.")
+		.def("OnViseme", &SBSceneListener::OnViseme, &CharacterListenerWrap::default_OnViseme, "Triggered when a viseme is triggered.")
+		.def("OnChannel", &SBSceneListener::OnChannel, &CharacterListenerWrap::default_OnChannel, "Channel data.")
+		.def("OnLogMessage", &SBSceneListener::OnLogMessage, &CharacterListenerWrap::default_OnLogMessage, "Log message.")
 		;
 
 	boost::python::class_<SBAssetManager, boost::python::bases<SBObject> >("SBAssetManager")

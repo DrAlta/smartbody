@@ -42,7 +42,7 @@
 #include <sb/SBRetarget.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBEvent.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
 #include <stdlib.h>
@@ -115,7 +115,6 @@ void pythonFuncsCharacter()
 	boost::python::class_<SBCharacter, boost::python::bases<SBPawn, SBObject> >("SBCharacter")
 		//.def(boost::python::init<std::string, std::string>())
 		.def("setMeshMap", &SBCharacter::setMeshMap, "Set the OpenCollada file for the character which contains all the smoothbinding information.")
-		.def("setDeformableMeshName", &SBCharacter::setDeformableMeshName, "load the deformable mesh with given mesh name")
 		.def("addMesh", &SBCharacter::addMesh, "Add obj mesh to current character for smoothbinding.")
 		.def("addJointTrajectoryConstraint", &SBCharacter::addJointTrajectoryConstraint, "Add IK constraint to a specific end effector joint to be enforced in the post-processing.")
 		.def("isAutomaticPruning", &SBCharacter::isAutomaticPruning, "Returns true if the character's cotnroller are automatically pruned.")

@@ -16,10 +16,6 @@
 *  License along with SmartBody-lib.  If not, see:
 *      http://www.gnu.org/licenses/lgpl-3.0.txt
 *
-*  CONTRIBUTORS:
-*      Andrew n marshall, USC
-*      Ed Fast, USC
-*      Thomas Amundsen, USC
 */
 
 #include "vhcl.h"
@@ -33,11 +29,12 @@
 #include <sb/SBPythonClass.h>
 #endif
 
+#include <sb/SBSceneListener.h>
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBCollisionManager.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sb/SBWSPManager.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
@@ -197,7 +194,6 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 	_skeleton = sk;
 	_skeleton->ref();	
 	ct_tree_p->add_skeleton( _skeleton->getName(), _skeleton );	
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
 	//scene_p->init(_skeleton);
 	//int err = mcu.add_scene(scene_p);	
@@ -206,9 +202,11 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 	setHeight(height);
 	//_skeleton->ref();
 
-	if ( scene->getCharacterListener() )
-	{		
-		scene->getCharacterListener()->OnCharacterUpdate( getName() );
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+	for (size_t i = 0; i < listeners.size(); i++)
+	{
+		listeners[i]->OnCharacterUpdate( getName() );
 	}
 }
 
@@ -227,10 +225,12 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 		ct_tree_p->add_skeleton( _skeleton->getName(), _skeleton );
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		
-		if (scene->getCharacterListener())
+		std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+		for (size_t i = 0; i < listeners.size(); i++)
 		{
-			scene->getCharacterListener()->OnCharacterUpdate(getName());
+			listeners[i]->OnCharacterUpdate( getName() );
 		}
+
 	}
 
 	// 	if (colObj_p)
@@ -284,10 +284,12 @@ int SbmPawn::setup() {
 	wo_cache.r = 0;
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	if ( scene->getCharacterListener() )
+	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+	for (size_t i = 0; i < listeners.size(); i++)
 	{
-		scene->getCharacterListener()->OnCharacterUpdate( getName() );
+		listeners[i]->OnCharacterUpdate( getName() );
 	}
+
 	return( CMD_SUCCESS ); 
 }
 
@@ -403,9 +405,10 @@ SbmPawn::~SbmPawn()	{
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	
-	if ( scene->getCharacterListener() )
+	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+	for (size_t i = 0; i < listeners.size(); i++)
 	{
-		scene->getCharacterListener()->OnCharacterDelete( getName() );
+		listeners[i]->OnCharacterDelete( getName() );
 	}
 
 	if ( bonebusCharacter )

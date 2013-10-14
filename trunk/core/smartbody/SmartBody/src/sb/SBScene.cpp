@@ -52,7 +52,7 @@
 #include <boost/foreach.hpp>
 #include <sb/nvbg.h>
 #include <sb/SBJointMap.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sb/SBNavigationMesh.h>
 #include <sbm/ParserBVH.h>
 #include <sbm/ParserCOLLADAFast.h>
@@ -110,9 +110,11 @@ class ForwardLogListener : public vhcl::Log::Listener
 			SBScene* scene = SmartBody::SBScene::getScene();
 			if (!scene)
 				return;
-			SmartBody::SBCharacterListener* listener = scene->getCharacterListener();
-			if (listener)
-				listener->OnLogMessage(message);
+			std::vector<SBSceneListener*>& listeners = scene->getSceneListeners();
+			for (size_t i = 0; i < listeners.size(); i++)
+			{
+				listeners[i]->OnLogMessage(message);
+			}
 		}
 };
 
@@ -134,7 +136,7 @@ void SBScene::initialize()
 
 	createDefaultControllers();
 
-	_characterListener = NULL;
+	_sceneListeners.clear();
 
 	_sim = new SBSimulationManager();
 	_profiler = new SBProfiler();
@@ -224,10 +226,11 @@ void SBScene::initialize()
 	// Create default settings
 	createDefaultControllers();
 	
-	SmartBody::SBCharacterListener* listener = getCharacterListener();
+	/*
+	SmartBody::SBSceneListener* listener = getCharacterListener();
 	//_scene = SmartBody::SBScene::getScene();
-	setCharacterListener(listener);
-
+	addSceneListener(listener);
+	*/
 	_debuggerServer->Init();
 	_debuggerServer->SetSBScene(_scene);
 	getBlendManager()->createBlend0D(PseudoIdleState);
@@ -700,7 +703,7 @@ void SBScene::update()
 			char_p->_skeleton->update_global_matrices();
 
 			char_p->forward_visemes( getSimulationManager()->getTime() );	
-			char_p->forward_parameters( getSimulationManager()->getTime() );	
+			//char_p->forward_parameters( getSimulationManager()->getTime() );	
 
 			if (char_p->bonebusCharacter && char_p->bonebusCharacter->GetNumErrors() > 3)
 			{
@@ -818,6 +821,13 @@ void SBScene::update()
 		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZFar   = defaultCam.zfar;
 	}
 	*/
+
+	std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
+	for (size_t i = 0; i < listeners.size(); i++)
+	{
+		listeners[i]->OnSimulationUpdate( );
+	}
+
 
 	if (!SmartBody::SBScene::getScene()->isRemoteMode())
 		getDebuggerServer()->Update();
@@ -1028,9 +1038,12 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 
 		if (getBoneBusManager()->isEnable())
 			getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
-		if (getCharacterListener() )
-			getCharacterListener()->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
 
+		std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
+		for (size_t i = 0; i < listeners.size(); i++)
+		{
+			listeners[i]->OnCharacterCreate( character->getName().c_str(), character->getClassType() );
+		}
 
 		// notify the services		
 		std::map<std::string, SmartBody::SBService*>& services = getServiceManager()->getServices();
@@ -1078,9 +1091,12 @@ SBPawn* SBScene::createPawn(const std::string& pawnName)
 		_pawnMap.insert(std::pair<std::string, SbmPawn*>(pawn->getName(), pawn));
 		_pawnNames.push_back(pawn->getName());
 	
-		if (getCharacterListener())
-			getCharacterListener()->OnPawnCreate( pawn->getName().c_str() );
 
+		std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
+		for (size_t i = 0; i < listeners.size(); i++)
+		{
+			listeners[i]->OnPawnCreate( pawn->getName().c_str() );
+		}
 
 		// notify the services
 		std::map<std::string, SmartBody::SBService*>& services = getServiceManager()->getServices();
@@ -1116,9 +1132,11 @@ void SBScene::removeCharacter(const std::string& charName)
 			service->onCharacterDelete(character);
 		}
 	
-
-		if (getCharacterListener() )
-			getCharacterListener()->OnCharacterDelete( name );
+		std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
+		for (size_t i = 0; i < listeners.size(); i++)
+		{
+			listeners[i]->OnCharacterDelete( name);
+		}
 
 		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(name);
 		if (iter != _pawnMap.end())
@@ -1189,8 +1207,11 @@ void SBScene::removePawn(const std::string& pawnName)
 				service->onPawnDelete(sbpawn);
 			}
 			
-			if (getCharacterListener())
-				getCharacterListener()->OnPawnDelete( name );
+			std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
+			for (size_t i = 0; i < listeners.size(); i++)
+			{
+				listeners[i]->OnPawnDelete( name );
+			}
 
 			std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(name);
 			if (iter != _pawnMap.end())
@@ -1660,16 +1681,29 @@ std::map<std::string, SBScript*>& SBScene::getScripts()
 	return _scripts;
 }
 
-void SBScene::setCharacterListener(SBCharacterListener* listener)
+void SBScene::addSceneListener(SBSceneListener* listener)
 {
-	_characterListener = listener;
+	std::vector<SBSceneListener*>::iterator iter = std::find(_sceneListeners.begin(), _sceneListeners.end(), listener);
+	if (iter == _sceneListeners.end())
+		_sceneListeners.push_back(listener);
 }
 
-SBCharacterListener* SBScene::getCharacterListener()
+void SBScene::removeSceneListener(SBSceneListener* listener)
 {
-	return _characterListener;
+	std::vector<SBSceneListener*>::iterator iter = std::find(_sceneListeners.begin(), _sceneListeners.end(), listener);
+	if (iter != _sceneListeners.end())
+		_sceneListeners.erase(iter);
 }
 
+void SBScene::removeAllSceneListeners()
+{
+	_sceneListeners.clear();
+}
+
+std::vector<SBSceneListener*>& SBScene::getSceneListeners()
+{
+	return _sceneListeners;
+}
 
 std::string SBScene::saveSceneSetting()
 {
@@ -2827,11 +2861,6 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 			strstr << attrWrite;
 		}
 
-		// save deformable mesh 
-		std::string meshName = character->getStringAttribute("deformableMesh");
-		//character->setDeformableMeshName(meshName);
-		strstr << "obj.setDeformableMeshName(\"" << meshName << "\")\n";
-
 		// reach
 		strstr << "# -------------------- reaching for character " << character->getName() << "\n";
 		// reach
@@ -3341,9 +3370,11 @@ SrCamera* SBScene::createCamera(const std::string& name)
 	_pawnMap.insert(std::pair<std::string, SbmPawn*>(camera->getName(), camera));
 	_pawnNames.push_back(camera->getName());
 	
-	if (getCharacterListener())
-		getCharacterListener()->OnPawnCreate( camera->getName().c_str() );
-	
+	std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
+	for (size_t i = 0; i < listeners.size(); i++)
+	{
+		listeners[i]->OnPawnCreate( camera->getName() );
+	}
 
 	// notify the services
 	std::map<std::string, SmartBody::SBService*>& services = getServiceManager()->getServices();

@@ -726,9 +726,13 @@ void ResourceWindow::treeCallBack( Fl_Widget* widget, void* data )
 			window->updateTreeItemInfo(item,itemType);
 			if (itemType == ITEM_PAWN || itemType == ITEM_CHARACTER)
 			{
-				FLTKListener* listener = dynamic_cast<FLTKListener*>(SmartBody::SBScene::getScene()->getCharacterListener());
-				if (listener)
-					listener->OnObjectSelected(item->label());
+				std::vector<SmartBody::SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+				for (size_t i = 0; i < listeners.size(); i++)
+				{
+					FLTKListener* fltkListener = dynamic_cast<FLTKListener*>(listeners[i]);
+					if (fltkListener)
+						fltkListener->OnObjectSelected( item->label() );
+				}
 			}
 		}
 	}	

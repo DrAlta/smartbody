@@ -10,7 +10,7 @@
 #include <sb/SBAssetManager.h>
 #include <sb/sbm_pawn.hpp>
 #include <sb/sbm_character.hpp>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sb/SBSpeechManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBMotion.h>
@@ -445,11 +445,12 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 		sbpawn->set_world_offset(loc[0],loc[1],loc[2],h,p,r);	
 		sbpawn->wo_cache_update();
 
-		if ( scene->getCharacterListener() )
+		std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+		for (size_t i = 0; i < listeners.size(); i++)
 		{
-			scene->getCharacterListener()->OnCharacterCreate( pawn_name, pawn_p->getClassType().c_str() );
+			listeners[i]->OnCharacterCreate( pawn_name, pawn_p->getClassType() );
 		}
-
+		
 		return CMD_SUCCESS;
 	}
 
@@ -650,12 +651,12 @@ int create_remote_pawn_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 
 	int err = pawn_p->init( skeleton );
 
-	if (scene->getCharacterListener())
+	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+	for (size_t i = 0; i < listeners.size(); i++)
 	{
-		scene->getCharacterListener()->OnCharacterCreate(pawn_and_attribute, "");
+		listeners[i]->OnCharacterCreate( pawn_and_attribute, "" );
 	}
-
-
+		
 	if( err != CMD_SUCCESS ) {
 		LOG("ERROR: Unable to initialize SbmPawn \"%s\".", pawn_and_attribute.c_str() );
 		delete pawn_p;
@@ -925,10 +926,6 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 			LOG("Mesh %s already exist, using mesh instance.",meshName.c_str());
 			character->dMesh_p = deformableMesh;	
 			character->dMeshInstance_p->setDeformableMesh(deformableMesh);
-			if ( scene->getCharacterListener() )
-			{		
-//				 scene->getCharacterListener()->OnCharacterChangeMesh( character->getName() );
-			}		
 			return CMD_SUCCESS;
 		}
 
@@ -1102,10 +1099,10 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 
 		}
 
-		if (  scene->getCharacterListener() )
-		{		
+//		if (  scene->getCharacterListener() )
+	//	{		
 //			 scene->getCharacterListener()->OnCharacterChangeMesh( character->getName() );
-		}
+		//}
 		return CMD_SUCCESS;
 	}
 	else if (cmd == "meshstatus")

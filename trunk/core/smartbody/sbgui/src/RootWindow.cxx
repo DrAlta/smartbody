@@ -521,13 +521,22 @@ void BaseWindow::ResetScene()
 	SBGUIManager::singleton().resetGUI();
 	fltkViewer->resetViewer();
 
-	SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
+	std::vector<SmartBody::SBSceneListener*> listeners;
+	std::vector<SmartBody::SBSceneListener*>& currentListeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (int l = 0; l < currentListeners.size(); l++)
+	{
+		listeners.push_back(currentListeners[l]);
+	}
 	SmartBody::SBScene::destroyScene();
 
 	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->startFileLogging("./smartbody.log");
-	scene->setCharacterListener(listener);
+	for (int l = 0; l < listeners.size(); l++)
+	{
+		scene->addSceneListener(listeners[l]);
+	}
+	
 
 	SmartBody::SBScene::getScene()->setViewer(this);
 	SmartBody::SBScene::getScene()->getViewer()->root(SmartBody::SBScene::getScene()->getRootGroup());
@@ -795,7 +804,7 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 #if 1
 		window->ResetScene(); // should call the same function to be consistent
 #else
-		SmartBody::SBCharacterListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
+		SmartBody::SBSceneListener* listener = SmartBody::SBScene::getScene()->getCharacterListener();
 		window->resetWindow();
 		
 		SmartBody::SBScene::destroyScene();
@@ -810,7 +819,7 @@ void BaseWindow::NewCB(Fl_Widget* widget, void* data)
 		std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 		if (mediaPath != "")
 			scene->setMediaPath(mediaPath);
-		scene->setCharacterListener(listener);
+		scene->addSceneListener(listener);
 
 		scene->getSimulationManager()->setupTimer();
 		

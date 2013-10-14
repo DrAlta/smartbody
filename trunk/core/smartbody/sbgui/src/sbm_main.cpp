@@ -938,7 +938,7 @@ int main( int argc, char **argv )	{
 	mcu_register_callbacks();
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	scene->setCharacterListener(&fltkListener);
+	scene->addSceneListener(&fltkListener);
 
 	scene->startFileLogging("./smartbody.log");
 
@@ -1206,53 +1206,6 @@ int main( int argc, char **argv )	{
 		if( update_sim )	{
 			scene->update();
 		}
-
-		/*for (std::map<std::string, SbmCharacter*>::iterator iter = mcu.getCharacterMap().begin();
-			 iter != mcu.getCharacterMap().end();
-			 iter++)
-		{
-			SbmCharacter* character = (*iter).second;
-			if (character->scene_p)
-				character->scene_p->update();	
-		}*/
-		const std::vector<std::string>& pawns = scene->getPawnNames();
-		for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
-			pawnIter != pawns.end();
-			pawnIter++)
-		{
-			SmartBody::SBPawn* pawn = scene->getPawn((*pawnIter));
- 			if (pawn->scene_p)
- 				pawn->scene_p->update();	
-		}
-
-		scene->updateTrackedCameras();
-		
-		BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(scene->getViewer());
-
-		if(rootWindow && rootWindow->dataViewerWindow && rootWindow->dataViewerWindow->shown())
-		{
-			rootWindow->dataViewerWindow->update();
-		}
-
-		if(rootWindow && rootWindow->resourceWindow && rootWindow->resourceWindow->shown())
-		{
-			//rootWindow->resourceWindow->update();
-		}
-
-		if (rootWindow && rootWindow->panimationWindow && rootWindow->panimationWindow->shown())
-		{
-			 rootWindow->panimationWindow->update_viewer();
-		}
-		if (rootWindow && rootWindow->visemeViewerWindow && rootWindow->visemeViewerWindow->shown())
-		{
-			rootWindow->visemeViewerWindow->update();
-		}
-
-		if (scene->getViewer())
-			scene->getViewer()->render();
-		if (scene->getOgreViewer())
-			scene->getOgreViewer()->render();
-	
 	}	
 	
 	cleanup();

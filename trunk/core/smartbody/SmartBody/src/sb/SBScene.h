@@ -29,7 +29,7 @@ class KinectProcessor;
 
 namespace SmartBody {
 
-class SBCharacterListener;
+class SBSceneListener;
 class SBPawn;
 class SBCharacter;
 class SBSkeleton;
@@ -169,8 +169,10 @@ class SBScene : public SBObject
 		SBAPI bool isRemoteMode();
 		SBAPI void setRemoteMode(bool val);
 
-		SBAPI void setCharacterListener(SBCharacterListener* listener);
-		SBAPI SBCharacterListener* getCharacterListener();
+		SBAPI void addSceneListener(SBSceneListener* listener);
+		SBAPI std::vector<SBSceneListener*>& getSceneListeners();
+		SBAPI void removeSceneListener(SBSceneListener* listener);
+		SBAPI void removeAllSceneListeners();
 
 		SBAPI void notify(SBSubject* subject);
 
@@ -297,7 +299,7 @@ class SBScene : public SBObject
 
 		SBParser* _parser;
 
-		SBCharacterListener* _characterListener;
+		std::vector<SBSceneListener*> _sceneListeners;
 
 		SBBehaviorSetManager* _behaviorSetManager;
 

@@ -4,7 +4,10 @@
 #include <sb/SBPawn.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
+#include <sb/SBSimulationManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBWSPManager.h>
 #include <RootWindow.h>
 #include <fltk_viewer.h>
 
@@ -306,9 +309,60 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 	}
 }
 
-void FLTKListener::setOtherListener( SmartBody::SBCharacterListener* listener )
+void FLTKListener::setOtherListener( SmartBody::SBSceneListener* listener )
 {
 	otherListener = listener;
+}
+
+void FLTKListener::OnSimulationStart()
+{
+}
+
+void FLTKListener::OnSimulationEnd()
+{
+}
+
+void FLTKListener::OnSimulationUpdate()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
+	const std::vector<std::string>& pawns = scene->getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
+		pawnIter != pawns.end();
+		pawnIter++)
+	{
+		SmartBody::SBPawn* pawn = scene->getPawn((*pawnIter));
+ 		if (pawn->scene_p)
+ 			pawn->scene_p->update();	
+	}
+
+	scene->updateTrackedCameras();
+		
+	BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(scene->getViewer());
+
+	if(rootWindow && rootWindow->dataViewerWindow && rootWindow->dataViewerWindow->shown())
+	{
+		rootWindow->dataViewerWindow->update();
+	}
+
+	if(rootWindow && rootWindow->resourceWindow && rootWindow->resourceWindow->shown())
+	{
+		//rootWindow->resourceWindow->update();
+	}
+
+	if (rootWindow && rootWindow->panimationWindow && rootWindow->panimationWindow->shown())
+	{
+			rootWindow->panimationWindow->update_viewer();
+	}
+	if (rootWindow && rootWindow->visemeViewerWindow && rootWindow->visemeViewerWindow->shown())
+	{
+		rootWindow->visemeViewerWindow->update();
+	}
+
+	if (scene->getViewer())
+		scene->getViewer()->render();
+	if (scene->getOgreViewer())
+		scene->getOgreViewer()->render();
 }
 
 void FLTKListener::OnLogMessage( const std::string& message )

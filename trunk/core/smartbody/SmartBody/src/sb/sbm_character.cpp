@@ -60,7 +60,7 @@
 #include <sb/SBSteerAgent.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationState.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <controllers/me_ct_examples.h>
 #include <controllers/me_ct_motion_player.h>
 #include <controllers/me_ct_pose.h>
@@ -259,9 +259,10 @@ SbmCharacter::~SbmCharacter( void )	{
 	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	
-	if (scene->getCharacterListener())
+	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+	for (size_t i = 0; i < listeners.size(); i++)
 	{
-		scene->getCharacterListener()->OnCharacterDelete( getName() );
+		listeners[i]->OnCharacterDelete( getName() );
 	}
 
 	if ( bonebusCharacter )
@@ -411,11 +412,12 @@ void SbmCharacter::createStandardControllers()
 		breathingJointY->pos()->limits(SkJointPos::X, -1000, 1000);  // Setting upper bound to 2 allows some exageration
 		rootJoint->addChild(breathingJointY);
 
-		if (SmartBody::SBScene::getScene()->getCharacterListener())
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+		for (size_t i = 0; i < listeners.size(); i++)
 		{
-			SmartBody::SBScene::getScene()->getCharacterListener()->OnCharacterUpdate( getName() );
+			listeners[i]->OnCharacterUpdate( getName() );
 		}
-
 	}
 
 	gaze_sched_p = CreateSchedulerCt( getName().c_str(), "gaze" );
@@ -875,9 +877,10 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	if (scene->getBoneBusManager()->isEnable())
 		bonebusCharacter = scene->getBoneBusManager()->getBoneBus().CreateCharacter( getName().c_str(), classType, true );
 
-	if (scene->getCharacterListener())
-	{		
-		scene->getCharacterListener()->OnCharacterCreate( getName(), classType );
+	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+	for (size_t i = 0; i < listeners.size(); i++)
+	{
+		listeners[i]->OnCharacterCreate( getName(), classType );
 	}
 
 	// This needs to be tested
@@ -1081,9 +1084,10 @@ int SbmCharacter::init_skeleton() {
 	_skeleton->make_active_channels();
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	if (scene->getCharacterListener())
+	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+	for (size_t i = 0; i < listeners.size(); i++)
 	{
-		scene->getCharacterListener()->OnCharacterUpdate(getName());
+		listeners[i]->OnCharacterUpdate( getName() );
 	}
 
 	for( int i=0; i<viseme_channel_count; i++ ) {
@@ -1947,9 +1951,10 @@ void SbmCharacter::forward_visemes( double curTime )
 	return;
 #endif
 
-	SmartBody::SBCharacterListener *listener_p = SmartBody::SBScene::getScene()->getCharacterListener();
-
-	if( bonebusCharacter || listener_p )
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+	
+	if( bonebusCharacter || listeners.size() )
 	{
 		SkChannelArray& channels = _skeleton->channels();
 		MeFrameData& frameData = ct_tree_p->getLastFrame();
@@ -1969,10 +1974,11 @@ void SbmCharacter::forward_visemes( double curTime )
 					{
 						bonebusCharacter->SetViseme( channels.name(c).c_str(), value, 0 );
 					}
-					if( listener_p )
+					for (size_t l = 0; l < listeners.size();l++)
 					{
-						listener_p->OnViseme( getName(), channels.name(c), value, 0 );
+						listeners[l]->OnViseme( getName(), channels.name(c), value, 0  );
 					}
+
 					viseme_history_arr[ i ] = value;
 				}
 			}
@@ -1982,12 +1988,13 @@ void SbmCharacter::forward_visemes( double curTime )
 
 void SbmCharacter::forward_parameters( double curTime )
 {
+	/*
 #if __FLASHPLAYER__
 	return;
 #endif
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	SmartBody::SBCharacterListener *listener_p = scene->getCharacterListener();
+	SmartBody::SBSceneListener *listener_p = scene->getCharacterListener();
 
 	if( listener_p )
 	{
@@ -2002,6 +2009,7 @@ void SbmCharacter::forward_parameters( double curTime )
 			//listener_p->OnChannel(getName(), joint->jointName(), joint->pos()->value(0)); 
 		}
 	}
+	*/
 }
 
 ///////////////////////////////////////////////////////////////////////////
