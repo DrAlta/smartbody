@@ -15,9 +15,6 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SmartBody-lib.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Jingqiao Fu, USC
  */
 
 #ifndef _CHANNEL_BUFFER_WINDOW_H_
@@ -36,6 +33,32 @@
 #include <sk/sk_motion.h>
 #include <sbm/GenericViewer.h>
 #include "GlChartView.hpp"
+#include <sb/SBSceneListener.h>
+
+class ChannelBufferWindow;
+
+class ChannelBufferWindowListener : public SmartBody::SBSceneListener
+{
+	public:
+		ChannelBufferWindowListener(ChannelBufferWindow* window);
+
+		virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
+		virtual void OnCharacterDelete( const std::string & name );
+		virtual void OnCharacterUpdate( const std::string & name );
+      
+		virtual void OnPawnCreate( const std::string & name );
+		virtual void OnPawnDelete( const std::string & name );
+
+		virtual void OnReset();
+
+		virtual void OnSimulationStart();
+		virtual void OnSimulationEnd();
+		virtual void OnSimulationUpdate();
+	
+	private:
+		ChannelBufferWindow* _window;
+
+};
 
 class ChannelItem
 {
@@ -65,12 +88,12 @@ public:
 	int handle(int event) { return Fl_Double_Window::handle(event); }   
 	void updateGUI();
 	void show();  
+	void hide();
 
 	void reset();
 
 	void generateBML(Fl_Widget* widget, void* data);
 
-public:
 	GlChartView* chartview;
 	Fl_Choice* character;
 	Fl_Choice* controller;
@@ -102,12 +125,12 @@ public:
 
 protected:
 	std::string no_motion;
+	ChannelBufferWindowListener* _listener;
 
 public:
 	const char* getSelectedCharacterName();
 	void update();
 
-protected:
 	static void clearChannelItem(ChannelBufferWindow* window);
 	static void initChannelItem(ChannelBufferWindow* window, int num);
 	static void loadCharacters(ChannelBufferWindow* window);

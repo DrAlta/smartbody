@@ -34,6 +34,66 @@
 #include <bml/bml.hpp>
 #include <controllers/me_controller_tree_root.hpp>
 
+ChannelBufferWindowListener::ChannelBufferWindowListener(ChannelBufferWindow* window)
+{
+	_window = window;
+}
+
+void ChannelBufferWindowListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
+{
+}
+
+void ChannelBufferWindowListener::OnCharacterDelete( const std::string & name )
+{
+	if (name == _window->getSelectedCharacterName())
+	{
+		_window->character->value(0);
+		_window->clearChannelItem(_window);
+		_window->refreshChannels(_window->character, _window);
+		_window->refreshChannelsWidget(_window);
+	}
+}
+
+void ChannelBufferWindowListener::OnCharacterUpdate( const std::string & name )
+{
+	if (name == _window->getSelectedCharacterName())
+	{
+		_window->character->value(0);
+		_window->clearChannelItem(_window);
+		_window->refreshChannels(_window->character, _window);
+		_window->refreshChannelsWidget(_window);
+	}
+}
+      
+void ChannelBufferWindowListener::OnPawnCreate( const std::string & name )
+{
+}
+
+void ChannelBufferWindowListener::OnPawnDelete( const std::string & name )
+{
+}
+
+void ChannelBufferWindowListener::OnReset()
+{
+	_window->character->value(0);
+	_window->clearChannelItem(_window);
+	_window->refreshChannels(_window->character, _window);
+	_window->refreshChannelsWidget(_window);
+}
+
+void ChannelBufferWindowListener::OnSimulationStart()
+{
+}
+
+void ChannelBufferWindowListener::OnSimulationEnd()
+{
+}
+
+void ChannelBufferWindowListener::OnSimulationUpdate()
+{
+	_window->update();
+}
+
 ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {
 	set_default_values();
@@ -134,6 +194,8 @@ ChannelBufferWindow::ChannelBufferWindow(int x, int y, int w, int h, char* name)
 	secondGroup->resizable(chartview);
 	this->resizable(secondGroup);
 	this->size_range(800, 480);
+
+	_listener = new ChannelBufferWindowListener(this);
 }
 
 
@@ -148,6 +210,8 @@ ChannelBufferWindow::~ChannelBufferWindow()
 {
 	LOG("ChannelBufferWindow::destructor");
 	clearChannelItem(this);
+	SmartBody::SBScene::getScene()->removeSceneListener(_listener);
+	delete _listener;
 }
 
 void ChannelBufferWindow::clearChannelItem(ChannelBufferWindow* window)
@@ -881,8 +945,17 @@ void ChannelBufferWindow::update_viewer()
 
 void ChannelBufferWindow::show()
 {
+	SmartBody::SBScene::getScene()->addSceneListener(_listener);
 	Fl_Window::show();
 }
+
+void ChannelBufferWindow::hide()
+{
+	SmartBody::SBScene::getScene()->removeSceneListener(_listener);
+	Fl_Window::hide();
+}
+
+
 
 void ChannelBufferWindow::update()
 {

@@ -783,6 +783,9 @@ void ResourceWindow::treeCallBack( Fl_Widget* widget, void* data )
 			window->updateTreeItemInfo(item,itemType);
 			if (itemType == ITEM_PAWN || itemType == ITEM_CHARACTER)
 			{
+				if (item == window->treeItemList[ITEM_PAWN] ||
+					item == window->treeItemList[ITEM_CHARACTER]) // clicked on the extent
+					return;
 				std::vector<SmartBody::SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
 				for (size_t i = 0; i < listeners.size(); i++)
 				{
