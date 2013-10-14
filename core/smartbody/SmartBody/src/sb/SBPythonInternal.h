@@ -3,7 +3,7 @@
 
 #include <string>
 #include <sb/SBScript.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sr/sr_vec.h>
 
 #ifndef SB_NO_PYTHON
@@ -441,7 +441,7 @@ struct TransitionRuleWrap : SmartBody::SBAnimationTransitionRule, boost::python:
 	}
 };
 
-struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wrapper<SmartBody::SBCharacterListener>
+struct CharacterListenerWrap : SmartBody::SBSceneListener, boost::python::wrapper<SmartBody::SBSceneListener>
 {
 	virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass )
 	{
@@ -454,12 +454,12 @@ struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wr
 			}
 		}
 
-		return SBCharacterListener::OnCharacterCreate(name, objectClass);
+		return SBSceneListener::OnCharacterCreate(name, objectClass);
 	}
 
 	void default_OnCharacterCreate( const std::string & name, const std::string & objectClass ) \
 	{
-		SBCharacterListener::OnCharacterCreate(name, objectClass);
+		SBSceneListener::OnCharacterCreate(name, objectClass);
 	}
 
 	virtual void OnCharacterDelete( const std::string & name )
@@ -473,12 +473,12 @@ struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wr
 			}
 		}
 
-		SBCharacterListener::OnCharacterDelete(name);
+		SBSceneListener::OnCharacterDelete(name);
 	
 	}
 	void default_OnCharacterDelete( const std::string & name )
 	{
-		SBCharacterListener::OnCharacterDelete(name);
+		SBSceneListener::OnCharacterDelete(name);
 	}
 
 	virtual void OnCharacterUpdate( const std::string & name)
@@ -492,11 +492,11 @@ struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wr
 			}
 		}
 
-		SBCharacterListener::OnCharacterUpdate(name);
+		SBSceneListener::OnCharacterUpdate(name);
 	}
 	void default_OnCharacterUpdate( const std::string & name )
 	{
-		SBCharacterListener::OnCharacterUpdate(name);
+		SBSceneListener::OnCharacterUpdate(name);
 	}
 
 	virtual void OnPawnCreate( const std::string & name )
@@ -510,12 +510,12 @@ struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wr
 			}
 		}
 
-		SBCharacterListener::OnPawnCreate(name);
+		SBSceneListener::OnPawnCreate(name);
 	}
 	
 	void default_OnPawnCreate( const std::string & name )
 	{
-		SBCharacterListener::OnPawnCreate(name);
+		SBSceneListener::OnPawnCreate(name);
 	}
 
 	virtual void OnPawnDelete( const std::string & name )
@@ -529,12 +529,12 @@ struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wr
 			}
 		}
 
-		SBCharacterListener::OnPawnDelete(name);
+		SBSceneListener::OnPawnDelete(name);
 	}
 	
 	void default_OnPawnDelete( const std::string & name )
 	{
-		SBCharacterListener::OnPawnDelete(name);
+		SBSceneListener::OnPawnDelete(name);
 	}
 
 	virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
@@ -548,12 +548,12 @@ struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wr
 			}
 		}
 
-		SBCharacterListener::OnViseme(name, visemeName, weight, blendTime);
+		SBSceneListener::OnViseme(name, visemeName, weight, blendTime);
 	}
 	
 	void default_OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
 	{
-		SBCharacterListener::OnViseme(name, visemeName, weight, blendTime);
+		SBSceneListener::OnViseme(name, visemeName, weight, blendTime);
 	}
 
 	virtual void OnChannel( const std::string & name, const std::string & channelName, const float value)
@@ -567,12 +567,12 @@ struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wr
 			}
 		}
 
-		SBCharacterListener::OnChannel(name, channelName, value);
+		SBSceneListener::OnChannel(name, channelName, value);
 	}
 	
 	void default_OnChannel( const std::string & name, const std::string & channelName, const float value)
 	{
-		SBCharacterListener::OnChannel(name, channelName, value);
+		SBSceneListener::OnChannel(name, channelName, value);
 	}
 
 	virtual void OnLogMessage( const std::string & message)
@@ -585,12 +585,12 @@ struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wr
 				PyErr_Print();
 			}
 		}
-		SBCharacterListener::OnLogMessage(message);
+		SBSceneListener::OnLogMessage(message);
 	}
 	
 	void default_OnLogMessage( const std::string & message)
 	{
-		SBCharacterListener::OnLogMessage(message);
+		SBSceneListener::OnLogMessage(message);
 	}
 };
 

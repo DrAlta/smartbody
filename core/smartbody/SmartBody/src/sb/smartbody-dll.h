@@ -55,7 +55,7 @@ class SmartbodyCharacter
 };
 
 
-class Smartbody_dll_SBCharacterListener_Internal;
+class Smartbody_dll_SBSceneListener_Internal;
 class SBDebuggerServer;
 
 class Smartbody_dll
@@ -63,7 +63,7 @@ class Smartbody_dll
    private:
       SmartbodyCharacter m_emptyCharacter;
       SmartbodyListener * m_listener;
-      Smartbody_dll_SBCharacterListener_Internal * m_internalListener;
+      Smartbody_dll_SBSceneListener_Internal * m_internalListener;
       std::map<std::string, SmartbodyCharacter*> m_characters;
 
    public:
@@ -109,7 +109,7 @@ class Smartbody_dll
       void InitLocalSpeechRelay();
       void RegisterCallbacks();
 
-      friend class Smartbody_dll_SBCharacterListener_Internal;
+      friend class Smartbody_dll_SBSceneListener_Internal;
 };
 
 #endif  // SMARTBODY_DLL_H

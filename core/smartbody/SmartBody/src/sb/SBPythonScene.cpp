@@ -43,9 +43,9 @@
 #include <sb/SBRetarget.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBEvent.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sb/SBNavigationMesh.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
 #include <stdlib.h>
@@ -123,8 +123,11 @@ void pythonFuncsScene()
 		.def("isRemoteMode", &SBScene::isRemoteMode, "Returns the boolean indicating whether scene is in remote mode.")
 		.def("setRemoteMode", &SBScene::setRemoteMode, "Sets the scene remote mode.")
 		.def("removePendingCommands", &SBScene::removePendingCommands, "Removes any commands stored in SmartBody awaiting execution.")
-		.def("setCharacterListener", &SBScene::setCharacterListener, "Sets the listener for character and pawn events.")
-		.def("getCharacterListener", &SBScene::getCharacterListener, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the listener for character and pawn events.")
+		.def("addSceneListener", &SBScene::addSceneListener, "Adds a listener for scene events.")
+		.def("removeSceneListener", &SBScene::removeSceneListener, "Removes a scene listener.")
+		.def("removeSceneListener", &SBScene::addSceneListener, "Removes a listener for scene events.")
+		.def("getSceneListeners", &SBScene::getSceneListeners, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets all the scene listeners for scene events.")
+		.def("removeAllSceneListeners", &SBScene::removeAllSceneListeners, "Removes all scene listeners.")
 		.def("save", &SBScene::save, "Saves the SmartBody configuration. Returns a string containing Python commands representing the configuration.")
 		.def("exportScene", &SBScene::exportScene, "Saves the entire SmartBody configuration, including assets paths as a python script into a given file location.")
 		#if !defined(__FLASHPLAYER__)

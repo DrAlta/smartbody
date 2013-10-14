@@ -575,7 +575,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	
 
 	TransparentListener transparentListener;
-	SmartBody::SBScene::getScene()->setCharacterListener(&transparentListener);
+	SmartBody::SBScene::getScene()->addSceneListener(&transparentListener);
 	
 	mcu_register_callbacks();
 

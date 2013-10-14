@@ -15,9 +15,6 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SmartBody-lib.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Yuyu Xu, USC
  */
 
 #include "controllers/me_ct_param_animation.h"
@@ -31,7 +28,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBRetarget.h>
 #include <sr/sr_euler.h>

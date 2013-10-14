@@ -42,7 +42,7 @@
 #include <sb/SBRetarget.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBEvent.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
 #include <stdlib.h>

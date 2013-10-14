@@ -6,7 +6,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBAssetManager.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sr/sr_string.h>
 
 namespace SmartBody {
@@ -308,8 +308,11 @@ void SBSkeleton::update()
 	{
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		
-		if (scene->getCharacterListener())
-			scene->getCharacterListener()->OnCharacterUpdate( character->getName().c_str() );
+		std::vector<SBSceneListener*>& listeners = scene->getSceneListeners();
+		for (size_t i = 0; i < listeners.size(); i++)
+		{
+			listeners[i]->OnCharacterUpdate( character->getName().c_str() );
+		}
 	}
 }
 

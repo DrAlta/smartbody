@@ -1,10 +1,10 @@
 #ifndef _FLTKLISTENER_H_
 #define _FLTKLISTENER_H_
 
-#include "sb/SBCharacterListener.h"
+#include "sb/SBSceneListener.h"
 #include "sb/SBObserver.h"
 
-class FLTKListener : public SmartBody::SBCharacterListener, public SmartBody::SBObserver
+class FLTKListener : public SmartBody::SBSceneListener, public SmartBody::SBObserver
 {
    public:
 	  FLTKListener();
@@ -20,13 +20,19 @@ class FLTKListener : public SmartBody::SBCharacterListener, public SmartBody::SB
 	  virtual void OnReset();
 	  virtual void OnLogMessage( const std::string & message );
 
+	  virtual void OnSimulationStart();
+	  virtual void OnSimulationEnd();
+	  virtual void OnSimulationUpdate();
+
 	  virtual void OnObjectSelected(const std::string& objectName);
 
 	  virtual void notify(SmartBody::SBSubject* subject);
 
-	  void setOtherListener(SBCharacterListener* listener);
+
+
+	  void setOtherListener(SBSceneListener* listener);
 	protected:
-	  SmartBody::SBCharacterListener* otherListener;
+	  SmartBody::SBSceneListener* otherListener;
 };
 
 #endif

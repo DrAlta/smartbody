@@ -72,7 +72,6 @@ class SBCharacter : public SbmCharacter
 		SBAPI void interruptFace(double seconds);
 
 		SBAPI void notify(SBSubject* subject);	
-		SBAPI void setDeformableMeshName(std::string meshName);
 		SBAPI std::string getPostureName(); // get the current posture of character
 		SBAPI void setDeformableMeshScale(double meshScale);
 	    SBAPI void copy(SBCharacter* origChar);

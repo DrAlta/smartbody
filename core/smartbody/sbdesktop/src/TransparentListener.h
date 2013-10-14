@@ -3,11 +3,11 @@
 
 #include <vhcl.h>
 #include <external/glew/glew.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <sb/SBObserver.h>
 #include <sk/sk_scene.h>
 
-class TransparentListener : public SmartBody::SBCharacterListener, public SmartBody::SBObserver
+class TransparentListener : public SmartBody::SBSceneListener, public SmartBody::SBObserver
 {
    public:
 	  TransparentListener();
@@ -16,7 +16,6 @@ class TransparentListener : public SmartBody::SBCharacterListener, public SmartB
       virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
       virtual void OnCharacterDelete( const std::string & name );
 	  virtual void OnCharacterUpdate( const std::string & name );
-	  virtual void OnCharacterChanged( const std::string& name );
       virtual void OnPawnCreate( const std::string & name );
       virtual void OnPawnDelete( const std::string & name );
       virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime );

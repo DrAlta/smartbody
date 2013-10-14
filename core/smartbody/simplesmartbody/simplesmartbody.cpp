@@ -5,9 +5,9 @@
 #include <sb/SBPython.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 
-class SimpleListener : public SmartBody::SBCharacterListener
+class SimpleListener : public SmartBody::SBSceneListener
 {
    public:
 	   SimpleListener() {}
@@ -35,7 +35,7 @@ int main( int argc, char ** argv )
 	// get the scene object
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SimpleListener listener;
-	scene->setCharacterListener(&listener);
+	scene->addSceneListener(&listener);
 
 	// set the mediapath which dictates the top-level asset directory
 	scene->setMediaPath("../data");

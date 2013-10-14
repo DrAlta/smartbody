@@ -64,24 +64,10 @@ void FLTKOgreWindow::initOgreWindow()
 	ogreInterface->createOgreWindow(flHwnd, flParentHwnd, fltkGLContext, w(), h(), "OgreWindow");	
 
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
-	FLTKListener* fltkListener = dynamic_cast<FLTKListener*>(sbScene->getCharacterListener());
-	OgreListener* ogreListener = NULL;
-	if (fltkListener)
-	{
-		ogreListener = new OgreListener(ogreInterface);
-		fltkListener->setOtherListener(ogreListener);
-	}
-	if (ogreListener)
-	{
-		
-		std::vector<std::string> charNames = sbScene->getCharacterNames();
-		for (unsigned int i=0;i<charNames.size();i++)
-		{
-//			ogreListener->OnCharacterChangeMesh(charNames[i]);
-		}
-	}
+
+	sbScene->addSceneListener(new OgreListener(ogreInterface));
      
-		updateOptions();
+	updateOptions();
      
     
 	//fl_set_gl_context(this,ogreInterface->getGLContext());	

@@ -24,7 +24,7 @@
 #include "sb/SBSpeechManager.h"
 #include "sb/SBSimulationManager.h"
 #include "sb/SBVHMsgManager.h"
-#include "sb/SBCharacterListener.h"
+#include "sb/SBSceneListener.h"
 #include "sb/SBJointMap.h"
 #include "sb/SBJointMapManager.h"
 #include <sbm/remote_speech.h>
@@ -65,18 +65,18 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 #endif
 
 
-class Smartbody_dll_SBCharacterListener_Internal : public SmartBody::SBCharacterListener
+class Smartbody_dll_SBSceneListener_Internal : public SmartBody::SBSceneListener
 {
    private:
       Smartbody_dll * m_dll;
 
    public:
-      explicit Smartbody_dll_SBCharacterListener_Internal( Smartbody_dll * dll ) :
+      explicit Smartbody_dll_SBSceneListener_Internal( Smartbody_dll * dll ) :
          m_dll( dll )
       {
       }
 
-      virtual ~Smartbody_dll_SBCharacterListener_Internal()
+      virtual ~Smartbody_dll_SBSceneListener_Internal()
       {
       }
 
@@ -166,14 +166,14 @@ SBAPI void Smartbody_dll::SetMediaPath( const std::string & path )
 
 SBAPI bool Smartbody_dll::Init(const std::string& pythonLibPath, bool logToFile)
 {
-   m_internalListener = new Smartbody_dll_SBCharacterListener_Internal( this );
+   m_internalListener = new Smartbody_dll_SBSceneListener_Internal( this );
    
    XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
 
-   // TODO: Replace with g_scene->SetCharacterListener(m_internalListener)
+   // TODO: Replace with g_scene->addSceneListener(m_internalListener)
    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-   scene->setCharacterListener(m_internalListener);
+   scene->addSceneListener(m_internalListener);
    
    SetSpeechAudiofileBasePath( "../../" );
 

@@ -19,7 +19,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBReach.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -652,26 +652,7 @@ void SBCharacter::notify(SBSubject* subject)
 		}
 		else if (attrName == "deformableMesh")
 		{
-			/*
-			SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
-			std::stringstream strstr;
-#if 0
-			strstr << "char " << getName() << " mesh " << meshAttribute->getValue();
-			SmartBody::DoubleAttribute* meshScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("deformableMeshScale"));
-			if (meshScaleAttribute && meshScaleAttribute->getValue() !=  1.0)
-			{
-				strstr << " -scale " << meshScaleAttribute->getValue();
-			}
-
-			int success = SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) strstr.str().c_str());
-			if (success != CMD_SUCCESS)
-			{
-				LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
-			}
-#else
-			setDeformableMeshName(meshAttribute->getValue());
-#endif
-			*/
+	
 		}
 		else if (attrName == "voice")
 		{
@@ -866,80 +847,6 @@ void SBCharacter::setReach( SmartBody::SBReach* reach )
 SmartBody::SBReach* SBCharacter::getReach()
 {
 	return _reach;
-}
-
-void SBCharacter::setDeformableMeshName( std::string meshName )
-{
-    LOG("set deformable mesh name to be %s", meshName.c_str());
-	SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(getAttribute("deformableMesh"));
-	if (meshAttribute->getValue() != meshName)
-		meshAttribute->setValueFast(meshName); // don't notify the observer
-
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	if (meshName == "")
-	{
-		if ( scene->getCharacterListener() )
-		{		
-//			scene->getCharacterListener()->OnCharacterChangeMesh( this->getName() );
-		}	
-	}
-
-
-	// check assets for existence of that mesh
-	
-	SBAssetManager* assetManager = scene->getAssetManager();
-	DeformableMesh* mesh = assetManager->getDeformableMesh(meshName);
-	if (mesh)
-	{
-		this->dMesh_p = mesh;
-		this->dMeshInstance_p->setDeformableMesh(mesh);
-		this->dMeshInstance_p->setSkeleton(this->getSkeleton());
-		if ( scene->getCharacterListener() )
-		{		
-//				scene->getCharacterListener()->OnCharacterChangeMesh( this->getName() );
-		}		
-	}
-	else
-	{
-		// load the assets from the mesh directories
-		std::vector<std::string> meshPaths = assetManager->getAssetPaths("mesh");
-		for (size_t m = 0; m < meshPaths.size(); m++)
-		{
-			assetManager->loadAssetsFromPath(meshPaths[m] + "/" + meshName);
-		}
-		
-		DeformableMesh* mesh = assetManager->getDeformableMesh(meshName);
-		if (mesh)
-		{
-			this->dMesh_p = mesh;
-			this->dMeshInstance_p->setSkeleton(this->getSkeleton());
-			this->dMeshInstance_p->setDeformableMesh(mesh);
-			if ( scene->getCharacterListener() )
-			{		
-//					scene->getCharacterListener()->OnCharacterChangeMesh( this->getName() );
-			}		
-		}
-		else
-		{
-			LOG("Could not assign mesh %s to character %s: mesh not found", meshName.c_str(), this->getName().c_str());
-		}
-	}
-
-	/*
-	std::stringstream strstr;
-	strstr << "char " << getName() << " mesh " << meshName;
-	SmartBody::DoubleAttribute* meshScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("deformableMeshScale"));
-	if (meshScaleAttribute && meshScaleAttribute->getValue() !=  1.0)
-	{
-		strstr << " -scale " << meshScaleAttribute->getValue();
-	}
-
-	int success = SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) strstr.str().c_str());
-	if (success != CMD_SUCCESS)
-	{
-		LOG("Problem setting attribute 'mesh' on character %s", getName().c_str());
-	}
-	*/
 }
 
 void SBCharacter::setDeformableMeshScale( double meshScale )
