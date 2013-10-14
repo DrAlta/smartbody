@@ -63,12 +63,6 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 			window->redraw();
 		}
 	}
-
-	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
-	if (window && window->resourceWindow && window->resourceWindow->shown())
-	{
-		window->resourceWindow->updateGUI();
-	}
 }
 
 void FLTKListener::OnCharacterDelete( const std::string & name )
@@ -134,11 +128,6 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 
 	if (otherListener)
 		otherListener->OnCharacterDelete(name);
-
-	if (window && window->resourceWindow && window->resourceWindow->shown())
-	{
-		window->resourceWindow->updateGUI();
-	}
 }
 
 void FLTKListener::OnCharacterUpdate( const std::string & name)
@@ -343,11 +332,6 @@ void FLTKListener::OnSimulationUpdate()
 	if(rootWindow && rootWindow->dataViewerWindow && rootWindow->dataViewerWindow->shown())
 	{
 		rootWindow->dataViewerWindow->update();
-	}
-
-	if(rootWindow && rootWindow->resourceWindow && rootWindow->resourceWindow->shown())
-	{
-		//rootWindow->resourceWindow->update();
 	}
 
 	if (rootWindow && rootWindow->panimationWindow && rootWindow->panimationWindow->shown())
