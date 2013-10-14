@@ -112,6 +112,7 @@ protected:
 	SkSkeleton*			  _skeleton;
 	bool				  _updateMesh;
 	std::vector<SkJointList> _boneJointList;
+	float _meshScale;
 	bool meshVisible;
 	bool _recomputeNormal;
 public:
@@ -123,6 +124,7 @@ public:
 	SBAPI void updateJointList();
 	SBAPI virtual void setSkeleton(SkSkeleton* skel);	
 	SBAPI virtual void setVisibility(int deformableMesh);
+	SBAPI virtual void setMeshScale(float scale);
 	SBAPI bool    getVisibility();
 	SBAPI virtual void update();
 	SBAPI DeformableMesh* getDeformableMesh() { return _mesh; }

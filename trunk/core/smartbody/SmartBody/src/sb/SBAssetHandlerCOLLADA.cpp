@@ -167,7 +167,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			}
 			
 			const char* jointNamePrefix = "";
-			ParserCOLLADAFast::parseLibraryControllers(controllerNode, mesh, skeletonScale, jointNamePrefix);
+			ParserCOLLADAFast::parseLibraryControllers(controllerNode, mesh, factor, jointNamePrefix);
 
 			if (rapidFile)
 				delete rapidFile;
