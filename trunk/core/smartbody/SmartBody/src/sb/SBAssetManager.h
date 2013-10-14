@@ -71,6 +71,8 @@ class SBAssetManager : public SBObject
 		SBAPI std::vector<SBAssetHandler*> getAssetHandlers(const std::string& assetTypes);
 
 		SBAPI std::string getAssetNameVariation(SBAsset* asset);
+		SBAPI std::vector<std::string>& getAssetHistory();
+		SBAPI void clearAssetHistory();
 
 		
 protected:
@@ -88,7 +90,7 @@ protected:
 		int load_me_skeletons( const char* pathname, std::map<std::string, SmartBody::SBSkeleton*>& map, bool recursive, double scale = 1.0 );
 		int load_me_skeletons_impl( const boost::filesystem::path& pathname, std::map<std::string, SmartBody::SBSkeleton*>& map, bool recurse_dirs, double scale, const char* error_prefix );
 
-		
+		void addAssetHistory(const std::string& str);
 
 		std::map<std::string, SBSkeleton*> _skeletons;
 		std::map<std::string, SBMotion*> _motions;
@@ -104,6 +106,7 @@ protected:
 		int uniqueSkeletonId;
 		int _motionCounter;
 		int _skeletonCounter;
+		std::vector<std::string> _assetHistory;
 
 };
 

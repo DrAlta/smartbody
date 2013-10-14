@@ -652,7 +652,7 @@ void SBCharacter::notify(SBSubject* subject)
 		}
 		else if (attrName == "deformableMesh")
 		{
-
+			/*
 			SmartBody::StringAttribute* meshAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 			std::stringstream strstr;
 #if 0
@@ -671,6 +671,7 @@ void SBCharacter::notify(SBSubject* subject)
 #else
 			setDeformableMeshName(meshAttribute->getValue());
 #endif
+			*/
 		}
 		else if (attrName == "voice")
 		{
@@ -874,8 +875,18 @@ void SBCharacter::setDeformableMeshName( std::string meshName )
 	if (meshAttribute->getValue() != meshName)
 		meshAttribute->setValueFast(meshName); // don't notify the observer
 
-	// check assets for existence of that mesh
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	if (meshName == "")
+	{
+		if ( scene->getCharacterListener() )
+		{		
+//			scene->getCharacterListener()->OnCharacterChangeMesh( this->getName() );
+		}	
+	}
+
+
+	// check assets for existence of that mesh
+	
 	SBAssetManager* assetManager = scene->getAssetManager();
 	DeformableMesh* mesh = assetManager->getDeformableMesh(meshName);
 	if (mesh)
@@ -885,7 +896,7 @@ void SBCharacter::setDeformableMeshName( std::string meshName )
 		this->dMeshInstance_p->setSkeleton(this->getSkeleton());
 		if ( scene->getCharacterListener() )
 		{		
-				scene->getCharacterListener()->OnCharacterChangeMesh( this->getName() );
+//				scene->getCharacterListener()->OnCharacterChangeMesh( this->getName() );
 		}		
 	}
 	else
@@ -901,11 +912,11 @@ void SBCharacter::setDeformableMeshName( std::string meshName )
 		if (mesh)
 		{
 			this->dMesh_p = mesh;
-			this->dMeshInstance_p->setDeformableMesh(mesh);
 			this->dMeshInstance_p->setSkeleton(this->getSkeleton());
+			this->dMeshInstance_p->setDeformableMesh(mesh);
 			if ( scene->getCharacterListener() )
 			{		
-					scene->getCharacterListener()->OnCharacterChangeMesh( this->getName() );
+//					scene->getCharacterListener()->OnCharacterChangeMesh( this->getName() );
 			}		
 		}
 		else

@@ -81,6 +81,8 @@ void SkeletonItemInfoWidget::updateWidget()
 
 void SkeletonItemInfoWidget::updateJointAttributes(std::string jointName)
 {
+	if (!itemSkeleton)
+		return;
 	SkJoint* curJoint = itemSkeleton->search_joint(jointName.c_str());		
 	if (!curJoint)
 		return;

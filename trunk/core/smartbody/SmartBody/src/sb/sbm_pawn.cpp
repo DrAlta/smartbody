@@ -198,20 +198,18 @@ void SbmPawn::setSkeleton(SkSkeleton* sk)
 	_skeleton->ref();	
 	ct_tree_p->add_skeleton( _skeleton->getName(), _skeleton );	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	if ( scene->getCharacterListener() )
-	{		
-		scene->getCharacterListener()->OnCharacterChanged( getName() );
-	}
+
 	//scene_p->init(_skeleton);
 	//int err = mcu.add_scene(scene_p);	
-	if (dMesh_p)
-		dMesh_p->skeleton = _skeleton;	
-	if (dMeshInstance_p)
-		dMeshInstance_p->setSkeleton(_skeleton);
 		
 	float height = _skeleton->getCurrentHeight();	
 	setHeight(height);
 	//_skeleton->ref();
+
+	if ( scene->getCharacterListener() )
+	{		
+		scene->getCharacterListener()->OnCharacterUpdate( getName() );
+	}
 }
 
 int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
@@ -231,7 +229,7 @@ int SbmPawn::init( SkSkeleton* new_skeleton_p ) {
 		
 		if (scene->getCharacterListener())
 		{
-			scene->getCharacterListener()->OnCharacterChanged(getName());
+			scene->getCharacterListener()->OnCharacterUpdate(getName());
 		}
 	}
 
@@ -288,7 +286,7 @@ int SbmPawn::setup() {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	if ( scene->getCharacterListener() )
 	{
-		scene->getCharacterListener()->OnCharacterChanged( getName() );
+		scene->getCharacterListener()->OnCharacterUpdate( getName() );
 	}
 	return( CMD_SUCCESS ); 
 }

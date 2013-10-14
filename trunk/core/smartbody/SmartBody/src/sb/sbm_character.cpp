@@ -413,7 +413,7 @@ void SbmCharacter::createStandardControllers()
 
 		if (SmartBody::SBScene::getScene()->getCharacterListener())
 		{
-			SmartBody::SBScene::getScene()->getCharacterListener()->OnCharacterChanged( getName() );
+			SmartBody::SBScene::getScene()->getCharacterListener()->OnCharacterUpdate( getName() );
 		}
 
 	}
@@ -1083,7 +1083,7 @@ int SbmCharacter::init_skeleton() {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	if (scene->getCharacterListener())
 	{
-		scene->getCharacterListener()->OnCharacterChanged(getName());
+		scene->getCharacterListener()->OnCharacterUpdate(getName());
 	}
 
 	for( int i=0; i<viseme_channel_count; i++ ) {

@@ -30,6 +30,10 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 	std::string convertedPath = checkPath(path);
 	if (convertedPath == "")
 		return assets;
+
+	boost::filesystem::path p(path);
+	std::string extension = boost::filesystem::extension(p);
+	std::string basename = boost::filesystem::basename(p);
 	
 	double skeletonScale = SmartBody::SBScene::getScene()->getDoubleAttribute("globalSkeletonScale");
 	double motionScale = SmartBody::SBScene::getScene()->getDoubleAttribute("globalMotionScale");
@@ -60,7 +64,9 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			if (!visualSceneNode)
 				LOG(" .dae file %s doesn't contain correct geometry information.", convertedPath.c_str());
 			SBSkeleton* skeleton = new SBSkeleton();
+			skeleton->setName(basename + extension);
 			SBMotion* motion = new SBMotion();
+			motion->setName(basename + extension);
 			int order;
 			ParserCOLLADAFast::parseLibraryVisualScenes(visualSceneNode, *skeleton, *motion, 1.0, order, materialId2Name);
 			if (skeleton->getNumJoints() == 0)

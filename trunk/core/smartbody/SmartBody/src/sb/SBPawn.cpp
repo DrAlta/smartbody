@@ -404,6 +404,7 @@ void SBPawn::notify(SBSubject* subject)
 		}
 		else if (attribute->getName() == "visible")
 		{
+			/*
 			if (!this->scene_p)
 				return;
 			SmartBody::BoolAttribute* visibleAttr = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
@@ -411,6 +412,7 @@ void SBPawn::notify(SBSubject* subject)
 				this->scene_p->visible(true);
 			else
 				this->scene_p->visible(false);
+				*/
 		}
 		else if (attribute->getName() == "color")
 		{

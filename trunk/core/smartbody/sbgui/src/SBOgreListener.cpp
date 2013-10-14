@@ -28,50 +28,7 @@ OgreListener::~OgreListener(void)
 
 void OgreListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
-	
-
-}
-
-void OgreListener::OnCharacterDelete( const std::string & name )
-{
-
-}
-
-void OgreListener::OnCharacterUpdate( const std::string & name, const std::string & objectClass )
-{
-	SceneNode * node = (SceneNode *)ogreInterface->getSceneManager()->getRootSceneNode()->getChild(name);
-	if (!node) return;
-
-	node->detachAllObjects();
-	ogreInterface->getSceneManager()->destroyEntity(name);
-	ogreInterface->getSceneManager()->getRootSceneNode()->removeAndDestroyChild(name);
-
-	OgreFrameListener* frameListener = dynamic_cast<OgreFrameListener*>(ogreInterface->getOgreFrameListener());
-	if (frameListener)
-	{
-		// delete from character list
-		int eraseId = -1;
-		for (unsigned int i = 0; i < frameListener->m_characterList.size(); i++)
-		{
-			if (frameListener->m_characterList[i] == name)
-			{
-				eraseId = i;
-				break;
-			}
-		}
-		if (eraseId >= 0)
-			frameListener->m_characterList.erase(frameListener->m_characterList.begin() + eraseId);
-
-		// delete from initial bone position map
-		std::map<std::string, std::map<std::string, Ogre::Vector3> >::iterator iter = frameListener->m_initialBonePositions.find(name);
-		if (iter != frameListener->m_initialBonePositions.end())
-			frameListener->m_initialBonePositions.erase(iter);
-	}
-}
-
-void OgreListener::OnCharacterChangeMesh( const std::string& name )
-{
-	// created a ogre entity only when the character is changed and valid
+		// created a ogre entity only when the character is changed and valid
 	std::string logMsg = "Character " + name ;
 	LogManager::getSingleton().logMessage(logMsg.c_str());
 	SBCharacter* sbChar = SBScene::getScene()->getCharacter(name);
@@ -136,11 +93,45 @@ void OgreListener::OnCharacterChangeMesh( const std::string& name )
 		}
 		frameListener->m_initialBonePositions.insert(std::make_pair(name, intialBonePositions));
 	}
+
 }
 
-void OgreListener::OnCharacterChanged( const std::string& name )
-{	
-	
+void OgreListener::OnCharacterDelete( const std::string & name )
+{
+	SceneNode * node = (SceneNode *)ogreInterface->getSceneManager()->getRootSceneNode()->getChild(name);
+	if (!node) return;
+
+	node->detachAllObjects();
+	ogreInterface->getSceneManager()->destroyEntity(name);
+	ogreInterface->getSceneManager()->getRootSceneNode()->removeAndDestroyChild(name);
+
+	OgreFrameListener* frameListener = dynamic_cast<OgreFrameListener*>(ogreInterface->getOgreFrameListener());
+	if (frameListener)
+	{
+		// delete from character list
+		int eraseId = -1;
+		for (unsigned int i = 0; i < frameListener->m_characterList.size(); i++)
+		{
+			if (frameListener->m_characterList[i] == name)
+			{
+				eraseId = i;
+				break;
+			}
+		}
+		if (eraseId >= 0)
+			frameListener->m_characterList.erase(frameListener->m_characterList.begin() + eraseId);
+
+		// delete from initial bone position map
+		std::map<std::string, std::map<std::string, Ogre::Vector3> >::iterator iter = frameListener->m_initialBonePositions.find(name);
+		if (iter != frameListener->m_initialBonePositions.end())
+			frameListener->m_initialBonePositions.erase(iter);
+	}
+}
+
+void OgreListener::OnCharacterUpdate( const std::string & name )
+{
+	OnCharacterDelete(name);
+	OnCharacterCreate(name, "");
 }
 
 void OgreListener::OnPawnCreate( const std::string & name )

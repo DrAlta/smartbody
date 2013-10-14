@@ -384,10 +384,6 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 		skeleton->setName( skel_name);
 		// Init channels
 		skeleton->make_active_channels();
-		if (scene->getCharacterListener())
-		{
-			scene->getCharacterListener()->OnCharacterChanged(pawn_name);
-		}
 
 		int err = pawn_p->init( skeleton );
 
@@ -652,12 +648,13 @@ int create_remote_pawn_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 	// Init channels
 	skeleton->make_active_channels();	
 
+	int err = pawn_p->init( skeleton );
+
 	if (scene->getCharacterListener())
 	{
-		scene->getCharacterListener()->OnCharacterChanged(pawn_and_attribute);
+		scene->getCharacterListener()->OnCharacterCreate(pawn_and_attribute, "");
 	}
 
-	int err = pawn_p->init( skeleton );
 
 	if( err != CMD_SUCCESS ) {
 		LOG("ERROR: Unable to initialize SbmPawn \"%s\".", pawn_and_attribute.c_str() );
@@ -930,7 +927,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 			character->dMeshInstance_p->setDeformableMesh(deformableMesh);
 			if ( scene->getCharacterListener() )
 			{		
-				 scene->getCharacterListener()->OnCharacterChangeMesh( character->getName() );
+//				 scene->getCharacterListener()->OnCharacterChangeMesh( character->getName() );
 			}		
 			return CMD_SUCCESS;
 		}
@@ -1107,7 +1104,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 
 		if (  scene->getCharacterListener() )
 		{		
-			 scene->getCharacterListener()->OnCharacterChangeMesh( character->getName() );
+//			 scene->getCharacterListener()->OnCharacterChangeMesh( character->getName() );
 		}
 		return CMD_SUCCESS;
 	}

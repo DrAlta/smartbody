@@ -14,9 +14,7 @@ public:
 	virtual SBAPI ~SBCharacterListener() {}
 	virtual SBAPI void OnCharacterCreate( const std::string & name, const std::string & objectClass ) {}
 	virtual SBAPI void OnCharacterDelete( const std::string & name ) {}
-	virtual SBAPI void OnCharacterUpdate( const std::string & name, const std::string & objectClass ) {}
-	virtual SBAPI void OnCharacterChanged( const std::string& name ) {}
-	virtual SBAPI void OnCharacterChangeMesh( const std::string& name ) {}
+	virtual SBAPI void OnCharacterUpdate( const std::string & name ) {}
 	virtual SBAPI void OnPawnCreate( const std::string & name ) {}
 	virtual SBAPI void OnPawnDelete( const std::string & name ) {}
 	virtual SBAPI void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime ) {}

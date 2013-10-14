@@ -41,6 +41,9 @@ class SBAPI SkScene : public SrSnGroup
     float _cradius, _sfactor, _axislen;
 	float scaleFactor;
     SkSkeleton* _skeleton;
+	bool _needsInit;
+
+	void initInternal();
 
    public :
     /*! Constructor  */
