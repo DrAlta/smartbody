@@ -35,8 +35,9 @@ std::vector<SBAsset*> SBAssetHandlerSkm::getAssets(const std::string& path)
 	in.getall( fullin_string );
 	SrInput fullin( (const char *)fullin_string );
 	fullin.filename( convertedPath.c_str() ); // copy filename for error message
-			
-	double scale = SmartBody::SBScene::getScene()->getDoubleAttribute("globalMotionScale");
+	double scale = 1.0;
+	if (SmartBody::SBScene::getScene()->getAttribute("globalMotionScale"))
+		scale = SmartBody::SBScene::getScene()->getDoubleAttribute("globalMotionScale");
 	parseSuccessful = motion->load( fullin, scale );
 	if (parseSuccessful)
 		assets.push_back(motion);

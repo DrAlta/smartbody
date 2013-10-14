@@ -17,7 +17,6 @@ class SmartbodyListener
    public:
       SBAPI virtual void OnCharacterCreate( const std::string& name, const std::string& objectClass ) {}
       SBAPI virtual void OnCharacterDelete( const std::string& name ) {}
-      SBAPI virtual void OnCharacterChanged( const std::string& name ) {}
       SBAPI virtual void OnPawnCreate( const std::string& name ) {}
       SBAPI virtual void OnViseme( const std::string& name, const std::string& visemeName, const float weight, const float blendTime ) {}
       SBAPI virtual void OnChannel( const std::string& name, const std::string& channelName, const float value ) {}

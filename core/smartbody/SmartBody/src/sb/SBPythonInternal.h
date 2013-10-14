@@ -481,7 +481,7 @@ struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wr
 		SBCharacterListener::OnCharacterDelete(name);
 	}
 
-	virtual void OnCharacterUpdate( const std::string & name, const std::string & objectClass )
+	virtual void OnCharacterUpdate( const std::string & name)
 	{
 		if (boost::python::override o = this->get_override("OnCharacterUpdate"))
 		{
@@ -492,51 +492,11 @@ struct CharacterListenerWrap : SmartBody::SBCharacterListener, boost::python::wr
 			}
 		}
 
-		SBCharacterListener::OnCharacterUpdate(name, objectClass);
+		SBCharacterListener::OnCharacterUpdate(name);
 	}
-	void default_OnCharacterUpdate( const std::string & name, const std::string & objectClass )
+	void default_OnCharacterUpdate( const std::string & name )
 	{
-		SBCharacterListener::OnCharacterUpdate(name, objectClass);
-	}
-
-	virtual void OnCharacterChanged( const std::string& name )
-	{
-		if (boost::python::override o = this->get_override("OnCharacterChanged"))
-		{
-			try {
-				o(name);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		SBCharacterListener::OnCharacterChanged(name);
-	}
-
-	void default_OnCharacterChanged( const std::string& name )
-	{
-		SBCharacterListener::OnCharacterChanged(name);
-	}
-
-
-	virtual void OnCharacterChangeMesh( const std::string& name )
-	{
-		if (boost::python::override o = this->get_override("OnCharacterChangeMesh"))
-		{
-			try {
-				o(name);
-			} catch (...) {
-				PyErr_Print();
-			}
-		}
-
-		SBCharacterListener::OnCharacterChangeMesh(name);
-	
-	}
-
-	void default_OnCharacterChangeMesh( const std::string& name )
-	{
-		SBCharacterListener::OnCharacterChangeMesh(name);
+		SBCharacterListener::OnCharacterUpdate(name);
 	}
 
 	virtual void OnPawnCreate( const std::string & name )

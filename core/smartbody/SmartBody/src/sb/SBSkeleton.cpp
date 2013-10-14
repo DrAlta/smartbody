@@ -309,7 +309,7 @@ void SBSkeleton::update()
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		
 		if (scene->getCharacterListener())
-			scene->getCharacterListener()->OnCharacterChanged( character->getName().c_str() );
+			scene->getCharacterListener()->OnCharacterUpdate( character->getName().c_str() );
 	}
 }
 

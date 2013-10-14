@@ -127,22 +127,6 @@ class Smartbody_dll_SBCharacterListener_Internal : public SmartBody::SBCharacter
             m_dll->m_listener->OnChannel( name, channelName, value );
          }
       }
-
-      virtual void OnCharacterChanged( const std::string& name ) 
-      {	 
-         if ( m_dll->m_listener )
-         {
-            std::map<std::string,SmartbodyCharacter*>::iterator mi = m_dll->m_characters.find(name);
-            SmartbodyCharacter* pc = NULL;
-            if (mi != m_dll->m_characters.end())
-            {
-               pc = mi->second;
-               delete pc;
-               m_dll->m_characters.erase(mi);
-            }
-            m_dll->m_listener->OnCharacterChanged(name);
-         }
-      }
 };
 
 SBAPI Smartbody_dll::Smartbody_dll() :

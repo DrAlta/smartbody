@@ -147,17 +147,6 @@ public:
 #endif
    }
 
-   virtual void OnCharacterChanged( const std::string & name )
-   {
-#if !defined(IPHONE_BUILD) && !defined(ANDROID_BUILD)
-      m_changeCharacterCallback( m_sbmHandle, name.c_str() );
-#else
-      SBM_CallbackInfo info;
-      info.name = name;
-      g_ChangeCallbackInfo[m_sbmHandle].push_back(info);
-#endif
-   }
-
    virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
    {
 #if !defined(IPHONE_BUILD) && !defined(ANDROID_BUILD)

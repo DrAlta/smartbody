@@ -887,9 +887,11 @@ void DeformableMeshInstance::update()
 					int numOfInfJoints = skinWeight->numInfJoints[i];
 					if (numOfInfJoints > maxJoint)
 						maxJoint = numOfInfJoints;
-					SrVec& skinLocalVec = dMeshStatic->shape().V[i];					
+					SrVec& skinLocalVec = dMeshStatic->shape().V[i];
+					SrVec scaledSkinLocalVec = .01f * skinLocalVec;
 					SrVec finalVec;
 					//printf("Vtx bind pose = \n");
+
 					for (int j = 0; j < numOfInfJoints; j++)
 					{
 						//std::string jointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];	
@@ -901,7 +903,7 @@ void DeformableMeshInstance::update()
 						SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
 						double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
 						globalCounter ++;
-						finalVec = finalVec + (float(jointWeight) * (skinLocalVec * skinWeight->bindShapeMat * invBMat  * gMat));						
+						finalVec = finalVec + (float(jointWeight) * (scaledSkinLocalVec * skinWeight->bindShapeMat * invBMat  * gMat));						
 					}
 					_deformPosBuf[iVtx] = finalVec;
 					if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())

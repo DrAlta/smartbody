@@ -301,17 +301,19 @@ void SBAssetManager::loadAssets()
 {
 	me_paths->reset();
 
-	std::string path = me_paths->next_path(false);
+	std::string path = me_paths->next_path(true);
 	while (path != "")
 	{
-		load_motions(path.c_str(), true);
-		load_skeletons(path.c_str(), true);
-		path = me_paths->next_path(false);
+		loadAssetsFromPath(path);
+//		load_motions(path.c_str(), true);
+//		load_skeletons(path.c_str(), true);
+		path = me_paths->next_path(true);
 	}
 }
 
 void SBAssetManager::loadAsset(const std::string& assetPath)
 {
+	//LOG("Loading asset [%s]", assetPath.c_str());
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	const std::string& mediaPath = scene->getMediaPath();
 	boost::filesystem::path p( mediaPath );
@@ -365,10 +367,12 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 	std::string baseName = boost::filesystem::basename( finalPath );
 	std::string fileName = baseName+ext;
 
-	std::string extNoDot = ext.substr(1);
+	std::string extNoDot = "";
+	if (ext.size() > 0)
+		extNoDot = ext.substr(1);
 
 	// get all the asset handlers for that extension
-	std::vector<SBAssetHandler*>& assetHandlers = this->getAssetHandlers(extNoDot);
+	const std::vector<SBAssetHandler*>& assetHandlers = this->getAssetHandlers(extNoDot);
 
 	std::vector<SBAsset*> allAssets;
 	for (size_t h = 0; h < assetHandlers.size(); h++)
@@ -396,6 +400,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 				motion->setName(name);
 			}
 			_motions.insert(std::pair<std::string, SBMotion*>(motion->getName(), motion));
+			addAssetHistory("MOTION " + motion->getName());
 			continue;
 		}
 		SmartBody::SBSkeleton* skeleton = dynamic_cast<SmartBody::SBSkeleton*>(asset);
@@ -407,6 +412,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 				std::string name = this->getAssetNameVariation(existingSkeleton);
 				LOG("Skeleton named %s already exist, changing name to %s", skeleton->getName().c_str(), name.c_str());
 				skeleton->setName(name);
+				addAssetHistory("SKELETON " + skeleton->getName());
 			}
 			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skeleton->getName(), skeleton));
 			continue;
@@ -422,6 +428,8 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 				existingMesh->setName(name);
 			}
 			_deformableMeshMap.insert(std::pair<std::string, DeformableMesh*>(mesh->getName(), mesh));
+			addAssetHistory("MESH " + mesh->getName());
+			LOG("ADDED MESH NAMED %s", mesh->getName().c_str());
 			continue;
 		}
 		LOG("Unknown asset type for file %s", assetPath.c_str());
@@ -557,43 +565,79 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 
 void SBAssetManager::loadAssetsFromPath(const std::string& assetPath)
 {
-	std::vector<boost::filesystem::path> dirs;
+	LOG("Loading [%s]", assetPath.c_str());
+
 	boost::filesystem::path path(assetPath);
-	if (boost::filesystem::exists(path))
+
+	const std::string& mediaPath = SmartBody::SBScene::getScene()->getMediaPath();
+	if (mediaPath.size() > 0)
 	{
-		if (boost::filesystem::is_directory(path))
+		// if the path already contains the media path, ignore it
+		if (assetPath.find(mediaPath) == 0)
 		{
-			dirs.push_back(path);
-			while (dirs.size() > 0)
-			{
-				boost::filesystem::path curPath = dirs[0];
-				dirs.erase(dirs.begin());
-				for (boost::filesystem::directory_iterator it(curPath), eit; it != eit; ++it)
-				{
-					if (boost::filesystem::is_directory(it->path()))
-					{
-						// ignore directories that start with a '.'
-						if (it->path().string().find(".") == 0)
-							continue;
-						dirs.push_back(it->path());
-					}
-					else if (boost::filesystem::is_regular_file(it->path()))
-					{
-						loadAsset(it->path().string());
-					} 
-					/*
-					else if (boost::filesystem::is_symlink(p))
-					{
-						loadAsset(p.string());
-					}
-					*/
-				}
-			}
+			 // do nothing
 		}
 		else
 		{
-			loadAsset(assetPath);
+			if (boost::filesystem::exists(path))
+			{
+				// do nothing
+			}
+			else
+			{
+				boost::filesystem::path finalPath(mediaPath);
+				finalPath /= path;
+				if (boost::filesystem::exists(finalPath))
+					path = finalPath;
+				else
+				{
+					LOG("Could not load assets from %s, does not exist", finalPath.string().c_str());
+					return;
+				}
+			}
 		}
+
+	}
+	std::vector<boost::filesystem::path> dirs;
+
+	if (boost::filesystem::is_directory(path))
+	{
+		dirs.push_back(path);
+		while (dirs.size() > 0)
+		{
+			boost::filesystem::path curPath = dirs[0];
+			dirs.erase(dirs.begin());
+			for (boost::filesystem::directory_iterator it(curPath), eit; it != eit; ++it)
+			{
+				if (boost::filesystem::is_directory(it->path()))
+				{
+					// ignore directories that start with a '.'
+					std::string basename = boost::filesystem::basename(it->path());
+					std::string extension = boost::filesystem::extension(it->path());
+					if (basename.size() == 0 && extension.find(".") == 0)
+						continue;
+					dirs.push_back(it->path());
+				}
+				else if (boost::filesystem::is_regular_file(it->path()))
+				{
+					loadAsset(it->path().string());
+				} 
+				/*
+				else if (boost::filesystem::is_symlink(p))
+				{
+					loadAsset(p.string());
+				}
+				*/
+			}
+		}
+		for (size_t d = 0; d < dirs.size(); d++)
+		{
+			loadAssetsFromPath(dirs[d].string());
+		}
+	}
+	else
+	{
+		loadAsset(assetPath);
 	}
 	
 	
@@ -1710,7 +1754,7 @@ SBAPI std::string SBAssetManager::getAssetNameVariation(SBAsset* asset)
 		{
 			_motionCounter++;
 			std::stringstream strstr;
-			strstr << motion->getName() << _motionCounter;
+			strstr << motion->getName() << "xxx" << _motionCounter;
 			if (!scene->getMotion(strstr.str()))
 			{
 				return strstr.str();
@@ -1736,6 +1780,21 @@ SBAPI std::string SBAssetManager::getAssetNameVariation(SBAsset* asset)
 	return "xxxxxxx";
 
 	
+}
+
+void SBAssetManager::addAssetHistory(const std::string& str)
+{
+	_assetHistory.push_back(str);
+}
+
+std::vector<std::string>& SBAssetManager::getAssetHistory()
+{
+	return _assetHistory;
+}
+
+void SBAssetManager::clearAssetHistory()
+{
+	_assetHistory.clear();
 }
 
 

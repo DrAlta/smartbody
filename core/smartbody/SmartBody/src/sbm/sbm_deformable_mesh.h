@@ -117,15 +117,15 @@ protected:
 public:
 	std::vector<SrVec> _deformPosBuf;		
 public:
-	DeformableMeshInstance();
+	SBAPI DeformableMeshInstance();
 	SBAPI virtual ~DeformableMeshInstance();
-	virtual void setDeformableMesh(DeformableMesh* mesh);
-	void updateJointList();
-	virtual void setSkeleton(SkSkeleton* skel);	
-	virtual void setVisibility(int deformableMesh);
+	SBAPI virtual void setDeformableMesh(DeformableMesh* mesh);
+	SBAPI void updateJointList();
+	SBAPI virtual void setSkeleton(SkSkeleton* skel);	
+	SBAPI virtual void setVisibility(int deformableMesh);
 	SBAPI bool    getVisibility();
-	virtual void update();
-	DeformableMesh* getDeformableMesh() { return _mesh; }
+	SBAPI virtual void update();
+	SBAPI DeformableMesh* getDeformableMesh() { return _mesh; }
 
 protected:
 	void cleanUp();

@@ -48,6 +48,7 @@ SkScene::SkScene ()
    _axislen = DEF_AXIS_LEN;
    scaleFactor = 1.f;
    _skeleton = 0;
+   _needsInit = true;
  }
 
 SkScene::~SkScene ()
@@ -99,21 +100,31 @@ void SkScene::init ( SkSkeleton* s, float scale )
    _skeleton = s;
    _skeleton->ref();
 
+   _needsInit = true;
+   scaleFactor = scale;
+}
+
+void SkScene::initInternal()
+{
+	_needsInit = false;
+	if (!_skeleton)
+		return;
+
    SrMat arot;
    SrSnGroup* gaxis;
    SrSnLines* axis;
    SrSnSphere* sphere;
    SrSnSharedModel* smodel;
 
-   const std::vector<SkJoint*>& joints = s->joints ();
+   const std::vector<SkJoint*>& joints = _skeleton->joints ();
    _jgroup.size ( joints.size() );
    _jgroup.setall(NULL);
 
-   SkJoint* root = s->root();
+   SkJoint* root = _skeleton->root();
    if (!root)
 	   return;
 //   const char* root_name = root->name().get_string();  // expose to debugger
-   SrSnGroup* g = make_joint_group ( root, s, _jgroup );
+   SrSnGroup* g = make_joint_group ( root, _skeleton, _jgroup );
    if (!g)
    {
 	   LOG("Skeleton %s cannot be added to the scene.", _skeleton->getName().c_str());
@@ -121,10 +132,10 @@ void SkScene::init ( SkSkeleton* s, float scale )
    }
    g->separator ( true );
   
-   float height = s->getCurrentHeight();
+   float height = _skeleton->getCurrentHeight();
    scaleFactor =  height / 175.0f * 1.0f;
-   if (scaleFactor == 0.0f)
-	   scaleFactor = scale;
+  // if (scaleFactor == 0.0f)
+	//   scaleFactor = _scale;
    axis = new SrSnLines; // shared axis
    axis->shape().push_axis ( SrVec::null, _axislen*scaleFactor, 3, "xyz"/*let*/, false/*rule*/ );
    axis->ref();
@@ -189,11 +200,15 @@ void SkScene::init ( SkSkeleton* s, float scale )
    //sphere->unref();
    axis->unref();
    update ();
+
+
  }
 
 void SkScene::update ()
  {
    if ( !_skeleton ) return;
+   if (_needsInit)
+	   initInternal();
    const std::vector<SkJoint*>& joints = _skeleton->joints ();
    for (size_t i=0; i<joints.size(); i++ ) update ( i );
  }
@@ -249,6 +264,10 @@ void SkScene::rebuild ( int j )
 void SkScene::set_visibility ( int skel, int visgeo, int colgeo, int vaxis )
  {
    if ( !_skeleton ) return;
+
+   if (_needsInit)
+	   initInternal();
+
    const std::vector<SkJoint*>& joints = _skeleton->joints();
    for (size_t i=0; i<joints.size(); i++ )
     { 

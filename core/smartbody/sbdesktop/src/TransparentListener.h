@@ -15,7 +15,7 @@ class TransparentListener : public SmartBody::SBCharacterListener, public SmartB
 
       virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
       virtual void OnCharacterDelete( const std::string & name );
-	  virtual void OnCharacterUpdate( const std::string & name, const std::string & objectClass );
+	  virtual void OnCharacterUpdate( const std::string & name );
 	  virtual void OnCharacterChanged( const std::string& name );
       virtual void OnPawnCreate( const std::string & name );
       virtual void OnPawnDelete( const std::string & name );

@@ -35,7 +35,9 @@ std::vector<SBAsset*> SBAssetHandlerSk::getAssets(const std::string& path)
 	FILE* myfile = fopen(convertedPath.c_str(), "rt");
 	SrInput input(myfile);
 	SmartBody::SBSkeleton* skeleton = new SmartBody::SBSkeleton();
-	double scale = SmartBody::SBScene::getScene()->getDoubleAttribute("globalSkeletonScale");
+	double scale = 1.0;
+	if (SmartBody::SBScene::getScene()->getAttribute("globalSkeletonScale"))
+		scale = SmartBody::SBScene::getScene()->getDoubleAttribute("globalSkeletonScale");
 	if( skeleton->loadSk( input, scale) )
 	{
 		skeleton->ref();

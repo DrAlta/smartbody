@@ -103,22 +103,15 @@ void TransparentListener::OnCharacterDelete( const std::string & name )
 	
 }
 
-void TransparentListener::OnCharacterUpdate( const std::string & name, const std::string & objectClass )
+void TransparentListener::OnCharacterUpdate( const std::string & name)
 {
-	OnCharacterDelete(name);
-	OnCharacterCreate(name, objectClass);
-}
-
-void TransparentListener::OnCharacterChanged( const std::string& name )
-{
-	
-
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(name);
 	if (!character)
 		return;
+	std::string classType = character->getClassType();
 
 	OnCharacterDelete(name);
-	OnCharacterCreate(name, character->getClassType());
+	OnCharacterCreate(name, classType);
 }
 
 void TransparentListener::OnPawnCreate( const std::string & name )

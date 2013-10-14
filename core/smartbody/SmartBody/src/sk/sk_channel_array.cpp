@@ -375,7 +375,7 @@ void SkChannelArray::rebuild_hash_table()
 	{
 		Channel& channel = (*iter);
 		std::string mappedChannelName = getMappedChannelName(channel);
-		std::string channelName = channel.name;
+		std::string& channelName = channel.name;
 		std::map<std::string, std::map<SkChannel::Type, int> >::iterator origMapIter = _channelMap.find(channelName);
 		std::map<std::string, std::map<SkChannel::Type, int> >::iterator mapIter = _channelMapedNameMap.find(mappedChannelName);
 		// this is the only time we update the mapped name cache in each channel

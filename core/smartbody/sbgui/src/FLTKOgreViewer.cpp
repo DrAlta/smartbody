@@ -77,7 +77,7 @@ void FLTKOgreWindow::initOgreWindow()
 		std::vector<std::string> charNames = sbScene->getCharacterNames();
 		for (unsigned int i=0;i<charNames.size();i++)
 		{
-			ogreListener->OnCharacterChangeMesh(charNames[i]);
+//			ogreListener->OnCharacterChangeMesh(charNames[i]);
 		}
 	}
      
