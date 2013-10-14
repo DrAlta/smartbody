@@ -2867,6 +2867,7 @@ void FltkViewer::drawGrid()
 	}
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	float sceneScale = scene->getScale();
 	GLfloat gridHeight = 0.0f + 0.001f/scene->getScale();
 
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
