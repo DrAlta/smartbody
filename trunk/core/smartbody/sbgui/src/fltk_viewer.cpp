@@ -1461,11 +1461,11 @@ void FltkViewer::draw()
 	   texm.updateTexture();
    }	
    
-//    if (_objManipulator.hasPicking())
-//    {
-// 		SrVec2 pick_loc = _objManipulator.getPickLoc();
-// 		_objManipulator.picking(pick_loc.x,pick_loc.y, cam);	   
-//    }  
+   if (_objManipulator.hasPicking())
+   {
+		SrVec2 pick_loc = _objManipulator.getPickLoc();
+		_objManipulator.picking(pick_loc.x,pick_loc.y, cam);	   
+   }  
 
    
    glViewport ( 0, 0, w(), h() );
@@ -2065,15 +2065,21 @@ int FltkViewer::handle ( int event )
 		 if (e.button1)
 		 {
 			 {				 			 
+				 SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 				 makeGLContext();
-				 _objManipulator.picking(e.mouse.x, e.mouse.y, SmartBody::SBScene::getScene()->getActiveCamera());
+				 _objManipulator.picking(e.mouse.x, e.mouse.y,scene->getActiveCamera());
 				 SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
 				 if (selectedPawn)
 				 {
 					 // if the resource window is open, select that item
-					 FLTKListener* listener = dynamic_cast<FLTKListener*>(SmartBody::SBScene::getScene()->getCharacterListener());
-					 if (listener)
-						 listener->OnObjectSelected(selectedPawn->getName());
+					std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+					for (size_t i = 0; i < listeners.size(); i++)
+					{
+						FLTKListener* listener = dynamic_cast<FLTKListener*>(listeners[i]);
+						if (listener)
+							listener->OnObjectSelected(selectedPawn->getName());
+					}
+
 					 SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (selectedPawn);
 					 if (character)
 					 {
@@ -2193,31 +2199,31 @@ int FltkViewer::handle ( int event )
          e.key = Fl::event_key();
 		  switch (Fl::event_key())
 		  {
-			case 'w': // translate mode				
+			case 'w': // translate mode
+				_transformMode = ObjectManipulationHandle::CONTROL_POS;
 				{
 					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
 					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
 					_transformMode = ObjectManipulationHandle::CONTROL_POS;
 					if (rotControl->get_attach_pawn())
-					{						
+					{
 						posControl->attach_pawn(rotControl->get_attach_pawn());
 						rotControl->detach_pawn();
-						_objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_POS);
-						_objManipulator.active_control = posControl;
+						 _objManipulator.active_control = posControl;
 					}					
 				}
 				return ret;
-			case 'e': // rotate mode 				
+			case 'e': // rotate mode
+ 				_transformMode = ObjectManipulationHandle::CONTROL_ROT;
 				{
 					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
 					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
 					_transformMode = ObjectManipulationHandle::CONTROL_ROT;
 					if (posControl->get_attach_pawn())
-					{						
+					{
 						rotControl->attach_pawn(posControl->get_attach_pawn());
 						posControl->detach_pawn();
-						_objManipulator.active_control = rotControl;
-						_objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_ROT);
+						 _objManipulator.active_control = rotControl;
 					}
 				}
 				return ret;
@@ -2404,11 +2410,11 @@ int FltkViewer::handle_event ( const SrEvent &e )
 	   if ( res ) return res;
    }
 
-//    if (e.mouse_event() )
-//    {
-// 	   res = handle_object_manipulation ( e );
-// 	   if ( res ) return res;
-//    }
+   if (e.mouse_event() )
+   {
+	   res = handle_object_manipulation ( e );
+	   if ( res ) return res;
+   }
 
    if ( e.mouse_event() ) return handle_scene_event ( e );
 
@@ -2861,7 +2867,6 @@ void FltkViewer::drawGrid()
 	}
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	
 	GLfloat gridHeight = 0.0f + 0.001f/scene->getScale();
 
 	glPushAttrib(GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT | GL_LINE_BIT);
@@ -2878,7 +2883,7 @@ void FltkViewer::drawGrid()
 	glLineWidth(3.f);
 //	glLineStipple(1, 0xAAAA);
 	glBegin(GL_LINES);
-	float sceneScale = SmartBody::SBScene::getScene()->getScale();
+	
 	float adjustedGridStep = gridStep;
 	float adjustGridSize = gridSize * .01f / sceneScale;
 	if (sceneScale > 0.f)
@@ -5133,7 +5138,7 @@ void FltkViewer::drawDeformableModels()
 				SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p, _data->showSkinWeight);
 				if (pawn->scene_p)
 					pawn->scene_p->set_visibility(0,1,0,0);
-				//_data->render_action.apply(character->scene_p);
+				_data->render_action.apply(character->scene_p);
 			}
 		}
 	}

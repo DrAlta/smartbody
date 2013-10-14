@@ -39,7 +39,7 @@ RotationControl::~RotationControl(void)
 void RotationControl::identify( std::vector<int>& path )
 {
 	opdir=path[1];	
-	printf("opdir = %d\n",opdir);
+	//printf("opdir = %d\n",opdir);
 	prevPt = getWorldPt();
 	resetColor();
 }
@@ -142,9 +142,8 @@ void RotationControl::hitOPS(SrCamera& cam)
 
 void RotationControl::draw(SrCamera& cam)
 {
-	glDisable(GL_BLEND);
+	glPushAttrib(GL_LIGHTING_BIT);
 	glDisable(GL_LIGHTING);
-	glDisable(GL_COLOR_MATERIAL);
 	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 	//double lineWidth[5] = { 1.0, 1.0, 1.0, 1.0, 1.0} ;
@@ -160,7 +159,9 @@ void RotationControl::draw(SrCamera& cam)
 		screenParallelPlane(cam,center,dirx,diry);
 		float ratio=(dirx).norm();
 		SrVec nm=cam.getEye() - cam.getCenter();//cross(diry,dirx);
-		nm.normalize();		
+		nm.normalize();
+
+		glDisable(GL_LIGHTING);
 		glPushMatrix();
 		//	glMultMatrixd(::transpose(pm->t_matrix));
 		glTranslatef(center[0],center[1],center[2]);
@@ -210,6 +211,7 @@ void RotationControl::draw(SrCamera& cam)
 		glPopMatrix();
 		glEnable(GL_LIGHTING);
 	}
+	glPopAttrib();
 	
 }
 

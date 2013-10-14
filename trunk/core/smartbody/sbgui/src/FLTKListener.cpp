@@ -329,11 +329,6 @@ void FLTKListener::OnSimulationUpdate()
 		
 	BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(scene->getViewer());
 
-	if(rootWindow && rootWindow->dataViewerWindow && rootWindow->dataViewerWindow->shown())
-	{
-		rootWindow->dataViewerWindow->update();
-	}
-
 	if (rootWindow && rootWindow->panimationWindow && rootWindow->panimationWindow->shown())
 	{
 			rootWindow->panimationWindow->update_viewer();
