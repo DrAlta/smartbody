@@ -36,6 +36,10 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	if (attr)
 		attr->registerObserver(this);
 
+	attr = pawn->getAttribute("deformableMeshScale");
+	if (attr)
+		attr->registerObserver(this);
+
 	OnCharacterUpdate(name);
 	
 	if (otherListener)
@@ -246,6 +250,18 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 		}
 		if (name == "mesh")
 		{
+		}
+		else if ( name == "deformableMeshScale")
+		{
+			//LOG("name = deformableMeshScale");
+			SmartBody::DoubleAttribute* doubleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			if (doubleAttribute)
+			{
+				if (!pawn->dMeshInstance_p)
+					pawn->dMeshInstance_p = new DeformableMeshInstance();
+				pawn->dMeshInstance_p->setMeshScale(doubleAttribute->getValue());
+				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
+			}			
 		}
 		else if (name == "deformableMesh")
 		{
