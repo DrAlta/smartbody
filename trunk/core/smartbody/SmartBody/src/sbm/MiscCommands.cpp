@@ -1542,7 +1542,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 						}
 					else 	if( cmd == "viewer" ) {
 							std::string viewType = args.read_token();
-
+							/*
 							if (viewType == "0" || viewType == "bones")
 							{
 								if (character->scene_p)
@@ -1594,7 +1594,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 							{
 								LOG("Usage: char <name> viewer <bones|visgeo|colgeo|axis|deformable>");
 							}
-
+							*/
 							return CMD_SUCCESS;
 						} 
 			else if( cmd == "gazefade" ) {

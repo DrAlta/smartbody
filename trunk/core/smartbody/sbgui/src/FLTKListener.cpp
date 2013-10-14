@@ -281,16 +281,22 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 				{
 					//delete pawn->dMeshInstance_p;
 				}
+				if (value == "")
+					return;
 
 				SmartBody::SBAssetManager* assetManager = scene->getAssetManager();
 				DeformableMesh* mesh = assetManager->getDeformableMesh(value);
 				if (!mesh)
 				{
-					// load the assets from the mesh directories
-					std::vector<std::string> meshPaths = assetManager->getAssetPaths("mesh");
-					for (size_t m = 0; m < meshPaths.size(); m++)
+					int index = value.find(".");
+					if (index != std::string::npos)
 					{
-						assetManager->loadAssetsFromPath(meshPaths[m] + "/" + value);
+						std::string prefix = value.substr(0, index);
+						std::vector<std::string>& meshPaths = assetManager->getAssetPaths("mesh");
+						for (size_t x = 0; x < meshPaths.size(); x++)
+						{
+							assetManager->loadAsset(meshPaths[x] + "/" + prefix + "/" + value);
+						}
 					}
 				}
 		
