@@ -33,6 +33,11 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
 	if (!pawn)
 		return;
+
+	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(pawn);
+	if (!character)
+		return;
+
 		// created a ogre entity only when the character is changed and valid
 	std::string logMsg = "Character " + name ;
 	LogManager::getSingleton().logMessage(logMsg.c_str());
@@ -78,7 +83,7 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 
 	if (ent == NULL)
 	{
-		LOG("Can not create character %s ..., no mesh or skeleton exist",sbChar->getName().c_str());
+		LOG("Can not create character %s, no mesh or skeleton exists with type %s",sbChar->getName().c_str(), objectClass.c_str());
 		return;
 	}		
 	// Add entity to the scene node	

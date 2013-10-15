@@ -24,6 +24,63 @@
 #ifndef WIN32
 #define _stricmp strcasecmp
 #endif
+
+LipSyncWindowListener::LipSyncWindowListener(VisemeViewerWindow* window)
+{
+	_window = window;
+}
+
+void LipSyncWindowListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
+{
+	_window->OnCharacterRefreshCB(_window->_buttonRefreshCharacter, _window);
+}
+
+void LipSyncWindowListener::OnCharacterDelete( const std::string & name )
+{
+	if (_window->getCurrentCharacterName() == name)
+	{
+		_window->_choiceCharacter->value(0);
+		_window->OnCharacterSelectCB(_window->_choiceCharacter, _window);
+		_window->redraw();
+		LOG("DELETE CHAR");
+	}
+}
+
+void LipSyncWindowListener::OnCharacterUpdate( const std::string & name )
+{
+	if (_window->getCurrentCharacterName() == name)
+	{
+		_window->_choiceCharacter->value(0);
+		_window->OnCharacterRefreshCB(_window->_buttonRefreshCharacter, _window);
+		_window->redraw();
+	}
+}
+      
+void LipSyncWindowListener::OnPawnCreate( const std::string & name )
+{
+}
+
+void LipSyncWindowListener::OnPawnDelete( const std::string & name )
+{
+}
+
+void LipSyncWindowListener::OnReset()
+{
+}
+
+void LipSyncWindowListener::OnSimulationStart()
+{
+}
+
+void LipSyncWindowListener::OnSimulationEnd()
+{
+}
+
+void LipSyncWindowListener::OnSimulationUpdate()
+{
+	_window->update();
+}
+
  
 VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(x, y, w, h)
 {
@@ -123,10 +180,15 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_windowVisemeRunTime = NULL;
 
 	loadData();
+
+	_listener = new LipSyncWindowListener(this);
 }
 
 VisemeViewerWindow::~VisemeViewerWindow()
 {
+	SmartBody::SBScene::getScene()->removeSceneListener(_listener);
+	delete _listener;
+
 	if (_windowVisemeRunTime != NULL)
 	{
 		delete _windowVisemeRunTime;
@@ -135,14 +197,18 @@ VisemeViewerWindow::~VisemeViewerWindow()
 }
 void VisemeViewerWindow::show()
 {
+	SmartBody::SBScene::getScene()->addSceneListener(_listener);
 	Fl_Double_Window::show();
+
 	BML::Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
 	bp->registerRequestCallback(OnBmlRequestCB, this);
 }
 
 void VisemeViewerWindow::hide()
 {
+	SmartBody::SBScene::getScene()->removeSceneListener(_listener);
 	Fl_Double_Window::hide();
+
 	BML::Processor* bp = SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor();
 	bp->registerRequestCallback(NULL, NULL);
 }

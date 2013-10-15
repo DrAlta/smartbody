@@ -415,17 +415,6 @@ void FLTKListener::OnSimulationUpdate()
 
 	scene->updateTrackedCameras();
 		
-	BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(scene->getViewer());
-
-	if (rootWindow && rootWindow->panimationWindow && rootWindow->panimationWindow->shown())
-	{
-			rootWindow->panimationWindow->update_viewer();
-	}
-	if (rootWindow && rootWindow->visemeViewerWindow && rootWindow->visemeViewerWindow->shown())
-	{
-		rootWindow->visemeViewerWindow->update();
-	}
-
 	if (scene->getViewer())
 		scene->getViewer()->render();
 	if (scene->getOgreViewer())

@@ -6,21 +6,34 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Scroll.H>
+#include <FL/Fl_Value_Slider.H>
 #include <sbm/GenericViewer.h>
+#include <SBWindowListener.h>
 
-class FaceViewer : public GenericViewer, public Fl_Double_Window
+class FaceViewer : public GenericViewer, public Fl_Double_Window, public SBWindowListener
 {
 	public:
 		FaceViewer(int x, int y, int w, int h, char* name);
 		~FaceViewer();
 
+		virtual void show();
+		virtual void hide();
+
 		virtual void show_viewer();
 		virtual void hide_viewer();
+
+		virtual void updateGUI();
+
+		virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
+		virtual void OnCharacterDelete( const std::string & name );
+		virtual void OnCharacterUpdate( const std::string & name );
+		virtual void OnReset();
+		virtual void OnSimulationUpdate();
+
 
 		static void CharacterCB(Fl_Widget* widget, void* data);
 		static void RefreshCB(Fl_Widget* widget, void* data);
 		static void ResetCB(Fl_Widget* widget, void* data);
-		static void ShowCommandsCB(Fl_Widget* widget, void* data);
 		static void FaceCB(Fl_Widget* widget, void* data);
 		static void FaceWeightCB(Fl_Widget* widget, void* data);
 		
@@ -29,9 +42,8 @@ class FaceViewer : public GenericViewer, public Fl_Double_Window
 		Fl_Button* buttonReset;
 		Fl_Group* topGroup;
 		Fl_Scroll* bottomGroup;
-		Fl_Button* buttonCommands;
-
-
+		std::vector<Fl_Value_Slider*> _sliders;
+		std::vector<Fl_Value_Slider*> _weights;
 };
 
 class FaceViewerFactory : public GenericViewerFactory
