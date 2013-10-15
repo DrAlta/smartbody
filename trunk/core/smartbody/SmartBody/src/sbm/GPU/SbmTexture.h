@@ -68,7 +68,7 @@ public:
 	SBAPI void loadImage(const char* fileName);	
 	SBAPI void buildTexture();
 
-	SBAPI unsigned char* getBuffer() { return buffer; }
+	SBAPI unsigned char* getBuffer();
 	SBAPI int getWidth() const { return width; }	
 	SBAPI int getHeight() const { return height; }
 	SBAPI int getNumChannels() const { return channels; }	
