@@ -262,7 +262,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 			if (doubleAttribute)
 			{
 				if (!pawn->dMeshInstance_p)
-					pawn->dMeshInstance_p = new DeformableMeshInstance();
+					pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
 				pawn->dMeshInstance_p->setMeshScale(doubleAttribute->getValue());
 				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
 			}			
@@ -309,7 +309,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 				{
 					pawn->dMesh_p = mesh;
 					if (!pawn->dMeshInstance_p)
-						pawn->dMeshInstance_p = new DeformableMeshInstance();
+						pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
 					pawn->dMeshInstance_p->setDeformableMesh(mesh);
 					pawn->dMeshInstance_p->setSkeleton(pawn->getSkeleton());
 					

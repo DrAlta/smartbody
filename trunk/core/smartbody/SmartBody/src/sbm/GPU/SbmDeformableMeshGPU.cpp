@@ -112,6 +112,7 @@ std::string shaderVS_2 =
 const int NumLight =2;\n\
 uniform mat4 Transform[120]; \n\
 uniform int  updateNormal;\n\
+uniform float meshScale;\n\
 attribute vec4 BoneID1,BoneID2;   \n\
 attribute vec4 BoneWeight1,BoneWeight2;\n \
 attribute vec3 tangent, binormal;\n\
@@ -149,7 +150,7 @@ return result;\n\
 void main()\n \
 {\n	\
 // the following three lines provide the same result\n \
-vec3 pos = vec3(gl_Vertex.xyz);\n \
+vec3 pos = vec3(gl_Vertex.xyz)*meshScale;\n \
 mat4 skin = TransformPos(pos,gl_Normal,tangent,binormal,BoneID1,BoneWeight1) + TransformPos(pos,gl_Normal,tangent,binormal,BoneID2,BoneWeight2);\n\
 vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix * vec4(skin[0].xyz,1.0);\n\
 gl_Position = gl_ModelViewProjectionMatrix*vec4(skin[0].xyz,1.0);\n\
@@ -539,8 +540,13 @@ SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 	meshSubset.clear();
 }
 
-void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOData* tranTBO)
+void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance)
 {
+	SbmDeformableMeshGPUInstance* gpuMeshInstance = dynamic_cast<SbmDeformableMeshGPUInstance*>(meshInstance);
+	
+	TBOData* tranTBO = gpuMeshInstance->getTBOTransforBuffer();
+	std::vector<SrMat>& tranBuffer = gpuMeshInstance->getTransformBuffer();
+
 	std::string activeShader = shaderName;//SbmDeformableMeshGPU::useShadowPass ? shadowShaderName : shaderName;
 	if (SmartBody::SBScene::getScene()->getBoolAttribute("enableFaceShader"))
 		activeShader = shaderFaceName;
@@ -563,6 +569,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 	GLuint normal_sampler_location = glGetUniformLocation(program,"normalTexture");	
 	GLuint specular_sampler_location = glGetUniformLocation(program,"specularTexture");	
 	GLuint shadow_sampler_location = glGetUniformLocation(program,"tex");	
+	GLuint meshScale_location = glGetUniformLocation(program,"meshScale");	
 	GLuint bone_loc1 = glGetAttribLocation(program,"BoneID1");
 	GLuint weight_loc1 = glGetAttribLocation(program,"BoneWeight1");	
 	GLuint bone_loc2 = glGetAttribLocation(program,"BoneID2");
@@ -580,6 +587,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(std::vector<SrMat>& tranBuffer, TBOD
 
 	// update normal vectors for the deformable mesh. it is significantly slower to do this. So turn off by default. 
 	glUniform1i(updateNormalLoc,1);
+	glUniform1f(meshScale_location, meshInstance->getMeshScale());
 
 	GLuint idQuery;
 	GLuint count = 0;
@@ -1197,6 +1205,7 @@ void SbmDeformableMeshGPU::update()
 {	
 //#define USE_GPU_TRANSFORM 1
 //#if USE_GPU_TRANSFORM
+#if 0 // obsolete, use MeshInstance->update instead
 	if (disableRendering) return; // do nothing
 
 	if (!useGPUDeformableMesh)
@@ -1238,6 +1247,7 @@ void SbmDeformableMeshGPU::update()
 		updateTransformBuffer();
 		skinTransformGPU(transformBuffer,TBOTran);
 	}
+#endif
 //#else
 	
 //#endif
@@ -1361,7 +1371,9 @@ void SbmDeformableMeshGPUInstance::updateTransformBuffer()
 		SkJoint* joint = _skeleton->search_joint(mi->first.c_str());//boneJointList[i];		
 		if (!joint)
 			continue;
-		transformBuffer[idx] = _mesh->bindPoseMatList[idx]*joint->gmat();	
+		SrMat bindPoseMat = _mesh->bindPoseMatList[idx];
+		bindPoseMat.set_translation(bindPoseMat.get_translation()*_meshScale);
+		transformBuffer[idx] = bindPoseMat*joint->gmat();	
 		SrQuat q = SrQuat(transformBuffer[idx]);
 		//LOG("transform buffer %d , quat = %f %f %f %f",idx,q.w,q.x,q.y,q.z);
 		//sr_out << " transform buffer = " << transformBuffer[idx];
@@ -1408,7 +1420,7 @@ void SbmDeformableMeshGPUInstance::update()
 		_updateMesh = true;
 		_skeleton->update_global_matrices();
 		updateTransformBuffer();		
-		gpuMesh->skinTransformGPU(transformBuffer,TBOTran);
+		gpuMesh->skinTransformGPU(this);
 	}
 }
 
