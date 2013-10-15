@@ -1147,6 +1147,9 @@ int main( int argc, char **argv )	{
 	std::string pythonPrompt = "# ";
 	std::string commandPrompt = "> ";
 
+	SrTimer timer;
+	timer.start();
+	double lastUICheckTime = -1.0;
 	while((SmartBody::SBScene::getScene()->getSimulationManager()->isRunning()))	{
 
 
@@ -1158,6 +1161,12 @@ int main( int argc, char **argv )	{
 
 	//	mcu.mark( "main", 0, "fltk-check" );
 		Fl::check();
+		/*double curTime = timer.time();
+		if (curTime - lastUICheckTime > .016)
+		{
+			lastUICheckTime = curTime;
+			Fl::check();
+		}*/
 
 		scene = SmartBody::SBScene::getScene();
 
