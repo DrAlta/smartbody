@@ -850,7 +850,7 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 
 void DeformableMeshInstance::update()
 {
-#define RECOMPUTE_NORMAL 1
+#define RECOMPUTE_NORMAL 0
 	if (!_updateMesh)	return;
 	if (!_skeleton || !_mesh) return;	
 	_skeleton->update_global_matrices();

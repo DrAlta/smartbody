@@ -182,7 +182,9 @@ void SbmTexture::loadImage( const char* fileName )
 		imgBuffer[i] = buffer[i];
 	}
 	// set the texture file name
-	textureFileName = fileName;
+	textureFileName = fileName;	
+	SOIL_free_image_data(buffer);
+	buffer = NULL;
 }
 
 void SbmTexture::buildTexture()
@@ -232,9 +234,9 @@ void SbmTexture::buildTexture()
 	}
 	//glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);	
 #if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
-	gluBuild2DMipmaps(iType, channels, width, height, texture_format, GL_UNSIGNED_BYTE, buffer );
+	gluBuild2DMipmaps(iType, channels, width, height, texture_format, GL_UNSIGNED_BYTE, &imgBuffer[0] );
 #else
-	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);
+	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, &imgBuffer[0]);
 #endif
 
 	//LOG("texture id = %d, texture name = %s, width = %d, height = %d, channel = %d",texID, textureName.c_str(), width, height, channels);
