@@ -1158,7 +1158,8 @@ void EmbeddedOgre::updateOgreCharacterRenderMode(bool renderSkinWeight)
 		SmartBody::SBCharacter* sbChar = scene->getCharacter(charNames[i]);
 		if (sbChar && !renderSkinWeight)
 		{
-			setCharacterVisible(sbChar->dMeshInstance_p->getVisibility() ,charNames[i]);			
+			if (sbChar->dMeshInstance_p)
+				setCharacterVisible(sbChar->dMeshInstance_p->getVisibility() ,charNames[i]);			
 		}
 	}
 
