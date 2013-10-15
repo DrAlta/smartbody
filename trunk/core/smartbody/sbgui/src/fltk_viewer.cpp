@@ -487,8 +487,8 @@ void FltkViewer::applyToCharacters()
 		// feng : never show the collision mesh, instead we will show the bounding volumes as capsules
 		if (character->scene_p && character->dMeshInstance_p)
 		{
-			character->scene_p->set_visibility(_data->showbones,_data->showgeometry, false, _data->showaxis);
-			character->dMeshInstance_p->setVisibility(_data->showdeformablegeometry);
+//			character->scene_p->set_visibility(_data->showbones,_data->showgeometry, false, _data->showaxis);
+	//		character->dMeshInstance_p->setVisibility(_data->showdeformablegeometry);
 		}
 	}
 }
@@ -5137,8 +5137,8 @@ void FltkViewer::drawDeformableModels()
 			if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && _data->showdeformablegeometry) || _data->showSkinWeight)
 			{
 				SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p, _data->showSkinWeight);
-				if (pawn->scene_p)
-					pawn->scene_p->set_visibility(0,1,0,0);
+//				if (pawn->scene_p)
+	//				pawn->scene_p->set_visibility(0,1,0,0);
 				_data->render_action.apply(character->scene_p);
 			}
 		}

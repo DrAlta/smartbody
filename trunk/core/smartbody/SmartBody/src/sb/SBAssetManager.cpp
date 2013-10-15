@@ -525,7 +525,6 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 			}
 			_deformableMeshMap.insert(std::pair<std::string, DeformableMesh*>(mesh->getName(), mesh));
 			addAssetHistory("MESH " + mesh->getName());
-			LOG("ADDED MESH NAMED %s", mesh->getName().c_str());
 			continue;
 		}
 		LOG("Unknown asset type for file %s", assetPath.c_str());

@@ -40,6 +40,10 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	if (attr)
 		attr->registerObserver(this);
 
+	attr = pawn->getAttribute("displayType");
+	if (attr)
+		attr->registerObserver(this);
+
 	OnCharacterUpdate(name);
 	
 	if (otherListener)
@@ -313,6 +317,63 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					{
 						scene->getRootGroup()->add( pawn->dMesh_p->dMeshDynamic_p[i] );
 					}
+				}
+			}
+		}
+		else if (name == "displayType")
+		{
+			SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+			if (strAttribute)
+			{
+				const std::string& value = strAttribute->getValue();
+				if (value == "bones")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(1,0,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
+				}
+				else if (value == "visgeo")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,1,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
+				}
+				else if (value == "colgeo")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,0,1,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
+				}
+				else if (value == "axis")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,0,0,1);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
+				}
+				else if (value == "mesh")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,0,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(1);
+ #if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)						
+					SbmDeformableMeshGPU::useGPUDeformableMesh = false;
+#endif          
+				}
+				else if (value == "GPUmesh")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,0,0,0);
+#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)
+					SbmDeformableMeshGPU::useGPUDeformableMesh = true;
+#endif
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(1);
+
 				}
 			}
 		}

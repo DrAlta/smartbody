@@ -1540,61 +1540,37 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 							}
 
 						}
-					else 	if( cmd == "viewer" ) {
+					else 	if( cmd == "viewer" )
+					{
 							std::string viewType = args.read_token();
-							/*
 							if (viewType == "0" || viewType == "bones")
 							{
-								if (character->scene_p)
-									character->scene_p->set_visibility(1,0,0,0);
-								character->dMesh_p->set_visibility(0);
+								character->setStringAttribute("displayType", "bones");
 							}
 							else if (viewType == "1" || viewType == "visgeo")
 							{
-								if (character->scene_p)
-									character->scene_p->set_visibility(0,1,0,0);
-								character->dMesh_p->set_visibility(0);
+								character->setStringAttribute("displayType", "visgeo");
 							}
 							else if (viewType == "2" || viewType == "colgeo")
 							{
-								if (character->scene_p)
-									character->scene_p->set_visibility(0,0,1,0);
-								character->dMesh_p->set_visibility(0);
+								character->setStringAttribute("displayType", "colgeo");
 							}
 							else if (viewType == "3" || viewType == "axis")
 							{
-								if (character->scene_p)
-									character->scene_p->set_visibility(0,0,0,1);
-								character->dMesh_p->set_visibility(0);
+								character->setStringAttribute("displayType", "axis");
 							}
 							else if (viewType == "4" || viewType == "deformable")
 							{
-								if (character->scene_p)
-									character->scene_p->set_visibility(0,0,0,0);
-								character->dMesh_p->set_visibility(1);
-								if (character->dMeshInstance_p)
-									character->dMeshInstance_p->setVisibility(1);
-                                #if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)
-							
-								SbmDeformableMeshGPU::useGPUDeformableMesh = false;
-                                #endif          
+								character->setStringAttribute("displayType", "mesh");
 							}
 							else if (viewType == "5" || viewType == "deformableGPU")
 							{
-								if (character->scene_p)
-									character->scene_p->set_visibility(0,0,0,0);
-								character->dMesh_p->set_visibility(1);
-							#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)
-								SbmDeformableMeshGPU::useGPUDeformableMesh = true;
-							#endif
-								if (character->dMeshInstance_p)
-									character->dMeshInstance_p->setVisibility(1);
+								character->setStringAttribute("displayType", "GPUmesh");
 							}
 							else
 							{
 								LOG("Usage: char <name> viewer <bones|visgeo|colgeo|axis|deformable>");
 							}
-							*/
 							return CMD_SUCCESS;
 						} 
 			else if( cmd == "gazefade" ) {
