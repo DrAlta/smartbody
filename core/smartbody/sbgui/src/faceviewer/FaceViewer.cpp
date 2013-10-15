@@ -4,9 +4,10 @@
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
+#include <sbm/action_unit.hpp>
 #include <sbm/lin_win.h>
 
-FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
+FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name), SBWindowListener()
 {
 	begin();
 
@@ -19,8 +20,6 @@ FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x
 		buttonReset = new Fl_Button(220, 10, 60, 25, "Reset");
 		buttonReset->callback(ResetCB, this);
 
-		buttonCommands = new Fl_Button(360, 10, 100, 24, "Show Commands");
-		buttonCommands->callback(ShowCommandsCB, this);
 	topGroup->end();
 
 	bottomGroup = new Fl_Scroll(0, 45, w, h - 40);
@@ -52,59 +51,92 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 	FaceViewer* faceViewer = (FaceViewer*) data;
 
 	faceViewer->bottomGroup->clear();
+	faceViewer->_sliders.clear();
+	faceViewer->_weights.clear();
 
 	int curY = faceViewer->bottomGroup->y() + 25;
 	const Fl_Menu_Item* menu = faceViewer->choiceCharacters->menu();
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(menu[faceViewer->choiceCharacters->value()].label());
 	if (character)
 	{	
-		int startIndex = character->viseme_channel_start_pos;
-		int endIndex = character->viseme_channel_end_pos;
-		
-		if (startIndex < 0 || endIndex < 0)
+		SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
+		if (!faceDefinition)
 			return;
 
-		SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
-
-		SkChannelArray& channels = character->getSkeleton()->channels();
-		for (int c = startIndex; c <= endIndex; c++)
+		std::vector<int>& auNums = faceDefinition->getAUNumbers();
+		for (size_t a = 0; a < auNums.size(); a++)
 		{
-			std::stringstream strstr;
+			ActionUnit* au = faceDefinition->getAU(auNums[a]);
+			if (au->is_left())
+			{
+				Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(au->getLeftName().c_str()));
+				slider->type(FL_HORIZONTAL);
+				slider->align(FL_ALIGN_LEFT);
+				slider->range(0.0, 1.0);
+				slider->callback(FaceCB, faceViewer);
+				faceViewer->bottomGroup->add(slider);
+				faceViewer->_sliders.push_back(slider);
+				faceViewer->_weights.push_back(NULL);
+				curY += 30;
+			}
 
-			SkChannel& channel = channels[c];
-			std::string jointName = channels.name(c).c_str();
+			if (au->is_right())
+			{
+				Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(au->getRightName().c_str()));
+				slider->type(FL_HORIZONTAL);
+				slider->align(FL_ALIGN_LEFT);
+				slider->range(0.0, 1.0);
+				slider->callback(FaceCB, faceViewer);
+				faceViewer->bottomGroup->add(slider);
+				faceViewer->_sliders.push_back(slider);
+				faceViewer->_weights.push_back(NULL);
+				curY += 30;
+			}
 
-			strstr << jointName;
+			if (au->is_bilateral())
+			{
+				Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(au->getBilateralName().c_str()));
+				slider->type(FL_HORIZONTAL);
+				slider->align(FL_ALIGN_LEFT);
+				slider->range(0.0, 1.0);
+				slider->callback(FaceCB, faceViewer);
+				faceViewer->bottomGroup->add(slider);
+				faceViewer->_sliders.push_back(slider);
+				faceViewer->_weights.push_back(NULL);
+				curY += 30;
+			}
+			
 
-			Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(strstr.str().c_str()));
+		}
+
+		std::vector<std::string>& visemeNames = faceDefinition->getVisemeNames();
+		for (size_t v = 0; v < visemeNames.size(); v++)
+		{
+			Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(visemeNames[v].c_str()));
 			slider->type(FL_HORIZONTAL);
 			slider->align(FL_ALIGN_LEFT);
 			slider->range(0.0, 1.0);
 			slider->callback(FaceCB, faceViewer);
 			faceViewer->bottomGroup->add(slider);
-
-			// for visemes, add a viseme weight
-			if (jointName.find("au_") != 0)
-			{
-				std::string weightLabel = strstr.str() + " weight";
-				Fl_Value_Slider* weightSlider = new Fl_Value_Slider(330, curY, 100, 25, _strdup(weightLabel.c_str()));
-				weightSlider->type(FL_HORIZONTAL);
-				weightSlider->align(FL_ALIGN_LEFT);
-				weightSlider->range(0.0, 1.0);
-				weightSlider->callback(FaceWeightCB, faceViewer);
-				faceViewer->bottomGroup->add(weightSlider);
-				// set the initial weight
-				if (faceDefinition)
-				{
-					float initialWeight = faceDefinition->getVisemeWeight(strstr.str());
-					weightSlider->value(initialWeight);
-				}
-			}
-			curY += 30;
+			faceViewer->_sliders.push_back(slider);
 			
+			std::string weightLabel = visemeNames[v] + " weight";
+			Fl_Value_Slider* weightSlider = new Fl_Value_Slider(330, curY, 100, 25, _strdup(weightLabel.c_str()));
+			weightSlider->type(FL_HORIZONTAL);
+			weightSlider->align(FL_ALIGN_LEFT);
+			weightSlider->range(0.0, 1.0);
+			weightSlider->callback(FaceWeightCB, faceViewer);
+			faceViewer->bottomGroup->add(weightSlider);
+			// set the initial weight
+			float initialWeight = faceDefinition->getVisemeWeight(visemeNames[v]);
+			weightSlider->value(initialWeight);
+			faceViewer->_weights.push_back(weightSlider);
 
-			faceViewer->bottomGroup->damage(FL_DAMAGE_ALL);
+			curY += 30;
 		}
+
+		faceViewer->updateGUI();
+		faceViewer->bottomGroup->damage(FL_DAMAGE_ALL);
 	}
 }
 
@@ -118,6 +150,12 @@ void FaceViewer::RefreshCB(Fl_Widget* widget, void* data)
 		const std::string & charName = charNames[i];
 		faceViewer->choiceCharacters->add(charName.c_str());
 	}
+	if (charNames.size() > 0)
+		faceViewer->choiceCharacters->activate();
+	else
+		faceViewer->choiceCharacters->deactivate();
+
+	faceViewer->redraw();
 }
 
 void FaceViewer::ResetCB(Fl_Widget* widget, void* data)
@@ -153,34 +191,6 @@ void FaceViewer::ResetCB(Fl_Widget* widget, void* data)
 
 		}
 
-	}
-}
-
-void FaceViewer::ShowCommandsCB(Fl_Widget* widget, void* data)
-{
-	FaceViewer* faceViewer = (FaceViewer*) data;
-
-	const Fl_Menu_Item* menu = faceViewer->choiceCharacters->menu();
-	SbmCharacter* character = SmartBody::SBScene::getScene()->getCharacter(menu[faceViewer->choiceCharacters->value()].label());
-	if (character)
-	{
-		SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
-		if (!faceDefinition)
-		{
-			LOG("No face definition for character %s.", character->getName().c_str());
-			return;
-		}
-		
-		int numVisemes = faceDefinition->getNumVisemes();
-		LOG("Commands for generating viseme weights for character %s.", character->getName().c_str());
-		for (int v = 0; v < numVisemes; v++)
-		{
-			std::stringstream strstr;
-			const std::string& visemeName = faceDefinition->getVisemeName(v);
-			float weight = faceDefinition->getVisemeWeight(visemeName);
-			strstr << "char " << character->getName() << " visemeweight " << visemeName << " " << weight;
-			LOG(strstr.str().c_str());
-		}
 	}
 }
 
@@ -234,6 +244,47 @@ void FaceViewer::FaceWeightCB(Fl_Widget* widget, void* data)
 	}
 }
 
+void FaceViewer::updateGUI()
+{
+	if (!choiceCharacters->menu())
+		return;
+
+	std::string selectedCharacter = "";
+	if (choiceCharacters->menu()->size() > 0)
+	{
+		selectedCharacter = choiceCharacters->menu()[choiceCharacters->value()].label();
+	}
+
+	if (selectedCharacter == "")
+		return;
+
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(selectedCharacter);
+	if (character)
+	{	
+		SmartBody::SBSkeleton* skeleton = character->getSkeleton();
+		SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
+
+		for (size_t s = 0; s < _sliders.size(); s++)
+		{
+			Fl_Value_Slider* slider = _sliders[s];
+			SmartBody::SBJoint* joint = skeleton->getJointByName(slider->label());
+			if (joint)
+			{
+				SrVec position = joint->getPosition();
+				if (slider->value() != position.x)
+					slider->value(position.x);
+			}
+
+			if (_weights[s])
+			{
+				float weight = faceDefinition->getVisemeWeight(slider->label());
+				_weights[s]->value(weight);
+			}
+		}
+	}
+
+}
+
 
 void FaceViewer::show_viewer()
 {
@@ -244,6 +295,80 @@ void FaceViewer::hide_viewer()
 {
 	hide();
 }
+
+void FaceViewer::show()
+{
+	SBWindowListener::windowShow();
+	Fl_Double_Window::show();
+}
+void FaceViewer::hide()
+{
+	SBWindowListener::windowHide();
+	Fl_Double_Window::hide();
+}
+
+void FaceViewer::OnCharacterCreate( const std::string & name, const std::string & objectClass )
+{
+	std::string selectedCharacter = "";
+	if (!choiceCharacters->menu())
+		return;
+	if (choiceCharacters->menu()->size() > 0)
+	{
+		selectedCharacter = choiceCharacters->menu()[choiceCharacters->value()].label();
+	}
+	RefreshCB(buttonRefresh, this);
+
+	if (selectedCharacter != "")
+	{
+		for (int c = 0; c < choiceCharacters->size(); c++)
+		{
+			if (selectedCharacter == choiceCharacters->menu()[c].label())
+			{
+				choiceCharacters->value(c);
+				CharacterCB(choiceCharacters, this);
+			}
+		}
+	}
+	else
+	{
+		choiceCharacters->value(0);
+	}
+
+}
+
+void FaceViewer::OnCharacterDelete( const std::string & name )
+{
+	std::string selectedCharacter = "";
+	if (!choiceCharacters->menu())
+		return;
+
+	if (choiceCharacters->menu()->size() > 0)
+	{
+		selectedCharacter = choiceCharacters->menu()[choiceCharacters->value()].label();
+	}
+	if (selectedCharacter == name)
+	{
+		choiceCharacters->deactivate();
+		FaceViewer::CharacterCB(this, this);	
+	}
+}
+
+
+void FaceViewer::OnCharacterUpdate( const std::string & name )
+{
+	OnCharacterCreate(name, "");
+}
+
+void FaceViewer::OnReset()
+{
+}
+
+void FaceViewer::OnSimulationUpdate()
+{
+	updateGUI();
+}
+
+
 
 GenericViewer* FaceViewerFactory::create(int x, int y, int w, int h)
 {

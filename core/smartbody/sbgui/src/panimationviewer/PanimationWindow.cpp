@@ -40,6 +40,59 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCommandManager.h>
 
+
+PanimationWindowListener::PanimationWindowListener(PanimationWindow* window)
+{
+	_window = window;
+}
+
+void PanimationWindowListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
+{
+	_window->refreshUI(_window->characterList, _window);
+}
+
+void PanimationWindowListener::OnCharacterDelete( const std::string & name )
+{
+	if (_window->characterList->size() > 0)
+	{
+		std::string charName = _window->characterList->menu()[_window->characterList->value()].label();
+		if (charName == name)
+		{
+			_window->characterList->value(0);
+			_window->refreshUI(_window->characterList, _window);
+		}
+	}
+}
+
+void PanimationWindowListener::OnCharacterUpdate( const std::string & name )
+{
+}
+      
+void PanimationWindowListener::OnPawnCreate( const std::string & name )
+{
+}
+
+void PanimationWindowListener::OnPawnDelete( const std::string & name )
+{
+}
+
+void PanimationWindowListener::OnReset()
+{
+}
+
+void PanimationWindowListener::OnSimulationStart()
+{
+}
+
+void PanimationWindowListener::OnSimulationEnd()
+{
+}
+
+void PanimationWindowListener::OnSimulationUpdate()
+{
+	_window->update_viewer();
+}
+
 PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
 {
 	this->begin();
@@ -95,11 +148,15 @@ PanimationWindow::PanimationWindow(int x, int y, int w, int h, char* name) : Fl_
 	tabGroup->value(runTimeEditor);
 	lastCommand = "";
 	_currentCharacterName = "";
+
+	_listener = new PanimationWindowListener(this);
 }
 
 
 PanimationWindow::~PanimationWindow()
 {
+	SmartBody::SBScene::getScene()->removeSceneListener(_listener);
+	delete _listener;
 }
 
 void PanimationWindow::draw()
@@ -143,8 +200,16 @@ void PanimationWindow::update_viewer()
 
 void PanimationWindow::show()
 {    
+	SmartBody::SBScene::getScene()->addSceneListener(_listener);
     Fl_Double_Window::show();   
 }
+
+void PanimationWindow::hide()
+{    
+	SmartBody::SBScene::getScene()->removeSceneListener(_listener);
+    Fl_Double_Window::hide();   
+}
+
 
 void PanimationWindow::getSelectedMarkInfo(nle::NonLinearEditorModel* model, std::string& blockName, double& time)
 {

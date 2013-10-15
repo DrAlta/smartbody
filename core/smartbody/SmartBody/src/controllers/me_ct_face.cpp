@@ -108,23 +108,15 @@ void MeCtFace::init (SbmPawn* pawn) {
 		ActionUnit* au = faceDefinition->getAU(auNum);
 		if( au->is_left() )
 		{
-			std::string name = "au_";
-			name += id.str();
-			name += "_left";
-			add_key( name.c_str(), au->left);
+			add_key(au->getLeftName().c_str(), au->left);
 		}
 		if( au->is_right() )
 		{
-			std::string name = "au_";
-			name += id.str();
-			name += "_right";
-			add_key( name.c_str(), au->right);
+			add_key(au->getRightName().c_str(), au->right);
 		}
 		if( au->is_bilateral() )
 		{
-			std::string name = "au_";
-			name += id.str();
-			add_key( name.c_str(), au->left);
+			add_key(au->getBilateralName().c_str(), au->left);
 		}
 	}
 

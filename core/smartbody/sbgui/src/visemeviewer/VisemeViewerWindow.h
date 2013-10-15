@@ -20,11 +20,38 @@
 
 #include <sb/SBCharacter.h>
 #include <sb/SBPhoneme.h>
+#include <sb/SBSceneListener.h>
 #include <bml/bml.hpp>
 
 
 class VisemeCurveEditor;
 class VisemeRunTimeWindow;
+class VisemeViewerWindow;
+
+class LipSyncWindowListener : public SmartBody::SBSceneListener
+{
+	public:
+		LipSyncWindowListener(VisemeViewerWindow* window);
+
+		virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
+		virtual void OnCharacterDelete( const std::string & name );
+		virtual void OnCharacterUpdate( const std::string & name );
+      
+		virtual void OnPawnCreate( const std::string & name );
+		virtual void OnPawnDelete( const std::string & name );
+
+		virtual void OnReset();
+
+		virtual void OnSimulationStart();
+		virtual void OnSimulationEnd();
+		virtual void OnSimulationUpdate();
+	
+	private:
+		VisemeViewerWindow* _window;
+
+};
+
+
 
 class VisemeViewerWindow : public Fl_Double_Window{
 public:
@@ -41,7 +68,7 @@ public:
 	void selectViseme(int id);
 
 	static Fl_Menu_Item menu_[];
-protected:
+
 	Fl_Choice * _choiceCharacter;
 	Fl_Hold_Browser *_browserPhoneme[2];
 	Fl_Multi_Browser *_browserViseme;
@@ -72,6 +99,7 @@ protected:
 	bool _gatherStats;
 	std::map<std::string, int> _diphoneStats;
 	bool _useRemote;
+	LipSyncWindowListener* _listener;
 
 	void draw();
 	bool loadData();

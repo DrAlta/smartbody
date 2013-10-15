@@ -15,9 +15,6 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SmartBody-lib.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
  */
 
 #ifndef SBM_ActionUnit_HPP
@@ -43,20 +40,26 @@
 class ActionUnit
 {
 public:
-	ActionUnit(SkMotion* unified );
-	ActionUnit( SkMotion* left, SkMotion* right );
+	ActionUnit(int id, SkMotion* unified );
+	ActionUnit(int id, SkMotion* left, SkMotion* right );
 	ActionUnit(ActionUnit* source);
 	~ActionUnit();
 
+	SBAPI int getId();
+	SBAPI void setId(int id);
+
 	SBAPI bool is_bilateral() const;
-	void reset_type();
-	void set_left();
-	void set_bilateral();
-	void set_right();
+	SBAPI void reset_type();
+	SBAPI void set_left();
+	SBAPI void set_bilateral();
+	SBAPI void set_right();
 	SBAPI bool is_left() const;
 	SBAPI bool is_right() const;
-	void set( SkMotion* motion );
-	void set( SkMotion* left, SkMotion* right );
+	SBAPI void set( SkMotion* motion );
+	SBAPI void set( SkMotion* left, SkMotion* right );
+	SBAPI const std::string& getLeftName();
+	SBAPI const std::string& getRightName();
+	SBAPI const std::string& getBilateralName();
 
 	SkMotion* left;
 	SkMotion* right;
@@ -65,6 +68,11 @@ public:
 		bool m_isLeft;
 		bool m_isRight;
 		bool m_isBilateral;
+		std::string _leftName;
+		std::string _rightName;
+		std::string _bilateralName;
+		bool _dirtyName;
+		int _id;
 };
 
 #endif // SBM_ActionUnit_HPP

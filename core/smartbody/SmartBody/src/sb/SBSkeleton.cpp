@@ -301,6 +301,7 @@ void SBSkeleton::update()
 {
 	refresh_joints();
 	make_active_channels();
+	updateJointMap();
 		
 	SBPawn* pawn = getPawn();
 	SBCharacter* character = dynamic_cast<SBCharacter*>(pawn);

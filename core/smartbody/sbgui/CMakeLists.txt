@@ -121,6 +121,7 @@ set( SBM_FLTK_SRC
 	./src/RootWindow.cxx
 	./src/ExportWindow.cpp
 	./src/fltk_viewer.cpp
+	./src/SBWindowListener.cpp
 	${OGRE_SRCS}
 	./src/pic.cpp
 	./src/ppm.cpp

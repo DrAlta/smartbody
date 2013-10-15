@@ -33,32 +33,7 @@
 #include <sk/sk_motion.h>
 #include <sbm/GenericViewer.h>
 #include "GlChartView.hpp"
-#include <sb/SBSceneListener.h>
-
-class ChannelBufferWindow;
-
-class ChannelBufferWindowListener : public SmartBody::SBSceneListener
-{
-	public:
-		ChannelBufferWindowListener(ChannelBufferWindow* window);
-
-		virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
-		virtual void OnCharacterDelete( const std::string & name );
-		virtual void OnCharacterUpdate( const std::string & name );
-      
-		virtual void OnPawnCreate( const std::string & name );
-		virtual void OnPawnDelete( const std::string & name );
-
-		virtual void OnReset();
-
-		virtual void OnSimulationStart();
-		virtual void OnSimulationEnd();
-		virtual void OnSimulationUpdate();
-	
-	private:
-		ChannelBufferWindow* _window;
-
-};
+#include <SBWindowListener.h>
 
 class ChannelItem
 {
@@ -74,7 +49,7 @@ public:
 };
 
 
-class ChannelBufferWindow : public GenericViewer, public Fl_Double_Window 
+class ChannelBufferWindow : public GenericViewer, public Fl_Double_Window, public SBWindowListener
 {
 public:
 	ChannelBufferWindow(int x, int y, int w, int h, char* name);
@@ -123,9 +98,13 @@ public:
 
 	int mode; //0: character; 1: controller; 2: motion
 
+	void OnCharacterDelete( const std::string & name );
+	void OnCharacterUpdate( const std::string & name );
+	void OnSimulationUpdate( );
+	void OnReset();
+
 protected:
 	std::string no_motion;
-	ChannelBufferWindowListener* _listener;
 
 public:
 	const char* getSelectedCharacterName();

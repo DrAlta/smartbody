@@ -189,19 +189,19 @@ void SBFaceDefinition::setAU(int auNum, const std::string& side, const std::stri
 	{
 		if (side == "both" || side == "BOTH" || side == "")
 		{
-			au = new ActionUnit( motion );
+			au = new ActionUnit( auNum, motion );
 			au->reset_type();
 			au->set_bilateral();
 		}
 		else if (side == "left" || side == "LEFT")
 		{
-			au = new ActionUnit( motion, NULL );
+			au = new ActionUnit( auNum, motion, NULL );
 			au->reset_type();
 			au->set_left();
 		}
 		else if (side == "right" || side == "RIGHT")
 		{
-			au = new ActionUnit( NULL, motion );
+			au = new ActionUnit( auNum, NULL, motion );
 			au->reset_type();
 			au->set_right();
 		}

@@ -41,7 +41,7 @@
 #include <controllers/me_ct_param_animation_utilities.h>
 #include <sb/PABlend.h>
 #include <map>
-
+#include <sb/SBSceneListener.h>
 
 const static int yDis = 10;
 const static int xDis = 10;
@@ -65,6 +65,33 @@ namespace SmartBody {
 	class SBCharacter;
 }
 
+class PanimationWindow;
+
+class PanimationWindowListener : public SmartBody::SBSceneListener
+{
+	public:
+		PanimationWindowListener(PanimationWindow* window);
+
+		virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
+		virtual void OnCharacterDelete( const std::string & name );
+		virtual void OnCharacterUpdate( const std::string & name );
+      
+		virtual void OnPawnCreate( const std::string & name );
+		virtual void OnPawnDelete( const std::string & name );
+
+		virtual void OnReset();
+
+		virtual void OnSimulationStart();
+		virtual void OnSimulationEnd();
+		virtual void OnSimulationUpdate();
+	
+	private:
+		PanimationWindow* _window;
+
+};
+
+
+
 
 class PanimationWindow : public Fl_Double_Window, public GenericViewer
 {
@@ -77,7 +104,8 @@ class PanimationWindow : public Fl_Double_Window, public GenericViewer
 		virtual void hide_viewer();
 		virtual void update_viewer();
 		void draw();
-        void show();  
+        void show(); 
+		void hide();
 
 		void setCurrentCharacterName(const std::string& name);
 		const std::string& getCurrentCharacterName();
@@ -123,6 +151,7 @@ class PanimationWindow : public Fl_Double_Window, public GenericViewer
 		Fl_Choice*		characterList;
 		Fl_Button*		refresh;
 		Fl_Button*		resetCharacter;
+		PanimationWindowListener* _listener;
 };
 
  class PanimationViewerFactory : public GenericViewerFactory

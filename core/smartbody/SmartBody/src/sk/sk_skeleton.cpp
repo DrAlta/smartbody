@@ -259,8 +259,11 @@ void SkSkeleton::resetSearchJoint()
 
 SkJoint* SkSkeleton::search_joint ( const char* n )
 {
-	if (_jointMap.size() == 0 &&
-		_joints.size() > 0)
+	int jointMapSize = _jointMap.size();
+	int jointSize = _joints.size();
+	if ( jointMapSize == 0 &&
+		jointSize > 0 &&
+		jointMapSize != jointSize)
 	{
 		updateJointMap();
 
