@@ -296,7 +296,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					if (index != std::string::npos)
 					{
 						std::string prefix = value.substr(0, index);
-						std::vector<std::string>& meshPaths = assetManager->getAssetPaths("mesh");
+						const std::vector<std::string>& meshPaths = assetManager->getAssetPaths("mesh");
 						for (size_t x = 0; x < meshPaths.size(); x++)
 						{
 							assetManager->loadAsset(meshPaths[x] + "/" + prefix + "/" + value);
