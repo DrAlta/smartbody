@@ -82,7 +82,7 @@ for i in range(2):
 	brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 	# Set deformable mesh
 	brad.setDoubleAttribute('deformableMeshScale', 0.01)
-	brad.setStringAttribute('deformableMesh', 'ChrBrad')
+	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	

@@ -174,7 +174,7 @@ for i in range(2):
 	brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 	# Set deformable mesh
 	brad.setDoubleAttribute('deformableMeshScale', 0.01)
-	brad.setStringAttribute('deformableMesh', 'ChrBrad')
+	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	
@@ -194,7 +194,7 @@ for i in range(2):
 	rachel.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 	# Set deformable mesh
 	rachel.setDoubleAttribute('deformableMeshScale', 0.01)
-	rachel.setStringAttribute('deformableMesh', 'ChrRachel')
+	rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 

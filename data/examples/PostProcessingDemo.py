@@ -96,7 +96,7 @@ brad.setBoolAttribute('usePhoneBigram', True)
 brad.setVoice('remote')
 brad.setVoiceCode('MicrosoftAnna')
 # Gesture map setup
-brad.setStringAttribute('gestureMap', 'ChrBrad')
+brad.setStringAttribute('gestureMap', 'ChrBrad.dae')
 brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 # Retarget 
 
