@@ -91,6 +91,7 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 		pawn->scene_p = NULL;
 	}
 	// remove any existing deformable mesh
+#if 0
 	if (pawn->dMesh_p)
 	{
 		for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
@@ -100,6 +101,8 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 		//delete character->dMesh_p; // AS 1/28/13 causing crash related to mesh instances
 		pawn->dMesh_p = NULL;
 	}
+#endif 
+
 #if 1 //!USE_OGRE_VIEWER
 	// make sure the character isn't associated with the viewer
 
@@ -274,6 +277,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 			{
 				const std::string& value = strAttribute->getValue();
 				// clean up any old meshes
+#if 0
 				if (pawn->dMesh_p)
 				{
 					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
@@ -281,6 +285,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 						scene->getRootGroup()->remove( pawn->dMesh_p->dMeshDynamic_p[i] );
 					}
 				}
+#endif
 				if (pawn->dMeshInstance_p)
 				{
 					//delete pawn->dMeshInstance_p;
@@ -307,16 +312,16 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 				mesh = assetManager->getDeformableMesh(value);
 				if (mesh)
 				{
-					pawn->dMesh_p = mesh;
 					if (!pawn->dMeshInstance_p)
 						pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
 					pawn->dMeshInstance_p->setDeformableMesh(mesh);
-					pawn->dMeshInstance_p->setSkeleton(pawn->getSkeleton());
-					
+					pawn->dMeshInstance_p->setSkeleton(pawn->getSkeleton());					
+#if 0
 					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
 					{
 						scene->getRootGroup()->add( pawn->dMesh_p->dMeshDynamic_p[i] );
 					}
+#endif
 				}
 			}
 		}

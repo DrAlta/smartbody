@@ -86,7 +86,6 @@ SkChannelArray SbmPawn::WORLD_OFFSET_CHANNELS_P;
 
 
 SbmPawn::SbmPawn() : SBObject(),
-dMesh_p( NULL ),
 dMeshInstance_p(NULL),
 _skeleton(NULL),
 scene_p( NULL )
@@ -103,10 +102,8 @@ scene_p( NULL )
 SbmPawn::SbmPawn( const char * name ) : SmartBody::SBObject(),
 scene_p( NULL ),
 #if defined(__ANDROID__) || defined(SB_IPHONE) // don't use the GPU version in android
-dMesh_p( NULL) ,
 dMeshInstance_p(NULL),
 #else
-dMesh_p( NULL ),
 dMeshInstance_p(NULL),
 #endif
 ct_tree_p( MeControllerTreeRoot::create() ),
@@ -437,10 +434,7 @@ SbmPawn::~SbmPawn()	{
 		delete steeringSpaceObj_p;
 	}
 
-	if (dMesh_p)
-	{
-		//delete dMesh_p;
-	}
+	
 	if (dMeshInstance_p)
 	{
 		delete dMeshInstance_p;

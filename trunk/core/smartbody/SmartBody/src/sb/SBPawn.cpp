@@ -356,6 +356,7 @@ void SBPawn::notify(SBSubject* subject)
 			
 			mcu_load_mesh(getName().c_str(), meshAttr->getValue().c_str(), SmartBody::SBScene::getScene()->getCommandManager(), "");
 		}
+#if 0
 		else if (attribute->getName() == "meshScale")
 		{
 			SmartBody::DoubleAttribute* meshAttr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
@@ -402,6 +403,7 @@ void SBPawn::notify(SBSubject* subject)
 				}
 			}
 		}
+#endif
 		else if (attribute->getName() == "visible")
 		{
 			/*

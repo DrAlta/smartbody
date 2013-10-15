@@ -510,11 +510,9 @@ void ParserOpenCOLLADA::nodeStr(const XMLCh* s, std::string& out)
 	xml_utils::xml_translate(&out, s);
 }
 
-void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFactor, std::string jointPrefix)
+void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, DeformableMesh* mesh, float scaleFactor, std::string jointPrefix)
 {
 	boost::char_separator<char> sep(" \n");
-
-	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->getCharacter( char_name );
 	//const DOMNodeList* list = node->getChildNodes();
 	DOMNode* curNode = node->getFirstChild();
 	while (curNode)
@@ -637,12 +635,7 @@ void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, const char* char_
 												jointName.erase(0, jointPrefix.size());
 											}
 											//cout << "joint name = " << jointName << endl;	
-											SmartBody::SBJoint* joint = char_p->getSkeleton()->getJointByName(jointName);
-											if (joint)
-												skinWeight->infJointName.push_back(joint->getName());
-											else
-												skinWeight->infJointName.push_back(jointName);
-
+											skinWeight->infJointName.push_back(jointName);
 										}
 										//if ( sourceId == bindWeightName && realNodeName == "float_array") // joint weights
 										if ( isBindWeights && realNodeName == "float_array") // joint weights
@@ -713,8 +706,8 @@ void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, const char* char_
 							}
 							childOfSkinCurNode = childOfSkinCurNode->getNextSibling();
 						}
-						if (char_p && char_p->dMesh_p)
-							char_p->dMesh_p->skinWeights.push_back(skinWeight);
+						if (mesh)
+							mesh->skinWeights.push_back(skinWeight);
 					} // end of if (childName == "skin")
 					if (childName == "morph")	// parsing morph targets
 					{
@@ -759,7 +752,7 @@ void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, const char* char_
 											refMesh.push_back((*it));
 										}
 										refMesh.push_back(morphName);
-										char_p->dMesh_p->morphTargets.insert(make_pair(morphFullName, refMesh));
+										mesh->morphTargets.insert(make_pair(morphFullName, refMesh));
 									}
 									childOfSourceCurNode = childOfSourceCurNode->getNextSibling();
 								}
@@ -773,7 +766,7 @@ void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, const char* char_
 		}
 		curNode = curNode->getNextSibling();
 	}
-
+	/*
 	// cache the joint names for each skin weight
 	if (char_p && char_p->dMesh_p)
 	{	
@@ -789,6 +782,7 @@ void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, const char* char_
 			}
 		}
 	}
+	*/
 }
 
 void ParserOpenCOLLADA::parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name)

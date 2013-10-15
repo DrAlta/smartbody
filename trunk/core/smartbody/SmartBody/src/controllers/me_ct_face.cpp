@@ -403,33 +403,37 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 		visemeChannels.push_back("au_9");
 #endif
 
-		std::map<std::string, float>::iterator iter = _character->dMesh_p->visemeWeightMap.begin();
-		for (; iter != _character->dMesh_p->visemeWeightMap.end(); ++iter)
+		DeformableMesh* mesh = _character->dMeshInstance_p->getDeformableMesh();
+		if (mesh)
 		{
-			iter->second = 0.0f;
-			if (iter->first == "neutral")
-				iter->second = 1.0f;
-		}
-
-		for (size_t i = 0; i < visemeChannels.size(); ++i)
-		{
-			std::string& visemeChannelName = visemeChannels[i];
-			int chanid = frame.context()->channels().search(visemeChannels[i], SkChannel::XPos);
-			if (chanid >= 0)
+			std::map<std::string, float>::iterator iter = mesh->visemeWeightMap.begin();
+			for (; iter != mesh->visemeWeightMap.end(); ++iter)
 			{
-				double v = frame.buffer()[frame.toBufferIndex(chanid)];
-				if (v < 0)
-					v = 0;
-				if (v > 1)
-					v = 1;
+				iter->second = 0.0f;
+				if (iter->first == "neutral")
+					iter->second = 1.0f;
+			}
 
-				_character->dMesh_p->visemeWeightMap[visemeChannels[i]] = float(v);
-			}
-			else
+			for (size_t i = 0; i < visemeChannels.size(); ++i)
 			{
-				;//LOG("channel not found %s", visemeChannelName.c_str());
+				std::string& visemeChannelName = visemeChannels[i];
+				int chanid = frame.context()->channels().search(visemeChannels[i], SkChannel::XPos);
+				if (chanid >= 0)
+				{
+					double v = frame.buffer()[frame.toBufferIndex(chanid)];
+					if (v < 0)
+						v = 0;
+					if (v > 1)
+						v = 1;
+
+					mesh->visemeWeightMap[visemeChannels[i]] = float(v);
+				}
+				else
+				{
+					;//LOG("channel not found %s", visemeChannelName.c_str());
+				}
 			}
-		}
+		}		
 		return continuing;
 	}
 	int nchan = base_channels.size();

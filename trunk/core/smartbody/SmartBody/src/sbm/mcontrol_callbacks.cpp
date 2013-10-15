@@ -1529,6 +1529,7 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBComma
 		SrSnModel* srSnModelStatic = new SrSnModel();
 		srSnModelStatic->shape(*meshModelVec[i]);
 		srSnModelStatic->shape().name = meshModelVec[i]->name;
+#if 0
 		if (pawn->dMesh_p)
 		{
 			pawn->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
@@ -1540,7 +1541,7 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBComma
 			pawn->dMesh_p->dMeshStatic_p.push_back(srSnModelStatic);
 			srSnModelStatic->ref();
 		}
-
+#endif
 		SrSnGroup* meshGroup = new SrSnGroup();
 		meshGroup->separator(true);
 		meshGroup->add(srSnModelStatic);
@@ -1894,7 +1895,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 		srSnModelDynamic->visible(false);
 		srSnModelStatic->shape().name = meshModelVec[i]->name;
 		srSnModelDynamic->shape().name = meshModelVec[i]->name;
-
+#if 0
 		if (char_p->dMesh_p)
 		{
 			if (visemeName != "")
@@ -1914,6 +1915,7 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 			srSnModelDynamic->ref();
 			srSnModelStatic->ref();
 		}
+#endif
 		//mcu.root_group_p->add(srSnModelDynamic);
 	
 		delete meshModelVec[i];
@@ -1970,7 +1972,9 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 				return CMD_FAILURE;
 			}
 			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(char_name);
+#if 0
 			ParserCOLLADAFast::parseLibraryControllers(controllerNode, character->dMesh_p, scaleFactor, jointNamePrefix);
+#endif
 		}	
 		else if (ext == ".xml" || ext == ".XML")
 		{	
@@ -1993,6 +1997,7 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 			DOMDocument* doc = parser->getDocument();
 
 			SmartBody::SBCharacter* sbmChar = SmartBody::SBScene::getScene()->getCharacter(char_name);
+#if 0
 			if (sbmChar && sbmChar->dMesh_p)
 			{
 				DOMNode* controllerNode = ParserOpenCOLLADA::getNode("mesh", doc);		
@@ -2024,7 +2029,9 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 					}
 				}
 			}	
+#endif
 		}
+
 		if (rapidFile)
 			delete rapidFile;
 	
@@ -2091,11 +2098,14 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 					LOG("mcu_character_load_skinweights ERR: no binding info contained");
 					return CMD_FAILURE;
 				}
+#if 0
 				ParserOpenCOLLADA::parseLibraryControllers(controllerNode, char_name, scaleFactor, jointNamePrefix);
+#endif
 			}	
 			else if (ext == ".xml" || ext == ".XML")
 			{
 				SmartBody::SBCharacter* sbmChar = SmartBody::SBScene::getScene()->getCharacter(char_name);
+#if 0
 				if (sbmChar && sbmChar->dMesh_p)
 				{
 					DOMNode* controllerNode = ParserOpenCOLLADA::getNode("mesh", doc);		
@@ -2127,6 +2137,7 @@ int mcu_character_load_skinweights( const char* char_name, const char* skin_file
 						}
 					}
 				}
+#endif
 			}
 		
 		}

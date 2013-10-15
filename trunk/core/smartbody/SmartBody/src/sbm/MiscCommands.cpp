@@ -904,12 +904,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(character);
 	if (cmd == "mesh")
-	{
-		if (!character->dMesh_p)
-		{
-			LOG("Character %s has no dynamic mesh, cannot perform mesh operations.", character->getName().c_str());
-			return CMD_FAILURE;
-		}
+	{	
 		char* meshdir = args.read_token();
 		if (!meshdir)
 		{
@@ -924,7 +919,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 			DeformableMesh* deformableMesh = mesh;
 			// mesh already exist, 
 			LOG("Mesh %s already exist, using mesh instance.",meshName.c_str());
-			character->dMesh_p = deformableMesh;	
+			//character->dMesh_p = deformableMesh;	
 			character->dMeshInstance_p->setDeformableMesh(deformableMesh);
 			return CMD_SUCCESS;
 		}
@@ -1088,6 +1083,8 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 				}
 			}
 		}	
+
+#if 0
 		//LOG("set dynamic mesh for character, dynamicmesh = %d, skinweight = %d", character->dMesh_p->dMeshDynamic_p.size() > 0, character->dMesh_p->skinWeights.size());
 		if (character->dMesh_p->dMeshDynamic_p.size() > 0 && character->dMesh_p->skinWeights.size() > 0) // successfully loaded all skin mesh data
 		{
@@ -1096,8 +1093,8 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 			scene->getAssetManager()->addDeformableMesh(meshName, character->dMesh_p);
 			LOG("character %s, set deformable mesh",character->getName().c_str());
 			character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
-
 		}
+#endif
 
 //		if (  scene->getCharacterListener() )
 	//	{		
@@ -1107,6 +1104,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 	}
 	else if (cmd == "meshstatus")
 	{
+#if 0
 		if (!character->dMesh_p)
 		{
 			LOG("Character %s has no dynamic mesh, cannot perform mesh operations.", character->getName().c_str());
@@ -1125,27 +1123,31 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 			SrModel& model = srsnModel->shape();
 			LOG("Name: %s  Verts: %d  Faces: %d  Materials: %d", (const char*) model.name, model.V.size(), model.F.size(), model.M.size());
 		}
-
+#endif
 		return CMD_SUCCESS;
 	}
 	else if( cmd == "smoothbindmesh" )
 	{
+#if 0
 		if (!character->dMesh_p)
 		{
 			LOG("Character %s has no dynamic mesh, cannot perform mesh operations.", character->getName().c_str());
 			return CMD_FAILURE;
 		}
+#endif
 		char* obj_file = args.read_token();
 		char* option = args.read_remainder_raw();
 		return mcu_character_load_mesh( character->getName().c_str(), obj_file, SmartBody::SBScene::getScene()->getCommandManager(), option );
 	} 
 	else 
 		if( cmd == "smoothbindweight" ) {
+#if 0
 			if (!character->dMesh_p)
 			{
 				LOG("Character %s has no dynamic mesh, cannot perform mesh operations.", character->getName().c_str());
 				return CMD_FAILURE;
 			}
+#endif
 			char* skin_file = args.read_token();
 			char* option = args.read_token();
 			char* prefixName = NULL;
