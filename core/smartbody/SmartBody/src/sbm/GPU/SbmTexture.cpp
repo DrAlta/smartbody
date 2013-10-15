@@ -256,3 +256,9 @@ void SbmTexture::buildTexture()
 #endif
 }
 
+unsigned char* SbmTexture::getBuffer()
+{
+	if (imgBuffer.size() == 0) return NULL;
+	
+	return &imgBuffer[0];
+}
