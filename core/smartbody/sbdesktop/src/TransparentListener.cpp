@@ -50,24 +50,14 @@ void TransparentListener::OnCharacterCreate( const std::string & name, const std
 
 
 	// remove any existing deformable mesh
-	if (character->dMesh_p)
-	{
-		for (size_t i = 0; i < character->dMesh_p->dMeshDynamic_p.size(); i++)
-		{
-			SmartBody::SBScene::getScene()->getRootGroup()->remove( character->dMesh_p->dMeshDynamic_p[i] );
-		}
-		delete character->dMesh_p;
-		character->dMesh_p = NULL;
-	}
+	
 
 	#if defined(__ANDROID__) || defined(SBM_IPHONE)
 		character->dMesh_p = new DeformableMesh();
-	#else
-		character->dMesh_p =  new SbmDeformableMeshGPU();
+	#else		
 		character->dMeshInstance_p =  new SbmDeformableMeshGPUInstance();
 	#endif
-	SmartBody::SBSkeleton* sbSkel = character->getSkeleton();
-	character->dMesh_p->setSkeleton(sbSkel);
+	SmartBody::SBSkeleton* sbSkel = character->getSkeleton();	
 	character->dMeshInstance_p->setSkeleton(sbSkel);
 }
 
@@ -89,18 +79,7 @@ void TransparentListener::OnCharacterDelete( const std::string & name )
 		character->scene_p->unref();
 		character->scene_p = NULL;
 	}
-	// remove any existing deformable mesh
-	if (character->dMesh_p)
-	{
-		for (size_t i = 0; i < character->dMesh_p->dMeshDynamic_p.size(); i++)
-		{
-			SmartBody::SBScene::getScene()->getRootGroup()->remove( character->dMesh_p->dMeshDynamic_p[i] );
-		}
-		delete character->dMesh_p;
-		character->dMesh_p = NULL;
-	}
-
-	
+	// remove any existing deformable mesh		
 }
 
 void TransparentListener::OnCharacterUpdate( const std::string & name)
@@ -142,18 +121,14 @@ void TransparentListener::OnPawnCreate( const std::string & name )
 		pawn->scene_p = NULL;
 	}
 	// remove any existing deformable mesh	
-	if (pawn->dMesh_p)
-	{
-		delete pawn->dMesh_p;
-		pawn->dMesh_p = NULL;
-	}	
+	
 	if (pawn->dMeshInstance_p)
 	{
 		delete pawn->dMeshInstance_p;
 		pawn->dMeshInstance_p = NULL;
 	}
 
-	pawn->dMesh_p =  new SbmDeformableMeshGPU();
+	//pawn->dMesh_p =  new SbmDeformableMeshGPU();
 	pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
 
 	pawn->scene_p = new SkScene();

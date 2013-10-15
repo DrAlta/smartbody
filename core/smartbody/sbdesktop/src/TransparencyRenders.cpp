@@ -125,7 +125,7 @@ void TransparencyRenders::drawCharacters(bool shadowPass)
 		 iter++)
 	{
 		SmartBody::SBCharacter* cur =  scene->getCharacter(*iter);
-		if(cur->dMesh_p && cur->dMeshInstance_p)
+		if(cur->dMeshInstance_p)
 		{
 			//cur->dMeshInstance_p->update();
 			cur->dMeshInstance_p->setVisibility(true);

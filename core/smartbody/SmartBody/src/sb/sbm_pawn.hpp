@@ -100,7 +100,6 @@ protected:
 public:  // TODO - properly encapsulate / privatize the following
 	SkSkeleton*	_skeleton;  // MAY BE NULL!!!
 	SkScene*		scene_p;	 // Skeleton Scene and Rigid Mesh		
-	DeformableMesh*	dMesh_p;	 // Deformable Mesh using smooth skinning	
 	DeformableMeshInstance* dMeshInstance_p;
 	SrSnGroup* blendMeshGroup;
 	SteerLib::ObstacleInterface* steeringSpaceObj_p;

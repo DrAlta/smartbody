@@ -34,6 +34,7 @@
 #include "sbm/gwiz_math.h"
 
 typedef std::map<std::string, std::vector<SrVec> > VecListMap;
+class DeformableMesh;
 
 struct ColladaFloatArray
 {
@@ -73,7 +74,7 @@ class ParserOpenCOLLADA
 		static bool parseStaticMesh(std::vector<SrModel*>& meshModelVecs, std::string fileName);
 
 		// parse nodes
-		static void parseLibraryControllers(DOMNode* node, const char* char_name, float scaleFactor, std::string jointPrefix);
+		static void parseLibraryControllers(DOMNode* node, DeformableMesh* mesh, float scaleFactor, std::string jointPrefix);
 		static void parseLibraryVisualScenes(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name);
 		static void parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, std::map<std::string, std::string>& materialId2Name, SkJoint* parent = NULL, bool hasRootJoint = false);
 		static void parseLibraryAnimations(DOMNode* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order, bool zaxis = false);

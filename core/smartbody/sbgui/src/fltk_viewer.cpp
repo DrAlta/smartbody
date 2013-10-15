@@ -5119,7 +5119,7 @@ void FltkViewer::drawDeformableModels()
 		pawnIter++)
 	{
 		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
-		if(pawn->dMesh_p && pawn->dMeshInstance_p)
+		if(pawn->dMeshInstance_p)
 		{
 			//pawn->dMesh_p->update();
 			bool useBlendShape = false;
@@ -5128,10 +5128,11 @@ void FltkViewer::drawDeformableModels()
 			{
 				useBlendShape = character->getBoolAttribute("blendshape");
 			}
-			if (useBlendShape)
+			if (useBlendShape && character->dMeshInstance_p->getDeformableMesh())
 			{
-				character->dMesh_p->blendShapes();
-				character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
+				//character->dMesh_p->blendShapes();
+				character->dMeshInstance_p->getDeformableMesh()->blendShapes();
+				//character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
 			}
 			pawn->dMeshInstance_p->update();
 			if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && pawn->dMeshInstance_p->getVisibility()) || _data->showSkinWeight)

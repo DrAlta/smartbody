@@ -190,7 +190,7 @@ void RetargetStepWindow::updatePawnList()
 	{
 		SmartBody::SBPawn* pawn = scene->getPawn(pawns[c]);
 		SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(pawn);
-		if (!sbChar && pawn->dMesh_p && pawn->dMesh_p->dMeshStatic_p.size() > 0) // only add pawns that has attached mesh
+		if (!sbChar && pawn->dMeshInstance_p && pawn->dMeshInstance_p->getDeformableMesh()) // only add pawns that has attached mesh
 		{
 			_choicePawns->add(pawns[c].c_str());
 		}		
@@ -236,14 +236,15 @@ void RetargetStepWindow::applyAutoRig()
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string pawnName = _choicePawns->text();
 	SmartBody::SBPawn* sbPawn = scene->getPawn(pawnName);	
-	if (!sbPawn || sbPawn->dMesh_p->dMeshStatic_p.size() == 0)
+	if (!sbPawn || sbPawn->dMeshInstance_p->getDeformableMesh() == NULL)
 	{
 		LOG("AutoRigging Fail : No pawn is selected, or the selected pawn does not contain 3D mesh for rigging.");
 		return;
 	}
 	
 	SBAutoRigManager& autoRigManager = SBAutoRigManager::singleton();
-	SrModel& model = sbPawn->dMesh_p->dMeshStatic_p[0]->shape();
+	DeformableMesh* mesh = sbPawn->dMeshInstance_p->getDeformableMesh();
+	SrModel& model = mesh->dMeshStatic_p[0]->shape();
 	std::string modelName = (const char*) model.name;
 	std::string filebasename = boost::filesystem::basename(modelName);
 	std::string fileextension = boost::filesystem::extension(modelName);
