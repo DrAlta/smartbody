@@ -40,7 +40,10 @@ std::vector<SBAsset*> SBAssetHandlerSkm::getAssets(const std::string& path)
 		scale = SmartBody::SBScene::getScene()->getDoubleAttribute("globalMotionScale");
 	parseSuccessful = motion->load( fullin, scale );
 	if (parseSuccessful)
+	{
+		motion->filename(convertedPath.c_str());
 		assets.push_back(motion);
+	}
 	else
 		LOG("Could not read .skm file %s", convertedPath.c_str());
 
