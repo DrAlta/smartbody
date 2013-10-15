@@ -251,7 +251,7 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 			if ( ent == NULL )
 				continue;
 			std::map<std::string, Ogre::Vector3>& intialBonePositionMap = m_initialBonePositions[name];
-			Ogre::Skeleton* skel = ent->getSkeleton();			
+			Ogre::Skeleton* skel = ent->getSkeleton();				
 			if (!skel) continue;
 			SmartBody::SBSkeleton* sbSkel = character->getSkeleton();
 			for (int jId = 0; jId < sbSkel->getNumJoints(); jId++)

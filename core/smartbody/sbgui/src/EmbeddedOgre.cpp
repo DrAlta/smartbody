@@ -725,17 +725,20 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 	Ogre::Entity* outChar = NULL;
 	std::string skeletonName = sbChar->getSkeleton()->getName();
 	std::string meshName = sbChar->getStringAttribute("deformableMesh");
+	DeformableMeshInstance* meshInstance = sbChar->dMeshInstance_p;
 	if (meshName == "") meshName = sbChar->getName();
 
 	SmartBody::SBSkeleton* charSkel = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
 	addSBSkeleton(charSkel);
-	addDeformableMesh(meshName, sbChar->dMesh_p);
+	addDeformableMesh(meshName, meshInstance);
 	Ogre::SkeletonPtr ogreSkel = Ogre::SkeletonManager::getSingleton().getByName(skeletonName);
 	Ogre::MeshPtr     ogreMesh = Ogre::MeshManager::getSingleton().getByName(meshName);	
 	if (ogreSkel.isNull() || ogreMesh.isNull()) return NULL;
-   
+    if (!meshInstance) return NULL;
 
-	DeformableMesh* deformMesh = sbChar->dMesh_p;	
+	DeformableMesh* deformMesh = meshInstance->getDeformableMesh();
+	if (!deformMesh) return NULL;
+
  	ogreMesh->setSkeletonName(skeletonName);	
  	ogreMesh->_notifySkeleton(ogreSkel);
 	// combine skeleton and mesh with skinning information	
@@ -776,7 +779,7 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 				// The index of the vertex in the vertex buffer
 				vba.vertexIndex = static_cast<unsigned int>(j);							
 				int origBoneID = deformMesh->boneIDBuf[m][j][k];
-				std::string jName = deformMesh->boneJointList[origBoneID]->getName();
+				std::string jName = deformMesh->boneJointNameList[origBoneID];
 				//vba.boneIndex = (ogreSkel->getBone(jName)->getHandle()+2)%ogreSkel->getNumBones();				o
 				vba.boneIndex = ogreSkel->getBone(jName)->getHandle();
 				//if (origBoneID != vba.boneIndex)
@@ -880,7 +883,7 @@ void EmbeddedOgre::addSBSkeleton( SmartBody::SBSkeleton* skel )
 	ogreSkel->load(); // load the skeleton	
 }
 
-void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh )
+void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstance* meshInstance )
 {
 #if 0
 	Ogre::MeshManager& meshManager = Ogre::MeshManager::getSingleton();	
@@ -957,12 +960,16 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 	ogreMesh->load(); // load the mesh
 
 #else 
+	if (!meshInstance) return;
 	// do not create anything if there is no skin weights or meshes
+	DeformableMesh* mesh = meshInstance->getDeformableMesh();
+	if (!mesh) return;
 	if (mesh->skinWeights.size() == 0 || mesh->dMeshStatic_p.size() == 0) return; 
 
 	Ogre::MeshManager& meshManager = Ogre::MeshManager::getSingleton();	
 	if (!meshManager.getByName(meshName).isNull()) return; // mesh already exists
 
+	float meshScale = meshInstance->getMeshScale();
 	Ogre::MeshPtr ogreMesh = meshManager.create(meshName,"General",true);
 	mesh->buildVertexBuffer(); // if not already built
 	Ogre::VertexData* vtxData = new Ogre::VertexData();
@@ -992,14 +999,15 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMesh* mesh
 	bbMin = SrVec((float)1e20,(float)1e20,(float)1e20);
 	for (unsigned int j=0;j<vtxData->vertexCount;j++)
 	{
+		SrVec meshPos = mesh->posBuf[j]*meshScale;
 		for (int k=0;k<3;k++)
 		{
-			tempFloatArray[j*6+k] = mesh->posBuf[j][k];
+			tempFloatArray[j*6+k] = meshPos[k];
 			tempFloatArray[j*6+3+k] = mesh->normalBuf[j][k];
-			if (bbMax[k] < mesh->posBuf[j][k])
-				bbMax[k] = mesh->posBuf[j][k];
-			if (bbMin[k] > mesh->posBuf[j][k])
-				bbMin[k] = mesh->posBuf[j][k];
+			if (bbMax[k] < meshPos[k])
+				bbMax[k] = meshPos[k];
+			if (bbMin[k] > meshPos[k])
+				bbMin[k] = meshPos[k];
 		}		
 		//LOG("vtx %d, mesh normal = %f %f %f", j, mesh->normalBuf[j][0], mesh->normalBuf[j][1], mesh->normalBuf[j][2]);
 	}

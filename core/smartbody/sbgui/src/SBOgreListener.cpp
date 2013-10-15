@@ -1,7 +1,9 @@
 #include "SBOgreListener.h"
 #include <sb/SBCharacter.h>
+#include <sb/SBPawn.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
+#include <sb/SBAttribute.h>
 
 #ifdef INTMAX_C 
 #undef INTMAX_C
@@ -28,21 +30,35 @@ OgreListener::~OgreListener(void)
 
 void OgreListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
+	if (!pawn)
+		return;
 		// created a ogre entity only when the character is changed and valid
 	std::string logMsg = "Character " + name ;
 	LogManager::getSingleton().logMessage(logMsg.c_str());
 	SBCharacter* sbChar = SBScene::getScene()->getCharacter(name);
 	if (!sbChar) return; // no smartbody character exist ?
-
 	Entity * ent = NULL;
 	if (ogreInterface->getSceneManager()->hasEntity(name))
 		return;
+
+
+	SmartBody::SBAttribute* attr = pawn->getAttribute("mesh");
+	if (attr)
+		attr->registerObserver(this);
+	attr = pawn->getAttribute("deformableMesh");
+	if (attr)
+		attr->registerObserver(this);
+
+	attr = pawn->getAttribute("deformableMeshScale");
+	if (attr)
+		attr->registerObserver(this);
 
 	try
 	{
 		//Create character from characterType
 		//ent = ogreInterface->getSceneManager()->createEntity(name, name + ".mesh" );
-		LOG("create ogre chracter = %s",name.c_str());
+		//LOG("create ogre chracter = %s",name.c_str());
 		ent = ogreInterface->createOgreCharacter(sbChar);
 	}
 	catch( Ogre::ItemIdentityException& )
@@ -98,7 +114,17 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 
 void OgreListener::OnCharacterDelete( const std::string & name )
 {
-	SceneNode * node = (SceneNode *)ogreInterface->getSceneManager()->getRootSceneNode()->getChild(name);
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
+	if (!pawn)
+		return;
+
+	SceneManager* sceneManager = ogreInterface->getSceneManager();
+	if (!sceneManager->hasSceneNode(name)) return;
+
+	SceneNode* rootSceneNode = ogreInterface->getSceneManager()->getRootSceneNode();
+	if (!rootSceneNode) return;
+	
+	SceneNode * node = (SceneNode *)rootSceneNode->getChild(name);
 	if (!node) return;
 
 	node->detachAllObjects();
@@ -130,8 +156,26 @@ void OgreListener::OnCharacterDelete( const std::string & name )
 
 void OgreListener::OnCharacterUpdate( const std::string & name )
 {
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
+	if (!pawn)
+		return;
+
 	OnCharacterDelete(name);
 	OnCharacterCreate(name, "");
+}
+
+void OgreListener::notify(SmartBody::SBSubject* subject)
+{
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
+	if (attribute)
+	{
+		SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(attribute->getObject());
+		const std::string& name = attribute->getName();
+		if (name == "deformableMesh")
+		{
+			OnCharacterUpdate(pawn->getName());
+		}
+	}	
 }
 
 void OgreListener::OnPawnCreate( const std::string & name )

@@ -443,6 +443,7 @@ bool DeformableMesh::buildVertexBuffer()
 				{
 					boneJointIdxMap[jointName] = nTotalBones++;		
 					boneJointList.push_back(curJoint);
+					boneJointNameList.push_back(jointName);
 					//bindPoseMatList.push_back(skinWeight->bindShapeMat*skinWeight->bindPoseMat[k]);
 					bindPoseMatList.push_back(skinWeight->bindPoseMat[k]);
 				}
@@ -905,7 +906,8 @@ void DeformableMeshInstance::update()
 						double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
 						globalCounter ++;
 						SrVec transformVec = _meshScale*(scaledSkinLocalVec * skinWeight->bindShapeMat * invBMat);
-						finalVec = finalVec + (float(jointWeight) * (transformVec  * gMat));						
+						finalVec = finalVec + (float(jointWeight) * (transformVec  * gMat));		
+						//finalVec = finalVec + (float(jointWeight) * (scaledSkinLocalVec * skinWeight->bindShapeMat * invBMat  * gMat));	
 					}
 					_deformPosBuf[iVtx] = finalVec;
 					if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
