@@ -235,7 +235,7 @@ brad.createStandardControllers()
 brad.setFaceDefinition(bradFace)
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrBrad')
+brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 # Lip syncing diphone setup
 brad.setStringAttribute('lipSyncSetName', 'default')
 brad.setBoolAttribute('usePhoneBigram', True)
@@ -259,7 +259,7 @@ rachel.createStandardControllers()
 rachel.setFaceDefinition(rachelFace)
 # Deformable mesh
 rachel.setDoubleAttribute('deformableMeshScale', .01)
-rachel.setStringAttribute('deformableMesh', 'ChrRachel')
+rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 # Lip syncing diphone setup
 rachel.setStringAttribute('lipSyncSetName', 'default')
 rachel.setBoolAttribute('usePhoneBigram', True)

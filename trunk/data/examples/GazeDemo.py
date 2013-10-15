@@ -51,7 +51,7 @@ brad.setHPR(SrVec(-17, 0, 0))
 brad.createStandardControllers()
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrBrad')
+brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
 
 print 'Setting up Rachel'
@@ -64,7 +64,7 @@ rachel.setHPR(SrVec(17, 0, 0))
 rachel.createStandardControllers()
 # Deformable mesh
 rachel.setDoubleAttribute('deformableMeshScale', .01)
-rachel.setStringAttribute('deformableMesh', 'ChrRachel')
+rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 
 # Add pawns in scene

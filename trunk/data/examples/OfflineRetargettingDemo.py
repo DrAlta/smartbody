@@ -38,7 +38,7 @@ source.setPosition(sourcePos)
 source.createStandardControllers()
 # Deformable mesh
 source.setDoubleAttribute('deformableMeshScale', 1)
-source.setStringAttribute('deformableMesh', 'ChrBrad')
+source.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 bml.execBML('source', '<body posture="ChrBrad@Idle01"/>')
 
 # Turn on GPU deformable geometry

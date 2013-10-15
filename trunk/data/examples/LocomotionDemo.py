@@ -59,7 +59,7 @@ for i in range(amount):
 	brad.createStandardControllers()
 	# Set deformable mesh
 	brad.setDoubleAttribute('deformableMeshScale', .01)
-	brad.setStringAttribute('deformableMesh', 'ChrBrad')
+	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Retarget character
 	if i== 0 : 
 		scene.run('BehaviorSetMaleLocomotion.py')

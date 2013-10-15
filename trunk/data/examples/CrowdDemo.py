@@ -33,7 +33,7 @@ steerManager = scene.getSteerManager()
 
 # Setting up Brads
 print 'Setting up Brads'
-amount = 2
+amount = 20
 row = 0; column = 0; 
 offsetX = 0; offsetZ = 0;
 for i in range(amount):
@@ -54,7 +54,7 @@ for i in range(amount):
 	brad.createStandardControllers()
 	# Set deformable mesh
 	brad.setDoubleAttribute('deformableMeshScale', .01)
-	brad.setStringAttribute('deformableMesh', 'ChrBrad')
+	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Retarget character
 	#etargetCharacter(baseName, 'ChrBrad.sk', False)
 	# setup mocap locomotion
