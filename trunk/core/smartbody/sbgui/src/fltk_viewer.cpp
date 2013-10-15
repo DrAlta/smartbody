@@ -5134,7 +5134,7 @@ void FltkViewer::drawDeformableModels()
 				character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
 			}
 			pawn->dMeshInstance_p->update();
-			if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && _data->showdeformablegeometry) || _data->showSkinWeight)
+			if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && pawn->dMeshInstance_p->getVisibility()) || _data->showSkinWeight)
 			{
 				SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p, _data->showSkinWeight);
 //				if (pawn->scene_p)
