@@ -1,9 +1,10 @@
 #ifndef SBOGRELISTENER_H
 #define SBOGRELISTENER_H
 #include <sb/SBSceneListener.h>
+#include <sb/SBObserver.h>
 
 class EmbeddedOgre;
-class OgreListener : public SmartBody::SBSceneListener
+class OgreListener : public SmartBody::SBSceneListener, public SmartBody::SBObserver
 {
 public:
 	OgreListener(EmbeddedOgre* ogreInterface);
@@ -17,6 +18,7 @@ public:
 	virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime );
 	virtual void OnChannel( const std::string & name, const std::string & channelName, const float value);
 	virtual void OnReset();
+	virtual void notify(SmartBody::SBSubject* subject);
 protected:
 	EmbeddedOgre* ogreInterface;	
 };

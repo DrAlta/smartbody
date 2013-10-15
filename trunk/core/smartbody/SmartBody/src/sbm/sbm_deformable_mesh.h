@@ -80,6 +80,7 @@ public:
 	std::vector<SrVec4>         boneWeightBuf[2];
 	std::map<std::string,int>   boneJointIdxMap;
 	std::vector<SkJoint*>		boneJointList;	
+	std::vector<std::string>    boneJointNameList;
 	std::vector<SrMat>          bindPoseMatList;	
 	std::map<int,std::vector<int> > vtxNewVtxIdxMap;
 
@@ -125,6 +126,7 @@ public:
 	SBAPI virtual void setSkeleton(SkSkeleton* skel);	
 	SBAPI virtual void setVisibility(int deformableMesh);
 	SBAPI virtual void setMeshScale(float scale);
+	SBAPI float   getMeshScale() { return _meshScale; }
 	SBAPI bool    getVisibility();
 	SBAPI virtual void update();
 	SBAPI DeformableMesh* getDeformableMesh() { return _mesh; }
