@@ -44,6 +44,7 @@ SBCharacter::SBCharacter() : SbmCharacter()
 
 SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name.c_str(), type)
 {
+	setAttributeGroupPriority("Display", 110);
 	setAttributeGroupPriority("Voice", 170);
 	setAttributeGroupPriority("Lip Sync", 180);
 	setAttributeGroupPriority("Gestures", 190);
@@ -120,6 +121,16 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createBoolAttribute("ikPostFix", false, true, "Retargeting", 200, false, false, false, "Post-Processing IK to fix foot sliding.");
 	createBoolAttribute("terrainWalk", false, true, "Retargeting", 200, false, false, false, "Post-Processing to adjust the character for different terrain height. ikPostFix must be on for this to work.");
 	createBoolAttribute("onlineRetarget", true, true, "Retargeting", 200, false, false, false, "Use on-line retargeting to adjust joint angles when playing animation blend.");
+
+	SmartBody::StringAttribute* displayAttribute = createStringAttribute("displayType", "bones", true, "Display", 210, false, false, false, "How to display the character: bones, colgeo, visgeo, axis, mesh, GPUmesh");
+	std::vector<std::string> displayVec;
+	displayVec.push_back("bones");
+	displayVec.push_back("colgeo");
+	displayVec.push_back("visgeo");
+	displayVec.push_back("axis");
+	displayVec.push_back("mesh");
+	displayVec.push_back("GPUmesh");
+	displayAttribute->setValidValues(displayVec);
 
 	createStringAttribute("deformableMesh", "", true, "Display", 220, false, false, false, "Directory that contains mesh information.");
 	createDoubleAttribute("deformableMeshScale", 1, true, "Display", 230, false, false, false, "Scale factor when loading mesh.");
