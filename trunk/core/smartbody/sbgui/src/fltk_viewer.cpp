@@ -2241,6 +2241,11 @@ int FltkViewer::handle ( int event )
 				if (selectedPawn)
 				{
 					SrBox box = selectedPawn->getSkeleton()->getBoundingBox();
+					if (box.volume() < .0001)
+					{
+						double val = 1.0 / SmartBody::SBScene::getScene()->getScale() * .5;
+						box.grows(val, val, val);
+					} 
 					sceneBox.extend(box);
 				}
 				else
@@ -2706,10 +2711,10 @@ int FltkViewer::handle_default_camera_manipulation ( const SrEvent &e, SrCamera*
 		  cameraPos += adjustment;
 		  SrVec oldEyePos = camera->getEye();
 		  camera->setEye(cameraPos.x, cameraPos.y, cameraPos.z);
-		  SrVec cameraDiff = camera->getEye() - oldEyePos;
-		  SrVec tmpCenter = camera->getCenter();
-		  tmpCenter += cameraDiff;
-		  camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);
+//		  SrVec cameraDiff = camera->getEye() - oldEyePos;
+//		  SrVec tmpCenter = camera->getCenter();
+//		  tmpCenter += cameraDiff;
+//		  camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);
 		  redraw();
 	  }
     }   
