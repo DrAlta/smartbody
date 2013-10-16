@@ -30,7 +30,9 @@ brad.setSkeleton(bradSkeleton)
 brad.createStandardControllers()
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrBrad')
+brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+# show the character
+brad.setStringAttribute('displayType', 'GPUmesh')
 
 # setup behavior sets
 scene.addAssetPath("script", "behaviorsets") # add search path for behavior set
