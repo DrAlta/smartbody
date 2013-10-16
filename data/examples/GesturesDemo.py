@@ -200,8 +200,8 @@ for i in range(2):
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
-	
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
+
 last = 0
 delay = 5
 class GesturesDemo(SBScript):

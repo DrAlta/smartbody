@@ -116,7 +116,8 @@ pawn3.setPosition(SrVec(-0.65, 1.6 , 1))
 
 # Turn on GPU deformable geomtery for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
+
 
 # Variables to perform pick up and put down
 area1PickUp = False

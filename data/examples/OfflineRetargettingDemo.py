@@ -42,8 +42,9 @@ source.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 bml.execBML('source', '<body posture="ChrBrad@Idle01"/>')
 
 # Turn on GPU deformable geometry
-scene.command("char target viewer deformableGPU")
-scene.command("char source viewer deformableGPU")
+target.setStringAttribute("displayType", "GPUmesh")
+source.setStringAttribute("displayType", "GPUmesh")
+
 
 # Run motion retarget script
 scene.run('motion-retarget.py')

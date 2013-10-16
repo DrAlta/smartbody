@@ -65,7 +65,7 @@ for i in range(amount):
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
 
 # Set camera position
 scene.getPawn('camera').setPosition(SrVec(0, -50, 0))

@@ -74,7 +74,7 @@ bml.execBML('chr2D', '<body posture="ChrUtah_Idle001"/>')
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
 
 # Set up blends
 blendManager = scene.getBlendManager()

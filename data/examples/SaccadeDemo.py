@@ -57,7 +57,7 @@ for i in range(1):
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
 
 # Talk
 bml.execBML('ChrBrad0', '<saccade mode="talk"/>')

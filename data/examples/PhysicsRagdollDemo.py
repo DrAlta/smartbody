@@ -79,7 +79,7 @@ wall4.setPosition(SrVec(90, 100, 150))
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
 
 # Configuring character physics
 print 'Configuring character physics'
