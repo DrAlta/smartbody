@@ -42,6 +42,7 @@
 # include <sr/sr_polygons.h>
 #include <sbm/GPU/SbmTexture.h>
 #include <sbm/sbm_deformable_mesh.h>
+#include <sb/SBSkeleton.h>
 
 # include <sr/sr_sn.h>
 # include <sr/sr_sn_shape.h>
@@ -61,6 +62,15 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
         //LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
         return; // no deformable mesh
     }
+
+	if (!mesh->isSkinnedMesh())
+	{
+		SmartBody::SBSkeleton* skel = shape->getSkeleton();
+		SrMat woMat = skel->root()->gmat();
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glMultMatrix(woMat);
+	}
 
 	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
 	glEnable(GL_LIGHTING);
@@ -120,7 +130,10 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);	
-	
+	if (!mesh->isSkinnedMesh())
+	{
+		glPopMatrix();
+	}
 }
 
 void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )

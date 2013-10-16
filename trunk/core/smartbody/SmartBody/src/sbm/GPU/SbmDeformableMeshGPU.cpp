@@ -1276,7 +1276,7 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 	if (skinWeights.size() == 0 )
 		return false;
 	if (initGPUVertexBuffer) return true;
-	DeformableMesh::buildVertexBuffer();
+	bool hasSkinBuffer = DeformableMesh::buildSkinnedVertexBuffer();
 	//GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
 	VBOPos = new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuf);		
 	VBOTangent = new VBOVec3f((char*)"Tangent",VERTEX_TANGENT, tangentBuf);
@@ -1385,12 +1385,14 @@ void SbmDeformableMeshGPUInstance::update()
 	if (!_skeleton || !_mesh) return; // do nothing if there is no mesh or skeleton in the instance
 	if (SbmDeformableMeshGPU::disableRendering) return; // do nothing
 	if (!_updateMesh) return;
+	if (isStaticMesh()) return;
 
 	if (!SbmDeformableMeshGPU::useGPUDeformableMesh)
 	{
 		DeformableMeshInstance::update();		
 		return;
 	}	
+
 	
 	SbmShaderProgram* program = SbmShaderManager::singleton().getShader(shaderName);	
 	bool hasGLContext = SbmShaderManager::singleton().initOpenGL() && SbmShaderManager::singleton().initGLExtension();	

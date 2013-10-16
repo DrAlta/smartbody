@@ -970,7 +970,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 
 	float meshScale = meshInstance->getMeshScale();
 	Ogre::MeshPtr ogreMesh = meshManager.create(meshName,"General",true);
-	mesh->buildVertexBuffer(); // if not already built
+	mesh->buildSkinnedVertexBuffer(); // if not already built
 	Ogre::VertexData* vtxData = new Ogre::VertexData();
 	ogreMesh->sharedVertexData = vtxData;
 	vtxData->vertexCount = mesh->posBuf.size();
