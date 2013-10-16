@@ -311,7 +311,6 @@ void EmbeddedOgre::updateOgreLights()
 	if (ogreSceneMgr->getShadowDirectionalLightExtrusionDistance() != 30.f*inverseScale)
 		ogreSceneMgr->setShadowDirectionalLightExtrusionDistance(30.f*inverseScale);
 
-
 	if (numLightsInScene == 0)
 	{
 		Light* light;
@@ -324,7 +323,7 @@ void EmbeddedOgre::updateOgreLights()
 		}
 
 		SrMat mat;
-		sr_euler_mat_xyz (mat, SR_TORAD(-72), SR_TORAD(180), SR_TORAD(-165));
+		sr_euler_mat_xyz (mat, SR_TORAD(0), SR_TORAD(0), SR_TORAD(135));
 		SrQuat orientation(mat);
 		SrVec up(0,1,0);
 		SrVec lightDirection = up * orientation;
@@ -340,7 +339,7 @@ void EmbeddedOgre::updateOgreLights()
 			light->setType(Light::LT_DIRECTIONAL);
 		}
 
-		sr_euler_mat_xyz (mat, SR_TORAD(1.34), SR_TORAD(7.07), SR_TORAD(-144));
+		sr_euler_mat_xyz (mat, SR_TORAD(0), SR_TORAD(0), SR_TORAD(-135));
 		SrQuat orientation2(mat);
 		SrVec lightDirection2 = up * orientation2;
 		light->setDirection(lightDirection2[0], lightDirection2[1], -lightDirection2[2]);  
