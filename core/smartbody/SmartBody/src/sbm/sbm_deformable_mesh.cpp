@@ -61,7 +61,8 @@ DeformableMesh::DeformableMesh() : SBAsset()
 {
 	meshName = "null";
 	binding = false;
-	initVertexBuffer = false;
+	initSkinnedVertexBuffer = false;
+
 	skeleton = new SmartBody::SBSkeleton();
 	skeleton->ref();
 }
@@ -300,14 +301,18 @@ void DeformableMesh::set_visibility(int deformableMesh)
 	}
 }
 
-bool DeformableMesh::buildVertexBuffer()
+bool DeformableMesh::buildSkinnedVertexBuffer()
 {
 	// feng : the CPU version of deformable mesh consists of some mesh segments, with their corresponding bone weights loosely stored.
 	// this is very bad for GPU processing. Thus I reorganize the data into a single array, to avoid redundancy in memory storage.
 	if (skinWeights.size() == 0 )
 		return false;
 
-	if (initVertexBuffer) return true;
+	if (initSkinnedVertexBuffer) return true;
+
+	if (initStaticVertexBuffer && !isSkinnedMesh()) return true;
+
+	bool buildSkinnedBuffer = isSkinnedMesh();
 
 	int nTotalVtxs=0, nTotalTris = 0, nTotalBones = 0;	
 	std::vector<std::set<IntPair> > vtxNormalIdxMap;
@@ -336,60 +341,100 @@ bool DeformableMesh::buildVertexBuffer()
 	allNormalTexNameList.push_back("");
 	allSpecularTexNameList.push_back("");
 	meshSubsetMap[0] = std::vector<int>(); // default material group : gray color
-	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
+
+	std::vector<int> meshIndexList;
+	std::vector<SkinWeight*> skinWeightList;
+	boneJointIdxMap.clear();
+	if (buildSkinnedBuffer)
 	{
-		SkinWeight* skinWeight = skinWeights[skinCounter];		
-		int pos;
-		int globalCounter = 0;
-		//pos = this->getMesh(skinWeight->sourceMesh);
-		pos = this->getValidSkinMesh(skinWeight->sourceMesh);
-		if (pos != -1)
+		for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
 		{
-			SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
-			SrSnModel* dMeshStatic = dMeshStatic_p[pos];
-			dMeshStatic->shape().computeTangentBiNormal();
-			SrArray<SrMaterial>& matList = dMeshDynamic->shape().M; 	
-			std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
-			std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;		
-			std::map<std::string,std::string> mtlSpecularTexMap = dMeshDynamic->shape().mtlSpecularTexNameMap;		
-			for (int j=0;j<matList.size();j++)
-			{			
-				SrMaterial& mat = matList[j];	
-				std::string mtlName = dMeshDynamic->shape().mtlnames[j];
-				if (mtlTexMap.find(mtlName) != mtlTexMap.end())
+			SkinWeight* skinWeight = skinWeights[skinCounter];		
+			int pos;
+			int globalCounter = 0;
+			//pos = this->getMesh(skinWeight->sourceMesh);
+			pos = this->getValidSkinMesh(skinWeight->sourceMesh);
+			if (pos != -1)
+			{
+				meshIndexList.push_back(pos);
+				skinWeightList.push_back(skinWeight);
+				for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
 				{
-					allTexNameList.push_back(mtlTexMap[mtlName]);					
-				}
-				else
-				{
-					allTexNameList.push_back("");
-				}	
-
-				if (mtlNormalTexMap.find(mtlName) != mtlNormalTexMap.end())
-				{
-					allNormalTexNameList.push_back(mtlNormalTexMap[mtlName]);
-				}
-				else
-				{
-					allNormalTexNameList.push_back("");
+					std::string& jointName = skinWeight->infJointName[j];
+					SkJoint* curJoint = skeleton->search_joint(jointName.c_str());
+					skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
 				}
 
-				if (mtlSpecularTexMap.find(mtlName) != mtlSpecularTexMap.end())
+				for (unsigned int k=0;k<skinWeight->infJointName.size();k++)
 				{
-					allSpecularTexNameList.push_back(mtlSpecularTexMap[mtlName]);
+					std::string& jointName = skinWeight->infJointName[k];
+					SkJoint* curJoint = skinWeight->infJoint[k];
+					if (boneJointIdxMap.find(jointName) == boneJointIdxMap.end()) // new joint
+					{
+						boneJointIdxMap[jointName] = nTotalBones++;		
+						boneJointList.push_back(curJoint);
+						boneJointNameList.push_back(jointName);
+						//bindPoseMatList.push_back(skinWeight->bindShapeMat*skinWeight->bindPoseMat[k]);
+						bindPoseMatList.push_back(skinWeight->bindPoseMat[k]);
+					}
 				}
-				else
-				{
-					allSpecularTexNameList.push_back("");
-				}
-				allMatList.push_back(mat);
-				allMatNameList.push_back(mtlName);
-				//colorArray[j%6].get(fcolor);				
-				meshSubsetMap[nMaterial] = std::vector<int>(); 
-				nMaterial++;
+			}	
+		}
+	}
+	else
+	{
+		for (int i=0;i<dMeshDynamic_p.size();i++)
+			meshIndexList.push_back(i);
+	}
+
+	for (unsigned int i=0;i<meshIndexList.size();i++)
+	{
+		int pos = meshIndexList[i];
+		SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
+		SrSnModel* dMeshStatic = dMeshStatic_p[pos];
+		dMeshStatic->shape().computeTangentBiNormal();
+		SrArray<SrMaterial>& matList = dMeshDynamic->shape().M; 	
+		std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
+		std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;		
+		std::map<std::string,std::string> mtlSpecularTexMap = dMeshDynamic->shape().mtlSpecularTexNameMap;		
+		for (int j=0;j<matList.size();j++)
+		{			
+			SrMaterial& mat = matList[j];	
+			std::string mtlName = dMeshDynamic->shape().mtlnames[j];
+			if (mtlTexMap.find(mtlName) != mtlTexMap.end())
+			{
+				allTexNameList.push_back(mtlTexMap[mtlName]);					
 			}
-		}				
-	}	
+			else
+			{
+				allTexNameList.push_back("");
+			}	
+
+			if (mtlNormalTexMap.find(mtlName) != mtlNormalTexMap.end())
+			{
+				allNormalTexNameList.push_back(mtlNormalTexMap[mtlName]);
+			}
+			else
+			{
+				allNormalTexNameList.push_back("");
+			}
+
+			if (mtlSpecularTexMap.find(mtlName) != mtlSpecularTexMap.end())
+			{
+				allSpecularTexNameList.push_back(mtlSpecularTexMap[mtlName]);
+			}
+			else
+			{
+				allSpecularTexNameList.push_back("");
+			}
+			allMatList.push_back(mat);
+			allMatNameList.push_back(mtlName);
+			//colorArray[j%6].get(fcolor);				
+			meshSubsetMap[nMaterial] = std::vector<int>(); 
+			nMaterial++;
+		}
+	}				
+		
 
 	//printf("num of mesh subset =  %d\n",meshSubsetMap.size());
 
@@ -398,92 +443,59 @@ bool DeformableMesh::buildVertexBuffer()
 	int iFace = 0;
 	SrModel::Face defaultIdx;
 	defaultIdx.a = defaultIdx.b = defaultIdx.c = -1;
-	boneJointIdxMap.clear();
-
-
-	for (size_t x = 0; x < this->skinWeights.size(); x++)
+		
+	for (unsigned int i=0;i<meshIndexList.size();i++)
 	{
-		SkinWeight* skinWeight = this->skinWeights[x];
-		for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
+		int pos = meshIndexList[i];
+		
+		SrSnModel* dMeshStatic = dMeshStatic_p[pos];
+		SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];			
+		int nVtx = dMeshStatic->shape().V.size();	
+		int nFace = dMeshStatic->shape().F.size();
+		int nNormal = dMeshStatic->shape().N.size();	
+		int nTexture = dMeshStatic->shape().T.size();
+		for (int i=0;i<nVtx;i++)
 		{
-			std::string& jointName = skinWeight->infJointName[j];
-			SkJoint* curJoint = skeleton->search_joint(jointName.c_str());
-			skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
+			vtxNormalIdxMap.push_back(std::set<IntPair>());				
 		}
-	}
 
-
-	
-	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
-	{
-		SkinWeight* skinWeight = skinWeights[skinCounter];		
-		int pos;
-		int globalCounter = 0;		
-		//pos = this->getMesh(skinWeight->sourceMesh);
-		pos = this->getValidSkinMesh(skinWeight->sourceMesh);
-		if (pos != -1)
+		nTotalVtxs += nVtx;				
+		nTotalTris += nFace;
+		
+		int numTris = dMeshStatic->shape().F.size();
+		for (int i=0; i < numTris ; i++)
 		{
-			SrSnModel* dMeshStatic = dMeshStatic_p[pos];
-			SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];			
-			int nVtx = dMeshStatic->shape().V.size();	
-			int nFace = dMeshStatic->shape().F.size();
-			int nNormal = dMeshStatic->shape().N.size();	
-			int nTexture = dMeshStatic->shape().T.size();
-			for (int i=0;i<nVtx;i++)
+			SrModel& model = dMeshStatic->shape();
+			if (dMeshStatic->shape().F.size() == 0)
+				continue;
+			SrModel::Face& faceIdx = dMeshStatic->shape().F[i];	
+			SrModel::Face nIdx;
+			nIdx.set(faceIdx.a,faceIdx.b,faceIdx.c);
+			if (dMeshStatic->shape().Fn.size() != 0)
 			{
-				vtxNormalIdxMap.push_back(std::set<IntPair>());				
+				SrModel::Face& fnIdx = dMeshStatic->shape().Fn[i];	
+				nIdx.set(fnIdx.a,fnIdx.b,fnIdx.c);
 			}
+			//SrModel::Face& nIdx = dMeshStatic->shape().Fn[i];
+			SrModel::Face& tIdx = defaultIdx;
+			if (model.Ft.size() > i)
+				tIdx = model.Ft[i];
 
-			nTotalVtxs += nVtx;				
-			nTotalTris += nFace;
-			for (unsigned int k=0;k<skinWeight->infJointName.size();k++)
-			{
-				std::string& jointName = skinWeight->infJointName[k];
-				SkJoint* curJoint = skinWeight->infJoint[k];
-				if (boneJointIdxMap.find(jointName) == boneJointIdxMap.end()) // new joint
-				{
-					boneJointIdxMap[jointName] = nTotalBones++;		
-					boneJointList.push_back(curJoint);
-					boneJointNameList.push_back(jointName);
-					//bindPoseMatList.push_back(skinWeight->bindShapeMat*skinWeight->bindPoseMat[k]);
-					bindPoseMatList.push_back(skinWeight->bindPoseMat[k]);
-				}
-			}
-			int numTris = dMeshStatic->shape().F.size();
-			for (int i=0; i < numTris ; i++)
-			{
-				SrModel& model = dMeshStatic->shape();
-				if (dMeshStatic->shape().F.size() == 0)
-					continue;
-				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];	
-				SrModel::Face nIdx;
-				nIdx.set(faceIdx.a,faceIdx.b,faceIdx.c);
-				if (dMeshStatic->shape().Fn.size() != 0)
-				{
-					SrModel::Face& fnIdx = dMeshStatic->shape().Fn[i];	
-					nIdx.set(fnIdx.a,fnIdx.b,fnIdx.c);
-				}
-				//SrModel::Face& nIdx = dMeshStatic->shape().Fn[i];
-				SrModel::Face& tIdx = defaultIdx;
-				if (model.Ft.size() > i)
-					tIdx = model.Ft[i];
+			vtxNormalIdxMap[faceIdx.a + iFaceIdxOffset].insert(IntPair(nIdx.a+iNormalIdxOffset,tIdx.a+iTextureIdxOffset));
+			vtxNormalIdxMap[faceIdx.b + iFaceIdxOffset].insert(IntPair(nIdx.b+iNormalIdxOffset,tIdx.b+iTextureIdxOffset));
+			vtxNormalIdxMap[faceIdx.c + iFaceIdxOffset].insert(IntPair(nIdx.c+iNormalIdxOffset,tIdx.c+iTextureIdxOffset));
 
-				vtxNormalIdxMap[faceIdx.a + iFaceIdxOffset].insert(IntPair(nIdx.a+iNormalIdxOffset,tIdx.a+iTextureIdxOffset));
-				vtxNormalIdxMap[faceIdx.b + iFaceIdxOffset].insert(IntPair(nIdx.b+iNormalIdxOffset,tIdx.b+iTextureIdxOffset));
-				vtxNormalIdxMap[faceIdx.c + iFaceIdxOffset].insert(IntPair(nIdx.c+iNormalIdxOffset,tIdx.c+iTextureIdxOffset));
-
-				int nMatIdx = 0; // if no corresponding materials, push into the default gray material group
-				if (i < dMeshStatic->shape().Fm.size())
-					nMatIdx = dMeshStatic->shape().Fm[i] + iMaterialOffset;		
-				meshSubsetMap[nMatIdx].push_back(iFace);			
-				iFace++;
-			}
-			iFaceIdxOffset += nVtx;
-			iNormalIdxOffset += nNormal;
-			iMaterialOffset += dMeshDynamic->shape().M.size();
-			iTextureIdxOffset += nTexture;
-			//printf("iMaterial Offset = %d\n",iMaterialOffset);
-		}			
+			int nMatIdx = 0; // if no corresponding materials, push into the default gray material group
+			if (i < dMeshStatic->shape().Fm.size())
+				nMatIdx = dMeshStatic->shape().Fm[i] + iMaterialOffset;		
+			meshSubsetMap[nMatIdx].push_back(iFace);			
+			iFace++;
+		}
+		iFaceIdxOffset += nVtx;
+		iNormalIdxOffset += nNormal;
+		iMaterialOffset += dMeshDynamic->shape().M.size();
+		iTextureIdxOffset += nTexture;
+		//printf("iMaterial Offset = %d\n",iMaterialOffset);			
 	}
 
 	if (nTotalVtxs == 0 || nTotalTris ==0)
@@ -518,12 +530,17 @@ bool DeformableMesh::buildVertexBuffer()
 	texCoordBuf.resize(nTotalVtxs);
 	skinColorBuf.resize(nTotalVtxs);
 	triBuf.resize(nTotalTris);
-	for (int i=0;i<2;i++)
+
+	if (buildSkinnedBuffer)
 	{
-		boneIDBuf[i].resize(nTotalVtxs);
-		boneIDBuf_f[i].resize(nTotalVtxs);
-		boneWeightBuf[i].resize(nTotalVtxs);
+		for (int i=0;i<2;i++)
+		{
+			boneIDBuf[i].resize(nTotalVtxs);
+			boneIDBuf_f[i].resize(nTotalVtxs);
+			boneWeightBuf[i].resize(nTotalVtxs);
+		}
 	}
+	
 
 	int iVtx = 0;
 	iFace = 0;
@@ -545,34 +562,43 @@ bool DeformableMesh::buildVertexBuffer()
 			boneColorMap.push_back(SrVec(floatBuf[0],floatBuf[1],floatBuf[2]));				
 	}
 	
-	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
+	for (unsigned int c=0;c<meshIndexList.size();c++)
 	{
-		SkinWeight* skinWeight = skinWeights[skinCounter];		
-		int pos;
+		int pos = meshIndexList[c];
 		int globalCounter = 0;
-		//pos = this->getMesh(skinWeight->sourceMesh);
-		pos = this->getValidSkinMesh(skinWeight->sourceMesh);
-		if (pos != -1)
+		SrSnModel* dMeshStatic = dMeshStatic_p[pos];
+		SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
+		dMeshDynamic->visible(false);
+		int numVertices = dMeshStatic->shape().V.size();
+		int numNormals = dMeshStatic->shape().N.size();
+		int numTexCoords = dMeshStatic->shape().T.size();
+		SrMat bindShapeMat;
+		SkinWeight* skinWeight = NULL;
+		if (buildSkinnedBuffer)
 		{
-			SrSnModel* dMeshStatic = dMeshStatic_p[pos];
-			SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
-			dMeshDynamic->visible(false);
-			int numVertices = dMeshStatic->shape().V.size();
-			int numNormals = dMeshStatic->shape().N.size();
-			int numTexCoords = dMeshStatic->shape().T.size();
-			for (int i = 0; i < numVertices; i++)
-			{
+			skinWeight = skinWeightList[c];
+			bindShapeMat = skinWeight->bindShapeMat;
+		}
+		for (int i = 0; i < numVertices; i++)
+		{
+			
+			if (buildSkinnedBuffer)
+			{				
 				if (i >= (int) skinWeight->numInfJoints.size())
-					continue;
-				int numOfInfJoints = skinWeight->numInfJoints[i];				
-				SrVec& lv = dMeshStatic->shape().V[i];					
-				posBuf[iVtx] = lv*skinWeight->bindShapeMat;
-				SrVec& lt =	dMeshStatic->shape().Tangent[i];		
-				SrVec& lb = dMeshStatic->shape().BiNormal[i];
-				tangentBuf[iVtx] = lt*skinWeight->bindShapeMat;
-				binormalBuf[iVtx] = lb*skinWeight->bindShapeMat;
+					continue;				
+			}
+			SrVec& lv = dMeshStatic->shape().V[i];					
+			posBuf[iVtx] = lv*bindShapeMat;
+			SrVec& lt =	dMeshStatic->shape().Tangent[i];		
+			SrVec& lb = dMeshStatic->shape().BiNormal[i];
+			tangentBuf[iVtx] = lt*bindShapeMat;
+			binormalBuf[iVtx] = lb*bindShapeMat;
 				
-				//normalBuffer(iVtx) = Vec3f(ln[0],ln[1],ln[2]);
+			//normalBuffer(iVtx) = Vec3f(ln[0],ln[1],ln[2]);
+
+			if (buildSkinnedBuffer && skinWeight)
+			{
+				int numOfInfJoints = skinWeight->numInfJoints[i];
 				for (int k=0;k<2;k++)
 				{
 					boneIDBuf[k][iVtx] = SrVec4i(0,0,0,0);
@@ -580,15 +606,13 @@ bool DeformableMesh::buildVertexBuffer()
 					boneWeightBuf[k][iVtx] = SrVec4(0,0,0,0);
 				}
 				std::vector<IntFloatPair> weightList;
-				// 				if (numOfInfJoints > 8)
-				// 					printf("vtx %d : \n",iVtx);
 				for (int j = 0; j < numOfInfJoints; j++)
 				{
 					const std::string& curJointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];					
 					float jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
 					int    jointIndex  = boneJointIdxMap[curJointName];
-// 					 					if (numOfInfJoints > 8)
-// 					 						printf("w = %d : %f\n",jointIndex,jointWeight);
+					// 					 					if (numOfInfJoints > 8)
+					// 					 						printf("w = %d : %f\n",jointIndex,jointWeight);
 					weightList.push_back(IntFloatPair(jointIndex,jointWeight));							
 					globalCounter ++;									
 				}
@@ -612,7 +636,7 @@ bool DeformableMesh::buildVertexBuffer()
 						boneIDBuf_f[1][iVtx][j-4] = (float)w.first;
 						boneWeightBuf[1][iVtx][j-4] = w.second;
 					}	
-					
+
 					if (w.first >= 0 && w.first < boneJointList.size())
 					{
 						skinColor += boneColorMap[w.first]*w.second;
@@ -624,80 +648,84 @@ bool DeformableMesh::buildVertexBuffer()
 				{
 					boneWeightBuf[0][iVtx][j] /= weightSum;
 					boneWeightBuf[1][iVtx][j] /= weightSum;
-					//LOG("weight 0 - %d = %f",j,boneWeightBuf[0][iVtx][j]);
-					//LOG("weight 1 - %d = %f",j,boneWeightBuf[1][iVtx][j]);
 				}	
 
-				if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
+			}
+			
+
+			if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
+			{
+				std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
+				// copy related vtx components 
+				for (unsigned int k=0;k<idxMap.size();k++)
 				{
-					std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
-					// copy related vtx components 
-					for (unsigned int k=0;k<idxMap.size();k++)
+					posBuf[idxMap[k]] = posBuf[iVtx];
+					tangentBuf[idxMap[k]] = tangentBuf[iVtx];
+					binormalBuf[idxMap[k]] = binormalBuf[iVtx];
+
+					if (buildSkinnedBuffer)
 					{
-						posBuf[idxMap[k]] = posBuf[iVtx];
-						tangentBuf[idxMap[k]] = tangentBuf[iVtx];
-						binormalBuf[idxMap[k]] = binormalBuf[iVtx];
 						boneIDBuf[0][idxMap[k]] = boneIDBuf[0][iVtx];
 						boneIDBuf[1][idxMap[k]] = boneIDBuf[1][iVtx];
 						boneIDBuf_f[0][idxMap[k]] = boneIDBuf_f[0][iVtx];
 						boneIDBuf_f[1][idxMap[k]] = boneIDBuf_f[1][iVtx];
 						boneWeightBuf[0][idxMap[k]] = boneWeightBuf[0][iVtx];
 						boneWeightBuf[1][idxMap[k]] = boneWeightBuf[1][iVtx];
-						skinColorBuf[idxMap[k]] = skinColorBuf[iVtx];;
-					}
+						skinColorBuf[idxMap[k]] = skinColorBuf[iVtx];
+					}	
 				}
-				iVtx++;
 			}
+			iVtx++;
+		}
 
-			int numTris = dMeshStatic->shape().F.size();
-			for (int i=0; i < numTris ; i++)
+		int numTris = dMeshStatic->shape().F.size();
+		for (int i=0; i < numTris ; i++)
+		{
+			if (dMeshStatic->shape().F.size() <= i)
+				continue;				
+			SrModel::Face& faceIdx = dMeshStatic->shape().F[i];
+			SrModel::Face normalIdx;// = dMeshStatic->shape().F[i];
+			normalIdx.set(faceIdx.a,faceIdx.b,faceIdx.c);
+
+			if (dMeshStatic->shape().Fn.size() > i)
 			{
-				if (dMeshStatic->shape().F.size() <= i)
-					continue;				
-				SrModel::Face& faceIdx = dMeshStatic->shape().F[i];
-				SrModel::Face normalIdx;// = dMeshStatic->shape().F[i];
-				normalIdx.set(faceIdx.a,faceIdx.b,faceIdx.c);
-
-				if (dMeshStatic->shape().Fn.size() > i)
-				{
-					//normalIdx = dMeshStatic->shape().Fn[i];							
-					SrModel::Face& fnIdx = dMeshStatic->shape().Fn[i];	
-					normalIdx.set(fnIdx.a,fnIdx.b,fnIdx.c);
-				}
-				SrModel::Face& texCoordIdx = defaultIdx;
-				if (dMeshStatic->shape().Ft.size() > i)
-					texCoordIdx = dMeshStatic->shape().Ft[i];
-				int fIdx[3] = { faceIdx.a, faceIdx.b, faceIdx.c};
-				int nIdx[3] = { normalIdx.a, normalIdx.b, normalIdx.c};
-				int tIdx[3] = { texCoordIdx.a, texCoordIdx.b, texCoordIdx.c};
-				
-				SrVec faceNormal = dMeshStatic->shape().face_normal(i);
-				for (int k=0;k<3;k++)
-				{
-					SrVec nvec;
-					SrPnt2 tvec = SrPnt2(0,0);
-					int nidx = nIdx[k];
-					if (dMeshStatic->shape().N.size() > nidx)
-						nvec = dMeshStatic->shape().N[nIdx[k]];
-					else
-						nvec = faceNormal;
-					if (dMeshStatic->shape().T.size() > tIdx[k] && dMeshStatic->shape().T.size() > 0 && dMeshStatic->shape().Ft.size() > 0)
-						tvec = dMeshStatic->shape().T[tIdx[k]];
-					int newNIdx = nIdx[k] + iNormalIdxOffset;
-					int newTIdx = tIdx[k] + iTextureIdxOffset;
-					int vIdx = fIdx[k] + iFaceIdxOffset;
-					if (ntNewVtxIdxMap.find(IntPair(newNIdx,newTIdx)) != ntNewVtxIdxMap.end())
-						vIdx = ntNewVtxIdxMap[IntPair(newNIdx,newTIdx)];
-					normalBuf[vIdx] = nvec;
-					texCoordBuf[vIdx] = SrVec2(tvec.x, tvec.y);
-					triBuf[iFace][k] = vIdx;
-				}			
-				iFace++;
+				//normalIdx = dMeshStatic->shape().Fn[i];							
+				SrModel::Face& fnIdx = dMeshStatic->shape().Fn[i];	
+				normalIdx.set(fnIdx.a,fnIdx.b,fnIdx.c);
 			}
-			iFaceIdxOffset += numVertices;
-			iNormalIdxOffset += numNormals;
-			iTextureIdxOffset += numTexCoords;
-		}			
+			SrModel::Face& texCoordIdx = defaultIdx;
+			if (dMeshStatic->shape().Ft.size() > i)
+				texCoordIdx = dMeshStatic->shape().Ft[i];
+			int fIdx[3] = { faceIdx.a, faceIdx.b, faceIdx.c};
+			int nIdx[3] = { normalIdx.a, normalIdx.b, normalIdx.c};
+			int tIdx[3] = { texCoordIdx.a, texCoordIdx.b, texCoordIdx.c};
+				
+			SrVec faceNormal = dMeshStatic->shape().face_normal(i);
+			for (int k=0;k<3;k++)
+			{
+				SrVec nvec;
+				SrPnt2 tvec = SrPnt2(0,0);
+				int nidx = nIdx[k];
+				if (dMeshStatic->shape().N.size() > nidx)
+					nvec = dMeshStatic->shape().N[nIdx[k]];
+				else
+					nvec = faceNormal;
+				if (dMeshStatic->shape().T.size() > tIdx[k] && dMeshStatic->shape().T.size() > 0 && dMeshStatic->shape().Ft.size() > 0)
+					tvec = dMeshStatic->shape().T[tIdx[k]];
+				int newNIdx = nIdx[k] + iNormalIdxOffset;
+				int newTIdx = tIdx[k] + iTextureIdxOffset;
+				int vIdx = fIdx[k] + iFaceIdxOffset;
+				if (ntNewVtxIdxMap.find(IntPair(newNIdx,newTIdx)) != ntNewVtxIdxMap.end())
+					vIdx = ntNewVtxIdxMap[IntPair(newNIdx,newTIdx)];
+				normalBuf[vIdx] = nvec;
+				texCoordBuf[vIdx] = SrVec2(tvec.x, tvec.y);
+				triBuf[iFace][k] = vIdx;
+			}			
+			iFace++;
+		}
+		iFaceIdxOffset += numVertices;
+		iNormalIdxOffset += numNormals;
+		iTextureIdxOffset += numTexCoords;		
 	}
     
     int group = 0;
@@ -753,8 +781,15 @@ bool DeformableMesh::buildVertexBuffer()
 #endif			
 	}	
 	subMeshList.insert(subMeshList.end(),hairMeshList.begin(),hairMeshList.end());
-	initVertexBuffer = true;
+	initStaticVertexBuffer = true;
+	if (buildSkinnedBuffer)
+		initSkinnedVertexBuffer = true;
 	return true;
+}
+
+bool DeformableMesh::isSkinnedMesh()
+{
+	return skinWeights.size() > 0;
 }
 
 /************************************************************************/
@@ -766,6 +801,7 @@ DeformableMeshInstance::DeformableMeshInstance()
 	_mesh = NULL;
 	_skeleton = NULL;
 	_updateMesh = false;
+	_isStaticMesh = false;
 	_recomputeNormal = true;
 	_meshScale = 1.f;
 }
@@ -801,7 +837,7 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
     //LOG("setDeformableMesh to be %s", mesh->meshName.c_str());
 	_mesh = mesh;
 	cleanUp(); // remove all previous dynamic mesh
-	_mesh->buildVertexBuffer(); // make sure the deformable mesh has vertex buffer
+	_mesh->buildSkinnedVertexBuffer(); // make sure the deformable mesh has vertex buffer
 	for (unsigned int i=0;i<_mesh->dMeshStatic_p.size();i++)
 	{
 		SrSnModel* srSnModel = _mesh->dMeshStatic_p[i];
@@ -816,6 +852,8 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 		//SmartBody::SBScene::getScene()->getRootGroup()->add(dynamicMesh[i]);
 	}	
 	_deformPosBuf.resize(_mesh->posBuf.size()); // initialized deformation posBuffer
+	for (unsigned int i=0;i<_deformPosBuf.size();i++)
+		_deformPosBuf[i] = _mesh->posBuf[i];
 	updateJointList();
 }
 
@@ -854,6 +892,7 @@ void DeformableMeshInstance::update()
 #define RECOMPUTE_NORMAL 0
 	if (!_updateMesh)	return;
 	if (!_skeleton || !_mesh) return;	
+	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
 	_skeleton->update_global_matrices();
 	int maxJoint = -1;
 	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
@@ -964,4 +1003,21 @@ bool DeformableMeshInstance::getVisibility()
 void DeformableMeshInstance::setMeshScale( float scale )
 {
 	_meshScale = scale;
+}
+
+SmartBody::SBSkeleton* DeformableMeshInstance::getSkeleton()
+{
+	SmartBody::SBSkeleton* skel = dynamic_cast<SmartBody::SBSkeleton*>(_skeleton);
+	return skel;
+}
+
+void DeformableMeshInstance::setToStaticMesh( bool isStatic )
+{
+	_isStaticMesh = isStatic;
+}
+
+SBAPI bool DeformableMeshInstance::isStaticMesh()
+{
+	if (!_mesh) return true;
+	return (_isStaticMesh || !_mesh->isSkinnedMesh());
 }

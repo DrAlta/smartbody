@@ -255,10 +255,13 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					pawn->scene_p->visible(false);
 			}
 		}
+#if 0
 		if (name == "mesh")
 		{
 		}
-		else if ( name == "deformableMeshScale")
+		else 
+#endif
+		if ( name == "deformableMeshScale")
 		{
 			//LOG("name = deformableMeshScale");
 			SmartBody::DoubleAttribute* doubleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
@@ -270,7 +273,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
 			}			
 		}
-		else if (name == "deformableMesh")
+		else if (name == "deformableMesh" || name == "mesh")
 		{
 			SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 			if (strAttribute)
@@ -316,7 +319,11 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					if (!pawn->dMeshInstance_p)
 						pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
 					pawn->dMeshInstance_p->setDeformableMesh(mesh);
-					pawn->dMeshInstance_p->setSkeleton(pawn->getSkeleton());					
+					pawn->dMeshInstance_p->setSkeleton(pawn->getSkeleton());	
+					if (name == "mesh") // setting static mesh
+					{
+						pawn->dMeshInstance_p->setToStaticMesh(true);
+					}
 #if 0
 					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
 					{

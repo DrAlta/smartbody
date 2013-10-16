@@ -189,6 +189,7 @@ void SbmTexture::loadImage( const char* fileName )
 
 void SbmTexture::buildTexture()
 {	
+	if (!getBuffer()) return;
 #if !defined(__native_client__)
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:10");		
 	GLuint iType = GL_TEXTURE_2D;

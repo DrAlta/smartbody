@@ -65,7 +65,7 @@ public:
 	SkSkeleton*					skeleton;			// pointer to current skeleton
 	bool						binding;			// whether in deformable mesh mode
 	// unrolled all vertices into a single buffer for faster GPU rendering
-	bool initVertexBuffer;	
+	bool initStaticVertexBuffer, initSkinnedVertexBuffer;	
 	std::vector<SrVec>          posBuf;	
 	std::vector<SrVec>          normalBuf;
 	std::vector<SrVec>          tangentBuf;
@@ -101,8 +101,9 @@ public:
     /*! Set the visibility state of the deformable geometry,
         The integers mean 1:show, 0:hide, and -1:don't change the visibility state. */
 	void set_visibility(int deformableMesh);
-	virtual bool buildVertexBuffer(); // unrolled all models inside this deformable mesh into a GPU-friendly format
+	virtual bool buildSkinnedVertexBuffer(); // unrolled all models inside this deformable mesh into a GPU-friendly format
 	SBAPI void blendShapes();
+	SBAPI bool isSkinnedMesh();
 };
 
 class DeformableMeshInstance
@@ -116,6 +117,7 @@ protected:
 	float _meshScale;
 	bool meshVisible;
 	bool _recomputeNormal;
+	bool _isStaticMesh;
 public:
 	std::vector<SrVec> _deformPosBuf;		
 public:
@@ -128,6 +130,9 @@ public:
 	SBAPI virtual void setMeshScale(float scale);
 	SBAPI float   getMeshScale() { return _meshScale; }
 	SBAPI bool    getVisibility();
+	SBAPI void    setToStaticMesh(bool isStatic);
+	SBAPI bool    isStaticMesh();
+	SBAPI SmartBody::SBSkeleton* getSkeleton();	
 	SBAPI virtual void update();
 	SBAPI DeformableMesh* getDeformableMesh() { return _mesh; }
 
