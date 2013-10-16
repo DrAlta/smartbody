@@ -74,6 +74,24 @@ std::vector<SBAsset*> SBAssetHandlerOgre::getAssets(const std::string& path)
 			{
 				// find the skeleton
 				skeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skeletonName);
+				if (skeleton)
+				{
+					for (unsigned int i=0; i< mesh->skinWeights.size(); i++)
+					{
+						SkinWeight* sw = mesh->skinWeights[i];
+						
+						for (int k=0; k < skeleton->getNumJoints(); k++)
+						{
+							// manually add all joint names
+							SmartBody::SBJoint* joint = skeleton->getJoint(k);
+							sw->infJointName.push_back(joint->getName());
+							sw->infJoint.push_back(joint);
+							SrMat gmatZeroInv = joint->gmatZero().rigidInverse();						
+							sw->bindPoseMat.push_back(gmatZeroInv);
+						}
+					}
+				}
+
 				for (size_t s = 0; s < mesh->skinWeights.size(); s++)
 				{
 					for (size_t i = 0; i < mesh->skinWeights[s]->jointNameIndex.size(); i++)
