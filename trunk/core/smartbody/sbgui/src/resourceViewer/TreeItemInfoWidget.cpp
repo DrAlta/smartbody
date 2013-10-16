@@ -8,6 +8,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
 #include <sb/SBEvent.h>
+#include <sb/SBAnimationStateManager.h>
 
 #include "ResourceWindow.h"
 #include "channelbufferviewer/GlChartViewArchive.hpp"
@@ -692,4 +693,79 @@ MultiAttributeItemWidget::~MultiAttributeItemWidget()
 void MultiAttributeItemWidget::updateWidget()
 {
 	redraw();
+}
+
+AnimationBlendInfoWidget::AnimationBlendInfoWidget( SmartBody::SBAnimationBlend* blend, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow )
+:TreeItemInfoWidget(x,y,w,h,name,inputItem,type) 
+{
+	if (!blend) return;
+	attrWindow = NULL;
+	blendName = blend->stateName;
+	blendInfoObject = new TreeInfoObject();
+	this->begin();
+	attrWindow = new AttributeWindow(blendInfoObject,x,y,w,h,blendName.c_str());
+	attrWindow->setOffset(150);
+	attrWindow->begin();
+	attrWindow->end();
+	this->end();	
+	updateWidget();
+}
+
+void AnimationBlendInfoWidget::updateWidget()
+{
+	SmartBody::SBAnimationBlendManager* blendManager = SmartBody::SBScene::getScene()->getBlendManager();
+	SmartBody::SBAnimationBlend* animBlend = blendManager->getBlend(blendName);
+	if (!animBlend)
+		return;
+	
+	blendInfoObject->clearAttributes();	
+	attrWindow->cleanUpWidgets();
+	std::vector<SrVec> parameters = animBlend->getParameters();
+	for (unsigned int i=0;i<animBlend->getNumMotions();i++)
+	{
+		std::string motionName = animBlend->getMotionName(i);
+		SrVec& para = parameters[i];
+		blendInfoObject->createVec3Attribute(motionName,para[0],para[1],para[2], true, "Blend Parameters", i+1,true, false, false, "");		
+	}
+
+	this->attrWindow->setDirty(true);	
+	this->attrWindow->redraw();
+	this->redraw();
+}
+
+BlendTransitionInfoWidget::BlendTransitionInfoWidget( SmartBody::SBAnimationTransition* transition, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow )
+:TreeItemInfoWidget(x,y,w,h,name,inputItem,type) 
+{
+	if (!transition) return;
+	attrWindow = NULL;
+	transitionName = transition->getTransitionName();
+	transitionInfoObject = new TreeInfoObject();
+	this->begin();
+	attrWindow = new AttributeWindow(transitionInfoObject,x,y,w,h,transitionName.c_str());
+	attrWindow->setOffset(150);
+	attrWindow->begin();
+	attrWindow->end();
+	this->end();	
+	updateWidget();
+
+}
+
+void BlendTransitionInfoWidget::updateWidget()
+{
+	SmartBody::SBAnimationBlendManager* blendManager = SmartBody::SBScene::getScene()->getBlendManager();
+	SmartBody::SBAnimationTransition* blendTransition = blendManager->getTransitionByName(transitionName);
+	if (!blendTransition)
+		return;
+
+	transitionInfoObject->clearAttributes();	
+	attrWindow->cleanUpWidgets();
+
+	transitionInfoObject->createStringAttribute("Source Blend",blendTransition->getSourceBlend()->stateName, true, "Transition Parameters", 1,true, false, false, "");
+	transitionInfoObject->createStringAttribute("Source Motion",blendTransition->getSourceMotionName(), true, "Transition Parameters", 5,true, false, false, "");
+	transitionInfoObject->createStringAttribute("Target Blend",blendTransition->getDestinationBlend()->stateName, true, "Transition Parameters", 10,true, false, false, "");
+	transitionInfoObject->createStringAttribute("Target Motion",blendTransition->getDestinationMotionName(), true, "Transition Parameters", 15,true, false, false, "");	
+
+	this->attrWindow->setDirty(true);	
+	this->attrWindow->redraw();
+	this->redraw();
 }

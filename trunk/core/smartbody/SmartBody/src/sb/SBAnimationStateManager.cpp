@@ -187,6 +187,17 @@ SBAnimationTransition* SBAnimationBlendManager::getTransition(const std::string&
 	return NULL;
 }
 
+SBAnimationTransition* SBAnimationBlendManager::getTransitionByName( const std::string& transitionName )
+{
+	for (size_t i = 0; i < _transitions.size(); i++)
+	{
+		if (_transitions[i]->getTransitionName() == transitionName)
+			return _transitions[i];
+	}
+
+	return NULL;
+}
+
 SBAnimationTransition* SBAnimationBlendManager::getTransitionByIndex(int id)
 {
 	if (id >= 0 && id < (int) _transitions.size())
@@ -209,8 +220,7 @@ std::vector<std::string> SBAnimationBlendManager::getTransitionNames()
 	std::vector<string> transitionNames;
 	for (size_t i = 0; i < _transitions.size(); i++)
 	{
-		transitionNames.push_back(_transitions[i]->getSourceBlend()->stateName +
-								  "/" + _transitions[i]->getDestinationBlend()->stateName );
+		transitionNames.push_back( _transitions[i]->getTransitionName() );
 	}
 	return transitionNames;
 }

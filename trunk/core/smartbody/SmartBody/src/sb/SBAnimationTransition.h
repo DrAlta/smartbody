@@ -41,7 +41,7 @@ class SBAnimationTransition
 		SBAPI std::vector<double> getEaseOutInterval(int num);
 		SBAPI SBAnimationTransitionRule* getTransitionRule();
 		SBAPI void setTransitionRule(SBAnimationTransitionRule* rule);
-		
+		SBAPI std::string getTransitionName();
 		SBAPI std::string saveToString();
 
 	protected:

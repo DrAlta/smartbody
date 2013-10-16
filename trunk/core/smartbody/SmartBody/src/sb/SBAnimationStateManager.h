@@ -42,6 +42,7 @@ class SBAnimationBlendManager
 		SBAPI std::vector<std::string> getBlendNames();
 
 		SBAPI SBAnimationTransition* getTransition(const std::string& source, const std::string& dest);
+		SBAPI SBAnimationTransition* getTransitionByName(const std::string& transitionName);
 		SBAPI SBAnimationTransition* getTransitionByIndex(int id);
 		SBAPI int getNumTransitions();
 		SBAPI std::vector<std::string> getTransitionNames();

@@ -15,7 +15,7 @@ namespace SmartBody {
 
 SBAssetHandlerObj::SBAssetHandlerObj()
 {
-	assetTypes.push_back("asf");
+	assetTypes.push_back("obj");
 }
 
 SBAssetHandlerObj::~SBAssetHandlerObj()
