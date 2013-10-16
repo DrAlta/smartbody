@@ -1253,10 +1253,10 @@ void FltkViewer::updateLights()
 		light.directional = true;
 		light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
 		SrMat mat;
-		sr_euler_mat_xyz (mat, SR_TORAD(-72), SR_TORAD(180), SR_TORAD(-165));
+		sr_euler_mat_xyz (mat, SR_TORAD(0), SR_TORAD(0), SR_TORAD(135	));
 		SrQuat orientation(mat);
 		SrVec up(0,1,0);
-		SrVec lightDirection = up * orientation;
+		SrVec lightDirection = -up * orientation;
 		light.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
 	//	light.constant_attenuation = 1.0f/cam.scale;
 		light.constant_attenuation = 1.0f;
@@ -1265,9 +1265,9 @@ void FltkViewer::updateLights()
 		SrLight light2 = light;
 		light2.directional = true;
 		light2.diffuse = SrColor( 0.8f, 0.8f, 0.8f );
-		sr_euler_mat_xyz (mat, SR_TORAD(1.34), SR_TORAD(7.07), SR_TORAD(-144));
+		sr_euler_mat_xyz (mat, SR_TORAD(0), SR_TORAD(0), SR_TORAD(-135));
 		SrQuat orientation2(mat);
-		lightDirection = up * orientation2;
+		lightDirection = -up * orientation2;
 		light2.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
 	//	light2.constant_attenuation = 1.0f;
 	//	light2.linear_attenuation = 2.0f;
