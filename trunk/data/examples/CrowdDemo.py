@@ -74,8 +74,8 @@ for i in range(amount):
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
-	#scene.command("char %s viewer axis" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
+
 
 # Set up list of Brads
 bradList = []

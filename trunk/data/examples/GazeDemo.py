@@ -74,10 +74,11 @@ gazeTarget.setPosition(SrVec(0.75, 1.54, 0.33))
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
+
 
 # Make characters gaze at pawn
-bml.execBML('ChrRachel', '<gaze sbm:joint-range="EYES NECK" sbm:joint-speed="1600" target="gazeTarget"/>')
+bml.execBML('ChrRachel', '<gaze sbm:joint-range="EYES NECK" target="gazeTarget"/>')
 
 # Variables to move pawn
 gazeX = -2
@@ -114,6 +115,6 @@ class GazeDemo(SBScript):
 			bml.execBMLAt(8, 'ChrBrad', '<gaze target="ChrRachel:spine4" sbm:joint-speed="800" sbm:joint-smooth="0.2"/>')
 		
 # Run the update script
-scene.removeScript('gazedemo')
-gazedemo = GazeDemo()
-scene.addScript('gazedemo', gazedemo)
+#scene.removeScript('gazedemo')
+#gazedemo = GazeDemo()
+#scene.addScript('gazedemo', gazedemo)

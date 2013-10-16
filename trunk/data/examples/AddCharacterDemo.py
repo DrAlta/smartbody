@@ -181,7 +181,7 @@ scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrBrad')
 # Turn on GPU deformable geometry
-scene.command('char ChrBrad viewer deformableGPU')
+brad.setStringAttribute("displayType", "GPUmesh")
 
 # Set up steering
 print 'Setting up steering'

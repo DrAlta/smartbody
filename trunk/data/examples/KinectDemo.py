@@ -88,7 +88,8 @@ brad.setDoubleAttribute('deformableMeshScale', .01)
 brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 # Idle pose
 # Turn on GPU deformable geometry
-scene.command('char ChrBrad viewer deformableGPU')
+brad.setStringAttribute("displayType", "GPUmesh")
+
 # Start the simulation
 print 'Starting the simulation'
 sim.start()

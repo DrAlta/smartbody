@@ -99,7 +99,8 @@ for i in range(15):
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
+
 
 # Paths for Brad and Rachel
 print 'Setting up paths for Brad and Rachel'

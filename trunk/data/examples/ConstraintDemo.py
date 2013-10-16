@@ -58,7 +58,7 @@ scene.getPawn('camera').setPosition(SrVec(0, -50, 0))
 # Turn on GPU deformable geometry for all
 print 'Turning on GPU deformable geometry for all'
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
 
 # Set up multiple pawns
 print 'Adding pawns into scene'

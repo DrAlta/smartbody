@@ -271,8 +271,9 @@ rachel.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 
 # Turning on deformable GPU
-scene.command('char ChrBrad viewer deformableGPU')
-scene.command('char ChrRachel viewer deformableGPU')
+brad.getCharacter("ChrBrad").setStringAttribute("displayType", "GPUmesh")
+rachel.setStringAttribute("displayType", "GPUmesh")
+
 
 # Set up pawn
 print 'Setting up gaze target'

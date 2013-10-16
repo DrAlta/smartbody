@@ -78,7 +78,8 @@ pole3.setPosition(SrVec(0, 230, 800))
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
+
 
 # Configure character physics
 print 'Configuring character physics'

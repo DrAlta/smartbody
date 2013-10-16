@@ -67,7 +67,8 @@ bml.execBML('brad2', '<body posture="HandsAtSide_Motex"/>')
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
+
 
 # Setting up pawns
 print 'Adding pawns to scene'

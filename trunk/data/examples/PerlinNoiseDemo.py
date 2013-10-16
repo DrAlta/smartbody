@@ -91,8 +91,9 @@ scene.getCharacter('ChrBrad0').setHPR(SrVec(17, 0, 0))
 scene.getCharacter('ChrBrad1').setHPR(SrVec(-17, 0, 0))
 	
 # Turn on GPU deformable geometry
-scene.command('char ChrBrad0 viewer deformableGPU')
-scene.command('char ChrBrad1 viewer deformableGPU')
+scene.getCharacter("ChrBrad0").setStringAttribute("displayType", "GPUmesh")
+scene.getCharacter("ChrBrad1").setStringAttribute("displayType", "GPUmesh")
+
 
 lastTime = -5
 import random
