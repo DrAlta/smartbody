@@ -485,6 +485,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\sb\SBAssetHandlerAmc.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerAsf.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerCOLLADA.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerOgre.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSk.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkm.cpp" />
     <ClCompile Include="src\sb\smartbody-c-dll.cpp" />
@@ -859,6 +860,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\sb\SBAssetHandlerAmc.h" />
     <ClInclude Include="src\sb\SBAssetHandlerAsf.h" />
     <ClInclude Include="src\sb\SBAssetHandlerCOLLADA.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerOgre.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSk.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSkm.h" />
     <ClInclude Include="src\sb\SBCharacterListener.h" />

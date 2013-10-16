@@ -492,7 +492,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBAssetHandlerCOLLADA.cpp
         ./src/sb/SBAssetHandlerSk.cpp
         ./src/sb/SBAssetHandlerSkm.cpp
-
+		./src/sb/SBAssetHandlerAsf.cpp
+		./src/sb/SBAssetHandlerOgre.cpp
         ./src/sb/SBBehavior.cpp
         ./src/sb/SBDebuggerServer.cpp
         ./src/sb/SBDebuggerClient.cpp

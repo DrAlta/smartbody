@@ -1386,7 +1386,8 @@ int mcu_load_mesh(const char* pawnName, const char* obj_file, SmartBody::SBComma
 	else if (ext == ".xml" || ext == ".XML")
 	{
 		std::vector<SkinWeight*> tempWeights;
-		ParserOgre::parseSkinMesh(meshModelVec,tempWeights,obj_file,1.0,true,false);		
+		std::string skeletonName;
+		ParserOgre::parseSkinMesh(meshModelVec,tempWeights,obj_file,skeletonName, 1.0,true,false);		
 	}
 	else if (ext == ".dae" || ext == ".DAE")// || ext == ".xml" || ext == ".XML")
 	{
@@ -1616,7 +1617,8 @@ int mcu_character_load_mesh(const char* char_name, const char* obj_file, SmartBo
 	{
 		// load ogre mesh
 		std::vector<SkinWeight*> tempWeights;
-		ParserOgre::parseSkinMesh(meshModelVec,tempWeights,obj_file,factor,true,false);
+		std::string skeletonName;
+		ParserOgre::parseSkinMesh(meshModelVec,tempWeights,obj_file,skeletonName, factor,true,false);
 	}
 	else if (ext == ".dae" || ext == ".DAE" || ext == ".xml" || ext == ".XML")
 	{

@@ -3931,7 +3931,8 @@ SBAPI bool SBScene::createNavigationMesh( const std::string& meshfilename )
 	else if ( ext == ".xml" || ext == ".XML" )
 	{
 		std::vector<SkinWeight*> tempWeights;
-		loadSuccess = ParserOgre::parseSkinMesh(meshVec,tempWeights,meshfilename,1.0,true,false);	
+		std::string skeletonName;
+		loadSuccess = ParserOgre::parseSkinMesh(meshVec,tempWeights,meshfilename,skeletonName, 1.0,true,false);	
 	}
 	else if ( ext == ".dae" || ext == ".DAE" )
 	{
