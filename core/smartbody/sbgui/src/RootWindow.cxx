@@ -523,7 +523,7 @@ void BaseWindow::ResetScene()
 
 	std::vector<SmartBody::SBSceneListener*> listeners;
 	std::vector<SmartBody::SBSceneListener*>& currentListeners = SmartBody::SBScene::getScene()->getSceneListeners();
-	for (int l = 0; l < currentListeners.size(); l++)
+	for (size_t l = 0; l < currentListeners.size(); l++)
 	{
 		listeners.push_back(currentListeners[l]);
 	}
@@ -532,7 +532,7 @@ void BaseWindow::ResetScene()
 	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->startFileLogging("./smartbody.log");
-	for (int l = 0; l < listeners.size(); l++)
+	for (size_t l = 0; l < listeners.size(); l++)
 	{
 		scene->addSceneListener(listeners[l]);
 	}
