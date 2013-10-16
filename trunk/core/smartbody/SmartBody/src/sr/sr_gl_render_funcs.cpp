@@ -98,7 +98,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 		glMaterial(subMesh->material);
 		//LOG("mat color = %f %f %f\n",color[0],color[1],color[2]);
 		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,subMesh->texName.c_str());
-		//LOG("texManager size = %d, tex = %d, texName= %s",SbmTextureManager::singleton(),tex, mesh->texName.c_str());
+		//LOG("texManager size = %d, tex = %d, texName= %s",SbmTextureManager::singleton(),tex, subMesh->texName.c_str());
 		if (tex && !showSkinWeight)
 		{
 			GLint activeTexture = -1;

@@ -140,7 +140,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				mesh->dMeshDynamic_p.push_back(srSnModelDynamic);
 				srSnModelDynamic->ref();
 
-
+				//LOG("mesh name is %s", (const char*)meshModelVec[i]->name);
 			
 				/* perform this when the character wants to attach to the mesh
 				SrSnGroup* meshGroup = new SrSnGroup();
