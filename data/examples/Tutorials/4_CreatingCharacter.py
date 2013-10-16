@@ -13,7 +13,7 @@ assetManager.loadAssets()
 
 # set the camera
 scene.setScale(1.0)
-scene.run('default-viewer.py')
+scene.getActiveCamera().reset()
 
 # run a Python script file
 scene.run('zebra2-map.py')
@@ -30,4 +30,7 @@ brad.setSkeleton(bradSkeleton)
 brad.createStandardControllers()
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrBrad')
+brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+
+# show the character
+brad.setStringAttribute('displayType', 'GPUmesh')

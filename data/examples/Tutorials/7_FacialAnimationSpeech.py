@@ -62,7 +62,9 @@ brad.setFaceDefinition(bradFace)
 
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrBrad')
+brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+# show the character
+brad.setStringAttribute('displayType', 'GPUmesh')
 
 # Starting the simulation
 sim.start()
