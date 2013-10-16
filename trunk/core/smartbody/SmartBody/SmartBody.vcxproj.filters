@@ -1126,6 +1126,9 @@
     <ClCompile Include="src\sb\SBAssetHandlerOgre.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandlerObj.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2249,6 +2252,9 @@
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="src\sb\SBAssetHandlerOgre.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBAssetHandlerObj.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
