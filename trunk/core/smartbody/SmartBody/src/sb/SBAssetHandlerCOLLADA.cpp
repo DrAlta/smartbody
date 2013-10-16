@@ -105,7 +105,11 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				ParserCOLLADAFast::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
 			}
 			// parsing geometry
+#if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__)
 			SbmDeformableMeshGPU* mesh = new SbmDeformableMeshGPU();
+#else
+			DeformableMesh* mesh = new DeformableMesh();
+#endif
 			boost::filesystem::path meshPath(path);
 			std::string meshBaseName = boost::filesystem::basename(meshPath);
 			std::string extension = boost::filesystem::extension(meshPath);
