@@ -262,7 +262,7 @@ int DeformableMesh::getValidSkinMesh(const std::string& meshName)
 	if (iter != morphTargets.end())
 	{
 		int morphSize = iter->second.size();	
-		for (size_t morphCounter = 0; morphCounter < morphSize; morphCounter++)
+		for (int morphCounter = 0; morphCounter < morphSize; morphCounter++)
 		{	
 			int pos;
 			int globalCounter = 0;
@@ -276,6 +276,7 @@ int DeformableMesh::getValidSkinMesh(const std::string& meshName)
 	else
 		return getMesh(sourceMeshName);
 	
+	return -1;
 }
 
 int	DeformableMesh::getMesh(const std::string& meshName)
@@ -870,7 +871,7 @@ void DeformableMeshInstance::update()
 		SkJointList& jointList = _boneJointList[skinCounter];
 		std::map<std::string, std::vector<std::string> >::iterator iter = _mesh->morphTargets.find(skinWeight->sourceMesh);
 		size_t morphSize = 1;
-		if (iter != _mesh->morphTargets.end())	morphSize = iter->second.size();	
+		//if (iter != _mesh->morphTargets.end())	morphSize = iter->second.size();
 		for (size_t morphCounter = 0; morphCounter < morphSize; morphCounter++)
 		{	
 			int pos;
