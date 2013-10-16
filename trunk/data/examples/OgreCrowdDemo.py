@@ -40,26 +40,23 @@ for i in range(amount):
 	sinbadPos = SrVec(posX, 5.16, posZ)
 	sinbad.setPosition(sinbadPos)
 	sinbad.createStandardControllers()
-	sinbad.setStringAttribute('deformableMesh', 'Sinbad')
+	sinbad.setStringAttribute('deformableMesh', 'Sinbad.mesh.xml')
 	# Retarget character
 	if i == 0 :
 		scene.run('BehaviorSetMaleLocomotion.py')
 		setupBehaviorSet()
-	retargetBehaviorSet(sinbadName)	
-	sinbadList.append(sinbad)
-	scene.command("char %s viewer deformableGPU" % sinbadName)	
-	# Play default animation
-	bml.execBML(sinbadName, '<body posture="ChrUtah_Idle001"/>')
+	retargetBehaviorSet(sinbadName)
 	
-	#steerManager = scene.getSteerManager()
-	#steerManager.removeSteerAgent(sinbadName)
-	#steerAgent = steerManager.createSteerAgent(sinbadName)
-	#steerAgent.setSteerType("basic")
+	
+	sinbadList.append(sinbad)
+	sinbad.setStringAttribute("displayType", "GPUmesh")
+	# Play default animation
+	bml.execBML(sinbadName, '<body posture="ChrUtah_Idle001"/>')	
 	
 steerManager.setEnable(False)
 steerManager.setEnable(True)
 
-# Set up list of Brads
+# Set up list of characters
 
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
