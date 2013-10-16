@@ -41,7 +41,7 @@ class ParserOgre
 {
 	public:
 		static bool parse(SmartBody::SBSkeleton& skeleton, std::vector<SmartBody::SBMotion*>& motions, std::string fileName, float scale, bool doParseSkeleton, bool doParseMotion);		
-		static bool parseSkinMesh(std::vector<SrModel*>& meshModelVec, std::vector<SkinWeight*>& skinWeights, std::string filename, float scale, bool doParseMesh, bool doParseSkinWeight);
+		static bool parseSkinMesh(std::vector<SrModel*>& meshModelVec, std::vector<SkinWeight*>& skinWeights, std::string filename, std::string& skeletonName, float scale, bool doParseMesh, bool doParseSkinWeight);
 		static DOMNode* getNode(const std::string& nodeName, DOMNode* node);
 
 		static bool parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& skeleton, std::string fileName, float scale);

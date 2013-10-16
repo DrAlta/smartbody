@@ -43,7 +43,7 @@
 #endif
 
 
-bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector<SkinWeight*>& skinWeights, std::string pathName, float scale, bool doParseMesh, bool doParseSkinWeight )
+bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector<SkinWeight*>& skinWeights, std::string pathName, std::string& skeletonName, float scale, bool doParseMesh, bool doParseSkinWeight )
 {
 	try 
 	{
@@ -108,6 +108,25 @@ bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector
 
 		if (doParseSkinWeight)
 		{
+			// find the skeleton
+			DOMNode* skeletonLinkNode = getNode("skeletonlink", doc);
+			if (skeletonLinkNode)
+			{
+				DOMNamedNodeMap* childAttr = skeletonLinkNode->getAttributes();
+				const DOMNode* nameNode = childAttr->getNamedItem(BML::BMLDefs::ATTR_NAME);
+				std::string nameAttr = "";
+				if (nameNode)
+				{
+					xml_utils::xml_translate(&nameAttr, nameNode->getNodeValue());
+					// if the reference is to a .skeleton file, transform it into a .skeleton.xml file
+					if (nameAttr.find(".skeleton") == nameAttr.size() - 9)
+					{
+						nameAttr.append(".xml");
+					}
+					skeletonName = nameAttr;
+				}
+			}
+
 			DOMNode* meshNode = getNode("mesh", doc);
 			if (!meshNode)
 			{

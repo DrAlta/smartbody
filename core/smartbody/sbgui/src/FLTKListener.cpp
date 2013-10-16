@@ -307,9 +307,10 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 							assetManager->loadAsset(meshPaths[x] + "/" + prefix + "/" + value);
 						}
 					}
+					mesh = assetManager->getDeformableMesh(value);
 				}
 		
-				mesh = assetManager->getDeformableMesh(value);
+				
 				if (mesh)
 				{
 					if (!pawn->dMeshInstance_p)
