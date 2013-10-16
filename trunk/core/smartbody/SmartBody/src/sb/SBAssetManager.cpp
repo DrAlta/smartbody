@@ -6,6 +6,7 @@
 #include <sb/SBAssetHandlerSkm.h>
 #include <sb/SBAssetHandlerSk.h>
 #include <sb/SBAssetHandlerCOLLADA.h>
+#include <sb/SBAssetHandlerAsf.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -47,6 +48,7 @@ SBAssetManager::SBAssetManager()
 	addAssetHandler(new SBAssetHandlerSkm());
 	addAssetHandler(new SBAssetHandlerSk());	
 	addAssetHandler(new SBAssetHandlerCOLLADA());	
+	addAssetHandler(new SBAssetHandlerAsf());	
 	uniqueSkeletonId = 0;
 
 	_motionCounter = 0;
