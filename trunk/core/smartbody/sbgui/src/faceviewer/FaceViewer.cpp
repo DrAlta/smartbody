@@ -63,7 +63,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 		if (!faceDefinition)
 			return;
 
-		std::vector<int>& auNums = faceDefinition->getAUNumbers();
+		const std::vector<int>& auNums = faceDefinition->getAUNumbers();
 		for (size_t a = 0; a < auNums.size(); a++)
 		{
 			ActionUnit* au = faceDefinition->getAU(auNums[a]);

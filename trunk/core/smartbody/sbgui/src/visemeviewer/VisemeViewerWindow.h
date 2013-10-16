@@ -22,38 +22,14 @@
 #include <sb/SBPhoneme.h>
 #include <sb/SBSceneListener.h>
 #include <bml/bml.hpp>
+#include <SBWindowListener.h>
 
 
 class VisemeCurveEditor;
 class VisemeRunTimeWindow;
 class VisemeViewerWindow;
 
-class LipSyncWindowListener : public SmartBody::SBSceneListener
-{
-	public:
-		LipSyncWindowListener(VisemeViewerWindow* window);
-
-		virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
-		virtual void OnCharacterDelete( const std::string & name );
-		virtual void OnCharacterUpdate( const std::string & name );
-      
-		virtual void OnPawnCreate( const std::string & name );
-		virtual void OnPawnDelete( const std::string & name );
-
-		virtual void OnReset();
-
-		virtual void OnSimulationStart();
-		virtual void OnSimulationEnd();
-		virtual void OnSimulationUpdate();
-	
-	private:
-		VisemeViewerWindow* _window;
-
-};
-
-
-
-class VisemeViewerWindow : public Fl_Double_Window{
+class VisemeViewerWindow : public Fl_Double_Window, SBWindowListener {
 public:
 	VisemeViewerWindow(int x, int y, int w, int h, char* name);
 	~VisemeViewerWindow();
@@ -66,6 +42,12 @@ public:
 	void hide();
 	void update();
 	void selectViseme(int id);
+
+	void OnSimulationUpdate();
+	void OnCharacterUpdate( const std::string & name );
+	void OnCharacterDelete( const std::string & name );
+	void OnCharacterCreate( const std::string & name, const std::string & objectClass );
+
 
 	static Fl_Menu_Item menu_[];
 
@@ -99,7 +81,6 @@ public:
 	bool _gatherStats;
 	std::map<std::string, int> _diphoneStats;
 	bool _useRemote;
-	LipSyncWindowListener* _listener;
 
 	void draw();
 	bool loadData();
