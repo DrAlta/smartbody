@@ -109,7 +109,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 
 		}
 
-		std::vector<std::string>& visemeNames = faceDefinition->getVisemeNames();
+		const std::vector<std::string>& visemeNames = faceDefinition->getVisemeNames();
 		for (size_t v = 0; v < visemeNames.size(); v++)
 		{
 			Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(visemeNames[v].c_str()));
