@@ -41,7 +41,6 @@
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBAttributeInfo">SBAttributeInfo</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBBehaviorSet">SBBehaviorSet</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBBehaviorSetManager">SBBehaviorSetManager</a>
-</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBCharacterListener">SBCharacterListener</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBDiphone">SBDiphone</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBDiphoneManager">SBDiphoneManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBEvent">SBEvent</a>
@@ -108,6 +107,7 @@
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBReachManager">SBReachManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBRetarget">SBRetarget</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBRetargetManager">SBRetargetManager</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBSceneListener">SBSceneListener</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBScript">SBScript</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBServiceManager">SBServiceManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBSimulationManager">SBSimulationManager</a>
@@ -167,7 +167,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 64</dl>
+<dl><dt><strong>__instance_size__</strong> = 72</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAttribute">SBAttribute</a>:<br>
@@ -291,7 +291,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 68</dl>
+<dl><dt><strong>__instance_size__</strong> = 76</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAttribute">SBAttribute</a>:<br>
@@ -407,7 +407,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 528</dl>
+<dl><dt><strong>__instance_size__</strong> = 568</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBPawn">SBPawn</a>:<br>
@@ -550,16 +550,6 @@ Methods defined here:<br>
 &nbsp;<br>
 <a href="#CharacterListener-OnChannel">OnChannel</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(float)arg4)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
 
-<dl><dt><a name="CharacterListener-OnCharacterChangeMesh"><strong>OnCharacterChangeMesh</strong></a>(...)</dt><dd><tt><a href="#CharacterListener-OnCharacterChangeMesh">OnCharacterChangeMesh</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;mesh&nbsp;is&nbsp;deleted.<br>
-&nbsp;<br>
-<a href="#CharacterListener-OnCharacterChangeMesh">OnCharacterChangeMesh</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
-
-<dl><dt><a name="CharacterListener-OnCharacterChanged"><strong>OnCharacterChanged</strong></a>(...)</dt><dd><tt><a href="#CharacterListener-OnCharacterChanged">OnCharacterChanged</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;is&nbsp;changed.<br>
-&nbsp;<br>
-<a href="#CharacterListener-OnCharacterChanged">OnCharacterChanged</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
-
 <dl><dt><a name="CharacterListener-OnCharacterCreate"><strong>OnCharacterCreate</strong></a>(...)</dt><dd><tt><a href="#CharacterListener-OnCharacterCreate">OnCharacterCreate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;is&nbsp;created.<br>
 &nbsp;<br>
@@ -570,10 +560,10 @@ Methods defined here:<br>
 &nbsp;<br>
 <a href="#CharacterListener-OnCharacterDelete">OnCharacterDelete</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
 
-<dl><dt><a name="CharacterListener-OnCharacterUpdate"><strong>OnCharacterUpdate</strong></a>(...)</dt><dd><tt><a href="#CharacterListener-OnCharacterUpdate">OnCharacterUpdate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+<dl><dt><a name="CharacterListener-OnCharacterUpdate"><strong>OnCharacterUpdate</strong></a>(...)</dt><dd><tt><a href="#CharacterListener-OnCharacterUpdate">OnCharacterUpdate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;is&nbsp;updated.<br>
 &nbsp;<br>
-<a href="#CharacterListener-OnCharacterUpdate">OnCharacterUpdate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+<a href="#CharacterListener-OnCharacterUpdate">OnCharacterUpdate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
 
 <dl><dt><a name="CharacterListener-OnLogMessage"><strong>OnLogMessage</strong></a>(...)</dt><dd><tt><a href="#CharacterListener-OnLogMessage">OnLogMessage</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Log&nbsp;message.<br>
@@ -635,7 +625,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 744</dl>
+<dl><dt><strong>__instance_size__</strong> = 824</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
@@ -784,7 +774,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 96</dl>
+<dl><dt><strong>__instance_size__</strong> = 104</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAttribute">SBAttribute</a>:<br>
@@ -851,7 +841,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -885,7 +875,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 744</dl>
+<dl><dt><strong>__instance_size__</strong> = 824</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
@@ -1033,7 +1023,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -1082,7 +1072,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 128</dl>
+<dl><dt><strong>__instance_size__</strong> = 144</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBBehavior">SBBehavior</a>:<br>
@@ -1198,7 +1188,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 1024</dl>
+<dl><dt><strong>__instance_size__</strong> = 1136</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
@@ -1368,7 +1358,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 176</dl>
+<dl><dt><strong>__instance_size__</strong> = 200</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -1417,7 +1407,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 80</dl>
+<dl><dt><strong>__instance_size__</strong> = 88</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAttribute">SBAttribute</a>:<br>
@@ -1484,7 +1474,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -1521,7 +1511,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 84</dl>
+<dl><dt><strong>__instance_size__</strong> = 92</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBBehavior">SBBehavior</a>:<br>
@@ -1652,7 +1642,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 192</dl>
+<dl><dt><strong>__instance_size__</strong> = 200</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAttribute">SBAttribute</a>:<br>
@@ -1705,7 +1695,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 744</dl>
+<dl><dt><strong>__instance_size__</strong> = 808</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
@@ -1898,7 +1888,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 128</dl>
+<dl><dt><strong>__instance_size__</strong> = 148</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -2012,7 +2002,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 96</dl>
+<dl><dt><strong>__instance_size__</strong> = 108</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBBehavior">SBBehavior</a>:<br>
@@ -2186,7 +2176,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 744</dl>
+<dl><dt><strong>__instance_size__</strong> = 824</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
@@ -2328,7 +2318,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -2462,7 +2452,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 500</dl>
+<dl><dt><strong>__instance_size__</strong> = 568</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -2500,7 +2490,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 500</dl>
+<dl><dt><strong>__instance_size__</strong> = 568</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -2647,7 +2637,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 500</dl>
+<dl><dt><strong>__instance_size__</strong> = 568</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -2797,7 +2787,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 500</dl>
+<dl><dt><strong>__instance_size__</strong> = 568</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -2947,7 +2937,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 500</dl>
+<dl><dt><strong>__instance_size__</strong> = 568</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -3161,7 +3151,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 88</dl>
+<dl><dt><strong>__instance_size__</strong> = 108</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -3239,7 +3229,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 128</dl>
+<dl><dt><strong>__instance_size__</strong> = 144</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -3329,7 +3319,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 188</dl>
+<dl><dt><strong>__instance_size__</strong> = 292</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -3445,7 +3435,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 64</dl>
+<dl><dt><strong>__instance_size__</strong> = 72</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBSubject">SBSubject</a>:<br>
@@ -3512,7 +3502,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 56</dl>
+<dl><dt><strong>__instance_size__</strong> = 60</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -3548,7 +3538,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 68</dl>
+<dl><dt><strong>__instance_size__</strong> = 76</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -3669,7 +3659,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 64</dl>
+<dl><dt><strong>__instance_size__</strong> = 72</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -3719,7 +3709,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -3753,7 +3743,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 200</dl>
+<dl><dt><strong>__instance_size__</strong> = 232</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBService">SBService</a>:<br>
@@ -3945,9 +3935,6 @@ Methods defined here:<br>
 <dl><dt><a name="SBCharacter-setAutomaticPruning"><strong>setAutomaticPruning</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setAutomaticPruning">setAutomaticPruning</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Toggles&nbsp;the&nbsp;automatic&nbsp;pruning&nbsp;mechanism&nbsp;on&nbsp;or&nbsp;off.</tt></dd></dl>
 
-<dl><dt><a name="SBCharacter-setDeformableMeshName"><strong>setDeformableMeshName</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setDeformableMeshName">setDeformableMeshName</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;load&nbsp;the&nbsp;deformable&nbsp;mesh&nbsp;with&nbsp;given&nbsp;mesh&nbsp;name</tt></dd></dl>
-
 <dl><dt><a name="SBCharacter-setFaceDefinition"><strong>setFaceDefinition</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setFaceDefinition">setFaceDefinition</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(<a href="#SBFaceDefinition">SBFaceDefinition</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;face&nbsp;definition&nbsp;(visemes,&nbsp;action&nbsp;units)&nbsp;for&nbsp;a&nbsp;character.</tt></dd></dl>
 
@@ -3989,7 +3976,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 872</dl>
+<dl><dt><strong>__instance_size__</strong> = 952</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBPawn">SBPawn</a>:<br>
@@ -4117,62 +4104,6 @@ Data and other attributes inherited from Boost.Python.instance:<br>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="SBCharacterListener">class <strong>SBCharacterListener</strong></a>(Boost.Python.instance)</font></td></tr>
-    
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="SmartBody.html#SBCharacterListener">SBCharacterListener</a></dd>
-<dd>Boost.Python.instance</dd>
-<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="SBCharacterListener-OnCharacterChangeMesh"><strong>OnCharacterChangeMesh</strong></a>(...)</dt><dd><tt><a href="#SBCharacterListener-OnCharacterChangeMesh">OnCharacterChangeMesh</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character's&nbsp;mesh&nbsp;is&nbsp;created.</tt></dd></dl>
-
-<dl><dt><a name="SBCharacterListener-OnCharacterChanged"><strong>OnCharacterChanged</strong></a>(...)</dt><dd><tt><a href="#SBCharacterListener-OnCharacterChanged">OnCharacterChanged</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;is&nbsp;changed.</tt></dd></dl>
-
-<dl><dt><a name="SBCharacterListener-OnCharacterCreate"><strong>OnCharacterCreate</strong></a>(...)</dt><dd><tt><a href="#SBCharacterListener-OnCharacterCreate">OnCharacterCreate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;is&nbsp;created.</tt></dd></dl>
-
-<dl><dt><a name="SBCharacterListener-OnCharacterDelete"><strong>OnCharacterDelete</strong></a>(...)</dt><dd><tt><a href="#SBCharacterListener-OnCharacterDelete">OnCharacterDelete</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;is&nbsp;deleted.</tt></dd></dl>
-
-<dl><dt><a name="SBCharacterListener-OnCharacterUpdate"><strong>OnCharacterUpdate</strong></a>(...)</dt><dd><tt><a href="#SBCharacterListener-OnCharacterUpdate">OnCharacterUpdate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;is&nbsp;updated.</tt></dd></dl>
-
-<dl><dt><a name="SBCharacterListener-OnPawnCreate"><strong>OnPawnCreate</strong></a>(...)</dt><dd><tt><a href="#SBCharacterListener-OnPawnCreate">OnPawnCreate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;pawn&nbsp;is&nbsp;created.</tt></dd></dl>
-
-<dl><dt><a name="SBCharacterListener-OnPawnDelete"><strong>OnPawnDelete</strong></a>(...)</dt><dd><tt><a href="#SBCharacterListener-OnPawnDelete">OnPawnDelete</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;pawn&nbsp;is&nbsp;deleted.</tt></dd></dl>
-
-<dl><dt><a name="SBCharacterListener-OnViseme"><strong>OnViseme</strong></a>(...)</dt><dd><tt><a href="#SBCharacterListener-OnViseme">OnViseme</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Visemes&nbsp;sent&nbsp;every&nbsp;frame.</tt></dd></dl>
-
-<dl><dt><a name="SBCharacterListener-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBCharacterListener-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
-
-<dl><dt><a name="SBCharacterListener-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
-
-<hr>
-Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 12</dl>
-
-<hr>
-Data descriptors inherited from Boost.Python.instance:<br>
-<dl><dt><strong>__dict__</strong></dt>
-</dl>
-<dl><dt><strong>__weakref__</strong></dt>
-</dl>
-<hr>
-Data and other attributes inherited from Boost.Python.instance:<br>
-<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBCharacterListener-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="SBCollisionManager">class <strong>SBCollisionManager</strong></a>(<a href="SmartBody.html#SBService">SBService</a>)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
@@ -4197,7 +4128,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 196</dl>
+<dl><dt><strong>__instance_size__</strong> = 228</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBService">SBService</a>:<br>
@@ -4341,7 +4272,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 592</dl>
+<dl><dt><strong>__instance_size__</strong> = 648</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -4465,7 +4396,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 80</dl>
+<dl><dt><strong>__instance_size__</strong> = 92</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -4515,7 +4446,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -4561,7 +4492,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 68</dl>
+<dl><dt><strong>__instance_size__</strong> = 76</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -4598,7 +4529,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 72</dl>
+<dl><dt><strong>__instance_size__</strong> = 80</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -4648,7 +4579,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -4716,7 +4647,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 100</dl>
+<dl><dt><strong>__instance_size__</strong> = 116</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -4766,7 +4697,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 308</dl>
+<dl><dt><strong>__instance_size__</strong> = 356</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -4810,7 +4741,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -4923,7 +4854,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 628</dl>
+<dl><dt><strong>__instance_size__</strong> = 672</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -5074,7 +5005,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 256</dl>
+<dl><dt><strong>__instance_size__</strong> = 320</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -5121,7 +5052,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -5294,6 +5225,10 @@ Methods defined here:<br>
 <dl><dt><a name="SBMotion-mirrorChildren"><strong>mirrorChildren</strong></a>(...)</dt><dd><tt><a href="#SBMotion-mirrorChildren">mirrorChildren</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(str)arg4)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Mirrors&nbsp;only&nbsp;the&nbsp;child&nbsp;joints&nbsp;of&nbsp;a&nbsp;specific&nbsp;parent&nbsp;joint.</tt></dd></dl>
 
+<dl><dt><a name="SBMotion-pertainMotionChannelsByEndJoints"><strong>pertainMotionChannelsByEndJoints</strong></a>(...)</dt><dd><tt><a href="#SBMotion-pertainMotionChannelsByEndJoints">pertainMotionChannelsByEndJoints</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#StringVec">StringVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Pertain&nbsp;all&nbsp;the&nbsp;motion&nbsp;channels&nbsp;corresponding&nbsp;to&nbsp;the&nbsp;descendents&nbsp;of&nbsp;end&nbsp;joints.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;:&nbsp;skeleton&nbsp;name,&nbsp;end&nbsp;joint&nbsp;names</tt></dd></dl>
+
 <dl><dt><a name="SBMotion-removeMetaData"><strong>removeMetaData</strong></a>(...)</dt><dd><tt><a href="#SBMotion-removeMetaData">removeMetaData</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Remove&nbsp;a&nbsp;tagged&nbsp;metadata&nbsp;from&nbsp;the&nbsp;motion.</tt></dd></dl>
 
@@ -5313,6 +5248,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBMotion-saveToSkm"><strong>saveToSkm</strong></a>(...)</dt><dd><tt><a href="#SBMotion-saveToSkm">saveToSkm</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;file&nbsp;in&nbsp;.skm&nbsp;format&nbsp;to&nbsp;a&nbsp;given&nbsp;file&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBMotion-saveToSkmByFrames"><strong>saveToSkmByFrames</strong></a>(...)</dt><dd><tt><a href="#SBMotion-saveToSkmByFrames">saveToSkmByFrames</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3,&nbsp;(int)arg4)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;file&nbsp;in&nbsp;.skm&nbsp;format&nbsp;to&nbsp;a&nbsp;given&nbsp;file&nbsp;name,&nbsp;start&nbsp;and&nbsp;end&nbsp;frame.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-scale"><strong>scale</strong></a>(...)</dt><dd><tt><a href="#SBMotion-scale">scale</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Scales&nbsp;all&nbsp;translations&nbsp;in&nbsp;skeleton&nbsp;by&nbsp;scale&nbsp;factor.</tt></dd></dl>
@@ -5334,7 +5272,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 576</dl>
+<dl><dt><strong>__instance_size__</strong> = 664</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -5477,7 +5415,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 592</dl>
+<dl><dt><strong>__instance_size__</strong> = 672</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -5729,7 +5667,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 124</dl>
+<dl><dt><strong>__instance_size__</strong> = 144</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -5773,7 +5711,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 28</dl>
+<dl><dt><strong>__instance_size__</strong> = 32</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -5820,7 +5758,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 80</dl>
+<dl><dt><strong>__instance_size__</strong> = 92</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -5864,7 +5802,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 124</dl>
+<dl><dt><strong>__instance_size__</strong> = 136</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -5933,7 +5871,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 392</dl>
+<dl><dt><strong>__instance_size__</strong> = 424</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -6074,7 +6012,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 144</dl>
+<dl><dt><strong>__instance_size__</strong> = 160</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBService">SBService</a>:<br>
@@ -6245,7 +6183,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 120</dl>
+<dl><dt><strong>__instance_size__</strong> = 144</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -6289,7 +6227,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -6336,7 +6274,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 180</dl>
+<dl><dt><strong>__instance_size__</strong> = 216</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -6377,7 +6315,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -6422,6 +6360,9 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Add&nbsp;motion&nbsp;resource&nbsp;given&nbsp;filepath&nbsp;and&nbsp;recursive&nbsp;flag.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;path,&nbsp;recursive&nbsp;flag(boolean&nbsp;variable&nbsp;indicating&nbsp;whether&nbsp;to&nbsp;tranverse&nbsp;all&nbsp;the&nbsp;children&nbsp;directories)&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;NULL</tt></dd></dl>
+
+<dl><dt><a name="SBScene-addSceneListener"><strong>addSceneListener</strong></a>(...)</dt><dd><tt><a href="#SBScene-addSceneListener">addSceneListener</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;listener&nbsp;for&nbsp;scene&nbsp;events.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-addScript"><strong>addScript</strong></a>(...)</dt><dd><tt><a href="#SBScene-addScript">addScript</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SBScript">SBScript</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;script&nbsp;to&nbsp;the&nbsp;scene.</tt></dd></dl>
@@ -6468,6 +6409,9 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-createSkeleton"><strong>createSkeleton</strong></a>(...)</dt><dd><tt><a href="#SBScene-createSkeleton">createSkeleton</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBSkeleton">SBSkeleton</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;new&nbsp;skeleton&nbsp;given&nbsp;a&nbsp;skeleton&nbsp;definition.</tt></dd></dl>
 
+<dl><dt><a name="SBScene-exportCharacter"><strong>exportCharacter</strong></a>(...)</dt><dd><tt><a href="#SBScene-exportCharacter">exportCharacter</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;character's&nbsp;skeleton,&nbsp;skinned&nbsp;mesh&nbsp;and&nbsp;all&nbsp;other&nbsp;assets&nbsp;into&nbsp;a&nbsp;given&nbsp;folder&nbsp;in&nbsp;Collada&nbsp;format.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-exportScene"><strong>exportScene</strong></a>(...)</dt><dd><tt><a href="#SBScene-exportScene">exportScene</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#StringVec">StringVec</a>)arg2,&nbsp;(object)arg3)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;entire&nbsp;SmartBody&nbsp;configuration,&nbsp;including&nbsp;assets&nbsp;paths&nbsp;as&nbsp;a&nbsp;python&nbsp;script&nbsp;into&nbsp;a&nbsp;given&nbsp;file&nbsp;location.</tt></dd></dl>
 
@@ -6505,9 +6449,6 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;character&nbsp;object&nbsp;given&nbsp;its&nbsp;name.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;character&nbsp;name&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;character&nbsp;object</tt></dd></dl>
-
-<dl><dt><a name="SBScene-getCharacterListener"><strong>getCharacterListener</strong></a>(...)</dt><dd><tt><a href="#SBScene-getCharacterListener">getCharacterListener</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#CharacterListener">CharacterListener</a>&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;listener&nbsp;for&nbsp;character&nbsp;and&nbsp;pawn&nbsp;events.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getCharacterNames"><strong>getCharacterNames</strong></a>(...)</dt><dd><tt><a href="#SBScene-getCharacterNames">getCharacterNames</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;character&nbsp;names.<br>
@@ -6613,6 +6554,9 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-getScale"><strong>getScale</strong></a>(...)</dt><dd><tt><a href="#SBScene-getScale">getScale</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;scene&nbsp;scale&nbsp;in&nbsp;meters&nbsp;(default&nbsp;is&nbsp;centimeters&nbsp;.01)</tt></dd></dl>
 
+<dl><dt><a name="SBScene-getSceneListeners"><strong>getSceneListeners</strong></a>(...)</dt><dd><tt><a href="#SBScene-getSceneListeners">getSceneListeners</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;object&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;all&nbsp;the&nbsp;scene&nbsp;listeners&nbsp;for&nbsp;scene&nbsp;events.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-getScript"><strong>getScript</strong></a>(...)</dt><dd><tt><a href="#SBScene-getScript">getScript</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBScript">SBScript</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;a&nbsp;script.</tt></dd></dl>
 
@@ -6670,6 +6614,9 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-removeAllPawns"><strong>removeAllPawns</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeAllPawns">removeAllPawns</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;all&nbsp;the&nbsp;pawns.</tt></dd></dl>
 
+<dl><dt><a name="SBScene-removeAllSceneListeners"><strong>removeAllSceneListeners</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeAllSceneListeners">removeAllSceneListeners</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;all&nbsp;scene&nbsp;listeners.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-removeAllSystemParameters"><strong>removeAllSystemParameters</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeAllSystemParameters">removeAllSystemParameters</a>(&nbsp;(str)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;a&nbsp;system&nbsp;parameter.</tt></dd></dl>
 
@@ -6694,6 +6641,12 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-removePendingCommands"><strong>removePendingCommands</strong></a>(...)</dt><dd><tt><a href="#SBScene-removePendingCommands">removePendingCommands</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;any&nbsp;commands&nbsp;stored&nbsp;in&nbsp;SmartBody&nbsp;awaiting&nbsp;execution.</tt></dd></dl>
 
+<dl><dt><a name="SBScene-removeSceneListener"><strong>removeSceneListener</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeSceneListener">removeSceneListener</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;a&nbsp;scene&nbsp;listener.<br>
+&nbsp;<br>
+<a href="#SBScene-removeSceneListener">removeSceneListener</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;a&nbsp;listener&nbsp;for&nbsp;scene&nbsp;events.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-removeScript"><strong>removeScript</strong></a>(...)</dt><dd><tt><a href="#SBScene-removeScript">removeScript</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;scripts.</tt></dd></dl>
 
@@ -6708,9 +6661,6 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBScene-setActiveCamera"><strong>setActiveCamera</strong></a>(...)</dt><dd><tt><a href="#SBScene-setActiveCamera">setActiveCamera</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#Camera">Camera</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;camera&nbsp;to&nbsp;be&nbsp;used&nbsp;in&nbsp;the&nbsp;viewer.</tt></dd></dl>
-
-<dl><dt><a name="SBScene-setCharacterListener"><strong>setCharacterListener</strong></a>(...)</dt><dd><tt><a href="#SBScene-setCharacterListener">setCharacterListener</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;listener&nbsp;for&nbsp;character&nbsp;and&nbsp;pawn&nbsp;events.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-setDefaultCharacter"><strong>setDefaultCharacter</strong></a>(...)</dt><dd><tt><a href="#SBScene-setDefaultCharacter">setDefaultCharacter</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;default&nbsp;character.</tt></dd></dl>
@@ -6750,7 +6700,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 524</dl>
+<dl><dt><strong>__instance_size__</strong> = 612</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -6843,6 +6793,56 @@ Data and other attributes inherited from Boost.Python.instance:<br>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBSceneListener">class <strong>SBSceneListener</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBSceneListener">SBSceneListener</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBSceneListener-OnCharacterCreate"><strong>OnCharacterCreate</strong></a>(...)</dt><dd><tt><a href="#SBSceneListener-OnCharacterCreate">OnCharacterCreate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;is&nbsp;created.</tt></dd></dl>
+
+<dl><dt><a name="SBSceneListener-OnCharacterDelete"><strong>OnCharacterDelete</strong></a>(...)</dt><dd><tt><a href="#SBSceneListener-OnCharacterDelete">OnCharacterDelete</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;is&nbsp;deleted.</tt></dd></dl>
+
+<dl><dt><a name="SBSceneListener-OnCharacterUpdate"><strong>OnCharacterUpdate</strong></a>(...)</dt><dd><tt><a href="#SBSceneListener-OnCharacterUpdate">OnCharacterUpdate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;is&nbsp;updated.</tt></dd></dl>
+
+<dl><dt><a name="SBSceneListener-OnPawnCreate"><strong>OnPawnCreate</strong></a>(...)</dt><dd><tt><a href="#SBSceneListener-OnPawnCreate">OnPawnCreate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;pawn&nbsp;is&nbsp;created.</tt></dd></dl>
+
+<dl><dt><a name="SBSceneListener-OnPawnDelete"><strong>OnPawnDelete</strong></a>(...)</dt><dd><tt><a href="#SBSceneListener-OnPawnDelete">OnPawnDelete</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;pawn&nbsp;is&nbsp;deleted.</tt></dd></dl>
+
+<dl><dt><a name="SBSceneListener-OnViseme"><strong>OnViseme</strong></a>(...)</dt><dd><tt><a href="#SBSceneListener-OnViseme">OnViseme</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Visemes&nbsp;sent&nbsp;every&nbsp;frame.</tt></dd></dl>
+
+<dl><dt><a name="SBSceneListener-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBSceneListener-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBSceneListener-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 12</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBSceneListener-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="SBScript">class <strong>SBScript</strong></a>(Boost.Python.instance)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
@@ -6923,7 +6923,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 128</dl>
+<dl><dt><strong>__instance_size__</strong> = 148</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -7047,7 +7047,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 140</dl>
+<dl><dt><strong>__instance_size__</strong> = 164</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -7184,6 +7184,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBSkeleton-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
 
+<dl><dt><a name="SBSkeleton-createJoint"><strong>createJoint</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-createJoint">createJoint</a>(&nbsp;(<a href="#SBSkeleton">SBSkeleton</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SBJoint">SBJoint</a>)arg3)&nbsp;-&gt;&nbsp;<a href="#SBJoint">SBJoint</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;joint&nbsp;to&nbsp;the&nbsp;skeleton.&nbsp;First&nbsp;parameter&nbsp;is&nbsp;the&nbsp;joint,&nbsp;second&nbsp;is&nbsp;the&nbsp;joints&nbsp;parent&nbsp;(null&nbsp;for&nbsp;root).</tt></dd></dl>
+
 <dl><dt><a name="SBSkeleton-createSkelWithoutPreRot"><strong>createSkelWithoutPreRot</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-createSkelWithoutPreRot">createSkelWithoutPreRot</a>(&nbsp;(<a href="#SBSkeleton">SBSkeleton</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBSkeleton">SBSkeleton</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Create&nbsp;a&nbsp;new&nbsp;standard&nbsp;T-pose&nbsp;skel&nbsp;from&nbsp;source&nbsp;but&nbsp;without&nbsp;pre-rotations</tt></dd></dl>
 
@@ -7231,7 +7234,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 356</dl>
+<dl><dt><strong>__instance_size__</strong> = 408</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -7352,7 +7355,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 72</dl>
+<dl><dt><strong>__instance_size__</strong> = 80</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -7407,7 +7410,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 176</dl>
+<dl><dt><strong>__instance_size__</strong> = 200</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBService">SBService</a>:<br>
@@ -7533,7 +7536,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 28</dl>
+<dl><dt><strong>__instance_size__</strong> = 32</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -7600,7 +7603,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 216</dl>
+<dl><dt><strong>__instance_size__</strong> = 248</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBService">SBService</a>:<br>
@@ -7722,7 +7725,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 808</dl>
+<dl><dt><strong>__instance_size__</strong> = 912</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
@@ -7859,7 +7862,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 96</dl>
+<dl><dt><strong>__instance_size__</strong> = 108</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBBehavior">SBBehavior</a>:<br>
@@ -8246,7 +8249,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 136</dl>
+<dl><dt><strong>__instance_size__</strong> = 156</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAttribute">SBAttribute</a>:<br>
@@ -8307,7 +8310,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -8355,7 +8358,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -8441,7 +8444,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 88</dl>
+<dl><dt><strong>__instance_size__</strong> = 96</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAttribute">SBAttribute</a>:<br>
@@ -8508,7 +8511,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -8550,7 +8553,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
+<dl><dt><strong>__instance_size__</strong> = 28</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
