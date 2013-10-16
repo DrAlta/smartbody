@@ -91,12 +91,12 @@ sinbadPos = SrVec(-6,5.16, 0)
 sinbad.setPosition(sinbadPos)
 sinbad.createStandardControllers()
 sinbad.setDoubleAttribute('deformableMeshScale', 1)
-sinbad.setStringAttribute('deformableMesh', 'Sinbad')
+sinbad.setStringAttribute('deformableMesh', 'Sinbad.mesh.xml')
 scene.run('BehaviorSetMaleLocomotion.py')
 setupBehaviorSet()
 retargetBehaviorSet(sinbadName)
 bml.execBML('target', '<body posture="ChrBrad@Idle01"/>')
-scene.command('char target viewer deformableGPU')
+sinbad.setStringAttribute("displayType", "GPUmesh")
 
 # Add ChrBrad (source character )
 source = scene.createCharacter('source', '')
@@ -109,10 +109,7 @@ source.createStandardControllers()
 source.setDoubleAttribute('deformableMeshScale', 0.06)
 source.setStringAttribute('deformableMesh', 'ChrBrad')
 bml.execBML('source', '<body posture="ChrBrad@Idle01"/>')
-
-# Turn on GPU deformable geometry
-scene.command("char target viewer deformableGPU")
-scene.command("char source viewer deformableGPU")
+source.setStringAttribute("displayType", "GPUmesh")
 
 print 'Configuring scene parameters and camera'
 camera = getCamera()
