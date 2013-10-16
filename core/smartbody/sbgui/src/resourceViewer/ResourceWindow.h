@@ -12,7 +12,10 @@
 #include <sb/SBSceneListener.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBJointMap.h>
+#include <sb/SBAnimationState.h>
+#include <sb/SBAnimationTransition.h>
 #include <sbm/GenericViewer.h>
+#include <sbm/sbm_deformable_mesh.h>
 #include <sb/SBEvent.h>
 #include "Fl_Tree_Horizontal.h" // a custom tree widget with horizontal scroll bar
 #include "TreeItemInfoWidget.h"
@@ -61,7 +64,10 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 			   ITEM_SKELETON, 
 			   ITEM_JOINT_MAP,
 			   ITEM_DIPHONES,
-			   ITEM_MOTION, 			   
+			   ITEM_MOTION,
+			   ITEM_ANIMATION_BLEND,
+			   ITEM_BLEND_TRANSITION,
+			   ITEM_MESH,
 			   ITEM_FACE_DEFINITION,
 			   ITEM_EVENT_HANDLERS,
 			   ITEM_PAWN, 
@@ -72,7 +78,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 			   ITEM_PHYSICS,
 			   ITEM_NETURAL_MOTION,
 			   ITEM_AU_MAP,
-			   ITEM_VISEME_MAP,			   
+			   ITEM_VISEME_MAP,			   			  
 			   ITEM_DEFAULT,
 			   ITEM_SIZE };
 		std::vector<std::string> ItemNameList;
@@ -117,6 +123,9 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		void updateSkeleton(Fl_Tree_Item* tree, SmartBody::SBSkeleton* skel);
 		void updateJointMap(Fl_Tree_Item* tree, SmartBody::SBJointMap* jointMap);
 		void updateMotion(Fl_Tree_Item* tree, SmartBody::SBMotion* motion);
+		void updateAnimationBlend(Fl_Tree_Item* tree, SmartBody::SBAnimationBlend* blend);
+		void updateBlendTransition(Fl_Tree_Item* tree, SmartBody::SBAnimationTransition* transition);
+		void updateMesh(Fl_Tree_Item* tree, DeformableMesh* mesh);
 		void updatePawn(Fl_Tree_Item* tree, SmartBody::SBPawn* pawn);
 		void updateCharacter(Fl_Tree_Item* tree, SmartBody::SBCharacter* character);
 		void updatePhysicsCharacter(Fl_Tree_Item* tree, SmartBody::SBPhysicsCharacter* phyChar);
@@ -124,7 +133,7 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		void updatePhysicsManager(Fl_Tree_Item* tree, SmartBody::SBPhysicsManager* phyService);
 		void updateFaceMotion(Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition);
 		void updateEventHandler(Fl_Tree_Item* tree, SmartBody::SBEventHandler* handler);
-		
+		bool processedDragAndDrop(std::string& dndText);
 		int  findTreeItemType(Fl_Tree_Item* treeItem);
 		void clearInfoWidget(TreeItemInfoWidget* lastWidget);
 		TreeItemInfoWidget* createInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* treeItem, int itemType );

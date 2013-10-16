@@ -166,4 +166,15 @@ std::string SBAnimationTransition::saveToString()
 	return strstr.str();	
 }
 
+SBAPI std::string SBAnimationTransition::getTransitionName()
+{
+	std::string transitionName = "Error";
+
+	if (getSourceBlend() && getDestinationBlend())
+		transitionName = getSourceBlend()->stateName + "/" + getDestinationBlend()->stateName;
+
+	return transitionName;
+
+}
+
 }

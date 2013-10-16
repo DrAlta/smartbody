@@ -8,6 +8,8 @@
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Tabs.H>
+#include <sb/SBAnimationState.h>
+#include <sb/SBAnimationTransition.h>
 
 
 namespace SmartBody { class SBSkeleton; }
@@ -77,6 +79,28 @@ protected:
 	std::string getTypeParameter(int type);
 	std::string pathName;
 	SmartBody::SBObserver* observer;
+};
+
+class AnimationBlendInfoWidget : public TreeItemInfoWidget
+{
+protected:
+	AttributeWindow* attrWindow;
+	TreeInfoObject* blendInfoObject;
+	std::string blendName;
+public:
+	AnimationBlendInfoWidget(SmartBody::SBAnimationBlend* blend, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow);	
+	virtual void updateWidget();
+};
+
+class BlendTransitionInfoWidget : public TreeItemInfoWidget
+{
+protected:
+	AttributeWindow* attrWindow;
+	TreeInfoObject* transitionInfoObject;
+	std::string transitionName;
+public:
+	BlendTransitionInfoWidget(SmartBody::SBAnimationTransition* blend, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow);	
+	virtual void updateWidget();
 };
 
 class SeqItemInfoWidget : public TreeItemInfoWidget

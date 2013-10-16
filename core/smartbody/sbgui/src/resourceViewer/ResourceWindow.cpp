@@ -25,6 +25,8 @@
 #include <sb/SBJointMap.h>
 #include <sb/SBGestureMap.h>
 #include <sb/SBGestureMapManager.h>
+#include <sb/SBAssetManager.h>
+#include <sb/SBAnimationStateManager.h>
 #include <sb/nvbg.h>
 
 #include <sbm/action_unit.hpp>
@@ -115,8 +117,11 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 	ItemNameList.push_back("MESH_PATH");
 	ItemNameList.push_back("SEQ_FILES");
 	ItemNameList.push_back("SKELETON");
-	ItemNameList.push_back("BONE MAP");
+	ItemNameList.push_back("JOINT MAP");
 	ItemNameList.push_back("MOTION");
+	ItemNameList.push_back("ANIMATION BLEND");
+	ItemNameList.push_back("BLEND TRANSITION");
+	ItemNameList.push_back("MESH");
 	ItemNameList.push_back("FACE DEFINITION");
 	ItemNameList.push_back("EVENT HANDLERS");
 	ItemNameList.push_back("PAWN");
@@ -125,7 +130,7 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 	ItemNameList.push_back("PHYSICS");
 	ItemNameList.push_back("NEUTRAL MOTION");
 	ItemNameList.push_back("AU MAP");
-	ItemNameList.push_back("VISEME MAP");
+	ItemNameList.push_back("VISEME MAP");	
 	ItemNameList.push_back("DEFAULT");
 
 
@@ -149,6 +154,9 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 	treeItemList[ITEM_JOINT_MAP] = resourceTree->add("Character Maps");
 	treeItemList[ITEM_DIPHONES] = resourceTree->add("Lip Syncing");
 	treeItemList[ITEM_MOTION] =  resourceTree->add("Motions");	
+	treeItemList[ITEM_ANIMATION_BLEND] =  resourceTree->add("Animation Blends");
+	treeItemList[ITEM_BLEND_TRANSITION] =  resourceTree->add("Blend Transitions");
+	treeItemList[ITEM_MESH] =  resourceTree->add("Meshes");	
 
 	treeItemList[ITEM_FACE_DEFINITION] = resourceTree->add("Face Definitions");
 	treeItemList[ITEM_EVENT_HANDLERS] = resourceTree->add("Event Handlers");
@@ -164,7 +172,7 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Doub
 	for (int i = 0; i <= ITEM_CHARACTER; i++)
 		treeItemList[i]->user_data((void*)i);
 
-	resourceTree->callback(treeCallBack,this);
+	resourceTree->callback(treeCallBack,this);	
 
 	refreshButton = new Fl_Button( w - rightPanelWidth + 20 , 10 , 100, 20, "Refresh");
 	refreshButton->callback(refreshUI, this);
@@ -223,10 +231,55 @@ void ResourceWindow::update_viewer()
 
 }
 
+
+bool ResourceWindow::processedDragAndDrop( std::string& dndText )
+{
+	boost::filesystem::path dndPath(dndText);
+	std::string fullPathName = dndText;
+	std::string filebasename = boost::filesystem::basename(dndText);
+	std::string fileextension = boost::filesystem::extension(dndText);					
+	std::string fullPath = dndPath.parent_path().string();
+	
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	assetManager->loadAsset(dndText);
+	updateGUI();
+	return true;
+}
+
+
 int ResourceWindow::handle( int event )
 {
 	int ret = Fl_Double_Window::handle(event);
+	std::string dndText;
 	switch ( event ) {
+		case FL_DND_RELEASE:
+			//LOG("DND Release");
+			ret = 1;
+			break;
+		case FL_DND_ENTER:          // return(1) for these events to 'accept' dnd
+			//LOG("DND Enter");
+			//Fl::belowmouse(this); // send the leave events first
+			//Fl::focus(this);
+			//handle(FL_FOCUS);		
+			ret = 1;
+			break;
+		case FL_DND_DRAG:			
+			ret = 1;
+			break;
+		case FL_DND_LEAVE:
+			//LOG("DND Leave");
+			ret = 1;
+			break;	  
+		case FL_PASTE:              // handle actual drop (paste) operation		   
+			{
+				//label(Fl::event_text());
+				//fprintf(stderr, "PASTE: %s\n", Fl::event_text());
+				//LOG("PASTE: %s\n", Fl::event_text());
+				dndText = Fl::event_text();
+				bool hasAsset = processedDragAndDrop(dndText);
+				ret = 1;				
+			}
+			break;	
 		case FL_PUSH:  
 		{// do 'copy/dnd' when someone clicks on box
 			if (Fl::event_button() == 2)
@@ -337,6 +390,7 @@ void ResourceWindow::updateGUI()
 {
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBAssetManager* assetManager = scene->getAssetManager();
 
 	resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
 	// update path tree	
@@ -384,6 +438,37 @@ void ResourceWindow::updateGUI()
 		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
 		SmartBody::SBMotion * motion = scene->getMotion(motionNames[i]);
 		updateMotion(treeItemList[ITEM_MOTION], motion);
+	}
+
+	SmartBody::SBAnimationBlendManager* blendManager = scene->getBlendManager();
+	// update animation blend map
+	resourceTree->clear_children(treeItemList[ITEM_ANIMATION_BLEND]);
+	std::vector<std::string> blendNames = blendManager->getBlendNames();
+	for (size_t i = 0; i < blendNames.size(); i++)
+	{
+		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
+		SmartBody::SBAnimationBlend * blend = blendManager->getBlend(blendNames[i]);
+		updateAnimationBlend(treeItemList[ITEM_ANIMATION_BLEND], blend);
+	}
+
+	// update blend transition map
+	resourceTree->clear_children(treeItemList[ITEM_BLEND_TRANSITION]);
+	std::vector<std::string> transitionNames = blendManager->getTransitionNames();
+	for (size_t i = 0; i < transitionNames.size(); i++)
+	{
+		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
+		SmartBody::SBAnimationTransition * transition = blendManager->getTransitionByName(transitionNames[i]);
+		updateBlendTransition(treeItemList[ITEM_BLEND_TRANSITION], transition);
+	}
+
+	// update mesh map
+	resourceTree->clear_children(treeItemList[ITEM_MESH]);
+	std::vector<std::string> meshNames = assetManager->getDeformableMeshNames();
+	for (size_t i = 0; i < meshNames.size(); i++)
+	{
+		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
+		DeformableMesh* mesh = assetManager->getDeformableMesh(meshNames[i]);
+		updateMesh(treeItemList[ITEM_MESH], mesh);
 	}
 
 	// update face definition map
@@ -655,11 +740,32 @@ void ResourceWindow::updateSkeleton( Fl_Tree_Item* tree, SmartBody::SBSkeleton* 
 	std::string ext = boost::filesystem::extension( skel->skfilename() );
 #else
 	std::string ext = boost::filesystem2::extension( skel->skfilename() );
-#endif
-	std::string filebase = boost::filesystem::basename(skel->skfilename());
-	Fl_Tree_Item* item = resourceTree->add(tree,(filebase+ext).c_str());
+#endif	
+	Fl_Tree_Item* item = resourceTree->add(tree,skel->getName().c_str());
 	item->user_data((void*)ITEM_SKELETON);
 }
+
+
+void ResourceWindow::updateMesh( Fl_Tree_Item* tree, DeformableMesh* mesh )
+{
+	Fl_Tree_Item* item = resourceTree->add(tree, mesh->getName().c_str());
+	item->user_data((void*)ITEM_MESH);
+}
+
+void ResourceWindow::updateAnimationBlend( Fl_Tree_Item* tree, SmartBody::SBAnimationBlend* blend )
+{
+	Fl_Tree_Item* item = resourceTree->add(tree, blend->stateName.c_str());
+	item->user_data((void*)ITEM_ANIMATION_BLEND);
+
+}
+
+void ResourceWindow::updateBlendTransition( Fl_Tree_Item* tree, SmartBody::SBAnimationTransition* transition )
+{	
+	std::string transitionName = transition->getTransitionName();
+	Fl_Tree_Item* item = resourceTree->add(tree, transitionName.c_str());
+	item->user_data((void*)ITEM_BLEND_TRANSITION);
+}
+
 
 void ResourceWindow::updateMotion( Fl_Tree_Item* tree, SmartBody::SBMotion* motion )
 {
@@ -847,6 +953,8 @@ void ResourceWindow::clearInfoWidget(TreeItemInfoWidget* lastWidget)
 TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* treeItem, int itemType )
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBAssetManager* assetManager = scene->getAssetManager();
+	SmartBody::SBAnimationBlendManager* blendManager = scene->getBlendManager();
 	TreeItemInfoWidget* widget = NULL;
 	if (itemType == ITEM_SKELETON)
 	{
@@ -873,6 +981,22 @@ TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h
 			widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
 		*/
 		widget = new AttributeItemWidget(curPawn, x, y, w, h, strdup(name), treeItem, itemType, this);
+	}
+	else if (itemType == ITEM_MESH)
+	{
+		DeformableMesh* mesh = assetManager->getDeformableMesh(treeItem->label());		
+		widget = new AttributeItemWidget(mesh, x, y, w, h, strdup(name), treeItem, itemType, this);
+	}
+	else if (itemType == ITEM_ANIMATION_BLEND)
+	{
+		SmartBody::SBAnimationBlend* blend = blendManager->getBlend(treeItem->label());		
+		widget = new AnimationBlendInfoWidget(blend, x, y, w, h, strdup(name), treeItem, itemType, this);
+		//widget = new AttributeItemWidget(mesh, x, y, w, h, strdup(name), treeItem, itemType, this);
+	}
+	else if (itemType == ITEM_BLEND_TRANSITION)
+	{
+		SmartBody::SBAnimationTransition* transition = blendManager->getTransitionByName(treeItem->label());		
+		widget = new BlendTransitionInfoWidget(transition, x, y, w, h, strdup(name), treeItem, itemType, this);
 	}
 	else if (itemType == ITEM_CHARACTER)
 	{
@@ -1014,6 +1138,8 @@ void ResourceWindow::notify( SmartBody::SBSubject* subject )
 {
 	this->refreshUI(this, this);
 }
+
+
 /************************************************************************/
 /* Resource Viewer Factory                                              */
 /************************************************************************/
