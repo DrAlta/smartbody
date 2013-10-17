@@ -14,6 +14,7 @@
 #include <sb/SBJointMapManager.h>
 #include <sb/SBBehaviorSet.h>
 #include <sb/SBBehaviorSetManager.h>
+#include <sb/SBAssetManager.h>
 
 #include <autorig/SBAutoRigManager.h>
 #include <boost/filesystem.hpp>
@@ -190,7 +191,7 @@ void RetargetStepWindow::updatePawnList()
 	{
 		SmartBody::SBPawn* pawn = scene->getPawn(pawns[c]);
 		SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(pawn);
-		if (!sbChar && pawn->dMeshInstance_p && pawn->dMeshInstance_p->getDeformableMesh()) // only add pawns that has attached mesh
+		if (!sbChar && pawn->dStaticMeshInstance_p && pawn->dStaticMeshInstance_p->getDeformableMesh()) // only add pawns that has attached mesh
 		{
 			_choicePawns->add(pawns[c].c_str());
 		}		
@@ -236,35 +237,51 @@ void RetargetStepWindow::applyAutoRig()
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string pawnName = _choicePawns->text();
 	SmartBody::SBPawn* sbPawn = scene->getPawn(pawnName);	
-	if (!sbPawn || sbPawn->dMeshInstance_p->getDeformableMesh() == NULL)
+	DeformableMeshInstance* meshInstance = sbPawn->dStaticMeshInstance_p;
+	if (!sbPawn || !meshInstance || meshInstance->getDeformableMesh() == NULL)
 	{
 		LOG("AutoRigging Fail : No pawn is selected, or the selected pawn does not contain 3D mesh for rigging.");
 		return;
 	}
 	
 	SBAutoRigManager& autoRigManager = SBAutoRigManager::singleton();
-	DeformableMesh* mesh = sbPawn->dMeshInstance_p->getDeformableMesh();
-	SrModel& model = mesh->dMeshStatic_p[0]->shape();
+	
+
+	DeformableMesh* mesh = meshInstance->getDeformableMesh();	
+	SrModel& model = mesh->dMeshStatic_p[0]->shape();	
 	std::string modelName = (const char*) model.name;
 	std::string filebasename = boost::filesystem::basename(modelName);
 	std::string fileextension = boost::filesystem::extension(modelName);
 	std::string skelName = filebasename+".sk";
-	std::string deformMeshName = filebasename;
+	std::string deformMeshName = filebasename+"AutoRig.dae"; 
 
-
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	bool autoRigSuccess = false;
+
+	if (!assetManager->getDeformableMesh(deformMeshName))
+	{			
+		model.scale(meshInstance->getMeshScale()); // resize the verti
 #if 0 // test voxel build
-	autoRigSuccess = autoRigManager.buildAutoRiggingVoxels(model,skelName,deformMeshName);
-	//return;
+		autoRigSuccess = autoRigManager.buildAutoRiggingVoxels(model,skelName,deformMeshName);
+		//return;
 #else
-	autoRigSuccess = autoRigManager.buildAutoRigging(model, skelName, deformMeshName);
+		autoRigSuccess = autoRigManager.buildAutoRigging(model, skelName, deformMeshName);
 #endif
 
-	if (!autoRigSuccess)
-	{
-		LOG("AutoRigging Fail : The input mesh must be a single component and water tight mesh.");
-		return;
+		model.restoreOriginalVertices(); // reset the vertices back to original size
+		if (!autoRigSuccess)
+		{
+			LOG("AutoRigging Fail : The input mesh must be a single component and water tight mesh.");
+			return;
+		}		
 	}
+	else
+	{
+		LOG("Deformable mesh %s already exists. Skip auto-rigging and create the character directly.");
+	}
+
+	
+
 
 	std::string charName = sbPawn->getName()+"autoRig";
 
@@ -281,12 +298,13 @@ void RetargetStepWindow::applyAutoRig()
 	SmartBody::SBCharacter* character = scene->createCharacter(charName, "");
 	character->setSkeleton(skel);
 	character->createStandardControllers();
-	character->setStringAttribute("deformableMesh",deformMeshName + fileextension);
+	character->setStringAttribute("deformableMesh",deformMeshName);	
 
 	SrVec dest = sbPawn->getPosition();
 	float yOffset = -skel->getBoundingBox().a.y;
 	dest.y = yOffset;		
 	character->setPosition(SrVec(dest.x,dest.y,dest.z));
+	character->setStringAttribute("displayType","GPUmesh");
 
 
 	// setup behavior set
@@ -316,10 +334,9 @@ void RetargetStepWindow::applyAutoRig()
 	character->createActionAttribute("_3testGesture", true, "TestHead", 300, false, false, false, "Test Head");
 	character->createActionAttribute("_4testReach", true, "TestHead", 300, false, false, false, "Test Head");
 	character->createActionAttribute("_5testLocomotion", true, "TestHead", 300, false, false, false, "Test Head");
-#endif
-
+#endif	
 	//updateCharacterList();
-	scene->removePawn(pawnName);
+	scene->removePawn(pawnName);	
 	this->refreshAll();		
 	this->setApplyType(true);
 	setCharacterName(charName);

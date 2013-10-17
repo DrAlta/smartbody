@@ -62,6 +62,7 @@ DeformableMesh::DeformableMesh() : SBAsset()
 	meshName = "null";
 	binding = false;
 	initSkinnedVertexBuffer = false;
+	initStaticVertexBuffer = false;
 
 	skeleton = new SmartBody::SBSkeleton();
 	skeleton->ref();
@@ -302,12 +303,7 @@ void DeformableMesh::set_visibility(int deformableMesh)
 }
 
 bool DeformableMesh::buildSkinnedVertexBuffer()
-{
-	// feng : the CPU version of deformable mesh consists of some mesh segments, with their corresponding bone weights loosely stored.
-	// this is very bad for GPU processing. Thus I reorganize the data into a single array, to avoid redundancy in memory storage.
-	if (skinWeights.size() == 0 )
-		return false;
-
+{	
 	if (initSkinnedVertexBuffer) return true;
 
 	if (initStaticVertexBuffer && !isSkinnedMesh()) return true;
