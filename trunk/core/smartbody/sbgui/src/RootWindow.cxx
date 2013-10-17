@@ -114,6 +114,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	deleteCameraMenuIndex = menubar->add("&Camera/Delete Camera", 0, 0, 0, FL_SUBMENU_POINTER );
 	menubar->add("&Camera/Reset", 0, CameraResetCB, this, NULL);
 	menubar->add("&Camera/Frame All", 0, CameraFrameCB, this, NULL);
+	menubar->add("&Camera/Frame Selected Object", 0, CameraFrameObjectCB, this, NULL);
 	menubar->add("&Camera/Face Camera", 0, FaceCameraCB, this, NULL);
 	menubar->add("&Camera/Track Character", 0, TrackCharacterCB, this, NULL);
 	menubar->add("&Camera/Rotate Around Selected", 0, RotateSelectedCB, this, NULL);	
@@ -1007,6 +1008,11 @@ void BaseWindow::CameraFrameCB(Fl_Widget* widget, void* data)
 		if (!visible)
 			continue;
 		SrBox box = pawn->getSkeleton()->getBoundingBox();
+		if (box.volume() < .0001)
+		{
+			double val = 1.0 / SmartBody::SBScene::getScene()->getScale() * .5;
+			box.grows(val, val, val);
+		}
 		sceneBox.extend(box);
 	}
 	camera->view_all(sceneBox, camera->getFov());	
@@ -1016,6 +1022,40 @@ void BaseWindow::CameraFrameCB(Fl_Widget* widget, void* data)
 	camera->setNearPlane(znear);
 	camera->setFarPlane(zfar);
 }
+
+void BaseWindow::CameraFrameObjectCB(Fl_Widget* widget, void* data)
+{
+	BaseWindow* rootWindow = (BaseWindow*) data;
+	SbmPawn* pawn = rootWindow->fltkViewer->getObjectManipulationHandle().get_selected_pawn();
+	if (!pawn)
+	{
+		pawn = rootWindow->getSelectedCharacter();
+		if (!pawn)
+			return;
+	}
+
+	//SmartBody::SBScene::getScene()->command((char*)"camera frame");
+	SrBox sceneBox;
+	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+	if (!camera) return;
+
+	SrBox box = pawn->getSkeleton()->getBoundingBox();
+	if (box.volume() < .0001)
+	{
+			double val = 1.0 / SmartBody::SBScene::getScene()->getScale() * .5;
+			box.grows(val, val, val);
+	}
+
+	sceneBox.extend(box);
+
+	camera->view_all(sceneBox, camera->getFov());	
+	float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
+	float znear = 0.01f*scale;
+	float zfar = 100.0f*scale;
+	camera->setNearPlane(znear);
+	camera->setFarPlane(zfar);
+}
+
 
 void BaseWindow::RotateSelectedCB(Fl_Widget* widget, void* data)
 {
