@@ -172,6 +172,9 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	createDoubleAttribute("saccadeTurnOnDelay", 2, true, "Speech", 502, false, false, false, "delay saccade turn on after utterance.");
 	jointTrajBlendWeight = 0.f;
 	_reach = NULL;
+
+	// since this is a character, show the deformable mesh by default
+	setBoolAttribute("showStaticMesh",false);
 }
 
 

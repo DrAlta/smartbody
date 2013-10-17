@@ -32,6 +32,11 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	SmartBody::SBAttribute* attr = pawn->getAttribute("mesh");
 	if (attr)
 		attr->registerObserver(this);
+
+	attr = pawn->getAttribute("meshScale");
+	if (attr)
+		attr->registerObserver(this);
+
 	attr = pawn->getAttribute("deformableMesh");
 	if (attr)
 		attr->registerObserver(this);
@@ -261,38 +266,32 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 		}
 		else 
 #endif
-		if ( name == "deformableMeshScale")
+		if ( name == "deformableMeshScale" || name == "meshScale")
 		{
 			//LOG("name = deformableMeshScale");
+			bool useDeformableMesh = (name == "deformableMeshScale");
 			SmartBody::DoubleAttribute* doubleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
 			if (doubleAttribute)
 			{
-				if (!pawn->dMeshInstance_p)
+				if (!pawn->dMeshInstance_p && useDeformableMesh)
 					pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
-				pawn->dMeshInstance_p->setMeshScale(doubleAttribute->getValue());
+				else if (!pawn->dStaticMeshInstance_p && !useDeformableMesh)
+					pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
+				
+				DeformableMeshInstance* meshInsance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
+				meshInsance->setMeshScale(doubleAttribute->getValue());
 				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
 			}			
 		}
 		else if (name == "deformableMesh" || name == "mesh")
 		{
+			bool useDeformableMesh = (name == "deformableMesh");
 			SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 			if (strAttribute)
 			{
 				const std::string& value = strAttribute->getValue();
 				// clean up any old meshes
-#if 0
-				if (pawn->dMesh_p)
-				{
-					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
-					{
-						scene->getRootGroup()->remove( pawn->dMesh_p->dMeshDynamic_p[i] );
-					}
-				}
-#endif
-				if (pawn->dMeshInstance_p)
-				{
-					//delete pawn->dMeshInstance_p;
-				}
+
 				if (value == "")
 					return;
 
@@ -316,14 +315,21 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 				
 				if (mesh)
 				{
-					if (!pawn->dMeshInstance_p)
-						pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
-					pawn->dMeshInstance_p->setDeformableMesh(mesh);
-					pawn->dMeshInstance_p->setSkeleton(pawn->getSkeleton());	
-					if (name == "mesh") // setting static mesh
+					if (!pawn->dMeshInstance_p && useDeformableMesh)
 					{
-						pawn->dMeshInstance_p->setToStaticMesh(true);
+						pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
+						pawn->dMeshInstance_p->setToStaticMesh(false);
 					}
+					else if (!pawn->dStaticMeshInstance_p && !useDeformableMesh)
+					{
+						pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
+						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
+					}
+
+					DeformableMeshInstance* meshInsance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
+					meshInsance->setDeformableMesh(mesh);
+					meshInsance->setSkeleton(pawn->getSkeleton());	
+					
 #if 0
 					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
 					{

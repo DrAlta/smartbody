@@ -101,6 +101,7 @@ public:  // TODO - properly encapsulate / privatize the following
 	SkSkeleton*	_skeleton;  // MAY BE NULL!!!
 	SkScene*		scene_p;	 // Skeleton Scene and Rigid Mesh		
 	DeformableMeshInstance* dMeshInstance_p;
+	DeformableMeshInstance* dStaticMeshInstance_p;
 	SrSnGroup* blendMeshGroup;
 	SteerLib::ObstacleInterface* steeringSpaceObj_p;
 	SrVec			steeringSpaceObjSize;
