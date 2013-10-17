@@ -5,9 +5,7 @@
 #include <vector>
 #include <string>
 #include <sk/sk_motion.h>
-
-
-
+#include <boost/serialization/base_object.hpp>
 
 namespace SmartBody {
 
@@ -105,6 +103,8 @@ class SBMotion : public SkMotion
 	//	bool move(int startFrame, int endFrame, int position);
 		SBAPI void saveToSkm(const std::string& fileName);
 		SBAPI void saveToSkmByFrames(const std::string& fileName, int startFrame, int endFrame);
+		SBAPI void saveToSkb(const std::string& fileName);
+		SBAPI bool readFromSkb(const std::string& fileName);
 
 		SBAPI float getJointSpeed(SBJoint* joint, float startTime, float endTime);
 		SBAPI float getJointSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
@@ -155,6 +155,22 @@ class SBMotion : public SkMotion
 		SBAPI void buildJointTrajectory(std::string effectorName, std::string refJointName = "base" );
 		SBAPI JointTrajectory* getJointTrajectory(std::string effectorName);
 		SBAPI bool getTrajPosition(std::string effectorName, float time, SrVec& outPos);		
+
+
+		// serializable data
+		std::string sName;
+		int sNumChannels;
+		std::vector<std::string> sChannelNames;
+		std::vector<int> sChannelTypes;
+		int sFrames;
+		std::vector<float> sKeyTimes;
+		std::vector<std::vector<float> > sKeyValues;
+		std::vector<std::string> sMetaDataNames;
+		std::vector<std::string> sMetaDataValues;
+
+		friend class boost::serialization::access;
+		template<class Archive>
+		void serialize(Archive & ar, const unsigned int version);
 
 	protected:
 		void alignToSide(int numFrames, int direction = 0);

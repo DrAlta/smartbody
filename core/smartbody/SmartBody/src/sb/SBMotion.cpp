@@ -14,6 +14,10 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <sbm/sbm_constants.h>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/string.hpp>
 
 namespace SmartBody {
 
@@ -1693,6 +1697,121 @@ void SBMotion::saveToSkm(const std::string& fileName)
 	this->save(*out);
 	delete out;
 }
+
+template<class Archive>
+void SBMotion::serialize(Archive & ar, const unsigned int version)
+{
+	ar& this->sName;
+	ar& this->sNumChannels;
+	ar& this->sChannelNames;
+	ar& this->sChannelTypes;
+	ar& this->sFrames;
+	ar& this->sKeyTimes;
+	ar& this->sKeyValues;
+	ar& this->sMetaDataNames;
+	ar& this->sMetaDataValues;
+}
+
+void SBMotion::saveToSkb(const std::string& fileName)
+{
+	// write the data to the stream variables
+	sName = this->getName();
+	
+	sNumChannels = this->getNumChannels();
+	for (int c = 0; c < _channels.size(); c++)
+	{
+		sChannelNames.push_back(_channels.name(c));
+		sChannelTypes.push_back(_channels.type(c));
+	}
+	
+	sFrames = this->getNumFrames();
+
+	int size = this->posture_size();
+	
+	for (int f = 0; f < sFrames; f++)
+	{
+		float time = this->keytime(f);
+		sKeyTimes.push_back(time);
+		sKeyValues.push_back(std::vector<float>() );
+		std::vector<float>& data = sKeyValues[f];
+		float* posture = this->posture(f);
+		for (int p = 0; p < size; p++)
+		{
+			data.push_back(posture[p]);
+		}
+	}
+	
+	std::vector<std::string> tags = getMetaDataTags();
+	for (size_t t = 0; t < tags.size(); t++)
+	{
+		std::string tagValue = this->getMetaDataString(tags[t]);
+		this->sMetaDataNames.push_back(tags[t]);
+		this->sMetaDataValues.push_back(tagValue);
+	}
+	
+	try {
+		std::ofstream ofs(fileName, std::ios::binary);
+		boost::archive::binary_oarchive oa(ofs);
+		oa << *this;
+	}
+	catch (const boost::archive::archive_exception& e)
+	{
+		LOG("Problem saving into binary motion file %s: %s", fileName.c_str(), e.what());
+	}
+	catch(std::exception& stde)
+	{
+		LOG("Problem loading binary motion file %s: %s", fileName.c_str(), stde.what());
+	}
+}
+
+bool SBMotion::readFromSkb(const std::string& fileName)
+{
+	try {
+		std::ifstream ifs(fileName, std::ios::binary);
+		boost::archive::binary_iarchive ia(ifs);
+		ia >> *this;
+	}
+	catch (const boost::archive::archive_exception& e)
+	{
+		LOG("Problem loading binary motion file %s: %s", fileName.c_str(), e.what());
+		return false;
+	}
+	catch(std::exception& stde)
+	{
+		LOG("Problem loading binary motion file %s: %s", fileName.c_str(), stde.what());
+		return false;
+	}
+
+	this->_filename = fileName;
+
+	// read the data
+	this->setName(sName);
+	
+	for (size_t c = 0; c < sChannelNames.size(); c++)
+	{
+		_channels.add(sChannelNames[c], (SkChannel::Type) sChannelTypes[c]);
+	}
+	
+	int postureSize = this->posture_size();
+	
+	for (int f = 0; f < sFrames; f++)
+	{
+		this->insert_frame(f, sKeyTimes[f]);
+		float* frame = this->posture(f);
+		for (int p = 0; p < postureSize; p++)
+		{
+			frame[p] = sKeyValues[f][p];
+		}
+	}
+	
+	for (size_t t = 0; t < sMetaDataNames.size(); t++)
+	{
+		addMetaData(sMetaDataNames[t], sMetaDataValues[t]);
+	}
+
+	return true;
+}
+
 
 void SBMotion::saveToSkmByFrames(const std::string& fileName, int startFrame, int endFrame)
 {

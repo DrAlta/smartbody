@@ -55,7 +55,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;boost_serialization-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\SmartBody\src\external\glew;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug;..\..\..\core\smartbody\ode\lib;..\..\..\core\smartbody\Python27\libs;..\..\..\lib\festival\festival\src\lib;..\..\..\lib\festival\speech_tools\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>$(OutDir)$(ProjectName)_d.lib</ImportLibrary>
     </Link>
@@ -94,7 +94,7 @@ copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\SmartBody\src\external\glew;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\..\..\lib\festival\festival\src\lib;..\..\..\lib\festival\speech_tools\lib;..\ode\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release;..\..\..\core\smartbody\Python27\libs;..\..\..\lib\cerevoice\cerevoice\lib;..\..\..\lib\cerevoice\cerevoice_eng\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;boost_serialization-vc100-mt-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
     </Link>
@@ -488,6 +488,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\sb\SBAssetHandlerObj.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerOgre.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSk.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerSkb.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkm.cpp" />
     <ClCompile Include="src\sb\smartbody-c-dll.cpp" />
     <ClCompile Include="src\sb\smartbody-dll.cpp" />
@@ -864,6 +865,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\sb\SBAssetHandlerObj.h" />
     <ClInclude Include="src\sb\SBAssetHandlerOgre.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSk.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerSkb.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSkm.h" />
     <ClInclude Include="src\sb\SBCharacterListener.h" />
     <ClInclude Include="src\sb\SBVersion.hpp" />

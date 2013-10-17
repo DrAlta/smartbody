@@ -11,7 +11,7 @@ assetManager.addAssetPath('script', 'scripts')
 # Load assets based on asset paths
 assetManager.loadAssets()
 
-# set the camera
+# set scene scale and reset the camera
 scene.setScale(1.0)
 scene.getActiveCamera().reset()
 
