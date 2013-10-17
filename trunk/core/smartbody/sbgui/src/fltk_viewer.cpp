@@ -1727,12 +1727,8 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 {
 	static int characterCount = 0;
 	static int pawnCount = 0;
-	//LOG("dndMsg = %s",dndMsg.c_str());
 	std::vector<std::string> toks;
 	vhcl::Tokenize(dndMsg,toks,":");
-	//if (toks.size() != 2)
-	//	return;
-
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	char cmdStr[256];
 	SrVec p1;
@@ -1740,7 +1736,6 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 	scene->getActiveCamera()->get_ray(x,y, p1, p2);
 	SrPlane ground(SrVec(0,0,0), SrVec(0, 1, 0));
 	SrVec dest = ground.intersect(p1, p2);
-	//dest.y = _paLocoData->character->getHeight() / 100.0f;			
 	if (toks[0] == "SKELETON")
 	{
 		//dest.y = 102;		
@@ -1761,7 +1756,8 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		{
 			LOG("Error : Drag and drop,  skeleton %s not found",skelName.c_str());
 		}		
-	}	
+	}
+#if 0 // don't think this will be useful anymore
 	else if (toks[0] == "PAWN")
 	{
 		dest.y = 10;
@@ -1771,6 +1767,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		SmartBody::SBScene::getScene()->command(cmdStr);
 		pawnCount++;
 	}	
+#endif
 	else // drag a file from explorer
 	{	
 		boost::filesystem::path dndPath(dndMsg);
@@ -1796,21 +1793,20 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 			return;
 		}
 
+		// process mesh or skeleton
+		//LOG("path name = %s, base name = %s, extension = %s",fullPath.c_str(), filebasename.c_str(), fileextension.c_str());
+		// first, load the drag-in-assets
+		SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+		assetManager->loadAsset(fullPathName);	
+
+#if 0 // the code is replaced by the new asset loading mechanism, which provides cleaner handling. So there is no need to copy the files to retarget folders. 
 		if ( boost::iequals(fileextension,".skm") || boost::iequals(fileextension,".bvh") || boost::iequals(fileextension,".amc") ) // a motion extension
 		{
 			SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 			assetManager->loadAsset(fullPathName);
 			return;
-		}
-
-
+		}		
 		
-		
-		// process mesh or skeleton
-		LOG("path name = %s, base name = %s, extension = %s",fullPath.c_str(), filebasename.c_str(), fileextension.c_str());
-
-		std::string skelName = filebasename+fileextension;
-		std::string meshName = filebasename+fileextension;
 
 		bool hasMesh = false;
 		bool hasSkeleton = false;
@@ -1913,10 +1909,31 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 				boost::filesystem::copy_file(fullPathName,targetMeshFile);
 			scene->loadAsset(targetSkelFile);
 		}
+#endif
 
+		std::string skelName = filebasename+fileextension;
+		std::string meshName = filebasename+fileextension;
+		// check the filename extension
+		SmartBody::SBSkeleton* dndSkel = assetManager->getSkeleton(skelName);
+		DeformableMesh* dndMesh = assetManager->getDeformableMesh(meshName);
+
+		if (!dndMesh && !dndSkel) // the file doesn't contain skeleton or mesh. Just return after loading the assets.
+		{
+			return; 
+		}
+
+		if (dndMesh && !dndSkel) // the file contains mesh, but there is no skeleton
+		{
+			std::stringstream strstr;
+			strstr << "defaultPawn";
+			strstr << pawnCount;
+			pawnCount++;
+			SmartBody::SBPawn* pawn = scene->createPawn(strstr.str());			
+			pawn->setStringAttribute("mesh",dndMesh->getName());		
+			return;
+		}
 		
-		
- 		//boost::filesystem::copy_file()
+		// otherwise the file contatins skeleton
 
 		// create the joint mapping before creating the skeleton for the character
 		SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
@@ -1924,10 +1941,10 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		if (!jointMap)
 		{
 			jointMap = jointMapManager->createJointMap(skelName);
-			jointMap->guessMapping(scene->getSkeleton(skelName), false);
+			jointMap->guessMapping(assetManager->getSkeleton(skelName), false);
 		}
 
- 		SmartBody::SBSkeleton* skel = scene->createSkeleton(skelName);
+ 		SmartBody::SBSkeleton* skel = assetManager->createSkeleton(skelName);
 
 		std::stringstream strstr;
 		strstr << "defaultChar";
@@ -1938,28 +1955,14 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		SmartBody::SBCharacter* character = scene->createCharacter(charName, "");
 		character->setSkeleton(skel);
 		character->createStandardControllers();
-		character->setStringAttribute("deformableMesh",meshName);
+		if (dndMesh) // set the deformable mesh if the file contatins it
+			character->setStringAttribute("deformableMesh",meshName);
 
  		float yOffset = -skel->getBoundingBox().a.y;
  		dest.y = yOffset;		
-		character->setPosition(SrVec(dest.x,dest.y,dest.z));
-	/*
-		std::string charName = strstr.str();
-		sprintf(cmdStr,"createDragAndDropCharacter('%s','%s','%s',SrVec(%f,%f,%f))",charName.c_str(),skelName.c_str(),meshName.c_str(),
-			    dest.x,dest.y,dest.z);
-		->
+		character->setPosition(SrVec(dest.x,dest.y,dest.z));	
+		character->setStringAttribute("displayType","GPUmesh");
 		
-			
-		
-		LOG("pythonCmd = %s",cmdStr);
-		mcu.executePythonFile("drag-and-drop.py");
-		mcu.executePython(cmdStr);
-		*/		
-		std::stringstream strCmd;
-		strCmd << "char " << charName << " viewer deformableGPU";		
-		//strCmd << "char " << charName << " viewer deformable";	
-		scene->command(strCmd.str());
-
 
 		// load the behavior sets if they have not yet been loaded
 		SmartBody::SBBehaviorSetManager* manager = scene->getBehaviorSetManager();
@@ -1978,7 +1981,8 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 				LOG("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
 			}
 		}
-#define TEST_ROCKETBOX 1
+
+#define TEST_ROCKETBOX 0
 #if TEST_ROCKETBOX
 		scene->addAssetPath("script", "scripts");
 		scene->run("scene.run('characterUnitTest.py')");
