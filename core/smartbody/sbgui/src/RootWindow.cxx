@@ -24,6 +24,7 @@
 #include <sbm/KinectProcessor.h>
 #include <sb/SBPython.h>
 #include <sb/SBVersion.hpp>
+#include <sb/SBBehaviorSetManager.h>
 
 #include "SBGUIManager.h"
 
@@ -922,6 +923,23 @@ void BaseWindow::LaunchRetargetCreatorCB(Fl_Widget* widget, void* data)
 void BaseWindow::LaunchJointMapViewerCB( Fl_Widget* widget, void* data )
 {
 	// console doesn't receive commands - why?
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBBehaviorSetManager* manager = scene->getBehaviorSetManager();
+	if (manager->getNumBehaviorSets() == 0)
+	{
+		// look for the behavior set directory under the media path
+		scene->addAssetPath("script", "behaviorsets");
+		scene->runScript("default-behavior-sets.py");
+
+		if (manager->getNumBehaviorSets() == 0)
+		{
+			LOG("Can not find any behavior sets under path %s/behaviorsets.", scene->getMediaPath().c_str());
+		}
+		else
+		{
+			LOG("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
+		}
+	}
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (rootWindow->fltkViewer && !rootWindow->fltkViewer->_retargetStepWindow)
 	{
