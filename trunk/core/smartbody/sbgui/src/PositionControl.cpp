@@ -586,3 +586,23 @@ void PositionControl::drawShadowSquare( float x,float y,float z,SrVec& dirx,SrVe
 	glPopMatrix();
 }
 
+
+SelectionControl::SelectionControl()
+{
+
+}
+
+SelectionControl::~SelectionControl()
+{
+
+}
+
+bool SelectionControl::drag( SrCamera& cam, float fx, float fy, float tx, float ty )
+{
+	return true;
+}
+
+void SelectionControl::draw( SrCamera& cam )
+{
+
+}

@@ -41,6 +41,16 @@ public:
 };
 
 
+class SelectionControl : public ObjectControl
+{
+public:
+	SelectionControl();
+	~SelectionControl();
+
+	virtual bool drag(SrCamera& cam, float fx, float fy, float tx, float ty);
+	virtual void draw(SrCamera& cam);	
+};
+
 
 class PositionControl : public ObjectControl
 {

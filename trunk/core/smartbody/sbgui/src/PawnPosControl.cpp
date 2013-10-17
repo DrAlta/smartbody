@@ -230,3 +230,55 @@ SrVec PawnRotationControl::getWorldPt()
 	assert(pawn);
 	return get_pawn_pos(pawn);
 }
+
+
+/************************************************************************/
+/* Pawn Select Control                                                  */
+/************************************************************************/
+
+PawnSelectControl::PawnSelectControl( void )
+{
+
+}
+
+PawnSelectControl::~PawnSelectControl( void )
+{
+
+}
+
+void PawnSelectControl::renderControl( SrCamera& cam )
+{
+
+}
+
+void PawnSelectControl::updateControl( SrCamera& cam, float fx, float fy, float tx, float ty )
+{
+
+}
+
+void PawnSelectControl::hitTest( SrCamera& cam )
+{
+	SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(this->get_attach_pawn());
+	if (!pawn) return;
+
+	SrBox bbox = pawn->getBoundingBox();
+	if (bbox.max_size() < 1e-9) // no bounding box
+	{
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		float sphereSize = 0.05f / scene->getScale();
+		PositionControl::drawSphere(pawn->getPosition(),sphereSize);
+	}
+	else
+	{
+		PositionControl::drawBox(bbox);	
+	}
+	
+	//LOG("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",curChar->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
+	
+
+}
+
+void PawnSelectControl::processHit( std::vector<int>& hitNames )
+{
+
+}

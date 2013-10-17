@@ -12,7 +12,7 @@ ObjectManipulationHandle::ObjectManipulationHandle(void)
 {
 	active_control = NULL;
 	bHasPicking = false;
-	pickType = CONTROL_POS;
+	pickType = CONTROL_SELECTION;
 }
 
 ObjectManipulationHandle::~ObjectManipulationHandle(void)
@@ -46,9 +46,17 @@ void ObjectManipulationHandle::draw(SrCamera& cam)
 		active_control->renderControl(cam);
 		if (renderSelectedBoundingBox)
 		{
-			if (active_control->get_attach_pawn())
+			SmartBody::SBPawn* sbPawn = dynamic_cast<SmartBody::SBPawn*>(active_control->get_attach_pawn());
+			if (sbPawn)
 			{
-				SrBox box = active_control->get_attach_pawn()->getBoundingBox();
+				SrBox box = sbPawn->getBoundingBox();
+				if (box.max_size() < 1e-9) // no bounding box
+				{
+					SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+					float boxSize = 0.05f / scene->getScale();
+					box.a = sbPawn->getPosition() - SrVec(boxSize,boxSize,boxSize);
+					box.b = sbPawn->getPosition() + SrVec(boxSize,boxSize,boxSize);
+				}
 				PositionControl::drawBox(box,true);
 			}
 		}
@@ -125,12 +133,15 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 		glPushName(0xffffffff);
 		glLoadName(i);
 		SmartBody::SBCharacter* curChar = dynamic_cast<SmartBody::SBCharacter*>(pawn);
-		//PositionControl::drawSphere(pawn_pos, pawnSize);		
+		//PositionControl::drawSphere(pawn_pos, pawnSize);				
 		if (active_control && active_control->get_attach_pawn() == pawn)
 		{			
+			SrBox bbox = sbpawn->getBoundingBox();
+			PositionControl::drawBox(bbox);
 			//pawnPosControl.hitOPS(cam);
-			active_control->hitTest(*cam);
+			active_control->hitTest(*cam);			
 		}
+#if 1
 		else if (curChar) // the selected pawn is actually a character
 		{			
 			SrBox bbox = curChar->getBoundingBox();
@@ -142,6 +153,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 			SrMat gmat = sbpawn->getPhysicsObject()->getGlobalTransform().gmat();
 			//FltkViewer::drawColObject(pawn->getGeomObject(), gmat);
 		}
+#endif
 		else
 		{		
 			PositionControl::drawSphere(pawn_pos, pawnSize);				
@@ -263,7 +275,7 @@ void ObjectManipulationHandle::picking(float x,float y,SrCamera* cam)
 
 std::vector<int> ObjectManipulationHandle::process_hit(unsigned int *pickbuffer,int nhits)
 {
-	GLuint d1,d2,i,n,zmin,zmax,sel=0;
+	GLuint d1,d2,i,n,zmin,zmax,sel=0, nameSize = 0;
 	std::vector<int> hitNames;
 	if(0<=nhits){    
 		for(i=0,zmin=zmax=4294967295U; nhits>0; i+=n+3,nhits--)
@@ -271,11 +283,21 @@ std::vector<int> ObjectManipulationHandle::process_hit(unsigned int *pickbuffer,
 			n=pickbuffer[i];
       		d1=pickbuffer[1+i];
 			d2=pickbuffer[2+i];
-			if(d1<zmin || (d1==zmin && d2<=zmax)){
-				zmin=d1;
-				zmax=d2;
-				sel=i;
-			}
+			
+			// this test ensures that we always give control widgets (name size = 2) higher selection priority over pawn ( name size = 1).
+			// if the name size is the same, then the priority is determined by the depth value.
+			if ( n >= nameSize ) // only process highest level hit
+			{
+				bool depthTest = d1<zmin || (d1==zmin && d2<=zmax);
+				bool nameSizeTest = (n > nameSize);
+				if( depthTest || nameSizeTest )
+				{
+					zmin=d1;
+					zmax=d2;
+					sel=i;
+					nameSize = n;
+				}
+			}			
 		}
 		//return pickbuffer[3+sel];
 		int n = pickbuffer[sel];
@@ -291,6 +313,8 @@ PawnControl* ObjectManipulationHandle::getPawnControl( ControlType type )
 		return &pawnPosControl;
 	if (type == CONTROL_ROT)
 		return &pawnRotControl;
+	if (type == CONTROL_SELECTION)
+		return &pawnSelectControl;
 
-	return &pawnPosControl;
+	return &pawnSelectControl;
 }

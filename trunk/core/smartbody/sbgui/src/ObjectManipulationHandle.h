@@ -9,6 +9,7 @@ public:
 protected:
 	PawnPosControl pawnPosControl;	
 	PawnRotationControl pawnRotControl;
+	PawnSelectControl pawnSelectControl;
 	
 	bool bHasPicking;
 	SrVec2 pick_loc;
