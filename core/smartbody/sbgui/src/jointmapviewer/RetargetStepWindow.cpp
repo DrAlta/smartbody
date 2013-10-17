@@ -281,7 +281,7 @@ void RetargetStepWindow::applyAutoRig()
 	SmartBody::SBCharacter* character = scene->createCharacter(charName, "");
 	character->setSkeleton(skel);
 	character->createStandardControllers();
-	character->setStringAttribute("deformableMesh",deformMeshName);
+	character->setStringAttribute("deformableMesh",deformMeshName + fileextension);
 
 	SrVec dest = sbPawn->getPosition();
 	float yOffset = -skel->getBoundingBox().a.y;

@@ -1810,7 +1810,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		LOG("path name = %s, base name = %s, extension = %s",fullPath.c_str(), filebasename.c_str(), fileextension.c_str());
 
 		std::string skelName = filebasename+fileextension;
-		std::string meshName = filebasename;
+		std::string meshName = filebasename+fileextension;
 
 		bool hasMesh = false;
 		bool hasSkeleton = false;
