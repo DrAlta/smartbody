@@ -2,10 +2,17 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for Female Locomotion..."
-	scene.loadAssetsFromPath("behaviorsets/kicking/skeletons")
-	scene.loadAssetsFromPath("behaviorsets/kicking/motions")
+	#scene.loadAssetsFromPath("behaviorsets/kicking/skeletons")
+	#scene.loadAssetsFromPath("behaviorsets/kicking/motions")
 	scene.addAssetPath("script", "behaviorsets/kicking/scripts")
 	
+	
+	assetManager = scene.getAssetManager()	
+	motionPath = "behaviorsets/kicking/motions/"
+	skel = scene.getSkeleton("ChrGarza.sk")
+	if skel == None:
+		scene.loadAssetsFromPath("behaviorsets/kicking/skeletons")
+		
 	scene.run("zebra2-map.py")
 	zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
 	zebra2Skeleton = scene.getSkeleton("ChrGarza.sk")
@@ -29,7 +36,13 @@ def setupBehaviorSet():
 	
 	for i in range(0, len(kickMotions)):
 		motion = scene.getMotion(kickMotions[i])
-		zebra2Map.applyMotion(motion)
+		if motion == None:
+			assetManager.loadAsset(motionPath+kickMotions[i]+'.skm')
+			motion = scene.getMotion(kickMotions[i])
+		#print 'motionName = ' + locoMotions[i]
+		if motion != None:
+			motion.setMotionSkeletonName("ChrGarza.sk")
+			zebra2Map.applyMotion(motion)
 	'''
 	mirroredMotions = StringVec()
 	mirroredMotions.append("ChrGarza@IdleStand01_JumpLeft45HighMid01")

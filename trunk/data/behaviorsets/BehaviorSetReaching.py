@@ -2,10 +2,17 @@ scene.run("BehaviorSetCommon.py")
 def setupBehaviorSet():
 	scene = getScene()	
 	print "Setting up behavior set for Reaching ..."
-	scene.loadAssetsFromPath("behaviorsets/reaching/skeletons")
-	scene.loadAssetsFromPath("behaviorsets/reaching/motions")
+	#scene.loadAssetsFromPath("behaviorsets/reaching/skeletons")
+	#scene.loadAssetsFromPath("behaviorsets/reaching/motions")
 	scene.addAssetPath("script", "behaviorsets/reaching/scripts")
 	
+	
+	assetManager = scene.getAssetManager()	
+	motionPath = "behaviorsets/reaching/motions/"
+	skel = scene.getSkeleton("common.sk")
+	if skel == None:
+		scene.loadAssetsFromPath("behaviorsets/reaching/skeletons")
+		
 	commonSk = scene.getSkeleton("common.sk")
 	# mirror all arm and hand motions
 	preFix = ""
@@ -84,6 +91,13 @@ def setupBehaviorSet():
 	leftHandMotions.append("HandsAtSide_LArm_GestureYou")	
 	
 	for i in range(0,len(rightHandMotions)):
+		motion = scene.getMotion(rightHandMotions[i]
+		if motion == None:
+			assetManager.loadAsset(motionPath+rightHandMotions[i]+'.skm')
+			motion = scene.getMotion(rightHandMotions[i])
+		#print 'motionName = ' + locoMotions[i]
+		if motion != None:
+			motion.setMotionSkeletonName("common.sk")			
 		mirrorMotion1 = scene.getMotion(rightHandMotions[i])
 		mirrorMotion1.mirror(leftHandMotions[i], 'common.sk')		
 	

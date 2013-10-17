@@ -2,11 +2,17 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for gestures..."
-	scene.loadAssetsFromPath("behaviorsets/MocapReaching/skeletons")
-	scene.loadAssetsFromPath("behaviorsets/MocapReaching/motions")
+	#scene.loadAssetsFromPath("behaviorsets/MocapReaching/skeletons")
+	#scene.loadAssetsFromPath("behaviorsets/MocapReaching/motions")
 	scene.addAssetPath("script", "behaviorsets/MocapReaching/scripts")
 	# map the zebra2 skeleton
 	
+	assetManager = scene.getAssetManager()	
+	motionPath = "behaviorsets/MocapReaching/motions/"
+	skel = scene.getSkeleton("ChrGarza.sk")
+	if skel == None:
+		scene.loadAssetsFromPath("behaviorsets/MocapReaching/skeletons")
+		
 	scene.run("zebra2-map.py")
 	zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
 	garzaSkeleton = scene.getSkeleton("ChrGarza.sk")
@@ -101,7 +107,14 @@ def setupBehaviorSet():
 
 	# mirror the right hand motions to the left hand side
 	for i in range(0,len(mocapRReachMotions)):
-		zebra2Map.applyMotion(scene.getMotion(mocapRReachMotions[i]))
+		motion = scene.getMotion(mocapRReachMotions[i])
+		if motion == None:
+			assetManager.loadAsset(motionPath+mocapRReachMotions[i]+'.skm')
+			motion = scene.getMotion(mocapRReachMotions[i])
+		#print 'motionName = ' + locoMotions[i]
+		if motion != None:
+			motion.setMotionSkeletonName("ChrGarza.sk")
+			zebra2Map.applyMotion(motion)		
 		mirrorMotion1 = scene.getMotion(mocapRReachMotions[i])
 		mirrorMotion1.mirror(mocapLReachMotions[i], "ChrGarza.sk")	
 		

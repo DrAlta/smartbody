@@ -2,9 +2,17 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for MaleMocapLocomotion..."
-	scene.loadAssetsFromPath("behaviorsets/MaleMocapLocomotion/skeletons")
-	scene.loadAssetsFromPath("behaviorsets/MaleMocapLocomotion/motions")
+	
+	#scene.loadAssetsFromPath("behaviorsets/MaleMocapLocomotion/skeletons")
+	#scene.loadAssetsFromPath("behaviorsets/MaleMocapLocomotion/motions")
+	assetManager = scene.getAssetManager()
 	scene.addAssetPath("script", "behaviorsets/MaleMocapLocomotion/scripts")
+	motionPath = "behaviorsets/MaleMocapLocomotion/motions/"
+	skel = scene.getSkeleton("ChrBackovic.sk")
+	if skel == None:
+		scene.loadAssetsFromPath("behaviorsets/MaleMocapLocomotion/skeletons")
+		
+	
 	# map the zebra2 skeleton
 	scene.run("zebra2-map.py")
 	zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
@@ -15,47 +23,52 @@ def setupBehaviorSet():
 	locoMotions.append("ChrMarine@Jog01")
 	locoMotions.append("ChrMarine@Meander01")
 	locoMotions.append("ChrMarine@Run01")
-	locoMotions.append("ChrMarine@RunCircleLf01")
+	#locoMotions.append("ChrMarine@RunCircleLf01")
 	locoMotions.append("ChrMarine@RunCircleRt01")
-	locoMotions.append("ChrMarine@RunTightCircleLf01")
+	#locoMotions.append("ChrMarine@RunTightCircleLf01")
 	locoMotions.append("ChrMarine@RunTightCircleRt01")
-	locoMotions.append("ChrMarine@StrafeSlowLf01")
+	#locoMotions.append("ChrMarine@StrafeSlowLf01")
 	locoMotions.append("ChrMarine@StrafeSlowRt01")
 	locoMotions.append("ChrMarine@Walk01")
-	locoMotions.append("ChrMarine@WalkCircleLf01")
+	#locoMotions.append("ChrMarine@WalkCircleLf01")
 	locoMotions.append("ChrMarine@WalkCircleRt01")
-	locoMotions.append("ChrMarine@WalkTightCircleLf01")
+	#locoMotions.append("ChrMarine@WalkTightCircleLf01")
 	locoMotions.append("ChrMarine@WalkTightCircleRt01")
-	locoMotions.append("ChrMarine@Turn360Lf01")
+	#locoMotions.append("ChrMarine@Turn360Lf01")
 	locoMotions.append("ChrMarine@Turn360Rt01")
-	locoMotions.append("ChrMarine@StrafeFastLf01")
+	#locoMotions.append("ChrMarine@StrafeFastLf01")
 	locoMotions.append("ChrMarine@StrafeFastRt01")
-	locoMotions.append("ChrMarine@Idle01_StepBackwardsLf01")
+	#locoMotions.append("ChrMarine@Idle01_StepBackwardsLf01")
 	locoMotions.append("ChrMarine@Idle01_StepBackwardsRt01")
-	locoMotions.append("ChrMarine@Idle01_StepForwardLf01")
+	#locoMotions.append("ChrMarine@Idle01_StepForwardLf01")
 	locoMotions.append("ChrMarine@Idle01_StepForwardRt01")
-	locoMotions.append("ChrMarine@Idle01_StepSidewaysLf01")
+	#locoMotions.append("ChrMarine@Idle01_StepSidewaysLf01")
 	locoMotions.append("ChrMarine@Idle01_StepSidewaysRt01")
-	locoMotions.append("ChrMarine@Turn90Lf01")	
-	locoMotions.append("ChrMarine@Turn180Lf01")
+	#locoMotions.append("ChrMarine@Turn90Lf01")	
+	#locoMotions.append("ChrMarine@Turn180Lf01")
 	locoMotions.append("ChrMarine@Turn90Rt01")
 	locoMotions.append("ChrMarine@Turn180Rt01")
-	locoMotions.append("ChrMarine@Idle01_ToWalkLf01")
-	locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn90Lf01")
-	locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn180Lf01")
+	#locoMotions.append("ChrMarine@Idle01_ToWalkLf01")
+	#locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn90Lf01")
+	#locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn180Lf01")
 	locoMotions.append("ChrMarine@Idle01_ToWalk01")
 	locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn90Rt01")
 	locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn180Rt01")
+	
+	
 	for i in range(0, len(locoMotions)):
 		motion = scene.getMotion(locoMotions[i])
+		if motion == None:
+			assetManager.loadAsset(motionPath+locoMotions[i]+'.skm')
+			motion = scene.getMotion(locoMotions[i])
 		#print 'motionName = ' + locoMotions[i]
 		if motion != None:
 			motion.setMotionSkeletonName('ChrBackovic.sk')
 			zebra2Map.applyMotion(motion)
-			#motion.buildJointTrajectory('l_forefoot','base')
-			#motion.buildJointTrajectory('r_forefoot','base')
-			#motion.buildJointTrajectory('l_ankle','base')
-			#motion.buildJointTrajectory('r_ankle','base')
+			motion.buildJointTrajectory('l_forefoot','base')
+			motion.buildJointTrajectory('r_forefoot','base')
+			motion.buildJointTrajectory('l_ankle','base')
+			motion.buildJointTrajectory('r_ankle','base')
 
 
 def retargetBehaviorSet(charName):
@@ -99,14 +112,7 @@ def retargetBehaviorSet(charName):
 	locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn90Rt01")
 	locoMotions.append("ChrMarine@Idle01_ToWalk01_Turn180Rt01")
 	
-	for i in range(0, len(locoMotions)):
-		motion = scene.getMotion(locoMotions[i])
-		#print 'motionName = ' + locoMotions[i]
-		if motion != None:
-			motion.buildJointTrajectory('l_forefoot','base')
-			motion.buildJointTrajectory('r_forefoot','base')
-			motion.buildJointTrajectory('l_ankle','base')
-			motion.buildJointTrajectory('r_ankle','base')
+	
 			
 	
 	'''	
@@ -150,6 +156,15 @@ def retargetBehaviorSet(charName):
 	stateManager = scene.getStateManager()
 	mocapLocomotionState = stateManager.getBlend('mocapLocomotion')
 	if mocapLocomotionState == None:
+		# compute motion trajectory
+		for i in range(0, len(locoMotions)):
+			motion = scene.getMotion(locoMotions[i])
+			#print 'motionName = ' + locoMotions[i]
+			if motion != None:
+				motion.buildJointTrajectory('l_forefoot','base')
+				motion.buildJointTrajectory('r_forefoot','base')
+				motion.buildJointTrajectory('l_ankle','base')
+				motion.buildJointTrajectory('r_ankle','base')
 		# setup standard locomotion
 		scene.run("locomotion-ChrMarine-state-Locomotion.py")
 		#marineLocomotionSetup('ChrBackovic.sk', 'ChrBackovic.sk', "base", '', 'mocap')	

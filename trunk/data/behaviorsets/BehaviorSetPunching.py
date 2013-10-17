@@ -2,10 +2,16 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for Punching..."
-	scene.loadAssetsFromPath("behaviorsets/punching/skeletons")
-	scene.loadAssetsFromPath("behaviorsets/punching/motions")
+	#scene.loadAssetsFromPath("behaviorsets/punching/skeletons")
+	#scene.loadAssetsFromPath("behaviorsets/punching/motions")
 	scene.addAssetPath("script", "behaviorsets/punching/scripts")
 	
+	assetManager = scene.getAssetManager()	
+	motionPath = "behaviorsets/punching/motions/"
+	skel = scene.getSkeleton("ChrGarza.sk")
+	if skel == None:
+		scene.loadAssetsFromPath("behaviorsets/punching/skeletons")
+		
 	scene.run("zebra2-map.py")
 	zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
 	zebra2Skeleton = scene.getSkeleton("ChrGarza.sk")
@@ -38,7 +44,13 @@ def setupBehaviorSet():
 	
 	for i in range(0, len(punchMotions)):
 		motion = scene.getMotion(punchMotions[i])
-		zebra2Map.applyMotion(motion)
+		if motion == None:
+			assetManager.loadAsset(motionPath+punchMotions[i]+'.skm')
+			motion = scene.getMotion(punchMotions[i])
+		#print 'motionName = ' + locoMotions[i]
+		if motion != None:
+			motion.setMotionSkeletonName("ChrGarza.sk")
+			zebra2Map.applyMotion(motion)
 	'''
 	mirroredMotions = StringVec()
 	mirroredMotions.append("ChrGarza@IdleStand01_JumpLeft45HighMid01")
