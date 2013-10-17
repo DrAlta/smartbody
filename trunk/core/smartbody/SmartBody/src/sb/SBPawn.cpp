@@ -29,6 +29,8 @@ SBPawn::SBPawn() : SbmPawn()
 	_rotY = createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
 	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
 	createStringAttribute("mesh", "", true, "Display", 400, false, false, false, "Geometry/mesh");
+	// since this is a pawn, show static mesh by default
+	createBoolAttribute("showStaticMesh", true, true, "Display", 405, false, false, false, "Whether the object is visible.");
 	createDoubleAttribute("meshScale", 1.0, true, "Display", 410, false, false, false, "Scale of geometry/mesh");
 	createVec3Attribute("meshTranslate", 0.0, 0.0, 0.0, true, "Display", 420, false, false, false, "Mesh translation offset");
 	createVec3Attribute("meshRotation", 0.0, 0.0, 0.0, true, "Display", 430, false, false, false,  "Mesh rotation offset");
@@ -66,6 +68,8 @@ SBPawn::SBPawn(const char* name) : SbmPawn(name)
 	_rotY = createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
 	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
 	createStringAttribute("mesh", "", true, "Display", 400, false, false, false, "Geometry/mesh");
+	// since this is a pawn, show static mesh by default
+	createBoolAttribute("showStaticMesh", true, true, "Display", 405, false, false, false, "Whether the object is visible.");
 	createDoubleAttribute("meshScale", 1.0, true, "Display", 410, false, false, false, "Scale of geometry/mesh");
 	createVec3Attribute("meshTranslation", 0.0, 0.0, 0.0, true, "Display", 420, false, false, false, "Mesh translation offset");
 	createVec3Attribute("meshRotation", 0.0, 0.0, 0.0, true, "Display", 430, false, false, false,  "Mesh rotation offset");
@@ -440,5 +444,17 @@ void SBPawn::copy( SBPawn* orignalPawn )
 	SBObject::copyAllAttributes(orignalPawn);		
 }
 
+DeformableMeshInstance* SBPawn::getActiveMesh()
+{
+	bool showStaticMesh = getBoolAttribute("showStaticMesh");
+	if (showStaticMesh)
+	{
+		return dStaticMeshInstance_p;
+	}
+	else
+	{
+		return dMeshInstance_p;
+	}
+}
 };
 

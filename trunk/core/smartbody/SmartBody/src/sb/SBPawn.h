@@ -34,6 +34,7 @@ class SBPawn : public SbmPawn
 		SBAPI SrVec getHPR();
 
 		SBAPI SBPhysicsObj* getPhysicsObject();
+		SBAPI DeformableMeshInstance* getActiveMesh();
 
 		SBAPI virtual void afterUpdate(double time);
 		SBAPI virtual void notify(SBSubject* subject);

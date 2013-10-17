@@ -63,13 +63,15 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
         return; // no deformable mesh
     }
 
-	if (!mesh->isSkinnedMesh())
+	if (shape->isStaticMesh())
 	{
 		SmartBody::SBSkeleton* skel = shape->getSkeleton();
 		SrMat woMat = skel->root()->gmat();
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glMultMatrix(woMat);
+		float meshScale = shape->getMeshScale();
+		glScalef(meshScale,meshScale,meshScale);
 	}
 
 	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
@@ -130,7 +132,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);	
-	if (!mesh->isSkinnedMesh())
+	if (shape->isStaticMesh())
 	{
 		glPopMatrix();
 	}

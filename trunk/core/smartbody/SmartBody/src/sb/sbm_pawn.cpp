@@ -87,6 +87,7 @@ SkChannelArray SbmPawn::WORLD_OFFSET_CHANNELS_P;
 
 SbmPawn::SbmPawn() : SBObject(),
 dMeshInstance_p(NULL),
+dStaticMeshInstance_p(NULL),
 _skeleton(NULL),
 scene_p( NULL )
 {
@@ -103,8 +104,10 @@ SbmPawn::SbmPawn( const char * name ) : SmartBody::SBObject(),
 scene_p( NULL ),
 #if defined(__ANDROID__) || defined(SB_IPHONE) // don't use the GPU version in android
 dMeshInstance_p(NULL),
+dStaticMeshInstance_p(NULL),
 #else
 dMeshInstance_p(NULL),
+dStaticMeshInstance_p(NULL),
 #endif
 ct_tree_p( MeControllerTreeRoot::create() ),
 world_offset_writer_p( NULL ),

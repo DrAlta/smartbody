@@ -5124,28 +5124,37 @@ void FltkViewer::drawDeformableModels()
 		pawnIter++)
 	{
 		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
-		if(pawn->dMeshInstance_p)
+		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
+		if(meshInstance)
 		{
 			//pawn->dMesh_p->update();
-			bool useBlendShape = false;
-			SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (pawn);
-			if (character)
+			if (!meshInstance->isStaticMesh()) // is skinned mesh
 			{
-				useBlendShape = character->getBoolAttribute("blendshape");
+				bool useBlendShape = false;
+				SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (pawn);
+				if (character)
+				{
+					useBlendShape = character->getBoolAttribute("blendshape");
+				}
+				if (useBlendShape && meshInstance->getDeformableMesh())
+				{
+					//character->dMesh_p->blendShapes();
+					meshInstance->getDeformableMesh()->blendShapes();
+					//character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
+				}
+				meshInstance->update();
+				if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && meshInstance->getVisibility()) || _data->showSkinWeight)
+				{
+					SrGlRenderFuncs::renderDeformableMesh(meshInstance, _data->showSkinWeight);
+					//				if (pawn->scene_p)
+					//				pawn->scene_p->set_visibility(0,1,0,0);
+					//_data->render_action.apply(character->scene_p);
+				}
 			}
-			if (useBlendShape && character->dMeshInstance_p->getDeformableMesh())
+			else
 			{
-				//character->dMesh_p->blendShapes();
-				character->dMeshInstance_p->getDeformableMesh()->blendShapes();
-				//character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
-			}
-			pawn->dMeshInstance_p->update();
-			if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && pawn->dMeshInstance_p->getVisibility()) || _data->showSkinWeight)
-			{
-				SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p, _data->showSkinWeight);
-//				if (pawn->scene_p)
-	//				pawn->scene_p->set_visibility(0,1,0,0);
-				_data->render_action.apply(character->scene_p);
+				// simply draw the static mesh
+				SrGlRenderFuncs::renderDeformableMesh(meshInstance, false);
 			}
 		}
 	}
