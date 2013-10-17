@@ -1356,16 +1356,20 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 	//choiceCharacters->callback(CharacterCB, this);
 	//std::vector<std::string> characters = scene->getCharacterNames();
 	updateJointMapList();
+	_choiceJointMaps->value(0);
 
 	_choiceJointMaps->callback(SelectMapCB,this);
 
 	curY += 35;	
 
-	_buttonReset = new Fl_Button(40, curY, 120, 20, "Reset Mapping");
+	_buttonReset = new Fl_Button(20, curY, 80, 20, "Reset Map");
 	_buttonReset->callback(ResetMapCB,this);
 
-	_buttonRestore = new Fl_Button(180, curY, 120, 20, "Restore Mapping");
+	_buttonRestore = new Fl_Button(120, curY, 80, 20, "Restore Map");
 	_buttonRestore->callback(ResetMapCB,this);
+
+	_buttonAutoMap = new Fl_Button(220, curY, 80, 20, "Auto Map");
+	_buttonAutoMap->callback(ResetMapCB,this);
 
 
 // 
@@ -1468,12 +1472,14 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 
 	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
 	std::vector<std::string> jointMapNames = jointMapManager->getJointMapNames();
-	if (jointMapNames.size() > 0) 
+	if (_choiceJointMaps->size() > 0) 
 	{
 		_choiceJointMaps->value(0);
 		setJointMapName(_choiceJointMaps->text());
 		//updateSelectMap();
 	}		
+	_charName = "";
+	_skelName = "";
 }
 
 
@@ -1574,7 +1580,7 @@ void JointMapViewer::setJointMapName( std::string jointMapName )
 	{
 		if (jointMapName == _choiceJointMaps->text(c))
 		{
-			_choiceJointMaps->value(c);
+			_choiceJointMaps->value(c);			
 			break;
 		}
 	}
@@ -1664,13 +1670,37 @@ void JointMapViewer::updateCharacter()
 	}
 }
 
+
+void JointMapViewer::autoGuessJointMap()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string jointMapName = _skelName + "-autoMap";
+	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
+	SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);
+	SmartBody::SBSkeleton* skel = scene->getSkeleton(_skelName);
+	if (!skel) // no skeleton exists
+		return;
+	if (!jointMap && skel)
+	{
+		jointMap = jointMapManager->createJointMap(jointMapName);
+		jointMap->guessMapping(scene->getSkeleton(_skelName), false);		
+	}
+	_jointMapName = jointMapName;
+	updateJointMapList();
+	setJointMapName(_jointMapName);
+}
+
 void JointMapViewer::updateSelectMap()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::string jointMapName = _jointMapName;
 	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
 	SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);
-	if (!jointMap) return;
+	if (!jointMap)  // create the guess mapping instead
+	{	
+		//autoGuessJointMap();
+		return;	
+	}
 
 	int numChildren = _scrollGroup->children();
 	for (int i=0;i<numChildren;i++)
@@ -1690,6 +1720,7 @@ void JointMapViewer::updateSelectMap()
 			}
 		}
 	}
+	
 }
 
 
@@ -1805,6 +1836,8 @@ void JointMapViewer::ResetMapCB( Fl_Widget* widget, void* data )
 		viewer->resetJointMap(false);
 	else if (button == viewer->_buttonRestore)
 		viewer->resetJointMap(true);
+	else if (button == viewer->_buttonAutoMap)
+		viewer->autoGuessJointMap();
 }
 
 void JointMapViewer::CheckShowJointLabelCB( Fl_Widget* widget, void* data )
@@ -2018,6 +2051,7 @@ void JointMapViewer::updateJointMapList()
 	std::vector<std::string> jointMapNames = jointMapManager->getJointMapNames();	
 	int oldValue = _choiceJointMaps->value();
 	_choiceJointMaps->clear();
+	_choiceJointMaps->add("----");
 	for (size_t c = 0; c < jointMapNames.size(); c++)
 	{
 		_choiceJointMaps->add(jointMapNames[c].c_str());
@@ -2028,6 +2062,8 @@ void JointMapViewer::updateJointMapList()
 		_choiceJointMaps->value(oldValue);
 	}
 }
+
+
 JointMapInputChoice::JointMapInputChoice( int x, int y, int w, int h, char* name ) : Fl_Input_Choice(x,y,w,h,name)
 {
 	skelViewer = NULL;

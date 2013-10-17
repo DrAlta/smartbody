@@ -1936,11 +1936,12 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		// otherwise the file contatins skeleton
 
 		// create the joint mapping before creating the skeleton for the character
+		std::string jointMapName = skelName + "-autoMap";
 		SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
-		SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(skelName);
+		SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(jointMapName);
 		if (!jointMap)
 		{
-			jointMap = jointMapManager->createJointMap(skelName);
+			jointMap = jointMapManager->createJointMap(jointMapName);
 			jointMap->guessMapping(assetManager->getSkeleton(skelName), false);
 		}
 
@@ -2000,7 +2001,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		_retargetStepWindow->setApplyType(true);
 		_retargetStepWindow->show();			
 		_retargetStepWindow->setCharacterName(charName);		
-		_retargetStepWindow->setJointMapName(skelName);		
+		_retargetStepWindow->setJointMapName(jointMapName);		
 	}
 }
 

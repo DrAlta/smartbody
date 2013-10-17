@@ -123,6 +123,7 @@ class JointMapViewer : public Fl_Double_Window
 		void updateJointName(Fl_Input_Choice* jointChoice);		
 		void setShowButton(bool showButton);
 		void showJointLabels(int showLabel);
+		void autoGuessJointMap();
 		virtual void draw();
 	protected:
 		void updateJointLists();
@@ -144,6 +145,7 @@ class JointMapViewer : public Fl_Double_Window
 		Fl_Button* _buttonCancel;
 		Fl_Button* _buttonReset;
 		Fl_Button* _buttonRestore;
+		Fl_Button* _buttonAutoMap;
 		Fl_Button* _buttonAddMapping;
 		Fl_Button* _buttonTestPlayMotion;
 		std::vector<JointMapInputChoice*> _jointChoiceList;
