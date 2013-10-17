@@ -38,6 +38,17 @@ protected:
 	void init_font();
 };
 
+class PawnSelectControl : public SelectionControl, public PawnControl // Dummy control for character/pawn selection
+{
+public:
+	PawnSelectControl(void);
+	~PawnSelectControl(void);
+
+	virtual void renderControl(SrCamera& cam);
+	virtual void updateControl(SrCamera& cam, float fx, float fy, float tx, float ty);	
+	virtual void hitTest(SrCamera& cam);
+	virtual void processHit(std::vector<int>& hitNames);
+};
 
 class PawnPosControl : public PositionControl, public PawnControl
 {

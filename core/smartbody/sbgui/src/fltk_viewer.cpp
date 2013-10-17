@@ -413,7 +413,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 //   gridStep = 50.0;
    gridList = -1;
    _arrowTime = 0.0f;
-   _transformMode = ObjectManipulationHandle::CONTROL_POS;
+   _transformMode = ObjectManipulationHandle::CONTROL_SELECTION;
 
    init_foot_print();
    _lastSelectedCharacter = "";   
@@ -2209,11 +2209,17 @@ int FltkViewer::handle ( int event )
 				{
 					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
 					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
-					_transformMode = ObjectManipulationHandle::CONTROL_POS;
-					if (rotControl->get_attach_pawn())
+					PawnControl* selControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_SELECTION);
+					_transformMode = ObjectManipulationHandle::CONTROL_POS;					
+					
+					SbmPawn* newAttachPawn = NULL;
+					if (rotControl->get_attach_pawn()) newAttachPawn = rotControl->get_attach_pawn();
+					if (selControl->get_attach_pawn()) newAttachPawn = selControl->get_attach_pawn();
+					if (newAttachPawn)
 					{
-						posControl->attach_pawn(rotControl->get_attach_pawn());
+						posControl->attach_pawn(newAttachPawn);
 						rotControl->detach_pawn();
+						selControl->detach_pawn();
 						 _objManipulator.active_control = posControl;
 					}					
 				}
@@ -2223,13 +2229,40 @@ int FltkViewer::handle ( int event )
 				{
 					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
 					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
+					PawnControl* selControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_SELECTION);
 					_transformMode = ObjectManipulationHandle::CONTROL_ROT;
-					if (posControl->get_attach_pawn())
+
+					SbmPawn* newAttachPawn = NULL;
+					if (posControl->get_attach_pawn()) newAttachPawn = posControl->get_attach_pawn();
+					if (selControl->get_attach_pawn()) newAttachPawn = selControl->get_attach_pawn();
+					if (newAttachPawn)
 					{
-						rotControl->attach_pawn(posControl->get_attach_pawn());
+						rotControl->attach_pawn(newAttachPawn);
 						posControl->detach_pawn();
-						 _objManipulator.active_control = rotControl;
-					}
+						selControl->detach_pawn();
+						_objManipulator.active_control = rotControl;
+					}	
+				}
+				return ret;
+
+			case 'q': // rotate mode
+				_transformMode = ObjectManipulationHandle::CONTROL_SELECTION;
+				{
+					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
+					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
+					PawnControl* selControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_SELECTION);
+					_transformMode = ObjectManipulationHandle::CONTROL_SELECTION;
+
+					SbmPawn* newAttachPawn = NULL;
+					if (posControl->get_attach_pawn()) newAttachPawn = posControl->get_attach_pawn();
+					if (rotControl->get_attach_pawn()) newAttachPawn = rotControl->get_attach_pawn();
+					if (newAttachPawn)
+					{
+						selControl->attach_pawn(newAttachPawn);
+						posControl->detach_pawn();
+						rotControl->detach_pawn();
+						_objManipulator.active_control = selControl;
+					}	
 				}
 				return ret;
 			//case 't': // scale mode - not yet supported
@@ -2452,6 +2485,10 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 			 else if (this->_transformMode == ObjectManipulationHandle::CONTROL_ROT)
 			 {
 				 _objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_ROT);
+			 }
+			 else if (this->_transformMode == ObjectManipulationHandle::CONTROL_SELECTION)
+			 {
+				 _objManipulator.setPickingType(ObjectManipulationHandle::CONTROL_SELECTION);
 			 }
 		 }
 		 if (e.button3 && e.shift)
