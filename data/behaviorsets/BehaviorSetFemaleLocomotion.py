@@ -2,29 +2,21 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for Female Locomotion..."
-	scene.loadAssetsFromPath("behaviorsets/FemaleLocomotion/skeletons")
-	scene.loadAssetsFromPath("behaviorsets/FemaleLocomotion/motions")
+	#scene.loadAssetsFromPath("behaviorsets/FemaleLocomotion/skeletons")
+	#scene.loadAssetsFromPath("behaviorsets/FemaleLocomotion/motions")
 	scene.addAssetPath("script", "behaviorsets/FemaleLocomotion/scripts")
+	
+	assetManager = scene.getAssetManager()	
+	motionPath = "behaviorsets/FemaleLocomotion/motions/"
+	skel = scene.getSkeleton("ChrHarmony.sk")
+	if skel == None:
+		scene.loadAssetsFromPath("behaviorsets/FemaleLocomotion/skeletons")
 	# map the Harmony skeleton
 	scene.run("zebra2-map.py")
 	zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
 	harmonySkeleton = scene.getSkeleton("ChrHarmony.sk")
 	zebra2Map.applySkeleton(harmonySkeleton)
-		
-	mirrorMotion1 = scene.getMotion("ChrHarmony@WalkCircleRt01")
-	if scene.getMotion("ChrHarmony@WalkCircleLf01") == None:
-		zebra2Map.applyMotion(mirrorMotion1)	
-		mirrorMotion1.mirror("ChrHarmony@WalkCircleLf01", "ChrHarmony.sk")
-		
-	mirrorMotion1 = scene.getMotion("ChrHarmony@WalkTightCircleRt01")
-	if scene.getMotion("ChrHarmony@WalkTightCircleLf01") == None:
-		zebra2Map.applyMotion(mirrorMotion1)	
-		mirrorMotion1.mirror("ChrHarmony@WalkTightCircleLf01", "ChrHarmony.sk")
-		
-	mirrorMotion1 = scene.getMotion("ChrHarmony@StrafeSlowRt01")
-	if scene.getMotion("ChrHarmony@StrafeSlowLf01") == None:
-		zebra2Map.applyMotion(mirrorMotion1)	
-		mirrorMotion1.mirror("ChrHarmony@StrafeSlowLf01", "ChrHarmony.sk")
+	
 	
 	locoMotions = StringVec()	
 	locoMotions.append("ChrHarmony@Idle01_StepBackwardLf01")	
@@ -42,7 +34,7 @@ def setupBehaviorSet():
 	locoMotions.append("ChrHarmony@Idle01_ToWalkLf01")
 	locoMotions.append("ChrHarmony@Idle01_ToWalkRt01")
 	locoMotions.append("ChrHarmony@IdleHandOnHip01")
-	locoMotions.append("ChrHarmony@StrafeSlowLf01")
+	#locoMotions.append("ChrHarmony@StrafeSlowLf01")
 	locoMotions.append("ChrHarmony@StrafeSlowRt01")
 	locoMotions.append("ChrHarmony@Turn90Lf01")
 	locoMotions.append("ChrHarmony@Turn90Rt01")
@@ -51,16 +43,37 @@ def setupBehaviorSet():
 	locoMotions.append("ChrHarmony@Walk01")
 	locoMotions.append("ChrHarmony@Walk01_ToIdle01")
 	locoMotions.append("ChrHarmony@Walk02")
-	locoMotions.append("ChrHarmony@WalkCircleLf01")
+	#locoMotions.append("ChrHarmony@WalkCircleLf01")
 	locoMotions.append("ChrHarmony@WalkCircleRt01")
-	locoMotions.append("ChrHarmony@WalkTightCircleLf01")
+	#locoMotions.append("ChrHarmony@WalkTightCircleLf01")
 	locoMotions.append("ChrHarmony@WalkTightCircleRt01")	
 	
 	for i in range(0, len(locoMotions)):
 		motion = scene.getMotion(locoMotions[i])
+		if motion == None:
+			assetManager.loadAsset(motionPath+locoMotions[i]+'.skm')
+			motion = scene.getMotion(locoMotions[i])		
 		if motion != None:
 			motion.setMotionSkeletonName('ChrHarmony.sk')
 			zebra2Map.applyMotion(motion)	
+			
+		
+	mirrorMotion1 = scene.getMotion("ChrHarmony@WalkCircleRt01")
+	if scene.getMotion("ChrHarmony@WalkCircleLf01") == None:
+		zebra2Map.applyMotion(mirrorMotion1)	
+		mirrorMotion1.mirror("ChrHarmony@WalkCircleLf01", "ChrHarmony.sk")
+		
+	mirrorMotion1 = scene.getMotion("ChrHarmony@WalkTightCircleRt01")
+	if scene.getMotion("ChrHarmony@WalkTightCircleLf01") == None:
+		zebra2Map.applyMotion(mirrorMotion1)	
+		mirrorMotion1.mirror("ChrHarmony@WalkTightCircleLf01", "ChrHarmony.sk")
+		
+	mirrorMotion1 = scene.getMotion("ChrHarmony@StrafeSlowRt01")
+	if scene.getMotion("ChrHarmony@StrafeSlowLf01") == None:
+		zebra2Map.applyMotion(mirrorMotion1)	
+		mirrorMotion1.mirror("ChrHarmony@StrafeSlowLf01", "ChrHarmony.sk")
+	
+	
 
 def retargetBehaviorSet(charName):
 	locoMotions = StringVec()

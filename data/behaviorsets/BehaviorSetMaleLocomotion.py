@@ -2,9 +2,15 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for MaleLocomotion..."
-	scene.loadAssetsFromPath("behaviorsets/MaleLocomotion/skeletons")
-	scene.loadAssetsFromPath("behaviorsets/MaleLocomotion/motions")
+	#scene.loadAssetsFromPath("behaviorsets/MaleLocomotion/skeletons")
+	#scene.loadAssetsFromPath("behaviorsets/MaleLocomotion/motions")
 	scene.addAssetPath("script", "behaviorsets/MaleLocomotion/scripts")
+	
+	assetManager = scene.getAssetManager()	
+	motionPath = "behaviorsets/MaleLocomotion/motions/"
+	skel = scene.getSkeleton("test_utah.sk")
+	if skel == None:
+		scene.loadAssetsFromPath("behaviorsets/MaleLocomotion/skeletons")
 	
 	locoMotions = StringVec()
 	locoMotions.append("ChrUtah_Walk001")
@@ -44,11 +50,16 @@ def setupBehaviorSet():
 	
 	for i in range(0, len(locoMotions)):
 		motion = scene.getMotion(locoMotions[i])
-		motion.setMotionSkeletonName('test_utah.sk')
-		motion.buildJointTrajectory('l_forefoot','base')
-		motion.buildJointTrajectory('r_forefoot','base')
-		motion.buildJointTrajectory('l_ankle','base')
-		motion.buildJointTrajectory('r_ankle','base')
+		if motion == None:
+			assetManager.loadAsset(motionPath+locoMotions[i]+'.skm')
+			motion = scene.getMotion(locoMotions[i])
+		#print 'motionName = ' + locoMotions[i]
+		if motion != None:
+			motion.setMotionSkeletonName('test_utah.sk')
+			motion.buildJointTrajectory('l_forefoot','base')
+			motion.buildJointTrajectory('r_forefoot','base')
+			motion.buildJointTrajectory('l_ankle','base')
+			motion.buildJointTrajectory('r_ankle','base')
 
 def retargetBehaviorSet(charName):			
 	#outDir = scene.getMediaPath() + '/retarget/motion/' + skelName + '/';

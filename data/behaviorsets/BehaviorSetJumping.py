@@ -2,9 +2,15 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for Jumping..."
-	scene.loadAssetsFromPath("behaviorsets/jumping/skeletons")
-	scene.loadAssetsFromPath("behaviorsets/jumping/motions")
+	#scene.loadAssetsFromPath("behaviorsets/jumping/skeletons")
+	#scene.loadAssetsFromPath("behaviorsets/jumping/motions")
 	scene.addAssetPath("script", "behaviorsets/jumping/scripts")
+	
+	assetManager = scene.getAssetManager()	
+	motionPath = "behaviorsets/jumping/motions/"
+	skel = scene.getSkeleton("ChrGarza.sk")
+	if skel == None:
+		scene.loadAssetsFromPath("behaviorsets/jumping/skeletons")
 	# map the Backovic skeleton
 	scene.run("zebra2-map.py")
 	zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
@@ -34,7 +40,12 @@ def setupBehaviorSet():
 	
 	for i in range(0, len(jumpMotions)):
 		motion = scene.getMotion(jumpMotions[i])
-		zebra2Map.applyMotion(motion)
+		if motion == None:
+			assetManager.loadAsset(motionPath+jumpMotions[i]+'.skm')
+			motion = scene.getMotion(jumpMotions[i])		
+		if motion != None:
+			motion.setMotionSkeletonName("ChrGarza.sk")
+			zebra2Map.applyMotion(motion)
 	
 	mirroredMotions = StringVec()
 	mirroredMotions.append("ChrGarza@IdleStand01_JumpLeft45HighMid01")

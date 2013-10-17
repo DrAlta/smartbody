@@ -2,9 +2,15 @@ scene.run("BehaviorSetCommon.py")
 
 def setupBehaviorSet():
 	print "Setting up behavior set for gestures..."
-	scene.loadAssetsFromPath("behaviorsets/Gestures/skeletons")
-	scene.loadAssetsFromPath("behaviorsets/Gestures/motions")
+	#scene.loadAssetsFromPath("behaviorsets/Gestures/skeletons")
+	#scene.loadAssetsFromPath("behaviorsets/Gestures/motions")
 	scene.addAssetPath("script", "behaviorsets/Gestures/scripts")
+	
+	assetManager = scene.getAssetManager()	
+	motionPath = "behaviorsets/Gestures/motions/"
+	skel = scene.getSkeleton("ChrBrad.sk")
+	if skel == None:
+		scene.loadAssetsFromPath("behaviorsets/Gestures/skeletons")
 	# map the zebra2 skeleton
 	scene.run("zebra2-map.py")
 	zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
@@ -59,7 +65,13 @@ def setupBehaviorSet():
 	
 	for i in range(0, len(gestureMotions)):
 		motion = scene.getMotion(gestureMotions[i])		
-		zebra2Map.applyMotion(motion)
+		if motion == None:
+			assetManager.loadAsset(motionPath+gestureMotions[i]+'.skm')
+			motion = scene.getMotion(gestureMotions[i])
+		#print 'motionName = ' + locoMotions[i]
+		if motion != None:
+			motion.setMotionSkeletonName("ChrBrad.sk")
+			zebra2Map.applyMotion(motion)				
 		
 
 
