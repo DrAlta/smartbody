@@ -514,9 +514,10 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 				std::string name = this->getAssetNameVariation(existingSkeleton);
 				LOG("Skeleton named %s already exist, changing name to %s", skeleton->getName().c_str(), name.c_str());
 				skeleton->setName(name);
-				addAssetHistory("SKELETON " + skeleton->getName());
 			}
 			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skeleton->getName(), skeleton));
+			skeleton->ref();
+			addAssetHistory("SKELETON " + skeleton->getName());
 			continue;
 		}
 		DeformableMesh* mesh = dynamic_cast<DeformableMesh*>(asset);
