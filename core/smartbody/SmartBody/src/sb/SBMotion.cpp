@@ -1710,6 +1710,7 @@ void SBMotion::serialize(Archive & ar, const unsigned int version)
 	ar& this->sKeyValues;
 	ar& this->sMetaDataNames;
 	ar& this->sMetaDataValues;
+	ar& this->sSyncPoints;
 }
 
 void SBMotion::saveToSkb(const std::string& fileName)
@@ -1748,6 +1749,13 @@ void SBMotion::saveToSkb(const std::string& fileName)
 		this->sMetaDataNames.push_back(tags[t]);
 		this->sMetaDataValues.push_back(tagValue);
 	}
+
+	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::READY ) ); 
+	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::STROKE_START ) ); 
+	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::STROKE ) ); 
+	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::STROKE_STOP ) );
+	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::RELAX ) );
+	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::STOP ) );
 	
 	try {
 		std::ofstream ofs(fileName, std::ios::binary);
@@ -1791,19 +1799,26 @@ bool SBMotion::readFromSkb(const std::string& fileName)
 	{
 		_channels.add(sChannelNames[c], (SkChannel::Type) sChannelTypes[c]);
 	}
+
+	int postureSize = _channels.size();
 	
-	int postureSize = this->posture_size();
-	
+	_frames.resize(sKeyTimes.size());
 	for (int f = 0; f < sFrames; f++)
 	{
-		this->insert_frame(f, sKeyTimes[f]);
-		float* frame = this->posture(f);
+		_frames[f].keytime = sKeyTimes[f];
+		_frames[f].posture = (float*) malloc ( sizeof(float)*postureSize );
 		for (int p = 0; p < postureSize; p++)
 		{
-			frame[p] = sKeyValues[f][p];
+			_frames[f].posture[p] = sKeyValues[f][p];
 		}
 	}
-	
+	sSyncPoints[0] = this->synch_points.set_time( srSynchPoints::READY, sSyncPoints[0] ); 
+	sSyncPoints[1] = this->synch_points.get_time( srSynchPoints::STROKE_START, sSyncPoints[1] ); 
+	sSyncPoints[2] = this->synch_points.get_time( srSynchPoints::STROKE, sSyncPoints[2] ); 
+	sSyncPoints[3] = this->synch_points.get_time( srSynchPoints::STROKE_STOP, sSyncPoints[3] ); 
+	sSyncPoints[4] = this->synch_points.get_time( srSynchPoints::RELAX, sSyncPoints[4] ); 
+	sSyncPoints[5] = this->synch_points.get_time( srSynchPoints::STOP, sSyncPoints[5] ); 
+
 	for (size_t t = 0; t < sMetaDataNames.size(); t++)
 	{
 		addMetaData(sMetaDataNames[t], sMetaDataValues[t]);
