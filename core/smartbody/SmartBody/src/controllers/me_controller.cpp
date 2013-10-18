@@ -636,7 +636,7 @@ void MeController::saveMotionRecord( const std::string &recordname )
 	
 	// load the motion
 	SrInput recordInput = SrInput((const char*)(stringOutput));
-	SmartBody::SBMotion* sbMotion = SmartBody::SBScene::getScene()->addMotionDefinition(recordname,-1.0);
+	SmartBody::SBMotion* sbMotion = SmartBody::SBScene::getScene()->createMotion(recordname);
 	sbMotion->setName(recordname);
 	sbMotion->load(recordInput);
 	sbMotion->filename(filename.c_str());

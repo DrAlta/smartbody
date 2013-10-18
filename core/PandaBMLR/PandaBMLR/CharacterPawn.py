@@ -99,7 +99,7 @@ class CharacterPawn(Pawn):
 		
 		print("Character '" + self.GetName() +  "' loaded in %2.3f sec" % (time.time() - t))
 		# add morph target map here:
-		#self.__morphTargetMap["blink"] = "BlendShapes.0"
+		self.__morphTargetMap["blink"] = "BlendShapes.15"
 		#self.__morphTargetMap["D"] = "BlendShapes.1"
 		#self.__morphTargetMap["EE"] = "BlendShapes.2"
 		#self.__morphTargetMap["Er"] = "BlendShapes.3"
@@ -240,11 +240,19 @@ class CharacterPawn(Pawn):
 	
 		if (self.__Joints.controlJoint(jointName, jointNP.node())):
 			joint = self.__Joints.findChild(jointName)
-			jointNP.setMat(joint.getDefaultValue())
-			self.__JointMap[self.JointNameToID(jointName)] = jointNP
+			self.__JointMap[jointName] = jointNP
+			try:
+				if PandaSystem.getMinorVersion() > 5:
+					jointNP.setMat(joint.getDefaultValue())
+				else:
+					jointNP.setMat(joint.getInitialValue())
+
+			except TypeError:
+				print("Initial value on joint " + jointName + " not a matrix. Assuming blendShape")
+				jointNP.setX(joint.getDefaultValue())
 			return jointNP
 		else:
-			print("Joint control request for '" << _jointName << "' FAILED!\n")
+			print("Joint control request for '" + jointName + "' FAILED!\n")
 			return None;
 	
 	def SetJointQuat(self, time, boneBusjointID, quat):
@@ -298,17 +306,21 @@ class CharacterPawn(Pawn):
 		
 		try:
 			morphTarget = self.__morphTargetMap[mappedViseme]
+			print "SetViseme " + mappedViseme  + " morph=" + morphTarget 
 			# get the joint id
-			pandaJointID = self.JointNameToID(morphTarget)
-			
-			joint = self.FindJoint(pandaJointID)
+			# pandaJointID = self.JointNameToID(morphTarget)
+			#print " jointID=" + pandaJointID 
+			# joint = self.FindJoint(pandaJointID)
+			joint = self.FindJoint(morphTarget)
+		
 			if joint is not None:
 				joint.setX(weight)
 		except:
 			print "Cannot find morph target for viseme " + mappedViseme + " on character " + self.GetName()
 			# add a dummy value
-			self.__morphTargetMap[mappedViseme] = "unknown" + str(self.__morphTargetCounter)
-			self.__morphTargetCounter = self.__morphTargetCounter + 1
+			if mappedViseme not in self.__morphTargetMap:
+				self.__morphTargetMap[mappedViseme] = "unknown" + str(self.__morphTargetCounter)
+				self.__morphTargetCounter = self.__morphTargetCounter + 1
 			
 		
 	
