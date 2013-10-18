@@ -53,6 +53,7 @@ class SBBehaviorSetManager;
 class SBRetargetManager;
 class SBAssetManager;
 class SBSpeechManager;
+class SBNavigationMeshManager;
 class SBParser;
 class SBSubject;
 class SBController;
@@ -160,6 +161,7 @@ class SBScene : public SBObject
 		SBAPI SBVHMsgManager* getVHMsgManager();
 		SBAPI SBCommandManager* getCommandManager();
 		SBAPI SBWSPManager* getWSPManager();
+		SBAPI SBNavigationMeshManager* getNavigationMeshManager();
 
 		SBAPI SBParser* getParser();
 
@@ -223,7 +225,10 @@ class SBScene : public SBObject
 		SBAPI void updatePawnNames();
 		SBAPI void updateCharacterNames();
 
+#if 0 // should be creating navigation mesh directly in AssetManager
 		SBAPI bool createNavigationMesh(const std::string& meshfilename);
+#endif
+		SBAPI void setNavigationMesh(const std::string& naviMeshName);
 		SBAPI SBNavigationMesh* getNavigationMesh();
 		
 		SBAPI Heightfield* createHeightfield();
@@ -296,6 +301,7 @@ class SBScene : public SBObject
 		SBVHMsgManager* _vhmsgManager;
 		SBCommandManager* _commandManager;
 		SBWSPManager* _wspManager;
+		SBNavigationMeshManager* _naviMeshManager;
 
 		SBParser* _parser;
 

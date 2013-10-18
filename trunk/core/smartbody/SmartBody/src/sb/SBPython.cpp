@@ -42,6 +42,8 @@
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBRetarget.h>
 #include <sb/SBRetargetManager.h>
+#include <sb/SBNavigationMesh.h>
+#include <sb/SBNavigationMeshManager.h>
 #include <sb/SBEvent.h>
 #include <sb/SBSceneListener.h>
 #include <sb/SBNavigationMesh.h>
@@ -404,6 +406,17 @@ boost::python::class_<SBObserver>("SBObserver")
 
 		;
 
+
+	boost::python::class_<SBNavigationMeshManager>("SBNavigationMeshManager")
+		.def("createNavigationMesh", &SBNavigationMeshManager::createNavigationMesh, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a navigation mesh")
+		.def("getNavigationMesh", &SBNavigationMeshManager::getNavigationMesh, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the navigation mesh based on its name.")
+		.def("getNavigationMeshNames", &SBNavigationMeshManager::getNavigationMeshNames, "Get the names of all navigation meshes.")
+		;
+
+	boost::python::class_<SBNavigationMesh>("SBNavigationMesh")
+		.def("buildNavigationMesh", &SBNavigationMesh::buildNavigationMesh, "Build the navigation mesh based on input mesh name")		
+		;
+
 	boost::python::class_<SBRetarget>("SBRetarget")
 		.def("initRetarget", &SBRetarget::initRetarget, "Initialize retarget instance.")
 		.def("applyRetargetJointRotation", &SBRetarget::applyRetargetJointRotation, "Apply retargeting on the joint rotation.")
@@ -699,7 +712,8 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("getSkeletonNames", &SBAssetManager::getSkeletonNames, "Returns a list of all skeleton names.\n Input: NULL \nOutput: list of skeleton names")
 		;
 
-		boost::python::class_<SBVHMsgManager, boost::python::bases<SBService> >("SBVHMsgManager")
+
+	boost::python::class_<SBVHMsgManager, boost::python::bases<SBService> >("SBVHMsgManager")
 		.def("connect", &SBVHMsgManager::connect, "Connects to the VH Message (ActiveMQ) server")
 		.def("disconnect", &SBVHMsgManager::disconnect, "Disconnects from the VH Message (ActiveMQ) server")
 		.def("send", &SBVHMsgManager::send, "Sends a VH message.")

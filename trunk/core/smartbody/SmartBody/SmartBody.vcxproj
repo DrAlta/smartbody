@@ -490,6 +490,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\sb\SBAssetHandlerSk.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkb.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkm.cpp" />
+    <ClCompile Include="src\sb\SBNavigationMeshManager.cpp" />
     <ClCompile Include="src\sb\smartbody-c-dll.cpp" />
     <ClCompile Include="src\sb\smartbody-dll.cpp" />
   </ItemGroup>
@@ -868,6 +869,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\sb\SBAssetHandlerSkb.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSkm.h" />
     <ClInclude Include="src\sb\SBCharacterListener.h" />
+    <ClInclude Include="src\sb\SBNavigationMeshManager.h" />
     <ClInclude Include="src\sb\SBVersion.hpp" />
     <ClInclude Include="src\sb\smartbody-c-dll.h" />
     <ClInclude Include="src\sb\smartbody-dll.h" />

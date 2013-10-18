@@ -6,6 +6,7 @@
 #include <sr/sr_model.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sb/SBAsset.h>
+#include <sb/SBObject.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -15,18 +16,22 @@ class dtNavMeshQuery;
 
 namespace SmartBody {
 
-class SBNavigationMesh : public SBAsset
+class SBNavigationMesh : public SBObject
 {
 	public:
 		SBAPI SBNavigationMesh();		
 		SBAPI ~SBNavigationMesh();	
-		SBAPI bool buildNavigationMesh(DeformableMesh* mesh);
-		SBAPI bool buildNavigationMesh(SrModel& inMesh);			
+		SBAPI bool buildNavigationMesh(std::string meshName);
+		SBAPI bool buildNavigationMeshFromModel(SrModel& inMesh);			
 		SBAPI SrModel* getRawMesh();
 		SBAPI SrModel* getNavigationMesh();
 		SBAPI float queryFloorHeight(SrVec pos, SrVec searchSize);
 		SBAPI SrVec queryMeshPointByRayCast(SrVec& p1, SrVec& p2);
 		SBAPI std::vector<SrVec> findPath(SrVec& spos, SrVec& epos);
+
+		SBAPI virtual void notify(SBSubject* subject);
+	protected:
+		void cleanUp();
 	protected:
 		float m_cellSize;
 		float m_cellHeight;
