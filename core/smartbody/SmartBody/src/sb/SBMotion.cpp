@@ -18,6 +18,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
+#include <fstream>
 
 namespace SmartBody {
 
@@ -1823,7 +1824,7 @@ void SBMotion::saveToSkb(const std::string& fileName)
 	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::STOP ) );
 	
 	try {
-		std::ofstream ofs(fileName, std::ios::binary);
+		std::ofstream ofs(fileName.c_str(), std::ios::binary);
 		boost::archive::binary_oarchive oa(ofs);
 		oa << *this;
 	}
@@ -1840,7 +1841,7 @@ void SBMotion::saveToSkb(const std::string& fileName)
 bool SBMotion::readFromSkb(const std::string& fileName)
 {
 	try {
-		std::ifstream ifs(fileName, std::ios::binary);
+		std::ifstream ifs(fileName.c_str(), std::ios::binary);
 		boost::archive::binary_iarchive ia(ifs);
 		ia >> *this;
 	}

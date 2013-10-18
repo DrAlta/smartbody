@@ -243,6 +243,8 @@ SbmCharacter::~SbmCharacter( void )	{
 		physics_ct->unref();
 	if (noise_ct)
 		noise_ct->unref();
+	if (record_ct)
+		record_ct->unref();
 
 	
 
