@@ -83,6 +83,8 @@ class SBCharacter : public SbmCharacter
 		SBAPI std::vector<std::string> getJointConstraintNames();
 		float getJointTrajBlendWeight() const { return jointTrajBlendWeight; }
 		void setJointTrajBlendWeight(float val) { jointTrajBlendWeight = val; }
+
+		SBAPI void createBlendShapeChannel(const std::string& channelName);
 		
 	protected:
 		std::vector<SBBehavior*> _curBehaviors;	

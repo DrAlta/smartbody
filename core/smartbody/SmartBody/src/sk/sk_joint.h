@@ -60,6 +60,7 @@ TypeEuler       // Euler angles with min/max limits per dof
 
 enum JointType { TypeJoint,
 TypeViseme,
+TypeBlendShape,
 TypeOther
 };
 

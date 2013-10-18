@@ -56,7 +56,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 
 	createBoolAttribute("useCustomizedLipSyncIfPresent", true, true, "Lip Sync", 60, false, false, false, "If motion name exists inside pre-recorded audio file bml, use it by default"); 
 	
-	createBoolAttribute("blendshape", 0, true, "Blendshapes", 69, false, false, false, "");	
+	//createBoolAttribute("blendshape", 0, true, "Blend Shape", 69, false, false, false, "");	
 
 	createBoolAttribute("gestureRequest.autoGestureTransition", true, true, "Gestures", 89, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
 	createBoolAttribute("gestureRequest.matchingHandness", true, true, "Gestures", 90, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
@@ -920,4 +920,11 @@ SBAPI std::vector<std::string> SBCharacter::getJointConstraintNames()
 	}
 	return jointConsNames;
 }
+
+
+void SBCharacter::createBlendShapeChannel(const std::string& channelName)
+{
+	this->addBlendShapeChannel(channelName);
+}
+
 };

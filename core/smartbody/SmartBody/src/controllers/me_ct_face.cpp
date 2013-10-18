@@ -372,6 +372,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 		return continuing;
 	}
 
+#if 0
 	if (_character->getBoolAttribute("blendshape"))
 	{
 		std::vector<std::string> visemeChannels;
@@ -428,6 +429,8 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 		}		
 		return continuing;
 	}
+#endif
+
 	int nchan = base_channels.size();
 	float * base_pose_buff_p = NULL;
 	if (_base_pose_p->frames() > 0)

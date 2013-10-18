@@ -118,6 +118,19 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			ParserCOLLADAFast::parseLibraryGeometries(geometryNode, convertedPath.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f);
 
 			float factor = 1.0f;
+
+			rapidxml::xml_node<>* controllerNode = ParserCOLLADAFast::getNode("library_controllers", colladaNode, 0, 2);		
+			if (!controllerNode)
+			{
+				LOG("mcu_character_load_skinweights ERR: no binding info contained");
+				return assets;
+			}
+
+			const char* jointNamePrefix = "";
+			ParserCOLLADAFast::parseLibraryControllers(controllerNode, mesh, factor, jointNamePrefix);
+	
+			std::map<std::string, std::vector<std::string> >::iterator morphTargetIter;
+			// handling morph targets
 			for (unsigned int i = 0; i < meshModelVec.size(); i++)
 			{
 				for (int j = 0; j < meshModelVec[i]->V.size(); j++)
@@ -133,18 +146,74 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				SrSnModel* srSnModelStatic = new SrSnModel();
 				srSnModelStatic->shape(*meshModelVec[i]);
 				srSnModelStatic->shape().name = meshModelVec[i]->name;
-				mesh->dMeshStatic_p.push_back(srSnModelStatic);
-				srSnModelStatic->ref();
-
+				
 				SrSnModel* srSnModelDynamic = new SrSnModel();
 				srSnModelDynamic->shape(*meshModelVec[i]);
 				srSnModelDynamic->changed(true);
 				srSnModelDynamic->visible(false);
 				srSnModelDynamic->shape().name = meshModelVec[i]->name;
-				mesh->dMeshDynamic_p.push_back(srSnModelDynamic);
-				srSnModelDynamic->ref();
+				
+				bool isBlendShape = false;
+				bool isBaseShape = false;
+				std::string baseShape = "";
 
-				//LOG("mesh name is %s", (const char*)meshModelVec[i]->name);
+				for (morphTargetIter = mesh->morphTargets.begin(); morphTargetIter != mesh->morphTargets.end(); ++morphTargetIter)	
+				{
+					if (morphTargetIter->second.size() < 1)
+						continue;
+
+					baseShape = morphTargetIter->second[0];
+					for (size_t c = 0; c < morphTargetIter->second.size(); ++c)
+					{
+						if (strcmp(morphTargetIter->second[c].c_str(), meshModelVec[i]->name) == 0)
+						{
+							if (c == 0)
+								isBaseShape = true;
+							else
+								isBlendShape = true;
+						}
+					}
+				}
+
+				if (isBlendShape || isBaseShape)
+				{
+					if (mesh->blendShapeMap.find(baseShape) == mesh->blendShapeMap.end())		
+					{
+						mesh->blendShapeMap.insert(std::make_pair(baseShape, std::vector<SrSnModel*>()));
+					}
+					mesh->blendShapeMap[baseShape].push_back(srSnModelStatic);
+					srSnModelStatic->ref();
+					delete srSnModelDynamic;
+					//LOG("Insert blend shape %s with base shape %s", (const char*)meshModelVec[i]->name, baseShape.c_str());
+				}
+
+				if (isBaseShape)
+				{
+					SrSnModel* srSnModelStaticBase = new SrSnModel();
+					srSnModelStaticBase->shape(*meshModelVec[i]);
+					srSnModelStaticBase->shape().name = meshModelVec[i]->name;
+
+					SrSnModel* srSnModelDynamicBase = new SrSnModel();
+					srSnModelDynamicBase->shape(*meshModelVec[i]);
+					srSnModelDynamicBase->changed(true);
+					srSnModelDynamicBase->visible(false);
+					srSnModelDynamicBase->shape().name = meshModelVec[i]->name;
+
+					mesh->dMeshStatic_p.push_back(srSnModelStaticBase);
+					srSnModelStaticBase->ref();
+					mesh->dMeshDynamic_p.push_back(srSnModelDynamicBase);
+					srSnModelDynamicBase->ref();
+					//LOG("Insert base mesh %s", (const char*)meshModelVec[i]->name);
+				}
+
+				if (!isBlendShape && !isBaseShape)
+				{
+					mesh->dMeshStatic_p.push_back(srSnModelStatic);
+					srSnModelStatic->ref();
+					mesh->dMeshDynamic_p.push_back(srSnModelDynamic);
+					srSnModelDynamic->ref();
+					//LOG("Insert mesh %s", (const char*)meshModelVec[i]->name);
+				}
 			
 				/* perform this when the character wants to attach to the mesh
 				SrSnGroup* meshGroup = new SrSnGroup();
@@ -163,20 +232,8 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			}
 			assets.push_back(mesh);
 
-			rapidxml::xml_node<>* controllerNode = ParserCOLLADAFast::getNode("library_controllers", colladaNode, 0, 2);		
-			if (!controllerNode)
-			{
-				LOG("mcu_character_load_skinweights ERR: no binding info contained");
-				return assets;
-			}
-			
-			const char* jointNamePrefix = "";
-			ParserCOLLADAFast::parseLibraryControllers(controllerNode, mesh, factor, jointNamePrefix);
-
 			if (rapidFile)
 				delete rapidFile;
-
-
 		}
 		else
 		{

@@ -9,6 +9,7 @@
 #include <sk/sk_skeleton.h>
 #include <sr/sr_model.h>
 #include <sb/SBAsset.h>
+#include <sb/SBCharacter.h>
 
 typedef std::vector<SkJoint*> SkJointList;
 
@@ -60,9 +61,11 @@ public:
 	std::vector<SrSnModel*>		dMeshDynamic_p;
 	std::vector<SrSnModel*>		dMeshStatic_p;
 	std::vector<SkinWeight*>	skinWeights;
-	std::map<std::string, std::vector<std::string> > morphTargets;
+	std::map<std::string, std::vector<SrSnModel*> > blendShapeMap; // morphTargets the key store the base shape name, vector stores morph target SrModels. first one in the vector is always the base one
+	std::map<std::string, std::vector<std::string> > morphTargets; // morphTargets stores a vector of morph target names, first one is always the base one
 	std::string                 skeletonName; // binding skeleton for this deformable model
 	SkSkeleton*					skeleton;			// pointer to current skeleton
+	SmartBody::SBCharacter*		curCharacter;		// pointer to current character
 	bool						binding;			// whether in deformable mesh mode
 	// unrolled all vertices into a single buffer for faster GPU rendering
 	bool initStaticVertexBuffer, initSkinnedVertexBuffer;	
@@ -94,9 +97,10 @@ public:
 	DeformableMesh();
 	SBAPI virtual ~DeformableMesh();	
 	SBAPI void setSkeleton(SkSkeleton* skel);
+	SBAPI void setCharacter(SmartBody::SBCharacter* c);
 	virtual void update();
 	SkinWeight* getSkinWeight(const std::string& skinSourceName);
-	int	getMesh(const std::string& meshName);				// get the postion given the mesh name
+	int	getMesh(const std::string& meshName);				// get the position given the mesh name
 	int getValidSkinMesh(const std::string& meshName);
     /*! Set the visibility state of the deformable geometry,
         The integers mean 1:show, 0:hide, and -1:don't change the visibility state. */

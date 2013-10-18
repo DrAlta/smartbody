@@ -2353,8 +2353,8 @@ void SbmCharacter::updateFaceDefinition()
 	int numVisemeChannels = numVisemes;
 
 //	viseme_channel_count = numAUs + numVisemes;
-//	viseme_channel_count = viseme_channel_end_pos - viseme_channel_start_pos;
-	viseme_channel_count = numAUChannels + numVisemeChannels;
+	viseme_channel_count = viseme_channel_end_pos - viseme_channel_start_pos;
+//	viseme_channel_count = numAUChannels + numVisemeChannels;
 
 	viseme_history_arr = new float[viseme_channel_count];
 	for( int i=0; i<viseme_channel_count; i++ ) {
@@ -2497,6 +2497,34 @@ void SbmCharacter::addVisemeChannel(std::string visemeName, std::string motionNa
 	{
 		addVisemeChannel(visemeName, NULL);
 	}
+}
+
+void SbmCharacter::addBlendShapeChannel(std::string bShapeName)
+{
+	// add a corresponding channel for this action unit
+	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+	if (!sbSkel)
+	{
+		LOG("No skeleton for character %s. Blend shape %d cannot be added.", this->getName().c_str(), bShapeName.c_str());
+		return;
+	}
+	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
+	if (!rootJoint)
+	{
+		LOG("No root joint for character %s. Blend shape %d cannot be added.", this->getName().c_str(), bShapeName.c_str());
+		return;
+	}
+
+
+	SmartBody::SBJoint* auJoint = new SmartBody::SBJoint();
+	auJoint->setJointType(SkJoint::TypeBlendShape);
+	auJoint->setName(bShapeName);
+	auJoint->setUsePosition(0, true);
+	auJoint->pos()->limits(SkJointPos::X, 0, 1);  // Setting upper bound to 2 allows some exaggeration
+	rootJoint->addChild(auJoint);
+
+	//LOG("Added blend shape channel %s", bShapeName.c_str());
+	updateFaceDefinition();
 }
 
 void SbmCharacter::addActionUnitChannel(int auNum, ActionUnit* au)

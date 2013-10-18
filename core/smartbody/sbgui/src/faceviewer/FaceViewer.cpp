@@ -135,6 +135,26 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 			curY += 30;
 		}
 
+		// also create slider for blend shape channels
+		if (character->getSkeleton())
+		{
+			for (int jointCounter = 0; jointCounter < character->getSkeleton()->getNumJoints(); ++jointCounter)
+			{
+				if (character->getSkeleton()->getJoint(jointCounter)->getJointType() == SkJoint::TypeBlendShape)
+				{
+					Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(character->getSkeleton()->getJoint(jointCounter)->getName().c_str()));
+					slider->type(FL_HORIZONTAL);
+					slider->align(FL_ALIGN_LEFT);
+					slider->range(0.0, 1.0);
+					slider->callback(FaceCB, faceViewer);
+					faceViewer->bottomGroup->add(slider);
+					faceViewer->_sliders.push_back(slider);
+					faceViewer->_weights.push_back(NULL);
+					curY += 30;
+				}
+			}
+		}
+
 		faceViewer->updateGUI();
 		faceViewer->bottomGroup->damage(FL_DAMAGE_ALL);
 	}
