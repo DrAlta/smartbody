@@ -279,8 +279,8 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 				else if (!pawn->dStaticMeshInstance_p && !useDeformableMesh)
 					pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
 				
-				DeformableMeshInstance* meshInsance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
-				meshInsance->setMeshScale(doubleAttribute->getValue());
+				DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
+				meshInstance->setMeshScale((float) doubleAttribute->getValue());
 				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
 			}			
 		}

@@ -62,6 +62,7 @@ bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName
 	assetManager->addSkeleton(sbSk);
 	assetManager->addDeformableMesh(outDeformableMeshName, deformMesh);
 #endif
+	return false;
 }
 
 
