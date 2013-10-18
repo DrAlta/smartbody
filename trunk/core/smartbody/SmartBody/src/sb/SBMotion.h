@@ -167,6 +167,7 @@ class SBMotion : public SkMotion
 		std::vector<std::vector<float> > sKeyValues;
 		std::vector<std::string> sMetaDataNames;
 		std::vector<std::string> sMetaDataValues;
+		std::vector<float> sSyncPoints;
 
 		friend class boost::serialization::access;
 		template<class Archive>
