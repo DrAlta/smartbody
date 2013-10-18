@@ -721,7 +721,7 @@ void AnimationBlendInfoWidget::updateWidget()
 	blendInfoObject->clearAttributes();	
 	attrWindow->cleanUpWidgets();
 	std::vector<SrVec> parameters = animBlend->getParameters();
-	for (unsigned int i=0;i<animBlend->getNumMotions();i++)
+	for (unsigned int i=0;i< (size_t) animBlend->getNumMotions();i++)
 	{
 		std::string motionName = animBlend->getMotionName(i);
 		SrVec& para = parameters[i];

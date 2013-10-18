@@ -77,6 +77,8 @@ void pythonFuncsMotion()
 
 	boost::python::class_<SBMotion, boost::python::bases<SBObject> >("SBMotion")
 		//.def(boost::python::init<std::string>())
+		.def("addChannel", &SBMotion::addChannel, "Adds a channel to the motion with a given type (XPos, YPos, ZPos, Quat)")
+		.def("addFrame", &SBMotion::addFrame, "Adds a frame to the motion a given time.")
 		.def("getMotionFileName", &SBMotion::getMotionFileName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the motion file name. \n Input: NULL \n Output: motion file name")
 		.def("getNumFrames", &SBMotion::getNumFrames, "Returns the number of frames inside this motion. \n Input: NULL \n Output: number of frames in the motion")
 		.def("getFrameData", &SBMotion::getFrameData, "Returns the frame data given frame index. \n Input: frame index \n Output: a list of frame data")

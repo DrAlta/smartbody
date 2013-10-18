@@ -50,13 +50,12 @@ class SBAssetManager : public SBObject
 		SBAPI SBNavigationMesh* createNewNavigationMesh(const std::string& naviMeshName);
 		SBAPI SBNavigationMesh* getNavigationMesh(const std::string& naviMeshName);		
 		SBAPI std::vector<std::string> getNavigationMeshNames();
-
-		
+	
 		SBAPI void loadMotions();
 		SBAPI void addMotion(SmartBody::SBMotion* motion);
 		SBAPI void removeMotion(SmartBody::SBMotion* motion);
 		SBAPI void addMotions(const std::string& path, bool recursive);
-		SBAPI SBMotion* addMotionDefinition(const std::string& motionName, double duration, int motionFrames = -1);
+		SBAPI SBMotion* createMotion(const std::string& motionName);
 		SBAPI SBMotion* getMotion(const std::string& name);
 		SBAPI int getNumMotions();
 		SBAPI std::vector<std::string> getMotionNames();

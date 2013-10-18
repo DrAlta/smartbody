@@ -62,12 +62,15 @@ class SBMotion : public SkMotion
 		SBAPI SBMotion();
 		SBAPI SBMotion(const SBMotion& motion);
 		SBAPI SBMotion(std::string motionFile);
-		SBAPI ~SBMotion();		
+		SBAPI ~SBMotion();
 		SBAPI const std::string& getMotionFileName();
 		SBAPI int getNumFrames();
 		SBAPI std::vector<float> getFrameData(int i);
 		SBAPI int getFrameSize();
 		void setMotionType(MotionType type);
+
+		SBAPI void addChannel(const std::string& channelName, const std::string& channelType);
+		SBAPI void addFrame(float frameTime, const std::vector<float>& frameData);
 
 		SBAPI void setMotionSkeletonName(std::string skelName);
 		SBAPI const std::string& getMotionSkeletonName();
@@ -78,6 +81,8 @@ class SBMotion : public SkMotion
 		
 		SBAPI virtual int connect(SBSkeleton* skel);
 		SBAPI virtual void disconnect();
+
+		SBAPI void setEmptyMotion(float duration, int numFrames);
 
 		SBAPI void alignToBegin(int numFrames);
 		SBAPI void alignToEnd(int numFrames);

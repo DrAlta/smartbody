@@ -2583,7 +2583,8 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup)
 			if (motion)
 			{
 				// add motion definition
-				strstr << "tempMotion = scene.addMotionDefinition(\"" << moName << "\"," << motion->getDuration() << "," << motion->getNumFrames() << ")\n";	
+				strstr << "tempMotion = scene.createMotion(\"" << moName << "\")\n";	
+				strstr << "tempMotion.setEmptyMotion(\"" << motion->getDuration() << ", " << motion->getNumFrames() << ")\n";
 				// add sync points
 				strstr << "tempMotion.setSyncPoint(\"start\"," << motion->getTimeStart() <<")\n";
 				strstr << "tempMotion.setSyncPoint(\"ready\"," << motion->getTimeReady() <<")\n";
@@ -3572,11 +3573,11 @@ SBSkeleton* SBScene::addSkeletonDefinition(const std::string& skelName )
 	return getAssetManager()->addSkeletonDefinition(skelName);
 }
 
-SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double duration, int motionFrame )
+SBMotion* SBScene::createMotion(const std::string& motionName)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.addMotionDefinition() instead.");
-	return getAssetManager()->addMotionDefinition(motionName, duration, motionFrame);
+		LOG("DEPRECATED: Use AssetManager.createMotion() instead.");
+	return getAssetManager()->createMotion(motionName);
 }
 
 void SBScene::addMotions(const std::string& path, bool recursive)

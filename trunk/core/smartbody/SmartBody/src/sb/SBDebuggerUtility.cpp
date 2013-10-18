@@ -222,7 +222,7 @@ bool QueryResourcesCB(void* caller, NetRequest* req)
 	case NetRequest::Get_Motion_Names:
 		for (size_t i = 0; i < args.size(); i++)
 		{
-			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->addMotionDefinition(args[i], 0);
+			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->createMotion(args[i]);
 		}
 		break;
 

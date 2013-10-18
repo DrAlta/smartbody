@@ -187,6 +187,72 @@ std::vector<std::string> SBMotion::getChannels()
 	return ret;
 }
 
+void SBMotion::addChannel(const std::string& channelName, const std::string& type)
+{
+	SkChannel::Type channelType = SkChannel::XPos;
+	if (type == "XPos")
+	{
+		channelType = SkChannel::XPos;
+	}
+	else if (type == "YPos")
+	{
+		channelType = SkChannel::YPos;
+	}
+	else if (type == "ZPos")
+	{
+		channelType = SkChannel::ZPos;
+	}
+	else if (type == "Quat")
+	{
+		channelType = SkChannel::Quat;
+	}
+	else 
+	{
+		LOG("Channel type %s not valid, must be one of: XPos, YPos, ZPos, Quat. Channel %s not added.", type.c_str(), channelName.c_str());
+		return;
+	}
+
+	int index = _channels.search(channelName, channelType);
+	if (index != -1)
+	{
+		LOG("Channel %s of type %s already present in motion, duplicate channel not added.", channelName.c_str(), type.c_str());
+		return;
+	}
+
+	_channels.add(channelName, channelType);
+}
+
+void SBMotion::addFrame(float frameTime, const std::vector<float>& frameData)
+{
+	// make sure that the frame data corresponds to the channel data
+	int channelSize = _channels.size();
+	if (channelSize != frameData.size())
+	{
+		LOG("Motion %s needs %d values, only have %d values, data not added.", this->getName().c_str(), channelSize, frameData.size());
+		return;
+	}
+
+	double duration = this->getDuration();
+	if (duration <= frameTime)
+	{
+		int postureSize = _channels.size();
+		int frameSize = _frames.size();
+		_frames.resize(_frames.size() + 1);
+		_frames[frameSize].keytime = frameTime;
+		_frames[frameSize].posture = (float*) malloc ( sizeof(float)*postureSize );
+		for (int p = 0; p < postureSize; p++)
+		{
+			_frames[frameSize].posture[p] = frameData[p];
+		}
+	}
+	else
+	{
+		LOG("Frame must be added in time-order. Motion %s has duration %f, frame is at time %f. Frame not added.", this->getName().c_str(), duration, frameTime);
+		return;
+	}
+
+}
+
 void SBMotion::checkSkeleton(std::string skel)
 {
 	 
@@ -1718,27 +1784,26 @@ void SBMotion::saveToSkb(const std::string& fileName)
 	// write the data to the stream variables
 	sName = this->getName();
 	
-	sNumChannels = this->getNumChannels();
+	sNumChannels = _channels.size();
 	for (int c = 0; c < _channels.size(); c++)
 	{
 		sChannelNames.push_back(_channels.name(c));
 		sChannelTypes.push_back(_channels.type(c));
 	}
 	
-	sFrames = this->getNumFrames();
-
-	int size = this->posture_size();
+	sFrames = _frames.size();
+	
+	int size = _channels.size();
 	
 	for (int f = 0; f < sFrames; f++)
 	{
-		float time = this->keytime(f);
+		float time = _frames[f].keytime;
 		sKeyTimes.push_back(time);
 		sKeyValues.push_back(std::vector<float>() );
 		std::vector<float>& data = sKeyValues[f];
-		float* posture = this->posture(f);
 		for (int p = 0; p < size; p++)
 		{
-			data.push_back(posture[p]);
+			data.push_back(_frames[f].posture[p]);
 		}
 	}
 	
@@ -1750,12 +1815,12 @@ void SBMotion::saveToSkb(const std::string& fileName)
 		this->sMetaDataValues.push_back(tagValue);
 	}
 
-	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::READY ) ); 
-	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::STROKE_START ) ); 
-	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::STROKE ) ); 
-	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::STROKE_STOP ) );
-	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::RELAX ) );
-	sSyncPoints.push_back(this->synch_points.get_time( srSynchPoints::STOP ) );
+	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::READY ) ); 
+	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::STROKE_START ) ); 
+	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::STROKE ) ); 
+	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::STROKE_STOP ) );
+	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::RELAX ) );
+	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::STOP ) );
 	
 	try {
 		std::ofstream ofs(fileName, std::ios::binary);
@@ -1812,12 +1877,12 @@ bool SBMotion::readFromSkb(const std::string& fileName)
 			_frames[f].posture[p] = sKeyValues[f][p];
 		}
 	}
-	sSyncPoints[0] = this->synch_points.set_time( srSynchPoints::READY, sSyncPoints[0] ); 
-	sSyncPoints[1] = this->synch_points.get_time( srSynchPoints::STROKE_START, sSyncPoints[1] ); 
-	sSyncPoints[2] = this->synch_points.get_time( srSynchPoints::STROKE, sSyncPoints[2] ); 
-	sSyncPoints[3] = this->synch_points.get_time( srSynchPoints::STROKE_STOP, sSyncPoints[3] ); 
-	sSyncPoints[4] = this->synch_points.get_time( srSynchPoints::RELAX, sSyncPoints[4] ); 
-	sSyncPoints[5] = this->synch_points.get_time( srSynchPoints::STOP, sSyncPoints[5] ); 
+	sSyncPoints[0] = (float) this->synch_points.set_time( srSynchPoints::READY, sSyncPoints[0] ); 
+	sSyncPoints[1] = (float) this->synch_points.get_time( srSynchPoints::STROKE_START, sSyncPoints[1] ); 
+	sSyncPoints[2] = (float) this->synch_points.get_time( srSynchPoints::STROKE, sSyncPoints[2] ); 
+	sSyncPoints[3] = (float) this->synch_points.get_time( srSynchPoints::STROKE_STOP, sSyncPoints[3] ); 
+	sSyncPoints[4] = (float) this->synch_points.get_time( srSynchPoints::RELAX, sSyncPoints[4] ); 
+	sSyncPoints[5] = (float) this->synch_points.get_time( srSynchPoints::STOP, sSyncPoints[5] ); 
 
 	for (size_t t = 0; t < sMetaDataNames.size(); t++)
 	{
@@ -2496,7 +2561,7 @@ SBAPI bool SBMotion::getTrajPosition( std::string effectorName, float time, SrVe
 	float weight;
 	bool validTime = getInterpolationFrames(time, f1,f2,weight);
 	if (!validTime) return false;
-	if (f1 >= traj->jointTrajectory.size() || f2 >= traj->jointTrajectory.size()) return false;
+	if (f1 >= (int) traj->jointTrajectory.size() || f2 >= (int) traj->jointTrajectory.size()) return false;
 	
 	outPos = traj->jointTrajectory[f1]*(1-weight) + traj->jointTrajectory[f2]*weight;
 	return true;
@@ -2531,6 +2596,31 @@ bool SBMotion::getInterpolationFrames( float time, int& f1, int& f2, float& weig
 bool motionComp(const SBMotion *a, const SBMotion *b)
 {
 	return a->getTransformDepth() < b->getTransformDepth();
+}
+
+
+void SBMotion::setEmptyMotion(float duration, int numFrames)
+{
+	if (duration <= 0.0 || numFrames <= 0)
+	{
+		LOG("Duration for motion %s should be > 0 and frames > 0", this->getName().c_str());
+		return;
+	}
+
+	if (numFrames <= 2 && duration > 0)
+	{
+		this->insert_frame(0,0.f);
+		this->insert_frame(1,(float)duration);
+	}	
+	else if (numFrames > 2 && duration > 0)
+	{
+		float deltaT = (float)duration/(numFrames-1);
+		for (int i=0;i<numFrames;i++)
+		{
+			this->insert_frame(i,deltaT*i);			
+		}
+	}
+
 }
 
 
