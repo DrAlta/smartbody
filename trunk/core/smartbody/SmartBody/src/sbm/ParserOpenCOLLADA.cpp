@@ -738,11 +738,12 @@ void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, DeformableMesh* m
 									DOMNode* childNodeOfSource = childOfSourceCurNode;
 									std::string childNameOfSource;
 									nodeStr(childNodeOfSource->getNodeName(), childNameOfSource);
-									if (childNameOfSource == "IDREF_array")
+									if (childNameOfSource == "IDREF_array" || childNameOfSource == "Name_array")
 									{
 										std::vector<std::string> refMesh;
+										refMesh.push_back(morphName);
 										std::string tokenBlock;
-										nodeStr(childNodeOfMorph->getTextContent(), tokenBlock);
+										nodeStr(childNodeOfSource->getTextContent(), tokenBlock);
 										boost::char_separator<char> sep2(" \n");
 										boost::tokenizer<boost::char_separator<char> > tokens(tokenBlock, sep2);
 										for (boost::tokenizer<boost::char_separator<char> >::iterator it = tokens.begin();
@@ -751,7 +752,6 @@ void ParserOpenCOLLADA::parseLibraryControllers(DOMNode* node, DeformableMesh* m
 										{
 											refMesh.push_back((*it));
 										}
-										refMesh.push_back(morphName);
 										mesh->morphTargets.insert(make_pair(morphFullName, refMesh));
 									}
 									childOfSourceCurNode = childOfSourceCurNode->getNextSibling();
@@ -2183,7 +2183,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 					}										
 				}
 
-				if (nodeName1 == "triangles" || nodeName1 == "polylist")
+				if (nodeName1 == "triangles" || nodeName1 == "polylist" || nodeName1 == "polygons")
 				{
 					//LOG("nodeName1 = %s", nodeName1.c_str());
 					int curmtl = -1;
@@ -2269,9 +2269,23 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 						for (int i = 0; i < count; i++)
 							vcountList.push_back(3);
 					}
-					DOMNode* pNode = ParserOpenCOLLADA::getNode("p", node1);
-					std::string pString;
-					xml_utils::xml_translate(&pString, pNode->getTextContent());
+
+					//DOMNode* pNode = ParserOpenCOLLADA::getNode("p", node1);
+
+					std::string pString = "";
+					DOMNode* pNode = node1->getFirstChild();
+					while (pNode)
+					{
+						if (strcmp(xml_utils::xml_translate_string(pNode->getNodeName()).c_str(), "p") == 0)
+						{
+							pString += xml_utils::xml_translate_string(pNode->getNodeValue());
+							pString += " ";
+						}
+						pNode = pNode->getNextSibling();
+					}
+
+					//std::string pString;
+					//xml_utils::xml_translate(&pString, pNode->getTextContent());
 
 					/*
 					std::vector<std::string> tokens;
@@ -2560,6 +2574,20 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 					std::string texID;
 					xml_utils::xml_translate(&texID, texAttrNode->getNodeValue());
 					diffuseTexture = texID;
+
+
+					std::string imageId = diffuseTexture;
+					std::string imageFile = pictureId2File[imageId];
+					std::string mtlName = mnames.top();
+#if (BOOST_VERSION > 104400)
+					std::string fileExt = boost::filesystem::extension(imageFile);
+#else
+					std::string fileExt = boost::filesystem2::extension(imageFile);
+#endif
+					std::string fileName = boost::filesystem::basename(imageFile);
+					if (diffuseTexture.find(imageId) != std::string::npos)
+						mtlTexMap[mtlName] = fileName + fileExt;		
+
 				}
 				DOMNode* colorNode = ParserOpenCOLLADA::getNode("color", diffuseNode);
 				if (colorNode)
@@ -2585,6 +2613,19 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 					std::string texID;
 					xml_utils::xml_translate(&texID, texAttrNode->getNodeValue());
 					normalTexture = texID;
+
+					std::string imageId = diffuseTexture;
+					std::string imageFile = pictureId2File[imageId];
+					std::string mtlName = mnames.top();
+#if (BOOST_VERSION > 104400)
+					std::string fileExt = boost::filesystem::extension(imageFile);
+#else
+					std::string fileExt = boost::filesystem2::extension(imageFile);
+#endif
+					std::string fileName = boost::filesystem::basename(imageFile);
+					if (diffuseTexture.find(imageId) != std::string::npos)
+						mtlTexBumpMap[mtlName] = fileName + fileExt;	
+
 					M.top().specular = SrColor(0.1f,0.1f,0.1f,1.f);
 					M.top().shininess = 20;
 				}			
@@ -2600,6 +2641,19 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 					std::string texID;
 					xml_utils::xml_translate(&texID, texAttrNode->getNodeValue());
 					specularTexture = texID;
+
+					std::string imageId = diffuseTexture;
+					std::string imageFile = pictureId2File[imageId];
+					std::string mtlName = mnames.top();
+#if (BOOST_VERSION > 104400)
+					std::string fileExt = boost::filesystem::extension(imageFile);
+#else
+					std::string fileExt = boost::filesystem2::extension(imageFile);
+#endif
+					std::string fileName = boost::filesystem::basename(imageFile);
+					if (diffuseTexture.find(imageId) != std::string::npos)
+						mtlTexSpecularMap[mtlName] = fileName + fileExt;	
+
 					M.top().specular = SrColor(0.1f,0.1f,0.1f,1.f);
 					M.top().shininess = 20;
 				}			

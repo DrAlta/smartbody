@@ -2453,6 +2453,12 @@ void SbmCharacter::removeAllFaceChannels()
 	}
 }
 
+
+void SbmCharacter::removeAllBlendShapeChannels()
+{
+
+}
+
 void SbmCharacter::addVisemeChannel(std::string visemeName, SkMotion* motion)
 {
 	// add a corresponding channel for this viseme

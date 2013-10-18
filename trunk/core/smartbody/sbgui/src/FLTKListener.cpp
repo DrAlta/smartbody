@@ -338,14 +338,15 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 
 							std::stringstream ss;
 							ss << "blendShape.channelName." << (const char*)iter->second[c]->shape().name;
-							character->createStringAttribute(ss.str().c_str(), "", true, "Blend Shape", c, false, false, false, "blend shape channel name");
+							character->createStringAttribute(ss.str().c_str(), "", true, "Blend Shape", c + 1, false, false, false, "blend shape channel name");
+							character->createActionAttribute("updateChannel", true, "Blend Shape", 0, false, false, false, "update blend shape channel");
 						}
 					}
 
 					DeformableMeshInstance* meshInsance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
 					meshInsance->setDeformableMesh(mesh);
-					meshInsance->setSkeleton(pawn->getSkeleton());	
-					mesh->setCharacter(character);
+					//meshInsance->setSkeleton(pawn->getSkeleton());	
+					meshInsance->setCharacter(character);
 					
 #if 0
 					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)

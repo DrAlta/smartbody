@@ -367,6 +367,7 @@ public:
 	virtual void setFaceDefinition(SmartBody::SBFaceDefinition* face);
 	virtual void updateFaceDefinition();
 	void removeAllFaceChannels();
+	void removeAllBlendShapeChannels();
 
 	virtual void setNvbg(SmartBody::Nvbg* nvbg);
 	virtual SmartBody::Nvbg* getNvbg();
