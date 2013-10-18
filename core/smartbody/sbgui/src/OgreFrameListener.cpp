@@ -212,7 +212,28 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 		if (!sceneNode)
 			return false;
 
-		int numVisibleCharacters = 0;		
+		int numVisibleCharacters = 0;	
+		// for pawn, only update the world offset
+		for ( size_t i = 0; i< m_pawnList.size(); i++ )
+		{
+			std::string& name = m_pawnList[i];
+			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
+			if (!mSceneMgr->hasEntity(name))
+				continue;
+			if (!pawn)
+				continue;
+
+			Node* node = sceneNode->getChild(name);
+
+			if (!node)
+				continue;
+			// set character positions& rotations
+			SrMat wMat = pawn->get_world_offset();
+			SrQuat wRot = SrQuat(wMat);
+			SrVec wPos = wMat.get_translation();
+			node->setPosition(wPos.x, wPos.y, wPos.z);
+			node->setOrientation(Quaternion(wRot.w, wRot.x, wRot.y, wRot.z));
+		}
 		// set character position and rotation
 		for ( size_t i = 0; i < m_characterList.size(); i++ )
 		{
