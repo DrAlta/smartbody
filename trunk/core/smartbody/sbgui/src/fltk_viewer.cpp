@@ -5175,6 +5175,7 @@ void FltkViewer::drawDeformableModels()
 			//pawn->dMesh_p->update();
 			if (!meshInstance->isStaticMesh()) // is skinned mesh
 			{
+#if 0
 				bool useBlendShape = false;
 				SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (pawn);
 				if (character)
@@ -5187,6 +5188,7 @@ void FltkViewer::drawDeformableModels()
 					meshInstance->getDeformableMesh()->blendShapes();
 					//character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
 				}
+#endif
 				meshInstance->update();
 				if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && meshInstance->getVisibility()) || _data->showSkinWeight)
 				{

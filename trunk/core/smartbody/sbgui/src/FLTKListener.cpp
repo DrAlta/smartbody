@@ -246,6 +246,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 	if (attribute)
 	{
 		SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(attribute->getObject());
+		SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(attribute->getObject());
 		const std::string& name = attribute->getName();
 		if (name == "visible")
 		{
@@ -326,9 +327,25 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
 					}
 
+					// create attributes for all the blend shapes if there's any
+					std::map<std::string, std::vector<SrSnModel*> > ::iterator iter = mesh->blendShapeMap.begin();
+					for (; iter != mesh->blendShapeMap.end(); ++iter)
+					{
+						for (size_t c = 0; c < iter->second.size(); ++c)
+						{
+							if (strcmp(iter->first.c_str(), (const char*)iter->second[c]->shape().name) == 0)	// you don't create it for base shape
+								continue;
+
+							std::stringstream ss;
+							ss << "blendShape.channelName." << (const char*)iter->second[c]->shape().name;
+							character->createStringAttribute(ss.str().c_str(), "", true, "Blend Shape", c, false, false, false, "blend shape channel name");
+						}
+					}
+
 					DeformableMeshInstance* meshInsance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
 					meshInsance->setDeformableMesh(mesh);
 					meshInsance->setSkeleton(pawn->getSkeleton());	
+					mesh->setCharacter(character);
 					
 #if 0
 					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)

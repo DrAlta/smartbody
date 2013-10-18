@@ -306,6 +306,8 @@ public:
 
 public:
 	
+	SBAPI void addBlendShapeChannel(std::string bShapeName);
+
 	static void addTagSkMotion(int tag, SkMotion* motion, std::set<std::pair<int,SkMotion*> >& motionSet);
 
 	/*
@@ -424,4 +426,3 @@ protected:
 
 /////////////////////////////////////////////////////////////
 #endif // SBM_CHARACTER_HPP
-
