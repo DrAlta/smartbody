@@ -489,7 +489,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	}
 	else
 	{
-		for (int i=0;i<dMeshDynamic_p.size();i++)
+		for (size_t i=0;i<dMeshDynamic_p.size();i++)
 			meshIndexList.push_back(i);
 	}
 
@@ -743,7 +743,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 						boneWeightBuf[1][iVtx][j-4] = w.second;
 					}	
 
-					if (w.first >= 0 && w.first < boneJointList.size())
+					if (w.first >= 0 && w.first < (int) boneJointList.size())
 					{
 						skinColor += boneColorMap[w.first]*w.second;
 					}

@@ -1029,7 +1029,7 @@ void BaseWindow::CameraFrameCB(Fl_Widget* widget, void* data)
 		if (box.volume() < .0001)
 		{
 			double val = 1.0 / SmartBody::SBScene::getScene()->getScale() * .5;
-			box.grows(val, val, val);
+			box.grows((float) val, (float) val, (float) val);
 		}
 		sceneBox.extend(box);
 	}
@@ -1061,7 +1061,7 @@ void BaseWindow::CameraFrameObjectCB(Fl_Widget* widget, void* data)
 	if (box.volume() < .0001)
 	{
 			double val = 1.0 / SmartBody::SBScene::getScene()->getScale() * .5;
-			box.grows(val, val, val);
+			box.grows((float) val, (float) val, (float) val);
 	}
 
 	sceneBox.extend(box);

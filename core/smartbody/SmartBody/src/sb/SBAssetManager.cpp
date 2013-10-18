@@ -792,6 +792,12 @@ void SBAssetManager::loadAssetsFromPath(const std::string& assetPath)
 
 SBSkeleton* SBAssetManager::addSkeletonDefinition(const std::string& skelName )
 {
+	SBSkeleton* existingSkeleton = this->getSkeleton(skelName);
+	if (existingSkeleton)
+	{
+		LOG("Skeleton named %s already exists, new skeleton will not be created.", skelName.c_str());
+		return NULL;
+	}
 	SBSkeleton* sbSkel = new SBSkeleton();	
 	sbSkel->setName(skelName);
 	sbSkel->skfilename(skelName.c_str());
@@ -804,26 +810,20 @@ SBAPI void SBAssetManager::addSkeleton(SmartBody::SBSkeleton* skeleton)
 	_skeletons[skeleton->getName()] = skeleton;
 }
 
-SBMotion* SBAssetManager::addMotionDefinition(const std::string& motionName, double duration, int motionFrames )
+SBMotion* SBAssetManager::createMotion(const std::string& motionName)
 {
-	SBMotion* sbMotion = new SBMotion();
-	if (motionFrames <= 2 && duration > 0)
+	std::map<std::string, SBMotion*>::iterator iter = _motions.find(motionName);
+	if (iter != _motions.end())
 	{
-		sbMotion->insert_frame(0,0.f);
-		sbMotion->insert_frame(1,(float)duration);
-	}	
-	else if (motionFrames > 2 && duration > 0)// motion frame > 2
-	{
-		float deltaT = (float)duration/(motionFrames-1);
-		for (int i=0;i<motionFrames;i++)
-		{
-			sbMotion->insert_frame(i,deltaT*i);			
-		}
+		LOG("Motion named %s already exists, new motion will not be created.");
+		return NULL;
 	}
-	sbMotion->setName(motionName);	
-	//mcuCBHandle::singleton().motion_map.insert(std::pair<std::string, SkMotion*>(motionName, sbMotion));
-	_motions[motionName] = sbMotion;
-	return sbMotion;
+
+	SBMotion* motion = new SBMotion();
+	motion->setName(motionName);
+	_motions[motionName] = motion;
+
+	return motion;
 }
 
 SBAPI void SBAssetManager::addMotion(SmartBody::SBMotion* motion)

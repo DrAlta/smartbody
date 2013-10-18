@@ -677,8 +677,10 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("OnChannel", &SBSceneListener::OnChannel, &CharacterListenerWrap::default_OnChannel, "Channel data.")
 		.def("OnLogMessage", &SBSceneListener::OnLogMessage, &CharacterListenerWrap::default_OnLogMessage, "Log message.")
 		;
-
+	
 	boost::python::class_<SBAssetManager, boost::python::bases<SBObject> >("SBAssetManager")
+		.def("addSkeletonDefinition", &SBAssetManager::addSkeletonDefinition, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a name.")
+		.def("createMotion", &SBAssetManager::createMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new motion given a name.")
 		.def("createSkeleton", &SBAssetManager::createSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates a new skeleton given a skeleton definition.")
 		.def("getSkeleton", &SBAssetManager::getSkeleton, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the skeleton object given its name. \n Input: skeleton name \nOutput: skeleton object")
 		.def("addAssetPath", &SBAssetManager::addAssetPath, "Add path resource given path type and actual path string. \n Input: type(can be seq|me|ME), path \n Output: NULL")

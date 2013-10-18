@@ -809,7 +809,7 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 	if(spine4 && spine4->num_children()>0)
 	{
 		std::vector<SkJoint*> j_list;
-		for (unsigned int i=0;i<spine4->num_children();i++)
+		for (unsigned int i=0;i< (size_t) spine4->num_children();i++)
 		{
 			SkJoint* j = spine4->child(i);
 			SrString jname(j->jointName().c_str());

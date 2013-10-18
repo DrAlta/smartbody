@@ -90,7 +90,7 @@ bool AutoRigToDeformableMesh( PinocchioOutput& out, SrModel& m, SmartBody::SBSke
 	//int boneIdxMap[] = {1, 2, 3}
 	int prevJointIdx[] = { 1, 2, 3, 4, -1, 0, 5, 6,  4, 8, 9, 10, 11, 4, 13, 14, 15, 16, 0, 18, 19, 20, 0, 22, 23, 24};
 	std::vector<int> boneIdxMap;
-	for (int i=0;i<out.embedding.size();i++)
+	for (int i=0;i< (int) out.embedding.size();i++)
 	{
 		int boneIdx = prevJointIdx[i];
 		if (boneIdx < 0)
@@ -102,7 +102,7 @@ bool AutoRigToDeformableMesh( PinocchioOutput& out, SrModel& m, SmartBody::SBSke
 	
 	SkinWeight* sw = new SkinWeight();
 	sw->sourceMesh = meshName;	
-	for (unsigned int i=0;i<m.V.size();i++)
+	for (unsigned int i=0;i< (size_t) m.V.size();i++)
 	{
 		Vector<double, -1> v = out.attachment->getWeights(i);
 		double maxD = -1.0;
@@ -117,7 +117,7 @@ bool AutoRigToDeformableMesh( PinocchioOutput& out, SrModel& m, SmartBody::SBSke
 				{
 					weights[boneIdx] = 0.f;
 				}
-				weights[boneIdx] += d;
+				weights[boneIdx] += (float) d;
 			}		
 		}
 		std::map<int,float>::iterator mi;
@@ -177,16 +177,16 @@ bool AutoRigToSBSk( PinocchioOutput& out, Skeleton& sk, SmartBody::SBSkeleton& s
 		float pos[3];
 		for (int j=0;j<3;j++)
 		{
-			pos[j] = out.embedding[i][j];
+			pos[j] = (float) out.embedding[i][j];
 			if (prevJointIdx[i] != -1)
 			{
-				pos[j] -= out.embedding[prevJointIdx[i]][j];
+				pos[j] -= (float) out.embedding[prevJointIdx[i]][j];
 			}
 		}	
 		joint->setOffset(SrVec(pos[0],pos[1],pos[2]));
 	}
 	// setup joint hierarchy
-	for (unsigned int i=0;i<sbSk.getNumJoints();i++)
+	for (unsigned int i=0;i< (size_t) sbSk.getNumJoints();i++)
 	{
 		SmartBody::SBJoint* joint = sbSk.getJoint(i);
 		int parentIdx = prevJointIdx[i];

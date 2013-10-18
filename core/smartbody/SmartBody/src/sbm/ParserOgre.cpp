@@ -1599,7 +1599,7 @@ bool ParserOgre::exportOgreXMLMesh( DeformableMesh* defMesh, std::string meshNam
 		if (model.V.size() != model.N.size())
 			model.computeNormals();
 		fprintf(fp,"<vertexbuffer positions=\"true\" normals=\"true\">\n");
-		for (unsigned int k=0;k<model.V.size();k++)
+		for (unsigned int k=0;k< (size_t) model.V.size();k++)
 		{
 			SrVec& p = model.V[k];
 			SrVec& n = model.N[k];
@@ -1613,7 +1613,7 @@ bool ParserOgre::exportOgreXMLMesh( DeformableMesh* defMesh, std::string meshNam
 		if (model.T.size() == model.V.size())
 		{
 			fprintf(fp,"<vertexbuffer texture_coord_dimensions_0=\"2\" texture_coords=\"1\">\n");
-			for (unsigned int k=0;k<model.T.size();k++)
+			for (unsigned int k=0;k< (size_t) model.T.size();k++)
 			{
 				//const Vector3 &p = m.vertices[i].pos;
 				SrPnt2& tex = model.T[k];
