@@ -719,6 +719,27 @@ void EmbeddedOgre::finishRender()
 	ogreWnd->swapBuffers(lVerticalSynchro);		
 }
 
+
+Ogre::Entity* EmbeddedOgre::createOgrePawn( SmartBody::SBPawn* sbPawn )
+{
+	Ogre::Entity* outPawn = NULL;
+	std::string meshName = sbPawn->getStringAttribute("mesh");
+	DeformableMeshInstance* meshInstance = sbPawn->dStaticMeshInstance_p;
+	if (meshName == "") meshName = sbPawn->getName();
+
+	addDeformableMesh(meshName, meshInstance);
+	Ogre::MeshPtr     ogreMesh = Ogre::MeshManager::getSingleton().getByName(meshName);	
+	if (ogreMesh.isNull()) return NULL;
+	if (!meshInstance) return NULL;
+	DeformableMesh* deformMesh = meshInstance->getDeformableMesh();
+	if (!deformMesh) return NULL;
+
+	ogreMesh->load();
+	outPawn = ogreSceneMgr->createEntity(sbPawn->getName(),meshName);	
+	return outPawn;
+}
+
+
 Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar )
 {
 	Ogre::Entity* outChar = NULL;
@@ -962,8 +983,12 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	if (!meshInstance) return;
 	// do not create anything if there is no skin weights or meshes
 	DeformableMesh* mesh = meshInstance->getDeformableMesh();
-	if (!mesh) return;
-	if (mesh->skinWeights.size() == 0 || mesh->dMeshStatic_p.size() == 0) return; 
+	if (!mesh) return;	
+	if (mesh->dMeshStatic_p.size() == 0) return; 
+	bool isSkinMesh = true;
+	if (mesh->skinWeights.size() == 0) 
+		isSkinMesh = false;
+	
 
 	Ogre::MeshManager& meshManager = Ogre::MeshManager::getSingleton();	
 	if (!meshManager.getByName(meshName).isNull()) return; // mesh already exists

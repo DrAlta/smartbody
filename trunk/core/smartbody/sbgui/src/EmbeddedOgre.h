@@ -17,6 +17,7 @@ namespace SmartBody
 {
 	class SBSkeleton;
 	class SBCharacter;
+	class SBPawn;
 }
 
 class EmbeddedOgre
@@ -41,6 +42,8 @@ public:
 	Ogre::Camera*       getCamera() { return ogreCamera; }
 	unsigned long getGLContext() { return ogreGLContext; }
 	Ogre::Entity* createOgreCharacter(SmartBody::SBCharacter* sbChar); // create a ogre character from a smartbody character
+	Ogre::Entity* createOgrePawn(SmartBody::SBPawn* sbPawn); // create a ogre character from a smartbody character
+
 	void addSBSkeleton(SmartBody::SBSkeleton* skel); // convert a SB skeleton to ogre
 	void addDeformableMesh(std::string meshName, DeformableMeshInstance* meshInstance);
 	void addTexture(std::string texName);	
