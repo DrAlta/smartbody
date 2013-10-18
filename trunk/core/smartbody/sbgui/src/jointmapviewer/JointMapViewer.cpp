@@ -977,7 +977,8 @@ std::string SkeletonViewer::pickJointName( float x, float y )
 		SrVec jointPos = joint->gmat().get_translation();
 		glPushName(0xffffffff);
 		glLoadName(i);
-		PositionControl::drawSphere(jointPos, jointSize);								
+		SrVec color(1,0,0);
+		PositionControl::drawSphere(jointPos, jointSize, color);								
 		glPopName();			
 	}	
 	// process picking

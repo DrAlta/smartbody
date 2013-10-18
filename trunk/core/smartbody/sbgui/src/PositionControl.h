@@ -58,7 +58,7 @@ protected:
 	int opdir;	
 	SrVec colors[4];
 public:
-	PositionControl(void);
+	PositionControl();
 	~PositionControl(void);
 
 	virtual void draw(SrCamera& cam);
@@ -66,8 +66,8 @@ public:
 	virtual void hitOPS(SrCamera& cam);	
 	virtual void identify(std::vector<int>& path);
 
-	static void drawSphere(SrVec& pos, float fRadius = 1.0, SrVec color = SrVec(1.f,0,0));
-	static void drawBox(SrBox& box, bool wireFrame = false, SrVec color = SrVec(0.f,1.f,1.f));
+	static void drawSphere(SrVec& pos, float fRadius, SrVec& color);
+	static void drawBox(SrBox& box, bool wireFrame, SrVec& color);
 	void drawShadowSquare(float x,float y,float z,SrVec& dirx,SrVec& diry,float sz,unsigned int mode);	
 protected:
 	void drawCenter();		

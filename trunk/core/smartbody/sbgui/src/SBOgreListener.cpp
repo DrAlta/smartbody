@@ -45,7 +45,10 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	if (!sbChar) return; // no smartbody character exist ?
 	Entity * ent = NULL;
 	if (ogreInterface->getSceneManager()->hasEntity(name))
+	{
+		LOG("ALREADY FOUND ENTITY NAMED %s", name.c_str());
 		return;
+	}
 
 
 	SmartBody::SBAttribute* attr = pawn->getAttribute("mesh");
@@ -205,5 +208,6 @@ void OgreListener::OnChannel( const std::string & name, const std::string & chan
 
 void OgreListener::OnReset()
 {
+	delete ogreInterface->getSceneManager();
 
 }

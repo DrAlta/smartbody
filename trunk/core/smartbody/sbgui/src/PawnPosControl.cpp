@@ -262,15 +262,17 @@ void PawnSelectControl::hitTest( SrCamera& cam )
 	if (!pawn) return;
 
 	SrBox bbox = pawn->getBoundingBox();
+	SrVec color(0.f,1.f,1.f);
 	if (bbox.max_size() < 1e-9) // no bounding box
 	{
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		float sphereSize = 0.05f / scene->getScale();
-		PositionControl::drawSphere(pawn->getPosition(),sphereSize);
+		SrVec pos = pawn->getPosition();
+		PositionControl::drawSphere(pos, sphereSize, color);
 	}
 	else
 	{
-		PositionControl::drawBox(bbox);	
+		PositionControl::drawBox(bbox, false, color);	
 	}
 	
 	//LOG("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",curChar->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
