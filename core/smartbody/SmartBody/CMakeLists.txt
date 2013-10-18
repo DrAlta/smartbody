@@ -548,6 +548,7 @@ target_link_libraries( SmartBody
 	boost_system
 	boost_regex
 	boost_python
+	boost_serialization
 	blas
 	lapack
 	${OPENGL_LIBRARIES}
