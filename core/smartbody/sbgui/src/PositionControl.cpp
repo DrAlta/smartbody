@@ -148,7 +148,8 @@ SrVec ObjectControl::mouseToWorld( SrCamera& cam, float fx, float fy, float tx, 
 void PositionControl::drawCenter()
 {	
 	SrVec center= getWorldPt();
-	drawSphere(center);
+	SrVec color(1, 0, 0);
+	drawSphere(center, false, color);
 }
 
 
@@ -171,7 +172,7 @@ PositionControl::~PositionControl(void)
 {
 }
 
-void PositionControl::drawSphere(SrVec& pos, float fRadius, SrVec color)
+void PositionControl::drawSphere(SrVec& pos, float fRadius, SrVec& color)
 {
 	//glColor3f(1.0, 0.0, 0.0);
 	glEnable(GL_LIGHTING);
@@ -184,7 +185,7 @@ void PositionControl::drawSphere(SrVec& pos, float fRadius, SrVec color)
 	glDisable(GL_LIGHTING);
 }
 
-void PositionControl::drawBox( SrBox& box, bool wireFrame /*= false*/, SrVec color /*= SrVec(0.f,1.f,1.f)*/ )
+void PositionControl::drawBox( SrBox& box, bool wireFrame /*= false*/, SrVec& color /*= SrVec(0.f,1.f,1.f)*/ )
 {
 	glDisable(GL_LIGHTING);	
 	SrSnBox sbox;					
@@ -232,7 +233,8 @@ void PositionControl::hitOPS(SrCamera& cam)
 	glEnd();
 
 	//drawShadowSquare(center[0],center[1],center[2],dirx,diry,s_len,GL_QUADS);
-	drawSphere(center,ratio*s_len*hitScale);
+	SrVec color(1.0, 0, 0);
+	drawSphere(center,ratio*s_len*hitScale, color);
 
 	glPushMatrix();
 	glTranslatef(center[0],center[1],center[2]);

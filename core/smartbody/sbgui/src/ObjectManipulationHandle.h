@@ -14,6 +14,7 @@ protected:
 	bool bHasPicking;
 	SrVec2 pick_loc;
 	ControlType pickType;
+	SrVec defaultColor;
 	
 public:
 	ObjectManipulationHandle(void);

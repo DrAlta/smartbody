@@ -13,6 +13,7 @@ ObjectManipulationHandle::ObjectManipulationHandle(void)
 	active_control = NULL;
 	bHasPicking = false;
 	pickType = CONTROL_SELECTION;
+	defaultColor.set(1, 0, 0);
 }
 
 ObjectManipulationHandle::~ObjectManipulationHandle(void)
@@ -57,7 +58,7 @@ void ObjectManipulationHandle::draw(SrCamera& cam)
 					box.a = sbPawn->getPosition() - SrVec(boxSize,boxSize,boxSize);
 					box.b = sbPawn->getPosition() + SrVec(boxSize,boxSize,boxSize);
 				}
-				PositionControl::drawBox(box,true);
+				PositionControl::drawBox(box,true, defaultColor);
 			}
 		}
 	}
@@ -137,7 +138,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 		if (active_control && active_control->get_attach_pawn() == pawn)
 		{			
 			SrBox bbox = sbpawn->getBoundingBox();
-			PositionControl::drawBox(bbox);
+			PositionControl::drawBox(bbox, false, defaultColor);
 			//pawnPosControl.hitOPS(cam);
 			active_control->hitTest(*cam);			
 		}
@@ -146,7 +147,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 		{			
 			SrBox bbox = curChar->getBoundingBox();
 			//LOG("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",curChar->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
-			PositionControl::drawBox(bbox);						
+			PositionControl::drawBox(bbox, false, defaultColor);						
 		}
 		else if (sbpawn->getPhysicsObject())
 		{
@@ -156,7 +157,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 #endif
 		else
 		{		
-			PositionControl::drawSphere(pawn_pos, pawnSize);				
+			PositionControl::drawSphere(pawn_pos, pawnSize, defaultColor);				
 		}		
 		glPopName();			
 	}

@@ -4759,9 +4759,11 @@ void FltkViewer::drawReach()
 
 		EffectorState& es = rd->effectorState;
 // 		SrVec reachTraj = es.curState.tran;
-// 		PositionControl::drawSphere(reachTraj,sphereSize,SrVec(0,1,1));
+		SrVec sphereColor(0,1,1);
+// 		PositionControl::drawSphere(reachTraj,sphereSize,sphereColor);
 		SrVec ikTraj = es.curIKTargetState.tran;		
-		PositionControl::drawSphere(ikTraj,sphereSize,SrVec(1,0,1));
+		SrVec color(1,0,1);
+		PositionControl::drawSphere(ikTraj,sphereSize,color);
 		SrVec ikTarget = es.ikTargetState.tran;
 		std::string effectorJointName = rd->effectorState.effectorName;
 		SmartBody::SBJoint* effectorJoint = character->getSkeleton()->getJointByName(effectorJointName);
@@ -4795,7 +4797,8 @@ void FltkViewer::drawReach()
 		{
 			MeCtIKTreeNode* node = ikTree.ikValidNodes[i];
 			SrVec nodePos = node->getGlobalPos();
-			PositionControl::drawSphere(nodePos,sphereSize,SrVec(0,1,1));
+			SrVec color(0,1,1);
+			PositionControl::drawSphere(nodePos,sphereSize,color);
 		}
 
 // 		glColor3f(1.0, 0.0, 0.0);
