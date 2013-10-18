@@ -37,6 +37,7 @@
 #include <sb/SBSpeechManager.h>
 #include <sb/SBCommandManager.h>
 #include <sb/SBWSPManager.h>
+#include <sb/SBNavigationMeshManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
 #include <sb/SBRetarget.h>
@@ -159,6 +160,7 @@ void SBScene::initialize()
 	_vhmsgManager = new SBVHMsgManager();
 	_commandManager = new SBCommandManager();
 	_wspManager = new SBWSPManager();
+	_naviMeshManager = new SBNavigationMeshManager();
 
 	_scale = .01f; // default scale is centimeters
 
@@ -359,7 +361,7 @@ void SBScene::cleanup()
 	delete _speechManager;
 	delete _commandManager;
 	delete _wspManager;
-
+	delete _naviMeshManager;
 	delete _kinectProcessor;
 
 	_sim = NULL;
@@ -393,10 +395,12 @@ void SBScene::cleanup()
 	}
 	_heightField = NULL;
 
+#if 0 // this should be done in asset manager
 	if (_navigationMesh)
 	{
 		delete _navigationMesh;
 	}
+#endif
 	_navigationMesh = NULL;
 
 	_rootGroup->unref();
@@ -1533,6 +1537,11 @@ SBCommandManager* SBScene::getCommandManager()
 SBWSPManager* SBScene::getWSPManager()
 {
 	return _wspManager;
+}
+
+SBNavigationMeshManager* SBScene::getNavigationMeshManager()
+{
+	return _naviMeshManager;
 }
 
 
@@ -3913,6 +3922,7 @@ std::map<std::string, GeneralParam*>& SBScene::getGeneralParameters()
 	return _generalParams;
 }
 
+#if 0
 SBAPI bool SBScene::createNavigationMesh( const std::string& meshfilename )
 {	
 	std::vector<SrModel*> meshVec;
@@ -3960,11 +3970,18 @@ SBAPI bool SBScene::createNavigationMesh( const std::string& meshfilename )
 		delete _navigationMesh;
 		_navigationMesh = NULL;
 	}
-
 	_navigationMesh = new SBNavigationMesh();
 	_navigationMesh->buildNavigationMesh(*srMesh);
-
 	return true;
+}
+#endif
+
+SBAPI void SBScene::setNavigationMesh( const std::string& naviMeshName )
+{
+	SBNavigationMeshManager* naviManager = getNavigationMeshManager();
+	SBNavigationMesh* naviMesh = naviManager->getNavigationMesh(naviMeshName);
+	if (naviMesh)
+		_navigationMesh = naviMesh;
 }
 
 SBAPI SBNavigationMesh* SBScene::getNavigationMesh()
@@ -3983,6 +4000,8 @@ void SBScene::stopFileLogging()
 	if (_logListener)
 		vhcl::Log::g_log.RemoveListener(_logListener);
 }
+
+
 
 };
 
