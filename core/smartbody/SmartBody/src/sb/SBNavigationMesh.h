@@ -4,6 +4,8 @@
 #include <vhcl.h>
 #include <sb/SBTypes.h>
 #include <sr/sr_model.h>
+#include <sbm/sbm_deformable_mesh.h>
+#include <sb/SBAsset.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -13,12 +15,13 @@ class dtNavMeshQuery;
 
 namespace SmartBody {
 
-class SBNavigationMesh
+class SBNavigationMesh : public SBAsset
 {
 	public:
 		SBAPI SBNavigationMesh();		
-		SBAPI ~SBNavigationMesh();		
-		SBAPI bool buildNavigationMesh(SrModel& inMesh);	
+		SBAPI ~SBNavigationMesh();	
+		SBAPI bool buildNavigationMesh(DeformableMesh* mesh);
+		SBAPI bool buildNavigationMesh(SrModel& inMesh);			
 		SBAPI SrModel* getRawMesh();
 		SBAPI SrModel* getNavigationMesh();
 		SBAPI float queryFloorHeight(SrVec pos, SrVec searchSize);
@@ -40,11 +43,10 @@ class SBNavigationMesh
 		float m_detailSampleDist;
 		float m_detailSampleMaxError;
 		SrModel* rawMesh; // the orignal model
-		SrModel* naviMesh; // the navigation mesh built from original model
+		SrModel* naviMesh; // the navigation mesh built from original model		
 
-		class dtNavMesh* m_navMesh;
-		class dtNavMeshQuery* m_navQuery;
-
+		dtNavMesh* m_navMesh;
+		dtNavMeshQuery* m_navQuery;
 };
 
 }

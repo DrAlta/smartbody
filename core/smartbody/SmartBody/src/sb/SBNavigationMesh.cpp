@@ -22,6 +22,7 @@ SBAPI SBNavigationMesh::~SBNavigationMesh()
 {
 }
 
+
 SBAPI bool SBNavigationMesh::buildNavigationMesh( SrModel& inMesh )
 {	
 	if (inMesh.V.size() <= 0 || inMesh.F.size() <= 0)
@@ -408,6 +409,10 @@ SBAPI bool SBNavigationMesh::buildNavigationMesh( SrModel& inMesh )
 	return true;
 }
 
+SBAPI bool SBNavigationMesh::buildNavigationMesh( DeformableMesh* mesh )
+{
+	return true;
+}
 
 SBAPI float SBNavigationMesh::queryFloorHeight( SrVec pos, SrVec searchSize )
 {

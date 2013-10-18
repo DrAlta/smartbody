@@ -15,6 +15,7 @@ namespace SmartBody {
 
 class SBSkeleton;
 class SBMotion;
+class SBNavigationMesh;
 
 class SBAssetManager : public SBObject
 {
@@ -44,6 +45,12 @@ class SBAssetManager : public SBObject
 		SBAPI void addSkeleton(SBSkeleton* skeleton);
 		SBAPI int getNumSkeletons();
 		SBAPI std::vector<std::string> getSkeletonNames();
+
+		
+		SBAPI SBNavigationMesh* createNewNavigationMesh(const std::string& naviMeshName);
+		SBAPI SBNavigationMesh* getNavigationMesh(const std::string& naviMeshName);		
+		SBAPI std::vector<std::string> getNavigationMeshNames();
+
 		
 		SBAPI void loadMotions();
 		SBAPI void addMotion(SmartBody::SBMotion* motion);
@@ -97,6 +104,7 @@ protected:
 		std::map<std::string, SBSkeleton*> _skeletons;
 		std::map<std::string, SBMotion*> _motions;
 		std::map<std::string, DeformableMesh*> _deformableMeshMap;
+		std::map<std::string, SBNavigationMesh*> _navigationMeshMap;
 
 		srPathList*	seq_paths;
 		srPathList*	me_paths;
