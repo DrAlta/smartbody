@@ -67,13 +67,12 @@ DeformableMesh::DeformableMesh() : SBAsset()
 
 	skeleton = new SmartBody::SBSkeleton();
 	skeleton->ref();
-
-	curCharacter = NULL;
 }
 
 DeformableMesh::~DeformableMesh() 
 {
 	skeleton->unref();
+
 	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
 	{
 		dMeshDynamic_p[i]->unref();
@@ -96,8 +95,6 @@ DeformableMesh::~DeformableMesh()
 		}
 	}	
 	skinWeights.clear();
-
-	curCharacter = NULL;
 }
 
 
@@ -107,205 +104,6 @@ void DeformableMesh::setSkeleton(SkSkeleton* skel)
 		skeleton->unref();
 	skeleton = skel;
 	skel->ref();
-}
-
-void DeformableMesh::setCharacter(SmartBody::SBCharacter* c)
-{
-	curCharacter = c;
-}
-
-void DeformableMesh::blendShapes()
-{
-	// find the base shape from static meshes
-	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
-	for (mIter = blendShapeMap.begin(); mIter != blendShapeMap.end(); ++mIter)
-	{
-		SrSnModel* writeToBaseModel = NULL;
-		SrSnModel* baseModel = NULL;
-		for (size_t i = 0; i < dMeshStatic_p.size(); ++i)
-		{
-			if (strcmp(dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
-			{
-				writeToBaseModel = dMeshStatic_p[i];
-				break;
-			}
-		}
-
-		if (writeToBaseModel == NULL)
-		{
-			LOG("base model to write to cannot be found");
-			continue;
-		}
-		for (size_t i = 0; i < mIter->second.size(); ++i)
-		{
-			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
-			{
-				baseModel = mIter->second[i];
-				break;
-			}
-		}
-		if (baseModel == NULL)
-		{
-			LOG("original base model cannot be found");
-			continue;
-		}
-		
-		SrArray<SrPnt>& neutralV = baseModel->shape().V;
-		SrArray<SrPnt>& neutralN = baseModel->shape().N;
-		SrArray<SrPnt> newV = neutralV;
-		SrArray<SrPnt> newN = neutralN;
-		for (size_t i = 0; i < mIter->second.size(); ++i)
-		{
-			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
-				continue;	// don't do anything about base model
-			
-			float w = 0.0f;
-			// get weight
-			std::stringstream ss;
-			ss << "blendShape.channelName." << (const char*)mIter->second[i]->shape().name;
-			if (curCharacter->hasAttribute(ss.str()))
-			{
-				std::string mappedCName = curCharacter->getStringAttribute(ss.str());
-				SmartBody::SBSkeleton* sbSkel = curCharacter->getSkeleton();
-				if (sbSkel && mappedCName != "")
-				{
-					SmartBody::SBJoint* joint = sbSkel->getJointByName(mappedCName);
-					if (joint)
-					{
-						SrVec pos = joint->getPosition();
-						w = pos.x;
-						//LOG("shape %s(%s) with weight %f", (const char*)mIter->second[i]->shape().name, mappedCName.c_str(), w);
-					}
-				}
-			}
-			else
-				continue;
-			
-			if (fabs(w) > gwiz::epsilon4())	// if it has weight
-			{
-				//LOG("blend in %s with weight %f", (const char*)mIter->second[i]->shape().name, w);
-				SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
-				SrArray<SrPnt>& visemeN = mIter->second[i]->shape().N;
-				if (visemeV.size() != neutralV.size())
-				{
-					LOG("number of vertices for %s is not same as neutral", mIter->first.c_str());
-					continue;
-				}
-				if (visemeN.size() != neutralN.size())
-				{
-					LOG("number of normals for %s is not same as neutral", mIter->first.c_str());
-					continue;
-				}
-				for (int v = 0; v < visemeV.size(); ++v)
-				{
-					SrPnt diff = visemeV[v] - neutralV[v];
-					newV[v] = newV[v] + diff * w;
-				}
-				for (int n = 0; n < visemeN.size(); ++n)
-				{
-					SrPnt diff = visemeN[n] - neutralN[n];
-					newN[n] = newN[n] + diff * w;
-				}
-			}
-		}
-		for (int n = 0; n < newN.size(); ++n)
-		{
-			newN[n].normalize();
-		}
-
-		writeToBaseModel->shape().V = newV;
-		writeToBaseModel->shape().N = newN;
-	}
-
-	return;
-
-#if 0
-	for (size_t i = 0; i < dMeshBlend_p.size(); ++i)
-	{
-		delete dMeshBlend_p[i];
-	}
-	dMeshBlend_p.clear();
-
-	for (size_t i = 0; i < dMeshStatic_p.size(); ++i)
-	{
-		delete dMeshStatic_p[i];
-	}
-	dMeshStatic_p.clear();
-
-	if (visemeShapeMap.find("neutral") == visemeShapeMap.end())
-	{
-		LOG("neutral blend shape has not been defined!");
-		return;
-	}
-
-
-
-	std::vector<SrSnModel*>& neutralModel = visemeShapeMap["neutral"];
-	for (size_t i = 0; i < neutralModel.size(); ++i)
-	{
-		SrArray<SrPnt>& neutralV = neutralModel[i]->shape().V;
-		SrArray<SrPnt>& neutralN = neutralModel[i]->shape().N;
-		SrArray<SrPnt> newV = neutralV;
-		SrArray<SrPnt> newN = neutralN;
-
-		bool isBlending = false;
-		std::map<std::string, float>::iterator iter;
-		for (iter = visemeWeightMap.begin(); iter != visemeWeightMap.end(); ++iter)
-		{
-				for (size_t j = 0; j < visemeShapeMap[iter->first].size(); j++)
-				{
-					LOG("Shape %s", (const char*)visemeShapeMap[iter->first][j]->shape().name);
-				}
-				LOG("%s", (const char*) neutralModel[i]->shape().name);
-			if (iter->second > 0.01f && iter->first != "neutral")
-			{
-				for (size_t j = 0; j < visemeShapeMap[iter->first].size(); j++)
-				{
-					if (visemeShapeMap[iter->first][j]->shape().name != neutralModel[i]->shape().name)
-						continue;
-
-					isBlending = true;
-					SrArray<SrPnt>& visemeV = visemeShapeMap[iter->first][j]->shape().V;
-					SrArray<SrPnt>& visemeN = visemeShapeMap[iter->first][j]->shape().N;
-					if (visemeV.size() != neutralV.size())
-					{
-						LOG("number of vertices for %s is not same as neutral", iter->first.c_str());
-						continue;
-					}
-					if (visemeN.size() != neutralN.size())
-					{
-						LOG("number of normals for %s is not same as neutral", iter->first.c_str());
-						continue;
-					}
-					for (int v = 0; v < visemeV.size(); ++v)
-					{
-						SrPnt diff = visemeV[v] - neutralV[v];
-						newV[v] = newV[v] + diff * iter->second;
-					}
-					for (int n = 0; n < visemeN.size(); ++n)
-					{
-						SrPnt diff = visemeN[n] - neutralN[n];
-						newN[n] = newN[n] + diff * iter->second;
-					}
-				}
-			}
-		}
-		for (int n = 0; n < newN.size(); ++n)
-		{
-			newN[n].normalize();
-		}
-
-		SrSnModel* blendedModel = new SrSnModel();
-		//SrSnModel* blendedModel = dMeshStatic_p[i];
-		blendedModel->shape(neutralModel[i]->shape());
-		if (isBlending)
-		{
-			blendedModel->shape().V = newV;
-			blendedModel->shape().N = newN;			
-		}
-		dMeshStatic_p.push_back(blendedModel);
-	}
-#endif
 }
 
 void DeformableMesh::update()
@@ -910,6 +708,7 @@ DeformableMeshInstance::DeformableMeshInstance()
 	_isStaticMesh = false;
 	_recomputeNormal = true;
 	_meshScale = 1.f;
+	_character = NULL;
 }
 
 DeformableMeshInstance::~DeformableMeshInstance()
@@ -917,12 +716,15 @@ DeformableMeshInstance::~DeformableMeshInstance()
 	cleanUp();
 }
 
-void DeformableMeshInstance::setSkeleton( SkSkeleton* skel )
+
+void DeformableMeshInstance::setCharacter(SmartBody::SBCharacter* c)
 {
 	if (_skeleton)
 		_skeleton->unref();
-	_skeleton = skel;
-	skel->ref();
+	_skeleton = c->getSkeleton();
+	if (_skeleton)
+		_skeleton->ref();
+	_character = c;
 	updateJointList();
 }
 
@@ -937,6 +739,206 @@ void DeformableMeshInstance::cleanUp()
 	}
 	dynamicMesh.clear();
 }
+
+void DeformableMeshInstance::blendShapes()
+{
+	if (!_character)
+	{
+		return;
+	}
+
+	// find the base shape from static meshes
+	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
+	for (mIter = _mesh->blendShapeMap.begin(); mIter != _mesh->blendShapeMap.end(); ++mIter)
+	{
+		SrSnModel* writeToBaseModel = NULL;
+		SrSnModel* baseModel = NULL;
+		for (size_t i = 0; i < _mesh->dMeshStatic_p.size(); ++i)
+		{
+			if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
+			{
+				writeToBaseModel = _mesh->dMeshStatic_p[i];
+				break;
+			}
+		}
+
+		if (writeToBaseModel == NULL)
+		{
+			LOG("base model to write to cannot be found");
+			continue;
+		}
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
+			{
+				baseModel = mIter->second[i];
+				break;
+			}
+		}
+		if (baseModel == NULL)
+		{
+			LOG("original base model cannot be found");
+			continue;
+		}
+
+		SrArray<SrPnt>& neutralV = baseModel->shape().V;
+		SrArray<SrPnt>& neutralN = baseModel->shape().N;
+		SrArray<SrPnt> newV = neutralV;
+		SrArray<SrPnt> newN = neutralN;
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
+				continue;	// don't do anything about base model
+
+			float w = 0.0f;
+			// get weight
+			std::stringstream ss;
+			ss << "blendShape.channelName." << (const char*)mIter->second[i]->shape().name;
+			if (_character->hasAttribute(ss.str()))
+			{
+				std::string mappedCName = _character->getStringAttribute(ss.str());
+				SmartBody::SBSkeleton* sbSkel = _character->getSkeleton();
+				if (sbSkel && mappedCName != "")
+				{
+					SmartBody::SBJoint* joint = sbSkel->getJointByName(mappedCName);
+					if (joint)
+					{
+						SrVec pos = joint->getPosition();
+						w = pos.x;
+						//LOG("shape %s(%s) with weight %f", (const char*)mIter->second[i]->shape().name, mappedCName.c_str(), w);
+					}
+				}
+			}
+			else
+				continue;
+
+			if (fabs(w) > gwiz::epsilon4())	// if it has weight
+			{
+				//LOG("blend in %s with weight %f", (const char*)mIter->second[i]->shape().name, w);
+				SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
+				SrArray<SrPnt>& visemeN = mIter->second[i]->shape().N;
+				if (visemeV.size() != neutralV.size())
+				{
+					LOG("number of vertices for %s is not same as neutral", mIter->first.c_str());
+					continue;
+				}
+				if (visemeN.size() != neutralN.size())
+				{
+					LOG("number of normals for %s is not same as neutral", mIter->first.c_str());
+					continue;
+				}
+				for (int v = 0; v < visemeV.size(); ++v)
+				{
+					SrPnt diff = visemeV[v] - neutralV[v];
+					newV[v] = newV[v] + diff * w;
+				}
+				for (int n = 0; n < visemeN.size(); ++n)
+				{
+					SrPnt diff = visemeN[n] - neutralN[n];
+					newN[n] = newN[n] + diff * w;
+				}
+			}
+		}
+		for (int n = 0; n < newN.size(); ++n)
+		{
+			newN[n].normalize();
+		}
+
+		writeToBaseModel->shape().V = newV;
+		writeToBaseModel->shape().N = newN;
+	}
+
+	return;
+
+#if 0
+	for (size_t i = 0; i < dMeshBlend_p.size(); ++i)
+	{
+		delete dMeshBlend_p[i];
+	}
+	dMeshBlend_p.clear();
+
+	for (size_t i = 0; i < dMeshStatic_p.size(); ++i)
+	{
+		delete dMeshStatic_p[i];
+	}
+	dMeshStatic_p.clear();
+
+	if (visemeShapeMap.find("neutral") == visemeShapeMap.end())
+	{
+		LOG("neutral blend shape has not been defined!");
+		return;
+	}
+
+
+
+	std::vector<SrSnModel*>& neutralModel = visemeShapeMap["neutral"];
+	for (size_t i = 0; i < neutralModel.size(); ++i)
+	{
+		SrArray<SrPnt>& neutralV = neutralModel[i]->shape().V;
+		SrArray<SrPnt>& neutralN = neutralModel[i]->shape().N;
+		SrArray<SrPnt> newV = neutralV;
+		SrArray<SrPnt> newN = neutralN;
+
+		bool isBlending = false;
+		std::map<std::string, float>::iterator iter;
+		for (iter = visemeWeightMap.begin(); iter != visemeWeightMap.end(); ++iter)
+		{
+			for (size_t j = 0; j < visemeShapeMap[iter->first].size(); j++)
+			{
+				LOG("Shape %s", (const char*)visemeShapeMap[iter->first][j]->shape().name);
+			}
+			LOG("%s", (const char*) neutralModel[i]->shape().name);
+			if (iter->second > 0.01f && iter->first != "neutral")
+			{
+				for (size_t j = 0; j < visemeShapeMap[iter->first].size(); j++)
+				{
+					if (visemeShapeMap[iter->first][j]->shape().name != neutralModel[i]->shape().name)
+						continue;
+
+					isBlending = true;
+					SrArray<SrPnt>& visemeV = visemeShapeMap[iter->first][j]->shape().V;
+					SrArray<SrPnt>& visemeN = visemeShapeMap[iter->first][j]->shape().N;
+					if (visemeV.size() != neutralV.size())
+					{
+						LOG("number of vertices for %s is not same as neutral", iter->first.c_str());
+						continue;
+					}
+					if (visemeN.size() != neutralN.size())
+					{
+						LOG("number of normals for %s is not same as neutral", iter->first.c_str());
+						continue;
+					}
+					for (int v = 0; v < visemeV.size(); ++v)
+					{
+						SrPnt diff = visemeV[v] - neutralV[v];
+						newV[v] = newV[v] + diff * iter->second;
+					}
+					for (int n = 0; n < visemeN.size(); ++n)
+					{
+						SrPnt diff = visemeN[n] - neutralN[n];
+						newN[n] = newN[n] + diff * iter->second;
+					}
+				}
+			}
+		}
+		for (int n = 0; n < newN.size(); ++n)
+		{
+			newN[n].normalize();
+		}
+
+		SrSnModel* blendedModel = new SrSnModel();
+		//SrSnModel* blendedModel = dMeshStatic_p[i];
+		blendedModel->shape(neutralModel[i]->shape());
+		if (isBlending)
+		{
+			blendedModel->shape().V = newV;
+			blendedModel->shape().N = newN;			
+		}
+		dMeshStatic_p.push_back(blendedModel);
+	}
+#endif
+}
+
 
 void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 {
@@ -995,7 +997,7 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 
 void DeformableMeshInstance::update()
 {
-	_mesh->blendShapes();
+	blendShapes();
 
 #define RECOMPUTE_NORMAL 0
 	if (!_updateMesh)	return;

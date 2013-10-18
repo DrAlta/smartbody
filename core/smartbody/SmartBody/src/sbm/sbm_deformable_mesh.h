@@ -65,7 +65,6 @@ public:
 	std::map<std::string, std::vector<std::string> > morphTargets; // morphTargets stores a vector of morph target names, first one is always the base one
 	std::string                 skeletonName; // binding skeleton for this deformable model
 	SkSkeleton*					skeleton;			// pointer to current skeleton
-	SmartBody::SBCharacter*		curCharacter;		// pointer to current character
 	bool						binding;			// whether in deformable mesh mode
 	// unrolled all vertices into a single buffer for faster GPU rendering
 	bool initStaticVertexBuffer, initSkinnedVertexBuffer;	
@@ -97,7 +96,6 @@ public:
 	DeformableMesh();
 	SBAPI virtual ~DeformableMesh();	
 	SBAPI void setSkeleton(SkSkeleton* skel);
-	SBAPI void setCharacter(SmartBody::SBCharacter* c);
 	virtual void update();
 	SkinWeight* getSkinWeight(const std::string& skinSourceName);
 	int	getMesh(const std::string& meshName);				// get the position given the mesh name
@@ -106,7 +104,6 @@ public:
         The integers mean 1:show, 0:hide, and -1:don't change the visibility state. */
 	void set_visibility(int deformableMesh);
 	virtual bool buildSkinnedVertexBuffer(); // unrolled all models inside this deformable mesh into a GPU-friendly format
-	SBAPI void blendShapes();
 	SBAPI bool isSkinnedMesh();
 };
 
@@ -114,8 +111,9 @@ class DeformableMeshInstance
 {
 protected:
 	DeformableMesh* _mesh;
-	std::vector<SrSnModel*> dynamicMesh; 
-	SkSkeleton*			  _skeleton;
+	std::vector<SrSnModel*>	dynamicMesh; 
+	SkSkeleton*				_skeleton;
+	SmartBody::SBCharacter*	_character;		// pointer to current character
 	bool				  _updateMesh;
 	std::vector<SkJointList> _boneJointList;
 	float _meshScale;
@@ -129,7 +127,7 @@ public:
 	SBAPI virtual ~DeformableMeshInstance();
 	SBAPI virtual void setDeformableMesh(DeformableMesh* mesh);
 	SBAPI void updateJointList();
-	SBAPI virtual void setSkeleton(SkSkeleton* skel);	
+	SBAPI virtual void setCharacter(SmartBody::SBCharacter* c);
 	SBAPI virtual void setVisibility(int deformableMesh);
 	SBAPI virtual void setMeshScale(float scale);
 	SBAPI float   getMeshScale() { return _meshScale; }
@@ -138,6 +136,7 @@ public:
 	SBAPI bool    isStaticMesh();
 	SBAPI SmartBody::SBSkeleton* getSkeleton();	
 	SBAPI virtual void update();
+	SBAPI virtual void blendShapes();
 	SBAPI DeformableMesh* getDeformableMesh() { return _mesh; }
 
 protected:

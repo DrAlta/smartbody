@@ -2409,6 +2409,19 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 					rapidxml::xml_attribute<>* texAttrNode = texNode->first_attribute("texture");			
 					std::string texID = texAttrNode->value();
 					normalTexture = texID;
+
+					std::string imageId = diffuseTexture;
+					std::string imageFile = pictureId2File[imageId];
+					std::string mtlName = mnames.top();
+#if (BOOST_VERSION > 104400)
+					std::string fileExt = boost::filesystem::extension(imageFile);
+#else
+					std::string fileExt = boost::filesystem2::extension(imageFile);
+#endif
+					std::string fileName = boost::filesystem::basename(imageFile);
+					if (diffuseTexture.find(imageId) != std::string::npos)
+						mtlTexBumpMap[mtlName] = fileName + fileExt;		
+
 					M.top().specular = SrColor(0.1f,0.1f,0.1f,1.f);
 					M.top().shininess = 20;
 				}			
@@ -2422,6 +2435,19 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 					rapidxml::xml_attribute<>* texAttrNode = texNode->first_attribute("texture");			
 					std::string texID = texAttrNode->value();
 					specularTexture = texID;
+
+					std::string imageId = diffuseTexture;
+					std::string imageFile = pictureId2File[imageId];
+					std::string mtlName = mnames.top();
+#if (BOOST_VERSION > 104400)
+					std::string fileExt = boost::filesystem::extension(imageFile);
+#else
+					std::string fileExt = boost::filesystem2::extension(imageFile);
+#endif
+					std::string fileName = boost::filesystem::basename(imageFile);
+					if (diffuseTexture.find(imageId) != std::string::npos)
+						mtlTexSpecularMap[mtlName] = fileName + fileExt;	
+
 					M.top().specular = SrColor(0.1f,0.1f,0.1f,1.f);
 					M.top().shininess = 20;
 				}			

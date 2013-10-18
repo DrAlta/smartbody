@@ -621,6 +621,33 @@ void SBCharacter::notify(SBSubject* subject)
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	if (attribute)
 	{
+		if (attribute->getName() == "updateChannel")
+		{
+			if (!getSkeleton())
+				return;
+
+			//LOG("Update blend shape channel!");
+			// clear out all the TypeBlendShape joint channel
+			
+			// add 
+			for (size_t i = 0; i < getAttributeNames().size(); ++i)
+			{
+				std::string attrName = getAttributeNames()[i];
+				if (attrName.find("blendShape.channelName.") != std::string::npos)
+				{
+					std::string channelName = getStringAttribute(attrName);
+					if (channelName != "")
+					{
+						if (getSkeleton()->getJointByName(channelName))
+						{
+							return;
+						}
+						LOG("add blend shape channel %s", channelName.c_str());
+						addBlendShapeChannel(channelName);
+					}
+				}
+			}
+		}
 		if (attribute->getName() == "createPhysics")
 		{
 			SmartBody::SBPhysicsManager* manager = SmartBody::SBScene::getScene()->getPhysicsManager();

@@ -57,8 +57,9 @@ void TransparentListener::OnCharacterCreate( const std::string & name, const std
 	#else		
 		character->dMeshInstance_p =  new SbmDeformableMeshGPUInstance();
 	#endif
-	SmartBody::SBSkeleton* sbSkel = character->getSkeleton();	
-	character->dMeshInstance_p->setSkeleton(sbSkel);
+	//SmartBody::SBSkeleton* sbSkel = character->getSkeleton();	
+	//character->dMeshInstance_p->setSkeleton(sbSkel);
+	character->dMeshInstance_p->setCharacter(character);
 }
 
 void TransparentListener::OnCharacterDelete( const std::string & name )
