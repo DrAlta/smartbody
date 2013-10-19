@@ -1888,7 +1888,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 			SmartBody::SBPawn* pawn = scene->createPawn(strstr.str());
 			//SrModel model; 
 			//model.import_obj(fullPathName.c_str());
-			pawn->addMesh(fullPathName);			
+			pawn.setStringAttribute("mesh", fullPathName);
 
 // 			skelName = filebasename+".sk"; // reset back to .sk extension
 // 			SBAutoRigManager& autoRigManager = SBAutoRigManager::singleton();

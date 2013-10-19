@@ -223,16 +223,6 @@ std::string SBCharacter::getType()
 	return getClassType();
 }
 
-void SBCharacter::setMeshMap(std::string filename)
-{
-	mcu_character_load_skinweights( getName().c_str(), filename.c_str(), SmartBody::SBScene::getScene()->getCommandManager(), 1.0f );
-}
-
-void SBCharacter::addMesh(std::string mesh)
-{
-	mcu_character_load_mesh( getName().c_str(), mesh.c_str(), SmartBody::SBScene::getScene()->getCommandManager() );
-}
-
 int SBCharacter::getNumControllers()
 {
 	MeControllerTreeRoot* controllerTree = ct_tree_p;

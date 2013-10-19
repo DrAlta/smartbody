@@ -496,7 +496,6 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	if( char_name.length()==0 ) {
 		LOG( "HELP: char <> <command>" );
 		LOG( "  param" );
-		LOG( "  init" );
 		LOG( "  smoothbindmesh" );
 		LOG( "  smoothbindweight" );
 		LOG( "  mesh");
@@ -568,17 +567,8 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 		}
 	}
 
-	// Commands for uninitialized characters:
-	if( char_cmd == "init" ) {
-
-		char* skel_file = args.read_token();
-		char* type = args.read_token();
-		return(	
-			mcu_character_init( char_name.c_str(), skel_file, type, scene->getCommandManager() )
-			);
-	} 
-	else
-		if( char_cmd == "param" ) {
+		if( char_cmd == "param" )
+		{
 
 			char* param_name = args.read_token();
 			GeneralParam * new_param = new GeneralParam;
@@ -1126,53 +1116,8 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 #endif
 		return CMD_SUCCESS;
 	}
-	else if( cmd == "smoothbindmesh" )
-	{
-#if 0
-		if (!character->dMesh_p)
-		{
-			LOG("Character %s has no dynamic mesh, cannot perform mesh operations.", character->getName().c_str());
-			return CMD_FAILURE;
-		}
-#endif
-		char* obj_file = args.read_token();
-		char* option = args.read_remainder_raw();
-		return mcu_character_load_mesh( character->getName().c_str(), obj_file, SmartBody::SBScene::getScene()->getCommandManager(), option );
-	} 
-	else 
-		if( cmd == "smoothbindweight" ) {
-#if 0
-			if (!character->dMesh_p)
-			{
-				LOG("Character %s has no dynamic mesh, cannot perform mesh operations.", character->getName().c_str());
-				return CMD_FAILURE;
-			}
-#endif
-			char* skin_file = args.read_token();
-			char* option = args.read_token();
-			char* prefixName = NULL;
-			float scaleFactor = 1.f;
-
-			while (strcmp(option,EMPTY_STRING) != 0)
-			{
-				if (option && strcmp(option,"-prefix") == 0)
-				{
-					prefixName = args.read_token();
-				}
-				else if (strcmp(option,"-m") == 0)
-				{
-					scaleFactor = 0.01f;
-				}
-				else if (strcmp(option,"-scale") == 0)
-				{
-					scaleFactor =  args.read_float();
-				}
-				option = args.read_token();
-			}
-
-			//printf("prefix name = %s\n",prefixName);
-			return mcu_character_load_skinweights( character->getName().c_str(), skin_file, SmartBody::SBScene::getScene()->getCommandManager(), scaleFactor,prefixName);
-		} 
+	
+	
 		else if ( cmd == "remove" ) {
 				SmartBody::SBScene::getScene()->removeCharacter(character->getName());
 				return CMD_SUCCESS;

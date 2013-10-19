@@ -28,9 +28,6 @@ class SBCharacter : public SbmCharacter
 		
 		SBAPI virtual int setup();
 
-		SBAPI void setMeshMap(std::string filename);
-		SBAPI void addMesh(std::string mesh);
-
 		SBAPI int getNumControllers();
 
 		SBAPI void setAutomaticPruning(bool val);
