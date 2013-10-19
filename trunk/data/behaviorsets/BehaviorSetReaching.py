@@ -91,7 +91,7 @@ def setupBehaviorSet():
 	leftHandMotions.append("HandsAtSide_LArm_GestureYou")	
 	
 	for i in range(0,len(rightHandMotions)):
-		motion = scene.getMotion(rightHandMotions[i]
+		motion = scene.getMotion(rightHandMotions[i])
 		if motion == None:
 			assetManager.loadAsset(motionPath+rightHandMotions[i]+'.skm')
 			motion = scene.getMotion(rightHandMotions[i])
