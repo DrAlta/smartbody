@@ -78,7 +78,8 @@ namespace SmartBody
 
 void pythonFuncsScene()
 {
-		boost::python::class_<SBNavigationMesh>("SBNavigationMesh")			
+		boost::python::class_<SBNavigationMesh>("SBNavigationMesh")		
+		.def("buildNavigationMesh", &SBNavigationMesh::buildNavigationMesh, "Build the navigation mesh based on input mesh name")		
 		.def("findPath", &SBNavigationMesh::findPath, boost::python::return_value_policy<boost::python::return_by_value>(), "Find a path from start position to end position.")
 		.def("queryMeshPointByRayCast", &SBNavigationMesh::queryMeshPointByRayCast, boost::python::return_value_policy<boost::python::return_by_value>(), "Query the position on navigation mesh by ray casting.")
 		.def("queryFloorHeight", &SBNavigationMesh::queryFloorHeight, boost::python::return_value_policy<boost::python::return_by_value>(), "Query the height of floor on navigation mesh given a position and search radius.")

@@ -413,9 +413,6 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("getNavigationMeshNames", &SBNavigationMeshManager::getNavigationMeshNames, "Get the names of all navigation meshes.")
 		;
 
-	boost::python::class_<SBNavigationMesh>("SBNavigationMesh")
-		.def("buildNavigationMesh", &SBNavigationMesh::buildNavigationMesh, "Build the navigation mesh based on input mesh name")		
-		;
 
 	boost::python::class_<SBRetarget>("SBRetarget")
 		.def("initRetarget", &SBRetarget::initRetarget, "Initialize retarget instance.")
