@@ -61,6 +61,7 @@
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBFaceDefinition.h>
 #include <controllers/me_ct_examples.h>
 #include <controllers/me_ct_motion_player.h>
 #include <controllers/me_ct_pose.h>
@@ -2336,7 +2337,7 @@ void SbmCharacter::updateFaceDefinition()
 	{
 		SkChannel& channel = skelChannelArray[c];
 		SkJoint* joint = channel.joint;
-		if (joint && joint->getJointType() == SkJoint::TypeViseme)
+		if (joint && (joint->getJointType() == SkJoint::TypeViseme || joint->getJointType() == SkJoint::TypeBlendShape))
 		{
 			if (viseme_channel_start_pos == -1)
 			{
@@ -2523,6 +2524,13 @@ void SbmCharacter::addBlendShapeChannel(std::string bShapeName)
 		return;
 	}
 
+	if (getFaceDefinition() == NULL)
+	{
+		LOG("Current character %s doesn't have a face definition, create a default one to support blend shape", this->getName().c_str());
+		SmartBody::SBFaceDefinition* defaultFaceDef = SmartBody::SBScene::getScene()->createFaceDefinition("default");
+		defaultFaceDef->setFaceNeutral("");
+		this->setFaceDefinition(defaultFaceDef);
+	}
 
 	SmartBody::SBJoint* auJoint = new SmartBody::SBJoint();
 	auJoint->setJointType(SkJoint::TypeBlendShape);
@@ -2532,6 +2540,7 @@ void SbmCharacter::addBlendShapeChannel(std::string bShapeName)
 	rootJoint->addChild(auJoint);
 
 	//LOG("Added blend shape channel %s", bShapeName.c_str());
+	viseme_channel_count++;
 	updateFaceDefinition();
 }
 
