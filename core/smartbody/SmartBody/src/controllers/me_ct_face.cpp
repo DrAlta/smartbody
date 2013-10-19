@@ -470,7 +470,9 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 
 	c = 0;
 	_key_pose_map.reset();
-	while( key_pose_p = _key_pose_map.next() )	{
+	key_pose_p = _key_pose_map.next();
+	while( key_pose_p )
+	{
 		int weight_index = _kChan_to_buff[ c++ ];
 		if( weight_index >= 0 )	{
 			float key_weight = fbuffer[ weight_index ];
@@ -490,6 +492,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 				if (iter == _visemeChannelMap.end())
 				{
 					LOG("Viseme %s not found in channel-buffer map. Programmer needs to fix this! Might be lack of finish_adding function.", key_pose_p->getName().c_str());
+					key_pose_p = _key_pose_map.next();
 					continue;
 				}
 				std::vector<int>& keyToChannelMap = (*iter).second;
@@ -503,6 +506,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 					if (baseIndex == -1) // this should only happen if there is a channel in the key pose that does not exist in the base pose
 					{
 						pose_var_index += ch_size;
+						key_pose_p = _key_pose_map.next();
 						continue;
 					}
 					int baseBufferIndex = _baseChannelToBufferIndex[baseIndex];
@@ -559,6 +563,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 				}
 			}
 		}
+		key_pose_p = _key_pose_map.next();
 	}
 
 	return continuing;
