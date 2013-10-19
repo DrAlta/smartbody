@@ -114,8 +114,6 @@ void pythonFuncsCharacter()
 
 	boost::python::class_<SBCharacter, boost::python::bases<SBPawn, SBObject> >("SBCharacter")
 		//.def(boost::python::init<std::string, std::string>())
-		.def("setMeshMap", &SBCharacter::setMeshMap, "Set the OpenCollada file for the character which contains all the smoothbinding information.")
-		.def("addMesh", &SBCharacter::addMesh, "Add obj mesh to current character for smoothbinding.")
 		.def("addJointTrajectoryConstraint", &SBCharacter::addJointTrajectoryConstraint, "Add IK constraint to a specific end effector joint to be enforced in the post-processing.")
 		.def("isAutomaticPruning", &SBCharacter::isAutomaticPruning, "Returns true if the character's cotnroller are automatically pruned.")
 		.def("setAutomaticPruning", &SBCharacter::setAutomaticPruning, "Toggles the automatic pruning mechanism on or off.")

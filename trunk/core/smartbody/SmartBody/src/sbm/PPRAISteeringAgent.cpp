@@ -657,10 +657,6 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 			}
 			else
 			{
-// 				std::stringstream command;
-// 				command << "panim schedule char " << character->getName();
-// 				command << " state " << locomotionName << " loop true playnow true";
-// 				SmartBody::SBScene::getScene()->getCommandManager()->execute((char*) command.str().c_str());  
 				startLocomotionState();
 			}	
 		}

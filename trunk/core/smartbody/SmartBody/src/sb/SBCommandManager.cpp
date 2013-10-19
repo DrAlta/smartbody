@@ -155,12 +155,9 @@ void SBCommandManager::registerCallbacks()
 {
 	insert( "sb",			sb_main_func );
 	insert( "sbm",			sbm_main_func );
-	insert( "help",			mcu_help_func );
 
-	insert( "reset",		mcu_reset_func );
 	insert( "echo",			mcu_echo_func );
 	
-	insert( "path",			mcu_filepath_func );
 	insert( "seq",			mcu_sequence_func );
 	insert( "seq-chain",	mcu_sequence_chain_func );
 	insert( "send",			sbm_vhmsg_send_func );
@@ -174,9 +171,7 @@ void SBCommandManager::registerCallbacks()
 	insert( "time",			mcu_time_func );
 	insert( "tip",			mcu_time_ival_prof_func );
 
-	insert( "panim",		mcu_panim_cmd_func );	
-	insert( "physics",		mcu_physics_cmd_func );	
-	insert( "mirror",       mcu_motion_mirror_cmd_func);
+	insert( "panim",		mcu_panim_cmd_func );
 	insert( "motionplayer", mcu_motion_player_func);
 
 	insert( "pawn",			pawn_cmd_func );
@@ -199,41 +194,17 @@ void SBCommandManager::registerCallbacks()
 	insert( "RemoteSpeechTimeOut", remoteSpeechTimeOut_func);  // internally routed message
 //	insert( "locomotion",          locomotion_cmd_func );
 //	insert( "loco",                locomotion_cmd_func ); // shorthand
-	insert( "syncpolicy",          mcu_syncpolicy_func );
 	insert( "check",			   mcu_check_func);		// check matching between .skm and .sk
 	insert( "pythonscript",		   mcu_pythonscript_func);
 	insert( "python",			   mcu_python_func);
 	insert( "p",				   mcu_python_func);
-	insert( "adjustmotion",		   mcu_adjust_motion_function);
-	insert( "mediapath",		   mcu_mediapath_func);
 	insert( "bml",				   test_bml_func );
-	insert( "triggerevent",		   triggerevent_func );
-	insert( "addevent",			   addevent_func );
-	insert( "removeevent",		   removeevent_func );
-	insert( "enableevents",	       enableevents_func );
-	insert( "disableevents",	   disableevents_func );
-	insert( "registerevent",       registerevent_func );
-	insert( "unregisterevent",     unregisterevent_func );
-	insert( "setmap",			   setmap_func );
-	insert( "motionmap",		   motionmap_func );
-	insert( "motionmapdir",		   motionmapdir_func );
-	insert( "skeletonmap",		   skeletonmap_func );
 	insert( "steer",			   mcu_steer_func);	
-	insert( "characters",		   showcharacters_func );
-	insert( "pawns",			   showpawns_func );
 	insert( "RemoteSpeechReplyRecieved", remoteSpeechReady_func);  // TODO: move to test commands
 	insert( "syncpoint",		   syncpoint_func);
 	insert( "vhmsgconnect",		   mcu_vhmsg_connect_func);
 	insert( "vhmsgdisconnect",	   mcu_vhmsg_disconnect_func);
-    insert( "resetanimation",	   resetanim_func);
-	insert( "animation",		   animation_func);
 	insert( "vhmsglog",			   vhmsglog_func);
-	insert( "skscale",			   skscale_func);
-	insert( "skmscale",			   skmscale_func);
-
-	insert( "xmlcachedir",		   xmlcachedir_func);
-	insert( "xmlcache",			   xmlcache_func);
-
 
 #ifdef USE_GOOGLE_PROFILER
 	insert( "startprofile",			   startprofile_func );
@@ -245,10 +216,8 @@ void SBCommandManager::registerCallbacks()
 	insert_set_cmd( "pawn",           pawn_set_cmd_funcx );
 	insert_set_cmd( "character",      character_set_cmd_func );
 	insert_set_cmd( "char",           character_set_cmd_func );
-	insert_set_cmd( "face",           mcu_set_face_func );
 	
 	insert_print_cmd( "bp",           BML::Processor::print_func );
-	insert_print_cmd( "face",         mcu_print_face_func );
 	
 	insert_test_cmd( "bml",  test_bml_func );
 	insert_test_cmd( "fml",  test_fml_func );

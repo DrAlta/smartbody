@@ -64,6 +64,9 @@ MeCtBreathing::MeCtBreathing () : SmartBody::SBController()
 	addDefaultAttributeString("breathing.motion", "", "Breathing");
 	addDefaultAttributeBool("breathing.useBlendChannels", false, "Breathing");
 	addDefaultAttributeDouble("breathing.bpm", 15, "Breathing");
+	addDefaultAttributeDouble("breathing.min", 15, "Breathing");
+	addDefaultAttributeDouble("breathing.max", 15, "Breathing");
+	addDefaultAttributeBool("breathing.incremental", false, "Breathing");
 }
 
 MeCtBreathing::~MeCtBreathing ()

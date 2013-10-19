@@ -104,12 +104,6 @@ void SBPawn::setName(const std::string& name)
 	SmartBody::SBScene::getScene()->updatePawnNames();
 }
 
-void SBPawn::addMesh(std::string mesh)
-{
-	 
-	mcu_load_mesh( getName().c_str(), mesh.c_str(), SmartBody::SBScene::getScene()->getCommandManager());
-}
-
 SBSkeleton* SBPawn::getSkeleton()
 {
 	SkSkeleton* skskel = SbmPawn::getSkeleton();
@@ -356,9 +350,6 @@ void SBPawn::notify(SBSubject* subject)
 		}
 		else if (attribute->getName() == "mesh")
 		{
-			SmartBody::StringAttribute* meshAttr = dynamic_cast<SmartBody::StringAttribute*>(attribute);
-			
-			mcu_load_mesh(getName().c_str(), meshAttr->getValue().c_str(), SmartBody::SBScene::getScene()->getCommandManager(), "");
 		}
 #if 0
 		else if (attribute->getName() == "meshScale")
