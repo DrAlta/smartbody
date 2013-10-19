@@ -898,72 +898,6 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 		}
 	}
 
-	// Do the sbm viseme name patch here
-	/*
-	std::vector<std::string> au_1_patch;
-	au_1_patch.push_back("au_1_left");
-	au_1_patch.push_back("au_1_right");
-	std::vector<std::string> au_2_patch;
-	au_2_patch.push_back("au_2_left");
-	au_2_patch.push_back("au_2_right");
-	std::vector<std::string> au_4_patch;
-	au_4_patch.push_back("au_4_left");
-	au_4_patch.push_back("au_4_right");
-	std::vector<std::string> au_45_patch;
-	au_45_patch.push_back("au_45_left");
-	au_45_patch.push_back("au_45_right");
-	viseme_name_patch.insert(make_pair("au_1", au_1_patch));
-	viseme_name_patch.insert(make_pair("au_2", au_2_patch));
-	viseme_name_patch.insert(make_pair("au_4", au_4_patch));
-	viseme_name_patch.insert(make_pair("au_45", au_45_patch));
-	*/
-
-	// Do the bone bus viseme name patch here
-	// hard coded, can be removed if these are added to bone bus and rendering side
-	std::vector<std::string> closed_mouth;							// this should is an empty vector
-	viseme_name_patch.insert(make_pair("_", closed_mouth));	// when receiving this two viseme, do not send signal to bone bus
-	//viseme_name_patch.insert(make_pair("BMP", closed_mouth));
-
-	std::vector<std::string> f_patch;								// "F" patch (match to "f")
-	f_patch.push_back("f");
-	viseme_name_patch.insert(make_pair("F",f_patch));
-
-	std::vector<std::string> oh_patch;								// "OW" patch (match to "oh")
-	oh_patch.push_back("oh");
-	viseme_name_patch.insert(make_pair("OW",oh_patch));
-
-	std::vector<std::string> all_viseme;							// "ALL" patch (match to all the viseme)
-	all_viseme.push_back("Ao");
-	all_viseme.push_back("D");
-	all_viseme.push_back("EE");
-	all_viseme.push_back("Er");
-	all_viseme.push_back("f");
-	all_viseme.push_back("Ih");
-	all_viseme.push_back("j");
-	all_viseme.push_back("KG");
-	all_viseme.push_back("oh");
-	all_viseme.push_back("OO");
-	all_viseme.push_back("NG");
-	all_viseme.push_back("R");
-	all_viseme.push_back("Th");
-	all_viseme.push_back("Z");
-	// new added visemes: here viseme needs a better name, because following is really facial expressions
-	//all_viseme.push_back("base"); // Removed by A. Shapiro 3/8/11 - was causing a conflict with joint name 'base'
-	all_viseme.push_back("base_lower_face");
-	all_viseme.push_back("base_upper_face");
-	all_viseme.push_back("fe103_effort");
-	all_viseme.push_back("fe107_surprised");
-	all_viseme.push_back("fe112_happy");
-	all_viseme.push_back("fe113_sad");
-	all_viseme.push_back("fe119_bored");
-	all_viseme.push_back("fe124_dislike");
-	all_viseme.push_back("fe7_worried");
-	all_viseme.push_back("fe8_scared");
-	all_viseme.push_back("fe9_thinking");
-	all_viseme.push_back("fe127_yawn");
-	all_viseme.push_back("fe129_angry");
-	viseme_name_patch.insert(make_pair("ALL",all_viseme));
-
 #ifdef USE_REACH_TEST	
 	// init left and right arm IKs for the character	
 	string r_effector_name, l_effector_name;
@@ -2364,70 +2298,7 @@ void SbmCharacter::updateFaceDefinition()
 		viseme_history_arr[ i ] = -1.0;
 	}
 
-	// Do the sbm viseme name patch here
-	viseme_name_patch.clear();
-	std::vector<std::string> au_1_patch;
-	au_1_patch.push_back("au_1_left");
-	au_1_patch.push_back("au_1_right");
-	std::vector<std::string> au_2_patch;
-	au_2_patch.push_back("au_2_left");
-	au_2_patch.push_back("au_2_right");
-	std::vector<std::string> au_4_patch;
-	au_4_patch.push_back("au_4_left");
-	au_4_patch.push_back("au_4_right");
-	std::vector<std::string> au_45_patch;
-	au_45_patch.push_back("au_45_left");
-	au_45_patch.push_back("au_45_right");
-	viseme_name_patch.insert(make_pair("au_1", au_1_patch));
-	viseme_name_patch.insert(make_pair("au_2", au_2_patch));
-	viseme_name_patch.insert(make_pair("au_4", au_4_patch));
-	viseme_name_patch.insert(make_pair("au_45", au_45_patch));
-
-	// Do the bone bus viseme name patch here
-	// hard coded, can be removed if these are added to bone bus and rendering side
-	std::vector<std::string> closed_mouth;							// this should is an empty vector
-	viseme_name_patch.insert(make_pair("_", closed_mouth));	// when receiving this two viseme, do not send signal to bone bus
-	//viseme_name_patch.insert(make_pair("BMP", closed_mouth));
-
-	std::vector<std::string> f_patch;								// "F" patch (match to "f")
-	f_patch.push_back("f");
-	viseme_name_patch.insert(make_pair("F",f_patch));
-
-	std::vector<std::string> oh_patch;								// "OW" patch (match to "oh")
-	oh_patch.push_back("oh");
-	viseme_name_patch.insert(make_pair("OW",oh_patch));
-
-	std::vector<std::string> all_viseme;							// "ALL" patch (match to all the viseme)
-	all_viseme.push_back("Ao");
-	all_viseme.push_back("D");
-	all_viseme.push_back("EE");
-	all_viseme.push_back("Er");
-	all_viseme.push_back("f");
-	all_viseme.push_back("Ih");
-	all_viseme.push_back("j");
-	all_viseme.push_back("KG");
-	all_viseme.push_back("oh");
-	all_viseme.push_back("OO");
-	all_viseme.push_back("NG");
-	all_viseme.push_back("R");
-	all_viseme.push_back("Th");
-	all_viseme.push_back("Z");
-	// new added visemes: here viseme needs a better name, because following is really facial expressions
-	//all_viseme.push_back("base"); // Removed by A. Shapiro 3/8/11 - was causing a conflict with joint name 'base'
-	all_viseme.push_back("base_lower_face");
-	all_viseme.push_back("base_upper_face");
-	all_viseme.push_back("fe103_effort");
-	all_viseme.push_back("fe107_surprised");
-	all_viseme.push_back("fe112_happy");
-	all_viseme.push_back("fe113_sad");
-	all_viseme.push_back("fe119_bored");
-	all_viseme.push_back("fe124_dislike");
-	all_viseme.push_back("fe7_worried");
-	all_viseme.push_back("fe8_scared");
-	all_viseme.push_back("fe9_thinking");
-	all_viseme.push_back("fe127_yawn");
-	all_viseme.push_back("fe129_angry");
-	viseme_name_patch.insert(make_pair("ALL",all_viseme));
+	
 	// make sure that the face controller has been updated
 	if (face_ct)
 	{
