@@ -15,13 +15,6 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SmartBody-lib.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
- *      Andrew n marshall, USC
- *      Marcus Thiebaux, USC
- *      Ed Fast, USC
- *      Ashok Basawapatna, USC (no longer)
  */
 
 #ifndef SBM_CHARACTER_HPP
