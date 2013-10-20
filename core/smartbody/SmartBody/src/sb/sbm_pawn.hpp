@@ -15,11 +15,7 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SmartBody-lib.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
- *      Ed Fast, USC
- *      Thomas Amundsen, USC
+
  */
 
 #ifndef SBM_PAWN_HPP
@@ -57,23 +53,11 @@ class DeformableMeshInstance;
 
 
 #define SBM_PAWN_USE_WORLD_OFFSET_WRITER	(1)
-#define SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK	(0)
 
 class SbmPawn : public SmartBody::SBObject, public SBTransformObjInterface {
 public:
 	//  Public Constants
 	static const char* WORLD_OFFSET_JOINT_NAME;
-
-#if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
-	// Typedefs
-	/**
-	 *  Controller clean-up callback function prototypes.
-	 *
-	 *  Called when a controller is determined to no longer be in use
-	 *  (by controller tree pruning, behavior interruption, etc.).
-	 */
-	typedef void (*controller_cleanup_callback_fp)( MeController*, SbmPawn*, mcuCBHandle* );
-#endif // SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
 
 private:
 	//  Private Constants
@@ -91,11 +75,6 @@ protected:
 	float	_height;
 	//SBGeomObject* _collisionObject;
 	std::string collisionObjName;
-
-#if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
-	// Map of pending controller clean-up callbacks
-	std::multimap<MeController*,controller_cleanup_callback_fp> ct_cleanup_funcs;
-#endif // SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
 
 public:  // TODO - properly encapsulate / privatize the following
 	SkSkeleton*	_skeleton;  // MAY BE NULL!!!
@@ -166,11 +145,6 @@ public:
 	SBAPI virtual void setClassType(std::string classType);
 
 	SBAPI virtual void notify(SBSubject* subject);
-
-#if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
-	virtual void register_controller_cleanup( MeController* ct, controller_cleanup_callback_fp func );
-	virtual void exec_controller_cleanup( MeController* ct, mcuCBHandle* mcu_p );
-#endif // SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
 
 protected:
 	/*!

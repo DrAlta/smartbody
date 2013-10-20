@@ -378,28 +378,6 @@ int SbmPawn::prune_controller_tree() {
 	return CMD_SUCCESS;
 }
 
-#if SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
-void SbmPawn::register_controller_cleanup( MeController* ct, controller_cleanup_callback_fp func ) {
-	ct_cleanup_funcs.insert( make_pair( ct, func ) );
-}
-
-void SbmPawn::exec_controller_cleanup( MeController* ct, mcuCBHandle* mcu_p ) {
-	typedef std::multimap<MeController*,controller_cleanup_callback_fp>::iterator fp_iterator;
-
-	fp_iterator lower = ct_cleanup_funcs.lower_bound( ct );
-	fp_iterator upper = ct_cleanup_funcs.upper_bound( ct );
-
-	for( fp_iterator it = lower; it != upper; ++it ) {
-		controller_cleanup_callback_fp func = it->second;
-		if( func != NULL )
-			func( ct, this, mcu_p );
-	}
-	if( lower != upper ) {
-		ct_cleanup_funcs.erase( ct );
-	}
-}
-#endif // SBM_PAWN_USE_CONTROLLER_CLEANUP_CALLBACK
-
 //  Destructor
 SbmPawn::~SbmPawn()	{
 
