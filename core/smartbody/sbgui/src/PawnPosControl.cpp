@@ -15,6 +15,7 @@
 
 PawnControl::PawnControl()
 {
+	pawn = NULL;
 }
 
 PawnControl::~PawnControl()
