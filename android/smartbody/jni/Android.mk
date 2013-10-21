@@ -541,6 +541,10 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerCOLLADA.cpp
     $(SBM_MY_DIR)/sb/SBAssetHandlerSk.cpp
     $(SBM_MY_DIR)/sb/SBAssetHandlerSkm.cpp
+    $(SBM_MY_DIR)/sb/SBAssetHandlerAsf.cpp
+    $(SBM_MY_DIR)/sb/SBAssetHandlerOgre.cpp
+    $(SBM_MY_DIR)/sb/SBAssetHandlerObj.cpp
+    $(SBM_MY_DIR)/sb/SBAssetHandlerBvh.cpp
 
 	$(SBM_MY_DIR)/sb/smartbody-dll.cpp \
         $(SBM_MY_DIR)/sb/smartbody-c-dll.cpp \

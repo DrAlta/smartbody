@@ -1135,6 +1135,9 @@
     <ClCompile Include="src\sb\SBNavigationMeshManager.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandlerBvh.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2267,6 +2270,9 @@
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="src\sb\SBNavigationMeshManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBAssetHandlerBvh.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
