@@ -163,13 +163,13 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 void FaceViewer::RefreshCB(Fl_Widget* widget, void* data)
 {
 	FaceViewer* faceViewer = (FaceViewer*) data;
-	faceViewer->choiceCharacters->clear();	
+	faceViewer->choiceCharacters->clear();
 	const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (size_t i = 0; i < charNames.size(); i++)
 	{
-		const std::string & charName = charNames[i];
-		faceViewer->choiceCharacters->add(charName.c_str());
+		faceViewer->choiceCharacters->add(charNames[i].c_str());
 	}
+
 	if (charNames.size() > 0)
 		faceViewer->choiceCharacters->activate();
 	else
@@ -332,6 +332,8 @@ void FaceViewer::OnCharacterCreate( const std::string & name, const std::string 
 	std::string selectedCharacter = "";
 	if (!choiceCharacters->menu())
 		return;
+	if (!choiceCharacters)
+		return;
 	if (choiceCharacters->menu()->size() > 0)
 	{
 		selectedCharacter = choiceCharacters->menu()[choiceCharacters->value()].label();
@@ -340,8 +342,11 @@ void FaceViewer::OnCharacterCreate( const std::string & name, const std::string 
 
 	if (selectedCharacter != "")
 	{
-		for (int c = 0; c < choiceCharacters->size(); c++)
+		for (int c = 0; c < choiceCharacters->menu()->size(); c++)
 		{
+			if (choiceCharacters->menu()[c].label() == NULL)
+				continue;
+
 			if (selectedCharacter == choiceCharacters->menu()[c].label())
 			{
 				choiceCharacters->value(c);
