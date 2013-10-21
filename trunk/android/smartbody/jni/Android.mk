@@ -537,6 +537,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBVHMsgManager.cpp \
 	$(SBM_MY_DIR)/sb/SBCommandManager.cpp \
 	$(SBM_MY_DIR)/sb/SBWSPManager.cpp \
+	$(SBM_MY_DIR)/sb/SBNavigationMeshManager.cpp \
 	$(SBM_MY_DIR)/sb/SBAssetHandler.cpp
     $(SBM_MY_DIR)/sb/SBAssetHandlerCOLLADA.cpp
     $(SBM_MY_DIR)/sb/SBAssetHandlerSk.cpp
