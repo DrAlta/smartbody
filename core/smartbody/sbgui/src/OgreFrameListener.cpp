@@ -3,6 +3,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
+#include <sbm/sbm_deformable_mesh.h>
 #include "OgreFrameListener.h"
 #include "EmbeddedOgre.h"
 
@@ -193,6 +194,76 @@ bool OgreFrameListener::processUnbufferedMouseInput( const FrameEvent & evt )
 }
 
 
+void OgreFrameListener::ogreBlendShape( Ogre::Entity* sbEntity, DeformableMeshInstance* meshInstance )
+{
+	DeformableMesh* defMesh = meshInstance->getDeformableMesh();
+	if (!defMesh) return;
+	if (defMesh->blendShapeMap.size() == 0) return;  // no blend shape
+
+	Ogre::MeshPtr meshPtr = sbEntity->getMesh();
+
+	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
+	mIter = defMesh->blendShapeMap.begin();
+	SrSnModel* writeToBaseModel = NULL;
+	int vtxBaseIdx = 0;
+	for (size_t i = 0; i < defMesh->dMeshStatic_p.size(); ++i)
+	{		
+		if (strcmp(defMesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
+		{
+			writeToBaseModel = defMesh->dMeshStatic_p[i];
+			break;
+		}
+		else
+		{
+			// skip vertices for this sub mesh
+			vtxBaseIdx += defMesh->dMeshStatic_p[i]->shape().V.size();
+		}
+	}
+	
+	if (!writeToBaseModel) return;
+
+	// perform face blendshape
+	meshInstance->blendShapes();
+
+	SrModel& baseModel = writeToBaseModel->shape();
+	const Ogre::VertexElement* VertexEle_POS = meshPtr->sharedVertexData->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);
+	Ogre::HardwareVertexBufferSharedPtr VertexBufPOS = meshPtr->sharedVertexData->vertexBufferBinding->getBuffer( VertexEle_POS->getSource() );
+	unsigned char* VertexPtrPOS = static_cast<unsigned char*>( VertexBufPOS->lock( Ogre::HardwareBuffer::LockOptions::HBL_NORMAL ) );
+	int VertSizePOS=VertexBufPOS->getVertexSize();
+	float * pElementPOS=NULL;
+	std::map<int,std::vector<int> >& vtxNewVtxIdxMap = defMesh->vtxNewVtxIdxMap;
+
+	for (int i=0;i<baseModel.V.size();i++)
+	{
+		int iVtx = vtxBaseIdx+i;
+		SrVec basePos = baseModel.V[i];
+		unsigned char* curVertexPtrPos = VertexPtrPOS + iVtx*VertSizePOS;
+
+		VertexEle_POS->baseVertexPointerToElement( curVertexPtrPos, &pElementPOS );	
+		pElementPOS[0] = basePos[0];
+		pElementPOS[1] = basePos[1];
+		pElementPOS[2] = basePos[2];
+		if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
+		{
+			std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
+			// copy related vtx components 
+			for (unsigned int k=0;k<idxMap.size();k++)
+			{
+				curVertexPtrPos = VertexPtrPOS + idxMap[k]*VertSizePOS;
+				VertexEle_POS->baseVertexPointerToElement( curVertexPtrPos, &pElementPOS );
+				pElementPOS[0] = basePos[0];
+				pElementPOS[1] = basePos[1];
+				pElementPOS[2] = basePos[2];
+				//_deformPosBuf[idxMap[k]] = finalVec;
+			}
+		}			
+	}
+
+	//UNLOCK BUFFER
+	if(VertexBufPOS->isLocked()) 
+		VertexBufPOS->unlock();
+}
+
 bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 {
 	//return true;
@@ -244,10 +315,17 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 			if (!character)
 				continue;
 
-			Node* node = sceneNode->getChild(name);
+			SceneNode* node = dynamic_cast<SceneNode*>(sceneNode->getChild(name));
 
 			if (!node)
 				continue;
+			
+			Ogre::Entity* nodeEntity = dynamic_cast<Entity*>(node->getAttachedObject(0));		
+			if (nodeEntity && character->dMeshInstance_p)
+			{
+				ogreBlendShape(nodeEntity, character->dMeshInstance_p);				
+			}
+			
 			// set character positions& rotations
 			SrMat wMat = character->get_world_offset();
 			SrQuat wRot = SrQuat(wMat);

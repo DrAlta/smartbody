@@ -4,6 +4,12 @@
 #include "ExampleFrameListener.h"
 
 class EmbeddedOgre;
+class DeformableMeshInstance;
+
+// namespace Ogre
+// {
+// 	class Entity;
+// }
 // Event handler to animate
 class OgreFrameListener : public ExampleFrameListener
 {
@@ -21,8 +27,9 @@ class OgreFrameListener : public ExampleFrameListener
 		std::map<std::string, std::map<std::string, Ogre::Vector3> > m_initialBonePositions;
 
 		std::set<std::string> m_validJointNames;
-
-protected:
+	protected:
+		void ogreBlendShape(Ogre::Entity* sbEntity, DeformableMeshInstance* meshInstance);
+	protected:
 		Ogre::SceneManager * mSceneMgr;			
 		std::vector<std::string> m_initialCommands;
 		bool m_ogreMouseEnabled;	
