@@ -1570,8 +1570,8 @@ SmartBody::SBFaceDefinition* SBScene::createFaceDefinition(const std::string& na
 	// make sure the name doesn't already exist
 	if (_faceDefinitions.find(name) != _faceDefinitions.end())
 	{
-		LOG("Face definition named '%s' already exists.", name.c_str());
-		return NULL;
+		LOG("Face definition named '%s' already exists. Returning existing one", name.c_str());
+		return _faceDefinitions[name];
 	}
 
 	SBFaceDefinition* face = new SBFaceDefinition(name);
