@@ -290,6 +290,19 @@ void SkJoint::add_child( SkJoint* child )
 	 child->skeleton(this->skeleton());
 }
 
+void SkJoint::remove_child(SkJoint* child)
+{
+	for (size_t i = 0; i < _children.size(); ++i)
+	{
+		if (_children[i]->getName() == child->getName())
+		{
+			_children.erase(_children.begin() + i);
+			return;
+		}
+	}
+	LOG("SkJoint::remove_child WARNING: cannot find child joint %s", child->getName().c_str());
+}
+
 void SkJoint::updateGmatZero(const SrMat& gmatZero)
 {
 	_gmatZero = gmatZero;

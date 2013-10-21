@@ -74,6 +74,15 @@ void SBJoint::addChild(SBJoint* child)
 		skel->update();
 }
 
+void SBJoint::removeChild(SBJoint* child)
+{
+	remove_child(child);
+
+	SBSkeleton* skel = getSkeleton();
+	if (skel)
+		skel->update();
+}
+
 void SBJoint::setSkeleton(SBSkeleton* skeleton)
 {
 	SkJoint::skeleton(skeleton);

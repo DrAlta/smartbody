@@ -277,6 +277,7 @@ public:
 	void setJointType(int jtype) {  _jointType = jtype; };
 
 	SBAPI void add_child ( SkJoint* child );
+	SBAPI void remove_child (SkJoint* child);
 
 	void updateGmatZero(const SrMat& gmatZero);
 	const SrMat& gmatZero() { return _gmatZero; }
