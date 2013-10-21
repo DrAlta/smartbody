@@ -15,9 +15,7 @@
  *  You should have received a copy of the Lesser GNU General Public
  *  License along with SmartBody-lib.  If not, see:
  *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
+
  */
 
 #include "vhcl.h"
@@ -1366,6 +1364,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 	// Schedule visemes
 	//   visemes are stored in request->visemes as VisemeData objects (defined in bml.hpp)
 	// add audioOffset to each viseme time,
+	double lastTime = endAt;
 	if( visemes.size() > 0 ) {
 		//// Replaced by addition in next loop
 		//for( int i=0; i<(int)request->visemes.size(); i++ ) {
@@ -1377,12 +1376,15 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 		for( size_t i=0; i<viseme_count; i++ ) { //adds visemes for audio into sequence file
 			VisemeData* v = visemes.at(i);
 			time_sec time = (time_sec)( v->time() + startAt );
+			
 			if (v->isMotionMode())
 			{
 				// calling face controller directly
 				if (request->actor->face_ct)
 				{
 					request->actor->face_ct->customizeMotion(v->id(), time);
+					if (time > lastTime)
+						lastTime = time;
 				}
 			}
 			else if (v->isFloatCurveMode())
@@ -1399,6 +1401,9 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 				string cmd_str = command.str();
 				SbmCommand *cmd = new SbmCommand( cmd_str, time );
 				sbm_commands.push_back( cmd );
+				double lastVisemeTime = data[(numKeys - 1) * floatsPerKey];
+				if (time + lastVisemeTime > lastTime)
+					lastTime = time  + lastVisemeTime;
 			}
 			else if (!v->isCurveMode())
 			{
@@ -1433,6 +1438,8 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 				SbmCommand *cmd = new SbmCommand( cmd_str, time );
 				sbm_commands.push_back( cmd );
 //				sbm_commands.push_back( new SbmCommand( command.str(), time ) );
+				if (time + duration > lastTime)
+					lastTime = time + duration;
 #endif
 				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
 			}
@@ -1508,6 +1515,9 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 				for (size_t i = 0; i < tokens.size(); ++i)
 					curve[i] = (float)atof(tokens[i].c_str());
 				request->actor->schedule_viseme_curve(v->id(), time, curve, v->getNumKeys(), numKeyParam, 0.0f, 0.0f);
+				double lastVisemeTime = curve[(v->getNumKeys() - 1) * 2];
+				if (time + lastVisemeTime > lastTime)
+					lastTime = time  + lastVisemeTime;
 #endif
 				if( LOG_BML_VISEMES ) cout << "command (complete): " << command.str() << endl;
 			}
@@ -1543,6 +1553,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 		LOG("WARNING: BodyPlannerImpl::realizeRequest(..): SpeechRequest has no audioPlay command.");
 	}
 
+	behav_syncs.sync_end()->set_time(lastTime);
 	realize_sequence( sbm_commands, scene );
 }
 
