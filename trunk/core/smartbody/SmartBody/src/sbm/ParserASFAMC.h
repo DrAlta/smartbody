@@ -44,8 +44,8 @@ that is distributed: */
 
 
 #include <fstream>
-#include "sk/sk_skeleton.h"
-#include "sk/sk_motion.h"
+#include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
 
 struct JointInfo
 {
@@ -59,7 +59,8 @@ struct JointInfo
 class ParserASFAMC
 {
 	public:
-		static bool parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& metaFile, std::ifstream& dataFile, float scale);
+		static bool parseAsf(SmartBody::SBSkeleton& skeleton, std::ifstream& metaFile, float scale);
+		static bool parseAmc(SmartBody::SBMotion& motion, SmartBody::SBSkeleton* skeleton, std::ifstream& dataFile, float scale);
 	
 	private:
 		static int getMotionChannelId(SkChannelArray& channels, std::string channelType, std::string jointName);

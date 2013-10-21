@@ -65,9 +65,16 @@ class SBJoint : public SkJoint, public SBTransformObjInterface
 		SBAPI virtual SBTransform& getGlobalTransform();
 		SBAPI virtual void setGlobalTransform(SBTransform& newGlobalTransform);
 
+		SBAPI void setAsfAxis(SrVec axis);
+		SBAPI SrVec& getAsfAxis();
+		SBAPI void setAsfChannels(std::vector<std::string>& channels);
+		SBAPI std::vector<std::string>& getAsfChannels();
+
 	protected:
 		SrVec _localCenter;
 		SBTransform globalTransform;
+		SrVec _asfAxis;
+		std::vector<std::string> _asfChannels;
 };
 
 };

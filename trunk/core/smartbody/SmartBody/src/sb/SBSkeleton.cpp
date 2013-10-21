@@ -403,6 +403,8 @@ float SBSkeleton::getScale()
 	return _scale;
 }
 
+
+
 void SBSkeleton::notify(SBSubject* subject)
 {
 	SBObject::notify(subject);
