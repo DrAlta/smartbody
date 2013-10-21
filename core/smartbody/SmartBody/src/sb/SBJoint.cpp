@@ -263,4 +263,30 @@ void SBJoint::setGlobalTransform( SBTransform& newGlobalTransform )
 	// can not set gmat directly
 }
 
+void SBJoint::setAsfAxis(SrVec axis)
+{
+	_asfAxis = axis;
+}
+
+SrVec& SBJoint::getAsfAxis()
+{
+	return _asfAxis;
+}
+
+void SBJoint::setAsfChannels(std::vector<std::string>& channels)
+{
+	_asfChannels.clear();
+	for (size_t c = 0; c < channels.size(); c++)
+	{
+		_asfChannels.push_back(channels[c]);
+	}
+}
+
+std::vector<std::string>& SBJoint::getAsfChannels()
+{
+	return _asfChannels;
+}
+
+
+
 };

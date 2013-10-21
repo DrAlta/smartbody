@@ -7,6 +7,8 @@
 #include <boost/algorithm/string.hpp>
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
+#include <sb/SBAssetManager.h>
+#include <sbm/ParserASFAMC.h>
 
 namespace SmartBody {
 
@@ -44,25 +46,57 @@ std::vector<SBAsset*> SBAssetHandlerAmc::getAssets(const std::string& path)
 		return assets;
 	}
 
-	SmartBody::SBMotion* motion = new SmartBody::SBMotion();
-	bool parseSuccessful = false;
-
 	std::string convertedPath = pathname.string();
 #ifdef WIN32
 	boost::replace_all(convertedPath, "\\", "/");
 #endif
-	SrInput in( convertedPath.c_str(), "rt" );
-	SrString fullin_string;
-	in.getall( fullin_string );
-	SrInput fullin( (const char *)fullin_string );
-	fullin.filename( convertedPath.c_str() ); // copy filename for error message
-			
-	double scale = SmartBody::SBScene::getScene()->getDoubleAttribute("globalMotionScale");
-	parseSuccessful = motion->load( fullin, scale );
-	if (parseSuccessful)
+
+	boost::filesystem::path p(convertedPath);
+	std::string fileName = boost::filesystem::basename( p );
+	std::string extension =  boost::filesystem::extension( p );
+
+
+	std::ifstream filestream(convertedPath.c_str());
+
+	double scale = 1.0;
+	if (SmartBody::SBScene::getScene()->getAttribute("globalMotionScale"))
+		scale = SmartBody::SBScene::getScene()->getDoubleAttribute("globalMotionScale");
+
+	SmartBody::SBSkeleton* skeleton = NULL;
+	// find a skeleton with a prefix that matches the first part of this motion file
+	int pos = fileName.find_first_of("_");
+	if (pos != std::string::npos)
+	{
+		std::string skelPrefix = fileName.substr(0, pos);
+		// find a skeleton with that name
+		std::string skelName = skelPrefix + ".asf";
+		skeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skelName);
+		if (!skeleton)
+		{
+			LOG("No skeleton with name %s could be find to accompany .asf file, %s not loaded.", skelName.c_str(), convertedPath.c_str());
+			return assets;
+		}
+	}
+
+	if (!skeleton)
+	{
+		LOG(".amc files need accompanying .asf skeleton, %s not loaded.", convertedPath.c_str());
+		return assets;
+	}
+
+	
+	SmartBody::SBMotion* motion = new SmartBody::SBMotion();
+	bool ok = ParserASFAMC::parseAmc(*motion, skeleton, filestream, float(scale));
+	if (ok)
+	{
+		motion->setName(fileName);
 		assets.push_back(motion);
+	}
 	else
-		LOG("Could not .skm file %s", convertedPath.c_str());
+	{
+		delete motion;
+		LOG("Could not load .amc file %s", convertedPath.c_str());
+	}
 
 	return assets;
 }

@@ -12,6 +12,7 @@
 #include <sb/SBAssetHandlerObj.h>
 #include <sb/SBAssetHandlerSkb.h>
 #include <sb/SBAssetHandlerBvh.h>
+#include <sb/SBAssetHandlerAmc.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -55,6 +56,7 @@ SBAssetManager::SBAssetManager()
 	addAssetHandler(new SBAssetHandlerSk());	
 	addAssetHandler(new SBAssetHandlerCOLLADA());	
 	addAssetHandler(new SBAssetHandlerAsf());	
+	addAssetHandler(new SBAssetHandlerAmc());	
 	addAssetHandler(new SBAssetHandlerOgre());	
 	addAssetHandler(new SBAssetHandlerObj());	
 	addAssetHandler(new SBAssetHandlerSkb());	
@@ -1052,7 +1054,8 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 			std::ifstream metafilestream(asf.c_str());
 			std::ifstream filestream(convertedPath.c_str());
 			SBSkeleton skeleton;
-			parseSuccessful = ParserASFAMC::parse(skeleton, *motion, metafilestream, filestream, float(scale));
+			parseSuccessful = ParserASFAMC::parseAsf(skeleton,metafilestream, float(scale));
+			parseSuccessful = ParserASFAMC::parseAmc(*motion, &skeleton, filestream, float(scale));
 			motion->setName(filebase.c_str());
 			if (parseSuccessful)
 				motions.push_back(motion);
@@ -1271,7 +1274,7 @@ SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srP
 		std::ifstream filestream(filename.c_str());
 		std::ifstream datastream("");
 		SmartBody::SBMotion motion;
-		ParserASFAMC::parse(*skeleton_p, motion, filestream, datastream, float(scale));
+		ParserASFAMC::parseAsf(*skeleton_p, filestream, float(scale));
 		skeleton_p->skfilename(filename.c_str());
 	}
 	else if (filename.find(".dae") == (filename.size() - 4) || 
@@ -1473,7 +1476,7 @@ int SBAssetManager::load_me_skeletons_impl( const boost::filesystem::path& pathn
 			skeleton->skfilename(fullName.c_str());
 			skeleton->setName(fullName.c_str());
 			SkMotion motion;
-			bool ok = ParserASFAMC::parse(*skeleton, motion, filestream, datastream, float(scale));
+			bool ok = ParserASFAMC::parseAsf(*skeleton, filestream, float(scale));
 			if (ok)
 			{
 				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
