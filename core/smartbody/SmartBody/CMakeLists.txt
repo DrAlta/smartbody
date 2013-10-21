@@ -474,6 +474,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBVHMsgManager.cpp
         ./src/sb/SBCommandManager.cpp
         ./src/sb/SBWSPManager.cpp
+        ./src/sb/SBNavigationMeshManager.cpp
 
         ./src/sb/SBPython.cpp
         ./src/sb/SBPythonAnimation.cpp
@@ -491,11 +492,11 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBAssetHandlerCOLLADA.cpp
         ./src/sb/SBAssetHandlerSk.cpp
         ./src/sb/SBAssetHandlerSkm.cpp
-		./src/sb/SBAssetHandlerAsf.cpp
-		./src/sb/SBAssetHandlerOgre.cpp
-		./src/sb/SBAssetHandlerObj.cpp
-		./src/sb/SBAssetHandlerBvh.cpp
-		./src/sb/SBAssetHandlerSkb.cpp
+	./src/sb/SBAssetHandlerAsf.cpp
+	./src/sb/SBAssetHandlerOgre.cpp
+	./src/sb/SBAssetHandlerObj.cpp
+	./src/sb/SBAssetHandlerBvh.cpp
+	./src/sb/SBAssetHandlerSkb.cpp
         ./src/sb/SBBehavior.cpp
         ./src/sb/SBDebuggerServer.cpp
         ./src/sb/SBDebuggerClient.cpp
