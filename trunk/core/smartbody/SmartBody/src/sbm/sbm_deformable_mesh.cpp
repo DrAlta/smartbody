@@ -721,7 +721,8 @@ void DeformableMeshInstance::setCharacter(SmartBody::SBCharacter* c)
 {
 	if (_skeleton)
 		_skeleton->unref();
-	_skeleton = c->getSkeleton();
+	if (c)
+		_skeleton = c->getSkeleton();
 	if (_skeleton)
 		_skeleton->ref();
 	_character = c;
