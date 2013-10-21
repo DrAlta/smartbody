@@ -75,7 +75,7 @@ class SBScene : public SBObject
 		SBAPI const std::string& getMediaPath();
 
 		SBAPI void update();
-		SBAPI std::string save(bool remoteSetup = false);
+		SBAPI std::string save(bool remoteSetup = false, std::string mediaPath = "");
 		SBAPI std::string saveSceneSetting();
 		SBAPI std::string exportScene(const std::vector<std::string>& aspects, bool remoteSetup);
 
@@ -264,7 +264,7 @@ class SBScene : public SBObject
 		void initialize();
 		void cleanup();
 		void saveScene(std::stringstream& strstr, bool remoteSetup);
-		void saveAssets(std::stringstream& strstr, bool remoteSetup);
+		void saveAssets(std::stringstream& strstr, bool remoteSetup, std::string mediaPath);
 		void saveCameras(std::stringstream& strstr, bool remoteSetup);
 		void savePawns(std::stringstream& strstr, bool remoteSetup);
 		void saveCharacters(std::stringstream& strstr, bool remoteSetup);
