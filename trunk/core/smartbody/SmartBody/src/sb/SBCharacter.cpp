@@ -616,10 +616,10 @@ void SBCharacter::notify(SBSubject* subject)
 			if (!getSkeleton())
 				return;
 
-			//LOG("Update blend shape channel!");
 			// clear out all the TypeBlendShape joint channel
+			removeAllBlendShapeChannels();
 			
-			// add 
+			// add channel
 			std::vector<std::string> attributeNames = this->getAttributeNames();
 			for (size_t i = 0; i < attributeNames.size(); ++i)
 			{
@@ -629,12 +629,15 @@ void SBCharacter::notify(SBSubject* subject)
 					std::string channelName = getStringAttribute(attrName);
 					if (channelName != "")
 					{
+						int startPos = std::string("blendShape.channelName").size();
+						std::string shapeName = attrName.substr(startPos + 1);
 						if (getSkeleton()->getJointByName(channelName))
 						{
+							LOG("Blend shape channel %s already existed. Skiping add shape %s...", channelName.c_str(), shapeName.c_str());
 							continue;
 						}
-						LOG("added blend shape channel %s", channelName.c_str());
 						addBlendShapeChannel(channelName);
+						LOG("Blend shape channel %s added for shape %s ...", channelName.c_str(), shapeName.c_str());
 					}
 				}
 			}

@@ -2320,15 +2320,41 @@ void SbmCharacter::removeAllFaceChannels()
 		if (joint)
 		{
 			// remove the joint
-			// function does not exist - add it
+			// TODO: this function is not used and tested
+			if (joint->parent())
+			{
+				joint->parent()->remove_child(joint);
+			}
 		}
 	}
+
 }
 
 
 void SbmCharacter::removeAllBlendShapeChannels()
 {
+	SkSkeleton* skeleton = getSkeleton();
+	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*> (skeleton);
+	for (int i = 0; i < sbSkel->getNumJoints(); ++i)
+	{
+		SkJoint* joint = sbSkel->getJoint(i);
+		SmartBody::SBJoint* sbJoint = dynamic_cast<SmartBody::SBJoint*> (joint);
+		if (!joint)	continue;
 
+		if (joint->getJointType() == SkJoint::TypeBlendShape)
+		{
+			SkJoint* jointParent = joint->parent();
+			if (jointParent)
+			{
+				SmartBody::SBJoint* sbJointParent = dynamic_cast<SmartBody::SBJoint*> (jointParent);
+				sbJointParent->removeChild(sbJoint);
+				i--;
+				//LOG("remove joint %s", joint->getName().c_str());
+			}
+		}
+	}
+
+	updateFaceDefinition();
 }
 
 void SbmCharacter::addVisemeChannel(std::string visemeName, SkMotion* motion)
