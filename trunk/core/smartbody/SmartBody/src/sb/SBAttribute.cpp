@@ -345,7 +345,11 @@ std::string BoolAttribute::write()
 {
 	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
-	strstr << "attr = obj.createBoolAttribute(\"" << getName() << "\"";
+	std::string boolValue = getValue() ? "True" : "False";
+	strstr << "if obj.getAttribute(\""<< getName() << "\") != None :\n";
+	strstr << "\tobj.setBoolAttribute(\"" << getName() << "\"," << boolValue << ")\n";
+	strstr << "else:\n";
+	strstr << "\tattr = obj.createBoolAttribute(\"" << getName() << "\"";
 	getValue() ? strstr << ", True" :  strstr << ", False";
 	SBObject* object = this->getObject();
 	if (object->hasDependency(this))
@@ -373,7 +377,7 @@ std::string BoolAttribute::write()
 
 	bool val = getDefaultValue();
 	bool curVal = getValue();
-	strstr << "attr.setDefaultValue(";
+	strstr << "\tattr.setDefaultValue(";
 	val? strstr << "True)\n" : strstr << "False)\n"; 
 	//strstr << "attr.setValue(";
 	//curVal? strstr << "True)\n" : strstr << "False)\n"; 
@@ -490,7 +494,10 @@ std::string IntAttribute::write()
 {
 	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
-	strstr << "attr = obj.createIntAttribute(\"" << getName() << "\", ";
+	strstr << "if obj.getAttribute(\""<< getName() << "\") != None :\n";
+	strstr << "\tobj.setIntAttribute(\"" << getName() << "\"," << getValue() << ")\n";
+	strstr << "else:\n";
+	strstr << "\tattr = obj.createIntAttribute(\"" << getName() << "\", ";
 	strstr << getValue();
 	SBObject* object = this->getObject();
 	if (object->hasDependency(this))
@@ -518,7 +525,7 @@ std::string IntAttribute::write()
 
 	int val = getDefaultValue();
 	int curVal = getValue();
-	strstr << "attr.setDefaultValue(" << val << ")\n";
+	strstr << "\tattr.setDefaultValue(" << val << ")\n";
 	//strstr << "attr.setValue(" << curVal << ")\n";
 
 	return strstr.str();
@@ -635,8 +642,11 @@ void DoubleAttribute::setMax(double val)
 std::string DoubleAttribute::write()
 {
 	SBAttributeInfo* info = this->getAttributeInfo();
-	std::stringstream strstr;
-	strstr << "attr = obj.createDoubleAttribute(\"" << getName() << "\", ";
+	std::stringstream strstr;	
+	strstr << "if obj.getAttribute(\""<< getName() << "\") != None :\n";
+	strstr << "\tobj.setDoubleAttribute(\"" << getName() << "\"," << getValue() << ")\n";
+	strstr << "else:\n";
+	strstr << "\tattr = obj.createDoubleAttribute(\"" << getName() << "\", ";
 	strstr << getValue();
 	SBObject* object = this->getObject();
 	if (object->hasDependency(this))
@@ -664,7 +674,7 @@ std::string DoubleAttribute::write()
 
 	double val = getDefaultValue();
 	double curVal = getValue();
-	strstr << "attr.setDefaultValue(" << val << ")\n";
+	strstr << "\tattr.setDefaultValue(" << val << ")\n";	
 	//strstr << "attr.setValue(" << curVal << ")\n";
 	return strstr.str();
 }
@@ -743,7 +753,10 @@ std::string StringAttribute::write()
 {
 	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
-	strstr << "attr = obj.createStringAttribute(\"" << getName() << "\", ";
+	strstr << "if obj.getAttribute(\""<< getName() << "\") != None :\n";
+	strstr << "\tobj.setStringAttribute(\"" << getName() << "\",\"" << getValue() << "\")\n";
+	strstr << "else:\n";
+	strstr << "\tattr = obj.createStringAttribute(\"" << getName() << "\", ";
 	const std::string& val = getValue();
 	if (val == "")
 		strstr << " \"\"";
@@ -777,22 +790,22 @@ std::string StringAttribute::write()
 	const std::string& curVal = getValue();
 	if (defaultVal == "")
 	{
-		strstr << "attr.setDefaultValue(\"\")\n";		
+		strstr << "\tattr.setDefaultValue(\"\")\n";		
 	}
 	else
 	{
-		strstr << "attr.setDefaultValue(\"" << defaultVal << "\")\n";		
+		strstr << "\tattr.setDefaultValue(\"" << defaultVal << "\")\n";		
 	}
 	//strstr << "attr.setValue(\"" << curVal << "\")\n";
-	strstr << "validValues = StringVec()\n";
+	strstr << "\tvalidValues = StringVec()\n";
 	const std::vector<std::string>& values = getValidValues();
 	for (std::vector<std::string>::const_iterator iter = values.begin();
 		 iter != values.end();
 		 iter++)
 	{
-		strstr << "validValues.append(\"" << (*iter) << "\")\n";
+		strstr << "\tvalidValues.append(\"" << (*iter) << "\")\n";
 	}
-	strstr << "attr.setValidValues(validValues)\n";
+	strstr << "\tattr.setValidValues(validValues)\n";
 	return strstr.str();
 }
 

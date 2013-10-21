@@ -132,8 +132,8 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	displayVec.push_back("GPUmesh");
 	displayAttribute->setValidValues(displayVec);
 
-	createStringAttribute("deformableMesh", "", true, "Display", 220, false, false, false, "Directory that contains mesh information.");
-	createDoubleAttribute("deformableMeshScale", 1, true, "Display", 230, false, false, false, "Scale factor when loading mesh.");
+	createDoubleAttribute("deformableMeshScale", 1, true, "Display", 220, false, false, false, "Scale factor when loading mesh.");
+	createStringAttribute("deformableMesh", "", true, "Display", 230, false, false, false, "Directory that contains mesh information.");
 	createStringAttribute("receiverName", "kinect1", true, "Remote", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
 	createVec3Attribute("leftSholderOffset",0.f,0.f,0.f,true, "Retargeting", 320, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
 	createVec3Attribute("rightSholderOffset",0.f,0.f,0.f,true, "Retargeting", 340, false, false, false, "rotation offset added on left shoulder joint during retargeting.");

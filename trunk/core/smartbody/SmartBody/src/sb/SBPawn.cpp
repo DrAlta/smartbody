@@ -28,10 +28,11 @@ SBPawn::SBPawn() : SbmPawn()
 	_rotX = createDoubleAttribute("rotX", 0.0, true, "transform", 40, false, false, false, "X rotation");
 	_rotY = createDoubleAttribute("rotY", 0.0, true, "transform", 50, false, false, false, "Y rotation");
 	_rotZ = createDoubleAttribute("rotZ", 0.0, true, "transform", 60, false, false, false, "Z rotation");
-	createStringAttribute("mesh", "", true, "Display", 400, false, false, false, "Geometry/mesh");
+	
+	createDoubleAttribute("meshScale", 1.0, true, "Display", 400, false, false, false, "Scale of geometry/mesh");
+	createStringAttribute("mesh", "", true, "Display", 405, false, false, false, "Geometry/mesh");
 	// since this is a pawn, show static mesh by default
-	createBoolAttribute("showStaticMesh", true, true, "Display", 405, false, false, false, "Whether the object is visible.");
-	createDoubleAttribute("meshScale", 1.0, true, "Display", 410, false, false, false, "Scale of geometry/mesh");
+	createBoolAttribute("showStaticMesh", true, true, "Display", 415, false, false, false, "Whether the object is visible.");
 	createVec3Attribute("meshTranslate", 0.0, 0.0, 0.0, true, "Display", 420, false, false, false, "Mesh translation offset");
 	createVec3Attribute("meshRotation", 0.0, 0.0, 0.0, true, "Display", 430, false, false, false,  "Mesh rotation offset");
 	createActionAttribute("createPhysics", true, "Physics", 300, false, false, false, "Initializes the pawn as a physics object.");
