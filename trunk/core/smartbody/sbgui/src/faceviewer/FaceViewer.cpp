@@ -61,7 +61,10 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 	{	
 		SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
 		if (!faceDefinition)
+		{
+			faceViewer->redraw();
 			return;
+		}
 
 		const std::vector<int>& auNums = faceDefinition->getAUNumbers();
 		for (size_t a = 0; a < auNums.size(); a++)
@@ -157,6 +160,8 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 
 		faceViewer->updateGUI();
 		faceViewer->bottomGroup->damage(FL_DAMAGE_ALL);
+
+		faceViewer->redraw();
 	}
 }
 
