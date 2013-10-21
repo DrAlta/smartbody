@@ -1419,12 +1419,69 @@ void SbmDeformableMeshGPUInstance::update()
 		// GPU update and rendering
 		//printf("GPU Deformable Model Update\n");
 		DeformableMeshInstance::setVisibility(false);
-		_updateMesh = true;
+		_updateMesh = true;		
 		_skeleton->update_global_matrices();
+		gpuBlendShape();
 		updateTransformBuffer();		
 		gpuMesh->skinTransformGPU(this);
 	}
 }
+
+void SbmDeformableMeshGPUInstance::gpuBlendShape()
+{
+	SbmDeformableMeshGPU* gpuMesh = dynamic_cast<SbmDeformableMeshGPU*>(_mesh);
+	if (!gpuMesh) return;
+	if (gpuMesh->blendShapeMap.size() == 0) return;
+
+	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
+	mIter = gpuMesh->blendShapeMap.begin();
+	SrSnModel* writeToBaseModel = NULL;
+	int vtxBaseIdx = 0;
+	for (size_t i = 0; i < gpuMesh->dMeshStatic_p.size(); ++i)
+	{		
+		if (strcmp(gpuMesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
+		{
+			writeToBaseModel = gpuMesh->dMeshStatic_p[i];
+			break;
+		}
+		else
+		{
+			// skip vertices for this sub mesh
+			vtxBaseIdx += gpuMesh->dMeshStatic_p[i]->shape().V.size();
+		}
+	}
+	if (!writeToBaseModel) return;
+
+	DeformableMeshInstance::blendShapes();
+	VBOVec3f* posVBO = gpuMesh->getPosVBO();	
+	glBindBuffer(GL_ARRAY_BUFFER, posVBO->VBO()->m_iVBO_ID);	
+	float* pData = (float*) glMapBuffer(GL_ARRAY_BUFFER,GL_WRITE_ONLY);
+	std::map<int,std::vector<int> >& vtxNewVtxIdxMap = gpuMesh->vtxNewVtxIdxMap;
+	SrModel& baseModel = writeToBaseModel->shape();
+
+	for (int i=0;i<baseModel.V.size();i++)
+	{
+		int iVtx = vtxBaseIdx+i;
+		SrVec basePos = baseModel.V[i];
+		pData[iVtx*3] = basePos[0];
+		pData[iVtx*3+1] = basePos[1];
+		pData[iVtx*3+2] = basePos[2];
+		if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
+		{
+			std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
+			// copy related vtx components 
+			for (unsigned int k=0;k<idxMap.size();k++)
+			{
+				int idx = idxMap[k];
+				pData[idx*3] = basePos[0];
+				pData[idx*3+1] = basePos[1];
+				pData[idx*3+2] = basePos[2];
+			}
+		}			
+	}	
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+
 
 bool SbmDeformableMeshGPUInstance::initBuffer()
 {	

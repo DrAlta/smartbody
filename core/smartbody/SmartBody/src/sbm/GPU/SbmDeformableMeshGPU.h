@@ -50,6 +50,7 @@ public:
 	virtual bool buildVertexBufferGPU();	
 	void skinTransformGPU(DeformableMeshInstance* meshInstance);
 	static void initShaderProgram();	
+	VBOVec3f* getPosVBO() { return VBOPos; }
 protected:
 	bool initBuffer(); // initialize VBO and related GPU data buffer	
 	bool initBuffer1();	
@@ -71,6 +72,7 @@ public:
 	std::vector<SrMat>& getTransformBuffer() { return transformBuffer; }
 	TBOData*            getTBOTransforBuffer() { return TBOTran; }
 protected:
+	void gpuBlendShape();
 	bool initBuffer();	
 	void cleanBuffer();	
 };
