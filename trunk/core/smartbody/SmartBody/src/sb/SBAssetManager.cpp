@@ -11,6 +11,7 @@
 #include <sb/SBAssetHandlerOgre.h>
 #include <sb/SBAssetHandlerObj.h>
 #include <sb/SBAssetHandlerSkb.h>
+#include <sb/SBAssetHandlerBvh.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -21,6 +22,7 @@
 #include <sbm/ParserCOLLADAFast.h>
 #include <sbm/ParserOgre.h>
 #include <sbm/ParserASFAMC.h>
+#include <sbm/ParserBvh.h>
 #include <sbm/ParserFBX.h>
 #include <sbm/lin_win.h>
 #include <sbm/sr_path_list.h>
@@ -56,6 +58,7 @@ SBAssetManager::SBAssetManager()
 	addAssetHandler(new SBAssetHandlerOgre());	
 	addAssetHandler(new SBAssetHandlerObj());	
 	addAssetHandler(new SBAssetHandlerSkb());	
+	addAssetHandler(new SBAssetHandlerBvh());	
 	uniqueSkeletonId = 0;
 
 	_motionCounter = 0;
