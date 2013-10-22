@@ -74,20 +74,19 @@ public:
 	Fl_Button*			_buttonRefresh;
 	Fl_Button*			_buttonSaveMotion;
 	Fl_Hold_Browser*	_browserMotionList;
-   Fl_Button*        _buttonQueryAnims;
+	Fl_Button*			_buttonQueryAnims;
 	Fl_Button*			_buttonPlayMotion;
-   Fl_Button*        _buttonSetPosture;
+	Fl_Button*			_buttonSetPosture;
 	Fl_Check_Button*	_checkButtonPlayMotion;
 	Fl_Value_Slider*	_sliderMotionFrame;
 	Fl_Output*			_outputMotionFrameNumber;
 	Fl_Input*			_inputFilePath;
-   Fl_Box*           _animationSearchFilterLabel;
-   Fl_Input*			_animationSearchFilter;
+	Fl_Input*			_animationSearchFilter;
 	Fl_Button*			_buttonPlayMotionFolder;
 
 	// meta information
 	Fl_Group*			_groupMetaInfo;
-   Fl_Group*         _groupGazeInfo;
+	Fl_Group*			_groupGazeInfo;
 	Fl_Value_Slider*	_sliderStart;
 	Fl_Button*			_buttonGetStartTime;
 	Fl_Value_Slider*	_sliderReady;

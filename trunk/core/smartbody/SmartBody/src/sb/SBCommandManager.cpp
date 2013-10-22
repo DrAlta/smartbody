@@ -242,6 +242,37 @@ void SBCommandManager::registerCallbacks()
 	insert( "sbmdebugger", mcu_sbmdebugger_func );
 
 	insert( "text_speech", text_speech::text_speech_func ); // [BMLR]
+
+	/*
+	// deprecated callbacks
+	insert( "help",					deprecatedMessage);
+	insert( "reset",				deprecatedMessage );
+	insert( "path",					deprecatedMessage );
+	insert( "physics",				deprecatedMessage );	
+	insert( "mirror",				deprecatedMessage);
+	insert( "syncpolicy",          deprecatedMessage );
+	insert( "adjustmotion",		   deprecatedMessage);
+	insert( "mediapath",		   deprecatedMessage);
+	insert( "triggerevent",		   deprecatedMessage );
+	insert( "addevent",			   deprecatedMessage );
+	insert( "removeevent",		   deprecatedMessage );
+	insert( "enableevents",	       deprecatedMessage );
+	insert( "disableevents",	   deprecatedMessage );
+	insert( "registerevent",       deprecatedMessage );
+	insert( "unregisterevent",     deprecatedMessage );
+	insert( "setmap",			   deprecatedMessage );
+	insert( "motionmap",		   deprecatedMessage );
+	insert( "motionmapdir",		   deprecatedMessage );
+	insert( "skeletonmap",		   deprecatedMessage );
+	insert( "characters",		   deprecatedMessage );
+	insert( "pawns",			   deprecatedMessage );
+	insert( "resetanimation",	   deprecatedMessage);
+	insert( "animation",		   deprecatedMessage);
+	insert( "skscale",			   deprecatedMessage);
+	insert( "skmscale",			   deprecatedMessage);
+	insert( "xmlcachedir",		   deprecatedMessage);
+	insert( "xmlcache",			   deprecatedMessage);
+	*/
 }
 
 int SBCommandManager::execute( const char *key, srArgBuffer& args )
