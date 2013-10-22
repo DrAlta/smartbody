@@ -148,14 +148,95 @@ MotionEditorWindow::~MotionEditorWindow()
 {
 }
 
+
+void MotionEditorWindow::reloadCharactersAndPawns()
+{
+	if (!_choiceCharacaterList)
+		return;
+	if (!_choiceGazeTargetList)
+		return;
+
+	// get previous selected character & pawn
+	std::string selectedCharacter = _choiceCharacaterList->text();
+	std::string selectedPawn = _choiceGazeTargetList->text();
+
+	// clear and reload
+	_choiceCharacaterList->clear();
+	_choiceGazeTargetList->clear();
+	loadCharacters();
+
+	// select again the character & pawn
+	for (int c = 0; c < _choiceCharacaterList->menu()->size(); c++)
+	{
+		if (_choiceCharacaterList->menu()[c].label() == NULL)
+			continue;
+
+		if (selectedCharacter == _choiceCharacaterList->menu()[c].label())
+		{
+			_choiceCharacaterList->value(c);
+		}
+	}
+
+	for (int c = 0; c < _choiceGazeTargetList->menu()->size(); c++)
+	{
+		if (_choiceGazeTargetList->menu()[c].label() == NULL)
+			continue;
+
+		if (selectedPawn == _choiceGazeTargetList->menu()[c].label())
+		{
+			_choiceGazeTargetList->value(c);
+		}
+	}
+}
+
+
 void MotionEditorWindow::show()
 {
+	// if window is shown again, update character and pawns
+	// For some weird reason, when you inserting to FLTK Choice, the size is one more than its real size
+	if (_choiceCharacaterList && _choiceGazeTargetList)
+	{
+		if ((_choiceCharacaterList->size() - 1) != (SmartBody::SBScene::getScene()->getNumCharacters() + 1) 
+			|| (_choiceGazeTargetList->size() - 1) != (SmartBody::SBScene::getScene()->getNumPawns() + SmartBody::SBScene::getScene()->getNumCharacters()))
+		{
+			reloadCharactersAndPawns();
+		}
+	}
+
+	SBWindowListener::windowShow();
 	Fl_Double_Window::show();
 }
 
 void MotionEditorWindow::hide()
 {
+	SBWindowListener::windowHide();
 	Fl_Double_Window::hide();
+}
+
+void MotionEditorWindow::OnCharacterCreate( const std::string & name, const std::string & objectClass )
+{
+	reloadCharactersAndPawns();
+}
+
+void MotionEditorWindow::OnCharacterDelete( const std::string & name )
+{
+	reloadCharactersAndPawns();
+}
+
+void MotionEditorWindow::OnCharacterUpdate( const std::string & name )
+{
+
+}
+
+
+void MotionEditorWindow::OnPawnCreate( const std::string & name )
+{
+	reloadCharactersAndPawns();
+}
+
+void MotionEditorWindow::OnPawnDelete( const std::string & name )
+{
+	reloadCharactersAndPawns();
 }
 
 void MotionEditorWindow::loadCharacters()
@@ -165,16 +246,16 @@ void MotionEditorWindow::loadCharacters()
 	for (size_t i = 0; i < charNames.size(); ++i)
 	{
 		_choiceCharacaterList->add(charNames[i].c_str());
-      _choiceGazeTargetList->add(charNames[i].c_str());
+		_choiceGazeTargetList->add(charNames[i].c_str());
 	}
-	_choiceCharacaterList->value(0);
-   _choiceGazeTargetList->value(0);
 
    const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
    for (size_t i = 0; i < pawnNames.size(); ++i)
 	{
       _choiceGazeTargetList->add(pawnNames[i].c_str());
-	}
+   }
+   _choiceCharacaterList->value(0);
+   _choiceGazeTargetList->value(0);
 }
 
 SmartBody::SBCharacter* MotionEditorWindow::getCurrentCharacter()
