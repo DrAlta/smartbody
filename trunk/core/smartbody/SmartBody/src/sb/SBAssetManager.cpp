@@ -388,7 +388,7 @@ std::string SBAssetManager::findAssetFromLocation(const std::string& filepath, c
 			else if (boost::filesystem::is_regular_file(it->path()))
 			{
 				std::string base = boost::filesystem::basename(it->path());
-				std::string ext = boost::filesystem::basename(it->path());
+				std::string ext = boost::filesystem::extension(it->path());
 				if (assetName == base + ext)
 					return filepath;
 			} 
