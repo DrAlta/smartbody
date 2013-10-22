@@ -2492,8 +2492,8 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
     //using boost::filesystem2::dot;
     //using boost::filesystem2::slash;
 #endif
-
-	// feng : since we may have use "loadAssetsFromPath" to load the motions, we should infer all other motion paths from existing motions.
+	SmartBody::SBAssetManager* assetManager = getAssetManager();
+	// feng : since we may have use "loadAssetsFromPath" to load the motions, we should infer all other motion paths from existing motions
 	for (unsigned int i=0;i<motionNames.size();i++)
 	{
 		SmartBody::SBMotion* motion = getMotion(motionNames[i]);	
@@ -2502,12 +2502,17 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 		if (motionPath.empty()) // don't care about empty path
 			continue;
 
-		path mePath(systemMediaPath);
-		path diffPath = naive_uncomplete(motionPath,mePath);
-		//LOG("motionpath = %s, mediapath = %s, diffpath = %s", motionFile.directory_string().c_str(), mePath.string().c_str(), diffPath.string().c_str());
+		std::string ext = boost::filesystem::extension(motionFile);
+		std::string base = boost::filesystem::basename(motionFile);
+		std::string assetName = base+ext;
+		std::string assetExist = assetManager->findAsset("motion",assetName);
 
+		path mePath(systemMediaPath);
+		path diffPath = naive_uncomplete(motionPath,mePath);		
+		//LOG("motionpath = %s, mediapath = %s, diffpath = %s", motionFile.directory_string().c_str(), mePath.string().c_str(), diffPath.string().c_str());
 		std::vector<std::string>::iterator st = std::find(motionPaths.begin(),motionPaths.end(),diffPath.string());
-		if (st == motionPaths.end())
+		//if (st == motionPaths.end())
+		if (assetExist == "") // can not find this asset in the motion path
 		{
 			extraAssetPathSet.insert(diffPath.string());
 		}
@@ -2521,19 +2526,24 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 		if (skelPath.empty()) // don't care about empty path
 			continue;
 
+		std::string ext = boost::filesystem::extension(skelFile);
+		std::string base = boost::filesystem::basename(skelFile);
+		std::string assetName = base+ext;
+		std::string assetExist = assetManager->findAsset("motion",assetName);
 		path mePath(systemMediaPath);
 		path diffPath = naive_uncomplete(skelPath,mePath);
 		//LOG("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
 
 		std::vector<std::string>::iterator st = std::find(motionPaths.begin(),motionPaths.end(),diffPath.string());
-		if (st == motionPaths.end())
+		//if (st == motionPaths.end())
+		if (assetExist == "") // can not find this asset in the skeleton path
 		{
 			extraAssetPathSet.insert(diffPath.string());
 		}
 	}
 
 	for (iter = motionPaths.begin(); iter != motionPaths.end(); iter++)
-	{
+	{ 
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"motion\", \"" << path << "\")\n";
 	}

@@ -1436,12 +1436,14 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
 	mIter = gpuMesh->blendShapeMap.begin();
 	SrSnModel* writeToBaseModel = NULL;
+	SkinWeight* skinWeight = NULL;
 	int vtxBaseIdx = 0;
 	for (size_t i = 0; i < gpuMesh->dMeshStatic_p.size(); ++i)
 	{		
 		if (strcmp(gpuMesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
 		{
 			writeToBaseModel = gpuMesh->dMeshStatic_p[i];
+			skinWeight = gpuMesh->skinWeights[i];
 			break;
 		}
 		else
@@ -1462,7 +1464,7 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 	for (int i=0;i<baseModel.V.size();i++)
 	{
 		int iVtx = vtxBaseIdx+i;
-		SrVec basePos = baseModel.V[i];
+		SrVec basePos = baseModel.V[i]*skinWeight->bindShapeMat;
 		pData[iVtx*3] = basePos[0];
 		pData[iVtx*3+1] = basePos[1];
 		pData[iVtx*3+2] = basePos[2];
