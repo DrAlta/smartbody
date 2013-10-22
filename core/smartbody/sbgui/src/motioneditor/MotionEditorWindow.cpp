@@ -16,12 +16,14 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
 		_buttonRefresh->callback(OnButtonRefresh, this);
 		_buttonSaveMotion = new Fl_Button(300, 10, 100, 20, "Save");
 		_buttonSaveMotion->callback(OnButtonSaveMotion, this);
-		_browserMotionList = new Fl_Hold_Browser(10, 40, 300, 180, "Motion List");
+
+		_animationSearchFilter  = new Fl_Input(80, 40, 80, 20, "Search Filter");
+		_animationSearchFilter->when(FL_WHEN_CHANGED);
+		_animationSearchFilter->callback(OnAnimationFilterTextChanged, this);
+
+		_browserMotionList = new Fl_Hold_Browser(10, 70, 300, 150, "Motion List");
 		_browserMotionList->callback(OnBrowserMotionList, this);
 
-      _animationSearchFilterLabel = new Fl_Box(320, 40, 80, 20, "Search Filter");
-      _animationSearchFilter  = new Fl_Input(320, 60, 80, 20, "");
-      _animationSearchFilter->callback(OnAnimationFilterTextChanged, this);
 
       if (SmartBody::SBScene::getScene()->isRemoteMode())
       {
@@ -34,6 +36,7 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
 		_buttonPlayMotion->callback(OnButtonSetPosture, this);
 		_checkButtonPlayMotion = new Fl_Check_Button(10, 240, 50, 20, "Scrub");
 		_checkButtonPlayMotion->callback(OnCheckButtonPlayMotion, this);
+		_checkButtonPlayMotion->deactivate();
 		_sliderMotionFrame = new Fl_Value_Slider(60, 240, 300, 20);
 		_sliderMotionFrame->type(FL_HORIZONTAL);
 		_sliderMotionFrame->callback(OnSliderMotionFrame, this);
@@ -264,11 +267,23 @@ void MotionEditorWindow::OnButtonSaveMotion(Fl_Widget* widget, void* data)
 void MotionEditorWindow::OnBrowserMotionList(Fl_Widget* widget, void* data)
 {
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
+	std::string motionName = editor->getCurrentMotionName();
+
 	editor->updateSyncPointsUI();
 	editor->updateMetaDataUI();
+
 	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
 	if (!curMotion)
+	{
+		editor->_checkButtonPlayMotion->deactivate();
+		editor->_sliderMotionFrame->deactivate();
 		return;
+	}
+	else
+	{
+		editor->_checkButtonPlayMotion->activate();
+		editor->_sliderMotionFrame->activate();
+	}
 	double dur = curMotion->getDuration();
 	editor->_sliderMotionFrame->range(0, dur);
 	editor->redraw();

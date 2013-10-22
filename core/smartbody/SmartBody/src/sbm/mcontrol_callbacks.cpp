@@ -122,6 +122,14 @@ using namespace WSP;
 #endif
 
 
+int deprecatedMessage( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )
+{
+	LOG("Command %s has been deprecated.", args.read_remainder_raw());
+	return CMD_FAILURE;
+}
+
+
+
 /*
 
 	PREPROCESSOR: make paths available immediately to inline seq preprocessor

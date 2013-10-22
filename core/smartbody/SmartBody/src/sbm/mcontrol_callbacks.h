@@ -104,6 +104,7 @@ int mcu_echo_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  );
 int sb_main_func( srArgBuffer & args, SmartBody::SBCommandManager* cmdMgr  );
 int sbm_main_func( srArgBuffer & args, SmartBody::SBCommandManager* cmdMgr  );
 int sbm_vhmsg_send_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  );
+int deprecatedMessage( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  );
 
 //////////////////////////////////////////////////////////////////
 #endif
