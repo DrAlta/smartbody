@@ -126,7 +126,15 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 //			return;
 
 	if (currentState == "")
+	{
+		if (paramGroup)
+		{
+			parameterGroup->remove(paramGroup);
+			delete paramGroup;
+			paramGroup = NULL;
+		}
 		return;
+	}
 
 	if (currentState == PseudoIdleState)
 	{

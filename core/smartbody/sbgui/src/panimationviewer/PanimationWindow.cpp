@@ -200,6 +200,8 @@ void PanimationWindow::update_viewer()
 
 void PanimationWindow::show()
 {    
+	refreshUI(characterList, this);
+
 	SmartBody::SBScene::getScene()->addSceneListener(_listener);
     Fl_Double_Window::show();   
 }
