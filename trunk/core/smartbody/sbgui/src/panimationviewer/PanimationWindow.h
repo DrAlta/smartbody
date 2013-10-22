@@ -103,9 +103,9 @@ class PanimationWindow : public Fl_Double_Window, public GenericViewer
 		virtual void show_viewer();
 		virtual void hide_viewer();
 		virtual void update_viewer();
-		void draw();
-        void show(); 
-		void hide();
+		virtual void draw();
+        virtual void show(); 
+		virtual void hide();
 
 		void setCurrentCharacterName(const std::string& name);
 		const std::string& getCurrentCharacterName();

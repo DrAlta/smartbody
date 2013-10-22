@@ -13,6 +13,7 @@
 #include <FL/Fl_Output.H>
 #include <sb/SBCharacter.h>
 #include <sb/SBMotion.h>
+#include <SBWindowListener.h>
 
 namespace SmartBody
 {
@@ -20,36 +21,43 @@ namespace SmartBody
 	class SBMotion;
 }
 
-class MotionEditorWindow : public Fl_Double_Window
+class MotionEditorWindow : public Fl_Double_Window, public SBWindowListener
 {
 public:
 	MotionEditorWindow(int x, int y, int w, int h, char* label);
 	~MotionEditorWindow();
 	
-	void show();
-	void hide();
+	virtual void show();
+	virtual void hide();
 
+	virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
+	virtual void OnCharacterDelete( const std::string & name );
+	virtual void OnCharacterUpdate( const std::string & name );
+	virtual void OnPawnCreate( const std::string & name );
+	virtual void OnPawnDelete( const std::string & name );
+
+	void reloadCharactersAndPawns();
 	void loadCharacters();
 	SmartBody::SBCharacter* getCurrentCharacter();
 	void loadMotions();
-   void loadMotions(const std::string& filterString);
+	void loadMotions(const std::string& filterString);
 	SmartBody::SBMotion* getCurrentMotion();
-   std::string getCurrentCharacterName();
-   std::string getCurrentMotionName();
+	std::string getCurrentCharacterName();
+	std::string getCurrentMotionName();
 
 	static void OnChoiceCharacterList(Fl_Widget* widget, void* data);
 	static void OnButtonRefresh(Fl_Widget* widget, void* data);
 	static void OnButtonSaveMotion(Fl_Widget* widget, void* data);
 	static void OnBrowserMotionList(Fl_Widget* widget, void* data);
-   static void OnButtonQueryAnims(Fl_Widget* widget, void* data);
+	static void OnButtonQueryAnims(Fl_Widget* widget, void* data);
 	static void OnButtonPlayMotion(Fl_Widget* widget, void* data);
-   static void OnButtonSetPosture(Fl_Widget* widget, void* data);
+	static void OnButtonSetPosture(Fl_Widget* widget, void* data);
 	static void OnCheckButtonPlayMotion(Fl_Widget* widget, void* data);
 	static void OnSliderMotionFrame(Fl_Widget* widget, void* data);
 	static void OnButtonPlayMotionFolder(Fl_Widget* widget, void* data);
-   static void OnButtonGazeAt(Fl_Widget* widget, void* data);
-   static void OnButtonStopGaze(Fl_Widget* widget, void* data);
-   static void OnAnimationFilterTextChanged(Fl_Widget* widget, void* data);
+	static void OnButtonGazeAt(Fl_Widget* widget, void* data);
+	static void OnButtonStopGaze(Fl_Widget* widget, void* data);
+	static void OnAnimationFilterTextChanged(Fl_Widget* widget, void* data);
 
 	void updateSyncPointsUI();
 	void updateMotionSyncPoints(const std::string& type);
@@ -62,11 +70,10 @@ public:
 	static void OnBrowserMetaValues(Fl_Widget* widget, void* data);
 	static void OnButtonAddMetaEntry(Fl_Widget* widget, void* data);
 	static void OnButtonDeleteMetaEntry(Fl_Widget* widget, void* data);
-	
 
-   void PlayAnimation(const std::string& characterName, const std::string& animName, bool setAsPosture);
-   void GazeAt(const std::string& characterName, const std::string& gazeTarget);
-   void StopGaze(const std::string& characterName);
+	void PlayAnimation(const std::string& characterName, const std::string& animName, bool setAsPosture);
+	void GazeAt(const std::string& characterName, const std::string& gazeTarget);
+	void StopGaze(const std::string& characterName);
 
 public:
 	// common
@@ -108,10 +115,10 @@ public:
 	Fl_Button*			_buttonAddMetaEntry;
 	Fl_Button*			_buttonDeleteMetaEntry;
 
-   // gaze informations
-   Fl_Choice*			_choiceGazeTargetList;
-   Fl_Button*        _buttonGazeAt;
-   Fl_Button*        _buttonStopGaze;
+	// gaze informations
+	Fl_Choice*			_choiceGazeTargetList;
+	Fl_Button*        _buttonGazeAt;
+	Fl_Button*        _buttonStopGaze;
 
 };
 #endif
