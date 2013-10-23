@@ -493,6 +493,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBAssetHandlerSk.cpp
         ./src/sb/SBAssetHandlerSkm.cpp
 	./src/sb/SBAssetHandlerAsf.cpp
+	./src/sb/SBAssetHandlerAmc.cpp
 	./src/sb/SBAssetHandlerOgre.cpp
 	./src/sb/SBAssetHandlerObj.cpp
 	./src/sb/SBAssetHandlerBvh.cpp
