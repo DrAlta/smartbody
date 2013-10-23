@@ -549,6 +549,11 @@ void BaseWindow::ResetScene()
 	SrCamera* camera = SmartBody::SBScene::getScene()->createCamera("cameraDefault");
 	camera->reset();
 
+	// setup python
+	boost::python::object module = boost::python::import("__main__");
+	scene->setPythonMainModule(module);
+	boost::python::object dict  = module.attr("__dict__");
+	scene->setPythonMainDict(dict);
 	std::string pythonLibPath = SmartBody::SBScene::getSystemParameter("pythonlibpath");
 	setupPython();
 

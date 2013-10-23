@@ -569,6 +569,7 @@ void SBScene::update()
 	// remote mode
 	if (isRemoteMode())
 	{
+		// update client
 		getDebuggerClient()->Update();
 		const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
 		for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
@@ -578,6 +579,13 @@ void SBScene::update()
 			SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
 			pawn->ct_tree_p->evaluate(getSimulationManager()->getTime());
 			pawn->ct_tree_p->applySkeletonToBuffer();
+		}
+
+		// update renderer as listener
+		std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
+		for (size_t i = 0; i < listeners.size(); i++)
+		{
+			listeners[i]->OnSimulationUpdate( );
 		}
 
 		return;
@@ -2932,7 +2940,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 			{
 				// add motion definition
 				strstr << "tempMotion = scene.createMotion(\"" << moName << "\")\n";	
-				strstr << "tempMotion.setEmptyMotion(\"" << motion->getDuration() << ", " << motion->getNumFrames() << ")\n";
+				strstr << "tempMotion.setEmptyMotion(" << motion->getDuration() << ", " << motion->getNumFrames() << ")\n";
 				// add sync points
 				strstr << "tempMotion.setSyncPoint(\"start\"," << motion->getTimeStart() <<")\n";
 				strstr << "tempMotion.setSyncPoint(\"ready\"," << motion->getTimeReady() <<")\n";
@@ -4102,22 +4110,22 @@ float SBScene::queryTerrain( float x, float z, float *normal_p )
 }
 
 #ifndef SB_NO_PYTHON
-void SBScene::setPythonMainModule(boost::python::object pyobject)
+void SBScene::setPythonMainModule(boost::python::object& pyobject)
 {
 	_mainModule = pyobject;
 }
 
-void SBScene::setPythonMainDict(boost::python::object pyobject)
+void SBScene::setPythonMainDict(boost::python::object& pyobject)
 {
 	_mainDict = pyobject;
 }
 
-boost::python::object SBScene::getPythonMainModule()
+boost::python::object& SBScene::getPythonMainModule()
 {
 	return _mainModule;
 }
 
-boost::python::object SBScene::getPythonMainDict()
+boost::python::object& SBScene::getPythonMainDict()
 {
 	return _mainDict;
 }

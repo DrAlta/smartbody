@@ -2047,8 +2047,6 @@ int mcu_vrSpeech_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	
-
 #ifndef SB_NO_PYTHON	
 #ifndef __ANDROID__
 #ifndef __native_client__
@@ -2067,6 +2065,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 
 	std::string returnType = args.read_token();
 	std::string code = args.read_token();
+	//LOG("mcu_sbmdebugger_func code: %s", code.c_str());
 	if (code.size() == 0)
 	{
 		std::stringstream strstr;
@@ -2219,12 +2218,10 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	strstr << instanceId << " " << messageId << " response-fail ";
 	strstr << "Problem executing code." << returnType;
 	SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "sbmdebugger", strstr.str().c_str() );
-	return CMD_FAILURE;
 #endif	
 #endif
 #endif
-	return CMD_SUCCESS;
-
+	return CMD_FAILURE;
 }
 
 /////////////////////////////////////////////////////////////
