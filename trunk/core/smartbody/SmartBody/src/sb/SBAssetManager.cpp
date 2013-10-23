@@ -785,7 +785,7 @@ SBMotion* SBAssetManager::createMotion(const std::string& motionName)
 	std::map<std::string, SBMotion*>::iterator iter = _motions.find(motionName);
 	if (iter != _motions.end())
 	{
-		LOG("Motion named %s already exists, new motion will not be created.");
+		LOG("Motion named %s already exists, new motion will not be created.", motionName.c_str());
 		return NULL;
 	}
 

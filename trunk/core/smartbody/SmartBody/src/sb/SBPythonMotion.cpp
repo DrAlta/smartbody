@@ -132,6 +132,7 @@ void pythonFuncsMotion()
 		.def("getMetaDataTags", &SBMotion::getMetaDataTags, "Get all tag names in the metadata map.")
 		.def("getMotionSkeletonName", &SBMotion::getMotionSkeletonName, boost::python::return_value_policy<boost::python::return_by_value>(),"Get the skeleton associated with this motion.")
 		.def("setMotionSkeletonName", &SBMotion::setMotionSkeletonName, "Set the skeleton associated with this motion.")
+		.def("setEmptyMotion", &SBMotion::setEmptyMotion, "Set this motion to be empty given duration and number of frames")
 		;
 
 }
