@@ -1,6 +1,7 @@
 #include "SBAutoRigManager.h"
 #ifdef WIN32
 #include "pinocchioApi.h"
+#include "VoxelizerWindow.h"
 #endif
 
 #include <vhcl.h>
@@ -10,7 +11,7 @@
 #include <sb/SBAssetManager.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
-#include "VoxelizerWindow.h"
+
 #include <FL/Fl.H>
 
 #ifdef WIN32
