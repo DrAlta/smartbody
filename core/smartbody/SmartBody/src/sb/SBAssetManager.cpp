@@ -23,7 +23,7 @@
 #include <sbm/ParserCOLLADAFast.h>
 #include <sbm/ParserOgre.h>
 #include <sbm/ParserASFAMC.h>
-#include <sbm/ParserBvh.h>
+#include <sbm/ParserBVH.h>
 #include <sbm/ParserFBX.h>
 #include <sbm/lin_win.h>
 #include <sbm/sr_path_list.h>
