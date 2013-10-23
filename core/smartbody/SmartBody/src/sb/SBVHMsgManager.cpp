@@ -87,6 +87,10 @@ void SBVHMsgManager::setEnable(bool val)
 
 bool SBVHMsgManager::isEnable()
 {
+	// if it's remote mode, vhmsg should be enabled no matter what
+	if (SmartBody::SBScene::getScene()->isRemoteMode())
+		return true;
+	
 	return SBService::isEnable();
 }
 
@@ -172,7 +176,7 @@ int SBVHMsgManager::send2( const char *op, const char* message )
 int SBVHMsgManager::send( const char* message )
 {
 #if LINK_VHMSG_CLIENT
-	if( isEnable() )
+	if( isEnable())
 	{
 		int err = vhmsg::ttu_notify1( message );
 		if( err != vhmsg::TTU_SUCCESS )	{

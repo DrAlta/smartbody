@@ -281,6 +281,9 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 {
 	PABlendEditor* editor = (PABlendEditor*) data;
 	int curValue = editor->stateList->value();
+	if (curValue < 0)
+		return;
+
 	editor->loadStates();
 	editor->stateList->value(curValue);
 	editor->stateEditorNleModel->removeAllTracks();
