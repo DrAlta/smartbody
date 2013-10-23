@@ -717,15 +717,15 @@ DeformableMeshInstance::~DeformableMeshInstance()
 }
 
 
-void DeformableMeshInstance::setCharacter(SmartBody::SBCharacter* c)
+void DeformableMeshInstance::setPawn(SmartBody::SBPawn* pawn)
 {
 	if (_skeleton)
 		_skeleton->unref();
-	if (c)
-		_skeleton = c->getSkeleton();
+	if (pawn)
+		_skeleton = pawn->getSkeleton();
 	if (_skeleton)
 		_skeleton->ref();
-	_character = c;
+	_character = dynamic_cast<SmartBody::SBCharacter*>(pawn);
 	updateJointList();
 }
 

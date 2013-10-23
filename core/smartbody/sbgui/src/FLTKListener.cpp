@@ -346,7 +346,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					DeformableMeshInstance* meshInsance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
 					meshInsance->setDeformableMesh(mesh);
 					//meshInsance->setSkeleton(pawn->getSkeleton());	
-					meshInsance->setCharacter(character);
+					meshInsance->setPawn(pawn);
 					
 #if 0
 					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)

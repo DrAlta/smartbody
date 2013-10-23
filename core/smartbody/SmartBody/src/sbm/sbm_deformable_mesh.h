@@ -127,7 +127,7 @@ public:
 	SBAPI virtual ~DeformableMeshInstance();
 	SBAPI virtual void setDeformableMesh(DeformableMesh* mesh);
 	SBAPI void updateJointList();
-	SBAPI virtual void setCharacter(SmartBody::SBCharacter* c);
+	SBAPI virtual void setPawn(SmartBody::SBPawn* pawn);
 	SBAPI virtual void setVisibility(int deformableMesh);
 	SBAPI virtual void setMeshScale(float scale);
 	SBAPI float   getMeshScale() { return _meshScale; }

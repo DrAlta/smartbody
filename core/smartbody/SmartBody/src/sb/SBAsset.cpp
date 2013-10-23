@@ -5,6 +5,7 @@ namespace SmartBody {
 SBAsset::SBAsset()
 {
 	_loaded = false;
+	fullFilePath = "";
 }
 
 SBAsset::~SBAsset()
@@ -25,5 +26,14 @@ void SBAsset::unload()
 {
 }
 
+std::string SBAsset::getFullFilePath()
+{
+	return fullFilePath;
+}
+
+void SBAsset::setFullFilePath( std::string filename )
+{
+	fullFilePath = filename;
+}
 }
 
