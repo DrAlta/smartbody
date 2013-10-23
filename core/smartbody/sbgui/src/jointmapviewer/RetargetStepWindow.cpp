@@ -19,6 +19,7 @@
 #include <autorig/SBAutoRigManager.h>
 #include <boost/filesystem.hpp>
 
+#include <FL/fl_ask.H>
 RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name)
 {	
 	int yDis = 10;
@@ -51,6 +52,8 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	_buttonAutoRig = new Fl_Button(570, yDis, 120, 25, "Apply AutoRig");
 	_buttonAutoRig->callback(ApplyAutoRigCB, this);
 	//_choiceCharacters->callback(CharacterCB,this);
+
+	_buttonVoxelRigging = new Fl_Check_Button(710, yDis, 120, 25, "Voxel Rigging");
 
 	tabGroup = new Fl_Tabs(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
 	//tabGroup->callback(changeTabGroup, this);
@@ -230,7 +233,7 @@ void RetargetStepWindow::setJointMapName( std::string jointMapName )
 }
 
 
-void RetargetStepWindow::applyAutoRig()
+void RetargetStepWindow::applyAutoRig(bool voxelRigging)
 {
 	if (!_choicePawns->text())
 		return;
@@ -240,6 +243,7 @@ void RetargetStepWindow::applyAutoRig()
 	DeformableMeshInstance* meshInstance = sbPawn->dStaticMeshInstance_p;
 	if (!sbPawn || !meshInstance || meshInstance->getDeformableMesh() == NULL)
 	{
+		
 		LOG("AutoRigging Fail : No pawn is selected, or the selected pawn does not contain 3D mesh for rigging.");
 		return;
 	}
@@ -249,6 +253,9 @@ void RetargetStepWindow::applyAutoRig()
 
 	DeformableMesh* mesh = meshInstance->getDeformableMesh();	
 	SrModel& model = mesh->dMeshStatic_p[0]->shape();	
+	
+	SrModel scaleModel = SrModel(model);
+
 	std::string modelName = (const char*) model.name;
 	std::string filebasename = boost::filesystem::basename(modelName);
 	std::string fileextension = boost::filesystem::extension(modelName);
@@ -260,18 +267,21 @@ void RetargetStepWindow::applyAutoRig()
 
 	if (!assetManager->getDeformableMesh(deformMeshName))
 	{			
-		model.scale(meshInstance->getMeshScale()); // resize the verti
-#if 0 // test voxel build
-		autoRigSuccess = autoRigManager.buildAutoRiggingVoxels(model,skelName,deformMeshName);
-		//return;
-#else
-		autoRigSuccess = autoRigManager.buildAutoRigging(model, skelName, deformMeshName);
-#endif
+		//model.scale(meshInstance->getMeshScale()); // resize the vertices
+		float meshScale = meshInstance->getMeshScale();
+		for (int i=0;i<scaleModel.V.size();i++)
+			scaleModel.V[i] *= meshScale;
 
-		model.restoreOriginalVertices(); // reset the vertices back to original size
-		if (!autoRigSuccess)
+		if (voxelRigging)
+			autoRigSuccess = autoRigManager.buildAutoRiggingVoxels(scaleModel,skelName,deformMeshName);
+		else
+			autoRigSuccess = autoRigManager.buildAutoRigging(scaleModel, skelName, deformMeshName);
+
+		if (!autoRigSuccess && !voxelRigging)		
 		{
-			LOG("AutoRigging Fail : The input mesh must be a single component and water tight mesh.");
+			std::string errorMsg = "AutoRigging Fail : The input mesh must be a single component and water tight mesh. Try to enable 'voxelRigging'.";
+			LOG(errorMsg.c_str());
+			fl_alert(errorMsg.c_str());
 			return;
 		}		
 	}
@@ -396,5 +406,6 @@ void RetargetStepWindow::ApplyBehaviorSetCB( Fl_Widget* widget, void* data )
 void RetargetStepWindow::ApplyAutoRigCB( Fl_Widget* widget, void* data )
 {
 	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
-	viewer->applyAutoRig();
+	bool useVoxelRigging = viewer->_buttonVoxelRigging->value();
+	viewer->applyAutoRig(useVoxelRigging);
 }

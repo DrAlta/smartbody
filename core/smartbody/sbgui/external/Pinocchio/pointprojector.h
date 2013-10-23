@@ -28,6 +28,7 @@
 
 struct Vec3Object
 {
+	Vec3Object() {}
     Vec3Object(const Vector3 &inV) : v(inV) {}
     
     Rect3 boundingRect() const { return Rect3(v); }
@@ -39,15 +40,16 @@ struct Vec3Object
 
 struct Tri3Object
 {
-    Tri3Object(const Vector3 &inV1, const Vector3 &inV2, const Vector3 &inV3) : v1(inV1), v2(inV2), v3(inV3) {}
+	Tri3Object() {}
+    Tri3Object(const Vector3 &inV1, const Vector3 &inV2, const Vector3 &inV3, int idx = 0) : v1(inV1), v2(inV2), v3(inV3), triIdx(idx) {}
     
     Rect3 boundingRect() const { return Rect3(v1) | Rect3(v2) | Rect3(v3); }
     double operator[](int i) const { return v1[i] + v2[i] + v3[i]; } //for comparison only, no need to divide by 3
     Vector3 project(const Vector3 &v) const { return projToTri(v, v1, v2, v3); }
-    
+    int triIdx;
     Vector3 v1, v2, v3;
 };
-
+ 
 template<int Dim, class Obj>
 class ObjectProjector
 {
@@ -72,52 +74,59 @@ public:
         initHelper(orders);
     }
 
+	Vec projectObj(const Vec &from, Obj& closestObj) const
+	{
+		double minDistSq = 1e37;
+		Vec closestSoFar;
+
+		int sz = 1;
+		static pair<double, int> todo[10000];
+		todo[0] = make_pair(rnodes[0].rect.distSqTo(from), 0);
+
+		while(sz > 0) {
+			if(todo[--sz].first > minDistSq) {
+				continue;
+			}
+			int cur = todo[sz].second; //the top element that was just popped
+
+			int c1 = rnodes[cur].child1;
+			int c2 = rnodes[cur].child2;
+
+			if(c1 >= 0) { //not a leaf
+				double l1 = rnodes[c1].rect.distSqTo(from);
+				if(l1 < minDistSq)
+					todo[sz++] = make_pair(l1, c1);
+
+				double l2 = rnodes[c2].rect.distSqTo(from);
+				if(l2 < minDistSq)
+					todo[sz++] = make_pair(l2, c2);
+
+				if(sz >= 2 && todo[sz - 1].first > todo[sz - 2].first) {
+					swap(todo[sz - 1], todo[sz - 2]);
+				}
+				if(sz > 9995) {//getting close to our array limit
+					Debugging::out() << "Large todo list, likely to fail" << endl;
+				}
+				continue;
+			}
+
+			//leaf -- consider the object
+			Vec curPt = objs[c2].project(from);
+			double distSq = (from - curPt).lengthsq();
+			if(distSq <= minDistSq) {
+				minDistSq = distSq;
+				closestSoFar = curPt;
+				closestObj = objs[c2];
+			}
+		}
+
+		return closestSoFar;
+	}
+
     Vec project(const Vec &from) const
     {
-        double minDistSq = 1e37;
-        Vec closestSoFar;
-
-        int sz = 1;
-        static pair<double, int> todo[10000];
-        todo[0] = make_pair(rnodes[0].rect.distSqTo(from), 0);
-
-        while(sz > 0) {
-            if(todo[--sz].first > minDistSq) {
-                continue;
-            }
-            int cur = todo[sz].second; //the top element that was just popped
-        
-            int c1 = rnodes[cur].child1;
-            int c2 = rnodes[cur].child2;
-        
-            if(c1 >= 0) { //not a leaf
-                double l1 = rnodes[c1].rect.distSqTo(from);
-                if(l1 < minDistSq)
-                    todo[sz++] = make_pair(l1, c1);
-            
-                double l2 = rnodes[c2].rect.distSqTo(from);
-                if(l2 < minDistSq)
-                    todo[sz++] = make_pair(l2, c2);
-            
-                if(sz >= 2 && todo[sz - 1].first > todo[sz - 2].first) {
-                    swap(todo[sz - 1], todo[sz - 2]);
-                }
-                if(sz > 9995) {//getting close to our array limit
-                    Debugging::out() << "Large todo list, likely to fail" << endl;
-                }
-                continue;
-            }
-
-            //leaf -- consider the object
-            Vec curPt = objs[c2].project(from);
-            double distSq = (from - curPt).lengthsq();
-            if(distSq <= minDistSq) {
-                minDistSq = distSq;
-                closestSoFar = curPt;
-            }
-        }
-
-        return closestSoFar;
+		Obj test;
+		return projectObj(from, test);		       
     };
 
     struct RNode
