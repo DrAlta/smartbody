@@ -169,7 +169,7 @@ brad.setVoice('remote')
 brad.setVoiceCode('MicrosoftAnna')
 # Gesture map setup
 brad.setStringAttribute('gestureMap', 'ChrBrad')
-brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
+brad.setBoolAttribute('gestureRequest.autoGestureTransition', True)
 # Retarget 
 
 # setup locomotion
