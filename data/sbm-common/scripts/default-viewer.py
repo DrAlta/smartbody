@@ -2,7 +2,7 @@ viewer = getViewer()
 if viewer is not None:
 	viewer.show()
 else:
-	return
+	print ''
 
 sscale = 1.0/scene.getScale()
 

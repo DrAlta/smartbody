@@ -222,7 +222,7 @@ brad.setHPR(bradHPR)
 brad.createStandardControllers()
 # deformable mesh
 brad.setDoubleAttribute("deformableMeshScale", .01)
-brad.setStringAttribute("deformableMesh", "ChrBrad")
+brad.setStringAttribute("deformableMesh", "ChrBrad.dae")
 # lip syncing diphone setup
 brad.setStringAttribute("lipSyncSetName", "default")
 brad.setBoolAttribute("usePhoneBigram", True)
@@ -281,7 +281,7 @@ rachel.setHPR(rachelHPR)
 rachel.createStandardControllers()
 # deformable mesh
 rachel.setDoubleAttribute("deformableMeshScale", .01)
-rachel.setStringAttribute("deformableMesh", "ChrRachel")
+rachel.setStringAttribute("deformableMesh", "ChrRachel.dae")
 # lip syncing diphone setup
 rachel.setStringAttribute("lipSyncSetName", "default")
 rachel.setBoolAttribute("usePhoneBigram", True)
