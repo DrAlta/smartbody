@@ -6,6 +6,7 @@
 #include <sb/SBSkeleton.h>
 #include <sbm/action_unit.hpp>
 #include <sbm/lin_win.h>
+#include <sb/SBVHMsgManager.h>
 
 FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name), SBWindowListener()
 {
@@ -209,8 +210,7 @@ void FaceViewer::ResetCB(Fl_Widget* widget, void* data)
 				}
 				else
 				{
-					std::string sendStr = "send sbm " + message;
-					SmartBody::SBScene::getScene()->command(sendStr);
+					SmartBody::SBScene::getScene()->getVHMsgManager()->send2("sbm", message.c_str());
 				}
 			}
 

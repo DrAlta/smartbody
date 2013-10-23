@@ -258,6 +258,9 @@ void PATransitionEditor2::changeState1List(Fl_Widget* widget, void* data)
 	PATransitionEditor2* editor = (PATransitionEditor2*) data;
 	int stateValue = editor->state1List->value();
 	int stateValueP = editor->state2List->value();
+	if (stateValue < 0 || stateValueP < 0)
+		return;
+
 	editor->loadStates();	
 	editor->state1List->value(stateValue);
 	editor->state2List->value(stateValueP);
@@ -320,9 +323,11 @@ void PATransitionEditor2::changeState2List(Fl_Widget* widget, void* data)
 	PATransitionEditor2* editor = (PATransitionEditor2*) data;
 	int stateValue = editor->state2List->value();
 	int stateValueP = editor->state1List->value();
+	if (stateValue < 0 || stateValueP < 0)
+		return;
+
 	editor->loadStates();
-	SmartBody::SBAnimationBlend* state2 = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(editor->state2List->menu()[stateValue].label());
-	
+	SmartBody::SBAnimationBlend* state2 = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(editor->state2List->text(stateValue));
 	editor->state2List->value(stateValue);
 	editor->state1List->value(stateValueP);
 	editor->state2AnimationList->clear();
