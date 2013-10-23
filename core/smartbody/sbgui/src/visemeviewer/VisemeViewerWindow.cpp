@@ -791,46 +791,48 @@ void VisemeViewerWindow::loadAudioFiles()
 	if (getUseRemote())
 		return;
 
+
+	_choiceAudioFile->clear();
 	// if an audio path is present, use it
 	bool useAudioPaths = true;
 	std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
 	std::string relativeAudioPath = "";
-	if (audioPaths.size() > 0)
-		relativeAudioPath = audioPaths[0];
-
-	boost::filesystem::path p(relativeAudioPath);
-	p /= character->getVoiceCode();
+	for (size_t audioPathCounter = 0; audioPathCounter < audioPaths.size(); ++audioPathCounter)
+	{
+		relativeAudioPath = audioPaths[audioPathCounter];
+		boost::filesystem::path p(relativeAudioPath);
+		p /= character->getVoiceCode();
 
 #if (BOOST_VERSION > 104400)
-	boost::filesystem::path abs_p = boost::filesystem::absolute( p );	
-	if( !boost::filesystem::exists( abs_p ))
+		boost::filesystem::path abs_p = boost::filesystem::absolute( p );	
+		if( !boost::filesystem::exists( abs_p ))
 #else
-	boost::filesystem::path abs_p = boost::filesystem::complete( p );	
-	if( !boost::filesystem2::exists( abs_p ))
+		boost::filesystem::path abs_p = boost::filesystem::complete( p );	
+		if( !boost::filesystem2::exists( abs_p ))
 #endif
-	{
-//		LOG( "VisemeViewerWindow::loadAudioFiles: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
-		return;
-	}
-	_choiceAudioFile->clear();
-	boost::filesystem::directory_iterator end;
-	for( boost::filesystem::directory_iterator i(abs_p); i!=end; ++i ) 
-	{
-		const boost::filesystem::path& cur = *i;
-		if (boost::filesystem::is_directory(cur)) 
 		{
-			;	
-		} 
-		else 
+			//LOG( "VisemeViewerWindow::loadAudioFiles: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+			continue;
+		}
+		boost::filesystem::directory_iterator end;
+		for( boost::filesystem::directory_iterator i(abs_p); i!=end; ++i ) 
 		{
-			std::string ext = boost::filesystem::extension(cur);
-			if (_stricmp(ext.c_str(), ".bml" ) == 0)
+			const boost::filesystem::path& cur = *i;
+			if (boost::filesystem::is_directory(cur)) 
 			{
+				;	
+			} 
+			else 
+			{
+				std::string ext = boost::filesystem::extension(cur);
+				if (_stricmp(ext.c_str(), ".bml" ) == 0)
+				{
 #if (BOOST_VERSION > 104400)
-				_choiceAudioFile->add(cur.stem().string().c_str());
+					_choiceAudioFile->add(cur.stem().string().c_str());
 #else
-				_choiceAudioFile->add(cur.stem().c_str());
+					_choiceAudioFile->add(cur.stem().c_str());
 #endif
+				}
 			}
 		}
 	}
