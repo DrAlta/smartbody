@@ -15,11 +15,12 @@ class SBAsset : public SBObject
 		SBAPI bool isLoaded();
 		SBAPI void load();
 		SBAPI void unload();
+		SBAPI std::string getFullFilePath();
+		SBAPI void setFullFilePath(std::string filename);
 
 	protected:
 		bool _loaded;
-
-		
+		std::string fullFilePath;		
 };
 
 }

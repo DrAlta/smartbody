@@ -493,6 +493,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 		std::vector<SBAsset*> assets = assetHandler->getAssets(finalPath);
 		for (size_t a = 0; a < assets.size(); a++)
 		{
+			assets[a]->setFullFilePath(finalPath);
 			allAssets.push_back(assets[a]);
 		}
 	}
