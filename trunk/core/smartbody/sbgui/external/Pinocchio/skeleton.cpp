@@ -231,10 +231,11 @@ SmartBodySkeleton::SmartBodySkeleton()
 
 	setFoot("ltoe");
 	setFoot("rtoe");
-
+	
 	setFat("hips");
 	setFat("shoulders");
 	setFat("head");
+	//setFat("skullbase");
 }
 
 QuadSkeleton::QuadSkeleton()

@@ -27,7 +27,7 @@ public:
 	//void setSkeletonName(std::string skName);
 	void setJointMapName(std::string jointMapName);
 	void applyRetargetSteps();
-	void applyAutoRig();
+	void applyAutoRig(bool voxelRigging = false);
 
 	void updateCharacterList();
 	void updatePawnList();
@@ -55,6 +55,7 @@ protected:
 	Fl_Button* _buttonApplyAll;
 	Fl_Button* _buttonCancel;
 	Fl_Button* _buttonRefresh;
+	Fl_Check_Button* _buttonVoxelRigging;
 	std::string _charName;
 };
 

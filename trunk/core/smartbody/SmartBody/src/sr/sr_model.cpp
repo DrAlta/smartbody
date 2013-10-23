@@ -674,7 +674,8 @@ void SrModel::recalculateVertices()
 
 	int i, s=V.size();
 	for ( i=0; i<s; i++ ) 
-		V[i] = (VOrig[i] * _scale * finalRot) + _translation;
+		V[i] = ((VOrig[i] + _translation) * _scale * finalRot);
+		//V[i] = (VOrig[i] * _scale * finalRot) + _translation;
 }
 
 
@@ -706,8 +707,8 @@ void SrModel::normalize ( float maxcoord )
    p.z = SR_MAX(box.a.z,box.b.z);
 
    float maxactual = SR_MAX3(p.x,p.y,p.z);
-
-   scale ( maxcoord/maxactual );  // Now we normalize to get the desired radius
+   float resizeScale = maxcoord/maxactual;   
+   scale ( resizeScale );  // Now we normalize to get the desired radius
  }
 
 struct VertexNode : public SrTreeNode // only internally used

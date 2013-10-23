@@ -73,6 +73,7 @@ public:
 
     Mesh deform(const Mesh &mesh, const vector<Transform<> > &transforms) const;
     Vector<double, -1> getWeights(int i) const;
+	vector<Vector<double, -1> >& getAllWeights();
 private:
     AttachmentPrivate *a;
 };

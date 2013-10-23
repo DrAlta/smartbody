@@ -216,6 +216,7 @@ public:
 
     Vector<double, -1> getWeights(int i) const { return weights[i]; }
 
+	vector<Vector<double, -1> >& getAllWeights() { return weights; }
     AttachmentPrivate *clone() const
     {
         AttachmentPrivate1 *out = new AttachmentPrivate1();
@@ -249,4 +250,12 @@ Mesh Attachment::deform(const Mesh &mesh, const vector<Transform<> > &transforms
 Attachment::Attachment(const Mesh &mesh, const Skeleton &skeleton, const vector<Vector3> &match, const VisibilityTester *tester)
 {
     a = new AttachmentPrivate1(mesh, skeleton, match, tester);
+}
+
+vector<Vector<double, -1> >& Attachment::getAllWeights()
+{
+	if (!a)
+		a = new AttachmentPrivate1();
+	AttachmentPrivate1* aprivate = dynamic_cast<AttachmentPrivate1*>(a);
+	return aprivate->getAllWeights();	
 }

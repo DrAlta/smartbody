@@ -35,6 +35,9 @@ struct PinocchioOutput
 //see the implementation of this function to find out how to use the individual functions
 PinocchioOutput PINOCCHIO_API autorig(const Skeleton &given, const Mesh &m);
 
+// use voxel mesh for auto rigging, then transfer the attachment weight to original mesh
+PinocchioOutput PINOCCHIO_API autorigVoxelTransfer(const Skeleton &given, Mesh &voxelMesh, Mesh& origMesh); 
+
 //============================================individual steps=====================================
 
 //fits mesh inside unit cube, makes sure there's exactly one connected component
