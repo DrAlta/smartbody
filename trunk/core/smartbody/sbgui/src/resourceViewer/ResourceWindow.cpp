@@ -191,7 +191,7 @@ bool ResourceWindow::processedDragAndDrop( std::string& dndText )
 	std::string fullPath = dndPath.parent_path().string();
 	
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
-	assetManager->loadAsset(dndText);
+	assetManager->loadAssetsFromPath(dndText);
 	updateGUI();
 	return true;
 }
@@ -514,6 +514,12 @@ void ResourceWindow::updateGUI()
 	}			
 
 	_dirty = false;
+
+	if (_firstTime)
+	{
+		hideTree();
+		_firstTime = false;
+	}
 }
 
 
@@ -635,9 +641,9 @@ void ResourceWindow::updatePath( Fl_Tree_Item* tree, const std::vector<std::stri
 void ResourceWindow::updateScriptFiles( Fl_Tree_Item* tree, std::string pname )
 {	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string>& scriptPaths = scene->getAssetManager()->getAssetPaths("script");
+	const std::vector<std::string>& scriptPaths = scene->getAssetManager()->getAssetPaths("script");
 	
-	for (std::vector<std::string>::iterator pathIter = scriptPaths.begin();
+	for (std::vector<std::string>::const_iterator pathIter = scriptPaths.begin();
 		 pathIter != scriptPaths.end(); 
 		 pathIter++)
 	{
@@ -937,9 +943,10 @@ void ResourceWindow::OnPawnDelete( const std::string & name )
 	_dirty = true;
 }
 
-void ResourceWindow::OnReset()
+void ResourceWindow::OnSimulationStart()
 {
 	_dirty = true;
+	_firstTime = true;
 }
 
 int ResourceWindow::addSpecialName(const std::string& name)
@@ -970,3 +977,28 @@ void ResourceWindow::removeSpecialName(const std::string& name)
 	
 	}
 }
+
+void ResourceWindow::hideTree()
+{
+	// show only top-level items
+	Fl_Tree_Item* root = resourceTree->first();
+	int numChildren = root->children();
+	for (int c = 0; c < numChildren; c++)
+	{
+		Fl_Tree_Item* item = root->child(c);
+		item->close();
+	}
+}
+
+void ResourceWindow::showTree()
+{
+	// show everything under the top-level items
+	Fl_Tree_Item* root = resourceTree->first();
+	int numChildren = root->children();
+	for (int c = 0; c < numChildren; c++)
+	{
+		Fl_Tree_Item* item = root->child(c);
+		item->open();
+	}
+}
+
