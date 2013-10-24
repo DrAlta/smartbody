@@ -1152,6 +1152,12 @@ void SBScene::removeCharacter(const std::string& charName)
 			listeners[i]->OnCharacterDelete( name);
 		}
 
+		if ( character->bonebusCharacter )
+		{
+			this->getBoneBusManager()->getBoneBus().DeleteCharacter(  character->bonebusCharacter );
+			character->bonebusCharacter = NULL;
+		}
+
 		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(name);
 		if (iter != _pawnMap.end())
 		{

@@ -382,17 +382,6 @@ int SbmPawn::prune_controller_tree() {
 SbmPawn::~SbmPawn()	{
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	
-	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
-	for (size_t i = 0; i < listeners.size(); i++)
-	{
-		listeners[i]->OnCharacterDelete( getName() );
-	}
-
-	if ( bonebusCharacter )
-	{		
-		bonebusCharacter = NULL;
-	}
 
 	if ( world_offset_writer_p )
 		world_offset_writer_p->unref();
