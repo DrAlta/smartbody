@@ -262,18 +262,6 @@ SbmCharacter::~SbmCharacter( void )	{
 	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	
-	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
-	for (size_t i = 0; i < listeners.size(); i++)
-	{
-		listeners[i]->OnCharacterDelete( getName() );
-	}
-
-	if ( bonebusCharacter )
-	{
-		scene->getBoneBusManager()->getBoneBus().DeleteCharacter( bonebusCharacter );
-		bonebusCharacter = NULL;
-	}
-
 	if( viseme_history_arr )	{
 		delete [] viseme_history_arr;
 		viseme_history_arr = NULL;

@@ -103,6 +103,15 @@ void AttributeEditor::draw()
 	{
 		updateGUI();
 	}
+	// make sure the object still exists
+	if (_currentSelection != "")
+	{
+		SmartBody::SBObject* object = SmartBody::SBScene::getScene()->getObjectFromString(_currentSelection);
+		if (!object)
+		{
+			OnDeselect(_currentSelection);
+		}
+	}
 	Fl_Group::draw();
 }
 
@@ -307,6 +316,7 @@ void AttributeEditor::removeCurrentWidget()
 	if (_currentWidget)
 	{
 		this->remove(_currentWidget);
+		delete _currentWidget;
 		_currentWidget = NULL;
 	}
 }
