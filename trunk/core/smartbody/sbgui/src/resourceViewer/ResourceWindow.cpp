@@ -629,9 +629,9 @@ void ResourceWindow::updatePath( Fl_Tree_Item* tree, const std::vector<std::stri
 void ResourceWindow::updateScriptFiles( Fl_Tree_Item* tree, std::string pname )
 {	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string>& scriptPaths = scene->getAssetManager()->getAssetPaths("script");
+	const std::vector<std::string>& scriptPaths = scene->getAssetManager()->getAssetPaths("script");
 	
-	for (std::vector<std::string>::iterator pathIter = scriptPaths.begin();
+	for (std::vector<std::string>::const_iterator pathIter = scriptPaths.begin();
 		 pathIter != scriptPaths.end(); 
 		 pathIter++)
 	{

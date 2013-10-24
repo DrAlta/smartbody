@@ -122,6 +122,7 @@ set( SBM_FLTK_SRC
 	./src/ExportWindow.cpp
 	./src/fltk_viewer.cpp
 	./src/SBWindowListener.cpp
+	./src/SBSelectionManager.cpp
 	${OGRE_SRCS}
 	./src/pic.cpp
 	./src/ppm.cpp
@@ -174,6 +175,7 @@ set( SBM_FLTK_SRC
 	./src/resourceViewer/TreeItemInfoWidget.cpp
 	./src/resourceViewer/ResourceWindow.cpp
 	./src/resourceViewer/TreeInfoObject.cpp
+	./src/resourceViewer/AttributeEditor.cpp
 
 	./src/visemeviewer/VisemeCurve.cpp
 	./src/visemeviewer/VisemeCurveEditor.cpp
