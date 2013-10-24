@@ -286,8 +286,6 @@ void OgreListener::OnChannel( const std::string & name, const std::string & chan
 
 }
 
-void OgreListener::OnReset()
+void OgreListener::OnSimulationStart()
 {
-	delete ogreInterface->getSceneManager();
-
 }

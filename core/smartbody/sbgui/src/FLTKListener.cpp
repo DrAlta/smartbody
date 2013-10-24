@@ -198,10 +198,6 @@ void FLTKListener::OnChannel( const std::string & name, const std::string & chan
 {
 }
 
-void FLTKListener::OnReset()
-{
-}
-
 void FLTKListener::notify(SmartBody::SBSubject* subject)
 {
 	SmartBody::SBScene* scene =	SmartBody::SBScene::getScene();

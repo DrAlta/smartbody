@@ -76,10 +76,6 @@ void PanimationWindowListener::OnPawnDelete( const std::string & name )
 {
 }
 
-void PanimationWindowListener::OnReset()
-{
-}
-
 void PanimationWindowListener::OnSimulationStart()
 {
 }

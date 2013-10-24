@@ -990,7 +990,7 @@ void ChannelBufferWindow::OnCharacterUpdate( const std::string & name )
 	}
 }
  
-void ChannelBufferWindow::OnReset()
+void ChannelBufferWindow::OnSimulationStart()
 {
 	character->value(0);
 	clearChannelItem(this);

@@ -389,10 +389,6 @@ void FaceViewer::OnCharacterUpdate( const std::string & name )
 	OnCharacterCreate(name, "");
 }
 
-void FaceViewer::OnReset()
-{
-}
-
 void FaceViewer::OnSimulationUpdate()
 {
 	updateGUI();

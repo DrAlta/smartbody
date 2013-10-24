@@ -27,7 +27,6 @@ class FaceViewer : public GenericViewer, public Fl_Double_Window, public SBWindo
 		virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
 		virtual void OnCharacterDelete( const std::string & name );
 		virtual void OnCharacterUpdate( const std::string & name );
-		virtual void OnReset();
 		virtual void OnSimulationUpdate();
 
 

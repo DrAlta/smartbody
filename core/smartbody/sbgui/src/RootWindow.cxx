@@ -253,7 +253,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	_mainGroup = new Fl_Group(0, curY, w - 20, h - curY, "");
 	_mainGroup->begin();
 
-	_leftGroup = new Fl_Group(0, curY, w - 640, h - curY);
+	_leftGroup = new Fl_Group(0, curY, 384, h - curY);
 
 	// add the outliner
 	int outlinerWidth = 384;
@@ -563,8 +563,12 @@ void BaseWindow::ResetScene()
 	{
 		scene->addSceneListener(listeners[l]);
 	}
-	
 
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnSimulationStart();
+	}
+	
 	SmartBody::SBScene::getScene()->setViewer(this);
 	SmartBody::SBScene::getScene()->getViewer()->root(SmartBody::SBScene::getScene()->getRootGroup());
 	SbmShaderManager::singleton().setViewer(this);
