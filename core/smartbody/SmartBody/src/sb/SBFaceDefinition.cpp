@@ -19,6 +19,7 @@ SBFaceDefinition::SBFaceDefinition(const std::string& name)
 {
 	_faceNeutral = NULL;
 	_name = name;
+	setName(name);
 }
 
 SBFaceDefinition::SBFaceDefinition(SBFaceDefinition* source)

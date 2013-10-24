@@ -45,7 +45,7 @@ void MeCtBlendEngine::init(const std::string& paramFuncType)
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		MeCtIKTreeNode* node = nodeList[i];
-		SmartBody::SBJoint* joint = skeletonCopy->getJointByName(node->nodeName.c_str());		
+		SmartBody::SBJoint* joint = skeletonCopy->getJointByName(node->getNodeName());		
 		affectedJoints.push_back(joint);			
 	}
 

@@ -59,7 +59,7 @@ void TransparentListener::OnCharacterCreate( const std::string & name, const std
 	#endif
 	//SmartBody::SBSkeleton* sbSkel = character->getSkeleton();	
 	//character->dMeshInstance_p->setSkeleton(sbSkel);
-	character->dMeshInstance_p->setCharacter(character);
+	character->dMeshInstance_p->setPawn(character);
 }
 
 void TransparentListener::OnCharacterDelete( const std::string & name )

@@ -160,6 +160,7 @@ void MeCtConstraint::updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>
 	SrBuffer<float>& buffer = frame.buffer();
 	int count = 0;
 
+#if 0
 	BOOST_FOREACH(SrQuat& quat, quatList)
 	{
 		int index = frame.toBufferIndex(_toContextCh[count++]);	
@@ -188,6 +189,44 @@ void MeCtConstraint::updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>
 			}
 		}				
 	}	
+#else
+	const IKTreeNodeList& nodeList = ik_scenario.ikTreeNodes;		
+	BOOST_FOREACH(SrQuat& quat, quatList)
+	{
+		int chanId;
+		int index;
+		SkJoint* joint = nodeList[count++]->joint;
+		chanId = _context->channels().search(joint->getMappedJointName(), SkChannel::Quat);
+		if (chanId < 0)
+			continue;
+
+		index = _context->toBufferIndex(chanId);
+		if (index < 0 )
+		{
+			if (bRead)
+			{
+				quat = SrQuat();
+			}
+		}
+		else
+		{
+			if (bRead)
+			{
+				quat.w = buffer[index] ;
+				quat.x = buffer[index + 1] ;
+				quat.y = buffer[index + 2] ;
+				quat.z = buffer[index + 3] ;			
+			}
+			else
+			{
+				buffer[index] = quat.w;
+				buffer[index + 1] = quat.x;
+				buffer[index + 2] = quat.y;
+				buffer[index + 3] = quat.z;
+			}
+		}			
+	}
+#endif
 }
 
 
@@ -344,7 +383,7 @@ bool MeCtConstraint::addEffectorJointPair( SmartBody::SBJoint* targetJoint, cons
 	std::string rootName = effectorRootName;
 
 	if (!rootNode)
-		rootName = ik_scenario.ikTreeRoot->nodeName;
+		rootName = ik_scenario.ikTreeRoot->getNodeName();
 
 	// separate position & rotation constraint
 	//ConstraintList& jEffectorList = (cType == CONSTRAINT_ROT) ? rotConstraint : posConstraint;

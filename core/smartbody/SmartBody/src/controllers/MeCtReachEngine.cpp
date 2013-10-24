@@ -169,7 +169,7 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		MeCtIKTreeNode* node = nodeList[i];
-		SmartBody::SBJoint* joint = skeletonCopy->getJointByName(node->nodeName);		
+		SmartBody::SBJoint* joint = skeletonCopy->getJointByName(node->getNodeName());		
 		SkJointQuat* skQuat = joint->quat();		
 		affectedJoints.push_back(joint);			
 	}		

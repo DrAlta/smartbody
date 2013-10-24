@@ -275,13 +275,12 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 
 				// a hack to also transition the IK post-processing results from/to pseudo-idle pose
 				float currentTrajBlendWeight = character->getJointTrajBlendWeight();
-
-				if (curStateData->getStateName() == PseudoIdleState && currentTrajBlendWeight == 0.f) // transition from idle pose, and poseture doesn't provide IK traj
+				if (curStateData->getStateName() == PseudoIdleState)// && currentTrajBlendWeight == 0.f) // transition from idle pose, and poseture doesn't provide IK traj
 				{	
 					character->setJointTrajBlendWeight(1.f - transitionManager->getCurrentTransitionWeight());										
 					updateJointTrajectory(nextStateData);	
 				}
-				else if (nextStateData->getStateName() == PseudoIdleState && currentTrajBlendWeight == 0.f) // transition to idle pose, and poseture doesn't provide IK traj
+				else if (nextStateData->getStateName() == PseudoIdleState)// && currentTrajBlendWeight == 0.f) // transition to idle pose, and poseture doesn't provide IK traj
 				{
 					character->setJointTrajBlendWeight(transitionManager->getCurrentTransitionWeight());	
 					updateJointTrajectory(curStateData);	
@@ -1075,9 +1074,9 @@ void MeCtParamAnimation::updateMotionFrame( BodyMotionFrame& motionFrame, MeCtIK
 	{
 		int chanId[3];
 		int buffId[3];
-		chanId[0] = _context->channels().search(rootNode->nodeName.c_str(), SkChannel::XPos);
-		chanId[1] = _context->channels().search(rootNode->nodeName.c_str(), SkChannel::YPos);
-		chanId[2] = _context->channels().search(rootNode->nodeName.c_str(), SkChannel::ZPos);
+		chanId[0] = _context->channels().search(rootNode->getNodeName().c_str(), SkChannel::XPos);
+		chanId[1] = _context->channels().search(rootNode->getNodeName().c_str(), SkChannel::YPos);
+		chanId[2] = _context->channels().search(rootNode->getNodeName().c_str(), SkChannel::ZPos);
 		for (int k=0;k<3;k++)
 		{
 			if (chanId[k] < 0)
@@ -1097,7 +1096,7 @@ void MeCtParamAnimation::updateMotionFrame( BodyMotionFrame& motionFrame, MeCtIK
 		MeCtIKTreeNode* node = nodeList[i];
 		JointChannelId chanId;
 		JointChannelId buffId;
-		chanId.q = _context->channels().search(node->nodeName.c_str(), SkChannel::Quat);
+		chanId.q = _context->channels().search(node->getNodeName().c_str(), SkChannel::Quat);
 		if (chanId.q < 0)
 			continue;
 		buffId.q = _context->toBufferIndex(chanId.q);
