@@ -330,9 +330,9 @@ void PathItemInfoWidget::addDirectory( const char* dirName )
 std::string PathItemInfoWidget::getTypeParameter( int type )
 {
 	std::string paraType = "script";
+/*
 	switch (type)
 	{
-		/*
 	case ResourceWindow::ITEM_SEQ_PATH :
 		paraType = "script";
 		break;
@@ -345,8 +345,8 @@ std::string PathItemInfoWidget::getTypeParameter( int type )
 	case ResourceWindow::ITEM_MESH_PATH :
 		paraType = "mesh";
 		break;
-	*/
 	}
+*/
 	return paraType;
 }
 
