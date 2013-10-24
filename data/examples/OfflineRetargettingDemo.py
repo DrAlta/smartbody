@@ -26,7 +26,7 @@ targetPos = SrVec(-50, 102, 0)
 target.setPosition(targetPos)
 target.createStandardControllers()
 target.setDoubleAttribute('deformableMeshScale', 1)
-target.setStringAttribute('deformableMesh', 'brad')
+target.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 bml.execBML('target', '<body posture="HandsAtSide_Motex"/>')
 
 source = scene.createCharacter('source', '')

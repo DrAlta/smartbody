@@ -343,7 +343,7 @@ rachel2.setHPR(rachel2HPR)
 rachel2.createStandardControllers()
 # deformable mesh
 rachel2.setDoubleAttribute("deformableMeshScale", .01)
-rachel2.setStringAttribute("deformableMesh", "ChrRachel")
+rachel2.setStringAttribute("deformableMesh", "ChrRachel.dae")
 # lip syncing diphone setup
 rachel2.setStringAttribute("diphoneSetName", "default")
 rachel2.setBoolAttribute("useDiphone", True)
@@ -369,6 +369,10 @@ steerManager = scene.getSteerManager()
 steerManager.setEnable(False)
 brad.setBoolAttribute("steering.pathFollowingMode", True)
 rachel.setBoolAttribute("steering.pathFollowingMode", True)
+
+brad.setStringAttribute("displayType", "GPUmesh")
+rachel.setStringAttribute("displayType", "GPUmesh")
+rachel2.setStringAttribute("displayType", "GPUmesh")
 
 #scene.run("runNVBG.py")
 # start the simulation

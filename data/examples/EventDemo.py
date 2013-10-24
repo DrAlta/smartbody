@@ -243,7 +243,7 @@ brad.setVoice('remote')
 brad.setVoiceCode('MicrosoftAnna')
 # Gesture map setup
 brad.setStringAttribute('gestureMap', 'ChrBrad')
-brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
+brad.setBoolAttribute('gestureRequest.autoGestureTransition', True)
 # Idle pose
 bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
 
@@ -266,12 +266,12 @@ rachel.setVoice('remote')
 rachel.setVoiceCode('MicrosoftAnna')
 # Gesture map setup
 rachel.setStringAttribute('gestureMap', 'ChrRachel')
-rachel.setBoolAttribute('bmlRequest.autoGestureTransition', True)
+rachel.setBoolAttribute('gestureRequest.autoGestureTransition', True)
 # Idle pose
 bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 
 # Turning on deformable GPU
-brad.getCharacter("ChrBrad").setStringAttribute("displayType", "GPUmesh")
+brad.setStringAttribute("displayType", "GPUmesh")
 rachel.setStringAttribute("displayType", "GPUmesh")
 
 
