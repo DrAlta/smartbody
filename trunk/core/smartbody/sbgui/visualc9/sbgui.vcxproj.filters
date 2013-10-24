@@ -304,8 +304,11 @@
     <ClCompile Include="..\src\SBWindowListener.cpp">
       <Filter>viewer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\autorig\VoxelizerWindow.cpp">
-      <Filter>autorig</Filter>
+    <ClCompile Include="..\src\SBSelectionManager.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\resourceViewer\AttributeEditor.cpp">
+      <Filter>resourceViewer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -557,11 +560,14 @@
     <ClInclude Include="..\src\autorig\SBAutoRigManager.h">
       <Filter>autorig</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\autorig\VoxelizerWindow.h">
-      <Filter>autorig</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\SBWindowListener.h">
       <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SBSelectionManager.h">
+      <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\resourceViewer\AttributeEditor.h">
+      <Filter>resourceViewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

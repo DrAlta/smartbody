@@ -19,10 +19,8 @@ class SkJoint;
 class TreeItemInfoWidget : public Fl_Group
 {
 public:
-	TreeItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type);
-protected:
-	Fl_Tree_Item* treeItem;
-	int           itemType;
+	TreeItemInfoWidget(int x, int y, int w, int h, const char* name);
+
 public:
 	virtual void updateWidget() {};	
 };
@@ -39,7 +37,7 @@ protected:
 	std::string      skeletonName;
 	std::string      charName;
 public:
-	SkeletonItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
+	SkeletonItemInfoWidget( const std::string& characterName, int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow = NULL);
 	virtual void updateWidget();
 	void updateJointAttributes(std::string jointName);
 	static void treeCallBack(Fl_Widget* widget, void* data);
@@ -60,7 +58,7 @@ protected:
 	int              motionFrame;
 	int              channelIndex;
 public:
-	MotionItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
+	MotionItemInfoWidget(int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow = NULL);
 	virtual void updateWidget();
 	void updateChannelAttributes();
 	void setMotionFrame(int frame) { motionFrame = frame; }
@@ -72,7 +70,7 @@ public:
 class PathItemInfoWidget : public TreeItemInfoWidget
 {
 public:
-	PathItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow);
+	PathItemInfoWidget(int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow);
 	static void addDirectoryCallback(Fl_Widget* widget, void* data);
 	void addDirectory(const char* dirName );
 protected:
@@ -88,7 +86,7 @@ protected:
 	TreeInfoObject* blendInfoObject;
 	std::string blendName;
 public:
-	AnimationBlendInfoWidget(SmartBody::SBAnimationBlend* blend, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow);	
+	AnimationBlendInfoWidget(SmartBody::SBAnimationBlend* blend, int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow);	
 	virtual void updateWidget();
 };
 
@@ -99,7 +97,7 @@ protected:
 	TreeInfoObject* transitionInfoObject;
 	std::string transitionName;
 public:
-	BlendTransitionInfoWidget(SmartBody::SBAnimationTransition* blend, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow);	
+	BlendTransitionInfoWidget(SmartBody::SBAnimationTransition* blend, int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow);	
 	virtual void updateWidget();
 };
 
@@ -113,7 +111,7 @@ protected:
 	Fl_Button*          runSeqButton;
 	Fl_Button*          editSeqButton;
 public:
-	SeqItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
+	SeqItemInfoWidget(int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow = NULL);
 	static void runSeqCallback(Fl_Widget* widget, void* data);
 	static void editSeqCallback(Fl_Widget* widget, void* data);
 	virtual void updateWidget();
@@ -129,7 +127,7 @@ protected:
 	TreeInfoObject* eventInfoObject;
 	std::string     eventName;
 public:
-	EventItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
+	EventItemInfoWidget(int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow = NULL);
 	static void addEventCallback(Fl_Widget* widget, void* data);
 	void addNewEvent();
 	void removeEvent();
@@ -142,7 +140,7 @@ public:
 class PawnItemInfoWidget : public TreeItemInfoWidget, public SmartBody::SBObserver
 {
 public:
-	PawnItemInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SBObserver* observerWindow = NULL);	
+	PawnItemInfoWidget(int x, int y, int w, int h, const char* name, SBObserver* observerWindow = NULL);	
 	~PawnItemInfoWidget();
 	virtual void updateWidget();
 	virtual void notify(SmartBody::SBSubject* subject);
@@ -158,7 +156,7 @@ protected:
 	AttributeWindow* attrWindow;
 	SmartBody::SBObject*         infoObject;
 public:
-	AttributeItemWidget(SmartBody::SBObject* object, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
+	AttributeItemWidget(SmartBody::SBObject* object, int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow = NULL);
 	~AttributeItemWidget();
 
 	virtual void updateWidget();
@@ -171,7 +169,7 @@ protected:
 	SmartBody::SBObject*         infoObject1;
 	SmartBody::SBObject*         infoObject2;
 public:
-	DoubleAttributeItemWidget(SmartBody::SBObject* object1, SmartBody::SBObject* object2, int x, int y, int w, int h, int ySep, const char* name1, const char* name2, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow = NULL);
+	DoubleAttributeItemWidget(SmartBody::SBObject* object1, SmartBody::SBObject* object2, int x, int y, int w, int h, int ySep, const char* name1, const char* name2, SmartBody::SBObserver* observerWindow = NULL);
 	~DoubleAttributeItemWidget();
 
 	virtual void updateWidget();
@@ -186,7 +184,7 @@ protected:
 	std::vector<SmartBody::SBObject*> infoObjectList;	
 	std::vector<std::string> attrNameList;
 public:
-	MultiAttributeItemWidget(std::vector<SmartBody::SBObject*>& objectList, int x, int y, int w, int h, int yStep, const char* name, std::vector<std::string>& objectNameList, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow /*= NULL*/ );
+	MultiAttributeItemWidget(std::vector<SmartBody::SBObject*>& objectList, int x, int y, int w, int h, int yStep, const char* name, std::vector<std::string>& objectNameList, SmartBody::SBObserver* observerWindow /*= NULL*/ );
 	~MultiAttributeItemWidget();
 
 	virtual void updateWidget();

@@ -12,6 +12,7 @@
 #include <sb/SBSceneListener.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBJointMap.h>
+#include <sb/SBGestureMap.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationTransition.h>
 #include <sbm/GenericViewer.h>
@@ -20,6 +21,8 @@
 #include "Fl_Tree_Horizontal.h" // a custom tree widget with horizontal scroll bar
 #include "TreeItemInfoWidget.h"
 #include "TreeInfoObject.h"
+#include <SBSelectionManager.h>
+#include <SBWindowListener.h>
 
 class srPathList;
 class BoneMap;
@@ -27,69 +30,16 @@ class EventHandler;
 
 class ResourceWindow;
 
-class ResourceWindowListener : public SmartBody::SBSceneListener
+class ResourceWindow : public Fl_Group, public SmartBody::SBObserver, public SBWindowListener, public SelectionListener
 {
 	public:
-		ResourceWindowListener(ResourceWindow* window);
-
-		virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
-		virtual void OnCharacterDelete( const std::string & name );
-		virtual void OnCharacterUpdate( const std::string & name );
-      
-		virtual void OnPawnCreate( const std::string & name );
-		virtual void OnPawnDelete( const std::string & name );
-
-		virtual void OnReset();
-
-		virtual void OnSimulationStart();
-		virtual void OnSimulationEnd();
-		virtual void OnSimulationUpdate();
-	
-	private:
-		ResourceWindow* _window;
-
-};
-
-class ResourceWindow : public Fl_Double_Window, public GenericViewer, public SmartBody::SBObserver
-{
-	public:
-		enum {
-			   ITEM_SCENE = 0,
-			   ITEM_SERVICES,			   
-			   ITEM_SEQ_PATH, 
-			   ITEM_ME_PATH, 
-			   ITEM_AUDIO_PATH, 
-			   ITEM_MESH_PATH, 
-			   ITEM_SEQ_FILES,
-			   ITEM_SKELETON, 
-			   ITEM_JOINT_MAP,
-			   ITEM_DIPHONES,
-			   ITEM_MOTION,
-			   ITEM_ANIMATION_BLEND,
-			   ITEM_BLEND_TRANSITION,
-			   ITEM_MESH,
-			   ITEM_FACE_DEFINITION,
-			   ITEM_EVENT_HANDLERS,
-			   ITEM_PAWN, 
-			   ITEM_CHARACTER,   
-			   ITEM_CONTROLLER,
-			   ITEM_GESTUREMAP,
-			   ITEM_NVBG,
-			   ITEM_PHYSICS,
-			   ITEM_NETURAL_MOTION,
-			   ITEM_AU_MAP,
-			   ITEM_VISEME_MAP,			   			  
-			   ITEM_DEFAULT,
-			   ITEM_SIZE };
-		std::vector<std::string> ItemNameList;
+		
+//		std::vector<std::string> _itemNameList;
 
 		ResourceWindow(int x, int y, int w, int h, char* name);
 		~ResourceWindow();
 		
 		virtual void label_viewer(std::string name);
-		virtual void show_viewer();
-		virtual void hide_viewer();
-		virtual	void update_viewer();
 
 		virtual void notify(SmartBody::SBSubject* subject);
 		int handle(int event);
@@ -101,27 +51,44 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
         
 		void selectPawn(const std::string& name);
 		void updateGUI();				
-		void updateTreeItemInfo(Fl_Tree_Item* treeItem, long itemType);
 		static void refreshUI(Fl_Widget* widget, void* data);
 		static void treeCallBack(Fl_Widget* widget, void* data);
+
+		// selection callbacks
+		virtual void OnSelect(const std::string& value);
+		virtual void OnDeselect(const std::string& value);
+		// object lifecycle callbacks
+		void OnCharacterCreate( const std::string & name, const std::string & objectClass );
+		void OnCharacterDelete( const std::string & name );
+		void OnCharacterUpdate( const std::string & name );
+		void OnPawnCreate( const std::string & name );
+		void OnPawnDelete( const std::string & name );
+		void OnReset();
+
 	protected:		
 		Fl_Tree* resourceTree;
-		Fl_Tree_Item *pathTree;//, *skeletonTree, *motionTree, *meshTree;		
-		//Fl_Tree_Item *pathSeqTree, *pathMeTree, *pathAudioTree;
-		//Fl_Tree_Item *pawnTree, *characterTree;
-		Fl_Tree_Item* treeItemList[ITEM_SIZE];
-		Fl_Button    *refreshButton;
-		Fl_Group     *resourceInfoGroup;
+		
+		int addSpecialName(const std::string& name);
+		void removeSpecialName(const std::string& name);
+		std::map<Fl_Tree_Item*, std::string> _treeMap;
+		std::string emptyString;
+		std::map<int, std::string> _specialNames;
+		std::map<std::string, int> _reverseSpecialNames;
+		int _specialNameIndex;
+
 		TreeItemInfoWidget* itemInfoWidget;
 		std::string lastClickedItemPath;
 		std::vector<TreeItemInfoWidget*> widgetsToDelete;
 
-		
-	protected:
+		std::string getNameFromTree(Fl_Tree_Item* item);
+		Fl_Tree_Item* getTreeFromName(const std::string& name);
+		std::string getNameFromItem(Fl_Tree_Item* item);
+
 		void updatePath(Fl_Tree_Item* tree, const std::vector<std::string>& pathList);
-		void updateSeqFiles(Fl_Tree_Item* tree, std::string pathName);
+		void updateScriptFiles(Fl_Tree_Item* tree, std::string pathName);
 		void updateSkeleton(Fl_Tree_Item* tree, SmartBody::SBSkeleton* skel);
 		void updateJointMap(Fl_Tree_Item* tree, SmartBody::SBJointMap* jointMap);
+		void updateGestureMap(Fl_Tree_Item* tree, SmartBody::SBGestureMap* gestureMap);
 		void updateMotion(Fl_Tree_Item* tree, SmartBody::SBMotion* motion);
 		void updateAnimationBlend(Fl_Tree_Item* tree, SmartBody::SBAnimationBlend* blend);
 		void updateBlendTransition(Fl_Tree_Item* tree, SmartBody::SBAnimationTransition* transition);
@@ -131,21 +98,9 @@ class ResourceWindow : public Fl_Double_Window, public GenericViewer, public Sma
 		void updatePhysicsCharacter(Fl_Tree_Item* tree, SmartBody::SBPhysicsCharacter* phyChar);
 		void updateService(Fl_Tree_Item* tree, SmartBody::SBService* service);
 		void updatePhysicsManager(Fl_Tree_Item* tree, SmartBody::SBPhysicsManager* phyService);
-		void updateFaceMotion(Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition);
+		void updateFaceDefinition(Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition);
 		void updateEventHandler(Fl_Tree_Item* tree, SmartBody::SBEventHandler* handler);
 		bool processedDragAndDrop(std::string& dndText);
-		int  findTreeItemType(Fl_Tree_Item* treeItem);
-		void clearInfoWidget(TreeItemInfoWidget* lastWidget);
-		TreeItemInfoWidget* createInfoWidget(int x, int y, int w, int h, const char* name, Fl_Tree_Item* treeItem, int itemType );
-		ResourceWindowListener* _listener;
 };
 
- class ResourceViewerFactory : public GenericViewerFactory
- {
-	public:
-		ResourceViewerFactory();
-
-		virtual GenericViewer* create(int x, int y, int w, int h);
-		virtual void destroy(GenericViewer* viewer);
- };
-#endif
+ #endif

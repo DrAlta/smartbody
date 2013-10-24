@@ -75,6 +75,10 @@ class SBScene : public SBObject
 		SBAPI const std::string& getMediaPath();
 
 		SBAPI void update();
+
+		SBAPI std::string getStringFromObject(SmartBody::SBObject* object);
+		SBAPI SmartBody::SBObject* getObjectFromString(const std::string& value);
+
 		SBAPI std::string save(bool remoteSetup = false, std::string mediaPath = "");
 		SBAPI std::string saveSceneSetting();
 		SBAPI std::string exportScene(const std::vector<std::string>& aspects, bool remoteSetup);

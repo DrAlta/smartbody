@@ -202,23 +202,6 @@ void FLTKListener::OnReset()
 {
 }
 
-void FLTKListener::OnObjectSelected(const std::string& objectName)
-{
-	SmartBody::SBScene* scene =	SmartBody::SBScene::getScene();
-	BaseWindow* window = dynamic_cast<BaseWindow*>(scene->getViewer());
-	if (window->resourceWindow)
-	{
-		window->resourceWindow->selectPawn(objectName);
-	}
-
-	if (window->fltkViewer)
-	{
-		PawnControl* tempControl = window->fltkViewer->_objManipulator.getPawnControl(window->fltkViewer->_transformMode);
-		window->fltkViewer->_objManipulator.active_control = tempControl;
-		window->fltkViewer->_objManipulator.set_selected_pawn(scene->getPawn(objectName));
-	}
-}
-
 void FLTKListener::notify(SmartBody::SBSubject* subject)
 {
 	SmartBody::SBScene* scene =	SmartBody::SBScene::getScene();
@@ -322,6 +305,11 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 						pawn->dMeshInstance_p->setToStaticMesh(false);
 					}
 					else if (!pawn->dStaticMeshInstance_p && !useDeformableMesh)
+					{
+						pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
+						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
+					}
+					else if (!pawn->dStaticMeshInstance_p && name == "mesh")
 					{
 						pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);

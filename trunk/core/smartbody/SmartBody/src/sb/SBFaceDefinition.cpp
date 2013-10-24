@@ -10,7 +10,7 @@
 
 namespace SmartBody {
 
-SBFaceDefinition::SBFaceDefinition()
+SBFaceDefinition::SBFaceDefinition() : SBObject()
 {
 	_faceNeutral = NULL;
 }
@@ -18,16 +18,6 @@ SBFaceDefinition::SBFaceDefinition()
 SBFaceDefinition::SBFaceDefinition(const std::string& name)
 {
 	_faceNeutral = NULL;
-	_name = name;
-}
-
-const std::string& SBFaceDefinition::getName()
-{
-	return _name;
-}
-
-void SBFaceDefinition::setName(const std::string& name)
-{
 	_name = name;
 }
 

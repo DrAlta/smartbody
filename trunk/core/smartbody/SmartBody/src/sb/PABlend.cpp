@@ -34,7 +34,7 @@
 
 const double changeLimit = 20;
 
-PABlend::PABlend()
+PABlend::PABlend() : SBObject()
 {
 	stateName = "unknown";
 	parameterScale.x = 1.0f;
@@ -43,7 +43,7 @@ PABlend::PABlend()
 	incrementWorldOffsetY = false;
 }
 
-PABlend::PABlend(PABlend* data)
+PABlend::PABlend(PABlend* data) : SBObject()
 {
 	stateName = data->stateName;
 	for (unsigned int i = 0; i < data->motions.size(); i++)
@@ -80,7 +80,7 @@ PABlend::PABlend(PABlend* data)
 }
 
 
-PABlend::PABlend(const std::string& name)
+PABlend::PABlend(const std::string& name) : SBObject()
 {
 	stateName = name;
 	cycle = false;

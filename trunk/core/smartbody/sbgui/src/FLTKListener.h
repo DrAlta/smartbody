@@ -24,11 +24,7 @@ class FLTKListener : public SmartBody::SBSceneListener, public SmartBody::SBObse
 	  virtual void OnSimulationEnd();
 	  virtual void OnSimulationUpdate();
 
-	  virtual void OnObjectSelected(const std::string& objectName);
-
 	  virtual void notify(SmartBody::SBSubject* subject);
-
-
 
 	  void setOtherListener(SBSceneListener* listener);
 	protected:

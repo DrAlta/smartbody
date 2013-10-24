@@ -414,13 +414,6 @@ void SbmCharacter::createStandardControllers()
 		breathingJointY->setUsePosition(0, true);
 		breathingJointY->pos()->limits(SkJointPos::X, -1000, 1000);  // Setting upper bound to 2 allows some exageration
 		rootJoint->addChild(breathingJointY);
-
-		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-		std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
-		for (size_t i = 0; i < listeners.size(); i++)
-		{
-			listeners[i]->OnCharacterUpdate( getName() );
-		}
 	}
 
 	gaze_sched_p = CreateSchedulerCt( getName().c_str(), "gaze" );
@@ -579,7 +572,12 @@ void SbmCharacter::createStandardControllers()
 			}
 		}
 	}
-
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+	for (size_t i = 0; i < listeners.size(); i++)
+	{
+		listeners[i]->OnCharacterUpdate( getName() );
+	}
 }
 void SbmCharacter::initData()
 {

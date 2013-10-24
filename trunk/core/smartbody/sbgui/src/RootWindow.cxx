@@ -25,6 +25,7 @@
 #include <sb/SBPython.h>
 #include <sb/SBVersion.hpp>
 #include <sb/SBBehaviorSetManager.h>
+#include"resourceViewer/AttributeEditor.h"
 
 #include "SBGUIManager.h"
 
@@ -123,7 +124,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
    menubar->add("&Camera/Modes/Free Look", 0, SetFreeLookCamera, this, NULL);	
    menubar->add("&Camera/Modes/Follow Renderer", 0, SetFollowRendererCamera, this, NULL);	
 	
-	menubar->add("&Window/Resource Viewer", 0, LaunchResourceViewerCB, this, NULL);
+//	menubar->add("&Window/Resource Viewer", 0, LaunchResourceViewerCB, this, NULL);
 	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 //	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
@@ -242,16 +243,46 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 	curY += 30;
 	*/
+
+	// should the layout be single window or include the outliner and attribute window
+	_layoutMode = 0;
+
+	int leftBorderSize = 10;
+	int rightBorderSize = 10;
+
+	_mainGroup = new Fl_Group(0, curY, w - 20, h - curY, "");
+	_mainGroup->begin();
+
+	_leftGroup = new Fl_Group(0, curY, w - 640, h - curY);
+
+	// add the outliner
+	int outlinerWidth = 384;
+	int outlinerHeight = (int) (h - curY) / 2  - 20;
+	resourceWindow = new ResourceWindow(leftBorderSize, curY, outlinerWidth, outlinerHeight, "");
+	resourceWindow->box(FL_UP_BOX);
+	// add the attribute window
+	int attributeEditorWidth = 384;
+	_attributeEditor = new AttributeEditor(leftBorderSize, curY + outlinerHeight + 10, attributeEditorWidth, outlinerHeight, "");
+	_attributeEditor->box(FL_UP_BOX);
+
+	_leftGroup->end();
+
+	// add the viewer
+	int viewerWidth = 640;
+	int viewerHeight = h - curY - 10;
 #if USE_OGRE_VIEWER < 1
-	fltkViewer = new FltkViewer(10, curY, w - 20, h - (curY + 10), NULL);
+	fltkViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
 #else
-	fltkViewer = new FLTKOgreWindow(10, curY, w - 20, h - (curY + 10), NULL);	
+	fltkViewer = new FLTKOgreWindow(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);	
 #endif
 	fltkViewer->box(FL_UP_BOX);
 
+	_mainGroup->end();
+	_mainGroup->resizable(fltkViewer);
+
 	this->end();
 
-	this->resizable(fltkViewer);
+	this->resizable(_mainGroup);
 
 	const boost::filesystem::path& curDir = boost::filesystem::current_path();
 	scriptFolder = curDir.string();
@@ -274,7 +305,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	faceViewerWindow = NULL;
 	bmlViewerWindow = NULL;
 	dataViewerWindow = NULL;
-	resourceWindow = NULL;
+	
 	panimationWindow = NULL;	
 	exportWindow = NULL;
 }
@@ -495,12 +526,6 @@ void BaseWindow::resetWindow()
 		dataViewerWindow->hide();
 		delete dataViewerWindow;
 		dataViewerWindow = NULL;
-	}
-	if (resourceWindow)
-	{
-		resourceWindow->hide();
-		delete resourceWindow;
-		resourceWindow = NULL;
 	}
 	if (panimationWindow)
 	{
@@ -2015,6 +2040,9 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	Fl_Choice* resChoice = static_cast<Fl_Choice*>(widget);
 
+	int origX = rootWindow->x();
+	int origY = rootWindow->y();
+
 	size_t windowIndex = (size_t) data;	
 	
 	std::vector<std::string> tokens;	
@@ -2042,8 +2070,10 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 
 	int width = atoi(tokens[0].c_str());
 	int height = atoi(tokens[1].c_str());
+	width += rootWindow->_leftGroup->w();
+	height += rootWindow->_leftGroup->h();
 	//std::cout << width << " " << height << std::endl;	
-	rootWindow->resize(rootWindow->x(),rootWindow->y(),width+20,height+70);
+	rootWindow->resize(origX, origY, width, height + 30);
 // 	rootWindow->w(width);
 // 	rootWindow->h(height);
 
