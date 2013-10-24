@@ -87,6 +87,18 @@ SrVec MeCtIKTreeNode::getGlobalPos()
 {
 	return gmat.get_translation();//joint->gmat().get_translation();
 }
+
+std::string MeCtIKTreeNode::getNodeName()
+{
+	if (joint)
+		return joint->getMappedJointName();
+	return _nodeName;
+}
+
+void MeCtIKTreeNode::setNodeName( const std::string& nodeName )
+{
+	_nodeName = nodeName;
+}
 /************************************************************************/
 /* IK Tree scenario to hold data/parameters for full-body IK            */
 /************************************************************************/
@@ -110,7 +122,7 @@ void MeCtIKTreeScenario::updateEndEffectorValidNodes(EffectorConstraint* cons, s
 	MeCtIKTreeNode* endNode = findIKTreeNode(cons->efffectorName.c_str());
 	MeCtIKTreeNode* node = endNode->parent;		
 	bool bStop = false;
-	if (endNode->nodeName == cons->rootName)
+	if (endNode->getNodeName() == cons->rootName)
 		bStop = true;
 
 	while(node && node->parent && !bStop) // no root node
@@ -123,7 +135,7 @@ void MeCtIKTreeScenario::updateEndEffectorValidNodes(EffectorConstraint* cons, s
 		{
 			validNodes.insert(node);
 		}
-		if (node->nodeName == cons->rootName)
+		if (node->getNodeName() == cons->rootName)
 			bStop = true;			
 		node = node->parent;
 	}		
@@ -223,7 +235,7 @@ void MeCtIKTreeScenario::buildIKTreeFromJointRoot( SkJoint* root, std::vector<st
 	ikTreeRoot->joint = root;
 	ikTreeRoot->nodeIdx = ikTreeNodes.size();
 	ikTreeRoot->nodeLevel = 0;
-	ikTreeRoot->nodeName = root->getMappedJointName();
+	ikTreeRoot->setNodeName(root->getMappedJointName());
 	ikTreeNodes.push_back(ikTreeRoot);
 	traverseJoint(root,ikTreeRoot,ikTreeNodes, stopJoints);
 	
@@ -242,7 +254,7 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		MeCtIKTreeNode* childNode = new MeCtIKTreeNode();
 		childNode->nodeLevel = jointNode->nodeLevel + 1;
 		childNode->joint = child;		
-		childNode->nodeName = child->getMappedJointName();
+		childNode->setNodeName(child->getMappedJointName());
 		childNode->nodeIdx = nodeList.size();
 		childNode->parent = jointNode;
 		nodeList.push_back(childNode);
@@ -252,7 +264,7 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		if (prevNode)
 			prevNode->brother = childNode;
 
-		if ( strcmp(child->getMappedJointName().c_str(),"skullbase")==0)// || 
+		if ( child->getMappedJointName() == "skullbase" )
 // 			strcmp(child->name().get_string(),"l_wrist")==0 ||
 // 			strcmp(child->name().get_string(),"r_wrist")==0 )
 		{
@@ -352,7 +364,7 @@ void MeCtIKTreeScenario::setTreeNodeQuat( SkSkeleton* skel,NodeQuatType type )
 	for (unsigned int i=0;i<ikTreeNodes.size();i++)
 	{
 		MeCtIKTreeNode* node = ikTreeNodes[i];
-		SkJoint* joint = skel->search_joint(node->nodeName.c_str());
+		SkJoint* joint = skel->search_joint(node->getNodeName().c_str());
 		if (joint)
 		{
 			node->setQuat(joint->quat()->rawValue(),type);
@@ -521,17 +533,17 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 		MeCtIKTreeNode* node = endNode->parent;
 		//float fRatio = 1.f/(float)(endNode->nodeLevel + 1);
 		bool bStop = false;
-		if (endNode->nodeName == cons->rootName)
+		if (endNode->getNodeName() == cons->rootName)
 			bStop = true;
 
 		float consWeight = cons->constraintWeight;
+		
 		while(node && node->parent && !bStop) // no root node
 		{
-			int idx = node->validNodeIdx;			
-
+			int idx = node->validNodeIdx;						
 			assert(idx != -1);
 			float nodeWeight = 1.f;		
-			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm" || node->nodeName == "l_forearm" || node->nodeName == "l_acromioclavicular") 
+			if (node->getNodeName() == "r_acromioclavicular" || node->getNodeName() == "r_forearm" || node->getNodeName() == "l_forearm" || node->getNodeName() == "l_acromioclavicular") 
 				nodeWeight = 0.f;
 			if (!node->active)
 				nodeWeight = 0.f;
@@ -563,7 +575,7 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 				matJ(posCount*3+1,idx*3+k) = jVec[1]*nodeWeight*consWeight;	
 				matJ(posCount*3+2,idx*3+k) = jVec[2]*nodeWeight*consWeight;							
 			}		
-			if (node->nodeName == cons->rootName)
+			if (node->getNodeName() == cons->rootName)
 				bStop = true;
 			
 			node = node->parent;
@@ -609,7 +621,7 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 			int idx = node->validNodeIdx;
 			assert(idx != -1);
 			float nodeWeight = 1.f;
-			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm" ||  node->nodeName == "l_forearm" || node->nodeName == "l_acromioclavicular") 
+			if (node->getNodeName() == "r_acromioclavicular" || node->getNodeName() == "r_forearm" ||  node->getNodeName() == "l_forearm" || node->getNodeName() == "l_acromioclavicular") 
 				nodeWeight = 0.f;
 			if (!node->active)
 				nodeWeight = 0.f;
@@ -638,7 +650,7 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 				matJ(offset_idx+rotCount*3+1,idx*3+k) = axis[k][1]*nodeWeight;	
 				matJ(offset_idx+rotCount*3+2,idx*3+k) = axis[k][2]*nodeWeight;						
 			}		
-			if (node->nodeName == cons->rootName)
+			if (node->getNodeName() == cons->rootName)
 				bStop = true;
 			node = node->parent;
 		}
@@ -776,14 +788,14 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 		MeCtIKTreeNode* node = endNode->parent;
 		//float fRatio = 1.f/(float)(endNode->nodeLevel + 1);
 		bool bStop = false;
-		if (endNode->nodeName == cons->rootName)
+		if (endNode->getNodeName() == cons->rootName)
 			bStop = true;
 
 		while(node && node->parent && !bStop) // no root node
 		{
 			int idx = node->nodeIdx;			
 			float nodeWeight = 1.f;//((float)node->nodeLevel+endNode->nodeLevel)/(endNode->nodeLevel*2.f);
-			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm" || node->nodeName == "l_forearm" || node->nodeName == "l_acromioclavicular") 
+			if (node->getNodeName() == "r_acromioclavicular" || node->getNodeName() == "r_forearm" || node->getNodeName() == "l_forearm" || node->getNodeName() == "l_acromioclavicular") 
 				nodeWeight = 0.f;
 			if (!node->active)
 				nodeWeight = 0.f;
@@ -810,7 +822,7 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 				matJ(posCount*3+1,idx*3+k) = jVec[1]*nodeWeight;	
 				matJ(posCount*3+2,idx*3+k) = jVec[2]*nodeWeight;							
 			}		
-			if (node->nodeName == cons->rootName)
+			if (node->getNodeName() == cons->rootName)
 				bStop = true;
 			
 			node = node->parent;
@@ -852,7 +864,7 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 		{
 			int idx = node->nodeIdx;
 			float nodeWeight = 1.f;
-			if (node->nodeName == "r_acromioclavicular" || node->nodeName == "r_forearm" ||  node->nodeName == "l_forearm" || node->nodeName == "l_acromioclavicular") 
+			if (node->getNodeName() == "r_acromioclavicular" || node->getNodeName() == "r_forearm" ||  node->getNodeName() == "l_forearm" || node->getNodeName() == "l_acromioclavicular") 
 				nodeWeight = 0.f;
 			if (!node->active)
 				nodeWeight = 0.f;
@@ -874,7 +886,7 @@ void MeCtJacobianIK::computeJacobian(MeCtIKTreeScenario* s)
 				matJ(offset_idx+rotCount*3+1,idx*3+k) = axis[k][1]*nodeWeight;	
 				matJ(offset_idx+rotCount*3+2,idx*3+k) = axis[k][2]*nodeWeight;						
 			}		
-			if (node->nodeName == cons->rootName)
+			if (node->getNodeName() == cons->rootName)
 				bStop = true;
 			node = node->parent;
 		}

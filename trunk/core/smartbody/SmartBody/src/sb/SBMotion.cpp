@@ -928,8 +928,8 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 		for (unsigned int k=0;k<ikScenario.ikTreeNodes.size();k++)
 		{
 			MeCtIKTreeNode* ikNode = ikScenario.ikTreeNodes[k];
-			SBJoint* ikJoint = interSk->getJointByName(ikNode->nodeName);
-			int chanID = mchan_arr.search(ikNode->nodeName,SkChannel::Quat);
+			SBJoint* ikJoint = interSk->getJointByName(ikNode->getNodeName());
+			int chanID = mchan_arr.search(ikNode->getNodeName(),SkChannel::Quat);
 			SrQuat& nq = ikNode->getQuat(QUAT_CUR);
 			SrQuat kq; 
 			if (ikJoint) kq = ikJoint->quat()->rawValue();			
@@ -1085,8 +1085,8 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 		for (unsigned int k=0;k<ikScenario.ikTreeNodes.size();k++)
 		{
 			MeCtIKTreeNode* ikNode = ikScenario.ikTreeNodes[k];
-			SBJoint* ikJoint = skel->getJointByName(ikNode->nodeName);
-			int chanID = mchan_arr.search(ikNode->nodeName,SkChannel::Quat);
+			SBJoint* ikJoint = skel->getJointByName(ikNode->getNodeName());
+			int chanID = mchan_arr.search(ikNode->getNodeName(),SkChannel::Quat);
 			SrQuat& nq = ikNode->getQuat(QUAT_CUR);
 			SrQuat kq; 
 			if (ikJoint) kq = ikJoint->quat()->rawValue();

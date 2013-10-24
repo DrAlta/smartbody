@@ -8,11 +8,12 @@ enum NodeQuatType { QUAT_INIT = 0, QUAT_REF, QUAT_PREVREF, QUAT_CUR, QUAT_DUMMY,
 enum ConstraintType { CONSTRAINT_POS = 0, CONSTRAINT_ROT };
 class MeCtIKTreeNode
 {
+protected:
+	std::string      _nodeName;
 public:	
 	int              nodeIdx;
 	int              validNodeIdx;
-	int              nodeLevel;
-	std::string      nodeName;
+	int              nodeLevel;	
 	MeCtIKTreeNode   *parent, *child, *brother;
 
 	bool             lock;
@@ -27,6 +28,7 @@ public:
 	SrQuat           nodeQuat[QUAT_SIZE];
 	float            mass;
 
+public:
 	MeCtIKTreeNode();
 	~MeCtIKTreeNode();
 	SrVec getCoMPos(); 
@@ -34,6 +36,8 @@ public:
 	SBAPI SrVec getGlobalPos();
 	SrQuat& getQuat(NodeQuatType type = QUAT_CUR);
 	bool setQuat(const SrQuat& q, NodeQuatType type = QUAT_CUR);
+	std::string getNodeName();
+	void setNodeName(const std::string& nodeName);
 };
 
 

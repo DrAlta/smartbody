@@ -199,13 +199,13 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 		MeCtIKTreeNode* node = ikScenario.ikTreeNodes[i];
 		if (!node->child)
 		{
-			FingerID fID = findFingerID(node->nodeName.c_str());
+			FingerID fID = findFingerID(node->getNodeName().c_str());
 			//LOG("finger name = %s\n",node->nodeName.c_str());
 			FingerChain& fchain = fingerChains[fID];
 			fchain.init(node);			
 			// add constraint
 			EffectorConstantConstraint* cons = new EffectorConstantConstraint();
-			cons->efffectorName = node->nodeName;
+			cons->efffectorName = node->getNodeName();
 			cons->rootName = wristJoint->jointName();//"r_shoulder";//rootJoint->name().get_string();		
 			handPosConstraint[cons->efffectorName] = cons;
 		}
@@ -223,7 +223,7 @@ void MeCtHand::init(std::string grabType, const MotionDataSet& reachPose, const 
 	for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		MeCtIKTreeNode* node = nodeList[i];
-		SmartBody::SBJoint* joint = skeletonCopy->getJointByName(node->nodeName);
+		SmartBody::SBJoint* joint = skeletonCopy->getJointByName(node->getNodeName());
 		SkJointQuat* skQuat = joint->quat();		
 		affectedJoints.push_back(joint);	
 		_channels.add(joint->getMappedJointName(), SkChannel::Quat);		
@@ -271,7 +271,7 @@ void MeCtHand::getPinchFrame( BodyMotionFrame& pinchFrame, SrVec& wristOffset )
 		FingerChain& fig = fingerChains[i];
 		MeCtIKTreeNode* node = fig.fingerTip;
 		if (!node) continue;
-		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(handPosConstraint[node->nodeName]);
+		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>(handPosConstraint[node->getNodeName()]);
 		cons->targetPos = ikTarget;		
 	}
 	for (int i=0;i<100;i++)
