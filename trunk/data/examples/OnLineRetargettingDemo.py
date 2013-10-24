@@ -107,7 +107,7 @@ source.setPosition(sourcePos)
 source.createStandardControllers()
 # Deformable mesh
 source.setDoubleAttribute('deformableMeshScale', 0.06)
-source.setStringAttribute('deformableMesh', 'ChrBrad')
+source.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 bml.execBML('source', '<body posture="ChrBrad@Idle01"/>')
 source.setStringAttribute("displayType", "GPUmesh")
 

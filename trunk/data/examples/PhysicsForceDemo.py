@@ -32,7 +32,7 @@ brad1.setSkeleton(brad1Skeleton)
 brad1.setPosition(SrVec(0, 122, 860))
 brad1.setHPR(SrVec(180, 0, 0))
 brad1.createStandardControllers()
-brad1.setStringAttribute('deformableMesh', 'brad')
+brad1.setStringAttribute('deformableMesh', 'Brad.dae')
 reachSetup('brad1', 'KNN', '')
 bml.execBML('brad1', '<body posture="HandsAtSide_Motex"/>')
 # Brad2
@@ -41,7 +41,7 @@ brad2Skeleton = scene.createSkeleton('common.sk')
 brad2.setSkeleton(brad2Skeleton)
 brad2.setPosition(SrVec(100, 102, -650))
 brad2.createStandardControllers()
-brad2.setStringAttribute('deformableMesh', 'brad')
+brad2.setStringAttribute('deformableMesh', 'Brad.dae')
 bml.execBML('brad2', '<body posture="HandsAtSide_Motex"/>')
 	
 # Ball variables

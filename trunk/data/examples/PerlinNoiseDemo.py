@@ -79,7 +79,7 @@ for i in range(2):
 	brad.createStandardControllers()
 	# Gesture map setup
 	brad.setStringAttribute('gestureMap', 'ChrBrad')
-	brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
+	brad.setBoolAttribute('gestureRequest.autoGestureTransition', True)
 	# Set deformable mesh
 	brad.setDoubleAttribute('deformableMeshScale', 0.01)
 	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')

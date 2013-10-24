@@ -17,7 +17,7 @@ cameraPawn.setPosition(cameraPos)
 light0 = scene.createPawn("light0")
 light0Pos = SrVec(1.00*sscale, 2.50*sscale, 4.00*sscale)
 light0.setPosition(light0Pos)
-
+light0.setOrientation(SrQuat(-0.425918, 0.904762, 8.14806e-017, 8.14806e-017))
 light0.createBoolAttribute("lightIsDirectional", True, True, "LightAttributes", 5, False, False, False, "Is the light a directional light")
 light0.createVec3Attribute("lightDiffuseColor", 1, 1, 1, True, "LightAttributes", 10, False, False, False, "Diffuse color")
 light0.createVec3Attribute("lightAmbientColor", 0, 0, 0, True, "LightAttributes", 20, False, False, False, "Ambient color")
@@ -34,7 +34,7 @@ light0.createIntAttribute("lightShadowMap", 1024, True, "LightAttributes", 100, 
 light1 = scene.createPawn("light1")
 light1Pos = SrVec(1.00*sscale, 5.00*sscale, -10.00*sscale)
 light1.setPosition(light1Pos)
-
+light1.setOrientation(SrQuat(0.63753, 0.770426, 8.1375e-018, 8.1375e-018))
 light1.createBoolAttribute("lightIsDirectional", True, True, "LightAttributes", 5, False, False, False, "Is the light a directional light")
 light1.createVec3Attribute("lightDiffuseColor", 1, 1, 1, True, "LightAttributes", 10, False, False, False, "Diffuse color")
 light1.createVec3Attribute("lightAmbientColor", 0, 0, 0, True, "LightAttributes", 20, False, False, False, "Ambient color")
