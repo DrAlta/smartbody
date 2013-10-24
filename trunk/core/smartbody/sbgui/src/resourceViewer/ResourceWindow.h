@@ -63,13 +63,19 @@ class ResourceWindow : public Fl_Group, public SmartBody::SBObserver, public SBW
 		void OnCharacterUpdate( const std::string & name );
 		void OnPawnCreate( const std::string & name );
 		void OnPawnDelete( const std::string & name );
-		void OnReset();
+		void OnSimulationStart();
 
 	protected:		
 		Fl_Tree* resourceTree;
+		bool _dirty;
+		bool _firstTime;
 		
 		int addSpecialName(const std::string& name);
 		void removeSpecialName(const std::string& name);
+
+		void hideTree();
+		void showTree();
+
 		std::map<Fl_Tree_Item*, std::string> _treeMap;
 		std::string emptyString;
 		std::map<int, std::string> _specialNames;

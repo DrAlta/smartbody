@@ -100,8 +100,8 @@ public:
 
 	void OnCharacterDelete( const std::string & name );
 	void OnCharacterUpdate( const std::string & name );
+	void OnSimulationStart( );
 	void OnSimulationUpdate( );
-	void OnReset();
 
 protected:
 	std::string no_motion;

@@ -13,6 +13,10 @@ class AttributeEditor : public Fl_Group, public SmartBody::SBObserver, public SB
 		AttributeEditor(int x, int y, int w, int h, char* name);
 		~AttributeEditor();
 		
+		virtual void draw();
+		virtual void show();
+		virtual void hide();
+
 		// selection callbacks
 		virtual void OnSelect(const std::string& value);
 		virtual void OnDeselect(const std::string& value);
@@ -22,19 +26,19 @@ class AttributeEditor : public Fl_Group, public SmartBody::SBObserver, public SB
 		void OnCharacterUpdate( const std::string & name );
 		void OnPawnCreate( const std::string & name );
 		void OnPawnDelete( const std::string & name );
-		void OnReset();
+		void OnSimulationStart();
 		void updateGUI();
 
+		void removeCurrentWidget();
+
 	protected:		
+		bool _dirty;
 		Fl_Button    *refreshButton;
-		Fl_Group     *resourceInfoGroup;
-		TreeItemInfoWidget* itemInfoWidget;
 		std::string lastClickedItemPath;
 		std::vector<TreeItemInfoWidget*> widgetsToDelete;
 		std::string _currentSelection;
 		TreeItemInfoWidget* _currentWidget;
 
-		void clearInfoWidget(TreeItemInfoWidget* lastWidget);
 		void updateTreeItemInfo(  );
 		TreeItemInfoWidget* createInfoWidget( int x, int y, int w, int h, const std::string& name );
 

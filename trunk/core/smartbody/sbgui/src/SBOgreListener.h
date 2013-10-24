@@ -17,7 +17,7 @@ public:
 	virtual void OnPawnDelete( const std::string & name );
 	virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime );
 	virtual void OnChannel( const std::string & name, const std::string & channelName, const float value);
-	virtual void OnReset();
+	virtual void OnSimulationStart();
 	virtual void notify(SmartBody::SBSubject* subject);
 protected:
 	EmbeddedOgre* ogreInterface;	

@@ -79,8 +79,6 @@ class PanimationWindowListener : public SmartBody::SBSceneListener
 		virtual void OnPawnCreate( const std::string & name );
 		virtual void OnPawnDelete( const std::string & name );
 
-		virtual void OnReset();
-
 		virtual void OnSimulationStart();
 		virtual void OnSimulationEnd();
 		virtual void OnSimulationUpdate();

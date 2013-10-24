@@ -114,6 +114,7 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Grou
 		_reverseSpecialNames.insert(std::pair<std::string, int>((*iter).second, (*iter).first));
 	}
 
+	_dirty = true;
 	
 }
 
@@ -326,6 +327,10 @@ void ResourceWindow::update()
 
 void ResourceWindow::draw()
 {	
+	if (_dirty)
+	{
+		updateGUI();
+	}
 	Fl_Group::draw();
 }
 
@@ -508,6 +513,7 @@ void ResourceWindow::updateGUI()
 			updateService(getTreeFromName("service"), service);
 	}			
 
+	_dirty = false;
 }
 
 
@@ -629,9 +635,9 @@ void ResourceWindow::updatePath( Fl_Tree_Item* tree, const std::vector<std::stri
 void ResourceWindow::updateScriptFiles( Fl_Tree_Item* tree, std::string pname )
 {	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	const std::vector<std::string>& scriptPaths = scene->getAssetManager()->getAssetPaths("script");
+	std::vector<std::string>& scriptPaths = scene->getAssetManager()->getAssetPaths("script");
 	
-	for (std::vector<std::string>::const_iterator pathIter = scriptPaths.begin();
+	for (std::vector<std::string>::iterator pathIter = scriptPaths.begin();
 		 pathIter != scriptPaths.end(); 
 		 pathIter++)
 	{
@@ -907,33 +913,33 @@ void ResourceWindow::OnDeselect(const std::string& value)
 
 void ResourceWindow::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
-	updateGUI();
+	_dirty = true;
 }
 
 void ResourceWindow::OnCharacterDelete( const std::string & name )
 {
 	removeSpecialName(name);
-	updateGUI();
+	_dirty = true;
 }
 
 void ResourceWindow::OnCharacterUpdate( const std::string & name )
 {
-	updateGUI();
+	_dirty = true;
 }
       
 void ResourceWindow::OnPawnCreate( const std::string & name )
 {
-	updateGUI();
+	_dirty = true;
 }
 
 void ResourceWindow::OnPawnDelete( const std::string & name )
 {
-	updateGUI();
+	_dirty = true;
 }
 
 void ResourceWindow::OnReset()
 {
-	updateGUI();
+	_dirty = true;
 }
 
 int ResourceWindow::addSpecialName(const std::string& name)

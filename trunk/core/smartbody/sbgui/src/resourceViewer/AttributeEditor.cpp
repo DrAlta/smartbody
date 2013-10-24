@@ -18,6 +18,7 @@ AttributeEditor::AttributeEditor(int x, int y, int w, int h, char* name) : Fl_Gr
 {
 	_currentSelection = "";
 	_currentWidget = NULL;
+	_dirty = true;
 }
 
 AttributeEditor::~AttributeEditor()
@@ -38,17 +39,18 @@ void AttributeEditor::OnSelect(const std::string& value)
 		return;
 	}
 	this->add(_currentWidget);
+	_dirty = true;
 	this->redraw();
+
 }
 
 void AttributeEditor::OnDeselect(const std::string& value)
 {
 	if (_currentSelection == value)
 	{
-		this->remove(_currentWidget);
-		clearInfoWidget(_currentWidget);
-		_currentWidget = NULL;
+		removeCurrentWidget();
 		_currentSelection = "";
+		_dirty = true;
 		this->redraw();
 	}
 }
@@ -73,13 +75,21 @@ void AttributeEditor::OnPawnDelete( const std::string & name )
 {
 }
 
-void AttributeEditor::OnReset()
+void AttributeEditor::OnSimulationStart()
 {
-	_currentSelection = "";
-	clearInfoWidget(itemInfoWidget);
-	itemInfoWidget = NULL;
-	updateGUI();
+	OnDeselect(_currentSelection);
+	_dirty = true;
 }
+
+void AttributeEditor::draw()
+{
+	if (_dirty)
+	{
+		updateGUI();
+	}
+	Fl_Group::draw();
+}
+
 
 void AttributeEditor::updateGUI()
 {
@@ -89,18 +99,9 @@ void AttributeEditor::updateGUI()
 	}
 	else
 	{
-		clearInfoWidget(itemInfoWidget);
-		itemInfoWidget = NULL;
+		removeCurrentWidget();
 	}
-}
-
-void AttributeEditor::clearInfoWidget(TreeItemInfoWidget* lastWidget)
-{
-	if (lastWidget)
-	{
-		this->remove(lastWidget);
-		widgetsToDelete.push_back(lastWidget); // need to delete these - causes memory leak
-	}
+	_dirty = false;
 }
 
 TreeItemInfoWidget* AttributeEditor::createInfoWidget( int x, int y, int w, int h, const std::string& name)
@@ -277,13 +278,31 @@ void AttributeEditor::updateTreeItemInfo()
 {
 	if (_currentSelection == "")
 		return;
-	TreeItemInfoWidget* lastWidget = _currentWidget;
-	itemInfoWidget = createInfoWidget(resourceInfoGroup->x(),resourceInfoGroup->y(),resourceInfoGroup->w(),resourceInfoGroup->h(), _currentSelection);
-	resourceInfoGroup->add(itemInfoWidget);
-	clearInfoWidget(lastWidget);	
-	resourceInfoGroup->show();
-	itemInfoWidget->show();
-	resourceInfoGroup->redraw();
+	removeCurrentWidget();
+	_currentWidget = createInfoWidget(this->x(),this->y(),this->w(),this->h(), _currentSelection);
+	this->add(_currentWidget);
+	this->show();
+	_currentWidget->show();
+	this->redraw();
 }
 
+void AttributeEditor::removeCurrentWidget()
+{
+	if (_currentWidget)
+	{
+		this->remove(_currentWidget);
+		_currentWidget = NULL;
+	}
+}
 
+void AttributeEditor::show()
+{
+	SBWindowListener::windowShow();
+	Fl_Group::show();
+}
+
+void AttributeEditor::hide()
+{
+	SBWindowListener::windowHide();
+	Fl_Group::hide();
+}

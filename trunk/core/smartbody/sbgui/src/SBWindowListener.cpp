@@ -30,10 +30,6 @@ void SBWindowListener::OnPawnDelete( const std::string & name )
 {
 }
 
-void SBWindowListener::OnReset()
-{
-}
-
 void SBWindowListener::OnSimulationStart()
 {
 }
