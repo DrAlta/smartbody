@@ -241,7 +241,9 @@ void CommandWindow::upcb(int key, Fl_Text_Editor* editor)
 {
 	CommandWindow* commandWindow = CommandWindow::getCommandWindow(editor);
 	// only use up/down functionality if the cursor is at the very beginning
-	if (editor->buffer()->length() > 0)
+	int cursorPos = editor->insert_position();
+	//if (editor->buffer()->length() > 0)
+	if (cursorPos > 0)
 		return;
 
 	int index = editor == commandWindow->textEditor[0]? 0 : 1;
