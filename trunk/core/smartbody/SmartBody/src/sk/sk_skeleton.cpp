@@ -398,7 +398,7 @@ SrBox SkSkeleton::getBoundingBox()
 	std::vector<SkJoint*>& joints = get_joint_array();	
 	for (size_t j = 0; j < joints.size(); j++)
 	{
-		if (joints[j]->getJointType() == SkJoint::TypeOther)
+		if (joints[j]->getJointType() != SkJoint::TypeJoint)
 			continue;
 		joints[j]->update_gmat();
 		const SrMat& gmat = joints[j]->gmat();

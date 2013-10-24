@@ -50,6 +50,7 @@ SkJoint::SkJoint() : _pos ( 0 )
    _quat = 0;
    _rtype =-1;
    rot_type(TypeQuat);
+   _jointType = TypeJoint;
 
    _mass = 0;
 }
