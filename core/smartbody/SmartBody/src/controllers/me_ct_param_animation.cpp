@@ -275,12 +275,13 @@ bool MeCtParamAnimation::controller_evaluate(double t, MeFrameData& frame)
 
 				// a hack to also transition the IK post-processing results from/to pseudo-idle pose
 				float currentTrajBlendWeight = character->getJointTrajBlendWeight();
-				if (curStateData->getStateName() == PseudoIdleState)// && currentTrajBlendWeight == 0.f) // transition from idle pose, and poseture doesn't provide IK traj
+				bool useJointConstraint = character->getUseJointConstraint();
+				if (curStateData->getStateName() == PseudoIdleState && !useJointConstraint) // transition from idle pose, and poseture doesn't provide IK traj
 				{	
 					character->setJointTrajBlendWeight(1.f - transitionManager->getCurrentTransitionWeight());										
 					updateJointTrajectory(nextStateData);	
 				}
-				else if (nextStateData->getStateName() == PseudoIdleState)// && currentTrajBlendWeight == 0.f) // transition to idle pose, and poseture doesn't provide IK traj
+				else if (nextStateData->getStateName() == PseudoIdleState && !useJointConstraint) // transition to idle pose, and poseture doesn't provide IK traj
 				{
 					character->setJointTrajBlendWeight(transitionManager->getCurrentTransitionWeight());	
 					updateJointTrajectory(curStateData);	

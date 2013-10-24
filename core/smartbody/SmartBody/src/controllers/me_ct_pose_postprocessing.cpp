@@ -108,6 +108,8 @@ bool MeCtPosePostProcessing::controller_evaluate( double t, MeFrameData& frame )
 		useIKConstraint = false;
 
 	float transitionWeight = _sbChar->getJointTrajBlendWeight();
+	if (transitionWeight > 1.f) transitionWeight = 1.f;
+	//LOG("joint transition weight = %f",transitionWeight);
 	if (useIKConstraint && transitionWeight > 0.0) //&& ik_scenario.ikEndEffectors.size() != 0)	
 	{	
 		if (firstIKSolve)

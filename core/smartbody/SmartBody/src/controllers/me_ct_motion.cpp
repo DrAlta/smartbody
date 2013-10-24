@@ -410,9 +410,15 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 			retarget->applyRetargetJointTrajectory(*trajRecord,baseGmat);			
 		}
 		if (hasCharacterTraj)
-			_character->setJointTrajBlendWeight(1.f);
+		{
+			_character->setJointTrajBlendWeight(1.0f);
+			_character->setUseJointConstraint(true);
+		}
 		else
+		{
 			_character->setJointTrajBlendWeight(0.f);
+			_character->setUseJointConstraint(false);
+		}
 	}
 #endif
 

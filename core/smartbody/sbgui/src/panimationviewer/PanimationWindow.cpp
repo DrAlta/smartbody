@@ -396,6 +396,13 @@ void PanimationWindow::reset(Fl_Widget* widget, void* data)
 	std::stringstream resetPosCommand;
 	resetPosCommand << "set char " << charName << " world_offset x 0 z 0 h 0 p 0 r 0";
 	execCmd(window, resetPosCommand.str());		
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBCharacter* sbChar = scene->getCharacter(charName);
+	if (sbChar)
+	{
+		sbChar->setJointTrajBlendWeight(0.f);
+		sbChar->setUseJointConstraint(false);
+	}
 }
 
 void PanimationWindow::changeTabGroup(Fl_Widget* widget, void* data)
