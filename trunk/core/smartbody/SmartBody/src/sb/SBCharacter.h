@@ -75,6 +75,8 @@ class SBCharacter : public SbmCharacter
 		SBAPI void setReach(SmartBody::SBReach* reach);
 		SBAPI SmartBody::SBReach* getReach();
 
+		SBAPI void setUseJointConstraint(bool bUseConstraint);
+		SBAPI bool getUseJointConstraint();
 		SBAPI void addJointTrajectoryConstraint(std::string jointName, std::string refJointName);
 		SBAPI TrajectoryRecord* getJointTrajectoryConstraint(std::string jointName);	
 		SBAPI std::vector<std::string> getJointConstraintNames();
@@ -88,6 +90,7 @@ class SBCharacter : public SbmCharacter
 		SmartBody::SBReach* _reach;
 		std::map<std::string, TrajectoryRecord*> jointTrajMap;
 		float jointTrajBlendWeight;
+		bool useJointConstraint;
 		
 };
 
