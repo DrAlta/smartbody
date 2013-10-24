@@ -57,10 +57,18 @@ void AttributeEditor::OnDeselect(const std::string& value)
 
 void AttributeEditor::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
+	
 }
 
 void AttributeEditor::OnCharacterDelete( const std::string & name )
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBCharacter* character = scene->getCharacter(name);
+	std::string id = scene->getStringFromObject(character);
+	if (id == _currentSelection)
+	{
+		OnDeselect(_currentSelection);
+	}
 }
 
 void AttributeEditor::OnCharacterUpdate( const std::string & name )
@@ -69,10 +77,18 @@ void AttributeEditor::OnCharacterUpdate( const std::string & name )
 
 void AttributeEditor::OnPawnCreate( const std::string & name )
 {
+
 }
 
 void AttributeEditor::OnPawnDelete( const std::string & name )
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBPawn* pawn = scene->getPawn(name);
+	std::string id = scene->getStringFromObject(pawn);
+	if (id == _currentSelection)
+	{
+		OnDeselect(_currentSelection);
+	}
 }
 
 void AttributeEditor::OnSimulationStart()

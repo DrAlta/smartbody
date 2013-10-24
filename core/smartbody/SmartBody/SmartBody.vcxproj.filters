@@ -2232,9 +2232,6 @@
     <ClInclude Include="src\sb\smartbody-dll.h">
       <Filter>sb</Filter>
     </ClInclude>
-    <ClInclude Include="src\sb\SBCharacterListener.h">
-      <Filter>sb</Filter>
-    </ClInclude>
     <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp">
       <Filter>controllers</Filter>
     </ClInclude>
@@ -2273,6 +2270,9 @@
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="src\sb\SBAssetHandlerBvh.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBSceneListener.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
