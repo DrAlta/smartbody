@@ -228,7 +228,11 @@ void OgreFrameListener::ogreBlendShape( Ogre::Entity* sbEntity, DeformableMeshIn
 	SrModel& baseModel = writeToBaseModel->shape();
 	const Ogre::VertexElement* VertexEle_POS = meshPtr->sharedVertexData->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);
 	Ogre::HardwareVertexBufferSharedPtr VertexBufPOS = meshPtr->sharedVertexData->vertexBufferBinding->getBuffer( VertexEle_POS->getSource() );
+#ifdef WIN32
 	unsigned char* VertexPtrPOS = static_cast<unsigned char*>( VertexBufPOS->lock( Ogre::HardwareBuffer::LockOptions::HBL_NORMAL ) );
+#else
+	unsigned char* VertexPtrPOS = static_cast<unsigned char*>( VertexBufPOS->lock( Ogre::HardwareBuffer::HBL_NORMAL ) );
+#endif
 	int VertSizePOS=VertexBufPOS->getVertexSize();
 	float * pElementPOS=NULL;
 	std::map<int,std::vector<int> >& vtxNewVtxIdxMap = defMesh->vtxNewVtxIdxMap;
