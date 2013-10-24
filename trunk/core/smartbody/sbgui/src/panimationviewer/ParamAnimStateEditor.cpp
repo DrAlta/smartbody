@@ -1192,6 +1192,9 @@ void PABlendEditor::selectStateAnimations(Fl_Widget* widget, void* data)
 	}
 
 	const char* stateText = editor->stateList->text();
+	if (!stateText)
+		return;
+
 	PABlend* currentState = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateText);
 	
 	if (!currentState)
