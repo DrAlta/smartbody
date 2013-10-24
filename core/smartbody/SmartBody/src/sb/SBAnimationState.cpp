@@ -1430,6 +1430,7 @@ SBAnimationBlend0D::SBAnimationBlend0D() : SBAnimationBlend("unknown")
 SBAnimationBlend0D::SBAnimationBlend0D(const std::string& name) : SBAnimationBlend(name)
 {
 	_dimension = "0D";
+	setType(0);
 }
 
 SBAnimationBlend0D::~SBAnimationBlend0D()
@@ -1457,6 +1458,7 @@ SBAnimationBlend1D::SBAnimationBlend1D() : SBAnimationBlend("unknown")
 SBAnimationBlend1D::SBAnimationBlend1D(const std::string& name) : SBAnimationBlend(name)
 {
 	_dimension = "1D";
+	setType(1);
 }
 
 SBAnimationBlend1D::~SBAnimationBlend1D()
@@ -1467,7 +1469,6 @@ void SBAnimationBlend1D::addMotion(const std::string& motion, float parameter)
 {
 	addSkMotion(motion);
 
-	setType(0);
 	setParameter(motion, parameter);
 }
 
@@ -1491,6 +1492,7 @@ SBAnimationBlend2D::SBAnimationBlend2D() : SBAnimationBlend("unknown")
 SBAnimationBlend2D::SBAnimationBlend2D(const std::string& name) : SBAnimationBlend(name)
 {
 	_dimension = "2D";
+	setType(2);
 }
 
 SBAnimationBlend2D::~SBAnimationBlend2D()
@@ -1500,8 +1502,6 @@ SBAnimationBlend2D::~SBAnimationBlend2D()
 void SBAnimationBlend2D::addMotion(const std::string& motion, float parameter1, float parameter2)
 {
 	addSkMotion(motion);
-	
-	setType(1);
 	PABlend::setParameter(motion, parameter1, parameter2);
 }
 
@@ -1534,6 +1534,7 @@ SBAnimationBlend3D::SBAnimationBlend3D() : SBAnimationBlend("unknown")
 SBAnimationBlend3D::SBAnimationBlend3D(const std::string& name) : SBAnimationBlend(name)
 {
 	_dimension = "3D";
+	setType(3);
 }
 
 SBAnimationBlend3D::~SBAnimationBlend3D()
@@ -1545,7 +1546,6 @@ void SBAnimationBlend3D::addMotion(const std::string& motion, float parameter1, 
 {
 	addSkMotion(motion);
 	
-	setType(1);
 	setParameter(motion, parameter1, parameter2, parameter3);
 }
 

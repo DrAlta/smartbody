@@ -120,7 +120,6 @@ void PARunTimeEditor::updateRunTimeStates(std::string currentState)
 {
 	nextCycleStates->clear();
 	PABlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(currentState);
-
 //	if (blendData)
 //		if (!blendData->cycle)
 //			return;
