@@ -75,8 +75,10 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		FltkViewer* fltkViewer;
 #endif
 		int _layoutMode;
+
+		void changeLayoutMode(int mode);
 		
-		
+		Fl_Double_Window* standaloneResourceWindow;
 		CommandWindow* commandWindow;
 		BMLCreatorWindow* bmlCreatorWindow;
 		VisemeViewerWindow* visemeViewerWindow;

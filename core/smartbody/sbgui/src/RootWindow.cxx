@@ -33,6 +33,7 @@
 
 BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {
+	standaloneResourceWindow = NULL;
 	commandWindow = NULL;
 	bmlCreatorWindow = NULL;
 	this->begin();
@@ -124,7 +125,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
    menubar->add("&Camera/Modes/Free Look", 0, SetFreeLookCamera, this, NULL);	
    menubar->add("&Camera/Modes/Follow Renderer", 0, SetFollowRendererCamera, this, NULL);	
 	
-//	menubar->add("&Window/Resource Viewer", 0, LaunchResourceViewerCB, this, NULL);
+//	menubar->add("&Window/Resource View", 0, LaunchResourceViewerCB, this, NULL);
 	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, NULL);
 	menubar->add("&Window/Data Viewer", 0, LaunchDataViewerCB,this, NULL);
 //	menubar->add("&Window/BML Viewer", 0, LaunchBMLViewerCB, this, NULL);
@@ -338,6 +339,86 @@ BaseWindow::~BaseWindow() {
 	if (panimationWindow)
 		delete panimationWindow;
 
+}
+
+void BaseWindow::changeLayoutMode(int mode)
+{
+	if (mode == 0)
+	{
+		// resource, attribute and viewer
+
+	}
+	else
+	{
+		// resource and attribute in separate window, viewer takes up entire window
+		int leftX = _leftGroup->x();
+		int leftY = _leftGroup->y();
+		int leftW = _leftGroup->w();
+		int leftH = _leftGroup->h();
+
+
+		int children = this->children();
+		for (int c = 0; c < children; c++)
+		{
+			Fl_Widget* widget = this->child(c);
+			const char* label = widget->label();
+		}
+
+		int numChildren = _mainGroup->children();
+		for (int c = 0; c < numChildren; c++)
+		{
+			_mainGroup->remove(0);
+		}
+
+		numChildren = _mainGroup->children();
+		for (int c = 0; c < numChildren; c++)
+		{
+			_mainGroup->remove(0);
+		}
+
+		if (!standaloneResourceWindow)
+		{
+			standaloneResourceWindow = new Fl_Double_Window(leftX + 10, leftY + 10, leftW + 20, leftH + 20, "Resources and Attributes");
+		}
+		standaloneResourceWindow->add(_leftGroup);
+		standaloneResourceWindow->resizable(_leftGroup);
+		standaloneResourceWindow->resize(leftX + 10, leftY + 10, leftW + 20, leftH + 20);
+		standaloneResourceWindow->redraw();
+		standaloneResourceWindow->show();
+		this->redraw();
+
+
+		// resize the main window according to the viewer size
+		int viewerX = fltkViewer->x();
+		int viewerY = fltkViewer->y();
+		int viewerW = fltkViewer->w();
+		int viewerH = fltkViewer->h();
+
+		int curX = x();
+		int curY = y();
+		fltkViewer->resize(10, 28, viewerW, viewerH);
+
+		_mainGroup->add(fltkViewer);
+		this->resizable(_mainGroup);
+		_mainGroup->resizable(fltkViewer);
+
+		_mainGroup->resize(curX + 10, curY + 28, viewerW, viewerH);
+		this->resize(curX, curY, viewerW + 20, viewerH + 28);
+	
+		fltkViewer->damage(FL_DAMAGE_ALL);
+		_mainGroup->damage(FL_DAMAGE_ALL);
+		this->damage(FL_DAMAGE_ALL);
+		
+		
+		
+
+		this->redraw();
+
+
+
+
+
+	}
 }
 
 std::string BaseWindow::chooseFile(const std::string& label, const std::string& filter, const std::string& defaultDirectory)
@@ -804,11 +885,16 @@ void BaseWindow::LaunchDataViewerCB(Fl_Widget* widget, void* data)
 void BaseWindow::LaunchResourceViewerCB( Fl_Widget* widget, void* data )
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (!rootWindow->resourceWindow)
+	if (rootWindow->_layoutMode == 0)
 	{
-		rootWindow->resourceWindow = new ResourceWindow(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "Resource Viewer");
+		rootWindow->_layoutMode = 1;
 	}
-	rootWindow->resourceWindow->show();
+	else
+	{
+		rootWindow->_layoutMode = 0;
+	}
+	rootWindow->changeLayoutMode(rootWindow->_layoutMode);
+	
 }
 
 void BaseWindow::LaunchFaceViewerCB( Fl_Widget* widget, void* data )
