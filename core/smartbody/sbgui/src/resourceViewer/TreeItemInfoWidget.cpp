@@ -22,7 +22,7 @@ const int Pad = 10;
 /* Tree Item Info Widget                                                */
 /************************************************************************/
 
-TreeItemInfoWidget::TreeItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type ) : Fl_Group(x,y,w,h), treeItem(inputItem), itemType(type)
+TreeItemInfoWidget::TreeItemInfoWidget( int x, int y, int w, int h, const char* name) : Fl_Group(x,y,w,h)
 {	
 	this->begin();
 // 	Fl_Input* info = new Fl_Input(Pad*5+x,Pad+y,120,20,"Type");
@@ -38,29 +38,27 @@ TreeItemInfoWidget::TreeItemInfoWidget( int x, int y, int w, int h, const char* 
 /* Skeleton Info                                                        */
 /************************************************************************/
 
-SkeletonItemInfoWidget::SkeletonItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
+SkeletonItemInfoWidget::SkeletonItemInfoWidget( const std::string& characterName, int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name)
 {
 	jointInfoObject = new TreeInfoObject();
 	this->begin();
-	skeletonTree = new Fl_TreeHorizontal(Pad*2+x,Pad*2+y,w-30,h-400);//new Fl_Tree(10,10,w - 300, h - 30);			
+	skeletonTree = new Fl_TreeHorizontal(Pad*2+x,Pad*2+y,w-30,100);//new Fl_Tree(10,10,w - 300, h - 30);			
 	skeletonTree->callback(treeCallBack,this);	
-	attrWindow = new AttributeWindow(jointInfoObject,Pad*2+x,Pad*2+y+h-380,w-30,360,"Joint Attributes");
+	attrWindow = new AttributeWindow(jointInfoObject,Pad*2+x,Pad*2+y+110,w - 30,h -(Pad*2+110),"Joint Attributes");
 	attrWindow->setOffset(150);
 	attrWindow->begin();
 	attrWindow->end();
 	this->end();	
 	this->resizable(skeletonTree);
 	itemSkeleton = NULL;	
-	skeletonName = inputItem->label();
-	charName = inputItem->parent()->label();
+	skeletonName = name;
+	charName = characterName;
 	updateWidget();
 }
 
 void SkeletonItemInfoWidget::updateWidget()
 {
 	skeletonTree->clear_children(skeletonTree->root());
-	if (!treeItem->label())
-		return;
 
 	SmartBody::SBCharacter* sbmChar = SmartBody::SBScene::getScene()->getCharacter(charName);
 	if (sbmChar)
@@ -181,7 +179,7 @@ void SkeletonItemInfoWidget::treeCallBack( Fl_Widget* widget, void* data )
 /*  Motion Item Info Widget                                             */
 /************************************************************************/
 
-MotionItemInfoWidget::MotionItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
+MotionItemInfoWidget::MotionItemInfoWidget( int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name)
 {
 	channelInfoObject = new TreeInfoObject();
 	this->begin();
@@ -196,7 +194,7 @@ MotionItemInfoWidget::MotionItemInfoWidget( int x, int y, int w, int h, const ch
 	attrWindow->end();
 	this->end();	
 	this->resizable(channelBrowser);	
-	motionName = inputItem->label();
+	motionName = name;
 	updateWidget();
 }
 
@@ -290,7 +288,7 @@ void MotionItemInfoWidget::updateChannelAttributes()
 /************************************************************************/
 /* Path Info Widget                                                     */
 /************************************************************************/
-PathItemInfoWidget::PathItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
+PathItemInfoWidget::PathItemInfoWidget( int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name)
 {
 	observer = observerWindow;
 	this->begin();
@@ -319,7 +317,7 @@ void PathItemInfoWidget::addDirectory( const char* dirName )
 	char relativePath[256];
 	fl_filename_relative(relativePath, sizeof(relativePath), directory.c_str());
 
-	std::string paraType = getTypeParameter(itemType);
+	std::string paraType = "";//getTypeParameter(itemType);
 
 	SmartBody::SBScene::getScene()->addAssetPath(paraType, relativePath);
 	updateWidget();
@@ -334,6 +332,7 @@ std::string PathItemInfoWidget::getTypeParameter( int type )
 	std::string paraType = "script";
 	switch (type)
 	{
+		/*
 	case ResourceWindow::ITEM_SEQ_PATH :
 		paraType = "script";
 		break;
@@ -346,6 +345,7 @@ std::string PathItemInfoWidget::getTypeParameter( int type )
 	case ResourceWindow::ITEM_MESH_PATH :
 		paraType = "mesh";
 		break;
+	*/
 	}
 	return paraType;
 }
@@ -353,9 +353,9 @@ std::string PathItemInfoWidget::getTypeParameter( int type )
 /************************************************************************/
 /* Seq Item Info Widget                                                 */
 /************************************************************************/
-SeqItemInfoWidget::SeqItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
+SeqItemInfoWidget::SeqItemInfoWidget( int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name)
 {
-	seqFilename = inputItem->label();
+	seqFilename = name;
 	this->begin();
 	//runSeqButton = new Fl_Button()
 	runSeqButton = new Fl_Button( Pad*2+x,Pad*2+y, 100, 20, "Run Seq");
@@ -444,11 +444,11 @@ void SeqItemInfoWidget::editSeqCallback( Fl_Widget* widget, void* data )
 /* Event Item Info Widget                                                 */
 /************************************************************************/
 
-EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow)
-: TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
+EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow)
+: TreeItemInfoWidget(x,y,w,h,name)
 {
 	eventInfoObject = new TreeInfoObject();
-	eventName = inputItem->label();
+	eventName = name;
 	eventInfoObject->setName(eventName);
 	eventInfoObject->createStringAttribute("EventType","",true,"Basic",10,false,false,false,"?");
 	eventInfoObject->createStringAttribute("Action","",true,"Basic",20,false,false,false,"?");
@@ -536,11 +536,11 @@ void EventItemInfoWidget::removeEvent()
 /************************************************************************/
 /* Pawn Item Info Widget                                                */
 /************************************************************************/
-PawnItemInfoWidget::PawnItemInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SBObserver* observerWindow ) 
-: TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
+PawnItemInfoWidget::PawnItemInfoWidget( int x, int y, int w, int h, const char* name, SBObserver* observerWindow ) 
+: TreeItemInfoWidget(x,y,w,h,name)
 {
 	pawnInfoObject = NULL;
-	pawnName = inputItem->label();
+	pawnName = name;
 	updateWidget();
 	//if (observerWindow)
 	//	pawnInfoObject->registerObserver(observerWindow);
@@ -601,8 +601,8 @@ void PawnItemInfoWidget::notify( SmartBody::SBSubject* subject )
 	}
 }
 
-AttributeItemWidget::AttributeItemWidget( SmartBody::SBObject* object, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow /*= NULL*/ )
-: TreeItemInfoWidget(x,y,w,h,name,inputItem,type)
+AttributeItemWidget::AttributeItemWidget( SmartBody::SBObject* object, int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow /*= NULL*/ )
+: TreeItemInfoWidget(x,y,w,h,name)
 {
 	attrWindow = NULL;
 	infoObject = object;
@@ -626,8 +626,8 @@ AttributeItemWidget::~AttributeItemWidget()
 	delete attrWindow;
 }
 
-DoubleAttributeItemWidget::DoubleAttributeItemWidget( SmartBody::SBObject* object1, SmartBody::SBObject* object2, int x, int y, int w, int h, int ySep, const char* name1, const char* name2, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow /*= NULL*/ )
-: TreeItemInfoWidget(x,y,w,h,name1,inputItem,type)
+DoubleAttributeItemWidget::DoubleAttributeItemWidget( SmartBody::SBObject* object1, SmartBody::SBObject* object2, int x, int y, int w, int h, int ySep, const char* name1, const char* name2, SmartBody::SBObserver* observerWindow /*= NULL*/ )
+: TreeItemInfoWidget(x,y,w,h,name1)
 {
 	attrWindow1 = NULL;
 	attrWindow2 = NULL;
@@ -662,8 +662,8 @@ void DoubleAttributeItemWidget::updateWidget()
 	redraw();
 }
 
-MultiAttributeItemWidget::MultiAttributeItemWidget( std::vector<SmartBody::SBObject*>& objectList, int x, int y, int w, int h, int yStep, const char* name, std::vector<std::string>& objectNameList, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow /*= NULL*/ )
-:TreeItemInfoWidget(x,y,w,h,name,inputItem,type) 
+MultiAttributeItemWidget::MultiAttributeItemWidget( std::vector<SmartBody::SBObject*>& objectList, int x, int y, int w, int h, int yStep, const char* name, std::vector<std::string>& objectNameList, SmartBody::SBObserver* observerWindow /*= NULL*/ )
+:TreeItemInfoWidget(x,y,w,h,name) 
 {
 	infoObjectList = objectList;
 	attrNameList = objectNameList;
@@ -695,8 +695,8 @@ void MultiAttributeItemWidget::updateWidget()
 	redraw();
 }
 
-AnimationBlendInfoWidget::AnimationBlendInfoWidget( SmartBody::SBAnimationBlend* blend, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow )
-:TreeItemInfoWidget(x,y,w,h,name,inputItem,type) 
+AnimationBlendInfoWidget::AnimationBlendInfoWidget( SmartBody::SBAnimationBlend* blend, int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow )
+:TreeItemInfoWidget(x,y,w,h,name) 
 {
 	if (!blend) return;
 	attrWindow = NULL;
@@ -733,8 +733,8 @@ void AnimationBlendInfoWidget::updateWidget()
 	this->redraw();
 }
 
-BlendTransitionInfoWidget::BlendTransitionInfoWidget( SmartBody::SBAnimationTransition* transition, int x, int y, int w, int h, const char* name, Fl_Tree_Item* inputItem, int type, SmartBody::SBObserver* observerWindow )
-:TreeItemInfoWidget(x,y,w,h,name,inputItem,type) 
+BlendTransitionInfoWidget::BlendTransitionInfoWidget( SmartBody::SBAnimationTransition* transition, int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow )
+:TreeItemInfoWidget(x,y,w,h,name) 
 {
 	if (!transition) return;
 	attrWindow = NULL;

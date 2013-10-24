@@ -599,6 +599,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\panimationviewer\VisualizationView.cpp" />
     <ClCompile Include="..\src\PawnPosControl.cpp" />
     <ClCompile Include="..\src\PositionControl.cpp" />
+    <ClCompile Include="..\src\resourceViewer\AttributeEditor.cpp" />
     <ClCompile Include="..\src\retargetcreator\RetargetCreatorWindow.cpp" />
     <ClCompile Include="..\src\retargetviewer\RetargetViewer.cpp" />
     <ClCompile Include="..\src\RootWindow.cxx" />
@@ -651,6 +652,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\SBGUIManager.cpp" />
     <ClCompile Include="..\src\sbm_main.cpp" />
     <ClCompile Include="..\src\SBOgreListener.cpp" />
+    <ClCompile Include="..\src\SBSelectionManager.cpp" />
     <ClCompile Include="..\src\SBWindowListener.cpp" />
     <ClCompile Include="..\src\visemeviewer\VisemeCurve.cpp" />
     <ClCompile Include="..\src\visemeviewer\VisemeCurveEditor.cpp" />
@@ -689,6 +691,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClInclude Include="..\src\panimationviewer\VisualizationView.h" />
     <ClInclude Include="..\src\PawnPosControl.h" />
     <ClInclude Include="..\src\PositionControl.h" />
+    <ClInclude Include="..\src\resourceViewer\AttributeEditor.h" />
     <ClInclude Include="..\src\retargetcreator\RetargetCreatorWindow.h" />
     <ClInclude Include="..\src\retargetviewer\RetargetViewer.h" />
     <ClInclude Include="..\src\RootWindow.h" />
@@ -739,6 +742,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClInclude Include="..\src\pic.h" />
     <ClInclude Include="..\src\SBGUIManager.h" />
     <ClInclude Include="..\src\SBOgreListener.h" />
+    <ClInclude Include="..\src\SBSelectionManager.h" />
     <ClInclude Include="..\src\SBWindowListener.h" />
     <ClInclude Include="..\src\visemeviewer\VisemeCurve.h" />
     <ClInclude Include="..\src\visemeviewer\VisemeCurveEditor.h" />

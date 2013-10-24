@@ -958,7 +958,7 @@ int main( int argc, char **argv )	{
 	scene->setMediaPath(mediaPath);
 
 // change the default font size
-	FL_NORMAL_SIZE = 12;
+	FL_NORMAL_SIZE = 11;
 	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
 	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
 	//viewerFactory->setFltkViewer(viewer);

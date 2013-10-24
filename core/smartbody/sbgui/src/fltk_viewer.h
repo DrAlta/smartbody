@@ -47,6 +47,7 @@
 #include <sb/SBMotionBlendBase.h>
 #include <sb/SBEvent.h>
 #include "ObjectManipulationHandle.h"
+#include <SBSelectionManager.h>
 //#include <CEGUI.h>
 
 class SBGeomObject;
@@ -80,7 +81,7 @@ class PALocomotionData;
     A popup menu appears with a right button click or ctrl+shift+m. */
 
 //class FltkViewer : public SrViewer, public Fl_Gl_Window, public SmartBody::SBObserver
-class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
+class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public SelectionListener
  {
    public : // enumerators
 
@@ -393,7 +394,11 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver
 	virtual void show_viewer();
 	virtual void hide_viewer();
 	virtual void makeGLContext();
+
 	virtual void resetViewer();
+
+	virtual void OnSelect(const std::string& value);
+	virtual void OnDeselect(const std::string& value);
 
     FltkViewerData* _data;
 	GestureData* _gestureData;

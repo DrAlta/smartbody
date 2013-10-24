@@ -27,6 +27,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <sb/SBObject.h>
 
 /**
  *  Maps viseme ids to the related motion.
@@ -40,7 +41,7 @@ namespace SmartBody {
 
 class SBMotion;
 
-class SBFaceDefinition
+class SBFaceDefinition : public SBObject
 {
 	public:
 		SBAPI SBFaceDefinition();
@@ -48,9 +49,6 @@ class SBFaceDefinition
 		SBAPI SBFaceDefinition(SBFaceDefinition* source);
 
 		SBAPI ~SBFaceDefinition();
-
-		SBAPI const std::string& getName();
-		SBAPI void setName(const std::string& name);
 
 		SBAPI void setFaceNeutral(const std::string& motionName);
 		SBAPI SkMotion* getFaceNeutral();

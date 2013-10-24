@@ -27,6 +27,7 @@
 #include <sb/SBGestureMapManager.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBAnimationStateManager.h>
+#include <sb/SBGestureMap.h>
 #include <sb/nvbg.h>
 
 #include <sbm/action_unit.hpp>
@@ -35,168 +36,131 @@
 #include "FLTKListener.h"
 
 
-// enum {
-// 	ITEM_PHYSICS = 0,
-// 	ITEM_SEQ_PATH, 
-// 	ITEM_ME_PATH, 
-// 	ITEM_AUDIO_PATH, 
-// 	ITEM_MESH_PATH, 
-// 	ITEM_SEQ_FILES,
-// 	ITEM_SKELETON, 
-// 	ITEM_JOINT_MAP,
-// 	ITEM_MOTION, 			   
-// 	ITEM_FACE_DEFINITION,
-// 	ITEM_EVENT_HANDLERS,
-// 	ITEM_PAWN, 
-// 	ITEM_CHARACTER,   
-// 	ITEM_NETURAL_MOTION,
-// 	ITEM_AU_MAP,
-// 	ITEM_VISEME_MAP,
-// 	ITEM_SIZE };
-
-
-ResourceWindowListener::ResourceWindowListener(ResourceWindow* window)
+ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Group(x, y, w, h, name), SBWindowListener(), SelectionListener()
 {
-	_window = window;
-}
-
-void ResourceWindowListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
-{
-	_window->updateGUI();
-}
-
-void ResourceWindowListener::OnCharacterDelete( const std::string & name )
-{
-	_window->updateGUI();
-}
-
-void ResourceWindowListener::OnCharacterUpdate( const std::string & name )
-{
-	_window->updateGUI();
-}
-      
-void ResourceWindowListener::OnPawnCreate( const std::string & name )
-{
-	_window->updateGUI();
-}
-
-void ResourceWindowListener::OnPawnDelete( const std::string & name )
-{
-	_window->updateGUI();
-}
-
-void ResourceWindowListener::OnReset()
-{
-	_window->updateGUI();
-}
-
-void ResourceWindowListener::OnSimulationStart()
-{
-}
-
-void ResourceWindowListener::OnSimulationEnd()
-{
-}
-
-void ResourceWindowListener::OnSimulationUpdate()
-{
-}
-
-
-ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Double_Window(w, h, name), GenericViewer(x, y, w, h)
-{
-	int rightPanelWidth = 450;
 	itemInfoWidget = NULL;
 	lastClickedItemPath = " ";
+	emptyString = "";
 
-	ItemNameList.push_back("SCENE");
-	ItemNameList.push_back("SERVICES");
-	ItemNameList.push_back("SEQ_PATH");
-	ItemNameList.push_back("ME_PATH");
-	ItemNameList.push_back("AUDIO_PATH");
-	ItemNameList.push_back("MESH_PATH");
-	ItemNameList.push_back("SEQ_FILES");
-	ItemNameList.push_back("SKELETON");
-	ItemNameList.push_back("JOINT MAP");
-	ItemNameList.push_back("MOTION");
-	ItemNameList.push_back("ANIMATION BLEND");
-	ItemNameList.push_back("BLEND TRANSITION");
-	ItemNameList.push_back("MESH");
-	ItemNameList.push_back("FACE DEFINITION");
-	ItemNameList.push_back("EVENT HANDLERS");
-	ItemNameList.push_back("PAWN");
-	ItemNameList.push_back("CHARACTER");
-	ItemNameList.push_back("CONTROLLER");
-	ItemNameList.push_back("PHYSICS");
-	ItemNameList.push_back("NEUTRAL MOTION");
-	ItemNameList.push_back("AU MAP");
-	ItemNameList.push_back("VISEME MAP");	
-	ItemNameList.push_back("DEFAULT");
-
-
-	for (int i=0;i<ITEM_SIZE;i++)
-		treeItemList[i] = NULL;
+	/*
+	_itemNameList.push_back("controller");
+	_itemNameList.push_back("physics");
+	_itemNameList.push_back("neutral");
+	_itemNameList.push_back("au");
+	_itemNameList.push_back("viseme");	
+	_itemNameList.push_back("default");
+	*/
 
 	// create Tree Info Object
+	int index = 0;
 	this->begin();
-	resourceTree = new Fl_TreeHorizontal(10,10,w-rightPanelWidth,h-30);//new Fl_Tree(10,10,w - 300, h - 30);			
+	resourceTree = new Fl_TreeHorizontal(x, y, w - 10, h - 10);
 	resourceTree->showroot(0);
-	pathTree = resourceTree->add("Paths");	
-	pathTree->user_data((void*)ITEM_DEFAULT);
-	treeItemList[ITEM_SEQ_PATH] = resourceTree->add(pathTree,"Script Paths");
-	treeItemList[ITEM_ME_PATH] = resourceTree->add(pathTree,"Motion Paths");
-	treeItemList[ITEM_AUDIO_PATH] = resourceTree->add(pathTree,"Audio Paths");
-	treeItemList[ITEM_MESH_PATH] = resourceTree->add(pathTree,"Mesh Paths");
 
-	treeItemList[ITEM_SEQ_FILES] = resourceTree->add("Scripts");
+	Fl_Tree_Item* pathTree = resourceTree->add("Paths");
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(pathTree, "paths"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add(pathTree,"Scripts"), "script path"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add(pathTree,"Motions"), "motion path"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add(pathTree,"Audio"), "audio path"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add(pathTree,"Mesh"), "mesh path"));
 
-	treeItemList[ITEM_SKELETON] = resourceTree->add("Skeletons");
-	treeItemList[ITEM_JOINT_MAP] = resourceTree->add("Character Maps");
-	treeItemList[ITEM_DIPHONES] = resourceTree->add("Lip Syncing");
-	treeItemList[ITEM_MOTION] =  resourceTree->add("Motions");	
-	treeItemList[ITEM_ANIMATION_BLEND] =  resourceTree->add("Animation Blends");
-	treeItemList[ITEM_BLEND_TRANSITION] =  resourceTree->add("Blend Transitions");
-	treeItemList[ITEM_MESH] =  resourceTree->add("Meshes");	
-
-	treeItemList[ITEM_FACE_DEFINITION] = resourceTree->add("Face Definitions");
-	treeItemList[ITEM_EVENT_HANDLERS] = resourceTree->add("Event Handlers");
-
-	treeItemList[ITEM_PAWN] = resourceTree->add("Pawns");
-	treeItemList[ITEM_CHARACTER] = resourceTree->add("Characters");
-
-	treeItemList[ITEM_SCENE] = resourceTree->add("Scene");
-	treeItemList[ITEM_SERVICES] = resourceTree->add("Services");
-	//treeItemList[ITEM_PHYSICS] = resourceTree->add("Physics");
-
-	// set user_data to be the item enum ID
-	for (int i = 0; i <= ITEM_CHARACTER; i++)
-		treeItemList[i]->user_data((void*)i);
-
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Scene"), "scene"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Scripts"), "scripts"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Skeletons"), "skeleton"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Character Maps"), "jointmap"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Gesture Maps"), "gesturemap"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Lip Syncing"), "lipsync"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Motions"), "motion"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Blends"), "blend"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Transitions"), "transition"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Models"), "mesh"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Face Definitions"), "face definition"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Event Handlers"), "event handler"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Pawns"), "pawn"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Characters"), "character"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Services"), "service"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Behavior Sets"), "behavior"));
+	
 	resourceTree->callback(treeCallBack,this);	
 
-	refreshButton = new Fl_Button( w - rightPanelWidth + 20 , 10 , 100, 20, "Refresh");
-	refreshButton->callback(refreshUI, this);
-
-	resourceInfoGroup = new Fl_Group( w - rightPanelWidth + 20, 40, rightPanelWidth - 40 , h - 60);
-	resourceInfoGroup->box(FL_UP_BOX);
 	this->end();	
+
 	this->resizable(resourceTree);
 	updateGUI();	
 	//resourceTree->close(resourceTree->root());	
-	for (int i = 0; i < ITEM_SIZE; i++)
+	for (std::map<Fl_Tree_Item*, std::string>::iterator iter = _treeMap.begin();
+		 iter != _treeMap.end();
+		 iter++)
 	{
-		if (treeItemList[i])
-			treeItemList[i]->close();
+		//(*iter).first->labelfont(FL_HELVETICA_BOLD);
+//		(*iter).second.closecond->close();
 	}
 
-	_listener = new ResourceWindowListener(this);
+	windowShow();
+
+	_specialNames[1] = "controller";
+	_specialNames[2] = "skeleton";
+	_specialNames[3] = "minibrain";
+	_specialNames[4] = "physics";
+	_specialNames[5] = "neutral";
+	_specialNames[6] = "au";
+	_specialNames[7] = "viseme";
+	_specialNames[8] = "default";
+
+	for (std::map<int, std::string>::iterator iter = _specialNames.begin();
+		 iter != _specialNames.end();
+		 iter++)
+	{
+		_reverseSpecialNames.insert(std::pair<std::string, int>((*iter).second, (*iter).first));
+	}
+
 	
 }
 
 ResourceWindow::~ResourceWindow()
 {
-	SmartBody::SBScene::getScene()->removeSceneListener(_listener);
-	delete _listener;
+}
+
+std::string ResourceWindow::getNameFromTree(Fl_Tree_Item* item)
+{
+	std::map<Fl_Tree_Item*, std::string>::iterator iter = _treeMap.find(item);
+	if (iter != _treeMap.end())
+		return (*iter).second;
+	else
+		return emptyString;
+}
+
+Fl_Tree_Item* ResourceWindow::getTreeFromName(const std::string& name)
+{
+	for (std::map<Fl_Tree_Item*, std::string>::iterator iter = _treeMap.begin();
+		 iter != _treeMap.end();
+		 iter++)
+	{
+		if (name == (*iter).second)
+			return (*iter).first;
+	}
+
+	return NULL;
+}
+
+std::string ResourceWindow::getNameFromItem(Fl_Tree_Item* item)
+{
+	// find the item just under the root item
+	std::string subname = "";
+	Fl_Tree_Item* curItem = item;
+	int numSubnames = 0;
+	while (curItem->parent() != resourceTree->root())
+	{
+		long specialNameIndex = (long) curItem->user_data();
+		if (specialNameIndex > 0)
+		{
+			subname = "/" + _specialNames[specialNameIndex] + subname;
+			numSubnames++;
+		}
+		curItem = curItem->parent();
+	}
+
+	return  getNameFromTree(curItem) + subname;
 }
 
 void ResourceWindow::label_viewer( std::string name )
@@ -206,29 +170,14 @@ void ResourceWindow::label_viewer( std::string name )
 
 void ResourceWindow::show()
 {
-	SmartBody::SBScene::getScene()->addSceneListener(_listener);
-	Fl_Double_Window::show();
+	SBWindowListener::windowShow();
+	Fl_Group::show();
 }
 
 void ResourceWindow::hide()
 {
-	SmartBody::SBScene::getScene()->removeSceneListener(_listener);
-	Fl_Double_Window::hide();
-}
-
-void ResourceWindow::show_viewer()
-{
-	this->show();
-}
-
-void ResourceWindow::hide_viewer()
-{
-	this->hide();
-}
-
-void ResourceWindow::update_viewer()
-{
-
+	SBWindowListener::windowHide();
+	Fl_Group::hide();
 }
 
 
@@ -249,7 +198,7 @@ bool ResourceWindow::processedDragAndDrop( std::string& dndText )
 
 int ResourceWindow::handle( int event )
 {
-	int ret = Fl_Double_Window::handle(event);
+	int ret = Fl_Group::handle(event);
 	std::string dndText;
 	switch ( event ) {
 		case FL_DND_RELEASE:
@@ -289,17 +238,17 @@ int ResourceWindow::handle( int event )
 				Fl_Tree_Item* lastItem = resourceTree->find_item(lastClickedItemPath.c_str());	
 				if (lastItem)
 				{
-					long itemType = (long)lastItem->user_data();
+					const char* itemType = (const char*)lastItem->user_data();
 					bool sendDND = false;
 					std::string dndMsg = "";
-					if (itemType == ITEM_SKELETON)
+					if (strcmp(itemType, "skeleton") == 0)
 					{
 						std::string skName = lastItem->label();
 						dndMsg = "SKELETON:";
 						dndMsg += skName;
 						sendDND = true;
 					}
-					else if (itemType == ITEM_PAWN)
+					else if (strcmp(itemType, "pawn") == 0)
 					{
 						dndMsg = "PAWN:dummy";
 						sendDND = true;
@@ -323,7 +272,7 @@ int ResourceWindow::handle( int event )
 			case FL_Delete:
 				{
 					// check pawns and characters for selection
-					Fl_Tree_Item* tree = treeItemList[ITEM_PAWN];
+					Fl_Tree_Item* tree = getTreeFromName("pawn");
 					int numChildren = tree->children();
 					for (int c = 0; c < numChildren; c++)
 					{
@@ -337,7 +286,7 @@ int ResourceWindow::handle( int event )
 						}
 					}
 
-					tree = treeItemList[ITEM_CHARACTER];
+					tree = getTreeFromName("character");
 					numChildren = tree->children();
 					for (int c = 0; c < numChildren; c++)
 					{
@@ -377,13 +326,12 @@ void ResourceWindow::update()
 
 void ResourceWindow::draw()
 {	
-	Fl_Double_Window::draw();
+	Fl_Group::draw();
 }
 
 void ResourceWindow::resize( int x, int y, int w, int h )
 {
-	Fl_Double_Window::resize(x, y, w, h);   
-	this->redraw();
+	Fl_Group::resize(x, y, w, h);
 }
 
 void ResourceWindow::updateGUI()
@@ -394,128 +342,140 @@ void ResourceWindow::updateGUI()
 
 	resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
 	// update path tree	
-	updatePath(treeItemList[ITEM_SEQ_PATH], SmartBody::SBScene::getScene()->getAssetPaths("script"));	
-	updatePath(treeItemList[ITEM_ME_PATH], SmartBody::SBScene::getScene()->getAssetPaths("motion"));	
-	updatePath(treeItemList[ITEM_AUDIO_PATH], SmartBody::SBScene::getScene()->getAssetPaths("audio"));	
-	updatePath(treeItemList[ITEM_MESH_PATH], SmartBody::SBScene::getScene()->getAssetPaths("mesh"));	
+	updatePath(getTreeFromName("script path"), SmartBody::SBScene::getScene()->getAssetPaths("script"));	
+	updatePath(getTreeFromName("motion path"), SmartBody::SBScene::getScene()->getAssetPaths("motion"));	
+	updatePath(getTreeFromName("audio path"), SmartBody::SBScene::getScene()->getAssetPaths("audio"));	
+	updatePath(getTreeFromName("mesh path"), SmartBody::SBScene::getScene()->getAssetPaths("mesh"));	
 	
 
 	// update sequence file list
 
 	const std::vector<std::string> scriptPaths = SmartBody::SBScene::getScene()->getAssetPaths("script");
-	resourceTree->clear_children(treeItemList[ITEM_SEQ_FILES]);
+	resourceTree->clear_children(getTreeFromName("scripts"));
 	for (size_t p = 0; p < scriptPaths.size(); p++)
 	{
-		updateSeqFiles(treeItemList[ITEM_SEQ_FILES], scriptPaths[p]);
+		updateScriptFiles(getTreeFromName("scripts"), scriptPaths[p]);
 	}	
 
 	// update skeleton
-	resourceTree->clear_children(treeItemList[ITEM_SKELETON]);
+	resourceTree->clear_children(getTreeFromName("skeleton"));
 	std::vector<std::string> skeletons = scene->getSkeletonNames();
 	for (size_t c = 0; c < skeletons.size(); c++)
 	{
 		SmartBody::SBSkeleton * skel = scene->getSkeleton(skeletons[c]);
-		updateSkeleton(treeItemList[ITEM_SKELETON], skel);
+		updateSkeleton(getTreeFromName("skeleton"), skel);
 	}
 
 	// update joint maps
-	resourceTree->clear_children(treeItemList[ITEM_JOINT_MAP]);	
+	resourceTree->clear_children(getTreeFromName("jointmap"));	
 	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
 	std::vector<std::string> jointMapNames = jointMapManager->getJointMapNames();
 	for (std::vector<std::string>::iterator iter = jointMapNames.begin();
 		 iter != jointMapNames.end(); 
 		 iter++)
 	{
-		Fl_Tree_Item* boneMapItem = resourceTree->add(treeItemList[ITEM_JOINT_MAP], (*iter).c_str());
+		Fl_Tree_Item* boneMapItem = resourceTree->add(getTreeFromName("jointmap"), (*iter).c_str());
 		updateJointMap(boneMapItem, jointMapManager->getJointMap((*iter)));
 	}
 
+	// update gesture maps
+	resourceTree->clear_children(getTreeFromName("gesturemap"));
+	SmartBody::SBGestureMapManager* gestureMapManager = scene->getGestureMapManager();
+	std::vector<std::string> gestureMapNames = gestureMapManager->getGestureMapNames();
+	for (std::vector<std::string>::iterator iter = gestureMapNames.begin();
+		 iter != gestureMapNames.end(); 
+		 iter++)
+	{
+		Fl_Tree_Item* gestureMapItem = resourceTree->add(getTreeFromName("gesturemap"), (*iter).c_str());
+		updateGestureMap(gestureMapItem, gestureMapManager->getGestureMap((*iter)));
+	}
+
 	// update motion map
-	resourceTree->clear_children(treeItemList[ITEM_MOTION]);
+	resourceTree->clear_children(getTreeFromName("motion"));
 	std::vector<std::string> motionNames = scene->getMotionNames();
 	for (size_t i = 0; i < motionNames.size(); i++)
 	{
 		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
 		SmartBody::SBMotion * motion = scene->getMotion(motionNames[i]);
-		updateMotion(treeItemList[ITEM_MOTION], motion);
+		updateMotion(getTreeFromName("motion"), motion);
 	}
 
 	SmartBody::SBAnimationBlendManager* blendManager = scene->getBlendManager();
 	// update animation blend map
-	resourceTree->clear_children(treeItemList[ITEM_ANIMATION_BLEND]);
+	resourceTree->clear_children(getTreeFromName("blend"));
 	std::vector<std::string> blendNames = blendManager->getBlendNames();
 	for (size_t i = 0; i < blendNames.size(); i++)
 	{
 		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
 		SmartBody::SBAnimationBlend * blend = blendManager->getBlend(blendNames[i]);
-		updateAnimationBlend(treeItemList[ITEM_ANIMATION_BLEND], blend);
+		updateAnimationBlend(getTreeFromName("blend"), blend);
 	}
 
 	// update blend transition map
-	resourceTree->clear_children(treeItemList[ITEM_BLEND_TRANSITION]);
+	resourceTree->clear_children(getTreeFromName("transition"));
 	std::vector<std::string> transitionNames = blendManager->getTransitionNames();
 	for (size_t i = 0; i < transitionNames.size(); i++)
 	{
 		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
 		SmartBody::SBAnimationTransition * transition = blendManager->getTransitionByName(transitionNames[i]);
-		updateBlendTransition(treeItemList[ITEM_BLEND_TRANSITION], transition);
+		updateBlendTransition(getTreeFromName("transition"), transition);
 	}
 
 	// update mesh map
-	resourceTree->clear_children(treeItemList[ITEM_MESH]);
+	resourceTree->clear_children(getTreeFromName("mesh"));
 	std::vector<std::string> meshNames = assetManager->getDeformableMeshNames();
 	for (size_t i = 0; i < meshNames.size(); i++)
 	{
 		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
 		DeformableMesh* mesh = assetManager->getDeformableMesh(meshNames[i]);
-		updateMesh(treeItemList[ITEM_MESH], mesh);
+		updateMesh(getTreeFromName("mesh"), mesh);
 	}
 
 	// update face definition map
-	resourceTree->clear_children(treeItemList[ITEM_FACE_DEFINITION]);
+	resourceTree->clear_children(getTreeFromName("face definition"));
 	std::vector<std::string> faceNames = scene->getFaceDefinitionNames();
 	for (size_t i = 0; i < faceNames.size(); i++)
 	{
 		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
 		SmartBody::SBFaceDefinition * face = scene->getFaceDefinition(faceNames[i]);
-		Fl_Tree_Item* faceTree = resourceTree->add(treeItemList[ITEM_FACE_DEFINITION], face->getName().c_str());
-		faceTree->user_data((void*)ITEM_FACE_DEFINITION);
-		updateFaceMotion(faceTree, face);
+		if (!face)
+			continue;
+		Fl_Tree_Item* faceTree = resourceTree->add(getTreeFromName("face definition"), face->getName().c_str());
+		updateFaceDefinition(faceTree, face);
 	}
 
 	// update event handler list
 	SmartBody::SBEventManager* eventManager = SmartBody::SBScene::getScene()->getEventManager();
 	SmartBody::SBEventHandlerMap& eventMap = eventManager->getEventHandlers();
 	SmartBody::SBEventHandlerMap::iterator ei;
-	resourceTree->clear_children(treeItemList[ITEM_EVENT_HANDLERS]);
+	resourceTree->clear_children(getTreeFromName("event handler"));
 	for ( ei  = eventMap.begin();
 		  ei != eventMap.end();
 		  ei++)
 	{
 		std::string handlerKey = ei->first;
-		Fl_Tree_Item* handlerItem = resourceTree->add(treeItemList[ITEM_EVENT_HANDLERS],handlerKey.c_str());
-		handlerItem->user_data((void*)ITEM_EVENT_HANDLERS);
+		Fl_Tree_Item* handlerItem = resourceTree->add(getTreeFromName("event handler"),handlerKey.c_str());
 		updateEventHandler(handlerItem,ei->second);
 	}
 	// Below are instance objects :
 
 	// update pawn objects
-	resourceTree->clear_children(treeItemList[ITEM_PAWN]);
+	resourceTree->clear_children(getTreeFromName("pawn"));
 	const std::vector<std::string>& pawnNames = scene->getPawnNames();
 	for (size_t i = 0; i < pawnNames.size(); i++)
 	{
 		SmartBody::SBPawn* pawn = scene->getPawn(pawnNames[i]);
-		updatePawn(treeItemList[ITEM_PAWN], pawn);
+		updatePawn(getTreeFromName("pawn"), pawn);
 	}
 
 	// update characters
-	resourceTree->clear_children(treeItemList[ITEM_CHARACTER]);
+	resourceTree->clear_children(getTreeFromName("character"));
 	const std::vector<std::string>& charNames = scene->getCharacterNames();
 	for (size_t i = 0; i < charNames.size(); i++)
 	{
 		SmartBody::SBCharacter* character = scene->getCharacter(charNames[i]);
 		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);
-		updateCharacter(treeItemList[ITEM_CHARACTER], character);
+		updateCharacter(getTreeFromName("character"), character);
 	}
 
 	
@@ -534,7 +494,7 @@ void ResourceWindow::updateGUI()
 	SmartBody::SBServiceManager* serviceManager = scene->getServiceManager();
 	std::map<std::string, SmartBody::SBService*>& serviceMap = serviceManager->getServices();
 
-	resourceTree->clear_children(treeItemList[ITEM_SERVICES]);
+	resourceTree->clear_children(getTreeFromName("service"));
 	for (std::map<std::string, SmartBody::SBService*>::iterator iter = serviceMap.begin();
 		iter != serviceMap.end();
 		iter++)
@@ -543,28 +503,16 @@ void ResourceWindow::updateGUI()
 		resourceTree->sortorder(FL_TREE_SORT_ASCENDING);	
 		SmartBody::SBPhysicsManager* phyManager = dynamic_cast<SmartBody::SBPhysicsManager*>(service);
 		if (phyManager)
-			updatePhysicsManager(treeItemList[ITEM_SERVICES],phyManager);
+			updatePhysicsManager(getTreeFromName("service"),phyManager);
 		else
-			updateService(treeItemList[ITEM_SERVICES], service);
+			updateService(getTreeFromName("service"), service);
 	}			
 
-
-	Fl_Tree_Item* lastItem = resourceTree->find_item(lastClickedItemPath.c_str());	
-	if (lastItem)
-	{		
-		long itemType = (long)lastItem->user_data();
-		updateTreeItemInfo(lastItem,itemType);
-	}
-	else
-	{
-		clearInfoWidget(itemInfoWidget);
-		itemInfoWidget = NULL;
-	}
 }
 
 
 void ResourceWindow::updatePhysicsManager( Fl_Tree_Item* tree, SmartBody::SBPhysicsManager* phyService )
-{
+{/*
 	SmartBody::SBPhysicsSim* phySim = phyService->getPhysicsEngine();
 	Fl_Tree_Item* item = resourceTree->add(tree, phyService->getName().c_str());
 	item->user_data((void*)ITEM_PHYSICS);
@@ -587,10 +535,11 @@ void ResourceWindow::updatePhysicsManager( Fl_Tree_Item* tree, SmartBody::SBPhys
 		Fl_Tree_Item* phyObjItem = resourceTree->add(item, phyObj->getName().c_str());
 		phyObjItem->user_data((void*)ITEM_PHYSICS);
 	}
+	*/
 }
 
 
-void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition )
+void ResourceWindow::updateFaceDefinition( Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition )
 {
 	std::string neutralMotionName = "NA";
 	if (faceDefinition->getFaceNeutral())
@@ -599,15 +548,12 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefi
 	}
 	Fl_Tree_Item* neutralMotionTree = resourceTree->add(tree,"Neutral Expression");
 	neutralMotionTree->close();
-	neutralMotionTree->user_data((void*)ITEM_NETURAL_MOTION);
 
 	Fl_Tree_Item* item = resourceTree->add(neutralMotionTree,neutralMotionName.c_str());
-	item->user_data((void*)ITEM_NETURAL_MOTION);
 
 	// update action unit tree
 	Fl_Tree_Item* auTree = resourceTree->add(tree,"Action Units (AUs)");
 	auTree->close();
-	auTree->user_data((void*)ITEM_AU_MAP);
 	int numAUs = faceDefinition->getNumAUs();
 	for (int a = 0; a < numAUs; a++)
 	{
@@ -617,7 +563,6 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefi
 		
 		Fl_Tree_Item* auItem = resourceTree->add(auTree,auName.c_str());
 		auItem->close();
-		auItem->user_data((void*)ITEM_AU_MAP);
 		std::string auType = "bilateral:";
 		if (au->is_bilateral())
 		{	
@@ -626,8 +571,6 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefi
 				item = resourceTree->add(auItem,(auType+ au->left->getName()).c_str());
 			else
 				item = resourceTree->add(auItem, auType.c_str());
-
-			item->user_data((void*)ITEM_AU_MAP);
 		}
 		else 
 		{
@@ -643,7 +586,6 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefi
 				{
 					item = resourceTree->add(auItem, auType.c_str());
 				}
-				item->user_data((void*)ITEM_AU_MAP);
 			}
 			if (au->is_right())
 			{
@@ -656,7 +598,6 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefi
 				{
 					item = resourceTree->add(auItem, auType.c_str());
 				}
-				item->user_data((void*)ITEM_AU_MAP);
 			}
 		}		
 	}
@@ -664,7 +605,6 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefi
 	// update viseme tree
 	Fl_Tree_Item* visemeTree = resourceTree->add(tree,"Visemes");	
 	visemeTree->close();
-	visemeTree->user_data((void*)ITEM_VISEME_MAP);
 	int numVisemes = faceDefinition->getNumVisemes();
 	for (int v = 0; v < numVisemes; v++)
 	{
@@ -673,7 +613,6 @@ void ResourceWindow::updateFaceMotion( Fl_Tree_Item* tree, SmartBody::SBFaceDefi
 		if (faceDefinition->getVisemeMotion(visemeName))
 			motionName = faceDefinition->getVisemeMotion(visemeName)->getName();
 		Fl_Tree_Item* item = resourceTree->add(visemeTree,(visemeName+"-->"+motionName).c_str());
-		item->user_data((void*)ITEM_VISEME_MAP);		
 	}
 }
 
@@ -687,28 +626,32 @@ void ResourceWindow::updatePath( Fl_Tree_Item* tree, const std::vector<std::stri
 	}	
 }
 
-void ResourceWindow::updateSeqFiles( Fl_Tree_Item* tree, std::string pname )
+void ResourceWindow::updateScriptFiles( Fl_Tree_Item* tree, std::string pname )
 {	
-	using namespace boost::filesystem;
-	path seqPath(pname);		
-	if( is_directory( seqPath ) ) {
-
-		directory_iterator end;
-		for( directory_iterator i( seqPath ); i!=end; ++i ) {
-			const path& cur = *i;
-			if( !is_directory( cur ) ) {
-				std::string ext = extension( cur );	
-				if (_stricmp(ext.c_str(),".seq") == 0 ||
-					_stricmp(ext.c_str(),".SEQ") == 0 )
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<std::string>& scriptPaths = scene->getAssetManager()->getAssetPaths("script");
+	
+	for (std::vector<std::string>::iterator pathIter = scriptPaths.begin();
+		 pathIter != scriptPaths.end(); 
+		 pathIter++)
+	{
+		boost::filesystem::path path(*pathIter);
+		if (boost::filesystem::is_directory(path))
+		{
+			boost::filesystem::directory_iterator end;
+			for (boost::filesystem::directory_iterator iter(path); iter != end; iter++)
+			{
+				const boost::filesystem::path& cur = (*iter);
+				std::string ext = boost::filesystem::extension( cur );
+				if (ext == ".seq" || ext == ".SEQ" || ext == ".py" || ext == ".PY")
 				{
-					std::string fileName = basename(cur);
-					if (tree->find_child(fileName.c_str()) == -1) // if the seq name does not exist in the tree list
+					std::string fileName = boost::filesystem::basename(cur);
+					if (tree->find_child(fileName.c_str()) == -1) // if the script name does not exist in the tree list
 					{
-						Fl_Tree_Item* item = resourceTree->add(tree,fileName.c_str());
-						item->user_data((void*)ITEM_SEQ_FILES);
+						Fl_Tree_Item* item = resourceTree->add(tree, fileName.c_str());						
 					}
 				}
-			} 
+			}
 		}
 	}
 }
@@ -723,8 +666,19 @@ void ResourceWindow::updateJointMap( Fl_Tree_Item* tree, SmartBody::SBJointMap* 
 
 		
 		Fl_Tree_Item* item = resourceTree->add(tree,(key+"-->"+target).c_str());	
-		item->user_data((void*)ITEM_JOINT_MAP);
 		//resourceTree->add(item,target.c_str());
+	}
+}
+
+void ResourceWindow::updateGestureMap( Fl_Tree_Item* tree, SmartBody::SBGestureMap* gestureMap )
+{
+	for (int i=0;i<gestureMap->getNumMappings();i++)
+	{
+		SmartBody::SBGestureMap::GestureInfo& info = gestureMap->getGestureByIndex(i);
+
+		std::stringstream strstr;
+		strstr << info._lexeme << ", " << info._type << ", " << info._hand << ", " << info._style << ", " << info._posture;
+		Fl_Tree_Item* item = resourceTree->add(tree, strstr.str().c_str());	
 	}
 }
 
@@ -742,20 +696,20 @@ void ResourceWindow::updateSkeleton( Fl_Tree_Item* tree, SmartBody::SBSkeleton* 
 	std::string ext = boost::filesystem2::extension( skel->skfilename() );
 #endif	
 	Fl_Tree_Item* item = resourceTree->add(tree,skel->getName().c_str());
-	item->user_data((void*)ITEM_SKELETON);
+	//item->user_data((void*)ITEM_SKELETON);
 }
 
 
 void ResourceWindow::updateMesh( Fl_Tree_Item* tree, DeformableMesh* mesh )
 {
 	Fl_Tree_Item* item = resourceTree->add(tree, mesh->getName().c_str());
-	item->user_data((void*)ITEM_MESH);
+//	item->user_data((void*)ITEM_MESH);
 }
 
 void ResourceWindow::updateAnimationBlend( Fl_Tree_Item* tree, SmartBody::SBAnimationBlend* blend )
 {
 	Fl_Tree_Item* item = resourceTree->add(tree, blend->stateName.c_str());
-	item->user_data((void*)ITEM_ANIMATION_BLEND);
+//	item->user_data((void*)ITEM_ANIMATION_BLEND);
 
 }
 
@@ -763,14 +717,14 @@ void ResourceWindow::updateBlendTransition( Fl_Tree_Item* tree, SmartBody::SBAni
 {	
 	std::string transitionName = transition->getTransitionName();
 	Fl_Tree_Item* item = resourceTree->add(tree, transitionName.c_str());
-	item->user_data((void*)ITEM_BLEND_TRANSITION);
+//	item->user_data((void*)ITEM_BLEND_TRANSITION);
 }
 
 
 void ResourceWindow::updateMotion( Fl_Tree_Item* tree, SmartBody::SBMotion* motion )
 {
 	Fl_Tree_Item* item = resourceTree->add(tree, motion->getName().c_str());
-	item->user_data((void*)ITEM_MOTION);
+//	item->user_data((void*)ITEM_MOTION);
 }
 
 void ResourceWindow::updatePawn( Fl_Tree_Item* tree, SmartBody::SBPawn* pawn )
@@ -779,21 +733,21 @@ void ResourceWindow::updatePawn( Fl_Tree_Item* tree, SmartBody::SBPawn* pawn )
 		return; // this is actually a character
 
 	Fl_Tree_Item* item = resourceTree->add(tree,pawn->getName().c_str());
-	item->user_data((void*)ITEM_PAWN);
+//	item->user_data((void*)ITEM_PAWN);
 }
 
 
 void ResourceWindow::updatePhysicsCharacter( Fl_Tree_Item* tree, SmartBody::SBPhysicsCharacter* phyChar )
 {
 	Fl_Tree_Item* item = resourceTree->add(tree,phyChar->getPhysicsCharacterName().c_str());
-	item->user_data((void*)ITEM_PHYSICS);
+//	item->user_data((void*)ITEM_PHYSICS);
 	resourceTree->sortorder(FL_TREE_SORT_NONE);	
 	std::vector<SmartBody::SBPhysicsJoint*> jointList = phyChar->getPhyJointList();
 	for (unsigned int i=0;i<jointList.size();i++)
 	{
 		SmartBody::SBPhysicsJoint* phyJoint = jointList[i];
 		Fl_Tree_Item* jointItem = resourceTree->add(item,phyJoint->getSBJoint()->getName().c_str());
-		jointItem->user_data((void*)ITEM_PHYSICS);
+//		jointItem->user_data((void*)ITEM_PHYSICS);
 		//Fl_Tree_Item* rigidBodyItem = resourceTree->add(jointItem,"body");
 		//rigidBodyItem->user_data((void*)ITEM_PHYSICS);
 	}
@@ -804,16 +758,17 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SmartBody::SBCharacter
 {
 	SmartBody::SBCharacter* sbcharacter = dynamic_cast<SmartBody::SBCharacter*>(character);
 	Fl_Tree_Item* item = resourceTree->add(tree,character->getName().c_str());
-	item->user_data((void*)ITEM_CHARACTER);
+	item->user_data((void*) addSpecialName(character->getName()));
 	resourceTree->sortorder(FL_TREE_SORT_NONE);		
+	Fl_Tree_Item* skeletonFolder = resourceTree->add(item,"skeleton");	
+	skeletonFolder->user_data((void*) _reverseSpecialNames["skeleton"]); 
 	SmartBody::SBSkeleton* sbSk = sbcharacter->getSkeleton();
 	if (sbSk)
 	{
-		Fl_Tree_Item* charSkItem = resourceTree->add(item, sbSk->getName().c_str());
-		charSkItem->user_data((void*)ITEM_SKELETON);
+		Fl_Tree_Item* charSkItem = resourceTree->add(skeletonFolder, sbSk->getName().c_str());
 	}
 	Fl_Tree_Item* controllerFolder = resourceTree->add(item,"controllers");	
-	controllerFolder->user_data((void*)-1);
+	controllerFolder->user_data((void*) _reverseSpecialNames["controller"]); 
 	controllerFolder->close();
 	// add controllers
 	MeControllerTreeRoot* ctTree = character->ct_tree_p ;
@@ -824,7 +779,7 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SmartBody::SBCharacter
 		{
 			//LOG( "%s", ctTree->controller(c)->name() );
 			Fl_Tree_Item* ctrlItem = resourceTree->add(controllerFolder,ctTree->controller(c)->getName().c_str());
-			ctrlItem->user_data((void*)ITEM_CONTROLLER);
+//			ctrlItem->user_data((void*)ITEM_CONTROLLER);
 		}
 	}
 	/*
@@ -851,11 +806,12 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SmartBody::SBCharacter
 	*/
 
 	// add NVBG
+	Fl_Tree_Item* nvbgItem = resourceTree->add(item, "minibrain");
+	nvbgItem->user_data((void*) _reverseSpecialNames["minibrain"]); 
 	SmartBody::Nvbg* nvbg = character->getNvbg();
 	if (nvbg)
 	{
-		Fl_Tree_Item* ctrlItem = resourceTree->add(item, "NVBG");
-		ctrlItem->user_data((void*)ITEM_NVBG);
+		nvbgItem = resourceTree->add(item, nvbg->getName().c_str());
 	}
 }
 
@@ -863,7 +819,7 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SmartBody::SBCharacter
 void ResourceWindow::updateService( Fl_Tree_Item* tree, SmartBody::SBService* service )
 {
 	Fl_Tree_Item* item = resourceTree->add(tree, service->getName().c_str());
-	item->user_data((void*)ITEM_SERVICES);
+//	item->user_data((void*)ITEM_SERVICES);
 	resourceTree->sortorder(FL_TREE_SORT_NONE);	
 }
 
@@ -882,223 +838,26 @@ void ResourceWindow::treeCallBack( Fl_Widget* widget, void* data )
 	ResourceWindow* window = (ResourceWindow*)data;
 	if (tree->callback_reason() == FL_TREE_REASON_SELECTED)
 	{
-		long itemType = (long)item->user_data();//window->findTreeItemType(item);
-		if (itemType >= 0)
-		{
-			//LOG("Item Type =%s",ItemNameList[itemType].c_str());				
-			window->updateTreeItemInfo(item,itemType);
-			if (itemType == ITEM_PAWN || itemType == ITEM_CHARACTER)
-			{
-				if (item == window->treeItemList[ITEM_PAWN] ||
-					item == window->treeItemList[ITEM_CHARACTER]) // clicked on the extent
-					return;
-				std::vector<SmartBody::SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
-				for (size_t i = 0; i < listeners.size(); i++)
-				{
-					FLTKListener* fltkListener = dynamic_cast<FLTKListener*>(listeners[i]);
-					if (fltkListener)
-						fltkListener->OnObjectSelected( item->label() );
-				}
-			}
-		}
+		std::stringstream strstr;
+		strstr <<  window->getNameFromItem(item);
+		long specialNameIndex = (long) item->user_data();
+		if (specialNameIndex == 0) // assume any item with a special name doesn't need an additional label
+			strstr << "/" << item->label();
+			
+		SBSelectionManager::getSelectionManager()->select(strstr.str());
 	}	
 	if (tree->callback_reason() == FL_TREE_REASON_DESELECTED)
 	{
-		//LOG("Item Deselect...\n");
+		std::stringstream strstr;
+		strstr <<  window->getNameFromItem(item) << "/" << item->label();
+			
+		SBSelectionManager::getSelectionManager()->deselect(strstr.str());
 	}
-}
-
-int ResourceWindow::findTreeItemType( Fl_Tree_Item* treeItem )
-{
-	Fl_Tree_Item* curItem = treeItem;
-	while (curItem != resourceTree->root())
-	{
-		for (int i=0;i<ITEM_SIZE;i++)
-		{
-			if (curItem == treeItemList[i])
-				return i;
-		}
-		curItem = curItem->parent();
-	}
-	return -1;
-}
-
-void ResourceWindow::updateTreeItemInfo( Fl_Tree_Item* treeItem, long itemType )
-{
-	if (!treeItem || itemType < 0) return;		
-
-	char pathName[128];	
-	resourceTree->item_pathname(pathName,128,treeItem);
-	if (strcmp(pathName, lastClickedItemPath.c_str()) == 0)
-		return;
-	lastClickedItemPath = pathName;	
-	TreeItemInfoWidget* lastWidget = itemInfoWidget;
-	itemInfoWidget = createInfoWidget(resourceInfoGroup->x(),resourceInfoGroup->y(),resourceInfoGroup->w(),resourceInfoGroup->h(),ItemNameList[itemType].c_str(),treeItem,itemType);
-	resourceInfoGroup->add(itemInfoWidget);
-	clearInfoWidget(lastWidget);	
-	resourceInfoGroup->show();
-	itemInfoWidget->show();
-	resourceInfoGroup->redraw();
-}
-
-void ResourceWindow::clearInfoWidget(TreeItemInfoWidget* lastWidget)
-{
-	if (lastWidget)
-	{
-		resourceInfoGroup->remove(lastWidget);
-		widgetsToDelete.push_back(lastWidget); // need to delete these - causes memory leak
-	}
-}
-
-TreeItemInfoWidget* ResourceWindow::createInfoWidget( int x, int y, int w, int h, const char* name, Fl_Tree_Item* treeItem, int itemType )
-{
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	SmartBody::SBAssetManager* assetManager = scene->getAssetManager();
-	SmartBody::SBAnimationBlendManager* blendManager = scene->getBlendManager();
-	TreeItemInfoWidget* widget = NULL;
-	if (itemType == ITEM_SKELETON)
-	{
-		widget = new SkeletonItemInfoWidget(x,y,w,h,name,treeItem,itemType, this);
-	}
-	else if (itemType == ITEM_SEQ_PATH || itemType == ITEM_ME_PATH || itemType == ITEM_AUDIO_PATH || itemType == ITEM_MESH_PATH)
-	{
-		widget = new PathItemInfoWidget(x,y,w,h,name,treeItem,itemType, this);
-	}
-	else if (itemType == ITEM_SEQ_FILES)
-	{
-		widget = new SeqItemInfoWidget(x,y,w,h,name,treeItem,itemType, this);
-	}
-	else if (itemType == ITEM_MOTION)
-	{
-		widget = new MotionItemInfoWidget(x,y,w,h,name,treeItem,itemType, this);
-	}
-	else if (itemType == ITEM_PAWN)
-	{
-		SmartBody::SBPawn* curPawn = scene->getPawn(treeItem->label());
-		/*if (curPawn)
-			widget = new PawnItemInfoWidget(x,y,w,h,name,treeItem,itemType,this);
-		else 
-			widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
-		*/
-		widget = new AttributeItemWidget(curPawn, x, y, w, h, strdup(name), treeItem, itemType, this);
-	}
-	else if (itemType == ITEM_MESH)
-	{
-		DeformableMesh* mesh = assetManager->getDeformableMesh(treeItem->label());		
-		widget = new AttributeItemWidget(mesh, x, y, w, h, strdup(name), treeItem, itemType, this);
-	}
-	else if (itemType == ITEM_ANIMATION_BLEND)
-	{
-		SmartBody::SBAnimationBlend* blend = blendManager->getBlend(treeItem->label());		
-		widget = new AnimationBlendInfoWidget(blend, x, y, w, h, strdup(name), treeItem, itemType, this);
-		//widget = new AttributeItemWidget(mesh, x, y, w, h, strdup(name), treeItem, itemType, this);
-	}
-	else if (itemType == ITEM_BLEND_TRANSITION)
-	{
-		SmartBody::SBAnimationTransition* transition = blendManager->getTransitionByName(treeItem->label());		
-		widget = new BlendTransitionInfoWidget(transition, x, y, w, h, strdup(name), treeItem, itemType, this);
-	}
-	else if (itemType == ITEM_CHARACTER)
-	{
-		SmartBody::SBCharacter* curChar = scene->getCharacter(treeItem->label());
-		if (curChar)
-			widget = new AttributeItemWidget(curChar,x,y,w,h,name,treeItem,itemType,this);
-		else
-			widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
-	}
-	else if (itemType == ITEM_PHYSICS)
-	{
-		SmartBody::SBPhysicsSim* phySim = SmartBody::SBPhysicsSim::getPhysicsEngine();
-		std::string itemName = treeItem->label();
-		std::string parentName = treeItem->parent()->label();
-		SmartBody::SBPhysicsCharacter* phyChar = phySim->getPhysicsCharacter(itemName);
-		SmartBody::SBPhysicsCharacter* phyParent = phySim->getPhysicsCharacter(parentName);
-		SmartBody::SBPhysicsObj*    phyBody = phySim->getPhysicsPawn(itemName);
-		SmartBody::SBObject* phyObj = phySim;		
-		SmartBody::SBObject* phyObj2 = NULL;
-
-		static std::string name1 = "PHYSICS JOINT";
-		static std::string name2 = "RIGID BODY";	
-		std::vector<std::string> phyObjNameList;
-		std::vector<SmartBody::SBObject*> phyObjList;
-		if (phyChar)
-		{
-			phyObj = phyChar;
-		}
-		else if (phyParent)
-		{
-			SmartBody::SBPhysicsJoint* phyJoint = phyParent->getPhyJoint(itemName);
-			phyObj = phyJoint;
-			phyObj2 = phyJoint->getChildObj();
-			phyObjNameList.push_back(name1);
-			phyObjNameList.push_back(name2);
-			phyObjList.push_back(phyObj);
-			phyObjList.push_back(phyObj2);
-		}
-		else if (phyBody)
-		{
-			phyObj = phyBody;			
-		}
-
-		if (phyObjList.size() > 0)
-		{
-			//widget = new DoubleAttributeItemWidget(phyObj,phyObj2,x,y,w,h,h/2,name1.c_str(),name2.c_str(),treeItem,itemType,this);
-			widget = new MultiAttributeItemWidget(phyObjList,x,y,w,h,h/2,name,phyObjNameList,treeItem,itemType,this);
-		}
-		else if (phyObj)
-			widget = new AttributeItemWidget(phyObj,x,y,w,h,name,treeItem,itemType,this);
-	}
-	else if (itemType == ITEM_SCENE)
-	{
-		widget = new AttributeItemWidget(scene,x,y,w,h,name,treeItem,itemType,this);
-	}
-	else if (itemType == ITEM_SERVICES)
-	{
-		SmartBody::SBService* service = scene->getServiceManager()->getService(treeItem->label());
-		widget = new AttributeItemWidget(service,x,y,w,h,name,treeItem,itemType,this);
-	}
-	else if (itemType == ITEM_EVENT_HANDLERS)
-	{
-		widget = new EventItemInfoWidget(x,y,w,h,name,treeItem,itemType);
-	}
-	else if (itemType == ITEM_CONTROLLER)
-	{
-		SmartBody::SBCharacter* curChar = scene->getCharacter(treeItem->parent()->parent()->label()); // a controller's parent is its character name
-		MeController* ctrl = NULL;
-		if (curChar)
-		{			
-			MeControllerTreeRoot* ctTree = curChar->ct_tree_p ;
-			for (unsigned int c = 0; c < ctTree->count_controllers(); c++)
-			{
-				if (ctTree->controller(c)->getName() == treeItem->label())
-					ctrl = ctTree->controller(c);
-			}
-		}		
-		if (ctrl)
-			widget = new AttributeItemWidget(ctrl,x,y,w,h,name,treeItem,itemType,this);
-		else
-			widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
-	}
-	else if (itemType == ITEM_GESTUREMAP)
-	{
-		SmartBody::SBCharacter* curChar = scene->getCharacter(treeItem->parent()->parent()->label()); // a controller's parent is its character name
-		widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
-	}
-	else if (itemType == ITEM_NVBG)
-	{
-		SmartBody::SBCharacter* curChar = scene->getCharacter(treeItem->parent()->label());
-		widget = new AttributeItemWidget(curChar->getNvbg(),x,y,w,h,name,treeItem,itemType,this);
-	}
-	else
-	{
-		widget = new TreeItemInfoWidget(x,y,w,h,name,treeItem,itemType);
-	}
-	return widget;
 }
 
 void ResourceWindow::selectPawn(const std::string& name)
 {
-	Fl_Tree_Item* tree = treeItemList[ITEM_PAWN];
+	Fl_Tree_Item* tree = getTreeFromName("pawn");
 
 	for (int c = 0; c < tree->children(); c++)
 	{
@@ -1107,7 +866,6 @@ void ResourceWindow::selectPawn(const std::string& name)
 		{
 			if (child->is_selected())
 				return;
-			this->updateTreeItemInfo(child, ITEM_PAWN);
 			resourceTree->deselect_all();
 			child->select();
 			resourceTree->redraw();
@@ -1115,7 +873,7 @@ void ResourceWindow::selectPawn(const std::string& name)
 		}
 	}
 
-	tree = treeItemList[ITEM_CHARACTER];
+	tree = getTreeFromName("character");
 	for (int c = 0; c < tree->children(); c++)
 	{
 		Fl_Tree_Item* child = tree->child(c);
@@ -1123,7 +881,6 @@ void ResourceWindow::selectPawn(const std::string& name)
 		{
 			if (child->is_selected())
 				return;
-			this->updateTreeItemInfo(child, ITEM_CHARACTER);
 			resourceTree->deselect_all();
 			child->select();
 			resourceTree->redraw();
@@ -1140,23 +897,70 @@ void ResourceWindow::notify( SmartBody::SBSubject* subject )
 }
 
 
-/************************************************************************/
-/* Resource Viewer Factory                                              */
-/************************************************************************/
-
-GenericViewer* ResourceViewerFactory::create(int x, int y, int w, int h)
+void ResourceWindow::OnSelect(const std::string& value)
 {
-	ResourceWindow* resourceWindow = new ResourceWindow(x, y, w, h, (char*)"Resource Window");
-	return resourceWindow;
 }
 
-void ResourceViewerFactory::destroy(GenericViewer* viewer)
+void ResourceWindow::OnDeselect(const std::string& value)
 {
-	delete viewer;
 }
 
-ResourceViewerFactory::ResourceViewerFactory()
+void ResourceWindow::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
-
+	updateGUI();
 }
 
+void ResourceWindow::OnCharacterDelete( const std::string & name )
+{
+	removeSpecialName(name);
+	updateGUI();
+}
+
+void ResourceWindow::OnCharacterUpdate( const std::string & name )
+{
+	updateGUI();
+}
+      
+void ResourceWindow::OnPawnCreate( const std::string & name )
+{
+	updateGUI();
+}
+
+void ResourceWindow::OnPawnDelete( const std::string & name )
+{
+	updateGUI();
+}
+
+void ResourceWindow::OnReset()
+{
+	updateGUI();
+}
+
+int ResourceWindow::addSpecialName(const std::string& name)
+{
+	std::map<std::string, int>::iterator iter = _reverseSpecialNames.find(name);
+	if (iter != _reverseSpecialNames.end())
+	{
+		return (*iter).second;
+	}
+
+	int index = _specialNames.size() + 1;
+	_specialNames.insert(std::pair<int, std::string>(index, name));
+	_reverseSpecialNames.insert(std::pair<std::string, int >(name, index));
+
+	return index;
+}
+
+void ResourceWindow::removeSpecialName(const std::string& name)
+{
+	std::map<std::string, int>::iterator iter = _reverseSpecialNames.find(name);
+	if (iter != _reverseSpecialNames.end())
+	{
+		int val = (*iter).second;
+		_reverseSpecialNames.erase(iter);
+		std::map<int, std::string>::iterator iter2 = _specialNames.find(val);
+		_specialNames.erase(iter2);
+
+	
+	}
+}

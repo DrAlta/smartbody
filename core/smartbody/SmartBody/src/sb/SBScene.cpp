@@ -4350,6 +4350,227 @@ void SBScene::stopFileLogging()
 		vhcl::Log::g_log.RemoveListener(_logListener);
 }
 
+std::string SBScene::getStringFromObject(SmartBody::SBObject* object)
+{
+	std::stringstream strstr;
+	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(object);
+	if (character)
+	{
+		strstr << "character/" << character->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
+	if (pawn)
+	{
+		strstr << "pawn/" << pawn->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBScene* scene = dynamic_cast<SmartBody::SBScene*>(object);
+	if (scene)
+	{
+		strstr << "scene/" << scene->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBSkeleton* skeleton = dynamic_cast<SmartBody::SBSkeleton*>(object);
+	if (skeleton)
+	{
+		strstr << "skeleton/" << skeleton->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBMotion* motion = dynamic_cast<SmartBody::SBMotion*>(object);
+	if (motion)
+	{
+		strstr << "motion/" << motion->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBService* service = dynamic_cast<SmartBody::SBService*>(object);
+	if (service)
+	{
+		strstr << "service/" << service->getName();
+		return strstr.str();
+	}
+
+	DeformableMesh* mesh = dynamic_cast<DeformableMesh*>(object);
+	if (mesh)
+	{
+		strstr << "model/" << mesh->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBController* controller = dynamic_cast<SmartBody::SBController*>(object);
+	if (controller)
+	{
+		strstr << "character/" << controller->getCharacterName() << "/controller/" << controller->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBJointMap* jointmap = dynamic_cast<SmartBody::SBJointMap*>(object);
+	if (jointmap)
+	{
+		strstr << "jointmap/" << jointmap->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBGestureMap* gesturemap = dynamic_cast<SmartBody::SBGestureMap*>(object);
+	if (gesturemap)
+	{
+		strstr << "gesturemap/" << gesturemap->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBEventHandler* eventHandler = dynamic_cast<SmartBody::SBEventHandler*>(object);
+	if (eventHandler)
+	{
+		strstr << "eventhandler/" << eventHandler->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBAnimationBlend* blend = dynamic_cast<SmartBody::SBAnimationBlend*>(object);
+	if (blend)
+	{
+		strstr << "blend/" << blend->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBAnimationTransition* transition = dynamic_cast<SmartBody::SBAnimationTransition*>(object);
+	if (transition)
+	{
+		strstr << "transition/" << transition->getName();
+		return strstr.str();
+	}
+
+	return "";
+}
+
+
+SmartBody::SBObject* SBScene::getObjectFromString(const std::string& value)
+{
+	int prefixPos = value.find("/");
+	if (prefixPos == std::string::npos)
+		return NULL;
+
+	std::string prefix = value.substr(0, prefixPos);
+	std::string suffix = value.substr(prefixPos + 1);
+
+	if (prefix == "character")
+	{
+		// check for a second level name
+		int prefixPos2 = suffix.find("/");
+		if (prefixPos2 == std::string::npos)
+		{
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(suffix);
+			return character;
+		}
+
+		std::string characterName = suffix.substr(0, prefixPos2);
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		if (!character)
+			return NULL;
+
+		std::string remainder = suffix.substr(prefixPos2 + 1);
+
+		int prefixPos3 = remainder.find("/");
+		if (prefixPos3 != std::string::npos)
+		{
+			std::string part = remainder.substr(0, prefixPos3);		
+			std::string rest = remainder.substr(prefixPos3 + 1);
+			if (part == "controller")
+			{
+				SBController* controller = character->getControllerByName(rest);
+				return controller;
+			}
+			if (part == "skeleton")
+			{
+				SBSkeleton* skeleton = character->getSkeleton();
+				if (skeleton->getName() == rest)
+					return skeleton;
+				else
+					return NULL;
+			}
+			if (part == "minibrain")
+			{
+				SmartBody::Nvbg* nvbg = character->getNvbg();
+				return nvbg;
+			}
+		}
+		
+		return NULL;
+	}
+	else if (prefix == "pawn")
+	{
+		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(suffix);
+		return pawn;
+	}
+	else if (prefix == "scene")
+	{
+		return SmartBody::SBScene::getScene();
+	}
+	else if (prefix == "motion")
+	{
+		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(suffix);
+		return motion;
+	}
+	else if (prefix == "skeleton")
+	{
+		SmartBody::SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(suffix);
+		return skeleton;
+	}
+	else if (prefix == "service")
+	{
+		SmartBody::SBService* service = SmartBody::SBScene::getScene()->getServiceManager()->getService(suffix);
+		return service;
+	}
+	else if (prefix == "model")
+	{
+		DeformableMesh* mesh = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMesh(suffix);
+		return mesh;
+	}
+	else if (prefix == "controller")
+	{
+		int prefixPos2 = suffix.find("/");
+		if (prefixPos2 == std::string::npos)
+			return NULL;
+		std::string prefix2 = suffix.substr(0, prefixPos2 - 1);
+		std::string suffix2 = suffix.substr(prefixPos2 + 1);
+		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(suffix);
+		if (!character)
+			return NULL;
+		return character->getControllerByName(suffix2);
+	}
+	else if (prefix == "jointmap")
+	{
+		SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(suffix);
+		return jointMap;
+	}
+	else if (prefix == "gesturemap")
+	{
+		SBGestureMap* gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(suffix);
+		return gestureMap;
+	}
+	else if (prefix == "eventhandler")
+	{
+		SBGestureMap* gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(suffix);
+		return gestureMap;
+	}
+	else if (prefix == "blend")
+	{
+		SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(suffix);
+		return blend;
+	}
+	else if (prefix == "transition")
+	{
+		SBAnimationTransition* transition = SmartBody::SBScene::getScene()->getBlendManager()->getTransitionByName(suffix);
+		return transition;
+	}
+
+	return NULL;
+}
+
 
 
 };

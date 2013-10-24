@@ -72,23 +72,23 @@ AttributeWindow::AttributeWindow(SmartBody::SBObject* obj, int x, int y, int w, 
 {
 	//this->type(VERTICAL);
 
-	setOffset(100);
+	setOffset(70);
 	setObject(obj);
 	this->begin();		
-		mainGroup = new Fl_Scroll( x + 10,  y + 10, w - 20, h - 20);	
+		mainGroup = new Fl_Scroll(x, y, w, h);	
 		//mainGroup->label(s);
 		mainGroup->type(Fl_Scroll::VERTICAL_ALWAYS);
 		if (upDownBox)
 			mainGroup->box(FL_UP_BOX);
 		mainGroup->begin();
-		mainPack = new Fl_Pack(x + 10, y + 10,  w - 20, h - 20, "");
+		mainPack = new Fl_Pack(x, y, w, h, "");
 		
-		Fl_Group* buttonGroup = new Fl_Group(x + 10, y + 10, w - 20, 20);
-		Fl_Button* buttonExpandAll = new Fl_Button(x + 340, y + 10, 20, 20, "+");
+		Fl_Group* buttonGroup = new Fl_Group(x + 10, y + 10, w - 20, 15);
+		Fl_Button* buttonExpandAll = new Fl_Button(x + 20, y + 10, 20, 15, "+");
 		buttonExpandAll->callback(ExpandAllCB, mainPack);
 		buttonExpandAll->tooltip("Expand all attribute groups");
 		buttonGroup->add(buttonExpandAll);
-		Fl_Button* buttonCollapseAll = new Fl_Button(x + 360, y + 10, 20, 20, "-");
+		Fl_Button* buttonCollapseAll = new Fl_Button(x + 40, y + 10, 20, 15, "-");
 		buttonCollapseAll->callback(CollapseAllCB, mainPack);
 		buttonCollapseAll->tooltip("Collapse all attribute groups");
 		buttonGroup->add(buttonCollapseAll);
@@ -313,7 +313,7 @@ void AttributeWindow::draw()
 {
 	if (dirty) 
 	{
-		int widgetHeight = 25;
+		int widgetHeight = 20;
 		
 		std::map<std::string, int> attributeStatus;
 		for (std::map<std::string, Fl_Widget*>::iterator mapIter = widgetMap.begin();
@@ -339,7 +339,7 @@ void AttributeWindow::draw()
 		}
 		std::sort(sortedAttributeGroups.begin(), sortedAttributeGroups.end(), AttributeGroupPriorityPredicate);
 		
-		int startY = 30;
+		int startY = 35;
 
 		// now we have the sorted attribute groups, get the attributes for each group and sort and display them accordingly
 		for (size_t g = 0; g < sortedAttributeGroups.size(); g++)
@@ -366,7 +366,7 @@ void AttributeWindow::draw()
 			if (mapGroupIter == widgetGroupMap.end()) // widget not found, create it
 			{
 				attributeGroupStatus[groupName] = 2; // attribute group widget created
-				attGroupWidget = new Flu_Collapsable_Group(mainPack->x() + 10, mainPack->y() + startY, mainPack->w() - 50, 25 * sortedAttributes.size() + 20, attributeGroup->getName().c_str());
+				attGroupWidget = new Flu_Collapsable_Group(mainPack->x() + 10, mainPack->y() + startY, mainPack->w() - 50, widgetHeight * sortedAttributes.size() + 20, attributeGroup->getName().c_str());
 				attGroupWidget->collapse_time(.05f);
 				mainPack->add(attGroupWidget);
 				widgetGroupMap[groupName] = attGroupWidget;
@@ -378,7 +378,7 @@ void AttributeWindow::draw()
 				attGroupWidget = (*mapGroupIter).second;
 			}
 			
-			startY += 25 * sortedAttributes.size() + 20;
+			startY += widgetHeight * sortedAttributes.size() + 20;
 	
 			int localY = 20;
 			std::sort(sortedAttributes.begin(), sortedAttributes.end(), AttributePriorityPredicate);
@@ -418,7 +418,7 @@ void AttributeWindow::draw()
 					if (boolAttr) 
 					{
 						boolAttr->registerObserver(this);
-						Fl_Check_Button* check = new Fl_Check_Button(attGroupWidget->x() + _offset, attGroupWidget->y() + localY, 150, 20, _strdup(name.c_str()));
+						Fl_Check_Button* check = new Fl_Check_Button(attGroupWidget->x() + _offset, attGroupWidget->y() + localY, 120, 20, _strdup(name.c_str()));
 						if (attrInfo->getDescription() != "")
 							check->tooltip(_strdup(attrInfo->getDescription().c_str()));
 						check->align(FL_ALIGN_LEFT);
@@ -454,7 +454,7 @@ void AttributeWindow::draw()
 						if (intAttr->getMin() == -std::numeric_limits<int>::max() || 
 							intAttr->getMax() == std::numeric_limits<int>::max())
 						{
-							Fl_Roller* wheel = new Fl_Roller(attGroupWidget->x() + _offset + 70, attGroupWidget->y() + localY, 100, 20);
+							Fl_Roller* wheel = new Fl_Roller(attGroupWidget->x() + _offset + 70, attGroupWidget->y() + localY, 50, 20);
 							if (attrInfo->getDescription() != "")
 								wheel->tooltip(_strdup(attrInfo->getDescription().c_str()));
 							wheel->type(FL_HORIZONTAL);
@@ -466,7 +466,7 @@ void AttributeWindow::draw()
 						}
 						else
 						{
-							Fl_Slider* slider = new Fl_Slider(attGroupWidget->x() + 70, attGroupWidget->y() + localY, 100, 20);
+							Fl_Slider* slider = new Fl_Slider(attGroupWidget->x() + 70, attGroupWidget->y() + localY, 50, 20);
 							if (attrInfo->getDescription() != "")
 								slider->tooltip(_strdup(attrInfo->getDescription().c_str()));
 							//slider->type(Fl_Slider::Fl_Slider::LINEAR);
@@ -506,7 +506,7 @@ void AttributeWindow::draw()
 						if (doubleAttr->getMin() == -std::numeric_limits<double>::max() ||
 							doubleAttr->getMax() == std::numeric_limits<double>::max())
 						{
-							Fl_Roller* wheel = new Fl_Roller(attGroupWidget->x() + _offset + 70, attGroupWidget->y() + localY, 100, 20);
+							Fl_Roller* wheel = new Fl_Roller(attGroupWidget->x() + _offset + 70, attGroupWidget->y() + localY, 50, 20);
 							if (attrInfo->getDescription() != "")
 								wheel->tooltip(_strdup(attrInfo->getDescription().c_str()));
 							wheel->type(FL_HORIZONTAL);
@@ -518,7 +518,7 @@ void AttributeWindow::draw()
 						}
 						else
 						{
-							Fl_Slider* slider = new Fl_Slider(attGroupWidget->x() + 70, attGroupWidget->y() + localY, 100, 20);
+							Fl_Slider* slider = new Fl_Slider(attGroupWidget->x() + 70, attGroupWidget->y() + localY, 50, 20);
 							if (attrInfo->getDescription() != "")
 								slider->tooltip(_strdup(attrInfo->getDescription().c_str()));
 							//slider->type(FL_LINEAR);
@@ -544,7 +544,7 @@ void AttributeWindow::draw()
 						stringAttr->registerObserver(this);
 						if (stringAttr->getValidValues().size() == 0)
 						{
-							Fl_Input* input = new Fl_Input(attGroupWidget->x() + _offset, attGroupWidget->y() + localY, 150, 20, _strdup(name.c_str()));
+							Fl_Input* input = new Fl_Input(attGroupWidget->x() + _offset, attGroupWidget->y() + localY, 120, 20, _strdup(name.c_str()));
 							Fl_Button* edit = new Fl_Button(attGroupWidget->x() + _offset + 160, attGroupWidget->y() + localY, 20, 20, ".");
 							edit->tooltip(stringAttr->getName().c_str());
 							edit->callback(EditStringCB, stringAttr);
@@ -560,7 +560,7 @@ void AttributeWindow::draw()
 						}
 						else
 						{
-							Fl_Choice* choice = new Fl_Choice(attGroupWidget->x() + _offset, attGroupWidget->y() + localY, 150, 20, _strdup(name.c_str()));
+							Fl_Choice* choice = new Fl_Choice(attGroupWidget->x() + _offset, attGroupWidget->y() + localY, 120, 20, _strdup(name.c_str()));
 							if (attrInfo->getDescription() != "")
 								choice->tooltip(_strdup(attrInfo->getDescription().c_str()));
 							// add all the options
@@ -597,7 +597,7 @@ void AttributeWindow::draw()
 						SrVec val = vec3Attr->getValue();
 						for (int c = 0; c < 3; c++)
 						{
-							Fl_Float_Input* finput = new Fl_Float_Input(attGroupWidget->x() + _offset + c * 50, attGroupWidget->y() +  localY, 60, 20);
+							Fl_Float_Input* finput = new Fl_Float_Input(attGroupWidget->x() + _offset + c * 40, attGroupWidget->y() +  localY, 40, 20);
 							if (attrInfo->getDescription() != "")
 								finput->tooltip(_strdup(attrInfo->getDescription().c_str()));
 							std::stringstream strstr;

@@ -4,17 +4,18 @@
 
 namespace SmartBody {
 
-SBAnimationTransition::SBAnimationTransition() 
+SBAnimationTransition::SBAnimationTransition() : SBObject()
 {
 	_rule = NULL;
 }
 
-SBAnimationTransition::SBAnimationTransition(std::string name) 
+SBAnimationTransition::SBAnimationTransition(std::string name) : SBObject()
 {
+	setName(name);
 	_rule = NULL;
 }
 
-SBAPI SBAnimationTransition::SBAnimationTransition(SBAnimationTransition* transition, PABlend* from, PABlend* to)
+SBAPI SBAnimationTransition::SBAnimationTransition(SBAnimationTransition* transition, PABlend* from, PABlend* to) : SBObject()
 {
 	this->fromState = from;
 	this->toState = to;

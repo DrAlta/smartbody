@@ -4,6 +4,7 @@
 #include <sb/SBTypes.h>
 #include <map>
 #include <string>
+#include <sb/SBObject.h>
 
 namespace SmartBody {
 
@@ -22,7 +23,7 @@ class SBEvent
 		std::string m_params;
 };
 
-class SBEventHandler
+class SBEventHandler : public SBObject
 {
 	public:
 		SBAPI SBEventHandler() : m_type(""), m_action("") {}

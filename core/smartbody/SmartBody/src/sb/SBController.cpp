@@ -21,6 +21,11 @@ const std::string& SBController::getType()
 	return controller_type();
 }
 
+const std::string& SBController::getCharacterName()
+{
+	return "unknown"; // need to fix this
+}
+
 void SBController::setIgnore(bool val)
 {
 	setEnable(!val);

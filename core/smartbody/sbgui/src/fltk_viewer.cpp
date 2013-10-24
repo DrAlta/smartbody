@@ -378,7 +378,7 @@ static void _callback_func ( Fl_Widget* win, void* pt )
 
 FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 //         : SrViewer(x, y, w, h) , Fl_Gl_Window ( x, y, w, h, label )
-         : Fl_Gl_Window ( x, y, w, h, label )
+         : Fl_Gl_Window ( x, y, w, h, label ), SelectionListener()
  {
 	 Fl::gl_visual( FL_RGB | FL_DOUBLE | FL_DEPTH );//| FL_ALPHA );
 
@@ -471,6 +471,23 @@ void FltkViewer::show_menu ()
 	}
 	//MenuTable->popup();	
  }
+
+
+void FltkViewer::OnSelect(const std::string& value)
+{
+	SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(SmartBody::SBScene::getScene()->getObjectFromString(value));
+	if (!pawn)
+		return;
+
+	PawnControl* tempControl = this->_objManipulator.getPawnControl(this->_transformMode);
+	this->_objManipulator.active_control = tempControl;
+	this->_objManipulator.set_selected_pawn(pawn);
+
+}
+
+void FltkViewer::OnDeselect(const std::string& value)
+{
+}
 
 void FltkViewer::applyToCharacters()
 {
@@ -2076,14 +2093,8 @@ int FltkViewer::handle ( int event )
 				 SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
 				 if (selectedPawn)
 				 {
-					 // if the resource window is open, select that item
-					std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
-					for (size_t i = 0; i < listeners.size(); i++)
-					{
-						FLTKListener* listener = dynamic_cast<FLTKListener*>(listeners[i]);
-						if (listener)
-							listener->OnObjectSelected(selectedPawn->getName());
-					}
+					 std::string selectString = SmartBody::SBScene::getScene()->getStringFromObject(selectedPawn);
+					 SBSelectionManager::getSelectionManager()->select(selectString);
 
 					 SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (selectedPawn);
 					 if (character)

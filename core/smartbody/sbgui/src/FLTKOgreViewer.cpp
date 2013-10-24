@@ -55,7 +55,12 @@ void FLTKOgreWindow::initOgreWindow()
 	void* flHwnd = (void*)fl_xid(this); // get hwnd	
 	void* flParentHwnd = NULL;
 	if (parent())
-		flParentHwnd = (void*)fl_xid(dynamic_cast<Fl_Window*>(parent()));
+	{
+		Fl_Window* parentWindow = dynamic_cast<Fl_Window*>(parent());
+		if (!parentWindow)
+			parentWindow = dynamic_cast<Fl_Window*>(parent()->parent());
+		flParentHwnd = (void*)fl_xid(dynamic_cast<Fl_Window*>(parentWindow));
+	}
 	make_current();
     unsigned long fltkGLContext = (unsigned long)this->context();
 	printf("ogreWindow, GLContext = %d\n",fltkGLContext);

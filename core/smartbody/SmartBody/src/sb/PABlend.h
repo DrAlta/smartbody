@@ -30,6 +30,7 @@
 #include <string>
 #include <vector>
 #include <sk/sk_motion.h>
+#include <sb/SBObject.h>
 
 namespace SmartBody {
 	class SBMotionEvent;
@@ -58,7 +59,7 @@ struct TetrahedronInfo
 	std::string motion4;
 };
 
-class PABlend
+class PABlend : public SmartBody::SBObject
 {
 	public:
 		SBAPI PABlend();

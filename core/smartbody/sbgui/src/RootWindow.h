@@ -23,12 +23,13 @@
 #include "retargetviewer/RetargetViewer.h"
 #include "jointmapviewer/RetargetStepWindow.h"
 #include "ExportWindow.h"
+#include "resourceViewer/AttributeEditor.h"
 
 class SbmCharacter;
 
 
 #ifdef WIN_BUILD
-#define USE_OGRE_VIEWER 1
+#define USE_OGRE_VIEWER 0
 #elif LINUX_BUILD
 #define USE_OGRE_VIEWER 0
 #else
@@ -73,6 +74,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 #else
 		FltkViewer* fltkViewer;
 #endif
+		int _layoutMode;
 		
 		
 		CommandWindow* commandWindow;
@@ -85,12 +87,14 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		BehaviorWindow* bmlViewerWindow;
 		ChannelBufferWindow* dataViewerWindow;
 		ResourceWindow* resourceWindow;
+		AttributeEditor* _attributeEditor;
 		PanimationWindow* panimationWindow;
 		ExportWindow* exportWindow;
 		//RetargetViewer* behaviorSetViewer;
 		//JointMapViewer* jointMapViewer;
 		RetargetStepWindow* retargetStepWindow;
-
+		
+		Fl_Group* _mainGroup;
 		Fl_Menu_Bar* menubar;
 		Fl_Button* buttonPlay;
 		Fl_Button* buttonStop;
@@ -98,6 +102,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		CharacterCreatorWindow* characterCreator;
 		ResolutionWindow* resWindow;
 
+		Fl_Group* _leftGroup;
 		Fl_Choice* cameraChoice;
 		Fl_Button* saveCamera;
 		Fl_Button* deleteCamera;

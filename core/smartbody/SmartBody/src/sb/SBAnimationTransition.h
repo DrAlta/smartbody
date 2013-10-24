@@ -4,6 +4,7 @@
 #include <sb/SBTypes.h>
 #include <vector>
 #include <sb/PABlend.h>
+#include <sb/SBObject.h>
 
 class PABlend;
 
@@ -12,7 +13,7 @@ namespace SmartBody {
 class SBAnimationBlend;
 class SBAnimationTransitionRule;
 
-class SBAnimationTransition 
+class SBAnimationTransition : public SBObject
 {
 	public:
 		SBAPI SBAnimationTransition();
