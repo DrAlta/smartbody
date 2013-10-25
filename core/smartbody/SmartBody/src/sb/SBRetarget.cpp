@@ -149,6 +149,14 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 		}
 	}
 
+	// clear intermediate skeletons
+	if (interSk)
+		delete interSk;
+	interSk = NULL;
+	if (tempSrcSk)
+		delete tempSrcSk;
+	tempSrcSk = NULL;
+
 	return true;
 
 #if 0 // not doing motion retargeting here

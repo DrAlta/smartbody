@@ -180,6 +180,7 @@ record_ct(NULL),
 face_neutral( NULL ),
 _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 {
+	/*
 	posture_sched_p->ref();
 	motion_sched_p->ref();
 	breathing_p->ref();
@@ -187,6 +188,7 @@ _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 	head_sched_p->ref();
 	param_sched_p->ref();
 	eyelid_ct->ref();	
+	*/
 
 	reachEngineMap = new ReachEngineMap();	
 }
@@ -246,8 +248,10 @@ SbmCharacter::~SbmCharacter( void )	{
 		noise_ct->unref();
 	if (record_ct)
 		record_ct->unref();
-
-	
+	if (basic_locomotion_ct)
+		basic_locomotion_ct->unref();
+	if (postprocess_ct)
+		postprocess_ct->unref();
 
 	std::map<int,MeCtReachEngine*>::iterator mi;
 	for ( mi  = reachEngineMap->begin();
@@ -319,6 +323,7 @@ void SbmCharacter::createStandardControllers()
 	this->basic_locomotion_ct = new MeCtBasicLocomotion(this);
 	std::string bLocoName = getName() + "_basicLocomotionController";
 	this->basic_locomotion_ct->setName(bLocoName.c_str());
+	this->basic_locomotion_ct->ref();
 	//this->basic_locomotion_ct->set_pass_through(false);
 
 	// example-based head movement
@@ -378,9 +383,11 @@ void SbmCharacter::createStandardControllers()
 
 	postprocess_ct = new MeCtPosePostProcessing(sbSkel);
 	postprocess_ct->setName(getName() + "_postprocessController");
+	postprocess_ct->ref();
 	
 	breathing_p = new MeCtBreathing();
 	breathing_p->setName(getName() + "_breathingController");
+	breathing_p->ref();
 	// add two channels for blendshape-based breathing
 	//SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
@@ -437,7 +444,7 @@ void SbmCharacter::createStandardControllers()
 
 	// motion player
 	motionplayer_ct = new MeCtMotionPlayer(this);
-	//	motionplayer_ct->ref();
+	motionplayer_ct->ref();
 	std::string mpName = getName();
 	mpName += "_motionPlayer";
 	motionplayer_ct->setName(mpName.c_str());

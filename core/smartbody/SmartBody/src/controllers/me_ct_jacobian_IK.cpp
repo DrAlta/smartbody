@@ -111,11 +111,7 @@ MeCtIKTreeScenario::MeCtIKTreeScenario()
 
 MeCtIKTreeScenario::~MeCtIKTreeScenario()
 {
-	for (unsigned int i=0;i<ikTreeNodes.size();i++)
-	{
-		MeCtIKTreeNode* node = ikTreeNodes[i];
-		delete node;
-	}	
+	clearNodes();
 }
 void MeCtIKTreeScenario::updateEndEffectorValidNodes(EffectorConstraint* cons, std::set<MeCtIKTreeNode*>& validNodes)
 {	

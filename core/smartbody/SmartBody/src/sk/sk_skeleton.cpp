@@ -159,6 +159,7 @@ void SkSkeleton::init ()
 	for (unsigned int i=0;i<_joints.size();i++)
 	{
 		delete _joints[i];
+		_joints[i] = NULL;
 	}
 	_joints.clear();
 	_jointMap.clear();
