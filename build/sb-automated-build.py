@@ -143,8 +143,7 @@ def deleteFiles(folder, wildcard):
                 os.remove(os.path.join(base, file))
 
 
-
-def cleanBuild():
+def checkBuildRunning():
     # Check to see if a build is already running
     if os.path.exists("BUILD_RUNNING"):
         print "Build is already running.\n";
@@ -155,6 +154,8 @@ def cleanBuild():
             print "  Exiting..."
             sys.exit()
 
+
+def cleanBuild():
     # remove the exported build folder on fresh builds
     if os.path.exists("build"):
         print "--- Removing 'build' folder"
@@ -200,19 +201,14 @@ def cleanBuild():
 
 
 def cleanSandbox():
+    # separate command that removes build.sandbox to do a clean checkout.
+    # not called by the main build process. 
+
+    checkBuildRunning()
+
     cleanBuild()
 
-    # Check to see if a build is already running
-    if os.path.exists("BUILD_RUNNING"):
-        print "Build is already running.\n";
-        if time.time() - os.path.getctime("BUILD_RUNNING") > timeToForceBuildIfRunning:
-            print "Build has been running for too long, forcing build."
-            os.remove("BUILD_RUNNING")
-        else:
-            print "  Exiting..."
-            sys.exit()
-
-    print "Removing build.sandbox folder to make way for a clean checkout"
+    print "--- Removing build.sandbox folder to make way for a clean checkout"
 
     if os.path.exists("build.sandbox"):
         shutil.rmtree("build.sandbox", onerror=handleRemoveReadonly)
@@ -239,10 +235,69 @@ def getBuildFolderName(buildNumber, buildDate, doFreshBuild, buildSuffix, buildS
     return buildFolderName, buildFolder
 
 
+def isError(line):
+    #  ": warning "
+    #  ": error "
+    #  ": fatal error "
+    #  ":  warning :"   # mono
+    #  ": warning: "   # gcc
+    #  ": error: "     # gcc
+    #  ": fatal error: "  # gcc
+    #  "make[X]: *** " ... "Error "  # gcc
+    #  "make: *** " ... "Error "  # gcc
+    #  "CMake Error"  # cmake
+    #  "(beginning of line) "error: " or "warning: "  # xcode
+    #  "[BEROR]"   # xcode
+    #  "Android.mk:427: *** commands commence before first target.  Stop."   # android gcc
+    #  "Error building player "   # unity
+    #  " ... foobar.java:218: warning: ... is internal proprietary API and may be removed in a future release  # java
+    #  " ... : warning CS0419: Ambiguous reference in cref attribute ...  # mono - fixed in newer version.  ubuntu isn't updated yet
+    #  "ld: warning: CPU_SUBTYPE_ARM_ALL subtype is deprecated:"  # ios warning - need to recompile 3rd party dependencies
+    #  "means the weak symbol cannot be overridden at runtime. This was likely caused by different translation units being compiled with different visibility settings."  # ios - 3rd party
+    #  "ld: warning: 32-bit absolute address out of range ("  # ios - unknown
+    #  "doesn't contain architecture information for armv7."  # ios - need to recompile 3rd party dependencies
+
+    if ": error " in line or \
+       ": fatal error " in line or \
+       ": error: " in line or \
+       ": fatal error: " in line or \
+       (line.startswith("make[") and "Error " in line) or \
+       (line.startswith("make: *** ") and "Error " in line) or \
+       "CMake Error" in line or \
+       line.startswith("error: ") or \
+       "[BEROR]" in line or \
+       ("***" in line and "Stop." in line) or \
+       "Error building player " in line:
+        return True
+
+    return False
+
+
+def isWarning(line):
+    if ": warning " in line or \
+       ": warning: " in line or \
+       ":  warning :" in line or \
+       line.startswith("warning: "):
+
+        # exceptions
+        if ": (not reported) : warning:" in line or \
+           "is internal proprietary API and may be removed in a future release" in line or \
+           "warning CS0419: Ambiguous reference in cref attribute" in line or \
+           "ld: warning: CPU_SUBTYPE_ARM_ALL subtype is deprecated:" in line or \
+           "means the weak symbol cannot be overridden at runtime. This was likely caused by different translation units being compiled with different visibility settings." in line or \
+           "ld: warning: 32-bit absolute address out of range (" in line or \
+           "doesn't contain architecture information for armv7." in line:
+            return False
+
+        return True
+
+    return False
+
+
 def makeDist(distLocation):
     # This builds a distribution, not in the traditional sense, but rather takes a build and removes unneeded files to produce a 'clean' build.
 
-    print "Removing source and extra data from: {0}".format(distLocation)
+    print "--- Removing source and extra data from: {0}".format(distLocation)
 
     deleteDir(os.path.join(distLocation, "android/vh_wrapper/obj/local/armeabi/objs"))
     deleteDir(os.path.join(distLocation, "core/FestivalRelay/Release"))
@@ -250,8 +305,9 @@ def makeDist(distLocation):
     deleteDir(os.path.join(distLocation, "core/ogre-viewer/build/vs2008/Release"))
     deleteDir(os.path.join(distLocation, "core/sbmonitor/gui/Debug"))
     deleteDir(os.path.join(distLocation, "core/sbmonitor/gui/Release"))
-    deleteDir(os.path.join(distLocation, "core/smartbody/sbm/visualc9/obj"))
-    deleteDir(os.path.join(distLocation, "core/smartbody/smartbody-lib/visualc9/obj"))
+    deleteDir(os.path.join(distLocation, "core/smartbody/sbgui/visualc9/obj"))
+    deleteDir(os.path.join(distLocation, "core/smartbody/SmartBody/Debug"))
+    deleteDir(os.path.join(distLocation, "core/smartbody/SmartBody/Release"))
     deleteDir(os.path.join(distLocation, "core/smartbody/steersuite-1.3/steerlib/build/win32/Debug"))
     deleteDir(os.path.join(distLocation, "core/smartbody/steersuite-1.3/steerlib/build/win32/Release"))
     deleteDir(os.path.join(distLocation, "core/smartbody/steersuite-1.3/pprAI/build/win32/Debug"))
@@ -298,6 +354,12 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
     totalBuildTime = time.time()
 
 
+    checkBuildRunning()
+
+    # Create the build running file
+    open("BUILD_RUNNING", "w").close()
+
+
     cleanTime = time.time()
 
     cleanBuild()
@@ -305,19 +367,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
     cleanTime = time.time() - cleanTime
 
 
-    # Check to see if a build is already running
-    if os.path.exists("BUILD_RUNNING"):
-        print "Build is already running.\n";
-        if time.time() - os.path.getctime("BUILD_RUNNING") > timeToForceBuildIfRunning:
-            print "Build has been running for too long, forcing build."
-            os.remove("BUILD_RUNNING")
-        else:
-            print "  Exiting..."
-            sys.exit()
-
-
-    # Create the build running file, and update the timestamp file
-    open("BUILD_RUNNING", "w").close()
+    # update the timestamp file
     f = open("BUILD_TIME", "w")
     f.write(time.strftime("%Y-%m-%d %H:%M:%S"))
     f.close()
@@ -432,36 +482,15 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
 
     # filter out compiler errors and warnings
 
-    #  ": warning "
-    #  ": error "
-    #  ": fatal error "
-    #  ": warning: "   # gcc
-    #  ": error: "     # gcc
-    #  ": fatal error: "  # gcc
-    #  "make[X]: *** " ... "Error "  # gcc
-    #  "make: *** " ... "Error "  # gcc
-    #  "CMake Error "  # cmake
-    #  "(beginning of line) "error: " or "warning: "  # xcode
 
     buildCompileErrors = []
     buildCompileWarnings = []
     for line in buildCompileOutput:
-        if ": error " in line or \
-           ": fatal error " in line or \
-           ": error: " in line or \
-           ": fatal error: " in line or \
-           (line.startswith("make[") and "Error " in line) or \
-           (line.startswith("make: *** ") and "Error " in line) or \
-           "CMake Error " in line or \
-           line.startswith("error: "):
-           buildCompileErrors.append("   " + line)
+        if isError(line):
+            buildCompileErrors.append("   " + line)
 
-        if ": warning " in line or \
-           ": warning: " in line or \
-           line.startswith("warning: "):
-           if ": (not reported) : warning:" not in line:
-              buildCompileWarnings.append("   " + line)
-
+        if isWarning(line):
+            buildCompileWarnings.append("   " + line)
 
 
     # determine if build succeeded by looking for compiler errors
@@ -514,8 +543,33 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
     # move build to its destination folder
     os.makedirs(buildFolder)
     if doFreshBuild:
-        print "--- Moving build to folder: {0}".format(buildFolder)
-        shutil.move("build", os.path.join(buildFolder, "smartbody"))
+        zipFolderName = 'smartbody'
+
+        if platform.system() == "Windows":
+            zipExe = "./{0}/build/zip".format(zipFolderName)
+        else:
+            zipExe = "zip"
+
+        try:
+            print "--- Renaming build to prepare for zipping - {0} {1}".format(buildDir, zipFolderName)
+            os.rename(buildDir, zipFolderName)
+
+            print "--- Zipping build"
+            p = subprocess.Popen("{0} -r {1} {2}".format(zipExe, zipFolderName, zipFolderName).split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            buildCompileOutput = []
+            for line in p.stdout:
+                buildCompileOutput.append(line.strip())
+            p.wait()
+
+            print "--- Moving build to folder: {0}".format(buildFolder)
+            shutil.move("{0}.zip".format(zipFolderName), buildFolder)
+
+            print "--- Renaming build back to original"
+            os.rename(zipFolderName, buildDir)
+
+        except:
+            print "--- FAILED to zip and move destination"
+            buildSuccess = False    # should also change the folder name, but that's done earlier in the process.
 
     moveTime = time.time() - moveTime
 
@@ -667,7 +721,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
 
 
 
-def checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix, hoursBetweenFreshBuild):
+def checkIfTimeForBuild(svnURL, svnUser, svnPassword, freeUpSpace, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix, hoursBetweenFreshBuild):
 
     """
     This function:
@@ -681,15 +735,7 @@ def checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBui
 
     """
 
-    # Check to see if a build is already running
-    if os.path.exists("BUILD_RUNNING"):
-        print "Build is already running.\n";
-        if time.time() - os.path.getctime("BUILD_RUNNING") > timeToForceBuildIfRunning:
-            print "Build has been running for too long, forcing build."
-            os.remove("BUILD_RUNNING")
-        else:
-            print "  Exiting..."
-            sys.exit()
+    checkBuildRunning()
 
 
     # Get time of last build
@@ -772,20 +818,21 @@ def checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBui
         # delete build
         # loop until enough space is left
 
-        if platform.system() == "Windows":
-            minFreeSpaceRequiredForBuild = minFreeSpaceRequiredForBuildGig * 1000 * 1000 * 1000;  # ~gigs
+        if freeUpSpace:
+            if platform.system() == "Windows":
+                minFreeSpaceRequiredForBuild = minFreeSpaceRequiredForBuildGig * 1000 * 1000 * 1000;  # ~gigs
 
-            while getFreeSpace(buildDrive) < minFreeSpaceRequiredForBuild:
-                lowestBuildDir = getLowestBuildDir(buildOutputFolder, "ci")
+                while getFreeSpace(buildDrive) < minFreeSpaceRequiredForBuild:
+                    lowestBuildDir = getLowestBuildDir(buildOutputFolder, "ci")
 
-                if lowestBuildDir == "":
-                     print "No CI build dirs found.  Can't delete enough hard disk space.\n"
-                     sys.exit()
+                    if lowestBuildDir == "":
+                         print "No CI build dirs found.  Can't delete enough hard disk space.\n"
+                         sys.exit()
 
-                lowestBuildFullPath = os.path.join(buildOutputFolder, lowestBuildDir)
+                    lowestBuildFullPath = os.path.join(buildOutputFolder, lowestBuildDir)
 
-                print "Removing folder {0} to free up disk space".format(lowestBuildFullPath)
-                shutil.rmtree(lowestBuildFullPath, onerror=handleRemoveReadonly)
+                    print "Removing folder {0} to free up disk space".format(lowestBuildFullPath)
+                    shutil.rmtree(lowestBuildFullPath, onerror=handleRemoveReadonly)
 
 
         print "Disk has enough space for build"
@@ -841,6 +888,6 @@ else:
         buildOutputFolder = sys.argv[7]
         buildSuffix = sys.argv[8]
         hoursBetweenFreshBuild = int(sys.argv[9])
-        checkIfTimeForBuild(svnURL, svnUser, svnPassword, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix, hoursBetweenFreshBuild)
+        checkIfTimeForBuild(svnURL, svnUser, svnPassword, False, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix, hoursBetweenFreshBuild)
     else:
         printUsage()
