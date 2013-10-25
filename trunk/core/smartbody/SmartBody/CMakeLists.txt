@@ -536,11 +536,18 @@ add_library(
 
 )
 
+if (${GOOGLE_PROFILER})
+set (PROFILER_LIBS
+	tcmalloc
+	profiler
+)
+else()
+set (PROFILER_LIBS "")
+endif()
 
 target_link_libraries( SmartBody
 
-	#tcmalloc
-	#profiler
+	${PROFILER_LIBS}
 	bonebus
 	vhmsg
 	vhcl

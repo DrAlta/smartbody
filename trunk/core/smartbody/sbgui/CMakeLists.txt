@@ -212,10 +212,18 @@ else()
 set ( XFT "" ) 
 endif()
 
+if (${GOOGLE_PROFILER})
+set ( PROFILER_LIBS
+	tcmalloc
+	profiler
+)
+else()
+set ( PROFILER_LIBS "")
+endif()
+
 target_link_libraries( sbgui
 
-	#tcmalloc
-	#profiler
+	${PROFILER_LIBS}
 	SmartBody
 	bonebus
 	vhmsg
