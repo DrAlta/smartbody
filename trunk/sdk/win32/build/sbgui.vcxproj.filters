@@ -55,6 +55,9 @@
     <Filter Include="jointmapviewer\retargetcreator">
       <UniqueIdentifier>{56361f18-4f18-4cc4-b99b-6afd39fa8ac8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="autorig">
+      <UniqueIdentifier>{916cb17b-904c-456e-9716-5e306fa77173}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\sbgui\glfont2.cpp" />
@@ -293,6 +296,21 @@
       <Filter>viewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbgui\SBOgreListener.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\resourceViewer\AttributeEditor.cpp">
+      <Filter>resourceViewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\autorig\SBAutoRigManager.cpp">
+      <Filter>autorig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\autorig\VoxelizerWindow.cpp">
+      <Filter>autorig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\SBSelectionManager.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\SBWindowListener.cpp">
       <Filter>viewer</Filter>
     </ClCompile>
   </ItemGroup>
@@ -540,6 +558,21 @@
       <Filter>viewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbgui\SBOgreListener.h">
+      <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\resourceViewer\AttributeEditor.h">
+      <Filter>resourceViewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\autorig\SBAutoRigManager.h">
+      <Filter>autorig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\autorig\VoxelizerWindow.h">
+      <Filter>autorig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\SBSelectionManager.h">
+      <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\SBWindowListener.h">
       <Filter>viewer</Filter>
     </ClInclude>
   </ItemGroup>

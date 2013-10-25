@@ -5,7 +5,6 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
-#include <sb/SBCharacterListener.h>
 
 //-------------------------------------------------------------------------------------
 OgreSmartBody::OgreSmartBody(void)
@@ -159,7 +158,7 @@ bool OgreSmartBody::go(void)
 
 	m_pScene->startFileLogging("smartbody.log");
 	OgreSmartBodyListener* listener = new OgreSmartBodyListener(this);
-	m_pScene->setCharacterListener(listener);
+	m_pScene->addSceneListener(listener);
 	m_pScene->start();
 
 	// sets the media path, or root of all the data to be used

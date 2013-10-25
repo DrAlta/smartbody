@@ -2,11 +2,11 @@
 #define _IRRLICHTSMARTBODYLISTENER_H_
 
 #include <irrlicht.h>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 #include <ISceneManager.h>
 #include <map>
 
-class IrrlichtSmartBodyListener : public SmartBody::SBCharacterListener
+class IrrlichtSmartBodyListener : public SmartBody::SBSceneListener
 {
    public:
 	   IrrlichtSmartBodyListener(irr::scene::ISceneManager* sceneMgr, std::map<std::string, int>* characterMap);

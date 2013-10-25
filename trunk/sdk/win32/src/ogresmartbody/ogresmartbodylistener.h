@@ -3,9 +3,9 @@
 
 #include <ogre/Ogre.h>
 #include "ogresmartbody.h"
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 
-class OgreSmartBodyListener : public SmartBody::SBCharacterListener
+class OgreSmartBodyListener : public SmartBody::SBSceneListener
 {
    public:
 	   OgreSmartBodyListener(OgreSmartBody* osb);
