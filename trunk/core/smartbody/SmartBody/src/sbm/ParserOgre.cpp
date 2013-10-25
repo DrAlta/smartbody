@@ -990,6 +990,14 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SmartBody::SBM
 						}
 					}
 				}
+
+				// clean up allData
+				for (size_t allDataCounter = 0; allDataCounter < allData.size(); ++allDataCounter)
+				{
+					delete allData[allDataCounter];
+					allData[allDataCounter]	 = NULL;
+				}
+				allData.clear();
 			}
 			else
 			{
