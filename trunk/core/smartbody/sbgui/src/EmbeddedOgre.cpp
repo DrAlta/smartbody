@@ -1132,7 +1132,8 @@ void EmbeddedOgre::addTexture( std::string texName )
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
 	SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE,texName.c_str());
 	Ogre::TextureManager& ogreTexManager = Ogre::TextureManager::getSingleton();	
-	Ogre::TexturePtr ogreTex = ogreTexManager.getByName(texName);	
+	ogreTexManager.setDefaultNumMipmaps(MIP_UNLIMITED);
+	Ogre::TexturePtr ogreTex = ogreTexManager.getByName(texName);		
 	if (!ogreTex.isNull()) return; // the texture already exist in ogre
 	if (!tex) return; // the texture not exist in SmartBody
 	PixelFormat pixelFormat = PF_R8G8B8;
@@ -1143,9 +1144,9 @@ void EmbeddedOgre::addTexture( std::string texName )
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
 		TEX_TYPE_2D,      // type
 		tex->getWidth(), tex->getHeight(),         // width & height
-		0,                // number of mipmaps
+		5,                // number of mipmaps
 		pixelFormat,     // pixel format
-		TU_STATIC );  	
+		TU_AUTOMIPMAP );  	
 	HardwarePixelBufferSharedPtr pixelBuffer = ogreTex->getBuffer();
 	//LOG("texture format = %d, buffer format = %d",ogreTex->getFormat(), pixelBuffer->getFormat());
 	pixelBuffer->lock(HardwareBuffer::HBL_NORMAL);
