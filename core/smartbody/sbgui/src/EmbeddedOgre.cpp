@@ -373,7 +373,7 @@ void EmbeddedOgre::createDefaultScene()
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_MODULATIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_NONE );
-	ogreSceneMgr->setShadowTextureCount(2);
+	ogreSceneMgr->setShadowTextureCount(1);
 	MovablePlane* shadowPlane;
 	shadowPlane = new MovablePlane(Vector3::UNIT_Y,Ogre::Vector3(0,0,0));
 	
