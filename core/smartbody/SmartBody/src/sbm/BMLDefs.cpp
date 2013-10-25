@@ -749,4 +749,9 @@ BMLDefs::BMLDefs()
 
 }
 
+BMLDefs::~BMLDefs()
+{
+
+}
+
 }

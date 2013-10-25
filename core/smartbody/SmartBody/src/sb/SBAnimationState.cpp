@@ -28,7 +28,8 @@ SBAnimationBlend::SBAnimationBlend(const std::string& name) : PABlend(name)
 
 SBAnimationBlend::~SBAnimationBlend()
 {
-	delete motionAnalysis;
+	if (motionAnalysis)
+		delete motionAnalysis;
 }
 
 void SBAnimationBlend::setIncrementWorldOffsetY(bool flag)
