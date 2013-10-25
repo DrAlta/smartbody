@@ -90,12 +90,6 @@ LocomotionAnalyzer::LocomotionAnalyzer()
 
 LocomotionAnalyzer::~LocomotionAnalyzer()
 {
-	for (size_t i = 0; i < legInfos.size(); ++i)
-	{
-		if (legInfos[i])
-			delete legInfos[i];
-	}
-	legInfos.clear();
 }
 
 
