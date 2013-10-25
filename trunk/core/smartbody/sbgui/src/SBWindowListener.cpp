@@ -42,6 +42,14 @@ void SBWindowListener::OnSimulationUpdate()
 {
 }
 
+void SBWindowListener::OnObjectCreate( SmartBody::SBObject* object )
+{
+}
+
+void SBWindowListener::OnObjectDelete( SmartBody::SBObject* object )
+{
+}
+
 void SBWindowListener::windowShow()
 {
 	SmartBody::SBScene::getScene()->addSceneListener(this);

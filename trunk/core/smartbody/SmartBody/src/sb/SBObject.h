@@ -85,13 +85,27 @@ class SBObject : public SBObserver, public SBSubject
 		SBAPI const SrMat& getMatrixAttribute(const std::string& name) ;
 
 		SBAPI virtual void notify(SBSubject* subject);
+		
+		SBAPI void addDependency(SBObject* object);
+		SBAPI void removeDependency(SBObject* object);
+		SBAPI void addDependencyOnly(SBObject* object);
+		SBAPI void removeDependencyOnly(SBObject* object);
+		SBAPI std::set<SBObject*>& getDependencies();
+		SBAPI void addDependencyReverse(SBObject* object);
+		SBAPI void removeDependencyReverse(SBObject* object);
+		SBAPI std::set<SBObject*>& getDependenciesReverse();
+		SBAPI void clearDependencies();
+		SBAPI void clearReverseDependencies();
 
+		SBAPI virtual void onDependencyRemoval(SBObject* object);
 
 	protected:
 		std::string m_name;
 		SBAttributeManager* m_attributeManager;
 		std::map<std::string, SBAttribute*> m_attributeList;
 		std::string m_emptyString;
+		std::set<SBObject*> _dependencies;
+		std::set<SBObject*> _dependenciesReverse;
 
 		static bool defaultBool;
 		static int defaultInt;

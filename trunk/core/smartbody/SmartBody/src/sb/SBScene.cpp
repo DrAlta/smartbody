@@ -1592,6 +1592,10 @@ SmartBody::SBFaceDefinition* SBScene::createFaceDefinition(const std::string& na
 
 	SBFaceDefinition* face = new SBFaceDefinition(name);
 	_faceDefinitions.insert(std::pair<std::string, SBFaceDefinition*>(name, face));
+	for (size_t l = 0; l < this->_sceneListeners.size(); l++)
+	{
+		this->_sceneListeners[l]->OnObjectCreate(face);
+	}
 
 	return face;
 }
@@ -1607,10 +1611,14 @@ void SBScene::removeFaceDefinition(const std::string& name)
 		LOG("Face definition named '%s' does not exist.", name.c_str());
 		return;
 	}
-
+	for (size_t l = 0; l < this->_sceneListeners.size(); l++)
+	{
+		this->_sceneListeners[l]->OnObjectDelete(iter->second);
+	}
 	delete iter->second;
 	iter->second = NULL;
 	_faceDefinitions.erase(iter);
+
 }
 
 SmartBody::SBFaceDefinition* SBScene::getFaceDefinition(const std::string& name)
@@ -3936,6 +3944,14 @@ SBSkeleton* SBScene::addSkeletonDefinition(const std::string& skelName )
 		LOG("DEPRECATED: Use AssetManager.addSkeletonDefinition() instead.");
 	return getAssetManager()->addSkeletonDefinition(skelName);
 }
+
+void SBScene::removeSkeletonDefinition(const std::string& skelName )
+{
+	if (SHOW_DEPRECATION_MESSAGES)
+		LOG("DEPRECATED: Use AssetManager.removeSkeletonDefinition() instead.");
+	return getAssetManager()->removeSkeletonDefinition(skelName);
+}
+
 
 SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double duration, int numFrames )
 {

@@ -218,6 +218,7 @@ class SBScene : public SBObject
 		SBAPI void addMotions(const std::string& path, bool recursive);
 		SBAPI SBMotion* addMotionDefinition(const std::string& motionName, double duration, int numFrames );
 		SBAPI SBSkeleton* addSkeletonDefinition(const std::string& skelName);
+		SBAPI void removeSkeletonDefinition(const std::string& skelName);
 		SBAPI SBMotion* createMotion(const std::string& motionName);
 		SBAPI SBMotion* getMotion(const std::string& name);
 		SBAPI int getNumMotions();
