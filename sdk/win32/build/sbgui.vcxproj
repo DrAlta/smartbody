@@ -115,7 +115,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\include\cegui-0.8.2;..\src\sbgui;..\src\SmartBody;..\include;..\include\vhcl;..\include\steersuite;..\include\vhmsg;..\include\bonebus;..\include\wsp;..\python27\include;..\OgreSDK\include;..\OgreSDK\include\OGRE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include\cegui;..\src\sbgui;..\src\SmartBody;..\include;..\include\vhcl;..\include\steersuite;..\include\vhmsg;..\include\bonebus;..\include\wsp;..\include\polyvox;..\include\Pinocchio;..\python27\include;..\OgreSDK\include;..\OgreSDK\include\OGRE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -135,7 +135,7 @@
     </ProjectReference>
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>glew32.lib;SmartBody_d.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;fltkgld.lib;fltkd.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAId.lib;steerlibd.lib;ode_doubled.lib;python27.lib;OgreMain_d.lib;OIS_d.lib;OgreRTShaderSystem_d.lib;CEGUIBase-0_d.lib;CEGUIExpatParser_d.lib;CEGUICoreWindowRendererSet_d.lib;CEGUIOpenGLRenderer-0_d.lib;CEGUISILLYImageCodec_d.lib;PyCEGUI_d.lib;PyCEGUIOpenGLRenderer_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;SmartBody_d.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;boost_serialization-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;fltkgld.lib;fltkd.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAId.lib;steerlibd.lib;ode_doubled.lib;python27.lib;OgreMain_d.lib;OIS_d.lib;OgreRTShaderSystem_d.lib;CEGUIBase-0_d.lib;CEGUIExpatParser_d.lib;CEGUICoreWindowRendererSet_d.lib;CEGUIOpenGLRenderer-0_d.lib;CEGUISILLYImageCodec_d.lib;PyCEGUI_d.lib;PyCEGUIOpenGLRenderer_d.lib;Pinocchio_d.lib;PolyVoxCore_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\OgreSDK\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -165,7 +165,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>..\include\cegui-0.8.2;..\src\sbgui;..\src\SmartBody;..\include;..\include\vhcl;..\include\steersuite;..\include\vhmsg;..\include\bonebus;..\include\wsp;..\python27\include;..\OgreSDK\include;..\OgreSDK\include\OGRE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include\cegui;..\src\sbgui;..\src\SmartBody;..\include;..\include\vhcl;..\include\steersuite;..\include\vhmsg;..\include\bonebus;..\include\wsp;..\include\polyvox;..\include\Pinocchio;..\python27\include;..\OgreSDK\include;..\OgreSDK\include\OGRE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;ENABLE_GUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -183,7 +183,7 @@
     </ProjectReference>
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>glew32.lib;Smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;fltk.lib;fltkgl.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;dbghelp.lib;opengl32.lib;glu32.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAI.lib;steerlib.lib;ode_double.lib;python27.lib;OgreMain.lib;OIS.lib;OgreRTShaderSystem.lib;CEGUIBase-0.lib;CEGUIExpatParser.lib;CEGUICoreWindowRendererSet.lib;CEGUIOpenGLRenderer-0.lib;CEGUISILLYImageCodec.lib;PyCEGUI.lib;PyCEGUIOpenGLRenderer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;Smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;fltk.lib;fltkgl.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;dbghelp.lib;opengl32.lib;glu32.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAI.lib;steerlib.lib;ode_double.lib;python27.lib;OgreMain.lib;OIS.lib;OgreRTShaderSystem.lib;CEGUIBase-0.lib;CEGUIExpatParser.lib;CEGUICoreWindowRendererSet.lib;CEGUIOpenGLRenderer-0.lib;CEGUISILLYImageCodec.lib;PyCEGUI.lib;PyCEGUIOpenGLRenderer.lib;Pinocchio.lib;PolyVoxCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\OgreSDK\lib\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -387,6 +387,8 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\sbgui\autorig\SBAutoRigManager.cpp" />
+    <ClCompile Include="..\src\sbgui\autorig\VoxelizerWindow.cpp" />
     <ClCompile Include="..\src\sbgui\bmlcreator\TextEditor.cpp" />
     <ClCompile Include="..\src\sbgui\CharacterCreatorWindow.cpp" />
     <ClCompile Include="..\src\sbgui\EmbeddedOgre.cpp" />
@@ -412,6 +414,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\sbgui\panimationviewer\VisualizationView.cpp" />
     <ClCompile Include="..\src\sbgui\PawnPosControl.cpp" />
     <ClCompile Include="..\src\sbgui\PositionControl.cpp" />
+    <ClCompile Include="..\src\sbgui\resourceViewer\AttributeEditor.cpp" />
     <ClCompile Include="..\src\sbgui\retargetcreator\RetargetCreatorWindow.cpp" />
     <ClCompile Include="..\src\sbgui\retargetviewer\RetargetViewer.cpp" />
     <ClCompile Include="..\src\sbgui\RootWindow.cxx" />
@@ -464,6 +467,8 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\sbgui\SBGUIManager.cpp" />
     <ClCompile Include="..\src\sbgui\sbm_main.cpp" />
     <ClCompile Include="..\src\sbgui\SBOgreListener.cpp" />
+    <ClCompile Include="..\src\sbgui\SBSelectionManager.cpp" />
+    <ClCompile Include="..\src\sbgui\SBWindowListener.cpp" />
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeCurve.cpp" />
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeCurveEditor.cpp" />
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeRTCurveViewer.cpp" />
@@ -472,6 +477,8 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\smartbody-lib\src\external\glew\glew.h" />
+    <ClInclude Include="..\src\sbgui\autorig\SBAutoRigManager.h" />
+    <ClInclude Include="..\src\sbgui\autorig\VoxelizerWindow.h" />
     <ClInclude Include="..\src\sbgui\bmlcreator\TextEditor.h" />
     <ClInclude Include="..\src\sbgui\CharacterCreatorWindow.h" />
     <ClInclude Include="..\src\sbgui\EmbeddedOgre.h" />
@@ -499,6 +506,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClInclude Include="..\src\sbgui\panimationviewer\VisualizationView.h" />
     <ClInclude Include="..\src\sbgui\PawnPosControl.h" />
     <ClInclude Include="..\src\sbgui\PositionControl.h" />
+    <ClInclude Include="..\src\sbgui\resourceViewer\AttributeEditor.h" />
     <ClInclude Include="..\src\sbgui\retargetcreator\RetargetCreatorWindow.h" />
     <ClInclude Include="..\src\sbgui\retargetviewer\RetargetViewer.h" />
     <ClInclude Include="..\src\sbgui\RootWindow.h" />
@@ -549,6 +557,8 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClInclude Include="..\src\sbgui\pic.h" />
     <ClInclude Include="..\src\sbgui\SBGUIManager.h" />
     <ClInclude Include="..\src\sbgui\SBOgreListener.h" />
+    <ClInclude Include="..\src\sbgui\SBSelectionManager.h" />
+    <ClInclude Include="..\src\sbgui\SBWindowListener.h" />
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeCurve.h" />
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeCurveEditor.h" />
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeRTCurveViewer.h" />

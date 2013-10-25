@@ -1,9 +1,8 @@
 #include "ogresmartbodylistener.h"
 #include "ogresmartbody.h"
-#include <SB/SBCharacterListener.h>
 
 
-OgreSmartBodyListener::OgreSmartBodyListener(OgreSmartBody* osb)
+OgreSmartBodyListener::OgreSmartBodyListener(OgreSmartBody* osb) : SBSceneListener()
 {
 	ogreSB = osb;
 }
