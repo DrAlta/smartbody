@@ -40,7 +40,10 @@ CEGUI::Key::Scan mapFlKeyToCEGUI(int flKey)
 {
 	CEGUI::Key::Scan ceguiKey = CEGUI::Key::Unknown;
 	switch(flKey)
-	{
+	{			
+	case 32:
+		ceguiKey = CEGUI::Key::Space;
+		break;
 	case FL_BackSpace:
 		ceguiKey = CEGUI::Key::Backspace;
 		//LOG("flKey = %d, CEGUI Backspace", flKey);
@@ -103,7 +106,7 @@ int SBGUIManager::handleEvent(int eventID)
 	}	
 
 	int key = Fl::event_key();	
-	if (eventID == FL_SHORTCUT)
+	if (eventID == FL_SHORTCUT || key == 32)
 	{
 		//LOG("event FL_SHORTCUT");
 		context.injectKeyDown(mapFlKeyToCEGUI(key));	
