@@ -58,7 +58,7 @@ for i in range(15):
 	brad.getAttribute('collisionShapeScale').setValue(SrVec(.01, .01, .01))
 	# Set defomable mesh
 	brad.setDoubleAttribute('deformableMeshScale', .01)
-	brad.setStringAttribute('deformableMesh', 'ChrBrad')
+	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	# Retarget character
@@ -88,7 +88,7 @@ for i in range(15):
 	rachel.getAttribute('collisionShapeScale').setValue(SrVec(.01, .01, .01))
 	# Set deformable mesh
 	rachel.setDoubleAttribute('deformableMeshScale', .01)
-	rachel.setStringAttribute('deformableMesh', 'ChrRachel')
+	rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 	# Retarget character

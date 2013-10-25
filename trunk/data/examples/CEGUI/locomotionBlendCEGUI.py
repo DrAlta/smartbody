@@ -159,7 +159,7 @@ brad.setFaceDefinition(bradFace)
 brad.createStandardControllers()
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrBrad')
+brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 # Lip syncing diphone setup
 brad.setStringAttribute('lipSyncSetName', 'default')
 brad.setBoolAttribute('usePhoneBigram', True)
