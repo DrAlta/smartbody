@@ -132,6 +132,8 @@ void SBGUIManager::resetGUI()
 		winMgr.destroyWindow(oldRootWin);
 	}	
 	CEGUI::Window *sheet = winMgr.createWindow("DefaultWindow", "SBGUI");
+	sheet->setUsingAutoRenderingSurface(false);
+	sheet->setClippedByParent(false);
 	//sheet->setMinSize(CEGUI::UVector2(CEGUI::UDim(0.0, 1920), CEGUI::UDim(0.0, 1200)));
 	CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow( sheet );
 #endif
@@ -180,14 +182,25 @@ void SBGUIManager::init()
 	CEGUI::Scheme& taharezScheme = CEGUI::SchemeManager::getSingleton().createFromFile( "TaharezLook.scheme" );	
 	CEGUI::Scheme& windowScheme = CEGUI::SchemeManager::getSingleton().createFromFile( "WindowsLook.scheme" );	
 	CEGUI::Scheme& alfiskoScheme = CEGUI::SchemeManager::getSingleton().createFromFile( "AlfiskoSkin.scheme" );	
-	CEGUI::Scheme& vanillaScheme = CEGUI::SchemeManager::getSingleton().createFromFile( "VanillaSkin.scheme" );	
+	CEGUI::Scheme& vanillaScheme = CEGUI::SchemeManager::getSingleton().createFromFile( "VanillaSkin.scheme" );
 	
 	
 	//CEGUI::Imageset& imageSet = CEGUI::ImagesetManager::getSingleton().get("OgreTrayImages");
 	//imageSet.setAutoScalingEnabled(false);
 	//CEGUI::Font& font = CEGUI::FontManager::getSingleton().get("DejaVuSans-10");
 	//font.setAutoScaled(false);
-	
+	CEGUI::FontManager& fontManager = CEGUI::FontManager::getSingleton();		
+	CEGUI::FontManager::FontIterator pi = fontManager.getIterator();
+	while ( !pi.isAtEnd () )   {
+		CEGUI::Font* curFont = dynamic_cast<CEGUI::Font*>(pi.getCurrentValue());
+		if ( curFont ) 
+		{
+			//LOG("Font name = %s",curFont->getName().c_str());
+			curFont->setAutoScaled(CEGUI::AutoScaledMode::ASM_Disabled);
+			curFont->setNativeResolution(CEGUI::Sizef(800,600));
+		}
+		pi++;
+	}
 	//CEGUI::Font& font = CEGUI::FontManager.getSingleton().get("")
 	//CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
 
@@ -227,6 +240,13 @@ void SBGUIManager::resize( int w, int h )
 {
 #if USE_CEGUI
 	if (initialized)
+	{
 		CEGUI::System::getSingleton().notifyDisplaySizeChanged(CEGUI::Sizef((float)w,(float)h));
+		CEGUI::FontManager& fontManager = CEGUI::FontManager::getSingleton();		
+		fontManager.notifyDisplaySizeChanged(CEGUI::Sizef((float)w,(float)h));
+		CEGUI::Window* sheet = CEGUI::System::getSingleton().getDefaultGUIContext().getRootWindow();
+		sheet->setClippedByParent(false);
+		sheet->setUsingAutoRenderingSurface(false);		
+	}
 #endif
 }

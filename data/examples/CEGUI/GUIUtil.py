@@ -65,6 +65,8 @@ class GUIManager:
 	def createCheckBox(self, chkBoxName, chkBoxText, posX = -1, posY = -1, width = -1):
 		winManager = WindowManager.getSingleton()	
 		chkBox = winManager.createWindow(self.CheckBoxType, chkBoxName)
+		chkBox.setUsingAutoRenderingSurface(False)
+		chkBox.setClippedByParent(False)
 		chkBox.setText(chkBoxText)				
 		chkBox.setProperty("HoverTextColour","FFFF00")		
 		boxWidth = self.chkBoxWidth
@@ -84,7 +86,9 @@ class GUIManager:
 
 	def createComboBox(self, comboName, comboTextList, posX = -1, posY = -1, width = -1):
 		winManager = WindowManager.getSingleton()	
-		combo = winManager.createWindow(self.ComboBoxType, comboName)		
+		combo = winManager.createWindow(self.ComboBoxType, comboName)	
+		combo.setUsingAutoRenderingSurface(False)	
+		combo.setClippedByParent(False)
 		comboWidth = self.comboWidth
 		if width != -1:
 			comboWidth = width
@@ -117,8 +121,11 @@ class GUIManager:
 	def createButton(self, btnName, btnText, posX = -1, posY = -1, width = -1):
 		winManager = WindowManager.getSingleton()	
 		button = winManager.createWindow(self.ButtonType, btnName)
+		button.setUsingAutoRenderingSurface(False)
+		button.setClippedByParent(False)
 		button.setText(btnText)		
 		button.setProperty("HoverTextColour","FFFF00")
+		
 		
 		buttonWidth = self.buttonWidth
 		if width != -1:
@@ -138,7 +145,9 @@ class GUIManager:
 	def createEditBox(self, editBoxName, editBoxText, posX = -1, posY = -1, width = -1):
 		winManager = WindowManager.getSingleton()	
 		editBox = winManager.createWindow(self.EditBoxType, editBoxName)
-		editBox.setText(editBoxText)		
+		editBox.setUsingAutoRenderingSurface(False)
+		editBox.setText(editBoxText)	
+		editBox.setClippedByParent(False)
 				
 		editBoxWidth = self.buttonWidth
 		if width != -1:
@@ -159,6 +168,8 @@ class GUIManager:
 	def createStaticText(self, textName, text, posX = -1, posY = -1, width = -1, height = -1):
 		winManager = WindowManager.getSingleton()		
 		staticText = winManager.createWindow(self.TextType, textName)		
+		staticText.setUsingAutoRenderingSurface(False)
+		staticText.setClippedByParent(False)
 		staticText.setText(text)
 		staticText.setSize(USize(UDim(0.0, self.staticTextWidth), UDim(0.0, self.staticTextHeight)))	
 		#staticText.setProperty("TextColours", "FFFF00");
@@ -198,6 +209,10 @@ class GUIManager:
 		#slider.setProperty("Font", "DejaVuSans-10");			
 		slider.setMaxValue(max)		
 		slider.setCurrentValue(defVal)		
+		staticText.setUsingAutoRenderingSurface(False)
+		staticText.setClippedByParent(False)
+		slider.setUsingAutoRenderingSurface(False)
+		slider.setClippedByParent(False)
 		txtWidth = self.staticTextWidth
 		sliderWidth = self.sliderWidth
 		if width != -1:
