@@ -380,7 +380,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 //         : SrViewer(x, y, w, h) , Fl_Gl_Window ( x, y, w, h, label )
          : Fl_Gl_Window ( x, y, w, h, label ), SelectionListener()
  {
-	 Fl::gl_visual( FL_RGB | FL_DOUBLE | FL_DEPTH );//| FL_ALPHA );
+	 Fl::gl_visual( FL_RGB | FL_DOUBLE | FL_DEPTH | FL_MULTISAMPLE);//| FL_ALPHA );
 
    callback ( _callback_func, this );
 
@@ -425,6 +425,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
 	manager->addEventHandler("bmlstatus", gv);
 
+	mode( FL_RGB | FL_DOUBLE | FL_DEPTH | FL_MULTISAMPLE);
 	//CEGUI::OpenGLRenderer* myRenderer = 
 	//	new CEGUI::OpenGLRenderer( 0 );
 	
