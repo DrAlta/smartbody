@@ -120,6 +120,18 @@ SBMotion::SBMotion(std::string file) : SkMotion()
 SBMotion::~SBMotion()
 {
 	_motionFile = "";
+
+	std::map<std::string, JointTrajectory*>::iterator jointTrajectoryIter;
+	for (jointTrajectoryIter = trajMap.begin(); jointTrajectoryIter != trajMap.end(); ++jointTrajectoryIter)
+	{
+		if (jointTrajectoryIter->second)
+			delete jointTrajectoryIter->second;
+	}
+	trajMap.clear();
+
+	if (_offsetMotion)
+		delete _offsetMotion;
+	_offsetMotion = NULL;
 }
 
 void SBMotion::setMotionType(MotionType type)

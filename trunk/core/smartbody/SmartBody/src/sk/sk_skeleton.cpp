@@ -140,6 +140,7 @@ void SkSkeleton::copy(SkSkeleton* origSkel)
 
 void SkSkeleton::init ()
 {
+	resetSearchJoint();
 	_coldet_free_pairs.clear();
 	_channels->init();
 	while ( _postures.size()>0 ) 

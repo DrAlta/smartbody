@@ -90,7 +90,12 @@ LocomotionAnalyzer::LocomotionAnalyzer()
 
 LocomotionAnalyzer::~LocomotionAnalyzer()
 {
-
+	for (size_t i = 0; i < legInfos.size(); ++i)
+	{
+		if (legInfos[i])
+			delete legInfos[i];
+	}
+	legInfos.clear();
 }
 
 
@@ -245,6 +250,25 @@ MotionAnalysis::MotionAnalysis(void)
 
 MotionAnalysis::~MotionAnalysis(void)
 {
+	for (size_t i = 0; i < legInfos.size(); ++i)
+	{
+		if (legInfos[i])
+		{
+			delete legInfos[i];
+			legInfos[i] = NULL;
+		}
+	}
+	legInfos.clear();
+
+	for (size_t i = 0; i < locoAnalyzers.size(); ++i)
+	{
+		if (locoAnalyzers[i])
+		{
+			delete locoAnalyzers[i];
+			locoAnalyzers[i] = NULL;
+		}
+	}
+	locoAnalyzers.clear();
 }
 
 void MotionAnalysis::init(std::string skeletonName, std::string baseJoint, SmartBody::SBAnimationBlend* locomotionBlend, const std::vector<std::string>& motions, std::string motionPrefix )

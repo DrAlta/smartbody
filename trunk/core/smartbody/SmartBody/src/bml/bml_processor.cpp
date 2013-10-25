@@ -188,7 +188,8 @@ BML::Processor::Processor()
 	ct_speed_max( CONTROLLER_SPEED_MAX_DEFAULT ),
 	requestcb(NULL)
 {
-	BMLDefs* bmlDefs = new BMLDefs();
+	//BMLDefs* bmlDefs = new BMLDefs();
+	BMLDefs bmlDefs;
 	try {
 		xmlParser = new XercesDOMParser();
 
@@ -218,11 +219,14 @@ void BML::Processor::registerRequestCallback(void (*cb)(BmlRequest* request, voi
 
 BML::Processor::~Processor()
 {
-//	xmlErrorHandler->release();
-//	delete xmlErrorHandler;
-//	xmlErrorHandler = NULL;	
-//	if (xmlParser)
-//		delete xmlParser; 
+	/*
+	if (xmlErrorHandler)
+		delete xmlErrorHandler;
+	xmlErrorHandler = NULL;	
+	if (xmlParser)
+		delete xmlParser; 
+	xmlParser = NULL;
+	*/
 }
 
 

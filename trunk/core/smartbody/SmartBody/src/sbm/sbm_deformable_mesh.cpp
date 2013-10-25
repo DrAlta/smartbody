@@ -95,6 +95,13 @@ DeformableMesh::~DeformableMesh()
 		}
 	}	
 	skinWeights.clear();
+
+	for (size_t i = 0; i < subMeshList.size(); ++i)
+	{
+		if (subMeshList[i])
+			delete subMeshList[i];
+	}
+	subMeshList.clear();
 }
 
 
