@@ -346,7 +346,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
     elif platform.system() == "Darwin":
         destinationFolder = "/Users/fast/build/sbm-builds"
     else:
-        destinationFolder = "/build/sbm-builds"
+        destinationFolder = "/data/build/sbm-builds"
     tagSvn = False
     emailReport = True
 
