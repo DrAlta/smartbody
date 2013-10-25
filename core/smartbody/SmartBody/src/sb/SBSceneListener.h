@@ -2,6 +2,7 @@
 #define  __SBM_CHARACTER_LISTENER__
 #include <string>
 #include <sb/SBTypes.h>
+#include <sb/SBObject.h>
 
 namespace SmartBody
 {
@@ -23,6 +24,9 @@ public:
 	virtual SBAPI void OnChannel( const std::string & name, const std::string & channelName, const float value) {}
 	virtual SBAPI void OnLogMessage( const std::string & message) {}
 
+	virtual SBAPI void OnObjectCreate(SmartBody::SBObject* object) {}
+	virtual SBAPI void OnObjectDelete(SmartBody::SBObject* object) {}
+	
 	virtual SBAPI void OnSimulationStart() {}
 	virtual SBAPI void OnSimulationEnd() {}
 	virtual SBAPI void OnSimulationUpdate() {}

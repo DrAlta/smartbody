@@ -310,6 +310,9 @@
     <ClCompile Include="..\src\resourceViewer\AttributeEditor.cpp">
       <Filter>resourceViewer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\autorig\VoxelizerWindow.cpp">
+      <Filter>autorig</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -568,6 +571,9 @@
     </ClInclude>
     <ClInclude Include="..\src\resourceViewer\AttributeEditor.h">
       <Filter>resourceViewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\autorig\VoxelizerWindow.h">
+      <Filter>autorig</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

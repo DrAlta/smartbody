@@ -91,6 +91,20 @@ void AttributeEditor::OnPawnDelete( const std::string & name )
 	}
 }
 
+void AttributeEditor::OnObjectCreate( SmartBody::SBObject* object )
+{
+}
+
+void AttributeEditor::OnObjectDelete( SmartBody::SBObject* object )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string id = scene->getStringFromObject(object);
+	if (id == _currentSelection)
+	{
+		OnDeselect(_currentSelection);
+	}
+}
+
 void AttributeEditor::OnSimulationStart()
 {
 	OnDeselect(_currentSelection);

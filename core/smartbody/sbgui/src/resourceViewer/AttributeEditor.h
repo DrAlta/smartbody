@@ -26,6 +26,9 @@ class AttributeEditor : public Fl_Group, public SmartBody::SBObserver, public SB
 		void OnCharacterUpdate( const std::string & name );
 		void OnPawnCreate( const std::string & name );
 		void OnPawnDelete( const std::string & name );
+
+		void OnObjectCreate( SmartBody::SBObject* object );
+		void OnObjectDelete( SmartBody::SBObject* object );
 		void OnSimulationStart();
 		void updateGUI();
 

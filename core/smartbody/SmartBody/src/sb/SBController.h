@@ -49,6 +49,7 @@ class SBController : public MeController
 	private:
 		SkChannelArray channelArray;
 		std::string controllerType;
+
 };
 
 }

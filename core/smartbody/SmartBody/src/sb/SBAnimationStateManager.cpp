@@ -5,6 +5,7 @@
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBScene.h>
+#include <sb/SBSceneListener.h>
 #include <controllers/me_ct_param_animation.h>
 
 namespace SmartBody {
@@ -61,6 +62,12 @@ SBAnimationBlend0D* SBAnimationBlendManager::createBlend0D(const std::string& na
 
 	addBlendToGraph(name);
 	_blends.push_back(blend);
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectCreate(blend);
+	}
 	return blend;
 }
 
@@ -74,6 +81,12 @@ SBAnimationBlend1D* SBAnimationBlendManager::createBlend1D(const std::string& na
 	
 	addBlendToGraph(name);
 	_blends.push_back(blend);
+	
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectCreate(blend);
+	}
 	return blend;
 }
 
@@ -87,6 +100,13 @@ SBAnimationBlend2D* SBAnimationBlendManager::createBlend2D(const std::string& na
 	
 	addBlendToGraph(name);
 	_blends.push_back(blend);
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectCreate(blend);
+	}
+
 	return blend;
 }
 
@@ -100,6 +120,12 @@ SBAnimationBlend3D* SBAnimationBlendManager::createBlend3D(const std::string& na
 	
 	addBlendToGraph(name);
 	_blends.push_back(blend);
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectCreate(blend);
+	}
 	return blend;
 }
 
@@ -109,6 +135,12 @@ SBMotionBlendBase* SBAnimationBlendManager::createMotionBlendBase( const std::st
 	
 	//	addBlendToGraph(name);
 	_blends.push_back(blend);
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectCreate(blend);
+	}
 	return blend;
 }
 
@@ -132,6 +164,12 @@ SBAnimationTransition* SBAnimationBlendManager::createTransition(const std::stri
 	transition->set(sourceBlend, destBlend);
 
 	_transitions.push_back(transition);
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectCreate(transition);
+	}
 	return transition;
 }
 

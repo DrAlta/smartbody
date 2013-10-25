@@ -298,14 +298,14 @@ bool AutoRigToSBSk( PinocchioOutput& out, Skeleton& sk, SmartBody::SBSkeleton& s
 bool PolyVoxMeshToPinoMesh( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& polyMesh, Mesh& mesh )
 {
 	mesh.vertices.resize(polyMesh.m_vecVertices.size());
-	for (int i=0;i<polyMesh.m_vecVertices.size();i++)
+	for (size_t i=0;i<polyMesh.m_vecVertices.size();i++)
 	{
 		PolyVox::PositionMaterialNormal& vtx = polyMesh.m_vecVertices[i];
 		mesh.vertices[i].pos = Vector3(vtx.position.getX(),vtx.position.getY(),vtx.position.getZ());
 	}
 
 	mesh.edges.resize(polyMesh.getIndices().size());
-	for (int i=0;i<polyMesh.getIndices().size();i++)
+	for (size_t i=0;i<polyMesh.getIndices().size();i++)
 	{
 		mesh.edges[i].vertex = polyMesh.m_vecTriangleIndices[i];		
 	}
@@ -320,6 +320,8 @@ bool PolyVoxMeshToPinoMesh( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal
 	}	
 	mesh.normalizeBoundingBox();
 	mesh.computeVertexNormals();
+
+	return true;
 }
 
 

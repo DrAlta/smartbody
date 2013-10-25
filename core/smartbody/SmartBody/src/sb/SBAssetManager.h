@@ -42,12 +42,10 @@ class SBAssetManager : public SBObject
 		SBAPI SBSkeleton* createSkeleton(const std::string&char_name);
 		SBAPI SBSkeleton* getSkeleton(const std::string& name);
 		SBAPI SBSkeleton* addSkeletonDefinition(const std::string& skelName);
+		SBAPI void removeSkeletonDefinition(const std::string& skelName);
 		SBAPI void addSkeleton(SBSkeleton* skeleton);
 		SBAPI int getNumSkeletons();
 		SBAPI std::vector<std::string> getSkeletonNames();
-
-		
-		
 	
 		SBAPI void loadMotions();
 		SBAPI void addMotion(SmartBody::SBMotion* motion);
@@ -57,6 +55,11 @@ class SBAssetManager : public SBObject
 		SBAPI SBMotion* getMotion(const std::string& name);
 		SBAPI int getNumMotions();
 		SBAPI std::vector<std::string> getMotionNames();
+
+		SBAPI void addMesh(DeformableMesh* mesh);
+		SBAPI void removeMesh(DeformableMesh* mesh);
+		SBAPI int getNumMeshes();
+		SBAPI std::vector<std::string> getMeshNames();
 
 		SBAPI int load_motion( const void* data, int sizeBytes, const char* motionName );
 		SBAPI int load_skeleton( const void* data, int sizeBytes, const char* skeletonName );

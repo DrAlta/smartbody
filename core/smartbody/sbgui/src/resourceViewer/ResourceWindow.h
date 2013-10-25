@@ -64,6 +64,8 @@ class ResourceWindow : public Fl_Group, public SmartBody::SBObserver, public SBW
 		void OnPawnCreate( const std::string & name );
 		void OnPawnDelete( const std::string & name );
 		void OnSimulationStart();
+		void OnObjectCreate( SmartBody::SBObject* object );
+		void OnObjectDelete( SmartBody::SBObject* object );
 
 	protected:		
 		Fl_Tree* resourceTree;

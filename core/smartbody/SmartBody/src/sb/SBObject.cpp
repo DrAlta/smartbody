@@ -20,6 +20,13 @@ SBObject::SBObject() : SBSubject(), SBObserver()
 
 SBObject::~SBObject()
 {
+	for (std::set<SBObject*>::iterator iter = _dependenciesReverse.begin();
+		iter != _dependenciesReverse.end(); 
+		iter++)
+	{
+		(*iter)->onDependencyRemoval(this);
+	}
+
 	for (std::map<std::string, SBAttribute*>::iterator iter = m_attributeList.begin();
 		 iter != m_attributeList.end();
 		 iter++)
@@ -581,6 +588,83 @@ void SBObject::afterUpdate(double time)
 void SBObject::stop()
 {
 }
+
+
+void SBObject::addDependency(SBObject* object)
+{
+	if (object == NULL)
+		return;
+	addDependencyOnly(object);
+	object->addDependencyReverse(this);
+}
+
+void SBObject::addDependencyOnly(SBObject* object)
+{
+	if (object == NULL)
+		return;
+	std::set<SBObject*>::iterator iter = _dependencies.find(object);
+	if (iter == _dependencies.end())
+		_dependencies.insert(object);
+}
+
+
+void SBObject::removeDependency(SBObject* object)
+{
+	if (object == NULL)
+		return;
+	removeDependencyOnly(object);
+	this->onDependencyRemoval(object);
+	object->removeDependencyReverse(this);
+}
+
+void SBObject::removeDependencyOnly(SBObject* object)
+{
+	if (object == NULL)
+		return;
+	std::set<SBObject*>::iterator iter = _dependencies.find(object);
+	if (iter != _dependencies.end())
+		_dependencies.erase(iter);
+}
+
+void SBObject::clearDependencies()
+{
+	_dependencies.clear();
+}
+
+void SBObject::clearReverseDependencies()
+{
+	_dependenciesReverse.clear();
+}
+
+std::set<SBObject*>& SBObject::getDependencies()
+{
+	return _dependencies;
+}
+
+void SBObject::addDependencyReverse(SBObject* object)
+{
+	std::set<SBObject*>::iterator iter = _dependencies.find(object);
+	if (iter == _dependencies.end())
+		_dependencies.insert(object);
+
+}
+
+void SBObject::removeDependencyReverse(SBObject* object)
+{
+	std::set<SBObject*>::iterator iter = _dependenciesReverse.find(object);
+	if (iter != _dependenciesReverse.end())
+		_dependenciesReverse.erase(iter);
+}
+
+std::set<SBObject*>& SBObject::getDependenciesReverse()
+{
+	return _dependenciesReverse;
+}
+
+void SBObject::onDependencyRemoval(SBObject* object)
+{
+}
+
 
 };
   

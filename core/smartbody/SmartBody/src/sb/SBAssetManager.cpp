@@ -2,6 +2,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
+#include <sb/SBSceneListener.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBNavigationMesh.h>
 #include <sb/SBAssetHandlerSkm.h>
@@ -512,7 +513,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 				LOG("Motion named %s already exist, changing name to %s", motion->getName().c_str(), name.c_str());
 				motion->setName(name);
 			}
-			_motions.insert(std::pair<std::string, SBMotion*>(motion->getName(), motion));
+			this->addMotion(motion);
 			addAssetHistory("MOTION " + motion->getName());
 			continue;
 		}
@@ -526,7 +527,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 				LOG("Skeleton named %s already exist, changing name to %s", skeleton->getName().c_str(), name.c_str());
 				skeleton->setName(name);
 			}
-			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skeleton->getName(), skeleton));
+			this->addSkeleton(skeleton);
 			skeleton->ref();
 			addAssetHistory("SKELETON " + skeleton->getName());
 			continue;
@@ -541,7 +542,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 				LOG("Mesh named %s already exist, changing name to %s", existingMesh->getName().c_str(), name.c_str());
 				existingMesh->setName(name);
 			}
-			_deformableMeshMap.insert(std::pair<std::string, DeformableMesh*>(mesh->getName(), mesh));
+			this->addMesh(mesh);
 			addAssetHistory("MESH " + mesh->getName());
 			continue;
 		}
@@ -772,7 +773,35 @@ SBSkeleton* SBAssetManager::addSkeletonDefinition(const std::string& skelName )
 	sbSkel->setName(skelName);
 	sbSkel->skfilename(skelName.c_str());
 	_skeletons.insert(std::pair<std::string, SBSkeleton*>(sbSkel->getName(), sbSkel));
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectCreate(sbSkel);
+	}
+
 	return sbSkel;
+}
+
+void SBAssetManager::removeSkeletonDefinition(const std::string& skelName )
+{
+	std::map<std::string, SBSkeleton*>::iterator iter = _skeletons.find(skelName);
+	if (iter == _skeletons.end())
+	{
+		LOG("Skeleton named %s does not exist.", skelName.c_str());
+		return;
+	}
+
+	SBSkeleton* existingSkeleton = (*iter).second;
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectDelete(existingSkeleton);
+	}
+
+	_skeletons.erase(iter);
+	delete existingSkeleton;
 }
 
 SBAPI void SBAssetManager::addSkeleton(SmartBody::SBSkeleton* skeleton)
@@ -793,12 +822,29 @@ SBMotion* SBAssetManager::createMotion(const std::string& motionName)
 	motion->setName(motionName);
 	_motions[motionName] = motion;
 
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectCreate(motion);
+	}
+
 	return motion;
 }
 
 SBAPI void SBAssetManager::addMotion(SmartBody::SBMotion* motion)
 {
+	std::map<std::string, SBMotion*>::iterator iter = _motions.find(motion->getName());
+	if (iter != _motions.end())
+	{
+		LOG("Motion named %s already exists, new motion will not be added.", motion->getName().c_str());
+		return;
+	}
 	_motions[motion->getName()] = motion;
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectCreate(motion);
+	}
 }
 
 SBAPI void SBAssetManager::removeMotion(SmartBody::SBMotion* motion)
@@ -808,7 +854,67 @@ SBAPI void SBAssetManager::removeMotion(SmartBody::SBMotion* motion)
 	{
 		_motions.erase(iter);
 	}
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectDelete(motion);
+	}
 	delete motion;
+}
+
+SBAPI void SBAssetManager::addMesh(DeformableMesh* mesh)
+{
+	std::map<std::string, DeformableMesh*>::iterator iter = _deformableMeshMap.find(mesh->getName());
+	if (iter != _deformableMeshMap.end())
+	{
+		LOG("Mesh named %s already exists, new mesh will not be added.", mesh->getName().c_str());
+		return;
+	}
+	_deformableMeshMap.insert(std::pair<std::string, DeformableMesh*>(mesh->getName(), mesh));
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectCreate(mesh);
+	}
+}
+
+SBAPI void SBAssetManager::removeMesh(DeformableMesh* mesh)
+{
+	std::map<std::string, DeformableMesh*>::iterator iter = _deformableMeshMap.find(mesh->getName());
+	if (iter != _deformableMeshMap.end())
+	{
+		_deformableMeshMap.erase(iter);
+	}
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectDelete(mesh);
+	}
+	delete mesh;
+}
+
+int SBAssetManager::getNumMeshes()
+{
+	return _deformableMeshMap.size();
+}
+
+
+std::vector<std::string> SBAssetManager::getMeshNames()
+{
+	std::vector<std::string> ret;
+
+	for(std::map<std::string, DeformableMesh*>::iterator iter = _deformableMeshMap.begin();
+		iter != _deformableMeshMap.end();
+		iter++)
+	{
+		DeformableMesh* mesh = (*iter).second;
+		ret.push_back(mesh->getName());
+	}
+
+	return ret;
 }
 
 

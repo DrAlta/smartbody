@@ -943,6 +943,16 @@ void ResourceWindow::OnPawnDelete( const std::string & name )
 	_dirty = true;
 }
 
+void ResourceWindow::OnObjectCreate( SmartBody::SBObject* object )
+{
+	_dirty = true;
+}
+
+void ResourceWindow::OnObjectDelete( SmartBody::SBObject* object )
+{
+	_dirty = true;
+}
+
 void ResourceWindow::OnSimulationStart()
 {
 	_dirty = true;
