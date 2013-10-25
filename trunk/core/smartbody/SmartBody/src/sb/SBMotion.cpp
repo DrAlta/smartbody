@@ -115,6 +115,7 @@ SBMotion::SBMotion(std::string file) : SkMotion()
 	transformDepth = 0;
 	_motionType = Unknown;
 	_scale = 1.f;
+	_offsetMotion = NULL;
 }
 
 SBMotion::~SBMotion()
