@@ -46,7 +46,7 @@ void AttributeEditor::OnSelect(const std::string& value)
 
 void AttributeEditor::OnDeselect(const std::string& value)
 {
-	if (_currentSelection == value)
+	if (_currentSelection == value && _currentSelection != "")
 	{
 		removeCurrentWidget();
 		_currentSelection = "";
