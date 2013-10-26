@@ -1355,7 +1355,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 	buffer << t.rdbuf();
 	std::string matFileContent = buffer.str();
 	std::vector<std::string> tokens;
-	vhcl::Tokenize(matFileContent,tokens," \t\n");
+	vhcl::Tokenize(matFileContent,tokens," \t\n\f\b\r"); // remove all spaces or special escape sequences
 	unsigned int idx = 0;
 	while (idx < tokens.size())
 	{
