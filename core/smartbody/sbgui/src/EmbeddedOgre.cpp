@@ -24,7 +24,7 @@
 #undef UINTMAX_C
 #endif
 
-#define USE_RTSHADER_SYSTEM
+//#define USE_RTSHADER_SYSTEM
 
 using namespace Ogre;
 
