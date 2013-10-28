@@ -398,7 +398,6 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 	virtual void resetViewer();
 
 	virtual void OnSelect(const std::string& value);
-	virtual void OnDeselect(const std::string& value);
 
     FltkViewerData* _data;
 	GestureData* _gestureData;

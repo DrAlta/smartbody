@@ -863,7 +863,7 @@ void ResourceWindow::treeCallBack( Fl_Widget* widget, void* data )
 		std::stringstream strstr;
 		strstr <<  window->getNameFromItem(item) << "/" << item->label();
 			
-		SBSelectionManager::getSelectionManager()->deselect(strstr.str());
+		SBSelectionManager::getSelectionManager()->select("");
 	}
 }
 
@@ -910,10 +910,6 @@ void ResourceWindow::notify( SmartBody::SBSubject* subject )
 
 
 void ResourceWindow::OnSelect(const std::string& value)
-{
-}
-
-void ResourceWindow::OnDeselect(const std::string& value)
 {
 }
 

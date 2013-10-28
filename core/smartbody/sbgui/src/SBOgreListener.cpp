@@ -99,10 +99,13 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 
 	if (ent == NULL)
 	{
-		if (isPawn)
-			LOG("Can not create pawn %s, no mesh exists with type %s",pawn->getName().c_str(), objectClass.c_str());
-		else
-			LOG("Can not create character %s, no mesh or skeleton exists with type %s",sbChar->getName().c_str(), objectClass.c_str());
+		if (objectClass != "")
+		{
+			if (isPawn)
+				LOG("Can not create pawn %s, no mesh exists with type %s",pawn->getName().c_str(), objectClass.c_str());
+			else
+				LOG("Can not create character %s, no mesh or skeleton exists with type %s",sbChar->getName().c_str(), objectClass.c_str());
+		}
 		return;
 	}		
 	// Add entity to the scene node	

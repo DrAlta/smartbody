@@ -19,7 +19,6 @@ class AttributeEditor : public Fl_Group, public SmartBody::SBObserver, public SB
 
 		// selection callbacks
 		virtual void OnSelect(const std::string& value);
-		virtual void OnDeselect(const std::string& value);
 		// object lifecycle callbacks
 		void OnCharacterCreate( const std::string & name, const std::string & objectClass );
 		void OnCharacterDelete( const std::string & name );
@@ -42,7 +41,6 @@ class AttributeEditor : public Fl_Group, public SmartBody::SBObserver, public SB
 		std::string _currentSelection;
 		TreeItemInfoWidget* _currentWidget;
 
-		void updateTreeItemInfo(  );
 		TreeItemInfoWidget* createInfoWidget( int x, int y, int w, int h, const std::string& name );
 
 };

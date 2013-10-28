@@ -179,7 +179,7 @@ void SBDiphoneManager::normalizeCurves(const std::string& name)
 
 				// normalize the values according the the scale
 				LOG("Normalize scale is %f", maxVal);
-				float scale = 1.0f / ((1.0f + maxVal) / 2.0);
+				float scale = 1.0f / ((1.0f + maxVal) / 2.0f);
 				for (std::vector<std::string>::iterator visemeIter = visemes.begin();
 					 visemeIter != visemes.end();
 					 visemeIter++)
