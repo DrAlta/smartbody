@@ -831,13 +831,13 @@ SBMotion* SBAssetManager::createMotion(const std::string& motionName)
 	return motion;
 }
 
-SBAPI void SBAssetManager::addMotion(SmartBody::SBMotion* motion)
+SBAPI bool SBAssetManager::addMotion(SmartBody::SBMotion* motion)
 {
 	std::map<std::string, SBMotion*>::iterator iter = _motions.find(motion->getName());
 	if (iter != _motions.end())
 	{
 		LOG("Motion named %s already exists, new motion will not be added.", motion->getName().c_str());
-		return;
+		return false;
 	}
 	_motions[motion->getName()] = motion;
 	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
@@ -845,6 +845,7 @@ SBAPI void SBAssetManager::addMotion(SmartBody::SBMotion* motion)
 	{
 		listeners[l]->OnObjectCreate(motion);
 	}
+	return true;
 }
 
 SBAPI void SBAssetManager::removeMotion(SmartBody::SBMotion* motion)

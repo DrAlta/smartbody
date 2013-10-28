@@ -1147,7 +1147,13 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 			motionName = name;
 		sbmotion->setName(motionName.c_str());
 
-		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
+		bool success = SmartBody::SBScene::getScene()->getAssetManager()->addMotion(sbmotion);
+		if (!success)
+		{
+			delete sbmotion;
+			sbmotion = NULL;
+			return NULL;
+		}
 	}
 
 	// create a trail indicating that this motion was mirrored
