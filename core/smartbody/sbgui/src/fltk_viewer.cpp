@@ -1751,7 +1751,6 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 	std::vector<std::string> toks;
 	vhcl::Tokenize(dndMsg,toks,":");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	char cmdStr[256];
 	SrVec p1;
 	SrVec p2;
 	scene->getActiveCamera()->get_ray(x,y, p1, p2);
@@ -1764,14 +1763,30 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		SmartBody::SBSkeleton* skel = scene->getSkeleton(skelName);
 		if (skel)
 		{
-			sprintf(cmdStr,"char defaultChar%d init %s",characterCount,toks[1].c_str());
-			SmartBody::SBScene::getScene()->command(cmdStr);
+			SmartBody::SBScene* scene = SmartBody::SBScene::getScene();		
+			SmartBody::SBCharacter* character = NULL;
+			while (!character)
+			{
+				std::stringstream strstr;
+				strstr << "char" << characterCount;
+				character = scene->createCharacter(strstr.str(), "");
+				characterCount++;
+			}
+			SmartBody::SBSkeleton* skeleton = scene->createSkeleton(toks[1]);
+			if (!skeleton)
+			{
+				LOG("Could not find skeleton named %s, character will not be created.", toks[1].c_str());
+				return;
+			}
+			character->setSkeleton(skeleton);
+			character->createStandardControllers();
+
 			float yOffset = -skel->getBoundingBox().a.y;
 			dest.y = yOffset;
-			sprintf(cmdStr,"set char defaultChar%d world_offset x %f y %f z %f",characterCount,dest.x,dest.y,dest.z);
-			//LOG("setCmd = %s",cmdStr);
-			SmartBody::SBScene::getScene()->command(cmdStr);
-			characterCount++;
+
+			SrVec worldOffset(dest.x, dest.y, dest.z);
+			character->setPosition(worldOffset);
+			character->setStringAttribute("displayType", "bones");
 		}
 		else
 		{
@@ -1982,8 +1997,11 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 
  		float yOffset = -skel->getBoundingBox().a.y;
  		dest.y = yOffset;		
-		character->setPosition(SrVec(dest.x,dest.y,dest.z));	
-		character->setStringAttribute("displayType","GPUmesh");
+		character->setPosition(SrVec(dest.x,dest.y,dest.z));
+		if (dndMesh)
+			character->setStringAttribute("displayType","GPUmesh");
+		else
+			character->setStringAttribute("displayType","bones");
 		
 
 		// load the behavior sets if they have not yet been loaded
