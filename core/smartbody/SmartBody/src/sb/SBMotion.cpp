@@ -239,7 +239,7 @@ void SBMotion::addChannel(const std::string& channelName, const std::string& typ
 void SBMotion::addFrame(float frameTime, const std::vector<float>& frameData)
 {
 	// make sure that the frame data corresponds to the channel data
-	int channelSize = _channels.size();
+	int channelSize = _channels.floats();
 	if (channelSize != frameData.size())
 	{
 		LOG("Motion %s needs %d values, only have %d values, data not added.", this->getName().c_str(), channelSize, frameData.size());
