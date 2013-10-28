@@ -12,7 +12,6 @@ class SelectionListener
 		~SelectionListener();
 
 		virtual void OnSelect(const std::string& value);
-		virtual void OnDeselect(const std::string& value);
 };
 
 
@@ -23,7 +22,6 @@ class SBSelectionManager
 		~SBSelectionManager();
 
 		void select(const std::string& value);
-		void deselect(const std::string& value);
 
 		const std::string& getCurrentSelection();
 

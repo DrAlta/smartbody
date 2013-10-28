@@ -29,30 +29,15 @@ void AttributeEditor::OnSelect(const std::string& value)
 {
 	if (_currentSelection != value)
 	{
-		OnDeselect(_currentSelection);
+		removeCurrentWidget();
+		_dirty = true;
+		_currentSelection = "";
+		this->redraw();
 	}
 	_currentSelection = value;
-	_currentWidget = createInfoWidget(x(), y(), w() - 20, h() - 20, value);
-	if (!_currentWidget)
-	{
-		_currentSelection = "";
-		return;
-	}
-	this->add(_currentWidget);
 	_dirty = true;
 	this->redraw();
 
-}
-
-void AttributeEditor::OnDeselect(const std::string& value)
-{
-	if (_currentSelection == value && _currentSelection != "")
-	{
-		removeCurrentWidget();
-		_currentSelection = "";
-		_dirty = true;
-		this->redraw();
-	}
 }
 
 void AttributeEditor::OnCharacterCreate( const std::string & name, const std::string & objectClass )
@@ -67,7 +52,7 @@ void AttributeEditor::OnCharacterDelete( const std::string & name )
 	std::string id = scene->getStringFromObject(character);
 	if (id == _currentSelection)
 	{
-		OnDeselect(_currentSelection);
+		OnSelect("");
 	}
 }
 
@@ -87,7 +72,7 @@ void AttributeEditor::OnPawnDelete( const std::string & name )
 	std::string id = scene->getStringFromObject(pawn);
 	if (id == _currentSelection)
 	{
-		OnDeselect(_currentSelection);
+		OnSelect("");
 	}
 }
 
@@ -101,13 +86,13 @@ void AttributeEditor::OnObjectDelete( SmartBody::SBObject* object )
 	std::string id = scene->getStringFromObject(object);
 	if (id == _currentSelection)
 	{
-		OnDeselect(_currentSelection);
+		OnSelect("");
 	}
 }
 
 void AttributeEditor::OnSimulationStart()
 {
-	OnDeselect(_currentSelection);
+	OnSelect("");
 	_dirty = true;
 }
 
@@ -123,7 +108,7 @@ void AttributeEditor::draw()
 		SmartBody::SBObject* object = SmartBody::SBScene::getScene()->getObjectFromString(_currentSelection);
 		if (!object)
 		{
-			OnDeselect(_currentSelection);
+			OnSelect("");
 		}
 	}
 	Fl_Group::draw();
@@ -134,7 +119,14 @@ void AttributeEditor::updateGUI()
 {
 	if (_currentSelection != "")
 	{
-		updateTreeItemInfo();
+		removeCurrentWidget();
+		_currentWidget = createInfoWidget(this->x(),this->y(),this->w(),this->h(), _currentSelection);
+		if (_currentWidget)
+		{
+			this->add(_currentWidget);
+			this->show();
+			_currentWidget->show();
+		}
 	}
 	else
 	{
@@ -313,24 +305,23 @@ return NULL;
 }
 
 
-void AttributeEditor::updateTreeItemInfo()
-{
-	if (_currentSelection == "")
-		return;
-	removeCurrentWidget();
-	_currentWidget = createInfoWidget(this->x(),this->y(),this->w(),this->h(), _currentSelection);
-	this->add(_currentWidget);
-	this->show();
-	_currentWidget->show();
-	this->redraw();
-}
-
 void AttributeEditor::removeCurrentWidget()
 {
 	if (_currentWidget)
 	{
-		this->remove(_currentWidget);
-		delete _currentWidget;
+		int numChildren = this->children();
+		std::vector<Fl_Widget*> widgets;
+		for (int c = 0; c < numChildren; c++)
+		{
+			widgets.push_back(this->child(c));
+		}
+		for (size_t w = 0; w < widgets.size(); w++)
+		{
+			this->remove(widgets[w]);
+			// need to delete this widget, but doing so causes 
+			// crashes in FLTK
+		}
+
 		_currentWidget = NULL;
 	}
 }

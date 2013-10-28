@@ -486,10 +486,6 @@ void FltkViewer::OnSelect(const std::string& value)
 
 }
 
-void FltkViewer::OnDeselect(const std::string& value)
-{
-}
-
 void FltkViewer::applyToCharacters()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();

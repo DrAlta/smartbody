@@ -56,7 +56,6 @@ class ResourceWindow : public Fl_Group, public SmartBody::SBObserver, public SBW
 
 		// selection callbacks
 		virtual void OnSelect(const std::string& value);
-		virtual void OnDeselect(const std::string& value);
 		// object lifecycle callbacks
 		void OnCharacterCreate( const std::string & name, const std::string & objectClass );
 		void OnCharacterDelete( const std::string & name );

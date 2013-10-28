@@ -26,10 +26,6 @@ void SelectionListener::OnSelect(const std::string& value)
 {
 }
 
-void SelectionListener::OnDeselect(const std::string& value)
-{
-}
-
 SBSelectionManager* SBSelectionManager::getSelectionManager()
 {
 	if (!_selectionManager)
@@ -55,16 +51,6 @@ void SBSelectionManager::select(const std::string& value)
 		iter++)
 	{
 		(*iter)->OnSelect(value);
-	}
-}
-
-void SBSelectionManager::deselect(const std::string& value)
-{
-	for (std::vector<SelectionListener*>::iterator iter = _selectionListeners.begin();
-		iter != _selectionListeners.end(); 
-		iter++)
-	{
-		(*iter)->OnDeselect(value);
 	}
 }
 

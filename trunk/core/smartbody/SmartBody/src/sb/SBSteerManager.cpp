@@ -270,7 +270,7 @@ void SBSteerManager::start()
 			if (character) continue; // do not set obstacle for the character, it will mess up the steering
 // 			if ((*iter).second->getGeomObject())
 // 				(*iter).second->initSteeringSpaceObject();
-			if (pawn && pawn->getGeomObject()->geomType() != "null")
+			if (pawn && pawn->getGeomObject() && pawn->getGeomObject()->geomType() != "null")
 				pawn->initSteeringSpaceObject();
 		}
 
