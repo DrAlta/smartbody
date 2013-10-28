@@ -1035,7 +1035,7 @@ void FltkViewer::init_opengl ( int w, int h )
    glDepthFunc ( GL_LEQUAL );
    glFrontFace ( GL_CCW );
 
-   glEnable ( GL_POLYGON_SMOOTH );
+   //glEnable ( GL_POLYGON_SMOOTH );
 
    //glEnable ( GL_LINE_SMOOTH );
    //glHint ( GL_LINE_SMOOTH_HINT, GL_NICEST );

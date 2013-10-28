@@ -79,6 +79,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	glEnable(GL_TEXTURE_2D);	
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
+	glDisable ( GL_POLYGON_SMOOTH );
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glAlphaFunc ( GL_GREATER, 0.0f ) ;
 	glEnable(GL_CULL_FACE);

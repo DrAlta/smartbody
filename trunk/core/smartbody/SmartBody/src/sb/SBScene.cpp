@@ -203,7 +203,7 @@ void SBScene::initialize()
 	createStringAttribute("processedBMLPath","./processedXML.xml",true,"",90,false,false,false,"path of exported bml file after realization.");
 
 	createIntAttribute("shadowMapSize", 1024, true, "RenderingParameters", 100, false, false, false, "Size of the shadow map");
-	createIntAttribute("shadowMapCount", 2, true, "RenderingParameters", 110, false, false, false, "Num of the shadow maps");
+	createIntAttribute("shadowMapCount", 1, true, "RenderingParameters", 110, false, false, false, "Num of the shadow maps");
 
 	vhcl::Log::g_log.RemoveAllListeners();
 	ForwardLogListener* forwardListener = new ForwardLogListener();
