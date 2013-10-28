@@ -863,7 +863,7 @@ void ResourceWindow::treeCallBack( Fl_Widget* widget, void* data )
 		std::stringstream strstr;
 		strstr <<  window->getNameFromItem(item) << "/" << item->label();
 			
-		SBSelectionManager::getSelectionManager()->select("");
+		//SBSelectionManager::getSelectionManager()->select("");
 	}
 }
 

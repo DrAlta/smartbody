@@ -478,7 +478,14 @@ void FltkViewer::OnSelect(const std::string& value)
 {
 	SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(SmartBody::SBScene::getScene()->getObjectFromString(value));
 	if (!pawn)
-		return;
+	{
+		// deselect a pawn if it is already selected.
+		SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
+		if (selectedPawn)
+		{
+			_objManipulator.set_selected_pawn(NULL);
+		}
+	}
 
 	PawnControl* tempControl = this->_objManipulator.getPawnControl(this->_transformMode);
 	this->_objManipulator.active_control = tempControl;
@@ -2081,7 +2088,7 @@ int FltkViewer::handle ( int event )
 		 //printf("Mouse Push\n");
 
 		 //char exe_cmd[256];
-		 if (e.button1)
+		 if (e.button1 && (!e.alt) && (!e.ctrl) && !(e.shift))
 		 {
 			 {				 			 
 				 SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -2098,6 +2105,10 @@ int FltkViewer::handle ( int event )
 					 {
 						 _lastSelectedCharacter = character->getName();
 					 }
+				 }
+				 else
+				 {
+					 SBSelectionManager::getSelectionManager()->select("");
 				 }
 			 }			 
 		 }

@@ -30,14 +30,10 @@ void AttributeEditor::OnSelect(const std::string& value)
 	if (_currentSelection != value)
 	{
 		removeCurrentWidget();
-		_dirty = true;
-		_currentSelection = "";
-		this->redraw();
 	}
 	_currentSelection = value;
 	_dirty = true;
 	this->redraw();
-
 }
 
 void AttributeEditor::OnCharacterCreate( const std::string & name, const std::string & objectClass )
