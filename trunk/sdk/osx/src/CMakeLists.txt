@@ -341,9 +341,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ./SmartBody/sbm/ParserASFAMC.cxx
         ./SmartBody/sbm/ParserFBX.cpp
         ./SmartBody/sbm/ParserOgre.cpp
-        ./SmartBody/sbm/ParserOpenCOLLADA.cpp
         ./SmartBody/sbm/ParserCOLLADAFast.cpp
-        ./SmartBody/sbm/remote_speech.cpp
+        ./SmartBody/sbm/ParserOpenCOLLADA.cpp
         ./SmartBody/sbm/remote_speech.cpp
         ./SmartBody/sbm/sbm_audio.cpp
         ./SmartBody/controllers/MeCtBodyReachState.cpp
@@ -445,6 +444,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./SmartBody/sb/SBVHMsgManager.cpp
         ./SmartBody/sb/SBCommandManager.cpp
         ./SmartBody/sb/SBWSPManager.cpp
+        ./SmartBody/sb/SBNavigationMeshManager.cpp
 
         ./SmartBody/sb/SBPython.cpp
         ./SmartBody/sb/SBPythonAnimation.cpp
@@ -457,7 +457,17 @@ set( SMARTBODY_LIB_SBM_SRC
         ./SmartBody/sb/SBPythonSkeleton.cpp
         ./SmartBody/sb/SBPythonSystem.cpp
         ./SmartBody/sb/SBPythonClass.cpp
-
+		
+        ./SmartBody/sb/SBAssetHandler.cpp
+        ./SmartBody/sb/SBAssetHandlerCOLLADA.cpp
+        ./SmartBody/sb/SBAssetHandlerSk.cpp
+        ./SmartBody/sb/SBAssetHandlerSkm.cpp
+	./SmartBody/sb/SBAssetHandlerAsf.cpp
+	./SmartBody/sb/SBAssetHandlerAmc.cpp
+	./SmartBody/sb/SBAssetHandlerOgre.cpp
+	./SmartBody/sb/SBAssetHandlerObj.cpp
+	./SmartBody/sb/SBAssetHandlerBvh.cpp
+	./SmartBody/sb/SBAssetHandlerSkb.cpp
         ./SmartBody/sb/SBBehavior.cpp
         ./SmartBody/sb/SBDebuggerServer.cpp
         ./SmartBody/sb/SBDebuggerClient.cpp
@@ -510,6 +520,7 @@ target_link_libraries( SmartBody
 	boost_system
 	boost_regex
 	boost_python
+	boost_serialization
 	blas
 	lapack
 	${OPENGL_LIBRARIES}
@@ -605,7 +616,9 @@ install(
 
 ######### sbgui
 include_directories( ./sbgui)
+
 set( SBM_FLTK_SRC
+
 	./sbgui/sbm_main.cpp
 	./sbgui/ppm.cpp
 	./sbgui/pic.cpp
@@ -618,6 +631,9 @@ set( SBM_FLTK_SRC
 	./sbgui/RootWindow.cxx
 	./sbgui/ExportWindow.cpp
 	./sbgui/fltk_viewer.cpp
+	./sbgui/SBWindowListener.cpp
+	./sbgui/SBSelectionManager.cpp
+	${OGRE_SRCS}
 	./sbgui/pic.cpp
 	./sbgui/ppm.cpp
 	./sbgui/bmlviewer/BehaviorBlock.cpp
@@ -669,6 +685,7 @@ set( SBM_FLTK_SRC
 	./sbgui/resourceViewer/TreeItemInfoWidget.cpp
 	./sbgui/resourceViewer/ResourceWindow.cpp
 	./sbgui/resourceViewer/TreeInfoObject.cpp
+	./sbgui/resourceViewer/AttributeEditor.cpp
 
 	./sbgui/visemeviewer/VisemeCurve.cpp
 	./sbgui/visemeviewer/VisemeCurveEditor.cpp
@@ -678,6 +695,7 @@ set( SBM_FLTK_SRC
 
 	./sbgui/retargetviewer/RetargetViewer.cpp
 	./sbgui/retargetcreator/RetargetCreatorWindow.cpp
+	./sbgui/autorig/SBAutoRigManager.cpp
 
 	./sbgui/monitorviewer/MonitorConnectWindow.cpp 
 	./sbgui/motioneditor/MotionEditorWindow.cpp
@@ -714,6 +732,7 @@ target_link_libraries( sbgui
 	boost_system
 	boost_regex
 	boost_python
+	boost_serialization
 	fltk_images 
 	fltk 
 	fltk_gl 
