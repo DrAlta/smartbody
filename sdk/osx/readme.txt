@@ -4,7 +4,7 @@ Open terminal and direct to current folder, run the following command
 This will generate a sdk folder.
 
 - What's inside sdk folder that's interesting to end user
-"bin" folder contains ready-to-use execuables.
+"bin" folder contains ready-to-use execuables. Note that bin folder assumes that SmartBody is already built on macosx
 startSimpleSmartBody.command will launch a simple SmartBody test program.
 startSBGUI.command will launch standard SmartBody program.
 

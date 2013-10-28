@@ -23,6 +23,15 @@ rsync -ap --exclude=".svn" ./lib ./sdk
 # copy bin
 rsync -ap --exclude=".svn" ./bin ./sdk
 
+# copy dylib for SmartBody (assuming it's prebuilt)
+cp ../../core/smartbody/sbgui/bin/sbgui ./sdk/bin
+cp ../../core/smartbody/sbgui/bin/simplesmartbody ./sdk/bin
+cp ../../core/smartbody/sbgui/bin/libSmartBody.dylib ./sdk/bin
+
+# copy dylib for pprAI and steerlib
+cp ../../core/smartbody/sbgui/bin/libpprAI.dylib ./sdk/bin
+cp ../../core/smartbody/sbgui/bin/libsteerlib.dylib ./sdk/bin
+
 # copy readme.txt
 rsync -ap --exclude=".svn" ./readme.txt ./sdk/readme.txt
 
@@ -38,9 +47,6 @@ rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/src/* ./sdk/src/sbgui/
 rsync -ap --exclude=".svn" ../../core/smartbody/simplesmartbody/simplesmartbody.cpp ./sdk/src/simplesmartbody/
 rsync -ap --exclude=".svn" ../../core/smartbody/Smartbody/src/* ./sdk/src/Smartbody/
 
-# copy dylib for pprAI and steerlib
-cp ../../core/smartbody/sbgui/bin/libpprAI.dylib ./sdk/bin
-cp ../../core/smartbody/sbgui/bin/libsteerlib.dylib ./sdk/bin
 
 # first need to create data & data/mesh folder
 # copy data folder
