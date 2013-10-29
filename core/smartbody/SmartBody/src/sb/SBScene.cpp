@@ -547,6 +547,7 @@ void SBScene::destroyScene()
 {
 	if (_scene)
 	{
+		XMLPlatformUtils::Terminate(); 
 		delete _scene;
 		_scene = NULL;
 		_firstTime = true;

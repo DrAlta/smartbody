@@ -263,13 +263,20 @@ MotionAnalysis::~MotionAnalysis(void)
 		}
 	}
 	locoAnalyzers.clear();
+
+	if (skelCopy)
+	{
+		delete skelCopy;
+		skelCopy = NULL;
+	}
 }
 
 void MotionAnalysis::init(std::string skeletonName, std::string baseJoint, SmartBody::SBAnimationBlend* locomotionBlend, const std::vector<std::string>& motions, std::string motionPrefix )
 {		
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSkeleton* sbSkel = scene->getSkeleton(skeletonName);
-	skelCopy = new SmartBody::SBSkeleton(sbSkel);	
+	skelCopy = new SmartBody::SBSkeleton(sbSkel);
+	skelCopy->ref();
 	initLegInfos();
 	int numMotions = motions.size();	
 	for (int i=0;i<numMotions;i++)
