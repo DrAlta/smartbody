@@ -558,7 +558,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		ogreWnd = ogreRoot->initialise( false );
 		Ogre::NameValuePairList params;
 	
-		/*
+#ifndef WIN32
 		// determine system capabilities
 		Ogre::ConfigOptionMap& configMap = lRenderSystem->getConfigOptions();
 		for (Ogre::ConfigOptionMap::iterator optionIter = configMap.begin();
@@ -588,8 +588,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		}
 		params["FSAA"] = lastFSAAVal;
 		LOG("Using FSAA level %s", lastFSAAVal.c_str());
-		*/
-		
+#endif				
 		//if (parentHandle)
 		//	params["parentWindowHandle"] = Ogre::StringConverter::toString((size_t)parentHandle);	
         
