@@ -911,6 +911,8 @@ void MeCtParamAnimation::reset()
 	if (nextStateData)
 		delete nextStateData;
 	nextStateData = NULL;
+	if (transitionManager)
+		delete transitionManager;
 	transitionManager = NULL;
 	waitingList.clear();
 }
