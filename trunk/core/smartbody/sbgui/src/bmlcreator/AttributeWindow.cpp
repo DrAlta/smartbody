@@ -81,9 +81,9 @@ AttributeWindow::AttributeWindow(SmartBody::SBObject* obj, int x, int y, int w, 
 		if (upDownBox)
 			mainGroup->box(FL_UP_BOX);
 		mainGroup->begin();
-		mainPack = new Fl_Pack(x, y, w, h, "");
+		mainPack = new Fl_Pack(x+5, y+5, w, h, "");
 		
-		Fl_Group* buttonGroup = new Fl_Group(x + 10, y + 10, w - 20, 15);
+		Fl_Group* buttonGroup = new Fl_Group(x + 10, y + 10, w - 20, 20);
 		Fl_Button* buttonExpandAll = new Fl_Button(x + 20, y + 10, 20, 15, "+");
 		buttonExpandAll->callback(ExpandAllCB, mainPack);
 		buttonExpandAll->tooltip("Expand all attribute groups");
@@ -366,7 +366,7 @@ void AttributeWindow::draw()
 			if (mapGroupIter == widgetGroupMap.end()) // widget not found, create it
 			{
 				attributeGroupStatus[groupName] = 2; // attribute group widget created
-				attGroupWidget = new Flu_Collapsable_Group(mainPack->x() + 10, mainPack->y() + startY, mainPack->w() - 50, widgetHeight * sortedAttributes.size() + 20, attributeGroup->getName().c_str());
+				attGroupWidget = new Flu_Collapsable_Group(mainPack->x() + 10, mainPack->y() + startY, mainPack->w() - 50, widgetHeight * sortedAttributes.size() + 30, attributeGroup->getName().c_str());
 				attGroupWidget->collapse_time(.05f);
 				mainPack->add(attGroupWidget);
 				widgetGroupMap[groupName] = attGroupWidget;
@@ -378,7 +378,7 @@ void AttributeWindow::draw()
 				attGroupWidget = (*mapGroupIter).second;
 			}
 			
-			startY += widgetHeight * sortedAttributes.size() + 20;
+			startY += widgetHeight * sortedAttributes.size() + 30;
 	
 			int localY = 20;
 			std::sort(sortedAttributes.begin(), sortedAttributes.end(), AttributePriorityPredicate);
@@ -797,8 +797,8 @@ void AttributeWindow::CollapseAllCB(Fl_Widget* w, void *data)
 	for (int c = 0; c < numChildren; c++)
 	{
 		Fl_Widget* widget = pack->child(c);
-		Flu_Collapsable_Group* cGroup = dynamic_cast<Flu_Collapsable_Group*>(widget);
-		if (cGroup)
+		Flu_Collapsable_Group* cGroup = dynamic_cast<Flu_Collapsable_Group*>(widget);		
+		if (cGroup && cGroup->open())
 		{
 			cGroup->open(false);
 		}
