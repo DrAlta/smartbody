@@ -485,6 +485,8 @@ void FltkViewer::OnSelect(const std::string& value)
 		{
 			_objManipulator.set_selected_pawn(NULL);
 		}
+		_objManipulator.removeActiveControl();
+		return;
 	}
 
 	PawnControl* tempControl = this->_objManipulator.getPawnControl(this->_transformMode);
