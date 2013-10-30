@@ -29,21 +29,20 @@ public:
 	
 	virtual void show();
 	virtual void hide();
+	virtual void draw();
 
 	virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
 	virtual void OnCharacterDelete( const std::string & name );
 	virtual void OnCharacterUpdate( const std::string & name );
 	virtual void OnPawnCreate( const std::string & name );
 	virtual void OnPawnDelete( const std::string & name );
+	virtual void OnObjectCreate( SmartBody::SBObject* object );
+	virtual void OnObjectDelete( SmartBody::SBObject* object );
 
 	void reloadCharactersAndPawns();
 	void loadCharacters();
-	SmartBody::SBCharacter* getCurrentCharacter();
 	void loadMotions();
 	void loadMotions(const std::string& filterString);
-	SmartBody::SBMotion* getCurrentMotion();
-	std::string getCurrentCharacterName();
-	std::string getCurrentMotionName();
 
 	static void OnChoiceCharacterList(Fl_Widget* widget, void* data);
 	static void OnButtonRefresh(Fl_Widget* widget, void* data);
@@ -77,7 +76,7 @@ public:
 
 public:
 	// common
-	Fl_Choice*			_choiceCharacaterList;
+	Fl_Choice*			_choiceCharacterList;
 	Fl_Button*			_buttonRefresh;
 	Fl_Button*			_buttonSaveMotion;
 	Fl_Hold_Browser*	_browserMotionList;
@@ -119,6 +118,12 @@ public:
 	Fl_Choice*			_choiceGazeTargetList;
 	Fl_Button*        _buttonGazeAt;
 	Fl_Button*        _buttonStopGaze;
+	bool _dirty;
+	std::string _selectedCharacter;
+	std::string _selectedGazeTarget;
+	std::string _selectedMotion;
+	bool _isScrubbing;
+	double _scrubTime;
 
 };
 #endif
