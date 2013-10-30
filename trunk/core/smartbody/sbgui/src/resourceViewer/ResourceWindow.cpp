@@ -150,6 +150,12 @@ std::string ResourceWindow::getNameFromItem(Fl_Tree_Item* item)
 	std::string subname = "";
 	Fl_Tree_Item* curItem = item;
 	int numSubnames = 0;
+	if (!curItem)
+		return "";
+
+	if (item == resourceTree->root())
+		return "ROOT";
+
 	while (curItem->parent() != resourceTree->root())
 	{
 		long specialNameIndex = (long) curItem->user_data();
