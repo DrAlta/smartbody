@@ -18,7 +18,8 @@
 #include <FL/Fl_Input.H>
 
 
-class RetargetCreatorWindow : public Fl_Double_Window{
+class RetargetCreatorWindow : public Fl_Double_Window
+{
 public:
 	RetargetCreatorWindow(int x, int y, int w, int h, char* name);
 	~RetargetCreatorWindow();	
@@ -41,6 +42,10 @@ public:
 	Fl_Input  *_curAssetDir;
 	Fl_Button* _buttonReloadAsset;
 	std::vector<std::string> inputMotionList;
+public:
+
+	
+
 	void draw();
 	void loadSkeletons();
 	void loadMotions();

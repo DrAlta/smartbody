@@ -1099,13 +1099,15 @@ void SkeletonViewer::setSkeleton( std::string skelName )
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSkeleton* sk = scene->getSkeleton(skelName);
-	if (!sk) return;
 
 	if (skeletonScene)
 	{
 		delete skeletonScene;
 		skeletonScene = NULL;
 	}
+
+	if (!sk) return;
+	
 	skeleton = sk;
 	skeletonScene = new SkScene();
 	skeletonScene->ref();
@@ -1569,6 +1571,11 @@ void JointMapViewer::setCharacterName( std::string charName )
 		targetSkeletonViewer->setSkeleton(sbChar->getSkeleton()->getName());
 		_skelName = sbChar->getSkeleton()->getName();
 	}
+	else // if there is no character or skeleton
+	{
+		targetSkeletonViewer->setSkeleton("");
+	}
+
 	updateJointLists();
 	updateCharacter();	
 	updateSelectMap();

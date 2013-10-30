@@ -41,6 +41,11 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	int windowGroupW = tabGroupW- 30;
 	int windowGroupH = tabGroupH - 5 * yDis;
 
+	jointMapViewer = NULL;
+	retargetViewer = NULL;
+	_removeCharacterName = "";
+	_removePawnName = "";
+
 	_choiceCharacters = new Fl_Choice(110, yDis, 150, 20, "Character");
 	_choiceCharacters->callback(CharacterCB, this);
 	updateCharacterList();
@@ -138,6 +143,7 @@ void RetargetStepWindow::refreshAll()
 	updateCharacterList();
 	jointMapViewer->updateUI();
 	retargetViewer->updateBehaviorSet();
+	redraw();
 }
 
 void RetargetStepWindow::setApplyType( bool applyAll )
@@ -172,37 +178,98 @@ void RetargetStepWindow::updateCharacterList()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	int oldValue = _choiceCharacters->value();
+	std::string oldCharacterName = "";
+	if (oldValue >= 0 && oldValue < _choiceCharacters->size())
+	{
+		if (_choiceCharacters->text(oldValue))
+			oldCharacterName = _choiceCharacters->text(oldValue);
+	}
 	const std::vector<std::string>& characters = scene->getCharacterNames();
-	_choiceCharacters->clear();
+	_choiceCharacters->clear();		
+	bool hasOldCharacter = false;
+	int charCount = 0;
 	for (size_t c = 0; c < characters.size(); c++)
 	{
-		_choiceCharacters->add(characters[c].c_str());
+		if (characters[c] == _removeCharacterName) // don't add remove character name
+			continue;
+
+		_choiceCharacters->add(characters[c].c_str());		
+		if (characters[c] == oldCharacterName)
+		{
+			_choiceCharacters->value(charCount);
+			hasOldCharacter = true;
+		}	
+		charCount++;
 	}
-	if (oldValue < _choiceCharacters->size() && oldValue >= 0)
+	if (!hasOldCharacter) // no character, set to default character
 	{
-		_choiceCharacters->value(oldValue);
-	}
+		std::string newCharName = "";
+		for (int c = 0; c < _choiceCharacters->size(); c++)
+		{
+			if (_choiceCharacters->text(c))
+			{
+				_choiceCharacters->value(c);
+				newCharName = _choiceCharacters->text(c);
+			}
+		}
+		setCharacterName(newCharName);
+	}	
+// 	if (oldValue < _choiceCharacters->size() && oldValue >= 0)
+// 	{
+// 		_choiceCharacters->value(oldValue);
+// 	}
+	
 }
 
 void RetargetStepWindow::updatePawnList()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	int oldValue = _choicePawns->value();
+	std::string oldPawnName = "";
+	if (oldValue >= 0 && oldValue < _choicePawns->size())
+	{
+		if (_choicePawns->text(oldValue))
+			oldPawnName = _choicePawns->text(oldValue);
+	}
+
 	const std::vector<std::string>& pawns = scene->getPawnNames();
 	_choicePawns->clear();
+	int pawnCount = 0;
+	bool hasPawn = false;
 	for (size_t c = 0; c < pawns.size(); c++)
 	{
+		if (pawns[c] == _removePawnName) // don't add remove character name
+			continue;
+
 		SmartBody::SBPawn* pawn = scene->getPawn(pawns[c]);
 		SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(pawn);
 		if (!sbChar && pawn->dStaticMeshInstance_p && pawn->dStaticMeshInstance_p->getDeformableMesh()) // only add pawns that has attached mesh
 		{
 			_choicePawns->add(pawns[c].c_str());
+			if (pawns[c] == oldPawnName)
+			{
+				_choicePawns->value(pawnCount);
+				hasPawn = true;
+			}
+			pawnCount++;
 		}		
 	}
-	if (oldValue < _choicePawns->size() && oldValue >= 0)
-	{
-		_choicePawns->value(oldValue);
+
+	if (!hasPawn) // no character, set to default character
+	{		
+		for (int c = 0; c < _choicePawns->size(); c++)
+		{
+			if (_choicePawns->text(c))
+			{
+				_choicePawns->value(c);
+				//setCharacterName(_choiceCharacters->text());
+			}
+		}
 	}
+// 	if (oldValue < _choicePawns->size() && oldValue >= 0)
+// 	{
+// 		_choicePawns->value(oldValue);
+// 	}
 }
 
 void RetargetStepWindow::setCharacterName( std::string charName )
@@ -217,8 +284,10 @@ void RetargetStepWindow::setCharacterName( std::string charName )
 		}
 	}
 
-	jointMapViewer->setCharacterName(_charName);
-	retargetViewer->setCharacterName(_charName);
+	if (jointMapViewer)
+		jointMapViewer->setCharacterName(_charName);
+	if (retargetViewer)
+		retargetViewer->setCharacterName(_charName);
 }
 
 
@@ -366,6 +435,7 @@ void RetargetStepWindow::CharacterCB( Fl_Widget* widget, void* data )
 	RetargetStepWindow* viewer = (RetargetStepWindow*) data;	
 	Fl_Choice* charChoice = dynamic_cast<Fl_Choice*>(widget);	
 	viewer->setCharacterName(charChoice->text());
+	viewer->redraw();
 }
 
 
@@ -408,4 +478,46 @@ void RetargetStepWindow::ApplyAutoRigCB( Fl_Widget* widget, void* data )
 	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
 	bool useVoxelRigging = viewer->_buttonVoxelRigging->value();
 	viewer->applyAutoRig(useVoxelRigging);
+}
+
+void RetargetStepWindow::OnCharacterCreate( const std::string & name, const std::string & objectClass )
+{
+	refreshAll();
+}
+
+void RetargetStepWindow::OnCharacterDelete( const std::string & name )
+{
+	_removeCharacterName = name;
+	refreshAll();
+	_removeCharacterName = "";
+}
+
+void RetargetStepWindow::OnCharacterUpdate( const std::string & name )
+{
+
+}
+
+void RetargetStepWindow::OnPawnCreate( const std::string & name )
+{
+	refreshAll();
+}
+
+void RetargetStepWindow::OnPawnDelete( const std::string & name )
+{
+	_removePawnName = name;
+	refreshAll();
+	_removePawnName = "";
+}
+
+void RetargetStepWindow::hide()
+{
+	SBWindowListener::windowHide();
+	Fl_Double_Window::hide();	
+}
+
+void RetargetStepWindow::show()
+{
+	SBWindowListener::windowShow();
+	Fl_Double_Window::show();
+	refreshAll();
 }

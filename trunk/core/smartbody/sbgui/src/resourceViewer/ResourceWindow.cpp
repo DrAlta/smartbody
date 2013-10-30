@@ -54,7 +54,7 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Grou
 	// create Tree Info Object
 	int index = 0;
 	this->begin();
-	resourceTree = new Fl_TreeHorizontal(x, y, w - 10, h - 10);
+	resourceTree = new Fl_TreeHorizontal(x, y, w , h );
 	resourceTree->showroot(0);
 
 	Fl_Tree_Item* pathTree = resourceTree->add("Paths");

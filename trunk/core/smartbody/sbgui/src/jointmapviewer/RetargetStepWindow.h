@@ -12,15 +12,24 @@
 #include <FL/Fl_Tabs.H>
 #include "jointmapviewer/JointMapViewer.h"
 #include "retargetviewer/RetargetViewer.h"
+#include <SBWindowListener.h>
 
 
-class RetargetStepWindow : public Fl_Double_Window 
+class RetargetStepWindow : public Fl_Double_Window , public SBWindowListener  
 {
 public:
 	RetargetStepWindow(int x, int y, int w, int h, char* name);
 	~RetargetStepWindow();
 	
+	virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
+	virtual void OnCharacterDelete( const std::string & name );
+	virtual void OnCharacterUpdate( const std::string & name );
+	virtual void OnPawnCreate( const std::string & name );
+	virtual void OnPawnDelete( const std::string & name );
+
 public:	
+	virtual void hide();
+	virtual void show();
 	virtual void draw();
 	void setApplyType(bool applyAll);
 	void setCharacterName(std::string charName);	
@@ -57,6 +66,8 @@ protected:
 	Fl_Button* _buttonRefresh;
 	Fl_Check_Button* _buttonVoxelRigging;
 	std::string _charName;
+	std::string _removeCharacterName;
+	std::string _removePawnName;
 };
 
 
