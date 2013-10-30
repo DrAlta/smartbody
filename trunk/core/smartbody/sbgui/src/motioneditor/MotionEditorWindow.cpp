@@ -10,8 +10,8 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
 {
 	this->label("Motion Editor");
 	this->begin();
-		_choiceCharacaterList = new Fl_Choice(80, 10, 100, 20, "Characters");
-		_choiceCharacaterList->callback(OnChoiceCharacterList, this);
+		_choiceCharacterList = new Fl_Choice(80, 10, 100, 20, "Characters");
+		_choiceCharacterList->callback(OnChoiceCharacterList, this);
 		_buttonRefresh = new Fl_Button(200, 10, 100, 20, "Refresh");
 		_buttonRefresh->callback(OnButtonRefresh, this);
 		_buttonSaveMotion = new Fl_Button(300, 10, 100, 20, "Save");
@@ -32,7 +32,7 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
       }
 		_buttonPlayMotion = new Fl_Button(320, 165, 80, 20, "Play");
 		_buttonPlayMotion->callback(OnButtonPlayMotion, this);
-      _buttonPlayMotion = new Fl_Button(320, 190, 80, 20, "Set Posture");
+		 _buttonPlayMotion = new Fl_Button(320, 190, 80, 20, "Set Posture");
 		_buttonPlayMotion->callback(OnButtonSetPosture, this);
 		_checkButtonPlayMotion = new Fl_Check_Button(10, 240, 50, 20, "Scrub");
 		_checkButtonPlayMotion->callback(OnCheckButtonPlayMotion, this);
@@ -138,6 +138,13 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
 		_groupGazeInfo->box(FL_BORDER_BOX);
 	this->end();
 
+	_dirty = true;
+	_selectedCharacter = "*";
+	_selectedGazeTarget = "";
+	_selectedMotion = "";
+	_isScrubbing = false;
+	_scrubTime = 0.0;
+
 	loadCharacters();
 	loadMotions();
 
@@ -148,32 +155,45 @@ MotionEditorWindow::~MotionEditorWindow()
 {
 }
 
+void MotionEditorWindow::draw()
+{
+	if (_dirty)
+	{
+		loadCharacters();
+		loadMotions();
+		_dirty = false;
+	}
+
+	Fl_Double_Window::draw();
+
+}
+
 
 void MotionEditorWindow::reloadCharactersAndPawns()
 {
-	if (!_choiceCharacaterList)
+	if (!_choiceCharacterList)
 		return;
 	if (!_choiceGazeTargetList)
 		return;
 
 	// get previous selected character & pawn
-	std::string selectedCharacter = _choiceCharacaterList->text();
+	std::string selectedCharacter = _choiceCharacterList->text();
 	std::string selectedPawn = _choiceGazeTargetList->text();
 
 	// clear and reload
-	_choiceCharacaterList->clear();
+	_choiceCharacterList->clear();
 	_choiceGazeTargetList->clear();
 	loadCharacters();
 
 	// select again the character & pawn
-	for (int c = 0; c < _choiceCharacaterList->menu()->size(); c++)
+	for (int c = 0; c < _choiceCharacterList->menu()->size(); c++)
 	{
-		if (_choiceCharacaterList->menu()[c].label() == NULL)
+		if (_choiceCharacterList->menu()[c].label() == NULL)
 			continue;
 
-		if (selectedCharacter == _choiceCharacaterList->menu()[c].label())
+		if (selectedCharacter == _choiceCharacterList->menu()[c].label())
 		{
-			_choiceCharacaterList->value(c);
+			_choiceCharacterList->value(c);
 		}
 	}
 
@@ -192,16 +212,19 @@ void MotionEditorWindow::reloadCharactersAndPawns()
 
 void MotionEditorWindow::show()
 {
+	_dirty = true;
+	/*
 	// if window is shown again, update character and pawns
 	// For some weird reason, when you inserting to FLTK Choice, the size is one more than its real size
-	if (_choiceCharacaterList && _choiceGazeTargetList)
+	if (_choiceCharacterList && _choiceGazeTargetList)
 	{
-		if ((_choiceCharacaterList->size() - 1) != (SmartBody::SBScene::getScene()->getNumCharacters() + 1) 
+		if ((_choiceCharacterList->size() - 1) != (SmartBody::SBScene::getScene()->getNumCharacters() + 1) 
 			|| (_choiceGazeTargetList->size() - 1) != (SmartBody::SBScene::getScene()->getNumPawns() + SmartBody::SBScene::getScene()->getNumCharacters()))
 		{
 			reloadCharactersAndPawns();
 		}
 	}
+	*/
 
 	SBWindowListener::windowShow();
 	Fl_Double_Window::show();
@@ -215,12 +238,16 @@ void MotionEditorWindow::hide()
 
 void MotionEditorWindow::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
-	reloadCharactersAndPawns();
+	_dirty = true;
+	redraw();
+	//reloadCharactersAndPawns();
 }
 
 void MotionEditorWindow::OnCharacterDelete( const std::string & name )
 {
-	reloadCharactersAndPawns();
+	_dirty = true;
+	redraw();
+	//reloadCharactersAndPawns();
 }
 
 void MotionEditorWindow::OnCharacterUpdate( const std::string & name )
@@ -231,45 +258,60 @@ void MotionEditorWindow::OnCharacterUpdate( const std::string & name )
 
 void MotionEditorWindow::OnPawnCreate( const std::string & name )
 {
-	reloadCharactersAndPawns();
+	_dirty = true;
+	redraw();
+//	reloadCharactersAndPawns();
 }
 
 void MotionEditorWindow::OnPawnDelete( const std::string & name )
 {
-	reloadCharactersAndPawns();
+	_dirty = true;
+	redraw();
+	//reloadCharactersAndPawns();
 }
 
 void MotionEditorWindow::loadCharacters()
 {
+	_choiceCharacterList->clear();
+	_choiceGazeTargetList->clear();
 	const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
-   _choiceCharacaterList->add("*");
+   _choiceCharacterList->add("*");
+   if (_selectedCharacter == "")
+	   _choiceCharacterList->value(0);
 	for (size_t i = 0; i < charNames.size(); ++i)
 	{
-		_choiceCharacaterList->add(charNames[i].c_str());
+		_choiceCharacterList->add(charNames[i].c_str());
+		if (_selectedCharacter == charNames[i])
+			_choiceCharacterList->value(i + 1);
 		_choiceGazeTargetList->add(charNames[i].c_str());
+		if (_selectedGazeTarget == charNames[i])
+			_choiceGazeTargetList->value(i + 1);
 	}
 
-   const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
-   for (size_t i = 0; i < pawnNames.size(); ++i)
+	const std::vector<std::string>& pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+	for (size_t i = 0; i < pawnNames.size(); ++i)
 	{
-      _choiceGazeTargetList->add(pawnNames[i].c_str());
-   }
-   _choiceCharacaterList->value(0);
-   _choiceGazeTargetList->value(0);
+		_choiceGazeTargetList->add(pawnNames[i].c_str());
+		if (_selectedGazeTarget == pawnNames[i])
+			_choiceGazeTargetList->value(i + 1);
+	}
 }
 
-SmartBody::SBCharacter* MotionEditorWindow::getCurrentCharacter()
-{
-	std::string curCharName = _choiceCharacaterList->text();
-	return SmartBody::SBScene::getScene()->getCharacter(curCharName);
-}
+//SmartBody::SBCharacter* MotionEditorWindow::getCurrentCharacter()
+//{
+	//std::string curCharName = _choiceCharacterList->text();
+	//return SmartBody::SBScene::getScene()->getCharacter(curCharName);
+//}
 
 void MotionEditorWindow::loadMotions()
 {
+	_browserMotionList->clear();
 	const std::vector<std::string>& motionNames = SmartBody::SBScene::getScene()->getMotionNames();
 	for (size_t i = 0; i < motionNames.size(); ++i)
 	{
 		_browserMotionList->add(motionNames[i].c_str());
+		if (_selectedMotion == motionNames[i])
+			_browserMotionList->value(i);
 	}
 }
 
@@ -291,69 +333,53 @@ void MotionEditorWindow::loadMotions(const std::string& filterString)
 	}
 }
 
-SmartBody::SBMotion* MotionEditorWindow::getCurrentMotion()
-{
-	for (int i = 0; i < _browserMotionList->size(); ++i)
-	{
-		if (_browserMotionList->selected(i + 1))
-		{
-			return SmartBody::SBScene::getScene()->getMotion(_browserMotionList->text(i + 1));
-		}
-	}
-	return NULL;
-}
-
-std::string MotionEditorWindow::getCurrentCharacterName()
-{
-   return _choiceCharacaterList->text();
-}
-
-std::string MotionEditorWindow::getCurrentMotionName()
-{
-   int v = _browserMotionList->value();
-   if (v > 0 && v <= _browserMotionList->size())
-   {
-      return _browserMotionList->text(_browserMotionList->value());
-   }
-   else
-   {
-      return "";
-   }
-}
 
 void MotionEditorWindow::OnChoiceCharacterList(Fl_Widget* widget, void* data)
 {
-	MotionEditorWindow::OnButtonRefresh(widget, data);
+	MotionEditorWindow* editor = (MotionEditorWindow*) data;
+
+	int selected = editor->_choiceCharacterList->value();
+	if (selected >= 0)
+	{
+		editor->_selectedCharacter = editor->_choiceCharacterList->text(selected);
+	}
+	//MotionEditorWindow::OnButtonRefresh(widget, data);
 }
 
 void MotionEditorWindow::OnButtonRefresh(Fl_Widget* widget, void* data)
 {
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
-	editor->_browserMotionList->deselect();
-	OnBrowserMotionList(widget, data);
-	editor->_checkButtonPlayMotion->value(0);
-	editor->_sliderMotionFrame->deactivate();
-	OnCheckButtonPlayMotion(widget, data);
+	editor->_dirty = true;
+	editor->redraw();
 }
 
 void MotionEditorWindow::OnButtonSaveMotion(Fl_Widget* widget, void* data)
 {
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
-	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
-	if (!curMotion)
+	SmartBody::SBMotion* motion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(editor->_selectedMotion));
+	if (!motion)
 		return;
-	curMotion->saveToSkm(curMotion->getMotionFileName());
+	motion->saveToSkm(motion->getMotionFileName());
 }
 
 void MotionEditorWindow::OnBrowserMotionList(Fl_Widget* widget, void* data)
 {
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
-	std::string motionName = editor->getCurrentMotionName();
 
+	int selected = editor->_browserMotionList->value();
+	if (selected >= 0)
+	{
+		const char* motionStr = editor->_browserMotionList->text(selected);
+		if (!motionStr)
+			editor->_selectedMotion = "";
+		else
+			editor->_selectedMotion = motionStr;
+	}
+	//
 	editor->updateSyncPointsUI();
 	editor->updateMetaDataUI();
 
-	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
+	SmartBody::SBMotion* curMotion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(editor->_selectedMotion));
 	if (!curMotion)
 	{
 		editor->_checkButtonPlayMotion->deactivate();
@@ -379,7 +405,7 @@ void MotionEditorWindow::OnButtonQueryAnims(Fl_Widget* widget, void* data)
 		ss << "send sbm vhmsg log on";
       sbScene->command(ss.str());
       ss.clear();
-      ss << "send sbm resource motion";
+      ss << "send sb motionNames = scene.getMotionNames()\nfor i in range(0, len(motionNames)):\n\tprint motionNames[i]";
       sbScene->command(ss.str());
 	}
 }
@@ -387,64 +413,65 @@ void MotionEditorWindow::OnButtonQueryAnims(Fl_Widget* widget, void* data)
 void MotionEditorWindow::OnButtonPlayMotion(Fl_Widget* widget, void* data)
 {
    MotionEditorWindow* editor = (MotionEditorWindow*) data;
-   if (editor->getCurrentCharacterName() == "*")
+
+   if (editor->_selectedCharacter == "*")
    {
-      for (int i = 1; i < editor->_choiceCharacaterList->size() - 1; i++) // start at 1 to get past *
+      for (int i = 1; i < editor->_choiceCharacterList->size() - 1; i++) // start at 1 to get past *
       {
-         editor->PlayAnimation(editor->_choiceCharacaterList->text(i), editor->getCurrentMotionName(), false);
+         editor->PlayAnimation(editor->_choiceCharacterList->text(i), editor->_selectedMotion, false);
       }
    }
    else
    {
-      editor->PlayAnimation(editor->getCurrentCharacterName(), editor->getCurrentMotionName(), false);
+      editor->PlayAnimation(editor->_selectedCharacter, editor->_selectedMotion, false);
    }
 }
 
 void MotionEditorWindow::OnButtonSetPosture(Fl_Widget* widget, void* data)
 {
    MotionEditorWindow* editor = (MotionEditorWindow*) data;
-   if (editor->getCurrentCharacterName() == "*")
+   if (editor->_selectedCharacter == "*")
    {
-      for (int i = 1; i < editor->_choiceCharacaterList->size() - 1; i++) // start at 1 to get past *
+      for (int i = 1; i < editor->_choiceCharacterList->size() - 1; i++) // start at 1 to get past *
       {
-         editor->PlayAnimation(editor->_choiceCharacaterList->text(i), editor->getCurrentMotionName(), true);
+         editor->PlayAnimation(editor->_choiceCharacterList->text(i), editor->_selectedMotion, true);
       }
    }
    else
    {
-      editor->PlayAnimation(editor->getCurrentCharacterName(), editor->getCurrentMotionName(), true);
+      editor->PlayAnimation(editor->_selectedCharacter, editor->_selectedMotion, true);
    }
 }
 
 void MotionEditorWindow::OnButtonGazeAt(Fl_Widget* widget, void* data)
 {
    MotionEditorWindow* editor = (MotionEditorWindow*) data;
-   if (editor->getCurrentCharacterName() == "*")
+   if (editor->_selectedCharacter == "*")
    {
-      for (int i = 1; i < editor->_choiceCharacaterList->size() - 1; i++) // start at 1 to get past *
+      for (int i = 1; i < editor->_choiceCharacterList->size() - 1; i++) // start at 1 to get past *
       {
-         editor->GazeAt(editor->_choiceCharacaterList->text(i), editor->_choiceGazeTargetList->text());
+         editor->GazeAt(editor->_choiceCharacterList->text(i), editor->_choiceGazeTargetList->text());
       }
    }
    else
    {
-      editor->GazeAt(editor->getCurrentCharacterName(), editor->_choiceGazeTargetList->text());
+      editor->GazeAt(editor->_selectedCharacter, editor->_choiceGazeTargetList->text());
    }
 }
 
 void MotionEditorWindow::OnButtonStopGaze(Fl_Widget* widget, void* data)
 {
    MotionEditorWindow* editor = (MotionEditorWindow*) data;
-   if (editor->getCurrentCharacterName() == "*")
+   if (editor->_selectedCharacter == "*")
    {
-      for (int i = 1; i < editor->_choiceCharacaterList->size() - 1; i++) // start at 1 to get past *
+      for (int i = 1; i < editor->_choiceCharacterList->size() - 1; i++) // start at 1 to get past *
       {
-         editor->StopGaze(editor->_choiceCharacaterList->text(i));
+         editor->StopGaze(editor->_choiceCharacterList->text(i));
       }
    }
    else
    {
-      editor->StopGaze(editor->getCurrentCharacterName());
+      editor->StopGaze(editor->_selectedCharacter);
    }
 }
 
@@ -524,10 +551,16 @@ void MotionEditorWindow::StopGaze(const std::string& characterName)
 void MotionEditorWindow::OnCheckButtonPlayMotion(Fl_Widget* widget, void* data)
 {
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
-	SmartBody::SBCharacter* curChar = editor->getCurrentCharacter();
-	if (!curChar)	return;
-	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
-	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
+	SmartBody::SBCharacter* curChar = dynamic_cast<SmartBody::SBCharacter*>(SmartBody::SBScene::getScene()->getCharacter(editor->_selectedCharacter));
+	if (!curChar)
+	{
+		if (editor->_selectedCharacter != "*")
+			return;
+	}
+
+	editor->_isScrubbing = editor->_checkButtonPlayMotion->value() == 1? true: false;
+
+	SmartBody::SBMotion* curMotion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(editor->_selectedMotion));
 	if (!curMotion)	
 	{
 		const std::vector<std::string>& charNames = SmartBody::SBScene::getScene()->getCharacterNames();
@@ -535,7 +568,7 @@ void MotionEditorWindow::OnCheckButtonPlayMotion(Fl_Widget* widget, void* data)
 		for (size_t i = 0; i < charNames.size(); ++i)
 		{
 			ss.str("");
-			if (sbScene->isRemoteMode())
+			if (SmartBody::SBScene::getScene()->isRemoteMode())
 			{
 				ss << "send sbm ";
 			}
@@ -545,37 +578,51 @@ void MotionEditorWindow::OnCheckButtonPlayMotion(Fl_Widget* widget, void* data)
 		return;
 	}
 
-	if (editor->_checkButtonPlayMotion->value() == 1)
+	// determine the set of characters that are affected
+	std::vector<std::string> names;
+	if (editor->_selectedCharacter == "*")
+		names = SmartBody::SBScene::getScene()->getCharacterNames();
+	else
+		names.push_back(editor->_selectedCharacter);
+
+	if (editor->_isScrubbing)
 	{
 		editor->_sliderMotionFrame->activate();
 		double playTime = editor->_sliderMotionFrame->value();
 		double delta = curMotion->duration() / double(curMotion->frames() - 1);
-		int frameNumber = int(playTime / delta);		
-		std::stringstream ss;
-		if (sbScene->isRemoteMode())
+		int frameNumber = int(playTime / delta);
+		for (size_t c = 0; c < names.size(); c++)
 		{
-			ss << "send sbm ";
+			std::stringstream ss;
+			if (SmartBody::SBScene::getScene()->isRemoteMode())
+			{
+				ss << "send sbm ";
+			}
+			ss << "motionplayer " << names[c] << " on";		
+			SmartBody::SBScene::getScene()->command(ss.str());
+			ss.str("");
+			if (SmartBody::SBScene::getScene()->isRemoteMode())
+			{
+				ss << "send sbm ";
+			}
+			ss << "motionplayer " << names[c] << " " << curMotion->getName() << " " << frameNumber;
+			SmartBody::SBScene::getScene()->command(ss.str());
 		}
-		ss << "motionplayer " << curChar->getName() << " on";		
-		SmartBody::SBScene::getScene()->command(ss.str());
-		ss.str("");
-		if (sbScene->isRemoteMode())
-		{
-			ss << "send sbm ";
-		}
-		ss << "motionplayer " << curChar->getName() << " " << curMotion->getName() << " " << frameNumber;
-		SmartBody::SBScene::getScene()->command(ss.str());
+
 	}
-	else if (editor->_checkButtonPlayMotion->value() == 0)
+	else
 	{		
-		std::stringstream ss;
-		if (sbScene->isRemoteMode())
-		{
-			ss << "send sbm ";
-		}
-		ss << "motionplayer " << curChar->getName() << " off";
-		SmartBody::SBScene::getScene()->command(ss.str());
 		editor->_sliderMotionFrame->deactivate();
+		for (size_t c = 0; c < names.size(); c++)
+		{
+			std::stringstream ss;
+			if (SmartBody::SBScene::getScene()->isRemoteMode())
+			{
+				ss << "send sbm ";
+			}
+			ss << "motionplayer " <<  names[c] << " off";
+			SmartBody::SBScene::getScene()->command(ss.str());
+		}
 		editor->_sliderMotionFrame->value(0);
 		editor->_outputMotionFrameNumber->value("0");
 	}
@@ -584,22 +631,35 @@ void MotionEditorWindow::OnCheckButtonPlayMotion(Fl_Widget* widget, void* data)
 void MotionEditorWindow::OnSliderMotionFrame(Fl_Widget* widget, void* data)
 {
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
-	SmartBody::SBCharacter* curChar = editor->getCurrentCharacter();
-	if (!curChar)	return;
-	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
-	if (!curMotion)	return;
+	
+	SmartBody::SBMotion* curMotion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(editor->_selectedMotion));
+	if (!curMotion)
+		return;
+	
+	std::vector<std::string> names;
+	if (editor->_selectedCharacter == "*")
+	{
+		names = SmartBody::SBScene::getScene()->getCharacterNames();
+	}
+	else
+	{
+		names.push_back(editor->_selectedCharacter);
+	}
 
 	double playTime = editor->_sliderMotionFrame->value();
 	double delta = curMotion->duration() / double(curMotion->frames() - 1);
 	int frameNumber = int(playTime / delta);
-	std::stringstream ss;
-	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
-	if (sbScene->isRemoteMode())
+	for (size_t c = 0; c < names.size(); c++)
 	{
-		ss << "send sbm ";
+		std::stringstream ss;
+		SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
+		if (sbScene->isRemoteMode())
+		{
+			ss << "send sbm ";
+		}
+		ss << "motionplayer " << names[c] << " " << curMotion->getName() << " " << frameNumber;
+		SmartBody::SBScene::getScene()->command(ss.str());
 	}
-	ss << "motionplayer " << curChar->getName() << " " << curMotion->getName() << " " << frameNumber;
-	SmartBody::SBScene::getScene()->command(ss.str());
 	std::stringstream ss1;
 	ss1 << frameNumber;
 	editor->_outputMotionFrameNumber->value(ss1.str().c_str());
@@ -611,7 +671,7 @@ void MotionEditorWindow::OnSliderMotionFrame(Fl_Widget* widget, void* data)
 void MotionEditorWindow::OnButtonPlayMotionFolder(Fl_Widget* widget, void* data)
 {
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
-	SmartBody::SBCharacter* curChar = editor->getCurrentCharacter();
+	SmartBody::SBCharacter* curChar = dynamic_cast<SmartBody::SBCharacter*>(SmartBody::SBScene::getScene()->getCharacter(editor->_selectedCharacter));
 	if (!curChar)
 		return;
 
@@ -656,7 +716,7 @@ void MotionEditorWindow::OnButtonPlayMotionFolder(Fl_Widget* widget, void* data)
 
 void MotionEditorWindow::updateSyncPointsUI()
 {
-	SmartBody::SBMotion* curMotion = getCurrentMotion();
+	SmartBody::SBMotion* curMotion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(this->_selectedMotion));
 	if (!curMotion)
 	{
 		_sliderStart->range(0, 1);
@@ -673,6 +733,7 @@ void MotionEditorWindow::updateSyncPointsUI()
 		_sliderStrokeEnd->value(0);
 		_sliderRelax->value(0);
 		_sliderEnd->value(0);
+		redraw();
 		return;
 	}
 	double dur = curMotion->getDuration();
@@ -696,7 +757,7 @@ void MotionEditorWindow::updateSyncPointsUI()
 
 void MotionEditorWindow::updateMotionSyncPoints(const std::string& type)
 {
-	SmartBody::SBMotion* curMotion = getCurrentMotion();
+	SmartBody::SBMotion* curMotion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(this->_selectedMotion));
 	if (!curMotion)
 		return;
 	curMotion->validateSyncPoint(type);
@@ -706,8 +767,9 @@ void MotionEditorWindow::updateMotionSyncPoints(const std::string& type)
 void MotionEditorWindow::OnSliderSyncPoints(Fl_Widget* widget, void* data)
 {
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
-	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
-	if (!curMotion)	return;
+	SmartBody::SBMotion* curMotion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(editor->_selectedMotion));
+	if (!curMotion)
+		return;
 
 	const std::string& type = widget->label();
 	if (type == "start")
@@ -752,8 +814,9 @@ void MotionEditorWindow::OnSliderSyncPoints(Fl_Widget* widget, void* data)
 void MotionEditorWindow::OnButtonGetSyncPoints(Fl_Widget* widget, void* data)
 {
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
-	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
-	if (!curMotion)	return;
+	SmartBody::SBMotion* curMotion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(editor->_selectedMotion));
+	if (!curMotion)
+		return;
 	const std::string& type = widget->tooltip();
 	double playTime = editor->_sliderMotionFrame->value();
 	if (type == "start")
@@ -790,7 +853,7 @@ void MotionEditorWindow::OnButtonGetSyncPoints(Fl_Widget* widget, void* data)
 
 void MotionEditorWindow::updateMetaDataUI()
 {
-	SmartBody::SBMotion* curMotion = getCurrentMotion();
+	SmartBody::SBMotion* curMotion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(this->_selectedMotion));
 	if (!curMotion)
 	{
 		_browserMetaNames->clear();
@@ -815,7 +878,7 @@ void MotionEditorWindow::updateMetaDataUI()
 
 void MotionEditorWindow::addMotionMetaData(const std::string& name, const std::string& value)
 {
-	SmartBody::SBMotion* curMotion = getCurrentMotion();
+	SmartBody::SBMotion* curMotion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(this->_selectedMotion));
 	if (!curMotion)
 		return;
 
@@ -853,10 +916,50 @@ void MotionEditorWindow::OnButtonDeleteMetaEntry(Fl_Widget* widget, void* data)
 	MotionEditorWindow* editor = (MotionEditorWindow*) data;
 	if (editor->_browserMetaNames->value() <= 0)
 		return;
-	SmartBody::SBMotion* curMotion = editor->getCurrentMotion();
+	SmartBody::SBMotion* curMotion = dynamic_cast<SmartBody::SBMotion*>(SmartBody::SBScene::getScene()->getMotion(editor->_selectedMotion));
 	if (!curMotion)
 		return;
 	const std::string& name = editor->_browserMetaNames->text(editor->_browserMetaNames->value());
 	curMotion->removeMetaData(name);
 	editor->updateMetaDataUI();
+}
+
+
+void MotionEditorWindow::OnObjectCreate( SmartBody::SBObject* object )
+{
+	SmartBody::SBMotion* motion = dynamic_cast<SmartBody::SBMotion*>(object);
+	if (motion)
+	{
+		_dirty = true;
+		redraw();
+		return;
+	}
+
+	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(object);
+	if (character)
+	{
+		_dirty = true;
+		redraw();
+		return;
+	}
+}
+
+
+void MotionEditorWindow::OnObjectDelete( SmartBody::SBObject* object )
+{
+	SmartBody::SBMotion* motion = dynamic_cast<SmartBody::SBMotion*>(object);
+	if (motion)
+	{
+		_dirty = true;
+		redraw();
+		return;
+	}
+
+	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(object);
+	if (character)
+	{
+		_dirty = true;
+		redraw();
+		return;
+	}
 }
