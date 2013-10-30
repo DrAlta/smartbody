@@ -38,6 +38,9 @@ void FLTKOgreWindow::show_viewer()
 		initOgreWindow();
 		make_current();		
 		SBGUIManager::singleton().init();			
+		SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
+		fltkListener = new OgreListener(ogreInterface);
+		sbScene->addSceneListener(fltkListener);
 	}
 }
 
@@ -66,15 +69,8 @@ void FLTKOgreWindow::initOgreWindow()
 	printf("ogreWindow, GLContext = %d\n",fltkGLContext);
     
 	ogreInterface = new EmbeddedOgre();
-	ogreInterface->createOgreWindow(flHwnd, flParentHwnd, fltkGLContext, w(), h(), "OgreWindow");	
-
-	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
-
-	sbScene->addSceneListener(new OgreListener(ogreInterface));
-     
-	updateOptions();
-     
-    
+	ogreInterface->createOgreWindow(flHwnd, flParentHwnd, fltkGLContext, w(), h(), "OgreWindow");	     
+	updateOptions();    
 	//fl_set_gl_context(this,ogreInterface->getGLContext());	
 }
 

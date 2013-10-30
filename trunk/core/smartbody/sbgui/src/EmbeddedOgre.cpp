@@ -615,7 +615,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		ogreGLContext = (unsigned long)getCurrentGLContext();
 
 		
-#if defined(USE_RTSHADER_SYSTEM) 	
+#if USE_RTSHADER
 		if (Ogre::RTShader::ShaderGenerator::initialize())
 		{
 			ResourceGroupManager::getSingleton().initialiseAllResourceGroups();		

@@ -3,7 +3,11 @@
 #undef WIN32_LEAN_AND_MEAN
 #endif
 #include <OGRE/Ogre.h>
+
+#define USE_RTSHADER 1
+#if USE_RTSHADER
 #include <OGRE/RTShaderSystem/OgreRTShaderSystem.h>
+#endif
 //#include <sbm/SBSkeleton.h>
 //#include <sbm/SBCharacter.h>
 //#include <sbm/sbm_deformable_mesh.h>
@@ -58,8 +62,10 @@ protected:
 	Ogre::SceneManager*   ogreSceneMgr;
 	Ogre::Camera*		  ogreCamera;
 	ExampleFrameListener* ogreFrameListener;
+#if USE_RTSHADER
 	Ogre::RTShader::ShaderGenerator* ogreShaderGenerator;   
 	Ogre::RTShader::SubRenderState* ogreSrsHardwareSkinning;
+#endif
 	OgreListener*         ogreListener;
 	unsigned long         ogreGLContext;
 	bool                  ogreCharacterVisible;

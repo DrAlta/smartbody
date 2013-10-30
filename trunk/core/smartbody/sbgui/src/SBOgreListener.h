@@ -1,10 +1,10 @@
 #ifndef SBOGRELISTENER_H
 #define SBOGRELISTENER_H
-#include <sb/SBSceneListener.h>
+#include "FLTKListener.h"
 #include <sb/SBObserver.h>
 
 class EmbeddedOgre;
-class OgreListener : public SmartBody::SBSceneListener, public SmartBody::SBObserver
+class OgreListener : public FLTKListener, public SmartBody::SBObserver
 {
 public:
 	OgreListener(EmbeddedOgre* ogreInterface);
