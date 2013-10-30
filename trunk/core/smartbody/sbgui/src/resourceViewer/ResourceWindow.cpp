@@ -911,48 +911,119 @@ void ResourceWindow::notify( SmartBody::SBSubject* subject )
 
 void ResourceWindow::OnSelect(const std::string& value)
 {
+	if (value == "")
+	{
+		// deselect all
+		resourceTree->select_only(NULL);
+	}
+	SmartBody::SBObject* object = SmartBody::SBScene::getScene()->getObjectFromString(value);
+	if (!object)
+		return;
+
+	Fl_Tree_Item* item = NULL;
+	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(object);
+	if (character)
+	{
+		// select a character
+		for (std::map<Fl_Tree_Item*, std::string>::iterator iter = _treeMap.begin();
+			 iter != _treeMap.end();
+			 iter++)
+		{
+			if ((*iter).second == "character")
+			{
+				item = (*iter).first;
+				// make sure that the parent is open so that the selection can be seen
+				resourceTree->open(item);
+			}
+		}
+		if (!item)
+			return;
+	}
+	else
+	{
+		SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
+		if (pawn)
+		{
+			// select a pawn
+			for (std::map<Fl_Tree_Item*, std::string>::iterator iter = _treeMap.begin();
+				 iter != _treeMap.end();
+				 iter++)
+			{
+				if ((*iter).second == "pawn")
+				{
+					item = (*iter).first;
+					// make sure that the parent is open so that the selection can be seen
+					resourceTree->open(item);
+				}
+			}
+			if (!item)
+				return;
+		}
+	}
+
+	if (!item)
+		return;
+
+	int numChildren = item->children();
+	for (int c = 0; c < numChildren; c++)
+	{
+		Fl_Tree_Item* child = item->child(c);
+		if (object->getName() == child->label())
+		{
+			resourceTree->select_only(child);
+		}
+	}
+
 }
 
 void ResourceWindow::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
 	_dirty = true;
+	this->redraw();
 }
 
 void ResourceWindow::OnCharacterDelete( const std::string & name )
 {
 	removeSpecialName(name);
 	_dirty = true;
+	this->redraw();
 }
 
 void ResourceWindow::OnCharacterUpdate( const std::string & name )
 {
 	_dirty = true;
+	this->redraw();
 }
       
 void ResourceWindow::OnPawnCreate( const std::string & name )
 {
 	_dirty = true;
+	this->redraw();
 }
 
 void ResourceWindow::OnPawnDelete( const std::string & name )
 {
 	_dirty = true;
+	this->redraw();
 }
 
 void ResourceWindow::OnObjectCreate( SmartBody::SBObject* object )
 {
 	_dirty = true;
+	this->redraw();
 }
 
 void ResourceWindow::OnObjectDelete( SmartBody::SBObject* object )
 {
 	_dirty = true;
+	this->redraw();
 }
 
 void ResourceWindow::OnSimulationStart()
 {
 	_dirty = true;
 	_firstTime = true;
+	this->redraw();
 }
 
 int ResourceWindow::addSpecialName(const std::string& name)
