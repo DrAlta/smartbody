@@ -31,7 +31,7 @@ class SbmCharacter;
 #ifdef WIN_BUILD
 #define USE_OGRE_VIEWER 1
 #elif LINUX_BUILD
-#define USE_OGRE_VIEWER 0
+#define USE_OGRE_VIEWER 1
 #else
 #define USE_OGRE_VIEWER 0
 #endif

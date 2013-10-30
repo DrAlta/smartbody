@@ -4,7 +4,7 @@
 #include <sb/SBObserver.h>
 
 class EmbeddedOgre;
-class OgreListener : public FLTKListener, public SmartBody::SBObserver
+class OgreListener : public FLTKListener
 {
 public:
 	OgreListener(EmbeddedOgre* ogreInterface);

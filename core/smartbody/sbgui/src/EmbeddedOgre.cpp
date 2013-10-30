@@ -506,7 +506,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 	// initialize Ogre3D
 	size_t winHandle = (size_t)windowHandle;
 	unsigned long oldGLContext = getCurrentGLContext();//glContext;
-	//LOG("embeddedOgre, current GL context = %lu, input GL context = %lu, winHandle = %lu",oldGLContext, glContext, winHandle);
+	printf("embeddedOgre, current GL context = %lu, input GL context = %lu, winHandle = %lu\n",oldGLContext, glContext, winHandle);
 	try 
 	{		
 		ogreRoot = OGRE_NEW Ogre::Root();
@@ -528,6 +528,8 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 #else
 		Ogre::String sceneManagerPlugin = "/usr/lib/x86_64-linux-gnu/OGRE-1.8.0/Plugin_OctreeSceneManager";
 		Ogre::String pluginName = "/usr/lib/x86_64-linux-gnu/OGRE-1.8.0/RenderSystem_GL";	
+		//Ogre::String sceneManagerPlugin = "/usr/lib/x86_64-linux-gnu/OGRE-1.7.4/Plugin_OctreeSceneManager";
+		//Ogre::String pluginName = "/usr/lib/x86_64-linux-gnu/OGRE-1.7.4/RenderSystem_GL";
 #endif
 		ogreRoot->loadPlugin(pluginName);		
 		ogreRoot->loadPlugin(sceneManagerPlugin);
