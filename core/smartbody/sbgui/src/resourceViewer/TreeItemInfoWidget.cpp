@@ -44,7 +44,7 @@ SkeletonItemInfoWidget::SkeletonItemInfoWidget( const std::string& characterName
 	this->begin();
 	skeletonTree = new Fl_TreeHorizontal(Pad*2+x,Pad*2+y,w-30,100);//new Fl_Tree(10,10,w - 300, h - 30);			
 	skeletonTree->callback(treeCallBack,this);	
-	attrWindow = new AttributeWindow(jointInfoObject,Pad*2+x,Pad*2+y+110,w - 30,h -(Pad*2+110),"Joint Attributes");
+	attrWindow = new AttributeWindow(jointInfoObject,Pad*2+x,Pad*2+y+120,w - 30,h -(Pad*2+130),"Joint Attributes");
 	attrWindow->setOffset(150);
 	attrWindow->begin();
 	attrWindow->end();
@@ -186,10 +186,10 @@ MotionItemInfoWidget::MotionItemInfoWidget( int x, int y, int w, int h, const ch
 	this->begin();
 	channelBrowser = new Fl_Hold_Browser(Pad*2+x,Pad*2+y,w-30,h-channelBrowserHeight,"Channels");//new Fl_Tree(10,10,w - 300, h - 30);			
 	channelBrowser->callback(browserCallBack,this);	
-	frameSlider = new Fl_Value_Slider(Pad*2+x,Pad*2+y+h-channelBrowserHeight+20,w-30,20,"Frames");
+	frameSlider = new Fl_Value_Slider(Pad*2+x,Pad*2+y+h-channelBrowserHeight+25,w-30,20,"Frames");
 	frameSlider->type(FL_HORIZONTAL);
 	frameSlider->callback(sliderCallBack,this);
-	attrWindow = new AttributeWindow(channelInfoObject,Pad*2+x,Pad*2+y+h-channelBrowserHeight + 50 ,w-30, channelBrowserHeight - 100,"");
+	attrWindow = new AttributeWindow(channelInfoObject,Pad*2+x,Pad*2+y+h-channelBrowserHeight + 65 ,w-30, channelBrowserHeight - 100,"");
 	attrWindow->setOffset(150);
 	attrWindow->begin();
 	attrWindow->end();

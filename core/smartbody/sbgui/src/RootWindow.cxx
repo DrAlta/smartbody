@@ -251,25 +251,26 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	int leftBorderSize = 10;
 	int rightBorderSize = 10;
 
-	_mainGroup = new Fl_Group(0, curY, w - 20, h - curY, "");
+	int leftGroupSize = 364;
+	_mainGroup = new Fl_Group(10, curY, w - 20, h - curY, "");
 	_mainGroup->begin();
 
-	_leftGroup = new Fl_Group(0, curY, 384, h - curY);
+	_leftGroup = new Fl_Group(10, curY, leftGroupSize, h - curY);
 
 	// add the outliner
-	int outlinerWidth = 384;
-	int outlinerHeight = (int) (h - curY) / 2  - 20;
-	resourceWindow = new ResourceWindow(leftBorderSize, curY, outlinerWidth, outlinerHeight, "");
+	int outlinerWidth = 364;
+	int outlinerHeight = (int) (h - curY) / 2  - 10;
+	resourceWindow = new ResourceWindow(leftBorderSize, curY, outlinerWidth-10 , outlinerHeight, "");
 	resourceWindow->box(FL_UP_BOX);
 	// add the attribute window
-	int attributeEditorWidth = 384;
-	_attributeEditor = new AttributeEditor(leftBorderSize, curY + outlinerHeight + 10, attributeEditorWidth, outlinerHeight, "");
+	int attributeEditorWidth = 364;
+	_attributeEditor = new AttributeEditor(leftBorderSize, curY + outlinerHeight + 10, attributeEditorWidth - leftBorderSize, outlinerHeight, "");
 	_attributeEditor->box(FL_UP_BOX);
 
 	_leftGroup->end();
 
 	// add the viewer
-	int viewerWidth = 640;
+	int viewerWidth = 640 ;
 	int viewerHeight = h - curY - 10;
 #if USE_OGRE_VIEWER < 1
 	fltkViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
