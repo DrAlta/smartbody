@@ -30,6 +30,8 @@ OgreListener::~OgreListener(void)
 
 void OgreListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
+	FLTKListener::OnCharacterCreate(name, objectClass);
+
 	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
 	if (!pawn)
 		return;
@@ -186,18 +188,22 @@ void OgreListener::OnCharacterDelete( const std::string & name )
 		if (iter != frameListener->m_initialBonePositions.end())
 			frameListener->m_initialBonePositions.erase(iter);
 	}
+
+	FLTKListener::OnCharacterDelete(name);
 }
 
 void OgreListener::OnCharacterUpdate( const std::string & name )
 {
 	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
 	
-	OnCharacterDelete(name);
-	OnCharacterCreate(name, "");
+	OgreListener::OnCharacterDelete(name);
+	OgreListener::OnCharacterCreate(name, "");
 }
 
 void OgreListener::notify(SmartBody::SBSubject* subject)
 {
+	// notify the FLTKListener first
+	FLTKListener::notify(subject);
 	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attribute)
 	{
@@ -271,24 +277,25 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 
 void OgreListener::OnPawnCreate( const std::string & name )
 {
-	OnCharacterCreate(name, "");
+	OgreListener::OnCharacterCreate(name, "");
 }
 
 void OgreListener::OnPawnDelete( const std::string & name )
 {
-	OnCharacterDelete(name);
+	OgreListener::OnCharacterDelete(name);
 }
 
 void OgreListener::OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
 {
-
+	FLTKListener::OnViseme(name, visemeName, weight, blendTime);
 }
 
 void OgreListener::OnChannel( const std::string & name, const std::string & channelName, const float value )
 {
-
+	FLTKListener::OnChannel(name,channelName, value);
 }
 
 void OgreListener::OnSimulationStart()
 {
+	FLTKListener::OnSimulationStart();
 }

@@ -69,7 +69,7 @@ class MeCtExampleBodyReach;
 class JointMapViewer;
 class RetargetStepWindow;
 class PALocomotionData;
-
+class FLTKListener;
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
@@ -423,11 +423,7 @@ protected:
 	std::vector<SrLight> _lights;
 
 	SmartBody::SBAnimationBlend* getCurrentCharacterAnimationBlend(); // for visualization plots	
-
-
-
-	
-	
+	FLTKListener* fltkListener;	
  };
 
 

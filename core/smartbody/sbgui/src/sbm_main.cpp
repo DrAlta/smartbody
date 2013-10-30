@@ -689,7 +689,7 @@ int main( int argc, char **argv )	{
 
 	
 
-	FLTKListener fltkListener;
+	//FLTKListener fltkListener;
 
 #ifdef __APPLE__
 	Fl::scheme("plastic");
@@ -938,7 +938,7 @@ int main( int argc, char **argv )	{
 	mcu_register_callbacks();
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	scene->addSceneListener(&fltkListener);
+	//scene->addSceneListener(&fltkListener);
 
 	scene->startFileLogging("./smartbody.log");
 

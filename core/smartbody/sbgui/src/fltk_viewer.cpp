@@ -418,7 +418,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
    init_foot_print();
    _lastSelectedCharacter = "";   
    _retargetStepWindow = NULL;
-
+   fltkListener = NULL;
    // register gesture event handler
 	GestureVisualizationHandler* gv = new GestureVisualizationHandler();
 	gv->setGestureData(_gestureData);
@@ -2924,6 +2924,11 @@ void FltkViewer::show_viewer()
 	show();
 	make_current();
 	SBGUIManager::singleton().init();	
+	if (!fltkListener)
+	{
+		fltkListener = new FLTKListener();
+		SmartBody::SBScene::getScene()->addSceneListener(fltkListener);
+	}
 }
 
 void FltkViewer::hide_viewer()

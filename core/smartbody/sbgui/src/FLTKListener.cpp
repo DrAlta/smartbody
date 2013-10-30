@@ -49,7 +49,7 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	if (attr)
 		attr->registerObserver(this);
 
-	OnCharacterUpdate(name);
+	FLTKListener::OnCharacterUpdate(name);
 	
 	if (otherListener)
 		otherListener->OnCharacterCreate(name,objectClass);
@@ -110,6 +110,7 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 
 #if 1 //!USE_OGRE_VIEWER
 	// make sure the character isn't associated with the viewer
+
 
 	
 	BaseWindow* window = dynamic_cast<BaseWindow*>(scene->getViewer());
@@ -182,12 +183,12 @@ void FLTKListener::OnCharacterUpdate( const std::string & name)
 
 void FLTKListener::OnPawnCreate( const std::string & name )
 {
-	OnCharacterCreate(name, "");
+	FLTKListener::OnCharacterCreate(name, "");
 }
 
 void FLTKListener::OnPawnDelete( const std::string & name )
 {
-	OnCharacterDelete(name);
+	FLTKListener::OnCharacterDelete(name);
 }
 
 void FLTKListener::OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
