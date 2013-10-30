@@ -26,9 +26,17 @@ def startingSetup(origSkelName, skeletonName, baseJoint, preFix, statePreFix):
 		sbMotion1 = assetManager.getMotion(originalMotions1[i])
 		if sbMotion1 != None:
 			sbMotion1.setMotionSkeletonName(origSkelName)
+			sbMotion1.buildJointTrajectory('l_forefoot','base')
+			sbMotion1.buildJointTrajectory('r_forefoot','base')
+			sbMotion1.buildJointTrajectory('l_ankle','base')
+			sbMotion1.buildJointTrajectory('r_ankle','base')
 		sbMotion2 = assetManager.getMotion(originalMotions2[i])
 		if sbMotion2 != None:
 			sbMotion2.setMotionSkeletonName(origSkelName)
+			sbMotion2.buildJointTrajectory('l_forefoot','base')
+			sbMotion2.buildJointTrajectory('r_forefoot','base')
+			sbMotion2.buildJointTrajectory('l_ankle','base')
+			sbMotion2.buildJointTrajectory('r_ankle','base')
 		
 	stateManager = scene.getStateManager()
 
