@@ -4,7 +4,7 @@
 #endif
 #include <OGRE/Ogre.h>
 
-#define USE_RTSHADER 1
+#define USE_RTSHADER 0
 #if USE_RTSHADER
 #include <OGRE/RTShaderSystem/OgreRTShaderSystem.h>
 #endif

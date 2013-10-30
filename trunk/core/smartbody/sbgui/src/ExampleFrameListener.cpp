@@ -57,7 +57,7 @@ mInputManager(0), mMouse(0), mKeyboard(0), mJoy(0)
 	win->getCustomAttribute("WINDOW", &windowAttr);
 	
 	windowHnd = windowAttr;
-	printf("custom attribute = %u, windowHnd = %u\n",windowAttr,windowHnd);
+	printf("custom attribute = %lu, windowHnd = %lu\n",windowAttr,windowHnd);
 
 	/*while (getParentWindowHandle(windowHnd)) // loop until we get top level window
 	{
