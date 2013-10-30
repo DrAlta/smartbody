@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
+# Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "elbench", "lib\vhmsg\samples\elbench\cpp\elbench.vcxproj", "{9E9B80AE-5A0E-45CB-9E88-1734F2527D5E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "elbenchcs", "lib\vhmsg\samples\elbench\cs\elbenchcs.csproj", "{1532040E-331E-41E4-989D-87EC4C8E57D3}"
@@ -92,6 +92,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qt", "lib\qt\qt.vcxproj", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sbgui", "core\smartbody\sbgui\visualc9\sbgui.vcxproj", "{2C18CD04-407B-420A-8CDC-1C6325F87072}"
 	ProjectSection(ProjectDependencies) = postProject
+		{E1BABF1B-764A-46BC-9E0B-9948D6DEEBA0} = {E1BABF1B-764A-46BC-9E0B-9948D6DEEBA0}
 		{4559341E-D53D-45E5-A67C-43D7C5956636} = {4559341E-D53D-45E5-A67C-43D7C5956636}
 		{A8E03E2E-B9AE-4574-81A2-F661819322E1} = {A8E03E2E-B9AE-4574-81A2-F661819322E1}
 		{8BBCFC4A-6B52-461E-8BBA-A86DE3FAD6F6} = {8BBCFC4A-6B52-461E-8BBA-A86DE3FAD6F6}
