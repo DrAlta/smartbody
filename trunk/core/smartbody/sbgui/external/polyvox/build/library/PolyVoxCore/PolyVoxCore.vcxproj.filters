@@ -242,9 +242,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\..\..\library\PolyVoxCore\CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Headers\Impl">
       <UniqueIdentifier>{929BAF06-9C40-4DDA-90BE-717E4E418155}</UniqueIdentifier>
     </Filter>
