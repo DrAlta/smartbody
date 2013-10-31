@@ -700,6 +700,16 @@ void VisemeViewerWindow::OnCharacterSelectCB(Fl_Widget* widget, void* data)
 //			viewer->enforceNamingConvention(c_str);
 			viewer->_browserViseme->add(c_str);
 		}
+
+		// if it has blend shape, add those as well
+		for (int jointCounter = 0; jointCounter < character->getSkeleton()->getNumJoints(); ++jointCounter)
+		{
+			if (character->getSkeleton()->getJoint(jointCounter)->getJointType() == SkJoint::TypeBlendShape)
+			{
+				const std::string& jointName = character->getSkeleton()->getJoint(jointCounter)->getName();
+				viewer->_browserViseme->add(jointName.c_str());
+			}
+		}
 	}
 
 	viewer->initializeVisemes();

@@ -801,9 +801,16 @@ void DeformableMeshInstance::blendShapes()
 				continue;	// don't do anything about base model
 
 			float w = 0.0f;
+			float wLimit = 1.0f;
 			// get weight
 			std::stringstream ss;
 			ss << "blendShape.channelName." << (const char*)mIter->second[i]->shape().name;
+			std::stringstream ss1;
+			ss1 << "blendShape.channelWeightLimit." << (const char*)mIter->second[i]->shape().name;
+			if (_character->hasAttribute(ss1.str()))
+			{
+				wLimit = (float)_character->getDoubleAttribute(ss1.str());
+			}
 			if (_character->hasAttribute(ss.str()))
 			{
 				std::string mappedCName = _character->getStringAttribute(ss.str());
@@ -816,6 +823,8 @@ void DeformableMeshInstance::blendShapes()
 						SrVec pos = joint->getPosition();
 						w = pos.x;
 						//LOG("shape %s(%s) with weight %f", (const char*)mIter->second[i]->shape().name, mappedCName.c_str(), w);
+						if (w > wLimit)
+							w = wLimit;
 					}
 				}
 			}
@@ -1137,4 +1146,50 @@ SBAPI bool DeformableMeshInstance::isStaticMesh()
 {
 	if (!_mesh) return true;
 	return (_isStaticMesh || !_mesh->isSkinnedMesh());
+}
+
+SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
+{
+	if (!_mesh) return;
+	if (_mesh->blendShapeMap.size() == 0) return;
+
+	DeformableMeshInstance::blendShapes();
+
+	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
+	mIter = _mesh->blendShapeMap.begin();
+	SrSnModel* writeToBaseModel = NULL;	
+	int vtxBaseIdx = 0;
+	for (size_t i = 0; i < _mesh->dMeshStatic_p.size(); ++i)
+	{		
+		if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
+		{
+			writeToBaseModel = _mesh->dMeshStatic_p[i];			
+			break;
+		}
+		else
+		{
+			// skip vertices for this sub mesh
+			vtxBaseIdx += _mesh->dMeshStatic_p[i]->shape().V.size();
+		}
+	}
+	if (!writeToBaseModel) return;
+	std::map<int,std::vector<int> >& vtxNewVtxIdxMap = _mesh->vtxNewVtxIdxMap;
+	SrModel& baseModel = writeToBaseModel->shape();
+	for (int i=0;i<baseModel.V.size();i++)
+	{
+		int iVtx = vtxBaseIdx+i;
+		SrVec& basePos = baseModel.V[i];
+		_deformPosBuf[iVtx] = basePos;
+		if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
+		{
+			std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
+			// copy related vtx components 
+			for (unsigned int k=0;k<idxMap.size();k++)
+			{
+				int idx = idxMap[k];
+				_deformPosBuf[idx] = basePos;
+			}
+		}			
+	}	
+
 }
