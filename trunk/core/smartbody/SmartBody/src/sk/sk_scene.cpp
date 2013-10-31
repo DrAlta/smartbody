@@ -52,9 +52,9 @@ SkScene::SkScene ()
  }
 
 SkScene::~SkScene ()
- {
-   if ( _skeleton ) _skeleton->unref();
- }
+{	
+   //if ( _skeleton ) _skeleton->unref();
+}
 
 static SrSnGroup* make_joint_group ( const SkJoint* j, SkSkeleton* s, SrArray<SrSnGroup*>& _jgroup )
  {
@@ -94,7 +94,8 @@ void SkScene::init ( SkSkeleton* s, float scale )
  {
    remove_all();
    _jgroup.size ( 0 );
-   if ( _skeleton ) { _skeleton->unref(); _skeleton=0; }
+   // unref seems to make things unstable with random crash. Since SkScene is only getting a pointer to the skeleton, I think its parent is responsible for cleaning it up. 
+   //if ( _skeleton ) { _skeleton->unref(); _skeleton=0; }
       
    if ( !s ) return;
    _skeleton = s;

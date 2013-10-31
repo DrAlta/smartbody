@@ -1494,7 +1494,7 @@ bool SbmDeformableMeshGPUInstance::initBuffer()
 	{
 		cleanBuffer();
 		int tranSize = _mesh->boneJointIdxMap.size()*16;
-		int colorSize = dynamicMesh.size()*3;
+		//int colorSize = dynamicMesh.size()*3;
 		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 	}
 	return true;
