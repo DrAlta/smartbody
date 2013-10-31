@@ -848,6 +848,36 @@ SBAPI bool SBAssetManager::addMotion(SmartBody::SBMotion* motion)
 	return true;
 }
 
+SBMotion* SBAssetManager::addMotionDefinition(const std::string& name, double duration, int numFrames)
+{
+	std::map<std::string, SBMotion*>::iterator iter = _motions.find(name);
+	if (iter != _motions.end())
+	{
+		LOG("Motion named %s already exists, new motion will not be added.", name.c_str());
+		return false;
+	}
+
+	SBMotion* sbMotion = new SBMotion();
+	if (numFrames <= 2 && duration > 0)
+	{
+		sbMotion->insert_frame(0,0.f);
+		sbMotion->insert_frame(1,(float)duration);
+	}	
+	else if (numFrames > 2 && duration > 0)// motion frame > 2
+	{
+		float deltaT = (float)duration/(numFrames-1);
+		for (int i=0;i<numFrames;i++)
+		{
+			sbMotion->insert_frame(i,deltaT*i);			
+		}
+	}
+	sbMotion->setName(name);	
+	this->addMotion(sbMotion);
+
+	return sbMotion;
+}
+
+
 SBAPI void SBAssetManager::removeMotion(SmartBody::SBMotion* motion)
 {
 	std::map<std::string, SBMotion*>::iterator iter = _motions.find(motion->getName());

@@ -49,6 +49,7 @@ class SBAssetManager : public SBObject
 	
 		SBAPI void loadMotions();
 		SBAPI bool addMotion(SmartBody::SBMotion* motion);
+		SBAPI SBMotion* addMotionDefinition(const std::string& name, double duration, int numFrames);
 		SBAPI void removeMotion(SmartBody::SBMotion* motion);
 		SBAPI void addMotions(const std::string& path, bool recursive);
 		SBAPI SBMotion* createMotion(const std::string& motionName);

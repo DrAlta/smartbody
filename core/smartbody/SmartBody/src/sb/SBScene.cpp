@@ -3960,25 +3960,8 @@ SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double dur
 		LOG("DEPRECATED: Use AssetManager.addSkeletonDefinition() instead.");
 	
 	SBMotion* sbMotion = new SBMotion();
-	this->getAssetManager()->addMotion(sbMotion);
-	if (numFrames <= 2 && duration > 0)
-	{
-		sbMotion->insert_frame(0,0.f);
-		sbMotion->insert_frame(1,(float)duration);
-	}	
-	else if (numFrames > 2 && duration > 0)// motion frame > 2
-	{
-		float deltaT = (float)duration/(numFrames-1);
-		for (int i=0;i<numFrames;i++)
-		{
-			sbMotion->insert_frame(i,deltaT*i);			
-		}
-	}
-	sbMotion->setName(motionName);	
-	
-	return sbMotion;
+	return this->getAssetManager()->addMotionDefinition(motionName, duration, numFrames);
 }
-
 
 SBMotion* SBScene::createMotion(const std::string& motionName)
 {
