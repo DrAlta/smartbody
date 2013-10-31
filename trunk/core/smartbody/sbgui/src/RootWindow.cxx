@@ -79,7 +79,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Character/Show Trajectory", 0, TrajectoryCB, this, NULL);	
 	menubar->add("&View/Character/Show Gesture", 0, GestureCB, this, NULL);
 	menubar->add("&View/Character/Show Joint Labels", 0, JointLabelCB, this, NULL);
-	menubar->add("&View/Character/Show Selected Character", 0, ShowSelectedCharacterCB, this, NULL);
+	menubar->add("&View/Character/Show Selected Object", 0, ShowSelectedCharacterCB, this, NULL);
 	menubar->add("&View/Pawns", 0, ShowPawns, this, NULL);
 	menubar->add("&View/Show Cameras", 0, ShowCamerasCB, this, NULL);
 	menubar->add("&View/Show Lights", 0, ShowLightsCB, this, NULL);
@@ -104,11 +104,11 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 	menubar->add("&Create/Character...", 0, CreateCharacterCB, this, NULL);
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, NULL);
-	menubar->add("&Create/Light...", 0, CreateLightCB, this, NULL);
+	menubar->add("&Create/Light", 0, CreateLightCB, this, NULL);
 	menubar->add("&Create/Camera...", 0, CreateCameraCB, this, NULL);
 	//menubar->add("&Create/Terrain...", 0, CreateTerrainCB, this, NULL); // should replace it with create navigation mesh.
 	
-	setResolutionMenuIndex = menubar->add("&Settings/Set Resolution", 0, 0, 0, FL_SUBMENU_POINTER);
+//	setResolutionMenuIndex = menubar->add("&Settings/Set Resolution", 0, 0, 0, FL_SUBMENU_POINTER);
 	menubar->add("&Settings/Default Media Path", 0, SettingsDefaultMediaPathCB, this, NULL);
 	menubar->add("&Settings/Internal Audio", 0, AudioCB, this, NULL);	
 
@@ -207,8 +207,8 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	resolutionMenuList.push_back(tempItem);
 	
 	Fl_Menu_Item* menuList = const_cast<Fl_Menu_Item*>(menubar->menu());
-	Fl_Menu_Item& resolutionSubMenu = menuList[setResolutionMenuIndex];
-	resolutionSubMenu.user_data(&resolutionMenuList[0]);
+//	Fl_Menu_Item& resolutionSubMenu = menuList[setResolutionMenuIndex];
+//	resolutionSubMenu.user_data(&resolutionMenuList[0]);
 
 	//cameraGroup->end();	
 
@@ -2131,8 +2131,8 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	Fl_Choice* resChoice = static_cast<Fl_Choice*>(widget);
 
-	int origX = rootWindow->x();
-	int origY = rootWindow->y();
+	int origX = rootWindow->fltkViewer->x();
+	int origY = rootWindow->fltkViewer->y();
 
 	size_t windowIndex = (size_t) data;	
 	
@@ -2141,7 +2141,7 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 	std::string resStr = menuItem->label();
 	if (resStr == "Default")
 	{
-		rootWindow->resize(rootWindow->x(),rootWindow->y(),800,600);
+		rootWindow->fltkViewer->resize(origX,origY,800,600);
 		return;
 	}
 	else if (resStr == "Custom...")
@@ -2161,13 +2161,20 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 
 	int width = atoi(tokens[0].c_str());
 	int height = atoi(tokens[1].c_str());
-	width += rootWindow->_leftGroup->w();
-	height += rootWindow->_leftGroup->h();
-	//std::cout << width << " " << height << std::endl;	
-	rootWindow->resize(origX, origY, width, height + 30);
-// 	rootWindow->w(width);
-// 	rootWindow->h(height);
 
+	// resize the main window
+
+	int windowX = rootWindow->x();
+	int windowY = rootWindow->y();
+	int leftX = rootWindow->_leftGroup->x();
+	int leftY = rootWindow->_leftGroup->y();
+	int leftW = rootWindow->_leftGroup->w();
+	int leftH = rootWindow->_leftGroup->h();
+
+	//std::cout << width << " " << height << std::endl;
+	rootWindow->fltkViewer->resize(rootWindow->fltkViewer->x(), rootWindow->fltkViewer->y(), width, height);
+	rootWindow->fltkViewer->damage(1);
+	rootWindow->resize(rootWindow->x(), rootWindow->y(), width + leftW + 20, height + leftH + 20);
 }
 
 void BaseWindow::SaveCameraCB( Fl_Widget* widget, void* data )
