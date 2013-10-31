@@ -759,63 +759,66 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 
 	DeformableMesh* deformMesh = meshInstance->getDeformableMesh();
 	if (!deformMesh) return NULL;
-
- 	ogreMesh->setSkeletonName(skeletonName);	
- 	ogreMesh->_notifySkeleton(ogreSkel);
-	// combine skeleton and mesh with skinning information	
-#if 0
-	for (unsigned int i=0;i<deformMesh->skinWeights.size();i++)
+	if (deformMesh->isSkinnedMesh())
 	{
-		// generate bone indices
-		SkinWeight* skinWeight = deformMesh->skinWeights[i];
-		if (deformMesh->getMesh(skinWeight->sourceMesh) == -1) continue;
-		Ogre::SubMesh* subMesh = ogreMesh->getSubMesh(skinWeight->sourceMesh);		
-		int globalCounter = 0;
-		for (unsigned int j=0;j<subMesh->vertexData->vertexCount;j++)
+ 		ogreMesh->setSkeletonName(skeletonName);	
+ 		ogreMesh->_notifySkeleton(ogreSkel);
+		// combine skeleton and mesh with skinning information	
+	#if 0
+		for (unsigned int i=0;i<deformMesh->skinWeights.size();i++)
 		{
-			Ogre::VertexBoneAssignment vba;
-			// The index of the vertex in the vertex buffer
-			vba.vertexIndex = static_cast<unsigned int>(j);			
-			for (unsigned int k=0;k<skinWeight->numInfJoints[j];k++)
-			{
-				std::string jName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];
-				vba.boneIndex = ogreSkel->getBone(jName)->getHandle();
-				vba.weight    = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
-				//if (k < 4)
-				subMesh->addBoneAssignment(vba);
-				globalCounter++;
-			}		
-		}	
-		subMesh->_compileBoneAssignments();
-	}	
-#else	
-	ogreMesh->clearBoneAssignments();
-	for (unsigned int j=0;j<ogreMesh->sharedVertexData->vertexCount;j++)
-	{
-		for (unsigned int m=0;m<1;m++)
-		{
-			for (unsigned int k=0;k<4;k++)
+			// generate bone indices
+			SkinWeight* skinWeight = deformMesh->skinWeights[i];
+			if (deformMesh->getMesh(skinWeight->sourceMesh) == -1) continue;
+			Ogre::SubMesh* subMesh = ogreMesh->getSubMesh(skinWeight->sourceMesh);		
+			int globalCounter = 0;
+			for (unsigned int j=0;j<subMesh->vertexData->vertexCount;j++)
 			{
 				Ogre::VertexBoneAssignment vba;
 				// The index of the vertex in the vertex buffer
-				vba.vertexIndex = static_cast<unsigned int>(j);							
-				int origBoneID = deformMesh->boneIDBuf[m][j][k];
-				std::string jName = deformMesh->boneJointNameList[origBoneID];
-				//vba.boneIndex = (ogreSkel->getBone(jName)->getHandle()+2)%ogreSkel->getNumBones();				o
-				vba.boneIndex = ogreSkel->getBone(jName)->getHandle();
-				//if (origBoneID != vba.boneIndex)
-				//vba.boneIndex = origBoneID;
-				vba.weight    = deformMesh->boneWeightBuf[m][j][k];			
-				if (vba.weight > 0)
+				vba.vertexIndex = static_cast<unsigned int>(j);			
+				for (unsigned int k=0;k<skinWeight->numInfJoints[j];k++)
 				{
-					ogreMesh->addBoneAssignment(vba);		
-					//LOG("jName = %s, origID = %d, ogreBoneID = %d, weight = %f",jName.c_str(),origBoneID,vba.boneIndex, vba.weight);
-				}
+					std::string jName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];
+					vba.boneIndex = ogreSkel->getBone(jName)->getHandle();
+					vba.weight    = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
+					//if (k < 4)
+					subMesh->addBoneAssignment(vba);
+					globalCounter++;
+				}		
 			}	
-		}			
-	}
-	ogreMesh->_compileBoneAssignments();	
+			subMesh->_compileBoneAssignments();
+		}	
+	#else	
+		ogreMesh->clearBoneAssignments();
+		for (unsigned int j=0;j<ogreMesh->sharedVertexData->vertexCount;j++)
+		{
+			for (unsigned int m=0;m<1;m++)
+			{
+				for (unsigned int k=0;k<4;k++)
+				{
+					Ogre::VertexBoneAssignment vba;
+					// The index of the vertex in the vertex buffer
+					vba.vertexIndex = static_cast<unsigned int>(j);							
+					int origBoneID = deformMesh->boneIDBuf[m][j][k];
+					std::string jName = deformMesh->boneJointNameList[origBoneID];
+					//vba.boneIndex = (ogreSkel->getBone(jName)->getHandle()+2)%ogreSkel->getNumBones();				o
+					vba.boneIndex = ogreSkel->getBone(jName)->getHandle();
+					//if (origBoneID != vba.boneIndex)
+					//vba.boneIndex = origBoneID;
+					vba.weight    = deformMesh->boneWeightBuf[m][j][k];			
+					if (vba.weight > 0)
+					{
+						ogreMesh->addBoneAssignment(vba);		
+						//LOG("jName = %s, origID = %d, ogreBoneID = %d, weight = %f",jName.c_str(),origBoneID,vba.boneIndex, vba.weight);
+					}
+				}	
+			}			
+		}
+		ogreMesh->_compileBoneAssignments();	
 #endif
+	}
+
 	ogreMesh->load();
 	outChar = ogreSceneMgr->createEntity(sbChar->getName(),meshName);	
 
