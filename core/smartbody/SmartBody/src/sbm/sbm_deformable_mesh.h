@@ -125,6 +125,7 @@ public:
 public:
 	SBAPI DeformableMeshInstance();
 	SBAPI virtual ~DeformableMeshInstance();
+	SBAPI void blendShapeStaticMesh();
 	SBAPI virtual void setDeformableMesh(DeformableMesh* mesh);
 	SBAPI void updateJointList();
 	SBAPI virtual void setPawn(SmartBody::SBPawn* pawn);

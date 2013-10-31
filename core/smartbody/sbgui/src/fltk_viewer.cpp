@@ -5244,6 +5244,9 @@ void FltkViewer::drawDeformableModels()
 			}
 			else
 			{
+				//meshInstance->blendShapes();
+				meshInstance->blendShapeStaticMesh();
+
 				// simply draw the static mesh
 				SrGlRenderFuncs::renderDeformableMesh(meshInstance, false);
 			}
