@@ -455,8 +455,8 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 				blendIval = 2.0f * (curViseme->time() - prevViseme->time());
 
 			// ad-hoc, blend interval should not be less than 0.1f
-			//if (blendIval < 0.2f)
-			//	blendIval = 0.2f;
+			if (blendIval < 0.2f)
+				blendIval = 0.2f;
 
 			if (diphone)
 			{
@@ -874,7 +874,9 @@ void BML::SpeechRequest::filterCurve(std::vector<float>&c, float speedLimit)
 				isZero = true;
 
 			y[i + 1] = fabs(x[i] - x[i + 1]) * speedLimit * sign + y[i];
-
+			// clamp it
+			if (y[i + 1] < 0)
+				y[i + 1]  = 0.0f;
 			if (isZero && i < (x.size() - 2))	// append one if y[i + 1] is zero
 			{
 				if ((x[i + 2] - x[i + 1]) > 0.1)	// 0.1 is adhoc
@@ -1023,8 +1025,8 @@ void BML::SpeechRequest::constrainCurve(std::vector<float>& openCurve, std::vect
 					{
 						float currPBMY = (openX[j] - otherX[k]) * (otherY[k + 1] - otherY[k]) / (otherX[k + 1] - otherX[k]) + otherY[k];
 						float constrainOpenY = ratio - currPBMY;
-						//if (constrainOpenY < 0)
-						//	constrainOpenY = 0;
+						if (constrainOpenY < 0)
+							constrainOpenY = 0;
 						if (openY[j] > constrainOpenY)
 							openY[j] = constrainOpenY;
 					}
@@ -1040,8 +1042,8 @@ void BML::SpeechRequest::constrainCurve(std::vector<float>& openCurve, std::vect
 					{
 						float currOpenY = (otherX[j] - openX[k]) * (openY[k + 1] - openY[k]) / (openX[k + 1] - openX[k]) + openY[k];
 						float constrainOpenY = ratio - otherY[j];
-						//if (constrainOpenY < 0)
-						//	constrainOpenY = 0;
+						if (constrainOpenY < 0)
+							constrainOpenY = 0;
 						if (currOpenY > constrainOpenY)
 						{
 							openX.insert(openX.begin() + k + 1, otherX[j]);
