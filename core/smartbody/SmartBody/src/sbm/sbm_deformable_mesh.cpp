@@ -107,8 +107,8 @@ DeformableMesh::~DeformableMesh()
 
 void DeformableMesh::setSkeleton(SkSkeleton* skel)
 {
-	if (skeleton)
-		skeleton->unref();
+	//if (skeleton)
+	//	skeleton->unref();
 	skeleton = skel;
 	skel->ref();
 }
@@ -726,8 +726,8 @@ DeformableMeshInstance::~DeformableMeshInstance()
 
 void DeformableMeshInstance::setPawn(SmartBody::SBPawn* pawn)
 {
-	if (_skeleton)
-		_skeleton->unref();
+	//if (_skeleton)
+	//	_skeleton->unref();
 	if (pawn)
 		_skeleton = pawn->getSkeleton();
 	if (_skeleton)
@@ -738,14 +738,16 @@ void DeformableMeshInstance::setPawn(SmartBody::SBPawn* pawn)
 
 void DeformableMeshInstance::cleanUp()
 {
+#if 0
 	for (unsigned int i = 0; i < dynamicMesh.size(); i++)
 	{
 
 		//SmartBody::SBScene::getScene()->getRootGroup()->remove(dynamicMesh[i]);
-		dynamicMesh[i]->unref();		
+		//dynamicMesh[i]->unref();		
 		//delete dynamicMesh[i];
 	}
 	dynamicMesh.clear();
+#endif
 }
 
 void DeformableMeshInstance::blendShapes()
@@ -954,6 +956,7 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 	_mesh = mesh;
 	cleanUp(); // remove all previous dynamic mesh
 	_mesh->buildSkinnedVertexBuffer(); // make sure the deformable mesh has vertex buffer
+#if 0
 	for (unsigned int i=0;i<_mesh->dMeshStatic_p.size();i++)
 	{
 		SrSnModel* srSnModel = _mesh->dMeshStatic_p[i];
@@ -966,7 +969,8 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 		srSnModelDynamic->ref();
 		//LOG("rootGroup add mesh %d, vtx = %d, face = %d",i, dynamicMesh[i]->shape().V.size(), dynamicMesh[i]->shape().F.size());
 		//SmartBody::SBScene::getScene()->getRootGroup()->add(dynamicMesh[i]);
-	}	
+	}
+#endif
 	_deformPosBuf.resize(_mesh->posBuf.size()); // initialized deformation posBuffer
 	for (unsigned int i=0;i<_deformPosBuf.size();i++)
 		_deformPosBuf[i] = _mesh->posBuf[i];
@@ -996,8 +1000,8 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 {
 	if (deformableMesh != -1)
 	{
-		for (unsigned int i = 0; i < dynamicMesh.size(); i++)
-			dynamicMesh[i]->visible(deformableMesh? true:false );
+		//for (unsigned int i = 0; i < dynamicMesh.size(); i++)
+		//	dynamicMesh[i]->visible(deformableMesh? true:false );
 		_updateMesh = deformableMesh? true:false;
 		meshVisible = deformableMesh? true:false;
 	}
@@ -1034,7 +1038,7 @@ void DeformableMeshInstance::update()
 		if (pos != -1)
 		{
 			SrSnModel* dMeshStatic = _mesh->dMeshStatic_p[pos];
-			SrSnModel* dMeshDynamic = dynamicMesh[pos];
+			//SrSnModel* dMeshDynamic = dynamicMesh[pos];
 			int numVertices = dMeshStatic->shape().V.size();
 			for (int i = 0; i < numVertices; i++)
 			{
@@ -1100,7 +1104,7 @@ void DeformableMeshInstance::update()
 					
 			}
 #endif
-			dMeshDynamic->changed(true);	
+			//dMeshDynamic->changed(true);	
 		}
 		else
 			continue;

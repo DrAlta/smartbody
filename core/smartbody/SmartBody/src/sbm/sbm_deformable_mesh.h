@@ -111,7 +111,7 @@ class DeformableMeshInstance
 {
 protected:
 	DeformableMesh* _mesh;
-	std::vector<SrSnModel*>	dynamicMesh; 
+	//std::vector<SrSnModel*>	dynamicMesh; 
 	SkSkeleton*				_skeleton;
 	SmartBody::SBCharacter*	_character;		// pointer to current character
 	bool				  _updateMesh;
