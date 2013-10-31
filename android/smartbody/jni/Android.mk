@@ -293,6 +293,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sr/sr_polygon.cpp \
 	$(SBM_MY_DIR)/sr/sr_polygons.cpp \
 	$(SBM_MY_DIR)/sr/sr_quat.cpp \
+	$(SBM_MY_DIR)/sr/sr_random.cpp \
 	$(SBM_MY_DIR)/sr/sr_sa_bbox.cpp \
 	$(SBM_MY_DIR)/sr/sr_sa.cpp \
 	$(SBM_MY_DIR)/sr/sr_sa_event.cpp \
@@ -512,7 +513,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/MiniBrain.cpp \
 	$(SBM_MY_DIR)/sb/SBBehavior.cpp \
 	$(SBM_MY_DIR)/sbm/ParserBVH.cpp \
-	$(SBM_MY_DIR)/sbm/ParserASFAMC.cpp \
+	$(SBM_MY_DIR)/sbm/ParserASFAMC.cxx \
 	$(SBM_MY_DIR)/sb/SBBoneBusManager.cpp \
 	$(SBM_MY_DIR)/sb/SBGestureMapManager.cpp \
 	$(SBM_MY_DIR)/sb/SBGestureMap.cpp \
@@ -542,10 +543,12 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerCOLLADA.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerSk.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerSkm.cpp \
+    $(SBM_MY_DIR)/sb/SBAssetHandlerAmc.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerAsf.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerOgre.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerObj.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerBvh.cpp \
+    $(SBM_MY_DIR)/sb/SBAssetHandlerSkb.cpp \
 	$(SBM_MY_DIR)/sb/smartbody-dll.cpp \
         $(SBM_MY_DIR)/sb/smartbody-c-dll.cpp
 
