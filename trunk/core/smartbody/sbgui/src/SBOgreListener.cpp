@@ -4,6 +4,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
 #include <sb/SBAttribute.h>
+#include <sbm/sbm_deformable_mesh.h>
 
 #ifdef INTMAX_C 
 #undef INTMAX_C
@@ -41,7 +42,17 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	SBCharacter* sbChar = SBScene::getScene()->getCharacter(name);
 
 	//if (!sbChar) return; // no smartbody character exist ?
-	if (!sbChar) isPawn = true;
+	if (!sbChar) 
+	{
+		isPawn = true;
+	}
+// 	else
+// 	{
+// 		if (sbChar->dMeshInstance_p && sbChar->dMeshInstance_p->isStaticMesh())
+// 		{
+// 			isPawn = true;
+// 		}
+// 	}
 
 	//std::string logMsg = "Character " + name ;
 	//LogManager::getSingleton().logMessage(logMsg.c_str());
@@ -132,17 +143,20 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 		{
 			// insert into character list
 			Ogre::Skeleton* skel = ent->getSkeleton();	
-			if (!skel) return; // this should not happen at all ?
+			//if (!skel) return; // this should not happen at all ?
 			frameListener->m_characterList.push_back(name);
 			// get intial bone position for every character
-			for (int i = 0; i < skel->getNumBones(); i++)
+			if (skel)
 			{
-				Bone* bone = skel->getBone(i);
-				intialBonePositions.insert(std::make_pair(bone->getName(), bone->getPosition()));
-				frameListener->m_validJointNames.insert(bone->getName());
+				for (int i = 0; i < skel->getNumBones(); i++)
+				{
+					Bone* bone = skel->getBone(i);
+					intialBonePositions.insert(std::make_pair(bone->getName(), bone->getPosition()));
+					frameListener->m_validJointNames.insert(bone->getName());
 
-			}
-			frameListener->m_initialBonePositions.insert(std::make_pair(name, intialBonePositions));
+				}
+				frameListener->m_initialBonePositions.insert(std::make_pair(name, intialBonePositions));
+			}			
 		}		
 	}
 

@@ -303,7 +303,7 @@ public:
 		SR_ASSERT( _state!=REMAPPING );  // simple lock
 		if( _skeletonName==entityName ) {
 			_skeletonName = "";
-			_skeleton->unref();
+			//_skeleton->unref();
 			_skeleton = NULL;
 		}
 	}
