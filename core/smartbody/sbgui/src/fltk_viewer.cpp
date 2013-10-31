@@ -4026,6 +4026,7 @@ void FltkViewer::drawKinematicFootprints(int index)
 	}
 #endif
 	glDisable(GL_LIGHTING);
+	glDisable(GL_COLOR_MATERIAL);
 	SmartBody::SBCharacter* curChar = dynamic_cast<SmartBody::SBCharacter*>(getCurrentCharacter());
 	if (!curChar) return;
 	SrVec faceDir = curChar->getFacingDirection();
@@ -5199,6 +5200,13 @@ void FltkViewer::drawText( const SrMat& mat, float textSize, std::string &text )
 void FltkViewer::resetViewer()
 {
 	_data->setupData();
+
+	// clear object selection
+
+	_objManipulator.set_selected_pawn(NULL);
+	if (_objManipulator.get_active_control())
+		_objManipulator.get_active_control()->detach_pawn();
+	_objManipulator.removeActiveControl();
 }
 
 void FltkViewer::updateOptions()
