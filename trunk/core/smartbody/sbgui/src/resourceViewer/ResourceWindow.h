@@ -12,8 +12,10 @@
 #include <sb/SBSceneListener.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBJointMap.h>
+#include <sb/SBScript.h>
 #include <sb/SBGestureMap.h>
 #include <sb/SBAnimationState.h>
+#include <sb/SBBehaviorSet.h>
 #include <sb/SBAnimationTransition.h>
 #include <sbm/GenericViewer.h>
 #include <sbm/sbm_deformable_mesh.h>
@@ -93,6 +95,7 @@ class ResourceWindow : public Fl_Group, public SmartBody::SBObserver, public SBW
 
 		void updatePath(Fl_Tree_Item* tree, const std::vector<std::string>& pathList);
 		void updateScriptFiles(Fl_Tree_Item* tree, std::string pathName);
+		void updateScript(Fl_Tree_Item* tree, SmartBody::SBScript* script);
 		void updateSkeleton(Fl_Tree_Item* tree, SmartBody::SBSkeleton* skel);
 		void updateJointMap(Fl_Tree_Item* tree, SmartBody::SBJointMap* jointMap);
 		void updateGestureMap(Fl_Tree_Item* tree, SmartBody::SBGestureMap* gestureMap);
@@ -107,6 +110,7 @@ class ResourceWindow : public Fl_Group, public SmartBody::SBObserver, public SBW
 		void updatePhysicsManager(Fl_Tree_Item* tree, SmartBody::SBPhysicsManager* phyService);
 		void updateFaceDefinition(Fl_Tree_Item* tree, SmartBody::SBFaceDefinition* faceDefinition);
 		void updateEventHandler(Fl_Tree_Item* tree, SmartBody::SBEventHandler* handler);
+		void updateBehaviorSet(Fl_Tree_Item* tree, SmartBody::SBBehaviorSet* behaviorSet);
 		bool processedDragAndDrop(std::string& dndText);
 };
 

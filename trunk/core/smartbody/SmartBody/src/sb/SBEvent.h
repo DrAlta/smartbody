@@ -26,16 +26,21 @@ class SBEvent
 class SBEventHandler : public SBObject
 {
 	public:
-		SBAPI SBEventHandler() : m_type(""), m_action("") {}
+		SBAPI SBEventHandler();
 		SBAPI ~SBEventHandler() {}
+
+		SBAPI void setEnable(bool val);
+		SBAPI bool isEnable();
 
 	//	void setType(const std::string& type) { m_type = type; }
 	//	const std::string& getType() { return m_type; }
 		SBAPI virtual void executeAction(SBEvent* event) {}
+		SBAPI virtual void notify(SBSubject* subject);
 
 	protected:
 		std::string m_type;
 		std::string m_action;
+		bool _enabled;
 };
 
 class SBBasicHandler : public SBEventHandler
@@ -45,6 +50,7 @@ class SBBasicHandler : public SBEventHandler
 		SBAPI void setAction(const std::string& action);
 		SBAPI const std::string& getAction();
 		SBAPI virtual void executeAction(SBEvent* event);
+		SBAPI void notify(SBSubject* subject);
 };
 
 typedef std::map<std::string, SBEventHandler*> SBEventHandlerMap;
