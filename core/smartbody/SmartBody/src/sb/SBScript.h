@@ -15,6 +15,8 @@ class SBScript : public SBAsset
 		SBAPI virtual void setEnable(bool val);
 		SBAPI virtual bool isEnable();
 
+		SBAPI virtual void SBScript::notify(SBSubject* subject);
+
 	protected:
 		bool _enabled;
 

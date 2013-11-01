@@ -851,7 +851,8 @@ void SBScene::update()
 		iter != scripts.end();
 		iter++)
 	{
-		(*iter).second->update(getSimulationManager()->getTime());
+		if ((*iter).second->isEnable())
+			(*iter).second->update(getSimulationManager()->getTime());
 	}
 
 	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
@@ -1662,6 +1663,7 @@ void SBScene::addScript(const std::string& name, SBScript* script)
 		//return;
 		_scripts.erase(iter);
 	}
+	script->setName(name);
 
 	_scripts.insert(std::pair<std::string, SBScript*>(name, script));
 }
@@ -4476,6 +4478,20 @@ std::string SBScene::getStringFromObject(SmartBody::SBObject* object)
 		return strstr.str();
 	}
 
+	SmartBody::SBScript* script = dynamic_cast<SmartBody::SBScript*>(object);
+	if (script)
+	{
+		strstr << "script/" << script->getName();
+		return strstr.str();
+	}
+
+	SmartBody::SBFaceDefinition* facedef = dynamic_cast<SmartBody::SBFaceDefinition*>(object);
+	if (facedef)
+	{
+		strstr << "facedefinition/" << facedef->getName();
+		return strstr.str();
+	}
+
 	return "";
 }
 
@@ -4495,12 +4511,12 @@ SmartBody::SBObject* SBScene::getObjectFromString(const std::string& value)
 		int prefixPos2 = suffix.find("/");
 		if (prefixPos2 == std::string::npos)
 		{
-			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(suffix);
+			SmartBody::SBCharacter* character = this->getCharacter(suffix);
 			return character;
 		}
 
 		std::string characterName = suffix.substr(0, prefixPos2);
-		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		SmartBody::SBCharacter* character = this->getCharacter(characterName);
 		if (!character)
 			return NULL;
 
@@ -4535,31 +4551,31 @@ SmartBody::SBObject* SBScene::getObjectFromString(const std::string& value)
 	}
 	else if (prefix == "pawn")
 	{
-		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(suffix);
+		SmartBody::SBPawn* pawn = this->getPawn(suffix);
 		return pawn;
 	}
 	else if (prefix == "scene")
 	{
-		return SmartBody::SBScene::getScene();
+		return this;
 	}
 	else if (prefix == "motion")
 	{
-		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(suffix);
+		SmartBody::SBMotion* motion = this->getAssetManager()->getMotion(suffix);
 		return motion;
 	}
 	else if (prefix == "skeleton")
 	{
-		SmartBody::SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(suffix);
+		SmartBody::SBSkeleton* skeleton = this->getAssetManager()->getSkeleton(suffix);
 		return skeleton;
 	}
 	else if (prefix == "service")
 	{
-		SmartBody::SBService* service = SmartBody::SBScene::getScene()->getServiceManager()->getService(suffix);
+		SmartBody::SBService* service = this->getServiceManager()->getService(suffix);
 		return service;
 	}
 	else if (prefix == "model")
 	{
-		DeformableMesh* mesh = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMesh(suffix);
+		DeformableMesh* mesh = this->getAssetManager()->getDeformableMesh(suffix);
 		return mesh;
 	}
 	else if (prefix == "controller")
@@ -4569,37 +4585,46 @@ SmartBody::SBObject* SBScene::getObjectFromString(const std::string& value)
 			return NULL;
 		std::string prefix2 = suffix.substr(0, prefixPos2 - 1);
 		std::string suffix2 = suffix.substr(prefixPos2 + 1);
-		SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(suffix);
+		SmartBody::SBCharacter* character = this->getCharacter(suffix);
 		if (!character)
 			return NULL;
 		return character->getControllerByName(suffix2);
 	}
 	else if (prefix == "jointmap")
 	{
-		SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(suffix);
+		SBJointMap* jointMap = this->getJointMapManager()->getJointMap(suffix);
 		return jointMap;
 	}
 	else if (prefix == "gesturemap")
 	{
-		SBGestureMap* gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(suffix);
+		SBGestureMap* gestureMap = this->getGestureMapManager()->getGestureMap(suffix);
 		return gestureMap;
 	}
 	else if (prefix == "eventhandler")
 	{
-		SBGestureMap* gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(suffix);
-		return gestureMap;
+		SBEventHandler* eventHandler = this->getEventManager()->getEventHandler(suffix);
+		return eventHandler;
 	}
 	else if (prefix == "blend")
 	{
-		SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(suffix);
+		SBAnimationBlend* blend = this->getBlendManager()->getBlend(suffix);
 		return blend;
 	}
 	else if (prefix == "transition")
 	{
-		SBAnimationTransition* transition = SmartBody::SBScene::getScene()->getBlendManager()->getTransitionByName(suffix);
+		SBAnimationTransition* transition = this->getBlendManager()->getTransitionByName(suffix);
 		return transition;
 	}
-
+	else if (prefix == "script")
+	{
+		SBScript* script = this->getScript(suffix);
+		return script;
+	}
+	else if (prefix == "facedefinition")
+	{
+		SBFaceDefinition* facedef = this->getFaceDefinition(suffix);
+		return facedef;
+	}
 	return NULL;
 }
 

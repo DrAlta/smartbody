@@ -211,7 +211,7 @@ TreeItemInfoWidget* AttributeEditor::createInfoWidget( int x, int y, int w, int 
 	SmartBody::SBEventHandler* eventHandler = dynamic_cast<SmartBody::SBEventHandler*>(object);
 	if (eventHandler)
 	{
-		widget = new EventItemInfoWidget(x,y,w,h,strdup(object->getName().c_str()));
+		widget = new AttributeItemWidget(eventHandler, x,y,w,h,strdup(object->getName().c_str()));
 		return widget;
 	}
 
@@ -226,6 +226,13 @@ TreeItemInfoWidget* AttributeEditor::createInfoWidget( int x, int y, int w, int 
 	if (transition)
 	{
 		widget = new BlendTransitionInfoWidget(transition, x, y, w, h, strdup(object->getName().c_str()), this);
+		return widget;
+	}
+
+	SmartBody::SBScript* script = dynamic_cast<SmartBody::SBScript*>(object);
+	if (script)
+	{
+		widget =  new AttributeItemWidget(script, x,y,w,h,strdup(object->getName().c_str()));
 		return widget;
 	}
 

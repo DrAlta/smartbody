@@ -27,6 +27,7 @@
 #include <sb/SBGestureMapManager.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBAnimationStateManager.h>
+#include <sb/SBBehaviorSetManager.h>
 #include <sb/SBGestureMap.h>
 #include <sb/nvbg.h>
 
@@ -65,7 +66,8 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Grou
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add(pathTree,"Mesh"), "mesh path"));
 
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Scene"), "scene"));
-	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Scripts"), "scripts"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Available Scripts"), "scriptfiles"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Runtime Scripts"), "script"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Skeletons"), "skeleton"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Character Maps"), "jointmap"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Gesture Maps"), "gesturemap"));
@@ -74,12 +76,12 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Grou
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Blends"), "blend"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Transitions"), "transition"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Models"), "mesh"));
-	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Face Definitions"), "face definition"));
-	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Event Handlers"), "event handler"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Face Definitions"), "facedefinition"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Event Handlers"), "eventhandler"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Pawns"), "pawn"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Characters"), "character"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Services"), "service"));
-	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Behavior Sets"), "behavior"));
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Behavior Sets"), "behaviorset"));
 	
 	resourceTree->callback(treeCallBack,this);	
 
@@ -362,11 +364,20 @@ void ResourceWindow::updateGUI()
 	// update sequence file list
 
 	const std::vector<std::string> scriptPaths = SmartBody::SBScene::getScene()->getAssetPaths("script");
-	resourceTree->clear_children(getTreeFromName("scripts"));
+	resourceTree->clear_children(getTreeFromName("scriptfiles"));
 	for (size_t p = 0; p < scriptPaths.size(); p++)
 	{
-		updateScriptFiles(getTreeFromName("scripts"), scriptPaths[p]);
+		updateScriptFiles(getTreeFromName("scriptfiles"), scriptPaths[p]);
 	}	
+
+	// update runtime scripts
+	resourceTree->clear_children(getTreeFromName("script"));
+	std::vector<std::string> scriptName = scene->getScriptNames();
+	for (size_t i = 0; i < scriptName.size(); i++)
+	{
+		SmartBody::SBScript* script = scene->getScript(scriptName[i]);
+		updateScript(getTreeFromName("script"), script);
+	}
 
 	// update skeleton
 	resourceTree->clear_children(getTreeFromName("skeleton"));
@@ -442,8 +453,9 @@ void ResourceWindow::updateGUI()
 		updateMesh(getTreeFromName("mesh"), mesh);
 	}
 
+
 	// update face definition map
-	resourceTree->clear_children(getTreeFromName("face definition"));
+	resourceTree->clear_children(getTreeFromName("facedefinition"));
 	std::vector<std::string> faceNames = scene->getFaceDefinitionNames();
 	for (size_t i = 0; i < faceNames.size(); i++)
 	{
@@ -451,7 +463,7 @@ void ResourceWindow::updateGUI()
 		SmartBody::SBFaceDefinition * face = scene->getFaceDefinition(faceNames[i]);
 		if (!face)
 			continue;
-		Fl_Tree_Item* faceTree = resourceTree->add(getTreeFromName("face definition"), face->getName().c_str());
+		Fl_Tree_Item* faceTree = resourceTree->add(getTreeFromName("facedefinition"), face->getName().c_str());
 		updateFaceDefinition(faceTree, face);
 	}
 
@@ -459,14 +471,12 @@ void ResourceWindow::updateGUI()
 	SmartBody::SBEventManager* eventManager = SmartBody::SBScene::getScene()->getEventManager();
 	SmartBody::SBEventHandlerMap& eventMap = eventManager->getEventHandlers();
 	SmartBody::SBEventHandlerMap::iterator ei;
-	resourceTree->clear_children(getTreeFromName("event handler"));
+	resourceTree->clear_children(getTreeFromName("eventhandler"));
 	for ( ei  = eventMap.begin();
 		  ei != eventMap.end();
 		  ei++)
 	{
-		std::string handlerKey = ei->first;
-		Fl_Tree_Item* handlerItem = resourceTree->add(getTreeFromName("event handler"),handlerKey.c_str());
-		updateEventHandler(handlerItem,ei->second);
+		updateEventHandler(getTreeFromName("eventhandler"), ei->second);
 	}
 	// Below are instance objects :
 
@@ -517,7 +527,19 @@ void ResourceWindow::updateGUI()
 			updatePhysicsManager(getTreeFromName("service"),phyManager);
 		else
 			updateService(getTreeFromName("service"), service);
-	}			
+	}
+
+	// update behavior sets
+	resourceTree->clear_children(getTreeFromName("behaviorset"));
+	std::map<std::string, SmartBody::SBBehaviorSet*>& behaviorSets = scene->getBehaviorSetManager()->getBehaviorSets();
+	for (std::map<std::string, SmartBody::SBBehaviorSet*>::iterator iter = behaviorSets.begin();
+		 iter != behaviorSets.end();
+		 iter++)
+	{
+		SmartBody::SBBehaviorSet* behaviorSet = (*iter).second;
+		updateBehaviorSet(getTreeFromName("behaviorset"), behaviorSet);
+	}
+
 
 	_dirty = false;
 
@@ -644,6 +666,16 @@ void ResourceWindow::updatePath( Fl_Tree_Item* tree, const std::vector<std::stri
 	}	
 }
 
+void ResourceWindow::updateBehaviorSet( Fl_Tree_Item* tree, SmartBody::SBBehaviorSet* behaviorSet )
+{
+	Fl_Tree_Item* item = resourceTree->add(tree, behaviorSet->getName().c_str());
+}
+
+void ResourceWindow::updateScript( Fl_Tree_Item* tree, SmartBody::SBScript* script )
+{
+	Fl_Tree_Item* item = resourceTree->add(tree, script->getName().c_str());
+}
+
 void ResourceWindow::updateScriptFiles( Fl_Tree_Item* tree, std::string pname )
 {	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -702,8 +734,7 @@ void ResourceWindow::updateGestureMap( Fl_Tree_Item* tree, SmartBody::SBGestureM
 
 void ResourceWindow::updateEventHandler( Fl_Tree_Item* tree, SmartBody::SBEventHandler* handler )
 {
-	//Fl_Tree_Item* item = resourceTree->add(tree,(handler->getType() + ":" + "\""+ handler->getAction() + "\"").c_str());
-	//item->user_data((void*)ITEM_EVENT_HANDLERS);
+	Fl_Tree_Item* item = resourceTree->add(tree, handler->getName().c_str());
 }
 
 void ResourceWindow::updateSkeleton( Fl_Tree_Item* tree, SmartBody::SBSkeleton* skel )
