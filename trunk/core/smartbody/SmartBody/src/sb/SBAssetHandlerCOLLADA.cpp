@@ -74,6 +74,14 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			else
 				assets.push_back(skeleton);
 
+
+			rapidxml::xml_node<>* skmNode = ParserCOLLADAFast::getNode("library_animations", colladaNode, 0, 1);
+			if (skmNode)
+			{
+				ParserCOLLADAFast::parseLibraryAnimations(skmNode, *skeleton, *motion, 1.0, order, false);
+			}
+		
+
 			if (motion->getNumFrames() == 0)
 				delete motion;
 			else
