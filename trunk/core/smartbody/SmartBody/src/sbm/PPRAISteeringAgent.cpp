@@ -74,6 +74,7 @@ PPRAISteeringAgent::PPRAISteeringAgent(SmartBody::SBCharacter* c) : SmartBody::S
 	prevYaw = 0.0f;
 	collisionTime = 0.f;
 
+	turningEpsilon = 1.f;
 	inControl = true;
 
 	fastInitial = false;
@@ -140,6 +141,9 @@ void PPRAISteeringAgent::addSteeringAttributes()
 
 	if (!character->hasAttribute("steering.distDownThreshold"))
 		character->createDoubleAttribute("steering.distDownThreshold", .3f, true, "steering", 300, false, false, false, ""); 
+
+	if (!character->hasAttribute("steering.turningEpsilon"))
+		character->createDoubleAttribute("steering.turningEpsilon", 2.f, true, "steering", 305, false, false, false, ""); 
 
 	if (!character->hasAttribute("steering.brakingGain"))
 		character->createDoubleAttribute("steering.brakingGain", 1.2f, true, "steering", 310, false, false, false, ""); 
@@ -261,6 +265,11 @@ void PPRAISteeringAgent::initSteerParams()
 	else
 		distDownThreshold = 0.3f;
 
+	if (character && character->hasAttribute("steering.turingEpsilon"))
+		turningEpsilon = (float) character->getDoubleAttribute("steering.turingEpsilon");
+	else
+		turningEpsilon = 2.f;
+
 	if (character && character->hasAttribute("steering.brakingGain"))
 		brakingGain = (float) character->getDoubleAttribute("steering.brakingGain");
 	else
@@ -378,22 +387,29 @@ SrVec PPRAISteeringAgent::getCollisionFreeGoal( SrVec targetPos, SrVec curPos )
 	scaleCurPos.y = 0.f;
 	scaleTarget.y = 0.f;
 	
-	SteerSuiteEngineDriver* driver = manager->getEngineDriver();	
-	float penetrationDeth = driver->collisionPenetration(newGoal, agent->radius(), agent);
-	float dist = (scaleTarget-scaleCurPos).len();
-	SrVec dir = (scaleCurPos-scaleTarget);
-	dir.normalize();
-	// not move at all if the agent is close to target and there are obstacles on the way.
-	if (penetrationDeth > 0.f && dist <= agent->radius()) 
-		return scaleCurPos;
-
-	// if there are obstacles in target position, setting the new target closer to agent and test again
-	while (penetrationDeth > 0.f && dist > agent->radius())
+	try 
 	{
-		float offset = min(penetrationDeth+0.2f,agent->radius());
-		newGoal = newGoal + dir*offset;
-		penetrationDeth = driver->collisionPenetration(newGoal, agent->radius(), agent);
-		dist -= offset;
+		SteerSuiteEngineDriver* driver = manager->getEngineDriver();	
+		float penetrationDeth = driver->collisionPenetration(newGoal, agent->radius(), agent);
+		float dist = (scaleTarget-scaleCurPos).len();
+		SrVec dir = (scaleCurPos-scaleTarget);
+		dir.normalize();
+		// not move at all if the agent is close to target and there are obstacles on the way.
+		if (penetrationDeth > 0.f && dist <= agent->radius()) 
+			return scaleCurPos;
+
+		// if there are obstacles in target position, setting the new target closer to agent and test again
+		while (penetrationDeth > 0.f && dist > agent->radius())
+		{
+			float offset = min(penetrationDeth+0.2f,agent->radius());
+			newGoal = newGoal + dir*offset;
+			penetrationDeth = driver->collisionPenetration(newGoal, agent->radius(), agent);
+			dist -= offset;
+		}
+	}
+	catch  (std::exception &e) 
+	{
+		LOG("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
 	}
 
 	return newGoal;
@@ -430,68 +446,76 @@ void PPRAISteeringAgent::evaluate(double dtime)
 	if (!agent)
 		return;
 
+	
 	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 	//mcu.mark("Steering",0,"Evaluate");
-	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
-	int numGoals = goalQueue.size();
-
-	// make sure the character is within the grid
-	if (!pathFollowing && manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(x * scene->getScale(), z * scene->getScale()) == -1)
+	int numGoals;
+	try 
 	{
-		if (numGoals > 0)
+		const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
+		numGoals = goalQueue.size();
+
+		// make sure the character is within the grid
+		if (!pathFollowing && manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(x * scene->getScale(), z * scene->getScale()) == -1)
 		{
-			LOG("Character %s is out of range of grid (%f, %f). All goals will be cancelled.", character->getName().c_str(), x * scene->getScale(), z * scene->getScale());
+			if (numGoals > 0)
+			{
+				LOG("Character %s is out of range of grid (%f, %f). All goals will be cancelled.", character->getName().c_str(), x * scene->getScale(), z * scene->getScale());
+				agent->clearGoals();
+				sendLocomotionEvent("failure");
+			}
+		}
+
+		if (numGoals == 0) {
+			newSpeed = 0.0f;
+		}
+
+		if (goalList.size() != 0 && numGoals == 0)
+		{
+			float goalx = goalList.front();
+			goalList.pop_front();
+			float goaly = goalList.front();
+			goalList.pop_front();
+			float goalz = goalList.front();
+			goalList.pop_front();
 			agent->clearGoals();
-			sendLocomotionEvent("failure");
+			SrVec newGoal = getCollisionFreeGoal(SrVec(goalx,goaly,goalz)*scene->getScale(),curSteerPos*scene->getScale());		
+
+			//LOG("original goal = %f %f %f, new goal = %f %f %f",goalx,goaly,goalz, newGoal.x*100.f, newGoal.y*100.f, newGoal.z*100.f);
+			SteerLib::AgentGoalInfo goal;		
+			goal.desiredSpeed = desiredSpeed;
+			goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
+			goal.targetIsRandom = false;
+			//goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
+			// compute a collision free goal toward the target
+			goal.targetLocation = Util::Point(newGoal.x , 0.0f, newGoal.z);
+			// make sure that the desired goal is within the bounds of the steering grid
+			if (!pathFollowing && manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(goal.targetLocation.x, goal.targetLocation.z) == -1)
+			{
+				LOG("Goal (%f, %f) for character %s is out of range of grid.", goal.targetLocation.x, goal.targetLocation.z, character->getName().c_str());
+			}
+			else
+			{
+				agent->addGoal(goal);
+			}
 		}
+		numGoals = goalQueue.size();
 	}
-
-	if (numGoals == 0) {
-		newSpeed = 0.0f;
-	}
-
-	if (goalList.size() != 0 && numGoals == 0)
+	catch  (std::exception &e) 
 	{
-		float goalx = goalList.front();
-		goalList.pop_front();
-		float goaly = goalList.front();
-		goalList.pop_front();
-		float goalz = goalList.front();
-		goalList.pop_front();
-		agent->clearGoals();
-		SrVec newGoal = getCollisionFreeGoal(SrVec(goalx,goaly,goalz)*scene->getScale(),curSteerPos*scene->getScale());		
-
-		//LOG("original goal = %f %f %f, new goal = %f %f %f",goalx,goaly,goalz, newGoal.x*100.f, newGoal.y*100.f, newGoal.z*100.f);
-		SteerLib::AgentGoalInfo goal;		
-		goal.desiredSpeed = desiredSpeed;
-		goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
-		goal.targetIsRandom = false;
-		//goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
-		// compute a collision free goal toward the target
-		goal.targetLocation = Util::Point(newGoal.x , 0.0f, newGoal.z);
-		// make sure that the desired goal is within the bounds of the steering grid
-		if (!pathFollowing && manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(goal.targetLocation.x, goal.targetLocation.z) == -1)
-		{
-			LOG("Goal (%f, %f) for character %s is out of range of grid.", goal.targetLocation.x, goal.targetLocation.z, character->getName().c_str());
-		}
-		else
-		{
-			agent->addGoal(goal);
-		}
+		LOG("Exception '%s' occurs at PPRAISteeringAgent::evaluate",e.what());
 	}
+	
 
-	numGoals = goalQueue.size();
+	
 
 	// Update Steering Engine (position, orientation, scalar speed)
 	Util::Point newPosition(x * scene->getScale(), 0.0f, z * scene->getScale());
 	Util::Vector newOrientation = Util::rotateInXZPlane(Util::Vector(0.0f, 0.0f, 1.0f), yaw * float(M_PI) / 180.0f);
 	static float accumTime = 0.f;
 	try {
-		//if (accumTime > 0.1f)
-		{
-			agent->updateAgentState(newPosition, newOrientation, newSpeed);
-			//accumTime -= 0.1f;
-		}		
+			
+		agent->updateAgentState(newPosition, newOrientation, newSpeed);				
 		//accumTime += dt;
 		agent->updateAI((float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), dt, _curFrame++);
 	} catch (Util::GenericException& ge) {
@@ -510,12 +534,24 @@ void PPRAISteeringAgent::evaluate(double dtime)
 			}
 		}
 	}
-	int remainingGoals = goalQueue.size();
-	if (remainingGoals < numGoals)
+
+
+	try 
 	{
-		// AI satisfied the goals, send message
-		sendLocomotionEvent("success");
+		const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
+
+		int remainingGoals = goalQueue.size();
+		if (remainingGoals < numGoals)
+		{
+			// AI satisfied the goals, send message
+			sendLocomotionEvent("success");
+		}
 	}
+	catch  (std::exception &e) 
+	{
+		LOG("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
+	}
+	
 
 	
 	// Prepare Data
@@ -537,7 +573,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 				goal.targetLocation = Util::Point(x1 * scene->getScale(), 0.0f, (z1 * scene->getScale() - 1.0f * scene->getScale()));
 			else 
 				goal.targetLocation = Util::Point(x1 * scene->getScale(), 0.0f, z1 * scene->getScale());
-
+			
 			agent->addGoal(goal);
 		}
 	}
@@ -571,7 +607,16 @@ void PPRAISteeringAgent::evaluate(double dtime)
 		}
 	}
 
-	_numSteeringGoal = goalQueue.size();
+	try 
+	{
+		const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
+		_numSteeringGoal = goalQueue.size();
+	}
+	catch  (std::exception &e) 
+	{
+		LOG("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
+	}
+	
 
 	//mcu.mark("Steering");
 }
@@ -1061,6 +1106,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 	
 
 	//*** IMPORTANT: use the example-based animation to update the steering agent
+
 	forward = agent->forward();
 	rightSide = rightSideInXZPlane(forward);
 
@@ -1115,59 +1161,70 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 
 	rightSide = rightSideInXZPlane(newForward);
 
-	pprAgent->updateDesiredForward(forward);
-	// WJ added end
-	//---------------------------------------------------------------------------
-
 	bool sentLocomotionEvent = false;
 	bool reachTarget = false;
 	float agentToTargetDist = 0.0f;
 	SrVec agentToTargetVec;
 	float distToTarget = -1;
-	if (goalQueue.size() > 0)
+	
+	try 
 	{
-		targetLoc.x = goalQueue.front().targetLocation.x;
-		targetLoc.y = goalQueue.front().targetLocation.y;
-		targetLoc.z = goalQueue.front().targetLocation.z;
+		pprAgent->updateDesiredForward(forward);
 
-		distToTarget = sqrt((x * scene->getScale() - targetLoc.x) * (x * scene->getScale() - targetLoc.x) + 
-							(z * scene->getScale() - targetLoc.z) * (z * scene->getScale() - targetLoc.z));
-
-		if (distToTarget < agent->radius()*10.f)
+		// WJ added end
+		//---------------------------------------------------------------------------		
+		if (goalQueue.size() > 0)
 		{
-			SmartBody::SBSteerManager* manager = scene->getSteerManager();
-			SteerSuiteEngineDriver* driver = manager->getEngineDriver();	
-			float penetration = driver->collisionPenetration(targetLoc,agent->radius(),agent);		
-			if (penetration > 0) 
-				collisionTime += dt;
-			else
-				collisionTime = 0;
+			targetLoc.x = goalQueue.front().targetLocation.x;
+			targetLoc.y = goalQueue.front().targetLocation.y;
+			targetLoc.z = goalQueue.front().targetLocation.z;
+			distToTarget = sqrt((x * scene->getScale() - targetLoc.x) * (x * scene->getScale() - targetLoc.x) + 
+				(z * scene->getScale() - targetLoc.z) * (z * scene->getScale() - targetLoc.z));
 
-			if (penetration > 0.f && collisionTime > 1.f) // if the current target become blocked
+			if (distToTarget < agent->radius()*10.f)
 			{
-				SrVec newTarget = getCollisionFreeGoal(targetLoc, curSteerPos*scene->getScale());
-				agent->clearGoals();
-				SteerLib::AgentGoalInfo goal;
-				goal.desiredSpeed = desiredSpeed;
-				goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
-				goal.targetIsRandom = false;
-				//goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
-				goal.targetLocation = Util::Point(newTarget.x, 0.0f, newTarget.z);
-				//LOG("agent %s, newTarget = %f %f %f",character->getName().c_str(),newTarget.x, newTarget.y,newTarget.z);
-				agent->addGoal(goal);
-				collisionTime = 0;
-			}		
-		}
-		
+				SmartBody::SBSteerManager* manager = scene->getSteerManager();
+				SteerSuiteEngineDriver* driver = manager->getEngineDriver();	
+				float penetration = driver->collisionPenetration(targetLoc,agent->radius(),agent);		
+				if (penetration > 0) 
+					collisionTime += dt;
+				else
+					collisionTime = 0;
 
-		if (distToTarget < distDownThreshold)
-		{
-			getAgent()->clearGoals();
-			sendLocomotionEvent("success");
-			sentLocomotionEvent = true;
-			//LOG("dist close to target. stop locomotion");
+				if (penetration > 0.f && collisionTime > 1.f) // if the current target become blocked
+				{
+					SrVec newTarget = getCollisionFreeGoal(targetLoc, curSteerPos*scene->getScale());
+					agent->clearGoals();
+					SteerLib::AgentGoalInfo goal;
+					goal.desiredSpeed = desiredSpeed;
+					goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
+					goal.targetIsRandom = false;
+					//goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
+					goal.targetLocation = Util::Point(newTarget.x, 0.0f, newTarget.z);
+					//LOG("agent %s, newTarget = %f %f %f",character->getName().c_str(),newTarget.x, newTarget.y,newTarget.z);
+					agent->addGoal(goal);
+					collisionTime = 0;
+				}		
+			}
+
+
+			if (distToTarget < distDownThreshold)
+			{
+				getAgent()->clearGoals();
+				sendLocomotionEvent("success");
+				sentLocomotionEvent = true;
+				//LOG("dist close to target. stop locomotion");
+			}
 		}
 	}
+	catch  (std::exception &e) 
+	{
+		LOG("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
+	}
+	
+
+	
+	
 	int numGoals = goalQueue.size();
 	if (numGoals == 0)
 	{
@@ -1396,6 +1453,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 				}
 			}
 			curSpeed = curSpeed * scene->getScale();
+
 			if (steeringCommand.aimForTargetSpeed)
 			{
 				if (fabs(curSpeed - targetSpeed) > speedThreshold)
@@ -1423,23 +1481,26 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 			float angleDiff = angleGlobal - yaw;
 			normalizeAngle(angleDiff);
 			
-			targetAngleDiff = angleDiff;
-			float addOnTurning = angleDiff * paLocoAngleGain;
-			if (fabs(curTurningAngle - addOnTurning) > angleSpeedThreshold)
+			if (fabs(angleDiff) > turningEpsilon)
 			{
-				if (curTurningAngle < addOnTurning)
+				targetAngleDiff = angleDiff;
+				float addOnTurning = angleDiff * paLocoAngleGain;
+				if (fabs(curTurningAngle - addOnTurning) > angleSpeedThreshold)
 				{
-					curTurningAngle += angleAcceleration * dt;
-					if (curTurningAngle > addOnTurning)
-						curTurningAngle = addOnTurning;
-				}
-				else if (curTurningAngle > addOnTurning)
-				{					
-					curTurningAngle -= angleAcceleration * dt;
 					if (curTurningAngle < addOnTurning)
-						curTurningAngle = addOnTurning;
+					{
+						curTurningAngle += angleAcceleration * dt;
+						if (curTurningAngle > addOnTurning)
+							curTurningAngle = addOnTurning;
+					}
+					else if (curTurningAngle > addOnTurning)
+					{					
+						curTurningAngle -= angleAcceleration * dt;
+						if (curTurningAngle < addOnTurning)
+							curTurningAngle = addOnTurning;
+					}
 				}
-			}
+			}			
 			// update locomotion state
 			newSpeed = curSpeed;
 			curSpeed = curSpeed / scene->getScale();
