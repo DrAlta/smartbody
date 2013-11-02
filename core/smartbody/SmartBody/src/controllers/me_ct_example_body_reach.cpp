@@ -46,6 +46,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 	reachVelocityScale = 1.f; 
 	desireLinearVel = -1.f;
 	desireGrabSpeed = -1.f;
+	setDefaultAttributeGroupPriority("Reaching", 220);
 	addDefaultAttributeFloat("reach.autoReturnDuration",-1.f, "Reaching", &autoReturnDuration);
 	addDefaultAttributeFloat("reach.velocityScale",1.f,"Reaching", &reachVelocityScale);
 	addDefaultAttributeBool("reach.footIK",true, "Reaching", &footIKFix);

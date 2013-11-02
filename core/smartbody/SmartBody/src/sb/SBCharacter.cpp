@@ -52,6 +52,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	setAttributeGroupPriority("Speech", 205);
 	setAttributeGroupPriority("Retargeting", 210);
 	setAttributeGroupPriority("Reaching", 220);
+	setAttributeGroupPriority("Remote", 800);
 	setAttributeGroupPriority("Baldi Lip Sync", 2000);
 
 	createBoolAttribute("useCustomizedLipSyncIfPresent", true, true, "Lip Sync", 60, false, false, false, "If motion name exists inside pre-recorded audio file bml, use it by default"); 
