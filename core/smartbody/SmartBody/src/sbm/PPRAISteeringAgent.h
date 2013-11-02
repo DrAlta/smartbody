@@ -128,6 +128,7 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 		float acceleration;
 		float scootAcceleration;
 		float angleAcceleration;
+		float turningEpsilon;		
 		SrVec targetLoc;
 		bool stepAdjust;
 		float pedMaxTurningRateMultiplier;
