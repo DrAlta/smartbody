@@ -29,6 +29,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBCharacter.h>
+#include <sb/SBAttributeManager.h>
 
 using namespace gwiz;
 std::string MeCtSaccade::CONTROLLER_TYPE = "Saccade";
@@ -80,6 +81,8 @@ void MeCtSaccade::initAttributes()
 {
 	if (!_attributeInitialized)
 	{
+		SmartBody::SBAttributeGroup* group = _character->getAttributeManager()->getGroup("Saccade", true);
+		group->setPriority(700);
 		// Data from papar "eyes alive" - listening mode
 		_character->createDoubleAttribute("saccade.listening.percentage0", 15.54f, true, "Saccade", 2, false, false, false, "listening mode, percentage bin for 0 degree.");
 		_character->createDoubleAttribute("saccade.listening.percentage45", 6.46f, true, "Saccade", 3, false, false, false, "listening mode, percentage bin for 45 degree.");

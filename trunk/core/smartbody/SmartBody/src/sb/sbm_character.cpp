@@ -538,8 +538,11 @@ void SbmCharacter::createStandardControllers()
 		for (size_t a = 0; a < defaultAttributes.size(); a++)
 		{
 			SmartBody::SBAttribute* attribute = defaultAttributes[a].first;
+			int groupPriority = attribute->getAttributeInfo()->getGroup()->getPriority();
 			SmartBody::SBAttribute* attributeCopy = attribute->copy();
 			this->addAttribute(attributeCopy, attribute->getAttributeInfo()->getGroup()->getName());
+			// make sure the group's priority is set properly
+			attributeCopy->getAttributeInfo()->getGroup()->setPriority(groupPriority);
 			// if the controller isn't a scheduler, then add the controller as an observer
 			MeCtScheduler2* scheduler = dynamic_cast<MeCtScheduler2*>(controller);
 			if (!scheduler)
