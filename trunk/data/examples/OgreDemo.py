@@ -8,7 +8,7 @@ scene.setScale(0.1)
 # Add asset paths
 
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'mesh/Ogre')
+scene.addAssetPath('motion', 'Sinbad')
 scene.addAssetPath('script', 'scripts')
 scene.addAssetPath('script', 'behaviorsets')
 scene.loadAssets()

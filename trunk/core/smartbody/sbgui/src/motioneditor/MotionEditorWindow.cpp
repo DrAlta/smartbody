@@ -450,7 +450,7 @@ void MotionEditorWindow::OnButtonGazeAt(Fl_Widget* widget, void* data)
    {
       for (int i = 1; i < editor->_choiceCharacterList->size() - 1; i++) // start at 1 to get past *
       {
-         editor->GazeAt(editor->_choiceCharacterList->text(i), editor->_choiceGazeTargetList->text());
+         editor->GazeAt("*", editor->_choiceGazeTargetList->text());
       }
    }
    else
