@@ -100,6 +100,7 @@ void SkChannelArray::_add ( SkJoint* j, std::string name, SkChannel::Type t, boo
 		_channelMap.insert(std::pair<std::string, std::map<SkChannel::Type, int> >(name, typeMap));
 		_floats += SkChannel::size(t);
 	}
+	_dirty = true;
 }
 
 bool SkChannelArray::insert ( int pos, std::string name, SkChannel::Type t )
