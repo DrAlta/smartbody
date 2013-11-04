@@ -249,7 +249,7 @@ void SBMotion::addFrame(float frameTime, const std::vector<float>& frameData)
 	double duration = this->getDuration();
 	if (duration <= frameTime)
 	{
-		int postureSize = _channels.size();
+		int postureSize = _channels.floats();
 		int frameSize = _frames.size();
 		_frames.resize(_frames.size() + 1);
 		_frames[frameSize].keytime = frameTime;
