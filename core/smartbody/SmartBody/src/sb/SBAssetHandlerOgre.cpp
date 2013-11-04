@@ -96,14 +96,18 @@ std::vector<SBAsset*> SBAssetHandlerOgre::getAssets(const std::string& path)
 					}
 				}
 
-				for (size_t s = 0; s < mesh->skinWeights.size(); s++)
+				if (skeleton)
 				{
-					for (size_t i = 0; i < mesh->skinWeights[s]->jointNameIndex.size(); i++)
+					for (size_t s = 0; s < mesh->skinWeights.size(); s++)
 					{
-						SmartBody::SBJoint* joint = skeleton->getJoint(mesh->skinWeights[s]->jointNameIndex[i]);
-						mesh->skinWeights[s]->infJointName.push_back(joint->getName());
+						for (size_t i = 0; i < mesh->skinWeights[s]->jointNameIndex.size(); i++)
+						{
+							SmartBody::SBJoint* joint = skeleton->getJoint(mesh->skinWeights[s]->jointNameIndex[i]);
+							mesh->skinWeights[s]->infJointName.push_back(joint->getName());
+						}
 					}
 				}
+
 			}
 			
 			mesh->setName(fileName + extension);

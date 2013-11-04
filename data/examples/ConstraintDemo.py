@@ -2,6 +2,9 @@ print "|--------------------------------------------|"
 print "|          Starting Constraint Demo          |"
 print "|--------------------------------------------|"
 
+import math
+
+scene.setScale(1.0)
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('motion', 'ChrBrad')
@@ -12,8 +15,10 @@ scene.loadAssets()
 # Runs the default viewer for camera
 scene.run('default-viewer.py')
 camera = getCamera()
-camera.setEye(10, 250, 328.23)
-camera.setCenter(10, 150, 155.43)
+camera.setEye(-0.193661, 2.12169, 4.92749)
+camera.setCenter(-0.0138556, 1.1562, 1.2083)
+camera.setFarPlane(100)
+camera.setNearPlane(0.1)
 
 # Set joint map for Brad
 print 'Setting up joint map for Brad'
@@ -23,26 +28,21 @@ bradSkeleton = scene.getSkeleton('ChrBrad.sk')
 zebra2Map.applySkeleton(bradSkeleton)
 zebra2Map.applyMotionRecurse('ChrBrad')
 
-# Set proper motion scale
-print 'Scaling motion to fit rescaled skeleton'
-scene.getMotion('ChrBrad@Idle01').scale(100)
-
 print 'Adding characters into scene'
 # Set up multiple Brads
-posX = -145;
+posX = -1.45;
 for i in range(4):
 	baseName = 'ChrBrad%s' % i
 	brad = scene.createCharacter(baseName, '')
 	bradSkeleton = scene.createSkeleton('ChrBrad.sk')
-	bradSkeleton.rescale(100)
 	brad.setSkeleton(bradSkeleton)
 	# Set position
-	bradPos = SrVec(posX + (i * 100), 0, 0)
+	bradPos = SrVec(posX + (i * 1.00), 0, 0)
 	brad.setPosition(bradPos)
 	# Set up standard controllers
 	brad.createStandardControllers()
 	# Set deformable mesh
-	brad.setDoubleAttribute('deformableMeshScale', 1)
+	brad.setDoubleAttribute('deformableMeshScale', .01)
 	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
@@ -53,7 +53,7 @@ for i in range(4):
 	retargetBehaviorSet(baseName)	
 	
 # Set camera position
-scene.getPawn('camera').setPosition(SrVec(0, -50, 0))
+scene.getPawn('camera').setPosition(SrVec(0, -.50, 0))
 
 # Turn on GPU deformable geometry for all
 print 'Turning on GPU deformable geometry for all'
@@ -66,18 +66,16 @@ for i in range(5):
 	baseName = 'pawn%s' % i
 	pawn = scene.createPawn(baseName)
 	pawn.setStringAttribute('collisionShape', 'sphere')
-	collisionShapeScale = SrVec(5, 5, 5)
+	collisionShapeScale = SrVec(.05,.05,.05)
 	pawn.getAttribute('collisionShapeScale').setValue(collisionShapeScale)
 
 # Set pawn position and collision scale
 print 'Set pawn position'
-scene.getPawn('pawn0').setPosition(SrVec(130, 130, 15))
-scene.getPawn('pawn0').getAttribute('collisionShapeScale').setValue(SrVec(0, 0, 0))
-scene.getPawn('pawn1').setPosition(SrVec(190, 130, 15))
-scene.getPawn('pawn1').getAttribute('collisionShapeScale').setValue(SrVec(0, 0, 0))
-scene.getPawn('pawn2').setPosition(SrVec(-100, 175, 150))
-scene.getPawn('pawn3').setPosition(SrVec(-110, 155, 43))
-scene.getPawn('pawn4').setPosition(SrVec(-10, 155, 43))
+scene.getPawn('pawn0').setPosition(SrVec(1.30, 1.30, .15))
+scene.getPawn('pawn1').setPosition(SrVec(1.90, 1.30, .15))
+scene.getPawn('pawn2').setPosition(SrVec(-1.00, 1.75, 1.50))
+scene.getPawn('pawn3').setPosition(SrVec(-1.10, 1.55, .43))
+scene.getPawn('pawn4').setPosition(SrVec(-.10, 1.55, .43))
 
 # 2 on the left touch pawns
 print 'ChrBrad0 and ChrBrad1 touching pawns'
@@ -95,22 +93,22 @@ bml.execBMLAt(2, 'ChrBrad3', '<sbm:constraint effector="l_wrist" sbm:effector-ro
 bml.execBMLAt(5, '*', '<gaze target="pawn2"/>')
 
 # Move pawn around
-gazeX = -200
+gazeX = -2.00
 dir = 1
-speed = 1.0
+speed = .01
 pawn2 = scene.getPawn('pawn2')
 
 class ConstraintDemo(SBScript):
 	def update(self, time):
 		global gazeX, dir, speed
 		# Change direction when hit border
-		if gazeX > 200:
+		if gazeX > 2.00:
 			dir = -1
-		elif gazeX < -200:
+		elif gazeX < -2.00:
 			dir = 1
 		gazeX = gazeX + speed * dir
 		# Set pawn position
-		pawn2.setPosition(SrVec(gazeX, 175, 150))
+		pawn2.setPosition(SrVec(gazeX, 1.75, 1.50 * math.sin(time)))
 		
 # Run the update script
 scene.removeScript('constraintdemo')

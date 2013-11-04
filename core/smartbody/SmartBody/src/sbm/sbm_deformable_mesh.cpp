@@ -517,15 +517,18 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 					boneWeightBuf[k][iVtx] = SrVec4(0,0,0,0);
 				}
 				std::vector<IntFloatPair> weightList;
-				for (int j = 0; j < numOfInfJoints; j++)
+				if (skinWeight->infJointName.size() > 0)
 				{
-					const std::string& curJointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];					
-					float jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
-					int    jointIndex  = boneJointIdxMap[curJointName];
-					// 					 					if (numOfInfJoints > 8)
-					// 					 						printf("w = %d : %f\n",jointIndex,jointWeight);
-					weightList.push_back(IntFloatPair(jointIndex,jointWeight));							
-					globalCounter ++;									
+					for (int j = 0; j < numOfInfJoints; j++)
+					{
+						const std::string& curJointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];					
+						float jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
+						int    jointIndex  = boneJointIdxMap[curJointName];
+						// 					 					if (numOfInfJoints > 8)
+						// 					 						printf("w = %d : %f\n",jointIndex,jointWeight);
+						weightList.push_back(IntFloatPair(jointIndex,jointWeight));							
+						globalCounter ++;									
+					}
 				}
 				std::sort(weightList.begin(),weightList.end(),intFloatComp); // sort for minimum weight
 				int numWeight = numOfInfJoints > 8 ? 8 : numOfInfJoints;
@@ -533,6 +536,8 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				SrVec skinColor;
 				for (int j=0;j<numWeight;j++)
 				{
+					if (j >= weightList.size())
+						continue;
 					IntFloatPair& w = weightList[j];
 					weightSum += w.second;
 					if ( j < 4)
