@@ -319,7 +319,7 @@ SmartBody::SBDiphone* VisemeViewerWindow::getCurrentDiphone()
 		phoneme2 = _browserPhoneme[1]->text(_browserPhoneme[1]->value());
 	}
 
-	if (phoneme1 == "" || phoneme2 == "")
+	if (phoneme1 == "" || phoneme2 == "" || !getCurrentCharacter())
 		return NULL;
 
 	const std::string& diphoneMap = SmartBody::SBScene::getScene()->getCharacter(getCurrentCharacterName())->getStringAttribute("lipSyncSetName");
@@ -980,6 +980,9 @@ void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
 				if (viewer->_imageSequenceViewer && viewer->_imageSequenceViewer->shown())
 				{
 					double timeDelay = atof(viewer->_imageSequenceViewer->_inputPlayTimeDelay->value());
+					double inputLength = atof(viewer->_imageSequenceViewer->_inputAudioLength->value());
+					if (inputLength > 0)
+						length = (float)inputLength;
 					viewer->_imageSequenceViewer->playbackSequence(SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), length, (float)timeDelay);
 				}
 			}

@@ -46,6 +46,7 @@ public:
 	Fl_Value_Slider* _sliderSequenceIndex;
 	Fl_Button* _buttonPlay;
 	Fl_Input* _inputPlayTimeDelay;
+	Fl_Input* _inputAudioLength;
 	ImageSequencePlayer* _imageSequencePlayer;
 
 	float _startTime;
