@@ -263,12 +263,9 @@ SkJoint* SkSkeleton::search_joint ( const char* n )
 {
 	int jointMapSize = _jointMap.size();
 	int jointSize = _joints.size();
-	if ( jointMapSize == 0 &&
-		jointSize > 0 &&
-		jointMapSize != jointSize)
+	if ( jointSize > 0 && jointMapSize != jointSize)
 	{
 		updateJointMap();
-
 	}
 
 	if (_extJointMap.size() == 0 &&

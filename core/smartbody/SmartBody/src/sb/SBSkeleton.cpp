@@ -45,6 +45,7 @@ SBAPI SBJoint* SBSkeleton::createJoint(const std::string& name, SBJoint* parent)
 	if (parent)
 	{
 		joint->setParent(parent);
+		parent->addChild(joint);
 	}
 	else
 	{
