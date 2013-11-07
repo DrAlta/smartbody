@@ -105,7 +105,10 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Create/Character...", 0, CreateCharacterCB, this, NULL);
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, NULL);
 	menubar->add("&Create/Light", 0, CreateLightCB, this, NULL);
-	menubar->add("&Create/Camera...", 0, CreateCameraCB, this, NULL);
+	menubar->add("&Create/Camera...", 0, CreateCameraCB, this, FL_MENU_DIVIDER);
+	deleteObjectMenuIndex = menubar->add("&Create/Delete Object", 0, 0, 0, FL_SUBMENU_POINTER);
+	menubar->add("&Create/Delete Selected Object", 0, DeleteSelectionCB, this, NULL);
+
 	//menubar->add("&Create/Terrain...", 0, CreateTerrainCB, this, NULL); // should replace it with create navigation mesh.
 	
 //	setResolutionMenuIndex = menubar->add("&Settings/Set Resolution", 0, 0, 0, FL_SUBMENU_POINTER);
@@ -278,6 +281,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	fltkViewer = new FLTKOgreWindow(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);	
 #endif
 	fltkViewer->box(FL_UP_BOX);
+	fltkViewer->baseWin = this;
 
 	_mainGroup->end();
 	_mainGroup->resizable(fltkViewer);
@@ -496,7 +500,7 @@ void BaseWindow::show_viewer()
 		SbmShaderManager::singleton().setViewer(this);
 	#endif	
 	show();
-	fltkViewer->show_viewer();
+	fltkViewer->show_viewer();	
 }
 
 void BaseWindow::hide_viewer()
@@ -671,7 +675,8 @@ void BaseWindow::ResetScene()
 	if (mediaPath != "")
 		SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
 
-	scene->getVHMsgManager()->setEnable(true);			
+	scene->getVHMsgManager()->setEnable(true);		
+	updateObjectList();
 }
 
 
@@ -2220,6 +2225,31 @@ void BaseWindow::DeleteCameraCB( Fl_Widget* widget, void* data )
 	window->updateCameraList();
 }
 
+
+void BaseWindow::DeleteObjectCB( Fl_Widget* widget, void* data )
+{
+	const Fl_Menu_Item* menuItem = ((Fl_Menu_*)widget)->mvalue();
+	std::string objName = menuItem->label();
+	BaseWindow* window = (BaseWindow*)data;	
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(objName);
+	SmartBody::SBCharacter* sbChar = SmartBody::SBScene::getScene()->getCharacter(objName);
+	if (!pawn && !sbChar)
+	{
+		fl_alert("No object named '%s' found, cannot remove it.", objName.c_str());
+		return;
+	}
+
+	int confirm = fl_ask("Are you sure you want to delete '%s'?",objName.c_str());
+	if (confirm == 0)
+		return ;
+	if (sbChar)
+		SmartBody::SBScene::getScene()->removeCharacter(objName);
+	else if (pawn)
+		SmartBody::SBScene::getScene()->removePawn(objName);
+	//SmartBody::SBScene::getScene()->removeCamera(camera);
+	window->updateObjectList();
+}
+
 void BaseWindow::ChooseCameraCB( Fl_Widget* widget, void* data )
 {
 	const Fl_Menu_Item* menuItem = ((Fl_Menu_*)widget)->mvalue();
@@ -2242,6 +2272,43 @@ void BaseWindow::ChooseCameraCB( Fl_Widget* widget, void* data )
 // 		//window->set_camera(cam);
 // 		window->get_camera()->copyCamera(cam);
 // 	}
+}
+
+
+void BaseWindow::updateObjectList(std::string deleteObjectName)
+{
+	Fl_Menu_Item* menuList = const_cast<Fl_Menu_Item*>(menubar->menu());
+	Fl_Menu_Item& deleteobjSubMenu = menuList[deleteObjectMenuIndex];	
+	deleteObjectList.clear();
+	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (unsigned int i=0;i<characterNames.size();i++)
+	{		
+		const std::string charName = characterNames[i];
+		if (charName == deleteObjectName)
+			continue;
+		int flag = (i==characterNames.size()-1) ? FL_MENU_DIVIDER : 0;
+		Fl_Menu_Item temp_DeleteObj = { strdup(charName.c_str()), 0, DeleteObjectCB, this, flag };		
+		deleteObjectList.push_back(temp_DeleteObj);		
+	}
+
+	std::vector<std::string> pawnNames = SmartBody::SBScene::getScene()->getPawnNames();
+	for (unsigned int i=0;i<pawnNames.size();i++)
+	{		
+		const std::string pawnName = pawnNames[i];
+		SmartBody::SBCharacter* sbChar = SmartBody::SBScene::getScene()->getCharacter(pawnName);
+		if (sbChar)
+			continue;
+
+		if (pawnName == deleteObjectName)
+			continue;
+		Fl_Menu_Item temp_DeleteObj = { strdup(pawnName.c_str()), 0, DeleteObjectCB, this };		
+		deleteObjectList.push_back(temp_DeleteObj);		
+	}
+
+	Fl_Menu_Item temp = {0};
+	deleteObjectList.push_back(temp);
+
+	deleteobjSubMenu.user_data(&deleteObjectList[0]);
 }
 
 void BaseWindow::updateCameraList()
@@ -2328,6 +2395,12 @@ void BaseWindow::ShowSelectedCharacterCB( Fl_Widget* w, void* data )
 	static bool showSelected = true;
 	showSelected = !showSelected;
 	ObjectManipulationHandle::renderSelectedBoundingBox = showSelected;
+}
+
+void BaseWindow::DeleteSelectionCB( Fl_Widget* widget, void* data )
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->fltkViewer->deleteSelectedObject(0);
 }
 
 //== Viewer Factory ========================================================

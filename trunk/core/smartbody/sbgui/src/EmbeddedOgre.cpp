@@ -73,6 +73,7 @@ void EmbeddedOgre::setupResource()
 
 void EmbeddedOgre::resetOgreScene()
 {
+	Ogre::MaterialManager& matManager = Ogre::MaterialManager::getSingleton();
 	Ogre::TextureManager& ogreTexManager = Ogre::TextureManager::getSingleton();	
 	Ogre::MeshManager& meshManager = Ogre::MeshManager::getSingleton();	
 	Ogre::SkeletonManager& skelManager = Ogre::SkeletonManager::getSingleton();
@@ -83,16 +84,40 @@ void EmbeddedOgre::resetOgreScene()
 	
 	meshManager.unloadAll();
 	meshManager.removeAll();
+
+	//matManager.unloadAll();
+	//matManager.removeAll();
 	ogreTexManager.unloadAll();
+	//ogreTexManager.removeAll();
 	skelManager.unloadAll();
 	skelManager.removeAll();		
+
+	// remove all SmartBody textures
+	SbmTextureManager& texManager = SbmTextureManager::singleton();
+	std::vector<std::string> texNames = texManager.getTextureNames(SbmTextureManager::TEXTURE_DIFFUSE);
+	for (unsigned int i=0;i<texNames.size();i++)
+		ogreTexManager.remove(texNames[i]);
+	texNames = texManager.getTextureNames(SbmTextureManager::TEXTURE_NORMALMAP);
+	for (unsigned int i=0;i<texNames.size();i++)
+		ogreTexManager.remove(texNames[i]);
+	texNames = texManager.getTextureNames(SbmTextureManager::TEXTURE_SPECULARMAP);
+	for (unsigned int i=0;i<texNames.size();i++)
+		ogreTexManager.remove(texNames[i]);
+
+	OgreFrameListener* frameListener = dynamic_cast<OgreFrameListener*>(ogreFrameListener);
+	if (frameListener) // clear all frame listener data
+	{
+		frameListener->m_pawnList.clear();
+		frameListener->m_characterList.clear();
+		frameListener->m_initialBonePositions.clear();
+		frameListener->m_validJointNames.clear();
+	}
 
 // 	std::vector<std::string> characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
 // 	for (unsigned int i=0;i<characterNames.size();i++)
 // 	{
 // 		ogreListener->OnCharacterUpdate(characterNames[i],"character");
-// 	}		
-
+// 	}			
 	createDefaultScene();
 }
 
@@ -374,6 +399,7 @@ void EmbeddedOgre::createDefaultScene()
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_NONE );
 	ogreSceneMgr->setShadowTextureCount(1);
+	ogreSceneMgr->setShadowTextureSize(1024);
 	MovablePlane* shadowPlane;
 	shadowPlane = new MovablePlane(Vector3::UNIT_Y,Ogre::Vector3(0,0,0));
 	
@@ -759,7 +785,7 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 
 	DeformableMesh* deformMesh = meshInstance->getDeformableMesh();
 	if (!deformMesh) return NULL;
-	if (deformMesh->isSkinnedMesh())
+	if (deformMesh->isSkinnedMesh())	
 	{
  		ogreMesh->setSkeletonName(skeletonName);	
  		ogreMesh->_notifySkeleton(ogreSkel);
@@ -818,7 +844,6 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 		ogreMesh->_compileBoneAssignments();	
 #endif
 	}
-
 	ogreMesh->load();
 	outChar = ogreSceneMgr->createEntity(sbChar->getName(),meshName);	
 
@@ -878,7 +903,11 @@ void EmbeddedOgre::addSBSkeleton( SmartBody::SBSkeleton* skel )
 	if (!skel) return;
  	Ogre::String skelName = skel->getName();
  	Ogre::SkeletonManager& skelManager = Ogre::SkeletonManager::getSingleton();
-	if (!skelManager.getByName(skelName).isNull()) return; // skeleton already exists
+	if (!skelManager.getByName(skelName).isNull()) 
+	{
+		return; // skeleton already exists
+	}
+
 	Ogre::SkeletonPtr ogreSkel = skelManager.create(skelName,"General",true);
 	
 	// setup the initial state 
@@ -886,7 +915,7 @@ void EmbeddedOgre::addSBSkeleton( SmartBody::SBSkeleton* skel )
 	{
 		SmartBody::SBJoint* joint = skel->getJoint(i);
 		Bone* ogBone = ogreSkel->createBone(joint->getName());
-		SrVec p = joint->getOffset();
+		SrVec p = joint->getOffset();		
 		ogBone->setPosition(p.x,p.y,p.z);
 		SrQuat q = joint->quat()->orientation()*joint->quat()->prerot();
 		ogBone->setOrientation(q.w,q.x,q.y,q.z);
@@ -995,7 +1024,10 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	
 
 	Ogre::MeshManager& meshManager = Ogre::MeshManager::getSingleton();	
-	if (!meshManager.getByName(meshName).isNull()) return; // mesh already exists
+	if (!meshManager.getByName(meshName).isNull()) 
+	{		
+		return; // mesh already exists
+	}
 
 	float meshScale = meshInstance->getMeshScale();
 	Ogre::MeshPtr ogreMesh = meshManager.create(meshName,"General",true);
@@ -1140,7 +1172,7 @@ void EmbeddedOgre::addTexture( std::string texName )
 	Ogre::TexturePtr ogreTex = ogreTexManager.getByName(texName);		
 	if (!ogreTex.isNull()) return; // the texture already exist in ogre
 	if (!tex) return; // the texture not exist in SmartBody
-	PixelFormat pixelFormat = PF_R8G8B8;
+	PixelFormat pixelFormat = PF_R8G8B8;	
 	if (tex->getNumChannels() == 4) pixelFormat = PF_R8G8B8A8;	
 	// initialze the texture
 	ogreTex = TextureManager::getSingleton().createManual(
@@ -1148,9 +1180,9 @@ void EmbeddedOgre::addTexture( std::string texName )
 		ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
 		TEX_TYPE_2D,      // type
 		tex->getWidth(), tex->getHeight(),         // width & height
-		5,                // number of mipmaps
+		0,                // number of mipmaps
 		pixelFormat,     // pixel format
-		TU_AUTOMIPMAP );  	
+		TU_DEFAULT );  	
 	HardwarePixelBufferSharedPtr pixelBuffer = ogreTex->getBuffer();
 	//LOG("texture format = %d, buffer format = %d",ogreTex->getFormat(), pixelBuffer->getFormat());
 	pixelBuffer->lock(HardwareBuffer::HBL_NORMAL);

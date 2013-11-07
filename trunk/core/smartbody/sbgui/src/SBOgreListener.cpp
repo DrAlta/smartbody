@@ -143,7 +143,7 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 		{
 			// insert into character list
 			Ogre::Skeleton* skel = ent->getSkeleton();	
-			//if (!skel) return; // this should not happen at all ?
+			if (!skel) return; // this should not happen at all ?
 			frameListener->m_characterList.push_back(name);
 			// get intial bone position for every character
 			if (skel)
@@ -168,16 +168,24 @@ void OgreListener::OnCharacterDelete( const std::string & name )
 	if (!pawn)
 		return;
 
+	SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(pawn);
+
+	bool isPawn = true;
+	if (sbChar)
+		isPawn = false;
+	// since the charcter/pawn exists, remove it from the scene
+	FLTKListener::OnCharacterDelete(name);
+
 	SceneManager* sceneManager = ogreInterface->getSceneManager();
 	if (!sceneManager->hasSceneNode(name)) return;
 
 	SceneNode* rootSceneNode = ogreInterface->getSceneManager()->getRootSceneNode();
 	if (!rootSceneNode) return;
-	
+
 	SceneNode * node = (SceneNode *)rootSceneNode->getChild(name);
 	if (!node) return;
 
-	node->detachAllObjects();
+	node->detachAllObjects();	
 	ogreInterface->getSceneManager()->destroyEntity(name);
 	ogreInterface->getSceneManager()->getRootSceneNode()->removeAndDestroyChild(name);
 
@@ -185,25 +193,29 @@ void OgreListener::OnCharacterDelete( const std::string & name )
 	if (frameListener)
 	{
 		// delete from character list
+		std::vector<std::string>& objList = isPawn ? frameListener->m_pawnList : frameListener->m_characterList;
 		int eraseId = -1;
-		for (unsigned int i = 0; i < frameListener->m_characterList.size(); i++)
+		for (unsigned int i = 0; i < objList.size(); i++)
 		{
-			if (frameListener->m_characterList[i] == name)
+			if (objList[i] == name)
 			{
 				eraseId = i;
 				break;
 			}
 		}
 		if (eraseId >= 0)
-			frameListener->m_characterList.erase(frameListener->m_characterList.begin() + eraseId);
+			objList.erase(frameListener->m_characterList.begin() + eraseId);
 
-		// delete from initial bone position map
-		std::map<std::string, std::map<std::string, Ogre::Vector3> >::iterator iter = frameListener->m_initialBonePositions.find(name);
-		if (iter != frameListener->m_initialBonePositions.end())
-			frameListener->m_initialBonePositions.erase(iter);
+		if (!isPawn)
+		{
+			// delete from initial bone position map
+			std::map<std::string, std::map<std::string, Ogre::Vector3> >::iterator iter = frameListener->m_initialBonePositions.find(name);
+			if (iter != frameListener->m_initialBonePositions.end())
+				frameListener->m_initialBonePositions.erase(iter);
+		}	
 	}
 
-	FLTKListener::OnCharacterDelete(name);
+	
 }
 
 void OgreListener::OnCharacterUpdate( const std::string & name )

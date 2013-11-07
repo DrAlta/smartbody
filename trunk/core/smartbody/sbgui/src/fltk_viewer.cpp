@@ -105,6 +105,7 @@
 #include <autorig/SBAutoRigManager.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include "FLTKListener.h"
+#include "RootWindow.h"
 
 /*
 #define USE_CEGUI 1
@@ -300,6 +301,59 @@ Fl_Menu_Item MenuTable[] =
  };
 
 
+void FltkViewer::create_popup_menus()
+{
+	update_submenus();   
+	begin();
+	_data->menubut = new Fl_Menu_Button(0,0,50,50);
+	_data->menubut->type(Fl_Menu_Button::POPUP23);
+	_data->menubut->menu(MenuTable);   
+	_data->menubut->textsize(12);	
+	end();
+}
+
+Fl_Menu_Item FltkViewer::createMenuItem( const char* itemName, Fl_Callback* funcCallback, void* userData, int flag )
+{
+	Fl_Menu_Item menuItem = { itemName, 0, funcCallback, userData, flag};
+	return menuItem;
+}
+
+void FltkViewer::initializePopUpMenus()
+{
+	Fl_Menu_Item temp = {0};
+
+	selectionPopUpMenu.clear();
+	selectionPopUpMenu.push_back(createMenuItem("Frame Selected Object", ((Fl_Callback*)BaseWindow::CameraFrameObjectCB), baseWin, 0));
+	selectionPopUpMenu.push_back(createMenuItem("Face Camera", ((Fl_Callback*)BaseWindow::FaceCameraCB), baseWin, 0));
+	selectionPopUpMenu.push_back(createMenuItem("Track Character", ((Fl_Callback*)BaseWindow::TrackCharacterCB), baseWin, 0));
+	selectionPopUpMenu.push_back(createMenuItem("Rotate Around Character", ((Fl_Callback*)BaseWindow::RotateSelectedCB), baseWin, FL_MENU_DIVIDER));
+	selectionPopUpMenu.push_back(createMenuItem("Delete Selected Object", ((Fl_Callback*)BaseWindow::DeleteSelectionCB), baseWin, 0));	
+	selectionPopUpMenu.push_back(temp);
+
+
+	nonSelectionPopUpMenu.clear();
+	nonSelectionPopUpMenu.push_back(createMenuItem("Create Character...", ((Fl_Callback*)BaseWindow::CreateCharacterCB), baseWin, 0));
+	nonSelectionPopUpMenu.push_back(createMenuItem("Create Pawn...", ((Fl_Callback*)BaseWindow::CreatePawnCB), baseWin, 0));
+	nonSelectionPopUpMenu.push_back(createMenuItem("Create Light...", ((Fl_Callback*)BaseWindow::CreateLightCB), baseWin, 0));
+	nonSelectionPopUpMenu.push_back(createMenuItem("Create Camera...", ((Fl_Callback*)BaseWindow::CreateCameraCB), baseWin, FL_MENU_DIVIDER));
+	nonSelectionPopUpMenu.push_back(createMenuItem("Camera Reset", ((Fl_Callback*)BaseWindow::CameraResetCB), baseWin, 0));
+	nonSelectionPopUpMenu.push_back(createMenuItem("Camera Frame All", ((Fl_Callback*)BaseWindow::CameraFrameCB), baseWin, 0));	
+	nonSelectionPopUpMenu.push_back(temp);
+}
+
+void FltkViewer::createRightClickMenu( bool isSelected, int x, int y )
+{
+	initializePopUpMenus();
+	Fl_Menu_Item* popUp = NULL;
+	if (isSelected)
+		popUp = &selectionPopUpMenu[0];
+	else
+		popUp = &nonSelectionPopUpMenu[0];
+	const Fl_Menu_Item *m = popUp->popup(x, y, 0, 0, 0);
+	if ( m ) m->do_callback(0, m->user_data());
+
+}
+
 static void get_pawn_submenus(void* user_data, std::vector<Fl_Menu_Item>& menu_list)
 {
 	std::vector<SbmPawn*> pawn_list;
@@ -432,16 +486,8 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 	//make_current();	
 }
 
-void FltkViewer::create_popup_menus()
-{
-	update_submenus();   
-	begin();
-    _data->menubut = new Fl_Menu_Button(0,0,50,50);
-	_data->menubut->type(Fl_Menu_Button::POPUP23);
-    _data->menubut->menu(MenuTable);   
-    _data->menubut->textsize(12);	
-    end();
-}
+
+
 
 FltkViewer::~FltkViewer ()
  {
@@ -2133,9 +2179,12 @@ int FltkViewer::handle ( int event )
 			 }			 
 		 }
 
-		 if (e.button3 && Fl::event_clicks() && e.alt)
+		 if (e.button3 && e.ctrl)
 		 {
-			
+			 LOG("Create Right Click Pop-up Menus");
+			 SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
+			 bool hasSelection = (selectedPawn != NULL)? true : false;
+			 createRightClickMenu(hasSelection,Fl::event_x(), Fl::event_y());
 		 }
 		 else if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized() && e.button3 && !e.alt)
 		 {
@@ -2348,34 +2397,11 @@ int FltkViewer::handle ( int event )
 				camera->setNearPlane(znear);
 				camera->setFarPlane(zfar);
 				}
-			break;
+				break;
 			case FL_Delete: // delete selected object
-				SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
-				LOG("1");
-				if (selectedPawn)
-				{
-					SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(selectedPawn);
-					if (character)
-					{
-						SmartBody::SBScene::getScene()->removeCharacter(character->getName());
-						ret = 1;
-						LOG("2");
-					}
-					else
-					{
-						SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(selectedPawn);
-						SmartBody::SBScene::getScene()->removePawn(pawn->getName());
-						ret = 1;
-						LOG("3");
-					}
-				}
-				LOG("4");
+				ret = deleteSelectedObject(ret);
 				break;
 		  }
-		break;
-        //translate_keyboard_event ( e, SrEvent::Keyboard, w(), h());
-        break;
-
       case FL_HIDE: // Called when the window is iconized
         { //SR_TRACE1 ( "Hide" );
           _data->iconized = true;
@@ -5260,6 +5286,38 @@ void FltkViewer::drawDeformableModels()
 			}
 		}
 	}
+}
+
+int FltkViewer::deleteSelectedObject( int ret )
+{
+	SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
+	//LOG("1");
+	if (selectedPawn)
+	{	
+		int confirm = fl_ask("Are you sure you want to delete '%s'?",selectedPawn->getName().c_str());
+		if (confirm == 0)
+			return ret;
+		//_objManipulator.set_selected_pawn(NULL);
+		//_objManipulator.removeActiveControl();
+		SBSelectionManager::getSelectionManager()->select("");
+		SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(selectedPawn);
+		if (character)
+		{
+			SmartBody::SBScene::getScene()->removeCharacter(character->getName());
+			ret = 1;
+			//LOG("2");
+		}
+		else
+		{
+			SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(selectedPawn);
+			SmartBody::SBScene::getScene()->removePawn(pawn->getName());
+			ret = 1;
+			//LOG("3");
+		}		
+	}
+	//LOG("4");	
+	//baseWin->updateObjectList();
+	return ret;
 }
 GestureVisualizationHandler::GestureVisualizationHandler()
 {

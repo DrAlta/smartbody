@@ -54,10 +54,12 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	if (otherListener)
 		otherListener->OnCharacterCreate(name,objectClass);
 
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (window)
+		window->updateObjectList();
 	if (name.find("light") == 0)
 	{
-		pawn->registerObserver(this);
-		BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+		pawn->registerObserver(this);		
 		if (window)
 		{
 			window->fltkViewer->updateLights();
@@ -69,10 +71,9 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
 	if (camera)
 	{
-		BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 		if (window)
 		{
-			window->updateCameraList();
+			window->updateCameraList();			
 			window->redraw();
 		}
 	}
@@ -116,6 +117,7 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 	BaseWindow* window = dynamic_cast<BaseWindow*>(scene->getViewer());
 	if (window)
 	{
+		window->updateObjectList(name);
 		if (window->fltkViewer->_objManipulator.get_selected_pawn() == pawn)
 		{
 			window->fltkViewer->_objManipulator.set_selected_pawn(NULL);
@@ -129,12 +131,14 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 	if (camera)
 	{
 		if (window)
-			window->updateCameraList();
+		{
+			window->updateCameraList();			
+		}
 	}
 #endif
 
 	if (window)
-	{
+	{		
 		if (window->fltkViewer->_objManipulator.get_selected_pawn() == pawn)
 		{
 			window->fltkViewer->_objManipulator.set_selected_pawn(NULL);

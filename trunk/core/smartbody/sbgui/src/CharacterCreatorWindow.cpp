@@ -56,7 +56,7 @@ void CharacterCreatorWindow::CreateCB(Fl_Widget* w, void* data)
 	}
 	std::string skel = creator->choiceSkeletons->menu()[creator->choiceSkeletons->value()].label();
 	
-	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->createCharacter(creator->inputName->value(), skel);
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->createCharacter(creator->inputName->value(), "");
 	if (!character)
 	{
 		fl_alert("Character named '%s' could not be created.", creator->inputName->value());

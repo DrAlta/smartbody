@@ -62,7 +62,8 @@ void BML::EventRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene*
 	ostringstream cmd;
 	if (oldMessage.size() > 0)
 	{
-		cmd << "send " << oldMessage;
+		cmd << "send sbm " << oldMessage;
+		//cmd << oldMessage;
 	}
 	else
 	{

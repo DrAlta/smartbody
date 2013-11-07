@@ -64,6 +64,23 @@ StrTextureMap& SbmTextureManager::findMap( int type )
 }
 
 
+std::vector<std::string> SbmTextureManager::getTextureNames( int type )
+{
+	StrTextureMap& texMap = findMap(type);
+	
+	std::vector<std::string> texNames;
+	StrTextureMap::iterator vi;
+	for ( vi  = texMap.begin();
+		vi != texMap.end();
+		vi++)
+	{
+		texNames.push_back(vi->first);		
+	}
+	return texNames;
+}
+
+
+
 void SbmTextureManager::loadTexture(int iType, const char* textureName, const char* fileName )
 {
 	std::string strTex = textureName;
