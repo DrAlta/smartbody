@@ -23,11 +23,14 @@ VisemeCurveEditor::VisemeCurveEditor(int x, int y, int w, int h, char* name) : F
 
 	visemeWindow = NULL;
 
-	_colors.push_back(FL_BLACK);
+	_colors.push_back(FL_GRAY0);
 	_colors.push_back(FL_RED);
-	_colors.push_back(FL_GREEN);
+	//_colors.push_back(FL_GREEN);
 	_colors.push_back(FL_BLUE);
 	_colors.push_back(FL_DARK_RED);
+	_colors.push_back(FL_DARK_GREEN);
+	_colors.push_back(FL_CYAN);
+	_colors.push_back(FL_DARK_BLUE);
 	_colors.push_back(FL_MAGENTA);
 }
 
@@ -181,6 +184,7 @@ int VisemeCurveEditor::handle(int event)
 							_curves[_selectedLine].insert(_curves[_selectedLine].begin() + insertIndx, curvePoint);
 							_selectedPoint = insertIndx;
 							_pointIsSelected = true;
+							isCurveDirty = true;
 							// draw a point in that location
 							redraw();
 						}
@@ -201,7 +205,10 @@ int VisemeCurveEditor::handle(int event)
 
 				redraw();
 			}
-
+			if (isCurveDirty) // if data changed, refresh it
+			{
+				visemeWindow->refreshData();
+			}
 			return 1;
 			break;
 		}
@@ -282,7 +289,7 @@ bool VisemeCurveEditor::isPointSelected(int mousex, int mousey)
 		SrVec newPoint = mapCurveData(point);
 		float distance = dist(mouseClick, newPoint);
 	
-		if(distance <= _curves[_selectedLine].getPointRadius())
+		if(distance <= _curves[_selectedLine].getPointRadius() * 5.0f)
 		{
 			pointIsSelected = true;
 			_pointIsSelected = true;
@@ -441,6 +448,7 @@ void VisemeCurveEditor::drawCurve()
 			newLastPoint = newPoint;
 		}
 	}
+	fl_line_style(0, 0, 0);
 }
 
 

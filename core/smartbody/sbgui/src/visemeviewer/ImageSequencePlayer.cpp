@@ -15,14 +15,16 @@ ImageSequenceViewer::ImageSequenceViewer(int x, int y, int w, int h, char* name)
 	this->begin();
 		_inputImageSequenceFolder = new Fl_Input(70, 10, 300, 20, "Input Folder:");
 		_inputImageSequenceFolder->callback(OnInputFolder, this);
-		_sliderSequenceIndex = new Fl_Value_Slider(120, 30, 300, 20);
+		_sliderSequenceIndex = new Fl_Value_Slider(180, 30, 300, 20);
 		_sliderSequenceIndex->callback(OnSlideSequence, this);
 		_sliderSequenceIndex->type(FL_HORIZONTAL);
 		_sliderSequenceIndex->align(FL_ALIGN_LEFT);
-		_buttonPlay = new Fl_Button(80, 30, 40, 20, "Play");	// this button play the whole sequence and stop when it's done
+		_buttonPlay = new Fl_Button(140, 30, 40, 20, "Play");	// this button play the whole sequence and stop when it's done
 		_buttonPlay->callback(OnButtonOnePlay, this);
 		_inputPlayTimeDelay = new Fl_Input(40, 30, 30, 20, "Delay");
 		_inputPlayTimeDelay->value("1");
+		_inputAudioLength = new Fl_Input(110, 30, 30, 20, "Length");
+		_inputAudioLength->value("-1");
 
 		_imageSequencePlayer = new ImageSequencePlayer(10, 60, 480, 430, "");
 	this->end();
@@ -136,6 +138,9 @@ void ImageSequenceViewer::OnButtonOnePlay(Fl_Widget* widget, void* data)
 	ImageSequenceViewer* viewer = (ImageSequenceViewer*) data;
 	float length = viewer->_imageSequencePlayer->_imageSequences.size() / 30.0f;	// assuming fps = 30.0f
 	double timeDelay = atof(viewer->_inputPlayTimeDelay->value());
+	double inputLength = atof(viewer->_inputAudioLength->value());
+	if (inputLength > 0)
+		length = (float)inputLength;
 	viewer->playbackSequence((float)SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), length, (float)timeDelay);
 	viewer->_buttonPlay->deactivate();
 	viewer->_sliderSequenceIndex->deactivate();
