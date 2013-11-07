@@ -126,6 +126,9 @@ SbmTexture::SbmTexture( const char* texName )
 	buffer = NULL;
 	finishBuild = false;
 	transparentTexture = false;
+	width = -1;
+	height = -1;
+	channels = -1;
 }
 
 SbmTexture::~SbmTexture(void)
@@ -136,11 +139,11 @@ SbmTexture::~SbmTexture(void)
 	   glDeleteTextures(1,&texID);	
 }
 
-void SbmTexture::loadImage( const char* fileName )
+bool SbmTexture::loadImage( const char* fileName )
 {
 	buffer = SOIL_load_image(fileName,&width,&height,&channels,SOIL_LOAD_AUTO);	
 	if (width < 0 || height < 0 || channels < 0)
-		return;
+		return false;
 	std::string testOutFileName = fileName;
 	//testOutFileName += ".bmp";
 	//SOIL_save_image(testOutFileName.c_str(),SOIL_SAVE_TYPE_BMP,width,height,channels,buffer);
@@ -185,9 +188,10 @@ void SbmTexture::loadImage( const char* fileName )
 	textureFileName = fileName;	
 	SOIL_free_image_data(buffer);
 	buffer = NULL;
+	return true;
 }
 
-void SbmTexture::buildTexture()
+void SbmTexture::buildTexture(bool buildMipMap)
 {	
 	if (!getBuffer()) return;
 #if !defined(__native_client__)
@@ -216,7 +220,10 @@ void SbmTexture::buildTexture()
 	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 #if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
-	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+	if (buildMipMap)
+		glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+	else
+		glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 #else
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 #endif
@@ -235,7 +242,10 @@ void SbmTexture::buildTexture()
 	}
 	//glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);	
 #if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
-	gluBuild2DMipmaps(iType, channels, width, height, texture_format, GL_UNSIGNED_BYTE, &imgBuffer[0] );
+	if (buildMipMap)
+		gluBuild2DMipmaps(iType, channels, width, height, texture_format, GL_UNSIGNED_BYTE, &imgBuffer[0] );
+	else
+		glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, &imgBuffer[0]);
 #else
 	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, &imgBuffer[0]);
 #endif
@@ -262,4 +272,25 @@ unsigned char* SbmTexture::getBuffer()
 	if (imgBuffer.size() == 0) return NULL;
 	
 	return &imgBuffer[0];
+}
+
+int SbmTexture::getBufferSize()
+{
+	return imgBuffer.size();
+}
+
+void SbmTexture::setBuffer(unsigned char* buffer, int size)
+{
+	imgBuffer.clear();
+	for (int i = 0; i < size; ++i)
+	{
+		imgBuffer.push_back(buffer[i]);
+	}
+}
+
+void SbmTexture::setTextureSize(int w, int h, int numChannels)
+{
+	width = w;
+	height = h;
+	channels = numChannels;
 }

@@ -28,6 +28,7 @@
 class VisemeCurveEditor;
 class VisemeRunTimeWindow;
 class VisemeViewerWindow;
+class ImageSequenceViewer;
 
 class VisemeViewerWindow : public Fl_Double_Window, SBWindowListener {
 public:
@@ -71,8 +72,10 @@ public:
 	Fl_Input* _inputUtterance;
 	Fl_Input* _inputAudioFile;
 	Fl_Button* _buttonRunTimeCurves;
+	Fl_Button* _buttonPlayImageSequence;
 	Fl_Choice* _choiceAudioFile;
 	VisemeRunTimeWindow* _windowVisemeRunTime;
+	ImageSequenceViewer* _imageSequenceViewer;
 
 	Fl_Check_Button* _checkStats;
 	VisemeCurveEditor * _curveEditor;
@@ -120,5 +123,6 @@ public:
 	static void OnNormalizeCB(Fl_Widget* widget, void* data);
 	static void OnRunTimeCurvesCB(Fl_Widget* widget, void* data);
 	static void OnSinglePhonemeSelectCB(Fl_Widget* widget, void* data);
+	static void OnPlayImageSequence(Fl_Widget* widget, void* data);
 };
 #endif

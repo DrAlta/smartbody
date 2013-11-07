@@ -654,6 +654,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\SBOgreListener.cpp" />
     <ClCompile Include="..\src\SBSelectionManager.cpp" />
     <ClCompile Include="..\src\SBWindowListener.cpp" />
+    <ClCompile Include="..\src\visemeviewer\ImageSequencePlayer.cpp" />
     <ClCompile Include="..\src\visemeviewer\VisemeCurve.cpp" />
     <ClCompile Include="..\src\visemeviewer\VisemeCurveEditor.cpp" />
     <ClCompile Include="..\src\visemeviewer\VisemeRTCurveViewer.cpp" />
@@ -744,6 +745,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClInclude Include="..\src\SBOgreListener.h" />
     <ClInclude Include="..\src\SBSelectionManager.h" />
     <ClInclude Include="..\src\SBWindowListener.h" />
+    <ClInclude Include="..\src\visemeviewer\ImageSequencePlayer.h" />
     <ClInclude Include="..\src\visemeviewer\VisemeCurve.h" />
     <ClInclude Include="..\src\visemeviewer\VisemeCurveEditor.h" />
     <ClInclude Include="..\src\visemeviewer\VisemeRTCurveViewer.h" />

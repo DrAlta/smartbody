@@ -6,6 +6,7 @@
 #include <FL/fl_draw.H>
 #include <FL/Fl_File_Chooser.H>
 #include <sb/SBScene.h>
+#include <sb/SBSimulationManager.h>
 #include <sb/SBFaceDefinition.h>
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBAssetManager.h>
@@ -19,6 +20,7 @@
 #include "VisemeViewerWindow.h"
 #include "VisemeCurveEditor.h"
 #include "VisemeRunTimeWindow.h"
+#include "ImageSequencePlayer.h"
 #include "RootWindow.h"
 
 #ifndef WIN32
@@ -53,11 +55,15 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_buttonRunTimeCurves = new Fl_Button(560, 500, 100, 30, "RunTime Curves");
 	_buttonRunTimeCurves->callback(OnRunTimeCurvesCB, this);
 
+	_buttonPlayImageSequence = new Fl_Button(660, 500, 100, 30, "PlayImageSequence");
+	_buttonPlayImageSequence->callback(OnPlayImageSequence, this);
+
 	_buttonPlayAudioFile = new Fl_Button(40, 535, 70, 30, "Play Audio");
 	_buttonPlayAudioFile->callback(OnPlayAudioFileCB, this);
 	_inputAudioFile = new Fl_Input(115, 535, 435, 30);
 	_choiceAudioFile = new Fl_Choice(560, 535, 100, 30, "");
 	_choiceAudioFile->callback(OnAudioFileSelectCB, this);
+
 
 	_choiceCharacter = new Fl_Choice(70, 35, 100, 25, "Character");
 	_choiceCharacter->callback(OnCharacterSelectCB, this);
@@ -121,6 +127,7 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_useRemote = true;
 
 	_windowVisemeRunTime = NULL;
+	_imageSequenceViewer = NULL;
 
 	loadData();
 
@@ -966,6 +973,16 @@ void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
 					}
 				}
 			}
+
+			if (phonemes.size() > 0)
+			{
+				float length = phonemes[phonemes.size() - 1]->time() - phonemes[0]->time();
+				if (viewer->_imageSequenceViewer && viewer->_imageSequenceViewer->shown())
+				{
+					double timeDelay = atof(viewer->_imageSequenceViewer->_inputPlayTimeDelay->value());
+					viewer->_imageSequenceViewer->playbackSequence(SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), length, (float)timeDelay);
+				}
+			}
 		}
 	}
 	viewer->_lastUtterance = utterance;
@@ -1335,4 +1352,15 @@ void VisemeViewerWindow::OnCharacterUpdate( const std::string & name )
 void VisemeViewerWindow::OnSimulationUpdate()
 {
 	this->update();
+}
+
+
+void VisemeViewerWindow::OnPlayImageSequence(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+	if (viewer->_imageSequenceViewer == NULL)
+	{
+		viewer->_imageSequenceViewer = new ImageSequenceViewer(100, 100, 500, 500, "Image Sequence Viewer");
+	}
+	viewer->_imageSequenceViewer->show();
 }

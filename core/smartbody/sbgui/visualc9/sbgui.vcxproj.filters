@@ -313,6 +313,9 @@
     <ClCompile Include="..\src\autorig\VoxelizerWindow.cpp">
       <Filter>autorig</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\visemeviewer\ImageSequencePlayer.cpp">
+      <Filter>lipsyncviewer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -574,6 +577,9 @@
     </ClInclude>
     <ClInclude Include="..\src\autorig\VoxelizerWindow.h">
       <Filter>autorig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\visemeviewer\ImageSequencePlayer.h">
+      <Filter>lipsyncviewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

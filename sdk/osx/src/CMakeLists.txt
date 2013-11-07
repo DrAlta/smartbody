@@ -692,6 +692,7 @@ set( SBM_FLTK_SRC
 	./sbgui/visemeviewer/VisemeViewerWindow.cpp
 	./sbgui/visemeviewer/VisemeRunTimeWindow.cpp
 	./sbgui/visemeviewer/VisemeRTCurveViewer.cpp
+	./sbgui/visemeviewer/ImageSequencePlayer.cpp
 
 	./sbgui/retargetviewer/RetargetViewer.cpp
 	./sbgui/retargetcreator/RetargetCreatorWindow.cpp
