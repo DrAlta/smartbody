@@ -29,7 +29,7 @@ class SbmCharacter;
 
 
 #ifdef WIN_BUILD
-#define USE_OGRE_VIEWER 1
+#define USE_OGRE_VIEWER 0
 #elif LINUX_BUILD
 #define USE_OGRE_VIEWER 1
 #else
@@ -119,15 +119,17 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		std::vector<Fl_Menu_Item> resolutionMenuList;
 		int setResolutionMenuIndex;
 		
-		int loadCameraMenuIndex, deleteCameraMenuIndex;
+		int loadCameraMenuIndex, deleteCameraMenuIndex, deleteObjectMenuIndex;
 		std::vector<Fl_Menu_Item> loadCameraList;
 		std::vector<Fl_Menu_Item> deleteCameraList;
+		std::vector<Fl_Menu_Item> deleteObjectList;
 
 		//std::vector<SrCamera*> cameraList;
 		//std::map<std::string,SrCamera*> cameraMap;
 
 
 		void updateCameraList();
+		void updateObjectList(std::string deleteObjectName = "");
 
 		static void SaveCameraCB(Fl_Widget* widget, void* data);
 		static void DeleteCameraCB(Fl_Widget* widget, void* data);
@@ -233,6 +235,8 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void HelpCB(Fl_Widget* widget, void* data);
 		static void DocumentationCB(Fl_Widget* widget, void* data);
 		static void ResizeWindowCB(Fl_Widget* widget, void* data);
+		static void DeleteSelectionCB(Fl_Widget* widget, void* data);
+		static void DeleteObjectCB(Fl_Widget* widget, void* data);
 
 };
 

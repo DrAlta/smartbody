@@ -38,7 +38,9 @@ public:
 	SBAPI SbmTexture* findTexture(int type, const char* textureName);
 	SBAPI void loadTexture(int type, const char* textureName, const char* fileName);
 	SBAPI void updateTexture();
-	void releaseAllTextures();
+	SBAPI std::vector<std::string> getTextureNames(int type);
+
+	void releaseAllTextures();	
 protected:
 	StrTextureMap& findMap(int type);
 };

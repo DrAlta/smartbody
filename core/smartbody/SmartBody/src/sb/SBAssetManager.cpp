@@ -75,6 +75,12 @@ SBAssetManager::~SBAssetManager()
 	delete me_paths;
 	delete audio_paths;
 	delete mesh_paths;	
+
+	std::vector<SBAssetHandler*>& handlerList = getAssetHandlers();
+	for (unsigned int i=0;i<handlerList.size();i++)
+		delete handlerList[i];
+	handlerList.clear();
+	_assetHandlerMap.clear();
 }
 
 
@@ -1932,6 +1938,7 @@ void SBAssetManager::addAssetHandler(SBAssetHandler* handler)
 		return;
 
 	// add the asset types to the map
+	_assetHandlers.push_back(handler);
 	std::vector<std::string> assetTypes = handler->getAssetTypes();
 	for (std::vector<std::string>::iterator iter = assetTypes.begin();
 		 iter != assetTypes.end();

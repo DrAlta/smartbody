@@ -70,6 +70,7 @@ class JointMapViewer;
 class RetargetStepWindow;
 class PALocomotionData;
 class FLTKListener;
+class BaseWindow;
 
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
@@ -320,6 +321,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
         This is a derived FLTK method. */ 
     virtual int handle ( int event );
 
+	int deleteSelectedObject( int ret );
     /*! handle_event() will just call the other handle methods, according 
         to the viewer configuration and generated event. This is the first method
         that will be called from the fltk derived handle() method. */
@@ -409,6 +411,9 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 public:
 	RetargetStepWindow* _retargetStepWindow;	
 	ObjectManipulationHandle::ControlType _transformMode;
+	BaseWindow* baseWin;
+	std::vector<Fl_Menu_Item> nonSelectionPopUpMenu;
+	std::vector<Fl_Menu_Item> selectionPopUpMenu;
 protected:
 	
 	void drawJointLimitCone(SmartBody::SBJoint* joint, float coneSize, float pitchUpLimit, float pitchDownLimit, float headLimit);
@@ -416,6 +421,9 @@ protected:
 	void set_reach_target(int itype, const char* targetname);	
 	void update_submenus();
 	void create_popup_menus();	
+	void createRightClickMenu(bool isSelected, int x, int y);
+	void initializePopUpMenus();
+	Fl_Menu_Item createMenuItem(const char* itemName, Fl_Callback* funcCallback, void* userData, int flag);
 	//bool testCEGUIButtonPush(const CEGUI::EventArgs& /*e*/);
 	MeCtExampleBodyReach* getCurrentCharacterBodyReachController();
 	MeCtConstraint*    getCurrentCharacterConstraintController();
@@ -492,16 +500,14 @@ protected:
    SrSnLines* sceneaxis; // the current axis being displayed
 
    Fl_Menu_Button* menubut; // the ctrl+shift+m or button3 menu
+      
 
    SrSaGlRender render_action;
    SrSaBBox bbox_action;
 
    unsigned int  shadowMapID, depthMapID, depthFB, rboID;
    float shadowCPM[16];
-
-
-
-
+   
  };
 
 class GestureVisualizationHandler : public SmartBody::SBEventHandler
