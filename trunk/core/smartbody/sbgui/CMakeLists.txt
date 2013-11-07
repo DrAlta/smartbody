@@ -182,7 +182,8 @@ set( SBM_FLTK_SRC
 	./src/visemeviewer/VisemeViewerWindow.cpp
 	./src/visemeviewer/VisemeRunTimeWindow.cpp
 	./src/visemeviewer/VisemeRTCurveViewer.cpp
-
+	./src/visemeviewer/ImageSequencePlayer.cpp
+	
 	./src/retargetviewer/RetargetViewer.cpp
 	./src/retargetcreator/RetargetCreatorWindow.cpp
 	./src/autorig/SBAutoRigManager.cpp

@@ -49,12 +49,11 @@ protected:
 	std::string textureName;
 	std::string textureFileName;
 	int width, height;
-	int channels; // num of channels in the iamge	
+	int channels; // num of channels in the image	
 	unsigned char* buffer;
 	std::vector<unsigned char> imgBuffer;
 	bool finishBuild;
 	bool transparentTexture;
-
 	GLuint texID;	
 	GLuint internal_format, texture_format;		
 public:
@@ -65,11 +64,15 @@ public:
 	SBAPI const std::string& getName() { return textureName; }
 	SBAPI const std::string& getFileName() { return textureFileName; }
 	SBAPI GLuint getID() { return texID; }
-	SBAPI void loadImage(const char* fileName);	
-	SBAPI void buildTexture();
+	SBAPI bool loadImage(const char* fileName);	
+	SBAPI void buildTexture(bool buildMipMap = true);
 
 	SBAPI unsigned char* getBuffer();
+	SBAPI int getBufferSize();
 	SBAPI int getWidth() const { return width; }	
 	SBAPI int getHeight() const { return height; }
 	SBAPI int getNumChannels() const { return channels; }	
+
+	SBAPI void setBuffer(unsigned char* buffer, int size);
+	SBAPI void setTextureSize(int w, int h, int numChannels);
 };
