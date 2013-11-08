@@ -57,7 +57,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 
 	createBoolAttribute("useCustomizedLipSyncIfPresent", true, true, "Lip Sync", 60, false, false, false, "If motion name exists inside pre-recorded audio file bml, use it by default"); 
 	
-	//createBoolAttribute("blendshape", 0, true, "Blend Shape", 69, false, false, false, "");	
+	createBoolAttribute("reach.useLocomotion", false, true, "Reaching", 110, false, false, false, "Whether to use locomotion for reach by default.");
 
 	createBoolAttribute("gestureRequest.autoGestureTransition", true, true, "Gestures", 89, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
 	createBoolAttribute("gestureRequest.matchingHandness", true, true, "Gestures", 90, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
@@ -88,7 +88,8 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	SmartBody::DoubleAttribute* visemeDelayAttr = createDoubleAttribute("visemetimedelay", 0.0, true, "Behaviors", 99, false, false, false, "Delay visemes by a fixed amount.");
 	visemeDelayAttr->setMin(0.0);
 	createBoolAttribute("visemecurve", false, true, "Lip Sync", 100, false, false, false, "Use curve-based visemes instead of discrete visemes.");
-	createBoolAttribute("reach.useLocomotion", false, true, "Reaching", 110, false, false, false, "Whether to use locomotion for reach by default.");
+	createBoolAttribute("phoneBigramAnimation", true, true, "Lip Sync", 101, false, false, false, "Use phone bigram animation as opposed to diphone animation");
+	createDoubleAttribute("diphoneTransition", 0.1, true, "Lip Sync", 102, false, false, false, "transition overlap between diphone");
 	createBoolAttribute("usePhoneBigram", true, true, "Lip Sync", 150, false, false, false, "Use phone bigram method.");
 	createBoolAttribute("lipSyncConstraint", true, true, "Lip Sync", 151, false, false, false, "Use constrains on facial shapes.");
 	createBoolAttribute("constrainFV", true, true, "Lip Sync", 152, false, false, false, "Constrain facial shape FV.");

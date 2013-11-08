@@ -449,10 +449,18 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 			SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(prevViseme->id(), curViseme->id(), diphoneMap);
 			float blendIval = 0.0f;
 
-			if (nextViseme != NULL)
-				blendIval = nextViseme->time() - prevViseme->time();
+			float transitionPadding = (float)character->getDoubleAttribute("diphoneTransition");
+			if (!character->getBoolAttribute("phoneBigramAnimation"))
+			{
+				blendIval = curViseme->time() - prevViseme->time() + 2.0f * transitionPadding;
+			}
 			else
-				blendIval = 2.0f * (curViseme->time() - prevViseme->time());
+			{
+				if (nextViseme != NULL)
+					blendIval = nextViseme->time() - prevViseme->time();
+				else
+					blendIval = 2.0f * (curViseme->time() - prevViseme->time());
+			}
 
 			// ad-hoc, blend interval should not be less than 0.1f
 			//if (blendIval < 0.2f)
@@ -478,19 +486,40 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 					std::vector<float> curve = diphone->getKeys(visemeNames[v]);
 					for (size_t k = 0; k < curve.size(); k++)
 					{
-						if ((k % 2) == 0)
+						if (!character->getBoolAttribute("phoneBigramAnimation"))
 						{
-							curve[k] *= blendIval;
-							curve[k] += prevViseme->time();
-							curve[k] -= (*result_visemes)[0]->time();
+							if ((k % 2) == 0)
+							{
+								curve[k] *= blendIval;
+								curve[k] += prevViseme->time();
+								curve[k] -= (*result_visemes)[0]->time();
+								curve[k] -= transitionPadding;
+							}
+							else
+							{
+								curve[k] *= scale;
+								if (curve[k] > 1.0f)	//clamp to 1
+									curve[k] = 1.0f;
+								if (curve[k] < 0.05)	// clamp to 0.0
+									curve[k] = 0.0f;
+							}
 						}
 						else
 						{
-							curve[k] *= scale;
-							if (curve[k] > 1.0f)	//clamp to 1
-								curve[k] = 1.0f;
-							if (curve[k] < 0.05)	// clamp to 0.0
-								curve[k] = 0.0f;
+							if ((k % 2) == 0)
+							{
+								curve[k] *= blendIval;
+								curve[k] += prevViseme->time();
+								curve[k] -= (*result_visemes)[0]->time();
+							}
+							else
+							{
+								curve[k] *= scale;
+								if (curve[k] > 1.0f)	//clamp to 1
+									curve[k] = 1.0f;
+								if (curve[k] < 0.05)	// clamp to 0.0
+									curve[k] = 0.0f;
+							}
 						}
 					}
 
@@ -931,7 +960,9 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 		float curY2 = c2[index2 * 2 + 1];
 		if (curX1 == curX2) // (fabs(curX1 - curX2) < 0.001f)
 		{
-			float ratioTransition = (curX1 - leftX) / (rightX - leftX);
+			float ratioTransition = 0.0f;
+			if (rightX != leftX)
+				float ratioTransition = (curX1 - leftX) / (rightX - leftX);
 			float finalY = (1 - ratioTransition) * curY1 + ratioTransition * curY2;
 			retc.push_back(curX1);
 			retc.push_back(finalY);
@@ -1105,6 +1136,9 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& 
 				localMaxId.push_back(i);
 			}
 		}
+
+		if (localMaxId.size() == 0)
+			return;
 
 		for (size_t i = 0; i < localMaxId.size() - 1; ++i)
 		{
