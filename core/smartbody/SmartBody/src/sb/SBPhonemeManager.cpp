@@ -54,6 +54,14 @@ SBDiphoneManager::~SBDiphoneManager()
 	}
 }
 
+void SBDiphoneManager::deleteDiphoneSet(const std::string& name)
+{
+	if (_diphoneMap.find(name) != _diphoneMap.end())
+	{
+		_diphoneMap.erase(name);
+	}
+}
+
 SBDiphone* SBDiphoneManager::createDiphone(const std::string& fromPhoneme, const std::string& toPhoneme, const std::string& name)
 {
 	std::string lowerCaseFromPhoneme = fromPhoneme;
@@ -63,7 +71,7 @@ SBDiphone* SBDiphoneManager::createDiphone(const std::string& fromPhoneme, const
 	SBDiphone* diphone = getDiphone(lowerCaseFromPhoneme, lowerCaseToPhoneme, name);
 	if (diphone)
 	{
-		LOG("Diphone set %s already contain diphone pair %s to %s, return existing one.", name.c_str(), lowerCaseFromPhoneme.c_str(), lowerCaseToPhoneme.c_str());
+		;//LOG("Diphone set %s already contain diphone pair %s to %s, return existing one.", name.c_str(), lowerCaseFromPhoneme.c_str(), lowerCaseToPhoneme.c_str());
 	}
 	else
 	{

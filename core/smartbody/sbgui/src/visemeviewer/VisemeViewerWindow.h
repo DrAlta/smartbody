@@ -114,6 +114,7 @@ public:
 	static void OnPlayAudioFileCB(Fl_Widget* widget, void* data);
 	static void OnAudioFileSelectCB(Fl_Widget* widget, void* data);
 	static void OnSaveCB(Fl_Widget* widget, void* data);
+	static void OnLoadCB(Fl_Widget* widget, void* data);
 	static void OnBmlRequestCB(BML::BmlRequest* request, void* data);
 	static void OnShowStatsCB(Fl_Widget* widget, void* data);
 	static void OnStatsResetCB(Fl_Widget* widget, void* data);

@@ -3,6 +3,8 @@
 
 diphoneManager = scene.getDiphoneManager()
 
+diphoneManager.deleteDiphoneSet("default")
+
 diphone = diphoneManager.createDiphone("ao", "er", "default")
 diphone.addKey("W", 0.0574413, -0.00291545)
 diphone.addKey("W", 0.391645, 0.443149)
