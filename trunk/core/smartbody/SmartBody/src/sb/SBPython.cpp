@@ -372,6 +372,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("getNumDiphoneMap", &SBDiphoneManager::getNumDiphoneMap, "Return number of diphone set.")
 		.def("getNumDiphones", &SBDiphoneManager::getNumDiphones, "Return number of diphones given the diphone set name.")
 		.def("getDiphoneMapNames", &SBDiphoneManager::getDiphoneMapNames, "Returns the names of all the diphone sets.")
+		.def("deleteDiphoneSet", &SBDiphoneManager::deleteDiphoneSet, "Delete all the diphones given diphone sets.")
 		;
 
 	boost::python::class_<SBDiphone>("SBDiphone")

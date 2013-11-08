@@ -455,8 +455,8 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 				blendIval = 2.0f * (curViseme->time() - prevViseme->time());
 
 			// ad-hoc, blend interval should not be less than 0.1f
-			if (blendIval < 0.2f)
-				blendIval = 0.2f;
+			//if (blendIval < 0.2f)
+			//	blendIval = 0.2f;
 
 			if (diphone)
 			{
@@ -729,6 +729,8 @@ bool BML::SpeechRequest::getLineIntersection(float p0_x, float p0_y, float p1_x,
 	return false; // No collision
 }
 
+/*
+// find the outline of 2 curves
 std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::vector<float>& c2)
 {
 	std::vector<float> retc;
@@ -842,6 +844,165 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 
 	return retc;
 }
+*/
+
+// use blend-in, blend-out methods, assuming c1 and c2 are in ascending order
+std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::vector<float>& c2)
+{
+	std::vector<float> retc;
+	int size1 = c1.size();
+	int size2 = c2.size();
+	if (size1 == 0 || size2 == 0)
+		return retc;
+
+	for (int i = 1; i < size1 / 2; ++i)
+	{
+		if (c1[i * 2] < c1[(i - 1) * 2])
+		{
+			LOG("stitchCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
+		}
+	}
+	for (int i = 1; i < size2 / 2; ++i)
+	{
+		if (c2[i * 2] < c2[(i - 1) * 2])
+		{
+			LOG("stitchCurve: curve 2 is not in ascending order: %f %f", c2[(i - 1) * 2], c2[i * 2]);
+		}
+	}
+
+	// determining the overlapping area
+	if (c1[size1 - 2] < c2[0])	// no overlapping, c1 on the left
+	{
+		for (int i = 0; i < size1; ++i)
+			retc.push_back(c1[i]);
+		for (int i = 0; i < size2; ++i)
+			retc.push_back(c2[i]);
+		return retc;
+	}
+	if (c2[size2 - 2] < c1[0])	// no overlapping, c2 on the left
+	{
+		for (int i = 0; i < size2; ++i)
+			retc.push_back(c2[i]);
+		for (int i = 0; i < size1; ++i)
+			retc.push_back(c1[i]);
+		return retc;
+	}
+
+	float leftX = -1.0f;
+	float rightX = -1.0f;
+	if (c1[size1 - 2] >= c2[0] && c1[size1 - 2] <= c2[size2 - 2])
+	{
+		if (c1[0] >= c2[0])	// overlapping area: entire curve 1
+		{
+			leftX = c1[0];
+			rightX = c1[size1 - 2];
+		}
+		else				// overlapping area: c2[0] -> c1[n]
+		{
+			leftX = c2[0];
+			rightX = c1[size1 - 2];
+		}
+	}
+	if (c2[size2 - 2] >= c1[0] && c2[size2 - 2] <= c1[size1 - 2])
+	{
+		if (c2[0] >= c1[0])	// overlapping area: entire curve 2
+		{
+			leftX = c2[0];
+			rightX = c2[size2 - 2];
+		}
+		else				// overlapping area: c1[0] -> c2[n]
+		{
+			leftX = c1[0];
+			rightX = c2[size2 - 2];
+		}
+	}
+	if (leftX < 0 || rightX < 0)
+	{
+		LOG("BML::SpeechRequest::stitchCurve ERR: Did not find overlapping area.");
+	}
+
+	int index1 = 0;
+	int index2 = 0;
+	while (index1 < size1 / 2 && index2 < size2 / 2)
+	{
+		float curX1 = c1[index1 * 2 + 0];
+		float curY1 = c1[index1 * 2 + 1];
+		float curX2 = c2[index2 * 2 + 0];
+		float curY2 = c2[index2 * 2 + 1];
+		if (curX1 == curX2) // (fabs(curX1 - curX2) < 0.001f)
+		{
+			float ratioTransition = (curX1 - leftX) / (rightX - leftX);
+			float finalY = (1 - ratioTransition) * curY1 + ratioTransition * curY2;
+			retc.push_back(curX1);
+			retc.push_back(finalY);
+			index1++;
+			index2++;
+			continue;
+		}
+		else if (curX1 < curX2)
+		{
+			if (index2 > 0)
+			{
+				float prevX2 = c2[(index2 - 1) * 2 + 0];
+				float prevY2 = c2[(index2 - 1) * 2 + 1];
+				if (curX1 > prevX2)
+				{
+					float ratioCurve2 = (curX1 - prevX2) / (curX2 - prevX2);
+					float curY2_X1 = ratioCurve2 * (curY2 - prevY2) + prevY2;
+					float ratioTransition = (curX1 - leftX) / (rightX - leftX);
+					float finalY = (1 - ratioTransition) * curY1 + ratioTransition * curY2_X1;
+					retc.push_back(curX1);
+					retc.push_back(finalY);
+					index1++;
+					continue;
+				}
+			}
+			retc.push_back(curX1);
+			retc.push_back(curY1);
+			index1++;
+			continue;
+		}
+		else
+		{
+			if (index1 > 0)
+			{
+				float prevX1 = c1[(index1 - 1) * 2 + 0];
+				float prevY1 = c1[(index1 - 1) * 2 + 1];
+				if (curX2 > prevX1)
+				{
+					float ratioCurve1 = (curX2 - prevX1) / (curX1 - prevX1);
+					float curY1_X2 = ratioCurve1 * (curY1 - prevY1) + prevY1;
+					float ratioTransition = (curX2 - leftX) / (rightX - leftX);
+					float finalY = ratioTransition * curY2 + (1 - ratioTransition) * curY1_X2;
+					retc.push_back(curX2);
+					retc.push_back(finalY);
+					index2++;
+					continue;
+				}
+			}
+			retc.push_back(curX2);
+			retc.push_back(curY2);
+			index2++;
+			continue;
+		}
+	}
+
+	// handle the left over
+	for (; index1 < size1 / 2; ++index1)
+	{
+		retc.push_back(c1[index1 * 2 + 0]);
+		retc.push_back(c1[index1 * 2 + 1]);
+	}
+
+	for (; index2 < size2 / 2; ++index2)
+	{
+		retc.push_back(c2[index2 * 2 + 0]);
+		retc.push_back(c2[index2 * 2 + 1]);
+	}
+
+	return retc;
+}
+
 
 void BML::SpeechRequest::filterCurve(std::vector<float>&c, float speedLimit)
 {

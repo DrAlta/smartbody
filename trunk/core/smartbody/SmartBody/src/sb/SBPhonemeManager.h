@@ -25,6 +25,7 @@ class SBDiphoneManager
 		SBAPI int getNumDiphoneMap();
 		SBAPI int getNumDiphones(const std::string& name);
 		SBAPI void normalizeCurves(const std::string& name);
+		SBAPI void deleteDiphoneSet(const std::string& name);
 
 	protected:
 		std::map<std::string, std::vector<SBDiphone*> > _diphoneMap;

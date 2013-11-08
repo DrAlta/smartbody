@@ -828,8 +828,12 @@ void DeformableMeshInstance::blendShapes()
 						SrVec pos = joint->getPosition();
 						w = pos.x;
 						//LOG("shape %s(%s) with weight %f", (const char*)mIter->second[i]->shape().name, mappedCName.c_str(), w);
-						if (w > wLimit)
-							w = wLimit;
+						// clamp
+						//if (w > wLimit)
+						//	w = wLimit;
+						
+						// multiplier
+						w = w * wLimit;
 					}
 				}
 			}
