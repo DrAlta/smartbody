@@ -249,6 +249,11 @@ int VisemeCurveEditor::handle(int event)
 				{
 					SrVec temp((float)mousex, (float)mousey, 0.0f);
 					SrVec newCurvePoint = mapDrawData(temp);
+					if (newCurvePoint.x < 0.02f)	// clamp it
+						newCurvePoint.x = 0.0f;
+					if (newCurvePoint.x > 0.98f)	// clamp it
+						newCurvePoint.x = 1.0f;
+
 					point.x = newCurvePoint.x;
 					point.y = newCurvePoint.y;
 					isCurveDirty = true;
