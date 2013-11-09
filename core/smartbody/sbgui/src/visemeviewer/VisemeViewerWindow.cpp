@@ -1027,7 +1027,7 @@ void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
 	if(viewer->_browserDiphone->size() == 0)
 		return;
 
-	if (viewer->_browserDiphone->value() < 0 || viewer->_browserDiphone->value() >= viewer->_browserDiphone->size())
+	if (viewer->_browserDiphone->value() < 0 || viewer->_browserDiphone->value() >= (viewer->_browserDiphone->size() + 1))
 		return;
 
 	std::string str = viewer->_browserDiphone->text(viewer->_browserDiphone->value());
