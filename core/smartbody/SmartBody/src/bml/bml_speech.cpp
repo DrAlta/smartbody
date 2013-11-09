@@ -1018,17 +1018,27 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 		}
 	}
 
-	// handle the left over
-	for (; index1 < size1 / 2; ++index1)
-	{
-		retc.push_back(c1[index1 * 2 + 0]);
-		retc.push_back(c1[index1 * 2 + 1]);
-	}
+	bool blendIntoC2 = true;
+	if (c1[0] > c2[0])
+		blendIntoC2 = false;
 
-	for (; index2 < size2 / 2; ++index2)
+
+	// handle the left over, discard if needed after blend into another one 
+	if (!blendIntoC2)
 	{
-		retc.push_back(c2[index2 * 2 + 0]);
-		retc.push_back(c2[index2 * 2 + 1]);
+		for (; index1 < size1 / 2; ++index1)
+		{
+			retc.push_back(c1[index1 * 2 + 0]);
+			retc.push_back(c1[index1 * 2 + 1]);
+		}
+	}
+	else
+	{
+		for (; index2 < size2 / 2; ++index2)
+		{
+			retc.push_back(c2[index2 * 2 + 0]);
+			retc.push_back(c2[index2 * 2 + 1]);
+		}
 	}
 
 	return retc;
