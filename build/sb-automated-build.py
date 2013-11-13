@@ -320,7 +320,7 @@ def makeDist(distLocation):
     deleteDir(os.path.join(distLocation, "tools/elsender/obj"))
 
 
-def fullBuild(svnPassword, buildSuffix, doFreshBuild):
+def fullBuild(svnPassword, buildSuffix, doFreshBuild, emailTo):
 
     """
     This script performs the following tasks:
@@ -580,8 +580,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
     numDirsTotal = 0
     for dirpath, dirnames, filenames in os.walk(buildFolder):
         for filename in filenames:
-            if platform.system() == "Windows":
-                dirSizeTotal += os.path.getsize(os.path.join(dirpath,filename))
+            dirSizeTotal += os.path.getsize(os.path.join(dirpath, filename))
             numFilesTotal += 1
 
         for dirname in dirnames:
@@ -677,7 +676,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
         msg = email.mime.text.MIMEText(fp.read())
         fp.close()
 
-        emailTo = "nospam@ict.usc.edu"
+        # emailTo is passed in as a parameter to this main function up above
         msg["Subject"] = "{0} Build Results #{1}".format(emailSubjectPrefix, buildNumber)
         msg["From"] = "svn@svn.ict.usc.edu"
         msg["To"] = emailTo
@@ -721,7 +720,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild):
 
 
 
-def checkIfTimeForBuild(svnURL, svnUser, svnPassword, freeUpSpace, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix, hoursBetweenFreshBuild):
+def checkIfTimeForBuild(svnURL, svnUser, svnPassword, freeUpSpace, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix, hoursBetweenFreshBuild, emailTo):
 
     """
     This function:
@@ -839,19 +838,19 @@ def checkIfTimeForBuild(svnURL, svnUser, svnPassword, freeUpSpace, minFreeSpaceR
 
 
     # start the build
-    fullBuild(svnPassword, buildSuffix, doFreshBuild)
+    fullBuild(svnPassword, buildSuffix, doFreshBuild, emailTo)
 
 
 def printUsage():
     print ""
     print "Usage:  python create-build.py [task] [args]"
     print "   Where task is:"
-    print "     python create-build.py build [svnPassword] [buildSuffix]"
+    print "     python create-build.py build [svnPassword] [buildSuffix] [emailTo]"
     print "            # performs the full build, both arguments optional, default to \"\""
     print "     python create-build.py cleansandbox"
     print "            # wipes out the svn sandbox to do a fresh checkout"
     print "     python create-build.py checktime [svnURL] [svnUser] [svnPassword]"
-    print "            [minSpace] [buildDrive] [buildOutputFolder] [buildSuffix]"
+    print "            [minSpace] [buildDrive] [buildOutputFolder] [buildSuffix] [hoursBetweenFreshBuild] [emailTo]"
     print "            # determines if time to run a new build, then triggers the build"
     print "            eg:"
     print "            python create-build.py checktime \\"
@@ -875,7 +874,10 @@ else:
         if len(sys.argv) > 3:
             buildSuffix = sys.argv[3]
 
-        fullBuild(svnPassword, buildSuffix, True)
+        if len(sys.argv) > 4:
+            emailTo = sys.argv[4]
+
+        fullBuild(svnPassword, buildSuffix, True, emailTo)
 
     elif sys.argv[1] == "cleansandbox":
         cleanSandbox()
@@ -888,6 +890,7 @@ else:
         buildOutputFolder = sys.argv[7]
         buildSuffix = sys.argv[8]
         hoursBetweenFreshBuild = int(sys.argv[9])
-        checkIfTimeForBuild(svnURL, svnUser, svnPassword, False, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix, hoursBetweenFreshBuild)
+        emailTo = sys.argv[10]
+        checkIfTimeForBuild(svnURL, svnUser, svnPassword, False, minFreeSpaceRequiredForBuildGig, buildDrive, buildOutputFolder, buildSuffix, hoursBetweenFreshBuild, emailTo)
     else:
         printUsage()
