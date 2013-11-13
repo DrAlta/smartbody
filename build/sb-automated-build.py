@@ -612,7 +612,7 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild, emailTo):
         buildServerShareName = "\\\\vhbuild\\SBM-builds\\"
         emailSubjectPrefix = "[SB]"
     elif platform.system() == "Darwin":
-        buildServerShareName = "\\\\roscoemini\\sbm-builds\\"
+        buildServerShareName = "\\\\vhbuildmac\\sbm-builds\\"
         emailSubjectPrefix = "[SB-MAC]"
     else:
         buildServerShareName = "\\\\vhbuild3\\sbm-builds\\"
