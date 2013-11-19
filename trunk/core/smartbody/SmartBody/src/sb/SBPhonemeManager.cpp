@@ -12,7 +12,7 @@ SBDiphoneManager::SBDiphoneManager()
 std::vector<std::string> SBDiphoneManager::getCommonPhonemes()
 {
 	std::vector<std::string> commonPhonemes;
-
+#if 1
 	commonPhonemes.push_back("_");    /// silence
 	commonPhonemes.push_back("Ah");   /// Viseme for aa, ae, ah
 	commonPhonemes.push_back("Aa");   /// Viseme for aa
@@ -35,6 +35,21 @@ std::vector<std::string> SBDiphoneManager::getCommonPhonemes()
 	commonPhonemes.push_back("D");   /// d, t, n   - also try NG: 2 to 1 against
 	commonPhonemes.push_back("KG");  /// k, g, ,ng   - also try NG: 2 to 1 against
 	commonPhonemes.push_back("BMP"); /// p, b, m
+#else
+	commonPhonemes.push_back("_");    /// silence
+	commonPhonemes.push_back("Ah");   /// Viseme for aa, ae, ah
+	commonPhonemes.push_back("Eh");   /// ey, eh, uh
+	commonPhonemes.push_back("Er");   /// er
+	commonPhonemes.push_back("Ih");   /// y, iy, ih, ix
+	commonPhonemes.push_back("W");   /// w, uw
+	commonPhonemes.push_back("Ow");   /// ow
+	commonPhonemes.push_back("R");   /// r
+	commonPhonemes.push_back("L");   /// l
+	commonPhonemes.push_back("Z");   /// s, z
+	commonPhonemes.push_back("Sh");   /// sh, ch, jh, zh
+	commonPhonemes.push_back("F");   /// f, v
+	commonPhonemes.push_back("BMP"); /// p, b, m
+#endif
 
 	return commonPhonemes;
 }

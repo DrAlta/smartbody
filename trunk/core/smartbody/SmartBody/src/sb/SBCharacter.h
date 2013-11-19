@@ -54,7 +54,8 @@ class SBCharacter : public SbmCharacter
 		SBAPI SBController* getControllerByName(std::string name);
 		SBAPI std::vector<std::string> getControllerNames();
 		SBAPI void startMotionRecord(double frameRate);
-		SBAPI void stopMotionRecord(const std::string& motionName);
+		SBAPI void stopMotionRecord(const std::string& motionName, const std::string& type);
+		SBAPI void writeMotionRecord(const std::string& motionName, const std::string& type);
 
 		SBAPI int getNumBehaviors();
 		SBAPI SBBehavior* getBehavior(int num);

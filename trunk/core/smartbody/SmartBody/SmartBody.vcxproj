@@ -46,7 +46,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\src;..\..\..\lib\protobuf\include;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <MinimalRebuild>false</MinimalRebuild>
@@ -55,8 +55,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;boost_serialization-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\SmartBody\src\external\glew;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug;..\..\..\core\smartbody\ode\lib;..\..\..\core\smartbody\Python27\libs;..\..\..\lib\festival\festival\src\lib;..\..\..\lib\festival\speech_tools\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;boost_serialization-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;python27.lib;libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\SmartBody\src\external\glew;..\..\..\lib\protobuf\lib\Debug;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug;..\..\..\core\smartbody\ode\lib;..\..\..\core\smartbody\Python27\libs;..\..\..\lib\festival\festival\src\lib;..\..\..\lib\festival\speech_tools\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>$(OutDir)$(ProjectName)_d.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
@@ -79,7 +79,7 @@ copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\src;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\src;..\..\..\lib\protobuf\include;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <WarningLevel>Level3</WarningLevel>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -93,8 +93,8 @@ copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>..\SmartBody\src\external\glew;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\..\..\lib\festival\festival\src\lib;..\..\..\lib\festival\speech_tools\lib;..\ode\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release;..\..\..\core\smartbody\Python27\libs;..\..\..\lib\cerevoice\cerevoice\lib;..\..\..\lib\cerevoice\cerevoice_eng\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;boost_serialization-vc100-mt-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\SmartBody\src\external\glew;..\..\..\lib\protobuf\lib\Release;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;..\..\..\lib\festival\festival\src\lib;..\..\..\lib\festival\speech_tools\lib;..\ode\lib;..\clapack\lib;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release;..\..\..\core\smartbody\Python27\libs;..\..\..\lib\cerevoice\cerevoice\lib;..\..\..\lib\cerevoice\cerevoice_eng\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;boost_serialization-vc100-mt-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;python27.lib;libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
     </Link>
@@ -480,6 +480,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\sr\sr_vec2.cpp" />
     <ClCompile Include="..\SmartBody\src\sr\sr_viewer.cpp" />
     <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp" />
+    <ClCompile Include="src\protocols\sbmotion.pb.cc" />
     <ClCompile Include="src\sbm\ParserCOLLADAFast.cpp" />
     <ClCompile Include="src\sb\SBAssetHandler.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerAmc.cpp" />
@@ -859,6 +860,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\SmartBody\src\sr\sr_vec2.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_viewer.h" />
     <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp" />
+    <ClInclude Include="src\protocols\sbmotion.pb.h" />
     <ClInclude Include="src\sbm\ParserCOLLADAFast.h" />
     <ClInclude Include="src\sb\SBAssetHandler.h" />
     <ClInclude Include="src\sb\SBAssetHandlerAmc.h" />

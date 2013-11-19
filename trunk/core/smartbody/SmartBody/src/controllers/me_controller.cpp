@@ -637,6 +637,12 @@ void MeController::saveMotionRecord( const std::string &recordname )
 	// load the motion
 	SrInput recordInput = SrInput((const char*)(stringOutput));
 	SmartBody::SBMotion* sbMotion = SmartBody::SBScene::getScene()->createMotion(recordname);
+	if (sbMotion == NULL)
+	{
+		LOG("Recorded motion %s is already existing!", recordname.c_str());
+		return;
+	}
+
 	sbMotion->setName(recordname);
 	sbMotion->load(recordInput);
 	sbMotion->filename(filename.c_str());
@@ -645,7 +651,7 @@ void MeController::saveMotionRecord( const std::string &recordname )
 	*fileOutput << stringOutput;
 	fileOutput->close();
 
-	record_clear();
+	//record_clear();
 	if( fileOutput )	{
 		delete fileOutput;
 		fileOutput = NULL;

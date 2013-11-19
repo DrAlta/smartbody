@@ -26,6 +26,7 @@ void MeCtMotionRecorder::startRecording( double frameRate )
 	if (frameRate > 0)
 	{
 		recordDt = 1.0/frameRate;
+		_record_dt = recordDt;
 	}
 	stop_record();
 	recordStart = true;
@@ -35,15 +36,48 @@ void MeCtMotionRecorder::startRecording( double frameRate )
 	_record_max_frames = -1;
 }
 
-void MeCtMotionRecorder::stopRecording( const std::string& motionName )
+void MeCtMotionRecorder::stopRecording(const std::string& motionName, const std::string& type)
 {
 	if (!recordStart)
 	{
-		return; // haven't started recorind yet. Nothing to save.
+		return; // haven't started recording yet. Nothing to save.
 	}
 	recordStart = false;
+	if (type == "bvh" || type == "BVH")
+	{
+		_record_mode = RECORD_BVH_MOTION;
+	}
+	else if (type == "skm" || type == "SKM")
+	{
+		_record_mode = RECORD_MOTION;
+	}
+	else
+	{
+		LOG("Exported file format %s not supported, export to skm instead", type.c_str());
+	}
 	saveMotionRecord(motionName.c_str());
 	stop_record();
+}
+
+void MeCtMotionRecorder::writeRecording(const std::string& motionName, const std::string& type)
+{
+	if (!recordStart)
+	{
+		return;
+	}
+	if (type == "bvh" || type == "BVH")
+	{
+		_record_mode = RECORD_BVH_MOTION;
+	}
+	else if (type == "skm" || type == "SKM")
+	{
+		_record_mode = RECORD_MOTION;
+	}
+	else
+	{
+		LOG("Exported file format %s not supported, export to skm instead", type.c_str());
+	}
+	saveMotionRecord(motionName.c_str());
 }
 
 void MeCtMotionRecorder::init(SbmPawn* pawn)

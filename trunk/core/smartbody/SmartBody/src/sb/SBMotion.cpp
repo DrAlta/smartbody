@@ -19,6 +19,7 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
 #include <fstream>
+#include <protocols/sbmotion.pb.h>
 
 namespace SmartBody {
 
@@ -1803,18 +1804,18 @@ void SBMotion::saveToSkb(const std::string& fileName)
 {
 	// write the data to the stream variables
 	sName = this->getName();
-	
+
 	sNumChannels = _channels.size();
 	for (int c = 0; c < _channels.size(); c++)
 	{
 		sChannelNames.push_back(_channels.name(c));
 		sChannelTypes.push_back(_channels.type(c));
 	}
-	
+
 	sFrames = _frames.size();
-	
-	int size = _channels.size();
-	
+
+	int size = _channels.floats();
+
 	for (int f = 0; f < sFrames; f++)
 	{
 		float time = _frames[f].keytime;
@@ -1826,7 +1827,7 @@ void SBMotion::saveToSkb(const std::string& fileName)
 			data.push_back(_frames[f].posture[p]);
 		}
 	}
-	
+
 	std::vector<std::string> tags = getMetaDataTags();
 	for (size_t t = 0; t < tags.size(); t++)
 	{
@@ -1834,81 +1835,173 @@ void SBMotion::saveToSkb(const std::string& fileName)
 		this->sMetaDataNames.push_back(tags[t]);
 		this->sMetaDataValues.push_back(tagValue);
 	}
-
+	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::START ) ); 
 	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::READY ) ); 
 	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::STROKE_START ) ); 
 	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::STROKE ) ); 
 	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::STROKE_STOP ) );
 	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::RELAX ) );
 	sSyncPoints.push_back((float) this->synch_points.get_time( srSynchPoints::STOP ) );
-	
-	try {
-		std::ofstream ofs(fileName.c_str(), std::ios::binary);
-		boost::archive::binary_oarchive oa(ofs);
-		oa << *this;
-	}
-	catch (const boost::archive::archive_exception& e)
+
+
+	if (!SmartBody::SBScene::getScene()->getBoolAttribute("useProtocolBuffer"))	// if use boost serialization
 	{
-		LOG("Problem saving into binary motion file %s: %s", fileName.c_str(), e.what());
+		try {
+			std::ofstream ofs(fileName.c_str(), std::ios::binary);
+			boost::archive::binary_oarchive oa(ofs);
+			oa << *this;
+		}
+		catch (const boost::archive::archive_exception& e)
+		{
+			LOG("Problem saving into binary motion file %s: %s", fileName.c_str(), e.what());
+		}
+		catch(std::exception& stde)
+		{
+			LOG("Problem loading binary motion file %s: %s", fileName.c_str(), stde.what());
+		}
 	}
-	catch(std::exception& stde)
+	else	// use google protocol buffer
 	{
-		LOG("Problem loading binary motion file %s: %s", fileName.c_str(), stde.what());
+		SmartBodyBinary::Motion* outputMotion = new SmartBodyBinary::Motion();
+		outputMotion->set_name(sName);
+		outputMotion->set_numchannels(sNumChannels);
+		for (int i = 0; i < sNumChannels; ++i)
+		{
+			outputMotion->add_channelname(sChannelNames[i]);
+			outputMotion->add_channeltype(sChannelTypes[i]);
+		}
+		outputMotion->set_numframes(sFrames);
+		for (int i = 0; i < sFrames; ++i)
+		{
+			outputMotion->add_keytimes(sKeyTimes[i]);
+		}
+		for (int i = 0; i < sFrames; ++i)
+		{
+			for (int j = 0; j < size; ++j)
+			{
+				outputMotion->add_keyvalues(sKeyValues[i][j]);
+			}
+		}
+		for (size_t i = 0; i < sSyncPoints.size(); ++i)
+			outputMotion->add_syncpoints(sSyncPoints[i]);
+		for (size_t i = 0; i < sMetaDataNames.size(); ++i)
+		{
+			SmartBodyBinary::Motion_MetaData* newMetaData = outputMotion->add_metadata();
+			newMetaData->set_metadataname(sMetaDataNames[i]);
+			newMetaData->set_metadatavalue(sMetaDataValues[i]);
+		}
+
+		std::fstream file(fileName, std::ios::out | std::ios::trunc | std::ios::binary);
+		if (!outputMotion->SerializeToOstream(&file)) 
+		{
+			LOG("Fail to write to binary file %s", fileName.c_str());
+		}
+		google::protobuf::ShutdownProtobufLibrary();
 	}
 }
 
 bool SBMotion::readFromSkb(const std::string& fileName)
 {
-	try {
-		std::ifstream ifs(fileName.c_str(), std::ios::binary);
-		boost::archive::binary_iarchive ia(ifs);
-		ia >> *this;
-	}
-	catch (const boost::archive::archive_exception& e)
+	if (!SmartBody::SBScene::getScene()->getBoolAttribute("useProtocolBuffer"))	// if use boost serialization
 	{
-		LOG("Problem loading binary motion file %s: %s", fileName.c_str(), e.what());
-		return false;
-	}
-	catch(std::exception& stde)
-	{
-		LOG("Problem loading binary motion file %s: %s", fileName.c_str(), stde.what());
-		return false;
-	}
-
-	this->_filename = fileName;
-
-	// read the data
-	this->setName(sName);
-	
-	for (size_t c = 0; c < sChannelNames.size(); c++)
-	{
-		_channels.add(sChannelNames[c], (SkChannel::Type) sChannelTypes[c]);
-	}
-
-	int postureSize = _channels.size();
-	
-	_frames.resize(sKeyTimes.size());
-	for (int f = 0; f < sFrames; f++)
-	{
-		_frames[f].keytime = sKeyTimes[f];
-		_frames[f].posture = (float*) malloc ( sizeof(float)*postureSize );
-		for (int p = 0; p < postureSize; p++)
+		try 
 		{
-			_frames[f].posture[p] = sKeyValues[f][p];
+			std::ifstream ifs(fileName.c_str(), std::ios::binary);
+			boost::archive::binary_iarchive ia(ifs);
+			ia >> *this;
+		}
+		catch (const boost::archive::archive_exception& e)
+		{
+			LOG("Problem loading binary motion file %s: %s", fileName.c_str(), e.what());
+			return false;
+		}
+		catch(std::exception& stde)
+		{
+			LOG("Problem loading binary motion file %s: %s", fileName.c_str(), stde.what());
+			return false;
+		}
+
+		// read the data
+		this->setName(sName);
+
+		for (size_t c = 0; c < sChannelNames.size(); c++)
+		{
+			_channels.add(sChannelNames[c], (SkChannel::Type) sChannelTypes[c]);
+		}
+
+		int postureSize = _channels.floats();
+
+		_frames.resize(sKeyTimes.size());
+		for (int f = 0; f < sFrames; f++)
+		{
+			_frames[f].keytime = sKeyTimes[f];
+			_frames[f].posture = (float*) malloc ( sizeof(float)*postureSize );
+			for (int p = 0; p < postureSize; p++)
+			{
+				_frames[f].posture[p] = sKeyValues[f][p];
+			}
+		}
+		this->synch_points.set_time( srSynchPoints::START, sSyncPoints[0] ); 
+		this->synch_points.set_time( srSynchPoints::READY, sSyncPoints[1] ); 
+		this->synch_points.set_time( srSynchPoints::STROKE_START, sSyncPoints[2] ); 
+		this->synch_points.set_time( srSynchPoints::STROKE, sSyncPoints[3] ); 
+		this->synch_points.set_time( srSynchPoints::STROKE_STOP, sSyncPoints[4] ); 
+		this->synch_points.set_time( srSynchPoints::RELAX, sSyncPoints[5] ); 
+		this->synch_points.set_time( srSynchPoints::STOP, sSyncPoints[6] ); 
+
+		for (size_t t = 0; t < sMetaDataNames.size(); t++)
+		{
+			addMetaData(sMetaDataNames[t], sMetaDataValues[t]);
 		}
 	}
-	sSyncPoints[0] = (float) this->synch_points.set_time( srSynchPoints::READY, sSyncPoints[0] ); 
-	sSyncPoints[1] = (float) this->synch_points.get_time( srSynchPoints::STROKE_START, sSyncPoints[1] ); 
-	sSyncPoints[2] = (float) this->synch_points.get_time( srSynchPoints::STROKE, sSyncPoints[2] ); 
-	sSyncPoints[3] = (float) this->synch_points.get_time( srSynchPoints::STROKE_STOP, sSyncPoints[3] ); 
-	sSyncPoints[4] = (float) this->synch_points.get_time( srSynchPoints::RELAX, sSyncPoints[4] ); 
-	sSyncPoints[5] = (float) this->synch_points.get_time( srSynchPoints::STOP, sSyncPoints[5] ); 
-
-	for (size_t t = 0; t < sMetaDataNames.size(); t++)
+	else
 	{
-		addMetaData(sMetaDataNames[t], sMetaDataValues[t]);
-	}
+		SmartBodyBinary::Motion inputMoiton;
+		std::fstream input(fileName, std::ios::in | std::ios::binary);
+		if (!inputMoiton.ParseFromIstream(&input)) 
+		{
+			LOG("Failed to parse binary motion from file %s", fileName.c_str());
+			return false;
+		}
+		this->_filename = fileName;
 
+		// read the data
+		this->setName(inputMoiton.name());
+
+		for (size_t c = 0; c < inputMoiton.numchannels(); c++)
+		{
+			_channels.add(inputMoiton.channelname(c), (SkChannel::Type) inputMoiton.channeltype(c));
+		}
+
+		int postureSize = _channels.floats();
+
+		_frames.resize(inputMoiton.numframes());
+		for (int f = 0; f < inputMoiton.numframes(); f++)
+		{
+			_frames[f].keytime = inputMoiton.keytimes(f);
+		}
+		for (int f = 0; f < inputMoiton.numframes(); f++)
+		{
+			_frames[f].posture = (float*) malloc ( sizeof(float)*postureSize );
+			for (int p = 0; p < postureSize; p++)
+			{
+				_frames[f].posture[p] = inputMoiton.keyvalues(f * postureSize + p);
+			}
+		}
+
+		this->synch_points.set_time( srSynchPoints::START, inputMoiton.syncpoints(0) ); 
+		this->synch_points.set_time( srSynchPoints::READY, inputMoiton.syncpoints(1) ); 
+		this->synch_points.set_time( srSynchPoints::STROKE_START, inputMoiton.syncpoints(2) ); 
+		this->synch_points.set_time( srSynchPoints::STROKE, inputMoiton.syncpoints(3) ); 
+		this->synch_points.set_time( srSynchPoints::STROKE_STOP, inputMoiton.syncpoints(4) ); 
+		this->synch_points.set_time( srSynchPoints::RELAX, inputMoiton.syncpoints(5) ); 
+		this->synch_points.set_time( srSynchPoints::STOP, inputMoiton.syncpoints(6) ); 
+
+		for (size_t t = 0; t < inputMoiton.metadata_size(); t++)
+		{
+			addMetaData(inputMoiton.metadata(t).metadataname(), inputMoiton.metadata(t).metadatavalue());
+		}
+	}
 	return true;
 }
 

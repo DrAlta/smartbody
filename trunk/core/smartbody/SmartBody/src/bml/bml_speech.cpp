@@ -498,10 +498,12 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 							else
 							{
 								curve[k] *= scale;
+								/*
 								if (curve[k] > 1.0f)	//clamp to 1
 									curve[k] = 1.0f;
 								if (curve[k] < 0.05)	// clamp to 0.0
 									curve[k] = 0.0f;
+								*/
 							}
 						}
 						else

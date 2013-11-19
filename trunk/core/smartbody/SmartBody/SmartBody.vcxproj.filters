@@ -1138,6 +1138,9 @@
     <ClCompile Include="src\sb\SBAssetHandlerBvh.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="src\protocols\sbmotion.pb.cc">
+      <Filter>protocols</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2275,6 +2278,9 @@
     <ClInclude Include="src\sb\SBSceneListener.h">
       <Filter>sb</Filter>
     </ClInclude>
+    <ClInclude Include="src\protocols\sbmotion.pb.h">
+      <Filter>protocols</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">
@@ -2318,6 +2324,9 @@
     </Filter>
     <Filter Include="external\zlib">
       <UniqueIdentifier>{7b13f61f-722c-4873-8470-0e16023106b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="protocols">
+      <UniqueIdentifier>{b31a1335-2324-4ce0-921c-dd70cbc6ff78}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

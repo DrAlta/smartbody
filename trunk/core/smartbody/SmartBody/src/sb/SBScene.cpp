@@ -182,6 +182,7 @@ void SBScene::initialize()
 	_isRemoteMode = false;
    _isCameraLocked = false;
 
+	createBoolAttribute("useProtocolBuffer",true,true,"",1,false,false,false,"Use google protocol buffer or boost serialization");
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 	createStringAttribute("speechRelaySoundCacheDir","../../../..",true,"",20,false,false,false,"Directory where sound files from speech relays will be placed. ");
 	createDoubleAttribute("scale",.01,true,"",30,false,false,false,"The scale of scene (1 = meters, .01 = centimeters, etc).");

@@ -259,6 +259,10 @@ void CommandWindow::downcb(int key, Fl_Text_Editor* editor)
 {
 	CommandWindow* commandWindow = CommandWindow::getCommandWindow(editor);
 
+	int cursorPos = editor->insert_position();
+	if (cursorPos > 0)
+		return;
+
 	int index = editor == commandWindow->textEditor[0]? 0 : 1;
 	commandWindow->historyLocation[index]++;
 	if (commandWindow->historyLocation[index] > int(commandWindow->historyItems[index].size()))

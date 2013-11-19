@@ -15,7 +15,8 @@ public:
 	~MeCtMotionRecorder();
 
 	void startRecording(double frameRate);
-	void stopRecording(const std::string& motionName);
+	void stopRecording(const std::string& motionName, const std::string& type);
+	void writeRecording(const std::string& motionName, const std::string& type);
 	void init(SbmPawn* pawn);		
 	virtual void controller_map_updated();
     virtual SkChannelArray& controller_channels();
