@@ -2429,7 +2429,7 @@ void SbmCharacter::addBlendShapeChannel(std::string bShapeName)
 	auJoint->setJointType(SkJoint::TypeBlendShape);
 	auJoint->setName(bShapeName);
 	auJoint->setUsePosition(0, true);
-	auJoint->pos()->limits(SkJointPos::X, 0, 1);  // Setting upper bound to 2 allows some exaggeration
+	auJoint->pos()->limits(SkJointPos::X, -10, 10);  // Setting upper bound to 2 allows some exaggeration
 	rootJoint->addChild(auJoint);
 
 	//LOG("Added blend shape channel %s", bShapeName.c_str());

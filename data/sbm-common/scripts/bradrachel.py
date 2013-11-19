@@ -1,7 +1,6 @@
 print "|--------------------------------------------|"
 print "|  data/sbm-common/scripts/bradrachel.py  |"
 print "|--------------------------------------------|"
-scene.addAssetPath("audio", "C:/ICT/vhtoolkit/core/vhtoolkitUnity/Assets/")
 scene.run("motion-retarget.py")
 ### Load data/sbm-common assets
 scene.addAssetPath("script", "sbm-common/scripts")

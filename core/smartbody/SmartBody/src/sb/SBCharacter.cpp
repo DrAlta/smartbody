@@ -189,13 +189,21 @@ void SBCharacter::startMotionRecord( double frameRate )
 	}
 }
 
-void SBCharacter::stopMotionRecord( const std::string& motionName )
+
+void SBCharacter::stopMotionRecord( const std::string& motionName, const std::string& type)
 {
 	if (record_ct)
 	{
-		record_ct->stopRecording(motionName);
+		record_ct->stopRecording(motionName, type);
 	}
+}
 
+void SBCharacter::writeMotionRecord(const std::string& motionName, const std::string& type)
+{
+	if (record_ct)
+	{
+		record_ct->writeRecording(motionName, type);
+	}
 }
 
 int SBCharacter::setup()
