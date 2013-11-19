@@ -1891,7 +1891,7 @@ void SBMotion::saveToSkb(const std::string& fileName)
 			newMetaData->set_metadatavalue(sMetaDataValues[i]);
 		}
 
-		std::fstream file(fileName, std::ios::out | std::ios::trunc | std::ios::binary);
+		std::fstream file(fileName.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 		if (!outputMotion->SerializeToOstream(&file)) 
 		{
 			LOG("Fail to write to binary file %s", fileName.c_str());
@@ -1957,7 +1957,7 @@ bool SBMotion::readFromSkb(const std::string& fileName)
 	else
 	{
 		SmartBodyBinary::Motion inputMoiton;
-		std::fstream input(fileName, std::ios::in | std::ios::binary);
+		std::fstream input(fileName.c_str(), std::ios::in | std::ios::binary);
 		if (!inputMoiton.ParseFromIstream(&input)) 
 		{
 			LOG("Failed to parse binary motion from file %s", fileName.c_str());
