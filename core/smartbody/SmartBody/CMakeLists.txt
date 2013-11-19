@@ -68,6 +68,10 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
+add_custom_target(protoctarget
+		COMMAND protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbmotion.proto 
+		
+		)
 
 
 set( SMARTBODY_LIB_EXT_NANOFLANN_SRC
@@ -505,11 +509,10 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sbm/SteerPath.cpp
         ./src/sbm/MiscCommands.cpp
 		
-		./src/sb/smartbody-dll.cpp
-		./src/sb/smartbody-c-dll.cpp
+	./src/sb/smartbody-dll.cpp
+	./src/sb/smartbody-c-dll.cpp
 		
 	./src/protocols/sbmotion.pb.cc
-	./src/protocols/sbmotion.pb.h
 )
 
 add_library(
@@ -574,6 +577,8 @@ target_link_libraries( SmartBody
 	protoc
 	protobuf
 )
+
+add_dependencies(SmartBody protoctarget)
 
 set( EXEC_LIST
 
