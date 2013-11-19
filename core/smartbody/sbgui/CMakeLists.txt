@@ -247,6 +247,8 @@ target_link_libraries( sbgui
 	${OGRE_LIBS}
 	#CEGUIBase
 	#CEGUIOpenGLRenderer
+	protobuf
+	protoc
 )
 
 set( EXEC_LIST

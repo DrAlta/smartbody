@@ -4,6 +4,7 @@
 #include <sbm/GPU/SbmTexture.h>
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
+#include <sbm/lin_win.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>

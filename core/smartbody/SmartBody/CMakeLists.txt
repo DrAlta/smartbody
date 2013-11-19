@@ -508,6 +508,8 @@ set( SMARTBODY_LIB_SBM_SRC
 		./src/sb/smartbody-dll.cpp
 		./src/sb/smartbody-c-dll.cpp
 		
+	./src/protocols/sbmotion.pb.cc
+	./src/protocols/sbmotion.pb.h
 )
 
 add_library(
@@ -569,6 +571,8 @@ target_link_libraries( SmartBody
 	python2.7
 	ncurses
 	${MORE_LIBS}
+	protoc
+	protobuf
 )
 
 set( EXEC_LIST
