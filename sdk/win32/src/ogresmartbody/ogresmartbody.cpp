@@ -14,7 +14,7 @@ OgreSmartBody::OgreSmartBody(void)
     mWindow(0),
     mSceneMgr(0),
     mCamera(0),
-	m_pScene(nullptr)
+	m_pScene(NULL)
 {
 }
 //-------------------------------------------------------------------------------------
@@ -153,7 +153,11 @@ bool OgreSmartBody::go(void)
 	std::string smartbodyRoot = "..";
 	// set the following to the location of the Python libraries. 
 	// if you downloaded SmartBody, it will be in core/smartbody/Python26/Lib
+#ifdef WIN32
 	initPython(smartbodyRoot + "/Python27/lib");
+#else
+	initPython("/usr/lib/python2.7");
+#endif
 	m_pScene = SmartBody::SBScene::getScene();
 
 	m_pScene->startFileLogging("smartbody.log");
