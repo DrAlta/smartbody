@@ -16,7 +16,9 @@ class SimpleListener : public SmartBody::SBSceneListener
 	  virtual void OnLogMessage( const std::string & message )
 	  {
 #ifdef WIN32
-		  LOG(message.c_str());
+		LOG("%s", message.c_str());
+#else
+		std::cout << message << std::endl;
 #endif
 	  }
 };
@@ -105,9 +107,10 @@ int main( int argc, char ** argv )
 		for (size_t c = 0; c < characterNames.size(); c++)
 		{
 			SmartBody::SBCharacter* character = scene->getCharacter(characterNames[c]);
-			SmartBody::SBJoint* joint = character->getSkeleton()->getJoint(0);
+			std::string jointName = "JtRoot";
+			SmartBody::SBJoint* joint = character->getSkeleton()->getJointByName(jointName);
 			SrVec position = joint->getPosition();
-			LOG("Character %s first joint is at position (%f, %f, %f)", character->getName().c_str(), position.x, position.y, position.z);
+			LOG("Character %s joint %s is at position (%f, %f, %f)", character->getName().c_str(), jointName.c_str(), position.x, position.y, position.z);
 		}
 	}
 
