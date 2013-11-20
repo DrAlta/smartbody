@@ -77,6 +77,7 @@ endif()
 find_package(OpenGL REQUIRED)
 
 add_custom_target(protoctarget
+		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/protocols/sbmotion.pb.cc
 		COMMAND protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/protocols ${CMAKE_CURRENT_SOURCE_DIR}/protocols/sbmotion.proto 
 		
 		)
