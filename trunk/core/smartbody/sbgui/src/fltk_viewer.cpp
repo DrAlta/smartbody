@@ -1774,11 +1774,12 @@ static void translate_event ( SrEvent& e, SrEvent::EventType t, int w, int h, Fl
    if ( Fl::event_state(FL_BUTTON3) ) e.button3 = 1;
 
 #ifdef LINUX_BUILD
-   if ( Fl::event_state(FL_ALT)   ) e.alt = 1;
+   if ( Fl::event_state(FL_CTRL)   ) e.alt = 1;
+   e.ctrl = 0;
 #else
    if ( Fl::event_state(FL_ALT)   ) e.alt = 1;
-#endif
    if ( Fl::event_state(FL_CTRL)  ) e.ctrl = 1;
+#endif
 
    if ( Fl::event_state(FL_SHIFT) ) e.shift = 1;
    
