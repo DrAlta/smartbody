@@ -1886,8 +1886,9 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		int pos = fullPathName.find("file://");
 		if (pos != std::string::npos)
 		{
-			fullPathName = fullPathName.substr(7);
+			fullPathName = fullPathName.substr(pos + 7);
 		}
+std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 		assetManager->loadAsset(fullPathName);	
 
 #if 0 // the code is replaced by the new asset loading mechanism, which provides cleaner handling. So there is no need to copy the files to retarget folders. 
@@ -2140,6 +2141,13 @@ int FltkViewer::handle ( int event )
 		   //fprintf(stderr, "PASTE: %s\n", Fl::event_text());
 		   std::cout << "PASTE: n" << Fl::event_text() << std::endl;
 		   dndText = Fl::event_text();
+		   // remove any trailing newlines
+		   if (dndText.size() > 0)
+		   {
+		   	if (dndText[dndText.size() - 1] == '\n')
+				dndText = dndText.substr(0, dndText.size() - 1);
+		   }	
+			
 		   processDragAndDrop(dndText,dndX,dndY);
 		   ret = 1;
 		   break;		
