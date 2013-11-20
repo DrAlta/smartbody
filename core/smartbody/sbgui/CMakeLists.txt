@@ -1,5 +1,13 @@
+add_subdirectory ( external/Pinocchio)
+add_subdirectory ( external/polyvox)
+
+add_definitions(  -std=c++11 )
+
+
 include_directories( ./src )
 include_directories( ../SmartBody/src )
+include_directories( ./external/Pinocchio )
+include_directories( ./external/polyvox/library/PolyVoxCore/include )
 #include_directories( /usr/local/include/CEGUI )
 link_directories( /usr/local/lib )
 link_directories( /usr/lib )                                                           
@@ -187,6 +195,7 @@ set( SBM_FLTK_SRC
 	./src/retargetviewer/RetargetViewer.cpp
 	./src/retargetcreator/RetargetCreatorWindow.cpp
 	./src/autorig/SBAutoRigManager.cpp
+	./src/autorig/VoxelizerWindow.cpp
 
 	./src/monitorviewer/MonitorConnectWindow.cpp 
 	./src/motioneditor/MotionEditorWindow.cpp
@@ -242,6 +251,8 @@ target_link_libraries( sbgui
 	python2.7
     	ncurses	
 	pthread
+	pinocchio
+        polyvoxcore
 	#pinocchio
 	${MORE_LIBS}
 	${OGRE_LIBS}
