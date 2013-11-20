@@ -50,14 +50,21 @@ rsync -ap --exclude=".svn" ./CMakeLists.txt ./sdk/CMakeLists.txt
 rsync -ap --exclude=".svn" ./src ./sdk
 mkdir -p ./sdk/src/sbgui
 rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/src/* ./sdk/src/sbgui/
-mkdir -p ./sdk/src/sbgui/external
-rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/* ./sdk/src/sbgui/external
 mkdir -p ./sdk/src/simplesmartbody
 rsync -ap --exclude=".svn" ../../core/smartbody/simplesmartbody/simplesmartbody.cpp ./sdk/src/simplesmartbody/
 mkdir -p ./sdk/src/SmartBody
 rsync -ap --exclude=".svn" ../../core/smartbody/SmartBody/src/* ./sdk/src/SmartBody/
 mkdir -p ./sdk/src/sbgui
-rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/src/* ./sdk/src/sbgui/
+rsync -ap --exclude=".svn" --exclude="fltk-1.3.2" --exclude="cegui" --exclude="cegui-0.8.2" --exclude="polyvox" ../../core/smartbody/sbgui/src/* ./sdk/src/sbgui/
+mkdir -p ./sdk/src/sbgui/external
+mkdir -p ./sdk/src/sbgui/external/polyvox
+mkdir -p ./sdk/src/sbgui/external/polyvox/library
+mkdir -p ./sdk/src/sbgui/external/polyvox/library/PolyVoxCore
+rsync -arp --exclude=".svn" ../../core/smartbody/sbgui/external/polyvox/library/PolyVoxCore/* ./sdk/src/sbgui/external/polyvox/library/PolyVoxCore
+mkdir -p ./sdk/src/sbgui/external/Pinocchio
+rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/Pinocchio/*.cpp ./sdk/src/sbgui/external/Pinocchio/
+rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/Pinocchio/*.h ./sdk/src/sbgui/external/Pinocchio/
+
 mkdir -p ./sdk/src/vhcl
 rsync -ap --exclude=".svn" ../../lib/vhcl/src/* ./sdk/src/vhcl/
 mkdir -p ./sdk/src/vhmsg
@@ -93,5 +100,24 @@ rsync -ap --exclude=".svn" ../../data/mesh/ChrRachel/* ./sdk/data/mesh/ChrRachel
 rsync -ap --exclude=".svn" ../../data/mesh/Sinbad/* ./sdk/data/mesh/Sinbad/
 rsync -ap --exclude=".svn" ../../data/mesh/Ogre/* ./sdk/data/mesh/Ogre/
 
+# integration examples
+mkdir sdk/src/ogresmartbody
+cp ../win32/src/ogresmartbody/* sdk/src/ogresmartbody
+mkdir sdk/src/irrlichtsmartbody
+cp ../win32/src/irrlichtsmartbody/* sdk/src/irrlichtsmartbody
+
 # build files
+cp build/CMakeLists.txt ./sdk/
+cp build/CMakeLists.txt-SmartBody ./sdk/src/SmartBody
+cp build/CMakeLists.txt-sbgui ./sdk/src/sbgui
+cp build/CMakeLists.txt-polyvox ./sdk/src/sbgui/external/polyvox/library/PolyVoxCore
+cp build/CMakeLists.txt-simplesmartbody ./sdk/src/simplesmartbody
+cp build/CMakeLists.txt-vhcl ./sdk/src/vhcl
+cp build/CMakeLists.txt-vhmsg ./sdk/src/vhmsg
+cp build/CMakeLists.txt-bonebus ./sdk/src/bonebus
+cp build/CMakeLists.txt-wsp ./sdk/src/wsp
+cp build/CMakeLists.txt-steerlib ./sdk/src/steerlib
+cp build/CMakeLists.txt-pprAI ./sdk/src/pprAI
+cp build/CMakeLists.txt-ogresmartbody ./sdk/src/ogresmartbody
+cp build/CMakeLists.txt-irrlichtsmartbody ./sdk/src/irrlichtsmartbody
 

@@ -1,3 +1,6 @@
+add_subdirectory(external/polyvox) 
+add_subdirectory(external/Pinocchio) 
+
 include_directories( . )
 include_directories( ../SmartBody )
 include_directories( ../../include/vhcl )
@@ -8,6 +11,11 @@ include_directories( ../../include/steersuite )
 include_directories( ../../include/steersuite/external )
 include_directories( ../../include/steersuite/external/tinyxml )
 include_directories( /usr/include/python2.7 )
+include_directories( external/Pinocchio )
+include_directories( external/polyvox/library/PolyVoxCore/include)
+
+add_definitions(  -std=c++11 )
+
 
 set (BUILD_OGRE TRUE)
 # never build ogre if in osx
@@ -192,6 +200,7 @@ set( SBM_FLTK_SRC
 	./retargetviewer/RetargetViewer.cpp
 	./retargetcreator/RetargetCreatorWindow.cpp
 	./autorig/SBAutoRigManager.cpp
+	./autorig/VoxelizerWindow.cpp
 
 	./monitorviewer/MonitorConnectWindow.cpp 
 	./motioneditor/MotionEditorWindow.cpp
@@ -247,7 +256,8 @@ target_link_libraries( sbgui
 	python2.7
     	ncurses	
 	pthread
-	#pinocchio
+	pinocchio
+	polyvoxcore
 	${MORE_LIBS}
 	${OGRE_LIBS}
 	#CEGUIBase
