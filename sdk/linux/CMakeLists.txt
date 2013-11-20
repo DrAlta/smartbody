@@ -15,6 +15,7 @@ include_directories(
 	./include/bonebus
 	./include/wsp
 	./include/steersuite
+	./include/steersuite/external
 	./include
 	/usr/include
 	/usr/local/include
