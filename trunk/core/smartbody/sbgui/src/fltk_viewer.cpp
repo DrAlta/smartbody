@@ -1878,9 +1878,15 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		}
 
 		// process mesh or skeleton
-		//LOG("path name = %s, base name = %s, extension = %s",fullPath.c_str(), filebasename.c_str(), fileextension.c_str());
+		//std::cout << "path name = " << fullPath << " base name = " << filebasename << "  extension = " << fileextension << std::endl;
 		// first, load the drag-in-assets
 		SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+		//std::cout << "FULLPATHNAME = " << fullPathName << std::endl;
+		int pos = fullPathName.find("file://");
+		if (pos != std::string::npos)
+		{
+			fullPathName = fullPathName.substr(7);
+		}
 		assetManager->loadAsset(fullPathName);	
 
 #if 0 // the code is replaced by the new asset loading mechanism, which provides cleaner handling. So there is no need to copy the files to retarget folders. 
@@ -2131,7 +2137,7 @@ int FltkViewer::handle ( int event )
 	   case FL_PASTE:              // handle actual drop (paste) operation		   
 		   label(Fl::event_text());
 		   //fprintf(stderr, "PASTE: %s\n", Fl::event_text());
-		   LOG("PASTE: %s\n", Fl::event_text());
+		   std::cout << "PASTE: n" << Fl::event_text() << std::endl;
 		   dndText = Fl::event_text();
 		   processDragAndDrop(dndText,dndX,dndY);
 		   ret = 1;

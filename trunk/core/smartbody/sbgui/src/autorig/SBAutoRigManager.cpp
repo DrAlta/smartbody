@@ -1,5 +1,12 @@
-#include "SBAutoRigManager.h"
 #ifdef WIN32
+#define USE_AUTO_RIGGING 1
+#endif
+#ifdef __linux__
+#define USE_AUTO_RIGGING 1
+#endif
+
+#include "SBAutoRigManager.h"
+#if USE_AUTO_RIGGING
 #include "pinocchioApi.h"
 #include "VoxelizerWindow.h"
 #endif
@@ -14,7 +21,8 @@
 
 #include <FL/Fl.H>
 
-#ifdef WIN32
+
+#if USE_AUTO_RIGGING
 bool SrModelToMesh( SrModel& model, Mesh& mesh, bool sanityCheck = true );
 bool AutoRigToSBSk( PinocchioOutput& out, Skeleton& sk, SmartBody::SBSkeleton& sbSk);
 bool AutoRigToDeformableMesh(PinocchioOutput& out, SrModel& m, SmartBody::SBSkeleton& sbSk, DeformableMesh& deformMesh);
@@ -37,7 +45,7 @@ SBAutoRigManager::~SBAutoRigManager()
 
 bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
-#ifdef WIN32
+#ifdef USE_AUTO_RIGGING
 	int voxelSize = 180;
 	VoxelizerWindow* voxelWindow = new VoxelizerWindow(0,0,voxelSize,voxelSize,"voxelWindow");
 	voxelWindow->initVoxelizer(&inModel,voxelSize);
@@ -106,7 +114,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 
 bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
-#ifdef WIN32
+#ifdef USE_AUTO_RIGGING
 	Mesh m;
 	//Skeleton sk = HumanSkeleton(); // default human skeleton from Pinocchio. Should define our own custom skeleton to account for gaze and other behavior
 	Skeleton sk = SmartBodySkeleton();
@@ -145,12 +153,12 @@ bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName
 }
 
 
-#ifdef WIN32
+#ifdef USE_AUTO_RIGGING
 bool AutoRigToDeformableMesh( PinocchioOutput& out, SrModel& m, SmartBody::SBSkeleton& sbSk, DeformableMesh& deformMesh )
 {
 	//deformMesh.dMeshStatic_p.push_back()
 	// setup mesh
-	std::string meshName = m.name;
+	std::string meshName = (const char*) m.name;
 	SrSnModel* srSnModelDynamic = new SrSnModel();
 	SrSnModel* srSnModelStatic = new SrSnModel();
 	srSnModelDynamic->shape(m);
