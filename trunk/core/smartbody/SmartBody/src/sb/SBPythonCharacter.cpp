@@ -154,6 +154,7 @@ void pythonFuncsCharacter()
 		.def("interruptFace", &SBCharacter::interruptFace, "Stops any action units or lip syncing movements on a character by fading them out over a period of seconds specified.")
 		.def("hasSpeechBehavior", &SBCharacter::hasSpeechBehavior, "Returns speech behavior msg id if any, otherwise return empty string.")
 		.def("createBlendShapeChannel", &SBCharacter::createBlendShapeChannel, "Create a blend shape channel given its name.")
+		.def("setDeformableMeshName", &SBCharacter::setDeformableMeshName, "Sets the name of the deformable mesh. Same as setting the deformableMesh attribute.")
 		;
 
 }

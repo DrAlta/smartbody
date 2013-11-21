@@ -85,6 +85,8 @@ class SBCharacter : public SbmCharacter
 		void setJointTrajBlendWeight(float val) { jointTrajBlendWeight = val; }
 
 		SBAPI void createBlendShapeChannel(const std::string& channelName);
+
+		SBAPI void setDeformableMeshName(const std::string& meshName);
 		
 	protected:
 		std::vector<SBBehavior*> _curBehaviors;	
