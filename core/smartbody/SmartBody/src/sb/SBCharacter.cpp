@@ -968,4 +968,10 @@ void SBCharacter::setUseJointConstraint( bool bUseConstraint )
 {
 	useJointConstraint = bUseConstraint;
 }
+
+void SBCharacter::setDeformableMeshName(const std::string& meshName)
+{
+	this->setStringAttribute("deformableMesh", meshName);
+}
+
 };
