@@ -1284,8 +1284,9 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 	//---start locomotion
 	if (character->param_animation_ct->isIdle() && numGoals != 0 && nextStateName == "" && distToTarget > distDownThreshold)
 	{
-		// check to see if there's anything obstacles around it
-		float targetAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x * scene->getScale(), pprAgent->getStartTargetPosition().z - z * scene->getScale()));
+		// check to see if there's anything obstacles around it		
+		//float targetAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x * scene->getScale(), pprAgent->getStartTargetPosition().z - z * scene->getScale()));
+		float targetAngle = radToDeg(atan2(targetLoc.x - x * scene->getScale(), targetLoc.z - z * scene->getScale()));
 		normalizeAngle(targetAngle);
 		//LOG("steering:normalize target angle = %f",targetAngle);
 		normalizeAngle(yaw);
@@ -1759,8 +1760,8 @@ void PPRAISteeringAgent::startLocomotionState()
 {
 	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 	const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
-	float desiredSpeed = steeringCommand.targetSpeed;
-	desiredSpeed *= 1.0f / SmartBody::SBScene::getScene()->getScale();
+	float targetSpeed = this->desiredSpeed;//steeringCommand.targetSpeed;
+	targetSpeed *= 1.0f / SmartBody::SBScene::getScene()->getScale();
 
 	SmartBody::SBAnimationBlendManager* stateManager = SmartBody::SBScene::getScene()->getBlendManager();
 	SmartBody::SBAnimationBlend* state = stateManager->getBlend(locomotionName);
@@ -1777,8 +1778,8 @@ void PPRAISteeringAgent::startLocomotionState()
 		if (retarget)
 			parameterScale = 1.f/retarget->getHeightRatio();
 	}
-
-	adjustLocomotionBlend(character, locomotionName, 3, desiredSpeed*parameterScale, 0, 0, false, true);
+	//LOG("desire speed = %f, parameter scele = %f",targetSpeed, parameterScale);
+	adjustLocomotionBlend(character, locomotionName, 3, targetSpeed*parameterScale, 0, 0, false, true);
 }
 
 void PPRAISteeringAgent::adjustLocomotionBlend(SmartBody::SBCharacter* character, const std::string& blendName, int blendDimension, double x, double y, double z, bool directPlay, bool loop)
@@ -1827,7 +1828,7 @@ void PPRAISteeringAgent::adjustLocomotionBlend(SmartBody::SBCharacter* character
 			wrap = PABlendData::Once;
 		PABlendData::ScheduleMode schedule = PABlendData::Now;
 		PABlendData::BlendMode blendMode = PABlendData::Overwrite;
-
+		//LOG("blendName = %s, parameter = %f %f %f",blendName.c_str(), x,y,z);
 		character->param_animation_ct->schedule(blend, weights, wrap, schedule, blendMode, "null", 0.0, 0.0, 0.0, -1.0, directPlay);
 	}
 }
