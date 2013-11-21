@@ -66,7 +66,10 @@ for i in range(15):
 	if i== 0 : 
 		scene.run('BehaviorSetMaleMocapLocomotion.py')
 		setupBehaviorSet()
-	retargetBehaviorSet(baseName)
+		retargetBehaviorSet(baseName)
+	steerAgent = steerManager.createSteerAgent(baseName)
+	steerAgent.setSteerStateNamePrefix("mocap")
+	steerAgent.setSteerType("example")
 	# Add current Brad into list
 	bradList.append(brad)
 	
@@ -92,14 +95,21 @@ for i in range(15):
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 	# Retarget character
-	retargetBehaviorSet(baseName)
+	if i == 0:
+ 		retargetBehaviorSet(baseName)
+	steerAgent = steerManager.createSteerAgent(baseName)
+	steerAgent.setSteerStateNamePrefix("mocap")
+	steerAgent.setSteerType("example")    
 	#retargetCharacter(baseName, 'ChrRachel.sk', False)
 	# Add Rachel into list
 	rachelList.append(rachel)
+  
+steerManager.setEnable(False)
+steerManager.setEnable(True)
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
 
 # Paths for Brad and Rachel
 
@@ -119,14 +129,14 @@ class GUIHandler:
 		btn = args.window
 		for brad in bradList:
 			bmlCmd = '<locomotion target="' + str(btn.getText()) + '" speed="' + str(bradSpeed) + '"/>'
-			print bmlCmd
+			#print bmlCmd
 			bml.execBML(brad.getName(), bmlCmd)
 	def handleRachelSteerButton(self,args):
 		print 'handleRachelSteer'
 		btn = args.window
 		for rachel in rachelList:
 			bmlCmd = '<locomotion target="' + str(btn.getText()) + '" speed="' + str(rachelSpeed) + '"/>'
-			print bmlCmd
+			#print bmlCmd
 			bml.execBML(rachel.getName(), bmlCmd)
 	def handleBradSpeedSlider(self,args):		
 		slider = args.window				

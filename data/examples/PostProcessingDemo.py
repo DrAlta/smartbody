@@ -94,7 +94,7 @@ brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 brad.setStringAttribute('lipSyncSetName', 'default')
 brad.setBoolAttribute('usePhoneBigram', True)
 brad.setVoice('remote')
-brad.setVoiceCode('MicrosoftAnna')
+brad.setVoiceCode('Microsoft|Anna')
 # Gesture map setup
 brad.setStringAttribute('gestureMap', 'ChrBrad.dae')
 brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)

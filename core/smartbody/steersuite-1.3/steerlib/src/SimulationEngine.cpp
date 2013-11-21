@@ -325,6 +325,8 @@ bool SimulationEngine::_simulateOneStep( bool overrideClockTime, float newOverri
 		simulationDt = newOverrideTime - previousOverrideTime;
 		currentSimulationTime = newOverrideTime;
 		previousOverrideTime = newOverrideTime;
+		_clock._simulationFrameNumber++;
+		currentFrameNumber++;
 	}
 
 	// call preprocess for all modules

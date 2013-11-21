@@ -81,7 +81,7 @@ class SBScene : public SBObject
 
 		SBAPI std::string save(bool remoteSetup = false, std::string mediaPath = "");
 		SBAPI std::string saveSceneSetting();
-		SBAPI std::string exportScene(const std::vector<std::string>& aspects, bool remoteSetup);
+		SBAPI std::string exportScene(const std::vector<std::string>& aspects, std::string mediaPath = "", bool remoteSetup = false);
 
 		#if !defined(__FLASHPLAYER__)
 		SBAPI void exportScenePackage(std::string outDir, std::string outZipArchiveName = "");

@@ -6,7 +6,7 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'data/Sinbad')
+scene.addAssetPath('motion', 'Sinbad')
 scene.addAssetPath('script', 'behaviorsets')
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
@@ -45,8 +45,10 @@ for i in range(amount):
 	if i == 0 :
 		scene.run('BehaviorSetMaleLocomotion.py')
 		setupBehaviorSet()
-	retargetBehaviorSet(sinbadName)
-	
+		retargetBehaviorSet(sinbadName)
+ 	steerAgent = steerManager.createSteerAgent(sinbadName)
+	steerAgent.setSteerStateNamePrefix("all")
+	steerAgent.setSteerType("example")
 	
 	sinbadList.append(sinbad)
 	sinbad.setStringAttribute("displayType", "GPUmesh")

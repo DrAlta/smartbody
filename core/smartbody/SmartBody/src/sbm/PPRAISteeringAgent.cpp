@@ -498,6 +498,12 @@ void PPRAISteeringAgent::evaluate(double dtime)
 			{
 				agent->addGoal(goal);
 			}
+
+			if (pprAgent)
+			{
+				pprAgent->_nextFrameToRunLongTermPlanningPhase = 0;
+				pprAgent->_nextFrameToRunMidTermPlanningPhase = 0;
+			}
 		}
 		numGoals = goalQueue.size();
 	}
@@ -517,7 +523,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 			
 		agent->updateAgentState(newPosition, newOrientation, newSpeed);				
 		//accumTime += dt;
-		agent->updateAI((float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), dt, _curFrame++);
+		//agent->updateAI((float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), dt, _curFrame++);
 	} catch (Util::GenericException& ge) {
 		std::string message = ge.what();
 		if (lastMessage == message)
@@ -1103,6 +1109,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
 	const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
+	//LOG("%f %f %f %f %f %f", steeringCommand.acceleration, steeringCommand.targetDirection.x, steeringCommand.targetDirection.y, steeringCommand.targetDirection.z, steeringCommand.targetSpeed, steeringCommand.turningAmount);
 	
 
 	//*** IMPORTANT: use the example-based animation to update the steering agent
@@ -1204,6 +1211,8 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 					//LOG("agent %s, newTarget = %f %f %f",character->getName().c_str(),newTarget.x, newTarget.y,newTarget.z);
 					agent->addGoal(goal);
 					collisionTime = 0;
+					pprAgent->_nextFrameToRunLongTermPlanningPhase = 0;
+					pprAgent->_nextFrameToRunMidTermPlanningPhase = 0;
 				}		
 			}
 
@@ -1361,6 +1370,9 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 			//goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
 			goal.targetLocation = Util::Point(newGoal.x, 0.0f, newGoal.z);
 			agent->addGoal(goal);
+
+			pprAgent->_nextFrameToRunLongTermPlanningPhase = 0;
+			pprAgent->_nextFrameToRunMidTermPlanningPhase = 0;
 		}
 		
 		return 0;

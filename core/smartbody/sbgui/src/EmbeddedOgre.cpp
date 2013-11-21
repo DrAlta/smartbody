@@ -569,19 +569,22 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 
 		ogreRoot->setRenderSystem(lRenderSystem);
 
+		std::string ogrePath = SmartBody::SBScene::getSystemParameter("ogrepath");
+		if (ogrePath != "")
+		{
 #ifdef WIN32
-		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/materials/programs","FileSystem");
-		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/materials/scripts","FileSystem");
-		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/materials/textures","FileSystem");
-		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/RTShaderLib/","FileSystem");
-		ogreRoot->addResourceLocation("../../../../lib/OgreSDK/media/RTShaderLib/materials/","FileSystem");
+			ogrePath = "../../../../lib/OgreSDK";
 #else
-		ogreRoot->addResourceLocation("/usr/share/OGRE-1.8.0/media/materials/programs","FileSystem");
-		ogreRoot->addResourceLocation("/usr/share/OGRE-1.8.0/media/materials/scripts","FileSystem");
-		ogreRoot->addResourceLocation("/usr/share/OGRE-1.8.0/media/materials/textures","FileSystem");
-		ogreRoot->addResourceLocation("/usr/share/OGRE-1.8.0/media/RTShaderLib/","FileSystem");
-		ogreRoot->addResourceLocation("/usr/share/OGRE-1.8.0/media/RTShaderLib/materials/","FileSystem");
+			ogrePath = "/usr/share/OGRE-1.8.0";
 #endif
+		}
+
+		ogreRoot->addResourceLocation(ogrePath + "/media/materials/programs","FileSystem");
+		ogreRoot->addResourceLocation(ogrePath + "/media/materials/scripts","FileSystem");
+		ogreRoot->addResourceLocation(ogrePath + "/media/materials/textures","FileSystem");
+		ogreRoot->addResourceLocation(ogrePath + "/media/RTShaderLib/","FileSystem");
+		ogreRoot->addResourceLocation(ogrePath + "/media/RTShaderLib/materials/","FileSystem");
+
 
 		ogreWnd = ogreRoot->initialise( false );
 		Ogre::NameValuePairList params;

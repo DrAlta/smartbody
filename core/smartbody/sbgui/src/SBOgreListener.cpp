@@ -204,7 +204,12 @@ void OgreListener::OnCharacterDelete( const std::string & name )
 			}
 		}
 		if (eraseId >= 0)
-			objList.erase(frameListener->m_characterList.begin() + eraseId);
+		{
+			if (isPawn)
+				objList.erase(frameListener->m_pawnList.begin() + eraseId);
+			else
+				objList.erase(frameListener->m_characterList.begin() + eraseId);
+		}
 
 		if (!isPawn)
 		{

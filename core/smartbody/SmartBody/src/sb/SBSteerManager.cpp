@@ -100,22 +100,23 @@ void SBSteerManager::update(double time)
 			else
 				_maxUpdateFrequency = .016;
 			double timeDiff = SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - getEngineDriver()->getLastUpdateTime();
+			const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
+			for (std::vector<std::string>::const_iterator iter = characterNames.begin();
+				iter != characterNames.end();
+				iter++)
+			{
+				SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
+				SmartBody::SBSteerAgent* steerAgent = getSteerAgent(character->getName());
+				if (steerAgent)
+					steerAgent->evaluate(timeDiff);
+			}
+
 			if (timeDiff >= _maxUpdateFrequency)
 			{ // limit steering to 60 fps
 				getEngineDriver()->setLastUpdateTime(SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 
 
-				const std::vector<std::string>& characterNames = SmartBody::SBScene::getScene()->getCharacterNames();
-				for (std::vector<std::string>::const_iterator iter = characterNames.begin();
-					iter != characterNames.end();
-					iter++)
-				{
-					SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(*iter);
-					SmartBody::SBSteerAgent* steerAgent = getSteerAgent(character->getName());
-					if (steerAgent)
-						steerAgent->evaluate(timeDiff);
-				}
-
+			
 				bool running = getEngineDriver()->_engine->update(false, true, (float) (SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - getEngineDriver()->getStartTime()));
 				if (!running)
 					getEngineDriver()->setDone(true);

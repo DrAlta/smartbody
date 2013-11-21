@@ -11,9 +11,9 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r5194
+AppVersion=r5218
 OutputBaseFilename=SmartBody
-WizardImageFile=".\SmartBody_splash.bmp"
+WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
 
 
@@ -27,19 +27,19 @@ Source: ".\3rd party licenses.txt"; DestDir: "{app}"
 Source: ".\core\smartbody\sbgui\bin\*.exe"; DestDir: "{app}\bin"
 Source: ".\core\smartbody\sbgui\bin\*.dll"; DestDir: "{app}\bin"
 Source: ".\core\smartbody\sbgui\bin\*.pyd"; DestDir: "{app}\bin"
-Source: ".\.smartbodysettings"; DestDir: "{app}\bin"
-Source: ".\core\smartbody\sbgui\visualc9\SmartBody_48x48.ico"; DestDir: "{app}\bin"
+Source: ".\sdk\.smartbodysettings"; DestDir: "{app}\bin"
+;Source: ".\core\smartbody\sbgui\visualc9\SmartBody_48x48.ico"; DestDir: "{app}\bin"
 
 ; supporting libraries - Python 2.7
-Source: ".\core\smartbody\Python27\*"; DestDir: "{app}\python27"; Excludes: "tcl, tk, Cerebella, pyke, pyxb, scipy"; Flags: recursesubdirs
+Source: ".\core\smartbody\Python27\*"; DestDir: "{app}\python27"; Excludes: "tcl, tk, Cerebella, pyke, pyxb, scipy, .svn"; Flags: recursesubdirs
 
 ; supporting libraries - Ogre 1.8.1
-Source: ".\lib\OgreSDK\bin\*"; DestDir: "{app}\OgreSDK\bin";    Flags: recursesubdirs
-Source: ".\lib\OgreSDK\Docs\*"; DestDir: "{app}\OgreSDK\Docs";  Flags: recursesubdirs
-Source: ".\lib\OgreSDK\include\*"; DestDir: "{app}\OgreSDK\include"; Flags: recursesubdirs
-Source: ".\lib\OgreSDK\lib\*"; DestDir: "{app}\OgreSDK\lib"; Flags: recursesubdirs
-Source: ".\lib\OgreSDK\media\*"; DestDir: "{app}\OgreSDK\media"; Flags: recursesubdirs
-Source: ".\lib\OgreSDK\samples\*"; DestDir: "{app}\OgreSDK\samples"; Flags: recursesubdirs
+Source: ".\lib\OgreSDK\bin\*"; DestDir: "{app}\OgreSDK\bin";  Excludes: ".svn";  Flags: recursesubdirs
+Source: ".\lib\OgreSDK\Docs\*"; DestDir: "{app}\OgreSDK\Docs"; Excludes: ".svn";  Flags: recursesubdirs
+Source: ".\lib\OgreSDK\include\*"; DestDir: "{app}\OgreSDK\include"; Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\lib\OgreSDK\lib\*"; DestDir: "{app}\OgreSDK\lib"; Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\lib\OgreSDK\media\*"; DestDir: "{app}\OgreSDK\media"; Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\lib\OgreSDK\samples\*"; DestDir: "{app}\OgreSDK\samples"; Excludes: ".svn"; Flags: recursesubdirs
 
 ; supporting libraries - CEGUI 0.8.2
 
@@ -50,8 +50,8 @@ Source: ".\lib\OgreSDK\samples\*"; DestDir: "{app}\OgreSDK\samples"; Flags: recu
 ;Source: ".\core\TtsRelay\bin\x86\Release\*.dll"; DestDir: "{app}\bin"
 
 ; library includes
-Source: ".\core\smartbody\steersuite-1.3\steerlib\include\*"; DestDir: "{app}\include\steersuite"; Flags: recursesubdirs
-Source: ".\core\smartbody\steersuite-1.3\pprAI\include\*"; DestDir: "{app}\include\steersuite"; Flags: recursesubdirs
+Source: ".\core\smartbody\steersuite-1.3\steerlib\include\*"; DestDir: "{app}\include\steersuite";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\core\smartbody\steersuite-1.3\pprAI\include\*"; DestDir: "{app}\include\steersuite";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\steersuite-1.3\external\tinyxml\*"; DestDir: "{app}\include\steersuite\tinyxml"
 Source: ".\core\smartbody\steersuite-1.3\external\mersenne\*"; DestDir: "{app}\include\steersuite\mersenne"
 Source: ".\lib\vhcl\include\*"; DestDir: "{app}\include\vhcl"
@@ -59,9 +59,9 @@ Source: ".\lib\vhmsg\vhmsg-c\include\*"; DestDir: "{app}\include\vhmsg"
 Source: ".\lib\bonebus\include\*"; DestDir: "{app}\include\bonebus"
 Source: ".\lib\wsp\wsp\include\*"; DestDir: "{app}\include\wsp"
 Source: ".\core\smartbody\sbgui\external\fltk-1.3.2\FL\*"; DestDir: "{app}\include\FL"
-Source: ".\core\smartbody\sbgui\external\cegui-0.8.2\include\*"; DestDir: "{app}\include\CEGUI"; Flags: recursesubdirs
+Source: ".\core\smartbody\sbgui\external\cegui-0.8.2\include\*"; DestDir: "{app}\include\CEGUI";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\sbgui\external\Pinocchio\*.h"; DestDir: "{app}\include\Pinocchio";
-Source: ".\core\smartbody\sbgui\external\polyvox\library\PolyVoxCore\include\*"; DestDir: "{app}\include\polyvox";  Flags: recursesubdirs
+Source: ".\core\smartbody\sbgui\external\polyvox\library\PolyVoxCore\include\*"; DestDir: "{app}\include\polyvox";   Excludes: ".svn"; Flags: recursesubdirs
 
 ; libary header files
 Source: ".\lib\xerces-c\include\xercesc\*"; DestDir: "{app}\include\xercesc";Flags: recursesubdirs
@@ -69,8 +69,8 @@ Source: ".\lib\boost\boost\*"; DestDir: "{app}\include\boost";Flags: recursesubd
 Source: ".\core\SmartBody\ode\include\*"; DestDir: "{app}\include";Flags: recursesubdirs
 
 ; applications
-Source: ".\core\smartbody\SmartBody\src\*"; DestDir: "{app}\src\SmartBody"; Flags: recursesubdirs
-Source: ".\core\smartbody\sbgui\src\*"; DestDir: "{app}\src\sbgui"; Flags: recursesubdirs
+Source: ".\core\smartbody\SmartBody\src\*"; DestDir: "{app}\src\SmartBody";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\core\smartbody\sbgui\src\*"; DestDir: "{app}\src\sbgui";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\simplesmartbody\simplesmartbody.cpp"; DestDir: "{app}\src\simplesmartbody"; Flags:
 
 ; build
@@ -109,17 +109,17 @@ Source: ".\core\smartbody\sbgui\external\Pinocchio\lib\*.lib"; DestDir: "{app}\l
 Source: ".\core\smartbody\sbgui\external\polyvox\build\lib\*.lib"; DestDir: "{app}\lib"
 
 ; data
-Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets"; Flags: recursesubdirs
-Source: ".\data\examples\*"; DestDir: "{app}\data\examples"; Excludes: "Physics, Terrain";Flags: recursesubdirs
-Source: ".\data\fonts\*"; DestDir: "{app}\data\fonts"; Flags: recursesubdirs
-Source: ".\data\ChrBrad\*"; DestDir: "{app}\data\ChrBrad"; Flags: recursesubdirs
-Source: ".\data\ChrRachel\*"; DestDir: "{app}\data\ChrRachel"; Flags: recursesubdirs
-Source: ".\data\Sinbad\*"; DestDir: "{app}\data\Sinbad"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\examples\*"; DestDir: "{app}\data\examples"; Excludes: "Physics, Terrain, .svn";Flags: recursesubdirs
+Source: ".\data\fonts\*"; DestDir: "{app}\data\fonts";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\ChrBrad\*"; DestDir: "{app}\data\ChrBrad";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\ChrRachel\*"; DestDir: "{app}\data\ChrRachel";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\Sinbad\*"; DestDir: "{app}\data\Sinbad";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\data\mesh\ChrBrad\*"; DestDir: "{app}\data\mesh\ChrBrad"
 Source: ".\data\mesh\ChrRachel\*"; DestDir: "{app}\data\mesh\ChrRachel"
 Source: ".\data\mesh\Sinbad\*"; DestDir: "{app}\data\mesh\Sinbad"
 Source: ".\data\scripts\*"; DestDir: "{app}\data\scripts"
-Source: ".\data\cegui\datafiles-0.8.2\*"; DestDir: "{app}\data\cegui\datafiles-0.8.2"; Flags: recursesubdirs
+Source: ".\data\cegui\datafiles-0.8.2\*"; DestDir: "{app}\data\cegui\datafiles-0.8.2";  Excludes: ".svn"; Flags: recursesubdirs
 
 Source: "c:\users\shapiro\smartbody\externalprograms\vcredist_x86.exe"; DestDir: "{app}"
 
@@ -128,7 +128,7 @@ Source: ".\sdk\README.txt"; DestDir: "{app}\"
 Source: ".\sdk\resources.cfg"; DestDir: "{app}\"
 Source: ".\sdk\win32\build\*"; DestDir: "{app}\build"
 Source: ".\sdk\win32\bin\*"; DestDir: "{app}\bin"
-Source: ".\sdk\win32\src\*"; DestDir: "{app}\src"; Flags: recursesubdirs
+Source: ".\sdk\win32\src\*"; DestDir: "{app}\src";  Excludes: ".svn"; Flags: recursesubdirs
 
 
 

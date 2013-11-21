@@ -140,27 +140,39 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 
    // if an audio path is present, use it
    bool useAudioPaths = true;
+   bool hasAudioPath = false;
    std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
    std::string relativeAudioPath = "";
-   if (audioPaths.size() > 0)
-		relativeAudioPath = audioPaths[0];
-
-	boost::filesystem::path p( relativeAudioPath );
-	p /= voiceCode;
+   //if (audioPaths.size() > 0)
+   //	relativeAudioPath = audioPaths[0];
+   boost::filesystem::path abs_p;
+   for (size_t audioPathCounter = 0; audioPathCounter < audioPaths.size(); ++audioPathCounter)
+   {
+	   boost::filesystem::path p( relativeAudioPath );
+	   p /= voiceCode;
 #if (BOOST_VERSION > 104400)
-	boost::filesystem::path abs_p = boost::filesystem::absolute( p );	
-	if( !boost::filesystem::exists( abs_p ))
-	{
-	  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
+	   abs_p = boost::filesystem::absolute( p );	
+	   if( !boost::filesystem::exists( abs_p ))
+	   {
+		   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
 #else
-	boost::filesystem::path abs_p = boost::filesystem::complete( p );	
-	if( !boost::filesystem2::exists( abs_p ))
-	{
-	  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+	   abs_p = boost::filesystem::complete( p );	
+	   if( !boost::filesystem2::exists( abs_p ))
+	   {
+		   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
 #endif
-      return 0;
-	}
+		   continue;
+	   }
+	   else
+	   {
+		   hasAudioPath = true;
+		   break;
+	   }
+   }
+   if (!hasAudioPath) // can not find the audio file in audio paths
+	   return 0;
 
+	
 	boost::filesystem::path wavPath = abs_p;
 	wavPath /= std::string(ref + ".wav");
 	boost::filesystem::path bmlPath = abs_p;
@@ -265,27 +277,35 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    if( !boost::filesystem2::exists( voicecodeabs_p ))
 #endif
    {
-	    std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
-		std::string relativeAudioPath = "";
-		if (audioPaths.size() > 0)
-			relativeAudioPath = audioPaths[0];
-	    
-		boost::filesystem::path p( relativeAudioPath );
-		p /= voiceCode;
+	   std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
+	   std::string relativeAudioPath = "";
+	   bool hasAudioPath = false;
+	   boost::filesystem::path abs_p;
+	   for (size_t audioPathCounter = 0; audioPathCounter < audioPaths.size(); ++audioPathCounter)
+	   {
+		   boost::filesystem::path p( relativeAudioPath );
+		   p /= voiceCode;
 #if (BOOST_VERSION > 104400)
-		abs_p = boost::filesystem::absolute( p );	
-		if( !boost::filesystem::exists( abs_p ))
-		{
-		  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
+		   abs_p = boost::filesystem::absolute( p );	
+		   if( !boost::filesystem::exists( abs_p ))
+		   {
+			   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
 #else
-		abs_p = boost::filesystem::complete( p );	
-		if( !boost::filesystem2::exists( abs_p ))
-		{
-		  LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+		   abs_p = boost::filesystem::complete( p );	
+		   if( !boost::filesystem2::exists( abs_p ))
+		   {
+			   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
 #endif
-
-		  return 0;
-		}
+			   continue;
+		   }
+		   else
+		   {
+			   hasAudioPath = true;
+			   break;
+		   }
+	   }
+	   if (!hasAudioPath)
+		   return 0;
    }
 
 	boost::filesystem::path wavPath = abs_p;

@@ -1,10 +1,4 @@
 # Mapping from Mixamo skeleton to SmartBody skeleton
-# Before loading character, run this;
-#   seq mixamo-map.seq
-# then map any existing skeletons:
-#   skeletonmap <skeleton> mixamo
-# also map any motions to mixamo:
-#   motionmap <motion> mixamo
 
 jointMapManager = scene.getJointMapManager()
 mixamoMap = jointMapManager.createJointMap("mixamo")

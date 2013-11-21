@@ -274,8 +274,8 @@ rachel.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 
 # Turning on deformable GPU 
-scene.command('char ChrBrad viewer deformableGPU')
-scene.command('char ChrRachel viewer deformableGPU')
+brad.setStringAttribute("displayType", "GPUmesh")
+rachel.setStringAttribute("displayType", "GPUmesh")
 
 # Set saccade mode for Brad and Rachel
 print 'Setting saccade mode to talk'

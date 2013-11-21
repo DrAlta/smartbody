@@ -1,5 +1,9 @@
 # generate a sdk folder
 mkdir -p sdk
+# documentation
+cp ../../SmartBodyManual.pdf ./sdk/
+cp ../../SmartBodyPythonAPI.html ./sdk/
+cp ../../"3rd party licenses.txt" ./sdk/
 
 # copy include
 # (xerces is not matching the windows distribution)

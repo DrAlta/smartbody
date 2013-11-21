@@ -73,7 +73,7 @@ scene.getCharacter('ChrBrad1').setPosition(SrVec(0, 0, 1))
 
 # Turn on GPU deformable geomtery for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")
 
 # Set up pawns in scene
 print 'Adding pawns to scene'
