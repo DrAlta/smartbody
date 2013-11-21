@@ -41,6 +41,9 @@ SBAPI SBJoint* SBSkeleton::createJoint(const std::string& name, SBJoint* parent)
 	}
 	SBJoint* joint = new SBJoint();
 	joint->setName(name);
+	joint->rot_type ( SkJoint::TypeQuat );
+	joint->quat()->activate();
+	joint->pos()->activate();
 	int parentId = -1;
 	if (parent)
 	{

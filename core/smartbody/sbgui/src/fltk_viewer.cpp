@@ -2405,6 +2405,13 @@ int FltkViewer::handle ( int event )
 					}
 				}
 				
+				if (sceneBox.volume() < .0001)
+				{
+					double val = 1.0 / SmartBody::SBScene::getScene()->getScale() * .5;
+					sceneBox.grows((float) val, (float) val, (float) val);
+					sceneBox.extend(sceneBox);
+				} 
+				
 				camera->view_all(sceneBox, camera->getFov());	
 				float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
 				float znear = 0.01f*scale;
