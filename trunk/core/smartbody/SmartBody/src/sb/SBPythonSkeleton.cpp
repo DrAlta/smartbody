@@ -53,6 +53,7 @@ void pythonFuncsSkeleton()
 		.def("createSkelWithoutPreRot", &SBSkeleton::createSkelWithoutPreRot, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a new standard T-pose skel from source but without pre-rotations")	
 		.def("orientJointsLocalAxesToWorld", &SBSkeleton::orientJointsLocalAxesToWorld, "Orient skeleton joints local axes to match world coordinate axes (Y-up Z-front)")
 		.def("createJoint", &SBSkeleton::createJoint, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Adds a joint to the skeleton. First parameter is the joint, second is the joints parent (null for root).")
+		.def("update", &SBSkeleton::update, "Creates channels from the joints. Used after all the joints have been created.")
 		; 
 
 	boost::python::class_<SBJoint, boost::python::bases<SBObject> >("SBJoint")
