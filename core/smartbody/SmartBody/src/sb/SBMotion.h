@@ -5,7 +5,6 @@
 #include <vector>
 #include <string>
 #include <sk/sk_motion.h>
-#include <boost/serialization/base_object.hpp>
 
 namespace SmartBody {
 
@@ -173,10 +172,6 @@ class SBMotion : public SkMotion
 		std::vector<std::string> sMetaDataNames;
 		std::vector<std::string> sMetaDataValues;
 		std::vector<float> sSyncPoints;
-
-		friend class boost::serialization::access;
-		template<class Archive>
-		void serialize(Archive & ar, const unsigned int version);
 
 	protected:
 		void alignToSide(int numFrames, int direction = 0);

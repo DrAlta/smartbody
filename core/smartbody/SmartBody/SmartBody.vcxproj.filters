@@ -1093,54 +1093,26 @@
     <ClCompile Include="..\SmartBody\src\bml\behavior_scheduler_gesture.cpp">
       <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\smartbody-c-dll.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\smartbody-dll.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\controllers\me_ct_pose_postprocessing.cpp">
-      <Filter>controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sbm\ParserCOLLADAFast.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\SBAssetHandler.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\SBAssetHandlerSkm.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\SBAssetHandlerSk.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\SBAssetHandlerCOLLADA.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\SBAssetHandlerAmc.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\SBAssetHandlerAsf.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\SBAssetHandlerOgre.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\SBAssetHandlerObj.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\..\SmartBody\src\sb\SBAssetHandlerSkb.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
     <ClCompile Include="src\sb\SBNavigationMeshManager.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\SBAssetHandlerBvh.cpp">
       <Filter>sb</Filter>
     </ClCompile>
     <ClCompile Include="src\protocols\sbmotion.pb.cc">
       <Filter>protocols</Filter>
     </ClCompile>
+    <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp" />
+    <ClCompile Include="src\sbm\ParserCOLLADAFast.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandler.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerAmc.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerAsf.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerBvh.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerCOLLADA.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerObj.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerOgre.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerSk.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerSkb.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerSkm.cpp" />
+    <ClCompile Include="src\sb\smartbody-c-dll.cpp" />
+    <ClCompile Include="src\sb\smartbody-dll.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2229,58 +2201,26 @@
     <ClInclude Include="..\SmartBody\src\bml\behavior_scheduler_gesture.hpp">
       <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\smartbody-c-dll.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\smartbody-dll.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\controllers\me_ct_pose_postprocessing.hpp">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sbm\ParserCOLLADAFast.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBAssetHandler.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBAssetHandlerSkm.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBAssetHandlerSk.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBAssetHandlerCOLLADA.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBVersion.hpp" />
-    <ClInclude Include="..\SmartBody\src\sb\SBAssetHandlerAmc.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBAssetHandlerAsf.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBAssetHandlerOgre.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBAssetHandlerObj.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBAssetHandlerSkb.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBNavigationMeshManager.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBAssetHandlerBvh.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBSceneListener.h">
-      <Filter>sb</Filter>
-    </ClInclude>
     <ClInclude Include="src\protocols\sbmotion.pb.h">
       <Filter>protocols</Filter>
     </ClInclude>
+    <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp" />
+    <ClInclude Include="src\sbm\ParserCOLLADAFast.h" />
+    <ClInclude Include="src\sb\SBAssetHandler.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerAmc.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerAsf.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerBvh.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerCOLLADA.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerObj.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerOgre.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerSk.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerSkb.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerSkm.h" />
+    <ClInclude Include="src\sb\SBNavigationMeshManager.h" />
+    <ClInclude Include="src\sb\SBSceneListener.h" />
+    <ClInclude Include="src\sb\SBVersion.hpp" />
+    <ClInclude Include="src\sb\smartbody-c-dll.h" />
+    <ClInclude Include="src\sb\smartbody-dll.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">
