@@ -218,6 +218,8 @@ namespace SteerLib {
 		void setClockMode(ClockModeEnum clockMode, float fixedFps, float minSimulationDt, float maxSimulationDt);
 		//@}
 
+		unsigned int _simulationFrameNumber;
+
 	protected:
 		/// @name Protected helper functions
 		//@{
@@ -241,7 +243,7 @@ namespace SteerLib {
 		//@}
 
 		unsigned int _realFrameNumber;
-		unsigned int _simulationFrameNumber;
+		
 
 		unsigned long long _baseTick;
 		unsigned long long _totalRealTime;

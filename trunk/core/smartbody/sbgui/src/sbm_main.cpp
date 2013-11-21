@@ -697,7 +697,7 @@ int main( int argc, char **argv )	{
 	Fl::scheme("gtk+");
 #endif
 	
-	std::string python_lib_path = "../../../../core/smartbody/Python26/Lib";
+	std::string python_lib_path = "../../../../core/smartbody/Python27/Lib";
 	std::string festivalLibDir = "../../../../lib/festival/festival/lib/";
 	std::string festivalCacheDir = "../../../../data/cache/festival/";
 	std::string mediaPath = "../../../../data";
@@ -738,6 +738,16 @@ int main( int argc, char **argv )	{
 					}
 					
 				}
+				else if (tokens[t] == "ogrepath")
+				{
+					if (tokens.size() > t + 1)
+					{
+						LOG("Setting Ogre path to %s", tokens[t + 1].c_str());
+						SmartBody::SBScene::setSystemParameter("ogrepath", tokens[t + 1]);
+						t++;
+					}
+					
+				}
 				else if (tokens[t] == "mediapath")
 				{
 					if (tokens.size() > t + 1)
@@ -748,10 +758,19 @@ int main( int argc, char **argv )	{
 						t++;
 					}
 				}
+				else if (tokens[t] == "renderer")
+				{
+					if (tokens.size() > t + 1)
+					{
+						LOG("Setting renderer to %s", tokens[t + 1].c_str());
+						SmartBody::SBScene::setSystemParameter("renderer", mediaPath);
+						t++;
+					}
+				}
 				else
 				{
 					LOG("Unknown setting found in .smartbodysettings file: %s", line.c_str());
-					LOG("Valid settings are: pythonlibpath=<dir>  or mediapath=<dir>");
+					LOG("Valid settings are: pythonlibpath=<dir>  or mediapath=<dir> or ogrepath=<dir> or renderer=<ogre|classic>");
 				}
 			}
 		}

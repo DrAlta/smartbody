@@ -27,8 +27,6 @@ camera.setEye(1, 13.43, 18.63)
 camera.setCenter(1, 12, 16.91)
 scene.getPawn('camera').setPosition(SrVec(0, -50, 0))
 
-# Set up steering
-scene.run('init-steer-agents.py')
 steerManager = scene.getSteerManager()
 
 # Setting up Brads
@@ -56,21 +54,23 @@ for i in range(amount):
 	brad.setDoubleAttribute('deformableMeshScale', .01)
 	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Retarget character
-	#etargetCharacter(baseName, 'ChrBrad.sk', False)
+	#retargetCharacter(baseName, 'ChrBrad.sk', False)
 	# setup mocap locomotion
 	if i== 0 : 
-#		scene.run('BehaviorSetMaleMocapLocomotion.py')
 		scene.run('BehaviorSetMaleLocomotion.py')
 		setupBehaviorSet()
-	retargetBehaviorSet(baseName)
+		retargetBehaviorSet(baseName)
+	steerAgent = steerManager.createSteerAgent(baseName)
+	steerAgent.setSteerStateNamePrefix("all")
+	steerAgent.setSteerType("example")
 	# Set up steering
 	#setupSteerAgent(baseName, 'ChrBrad.sk')
-	steerManager.setEnable(False)
 	brad.setBoolAttribute('steering.pathFollowingMode', False)
-	steerManager.setEnable(True)
 	# Play default animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 
+steerManager.setEnable(False)
+steerManager.setEnable(True)
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
@@ -95,10 +95,10 @@ class CrowdDemo(SBScript):
 		# Once utah completes path, do again
 		if bradReached:
 			for brad in bradList:
-				print "Moving Brad " + brad.getName()
+				#print "Moving Brad " + brad.getName()
 				# Move character
-				print  '<locomotion speed="' +  str(random.uniform(1.20, 5.0)) + '" target="' +\
-											vec2str(bradPath[bradCur]) + '"/>'
+				#print  '<locomotion speed="' +  str(random.uniform(1.20, 5.0)) + '" target="' +\
+											#vec2str(bradPath[bradCur]) + '"/>'
 				bml.execBML(brad.getName(), '<locomotion speed="' +  str(random.uniform(1.20, 5.0)) + '" target="' +\
 											vec2str(bradPath[bradCur]) + '"/>')
 			bradCur = bradCur + 1

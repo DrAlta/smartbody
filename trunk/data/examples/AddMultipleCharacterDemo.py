@@ -83,8 +83,7 @@ class RamdomGazeScript(SBScript):
 		self.isInitialized = True
 		import random
 		self.names = scene.getCharacterNames()
-		print "Found " + str(len(self.names)) + " characters..."
-		self.numCharacters = len(self.names)
+		print "Found " + str(len(self.names)) + " characters..."		
 		for i in range(0, len(self.names)):
 			self.nextTimes.append(sim.getTime() + 3 + random.randrange(0, 6, 1))
 			which = random.randrange(0, len(self.names), 1)
@@ -96,12 +95,14 @@ class RamdomGazeScript(SBScript):
 		print "Stopping random gaze..."
 	def update(self, time):
 		curTime = sim.getTime()
-		for i in range(0, self.numCharacters):
+		self.names = scene.getCharacterNames()
+		for i in range(0, len(self.names)):
 			if (curTime > self.nextTimes[i]):
 				which = random.randrange(0, len(self.names), 1)
 				self.nextTimes[i] = (sim.getTime() + 3 + random.randrange(0, 6, 1))
+				rachelName = self.names[i]
 				if which != i:
-					bml.execBML("ChrRachel" + str(i), "<gaze target=\"ChrRachel" + str(which) + "\" sbm:joint-speed=\"500 500\" sbm:joint-range=\"chest eyes\"/><gesture name=\"ChrConnor@IdleStand01_ChopRt01\" start=\"1\"/>")
+					bml.execBML(rachelName, "<gaze target=\"ChrRachel" + str(which) + "\" sbm:joint-speed=\"500 500\" sbm:joint-range=\"chest eyes\"/><gesture name=\"ChrConnor@IdleStand01_ChopRt01\" start=\"1\"/>")
 
 gazeScript = RamdomGazeScript()
 scene.addScript("randomgaze", gazeScript)

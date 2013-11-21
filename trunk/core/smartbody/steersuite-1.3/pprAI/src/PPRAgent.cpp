@@ -269,12 +269,16 @@ void PPRAgent::updateAI(float timeStamp, float dt, unsigned int frameNumber)
 	// initialize some vars for this update step
 	// todo, this should eventually be removed after addressing the small issue with _currentFrameNumber.
 	_currentTimeStamp = timeStamp;
-	if (frameNumber >= 1) {
+
+	_currentFrameNumber = frameNumber-1;
+
+	/*if (frameNumber >= 1) {
 		_currentFrameNumber = frameNumber-1; // starting at 0 just because we didn't want to remove this while trying to reliably get a new chunk of code in.  TODO, change this later if it seems OK and appropriate...
 	}
 	else {
 		_currentFrameNumber = 0;
 	}
+	*/
 	_dt = dt;
 
 

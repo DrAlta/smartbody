@@ -74,7 +74,7 @@ brad.setDoubleAttribute('deformableMeshScale', .01)
 brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 
 # Turn on GPU deformable geometry
-scene.command('char ChrBrad viewer deformableGPU')
+brad.setStringAttribute("displayType", "GPUmesh")
 
 sliderList = []
 

@@ -1,50 +1,73 @@
 print "|-------------------------------------------------|"
-print "|  data/sbm-common/scripts/default-init-empty.py  |"
+print "|  Mixamo character setup                         |"
 print "|-------------------------------------------------|"
 
-def createStandardCharacter(charName, skelName, meshName, position):
-	sbChar = scene.createCharacter(charName, "")
-	sbSkeleton = scene.createSkeleton(skelName)		
-	sbChar.setSkeleton(sbSkeleton)
-	sbChar.setFaceDefinition(defaultFace)
-	sbPos = position
-	sbChar.setPosition(sbPos)	
-	sbChar.setVoice("remote")
-	sbChar.setVoiceCode("Festival_voice_rab_diphone")
-	sbChar.createStandardControllers()
-	sbChar.setStringAttribute("deformableMesh", meshName)
-	scene.run("motion-retarget.py")
-	retargetCharacter(charName,skelName)
+skelName = 'mixamo.dae'
+characterName = 'mycharacter'
+meshName = 'mixamo.dae'
 
-scene.run("default-viewer.py")
-scene.setIntAttribute("colladaTrimFrames", 2)
-### Load data/sbm-common assets
-scene.addAssetPath("seq", "../../../../data/sbm-common/scripts")
-scene.addAssetPath("seq", "../../../../data/sbm-test/scripts")
-scene.addAssetPath("mesh", "../../../../data/mesh")
+# first, load in the Mixamo asset explicitly
 
-scene.run("init-common-assets.py")
-scene.run("init-common-face.py")
-scene.run("mixamo-map.py")
+scene.loadAssetsFromPath("mesh/mixamo/mixamo.dae")
 
+# set up location of other assets
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath("script", "sbm-common/scripts")
+scene.addAssetPath("mesh", "mesh")
+
+# load in the mapping from Mixamo to SmartBody
+# mappings are inside the file mixamo-map.py
 jointMapManager = scene.getJointMapManager()
-jointMap = jointMapManager.getJointMap('mixamo')	
 
-playerSkelName = 'player.dae'
-playerSkel = scene.getSkeleton(playerSkelName)
-jointMap.applySkeleton(playerSkel)
-	
-createStandardCharacter('player', playerSkelName, 'player', SrVec(0, 0, 100))
+# map the skeleton to the SmartBody skeleton
+skeletonInstance = scene.getSkeleton(skelName)
 
-steerManager = scene.getSteerManager()
-steerManager.setBoolAttribute("useEnvironmentCollisions",False)
-steerManager.setEnable(False)
-steerManager.setEnable(True)
-scene.setBoolAttribute("internalAudio", True)
+# two options here:
+# 1) have SmartBody guess at the mapping 
+mixamoMap = jointMapManager.createJointMap("mixamoMap")
+mixamoMap.guessMapping(skeletonInstance, True)
+
+# 2) load an explicit mapping for mixamo
+#scene.run("mixamo-map.py")
+#mixamoMap = jointMapManager.getJointMap('mixamo')	
+
+# now apply that mapping to the skeleton, so that all 
+# future uses of that skeleton will be properly mapped
+mixamoMap.applySkeleton(skeletonInstance)
+
+# create the character
+sbChar = scene.createCharacter(characterName, "")
+sbSkeleton = scene.createSkeleton(skelName)		
+sbChar.setSkeleton(sbSkeleton)
+sbPos = SrVec(0, 0, 0)
+sbChar.setPosition(sbPos)	
+sbChar.createStandardControllers()
+sbChar.setStringAttribute("deformableMesh", meshName)
+sbChar.setStringAttribute("displayType", "GPUMesh")
+
+# setup locomotion
+scene.run('BehaviorSetMaleMocapLocomotion.py')
+setupBehaviorSet()
+retargetBehaviorSet(characterName)
+
+# setup reaching
+scene.run('BehaviorSetMocapReaching.py')
+setupBehaviorSet()
+retargetBehaviorSet(characterName)
+
+# setup gesturing
+scene.run('BehaviorSetGestures.py')
+setupBehaviorSet()
+retargetBehaviorSet(characterName)
 
 # start the simulation
 sim.start()
-bml.execBML('player', '<body posture="'+ playerSkelName +'HandsAtSide_Motex"/>')
+bml.execBML(characterName, '<body posture="ChrMarine@Idle01"/>')
+
+# some commands to try:
+#bml.execBML(characterName, '<locomotion target="100 200"/>')
+#bml.execBML(characterName, '<gesture name="ChrBrad@Idle01_Contemplate01"/>')
+
 sim.resume()
 
 

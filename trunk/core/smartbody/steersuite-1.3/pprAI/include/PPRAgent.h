@@ -208,8 +208,10 @@ protected:
 	// on-demand sooner than scheduled.
 
 	// schedules for each phase
+public:
 	unsigned int _nextFrameToRunLongTermPlanningPhase;
 	unsigned int _nextFrameToRunMidTermPlanningPhase;
+protected:
 	unsigned int _nextFrameToRunShortTermPlanningPhase;
 	unsigned int _nextFrameToRunPerceptivePhase;
 	unsigned int _nextFrameToRunPredictivePhase;
