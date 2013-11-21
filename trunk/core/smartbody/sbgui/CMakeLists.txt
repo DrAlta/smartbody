@@ -1,8 +1,8 @@
 add_subdirectory ( external/Pinocchio)
 add_subdirectory ( external/polyvox)
 
-add_definitions(  -std=c++11 )
-
+#add_definitions(  -std=c++11 )
+add_definitions(  -std=c++0x )
 
 include_directories( ./src )
 include_directories( ../SmartBody/src )
@@ -43,7 +43,7 @@ endif()
 if (${BUILD_OGRE})
 find_library (OGREMAIN Ogre)
 find_library (OISLIB OIS)
-find_library (RTSHADERLIB OgreRTShaderSystem)
+#find_library (RTSHADERLIB OgreRTShaderSystem)
 endif()
 if (${BUILD_OGRE})
 include_directories( /usr/include/OGRE )
@@ -52,7 +52,7 @@ set (OISLIB OIS)
 set (OGRE_LIBS
 	${OGREMAINLIB}	
 	${OISLIB}		
-	${RTSHADERLIB}		
+	#${RTSHADERLIB}		
 )
 
 set (OGRE_SRCS

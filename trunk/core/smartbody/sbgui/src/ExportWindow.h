@@ -8,6 +8,7 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Choice.H>
 #include <vector>
+#include <string>
 
 class ExportWindow : public Fl_Double_Window
 {
