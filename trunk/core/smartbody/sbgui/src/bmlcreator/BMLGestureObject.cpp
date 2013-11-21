@@ -28,6 +28,7 @@ BMLGestureObject::BMLGestureObject() : BMLObject()
 	modeAttr->setValidValues(modes);
 
 	createStringAttribute("sbm:style", "", "", "Basic", 80, false, false, false, "Style of the gestures. Used to differentiate gestures with same type, posture and mode.");
+	createBoolAttribute("sbm:additive", false, true, "Basic", 90, false, false, false, "Whether this gesture is additive or not.");
 
 	//createStringAttribute("target", "", "", "Basic", 90, false, false, false, "Target for POINT and REACH gestures.");
 	createStringAttribute("start", "", "", "Basic", 100, false, false, false, "Time when gesture starts.");

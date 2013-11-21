@@ -52,6 +52,17 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	xml_utils::xml_translate(&mode, modeAttr);
 	xml_utils::xml_translate(&style, styleAttr);
 
+	bool isAdditive = false;
+	std::string additiveStr = xml_parse_string( BMLDefs::ATTR_ADDITIVE, elem, "false" );	
+	if( stringICompare(additiveStr,"false") ) 
+	{			
+		isAdditive = false;
+	}
+	else //if (stringICompare(attrFootIK,"false"))
+	{			
+		isAdditive = true;
+	}
+
 	std::string emotion = xml_utils::xml_parse_string(BMLDefs::ATTR_EMOTION, elem, "neutral");
 	GestureRequest::EmotionTag tag = GestureRequest::NEUTRAL;
 	if (emotion == "sad")
@@ -98,6 +109,10 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 				}
 			}
 		}
+		if (isAdditive)			// if is additive, do not take in consideration of current posture.
+		{
+			posture = "";
+		}
 		animationName = gestureMap->getGestureByInfo(lexeme, type, mode, style, posture, request->actor->getStringAttribute("gesturePolicy"));
 		animationList = gestureMap->getGestureListByInfo(lexeme, type, mode, style, posture);
 		if (animationName == "")
@@ -126,6 +141,11 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	if (motion)
 	{
 		MeCtMotion* motionCt = new MeCtMotion();
+		if (isAdditive)
+		{
+			motion = motion->getOffset();
+			motionCt->isAdditive(true);
+		}
 
 		// Name controller with behavior unique_id
 		ostringstream name;
