@@ -1003,11 +1003,11 @@ SBAPI bool PABlendData::getTrajPosition( std::string effectorName, float time, S
 	{
 		SmartBody::SBMotion* sbMotion = scene->getMotion(state->getMotionName(i));
 		SrVec moPos;
-		bool hasTraj = sbMotion->getTrajPosition(effectorName,timeManager->motionTimes[i],moPos);
+		bool hasTraj = sbMotion->getTrajPosition(effectorName,(float)timeManager->motionTimes[i],moPos);
 		if (!hasTraj)
 			return false;
 		//moPos = moPo;
-		outPos += moPos*weights[i];				
+		outPos += moPos*(float)weights[i];				
 	}	
 	return true;
 }

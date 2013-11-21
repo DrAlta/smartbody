@@ -181,7 +181,7 @@ void SkeletonItemInfoWidget::treeCallBack( Fl_Widget* widget, void* data )
 
 MotionItemInfoWidget::MotionItemInfoWidget( int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name)
 {
-	int channelBrowserHeight = h*0.8;
+	int channelBrowserHeight = (int)(h*0.8);
 	channelInfoObject = new TreeInfoObject();
 	this->begin();
 	channelBrowser = new Fl_Hold_Browser(Pad*2+x,Pad*2+y,w-30,h-channelBrowserHeight,"Channels");//new Fl_Tree(10,10,w - 300, h - 30);			

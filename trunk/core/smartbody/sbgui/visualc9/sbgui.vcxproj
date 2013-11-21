@@ -125,6 +125,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <CompileAsManaged>
       </CompileAsManaged>
+      <DisableSpecificWarnings>4193;4251;4275</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -258,6 +259,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbgui\bin
       </PrecompiledHeaderOutputFile>
       <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
       <WarningLevel>Level3</WarningLevel>
+      <DisableSpecificWarnings>4193;4251;4275</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -662,7 +664,7 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     <ClCompile Include="..\src\visemeviewer\VisemeViewerWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\smartbody-lib\src\external\glew\glew.h" />
+    <ClInclude Include="..\..\SmartBody\src\external\glew\glew.h" />
     <ClInclude Include="..\src\autorig\SBAutoRigManager.h" />
     <ClInclude Include="..\src\autorig\VoxelizerWindow.h" />
     <ClInclude Include="..\src\bmlcreator\TextEditor.h" />

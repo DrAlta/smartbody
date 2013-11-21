@@ -522,7 +522,7 @@ void VisemeCurveEditor::changeCurve(int viseme, std::vector<float>& curveData, c
 			{
 				for (size_t i = 0; i < phonemeCurve2.size() / 2; i++)
 				{
-					_curves[viseme]. push_back(SrVec(phonemeCurve2[i * 2 + 0] * 0.5f + 0.5, phonemeCurve2[i * 2 + 1], 0.0f));
+					_curves[viseme]. push_back(SrVec(phonemeCurve2[i * 2 + 0] * 0.5f + 0.5f, phonemeCurve2[i * 2 + 1], 0.0f));
 				}
 			}
 		}

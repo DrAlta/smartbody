@@ -1,8 +1,8 @@
+#include "vhcl.h"
 #include "VoxelizerWindow.h"
 #include "external/glew/glew.h"
 #include <sr/sr_gl.h>
 //#include <imdebug/imdebug.h>
-#include <vhcl.h>
 #include <queue>
 
 #ifndef WIN32
@@ -355,8 +355,8 @@ void VoxelizerWindow::voxelCarving( int dir, float* sliceA, float* sliceB )
 				zvalueB = ztemp;
 			}
 			
-			int zFront = floor(zvalueA+0.5f)-1.f;
-			int zBack = depth - floor(zvalueB+0.5f)+1.f;
+			int zFront = (int)(floor(zvalueA+0.5f)-1.f);
+			int zBack = depth - (int)(floor(zvalueB+0.5f)+1.f);
 			voxelIdx[widx] = j;
 			voxelIdx[hidx] = i;			
 			for (int k=0;k<zFront;k++)
