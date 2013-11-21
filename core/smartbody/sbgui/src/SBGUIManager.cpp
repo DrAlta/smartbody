@@ -4,6 +4,7 @@
 //#define USE_CEGUI
 #endif
 #if USE_CEGUI
+#include "vhcl.h"
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/OpenGL/GLRenderer.h>
 #include <FL/Fl.H>
@@ -199,7 +200,7 @@ void SBGUIManager::init()
 		if ( curFont ) 
 		{
 			//LOG("Font name = %s",curFont->getName().c_str());
-			curFont->setAutoScaled(CEGUI::AutoScaledMode::ASM_Disabled);
+			curFont->setAutoScaled(CEGUI::ASM_Disabled);
 			curFont->setNativeResolution(CEGUI::Sizef(800,600));
 		}
 		pi++;

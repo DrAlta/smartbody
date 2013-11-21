@@ -521,7 +521,7 @@
     <ClInclude Include="..\src\ExportWindow.h">
       <Filter>viewer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\smartbody-lib\src\external\glew\glew.h">
+    <ClInclude Include="..\..\SmartBody\src\external\glew\glew.h">
       <Filter>glew</Filter>
     </ClInclude>
     <ClInclude Include="..\src\visemeviewer\VisemeRunTimeWindow.h">

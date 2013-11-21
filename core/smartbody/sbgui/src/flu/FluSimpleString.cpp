@@ -15,9 +15,13 @@
 
 #include "FluSimpleString.h"
 
+#ifndef WIN32
+#define _strdup strdup
+#endif
+
 FluSimpleString :: FluSimpleString()
 {
-  str = strdup( "" );
+  str = _strdup( "" );
 }
 
 FluSimpleString :: FluSimpleString( unsigned int len )
@@ -28,20 +32,20 @@ FluSimpleString :: FluSimpleString( unsigned int len )
       str[0] = '\0';
     }
   else
-    str = strdup( "" );
+    str = _strdup( "" );
 }
 
 FluSimpleString :: FluSimpleString( const char *s )
 {
   if( s )
-    str = strdup( s );
+    str = _strdup( s );
   else
-    str = strdup( "" );
+    str = _strdup( "" );
 }
 
 FluSimpleString :: FluSimpleString( const FluSimpleString& s )
 {
-  str = strdup( s.str );
+  str = _strdup( s.str );
 }
 
 FluSimpleString :: ~FluSimpleString()
@@ -145,9 +149,9 @@ FluSimpleString& FluSimpleString :: operator =( const char *s )
 { 
   char* tmp;
   if(s==0)
-    tmp = strdup("");
+    tmp = _strdup("");
   else
-    tmp = strdup(s);
+    tmp = _strdup(s);
   if(str)
     free(str);
   str = tmp;
@@ -158,7 +162,7 @@ FluSimpleString& FluSimpleString :: operator +=( const char *s )
 {
   if( s==0 )
     s = "";
-  char *old = strdup(str);
+  char *old = _strdup(str);
   int lold = strlen(old), ls = strlen(s);
   free(str);
   str = (char*)malloc( lold + ls + 1 );

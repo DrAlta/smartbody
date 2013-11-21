@@ -31,7 +31,7 @@ Flu_Collapsable_Group :: Flu_Collapsable_Group( int x, int y, int w, int h, cons
   _fps = 60.0f;
   _fit = false;
   _open = true;
-  _currentHeight = h;
+  _currentHeight = (float)h;
   label( l );
 
   box( FL_ENGRAVED_BOX );

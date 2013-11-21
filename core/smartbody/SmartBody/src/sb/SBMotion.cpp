@@ -1,3 +1,4 @@
+#include "vhcl.h"
 #include "SBMotion.h"
 #include <sb/SBScene.h>
 #include <sr/sr_euler.h>
@@ -14,8 +15,15 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <sbm/sbm_constants.h>
+#ifdef WIN_BUILD
+#pragma warning(push)
+#pragma warning(disable:4244)
+#endif
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#ifdef WIN_BUILD
+#pragma warning(pop)
+#endif
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/string.hpp>
 #include <fstream>

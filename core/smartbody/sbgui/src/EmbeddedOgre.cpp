@@ -214,7 +214,7 @@ void EmbeddedOgre::updateOgreLights()
 			SrVec pos = sbpawn->getPosition();
 			try {
 				light =  ogreSceneMgr->getLight(name);
-			} catch( Ogre::Exception& e ) {
+			} catch( Ogre::Exception& ) {
 				light = ogreSceneMgr->createLight( name );
 			}
 			SmartBody::BoolAttribute* enabledAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("enabled"));
@@ -342,7 +342,7 @@ void EmbeddedOgre::updateOgreLights()
 		// add in default Ogre lighting here
 		try {
 			light =  ogreSceneMgr->getLight("defaultLight0");
-		} catch( Ogre::Exception& e ) {
+		} catch( Ogre::Exception& ) {
 			light = ogreSceneMgr->createLight( "defaultLight0" );
 			light->setType(Light::LT_DIRECTIONAL);
 		}
@@ -359,7 +359,7 @@ void EmbeddedOgre::updateOgreLights()
 		// add the second default light
 		try {
 			light =  ogreSceneMgr->getLight("defaultLight1");
-		} catch( Ogre::Exception& e ) {
+		} catch( Ogre::Exception& ) {
 			light = ogreSceneMgr->createLight( "defaultLight1" );
 			light->setType(Light::LT_DIRECTIONAL);
 		}
@@ -378,12 +378,12 @@ void EmbeddedOgre::updateOgreLights()
 		try {
 			light =  ogreSceneMgr->getLight("defaultLight0");
 			light->setVisible(false);
-		} catch( Ogre::Exception& e ) {
+		} catch( Ogre::Exception& ) {
 		}
 		try {
 			light =  ogreSceneMgr->getLight("defaultLight1");
 			light->setVisible(false);
-		} catch( Ogre::Exception& e ) {
+		} catch( Ogre::Exception& ) {
 		}
 	}
 

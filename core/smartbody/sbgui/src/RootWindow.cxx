@@ -1962,7 +1962,11 @@ void BaseWindow::TrackCharacterCB(Fl_Widget* w, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
-	SmartBody::SBScene::getScene()->removeCameraTrack();
+	if (SmartBody::SBScene::getScene()->hasCameraTrack())
+	{
+		SmartBody::SBScene::getScene()->removeCameraTrack();
+		return;
+	}
 
 	// track the selected character
 	SbmCharacter* character = rootWindow->getSelectedCharacter();

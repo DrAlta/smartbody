@@ -62,6 +62,7 @@ that is distributed: */
 #include <sb/SBCharacter.h>
 #include "TextEditor.h"
 #include "../flu/Flu_Collapsable_Group.h"
+#include "sb/SBTypes.h"
 
 #ifndef WIN32
 #define _strdup strdup
@@ -774,6 +775,10 @@ void AttributeWindow::setObject(SmartBody::SBObject* g)
 
 void AttributeWindow::ExpandAllCB(Fl_Widget* w, void *data)
 {
+#ifdef __APPLE__ 
+	return;
+#endif
+
 	Fl_Pack* pack = (Fl_Pack*) data;
 
 	int numChildren = pack->children();
@@ -791,6 +796,10 @@ void AttributeWindow::ExpandAllCB(Fl_Widget* w, void *data)
 
 void AttributeWindow::CollapseAllCB(Fl_Widget* w, void *data)
 {
+#ifdef __APPLE__ 
+	return;
+#endif
+
 	Fl_Pack* pack = (Fl_Pack*) data;
 
 	int numChildren = pack->children();

@@ -536,7 +536,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				SrVec skinColor;
 				for (int j=0;j<numWeight;j++)
 				{
-					if (j >= weightList.size())
+					if (j >= (int)weightList.size())
 						continue;
 					IntFloatPair& w = weightList[j];
 					weightSum += w.second;
