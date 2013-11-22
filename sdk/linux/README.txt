@@ -7,9 +7,8 @@ The linux SDK is available for download from the SmartBody site:
 
 http://smartbody.ict.usc.edu/download
 
-
 Build instructions for SmartBody on linux:
-
+-------------------------------------------
 The SmartBody SDK for linux is in source form and requires a number of supporting libraries to build
 properly. A full description is located in the SmartBody Manual (SmartBodyManual.pdf). Here's a summary when using Ubuntu:
 
@@ -21,6 +20,9 @@ sudo apt-get install cmake g++ libxerces-c3-dev libgl1-mesa-dev libglu1-mesa-dev
 
 #packages needed for Ogre rendering
 sudo apt-get install libzzip-dev libxaw7-dev libxxf86vm-dev libxrandr-dev libfreeimage-dev nvidia-cg-toolkit libois-dev libogre-dev ogre-1.8-samples-data
+
+#packages needed for irrlicht rendering
+sudo apt-get install libirrlicht-dev
 
 
 Build
@@ -37,6 +39,8 @@ make install
 # alternatively, you can build using multiple threads like:
 # make -j8 install
 
+If you want to build the Ogre-SmartBody or the Irrlicht-SmartBody example code, then uncomment those lines at the bottom of the file src/CMakeLists.txt then rebuild
+
 
 Running SmartBody
 --------------------
@@ -51,6 +55,10 @@ There is an example of using the Ogre renderer with SmartBody called ogresmartbo
 cd bin
 ./ogresmartbody
 
+There is an example of using the Irrlicht game engine with SmartBody called irrlichtsmartbody which can be run:
+cd bin
+./irrlichtsmartbody
+
 Please feel free to post comments and questions on the SmartBody forum:
 
 http://smartbody.ict.usc.edu/forum
@@ -63,6 +71,4 @@ A list of 3rd party licenses is located in the file:
 3rd party licenses.txt
 The entire SmartBody distribution is available for download from SourceForge:
 svn checkout svn://svn.code.sf.net/p/smartbody/code/sdk smartbodysdk
-B
-A
-o
+

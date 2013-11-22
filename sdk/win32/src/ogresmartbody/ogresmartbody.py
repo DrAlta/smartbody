@@ -28,7 +28,7 @@ scene.run('default-behavior-sets.py')
 print 'Setting up Sinbad'
 
 
-numCharacters = 5
+numCharacters = 15
 for c in range(0, numCharacters):
 	sinbadName = 'sinbad' + str(c)
 	sinbad = scene.createCharacter(sinbadName,'sinbad')
@@ -38,13 +38,22 @@ for c in range(0, numCharacters):
 	sinbad.setPosition(sinbadPos)
 	sinbad.createStandardControllers()
 
-	# add behaviors to Sinbad: locomotion
-	scene.run('BehaviorSetMaleLocomotion.py')
-	setupBehaviorSet()
-	retargetBehaviorSet(sinbadName)
+	# only retarget the first character, the others
+	# can use the same data
+	if c == 0:
+		# add behaviors to Sinbad: locomotion
+		scene.run('BehaviorSetMaleLocomotion.py')
+		setupBehaviorSet()
+		retargetBehaviorSet(sinbadName)
+	steerManager = scene.getSteerManager()
+	steerAgent = steerManager.createSteerAgent(sinbadName)
+	steerAgent.setSteerStateNamePrefix("all")
+	steerAgent.setSteerType("example")
 
 	#sinbad.setBoolAttribute("steering.pathFollowingMode", True)
 
+steerManager.setEnable(False)
+steerManager.setEnable(True)
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
 
