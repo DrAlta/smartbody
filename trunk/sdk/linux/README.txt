@@ -24,9 +24,24 @@ sudo apt-get install libzzip-dev libxaw7-dev libxxf86vm-dev libxrandr-dev libfre
 #packages needed for irrlicht rendering
 sudo apt-get install libirrlicht-dev
 
+In addition, the activemq-cpp libraries will need to be installed. 
+The source code is included in this distribution. Other versions can be found here:
+http://activemq.apache.org/cms/
+
 
 Build
 -------------------
+First, build the activemq-cpp libraries and install them:
+
+tar -xvzf activemq-cpp-library-3.8.1-src.tar.gz
+cd activemq-cpp-library-3.8.1
+./configure --disable-ssl
+make 
+sudo make install
+
+This will install the activemq-cpp libraries in /usr/local.
+
+Next, build SmartBody.
 The build uses the cmake system as follows:
 
 # make a directory called 'mybuild' and generate the makefiles for SmartBody there
