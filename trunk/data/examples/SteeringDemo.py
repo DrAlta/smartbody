@@ -66,6 +66,11 @@ for i in range(10):
 	if i== 0 : 
 		scene.run('BehaviorSetMaleMocapLocomotion.py')
 		setupBehaviorSet()
+		retargetBehaviorSet(baseName)
+	else:
+		steerAgent = steerManager.createSteerAgent(baseName)
+		steerAgent.setSteerStateNamePrefix("mocap")
+		steerAgent.setSteerType("example")		
 	retargetBehaviorSet(baseName)
 	# Add current Brad into list
 	bradList.append(brad)
@@ -92,10 +97,23 @@ for i in range(15):
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 	# Retarget character
-	retargetBehaviorSet(baseName)
-	#retargetCharacter(baseName, 'ChrRachel.sk', False)
+	if i == 0:
+		scene.run('BehaviorSetMaleMocapLocomotion.py')
+		setupBehaviorSet()	
+		retargetBehaviorSet(baseName)
+	else:
+		steerAgent = steerManager.createSteerAgent(baseName)
+		steerAgent.setSteerStateNamePrefix("mocap")
+		steerAgent.setSteerType("example")		
 	# Add Rachel into list
 	rachelList.append(rachel)
+
+steerManager.setEnable(False)
+steerManager.setIntAttribute("gridDatabaseOptions.gridSizeX", 200)
+steerManager.setIntAttribute("gridDatabaseOptions.gridSizeY", 200)
+steerManager.setIntAttribute("gridDatabaseOptions.numGridCellsX", 200)
+steerManager.setIntAttribute("gridDatabaseOptions.numGridCellsY", 200)
+steerManager.setEnable(True)
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
