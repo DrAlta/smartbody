@@ -153,9 +153,8 @@ void drawSB()
 		pawnIter++)
 	{
 		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
-		if(pawn->dMesh_p && pawn->dMeshInstance_p)
-		{
-			pawn->dMesh_p->set_visibility(1);
+		if(pawn->dMeshInstance_p)
+		{			
 			pawn->dMeshInstance_p->setVisibility(1);
 			pawn->dMeshInstance_p->update();
 			SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p);
@@ -397,21 +396,10 @@ void initCharacterScene()
 			character->scene_p->visible(false);
 		scene->getRootGroup()->add(character->scene_p);
 		*/
-		LOG("Character %s's skeleton added to the scene.", charNames[i].c_str());
-
-		if (character->dMesh_p)
-		{
-			for (size_t i = 0; i < character->dMesh_p->dMeshDynamic_p.size(); i++)
-			{
-				SmartBody::SBScene::getScene()->getRootGroup()->remove( character->dMesh_p->dMeshDynamic_p[i] );
-			}
-			delete character->dMesh_p;
-			character->dMesh_p = NULL;
-		}
-		character->dMesh_p = new DeformableMesh();
+		LOG("Character %s's skeleton added to the scene.", charNames[i].c_str());		
 		character->dMeshInstance_p =  new DeformableMeshInstance();
-		character->dMesh_p->setSkeleton(character->getSkeleton());
-		character->dMeshInstance_p->setSkeleton(character->getSkeleton());
+		//character->dMeshInstance_p->setSkeleton(character->getSkeleton());
+		character->dMeshInstance_p->setPawn(character);
 		LOG("Character %s's deformable mesh reset.", charNames[i].c_str());
 
 		std::string dMeshAttrib = character->getStringAttribute("deformableMesh");
