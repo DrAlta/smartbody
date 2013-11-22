@@ -104,7 +104,7 @@ mkdir sdk/src/ogresmartbody
 cp ../win32/src/ogresmartbody/*.cpp sdk/src/ogresmartbody
 cp ../win32/src/ogresmartbody/*.h sdk/src/ogresmartbody
 cp ../win32/src/ogresmartbody/plugins.cfg-linux sdk/bin/plugins.cfg
-cp ../win32/src/ogresmartbody/resource.cfg-linux sdk/bin/resources.cfg
+cp ../win32/src/ogresmartbody/resources.cfg-linux sdk/bin/resources.cfg
 cp ../win32/src/ogresmartbody/*.py sdk/data
 mkdir sdk/src/irrlichtsmartbody
 cp ../win32/src/irrlichtsmartbody/*.cpp  sdk/src/irrlichtsmartbody
