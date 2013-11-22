@@ -131,3 +131,6 @@ cp build/CMakeLists.txt-Pinocchio ./sdk/src/sbgui/external/Pinocchio/CMakeLists.
 cp build/CMakeLists.txt-ogresmartbody ./sdk/src/ogresmartbody/CMakeLists.txt
 cp build/CMakeLists.txt-irrlichtsmartbody ./sdk/src/irrlichtsmartbody/CMakeLists.txt
 
+# supporting libraries
+cp activemq-cpp-library-3.8.1-src.tar.gz ./sdk/
+
