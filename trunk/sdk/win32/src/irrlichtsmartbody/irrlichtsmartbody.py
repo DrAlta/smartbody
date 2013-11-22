@@ -31,15 +31,24 @@ print 'Setting up Sinbad'
 scene.run('BehaviorSetMaleMocapLocomotion.py')
 setupBehaviorSet()
 
-numCharacters = 5
+numCharacters = 15
 for c in range(0, numCharacters):
 	sinbadName = 'sinbad' + str(c)
-	sinbad = scene.createCharacter(sinbadName,'sinbad')
+	sinbad = scene.createCharacter(sinbadName,'Sinbad')
 	sinbadSk = scene.createSkeleton(sinbadSkName)
 	sinbad.setSkeleton(sinbadSk)
 	sinbadPos = SrVec(0 + c * 5, 4.50, 0 + c * 5)
 	sinbad.setPosition(sinbadPos)
 	sinbad.createStandardControllers()
+	if c == 0:
+		scene.run('BehaviorSetMaleLocomotion.py')
+		setupBehaviorSet()
+		retargetBehaviorSet(sinbadName)
+	steerManager = scene.getSteerManager()
+ 	steerAgent = steerManager.createSteerAgent(sinbadName)
+	steerAgent.setSteerStateNamePrefix("all")
+	steerAgent.setSteerType("example")
+
 	retargetBehaviorSet(sinbadName)
 
 	#sinbad.setBoolAttribute("steering.pathFollowingMode", True)

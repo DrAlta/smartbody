@@ -19,7 +19,9 @@ mkdir -p sdk/include/steersuite/external
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/tinyxml/*.h ./sdk/include/steersuite/external/tinyxml/
 mkdir -p sdk/include/steersuite/mersenne
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/mersenne/*.h ./sdk/include/steersuite/external/mersenne/
-mkdir -p sdk/include/steersuite/glfw/GL
+mkdir -p sdk/include/steersuite/external/glfw
+mkdir -p sdk/include/steersuite/external/glfw/include
+mkdir -p sdk/include/steersuite/external/glfw/include/GL
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/include/GL/glfw.h ./sdk/include/steersuite/external/glfw/include/GL
 
 # copy lib
@@ -38,13 +40,10 @@ rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/inc
 #cp ../../core/smartbody/sbgui/bin/libsteerlib.so ./sdk/bin
 
 # copy readme.txt
-rsync -ap --exclude=".svn" ./readme.txt ./sdk/readme.txt
+rsync -ap --exclude=".svn" ./README.txt ./sdk/README.txt
 
 # copy build*.sh
 #rsync -ap --exclude=".svn" ./build*.sh ./sdk/
-
-# copy CMakeLists.txt
-rsync -ap --exclude=".svn" ./CMakeLists.txt ./sdk/CMakeLists.txt
 
 # copy src
 rsync -ap --exclude=".svn" ./src ./sdk
@@ -78,11 +77,11 @@ rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/steerlib/src/* ./
 mkdir -p ./sdk/src/pprAI
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/pprAI/src/* ./sdk/src/pprAI/
 mkdir -p ./sdk/src/external/tinyxml
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/tinyxml/*.cpp ./sdk/src/tinyxml/
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/tinyxml/*.cpp ./sdk/src/external/tinyxml/
 mkdir -p ./sdk/src/external/glfw
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/lib/*.c ./sdk/src/glfw/
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/lib/*.c ./sdk/src/external/glfw/
 mkdir -p ./sdk/src/external/glfw/x11
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/lib/x11/*.c ./sdk/src/glfw/x11
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/lib/x11/*.c ./sdk/src/external/glfw/x11
 
 # first need to create data & data/mesh folder
 # copy data folder
@@ -102,22 +101,33 @@ rsync -ap --exclude=".svn" ../../data/mesh/Ogre/* ./sdk/data/mesh/Ogre/
 
 # integration examples
 mkdir sdk/src/ogresmartbody
-cp ../win32/src/ogresmartbody/* sdk/src/ogresmartbody
+cp ../win32/src/ogresmartbody/*.cpp sdk/src/ogresmartbody
+cp ../win32/src/ogresmartbody/*.h sdk/src/ogresmartbody
+cp ../win32/src/ogresmartbody/plugins.cfg-linux sdk/bin/plugins.cfg
+cp ../win32/src/ogresmartbody/resource.cfg-linux sdk/bin/resources.cfg
+cp ../win32/src/ogresmartbody/*.py sdk/data
 mkdir sdk/src/irrlichtsmartbody
-cp ../win32/src/irrlichtsmartbody/* sdk/src/irrlichtsmartbody
+cp ../win32/src/irrlichtsmartbody/*.cpp  sdk/src/irrlichtsmartbody
+cp ../win32/src/irrlichtsmartbody/*.h sdk/src/irrlichtsmartbody
+cp ../win32/src/irrlichtsmartbody/*.py sdk/src/irrlichtsmartbody/data
+mkdir sdk/data/irrlichtmedia
+cp ../win32/src/irrlichtsmartbody/media/* sdk/data/irrlichtmedia
 
 # build files
 cp build/CMakeLists.txt ./sdk/
-cp build/CMakeLists.txt-SmartBody ./sdk/src/SmartBody
-cp build/CMakeLists.txt-sbgui ./sdk/src/sbgui
-cp build/CMakeLists.txt-polyvox ./sdk/src/sbgui/external/polyvox/library/PolyVoxCore
-cp build/CMakeLists.txt-simplesmartbody ./sdk/src/simplesmartbody
-cp build/CMakeLists.txt-vhcl ./sdk/src/vhcl
-cp build/CMakeLists.txt-vhmsg ./sdk/src/vhmsg
-cp build/CMakeLists.txt-bonebus ./sdk/src/bonebus
-cp build/CMakeLists.txt-wsp ./sdk/src/wsp
-cp build/CMakeLists.txt-steerlib ./sdk/src/steerlib
-cp build/CMakeLists.txt-pprAI ./sdk/src/pprAI
-cp build/CMakeLists.txt-ogresmartbody ./sdk/src/ogresmartbody
-cp build/CMakeLists.txt-irrlichtsmartbody ./sdk/src/irrlichtsmartbody
+cp build/CMakeLists.txt-SmartBody ./sdk/src/SmartBody/CMakeLists.txt
+cp build/CMakeLists.txt-src ./sdk/src/CMakeLists.txt
+cp build/CMakeLists.txt-sbgui ./sdk/src/sbgui/CMakeLists.txt
+cp build/CMakeLists.txt-polyvox ./sdk/src/sbgui/external/polyvox/library/PolyVoxCore/CMakeLists.txt
+cp build/CMakeLists.txt-simplesmartbody ./sdk/src/simplesmartbody/CMakeLists.txt
+cp build/CMakeLists.txt-vhcl ./sdk/src/vhcl/CMakeLists.txt
+cp build/CMakeLists.txt-vhmsg ./sdk/src/vhmsg/CMakeLists.txt
+cp build/CMakeLists.txt-bonebus ./sdk/src/bonebus/CMakeLists.txt
+cp build/CMakeLists.txt-wsp ./sdk/src/wsp/CMakeLists.txt
+cp build/CMakeLists.txt-steerlib ./sdk/src/steerlib/CMakeLists.txt
+cp build/CMakeLists.txt-pprAI ./sdk/src/pprAI/CMakeLists.txt
+cp build/CMakeLists.txt-polyvox ./sdk/src/sbgui/external/polyvox/CMakeLists.txt
+cp build/CMakeLists.txt-Pinocchio ./sdk/src/sbgui/external/Pinocchio/CMakeLists.txt
+cp build/CMakeLists.txt-ogresmartbody ./sdk/src/ogresmartbody/CMakeLists.txt
+cp build/CMakeLists.txt-irrlichtsmartbody ./sdk/src/irrlichtsmartbody/CMakeLists.txt
 

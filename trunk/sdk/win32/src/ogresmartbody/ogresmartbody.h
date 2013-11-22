@@ -17,7 +17,7 @@ This source file is part of the
 #ifndef __OgreSmartBody_h_
 #define __OgreSmartBody_h_
  
-#include <ogre/Ogre.h>
+#include <Ogre.h>
 #include <OIS/OIS.h>
 // smartbody
 #ifndef NDEBUG
@@ -64,3 +64,4 @@ private:
 };
  
 #endif // #ifndef __OgreSmartBody_h_
+

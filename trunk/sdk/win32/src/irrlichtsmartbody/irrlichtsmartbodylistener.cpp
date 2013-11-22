@@ -1,8 +1,9 @@
 #include "irrlichtsmartbodylistener.h"
-#include <SB/SBSceneListener.h>
+#include <sb/SBSceneListener.h>
 #include <IAnimatedMesh.h>
 #include <vhcl.h>
 #include <sstream>
+#include <iostream>
 
 IrrlichtSmartBodyListener::IrrlichtSmartBodyListener(irr::scene::ISceneManager* sceneMgr, std::map<std::string, int>* characterMap)
 {
@@ -18,7 +19,11 @@ IrrlichtSmartBodyListener::~IrrlichtSmartBodyListener()
 void IrrlichtSmartBodyListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
 {
 	std::stringstream strstr;
+#ifdef WIN32
 	strstr << "../irrlicht-1.8/media/" << objectClass<< ".mesh";
+#else
+	strstr << "../data/irrlichtmedia/" << objectClass<< ".mesh";
+#endif
 
 	irr::scene::ISkinnedMesh* mesh = (irr::scene::ISkinnedMesh*)mSceneMgr->getMesh(strstr.str().c_str());
 
@@ -88,6 +93,8 @@ void IrrlichtSmartBodyListener::OnLogMessage( const std::string & message )
 {
 #ifdef WIN32
 	LOG(message.c_str());
+#else
+	std::cout << message << std::endl;
 #endif
 }
 
