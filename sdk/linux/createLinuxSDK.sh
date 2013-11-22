@@ -134,3 +134,6 @@ cp build/CMakeLists.txt-irrlichtsmartbody ./sdk/src/irrlichtsmartbody/CMakeLists
 # supporting libraries
 cp activemq-cpp-library-3.8.1-src.tar.gz ./sdk/
 
+# tar and gzip it up!
+tar -cvzf SmartBodySDK-linux.tar.gz sdk
+
