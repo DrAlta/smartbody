@@ -58,7 +58,7 @@ for i in range(amount):
 	if i== 0 : 
 		scene.run('BehaviorSetFemaleGestures.py')
 		setupBehaviorSet()
-	retargetBehaviorSet(baseName)
+		retargetBehaviorSet(baseName)
 	# Play default animation
 	bml.execBML(baseName, '<body posture="ChrConnor@IdleStand01"/>')
 	bml.execBML(baseName, '<saccade mode="listen"/>')

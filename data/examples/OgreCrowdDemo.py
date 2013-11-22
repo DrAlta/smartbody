@@ -56,6 +56,10 @@ for i in range(amount):
 	bml.execBML(sinbadName, '<body posture="ChrUtah_Idle001"/>')	
 	
 steerManager.setEnable(False)
+steerManager.setIntAttribute("gridDatabaseOptions.gridSizeX", 200)
+steerManager.setIntAttribute("gridDatabaseOptions.gridSizeY", 200)
+steerManager.setIntAttribute("gridDatabaseOptions.numGridCellsX", 200)
+steerManager.setIntAttribute("gridDatabaseOptions.numGridCellsY", 200)
 steerManager.setEnable(True)
 
 # Set up list of characters
