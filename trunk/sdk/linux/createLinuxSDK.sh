@@ -1,139 +1,139 @@
-# generate a sdk folder
-mkdir -p sdk
-mkdir -p sdk/bin
+# generate a smartbody folder
+mkdir -p smartbody
+mkdir -p smartbody/bin
 
 # documentation
-cp ../../SmartBodyManual.pdf ./sdk/
-cp ../../SmartBodyPythonAPI.html ./sdk/
-cp ../../"3rd party licenses.txt" ./sdk/
+cp ../../SmartBodyManual.pdf ./smartbody/
+cp ../../SmartBodyPythonAPI.html ./smartbody/
+cp ../../"3rd party licenses.txt" ./smartbody/
 
 # copy include (do not include third party ones)
-mkdir -p sdk/include
-rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/include/*.h ./sdk/include/vhmsg/
-rsync -ap --exclude=".svn" ../../lib/wsp/wsp/include/*.h ./sdk/include/wsp/
-rsync -ap --exclude=".svn" ../../lib/bonebus/include/*.h ./sdk/include/bonebus/
-rsync -ap --exclude=".svn" ../../lib/vhcl/include/*.h ./sdk/include/vhcl/
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/pprAI/include/*.h ./sdk/include/steersuite/
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/steerlib/include/* ./sdk/include/steersuite/
-mkdir -p sdk/include/steersuite/external
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/tinyxml/*.h ./sdk/include/steersuite/external/tinyxml/
-mkdir -p sdk/include/steersuite/mersenne
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/mersenne/*.h ./sdk/include/steersuite/external/mersenne/
-mkdir -p sdk/include/steersuite/external/glfw
-mkdir -p sdk/include/steersuite/external/glfw/include
-mkdir -p sdk/include/steersuite/external/glfw/include/GL
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/include/GL/glfw.h ./sdk/include/steersuite/external/glfw/include/GL
+mkdir -p smartbody/include
+rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/include/*.h ./smartbody/include/vhmsg/
+rsync -ap --exclude=".svn" ../../lib/wsp/wsp/include/*.h ./smartbody/include/wsp/
+rsync -ap --exclude=".svn" ../../lib/bonebus/include/*.h ./smartbody/include/bonebus/
+rsync -ap --exclude=".svn" ../../lib/vhcl/include/*.h ./smartbody/include/vhcl/
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/pprAI/include/*.h ./smartbody/include/steersuite/
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/steerlib/include/* ./smartbody/include/steersuite/
+mkdir -p smartbody/include/steersuite/external
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/tinyxml/*.h ./smartbody/include/steersuite/external/tinyxml/
+mkdir -p smartbody/include/steersuite/mersenne
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/mersenne/*.h ./smartbody/include/steersuite/external/mersenne/
+mkdir -p smartbody/include/steersuite/external/glfw
+mkdir -p smartbody/include/steersuite/external/glfw/include
+mkdir -p smartbody/include/steersuite/external/glfw/include/GL
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/include/GL/glfw.h ./smartbody/include/steersuite/external/glfw/include/GL
 
 # copy lib
-#rsync -ap --exclude=".svn" ./lib ./sdk
+#rsync -ap --exclude=".svn" ./lib ./smartbody
 
 # copy bin
-#rsync -ap --exclude=".svn" ./bin ./sdk
+#rsync -ap --exclude=".svn" ./bin ./smartbody
 
 # copy .so for SmartBody (assuming it's prebuilt)
-#cp ../../core/smartbody/sbgui/bin/sbgui ./sdk/bin
-#cp ../../core/smartbody/sbgui/bin/simplesmartbody ./sdk/bin
-#cp ../../core/smartbody/sbgui/bin/libSmartBody.so ./sdk/bin
+#cp ../../core/smartbody/sbgui/bin/sbgui ./smartbody/bin
+#cp ../../core/smartbody/sbgui/bin/simplesmartbody ./smartbody/bin
+#cp ../../core/smartbody/sbgui/bin/libSmartBody.so ./smartbody/bin
 
 # copy dylib for pprAI and steerlib
-#cp ../../core/smartbody/sbgui/bin/libpprAI.so ./sdk/bin
-#cp ../../core/smartbody/sbgui/bin/libsteerlib.so ./sdk/bin
+#cp ../../core/smartbody/sbgui/bin/libpprAI.so ./smartbody/bin
+#cp ../../core/smartbody/sbgui/bin/libsteerlib.so ./smartbody/bin
 
 # copy readme.txt
-rsync -ap --exclude=".svn" ./README.txt ./sdk/README.txt
+rsync -ap --exclude=".svn" ./README.txt ./smartbody/README.txt
 
 # copy build*.sh
-#rsync -ap --exclude=".svn" ./build*.sh ./sdk/
+#rsync -ap --exclude=".svn" ./build*.sh ./smartbody/
 
 # copy src
-rsync -ap --exclude=".svn" ./src ./sdk
-mkdir -p ./sdk/src/sbgui
-rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/src/* ./sdk/src/sbgui/
-mkdir -p ./sdk/src/simplesmartbody
-rsync -ap --exclude=".svn" ../../core/smartbody/simplesmartbody/simplesmartbody.cpp ./sdk/src/simplesmartbody/
-mkdir -p ./sdk/src/SmartBody
-rsync -ap --exclude=".svn" ../../core/smartbody/SmartBody/src/* ./sdk/src/SmartBody/
-mkdir -p ./sdk/src/sbgui
-rsync -ap --exclude=".svn" --exclude="fltk-1.3.2" --exclude="cegui" --exclude="cegui-0.8.2" --exclude="polyvox" ../../core/smartbody/sbgui/src/* ./sdk/src/sbgui/
-mkdir -p ./sdk/src/sbgui/external
-mkdir -p ./sdk/src/sbgui/external/polyvox
-mkdir -p ./sdk/src/sbgui/external/polyvox/library
-mkdir -p ./sdk/src/sbgui/external/polyvox/library/PolyVoxCore
-rsync -arp --exclude=".svn" ../../core/smartbody/sbgui/external/polyvox/library/PolyVoxCore/* ./sdk/src/sbgui/external/polyvox/library/PolyVoxCore
-mkdir -p ./sdk/src/sbgui/external/Pinocchio
-rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/Pinocchio/*.cpp ./sdk/src/sbgui/external/Pinocchio/
-rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/Pinocchio/*.h ./sdk/src/sbgui/external/Pinocchio/
+rsync -ap --exclude=".svn" ./src ./smartbody
+mkdir -p ./smartbody/src/sbgui
+rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/src/* ./smartbody/src/sbgui/
+mkdir -p ./smartbody/src/simplesmartbody
+rsync -ap --exclude=".svn" ../../core/smartbody/simplesmartbody/simplesmartbody.cpp ./smartbody/src/simplesmartbody/
+mkdir -p ./smartbody/src/SmartBody
+rsync -ap --exclude=".svn" ../../core/smartbody/SmartBody/src/* ./smartbody/src/SmartBody/
+mkdir -p ./smartbody/src/sbgui
+rsync -ap --exclude=".svn" --exclude="fltk-1.3.2" --exclude="cegui" --exclude="cegui-0.8.2" --exclude="polyvox" ../../core/smartbody/sbgui/src/* ./smartbody/src/sbgui/
+mkdir -p ./smartbody/src/sbgui/external
+mkdir -p ./smartbody/src/sbgui/external/polyvox
+mkdir -p ./smartbody/src/sbgui/external/polyvox/library
+mkdir -p ./smartbody/src/sbgui/external/polyvox/library/PolyVoxCore
+rsync -arp --exclude=".svn" ../../core/smartbody/sbgui/external/polyvox/library/PolyVoxCore/* ./smartbody/src/sbgui/external/polyvox/library/PolyVoxCore
+mkdir -p ./smartbody/src/sbgui/external/Pinocchio
+rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/Pinocchio/*.cpp ./smartbody/src/sbgui/external/Pinocchio/
+rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/Pinocchio/*.h ./smartbody/src/sbgui/external/Pinocchio/
 
-mkdir -p ./sdk/src/vhcl
-rsync -ap --exclude=".svn" ../../lib/vhcl/src/* ./sdk/src/vhcl/
-mkdir -p ./sdk/src/vhmsg
-rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/src/* ./sdk/src/vhmsg/
-mkdir -p ./sdk/src/wsp
-rsync -ap --exclude=".svn" ../../lib/wsp/wsp/src/* ./sdk/src/wsp/
-mkdir -p ./sdk/src/bonebus
-rsync -ap --exclude=".svn" ../../lib/bonebus/src/* ./sdk/src/bonebus/
-mkdir -p ./sdk/src/steerlib
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/steerlib/src/* ./sdk/src/steerlib/
-mkdir -p ./sdk/src/pprAI
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/pprAI/src/* ./sdk/src/pprAI/
-mkdir -p ./sdk/src/external/tinyxml
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/tinyxml/*.cpp ./sdk/src/external/tinyxml/
-mkdir -p ./sdk/src/external/glfw
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/lib/*.c ./sdk/src/external/glfw/
-mkdir -p ./sdk/src/external/glfw/x11
-rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/lib/x11/*.c ./sdk/src/external/glfw/x11
+mkdir -p ./smartbody/src/vhcl
+rsync -ap --exclude=".svn" ../../lib/vhcl/src/* ./smartbody/src/vhcl/
+mkdir -p ./smartbody/src/vhmsg
+rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/src/* ./smartbody/src/vhmsg/
+mkdir -p ./smartbody/src/wsp
+rsync -ap --exclude=".svn" ../../lib/wsp/wsp/src/* ./smartbody/src/wsp/
+mkdir -p ./smartbody/src/bonebus
+rsync -ap --exclude=".svn" ../../lib/bonebus/src/* ./smartbody/src/bonebus/
+mkdir -p ./smartbody/src/steerlib
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/steerlib/src/* ./smartbody/src/steerlib/
+mkdir -p ./smartbody/src/pprAI
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/pprAI/src/* ./smartbody/src/pprAI/
+mkdir -p ./smartbody/src/external/tinyxml
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/tinyxml/*.cpp ./smartbody/src/external/tinyxml/
+mkdir -p ./smartbody/src/external/glfw
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/lib/*.c ./smartbody/src/external/glfw/
+mkdir -p ./smartbody/src/external/glfw/x11
+rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/lib/x11/*.c ./smartbody/src/external/glfw/x11
 
 # first need to create data & data/mesh folder
 # copy data folder
-mkdir -p ./sdk/data
-mkdir -p ./sdk/data/mesh
-rsync -ap --exclude=".svn" ../../data/behaviorsets/* ./sdk/data/behaviorsets/
-rsync -ap --exclude=".svn" ../../data/ChrBrad/* ./sdk/data/ChrBrad/
-rsync -ap --exclude=".svn" ../../data/ChrRachel/* ./sdk/data/ChrRachel/
-rsync -ap --exclude=".svn" ../../data/examples/* ./sdk/data/examples/
-rsync -ap --exclude=".svn" ../../data/fonts/* ./sdk/data/fonts/
-rsync -ap --exclude=".svn" ../../data/Sinbad/* ./sdk/data/Sinbad/
-rsync -ap --exclude=".svn" ../../data/scripts/* ./sdk/data/scripts/
-rsync -ap --exclude=".svn" ../../data/mesh/ChrBrad/* ./sdk/data/mesh/ChrBrad/
-rsync -ap --exclude=".svn" ../../data/mesh/ChrRachel/* ./sdk/data/mesh/ChrRachel/
-rsync -ap --exclude=".svn" ../../data/mesh/Sinbad/* ./sdk/data/mesh/Sinbad/
-rsync -ap --exclude=".svn" ../../data/mesh/Ogre/* ./sdk/data/mesh/Ogre/
+mkdir -p ./smartbody/data
+mkdir -p ./smartbody/data/mesh
+rsync -ap --exclude=".svn" ../../data/behaviorsets/* ./smartbody/data/behaviorsets/
+rsync -ap --exclude=".svn" ../../data/ChrBrad/* ./smartbody/data/ChrBrad/
+rsync -ap --exclude=".svn" ../../data/ChrRachel/* ./smartbody/data/ChrRachel/
+rsync -ap --exclude=".svn" ../../data/examples/* ./smartbody/data/examples/
+rsync -ap --exclude=".svn" ../../data/fonts/* ./smartbody/data/fonts/
+rsync -ap --exclude=".svn" ../../data/Sinbad/* ./smartbody/data/Sinbad/
+rsync -ap --exclude=".svn" ../../data/scripts/* ./smartbody/data/scripts/
+rsync -ap --exclude=".svn" ../../data/mesh/ChrBrad/* ./smartbody/data/mesh/ChrBrad/
+rsync -ap --exclude=".svn" ../../data/mesh/ChrRachel/* ./smartbody/data/mesh/ChrRachel/
+rsync -ap --exclude=".svn" ../../data/mesh/Sinbad/* ./smartbody/data/mesh/Sinbad/
+rsync -ap --exclude=".svn" ../../data/mesh/Ogre/* ./smartbody/data/mesh/Ogre/
 
 # integration examples
-mkdir sdk/src/ogresmartbody
-cp ../win32/src/ogresmartbody/*.cpp sdk/src/ogresmartbody
-cp ../win32/src/ogresmartbody/*.h sdk/src/ogresmartbody
-cp ../win32/src/ogresmartbody/plugins.cfg-linux sdk/bin/plugins.cfg
-cp ../win32/src/ogresmartbody/resources.cfg-linux sdk/bin/resources.cfg
-cp ../win32/src/ogresmartbody/*.py sdk/data
-mkdir sdk/src/irrlichtsmartbody
-cp ../win32/src/irrlichtsmartbody/*.cpp  sdk/src/irrlichtsmartbody
-cp ../win32/src/irrlichtsmartbody/*.h sdk/src/irrlichtsmartbody
-cp ../win32/src/irrlichtsmartbody/*.py sdk/src/irrlichtsmartbody/data
-mkdir sdk/data/irrlichtmedia
-cp ../win32/src/irrlichtsmartbody/media/* sdk/data/irrlichtmedia
+mkdir smartbody/src/ogresmartbody
+cp ../win32/src/ogresmartbody/*.cpp smartbody/src/ogresmartbody
+cp ../win32/src/ogresmartbody/*.h smartbody/src/ogresmartbody
+cp ../win32/src/ogresmartbody/plugins.cfg-linux smartbody/bin/plugins.cfg
+cp ../win32/src/ogresmartbody/resources.cfg-linux smartbody/bin/resources.cfg
+cp ../win32/src/ogresmartbody/*.py smartbody/data
+mkdir smartbody/src/irrlichtsmartbody
+cp ../win32/src/irrlichtsmartbody/*.cpp  smartbody/src/irrlichtsmartbody
+cp ../win32/src/irrlichtsmartbody/*.h smartbody/src/irrlichtsmartbody
+cp ../win32/src/irrlichtsmartbody/*.py smartbody/src/irrlichtsmartbody/data
+mkdir smartbody/data/irrlichtmedia
+cp ../win32/src/irrlichtsmartbody/media/* smartbody/data/irrlichtmedia
 
 # build files
-cp build/CMakeLists.txt ./sdk/
-cp build/CMakeLists.txt-SmartBody ./sdk/src/SmartBody/CMakeLists.txt
-cp build/CMakeLists.txt-src ./sdk/src/CMakeLists.txt
-cp build/CMakeLists.txt-sbgui ./sdk/src/sbgui/CMakeLists.txt
-cp build/CMakeLists.txt-polyvox ./sdk/src/sbgui/external/polyvox/library/PolyVoxCore/CMakeLists.txt
-cp build/CMakeLists.txt-simplesmartbody ./sdk/src/simplesmartbody/CMakeLists.txt
-cp build/CMakeLists.txt-vhcl ./sdk/src/vhcl/CMakeLists.txt
-cp build/CMakeLists.txt-vhmsg ./sdk/src/vhmsg/CMakeLists.txt
-cp build/CMakeLists.txt-bonebus ./sdk/src/bonebus/CMakeLists.txt
-cp build/CMakeLists.txt-wsp ./sdk/src/wsp/CMakeLists.txt
-cp build/CMakeLists.txt-steerlib ./sdk/src/steerlib/CMakeLists.txt
-cp build/CMakeLists.txt-pprAI ./sdk/src/pprAI/CMakeLists.txt
-cp build/CMakeLists.txt-polyvox ./sdk/src/sbgui/external/polyvox/CMakeLists.txt
-cp build/CMakeLists.txt-Pinocchio ./sdk/src/sbgui/external/Pinocchio/CMakeLists.txt
-cp build/CMakeLists.txt-ogresmartbody ./sdk/src/ogresmartbody/CMakeLists.txt
-cp build/CMakeLists.txt-irrlichtsmartbody ./sdk/src/irrlichtsmartbody/CMakeLists.txt
+cp build/CMakeLists.txt ./smartbody/
+cp build/CMakeLists.txt-SmartBody ./smartbody/src/SmartBody/CMakeLists.txt
+cp build/CMakeLists.txt-src ./smartbody/src/CMakeLists.txt
+cp build/CMakeLists.txt-sbgui ./smartbody/src/sbgui/CMakeLists.txt
+cp build/CMakeLists.txt-polyvox ./smartbody/src/sbgui/external/polyvox/library/PolyVoxCore/CMakeLists.txt
+cp build/CMakeLists.txt-simplesmartbody ./smartbody/src/simplesmartbody/CMakeLists.txt
+cp build/CMakeLists.txt-vhcl ./smartbody/src/vhcl/CMakeLists.txt
+cp build/CMakeLists.txt-vhmsg ./smartbody/src/vhmsg/CMakeLists.txt
+cp build/CMakeLists.txt-bonebus ./smartbody/src/bonebus/CMakeLists.txt
+cp build/CMakeLists.txt-wsp ./smartbody/src/wsp/CMakeLists.txt
+cp build/CMakeLists.txt-steerlib ./smartbody/src/steerlib/CMakeLists.txt
+cp build/CMakeLists.txt-pprAI ./smartbody/src/pprAI/CMakeLists.txt
+cp build/CMakeLists.txt-polyvox ./smartbody/src/sbgui/external/polyvox/CMakeLists.txt
+cp build/CMakeLists.txt-Pinocchio ./smartbody/src/sbgui/external/Pinocchio/CMakeLists.txt
+cp build/CMakeLists.txt-ogresmartbody ./smartbody/src/ogresmartbody/CMakeLists.txt
+cp build/CMakeLists.txt-irrlichtsmartbody ./smartbody/src/irrlichtsmartbody/CMakeLists.txt
 
 # supporting libraries
-cp activemq-cpp-library-3.8.1-src.tar.gz ./sdk/
+cp activemq-cpp-library-3.8.1-src.tar.gz ./smartbody/
 
 # tar and gzip it up!
-tar -cvzf SmartBodySDK-linux.tar.gz sdk
+tar -cvzf SmartBodySDK-linux.tar.gz smartbody
 
