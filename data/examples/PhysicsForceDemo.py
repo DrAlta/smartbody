@@ -8,6 +8,8 @@ scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
 # Run required scripts
@@ -17,11 +19,11 @@ scene.run('init-example-reach.py')
 # Set scene parameters and camera
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
-scene.run('default-viewer.py')
-camera = getCamera()
-camera.setEye(-409, 405, -917)
-camera.setCenter(-307, 325, -767)
-scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
+#scene.run('default-viewer.py')
+#camera = getCamera()
+#camera.setEye(-409, 405, -917)
+#camera.setCenter(-307, 325, -767)
+#scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
 
 # Setting up characters
 print 'Setting up characters'
@@ -33,7 +35,9 @@ brad1.setPosition(SrVec(0, 122, 860))
 brad1.setHPR(SrVec(180, 0, 0))
 brad1.createStandardControllers()
 brad1.setStringAttribute('deformableMesh', 'Brad.dae')
-reachSetup('brad1', 'KNN', '')
+scene.run('BehaviorSetMocapReaching.py')
+setupBehaviorSet()
+retargetBehaviorSet('brad2')
 bml.execBML('brad1', '<body posture="HandsAtSide_Motex"/>')
 # Brad2
 brad2 = scene.createCharacter('brad2', '')
