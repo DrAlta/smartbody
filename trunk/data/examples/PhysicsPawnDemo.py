@@ -10,11 +10,11 @@ scene.loadAssets()
 # Set scene parameters and camera
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
-scene.run('default-viewer.py')
-camera = getCamera()
-camera.setEye(0, 409.62, 733.74)
-camera.setCenter(0, 335.62, 548.74)
-scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
+#scene.run('default-viewer.py')
+#camera = getCamera()
+#camera.setEye(0, 409.62, 733.74)
+#camera.setCenter(0, 335.62, 548.74)
+#scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
 
 # Set up pawns in scene
 print 'Adding pawns to scene'

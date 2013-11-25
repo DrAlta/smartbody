@@ -8,6 +8,8 @@ scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
 # Set simulation fps
@@ -20,11 +22,11 @@ scene.run('init-example-reach.py')
 # Set scene parameters and camera
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
-scene.run('default-viewer.py')
-camera = getCamera()
-camera.setEye(-9, 255, 417)
-camera.setCenter(-9, 182, 232)
-scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
+#scene.run('default-viewer.py')
+#camera = getCamera()
+#camera.setEye(-9, 255, 417)
+#camera.setCenter(-9, 182, 232)
+#scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
 
 # Setting up characters
 print 'Setting up characters'
@@ -52,7 +54,11 @@ doctor.setPosition(SrVec(75, 102, 0))
 doctor.setHPR(SrVec(90, 0, 0))
 doctor.createStandardControllers()
 doctor.setStringAttribute('deformableMesh', 'Doctor.dae')
-reachSetup('doctor', 'KNN', '')
+scene.run('BehaviorSetMocapReaching.py')
+setupBehaviorSet()
+retargetBehaviorSet('doctor')
+
+#reachSetup('doctor', 'KNN', '')
 bml.execBML('doctor', '<body posture="LHandOnHip_Motex"/>')
 # Brad2
 brad2 = scene.createCharacter('brad2', '')
@@ -62,7 +68,11 @@ brad2.setPosition(SrVec(135, 102, 0))
 brad2.setHPR(SrVec(-90, 0, 0))
 brad2.createStandardControllers()
 brad2.setStringAttribute('deformableMesh', 'Brad.dae')
-reachSetup('brad2', 'KNN', '')
+scene.run('BehaviorSetMocapReaching.py')
+setupBehaviorSet()
+retargetBehaviorSet('brad2')
+
+#reachSetup('brad2', 'KNN', '')
 bml.execBML('brad2', '<body posture="HandsAtSide_Motex"/>')
 
 # Turn on GPU deformable geometry for all

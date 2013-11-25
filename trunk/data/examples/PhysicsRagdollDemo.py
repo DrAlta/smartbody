@@ -16,11 +16,11 @@ scene.run('init-param-animation.py')
 # Set scene parameters and camera
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
-scene.run('default-viewer.py')
-camera = getCamera()
-camera.setEye(-9, 255, 417)
-camera.setCenter(-9, 182, 232)
-scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
+#scene.run('default-viewer.py')
+#camera = getCamera()
+#camera.setEye(-9, 255, 417)
+#camera.setCenter(-9, 182, 232)
+#scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
 
 # Set simulation fps
 #scene.getSimulationManager().setSimFps(60)
