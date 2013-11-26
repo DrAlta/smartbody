@@ -424,11 +424,11 @@ void SbmCharacter::createStandardControllers()
 	if (!_faceDefinition || !_faceDefinition->getFaceNeutral())
 	{
 		eyelid_reg_ct_p->set_use_blink_viseme( true );
-		LOG("Character %s will use 'blink' viseme to control blinking.", getName().c_str());
+//		LOG("Character %s will use 'blink' viseme to control blinking.", getName().c_str());
 	}
 	else
 	{
-		LOG("Character %s will use FAC 45 left and right to control blinking.", getName().c_str());
+//		LOG("Character %s will use FAC 45 left and right to control blinking.", getName().c_str());
 	}
 	eyelid_reg_ct_p->init(this, true);
 	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
