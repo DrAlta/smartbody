@@ -6,27 +6,20 @@ print "|--------------------------------------------|"
 # Add asset paths
 scene.addAssetPath('script', 'sbm-common/scripts')
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('mesh', 'retarget/mesh')
-scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath('motion', 'sbm-common/common-sk/motion')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
+scene.loadAssetsFromPath('sbm-common/common-sk/common.sk')
+
 # Set simulation fps
 scene.getSimulationManager().setSimFps(60)
 
-# Run required scripts
-scene.run('init-param-animation.py')
-scene.run('init-example-reach.py')
 
 # Set scene parameters and camera
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
-#scene.run('default-viewer.py')
-#camera = getCamera()
-#camera.setEye(-9, 255, 417)
-#camera.setCenter(-9, 182, 232)
-#scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
 
 # Setting up characters
 print 'Setting up characters'
@@ -56,9 +49,8 @@ doctor.createStandardControllers()
 doctor.setStringAttribute('deformableMesh', 'Doctor.dae')
 scene.run('BehaviorSetMocapReaching.py')
 setupBehaviorSet()
-retargetBehaviorSet('doctor')
+#retargetBehaviorSet('doctor')
 
-#reachSetup('doctor', 'KNN', '')
 bml.execBML('doctor', '<body posture="LHandOnHip_Motex"/>')
 # Brad2
 brad2 = scene.createCharacter('brad2', '')
@@ -70,9 +62,8 @@ brad2.createStandardControllers()
 brad2.setStringAttribute('deformableMesh', 'Brad.dae')
 scene.run('BehaviorSetMocapReaching.py')
 setupBehaviorSet()
-retargetBehaviorSet('brad2')
+#retargetBehaviorSet('brad2')
 
-#reachSetup('brad2', 'KNN', '')
 bml.execBML('brad2', '<body posture="HandsAtSide_Motex"/>')
 
 # Turn on GPU deformable geometry for all
@@ -110,13 +101,14 @@ pawn5.setPosition(SrVec(135, 150, -10))
 print 'Configuring character physics'
 phyManager = scene.getPhysicsManager()
 phyManager.getPhysicsEngine().setBoolAttribute('enable', True)
+
 for name in scene.getCharacterNames():
 	char = scene.getCharacter(name)
 	char.getAttribute('createPhysics').setValue()
 	phyManager.getPhysicsCharacter(name).setBoolAttribute('usePD', True)
 
 def constrainChr(chr, joint, object=''):
-	''' Name of character, joint name of character, object name to act as constraint'''
+	#Name of character, joint name of character, object name to act as constraint
 	bodyLink = phyManager.getJointObj(chr, joint)
 	bodyLink.setBoolAttribute('constraint', True)
 	bodyLink = phyManager.getJointObj(chr, joint)
@@ -210,7 +202,6 @@ def boxingLogic():
 			bml.execBML('brad2', '<sbm:reach sbm:action="touch" sbm:reach-finish="true" sbm:reach-type="right" target="pawn3"/>')
 		if randDodge == 2:
 			phyManager.getPhysicsCharacter('doctor').setBoolAttribute('enable', False)
-			#bml.execBML('doctor', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
 		currentTurn = 'doctor'
 	# Doctor's turn, toggle physics and play reach
 	elif currentTurn == 'doctor':
@@ -225,7 +216,6 @@ def boxingLogic():
 			bml.execBML('doctor', '<sbm:reach sbm:action="touch" sbm:reach-finish="true" sbm:reach-type="left" target="pawn5"/>')
 		if randDodge == 2:
 			phyManager.getPhysicsCharacter('brad2').setBoolAttribute('enable', False)
-			#bml.execBML('brad2', '<animation name="ChrUtah_Relax001_CrouchProtectHead_right"/>')
 		currentTurn = 'brad2'
 		
 class CollisionHandler(SBEventHandler):
