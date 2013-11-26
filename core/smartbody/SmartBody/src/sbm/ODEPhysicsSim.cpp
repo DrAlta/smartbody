@@ -287,7 +287,7 @@ void ODEPhysicsSim::addPhysicsCharacter( SmartBody::SBPhysicsCharacter* phyChar 
 		SmartBody::SbmJointObj* obj = jointObjList[i];
 		addPhysicsObj(obj);
 		updatePhyObjGeometry(obj,obj->getColObj());	
-		LOG("joint obj name = %s",obj->getSBJoint()->getName().c_str());
+		//LOG("joint obj name = %s",obj->getSBJoint()->getName().c_str());
 		
 // 		if (obj->getParentObj() == NULL || obj->getSBJoint()->getName() == "base")
 // 		{
@@ -462,7 +462,7 @@ void ODEPhysicsSim::updatePhyObjGeometry( SmartBody::SBPhysicsObj* obj, SBGeomOb
 			odeObj->odeMass.translate((dReal)offsetT.tran[0],(dReal)offsetT.tran[1],(dReal)offsetT.tran[2]);
 			//obj->setMass((float)odeObj->odeMass.mass);
 		}
-		LOG("obj mass = %f",odeObj->odeMass.mass);
+//		LOG("obj mass = %f",odeObj->odeMass.mass);
 		dBodySetMass(odeObj->bodyID,&odeObj->odeMass);				
 	}	
 }

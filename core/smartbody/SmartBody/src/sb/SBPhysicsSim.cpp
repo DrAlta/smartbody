@@ -364,7 +364,7 @@ void SBPhysicsObj::handleCollision( SrVec contactPt, SBPhysicsObj* colObj )
 /* Physics Joint                                                        */
 /************************************************************************/
 
-SBPhysicsJoint::SBPhysicsJoint( SBJoint* joint ) 
+SBPhysicsJoint::SBPhysicsJoint( SBJoint* joint ) : SBObject()
 {
 	sbmJoint = joint;
 	jointTorque = SrVec(0,0,0);
@@ -383,6 +383,11 @@ void SBPhysicsJoint::updateTotalSupportMass()
 {
 	totalSupportMass = 0.f;
 	SbmJointObj* obj = getChildObj();
+	if (!obj)
+	{
+		LOG("Child object for joint %s does not exist.", this->sbmJoint->getName().c_str());
+		return;
+	}
 	totalSupportMass += obj->getMass();
 
 	for (int i=0;i<obj->getNumChildJoints();i++)
@@ -394,7 +399,7 @@ void SBPhysicsJoint::updateTotalSupportMass()
 			totalSupportMass += cj->getTotalSupportMass();
 		}		
 	}
-	LOG("joint %s, total mass = %f",this->getSBJoint()->getName().c_str(),totalSupportMass);
+//	LOG("joint %s, total mass = %f",this->getSBJoint()->getName().c_str(),totalSupportMass);
 }
 
 void SBPhysicsJoint::notify( SBSubject* subject )
