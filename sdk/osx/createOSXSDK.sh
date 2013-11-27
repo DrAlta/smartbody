@@ -17,6 +17,7 @@ rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/include/*.h ./SmartBodySDK/in
 rsync -ap --exclude=".svn" ../../lib/wsp/wsp/include/*.h ./SmartBodySDK/include/wsp/
 rsync -ap --exclude=".svn" ../../lib/bonebus/include/*.h ./SmartBodySDK/include/bonebus/
 rsync -ap --exclude=".svn" ../../lib/vhcl/include/*.h ./SmartBodySDK/include/vhcl/
+rsync -ap --exclude=".svn" ../../lib/protobuf/include/* ./SmartBodySDK/include/protobuf/
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/pprAI/include/*.h ./SmartBodySDK/include/steersuite/
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/steerlib/include/* ./SmartBodySDK/include/steersuite/
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/* ./SmartBodySDK/include/steersuite/
@@ -42,14 +43,26 @@ rsync -ap --exclude=".svn" ./readme.txt ./SmartBodySDK/readme.txt
 # copy build*.sh
 rsync -ap --exclude=".svn" ./build*.sh ./SmartBodySDK/
 
-# copy CMakeLists.txt
-rsync -ap --exclude=".svn" ./CMakeLists.txt ./SmartBodySDK/CMakeLists.txt
-
 # copy src
-rsync -ap --exclude=".svn" ./src ./SmartBodySDK
+mkdir -p ./SmartBodySDK/src
+mkdir -p ./SmartBodySDK/src/sbgui/external
+mkdir -p ./SmartBodySDK/src/sbgui/external/polyvox
+mkdir -p ./SmartBodySDK/src/sbgui/external/polyvox/library
 rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/src/* ./SmartBodySDK/src/sbgui/
+rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/polyvox/library/PolyVoxCore/* ./SmartBodySDK/src/sbgui/external/polyvox/library/PolyVoxCore/
+rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/polyvox/CMakeLists.txt ./SmartBodySDK/src/sbgui/external/polyvox/
+rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/Pinocchio/*.cpp ./SmartBodySDK/src/sbgui/external/Pinocchio/
+rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/Pinocchio/*.h ./SmartBodySDK/src/sbgui/external/Pinocchio/
+rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/Pinocchio/CMakeLists.txt ./SmartBodySDK/src/sbgui/external/Pinocchio/
 rsync -ap --exclude=".svn" ../../core/smartbody/simplesmartbody/simplesmartbody.cpp ./SmartBodySDK/src/simplesmartbody/
 rsync -ap --exclude=".svn" ../../core/smartbody/Smartbody/src/* ./SmartBodySDK/src/Smartbody/
+
+# copy CMakeLists.txt
+rsync -ap --exclude=".svn" ./build/CMakeLists.txt ./SmartBodySDK/CMakeLists.txt
+rsync -ap --exclude=".svn" ./build/CMakeLists-src.txt ./SmartBodySDK/src/CMakeLists.txt
+rsync -ap --exclude=".svn" ./build/CMakeLists-simplesmartbody.txt ./SmartBodySDK/src/simplesmartbody/CMakeLists.txt
+rsync -ap --exclude=".svn" ./build/CMakeLists-SmartBody.txt ./SmartBodySDK/src/SmartBody/CMakeLists.txt
+rsync -ap --exclude=".svn" ./build/CMakeLists-sbgui.txt ./SmartBodySDK/src/sbgui/CMakeLists.txt
 
 
 # first need to create data & data/mesh folder

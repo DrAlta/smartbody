@@ -1,7 +1,7 @@
 #ifdef WIN32
 #define USE_AUTO_RIGGING 1
 #endif
-#ifdef __linux__
+#if defined (__linux__) || defined(__APPLE__)
 #define USE_AUTO_RIGGING 1
 #endif
 
