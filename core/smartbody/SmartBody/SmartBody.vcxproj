@@ -888,6 +888,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <None Include="..\SmartBody\src\sbm\sbm_deformable_mesh.cpp.bak">
       <FileType>Document</FileType>
     </None>
+    <None Include="src\protocols\sbmotion.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2341,5 +2341,8 @@
     <None Include="..\SmartBody\src\sbm\sbm_deformable_mesh.cpp.bak">
       <Filter>sbm</Filter>
     </None>
+    <None Include="src\protocols\sbmotion.proto">
+      <Filter>protocols</Filter>
+    </None>
   </ItemGroup>
 </Project>
