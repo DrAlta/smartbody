@@ -422,6 +422,16 @@ std::vector<VisemeData*>* remote_speech::getVisemes( RequestId requestId, SbmCha
 }
 
 
+std::vector<float> remote_speech::getEmotionCurve(SmartBody::RequestId requestId, const std::string& emotionType, SbmCharacter* character)
+{
+	return std::vector<float>();
+}
+
+std::vector<std::string> remote_speech::getEmotionNames(SmartBody::RequestId requestId, SbmCharacter* character)
+{
+	return std::vector<std::string>();
+}
+
 /**
  *  Returns the sbm command used to play the speech audio. The command is now of form:  send PlaySound <audio path>- this sends the sound directly to Unreal
  */

@@ -815,7 +815,6 @@ void VisemeViewerWindow::loadAudioFiles()
 
 	_choiceAudioFile->clear();
 	// if an audio path is present, use it
-	bool useAudioPaths = true;
 	std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
 	std::string relativeAudioPath = "";
 	for (size_t audioPathCounter = 0; audioPathCounter < audioPaths.size(); ++audioPathCounter)

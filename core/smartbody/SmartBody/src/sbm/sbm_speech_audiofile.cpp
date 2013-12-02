@@ -138,53 +138,63 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
       return 0;
    }
 
-   // if an audio path is present, use it
-   bool useAudioPaths = true;
-   bool hasAudioPath = false;
-   std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
-   std::string relativeAudioPath = "";
-   //if (audioPaths.size() > 0)
-   //	relativeAudioPath = audioPaths[0];
-   boost::filesystem::path abs_p;
-   for (size_t audioPathCounter = 0; audioPathCounter < audioPaths.size(); ++audioPathCounter)
-   {
-	   boost::filesystem::path p( relativeAudioPath );
-	   p /= voiceCode;
+   // if the voice code is an absolute path, use it and ignore the media path and audio path
+   boost::filesystem::path abs_p( voiceCode );
 #if (BOOST_VERSION > 104400)
-	   abs_p = boost::filesystem::absolute( p );	
-	   if( !boost::filesystem::exists( abs_p ))
-	   {
-		   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
+   boost::filesystem::path voicecodeabs_p = boost::filesystem::absolute( abs_p );
+   voicecodeabs_p /= std::string(ref + ".bml");
+   if( !boost::filesystem::exists( voicecodeabs_p ))
 #else
-	   abs_p = boost::filesystem::complete( p );	
-	   if( !boost::filesystem2::exists( abs_p ))
-	   {
-		   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+   boost::filesystem::path voicecodeabs_p = boost::filesystem::complete( abs_p );
+   voicecodeabs_p /= std::string(ref + ".bml");
+   if( !boost::filesystem2::exists( voicecodeabs_p ))
 #endif
-		   continue;
-	   }
-	   else
+   { 
+	   bool hasAudioPath = false;
+	   std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
+	   for (size_t audioPathCounter = 0; audioPathCounter < audioPaths.size(); ++audioPathCounter)
 	   {
-		   hasAudioPath = true;
-		   break;
+		   boost::filesystem::path p( audioPaths[audioPathCounter] );
+		   p /= voiceCode;
+	#if (BOOST_VERSION > 104400)
+		   abs_p = boost::filesystem::absolute( p );	
+		   if( !boost::filesystem::exists( abs_p ))
+		   {
+			   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
+	#else
+		   abs_p = boost::filesystem::complete( p );	
+		   if( !boost::filesystem2::exists( abs_p ))
+		   {
+			   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+	#endif
+			   continue;
+		   }
+		   else
+		   {
+			   hasAudioPath = true;
+			   break;
+		   }
 	   }
+	   if (!hasAudioPath) // can not find the audio file in audio paths
+		   return 0;
    }
-   if (!hasAudioPath) // can not find the audio file in audio paths
-	   return 0;
-
 	
 	boost::filesystem::path wavPath = abs_p;
 	wavPath /= std::string(ref + ".wav");
 	boost::filesystem::path bmlPath = abs_p;
 	bmlPath /= std::string(ref + ".bml");
+	boost::filesystem::path emoPath = abs_p;
+	emoPath /= std::string(ref + ".emo");
 #if (BOOST_VERSION > 104400)
 	std::string basePath = abs_p.string().c_str();
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.string().c_str();
 	string bmlFilename = bmlPath.string().c_str();
+	string emoFilename = emoPath.string().c_str();
 #else
 	std::string basePath = abs_p.native_directory_string().c_str();
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.native_directory_string().c_str();
 	string bmlFilename = bmlPath.native_directory_string().c_str();
+	string emoFilename = emoPath.native_directory_string().c_str();
 #endif
 
 
@@ -225,6 +235,10 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 		//return 0;
 	}
 
+	// acquire emotion data from file
+	m_speechRequestInfo[m_requestIdCounter].emotionData.clear();
+	ReadEmotionData(emoFilename.c_str(), m_speechRequestInfo[m_requestIdCounter].emotionData);
+
 	SmartBody::SBScene::getScene()->getCommandManager()->execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
 	return m_requestIdCounter++;
 }
@@ -262,8 +276,6 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
       return 0;
    }
 
-   // if an audio path is present, use it
-   bool useAudioPaths = true;
 
    // if the voice code is an absolute path, use it and ignore the media path and audio path
    boost::filesystem::path abs_p( voiceCode );
@@ -278,12 +290,10 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 #endif
    {
 	   std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
-	   std::string relativeAudioPath = "";
 	   bool hasAudioPath = false;
-	   boost::filesystem::path abs_p;
 	   for (size_t audioPathCounter = 0; audioPathCounter < audioPaths.size(); ++audioPathCounter)
 	   {
-		   boost::filesystem::path p( relativeAudioPath );
+		   boost::filesystem::path p( audioPaths[audioPathCounter] );
 		   p /= voiceCode;
 #if (BOOST_VERSION > 104400)
 		   abs_p = boost::filesystem::absolute( p );	
@@ -312,9 +322,12 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 	wavPath /= std::string(ref + ".wav");
 	boost::filesystem::path bmlPath = abs_p;
 	bmlPath /= std::string(ref + ".bml");
+	boost::filesystem::path emoPath = abs_p;
+	emoPath /= std::string(ref + ".emo");
 #if (BOOST_VERSION > 104400)
 	std::string basePath = abs_p.string().c_str();
 	m_speechRequestInfo[ m_requestIdCounter ].audioFilename = wavPath.string().c_str();
+	string emoFilename = emoPath.string().c_str();
 
 #if (BOOST_VERSION > 104400)
 	ReadMotionDataBML(bmlPath.string().c_str(),  m_speechRequestInfo[ m_requestIdCounter ].visemeData);
@@ -339,6 +352,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
       return 0;
    }
    ReadSpeechTiming( bmlPath.native_directory_string().c_str(), m_speechRequestInfo[ m_requestIdCounter ].timeMarkers );
+   string emoFilename = emoPath.native_directory_string().c_str();
 #endif
 
 
@@ -353,6 +367,9 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
       //return 0;
    }
 
+   // acquire emotion data from file
+   m_speechRequestInfo[m_requestIdCounter].emotionData.clear();
+   ReadEmotionData(emoFilename.c_str(), m_speechRequestInfo[m_requestIdCounter].emotionData);
 
    SmartBody::SBScene::getScene()->getCommandManager()->execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
 
@@ -389,6 +406,40 @@ vector<VisemeData *> * AudioFileSpeech::getVisemes( RequestId requestId, SbmChar
    return NULL;
 }
 
+std::vector<float> AudioFileSpeech::getEmotionCurve(RequestId requestId, const std::string& emotionType, SbmCharacter* character)
+{
+	std::map<RequestId, SpeechRequestInfo>::iterator it = m_speechRequestInfo.find(requestId);
+	if (it != m_speechRequestInfo.end())
+	{
+		if (it->second.emotionData.find(emotionType) == it->second.emotionData.end())
+			return std::vector<float>();
+		else
+		{
+			std::vector<float> emoCurve;
+			for (size_t i = 0; i < it->second.emotionData[emotionType].size(); ++i)
+			{
+				emoCurve.push_back(it->second.emotionData[emotionType][i]);
+			}
+			return emoCurve;
+		}
+	}
+	return std::vector<float>();
+}
+
+std::vector<std::string> AudioFileSpeech::getEmotionNames(RequestId requestId, SbmCharacter* character)
+{
+	std::vector<std::string> emotionNames;
+	std::map<RequestId, SpeechRequestInfo>::iterator it = m_speechRequestInfo.find(requestId);
+	if (it != m_speechRequestInfo.end())
+	{
+		std::map<std::string, std::vector<float> >::iterator iter;
+		for (iter = it->second.emotionData.begin(); iter != it->second.emotionData.end(); ++iter)
+		{
+			emotionNames.push_back(iter->first);
+		}
+	}
+	return emotionNames;
+}
 
 char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, SbmCharacter * character )
 {
@@ -845,6 +896,49 @@ void AudioFileSpeech::ReadVisemeDataBML( const char * filename, std::vector< Vis
    }
 }
 
+void AudioFileSpeech::ReadEmotionData(const char* filename, std::map<std::string, std::vector<float> >& emotionData)
+{
+	std::ifstream emoFile(filename);
+	if (!emoFile.good())
+	{
+		//LOG("Cannot open emotion file %s", filename);
+		return;
+	}
+
+	double fps = 30;
+	std::string line;
+	while (!emoFile.eof())
+	{
+		getline(emoFile, line);
+		std::vector<std::string> tokens;
+		vhcl::Tokenize(line, tokens);
+		if (tokens.size() == 0)					// empty line
+		{
+			continue;
+		}
+
+		if (tokens[0] == "fps" && tokens.size() > 1)
+		{
+			fps = atof(tokens[1].c_str());
+			continue;
+		}
+		if (tokens[0].find("emotions.") != std::string::npos && tokens.size() > 2)
+		{
+			std::string emotionType = tokens[0].substr(9);
+			if (emotionData.find(emotionType) == emotionData.end())
+			{
+				emotionData.insert(std::make_pair(emotionType, std::vector<float>()));
+				LOG("Found %s emotion curve input for speech", emotionType.c_str());
+			}
+			int frameNumber = atoi(tokens[1].c_str());
+			float time = (float)frameNumber / (float)fps;
+			float value = (float)atof(tokens[2].c_str());
+			emotionData[emotionType].push_back(time);
+			emotionData[emotionType].push_back(value);
+			continue;
+		}
+	}
+}
 
 void AudioFileSpeech::ReadSpeechTiming( const char * filename, std::map< std::string, float > & timeMarkers )
 {
