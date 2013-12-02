@@ -237,6 +237,16 @@ namespace SmartBody {
          */
         virtual std::vector<VisemeData *>* getVisemes( RequestId requestId, SbmCharacter* character ) = 0;
 
+		/**
+		 *	Returns the emotion curve for given speech request.
+		 */
+		virtual std::vector<float> getEmotionCurve(RequestId requestId, const std::string& emotionType, SbmCharacter* character = NULL) = 0;
+
+		/**
+		 *	Returns number of emotions for given speech request.
+		 */
+		virtual std::vector<std::string> getEmotionNames(RequestId requestId, SbmCharacter* character = NULL) = 0;
+
         /**
          *  Returns the sbm command used to play the speech audio.
          */

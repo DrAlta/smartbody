@@ -417,32 +417,121 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 	if (result_visemes == NULL)
 		return;
 
+	// clean up debug data
 	for (size_t i = 0; i < debugVisemeCurves.size(); ++i)
 	{
 		delete debugVisemeCurves[i];
 	}
 	debugVisemeCurves.clear();
 
+	// process
 	SBCharacter* character = dynamic_cast<SBCharacter*>(request->actor);
-	const std::string& diphoneMap = character->getStringAttribute("lipSyncSetName");
-	VisemeData* curViseme = NULL;
-	VisemeData* prevViseme = NULL;
-	VisemeData* pprevViseme = NULL;
-	VisemeData* nextViseme = NULL;
-	VisemeData* nnextViseme = NULL;
-	std::vector<float> visemeTimeMarkers;
-	std::vector<VisemeData*> visemeRawData;
+	if (!character)
+		return;
+	
+	SpeechInterface* speechInterface = get_speech_interface();
+	std::vector<std::string> emotionNames = speechInterface->getEmotionNames(get_speech_request_id());
+
+	std::map<std::string, std::vector<float> > finalCurves;
+	if (emotionNames.size() > 0)
+	{
+		std::map<std::string, std::vector<std::vector<float> > > emotionCurvesMap;
+		for (size_t i = 0; i < emotionNames.size(); ++i)
+		{
+			std::map<std::string, std::vector<float> >& tempCurves = generateCurvesGivenDiphoneSet(result_visemes, emotionNames[i], character->getName());
+			
+			// merge it back according to emotion curve
+			std::map<std::string, std::vector<float> >::iterator iter;
+			for (iter = tempCurves.begin(); iter != tempCurves.end(); ++iter)
+			{
+				if (emotionCurvesMap.find(iter->first) == emotionCurvesMap.end())
+				{
+					emotionCurvesMap.insert(std::make_pair(iter->first, std::vector<std::vector<float> >()));
+				}
+				std::vector<float>& weights = speechInterface->getEmotionCurve(get_speech_request_id(), emotionNames[i]);
+				std::vector<float> weightedCurve = scaleCurve(iter->second, weights);
+				emotionCurvesMap[iter->first].push_back(weightedCurve);
+
+				// debug - before scale
+				std::stringstream debugNameSS;
+				debugNameSS << "[" << emotionNames[i] << "]" << iter->first;
+				VisemeData* debugDiphoneVisemeCurve = new VisemeData(debugNameSS.str(), 0.0f);
+				debugDiphoneVisemeCurve->setFloatCurve(iter->second, iter->second.size() / 2, 2);
+				debugDiphoneVisemeCurve->setCurveInfo("6");
+				debugVisemeCurves.push_back(debugDiphoneVisemeCurve);
+
+				// debug - after scale
+				std::stringstream debugNameSS1;
+				debugNameSS1 << "[" << emotionNames[i] << "]" << iter->first;
+				VisemeData* debugDiphoneVisemeCurve1 = new VisemeData(debugNameSS1.str(), 0.0f);
+				debugDiphoneVisemeCurve1->setFloatCurve(weightedCurve, weightedCurve.size() / 2, 2);
+				debugDiphoneVisemeCurve1->setCurveInfo("7");
+				debugVisemeCurves.push_back(debugDiphoneVisemeCurve1);
+			}
+		}
+		std::map<std::string, std::vector<std::vector<float> > >::iterator iter;
+		for (iter = emotionCurvesMap.begin(); iter != emotionCurvesMap.end(); ++iter)
+		{
+			std::vector<float> mergedCurve;
+			for (size_t i = 0; i < iter->second.size(); i++)
+			{
+				LOG("add curve for %s", iter->first.c_str());
+				std::vector<float>& tempCurve = addCurve(mergedCurve, iter->second[i]);
+				mergedCurve = tempCurve;
+			}
+			if (finalCurves.find(iter->first) == finalCurves.end())
+				finalCurves.insert(std::make_pair(iter->first, std::vector<float>()));
+			finalCurves[iter->first] = mergedCurve;
+
+			// debug merged curves
+			std::stringstream debugNameSS;
+			debugNameSS << iter->first;
+			VisemeData* debugDiphoneVisemeCurve = new VisemeData(debugNameSS.str(), 0.0f);
+			debugDiphoneVisemeCurve->setFloatCurve(mergedCurve, mergedCurve.size() / 2, 2);
+			debugDiphoneVisemeCurve->setCurveInfo("8");
+			debugVisemeCurves.push_back(debugDiphoneVisemeCurve);
+		}
+	}
+	else
+	{
+		finalCurves = generateCurvesGivenDiphoneSet(result_visemes, character->getStringAttribute("lipSyncSetName"), character->getName());
+	}
+
+	// assign back to viseme data
 	for ( size_t i = 0; i < (*result_visemes).size(); i++ )
 	{
+		delete (*result_visemes)[i];
+	}
+	(*result_visemes).clear();
+	std::map<std::string, std::vector<float> >::iterator curveIter;
+	for (curveIter = finalCurves.begin(); curveIter != finalCurves.end(); ++curveIter)
+	{
+		VisemeData* newVis = new VisemeData(curveIter->first, 0);
+		newVis->setFloatCurve(curveIter->second, curveIter->second.size() / 2, 2);
+		result_visemes->push_back(newVis);
+	}
+}
+
+std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGivenDiphoneSet(std::vector<SmartBody::VisemeData*>* visemes, std::string mappingName, std::string characterName)
+{
+	SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+	std::map<std::string, std::vector<float> > finalCurves;
+	if (!character)
+		return finalCurves;
+
+	const std::string& diphoneMap = mappingName;
+	VisemeData* curViseme = NULL;
+	VisemeData* prevViseme = NULL;
+	VisemeData* nextViseme = NULL;
+	std::vector<float> visemeTimeMarkers;
+	std::vector<VisemeData*> visemeRawData;
+	for ( size_t i = 0; i < (*visemes).size(); i++ )
+	{
 		if (i > 0)
-			prevViseme = (*result_visemes)[i - 1];
-		if (i < ((*result_visemes).size() - 1))
-			nextViseme = (*result_visemes)[i + 1];
-		if (i > 1)
-			pprevViseme = (*result_visemes)[i - 2];
-		if (i < ((*result_visemes).size() - 2))
-			nnextViseme = (*result_visemes)[i + 2];
-		curViseme = (*result_visemes)[i];
+			prevViseme = (*visemes)[i - 1];
+		if (i < ((*visemes).size() - 1))
+			nextViseme = (*visemes)[i + 1];
+		curViseme = (*visemes)[i];
 		visemeTimeMarkers.push_back(curViseme->time());
 		if (prevViseme != NULL)
 		{
@@ -492,12 +581,12 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 							{
 								curve[k] *= blendIval;
 								curve[k] += prevViseme->time();
-								curve[k] -= (*result_visemes)[0]->time();
+								curve[k] -= (*visemes)[0]->time();
 								curve[k] -= transitionPadding;
 							}
 							else
 							{
-								curve[k] *= scale;
+								curve[k] *= character->getDiphoneScale();
 								/*
 								if (curve[k] > 1.0f)	//clamp to 1
 									curve[k] = 1.0f;
@@ -512,11 +601,11 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 							{
 								curve[k] *= blendIval;
 								curve[k] += prevViseme->time();
-								curve[k] -= (*result_visemes)[0]->time();
+								curve[k] -= (*visemes)[0]->time();
 							}
 							else
 							{
-								curve[k] *= scale;
+								curve[k] *= character->getDiphoneScale();
 								if (curve[k] > 1.0f)	//clamp to 1
 									curve[k] = 1.0f;
 								if (curve[k] < 0.05)	// clamp to 0.0
@@ -530,12 +619,14 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 					visemeRawData.push_back(vcopy);
 
 					// debug
+					/*
 					std::stringstream debugNameSS;
 					debugNameSS << "[" << i << "]" << diphone->getFromPhonemeName() << "-" << diphone->getToPhonemeName() << "-" << visemeNames[v];
 					VisemeData* debugDiphoneVisemeCurve = new VisemeData(debugNameSS.str(), 0.0f);
 					debugDiphoneVisemeCurve->setFloatCurve(curve, curve.size() / 2, 2);
 					debugDiphoneVisemeCurve->setCurveInfo("0");
 					debugVisemeCurves.push_back(debugDiphoneVisemeCurve);
+					*/
 				}
 			}
 		}
@@ -581,22 +672,16 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 			std::vector<float>& origCurve = visemeProcessedData[index]->getFloatCurve();
 			std::vector<float> newCurve(stitchCurve(origCurve, stitchingCurve));
 			visemeProcessedData[index]->setFloatCurve(newCurve, newCurve.size() / 2, 2);
+			/*
 			std::stringstream debugNameSS;
 			debugNameSS << "stitching-" << visemeProcessedData[index]->id() << i;
 			VisemeData* debugStitch = new VisemeData(debugNameSS.str(), visemeProcessedData[index]->time());
 			debugStitch->setCurveInfo("1");
 			debugStitch->setFloatCurve(newCurve, newCurve.size() / 2, 2);
 			debugVisemeCurves.push_back(debugStitch);
+			*/
 		}
 	}
-
-	// assign back the viseme
-	for ( size_t i = 0; i < (*result_visemes).size(); i++ )
-	{
-		delete (*result_visemes)[i];
-	}
-	(*result_visemes).clear();
-	//(*result_visemes) = visemeProcessedData;
 
 	// stitch and smooth
 	for (size_t i = 0; i < visemeProcessedData.size(); i++)
@@ -736,8 +821,226 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 
 		VisemeData* newV = new VisemeData(visemeProcessedData[i]->id(), visemeProcessedData[i]->time());
 		newV->setFloatCurve(visemeProcessedData[i]->getFloatCurve(), visemeProcessedData[i]->getFloatCurve().size() / 2, 2);
-		(*result_visemes).push_back(newV);
+		
+		std::vector<float> finalCurveData;
+		for (size_t j = 0; j < visemeProcessedData[i]->getFloatCurve().size(); ++j)
+			finalCurveData.push_back(visemeProcessedData[i]->getFloatCurve()[j]);
+		
+		if (finalCurves.find(visemeProcessedData[i]->id()) == finalCurves.end())
+		{
+			finalCurves.insert(std::make_pair(visemeProcessedData[i]->id(), finalCurveData));
+		}
+		else
+		{
+			LOG("Cannot have two final curves that have same name!");
+		}
 	}
+
+	return finalCurves;
+}
+
+// this function scale curve c1 with weights
+// the weight is also in the format of (t, v)
+// assuming both curves are in ascending order
+std::vector<float> BML::SpeechRequest::scaleCurve(std::vector<float>& c1, std::vector<float>& weights)
+{
+	// return vector
+	std::vector<float> ret;
+
+	for (size_t i = 1; i < c1.size() / 2; ++i)
+	{
+		if (c1[i * 2] < c1[(i - 1) * 2])
+		{
+			LOG("scaleCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
+		}
+	}
+
+	// empty protection
+	if (c1.size() == 0 || weights.size() == 0)
+	{
+		for (size_t i = 0; i < c1.size(); i++)
+			ret.push_back(c1[i]);
+		return ret;
+	}
+	
+	// going through two curves
+	size_t index1 = 0;
+	size_t index2 = 0;
+	while (index1 < c1.size() / 2 && index2 < weights.size() / 2)
+	{
+		float x = c1[index1 * 2];
+		float y = c1[index1 * 2 + 1];
+		float t = weights[index2 * 2];
+		float v = weights[index2 * 2 + 1];
+		if (index2 == 0)	// edge case
+		{
+			if (x <= t)
+			{
+				ret.push_back(x);
+				ret.push_back(y * v);
+				index1++;
+				continue;
+			}
+			else
+			{
+				index2++;
+				continue;
+			}
+		}
+		else
+		{
+			float tPrev = weights[(index2 - 1) * 2];
+			float vPrev = weights[(index2 - 1) * 2 + 1];
+			
+			if (x >= tPrev && x <= t)
+			{
+				float scaleV = 1.0f;
+				if (fabs(t - tPrev) != 0)
+				{
+					scaleV = (v - vPrev) * (x - tPrev) / (t - tPrev) + vPrev;
+				}
+				
+				ret.push_back(x);
+				ret.push_back(y * scaleV);
+				index1++;
+				continue;
+			}
+			else
+			{
+				index2++;
+				continue;
+			}
+		}
+	}
+
+	// handle the left overs
+	if (index2 == (weights.size() / 2 - 1))
+	{
+		for (size_t i = index1; i < c1.size() / 2; ++i)
+		{
+			float scaleY = weights[weights.size() - 1];
+			ret.push_back(c1[index1 * 2]);
+			ret.push_back(c1[index1 * 2 + 1] * scaleY);
+		}
+	}
+
+	return ret;
+}
+
+
+// add curve function assume the two curves are in ascending order
+std::vector<float> BML::SpeechRequest::addCurve(std::vector<float>& c1, std::vector<float>& c2)
+{
+	std::vector<float> ret;
+
+	for (size_t i = 1; i < c1.size() / 2; ++i)
+	{
+		if (c1[i * 2] < c1[(i - 1) * 2])
+		{
+			LOG("addCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
+		}
+	}
+	for (size_t i = 1; i < c2.size() / 2; ++i)
+	{
+		if (c2[i * 2] < c2[(i - 1) * 2])
+		{
+			LOG("addCurve: curve 2 is not in ascending order: %f %f", c2[(i - 1) * 2], c2[i * 2]);
+		}
+	}
+
+	size_t index1 = 0;
+	size_t index2 = 0;
+	while (index1 < c1.size() / 2 && index2 < c2.size() / 2)
+	{
+		float x1 = c1[index1 * 2];
+		float y1 = c1[index1 * 2 + 1];
+		float x2 = c2[index2 * 2];
+		float y2 = c2[index2 * 2 + 1];
+		if (x1 == x2)
+		{
+			ret.push_back(x1);
+			ret.push_back(y1 + y2);
+			index1++;
+			index2++;
+			continue;
+		}
+		else if (x1 < x2)
+		{
+			if (index2 == 0)	// edge case
+			{
+				ret.push_back(x1);
+				ret.push_back(y1);
+			}
+			else
+			{
+				float x2Prev = c2[(index2 - 1) * 2];
+				float y2Prev = c2[(index2 - 1) * 2 + 1];
+				if (x1 >= x2Prev)
+				{
+					float curY2 = 0.0f;
+					if (fabs(x2 - x2Prev) != 0)
+					{
+						curY2 = y2Prev + (y2 - y2Prev) * (x1 - x2Prev) / (x2 - x2Prev);
+					}
+					ret.push_back(x1);
+					ret.push_back(y1 + curY2);
+				}
+				else
+				{
+					LOG("addCurve Warning: should not be here, point1(%f, %f), point2(%f, %f), previous point2(%f, %f)", x1, y1, x2, y2, x2Prev, y2Prev);
+					ret.push_back(x1);
+					ret.push_back(y1);
+				}
+			}
+			index1++;
+			continue;
+		}
+		else
+		{
+			if (index1 == 0)
+			{
+				ret.push_back(x2);
+				ret.push_back(y2);
+			}
+			else
+			{
+				float x1Prev = c1[(index1 - 1) * 2];
+				float y1Prev = c1[(index1 - 1) * 2 + 1];
+				if (x2 >= x1Prev)
+				{
+					float curY1 = 0.0f;
+					if (fabs(x1 - x1Prev) != 0)
+					{
+						curY1 = y1Prev + (y1 - y1Prev) * (x2 - x1Prev) / (x1 - x1Prev);
+					}
+					ret.push_back(x2);
+					ret.push_back(y2 + curY1);
+				}
+				else
+				{
+					LOG("addCurve Warning: should not be here, point1(%f, %f), point2(%f, %f), previous point1(%f, %f)", x1, y1, x2, y2, x1Prev, y1Prev);
+					ret.push_back(x2);
+					ret.push_back(y2);
+				}
+			}
+			index2++;
+			continue;
+		}
+	}
+
+	// handle the leftovers
+	for (size_t i = index1; i < c1.size() / 2; i++)
+	{
+		ret.push_back(c1[i * 2]);
+		ret.push_back(c1[i * 2 + 1]);
+	}
+	for (size_t i = index2; i < c2.size() / 2; i++)
+	{
+		ret.push_back(c2[i * 2]);
+		ret.push_back(c2[i * 2 + 1]);
+	}
+
+	return ret;
 }
 
 // line intersection reference: http://cboard.cprogramming.com/c-programming/154196-check-if-two-line-segments-intersect.html

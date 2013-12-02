@@ -46,6 +46,7 @@ class AudioFileSpeech : public SpeechInterface
          std::string audioFilename;
          std::string playCommand;
          std::string stopCommand;
+		 std::map<std::string, std::vector<float> >	emotionData;
       };
 
    private:
@@ -67,6 +68,8 @@ class AudioFileSpeech : public SpeechInterface
 	  virtual RequestId requestSpeechAudio( const char * agentName, const std::string voiceCode, std::string text, const char * callbackCmd );
 	  virtual RequestId requestSpeechAudioFast( const char * agentName, const std::string voiceCode, std::string text, const char * callbackCmd );
       virtual std::vector<VisemeData *> * getVisemes( RequestId requestId, SbmCharacter* character);
+	  virtual std::vector<float> getEmotionCurve(RequestId requestId, const std::string& emotionType, SbmCharacter* character = NULL);
+	  virtual std::vector<std::string> getEmotionNames(RequestId requestId, SbmCharacter* character = NULL);
       virtual char * getSpeechPlayCommand( RequestId requestId, SbmCharacter * character = NULL );
       virtual char * getSpeechStopCommand( RequestId requestId, SbmCharacter * character = NULL );
       virtual char * getSpeechAudioFilename( RequestId requestId );
@@ -82,6 +85,7 @@ class AudioFileSpeech : public SpeechInterface
       virtual void ReadVisemeDataLTF( const char * filename, std::vector< VisemeData > & visemeData );
       virtual void ReadVisemeDataBML( const char * filename, std::vector< VisemeData > & visemeData, const SbmCharacter* character );
 	  virtual void ReadMotionDataBML( const char * filename, std::vector< VisemeData > & visemeData);
+	  virtual void ReadEmotionData(const char* filename, std::map<std::string, std::vector<float> >& emotionData);
 //      virtual void ReadSpeechTiming( const char * filename, stdext::hash_map< std::string, float > & timeMarkers );
       virtual void ReadSpeechTiming( const char * filename, std::map< std::string, float > & timeMarkers );
 	  virtual void ReadSpeechTimingFast( const char * filename, std::map< std::string, float > & timeMarkers, rapidxml::xml_document<>& bmlDoc);

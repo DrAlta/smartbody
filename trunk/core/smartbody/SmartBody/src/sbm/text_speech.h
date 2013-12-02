@@ -33,6 +33,9 @@ class text_speech: public SmartBody::SpeechInterface {
 		float getMarkTime( SmartBody::RequestId requestId, const XMLCh* markId ); //gets time value for a given marker
 		void requestComplete( SmartBody::RequestId requestId );
 
+		std::vector<float> getEmotionCurve(SmartBody::RequestId requestId, const std::string& emotionType, SbmCharacter* character = NULL);
+		std::vector<std::string> getEmotionNames(SmartBody::RequestId requestId, SbmCharacter* character = NULL);
+
 		void startSchedule( SmartBody::RequestId requestId );
 		static int text_speech_func( srArgBuffer& args, SmartBody::SBCommandManager* manager);
 	private:

@@ -74,7 +74,7 @@ void VisemeRTCurveViewer::drawCurves()
 				glLineWidth(1.0f);
 				glPointSize(4.0f);
 			}
-			SrVec color = colorTable[_data->_curves[i].groupId];
+			SrVec color = colorTable[_data->_curves[i].groupId % colorTable.size()];
 			glColor3f(color.x, color.y, color.z);
 
 			// lines

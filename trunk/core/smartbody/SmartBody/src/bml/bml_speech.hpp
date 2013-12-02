@@ -185,6 +185,13 @@ namespace BML {
 	protected:
 		void createStandardSyncPoint( const std::wstring& attr, SyncPointPtr& sync );
 
+		// following is the functions that are needed for lip sync run time
+		std::map<std::string, std::vector<float> > generateCurvesGivenDiphoneSet(std::vector<SmartBody::VisemeData*>* visemes, std::string mappingName, std::string characterName);
+
+		std::vector<float> scaleCurve(std::vector<float>& c1, std::vector<float>& weights);
+
+		std::vector<float> addCurve(std::vector<float>& c1, std::vector<float>& c2);
+
 		std::vector<float> stitchCurve(std::vector<float>& c1, std::vector<float>& c2);
 
 		void smoothCurve(std::vector<float>& c, std::vector<float>& timeMarkers, float windowSize);
@@ -192,8 +199,6 @@ namespace BML {
 		void filterCurve(std::vector<float>&c, float speedLimit);
 
 		void constrainCurve(std::vector<float>& openCurve, std::vector<float>& otherCurve, float ratio = 1.0f);
-
-		void processOpenCurve(std::vector<float>& openCurve, std::vector<float>& otherCurve, float ratio = 1.0f);
 
 		bool getLineIntersection(float p0_x, float p0_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y, float& i_x, float& i_y);
 

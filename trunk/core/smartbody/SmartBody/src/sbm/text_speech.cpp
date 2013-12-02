@@ -200,6 +200,16 @@ std::vector<VisemeData*>* text_speech::getVisemes( RequestId requestId, SbmChara
 	}
 }
 
+std::vector<float> text_speech::getEmotionCurve(SmartBody::RequestId requestId, const std::string& emotionType, SbmCharacter* character)
+{
+	return std::vector<float>();
+}
+
+std::vector<std::string> text_speech::getEmotionNames(SmartBody::RequestId requestId, SbmCharacter* character)
+{
+	return std::vector<std::string>();
+}
+
 float text_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 	if(XMLString::indexOf(markId, '+') > -1 || XMLString::indexOf(markId, '-') > -1 ) return -1;
 	ostringstream markStream; //creates an ostringstream object

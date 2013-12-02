@@ -69,7 +69,8 @@ class remote_speech: public SmartBody::SpeechInterface {
 		virtual char* getSpeechStopCommand( SmartBody::RequestId requestId, SbmCharacter* character = NULL ); //''                     stop
 		virtual char* getSpeechAudioFilename( SmartBody::RequestId requestId ); // gets the fileName of speech
 		virtual float getMarkTime( SmartBody::RequestId requestId, const XMLCh* markId ); //gets time value for a given marker
-		
+		virtual std::vector<float> getEmotionCurve(SmartBody::RequestId requestId, const std::string& emotionType, SbmCharacter* character = NULL);
+		virtual std::vector<std::string> getEmotionNames(SmartBody::RequestId requestId, SbmCharacter* character = NULL);
 
 		virtual void requestComplete( SmartBody::RequestId requestId );
 
