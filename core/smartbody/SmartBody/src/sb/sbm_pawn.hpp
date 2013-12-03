@@ -28,7 +28,7 @@
 #include <sb/SBPhysicsSim.h>
 #include <sb/SBObject.h>
 #include <SteerLib.h>
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 #include "bonebus.h"
 #endif
 
@@ -94,7 +94,7 @@ public:  // TODO - properly encapsulate / privatize the following
 
 	// Temporarily, until there is a unified multi-skeleton controller tree
 	MeControllerTreeRoot	*ct_tree_p;
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 	bonebus::BoneBusCharacter * bonebusCharacter;
 #endif
 	SBTransform                globalTransform;

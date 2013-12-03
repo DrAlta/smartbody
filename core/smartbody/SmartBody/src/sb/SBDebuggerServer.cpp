@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
 
@@ -347,7 +347,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                   if (split[2] == "connect")
                   {
                      m_connectResult = true;
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
                      vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s connect_success", m_fullId.c_str()).c_str());
 #endif
                   }
@@ -371,7 +371,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 						 //FILE* fp = fopen("e:/sceneServer.py","wt");
 						 //fprintf(fp,"%s",initScript.c_str());
 						 //fclose(fp);
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 						 vhmsg::ttu_notify1(message.c_str());
 #endif
 
@@ -491,7 +491,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
             else if (split[1] == "queryids")
             {
                LOG("SBDebuggerServer::ProcessVHMsgs() - queryids");
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
                vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s id", m_fullId.c_str()).c_str());
 #endif
             }

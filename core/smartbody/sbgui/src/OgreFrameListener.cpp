@@ -1,5 +1,5 @@
 #include "vhcl.h"
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
 #include <sb/SBScene.h>

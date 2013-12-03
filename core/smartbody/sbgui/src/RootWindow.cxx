@@ -665,7 +665,7 @@ void BaseWindow::ResetScene()
 	camera->reset();
 
 	// setup python
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 	boost::python::object module = boost::python::import("__main__");
 	scene->setPythonMainModule(module);
 	boost::python::object dict  = module.attr("__dict__");

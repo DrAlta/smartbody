@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
 

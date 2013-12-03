@@ -18,7 +18,7 @@
 #endif
 
 #if LINK_VHMSG_CLIENT
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
 #endif
@@ -98,7 +98,7 @@ bool SBVHMsgManager::isEnable()
 
 bool SBVHMsgManager::connect()
 {
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 	if (vhmsg::ttu_is_open())
 		vhmsg::ttu_close();
 
@@ -144,7 +144,7 @@ void SBVHMsgManager::disconnect()
 
 int SBVHMsgManager::send2( const char *op, const char* message )
 {
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #if LINK_VHMSG_CLIENT
 
 	if( isEnable() )
@@ -186,7 +186,7 @@ int SBVHMsgManager::send2( const char *op, const char* message )
 
 int SBVHMsgManager::send( const char* message )
 {
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #if LINK_VHMSG_CLIENT
 	if( isEnable())
 	{
@@ -223,7 +223,7 @@ int SBVHMsgManager::send( const char* message )
 
 int SBVHMsgManager::poll()
 {
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #if LINK_VHMSG_CLIENT
 	if( isEnable() )
 	{

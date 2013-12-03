@@ -6,7 +6,7 @@
 
 #include "external/glew/glew.h"
 #include "vhcl.h"
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
 #include <sbm/lin_win.h>
@@ -59,7 +59,7 @@
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBSpeechManager.h>
 #include <sb/SBAssetManager.h>
-#ifdef NO_BONEBUS
+#ifdef SB_NO_BONEBUS
 #include <sb/SBBoneBusManager.h>
 #endif
 #include <sb/SBWSPManager.h>
@@ -67,7 +67,7 @@
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
 #include <sbm/PPRAISteeringAgent.h>
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #include <vhmsg.h>
 #endif
 
@@ -933,7 +933,7 @@ int main( int argc, char **argv )	{
 		}
 	}
 
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 	// initialize python
 	LOG("Initializing Python with libraries at location: %s", python_lib_path.c_str());
 

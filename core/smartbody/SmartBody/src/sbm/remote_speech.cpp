@@ -485,7 +485,7 @@ char* remote_speech::getSpeechStopCommand( RequestId requestId, SbmCharacter* ch
 	string characterName;
 	if ( character )
 	{
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 		if (character->bonebusCharacter )
 		{
 			characterName = character->bonebusCharacter->m_name;

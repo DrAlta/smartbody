@@ -426,7 +426,7 @@ void SBPawn::notify(SBSubject* subject)
 
 SBPhysicsObj* SBPawn::getPhysicsObject()
 {
-#ifndef NO_ODE_PHYSICS
+#ifndef SB_NO_ODE_PHYSICS
 	SBPhysicsSim* phyEngine = SBPhysicsSim::getPhysicsEngine();
 	return phyEngine->getPhysicsPawn(getName());	
 #else
