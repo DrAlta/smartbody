@@ -19,13 +19,19 @@ SBBoneBusManager::~SBBoneBusManager()
 {
 }
 
+#ifndef NO_BONEBUS
 bonebus::BoneBusClient& SBBoneBusManager::getBoneBus()
 {
 	return _boneBus;
 }
+#endif
 
 void SBBoneBusManager::setEnable(bool val)
 {
+#ifdef NO_BONEBUS
+	LOG("Bonebus has been disabled and is not available.");
+	return;
+#else
 	SBService::setEnable(val);
 
 	if (val)
@@ -66,10 +72,15 @@ void SBBoneBusManager::setEnable(bool val)
 	SmartBody::BoolAttribute* enableAttribute = dynamic_cast<SmartBody::BoolAttribute*>(getAttribute("enable"));
 	if (enableAttribute)
 		enableAttribute->setValueFast(val);
+#endif
 }
 
 void SBBoneBusManager::setHost(const std::string& host)
 {
+#ifdef NO_BONEBUS
+	LOG("Bonebus has been disabled and can not set the bonebus host.");
+	return;
+#endif
 	_host = host;
 	SmartBody::StringAttribute* hostAttribute = dynamic_cast<SmartBody::StringAttribute*>(getAttribute("host"));
 	if (hostAttribute)
@@ -87,12 +98,16 @@ void SBBoneBusManager::start()
 
 void SBBoneBusManager::beforeUpdate(double time)
 {
+#ifdef NO_BONEBUS
+	return;
+#else
 	// process commands received over BoneBus protocol
 	std::vector<std::string> commands = _boneBus.GetCommand();
 	for ( size_t i = 0; i < commands.size(); i++ )
 	{
 		SmartBody::SBScene::getScene()->command( (char *)commands[i].c_str() );
 	}
+#endif
 }
 
 void SBBoneBusManager::update(double time)
@@ -109,6 +124,10 @@ void SBBoneBusManager::stop()
 
 void SBBoneBusManager::notify(SBSubject* subject)
 {
+#ifdef NO_BONEBUS
+	return;
+#endif
+
 	SBService::notify(subject);
 
 	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
@@ -132,8 +151,10 @@ void SBBoneBusManager::notify(SBSubject* subject)
 
 }
 
+#ifndef NO_BONEBUS
 void SBBoneBusManager::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SmartBody::SBSkeleton* skeleton, GeneralParamMap * param_map )
 {
+
 	if ( character == NULL )
 	{
 		return;
@@ -252,6 +273,8 @@ void SBBoneBusManager::NetworkSendSkeleton( bonebus::BoneBusCharacter * characte
 */
 	
 }
+#endif
+
 
 }
 

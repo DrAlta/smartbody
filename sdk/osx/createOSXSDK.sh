@@ -28,12 +28,12 @@ rsync -ap --exclude=".svn" ./lib ./SmartBodySDK
 # copy bin
 rsync -ap --exclude=".svn" ./bin ./SmartBodySDK
 
-# copy dylib for SmartBody (assuming it's prebuilt)
-cp ../../core/smartbody/sbgui/bin/sbgui ./SmartBodySDK/bin
-cp ../../core/smartbody/sbgui/bin/simplesmartbody ./SmartBodySDK/bin
-cp ../../core/smartbody/sbgui/bin/libSmartBody.dylib ./SmartBodySDK/bin
+# copy dylib for SmartBody 
+#cp ../../core/smartbody/sbgui/bin/sbgui ./SmartBodySDK/bin
+#cp ../../core/smartbody/sbgui/bin/simplesmartbody ./SmartBodySDK/bin
+#cp ../../core/smartbody/sbgui/bin/libSmartBody.dylib ./SmartBodySDK/bin
 
-# copy dylib for pprAI and steerlib
+# copy dylib for pprAI and steerlib (assuming it's prebuilt)
 cp ../../core/smartbody/sbgui/bin/libpprAI.dylib ./SmartBodySDK/bin
 cp ../../core/smartbody/sbgui/bin/libsteerlib.dylib ./SmartBodySDK/bin
 
@@ -81,3 +81,7 @@ rsync -ap --exclude=".svn" ../../data/mesh/ChrRachel/* ./SmartBodySDK/data/mesh/
 rsync -ap --exclude=".svn" ../../data/mesh/Sinbad/* ./SmartBodySDK/data/mesh/Sinbad/
 rsync -ap --exclude=".svn" ../../data/mesh/Ogre/* ./SmartBodySDK/data/mesh/Ogre/
 
+# after copying, rebuild it
+cd SmartBodySDK
+./buildCMake.sh
+rm -rf buildCMake

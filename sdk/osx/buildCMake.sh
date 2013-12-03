@@ -2,7 +2,6 @@
 mkdir -p buildCMake
 cd buildCMake
 cmake ..
-make -j 6
-sudo make install
+make install -j 6
 cd ..
 
