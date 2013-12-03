@@ -56,7 +56,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp> 
 #include <boost/python/return_internal_reference.hpp>
 #include <boost/python/args.hpp>
@@ -72,7 +72,7 @@ typedef std::vector<SrVec> VecArray;
 
 namespace SmartBody 
 {
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 
 void pythonFuncsAnimation();
 void pythonFuncsAttribute();
@@ -803,7 +803,7 @@ extern "C" {
 
 void appendPythonModule(const char* moduleName, void (*initfunc)(void))
 {
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 	// TODO - remove (char *) cast when moving to new python version that has a proper const-aware header
 	int result = PyImport_AppendInittab((char *)moduleName, initfunc);
 	LOG("initialize module %s, result = %d",moduleName, result);
@@ -822,8 +822,9 @@ void initPython(std::string pythonLibPath)
 	std::string libPath = getenv("LD_LIBRARY_PATH");
 	LOG("LD_LIBRARY_PATH  = %s", libPath.c_str());	
 #endif
+#ifndef NO_PYTHON
 	Py_NoSiteFlag = 1;
-#ifndef SB_NO_PYTHON
+
 #ifdef __ANDROID__
 	Py_SetProgramName((char*)pythonHome.c_str());
         Py_SetPythonHome((char*)pythonHome.c_str());
@@ -894,7 +895,7 @@ void initPython(std::string pythonLibPath)
 	Py_Initialize();
 	
 	try {
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		boost::python::object module = boost::python::import("__main__");
 		scene->setPythonMainModule(module);
@@ -950,7 +951,7 @@ void initPython(std::string pythonLibPath)
 
 void setupPython()
 {
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 	try {
 	#ifdef PYLOG
 #ifdef __ANDROID__

@@ -43,7 +43,7 @@ using std::string;
 
 
 #if (NACL_BUILD) 
-#define SB_NO_PYTHON  1
+#define NO_PYTHON  1
 #endif
 
 
@@ -542,7 +542,7 @@ bool Smartbody_dll::InitVHMsg()
 
 SBAPI bool Smartbody_dll::PythonCommandVoid( const std::string & command )
 {
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	return scene->run(command) == 1 ? true : false;
 #else
@@ -573,7 +573,7 @@ bool Smartbody_dll::PythonCommandBool( const std::string & command )
 
 int Smartbody_dll::PythonCommandInt( const std::string & command )
 {
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
    
    try
    {
@@ -594,7 +594,7 @@ int Smartbody_dll::PythonCommandInt( const std::string & command )
 
 float Smartbody_dll::PythonCommandFloat( const std::string & command )
 {
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
    
    try
    {
@@ -615,7 +615,7 @@ float Smartbody_dll::PythonCommandFloat( const std::string & command )
 
 std::string Smartbody_dll::PythonCommandString( const std::string & command )
 {
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
    try
    {
 	  boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();

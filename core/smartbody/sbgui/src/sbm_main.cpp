@@ -932,7 +932,7 @@ int main( int argc, char **argv )	{
 		}
 	}
 
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 	// initialize python
 	LOG("Initializing Python with libraries at location: %s", python_lib_path.c_str());
 
