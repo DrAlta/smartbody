@@ -56,7 +56,7 @@ void MeCtPhysicsController::getJointChannelValues( const std::string& jointName,
 
 bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 {
-	
+#ifndef NO_ODE_PHYSICS	
 	if (_prevTime == 0)
 		_dt = 0.016;
 	else
@@ -279,6 +279,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			}
 		}
 	}	
+#endif
 #endif
 	return true;
 }

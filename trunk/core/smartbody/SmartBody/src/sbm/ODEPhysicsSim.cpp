@@ -1,3 +1,4 @@
+#ifndef NO_ODE_PHYSICS
 #include "ODEPhysicsSim.h"
 
 #include <sb/SBScene.h>
@@ -795,3 +796,5 @@ SbmCollisionPairList& ODECollisionSpace::getCurrentCollisionPairList()
 {
 	return curCollisionPairs;
 }
+
+#endif

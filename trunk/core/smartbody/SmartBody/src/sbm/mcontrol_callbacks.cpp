@@ -1450,7 +1450,7 @@ int mcu_net_reset( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 #ifndef NO_BONEBUS
 	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
 	SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(true);
-	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().UpdateAllCharacters()
+	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
 #endif	
 	return (CMD_SUCCESS);
 }
@@ -1716,7 +1716,7 @@ int mcu_stop_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		else
 		{
 #ifndef NO_BONEBUS
-	        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() )
+	        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
 #endif
 		}
 

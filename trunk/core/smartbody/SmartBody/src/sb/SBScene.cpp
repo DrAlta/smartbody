@@ -1062,7 +1062,7 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 
 #ifndef NO_BONEBUS
 		if (getBoneBusManager()->isEnable())
-			getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true )
+			getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
 #endif
 
 		std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
