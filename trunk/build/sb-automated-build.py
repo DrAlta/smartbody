@@ -556,7 +556,6 @@ def fullBuild(svnPassword, buildSuffix, doFreshBuild, emailTo):
 
             print "--- Zipping build"
             p = subprocess.Popen("{0} -r {1} {2}".format(zipExe, zipFolderName, zipFolderName).split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-            buildCompileOutput = []
             for line in p.stdout:
                 buildCompileOutput.append(line.strip())
             p.wait()
