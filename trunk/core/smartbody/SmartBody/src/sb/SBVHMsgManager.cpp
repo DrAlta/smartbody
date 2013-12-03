@@ -18,7 +18,9 @@
 #endif
 
 #if LINK_VHMSG_CLIENT
+#ifndef NO_VHMSG
 #include "vhmsg-tt.h"
+#endif
 #endif
 
 class VHMsgLogger : public vhcl::Log::Listener
@@ -96,6 +98,7 @@ bool SBVHMsgManager::isEnable()
 
 bool SBVHMsgManager::connect()
 {
+#ifndef NO_VHMSG
 	if (vhmsg::ttu_is_open())
 		vhmsg::ttu_close();
 
@@ -129,6 +132,10 @@ bool SBVHMsgManager::connect()
 		setEnable(false);
 		return false;
 	}
+#else
+	LOG("VHMSG has been disabled.");
+	return false;
+#endif
 }
 
 void SBVHMsgManager::disconnect()
@@ -137,7 +144,9 @@ void SBVHMsgManager::disconnect()
 
 int SBVHMsgManager::send2( const char *op, const char* message )
 {
+#ifndef NO_VHMSG
 #if LINK_VHMSG_CLIENT
+
 	if( isEnable() )
 	{
 		int err = vhmsg::ttu_notify2( op, message );
@@ -169,12 +178,17 @@ int SBVHMsgManager::send2( const char *op, const char* message )
 		command << op << " " << message;
 		execute_later( command.str().c_str() );
 	}
+#else
+	LOG("VHMSG has been disabled.");
+#endif
 #endif
 	return( CMD_SUCCESS );
+
 }
 
 int SBVHMsgManager::send( const char* message )
 {
+#ifndef NO_VHMSG
 #if LINK_VHMSG_CLIENT
 	if( isEnable())
 	{
@@ -204,11 +218,14 @@ int SBVHMsgManager::send( const char* message )
 		execute_later( message );
 	}
 #endif
+#endif
+
 	return( CMD_SUCCESS );
 }
 
 int SBVHMsgManager::poll()
 {
+#ifndef NO_VHMSG
 #if LINK_VHMSG_CLIENT
 	if( isEnable() )
 	{
@@ -218,6 +235,7 @@ int SBVHMsgManager::poll()
 		else
 			return CMD_FAILURE;
 	}
+#endif
 #endif
 	return CMD_SUCCESS;
 }

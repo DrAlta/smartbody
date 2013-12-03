@@ -14,7 +14,9 @@
 #include <stdlib.h>
 #include <algorithm>
 
+#ifndef NO_VHMSG
 #include "vhmsg-tt.h"
+#endif
 
 using std::string;
 using std::vector;

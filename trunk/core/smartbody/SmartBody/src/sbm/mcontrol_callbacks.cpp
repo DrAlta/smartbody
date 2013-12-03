@@ -1,26 +1,9 @@
-/*
- *  mcontrol_callbacks.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- */
-
 #include "vhcl.h"
 #ifndef __native_client__
+#ifndef NO_VHMSG
 #include "vhmsg.h"
 #include "vhmsg-tt.h"
+#endif
 #endif
 
 #include "mcontrol_callbacks.h"
@@ -58,7 +41,9 @@
 #include <sr/sr_timer.h>
 
 #include <sbm/action_unit.hpp>
+#ifndef NO_VHMSG
 #include <vhmsg.h>
+#endif
 
 #ifdef WIN32
 #include <direct.h>
@@ -3361,6 +3346,7 @@ int mcu_vhmsg_connect_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdM
 
 int mcu_vhmsg_disconnect_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
+#ifndef NO_VHMSG
 	SmartBody::SBVHMsgManager* vhmsgManager = SmartBody::SBScene::getScene()->getVHMsgManager();
 	
 	if (!vhmsgManager->isEnable())
@@ -3380,6 +3366,10 @@ int mcu_vhmsg_disconnect_func( srArgBuffer& args, SmartBody::SBCommandManager* c
 		LOG("VHMSG has been disconnected.");
 		return CMD_SUCCESS;
 	}
+#else
+	LOG("VHMSG is disabled.");
+	return CMD_FAILURE;
+#endif
 	
 }
 

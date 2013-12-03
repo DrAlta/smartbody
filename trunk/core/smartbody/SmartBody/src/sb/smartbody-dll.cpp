@@ -2,7 +2,9 @@
 #include "vhcl.h"
 
 #ifndef __native_client__
+#ifndef NO_VHMSG
 #include "vhmsg-tt.h"
+#endif
 #endif
 
 #include "smartbody-dll.h"
@@ -215,13 +217,14 @@ void Smartbody_dll::InitLocalSpeechRelay()
 
 SBAPI bool Smartbody_dll::Shutdown()
 {
+#ifndef NO_VHMSG
    {
 	   SmartBody::SBScene::getScene()->getVHMsgManager()->send("vrProcEnd sbm");
    }
 
    //SmartBody::SBScene::getScene()->getVHMsgManager()->setEnable(false);
    vhmsg::ttu_close();
-
+#endif
    XMLPlatformUtils::Terminate();
 
    std::map<std::string,SmartbodyCharacter*>::iterator mi; // m_dll->m_characters.find(name);
