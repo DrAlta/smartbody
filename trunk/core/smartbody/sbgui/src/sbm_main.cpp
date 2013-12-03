@@ -75,7 +75,9 @@
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBSpeechManager.h>
 #include <sb/SBAssetManager.h>
+#ifdef NO_BONEBUS
 #include <sb/SBBoneBusManager.h>
+#endif
 #include <sb/SBWSPManager.h>
 #include "FLTKListener.h"
 #include <sb/SBDebuggerServer.h>

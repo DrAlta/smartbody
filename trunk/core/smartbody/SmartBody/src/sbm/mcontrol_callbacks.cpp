@@ -1462,21 +1462,28 @@ int mcu_gaze_limit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 
 int mcu_net_reset( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 	bool ret = CMD_SUCCESS;
+#ifndef NO_BONEBUS
 	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
 	SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(true);
-	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
-	
+	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().UpdateAllCharacters()
+#endif	
 	return (CMD_SUCCESS);
 }
 
 int mcu_net_check( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
+#ifndef NO_BONEBUS
 	if (!SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().IsOpen())
 	{
 		return mcu_net_reset(args, cmdMgr);
 	}
 	else
+	{
 		return CMD_SUCCESS;
+	}
+#else
+	return CMD_SUCCESS;
+#endif
 }
 /*
 
@@ -1487,6 +1494,7 @@ int mcu_net_check( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
 int mcu_net_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
+#ifndef NO_BONEBUS
 	 
     char * command = args.read_token();
 
@@ -1509,6 +1517,7 @@ int mcu_net_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
         return CMD_SUCCESS;
     }
 
+#endif
     return CMD_NOT_FOUND;
   
 }
@@ -1619,7 +1628,9 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
         }
         else
         {
+#ifndef NO_BONEBUS
         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendPlaySound( soundFile.c_str(), characterName.c_str() );
+#endif
         }
 
         return CMD_SUCCESS;
@@ -1719,7 +1730,9 @@ int mcu_stop_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		}
 		else
 		{
-	        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
+#ifndef NO_BONEBUS
+	        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() )
+#endif
 		}
 
         return CMD_SUCCESS;
@@ -1753,7 +1766,9 @@ int mcu_uscriptexec_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
         }
 
         //SendWinsockExecScript( command.c_str() );
+#ifndef NO_BONEBUS
         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().ExecScript( command.c_str() );
+#endif
 
         return CMD_SUCCESS;
     }
@@ -1775,6 +1790,7 @@ int mcu_uscriptexec_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 
 int mcu_commapi_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
+#ifndef NO_BONEBUS
     char * command = args.read_token();
 
     if ( _stricmp( command, "setcameraposition" ) == 0 )
@@ -1799,6 +1815,8 @@ int mcu_commapi_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
         return CMD_SUCCESS;
     }
+
+#endif
 
     return CMD_NOT_FOUND;
 }

@@ -485,6 +485,7 @@ char* remote_speech::getSpeechStopCommand( RequestId requestId, SbmCharacter* ch
 	string characterName;
 	if ( character )
 	{
+#ifndef NO_BONEBUS
 		if (character->bonebusCharacter )
 		{
 			characterName = character->bonebusCharacter->m_name;
@@ -493,6 +494,9 @@ char* remote_speech::getSpeechStopCommand( RequestId requestId, SbmCharacter* ch
 		{
 			characterName = character->getName();
 		}
+#else
+		characterName = character->getName();
+#endif
 	}
 
 	string cmd = vhcl::Format( "send StopSound \"%s\" %s", soundFile.c_str(), characterName.c_str() );

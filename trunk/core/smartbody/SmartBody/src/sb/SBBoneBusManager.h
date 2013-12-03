@@ -3,7 +3,9 @@
 
 #include <sb/SBTypes.h>
 #include <sb/SBService.h>
+#ifndef NO_BONEBUS
 #include "bonebus.h"
+#endif
 #include <sbm/general_param_setting.h>
 
 namespace SmartBody {
@@ -25,15 +27,16 @@ class SBBoneBusManager : public SmartBody::SBService
 		SBAPI virtual void update(double time);
 		SBAPI virtual void afterUpdate(double time);
 		SBAPI virtual void stop();
-
+#ifndef NO_BONEBUS
 		SBAPI bonebus::BoneBusClient& getBoneBus();
-
 		SBAPI void NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SmartBody::SBSkeleton* skeleton, GeneralParamMap * param_map );
-
+#endif
 		SBAPI virtual void notify(SBSubject* subject);
 
 	private:
+#ifndef NO_BONEBUS
 		bonebus::BoneBusClient _boneBus;
+#endif
 		std::string _host;
 
 };

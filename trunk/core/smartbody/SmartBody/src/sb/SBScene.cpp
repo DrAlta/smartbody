@@ -679,6 +679,7 @@ void SBScene::update()
 		SbmCharacter* char_p = getCharacter(pawn->getName().c_str() );
 		if (!char_p)
 		{
+#ifndef NO_BONEBUS
 			if (getBoneBusManager()->isEnable())
 			{
 				if (pawn->bonebusCharacter && pawn->bonebusCharacter->GetNumErrors() > 3)
@@ -694,6 +695,7 @@ void SBScene::update()
 					}
 				}
 			}
+#endif
 		}
 		if( char_p ) {
 
@@ -720,12 +722,14 @@ void SBScene::update()
 			char_p->forward_visemes( getSimulationManager()->getTime() );	
 			//char_p->forward_parameters( getSimulationManager()->getTime() );	
 
+#ifndef NO_BONEBUS
 			if (char_p->bonebusCharacter && char_p->bonebusCharacter->GetNumErrors() > 3)
 			{
 				// connection is bad, remove the bonebus character
 				isClosingBoneBus = true;
 				LOG("BoneBus cannot connect to server after visemes sent. Removing all characters.");
 			}
+
 
 			if ( getBoneBusManager()->isEnable() && 
 				 char_p->getSkeleton() && 
@@ -763,9 +767,11 @@ void SBScene::update()
 				// bonebus was connected after character creation, create it now
 				char_p->bonebusCharacter = getBoneBusManager()->getBoneBus().CreateCharacter( char_p->getName().c_str(), char_p->getClassType().c_str(), true );
 			}
+#endif
 		}  // end of char_p processing
 	} // end of loop
 
+#ifndef NO_BONEBUS
 	if (isClosingBoneBus)
 	{
 		const std::vector<std::string>& pawnNames = getPawnNames();
@@ -783,6 +789,7 @@ void SBScene::update()
 
 		getBoneBusManager()->getBoneBus().CloseConnection();
 	}
+#endif
 
 	const std::vector<std::string>& pawnNames = getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
@@ -1052,8 +1059,10 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 //		joint->setName("world_offset");		
 //		joint->update_gmat();
 
+#ifndef NO_BONEBUS
 		if (getBoneBusManager()->isEnable())
-			getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
+			getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true )
+#endif
 
 		std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
 		for (size_t i = 0; i < listeners.size(); i++)
@@ -1154,11 +1163,13 @@ void SBScene::removeCharacter(const std::string& charName)
 			listeners[i]->OnCharacterDelete( name);
 		}
 
+#ifndef NO_BONEBUS
 		if ( character->bonebusCharacter )
 		{
 			this->getBoneBusManager()->getBoneBus().DeleteCharacter(  character->bonebusCharacter );
 			character->bonebusCharacter = NULL;
 		}
+#endif
 
 		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(name);
 		if (iter != _pawnMap.end())

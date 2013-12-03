@@ -474,6 +474,7 @@ char * AudioFileSpeech::getSpeechStopCommand( RequestId requestId, SbmCharacter 
    if ( it != m_speechRequestInfo.end() )
    {
       string characterName;
+#ifndef NO_BONEBUS
 	  if (character->bonebusCharacter )
 	  {
 		  characterName = character->bonebusCharacter->m_name;
@@ -482,6 +483,9 @@ char * AudioFileSpeech::getSpeechStopCommand( RequestId requestId, SbmCharacter 
 	  {
 		  characterName = character->getName();
 	  }
+#else
+		  characterName = character->getName();
+#endif
 
       it->second.stopCommand = vhcl::Format( "send StopSound \"%s\" %s", it->second.audioFilename.c_str(), characterName.c_str() );
       return (char *)it->second.stopCommand.c_str();

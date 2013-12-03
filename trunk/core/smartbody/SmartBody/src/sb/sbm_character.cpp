@@ -602,7 +602,9 @@ void SbmCharacter::initData()
 	motionplayer_ct = NULL;
 	_soft_eyes_enabled = ENABLE_EYELID_CORRECTIVE_CT;
 	_height = 1.0f;
+#ifndef NO_BONEBUS
 	bonebusCharacter = NULL;
+#endif
 
 	param_map = new std::map<std::string, GeneralParam*>();
 
@@ -873,8 +875,10 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
+#ifndef NO_BONEBUS
 	if (scene->getBoneBusManager()->isEnable())
 		bonebusCharacter = scene->getBoneBusManager()->getBoneBus().CreateCharacter( getName().c_str(), classType, true );
+#endif
 
 	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
 	for (size_t i = 0; i < listeners.size(); i++)
@@ -883,6 +887,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	}
 
 	// This needs to be tested
+#ifndef NO_BONEBUS
 	if( bonebusCharacter )
 	{
 		int index = 0;
@@ -893,6 +898,7 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 			bonebusCharacter->SetParams( pos->first.c_str(), index );
 		}
 	}
+#endif
 
 #ifdef USE_REACH_TEST	
 	// init left and right arm IKs for the character	
@@ -1887,7 +1893,12 @@ void SbmCharacter::forward_visemes( double curTime )
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
 	
-	if( bonebusCharacter || listeners.size() )
+	bool sendVisemes = false;
+#ifndef NO_BONEBUS
+	if (bonebusCharacter)
+		sendVisemes = true;
+#endif
+	if( sendVisemes || listeners.size() )
 	{
 		SkChannelArray& channels = _skeleton->channels();
 		MeFrameData& frameData = ct_tree_p->getLastFrame();
@@ -1903,10 +1914,12 @@ void SbmCharacter::forward_visemes( double curTime )
 				float value = frameData.buffer()[ buffIndex ];
 				if( value != viseme_history_arr[ i ] )	{
 
+#ifndef NO_BONEBUS
 					if( bonebusCharacter )
 					{
 						bonebusCharacter->SetViseme( channels.name(c).c_str(), value, 0 );
 					}
+#endif
 					for (size_t l = 0; l < listeners.size();l++)
 					{
 						listeners[l]->OnViseme( getName(), channels.name(c), value, 0  );
