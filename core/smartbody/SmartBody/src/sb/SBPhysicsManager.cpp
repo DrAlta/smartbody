@@ -23,8 +23,12 @@ SBPhysicsManager::SBPhysicsManager()
 	setName("physics");
 
 	physicsTime = 0;
+#ifndef NO_ODE_PHYSICS
 	_ode = new ODEPhysicsSim();
 	_ode->initSimulation();
+#else
+	_ode = NULL;
+#endif
 }
 
 SBPhysicsManager::~SBPhysicsManager()
@@ -40,11 +44,16 @@ SBPhysicsSim* SBPhysicsManager::getPhysicsEngine()
 
 bool SBPhysicsManager::isEnable()
 {
+#ifndef NO_ODE_PHYSICS
 	return getPhysicsEngine()->getBoolAttribute("enable");
+#else
+	return false;
+#endif
 }
 
 void SBPhysicsManager::setEnable(bool enable)
 {
+#ifndef NO_ODE_PHYSICS
 	if (enable)
 	{
 		// ...
@@ -55,6 +64,7 @@ void SBPhysicsManager::setEnable(bool enable)
 		// ...
 	}
 	getPhysicsEngine()->setBoolAttribute("enable",enable);
+#endif
 	
 }
 
@@ -69,6 +79,7 @@ void SBPhysicsManager::beforeUpdate(double time)
 
 void SBPhysicsManager::update(double time)
 {
+#ifndef NO_ODE_PHYSICS
 	SBPhysicsSim* physicsEngine = getPhysicsEngine();
 	
 	static double prevTime = -1;
@@ -114,6 +125,7 @@ void SBPhysicsManager::update(double time)
 		SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
 		updatePhysicsPawn(pawn->getName());
 	}
+#endif
 }
 
 void SBPhysicsManager::afterUpdate(double time)
@@ -131,11 +143,16 @@ SmartBody::SBObject* SBPhysicsManager::getPhysicsSimulationEngine()
 
 SmartBody::SBObject* SBPhysicsManager::getPhysicsCharacter( std::string charName )
 {
+#ifndef NO_ODE_PHYSICS
 	return this->getPhysicsEngine()->getPhysicsCharacter(charName);
+#else
+	return NULL;
+#endif
 }
 
 SmartBody::SBObject* SBPhysicsManager::getPhysicsJoint( std::string charName, std::string jointName )
 {
+#ifndef NO_ODE_PHYSICS
 	SBPhysicsCharacter* phyChar = this->getPhysicsEngine()->getPhysicsCharacter(charName);
 	SBPhysicsJoint* phyJoint = NULL;
 	if (phyChar)
@@ -143,27 +160,36 @@ SmartBody::SBObject* SBPhysicsManager::getPhysicsJoint( std::string charName, st
 		phyJoint = phyChar->getPhyJoint(jointName);		
 	}
 	return phyJoint;
+#else
+	return NULL;
+#endif
 }
 
 SmartBody::SBObject* SBPhysicsManager::getJointObj( std::string charName, std::string jointName )
 {
+#ifndef NO_ODE_PHYSICS
 	SBPhysicsCharacter* phyChar = this->getPhysicsEngine()->getPhysicsCharacter(charName);
 	SbmJointObj* jointObj = NULL;
 	if (phyChar)
 	{
 		jointObj = phyChar->getJointObj(jointName);		
 	}
-	return jointObj;	
+	return jointObj;
+#else
+	return NULL;
+#endif
 }
 
 void SBPhysicsManager::applyForceToPawn( std::string pawnName, SrVec force )
 {
+#ifndef NO_ODE_PHYSICS
 	SBPhysicsObj* phyObj = getPhysicsEngine()->getPhysicsPawn(pawnName);
 	if (phyObj)
 	{
 		LOG("Find phyobj, name = %s", pawnName.c_str());
 		phyObj->setExternalForce(force);
 	}
+#endif
 }
 
 void SBPhysicsManager::applyForceToCharacter( std::string charName, std::string jointName, SrVec force  )
@@ -177,13 +203,17 @@ void SBPhysicsManager::applyForceToCharacter( std::string charName, std::string 
 
 SmartBody::SBObject* SBPhysicsManager::getPhysicsPawn( std::string pawnName )
 {
+#ifndef NO_ODE_PHYSICS
 	return getPhysicsEngine()->getPhysicsPawn(pawnName);
+#else
+	return NULL;
+#endif
 }
 
 
 SmartBody::SBObject* SBPhysicsManager::createPhysicsPawn( std::string pawnName, std::string geomType, SrVec geomSize )
 {
-	
+#ifndef NO_ODE_PHYSICS	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBPawn* pawn = scene->getPawn(pawnName);
 	if (!pawn) return NULL;
@@ -199,11 +229,14 @@ SmartBody::SBObject* SBPhysicsManager::createPhysicsPawn( std::string pawnName, 
 	getPhysicsEngine()->updatePhyObjGeometry(phyObj);
 	updatePhysicsPawn(pawnName);
 	return phyObj;
+#else
+	return NULL;
+#endif
 }
 
 SmartBody::SBObject* SBPhysicsManager::createPhysicsCharacter( std::string charName)
 {
-	
+#ifndef NO_ODE_PHYSICS		
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBCharacter* sbmChar = scene->getCharacter(charName);
 	if (!sbmChar) return NULL; // no character with the name
@@ -250,11 +283,14 @@ SmartBody::SBObject* SBPhysicsManager::createPhysicsCharacter( std::string charN
 	getPhysicsEngine()->addPhysicsCharacter(phyChar);
 #endif
 	return phyChar;
+#else
+	return NULL;
+#endif
 }
 
 void SBPhysicsManager::updatePhysicsPawn( std::string pawnName )
 {
-	
+#ifndef NO_ODE_PHYSICS	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBPhysicsSim* phyEngine = getPhysicsEngine();
 	SBPhysicsObj* phyObj = phyEngine->getPhysicsPawn(pawnName);
@@ -276,10 +312,12 @@ void SBPhysicsManager::updatePhysicsPawn( std::string pawnName )
 		phyObj->setGlobalTransform(newWorldState);		
 		phyObj->updatePhySim();		
 	}	
+#endif
 }
 
 void SBPhysicsManager::updatePhysicsCharacter( std::string charName )
 {	
+#ifndef NO_ODE_PHYSICS	
 	SBPhysicsSim* phyEngine = getPhysicsEngine();
 	SBPhysicsCharacter* phyChar = phyEngine->getPhysicsCharacter(charName);
 	if (!phyChar) return; 
@@ -339,6 +377,7 @@ void SBPhysicsManager::updatePhysicsCharacter( std::string charName )
 		}			
 #endif
 		}
+#endif
 }	
 
 

@@ -55,6 +55,7 @@ void SBCollisionManager::setEnable(bool enable)
 
 void SBCollisionManager::start()
 {
+#ifndef NO_ODE_PHYSICS
 	_singleChrCapsuleMode = getBoolAttribute("singleChrCapsuleMode");
 	float jointBVLenRadRatio = (float)(getDoubleAttribute("jointBVLenRadRatio"));
 
@@ -74,6 +75,7 @@ void SBCollisionManager::start()
 	if (!collisionSpace)
 	{
 		collisionSpace = new ODECollisionSpace();
+
 	}
 	const std::vector<std::string>& characterNames = scene->getCharacterNames();
 	for (std::vector<std::string>::const_iterator iter = characterNames.begin();
@@ -167,6 +169,7 @@ void SBCollisionManager::start()
 			addObjectToCollisionSpace(pawn->getGeomObjectName());
 		}
 	}
+#endif
 }
 
 bool SBCollisionManager::isJointExcluded(SkJoint* j, const std::vector<SkJoint*>& jnt_excld_list)

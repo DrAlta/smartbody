@@ -178,8 +178,6 @@ int SBVHMsgManager::send2( const char *op, const char* message )
 		command << op << " " << message;
 		execute_later( command.str().c_str() );
 	}
-#else
-	LOG("VHMSG has been disabled.");
 #endif
 #endif
 	return( CMD_SUCCESS );

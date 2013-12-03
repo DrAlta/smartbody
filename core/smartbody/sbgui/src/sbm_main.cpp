@@ -27,6 +27,7 @@
 #include <sbm/lin_win.h>
 #include <sb/SBBmlProcessor.h>
 #include "sbm/GPU/SbmShader.h"
+#include <sb/SBBoneBusManager.h>
 
 #ifndef USE_WSP
 #define USE_WSP 1

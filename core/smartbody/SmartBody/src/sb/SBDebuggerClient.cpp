@@ -302,7 +302,7 @@ void SBDebuggerClient::StartUpdates(double updateFrequencyS)
 void SBDebuggerClient::EndUpdates()
 {
 #ifndef NO_VHMSG
-   vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s end_update", m_sbmId.c_str()).c_str())
+   vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s end_update", m_sbmId.c_str()).c_str());
 #endif
 }
 

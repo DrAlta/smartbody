@@ -42,7 +42,12 @@ class SBPhysicsManager : public SBService
 
 
 	protected:
+#ifndef NO_ODE_PHYSICS
 		ODEPhysicsSim* _ode;
+#else
+		SmartBody::SBPhysicsSim* _ode;
+#endif
+
 		double            physicsTime;
 		void updatePhysicsCharacter(std::string charName);
 		void updatePhysicsPawn(std::string pawnName);
