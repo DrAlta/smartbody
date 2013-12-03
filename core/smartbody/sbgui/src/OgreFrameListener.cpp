@@ -1,5 +1,7 @@
 #include "vhcl.h"
+#ifndef NO_VHMSG
 #include "vhmsg-tt.h"
+#endif
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>

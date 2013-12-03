@@ -25,7 +25,9 @@
 #define SBM_EMAIL_CRASH_REPORTS  1
 
 #include "vhcl.h"
+#ifndef NO_VHMSG
 #include "vhmsg-tt.h"
+#endif
 #include "external/glew/glew.h"
 
 #include <signal.h>

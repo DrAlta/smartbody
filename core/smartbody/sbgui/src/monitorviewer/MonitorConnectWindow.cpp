@@ -1,5 +1,7 @@
 #include "vhcl.h"
+#ifndef NO_VHMSG
 #include "vhmsg-tt.h"
+#endif
 
 #include "MonitorConnectWindow.h"
 #include <sb/SBScene.h>
@@ -90,6 +92,7 @@ void MonitorConnectWindow::loadProcesses()
 
 void MonitorConnectWindow::OnConfirmCB(Fl_Widget* widget, void* data)
 {
+#ifndef NO_VHMSG
 	MonitorConnectWindow* monitorConnectWindow = (MonitorConnectWindow*) data;
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
 	SBDebuggerClient* c = sbScene->getDebuggerClient();
@@ -116,6 +119,10 @@ void MonitorConnectWindow::OnConfirmCB(Fl_Widget* widget, void* data)
 	c->Init();
 	c->StartUpdates(sbScene->getSimulationManager()->getTimeDt());
 	monitorConnectWindow->hide();
+#else
+	fl_alert("VHMSG has been disabled.");
+#endif
+
 }
 
 void MonitorConnectWindow::OnCancelCB(Fl_Widget* widget, void* data)

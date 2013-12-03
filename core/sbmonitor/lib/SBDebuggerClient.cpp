@@ -10,7 +10,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef NO_VHMSG
 #include "vhmsg-tt.h"
+#endif
 
 #include "SBDebuggerCommon.h"
 
