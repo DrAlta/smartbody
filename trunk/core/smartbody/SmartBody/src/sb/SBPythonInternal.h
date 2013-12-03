@@ -6,7 +6,7 @@
 #include <sb/SBSceneListener.h>
 #include <sr/sr_vec.h>
 
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 
 namespace SmartBody 
 {

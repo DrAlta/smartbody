@@ -931,6 +931,7 @@ void VisemeViewerWindow::OnLoadCB(Fl_Widget* widget, void* data)
 	if (fileName == "")
 		return;
 
+#ifndef NO_PYTHON
 	try {
 		std::stringstream strstr;
 		strstr << "execfile(\"" << fileName << "\")";
@@ -940,7 +941,9 @@ void VisemeViewerWindow::OnLoadCB(Fl_Widget* widget, void* data)
 	} catch (...) {
 		PyErr_Print();
 	}
-
+#else
+	LOG("Python has been disabled.");
+#endif
 	viewer->updateViseme();
 	viewer->redraw();
 }

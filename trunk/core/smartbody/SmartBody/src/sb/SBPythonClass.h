@@ -17,7 +17,7 @@
 #endif
 //#endif
 
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 #include <boost/python.hpp>
 #endif
 namespace SmartBody 
@@ -26,7 +26,7 @@ namespace SmartBody
 SrViewer* getViewer();
 
 
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 class PyLogger
 {
 protected:

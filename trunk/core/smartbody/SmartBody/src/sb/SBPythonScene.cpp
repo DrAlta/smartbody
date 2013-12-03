@@ -55,7 +55,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp> 
 #include <boost/python/return_internal_reference.hpp>
 #include <boost/python/args.hpp>
@@ -69,7 +69,7 @@ typedef std::map<std::string,SrVec> VecMap;
 typedef std::map<std::string, std::string> StringMap;
 
 
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 
 
 namespace SmartBody

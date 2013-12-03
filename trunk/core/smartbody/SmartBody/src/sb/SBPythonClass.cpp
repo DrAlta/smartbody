@@ -33,7 +33,7 @@ SrViewer* getViewer()
 	return scene->getViewer();
 }
 
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 
 
 std::string PyLogger::strBuffer = "";

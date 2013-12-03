@@ -5,6 +5,7 @@
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <cctype>
 #include <string>

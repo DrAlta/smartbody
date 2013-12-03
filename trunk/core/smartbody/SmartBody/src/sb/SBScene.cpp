@@ -50,6 +50,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 #include <sb/nvbg.h>
 #include <sb/SBJointMap.h>
@@ -129,7 +130,7 @@ SBScene::SBScene(void) : SBObject()
 
 void SBScene::initialize()
 {
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 #ifndef __native_client__
 //	_mainModule = NULL;
 //	_mainDict = NULL;
@@ -254,7 +255,7 @@ void SBScene::initialize()
 #ifndef __native_client__
 	//Py_Finalize();
 	//initPython(initPythonLibPath);
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 	PyRun_SimpleString("scene = getScene()");
 	PyRun_SimpleString("bml = scene.getBmlProcessor()");
 	PyRun_SimpleString("sim = scene.getSimulationManager()");
@@ -425,7 +426,7 @@ void SBScene::cleanup()
 	SbmTextureManager::destroy_singleton();
 #endif
 
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 //	Py_Finalize();
 
 #if defined(WIN_BUILD)
@@ -1423,7 +1424,7 @@ void SBScene::sendVHMsg2(const std::string& message, const std::string& message2
 
 bool SBScene::run(const std::string& command)
 {
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 	try {
 		//LOG("executePython = %s",command);
 
@@ -1441,7 +1442,7 @@ bool SBScene::run(const std::string& command)
 
 bool SBScene::runScript(const std::string& script)
 {
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 	// add the .seq extension if necessary
 	std::string candidateSeqName = script;
 	if (candidateSeqName.find(".py") == std::string::npos)
@@ -4152,7 +4153,7 @@ float SBScene::queryTerrain( float x, float z, float *normal_p )
 	return( 0.0 );
 }
 
-#ifndef SB_NO_PYTHON
+#ifndef NO_PYTHON
 void SBScene::setPythonMainModule(boost::python::object& pyobject)
 {
 	_mainModule = pyobject;
