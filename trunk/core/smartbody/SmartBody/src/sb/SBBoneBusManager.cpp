@@ -19,7 +19,7 @@ SBBoneBusManager::~SBBoneBusManager()
 {
 }
 
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 bonebus::BoneBusClient& SBBoneBusManager::getBoneBus()
 {
 	return _boneBus;
@@ -28,7 +28,7 @@ bonebus::BoneBusClient& SBBoneBusManager::getBoneBus()
 
 void SBBoneBusManager::setEnable(bool val)
 {
-#ifdef NO_BONEBUS
+#ifdef SB_NO_BONEBUS
 	LOG("Bonebus has been disabled and is not available.");
 	return;
 #else
@@ -77,7 +77,7 @@ void SBBoneBusManager::setEnable(bool val)
 
 void SBBoneBusManager::setHost(const std::string& host)
 {
-#ifdef NO_BONEBUS
+#ifdef SB_NO_BONEBUS
 	LOG("Bonebus has been disabled and can not set the bonebus host.");
 	return;
 #endif
@@ -98,7 +98,7 @@ void SBBoneBusManager::start()
 
 void SBBoneBusManager::beforeUpdate(double time)
 {
-#ifdef NO_BONEBUS
+#ifdef SB_NO_BONEBUS
 	return;
 #else
 	// process commands received over BoneBus protocol
@@ -124,7 +124,7 @@ void SBBoneBusManager::stop()
 
 void SBBoneBusManager::notify(SBSubject* subject)
 {
-#ifdef NO_BONEBUS
+#ifdef SB_NO_BONEBUS
 	return;
 #endif
 
@@ -151,7 +151,7 @@ void SBBoneBusManager::notify(SBSubject* subject)
 
 }
 
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 void SBBoneBusManager::NetworkSendSkeleton( bonebus::BoneBusCharacter * character, SmartBody::SBSkeleton* skeleton, GeneralParamMap * param_map )
 {
 

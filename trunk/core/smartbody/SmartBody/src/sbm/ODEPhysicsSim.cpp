@@ -1,4 +1,4 @@
-#ifndef NO_ODE_PHYSICS
+#ifndef SB_NO_ODE_PHYSICS
 #include "ODEPhysicsSim.h"
 
 #include <sb/SBScene.h>

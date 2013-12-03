@@ -531,7 +531,7 @@ bool SBCollisionUtil::checkIntersection( SBGeomObject* obj1, SBGeomObject* obj2 
 
 void SBCollisionUtil::collisionDetection( SBGeomObject* obj1, SBGeomObject* obj2, std::vector<SBGeomContact>& contactPts )
 {
-#ifndef NO_ODE_PHYSICS
+#ifndef SB_NO_ODE_PHYSICS
 	dGeomID odeGeom1 = ODEPhysicsSim::createODERawGeometry(obj1);
 	dGeomID odeGeom2 = ODEPhysicsSim::createODERawGeometry(obj2);
 

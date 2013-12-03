@@ -55,7 +55,7 @@ void SBCollisionManager::setEnable(bool enable)
 
 void SBCollisionManager::start()
 {
-#ifndef NO_ODE_PHYSICS
+#ifndef SB_NO_ODE_PHYSICS
 	_singleChrCapsuleMode = getBoolAttribute("singleChrCapsuleMode");
 	float jointBVLenRadRatio = (float)(getDoubleAttribute("jointBVLenRadRatio"));
 

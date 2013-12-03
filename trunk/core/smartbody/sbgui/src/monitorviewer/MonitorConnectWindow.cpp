@@ -1,5 +1,5 @@
 #include "vhcl.h"
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
 
@@ -92,7 +92,7 @@ void MonitorConnectWindow::loadProcesses()
 
 void MonitorConnectWindow::OnConfirmCB(Fl_Widget* widget, void* data)
 {
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 	MonitorConnectWindow* monitorConnectWindow = (MonitorConnectWindow*) data;
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
 	SBDebuggerClient* c = sbScene->getDebuggerClient();

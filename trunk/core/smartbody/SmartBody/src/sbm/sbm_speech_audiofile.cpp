@@ -474,7 +474,7 @@ char * AudioFileSpeech::getSpeechStopCommand( RequestId requestId, SbmCharacter 
    if ( it != m_speechRequestInfo.end() )
    {
       string characterName;
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 	  if (character->bonebusCharacter )
 	  {
 		  characterName = character->bonebusCharacter->m_name;

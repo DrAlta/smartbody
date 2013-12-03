@@ -1,4 +1,4 @@
-#ifndef NO_ODE_PHYSICS
+#ifndef SB_NO_ODE_PHYSICS
 #ifndef _ODEPhysicsSim_H_
 #define _ODEPhysicsSim_H_
 

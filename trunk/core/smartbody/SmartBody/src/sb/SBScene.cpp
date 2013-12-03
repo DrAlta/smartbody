@@ -130,7 +130,7 @@ SBScene::SBScene(void) : SBObject()
 
 void SBScene::initialize()
 {
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 #ifndef __native_client__
 //	_mainModule = NULL;
 //	_mainDict = NULL;
@@ -255,7 +255,7 @@ void SBScene::initialize()
 #ifndef __native_client__
 	//Py_Finalize();
 	//initPython(initPythonLibPath);
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 	PyRun_SimpleString("scene = getScene()");
 	PyRun_SimpleString("bml = scene.getBmlProcessor()");
 	PyRun_SimpleString("sim = scene.getSimulationManager()");
@@ -426,7 +426,7 @@ void SBScene::cleanup()
 	SbmTextureManager::destroy_singleton();
 #endif
 
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 //	Py_Finalize();
 
 #if defined(WIN_BUILD)
@@ -680,7 +680,7 @@ void SBScene::update()
 		SbmCharacter* char_p = getCharacter(pawn->getName().c_str() );
 		if (!char_p)
 		{
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 			if (getBoneBusManager()->isEnable())
 			{
 				if (pawn->bonebusCharacter && pawn->bonebusCharacter->GetNumErrors() > 3)
@@ -723,7 +723,7 @@ void SBScene::update()
 			char_p->forward_visemes( getSimulationManager()->getTime() );	
 			//char_p->forward_parameters( getSimulationManager()->getTime() );	
 
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 			if (char_p->bonebusCharacter && char_p->bonebusCharacter->GetNumErrors() > 3)
 			{
 				// connection is bad, remove the bonebus character
@@ -772,7 +772,7 @@ void SBScene::update()
 		}  // end of char_p processing
 	} // end of loop
 
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 	if (isClosingBoneBus)
 	{
 		const std::vector<std::string>& pawnNames = getPawnNames();
@@ -1060,7 +1060,7 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 //		joint->setName("world_offset");		
 //		joint->update_gmat();
 
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 		if (getBoneBusManager()->isEnable())
 			getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
 #endif
@@ -1164,7 +1164,7 @@ void SBScene::removeCharacter(const std::string& charName)
 			listeners[i]->OnCharacterDelete( name);
 		}
 
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 		if ( character->bonebusCharacter )
 		{
 			this->getBoneBusManager()->getBoneBus().DeleteCharacter(  character->bonebusCharacter );
@@ -1424,7 +1424,7 @@ void SBScene::sendVHMsg2(const std::string& message, const std::string& message2
 
 bool SBScene::run(const std::string& command)
 {
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 	try {
 		//LOG("executePython = %s",command);
 
@@ -1442,7 +1442,7 @@ bool SBScene::run(const std::string& command)
 
 bool SBScene::runScript(const std::string& script)
 {
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 	// add the .seq extension if necessary
 	std::string candidateSeqName = script;
 	if (candidateSeqName.find(".py") == std::string::npos)
@@ -4153,7 +4153,7 @@ float SBScene::queryTerrain( float x, float z, float *normal_p )
 	return( 0.0 );
 }
 
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 void SBScene::setPythonMainModule(boost::python::object& pyobject)
 {
 	_mainModule = pyobject;

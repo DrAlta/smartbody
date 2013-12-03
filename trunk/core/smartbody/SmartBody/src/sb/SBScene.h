@@ -10,7 +10,7 @@
 #include <sr/sr_viewer.h>
 #include <sbm/general_param_setting.h>
 
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 #ifndef __native_client__
 #include <boost/python.hpp>
 #endif
@@ -245,7 +245,7 @@ class SBScene : public SBObject
 		SBAPI KinectProcessor* getKinectProcessor();
 		SBAPI std::map<std::string, GeneralParam*>& getGeneralParameters();
 
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 #ifndef __native_client__
 		SBAPI void setPythonMainModule(boost::python::object& pyobject);
 		SBAPI void setPythonMainDict(boost::python::object& pyobject);
@@ -354,7 +354,7 @@ class SBScene : public SBObject
 		Heightfield* _heightField;
 		SBNavigationMesh* _navigationMesh;
 		std::map<std::string, GeneralParam*> _generalParams;
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 #ifndef __native_client__
 		boost::python::object _mainModule;
 		boost::python::object _mainDict;

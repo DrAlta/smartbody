@@ -64,7 +64,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #endif
+#ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
+#endif
 #include <festival.h>
 #include <VHDuration.h>
 #include <sstream>

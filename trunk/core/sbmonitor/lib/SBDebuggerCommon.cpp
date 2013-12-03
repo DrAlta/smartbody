@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
 

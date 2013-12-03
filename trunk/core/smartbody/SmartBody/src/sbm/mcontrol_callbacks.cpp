@@ -1,6 +1,6 @@
 #include "vhcl.h"
 #ifndef __native_client__
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #include "vhmsg.h"
 #include "vhmsg-tt.h"
 #endif
@@ -41,7 +41,7 @@
 #include <sr/sr_timer.h>
 
 #include <sbm/action_unit.hpp>
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 #include <vhmsg.h>
 #endif
 
@@ -1447,7 +1447,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 
 int mcu_net_reset( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 	bool ret = CMD_SUCCESS;
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().CloseConnection();
 	SmartBody::SBScene::getScene()->getBoneBusManager()->setEnable(true);
 	SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().UpdateAllCharacters();
@@ -1457,7 +1457,7 @@ int mcu_net_reset( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
 int mcu_net_check( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 	if (!SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().IsOpen())
 	{
 		return mcu_net_reset(args, cmdMgr);
@@ -1479,7 +1479,7 @@ int mcu_net_check( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
 int mcu_net_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 	 
     char * command = args.read_token();
 
@@ -1613,7 +1613,7 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
         }
         else
         {
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendPlaySound( soundFile.c_str(), characterName.c_str() );
 #endif
         }
@@ -1715,7 +1715,7 @@ int mcu_stop_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		}
 		else
 		{
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 	        SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().SendStopSound( soundFile.c_str() );
 #endif
 		}
@@ -1751,7 +1751,7 @@ int mcu_uscriptexec_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
         }
 
         //SendWinsockExecScript( command.c_str() );
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
         SmartBody::SBScene::getScene()->getBoneBusManager()->getBoneBus().ExecScript( command.c_str() );
 #endif
 
@@ -1775,7 +1775,7 @@ int mcu_uscriptexec_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 
 int mcu_commapi_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
     char * command = args.read_token();
 
     if ( _stricmp( command, "setcameraposition" ) == 0 )
@@ -2050,7 +2050,7 @@ int mcu_vrSpeech_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-#ifndef NO_PYTHON	
+#ifndef SB_NO_PYTHON	
 #ifndef __ANDROID__
 #ifndef __native_client__
 	std::string instanceId = args.read_token();
@@ -3346,7 +3346,7 @@ int mcu_vhmsg_connect_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdM
 
 int mcu_vhmsg_disconnect_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-#ifndef NO_VHMSG
+#ifndef SB_NO_VHMSG
 	SmartBody::SBVHMsgManager* vhmsgManager = SmartBody::SBScene::getScene()->getVHMsgManager();
 	
 	if (!vhmsgManager->isEnable())

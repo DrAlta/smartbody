@@ -281,7 +281,7 @@ int text_speech::text_speech_func( srArgBuffer& args, SmartBody::SBCommandManage
 		int id = args.read_int();
 		SmartBody::SBScene::getScene()->getSpeechManager()->speech_text()->startSchedule(id);
 	} else {
-#ifndef NO_BONEBUS
+#ifndef SB_NO_BONEBUS
 		int msgNumber = args.read_int();
 		char* agentName = args.read_token();
 		char* text = args.read_remainder_raw();

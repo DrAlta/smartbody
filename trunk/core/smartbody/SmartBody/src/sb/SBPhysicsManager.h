@@ -42,7 +42,7 @@ class SBPhysicsManager : public SBService
 
 
 	protected:
-#ifndef NO_ODE_PHYSICS
+#ifndef SB_NO_ODE_PHYSICS
 		ODEPhysicsSim* _ode;
 #else
 		SmartBody::SBPhysicsSim* _ode;
