@@ -56,7 +56,8 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			return assets;
 		}
 		rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("library_geometries", colladaNode, 0, 1);
-		if (geometryNode)
+		rapidxml::xml_node<>* visualSceneNode = ParserCOLLADAFast::getNode("library_visual_scenes", colladaNode, 0, 1);
+		if (geometryNode || visualSceneNode)
 		{
 			// first from library visual scene retrieve the material id to name mapping (TODO: needs reorganizing the assets management)
 			std::map<std::string, std::string> materialId2Name;
@@ -123,7 +124,8 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			std::string extension = boost::filesystem::extension(meshPath);
 			mesh->setName(meshBaseName + extension);
 			std::vector<SrModel*> meshModelVec;
-			ParserCOLLADAFast::parseLibraryGeometries(geometryNode, convertedPath.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f);
+			if (geometryNode)
+				ParserCOLLADAFast::parseLibraryGeometries(geometryNode, convertedPath.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f);
 
 			float factor = 1.0f;
 
