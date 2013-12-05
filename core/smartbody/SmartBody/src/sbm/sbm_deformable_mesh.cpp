@@ -1080,6 +1080,7 @@ bool DeformableMesh::saveToDmb(std::string inputFileName)
 	// 2
 	SmartBodyBinary::StaticMesh* outputStaticMesh = outputDeformableMesh->mutable_staticmesh(); 
 	saveToStaticMeshBinary(outputStaticMesh);
+	outputStaticMesh->set_staticmeshname(fileName + extension);
 
 	// save skin weights
 	for (size_t i = 0; i < skinWeights.size(); ++i)
@@ -1173,20 +1174,12 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 	SmartBodyBinary::StaticMesh staticMesh = deformableMesh.staticmesh();
 	readFromStaticMeshBinary(&staticMesh);
 
-	// explicitly load all the textures
-	boost::filesystem::path p(inputFileName);
-	std::string filePath = p.parent_path().string();
-	loadAllFoundTextures(filePath);
-
 	// load skin weights
 	for (int i = 0; i < deformableMesh.skinweights_size(); ++i)
 	{
 		SkinWeight* newSkinWeights = new SkinWeight();
 		// 1 SkinWeight
-		for (int x = 0; x < deformableMesh.skinweights(i).influencejointnames_size(); ++x)
-		{
-			newSkinWeights->infJointName.push_back(deformableMesh.skinweights(i).influencejointnames(x));
-		}
+		newSkinWeights->sourceMesh = deformableMesh.skinweights(i).sourcemeshname();
 		// 2
 		for (int x = 0; x < deformableMesh.skinweights(i).influencejointnames_size(); ++x)
 		{
@@ -1198,12 +1191,12 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 			newSkinWeights->bindWeight.push_back(deformableMesh.skinweights(i).bindweights(x));
 		}
 		// 4
-		for (int x = 0; x < deformableMesh.skinweights(i).bindposematrice_size(); ++x)
+		for (int x = 0; x < deformableMesh.skinweights(i).bindposematrice_size() / 16; ++x)
 		{
 			SrMat mat;
 			for (int m = 0; m < 16; ++m)
 			{
-				mat.set(m, deformableMesh.skinweights(i).bindposematrice(x));
+				mat.set(m, deformableMesh.skinweights(i).bindposematrice(x * 16 + m));
 			}
 			newSkinWeights->bindPoseMat.push_back(mat);
 		}
@@ -1229,6 +1222,8 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 		{
 			newSkinWeights->jointNameIndex.push_back(deformableMesh.skinweights(i).jointnameindices(x));
 		}
+
+		this->skinWeights.push_back(newSkinWeights);
 	}
 
 	// load morph targets
@@ -1256,6 +1251,11 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 		morphTargets.insert(std::make_pair(morphMap.from(), morphs));
 		blendShapeMap.insert(std::make_pair(morphMap.from(), morphModels));
 	}
+	
+	// explicitly load all the textures
+	boost::filesystem::path p(inputFileName);
+	std::string filePath = p.parent_path().string();
+	loadAllFoundTextures(filePath);
 
 	return true;
 }
