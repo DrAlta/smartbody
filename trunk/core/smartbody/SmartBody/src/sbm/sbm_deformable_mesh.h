@@ -11,6 +11,7 @@
 #include <sb/SBAsset.h>
 #include <sb/SBCharacter.h>
 
+
 typedef std::vector<SkJoint*> SkJointList;
 
 class SkinWeight
@@ -50,6 +51,10 @@ public:
 };
 
 class DeformableMeshInstance;
+namespace SmartBodyBinary
+{
+	class StaticMesh;
+}
 
 /* This class is used to simulate and represent deformed mesh
    for Smartbody Characters.
@@ -105,6 +110,14 @@ public:
 	void set_visibility(int deformableMesh);
 	virtual bool buildSkinnedVertexBuffer(); // unrolled all models inside this deformable mesh into a GPU-friendly format
 	SBAPI bool isSkinnedMesh();
+	SBAPI bool saveToSmb(std::string inputFileName);
+	SBAPI bool saveToDmb(std::string inputFileName);
+	SBAPI bool readFromSmb(std::string inputFileName);
+	SBAPI bool readFromDmb(std::string inputFileName);
+	// helper function
+	void saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh);
+	void readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh);
+	void loadAllFoundTextures(std::string textureDirectory);
 };
 
 class DeformableMeshInstance

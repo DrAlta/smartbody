@@ -82,6 +82,7 @@ void pythonFuncsMotion();
 void pythonFuncsScene();
 void pythonFuncsSimulation();
 void pythonFuncsSkeleton();
+void pythonFuncsMesh();
 void pythonFuncsSystem();
 
 
@@ -486,6 +487,8 @@ boost::python::class_<SBObserver>("SBObserver")
 
 	pythonFuncsSkeleton();
 
+	pythonFuncsMesh();
+
 
 	boost::python::class_<SBBehavior, boost::python::bases<SBObject> >("SBBehavior")
 		//.def(boost::python::init<std::string, std::string>())
@@ -715,6 +718,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("addMesh", &SBAssetManager::addMesh, "Adds a mesh to the scene.")
 		.def("removeMesh", &SBAssetManager::removeMesh, "Removes a mesh from the scene.")
 		.def("getMeshNames", &SBAssetManager::getMeshNames, "Returns a list of all mesh names.\n Input: NULL \nOutput: list of skeleton names")
+		.def("getMesh", &SBAssetManager::getDeformableMesh, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a deformable mesh given name")
 		;
 
 
