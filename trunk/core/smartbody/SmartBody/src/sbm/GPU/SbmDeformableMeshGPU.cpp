@@ -1488,6 +1488,8 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 bool SbmDeformableMeshGPUInstance::initBuffer()
 {	
 	SbmDeformableMeshGPU* gpuMesh = dynamic_cast<SbmDeformableMeshGPU*>(_mesh);
+	if (!gpuMesh)
+		return false;
 	bool hasVertexBuffer = gpuMesh->buildVertexBufferGPU();	
 	if (!hasVertexBuffer) return false;
 	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_3_0)
