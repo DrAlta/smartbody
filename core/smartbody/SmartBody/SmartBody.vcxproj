@@ -480,7 +480,9 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\sr\sr_vec2.cpp" />
     <ClCompile Include="..\SmartBody\src\sr\sr_viewer.cpp" />
     <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp" />
+    <ClCompile Include="src\protocols\sbmesh.pb.cc" />
     <ClCompile Include="src\protocols\sbmotion.pb.cc" />
+    <ClCompile Include="src\protocols\sbutilities.pb.cc" />
     <ClCompile Include="src\sbm\ParserCOLLADAFast.cpp" />
     <ClCompile Include="src\sb\SBAssetHandler.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerAmc.cpp" />
@@ -489,10 +491,12 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\sb\SBAssetHandlerCOLLADA.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerObj.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerOgre.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerSBMeshBinary.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSk.cpp" />
-    <ClCompile Include="src\sb\SBAssetHandlerSkb.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerSkmb.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkm.cpp" />
     <ClCompile Include="src\sb\SBNavigationMeshManager.cpp" />
+    <ClCompile Include="src\sb\SBPythonMesh.cpp" />
     <ClCompile Include="src\sb\smartbody-c-dll.cpp" />
     <ClCompile Include="src\sb\smartbody-dll.cpp" />
   </ItemGroup>
@@ -860,7 +864,9 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\SmartBody\src\sr\sr_vec2.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_viewer.h" />
     <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp" />
+    <ClInclude Include="src\protocols\sbmesh.pb.h" />
     <ClInclude Include="src\protocols\sbmotion.pb.h" />
+    <ClInclude Include="src\protocols\sbutilities.pb.h" />
     <ClInclude Include="src\sbm\ParserCOLLADAFast.h" />
     <ClInclude Include="src\sb\SBAssetHandler.h" />
     <ClInclude Include="src\sb\SBAssetHandlerAmc.h" />
@@ -869,8 +875,9 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\sb\SBAssetHandlerCOLLADA.h" />
     <ClInclude Include="src\sb\SBAssetHandlerObj.h" />
     <ClInclude Include="src\sb\SBAssetHandlerOgre.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerSBMeshBinary.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSk.h" />
-    <ClInclude Include="src\sb\SBAssetHandlerSkb.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerSkmb.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSkm.h" />
     <ClInclude Include="src\sb\SBNavigationMeshManager.h" />
     <ClInclude Include="src\sb\SBSceneListener.h" />
@@ -885,10 +892,9 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <None Include="..\SmartBody\src\sbm\GPU\shaderFiles\vs_skin_pos.vert">
       <FileType>Document</FileType>
     </None>
-    <None Include="..\SmartBody\src\sbm\sbm_deformable_mesh.cpp.bak">
-      <FileType>Document</FileType>
-    </None>
+    <None Include="src\protocols\sbmesh.proto" />
     <None Include="src\protocols\sbmotion.proto" />
+    <None Include="src\protocols\sbutilities.proto" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

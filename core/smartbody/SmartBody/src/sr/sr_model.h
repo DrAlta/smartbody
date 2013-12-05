@@ -89,7 +89,7 @@ class SrModel : public SrSharedClass
     SrArray<SrMaterial> M;  //!< Used materials
     SrArray<SrPnt>      V;  //!< Vertices coordinates		
     SrArray<SrVec>      N;  //!< Normals table		
-	SrArray<SrVec>      Tangent, BiNormal; // tangent and binormal vectors
+	SrArray<SrVec>      Tangent, BiNormal; // tangent and bi normal vectors
     SrArray<SrPnt2>     T;  //!< Texture coordinates
     SrArray<Face>       F;  //!< Triangular faces indices to V
     SrArray<int>       Fm;  //!< Indices to the materials in M (size can be<F.size())
@@ -108,7 +108,7 @@ class SrModel : public SrSharedClass
 	float _scale;
 
     /*! Will be set to true (the default) if back face culling
-        should be applied, and false othrwise */
+        should be applied, and false otherwise */
     bool culling;
 
     /*! Stores a name description for the materials in M.

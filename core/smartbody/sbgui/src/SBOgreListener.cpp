@@ -101,7 +101,8 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	}
 	catch( Ogre::Exception& e )
 	{
-		LOG("Can not create character %s ...",sbChar->getName().c_str());
+		if (sbChar)
+			LOG("Can not create character %s ...",sbChar->getName().c_str());
 		LOG("Exception %s",e.getDescription().c_str());
 		if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) 
 		{

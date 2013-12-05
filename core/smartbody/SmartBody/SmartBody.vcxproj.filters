@@ -1123,9 +1123,6 @@
     <ClCompile Include="src\sb\SBAssetHandlerSk.cpp">
       <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="src\sb\SBAssetHandlerSkb.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
     <ClCompile Include="src\sb\SBAssetHandlerSkm.cpp">
       <Filter>sb</Filter>
     </ClCompile>
@@ -1140,6 +1137,21 @@
     </ClCompile>
     <ClCompile Include="src\sb\smartbody-dll.cpp">
       <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\protocols\sbmesh.pb.cc">
+      <Filter>protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBPythonMesh.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="src\protocols\sbutilities.pb.cc">
+      <Filter>protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandlerSkmb.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandlerSBMeshBinary.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2259,9 +2271,6 @@
     <ClInclude Include="src\sb\SBAssetHandlerSk.h">
       <Filter>sb</Filter>
     </ClInclude>
-    <ClInclude Include="src\sb\SBAssetHandlerSkb.h">
-      <Filter>sb</Filter>
-    </ClInclude>
     <ClInclude Include="src\sb\SBAssetHandlerSkm.h">
       <Filter>sb</Filter>
     </ClInclude>
@@ -2282,6 +2291,18 @@
     </ClInclude>
     <ClInclude Include="src\sb\smartbody-c-dll.h">
       <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="src\protocols\sbmesh.pb.h">
+      <Filter>protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="src\protocols\sbutilities.pb.h">
+      <Filter>protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBAssetHandlerSkmb.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBAssetHandlerSBMeshBinary.h">
+      <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2338,10 +2359,13 @@
     <None Include="..\SmartBody\src\sbm\GPU\shaderFiles\vs_skin_pos.vert">
       <Filter>GPU</Filter>
     </None>
-    <None Include="..\SmartBody\src\sbm\sbm_deformable_mesh.cpp.bak">
-      <Filter>sbm</Filter>
-    </None>
     <None Include="src\protocols\sbmotion.proto">
+      <Filter>protocols</Filter>
+    </None>
+    <None Include="src\protocols\sbutilities.proto">
+      <Filter>protocols</Filter>
+    </None>
+    <None Include="src\protocols\sbmesh.proto">
       <Filter>protocols</Filter>
     </None>
   </ItemGroup>
