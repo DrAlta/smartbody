@@ -1078,9 +1078,8 @@ bool DeformableMesh::saveToDmb(std::string inputFileName)
 	// 1 DeformableMesh
 	outputDeformableMesh->set_deformablemeshname(fileName + extension);
 	// 2
-	SmartBodyBinary::StaticMesh* outputStaticMesh = new SmartBodyBinary::StaticMesh();
+	SmartBodyBinary::StaticMesh* outputStaticMesh = outputDeformableMesh->mutable_staticmesh(); 
 	saveToStaticMeshBinary(outputStaticMesh);
-	outputDeformableMesh->set_allocated_staticmesh(outputStaticMesh);
 
 	// save skin weights
 	for (size_t i = 0; i < skinWeights.size(); ++i)

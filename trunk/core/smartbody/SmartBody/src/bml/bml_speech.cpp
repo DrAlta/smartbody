@@ -438,7 +438,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 		std::map<std::string, std::vector<std::vector<float> > > emotionCurvesMap;
 		for (size_t i = 0; i < emotionNames.size(); ++i)
 		{
-			std::map<std::string, std::vector<float> >& tempCurves = generateCurvesGivenDiphoneSet(result_visemes, emotionNames[i], character->getName());
+			std::map<std::string, std::vector<float> > tempCurves = generateCurvesGivenDiphoneSet(result_visemes, emotionNames[i], character->getName());
 			
 			// merge it back according to emotion curve
 			std::map<std::string, std::vector<float> >::iterator iter;
@@ -448,7 +448,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 				{
 					emotionCurvesMap.insert(std::make_pair(iter->first, std::vector<std::vector<float> >()));
 				}
-				std::vector<float>& weights = speechInterface->getEmotionCurve(get_speech_request_id(), emotionNames[i]);
+				std::vector<float> weights = speechInterface->getEmotionCurve(get_speech_request_id(), emotionNames[i]);
 				std::vector<float> weightedCurve = scaleCurve(iter->second, weights);
 				emotionCurvesMap[iter->first].push_back(weightedCurve);
 
@@ -476,7 +476,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 			for (size_t i = 0; i < iter->second.size(); i++)
 			{
 				LOG("add curve for %s", iter->first.c_str());
-				std::vector<float>& tempCurve = addCurve(mergedCurve, iter->second[i]);
+				std::vector<float> tempCurve = addCurve(mergedCurve, iter->second[i]);
 				mergedCurve = tempCurve;
 			}
 			if (finalCurves.find(iter->first) == finalCurves.end())
