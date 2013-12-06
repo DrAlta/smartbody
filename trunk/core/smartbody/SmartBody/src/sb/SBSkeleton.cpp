@@ -41,11 +41,35 @@ SBAPI SBJoint* SBSkeleton::createJoint(const std::string& name, SBJoint* parent)
 	}
 	SBJoint* joint = new SBJoint();
 	joint->setName(name);
-	joint->rot_type ( SkJoint::TypeQuat );
-	joint->quat()->activate();
-	joint->pos()->limits(SkVecLimits::X, false);
-	joint->pos()->limits(SkVecLimits::Y, false);
-	joint->pos()->limits(SkVecLimits::Z, false);
+	
+	if (!parent) // enable translation only for the root joint
+	{
+		joint->rot_type ( SkJoint::TypeQuat );
+		joint->quat()->activate();
+		joint->pos()->limits(0, false);
+		joint->pos()->limits(1, false);
+		joint->pos()->limits(2, false);
+		joint->pos()->value(0, 0);
+		joint->pos()->value(1, 0);
+		joint->pos()->value(2, 0);
+		joint->euler()->activate();
+		joint->euler()->limits(0, false);
+		joint->euler()->limits(1, false);
+		joint->euler()->limits(2, false);
+		joint->euler()->value(0, 0);
+		joint->euler()->value(1, 0);
+		joint->euler()->value(2, 0);
+	}
+	else
+	{
+		joint->rot_type ( SkJoint::TypeQuat );
+		joint->quat()->activate();
+		joint->pos()->limits(0, false);
+		joint->pos()->limits(1, false);
+		joint->pos()->limits(2, false);
+	}
+
+
 	int parentId = -1;
 	if (parent)
 	{
