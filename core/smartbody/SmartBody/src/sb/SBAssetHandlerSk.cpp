@@ -47,7 +47,7 @@ std::vector<SBAsset*> SBAssetHandlerSk::getAssets(const std::string& path)
 	}
 	else
 	{
-		LOG("Could not .sk file %s", convertedPath.c_str());
+		LOG("Could not load .sk file %s", convertedPath.c_str());
 		delete skeleton;
 	}
 
