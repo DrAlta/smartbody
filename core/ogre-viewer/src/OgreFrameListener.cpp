@@ -1,5 +1,7 @@
 #include "OgreFrameListener.h"
+#ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
+#endif
 #include "sb/smartbody-c-dll.h"
 
 OgreFrameListener::OgreFrameListener(RenderWindow * win, Camera * cam, const std::string & debugText, SceneManager * mgr, 
