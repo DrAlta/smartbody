@@ -92,7 +92,7 @@ namespace BML {
 			SmartBody::SpeechInterface* speech_impl_backup,
 			SmartBody::RequestId speech_request_id,
 			const std::string& policyOverride,
-			const std::vector<SpeechMark>& marks,
+			std::vector<SpeechMark>& marks,
 			BmlRequestPtr request
 		);
 		virtual ~SpeechRequest();

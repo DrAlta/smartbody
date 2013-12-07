@@ -175,6 +175,14 @@ namespace SmartBody {
 			}
 		}
 
+		void calculateDuration() {
+			// find the last key
+			if (!isFloatCurveMode())
+				return;
+			int index = (_numKeys - 1) * _floatsPerKey;
+			_duration = _curveData[index];
+		}
+
 		/** Get the number of keys. */
 		int getFloatsPerKey() {return _floatsPerKey;}
 

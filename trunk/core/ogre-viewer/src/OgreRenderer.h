@@ -3,8 +3,9 @@
 
 #include "vhcl.h"
 #include "bonebus.h"
+#ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
-
+#endif
 #include <string>
 #include <map>
 
