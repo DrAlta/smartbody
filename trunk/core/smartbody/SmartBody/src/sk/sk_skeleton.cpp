@@ -40,7 +40,7 @@ SkSkeleton::SkSkeleton () : SmartBody::SBAsset()
 	setName("noname");
 	_root = 0;
 	_coldetid = -1;       // index used in collision detection
-	_gmat_uptodate = false;
+	_gmat_uptodate = true;
 	_channels = new SkChannelArray;
 	_channels->ref();
 	_com.set(0, 0, 0);
