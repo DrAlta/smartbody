@@ -11,7 +11,7 @@ include_directories( ../../include/protobuf )
 include_directories( ../../include/steersuite )
 include_directories( ../../include/steersuite/external )
 include_directories( ../../include/steersuite/external/tinyxml )
-include_directories( /usr/include/python2.7 )
+include_directories( ../../include/python2.7)
 include_directories( external/Pinocchio )
 include_directories( external/polyvox/library/PolyVoxCore/include)
 
@@ -25,7 +25,6 @@ find_library (OPENAL openal)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 link_directories(/usr/X11R6/lib)
-link_directories(/usr/local/lib)
 set( MORE_LIBS
         ${COREAUDIO_LIBRARY}
         ${AUDIOUNIT_LIBRARY}
@@ -228,11 +227,8 @@ set_target_properties(
 
 	PROPERTIES 
 
-## link with binary tree:
-#	INSTALL_RPATH				.
-
 ## link with install tree:
-	INSTALL_RPATH			.	
+	INSTALL_RPATH			.
 
 	BUILD_WITH_INSTALL_RPATH	TRUE
 )
