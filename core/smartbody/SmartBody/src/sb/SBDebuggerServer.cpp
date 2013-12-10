@@ -23,12 +23,14 @@ using std::vector;
 
 SBDebuggerServer::SBDebuggerServer()
 {
+#ifndef SB_NO_VHMSG
    m_sbmFriendlyName = "sbm";
    m_connectResult = false;
    m_updateFrequencyS = 0;
    m_lastUpdate = m_timer.GetTime();
    m_scene = NULL;
    m_rendererIsRightHanded = true;
+#endif
 }
 
 
@@ -45,6 +47,8 @@ vector< vhcl::socket_t > m_sockConnectionsTCP;
 
 void SBDebuggerServer::Init()
 {
+#ifndef SB_NO_VHMSG
+
 #if __FLASHPLAYER__
 	return;
 #endif
@@ -109,12 +113,14 @@ void SBDebuggerServer::Init()
 
    vhcl::SocketListen(m_sockTCP);
 
-
+#endif
    //return true;
 }
 
 void SBDebuggerServer::Close()
 {
+#ifndef SB_NO_VHMSG
+
 #if __FLASHPLAYER__
 	return;
 #endif
@@ -126,12 +132,15 @@ void SBDebuggerServer::Close()
    }
 
    vhcl::SocketShutdown();
+#endif
 }
 
 void SBDebuggerServer::SetID(const std::string & id)
 {
+#ifndef SB_NO_VHMSG
    m_sbmFriendlyName = id;
    m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
+#endif
 }
 
 const std::string& SBDebuggerServer::GetID()
@@ -141,6 +150,8 @@ const std::string& SBDebuggerServer::GetID()
 
 void SBDebuggerServer::Update()
 {
+#ifndef SB_NO_VHMSG
+
 #if __FLASHPLAYER__
 	return;
 #endif
@@ -302,11 +313,14 @@ void SBDebuggerServer::Update()
          tcpDataPending = vhcl::SocketIsDataPending(s);
       }
    }
+#endif
 }
 
 
 void SBDebuggerServer::GenerateInitHierarchyMsg(SmartBody::SBJoint * root, string & msg, int tab)
 {
+#ifndef SB_NO_VHMSG
+
    string name = root->getName();
    float posx = root->offset().x;
    float posy = root->offset().y;
@@ -323,11 +337,14 @@ void SBDebuggerServer::GenerateInitHierarchyMsg(SmartBody::SBJoint * root, strin
 
    msg += string().assign(tab, ' ');
    msg += vhcl::Format("}\n");
+#endif
 }
 
 
 void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 {
+#ifndef SB_NO_VHMSG
+
    string message = string(op) + " " + string(args);
    vector<string> split;
    vhcl::Tokenize(message, split, " \t\n");
@@ -347,9 +364,8 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                   if (split[2] == "connect")
                   {
                      m_connectResult = true;
-#ifndef SB_NO_VHMSG
+
                      vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s connect_success", m_fullId.c_str()).c_str());
-#endif
                   }
                   else if (split[2] == "disconnect")
                   {
@@ -371,9 +387,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 						 //FILE* fp = fopen("e:/sceneServer.py","wt");
 						 //fprintf(fp,"%s",initScript.c_str());
 						 //fclose(fp);
-#ifndef SB_NO_VHMSG
 						 vhmsg::ttu_notify1(message.c_str());
-#endif
 
 #if 0
 						 std::vector<string> skeletonNames = m_scene->getSkeletonNames();
@@ -491,11 +505,10 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
             else if (split[1] == "queryids")
             {
                LOG("SBDebuggerServer::ProcessVHMsgs() - queryids");
-#ifndef SB_NO_VHMSG
                vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s id", m_fullId.c_str()).c_str());
-#endif
             }
          }
       }
    }
+#endif
 }
