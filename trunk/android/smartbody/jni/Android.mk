@@ -554,10 +554,12 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerOgre.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerObj.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerBvh.cpp \
-    $(SBM_MY_DIR)/sb/SBAssetHandlerSkb.cpp \
+    $(SBM_MY_DIR)/sb/SBAssetHandlerSBMeshBinary.cpp \
+    $(SBM_MY_DIR)/sb/SBAssetHandlerSkmb.cpp \
 	$(SBM_MY_DIR)/sb/smartbody-dll.cpp \
         $(SBM_MY_DIR)/sb/smartbody-c-dll.cpp \
-	$(SBM_MY_DIR)/protocols/sbmotion.pb.cc 
+	$(SBM_MY_DIR)/protocols/sbmotion.pb.cc \
+	$(SBM_MY_DIR)/protocols/sbmesh.pb.cc 
 
 
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv1_CM
