@@ -12,13 +12,11 @@ set( CMAKE_OSX_DEPLOYMENT_TARGET "10.5" )
 add_definitions( -O3	-fPIC )
 
 include_directories(
-	/System/Library/Frameworks/Python.framework/Headers/
 	./include/
 )
 
 LINK_DIRECTORIES(
 	/usr/lib
-	/System/Library/Frameworks/Python.framework
 )
 
 add_subdirectory( src )

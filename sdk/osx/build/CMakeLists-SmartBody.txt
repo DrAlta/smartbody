@@ -8,7 +8,7 @@ include_directories( ../../include/protobuf )
 include_directories ( ../../include/steersuite)
 include_directories ( ../../include/steersuite/external)
 include_directories ( ../../include/steersuite/external/tinyxml)
-include_directories ( /usr/include/python2.7 )
+include_directories ( ../../include/python2.7 )
 
 LINK_DIRECTORIES( ${PROJECT_SOURCE_DIR}/lib )
 LINK_DIRECTORIES( ${PROJECT_SOURCE_DIR}/bin )
@@ -70,7 +70,7 @@ find_package(OpenGL REQUIRED)
 
 add_custom_target(protoctarget
 		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/protocols/sbmotion.pb.cc
-		COMMAND protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/protocols ${CMAKE_CURRENT_SOURCE_DIR}/protocols/sbmotion.proto 
+		COMMAND ${CMAKE_SOURCE_DIR}/bin/protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/protocols ${CMAKE_CURRENT_SOURCE_DIR}/protocols/sbmotion.proto 
 		
 		)
 
