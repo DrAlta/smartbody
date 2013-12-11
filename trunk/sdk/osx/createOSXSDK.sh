@@ -17,15 +17,15 @@ rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/include/*.h ./SmartBodySDK/in
 rsync -ap --exclude=".svn" ../../lib/wsp/wsp/include/*.h ./SmartBodySDK/include/wsp/
 rsync -ap --exclude=".svn" ../../lib/bonebus/include/*.h ./SmartBodySDK/include/bonebus/
 rsync -ap --exclude=".svn" ../../lib/vhcl/include/*.h ./SmartBodySDK/include/vhcl/
-rsync -ap --exclude=".svn" ../../lib/protobuf/include/* ./SmartBodySDK/include/protobuf/
+rsync -ap --exclude=".svn" ../../core/smartbody/SmartBody/src/external/protobuf/include/* ./SmartBodySDK/include/protobuf/
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/pprAI/include/*.h ./SmartBodySDK/include/steersuite/
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/steerlib/include/* ./SmartBodySDK/include/steersuite/
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/* ./SmartBodySDK/include/steersuite/
 
 # copy lib
-rsync -ap --exclude=".svn" ./lib ./SmartBodySDK
+rsync -ap --exclude=".svn" ./lib/* ./SmartBodySDK/lib/
 
-# copy bin
+# copy bin & copy all the dynamic libraries to bin folder
 rsync -ap --exclude=".svn" ./bin ./SmartBodySDK
 
 # copy dylib for SmartBody 
@@ -56,6 +56,13 @@ rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/Pinocchio/*.h ./S
 rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/Pinocchio/CMakeLists.txt ./SmartBodySDK/src/sbgui/external/Pinocchio/
 rsync -ap --exclude=".svn" ../../core/smartbody/simplesmartbody/simplesmartbody.cpp ./SmartBodySDK/src/simplesmartbody/
 rsync -ap --exclude=".svn" ../../core/smartbody/Smartbody/src/* ./SmartBodySDK/src/Smartbody/
+
+# copy Python27
+rsync -ap --exclude=".svn" ./Python27 ./SmartBodySDK/
+mkdir -p ./SmartBodySDK/include/python2.7
+mv -f ./SmartBodySDK/Python27/include/python2.7/* ./SmartBodySDK/include/python2.7/
+mv -f ./SmartBodySDK/Python27/lib/libpython2.7.a ./SmartBodySDK/lib
+rm -rf ./SmartBodySDK/Python27/include
 
 # copy CMakeLists.txt
 rsync -ap --exclude=".svn" ./build/CMakeLists.txt ./SmartBodySDK/CMakeLists.txt
