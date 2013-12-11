@@ -1201,11 +1201,9 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 			newSkinWeights->bindPoseMat.push_back(mat);
 		}
 		// 5
-		for (int x = 0; x < deformableMesh.skinweights(i).bindshapematrix_size(); ++x)
+		for (int m = 0; m < deformableMesh.skinweights(i).bindshapematrix_size(); ++m)
 		{
-			SrMat mat;
-			mat.set(x, deformableMesh.skinweights(i).bindposematrice(x));
-			newSkinWeights->bindShapeMat = mat;
+			newSkinWeights->bindShapeMat.set(m, deformableMesh.skinweights(i).bindshapematrix(m));
 		}
 		// 6
 		for (int x = 0; x < deformableMesh.skinweights(i).numberofinfluencejoints_size(); ++x)
