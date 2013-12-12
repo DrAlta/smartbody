@@ -633,28 +633,33 @@ void SBScene::update()
 
 	std::string seqName = "";
 	std::vector<std::string> sequencesToDelete;
-	for (int s = 0; s < getCommandManager()->getActiveSequences()->getNumSequences(); s++)
+	SequenceManager* activeSequences = getCommandManager()->getActiveSequences();
+	int numSequences = activeSequences->getNumSequences();
+	for (int s = 0; s < numSequences; s++)
 	{
-		srCmdSeq* seq = getCommandManager()->getActiveSequences()->getSequence(s, seqName);
+		srCmdSeq* seq = activeSequences->getSequence(s, seqName);
 		char *cmd;
-		while( cmd = seq->pop( (float) getSimulationManager()->getTime() ) )
+		if (seq)
 		{
-			//LOG("execute command = %s",cmd);
-			int err = getCommandManager()->execute( cmd );
-			if( err != CMD_SUCCESS )	{
-				LOG( "update ERR: execute FAILED: '%s'\n", cmd );
+			while( cmd = seq->pop( (float) getSimulationManager()->getTime() ) )
+			{
+				//LOG("execute command = %s",cmd);
+				int err = getCommandManager()->execute( cmd );
+				if( err != CMD_SUCCESS )	{
+					LOG( "update ERR: execute FAILED: '%s'\n", cmd );
+				}
+				delete [] cmd;
 			}
-			delete [] cmd;
-		}
-		if( seq->get_count() < 1 )
-		{
-			sequencesToDelete.push_back(seqName);
+			if( seq->get_count() < 1 )
+			{
+				sequencesToDelete.push_back(seqName);
+			}
 		}
 	}
 
 	for (size_t d = 0; d < sequencesToDelete.size(); d++)
 	{
-		getCommandManager()->getActiveSequences()->removeSequence(sequencesToDelete[d], true);
+		activeSequences->removeSequence(sequencesToDelete[d], true);
 	}
 
 	bool isClosingBoneBus = false;

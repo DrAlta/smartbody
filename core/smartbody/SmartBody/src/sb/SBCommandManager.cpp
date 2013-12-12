@@ -90,7 +90,7 @@ srCmdSeq* SequenceManager::getSequence(const std::string& name)
 
 srCmdSeq* SequenceManager::getSequence(int num, std::string& name)
 {
-	if (_sequences.size() > (size_t) num)
+	if (num < (int) _sequences.size())
 	{
 		name = _sequences[num].first;
 		return _sequences[num].second;
