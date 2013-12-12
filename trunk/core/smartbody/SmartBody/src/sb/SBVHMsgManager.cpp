@@ -179,6 +179,11 @@ int SBVHMsgManager::send2( const char *op, const char* message )
 		execute_later( command.str().c_str() );
 	}
 #endif
+#else
+	// send the command locally
+	std::stringstream strstr;
+	strstr << op << " " << message;
+	SmartBody::SBScene::getScene()->command(strstr.str());
 #endif
 	return( CMD_SUCCESS );
 
@@ -216,6 +221,9 @@ int SBVHMsgManager::send( const char* message )
 		execute_later( message );
 	}
 #endif
+#else
+	// send the command locally
+	SmartBody::SBScene::getScene()->command(message);
 #endif
 
 	return( CMD_SUCCESS );
