@@ -55,20 +55,16 @@
         if (!context || ![EAGLContext setCurrentContext:context]) {
             return nil;
         }
-        
-        animationInterval = 15.0 / 60.0;
+
         antialiasing = YES;
+        time = 0.0;
 		[self setupView];
     }
     return self;
 }
 
 - (void)drawView 
-{    
-    static double timer = 0.0;
-    timer += 0.016;
-	SBUpdate(timer);
-    
+{
     [EAGLContext setCurrentContext:context];
 
     if (antialiasing)
@@ -109,7 +105,16 @@
     }
 }
 
+
+- (void)update
+{
+    time += animationInterval;
+    SBUpdate(time);
+    [self drawView];
+}
+
 - (void)layoutSubviews {
+    // prepare frame buffer
     [EAGLContext setCurrentContext:context];
     [self destroyFramebuffer];
     [self createFramebuffer];
@@ -190,7 +195,7 @@
 
 
 - (void)startAnimation {
-    self.animationTimer = [NSTimer scheduledTimerWithTimeInterval:animationInterval target:self selector:@selector(drawView) userInfo:nil repeats:YES];
+    self.animationTimer = [NSTimer scheduledTimerWithTimeInterval:animationInterval target:self selector:@selector(update) userInfo:nil repeats:YES];
 }
 
 

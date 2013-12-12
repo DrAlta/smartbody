@@ -30,4 +30,25 @@
     [window makeKeyAndVisible]; 
 }
 
+- (void) applicationWillResignActive:(UIApplication *)application
+{
+    EAGLView* glView = (EAGLView*)m_rootViewController.view;
+    if (glView != nil)
+        [glView stopAnimation];
+}
+
+- (void) applicationDidBecomeActive:(UIApplication *)application
+{
+    EAGLView* glView = (EAGLView*)m_rootViewController.view;
+    if (glView != nil)
+        [glView startAnimation];
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application
+{
+    EAGLView* glView = (EAGLView*)m_rootViewController.view;
+    if (glView != nil)
+        [glView stopAnimation];
+}
+
 @end

@@ -79,7 +79,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	glEnable(GL_TEXTURE_2D);	
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
-#if !defined (__ANDROID__)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE)
 	glDisable ( GL_POLYGON_SMOOTH );
 #endif
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

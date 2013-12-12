@@ -51,6 +51,9 @@ Note that setting the view non-opaque will only work if the EAGL surface has an 
 	// touches
 	CGPoint startPoint, endPoint, currentPoint, prevPoint;
 	GLfloat xposition, yposition, zposition;
+    
+    // current simulation time
+    double time;
 }
 
 @property NSTimeInterval animationInterval;
@@ -61,6 +64,7 @@ Note that setting the view non-opaque will only work if the EAGL surface has an 
 
 - (void)startAnimation;
 - (void)stopAnimation;
+- (void)update;
 - (void)drawView;
 - (void)setupView;
 
