@@ -28,6 +28,9 @@
 #include <sr/sr_light.h>
 #include <sr/sr_camera.h>
 #include <sr/sr_gl_render_funcs.h>
+#include <sr/sr_euler.h>
+#include <sb/SBSceneListener.h>
+#include <sb/SBAssetManager.h>
 
 #import <OpenGLES/ES1/gl.h>
 #import <OpenGLES/ES1/glext.h>
@@ -56,7 +59,317 @@ void SBSetupDrawing(int w, int h)
 	glShadeModel(GL_SMOOTH);
 	glDisable(GL_DEPTH_TEST);
 }
-    
+
+
+class AppListener : public SmartBody::SBSceneListener, public SmartBody::SBObserver
+{
+   public:
+	  AppListener();
+	  ~AppListener();
+
+      virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
+      virtual void OnCharacterDelete( const std::string & name );
+	  virtual void OnCharacterUpdate( const std::string & name );
+      virtual void OnPawnCreate( const std::string & name );
+      virtual void OnPawnDelete( const std::string & name );
+
+	  virtual void OnSimulationUpdate();
+
+	  virtual void notify(SmartBody::SBSubject* subject);
+};
+
+AppListener::AppListener()
+{
+}
+
+AppListener::~AppListener()
+{
+}
+
+void AppListener::OnCharacterCreate( const std::string & name, const std::string & objectClass )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBPawn* pawn = scene->getPawn(name);
+	if (!pawn)
+		return;
+
+	// add attribute observations
+	SmartBody::SBAttribute* attr = pawn->getAttribute("mesh");
+	if (attr)
+		attr->registerObserver(this);
+	attr = pawn->getAttribute("deformableMesh");
+	if (attr)
+		attr->registerObserver(this);
+
+	attr = pawn->getAttribute("deformableMeshScale");
+	if (attr)
+		attr->registerObserver(this);
+
+	attr = pawn->getAttribute("displayType");
+	if (attr)
+		attr->registerObserver(this);
+
+	OnCharacterUpdate(name);
+}
+
+void AppListener::OnCharacterDelete( const std::string & name )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
+	if (!pawn)
+		return;
+
+	// remove any existing scene
+	if (pawn->scene_p)
+	{
+		if( scene->getRootGroup() )
+		{
+			scene->getRootGroup()->remove( pawn->scene_p ); 
+		}
+		pawn->scene_p->unref();
+		pawn->scene_p = NULL;
+	}
+	// remove any existing deformable mesh
+#if 0
+	if (pawn->dMesh_p)
+	{
+		for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
+		{
+			scene->getRootGroup()->remove( pawn->dMesh_p->dMeshDynamic_p[i] );
+		}
+		//delete character->dMesh_p; // AS 1/28/13 causing crash related to mesh instances
+		pawn->dMesh_p = NULL;
+	}
+#endif 
+
+}
+
+void AppListener::OnCharacterUpdate( const std::string & name)
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
+	if (!pawn)
+		return;
+	
+	// remove any existing scene
+	if (pawn->scene_p)
+	{
+		if( scene->getRootGroup() )
+		{
+			scene->getRootGroup()->remove( pawn->scene_p ); 
+		}
+		pawn->scene_p->unref();
+		pawn->scene_p = NULL;
+	}
+
+	pawn->scene_p = new SkScene();
+	pawn->scene_p->ref();
+	pawn->scene_p->init(pawn->getSkeleton());
+	bool visible = pawn->getBoolAttribute("visible");
+	if (visible)
+		pawn->scene_p->visible(true);
+	else
+		pawn->scene_p->visible(false);
+
+
+	if( scene->getRootGroup() )
+	{
+		scene->getRootGroup()->add( pawn->scene_p ); 
+	}
+}
+
+void AppListener::OnPawnCreate( const std::string & name )
+{
+	OnCharacterCreate(name, "");
+}
+
+void AppListener::OnPawnDelete( const std::string & name )
+{
+	OnCharacterDelete(name);
+}
+
+void AppListener::notify(SmartBody::SBSubject* subject)
+{
+	SmartBody::SBScene* scene =	SmartBody::SBScene::getScene();
+	SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(subject);
+	
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
+	if (attribute)
+	{
+		SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(attribute->getObject());
+		const std::string& name = attribute->getName();
+		if (name == "visible")
+		{
+			SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			if (boolAttribute)
+			{
+				if (!pawn->scene_p)
+					return;
+				if (boolAttribute->getValue())
+					pawn->scene_p->visible(true);
+				else
+					pawn->scene_p->visible(false);
+			}
+		}
+#if 0
+		if (name == "mesh")
+		{
+		}
+		else 
+#endif
+		if ( name == "deformableMeshScale")
+		{
+			//LOG("name = deformableMeshScale");
+			SmartBody::DoubleAttribute* doubleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
+			if (doubleAttribute)
+			{
+				if (!pawn->dMeshInstance_p)
+					pawn->dMeshInstance_p = new DeformableMeshInstance();
+				pawn->dMeshInstance_p->setMeshScale(doubleAttribute->getValue());
+				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
+			}			
+		}
+		else if (name == "deformableMesh" || name == "mesh")
+		{
+			SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+			if (strAttribute)
+			{
+				const std::string& value = strAttribute->getValue();
+				// clean up any old meshes
+#if 0
+				if (pawn->dMesh_p)
+				{
+					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
+					{
+						scene->getRootGroup()->remove( pawn->dMesh_p->dMeshDynamic_p[i] );
+					}
+				}
+#endif
+				if (pawn->dMeshInstance_p)
+				{
+					//delete pawn->dMeshInstance_p;
+				}
+				if (value == "")
+					return;
+
+				SmartBody::SBAssetManager* assetManager = scene->getAssetManager();
+				DeformableMesh* mesh = assetManager->getDeformableMesh(value);
+				if (!mesh)
+				{
+					int index = value.find(".");
+					if (index != std::string::npos)
+					{
+						std::string prefix = value.substr(0, index);
+						const std::vector<std::string>& meshPaths = assetManager->getAssetPaths("mesh");
+						for (size_t x = 0; x < meshPaths.size(); x++)
+						{
+							assetManager->loadAsset(meshPaths[x] + "/" + prefix + "/" + value);
+						}
+					}
+					mesh = assetManager->getDeformableMesh(value);
+				}
+		
+				
+				if (mesh)
+				{
+					if (!pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p = new DeformableMeshInstance();
+					pawn->dMeshInstance_p->setDeformableMesh(mesh);
+                    pawn->dMeshInstance_p->setPawn(pawn);
+					if (name == "mesh") // setting static mesh
+					{
+						pawn->dMeshInstance_p->setToStaticMesh(true);
+					}
+#if 0
+					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
+					{
+						scene->getRootGroup()->add( pawn->dMesh_p->dMeshDynamic_p[i] );
+					}
+#endif
+				}
+			}
+		}
+		else if (name == "displayType")
+		{
+			SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+			if (strAttribute)
+			{
+				const std::string& value = strAttribute->getValue();
+				if (value == "bones")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(1,0,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
+				}
+				else if (value == "visgeo")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,1,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
+				}
+				else if (value == "colgeo")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,0,1,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
+				}
+				else if (value == "axis")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,0,0,1);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
+				}
+				else if (value == "mesh")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,0,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(1);
+ #if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)						
+					SbmDeformableMeshGPU::useGPUDeformableMesh = false;
+#endif          
+				}
+				else if (value == "GPUmesh")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,0,0,0);
+#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)
+					SbmDeformableMeshGPU::useGPUDeformableMesh = true;
+#endif
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(1);
+
+				}
+			}
+		}
+		
+	}
+}
+
+void AppListener::OnSimulationUpdate()
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
+	const std::vector<std::string>& pawns = scene->getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
+		pawnIter != pawns.end();
+		pawnIter++)
+	{
+		SmartBody::SBPawn* pawn = scene->getPawn((*pawnIter));
+ 		if (pawn->scene_p)
+        {
+ 			pawn->scene_p->update();
+            if (pawn->dMeshInstance_p)
+                pawn->dMeshInstance_p->update();
+        }
+	}
+	
+}
+  
 void drawLights()
 {
     _lights.clear();
@@ -195,20 +508,28 @@ void drawLights()
 	
 	if (_lights.size() == 0 && numLightsInScene == 0)
 	{
-		SrLight light;
+		SrLight light;		
 		light.directional = true;
 		light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
-		light.position = SrVec( 100.0, 250.0, 400.0 );
-        //	light.constant_attenuation = 1.0f/cam.scale;
+		SrMat mat;
+		sr_euler_mat_xyz (mat, SR_TORAD(0), SR_TORAD(0), SR_TORAD(135	));
+		SrQuat orientation(mat);
+		SrVec up(0,1,0);
+		SrVec lightDirection = -up * orientation;
+		light.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
+	//	light.constant_attenuation = 1.0f/cam.scale;
 		light.constant_attenuation = 1.0f;
 		_lights.push_back(light);
-        
+
 		SrLight light2 = light;
 		light2.directional = true;
 		light2.diffuse = SrColor( 0.8f, 0.8f, 0.8f );
-		light2.position = SrVec( 100.0, 500.0, -1000.0 );
-        //	light2.constant_attenuation = 1.0f;
-        //	light2.linear_attenuation = 2.0f;
+		sr_euler_mat_xyz (mat, SR_TORAD(0), SR_TORAD(0), SR_TORAD(-135));
+		SrQuat orientation2(mat);
+		lightDirection = -up * orientation2;
+		light2.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
+	//	light2.constant_attenuation = 1.0f;
+	//	light2.linear_attenuation = 2.0f;
 		_lights.push_back(light2);
 	}
     
@@ -273,49 +594,6 @@ void drawLights()
     
 }
     
-void initCharacterScene()
-{
- 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	// for some reason couldn't get flash listener working properly, following code is supposed to replace character listener
-	std::vector<std::string> charNames = scene->getCharacterNames();
-	for (size_t i = 0; i < charNames.size(); i++)
-	{
-		SmartBody::SBCharacter* character = scene->getCharacter(charNames[i]);
-		if (!character)
-			continue;
-        
-        LOG("init character %s", charNames[i].c_str());
-        
-		// add skeletons and mesh
-		
-		if (character->scene_p)
-		{
-			SmartBody::SBScene::getScene()->getRootGroup()->remove(character->scene_p);
-			character->scene_p->unref();
-			character->scene_p = NULL;
-		}
-		LOG("Character %s's skeleton added to the scene.", charNames[i].c_str());
-        
-		if (character->dMesh_p)
-		{
-			for (size_t i = 0; i < character->dMesh_p->dMeshDynamic_p.size(); i++)
-			{
-				SmartBody::SBScene::getScene()->getRootGroup()->remove( character->dMesh_p->dMeshDynamic_p[i] );
-			}
-			delete character->dMesh_p;
-			character->dMesh_p = NULL;
-		}
-		character->dMesh_p = new DeformableMesh();
-		character->dMeshInstance_p =  new DeformableMeshInstance();
-		character->dMesh_p->setSkeleton(character->getSkeleton());
-		character->dMeshInstance_p->setSkeleton(character->getSkeleton());
-		LOG("Character %s's deformable mesh reset.", charNames[i].c_str());
-        
-		std::string dMeshAttrib = character->getStringAttribute("deformableMesh");
-		character->setStringAttribute("deformableMesh", dMeshAttrib);
-		LOG("Character %s's deformable mesh %s added to the scene.", charNames[i].c_str(), dMeshAttrib.c_str());
-	}
-}
     
 void SBInitialize(const char* mediapath)
 {
@@ -323,6 +601,8 @@ void SBInitialize(const char* mediapath)
     XMLPlatformUtils::Initialize();
     LOG("media path%s", mediapath);
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	AppListener* appListener = new AppListener();
+	scene->addSceneListener(appListener);
     SrCamera& cam = *scene->createCamera("activeCamera");
     cam.init();
     initPython("../../Python26/Libs");
@@ -331,7 +611,6 @@ void SBInitialize(const char* mediapath)
     scene->setMediaPath(mediapath);
 	scene->addAssetPath("seq", "sbm-common/scripts");
 	scene->runScript("default-init.py");
-    initCharacterScene();
     
     // store the camera information for resetting
     cameraReset = new SrCamera(cam);
@@ -445,11 +724,10 @@ void SBDrawCharacters()
          pawnIter++)
 	{
 		SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
-		if(pawn->dMesh_p && pawn->dMeshInstance_p)
+		if(pawn->dMeshInstance_p)
 		{
-			pawn->dMesh_p->set_visibility(1);
 			pawn->dMeshInstance_p->setVisibility(1);
-			pawn->dMeshInstance_p->update();
+			//pawn->dMeshInstance_p->update();
 			SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p);
 		}
 	}
@@ -468,12 +746,14 @@ void SBExecuteCmd(const char* command)
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->command(command);
+    printf("%s\n", command);
 }
     
 void SBExecutePythonCmd(const char* command)
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->run(command);
+    printf("%s\n", command);
 }
     
     

@@ -16,7 +16,6 @@ extern "C"
     void SBSetupDrawing(int w, int h);
     void SBDrawFrame(int w, int h);
     void SBDrawCharacters();
-    void initCharacterScene();
     void drawLights();
     void SBUpdate(float t);
     void SBExecuteCmd(const char* command);

@@ -23,6 +23,12 @@
 	[glView startAnimation];
 }
 
+- (void)viewDidUnload
+{
+    [super viewDidUnload];
+    [glView stopAnimation];
+}
+
 - (void)dealloc 
 {
 	[self viewDidUnload];
