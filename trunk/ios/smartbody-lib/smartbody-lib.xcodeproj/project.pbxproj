@@ -7,6 +7,41 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA0AA89A18512DA20061EE9A /* SBAssetHandlerSBMeshBinary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA0AA89318512DA20061EE9A /* SBAssetHandlerSBMeshBinary.cpp */; };
+		AA0AA89B18512DA20061EE9A /* SBAssetHandlerSBMeshBinary.h in Headers */ = {isa = PBXBuildFile; fileRef = AA0AA89418512DA20061EE9A /* SBAssetHandlerSBMeshBinary.h */; };
+		AA0AA89C18512DA20061EE9A /* SBAssetHandlerSkmb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA0AA89518512DA20061EE9A /* SBAssetHandlerSkmb.cpp */; };
+		AA0AA89D18512DA20061EE9A /* SBAssetHandlerSkmb.h in Headers */ = {isa = PBXBuildFile; fileRef = AA0AA89618512DA20061EE9A /* SBAssetHandlerSkmb.h */; };
+		AA0AA89E18512DA20061EE9A /* SBNavigationMeshManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA0AA89718512DA20061EE9A /* SBNavigationMeshManager.cpp */; };
+		AA0AA89F18512DA20061EE9A /* SBNavigationMeshManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AA0AA89818512DA20061EE9A /* SBNavigationMeshManager.h */; };
+		AA0AA8A018512DA20061EE9A /* SBPythonMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA0AA89918512DA20061EE9A /* SBPythonMesh.cpp */; };
+		AA0AA8AB18512DD10061EE9A /* sbmesh.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = AA0AA8A218512DD10061EE9A /* sbmesh.pb.cc */; };
+		AA0AA8AC18512DD10061EE9A /* sbmesh.pb.h in Headers */ = {isa = PBXBuildFile; fileRef = AA0AA8A318512DD10061EE9A /* sbmesh.pb.h */; };
+		AA0AA8AD18512DD10061EE9A /* sbmotion.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = AA0AA8A518512DD10061EE9A /* sbmotion.pb.cc */; };
+		AA0AA8AE18512DD10061EE9A /* sbmotion.pb.h in Headers */ = {isa = PBXBuildFile; fileRef = AA0AA8A618512DD10061EE9A /* sbmotion.pb.h */; };
+		AA0AA8AF18512DD10061EE9A /* sbutilities.pb.cc in Sources */ = {isa = PBXBuildFile; fileRef = AA0AA8A818512DD10061EE9A /* sbutilities.pb.cc */; };
+		AA0AA8B018512DD10061EE9A /* sbutilities.pb.h in Headers */ = {isa = PBXBuildFile; fileRef = AA0AA8A918512DD10061EE9A /* sbutilities.pb.h */; };
+		AA0AA8B2185144190061EE9A /* ParserASFAMC.cxx in Sources */ = {isa = PBXBuildFile; fileRef = AA0AA8B1185144190061EE9A /* ParserASFAMC.cxx */; };
+		AA0AA8BA185154490061EE9A /* SBAssetHandlerBvh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA0AA8B8185154490061EE9A /* SBAssetHandlerBvh.cpp */; };
+		AA0AA8BB185154490061EE9A /* SBAssetHandlerBvh.h in Headers */ = {isa = PBXBuildFile; fileRef = AA0AA8B9185154490061EE9A /* SBAssetHandlerBvh.h */; };
+		AA2D77A2180F1C3900D12F24 /* SBAssetHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA2D778F180F1C3900D12F24 /* SBAssetHandler.cpp */; };
+		AA2D77A3180F1C3A00D12F24 /* SBAssetHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = AA2D7790180F1C3900D12F24 /* SBAssetHandler.h */; };
+		AA2D77A4180F1C3A00D12F24 /* SBAssetHandlerAmc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA2D7791180F1C3900D12F24 /* SBAssetHandlerAmc.cpp */; };
+		AA2D77A5180F1C3A00D12F24 /* SBAssetHandlerAmc.h in Headers */ = {isa = PBXBuildFile; fileRef = AA2D7792180F1C3900D12F24 /* SBAssetHandlerAmc.h */; };
+		AA2D77A6180F1C3A00D12F24 /* SBAssetHandlerAsf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA2D7793180F1C3900D12F24 /* SBAssetHandlerAsf.cpp */; };
+		AA2D77A7180F1C3A00D12F24 /* SBAssetHandlerAsf.h in Headers */ = {isa = PBXBuildFile; fileRef = AA2D7794180F1C3900D12F24 /* SBAssetHandlerAsf.h */; };
+		AA2D77A8180F1C3A00D12F24 /* SBAssetHandlerCOLLADA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA2D7795180F1C3900D12F24 /* SBAssetHandlerCOLLADA.cpp */; };
+		AA2D77A9180F1C3A00D12F24 /* SBAssetHandlerCOLLADA.h in Headers */ = {isa = PBXBuildFile; fileRef = AA2D7796180F1C3900D12F24 /* SBAssetHandlerCOLLADA.h */; };
+		AA2D77AA180F1C3A00D12F24 /* SBAssetHandlerObj.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA2D7797180F1C3900D12F24 /* SBAssetHandlerObj.cpp */; };
+		AA2D77AB180F1C3A00D12F24 /* SBAssetHandlerObj.h in Headers */ = {isa = PBXBuildFile; fileRef = AA2D7798180F1C3900D12F24 /* SBAssetHandlerObj.h */; };
+		AA2D77AC180F1C3A00D12F24 /* SBAssetHandlerOgre.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA2D7799180F1C3900D12F24 /* SBAssetHandlerOgre.cpp */; };
+		AA2D77AD180F1C3A00D12F24 /* SBAssetHandlerOgre.h in Headers */ = {isa = PBXBuildFile; fileRef = AA2D779A180F1C3900D12F24 /* SBAssetHandlerOgre.h */; };
+		AA2D77AE180F1C3A00D12F24 /* SBAssetHandlerSk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA2D779B180F1C3900D12F24 /* SBAssetHandlerSk.cpp */; };
+		AA2D77AF180F1C3A00D12F24 /* SBAssetHandlerSk.h in Headers */ = {isa = PBXBuildFile; fileRef = AA2D779C180F1C3900D12F24 /* SBAssetHandlerSk.h */; };
+		AA2D77B0180F1C3A00D12F24 /* SBAssetHandlerSkm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA2D779D180F1C3900D12F24 /* SBAssetHandlerSkm.cpp */; };
+		AA2D77B1180F1C3A00D12F24 /* SBAssetHandlerSkm.h in Headers */ = {isa = PBXBuildFile; fileRef = AA2D779E180F1C3900D12F24 /* SBAssetHandlerSkm.h */; };
+		AA2D77B2180F1C3A00D12F24 /* SBSceneListener.h in Headers */ = {isa = PBXBuildFile; fileRef = AA2D779F180F1C3900D12F24 /* SBSceneListener.h */; };
+		AA2D77B3180F1C3A00D12F24 /* SBVersion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA2D77A0180F1C3900D12F24 /* SBVersion.hpp */; };
+		AA2D77B4180F1C3A00D12F24 /* SBVersionTemplate.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA2D77A1180F1C3900D12F24 /* SBVersionTemplate.hpp */; };
 		AA93021517E02E3000958769 /* me_ct_pose_postprocessing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA93021317E02E3000958769 /* me_ct_pose_postprocessing.cpp */; };
 		AA93021617E02E3000958769 /* me_ct_pose_postprocessing.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AA93021417E02E3000958769 /* me_ct_pose_postprocessing.hpp */; };
 		AA9AC3B317E78F040077D800 /* ParserCOLLADAFast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9AC3B117E78F030077D800 /* ParserCOLLADAFast.cpp */; };
@@ -390,7 +425,6 @@
 		AAD45CB817A98E5D005905B2 /* SBBoneBusManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD4598117A98E5C005905B2 /* SBBoneBusManager.h */; };
 		AAD45CB917A98E5D005905B2 /* SBCharacter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD4598217A98E5C005905B2 /* SBCharacter.cpp */; };
 		AAD45CBA17A98E5D005905B2 /* SBCharacter.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD4598317A98E5C005905B2 /* SBCharacter.h */; };
-		AAD45CBB17A98E5D005905B2 /* SBCharacterListener.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD4598417A98E5C005905B2 /* SBCharacterListener.h */; };
 		AAD45CBC17A98E5D005905B2 /* SBCollisionManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD4598517A98E5C005905B2 /* SBCollisionManager.cpp */; };
 		AAD45CBD17A98E5D005905B2 /* SBCollisionManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD4598617A98E5C005905B2 /* SBCollisionManager.h */; };
 		AAD45CBE17A98E5D005905B2 /* SBColObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD4598717A98E5C005905B2 /* SBColObject.cpp */; };
@@ -539,10 +573,7 @@
 		AAD45D5517A98E5D005905B2 /* MiscCommands.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A2217A98E5C005905B2 /* MiscCommands.h */; };
 		AAD45D5617A98E5D005905B2 /* ODEPhysicsSim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A2317A98E5C005905B2 /* ODEPhysicsSim.cpp */; };
 		AAD45D5717A98E5D005905B2 /* ODEPhysicsSim.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A2417A98E5C005905B2 /* ODEPhysicsSim.h */; };
-		AAD45D5817A98E5D005905B2 /* ParserASFAMC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A2517A98E5C005905B2 /* ParserASFAMC.cpp */; };
-		AAD45D5917A98E5D005905B2 /* ParserASFAMC.cxx in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A2617A98E5C005905B2 /* ParserASFAMC.cxx */; };
 		AAD45D5A17A98E5D005905B2 /* ParserASFAMC.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A2717A98E5C005905B2 /* ParserASFAMC.h */; };
-		AAD45D5B17A98E5D005905B2 /* ParserBVH.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A2817A98E5C005905B2 /* ParserBVH.cpp */; };
 		AAD45D5C17A98E5D005905B2 /* ParserBVH.cxx in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A2917A98E5C005905B2 /* ParserBVH.cxx */; };
 		AAD45D5D17A98E5D005905B2 /* ParserBVH.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A2A17A98E5C005905B2 /* ParserBVH.h */; };
 		AAD45D5E17A98E5D005905B2 /* ParserFBX.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A2B17A98E5C005905B2 /* ParserFBX.cpp */; };
@@ -743,6 +774,44 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AA0AA89318512DA20061EE9A /* SBAssetHandlerSBMeshBinary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerSBMeshBinary.cpp; sourceTree = "<group>"; };
+		AA0AA89418512DA20061EE9A /* SBAssetHandlerSBMeshBinary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerSBMeshBinary.h; sourceTree = "<group>"; };
+		AA0AA89518512DA20061EE9A /* SBAssetHandlerSkmb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerSkmb.cpp; sourceTree = "<group>"; };
+		AA0AA89618512DA20061EE9A /* SBAssetHandlerSkmb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerSkmb.h; sourceTree = "<group>"; };
+		AA0AA89718512DA20061EE9A /* SBNavigationMeshManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBNavigationMeshManager.cpp; sourceTree = "<group>"; };
+		AA0AA89818512DA20061EE9A /* SBNavigationMeshManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBNavigationMeshManager.h; sourceTree = "<group>"; };
+		AA0AA89918512DA20061EE9A /* SBPythonMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBPythonMesh.cpp; sourceTree = "<group>"; };
+		AA0AA8A218512DD10061EE9A /* sbmesh.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sbmesh.pb.cc; path = protocols/sbmesh.pb.cc; sourceTree = "<group>"; };
+		AA0AA8A318512DD10061EE9A /* sbmesh.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sbmesh.pb.h; path = protocols/sbmesh.pb.h; sourceTree = "<group>"; };
+		AA0AA8A418512DD10061EE9A /* sbmesh.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sbmesh.proto; path = protocols/sbmesh.proto; sourceTree = "<group>"; };
+		AA0AA8A518512DD10061EE9A /* sbmotion.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sbmotion.pb.cc; path = protocols/sbmotion.pb.cc; sourceTree = "<group>"; };
+		AA0AA8A618512DD10061EE9A /* sbmotion.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sbmotion.pb.h; path = protocols/sbmotion.pb.h; sourceTree = "<group>"; };
+		AA0AA8A718512DD10061EE9A /* sbmotion.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sbmotion.proto; path = protocols/sbmotion.proto; sourceTree = "<group>"; };
+		AA0AA8A818512DD10061EE9A /* sbutilities.pb.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sbutilities.pb.cc; path = protocols/sbutilities.pb.cc; sourceTree = "<group>"; };
+		AA0AA8A918512DD10061EE9A /* sbutilities.pb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sbutilities.pb.h; path = protocols/sbutilities.pb.h; sourceTree = "<group>"; };
+		AA0AA8AA18512DD10061EE9A /* sbutilities.proto */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sbutilities.proto; path = protocols/sbutilities.proto; sourceTree = "<group>"; };
+		AA0AA8B1185144190061EE9A /* ParserASFAMC.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserASFAMC.cxx; sourceTree = "<group>"; };
+		AA0AA8B8185154490061EE9A /* SBAssetHandlerBvh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerBvh.cpp; sourceTree = "<group>"; };
+		AA0AA8B9185154490061EE9A /* SBAssetHandlerBvh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerBvh.h; sourceTree = "<group>"; };
+		AA2D778F180F1C3900D12F24 /* SBAssetHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandler.cpp; sourceTree = "<group>"; };
+		AA2D7790180F1C3900D12F24 /* SBAssetHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandler.h; sourceTree = "<group>"; };
+		AA2D7791180F1C3900D12F24 /* SBAssetHandlerAmc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerAmc.cpp; sourceTree = "<group>"; };
+		AA2D7792180F1C3900D12F24 /* SBAssetHandlerAmc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerAmc.h; sourceTree = "<group>"; };
+		AA2D7793180F1C3900D12F24 /* SBAssetHandlerAsf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerAsf.cpp; sourceTree = "<group>"; };
+		AA2D7794180F1C3900D12F24 /* SBAssetHandlerAsf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerAsf.h; sourceTree = "<group>"; };
+		AA2D7795180F1C3900D12F24 /* SBAssetHandlerCOLLADA.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerCOLLADA.cpp; sourceTree = "<group>"; };
+		AA2D7796180F1C3900D12F24 /* SBAssetHandlerCOLLADA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerCOLLADA.h; sourceTree = "<group>"; };
+		AA2D7797180F1C3900D12F24 /* SBAssetHandlerObj.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerObj.cpp; sourceTree = "<group>"; };
+		AA2D7798180F1C3900D12F24 /* SBAssetHandlerObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerObj.h; sourceTree = "<group>"; };
+		AA2D7799180F1C3900D12F24 /* SBAssetHandlerOgre.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerOgre.cpp; sourceTree = "<group>"; };
+		AA2D779A180F1C3900D12F24 /* SBAssetHandlerOgre.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerOgre.h; sourceTree = "<group>"; };
+		AA2D779B180F1C3900D12F24 /* SBAssetHandlerSk.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerSk.cpp; sourceTree = "<group>"; };
+		AA2D779C180F1C3900D12F24 /* SBAssetHandlerSk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerSk.h; sourceTree = "<group>"; };
+		AA2D779D180F1C3900D12F24 /* SBAssetHandlerSkm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerSkm.cpp; sourceTree = "<group>"; };
+		AA2D779E180F1C3900D12F24 /* SBAssetHandlerSkm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerSkm.h; sourceTree = "<group>"; };
+		AA2D779F180F1C3900D12F24 /* SBSceneListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBSceneListener.h; sourceTree = "<group>"; };
+		AA2D77A0180F1C3900D12F24 /* SBVersion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SBVersion.hpp; sourceTree = "<group>"; };
+		AA2D77A1180F1C3900D12F24 /* SBVersionTemplate.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SBVersionTemplate.hpp; sourceTree = "<group>"; };
 		AA93021317E02E3000958769 /* me_ct_pose_postprocessing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_pose_postprocessing.cpp; sourceTree = "<group>"; };
 		AA93021417E02E3000958769 /* me_ct_pose_postprocessing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_pose_postprocessing.hpp; sourceTree = "<group>"; };
 		AA9AC3B117E78F030077D800 /* ParserCOLLADAFast.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserCOLLADAFast.cpp; sourceTree = "<group>"; };
@@ -1128,7 +1197,6 @@
 		AAD4598117A98E5C005905B2 /* SBBoneBusManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBBoneBusManager.h; sourceTree = "<group>"; };
 		AAD4598217A98E5C005905B2 /* SBCharacter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBCharacter.cpp; sourceTree = "<group>"; };
 		AAD4598317A98E5C005905B2 /* SBCharacter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBCharacter.h; sourceTree = "<group>"; };
-		AAD4598417A98E5C005905B2 /* SBCharacterListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBCharacterListener.h; sourceTree = "<group>"; };
 		AAD4598517A98E5C005905B2 /* SBCollisionManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBCollisionManager.cpp; sourceTree = "<group>"; };
 		AAD4598617A98E5C005905B2 /* SBCollisionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBCollisionManager.h; sourceTree = "<group>"; };
 		AAD4598717A98E5C005905B2 /* SBColObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBColObject.cpp; sourceTree = "<group>"; };
@@ -1277,10 +1345,7 @@
 		AAD45A2217A98E5C005905B2 /* MiscCommands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MiscCommands.h; sourceTree = "<group>"; };
 		AAD45A2317A98E5C005905B2 /* ODEPhysicsSim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ODEPhysicsSim.cpp; sourceTree = "<group>"; };
 		AAD45A2417A98E5C005905B2 /* ODEPhysicsSim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ODEPhysicsSim.h; sourceTree = "<group>"; };
-		AAD45A2517A98E5C005905B2 /* ParserASFAMC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserASFAMC.cpp; sourceTree = "<group>"; };
-		AAD45A2617A98E5C005905B2 /* ParserASFAMC.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserASFAMC.cxx; sourceTree = "<group>"; };
 		AAD45A2717A98E5C005905B2 /* ParserASFAMC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserASFAMC.h; sourceTree = "<group>"; };
-		AAD45A2817A98E5C005905B2 /* ParserBVH.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserBVH.cpp; sourceTree = "<group>"; };
 		AAD45A2917A98E5C005905B2 /* ParserBVH.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserBVH.cxx; sourceTree = "<group>"; };
 		AAD45A2A17A98E5C005905B2 /* ParserBVH.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParserBVH.h; sourceTree = "<group>"; };
 		AAD45A2B17A98E5C005905B2 /* ParserFBX.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParserFBX.cpp; sourceTree = "<group>"; };
@@ -1492,6 +1557,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AA0AA8A118512DBD0061EE9A /* protocols */ = {
+			isa = PBXGroup;
+			children = (
+				AA0AA8A218512DD10061EE9A /* sbmesh.pb.cc */,
+				AA0AA8A318512DD10061EE9A /* sbmesh.pb.h */,
+				AA0AA8A418512DD10061EE9A /* sbmesh.proto */,
+				AA0AA8A518512DD10061EE9A /* sbmotion.pb.cc */,
+				AA0AA8A618512DD10061EE9A /* sbmotion.pb.h */,
+				AA0AA8A718512DD10061EE9A /* sbmotion.proto */,
+				AA0AA8A818512DD10061EE9A /* sbutilities.pb.cc */,
+				AA0AA8A918512DD10061EE9A /* sbutilities.pb.h */,
+				AA0AA8AA18512DD10061EE9A /* sbutilities.proto */,
+			);
+			name = protocols;
+			sourceTree = "<group>";
+		};
 		AA9CD5D9141FF8610064C27A = {
 			isa = PBXGroup;
 			children = (
@@ -1537,6 +1618,7 @@
 		AAD457CA17A98E5A005905B2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				AA0AA8A118512DBD0061EE9A /* protocols */,
 				AAD457CB17A98E5A005905B2 /* bml */,
 				AAD4580417A98E5B005905B2 /* controllers */,
 				AAD458B717A98E5B005905B2 /* external */,
@@ -1964,6 +2046,34 @@
 		AAD4595E17A98E5B005905B2 /* sb */ = {
 			isa = PBXGroup;
 			children = (
+				AA0AA8B8185154490061EE9A /* SBAssetHandlerBvh.cpp */,
+				AA0AA8B9185154490061EE9A /* SBAssetHandlerBvh.h */,
+				AA0AA89318512DA20061EE9A /* SBAssetHandlerSBMeshBinary.cpp */,
+				AA0AA89418512DA20061EE9A /* SBAssetHandlerSBMeshBinary.h */,
+				AA0AA89518512DA20061EE9A /* SBAssetHandlerSkmb.cpp */,
+				AA0AA89618512DA20061EE9A /* SBAssetHandlerSkmb.h */,
+				AA0AA89718512DA20061EE9A /* SBNavigationMeshManager.cpp */,
+				AA0AA89818512DA20061EE9A /* SBNavigationMeshManager.h */,
+				AA0AA89918512DA20061EE9A /* SBPythonMesh.cpp */,
+				AA2D778F180F1C3900D12F24 /* SBAssetHandler.cpp */,
+				AA2D7790180F1C3900D12F24 /* SBAssetHandler.h */,
+				AA2D7791180F1C3900D12F24 /* SBAssetHandlerAmc.cpp */,
+				AA2D7792180F1C3900D12F24 /* SBAssetHandlerAmc.h */,
+				AA2D7793180F1C3900D12F24 /* SBAssetHandlerAsf.cpp */,
+				AA2D7794180F1C3900D12F24 /* SBAssetHandlerAsf.h */,
+				AA2D7795180F1C3900D12F24 /* SBAssetHandlerCOLLADA.cpp */,
+				AA2D7796180F1C3900D12F24 /* SBAssetHandlerCOLLADA.h */,
+				AA2D7797180F1C3900D12F24 /* SBAssetHandlerObj.cpp */,
+				AA2D7798180F1C3900D12F24 /* SBAssetHandlerObj.h */,
+				AA2D7799180F1C3900D12F24 /* SBAssetHandlerOgre.cpp */,
+				AA2D779A180F1C3900D12F24 /* SBAssetHandlerOgre.h */,
+				AA2D779B180F1C3900D12F24 /* SBAssetHandlerSk.cpp */,
+				AA2D779C180F1C3900D12F24 /* SBAssetHandlerSk.h */,
+				AA2D779D180F1C3900D12F24 /* SBAssetHandlerSkm.cpp */,
+				AA2D779E180F1C3900D12F24 /* SBAssetHandlerSkm.h */,
+				AA2D779F180F1C3900D12F24 /* SBSceneListener.h */,
+				AA2D77A0180F1C3900D12F24 /* SBVersion.hpp */,
+				AA2D77A1180F1C3900D12F24 /* SBVersionTemplate.hpp */,
 				AAD4595F17A98E5C005905B2 /* DefaultAttributeTable.cpp */,
 				AAD4596017A98E5C005905B2 /* DefaultAttributeTable.h */,
 				AAD4596117A98E5C005905B2 /* MiniBrain.cpp */,
@@ -2001,7 +2111,6 @@
 				AAD4598117A98E5C005905B2 /* SBBoneBusManager.h */,
 				AAD4598217A98E5C005905B2 /* SBCharacter.cpp */,
 				AAD4598317A98E5C005905B2 /* SBCharacter.h */,
-				AAD4598417A98E5C005905B2 /* SBCharacterListener.h */,
 				AAD4598517A98E5C005905B2 /* SBCollisionManager.cpp */,
 				AAD4598617A98E5C005905B2 /* SBCollisionManager.h */,
 				AAD4598717A98E5C005905B2 /* SBColObject.cpp */,
@@ -2116,6 +2225,7 @@
 		AAD459F017A98E5C005905B2 /* sbm */ = {
 			isa = PBXGroup;
 			children = (
+				AA0AA8B1185144190061EE9A /* ParserASFAMC.cxx */,
 				AA9AC3B117E78F030077D800 /* ParserCOLLADAFast.cpp */,
 				AA9AC3B217E78F030077D800 /* ParserCOLLADAFast.h */,
 				AAD459F117A98E5C005905B2 /* action_unit.cpp */,
@@ -2146,10 +2256,7 @@
 				AAD45A2217A98E5C005905B2 /* MiscCommands.h */,
 				AAD45A2317A98E5C005905B2 /* ODEPhysicsSim.cpp */,
 				AAD45A2417A98E5C005905B2 /* ODEPhysicsSim.h */,
-				AAD45A2517A98E5C005905B2 /* ParserASFAMC.cpp */,
-				AAD45A2617A98E5C005905B2 /* ParserASFAMC.cxx */,
 				AAD45A2717A98E5C005905B2 /* ParserASFAMC.h */,
-				AAD45A2817A98E5C005905B2 /* ParserBVH.cpp */,
 				AAD45A2917A98E5C005905B2 /* ParserBVH.cxx */,
 				AAD45A2A17A98E5C005905B2 /* ParserBVH.h */,
 				AAD45A2B17A98E5C005905B2 /* ParserFBX.cpp */,
@@ -2598,7 +2705,6 @@
 				AAD45CB617A98E5D005905B2 /* SBBmlProcessor.h in Headers */,
 				AAD45CB817A98E5D005905B2 /* SBBoneBusManager.h in Headers */,
 				AAD45CBA17A98E5D005905B2 /* SBCharacter.h in Headers */,
-				AAD45CBB17A98E5D005905B2 /* SBCharacterListener.h in Headers */,
 				AAD45CBD17A98E5D005905B2 /* SBCollisionManager.h in Headers */,
 				AAD45CBF17A98E5D005905B2 /* SBColObject.h in Headers */,
 				AAD45CC117A98E5D005905B2 /* SBCommandManager.h in Headers */,
@@ -2779,6 +2885,24 @@
 				AAD45E3C17A98E5D005905B2 /* sr_viewer.h in Headers */,
 				AA93021617E02E3000958769 /* me_ct_pose_postprocessing.hpp in Headers */,
 				AA9AC3B417E78F040077D800 /* ParserCOLLADAFast.h in Headers */,
+				AA2D77A3180F1C3A00D12F24 /* SBAssetHandler.h in Headers */,
+				AA2D77A5180F1C3A00D12F24 /* SBAssetHandlerAmc.h in Headers */,
+				AA2D77A7180F1C3A00D12F24 /* SBAssetHandlerAsf.h in Headers */,
+				AA2D77A9180F1C3A00D12F24 /* SBAssetHandlerCOLLADA.h in Headers */,
+				AA2D77AB180F1C3A00D12F24 /* SBAssetHandlerObj.h in Headers */,
+				AA2D77AD180F1C3A00D12F24 /* SBAssetHandlerOgre.h in Headers */,
+				AA2D77AF180F1C3A00D12F24 /* SBAssetHandlerSk.h in Headers */,
+				AA2D77B1180F1C3A00D12F24 /* SBAssetHandlerSkm.h in Headers */,
+				AA2D77B2180F1C3A00D12F24 /* SBSceneListener.h in Headers */,
+				AA2D77B3180F1C3A00D12F24 /* SBVersion.hpp in Headers */,
+				AA2D77B4180F1C3A00D12F24 /* SBVersionTemplate.hpp in Headers */,
+				AA0AA89B18512DA20061EE9A /* SBAssetHandlerSBMeshBinary.h in Headers */,
+				AA0AA89D18512DA20061EE9A /* SBAssetHandlerSkmb.h in Headers */,
+				AA0AA89F18512DA20061EE9A /* SBNavigationMeshManager.h in Headers */,
+				AA0AA8AC18512DD10061EE9A /* sbmesh.pb.h in Headers */,
+				AA0AA8AE18512DD10061EE9A /* sbmotion.pb.h in Headers */,
+				AA0AA8B018512DD10061EE9A /* sbutilities.pb.h in Headers */,
+				AA0AA8BB185154490061EE9A /* SBAssetHandlerBvh.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3108,9 +3232,6 @@
 				AAD45D5117A98E5D005905B2 /* mcontrol_callbacks.cpp in Sources */,
 				AAD45D5417A98E5D005905B2 /* MiscCommands.cpp in Sources */,
 				AAD45D5617A98E5D005905B2 /* ODEPhysicsSim.cpp in Sources */,
-				AAD45D5817A98E5D005905B2 /* ParserASFAMC.cpp in Sources */,
-				AAD45D5917A98E5D005905B2 /* ParserASFAMC.cxx in Sources */,
-				AAD45D5B17A98E5D005905B2 /* ParserBVH.cpp in Sources */,
 				AAD45D5C17A98E5D005905B2 /* ParserBVH.cxx in Sources */,
 				AAD45D5E17A98E5D005905B2 /* ParserFBX.cpp in Sources */,
 				AAD45D6017A98E5D005905B2 /* ParserOgre.cpp in Sources */,
@@ -3208,6 +3329,23 @@
 				AAD45E3B17A98E5D005905B2 /* sr_viewer.cpp in Sources */,
 				AA93021517E02E3000958769 /* me_ct_pose_postprocessing.cpp in Sources */,
 				AA9AC3B317E78F040077D800 /* ParserCOLLADAFast.cpp in Sources */,
+				AA2D77A2180F1C3900D12F24 /* SBAssetHandler.cpp in Sources */,
+				AA2D77A4180F1C3A00D12F24 /* SBAssetHandlerAmc.cpp in Sources */,
+				AA2D77A6180F1C3A00D12F24 /* SBAssetHandlerAsf.cpp in Sources */,
+				AA2D77A8180F1C3A00D12F24 /* SBAssetHandlerCOLLADA.cpp in Sources */,
+				AA2D77AA180F1C3A00D12F24 /* SBAssetHandlerObj.cpp in Sources */,
+				AA2D77AC180F1C3A00D12F24 /* SBAssetHandlerOgre.cpp in Sources */,
+				AA2D77AE180F1C3A00D12F24 /* SBAssetHandlerSk.cpp in Sources */,
+				AA2D77B0180F1C3A00D12F24 /* SBAssetHandlerSkm.cpp in Sources */,
+				AA0AA89A18512DA20061EE9A /* SBAssetHandlerSBMeshBinary.cpp in Sources */,
+				AA0AA89C18512DA20061EE9A /* SBAssetHandlerSkmb.cpp in Sources */,
+				AA0AA89E18512DA20061EE9A /* SBNavigationMeshManager.cpp in Sources */,
+				AA0AA8A018512DA20061EE9A /* SBPythonMesh.cpp in Sources */,
+				AA0AA8AB18512DD10061EE9A /* sbmesh.pb.cc in Sources */,
+				AA0AA8AD18512DD10061EE9A /* sbmotion.pb.cc in Sources */,
+				AA0AA8AF18512DD10061EE9A /* sbutilities.pb.cc in Sources */,
+				AA0AA8B2185144190061EE9A /* ParserASFAMC.cxx in Sources */,
+				AA0AA8BA185154490061EE9A /* SBAssetHandlerBvh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3247,9 +3385,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DSTROOT = /tmp/smartbody_lib.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "smartbody-lib/smartbody-lib-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					DEBUG,
+					SB_NO_BONEBUS,
+					SB_NO_VHMSG,
+					SB_NO_ODE_PHYSICS,
+				);
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_UNUSED_VARIABLE = NO;
@@ -3273,6 +3418,7 @@
 					../../lib/wsp/wsp/include,
 					../../lib/bonebus/include,
 					../OpenGL,
+					../protobuf/iphoneos/include,
 				);
 				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = (
 					../boost/boost_1_51_0,
@@ -3291,6 +3437,7 @@
 					"../../lib/vhmsg/vhmsg-c/include",
 					../../lib/wsp/wsp/include,
 					../../lib/bonebus/include,
+					../protobuf/iphoneos/include,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../libs/iphoneos\"";
@@ -3299,7 +3446,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYMROOT = $PROJECT_DIR/build;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				USER_HEADER_SEARCH_PATHS = "../boost/boost_1_51_0 ../boost/boost-numeric-bindings ../xerces-c/iphoneos/include ../ode/iphoneos/include /usr/lib/python2.6 ../python/Python-2.6.5/_install/include/python2.6 ../python/Python-2.6.5 ../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0 ../../core/smartbody/sbm-debugger/lib ../../core/smartbody/SmartBody/src ../../core/smartbody/steersuite-1.3/pprAI/include ../../core/smartbody/steersuite-1.3/steerlib/include ../../core/smartbody/steersuite-1.3/external ../../lib/vhcl/include ../../lib/vhmsg/vhmsg-c/include ../../lib/wsp/wsp/include ../../lib/bonebus/include";
+				USER_HEADER_SEARCH_PATHS = "../boost/boost_1_51_0 ../boost/boost-numeric-bindings ../xerces-c/iphoneos/include ../ode/iphoneos/include /usr/lib/python2.6 ../python/Python-2.6.5/_install/include/python2.6 ../python/Python-2.6.5 ../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0 ../../core/smartbody/sbm-debugger/lib ../../core/smartbody/SmartBody/src ../../core/smartbody/steersuite-1.3/pprAI/include ../../core/smartbody/steersuite-1.3/steerlib/include ../../core/smartbody/steersuite-1.3/external ../../lib/vhcl/include ../../lib/vhmsg/vhmsg-c/include ../../lib/wsp/wsp/include ../../lib/bonebus/include ../protobuf/iphoneos/include";
 			};
 			name = Debug;
 		};
@@ -3307,9 +3454,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DSTROOT = /tmp/smartbody_lib.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "smartbody-lib/smartbody-lib-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					SB_NO_BONEBUS,
+					SB_NO_VHMSG,
+					SB_NO_ODE_PHYSICS,
+				);
 				GCC_THUMB_SUPPORT = NO;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_UNUSED_VARIABLE = NO;
@@ -3332,6 +3485,7 @@
 					"../../lib/vhmsg/vhmsg-c/include",
 					../../lib/wsp/wsp/include,
 					../../lib/bonebus/include,
+					../protobuf/iphoneos/include,
 				);
 				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = (
 					../boost/boost_1_51_0,
@@ -3350,6 +3504,7 @@
 					"../../lib/vhmsg/vhmsg-c/include",
 					../../lib/wsp/wsp/include,
 					../../lib/bonebus/include,
+					../protobuf/iphoneos/include,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../libs/iphoneos\"";
@@ -3358,7 +3513,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYMROOT = $PROJECT_DIR/build;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				USER_HEADER_SEARCH_PATHS = "../boost/boost_1_51_0 ../boost/boost-numeric-bindings ../xerces-c/iphoneos/include ../ode/iphoneos/include /usr/lib/python2.6 ../python/Python-2.6.5/_install/include/python2.6 ../python/Python-2.6.5 ../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0 ../../core/smartbody/sbm-debugger/lib ../../core/smartbody/SmartBody/src ../../core/smartbody/steersuite-1.3/pprAI/include ../../core/smartbody/steersuite-1.3/steerlib/include ../../core/smartbody/steersuite-1.3/external ../../lib/vhcl/include ../../lib/vhmsg/vhmsg-c/include ../../lib/wsp/wsp/include ../../lib/bonebus/include";
+				USER_HEADER_SEARCH_PATHS = "../boost/boost_1_51_0 ../boost/boost-numeric-bindings ../xerces-c/iphoneos/include ../ode/iphoneos/include /usr/lib/python2.6 ../python/Python-2.6.5/_install/include/python2.6 ../python/Python-2.6.5 ../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0 ../../core/smartbody/sbm-debugger/lib ../../core/smartbody/SmartBody/src ../../core/smartbody/steersuite-1.3/pprAI/include ../../core/smartbody/steersuite-1.3/steerlib/include ../../core/smartbody/steersuite-1.3/external ../../lib/vhcl/include ../../lib/vhmsg/vhmsg-c/include ../../lib/wsp/wsp/include ../../lib/bonebus/include ../protobuf/iphoneos/include";
 			};
 			name = Release;
 		};

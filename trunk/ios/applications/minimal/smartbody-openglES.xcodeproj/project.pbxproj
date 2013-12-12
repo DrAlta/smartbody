@@ -21,6 +21,7 @@
 		AA9AC3B617E7A7280077D800 /* libalut.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA9AC3B517E7A7280077D800 /* libalut.a */; };
 		AA9CDAAF141FFFB90064C27A /* minimalwrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA9CDAAD141FFFB90064C27A /* minimalwrapper.cpp */; };
 		AAA6ACD016EFF951006E8ACF /* assests in Resources */ = {isa = PBXBuildFile; fileRef = AAA6ACCF16EFF951006E8ACF /* assests */; };
+		AAC4061718594098002E407D /* libprotobuf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC4061618594098002E407D /* libprotobuf.a */; };
 		AAC9AC50142010C000F56F9C /* libactivemq-cpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC40142010C000F56F9C /* libactivemq-cpp.a */; };
 		AAC9AC51142010C000F56F9C /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC41142010C000F56F9C /* libapr-1.a */; };
 		AAC9AC52142010C000F56F9C /* libaprutil-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAC9AC42142010C000F56F9C /* libaprutil-1.a */; };
@@ -70,6 +71,7 @@
 		AA9CDAAD141FFFB90064C27A /* minimalwrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = minimalwrapper.cpp; sourceTree = "<group>"; };
 		AA9CDAAE141FFFB90064C27A /* minimalwrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = minimalwrapper.h; sourceTree = "<group>"; };
 		AAA6ACCF16EFF951006E8ACF /* assests */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assests; sourceTree = "<group>"; };
+		AAC4061618594098002E407D /* libprotobuf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libprotobuf.a; path = ../../libs/iphoneos/libprotobuf.a; sourceTree = "<group>"; };
 		AAC9AC40142010C000F56F9C /* libactivemq-cpp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libactivemq-cpp.a"; path = "../../libs/iphoneos/libactivemq-cpp.a"; sourceTree = "<group>"; };
 		AAC9AC41142010C000F56F9C /* libapr-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libapr-1.a"; path = "../../libs/iphoneos/libapr-1.a"; sourceTree = "<group>"; };
 		AAC9AC42142010C000F56F9C /* libaprutil-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libaprutil-1.a"; path = "../../libs/iphoneos/libaprutil-1.a"; sourceTree = "<group>"; };
@@ -131,6 +133,7 @@
 				AAE74E531798E70600D36911 /* CoreAudio.framework in Frameworks */,
 				AAE74E551798EEF300D36911 /* OpenAL.framework in Frameworks */,
 				AA9AC3B617E7A7280077D800 /* libalut.a in Frameworks */,
+				AAC4061718594098002E407D /* libprotobuf.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,6 +200,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				AAC4061618594098002E407D /* libprotobuf.a */,
 				AA9AC3B517E7A7280077D800 /* libalut.a */,
 				AAE74E4E1798E6E300D36911 /* libsndfile.a */,
 				AAD5A304177A39F70056CDD4 /* libboost_filesystem.a */,
