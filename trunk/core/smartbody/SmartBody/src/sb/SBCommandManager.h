@@ -18,6 +18,7 @@ class SequenceManager
 		SBAPI srCmdSeq* getSequence(const std::string& name);
 		SBAPI srCmdSeq* getSequence(int num, std::string& name);
 		SBAPI int getNumSequences();
+		SBAPI void cleanupMarkedSequences();
 
 		SBAPI void clear();
 

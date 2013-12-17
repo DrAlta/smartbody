@@ -62,9 +62,14 @@ bool SequenceManager::removeSequence(const std::string& seqName, bool deleteSequ
 	{
 		if ((*iter).first == seqName)
 		{
+			/*
 			if (deleteSequence)
 				delete (*iter).second;
 			_sequences.erase(iter);
+			*/
+			// need to mark the sequences as invalid for later removal
+			(*iter).second->setValid(false);
+
 			return true;
 		}
 	}
@@ -105,6 +110,32 @@ int SequenceManager::getNumSequences()
 {
 	return _sequences.size();
 }
+
+void SequenceManager::cleanupMarkedSequences()
+{
+	bool hasInvalidSequences = true;
+	while (hasInvalidSequences)
+	{
+		hasInvalidSequences = false;
+		for (std::vector<std::pair<std::string, srCmdSeq*> >::iterator iter = _sequences.begin();
+			iter != _sequences.end();
+			iter++)
+		{
+			if (!(*iter).second->isValid())
+			{
+				srCmdSeq* seq = (*iter).second;
+				delete seq;
+				_sequences.erase(iter);
+				hasInvalidSequences = true;
+				break;
+			}
+		}
+	}
+}
+
+
+
+
 namespace SmartBody {
 
 
@@ -300,7 +331,6 @@ int SBCommandManager::execute( const char *key, char* strArgs )
 
 int SBCommandManager::execute( char *cmd )
 { 
-
 	//LOG("execute cmd = %s\n",cmd);
 	// check to see if this is a sequence command
 	// if so, save the command id
@@ -486,7 +516,7 @@ int SBCommandManager::abortSequence( const char* name ) {
 
 	srCmdSeq* pending = pendingSequences.getSequence( name );
 	if( pending )
-		success = activeSequences.removeSequence( name, true );
+		success = pendingSequences.removeSequence( name, true );
 
 	return CMD_SUCCESS; 
 }

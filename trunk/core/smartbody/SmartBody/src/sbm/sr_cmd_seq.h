@@ -27,6 +27,7 @@
 #include <sb/SBTypes.h>
 #include <stdio.h>
 #include "sbm_constants.h"
+#include <string>
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -63,11 +64,14 @@ class srCmdSeq	{
 		/** Set pop by event.time + offset */
 		void	offset( float t ) { event_offset = t; }
 		/** remove first event passed */
-		char	*pop( float time );
+		std::string pop( float time );
 
 		void	reset(void) { iterator = handle; }
 		char	*next( float *t = NULL );	// return pointer, time
 		char	*pull( float *t = NULL );	// return instance, time
+
+		bool	isValid() { return _valid; }
+		void	setValid(bool val) { _valid = val; }
 
 	protected:
 		int		insert( sr_command_event_t *event );	/* sort by event.time, add after same time */
@@ -78,6 +82,7 @@ class srCmdSeq	{
 		float	event_offset;
 		sr_command_event_t *handle;
 		sr_command_event_t *iterator;
+		bool	_valid;
 };
 
 //////////////////////////////////////////////////////////////////////////////////
