@@ -638,18 +638,21 @@ void SBScene::update()
 	for (int s = 0; s < numSequences; s++)
 	{
 		srCmdSeq* seq = activeSequences->getSequence(s, seqName);
-		char *cmd;
-		if (seq)
+		std::string cmd = "";
+		if (seq && seq->isValid())
 		{
-			while( cmd = seq->pop( (float) getSimulationManager()->getTime() ) )
-			{
-				//LOG("execute command = %s",cmd);
-				int err = getCommandManager()->execute( cmd );
-				if( err != CMD_SUCCESS )	{
-					LOG( "update ERR: execute FAILED: '%s'\n", cmd );
-				}
-				delete [] cmd;
-			}
+			do {
+				cmd = seq->pop( (float) getSimulationManager()->getTime() );
+				if (cmd != "")			
+				{
+					//LOG("execute command = %s",cmd);
+					int err = getCommandManager()->execute( (char*)  cmd.c_str() );
+					if( err != CMD_SUCCESS )
+					{
+						LOG( "update ERR: execute FAILED: '%s'\n", cmd.c_str() );
+					}
+				} 
+			} while( cmd != "" );
 			if( seq->get_count() < 1 )
 			{
 				sequencesToDelete.push_back(seqName);
@@ -661,6 +664,7 @@ void SBScene::update()
 	{
 		activeSequences->removeSequence(sequencesToDelete[d], true);
 	}
+	activeSequences->cleanupMarkedSequences();
 
 	bool isClosingBoneBus = false;
 	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();

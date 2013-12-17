@@ -43,6 +43,7 @@ srCmdSeq::srCmdSeq( void )	{
 	handle->time = 0.0;
 	handle->cmd = NULL;
 	iterator = NULL;
+	_valid = true;
 }
 
 srCmdSeq::~srCmdSeq( void )	{
@@ -283,7 +284,7 @@ int srCmdSeq::insert_ref( float time, char *cmd_ref )	{
 	return( insert( event ) );
 }
 
-char *srCmdSeq::pop( float time )	{
+std::string srCmdSeq::pop( float time )	{
 	sr_command_event_t *event;
 	float offset_time = time - event_offset;
 	event = handle->next;
@@ -291,13 +292,15 @@ char *srCmdSeq::pop( float time )	{
 		//LOG("event time = %f, time = %f",event->time, time);
 		if( event->time <= offset_time )	{
 			handle->next = event->next;
-			char *cmd = event->cmd;
+			std::string cmdStr = "";
+			if (event->cmd)
+				cmdStr = event->cmd;
 			delete event;
 			event_count--;
-			return( cmd );
+			return( cmdStr );
 		}
 	}
-	return( NULL );
+	return( "" );
 }
 
 //////////////////////////////////////////////////////////////////////////////////
