@@ -1893,7 +1893,8 @@ bool SBMotion::readFromSkb(const std::string& fileName)
 		_channels.add(inputMotion.channelname(c), (SkChannel::Type) inputMotion.channeltype(c));
 	}
 
-	int postureSize = _channels.floats();
+	_postsize = _channels.floats();
+	int postureSize = _postsize;
 
 	_frames.resize(inputMotion.numframes());
 	for (int f = 0; f < inputMotion.numframes(); f++)

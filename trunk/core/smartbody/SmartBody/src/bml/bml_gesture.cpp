@@ -140,12 +140,15 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 
 	if (motion)
 	{
+		SkMotion* mForCt = motion;
 		MeCtMotion* motionCt = new MeCtMotion();
 		if (isAdditive)
 		{
-			motion = motion->getOffset();
+			mForCt = motion->getOffset();
 			motionCt->isAdditive(true);
 		}
+		else
+			mForCt = motion;
 
 		// Name controller with behavior unique_id
 		ostringstream name;
@@ -153,7 +156,6 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		motionCt->setName(name.str().c_str());  // TODO: include BML act and behavior ids
 		
 		// pre stroke hold
-		SkMotion* mForCt = motion;
 		float prestrokehold = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_PRESTROKE_HOLD, elem, -1.0);
 		std::string prestrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_PRESTROKE_HOLD_IDLEMOTION, elem);
 		SkMotion* preIdleMotion = (SkMotion*)SmartBody::SBScene::getScene()->getMotion(prestrokehold_idlemotion);
