@@ -356,7 +356,7 @@ void VoxelizerWindow::voxelCarving( int dir, float* sliceA, float* sliceB )
 			}
 			
 			int zFront = (int)(floor(zvalueA+0.5f)-1.f);
-			int zBack = depth - (int)(floor(zvalueB+0.5f)+1.f);
+			int zBack = (int)(depth - floor(zvalueB+0.5f) + 1.f);
 			voxelIdx[widx] = j;
 			voxelIdx[hidx] = i;			
 			for (int k=0;k<zFront;k++)

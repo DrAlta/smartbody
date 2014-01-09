@@ -46,7 +46,7 @@ SBAutoRigManager::~SBAutoRigManager()
 bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
 #ifdef USE_AUTO_RIGGING
-	int voxelSize = 180;
+	int voxelSize = 150;
 	VoxelizerWindow* voxelWindow = new VoxelizerWindow(0,0,voxelSize,voxelSize,"voxelWindow");
 	voxelWindow->initVoxelizer(&inModel,voxelSize);
 	voxelWindow->show();
