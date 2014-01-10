@@ -70,17 +70,20 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			motion->setName(basename + extension);
 			int order;
 			ParserCOLLADAFast::parseLibraryVisualScenes(visualSceneNode, *skeleton, *motion, 1.0, order, materialId2Name);
-			if (skeleton->getNumJoints() == 0)
-				delete skeleton;
-			else
-				assets.push_back(skeleton);
-
 
 			rapidxml::xml_node<>* skmNode = ParserCOLLADAFast::getNode("library_animations", colladaNode, 0, 1);
 			if (skmNode)
 			{
 				ParserCOLLADAFast::parseLibraryAnimations(skmNode, *skeleton, *motion, 1.0, order, false);
 			}
+
+			if (skeleton->getNumJoints() == 0)
+				delete skeleton;
+			else
+				assets.push_back(skeleton);
+
+
+			
 		
 
 			if (motion->getNumFrames() == 0)
@@ -135,9 +138,12 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				LOG("mcu_character_load_skinweights ERR: no binding info contained");
 				return assets;
 			}
+			else
+			{
+				const char* jointNamePrefix = "";
+				ParserCOLLADAFast::parseLibraryControllers(controllerNode, mesh, factor, jointNamePrefix);
+			}
 
-			const char* jointNamePrefix = "";
-			ParserCOLLADAFast::parseLibraryControllers(controllerNode, mesh, factor, jointNamePrefix);
 	
 			std::map<std::string, std::vector<std::string> >::iterator morphTargetIter;
 			// handling morph targets
