@@ -136,7 +136,6 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			if (!controllerNode)
 			{
 				LOG("mcu_character_load_skinweights ERR: no binding info contained");
-				return assets;
 			}
 			else
 			{
