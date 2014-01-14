@@ -333,13 +333,15 @@ void RetargetStepWindow::applyAutoRig(bool voxelRigging)
 
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	bool autoRigSuccess = false;
-
+	SrMat worldRotation = sbPawn->get_world_offset().get_rotation(); 
 	if (!assetManager->getDeformableMesh(deformMeshName))
 	{			
 		//model.scale(meshInstance->getMeshScale()); // resize the vertices
 		float meshScale = meshInstance->getMeshScale();
 		for (int i=0;i<scaleModel.V.size();i++)
 			scaleModel.V[i] *= meshScale;
+		for (int i=0;i<scaleModel.V.size();i++)
+			scaleModel.V[i] = scaleModel.V[i]*worldRotation;
 
 		if (voxelRigging)
 			autoRigSuccess = autoRigManager.buildAutoRiggingVoxels(scaleModel,skelName,deformMeshName);
