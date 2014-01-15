@@ -378,7 +378,7 @@ void PABlendEditor::changeStateList(Fl_Widget* widget, void* data)
 		}
 		SmartBody::SBAnimationBlend3D* state3d = dynamic_cast<SmartBody::SBAnimationBlend3D*>(currentState);
 		
-		bool use3DVisualization = state3d || (blendBase && blendBase->getNumDimensions() == 3);
+		bool use3DVisualization = state3d || (blendBase && blendBase->getParameterDimension() == 3);
 		if (use3DVisualization)
 		{
 			editor->choiceStateType->value(4);
