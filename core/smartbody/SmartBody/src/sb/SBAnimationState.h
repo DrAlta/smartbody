@@ -22,6 +22,10 @@ class SBAnimationBlend : public PABlend
 		SBAPI SBAnimationBlend(const std::string& name);
 		SBAPI ~SBAnimationBlend();
 
+		SBAPI int getParameterDimension();
+		SBAPI bool getWeightsFromParameters(SrVec& para, std::vector<float>& weights);
+		SBAPI SrBox getParameterBoundBox();
+
 		SBAPI void setBlendSkeleton(std::string skelName);
 		SBAPI std::string getBlendSkeleton();
 
@@ -94,12 +98,11 @@ class SBAnimationBlend : public PABlend
 		SBAPI const SrMat& getPlotVectorFlowTransform() { return plotVectorFlowTransform; }
 		SBAPI void clearPlotVectorFlowTransform() { plotVectorFlowTransform.identity(); }
 
+		bool addMotionRef( SBMotion* sbmotion );
 	protected:
-		bool addSkMotion(const std::string& motionName);
-		bool removeSkMotion(const std::string& motionName);
-		/*
-			This function make sure that all the correspondence points are in ascendant order
-		*/
+		bool addSkMotion(const std::string& motionName);		
+		bool removeSkMotion(const std::string& motionName);		
+		/*	This function make sure that all the correspondence points are in ascendant order		*/
 		void validateCorrespondencePoints();		
 
 	protected:
@@ -107,11 +110,11 @@ class SBAnimationBlend : public PABlend
 		std::string _dimension;
 		std::string blendSkelName;
 		bool _isFinalized;
+		int parameterDim;
 
 		std::vector<SrSnColorSurf*> errorSurfaces;
 		std::vector<SrSnColorSurf*> smoothSurfaces;
 		std::vector<KeyTagMap> keyTagList;
-
 		SrMat plotMotionTransform;
 		SrMat plotVectorFlowTransform;
 		std::vector<SrSnShape<SrLines>*> vecflowLinesArray;
@@ -133,8 +136,7 @@ class SBAnimationBlend0D : public SBAnimationBlend
 	public:
 		SBAPI SBAnimationBlend0D();
 		SBAPI SBAnimationBlend0D(const std::string& name);
-		SBAPI ~SBAnimationBlend0D();
-
+		SBAPI ~SBAnimationBlend0D();		
 		SBAPI virtual void addMotion(const std::string& motion);
 		SBAPI virtual void removeMotion(const std::string& motionName);
 		
@@ -146,7 +148,8 @@ class SBAnimationBlend1D : public SBAnimationBlend
 		SBAPI SBAnimationBlend1D();
 		SBAPI SBAnimationBlend1D(const std::string& name);
 		SBAPI ~SBAnimationBlend1D();
-
+		
+		virtual void addMotionFromRef(SmartBody::SBMotion* motion, float parameter);
 		SBAPI virtual void addMotion(const std::string& motion, float parameter);
 		SBAPI virtual void removeMotion(const std::string& motionName);
 		SBAPI void setParameter(const std::string& motion, float parameter);

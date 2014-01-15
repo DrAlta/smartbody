@@ -25,7 +25,7 @@ public:
 	SteerPath(void);
 	~SteerPath(void);
 	
-	void initPath(std::vector<SrPnt>& pts, float radius);	
+	void initPath(const std::vector<SrPnt>& pts, float radius);	
 	void clearPath();
 		
 	virtual SrVec closestPointOnPath(const SrVec& pt, SrVec& tangent, float& dist);	

@@ -64,7 +64,7 @@ void SBController::setJointChannelPos( const std::string& jointName, MeFrameData
 	if (positionChannelID < 0) hasTranslation = false;
 	int posBufferID = frame.toBufferIndex(positionChannelID);
 	if (posBufferID < 0) hasTranslation = false;
-	LOG("SBController : posChannelID = %d, posBufferID = %d",positionChannelID, posBufferID);
+	//LOG("SBController : posChannelID = %d, posBufferID = %d",positionChannelID, posBufferID);
 	if (hasTranslation)
 	{		
 		frame.buffer()[posBufferID + 0] = outPos[0];
@@ -88,6 +88,16 @@ void SBController::setJointChannelQuat( const std::string& jointName, MeFrameDat
 		frame.buffer()[bufferId + 2] = inQuat.y;;
 		frame.buffer()[bufferId + 3] = inQuat.z;;
 	}
+}
+
+
+SBAPI void SBController::getJointChannelValues( const std::string& jointName, MeFrameData& frame, SrMat& outMat )
+{
+	SrVec outPos;
+	SrQuat outQuat;
+	getJointChannelValues(jointName,frame,outQuat, outPos);
+	outQuat.get_mat(outMat);
+	outMat.set_translation(outPos);
 }
 
 void SBController::getJointChannelValues( const std::string& jointName, MeFrameData& frame, SrQuat& outQuat, SrVec& outPos )

@@ -67,6 +67,12 @@ class SBMotion : public SkMotion
 		SBAPI std::vector<float> getFrameData(int i);
 		SBAPI int getFrameSize();
 		void setMotionType(MotionType type);
+		
+		SBAPI void getAllChannelQuat(const std::vector<std::string>& channeNames, float t, std::vector<SrQuat>& outQuatList);
+		SBAPI void getAllChannelPos(const std::vector<std::string>& channeNames, float t, std::vector<SrVec>& outPosList);
+		SBAPI SrQuat getChannelQuat(const std::string& channelName, float t);
+		SBAPI SrVec  getChannelPos(const std::string& channelName, float t);
+		SBAPI SrMat  getChannelMat(const std::string& channelName, float t);
 
 		SBAPI void addChannel(const std::string& channelName, const std::string& channelType);
 		SBAPI void addFrame(float frameTime, const std::vector<float>& frameData);
@@ -103,6 +109,7 @@ class SBMotion : public SkMotion
 		SBAPI bool rotate(float xaxis, float yaxis, float zaxis, const std::string& baseJointName);
 		SBAPI bool scale(float factor);		
 		SBAPI bool retime(float factor);
+		SBAPI bool downsample(int factor);
 		SBAPI bool trim(int numFramesFromFront, int numFramesFromBack);
 	//	bool move(int startFrame, int endFrame, int position);
 		SBAPI void saveToSkm(const std::string& fileName);
@@ -178,6 +185,7 @@ class SBMotion : public SkMotion
 		bool getInterpolationFrames(float time, int& f1, int& f2, float& weight);
 		static bool kMeansClustering1D(int num, std::vector<double>& inputPoints, std::vector<double>& outMeans);
 		static void calculateMeans(std::vector<double>&inputPoints, std::vector<double>& means, double convergentValue);
+		int getKeyFrameFromTime(float t, int firstFrame, int lastFrame);
 
 		// the counter used to keep track of how deep this motion is under consecutive transformation ( mirror, smooth, etc )
 		int transformDepth;

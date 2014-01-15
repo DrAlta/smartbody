@@ -29,7 +29,7 @@
 #include <sr/sr_vec.h>
 #include <string>
 #include <vector>
-#include <sk/sk_motion.h>
+#include <sb/SBMotion.h>
 #include <sb/SBObject.h>
 
 namespace SmartBody {
@@ -66,7 +66,7 @@ class PABlend : public SmartBody::SBObject
 		SBAPI PABlend(PABlend* data);
 		SBAPI PABlend(const std::string& name);
 		SBAPI ~PABlend();
-
+		
 		SBAPI virtual bool getWeightsFromParameters(double x, std::vector<double>& weights);
 		SBAPI virtual bool getWeightsFromParameters(double x, double y, std::vector<double>& weights);
 		SBAPI virtual bool getWeightsFromParameters(double x, double y, double z, std::vector<double>& weights);
@@ -119,7 +119,7 @@ class PABlend : public SmartBody::SBObject
 		SBAPI void addEventToMotion(const std::string& motion, SmartBody::SBMotionEvent* motionEvent);
 
 		std::string stateName;
-		std::vector<SkMotion*> motions;
+		std::vector<SmartBody::SBMotion*> motions;
 		std::vector<std::vector<double> > keys;
 
 		bool cycle;
@@ -147,6 +147,7 @@ class PABlend : public SmartBody::SBObject
 		std::vector<TetrahedronInfo> tetrahedrons;
 		std::string emptyString;
 		std::vector<std::pair<SmartBody::SBMotionEvent*, int> > _events;
+		SrVec paraMax, paraMin;
 };
 
 

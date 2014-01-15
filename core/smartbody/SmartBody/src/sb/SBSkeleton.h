@@ -41,6 +41,7 @@ public:
 	SBAPI std::string getChannelType(int index);
 	SBAPI int getChannelSize(int index);
 
+	SBAPI void getJointPositions(const std::vector<std::string>& jointNames, std::vector<SrVec>& jointPositions, int startIdx = 0);
 	SBAPI SBPawn* getPawn();
 
 	SBAPI void rescale(float scaleRatio);

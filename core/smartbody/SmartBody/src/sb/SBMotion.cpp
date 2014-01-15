@@ -2608,9 +2608,9 @@ bool SBMotion::getInterpolationFrames( float time, int& f1, int& f2, float& weig
 	}
 
 	float dt = duration() / float(getNumFrames() - 1);
-	int frameId = int(time / dt);	
+	int frameId = int(time / dt) % getNumFrames();	
 	float t1,t2;
-	if (frameId == getNumFrames() -1 ) // last frame
+	if (frameId >= getNumFrames() -1 ) // last frame
 	{
 		time = _frames[getNumFrames()-1].keytime;		
 		t1 = time;
@@ -2658,4 +2658,174 @@ void SBMotion::setEmptyMotion(float duration, int numFrames)
 }
 
 
+SBAPI SrQuat SBMotion::getChannelQuat( const std::string& channelName, float t )
+{
+	int idx = _channels.search(channelName, SkChannel::Quat);
+	if (idx < 0) return SrQuat();
+	int floatIdx = _channels.float_position(idx);
+	if (floatIdx < 0) return SrQuat();
+
+	int frame1 = getKeyFrameFromTime(t, 0, _frames.size()-1); // get closest key frame
+	int frame2 = frame1+1; // next frame
+	if (frame2 >= _frames.size()-1) // last frame
+	{
+		frame2 = _frames.size()-1; 		
+	}
+	
+	float* fp1 = _frames[frame1].posture;
+	float* fp2 = _frames[frame2].posture;
+	float keyDuration = (frame1 != frame2) ? _frames[frame2].keytime - _frames[frame1].keytime : 1.f;
+	float interpWeight = (t - _frames[frame1].keytime)/keyDuration;
+
+	float q[4];
+	_channels[idx].interp(q,&fp1[floatIdx], &fp2[floatIdx], interpWeight);
+	return SrQuat(q[0],q[1],q[2],q[3]);	
+}
+
+
+SBAPI SrMat SBMotion::getChannelMat( const std::string& channelName, float t )
+{
+	SrQuat rot = getChannelQuat(channelName,t);
+	SrVec  pos = getChannelPos(channelName,t);
+	SrMat mat;
+	rot.get_mat(mat);
+	mat.set(12, pos[0]);
+	mat.set(13, pos[1]);
+	mat.set(14, pos[2]);
+
+	return mat;
+}
+
+
+SBAPI SrVec SBMotion::getChannelPos( const std::string& channelName, float t )
+{
+	SrVec pos;
+	int frame1 = getKeyFrameFromTime(t, 0, _frames.size()-1); // get closest key frame
+	int frame2 = frame1+1; // next frame
+	if (frame2 >= _frames.size()-1) // last frame
+	{
+		frame2 = _frames.size()-1; 		
+	}
+
+	float* fp1 = _frames[frame1].posture;
+	float* fp2 = _frames[frame2].posture;
+	float keyDuration = (frame1 != frame2) ? _frames[frame2].keytime - _frames[frame1].keytime : 1.f;
+	float interpWeight = (t - _frames[frame1].keytime)/keyDuration;
+
+	for (unsigned int i=0;i<3;i++)
+	{
+		int chanType = SkChannel::XPos + i; 	
+		int idx = _channels.search(channelName, (SkChannel::Type) chanType);
+		if (idx < 0) continue;
+		int floatIdx = _channels.float_position(idx);
+		if (floatIdx < 0) continue;
+		float q[4];
+		_channels[idx].interp(q,&fp1[floatIdx], &fp2[floatIdx], interpWeight);
+		pos[i] = q[0];
+	}
+	return pos;
+}
+
+// find the closest key frame with key time < t
+int SBMotion::getKeyFrameFromTime( float t, int firstFrame, int lastFrame )
+{
+	int f1,f2;
+	float weight;
+	getInterpolationFrames(t,f1,f2,weight);
+	return f1;
+
+	if (firstFrame+1>=lastFrame) // narrow down to the last frame
+		return firstFrame;	
+	unsigned int index = (firstFrame+lastFrame)/2;
+	if (_frames[index].keytime==t)
+		return index;
+	if (_frames[index].keytime < t)
+		return getKeyFrameFromTime(index, lastFrame, t);
+	return getKeyFrameFromTime(firstFrame, index, t);
+}
+
+void SBMotion::getAllChannelPos( const std::vector<std::string>& channeNames, float t, std::vector<SrVec>& outPosList )
+{
+	if (outPosList.size() != channeNames.size())
+		outPosList.resize(channeNames.size());
+
+	int frame1 = getKeyFrameFromTime(t, 0, _frames.size()-1); // get closest key frame
+	int frame2 = frame1+1; // next frame
+	if (frame2 >= _frames.size()-1) // last frame
+	{
+		frame2 = _frames.size()-1; 		
+	}
+
+	float* fp1 = _frames[frame1].posture;
+	float* fp2 = _frames[frame2].posture;
+	float keyDuration = (frame1 != frame2) ? _frames[frame2].keytime - _frames[frame1].keytime : 1.f;
+	float interpWeight = (t - _frames[frame1].keytime)/keyDuration;
+
+	for (unsigned int idx=0;idx<channeNames.size();idx++)
+	{
+		const std::string channelName = channeNames[idx];
+		outPosList[idx] = SrVec();
+		SrVec& pos = outPosList[idx];
+		for (unsigned int i=0;i<3;i++)
+		{
+			int chanType = SkChannel::XPos + i; 	
+			int cidx = _channels.search(channelName, (SkChannel::Type) chanType);
+			if (cidx < 0) continue;
+			int floatIdx = _channels.float_position(cidx);
+			if (floatIdx < 0) continue;
+			float q[4];
+			_channels[cidx].interp(q,&fp1[floatIdx], &fp2[floatIdx], interpWeight);
+			pos[i] = q[0];
+		}
+	}
+}
+
+void SBMotion::getAllChannelQuat( const std::vector<std::string>& channeNames, float t, std::vector<SrQuat>& outQuatList )
+{
+	if (outQuatList.size() != channeNames.size())
+		outQuatList.resize(channeNames.size());
+
+	int frame1 = getKeyFrameFromTime(t, 0, _frames.size()-1); // get closest key frame
+	int frame2 = frame1+1; // next frame
+	if (frame2 >= _frames.size()-1) // last frame
+	{
+		frame2 = _frames.size()-1; 		
+	}
+
+	float* fp1 = _frames[frame1].posture;
+	float* fp2 = _frames[frame2].posture;
+	float keyDuration = (frame1 != frame2) ? _frames[frame2].keytime - _frames[frame1].keytime : 1.f;
+	float interpWeight = (t - _frames[frame1].keytime)/keyDuration;
+	for (unsigned int i=0;i<channeNames.size();i++)
+	{
+		const std::string channelName = channeNames[i];
+		outQuatList[i] = SrQuat();
+
+		int idx = _channels.search(channelName, SkChannel::Quat);
+		if (idx < 0) continue;
+		int floatIdx = _channels.float_position(idx);
+		if (floatIdx < 0) continue;
+
+		float q[4];
+		_channels[idx].interp(q,&fp1[floatIdx], &fp2[floatIdx], interpWeight);
+		outQuatList[i] = SrQuat(q[0],q[1],q[2],q[3]);
+	}
+}
+
+SBAPI bool SBMotion::downsample( int factor )
+{
+	
+	if (factor <= 1) return false;
+	int newNumFrames = getNumFrames()/factor;
+
+	std::vector<Frame> newFrames;
+	newFrames.resize(newNumFrames);
+	for (int i=0;i<newNumFrames;i++)
+	{
+		int oldFrameIdx = i*factor;
+		newFrames[i].keytime = _frames[oldFrameIdx].keytime;
+		newFrames[i].posture = _frames[oldFrameIdx].posture;
+	}
+	_frames = newFrames;
+}
 };

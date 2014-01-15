@@ -1806,15 +1806,15 @@ void PPRAISteeringAgent::adjustLocomotionBlend(SmartBody::SBCharacter* character
 	}
 	else if (blendDimension == 1)
 	{
-		blend->getWeightsFromParameters(x, weights);
+		blend->PABlend::getWeightsFromParameters(x, weights);
 	}
 	else if (blendDimension == 2)
 	{
-		blend->getWeightsFromParameters(x, y, weights);
+		blend->PABlend::getWeightsFromParameters(x, y, weights);
 	}
 	else if (blendDimension == 3)
 	{
-		blend->getWeightsFromParameters(x, y, z, weights);
+		blend->PABlend::getWeightsFromParameters(x, y, z, weights);
 	}
 
 	if (currentStateName == blendName)

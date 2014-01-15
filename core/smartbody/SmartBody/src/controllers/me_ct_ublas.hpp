@@ -6,6 +6,9 @@ using namespace boost::numeric;
 typedef boost::numeric::ublas::matrix<double, boost::numeric::ublas::column_major> dMatrix;
 typedef boost::numeric::ublas::vector<double> dVector;
 
+typedef boost::numeric::ublas::matrix<float, boost::numeric::ublas::column_major> fMatrix;
+typedef boost::numeric::ublas::vector<float> fVector;
+
 template <class T>
 struct ublasT
 {

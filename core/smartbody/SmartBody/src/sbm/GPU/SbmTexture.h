@@ -10,6 +10,8 @@ class SbmTexture;
 
 typedef std::map<std::string,SbmTexture*> StrTextureMap;
 
+
+
 class SbmTextureManager
 {
 public:

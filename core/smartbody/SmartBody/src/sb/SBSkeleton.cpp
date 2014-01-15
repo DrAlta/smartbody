@@ -490,4 +490,17 @@ void SBSkeleton::notify(SBSubject* subject)
 
 }
 
+SBAPI void SBSkeleton::getJointPositions( const std::vector<std::string>& jointNames, std::vector<SrVec>& jointPositions, int startIdx )
+{
+	if (jointPositions.size() < jointNames.size()+startIdx)
+		return;
+
+	for (unsigned int i=0;i<jointNames.size();i++)
+	{
+		SmartBody::SBJoint* joint = getJointByName(jointNames[i]);
+		if (!joint)
+			continue;
+		jointPositions[i+startIdx] = joint->gmat().get_translation();
+	}
+}
 }; //namespace

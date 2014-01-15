@@ -158,6 +158,10 @@ class SrModel : public SrSharedClass
        is returned, and otherwise false is returned. */
     SBAPI bool import_obj ( const char* file );
 
+	/*! Imports .ply file format. If the import is succesfull, true
+       is returned, and otherwise false is returned. */
+	SBAPI bool import_ply ( const char* file );
+
     /*! Exports .iv file format. If the export is succesfull, true
        is returned, and otherwise false is returned. */
     SBAPI bool export_iv ( const char* file );

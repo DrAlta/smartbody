@@ -133,7 +133,7 @@ void pythonFuncsAnimation()
 		.def("getSkeleton", &SBMotionBlendBase::getSkeleton, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the skeleton used when constructing the blend")
 		.def("getInterpType", &SBMotionBlendBase::getInterpType, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the interpolation type of the blend.")
 		.def("getBlendType", &SBMotionBlendBase::getBlendType, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the type of blend, which dictates which joints are used for parameterization.")
-		.def("getNumDimensions", &SBMotionBlendBase::getNumDimensions, "Returns the number of dimensions for the blend.")
+		.def("getNumDimensions", &SBMotionBlendBase::getParameterDimension, "Returns the number of dimensions for the blend.")
 		;
 
 	boost::python::class_<SBAnimationTransition>("SBAnimationTransition")
