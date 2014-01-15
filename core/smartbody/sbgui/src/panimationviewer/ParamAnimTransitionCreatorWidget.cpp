@@ -74,8 +74,8 @@ void PATransitionCreator::setInfo(bool isCreateMode, const std::string& stateNam
 			cancelState(this, NULL);
 			return;
 		}
-		std::vector<SkMotion*>& motions = state->motions;
-		for (std::vector<SkMotion*>::iterator iter = motions.begin();
+		std::vector<SmartBody::SBMotion*>& motions = state->motions;
+		for (std::vector<SmartBody::SBMotion*>::iterator iter = motions.begin();
 			 iter != motions.end();
 			 iter++)
 		{
@@ -240,7 +240,7 @@ void PATransitionCreator::createState(Fl_Widget* widget, void* data)
 			updatedMotions.push_back(creator->stateAnimationList->text(i + 1));
 		}
 
-		std::vector<SkMotion*>& motions = state->motions;
+		std::vector<SmartBody::SBMotion*>& motions = state->motions;
 
 		std::set<std::string> updatedMap;
 		for (size_t u = 0; u < updatedMotions.size(); u++)
