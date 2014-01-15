@@ -310,7 +310,7 @@ void SBAnimationBlend::updateSmoothSurface( SrSnColorSurf* surf )
 	{
 		SrVec para = surfModel->V[i];
 		std::vector<double> weights;
-		getWeightsFromParameters(para[0],para[1],para[2],weights);		
+		PABlend::getWeightsFromParameters(para[0],para[1],para[2],weights);		
 		weightList.push_back(weights);		
 	}
 
@@ -373,7 +373,7 @@ void SBAnimationBlend::updateErrorSurace( SrSnColorSurf* errorSurf, SrVec center
 	{
 		SrVec para = surfModel->V[i];
 		std::vector<double> weights;
-		getWeightsFromParameters(para[0],para[1],para[2],weights);
+		PABlend::getWeightsFromParameters(para[0],para[1],para[2],weights);
 		float x,y,z;
 		getParametersFromWeights(x,y,z,weights);
 
@@ -1036,59 +1036,16 @@ void SBAnimationBlend::removeMotion(const std::string& motionName)
 }
 
 bool SBAnimationBlend::addSkMotion(const std::string& motion)
-{
-	
+{	
 	SBMotion* sbmotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motion);
 
-	if (sbmotion)
-	{
-		motions.push_back(sbmotion);
-/*		
-		// adding two correspondence points when the first motion got inserted
-		if (motions.size() == 1)
-		{
-			std::vector<double> keyVec;
-			keyVec.resize(2);
-			keyVec[0] = 0.0f;
-			keyVec[1] = skMotion->duration();
-			keys.push_back(keyVec);
-		}
-		else
-*/
-		{
-			// add a zero-correspondence point for this new motion
-			int numPoints = 0;
-			if (keys.size() > 0)
-				numPoints  = keys[0].size();
-			std::vector<double> keyVec;
-			if (numPoints > 0)
-			{
-				keyVec.resize(numPoints);
-				double duration = sbmotion->duration();
-				if (numPoints >= 2)
-				{
-					keyVec[0] = 0.0f;
-					keyVec[numPoints - 1] = duration;
-				}
-				// uniformly space the correspondence points
-				double step = duration / double(numPoints);
-				for (int i = 1; i < numPoints - 1; i++)
-				{
-					keyVec[i] = double(i) * step;
-				}
-			}
-			keys.push_back(keyVec);
-			keyTagList.push_back(KeyTagMap());
-		}
-
-		getParameters().push_back(SrVec());
-	}
-	else
+	if (!sbmotion)
 	{
 		LOG("SBAnimationBlend add sk motion failure, %s doesn't exist", motion.c_str());
 		return false;
 	}
-	return true;
+	else
+		return addMotionRef(sbmotion);	
 }
 
 bool SBAnimationBlend::removeSkMotion(const std::string& motionName)
@@ -1425,6 +1382,90 @@ std::string SBAnimationBlend::getBlendSkeleton()
 	return blendSkelName;
 }
 
+SBAPI SrBox SBAnimationBlend::getParameterBoundBox()
+{
+	return SrBox(paraMin, paraMax);
+}
+
+SBAPI bool SBAnimationBlend::getWeightsFromParameters( SrVec& para, std::vector<float>& weights )
+{
+	std::vector<double> doubleWeights;
+	if (getParameterDimension() == 1)
+	{
+		PABlend::getWeightsFromParameters(para[0],doubleWeights);
+	}
+	else if (getParameterDimension() == 2)
+	{
+		PABlend::getWeightsFromParameters(para[0],para[1],doubleWeights);
+	}
+	else if (getParameterDimension() == 3)
+	{
+		PABlend::getWeightsFromParameters(para[0],para[1],para[2],doubleWeights);
+	}
+	weights.resize(doubleWeights.size());
+	for (unsigned int i=0;i<weights.size();i++)
+		weights[i] = (float)doubleWeights[i];
+	return true;
+}
+
+int SBAnimationBlend::getParameterDimension()
+{
+	return parameterDim;
+}
+
+bool SBAnimationBlend::addMotionRef( SBMotion* sbmotion)
+{
+	if (sbmotion)
+	{
+		std::string motionName = sbmotion->getName();
+		motions.push_back(sbmotion);
+		/*		
+		// adding two correspondence points when the first motion got inserted
+		if (motions.size() == 1)
+		{
+		std::vector<double> keyVec;
+		keyVec.resize(2);
+		keyVec[0] = 0.0f;
+		keyVec[1] = skMotion->duration();
+		keys.push_back(keyVec);
+		}
+		else
+		*/
+		{
+			// add a zero-correspondence point for this new motion
+			int numPoints = 0;
+			if (keys.size() > 0)
+				numPoints  = keys[0].size();
+			std::vector<double> keyVec;
+			if (numPoints > 0)
+			{
+				keyVec.resize(numPoints);
+				double duration = sbmotion->duration();
+				if (numPoints >= 2)
+				{
+					keyVec[0] = 0.0f;
+					keyVec[numPoints - 1] = duration;
+				}
+				// uniformly space the correspondence points
+				double step = duration / double(numPoints);
+				for (int i = 1; i < numPoints - 1; i++)
+				{
+					keyVec[i] = double(i) * step;
+				}
+			}
+			keys.push_back(keyVec);
+			keyTagList.push_back(KeyTagMap());
+		}
+
+		getParameters().push_back(SrVec());
+		return true;
+	}
+	else
+	{			
+		return false;
+	}
+}
+
 SBAnimationBlend0D::SBAnimationBlend0D() : SBAnimationBlend("unknown")
 {
 }
@@ -1433,6 +1474,7 @@ SBAnimationBlend0D::SBAnimationBlend0D(const std::string& name) : SBAnimationBle
 {
 	_dimension = "0D";
 	setType(0);
+	parameterDim = 1;
 }
 
 SBAnimationBlend0D::~SBAnimationBlend0D()
@@ -1442,7 +1484,9 @@ SBAnimationBlend0D::~SBAnimationBlend0D()
 void SBAnimationBlend0D::addMotion(const std::string& motion)
 {
 	addSkMotion(motion);	
+	setParameter(motion, 1.f); // set a dummy parameter since there is only one motion
 }
+
 
 void SBAnimationBlend0D::removeMotion(const std::string& motion)
 {
@@ -1460,7 +1504,8 @@ SBAnimationBlend1D::SBAnimationBlend1D() : SBAnimationBlend("unknown")
 SBAnimationBlend1D::SBAnimationBlend1D(const std::string& name) : SBAnimationBlend(name)
 {
 	_dimension = "1D";
-	setType(1);
+	setType(0);
+	parameterDim = 1;
 }
 
 SBAnimationBlend1D::~SBAnimationBlend1D()
@@ -1473,6 +1518,13 @@ void SBAnimationBlend1D::addMotion(const std::string& motion, float parameter)
 
 	setParameter(motion, parameter);
 }
+
+void SBAnimationBlend1D::addMotionFromRef( SmartBody::SBMotion* motion, float parameter )
+{
+	addMotionRef(motion);	
+	setParameter(motion->getName(), parameter); // set a dummy parameter since there is only one motion
+}
+
 
 void SBAnimationBlend1D::removeMotion(const std::string& motionName)
 {
@@ -1494,7 +1546,8 @@ SBAnimationBlend2D::SBAnimationBlend2D() : SBAnimationBlend("unknown")
 SBAnimationBlend2D::SBAnimationBlend2D(const std::string& name) : SBAnimationBlend(name)
 {
 	_dimension = "2D";
-	setType(2);
+	setType(1);
+	parameterDim = 2;
 }
 
 SBAnimationBlend2D::~SBAnimationBlend2D()
@@ -1536,7 +1589,8 @@ SBAnimationBlend3D::SBAnimationBlend3D() : SBAnimationBlend("unknown")
 SBAnimationBlend3D::SBAnimationBlend3D(const std::string& name) : SBAnimationBlend(name)
 {
 	_dimension = "3D";
-	setType(3);
+	setType(2);
+	parameterDim = 3;
 }
 
 SBAnimationBlend3D::~SBAnimationBlend3D()

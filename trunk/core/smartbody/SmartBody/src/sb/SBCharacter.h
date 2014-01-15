@@ -13,6 +13,7 @@ class SBSteerAgent;
 class SBController;
 class SBDiphone;
 class SBReach;
+class SBMotionGraph;
 
 class SBCharacter : public SbmCharacter
 {
@@ -76,6 +77,11 @@ class SBCharacter : public SbmCharacter
 		SBAPI void setReach(SmartBody::SBReach* reach);
 		SBAPI SmartBody::SBReach* getReach();
 
+		SBAPI void setMotionGraph(const std::string& moGraphName);
+		SBAPI void startMotionGraph(const std::string& moNodeName);
+		SBAPI void startMotionGraphWithPath(const std::vector<SrVec>& pathList);
+		SBAPI void startMotionGraphRandomWalk();
+
 		SBAPI void setUseJointConstraint(bool bUseConstraint);
 		SBAPI bool getUseJointConstraint();
 		SBAPI void addJointTrajectoryConstraint(std::string jointName, std::string refJointName);
@@ -91,6 +97,7 @@ class SBCharacter : public SbmCharacter
 	protected:
 		std::vector<SBBehavior*> _curBehaviors;	
 		SmartBody::SBReach* _reach;
+		SmartBody::SBMotionGraph* _curMotionGraph;
 		std::map<std::string, TrajectoryRecord*> jointTrajMap;
 		float jointTrajBlendWeight;
 		bool useJointConstraint;

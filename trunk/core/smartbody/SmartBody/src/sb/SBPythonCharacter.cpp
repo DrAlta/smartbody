@@ -155,8 +155,11 @@ void pythonFuncsCharacter()
 		.def("hasSpeechBehavior", &SBCharacter::hasSpeechBehavior, "Returns speech behavior msg id if any, otherwise return empty string.")
 		.def("createBlendShapeChannel", &SBCharacter::createBlendShapeChannel, "Create a blend shape channel given its name.")
 		.def("setDeformableMeshName", &SBCharacter::setDeformableMeshName, "Sets the name of the deformable mesh. Same as setting the deformableMesh attribute.")
+		.def("setMotionGraph", &SBCharacter::setMotionGraph, "Sets the motion graph for this character")
+		.def("startMotionGraph", &SBCharacter::startMotionGraph, "Start running the motion graph given a starting node name")
+		.def("startMotionGraphRandomWalk", &SBCharacter::startMotionGraphRandomWalk, "Start running the motion graph from a random node.")
+		.def("startMotionGraphWithPath", &SBCharacter::startMotionGraphWithPath, "Start running the motion graph and synthesize a graph walk based on input path.")
 		;
-
 }
 }
 

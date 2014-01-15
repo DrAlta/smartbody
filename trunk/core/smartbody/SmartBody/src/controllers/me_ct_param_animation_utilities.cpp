@@ -426,11 +426,6 @@ void PAMotions::setBufferByBaseMat(SrMat& mat, SrBuffer<float>& buffer)
 	buffer[baseBuffId.q + 3] = quat.z;	
 }
 
-void PAMotions::processMat( SrMat& src, SrMat& yMat, SrMat xzMat )
-{
-
-}
-
 
 void PAMotions::getUpdateMat(SrMat& dest, SrMat& src)
 {
@@ -562,9 +557,6 @@ void PAInterpolator::blending(std::vector<double>& times, SrBuffer<float>& buff)
 		if (blendData->weights[i] != 0.0)
 			indices.push_back(i);
 	}
-
-	
-
 	SrBuffer<float> buffer;
 	buffer.size(buff.size());	
 	processedBaseMats.clear();

@@ -45,6 +45,7 @@
 #include <sb/SBDebuggerClient.h>
 #include <sb/SBDebuggerUtility.h>
 #include <sb/SBVHMsgManager.h>
+#include <sb/SBMotionGraph.h>
 #include <sbm/sbm_audio.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -164,6 +165,7 @@ void SBScene::initialize()
 	_commandManager = new SBCommandManager();
 	_wspManager = new SBWSPManager();
 	_naviMeshManager = new SBNavigationMeshManager();
+	_motionGraphManager = new SBMotionGraphManager();
 
 	_scale = .01f; // default scale is centimeters
 
@@ -1531,6 +1533,11 @@ SBDiphoneManager* SBScene::getDiphoneManager()
 SBBehaviorSetManager* SBScene::getBehaviorSetManager()
 {
 	return _behaviorSetManager;
+}
+
+SBMotionGraphManager* SBScene::getMotionGraphManager()
+{
+	return _motionGraphManager;
 }
 
 SBRetargetManager* SBScene::getRetargetManager()

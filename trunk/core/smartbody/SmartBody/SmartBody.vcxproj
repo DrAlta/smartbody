@@ -479,7 +479,9 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\sr\sr_vec.cpp" />
     <ClCompile Include="..\SmartBody\src\sr\sr_vec2.cpp" />
     <ClCompile Include="..\SmartBody\src\sr\sr_viewer.cpp" />
+    <ClCompile Include="src\controllers\me_ct_motion_graph.cpp" />
     <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp" />
+    <ClCompile Include="src\external\rply\rply.c" />
     <ClCompile Include="src\protocols\sbmesh.pb.cc" />
     <ClCompile Include="src\protocols\sbmotion.pb.cc" />
     <ClCompile Include="src\protocols\sbutilities.pb.cc" />
@@ -491,14 +493,17 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\sb\SBAssetHandlerCOLLADA.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerObj.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerOgre.cpp" />
+    <ClCompile Include="src\sb\SBAssetHandlerPly.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSBMeshBinary.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSk.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkmb.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkm.cpp" />
+    <ClCompile Include="src\sb\SBMotionGraph.cpp" />
     <ClCompile Include="src\sb\SBNavigationMeshManager.cpp" />
     <ClCompile Include="src\sb\SBPythonMesh.cpp" />
     <ClCompile Include="src\sb\smartbody-c-dll.cpp" />
     <ClCompile Include="src\sb\smartbody-dll.cpp" />
+    <ClCompile Include="src\sr\sr_model_import_ply.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\behavior_scheduler.hpp" />
@@ -863,7 +868,9 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\SmartBody\src\sr\sr_vec.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_vec2.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_viewer.h" />
+    <ClInclude Include="src\controllers\me_ct_motion_graph.hpp" />
     <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp" />
+    <ClInclude Include="src\external\rply\rply.h" />
     <ClInclude Include="src\protocols\sbmesh.pb.h" />
     <ClInclude Include="src\protocols\sbmotion.pb.h" />
     <ClInclude Include="src\protocols\sbutilities.pb.h" />
@@ -875,10 +882,12 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\sb\SBAssetHandlerCOLLADA.h" />
     <ClInclude Include="src\sb\SBAssetHandlerObj.h" />
     <ClInclude Include="src\sb\SBAssetHandlerOgre.h" />
+    <ClInclude Include="src\sb\SBAssetHandlerPly.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSBMeshBinary.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSk.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSkmb.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSkm.h" />
+    <ClInclude Include="src\sb\SBMotionGraph.h" />
     <ClInclude Include="src\sb\SBNavigationMeshManager.h" />
     <ClInclude Include="src\sb\SBSceneListener.h" />
     <ClInclude Include="src\sb\SBVersion.hpp" />

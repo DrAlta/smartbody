@@ -13,7 +13,7 @@ SteerPath::~SteerPath(void)
 {
 }
 
-void SteerPath::initPath( std::vector<SrPnt>& pts, float radius )
+void SteerPath::initPath( const std::vector<SrPnt>& pts, float radius )
 {
 	pathPts = pts;
 	pathRadius = radius;

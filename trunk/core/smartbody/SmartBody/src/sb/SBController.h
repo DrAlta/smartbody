@@ -37,6 +37,7 @@ class SBController : public MeController
 
 		SBAPI void setTiming(float indt, float outdt, float empht);
 
+		SBAPI void getJointChannelValues(const std::string& jointName, MeFrameData& frame, SrMat& outMat);
 		SBAPI void getJointChannelValues(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat, SrVec& outPos);
 		SBAPI void setJointChannelQuat(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat);
 		SBAPI void setJointChannelPos(const std::string& jointName, MeFrameData& frame, SrVec& outPos);

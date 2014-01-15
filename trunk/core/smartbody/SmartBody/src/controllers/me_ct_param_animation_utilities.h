@@ -114,7 +114,6 @@ class PAMotions
 		void getBuffer(SkMotion* motion, double t, SrBuffer<int>& map, SrBuffer<float>& buff);				
 		void getUpdateMat(SrMat& dest, SrMat& src);
 		void getProcessedMat(SrMat& dest, SrMat& src);
-		void processMat(SrMat& src, SrMat& yMat, SrMat xzMat);
 		PABlendData* blendData;
 };
 

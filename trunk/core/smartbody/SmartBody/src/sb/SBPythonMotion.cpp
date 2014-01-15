@@ -43,6 +43,7 @@
 #include <sb/SBRetargetManager.h>
 #include <sb/SBEvent.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBMotionGraph.h>
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
 #include <stdlib.h>
@@ -108,6 +109,7 @@ void pythonFuncsMotion()
 		.def("rotate", &SBMotion::rotate, "Rotates the base joint name by x,y,z axis.")			
 		.def("scale", &SBMotion::scale, "Scales all translations in skeleton by scale factor.")		
 		.def("trim", &SBMotion::trim, "Trims the starting and ending frames in the motion.")	
+		.def("downsample", &SBMotion::downsample, "Downsample the number of frames by factor N.")	
 		.def("removeMotionChannelsByEndJoints", &SBMotion::removeMotionChannelsByEndJoints, "Remove all the motion channels corresponding to the descendents of end joints. \n Input : skeleton name, end joint names")	
 		.def("pertainMotionChannelsByEndJoints", &SBMotion::pertainMotionChannelsByEndJoints, "Pertain all the motion channels corresponding to the descendents of end joints. \n Input : skeleton name, end joint names")	
 		.def("removeMotionChannels", &SBMotion::removeMotionChannels, "Remove the motion channels based on input joint names. \n Input : names of channels to be removed")	
@@ -135,6 +137,30 @@ void pythonFuncsMotion()
 		.def("setEmptyMotion", &SBMotion::setEmptyMotion, "Set this motion to be empty given duration and number of frames")
 		;
 
+	boost::python::class_<SBMotionNode>("SBMotionNode")
+		.def("getName", &SBMotionNode::getName, "Get the node name.")
+		.def("getAnimBlend", &SBMotionNode::getAnimBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the animation blend associated with this node.")
+		;
+
+	boost::python::class_<SBMotionTransitionEdge>("SBMotionTransitionEdge")
+		.def("getName", &SBMotionTransitionEdge::getName, "Get the transition edge name.")
+		.def("getSrcNode", &SBMotionTransitionEdge::getSrcNode, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the source motion node.")
+		.def("getTgtNode", &SBMotionTransitionEdge::getTgtNode, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the target motion node.")
+		;
+
+	boost::python::class_<SBMotionGraph>("SBMotionGraph")
+		//.def(boost::python::init<std::string>())
+		.def("addMotionNodeFromBlend", &SBMotionGraph::addMotionNodeFromBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Adds a motion node to the motion graph.")
+		.def("addMotionEdge", &SBMotionGraph::addMotionEdge, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Adds a motion edge to the motion graph.")
+		.def("getMotionNode", &SBMotionGraph::getMotionNode, boost::python::return_value_policy<boost::python::reference_existing_object>(), "get the motion node based on its name.")
+		.def("getMotionEdge", &SBMotionGraph::getMotionEdge, boost::python::return_value_policy<boost::python::reference_existing_object>(), "get the motion edge based on its name.")
+		.def("buildAutomaticMotionGraph", &SBMotionGraph::buildAutomaticMotionGraph, "build the motion graph automatically from a set of motions.")
+		;
+	boost::python::class_<SBMotionGraphManager>("SBMotionGraphManager")
+		.def("createMotionGraph", &SBMotionGraphManager::createMotionGraph, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a motion graph.")
+		.def("getMotionGraph", &SBMotionGraphManager::getMotionGraph, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the motion graph based on its name.")
+		.def("getMotionGraphNames", &SBMotionGraphManager::getMotionGraphNames, "Get the names of all motion graphs.")
+		;	
 }
 }
 

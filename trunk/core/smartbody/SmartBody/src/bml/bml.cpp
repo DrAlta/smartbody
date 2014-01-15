@@ -1882,7 +1882,7 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, SmartBo
 			if (strokeTime == 0)	// if stroke time not defined, put duration to 0, else using (duration = relaxTime - strokeTime)
 				z = 0;
 
-			state3D->getWeightsFromParameters(x, y, z, weights);
+			state3D->PABlend::getWeightsFromParameters(x, y, z, weights);
 			PABlendData* blendData = new PABlendData(state, weights);
 			blendData->timeManager->updateWeights();
 			std::vector<double> blendedKey = blendData->timeManager->getKey();

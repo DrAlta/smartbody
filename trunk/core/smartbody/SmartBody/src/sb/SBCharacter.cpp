@@ -20,6 +20,7 @@
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBReach.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBMotionGraph.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -28,12 +29,14 @@
 #include <controllers/me_ct_curve_writer.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
 #include <controllers/me_ct_saccade.h>
+#include <controllers/me_ct_motion_graph.hpp>
 #include <sbm/remote_speech.h>
 #include <sbm/local_speech.h>
 #include <sbm/text_speech.h>
 #include <sbm/sbm_speech_audiofile.hpp>
 #include <bml/bml_processor.hpp>
 #include <sk/sk_channel_array.h>
+#include <sr/sr_random.h>
 
 namespace SmartBody {
 
@@ -972,6 +975,126 @@ void SBCharacter::setUseJointConstraint( bool bUseConstraint )
 void SBCharacter::setDeformableMeshName(const std::string& meshName)
 {
 	this->setStringAttribute("deformableMesh", meshName);
+}
+
+SBAPI void SBCharacter::setMotionGraph( const std::string& moGraphName )
+{
+	SBMotionGraphManager* mographManager = SmartBody::SBScene::getScene()->getMotionGraphManager();
+	SBMotionGraph* mograph = mographManager->getMotionGraph(moGraphName);
+	if (mograph)
+		_curMotionGraph = mograph;
+}
+
+
+SBAPI void SBCharacter::startMotionGraphRandomWalk()
+{
+	if (!_curMotionGraph)
+	{
+		LOG("Cannot start motion graph. No motion graph available.");
+		return;
+	}
+	std::vector<std::string> nodeNames = _curMotionGraph->getMotionNodeNames();
+	SrRandom random;
+	random.limits(0, nodeNames.size()-1);
+	int nodeIdx = random.geti();
+	startMotionGraph(nodeNames[nodeIdx]);
+}
+
+SBAPI void SBCharacter::startMotionGraph( const std::string& moNodeName )
+{
+	if (!motiongraph_ct)
+	{
+		LOG("Motion Graph Controller is not initialized.");
+		return;
+	}
+
+	SBMotionNodeState* motionState = motiongraph_ct->getMotionNodeState();
+	if (!motionState)
+	{
+		LOG("Motion Graph Controller is not initialized.");
+		return;
+	}
+
+	if (!_curMotionGraph)
+	{
+		LOG("Cannot start motion graph. No motion graph available.");
+		return;
+	}
+	SBMotionNode* startNode = _curMotionGraph->getMotionNode(moNodeName);
+	if (!startNode)
+	{
+		LOG("Cannot start motion graph. The motion node '%s' doesn't exist.", moNodeName.c_str());
+		return;
+	}
+
+	if (motionState->isRunning())
+	{
+		LOG("Motion Graph is running. Stop the motion graph before restarting it.");
+		return;
+	}
+
+	std::vector<float> startWeights;
+	startNode->getRandomBlendWeights(startWeights);
+	motionState->startMotionState(startNode,startWeights);	
+	motiongraph_ct->controller_start();
+}
+
+SBAPI void SBCharacter::startMotionGraphWithPath( const std::vector<SrVec>& pathList )
+{
+	if (!_curMotionGraph)
+	{
+		LOG("Cannot start motion graph. No motion graph available.");
+		return;
+	}
+
+	SBMotionNodeState* motionState = motiongraph_ct->getMotionNodeState();
+	if (!motionState)
+	{
+		LOG("Motion Graph Controller is not initialized.");
+		return;
+	}
+
+	SteerPath moGraphPath;
+	std::vector<std::pair<std::string,std::string>> graphEdges;
+	moGraphPath.initPath(pathList, 0.1f);
+
+	trajectoryGoalList.clear();
+	trajectoryGoalList.resize(pathList.size()*3);
+	for (unsigned int i=0;i<pathList.size();i++)
+	{
+		for (int k=0;k<3;k++)
+			trajectoryGoalList[i*3+k] = pathList[i][k];
+	}
+	_curMotionGraph->synthesizePath(moGraphPath, getSkeleton()->getName(), graphEdges);
+	if (graphEdges.size() == 0)
+	{
+		LOG("Error, the resulting graph traversal is empty.");
+		return;
+	}
+	//LOG("Finish synthesize the paths, graph edge size = %d", graphEdges.size());
+	std::string startNodeName = graphEdges[0].first;
+	startMotionGraph(startNodeName);	
+
+	for (unsigned int i=0;i<graphEdges.size();i++)
+	{
+		std::pair<std::string,std::string>& edge = graphEdges[i];			
+		//LOG("Edge %d, name = %s %s", i, edge.first.c_str(), edge.second.c_str());
+		SBMotionTransitionEdge* motionEdge = _curMotionGraph->getMotionEdge(edge.first,edge.second);
+		if (!motionEdge)
+		{
+			LOG("Cannot find edge %s %s",edge.first.c_str(), edge.second.c_str());
+		}
+		//LOG("motion edge %d, name = %s", motionEdge, motionEdge->getName().c_str());
+		SBMotionNode* node = _curMotionGraph->getMotionNode(edge.second);	
+		//LOG("Motion node = %d, namae = %s", node, node->getName().c_str());
+		std::vector<float> weights;
+		node->getRandomBlendWeights(weights);
+		//LOG("Node weights size = %d", weights.size());
+		motionState->addNextTransition(motionEdge, weights);
+		//LOG("After add next transition");
+	}
+
+		
 }
 
 };

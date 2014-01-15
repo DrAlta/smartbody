@@ -82,6 +82,7 @@ PABlend::PABlend(PABlend* data) : SBObject()
 
 PABlend::PABlend(const std::string& name) : SBObject()
 {
+	setName(name);
 	stateName = name;
 	cycle = false;
 	incrementWorldOffsetY = false;
@@ -166,6 +167,7 @@ bool PABlend::getWeightsFromParameters(double x, std::vector<double>& weights)
 	//double xDiff = fabs(previousParam.x - x);
 	//if (xDiff > changeLimit)
 	//	x = (previousParam.x + x) * 0.5;
+	if (weights.size() != getNumMotions()) weights.resize(getNumMotions());
 	double left = -9999.0;
 	double right = 9999.0;
 	std::string leftMotion = "";
@@ -243,6 +245,7 @@ bool PABlend::getWeightsFromParameters(double x, double y, std::vector<double>& 
 	if (type != 1)
 		return false;
 	
+	if (weights.size() != getNumMotions()) weights.resize(getNumMotions());
 	SrVec point = SrVec((float)x, (float)y, 0);
 	for (int i = 0; i < getNumTriangles(); i++)
 	{
@@ -592,6 +595,9 @@ void PABlend::updateParameterScale()
 		if (parameters[i].z > zMax)
 			zMax = parameters[i].z;
 	}
+
+	paraMax = SrVec(xMax,yMax,zMax);
+	paraMin = SrVec(xMin,yMin,zMin);
 	float xSpan = xMax - xMin;
 	float ySpan = yMax - yMin;
 	float zSpan = zMax - zMin;

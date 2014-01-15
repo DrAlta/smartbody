@@ -53,7 +53,7 @@ public:
 	void getMotionParameter(const std::string& motion, dVector& outPara);
 	
 	void updateBlend(float t, float dt, BodyMotionFrame& inputFrame);	
-	void updateMotionExamples(const std::vector<SkMotion*>& inMotionSet, std::string interpolatorType);	
+	void updateMotionExamples(const std::vector<SmartBody::SBMotion*>& inMotionSet, std::string interpolatorType);	
 	IKTreeNodeList& ikTreeNodes() { return ikScenario.ikTreeNodes; }
 protected:
 	void updateSkeletonCopy();		

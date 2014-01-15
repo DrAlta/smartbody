@@ -14,7 +14,7 @@ class MotionTimeWarpFunc // motion time warp function interface, each motion sho
 {
 public:
 	MotionTimeWarpFunc() {}
-	virtual ~MotionTimeWarpFunc() {}
+	virtual ~MotionTimeWarpFunc() {} 
 
 public:
 	// t : actual time
@@ -43,6 +43,25 @@ public:
 	virtual double refTimeLength() { return refDuration; }
 	virtual double actualTimeLength() { return targetDuration; }
 	static double floatMod(double a, double b);	
+};
+
+class MultiLinearTimeWarp : public MotionTimeWarpFunc
+{
+protected:
+	double refDuration, targetDuration;
+	std::vector<double> refKeyTimes;
+	std::vector<double> targetKeyTimes;
+public:
+	MultiLinearTimeWarp(std::vector<double>& inRefKeys, std::vector<double>& inTargetKeys);	
+	virtual ~MultiLinearTimeWarp() {} ;
+	virtual double timeWarp(double u);
+	virtual double invTimeWarp(double t);
+	virtual double timeSlope(double u);
+	virtual double refTimeLength();
+	virtual double actualTimeLength();
+protected:
+	int getSection(std::vector<double>& keys, double t);
+	double invTimeSlope(double t);
 };
 
 

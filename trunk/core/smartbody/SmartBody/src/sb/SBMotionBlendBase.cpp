@@ -244,7 +244,7 @@ std::string SBMotionBlendBase::saveToString()
 
 	strstr << "\n";	
 	// add the motions
-	strstr << stateNameVariable << " = blendManager.createMotionBlendBase(\"" << stateName << "\", \"" << skeletonName << "\", " << getNumDimensions() << ")\n";			
+	strstr << stateNameVariable << " = blendManager.createMotionBlendBase(\"" << stateName << "\", \"" << skeletonName << "\", " << getParameterDimension() << ")\n";			
 	strstr << stateNameVariable << ".setBlendSkeleton(\"" << state->getBlendSkeleton() << "\")\n";
 	strstr << "\n";	
 	strstr << "motions = StringVec()\n";
@@ -276,10 +276,7 @@ std::string SBMotionBlendBase::saveToString()
 	return strstr.str();
 }
 
-int SBMotionBlendBase::getNumDimensions()
-{
-	return parameterDim;
-}
+
 
 const std::string& SBMotionBlendBase::getSkeleton()
 {

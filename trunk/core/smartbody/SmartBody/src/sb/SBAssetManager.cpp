@@ -14,6 +14,7 @@
 #include <sb/SBAssetHandlerSkmb.h>
 #include <sb/SBAssetHandlerBvh.h>
 #include <sb/SBAssetHandlerAmc.h>
+#include <sb/SBAssetHandlerPly.h>
 #include <sb/SBAssetHandlerSBMeshBinary.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
@@ -61,6 +62,7 @@ SBAssetManager::SBAssetManager()
 	addAssetHandler(new SBAssetHandlerAmc());	
 	addAssetHandler(new SBAssetHandlerOgre());	
 	addAssetHandler(new SBAssetHandlerObj());	
+	addAssetHandler(new SBAssetHandlerPly());	
 	addAssetHandler(new SBAssetHandlerSkmb());	
 	addAssetHandler(new SBAssetHandlerBvh());	
 	addAssetHandler(new SBAssetHandlerSBMeshBinary());

@@ -61,6 +61,7 @@ class SBVHMsgManager;
 class SBCommandManager;
 class SBWSPManager;
 class SBNavigationMesh;
+class SBMotionGraphManager;
 
 class SBScene : public SBObject
 {
@@ -166,6 +167,7 @@ class SBScene : public SBObject
 		SBAPI SBCommandManager* getCommandManager();
 		SBAPI SBWSPManager* getWSPManager();
 		SBAPI SBNavigationMeshManager* getNavigationMeshManager();
+		SBAPI SBMotionGraphManager* getMotionGraphManager();
 
 		SBAPI SBParser* getParser();
 
@@ -308,6 +310,7 @@ class SBScene : public SBObject
 		SBCommandManager* _commandManager;
 		SBWSPManager* _wspManager;
 		SBNavigationMeshManager* _naviMeshManager;
+		SBMotionGraphManager* _motionGraphManager;
 
 		SBParser* _parser;
 

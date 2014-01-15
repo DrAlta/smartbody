@@ -1153,6 +1153,21 @@
     <ClCompile Include="src\sb\SBAssetHandlerSBMeshBinary.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="src\sb\SBMotionGraph.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\controllers\me_ct_motion_graph.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandlerPly.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sr\sr_model_import_ply.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="src\external\rply\rply.c">
+      <Filter>external\rply</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2304,6 +2319,18 @@
     <ClInclude Include="src\sb\SBAssetHandlerSBMeshBinary.h">
       <Filter>sb</Filter>
     </ClInclude>
+    <ClInclude Include="src\sb\SBMotionGraph.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\controllers\me_ct_motion_graph.hpp">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBAssetHandlerPly.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\rply\rply.h">
+      <Filter>external\rply</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">
@@ -2350,6 +2377,9 @@
     </Filter>
     <Filter Include="protocols">
       <UniqueIdentifier>{b31a1335-2324-4ce0-921c-dd70cbc6ff78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\rply">
+      <UniqueIdentifier>{0ed04d35-b974-46f6-aaab-dbe9ed825509}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -272,6 +272,16 @@ float SBRetarget::applyRetargetJointTranslation( std::string jointName, float in
 }
 
 
+SBAPI SrVec SBRetarget::applyRetargetJointTranslationVec( std::string jointName, SrVec inVec )
+{
+	SrVec outPos = inVec;
+	if (jointPrePostRotMap.find(jointName) != jointPrePostRotMap.end())
+	{
+		outPos = inVec*heightRatio;
+	}
+	return outPos;
+}
+
 SBAPI SrVec SBRetarget::applyRetargetJointTrajectory( TrajectoryRecord& trajRecord, SrMat& baseGmat )
 {
 	SrVec outPos = trajRecord.refJointGlobalPos;

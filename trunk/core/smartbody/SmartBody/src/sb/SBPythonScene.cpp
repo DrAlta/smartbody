@@ -46,6 +46,8 @@
 #include <sb/SBSceneListener.h>
 #include <sb/SBNavigationMesh.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBNavigationMeshManager.h>
+#include <sb/SBMotionGraph.h>
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
 #include <stdlib.h>
@@ -178,6 +180,10 @@ void pythonFuncsScene()
 		.def("getRetargetManager", &SBScene::getRetargetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the retarget manager.")
 		.def("getAssetManager", &SBScene::getAssetManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the asset manager.")
 		.def("getVHMsgManager", &SBScene::getVHMsgManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the VH message manager.")
+		.def("getNavigationMeshManager", &SBScene::getNavigationMeshManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the navigation mesh manager.")
+		.def("getMotionGraphManager", &SBScene::getMotionGraphManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the motion graph manager.")
+
+
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
 
 		.def("setSystemParameter", &SBScene::setSystemParameter, "Sets a name/value pair that persists between scene sessions.")

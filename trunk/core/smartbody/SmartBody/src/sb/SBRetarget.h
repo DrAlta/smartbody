@@ -26,6 +26,8 @@ class SBRetarget
 		SBAPI SrQuat applyRetargetJointRotation(std::string jointName, SrQuat& inQuat);
 		SBAPI SrQuat applyRetargetJointRotationInverse(std::string jointName, SrQuat& inQuat);
 		SBAPI float  applyRetargetJointTranslation(std::string jointName, float inPos);		
+		SBAPI SrVec  applyRetargetJointTranslationVec(std::string jointName, SrVec inVec);		
+
 		SBAPI SrVec  applyRetargetJointTrajectory(TrajectoryRecord& trajRecord, SrMat& baseGmat);
 		SBAPI std::vector<std::string> getEndJointNames();
 		SBAPI std::vector<std::string> getRelativeJointNames();

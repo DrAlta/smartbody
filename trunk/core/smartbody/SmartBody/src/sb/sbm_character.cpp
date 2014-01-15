@@ -83,6 +83,7 @@
 #include <controllers/me_ct_reach.hpp>
 #include <controllers/me_ct_example_body_reach.hpp>
 #include <controllers/me_ct_pose_postprocessing.hpp>
+#include <controllers/me_ct_motion_graph.hpp>
 
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_physics_controller.h>
@@ -171,6 +172,7 @@ reach_sched_p( NULL ),
 head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
 param_sched_p( CreateSchedulerCt( character_name, "param" ) ),
 param_animation_ct( NULL ),
+motiongraph_ct(NULL),
 head_param_anim_ct( NULL ),
 face_ct( NULL ),
 eyelid_ct( new MeCtEyeLid() ),
@@ -253,6 +255,9 @@ SbmCharacter::~SbmCharacter( void )	{
 	if (postprocess_ct)
 		postprocess_ct->unref();
 
+	if (motiongraph_ct)
+		motiongraph_ct->unref();
+
 	std::map<int,MeCtReachEngine*>::iterator mi;
 	for ( mi  = reachEngineMap->begin();
 		mi != reachEngineMap->end();
@@ -331,6 +336,12 @@ void SbmCharacter::createStandardControllers()
 	std::string headParamAnimName = getName() + "_paramAnimHeadController";
 	this->head_param_anim_ct->setName(headParamAnimName.c_str());
 	this->head_param_anim_ct->ref();
+
+	SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(this);
+	this->motiongraph_ct = new MeCtMotionGraph(sbChar);
+	std::string motionGraphName = getName() + "_motionGraphController";
+	this->motiongraph_ct->setName(motionGraphName);
+	this->motiongraph_ct->ref();
 
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	SmartBody::SBJoint* effector = sbSkel->getJointByMappedName("r_middle1");
@@ -463,7 +474,6 @@ void SbmCharacter::createStandardControllers()
 	std::string noiseCtName = getName() + "_noiseController";
 	this->noise_ct->setName(noiseCtName.c_str());
 
-	SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(this);
 	if (!sbChar)
 	{
 		LOG("Error! SbChar = NULL");
@@ -504,6 +514,7 @@ void SbmCharacter::createStandardControllers()
 	//ct_tree_p->add_controller( locomotion_ct );
 	
 	ct_tree_p->add_controller( param_animation_ct );
+	ct_tree_p->add_controller( motiongraph_ct );
 	ct_tree_p->add_controller( basic_locomotion_ct );
 	ct_tree_p->add_controller( motion_sched_p );
 	ct_tree_p->add_controller( postprocess_ct );	
@@ -594,6 +605,9 @@ void SbmCharacter::initData()
 	noise_ct = NULL;
 	record_ct = NULL;
 	physics_ct = NULL;
+	postprocess_ct = NULL;
+	motiongraph_ct = NULL;
+
 
 	speech_impl = NULL;
 	speech_impl_backup = NULL;

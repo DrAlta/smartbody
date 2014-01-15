@@ -92,7 +92,7 @@ void MeCtBlendEngine::getMotionParameter( const std::string& motion, dVector& ou
 }
 
 
-void MeCtBlendEngine::updateMotionExamples( const std::vector<SkMotion*>& inMotionSet, std::string interpolatorType )
+void MeCtBlendEngine::updateMotionExamples( const std::vector<SmartBody::SBMotion*>& inMotionSet, std::string interpolatorType )
 {
 	if (inMotionSet.size() == 0)
 		return;

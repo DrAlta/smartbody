@@ -57,6 +57,7 @@ class MeCtBreathing;
 class MeCtBasicLocomotion;
 class MeCtReachEngine;
 class MeCtPosePostProcessing;
+class MeCtMotionGraph;
 
 class ActionUnit;
 class SkMotion;
@@ -249,6 +250,7 @@ public:
 	MeCtBreathing*			breathing_p;
 	MeCtBasicLocomotion*	basic_locomotion_ct;
 	MeCtPosePostProcessing* postprocess_ct;
+	MeCtMotionGraph*        motiongraph_ct;
 
 	int 	viseme_channel_start_pos;
 	int 	viseme_channel_end_pos;
