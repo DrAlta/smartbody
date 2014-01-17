@@ -59,6 +59,7 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	//_choiceCharacters->callback(CharacterCB,this);
 
 	_buttonVoxelRigging = new Fl_Check_Button(710, yDis, 120, 25, "Voxel Rigging");
+	_buttonVoxelRigging->value(1);
 
 	tabGroup = new Fl_Tabs(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
 	//tabGroup->callback(changeTabGroup, this);
