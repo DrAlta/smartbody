@@ -110,7 +110,7 @@ namespace SmartBody {
 	{
 	public: ///// Constants
 		enum GraphWalkType { RANDOM_WALK, DIRECTED_CONTROL, FULL_MANUAL } ;
-		typedef std::pair<SBMotionTransitionEdge*, std::vector<float>> SBTransitionRecord;
+		typedef std::pair<SBMotionTransitionEdge*, std::vector<float> > SBTransitionRecord;
 	protected:
 		SBMotionNode *prevNode, *nextNode;
 		SBMotionNode *motionNode;
@@ -167,7 +167,7 @@ namespace SmartBody {
 		{
 			int curNodeIdx;
 			SrMat curTransform;
-			std::vector<std::pair<int,int>> graphEdges;
+			std::vector<std::pair<int,int> > graphEdges;
 			float traversePathDist;
 			float traverseTime;
 			float traverseError;
