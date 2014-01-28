@@ -2122,8 +2122,11 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 							newModel->Fm.push() = curmtl;
 							if (ftVec.size() > x)
 								newModel->Ft.push().set(ftVec[0], ftVec[x - 1], ftVec[x]);
-							else
+							else if (ftVec.size() > 2)
 								newModel->Ft.push().set(ftVec[0], ftVec[1], ftVec[2]);
+							else
+								newModel->Ft.push().set(0, 0, 0);
+							
 							if (fnVec.size() > x)
 								newModel->Fn.push().set(fnVec[0], fnVec[x - 1], fnVec[x]);
 							else
