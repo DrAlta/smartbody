@@ -844,6 +844,8 @@ void SBCharacter::interruptFace(double seconds)
 	// retrieve any action units being executed
 	std::vector<MeCtScheduler2::TrackPtr> tracks = head_sched_p->tracks();
 
+	std::vector<MeCtScheduler2::TrackPtr> tracksToRemove;
+
 	for (unsigned int t = 0; t < tracks.size(); t++)
 	{
 		MeCtScheduler2::TrackPtr track = tracks[t];
@@ -861,20 +863,23 @@ void SBCharacter::interruptFace(double seconds)
 		bool visemeExists = faceDefinition->hasViseme(controllerName);
 		if (visemeExists)
 		{
-			this->schedule_viseme_trapezoid(controllerName.c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), 1, 0, float(seconds), float(seconds));
-			this->pruneControllers();
+			tracksToRemove.push_back(track);
+			//this->schedule_viseme_trapezoid(controllerName.c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), 0, 0, float(seconds), float(seconds));
+			//this->pruneControllers();
 		}
 		else
 		{
 			ActionUnit* au = faceDefinition->getAUByName(controllerName);
 			if (au)
 			{
-				this->schedule_viseme_trapezoid(controllerName.c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), 0, 0, float(seconds), float(seconds));
-				this->pruneControllers();
+				tracksToRemove.push_back(track);
+				//this->schedule_viseme_trapezoid(controllerName.c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), 0, 0, float(seconds), float(seconds));
+				//this->pruneControllers();
 			}
 		}
 	}
-	
+	if (tracksToRemove.size() > 0)
+		head_sched_p->remove_tracks(tracksToRemove);
 }
 
 void SBCharacter::copy( SmartBody::SBCharacter* origChar )

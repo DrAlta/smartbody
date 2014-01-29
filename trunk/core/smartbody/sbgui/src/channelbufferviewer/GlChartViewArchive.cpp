@@ -24,7 +24,7 @@
 #include <string.h>
 #include <sr/sr_euler.h>
 #include <vhcl_math.h>
-
+#include <stdlib.h>
 
 GlChartViewSeries::GlChartViewSeries()
 {

@@ -1,3 +1,4 @@
+#include "vhcl.h"
 #include "ImageSequencePlayer.h"
 #include "external/glew/glew.h"
 #include <sr/sr_gl.h>

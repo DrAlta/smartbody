@@ -815,6 +815,7 @@ void VisemeViewerWindow::loadAudioFiles()
 
 	_choiceAudioFile->clear();
 	// if an audio path is present, use it
+	bool useAudioPaths = true;
 	std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
 	std::string relativeAudioPath = "";
 	for (size_t audioPathCounter = 0; audioPathCounter < audioPaths.size(); ++audioPathCounter)
@@ -931,7 +932,6 @@ void VisemeViewerWindow::OnLoadCB(Fl_Widget* widget, void* data)
 	if (fileName == "")
 		return;
 
-#ifndef SB_NO_PYTHON
 	try {
 		std::stringstream strstr;
 		strstr << "execfile(\"" << fileName << "\")";
@@ -941,9 +941,7 @@ void VisemeViewerWindow::OnLoadCB(Fl_Widget* widget, void* data)
 	} catch (...) {
 		PyErr_Print();
 	}
-#else
-	LOG("Python has been disabled.");
-#endif
+
 	viewer->updateViseme();
 	viewer->redraw();
 }
@@ -1014,7 +1012,7 @@ void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
 					double inputLength = atof(viewer->_imageSequenceViewer->_inputAudioLength->value());
 					if (inputLength > 0)
 						length = (float)inputLength;
-					viewer->_imageSequenceViewer->playbackSequence(SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), length, (float)timeDelay);
+					viewer->_imageSequenceViewer->playbackSequence((float)SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), length, (float)timeDelay);
 				}
 			}
 		}

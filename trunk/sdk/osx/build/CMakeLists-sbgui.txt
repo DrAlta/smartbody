@@ -15,7 +15,8 @@ include_directories( ../../include/python2.7)
 include_directories( external/Pinocchio )
 include_directories( external/polyvox/library/PolyVoxCore/include)
 
-add_definitions(  -std=c++11 )
+#add_definitions(  -std=c++11 )
+add_definitions(  -std=c++0x )
 
 LINK_DIRECTORIES( ${PROJECT_SOURCE_DIR}/lib )
 LINK_DIRECTORIES( ${PROJECT_SOURCE_DIR}/bin )
