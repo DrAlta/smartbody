@@ -8,7 +8,7 @@
 
 #include "vhcl_public.h"
 
-#include <sb/SBTypes.h>
+#include "sb/SBTypes.h"
 
 
 typedef intptr_t SBMHANDLE;

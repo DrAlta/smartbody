@@ -17,7 +17,7 @@ rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/include/*.h ./SmartBodySDK/in
 rsync -ap --exclude=".svn" ../../lib/wsp/wsp/include/*.h ./SmartBodySDK/include/wsp/
 rsync -ap --exclude=".svn" ../../lib/bonebus/include/*.h ./SmartBodySDK/include/bonebus/
 rsync -ap --exclude=".svn" ../../lib/vhcl/include/*.h ./SmartBodySDK/include/vhcl/
-rsync -ap --exclude=".svn" ../../lib/protobuf/include/* ./SmartBodySDK/include/protobuf/
+rsync -ap --exclude=".svn" ../../core/smartbody/SmartBody/src/external/protobuf/include/* ./SmartBodySDK/include/protobuf/
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/pprAI/include/*.h ./SmartBodySDK/include/steersuite/
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/steerlib/include/* ./SmartBodySDK/include/steersuite/
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/* ./SmartBodySDK/include/steersuite/
@@ -27,6 +27,7 @@ rsync -ap --exclude=".svn" ./lib/* ./SmartBodySDK/lib/
 
 # copy bin & copy all the dynamic libraries to bin folder
 rsync -ap --exclude=".svn" ./bin ./SmartBodySDK
+chmod +x ./SmartBodySDK/bin/protoc
 
 # copy dylib for SmartBody 
 #cp ../../core/smartbody/sbgui/bin/sbgui ./SmartBodySDK/bin
@@ -34,8 +35,8 @@ rsync -ap --exclude=".svn" ./bin ./SmartBodySDK
 #cp ../../core/smartbody/sbgui/bin/libSmartBody.dylib ./SmartBodySDK/bin
 
 # copy dylib for pprAI and steerlib (assuming it's prebuilt)
-cp ../../core/smartbody/sbgui/bin/libpprAI.dylib ./SmartBodySDK/bin
-cp ../../core/smartbody/sbgui/bin/libsteerlib.dylib ./SmartBodySDK/bin
+#cp ../../core/smartbody/sbgui/bin/libpprAI.dylib ./SmartBodySDK/bin
+#cp ../../core/smartbody/sbgui/bin/libsteerlib.dylib ./SmartBodySDK/bin
 
 # copy readme.txt
 rsync -ap --exclude=".svn" ./readme.txt ./SmartBodySDK/readme.txt

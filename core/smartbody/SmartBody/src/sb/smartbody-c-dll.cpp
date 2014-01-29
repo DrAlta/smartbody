@@ -7,7 +7,7 @@
 #include <fstream>
 #include <ios>
 #include <string.h>
-
+#include <map>
 #include "smartbody-dll.h"
 
 

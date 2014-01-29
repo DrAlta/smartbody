@@ -71,6 +71,8 @@ find_package(OpenGL REQUIRED)
 add_custom_target(protoctarget
 		DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/protocols/sbmotion.pb.cc
 		COMMAND ${CMAKE_SOURCE_DIR}/bin/protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/protocols ${CMAKE_CURRENT_SOURCE_DIR}/protocols/sbmotion.proto 
+		COMMAND ${CMAKE_SOURCE_DIR}/bin/protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/protocols ${CMAKE_CURRENT_SOURCE_DIR}/protocols/sbutilities.proto 
+		COMMAND ${CMAKE_SOURCE_DIR}/bin/protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/protocols ${CMAKE_CURRENT_SOURCE_DIR}/protocols/sbmesh.proto 
 		
 		)
 
@@ -492,6 +494,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./sb/SBPythonSkeleton.cpp
         ./sb/SBPythonSystem.cpp
         ./sb/SBPythonClass.cpp
+        ./sb/SBPythonMesh.cpp
 		
         ./sb/SBAssetHandler.cpp
         ./sb/SBAssetHandlerCOLLADA.cpp
@@ -502,7 +505,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	./sb/SBAssetHandlerOgre.cpp
 	./sb/SBAssetHandlerObj.cpp
 	./sb/SBAssetHandlerBvh.cpp
-	./sb/SBAssetHandlerSkb.cpp
+	./sb/SBAssetHandlerSkmb.cpp
+	./sb/SBAssetHandlerSBMeshBinary.cpp
         ./sb/SBBehavior.cpp
         ./sb/SBDebuggerServer.cpp
         ./sb/SBDebuggerClient.cpp
@@ -514,6 +518,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	./sb/smartbody-c-dll.cpp
 		
 	./protocols/sbmotion.pb.cc
+	./protocols/sbutilities.pb.cc
+	./protocols/sbmesh.pb.cc
 )
 
 add_library(

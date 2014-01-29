@@ -8,7 +8,7 @@
 #include <queue>
 #include <map>
 
-#include <sb/SBTypes.h>
+#include "sb/SBTypes.h"
 
 
 // Listener class that executables should derive from to get Smartbody related notifications.

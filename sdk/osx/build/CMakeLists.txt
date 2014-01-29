@@ -3,7 +3,7 @@ project( SmartBody )
 SET(CMAKE_SYSTEM_NAME Darwin)
 
 set( CMAKE_INSTALL_PREFIX "../" )
-set( CMAKE_OSX_DEPLOYMENT_TARGET "10.5" )
+set( CMAKE_OSX_DEPLOYMENT_TARGET "10.6" )
 #debug
 #add_definitions(	-g3 -fPIC )
 #release
