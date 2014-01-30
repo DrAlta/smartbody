@@ -226,5 +226,12 @@ namespace SmartBody {
 	protected:
 		std::map<std::string, SBMotionGraph*> _motionGraphMap;
 	};
+
+	struct MotionGraphNode
+	{
+		int nodeIdx;
+		int moIndex;
+		int startFrame, endFrame;
+	};
 }
 #endif // namespace
