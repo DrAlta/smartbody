@@ -87,7 +87,8 @@ class SrModel : public SrSharedClass
      };
 
     SrArray<SrMaterial> M;  //!< Used materials
-    SrArray<SrPnt>      V;  //!< Vertices coordinates		
+    SrArray<SrPnt>      V;  //!< Vertices coordinates
+	SrArray<SrVec>      Vc; // color of vertices
     SrArray<SrVec>      N;  //!< Normals table		
 	SrArray<SrVec>      Tangent, BiNormal; // tangent and bi normal vectors
     SrArray<SrPnt2>     T;  //!< Texture coordinates

@@ -25,7 +25,7 @@ RotationControl::RotationControl(void) : ObjectControl()
 
 	radius[0]=100;		//inside circle
 	radius[1]=85;		//outside circle
-	seg=100;
+	seg=300;
 	circle.resize(seg);
 	for (int i=0;i<seg;i++)
 		circle[i]=SrVec2(cos(2.0f*(float)M_PI/seg*i),sin(2.0f*(float)M_PI/seg*i));

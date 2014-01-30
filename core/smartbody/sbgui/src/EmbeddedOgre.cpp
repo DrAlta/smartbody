@@ -788,6 +788,7 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 
 	DeformableMesh* deformMesh = meshInstance->getDeformableMesh();
 	if (!deformMesh) return NULL;
+	
 	if (deformMesh->isSkinnedMesh())	
 	{
  		ogreMesh->setSkeletonName(skeletonName);	
@@ -957,7 +958,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		size_t offset = 0;
 		decl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
 		offset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
-		decl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_NORMAL);
+		decl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_NORMAL);		
 		// store texture coordinate in a separate element
 		//decl->addElement(1, offset, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES);
 		
@@ -1031,24 +1032,29 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	{		
 		return; // mesh already exists
 	}
-
+	LOG("Generating Deformable Model Name = %s, size of pos buffer = %d, size of color buffer = %d", meshName.c_str(), meshInstance->getDeformableMesh()->posBuf.size(), meshInstance->getDeformableMesh()->meshColorBuf.size());
+	bool isAutoRig = meshName == "AutoRig.dae";
+	int perVertexSize = 6;
 	float meshScale = meshInstance->getMeshScale();
 	Ogre::MeshPtr ogreMesh = meshManager.create(meshName,"General",true);
 	mesh->buildSkinnedVertexBuffer(); // if not already built
 	Ogre::VertexData* vtxData = new Ogre::VertexData();
 	ogreMesh->sharedVertexData = vtxData;
 	vtxData->vertexCount = mesh->posBuf.size();
-
+	bool hasColorBuf = mesh->meshColorBuf.size() == mesh->posBuf.size();
 	Ogre::VertexDeclaration* decl = vtxData->vertexDeclaration;
 	size_t offset = 0;
 	decl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
 	offset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
 	decl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_NORMAL);
+	offset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
+	
 	// store texture coordinate in a separate element
 	//offset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
-	decl->addElement(1, 0, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES);
+	
 
 	// create vertex buffer 0 : position and normal
+
 	Ogre::HardwareVertexBufferSharedPtr vbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
 		decl->getVertexSize(0),                     // This value is the size of a vertex in memory
 		vtxData->vertexCount,                       // The number of vertices you'll put into this buffer
@@ -1056,7 +1062,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		true
 		);	
 	float* tempFloatArray;
-	tempFloatArray = new float[vtxData->vertexCount*6];
+	tempFloatArray = new float[vtxData->vertexCount*perVertexSize];
 	SrVec bbMax, bbMin;
 	bbMax = SrVec((float)-1e20,(float)-1e20,(float)-1e20);
 	bbMin = SrVec((float)1e20,(float)1e20,(float)1e20);
@@ -1065,8 +1071,16 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		SrVec meshPos = mesh->posBuf[j]*meshScale;
 		for (int k=0;k<3;k++)
 		{
-			tempFloatArray[j*6+k] = meshPos[k];
-			tempFloatArray[j*6+3+k] = mesh->normalBuf[j][k];
+			tempFloatArray[j*perVertexSize+k] = meshPos[k];
+			tempFloatArray[j*perVertexSize+3+k] = mesh->normalBuf[j][k];
+// 			if (hasColorBuf)
+// 			{
+// 				//if (isAutoRig)
+// 				//	LOG("Mesh Color = %f", mesh->meshColorBuf[j][k]);
+// 				if (j < 10)
+// 					LOG("Mesh Color = %f", mesh->meshColorBuf[j][k]);
+// 				tempFloatArray[j*perVertexSize+6+k] = mesh->meshColorBuf[j][k];								
+// 			}
 			if (bbMax[k] < meshPos[k])
 				bbMax[k] = meshPos[k];
 			if (bbMin[k] > meshPos[k])
@@ -1078,23 +1092,49 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	Ogre::VertexBufferBinding* bind = vtxData->vertexBufferBinding;
 	bind->setBinding(0, vbuf);
 	delete [] tempFloatArray;
+	
+	if (hasColorBuf)
+	{		
+		decl->addElement(1, 0, Ogre::VET_FLOAT3, Ogre::VES_DIFFUSE);
+		//perVertexSize = 9;
+		offset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT3);
 
-	// create vertex buffer 1 : texture coordinate
-	Ogre::HardwareVertexBufferSharedPtr tbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-		decl->getVertexSize(1),                     // This value is the size of a vertex in memory
-		vtxData->vertexCount,                       // The number of vertices you'll put into this buffer
-		Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, // Properties
-		true
-		);		
-	tempFloatArray = new float[vtxData->vertexCount*2];
-	for (unsigned int j=0;j<vtxData->vertexCount;j++)
-	{
-		tempFloatArray[j*2] = mesh->texCoordBuf[j][0];
-		tempFloatArray[j*2+1] = mesh->texCoordBuf[j][1];
+		Ogre::HardwareVertexBufferSharedPtr cbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+			decl->getVertexSize(1),                     // This value is the size of a vertex in memory
+			vtxData->vertexCount,                       // The number of vertices you'll put into this buffer
+		 	Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, // Properties
+		 	true
+	 		);		
+		tempFloatArray = new float[vtxData->vertexCount*3];
+		for (unsigned int j=0;j<vtxData->vertexCount;j++)
+		{
+			tempFloatArray[j*3] = mesh->meshColorBuf[j][0];
+			tempFloatArray[j*3+1] = mesh->meshColorBuf[j][1];
+			tempFloatArray[j*3+2] = mesh->meshColorBuf[j][2];
+		}
+		cbuf->writeData(0, cbuf->getSizeInBytes(), tempFloatArray, true);		
+		bind->setBinding(1, cbuf);
 	}
 
-	tbuf->writeData(0, tbuf->getSizeInBytes(), tempFloatArray, true);		
- 	bind->setBinding(1, tbuf);
+// 	int nextBindIdx = bind->getNextIndex();
+// 	// create vertex buffer 1 : texture coordinate
+// 	decl->addElement(nextBindIdx, 0, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES);
+// 	Ogre::HardwareVertexBufferSharedPtr tbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+// 		decl->getVertexSize(1),                     // This value is the size of a vertex in memory
+// 		vtxData->vertexCount,                       // The number of vertices you'll put into this buffer
+// 		Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, // Properties
+// 		true
+// 		);		
+// 	tempFloatArray = new float[vtxData->vertexCount*2];
+// 	for (unsigned int j=0;j<vtxData->vertexCount;j++)
+// 	{
+// 		tempFloatArray[j*2] = mesh->texCoordBuf[j][0];
+// 		tempFloatArray[j*2+1] = mesh->texCoordBuf[j][1];
+// 	}
+// 
+// 	tbuf->writeData(0, tbuf->getSizeInBytes(), tempFloatArray, true);		
+//  	bind->setBinding(nextBindIdx, tbuf);
+	
 	for (unsigned int i=0;i<mesh->subMeshList.size();i++)
 	{
 		SbmSubMesh* subModel = mesh->subMeshList[i];		
@@ -1142,14 +1182,28 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		//pass->setAmbient(color[0],color[1],color[2]);
 		mat.diffuse.get(color);	
 		//LOG("diffuse color = %f %f %f %f",color[0],color[1],color[2],color[3]);
-		pass->setDiffuse(color[0],color[1],color[2],color[3]);
-		mat.specular.get(color);	
-		//LOG("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
-		pass->setSpecular(color[0],color[1],color[2],color[3]);
-		pass->setShininess(mat.shininess);
-		pass->setAlphaRejectSettings(CMPF_GREATER, 0, true);		
-		pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
-		pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);	
+		if (hasColorBuf)
+		{
+			pass->setVertexColourTracking(TVC_DIFFUSE);
+			pass->setLightingEnabled(false);
+		}
+		else
+		{
+			pass->setDiffuse(color[0],color[1],color[2],color[3]);
+			mat.specular.get(color);	
+			//LOG("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
+			pass->setSpecular(color[0],color[1],color[2],color[3]);
+			pass->setShininess(mat.shininess);		
+		}
+	
+		if (!hasColorBuf)
+		{
+			// disable texture alpha blending if we are using vertex color
+			pass->setAlphaRejectSettings(CMPF_GREATER, 0, true);		
+			pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
+			pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);	
+		}
+		
 		//pass->setSceneBlending(Ogre::SBF_ONE, Ogre::SBF_ONE_MINUS_SOURCE_ALPHA);;
 		//pass->setShadingMode(SO_PHONG);
 		//pass->setShadowCasterVertexProgram("Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs");

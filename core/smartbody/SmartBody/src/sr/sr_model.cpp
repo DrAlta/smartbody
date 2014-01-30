@@ -52,6 +52,7 @@ void SrModel::init ()
    culling = true;
    M.capacity ( 0 );
    V.capacity ( 0 );
+   Vc.capacity( 0 );
    N.capacity ( 0 );
    T.capacity ( 0 );
    F.capacity ( 0 );
@@ -66,6 +67,7 @@ void SrModel::compress ()
  {
    M.compress();
    V.compress();
+   Vc.compress();
    N.compress();
    T.compress();
    F.compress();
@@ -1008,6 +1010,7 @@ void SrModel::operator = ( const SrModel& m )
  {
    M = m.M;
    V = m.V;
+   Vc = m.Vc;
    N = m.N;
    T = m.T;
    F = m.F;

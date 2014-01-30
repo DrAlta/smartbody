@@ -460,6 +460,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	binormalBuf.resize(nTotalVtxs);
 	texCoordBuf.resize(nTotalVtxs);
 	skinColorBuf.resize(nTotalVtxs);
+	meshColorBuf.resize(nTotalVtxs);
 	triBuf.resize(nTotalTris);
 
 	if (buildSkinnedBuffer)
@@ -520,6 +521,11 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			}
 			SrVec& lv = dMeshStatic->shape().V[i];					
 			posBuf[iVtx] = lv*bindShapeMat;
+			SrVec meshColor = SrVec(1.f,1.f,1.f);
+			if (i < dMeshStatic->shape().Vc.size())
+				meshColor = dMeshStatic->shape().Vc[i];
+			meshColorBuf[iVtx] = meshColor;
+
 			SrVec& lt =	dMeshStatic->shape().Tangent[i];		
 			SrVec& lb = dMeshStatic->shape().BiNormal[i];
 			tangentBuf[iVtx] = lt*bindShapeMat;
@@ -596,6 +602,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				for (unsigned int k=0;k<idxMap.size();k++)
 				{
 					posBuf[idxMap[k]] = posBuf[iVtx];
+					meshColorBuf[idxMap[k]] = meshColorBuf[iVtx];
 					tangentBuf[idxMap[k]] = tangentBuf[iVtx];
 					binormalBuf[idxMap[k]] = binormalBuf[iVtx];
 
