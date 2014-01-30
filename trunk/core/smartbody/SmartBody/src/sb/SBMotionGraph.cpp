@@ -806,7 +806,7 @@ SBAPI SBMotionTransitionEdge* SBMotionGraph::getMotionEdge( const std::string& s
 	return NULL;
 }
 
-SBAPI void SBMotionGraph::synthesizePath( SteerPath& desiredPath, const std::string& skeletonName, std::vector<std::pair<std::string,std::string>>& graphTraverseEdges )
+SBAPI void SBMotionGraph::synthesizePath( SteerPath& desiredPath, const std::string& skeletonName, std::vector<std::pair<std::string,std::string> >& graphTraverseEdges )
 {
 	SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();
 	// build the delta transform cache to quickly compute the path cost	
@@ -875,7 +875,7 @@ SBAPI void SBMotionGraph::synthesizePath( SteerPath& desiredPath, const std::str
 	finalGraphTraverse = curGraphTraverse;
 
 	float timeThreshold = 2.f; // restart traverse for every 2 seconds of graph traversal
-	std::vector<std::pair<int,int>> bestEdgeList;
+	std::vector<std::pair<int,int> > bestEdgeList;
 	bool reachTarget = false;
 	while (!reachTarget && bestGraphTraverse.traversePathDist < desiredPath.pathLength()*1.2f) 
 	{		
@@ -1055,18 +1055,18 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 		affectedJointNames.push_back(ikTree.ikTreeNodes[i]->joint->getMappedJointName());
 	}
 
-	std::vector<std::vector<int>> fromToList; // store all splited frames by transition
-	//std::vector<std::map<int,bool>> fromToList;
+	std::vector<std::vector<int> > fromToList; // store all splited frames by transition
+	//std::vector<std::map<int,bool> > fromToList;
 	fromToList.resize(motionNames.size());
 	typedef std::pair<int,int> IntPair;
-	std::map<IntPair, std::vector<IntPair>> transitionMap;
+	std::map<IntPair, std::vector<IntPair> > transitionMap;
 	int minFrameMergeDist = 3;
 	int minFrameRejectDist = 8;
 	for (unsigned int i=0;i<motionNames.size();i++)
 	{
 		for (unsigned int j=0;j<motionNames.size();j++)
 		{
-			std::vector<std::pair<int,int>> outTransition;
+			std::vector<std::pair<int,int> > outTransition;
 			//LOG("Building motion transition from '%s' to '%s'",motionNames[i].c_str(),motionNames[j].c_str());
 			//computeMotionTransition(motionNames[i],motionNames[j], skelName, affectedJointNames, threshold, outTransition);	
 			computeMotionTransitionFast(motionNames[i],motionNames[j], skelName, affectedJointNames, threshold, outTransition);
@@ -1107,7 +1107,7 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 		int moIndex;
 		int startFrame, endFrame;
 	};
-	std::vector<std::pair<int,int>> forwardEdgeList;
+	std::vector<std::pair<int,int> > forwardEdgeList;
 	std::vector<MotionGraphNode> motionNodeList;
 	std::map<IntPair,int> startFrameNodeMap;
 	std::map<IntPair,int> endFrameNodeMap;
@@ -1152,7 +1152,7 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 		IntPair& edge = forwardEdgeList[i];
 		boost::add_edge(edge.first, edge.second, tempMotionGraph);
 	}
-	std::map<IntPair, std::vector<IntPair>>::iterator mi;
+	std::map<IntPair, std::vector<IntPair> >::iterator mi;
 	for ( mi  = transitionMap.begin();
 		  mi != transitionMap.end();
 		  mi++)
@@ -1298,7 +1298,7 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 }
 
 
-void SBMotionGraph::computeMotionTransitionFast( const std::string& moName1, const std::string& moName2, const std::string& skelName, const std::vector<std::string>& affectedJointNames, float threshold, std::vector<std::pair<int,int>>& outTransition )
+void SBMotionGraph::computeMotionTransitionFast( const std::string& moName1, const std::string& moName2, const std::string& skelName, const std::vector<std::string>& affectedJointNames, float threshold, std::vector<std::pair<int,int> >& outTransition )
 {
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	SmartBody::SBMotion* motion1 = assetManager->getMotion(moName1);
@@ -1325,7 +1325,7 @@ void SBMotionGraph::computeMotionTransitionFast( const std::string& moName1, con
 	std::vector<SrVec> pointCloud1, pointCloud2;
 	pointCloud1.resize(affectedJointNames.size());
 	pointCloud2.resize(affectedJointNames.size());	
-	std::vector<std::vector<SrVec>> pointCloudList1, pointCloudList2;
+	std::vector<std::vector<SrVec> > pointCloudList1, pointCloudList2;
 	pointCloudList1.resize(mo1Frames);
 	pointCloudList2.resize(mo2Frames);
 	float invNumPoints = 1.f/affectedJointNames.size();
@@ -1473,7 +1473,7 @@ float SBMotionGraph::computeTransitionErrorFast( MotionCoordCache& cache, int fr
 
 
 #if 0
-void SBMotionGraph::computeMotionTransition( const std::string& moName1, const std::string& moName2, const std::string& skelName, const std::vector<std::string>& affectedJointNames, float threshold, std::vector<std::pair<int,int>>& outTransition )
+void SBMotionGraph::computeMotionTransition( const std::string& moName1, const std::string& moName2, const std::string& skelName, const std::vector<std::string>& affectedJointNames, float threshold, std::vector<std::pair<int,int> >& outTransition )
 {
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	SmartBody::SBMotion* motion1 = assetManager->getMotion(moName1);
@@ -1634,7 +1634,7 @@ SBAPI std::vector<std::string> SBMotionGraph::getMotionNodeNames()
 }
 
 // temp function for debugging
-void SBMotionGraph::writeOutTransitionMap( const std::string& outfilename, const dMatrix& mat, const std::vector<std::pair<int,int>>& transitions )
+void SBMotionGraph::writeOutTransitionMap( const std::string& outfilename, const dMatrix& mat, const std::vector<std::pair<int,int> >& transitions )
 {
 	double maxVal = -1.f;
 	for (unsigned int i=0;i<mat.size1();i++)
