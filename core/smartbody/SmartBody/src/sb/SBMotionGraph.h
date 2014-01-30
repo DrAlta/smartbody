@@ -197,16 +197,16 @@ namespace SmartBody {
 		SBAPI SBMotionTransitionEdge* getMotionEdge(const std::string& srcNode, const std::string& dstNode);
 		SBAPI std::vector<std::string> getMotionNodeNames();
 		SBAPI void buildAutomaticMotionGraph(const std::vector<std::string>& motionNames, const std::string& skelName, const std::vector<std::string>& endJointNames);
-		SBAPI void synthesizePath( SteerPath& desiredPath, const std::string& skeletonName, std::vector<std::pair<std::string,std::string>>& graphTraverseEdges);
+		SBAPI void synthesizePath( SteerPath& desiredPath, const std::string& skeletonName, std::vector<std::pair<std::string,std::string> >& graphTraverseEdges);
 	protected:
 		SBMotionNode* addMotionNodeFromMotionTransition( const std::string& nodeName, const std::string& motionName1, std::string& motionName2, int mo1EndFrme, int mo2StartFrame, int transitionLength = 5);
-		//void computeMotionTransition(const std::string& moName1, const std::string& moName2, const std::string& skelName, const std::vector<std::string>& affectedJointNames, float threshold, std::vector<std::pair<int,int>>& outTransition);
-		void computeMotionTransitionFast(const std::string& moName1, const std::string& moName2, const std::string& skelName, const std::vector<std::string>& affectedJointNames, float threshold, std::vector<std::pair<int,int>>& outTransition);
+		//void computeMotionTransition(const std::string& moName1, const std::string& moName2, const std::string& skelName, const std::vector<std::string>& affectedJointNames, float threshold, std::vector<std::pair<int,int> >& outTransition);
+		void computeMotionTransitionFast(const std::string& moName1, const std::string& moName2, const std::string& skelName, const std::vector<std::string>& affectedJointNames, float threshold, std::vector<std::pair<int,int> >& outTransition);
 
 		//float computeTransitionError(const std::vector<SrVec>& pos1, const std::vector<SrVec>& pos2, int idx1, int idx2);
 		float computeTransitionErrorFast(MotionCoordCache& cache, int frame1, int frame2, int windowSize );
 		bool findLocalMinimum(dMatrix& mat, int i, int j);
-		void writeOutTransitionMap(const std::string& outfilename, const dMatrix& mat, const std::vector<std::pair<int,int>>& transitions);
+		void writeOutTransitionMap(const std::string& outfilename, const dMatrix& mat, const std::vector<std::pair<int,int> >& transitions);
 		int findClosestElement(const std::vector<int>& intList, int val);
 		float pathError( SteerPath& curPath, const SBMotionNode* curNode, const SrMat& curTransform, MotionNodeCache& nodeCache, float pathLength);
 		float traverseGraph(SteerPath& curPath, MotionGraphTraverse& curGraphTraverse, MotionGraphTraverse& bestTraverse, std::map<std::string, MotionNodeCache>& deltaTransformMap, float timeThreshold, float& bestTraverseError);
