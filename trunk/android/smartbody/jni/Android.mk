@@ -154,9 +154,12 @@ LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libprotobuf.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
+
+
 LOCAL_MODULE := ann
 LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions 
-LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) 
+LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
+
 LOCAL_SRC_FILES := $(SBM_MY_DIR)/external/parser/Bchart.cpp \
 	$(SBM_MY_DIR)/external/parser/BchartSm.cpp \
 	$(SBM_MY_DIR)/external/parser/Bst.cpp \
@@ -233,6 +236,9 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/external/parser/Bchart.cpp \
 	$(SBM_MY_DIR)/external/zlib-1.2.5/unzip.c \
 	$(SBM_MY_DIR)/external/zlib-1.2.5/zip.c \
 	$(SBM_MY_DIR)/external/zlib-1.2.5/zutil.c \
+	$(SBM_MY_DIR)/external/rply/rply.c \
+
+	
 	
 	
 	
@@ -269,7 +275,8 @@ LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/pprAI/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/sbm-debugger/lib \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/smartbody-dll/include \
-					$(SBM_LOCAL_PATH)/../../../core/smartbody/ode/include	
+					$(SBM_LOCAL_PATH)/../../../core/smartbody/ode/include \
+					
 LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sr/sr_array.cpp \
 	$(SBM_MY_DIR)/sr/sr_box.cpp \
@@ -291,6 +298,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sr/sr_model.cpp \
 	$(SBM_MY_DIR)/sr/sr_model_import_obj.cpp \
 	$(SBM_MY_DIR)/sr/sr_model_export_iv.cpp \
+	$(SBM_MY_DIR)/sr/sr_model_import_ply.cpp \
 	$(SBM_MY_DIR)/sr/sr_output.cpp \
 	$(SBM_MY_DIR)/sr/sr_path_array.cpp \
 	$(SBM_MY_DIR)/sr/sr_plane.cpp \
@@ -431,6 +439,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_noise_controller.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_recorder.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_pose_postprocessing.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_motion_graph.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtBlendEngine.cpp \
 	$(SBM_MY_DIR)/controllers/MotionAnalysis.cpp \
 	$(SBM_MY_DIR)/sbm/ParserFBX.cpp \
@@ -492,6 +501,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonSkeleton.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonSystem.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonClass.cpp \
+	$(SBM_MY_DIR)/sb/SBPythonMesh.cpp \
 	$(SBM_MY_DIR)/sb/SBSimulationManager.cpp \
 	$(SBM_MY_DIR)/sb/SBBmlProcessor.cpp \
 	$(SBM_MY_DIR)/sb/SBAnimationState.cpp \
@@ -554,12 +564,16 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerOgre.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerObj.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerBvh.cpp \
+	$(SBM_MY_DIR)/sb/SBAssetHandlerPly.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerSBMeshBinary.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerSkmb.cpp \
+	$(SBM_MY_DIR)/sb/SBMotionGraph.cpp \
 	$(SBM_MY_DIR)/sb/smartbody-dll.cpp \
-        $(SBM_MY_DIR)/sb/smartbody-c-dll.cpp \
+    $(SBM_MY_DIR)/sb/smartbody-c-dll.cpp \
+	$(SBM_MY_DIR)/protocols/sbmesh.pb.cc \
 	$(SBM_MY_DIR)/protocols/sbmotion.pb.cc \
-	$(SBM_MY_DIR)/protocols/sbmesh.pb.cc 
+	$(SBM_MY_DIR)/protocols/sbutilities.pb.cc \	
+	
 
 
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv1_CM
