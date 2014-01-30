@@ -167,7 +167,8 @@ void SBScene::initialize()
 	_naviMeshManager = new SBNavigationMeshManager();
 	_motionGraphManager = new SBMotionGraphManager();
 
-	_scale = .01f; // default scale is centimeters
+	//_scale = .01f; // default scale is centimeters
+	_scale = 1.f;
 
 	// add the services
 	_serviceManager->addService(_steerManager);
@@ -187,7 +188,7 @@ void SBScene::initialize()
 
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 	createStringAttribute("speechRelaySoundCacheDir","../../../..",true,"",20,false,false,false,"Directory where sound files from speech relays will be placed. ");
-	createDoubleAttribute("scale",.01,true,"",30,false,false,false,"The scale of scene (1 = meters, .01 = centimeters, etc).");
+	createDoubleAttribute("scale",1.f,true,"",30,false,false,false,"The scale of scene (1 = meters, .01 = centimeters, etc).");
 	createIntAttribute("colladaTrimFrames",0,true,"",40,false,false,false,"Number of frames to be trimmed in the front when loading a collada motion.");
 	createBoolAttribute("useFastCOLLADAParsing",true,true,"",50,false,false,false,"Use faster parsing when reading COLLADA from a file.");
 	createBoolAttribute("useFastSpeechParsing",false,true,"",50,false,false,false,"Use faster parsing when reading speech from a file.");

@@ -94,6 +94,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 	bool isValidSkeleton = AutoRigToSBSk(out, sk, *sbSk);	
 	SbmDeformableMeshGPU* deformMesh = new SbmDeformableMeshGPU();
 	deformMesh->meshName = outDeformableMeshName;	
+	deformMesh->setName(outDeformableMeshName);
 	bool isValidDeformableMesh = AutoRigToDeformableMesh(out, inModel, *sbSk, *deformMesh);
 
 

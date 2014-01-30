@@ -78,6 +78,7 @@ public:
 	std::vector<SrVec>          tangentBuf;
 	std::vector<SrVec>          binormalBuf;
 	std::vector<SrVec>          skinColorBuf;
+	std::vector<SrVec>          meshColorBuf;
 	std::vector<SrVec2>         texCoordBuf;	
 	std::vector<SrVec3i>        triBuf;
 	std::vector<SbmSubMesh*>    subMeshList;
