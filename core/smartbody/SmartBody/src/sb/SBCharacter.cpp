@@ -1060,7 +1060,7 @@ SBAPI void SBCharacter::startMotionGraphWithPath( const std::vector<SrVec>& path
 	}
 
 	SteerPath moGraphPath;
-	std::vector<std::pair<std::string,std::string>> graphEdges;
+	std::vector<std::pair<std::string,std::string> > graphEdges;
 	moGraphPath.initPath(pathList, 0.1f);
 
 	trajectoryGoalList.clear();
