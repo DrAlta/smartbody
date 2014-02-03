@@ -3,11 +3,11 @@
 
 #include <vhcl.h>
 #include <string>
-#include <sb/SBCharacterListener.h>
+#include <sb/SBSceneListener.h>
 
 class OgreFramework;
 
-class SBListener : public SmartBody::SBCharacterListener
+class SBListener : public SmartBody::SBSceneListener
 {
 	public:
 		SBListener(OgreFramework* app);		

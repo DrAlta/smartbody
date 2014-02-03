@@ -15,7 +15,7 @@
 
 #ifdef USE_RTSHADER_SYSTEM
 #include "OgreRTShaderSystem.h"
-#include "AndroidInputManager.h"
+#include "android/AndroidInputManager.h"
 
 /** This class demonstrates basic usage of the RTShader system.
  It sub class the material manager listener class and when a target scheme callback

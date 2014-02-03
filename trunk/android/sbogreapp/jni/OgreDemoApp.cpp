@@ -240,7 +240,7 @@ void DemoApp::setupDemoScene()
 
 
     m_sbListener = new SBListener(OgreFramework::getSingletonPtr());
-    SmartBody::SBScene::getScene()->setCharacterListener(m_sbListener);
+    SmartBody::SBScene::getScene()->addSceneListener(m_sbListener);
      
     SBInitialize("");  
 }
