@@ -22,7 +22,7 @@
 #include <OISInputManager.h>
 #include <OISKeyboard.h>
 #include <OISMouse.h>
-#include "AndroidInputManager.h"
+#include "android/AndroidInputManager.h"
 
 #ifdef OGRE_STATIC_LIB
 #  define OGRE_STATIC_GL
