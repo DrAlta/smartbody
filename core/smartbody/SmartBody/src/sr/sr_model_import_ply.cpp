@@ -37,19 +37,7 @@ static int vertex_cb(p_ply_argument argument) {
 	if (idx == 0)
 		model->V.push();
 	double argumentValue = ply_get_argument_value(argument);
-	model->V.top()[idx] = argumentValue;	
-	return 1;
-}
-
-static int vertex_color_cb(p_ply_argument argument) {
-	static int count = 0;
-	long idx;	
-	SrModel* model;
-	ply_get_argument_user_data(argument, (void**)&model, &idx);
-	if (idx == 0)
-		model->Vc.push();
-	double argumentValue = ply_get_argument_value(argument);
-	model->Vc.top()[idx] = argumentValue/255.0;	
+	model->V.top()[int(idx)] = argumentValue;
 	return 1;
 }
 
@@ -68,7 +56,7 @@ static int face_cb(p_ply_argument argument) {
 	else if (value_index >= 0 && value_index <= 2) // a triangle face
 	{
 		double argumentValue = ply_get_argument_value(argument);
-		model->F.top()[value_index] = argumentValue;		
+		model->F.top()[int(value_index)] = argumentValue;
 	}		
 	return 1;
 }
@@ -87,9 +75,6 @@ bool SrModel::import_ply( const char* file )
 	nvertices = ply_set_read_cb(ply, "vertex", "x", vertex_cb, this, 0);
 	ply_set_read_cb(ply, "vertex", "y", vertex_cb, this, 1);
 	ply_set_read_cb(ply, "vertex", "z", vertex_cb, this, 2);
-	ply_set_read_cb(ply, "vertex", "red", vertex_color_cb, this, 0);
-	ply_set_read_cb(ply, "vertex", "green", vertex_color_cb, this, 1);
-	ply_set_read_cb(ply, "vertex", "blue", vertex_color_cb, this, 2);
 	ntriangles = ply_set_read_cb(ply, "face", "vertex_indices", face_cb, this, 0);
 	printf("%ld\n%ld\n", nvertices, ntriangles);
 	if (!ply_read(ply)) return false;

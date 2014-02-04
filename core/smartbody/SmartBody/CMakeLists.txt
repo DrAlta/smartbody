@@ -367,6 +367,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/controllers/me_ct_physics_controller.cpp
         ./src/controllers/me_ct_noise_controller.cpp
         ./src/controllers/me_ct_motion_recorder.cpp
+	./src/controllers/me_ct_motion_graph.cpp
+
 
         ./src/controllers/MeCtBlendEngine.cpp
         ./src/controllers/me_ct_motion_blend.cpp
@@ -441,6 +443,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBAnimationTransition.cpp
         ./src/sb/SBAnimationTransitionRule.cpp
         ./src/sb/SBAnimationStateManager.cpp
+	./src/sb/SBMotionGraph.cpp
         ./src/sb/SBSteerManager.cpp
         ./src/sb/SBSteerAgent.cpp
         ./src/sb/SBReachManager.cpp
