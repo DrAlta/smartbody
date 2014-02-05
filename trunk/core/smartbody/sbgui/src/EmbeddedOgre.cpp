@@ -1041,7 +1041,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	Ogre::VertexData* vtxData = new Ogre::VertexData();
 	ogreMesh->sharedVertexData = vtxData;
 	vtxData->vertexCount = mesh->posBuf.size();
-	bool hasColorBuf = mesh->meshColorBuf.size() == mesh->posBuf.size();
+	bool hasColorBuf = false;//mesh->meshColorBuf.size() == mesh->posBuf.size();
 	Ogre::VertexDeclaration* decl = vtxData->vertexDeclaration;
 	size_t offset = 0;
 	decl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
@@ -1115,26 +1115,29 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		cbuf->writeData(0, cbuf->getSizeInBytes(), tempFloatArray, true);		
 		bind->setBinding(1, cbuf);
 	}
+	else
+	{
+		// create vertex buffer 1 : texture coordinate
+		decl->addElement(1, 0, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES);
+		Ogre::HardwareVertexBufferSharedPtr tbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+			decl->getVertexSize(1),                     // This value is the size of a vertex in memory
+			vtxData->vertexCount,                       // The number of vertices you'll put into this buffer
+			Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, // Properties
+			true
+			);		
+		tempFloatArray = new float[vtxData->vertexCount*2];
+		for (unsigned int j=0;j<vtxData->vertexCount;j++)
+		{
+			tempFloatArray[j*2] = mesh->texCoordBuf[j][0];
+			tempFloatArray[j*2+1] = mesh->texCoordBuf[j][1];
+		}
+
+		tbuf->writeData(0, tbuf->getSizeInBytes(), tempFloatArray, true);		
+		bind->setBinding(1, tbuf);
+	}
 
 // 	int nextBindIdx = bind->getNextIndex();
-// 	// create vertex buffer 1 : texture coordinate
-// 	decl->addElement(nextBindIdx, 0, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES);
-// 	Ogre::HardwareVertexBufferSharedPtr tbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
-// 		decl->getVertexSize(1),                     // This value is the size of a vertex in memory
-// 		vtxData->vertexCount,                       // The number of vertices you'll put into this buffer
-// 		Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, // Properties
-// 		true
-// 		);		
-// 	tempFloatArray = new float[vtxData->vertexCount*2];
-// 	for (unsigned int j=0;j<vtxData->vertexCount;j++)
-// 	{
-// 		tempFloatArray[j*2] = mesh->texCoordBuf[j][0];
-// 		tempFloatArray[j*2+1] = mesh->texCoordBuf[j][1];
-// 	}
-// 
-// 	tbuf->writeData(0, tbuf->getSizeInBytes(), tempFloatArray, true);		
-//  	bind->setBinding(nextBindIdx, tbuf);
-	
+
 	for (unsigned int i=0;i<mesh->subMeshList.size();i++)
 	{
 		SbmSubMesh* subModel = mesh->subMeshList[i];		
