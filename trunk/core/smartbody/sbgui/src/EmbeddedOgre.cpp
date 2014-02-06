@@ -940,7 +940,7 @@ void EmbeddedOgre::addSBSkeleton( SmartBody::SBSkeleton* skel )
 	ogreSkel->load(); // load the skeleton	
 }
 
-void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstance* meshInstance )
+void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstance* meshInstance)
 {
 #if 0
 	Ogre::MeshManager& meshManager = Ogre::MeshManager::getSingleton();	
@@ -1041,7 +1041,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	Ogre::VertexData* vtxData = new Ogre::VertexData();
 	ogreMesh->sharedVertexData = vtxData;
 	vtxData->vertexCount = mesh->posBuf.size();
-	bool hasColorBuf = false;//mesh->meshColorBuf.size() == mesh->posBuf.size();
+	bool hasColorBuf = (mesh->meshColorBuf.size() == mesh->posBuf.size() && mesh->hasVertexColor);
 	Ogre::VertexDeclaration* decl = vtxData->vertexDeclaration;
 	size_t offset = 0;
 	decl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
@@ -1072,15 +1072,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		for (int k=0;k<3;k++)
 		{
 			tempFloatArray[j*perVertexSize+k] = meshPos[k];
-			tempFloatArray[j*perVertexSize+3+k] = mesh->normalBuf[j][k];
-// 			if (hasColorBuf)
-// 			{
-// 				//if (isAutoRig)
-// 				//	LOG("Mesh Color = %f", mesh->meshColorBuf[j][k]);
-// 				if (j < 10)
-// 					LOG("Mesh Color = %f", mesh->meshColorBuf[j][k]);
-// 				tempFloatArray[j*perVertexSize+6+k] = mesh->meshColorBuf[j][k];								
-// 			}
+			tempFloatArray[j*perVertexSize+3+k] = mesh->normalBuf[j][k];			
 			if (bbMax[k] < meshPos[k])
 				bbMax[k] = meshPos[k];
 			if (bbMin[k] > meshPos[k])

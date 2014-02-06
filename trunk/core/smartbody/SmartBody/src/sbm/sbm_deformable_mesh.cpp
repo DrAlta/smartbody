@@ -68,7 +68,7 @@ DeformableMesh::DeformableMesh() : SBAsset()
 	binding = false;
 	initSkinnedVertexBuffer = false;
 	initStaticVertexBuffer = false;
-
+	hasVertexColor = false;
 	skeleton = new SmartBody::SBSkeleton();
 	skeleton->ref();
 }
@@ -492,7 +492,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			boneColorMap.push_back(SrVec(1.f,0.f,0.f));
 		else
 			boneColorMap.push_back(SrVec(floatBuf[0],floatBuf[1],floatBuf[2]));				
-	}
+	}	
 	
 	for (unsigned int c=0;c<meshIndexList.size();c++)
 	{
@@ -523,7 +523,10 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			posBuf[iVtx] = lv*bindShapeMat;
 			SrVec meshColor = SrVec(1.f,1.f,1.f);
 			if (i < dMeshStatic->shape().Vc.size())
+			{
 				meshColor = dMeshStatic->shape().Vc[i];
+				hasVertexColor = true;
+			}
 			meshColorBuf[iVtx] = meshColor;
 
 			SrVec& lt =	dMeshStatic->shape().Tangent[i];		
@@ -1630,7 +1633,7 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 
 void DeformableMeshInstance::update()
 {
-	blendShapes();
+	//blendShapes();
 
 #define RECOMPUTE_NORMAL 0
 	if (!_updateMesh)	return;

@@ -63,6 +63,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
         return; // no deformable mesh
     }
 
+	//LOG("Render deformable mesh");
+
 	if (shape->isStaticMesh())
 	{
 		SmartBody::SBSkeleton* skel = shape->getSkeleton();
@@ -109,13 +111,13 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
 	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);      
 	
+	
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{	
 		SbmSubMesh* subMesh = subMeshList[i];
-		glMaterial(subMesh->material);
-		//LOG("mat color = %f %f %f\n",color[0],color[1],color[2]);
-		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,subMesh->texName.c_str());
-		//LOG("texManager size = %d, tex = %d, texName= %s",SbmTextureManager::singleton(),tex, subMesh->texName.c_str());
+		glMaterial(subMesh->material);		
+		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,subMesh->texName.c_str());		
+		//LOG("submesh num of tris = %d", subMesh->numTri);
 		if (tex && !showSkinWeight)
 		{
 			GLint activeTexture = -1;
