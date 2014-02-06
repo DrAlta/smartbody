@@ -1036,6 +1036,12 @@ float SBMotionGraph::pathError( SteerPath& curPath, const SBMotionNode* curNode,
 }
 
 
+struct MotionGraphNode
+{
+	int nodeIdx;
+	int moIndex;
+	int startFrame, endFrame;
+};
 
 SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::string>& motionNames, const std::string& skelName, const std::vector<std::string>& endJointNames )
 {
@@ -1101,12 +1107,7 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 	}
 
 	// analyze all the transition to build the raw graph
-	struct MotionGraphNode
-	{
-		int nodeIdx;
-		int moIndex;
-		int startFrame, endFrame;
-	};
+	
 	std::vector<std::pair<int,int> > forwardEdgeList;
 	std::vector<MotionGraphNode> motionNodeList;
 	std::map<IntPair,int> startFrameNodeMap;
