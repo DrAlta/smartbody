@@ -45,6 +45,7 @@ public:
 	ExampleFrameListener*  getOgreFrameListener() { return ogreFrameListener; }
 	Ogre::Camera*       getCamera() { return ogreCamera; }
 	unsigned long getGLContext() { return ogreGLContext; }
+	void makeGLContextCurrent();
 	Ogre::Entity* createOgreCharacter(SmartBody::SBCharacter* sbChar); // create a ogre character from a smartbody character
 	Ogre::Entity* createOgrePawn(SmartBody::SBPawn* sbPawn); // create a ogre character from a smartbody character
 

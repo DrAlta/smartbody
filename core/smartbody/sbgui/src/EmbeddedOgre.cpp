@@ -734,8 +734,9 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 
 }
 
+
 void EmbeddedOgre::update()
-{
+{	
 	ogreWnd->update(false);	
 	
 	// This update some internal counters and listeners.
@@ -752,6 +753,7 @@ void EmbeddedOgre::finishRender()
 
 Ogre::Entity* EmbeddedOgre::createOgrePawn( SmartBody::SBPawn* sbPawn )
 {
+	ogreWnd->setVSyncEnabled(true);
 	Ogre::Entity* outPawn = NULL;
 	std::string meshName = sbPawn->getStringAttribute("mesh");
 	DeformableMeshInstance* meshInstance = sbPawn->dStaticMeshInstance_p;
@@ -772,6 +774,7 @@ Ogre::Entity* EmbeddedOgre::createOgrePawn( SmartBody::SBPawn* sbPawn )
 
 Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar )
 {
+	ogreWnd->setVSyncEnabled(true);
 	Ogre::Entity* outChar = NULL;
 	std::string skeletonName = sbChar->getSkeleton()->getName();
 	std::string meshName = sbChar->getStringAttribute("deformableMesh");

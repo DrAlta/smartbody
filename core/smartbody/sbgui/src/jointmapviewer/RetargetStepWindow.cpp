@@ -15,6 +15,7 @@
 #include <sb/SBBehaviorSet.h>
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBAssetManager.h>
+#include <SBSelectionManager.h>
 
 #include <autorig/SBAutoRigManager.h>
 #include <boost/filesystem.hpp>
@@ -326,7 +327,7 @@ void RetargetStepWindow::applyAutoRig(bool voxelRigging)
 	
 	SrModel scaleModel = SrModel(model);
 
-	std::string modelName = (const char*) model.name;
+	std::string modelName = mesh->getName();//(const char*) model.name;
 	std::string filebasename = boost::filesystem::basename(modelName);
 	std::string fileextension = boost::filesystem::extension(modelName);
 	std::string skelName = filebasename+".sk";
@@ -417,12 +418,12 @@ void RetargetStepWindow::applyAutoRig(bool voxelRigging)
 	character->createActionAttribute("_4testReach", true, "TestHead", 300, false, false, false, "Test Head");
 	character->createActionAttribute("_5testLocomotion", true, "TestHead", 300, false, false, false, "Test Head");
 #endif	
-	//updateCharacterList();
+	//updateCharacterList();	
 	scene->removePawn(pawnName);	
 	this->refreshAll();		
 	this->setApplyType(true);
 	setCharacterName(charName);
-	setJointMapName(skelName);	
+	setJointMapName(skelName);		
 }
 
 
