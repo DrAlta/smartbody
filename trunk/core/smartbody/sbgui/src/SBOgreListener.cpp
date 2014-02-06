@@ -89,7 +89,7 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	{
 		//Create character from characterType
 		//ent = ogreInterface->getSceneManager()->createEntity(name, name + ".mesh" );
-		//LOG("create ogre chracter = %s",name.c_str());
+		//LOG("create ogre chracter = %s",name.c_str());		
 		if (isPawn)
 			ent = ogreInterface->createOgrePawn(pawn);
 		else
