@@ -5,6 +5,30 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/regex.hpp>
 
+
+// extract phoneme from possible initial or final metacharacters in ntp token
+// Note some phoneme names contain '(' but never as initial character
+// We leave "|" as is, it will never match any phoneme.
+static std::string ntpToken2phoneme(std::string& token)
+{
+	int s = 0;
+	int e = token.size() - 1;
+
+	while (token[s] == '[' || token[s] == '(')
+		++s;
+	while (token[e] == ']' || token[e] == ')')
+		--e;
+
+	return token.substr(s, (e-s) + 1);
+}
+
+static std::string unescapePhoneme(std::string& token)
+{
+	if (token == "\\>") // txt1 prints > phoneme as \>
+		return ">";
+	return token;
+}
+
 void CSLUConverter::generateDiphoneBML(const std::string& iFileName, const std::string& oFileName, const std::string& ntpFileName, const std::string& txtFileName, const std::string& baseFileName, const std::map<std::string, std::string> mapping)
 {
 	std::ifstream ifile(iFileName.c_str());
@@ -62,7 +86,7 @@ void CSLUConverter::generateDiphoneBML(const std::string& iFileName, const std::
 	}
 	if (ntpLines.size() > 0)
 		ntpLine = ntpLines[0];	// ntp file is supposed to only have one line
-
+	
 	std::vector<std::string> txtLines;
 	std::string txtLine = "";
 	while (!txtFile.eof())
@@ -82,47 +106,44 @@ void CSLUConverter::generateDiphoneBML(const std::string& iFileName, const std::
 	std::vector<std::string> ntpTokens;
 	vhcl::Tokenize(ntpLine, ntpTokens, " ");
 	int phonemeIndex = 0;
-	int ntpId = 0;
-	int sPhonemeId = -1;
-	int ePhonemeId = -1;
+	int ntpId = 1;			// start after initial [.pau]
+	int sPhonemeId = 0;		// current word starts on first phoneme
+	int ePhonemeId = -1;	// until current word end detected
 
-	bool stop = false;
-	bool wordStart = false;
-	while (ntpId < (int)ntpTokens.size() && phonemeIndex < (int)phonemesBeforeMapping.size())
+	while (phonemeIndex < (int)phonemesBeforeMapping.size())
 	{
-		if (ntpTokens[ntpId] == "[.pau]")
-		{
-			if (sPhonemeId < 0)
-			{
-				sPhonemeId = phonemeIndex;
-			}
-			else
-			{
-				ePhonemeId = phonemeIndex - 1;
-				wordStartTimes.push_back(startTimes[sPhonemeId]);
-				wordEndTimes.push_back(endTimes[ePhonemeId]);
-				sPhonemeId = phonemeIndex;
-			}
-			ntpId++;
-			continue;
-		}
-		if (phonemesBeforeMapping[phonemeIndex] == ".pau")
+		if (phonemesBeforeMapping[phonemeIndex] == ".pau")  // interword pause in phoneme list
 		{
 			phonemeIndex++;
-			if (sPhonemeId >= 0)
-				sPhonemeId++;
+			sPhonemeId++;		// advance start of current word
 			continue;
 		}
 
-		if (phonemesBeforeMapping[phonemeIndex] == ntpTokens[ntpId++])
+		// scan through ntpTokens until end-of-word marker, incrementing phonemeIndex on matches
+		while (ntpId < (int)ntpTokens.size() && ntpTokens[ntpId] != "[.pau]" ) {
+			if (phonemeIndex >= (int)phonemesBeforeMapping.size()) { // all phonemes have been matched
+				ntpId++; // continue to [.pau] at end of ntpTokens
+			}
+			else if (unescapePhoneme(phonemesBeforeMapping[phonemeIndex]) == ntpToken2phoneme(ntpTokens[ntpId++]))
+			{
+				phonemeIndex++;
+			}
+		}
+
+		if (ntpTokens[ntpId] == "[.pau]")	// at end of word marker in pronunciation. Should always be true here. 
 		{
-			phonemeIndex++;
+			// record word with last phoneme time as end
+			ePhonemeId = phonemeIndex - 1;
+			wordStartTimes.push_back(startTimes[sPhonemeId]);
+			wordEndTimes.push_back(endTimes[ePhonemeId]);
+			sPhonemeId = phonemeIndex;
+			ntpId++;
 		}
 	}
 
 	if (words.size() != wordStartTimes.size())
 	{
-		std::cout << "Ntp words not matching txt words!" << std::endl;
+		std::cout << iFileName << ": " << "Ntp words not matching txt words!" << std::endl;
 	}
 
 	// generate BML file
