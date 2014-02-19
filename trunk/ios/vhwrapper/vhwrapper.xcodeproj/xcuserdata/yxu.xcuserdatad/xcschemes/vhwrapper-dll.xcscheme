@@ -14,9 +14,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "AAC9AC9D142012EC00F56F9C"
-               BuildableName = "libvhwrapper-dll.a"
-               BlueprintName = "vhwrapper-dll"
-               ReferencedContainer = "container:vhwrapper-dll.xcodeproj">
+               BuildableName = "libvhwrapper.a"
+               BlueprintName = "vhwrapper"
+               ReferencedContainer = "container:vhwrapper.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
