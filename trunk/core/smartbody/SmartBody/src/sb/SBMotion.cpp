@@ -2827,5 +2827,7 @@ SBAPI bool SBMotion::downsample( int factor )
 		newFrames[i].posture = _frames[oldFrameIdx].posture;
 	}
 	_frames = newFrames;
+
+	return true;
 }
 };

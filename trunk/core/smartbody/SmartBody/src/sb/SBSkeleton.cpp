@@ -70,7 +70,6 @@ SBAPI SBJoint* SBSkeleton::createJoint(const std::string& name, SBJoint* parent)
 		//joint->pos()->limits(2, false);
 	}
 
-
 	int parentId = -1;
 	if (parent)
 	{
