@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 SBM_ANDROID_LOCAL_PATH := $(call my-dir)
-IOS_PATH := ../../../ios/vhwrapper-dll/
+IOS_PATH := ../../../ios/vhwrapper/
 SBM_PATH := ../../../core/smartbody/SmartBody/
 
 include $(SBM_ANDROID_LOCAL_PATH)/../../smartbody/jni/Android.mk
