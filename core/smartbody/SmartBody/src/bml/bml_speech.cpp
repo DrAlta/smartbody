@@ -321,7 +321,6 @@ BML::SpeechRequest::SpeechRequest(
 	trigger( behav_syncs.sync_start()->sync()->trigger.lock() ),
 	policy(policyOverride)
 {
-	
 	// Add SyncPoints for SpeechMarks
 	vector<SpeechMark>::const_iterator end = marks.end();
 	for( vector<SpeechMark>::const_iterator mark = marks.begin(); mark != end; ++mark ) {
@@ -1523,6 +1522,9 @@ void BML::SpeechRequest::constrainCurve(std::vector<float>& openCurve, std::vect
 			secEnd = otherX[i + 1];
 			secEndId = i + 1;
 
+			if (secStartId < 0)
+				continue;
+
 			// looping through open curve points
 			for (size_t j = 0; j < openX.size(); ++j)
 			{
@@ -1717,6 +1719,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 
 		for( ; cur!=end; ++cur ) {
 			VisemeData* v = (*cur);
+			v->calculateDuration();
 
 			if( BML::LOG_SPEECH ) {
 				//cout << "   " << (*v) << endl;  // Not linking

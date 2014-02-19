@@ -511,7 +511,7 @@ SBAPI SmartbodyCharacter& Smartbody_dll::GetCharacter( const string & name )
 
 bool Smartbody_dll::InitVHMsg()
 {
-#if !defined(ANDROID_BUILD) && !defined(IPHONE_BUILD)
+#if defined(WIN_BUILD) || defined(MAC_BUILD)
 
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 
