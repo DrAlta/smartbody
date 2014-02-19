@@ -13,9 +13,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		AAC9AC9E142012EC00F56F9C /* libvhwrapper-dll.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libvhwrapper-dll.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAC9AC9E142012EC00F56F9C /* libvhwrapper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libvhwrapper.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAC9ACA1142012EC00F56F9C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		AAC9ACA5142012EC00F56F9C /* vhwrapper-dll-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vhwrapper-dll-Prefix.pch"; sourceTree = "<group>"; };
+		AAC9ACA5142012EC00F56F9C /* vhwrapper-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vhwrapper-Prefix.pch"; sourceTree = "<group>"; };
 		AADDAE98154E224500A86087 /* vhwrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhwrapper.h; sourceTree = SOURCE_ROOT; };
 		AADDAE99154E224500A86087 /* vhwrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vhwrapper.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -35,7 +35,7 @@
 		AAC9AC93142012EC00F56F9C = {
 			isa = PBXGroup;
 			children = (
-				AAC9ACA3142012EC00F56F9C /* vhwrapper-dll */,
+				AAC9ACA3142012EC00F56F9C /* vhwrapper */,
 				AAC9ACA0142012EC00F56F9C /* Frameworks */,
 				AAC9AC9F142012EC00F56F9C /* Products */,
 			);
@@ -44,7 +44,7 @@
 		AAC9AC9F142012EC00F56F9C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AAC9AC9E142012EC00F56F9C /* libvhwrapper-dll.a */,
+				AAC9AC9E142012EC00F56F9C /* libvhwrapper.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -57,20 +57,20 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		AAC9ACA3142012EC00F56F9C /* vhwrapper-dll */ = {
+		AAC9ACA3142012EC00F56F9C /* vhwrapper */ = {
 			isa = PBXGroup;
 			children = (
 				AADDAE98154E224500A86087 /* vhwrapper.h */,
 				AADDAE99154E224500A86087 /* vhwrapper.cpp */,
 				AAC9ACA4142012EC00F56F9C /* Supporting Files */,
 			);
-			path = "vhwrapper-dll";
+			path = "vhwrapper";
 			sourceTree = "<group>";
 		};
 		AAC9ACA4142012EC00F56F9C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				AAC9ACA5142012EC00F56F9C /* vhwrapper-dll-Prefix.pch */,
+				AAC9ACA5142012EC00F56F9C /* vhwrapper-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -89,9 +89,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		AAC9AC9D142012EC00F56F9C /* vhwrapper-dll */ = {
+		AAC9AC9D142012EC00F56F9C /* vhwrapper */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AAC9ACA8142012EC00F56F9C /* Build configuration list for PBXNativeTarget "vhwrapper-dll" */;
+			buildConfigurationList = AAC9ACA8142012EC00F56F9C /* Build configuration list for PBXNativeTarget "vhwrapper" */;
 			buildPhases = (
 				AAC9AC9A142012EC00F56F9C /* Sources */,
 				AAC9AC9B142012EC00F56F9C /* Frameworks */,
@@ -102,9 +102,9 @@
 			);
 			dependencies = (
 			);
-			name = "vhwrapper-dll";
-			productName = "vhwrapper-dll";
-			productReference = AAC9AC9E142012EC00F56F9C /* libvhwrapper-dll.a */;
+			name = "vhwrapper";
+			productName = "vhwrapper";
+			productReference = AAC9AC9E142012EC00F56F9C /* libvhwrapper.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -112,7 +112,7 @@
 /* Begin PBXProject section */
 		AAC9AC95142012EC00F56F9C /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = AAC9AC98142012EC00F56F9C /* Build configuration list for PBXProject "vhwrapper-dll" */;
+			buildConfigurationList = AAC9AC98142012EC00F56F9C /* Build configuration list for PBXProject "vhwrapper" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -124,7 +124,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AAC9AC9D142012EC00F56F9C /* vhwrapper-dll */,
+				AAC9AC9D142012EC00F56F9C /* vhwrapper */,
 			);
 		};
 /* End PBXProject section */
@@ -191,9 +191,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				DSTROOT = /tmp/vhwrapper_dll.dst;
+				DSTROOT = /tmp/vhwrapper.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "vhwrapper-dll/vhwrapper-dll-Prefix.pch";
+				GCC_PREFIX_HEADER = "vhwrapper/vhwrapper-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
@@ -241,9 +241,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				DSTROOT = /tmp/vhwrapper_dll.dst;
+				DSTROOT = /tmp/vhwrapper.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "vhwrapper-dll/vhwrapper-dll-Prefix.pch";
+				GCC_PREFIX_HEADER = "vhwrapper/vhwrapper-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
@@ -290,7 +290,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AAC9AC98142012EC00F56F9C /* Build configuration list for PBXProject "vhwrapper-dll" */ = {
+		AAC9AC98142012EC00F56F9C /* Build configuration list for PBXProject "vhwrapper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AAC9ACA6142012EC00F56F9C /* Debug */,
@@ -299,7 +299,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AAC9ACA8142012EC00F56F9C /* Build configuration list for PBXNativeTarget "vhwrapper-dll" */ = {
+		AAC9ACA8142012EC00F56F9C /* Build configuration list for PBXNativeTarget "vhwrapper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AAC9ACA9142012EC00F56F9C /* Debug */,

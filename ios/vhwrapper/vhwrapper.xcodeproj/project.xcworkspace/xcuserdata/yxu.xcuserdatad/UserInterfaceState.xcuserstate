@@ -192,7 +192,7 @@
 		<string>IDEEditorArea</string>
 		<integer>0</integer>
 		<true/>
-		<string>vhwrapper-dll.xcodeproj</string>
+		<string>vhwrapper.xcodeproj</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -678,7 +678,7 @@
 				</dict>
 			</array>
 		</dict>
-		<string>vhwrapper-dll</string>
+		<string>vhwrapper</string>
 		<string>Frameworks</string>
 		<dict>
 			<key>$class</key>
@@ -712,7 +712,7 @@
 				</dict>
 			</array>
 		</dict>
-		<string>vhwrapper-dll</string>
+		<string>vhwrapper</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -1034,7 +1034,7 @@
 				<integer>103</integer>
 			</dict>
 		</dict>
-		<string>vhwrapper-dll</string>
+		<string>vhwrapper</string>
 		<dict>
 			<key>$classes</key>
 			<array>
@@ -1069,7 +1069,7 @@
 				<integer>108</integer>
 			</dict>
 			<key>NS.string</key>
-			<string>file://localhost/Users/yxu/smartbody/trunk/ios/vhwrapper-dll/vhwrapper-dll.xcodeproj/</string>
+			<string>file://localhost/Users/yxu/smartbody/trunk/ios/vhwrapper/vhwrapper.xcodeproj/</string>
 		</dict>
 		<dict>
 			<key>$classes</key>
@@ -1698,7 +1698,7 @@
 				<integer>163</integer>
 			</dict>
 		</dict>
-		<string>vhwrapper-dll</string>
+		<string>vhwrapper</string>
 		<integer>9223372036854775807</integer>
 		<dict>
 			<key>$class</key>
@@ -1895,7 +1895,7 @@
 				<integer>182</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/yxu/smartbody/trunk/ios/vhwrapper-dll/vhwrapper-dll.xcodeproj/</string>
+		<string>file://localhost/Users/yxu/smartbody/trunk/ios/vhwrapper/vhwrapper.xcodeproj/</string>
 		<real>337646550.787489</real>
 		<dict>
 			<key>$class</key>
@@ -1938,7 +1938,7 @@
 		<string>Target</string>
 		<string>Xcode3BuildSettingsEditorLocations</string>
 		<string>Xcode3BuildSettingsEditor</string>
-		<string>vhwrapper-dll</string>
+		<string>vhwrapper</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -4622,7 +4622,7 @@
 			<key>NS.objects</key>
 			<array/>
 		</dict>
-		<string>vhwrapper-dll</string>
+		<string>vhwrapper</string>
 		<string>Xcode.Xcode3ProjectSupport.EditorDocument.Xcode3Project</string>
 		<dict>
 			<key>$class</key>
@@ -4641,7 +4641,7 @@
 				<integer>401</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/yxu/smartbody/trunk/ios/vhwrapper-dll/vhwrapper-dll.xcodeproj/</string>
+		<string>file://localhost/Users/yxu/smartbody/trunk/ios/vhwrapper/vhwrapper.xcodeproj/</string>
 		<dict>
 			<key>$classes</key>
 			<array>
@@ -4971,7 +4971,7 @@
 				<integer>108</integer>
 			</dict>
 			<key>NS.string</key>
-			<string>file://localhost/Users/yxu/smartbody/trunk/ios/vhwrapper-dll/vhwrapper-dll.xcodeproj/</string>
+			<string>file://localhost/Users/yxu/smartbody/trunk/ios/vhwrapper/vhwrapper.xcodeproj/</string>
 		</dict>
 		<dict>
 			<key>$class</key>
@@ -7923,7 +7923,7 @@
 				<integer>108</integer>
 			</dict>
 			<key>NS.string</key>
-			<string>file://localhost/Users/yxu/UnityProjects/vhtoolkit/trunk/lib/vhunity/vhwrapper-dll/vhwrapper.cpp</string>
+			<string>file://localhost/Users/yxu/UnityProjects/vhtoolkit/trunk/lib/vhunity/vhwrapper/vhwrapper.cpp</string>
 		</dict>
 		<dict>
 			<key>$class</key>
@@ -7949,7 +7949,7 @@
 				<integer>108</integer>
 			</dict>
 			<key>NS.string</key>
-			<string>file://localhost/Users/yxu/UnityProjects/vhtoolkit/trunk/lib/vhunity/vhwrapper-dll/vhwrapper.h</string>
+			<string>file://localhost/Users/yxu/UnityProjects/vhtoolkit/trunk/lib/vhunity/vhwrapper/vhwrapper.h</string>
 		</dict>
 		<dict>
 			<key>$class</key>
@@ -8105,7 +8105,7 @@
 			</array>
 		</dict>
 		<string>IDENameString</string>
-		<string>vhwrapper-dll</string>
+		<string>vhwrapper</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -8254,7 +8254,7 @@
 		</dict>
 		<real>4</real>
 		<string>: </string>
-		<string>vhwrapper-dll</string>
+		<string>vhwrapper</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -8486,7 +8486,7 @@
 				<integer>708</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/yxu/UnityProjects/vhtoolkit/trunk/lib/vhunity/vhwrapper-dll/vhwrapper.cpp</string>
+		<string>file://localhost/Users/yxu/UnityProjects/vhtoolkit/trunk/lib/vhunity/vhwrapper/vhwrapper.cpp</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -8504,7 +8504,7 @@
 				<integer>710</integer>
 			</dict>
 		</dict>
-		<string>file://localhost/Users/yxu/UnityProjects/vhtoolkit/trunk/lib/vhunity/vhwrapper-dll/vhwrapper.h</string>
+		<string>file://localhost/Users/yxu/UnityProjects/vhtoolkit/trunk/lib/vhunity/vhwrapper/vhwrapper.h</string>
 	</array>
 	<key>$top</key>
 	<dict>
