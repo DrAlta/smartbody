@@ -268,7 +268,7 @@ LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/bonebus/include \
 					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/vhmsg/vhmsg-c/include \
 					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/wsp/wsp/include \
-					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/protobuf/include \
+					$(SBM_LOCAL_PATH)/../../../core/smartbody/SmartBody/src/external/protobuf/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/ \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/parser/ \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/steerlib/include \
