@@ -2389,9 +2389,6 @@
     <None Include="..\SmartBody\src\sbm\GPU\shaderFiles\vs_skin_pos.vert">
       <Filter>GPU</Filter>
     </None>
-    <None Include="src\protocols\sbmotion.proto">
-      <Filter>protocols</Filter>
-    </None>
     <None Include="src\protocols\sbutilities.proto">
       <Filter>protocols</Filter>
     </None>

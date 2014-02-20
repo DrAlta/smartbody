@@ -495,6 +495,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonAttribute.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonCharacter.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonMath.cpp \
+	$(SBM_MY_DIR)/sb/SBPythonMesh.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonMotion.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonScene.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonSimulation.cpp \
@@ -572,8 +573,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
     $(SBM_MY_DIR)/sb/smartbody-c-dll.cpp \
 	$(SBM_MY_DIR)/protocols/sbmesh.pb.cc \
 	$(SBM_MY_DIR)/protocols/sbmotion.pb.cc \
-	$(SBM_MY_DIR)/protocols/sbutilities.pb.cc \	
-	
+	$(SBM_MY_DIR)/protocols/sbmesh.pb.cc \
+	$(SBM_MY_DIR)/protocols/sbutilities.pb.cc
 
 
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv1_CM

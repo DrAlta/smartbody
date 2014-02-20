@@ -118,7 +118,7 @@
     [EAGLContext setCurrentContext:context];
     [self destroyFramebuffer];
     [self createFramebuffer];
-    [self drawView];
+    [self update];
 }
 
 

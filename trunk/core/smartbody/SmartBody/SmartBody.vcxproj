@@ -70,7 +70,12 @@ copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>if exist "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" src src\sb\SBVersionTemplate.hpp src\sb\SBVersion.hpp</Command>
+      <Command>svn info src &gt;nul 2&gt;nul
+if %errorlevel% == 0 (
+   if exist "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" src src\sb\SBVersionTemplate.hpp src\sb\SBVersion.hpp
+)
+set errorlevel=
+</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
