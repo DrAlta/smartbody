@@ -10,7 +10,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
-#include <sb/SBSceneListener.h>
+//#include <sb/SBCharacterListener.h>
 
 #include "irrlichtsmartbodylistener.h"
 
@@ -32,23 +32,12 @@ using namespace gui;
 
 int main()
 {
-#ifdef WIN32
-	std::string irrlichtMediaDirectory = "../irrlicht-1.8/media";
-#else
 
-	std::string irrlichtMediaDirectory = "../data/irrlichtmedia";
-#endif
 	const bool shadows = true;
 
-#ifdef WIN32
 		IrrlichtDevice *device =
 			createDevice( video::EDT_DIRECT3D9, dimension2d<u32>(640, 480), 16,
 		false, shadows);
-#else
-		IrrlichtDevice *device =
-			createDevice( video::EDT_OPENGL, dimension2d<u32>(640, 480), 16,
-		false, shadows);
-#endif
 
 	if (!device)
 		return 1;
@@ -71,12 +60,8 @@ int main()
 	// the root path to SmartBody: change this to your own path
 	std::string smartbodyRoot = "..";
 	// set the following to the location of the Python libraries. 
-	// if you downloaded SmartBody, it will be in core/smartbody/Python27/Lib
-#ifdef WIN32
+	// if you downloaded SmartBody, it will be in core/smartbody/Python26/Lib
 	initPython(smartbodyRoot + "/Python27/lib");
-#else
-	initPython("/usr/lib/python2.7");
-#endif
 	SmartBody::SBScene* m_pScene = SmartBody::SBScene::getScene();
 
 	m_pScene->startFileLogging("smartbody.log");
@@ -102,8 +87,7 @@ int main()
                            core::dimension2d<f32>(10.0f, 10.0f)); // textureRepeatCount
                                           
    irr::scene::IAnimatedMeshSceneNode* terrain_node = smgr->addAnimatedMeshSceneNode(terrain_model);
-   std::string textureLocation = irrlichtMediaDirectory + "/wall.jpg";
-   terrain_node->setMaterialTexture(0, driver->getTexture(textureLocation.c_str()));   
+   terrain_node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8/media/wall.jpg"));   
    terrain_node->setMaterialFlag(EMF_LIGHTING, false);
    
    // Insert it into the scene
@@ -124,8 +108,7 @@ int main()
 	node = smgr->addBillboardSceneNode(node, core::dimension2d<f32>(50, 50));
 	node->setMaterialFlag(video::EMF_LIGHTING, false);
 	node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
-	std::string particleTexture = irrlichtMediaDirectory + "/particlewhite.bmp";
-	node->setMaterialTexture(0, driver->getTexture(particleTexture.c_str()));
+	node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8/media/particlewhite.bmp"));
 
 	smgr->setShadowColor(video::SColor(150,0,0,0));
 
@@ -189,6 +172,10 @@ int main()
 			int numJoints = sbSkel->getNumJoints();
 			for (int j = 0; j < numJoints; j++)
 			{
+				//debug joint by joint
+				//if(found>7)
+				//	continue;
+
 				SmartBody::SBJoint* joint = sbSkel->getJoint(j);
 			
 				IBoneSceneNode* iJoint = animatedMeshNode->getJointNode(joint->getName().c_str());
@@ -225,3 +212,6 @@ int main()
 	return 0;
 }
 
+/*
+That's it. Compile and run.
+**/

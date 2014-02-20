@@ -61,7 +61,7 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\src\irrlichtsmartbody;..\src\SmartBody;..\include;..\include\vhcl;..\include\boost;..\include\steersuite;..\include\bonebus;..\include\wsp;..\python27\include;..\irrlicht-1.8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src\irrlichtsmartbody;..\src\SmartBody;..\include;..\include\vhcl;..\include\boost;..\include\steersuite;..\include\bonebus;..\include\wsp;..\python27\include;..\irrlicht-1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -76,7 +76,7 @@
     </ProjectReference>
     <Link>
       <AdditionalDependencies>SmartBody_d.lib;vhcl_d.lib;pthreadVSE2.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;Irrlicht.lib;boost_system-vc100-mt-gd-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\irrlicht-1.8\lib\Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\irrlicht-1.8.1\lib\Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)OgreExample_d.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -87,7 +87,7 @@
     </Link>
     <PostBuildEvent>
       <Command>copy /Y ..\src\irrlichtsmartbody\irrlichtsmartbody.py ..\data
-
+copy /Y ..\irrlicht-1.8.1\bin\Win32-VisualStudio\Irrlicht.dll ..\bin
 
 </Command>
     </PostBuildEvent>
@@ -96,7 +96,7 @@
     <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\src\irrlichtsmartbody;..\src\SmartBody;..\include;..\include\vhcl;..\include\boost;..\include\steersuite;..\include\bonebus;..\include\wsp;..\python27\include;..\irrlicht-1.8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\src\irrlichtsmartbody;..\src\SmartBody;..\include;..\include\vhcl;..\include\boost;..\include\steersuite;..\include\bonebus;..\include\wsp;..\python27\include;..\irrlicht-1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -112,7 +112,7 @@
     </ProjectReference>
     <Link>
       <AdditionalDependencies>SmartBody.lib;vhcl.lib;pthreadVSE2.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;Irrlicht.lib;boost_system-vc100-mt-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\irrlicht-1.8\lib\Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\irrlicht-1.8.1\lib\Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -124,7 +124,7 @@
     </Link>
     <PostBuildEvent>
       <Command>copy /Y ..\src\irrlichtsmartbody\irrlichtsmartbody.py ..\data
-copy /Y ..\irrlicht-1.8\bin\Win32-VisualStudio\Irrlicht.dll ..\bin</Command>
+copy /Y ..\irrlicht-1.8.1\bin\Win32-VisualStudio\Irrlicht.dll ..\bin</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

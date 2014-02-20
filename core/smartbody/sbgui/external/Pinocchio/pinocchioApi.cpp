@@ -78,7 +78,7 @@ PinocchioOutput autorig(const Skeleton &given, const Mesh &m)
 
 Vector3 barycentricCoord(Vector3& pt, Tri3Object& tri)
 {
-	float w1,w2,w3;
+	double w1,w2,w3;
 	Vector3 ptToV1 = tri.v1 - pt;
 	Vector3 ptToV2 = tri.v2 - pt;
 	Vector3 ptToV3 = tri.v2 - pt;
@@ -166,7 +166,7 @@ PinocchioOutput PINOCCHIO_API autorigVoxelTransfer( const Skeleton &given, Mesh 
 	printf("mesh weights size = %d\n",meshWeights.size());
 	Tri3Object projTri;
 	int bones = given.fGraph().verts.size() - 1;
-	for (int i=0;i<origMesh.vertices.size();i++)
+	for (size_t i=0;i<origMesh.vertices.size();i++)
 	{
 		MeshVertex& vtx = origMesh.vertices[i];
 		Vector<double, -1>& origWeight = meshWeights[i];

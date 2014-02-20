@@ -25,10 +25,12 @@ find_library (LIBSNDFILE sndfile )
 find_library (ALUT alut )
 find_library (OPENAL openal)
 find_library (GLEW GLEW)
+if (${BUILD_FESTIVAL})
 find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
 find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
 find_library (ESTSTRING eststring ../../..//lib/festival/speech_tools/lib)
 find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
+endif()
 else()
 find_library (LIBSNDFILE sndfile )
 find_library (ALUT alut )
@@ -43,6 +45,17 @@ endif()
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if (${BUILD_FESTIVAL})
+set( FESTIVAL_LIBS
+	${FESTIVAL}
+	${ESTBASE}
+	${ESTSTRING}
+	${ESTOOLS}
+)
+else()
+set( FESTIVAL_LIBS
+)
+endif()
 set( MORE_LIBS
 	${COREAUDIO_LIBRARY}
 	${AUDIOUNIT_LIBRARY}
@@ -51,10 +64,7 @@ set( MORE_LIBS
 	${ALUT}
 	${OPENAL}
 	${GLEW}
-	${FESTIVAL}
-	${ESTBASE}
-	${ESTSTRING}
-	${ESTOOLS}
+	${FESTIVAL_LIBS}
 )
 else()
 set( MORE_LIBS

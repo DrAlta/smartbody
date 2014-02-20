@@ -380,6 +380,9 @@ void drawLights()
          iter++)
 	{
 		SmartBody::SBPawn* sbpawn = SmartBody::SBScene::getScene()->getPawn(*iter);
+        if (!sbpawn)
+            continue;
+        
 		const std::string& name = sbpawn->getName();
 		if (name.find("light") == 0)
 		{
@@ -416,7 +419,7 @@ void drawLights()
 			}
 			else
 			{
-				light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
+				light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
 			}
 			SmartBody::Vec3Attribute* ambientColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightAmbientColor"));
 			if (ambientColorAttr)
@@ -638,6 +641,20 @@ void SBDrawFrame(int width, int height)
 	glScalef ( cam.getScale(), cam.getScale(), cam.getScale());
     glViewport( 0, 0, width, height);
 
+    
+    //
+    static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
+	static GLfloat mat_ambient[] = { 0.0,  0.0,    0.0,    1.0 };
+	static GLfloat mat_diffuse[] = { 1.0,  1.0,    1.0,    1.0 };
+	static GLfloat mat_speclar[] = { 0.0,  0.0,    0.0,    1.0 };
+	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar );
+	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
+	glEnable( GL_COLOR_MATERIAL );
+	glEnable( GL_NORMALIZE );
+    
     // draw lights
     drawLights();
     

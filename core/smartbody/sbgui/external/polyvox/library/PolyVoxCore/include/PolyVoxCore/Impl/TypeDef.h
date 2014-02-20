@@ -90,7 +90,10 @@ freely, subject to the following restrictions:
 	using boost::uint16_t;
 	using boost::uint32_t;
 #else
-	#ifdef __APPLE__
+	#if defined(__APPLE__) 
+		#include <AvailabilityMacros.h>
+	#endif
+	#if defined(__APPLE__) && !defined(MAC_OS_X_VERSION_10_9)
 		#include <tr1/cstdint>
 		#include <tr1/functional>
 		#include <tr1/memory>

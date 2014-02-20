@@ -55,7 +55,10 @@
     if (id == 2)    // reset camera
     {
         SBCameraOperation(0, 0);
+        SBExecutePythonCmd("bml.interruptCharacter(\"ChrRachel\",0)");
     }
+    else
+        SBExecuteCmd("bml char ChrRachel file \"./Sounds/9.xml\"");
 }
 
 - (IBAction)turnOnAntiAliasing
