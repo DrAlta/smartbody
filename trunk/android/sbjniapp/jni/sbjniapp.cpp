@@ -38,6 +38,8 @@
 #include <sr/sr_camera.h>
 #include <sr/sr_gl_render_funcs.h>
 
+#include "minimalwrapper.h"
+
 #define ANDROID_PYTHON
 #ifdef ANDROID_PYTHON
 #include <sb/SBPython.h>
@@ -103,6 +105,7 @@ void sb_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 #if 1
 void drawSB()
 {
+#define DRAW_STICK_FIGURE 1
 #if DRAW_STICK_FIGURE
 	static SrVec jointPos[200];
 	static unsigned short boneIdx[400];
@@ -119,11 +122,13 @@ void drawSB()
 		SmartBody::SBSkeleton* skeleton = character->getSkeleton();
 		skeleton->update_global_matrices();
 		std::map<int,int> indexMap;
+		//LOG("Skeleton number of joints = %d", skeleton->joints().size());
 		for (int i=0;i<skeleton->joints().size();i++)
 		{
 			SkJoint* joint = skeleton->joints()[i];
 			SrVec pos = joint->gmat().get_translation();
 			jointPos[i] = pos;
+			//LOG("joint pos = %f %f %f",  pos[0],pos[1],pos[2]);
 			indexMap[joint->index()] = i;
 			boneIdx[i*2+0] = joint->index();
 			if (joint->parent())
@@ -236,6 +241,15 @@ bool setupGraphics(int w, int h) {
 	cam.setEye( 0, 166, 185 );
 	cam.setScale(1.f);
 */
+
+	camera.setEye(0.0, 1.7, 1);
+	camera.setCenter(0.08, 1.4, 0);
+	camera.setUpVector(SrVec(0, 1, 0));
+	camera.setScale(1);
+	camera.setFov(0.4);
+	camera.setFarPlane(100);
+	camera.setNearPlane(0.1);
+/*
 	camera.setCenter(0.0, 1.60887, 0.0);
 	camera.setUpVector(SrVec(0, 1, 0));
 	camera.setEye(0, 1.0478, 3.69259);
@@ -243,9 +257,10 @@ bool setupGraphics(int w, int h) {
 	camera.setFov(1.0);
 	camera.setFarPlane(100);
 	camera.setNearPlane(0.1);
+*/
 	float aspectRatio = ((float)w)/h;
 	camera.setAspectRatio(aspectRatio);	
-        return true;
+    return true;
 }
 
 const GLfloat gTriangleVertices[] = { 0.0f, 0.5f, -0.5f, -0.5f,
@@ -304,7 +319,7 @@ void renderFrame() {
 	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&quad[0]);
 	glColorPointer(4, GL_FLOAT, 0, quadColor);
 	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&quadN[0]);
-//	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
 	//glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
 
@@ -385,7 +400,7 @@ void initCharacterScene()
 			character->scene_p->unref();
 			character->scene_p = NULL;
 		}
-		/*
+
 		character->scene_p = new SkScene();
 		character->scene_p->ref();
 		character->scene_p->init(character->getSkeleton());
@@ -395,7 +410,7 @@ void initCharacterScene()
 		else
 			character->scene_p->visible(false);
 		scene->getRootGroup()->add(character->scene_p);
-		*/
+
 		LOG("Character %s's skeleton added to the scene.", charNames[i].c_str());		
 		character->dMeshInstance_p =  new DeformableMeshInstance();
 		//character->dMeshInstance_p->setSkeleton(character->getSkeleton());
@@ -417,6 +432,8 @@ void initSmartBody()
 	initPython(python_lib_path);
 	LOGI("Before init SBScene");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	AppListener* appListener = new AppListener();
+	scene->addSceneListener(appListener);
 
 	scene->getSimulationManager()->setupTimer();
 	scene->getSimulationManager()->setTime(0.0);
@@ -424,7 +441,9 @@ void initSmartBody()
 
 	scene->addAssetPath("script", "/sdcard/sbjniappdir");
 	scene->runScript("brad.py");
-	initCharacterScene();	
+	//initCharacterScene();
+
+
 	//if (curW != -1 && curH != -1)
 	//    setupGraphics(curW,curH);	
 }
