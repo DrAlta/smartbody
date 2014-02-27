@@ -105,7 +105,7 @@ void sb_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 #if 1
 void drawSB()
 {
-#define DRAW_STICK_FIGURE 1
+#define DRAW_STICK_FIGURE 0
 #if DRAW_STICK_FIGURE
 	static SrVec jointPos[200];
 	static unsigned short boneIdx[400];
