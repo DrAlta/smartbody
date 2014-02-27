@@ -98,7 +98,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);
 
-	//if (showSkinWeight)
+	if (showSkinWeight)
 	{
 		//LOG("drawSkinColor");
 		glEnableClientState(GL_COLOR_ARRAY);
