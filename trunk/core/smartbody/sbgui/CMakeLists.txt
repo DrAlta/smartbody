@@ -48,7 +48,7 @@ find_library (OISLIB OIS)
 #find_library (RTSHADERLIB OgreRTShaderSystem)
 endif()
 if (${BUILD_OGRE})
-include_directories( /usr/include/OGRE )
+include_directories( /usr/local/include/OGRE )
 set (OGREMAINLIB OgreMain)
 set (OISLIB OIS)
 set (OGRE_LIBS
