@@ -428,6 +428,7 @@ void EmbeddedOgre::createDefaultScene()
 	// Give it a little ambience with lights
 
 #if 1
+	LOG("---------------------------------------");
 	Light * light1;
 	Vector3 dir;
 
@@ -592,7 +593,6 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		ogreWnd = ogreRoot->initialise( false );
 		Ogre::NameValuePairList params;
 	
-#ifndef WIN32
 		// determine system capabilities
 		Ogre::ConfigOptionMap& configMap = lRenderSystem->getConfigOptions();
 		for (Ogre::ConfigOptionMap::iterator optionIter = configMap.begin();
@@ -622,7 +622,6 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		}
 		params["FSAA"] = lastFSAAVal;
 		LOG("Using FSAA level %s", lastFSAAVal.c_str());
-#endif				
 		//if (parentHandle)
 		//	params["parentWindowHandle"] = Ogre::StringConverter::toString((size_t)parentHandle);	
         
@@ -726,6 +725,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 	{
 		Ogre::String s = "FLTKOgreWindow::createOgreWindow() - Exception:\n" + e.getFullDescription() +  "\n"; 
 		Ogre::LogManager::getSingleton().logMessage( s, Ogre::LML_CRITICAL );		
+		LOG("Ogre error: %s", s.c_str());		
 	}
 	//LOG("Finish setup resource");
 	// create frame listener
@@ -750,7 +750,11 @@ void EmbeddedOgre::update()
 void EmbeddedOgre::finishRender()
 {
 	bool lVerticalSynchro = true;	
+#ifdef WIN32
 	ogreWnd->swapBuffers(lVerticalSynchro);		
+#else
+	ogreWnd->swapBuffers();		
+#endif
 }
 
 

@@ -91,6 +91,11 @@ set( SMARTBODY_LIB_EXT_NANOFLANN_SRC
 
 )
 
+set( SMARTBODY_LIB_EXT_RPLY_SRC
+
+        ./src/external/rply/rply.c
+
+)
 set( SMARTBODY_LIB_EXT_PARSER_SRC
 
         ./src/external/parser/Bchart.cpp
@@ -255,6 +260,7 @@ set( SMARTBODY_LIB_SR_SRC
         ./src/sr/sr_model.cpp
         ./src/sr/sr_model_export_iv.cpp
         ./src/sr/sr_model_import_obj.cpp
+        ./src/sr/sr_model_import_ply.cpp
         ./src/sr/sr_output.cpp
         ./src/sr/sr_path_array.cpp
         ./src/sr/sr_plane.cpp
@@ -516,6 +522,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	./src/sb/SBAssetHandlerOgre.cpp
 	./src/sb/SBAssetHandlerObj.cpp
 	./src/sb/SBAssetHandlerBvh.cpp
+	./src/sb/SBAssetHandlerPly.cpp
         ./src/sb/SBBehavior.cpp
 	./src/sb/SBAssetHandlerSkmb.cpp
 	./src/sb/SBAssetHandlerSBMeshBinary.cpp
@@ -546,6 +553,10 @@ add_library(
         ${SMARTBODY_LIB_EXT_RECAST_SRC}
 
         ${SMARTBODY_LIB_EXT_PERLIN_SRC}
+
+        ${SMARTBODY_LIB_EXT_NANOFLAN_SRC}
+
+        ${SMARTBODY_LIB_EXT_RPLY_SRC}
 
         ${SMARTBODY_LIB_ME_SRC}
 
