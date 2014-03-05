@@ -163,6 +163,9 @@ bool EmbeddedOgre::getCharacterVisiblility()
 
 void EmbeddedOgre::updateOgreLights()
 {
+	if (!ogreSceneMgr)
+		return;
+		
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	int numLightsInScene = 0;
 	int numShadowLight = 0;

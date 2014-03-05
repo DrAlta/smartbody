@@ -129,6 +129,8 @@ void FLTKOgreWindow::draw()
 void FLTKOgreWindow::updateOgreCamera()
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	if (!ogreInterface)
+		return;
 	Ogre::Camera* ogreCam = ogreInterface->getCamera();
 	//SrCamera& cam = *FltkViewer::_data->camera;
 	SrCamera& cam = *scene->getActiveCamera();
@@ -254,6 +256,8 @@ void FLTKOgreWindow::resize( int x, int y, int w, int h )
 {
 	make_current();
 	Fl_Gl_Window::resize(x,y,w,h);
+	if (!ogreInterface)
+		return;
 	Ogre::RenderWindow* win = ogreInterface->getRenderWindow();
 	if (win) 
 	{
@@ -532,7 +536,7 @@ void FLTKOgreWindow::notify(SmartBody::SBSubject* subject)
 					// modify the scale of the plane mesh. Can this be done?
 					// ...
 					// ...
-				} catch ( Ogre::Exception& ) {
+				} catch ( Ogre::Exception& e) {
 				}
 
 			}
@@ -552,7 +556,7 @@ void FLTKOgreWindow::updateOptions()
 		Ogre::MaterialPtr mat = pPlaneEnt->getSubEntity(0)->getMaterial();
 		mat->setDiffuse(Ogre::ColourValue(_data->floorColor.r / 255.0f, _data->floorColor.g / 255.0f, _data->floorColor.b / 255.0f));
 		pPlaneEnt->setVisible(_data->showFloor);
-	} catch ( Ogre::Exception& ) {
+	} catch ( Ogre::Exception& e) {
 	}
 
 	Ogre::SceneManager* sceneMgr = ogreInterface->getSceneManager();
