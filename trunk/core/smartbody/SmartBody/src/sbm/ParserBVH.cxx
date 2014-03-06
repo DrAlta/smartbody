@@ -593,6 +593,7 @@ void ParserBVH::convertBVHtoSmartBody(SkJoint* joint, SkMotion& motion, ChannelI
 
 	int skChannelOffset = 0;
 	bool hasRotation = false;
+	float convertAngleRatio = float(M_PI) / 180.0f;
 
 	for (int c = 0; c < channelInfo->numBVHChannels; c++)
 	{
@@ -621,17 +622,17 @@ void ParserBVH::convertBVHtoSmartBody(SkJoint* joint, SkMotion& motion, ChannelI
 		}
 		else if (channelInfo->channels[c] == BVHXROTATION)
 		{
-			rot.x = float(data[c]) * float(M_PI) / 180.0f;
+			rot.x = float(data[c]) * convertAngleRatio;
 			hasRotation = true;
 		}
 		else if (channelInfo->channels[c] == BVHYROTATION)
 		{
-			rot.y = float(data[c]) * float(M_PI) / 180.0f;
+			rot.y = float(data[c]) * convertAngleRatio;
 			hasRotation = true;
 		}
 		else if (channelInfo->channels[c] == BVHZROTATION)
 		{
-			rot.z = float(data[c]) * float(M_PI) / 180.0f;
+			rot.z = float(data[c]) * convertAngleRatio;
 			hasRotation = true;
 		}
 	}

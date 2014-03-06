@@ -159,6 +159,7 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 
 		if (zaxis)
 		{
+			LOG("Prerot z-axis");
 			// get the root node
 			SkJoint* root = skeleton.root();
 			if (root)
@@ -168,7 +169,10 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 					SrQuat prerot = root->quat()->prerot();
 					SrVec xaxis(1, 0, 0);
 					SrQuat adjust(xaxis, 3.14159f / -2.0f);
-					SrQuat final = adjust * prerot;
+					SrQuat adjustY(SrVec(0,1,0), 3.14159f );
+					SrQuat final = adjust * adjustY * prerot; 
+					LOG("before = %f %f %f %f", prerot.w, prerot.x, prerot.y, prerot.z);
+					LOG("after = %f %f %f %f", final.w, final.x, final.y, final.z);
 					root->quat()->prerot(final);
 					root->offset(root->offset()*adjust);
 				}
@@ -2228,6 +2232,13 @@ void ParserCOLLADAFast::setModelVertexSource( std::string& sourceName, std::stri
 		{
 			SrVec ts = (*sourceArray)[i];
 			model->T.push(SrVec2(ts[0],ts[1]));										
+		}
+	}
+	else if (semanticName == "COLOR" && sourceArray && model->Vc.size() == 0)
+	{
+		for (unsigned int i=0;i<sourceArray->size();i++)
+		{			
+			model->Vc.push((*sourceArray)[i]);										
 		}
 	}
 }

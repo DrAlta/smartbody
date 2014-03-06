@@ -124,6 +124,36 @@ void SbmTextureManager::updateTexture()
 	}
 }
 
+
+SBAPI void SbmTextureManager::reloadTexture()
+{
+	StrTextureMap::iterator vi;
+	for ( vi  = textureMap.begin();
+		vi != textureMap.end();
+		vi++)
+	{
+		SbmTexture* tex = vi->second;
+		tex->buildTexture();
+	}
+
+	for ( vi  = normalTexMap.begin();
+		vi != normalTexMap.end();
+		vi++)
+	{
+		SbmTexture* tex = vi->second;
+		tex->buildTexture();
+	}
+
+	for ( vi  = specularTexMap.begin();
+		vi != specularTexMap.end();
+		vi++)
+	{
+		SbmTexture* tex = vi->second;
+		tex->buildTexture();
+	}
+}
+
+
 SbmTexture* SbmTextureManager::findTexture(int type, const char* textureName )
 {
 	std::string strTex = textureName;
@@ -210,6 +240,7 @@ bool SbmTexture::loadImage( const char* fileName )
 
 void SbmTexture::buildTexture(bool buildMipMap)
 {	
+	//LOG("Start Build Texture");
 	if (!getBuffer()) return;
 #if !defined(__native_client__)
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:10");		
@@ -225,7 +256,7 @@ void SbmTexture::buildTexture(bool buildMipMap)
 		SbmShaderProgram::printOglError("SbmTexture.cpp:100");
 	}
 #endif
-
+	//LOG("After Initialize and bind texture");
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:50");	
 #if defined(__ANDROID__) || defined(SB_IPHONE)
 #define GL_CLAMP GL_CLAMP_TO_EDGE
@@ -236,6 +267,8 @@ void SbmTexture::buildTexture(bool buildMipMap)
 	glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+	//LOG("After Texture parameters : GL_TEXTURE_WRAP_S");
+
 #if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
 	if (buildMipMap)
 		glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
@@ -244,8 +277,11 @@ void SbmTexture::buildTexture(bool buildMipMap)
 #else
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 #endif
+	//LOG("After Texture parameters : GL_TEXTURE_MIN_FILTER");
 	glTexParameteri(iType, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+	//LOG("After Texture parameters : GL_TEXTURE_MAX_FILTER");
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	//LOG("After glTexEnvf");
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:100");	
 	if (channels == 3)
 	{
@@ -265,9 +301,10 @@ void SbmTexture::buildTexture(bool buildMipMap)
 		glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, &imgBuffer[0]);
 #else
 	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, &imgBuffer[0]);
+	//glGenerateMipmap(GL_TEXTURE_2D);
 #endif
 
-	//LOG("texture id = %d, texture name = %s, width = %d, height = %d, channel = %d",texID, textureName.c_str(), width, height, channels);
+	//LOG("texture id = %u, texture name = %s, width = %d, height = %d, channel = %d",texID, textureName.c_str(), width, height, channels);
 
 	//glGenerateMipmap(iType);
 	//SbmShaderProgram::printOglError("Sb!defined(SB_IPHONE)mTexture.cpp:200");
@@ -278,6 +315,7 @@ void SbmTexture::buildTexture(bool buildMipMap)
 	//TextureDebug();	
 	glBindTexture(iType,0);	
 	finishBuild = true;
+	//LOG("Finish build texture");
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:300");
 	//printf("Texture name = %s, texture ID = %d\n",textureName.c_str(),texID);	
 	//imdebug("rgb w=%d h=%d %p", width, height, buffer);

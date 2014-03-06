@@ -3110,9 +3110,11 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
 	for (unsigned int i=0;i<defMesh->dMeshStatic_p.size();i++)
 	{		
 		SrModel& model = defMesh->dMeshStatic_p[i]->shape();
-		bool hasNormal = false, hasTexCoord = false;
+		bool hasNormal = false, hasTexCoord = false, hasColor = false;
 		if (model.N.size() > 0 && model.Fn.size() == model.F.size()) hasNormal = true; // export normal
 		if (model.T.size() > 0 && model.Ft.size() == model.F.size()) hasTexCoord = true;
+		if (model.Vc.size() == model.V.size()) hasColor = true;
+
 		std::string modelName = (const char*) model.name;
 
 		if (modelName == "") // no model name
@@ -3157,6 +3159,27 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
 			fprintf(fp,"<param name=\"X\" type=\"float\"/>\n");
 			fprintf(fp,"<param name=\"Y\" type=\"float\"/>\n");
 			fprintf(fp,"<param name=\"Z\" type=\"float\"/>\n");
+			fprintf(fp,"</accessor>\n");
+			fprintf(fp,"</technique_common>\n");
+			fprintf(fp,"</source>\n");
+		}
+
+		
+		// Note : this is a hack to support vertex color in Collada parsing, I don't think this is standard practice ... 
+		std::string colorID = modelName + "-colors";
+		std::string colorArrayID = positionID+"-array";
+
+		{
+			fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",colorID.c_str(),colorID.c_str());
+			fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", colorArrayID.c_str(),model.Vc.size()*3);
+			for (int k=0;k<model.Vc.size();k++)
+				fprintf(fp,"%f %f %f ",model.Vc[k][0],model.Vc[k][1],model.Vc[k][2]);
+			fprintf(fp,"</float_array>\n");
+			fprintf(fp,"<technique_common>\n");
+			fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n",colorArrayID.c_str(),model.Vc.size(),3);
+			fprintf(fp,"<param name=\"R\" type=\"float\"/>\n");
+			fprintf(fp,"<param name=\"G\" type=\"float\"/>\n");
+			fprintf(fp,"<param name=\"B\" type=\"float\"/>\n");
 			fprintf(fp,"</accessor>\n");
 			fprintf(fp,"</technique_common>\n");
 			fprintf(fp,"</source>\n");
@@ -3208,6 +3231,10 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
 			{
 				fprintf(fp,"<input semantic=\"TEXCOORD\" source=\"#%s\" offset=\"%d\"/>\n",texCoordID.c_str(),offset++);
 			}
+			if (hasColor)
+			{
+				fprintf(fp,"<input semantic=\"COLOR\" source=\"#%s\" offset=\"%d\"/>\n",colorID.c_str(),offset++);
+			}
 			fprintf(fp,"<p>");			
 			for (unsigned int k=0;k<mtlFaces.size();k++)
 			{
@@ -3226,6 +3253,8 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
 						fprintf(fp,"%d ",(*fn)[j]);
 					if (hasTexCoord)
 						fprintf(fp,"%d ",(*ft)[j]);
+					if (hasColor)
+						fprintf(fp,"%d ",(*f)[j]);
 				}
 			}
 			fprintf(fp,"</p>\n");

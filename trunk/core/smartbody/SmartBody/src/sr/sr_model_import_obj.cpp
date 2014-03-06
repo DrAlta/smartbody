@@ -288,7 +288,9 @@ bool SrModel::import_obj ( const char* file )
   
    //SR_TRACE1 ( "First path:" << path );
 
-   int curmtl = -1;
+   int curmtl = 0;
+   M.push();
+   mtlnames.push("noname");
 
    init ();
    name = filename;

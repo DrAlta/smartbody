@@ -63,7 +63,7 @@ static int face_cb(p_ply_argument argument) {
 	if (value_index == -1) // first entry in the list
 	{
 		model->F.push();
-		model->Fm.push(-1);
+		model->Fm.push(0);
 	}
 	else if (value_index >= 0 && value_index <= 2) // a triangle face
 	{
@@ -81,9 +81,16 @@ bool SrModel::import_ply( const char* file )
 {
 
 	long nvertices, ntriangles;
+	M.push();
+	mtlnames.push("noname");
 	p_ply ply = ply_open(file, NULL, 0, NULL);
 	if (!ply) return false;
 	if (!ply_read_header(ply)) return false;
+	SrString path=file;
+	SrString filename;
+	path.extract_file_name(filename);
+	name = filename;
+	name.remove_file_extension();
 	nvertices = ply_set_read_cb(ply, "vertex", "x", vertex_cb, this, 0);
 	ply_set_read_cb(ply, "vertex", "y", vertex_cb, this, 1);
 	ply_set_read_cb(ply, "vertex", "z", vertex_cb, this, 2);
