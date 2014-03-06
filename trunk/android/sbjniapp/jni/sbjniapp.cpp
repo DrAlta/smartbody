@@ -340,6 +340,7 @@ extern "C" {
     //JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executePython(JNIEnv * env, jobject obj, jstring pythonCmd);
     JNIEXPORT jstring JNICALL Java_com_android_sbjniapp_SBJNIAppLib_getLog(JNIEnv * env, jobject obj);   
     JNIEXPORT jboolean JNICALL Java_com_android_sbjniapp_SBJNIAppLib_handleInputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my);
+    JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_reloadTexture(JNIEnv * env, jobject obj);
 };
 
 #endif
@@ -570,6 +571,13 @@ JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_step(JNIEnv * env, 
 	scene->getSimulationManager()->updateTimer();
 	scene->update();
 	renderFrame();
+}
+
+JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_reloadTexture(JNIEnv * env, jobject obj)
+{
+	//LOG("Reload OpenGL Texture");
+	SbmTextureManager& texm = SbmTextureManager::singleton();
+	texm.reloadTexture();
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_executeSB(JNIEnv * env, jobject obj, jstring sbmCmd)
