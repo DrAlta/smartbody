@@ -461,7 +461,8 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	texCoordBuf.resize(nTotalVtxs);
 	skinColorBuf.resize(nTotalVtxs);
 	meshColorBuf.resize(nTotalVtxs);
-	triBuf.resize(nTotalTris);
+	boneCountBuf.resize(nTotalVtxs);
+	triBuf.resize(nTotalTris);	
 
 	if (buildSkinnedBuffer)
 	{
@@ -563,6 +564,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				int numWeight = numOfInfJoints > 8 ? 8 : numOfInfJoints;
 				float weightSum = 0.f;
 				SrVec skinColor;
+				boneCountBuf[iVtx] = numWeight;
 				for (int j=0;j<numWeight;j++)
 				{
 					if (j >= (int)weightList.size())
@@ -618,6 +620,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 						boneWeightBuf[0][idxMap[k]] = boneWeightBuf[0][iVtx];
 						boneWeightBuf[1][idxMap[k]] = boneWeightBuf[1][iVtx];
 						skinColorBuf[idxMap[k]] = skinColorBuf[iVtx];
+						boneCountBuf[idxMap[k]] = boneCountBuf[iVtx];
 					}	
 				}
 			}
@@ -1630,6 +1633,63 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 		meshVisible = deformableMesh? true:false;
 	}
 }
+
+void DeformableMeshInstance::updateTransformBuffer()
+{
+	if (!_mesh) return;
+
+	if (transformBuffer.size() != _mesh->boneJointIdxMap.size())
+		transformBuffer.resize(_mesh->boneJointIdxMap.size());
+	std::map<std::string,int>& boneIdxMap = _mesh->boneJointIdxMap;
+	std::map<std::string,int>::iterator mi;	
+	for ( mi  = boneIdxMap.begin();
+		mi != boneIdxMap.end();
+		mi++)	
+	{
+		int idx = mi->second;
+		SkJoint* joint = _skeleton->search_joint(mi->first.c_str());//boneJointList[i];		
+		if (!joint)
+			continue;
+		SrMat bindPoseMat = _mesh->bindPoseMatList[idx];
+		bindPoseMat.set_translation(bindPoseMat.get_translation()*_meshScale);
+		transformBuffer[idx] = bindPoseMat*joint->gmat();	
+		SrQuat q = SrQuat(transformBuffer[idx]);
+		//LOG("transform buffer %d , quat = %f %f %f %f",idx,q.w,q.x,q.y,q.z);
+		//sr_out << " transform buffer = " << transformBuffer[idx];
+	}
+}
+
+
+SBAPI void DeformableMeshInstance::updateFast()
+{
+	if (!_updateMesh)	return;
+	if (!_skeleton || !_mesh) return;	
+	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
+	_skeleton->update_global_matrices();
+	updateTransformBuffer();
+
+	for (unsigned int i=0;i<_mesh->posBuf.size();i++)
+	{
+		SrVec vPos = _mesh->posBuf[i]*_meshScale;
+		SrVec vSkinPos = SrVec(0,0,0);
+// 		SrVec4i& boneID1 = _mesh->boneIDBuf[0][i];
+// 		SrVec4&  boneWeight1 = _mesh->boneWeightBuf[0][i];
+// 		SrVec4i& boneID2 = _mesh->boneIDBuf[1][i];
+// 		SrVec4&  boneWeight2 = _mesh->boneWeightBuf[1][i];
+		for (int k=0;k<_mesh->boneCountBuf[i];k++)
+		//for (int k=0;k<8;k++)
+		{	
+			int a = (k<4) ? 0 : 1;
+			int b = k%4;			
+			vSkinPos += (vPos*transformBuffer[_mesh->boneIDBuf[a][i][b]])*_mesh->boneWeightBuf[a][i][b];
+		}
+
+		_deformPosBuf[i] = vSkinPos;
+	}
+
+	
+}
+
 
 void DeformableMeshInstance::update()
 {

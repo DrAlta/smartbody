@@ -12,6 +12,7 @@
 #include "sbm/ParserOpenCOLLADA.h"
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 
+
 namespace SmartBody {
 
 SBAssetHandlerCOLLADA::SBAssetHandlerCOLLADA()
@@ -55,6 +56,23 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			delete rapidFile;
 			return assets;
 		}
+		bool zaxis = false;
+		rapidxml::xml_node<>* assetNode = ParserCOLLADAFast::getNode("asset", colladaNode, 0, 1);
+		if (assetNode)
+		{
+			rapidxml::xml_node<>* upNode = ParserCOLLADAFast::getNode("up_axis", assetNode);
+			if (upNode)
+			{
+				std::string upAxisName = upNode->value();
+				if (upAxisName == "Z_UP" || upAxisName == "z_up")
+				{
+					// rotate the skeleton by -90 around the x-axis
+					zaxis = true;
+				}
+
+			}
+		}
+
 		rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("library_geometries", colladaNode, 0, 1);
 		rapidxml::xml_node<>* visualSceneNode = ParserCOLLADAFast::getNode("library_visual_scenes", colladaNode, 0, 1);
 		if (geometryNode || visualSceneNode)
@@ -70,6 +88,28 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			motion->setName(basename + extension);
 			int order;
 			ParserCOLLADAFast::parseLibraryVisualScenes(visualSceneNode, *skeleton, *motion, 1.0, order, materialId2Name);
+
+			if (zaxis)
+			{				
+				// get the root node
+				SkJoint* root = skeleton->root();
+				if (root)
+				{
+					if (root->quat())
+					{
+						SrQuat prerot = root->quat()->prerot();
+						SrVec xaxis(1, 0, 0);
+						SrQuat adjust(xaxis, 3.14159f / -2.0f);
+						SrQuat adjustY(SrVec(0,1,0), 3.14159f );
+						//SrQuat final = adjustY * adjust * prerot; 
+						SrQuat final = adjust * prerot;
+						//LOG("before = %f %f %f %f", prerot.w, prerot.x, prerot.y, prerot.z);
+						//LOG("after = %f %f %f %f", final.w, final.x, final.y, final.z);
+						root->quat()->prerot(final);
+						root->offset(root->offset()*adjust);
+					}
+				}
+			}		
 
 			rapidxml::xml_node<>* skmNode = ParserCOLLADAFast::getNode("library_animations", colladaNode, 0, 1);
 			if (skmNode)

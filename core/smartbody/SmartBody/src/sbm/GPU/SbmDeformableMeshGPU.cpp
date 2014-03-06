@@ -1355,30 +1355,7 @@ SbmDeformableMeshGPUInstance::~SbmDeformableMeshGPUInstance()
 		delete TBOTran;
 }
 
-void SbmDeformableMeshGPUInstance::updateTransformBuffer()
-{
-	if (!_mesh) return;
 
-	if (transformBuffer.size() != _mesh->boneJointIdxMap.size())
-		transformBuffer.resize(_mesh->boneJointIdxMap.size());
-	std::map<std::string,int>& boneIdxMap = _mesh->boneJointIdxMap;
-	std::map<std::string,int>::iterator mi;	
-	for ( mi  = boneIdxMap.begin();
-		  mi != boneIdxMap.end();
-		  mi++)	
-	{
-		int idx = mi->second;
-		SkJoint* joint = _skeleton->search_joint(mi->first.c_str());//boneJointList[i];		
-		if (!joint)
-			continue;
-		SrMat bindPoseMat = _mesh->bindPoseMatList[idx];
-		bindPoseMat.set_translation(bindPoseMat.get_translation()*_meshScale);
-		transformBuffer[idx] = bindPoseMat*joint->gmat();	
-		SrQuat q = SrQuat(transformBuffer[idx]);
-		//LOG("transform buffer %d , quat = %f %f %f %f",idx,q.w,q.x,q.y,q.z);
-		//sr_out << " transform buffer = " << transformBuffer[idx];
-	}
-}
 
 void SbmDeformableMeshGPUInstance::update()
 {		

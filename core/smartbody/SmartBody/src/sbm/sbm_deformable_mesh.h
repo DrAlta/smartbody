@@ -83,6 +83,7 @@ public:
 	std::vector<SrVec3i>        triBuf;
 	std::vector<SbmSubMesh*>    subMeshList;
 
+	std::vector<int>			boneCountBuf;
 	std::vector<SrVec4i>        boneIDBuf[2];
 	std::vector<SrVec4>         boneIDBuf_f[2];
 	std::vector<SrVec4>         boneWeightBuf[2];
@@ -134,7 +135,8 @@ protected:
 	bool _recomputeNormal;
 	bool _isStaticMesh;
 public:
-	std::vector<SrVec> _deformPosBuf;		
+	std::vector<SrVec> _deformPosBuf;	
+	std::vector<SrMat>  transformBuffer;	
 public:
 	SBAPI DeformableMeshInstance();
 	SBAPI virtual ~DeformableMeshInstance();
@@ -150,8 +152,10 @@ public:
 	SBAPI bool    isStaticMesh();
 	SBAPI SmartBody::SBSkeleton* getSkeleton();	
 	SBAPI virtual void update();
+	SBAPI virtual void updateFast();
 	SBAPI virtual void blendShapes();
 	SBAPI DeformableMesh* getDeformableMesh() { return _mesh; }
+	void updateTransformBuffer();
 
 protected:
 	void cleanUp();

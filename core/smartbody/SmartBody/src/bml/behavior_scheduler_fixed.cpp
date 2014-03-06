@@ -65,11 +65,11 @@ BehaviorSchedulerFixed::BehaviorSchedulerFixed( const VecSyncPairs& input ) {
 				throw BML::BmlException( "BehaviorSchedulerFixed: Invalid sync point timing." );
 			}
 
-			const wstring& sync_id = it->first;
+			std::wstring sync_id = it->first;
 			last_time = it->second;
 
-			sync_point_times.push_back( make_pair<wstring,time_sec>( sync_id, last_time ) );
-			name_to_index.insert( make_pair<wstring,unsigned int>( sync_id, cur_index++ ) );
+			sync_point_times.push_back( std::make_pair( sync_id, last_time ) );
+			name_to_index.insert( std::make_pair( sync_id, cur_index++ ) );
 		}
 	} else {
 		throw BML::BmlException( "BehaviorSchedulerFixed: No sync points specified." );

@@ -819,7 +819,8 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
 	  
 	  string replyCmd = "RemoteSpeechReply ";
 	  replyCmd = replyCmd + reply; //cmdConst;
-	  mcu.execute_later(replyCmd.c_str());
+	  SmartBody::SBScene::getScene()->command(replyCmd);
+	  //mcu.execute_later(replyCmd.c_str());
       //vhmsg::ttu_notify2( "RemoteSpeechReply", reply.c_str() );
    }
 }

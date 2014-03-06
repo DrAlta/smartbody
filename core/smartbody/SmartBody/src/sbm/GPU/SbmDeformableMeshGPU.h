@@ -59,14 +59,13 @@ protected:
 
 class SbmDeformableMeshGPUInstance : public DeformableMeshInstance
 {
-protected:
-	std::vector<SrMat>  transformBuffer;	
+protected:	
 	TBOData  *TBOTran; // bone transformation	
 	bool     bufferReady;
 public:
 	SBAPI SbmDeformableMeshGPUInstance();
 	~SbmDeformableMeshGPUInstance();
-	void updateTransformBuffer();
+	
 	virtual void update();			
 	virtual void setDeformableMesh(DeformableMesh* mesh);
 	std::vector<SrMat>& getTransformBuffer() { return transformBuffer; }
