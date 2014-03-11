@@ -1,5 +1,5 @@
 # Comment
-model=Classes/CADIA.SuperHumanoid/SuperHumanoid.bam
+model=Classes/CADIA.SuperHumanoid/SuperHumanoid.egg
 texture=Classes/CADIA.SuperHumanoid/red.png
 envmap=1
 flip=1

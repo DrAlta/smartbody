@@ -306,7 +306,7 @@ class CharacterPawn(Pawn):
 		
 		try:
 			morphTarget = self.__morphTargetMap[mappedViseme]
-			print "SetViseme " + mappedViseme  + " morph=" + morphTarget 
+			#print "SetViseme " + mappedViseme  + " morph=" + morphTarget 
 			# get the joint id
 			# pandaJointID = self.JointNameToID(morphTarget)
 			#print " jointID=" + pandaJointID 
@@ -342,7 +342,10 @@ class CharacterPawn(Pawn):
 	
 			self.Scene.SendSbmCommand("python mychar.setVoice(\"text\")")
 			self.Scene.SendSbmCommand("python mychar.setVoiceCode(\"" + self.GetName() + "\")")
+			print "About to setup character " + self.GetName()
 			self.Scene.SendSbmCommand("python characterSetup(\"" + self.GetName() + "\")")
+			print "Finished setting up character " + self.GetName()
+			
 			self.SetRegistered(True)
 			self.RegisterPosHpr()
 			
@@ -381,9 +384,11 @@ class CharacterPawn(Pawn):
 		
 	def GetVisemeMap(self, visemeId):
 		""" retrieves the mapping between the viseme name and the viseme id """
-		x = self.__visemeMap[visemeId]
-		return x		
-	
+		try:
+			x = self.__visemeMap[visemeId]
+			return x		
+		except:
+			return ""
 			
 class BubbleManager:
 	""" Handles the spawning and positioning of chat bubbles for a CharacterPawn instance """
