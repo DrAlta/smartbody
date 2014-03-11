@@ -33,6 +33,12 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 		return BehaviorRequestPtr();
 	}
 
+	if (!character->param_animation_ct)
+	{
+		LOG("No parameterized animation controller present for character %s.", character->getName().c_str());
+		return BehaviorRequestPtr();
+	}
+
 	// get state
 	std::string stateName = xml_parse_string(BMLDefs::ATTR_NAME, elem);
 	if (stateName == "")
