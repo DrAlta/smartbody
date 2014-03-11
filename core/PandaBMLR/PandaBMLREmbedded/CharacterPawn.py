@@ -96,8 +96,10 @@ class CharacterPawn(Pawn):
 		myskel = bmlr.sbscene.createSkeleton("common.sk")
 		mychar.setSkeleton(myskel)
 		mychar.createStandardControllers()
-		mychar.setVoice("local")
-		mychar.setVoiceCode("voice_kal_diphone")
+		mychar.setVoice("remote")
+		mychar.setVoiceCode("Microsoft|Anna")
+		print "About to setup the character..."
+		bmlr.sbscene.command("python characterSetup(\"" + self.GetName() + "\")")
 		
 		self.RegisterPosHpr()
 	

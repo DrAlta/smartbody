@@ -157,9 +157,10 @@ class ClassCacher:
 		""" Parses a character class file """
 		
 		file = open(filePath, "r")
-		for line in file:
+		for wholeline in file:
 			try:
-				line = string.strip(line)
+				line = wholeline.strip()
+				print "" + line
 				if (not line.startswith("#")):				
 					if (line.startswith("texture=")):
 						char.TexturePath = line.replace("texture=", "", 1)
