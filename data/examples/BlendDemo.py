@@ -15,9 +15,6 @@ scene.loadAssets()
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
 
-
-
-
 print 'Setting up joint map for Brad and Rachel'
 scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
@@ -49,7 +46,7 @@ chr0D.setSkeleton(chr0DSkeleton)
 chr0D.setPosition(SrVec(-14.5, 0, 0))
 chr0D.createStandardControllers()
 chr0D.setDoubleAttribute('deformableMeshScale', 0.06)
-chr0D.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+chr0D.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 createRetargetInstance('test_utah.sk','ChrBrad.sk')
 bml.execBML('chr0D', '<body posture="ChrUtah_Idle001"/>')
 # chr1D

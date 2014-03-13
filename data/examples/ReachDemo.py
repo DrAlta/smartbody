@@ -53,7 +53,7 @@ for i in range(2):
 	brad.createStandardControllers()
 	# Set deformable mesh
 	brad.setDoubleAttribute('deformableMeshScale', 0.01)
-	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	# Retarget character

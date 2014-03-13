@@ -39,7 +39,7 @@ brad.setSkeleton(bradSkeleton)
 brad.createStandardControllers()
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 
 # Turn on GPU deformable Geometry
 brad.setStringAttribute("displayType", "GPUmesh")

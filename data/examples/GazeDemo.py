@@ -51,7 +51,7 @@ brad.setHPR(SrVec(-17, 0, 0))
 brad.createStandardControllers()
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
 
 print 'Setting up Rachel'
