@@ -56,7 +56,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;boost_serialization-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;boost_serialization-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;python27.lib;libprotobufd.lib;libprotocd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib;..\python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <OutputFile>..\bin\$(TargetName)$(TargetExt)</OutputFile>
       <ImportLibrary>..\lib\$(TargetName).lib</ImportLibrary>
@@ -90,7 +90,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\lib;..\python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;boost_serialization-vc100-mt-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;python27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;boost_serialization-vc100-mt-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;python27.lib;libprotobuf.lib;libprotoc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <PerUserRedirection>true</PerUserRedirection>
       <OutputFile>..\bin\$(TargetName)$(TargetExt)</OutputFile>
@@ -106,7 +106,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\SmartBody\bml\behavior_scheduler_gesture.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion_graph.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_pose_postprocessing.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\rply\rply.c" />
     <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\adler32.c" />
     <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\compress.c" />
     <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\crc32.c" />
@@ -127,6 +129,9 @@
     <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\unzip.c" />
     <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\zip.c" />
     <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\zutil.c" />
+    <ClCompile Include="..\src\SmartBody\protocols\sbmesh.pb.cc" />
+    <ClCompile Include="..\src\SmartBody\protocols\sbmotion.pb.cc" />
+    <ClCompile Include="..\src\SmartBody\protocols\sbutilities.pb.cc" />
     <ClCompile Include="..\src\SmartBody\sbm\ParserCOLLADAFast.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\DefaultAttributeTable.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\MiniBrain.cpp" />
@@ -144,9 +149,11 @@
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerCOLLADA.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerObj.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerOgre.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerPly.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSBMeshBinary.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSk.cpp" />
-    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSkb.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSkm.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSkmb.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetManager.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAttribute.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAttributeManager.cpp" />
@@ -172,6 +179,7 @@
     <ClCompile Include="..\src\SmartBody\sb\SBJointMapManager.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBMotion.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBMotionBlendBase.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBMotionGraph.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\sbm_character.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\sbm_pawn.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBNavigationMesh.cpp" />
@@ -194,6 +202,7 @@
     <ClCompile Include="..\src\SmartBody\sb\SBPythonCharacter.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBPythonClass.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBPythonMath.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonMesh.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBPythonMotion.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBPythonScene.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBPythonSimulation.cpp" />
@@ -457,6 +466,7 @@
     <ClCompile Include="..\src\SmartBody\sr\sr_model.cpp" />
     <ClCompile Include="..\src\SmartBody\sr\sr_model_export_iv.cpp" />
     <ClCompile Include="..\src\SmartBody\sr\sr_model_import_obj.cpp" />
+    <ClCompile Include="..\src\SmartBody\sr\sr_model_import_ply.cpp" />
     <ClCompile Include="..\src\SmartBody\sr\sr_output.cpp" />
     <ClCompile Include="..\src\SmartBody\sr\sr_path_array.cpp" />
     <ClCompile Include="..\src\SmartBody\sr\sr_plane.cpp" />
@@ -560,6 +570,7 @@
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion.h" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_blend.hpp" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_example.hpp" />
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_graph.hpp" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_parameter.h" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_player.h" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_profile.h" />
@@ -635,6 +646,7 @@
     <ClInclude Include="..\src\SmartBody\external\recast\Recast.h" />
     <ClInclude Include="..\src\SmartBody\external\recast\RecastAlloc.h" />
     <ClInclude Include="..\src\SmartBody\external\recast\RecastAssert.h" />
+    <ClInclude Include="..\src\SmartBody\external\rply\rply.h" />
     <ClInclude Include="..\src\SmartBody\external\SOIL\image_DXT.h" />
     <ClInclude Include="..\src\SmartBody\external\SOIL\image_helper.h" />
     <ClInclude Include="..\src\SmartBody\external\SOIL\SOIL.h" />
@@ -657,6 +669,9 @@
     <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\zip.h" />
     <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\zlib.h" />
     <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\zutil.h" />
+    <ClInclude Include="..\src\SmartBody\protocols\sbmesh.pb.h" />
+    <ClInclude Include="..\src\SmartBody\protocols\sbmotion.pb.h" />
+    <ClInclude Include="..\src\SmartBody\protocols\sbutilities.pb.h" />
     <ClInclude Include="..\src\SmartBody\sbm\action_unit.hpp" />
     <ClInclude Include="..\src\SmartBody\sbm\BMLDefs.h" />
     <ClInclude Include="..\src\SmartBody\sbm\general_param_setting.h" />
@@ -729,9 +744,11 @@
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerCOLLADA.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerObj.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerOgre.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerPly.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerSBMeshBinary.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerSk.h" />
-    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerSkb.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerSkm.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerSkmb.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetManager.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAttribute.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAttributeManager.h" />
@@ -755,6 +772,7 @@
     <ClInclude Include="..\src\SmartBody\sb\SBJointMapManager.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBMotion.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBMotionBlendBase.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBMotionGraph.h" />
     <ClInclude Include="..\src\SmartBody\sb\sbm_character.hpp" />
     <ClInclude Include="..\src\SmartBody\sb\sbm_pawn.hpp" />
     <ClInclude Include="..\src\SmartBody\sb\SBNavigationMesh.h" />
@@ -868,6 +886,9 @@
     <ClInclude Include="..\src\SmartBody\sr\sr_viewer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\src\SmartBody\protocols\sbmesh.proto" />
+    <None Include="..\src\SmartBody\protocols\sbmotion.proto" />
+    <None Include="..\src\SmartBody\protocols\sbutilities.proto" />
     <None Include="..\src\SmartBody\sbm\GPU\shaderFiles\fs_skin_render.frag">
       <FileType>Document</FileType>
     </None>
