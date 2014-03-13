@@ -313,6 +313,9 @@
     <ClCompile Include="..\src\sbgui\SBWindowListener.cpp">
       <Filter>viewer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sbgui\visemeviewer\ImageSequencePlayer.cpp">
+      <Filter>lipsyncviewer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\smartbody-lib\src\external\glew\glew.h">
@@ -574,6 +577,9 @@
     </ClInclude>
     <ClInclude Include="..\src\sbgui\SBWindowListener.h">
       <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\visemeviewer\ImageSequencePlayer.h">
+      <Filter>lipsyncviewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

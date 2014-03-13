@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ogresmartbody", "ogresmartb
 		{8BBCFC4A-6B52-461E-8BBA-A86DE3FAD6F6} = {8BBCFC4A-6B52-461E-8BBA-A86DE3FAD6F6}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "irrlichtsmartbody", "irrlichtsmartbody.vcxproj", "{B19F5657-AA08-4D34-B3A3-58045374DBBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -39,6 +41,10 @@ Global
 		{B19F5657-AA08-4D34-B3A3-58045174DBBB}.Debug|Win32.Build.0 = Debug|Win32
 		{B19F5657-AA08-4D34-B3A3-58045174DBBB}.Release|Win32.ActiveCfg = Release|Win32
 		{B19F5657-AA08-4D34-B3A3-58045174DBBB}.Release|Win32.Build.0 = Release|Win32
+		{B19F5657-AA08-4D34-B3A3-58045374DBBB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B19F5657-AA08-4D34-B3A3-58045374DBBB}.Debug|Win32.Build.0 = Debug|Win32
+		{B19F5657-AA08-4D34-B3A3-58045374DBBB}.Release|Win32.ActiveCfg = Release|Win32
+		{B19F5657-AA08-4D34-B3A3-58045374DBBB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

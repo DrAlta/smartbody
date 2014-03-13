@@ -51,6 +51,8 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">sbguid</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">sbgui</TargetName>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -228,6 +230,7 @@
     <ClCompile Include="..\src\sbgui\SBOgreListener.cpp" />
     <ClCompile Include="..\src\sbgui\SBSelectionManager.cpp" />
     <ClCompile Include="..\src\sbgui\SBWindowListener.cpp" />
+    <ClCompile Include="..\src\sbgui\visemeviewer\ImageSequencePlayer.cpp" />
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeCurve.cpp" />
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeCurveEditor.cpp" />
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeRTCurveViewer.cpp" />
@@ -318,6 +321,7 @@
     <ClInclude Include="..\src\sbgui\SBOgreListener.h" />
     <ClInclude Include="..\src\sbgui\SBSelectionManager.h" />
     <ClInclude Include="..\src\sbgui\SBWindowListener.h" />
+    <ClInclude Include="..\src\sbgui\visemeviewer\ImageSequencePlayer.h" />
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeCurve.h" />
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeCurveEditor.h" />
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeRTCurveViewer.h" />
