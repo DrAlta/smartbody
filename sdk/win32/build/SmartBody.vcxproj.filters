@@ -1126,9 +1126,6 @@
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSk.cpp">
       <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSkb.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSkm.cpp">
       <Filter>sb</Filter>
     </ClCompile>
@@ -1137,6 +1134,39 @@
     </ClCompile>
     <ClCompile Include="..\src\SmartBody\sbm\ParserCOLLADAFast.cpp">
       <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSkmb.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\protocols\sbmesh.pb.cc">
+      <Filter>protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\protocols\sbmotion.pb.cc">
+      <Filter>protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\protocols\sbutilities.pb.cc">
+      <Filter>protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSBMeshBinary.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerPly.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sr\sr_model_import_ply.cpp">
+      <Filter>sr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBMotionGraph.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBPythonMesh.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion_graph.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\external\rply\rply.c">
+      <Filter>external\ply</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2259,9 +2289,6 @@
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerSk.h">
       <Filter>sb</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerSkb.h">
-      <Filter>sb</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerSkm.h">
       <Filter>sb</Filter>
     </ClInclude>
@@ -2270,6 +2297,33 @@
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\sbm\ParserCOLLADAFast.h">
       <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerSkmb.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\protocols\sbmesh.pb.h">
+      <Filter>protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\protocols\sbmotion.pb.h">
+      <Filter>protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\protocols\sbutilities.pb.h">
+      <Filter>protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerSBMeshBinary.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerPly.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBMotionGraph.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion_graph.hpp">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\rply\rply.h">
+      <Filter>external\ply</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2315,6 +2369,12 @@
     <Filter Include="external\zlib">
       <UniqueIdentifier>{7b13f61f-722c-4873-8470-0e16023106b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="protocols">
+      <UniqueIdentifier>{93dc4d94-f569-4044-89a4-cd3ed2a018d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\ply">
+      <UniqueIdentifier>{2f3ade32-1f08-4d24-b5f5-f0c3c635529e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\SmartBody\sbm\GPU\shaderFiles\fs_skin_render.frag">
@@ -2325,6 +2385,15 @@
     </None>
     <None Include="..\src\SmartBody\sbm\sbm_deformable_mesh.cpp.bak">
       <Filter>sbm</Filter>
+    </None>
+    <None Include="..\src\SmartBody\protocols\sbmesh.proto">
+      <Filter>protocols</Filter>
+    </None>
+    <None Include="..\src\SmartBody\protocols\sbmotion.proto">
+      <Filter>protocols</Filter>
+    </None>
+    <None Include="..\src\SmartBody\protocols\sbutilities.proto">
+      <Filter>protocols</Filter>
     </None>
   </ItemGroup>
 </Project>
