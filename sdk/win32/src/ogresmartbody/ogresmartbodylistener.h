@@ -1,7 +1,7 @@
 #ifndef _OGRESMARTBODYLISTENER_H_
 #define _OGRESMARTBODYLISTENER_H_
 
-#include <Ogre.h>
+#include <OGRE/Ogre.h>
 #include "ogresmartbody.h"
 #include <sb/SBSceneListener.h>
 
