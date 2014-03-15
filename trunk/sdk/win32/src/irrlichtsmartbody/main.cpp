@@ -1,3 +1,13 @@
+/******************************
+SmartBody -> Irrlicht demo
+To run this demo:
+1) download the irrlicht 1.8.1 sdk and place it 
+under the top-level SmartBody directory (at the same level as bin/ build/ etc.
+2) Extract the Sinbad.zip file from the OgreSDK/media directory into irrlicht-1.8.1/media
+
+
+*******************************/
+
 #include <irrlicht.h>
 #include <string>
 #include <map>
