@@ -82,6 +82,13 @@
       <Command>copy /Y ..\src\ogresmartbody\ogresmartbody.py ..\data
 copy /Y ..\src\ogresmartbody\resources_d.cfg ..\bin
 copy /Y ..\src\ogresmartbody\plugins_d.cfg ..\bin
+copy /Y ..\OgreSDK\bin\debug\Plugin_OctreeSceneManager_d.dll ..\bin
+copy /Y ..\OgreSDK\bin\debug\Plugin_BSPSceneManager_d.dll ..\bin
+copy /Y ..\OgreSDK\bin\debug\Plugin_ParticleFX_d.dll ..\bin
+copy /Y ..\OgreSDK\bin\debug\Plugin_CgProgramManager_d.dll ..\bin
+copy /Y ..\OgreSDK\bin\debug\OgreRTShaderSystem_d.dll ..\bin
+copy /Y ..\OgreSDK\bin\debug\RenderSystem_GL_d.dll ..\bin
+
 
 </Command>
     </PostBuildEvent>
@@ -120,7 +127,12 @@ copy /Y ..\src\ogresmartbody\plugins_d.cfg ..\bin
       <Command>copy /Y ..\src\ogresmartbody\ogresmartbody.py ..\data
 copy /Y ..\src\ogresmartbody\resources.cfg ..\bin
 copy /Y ..\src\ogresmartbody\plugins.cfg ..\bin
-
+copy /Y ..\OgreSDK\bin\release\Plugin_OctreeSceneManager.dll ..\bin
+copy /Y ..\OgreSDK\bin\release\Plugin_BSPSceneManager.dll ..\bin
+copy /Y ..\OgreSDK\bin\release\Plugin_ParticleFX.dll ..\bin
+copy /Y ..\OgreSDK\bin\release\Plugin_CgProgramManager.dll ..\bin
+copy /Y ..\OgreSDK\bin\release\OgreRTShaderSystem.dll ..\bin
+copy /Y ..\OgreSDK\bin\release\RenderSystem_GL.dll ..\bin
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

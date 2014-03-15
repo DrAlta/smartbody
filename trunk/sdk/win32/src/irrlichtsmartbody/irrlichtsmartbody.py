@@ -1,8 +1,8 @@
 import math
-import random
 print "|--------------------------------------------|"
 print "|         Starting irrlich Demo           |"
 print "|--------------------------------------------|"
+
 
 scene.setScale(0.1)
 # Add asset paths
@@ -11,6 +11,8 @@ scene.addAssetPath('motion', 'Sinbad')
 scene.addAssetPath('script', 'scripts')
 scene.addAssetPath('script', 'behaviorsets')
 scene.loadAssets()
+
+
 
 # Map Sinbad to the standard SmartBody setup
 print 'Setting up joint map for Sinbad'
