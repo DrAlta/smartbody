@@ -439,6 +439,7 @@ void MeCtJacobianIK::update( MeCtIKTreeScenario* scenario )
 		return;
 
 	scenario->updateNodeGlobalMat(scenario->ikTreeRoot);
+#if 1
 	// solve for initial jacobian	
 	if (useValidNodes)
 	{
@@ -451,6 +452,7 @@ void MeCtJacobianIK::update( MeCtIKTreeScenario* scenario )
 	solveDLS(matJ,dS,dampJ,dTheta, matJInv);
 	// update initial dTheta into new joints	
 	scenario->updateQuat(dTheta,useValidNodes);	
+#endif
 	// check for joint limit violation
 // 	scenario->updateJointLimit();
 // 	// solve for auxiliary Jacobian	
@@ -464,9 +466,11 @@ void MeCtJacobianIK::update( MeCtIKTreeScenario* scenario )
 // 	}	
 
 	// update null matrix		
+#if 1
 	dMatrix temp; 
 	matrixMatMult(matJInv,matJ,temp);
 	matJnull -= temp;		
+#endif
 	float weight = 1.0;	
 	if (ikUseReference)
 	{
@@ -667,12 +671,16 @@ bool MeCtJacobianIK::updateReferenceJointJacobianReduce(MeCtIKTreeScenario* s)
 		SrQuat nodeQuat = endNode->getQuat(QUAT_CUR);//s->ikQuatList[endNode->nodeIdx];
 		SrQuat refQuat = endNode->getQuat(QUAT_REF);//s->ikRefQuatList[endNode->nodeIdx];	
 		SrQuat diff = refQuat*nodeQuat.inverse();
-
 		diff.normalize(); // make sure it is a unit quaternion
 		SrVec axis;
 		float angle;
-		diff.get(axis,angle);
-		SrVec offset = axis*angle;//*0.9f;
+		diff.get(axis,angle);		
+		SrVec offset = axis*angle;//*0.9f
+		if (diff.w >= 1.f) // handle the zero rotation cause by rounding error when converting quaternion to axis-angle
+		{
+			offset = SrVec(diff.x,diff.y,diff.z); // approximated with the quaternion value directly
+		}	
+#if 1
 		if (offset.len() > maxRotOffset)
 		{
 			offset.normalize();
@@ -686,6 +694,7 @@ bool MeCtJacobianIK::updateReferenceJointJacobianReduce(MeCtIKTreeScenario* s)
 			}
 		}
 		else // otherwise, just copy the joint angles to the result
+#endif
 		{
 			for (int k=0;k<3;k++)
 			{			
@@ -693,6 +702,7 @@ bool MeCtJacobianIK::updateReferenceJointJacobianReduce(MeCtIKTreeScenario* s)
 			}						
 		}		
 	}
+#if 1
 	matrixVecMult(matJnull,dSref,dThetaTemp);	
 	// update the joint angles from IK nodes
 	for (unsigned int i=0;i<s->ikValidNodes.size();i++)
@@ -703,6 +713,7 @@ bool MeCtJacobianIK::updateReferenceJointJacobianReduce(MeCtIKTreeScenario* s)
 			dThetaAux(endNode->nodeIdx*3+k) = dThetaTemp(i*3+k);
 		}
 	}
+#endif
 
 	return true;	
 }
