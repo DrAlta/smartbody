@@ -179,6 +179,7 @@ eyelid_ct( new MeCtEyeLid() ),
 motionplayer_ct( NULL ),	
 noise_ct(NULL),
 record_ct(NULL),
+basic_locomotion_ct(NULL),
 face_neutral( NULL ),
 _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 {

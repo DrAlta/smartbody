@@ -2541,7 +2541,7 @@ SBAPI const std::string& SBMotion::getMotionSkeletonName()
 	return _motionSkeleton;
 }
 
-SBAPI void SBMotion::buildJointTrajectory( std::string effectorName, std::string refJointName /*= "base" */ )
+SBAPI void SBMotion::buildJointTrajectory( const std::string& effectorName, const std::string& refJointName /*= "base" */ )
 {
 	SBSkeleton* motionSkel = SBScene::getScene()->getSkeleton(getMotionSkeletonName());
 	if (!motionSkel)
@@ -2577,7 +2577,7 @@ SBAPI void SBMotion::buildJointTrajectory( std::string effectorName, std::string
 	delete skelCopy; 
 }
 
-SBAPI JointTrajectory* SBMotion::getJointTrajectory( std::string effectorName )
+SBAPI JointTrajectory* SBMotion::getJointTrajectory( const std::string& effectorName )
 {
 	if (trajMap.find(effectorName) == trajMap.end())
 	{
@@ -2587,7 +2587,7 @@ SBAPI JointTrajectory* SBMotion::getJointTrajectory( std::string effectorName )
 }
 
 
-SBAPI bool SBMotion::getTrajPosition( std::string effectorName, float time, SrVec& outPos )
+SBAPI bool SBMotion::getTrajPosition(const std::string& effectorName, float time, SrVec& outPos )
 {	
 	JointTrajectory* traj = getJointTrajectory(effectorName);
 	if (!traj) return false;
@@ -2597,7 +2597,7 @@ SBAPI bool SBMotion::getTrajPosition( std::string effectorName, float time, SrVe
 	if (!validTime) return false;
 	if (f1 >= (int) traj->jointTrajectory.size() || f2 >= (int) traj->jointTrajectory.size()) return false;
 	
-	outPos = traj->jointTrajectory[f1]*(1-weight) + traj->jointTrajectory[f2]*weight;
+	outPos = traj->jointTrajectory[f1]*(1.0f - weight) + traj->jointTrajectory[f2]*weight;
 	return true;
 }
 

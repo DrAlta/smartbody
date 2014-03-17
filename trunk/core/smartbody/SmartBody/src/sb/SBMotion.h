@@ -163,9 +163,9 @@ class SBMotion : public SkMotion
 		SBAPI void addEvent(double time, const std::string& type, const std::string& parameters, bool onceOnly);
 		int getTransformDepth() const { return transformDepth; }		
 		void setTransformDepth(int depth) { transformDepth = depth; }
-		SBAPI void buildJointTrajectory(std::string effectorName, std::string refJointName = "base" );
-		SBAPI JointTrajectory* getJointTrajectory(std::string effectorName);
-		SBAPI bool getTrajPosition(std::string effectorName, float time, SrVec& outPos);		
+		SBAPI void buildJointTrajectory(const std::string& effectorName, const std::string& refJointName = "base" );
+		SBAPI JointTrajectory* getJointTrajectory(const std::string& effectorName);
+		SBAPI bool getTrajPosition(const std::string& effectorName, float time, SrVec& outPos);		
 
 
 		// serializable data
