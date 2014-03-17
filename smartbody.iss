@@ -11,7 +11,7 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r5485
+AppVersion=r5498
 OutputBaseFilename=SmartBody
 WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
@@ -52,8 +52,9 @@ Source: ".\lib\OgreSDK\samples\*"; DestDir: "{app}\OgreSDK\samples"; Excludes: "
 ; library includes
 Source: ".\core\smartbody\steersuite-1.3\steerlib\include\*"; DestDir: "{app}\include\steersuite";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\steersuite-1.3\pprAI\include\*"; DestDir: "{app}\include\steersuite";  Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\core\smartbody\steersuite-1.3\external\tinyxml\*"; DestDir: "{app}\include\steersuite\tinyxml"
-Source: ".\core\smartbody\steersuite-1.3\external\mersenne\*"; DestDir: "{app}\include\steersuite\mersenne"
+Source: ".\core\smartbody\steersuite-1.3\external\tinyxml\*"; DestDir: "{app}\include\steersuite\tinyxml";  Excludes: ".svn"; 
+Source: ".\core\smartbody\steersuite-1.3\external\mersenne\*"; DestDir: "{app}\include\steersuite\mersenne"; Excludes: ".svn"
+Source: ".\core\smartbody\SmartBody\src\external\protobuf\include\*"; DestDir: "{app}\include\"; Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\lib\vhcl\include\*"; DestDir: "{app}\include\vhcl"
 Source: ".\lib\vhmsg\vhmsg-c\include\*"; DestDir: "{app}\include\vhmsg"
 Source: ".\lib\bonebus\include\*"; DestDir: "{app}\include\bonebus"
@@ -86,6 +87,8 @@ Source: ".\core\smartbody\SmartBody\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\SmartBody\lib\*.pdb"; DestDir: "{app}\lib"
 
 Source: ".\core\smartbody\SmartBody\src\external\glew\glew32.lib"; DestDir: "{app}\lib"
+Source: ".\core\smartbody\SmartBody\src\external\protobuf\lib\Release\*.lib"; DestDir: "{app}\lib"
+Source: ".\core\smartbody\SmartBody\src\external\protobuf\lib\Debug\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\vhcl\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\vhmsg\vhmsg-c\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\bonebus\lib\*.lib"; DestDir: "{app}\lib"
@@ -117,6 +120,7 @@ Source: ".\data\ChrRachel\*"; DestDir: "{app}\data\ChrRachel";  Excludes: ".svn"
 Source: ".\data\Sinbad\*"; DestDir: "{app}\data\Sinbad";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\data\mesh\ChrBrad\*"; DestDir: "{app}\data\mesh\ChrBrad"
 Source: ".\data\mesh\ChrRachel\*"; DestDir: "{app}\data\mesh\ChrRachel"
+Source: ".\data\mesh\ChrMaarten\*"; DestDir: "{app}\data\mesh\ChrMaarten"
 Source: ".\data\mesh\Sinbad\*"; DestDir: "{app}\data\mesh\Sinbad"
 Source: ".\data\scripts\*"; DestDir: "{app}\data\scripts"
 Source: ".\data\cegui\datafiles-0.8.2\*"; DestDir: "{app}\data\cegui\datafiles-0.8.2";  Excludes: ".svn"; Flags: recursesubdirs
