@@ -67,6 +67,7 @@ class SBCharacter : public SbmCharacter
 
 		SBAPI virtual SBFaceDefinition* getFaceDefinition();
 		SBAPI virtual void setFaceDefinition(SBFaceDefinition* face);
+		SBAPI virtual void updateDefaultFacePose();
 
 		SBAPI void interruptFace(double seconds);
 

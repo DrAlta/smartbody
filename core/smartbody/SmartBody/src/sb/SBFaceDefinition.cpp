@@ -46,7 +46,12 @@ SBFaceDefinition::SBFaceDefinition(SBFaceDefinition* source)
 		ActionUnit* au = new ActionUnit(sourceAu);
 		_auMap.insert(std::pair<int, ActionUnit*>(auNum, au));
 	}
-	
+
+	// copy the default face poses
+	std::vector<std::string> defaultPoses = source->getDefaultFacePoses();
+	std::vector<float> defaultPoseValues = source->getDefaultFaceValues();
+	this->setDefaultFacePose(defaultPoses, defaultPoseValues);
+		
 }
 
 SBFaceDefinition::~SBFaceDefinition()
@@ -90,6 +95,40 @@ void SBFaceDefinition::setFaceNeutral(const std::string& motionName)
 SkMotion* SBFaceDefinition::getFaceNeutral()
 {
 	return _faceNeutral;
+}
+
+void SBFaceDefinition::setDefaultFacePose(const std::vector<std::string>& poses, const std::vector<float>& values)
+{
+	if (poses.size() != values.size())
+	{
+		LOG("Cannot set default face pose; need the same number of face poses (%d) as values (%d)", poses.size(), values.size());
+		return;
+	}
+
+	_defaultFacePoses.clear();
+	_defaultFaceValues.clear();
+
+	for (unsigned int x = 0; x < poses.size(); x++)
+	{
+		_defaultFacePoses.push_back(poses[x]);
+		_defaultFaceValues.push_back(values[x]);
+	}
+}
+
+std::vector<std::string> SBFaceDefinition::getDefaultFacePoses()
+{
+	std::vector<std::string> poses;
+	for (unsigned int x = 0; x < _defaultFacePoses.size(); x++)
+		poses.push_back(_defaultFacePoses[x]);
+	return poses;
+}
+
+std::vector<float> SBFaceDefinition::getDefaultFaceValues()
+{
+	std::vector<float> values;
+	for (unsigned int x = 0; x < _defaultFaceValues.size(); x++)
+		values.push_back(_defaultFaceValues[x]);
+	return values;
 }
 
 bool SBFaceDefinition::hasAU(int auNum)

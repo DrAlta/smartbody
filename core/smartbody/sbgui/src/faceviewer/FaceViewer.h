@@ -35,10 +35,14 @@ class FaceViewer : public GenericViewer, public Fl_Double_Window, public SBWindo
 		static void ResetCB(Fl_Widget* widget, void* data);
 		static void FaceCB(Fl_Widget* widget, void* data);
 		static void FaceWeightCB(Fl_Widget* widget, void* data);
+		static void DefaultFaceCB(Fl_Widget* widget, void* data);
+		static void ResetDefaultFaceCB(Fl_Widget* widget, void* data);
 		
 		Fl_Choice* choiceCharacters;
 		Fl_Button* buttonRefresh;
 		Fl_Button* buttonReset;
+		Fl_Button* buttonDefaultFace;
+		Fl_Button* buttonResetDefaultFace;
 		Fl_Group* topGroup;
 		Fl_Scroll* bottomGroup;
 		std::vector<Fl_Value_Slider*> _sliders;

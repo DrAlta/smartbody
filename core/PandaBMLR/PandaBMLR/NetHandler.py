@@ -162,7 +162,7 @@ class NetHandler(DirectObject):
 	def CheckUDP(self):
 		""" Polls the UDP listener to see if there is any data to be received,
 			and sends the data to the appropriate handler if there is any"""
-			
+		
 		if (self.__UdpReader.dataAvailable()):
 			dg = Datagram()
 			while (self.__UdpReader.getData(dg)):
@@ -171,6 +171,7 @@ class NetHandler(DirectObject):
 				
 				packetId = unpack("i", dg.getMessage()[:4])[0]
 				
+				#print "PacketId = " + str(packetId)
 				if (packetId == 16):
 					# 0 = time, 1 = charid, 2 = numBoneRotations
 					BulkBoneRotations = unpack("iii", dg.getMessage()[4:16])

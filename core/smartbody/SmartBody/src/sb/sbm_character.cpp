@@ -2328,6 +2328,16 @@ void SbmCharacter::updateFaceDefinition()
 	{
 		face_ct->init( this );
 	}
+
+	// get any default face poses and set them
+	std::vector<std::string> poses = _faceDefinition->getDefaultFacePoses();
+	std::vector<float> values = _faceDefinition->getDefaultFaceValues();
+
+	for (unsigned int x = 0; x < poses.size(); x++)
+	{
+		this->schedule_viseme_trapezoid( poses[x].c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), values[x], 9999999.9, .25, .25 );
+	}
+
 }
 
 

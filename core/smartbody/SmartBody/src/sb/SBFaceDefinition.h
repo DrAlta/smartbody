@@ -1,25 +1,3 @@
-/*
- *  SBFaceDefinition.h - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
- */
-
 #ifndef _SBFACEDEFINITION_H_
 #define _SBFACEDEFINITION_H_
 
@@ -53,6 +31,11 @@ class SBFaceDefinition : public SBObject
 		SBAPI void setFaceNeutral(const std::string& motionName);
 		SBAPI SkMotion* getFaceNeutral();
 
+		SBAPI void setDefaultFacePose(const std::vector<std::string>& poses, const std::vector<float>& values);
+		SBAPI std::vector<std::string> getDefaultFacePoses();
+		SBAPI std::vector<float> getDefaultFaceValues();
+
+
 		SBAPI bool hasViseme(const std::string& visemeName);
 		SBAPI void setViseme(const std::string& visemeName, const std::string& motionName);
 		SBAPI void setVisemeWeight(const std::string& visemeName, float weight);
@@ -85,6 +68,8 @@ class SBFaceDefinition : public SBObject
 		std::map<std::string, std::pair<SkMotion*, float> > _visemeMap;
 		std::string _name;
 		std::string _emptyString;
+		std::vector<std::string> _defaultFacePoses;
+		std::vector<float> _defaultFaceValues;
 };
 
 }

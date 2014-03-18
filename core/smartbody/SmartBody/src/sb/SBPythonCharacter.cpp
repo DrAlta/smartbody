@@ -159,6 +159,8 @@ void pythonFuncsCharacter()
 		.def("startMotionGraph", &SBCharacter::startMotionGraph, "Start running the motion graph given a starting node name")
 		.def("startMotionGraphRandomWalk", &SBCharacter::startMotionGraphRandomWalk, "Start running the motion graph from a random node.")
 		.def("startMotionGraphWithPath", &SBCharacter::startMotionGraphWithPath, "Start running the motion graph and synthesize a graph walk based on input path.")
+		.def("updateFaceDefinition", &SBCharacter::updateFaceDefinition, "Updates the face definition.")
+		.def("updateDefaultFacePose", &SBCharacter::updateDefaultFacePose, "Updates the default face pose.")
 		;
 }
 }

@@ -447,6 +447,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("setAU", &SBFaceDefinition::setAU, "Sets an Action Unit of a given number to a side and a motion.")
 		.def("setFaceNeutral", &SBFaceDefinition::setFaceNeutral, "Sets the neutral face to a particular motion name.")
 		.def("save", &SBFaceDefinition::save, "Save face definition to a file.")
+		.def("setDefaultFacePose", &SBFaceDefinition::setDefaultFacePose, "Sets the default face poses, accepts a vector of face poses and a vector of values.")
 		;
 
 

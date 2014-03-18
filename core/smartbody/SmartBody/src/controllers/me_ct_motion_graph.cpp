@@ -36,7 +36,7 @@ bool MeCtMotionGraph::controller_evaluate( double t, MeFrameData& frame )
 		outMotionBuffer.copyFrameBuffer(motionState->getCurMotionFrameBuffer());
 	}	
 	
-	updateDt(t);
+	updateDt((float) t);
 	if (dt > 0.05f)
 		dt = 0.05f; // cap the update rate		
 
