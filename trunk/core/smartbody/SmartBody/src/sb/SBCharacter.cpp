@@ -619,6 +619,14 @@ void SBCharacter::setFaceDefinition(SBFaceDefinition* face)
 	SbmCharacter::setFaceDefinition(face);
 }
 
+void SBCharacter::updateDefaultFacePose()
+{
+	if (!_faceDefinition)
+		return;
+
+	interruptFace(0);
+}
+
 void SBCharacter::notify(SBSubject* subject)
 {
 	SBAttribute* attribute = dynamic_cast<SBAttribute*>(subject);
@@ -880,6 +888,16 @@ void SBCharacter::interruptFace(double seconds)
 	}
 	if (tracksToRemove.size() > 0)
 		head_sched_p->remove_tracks(tracksToRemove);
+
+	// reset the default face
+	// get any default face poses and set them
+	std::vector<std::string> poses = _faceDefinition->getDefaultFacePoses();
+	std::vector<float> values = _faceDefinition->getDefaultFaceValues();
+
+	for (unsigned int x = 0; x < poses.size(); x++)
+	{
+		this->schedule_viseme_trapezoid( poses[x].c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), values[x], 9999999.9, 0, 0 );
+	}
 }
 
 void SBCharacter::copy( SmartBody::SBCharacter* origChar )

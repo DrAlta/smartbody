@@ -7,6 +7,7 @@
 #include <sbm/action_unit.hpp>
 #include <sbm/lin_win.h>
 #include <sb/SBVHMsgManager.h>
+#include <sb/SBFaceDefinition.h>
 
 FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name), SBWindowListener()
 {
@@ -20,6 +21,10 @@ FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x
 		buttonRefresh->callback(RefreshCB, this);
 		buttonReset = new Fl_Button(220, 10, 60, 25, "Reset");
 		buttonReset->callback(ResetCB, this);
+		buttonDefaultFace = new Fl_Button(310, 10, 100, 25, "Set Default Face");
+		buttonDefaultFace->callback(DefaultFaceCB, this);
+		buttonResetDefaultFace = new Fl_Button(440, 10, 100, 25, "Reset Default Face");
+		buttonResetDefaultFace->callback(ResetDefaultFaceCB, this);
 
 	topGroup->end();
 
@@ -216,6 +221,76 @@ void FaceViewer::ResetCB(Fl_Widget* widget, void* data)
 
 		}
 
+	}
+}
+
+void FaceViewer::DefaultFaceCB(Fl_Widget* widget, void* data)
+{
+	FaceViewer* faceViewer = (FaceViewer*) data;
+
+	std::vector<std::string> defaultFacePoses;
+	std::vector<float> defaultFaceValues;
+
+	const Fl_Menu_Item* menu = faceViewer->choiceCharacters->menu();
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(menu[faceViewer->choiceCharacters->value()].label());
+	if (character)
+	{
+		int numSliders = faceViewer->bottomGroup->children();
+		for (int c = 0; c < numSliders; c++)
+		{
+			Fl_Value_Slider* slider = dynamic_cast<Fl_Value_Slider*>(faceViewer->bottomGroup->child(c));
+			if (slider)
+			{
+				std::string name = slider->label();
+				defaultFacePoses.push_back(name);
+				defaultFaceValues.push_back(slider->value());
+
+			}
+
+		}
+
+		SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
+		if (faceDefinition)
+		{
+			if (!SmartBody::SBScene::getScene()->isRemoteMode())
+			{
+				faceDefinition->setDefaultFacePose(defaultFacePoses, defaultFaceValues);
+				character->updateDefaultFacePose();
+			}
+			else
+			{
+				LOG("Default face poses cannot be set in remote mode.");
+			}
+		}
+
+	}
+}
+
+
+void FaceViewer::ResetDefaultFaceCB(Fl_Widget* widget, void* data)
+{
+	FaceViewer* faceViewer = (FaceViewer*) data;
+
+	const Fl_Menu_Item* menu = faceViewer->choiceCharacters->menu();
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(menu[faceViewer->choiceCharacters->value()].label());
+	if (character)
+	{
+		SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
+		if (faceDefinition)
+		{
+			if (!SmartBody::SBScene::getScene()->isRemoteMode())
+			{
+				std::vector<std::string> defaultFacePoses;
+				std::vector<float> defaultFaceValues;
+				faceDefinition->setDefaultFacePose(defaultFacePoses, defaultFaceValues);
+				character->updateDefaultFacePose();
+			}
+			else
+			{
+				LOG("Reset default face poses cannot be set in remote mode.");
+			}
+			
+		}
 	}
 }
 
