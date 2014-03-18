@@ -105,7 +105,7 @@ BehaviorRequestPtr BML::parse_bml_event( DOMElement* elem, const std::string& un
 	while (child)
 	{
 		DOMNode::NodeType type = child->getNodeType();
-		if (type == DOMNode::TEXT_NODE)
+		if (type == DOMNode::CDATA_SECTION_NODE)
 		{
 			child->normalize();
 			DOMText* textNode = dynamic_cast<DOMText*>(child);
