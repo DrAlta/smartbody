@@ -602,7 +602,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 			Ogre::String name = (*optionIter).first;
 			LOG("[%s]", name.c_str());
 			Ogre::ConfigOption& option = (*optionIter).second;
-			for (int x = 0; x < option.possibleValues.size(); x++)
+			for (unsigned int x = 0; x < option.possibleValues.size(); x++)
 			{
 				LOG("%s ", option.possibleValues[x].c_str());
 			}
