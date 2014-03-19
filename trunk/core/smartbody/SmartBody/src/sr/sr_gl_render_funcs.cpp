@@ -102,9 +102,16 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	{
 		//LOG("drawSkinColor");
 		glEnableClientState(GL_COLOR_ARRAY);
-		//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->skinColorBuf[0]);		
-		glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
+		glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->skinColorBuf[0]);		
+		//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
 		glDisable(GL_LIGHTING);
+	}
+	else
+	{
+		glDisableClientState(GL_COLOR_ARRAY);
+		glColorPointer(3,GL_FLOAT, 0,  NULL);		
+		//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
+		glEnable(GL_LIGHTING);
 	}
 
 	
