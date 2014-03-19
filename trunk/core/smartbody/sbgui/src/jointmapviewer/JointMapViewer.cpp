@@ -1197,7 +1197,8 @@ void SkeletonViewer::draw()
 // 	counter = counter%1000;
 // 	float color = ((float)counter)/1000.f;
 // 	counter++;
-	glClearColor ( SrColor(0.5f,0.5f,0.5f));
+	//glClearColor ( SrColor(0.5f,0.5f,0.5f));
+	glClearColor ( SrColor(1.0f,1.0f,1.0f));
 	//glClearColor(SrColor(color,color,color));
 	//----- Clear Background --------------------------------------------	
 	glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

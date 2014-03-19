@@ -36,7 +36,7 @@ public:
 	//void setSkeletonName(std::string skName);
 	void setJointMapName(std::string jointMapName);
 	void applyRetargetSteps();
-	void applyAutoRig(bool voxelRigging = false);
+	void applyAutoRig(int riggingType = 0);
 
 	void updateCharacterList();
 	void updatePawnList();
@@ -64,7 +64,7 @@ protected:
 	Fl_Button* _buttonApplyAll;
 	Fl_Button* _buttonCancel;
 	Fl_Button* _buttonRefresh;
-	Fl_Check_Button* _buttonVoxelRigging;
+	Fl_Choice* _buttonVoxelRigging;
 	std::string _charName;
 	std::string _removeCharacterName;
 	std::string _removePawnName;

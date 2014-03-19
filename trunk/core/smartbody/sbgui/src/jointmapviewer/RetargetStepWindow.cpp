@@ -59,8 +59,12 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	_buttonAutoRig->callback(ApplyAutoRigCB, this);
 	//_choiceCharacters->callback(CharacterCB,this);
 
-	_buttonVoxelRigging = new Fl_Check_Button(710, yDis, 120, 25, "Voxel Rigging");
-	_buttonVoxelRigging->value(1);
+	_buttonVoxelRigging = new Fl_Choice(750, yDis, 120, 25, "Type");
+	_buttonVoxelRigging->add("Voxel Weight");
+	_buttonVoxelRigging->add("Glow Weight");
+	_buttonVoxelRigging->add("Diffusion Weight");
+
+	_buttonVoxelRigging->value(0);
 
 	tabGroup = new Fl_Tabs(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
 	//tabGroup->callback(changeTabGroup, this);
@@ -304,7 +308,7 @@ void RetargetStepWindow::setJointMapName( std::string jointMapName )
 }
 
 
-void RetargetStepWindow::applyAutoRig(bool voxelRigging)
+void RetargetStepWindow::applyAutoRig(int riggingType)
 {
 	if (!_choicePawns->text())
 		return;
@@ -345,12 +349,15 @@ void RetargetStepWindow::applyAutoRig(bool voxelRigging)
 		for (int i=0;i<scaleModel.V.size();i++)
 			scaleModel.V[i] = scaleModel.V[i]*worldRotation;
 
-		if (voxelRigging)
+		if (riggingType == 0)
 			autoRigSuccess = autoRigManager.buildAutoRiggingVoxels(scaleModel,skelName,deformMeshName);
-		else
+			//autoRigSuccess = autoRigManager.buildAutoRiggingVoxelsWithVoxelSkinWeights(scaleModel,skelName,deformMeshName);
+		else if (riggingType == 1)
+			autoRigSuccess = autoRigManager.buildAutoRiggingVoxelsWithVoxelSkinWeights(scaleModel,skelName,deformMeshName);
+		else if (riggingType == 2)
 			autoRigSuccess = autoRigManager.buildAutoRigging(scaleModel, skelName, deformMeshName);
 
-		if (!autoRigSuccess && !voxelRigging)		
+		if (!autoRigSuccess && riggingType == 2)		
 		{
 			std::string errorMsg = "AutoRigging Fail : The input mesh must be a single component and water tight mesh. Try to enable 'voxelRigging'.";
 			LOG(errorMsg.c_str());
@@ -480,8 +487,8 @@ void RetargetStepWindow::ApplyBehaviorSetCB( Fl_Widget* widget, void* data )
 void RetargetStepWindow::ApplyAutoRigCB( Fl_Widget* widget, void* data )
 {
 	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
-	bool useVoxelRigging = viewer->_buttonVoxelRigging->value();
-	viewer->applyAutoRig(useVoxelRigging);
+	int riggingType = viewer->_buttonVoxelRigging->value();
+	viewer->applyAutoRig(riggingType);
 }
 
 void RetargetStepWindow::OnCharacterCreate( const std::string & name, const std::string & objectClass )
