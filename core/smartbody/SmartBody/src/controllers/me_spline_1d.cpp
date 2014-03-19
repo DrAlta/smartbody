@@ -144,9 +144,9 @@ void Knot::make_smooth( range y, range slope, range l_control, range r_control )
 	this->y         = y;
 	this->left_y    = y;
 	this->l_slope   = slope;
-	this->l_control = max( (range)0, l_control );
+	this->l_control = std::fmax( (range)0, l_control );
 	this->r_slope   = slope;
-	this->r_control = max( (range)0, r_control );
+	this->r_control = std::fmax((range)0, r_control);
 
 	update();
 	if( next )
@@ -157,9 +157,9 @@ void Knot::make_cusp( range y, range l_slope, range l_control, range r_slope, ra
 	this->y         = y;
 	this->left_y    = y;
 	this->l_slope   = l_slope;
-	this->l_control = max( (range)0, l_control );
+	this->l_control = std::fmax((range)0, l_control);
 	this->r_slope   = r_slope;
-	this->r_control = max( (range)0, r_control );
+	this->r_control = std::fmax((range)0, r_control);
 
 	update();
 	if( next )
@@ -170,9 +170,9 @@ void Knot::make_disjoint( range y, range left_y, range l_slope, range l_control,
 	this->y         = y;
 	this->left_y    = left_y;
 	this->l_slope   = l_slope;
-	this->l_control = max( (range)0, l_control );
+	this->l_control = std::fmax((range)0, l_control);
 	this->r_slope   = r_slope;
-	this->r_control = max( (range)0, r_control );
+	this->r_control = std::fmax((range)0, r_control);
 
 	update();
 	if( next )
@@ -262,7 +262,8 @@ Knot* MeSpline1D::make_knot( domain x, range y, update_knot_algo& update_knot ) 
 
 	if( knots.empty() ) {
 		knot = new_knot( x, y );
-		pair<knots_iterator,bool> result = knots.insert( make_pair<domain,Knot*>(x,knot) );
+		std::pair<domain, Knot*> p(x, knot);
+		pair<knots_iterator,bool> result = knots.insert( p );
 		if( result.second ) {
 			update_knot( knot );
 		}
@@ -275,7 +276,8 @@ Knot* MeSpline1D::make_knot( domain x, range y, update_knot_algo& update_knot ) 
 			knot = new_knot( x, y );
 
 			// Optimize insertion lookup via position hinting
-			knots_iterator pos = knots.insert( --i, make_pair<domain,Knot*>(x,knot) );
+			std::pair<domain, Knot*> p(x, knot);
+			knots_iterator pos = knots.insert( --i, p );
 
 			if( pos==knots.begin() ) {
 				// first knot, left remains NULL
@@ -311,7 +313,8 @@ Knot* MeSpline1D::make_knot( domain x, range y, update_knot_algo& update_knot ) 
 					prev->next = knot;
 				}
 				// Reuse i (possibly decremented) as hint
-				knots.insert( i, make_pair<domain,Knot*>(x,knot) );
+				std::pair<domain, Knot*> p(x, knot);
+				knots.insert( i, p );
 
 				update_knot( knot );
 			}
