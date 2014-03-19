@@ -33,10 +33,10 @@ struct PinocchioOutput
 
 //calls the other functions and does the whole rigging process
 //see the implementation of this function to find out how to use the individual functions
-PinocchioOutput PINOCCHIO_API autorig(const Skeleton &given, const Mesh &m);
+PinocchioOutput PINOCCHIO_API autorig(const Skeleton &given, const Mesh &m, bool computeSkinWeights = true);
 
 // use voxel mesh for auto rigging, then transfer the attachment weight to original mesh
-PinocchioOutput PINOCCHIO_API autorigVoxelTransfer(const Skeleton &given, Mesh &voxelMesh, Mesh& origMesh); 
+PinocchioOutput PINOCCHIO_API autorigVoxelTransfer(const Skeleton &given, Mesh &voxelMesh, Mesh& origMesh, bool computeSkinWeights = true); 
 
 //============================================individual steps=====================================
 
