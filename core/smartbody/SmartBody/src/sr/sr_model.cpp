@@ -928,6 +928,15 @@ SrVec SrModel::face_normal ( int f ) const
    return n; 
  }
 
+float SrModel::face_area ( int f ) const
+{ 
+	SrVec n; 
+	const Face& fac = F[f];
+	n.cross ( V[fac.b]-V[fac.a], V[fac.c]-V[fac.a] ); 
+	
+	return n.norm(); 
+}
+
 void SrModel::invert_faces ()
  {
    int i, tmp;

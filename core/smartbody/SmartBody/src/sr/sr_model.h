@@ -217,6 +217,8 @@ class SrModel : public SrSharedClass
     /*! Calculates and returns the normalized normal of the given face index. */
     SBAPI SrVec face_normal ( int f ) const;
 
+	SBAPI float face_area ( int f ) const;
+
     /*! Inverts faces orientations by swaping b and c indices, 
         and does the same to the normals. */
     SBAPI void invert_faces ();

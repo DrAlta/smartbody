@@ -133,6 +133,7 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 	displayVec.push_back("colgeo");
 	displayVec.push_back("visgeo");
 	displayVec.push_back("axis");
+	displayVec.push_back("skinWeight");
 	displayVec.push_back("mesh");
 	displayVec.push_back("GPUmesh");
 	displayAttribute->setValidValues(displayVec);
@@ -987,6 +988,7 @@ void SBCharacter::createBlendShapeChannel(const std::string& channelName)
 
 bool SBCharacter::getUseJointConstraint()
 {
+	//return false;
 	return useJointConstraint;
 }
 

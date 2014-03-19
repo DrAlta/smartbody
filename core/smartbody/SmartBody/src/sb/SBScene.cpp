@@ -6,6 +6,8 @@
 #include <direct.h>
 #endif
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS
+
 #include <sb/SBTypes.h>
 #include <sb/SBObject.h>
 #include <sb/SBCharacter.h>

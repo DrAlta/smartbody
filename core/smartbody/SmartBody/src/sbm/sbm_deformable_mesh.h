@@ -131,7 +131,7 @@ protected:
 	bool				  _updateMesh;
 	std::vector<SkJointList> _boneJointList;
 	float _meshScale;
-	bool meshVisible;
+	int  meshVisibleType;
 	bool _recomputeNormal;
 	bool _isStaticMesh;
 public:
@@ -147,7 +147,7 @@ public:
 	SBAPI virtual void setVisibility(int deformableMesh);
 	SBAPI virtual void setMeshScale(float scale);
 	SBAPI float   getMeshScale() { return _meshScale; }
-	SBAPI bool    getVisibility();
+	SBAPI int    getVisibility();
 	SBAPI void    setToStaticMesh(bool isStatic);
 	SBAPI bool    isStaticMesh();
 	SBAPI SmartBody::SBSkeleton* getSkeleton();	

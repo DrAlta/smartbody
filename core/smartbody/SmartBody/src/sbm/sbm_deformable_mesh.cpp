@@ -245,6 +245,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 
 	bool buildSkinnedBuffer = isSkinnedMesh();
 
+	LOG("Build Skinned Buffer");
 	int nTotalVtxs=0, nTotalTris = 0, nTotalBones = 0;	
 	std::vector<std::set<IntPair> > vtxNormalIdxMap;
 	std::vector<std::set<int> > vtxMaterialIdxMap;
@@ -276,6 +277,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	std::vector<int> meshIndexList;
 	std::vector<SkinWeight*> skinWeightList;
 	boneJointIdxMap.clear();
+	LOG("dynamic mesh size = %d, skin weight size = %d",dMeshDynamic_p.size(), skinWeights.size());
 	if (buildSkinnedBuffer)
 	{
 		for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
@@ -285,6 +287,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			int globalCounter = 0;
 			//pos = this->getMesh(skinWeight->sourceMesh);
 			pos = this->getValidSkinMesh(skinWeight->sourceMesh);
+			LOG("skinWeight->sourceMesh = %s, pos = %d", skinWeight->sourceMesh.c_str(), pos);
 			if (pos != -1)
 			{
 				meshIndexList.push_back(pos);
@@ -374,7 +377,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	int iFace = 0;
 	SrModel::Face defaultIdx;
 	defaultIdx.a = defaultIdx.b = defaultIdx.c = -1;
-		
+	LOG("meshIndexList size = %d",meshIndexList.size());
 	for (unsigned int i=0;i<meshIndexList.size();i++)
 	{
 		int pos = meshIndexList[i];
@@ -428,6 +431,8 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		iTextureIdxOffset += nTexture;
 		//printf("iMaterial Offset = %d\n",iMaterialOffset);			
 	}
+
+	LOG("nTotalVtxs = %d, nTotalTris = %d", nTotalVtxs, nTotalTris);
 
 	if (nTotalVtxs == 0 || nTotalTris ==0)
 		return false;
@@ -1630,7 +1635,7 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 		//for (unsigned int i = 0; i < dynamicMesh.size(); i++)
 		//	dynamicMesh[i]->visible(deformableMesh? true:false );
 		_updateMesh = deformableMesh? true:false;
-		meshVisible = deformableMesh? true:false;
+		meshVisibleType = deformableMesh;
 	}
 }
 
@@ -1796,9 +1801,9 @@ void DeformableMeshInstance::update()
 	_recomputeNormal = false;
 }
 
-bool DeformableMeshInstance::getVisibility()
+int DeformableMeshInstance::getVisibility()
 {
-	return meshVisible;
+	return meshVisibleType;
 }
 
 void DeformableMeshInstance::setMeshScale( float scale )
