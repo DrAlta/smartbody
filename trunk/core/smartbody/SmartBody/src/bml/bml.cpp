@@ -994,7 +994,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		if( start_seq->insert( (float)start_time, (char*)(start_command.str().c_str()) )!=CMD_SUCCESS ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
-				"Failed to insert \""<<start_command<<"\" command.";
+				"Failed to insert \""<<start_command.str()<<"\" command.";
 			LOG(strstr.str().c_str());
 		}
 
@@ -1071,7 +1071,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		if( cleanup_seq->insert( (float)end_time, (char*)(end_command.str().c_str()) )!=CMD_SUCCESS ) {
 			std::stringstream strstr;
 			strstr << "WARNING: BML::BmlRequest::realize(..): msgId=\""<<msgId<<"\": "<<
-				"Failed to insert \""<<end_command<<"\" command.";
+				"Failed to insert \""<<end_command.str()<<"\" command.";
 			LOG(strstr.str().c_str());
 		}
 
