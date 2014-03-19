@@ -24,7 +24,7 @@ ostream *Debugging::outStream = new ofstream();
 
 Vector3 barycentricCoord(Vector3& projPos, Tri3Object& tri);
 
-PinocchioOutput autorig(const Skeleton &given, const Mesh &m)
+PinocchioOutput autorig(const Skeleton &given, const Mesh &m, bool computeSkinWeights)
 {
     int i;
     PinocchioOutput out;
@@ -65,20 +65,22 @@ PinocchioOutput autorig(const Skeleton &given, const Mesh &m)
 
     out.embedding = refineEmbedding(distanceField, medialCenters, discreteEmbedding, given);
 
-    //attachment
-    VisTester<TreeType> *tester = new VisTester<TreeType>(distanceField);
-    out.attachment = new Attachment(newMesh, given, out.embedding, tester);
+	if (computeSkinWeights)
+	{
+		//attachment
+		VisTester<TreeType> *tester = new VisTester<TreeType>(distanceField);
+		out.attachment = new Attachment(newMesh, given, out.embedding, tester);
+		//cleanup
+		delete tester;
+	}    
 
-    //cleanup
-    delete tester;
     delete distanceField;
-
     return out;
 }
 
 Vector3 barycentricCoord(Vector3& pt, Tri3Object& tri)
 {
-	double w1,w2,w3;
+	float w1,w2,w3;
 	Vector3 ptToV1 = tri.v1 - pt;
 	Vector3 ptToV2 = tri.v2 - pt;
 	Vector3 ptToV3 = tri.v2 - pt;
@@ -104,7 +106,7 @@ Vector3 barycentricCoord(Vector3& pt, Tri3Object& tri)
 	return Vector3(w1,w2,w3);
 }
 
-PinocchioOutput PINOCCHIO_API autorigVoxelTransfer( const Skeleton &given, Mesh &voxelMesh, Mesh& origMesh )
+PinocchioOutput PINOCCHIO_API autorigVoxelTransfer( const Skeleton &given, Mesh &voxelMesh, Mesh& origMesh, bool computeSkinWeights )
 {
 
 	int i;
@@ -146,53 +148,54 @@ PinocchioOutput PINOCCHIO_API autorigVoxelTransfer( const Skeleton &given, Mesh 
 
 	out.embedding = refineEmbedding(distanceField, medialCenters, discreteEmbedding, given);
 
-	//attachment for voxel mesh
-	VisTester<TreeType> *tester = new VisTester<TreeType>(distanceField);
-	Attachment* voxelAttachment = new Attachment(newMesh, given, out.embedding, tester);
-	out.attachment = new Attachment();
 
-
-	vector<Tri3Object> triobjvec;
-	for(int i = 0; i < (int)voxelMesh.edges.size(); i += 3) {
-		Vector3 v1 = voxelMesh.vertices[voxelMesh.edges[i].vertex].pos;
-		Vector3 v2 = voxelMesh.vertices[voxelMesh.edges[i + 1].vertex].pos;
-		Vector3 v3 = voxelMesh.vertices[voxelMesh.edges[i + 2].vertex].pos;
-		triobjvec.push_back(Tri3Object(v1, v2, v3,i/3));
-	}
-
-	ObjectProjector<3, Tri3Object> proj(triobjvec);
-	vector<Vector<double, -1> >& meshWeights = out.attachment->getAllWeights();	
-	meshWeights.resize(origMesh.vertices.size());
-	printf("mesh weights size = %d\n",meshWeights.size());
-	Tri3Object projTri;
-	int bones = given.fGraph().verts.size() - 1;
-	for (size_t i=0;i<origMesh.vertices.size();i++)
+	if (computeSkinWeights)
 	{
-		MeshVertex& vtx = origMesh.vertices[i];
-		Vector<double, -1>& origWeight = meshWeights[i];
-		origWeight[bones - 1] = 0.f;
-		for (int k=0;k<bones;k++) // set to zero
-			origWeight[k] = 0.f;
+		//attachment for voxel mesh
+		VisTester<TreeType> *tester = new VisTester<TreeType>(distanceField);
+		Attachment* voxelAttachment = new Attachment(newMesh, given, out.embedding, tester);
+		out.attachment = new Attachment();
 
-		Vector3 projPos = proj.projectObj(vtx.pos,projTri);	
-		Vector3 baryW = barycentricCoord(projPos, projTri);	
-		for (int v=0;v<3;v++)
+
+		vector<Tri3Object> triobjvec;
+		for(int i = 0; i < (int)voxelMesh.edges.size(); i += 3) {
+			Vector3 v1 = voxelMesh.vertices[voxelMesh.edges[i].vertex].pos;
+			Vector3 v2 = voxelMesh.vertices[voxelMesh.edges[i + 1].vertex].pos;
+			Vector3 v3 = voxelMesh.vertices[voxelMesh.edges[i + 2].vertex].pos;
+			triobjvec.push_back(Tri3Object(v1, v2, v3,i/3));
+		}
+
+		ObjectProjector<3, Tri3Object> proj(triobjvec);
+		vector<Vector<double, -1> >& meshWeights = out.attachment->getAllWeights();	
+		meshWeights.resize(origMesh.vertices.size());
+		printf("mesh weights size = %d\n",meshWeights.size());
+		Tri3Object projTri;
+		int bones = given.fGraph().verts.size() - 1;
+		for (int i=0;i<origMesh.vertices.size();i++)
 		{
-			int vidx = voxelMesh.edges[projTri.triIdx*3+v].vertex;
-			Vector<double, -1> voxelWeight = voxelAttachment->getWeights(vidx);
-			for (int k=0;k<origWeight.size();k++)
-			{				
-				origWeight[k] += voxelWeight[k]*baryW[v];					
-			}
-		}	
-	}
+			MeshVertex& vtx = origMesh.vertices[i];
+			Vector<double, -1>& origWeight = meshWeights[i];
+			origWeight[bones - 1] = 0.f;
+			for (int k=0;k<bones;k++) // set to zero
+				origWeight[k] = 0.f;
 
-	//cleanup
-	delete tester;
+			Vector3 projPos = proj.projectObj(vtx.pos,projTri);	
+			Vector3 baryW = barycentricCoord(projPos, projTri);	
+			for (int v=0;v<3;v++)
+			{
+				int vidx = voxelMesh.edges[projTri.triIdx*3+v].vertex;
+				Vector<double, -1> voxelWeight = voxelAttachment->getWeights(vidx);
+				for (int k=0;k<origWeight.size();k++)
+				{				
+					origWeight[k] += voxelWeight[k]*baryW[v];					
+				}
+			}	
+		}
+		//cleanup
+		delete tester;
+		delete voxelAttachment;
+	}		
 	delete distanceField;
-	delete voxelAttachment;
-
 	return out;
-
 }
 

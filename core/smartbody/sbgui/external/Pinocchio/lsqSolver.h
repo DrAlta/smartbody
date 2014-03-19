@@ -46,7 +46,7 @@ class SPDMatrix
 {
 public:
     SPDMatrix(const vector<vector<pair<int, double> > > &inM) : m(inM) {}
-    LLTMatrix *factor() const;
+    PINOCCHIO_API LLTMatrix*  factor() const;
 
 private:
     vector<int> computePerm() const; //computes a fill-reduction permutation
