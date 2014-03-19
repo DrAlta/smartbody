@@ -421,7 +421,7 @@ void FLTKOgreWindow::fltkRender2()
 	// real surface geometries
 	//drawAllGeometries();	
 	//if (_data->showSkinWeight)
-	//if (0)
+	if (1)
 	{
 		drawDeformableModels();
 		//drawAllGeometries();
