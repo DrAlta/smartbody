@@ -23,6 +23,7 @@
 #include <controllers/me_spline_1d.hpp>
 
 #include <limits>
+#include <algorithm>
 
 using namespace std;
 
@@ -144,9 +145,9 @@ void Knot::make_smooth( range y, range slope, range l_control, range r_control )
 	this->y         = y;
 	this->left_y    = y;
 	this->l_slope   = slope;
-	this->l_control = std::fmax( (range)0, l_control );
+	this->l_control = max( (range)0, l_control );
 	this->r_slope   = slope;
-	this->r_control = std::fmax((range)0, r_control);
+	this->r_control = max((range)0, r_control);
 
 	update();
 	if( next )
@@ -157,9 +158,9 @@ void Knot::make_cusp( range y, range l_slope, range l_control, range r_slope, ra
 	this->y         = y;
 	this->left_y    = y;
 	this->l_slope   = l_slope;
-	this->l_control = std::fmax((range)0, l_control);
+	this->l_control = max((range)0, l_control);
 	this->r_slope   = r_slope;
-	this->r_control = std::fmax((range)0, r_control);
+	this->r_control = max((range)0, r_control);
 
 	update();
 	if( next )
@@ -170,9 +171,9 @@ void Knot::make_disjoint( range y, range left_y, range l_slope, range l_control,
 	this->y         = y;
 	this->left_y    = left_y;
 	this->l_slope   = l_slope;
-	this->l_control = std::fmax((range)0, l_control);
+	this->l_control = max((range)0, l_control);
 	this->r_slope   = r_slope;
-	this->r_control = std::fmax((range)0, r_control);
+	this->r_control = max((range)0, r_control);
 
 	update();
 	if( next )
