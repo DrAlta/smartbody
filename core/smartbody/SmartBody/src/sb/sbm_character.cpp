@@ -2335,7 +2335,7 @@ void SbmCharacter::updateFaceDefinition()
 
 	for (unsigned int x = 0; x < poses.size(); x++)
 	{
-		this->schedule_viseme_trapezoid( poses[x].c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), values[x], 9999999.9, .25, .25 );
+		this->schedule_viseme_trapezoid( poses[x].c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), values[x], 9999999.9f, .25, .25 );
 	}
 
 }

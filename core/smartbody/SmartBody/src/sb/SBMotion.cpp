@@ -2667,7 +2667,7 @@ SBAPI SrQuat SBMotion::getChannelQuat( const std::string& channelName, float t )
 
 	int frame1 = getKeyFrameFromTime(t, 0, _frames.size()-1); // get closest key frame
 	int frame2 = frame1+1; // next frame
-	if (frame2 >= _frames.size()-1) // last frame
+	if (frame2 >= (int) _frames.size()-1) // last frame
 	{
 		frame2 = _frames.size()-1; 		
 	}
@@ -2702,7 +2702,7 @@ SBAPI SrVec SBMotion::getChannelPos( const std::string& channelName, float t )
 	SrVec pos;
 	int frame1 = getKeyFrameFromTime(t, 0, _frames.size()-1); // get closest key frame
 	int frame2 = frame1+1; // next frame
-	if (frame2 >= _frames.size()-1) // last frame
+	if (frame2 >= (int) _frames.size()-1) // last frame
 	{
 		frame2 = _frames.size()-1; 		
 	}
@@ -2740,8 +2740,8 @@ int SBMotion::getKeyFrameFromTime( float t, int firstFrame, int lastFrame )
 	if (_frames[index].keytime==t)
 		return index;
 	if (_frames[index].keytime < t)
-		return getKeyFrameFromTime(index, lastFrame, t);
-	return getKeyFrameFromTime(firstFrame, index, t);
+		return getKeyFrameFromTime(t, index, lastFrame);
+	return getKeyFrameFromTime(t, firstFrame, index);
 }
 
 void SBMotion::getAllChannelPos( const std::vector<std::string>& channeNames, float t, std::vector<SrVec>& outPosList )
@@ -2751,7 +2751,7 @@ void SBMotion::getAllChannelPos( const std::vector<std::string>& channeNames, fl
 
 	int frame1 = getKeyFrameFromTime(t, 0, _frames.size()-1); // get closest key frame
 	int frame2 = frame1+1; // next frame
-	if (frame2 >= _frames.size()-1) // last frame
+	if (frame2 >= (int) _frames.size()-1) // last frame
 	{
 		frame2 = _frames.size()-1; 		
 	}
@@ -2787,7 +2787,7 @@ void SBMotion::getAllChannelQuat( const std::vector<std::string>& channeNames, f
 
 	int frame1 = getKeyFrameFromTime(t, 0, _frames.size()-1); // get closest key frame
 	int frame2 = frame1+1; // next frame
-	if (frame2 >= _frames.size()-1) // last frame
+	if (frame2 >= (int) _frames.size()-1) // last frame
 	{
 		frame2 = _frames.size()-1; 		
 	}
