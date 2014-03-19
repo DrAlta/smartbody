@@ -897,7 +897,7 @@ void SBCharacter::interruptFace(double seconds)
 
 	for (unsigned int x = 0; x < poses.size(); x++)
 	{
-		this->schedule_viseme_trapezoid( poses[x].c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), values[x], 9999999.9, 0, 0 );
+		this->schedule_viseme_trapezoid( poses[x].c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime(), values[x], 9999999.9f, 0, 0 );
 	}
 }
 

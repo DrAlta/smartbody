@@ -111,7 +111,7 @@ double MultiLinearTimeWarp::timeSlope( double u )
 {
 	int idx = getSection(refKeyTimes, u);
 	if (idx < 0) idx = 0;
-	if (idx >= refKeyTimes.size()-1)
+	if (idx >= (int) refKeyTimes.size()-1)
 		idx = refKeyTimes.size()-2; 
 	
 	return (targetKeyTimes[idx+1]-targetKeyTimes[idx])/(refKeyTimes[idx+1]-refKeyTimes[idx]);
@@ -122,14 +122,14 @@ double MultiLinearTimeWarp::invTimeSlope( double t )
 {
 	int idx = getSection(targetKeyTimes, t);
 	if (idx < 0) idx = 0;
-	if (idx >= targetKeyTimes.size()-1)
+	if (idx >= (int) targetKeyTimes.size()-1)
 		idx = targetKeyTimes.size()-2; 
 	return (refKeyTimes[idx+1]-refKeyTimes[idx])/(targetKeyTimes[idx+1]-targetKeyTimes[idx]);
 }
 
 int MultiLinearTimeWarp::getSection( std::vector<double>& keys, double time )
 {
-	for (int i = 0; i < keys.size() - 1; i++)
+	for (unsigned int i = 0; i < keys.size() - 1; i++)
 	{
 		if (keys[i] <= time && keys[i + 1] >= time)
 			return i;
