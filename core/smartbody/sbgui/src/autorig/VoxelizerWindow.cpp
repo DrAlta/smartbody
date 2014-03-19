@@ -58,20 +58,20 @@ void createSphereInVolume(PolyVox::SimpleVolume<uint8_t>& volData, float fRadius
 #endif
 
 
-void VoxelizerWindow::clearVoxels( PolyVox::SimpleVolume<uint8_t>* vol, uint8_t clearValue )
-{
-	PolyVox::SimpleVolume<uint8_t>& volData = *vol;
-	for (int z = 0; z < volData.getDepth(); z++)
-	{
-		for (int y = 0; y < volData.getHeight(); y++)
-		{
-			for (int x = 0; x < volData.getWidth(); x++)
-			{
-				volData.setVoxelAt(x,y,z,clearValue);
-			}
-		}
-	}
-}
+// void VoxelizerWindow::clearVoxels( PolyVox::SimpleVolume<uint8_t>* vol, uint8_t clearValue )
+// {
+// 	PolyVox::SimpleVolume<uint8_t>& volData = *vol;
+// 	for (int z = 0; z < volData.getDepth(); z++)
+// 	{
+// 		for (int y = 0; y < volData.getHeight(); y++)
+// 		{
+// 			for (int x = 0; x < volData.getWidth(); x++)
+// 			{
+// 				volData.setVoxelAt(x,y,z,clearValue);
+// 			}
+// 		}
+// 	}
+// }
 
 
 void VoxelizerWindow::voxelFindConnectedComponents(PolyVox::SimpleVolume<uint8_t>* vol)
@@ -161,6 +161,7 @@ void VoxelizerWindow::initVoxelizer( SrModel* inMesh, int voxelRes )
 	mesh->get_bounding_box(bbox);
 	voxelCenter = bbox.getCenter();
 	voxelScale = bbox.max_size()/normalizeScale;
+	voxelResolution = voxelRes;
 	//mesh->translate(-voxelCenter); // center the mesh
 	mesh->normalize(normalizeScale*0.5f); // normalize the mesh to fit into voxel volume
 	voxels = new PolyVox::SimpleVolume<uint8_t>(PolyVox::Region(PolyVox::Vector3DInt32(0,0,0), PolyVox::Vector3DInt32(voxelRes-1, voxelRes-1, voxelRes-1)));	
@@ -458,7 +459,7 @@ void VoxelizerWindow::generateVoxelsZBufferCarving()
 	float* sliceBufferA = &sliceA[0];
 	float* sliceBufferB = &sliceB[0];
 	
-	clearVoxels(voxels,255);
+	clearVoxels(voxels,(uint8_t)255);
 	int voxelDepth = voxels->getDepth();
 
 	glViewport(0,0,voxelDepth,voxelDepth);
@@ -567,4 +568,258 @@ PolyVox::SimpleVolume<uint8_t>* VoxelizerWindow::getVoxels()
 PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>* VoxelizerWindow::getNormalizedVoxelMesh()
 {
 	return voxelMesh;
+}
+
+SrVec VoxelizerWindow::getVoxelCenterByID( SrVec3i& voxID )
+{
+	SrVec mtran = -SrVec(0.5f,0.5f,0.5f)*voxelScale + voxelCenter; // min point of voxel volume
+	float cellSize = voxelScale/voxels->getDepth();
+	SrVec voxIDFloat = SrVec(voxID[0]+0.5f,voxID[1]+0.5f,voxID[2]+0.5f);
+	SrVec center = mtran + voxIDFloat*cellSize;
+	return center;
+}
+
+SrVec3i VoxelizerWindow::getVoxelIDFromPosition( SrVec& pos )
+{
+	SrVec mtran = -SrVec(0.5f,0.5f,0.5f)*voxelScale + voxelCenter; // min point of voxel volume
+	float cellSize = voxelScale/voxels->getDepth();
+	SrVec voxelPos = (pos-mtran)/cellSize;
+	return SrVec3i(voxelPos[0],voxelPos[1],voxelPos[2]); // return the voxel ID
+}
+
+
+
+std::vector<SrVec3i> VoxelizerWindow::getNeighborCells( SrVec3i& voxID )
+{
+	std::vector<SrVec3i> neighborCells;
+	for (int x=-1;x<=1;x++)
+	{
+		for (int y=-1;y<=1;y++)
+		{
+			for (int z=-1;z<=1;z++)
+			{
+				if (x==0 && y==0 && z==0)
+					continue;
+				if (abs(x) + abs(y) + abs(z) > 1)
+					continue;
+
+				SrVec3i nextID = SrVec3i(x+voxID[0],y+voxID[1],z+voxID[2]);
+				if (!isValidVoxelID(nextID))
+					continue;
+				neighborCells.push_back(nextID);
+			}
+		}
+	}
+	return neighborCells;
+}
+
+bool VoxelizerWindow::isBorderCell( SrVec3i& voxID )
+{	
+	uint8_t voxVal = voxels->getVoxelAt(voxID[0],voxID[1],voxID[2]);
+	if (voxVal == 0) // outside voxel
+		return false;
+	// detect all borders
+	for (int x=-1;x<=1;x++)
+	{
+		for (int y=-1;y<=1;y++)
+		{
+			for (int z=-1;z<=1;z++)
+			{
+				if (x==0 && y==0 && z==0)
+					continue;
+
+				SrVec3i nextID = SrVec3i(x+voxID[0],y+voxID[1],z+voxID[2]);
+				if (!isValidVoxelID(nextID))
+					continue;
+				voxVal = voxels->getVoxelAt(voxID[0],voxID[1],voxID[2]);
+				if (voxVal == 0)
+					return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool VoxelizerWindow::isValidVoxelID( SrVec3i& voxID )
+{
+	for (int i=0;i<3;i++)
+	{
+		int vid = voxID[i];
+		if (vid < 0 || vid >= voxelResolution)
+			return false;
+	}
+	return true;
+}
+
+
+std::vector<SrVec3i> VoxelizerWindow::rasterizeVoxelLine( SrVec3i& voxID1, SrVec3i& voxID2 )
+{
+	#define MAX(a,b) (((a)>(b))?(a):(b))
+	#define ABS(a) (((a)<0) ? -(a) : (a))
+	#define ZSGN(a) (((a)<0) ? -1 : (a)>0 ? 1 : 0)	
+	int x1, y1, x2, y2, z1, z2;
+	x1 = voxID1[0]; y1 = voxID1[1]; z1 = voxID1[2];
+	x2 = voxID2[0]; y2 = voxID2[1]; z2 = voxID2[2];
+
+	std::vector<SrVec3i> rasterLine;
+	{
+		int xd, yd, zd;
+		int x, y, z;
+		int ax, ay, az;
+		int sx, sy, sz;
+		int dx, dy, dz;
+
+		dx = x2 - x1;
+		dy = y2 - y1;
+		dz = z2 - z1;
+
+		ax = ABS(dx) << 1;
+		ay = ABS(dy) << 1;
+		az = ABS(dz) << 1;
+
+		sx = ZSGN(dx);
+		sy = ZSGN(dy);
+		sz = ZSGN(dz);
+
+		x = x1;
+		y = y1;
+		z = z1;
+
+		if (ax >= MAX(ay, az))            /* x dominant */
+		{
+			yd = ay - (ax >> 1);
+			zd = az - (ax >> 1);
+			for (;;)
+			{
+				//point3d(x, y, z);
+				rasterLine.push_back(SrVec3i(x,y,z));
+				if (x == x2)
+				{
+					return rasterLine;
+				}
+				if (yd >= 0)
+				{
+					y += sy;
+					yd -= ax;
+				}
+				if (zd >= 0)
+				{
+					z += sz;
+					zd -= ax;
+				}
+				x += sx;
+				yd += ay;
+				zd += az;
+			}
+		}
+		else if (ay >= MAX(ax, az))            /* y dominant */
+		{
+
+			xd = ax - (ay >> 1);
+			zd = az - (ay >> 1);
+			for (;;)
+			{
+				rasterLine.push_back(SrVec3i(x,y,z));
+				if (y == y2)
+				{
+					return rasterLine;
+				}
+				if (xd >= 0)
+				{
+					x += sx;
+					xd -= ay;
+				}
+				if (zd >= 0)
+				{
+					z += sz;
+					zd -= ay;
+				}
+
+				y += sy;
+				xd += ax;
+				zd += az;
+			}
+		}
+		else if (az >= MAX(ax, ay))            /* z dominant */
+		{
+			xd = ax - (az >> 1);
+			yd = ay - (az >> 1);
+			for (;;)
+			{
+				rasterLine.push_back(SrVec3i(x,y,z));
+				if (z == z2)
+				{
+					return rasterLine;
+				}
+				if (xd >= 0)
+				{
+					x += sx;
+					xd -= az;
+				}
+				if (yd >= 0)
+				{
+					y += sy;
+					yd -= az;
+				}
+				z += sz;
+				xd += ax;
+				yd += ay;
+			}
+		}
+	}
+	return rasterLine;
+
+}
+
+std::vector<SrVec3i> VoxelizerWindow::rasterizeVoxelLine( SrVec& pos1, SrVec& pos2 )
+{	
+	SrVec3i voxID1 = getVoxelIDFromPosition(pos1);
+	SrVec3i voxID2 = getVoxelIDFromPosition(pos2);
+	return rasterizeVoxelLine(voxID1,voxID2);
+}
+
+bool VoxelizerWindow::checkVoxelLineVisible( SrVec3i& v1, SrVec3i& v2 )
+{
+	std::vector<SrVec3i> voxelLines = rasterizeVoxelLine(v1,v2);
+	for (unsigned int i=0;i<voxelLines.size();i++)
+	{
+		SrVec3i& cv = voxelLines[i];
+		if (voxels->getVoxelAt(cv[0],cv[1],cv[2]) == 0)
+			return false;
+	}
+	return true;
+}
+
+float VoxelizerWindow::getVoxelEuclideanDist( SrVec3i& voxID1, SrVec3i& voxID2 )
+{
+	SrVec3i d = SrVec3i(voxID1[0]-voxID2[0],voxID1[1]-voxID2[1],voxID1[2]-voxID2[2]); 
+	float dist = sqrtf(d[0]*d[0] + d[1]*d[1] + d[2]*d[2]);
+	return dist;
+}
+
+
+bool aStarVoxelInsideValidator(const PolyVox::SimpleVolume<uint8_t>* volData, const PolyVox::Vector3DInt32& v3dPos)
+{
+	//Voxels are considered valid candidates for the path if they are inside the volume...
+	if(volData->getVoxelAt(v3dPos) == 0)
+	{
+		return false;
+	}
+	return true;
+}
+
+
+float VoxelizerWindow::getVoxelGeodesicDist( SrVec3i& voxID1, SrVec3i& voxID2 )
+{
+	PolyVox::Vector3DInt32 v1 = PolyVox::Vector3DInt32(voxID1[0],voxID1[1],voxID1[2]);
+	PolyVox::Vector3DInt32 v2 = PolyVox::Vector3DInt32(voxID2[0],voxID2[1],voxID2[2]);
+	std::list<PolyVox::Vector3DInt32> geoPath;
+	PolyVox::AStarPathfinderParams< PolyVox::SimpleVolume<uint8_t> > params(voxels,v1,v2,&geoPath,0.f,10000,PolyVox::SixConnected,&aStarVoxelInsideValidator,0);	
+	PolyVox::AStarPathfinder< PolyVox::SimpleVolume<uint8_t> > pathFinder(params);
+	LOG("Before A* path finder");
+	pathFinder.execute();
+	LOG("After A* path finder");
+	
+	return (float)params.result->size();	
+
 }

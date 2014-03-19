@@ -95,7 +95,7 @@ void FLTKOgreWindow::draw()
 		glPushMatrix();		
 		updateOgreCamera();
 		ogreInterface->updateOgreLights();
-		ogreInterface->updateOgreCharacterRenderMode(_data->showSkinWeight);
+		//ogreInterface->updateOgreCharacterRenderMode(_data->showSkinWeight);
 		ogreInterface->update(); // do Ogre rendering for deformable characters
 		// pop everything!
 		glMatrixMode( GL_COLOR );
@@ -283,6 +283,7 @@ void FLTKOgreWindow::menu_cmd( MenuCmd c, const char* label )
 		_data->showSkinWeight = false;
 		applyToCharacters();
 		ogreInterface->setCharacterVisibility(true);
+		FltkViewer::menu_cmd(c,label);
 	}	
 	else
 	{
@@ -419,7 +420,8 @@ void FLTKOgreWindow::fltkRender2()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	// real surface geometries
 	//drawAllGeometries();	
-	if (_data->showSkinWeight)
+	//if (_data->showSkinWeight)
+	//if (0)
 	{
 		drawDeformableModels();
 		//drawAllGeometries();

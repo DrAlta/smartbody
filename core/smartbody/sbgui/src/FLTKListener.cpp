@@ -383,6 +383,13 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					if (pawn->dMeshInstance_p)
 						pawn->dMeshInstance_p->setVisibility(0);
 				}
+				else if (value == "skinWeight")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,0,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(2);
+				}
 				else if (value == "mesh")
 				{
 					if (pawn->scene_p)

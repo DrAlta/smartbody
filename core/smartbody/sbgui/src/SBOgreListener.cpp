@@ -5,6 +5,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBAttribute.h>
 #include <sbm/sbm_deformable_mesh.h>
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
 
 #ifdef INTMAX_C 
 #undef INTMAX_C
@@ -249,9 +250,10 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 		{
 			SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
 			Entity * ent = NULL;
-			if (ogreInterface->getSceneManager()->hasEntity(name))
+			std::string entName = pawn->getName();
+			if (ogreInterface->getSceneManager()->hasEntity(entName))
 			{
-				ent = ogreInterface->getSceneManager()->getEntity(name);
+				ent = ogreInterface->getSceneManager()->getEntity(entName);
 			}
 			if (strAttribute)
 			{
@@ -260,6 +262,8 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 				{
 					if (pawn->scene_p)
 						pawn->scene_p->set_visibility(1,0,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
 					if (ent)
 						ent->setVisible(false);
 				}
@@ -267,6 +271,8 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 				{
 					if (pawn->scene_p)
 						pawn->scene_p->set_visibility(0,1,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
 					if (ent)
 						ent->setVisible(false);
 					
@@ -275,6 +281,8 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 				{
 					if (pawn->scene_p)
 						pawn->scene_p->set_visibility(0,0,1,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
 					if (ent)
 						ent->setVisible(false);
 					
@@ -283,24 +291,40 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 				{
 					if (pawn->scene_p)
 						pawn->scene_p->set_visibility(0,0,0,1);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
 					if (ent)
 						ent->setVisible(false);
 					
+				}
+				else if (value == "skinWeight")
+				{
+					if (pawn->scene_p)
+						pawn->scene_p->set_visibility(0,0,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(2);
+					if (ent)
+						ent->setVisible(false);
 				}
 				else if (value == "mesh")
 				{
 					if (pawn->scene_p)
 						pawn->scene_p->set_visibility(0,0,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
 					if (ent)
-						ent->setVisible(true);
-					
+						ent->setVisible(true);	
+					SbmDeformableMeshGPU::useGPUDeformableMesh = false;
 				}
 				else if (value == "GPUmesh")
 				{
 					if (pawn->scene_p)
 						pawn->scene_p->set_visibility(0,0,0,0);
+					if (pawn->dMeshInstance_p)
+						pawn->dMeshInstance_p->setVisibility(0);
 					if (ent)
 						ent->setVisible(true);
+					SbmDeformableMeshGPU::useGPUDeformableMesh = false;
 				}
 			}
 		}

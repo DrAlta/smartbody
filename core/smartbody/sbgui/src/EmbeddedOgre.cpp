@@ -1042,12 +1042,12 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	{		
 		return; // mesh already exists
 	}
-	LOG("Generating Deformable Model Name = %s, size of pos buffer = %d, size of color buffer = %d", meshName.c_str(), meshInstance->getDeformableMesh()->posBuf.size(), meshInstance->getDeformableMesh()->meshColorBuf.size());
 	bool isAutoRig = meshName == "AutoRig.dae";
 	int perVertexSize = 6;
 	float meshScale = meshInstance->getMeshScale();
 	Ogre::MeshPtr ogreMesh = meshManager.create(meshName,"General",true);
 	mesh->buildSkinnedVertexBuffer(); // if not already built
+	LOG("Generating Deformable Model Name = %s, size of pos buffer = %d, size of color buffer = %d", meshName.c_str(), meshInstance->getDeformableMesh()->posBuf.size(), meshInstance->getDeformableMesh()->meshColorBuf.size());
 	Ogre::VertexData* vtxData = new Ogre::VertexData();
 	ogreMesh->sharedVertexData = vtxData;
 	vtxData->vertexCount = mesh->posBuf.size();
@@ -1194,20 +1194,21 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		}
 		else
 		{
-			pass->setDiffuse(color[0],color[1],color[2],color[3]);
-			mat.specular.get(color);	
-			//LOG("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
-			pass->setSpecular(color[0],color[1],color[2],color[3]);
-			pass->setShininess(mat.shininess);		
+// 			pass->setDiffuse(color[0],color[1],color[2],color[3]);
+// 			mat.specular.get(color);	
+// 			//LOG("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
+// 			pass->setSpecular(color[0],color[1],color[2],color[3]);
+// 			pass->setShininess(mat.shininess);	
+			pass->setLightingEnabled(true);
 		}
 	
-		if (!hasColorBuf)
-		{
-			// disable texture alpha blending if we are using vertex color
-			pass->setAlphaRejectSettings(CMPF_GREATER, 0, true);		
-			pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
-			pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);	
-		}
+// 		if (!hasColorBuf)
+// 		{
+// 			// disable texture alpha blending if we are using vertex color
+// 			pass->setAlphaRejectSettings(CMPF_GREATER, 0, true);		
+// 			pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
+// 			pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);	
+// 		}
 		
 		//pass->setSceneBlending(Ogre::SBF_ONE, Ogre::SBF_ONE_MINUS_SOURCE_ALPHA);;
 		//pass->setShadingMode(SO_PHONG);
@@ -1283,6 +1284,11 @@ void EmbeddedOgre::updateOgreCharacterRenderMode(bool renderSkinWeight)
 		{
 			if (sbChar->dMeshInstance_p)
 				setCharacterVisible(sbChar->dMeshInstance_p->getVisibility() ,charNames[i]);			
+		}
+		else if (sbChar && renderSkinWeight) // disable model rendering for skin mesh
+		{
+			if (sbChar->dMeshInstance_p)
+				setCharacterVisible(false ,charNames[i]);			
 		}
 	}
 

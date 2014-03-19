@@ -1551,6 +1551,11 @@ void BaseWindow::ModeBonesCB(Fl_Widget* w, void* data)
 		SmartBody::SBCharacter* character = scene->getCharacter(characters[c]);
 		character->setStringAttribute("displayType", "bones");
 	}
+
+// #if !NO_OGRE_VIEWER_CMD
+// 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+// 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowBones, NULL);	
+// #endif
 }
 
 void BaseWindow::ModeGeometryCB(Fl_Widget* w, void* data)
@@ -1580,10 +1585,18 @@ void BaseWindow::ModeCollisionGeometryCB( Fl_Widget* w, void* data )
 
 void BaseWindow::ModeSkinWeightCB( Fl_Widget* w, void* data )
 {
-#if !NO_OGRE_VIEWER_CMD
-	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowSkinWeight, NULL);	
-#endif
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
+	const std::vector<std::string>& characters = scene->getCharacterNames();
+	for (size_t c = 0; c < characters.size(); c++)
+	{
+		SmartBody::SBCharacter* character = scene->getCharacter(characters[c]);
+		character->setStringAttribute("displayType", "skinWeight");
+	}
+// #if !NO_OGRE_VIEWER_CMD
+// 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+// 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowSkinWeight, NULL);	
+// #endif
 }
 
 void BaseWindow::ModeDeformableGeometryCB(Fl_Widget* w, void* data)
@@ -1596,6 +1609,11 @@ void BaseWindow::ModeDeformableGeometryCB(Fl_Widget* w, void* data)
 		SmartBody::SBCharacter* character = scene->getCharacter(characters[c]);
 		character->setStringAttribute("displayType", "mesh");
 	}
+
+// #if !NO_OGRE_VIEWER_CMD
+// 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+// 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowDeformableGeometry, NULL);	
+// #endif
 }
 
 void BaseWindow::ModeGPUDeformableGeometryCB(Fl_Widget* w, void* data)
@@ -1608,6 +1626,11 @@ void BaseWindow::ModeGPUDeformableGeometryCB(Fl_Widget* w, void* data)
 		SmartBody::SBCharacter* character = scene->getCharacter(characters[c]);
 		character->setStringAttribute("displayType", "GPUmesh");
 	}
+
+// #if !NO_OGRE_VIEWER_CMD
+// 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+// 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowDeformableGeometryGPU, NULL);	
+// #endif
 }
 
 void BaseWindow::ModeAxisCB(Fl_Widget* w, void* data)
@@ -1620,6 +1643,11 @@ void BaseWindow::ModeAxisCB(Fl_Widget* w, void* data)
 		SmartBody::SBCharacter* character = scene->getCharacter(characters[c]);
 		character->setStringAttribute("displayType", "axis");
 	}
+
+// #if !NO_OGRE_VIEWER_CMD
+// 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+// 	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdCharacterShowAxis, NULL);	
+// #endif
 }
 
 void BaseWindow::ModeEyebeamsCB(Fl_Widget* w, void* data)

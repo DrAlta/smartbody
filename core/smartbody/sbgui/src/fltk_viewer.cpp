@@ -778,6 +778,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  _data->showgeometry = false;
 		  _data->showcollisiongeometry = false;
 		  _data->showdeformablegeometry = false;
+		  _data->showSkinWeight = false;
 		  _data->showbones = false;
 		  _data->showaxis = true;
 		  applyToCharacter = true;
@@ -5290,9 +5291,11 @@ void FltkViewer::drawDeformableModels()
 				}
 #endif
 				meshInstance->update();
-				if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && meshInstance->getVisibility()) || _data->showSkinWeight)
+				//meshInstance->updateFast();
+				if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && meshInstance->getVisibility() == 1) || meshInstance->getVisibility() == 2)
 				{
-					SrGlRenderFuncs::renderDeformableMesh(meshInstance, _data->showSkinWeight);
+					bool showSkinWeight = (meshInstance->getVisibility() == 2);
+					SrGlRenderFuncs::renderDeformableMesh(meshInstance, showSkinWeight);
 					//				if (pawn->scene_p)
 					//				pawn->scene_p->set_visibility(0,1,0,0);
 					//_data->render_action.apply(character->scene_p);
