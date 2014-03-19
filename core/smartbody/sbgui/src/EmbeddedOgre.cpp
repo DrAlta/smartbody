@@ -1194,21 +1194,21 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		}
 		else
 		{
-// 			pass->setDiffuse(color[0],color[1],color[2],color[3]);
-// 			mat.specular.get(color);	
-// 			//LOG("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
-// 			pass->setSpecular(color[0],color[1],color[2],color[3]);
-// 			pass->setShininess(mat.shininess);	
+			pass->setDiffuse(color[0],color[1],color[2],color[3]);
+			mat.specular.get(color);	
+			//LOG("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
+			pass->setSpecular(color[0],color[1],color[2],color[3]);
+			pass->setShininess(mat.shininess);	
 			pass->setLightingEnabled(true);
 		}
 	
-// 		if (!hasColorBuf)
-// 		{
-// 			// disable texture alpha blending if we are using vertex color
-// 			pass->setAlphaRejectSettings(CMPF_GREATER, 0, true);		
-// 			pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
-// 			pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);	
-// 		}
+		if (!hasColorBuf)
+		{
+			// disable texture alpha blending if we are using vertex color
+			pass->setAlphaRejectSettings(CMPF_GREATER, 0, true);		
+			pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
+			pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);	
+		}
 		
 		//pass->setSceneBlending(Ogre::SBF_ONE, Ogre::SBF_ONE_MINUS_SOURCE_ALPHA);;
 		//pass->setShadingMode(SO_PHONG);
