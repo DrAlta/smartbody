@@ -89,6 +89,10 @@ set( SMARTBODY_LIB_EXT_NANOFLANN_SRC
 
 )
 
+set( SMARTBODY_LIB_EXT_RPLY_SRC
+        ./external/rply/rply.c
+)
+
 set( SMARTBODY_LIB_EXT_PARSER_SRC
 
         ./external/parser/Bchart.cpp
@@ -253,6 +257,7 @@ set( SMARTBODY_LIB_SR_SRC
         ./sr/sr_model.cpp
         ./sr/sr_model_export_iv.cpp
         ./sr/sr_model_import_obj.cpp
+	./sr/sr_model_import_ply.cpp
         ./sr/sr_output.cpp
         ./sr/sr_path_array.cpp
         ./sr/sr_plane.cpp
@@ -378,6 +383,7 @@ set( SMARTBODY_LIB_SBM_SRC
 
         ./controllers/MeCtBlendEngine.cpp
         ./controllers/me_ct_motion_blend.cpp
+        ./controllers/me_ct_motion_graph.cpp
         ./controllers/MotionAnalysis.cpp
 
         ./sbm/ParserBVH.cxx
@@ -488,6 +494,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./sb/SBCommandManager.cpp
         ./sb/SBWSPManager.cpp
         ./sb/SBNavigationMeshManager.cpp
+        ./sb/SBMotionGraph.cpp
 
         ./sb/SBPython.cpp
         ./sb/SBPythonAnimation.cpp
@@ -500,6 +507,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./sb/SBPythonSkeleton.cpp
         ./sb/SBPythonSystem.cpp
         ./sb/SBPythonClass.cpp
+        ./sb/SBPythonMesh.cpp
 		
         ./sb/SBAssetHandler.cpp
         ./sb/SBAssetHandlerCOLLADA.cpp
@@ -510,7 +518,9 @@ set( SMARTBODY_LIB_SBM_SRC
 	./sb/SBAssetHandlerOgre.cpp
 	./sb/SBAssetHandlerObj.cpp
 	./sb/SBAssetHandlerBvh.cpp
-	./sb/SBAssetHandlerSkb.cpp
+	./sb/SBAssetHandlerPly.cpp
+	./sb/SBAssetHandlerSkmb.cpp
+	./sb/SBAssetHandlerSBMeshBinary.cpp
         ./sb/SBBehavior.cpp
         ./sb/SBDebuggerServer.cpp
         ./sb/SBDebuggerClient.cpp
@@ -522,6 +532,8 @@ set( SMARTBODY_LIB_SBM_SRC
 	./sb/smartbody-c-dll.cpp
 		
 	./protocols/sbmotion.pb.cc
+	./protocols/sbutilities.pb.cc
+	./protocols/sbmesh.pb.cc
 )
 
 add_library(
@@ -537,6 +549,10 @@ add_library(
         ${SMARTBODY_LIB_EXT_RECAST_SRC}
 
         ${SMARTBODY_LIB_EXT_PERLIN_SRC}
+
+	${SMARTBODY_LIB_EXT_NANOFLAN_SRC}
+
+	${SMARTBODY_LIB_EXT_RPLY_SRC}
 
         ${SMARTBODY_LIB_ME_SRC}
 
