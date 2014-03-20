@@ -924,7 +924,7 @@ void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
 		speechRelayCommand = "start ..\\..\\..\\..\\bin\\TtsRelay\\bin\\x86\\Release\\TtsRelayGui.exe";
 		// run the speech relay launcher script
 #else
-		speechRelayCommand = "../../../../core/FestivalRelay/speechrelay.sh&"
+		speechRelayCommand = "../../../../core/FestivalRelay/speechrelay.sh&";
 #endif
 	}
 	int ret = system(speechRelayCommand.c_str());
