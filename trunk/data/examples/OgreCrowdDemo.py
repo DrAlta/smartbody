@@ -35,8 +35,8 @@ for i in range(amount):
 	sinbadSk = scene.createSkeleton(sinbadSkName)
 	sinbad.setSkeleton(sinbadSk)
 	# Set position logic
-	posX = math.cos(360.0 / amount * i) * 100.0
-	posZ = math.sin(360.0 / amount * i) * 100.0
+	posX = math.cos(360.0 / amount * float(i)) * 100.0
+	posZ = math.sin(360.0 / amount * float(i)) * 100.0
 	sinbadPos = SrVec(posX, 5.16, posZ)
 	sinbad.setPosition(sinbadPos)
 	sinbad.createStandardControllers()

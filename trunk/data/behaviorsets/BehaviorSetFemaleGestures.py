@@ -224,6 +224,9 @@ def retargetBehaviorSet(charName):
 	# throw away 
 	gestureMap.addGestureMapping( "ChrConnor@IdleStand01_ThrowAwayRt01", "THROWAWAY", "", "RIGHT_HAND", "",  "ChrConnor@IdleStand01")
 	gestureMap.addGestureMapping( "ChrConnor@IdleStand01_ThrowAwayRt01Lf", "THROWAWAY", "", "LEFT_HAND", "",  "ChrConnor@IdleStand01")
+	
+	print "Setting gesture map attribute..."
+	sbChar.setStringAttribute("gestureMap", charName)
 		
 	
 	

@@ -6,6 +6,8 @@ print "|--------------------------------------------|"
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('script', 'scripts')
+scene.addAssetPath('script', 'behaviorsets')
+
 scene.loadAssets()
 
 # Set scene parameters to fit new Brad and Rachel
@@ -32,10 +34,6 @@ bradSkeleton = scene.getSkeleton('ChrBrad.sk')
 zebra2Map.applySkeleton(bradSkeleton)
 zebra2Map.applyMotionRecurse('ChrBrad')
 
-# Animation setup
-scene.run('init-param-animation.py')
-
-
 # Setting up Brad
 print 'Setting up Brad'
 scene.run('BehaviorSetGestures.py')
@@ -59,15 +57,12 @@ for i in range(2):
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	retargetBehaviorSet(baseName)
+	brad.setStringAttribute("displayType", "GPUmesh")
 	
 # Set rotation
 scene.getCharacter('ChrBrad0').setHPR(SrVec(17, 0, 0))
 scene.getCharacter('ChrBrad1').setHPR(SrVec(-17, 0, 0))
 	
-# Turn on GPU deformable geometry
-scene.getCharacter("ChrBrad0").setStringAttribute("displayType", "GPUmesh")
-scene.getCharacter("ChrBrad1").setStringAttribute("displayType", "GPUmesh")
-
 
 lastTime = -5
 import random
