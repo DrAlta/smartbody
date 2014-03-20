@@ -99,9 +99,9 @@ Vector3 barycentricCoord(Vector3& pt, Tri3Object& tri)
 	}
 	else
 	{
-		w1 = area2 / totalArea;
-		w2 = area3 / totalArea;
-		w3 = area1 / totalArea;
+		w1 = (float) area2 / totalArea;
+		w2 = (float) area3 / totalArea;
+		w3 = (float) area1 / totalArea;
 	}
 	return Vector3(w1,w2,w3);
 }

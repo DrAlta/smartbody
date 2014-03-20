@@ -73,7 +73,7 @@ void SBMotionFrameBuffer::initFrameBuffer( SkChannelArray& channelArray, std::ve
 	}
 	else // use all channels
 	{			
-		for (unsigned int i=0;i<channelArray.size();i++)
+		for (unsigned int i=0;i< (unsigned int) channelArray.size();i++)
 		{
 			const std::string& chanName = channelArray.mappedName(i);
 			SkChannel::Type chanType = channelArray.type(i);
