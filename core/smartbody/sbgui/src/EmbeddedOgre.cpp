@@ -150,6 +150,7 @@ void EmbeddedOgre::setCharacterVisible( bool bVisible, std::string charName )
 	{
 		SceneNode* node = ogreSceneMgr->getSceneNode(charName);
 		Ogre::Entity* ogreChar = dynamic_cast<Ogre::Entity*>(node->getAttachedObject(charName));
+		ogreChar->setVisible(bVisible);
 		node->setVisible(bVisible);
 
 	}		
@@ -1280,12 +1281,13 @@ void EmbeddedOgre::updateOgreCharacterRenderMode(bool renderSkinWeight)
 	for (unsigned int i=0;i<charNames.size();i++)
 	{
 		SmartBody::SBCharacter* sbChar = scene->getCharacter(charNames[i]);
-		if (sbChar && !renderSkinWeight)
+		const std::string& displayType = sbChar->getStringAttribute("displayType");
+		if (sbChar && (displayType == "mesh" || displayType == "GPUmesh") )
 		{
 			if (sbChar->dMeshInstance_p)
-				setCharacterVisible(sbChar->dMeshInstance_p->getVisibility() ,charNames[i]);			
+				setCharacterVisible(true ,charNames[i]);			
 		}
-		else if (sbChar && renderSkinWeight) // disable model rendering for skin mesh
+		else 
 		{
 			if (sbChar->dMeshInstance_p)
 				setCharacterVisible(false ,charNames[i]);			
