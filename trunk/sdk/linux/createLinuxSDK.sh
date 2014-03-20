@@ -42,6 +42,9 @@ rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/inc
 # copy readme.txt
 rsync -ap --exclude=".svn" ./README.txt ./smartbody/README.txt
 
+# copy .smartbodysettings file
+rsync -ap --exclude=".svn" ./bin/.smartbodysettings ./smartbody/bin
+
 # copy build*.sh
 #rsync -ap --exclude=".svn" ./build*.sh ./smartbody/
 
@@ -95,6 +98,7 @@ rsync -ap --exclude=".svn" ../../data/fonts/* ./smartbody/data/fonts/
 rsync -ap --exclude=".svn" ../../data/Sinbad/* ./smartbody/data/Sinbad/
 rsync -ap --exclude=".svn" ../../data/scripts/* ./smartbody/data/scripts/
 rsync -ap --exclude=".svn" ../../data/mesh/ChrBrad/* ./smartbody/data/mesh/ChrBrad/
+rsync -ap --exclude=".svn" ../../data/mesh/ChrMaarten/* ./smartbody/data/mesh/Maarten/
 rsync -ap --exclude=".svn" ../../data/mesh/ChrRachel/* ./smartbody/data/mesh/ChrRachel/
 rsync -ap --exclude=".svn" ../../data/mesh/Sinbad/* ./smartbody/data/mesh/Sinbad/
 rsync -ap --exclude=".svn" ../../data/mesh/Ogre/* ./smartbody/data/mesh/Ogre/
