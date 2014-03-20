@@ -916,12 +916,22 @@ void BaseWindow::LaunchFaceViewerCB( Fl_Widget* widget, void* data )
 
 void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
 {
-	// run the speech relay launcher script
+	std::string speechRelayCommand = "";
+	SmartBody::SBScene::getSystemParameter("speechrelaycommand");
+	if (speechRelayCommand == "")
+	{
 #ifdef WIN32
-	system("start ..\\..\\..\\..\\bin\\TtsRelay\\bin\\x86\\Release\\TtsRelayGui.exe");
+		speechRelayCommand = "start ..\\..\\..\\..\\bin\\TtsRelay\\bin\\x86\\Release\\TtsRelayGui.exe";
+		// run the speech relay launcher script
 #else
-	system("../../../../core/FestivalRelay/speechrelay.sh&");
+		speechRelayCommand = "../../../../core/FestivalRelay/speechrelay.sh&"
 #endif
+	}
+	int ret = system(speechRelayCommand.c_str());
+	if (ret == -1)
+	{
+		LOG("Speech relay command failed: %s", speechRelayCommand.c_str());
+	}
 }
 
 void BaseWindow::NewCB(Fl_Widget* widget, void* data)

@@ -746,19 +746,19 @@ int main( int argc, char **argv )	{
 						t++;
 					}
 				}
-				else if (tokens[t] == "renderer")
+				else if (tokens[t] == "speechrelaycommand")
 				{
 					if (tokens.size() > t + 1)
 					{
-						LOG("Setting renderer to %s", tokens[t + 1].c_str());
-						SmartBody::SBScene::setSystemParameter("renderer", mediaPath);
+						LOG("Setting speech relay command to to %s", tokens[t + 1].c_str());
+						SmartBody::SBScene::setSystemParameter("speechrelaycommand", tokens[t + 1]);
 						t++;
 					}
 				}
 				else
 				{
 					LOG("Unknown setting found in .smartbodysettings file: %s", line.c_str());
-					LOG("Valid settings are: pythonlibpath=<dir>  or mediapath=<dir> or ogrepath=<dir> or renderer=<ogre|classic>");
+					LOG("Valid settings are: pythonlibpath=<dir>  or mediapath=<dir> or ogrepath=<dir> or speechrelaycommand=<command>");
 				}
 			}
 		}

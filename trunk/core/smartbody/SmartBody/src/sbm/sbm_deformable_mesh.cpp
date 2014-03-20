@@ -287,7 +287,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			int globalCounter = 0;
 			//pos = this->getMesh(skinWeight->sourceMesh);
 			pos = this->getValidSkinMesh(skinWeight->sourceMesh);
-			LOG("skinWeight->sourceMesh = %s, pos = %d", skinWeight->sourceMesh.c_str(), pos);
+			//LOG("skinWeight->sourceMesh = %s, pos = %d", skinWeight->sourceMesh.c_str(), pos);
 			if (pos != -1)
 			{
 				meshIndexList.push_back(pos);
