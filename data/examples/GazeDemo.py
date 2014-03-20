@@ -52,7 +52,7 @@ brad.createStandardControllers()
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
 brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
-bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
+bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01" ready="0" relax="0"/>')
 
 print 'Setting up Rachel'
 rachel = scene.createCharacter('ChrRachel', '')
@@ -65,7 +65,7 @@ rachel.createStandardControllers()
 # Deformable mesh
 rachel.setDoubleAttribute('deformableMeshScale', .01)
 rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
-bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01"/>')
+bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01" ready=".2" relax=".2"/>')
 
 # Add pawns in scene
 print 'Adding pawn to scene'
@@ -78,7 +78,7 @@ for name in scene.getCharacterNames():
 
 
 # Make characters gaze at pawn
-bml.execBML('ChrRachel', '<gaze sbm:joint-range="EYES NECK" target="gazeTarget"/>')
+bml.execBML('ChrRachel', '<gaze sbm:joint-range="EYES CHEST" target="gazeTarget"/>')
 
 # Variables to move pawn
 gazeX = -2
@@ -109,12 +109,12 @@ class GazeDemo(SBScript):
 			lastTime = time
 			#Gaze at joints
 			bml.execBMLAt(0, 'ChrBrad', '<gaze target="ChrRachel:base" sbm:joint-speed="800" sbm:joint-smooth="0.2"/>')
-			bml.execBMLAt(2, 'ChrBrad', '<gaze target="ChrRachel:spine1" sbm:joint-speed="800" sbm:joint-smooth="0.2"/>')
-			bml.execBMLAt(4, 'ChrBrad', '<gaze target="ChrRachel:spine2" sbm:joint-speed="800" sbm:joint-smooth="0.2"/>')
-			bml.execBMLAt(6, 'ChrBrad', '<gaze target="ChrRachel:spine3" sbm:joint-speed="800" sbm:joint-smooth="0.2"/>')
+			bml.execBMLAt(2, 'ChrBrad', '<gaze target="ChrBrad:l_wrist" sbm:joint-speed="800" sbm:joint-smooth="0.2"/>')
+			bml.execBMLAt(4, 'ChrBrad', '<gaze target="ChrBrad:r_ankle" sbm:joint-speed="800" sbm:joint-smooth="0.2"/>')
+			bml.execBMLAt(6, 'ChrBrad', '<gaze target="ChrRachel:l_wrist" sbm:joint-speed="800" sbm:joint-smooth="0.2"/>')
 			bml.execBMLAt(8, 'ChrBrad', '<gaze target="ChrRachel:spine4" sbm:joint-speed="800" sbm:joint-smooth="0.2"/>')
 		
 # Run the update script
-#scene.removeScript('gazedemo')
-#gazedemo = GazeDemo()
-#scene.addScript('gazedemo', gazedemo)
+scene.removeScript('gazedemo')
+gazedemo = GazeDemo()
+scene.addScript('gazedemo', gazedemo)
