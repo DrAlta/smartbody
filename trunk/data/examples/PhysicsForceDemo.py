@@ -12,9 +12,19 @@ scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
+scene.setScale(0.01)
+camera = getCamera()
+camera.setEye(-55.4046, 209.262, -1010.21)
+camera.setCenter(199.493, 56.5922, 83.8954)
+camera.setUpVector(SrVec(0, 1, 0))
+camera.setScale(1)
+camera.setFov(1.0472)
+camera.setFarPlane(5000.0)
+camera.setNearPlane(5.0)
+camera.setAspectRatio(1.02)
 # Run required scripts
 scene.run('init-param-animation.py')
-scene.run('init-example-reach.py')
+#scene.run('init-example-reach.py')
 
 # Set scene parameters and camera
 print 'Configuring scene parameters and camera'
@@ -35,9 +45,9 @@ brad1.setPosition(SrVec(0, 122, 860))
 brad1.setHPR(SrVec(180, 0, 0))
 brad1.createStandardControllers()
 brad1.setStringAttribute('deformableMesh', 'Brad.dae')
-scene.run('BehaviorSetMocapReaching.py')
+scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
-retargetBehaviorSet('brad2')
+retargetBehaviorSet('brad1')
 bml.execBML('brad1', '<body posture="HandsAtSide_Motex"/>')
 # Brad2
 brad2 = scene.createCharacter('brad2', '')
@@ -46,6 +56,7 @@ brad2.setSkeleton(brad2Skeleton)
 brad2.setPosition(SrVec(100, 102, -650))
 brad2.createStandardControllers()
 brad2.setStringAttribute('deformableMesh', 'Brad.dae')
+retargetBehaviorSet('brad2')
 bml.execBML('brad2', '<body posture="HandsAtSide_Motex"/>')
 	
 # Ball variables

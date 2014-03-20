@@ -13,8 +13,23 @@ scene.loadAssets()
 
 scene.loadAssetsFromPath('sbm-common/common-sk/common.sk')
 
+scene.setScale(0.01)
 # Set simulation fps
 scene.getSimulationManager().setSimFps(60)
+
+#scene.run('default-viewer.py')
+camera = getCamera()
+camera.setEye(-20, 187, 443)
+camera.setCenter(-20, 136, 151)
+camera.setUpVector(SrVec(0, 1, 0))
+camera.setScale(1)
+camera.setFov(1.0472)
+camera.setFarPlane(5000.0)
+camera.setNearPlane(5.0)
+camera.setAspectRatio(1.02)
+
+
+#scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
 
 
 # Set scene parameters and camera

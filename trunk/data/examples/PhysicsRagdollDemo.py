@@ -16,14 +16,17 @@ scene.run('init-param-animation.py')
 # Set scene parameters and camera
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)
-#scene.run('default-viewer.py')
-#camera = getCamera()
-#camera.setEye(-9, 255, 417)
-#camera.setCenter(-9, 182, 232)
-#scene.getPawn('camera').setPosition(SrVec(0, -20, 0))
 
-# Set simulation fps
-#scene.getSimulationManager().setSimFps(60)
+scene.setScale(0.01)
+camera = getCamera()
+camera.setEye(-20, 187, 443)
+camera.setCenter(-20, 136, 151)
+camera.setUpVector(SrVec(0, 1, 0))
+camera.setScale(1)
+camera.setFov(1.0472)
+camera.setFarPlane(5000.0)
+camera.setNearPlane(5.0)
+camera.setAspectRatio(1.02)
 
 # Setting up characters
 print 'Setting up characters'
@@ -123,7 +126,7 @@ amountZ = amountX = -1
 speed = 0.05
 last = 0
 canTime = True
-delay = 10
+delay = 5
 started = False
 class PhysicsRagdollDemo(SBScript):
 	def update(self, time):
