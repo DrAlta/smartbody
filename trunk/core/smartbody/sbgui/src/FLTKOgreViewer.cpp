@@ -95,7 +95,7 @@ void FLTKOgreWindow::draw()
 		glPushMatrix();		
 		updateOgreCamera();
 		ogreInterface->updateOgreLights();
-		//ogreInterface->updateOgreCharacterRenderMode(_data->showSkinWeight);
+		ogreInterface->updateOgreCharacterRenderMode(false);
 		ogreInterface->update(); // do Ogre rendering for deformable characters
 		// pop everything!
 		glMatrixMode( GL_COLOR );
