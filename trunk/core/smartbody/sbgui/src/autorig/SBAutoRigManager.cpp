@@ -46,6 +46,56 @@ SBAutoRigManager::~SBAutoRigManager()
 
 }
 
+
+bool SBAutoRigManager::buildAutoRiggingFromPawnMesh( const std::string& pawnName, int riggingType, const std::string& outSkName, const std::string& outDeformableMeshName )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBPawn* sbPawn = scene->getPawn(pawnName);	
+	DeformableMeshInstance* meshInstance = NULL;
+	if (sbPawn)
+		meshInstance = sbPawn->dStaticMeshInstance_p;
+	if (!sbPawn || !meshInstance || meshInstance->getDeformableMesh() == NULL)
+	{
+
+		LOG("AutoRigging Fail : No pawn is selected, or the selected pawn does not contain 3D mesh for rigging.");
+		return false;
+	}
+	DeformableMesh* mesh = meshInstance->getDeformableMesh();	
+	SrModel& model = mesh->dMeshStatic_p[0]->shape();	
+
+	SrModel scaleModel = SrModel(model);
+
+	
+
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	bool autoRigSuccess = false;
+	SrMat worldRotation = sbPawn->get_world_offset().get_rotation(); 
+	if (!assetManager->getDeformableMesh(outDeformableMeshName))
+	{			
+		//model.scale(meshInstance->getMeshScale()); // resize the vertices
+		float meshScale = meshInstance->getMeshScale();
+		for (int i=0;i<scaleModel.V.size();i++)
+			scaleModel.V[i] *= meshScale;
+		for (int i=0;i<scaleModel.V.size();i++)
+			scaleModel.V[i] = scaleModel.V[i]*worldRotation;
+
+		if (riggingType == 0)
+			autoRigSuccess = buildAutoRiggingVoxels(scaleModel,outSkName,outDeformableMeshName);
+		//autoRigSuccess = autoRigManager.buildAutoRiggingVoxelsWithVoxelSkinWeights(scaleModel,skelName,deformMeshName);
+		else if (riggingType == 1)
+			autoRigSuccess = buildAutoRiggingVoxelsWithVoxelSkinWeights(scaleModel,outSkName,outDeformableMeshName);
+		else if (riggingType == 2)
+			autoRigSuccess = buildAutoRigging(scaleModel, outSkName, outDeformableMeshName);		
+	}
+	else
+	{
+		LOG("Deformable mesh %s already exists. Skip auto-rigging and create the character directly.");
+		autoRigSuccess = true;
+	}
+	return autoRigSuccess;
+}
+
+
 bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
 #ifdef USE_AUTO_RIGGING
@@ -152,7 +202,6 @@ bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inMo
 #else
 	return false;
 #endif
-	
 
 }
 
@@ -391,7 +440,7 @@ void boneWeightInPainting(std::vector<std::map<int,float> >& vtxBoneWeights, std
 	std::map<int,float>& boneWeight = vtxBoneWeights[0];
 	
 	
-	normalizeBoneWeights(vtxBoneWeights);
+	//normalizeBoneWeights(vtxBoneWeights);
 
 	std::map<int,float>::iterator bi;
 	for ( bi  = boneWeight.begin();
@@ -554,7 +603,7 @@ void boneWeightLaplacianSmoothing(std::vector<std::map<int,float> >& vtxBoneWeig
 		boneIdxs.push_back(mi->first);
 	}
 
-	normalizeBoneWeights(vtxBoneWeights);
+	//normalizeBoneWeights(vtxBoneWeights);
 
 	vtxNeighbors.resize(nv);
 	//vtxAreas.resize(nv, 0.f);
@@ -601,8 +650,8 @@ void boneWeightLaplacianSmoothing(std::vector<std::map<int,float> >& vtxBoneWeig
 	}
 
 	std::vector<float> tempBoneWeights(nv,0.f);
-	int smoothIteration = 30;
-	float smoothAlpha = 0.95f;
+	int smoothIteration = 50;
+	float smoothAlpha = 0.9f;
 	for (int iter=0;iter<smoothIteration;iter++)
 	{
 		LOG("Smooth Iteration = %d",iter);
@@ -627,7 +676,7 @@ void boneWeightLaplacianSmoothing(std::vector<std::map<int,float> >& vtxBoneWeig
 				vtxBoneWeights[i][boneIdx] = tempBoneWeights[i];
 			}
 		}
-		normalizeBoneWeights(vtxBoneWeights);
+		//normalizeBoneWeights(vtxBoneWeights);
 	}
 }
 
@@ -1487,6 +1536,11 @@ void exportPolyVoxMeshToObj( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNorma
 	}
 
 	fclose(fp);
+}
+
+SBAutoRigManager* getAutoRigManager()
+{
+	return SBAutoRigManager::singletonPtr();
 }
 #endif
 
