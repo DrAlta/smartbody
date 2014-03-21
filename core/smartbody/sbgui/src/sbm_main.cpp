@@ -29,6 +29,8 @@
 #include "sbm/GPU/SbmShader.h"
 #include <sb/SBBoneBusManager.h>
 
+#include <pythonbind/SBPythonAutoRig.h>
+
 #ifndef USE_WSP
 #define USE_WSP 1
 #endif
@@ -939,6 +941,7 @@ int main( int argc, char **argv )	{
 
 	SmartBody::SBScene::setSystemParameter("pythonlibpath", python_lib_path);
 	initPython(python_lib_path);
+	initAutoRigPythonModule();
 #endif
 
 	

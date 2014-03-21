@@ -58,6 +58,9 @@
     <Filter Include="autorig">
       <UniqueIdentifier>{b54e54a0-5a9f-47fc-8798-b82bebd2cf85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="pythonbind">
+      <UniqueIdentifier>{4dc282ee-eda1-4034-a71b-4c1afa79c981}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -315,6 +318,9 @@
     </ClCompile>
     <ClCompile Include="..\src\visemeviewer\ImageSequencePlayer.cpp">
       <Filter>lipsyncviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pythonbind\SBPythonAutorig.cpp">
+      <Filter>pythonbind</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -580,6 +586,9 @@
     </ClInclude>
     <ClInclude Include="..\src\visemeviewer\ImageSequencePlayer.h">
       <Filter>lipsyncviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pythonbind\SBPythonAutoRig.h">
+      <Filter>pythonbind</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

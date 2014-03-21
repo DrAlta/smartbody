@@ -313,23 +313,20 @@ void RetargetStepWindow::applyAutoRig(int riggingType)
 	if (!_choicePawns->text())
 		return;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::string pawnName = _choicePawns->text();
+	std::string pawnName = _choicePawns->text();	
+	SBAutoRigManager& autoRigManager = SBAutoRigManager::singleton();
+
+
+
 	SmartBody::SBPawn* sbPawn = scene->getPawn(pawnName);	
 	DeformableMeshInstance* meshInstance = sbPawn->dStaticMeshInstance_p;
 	if (!sbPawn || !meshInstance || meshInstance->getDeformableMesh() == NULL)
 	{
-		
+
 		LOG("AutoRigging Fail : No pawn is selected, or the selected pawn does not contain 3D mesh for rigging.");
 		return;
 	}
-	
-	SBAutoRigManager& autoRigManager = SBAutoRigManager::singleton();
-	
-
 	DeformableMesh* mesh = meshInstance->getDeformableMesh();	
-	SrModel& model = mesh->dMeshStatic_p[0]->shape();	
-	
-	SrModel scaleModel = SrModel(model);
 
 	std::string modelName = mesh->getName();//(const char*) model.name;
 	std::string filebasename = boost::filesystem::basename(modelName);
@@ -337,6 +334,11 @@ void RetargetStepWindow::applyAutoRig(int riggingType)
 	std::string skelName = filebasename+".sk";
 	std::string deformMeshName = filebasename+"AutoRig.dae"; 
 
+	bool autoRigSuccess = autoRigManager.buildAutoRiggingFromPawnMesh(pawnName, riggingType, skelName, deformMeshName);
+#if 0
+
+	SrModel& model = mesh->dMeshStatic_p[0]->shape();		
+	SrModel scaleModel = SrModel(model);
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	bool autoRigSuccess = false;
 	SrMat worldRotation = sbPawn->get_world_offset().get_rotation(); 
@@ -355,20 +357,21 @@ void RetargetStepWindow::applyAutoRig(int riggingType)
 		else if (riggingType == 1)
 			autoRigSuccess = autoRigManager.buildAutoRiggingVoxelsWithVoxelSkinWeights(scaleModel,skelName,deformMeshName);
 		else if (riggingType == 2)
-			autoRigSuccess = autoRigManager.buildAutoRigging(scaleModel, skelName, deformMeshName);
-
-		if (!autoRigSuccess && riggingType == 2)		
-		{
-			std::string errorMsg = "AutoRigging Fail : The input mesh must be a single component and water tight mesh. Try to enable 'voxelRigging'.";
-			LOG(errorMsg.c_str());
-			fl_alert(errorMsg.c_str());
-			return;
-		}		
+			autoRigSuccess = autoRigManager.buildAutoRigging(scaleModel, skelName, deformMeshName);		
 	}
 	else
 	{
 		LOG("Deformable mesh %s already exists. Skip auto-rigging and create the character directly.");
 	}
+#endif
+
+	if (!autoRigSuccess && riggingType == 2)		
+	{
+		std::string errorMsg = "AutoRigging Fail : The input mesh must be a single component and water tight mesh. Try to enable 'voxelRigging'.";
+		LOG(errorMsg.c_str());
+		fl_alert(errorMsg.c_str());
+		return;
+	}		
 
 	
 

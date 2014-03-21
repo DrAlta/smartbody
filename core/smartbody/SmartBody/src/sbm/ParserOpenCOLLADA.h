@@ -91,7 +91,7 @@ class ParserOpenCOLLADA
 		static void parseLibraryEffects(DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap);
 
 		// exporting functionality
-		static bool exportCollada(std::string outPathname, std::string skeletonName, std::string deformMeshName, std::vector<std::string> motionNames, bool exportSk, bool exportMesh, bool exportMotion);
+		static SBAPI bool exportCollada(std::string outPathname, std::string skeletonName, std::string deformMeshName, std::vector<std::string> motionNames, bool exportSk, bool exportMesh, bool exportMotion);
 		static bool exportVisualScene(FILE* fp, std::string skeletonName, std::string defMeshName);
 		static bool exportSkinMesh(FILE* fp, std::string deformMeshName);
 		static bool exportMaterials(FILE* fp, std::string deformMeshName);		
