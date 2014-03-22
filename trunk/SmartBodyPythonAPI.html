@@ -51,6 +51,10 @@
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBGestureMapManager">SBGestureMapManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBJointMap">SBJointMap</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBJointMapManager">SBJointMapManager</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBMotionGraph">SBMotionGraph</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBMotionGraphManager">SBMotionGraphManager</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBMotionNode">SBMotionNode</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBMotionTransitionEdge">SBMotionTransitionEdge</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBNavigationMesh">SBNavigationMesh</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBNavigationMeshManager">SBNavigationMeshManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBObject">SBObject</a>
@@ -79,6 +83,7 @@
 </font></dt></dl>
 </dd>
 <dt><font face="helvetica, arial"><a href="SmartBody.html#SBJoint">SBJoint</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBMesh">SBMesh</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBMotion">SBMotion</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBPawn">SBPawn</a>
 </font></dt><dd>
@@ -2453,7 +2458,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 644</dl>
+<dl><dt><strong>__instance_size__</strong> = 672</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -2491,7 +2496,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 644</dl>
+<dl><dt><strong>__instance_size__</strong> = 672</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -2638,7 +2643,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 644</dl>
+<dl><dt><strong>__instance_size__</strong> = 672</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -2788,7 +2793,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 644</dl>
+<dl><dt><strong>__instance_size__</strong> = 672</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -2938,7 +2943,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 644</dl>
+<dl><dt><strong>__instance_size__</strong> = 672</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -3266,11 +3271,14 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;type(can&nbsp;be&nbsp;seq|me|ME),&nbsp;path&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;NULL</tt></dd></dl>
 
-<dl><dt><a name="SBAssetManager-addMesh"><strong>addMesh</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-addMesh">addMesh</a>(&nbsp;(<a href="#SBAssetManager">SBAssetManager</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+<dl><dt><a name="SBAssetManager-addMesh"><strong>addMesh</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-addMesh">addMesh</a>(&nbsp;(<a href="#SBAssetManager">SBAssetManager</a>)arg1,&nbsp;(<a href="#SBMesh">SBMesh</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;mesh&nbsp;to&nbsp;the&nbsp;scene.</tt></dd></dl>
 
 <dl><dt><a name="SBAssetManager-addMotion"><strong>addMotion</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-addMotion">addMotion</a>(&nbsp;(<a href="#SBAssetManager">SBAssetManager</a>)arg1,&nbsp;(<a href="#SBMotion">SBMotion</a>)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;motion&nbsp;to&nbsp;the&nbsp;scene.</tt></dd></dl>
+
+<dl><dt><a name="SBAssetManager-addMotionDefinition"><strong>addMotionDefinition</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-addMotionDefinition">addMotionDefinition</a>(&nbsp;(<a href="#SBAssetManager">SBAssetManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(int)arg4)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;motion&nbsp;definition&nbsp;with&nbsp;blank&nbsp;frames.</tt></dd></dl>
 
 <dl><dt><a name="SBAssetManager-addMotions"><strong>addMotions</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-addMotions">addMotions</a>(&nbsp;(<a href="#SBAssetManager">SBAssetManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Add&nbsp;motion&nbsp;resource&nbsp;given&nbsp;filepath&nbsp;and&nbsp;recursive&nbsp;flag.&nbsp;<br>
@@ -3291,6 +3299,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBAssetManager-getLocalAssetPaths"><strong>getLocalAssetPaths</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-getLocalAssetPaths">getLocalAssetPaths</a>(&nbsp;(<a href="#SBAssetManager">SBAssetManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;path&nbsp;names&nbsp;for&nbsp;a&nbsp;given&nbsp;type&nbsp;excluding&nbsp;the&nbsp;media&nbsp;path:&nbsp;seq,&nbsp;me,&nbsp;audio,&nbsp;mesh.</tt></dd></dl>
+
+<dl><dt><a name="SBAssetManager-getMesh"><strong>getMesh</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-getMesh">getMesh</a>(&nbsp;(<a href="#SBAssetManager">SBAssetManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMesh">SBMesh</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;a&nbsp;deformable&nbsp;mesh&nbsp;given&nbsp;name</tt></dd></dl>
 
 <dl><dt><a name="SBAssetManager-getMeshNames"><strong>getMeshNames</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-getMeshNames">getMeshNames</a>(&nbsp;(<a href="#SBAssetManager">SBAssetManager</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;mesh&nbsp;names.<br>
@@ -3338,7 +3349,7 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;type(can&nbsp;be&nbsp;cript|motion|audio),&nbsp;path&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;NULL</tt></dd></dl>
 
-<dl><dt><a name="SBAssetManager-removeMesh"><strong>removeMesh</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-removeMesh">removeMesh</a>(&nbsp;(<a href="#SBAssetManager">SBAssetManager</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+<dl><dt><a name="SBAssetManager-removeMesh"><strong>removeMesh</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-removeMesh">removeMesh</a>(&nbsp;(<a href="#SBAssetManager">SBAssetManager</a>)arg1,&nbsp;(<a href="#SBMesh">SBMesh</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;a&nbsp;mesh&nbsp;from&nbsp;the&nbsp;scene.</tt></dd></dl>
 
 <dl><dt><a name="SBAssetManager-removeMotion"><strong>removeMotion</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-removeMotion">removeMotion</a>(&nbsp;(<a href="#SBAssetManager">SBAssetManager</a>)arg1,&nbsp;(<a href="#SBMotion">SBMotion</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
@@ -3965,11 +3976,17 @@ Methods defined here:<br>
 <dl><dt><a name="SBCharacter-setAutomaticPruning"><strong>setAutomaticPruning</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setAutomaticPruning">setAutomaticPruning</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Toggles&nbsp;the&nbsp;automatic&nbsp;pruning&nbsp;mechanism&nbsp;on&nbsp;or&nbsp;off.</tt></dd></dl>
 
+<dl><dt><a name="SBCharacter-setDeformableMeshName"><strong>setDeformableMeshName</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setDeformableMeshName">setDeformableMeshName</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;deformable&nbsp;mesh.&nbsp;Same&nbsp;as&nbsp;setting&nbsp;the&nbsp;deformableMesh&nbsp;attribute.</tt></dd></dl>
+
 <dl><dt><a name="SBCharacter-setFaceDefinition"><strong>setFaceDefinition</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setFaceDefinition">setFaceDefinition</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(<a href="#SBFaceDefinition">SBFaceDefinition</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;face&nbsp;definition&nbsp;(visemes,&nbsp;action&nbsp;units)&nbsp;for&nbsp;a&nbsp;character.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-setMiniBrain"><strong>setMiniBrain</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setMiniBrain">setMiniBrain</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;mini&nbsp;brain&nbsp;handler&nbsp;for&nbsp;this&nbsp;character.</tt></dd></dl>
+
+<dl><dt><a name="SBCharacter-setMotionGraph"><strong>setMotionGraph</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setMotionGraph">setMotionGraph</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;motion&nbsp;graph&nbsp;for&nbsp;this&nbsp;character</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-setNvbg"><strong>setNvbg</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setNvbg">setNvbg</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(<a href="#Nvbg">Nvbg</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;NVBG&nbsp;handler&nbsp;for&nbsp;this&nbsp;character.</tt></dd></dl>
@@ -3995,15 +4012,33 @@ Methods defined here:<br>
 <dl><dt><a name="SBCharacter-setVoiceCode"><strong>setVoiceCode</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setVoiceCode">setVoiceCode</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;voice&nbsp;code.&nbsp;For&nbsp;audiofile&nbsp;type,&nbsp;this&nbsp;is&nbsp;a&nbsp;path.</tt></dd></dl>
 
+<dl><dt><a name="SBCharacter-startMotionGraph"><strong>startMotionGraph</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-startMotionGraph">startMotionGraph</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Start&nbsp;running&nbsp;the&nbsp;motion&nbsp;graph&nbsp;given&nbsp;a&nbsp;starting&nbsp;node&nbsp;name</tt></dd></dl>
+
+<dl><dt><a name="SBCharacter-startMotionGraphRandomWalk"><strong>startMotionGraphRandomWalk</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-startMotionGraphRandomWalk">startMotionGraphRandomWalk</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Start&nbsp;running&nbsp;the&nbsp;motion&nbsp;graph&nbsp;from&nbsp;a&nbsp;random&nbsp;node.</tt></dd></dl>
+
+<dl><dt><a name="SBCharacter-startMotionGraphWithPath"><strong>startMotionGraphWithPath</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-startMotionGraphWithPath">startMotionGraphWithPath</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(<a href="#VecArray">VecArray</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Start&nbsp;running&nbsp;the&nbsp;motion&nbsp;graph&nbsp;and&nbsp;synthesize&nbsp;a&nbsp;graph&nbsp;walk&nbsp;based&nbsp;on&nbsp;input&nbsp;path.</tt></dd></dl>
+
 <dl><dt><a name="SBCharacter-startMotionRecord"><strong>startMotionRecord</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-startMotionRecord">startMotionRecord</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Start&nbsp;recording&nbsp;the&nbsp;output&nbsp;motion&nbsp;of&nbsp;this&nbsp;character.</tt></dd></dl>
 
-<dl><dt><a name="SBCharacter-stopMotionRecord"><strong>stopMotionRecord</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-stopMotionRecord">stopMotionRecord</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Stop&nbsp;the&nbsp;recording&nbsp;and&nbsp;output&nbsp;the&nbsp;motion&nbsp;to&nbsp;a&nbsp;.skm&nbsp;file.</tt></dd></dl>
+<dl><dt><a name="SBCharacter-stopMotionRecord"><strong>stopMotionRecord</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-stopMotionRecord">stopMotionRecord</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Stop&nbsp;the&nbsp;recording&nbsp;and&nbsp;output&nbsp;the&nbsp;motion&nbsp;to&nbsp;a&nbsp;file&nbsp;given&nbsp;the&nbsp;type,&nbsp;type&nbsp;can&nbsp;be&nbsp;one&nbsp;of&nbsp;the&nbsp;following:&nbsp;skm,&nbsp;bvh.</tt></dd></dl>
+
+<dl><dt><a name="SBCharacter-updateDefaultFacePose"><strong>updateDefaultFacePose</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-updateDefaultFacePose">updateDefaultFacePose</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Updates&nbsp;the&nbsp;default&nbsp;face&nbsp;pose.</tt></dd></dl>
+
+<dl><dt><a name="SBCharacter-updateFaceDefinition"><strong>updateFaceDefinition</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-updateFaceDefinition">updateFaceDefinition</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Updates&nbsp;the&nbsp;face&nbsp;definition.</tt></dd></dl>
+
+<dl><dt><a name="SBCharacter-writeMotionRecord"><strong>writeMotionRecord</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-writeMotionRecord">writeMotionRecord</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Wrtie&nbsp;the&nbsp;recorded&nbsp;motion&nbsp;to&nbsp;a&nbsp;file&nbsp;given&nbsp;the&nbsp;type,&nbsp;type&nbsp;can&nbsp;be&nbsp;one&nbsp;of&nbsp;the&nbsp;following:&nbsp;skm,&nbsp;bvh.</tt></dd></dl>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 912</dl>
+<dl><dt><strong>__instance_size__</strong> = 920</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBPawn">SBPawn</a>:<br>
@@ -4456,6 +4491,9 @@ Methods defined here:<br>
 <dl><dt><a name="SBDiphoneManager-createDiphone"><strong>createDiphone</strong></a>(...)</dt><dd><tt><a href="#SBDiphoneManager-createDiphone">createDiphone</a>(&nbsp;(<a href="#SBDiphoneManager">SBDiphoneManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(str)arg4)&nbsp;-&gt;&nbsp;<a href="#SBDiphone">SBDiphone</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Create&nbsp;a&nbsp;diphone.</tt></dd></dl>
 
+<dl><dt><a name="SBDiphoneManager-deleteDiphoneSet"><strong>deleteDiphoneSet</strong></a>(...)</dt><dd><tt><a href="#SBDiphoneManager-deleteDiphoneSet">deleteDiphoneSet</a>(&nbsp;(<a href="#SBDiphoneManager">SBDiphoneManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Delete&nbsp;all&nbsp;the&nbsp;diphones&nbsp;given&nbsp;diphone&nbsp;sets.</tt></dd></dl>
+
 <dl><dt><a name="SBDiphoneManager-getDiphone"><strong>getDiphone</strong></a>(...)</dt><dd><tt><a href="#SBDiphoneManager-getDiphone">getDiphone</a>(&nbsp;(<a href="#SBDiphoneManager">SBDiphoneManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(str)arg4)&nbsp;-&gt;&nbsp;<a href="#SBDiphone">SBDiphone</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;diphone&nbsp;given&nbsp;from&nbsp;phoneme,&nbsp;to&nbsp;phoneme&nbsp;and&nbsp;diphone&nbsp;set&nbsp;name.</tt></dd></dl>
 
@@ -4556,7 +4594,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 216</dl>
+<dl><dt><strong>__instance_size__</strong> = 220</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -4666,6 +4704,9 @@ Methods defined here:<br>
 <dl><dt><a name="SBFaceDefinition-setAU"><strong>setAU</strong></a>(...)</dt><dd><tt><a href="#SBFaceDefinition-setAU">setAU</a>(&nbsp;(<a href="#SBFaceDefinition">SBFaceDefinition</a>)arg1,&nbsp;(int)arg2,&nbsp;(str)arg3,&nbsp;(str)arg4)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;Action&nbsp;Unit&nbsp;of&nbsp;a&nbsp;given&nbsp;number&nbsp;to&nbsp;a&nbsp;side&nbsp;and&nbsp;a&nbsp;motion.</tt></dd></dl>
 
+<dl><dt><a name="SBFaceDefinition-setDefaultFacePose"><strong>setDefaultFacePose</strong></a>(...)</dt><dd><tt><a href="#SBFaceDefinition-setDefaultFacePose">setDefaultFacePose</a>(&nbsp;(<a href="#SBFaceDefinition">SBFaceDefinition</a>)arg1,&nbsp;(<a href="#StringVec">StringVec</a>)arg2,&nbsp;(<a href="#FloatVec">FloatVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;default&nbsp;face&nbsp;poses,&nbsp;accepts&nbsp;a&nbsp;vector&nbsp;of&nbsp;face&nbsp;poses&nbsp;and&nbsp;a&nbsp;vector&nbsp;of&nbsp;values.</tt></dd></dl>
+
 <dl><dt><a name="SBFaceDefinition-setFaceNeutral"><strong>setFaceNeutral</strong></a>(...)</dt><dd><tt><a href="#SBFaceDefinition-setFaceNeutral">setFaceNeutral</a>(&nbsp;(<a href="#SBFaceDefinition">SBFaceDefinition</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;neutral&nbsp;face&nbsp;to&nbsp;a&nbsp;particular&nbsp;motion&nbsp;name.</tt></dd></dl>
 
@@ -4674,7 +4715,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 248</dl>
+<dl><dt><strong>__instance_size__</strong> = 280</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -5095,6 +5136,127 @@ Data and other attributes inherited from Boost.Python.instance:<br>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBMesh">class <strong>SBMesh</strong></a>(<a href="SmartBody.html#SBObject">SBObject</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBMesh">SBMesh</a></dd>
+<dd><a href="SmartBody.html#SBObject">SBObject</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBMesh-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBMesh-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None<br>
+&nbsp;<br>
+<a href="#SBMesh-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBMesh-isSkinnedMesh"><strong>isSkinnedMesh</strong></a>(...)</dt><dd><tt><a href="#SBMesh-isSkinnedMesh">isSkinnedMesh</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Whether&nbsp;the&nbsp;current&nbsp;mesh&nbsp;is&nbsp;static&nbsp;or&nbsp;skinned/deformable</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-saveToDmb"><strong>saveToDmb</strong></a>(...)</dt><dd><tt><a href="#SBMesh-saveToDmb">saveToDmb</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Save&nbsp;the&nbsp;dynamic&nbsp;mesh&nbsp;into&nbsp;a&nbsp;binary&nbsp;file&nbsp;with&nbsp;extension&nbsp;.dmb</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-saveToSmb"><strong>saveToSmb</strong></a>(...)</dt><dd><tt><a href="#SBMesh-saveToSmb">saveToSmb</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Save&nbsp;the&nbsp;static&nbsp;mesh&nbsp;into&nbsp;a&nbsp;binary&nbsp;file&nbsp;with&nbsp;extension&nbsp;.smb</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 720</dl>
+
+<hr>
+Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
+<dl><dt><a name="SBMesh-clearAttributes"><strong>clearAttributes</strong></a>(...)</dt><dd><tt><a href="#SBMesh-clearAttributes">clearAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Clear&nbsp;all&nbsp;the&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-createActionAttribute"><strong>createActionAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-createActionAttribute">createActionAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3,&nbsp;(str)arg4,&nbsp;(int)arg5,&nbsp;(object)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(str)arg9)&nbsp;-&gt;&nbsp;<a href="#ActionAttribute">ActionAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;action&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-createBoolAttribute"><strong>createBoolAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-createBoolAttribute">createBoolAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#BoolAttribute">BoolAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;boolean&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-createDoubleAttribute"><strong>createDoubleAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-createDoubleAttribute">createDoubleAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#DoubleAttribute">DoubleAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;double&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-createIntAttribute"><strong>createIntAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-createIntAttribute">createIntAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#IntAttribute">IntAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;an&nbsp;integer&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-createStringAttribute"><strong>createStringAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-createStringAttribute">createStringAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#StringAttribute">StringAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;string&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-createVec3Attribute"><strong>createVec3Attribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-createVec3Attribute">createVec3Attribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5,&nbsp;(object)arg6,&nbsp;(str)arg7,&nbsp;(int)arg8,&nbsp;(object)arg9,&nbsp;(object)arg10,&nbsp;(object)arg11,&nbsp;(str)arg12)&nbsp;-&gt;&nbsp;<a href="#Vec3Attribute">Vec3Attribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;vec3&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-getAttribute"><strong>getAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-getAttribute">getAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBAttribute">SBAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;an&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-getAttributeNames"><strong>getAttributeNames</strong></a>(...)</dt><dd><tt><a href="#SBMesh-getAttributeNames">getAttributeNames</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBMesh-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#SBMesh-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setActionAttribute"><strong>setActionAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setActionAttribute">setActionAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setBool"><strong>setBool</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setBool">setBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setBoolAttribute"><strong>setBoolAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setBoolAttribute">setBoolAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setDouble"><strong>setDouble</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setDouble">setDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setDoubleAttribute"><strong>setDoubleAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setDoubleAttribute">setDoubleAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setInt"><strong>setInt</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setInt">setInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setIntAttribute"><strong>setIntAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setIntAttribute">setIntAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setMatrix"><strong>setMatrix</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setMatrix">setMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrMat">SrMat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setMatrixAttribute"><strong>setMatrixAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setMatrixAttribute">setMatrixAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrMat">SrMat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setString"><strong>setString</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setString">setString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setStringAttribute"><strong>setStringAttribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setStringAttribute">setStringAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setVec3"><strong>setVec3</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setVec3">setVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;vector&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-setVec3Attribute"><strong>setVec3Attribute</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setVec3Attribute">setVec3Attribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;vector&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBMesh-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="SBMotion">class <strong>SBMotion</strong></a>(<a href="SmartBody.html#SBObject">SBObject</a>)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
@@ -5146,6 +5308,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBMotion-disconnect"><strong>disconnect</strong></a>(...)</dt><dd><tt><a href="#SBMotion-disconnect">disconnect</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Disconnect&nbsp;current&nbsp;motion&nbsp;with&nbsp;current&nbsp;skeleton&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBMotion-downsample"><strong>downsample</strong></a>(...)</dt><dd><tt><a href="#SBMotion-downsample">downsample</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Downsample&nbsp;the&nbsp;number&nbsp;of&nbsp;frames&nbsp;by&nbsp;factor&nbsp;N.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-duplicateCycle"><strong>duplicateCycle</strong></a>(...)</dt><dd><tt><a href="#SBMotion-duplicateCycle">duplicateCycle</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(int)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Duplicate&nbsp;motion&nbsp;by&nbsp;x&nbsp;amount&nbsp;of&nbsp;cycles.</tt></dd></dl>
@@ -5279,14 +5444,14 @@ Methods defined here:<br>
 <dl><dt><a name="SBMotion-rotate"><strong>rotate</strong></a>(...)</dt><dd><tt><a href="#SBMotion-rotate">rotate</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(float)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(str)arg5)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Rotates&nbsp;the&nbsp;base&nbsp;joint&nbsp;name&nbsp;by&nbsp;x,y,z&nbsp;axis.</tt></dd></dl>
 
-<dl><dt><a name="SBMotion-saveToSkb"><strong>saveToSkb</strong></a>(...)</dt><dd><tt><a href="#SBMotion-saveToSkb">saveToSkb</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;file&nbsp;in&nbsp;.skb&nbsp;(binary)&nbsp;format&nbsp;to&nbsp;a&nbsp;given&nbsp;file&nbsp;name.</tt></dd></dl>
-
 <dl><dt><a name="SBMotion-saveToSkm"><strong>saveToSkm</strong></a>(...)</dt><dd><tt><a href="#SBMotion-saveToSkm">saveToSkm</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;file&nbsp;in&nbsp;.skm&nbsp;format&nbsp;to&nbsp;a&nbsp;given&nbsp;file&nbsp;name.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-saveToSkmByFrames"><strong>saveToSkmByFrames</strong></a>(...)</dt><dd><tt><a href="#SBMotion-saveToSkmByFrames">saveToSkmByFrames</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3,&nbsp;(int)arg4)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;file&nbsp;in&nbsp;.skm&nbsp;format&nbsp;to&nbsp;a&nbsp;given&nbsp;file&nbsp;name,&nbsp;start&nbsp;and&nbsp;end&nbsp;frame.</tt></dd></dl>
+
+<dl><dt><a name="SBMotion-saveToSkmb"><strong>saveToSkmb</strong></a>(...)</dt><dd><tt><a href="#SBMotion-saveToSkmb">saveToSkmb</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;file&nbsp;in&nbsp;.skmb&nbsp;(binary)&nbsp;format&nbsp;to&nbsp;a&nbsp;given&nbsp;file&nbsp;name.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-scale"><strong>scale</strong></a>(...)</dt><dd><tt><a href="#SBMotion-scale">scale</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Scales&nbsp;all&nbsp;translations&nbsp;in&nbsp;skeleton&nbsp;by&nbsp;scale&nbsp;factor.</tt></dd></dl>
@@ -5454,7 +5619,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 736</dl>
+<dl><dt><strong>__instance_size__</strong> = 760</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -5569,6 +5734,173 @@ Data descriptors inherited from Boost.Python.instance:<br>
 <hr>
 Data and other attributes inherited from Boost.Python.instance:<br>
 <dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBMotionBlendBase-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBMotionGraph">class <strong>SBMotionGraph</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBMotionGraph">SBMotionGraph</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBMotionGraph-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBMotionGraph-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBMotionGraph-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBMotionGraph-addMotionEdge"><strong>addMotionEdge</strong></a>(...)</dt><dd><tt><a href="#SBMotionGraph-addMotionEdge">addMotionEdge</a>(&nbsp;(<a href="#SBMotionGraph">SBMotionGraph</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;<a href="#SBMotionTransitionEdge">SBMotionTransitionEdge</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;motion&nbsp;edge&nbsp;to&nbsp;the&nbsp;motion&nbsp;graph.</tt></dd></dl>
+
+<dl><dt><a name="SBMotionGraph-addMotionNodeFromBlend"><strong>addMotionNodeFromBlend</strong></a>(...)</dt><dd><tt><a href="#SBMotionGraph-addMotionNodeFromBlend">addMotionNodeFromBlend</a>(&nbsp;(<a href="#SBMotionGraph">SBMotionGraph</a>)arg1,&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotionNode">SBMotionNode</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;motion&nbsp;node&nbsp;to&nbsp;the&nbsp;motion&nbsp;graph.</tt></dd></dl>
+
+<dl><dt><a name="SBMotionGraph-buildAutomaticMotionGraph"><strong>buildAutomaticMotionGraph</strong></a>(...)</dt><dd><tt><a href="#SBMotionGraph-buildAutomaticMotionGraph">buildAutomaticMotionGraph</a>(&nbsp;(<a href="#SBMotionGraph">SBMotionGraph</a>)arg1,&nbsp;(<a href="#StringVec">StringVec</a>)arg2,&nbsp;(str)arg3,&nbsp;(<a href="#StringVec">StringVec</a>)arg4)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;build&nbsp;the&nbsp;motion&nbsp;graph&nbsp;automatically&nbsp;from&nbsp;a&nbsp;set&nbsp;of&nbsp;motions.</tt></dd></dl>
+
+<dl><dt><a name="SBMotionGraph-getMotionEdge"><strong>getMotionEdge</strong></a>(...)</dt><dd><tt><a href="#SBMotionGraph-getMotionEdge">getMotionEdge</a>(&nbsp;(<a href="#SBMotionGraph">SBMotionGraph</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;<a href="#SBMotionTransitionEdge">SBMotionTransitionEdge</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;get&nbsp;the&nbsp;motion&nbsp;edge&nbsp;based&nbsp;on&nbsp;its&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBMotionGraph-getMotionNode"><strong>getMotionNode</strong></a>(...)</dt><dd><tt><a href="#SBMotionGraph-getMotionNode">getMotionNode</a>(&nbsp;(<a href="#SBMotionGraph">SBMotionGraph</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotionNode">SBMotionNode</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;get&nbsp;the&nbsp;motion&nbsp;node&nbsp;based&nbsp;on&nbsp;its&nbsp;name.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 108</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBMotionGraph-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBMotionGraphManager">class <strong>SBMotionGraphManager</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBMotionGraphManager">SBMotionGraphManager</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBMotionGraphManager-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBMotionGraphManager-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBMotionGraphManager-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBMotionGraphManager-createMotionGraph"><strong>createMotionGraph</strong></a>(...)</dt><dd><tt><a href="#SBMotionGraphManager-createMotionGraph">createMotionGraph</a>(&nbsp;(<a href="#SBMotionGraphManager">SBMotionGraphManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotionGraph">SBMotionGraph</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Create&nbsp;a&nbsp;motion&nbsp;graph.</tt></dd></dl>
+
+<dl><dt><a name="SBMotionGraphManager-getMotionGraph"><strong>getMotionGraph</strong></a>(...)</dt><dd><tt><a href="#SBMotionGraphManager-getMotionGraph">getMotionGraph</a>(&nbsp;(<a href="#SBMotionGraphManager">SBMotionGraphManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotionGraph">SBMotionGraph</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;motion&nbsp;graph&nbsp;based&nbsp;on&nbsp;its&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBMotionGraphManager-getMotionGraphNames"><strong>getMotionGraphNames</strong></a>(...)</dt><dd><tt><a href="#SBMotionGraphManager-getMotionGraphNames">getMotionGraphNames</a>(&nbsp;(<a href="#SBMotionGraphManager">SBMotionGraphManager</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;names&nbsp;of&nbsp;all&nbsp;motion&nbsp;graphs.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 24</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBMotionGraphManager-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBMotionNode">class <strong>SBMotionNode</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBMotionNode">SBMotionNode</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBMotionNode-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBMotionNode-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBMotionNode-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBMotionNode-getAnimBlend"><strong>getAnimBlend</strong></a>(...)</dt><dd><tt><a href="#SBMotionNode-getAnimBlend">getAnimBlend</a>(&nbsp;(<a href="#SBMotionNode">SBMotionNode</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBAnimationBlend">SBAnimationBlend</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;animation&nbsp;blend&nbsp;associated&nbsp;with&nbsp;this&nbsp;node.</tt></dd></dl>
+
+<dl><dt><a name="SBMotionNode-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBMotionNode-getName">getName</a>(&nbsp;(<a href="#SBMotionNode">SBMotionNode</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;node&nbsp;name.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 140</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBMotionNode-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBMotionTransitionEdge">class <strong>SBMotionTransitionEdge</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBMotionTransitionEdge">SBMotionTransitionEdge</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBMotionTransitionEdge-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBMotionTransitionEdge-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBMotionTransitionEdge-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBMotionTransitionEdge-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBMotionTransitionEdge-getName">getName</a>(&nbsp;(<a href="#SBMotionTransitionEdge">SBMotionTransitionEdge</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;transition&nbsp;edge&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBMotionTransitionEdge-getSrcNode"><strong>getSrcNode</strong></a>(...)</dt><dd><tt><a href="#SBMotionTransitionEdge-getSrcNode">getSrcNode</a>(&nbsp;(<a href="#SBMotionTransitionEdge">SBMotionTransitionEdge</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBMotionNode">SBMotionNode</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;source&nbsp;motion&nbsp;node.</tt></dd></dl>
+
+<dl><dt><a name="SBMotionTransitionEdge-getTgtNode"><strong>getTgtNode</strong></a>(...)</dt><dd><tt><a href="#SBMotionTransitionEdge-getTgtNode">getTgtNode</a>(&nbsp;(<a href="#SBMotionTransitionEdge">SBMotionTransitionEdge</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBMotionNode">SBMotionNode</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;target&nbsp;motion&nbsp;node.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 32</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBMotionTransitionEdge-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -6495,7 +6827,7 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-exportCharacter"><strong>exportCharacter</strong></a>(...)</dt><dd><tt><a href="#SBScene-exportCharacter">exportCharacter</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;character's&nbsp;skeleton,&nbsp;skinned&nbsp;mesh&nbsp;and&nbsp;all&nbsp;other&nbsp;assets&nbsp;into&nbsp;a&nbsp;given&nbsp;folder&nbsp;in&nbsp;Collada&nbsp;format.</tt></dd></dl>
 
-<dl><dt><a name="SBScene-exportScene"><strong>exportScene</strong></a>(...)</dt><dd><tt><a href="#SBScene-exportScene">exportScene</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#StringVec">StringVec</a>)arg2,&nbsp;(object)arg3)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+<dl><dt><a name="SBScene-exportScene"><strong>exportScene</strong></a>(...)</dt><dd><tt><a href="#SBScene-exportScene">exportScene</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(<a href="#StringVec">StringVec</a>)arg2,&nbsp;(str)arg3,&nbsp;(object)arg4)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;entire&nbsp;SmartBody&nbsp;configuration,&nbsp;including&nbsp;assets&nbsp;paths&nbsp;as&nbsp;a&nbsp;python&nbsp;script&nbsp;into&nbsp;a&nbsp;given&nbsp;file&nbsp;location.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-exportScenePackage"><strong>exportScenePackage</strong></a>(...)</dt><dd><tt><a href="#SBScene-exportScenePackage">exportScenePackage</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
@@ -6575,11 +6907,17 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-getMotion"><strong>getMotion</strong></a>(...)</dt><dd><tt><a href="#SBScene-getMotion">getMotion</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;a&nbsp;the&nbsp;motion&nbsp;of&nbsp;given&nbsp;name.</tt></dd></dl>
 
+<dl><dt><a name="SBScene-getMotionGraphManager"><strong>getMotionGraphManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getMotionGraphManager">getMotionGraphManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBMotionGraphManager">SBMotionGraphManager</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;motion&nbsp;graph&nbsp;manager.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-getMotionNames"><strong>getMotionNames</strong></a>(...)</dt><dd><tt><a href="#SBScene-getMotionNames">getMotionNames</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;names&nbsp;of&nbsp;motions&nbsp;available.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getNavigationMesh"><strong>getNavigationMesh</strong></a>(...)</dt><dd><tt><a href="#SBScene-getNavigationMesh">getNavigationMesh</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBNavigationMesh">SBNavigationMesh</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;navigation&nbsp;mesh&nbsp;in&nbsp;the&nbsp;scene</tt></dd></dl>
+
+<dl><dt><a name="SBScene-getNavigationMeshManager"><strong>getNavigationMeshManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getNavigationMeshManager">getNavigationMeshManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBNavigationMeshManager">SBNavigationMeshManager</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;navigation&nbsp;mesh&nbsp;manager.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getNumCameras"><strong>getNumCameras</strong></a>(...)</dt><dd><tt><a href="#SBScene-getNumCameras">getNumCameras</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;cameras&nbsp;available.</tt></dd></dl>
@@ -6796,7 +7134,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 572</dl>
+<dl><dt><strong>__instance_size__</strong> = 576</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -7327,6 +7665,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBSkeleton-save"><strong>save</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-save">save</a>(&nbsp;(<a href="#SBSkeleton">SBSkeleton</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;skeleton&nbsp;definition&nbsp;with&nbsp;the&nbsp;given&nbsp;skeleton&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBSkeleton-update"><strong>update</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-update">update</a>(&nbsp;(<a href="#SBSkeleton">SBSkeleton</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;channels&nbsp;from&nbsp;the&nbsp;joints.&nbsp;Used&nbsp;after&nbsp;all&nbsp;the&nbsp;joints&nbsp;have&nbsp;been&nbsp;created.</tt></dd></dl>
 
 <hr>
 Data and other attributes defined here:<br>
