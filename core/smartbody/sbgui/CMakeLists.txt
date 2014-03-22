@@ -220,7 +220,7 @@ set( SBM_FLTK_SRC
 	./src/flu/Flu_Collapsable_Group.cpp
 	./src/flu/FluSimpleString.cpp
 	
-	./src/pythonbind/SBPythonAutoRig.cpp
+	./src/pythonbind/SBPythonAutorig.cpp
 )
 
 add_executable( sbgui
