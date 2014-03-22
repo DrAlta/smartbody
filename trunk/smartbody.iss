@@ -11,7 +11,7 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r5498
+AppVersion=r5523
 OutputBaseFilename=SmartBody
 WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
@@ -144,7 +144,7 @@ Name: "{group}\SmartBody Manual"; Filename: "{app}\SmartBodyManual.pdf"; Working
 Name: "{group}\SmartBody Python API"; Filename: "{app}\SmartBodyPythonAPI.html"; WorkingDir: "{app}"
 
 [Run]
-Filename: {app}\vcredist_x86.exe; Description: "Visual Studio 2010 Redistributable"; Parameters: "/q:a /c:""install /l """; WorkingDir: {tmp}; Flags: postinstall runascurrentuser ; StatusMsg: "Installing ""Microsoft Visual C++ 2010 Redistributable Package"" if needed. This can take several minutes..."
+Filename: {app}\vcredist_x86.exe; Description: "Visual Studio 2010 Redistributable"; Parameters: "/q:a /c:""install /l """; WorkingDir: {tmp}; Flags: postinstall runascurrentuser ; StatusMsg: "Installing ""Microsoft Visual C++ 2010 sp1 Redistributable Package"" if needed. This can take several minutes..."
 Filename: {app}\bin\sbgui.exe ; Flags: postinstall ; Description: "Run SmartBody"
 
 
