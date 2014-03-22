@@ -98,7 +98,7 @@ bool SBAutoRigManager::buildAutoRiggingFromPawnMesh( const std::string& pawnName
 
 bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
-#ifdef USE_AUTO_RIGGING
+#if USE_AUTO_RIGGING
 	int voxelSize = 150;
 	VoxelizerWindow* voxelWindow = new VoxelizerWindow(0,0,voxelSize,voxelSize,"voxelWindow");
 	voxelWindow->initVoxelizer(&inModel,voxelSize);
@@ -209,7 +209,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inMo
 
 bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
-#ifdef USE_AUTO_RIGGING
+#if USE_AUTO_RIGGING
 	int voxelSize = 150;
 	VoxelizerWindow* voxelWindow = new VoxelizerWindow(0,0,voxelSize,voxelSize,"voxelWindow");
 	voxelWindow->initVoxelizer(&inModel,voxelSize);
@@ -279,7 +279,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 
 bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
-#ifdef USE_AUTO_RIGGING
+#if USE_AUTO_RIGGING
 	Mesh m;
 	//Skeleton sk = HumanSkeleton(); // default human skeleton from Pinocchio. Should define our own custom skeleton to account for gaze and other behavior
 	Skeleton sk = SmartBodySkeleton();
@@ -318,7 +318,7 @@ bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName
 }
 
 
-#ifdef USE_AUTO_RIGGING
+#if USE_AUTO_RIGGING
 
 typedef PolyVox::SimpleVolume<uint8_t> IntVolume; 
 typedef PolyVox::SimpleVolume<float> FloatVolume;
