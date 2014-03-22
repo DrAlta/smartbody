@@ -214,6 +214,8 @@ set( SBM_FLTK_SRC
 	./flu/Flu_Button.cpp
 	./flu/Flu_Collapsable_Group.cpp
 	./flu/FluSimpleString.cpp
+	
+	./pythonbind/SBPythonAutoRig.cpp
 )
 
 add_executable( sbgui
