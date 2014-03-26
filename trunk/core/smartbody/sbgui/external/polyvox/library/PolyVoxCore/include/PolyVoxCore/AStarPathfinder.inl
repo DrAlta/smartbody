@@ -78,7 +78,7 @@ namespace PolyVox
 
 		openNodes.insert(startNode);
 
-		float fDistStartToEnd = (endNode->position - startNode->position).length();
+		float fDistStartToEnd = (float)((endNode->position - startNode->position).length());
 		m_fProgress = 0.0f;
 		if(m_params.progressCallback)
 		{
@@ -96,7 +96,7 @@ namespace PolyVox
 			if(m_params.progressCallback)
 			{
 				const float fMinProgresIncreament = 0.001f;
-				float fDistCurrentToEnd = (endNode->position - current->position).length();
+				float fDistCurrentToEnd = (float)((endNode->position - current->position).length());
 				float fDistNormalised = fDistCurrentToEnd / fDistStartToEnd;
 				float fProgress = 1.0f - fDistNormalised;
 				if(fProgress >= m_fProgress + fMinProgresIncreament)
