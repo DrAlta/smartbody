@@ -49,7 +49,7 @@ static int vertex_color_cb(p_ply_argument argument) {
 	if (idx == 0)
 		model->Vc.push();
 	double argumentValue = ply_get_argument_value(argument);
-	model->Vc.top()[idx] = (float) argumentValue/255.0;	
+	model->Vc.top()[idx] = (float) argumentValue/255.0f;	
 	return 1;
 }
 
