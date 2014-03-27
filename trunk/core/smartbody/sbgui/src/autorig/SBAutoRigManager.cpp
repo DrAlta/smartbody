@@ -344,7 +344,7 @@ void buildVoxelDistanceMap(SmartBody::SBJoint* joint, VoxelizerWindow& voxelWind
 	SrVec pos1 = joint->getMatrixGlobal().get_translation();
 	if (!centerOnly)
 	{
-		for (unsigned int i=0;i<joint->getNumChildren();i++)
+		for (int i=0;i<joint->getNumChildren();i++)
 		{		
 			SrVec pos2 = joint->getChild(i)->getMatrixGlobal().get_translation();
 			std::vector<SrVec3i> boneLineSeg = voxelWindow.rasterizeVoxelLine(pos1,pos2);
@@ -410,7 +410,7 @@ void normalizeBoneWeights( std::vector<std::map<int,float> > &vtxBoneWeights )
 {
 	std::map<int,float>::iterator mi;
 	// normalized weight first
-	for (int i=0;i<vtxBoneWeights.size();i++)
+	for (size_t i=0;i<vtxBoneWeights.size();i++)
 	{
 		std::map<int,float>& vtxWeight = vtxBoneWeights[i];
 		float weightSum = 0.f;
@@ -495,7 +495,7 @@ void boneWeightInPainting(std::vector<std::map<int,float> >& vtxBoneWeights, std
 		{
 			int nidx = *ni;
 			SrVec adjPos = m.V[nidx];
-			float vtxWeight = 1.f/((vPos-adjPos).norm()+1e-10);
+			float vtxWeight = 1.f/((vPos-adjPos).norm()+1e-10f);
 			mapNeighbor[nidx] = vtxWeight;
 			weightSum += vtxWeight;
 		}
@@ -543,7 +543,7 @@ void boneWeightInPainting(std::vector<std::map<int,float> >& vtxBoneWeights, std
 	if(Ainv == NULL)
 		return;
 
-	for(int j = 0; j < boneIdxs.size(); ++j) {
+	for(size_t j = 0; j < boneIdxs.size(); ++j) {
 		vector<double> rhs(validVtxMap.size(), 0.);		
 		int boneIdx = boneIdxs[j];
 		for ( vi  = validVtxMap.begin();
@@ -569,7 +569,7 @@ void boneWeightInPainting(std::vector<std::map<int,float> >& vtxBoneWeights, std
 			int ncol = vi->second;
 			//if (rhs[i] > 1.f)
 			//	rhs[i] = 1.f;
-			vtxBoneWeights[vidx][boneIdx] = rhs[ncol];			
+			vtxBoneWeights[vidx][boneIdx] = (float)rhs[ncol];			
 		}
 	}
 
@@ -635,7 +635,7 @@ void boneWeightLaplacianSmoothing(std::vector<std::map<int,float> >& vtxBoneWeig
 		{
 			int nidx = *ni;
 			SrVec adjPos = m.V[nidx];
-			float vtxWeight = 1.f/((vPos-adjPos).norm()+1e-10);
+			float vtxWeight = 1.f/((vPos-adjPos).norm()+1e-10f);
 			mapNeighbor[nidx] = vtxWeight;
 			weightSum += vtxWeight;
 		}
@@ -655,7 +655,7 @@ void boneWeightLaplacianSmoothing(std::vector<std::map<int,float> >& vtxBoneWeig
 	for (int iter=0;iter<smoothIteration;iter++)
 	{
 		LOG("Smooth Iteration = %d",iter);
-		for (int ibone = 0; ibone < boneIdxs.size(); ibone++)
+		for (size_t ibone = 0; ibone < boneIdxs.size(); ibone++)
 		{
 			int boneIdx = boneIdxs[ibone];
 			for (unsigned int i=0;i<tempBoneWeights.size();i++)
@@ -747,7 +747,7 @@ void boneWeightHarmonicSmoothing(std::vector<std::map<int,float> >& vtxBoneWeigh
 		{
 			int nidx = *ni;
 			SrVec adjPos = m.V[nidx];
-			float vtxWeight = 1.f/((vPos-adjPos).norm()+1e-10);
+			float vtxWeight = 1.f/((vPos-adjPos).norm()+1e-10f);
 			mapNeighbor[nidx] = vtxWeight;
 			weightSum += vtxWeight;
 		}
@@ -792,7 +792,7 @@ void boneWeightHarmonicSmoothing(std::vector<std::map<int,float> >& vtxBoneWeigh
 	if(Ainv == NULL)
 		return;
 
-	for(int j = 0; j < boneIdxs.size(); ++j) {
+	for(size_t j = 0; j < boneIdxs.size(); ++j) {
 		vector<double> rhs(nv, 0.);		
 		int boneIdx = boneIdxs[j];
 		for(int i = 0; i < nv; ++i) {
@@ -808,7 +808,7 @@ void boneWeightHarmonicSmoothing(std::vector<std::map<int,float> >& vtxBoneWeigh
 		for(int i = 0; i < nv; ++i) {
 			//if (rhs[i] > 1.f)
 			//	rhs[i] = 1.f;
-			 vtxBoneWeights[i][boneIdx] = rhs[i];			
+			 vtxBoneWeights[i][boneIdx] = (float)rhs[i];			
 		}
 	}
 
@@ -843,8 +843,8 @@ void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, Voxelizer
 		if (voxelVtxMap.find(voxID) == voxelVtxMap.end())
 		{
 			voxelVtxMap[voxID] = std::vector<int>();
-			voxClosestBoneMap[voxID] = std::pair<int,float>(-1,1e30);
-			voxClosestBoneMap[voxID] = std::pair<int,float>(-1,1e30);
+			voxClosestBoneMap[voxID] = std::pair<int,float>(-1,1e30f);
+			voxClosestBoneMap[voxID] = std::pair<int,float>(-1,1e30f);
 		}
 		voxelVtxMap[voxID].push_back(i);		
 	}

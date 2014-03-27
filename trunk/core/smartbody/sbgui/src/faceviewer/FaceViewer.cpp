@@ -243,7 +243,7 @@ void FaceViewer::DefaultFaceCB(Fl_Widget* widget, void* data)
 			{
 				std::string name = slider->label();
 				defaultFacePoses.push_back(name);
-				defaultFaceValues.push_back(slider->value());
+				defaultFaceValues.push_back((float)slider->value());
 
 			}
 
