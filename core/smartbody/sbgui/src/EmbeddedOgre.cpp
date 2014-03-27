@@ -616,7 +616,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		if (opt != configMap.end())
 		{
 			Ogre::ConfigOption& option = (*opt).second;
-			for (int x = 0; x < option.possibleValues.size(); x++)
+			for (size_t x = 0; x < option.possibleValues.size(); x++)
 			{
 				lastFSAAVal = option.possibleValues[x];
 			}

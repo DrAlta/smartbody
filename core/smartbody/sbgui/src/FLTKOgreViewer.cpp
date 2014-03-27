@@ -538,7 +538,7 @@ void FLTKOgreWindow::notify(SmartBody::SBSubject* subject)
 					// modify the scale of the plane mesh. Can this be done?
 					// ...
 					// ...
-				} catch ( Ogre::Exception& e) {
+				} catch ( Ogre::Exception&) {
 				}
 
 			}
@@ -558,7 +558,7 @@ void FLTKOgreWindow::updateOptions()
 		Ogre::MaterialPtr mat = pPlaneEnt->getSubEntity(0)->getMaterial();
 		mat->setDiffuse(Ogre::ColourValue(_data->floorColor.r / 255.0f, _data->floorColor.g / 255.0f, _data->floorColor.b / 255.0f));
 		pPlaneEnt->setVisible(_data->showFloor);
-	} catch ( Ogre::Exception& e) {
+	} catch ( Ogre::Exception&) {
 	}
 
 	Ogre::SceneManager* sceneMgr = ogreInterface->getSceneManager();
