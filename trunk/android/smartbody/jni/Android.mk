@@ -502,7 +502,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonSkeleton.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonSystem.cpp \
 	$(SBM_MY_DIR)/sb/SBPythonClass.cpp \
-	$(SBM_MY_DIR)/sb/SBPythonMesh.cpp \
 	$(SBM_MY_DIR)/sb/SBSimulationManager.cpp \
 	$(SBM_MY_DIR)/sb/SBBmlProcessor.cpp \
 	$(SBM_MY_DIR)/sb/SBAnimationState.cpp \
@@ -573,7 +572,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
     $(SBM_MY_DIR)/sb/smartbody-c-dll.cpp \
 	$(SBM_MY_DIR)/protocols/sbmesh.pb.cc \
 	$(SBM_MY_DIR)/protocols/sbmotion.pb.cc \
-	$(SBM_MY_DIR)/protocols/sbmesh.pb.cc \
 	$(SBM_MY_DIR)/protocols/sbutilities.pb.cc
 
 
