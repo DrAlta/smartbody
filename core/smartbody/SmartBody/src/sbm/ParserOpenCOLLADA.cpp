@@ -3167,7 +3167,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
 		
 		// Note : this is a hack to support vertex color in Collada parsing, I don't think this is standard practice ... 
 		std::string colorID = modelName + "-colors";
-		std::string colorArrayID = positionID+"-array";
+		std::string colorArrayID = colorID+"-array";
 
 		{
 			fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",colorID.c_str(),colorID.c_str());
@@ -3180,6 +3180,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
 			fprintf(fp,"<param name=\"R\" type=\"float\"/>\n");
 			fprintf(fp,"<param name=\"G\" type=\"float\"/>\n");
 			fprintf(fp,"<param name=\"B\" type=\"float\"/>\n");
+			//fprintf(fp,"<param name=\"A\" type=\"float\"/>\n");
 			fprintf(fp,"</accessor>\n");
 			fprintf(fp,"</technique_common>\n");
 			fprintf(fp,"</source>\n");
@@ -3219,9 +3220,10 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
 			  mi++)
 		{
 			matName = mi->first;
+			std::string matID = matName+"_SG";
 			std::vector<int>& mtlFaces = mi->second;
 			int offset = 0;
-			fprintf(fp,"<triangles material=\"%s\" count=\"%d\">\n",matName.c_str(),mtlFaces.size());
+			fprintf(fp,"<triangles material=\"%s\" count=\"%d\">\n",matID.c_str(),mtlFaces.size());
 			fprintf(fp,"<input semantic=\"VERTEX\" source=\"#%s\" offset=\"%d\"/>\n",vertexID.c_str(),offset++);
 			if (hasNormal)
 			{
@@ -3374,7 +3376,7 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 	// write-out instance of skinned mesh, if it exists
 	if (defMesh)
 	{
-		fprintf(fp,"<node id=\"SkinnedMesh\" name=\"SkinnedMesh\" type=\"NODE\">\n");
+		//fprintf(fp,"<node id=\"SkinnedMesh\" name=\"SkinnedMesh\" type=\"NODE\">\n");
 		std::string rootJointName = rootJoint->getName();
 		for (unsigned int i=0;i<defMesh->skinWeights.size();i++)
 		{
@@ -3401,7 +3403,7 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 			fprintf(fp,"</instance_controller>\n");
 			fprintf(fp,"</node>\n");
 		}
-		fprintf(fp,"</node>\n");
+		//fprintf(fp,"</node>\n");
 	}
 
 	fprintf(fp,"</visual_scene>\n");
