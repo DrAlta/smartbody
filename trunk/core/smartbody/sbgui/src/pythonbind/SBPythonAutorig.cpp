@@ -22,7 +22,7 @@
 
 #ifndef SB_NO_PYTHON
 
-void setPawnMesh(const std::string& pawnName, const std::string& meshName)
+void setPawnMesh(const std::string& pawnName, const std::string& meshName, float meshScale)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBAssetManager* assetManager = scene->getAssetManager();
@@ -43,6 +43,7 @@ void setPawnMesh(const std::string& pawnName, const std::string& meshName)
 		meshInsance->setDeformableMesh(mesh);
 		//meshInsance->setSkeleton(pawn->getSkeleton());	
 		meshInsance->setPawn(pawn);
+		meshInsance->setMeshScale(meshScale);
 	}
 }
 
