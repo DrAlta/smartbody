@@ -53,13 +53,6 @@ SBAPI SBJoint* SBSkeleton::createJoint(const std::string& name, SBJoint* parent)
 		joint->pos()->value(0, 0);
 		joint->pos()->value(1, 0);
 		joint->pos()->value(2, 0);
-		joint->euler()->activate();
-		joint->euler()->limits(0, false);
-		joint->euler()->limits(1, false);
-		joint->euler()->limits(2, false);
-		joint->euler()->value(0, 0);
-		joint->euler()->value(1, 0);
-		joint->euler()->value(2, 0);
 	}
 	else
 	{
