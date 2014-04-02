@@ -773,6 +773,10 @@
 		AAD45E3C17A98E5D005905B2 /* sr_viewer.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45B0D17A98E5C005905B2 /* sr_viewer.h */; };
 		C44B488618EB78F6007E8081 /* SBMotionGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C44B488418EB78F6007E8081 /* SBMotionGraph.cpp */; };
 		C44B488718EB78F6007E8081 /* SBMotionGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = C44B488518EB78F6007E8081 /* SBMotionGraph.h */; };
+		C44B488A18EB9BED007E8081 /* me_ct_motion_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C44B488818EB9BED007E8081 /* me_ct_motion_graph.cpp */; };
+		C44B488B18EB9BED007E8081 /* me_ct_motion_graph.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C44B488918EB9BED007E8081 /* me_ct_motion_graph.hpp */; };
+		C44B488E18EB9C24007E8081 /* SBAssetHandlerPly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C44B488C18EB9C24007E8081 /* SBAssetHandlerPly.cpp */; };
+		C44B488F18EB9C24007E8081 /* SBAssetHandlerPly.h in Headers */ = {isa = PBXBuildFile; fileRef = C44B488D18EB9C24007E8081 /* SBAssetHandlerPly.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1547,6 +1551,10 @@
 		AAD45B0D17A98E5C005905B2 /* sr_viewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_viewer.h; sourceTree = "<group>"; };
 		C44B488418EB78F6007E8081 /* SBMotionGraph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBMotionGraph.cpp; sourceTree = "<group>"; };
 		C44B488518EB78F6007E8081 /* SBMotionGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBMotionGraph.h; sourceTree = "<group>"; };
+		C44B488818EB9BED007E8081 /* me_ct_motion_graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_motion_graph.cpp; sourceTree = "<group>"; };
+		C44B488918EB9BED007E8081 /* me_ct_motion_graph.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_motion_graph.hpp; sourceTree = "<group>"; };
+		C44B488C18EB9C24007E8081 /* SBAssetHandlerPly.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerPly.cpp; sourceTree = "<group>"; };
+		C44B488D18EB9C24007E8081 /* SBAssetHandlerPly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerPly.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1701,6 +1709,8 @@
 		AAD4580417A98E5B005905B2 /* controllers */ = {
 			isa = PBXGroup;
 			children = (
+				C44B488818EB9BED007E8081 /* me_ct_motion_graph.cpp */,
+				C44B488918EB9BED007E8081 /* me_ct_motion_graph.hpp */,
 				AA93021317E02E3000958769 /* me_ct_pose_postprocessing.cpp */,
 				AA93021417E02E3000958769 /* me_ct_pose_postprocessing.hpp */,
 				AAD4580517A98E5B005905B2 /* me_blend_cover.h */,
@@ -2050,6 +2060,8 @@
 		AAD4595E17A98E5B005905B2 /* sb */ = {
 			isa = PBXGroup;
 			children = (
+				C44B488C18EB9C24007E8081 /* SBAssetHandlerPly.cpp */,
+				C44B488D18EB9C24007E8081 /* SBAssetHandlerPly.h */,
 				C44B488418EB78F6007E8081 /* SBMotionGraph.cpp */,
 				C44B488518EB78F6007E8081 /* SBMotionGraph.h */,
 				AA0AA8B8185154490061EE9A /* SBAssetHandlerBvh.cpp */,
@@ -2910,6 +2922,8 @@
 				AA0AA8B018512DD10061EE9A /* sbutilities.pb.h in Headers */,
 				AA0AA8BB185154490061EE9A /* SBAssetHandlerBvh.h in Headers */,
 				C44B488718EB78F6007E8081 /* SBMotionGraph.h in Headers */,
+				C44B488B18EB9BED007E8081 /* me_ct_motion_graph.hpp in Headers */,
+				C44B488F18EB9C24007E8081 /* SBAssetHandlerPly.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3354,6 +3368,8 @@
 				AA0AA8B2185144190061EE9A /* ParserASFAMC.cxx in Sources */,
 				AA0AA8BA185154490061EE9A /* SBAssetHandlerBvh.cpp in Sources */,
 				C44B488618EB78F6007E8081 /* SBMotionGraph.cpp in Sources */,
+				C44B488A18EB9BED007E8081 /* me_ct_motion_graph.cpp in Sources */,
+				C44B488E18EB9C24007E8081 /* SBAssetHandlerPly.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
