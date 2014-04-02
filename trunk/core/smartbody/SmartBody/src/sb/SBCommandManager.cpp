@@ -549,7 +549,7 @@ int SBCommandManager::mcu_set_func( srArgBuffer& args, SmartBody::SBCommandManag
     int result = SmartBody::SBScene::getScene()->getCommandManager()->set_cmd_map.execute( arg, args, SmartBody::SBScene::getScene()->getCommandManager() );
 	if( result == CMD_NOT_FOUND ) {
 		// TODO: Differentiate between not finding this var and subargs
-		LOG("SBM ERR: Unknown Variable, Cannot set: '%s'\n> ", arg );  // Clarify this as a set command error
+		LOG("SmartBody error: Unknown Variable, Cannot set: '%s'\n> ", arg );  // Clarify this as a set command error
 		return CMD_SUCCESS; // Avoid multiple error messages
 	} else {
 		return result;
@@ -566,7 +566,7 @@ int SBCommandManager::mcu_print_func( srArgBuffer& args, SmartBody::SBCommandMan
     int result = SmartBody::SBScene::getScene()->getCommandManager()->print_cmd_map.execute( arg, args, SmartBody::SBScene::getScene()->getCommandManager() );
 	if( result == CMD_NOT_FOUND ) {
 		// TODO: Differentiate between not finding this var and subargs
-		LOG("SBM ERR: Print command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a print command error
+		LOG("SmartBody error: Print command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a print command error
 		return CMD_SUCCESS; // Avoid multiple error messages
 	} else {
 		return result;
@@ -582,7 +582,7 @@ int SBCommandManager::mcu_test_func( srArgBuffer& args, SmartBody::SBCommandMana
     char* arg = args.read_token();
     int result = SmartBody::SBScene::getScene()->getCommandManager()->test_cmd_map.execute( arg, args, SmartBody::SBScene::getScene()->getCommandManager() );
 	if( result == CMD_NOT_FOUND ) {
-		LOG("SBM ERR: Test command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a test command error
+		LOG("SmartBody error: Test command NOT FOUND: '%s'\n> ", arg );  // Clarify this as a test command error
 		return CMD_SUCCESS; // Avoid multiple error messages
 	} else {
 		return result;

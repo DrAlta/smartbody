@@ -22,6 +22,7 @@ class TransparentListener : public SmartBody::SBSceneListener, public SmartBody:
 	  virtual void OnChannel( const std::string & name, const std::string & channelName, const float value);
 	  virtual void OnReset();
 	  virtual void OnLogMessage(const std::string& message);
+	  virtual void OnSimulationUpdate();
 
 	  virtual void notify(SmartBody::SBSubject* subject);
 };

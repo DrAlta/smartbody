@@ -8,8 +8,9 @@
 #include "TransparentViewer.h"
 #include <sbm/GPU/SbmShader.h>
 #include <sbm/GPU/SbmShader.h>
-#include <sbm\sbm_deformable_mesh.h>
-
+#include <sbm/sbm_deformable_mesh.h>
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
+#include <sr/sr_gl_render_funcs.h>
 
 TransparencyRenders::TransparencyRenders(TransparentViewer* viewer)
 {
@@ -127,14 +128,58 @@ void TransparencyRenders::drawCharacters(bool shadowPass)
 		SmartBody::SBCharacter* cur =  scene->getCharacter(*iter);
 		if(cur->dMeshInstance_p)
 		{
-			//cur->dMeshInstance_p->update();
 			cur->dMeshInstance_p->setVisibility(true);
 			cur->dMeshInstance_p->update();
-			cur->scene_p->set_visibility(0,0,0,0);			
-// 			if (SbmDeformableMeshGPU::useGPUDeformableMesh)
-// 				cur->dMeshInstance_p->setVisibility(false);
-// 			else
-			//cur->dMeshInstance_p->setVisibility(true);
+			cur->scene_p->set_visibility(0,0,0,0);
+			std::string display = cur->getStringAttribute("displayType");
+			if (display == "GPUmesh")
+			{
+				cur->dMeshInstance_p->setVisibility(false);
+			}
+			else if (display == "mesh")
+			{
+				DeformableMeshInstance* meshInstance = cur->getActiveMesh();
+				if(meshInstance)
+				{
+					//pawn->dMesh_p->update();
+					if (!meshInstance->isStaticMesh()) // is skinned mesh
+					{
+		#if 0
+						bool useBlendShape = false;
+						SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*> (pawn);
+						if (character)
+						{
+							useBlendShape = character->getBoolAttribute("blendshape");
+						}
+						if (useBlendShape && meshInstance->getDeformableMesh())
+						{
+							//character->dMesh_p->blendShapes();
+							meshInstance->getDeformableMesh()->blendShapes();
+							//character->dMeshInstance_p->setDeformableMesh(character->dMesh_p);
+						}
+		#endif
+						meshInstance->update();
+						//meshInstance->updateFast();
+						if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && meshInstance->getVisibility() == 1) || meshInstance->getVisibility() == 2)
+						{
+							bool showSkinWeight = (meshInstance->getVisibility() == 2);
+							SrGlRenderFuncs::renderDeformableMesh(meshInstance, showSkinWeight);
+							//				if (pawn->scene_p)
+							//				pawn->scene_p->set_visibility(0,1,0,0);
+							//_data->render_action.apply(character->scene_p);
+						}
+					}
+					else
+					{
+						//meshInstance->blendShapes();
+						meshInstance->blendShapeStaticMesh();
+
+						// simply draw the static mesh
+						SrGlRenderFuncs::renderDeformableMesh(meshInstance, false);
+					}
+				}
+			}
+			cur->dMeshInstance_p->setVisibility(true);
 		}
 	}
 
@@ -171,8 +216,9 @@ void TransparencyRenders::drawCharacters(bool shadowPass)
 		_viewer->_data.render_action.apply ( _viewer->_data.root );
 	}	
 
-	/*
-	for (std::vector<std::string>::iterator iter = names.begin();
+	
+	/* draw the skeleton
+	for (std::vector<std::string>::const_iterator iter = names.begin();
 		 iter != names.end();
 		 iter++)
 	{
@@ -197,5 +243,6 @@ void TransparencyRenders::drawCharacters(bool shadowPass)
 		
 	}
 	*/
+	
 	
 }

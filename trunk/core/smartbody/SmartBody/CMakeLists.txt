@@ -67,12 +67,19 @@ set( MORE_LIBS
 	${FESTIVAL_LIBS}
 )
 else()
+if (DEFINED ${FLASCC_ROOT})
+set( MORE_LIBS
+	rt
+	)
+
+else()
 set( MORE_LIBS
 	${LIBSNDFILE}
 	${ALUT}
 	${OPENAL}
 	rt
 )       
+endif()
 endif()
 
 
