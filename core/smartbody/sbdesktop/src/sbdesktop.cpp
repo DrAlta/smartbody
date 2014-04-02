@@ -1,23 +1,3 @@
-/*
- *  sbm_main.cpp - part of SBM: SmartBody Module
- *  Copyright (C) 2008  University of Southern California
- *
- *  SBM is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SBM is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SBM.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- */
-
 #define ENABLE_CMDL_TEST		0
 #define ENABLE_808_TEST			0
 
@@ -189,7 +169,7 @@ int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 				if (!scene->getViewerFactory())
 					return CMD_FAILURE;
 				scene->setViewer(scene->getViewerFactory()->create( px, py, width, height));
-				scene->getViewer()->label_viewer( "SBM Viewer - Local Mode" );
+				scene->getViewer()->label_viewer( "SmartBody Viewer" );
 				SrCamera* camera = scene->createCamera("activeCamera");
 				scene->getViewer()->set_camera( camera );
 				//((FltkViewer*)viewer_p)->set_mcu(this);
@@ -417,10 +397,10 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data ) {
 	// Replace singleton with a user_data pointer
 	switch( SmartBody::SBScene::getScene()->getCommandManager()->execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
-            LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
+            LOG("SmartBody error: command NOT FOUND: '%s' + '%s'", op, args );
             break;
         case CMD_FAILURE:
-            LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
+            LOG("SmartBody error: command FAILED: '%s' + '%s'", op, args );
             break;
     }
 
@@ -585,7 +565,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 	SmartBody::SBScene::getScene()->getSimulationManager()->setupProfiler();
 
-	std::string python_lib_path = "../../../../core/smartbody/Python26/Lib";
+	std::string python_lib_path = "../../../../core/smartbody/Python27/Lib";
 	std::string festivalLibDir = "../../../../lib/festival/festival/lib/";
 	std::string festivalCacheDir = "../../../../data/cache/festival/";
 
@@ -597,7 +577,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	SrString	s;
 	for (	i=1; i<argc; i++ )
 	{
-		LOG( "SBM ARG[%d]: '%s'", i, argv[i] );
+		LOG( "SmartBody argument [%d]: '%s'", i, argv[i] );
 		s = argv[i];
 
 		if( s == "-pythonpath" )  // argument -pythonpath
@@ -821,11 +801,11 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		} else {
 #if 0 // disable server name query until vhmsg is fixed
 			const char* vhmsg_server_actual = vhmsg::ttu_get_server();
-			LOG( "SBM ERR: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg_server_actual?"NULL":vhmsg_server_actual );
+			LOG( "SmartBody error: ttu_open VHMSG_SERVER='%s' FAILED\n", vhmsg_server_actual?"NULL":vhmsg_server_actual );
 #else
 			std::string vhserver = (vhmsg_server? vhmsg_server : "localhost");
 			std::string vhport = (vhmsg_port ? vhmsg_port : "61616");
-			LOG( "SBM ERR: ttu_open FAILED\n" );
+			LOG( "SmartBody error: ttu_open FAILED\n" );
 			LOG("Could not connect to %s:%s", vhserver.c_str(), vhport.c_str());
 #endif
 		}
@@ -863,12 +843,13 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	(void)signal( SIGBREAK, signal_handler );
 #endif
 
+
 #if ENABLE_DEFAULT_BOOTSTRAP
 	vector<string>::iterator it;
 
 	if( seq_paths.empty() && py_paths.empty() ) {
 		LOG( "No script paths specified. Adding current working directory to script path.\n" );
-		seq_paths.push_back( "." );
+		py_paths.push_back( "." );
 	}
 
 	for( it = me_paths.begin();
@@ -877,7 +858,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	{
 		std::stringstream strstr;
 		strstr << "path me " << it->c_str();
-		SmartBody::SBScene::getScene()->getCommandManager()->execute( (char *) strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->command( (char *) strstr.str().c_str() );
 	}
 
 	for( it = seq_paths.begin();
@@ -886,8 +867,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	{
 		std::stringstream strstr;
 		strstr << "path seq " << (it->c_str());
-		SrString seq_command = SrString( "path seq " );
-		SmartBody::SBScene::getScene()->getCommandManager()->execute( (char *) strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->command( (char *) strstr.str().c_str() );
 	}
 
 	for( it = audio_paths.begin();
@@ -896,7 +876,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	{
 		std::stringstream strstr;
 		strstr <<  "path audio " << it->c_str();
-		SmartBody::SBScene::getScene()->getCommandManager()->execute( (char *) strstr.str().c_str() );
+		SmartBody::SBScene::getScene()->command( (char *) strstr.str().c_str() );
 	}
 
 
@@ -905,7 +885,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		 ++it )
 	{
 		std::stringstream strstr;
-		strstr << "scene.addAssetPath('seq', '" << it->c_str() << "')";
+		strstr << "scene.addAssetPath('script', '" << it->c_str() << "')";
 		SmartBody::SBScene::getScene()->run( (char *) strstr.str().c_str() );
 	}
 
@@ -923,7 +903,9 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		SrString seq_command = SrString( "seq " ) << (it->c_str()) << " begin";
 		SmartBody::SBScene::getScene()->getCommandManager()->execute( (char *)(const char *)seq_command );
 	}
-
+	
+	SrCamera* camera = SmartBody::SBScene::getScene()->createCamera("cameraDefault");
+	camera->reset();
 
 	for( it = init_pys.begin();
 		 it != init_pys.end();
@@ -1003,24 +985,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		if( update_sim )	{
 			scene->update();
 		}
-
-		const std::vector<std::string>& pawns = scene->getPawnNames();
-		for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
-			pawnIter != pawns.end();
-			pawnIter++)
-		{
-			SmartBody::SBPawn* pawn = scene->getPawn((*pawnIter));
-			if (pawn->scene_p)
-				pawn->scene_p->update();	
-		}
-
-		// update any tracked cameras
-		scene->updateTrackedCameras();
 		
-
-		if (scene->getViewer())
-			scene->getViewer()->render();
-	
 	}	
 	cleanup();
 

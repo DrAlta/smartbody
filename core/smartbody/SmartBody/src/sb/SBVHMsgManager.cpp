@@ -291,10 +291,10 @@ void SBVHMsgManager::vhmsgCallback( const char *op, const char *args, void * use
 	switch( SmartBody::SBScene::getScene()->getCommandManager()->execute( op, (char *)args ) )
 	{
         case CMD_NOT_FOUND:
-            LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
+            LOG("SmartBody error: command NOT FOUND: '%s' + '%s'", op, args );
             break;
         case CMD_FAILURE:
-            LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
+            LOG("SmartBody error: command FAILED: '%s' + '%s'", op, args );
             break;
     }
 }

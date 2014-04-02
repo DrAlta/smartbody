@@ -136,7 +136,7 @@
     </Link>
     <PostBuildEvent>
       <Command>copy /Y ..\..\..\..\core\smartbody\SmartBody\lib\SmartBody_d.dll ..\bin
-copy /Y ..\..\..\..\core\smartbody\smartbody-lib\src\external\glew\glew32.dll ..\bin
+copy /Y ..\..\..\..\core\smartbody\SmartBody\src\external\glew\glew32.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\bin
@@ -160,6 +160,7 @@ copy /Y default.py ..\bin
 
 if not exist ..\..\..\..\bin\smartbody\sbdesktop\bin mkdir ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy "$(TargetPath)" ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\core\smartbody\SmartBody\src\external\glew\glew32.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
@@ -228,7 +229,7 @@ copy /Y default.py ..\..\..\..\bin\smartbody\sbdesktop\bin
     </Link>
     <PostBuildEvent>
       <Command>copy /Y ..\..\..\..\core\smartbody\SmartBody\lib\SmartBody.dll ..\bin
-copy /Y ..\..\..\..\core\smartbody\smartbody-lib\src\external\glew\glew32.dll ..\bin
+copy /Y ..\..\..\..\core\smartbody\SmartBody\src\external\glew\glew32.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\bin
@@ -254,6 +255,7 @@ copy /Y .\default.py ..\bin
 
 if not exist ..\..\..\..\bin\smartbody\sbdesktop\bin mkdir ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy "$(TargetPath)" ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\core\smartbody\SmartBody\src\external\glew\glew32.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\vhcl\blat\blat.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
@@ -269,8 +271,8 @@ copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-1_51.dll ..\..\..\..
 copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc100-mt-1_51.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc100-mt-1_51.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc100-mt-1_51.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll ..\..\..\..\bin\smartbody\sbdesktopbin
-copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll ..\..\..\..\bin\smartbody\sbm\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\core\smartbody\python27\libs\python27.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcp100.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin

@@ -1,133 +1,134 @@
-print "|---------------------------------------------------|"
-print "|  data/sbm-common/scripts/default-init-desktop.py  |"
-print "|---------------------------------------------------|"
+print "|--------------------------------------------|"
+print "|         Starting Character Demo            |"
+print "|--------------------------------------------|"
+
+# Add asset paths
+scene.addAssetPath('mesh', 'mesh')
+#scene.addAssetPath('mesh', 'retarget/mesh')
+scene.addAssetPath('motion', 'ChrBrad')
+#scene.addAssetPath('motion', 'sbm-common/common-sk')
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath('script', 'scripts')
+scene.loadAssets()
+
+# Set scene parameters and camera
+print 'Configuring scene parameters and camera'
+scene.setScale(1.0)
+scene.setBoolAttribute('internalAudio', True)
 
 
-#scene.run("default-viewer.py")
 camera = getCamera()
-camera.setEye(0, 166, 185)
-camera.setCenter(0, 92, 0)
-
-cameraPawn = scene.createPawn("camera")
-cameraPos = SrVec(0, 166, 185)
-cameraPawn.setPosition(cameraPos)
-
-
-### Load data/sbm-common assets
-scene.addAssetPath("seq", "../../../../data/sbm-common/scripts")
-scene.addAssetPath("seq", "../../../../data/sbm-test/scripts")
-scene.addAssetPath("mesh", "../../../../data/mesh")
-
-scene.run("init-common-assets.py")
-scene.run("init-common-face.py")
+camera.setEye(0, 1.71, 1.86)
+camera.setCenter(0, 1, 0.01)
+camera.setUpVector(SrVec(0, 1, 0))
+camera.setScale(1)
+camera.setFov(1.0472)
+camera.setFarPlane(100)
+camera.setNearPlane(0.1)
+camera.setAspectRatio(0.966897)
 
 
-'''
-doctor = scene.createCharacter("doctor", "SasoBase.SasoDoctorPerez")
-doctorSkeleton = scene.createSkeleton("common.sk")
-doctor.setSkeleton(doctorSkeleton)
-doctor.setFaceDefinition(defaultFace)
-doctorPos = SrVec(35, 102, 0)
-doctor.setPosition(doctorPos)
-doctorHPR = SrVec(-17, 0, 0)
-doctor.setHPR(doctorHPR)
-doctor.setVoice("remote")
-doctor.setVoiceCode("Festival_voice_rab_diphone")
-doctor.createStandardControllers()
-doctor.setStringAttribute("deformableMesh", "doctor")
+# Set up joint map for Brad
+print 'Setting up joint map and configuring Brad\'s skeleton'
+scene.run('zebra2-map.py')
+zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
+bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+zebra2Map.applySkeleton(bradSkeleton)
+zebra2Map.applyMotionRecurse('ChrBrad')
 
+# Establish lip syncing data set
+print 'Establishing lip syncing data set'
+scene.run('init-diphoneDefault.py')
 
-elder = scene.createCharacter("elder", "SasoBase.Mayor")
-elderSkeleton = scene.createSkeleton("common.sk")
-elder.setSkeleton(elderSkeleton)
-elder.setFaceDefinition(defaultFace)
-elderPos = SrVec(-35, 102, 0)
-elder.setPosition(elderPos)
-elderHPR = SrVec(17, 0, 0)
-elder.setHPR(elderHPR)
-elder.setVoice("remote")
-elder.setVoiceCode("Festival_voice_rab_diphone")
-elder.createStandardControllers()
-elder.setStringAttribute("deformableMesh", "elder")
+# Set up face definition
+print 'Setting up face definition'
+# Brad's face definition
+bradFace = scene.createFaceDefinition('ChrBrad')
+bradFace.setFaceNeutral('ChrBrad@face_neutral')
+bradFace.setAU(1,  "left",  "ChrBrad@001_inner_brow_raiser_lf")
+bradFace.setAU(1,  "right", "ChrBrad@001_inner_brow_raiser_rt")
+bradFace.setAU(2,  "left",  "ChrBrad@002_outer_brow_raiser_lf")
+bradFace.setAU(2,  "right", "ChrBrad@002_outer_brow_raiser_rt")
+bradFace.setAU(4,  "left",  "ChrBrad@004_brow_lowerer_lf")
+bradFace.setAU(4,  "right", "ChrBrad@004_brow_lowerer_rt")
+bradFace.setAU(5,  "both",  "ChrBrad@005_upper_lid_raiser")
+bradFace.setAU(6,  "both",  "ChrBrad@006_cheek_raiser")
+bradFace.setAU(7,  "both",  "ChrBrad@007_lid_tightener")
+bradFace.setAU(10, "both",  "ChrBrad@010_upper_lip_raiser")
+bradFace.setAU(12, "left",  "ChrBrad@012_lip_corner_puller_lf")
+bradFace.setAU(12, "right", "ChrBrad@012_lip_corner_puller_rt")
+bradFace.setAU(25, "both",  "ChrBrad@025_lips_part")
+bradFace.setAU(26, "both",  "ChrBrad@026_jaw_drop")
+bradFace.setAU(45, "left",  "ChrBrad@045_blink_lf")
+bradFace.setAU(45, "right", "ChrBrad@045_blink_rt")
 
-brad = scene.createCharacter("brad", "")
-bradSkeleton = scene.createSkeleton("common.sk")
+bradFace.setViseme("open",    "ChrBrad@open")
+bradFace.setViseme("W",       "ChrBrad@W")
+bradFace.setViseme("ShCh",    "ChrBrad@ShCh")
+bradFace.setViseme("PBM",     "ChrBrad@PBM")
+bradFace.setViseme("FV",      "ChrBrad@FV")
+bradFace.setViseme("wide",    "ChrBrad@wide")
+bradFace.setViseme("tBack",   "ChrBrad@tBack")
+bradFace.setViseme("tRoof",   "ChrBrad@tRoof")
+bradFace.setViseme("tTeeth",  "ChrBrad@tTeeth")
+
+print 'Adding character into scene'
+# Set up Brad
+brad = scene.createCharacter('ChrBrad', '')
+bradSkeleton = scene.createSkeleton('ChrBrad.sk')
 brad.setSkeleton(bradSkeleton)
-brad.setFaceDefinition(defaultFace)
-bradPos = SrVec(135, 102, 0)
+# Set position
+bradPos = SrVec(0, 0, 0)
 brad.setPosition(bradPos)
-bradHPR = SrVec(-17, 0, 0)
-brad.setHPR(bradHPR)
-brad.setVoice("remote")
-brad.setVoiceCode("Festival_voice_rab_diphone")
+# Set facing direction
+bradFacing = SrVec(0, 0, 0)
+brad.setHPR(bradFacing)
+# Set face definition
+brad.setFaceDefinition(bradFace)
+# Set standard controller
 brad.createStandardControllers()
-brad.setStringAttribute("deformableMesh", "brad")
+# Deformable mesh
+brad.setDoubleAttribute('deformableMeshScale', .01)
+brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
+
+# Lip syncing diphone setup
+brad.setStringAttribute('lipSyncSetName', 'default')
+brad.setBoolAttribute('usePhoneBigram', True)
+brad.setVoice('remote')
+brad.setVoiceCode('Microsoft|Anna')
+
+# setup locomotion
+scene.run('BehaviorSetMaleMocapLocomotion.py')
+setupBehaviorSet()
+retargetBehaviorSet('ChrBrad')
+
+
+# setup gestures
+scene.run('BehaviorSetGestures.py')
+setupBehaviorSet()
+retargetBehaviorSet('ChrBrad')
+'''
+# setup reach 
+scene.run('BehaviorSetReaching.py')
+setupBehaviorSet()
+retargetBehaviorSet('ChrBrad')
 '''
 
-utah = scene.createCharacter("utah", "")
-utahSkeleton = scene.createSkeleton("test_utah.sk")
-utah.setSkeleton(utahSkeleton)
-utah.setFaceDefinition(defaultFace)
-utahPos = SrVec(0, 0, 0)
-utah.setPosition(utahPos)
-utahHPR = SrVec(-17, 0, 0)
-utah.setHPR(utahHPR)
-utah.setVoice("remote")
-utah.setVoiceCode("Festival_voice_rab_diphone")
-utah.createStandardControllers()
-utah.setStringAttribute("deformableMesh", "utah")
+# Turn on GPU deformable geometry
+brad.setStringAttribute("displayType", "GPUmesh")
 
-#scene.setDefaultCharacter("doctor")
-#scene.setDefaultRecipient("elder")
-
-scene.run("init-param-animation.py")
-scene.run("init-steer-agents.py")
-
-scene.setBoolAttribute("internalAudio", True)
-
-# add the reaching database
-# scene.run("init-example-reach.py")
-# names = scene.getCharacterNames()
-# for n in range(0, len(names)):
-	# reachSetup(names[n])
-
-# start the simulation
+# Set up steering
+print 'Setting up steering'
+steerManager = scene.getSteerManager()
+steerManager.setEnable(False)
+brad.setBoolAttribute('steering.pathFollowingMode', True)
+steerManager.setEnable(True)
+# Start the simulation
+print 'Starting the simulation'
 sim.start()
 
-#bml.execBML('doctor', '<body posture="LHandOnHip_Motex"/>')
-#bml.execBML('elder', '<body posture="LHandOnHip_Motex"/>')
-#bml.execBML('brad', '<body posture="HandsAtSide_Motex"/>')
-bml.execBML('utah', '<body posture="ChrUtah_Idle003"/>')
-
-#bml.execBML('doctor', '<saccade mode="listen"/>')
-#bml.execBML('elder', '<saccade mode="listen"/>')
-#bml.execBML('brad', '<saccade mode="listen"/>')
-bml.execBML('utah', '<saccade mode="listen"/>')
+bml.execBML('ChrBrad', '<body posture="ChrMarine@Idle01"/>')
+bml.execBML('ChrBrad', '<saccade mode="listen"/>')
+#bml.execBML('ChrBrad', '<gaze sbm:handle="brad" target="camera"/>')
 
 sim.resume()
-
-
-'''
-class CollisionHandler(EventHandler):
-	def executeAction(self, ev):
-		params = ev.getParameters()
-		# uncomment the following line when debugging
-		#print params
-		tok = params.split('/')
-		#numTokens = len(tok)
-		#print tok[0] +' and '+ tok[1] + ' has collision';			
-		#bml.execBML(tok[0],'<gaze target="'+tok[1]+'"/>');
-		#bml.execBML(tok[1],'<gaze target="'+tok[0]+'"/>');
-				
-		
-
-f = CollisionHandler()
-em = scene.getEventManager()
-em.addEventHandler("collision", f)
-'''
-
-
-
-
-
-

@@ -3385,10 +3385,10 @@ void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
 
 	switch(SmartBody::SBScene::getScene()->getCommandManager()->execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
-            LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
+            LOG("SmartBody error: command NOT FOUND: '%s' + '%s'", op, args );
             break;
         case CMD_FAILURE:
-            LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
+            LOG("SmartBody error: command FAILED: '%s' + '%s'", op, args );
             break;
     }
 }
@@ -3522,10 +3522,10 @@ int sbm_main_func( srArgBuffer & args, SmartBody::SBCommandManager* cmdMgr )
    switch( result )
    {
       case CMD_NOT_FOUND:
-         LOG( "SBM ERR: command NOT FOUND: '%s %s'> ", token, args_raw );
+         LOG( "SmartBody error: command NOT FOUND: '%s %s'> ", token, args_raw );
          break;
       case CMD_FAILURE:
-         LOG( "SBM ERR: command FAILED: '%s %s'> ", token, args_raw );
+         LOG( "SmartBody error: command FAILED: '%s %s'> ", token, args_raw );
          break;
       case CMD_SUCCESS:
          break;

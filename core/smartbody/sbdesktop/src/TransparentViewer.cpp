@@ -110,7 +110,7 @@ void TransparentViewer::resizeViewer()
 	TransparentViewer::viewer->resizeSC(TransparentViewer::viewer->width, TransparentViewer::viewer->height);
 	TransparentViewer::viewer->init_opengl ( TransparentViewer::viewer->width, TransparentViewer::viewer->height); 
 	TransparentViewer::viewer->renderSC();
-	SbmDeformableMeshGPU::useGPUDeformableMesh = true;
+	SbmDeformableMeshGPU::useGPUDeformableMesh = false;
 }
 
 LRESULT CALLBACK WindowFunc(HWND hWnd,UINT msg, WPARAM wParam, LPARAM lParam)
@@ -160,6 +160,48 @@ LRESULT CALLBACK WindowFunc(HWND hWnd,UINT msg, WPARAM wParam, LPARAM lParam)
 					break;
 				}	
 				return 0;
+			}
+			else if (wParam == 'W')
+			{
+				SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+				SrVec eye = camera->getEye();
+				eye[1] = eye[1] + .9f;
+				camera->setEye(eye[0], eye[1], eye[2]);
+			}
+			else if (wParam == 'S')
+			{
+				SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+				SrVec eye = camera->getEye();
+				eye[1] = eye[1] - .9f;
+				camera->setEye(eye[0], eye[1], eye[2]);
+			}
+			else if (wParam == 'D')
+			{
+				SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+				SrVec eye = camera->getEye();
+				eye[0] = eye[0] + .9f;
+				camera->setEye(eye[0], eye[1], eye[2]);
+			}
+			else if (wParam == 'A')
+			{
+				SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+				SrVec eye = camera->getEye();
+				eye[0] = eye[0] - .9f;
+				camera->setEye(eye[0], eye[1], eye[2]);
+			}
+			else if (wParam == 'Q')
+			{
+				SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+				SrVec eye = camera->getEye();
+				eye[2] = eye[2] + .9f;
+				camera->setEye(eye[0], eye[1], eye[2]);
+			}
+			else if (wParam == 'E')
+			{
+				SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+				SrVec eye = camera->getEye();
+				eye[2] = eye[1] - .9f;
+				camera->setEye(eye[0], eye[1], eye[2]);
 			}
 			break;
 
@@ -317,7 +359,7 @@ BOOL TransparentViewer::initSC()
 
     glEnable(GL_BLEND);             
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glClearColor(0.f, 0.f, 0.f, 0.f);
+    glClearColor(0.2f, 0.2f, 0.2f, 0.2f);
 	//glClearColor(0.3, 0.3, 0.3, 1.0);
 
     return 0;
@@ -345,14 +387,19 @@ BOOL TransparentViewer::renderSC()
 	SrMat mat ( SrMat::NotInitialized );
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );	
 
-	_data.camera.setAspectRatio((float)viewer->width/(float)viewer->height);
+	SrCamera* cam = SmartBody::SBScene::getScene()->getActiveCamera();
+	if (!cam)
+	{
+		cam = SmartBody::SBScene::getScene()->createCamera("defaultCamera");
+	}
+	cam->setAspectRatio((float)viewer->width/(float)viewer->height);
 	glMatrixMode ( GL_PROJECTION );
     glLoadMatrix ( _data.camera.get_perspective_mat(mat) );
 
    glMatrixMode ( GL_MODELVIEW );
 
-   glLoadMatrix ( _data.camera.get_view_mat(mat) );
-   glScalef ( _data.camera.getScale(), _data.camera.getScale(), _data.camera.getScale() );
+   glLoadMatrix ( cam->get_view_mat(mat) );
+   glScalef (cam->getScale(), cam->getScale(), cam->getScale() );
 
    updateLights();
 	glEnable ( GL_LIGHTING );
@@ -383,6 +430,7 @@ BOOL TransparentViewer::renderSC()
 	if (_data.shadowmode == true && hasShaderSupport)
 		makeShadowMap();
 
+	/*
 	glPushMatrix();
 
     glColor3f(0, 1, 1);
@@ -396,6 +444,7 @@ BOOL TransparentViewer::renderSC()
     glEnd();
 
     glPopMatrix();
+	*/
 
 	_renders->drawGrid();
 	_renders->drawCharacters();
