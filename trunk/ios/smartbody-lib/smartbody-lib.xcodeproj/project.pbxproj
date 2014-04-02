@@ -777,6 +777,9 @@
 		C44B488B18EB9BED007E8081 /* me_ct_motion_graph.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C44B488918EB9BED007E8081 /* me_ct_motion_graph.hpp */; };
 		C44B488E18EB9C24007E8081 /* SBAssetHandlerPly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C44B488C18EB9C24007E8081 /* SBAssetHandlerPly.cpp */; };
 		C44B488F18EB9C24007E8081 /* SBAssetHandlerPly.h in Headers */ = {isa = PBXBuildFile; fileRef = C44B488D18EB9C24007E8081 /* SBAssetHandlerPly.h */; };
+		C48ED0C618EB9E6E00BBA419 /* rply.c in Sources */ = {isa = PBXBuildFile; fileRef = C48ED0C418EB9E6E00BBA419 /* rply.c */; };
+		C48ED0C718EB9E6E00BBA419 /* rply.h in Headers */ = {isa = PBXBuildFile; fileRef = C48ED0C518EB9E6E00BBA419 /* rply.h */; };
+		C4F0FDDA18EB9DB10099F20F /* sr_model_import_ply.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4F0FDD918EB9DB10099F20F /* sr_model_import_ply.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1555,6 +1558,9 @@
 		C44B488918EB9BED007E8081 /* me_ct_motion_graph.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_motion_graph.hpp; sourceTree = "<group>"; };
 		C44B488C18EB9C24007E8081 /* SBAssetHandlerPly.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerPly.cpp; sourceTree = "<group>"; };
 		C44B488D18EB9C24007E8081 /* SBAssetHandlerPly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerPly.h; sourceTree = "<group>"; };
+		C48ED0C418EB9E6E00BBA419 /* rply.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rply.c; path = rply/rply.c; sourceTree = "<group>"; };
+		C48ED0C518EB9E6E00BBA419 /* rply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rply.h; path = rply/rply.h; sourceTree = "<group>"; };
+		C4F0FDD918EB9DB10099F20F /* sr_model_import_ply.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_model_import_ply.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1854,6 +1860,8 @@
 		AAD458B717A98E5B005905B2 /* external */ = {
 			isa = PBXGroup;
 			children = (
+				C48ED0C418EB9E6E00BBA419 /* rply.c */,
+				C48ED0C518EB9E6E00BBA419 /* rply.h */,
 				AAD458BE17A98E5B005905B2 /* nanoflann */,
 				AAD458C017A98E5B005905B2 /* parser */,
 				AAD4590D17A98E5B005905B2 /* perlin */,
@@ -2413,6 +2421,7 @@
 		AAD45A8417A98E5C005905B2 /* sr */ = {
 			isa = PBXGroup;
 			children = (
+				C4F0FDD918EB9DB10099F20F /* sr_model_import_ply.cpp */,
 				AAD45A9E17A98E5C005905B2 /* sr.cpp */,
 				AAD45A9F17A98E5C005905B2 /* sr.h */,
 				AAD45AA017A98E5C005905B2 /* sr_alg.cpp */,
@@ -2924,6 +2933,7 @@
 				C44B488718EB78F6007E8081 /* SBMotionGraph.h in Headers */,
 				C44B488B18EB9BED007E8081 /* me_ct_motion_graph.hpp in Headers */,
 				C44B488F18EB9C24007E8081 /* SBAssetHandlerPly.h in Headers */,
+				C48ED0C718EB9E6E00BBA419 /* rply.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3370,6 +3380,8 @@
 				C44B488618EB78F6007E8081 /* SBMotionGraph.cpp in Sources */,
 				C44B488A18EB9BED007E8081 /* me_ct_motion_graph.cpp in Sources */,
 				C44B488E18EB9C24007E8081 /* SBAssetHandlerPly.cpp in Sources */,
+				C4F0FDDA18EB9DB10099F20F /* sr_model_import_ply.cpp in Sources */,
+				C48ED0C618EB9E6E00BBA419 /* rply.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
