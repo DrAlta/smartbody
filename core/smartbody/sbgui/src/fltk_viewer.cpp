@@ -1641,6 +1641,34 @@ void FltkViewer::draw()
 	//if (_data->shadowmode == ModeShadows && hasShaderSupport)
 	//	makeShadowMap();
 
+	/* // draw skeleton
+	const std::vector<std::string> names = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (std::vector<std::string>::const_iterator iter = names.begin();
+		 iter != names.end();
+		 iter++)
+	{
+		glBegin(GL_LINES);     
+		SmartBody::SBCharacter* cur =  SmartBody::SBScene::getScene()->getCharacter(*iter);
+		SmartBody::SBSkeleton* skeleton = cur->getSkeleton();
+		int numJoints = skeleton->getNumJoints();
+		for (int j = 0; j < numJoints; j++)
+		{
+			SmartBody::SBJoint* joint = skeleton->getJoint(j);
+			SmartBody::SBJoint* parent = joint->getParent();
+			if (parent)
+			{
+				const SrMat& gmat = joint->gmat();
+				glVertex3f(gmat[12], gmat[13], gmat[14]);  
+				const SrMat& pgmat = parent->gmat();
+				glVertex3f(pgmat[12], pgmat[13], pgmat[14]);  
+			}
+			
+		}
+		glEnd();
+		
+	}
+*/
+
 	// real surface geometries
 	drawAllGeometries();	
 
@@ -1719,6 +1747,7 @@ void FltkViewer::draw()
    {
 	   _retargetStepWindow->redraw();
    }
+
 
    // draw UI
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

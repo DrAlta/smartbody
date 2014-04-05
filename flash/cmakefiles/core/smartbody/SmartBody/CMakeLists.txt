@@ -1,4 +1,3 @@
-include_directories( ../smartbody-dll/include )
 include_directories( ./src)
 include_directories( /usr/include )
 
@@ -26,15 +25,16 @@ find_library (LIBSNDFILE sndfile )
 find_library (ALUT alut )
 find_library (OPENAL openal)
 find_library (GLEW GLEW)
+if (${BUILD_FESTIVAL})
 find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
 find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
 find_library (ESTSTRING eststring ../../..//lib/festival/speech_tools/lib)
 find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
+endif()
 else()
 find_library (LIBSNDFILE sndfile )
 find_library (ALUT alut )
 find_library (OPENAL openal)
-find_library (GLEW GLEW)
 endif()
 
 #if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -45,6 +45,17 @@ endif()
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if (${BUILD_FESTIVAL})
+set( FESTIVAL_LIBS
+	${FESTIVAL}
+	${ESTBASE}
+	${ESTSTRING}
+	${ESTOOLS}
+)
+else()
+set( FESTIVAL_LIBS
+)
+endif()
 set( MORE_LIBS
 	${COREAUDIO_LIBRARY}
 	${AUDIOUNIT_LIBRARY}
@@ -53,33 +64,38 @@ set( MORE_LIBS
 	${ALUT}
 	${OPENAL}
 	${GLEW}
-	${FESTIVAL}
-	${ESTBASE}
-	${ESTSTRING}
-	${ESTOOLS}
+	${FESTIVAL_LIBS}
 )
 else()
 set( MORE_LIBS
-	${LIBSNDFILE}
-	${ALUT}
-	${OPENAL}
+#	${LIBSNDFILE}
+#	${ALUT}
+#	${OPENAL}
 	rt
 )       
 endif()
 
 
-#find_package(OpenGL REQUIRED)
+find_package(OpenGL REQUIRED)
 
+add_custom_target(protoctarget
+		COMMAND protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbmotion.proto 
+		COMMAND protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbutilities.proto 
+		COMMAND protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbmesh.proto 
+		)
 
 
 set( SMARTBODY_LIB_EXT_NANOFLANN_SRC
 
         ./src/external/nanoflann/nanoflann.hpp
 
-		
-
 )
 
+set( SMARTBODY_LIB_EXT_RPLY_SRC
+
+        ./src/external/rply/rply.c
+
+)
 set( SMARTBODY_LIB_EXT_PARSER_SRC
 
         ./src/external/parser/Bchart.cpp
@@ -141,7 +157,6 @@ set( SMARTBODY_LIB_EXT_ZLIB_SRC
 	./src/external/zlib-1.2.5/unzip.c
 	./src/external/zlib-1.2.5/zip.c
 	./src/external/zlib-1.2.5/zutil.c
-
 )
 
 set( SMARTBODY_LIB_EXT_RECAST_SRC
@@ -200,7 +215,6 @@ set( SMARTBODY_LIB_ME_SRC
         ./src/controllers/me_default_prune_policy.cpp
         ./src/controllers/me_spline_1d.cpp
         ./src/controllers/me_ct_pose_postprocessing.cpp
-
 )
 
 set( SMARTBODY_LIB_SK_SRC
@@ -246,6 +260,7 @@ set( SMARTBODY_LIB_SR_SRC
         ./src/sr/sr_model.cpp
         ./src/sr/sr_model_export_iv.cpp
         ./src/sr/sr_model_import_obj.cpp
+        ./src/sr/sr_model_import_ply.cpp
         ./src/sr/sr_output.cpp
         ./src/sr/sr_path_array.cpp
         ./src/sr/sr_plane.cpp
@@ -368,6 +383,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/controllers/me_ct_physics_controller.cpp
         ./src/controllers/me_ct_noise_controller.cpp
         ./src/controllers/me_ct_motion_recorder.cpp
+	./src/controllers/me_ct_motion_graph.cpp
+
 
         ./src/controllers/MeCtBlendEngine.cpp
         ./src/controllers/me_ct_motion_blend.cpp
@@ -442,6 +459,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBAnimationTransition.cpp
         ./src/sb/SBAnimationTransitionRule.cpp
         ./src/sb/SBAnimationStateManager.cpp
+	./src/sb/SBMotionGraph.cpp
         ./src/sb/SBSteerManager.cpp
         ./src/sb/SBSteerAgent.cpp
         ./src/sb/SBReachManager.cpp
@@ -480,29 +498,46 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBVHMsgManager.cpp
         ./src/sb/SBCommandManager.cpp
         ./src/sb/SBWSPManager.cpp
+        ./src/sb/SBNavigationMeshManager.cpp
 
         ./src/sb/SBPython.cpp
         ./src/sb/SBPythonAnimation.cpp
         ./src/sb/SBPythonAttribute.cpp
         ./src/sb/SBPythonCharacter.cpp
         ./src/sb/SBPythonMath.cpp
+        ./src/sb/SBPythonMesh.cpp
         ./src/sb/SBPythonMotion.cpp
         ./src/sb/SBPythonScene.cpp
         ./src/sb/SBPythonSimulation.cpp
         ./src/sb/SBPythonSkeleton.cpp
         ./src/sb/SBPythonSystem.cpp
         ./src/sb/SBPythonClass.cpp
-
+		
+        ./src/sb/SBAssetHandler.cpp
+        ./src/sb/SBAssetHandlerCOLLADA.cpp
+        ./src/sb/SBAssetHandlerSk.cpp
+        ./src/sb/SBAssetHandlerSkm.cpp
+	./src/sb/SBAssetHandlerAsf.cpp
+	./src/sb/SBAssetHandlerAmc.cpp
+	./src/sb/SBAssetHandlerOgre.cpp
+	./src/sb/SBAssetHandlerObj.cpp
+	./src/sb/SBAssetHandlerBvh.cpp
+	./src/sb/SBAssetHandlerPly.cpp
         ./src/sb/SBBehavior.cpp
+	./src/sb/SBAssetHandlerSkmb.cpp
+	./src/sb/SBAssetHandlerSBMeshBinary.cpp
         ./src/sb/SBDebuggerServer.cpp
         ./src/sb/SBDebuggerClient.cpp
         ./src/sb/SBDebuggerUtility.cpp
         ./src/sbm/SteerPath.cpp
         ./src/sbm/MiscCommands.cpp
 		
-		./src/sb/smartbody-dll.cpp
-		./src/sb/smartbody-c-dll.cpp
+	./src/sb/smartbody-dll.cpp
+	./src/sb/smartbody-c-dll.cpp
 		
+	./src/protocols/sbmotion.pb.cc
+	./src/protocols/sbutilities.pb.cc
+	./src/protocols/sbmesh.pb.cc
 )
 
 add_library(
@@ -519,24 +554,34 @@ add_library(
 
         ${SMARTBODY_LIB_EXT_PERLIN_SRC}
 
+        ${SMARTBODY_LIB_EXT_NANOFLAN_SRC}
+
+        ${SMARTBODY_LIB_EXT_RPLY_SRC}
+
         ${SMARTBODY_LIB_ME_SRC}
 
         ${SMARTBODY_LIB_SK_SRC}
 
         ${SMARTBODY_LIB_SR_SRC}
 
-		${SMARTBODY_LIB_SBM_SRC}
+        ${SMARTBODY_LIB_SBM_SRC}
 
 	
 
 )
 
+if (${GOOGLE_PROFILER})
+set (PROFILER_LIBS
+	tcmalloc
+	profiler
+)
+else()
+set (PROFILER_LIBS "")
+endif()
 
 target_link_libraries( SmartBody
 
-	#tcmalloc
-	#profiler
-	
+	${PROFILER_LIBS}
 	bonebus
 	vhmsg
 	vhcl
@@ -546,14 +591,21 @@ target_link_libraries( SmartBody
 	boost_system
 	boost_regex
 	boost_python
+	blas
+	lapack
+	${OPENGL_LIBRARIES}
+	activemq-cpp
 	steerlib
 	pprAI
 	ode
-	python2.6
-	GL
-	glut
-	#GLEW
+	python2.7
+	ncurses
+	${MORE_LIBS}
+	protoc
+	protobuf
 )
+
+add_dependencies(SmartBody protoctarget)
 
 set( EXEC_LIST
 

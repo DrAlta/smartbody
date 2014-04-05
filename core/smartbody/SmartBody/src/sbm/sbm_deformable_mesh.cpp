@@ -1658,7 +1658,7 @@ void DeformableMeshInstance::updateTransformBuffer()
 		SrMat bindPoseMat = _mesh->bindPoseMatList[idx];
 		bindPoseMat.set_translation(bindPoseMat.get_translation()*_meshScale);
 		transformBuffer[idx] = bindPoseMat*joint->gmat();	
-		SrQuat q = SrQuat(transformBuffer[idx]);
+		//SrQuat q = SrQuat(transformBuffer[idx]);
 		//LOG("transform buffer %d , quat = %f %f %f %f",idx,q.w,q.x,q.y,q.z);
 		//sr_out << " transform buffer = " << transformBuffer[idx];
 	}
@@ -1740,6 +1740,9 @@ void DeformableMeshInstance::update()
 				SrVec finalVec;
 				//printf("Vtx bind pose = \n");
 
+
+
+
 				for (int j = 0; j < numOfInfJoints; j++)
 				{
 					//std::string jointName = skinWeight->infJointName[skinWeight->jointNameIndex[globalCounter]];	
@@ -1755,6 +1758,7 @@ void DeformableMeshInstance::update()
 					finalVec = finalVec + (float(jointWeight) * (transformVec  * gMat));		
 					//finalVec = finalVec + (float(jointWeight) * (skinLocalVec * skinWeight->bindShapeMat * invBMat  * gMat));	
 				}
+
 				_deformPosBuf[iVtx] = finalVec;
 				if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
 				{

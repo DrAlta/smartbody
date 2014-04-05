@@ -94,7 +94,7 @@ public :
 	void setJointMapName(const std::string& jmapName);
 	std::string getJointMapName() const ;
 
-	const std::string getMappedChannelName(const Channel& chan) const;
+	const std::string& getMappedChannelName(const Channel& chan) const;
 	/*! Set the array as empty */
 	void init ();
 
