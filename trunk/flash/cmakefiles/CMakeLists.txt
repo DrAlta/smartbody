@@ -1,9 +1,10 @@
 cmake_minimum_required( VERSION 2.8 )
+set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 project( SmartBody )
 
 set( CMAKE_INSTALL_PREFIX "../" )
 set( BUILD_OGRE FALSE)
-set( FLASCC_SDK "E:/flascc/sdk")
+set( FLASCC_SDK "C:/users/shapiro/crossbridge/sdk")
 
 add_definitions(-O4)
 
@@ -26,7 +27,7 @@ LINK_DIRECTORIES(
 	${FLASCC_SDK}/usr/local/lib
 )
 
-add_subdirectory( lib )
+#add_subdirectory( lib )
 add_subdirectory( core )
 
 

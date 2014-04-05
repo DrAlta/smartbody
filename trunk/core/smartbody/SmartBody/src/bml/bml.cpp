@@ -427,7 +427,9 @@ void BmlRequest::gestureRequestProcess()
 			MeCtMotion* prev_motion_ct = dynamic_cast<MeCtMotion*> (gestures[j]->anim_ct);
 			SkMotion* prevMotion = prev_motion_ct->motion();
 			SBMotion* prevSBMotion = dynamic_cast<SBMotion*> (prevMotion);
-			prevSBMotion->connect(actor->getSkeleton());
+
+			SmartBody::SBSkeleton* tempSkel = SmartBody::SBScene::getScene()->createSkeleton(actor->getSkeleton()->getName());
+			prevSBMotion->connect(tempSkel);
 			SrVec prevLWristPos = prevSBMotion->getJointPosition(lWrist, (float)prevMotion->time_stroke_end());
 			SrVec prevRWristPos = prevSBMotion->getJointPosition(rWrist, (float)prevMotion->time_stroke_end());
 
@@ -454,8 +456,8 @@ void BmlRequest::gestureRequestProcess()
 					continue;
 				if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 					LOG("Motion in list: %s", currGestureList[l].c_str());
-				motionInList->connect(actor->getSkeleton());
-				if (actor->getBoolAttribute("gestureRequest.matchingHandness"))
+				motionInList->connect(tempSkel);
+						if (actor->getBoolAttribute("gestureRequest.matchingHandness"))
 				{
 					float lMotionSpeed = motionInList->getJointSpeed(lWrist, (float)motionInList->time_start(), (float)motionInList->time_stop());
 					float rMotionSpeed = motionInList->getJointSpeed(rWrist, (float)motionInList->time_start(), (float)motionInList->time_stop());
@@ -607,6 +609,7 @@ void BmlRequest::gestureRequestProcess()
 					}
 				}
 			}
+			delete tempSkel;
 		}
 		else
 		{
