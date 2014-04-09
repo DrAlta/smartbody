@@ -101,6 +101,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	if (showSkinWeight)
 	{
 		//LOG("drawSkinColor");
+		glDepthMask(GL_FALSE);
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->skinColorBuf[0]);		
 		//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
@@ -150,6 +151,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	{
 		glPopMatrix();
 	}
+	glDepthMask(GL_TRUE);
 }
 
 void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )

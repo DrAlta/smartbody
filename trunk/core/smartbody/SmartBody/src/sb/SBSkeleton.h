@@ -43,6 +43,7 @@ public:
 
 	SBAPI void getJointPositions(const std::vector<std::string>& jointNames, std::vector<SrVec>& jointPositions, int startIdx = 0);
 	SBAPI SBPawn* getPawn();
+	void setPawnName(const std::string& pawnName);
 
 	SBAPI void rescale(float scaleRatio);
 	SBAPI float getScale();
@@ -60,9 +61,11 @@ public:
 	SBAPI SBSkeleton* createSkelWithoutPreRot(const char* new_name);	
 
 protected:
+	std::string linkedPawnName;
 	SrQuat _origRootPrerot;
 	bool _origRootChanged;
 	float _scale;	
+	
 };
 
 };

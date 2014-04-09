@@ -16,6 +16,7 @@ SBSkeleton::SBSkeleton() : SkSkeleton()
 	_scale = 1.0f;
 	_origRootChanged = false;
 	createVec3Attribute("orientation", 0, 0, 0, true, "Basic", 100, false, false, false, "Change in orientation from initial loading of skeleton. Parameters are rotation in degrees of the X, then Y, then Z axes.");
+	linkedPawnName = "";
 }
 
 SBSkeleton::SBSkeleton(std::string skelFile) : SkSkeleton()
@@ -24,11 +25,13 @@ SBSkeleton::SBSkeleton(std::string skelFile) : SkSkeleton()
 	_origRootChanged = false;
 	createVec3Attribute("orientation", 0, 0, 0, true, "Basic", 100, false, false, false, "Change in orientation from initial loading of skeleton. Parameters are rotation in degrees of the X, then Y, then Z axes.");
 	load(skelFile);
+	linkedPawnName = "";
 }
 
 SBSkeleton::SBSkeleton(SBSkeleton* copySkel) : SkSkeleton(copySkel)
 {
 	_scale = copySkel->getScale();	
+	linkedPawnName = "";
 	//jointMap = copySkel->getJointMapName();
 }
 
@@ -305,7 +308,9 @@ SBPawn* SBSkeleton::getPawn()
 {
 	// determine which character uses this skeleton
 	// NOTE: there should be back pointer between the skeleton and the pawn/character
-	
+	SmartBody::SBPawn* skelPawn = SmartBody::SBScene::getScene()->getPawn(linkedPawnName);
+	if (skelPawn)
+		return skelPawn;
 
 	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
@@ -314,7 +319,10 @@ SBPawn* SBSkeleton::getPawn()
 	{
 		SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
 		if (pawn->getSkeleton() == this)
+		{
+			setPawnName(pawn->getName());
 			return pawn;
+		}
 }
 
 	return NULL;
@@ -494,5 +502,10 @@ SBAPI void SBSkeleton::getJointPositions( const std::vector<std::string>& jointN
 			continue;
 		jointPositions[i+startIdx] = joint->gmat().get_translation();
 	}
+}
+
+void SBSkeleton::setPawnName( const std::string& pawnName )
+{
+	linkedPawnName = pawnName;
 }
 }; //namespace
