@@ -125,11 +125,13 @@ void SBPawn::setSkeleton(SBSkeleton* skel)
 
 	SbmPawn::setSkeleton(skel);	
 	setup();
+	std::string pawnName = this->getName();		
+	skel->setPawnName(pawnName);
 
 	if (sk)
 	{		
 		this->setPosition(position);
-		this->setHPR(hpr);
+		this->setHPR(hpr);			
 	}
 }
 
