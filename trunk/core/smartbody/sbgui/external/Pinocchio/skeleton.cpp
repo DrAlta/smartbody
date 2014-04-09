@@ -207,13 +207,13 @@ SmartBodySkeleton::SmartBodySkeleton()
 	makeJoint("lshoulder",  Vector3(-0.2, 0.5, 0.),     "shoulders");       //18
 	makeJoint("lelbow",     Vector3(-0.4, 0.25, 0.075), "lshoulder");       //19
 	makeJoint("lhand",      Vector3(-0.6, 0.0, 0.15),   "lelbow");          //20
-	makeJoint("lthumb",      Vector3(-0.65, 0.0, 0.15),   "lhand");          //21
+	makeJoint("lthumb",      Vector3(-0.62, -0.03, 0.225),   "lhand");          //21
 
 
 	makeJoint("rshoulder",  Vector3(0.2, 0.5, 0.),      "shoulders");       //22
 	makeJoint("relbow",     Vector3(0.4, 0.25, 0.075),  "rshoulder");       //23
 	makeJoint("rhand",      Vector3(0.6, 0.0, 0.15),    "relbow");          //24
-	makeJoint("rthumb",      Vector3(0.65, 0.0, 0.15),   "rhand");          //25
+	makeJoint("rthumb",      Vector3(0.62, -0.03, 0.225),   "rhand");          //25
 
 	//symmetry
 	makeSymmetric("lthigh", "rthigh");
@@ -225,7 +225,7 @@ SmartBodySkeleton::SmartBodySkeleton()
 	makeSymmetric("lshoulder", "rshoulder");
 	makeSymmetric("lelbow", "relbow");
 	makeSymmetric("lhand", "rhand");
-	makeSymmetric("lthumb", "rthumb");
+	//makeSymmetric("lthumb", "rthumb");
 
 	initCompressed();
 
@@ -235,6 +235,8 @@ SmartBodySkeleton::SmartBodySkeleton()
 	setFat("hips");
 	setFat("shoulders");
 	setFat("head");
+	//setFat("rthumb");
+	//setFat("lthumb");
 	//setFat("skullbase");
 }
 

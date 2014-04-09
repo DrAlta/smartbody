@@ -300,7 +300,7 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 				else if (value == "skinWeight")
 				{
 					if (pawn->scene_p)
-						pawn->scene_p->set_visibility(0,0,0,0);
+						pawn->scene_p->set_visibility(1,0,0,0);
 					if (pawn->dMeshInstance_p)
 						pawn->dMeshInstance_p->setVisibility(2);
 					if (ent)

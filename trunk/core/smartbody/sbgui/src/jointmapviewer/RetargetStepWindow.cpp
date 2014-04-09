@@ -59,6 +59,9 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	_buttonAutoRig->callback(ApplyAutoRigCB, this);
 	//_choiceCharacters->callback(CharacterCB,this);
 
+	_buttonUpdateSkinWeight = new Fl_Button(890, yDis, 120, 25, "Update Weight");
+	_buttonUpdateSkinWeight->callback(UpdateSkinWeightCB, this);
+
 	_buttonVoxelRigging = new Fl_Choice(750, yDis, 120, 25, "Type");
 	_buttonVoxelRigging->add("Voxel Weight");
 	_buttonVoxelRigging->add("Glow Weight");
@@ -308,6 +311,17 @@ void RetargetStepWindow::setJointMapName( std::string jointMapName )
 }
 
 
+
+void RetargetStepWindow::updateSkinWeight( int weightType /*= 0*/ )
+{
+	if (!_choiceCharacters->text())
+		return;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string charName = _choiceCharacters->text();	
+	SBAutoRigManager& autoRigManager = SBAutoRigManager::singleton();
+	bool autoRigSuccess = autoRigManager.updateSkinWeightFromCharacterMesh(charName, weightType);
+}
+
 void RetargetStepWindow::applyAutoRig(int riggingType)
 {
 	if (!_choicePawns->text())
@@ -492,6 +506,15 @@ void RetargetStepWindow::ApplyAutoRigCB( Fl_Widget* widget, void* data )
 	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
 	int riggingType = viewer->_buttonVoxelRigging->value();
 	viewer->applyAutoRig(riggingType);
+}
+
+
+
+void RetargetStepWindow::UpdateSkinWeightCB( Fl_Widget* widget, void* data )
+{
+	RetargetStepWindow* viewer = (RetargetStepWindow*) data;
+	int weightType = viewer->_buttonVoxelRigging->value();
+	viewer->updateSkinWeight(weightType);
 }
 
 void RetargetStepWindow::OnCharacterCreate( const std::string & name, const std::string & objectClass )

@@ -35,12 +35,76 @@ TreeItemInfoWidget::TreeItemInfoWidget( int x, int y, int w, int h, const char* 
 }
 
 /************************************************************************/
+/* Joint Info Object                                                    */
+/************************************************************************/
+
+JointInfoObject::JointInfoObject()
+{
+	itemSkeleton = NULL;
+	jointName = "";
+}
+
+JointInfoObject::~JointInfoObject()
+{
+
+}
+
+void JointInfoObject::notify( SBSubject* subject )
+{
+	if (!itemSkeleton)
+		return;	
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBSkeleton* templateSkel = scene->getSkeleton(itemSkeleton->getName());
+
+	SmartBody::SBJoint* templateSelectJoint = templateSkel->getJointByName(jointName);
+	SmartBody::SBJoint* selectJoint = itemSkeleton->getJointByName(jointName);
+	if (!selectJoint || !templateSelectJoint)
+		return;
+
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
+	if (attribute)
+	{
+		SrVec offset = selectJoint->offset();
+		SmartBody::DoubleAttribute* offsetAttr = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);		
+		if (!offsetAttr)
+			return;
+
+		if (attribute->getName() == "offset X")
+		{
+			offset.x = offsetAttr->getValue();
+		}
+		else if (attribute->getName() == "offset Y")
+		{
+			offset.y = offsetAttr->getValue();
+		}
+		else if (attribute->getName() == "offset Z")
+		{
+			offset.z = offsetAttr->getValue();
+		}	
+		selectJoint->setOffset(offset);
+		templateSelectJoint->setOffset(offset);
+		itemSkeleton->update();
+	}
+}
+
+void JointInfoObject::setSkeleton( SmartBody::SBSkeleton* skel )
+{
+	itemSkeleton = skel;
+	jointName = "";
+}
+
+void JointInfoObject::setJointName( const std::string& jname )
+{
+	jointName = jname;
+}
+/************************************************************************/
 /* Skeleton Info                                                        */
 /************************************************************************/
 
 SkeletonItemInfoWidget::SkeletonItemInfoWidget( const std::string& characterName, int x, int y, int w, int h, const char* name, SmartBody::SBObserver* observerWindow) : TreeItemInfoWidget(x,y,w,h,name)
 {
-	jointInfoObject = new TreeInfoObject();
+	jointInfoObject = new JointInfoObject();
 	this->begin();
 	skeletonTree = new Fl_TreeHorizontal(Pad*2+x,Pad*2+y,w-30,100);//new Fl_Tree(10,10,w - 300, h - 30);			
 	skeletonTree->callback(treeCallBack,this);	
@@ -74,7 +138,7 @@ void SkeletonItemInfoWidget::updateWidget()
 		//LOG("skelName = %s\n",skelName.c_str());
 		itemSkeleton = skeleton;
 	}
-
+	jointInfoObject->setSkeleton(itemSkeleton);
 	updateSkeletonTree(skeletonTree->root(), itemSkeleton);
 }
 
@@ -96,7 +160,7 @@ void SkeletonItemInfoWidget::updateJointAttributes(std::string jointName)
 	//jointInfoObject->setVec3Attribute("offset",offset.x,offset.y,offset.z);
 	for (int i=0;i<3;i++)
 	{
-		jointInfoObject->createDoubleAttribute(offsetName[i],offset[i], true, "Basic",10+i , true, false, false, "?");		
+		jointInfoObject->createDoubleAttribute(offsetName[i],offset[i], true, "Basic",10+i , false, false, false, "?");		
 		//attrWindow->notify(jointInfoObject->getAttribute(offsetName[i]));
 	}
 	//attrWindow->notify(jointInfoObject);
@@ -117,6 +181,7 @@ void SkeletonItemInfoWidget::updateJointAttributes(std::string jointName)
 	jointInfoObject->createDoubleAttribute(quatName[3],q.w,true, "Basic", 34, true, false, false, "?");
 	//for (int i=0;i<4;i++)
 	//	attrWindow->notify(jointInfoObject->getAttribute(quatName[i]));
+	jointInfoObject->setJointName(jointName);
 
 	//attrWindow->reorderAttributes();	
 	this->attrWindow->setDirty(true);	

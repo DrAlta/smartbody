@@ -156,7 +156,11 @@ TreeItemInfoWidget* AttributeEditor::createInfoWidget( int x, int y, int w, int 
 	SmartBody::SBSkeleton* skeleton = dynamic_cast<SmartBody::SBSkeleton*>(object);
 	if (skeleton)
 	{
-		widget = new SkeletonItemInfoWidget("", x,y,w,h,strdup(object->getName().c_str()), NULL);
+		std::string pawnName = "";
+		SmartBody::SBPawn* skelPawn = skeleton->getPawn();
+		if (skelPawn)
+			pawnName = skelPawn->getName();
+		widget = new SkeletonItemInfoWidget(pawnName, x,y,w,h,strdup(object->getName().c_str()), NULL);
 		return widget;
 	}
 

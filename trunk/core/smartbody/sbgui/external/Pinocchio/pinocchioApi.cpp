@@ -106,6 +106,75 @@ Vector3 barycentricCoord(Vector3& pt, Tri3Object& tri)
 	return Vector3(w1,w2,w3);
 }
 
+
+PinocchioOutput PINOCCHIO_API autoRigSkinWeightOnly( const Skeleton &given, Mesh &voxelMesh, Mesh& origMesh, std::vector<Vector3>& inputSkeleton )
+{
+	int i;
+	PinocchioOutput out;
+
+	Mesh newMesh = prepareMesh(voxelMesh);
+
+	if(newMesh.vertices.size() == 0)
+		return out;
+
+	TreeType *distanceField = constructDistanceField(newMesh);
+
+	
+	out.embedding = inputSkeleton;
+	//out.embedding = refineEmbedding(distanceField, medialCenters, discreteEmbedding, given);
+	//out.embedding.resize()
+	
+	
+	{
+		//attachment for voxel mesh
+		VisTester<TreeType> *tester = new VisTester<TreeType>(distanceField);
+		Attachment* voxelAttachment = new Attachment(newMesh ,given, out.embedding, tester);
+		out.attachment = new Attachment();
+
+
+		vector<Tri3Object> triobjvec;
+		for(int i = 0; i < (int)voxelMesh.edges.size(); i += 3) {
+			Vector3 v1 = voxelMesh.vertices[voxelMesh.edges[i].vertex].pos;
+			Vector3 v2 = voxelMesh.vertices[voxelMesh.edges[i + 1].vertex].pos;
+			Vector3 v3 = voxelMesh.vertices[voxelMesh.edges[i + 2].vertex].pos;
+			triobjvec.push_back(Tri3Object(v1, v2, v3,i/3));
+		}
+
+		ObjectProjector<3, Tri3Object> proj(triobjvec);
+		vector<Vector<double, -1> >& meshWeights = out.attachment->getAllWeights();	
+		meshWeights.resize(origMesh.vertices.size());
+		printf("mesh weights size = %d\n",meshWeights.size());
+		Tri3Object projTri;
+		int bones = given.fGraph().verts.size() - 1;
+		for (int i=0;i<origMesh.vertices.size();i++)
+		{
+			MeshVertex& vtx = origMesh.vertices[i];
+			Vector<double, -1>& origWeight = meshWeights[i];
+			origWeight[bones - 1] = 0.f;
+			for (int k=0;k<bones;k++) // set to zero
+				origWeight[k] = 0.f;
+
+			Vector3 projPos = proj.projectObj(vtx.pos,projTri);	
+			Vector3 baryW = barycentricCoord(projPos, projTri);	
+			for (int v=0;v<3;v++)
+			{
+				int vidx = voxelMesh.edges[projTri.triIdx*3+v].vertex;
+				Vector<double, -1> voxelWeight = voxelAttachment->getWeights(vidx);
+				for (int k=0;k<origWeight.size();k++)
+				{				
+					origWeight[k] += voxelWeight[k]*baryW[v];		
+					//printf("voxel weight[%d] = %f\n", k,voxelWeight[k]);
+				}
+			}	
+		}
+		//cleanup
+		delete tester;
+		delete voxelAttachment;
+	}		
+	delete distanceField;
+	return out;	
+}
+
 PinocchioOutput PINOCCHIO_API autorigVoxelTransfer( const Skeleton &given, Mesh &voxelMesh, Mesh& origMesh, bool computeSkinWeights )
 {
 
@@ -147,7 +216,7 @@ PinocchioOutput PINOCCHIO_API autorigVoxelTransfer( const Skeleton &given, Mesh 
 		medialCenters[i] = medialSurface[i].center;
 
 	out.embedding = refineEmbedding(distanceField, medialCenters, discreteEmbedding, given);
-
+	
 
 	if (computeSkinWeights)
 	{
@@ -187,7 +256,8 @@ PinocchioOutput PINOCCHIO_API autorigVoxelTransfer( const Skeleton &given, Mesh 
 				Vector<double, -1> voxelWeight = voxelAttachment->getWeights(vidx);
 				for (int k=0;k<origWeight.size();k++)
 				{				
-					origWeight[k] += voxelWeight[k]*baryW[v];					
+					origWeight[k] += voxelWeight[k]*baryW[v];		
+					//printf("voxel weight[%d] = %f\n", k,voxelWeight[k]);
 				}
 			}	
 		}

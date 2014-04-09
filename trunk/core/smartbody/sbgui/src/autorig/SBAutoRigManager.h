@@ -36,10 +36,10 @@ class SBAutoRigManager // build auto rigging given a static character mesh
 
 		bool buildAutoRigging(SrModel& inModel, std::string outSkName, std::string outDeformableMeshName);
 		bool buildAutoRiggingVoxels(SrModel& inModel, std::string outSkName, std::string outDeformableMeshName);	
-		bool buildAutoRiggingVoxelsWithVoxelSkinWeights(SrModel& inModel, std::string outSkName, std::string outDeformableMeshName);
-		
-		bool buildAutoRiggingFromPawnMesh(const std::string& pawnName, int riggingType, const std::string& outSkName, const std::string& outDeformableMeshName);
-		
+		bool buildAutoRiggingVoxelsWithVoxelSkinWeights(SrModel& inModel, std::string outSkName, std::string outDeformableMeshName);		
+		bool buildAutoRiggingFromPawnMesh(const std::string& pawnName, int riggingType, const std::string& outSkName, const std::string& outDeformableMeshName);	
+
+		bool updateSkinWeightFromCharacterMesh(const std::string& charName, int weightType);
 };
 
 SBAutoRigManager* getAutoRigManager();

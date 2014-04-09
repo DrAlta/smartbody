@@ -1715,7 +1715,7 @@ void FltkViewer::draw()
 	
 
 
-	if (_data->showcollisiongeometry)
+	//if (_data->showcollisiongeometry)
 		drawCharacterPhysicsObjs();
 	if (_data->showBoundingVolume)
 		drawCharacterBoundingVolumes();
