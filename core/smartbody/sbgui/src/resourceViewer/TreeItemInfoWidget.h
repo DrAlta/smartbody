@@ -26,13 +26,26 @@ public:
 };
 
 
+class JointInfoObject : public TreeInfoObject
+{
+protected:
+	SmartBody::SBSkeleton* itemSkeleton;
+	std::string jointName;
+public:
+	JointInfoObject();
+	~JointInfoObject();
+	virtual void notify(SBSubject* subject);
+	void setSkeleton(SmartBody::SBSkeleton* skel);
+	void setJointName(const std::string& jointName);
+};
+
 class SkeletonItemInfoWidget : public TreeItemInfoWidget
 {
 protected:
 	Fl_Tree*    skeletonTree;
 	SmartBody::SBSkeleton* itemSkeleton;
 	AttributeWindow* attrWindow;
-	TreeInfoObject*  jointInfoObject;
+	JointInfoObject*  jointInfoObject;
 	std::string      curJointName;
 	std::string      skeletonName;
 	std::string      charName;

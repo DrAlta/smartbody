@@ -411,9 +411,7 @@ void FLTKOgreWindow::fltkRender2()
 	glDisable(GL_TEXTURE_GEN_R);
 	glDisable(GL_TEXTURE_GEN_Q);
 
-	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
-		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
-	} 
+	
 	
 	
 	glBindBuffer( GL_ARRAY_BUFFER, 0);
@@ -426,6 +424,10 @@ void FLTKOgreWindow::fltkRender2()
 		drawDeformableModels();
 		//drawAllGeometries();
 	}
+
+	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
+		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
+	} 
 
 	glDisable(GL_LIGHTING);
 	glDisable(GL_BLEND);

@@ -38,6 +38,9 @@ PinocchioOutput PINOCCHIO_API autorig(const Skeleton &given, const Mesh &m, bool
 // use voxel mesh for auto rigging, then transfer the attachment weight to original mesh
 PinocchioOutput PINOCCHIO_API autorigVoxelTransfer(const Skeleton &given, Mesh &voxelMesh, Mesh& origMesh, bool computeSkinWeights = true); 
 
+// use voxel mesh for auto rigging, then transfer the attachment weight to original mesh
+PinocchioOutput PINOCCHIO_API autoRigSkinWeightOnly(const Skeleton &given, Mesh &voxelMesh, Mesh& origMesh, std::vector<Vector3>& inputSkeleton ); 
+
 //============================================individual steps=====================================
 
 //fits mesh inside unit cube, makes sure there's exactly one connected component
