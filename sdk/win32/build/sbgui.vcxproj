@@ -175,6 +175,7 @@
     <ClCompile Include="..\src\sbgui\panimationviewer\VisualizationView.cpp" />
     <ClCompile Include="..\src\sbgui\PawnPosControl.cpp" />
     <ClCompile Include="..\src\sbgui\PositionControl.cpp" />
+	<ClCompile Include="..\src\pythonbind\SBPythonAutorig.cpp" />
     <ClCompile Include="..\src\sbgui\resourceViewer\AttributeEditor.cpp" />
     <ClCompile Include="..\src\sbgui\retargetcreator\RetargetCreatorWindow.cpp" />
     <ClCompile Include="..\src\sbgui\retargetviewer\RetargetViewer.cpp" />
@@ -268,6 +269,7 @@
     <ClInclude Include="..\src\sbgui\panimationviewer\VisualizationView.h" />
     <ClInclude Include="..\src\sbgui\PawnPosControl.h" />
     <ClInclude Include="..\src\sbgui\PositionControl.h" />
+    <ClInclude Include="..\src\pythonbind\SBPythonAutoRig.h" />	
     <ClInclude Include="..\src\sbgui\resourceViewer\AttributeEditor.h" />
     <ClInclude Include="..\src\sbgui\retargetcreator\RetargetCreatorWindow.h" />
     <ClInclude Include="..\src\sbgui\retargetviewer\RetargetViewer.h" />
