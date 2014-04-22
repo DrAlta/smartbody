@@ -224,7 +224,7 @@ public :
 
 	/*! Adds to the channel array all channels that are in ca,
 		but are not in the channel array. The "floats counter" is updated. */
-	void merge ( SkChannelArray& ca );
+	bool merge ( SkChannelArray& ca );
 
 	/*! Copy operator copies all fields. */
 	void operator = ( const SkChannelArray& a );

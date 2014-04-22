@@ -499,7 +499,7 @@ m[i++] = cmap<0? cmap:cmap+v;
 }
 }*/
 
-void SkChannelArray::merge ( SkChannelArray& ca )
+bool SkChannelArray::merge ( SkChannelArray& ca )
 {
 	std::vector<std::string> namesToAdd;
 	std::vector<SkChannel::Type> typesToAdd;
@@ -525,7 +525,16 @@ void SkChannelArray::merge ( SkChannelArray& ca )
 	{
 		jointMapName = ca.getJointMapName();		
 	}
-	rebuild_hash_table();
+
+	if (namesToAdd.size() > 0)
+	{
+		rebuild_hash_table();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void SkChannelArray::operator = ( const SkChannelArray& a )
