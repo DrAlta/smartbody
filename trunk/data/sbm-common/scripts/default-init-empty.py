@@ -7,6 +7,7 @@ from SmartBody import *
 scene = SmartBody.getScene()
 sim = scene.getSimulationManager()
 bml = scene.getBmlProcessor()
+scene.setScale(.01)
 
 def setupFace(charName):
 
@@ -67,46 +68,51 @@ def setupFace(charName):
 		defaultFace = scene.getFaceDefinition("_default_")
 	
 	sbChar = scene.getCharacter(charName)
-	sbChar.setFaceDefinition(defaultFace)
+	if sbChar is not None:
+		sbChar.setFaceDefinition(defaultFace)
 	
 
 def characterSetup(charName):
-	print "Setting up character" + charName
+
+	print "Setting up character " + charName
 	setupFace(charName)
 
 	sbChar = scene.getCharacter(charName)
-	# steering
-	steerManager = scene.getSteerManager()
-	setupSteerAgent(charName, 'all')
-	steerManager.setEnable(False)	
-	steerManager.setEnable(True)
+	
+	# locomotion
+	#scene.run('BehaviorSetMaleMocapLocomotion.py')
+	#setupBehaviorSet()
+	#retargetBehaviorSet(charName)
 	
 	# reaching
-	reachSetup(charName,"KNN","")
+	#scene.run('BehaviorSetMocapReaching.py')
+	#setupBehaviorSet()
+	#retargetBehaviorSet(charName)
 	
 	# jumping
-	scene.run('BehaviorSetJumping.py')
-	setupBehaviorSet()
-	retargetBehaviorSet(charName, sbChar.getSkeleton().getName())
+	#scene.run('BehaviorSetJumping.py')
+	#setupBehaviorSet()
+	#retargetBehaviorSet(charName)
 	
 	# gesture
 	scene.run('BehaviorSetGestures.py')
 	setupBehaviorSet()
-	retargetBehaviorSet(charName, sbChar.getSkeleton().getName())
+	retargetBehaviorSet(charName)
 	
 	# punching
-	scene.run('BehaviorSetPunching.py')
-	setupBehaviorSet()
-	retargetBehaviorSet(charName, sbChar.getSkeleton().getName())
+	#scene.run('BehaviorSetPunching.py')
+	#setupBehaviorSet()
+	#retargetBehaviorSet(charName)
 	
 	# kicking
-	scene.run('BehaviorSetKicking.py')
-	setupBehaviorSet()
-	retargetBehaviorSet(charName, sbChar.getSkeleton().getName())
+	#scene.run('BehaviorSetKicking.py')
+	#setupBehaviorSet()
+	#retargetBehaviorSet(charName)
+	
 
+	
 
-
-#scene.run("default-viewer.py")
+scene.run("default-viewer.py")
 
 ### Load data/sbm-common assets
 scene.addAssetPath("seq", "sbm-common/scripts")
@@ -122,8 +128,7 @@ scene.run("init-example-reach.py")
 
 scene.setBoolAttribute("internalAudio", True)
 
-# start the simulation
-#sim.start()
 scene.vhmsg("vrAllCall")
 
-print "Finished default-init-empty.py"
+
+print "Finished default-init-empty.py for Panda"

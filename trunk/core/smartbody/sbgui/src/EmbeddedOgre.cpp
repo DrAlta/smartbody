@@ -741,11 +741,13 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 
 void EmbeddedOgre::update()
 {	
-	ogreWnd->update(false);	
+	if (ogreWnd)
+		ogreWnd->update(false);	
 	
 	// This update some internal counters and listeners.
 	// Each render surface (window/rtt/mrt) that is 'auto-updated' has got its 'update' function called.
-	ogreRoot->renderOneFrame();
+	if (ogreRoot)
+		ogreRoot->renderOneFrame();
 }
 
 void EmbeddedOgre::finishRender()

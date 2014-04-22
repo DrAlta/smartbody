@@ -135,6 +135,10 @@ void pythonFuncsMotion()
 		.def("getMotionSkeletonName", &SBMotion::getMotionSkeletonName, boost::python::return_value_policy<boost::python::return_by_value>(),"Get the skeleton associated with this motion.")
 		.def("setMotionSkeletonName", &SBMotion::setMotionSkeletonName, "Set the skeleton associated with this motion.")
 		.def("setEmptyMotion", &SBMotion::setEmptyMotion, "Set this motion to be empty given duration and number of frames")
+		.def("addSimilarPose", &SBMotion::addSimilarPose, "Marks another motion as being similar to this motion. This will be used by the gesture system to retarget gestures from one poses to a similar one.")
+		.def("removeSimilarPose", &SBMotion::removeSimilarPose, "Removes a pose as being similar to this motion. This will be used by the gesture system to retarget gestures from one poses to a similar one.")
+		.def("getSimilarPoses", &SBMotion::getSimilarPoses, "Retrieves all the similar pose.")
+		
 		;
 
 	boost::python::class_<SBMotionNode>("SBMotionNode")

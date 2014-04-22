@@ -555,6 +555,49 @@ void SBMotion::alignToSide(int numFrames, int direction)
 		alignIndex += numFrames;
 }
 
+void SBMotion::addSimilarPose(const std::string& motionName)
+{
+	for (std::vector<std::string>::iterator iter = _similarPoses.begin();
+		 iter != _similarPoses.end();
+		 iter++)
+	{
+		if ((*iter) == motionName)
+		{
+			LOG("Pose named '%s' already similar to motion %s.", motionName.c_str(), this->getName().c_str());
+			return;
+		}
+	}
+
+	_similarPoses.push_back(motionName);
+}
+
+void SBMotion::removeSimilarPose(const std::string& motionName)
+{
+	for (std::vector<std::string>::iterator iter = _similarPoses.begin();
+		 iter != _similarPoses.end();
+		 iter++)
+	{
+		if ((*iter) == motionName)
+		{
+			_similarPoses.erase(iter);
+			return;
+		}
+	}
+	LOG("Could not find similar pose '%s' for motion '%s'.", motionName.c_str(), this->getName().c_str());
+}
+
+std::vector<std::string> SBMotion::getSimilarPoses()
+{
+	std::vector<std::string> poses;
+	for (std::vector<std::string>::iterator iter = _similarPoses.begin();
+		 iter != _similarPoses.end();
+		 iter++)
+	{
+		poses.push_back(*iter);
+	}
+	return poses;
+}
+
 
 SBMotion* SBMotion::duplicateCycle(int num, std::string newName)
 {

@@ -87,15 +87,26 @@ void MeCtScheduler2::Context::child_channels_updated( MeController* child ) {
 	SkChannelArray& child_channels = child->controller_channels();
 	SkChannelArray& sched_channels = schedule->_channels;
 	int floats_before = sched_channels.floats();
-	sched_channels.merge( child_channels );
+	bool channelsAdded = sched_channels.merge( child_channels );
 
-	if( sched_channels.floats() == floats_before ) {
+	if (channelsAdded)
+	{
 		child->remap();
-	} else {
 		sched_channels.rebuild_hash_table();
 		if( parent_context )
 			parent_context->child_channels_updated( schedule );
 	}
+	else
+	{
+	
+	}
+//	if( sched_channels.floats() == floats_before ) {
+//		child->remap();
+//	} else {
+//		sched_channels.rebuild_hash_table();
+//		if( parent_context )
+//			parent_context->child_channels_updated( schedule );
+//	}
 }
 
 void MeCtScheduler2::Context::remove_controller( MeController* child ) {
