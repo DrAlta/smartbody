@@ -1,5 +1,6 @@
 #include "vhcl.h"
 #include "RetargetStepWindow.h"
+#include "RootWindow.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -16,6 +17,7 @@
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBAssetManager.h>
 #include <SBSelectionManager.h>
+#include <sbm/ParserOpenCOLLADA.h>
 
 #include <autorig/SBAutoRigManager.h>
 #include <boost/filesystem.hpp>
@@ -104,6 +106,9 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 
 	_buttonRefresh = new Fl_Button(420, curY, 120, 25, "Refresh");
 	_buttonRefresh->callback(RefreshCB, this);
+
+	_buttonSaveCharacter = new Fl_Button(560, curY, 120, 25, "Save Character");
+	_buttonSaveCharacter->callback(SaveCharacterCB, this);
 
 	retargetViewer->setShowButton(false);
 	jointMapViewer->setShowButton(false);
@@ -557,4 +562,35 @@ void RetargetStepWindow::show()
 	SBWindowListener::windowShow();
 	Fl_Double_Window::show();
 	refreshAll();
+}
+
+void RetargetStepWindow::SaveCharacterCB( Fl_Widget* widget, void* data )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBAssetManager* assetManager = scene->getAssetManager();	
+	RetargetStepWindow* retargetWindow = (RetargetStepWindow*)data;
+	std::string charName = retargetWindow->getCharName();
+	SmartBody::SBCharacter* selectChar = scene->getCharacter(charName);
+	if (!selectChar)
+	{
+		LOG("Save Character Fail : No character is selected.");
+		return;
+	}
+
+	SmartBody::SBSkeleton* skel = selectChar->getSkeleton();
+	std::string skelName = skel->getName();
+
+	std::string defMeshName = selectChar->getStringAttribute("deformableMesh");
+	DeformableMesh* defMesh = assetManager->getDeformableMesh(defMeshName);
+	if (!defMesh)
+	{
+		LOG("Save Character Fail : the character '%s' doesn't have a deformable mesh.", charName.c_str());
+		return;
+	}
+
+	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
+	std::string outDir = "";
+	outDir = BaseWindow::chooseDirectory("Save To:", mediaPath);	
+	std::vector<std::string> moNames;
+	ParserOpenCOLLADA::exportCollada(outDir,skelName,defMeshName,moNames,true,true,false);
 }

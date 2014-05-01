@@ -33,6 +33,8 @@ public:
 	virtual void draw();
 	void setApplyType(bool applyAll);
 	void setCharacterName(std::string charName);	
+	std::string getCharName() const { return _charName; }	
+
 	//void setSkeletonName(std::string skName);
 	void setJointMapName(std::string jointMapName);
 	void applyRetargetSteps();
@@ -51,6 +53,7 @@ public:
 	static void UpdateSkinWeightCB(Fl_Widget* widget, void* data);
 	static void CancelCB(Fl_Widget* widget, void* data);
 	static void RefreshCB(Fl_Widget* widget, void* data);
+	static void SaveCharacterCB(Fl_Widget* widget, void* data);
 
 public:
 	JointMapViewer* jointMapViewer;
@@ -67,6 +70,7 @@ protected:
 	Fl_Button* _buttonApplyAll;
 	Fl_Button* _buttonCancel;
 	Fl_Button* _buttonRefresh;
+	Fl_Button* _buttonSaveCharacter;
 	Fl_Choice* _buttonVoxelRigging;
 	std::string _charName;
 	std::string _removeCharacterName;
