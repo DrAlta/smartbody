@@ -26,11 +26,15 @@ public:
 	virtual int handle( int event );
 	void translate_event(SrEvent& e, SrEvent::EventType t, int w, int h, MouseViewer* viewer);
 	void mouse_event(SrEvent& e);	
+	void preRender();
 protected:
 	SrVec rotate_point(SrVec point, SrVec origin, SrVec direction, float angle);
+	void updateLights();
+	void init_opengl();
 protected:
 	SrEvent e;
 	SrCamera cam;
+	std::vector<SrLight> lights;
 };
 
 class SkeletonViewer : public MouseViewer
@@ -44,6 +48,8 @@ public:
 	void setTestMotion(SmartBody::SBMotion* motion);
 	void setShowJointLabels(int showLabel);
 	void setSkeleton(std::string skelName);
+
+	bool updateSkeleton();
 	void setJointMap(std::string mapName);
 	void setFocusJointName(std::string focusName);
 	std::string getFocusJointName();
@@ -53,8 +59,7 @@ public:
 	SmartBody::SBSkeleton* getSkeleton();
 	
 protected:
-	void updateLights();
-	void init_opengl();
+	
 	void drawJointMapLabels(std::string jointMapName);
 	std::vector<int> process_hit(unsigned int *pickbuffer,int nhits);
 	std::string pickJointName(float x, float y);
@@ -63,8 +68,7 @@ protected:
 	bool playMotion;
 	SmartBody::SBMotion* testMotion;
 	SrSaGlRender renderFunction;
-	int showJointLabels;
-	std::vector<SrLight> lights;
+	int showJointLabels;	
 	SkScene* skeletonScene;
 	SmartBody::SBSkeleton* skeleton;
 	std::string jointMapName;

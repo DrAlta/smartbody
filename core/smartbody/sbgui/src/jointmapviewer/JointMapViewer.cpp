@@ -665,6 +665,102 @@ MouseViewer::~MouseViewer()
 
 }
 
+void MouseViewer::preRender()
+{
+	glViewport ( 0, 0, w(), h() );		
+	SrMat mat ( SrMat::NotInitialized );
+	// 	static int counter = 0;
+	// 	counter = counter%1000;
+	// 	float color = ((float)counter)/1000.f;
+	// 	counter++;
+	//glClearColor ( SrColor(0.5f,0.5f,0.5f));
+	glClearColor ( SrColor(1.0f,1.0f,1.0f));
+	//glClearColor(SrColor(color,color,color));
+	//----- Clear Background --------------------------------------------	
+	glClear ( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+	glEnable ( GL_LIGHTING );
+	for (size_t x = 0; x < lights.size(); x++)
+	{
+		glLight ( x, lights[x] );		
+	}
+
+	glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 1.0f);
+	glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.2f);
+	glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.08f);	
+
+	static GLfloat mat_emissin[] = { 0.0,  0.0,    0.0,    1.0 };
+	static GLfloat mat_ambient[] = { 0.0,  0.0,    0.0,    1.0 };
+	static GLfloat mat_diffuse[] = { 1.0,  1.0,    1.0,    1.0 };
+	static GLfloat mat_speclar[] = { 0.0,  0.0,    0.0,    1.0 };
+	glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse );
+	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar );
+	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
+	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+	//glEnable( GL_COLOR_MATERIAL );
+	glEnable( GL_NORMALIZE );
+
+	//----- Set Projection ----------------------------------------------
+	cam.setAspectRatio((float)w()/(float)h());
+
+	glMatrixMode ( GL_PROJECTION );
+	glLoadMatrix ( cam.get_perspective_mat(mat) );
+
+	//----- Set Visualisation -------------------------------------------
+	glMatrixMode ( GL_MODELVIEW );
+	glLoadMatrix ( cam.get_view_mat(mat) );
+
+	glScalef ( cam.getScale(), cam.getScale(), cam.getScale() );
+}
+
+void MouseViewer::init_opengl()
+{
+	// valid() is turned on by fltk after draw() returns
+	glViewport ( 0, 0, w(), h() );
+	glEnable ( GL_DEPTH_TEST );
+	glEnable ( GL_LIGHT0 ); 
+	glEnable ( GL_LIGHTING );
+
+	//glEnable ( GL_BLEND ); // for transparency
+	//glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+	glCullFace ( GL_BACK );
+	glDepthFunc ( GL_LEQUAL );
+	glFrontFace ( GL_CCW );
+
+	glEnable ( GL_POLYGON_SMOOTH );
+
+	//glEnable ( GL_LINE_SMOOTH );
+	//glHint ( GL_LINE_SMOOTH_HINT, GL_NICEST );
+
+	glEnable ( GL_POINT_SMOOTH );
+	glPointSize ( 2.0 );
+
+	glShadeModel ( GL_SMOOTH );		
+}
+
+void MouseViewer::updateLights()
+{
+	SrLight light;		
+	light.directional = true;
+	light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
+	light.position = SrVec( 100.0, 250.0, 400.0 );
+	//	light.constant_attenuation = 1.0f/cam.scale;
+	light.constant_attenuation = 1.0f;
+	lights.push_back(light);
+
+	SrLight light2 = light;
+	light2.directional = true;
+	light2.diffuse = SrColor( 0.8f, 0.8f, 0.8f );
+	light2.position = SrVec( 100.0, 500.0, -1000.0 );
+	//	light2.constant_attenuation = 1.0f;
+	//	light2.linear_attenuation = 2.0f;
+	lights.push_back(light2);
+}
+
+
 int MouseViewer::handle( int event )
 {
 	switch ( event )
@@ -1076,71 +1172,39 @@ std::string SkeletonViewer::getFocusJointName()
 	return focusJointName;
 }
 
-void SkeletonViewer::updateLights()
-{
-	SrLight light;		
-	light.directional = true;
-	light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
-	light.position = SrVec( 100.0, 250.0, 400.0 );
-	//	light.constant_attenuation = 1.0f/cam.scale;
-	light.constant_attenuation = 1.0f;
-	lights.push_back(light);
 
-	SrLight light2 = light;
-	light2.directional = true;
-	light2.diffuse = SrColor( 0.8f, 0.8f, 0.8f );
-	light2.position = SrVec( 100.0, 500.0, -1000.0 );
-	//	light2.constant_attenuation = 1.0f;
-	//	light2.linear_attenuation = 2.0f;
-	lights.push_back(light2);
-}
 
 void SkeletonViewer::setSkeleton( std::string skelName )
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSkeleton* sk = scene->getSkeleton(skelName);
+	if (sk)
+	{
+		skeleton = sk;
+	}
+
+	bool success = updateSkeleton();
+	if (success)
+		focusOnSkeleton();
+}
+
+bool SkeletonViewer::updateSkeleton()
+{
 
 	if (skeletonScene)
 	{
 		delete skeletonScene;
 		skeletonScene = NULL;
 	}
-
-	if (!sk) return;
-	
-	skeleton = sk;
+	if (!skeleton) return false;		
 	skeletonScene = new SkScene();
 	skeletonScene->ref();
-	skeletonScene->init(sk);
+	skeletonScene->init(skeleton);
 	skeletonScene->set_visibility(true,false,false,false);
-	focusOnSkeleton();
+	return true;
 }
 
-void SkeletonViewer::init_opengl()
-{
-	// valid() is turned on by fltk after draw() returns
-	glViewport ( 0, 0, w(), h() );
-	glEnable ( GL_DEPTH_TEST );
-	glEnable ( GL_LIGHT0 ); 
-	glEnable ( GL_LIGHTING );
 
-	//glEnable ( GL_BLEND ); // for transparency
-	//glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-	glCullFace ( GL_BACK );
-	glDepthFunc ( GL_LEQUAL );
-	glFrontFace ( GL_CCW );
-
-	glEnable ( GL_POLYGON_SMOOTH );
-
-	//glEnable ( GL_LINE_SMOOTH );
-	//glHint ( GL_LINE_SMOOTH_HINT, GL_NICEST );
-
-	glEnable ( GL_POINT_SMOOTH );
-	glPointSize ( 2.0 );
-
-	glShadeModel ( GL_SMOOTH );		
-}
 
 
 void SkeletonViewer::focusOnSkeleton()
@@ -1323,6 +1387,7 @@ SmartBody::SBSkeleton* SkeletonViewer::getSkeleton()
 {
 	return skeleton;
 }
+
 
 const std::string spineJointNames[7] = {"base","spine1", "spine2", "spine3", "spine4", "spine5", "skullbase" };
 const std::string leftArmJointNames[5] = {"l_sternoclavicular","l_shoulder", "l_elbow", "l_forearm", "l_wrist" };
@@ -2040,6 +2105,8 @@ void JointMapViewer::updateUI()
 	updateTestMotions();
 	//updateCharacterList();
 	updateJointMapList();
+	targetSkeletonViewer->updateSkeleton();
+	
 }
 
 // void JointMapViewer::updateCharacterList()
