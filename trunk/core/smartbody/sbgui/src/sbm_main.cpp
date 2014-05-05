@@ -28,6 +28,7 @@
 #include <sb/SBBmlProcessor.h>
 #include "sbm/GPU/SbmShader.h"
 #include <sb/SBBoneBusManager.h>
+#include <boost/algorithm/string.hpp>
 
 #include <pythonbind/SBPythonAutoRig.h>
 
@@ -772,6 +773,10 @@ int main( int argc, char **argv )	{
 	float sleepFPS = -1;
 	float intervalAmount = -1;
 	bool isInteractive = true;
+
+	std::vector<std::string> envNames;
+	std::vector<std::string> envValues;
+
 	int i;
 	for (	i=1; i<argc; i++ )
 	{
@@ -929,6 +934,22 @@ int main( int argc, char **argv )	{
         {
                 isInteractive = false;
         }
+		else if ( s.compare("-env") == 0)
+        {
+			if( ++i < argc )
+			{
+				// environmental variables to be used during Python/scripting startup
+				 std::string nameValuePair = argv[i];
+				 std::vector<string> strs;
+				 boost::split(strs, nameValuePair, boost::is_any_of("="));
+				 if (strs.size() > 0)
+					 envNames.push_back(strs[0]);
+				 if (strs.size() > 1)
+					 envValues.push_back(strs[1]);       
+				 else
+					 envValues.push_back("");
+			}
+        }
 		else
 		{
 			LOG( "ERROR: Unrecognized command line argument: \"%s\"\n", s.c_str() );
@@ -951,6 +972,7 @@ int main( int argc, char **argv )	{
 	//scene->addSceneListener(&fltkListener);
 
 	scene->startFileLogging("./smartbody.log");
+
 
 	scene->getSimulationManager()->setupTimer();
 
@@ -1050,6 +1072,16 @@ int main( int argc, char **argv )	{
 	}
 
 	SmartBody::SBScene::getScene()->getDebuggerServer()->SetID("sbm-fltk");
+
+#ifndef SB_NO_PYTHON
+	// initialize any Python environment variables from the command line
+	std::stringstream strstr;
+	for (unsigned int x = 0; x < envNames.size(); x++)
+	{
+		strstr << envNames[x] << " = \"" << envValues[x] << "\"";
+		scene->run(strstr.str());
+	}
+#endif
 
 //	(void)signal( SIGABRT, signal_handler );
 //	(void)signal( SIGFPE, signal_handler );
