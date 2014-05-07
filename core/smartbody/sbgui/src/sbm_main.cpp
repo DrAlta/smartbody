@@ -1075,10 +1075,11 @@ int main( int argc, char **argv )	{
 
 #ifndef SB_NO_PYTHON
 	// initialize any Python environment variables from the command line
-	std::stringstream strstr;
 	for (unsigned int x = 0; x < envNames.size(); x++)
 	{
+		std::stringstream strstr;
 		strstr << envNames[x] << " = \"" << envValues[x] << "\"";
+		LOG(strstr.str().c_str());
 		scene->run(strstr.str());
 	}
 #endif
