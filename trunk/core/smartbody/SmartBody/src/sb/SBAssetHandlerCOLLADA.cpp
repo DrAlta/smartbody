@@ -193,10 +193,11 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 					meshModelVec[i]->V[j] *= factor;
 				}
 		
-				if (meshModelVec[i]->Fn.size() == 0)
-				{
-					meshModelVec[i]->computeNormals();
-				}
+// 				if (meshModelVec[i]->Fn.size() == 0)
+// 				{
+// 					meshModelVec[i]->computeNormals();
+// 				}
+				meshModelVec[i]->computeNormals();
 
 				SrSnModel* srSnModelStatic = new SrSnModel();
 				srSnModelStatic->shape(*meshModelVec[i]);

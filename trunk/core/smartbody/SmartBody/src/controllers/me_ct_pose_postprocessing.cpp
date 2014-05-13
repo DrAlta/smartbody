@@ -141,6 +141,7 @@ bool MeCtPosePostProcessing::controller_evaluate( double t, MeFrameData& frame )
 			{
 				MeCtIKTreeNode* node = ik_scenario.ikTreeNodes[i];
 				SrQuat qEval = node->getQuat(QUAT_CUR);//ik_scenario.ikQuatList[i];
+				//SrQuat qEval = node->getQuat(QUAT_REF);
 				SrQuat qInit = node->getQuat(QUAT_REF);
 				qEval.normalize();
 				qInit.normalize();
