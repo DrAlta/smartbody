@@ -32,6 +32,8 @@
 #include <sbm/sr_path_list.h>
 #include <sbm/sbm_constants.h>
 
+#include <boost/filesystem/path.hpp>
+
 #ifdef WIN32
 #include <direct.h>
 #else
@@ -468,7 +470,9 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 
 #endif
 
-		std::string finalPath = p.string();
+	std::string finalPath = p.string();
+
+	LOG("final path = %s", finalPath.c_str());
 
 	// make sure the file exists and is readable
 	std::ifstream file(finalPath.c_str());
@@ -1050,7 +1054,12 @@ int SBAssetManager::load_me_motions( const char* pathname, bool recurse_dirs, do
 	}
 
 	if (1) {
-		return load_me_motions_impl( finalPath, recurse_dirs, scale, "ERROR: " );
+#if (BOOST_VERSION > 104400)
+		std::string finalPathStr = finalPath.string();
+#else
+		std::string finalPathStr = finalPath.native_file_string();  
+#endif
+		return load_me_motions_impl( finalPathStr, recurse_dirs, scale, "ERROR: " );
 	} else {
 		LOG("ERROR: Invalid motion path \"%s\".", finalPath.string().c_str());
 		return CMD_FAILURE;
@@ -1058,8 +1067,9 @@ int SBAssetManager::load_me_motions( const char* pathname, bool recurse_dirs, do
 }
 
 
-int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathname, bool recurse_dirs, double scale, const char* error_prefix )
+int SBAssetManager::load_me_motions_impl( const std::string& pathStr, bool recurse_dirs, double scale, const char* error_prefix )
 {
+	boost::filesystem::path pathname(pathStr);
 
 	if( !boost::filesystem::exists( pathname ) )
 	{
@@ -1093,7 +1103,14 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 
 			if( boost::filesystem::is_directory( cur ) ) {
 				if( recurse_dirs )
-					load_me_motions_impl( cur, recurse_dirs, scale, "WARNING: " );
+				{
+#if (BOOST_VERSION > 104400)
+					std::string curStr = cur.string();
+#else
+					std::string curStr = cur.native_file_string();  
+#endif
+					load_me_motions_impl( curStr, recurse_dirs, scale, "WARNING: " );
+				}
 			} else {
 				std::string ext = boost::filesystem::extension( cur );
 #if ENABLE_FBX_PARSER
@@ -1111,7 +1128,12 @@ int SBAssetManager::load_me_motions_impl( const boost::filesystem::path& pathnam
 					_stricmp( ext.c_str(), ".amc" ) == 0)
 #endif
 				{
-					load_me_motions_impl( cur, false, scale, "WARNING: " );
+#if (BOOST_VERSION > 104400)
+					std::string curStr = cur.string();
+#else
+					std::string curStr = cur.native_file_string();  
+#endif
+					load_me_motions_impl( curStr, false, scale, "WARNING: " );
 				} 
 				else if( DEBUG_LOAD_PATHS2 ) {
 					LOG("DEBUG: load_me_motion_impl(): Skipping \"%s\".  Extension \"%s\" does not match MOTION_EXT.", cur.string().c_str(), ext.c_str() );
@@ -1501,9 +1523,9 @@ SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srP
 
 
 
-int SBAssetManager::load_me_skeletons_impl( const boost::filesystem::path& pathname, std::map<std::string, SmartBody::SBSkeleton*>& map, bool recurse_dirs, double scale, const char* error_prefix )
+int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map<std::string, SmartBody::SBSkeleton*>& map, bool recurse_dirs, double scale, const char* error_prefix )
 {
-		
+	boost::filesystem::path pathname(pathStr);	
 	if( !exists( pathname ) ) {
 #if (BOOST_VERSION > 104400)
 		LOG("%s Skeleton path \"%s\" not found.", error_prefix,  pathname.string().c_str());
@@ -1521,7 +1543,14 @@ int SBAssetManager::load_me_skeletons_impl( const boost::filesystem::path& pathn
 
 			if( boost::filesystem::is_directory( cur ) ) {
 				if( recurse_dirs )
-					load_me_skeletons_impl( cur, map, recurse_dirs, scale, "WARNING: " );
+				{
+#if (BOOST_VERSION > 104400)
+					std::string curStr = cur.string();
+#else
+					std::string curStr = cur.native_file_string();  
+#endif
+					load_me_skeletons_impl( curStr, map, recurse_dirs, scale, "WARNING: " );
+				}
 			} else {
 				std::string ext = boost::filesystem::extension( cur );
 #if ENABLE_FBX_PARSER
@@ -1546,7 +1575,12 @@ int SBAssetManager::load_me_skeletons_impl( const boost::filesystem::path& pathn
 					_stricmp( ext.c_str(), ".xml" ) == 0)
 #endif
 				{
-					load_me_skeletons_impl( cur, map, recurse_dirs, scale, "WARNING: " );
+#if (BOOST_VERSION > 104400)
+					std::string curStr = cur.string();
+#else
+					std::string curStr = cur.native_file_string();  
+#endif
+					load_me_skeletons_impl( curStr, map, recurse_dirs, scale, "WARNING: " );
 				} 
 				else if( DEBUG_LOAD_PATHS2 ) {
 					LOG("DEBUG: load_me_skeleton_impl(): Skipping \"%s\".  Extension \"%s\" does not match .sk.", cur.string().c_str(), ext.c_str() );
@@ -1793,7 +1827,12 @@ int SBAssetManager::load_me_skeletons( const char* pathname, std::map<std::strin
 	}
 
 	if (1) {
-		return load_me_skeletons_impl( finalPath, map, recurse_dirs, scale, "ERROR: " );
+#if (BOOST_VERSION > 104400)
+		std::string finalPathStr = finalPath.string();
+#else
+		std::string finalPathStr = finalPath.native_file_string();  
+#endif
+		return load_me_skeletons_impl( finalPathStr, map, recurse_dirs, scale, "ERROR: " );
 	} else {
 		LOG("ERROR: Invalid skeleton path \"%s\".", finalPath.string().c_str() );
 		return CMD_FAILURE;

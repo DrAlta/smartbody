@@ -179,7 +179,8 @@ void SkScene::initInternal()
     
       for (size_t j=0; j < (size_t) joints[i]->num_children(); j++ )
        { SrSnCylinder* c = new SrSnCylinder;
-		 c->color(SrColor::white);
+	     c->color(SrColor::gray);
+		 //c->color(SrColor::white);
          c->shape().a = SrPnt::null;
          c->shape().b = joints[i]->child(j)->offset();
          c->shape().radius = scaleFactor * _cradius;
@@ -191,7 +192,8 @@ void SkScene::initInternal()
 	  if (joints[i]->num_children() == 0)
 	  {
 		 SrSnSphere* sphere = new SrSnSphere;
-		 sphere->color(SrColor::white);
+		 sphere->color(SrColor::gray);
+		 //sphere->color(SrColor::white);
 		 sphere->shape().radius = scaleFactor * _cradius * _sfactor ;
 		 sphere->visible ( true );
 //		 sphere->ref();

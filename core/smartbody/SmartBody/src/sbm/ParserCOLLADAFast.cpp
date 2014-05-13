@@ -419,7 +419,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 								boost::algorithm::to_lower(sourceId);
 								bool isBindJointName = (sourceId.find("joints") != std::string::npos);
 								bool isBindWeights = (sourceId.find("weights") != std::string::npos);
-								bool isBindPoseMatrices = (sourceId.find("bind_poses") != std::string::npos || sourceId.find("matrices") != std::string::npos);
+								bool isBindPoseMatrices = (sourceId.find("bind_poses") != std::string::npos || sourceId.find("matrices") != std::string::npos || sourceId.find("poses") != std::string::npos);
 
 								//DOMNodeList* realContentNodeList = childNodeOfSkin->getChildNodes();
 								rapidxml::xml_node<>* realContentCurNode = childNodeOfSkin->first_node();
@@ -441,7 +441,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 										++it)
 									{
 										//if ( sourceId == bindJointName && realNodeName == "Name_array") // joint name
-										if ( isBindJointName && realNodeName == "Name_array") // joint name
+										if ( isBindJointName && (realNodeName == "Name_array" || realNodeName == "IDREF_array") ) // joint name
 										{
 											std::string jointName = (*it);
 											// check if the joint name start with the pre-fix and remove the prefix
