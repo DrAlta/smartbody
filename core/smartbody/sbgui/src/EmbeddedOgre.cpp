@@ -1055,6 +1055,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	ogreMesh->sharedVertexData = vtxData;
 	vtxData->vertexCount = mesh->posBuf.size();
 	bool hasColorBuf = (mesh->meshColorBuf.size() == mesh->posBuf.size() && mesh->hasVertexColor);
+	bool hasTexture = (mesh->texCoordBuf.size() == mesh->posBuf.size());
 	Ogre::VertexDeclaration* decl = vtxData->vertexDeclaration;
 	size_t offset = 0;
 	decl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
@@ -1098,7 +1099,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	bind->setBinding(0, vbuf);
 	delete [] tempFloatArray;
 	
-	if (hasColorBuf)
+	if (hasColorBuf && !hasTexture)
 	{		
 		decl->addElement(1, 0, Ogre::VET_FLOAT3, Ogre::VES_DIFFUSE);
 		//perVertexSize = 9;
@@ -1120,7 +1121,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		cbuf->writeData(0, cbuf->getSizeInBytes(), tempFloatArray, true);		
 		bind->setBinding(1, cbuf);
 	}
-	else
+	else if (hasTexture)
 	{
 		// create vertex buffer 1 : texture coordinate
 		decl->addElement(1, 0, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES);
@@ -1179,9 +1180,9 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		{
  			Ogre::TextureUnitState* texUnit = pass->createTextureUnitState();
  			texUnit->setTextureName(texPtr->getName());				
-			texUnit->setAlphaOperation(LBX_MODULATE, LBS_TEXTURE, LBS_CURRENT);//, 1.0, 0.1);
+			texUnit->setAlphaOperation(LBX_MODULATE, LBS_TEXTURE, LBS_CURRENT);//, 1.0, 0.1);			
 		}		
- 		//pass->setDiffuse(1.0,1.0,1.0,1.0);
+		//pass->setDiffuse(1.0,1.0,1.0,1.0);
 		SrMaterial& mat = subModel->material;
 		//LOG("diffuse material = %f %f %f %f",mat.diffuse.r,mat.diffuse.g,mat.diffuse.b,mat.diffuse.a);
 		float color[4];
@@ -1190,7 +1191,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		//pass->setAmbient(color[0],color[1],color[2]);
 		mat.diffuse.get(color);	
 		//LOG("diffuse color = %f %f %f %f",color[0],color[1],color[2],color[3]);
-		if (hasColorBuf)
+		if (hasColorBuf && !hasTexture)
 		{
 			pass->setVertexColourTracking(TVC_DIFFUSE);
 			pass->setLightingEnabled(false);
@@ -1198,14 +1199,14 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		else
 		{
 			pass->setDiffuse(color[0],color[1],color[2],color[3]);
-			mat.specular.get(color);	
+			mat.specular.get(color);				
 			//LOG("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
 			pass->setSpecular(color[0],color[1],color[2],color[3]);
 			pass->setShininess(mat.shininess);	
 			pass->setLightingEnabled(true);
 		}
 	
-		if (!hasColorBuf)
+		if (!hasColorBuf || hasTexture)
 		{
 			// disable texture alpha blending if we are using vertex color
 			pass->setAlphaRejectSettings(CMPF_GREATER, 0, true);		
