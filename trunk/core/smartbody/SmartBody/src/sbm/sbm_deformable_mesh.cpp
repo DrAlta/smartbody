@@ -69,6 +69,7 @@ DeformableMesh::DeformableMesh() : SBAsset()
 	initSkinnedVertexBuffer = false;
 	initStaticVertexBuffer = false;
 	hasVertexColor = false;	
+	hasTexCoord = false;
 	skeleton = new SmartBody::SBSkeleton();
 	skeleton->ref();
 }
@@ -533,6 +534,11 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				meshColor = dMeshStatic->shape().Vc[i];
 				hasVertexColor = true;
 			}			
+			if (dMeshStatic->shape().T.size() > 0)
+			{
+				hasTexCoord = true;
+			}
+
 			meshColorBuf[iVtx] = meshColor;
 
 			SrVec& lt =	dMeshStatic->shape().Tangent[i];		

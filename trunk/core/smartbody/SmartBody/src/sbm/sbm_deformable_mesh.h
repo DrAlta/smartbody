@@ -98,6 +98,7 @@ public:
 	std::map<std::string, float>	visemeWeightMap;
 	std::vector<SrSnModel*>		dMeshBlend_p;
 	bool hasVertexColor;	
+	bool hasTexCoord;
 public:
 	SBAPI DeformableMesh();
 	SBAPI virtual ~DeformableMesh();	
