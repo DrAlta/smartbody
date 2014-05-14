@@ -1055,7 +1055,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	ogreMesh->sharedVertexData = vtxData;
 	vtxData->vertexCount = mesh->posBuf.size();
 	bool hasColorBuf = (mesh->meshColorBuf.size() == mesh->posBuf.size() && mesh->hasVertexColor);
-	bool hasTexture = (mesh->texCoordBuf.size() == mesh->posBuf.size());
+	bool hasTexture = (mesh->texCoordBuf.size() == mesh->posBuf.size() && mesh->hasTexCoord);
 	Ogre::VertexDeclaration* decl = vtxData->vertexDeclaration;
 	size_t offset = 0;
 	decl->addElement(0, offset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
