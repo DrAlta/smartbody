@@ -5333,10 +5333,13 @@ void FltkViewer::drawDeformableModels()
 			else
 			{
 				//meshInstance->blendShapes();
-				meshInstance->blendShapeStaticMesh();
+				if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && meshInstance->getVisibility() == 1) || meshInstance->getVisibility() == 2)
+				{
+					meshInstance->blendShapeStaticMesh();
 
-				// simply draw the static mesh
-				SrGlRenderFuncs::renderDeformableMesh(meshInstance, false);
+					// simply draw the static mesh
+					SrGlRenderFuncs::renderDeformableMesh(meshInstance, false);
+				}				
 			}
 		}
 	}
