@@ -35,6 +35,17 @@
  
 //=================================== SrModel =================================================
 
+class Pt2Comp { // simple comparison function
+public:
+	bool operator ()(const SrPnt2& x,const SrPnt2 y) const
+	{  
+		if (x[0] == y[0])
+			return x[1] < y[1];
+		else
+			return x[0] < y[0];
+	} // returns x>y
+};
+
 const char* SrModel::class_name = "Model";
 
 SrModel::SrModel ()
@@ -209,18 +220,6 @@ void SrModel::remove_redundant_materials ()
 
 void SrModel::remove_redundant_texcoord()
 {
-
-	class Pt2Comp { // simple comparison function
-	public:
-		bool operator ()(const SrPnt2& x,const SrPnt2 y) const
-		{  
-			if (x[0] == y[0])
-				return x[1] < y[1];
-			else
-				return x[0] < y[0];
-		} // returns x>y
-	};
-
 	int i, j, k;
 	float ang;
 	float texDiff;
