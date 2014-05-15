@@ -84,9 +84,6 @@
 #include "sr/sr_model.h"
 
 #define ENABLE_DEFAULT_BOOTSTRAP	(1) 
-//#define DEFAULT_SEQUENCE_FILE		("ELITE-all.seq")
-#define DEFAULT_SEQUENCE_FILE		("default.seq")
-#define DEFAULT_PY_FILE				("default.py")
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -892,8 +889,8 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	// run the specified scripts
 	if( init_seqs.empty() && init_pys.empty())
 	{
-		LOG( "No Python scripts specified. Loading script '%s'\n", DEFAULT_PY_FILE );
-		init_pys.push_back( DEFAULT_PY_FILE );
+		LOG( "No Python scripts specified. Loading script 'default.py'\n");
+		init_pys.push_back( "default.py" );
 	}
 
 	for( it = init_seqs.begin();
