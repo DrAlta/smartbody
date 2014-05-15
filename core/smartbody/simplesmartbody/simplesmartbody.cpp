@@ -25,6 +25,12 @@ class SimpleListener : public SmartBody::SBSceneListener
 
 int main( int argc, char ** argv )
 {
+	// set the relative path from the location of the simplesmartbody binary to the data directory
+	// if you are downloading the source code from SVN, it will be ../../../../data
+	//std::string mediaPath = "../../../../data";
+	// if you're using the SDK, this path will be ../data
+	std::string mediaPath = "../data";
+
 	// add a message logger to stdout
 	vhcl::Log::StdoutListener* stdoutLog = new vhcl::Log::StdoutListener();
 	vhcl::Log::g_log.AddListener(stdoutLog);
@@ -40,7 +46,7 @@ int main( int argc, char ** argv )
 	scene->addSceneListener(&listener);
 
 	// set the mediapath which dictates the top-level asset directory
-	scene->setMediaPath("../data");
+	scene->setMediaPath(mediaPath);
 
 	// indicate where different assets will be located
 	// "motion" = animations and skeletons
@@ -109,8 +115,11 @@ int main( int argc, char ** argv )
 			SmartBody::SBCharacter* character = scene->getCharacter(characterNames[c]);
 			std::string jointName = "JtRoot";
 			SmartBody::SBJoint* joint = character->getSkeleton()->getJointByName(jointName);
-			SrVec position = joint->getPosition();
-			LOG("Character %s joint %s is at position (%f, %f, %f)", character->getName().c_str(), jointName.c_str(), position.x, position.y, position.z);
+			if (joint)
+			{
+				SrVec position = joint->getPosition();
+				LOG("Character %s joint %s is at position (%f, %f, %f)", character->getName().c_str(), jointName.c_str(), position.x, position.y, position.z);
+			}
 		}
 	}
 

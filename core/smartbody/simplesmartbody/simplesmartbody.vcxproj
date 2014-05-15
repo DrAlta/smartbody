@@ -116,7 +116,7 @@
       <Command>if not exist .\bin mkdir .\bin
 copy /Y "$(TargetPath)" .\bin
 copy /Y ..\SmartBody\lib\SmartBody_d.dll .\bin
-copy /Y ..\smartbody-lib\src\external\glew\glew32.dll .\bin
+copy /Y ..\Smartbody\src\external\glew\glew32.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin
@@ -127,13 +127,13 @@ copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll .\bin
 copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1D.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-gd-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_system-vc100-mt-gd-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_regex-vc100-mt-gd-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_python-vc100-mt-gd-1_44.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-gd-1_51.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_system-vc100-mt-gd-1_51.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_regex-vc100-mt-gd-1_51.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_python-vc100-mt-gd-1_51.dll .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll  .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll  .\bin
-copy /Y ..\..\..\core\smartbody\Python26\libs\python26.dll .\bin
+copy /Y ..\..\..\core\smartbody\Python27\libs\python27.dll .\bin
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
 </Command>
     </PostBuildEvent>
@@ -170,7 +170,7 @@ copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
       <Command>if not exist .\bin mkdir .\bin
 copy /Y "$(TargetPath)" .\bin
 copy /Y ..\SmartBody\lib\SmartBody.dll .\bin
-copy /Y ..\smartbody-lib\src\external\glew\glew32.dll .\bin
+copy /Y ..\Smartbody\src\external\glew\glew32.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin
 copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin
@@ -181,13 +181,13 @@ copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll .\bin
 copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_system-vc100-mt-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_regex-vc100-mt-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_python-vc100-mt-1_44.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-1_51.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_system-vc100-mt-1_51.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_regex-vc100-mt-1_51.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_python-vc100-mt-1_51.dll .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll  .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll  .\bin
-copy /Y ..\..\..\core\smartbody\Python26\libs\python26.dll .\bin
+copy /Y ..\..\..\core\smartbody\Python27\libs\python27.dll .\bin
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
 </Command>
     </PostBuildEvent>
