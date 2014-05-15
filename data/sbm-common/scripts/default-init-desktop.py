@@ -4,9 +4,7 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-#scene.addAssetPath('mesh', 'retarget/mesh')
 scene.addAssetPath('motion', 'ChrBrad')
-#scene.addAssetPath('motion', 'sbm-common/common-sk')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
@@ -15,7 +13,6 @@ scene.loadAssets()
 print 'Configuring scene parameters and camera'
 scene.setScale(1.0)
 scene.setBoolAttribute('internalAudio', True)
-
 
 camera = getCamera()
 camera.setEye(0, 1.71, 1.86)
@@ -97,22 +94,22 @@ brad.setBoolAttribute('usePhoneBigram', True)
 brad.setVoice('remote')
 brad.setVoiceCode('Microsoft|Anna')
 
+
 # setup locomotion
 scene.run('BehaviorSetMaleMocapLocomotion.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrBrad')
 
-
 # setup gestures
 scene.run('BehaviorSetGestures.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrBrad')
-'''
+
 # setup reach 
 scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrBrad')
-'''
+
 
 # Turn on GPU deformable geometry
 brad.setStringAttribute("displayType", "GPUmesh")
@@ -127,7 +124,7 @@ steerManager.setEnable(True)
 print 'Starting the simulation'
 sim.start()
 
-bml.execBML('ChrBrad', '<body posture="ChrMarine@Idle01"/>')
+bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
 bml.execBML('ChrBrad', '<saccade mode="listen"/>')
 #bml.execBML('ChrBrad', '<gaze sbm:handle="brad" target="camera"/>')
 
