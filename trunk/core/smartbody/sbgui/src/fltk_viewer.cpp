@@ -1,5 +1,4 @@
 /*
- /*
  *  sr_viewer.cpp - part of SBM: SmartBody Module
  *  Copyright (C) 2008  University of Southern California
  *

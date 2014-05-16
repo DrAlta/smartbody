@@ -2,6 +2,15 @@ add_definitions( -DENABLE_GUI )
 
 find_package(OpenGL REQUIRED)
 
+# osx c++ version >= clang 4.2.0
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+		if (NOT (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.2.0))
+			add_definitions(-Wno-tautological-compare)
+		endif()
+	endif()
+endif()
+
 include_directories ( "." )
 
 add_library(

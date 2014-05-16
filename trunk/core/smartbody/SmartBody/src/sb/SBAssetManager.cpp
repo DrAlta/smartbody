@@ -1405,7 +1405,7 @@ SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srP
 		//filename = path_list.next_filename( buffer, skel_file, & path );
 		filename = path_list.next_filename( buffer, skel_file);
 		if( filename.size() > 0 )	{
-			if( fp = fopen( filename.c_str(), "rt" ) )	{
+			if( (fp = fopen( filename.c_str(), "rt" )) )	{
 				done = TRUE;
 			}
 		}

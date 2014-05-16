@@ -837,7 +837,7 @@ void initPython(std::string pythonLibPath)
 	Py_SetProgramName((char*)pythonHome.c_str());
         Py_SetPythonHome((char*)pythonHome.c_str());
 #else
-	Py_SetProgramName("../../../../core/smartbody/Python27/");
+	Py_SetProgramName((char*)"../../../../core/smartbody/Python27/");
 #ifdef WIN32
 	Py_SetPythonHome((char*)pythonHome.c_str());
 #endif

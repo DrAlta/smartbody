@@ -100,8 +100,8 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	
 	Fl_Menu_Bar* menuBar = new Fl_Menu_Bar(0, 0, w, 30);
 	//menuBar->menu(menu_);
-	menuBar->add("&File/Save", 0, OnSaveCB, this, NULL);
-	menuBar->add("&File/Load", 0, OnLoadCB, this, NULL);
+	menuBar->add("&File/Save", 0, OnSaveCB, this, 0);
+	menuBar->add("&File/Load", 0, OnLoadCB, this, 0);
 	//menuBar->callback(OnMenuSelectCB, this);
 
 	_curveEditor = new VisemeCurveEditor(235, 80, 395, 355, "Animation Curve");

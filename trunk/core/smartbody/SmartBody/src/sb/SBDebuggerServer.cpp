@@ -98,7 +98,7 @@ void SBDebuggerServer::Init()
    {
       printf( "SocketBind() failed for Debugger Server\n" );
       vhcl::SocketClose(m_sockTCP);
-      m_sockTCP = NULL;
+      m_sockTCP = 0;
       vhcl::SocketShutdown();
       return;
    }
@@ -128,7 +128,7 @@ void SBDebuggerServer::Close()
    if ( m_sockTCP )
    {
       vhcl::SocketClose(m_sockTCP);
-      m_sockTCP = NULL;
+      m_sockTCP = 0;
    }
 
    vhcl::SocketShutdown();

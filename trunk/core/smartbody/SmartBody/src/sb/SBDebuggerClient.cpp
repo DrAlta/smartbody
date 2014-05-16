@@ -23,7 +23,7 @@ using std::vector;
 
 SBDebuggerClient::SBDebuggerClient()
 {
-	m_sockTCP_client = NULL;
+	m_sockTCP_client = 0;
 	m_initFinish = false;
 }
 
@@ -95,7 +95,7 @@ void SBDebuggerClient::Disconnect()
    if ( m_sockTCP_client )
    {
       vhcl::SocketClose(m_sockTCP_client);
-      m_sockTCP_client = NULL;
+      m_sockTCP_client = 0;
    }
 
    vhcl::SocketShutdown();

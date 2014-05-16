@@ -37,12 +37,28 @@ find_library (ALUT alut )
 find_library (OPENAL openal)
 endif()
 
-#if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-#	if (${CMAKE_C_COMPILER_VERSION} VERSION_GREATER 4.2.0)
-#		add_definitions(-Wno-unused-value)
-#	endif()
-#endif()
-
+# osx c++ version >= clang 4.2.0
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+		if (NOT (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.2.0))
+			add_definitions(-Wno-dangling-else)
+			add_definitions(-Wno-deprecated-writable-strings)
+			add_definitions(-Wno-format)
+			add_definitions(-Wno-implicit-function-declaration)
+			add_definitions(-Wno-logical-op-parentheses)
+			add_definitions(-Wno-parentheses-equality)
+			add_definitions(-Wno-switch)
+			add_definitions(-Wno-tautological-compare)
+			add_definitions(-Wno-unused-value)
+		endif()
+	endif()
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+		if (NOT (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.7.3))
+			add_definitions(-Wno-format)
+		endif()
+	endif()
+endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 if (${BUILD_FESTIVAL})
@@ -539,7 +555,6 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sbm/SteerPath.cpp
         ./src/sbm/MiscCommands.cpp
 		
-	./src/sb/smartbody-dll.cpp
 	./src/sb/smartbody-c-dll.cpp
 		
 	./src/protocols/sbmotion.pb.cc

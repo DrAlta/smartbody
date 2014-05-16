@@ -51,6 +51,7 @@ namespace Log
    class Listener
    {
       public:
+         virtual ~Listener();
          virtual void OnMessage( const std::string & message ) = 0;
    };
 

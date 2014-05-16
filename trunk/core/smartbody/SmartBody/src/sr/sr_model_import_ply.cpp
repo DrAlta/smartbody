@@ -42,7 +42,7 @@ static int vertex_cb(p_ply_argument argument) {
 		model->T.push();
 	}
 	double argumentValue = ply_get_argument_value(argument);
-	model->V.top()[idx] = (float) argumentValue;	
+	model->V.top()[(int)idx] = (float) argumentValue;	
 	return 1;
 }
 
@@ -54,7 +54,7 @@ static int vertex_color_cb(p_ply_argument argument) {
 	if (idx == 0)
 		model->Vc.push();
 	double argumentValue = ply_get_argument_value(argument);
-	model->Vc.top()[idx] = (float) argumentValue/255.0f;	
+	model->Vc.top()[(int)idx] = (float) argumentValue/255.0f;	
 	return 1;
 }
 
@@ -74,7 +74,7 @@ static int face_cb(p_ply_argument argument) {
 	else if (value_index >= 0 && value_index <= 2) // a triangle face
 	{
 		double argumentValue = ply_get_argument_value(argument);
-		model->F.top()[value_index] = (float) argumentValue;		
+		model->F.top()[value_index] = (int)(float) argumentValue;		
 	}		
 	return 1;
 }

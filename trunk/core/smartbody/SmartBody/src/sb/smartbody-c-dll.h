@@ -49,7 +49,18 @@ SBAPI bool SBM_PythonCommandVoid( SBMHANDLE sbmHandle, const char * command );
 SBAPI bool SBM_PythonCommandBool( SBMHANDLE sbmHandle, const char * command );
 SBAPI int SBM_PythonCommandInt( SBMHANDLE sbmHandle, const char * command );
 SBAPI float SBM_PythonCommandFloat( SBMHANDLE sbmHandle, const char * command );
-SBAPI char * SBM_PythonCommandString( SBMHANDLE sbmHandle, const char * command, char * output, int maxLen);
+SBAPI void SBM_PythonCommandString( SBMHANDLE sbmHandle, const char * command, char * output, int maxLen);
+
+SBAPI void SBM_SBMotion_AddChannel( SBMHANDLE sbmHandle, const char * motionName, const char * channelName, const char * channelType );
+SBAPI void SBM_SBMotion_AddFrame( SBMHANDLE sbmHandle, const char * motionName, float frameTime, const float * frameData, int numFrameData );
+SBAPI void SBM_SBMotion_SetSyncPoint( SBMHANDLE sbmHandle, const char * motionName, const char * syncTag, double time );
+
+SBAPI void SBM_SBJointMap_GetMapTarget( SBMHANDLE sbmHandle, const char * jointMap, const char * jointName, char * mappedJointName, int maxMappedJointName );
+
+SBAPI void SBM_SBVHMsgManager_SetServer( SBMHANDLE sbmHandle, const char * server );
+SBAPI void SBM_SBVHMsgManager_SetScope( SBMHANDLE sbmHandle, const char * scope );
+SBAPI void SBM_SBVHMsgManager_SetPort( SBMHANDLE sbmHandle, const char * port );
+SBAPI void SBM_SBVHMsgManager_SetEnable( SBMHANDLE sbmHandle, bool enable );
 
 
 #ifdef __cplusplus

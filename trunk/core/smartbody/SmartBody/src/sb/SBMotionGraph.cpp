@@ -825,7 +825,7 @@ SBAPI void SBMotionGraph::synthesizePath( SteerPath& desiredPath, const std::str
 		node->getRandomBlendWeights(weights);		
 		node->getDeltaAlignTransform(0.f, 0.999f, weights, deltaMat, baseXZMat);
 		
-		int numFrames = node->getActualDuration(weights)/0.033f;
+		int numFrames = (int)(node->getActualDuration(weights)/0.033f);
 		if (numFrames < 1) numFrames = 1; // minimum one frames
 		
 		float duStep = 1.f/numFrames;
@@ -1652,7 +1652,7 @@ void SBMotionGraph::writeOutTransitionMap( const std::string& outfilename, const
 		for (unsigned int j=0;j<mat.size2();j++)
 		{
 			float imgVal = (float)(mat(i,j)/maxVal);
-			unsigned char imgByte = imgVal*255;
+			unsigned char imgByte = (int)(imgVal*255);
 			imgBuf[i*mat.size2()*3 + j*3 ] = imgByte;
 			imgBuf[i*mat.size2()*3 + j*3 + 1] = imgByte;
 			imgBuf[i*mat.size2()*3 + j*3 + 2] = imgByte;
@@ -1680,7 +1680,7 @@ void SBMotionGraph::writeOutTransitionMap( const std::string& outfilename, const
 
 int SBMotionGraph::findClosestElement( const std::vector<int>& intList, int val )
 {
-	int minDist = 1e30;
+	int minDist = 2147483647;
 	int minDistElem = -1;
 	for (unsigned int i=0;i<intList.size();i++)
 	{
