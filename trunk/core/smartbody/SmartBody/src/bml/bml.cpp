@@ -2087,7 +2087,7 @@ NodRequest::NodRequest( const std::string& unique_id, const std::string& local, 
 NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, int axis, float period, float extent, float smooth, float warp, float accel, const SbmCharacter* actor,
 					   const BehaviorSyncPoints& syncs_in )
 : MeControllerRequest( unique_id, local, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
-    type(type), repeats(repeats), frequency(frequency), extent(extent), smooth(smooth), axis(axis), period(period), warp(warp), accel(accel), pitch(-1), decay(-1)
+    type(type), repeats(1.0f), frequency(1.0f), extent(extent), smooth(smooth), axis(axis), period(period), warp(warp), accel(accel), pitch(-1), decay(-1)
 {
 	MeCtSimpleNod* nod = (MeCtSimpleNod*)anim_ct;
 	BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController( nod );
@@ -2124,7 +2124,7 @@ NodRequest::NodRequest( const std::string& unique_id, const std::string& local, 
 NodRequest::NodRequest( const std::string& unique_id, const std::string& local, NodType type, int axis, float period, float extent, float smooth, float warp, float accel, float pitch, float decay, const SbmCharacter* actor,
 					   const BehaviorSyncPoints& syncs_in )
 : MeControllerRequest( unique_id, local, new MeCtSimpleNod(), actor->head_sched_p, syncs_in, MeControllerRequest::MANUAL ),
-    type(type), repeats(repeats), frequency(frequency), extent(extent), smooth(smooth), axis(axis), period(period), warp(warp), accel(accel), pitch(pitch), decay(decay)
+    type(type), repeats(1.0f), frequency(1.0f), extent(extent), smooth(smooth), axis(axis), period(period), warp(warp), accel(accel), pitch(pitch), decay(decay)
 {
 	MeCtSimpleNod* nod = (MeCtSimpleNod*)anim_ct;
 	BehaviorSchedulerConstantSpeedPtr scheduler = buildSchedulerForController( nod );

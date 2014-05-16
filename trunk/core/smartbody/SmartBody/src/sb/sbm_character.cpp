@@ -1611,14 +1611,14 @@ SmartBody::SpeechInterface* SbmCharacter::get_speech_impl_backup() const {
 }
 
 
-int SbmCharacter::set_voice_code( std::string& voice_code ) //allows you to set the voice-- made different from the init because of non Rhetoric might not have voice codes
+int SbmCharacter::set_voice_code( const std::string& voice_code ) //allows you to set the voice-- made different from the init because of non Rhetoric might not have voice codes
 {
 	//TODO: LOOK AND SEE IF THIS VOICE EXISTS AND IF IT DOESN'T PRINT ERROR MESSAGE AND RETURN FAILURE
 	this->voice_code = voice_code; //sets voice 
 	return (CMD_SUCCESS);
 }
 
-int SbmCharacter::set_voice_code_backup( std::string& voice_code ) //allows you to set the voice-- made different from the init because of non Rhetoric might not have voice codes
+int SbmCharacter::set_voice_code_backup( const std::string& voice_code ) //allows you to set the voice-- made different from the init because of non Rhetoric might not have voice codes
 {
 	//TODO: LOOK AND SEE IF THIS VOICE EXISTS AND IF IT DOESN'T PRINT ERROR MESSAGE AND RETURN FAILURE
 	this->voice_code_backup = voice_code; //sets voice 
@@ -2594,7 +2594,7 @@ bool SbmCharacter::checkExamples()
 	}
 	if (numMissing == 0)
 	{
-		LOG("%s: Steering works under standard config.", this->getName().c_str());
+		//LOG("%s: Steering works under standard config.", this->getName().c_str());
 		if (steerAgent)
 		{
 			PPRAISteeringAgent* steersuiteAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);

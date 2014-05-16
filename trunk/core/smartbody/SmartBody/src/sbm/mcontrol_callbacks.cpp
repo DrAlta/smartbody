@@ -2291,7 +2291,7 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	char* motionName = args.read_token();
 	char* frameNumString = args.read_token();
 	int frameNum = -1;
-	if (frameNumString != "")	frameNum = atoi(frameNumString);
+	if (strcmp(frameNumString, "") != 0)	frameNum = atoi(frameNumString);
 	int mode = -1;
 	int chanSize;
 	SkChannel chan;
@@ -2446,7 +2446,7 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		}
 		else
 		{
-			if (frameNumString != "")
+			if (strcmp(frameNumString, "") != 0)
 			{
 				LOG("mcu_check_func ERR: Frame Number not Exist!");
 				motion->disconnect();

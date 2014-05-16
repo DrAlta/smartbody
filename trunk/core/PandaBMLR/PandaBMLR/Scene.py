@@ -82,6 +82,8 @@ class Scene:
 					# 0 = BoneID, 1-4 = q.wxyz
 					#character.SetJointQuat(rotation[0], Converter.Unreal2Panda_Quat(Vec4(rotation[1], rotation[2], rotation[3], rotation[4])))
 					character.SetJointQuat(int(time), int(rotation[0]), Converter.Sbm2Panda_Quat(Vec4(rotation[2], rotation[3], rotation[4], rotation[1])))
+			else:
+				print "No character " + charId + " found, cannot process joint rotations..."
 		except:
 			print("Error parsing UDP packet")
 			print sys.exc_info()

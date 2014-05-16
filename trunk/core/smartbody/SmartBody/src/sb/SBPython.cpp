@@ -997,7 +997,7 @@ void setupPython()
 		//LOG("before import Smartbody");
 		PyRun_SimpleString("from SmartBody import *");
 		//LOG("before import pydoc");
-		PyRun_SimpleString("from pydoc import *");
+		//PyRun_SimpleString("from pydoc import *");
 #if 1
 		PyRun_SimpleString("scene = getScene()");
 		PyRun_SimpleString("bml = scene.getBmlProcessor()");

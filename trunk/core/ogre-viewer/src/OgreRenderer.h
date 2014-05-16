@@ -18,7 +18,7 @@
 namespace vhcl { class Audio; }
 
 
-class OgreRenderer : public ExampleApplication, public SmartbodyListener
+class OgreRenderer : public ExampleApplication
 {
 
 	public:
@@ -54,7 +54,7 @@ class OgreRenderer : public ExampleApplication, public SmartbodyListener
 		Ogre::SceneNode * sceneNode;
 		Ogre::Entity * sceneEntity;
 
-		Smartbody_dll* m_sbm;
+		SBMHANDLE m_sbm;
 		bonebus::BoneBusServer* m_bonebus;
 		SBListener* m_sbListener;
 		bool m_useBoneBus;

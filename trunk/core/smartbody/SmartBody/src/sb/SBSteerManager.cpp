@@ -160,7 +160,7 @@ void SBSteerManager::start()
 	int numGridCellsX = dynamic_cast<SmartBody::IntAttribute*> (SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("gridDatabaseOptions.numGridCellsX"))->getValue();
 	int numGridCellsZ = dynamic_cast<SmartBody::IntAttribute*> (SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("gridDatabaseOptions.numGridCellsZ"))->getValue();
 	int maxItemsPerGridCell = dynamic_cast<SmartBody::IntAttribute*> (SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("gridDatabaseOptions.maxItemsPerGridCell"))->getValue();
-	LOG("max Items per grid cell = %d",maxItemsPerGridCell);
+	//LOG("max Items per grid cell = %d",maxItemsPerGridCell);
 	steerOptions->gridDatabaseOptions.numGridCellsX = numGridCellsX;
 	steerOptions->gridDatabaseOptions.numGridCellsZ = numGridCellsZ;
 	steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemsPerGridCell;
@@ -190,7 +190,7 @@ void SBSteerManager::start()
 	//	steerOptions->gridDatabaseOptions.maxItemsPerGridCell = maxItemPerCell;
 
 
-	LOG("INIT STEERSIM");
+	//LOG("INIT STEERSIM");
 	try {
 		SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->init(steerOptions);
 	} catch (Util::GenericException& ge) {
@@ -209,7 +209,7 @@ void SBSteerManager::start()
 		return;
 	}
 
-	LOG("LOADING STEERSIM");
+	//LOG("LOADING STEERSIM");
 	SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->loadSimulation();
 
 	int numSetup = 0;
@@ -253,7 +253,7 @@ void SBSteerManager::start()
 	}
 	if (numSetup == 0)
 	{
-		LOG("No characters set up with steering. Steering will need to be restarted when new characters are available.");
+		//LOG("No characters set up with steering. Steering will need to be restarted when new characters are available.");
 	}
 
 	bool useEnvironment = getBoolAttribute("useEnvironmentCollisions");
@@ -286,7 +286,7 @@ void SBSteerManager::start()
 		getEngineDriver()->_engine->getSpatialDatabase()->addObject((*iter), (*iter)->getBounds());
 	}
 
-	LOG("STARTING STEERSIM");
+	//LOG("STARTING STEERSIM");
 	SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->startSimulation();
 	SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->setStartTime(0.0f);
 

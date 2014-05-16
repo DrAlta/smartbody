@@ -2331,6 +2331,9 @@
     <ClInclude Include="src\external\rply\rply.h">
       <Filter>external\rply</Filter>
     </ClInclude>
+    <ClInclude Include="src\sb\SBCharacterFrameData.h">
+      <Filter>sb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">
@@ -2395,5 +2398,6 @@
     <None Include="src\protocols\sbmesh.proto">
       <Filter>protocols</Filter>
     </None>
+    <None Include="src\protocols\sbmotion.proto" />
   </ItemGroup>
 </Project>

@@ -47,26 +47,6 @@ using std::string;
 #endif
 
 
-#ifdef WIN_BUILD
-BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
-{
-   switch ( fdwReason )
-   {
-      case DLL_PROCESS_ATTACH:
-      case DLL_THREAD_ATTACH:
-      case DLL_THREAD_DETACH:
-      case DLL_PROCESS_DETACH:
-      default:
-         break;
-   }
-
-   //vhcl::Memory::EnableDebugFlags( vhcl::Memory::MEM_DEFAULT_FLAGS | vhcl::Memory::CHECK_EVERY_128_DF );  // enable heap checking every 128 allocs
-
-   return TRUE;
-}
-#endif
-
-
 class Smartbody_dll_SBSceneListener_Internal : public SmartBody::SBSceneListener
 {
    private:
@@ -84,15 +64,10 @@ class Smartbody_dll_SBSceneListener_Internal : public SmartBody::SBSceneListener
 
       virtual void OnCharacterCreate( const string & name, const string & objectClass )
       {
-         if ( m_dll->m_listener )
-         {
-            m_dll->m_listener->OnCharacterCreate( name, objectClass );
-         }
       }
 
       virtual void OnCharacterDelete( const string & name )
       {
-         if ( m_dll->m_listener )
          {
             std::map<std::string,SmartbodyCharacter*>::iterator mi = m_dll->m_characters.find(name);
             SmartbodyCharacter* pc = NULL;
@@ -102,32 +77,19 @@ class Smartbody_dll_SBSceneListener_Internal : public SmartBody::SBSceneListener
                delete pc;
                m_dll->m_characters.erase(mi);
             }
-            m_dll->m_listener->OnCharacterDelete( name );
          }
       }
 
       virtual void OnPawnCreate( const std::string & name )
       {
-         if ( m_dll->m_listener )
-         {
-            m_dll->m_listener->OnPawnCreate( name );
-         }
       }
 
       virtual void OnViseme( const string & name, const string & visemeName, const float weight, const float blendTime )
       {
-         if ( m_dll->m_listener )
-         {
-            m_dll->m_listener->OnViseme( name, visemeName, weight, blendTime );
-         }
       }
 
       virtual void OnChannel( const string & name, const string & channelName, const float value )
       {
-         if ( m_dll->m_listener )
-         {
-            m_dll->m_listener->OnChannel( name, channelName, value );
-         }
       }
 };
 
@@ -143,64 +105,40 @@ SBAPI Smartbody_dll::~Smartbody_dll()
 }
 
 
-SBAPI void Smartbody_dll::SetSpeechAudiofileBasePath( const std::string & basePath )
-{
-   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
-
-   scene->removeAllAssetPaths("audio");
-   scene->addAssetPath("audio", basePath);
-}
-
-SBAPI void Smartbody_dll::SetProcessId( const std::string & processId )
-{
-   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
-	
-   scene->setProcessId(processId);
-}
-
-
-SBAPI void Smartbody_dll::SetMediaPath( const std::string & path )
-{
-  SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
-  scene->setMediaPath(path);
-}
-
-
 SBAPI bool Smartbody_dll::Init(const std::string& pythonLibPath, bool logToFile)
 {
    m_internalListener = new Smartbody_dll_SBSceneListener_Internal( this );
    
-   XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
+   //XMLPlatformUtils::Initialize();  // Initialize Xerces before creating MCU
 
 
    // TODO: Replace with g_scene->addSceneListener(m_internalListener)
    SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
    scene->addSceneListener(m_internalListener);
-   
-   SetSpeechAudiofileBasePath( "../../" );
+
+   //SetSpeechAudiofileBasePath( "../../" );
 
    initPython(pythonLibPath);
 
    InitVHMsg();
    InitLocalSpeechRelay();
-   RegisterCallbacks();
 
    srArgBuffer arg_buf( "" );
    mcu_vrAllCall_func( arg_buf, scene->getCommandManager() );
 
    if (logToFile)
    {
-      vhcl::Log::Listener* listener = new vhcl::Log::FileListener("./smartbody.log");
-      vhcl::Log::g_log.AddListener(listener);
+      scene->startFileLogging("./smartbody.log");
    }
 
    return true;
 }
 
+
 void Smartbody_dll::InitLocalSpeechRelay()
 {
-#if 1 //defined(__ANDROID__)
    //AUDIO_Init();
+
 #if defined(__ANDROID__)
    std::string festivalLibDir = "/sdcard/SBUnity/festival/lib/";
    std::string festivalCacheDir = "/sdcard/SBUnity/festival/cache/";
@@ -210,9 +148,9 @@ void Smartbody_dll::InitLocalSpeechRelay()
 	std::string festivalCacheDir = "./SBUnity/festival/cache/";
 	std::string cereprocLibDir = "./SBUnity/cerevoice/voices/";	
 #endif
-	SmartBody::SBScene::getScene()->getSpeechManager()->festivalRelay()->initSpeechRelay(festivalLibDir,festivalCacheDir);
-	SmartBody::SBScene::getScene()->getSpeechManager()->cereprocRelay()->initSpeechRelay(cereprocLibDir,festivalCacheDir);
-#endif
+
+	SmartBody::SBScene::getScene()->getSpeechManager()->festivalRelay()->initSpeechRelay(festivalLibDir, festivalCacheDir);
+	SmartBody::SBScene::getScene()->getSpeechManager()->cereprocRelay()->initSpeechRelay(cereprocLibDir, festivalCacheDir);
 }
 
 SBAPI bool Smartbody_dll::Shutdown()
@@ -255,68 +193,6 @@ SBAPI bool Smartbody_dll::LoadMotion( const void * data, int sizeBytes, const ch
 {
 	int ret = SmartBody::SBScene::getScene()->getAssetManager()->load_motion( data, sizeBytes, motionName );
     return ret == CMD_SUCCESS;
-}
-
-
-SBAPI bool Smartbody_dll::MapSkeleton( const char * mapName, const char * skeletonName )
-{
-   SmartBody::SBSkeleton* sbskeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skeletonName);
-
-	if (!sbskeleton)
-	{
-		LOG("Cannot find skeleton named %s.", skeletonName);
-		return false;
-	}
-	
-	// find the bone map name
-	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
-	if (!jointMap)
-	{
-		LOG("Cannot find joint map name '%s'.", mapName);
-		return false;
-	}
-
-	// apply the map
-	jointMap->applySkeleton(sbskeleton);
-
-	LOG("Applied joint map %s to skeleton %s.", mapName, skeletonName);
-
-	return true;
-
-
-    //int ret = mcu.map_skeleton( mapName, skeletonName );
-    //return ret == CMD_SUCCESS;
-}
-
-SBAPI bool Smartbody_dll::MapMotion( const char * mapName, const char * motionName )
-{
-    SmartBody::SBMotion* sbmotion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
-	if (!sbmotion)
-	{
-		LOG("Cannot find motion name %s.", motionName);
-		return false;
-	}
-	
-	// find the bone map name
-	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(mapName);
-	if (!jointMap)
-	{
-		LOG("Cannot find bone map name '%s'.", mapName);
-		return true;
-	}
-
-	// apply the map
-	jointMap->applyMotion(sbmotion);
-
-	LOG("Applied bone map %s to motion %s.", mapName, motionName);
-
-	return CMD_SUCCESS;
-}
-
-
-SBAPI void Smartbody_dll::SetListener( SmartbodyListener * listener )
-{
-   m_listener = listener;
 }
 
 
@@ -386,12 +262,6 @@ SBAPI bool Smartbody_dll::ExecutePython( const char * command )
 {
 	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
 	return scene->run(command);
-}
-
-SBAPI int Smartbody_dll::GetNumberOfCharacters()
-{
-  SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
-  return scene->getNumCharacters();
 }
 
 
@@ -552,12 +422,12 @@ SBAPI bool Smartbody_dll::PythonCommandVoid( const std::string & command )
 
 bool Smartbody_dll::PythonCommandBool( const std::string & command )
 {
-#if USE_SBPYTHON
-   
+#ifndef SB_NO_PYTHON
    try
    {
-      boost::python::object obj = boost::python::exec(command.c_str(), mcu.mainDict);
-      bool result = boost::python::extract<bool>(mcu.mainDict["ret"]);
+      boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
+      boost::python::object obj = boost::python::exec(command.c_str(), mainDict);
+      bool result = boost::python::extract<bool>(mainDict["ret"]);
       return result;
    }
    catch (...)
@@ -574,7 +444,6 @@ bool Smartbody_dll::PythonCommandBool( const std::string & command )
 int Smartbody_dll::PythonCommandInt( const std::string & command )
 {
 #ifndef SB_NO_PYTHON
-   
    try
    {
 		boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
@@ -595,7 +464,6 @@ int Smartbody_dll::PythonCommandInt( const std::string & command )
 float Smartbody_dll::PythonCommandFloat( const std::string & command )
 {
 #ifndef SB_NO_PYTHON
-   
    try
    {
 	  boost::python::object mainDict = SmartBody::SBScene::getScene()->getPythonMainDict();
@@ -631,9 +499,4 @@ std::string Smartbody_dll::PythonCommandString( const std::string & command )
 #else
    return "";
 #endif
-}
-
-void Smartbody_dll::RegisterCallbacks()
-{
-  // place any additional commands here...
 }

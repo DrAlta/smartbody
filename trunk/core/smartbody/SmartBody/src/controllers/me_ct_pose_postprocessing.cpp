@@ -34,7 +34,7 @@ void MeCtPosePostProcessing::updatePoseConstraint()
 			cons->rootName = trajRecord->refJointName;
 			if (consNames[i][0] == 'l')
 				cons->rootName = "l_hip";
-			else if (consNames[i][0] = 'r')
+			else if (consNames[i][0] == 'r')
 				cons->rootName = "r_hip";
 		}	
 		else

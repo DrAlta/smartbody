@@ -900,6 +900,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\sb\SBAssetHandlerSk.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSkmb.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSkm.h" />
+    <ClInclude Include="src\sb\SBCharacterFrameData.h" />
     <ClInclude Include="src\sb\SBMotionGraph.h" />
     <ClInclude Include="src\sb\SBNavigationMeshManager.h" />
     <ClInclude Include="src\sb\SBSceneListener.h" />

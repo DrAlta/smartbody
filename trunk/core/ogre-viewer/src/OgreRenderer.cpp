@@ -4,7 +4,7 @@
 #include "OgreFrameListener.h"
 #include "BoneBusHandler.h"
 
-OgreRenderer::OgreRenderer() : ExampleApplication(), SmartbodyListener()
+OgreRenderer::OgreRenderer() : ExampleApplication()
 {
 	m_sbm = NULL;
 	m_bonebus = NULL;
@@ -197,9 +197,8 @@ void OgreRenderer::createScene()
 	else
 	{
 		m_sbListener = new SBListener(this);
-		m_sbm = new Smartbody_dll;
-		m_sbm->Init("../../../Python26/Lib", true);
-		m_sbm->SetListener(m_sbListener);
+		m_sbm = SBM_CreateSBM();
+		SBM_Init(m_sbm, "../../../Python26/Lib", true);
 	}
 
 	vhmsg::ttu_notify2( "vrComponent", "renderer all" );
@@ -229,7 +228,7 @@ void OgreRenderer::createScene()
 // Create new frame listener
 void OgreRenderer::createFrameListener()
 {
-	mFrameListener = new OgreFrameListener( mWindow, mCamera, mDebugText, mSceneMgr, m_bonebus, m_sbm, m_initialCommands);
+	mFrameListener = new OgreFrameListener( mWindow, mCamera, mDebugText, mSceneMgr, m_bonebus, m_sbm, m_sbListener, m_initialCommands);
 	mRoot->addFrameListener( mFrameListener );
 }
 
@@ -265,7 +264,7 @@ void OgreRenderer::tt_client_callback( const char * op, const char * args, void 
   
 
    if (!app->isUseBoneBus())
-     app->m_sbm->ProcessVHMsgs(op, args);
+     SBM_ProcessVHMsgs(app->m_sbm, op, args);
 }
 
 
