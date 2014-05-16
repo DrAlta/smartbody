@@ -97,6 +97,12 @@ class VHCLLog4CxxAppender : public log4cxx::AppenderSkeleton
 } }
 
 
+Listener::~Listener()
+{
+}
+
+
+
 FileListener::FileListener( const char * filename )
 {
    m_filename = filename;
@@ -309,6 +315,12 @@ void LOG( const char * message, ... )
    vhcl::Log::g_log.updateListener(result);//( message, argList );
 #endif
 }
+
+
+Listener::~Listener()
+{
+}
+
 
 
 FileListener::FileListener( const char * filename )

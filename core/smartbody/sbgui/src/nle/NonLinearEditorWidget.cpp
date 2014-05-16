@@ -1260,17 +1260,21 @@ int EditorWidget::handle(int event)
 							{
 								nle::Block* selectBlock = track->getBlock(b1);
 								if (selectBlock != mark->getBlock())
+								{
 									if (selectBlock->isSelected())
 									{
 										selectBlock->setSelected(false);
 										changeBlockSelectionEvent(selectBlock);
 									}
+								}
 								else
+								{
 									if (!selectBlock->isSelected())
 									{
 										selectBlock->setSelected(true);
 										changeBlockSelectionEvent(selectBlock);
 									}
+								}
 							}
 
 							// unselect the other marks
@@ -1284,11 +1288,13 @@ int EditorWidget::handle(int event)
 									{
 										nle::Mark* mark1 = block1->getMark(m1);
 										if (mark1 != mark)
+										{
 											if (mark1->isSelected())
 											{
 												mark1->setSelected(false);
 												changeMarkSelectionEvent(mark1);
 											}
+										}
 									}
 								}
 							}
@@ -1326,17 +1332,21 @@ int EditorWidget::handle(int event)
 							{
 								nle::Track* selectTrack = model->getTrack(t);
 								if (selectTrack != block->getTrack())
+								{
 									if (selectTrack->isSelected())
 									{
 										selectTrack->setSelected(false);
 										changeTrackSelectionEvent(selectTrack);
 									}
+								}
 								else
+								{
 									if (!selectTrack->isSelected())
 									{
 										selectTrack->setSelected(true);
 										changeTrackSelectionEvent(selectTrack);
 									}
+								}
 							}
 							if (block->getTrack()->isSelected() != block->isSelected())
 							{
@@ -1349,11 +1359,13 @@ int EditorWidget::handle(int event)
 							{
 								nle::Block* block2 = track->getBlock(b2);
 								if (block2 != block)
+								{
 									if (block2->isSelected())
 									{
 										block2->setSelected(false);
 										changeBlockSelectionEvent(block2);
 									}
+								}
 							}
 							found = true;
 							model->setModelChanged(true);

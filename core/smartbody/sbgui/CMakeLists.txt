@@ -117,12 +117,23 @@ set( MORE_LIBS
 endif()
 
 
-#if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-#	if (${CMAKE_C_COMPILER_VERSION} VERSION_GREATER 4.2.0)
-#		add_definitions(-Wno-deprecated-writable-strings)
-#		add_definitions(-Wno-unused-value)
-#	endif()
-#endif()
+# osx c++ version >= clang 4.2.0
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+		if (NOT (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.2.0))
+			add_definitions(-Wno-deprecated-writable-strings)
+			add_definitions(-Wno-format-security)
+		endif()
+	endif()
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+		if (NOT (${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.7.3))
+			add_definitions(-Wno-format)
+			add_definitions(-Wno-format-security)
+			add_definitions(-Wno-write-strings)
+		endif()
+	endif()
+endif()
 
 
 set( SBM_FLTK_SRC

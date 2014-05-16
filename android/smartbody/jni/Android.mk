@@ -274,7 +274,6 @@ LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/steerlib/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/pprAI/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/sbm-debugger/lib \
-					$(SBM_LOCAL_PATH)/../../../core/smartbody/smartbody-dll/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/ode/include \
 					
 LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
@@ -568,7 +567,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerSBMeshBinary.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerSkmb.cpp \
 	$(SBM_MY_DIR)/sb/SBMotionGraph.cpp \
-	$(SBM_MY_DIR)/sb/smartbody-dll.cpp \
     $(SBM_MY_DIR)/sb/smartbody-c-dll.cpp \
 	$(SBM_MY_DIR)/protocols/sbmesh.pb.cc \
 	$(SBM_MY_DIR)/protocols/sbmotion.pb.cc \

@@ -1135,9 +1135,6 @@
     <ClCompile Include="src\sb\smartbody-c-dll.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="src\sb\smartbody-dll.cpp">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="src\protocols\sbmesh.pb.cc">
       <Filter>protocols</Filter>
     </ClCompile>
@@ -2299,9 +2296,6 @@
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="src\sbm\ParserCOLLADAFast.h">
-      <Filter>sbm</Filter>
-    </ClInclude>
-    <ClInclude Include="src\sb\smartbody-dll.h">
       <Filter>sbm</Filter>
     </ClInclude>
     <ClInclude Include="src\sb\smartbody-c-dll.h">

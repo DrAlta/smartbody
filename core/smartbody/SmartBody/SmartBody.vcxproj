@@ -515,7 +515,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\sb\SBNavigationMeshManager.cpp" />
     <ClCompile Include="src\sb\SBPythonMesh.cpp" />
     <ClCompile Include="src\sb\smartbody-c-dll.cpp" />
-    <ClCompile Include="src\sb\smartbody-dll.cpp" />
     <ClCompile Include="src\sr\sr_model_import_ply.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -906,7 +905,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\sb\SBSceneListener.h" />
     <ClInclude Include="src\sb\SBVersion.hpp" />
     <ClInclude Include="src\sb\smartbody-c-dll.h" />
-    <ClInclude Include="src\sb\smartbody-dll.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SmartBody\src\sbm\GPU\shaderFiles\fs_skin_render.frag">

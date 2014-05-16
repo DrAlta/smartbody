@@ -95,4 +95,5 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 		LOG(convertWStringToString(wstrstr.str()).c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
+	return BehaviorRequestPtr();  // a.k.a., NULL
 }

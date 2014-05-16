@@ -127,7 +127,7 @@ void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, SmartBody:
 	char *cmd;
 	
 	fr_seq_p->reset();
-	while( cmd = fr_seq_p->pull( & t ) )	{
+	while( (cmd = fr_seq_p->pull( & t )) )	{
 		srArgBuffer args( cmd );
 		srCmdSeq *inline_seq_p = NULL;
 

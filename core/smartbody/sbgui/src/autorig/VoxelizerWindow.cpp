@@ -584,7 +584,7 @@ SrVec3i VoxelizerWindow::getVoxelIDFromPosition( SrVec& pos )
 	SrVec mtran = -SrVec(0.5f,0.5f,0.5f)*voxelScale + voxelCenter; // min point of voxel volume
 	float cellSize = voxelScale/voxels->getDepth();
 	SrVec voxelPos = (pos-mtran)/cellSize;
-	return SrVec3i(voxelPos[0],voxelPos[1],voxelPos[2]); // return the voxel ID
+	return SrVec3i((int)voxelPos[0],(int)voxelPos[1],(int)voxelPos[2]); // return the voxel ID
 }
 
 
@@ -793,7 +793,7 @@ bool VoxelizerWindow::checkVoxelLineVisible( SrVec3i& v1, SrVec3i& v2 )
 float VoxelizerWindow::getVoxelEuclideanDist( SrVec3i& voxID1, SrVec3i& voxID2 )
 {
 	SrVec3i d = SrVec3i(voxID1[0]-voxID2[0],voxID1[1]-voxID2[1],voxID1[2]-voxID2[2]); 
-	float dist = sqrtf(d[0]*d[0] + d[1]*d[1] + d[2]*d[2]);
+	float dist = sqrtf((float)d[0]*d[0] + (float)d[1]*d[1] + (float)d[2]*d[2]);
 	return dist;
 }
 

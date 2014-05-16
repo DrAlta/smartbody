@@ -172,7 +172,7 @@ void ExportWindow::ExportCB(Fl_Widget* widget, void* data)
 		}
 	}
 
-	std::string exportData = SmartBody::SBScene::getScene()->exportScene(aspects, false);
+	std::string exportData = SmartBody::SBScene::getScene()->exportScene(aspects, "", false);
 	file << exportData;
 	file.close();
 

@@ -347,7 +347,7 @@
 		AAD45C6717A98E5D005905B2 /* image_DXT.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD4592E17A98E5B005905B2 /* image_DXT.h */; };
 		AAD45C6817A98E5D005905B2 /* image_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4592F17A98E5B005905B2 /* image_helper.c */; };
 		AAD45C6917A98E5D005905B2 /* image_helper.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD4593017A98E5B005905B2 /* image_helper.h */; };
-		AAD45C6A17A98E5D005905B2 /* SOIL.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4593117A98E5B005905B2 /* SOIL.c */; };
+		AAD45C6A17A98E5D005905B2 /* SOIL.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4593117A98E5B005905B2 /* SOIL.c */; settings = {COMPILER_FLAGS = "-Wno-implicit-function-declaration"; }; };
 		AAD45C6B17A98E5D005905B2 /* SOIL.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD4593217A98E5B005905B2 /* SOIL.h */; };
 		AAD45C6C17A98E5D005905B2 /* stb_image_aug.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4593317A98E5B005905B2 /* stb_image_aug.c */; };
 		AAD45C6D17A98E5D005905B2 /* stb_image_aug.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD4593417A98E5B005905B2 /* stb_image_aug.h */; };
@@ -363,9 +363,9 @@
 		AAD45C7817A98E5D005905B2 /* example.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4594017A98E5B005905B2 /* example.c */; };
 		AAD45C7917A98E5D005905B2 /* gzclose.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4594117A98E5B005905B2 /* gzclose.c */; };
 		AAD45C7A17A98E5D005905B2 /* gzguts.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD4594217A98E5B005905B2 /* gzguts.h */; };
-		AAD45C7B17A98E5D005905B2 /* gzlib.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4594317A98E5B005905B2 /* gzlib.c */; };
-		AAD45C7C17A98E5D005905B2 /* gzread.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4594417A98E5B005905B2 /* gzread.c */; };
-		AAD45C7D17A98E5D005905B2 /* gzwrite.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4594517A98E5B005905B2 /* gzwrite.c */; };
+		AAD45C7B17A98E5D005905B2 /* gzlib.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4594317A98E5B005905B2 /* gzlib.c */; settings = {COMPILER_FLAGS = "-Wno-implicit-function-declaration"; }; };
+		AAD45C7C17A98E5D005905B2 /* gzread.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4594417A98E5B005905B2 /* gzread.c */; settings = {COMPILER_FLAGS = "-Wno-implicit-function-declaration"; }; };
+		AAD45C7D17A98E5D005905B2 /* gzwrite.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4594517A98E5B005905B2 /* gzwrite.c */; settings = {COMPILER_FLAGS = "-Wno-implicit-function-declaration"; }; };
 		AAD45C7E17A98E5D005905B2 /* infback.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4594617A98E5B005905B2 /* infback.c */; };
 		AAD45C7F17A98E5D005905B2 /* inffast.c in Sources */ = {isa = PBXBuildFile; fileRef = AAD4594717A98E5B005905B2 /* inffast.c */; };
 		AAD45C8017A98E5D005905B2 /* inffast.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD4594817A98E5B005905B2 /* inffast.h */; };
@@ -530,8 +530,6 @@
 		AAD45D2217A98E5D005905B2 /* SBWSPManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD459EB17A98E5C005905B2 /* SBWSPManager.h */; };
 		AAD45D2317A98E5D005905B2 /* smartbody-c-dll.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD459EC17A98E5C005905B2 /* smartbody-c-dll.cpp */; };
 		AAD45D2417A98E5D005905B2 /* smartbody-c-dll.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD459ED17A98E5C005905B2 /* smartbody-c-dll.h */; };
-		AAD45D2517A98E5D005905B2 /* smartbody-dll.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD459EE17A98E5C005905B2 /* smartbody-dll.cpp */; };
-		AAD45D2617A98E5D005905B2 /* smartbody-dll.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD459EF17A98E5C005905B2 /* smartbody-dll.h */; };
 		AAD45D2717A98E5D005905B2 /* action_unit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD459F117A98E5C005905B2 /* action_unit.cpp */; };
 		AAD45D2817A98E5D005905B2 /* action_unit.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AAD459F217A98E5C005905B2 /* action_unit.hpp */; };
 		AAD45D2917A98E5D005905B2 /* BMLDefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD459F317A98E5C005905B2 /* BMLDefs.cpp */; };
@@ -549,8 +547,6 @@
 		AAD45D3717A98E5D005905B2 /* SbmShader.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A0317A98E5C005905B2 /* SbmShader.h */; };
 		AAD45D3817A98E5D005905B2 /* SbmTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A0417A98E5C005905B2 /* SbmTexture.cpp */; };
 		AAD45D3917A98E5D005905B2 /* SbmTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A0517A98E5C005905B2 /* SbmTexture.h */; };
-		AAD45D3A17A98E5D005905B2 /* fs_skin_render.frag in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A0717A98E5C005905B2 /* fs_skin_render.frag */; };
-		AAD45D3B17A98E5D005905B2 /* vs_skin_pos.vert in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A0817A98E5C005905B2 /* vs_skin_pos.vert */; };
 		AAD45D3D17A98E5D005905B2 /* TBOData.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A0A17A98E5C005905B2 /* TBOData.h */; };
 		AAD45D3F17A98E5D005905B2 /* VBOData.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A0C17A98E5C005905B2 /* VBOData.h */; };
 		AAD45D4017A98E5D005905B2 /* gwiz_cmdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A0D17A98E5C005905B2 /* gwiz_cmdl.cpp */; };
@@ -1311,8 +1307,6 @@
 		AAD459EB17A98E5C005905B2 /* SBWSPManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBWSPManager.h; sourceTree = "<group>"; };
 		AAD459EC17A98E5C005905B2 /* smartbody-c-dll.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "smartbody-c-dll.cpp"; sourceTree = "<group>"; };
 		AAD459ED17A98E5C005905B2 /* smartbody-c-dll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "smartbody-c-dll.h"; sourceTree = "<group>"; };
-		AAD459EE17A98E5C005905B2 /* smartbody-dll.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "smartbody-dll.cpp"; sourceTree = "<group>"; };
-		AAD459EF17A98E5C005905B2 /* smartbody-dll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "smartbody-dll.h"; sourceTree = "<group>"; };
 		AAD459F117A98E5C005905B2 /* action_unit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = action_unit.cpp; sourceTree = "<group>"; };
 		AAD459F217A98E5C005905B2 /* action_unit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = action_unit.hpp; sourceTree = "<group>"; };
 		AAD459F317A98E5C005905B2 /* BMLDefs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BMLDefs.cpp; sourceTree = "<group>"; };
@@ -1330,8 +1324,6 @@
 		AAD45A0317A98E5C005905B2 /* SbmShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmShader.h; sourceTree = "<group>"; };
 		AAD45A0417A98E5C005905B2 /* SbmTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SbmTexture.cpp; sourceTree = "<group>"; };
 		AAD45A0517A98E5C005905B2 /* SbmTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmTexture.h; sourceTree = "<group>"; };
-		AAD45A0717A98E5C005905B2 /* fs_skin_render.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = fs_skin_render.frag; sourceTree = "<group>"; };
-		AAD45A0817A98E5C005905B2 /* vs_skin_pos.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = vs_skin_pos.vert; sourceTree = "<group>"; };
 		AAD45A0A17A98E5C005905B2 /* TBOData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TBOData.h; sourceTree = "<group>"; };
 		AAD45A0C17A98E5C005905B2 /* VBOData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VBOData.h; sourceTree = "<group>"; };
 		AAD45A0D17A98E5C005905B2 /* gwiz_cmdl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gwiz_cmdl.cpp; sourceTree = "<group>"; };
@@ -2242,8 +2234,6 @@
 				AAD459EB17A98E5C005905B2 /* SBWSPManager.h */,
 				AAD459EC17A98E5C005905B2 /* smartbody-c-dll.cpp */,
 				AAD459ED17A98E5C005905B2 /* smartbody-c-dll.h */,
-				AAD459EE17A98E5C005905B2 /* smartbody-dll.cpp */,
-				AAD459EF17A98E5C005905B2 /* smartbody-dll.h */,
 			);
 			path = sb;
 			sourceTree = "<group>";
@@ -2377,8 +2367,6 @@
 		AAD45A0617A98E5C005905B2 /* shaderFiles */ = {
 			isa = PBXGroup;
 			children = (
-				AAD45A0717A98E5C005905B2 /* fs_skin_render.frag */,
-				AAD45A0817A98E5C005905B2 /* vs_skin_pos.vert */,
 			);
 			path = shaderFiles;
 			sourceTree = "<group>";
@@ -2781,7 +2769,6 @@
 				AAD45D2017A98E5D005905B2 /* SBVHMsgManager.h in Headers */,
 				AAD45D2217A98E5D005905B2 /* SBWSPManager.h in Headers */,
 				AAD45D2417A98E5D005905B2 /* smartbody-c-dll.h in Headers */,
-				AAD45D2617A98E5D005905B2 /* smartbody-dll.h in Headers */,
 				AAD45D2817A98E5D005905B2 /* action_unit.hpp in Headers */,
 				AAD45D2A17A98E5D005905B2 /* BMLDefs.h in Headers */,
 				AAD45D2B17A98E5D005905B2 /* general_param_setting.h in Headers */,
@@ -3246,13 +3233,10 @@
 				AAD45D1F17A98E5D005905B2 /* SBVHMsgManager.cpp in Sources */,
 				AAD45D2117A98E5D005905B2 /* SBWSPManager.cpp in Sources */,
 				AAD45D2317A98E5D005905B2 /* smartbody-c-dll.cpp in Sources */,
-				AAD45D2517A98E5D005905B2 /* smartbody-dll.cpp in Sources */,
 				AAD45D2717A98E5D005905B2 /* action_unit.cpp in Sources */,
 				AAD45D2917A98E5D005905B2 /* BMLDefs.cpp in Sources */,
 				AAD45D2C17A98E5D005905B2 /* GenericViewer.cpp in Sources */,
 				AAD45D3817A98E5D005905B2 /* SbmTexture.cpp in Sources */,
-				AAD45D3A17A98E5D005905B2 /* fs_skin_render.frag in Sources */,
-				AAD45D3B17A98E5D005905B2 /* vs_skin_pos.vert in Sources */,
 				AAD45D4017A98E5D005905B2 /* gwiz_cmdl.cpp in Sources */,
 				AAD45D4217A98E5D005905B2 /* gwiz_math.cpp in Sources */,
 				AAD45D4417A98E5D005905B2 /* gwiz_spline.cpp in Sources */,
@@ -3483,6 +3467,7 @@
 				SYMROOT = $PROJECT_DIR/build;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "../boost/boost_1_51_0 ../boost/boost-numeric-bindings ../xerces-c/iphoneos/include ../ode/iphoneos/include /usr/lib/python2.6 ../python/Python-2.6.5/_install/include/python2.6 ../python/Python-2.6.5 ../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0 ../../core/smartbody/sbm-debugger/lib ../../core/smartbody/SmartBody/src ../../core/smartbody/steersuite-1.3/pprAI/include ../../core/smartbody/steersuite-1.3/steerlib/include ../../core/smartbody/steersuite-1.3/external ../../lib/vhcl/include ../../lib/vhmsg/vhmsg-c/include ../../lib/wsp/wsp/include ../../lib/bonebus/include ../protobuf/iphoneos/include";
+				WARNING_CFLAGS = "-Wno-format";
 			};
 			name = Debug;
 		};
@@ -3550,6 +3535,7 @@
 				SYMROOT = $PROJECT_DIR/build;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "../boost/boost_1_51_0 ../boost/boost-numeric-bindings ../xerces-c/iphoneos/include ../ode/iphoneos/include /usr/lib/python2.6 ../python/Python-2.6.5/_install/include/python2.6 ../python/Python-2.6.5 ../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0 ../../core/smartbody/sbm-debugger/lib ../../core/smartbody/SmartBody/src ../../core/smartbody/steersuite-1.3/pprAI/include ../../core/smartbody/steersuite-1.3/steerlib/include ../../core/smartbody/steersuite-1.3/external ../../lib/vhcl/include ../../lib/vhmsg/vhmsg-c/include ../../lib/wsp/wsp/include ../../lib/bonebus/include ../protobuf/iphoneos/include";
+				WARNING_CFLAGS = "-Wno-format";
 			};
 			name = Release;
 		};

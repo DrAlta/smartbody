@@ -55,7 +55,7 @@ void MeCtPeriodicReplay::init( double period ) {
 void MeCtPeriodicReplay::init( double period, double period_offset, double child_offset ) {
 	this->period = period;
 	this->period_offset = period_offset;
-	this->child_time_offset = child_time_offset;
+	this->child_time_offset = child_offset;
 }
 
 double MeCtPeriodicReplay::controller_duration() {

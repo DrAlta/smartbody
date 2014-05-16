@@ -5,6 +5,8 @@
 #include "sb/SBScene.h"
 #include "sb/SBAssetManager.h"
 #include "sb/SBDebuggerServer.h"
+#include "sb/SBJointMap.h"
+#include "sb/SBJointMapManager.h"
 #include "sb/SBPython.h"
 #include "sb/SBSceneListener.h"
 #include "sb/SBSimulationManager.h"
@@ -117,7 +119,6 @@ int g_handleId_DLL = 0;
 
 bool SBM_ReleaseCharacterJoints( SBM_CharacterFrameDataMarshalFriendly * character );
 bool SBM_HandleExists( SBMHANDLE sbmHandle );
-bool SBM_InitVHMsg();
 void SBM_InitLocalSpeechRelay();
 
 
@@ -226,7 +227,6 @@ SBAPI bool SBM_Init( SBMHANDLE sbmHandle, const char * pythonLibPath, bool logTo
 
    initPython(pythonLibPath);
 
-   SBM_InitVHMsg();
    SBM_InitLocalSpeechRelay();
 
    srArgBuffer arg_buf( "" );
@@ -698,11 +698,11 @@ SBAPI float SBM_PythonCommandFloat( SBMHANDLE sbmHandle, const char * command )
 #endif
 }
 
-SBAPI char * SBM_PythonCommandString( SBMHANDLE sbmHandle, const char * command, char * output, int maxLen)
+SBAPI void SBM_PythonCommandString( SBMHANDLE sbmHandle, const char * command, char * output, int maxLen)
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
-      return 0;
+      return;
    }
 
 #ifndef SB_NO_PYTHON
@@ -712,45 +712,132 @@ SBAPI char * SBM_PythonCommandString( SBMHANDLE sbmHandle, const char * command,
       boost::python::object obj = boost::python::exec(command, mainDict);
       std::string result = boost::python::extract<std::string>(mainDict["ret"]);
       strncpy(output, result.c_str(), maxLen);
-      return output;
    }
    catch (...)
    {
       PyErr_Print();
-      return "";
    }
 #else
-   return "";
+   return;
 #endif
 }
 
 
-bool SBM_InitVHMsg()
+SBAPI void SBM_SBMotion_AddChannel( SBMHANDLE sbmHandle, const char * motionName, const char * channelName, const char * channelType )
 {
-#if defined(WIN_BUILD) || defined(MAC_BUILD)
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
 
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBMotion * motion = scene->getMotion(motionName);
 
-   printf( "Starting VHMsg (DLL side)\n" );
+   motion->addChannel(channelName, channelType);
+}
 
+
+SBAPI void SBM_SBMotion_AddFrame( SBMHANDLE sbmHandle, const char * motionName, float frameTime, const float * frameData, int numFrameData )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBMotion * motion = scene->getMotion(motionName);
+
+   // create vector from float array
+   std::vector<float> frameDataVec(frameData, frameData + numFrameData);
+
+   motion->addFrame(frameTime, frameDataVec);
+}
+
+
+SBAPI void SBM_SBMotion_SetSyncPoint( SBMHANDLE sbmHandle, const char * motionName, const char * syncTag, double time )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBMotion * motion = scene->getMotion(motionName);
+
+   motion->setSyncPoint(syncTag, time);
+}
+
+
+SBAPI void SBM_SBJointMap_GetMapTarget( SBMHANDLE sbmHandle, const char * jointMapName, const char * jointName, char * mappedJointName, int maxMappedJointName )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBJointMapManager * jointMapManager = scene->getJointMapManager();
+   SmartBody::SBJointMap * jointMap = jointMapManager->getJointMap(jointMapName);
+
+   const std::string & mapTarget = jointMap->getMapTarget(jointName);
+
+   strncpy(mappedJointName, mapTarget.c_str(), maxMappedJointName);
+}
+
+
+SBAPI void SBM_SBVHMsgManager_SetServer( SBMHANDLE sbmHandle, const char * server )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
    SmartBody::SBVHMsgManager * vhmsgManager = scene->getVHMsgManager();
-   const char* envScope = getenv("VHMSG_SCOPE");
-   const char* envServer = getenv("VHMSG_SERVER");
-   if (envScope)
+
+   vhmsgManager->setServer(server);
+}
+
+
+SBAPI void SBM_SBVHMsgManager_SetScope( SBMHANDLE sbmHandle, const char * scope )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
    {
-      vhmsgManager->setScope(envScope);
-   }
-   if (envServer)
-   {
-      vhmsgManager->setServer(envServer);
+      return;
    }
 
-   //int err = vhmsg::ttu_open();
-   //if (err == vhmsg::TTU_SUCCESS)
-   vhmsgManager->setEnable(true);
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBVHMsgManager * vhmsgManager = scene->getVHMsgManager();
 
-#endif
-   return true;
+   vhmsgManager->setScope(scope);
+}
+
+
+SBAPI void SBM_SBVHMsgManager_SetPort( SBMHANDLE sbmHandle, const char * port )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBVHMsgManager * vhmsgManager = scene->getVHMsgManager();
+
+   vhmsgManager->setPort(port);
+}
+
+
+SBAPI void SBM_SBVHMsgManager_SetEnable( SBMHANDLE sbmHandle, bool enable )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBVHMsgManager * vhmsgManager = scene->getVHMsgManager();
+
+   vhmsgManager->setEnable(enable);
 }
 
 
