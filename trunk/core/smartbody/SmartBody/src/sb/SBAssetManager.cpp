@@ -472,7 +472,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 
 	std::string finalPath = p.string();
 
-	LOG("final path = %s", finalPath.c_str());
+	//LOG("Asset loading from final path = %s", finalPath.c_str());
 
 	// make sure the file exists and is readable
 	std::ifstream file(finalPath.c_str());
