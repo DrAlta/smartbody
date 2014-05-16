@@ -753,7 +753,7 @@ int main( int argc, char **argv )	{
 				{
 					if (tokens.size() > t + 1)
 					{
-						LOG("Setting speech relay command to to %s", tokens[t + 1].c_str());
+						LOG("Setting speech relay command to %s", tokens[t + 1].c_str());
 						SmartBody::SBScene::setSystemParameter("speechrelaycommand", tokens[t + 1]);
 						t++;
 					}

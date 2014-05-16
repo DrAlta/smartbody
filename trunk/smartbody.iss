@@ -11,7 +11,7 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r5613
+AppVersion=r5614
 OutputBaseFilename=SmartBody
 WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
@@ -65,7 +65,7 @@ Source: ".\core\smartbody\sbgui\external\Pinocchio\*.h"; DestDir: "{app}\include
 Source: ".\core\smartbody\sbgui\external\polyvox\library\PolyVoxCore\include\*"; DestDir: "{app}\include\polyvox";   Excludes: ".svn"; Flags: recursesubdirs
 
 ; libary header files
-Source: ".\lib\xerces-c\include\xercesc\*"; DestDir: "{app}\include\xercesc";Flags: recursesubdirs
+Source: ".\lib\xerces-c\include\xercesc\*"; DestDir: "{app}\include\xercesc"; Flags: recursesubdirs
 Source: ".\lib\boost\boost\*"; DestDir: "{app}\include\boost";Flags: recursesubdirs
 Source: ".\core\SmartBody\ode\include\*"; DestDir: "{app}\include";Flags: recursesubdirs
 
@@ -73,6 +73,16 @@ Source: ".\core\SmartBody\ode\include\*"; DestDir: "{app}\include";Flags: recurs
 Source: ".\core\smartbody\SmartBody\src\*"; DestDir: "{app}\src\SmartBody";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\sbgui\src\*"; DestDir: "{app}\src\sbgui";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\simplesmartbody\simplesmartbody.cpp"; DestDir: "{app}\src\simplesmartbody"; Flags:
+
+; tts relay
+Source: ".\bin\TtsRelay\bin\x86\Release\TtsRelayGui.exe"; DestDir: "{app}\bin"; 
+Source: ".\bin\TtsRelay\bin\x86\Release\Apache.NMS.ActiveMQ.dll"; DestDir: "{app}\bin"; 
+Source: ".\bin\TtsRelay\bin\x86\Release\Apache.NMS.dll"; DestDir: "{app}\bin"; 
+Source: ".\bin\TtsRelay\bin\x86\Release\Ionic.Zlib.dll"; DestDir: "{app}\bin"; 
+Source: ".\bin\TtsRelay\bin\x86\Release\pthreadVSE.dll"; DestDir: "{app}\bin"; 
+Source: ".\bin\TtsRelay\bin\x86\Release\rhetrapi.dll"; DestDir: "{app}\bin"; 
+Source: ".\bin\TtsRelay\bin\x86\Release\TtsRelay.dll"; DestDir: "{app}\bin"; 
+Source: ".\bin\TtsRelay\bin\x86\Release\Apache.NMS.ActiveMQ.dll"; DestDir: "{app}\bin"; 
 
 ; build
 Source: ".\core\smartbody\SmartBody\SmartBody.vcxproj"; DestDir: "{app}\build"; Flags:

@@ -1093,12 +1093,6 @@
     <ClCompile Include="..\src\SmartBody\bml\behavior_scheduler_gesture.cpp">
       <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SmartBody\sb\smartbody-c-dll.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\sb\smartbody-dll.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_pose_postprocessing.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
@@ -2255,12 +2249,6 @@
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\bml\behavior_scheduler_gesture.hpp">
       <Filter>bml</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\sb\smartbody-c-dll.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\sb\smartbody-dll.h">
-      <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_pose_postprocessing.hpp">
       <Filter>controllers</Filter>

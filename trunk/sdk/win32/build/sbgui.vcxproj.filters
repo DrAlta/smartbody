@@ -58,6 +58,9 @@
     <Filter Include="autorig">
       <UniqueIdentifier>{916cb17b-904c-456e-9716-5e306fa77173}</UniqueIdentifier>
     </Filter>
+    <Filter Include="pythonbind">
+      <UniqueIdentifier>{e981edbf-6e00-447b-9168-26006c8a974e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\sbgui\glfont2.cpp" />
@@ -315,6 +318,9 @@
     </ClCompile>
     <ClCompile Include="..\src\sbgui\visemeviewer\ImageSequencePlayer.cpp">
       <Filter>lipsyncviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\pythonbind\SBPythonAutorig.cpp">
+      <Filter>pythonbind</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -580,6 +586,9 @@
     </ClInclude>
     <ClInclude Include="..\src\sbgui\visemeviewer\ImageSequencePlayer.h">
       <Filter>lipsyncviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\pythonbind\SBPythonAutoRig.h">
+      <Filter>pythonbind</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
