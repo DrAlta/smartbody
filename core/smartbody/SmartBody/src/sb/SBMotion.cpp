@@ -1813,7 +1813,7 @@ bool SBMotion::trim(int numFramesFromFront, int numFramesFromBack)
 	for (int i=frames()-1; i>= newFrames; i--)
 	{
 		Frame& delFrame = _frames[i];
-		delete [] delFrame.posture;
+		free(delFrame.posture);
 		_frames.pop_back();
 	}
 

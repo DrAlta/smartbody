@@ -868,7 +868,7 @@ SBMotion* SBAssetManager::addMotionDefinition(const std::string& name, double du
 	if (iter != _motions.end())
 	{
 		LOG("Motion named %s already exists, new motion will not be added.", name.c_str());
-		return false;
+		return NULL;
 	}
 
 	SBMotion* sbMotion = new SBMotion();

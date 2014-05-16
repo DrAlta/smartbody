@@ -1,2 +1,2 @@
-..\..\lib\Panda3D\python\ppython.exe -E DemoEmbedded.py
+..\..\lib\Panda3D-1.8.1\python\ppython.exe -E DemoEmbedded.py
 

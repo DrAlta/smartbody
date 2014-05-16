@@ -16,13 +16,13 @@ class SBSkeleton : public SkSkeleton
 {
 public:
 	SBAPI SBSkeleton();
-	SBAPI SBSkeleton(std::string skelFile);
+	SBAPI SBSkeleton(const std::string& skelFile);
 	SBAPI SBSkeleton(SBSkeleton* copySkel);
 
 	SBAPI SBJoint* createJoint(const std::string& name, SBJoint* parent);
 
-	SBAPI virtual bool load(std::string skeletonFile);
-	SBAPI virtual bool save(std::string skeletonFile);
+	SBAPI virtual bool load(const std::string& skeletonFile);
+	SBAPI virtual bool save(const std::string& skeletonFile);
 	SBAPI std::string saveToString();
 	SBAPI void loadFromString(const std::string& info);
 

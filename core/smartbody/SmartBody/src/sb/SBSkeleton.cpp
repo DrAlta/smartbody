@@ -19,7 +19,7 @@ SBSkeleton::SBSkeleton() : SkSkeleton()
 	linkedPawnName = "";
 }
 
-SBSkeleton::SBSkeleton(std::string skelFile) : SkSkeleton()
+SBSkeleton::SBSkeleton(const std::string& skelFile) : SkSkeleton()
 {
 	_scale = 1.0f;
 	_origRootChanged = false;
@@ -93,7 +93,7 @@ const std::string& SBSkeleton::getFileName()
 	return skfilename();
 }
 
-bool SBSkeleton::load(std::string skeletonFile)
+bool SBSkeleton::load(const std::string& skeletonFile)
 {
 	SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skeletonFile.c_str());
 	if (skeleton)
@@ -134,7 +134,7 @@ bool SBSkeleton::load(std::string skeletonFile)
 	}
 }
 
-bool SBSkeleton::save(std::string skeletonFile)
+bool SBSkeleton::save(const std::string& skeletonFile)
 {
 	FILE *fp = NULL;
 	fp = fopen(skeletonFile.c_str(), "w");

@@ -45,7 +45,7 @@ SBCharacter::SBCharacter() : SbmCharacter()
 	
 }
 
-SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name.c_str(), type)
+SBCharacter::SBCharacter(const std::string& name, const std::string& type) : SbmCharacter(name.c_str(), type)
 {
 	setAttributeGroupPriority("Display", 110);
 	setAttributeGroupPriority("Voice", 170);
@@ -182,6 +182,18 @@ SBCharacter::SBCharacter(std::string name, std::string type) : SbmCharacter(name
 
 	// since this is a character, show the deformable mesh by default
 	setBoolAttribute("showStaticMesh",false);
+
+	frameDataMarshalFriendly = NULL;
+	frameDataMarshalFriendly = new SBM_CharacterFrameDataMarshalFriendly();
+	InitFrameDataMarshalFriendly();
+}
+
+
+SBAPI SBCharacter::~SBCharacter()
+{
+	//FreeFrameDataMarshalFriendly();
+	delete frameDataMarshalFriendly;
+	frameDataMarshalFriendly = NULL;
 }
 
 
@@ -220,7 +232,7 @@ const std::string& SBCharacter::getName()
 	return SbmCharacter::getName();
 }
 
-void SBCharacter::setName(std::string& name)
+void SBCharacter::setName(const std::string& name)
 {
 	SBPawn::setName(name);
 
@@ -299,7 +311,7 @@ SBController* SBCharacter::getControllerByIndex(int index)
 	return controller;
 }
 
-SBController* SBCharacter::getControllerByName(std::string name)
+SBController* SBCharacter::getControllerByName(const std::string& name)
 {
 	if (!ct_tree_p)
 		return NULL;
@@ -327,7 +339,7 @@ std::vector<std::string> SBCharacter::getControllerNames()
 	return ret;
 }
 
-void SBCharacter::setVoice(std::string type)
+void SBCharacter::setVoice(const std::string& type)
 {
 	if (type == "")
 	{
@@ -382,7 +394,7 @@ const std::string SBCharacter::getVoice()
 	return type;
 }
 
-void SBCharacter::setVoiceCode(std::string param)
+void SBCharacter::setVoiceCode(const std::string& param)
 {
 	set_voice_code(param);
 	StringAttribute* attr = dynamic_cast<StringAttribute*>(getAttribute("voiceCode"));
@@ -395,7 +407,7 @@ const std::string& SBCharacter::getVoiceCode()
 	return get_voice_code();
 }
 
-void SBCharacter::setVoiceBackup(std::string type)
+void SBCharacter::setVoiceBackup(const std::string& type)
 {
 	
 
@@ -434,7 +446,7 @@ const std::string& SBCharacter::getVoiceBackup()
 	return get_voice_code_backup();
 }
 
-void SBCharacter::setVoiceBackupCode(std::string param)
+void SBCharacter::setVoiceBackupCode(const std::string& param)
 {
 	set_voice_code_backup(param);
 	StringAttribute* attr = dynamic_cast<StringAttribute*>(getAttribute("voiceCodeBackup"));
@@ -946,7 +958,7 @@ std::string SBCharacter::getPostureName()
 	return "";
 }
 
-SBAPI void SBCharacter::addJointTrajectoryConstraint( std::string jointName, std::string refJointName )
+SBAPI void SBCharacter::addJointTrajectoryConstraint( const std::string& jointName, const std::string& refJointName )
 {
 	if (jointTrajMap.find(jointName) == jointTrajMap.end())
 	{
@@ -958,7 +970,7 @@ SBAPI void SBCharacter::addJointTrajectoryConstraint( std::string jointName, std
 	trajRecord->isEnable = true;
 }
 
-SBAPI TrajectoryRecord* SBCharacter::getJointTrajectoryConstraint( std::string jointName )
+SBAPI TrajectoryRecord* SBCharacter::getJointTrajectoryConstraint( const std::string& jointName )
 {
 	if (jointTrajMap.find(jointName) == jointTrajMap.end())
 	{
@@ -1120,6 +1132,162 @@ SBAPI void SBCharacter::startMotionGraphWithPath( const std::vector<SrVec>& path
 	}
 
 		
+}
+
+
+void SBCharacter::InitFrameDataMarshalFriendly()
+{
+   frameDataMarshalFriendly->m_name = new char[ strlen(getName().c_str()) + 1 ];
+   strcpy( frameDataMarshalFriendly->m_name, getName().c_str() );
+
+   frameDataMarshalFriendly->x  = 0;
+   frameDataMarshalFriendly->y  = 0;
+   frameDataMarshalFriendly->z  = 0;
+   frameDataMarshalFriendly->rw = 0;
+   frameDataMarshalFriendly->rx = 0;
+   frameDataMarshalFriendly->ry = 0;
+   frameDataMarshalFriendly->rz = 0;
+   frameDataMarshalFriendly->m_numJoints = 0;
+
+   frameDataMarshalFriendly->jname = NULL;
+   frameDataMarshalFriendly->jx  = NULL;
+   frameDataMarshalFriendly->jy  = NULL;
+   frameDataMarshalFriendly->jz  = NULL;
+   frameDataMarshalFriendly->jrw = NULL;
+   frameDataMarshalFriendly->jrx = NULL;
+   frameDataMarshalFriendly->jry = NULL;
+   frameDataMarshalFriendly->jrz = NULL;
+}
+
+
+void SBCharacter::FreeFrameDataJointsMarshalFriendly()
+{
+   for ( size_t i = 0; i < frameDataMarshalFriendly->m_numJoints; i++ )
+   {
+      delete [] frameDataMarshalFriendly->jname[ i ];
+   }
+
+   frameDataMarshalFriendly->x  = 0;
+   frameDataMarshalFriendly->y  = 0;
+   frameDataMarshalFriendly->z  = 0;
+   frameDataMarshalFriendly->rw = 0;
+   frameDataMarshalFriendly->rx = 0;
+   frameDataMarshalFriendly->ry = 0;
+   frameDataMarshalFriendly->rz = 0;
+   frameDataMarshalFriendly->m_numJoints = 0;
+
+   delete [] frameDataMarshalFriendly->jname;
+   delete [] frameDataMarshalFriendly->jx;
+   delete [] frameDataMarshalFriendly->jy;
+   delete [] frameDataMarshalFriendly->jz;
+   delete [] frameDataMarshalFriendly->jrw;
+   delete [] frameDataMarshalFriendly->jrx;
+   delete [] frameDataMarshalFriendly->jry;
+   delete [] frameDataMarshalFriendly->jrz;
+
+   frameDataMarshalFriendly->jname = NULL;
+   frameDataMarshalFriendly->jx  = NULL;
+   frameDataMarshalFriendly->jy  = NULL;
+   frameDataMarshalFriendly->jz  = NULL;
+   frameDataMarshalFriendly->jrw = NULL;
+   frameDataMarshalFriendly->jrx = NULL;
+   frameDataMarshalFriendly->jry = NULL;
+   frameDataMarshalFriendly->jrz = NULL;
+}
+
+
+void SBCharacter::FreeFrameDataMarshalFriendly()
+{
+   FreeFrameDataJointsMarshalFriendly();
+
+   delete [] frameDataMarshalFriendly->m_name;
+   frameDataMarshalFriendly->m_name = NULL;
+}
+
+
+SBAPI const SBM_CharacterFrameDataMarshalFriendly & SBCharacter::GetFrameDataMarshalFriendly()
+{
+   const SkJoint * joint = get_world_offset_joint();
+
+   const SkJointPos * pos = joint->const_pos();
+   float x = pos->value( SkJointPos::X );
+   float y = pos->value( SkJointPos::Y );
+   float z = pos->value( SkJointPos::Z );
+
+   SkJoint::RotType rot_type = joint->rot_type();
+   if ( rot_type != SkJoint::TypeQuat )
+   {
+      //cerr << "ERROR: Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")"<<endl;
+   }
+
+   // const_cast because the SrQuat does validation (no const version of value())
+   const SrQuat & q = ((SkJoint *)joint)->quat()->value();
+
+   frameDataMarshalFriendly->x = x;
+   frameDataMarshalFriendly->y = y;
+   frameDataMarshalFriendly->z = z;
+   frameDataMarshalFriendly->rw = q.w;
+   frameDataMarshalFriendly->rx = q.x;
+   frameDataMarshalFriendly->ry = q.y;
+   frameDataMarshalFriendly->rz = q.z;
+
+   const std::vector<SkJoint *> & joints  = getSkeleton()->joints();
+
+   if (frameDataMarshalFriendly->m_numJoints == 0 || frameDataMarshalFriendly->m_numJoints != joints.size())
+   {
+      FreeFrameDataJointsMarshalFriendly();
+
+      frameDataMarshalFriendly->m_numJoints = joints.size();
+      frameDataMarshalFriendly->jname = new char * [ frameDataMarshalFriendly->m_numJoints ];
+      frameDataMarshalFriendly->jx = new float [ frameDataMarshalFriendly->m_numJoints ];
+      frameDataMarshalFriendly->jy = new float [ frameDataMarshalFriendly->m_numJoints ];
+      frameDataMarshalFriendly->jz = new float [ frameDataMarshalFriendly->m_numJoints ];
+      frameDataMarshalFriendly->jrw = new float [ frameDataMarshalFriendly->m_numJoints ];
+      frameDataMarshalFriendly->jrx = new float [ frameDataMarshalFriendly->m_numJoints ];
+      frameDataMarshalFriendly->jry = new float [ frameDataMarshalFriendly->m_numJoints ];
+      frameDataMarshalFriendly->jrz = new float [ frameDataMarshalFriendly->m_numJoints ];
+
+      for ( size_t i = 0; i < frameDataMarshalFriendly->m_numJoints; i++ )
+      {
+         frameDataMarshalFriendly->jname[ i ] = new char[ joints[ i ]->getName().length() + 1 ];
+         strcpy( frameDataMarshalFriendly->jname[ i ], joints[ i ]->getName().c_str() );
+      }
+   }
+
+
+   for ( size_t i = 0; i < joints.size(); i++ )
+   {
+      SkJoint * j = joints[i];
+      SrQuat q = j->quat()->value();
+
+      //printf( "%s %f %f %f %f\n", (const char *)j->name(), q.w, q.x, q.y, q.z );
+
+      float posx = j->pos()->value( 0 );
+      float posy = j->pos()->value( 1 );
+      float posz = j->pos()->value( 2 );
+      if ( false )
+      {
+         posx += j->offset().x;
+         posy += j->offset().y;
+         posz += j->offset().z;
+      }
+
+      std::string jointName;
+      if (j->extName() != "")
+         jointName = j->extName();
+      else
+         jointName = j->jointName();
+
+      frameDataMarshalFriendly->jx[i] = posx;
+      frameDataMarshalFriendly->jy[i] = posy;
+      frameDataMarshalFriendly->jz[i] = posz;
+      frameDataMarshalFriendly->jrw[i] = q.w;
+      frameDataMarshalFriendly->jrx[i] = q.x;
+      frameDataMarshalFriendly->jry[i] = q.y;
+      frameDataMarshalFriendly->jrz[i] = q.z;
+   }
+
+   return *frameDataMarshalFriendly;
 }
 
 };

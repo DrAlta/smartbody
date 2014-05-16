@@ -2,12 +2,11 @@
 #define _SBLISTENER_H
 
 #include "vhcl.h"
-#include "sb/smartbody-dll.h"
 #include <string>
 
 class OgreRenderer;
 
-class SBListener : public SmartbodyListener
+class SBListener
 {
 	public:
 		SBListener(OgreRenderer* app);

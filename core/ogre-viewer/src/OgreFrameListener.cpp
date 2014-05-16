@@ -5,13 +5,14 @@
 #include "sb/smartbody-c-dll.h"
 
 OgreFrameListener::OgreFrameListener(RenderWindow * win, Camera * cam, const std::string & debugText, SceneManager * mgr, 
-									 bonebus::BoneBusServer * bonebus, Smartbody_dll* sbmdll, std::vector<std::string>& initialCommands) 
+									 bonebus::BoneBusServer * bonebus, SBMHANDLE sbmdll, SBListener * sbListener, std::vector<std::string>& initialCommands) 
 								   : ExampleFrameListener( win, cam )
 	{
 	mDebugText = debugText;
 	mSceneMgr = mgr;
 	m_bonebus = bonebus;
 	m_sbmDLL = sbmdll;
+	m_sbListener = sbListener;
 	m_timer = NULL;
 	mQuit = false;
 	m_ogreMouseEnabled = true;
@@ -223,7 +224,7 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 			m_timer = new vhcl::Timer();
 			firstTime = true;
 		}
-		m_sbmDLL->Update(m_timer->GetTime());
+		SBM_Update(m_sbmDLL, m_timer->GetTime());
 		if (firstTime)
 		{
 			for (size_t i = 0; i < m_initialCommands.size(); i++)
@@ -232,6 +233,37 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 				vhmsg::ttu_notify2("sbm", m_initialCommands[i].c_str());
 			}
 		}
+
+
+		char name[256];
+		char objectClass[256];
+		char visemeName[256];
+		float weight;
+		float blendTime;
+
+		while (SBM_IsCharacterCreated(m_sbmDLL, name, 256, objectClass, 256))
+		{
+			m_sbListener->OnCharacterCreate(name, objectClass);
+		}
+
+		while (SBM_IsCharacterDeleted(m_sbmDLL, name, 256))
+		{
+			m_sbListener->OnCharacterDelete(name);
+		}
+
+		while (SBM_IsCharacterChanged(m_sbmDLL, name, 256))
+		{
+			m_sbListener->OnCharacterChange(name);
+		}
+
+		while (SBM_IsVisemeSet(m_sbmDLL, name, 256, visemeName, 256, &weight, &blendTime ))
+		{
+		}
+
+		while (SBM_IsChannelSet(m_sbmDLL, name, 256, visemeName, 256, &weight))
+		{
+		}
+
 
 		SceneNode* sceneNode = mSceneMgr->getRootSceneNode();
 		if (!sceneNode)
@@ -243,15 +275,15 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 			std::string& name = m_pawnList[i];
 			
 			std::string command = "tmp = scene.getPawn('"+name+"')";
-			m_sbmDLL->PythonCommandVoid(command);
-			m_sbmDLL->PythonCommandVoid("position = tmp.getPosition()\norientation = tmp.getOrientation()");
-			float x = m_sbmDLL->PythonCommandFloat("ret = position.getData(0)");
-			float y = m_sbmDLL->PythonCommandFloat("ret = position.getData(1)");
-			float z = m_sbmDLL->PythonCommandFloat("ret = position.getData(2)");
-			float qw = m_sbmDLL->PythonCommandFloat("ret = orientation.getData(0)");
-			float qx = m_sbmDLL->PythonCommandFloat("ret = orientation.getData(1)");
-			float qy = m_sbmDLL->PythonCommandFloat("ret = orientation.getData(2)");
-			float qz = m_sbmDLL->PythonCommandFloat("ret = orientation.getData(3)");
+			SBM_PythonCommandVoid(m_sbmDLL, command.c_str());
+			SBM_PythonCommandVoid(m_sbmDLL, "position = tmp.getPosition()\norientation = tmp.getOrientation()");
+			float x = SBM_PythonCommandFloat(m_sbmDLL, "ret = position.getData(0)");
+			float y = SBM_PythonCommandFloat(m_sbmDLL, "ret = position.getData(1)");
+			float z = SBM_PythonCommandFloat(m_sbmDLL, "ret = position.getData(2)");
+			float qw = SBM_PythonCommandFloat(m_sbmDLL, "ret = orientation.getData(0)");
+			float qx = SBM_PythonCommandFloat(m_sbmDLL, "ret = orientation.getData(1)");
+			float qy = SBM_PythonCommandFloat(m_sbmDLL, "ret = orientation.getData(2)");
+			float qz = SBM_PythonCommandFloat(m_sbmDLL, "ret = orientation.getData(3)");
 
 			Node* node = sceneNode->getChild(name);
 			if (!node) continue;
@@ -263,7 +295,9 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 		for ( size_t i = 0; i < m_characterList.size(); i++ )
 		{
 			std::string& name = m_characterList[i];
-			SmartbodyCharacter& c = m_sbmDLL->GetCharacter(name);
+			SBM_CharacterFrameDataMarshalFriendly c;
+			SBM_InitCharacter(m_sbmDLL, name.c_str(), &c);  // TODO: should be refactored to be done at init
+			SBM_GetCharacter(m_sbmDLL, name.c_str(), &c);
 			if (!mSceneMgr->hasEntity(name))
 				continue;
 
@@ -283,10 +317,9 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 			std::map<std::string, Ogre::Vector3>& intialBonePositionMap = m_initialBonePositions[name];
 			Ogre::Skeleton* skel = ent->getSkeleton();
 			if (!skel) continue;
-			for (size_t jId = 0; jId < c.m_joints.size(); jId++)
+			for (size_t jId = 0; jId < c.m_numJoints; jId++)
 			{
-				SmartbodyJoint& joint = c.m_joints[jId];
-				std::string& jointName = joint.m_name;
+				std::string jointName = c.jname[jId];
 				if (jointName == "")
 					continue;
 
@@ -304,12 +337,12 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 						bone->setManuallyControlled(true);
 					 	
 						Ogre::Vector3& vec = intialBonePositionMap[jointName];
-						float x = joint.x + vec.x;
-						float y = joint.y + vec.y;
-						float z = joint.z + vec.z;
+						float x = c.jx[jId] + vec.x;
+						float y = c.jy[jId] + vec.y;
+						float z = c.jz[jId] + vec.z;
 						bone->setPosition(x, y, z);
 
-						bone->setOrientation(Quaternion(joint.rw, joint.rx, joint.ry, joint.rz));
+						bone->setOrientation(Quaternion(c.jrw[jId], c.jrx[jId], c.jry[jId], c.jrz[jId]));
 					}
 				}
 				catch (ItemIdentityException&)
@@ -317,7 +350,8 @@ bool OgreFrameListener::frameStarted( const FrameEvent & evt )
 					//printf("Could not find bone name %s", jointName.c_str());
 				}
 			}
-			
+
+			SBM_ReleaseCharacter(&c);  // TODO: should be refactored to be done at application quit
 		}
 	}
 

@@ -235,11 +235,12 @@ class CharacterPawn(Pawn):
 		
 	def ControlJoint(self, jointName, parent):
 		""" Exposes a joint to a NodePath so it can be controlled manually """
-		
 		jointNP = parent.attachNewNode(jointName)
 	
 		if (self.__Joints.controlJoint(jointName, jointNP.node())):
 			joint = self.__Joints.findChild(jointName)
+			print "Adding control joint for " + jointName + " to " + str(jointNP)
+			pandaJointID = self.JointNameToID(jointName)
 			self.__JointMap[jointName] = jointNP
 			try:
 				if PandaSystem.getMinorVersion() > 5:
@@ -262,21 +263,26 @@ class CharacterPawn(Pawn):
 		if val == -100:
 			return
 		if  val > time:
+			print "time is " + str(time) + ", new value will not be set"
 			return
 		self.__boneBusRotTimes[boneBusjointID] = time
 		# get the mapped joint name
 		mappedName = self.GetBoneBusMap(boneBusjointID)
 		# now get the corresponding Panda character joint name
-		pandaJointID = self.JointNameToID(mappedName)
 		
+		pandaJointID = self.JointNameToID(mappedName)
+		#print "MAPPED NAME: " + str(mappedName) + " FROM BONEBUSID " + str(boneBusjointID) + " IS ID " + str(pandaJointID)
 		joint = self.FindJoint(pandaJointID)
 		
 		if (joint != None):
+			print "Joint " + str(pandaJointID) + " was found, setting values..."
 			if (LERP_ANIMS):
 				lerp = LerpPosQuatInterval(joint, ANIM_SPEED, joint.getPos(), quat)						
 				lerp.start()
 			else:
 				joint.setQuat(quat)
+		else:
+			print "Joint " + str(pandaJointID) + " was not found, values not set..."
 						
 	def SetJointPos(self, time, boneBusjointID, vec3):
 		""" Sets the position of a joint. Input is relative to the start position of that joint  """
