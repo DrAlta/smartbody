@@ -5039,7 +5039,7 @@ void FltkViewer::drawSteeringInfo()
 	glPushMatrix();
 	glDisable(GL_LIGHTING);
 
-	glTranslatef(0.0f, 0.5f, 0.0f);
+	//glTranslatef(0.0f, 0.5f, 0.0f);
 	glScalef(1.0f / scene->getScale(), 1.0f / scene->getScale(), 1.0f / scene->getScale());
 
 	//comment out for now, have to take a look at the steering code
