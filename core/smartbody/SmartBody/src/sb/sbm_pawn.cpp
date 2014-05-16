@@ -150,9 +150,9 @@ void SbmPawn::initData()
 	//colObj_p = NULL;
 	//phyObj_p = NULL;
 	steeringSpaceObj_p = NULL;
-	steeringSpaceObjSize.x = 20.0f;
-	steeringSpaceObjSize.y = 20.0f;
-	steeringSpaceObjSize.z = 20.0f;
+	steeringSpaceObjSize.x = 1.0f;
+	steeringSpaceObjSize.y = 1.0f;
+	steeringSpaceObjSize.z = 1.0f;
 	// world_offset_writer_p, applies external inputs to the skeleton,
 	//   and therefore needs to evaluate before other controllers
 	world_offset_writer_p->ref();
@@ -790,6 +790,12 @@ void SbmPawn::initSteeringSpaceObject()
 	if (!scene->getSteerManager()->getEngineDriver()->_engine)	return;
 
 	float steerScale = 1.0f / scene->getScale();
+
+	// get the size of the steering object
+	SrVec size = this->getVec3Attribute("collisionShapeScale");
+	steeringSpaceObjSize.x = size.x;
+	steeringSpaceObjSize.y = size.y;
+	steeringSpaceObjSize.z = size.z;
 
 	float x, y, z, h, p, r;
 	this->get_world_offset(x, y, z, h, p, r);	

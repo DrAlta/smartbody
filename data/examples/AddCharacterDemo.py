@@ -118,7 +118,7 @@ brad.setStringAttribute("displayType", "GPUmesh")
 print 'Setting up steering'
 steerManager = scene.getSteerManager()
 steerManager.setEnable(False)
-brad.setBoolAttribute('steering.pathFollowingMode', True)
+brad.setBoolAttribute('steering.pathFollowingMode', False) # disable path following mode so that obstacles will be respected
 steerManager.setEnable(True)
 # Start the simulation
 print 'Starting the simulation'
