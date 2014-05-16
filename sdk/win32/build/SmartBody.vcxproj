@@ -416,8 +416,6 @@
     <ClCompile Include="..\src\SmartBody\sbm\time_profiler.cpp" />
     <ClCompile Include="..\src\SmartBody\sbm\time_regulator.cpp" />
     <ClCompile Include="..\src\SmartBody\sbm\xercesc_utils.cpp" />
-    <ClCompile Include="..\src\SmartBody\sb\smartbody-c-dll.cpp" />
-    <ClCompile Include="..\src\SmartBody\sb\smartbody-dll.cpp" />
     <ClCompile Include="..\src\SmartBody\sk\sk_channel.cpp" />
     <ClCompile Include="..\src\SmartBody\sk\sk_channel_array.cpp" />
     <ClCompile Include="..\src\SmartBody\sk\sk_joint.cpp" />
@@ -806,8 +804,6 @@
     <ClInclude Include="..\src\SmartBody\sb\SBTypes.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBVHMsgManager.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBWSPManager.h" />
-    <ClInclude Include="..\src\SmartBody\sb\smartbody-c-dll.h" />
-    <ClInclude Include="..\src\SmartBody\sb\smartbody-dll.h" />
     <ClInclude Include="..\src\SmartBody\sk\sk_channel.h" />
     <ClInclude Include="..\src\SmartBody\sk\sk_channel_array.h" />
     <ClInclude Include="..\src\SmartBody\sk\sk_joint.h" />

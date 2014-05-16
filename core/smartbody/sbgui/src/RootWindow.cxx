@@ -917,7 +917,7 @@ void BaseWindow::LaunchFaceViewerCB( Fl_Widget* widget, void* data )
 void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
 {
 	std::string speechRelayCommand = "";
-	SmartBody::SBScene::getSystemParameter("speechrelaycommand");
+	speechRelayCommand = SmartBody::SBScene::getSystemParameter("speechrelaycommand");
 	if (speechRelayCommand == "")
 	{
 #ifdef WIN32
