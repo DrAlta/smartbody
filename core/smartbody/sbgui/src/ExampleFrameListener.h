@@ -41,12 +41,8 @@ D:        Step right
 #include "OGRE/Ogre.h"
 #include "OGRE/OgreStringConverter.h"
 #include "OGRE/OgreException.h"
-#ifdef WIN32
 #if OGRE_VERSION_MINOR > 7 && OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_PATCH >= 0
 #include "OGRE/OgreOverlay.h"
-#else
-#include "OGRE/Overlay/OgreOverlay.h"
-#endif
 #else
 #include "OGRE/Overlay/OgreOverlay.h"
 #endif
