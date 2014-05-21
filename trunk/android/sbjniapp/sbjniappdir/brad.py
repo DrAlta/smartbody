@@ -24,8 +24,10 @@ camera.setNearPlane(0.1)
 # map to the SmartBody standard
 scene.run("zebra2-map.py")
 zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
-
-
+bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+zebra2Map.applySkeleton(bradSkeleton)
+bradMotion = scene.getMotion('ChrBrad@Idle01_BeatHighBt01')
+zebra2Map.applyMotion(bradMotion)
 
 brad = scene.createCharacter("ChrBrad", "")
 bradSkeleton = scene.createSkeleton("ChrBrad.sk")
