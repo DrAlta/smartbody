@@ -2050,7 +2050,8 @@ std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 			strstr << pawnCount;
 			pawnCount++;
 			SmartBody::SBPawn* pawn = scene->createPawn(strstr.str());			
-			pawn->setStringAttribute("mesh",dndMesh->getName());		
+			pawn->setStringAttribute("mesh",dndMesh->getName());	
+			pawn->dStaticMeshInstance_p->setVisibility(2);
 			return;
 		}
 		
@@ -5329,7 +5330,7 @@ void FltkViewer::drawDeformableModels()
 					//_data->render_action.apply(character->scene_p);
 				}
 			}
-			else
+			else if (rendererType() != "ogre3D")
 			{
 				//meshInstance->blendShapes();
 				if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && meshInstance->getVisibility() == 1) || meshInstance->getVisibility() == 2)

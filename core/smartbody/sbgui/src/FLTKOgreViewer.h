@@ -27,6 +27,7 @@ public:
 	virtual void notify(SmartBody::SBSubject* subject);
 
 	void updateOptions();
+	virtual std::string rendererType() { return "ogre3D"; }
 	// handle fltk mouse events ?		
 protected:
 	void initOgreWindow();
