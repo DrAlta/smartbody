@@ -8,6 +8,7 @@ scene.addAssetPath('script', 'scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
+scene.addAssetPath("script", "behaviorsets")
 scene.loadAssets()
 
 # Set scene parameters to fit new Brad and Rachel
@@ -154,7 +155,7 @@ rachel.setVoiceCode('Microsoft|Anna')
 rachel.setStringAttribute('gestureMap', 'ChrRachel')
 rachel.setBoolAttribute('bmlRequest.autoGestureTransition', True)
 # Idle pose
-bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01"/>')
+bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01" start=".4"/>')
 
 # setup gestures
 scene.run('BehaviorSetFemaleGestures.py')
