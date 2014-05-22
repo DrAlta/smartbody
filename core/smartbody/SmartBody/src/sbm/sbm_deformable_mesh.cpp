@@ -485,20 +485,21 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	iFace = 0;
 	iFaceIdxOffset = 0;
 	iNormalIdxOffset = 0;
-	iTextureIdxOffset = 0;	
-	std::vector<SrVec> boneColorMap;
+	iTextureIdxOffset = 0;		
 	float step = 1.f/boneJointList.size();
 	float floatBuf[4];
 	SrRandom random;	
+
+	boneColorMap.clear();
 	for (unsigned int i=0;i<boneJointList.size();i++)
 	{
 		//SrColor boneColor = SrColor::interphue(random.getf());
 		SrColor boneColor = SrColor::interphue(i*step);
 		boneColor.get(floatBuf);
-		if (i == 3)
-			boneColorMap.push_back(SrVec(1.f,0.f,0.f));
-		else
-			boneColorMap.push_back(SrVec(floatBuf[0],floatBuf[1],floatBuf[2]));				
+// 		if (i == 3)
+// 			boneColorMap.push_back(SrVec(1.f,0.f,0.f));
+// 		else
+		boneColorMap.push_back(SrVec(floatBuf[0],floatBuf[1],floatBuf[2]));				
 	}	
 	
 	for (unsigned int c=0;c<meshIndexList.size();c++)

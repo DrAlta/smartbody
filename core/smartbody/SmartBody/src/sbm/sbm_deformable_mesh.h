@@ -84,6 +84,7 @@ public:
 	std::vector<SbmSubMesh*>    subMeshList;
 
 	std::vector<int>			boneCountBuf;
+	std::vector<SrVec>          boneColorMap;
 	std::vector<SrVec4i>        boneIDBuf[2];
 	std::vector<SrVec4>         boneIDBuf_f[2];
 	std::vector<SrVec4>         boneWeightBuf[2];

@@ -261,6 +261,19 @@ std::vector<SBJoint*> SBJoint::getDescendants()
 	return joints;
 }
 
+
+std::vector<SBJoint*> SBJoint::getAncestors()
+{
+	std::vector<SBJoint*> joints;
+	SmartBody::SBJoint* tempJoint = getParent();
+	while (tempJoint)
+	{
+		joints.push_back(tempJoint);
+		tempJoint = tempJoint->getParent();
+	}
+	return joints;
+}
+
 SBTransform& SBJoint::getGlobalTransform()
 {	
 	globalTransform.gmat(gmat());

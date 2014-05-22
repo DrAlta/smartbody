@@ -35,6 +35,7 @@ class SBJoint : public SkJoint, public SBTransformObjInterface
 		SBAPI void addChild(SBJoint* child);
 		SBAPI void removeChild(SBJoint* child);
 		SBAPI std::vector<SBJoint*> getDescendants();
+		SBAPI std::vector<SBJoint*> getAncestors();
 
 		SBAPI void setSkeleton(SBSkeleton* skeleton);
 		SBAPI SBSkeleton* getSkeleton();

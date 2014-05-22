@@ -78,9 +78,9 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 
 	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
 	glEnable(GL_LIGHTING);
-	glEnable(GL_TEXTURE_2D);	
-	glEnable ( GL_ALPHA_TEST );
-	glEnable (GL_BLEND);
+	//glEnable(GL_TEXTURE_2D);	
+	//glEnable ( GL_ALPHA_TEST );
+	//glEnable (GL_BLEND);
 #if !defined (__ANDROID__) && !defined(SB_IPHONE)
 	glDisable ( GL_POLYGON_SMOOTH );
 #endif
@@ -104,6 +104,13 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 		glDepthMask(GL_FALSE);
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->skinColorBuf[0]);		
+		//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
+		glDisable(GL_LIGHTING);
+	}
+	else if (mesh->hasVertexColor)
+	{
+		glEnableClientState(GL_COLOR_ARRAY);
+		glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);		
 		//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
 		glDisable(GL_LIGHTING);
 	}
