@@ -49,6 +49,8 @@ SkScene::SkScene ()
    scaleFactor = 1.f;
    _skeleton = 0;
    _needsInit = true;
+   _showBones = true;
+   _showJoints = true;
  }
 
 SkScene::~SkScene ()
@@ -160,12 +162,12 @@ void SkScene::initInternal()
 	  SrSnGroup* group_p = _jgroup[i];
       group_p->add ( gaxis, AxisPos );
 
-	  sphere = createSphere(scaleFactor*1.0f);	 
-	  group_p->add ( new SrSnMatrix, MatrixPos );
-	  group_p->add ( sphere, SpherePos );
-	  
-	  
-      
+	sphere = createSphere(scaleFactor*1.0f);	 
+	group_p->add ( new SrSnMatrix, MatrixPos );
+	group_p->add ( sphere, SpherePos );
+	if (!_showJoints)
+		group_p->visible(false);
+
 
       g = new SrSnGroup; // geometry group of the joint
       group_p->add ( g, GeoPos );
@@ -177,16 +179,18 @@ void SkScene::initInternal()
       smodel->visible ( false );
       g->add ( smodel ); // at ColgeoPos
     
-      for (size_t j=0; j < (size_t) joints[i]->num_children(); j++ )
-       { SrSnCylinder* c = new SrSnCylinder;
-	     c->color(SrColor::gray);
-		 //c->color(SrColor::white);
-         c->shape().a = SrPnt::null;
-         c->shape().b = joints[i]->child(j)->offset();
-         c->shape().radius = scaleFactor * _cradius;
-         c->visible ( true );
-         g->add ( c ); // starting at FirstCylPos
-       }
+		for (size_t j=0; j < (size_t) joints[i]->num_children(); j++ )
+		{ 
+			SrSnCylinder* c = new SrSnCylinder;
+			c->color(SrColor::gray);
+			//c->color(SrColor::white);
+			c->shape().a = SrPnt::null;
+			c->shape().b = joints[i]->child(j)->offset();
+			c->shape().radius = scaleFactor * _cradius;
+			c->visible ( _showBones );
+			g->add ( c ); // starting at FirstCylPos
+		}
+
 
 	  // end effector for bone mode
 	  if (joints[i]->num_children() == 0)
@@ -329,9 +333,14 @@ void SkScene::setJointRadius( SkJoint* joint, float radius )
 	SrSnSphere* sphere;
 	SrSnGroup* g;
 	i = joint->index();	
-	g = _jgroup[i];
-	sphere = (SrSnSphere*) g->get(SpherePos);
-	sphere->shape().radius = radius * _sfactor * scaleFactor;		
+	_cradius = radius;
+	if (_jgroup.size() > i)
+	{
+		g = _jgroup[i];
+		sphere = (SrSnSphere*) g->get(SpherePos);
+		sphere->shape().radius = _cradius * _sfactor * scaleFactor;	
+	}
+	
 }
 
 void SkScene::setJointColor( SkJoint* joint, SrColor color )
@@ -485,4 +494,15 @@ SrSnSphere* SkScene::createSphere(float scaleFactor )
 	//sphere->ref();	
 	return sphere;
 }
+
+void SkScene::setShowJoints(bool val)
+{
+	_showJoints = val;
+}
+
+void SkScene::setShowBones(bool val)
+{
+	_showBones = val;
+}
+
 //============================= EOF ===================================

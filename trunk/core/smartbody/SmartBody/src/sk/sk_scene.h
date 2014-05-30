@@ -42,6 +42,8 @@ class SBAPI SkScene : public SrSnGroup
 	float scaleFactor;
     SkSkeleton* _skeleton;
 	bool _needsInit;
+	bool _showJoints;
+	bool _showBones;
 
 	void initInternal();
 
@@ -87,6 +89,9 @@ class SBAPI SkScene : public SrSnGroup
 
 	void setJointRadius( SkJoint* joint, float radius);
 	void setJointColor( SkJoint* joint, SrColor color);
+
+	void setShowJoints(bool val);
+	void setShowBones(bool val);
     
     /*! Update the length of the axis to the new value */
     void set_axis_length ( float l );

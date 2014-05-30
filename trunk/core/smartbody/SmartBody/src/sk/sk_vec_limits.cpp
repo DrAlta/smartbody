@@ -31,7 +31,7 @@ void SkVecLimits::init ()
     { _value[i] = 0;
       _uplim[i] = 0;
       _lolim[i] = 0;
-      _limits[i] = 1;
+      _limits[i] = true;
     }
  }
 

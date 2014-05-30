@@ -49,6 +49,22 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 	if (attr)
 		attr->registerObserver(this);
 
+	attr = pawn->getAttribute("showBones");
+	if (attr)
+		attr->registerObserver(this);
+
+	attr = pawn->getAttribute("showJoints");
+	if (attr)
+		attr->registerObserver(this);
+
+	attr = pawn->getAttribute("displayBoneScale");
+	if (attr)
+		attr->registerObserver(this);
+
+	attr = pawn->getAttribute("displayJointScale");
+	if (attr)
+		attr->registerObserver(this);
+
 	FLTKListener::OnCharacterUpdate(name);
 	
 	if (otherListener)
@@ -413,7 +429,53 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 				}
 			}
 		}
-		
+		else if (name == "showBones")
+		{
+			bool val = pawn->getBoolAttribute("showBones");
+			if (pawn->scene_p)
+			{
+				pawn->scene_p->setShowBones(val);
+				pawn->scene_p->init(pawn->getSkeleton());
+			}
+
+		}
+		else if (name == "showJoints")
+		{	
+			bool val = pawn->getBoolAttribute("showJoints");
+			if (pawn->scene_p)
+			{
+				pawn->scene_p->setShowJoints(val);
+				pawn->scene_p->init(pawn->getSkeleton());
+			}
+		}
+		else if (name == "displayBoneScale")
+		{
+			double val = pawn->getDoubleAttribute("displayBoneScale");
+			if (pawn->scene_p)
+			{
+				pawn->scene_p->set_skeleton_radius(val);
+				pawn->scene_p->init(pawn->getSkeleton());
+			}
+		}
+		else if (name == "displayJointScale")
+		{		
+			double val = pawn->getDoubleAttribute("displayJointScale");
+			if (pawn->scene_p)
+			{
+				SmartBody::SBSkeleton* skeleton = pawn->getSkeleton();
+				if (skeleton)
+				{
+					int numJoints = skeleton->getNumJoints();
+					for (size_t j = 0; j < numJoints; j++)
+					{
+						SmartBody::SBJoint* joint = skeleton->getJoint(j);
+						pawn->scene_p->setJointRadius(joint, val);
+						pawn->scene_p->init(pawn->getSkeleton());
+					}
+				}
+			}
+		}
+
 	}
 }
 
