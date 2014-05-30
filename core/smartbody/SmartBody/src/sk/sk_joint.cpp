@@ -32,10 +32,11 @@
 
 //============================= SkJoint ============================
 
-SkJoint::SkJoint() : _pos ( 0 )
+SkJoint::SkJoint()
 {
    _visgeo = 0;
    _colgeo = 0;
+   _pos.init();
 
    _coldetid = -1;
 
@@ -56,10 +57,10 @@ SkJoint::SkJoint() : _pos ( 0 )
 }
 
 SkJoint::SkJoint ( SkSkeleton* sk, SkJoint* parent, RotType rtype, int i )
-          : _pos ( 0 )
  {
    _visgeo = 0;
    _colgeo = 0;
+   _pos.init();
 
    _coldetid = -1;
 

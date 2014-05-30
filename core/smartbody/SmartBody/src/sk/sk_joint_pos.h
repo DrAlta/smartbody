@@ -36,8 +36,12 @@ class SkJointPos : public SkVecLimits
     
    public :
    
+	SkJointPos() : SkVecLimits()
+	{
+	}
+
     /* Constructor calls init(), which set all values frozen in 0. */
-    SkJointPos ( SkJoint* j ) { _joint=j; }
+    SkJointPos ( SkJoint* j ) : SkVecLimits() { _joint=j; }
 
     /*! Set values per degree of freedom. In case joint limits are activated,
         values are bounded to the limits before inserted. The associated

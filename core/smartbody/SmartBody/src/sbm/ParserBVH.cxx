@@ -603,7 +603,8 @@ void ParserBVH::convertBVHtoSmartBody(SkJoint* joint, SkMotion& motion, ChannelI
 		{
 			if (motion.posture_size() <= channelInfo->startingChannelIndex + skChannelOffset)
 				std::cout << "WARNING!" << std::endl;
-			if (!joint->parent())
+			//if (!joint->parent())
+			if (true)
 			{ 
 				float finalValue = float(data[c]) * scale;
 				if (channelInfo->channels[c] == BVHXPOSITION)
