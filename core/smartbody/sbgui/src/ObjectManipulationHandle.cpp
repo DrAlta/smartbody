@@ -130,6 +130,10 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 	{
 		SbmPawn* pawn = pawn_list[i];
 		SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(pawn);
+		// ignore the active camera from the picking selection
+		SmartBody::SBPawn* activeCamera = SmartBody::SBScene::getScene()->getActiveCamera();
+		if (activeCamera && sbpawn == activeCamera)
+			continue;
 		SrVec pawn_pos = PawnPosControl::get_pawn_pos(pawn);
 		glPushName(0xffffffff);
 		glLoadName(i);
