@@ -28,7 +28,7 @@
 
 const char* SrBox::class_name = "Box";
 
-SrBox::SrBox () : a(SrPnt::one), b(SrPnt::null)
+SrBox::SrBox () : a(SrPnt::null), b(SrPnt::null)
  {
  }
 
