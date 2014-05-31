@@ -46,6 +46,12 @@ void SrBox::set_null ()
 
 bool SrBox::empty () const
  {
+	 if (a == SrPnt::null && 
+		 b == SrPnt::null)
+	 {
+		 return true;
+	 }
+
    return a.x>b.x || a.y>b.y || a.z>b.z ? true:false;
  }
 
