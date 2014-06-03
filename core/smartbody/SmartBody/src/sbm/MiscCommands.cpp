@@ -91,61 +91,6 @@ int set_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args)
 	}
 }
 
-
-#if USE_WSP
-WSP::WSP_ERROR remote_pawn_position_update( std::string id, std::string attribute_name, wsp_vector & vector_3d, void * data, const std::string & data_provider )
-{
-	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(id);
-	if ( pawn != NULL )
-	{
-		float x, y, z, h, p, r;
-		pawn->get_world_offset( x, y, z, h, p, r );
-
-		pawn->set_world_offset( (float)vector_3d.x, (float)vector_3d.y, (float)vector_3d.z, h, p, r );
-	}
-	else
-	{
-		std::stringstream strstr;
-		strstr << "ERROR: SbmPawn::remote_pawn_position_update: SbmPawn '" << id << "' is NULL, cannot set_world_offset";
-		LOG(strstr.str().c_str());
-		return WSP::not_found_error( "SbmPawn is NULL" );
-	}
-
-	return WSP::no_error();
-}
-
-WSP::WSP_ERROR remote_pawn_rotation_update( std::string id, std::string attribute_name, wsp_vector & vector_4d, void * data, const std::string & data_provider )
-{
-	SbmPawn * pawn_p =  SmartBody::SBScene::getScene()->getPawn( id );
-
-	if ( pawn_p != NULL )
-	{
-		float x, y, z, h, p, r;
-		pawn_p->get_world_offset( x, y, z, h, p, r );
-
-		gwiz::euler_t e = gwiz::quat_t( vector_4d.q, vector_4d.x, vector_4d.y, vector_4d.z );
-		pawn_p->set_world_offset( x, y, z, (float)e.h(), (float)e.p(), (float)e.r() );
-	}
-	else
-	{
-		std::stringstream strstr;
-		strstr << "ERROR: SbmPawn::remote_pawn_rotation_update: SbmPawn '" << id << "' is NULL, cannotsbm set_world_offset";
-		LOG(strstr.str().c_str());
-		return  WSP::not_found_error( "SbmPawn is NULL" );
-	}
-
-	return  WSP::no_error();
-}
-
-void handle_wsp_error( std::string id, std::string attribute_name, int error, std::string reason, void* data )
-{
-
-	LOG( "error getting id: %s attribute_name: %s. error_code: %d reason: %s\n", id.c_str(), attribute_name.c_str(), error, reason.c_str() );
-}
-
-
-#endif
-
 int pawn_set_cmd_funcx( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 {
 	std::string pawn_id = args.read_token();
@@ -663,12 +608,6 @@ int create_remote_pawn_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 		return err;
 	}
 
-/*
-#if USE_WSP
-	mcu.theWSP->subscribe_vector_3d_interval( pawn_and_attribute, "position", interval, handle_wsp_error, remote_pawn_position_update, &mcu );
-	mcu.theWSP->subscribe_vector_4d_interval( pawn_and_attribute, "rotation", interval, handle_wsp_error, remote_pawn_rotation_update, &mcu );
-#endif
-*/
 	return( CMD_SUCCESS );
 }
 

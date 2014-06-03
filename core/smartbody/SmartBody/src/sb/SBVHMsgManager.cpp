@@ -118,7 +118,6 @@ bool SBVHMsgManager::connect()
 		err = vhmsg::ttu_register( "object-data" );
 		err = vhmsg::ttu_register( "vrAllCall" );
 		err = vhmsg::ttu_register( "vrKillComponent" );
-		err = vhmsg::ttu_register( "wsp" );
 		err = vhmsg::ttu_register( "receiver" );
 		err = vhmsg::ttu_register( "sbmdebugger" );
 		err = vhmsg::ttu_register( "vrPerception" );

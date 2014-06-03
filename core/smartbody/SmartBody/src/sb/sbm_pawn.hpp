@@ -32,10 +32,6 @@
 #include "bonebus.h"
 #endif
 
-#if USE_WSP
-#include "wsp.h"
-#endif
-
 #include <map>
 
 
@@ -172,34 +168,11 @@ protected:
 
 	void initData();
 
-	
-
 
 public:
-	/**
-	 *  Removes a remote pawn that was being manipulated by the WSP library
-	 */
-	static int remove_remote_pawn_func( srArgBuffer& args);
-
-
-
 	MeCtChannelWriter* get_world_offset_writer_p()	{return world_offset_writer_p;}
 
 	void wo_cache_update();
-	
-
-	/**
-	 *  WSP access functions.
-	 */
-#if USE_WSP
-	static WSP::WSP_ERROR wsp_world_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
-	static WSP::WSP_ERROR wsp_world_rotation_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
-	static WSP::WSP_ERROR wsp_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
-	static WSP::WSP_ERROR wsp_rotation_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data );
-#endif
-
-
-
 };
 
 #endif // SBM_PAWN_HPP

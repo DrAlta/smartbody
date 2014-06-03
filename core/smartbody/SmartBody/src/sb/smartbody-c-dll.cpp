@@ -270,30 +270,6 @@ SBAPI bool SBM_Shutdown( SBMHANDLE sbmHandle )
 }
 
 
-SBAPI bool SBM_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName )
-{
-   if ( !SBM_HandleExists( sbmHandle ) )
-   {
-      return false;
-   }
-
-   int ret = SmartBody::SBScene::getScene()->getAssetManager()->load_skeleton( data, sizeBytes, skeletonName );
-   return ret == CMD_SUCCESS;
-}
-
-
-SBAPI bool SBM_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName )
-{
-   if ( !SBM_HandleExists( sbmHandle ) )
-   {
-      return false;
-   }
-
-   int ret = SmartBody::SBScene::getScene()->getAssetManager()->load_motion( data, sizeBytes, motionName );
-   return ret == CMD_SUCCESS;
-}
-
-
 SBAPI bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
@@ -304,52 +280,28 @@ SBAPI bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
    scene->getSimulationManager()->setTime(timeInSeconds);
    scene->update();
+
+   // sanity check the queues to make sure they don't grow unchecked
+   const int maxQueueSize = 10000;
+   while (g_smartbodyDLLInstances[sbmHandle]->m_createCallbackInfo.size() > maxQueueSize)
+       g_smartbodyDLLInstances[sbmHandle]->m_createCallbackInfo.pop();
+
+   while (g_smartbodyDLLInstances[sbmHandle]->m_deleteCallbackInfo.size() > maxQueueSize)
+       g_smartbodyDLLInstances[sbmHandle]->m_deleteCallbackInfo.pop();
+
+   while (g_smartbodyDLLInstances[sbmHandle]->m_changeCallbackInfo.size() > maxQueueSize)
+       g_smartbodyDLLInstances[sbmHandle]->m_changeCallbackInfo.pop();
+
+   while (g_smartbodyDLLInstances[sbmHandle]->m_visemeCallbackInfo.size() > maxQueueSize)
+       g_smartbodyDLLInstances[sbmHandle]->m_visemeCallbackInfo.pop();
+
+   while (g_smartbodyDLLInstances[sbmHandle]->m_channelCallbackInfo.size() > maxQueueSize)
+       g_smartbodyDLLInstances[sbmHandle]->m_channelCallbackInfo.pop();
+
+   while (g_smartbodyDLLInstances[sbmHandle]->m_logCallbackInfo.size() > maxQueueSize)
+       g_smartbodyDLLInstances[sbmHandle]->m_logCallbackInfo.pop();
+
    return true;
-}
-
-
-SBAPI void SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id )
-{
-   if ( !SBM_HandleExists( sbmHandle ) )
-   {
-      return;
-   }
-
-   SmartBody::SBScene::getScene()->getDebuggerServer()->SetID( id );
-}
-
-
-SBAPI void SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
-{
-   if ( !SBM_HandleExists( sbmHandle ) )
-   {
-      return;
-   }
-
-   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
-   SBDebuggerServer * debuggerServer = scene->getDebuggerServer();
-   debuggerServer->m_cameraPos.x = x;
-   debuggerServer->m_cameraPos.y = y;
-   debuggerServer->m_cameraPos.z = z;
-   debuggerServer->m_cameraRot.x = rx;
-   debuggerServer->m_cameraRot.y = ry;
-   debuggerServer->m_cameraRot.z = rz;
-   debuggerServer->m_cameraRot.w = rw;
-   debuggerServer->m_cameraFovY   = fov;
-   debuggerServer->m_cameraAspect = aspect;
-   debuggerServer->m_cameraZNear  = zNear;
-   debuggerServer->m_cameraZFar   = zFar;
-}
-
-
-SBAPI void SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled )
-{
-   if ( !SBM_HandleExists( sbmHandle ) )
-   {
-      return;
-   }
-
-   SmartBody::SBScene::getScene()->getDebuggerServer()->m_rendererIsRightHanded = enabled;
 }
 
 
@@ -443,16 +395,13 @@ SBAPI bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_Charact
    character->ry = data.ry;
    character->rz = data.rz;
 
-   for ( size_t i = 0; i < data.m_numJoints; i++ )
-   {
-      character->jx[i] = data.jx[i];
-      character->jy[i] = data.jy[i];
-      character->jz[i] = data.jz[i];
-      character->jrw[i] = data.jrw[i];
-      character->jrx[i] = data.jrx[i];
-      character->jry[i] = data.jry[i];
-      character->jrz[i] = data.jrz[i];
-   }
+   memcpy(character->jx,  data.jx,  data.m_numJoints * sizeof(float));
+   memcpy(character->jy,  data.jy,  data.m_numJoints * sizeof(float));
+   memcpy(character->jz,  data.jz,  data.m_numJoints * sizeof(float));
+   memcpy(character->jrw, data.jrw, data.m_numJoints * sizeof(float));
+   memcpy(character->jrx, data.jrx, data.m_numJoints * sizeof(float));
+   memcpy(character->jry, data.jry, data.m_numJoints * sizeof(float));
+   memcpy(character->jrz, data.jrz, data.m_numJoints * sizeof(float));
 
    return true;
 }
@@ -720,6 +669,88 @@ SBAPI void SBM_PythonCommandString( SBMHANDLE sbmHandle, const char * command, c
 #else
    return;
 #endif
+}
+
+
+SBAPI bool SBM_SBAssetManager_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBAssetManager * assetManager = scene->getAssetManager();
+
+   int ret = assetManager->load_skeleton( data, sizeBytes, skeletonName );
+   return ret == CMD_SUCCESS;
+}
+
+
+SBAPI bool SBM_SBAssetManager_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBAssetManager * assetManager = scene->getAssetManager();
+
+   int ret = assetManager->load_motion( data, sizeBytes, motionName );
+   return ret == CMD_SUCCESS;
+}
+
+
+SBAPI void SBM_SBDebuggerServer_SetID( SBMHANDLE sbmHandle, const char * id )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SBDebuggerServer * debuggerServer = scene->getDebuggerServer();
+
+   debuggerServer->SetID( id );
+}
+
+
+SBAPI void SBM_SBDebuggerServer_SetCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SBDebuggerServer * debuggerServer = scene->getDebuggerServer();
+
+   debuggerServer->m_cameraPos.x = x;
+   debuggerServer->m_cameraPos.y = y;
+   debuggerServer->m_cameraPos.z = z;
+   debuggerServer->m_cameraRot.x = rx;
+   debuggerServer->m_cameraRot.y = ry;
+   debuggerServer->m_cameraRot.z = rz;
+   debuggerServer->m_cameraRot.w = rw;
+   debuggerServer->m_cameraFovY   = fov;
+   debuggerServer->m_cameraAspect = aspect;
+   debuggerServer->m_cameraZNear  = zNear;
+   debuggerServer->m_cameraZFar   = zFar;
+}
+
+
+SBAPI void SBM_SBDebuggerServer_SetRendererIsRightHanded( SBMHANDLE sbmHandle, bool enabled )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SBDebuggerServer * debuggerServer = scene->getDebuggerServer();
+
+   debuggerServer->m_rendererIsRightHanded = enabled;
 }
 
 

@@ -273,7 +273,6 @@ void DemoApp::setupSmartbody()
     vhmsg::ttu_register( "StopSound" );
     vhmsg::ttu_register( "CommAPI" );
     vhmsg::ttu_register( "object-data" );
-    vhmsg::ttu_register( "wsp" );
 #endif    
     
     m_sbListener = new SBListener(this);

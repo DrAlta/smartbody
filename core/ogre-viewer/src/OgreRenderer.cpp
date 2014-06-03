@@ -221,7 +221,6 @@ void OgreRenderer::createScene()
     vhmsg::ttu_register( "StopSound" );
     vhmsg::ttu_register( "CommAPI" );
     vhmsg::ttu_register( "object-data" );
-    vhmsg::ttu_register( "wsp" );
 	vhmsg::ttu_register( "sbmdebugger" );
 }
 

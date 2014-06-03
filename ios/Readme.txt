@@ -83,16 +83,13 @@ Note: for smartbody iphone running on unity, we need to rename variables inside 
 	Since the vhcl_log.cpp hasn't been changed from VH group, you have to copy trunk/ios/vhcl/vhcl_log.cpp to trunk/lib/vhcl/src/vhcl_log.cpp for now.
 	Open smartbody-iphone.xcworkspace, select scheme vhcl and build.
 
-6) Build wsp
-	Open smartbody-iphone.xcworkspace, select scheme wsp and build.
-	
-7) Build smartbody-lib
+6) Build smartbody-lib
 	Open smartbody-iphone.xcworkspace, select scheme smartbody-lib and build. 
 
-8) Build smartbody-dll (For now, this is optional)
+7) Build smartbody-dll (For now, this is optional)
 	Open smartbody-iphone.xcworkspace, select scheme smartbody-dll and build. 
 	
-9) Build vhwrapper-dll (For unity only, optional)
+8) Build vhwrapper-dll (For unity only, optional)
 	Open smartbody-iphone.xcworkspace, select scheme vhwrapper-dll and build. 
 
 

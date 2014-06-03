@@ -59,7 +59,6 @@ class SBSubject;
 class SBController;
 class SBVHMsgManager;
 class SBCommandManager;
-class SBWSPManager;
 class SBNavigationMesh;
 class SBMotionGraphManager;
 
@@ -165,7 +164,6 @@ class SBScene : public SBObject
 		SBAPI SBSpeechManager* getSpeechManager();
 		SBAPI SBVHMsgManager* getVHMsgManager();
 		SBAPI SBCommandManager* getCommandManager();
-		SBAPI SBWSPManager* getWSPManager();
 		SBAPI SBNavigationMeshManager* getNavigationMeshManager();
 		SBAPI SBMotionGraphManager* getMotionGraphManager();
 
@@ -308,7 +306,6 @@ class SBScene : public SBObject
 		SBSpeechManager* _speechManager;
 		SBVHMsgManager* _vhmsgManager;
 		SBCommandManager* _commandManager;
-		SBWSPManager* _wspManager;
 		SBNavigationMeshManager* _naviMeshManager;
 		SBMotionGraphManager* _motionGraphManager;
 

@@ -289,7 +289,7 @@ int ResourceWindow::handle( int event )
 						if (child->is_selected())
 						{
 							const char* name = child->label();
-							int confirm = fl_ask("Are you sure you want to delete '%s'?",name);
+							int confirm = fl_choice(vhcl::Format("Are you sure you want to delete '%s'?",name).c_str(), "No", "Yes", NULL);
 							if (confirm == 0)
 								return 0;
 							SmartBody::SBScene::getScene()->removePawn(name);
@@ -306,7 +306,7 @@ int ResourceWindow::handle( int event )
 						if (child->is_selected())
 						{
 							const char* name = child->label();
-							int confirm = fl_ask("Are you sure you want to delete '%s'?",name);
+							int confirm = fl_choice(vhcl::Format("Are you sure you want to delete '%s'?",name).c_str(), "No", "Yes", NULL);
 							if (confirm == 0)
 								return 0;
 							SmartBody::SBScene::getScene()->removeCharacter(name);

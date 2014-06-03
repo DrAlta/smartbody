@@ -13,7 +13,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		AAC9AC9E142012EC00F56F9C /* libvhwrapper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libvhwrapper.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAC9AC9E142012EC00F56F9C /* libvhwrapper.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libvhwrapper.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAC9ACA1142012EC00F56F9C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		AAC9ACA5142012EC00F56F9C /* vhwrapper-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "vhwrapper-Prefix.pch"; sourceTree = "<group>"; };
 		AADDAE98154E224500A86087 /* vhwrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vhwrapper.h; sourceTree = SOURCE_ROOT; };
@@ -64,7 +64,7 @@
 				AADDAE99154E224500A86087 /* vhwrapper.cpp */,
 				AAC9ACA4142012EC00F56F9C /* Supporting Files */,
 			);
-			path = "vhwrapper";
+			path = vhwrapper;
 			sourceTree = "<group>";
 		};
 		AAC9ACA4142012EC00F56F9C /* Supporting Files */ = {
@@ -102,8 +102,8 @@
 			);
 			dependencies = (
 			);
-			name = "vhwrapper";
-			productName = "vhwrapper";
+			name = vhwrapper;
+			productName = vhwrapper;
 			productReference = AAC9AC9E142012EC00F56F9C /* libvhwrapper.a */;
 			productType = "com.apple.product-type.library.static";
 		};
@@ -209,7 +209,6 @@
 					"../../core/smartbody/smartbody-dll/include",
 					../../lib/vhcl/include,
 					"../../lib/vhmsg/vhmsg-c/include",
-					../../lib/wsp/wsp/include,
 					../../lib/bonebus/include,
 				);
 				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = (
@@ -225,7 +224,6 @@
 					"../../core/smartbody/steersuite-1.3/external",
 					../../lib/vhcl/include,
 					"../../lib/vhmsg/vhmsg-c/include",
-					../../lib/wsp/wsp/include,
 					../../lib/bonebus/include,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
@@ -259,7 +257,6 @@
 					"../../core/smartbody/steersuite-1.3/external",
 					../../lib/vhcl/include,
 					"../../lib/vhmsg/vhmsg-c/include",
-					../../lib/wsp/wsp/include,
 					../../lib/bonebus/include,
 				);
 				"HEADER_SEARCH_PATHS[sdk=iphonesimulator*][arch=*]" = (
@@ -275,7 +272,6 @@
 					"../../core/smartbody/steersuite-1.3/external",
 					../../lib/vhcl/include,
 					"../../lib/vhmsg/vhmsg-c/include",
-					../../lib/wsp/wsp/include,
 					../../lib/bonebus/include,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;

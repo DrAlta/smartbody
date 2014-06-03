@@ -35,7 +35,6 @@
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBCollisionManager.h>
 #include <sb/SBSceneListener.h>
-#include <sb/SBWSPManager.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <controllers/me_ct_channel_writer.hpp>
 #include <controllers/me_ct_curve_writer.hpp>
@@ -53,30 +52,17 @@
 #include <string.h>
 #include <iostream>
 
-#ifndef __native_client__
-
-#if USE_WSP
-#include "wsp.h"
-#endif
-
-#endif
-
 #include "sr/sr_model.h"
 #include "sr/sr_euler.h"
 #include <sb/SBSkeleton.h>
 #include <sr/sr_sn_matrix.h>
 
+
 using namespace std;
 
-#if USE_WSP
-using namespace WSP;
-#endif
 
 // Predeclare private functions defined below
 inline bool parse_float_or_error( float& var, const char* str, const string& var_name );
-
-/////////////////////////////////////////////////////////////
-//  WSP Callbacks
 
 
 /////////////////////////////////////////////////////////////
@@ -579,163 +565,6 @@ void SbmPawn::wo_cache_update() {
 	this->wo_cache.h = h;
 	this->wo_cache.r = r;
 }
-
-
-
-
-int SbmPawn::remove_remote_pawn_func( srArgBuffer& args)
-{
-	
-
-	std::string pawn_name = args.read_token();
-
-	if( pawn_name.length()==0 ) {
-
-		LOG("ERROR: Expected pawn name.");
-		return CMD_FAILURE;
-	}
-
-	SbmPawn* pawn_p = NULL;
-
-	pawn_p = SmartBody::SBScene::getScene()->getPawn( pawn_name );
-
-	if( pawn_p != NULL ) {
-/*
-#if USE_WSP
-		SmartBody::SBScene()->getScene()->getWSPManager()->unsubscribe( pawn_name, "position", 1 );
-#endif
-*/
-		SmartBody::SBScene::getScene()->removePawn(pawn_p->getName());
-
-		return CMD_SUCCESS;
-	} else {
-		LOG("ERROR: Pawn \"%s\" not found.", pawn_name.c_str() );
-		return CMD_FAILURE;
-	}
-}
-
-#if USE_WSP
-WSP_ERROR SbmPawn::wsp_world_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data )
-{
-	SbmPawn * pawn_p = (SbmPawn *)data;
-
-	const SkJoint * wo_joint = pawn_p->get_world_offset_joint();
-	if ( wo_joint != NULL )
-	{
-		value.x = wo_joint->const_pos()->value(0);
-		value.y = wo_joint->const_pos()->value(1);
-		value.z = wo_joint->const_pos()->value(2);
-		value.num_dimensions = 3;
-
-		return WSP::no_error();
-	}
-	else
-	{
-		return WSP::not_found_error( "no world_offset joint" );
-	}
-}
-
-WSP_ERROR SbmPawn::wsp_world_rotation_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data )
-{
-	SbmPawn * pawn_p = (SbmPawn *)data;
-
-	const SkJoint * wo_joint = pawn_p->get_world_offset_joint();
-	if ( wo_joint != NULL )
-	{
-		value.x = ((SkJoint *)wo_joint)->quat()->value().x;
-		value.y = ((SkJoint *)wo_joint)->quat()->value().y;
-		value.z = ((SkJoint *)wo_joint)->quat()->value().z;
-		value.q = ((SkJoint *)wo_joint)->quat()->value().w;
-		value.num_dimensions = 4;
-
-		return WSP::no_error();
-	}
-	else
-	{
-		return WSP::not_found_error( "no world_offset joint" );
-	}
-}
-
-WSP_ERROR SbmPawn::wsp_position_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data )
-{
-	SbmPawn * pawn_p = (SbmPawn *)data;
-
-	vector< string > tokens;
-	vhcl::Tokenize( id, tokens, ":" );
-	string & char_name = tokens[ 0 ];
-	string & joint_name = tokens[ 1 ];
-
-	SkJoint * joint = pawn_p->_skeleton->search_joint( joint_name.c_str() );
-	if ( joint != NULL )
-	{
-		joint->update_gmat();
-		const SrMat & sr_m = joint->gmat();
-
-		gwiz::matrix_t m;
-		for ( int i=0; i<4; i++ )
-		{
-			for ( int j=0; j<4; j++ )
-			{
-				m.set( i, j, sr_m.get( i, j ) );
-			}
-		}
-
-		gwiz::vector_t pos = m.translation( gwiz::COMP_M_TR );
-
-		value.x = pos.x();
-		value.y = pos.y();
-		value.z = pos.z();
-		value.num_dimensions = 3;
-
-		return WSP::no_error();
-	}
-	else
-	{
-		return WSP::not_found_error( "no joint" );
-	}
-}
-
-WSP_ERROR SbmPawn::wsp_rotation_accessor( const std::string id, const std::string attribute_name, wsp_vector & value, void * data )
-{
-	SbmPawn * pawn_p = (SbmPawn *)data;
-
-	vector< string > tokens;
-	vhcl::Tokenize( id, tokens, ":" );
-	string & char_name = tokens[ 0 ];
-	string & joint_name = tokens[ 1 ];
-
-	SkJoint * joint = pawn_p->_skeleton->search_joint( joint_name.c_str() );
-	if ( joint != NULL )
-	{
-		joint->update_gmat();
-		const SrMat & sr_m = joint->gmat();
-
-		gwiz::matrix_t m;
-		for( int i=0; i<4; i++ )
-		{
-			for( int j=0; j<4; j++ )
-			{
-				m.set( i, j, sr_m.get( i, j ) );
-			}
-		}
-
-		gwiz::quat_t quat = m.quat( gwiz::COMP_M_TR );
-
-		value.x = quat.x();
-		value.y = quat.y();
-		value.z = quat.z();
-		value.q = quat.w();
-		value.num_dimensions = 4;
-
-		return WSP::no_error();
-	}
-	else
-	{
-		return WSP::not_found_error( "no joint" );
-	}
-}
-#endif
-
 
 const std::string& SbmPawn::getGeomObjectName()
 {

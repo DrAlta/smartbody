@@ -38,7 +38,6 @@
 #include <sb/SBAssetManager.h>
 #include <sb/SBSpeechManager.h>
 #include <sb/SBCommandManager.h>
-#include <sb/SBWSPManager.h>
 #include <sb/SBNavigationMeshManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
@@ -165,7 +164,6 @@ void SBScene::initialize()
 	_speechManager = new SBSpeechManager();
 	_vhmsgManager = new SBVHMsgManager();
 	_commandManager = new SBCommandManager();
-	_wspManager = new SBWSPManager();
 	_naviMeshManager = new SBNavigationMeshManager();
 	_motionGraphManager = new SBMotionGraphManager();
 
@@ -178,7 +176,6 @@ void SBScene::initialize()
 	_serviceManager->addService(_boneBusManager);
 	_serviceManager->addService(_collisionManager);
 	_serviceManager->addService(_vhmsgManager);
-	_serviceManager->addService(_wspManager);
 
 	_parser = new SBParser();
 
@@ -368,7 +365,6 @@ void SBScene::cleanup()
 	delete _assetManager;
 	delete _speechManager;
 	delete _commandManager;
-	delete _wspManager;
 	delete _naviMeshManager;
 	delete _kinectProcessor;
 
@@ -391,7 +387,6 @@ void SBScene::cleanup()
 	_assetManager = NULL;
 	_commandManager = NULL;
 	_speechManager = NULL;
-	_wspManager = NULL;
 
 	_kinectProcessor = NULL;
 
@@ -1581,11 +1576,6 @@ SBJointMapManager* SBScene::getJointMapManager()
 SBCommandManager* SBScene::getCommandManager()
 {
 	return _commandManager;
-}
-
-SBWSPManager* SBScene::getWSPManager()
-{
-	return _wspManager;
 }
 
 SBNavigationMeshManager* SBScene::getNavigationMeshManager()

@@ -209,7 +209,6 @@ void SBCommandManager::registerCallbacks()
 	insert( "char",			character_cmd_func );
 
 	insert( "ctrl",			mcu_controller_func );
-	insert( "wsp",			mcu_wsp_cmd_func );
 	insert( "create_remote_pawn", create_remote_pawn_func );
 
 	insert( "vrAgentBML",   BML::Processor::vrAgentBML_cmd_func );

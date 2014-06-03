@@ -5351,7 +5351,7 @@ int FltkViewer::deleteSelectedObject( int ret )
 	//LOG("1");
 	if (selectedPawn)
 	{	
-		int confirm = fl_ask("Are you sure you want to delete '%s'?",selectedPawn->getName().c_str());
+		int confirm = fl_choice(vhcl::Format("Are you sure you want to delete '%s'?", selectedPawn->getName().c_str()).c_str(), "No", "Yes", NULL);
 		if (confirm == 0)
 			return ret;
 		//_objManipulator.set_selected_pawn(NULL);
