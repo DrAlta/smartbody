@@ -2282,7 +2282,7 @@ void BaseWindow::DeleteObjectCB( Fl_Widget* widget, void* data )
 		return;
 	}
 
-	int confirm = fl_ask("Are you sure you want to delete '%s'?",objName.c_str());
+	int confirm = fl_choice(vhcl::Format("Are you sure you want to delete '%s'?", objName.c_str()).c_str(), "No", "Yes", NULL);
 	if (confirm == 0)
 		return ;
 	if (sbChar)

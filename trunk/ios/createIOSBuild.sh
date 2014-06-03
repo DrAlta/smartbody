@@ -23,12 +23,9 @@ mkdir -p release/lib
 mkdir -p release/lib/vhcl
 mkdir -p release/lib/vhmsg
 mkdir -p release/lib/vhmsg/vhmsg-c
-mkdir -p release/lib/wsp
-mkdir -p release/lib/wsp/wsp
 mkdir -p release/lib/bonebus
 rsync -ap --exclude=".svn" ../lib/vhcl/include/*.h ./release/lib/vhcl/include/
 rsync -ap --exclude=".svn" ../lib/vhmsg/vhmsg-c/include/*.h ./release/lib/vhmsg/vhmsg-c/include/
-rsync -ap --exclude=".svn" ../lib/wsp/wsp/include/*.h ./release/lib/wsp/wsp/include/
 rsync -ap --exclude=".svn" ../lib/bonebus/include/*.h ./release/lib/bonebus/include/
 
 # copy ios

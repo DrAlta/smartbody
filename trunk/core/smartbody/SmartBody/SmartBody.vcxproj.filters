@@ -493,9 +493,6 @@
     <ClCompile Include="..\SmartBody\src\sb\SBVHMsgManager.cpp">
       <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\SBWSPManager.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
     <ClCompile Include="..\SmartBody\src\sb\SBAnimationState.cpp">
       <Filter>sb</Filter>
     </ClCompile>
@@ -1165,6 +1162,9 @@
     <ClCompile Include="src\external\rply\rply.c">
       <Filter>external\rply</Filter>
     </ClCompile>
+    <ClCompile Include="src\bml\BMLBlock.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -1699,9 +1699,6 @@
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="..\SmartBody\src\sb\SBVHMsgManager.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\sb\SBWSPManager.h">
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="..\SmartBody\src\sb\SBAnimationState.h">
@@ -2327,6 +2324,9 @@
     </ClInclude>
     <ClInclude Include="src\sb\SBCharacterFrameData.h">
       <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLBlock.h">
+      <Filter>bml</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

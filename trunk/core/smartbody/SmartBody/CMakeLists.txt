@@ -520,7 +520,6 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBSpeechManager.cpp
         ./src/sb/SBVHMsgManager.cpp
         ./src/sb/SBCommandManager.cpp
-        ./src/sb/SBWSPManager.cpp
         ./src/sb/SBNavigationMeshManager.cpp
 
         ./src/sb/SBPython.cpp
@@ -607,7 +606,6 @@ target_link_libraries( SmartBody
 	bonebus
 	vhmsg
 	vhcl
-	wsp
 	xerces-c
 	boost_filesystem
 	boost_system

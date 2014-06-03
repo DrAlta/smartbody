@@ -32,7 +32,6 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/bonebus/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/vhcl/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/vhmsg/vhmsg-c/include \
-					$(LOCAL_PATH)/$(SBM_PATH)/../../../lib/wsp/wsp/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/external/ \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/steerlib/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/../steersuite-1.3/pprAI/include \
@@ -47,8 +46,8 @@ LOCAL_SRC_FILES := $(IOS_PATH)/vhwrapper.cpp
 			
 #LOCAL_LDLIBS    := -llog -lOpenSLES  -fuse-ld=gold
 LOCAL_LDLIBS    := -llog -lOpenSLES -lEGL -lGLESv1_CM
-#LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt 
-LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt python-prebuilt 
+#LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt 
+LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt python-prebuilt 
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
 include $(BUILD_SHARED_LIBRARY) 
 

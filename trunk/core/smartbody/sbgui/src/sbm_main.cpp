@@ -32,14 +32,6 @@
 
 #include <pythonbind/SBPythonAutoRig.h>
 
-#ifndef USE_WSP
-#define USE_WSP 1
-#endif
-
-#if USE_WSP
-#include "wsp.h"
-#endif
-
 #include <sbm/sbm_constants.h>
 #include <sbm/xercesc_utils.hpp>
 
@@ -65,7 +57,6 @@
 #ifdef SB_NO_BONEBUS
 #include <sb/SBBoneBusManager.h>
 #endif
-#include <sb/SBWSPManager.h>
 #include "FLTKListener.h"
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
@@ -1249,11 +1240,6 @@ int main( int argc, char **argv )	{
 				}
 			}
 		}
-#if USE_WSP
-		SmartBody::SBWSPManager* wspManager = SmartBody::SBScene::getScene()->getWSPManager();
-		if (wspManager->isEnable())
-			wspManager->broadcastUpdate();
-#endif
 
 		if( update_sim )	{
 			scene->update();

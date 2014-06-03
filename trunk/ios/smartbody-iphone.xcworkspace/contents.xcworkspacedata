@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:vhwrapper/vhwrapper.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:bonebus/bonebus.xcodeproj">
    </FileRef>
    <FileRef
@@ -18,11 +21,5 @@
    </FileRef>
    <FileRef
       location = "group:vhmsg/vhmsg.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:vhwrapper-dll/vhwrapper-dll.xcodeproj">
-   </FileRef>
-   <FileRef
-      location = "group:wsp/wsp.xcodeproj">
    </FileRef>
 </Workspace>

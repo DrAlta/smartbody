@@ -43,12 +43,7 @@ int g_audioHandleId = 0;
 typedef SBMHANDLE (*SBM_CreateSBM_DEF)();
 typedef bool (*SBM_Init_DEF)( SBMHANDLE, const char *, bool );
 typedef bool (*SBM_Shutdown_DEF)( SBMHANDLE );
-typedef bool (*SBM_LoadSkeleton_DEF)( SBMHANDLE, const void *, int, const char * );
-typedef bool (*SBM_LoadMotion_DEF)( SBMHANDLE, const void *, int, const char * );
 typedef bool (*SBM_Update_DEF)(SBMHANDLE, double);
-typedef bool (*SBM_SetDebuggerId_DEF)(SBMHANDLE, const char * );
-typedef bool (*SBM_SetDebuggerCameraValues_DEF)(SBMHANDLE, double, double, double, double, double, double, double, double, double, double, double );
-typedef bool (*SBM_SetDebuggerRendererRightHanded_DEF)(SBMHANDLE, bool );
 typedef bool (*SBM_ProcessVHMsgs_DEF)(SBMHANDLE, const char *, const char*);
 typedef bool (*SBM_InitCharacter_DEF)( SBMHANDLE sbmHandle, const char*, SBM_CharacterFrameDataMarshalFriendly * );
 typedef bool (*SBM_GetCharacter_DEF)( SBMHANDLE sbmHandle, const char*, SBM_CharacterFrameDataMarshalFriendly * );
@@ -64,20 +59,24 @@ typedef bool (*SBM_PythonCommandBool_DEF)(SBMHANDLE sbmHandle, const char * comm
 typedef int  (*SBM_PythonCommandInt_DEF)(SBMHANDLE sbmHandle, const char *command);
 typedef float (*SBM_PythonCommandFloat_DEF)(SBMHANDLE sbmHandle, const char * command);
 typedef char * (*SBM_PythonCommandString_DEF)(SBMHANDLE sbmHandle, const char * command, char * output, int maxLen);
+typedef bool (*SBM_SBAssetManager_LoadSkeleton_DEF)( SBMHANDLE, const void *, int, const char * );
+typedef bool (*SBM_SBAssetManager_LoadMotion_DEF)( SBMHANDLE, const void *, int, const char * );
+typedef bool (*SBM_SBDebuggerServer_SetID_DEF)(SBMHANDLE, const char * );
+typedef bool (*SBM_SBDebuggerServer_SetCameraValues_DEF)(SBMHANDLE, double, double, double, double, double, double, double, double, double, double, double );
+typedef bool (*SBM_SBDebuggerServer_SetRendererIsRightHanded_DEF)(SBMHANDLE, bool );
 typedef void (*SBM_SBMotion_AddChannel_DEF)(SBMHANDLE sbmHandle, const char * motionName, const char * channelName, const char * channelType);
 typedef void (*SBM_SBMotion_AddFrame_DEF)(SBMHANDLE sbmHandle, const char * motionName, float frameTime, const float * frameData, int numFrameData);
 typedef void (*SBM_SBMotion_SetSyncPoint_DEF)(SBMHANDLE sbmHandle, const char * motionName, const char * syncTag, double time);
 typedef void (*SBM_SBJointMap_GetMapTarget_DEF)(SBMHANDLE sbmHandle, const char * jointMap, const char * jointName, char * mappedJointName, int maxMappedJointName);
+typedef void (*SBM_SBVHMsgManager_SetServer_DEF)(SBMHANDLE sbmHandle, const char * server);
+typedef void (*SBM_SBVHMsgManager_SetScope_DEF)(SBMHANDLE sbmHandle, const char * scope);
+typedef void (*SBM_SBVHMsgManager_SetPort_DEF)(SBMHANDLE sbmHandle, const char * port);
+typedef void (*SBM_SBVHMsgManager_SetEnable_DEF)(SBMHANDLE sbmHandle, bool enable);
 
 SBM_CreateSBM_DEF                  g_SBM_CreateSBM = NULL;
 SBM_Init_DEF                       g_SBM_Init = NULL;
 SBM_Shutdown_DEF                   g_SBM_Shutdown = NULL;
-SBM_LoadSkeleton_DEF               g_SBM_LoadSkeleton = NULL;
-SBM_LoadMotion_DEF                 g_SBM_LoadMotion = NULL;
 SBM_Update_DEF                     g_SBM_Update = NULL;
-SBM_SetDebuggerId_DEF              g_SBM_SetDebuggerId = NULL;
-SBM_SetDebuggerCameraValues_DEF    g_SBM_SetDebuggerCameraValues = NULL;
-SBM_SetDebuggerRendererRightHanded_DEF  g_SBM_SetDebuggerRendererRightHanded = NULL;
 SBM_ProcessVHMsgs_DEF              g_SBM_ProcessVHMsgs = NULL;
 SBM_InitCharacter_DEF              g_SBM_InitCharacter = NULL;
 SBM_GetCharacter_DEF               g_SBM_GetCharacter = NULL;
@@ -93,10 +92,19 @@ SBM_PythonCommandBool_DEF          g_SBM_PythonCommandBool = NULL;
 SBM_PythonCommandInt_DEF           g_SBM_PythonCommandInt = NULL;
 SBM_PythonCommandFloat_DEF         g_SBM_PythonCommandFloat = NULL;
 SBM_PythonCommandString_DEF        g_SBM_PythonCommandString = NULL;
+SBM_SBAssetManager_LoadSkeleton_DEF g_SBM_SBAssetManager_LoadSkeleton = NULL;
+SBM_SBAssetManager_LoadMotion_DEF  g_SBM_SBAssetManager_LoadMotion = NULL;
+SBM_SBDebuggerServer_SetID_DEF     g_SBM_SBDebuggerServer_SetID = NULL;
+SBM_SBDebuggerServer_SetCameraValues_DEF g_SBM_SBDebuggerServer_SetCameraValues = NULL;
+SBM_SBDebuggerServer_SetRendererIsRightHanded_DEF g_SBM_SBDebuggerServer_SetRendererIsRightHanded = NULL;
 SBM_SBMotion_AddChannel_DEF        g_SBM_SBMotion_AddChannel = NULL;
 SBM_SBMotion_AddFrame_DEF          g_SBM_SBMotion_AddFrame = NULL;
 SBM_SBMotion_SetSyncPoint_DEF      g_SBM_SBMotion_SetSyncPoint = NULL;
 SBM_SBJointMap_GetMapTarget_DEF    g_SBM_SBJointMap_GetMapTarget = NULL;
+SBM_SBVHMsgManager_SetServer_DEF   g_SBM_SBVHMsgManager_SetServer = NULL;
+SBM_SBVHMsgManager_SetScope_DEF    g_SBM_SBVHMsgManager_SetScope = NULL;
+SBM_SBVHMsgManager_SetPort_DEF     g_SBM_SBVHMsgManager_SetPort = NULL;
+SBM_SBVHMsgManager_SetEnable_DEF   g_SBM_SBVHMsgManager_SetEnable = NULL;
 
 
 VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
@@ -120,12 +128,7 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    g_SBM_CreateSBM                  = (SBM_CreateSBM_DEF)GetProcAddress(g_SBM_HINST, "SBM_CreateSBM");
    g_SBM_Init                       = (SBM_Init_DEF)GetProcAddress(g_SBM_HINST, "SBM_Init");
    g_SBM_Shutdown                   = (SBM_Shutdown_DEF)GetProcAddress(g_SBM_HINST, "SBM_Shutdown");
-   g_SBM_LoadSkeleton               = (SBM_LoadSkeleton_DEF)GetProcAddress(g_SBM_HINST, "SBM_LoadSkeleton");
-   g_SBM_LoadMotion                 = (SBM_LoadMotion_DEF)GetProcAddress(g_SBM_HINST, "SBM_LoadMotion");
    g_SBM_Update                     = (SBM_Update_DEF)GetProcAddress(g_SBM_HINST, "SBM_Update");
-   g_SBM_SetDebuggerId              = (SBM_SetDebuggerId_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerId");
-   g_SBM_SetDebuggerCameraValues    = (SBM_SetDebuggerCameraValues_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerCameraValues");
-   g_SBM_SetDebuggerRendererRightHanded  = (SBM_SetDebuggerRendererRightHanded_DEF)GetProcAddress(g_SBM_HINST, "SBM_SetDebuggerRendererRightHanded");
    g_SBM_ProcessVHMsgs              = (SBM_ProcessVHMsgs_DEF)GetProcAddress(g_SBM_HINST, "SBM_ProcessVHMsgs");
    g_SBM_InitCharacter              = (SBM_InitCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_InitCharacter");
    g_SBM_GetCharacter               = (SBM_GetCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetCharacter");
@@ -141,10 +144,19 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    g_SBM_PythonCommandInt           = (SBM_PythonCommandInt_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandInt");
    g_SBM_PythonCommandFloat         = (SBM_PythonCommandFloat_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandFloat");
    g_SBM_PythonCommandString        = (SBM_PythonCommandString_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandString");
+   g_SBM_SBAssetManager_LoadSkeleton = (SBM_SBAssetManager_LoadSkeleton_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBAssetManager_LoadSkeleton");
+   g_SBM_SBAssetManager_LoadMotion   = (SBM_SBAssetManager_LoadMotion_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBAssetManager_LoadMotion");
+   g_SBM_SBDebuggerServer_SetID                    = (SBM_SBDebuggerServer_SetID_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBDebuggerServer_SetID");
+   g_SBM_SBDebuggerServer_SetCameraValues          = (SBM_SBDebuggerServer_SetCameraValues_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBDebuggerServer_SetCameraValues");
+   g_SBM_SBDebuggerServer_SetRendererIsRightHanded = (SBM_SBDebuggerServer_SetRendererIsRightHanded_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBDebuggerServer_SetRendererIsRightHanded");
    g_SBM_SBMotion_AddChannel        = (SBM_SBMotion_AddChannel_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBMotion_AddChannel");
    g_SBM_SBMotion_AddFrame          = (SBM_SBMotion_AddFrame_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBMotion_AddFrame");
    g_SBM_SBMotion_SetSyncPoint      = (SBM_SBMotion_SetSyncPoint_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBMotion_SetSyncPoint");
    g_SBM_SBJointMap_GetMapTarget    = (SBM_SBJointMap_GetMapTarget_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBJointMap_GetMapTarget");
+   g_SBM_SBVHMsgManager_SetServer   = (SBM_SBVHMsgManager_SetServer_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBVHMsgManager_SetServer");
+   g_SBM_SBVHMsgManager_SetScope    = (SBM_SBVHMsgManager_SetScope_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBVHMsgManager_SetScope");
+   g_SBM_SBVHMsgManager_SetPort     = (SBM_SBVHMsgManager_SetPort_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBVHMsgManager_SetPort");
+   g_SBM_SBVHMsgManager_SetEnable   = (SBM_SBVHMsgManager_SetEnable_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBVHMsgManager_SetEnable");
 
    if (g_SBM_CreateSBM)
    {
@@ -197,32 +209,6 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle )
 #endif
 }
 
-VHWRAPPERDLL_API bool WRAPPER_SBM_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName )
-{
-#ifdef WIN_BUILD
-   if (g_SBM_LoadSkeleton)
-   {
-      return g_SBM_LoadSkeleton(sbmHandle, data, sizeBytes, skeletonName);
-   }
-   return false;
-#else
-   return SBM_LoadSkeleton(sbmHandle, data, sizeBytes, skeletonName);
-#endif
-}
-
-VHWRAPPERDLL_API bool WRAPPER_SBM_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName )
-{
-#ifdef WIN_BUILD
-   if (g_SBM_LoadMotion)
-   {
-      return g_SBM_LoadMotion(sbmHandle, data, sizeBytes, motionName);
-   }
-   return false;
-#else
-   return SBM_LoadMotion(sbmHandle, data, sizeBytes, motionName);
-#endif
-}
-
 VHWRAPPERDLL_API bool WRAPPER_SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
 {
 #ifdef WIN_BUILD
@@ -233,42 +219,6 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Update( SBMHANDLE sbmHandle, double timeInSeco
    return false;
 #else
    return SBM_Update(sbmHandle, timeInSeconds);
-#endif
-}
-
-VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerId( SBMHANDLE sbmHandle, const char * id )
-{
-#ifdef WIN_BUILD
-   if (g_SBM_SetDebuggerId)
-   {
-      g_SBM_SetDebuggerId(sbmHandle, id );
-   }
-#else
-   SBM_SetDebuggerId(sbmHandle, id);
-#endif
-}
-
-VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
-{
-#ifdef WIN_BUILD
-   if (g_SBM_SetDebuggerCameraValues)
-   {
-      g_SBM_SetDebuggerCameraValues(sbmHandle, x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
-   }
-#else
-   SBM_SetDebuggerCameraValues(sbmHandle, x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
-#endif
-}
-
-VHWRAPPERDLL_API void WRAPPER_SBM_SetDebuggerRendererRightHanded( SBMHANDLE sbmHandle, bool enabled )
-{
-#ifdef WIN_BUILD
-   if (g_SBM_SetDebuggerRendererRightHanded)
-   {
-      g_SBM_SetDebuggerRendererRightHanded(sbmHandle, enabled );
-   }
-#else
-   SBM_SetDebuggerRendererRightHanded(sbmHandle, enabled );
 #endif
 }
 
@@ -466,6 +416,68 @@ VHWRAPPERDLL_API void WRAPPER_SBM_PythonCommandString(SBMHANDLE sbmHandle, const
 #endif
 }
 
+VHWRAPPERDLL_API bool WRAPPER_SBM_SBAssetManager_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_SBAssetManager_LoadSkeleton)
+   {
+      return g_SBM_SBAssetManager_LoadSkeleton(sbmHandle, data, sizeBytes, skeletonName);
+   }
+   return false;
+#else
+   return SBM_SBAssetManager_LoadSkeleton(sbmHandle, data, sizeBytes, skeletonName);
+#endif
+}
+
+VHWRAPPERDLL_API bool WRAPPER_SBM_SBAssetManager_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_SBAssetManager_LoadMotion)
+   {
+      return g_SBM_SBAssetManager_LoadMotion(sbmHandle, data, sizeBytes, motionName);
+   }
+   return false;
+#else
+   return SBM_SBAssetManager_LoadMotion(sbmHandle, data, sizeBytes, motionName);
+#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SBDebuggerServer_SetID( SBMHANDLE sbmHandle, const char * id )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_SBDebuggerServer_SetID)
+   {
+      g_SBM_SBDebuggerServer_SetID(sbmHandle, id );
+   }
+#else
+   SBM_SBDebuggerServer_SetID(sbmHandle, id);
+#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SBDebuggerServer_SetCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_SBDebuggerServer_SetCameraValues)
+   {
+      g_SBM_SBDebuggerServer_SetCameraValues(sbmHandle, x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
+   }
+#else
+   SBM_SBDebuggerServer_SetCameraValues(sbmHandle, x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
+#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SBDebuggerServer_SetRendererIsRightHanded( SBMHANDLE sbmHandle, bool enabled )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_SBDebuggerServer_SetRendererIsRightHanded)
+   {
+      g_SBM_SBDebuggerServer_SetRendererIsRightHanded(sbmHandle, enabled );
+   }
+#else
+   SBM_SBDebuggerServer_SetRendererIsRightHanded(sbmHandle, enabled );
+#endif
+}
+
 VHWRAPPERDLL_API void WRAPPER_SBM_SBMotion_AddChannel(SBMHANDLE sbmHandle, const char * motionName, const char * channelName, const char * channelType)
 {
 #ifdef WIN_BUILD
@@ -511,6 +523,54 @@ VHWRAPPERDLL_API void WRAPPER_SBM_SBJointMap_GetMapTarget(SBMHANDLE sbmHandle, c
    }
 #else
     SBM_SBJointMap_GetMapTarget(sbmHandle, jointMap, jointName, mappedJointName, maxMappedJointName);
+#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetServer( SBMHANDLE sbmHandle, const char * server )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_SBVHMsgManager_SetServer)
+   {
+      g_SBM_SBVHMsgManager_SetServer(sbmHandle, server);
+   }
+#else
+    SBM_SBVHMsgManager_SetServer(sbmHandle, server);
+#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetScope( SBMHANDLE sbmHandle, const char * scope )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_SBVHMsgManager_SetScope)
+   {
+      g_SBM_SBVHMsgManager_SetScope(sbmHandle, scope);
+   }
+#else
+    SBM_SBVHMsgManager_SetScope(sbmHandle, scope);
+#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetPort( SBMHANDLE sbmHandle, const char * port )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_SBVHMsgManager_SetPort)
+   {
+      g_SBM_SBVHMsgManager_SetPort(sbmHandle, port);
+   }
+#else
+    SBM_SBVHMsgManager_SetPort(sbmHandle, port);
+#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetEnable( SBMHANDLE sbmHandle, bool enable )
+{
+#ifdef WIN_BUILD
+   if (g_SBM_SBVHMsgManager_SetEnable)
+   {
+      g_SBM_SBVHMsgManager_SetEnable(sbmHandle, enable);
+   }
+#else
+    SBM_SBVHMsgManager_SetEnable(sbmHandle, enable);
 #endif
 }
 

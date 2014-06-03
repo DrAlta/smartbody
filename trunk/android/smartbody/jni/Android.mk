@@ -245,7 +245,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/external/parser/Bchart.cpp \
 include $(BUILD_STATIC_LIBRARY)
 
 include $(SBM_LOCAL_PATH)/../../ode/jni/Android.mk
-include $(SBM_LOCAL_PATH)/../../wsp/jni/Android.mk
+include $(SBM_LOCAL_PATH)/../../vhmsg/jni/Android.mk
 include $(SBM_LOCAL_PATH)/../../bonebus/jni/Android.mk
 include $(SBM_LOCAL_PATH)/../../steersuite-1.3/jni/Android.mk
 
@@ -267,7 +267,6 @@ LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/vhcl/include \
 					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/bonebus/include \
 					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/vhmsg/vhmsg-c/include \
-					$(SBM_LOCAL_PATH)/$(SB_LIB_PATH)/wsp/wsp/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/SmartBody/src/external/protobuf/include \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/ \
 					$(SBM_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/external/parser/ \
@@ -552,7 +551,6 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBSpeechManager.cpp \
 	$(SBM_MY_DIR)/sb/SBVHMsgManager.cpp \
 	$(SBM_MY_DIR)/sb/SBCommandManager.cpp \
-	$(SBM_MY_DIR)/sb/SBWSPManager.cpp \
 	$(SBM_MY_DIR)/sb/SBNavigationMeshManager.cpp \
 	$(SBM_MY_DIR)/sb/SBAssetHandler.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerCOLLADA.cpp \
@@ -575,8 +573,8 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 
 LOCAL_LDLIBS    := -llog -lEGL -lGLESv1_CM
 #LOCAL_LDLIBS    := -llog -gstabs
-LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile python-prebuilt proto-prebuilt
-#LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl wsp vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt
+LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile python-prebuilt proto-prebuilt
+#LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
 include $(BUILD_STATIC_LIBRARY)
 #include $(BUILD_SHARED_LIBRARY)

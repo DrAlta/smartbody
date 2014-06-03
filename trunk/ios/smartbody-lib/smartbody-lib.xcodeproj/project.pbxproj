@@ -526,8 +526,6 @@
 		AAD45D1E17A98E5D005905B2 /* SBTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD459E717A98E5C005905B2 /* SBTypes.h */; };
 		AAD45D1F17A98E5D005905B2 /* SBVHMsgManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD459E817A98E5C005905B2 /* SBVHMsgManager.cpp */; };
 		AAD45D2017A98E5D005905B2 /* SBVHMsgManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD459E917A98E5C005905B2 /* SBVHMsgManager.h */; };
-		AAD45D2117A98E5D005905B2 /* SBWSPManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD459EA17A98E5C005905B2 /* SBWSPManager.cpp */; };
-		AAD45D2217A98E5D005905B2 /* SBWSPManager.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD459EB17A98E5C005905B2 /* SBWSPManager.h */; };
 		AAD45D2317A98E5D005905B2 /* smartbody-c-dll.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD459EC17A98E5C005905B2 /* smartbody-c-dll.cpp */; };
 		AAD45D2417A98E5D005905B2 /* smartbody-c-dll.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD459ED17A98E5C005905B2 /* smartbody-c-dll.h */; };
 		AAD45D2717A98E5D005905B2 /* action_unit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD459F117A98E5C005905B2 /* action_unit.cpp */; };
@@ -1303,8 +1301,6 @@
 		AAD459E717A98E5C005905B2 /* SBTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBTypes.h; sourceTree = "<group>"; };
 		AAD459E817A98E5C005905B2 /* SBVHMsgManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBVHMsgManager.cpp; sourceTree = "<group>"; };
 		AAD459E917A98E5C005905B2 /* SBVHMsgManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBVHMsgManager.h; sourceTree = "<group>"; };
-		AAD459EA17A98E5C005905B2 /* SBWSPManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBWSPManager.cpp; sourceTree = "<group>"; };
-		AAD459EB17A98E5C005905B2 /* SBWSPManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBWSPManager.h; sourceTree = "<group>"; };
 		AAD459EC17A98E5C005905B2 /* smartbody-c-dll.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "smartbody-c-dll.cpp"; sourceTree = "<group>"; };
 		AAD459ED17A98E5C005905B2 /* smartbody-c-dll.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "smartbody-c-dll.h"; sourceTree = "<group>"; };
 		AAD459F117A98E5C005905B2 /* action_unit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = action_unit.cpp; sourceTree = "<group>"; };
@@ -2230,8 +2226,6 @@
 				AAD459E717A98E5C005905B2 /* SBTypes.h */,
 				AAD459E817A98E5C005905B2 /* SBVHMsgManager.cpp */,
 				AAD459E917A98E5C005905B2 /* SBVHMsgManager.h */,
-				AAD459EA17A98E5C005905B2 /* SBWSPManager.cpp */,
-				AAD459EB17A98E5C005905B2 /* SBWSPManager.h */,
 				AAD459EC17A98E5C005905B2 /* smartbody-c-dll.cpp */,
 				AAD459ED17A98E5C005905B2 /* smartbody-c-dll.h */,
 			);
@@ -2767,7 +2761,6 @@
 				AAD45D1D17A98E5D005905B2 /* SBSubject.h in Headers */,
 				AAD45D1E17A98E5D005905B2 /* SBTypes.h in Headers */,
 				AAD45D2017A98E5D005905B2 /* SBVHMsgManager.h in Headers */,
-				AAD45D2217A98E5D005905B2 /* SBWSPManager.h in Headers */,
 				AAD45D2417A98E5D005905B2 /* smartbody-c-dll.h in Headers */,
 				AAD45D2817A98E5D005905B2 /* action_unit.hpp in Headers */,
 				AAD45D2A17A98E5D005905B2 /* BMLDefs.h in Headers */,
@@ -3231,7 +3224,6 @@
 				AAD45D1A17A98E5D005905B2 /* SBSteerManager.cpp in Sources */,
 				AAD45D1C17A98E5D005905B2 /* SBSubject.cpp in Sources */,
 				AAD45D1F17A98E5D005905B2 /* SBVHMsgManager.cpp in Sources */,
-				AAD45D2117A98E5D005905B2 /* SBWSPManager.cpp in Sources */,
 				AAD45D2317A98E5D005905B2 /* smartbody-c-dll.cpp in Sources */,
 				AAD45D2717A98E5D005905B2 /* action_unit.cpp in Sources */,
 				AAD45D2917A98E5D005905B2 /* BMLDefs.cpp in Sources */,
@@ -3455,7 +3447,6 @@
 					"../../core/smartbody/steersuite-1.3/external",
 					../../lib/vhcl/include,
 					"../../lib/vhmsg/vhmsg-c/include",
-					../../lib/wsp/wsp/include,
 					../../lib/bonebus/include,
 					../protobuf/iphoneos/include,
 				);
@@ -3466,7 +3457,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYMROOT = $PROJECT_DIR/build;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				USER_HEADER_SEARCH_PATHS = "../boost/boost_1_51_0 ../boost/boost-numeric-bindings ../xerces-c/iphoneos/include ../ode/iphoneos/include /usr/lib/python2.6 ../python/Python-2.6.5/_install/include/python2.6 ../python/Python-2.6.5 ../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0 ../../core/smartbody/sbm-debugger/lib ../../core/smartbody/SmartBody/src ../../core/smartbody/steersuite-1.3/pprAI/include ../../core/smartbody/steersuite-1.3/steerlib/include ../../core/smartbody/steersuite-1.3/external ../../lib/vhcl/include ../../lib/vhmsg/vhmsg-c/include ../../lib/wsp/wsp/include ../../lib/bonebus/include ../protobuf/iphoneos/include";
+				USER_HEADER_SEARCH_PATHS = "../boost/boost_1_51_0 ../boost/boost-numeric-bindings ../xerces-c/iphoneos/include ../ode/iphoneos/include /usr/lib/python2.6 ../python/Python-2.6.5/_install/include/python2.6 ../python/Python-2.6.5 ../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0 ../../core/smartbody/sbm-debugger/lib ../../core/smartbody/SmartBody/src ../../core/smartbody/steersuite-1.3/pprAI/include ../../core/smartbody/steersuite-1.3/steerlib/include ../../core/smartbody/steersuite-1.3/external ../../lib/vhcl/include ../../lib/vhmsg/vhmsg-c/include ../../lib/bonebus/include ../protobuf/iphoneos/include";
 				WARNING_CFLAGS = "-Wno-format";
 			};
 			name = Debug;
@@ -3504,7 +3495,6 @@
 					"../../core/smartbody/steersuite-1.3/external",
 					../../lib/vhcl/include,
 					"../../lib/vhmsg/vhmsg-c/include",
-					../../lib/wsp/wsp/include,
 					../../lib/bonebus/include,
 					../protobuf/iphoneos/include,
 				);
@@ -3523,7 +3513,6 @@
 					"../../core/smartbody/steersuite-1.3/external",
 					../../lib/vhcl/include,
 					"../../lib/vhmsg/vhmsg-c/include",
-					../../lib/wsp/wsp/include,
 					../../lib/bonebus/include,
 					../protobuf/iphoneos/include,
 				);
@@ -3534,7 +3523,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYMROOT = $PROJECT_DIR/build;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				USER_HEADER_SEARCH_PATHS = "../boost/boost_1_51_0 ../boost/boost-numeric-bindings ../xerces-c/iphoneos/include ../ode/iphoneos/include /usr/lib/python2.6 ../python/Python-2.6.5/_install/include/python2.6 ../python/Python-2.6.5 ../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0 ../../core/smartbody/sbm-debugger/lib ../../core/smartbody/SmartBody/src ../../core/smartbody/steersuite-1.3/pprAI/include ../../core/smartbody/steersuite-1.3/steerlib/include ../../core/smartbody/steersuite-1.3/external ../../lib/vhcl/include ../../lib/vhmsg/vhmsg-c/include ../../lib/wsp/wsp/include ../../lib/bonebus/include ../protobuf/iphoneos/include";
+				USER_HEADER_SEARCH_PATHS = "../boost/boost_1_51_0 ../boost/boost-numeric-bindings ../xerces-c/iphoneos/include ../ode/iphoneos/include /usr/lib/python2.6 ../python/Python-2.6.5/_install/include/python2.6 ../python/Python-2.6.5 ../activemq/activemq-cpp/iphoneos/include/activemq-cpp-3.4.0 ../../core/smartbody/sbm-debugger/lib ../../core/smartbody/SmartBody/src ../../core/smartbody/steersuite-1.3/pprAI/include ../../core/smartbody/steersuite-1.3/steerlib/include ../../core/smartbody/steersuite-1.3/external ../../lib/vhcl/include ../../lib/vhmsg/vhmsg-c/include ../../lib/bonebus/include ../protobuf/iphoneos/include";
 				WARNING_CFLAGS = "-Wno-format";
 			};
 			name = Release;

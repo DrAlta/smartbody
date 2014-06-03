@@ -27,7 +27,6 @@
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBCommandManager.h>
-#include <sb/SBWSPManager.h>
 #include <controllers/me_ct_param_animation.h>
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -59,10 +58,6 @@
 
 #include "sbm_audio.h"
 
-#if USE_WSP
-#include "wsp.h"
-#endif
-
 #include "sr/sr_model.h"
 #include "sb/sbm_pawn.hpp"
 #include "sb/SBEvent.h"
@@ -86,7 +81,6 @@
 #include <math.h>
 #include <sb/SBDebuggerServer.h>
 #include <sb/SBDebuggerClient.h>
-#include <wsp.h>
 
 #include <controllers/me_ct_gaze.h>
 #include <controllers/me_ct_motion_player.h>
@@ -101,10 +95,6 @@
 #endif
 
 using namespace std;
-
-#if USE_WSP
-using namespace WSP;
-#endif
 
 
 int deprecatedMessage( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )
@@ -2230,15 +2220,6 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 /////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////
-
-int mcu_wsp_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
-{
-#if USE_WSP
-	SmartBody::SBScene::getScene()->getWSPManager()->processCommand( args.read_remainder_raw() );
-#endif
-
-	return( CMD_SUCCESS );
-}
 
 int mcu_syncpolicy_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {

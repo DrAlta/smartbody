@@ -6,7 +6,6 @@ include_directories(
 	../../lib/vhcl/include
 	../../lib/vhmsg/vhmsg-c/include
 	../../lib/bonebus/include
-	../../lib/wsp/wsp/include
 	steersuite-1.3/steerlib/include
 	steersuite-1.3/pprAI/include
 	steersuite-1.3/external
