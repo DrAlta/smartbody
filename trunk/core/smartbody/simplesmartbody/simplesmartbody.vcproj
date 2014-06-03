@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\smartbody-dll\include&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;..\Python27\include;&quot;..\smartbody-lib\src&quot;;&quot;..\steersuite-1.3\steerlib\include&quot;;&quot;..\steersuite-1.3\external&quot;;&quot;..\steersuite-1.3\pprAI\include&quot;;&quot;%(AdditionalIncludeDirectories)&quot;"
+				AdditionalIncludeDirectories="..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\include;..\steersuite-1.3\steerlib\include;..\steersuite-1.3\external;..\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\Python27\include;..\..\..\core\smartbody\SmartBody\src;%(AdditionalIncludeDirectories)"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB;dDOUBLE;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -122,7 +122,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\Python27\include;&quot;..\smartbody-dll\include&quot;;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\smartbody-lib\src&quot;;&quot;..\steersuite-1.3\steerlib\include&quot;;&quot;..\steersuite-1.3\external&quot;;&quot;..\steersuite-1.3\pprAI\include&quot;;&quot;%(AdditionalIncludeDirectories)&quot;"
+				AdditionalIncludeDirectories="..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\include;..\steersuite-1.3\steerlib\include;..\steersuite-1.3\external;..\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\Python27\include;..\..\..\core\smartbody\SmartBody\src;%(AdditionalIncludeDirectories)"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB;dDOUBLE;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
