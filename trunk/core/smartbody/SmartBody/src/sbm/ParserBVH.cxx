@@ -87,6 +87,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 	std::vector<std::pair<int, int> > bvhIndex;
 	SkChannelArray& skChannels = skeleton.channels();
 	SkChannelArray motionChannels;
+	std::vector<SkJoint*> endEffectorJoint;
 
 	while(!file.eof() && file.good())
 	{
@@ -384,6 +385,10 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					str = strtok(NULL, " \t");
 					z = atof(str);
 					cur->endEffectorOffset(SrVec(float(x) * scale, float(y)* scale, float(z) * scale));
+ 					endEffectorJoint.push_back(cur);
+// 					joint->offset(cur->endEffectoroffset());
+// 					skeleton.make_active_channels();
+
 					//cur->setEndEffector(true);
 					//LOG("Found end effector at %s", cur->getName());
 					//cout << "Found end effector offset of " << x << " " << y << " " << z << " " << endl;
@@ -569,6 +574,14 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				file.close();
 				return false;
 		}
+	}
+
+	for (unsigned int i=0;i<endEffectorJoint.size();i++)
+	{
+		SkJoint* cur = endEffectorJoint[i];
+		SkJoint* endJoint = skeleton.add_joint(SkJoint::TypeQuat, cur->index());
+		endJoint->name(cur->getName()+"EndSite");
+		endJoint->offset(cur->endEffectoroffset());		
 	}
 	//LOG("Finished parsing motion with %d frames...", numFrames);
 	file.close();
