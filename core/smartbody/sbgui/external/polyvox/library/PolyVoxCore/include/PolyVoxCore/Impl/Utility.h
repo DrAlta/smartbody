@@ -27,6 +27,9 @@ freely, subject to the following restrictions:
 #include "PolyVoxCore/Impl/TypeDef.h"
 
 #include <cassert>
+#if defined(_MSC_VER) && (_MSC_VER < 1600)
+#include <vhcl.h>
+#endif
 
 namespace PolyVox
 {

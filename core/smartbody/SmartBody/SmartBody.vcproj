@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\SmartBody\src;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include"
+				AdditionalIncludeDirectories="..\SmartBody\src\external\protobuf\include;..\SmartBody\src;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include"
 				PreprocessorDefinitions="SB_EXPORTS;dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,10 +63,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="glew32.lib glu32.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib activemq-cppd.lib xerces-c_3D.lib boost_filesystem-vc90-mt-gd-1_51.lib boost_system-vc90-mt-gd-1_51.lib boost_regex-vc90-mt-gd-1_51.lib boost_python-vc90-mt-gd-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlibd.lib pprAId.lib ode_doubled.lib"
+				AdditionalDependencies="glew32.lib glu32.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib activemq-cppd.lib xerces-c_3D.lib boost_filesystem-vc90-mt-gd-1_51.lib boost_system-vc90-mt-gd-1_51.lib boost_regex-vc90-mt-gd-1_51.lib boost_python-vc90-mt-gd-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlibd.lib pprAId.lib ode_doubled.lib libprotobufd.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\SmartBody\lib&quot;;&quot;..\sbm-debugger\lib\Debug&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\core\smartbody\ode\lib9;..\..\..\core\smartbody\Python27\libs9;..\..\..\lib\festival\speech_tools\lib9;..\..\..\lib\festival\festival\src\lib9;&quot;..\SmartBody\src\external\glew&quot;"
+				AdditionalLibraryDirectories="..\SmartBody\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\core\smartbody\ode\lib9;..\..\..\core\smartbody\Python27\libs9;..\..\..\lib\festival\speech_tools\lib9;..\..\..\lib\festival\festival\src\lib9;..\SmartBody\src\external\glew;..\SmartBody\src\external\protobuf\lib9"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -124,7 +124,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="..\SmartBody\src;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include"
+				AdditionalIncludeDirectories="..\SmartBody\src\external\protobuf\include;..\SmartBody\src;..\..\..\lib\vhcl\include;&quot;..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;&quot;..\..\..\lib\xerces-c\include&quot;;..\..\..\lib\boost;&quot;..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\core\smartbody\steersuite-1.3\external&quot;;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include"
 				PreprocessorDefinitions="SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -146,9 +146,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib activemq-cpp.lib xerces-c_3.lib boost_filesystem-vc90-mt-1_51.lib boost_system-vc90-mt-1_51.lib boost_regex-vc90-mt-1_51.lib boost_python-vc90-mt-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlib.lib pprAI.lib ode_double.lib glu32.lib glew32.lib"
+				AdditionalDependencies="glew32.lib glu32.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib activemq-cpp.lib xerces-c.lib boost_filesystem-vc90-mt-1_51.lib boost_system-vc90-mt-1_51.lib boost_regex-vc90-mt-1_51.lib boost_python-vc90-mt-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlib.lib pprAI.lib ode_double.lib libprotobuf.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;..\SmartBody\src\external\glew&quot;;&quot;..\SmartBody\lib&quot;;&quot;..\sbm-debugger\lib\Release&quot;;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\..\..\lib\festival\festival\src\lib9;..\..\..\lib\festival\speech_tools\lib9;..\ode\lib9;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\core\smartbody\Python27\libs9"
+				AdditionalLibraryDirectories="..\SmartBody\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\core\smartbody\ode\lib9;..\..\..\core\smartbody\Python27\libs9;..\..\..\lib\festival\speech_tools\lib9;..\..\..\lib\festival\festival\src\lib9;..\SmartBody\src\external\glew;..\SmartBody\src\external\protobuf\lib9"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -793,6 +793,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\sr\sr_model_import_ply.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\SmartBody\src\sr\sr_output.cpp"
 				>
 			</File>
@@ -1137,6 +1141,10 @@
 			Name="controllers"
 			>
 			<File
+				RelativePath="..\SmartBody\src\controllers\me_blend_cover.h"
+				>
+			</File>
+			<File
 				RelativePath="..\SmartBody\src\controllers\me_controller.cpp"
 				>
 			</File>
@@ -1177,11 +1185,223 @@
 				>
 			</File>
 			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_barycentric_interpolation.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_barycentric_interpolation.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_basic_locomotion.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_basic_locomotion.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_blend.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_blend.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_breathing.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_breathing.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_breathing_interface.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_breathing_interface.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_ccd_IK.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_ccd_IK.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_channel_writer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_channel_writer.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_constraint.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_constraint.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_container.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_container.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\SmartBody\src\controllers\me_ct_curve_writer.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\SmartBody\src\controllers\me_ct_curve_writer.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_data_driven_reach.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_data_driven_reach.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_data_interpolation.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_data_interpolation.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_data_receiver.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_data_receiver.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_example_body_reach.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_example_body_reach.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_examples.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_examples.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_eyelid.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_eyelid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_face.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_face.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_gaze.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_gaze.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_gaze_alg.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_gaze_alg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_gaze_joint.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_gaze_joint.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_gaze_keymap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_gaze_sensor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_gaze_target.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_hand.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_hand.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_IK.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_IK.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_IK_scenario.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_IK_scenario.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_interpolator.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_interpolator.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_inverse_interpolation.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_inverse_interpolation.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_jacobian_IK.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_jacobian_IK.hpp"
 				>
 			</File>
 			<File
@@ -1193,6 +1413,86 @@
 				>
 			</File>
 			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_limb.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_limb.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_locomotion_func.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_locomotion_func.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_blend.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_blend.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_example.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_example.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\controllers\me_ct_motion_graph.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\controllers\me_ct_motion_graph.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_parameter.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_parameter.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_player.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_player.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_profile.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_profile.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_recorder.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_motion_recorder.h"
+				>
+			</File>
+			<File
 				RelativePath="..\SmartBody\src\controllers\me_ct_motion_timewarp.cpp"
 				>
 			</File>
@@ -1201,11 +1501,51 @@
 				>
 			</File>
 			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_noise_controller.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_noise_controller.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_param_animation.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_param_animation.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_param_animation_utilities.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_param_animation_utilities.h"
+				>
+			</File>
+			<File
 				RelativePath="..\SmartBody\src\controllers\me_ct_periodic_replay.cpp"
 				>
 			</File>
 			<File
+				RelativePath="..\SmartBody\src\me\me_ct_periodic_replay.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\SmartBody\src\controllers\me_ct_periodic_replay.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\me\me_ct_periodic_replay.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_physics_controller.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_physics_controller.h"
 				>
 			</File>
 			<File
@@ -1214,6 +1554,94 @@
 			</File>
 			<File
 				RelativePath="..\SmartBody\src\controllers\me_ct_pose.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\controllers\me_ct_pose_postprocessing.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\controllers\me_ct_pose_postprocessing.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_quick_draw.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_quick_draw.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_reach.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_reach.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_reach_IK.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_reach_IK.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_saccade.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_saccade.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_scheduler2.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_scheduler2.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_simple_gaze.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_simple_gaze.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_tether.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_tether.h"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_time_shift_warp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_time_shift_warp.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_ublas.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_ublas.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_unary.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\me_ct_unary.hpp"
 				>
 			</File>
 			<File
@@ -1240,598 +1668,38 @@
 				RelativePath="..\SmartBody\src\controllers\me_spline_1d.hpp"
 				>
 			</File>
-			<Filter
-				Name="semiprocedurallocomotion"
+			<File
+				RelativePath="..\SmartBody\src\controllers\MeCtBlendEngine.cpp"
 				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_IK.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_IK.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_IK_scenario.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_IK_scenario.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_interpolator.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_interpolator.h"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_locomotion_func.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_locomotion_func.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="gaze"
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\MeCtBlendEngine.h"
 				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_blend_cover.h"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_gaze.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_gaze.h"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_alg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_alg.h"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_joint.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_joint.h"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_keymap.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_sensor.h"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_gaze_target.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="eyelid"
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\MeCtBodyReachState.cpp"
 				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_eyelid.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_eyelid.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="face"
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\MeCtBodyReachState.h"
 				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_face.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_face.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="tether"
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\MeCtReachEngine.cpp"
 				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_tether.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_tether.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="quickdraw"
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\MeCtReachEngine.h"
 				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_quick_draw.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_quick_draw.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="nodshake"
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\MotionAnalysis.cpp"
 				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_examples.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_examples.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="simplegaze"
+			</File>
+			<File
+				RelativePath="..\SmartBody\src\controllers\MotionAnalysis.h"
 				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_simple_gaze.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_simple_gaze.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="motion"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_motion.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_motion.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="adshrenvelope"
-				>
-			</Filter>
-			<Filter
-				Name="scheduler"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_scheduler2.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_scheduler2.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="replay"
-				>
-				<File
-					RelativePath="..\SmartBody\src\me\me_ct_periodic_replay.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\me\me_ct_periodic_replay.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="interpolator"
-				>
-			</Filter>
-			<Filter
-				Name="timewarp"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_time_shift_warp.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_time_shift_warp.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="channelwriter"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_channel_writer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_channel_writer.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="pose"
-				>
-			</Filter>
-			<Filter
-				Name="container"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_container.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_container.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="unary"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_unary.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_unary.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="reach"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_data_driven_reach.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_data_driven_reach.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_limb.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_limb.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_reach.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_reach.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_reach_IK.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_reach_IK.hpp"
-					>
-				</File>
-				<Filter
-					Name="Constraint"
-					>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_constraint.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_constraint.hpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="BodyReach"
-					>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_example_body_reach.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_example_body_reach.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\MeCtBodyReachState.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\MeCtBodyReachState.h"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\MeCtReachEngine.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\MeCtReachEngine.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="Hand"
-					>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_hand.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_hand.hpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="blend"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_blend.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_blend.hpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="motionplayer"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_motion_player.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_motion_player.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="general"
-				>
-				<Filter
-					Name="MotionInterpolation"
-					>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_barycentric_interpolation.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_barycentric_interpolation.h"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_data_interpolation.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_data_interpolation.h"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_inverse_interpolation.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_inverse_interpolation.h"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_motion_example.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_motion_example.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_motion_parameter.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_motion_parameter.h"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_motion_profile.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_motion_profile.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="IK"
-					>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_ccd_IK.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_ccd_IK.hpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_jacobian_IK.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_jacobian_IK.hpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="ublas"
-					>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_ublas.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\me_ct_ublas.hpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="saccade"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_saccade.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_saccade.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="basiclocomotion"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_basic_locomotion.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_basic_locomotion.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="datareceiver"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_data_receiver.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_data_receiver.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="breathing"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_breathing.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_breathing.h"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_breathing_interface.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_breathing_interface.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="paramanimation"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_param_animation.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_param_animation.h"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_param_animation_utilities.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_param_animation_utilities.h"
-					>
-				</File>
-				<Filter
-					Name="LocomotionPostProcessing"
-					>
-					<File
-						RelativePath="..\SmartBody\src\controllers\MotionAnalysis.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\SmartBody\src\controllers\MotionAnalysis.h"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="physics"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_physics_controller.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_physics_controller.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="motionblend"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_motion_blend.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_motion_blend.hpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\MeCtBlendEngine.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\MeCtBlendEngine.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="noise"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_noise_controller.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_noise_controller.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="motionrecorder"
-				>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_motion_recorder.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\SmartBody\src\controllers\me_ct_motion_recorder.h"
-					>
-				</File>
-			</Filter>
+			</File>
 		</Filter>
 		<Filter
 			Name="external"
@@ -2464,6 +2332,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="rply"
+				>
+				<File
+					RelativePath=".\src\external\rply\rply.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\external\rply\rply.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="python"
@@ -2471,6 +2351,22 @@
 			<File
 				RelativePath="..\SmartBody\src\sb\SBPython.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/bigobj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/bigobj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\SmartBody\src\sb\SBPython.h"
@@ -2502,6 +2398,10 @@
 			</File>
 			<File
 				RelativePath="..\SmartBody\src\sb\SBPythonMath.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBPythonMesh.cpp"
 				>
 			</File>
 			<File
@@ -2602,6 +2502,102 @@
 			</File>
 			<File
 				RelativePath="..\SmartBody\src\sb\SBAsset.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandler.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandler.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerAmc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerAmc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerAsf.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerAsf.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerBvh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerBvh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerCOLLADA.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerCOLLADA.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerObj.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerObj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerOgre.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerOgre.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerPly.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerPly.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerSBMeshBinary.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerSBMeshBinary.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerSk.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerSk.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerSkm.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerSkm.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerSkmb.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBAssetHandlerSkmb.h"
 				>
 			</File>
 			<File
@@ -2821,11 +2817,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\sb\SBMotionGraph.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBMotionGraph.h"
+				>
+			</File>
+			<File
 				RelativePath="..\SmartBody\src\sb\SBNavigationMesh.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\SmartBody\src\sb\SBNavigationMesh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBNavigationMeshManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBNavigationMeshManager.h"
 				>
 			</File>
 			<File
@@ -3034,14 +3046,6 @@
 			</File>
 			<File
 				RelativePath=".\src\sb\smartbody-c-dll.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\sb\smartbody-dll.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\sb\smartbody-dll.h"
 				>
 			</File>
 		</Filter>
@@ -3258,6 +3262,14 @@
 			</File>
 			<File
 				RelativePath="..\SmartBody\src\sbm\ParserBVH.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sbm\ParserCOLLADAFast.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sbm\ParserCOLLADAFast.h"
 				>
 			</File>
 			<File
@@ -3569,6 +3581,30 @@
 				</File>
 			</Filter>
 		</Filter>
+		<File
+			RelativePath=".\src\protocols\sbmesh.pb.cc"
+			>
+		</File>
+		<File
+			RelativePath=".\src\protocols\sbmesh.pb.h"
+			>
+		</File>
+		<File
+			RelativePath=".\src\protocols\sbmotion.pb.cc"
+			>
+		</File>
+		<File
+			RelativePath=".\src\protocols\sbmotion.pb.h"
+			>
+		</File>
+		<File
+			RelativePath=".\src\protocols\sbutilities.pb.cc"
+			>
+		</File>
+		<File
+			RelativePath=".\src\protocols\sbutilities.pb.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

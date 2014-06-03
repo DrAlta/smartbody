@@ -34,6 +34,7 @@ EmbeddedOgre::EmbeddedOgre(void)
 	ogreWnd  = NULL;
 	ogreSceneMgr = NULL;
 	ogreFrameListener = NULL;
+	ogreCamera = NULL;
 	ogreCharacterVisible = false;
 }
 
