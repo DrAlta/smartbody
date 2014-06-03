@@ -83,12 +83,14 @@ freely, subject to the following restrictions:
 	//As long as we're requiring boost, we'll use it to compensate
 	//for the missing cstdint header too.
 	#include <boost/cstdint.hpp>
+/*
 	using boost::int8_t;
 	using boost::int16_t;
 	using boost::int32_t;
 	using boost::uint8_t;
 	using boost::uint16_t;
 	using boost::uint32_t;
+*/
 #else
 	#if defined(__APPLE__) 
 		#include <AvailabilityMacros.h>

@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;&quot;..\..\sbm-debugger\lib&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\external\fltk-1.3.2&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;..\..\sbm\src\channelbufferviewer;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python27\include"
+				AdditionalIncludeDirectories="..\src;..\..\SmartBody\src;..\..\SmartBody\src\external\protobuf\include;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\external\cegui-0.8.2\include&quot;;..\..\..\..\lib\boost;..\external\polyvox\library\PolyVoxCore\include;..\external\Pinocchio;&quot;..\external\fltk-1.3.2&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\OgreSDK\include\OGRE;..\..\..\..\lib\OgreSDK\include;..\panimationviewer\src;..\bmlviewer\src;..\channelbufferviewer;..\retargetviewer\src;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python27\include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -69,10 +69,10 @@
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
 				AdditionalOptions="/Stack:10000000"
-				AdditionalDependencies="glew32.lib SmartBody_d.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_51.lib boost_system-vc90-mt-gd-1_51.lib boost_regex-vc90-mt-gd-1_51.lib boost_python-vc90-mt-gd-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib fltkgld.lib fltkd.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAId.lib steerlibd.lib ode_doubled.lib"
+				AdditionalDependencies="glew32.lib SmartBody_d.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_51.lib boost_system-vc90-mt-gd-1_51.lib boost_regex-vc90-mt-gd-1_51.lib boost_python-vc90-mt-gd-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib fltkgld.lib fltkd.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAId.lib steerlibd.lib ode_doubled.lib python27.lib OgreMain.lib OgreRTShaderSystem.lib OIS.lib CEGUIBase-0.lib PyCEGUI.lib PyCEGUIOpenGLRenderer.lib CEGUIExpatParser.lib CEGUICoreWindowRendererSet.lib CEGUIOpenGLRenderer-0.lib CEGUISILLYImageCodec.lib Pinocchio.lib PolyVoxCore.lib libprotobufd.lib"
 				OutputFile="..\bin\sbguid.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\..\SmartBody\src\external\glew&quot;;..\..\SmartBody\lib;&quot;..\..\sbm-debugger\lib\Debug&quot;;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;&quot;..\external\fltk-1.3.2\lib&quot;;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib9&quot;;..\..\..\..\lib\boost\lib;&quot;..\..\sbm-ui\panimationviewer\lib&quot;;&quot;..\..\sbm-ui\bmlviewer\lib&quot;;..\..\ode\lib9;..\..\clapack\lib9;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\..\core\smartbody\Python27\libs9;..\..\..\..\lib\OgreSDK\lib9\debug;..\..\..\..\lib\festival\speech_tools\lib9;..\..\..\..\lib\festival\festival\src\lib9"
+				AdditionalLibraryDirectories="..\..\SmartBody\src\external\glew;..\..\SmartBody\lib;..\..\SmartBody\src\external\protobuf\lib9;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib\release;..\..\..\..\lib\wsp\wsp\lib;&quot;..\external\cegui-0.8.2\lib&quot;;..\external\polyvox\build\lib;..\external\Pinocchio\lib;&quot;..\external\fltk-1.3.2\lib&quot;;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib9&quot;;..\..\..\..\lib\boost\lib;..\panimationviewer\lib;..\bmlviewer\lib;..\..\ode\lib9;..\..\clapack\lib9;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\..\core\smartbody\Python27\libs9;..\..\..\..\lib\OgreSDK\lib9\debug;..\..\..\..\lib\festival\speech_tools\lib9;..\..\..\..\lib\festival\festival\src\lib9"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -139,7 +139,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="true"
-				AdditionalIncludeDirectories="..\src;&quot;..\..\smartbody-lib\src&quot;;&quot;..\..\sbm-debugger\lib&quot;;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\external\fltk-1.3.2&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\boost;&quot;..\..\sbm-ui\panimationviewer\src&quot;;&quot;..\..\sbm-ui\bmlviewer\src&quot;;..\..\sbm\src\channelbufferviewer;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python27\include"
+				AdditionalIncludeDirectories="..\src;..\..\SmartBody\src;..\..\SmartBody\src\external\protobuf\include;..\..\..\..\lib\vhcl\include;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\include&quot;;..\..\..\..\lib\bonebus\include;..\..\..\..\lib\wsp\wsp\include;&quot;..\external\cegui-0.8.2\include&quot;;..\..\..\..\lib\boost;..\external\polyvox\library\PolyVoxCore\include;..\external\Pinocchio;&quot;..\external\fltk-1.3.2&quot;;&quot;..\..\..\..\lib\xerces-c\include&quot;;..\..\..\..\lib\OgreSDK\include\OGRE;..\..\..\..\lib\OgreSDK\include;..\panimationviewer\src;..\bmlviewer\src;..\channelbufferviewer;..\retargetviewer\src;&quot;..\..\..\..\core\smartbody\steersuite-1.3\external&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\pprAI\include&quot;;&quot;..\..\..\..\core\smartbody\steersuite-1.3\steerlib\include&quot;;..\..\..\..\core\smartbody\ode\include;..\..\..\..\core\smartbody\Python27\include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -166,7 +166,7 @@
 				AdditionalDependencies="glew32.lib SmartBody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib pthreadVSE2.lib xerces-c_3.lib activemq-cpp.lib boost_filesystem-vc90-mt-1_51.lib boost_system-vc90-mt-1_51.lib boost_regex-vc90-mt-1_51.lib boost_python-vc90-mt-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib fltkgl.lib fltk.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAI.lib steerlib.lib ode_double.lib"
 				OutputFile="..\bin\sbgui.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\SmartBody\lib;..\..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;..\..\..\..\lib\vhcl\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;&quot;..\external\fltk-1.3.2\lib&quot;;..\..\..\..\lib\pthreads\lib9;&quot;..\..\smartbody-dll\lib&quot;;..\..\Python27\libs9;..\..\..\..\lib\boost\lib;&quot;..\..\steersuite-1.3\build\win32\Release&quot;;&quot;..\..\..\..\lib\xerces-c\lib9&quot;;..\..\..\..\lib\bonebus\lib;..\..\ode\lib9;..\..\clapack\lib9;..\..\..\..\lib\wsp\wsp\lib;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;..\..\SmartBody\src\external\glew"
+				AdditionalLibraryDirectories="..\..\SmartBody\src\external\glew;..\..\SmartBody\lib;..\..\SmartBody\src\external\protobuf\lib9;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib\release;..\..\..\..\lib\wsp\wsp\lib;&quot;..\external\cegui-0.8.2\lib&quot;;..\external\polyvox\build\lib;..\external\Pinocchio\lib;&quot;..\external\fltk-1.3.2\lib&quot;;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib9&quot;;..\..\..\..\lib\boost\lib;..\panimationviewer\lib;..\bmlviewer\lib;..\..\ode\lib9;..\..\clapack\lib9;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\..\core\smartbody\Python27\libs9;..\..\..\..\lib\OgreSDK\lib9\release;..\..\..\..\lib\festival\speech_tools\lib9;..\..\..\..\lib\festival\festival\src\lib9"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -419,6 +419,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\EmbeddedOgre.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\EmbeddedOgre.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\ExampleFrameListener.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\ExampleFrameListener.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\ExportWindow.cpp"
 				>
 			</File>
@@ -443,11 +459,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\FLTKOgreViewer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\FLTKOgreViewer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\ObjectManipulationHandle.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\src\ObjectManipulationHandle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\OgreFrameListener.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\OgreFrameListener.h"
 				>
 			</File>
 			<File
@@ -480,6 +512,30 @@
 			</File>
 			<File
 				RelativePath="..\src\RotationControl.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\SBOgreListener.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\SBOgreListener.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\SBSelectionManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\SBSelectionManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\SBWindowListener.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\SBWindowListener.h"
 				>
 			</File>
 		</Filter>
@@ -727,6 +783,14 @@
 			Name="resourceViewer"
 			>
 			<File
+				RelativePath="..\src\resourceViewer\AttributeEditor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\resourceViewer\AttributeEditor.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\resourceViewer\Fl_Tree_Horizontal.cpp"
 				>
 			</File>
@@ -915,6 +979,14 @@
 			Name="visemeviewer"
 			>
 			<File
+				RelativePath="..\src\visemeviewer\ImageSequencePlayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\visemeviewer\ImageSequencePlayer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\visemeviewer\VisemeCurve.cpp"
 				>
 			</File>
@@ -1068,6 +1140,38 @@
 			</File>
 			<File
 				RelativePath="..\src\flu\FluSimpleString.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="autorig"
+			>
+			<File
+				RelativePath="..\src\autorig\SBAutoRigManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\autorig\SBAutoRigManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\autorig\VoxelizerWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\autorig\VoxelizerWindow.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="pythonbind"
+			>
+			<File
+				RelativePath="..\src\pythonbind\SBPythonAutorig.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\pythonbind\SBPythonAutoRig.h"
 				>
 			</File>
 		</Filter>

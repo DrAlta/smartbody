@@ -132,6 +132,8 @@ void FLTKOgreWindow::updateOgreCamera()
 	if (!ogreInterface)
 		return;
 	Ogre::Camera* ogreCam = ogreInterface->getCamera();
+	if (!ogreCam)
+		return;
 	//SrCamera& cam = *FltkViewer::_data->camera;
 	SrCamera& cam = *scene->getActiveCamera();
 	// override the ogre camera with fltk camera
