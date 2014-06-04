@@ -1162,9 +1162,6 @@
     <ClCompile Include="src\external\rply\rply.c">
       <Filter>external\rply</Filter>
     </ClCompile>
-    <ClCompile Include="src\bml\BMLBlock.cpp">
-      <Filter>bml</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2324,9 +2321,6 @@
     </ClInclude>
     <ClInclude Include="src\sb\SBCharacterFrameData.h">
       <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="src\bml\BMLBlock.h">
-      <Filter>bml</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
