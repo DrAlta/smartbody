@@ -1000,6 +1000,7 @@ const bool ascendingTime(SmartBody::SBMotionEvent* a, SmartBody::SBMotionEvent* 
 	return (a->getTime() < b->getTime());
 }
 
+
 void SkMotion::addMotionEvent(SmartBody::SBMotionEvent* motionEvent)
 {
 	_motionEvents.push_back(motionEvent);
@@ -1010,6 +1011,18 @@ void SkMotion::addMotionEvent(SmartBody::SBMotionEvent* motionEvent)
 std::vector<SmartBody::SBMotionEvent*>& SkMotion::getMotionEvents()
 {
 	return _motionEvents;
+}
+
+void extractQuatXZY(SrQuat& inQuat, SrQuat& outXZQuat, SrQuat& outYQuat)
+{
+	SrVec vec = inQuat.axis() * inQuat.angle();	
+	SrMat mat;
+	inQuat.get_mat(mat);	
+	outYQuat =SrQuat(SrVec(0,vec.y,0)); // extract only the y-component
+	SrMat yRotMat; outYQuat.get_mat(yRotMat);
+	SrMat xzRotMat = mat*yRotMat.inverse();
+	outXZQuat = SrQuat(xzRotMat);
+	outXZQuat.normalize();
 }
 
 SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
@@ -1046,6 +1059,7 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 	// smooth the first and last s frames
 	float *first_p = this->posture( 0 );
 	float *last_p  = this->posture( num_f - 1 );	
+	LOG("num_f = %d, intervalFrames = %d",num_f, intervalFrames);
 	for (int i = 0; i< num_f; i++)
 	{
 		if (i > intervalFrames && i < num_f - intervalFrames)
@@ -1059,17 +1073,32 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 			SkChannel& chan = mchan_arr[k];
 			const std::string& jointName = mchan_arr.mappedName(k);
 			bool isPos = chan.type <= SkChannel::ZPos; 
-			if (jointName == "base") // we ignore the base when smoothing
-				continue;
+			//if (jointName == "base") // we ignore the base when smoothing
+			//	continue;
 			int index = mchan_arr.float_position(k);		
 			if (chan.type == SkChannel::Quat) // not sure if this is the best way of doing this
 			{
 				SrQuat q1 = SrQuat( first_p[ index ], first_p[ index + 1 ], first_p[ index + 2 ], first_p[ index + 3 ] );
 				SrQuat q2 = SrQuat( last_p[ index ], last_p[ index + 1 ], last_p[ index + 2 ], last_p[ index + 3 ] );
 				//SrVec diff = curFrame < intervalFrames ? (q2.inverse()*q1).axisAngle()*yf : (q1.inverse()*q2).axisAngle()*(yf);
-				SrQuat targetQ = curFrame < intervalFrames ? q1 : q2;
+				SrQuat targetQ = curFrame < intervalFrames ? q1 : q2;				
 				SrQuat curQ = SrQuat( new_p[ index ], new_p[ index + 1 ], new_p[ index + 2 ], new_p[ index + 3 ] );
-				SrQuat finalQ = slerp(curQ,targetQ,fabs(yf));			
+				
+				SrQuat finalQ;
+				if (jointName == "base") // only smooth & interpolate the XZ rotation components for base joint.
+				{
+					SrQuat tqXZ, tqY, curQXZ, curQY;
+					extractQuatXZY(targetQ, tqXZ, tqY);
+					extractQuatXZY(curQ, curQXZ, curQY);
+
+					finalQ = slerp(curQXZ,tqXZ,fabs(yf));	
+					finalQ = curQY*finalQ;//finalQ*curQY;
+				}
+				else
+				{
+					finalQ = slerp(curQ,targetQ,fabs(yf));	
+				}
+						
 				new_p[ index + 0 ] = (float)finalQ.w;
 				new_p[ index + 1 ] = (float)finalQ.x;
 				new_p[ index + 2 ] = (float)finalQ.y;
@@ -1077,11 +1106,14 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 			}
 			else
 			{
-				for (int j=0;j<chan.size();j++)
+				if (jointName != "base") // only smooth & interpolate non-base translations.
 				{
-					float diff = first_p[index + j] - last_p[index + j]; // difference between posture			
-					new_p[index+j] += yf*diff;
-				}	
+					for (int j=0;j<chan.size();j++)
+					{
+						float diff = first_p[index + j] - last_p[index + j]; // difference between posture			
+						new_p[index+j] += yf*diff;
+					}	
+				}				
 			}					
 		}
 	}

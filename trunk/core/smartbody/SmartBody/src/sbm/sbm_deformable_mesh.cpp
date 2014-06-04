@@ -1328,6 +1328,16 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 	}
 }
 
+SrVec DeformableMesh::computeCenterOfMass()
+{
+	SrVec CoM = SrVec(0,0,0);
+	for (unsigned int i=0;i<posBuf.size();i++)
+	{
+		CoM += posBuf[i];
+	}
+	CoM /= posBuf.size();
+	return CoM;
+}
 
 /************************************************************************/
 /* Deformable Mesh Instance                                             */
