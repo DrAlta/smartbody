@@ -198,7 +198,7 @@ void OgreRenderer::createScene()
 	{
 		m_sbListener = new SBListener(this);
 		m_sbm = SBM_CreateSBM();
-		SBM_Init(m_sbm, "../../../Python26/Lib", true);
+		SBM_Init(m_sbm, "../../../Python27/Lib", true);
 		SBM_SBVHMsgManager_SetEnable(m_sbm, true);
 	}
 
