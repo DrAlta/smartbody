@@ -17,13 +17,6 @@
 #include <vector>
 #include <fstream>
 
-#ifndef USE_WSP
-#define USE_WSP 1
-#endif
-
-#if USE_WSP
-#include "wsp.h"
-#endif
 #include <sb/SBScene.h>
 #include <sbm/sbm_constants.h>
 #include <sbm/xercesc_utils.hpp>
@@ -53,7 +46,6 @@
 #include "sb/SBVHMsgManager.h"
 #include "sb/SBCommandManager.h"
 #include "sb/SBBoneBusManager.h"
-#include "sb/SBWSPManager.h"
 #include "sbm/GPU/SbmShader.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -972,12 +964,6 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		for ( size_t i = 0; i < commands.size(); i++ ) {
 			scene->getCommandManager()->execute((char *)commands[i].c_str() );
 		}
-
-#if USE_WSP
-		SmartBody::SBWSPManager* wspManager = scene->getWSPManager();
-		if (wspManager->isEnable())
-			wspManager->broadcastUpdate();
-#endif
 
 		if( update_sim )	{
 			scene->update();
