@@ -415,9 +415,12 @@ void FLTKOgreWindow::fltkRender2()
 
 	
 	
+	if (hasShaderSupport)
+	{
+		glBindBuffer( GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
 	
-	glBindBuffer( GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	// real surface geometries
 	//drawAllGeometries();	
 	//if (_data->showSkinWeight)
@@ -515,10 +518,15 @@ void FLTKOgreWindow::fltkRender2()
 	// draw UI
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glDisable(GL_LIGHTING);
-	glBindBuffer( GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	if (hasShaderSupport)
+	{
+		glBindBuffer( GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glUseProgram(0);
+	}
+		
 	glBindTexture(GL_TEXTURE_2D,0);
-	glUseProgram(0);	
+	
 	SBGUIManager::singleton().update();
 
 	glPopAttrib();
