@@ -16,12 +16,6 @@
 *  License along with SmartBody.  If not, see:
 *      http://www.gnu.org/licenses/lgpl-3.0.txt
 *
-*  CONTRIBUTORS:
-*      Ed Fast, USC
-*      Andrew n marshall, USC
-*	   Deepali Mendhekar, USC
-*	   Shridhar Ravikumar, USC
-*      Arno Hartholt, USC
 */
 
 #include "vhcl.h"
@@ -169,6 +163,7 @@ int main(int argc, char* argv[])
 			{
 				std::string command = "python scene.addAssetPath(\"script\", \"" + tokenzied[tokenCounter] + "\")";
 				app.m_initialCommands.push_back(command);
+				app.setUseBoneBus(false);
 			}
 		}
 		if (op == "-seq")
@@ -187,7 +182,8 @@ int main(int argc, char* argv[])
 			if (tokenCounter < numTokens)
 			{
 				std::string command = "pythonscript " + tokenzied[tokenCounter];
-				app.m_initialCommands.push_back(command);				
+				app.m_initialCommands.push_back(command);		
+				app.setUseBoneBus(false);
 			}
 		}
 		if (op == "-mediapath")
@@ -197,6 +193,7 @@ int main(int argc, char* argv[])
 			{
 				std::string command = "python scene.setMediaPath(\"" + tokenzied[tokenCounter] + "\")";
 				app.m_initialCommands.push_back(command);
+				app.setUseBoneBus(false);
 			}
 		}
 		if (op == "-scene")
@@ -209,7 +206,6 @@ int main(int argc, char* argv[])
 		}
 		if (op.size() > 11 && op.substr(0,11)  == "-mediapath=")
 		{
-			tokenCounter++;
 			std::string mediaPath = op.substr(11);
 			if (tokenCounter < numTokens)
 			{
