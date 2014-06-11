@@ -378,7 +378,7 @@ public:
 
 	bool frameEnded(const FrameEvent& evt)
 	{
-		updateStats();
+		//updateStats();
 		return true;
 	}
 

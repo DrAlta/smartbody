@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
 			tokenCounter++;
 			if (tokenCounter < numTokens)
 			{
-				std::string command = "pythonscript " + tokenzied[tokenCounter];
+				std::string command = "python scene.run(\"" + tokenzied[tokenCounter] + "\")";
 				app.m_initialCommands.push_back(command);		
 				app.setUseBoneBus(false);
 			}
