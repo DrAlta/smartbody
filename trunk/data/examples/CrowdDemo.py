@@ -52,7 +52,7 @@ for i in range(amount):
 	brad.createStandardControllers()
 	# Set deformable mesh
 	brad.setDoubleAttribute('deformableMeshScale', .01)
-	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 	# Retarget character
 	#retargetCharacter(baseName, 'ChrBrad.sk', False)
 	# setup mocap locomotion
