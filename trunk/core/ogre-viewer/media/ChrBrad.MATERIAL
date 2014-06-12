@@ -1,12 +1,13 @@
-material /ChrBrad.MESH/ChrBrad_Hair_Mat
+material ChrBrad_Hair_Mat
 {
 	technique
 	{
 		pass
 		{
+			shading phong
 			ambient 0 0 0 1
 			diffuse 1 1 1 1
-			specular 0 0 0 89.6
+			specular 0 0 0 1.59454
 			emissive 0 0 0
 
 			scene_blend alpha_blend
@@ -24,15 +25,16 @@ material /ChrBrad.MESH/ChrBrad_Hair_Mat
 		}
 	}
 }
-material /ChrBrad.MESH/ChrBrad_Teeth_Mat
+material ChrBrad_Teeth_Mat
 {
 	technique
 	{
 		pass
 		{
+			shading phong
 			ambient 0 0 0 1
 			diffuse 1 1 1 1
-			specular 0 0 0 89.6
+			specular 0 0 0 1.59454
 			emissive 0 0 0
 
 			texture_unit
@@ -47,15 +49,33 @@ material /ChrBrad.MESH/ChrBrad_Teeth_Mat
 		}
 	}
 }
-material /ChrBrad.MESH/ChrBrad_Hands_Mat
+material ChrBrad_EyeShell_Mat
 {
 	technique
 	{
 		pass
 		{
+			shading phong
+			ambient 0.588235 0.588235 0.588235 1
+			diffuse 0.5 0.5 0.5 0
+			specular 0 0 0 1.59454
+			emissive 0 0 0
+
+			scene_blend alpha_blend
+			depth_write off
+		}
+	}
+}
+material ChrBrad_Hands_Mat
+{
+	technique
+	{
+		pass
+		{
+			shading phong
 			ambient 0 0 0 1
 			diffuse 1 1 1 1
-			specular 0.0650339 0.0650339 0.0650339 89.6
+			specular 0.0650339 0.0650339 0.0650339 1.59454
 			emissive 0 0 0
 
 			texture_unit
@@ -70,7 +90,7 @@ material /ChrBrad.MESH/ChrBrad_Hands_Mat
 		}
 	}
 }
-material /ChrBrad.MESH/ChrBrad_UpperBody_Mat
+material ChrBrad_UpperBody_Mat
 {
 	technique
 	{
@@ -93,15 +113,16 @@ material /ChrBrad.MESH/ChrBrad_UpperBody_Mat
 		}
 	}
 }
-material /ChrBrad.MESH/ChrBrad_LowerBody_Mat
+material ChrBrad_LowerBody_Mat
 {
 	technique
 	{
 		pass
 		{
+			shading phong
 			ambient 0 0 0 1
 			diffuse 1 1 1 1
-			specular 0 0 0 89.6
+			specular 0 0 0 1.59454
 			emissive 0 0 0
 
 			texture_unit
@@ -116,15 +137,16 @@ material /ChrBrad.MESH/ChrBrad_LowerBody_Mat
 		}
 	}
 }
-material /ChrBrad.MESH/ChrBrad_Shoes_Mat
+material ChrBrad_Shoes_Mat
 {
 	technique
 	{
 		pass
 		{
+			shading phong
 			ambient 0 0 0 1
 			diffuse 1 1 1 1
-			specular 0.0487831 0.0487831 0.0487831 89.6
+			specular 0.0487831 0.0487831 0.0487831 1.59454
 			emissive 0 0 0
 
 			texture_unit
@@ -139,15 +161,16 @@ material /ChrBrad.MESH/ChrBrad_Shoes_Mat
 		}
 	}
 }
-material /ChrBrad.MESH/ChrBrad_Head_Mat
+material ChrBrad_Head_Mat
 {
 	technique
 	{
 		pass
 		{
+			shading phong
 			ambient 0 0 0 1
 			diffuse 1 1 1 1
-			specular 0.073167 0.073167 0.073167 89.6
+			specular 0.073167 0.073167 0.073167 1.59454
 			emissive 0 0 0
 
 			texture_unit
@@ -162,15 +185,16 @@ material /ChrBrad.MESH/ChrBrad_Head_Mat
 		}
 	}
 }
-material /ChrBrad.MESH/ChrBrad_Eyelashes_Mat
+material ChrBrad_Eyelashes_Mat
 {
 	technique
 	{
 		pass
 		{
+			shading phong
 			ambient 0 0 0 1
 			diffuse 1 1 1 1
-			specular 0 0 0 89.6
+			specular 0 0 0 1.59454
 			emissive 0 0 0
 
 			scene_blend alpha_blend
@@ -188,7 +212,7 @@ material /ChrBrad.MESH/ChrBrad_Eyelashes_Mat
 		}
 	}
 }
-material /ChrBrad.MESH/ChrBrad_Eye_Mat
+material ChrBrad_Eye_Mat
 {
 	technique
 	{
