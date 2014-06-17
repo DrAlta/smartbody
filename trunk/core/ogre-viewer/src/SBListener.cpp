@@ -2,6 +2,8 @@
 #include "ExampleApplication.h"
 #include "OgreRenderer.h"
 #include "OgreFrameListener.h"
+//#include <sb/SBScene.h>
+//#include <sb/SBCharacter.h>
 
 SBListener::SBListener(OgreRenderer* app)
 {
@@ -67,6 +69,7 @@ void SBListener::OnCharacterCreate( const  std::string & name, const  std::strin
 		//Create character from characterType
 
 		ent = m_app->getSceneManager()->createEntity(name, objectClass + ".mesh" );						
+		
 	}
 	catch( Ogre::ItemIdentityException& )
 	{
@@ -76,8 +79,11 @@ void SBListener::OnCharacterCreate( const  std::string & name, const  std::strin
 	{
 		if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) 
 		{
+
 			//Default to existing Brad character
-			ent = m_app->getSceneManager()->createEntity(name, "ChrBrad.mesh" );
+			//ent = m_app->getSceneManager()->createEntity(name, "ChrBrad.mesh" );
+			LOG("Cannot find mesh named %s. Ignoring mesh for character %s.", objectClass.c_str(), name.c_str());
+			ent = NULL;
 		}
 	}
 		
@@ -90,6 +96,9 @@ void SBListener::OnCharacterCreate( const  std::string & name, const  std::strin
 	// Add entity to the scene node
 	SceneNode * mSceneNode = m_app->getSceneManager()->getRootSceneNode()->createChildSceneNode(name);
 	mSceneNode->attachObject(ent);
+	
+	//mSceneNode->scale(scaleFactor, scaleFactor, scaleFactor);
+
 	Ogre::Skeleton* skel = ent->getSkeleton();
 	OgreFrameListener* frameListener = m_app->getOgreFrameListener();
 	if (frameListener)

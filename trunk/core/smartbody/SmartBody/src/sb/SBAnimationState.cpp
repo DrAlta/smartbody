@@ -920,7 +920,7 @@ void SBAnimationBlend::addCorrespondencePoints(const std::vector<std::string>& m
 	}
 	if (motionNames.size() != motions.size())
 	{
-		LOG("Add correspondence points error, input motion number is not the same with that when adding motions");
+		LOG("Add correspondence points error, input motion number is not the same with that when adding motions. %d motion names, %d motions.", motionNames.size(), motions.size());
 		return;		
 	}
 	for (size_t i = 0; i < motionNames.size(); i++)
@@ -933,7 +933,7 @@ void SBAnimationBlend::addCorrespondencePoints(const std::vector<std::string>& m
 	}
 	if (motionNames.size() != points.size())
 	{
-		LOG("Add correspondence points error, input motion number is not the same with points number!");
+		LOG("Add correspondence points error, input motion number is not the same with points number. %d motion names, %d points.", motionNames.size(), points.size());
 		return;
 	}	
 	int num = motionNames.size();
