@@ -43,6 +43,7 @@ class MeCtPAnimation;
 class MeCtParamAnimation;
 class MeCtSaccade;
 class MeCtBasicLocomotion;
+class MeCtNewLocomotion;
 class MeCtDataReceiver;
 class SBPhysicsCharacter;
 class MeCtPhysicsController;
@@ -80,7 +81,7 @@ public:
 	bool _lastReachStatus;
 	//SBPhysicsCharacter* phyChar;
 
-	enum LocomotionType {Basic, Example, Procedural};
+	enum LocomotionType {Basic, Example, Procedural, New};
 	
 	LocomotionType								locomotion_type;
 	std::string									statePrefix;
@@ -249,6 +250,7 @@ public:
 	//MeCtReachEngine*	reachEngine[2];	
 	MeCtBreathing*			breathing_p;
 	MeCtBasicLocomotion*	basic_locomotion_ct;
+	MeCtNewLocomotion*		new_locomotion_ct;
 	MeCtPosePostProcessing* postprocess_ct;
 	MeCtMotionGraph*        motiongraph_ct;
 
