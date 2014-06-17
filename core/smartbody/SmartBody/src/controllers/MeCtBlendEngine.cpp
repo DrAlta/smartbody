@@ -73,6 +73,17 @@ void MeCtBlendEngine::init(const std::string& paramFuncType)
 	{
 		motionParameter = new LocomotionParameter(skeletonCopy, affectedJoints, "base");
 	}
+	else if (paramFuncType == "catch")
+	{
+		SmartBody::SBJoint* copyEffector = skeletonCopy->getJointByMappedName("r_wrist");
+		SmartBody::SBJoint* copyRoot = skeletonCopy->getJointByName("base");
+		motionParameter = new ReachMotionParameter(skeletonCopy,affectedJoints,copyEffector,copyRoot);
+	}
+	else
+	{
+		motionParameter = new LocomotionParameter(skeletonCopy, affectedJoints, "base");
+	}
+
 	motionExamples.initMotionExampleSet(motionParameter);	
 }
 
