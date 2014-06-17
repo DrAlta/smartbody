@@ -2691,6 +2691,11 @@ int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 				*/
 				return CMD_SUCCESS;
 			}
+			if (type == "new")
+			{
+				character->locomotion_type = character->New;
+				return CMD_SUCCESS;
+			}
 		}
 	}
 	else if (command == "facing")

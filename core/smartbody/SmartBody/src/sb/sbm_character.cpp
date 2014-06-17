@@ -73,6 +73,7 @@
 #include <controllers/me_ct_param_animation.h>
 #include <controllers/me_ct_saccade.h>
 #include <controllers/me_ct_basic_locomotion.h>
+#include <controllers/me_ct_new_locomotion.h>
 #include <controllers/me_ct_gaze.h>
 #include <controllers/me_ct_example_body_reach.hpp>
 #include <controllers/me_ct_breathing.h>
@@ -180,6 +181,7 @@ motionplayer_ct( NULL ),
 noise_ct(NULL),
 record_ct(NULL),
 basic_locomotion_ct(NULL),
+new_locomotion_ct(NULL),
 face_neutral( NULL ),
 _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 {
@@ -253,6 +255,8 @@ SbmCharacter::~SbmCharacter( void )	{
 		record_ct->unref();
 	if (basic_locomotion_ct)
 		basic_locomotion_ct->unref();
+	if (new_locomotion_ct)
+		new_locomotion_ct->unref();
 	if (postprocess_ct)
 		postprocess_ct->unref();
 
@@ -332,6 +336,12 @@ void SbmCharacter::createStandardControllers()
 	this->basic_locomotion_ct->ref();
 	//this->basic_locomotion_ct->set_pass_through(false);
 
+	// new locomotion
+	this->new_locomotion_ct = new MeCtNewLocomotion(this);
+	std::string nLocoName = getName() + "_newLocomotionController";
+	this->new_locomotion_ct->setName(nLocoName.c_str());
+	this->new_locomotion_ct->ref();
+	this->new_locomotion_ct->init(this);
 	// example-based head movement
 	this->head_param_anim_ct = new MeCtParamAnimation(this, world_offset_writer_p);
 	std::string headParamAnimName = getName() + "_paramAnimHeadController";
@@ -517,6 +527,7 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( param_animation_ct );
 	ct_tree_p->add_controller( motiongraph_ct );
 	ct_tree_p->add_controller( basic_locomotion_ct );
+	//ct_tree_p->add_controller( new_locomotion_ct );
 	ct_tree_p->add_controller( motion_sched_p );
 	ct_tree_p->add_controller( postprocess_ct );	
 	ct_tree_p->add_controller( reach_sched_p );	
@@ -577,6 +588,8 @@ void SbmCharacter::createStandardControllers()
 					//attributeCopy->registerObserver(locomotion_ct);
 				else if (dynamic_cast<MeCtBasicLocomotion*>(controller))
 					attributeCopy->registerObserver(basic_locomotion_ct);
+				else if (dynamic_cast<MeCtNewLocomotion*>(controller))
+					attributeCopy->registerObserver(new_locomotion_ct);
 				else if (dynamic_cast<MeCtBreathing*>(controller))
 					attributeCopy->registerObserver(breathing_p);
 			}
@@ -970,6 +983,8 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 				}
 				else if (dynamic_cast<MeCtBasicLocomotion*>(controller))
 					attributeCopy->registerObserver(basic_locomotion_ct);
+				else if (dynamic_cast<MeCtNewLocomotion*>(controller))
+					attributeCopy->registerObserver(new_locomotion_ct);
 				else if (dynamic_cast<MeCtBreathing*>(controller))
 					attributeCopy->registerObserver(breathing_p);
 			}

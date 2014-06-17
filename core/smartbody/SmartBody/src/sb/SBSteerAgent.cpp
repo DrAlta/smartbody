@@ -69,6 +69,10 @@ void SBSteerAgent::setSteerType(std::string type)
 	{
 		character->locomotion_type = character->Basic;
 	}
+	if (type == "new")
+	{
+		character->locomotion_type = character->New;
+	}
 }
 
 const std::string& SBSteerAgent::getSteerType()

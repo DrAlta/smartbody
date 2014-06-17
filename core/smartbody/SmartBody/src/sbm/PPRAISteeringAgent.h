@@ -73,6 +73,7 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 		inline float radToDeg(float v)	{return (v * 180.0f / 3.14159f);}
 
 		float evaluateBasicLoco(float dt, float x, float y, float z, float yaw);
+		float evaluateNewLoco(float dt, float x, float y, float z, float yaw);
 		float evaluateBasicLocoDirect(float dt, float x, float y, float z, float yaw);
 		float evaluateExampleLoco(float dt, float x, float y, float z, float yaw);
 
@@ -108,6 +109,9 @@ class PPRAISteeringAgent : public SmartBody::SBSteerAgent
 		// basic param
 		float basicLocoAngleGain;
 		float basicLocoScootGain;
+		//  new param
+		float newLocoAngleGain;
+		float newLocoScootGain;
 		// procedural param
 		float locoSpdGain;
 		float locoScootGain;

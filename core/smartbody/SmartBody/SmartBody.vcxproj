@@ -493,6 +493,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\sr\sr_vec2.cpp" />
     <ClCompile Include="..\SmartBody\src\sr\sr_viewer.cpp" />
     <ClCompile Include="src\controllers\me_ct_motion_graph.cpp" />
+    <ClCompile Include="src\controllers\me_ct_new_locomotion.cpp" />
     <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp" />
     <ClCompile Include="src\external\rply\rply.c" />
     <ClCompile Include="src\protocols\sbmesh.pb.cc" />
@@ -880,6 +881,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\SmartBody\src\sr\sr_vec2.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_viewer.h" />
     <ClInclude Include="src\controllers\me_ct_motion_graph.hpp" />
+    <ClInclude Include="src\controllers\me_ct_new_locomotion.h" />
     <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp" />
     <ClInclude Include="src\external\rply\rply.h" />
     <ClInclude Include="src\protocols\sbmesh.pb.h" />

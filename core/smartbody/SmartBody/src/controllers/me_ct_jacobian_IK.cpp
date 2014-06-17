@@ -663,6 +663,7 @@ bool MeCtJacobianIK::updateReferenceJointJacobianReduce(MeCtIKTreeScenario* s)
 	dVector dThetaTemp;
 	dThetaTemp.resize(dSref.size());
 	dThetaAux.resize(s->ikTreeNodes.size()*3);
+	
 
 	float maxRotOffset = 0.1f;
 	for (unsigned int i=0;i<s->ikTreeNodes.size();i++)

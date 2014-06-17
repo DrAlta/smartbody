@@ -1162,6 +1162,9 @@
     <ClCompile Include="src\external\rply\rply.c">
       <Filter>external\rply</Filter>
     </ClCompile>
+    <ClCompile Include="src\controllers\me_ct_new_locomotion.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2321,6 +2324,9 @@
     </ClInclude>
     <ClInclude Include="src\sb\SBCharacterFrameData.h">
       <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\controllers\me_ct_new_locomotion.h">
+      <Filter>controllers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

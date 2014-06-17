@@ -295,7 +295,7 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 // 		ik_scenario.ikEndEffectors[i]->targetPos = get_reach_target(targetJointList[i]);
 // 	}
 
-	ConstraintMap::iterator ci;
+	/*ConstraintMap::iterator ci;
 
 	//for (unsigned int i=0;i<rotConstraint.size();i++)
 	for (ci = rotConstraint.begin(); ci != rotConstraint.end(); ci++)
@@ -310,7 +310,7 @@ bool MeCtConstraint::controller_evaluate( double t, MeFrameData& frame )
 		EffectorConstraint* cons = ci->second;//posConstraint[i];
 		MeCtIKTreeNode* node = ik_scenario.findIKTreeNode(cons->efffectorName.c_str());
 		node->targetPos = cons->getPosConstraint();
-	}	
+	}*/	
 
 
 	_skeleton->update_global_matrices();
