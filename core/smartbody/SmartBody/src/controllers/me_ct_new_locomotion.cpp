@@ -52,7 +52,7 @@ MeCtNewLocomotion::~MeCtNewLocomotion()
 void MeCtNewLocomotion::init(SbmCharacter* sbChar)
 {
 	_lastTime = -1.0;
-		assert(_skeleton);	
+		//assert(_skeleton);	
 	// root is "world_offset", so we use root->child to get the base joint.
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sk->root()->child(0));//_skeleton->getJointByName(rootJointName);//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("base"); // test for now
 	character = sbChar;
