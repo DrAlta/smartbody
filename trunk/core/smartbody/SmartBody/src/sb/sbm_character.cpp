@@ -94,6 +94,7 @@
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #endif
 
+#define USE_NEW_LOCOMOTION 0
 #define USE_REACH 1
 #define USE_PHYSICS_CHARACTER 1
 //#define USE_REACH_TEST 0
@@ -255,8 +256,10 @@ SbmCharacter::~SbmCharacter( void )	{
 		record_ct->unref();
 	if (basic_locomotion_ct)
 		basic_locomotion_ct->unref();
+#if USE_NEW_LOCOMOTION
 	if (new_locomotion_ct)
 		new_locomotion_ct->unref();
+#endif
 	if (postprocess_ct)
 		postprocess_ct->unref();
 
@@ -337,11 +340,13 @@ void SbmCharacter::createStandardControllers()
 	//this->basic_locomotion_ct->set_pass_through(false);
 
 	// new locomotion
+#if USE_NEW_LOCOMOTION
 	this->new_locomotion_ct = new MeCtNewLocomotion(this);
 	std::string nLocoName = getName() + "_newLocomotionController";
 	this->new_locomotion_ct->setName(nLocoName.c_str());
 	this->new_locomotion_ct->ref();
 	this->new_locomotion_ct->init(this);
+#endif
 	// example-based head movement
 	this->head_param_anim_ct = new MeCtParamAnimation(this, world_offset_writer_p);
 	std::string headParamAnimName = getName() + "_paramAnimHeadController";
