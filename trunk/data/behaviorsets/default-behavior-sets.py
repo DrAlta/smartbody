@@ -32,3 +32,7 @@ behav.setScript("BehaviorSetFemaleGestures.py")
 
 behav = behaviorSetManager.createBehaviorSet("Catching")
 behav.setScript("BehaviorSetCatching.py")
+
+print "Creating swatting..."
+behav = behaviorSetManager.createBehaviorSet("Swatting")
+behav.setScript("BehaviorSetSwatting.py")
