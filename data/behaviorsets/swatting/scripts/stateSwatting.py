@@ -148,7 +148,21 @@ def swattingSetup(origSkelName, skeletonName, baseJoint, prefix, statePreFix):
 	#blendSwatting.buildBlendBase("Swat", "RBF" ,True);	
 	#blendSwatting.buildBlendBase("Swat", "Inverse" ,True);	
 	blendSwattingRight.buildBlendBase("Swat", "KNN" ,True);	
-	blendSwattingLeft.buildBlendBase("Swat", "KNN" ,True);	
-	
-	
+	blendSwattingLeft.buildBlendBase("Swat", "KNN" ,True);
+
+	# add 'concentration' events during the blend
+	blendSwattingRight.addEvent(rightMotions[0], points1[0] - .50, "concentration", "", False)
+	blendSwattingLeft.addEvent(leftMotions[0], points1[0] - .50, "concentration", "", False)
+'''
+	# strange crash in the GUI when activating the UI, disabled for now
+	class SwatConcentrationEventHandler(SBEventHandler):
+	   def executeAction(self, event):
+		  str = event.getParameters()
+		  print "Concentrate!"
+		  bml.execBML('*', '<face amount="1" au="4" side="BOTH" type="facs"/>')
+
+	myHandler = SwatConcentrationEventHandler()
+	eventManager = scene.getEventManager()
+	eventManager .addEventHandler("concentration", myHandler)
+'''	
 
