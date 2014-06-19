@@ -84,7 +84,7 @@ def swattingSetup(origSkelName, skeletonName, baseJoint, prefix, statePreFix):
 	points1 = DoubleVec()
 	points1.append(.70) # SwatCenter 1
 	points1.append(1.42) # SwatLeft 1
-	points1.append(.29) # SwatLow_Far_Left 1
+	points1.append(1.06) # SwatLow_Far_Left 1
 	points1.append(.58) # SwatLow_Right 1
 	points1.append(.66) # SwatLow_Right_Far 1
 	points1.append(.79) # SwatLow_Right2 1
@@ -120,7 +120,7 @@ def swattingSetup(origSkelName, skeletonName, baseJoint, prefix, statePreFix):
 	
 	skeleton = scene.getSkeleton(skeletonName)
 	rhand = skeleton.getJointByName("r_wrist")
-	for r in range(0, 9):
+	for r in range(0, 12):
 		m = scene.getMotion(rightMotions[r])
 		m.connect(skeleton)
 		rpos = m.getJointPosition(rhand, points1[r])
@@ -133,7 +133,7 @@ def swattingSetup(origSkelName, skeletonName, baseJoint, prefix, statePreFix):
 #		print rightMotions[r] + " " + str(params[0]) + " " + str(params[1]) + " " +str(params[2])
 
 	lhand = skeleton.getJointByName("l_wrist")
-	for l in range(0, 9):
+	for l in range(0, 12):
 		m = scene.getMotion(leftMotions[l])
 		m.connect(skeleton)
 		lpos = m.getJointPosition(lhand, points1[l])
