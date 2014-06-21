@@ -6,7 +6,7 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'ChrMaarten')
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
 
@@ -28,7 +28,7 @@ scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
 bradSkeleton = scene.getSkeleton('ChrBrad.sk')
 zebra2Map.applySkeleton(bradSkeleton)
-zebra2Map.applyMotionRecurse('ChrBrad')
+zebra2Map.applyMotionRecurse('ChrMaarten')
 
 # Setting up face definition
 print 'Setting up Brad\'s face definition'
@@ -71,7 +71,7 @@ brad.setFaceDefinition(bradFace)
 brad.createStandardControllers()
 # DeformableMesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 
 # Turn on GPU deformable geometry
 brad.setStringAttribute("displayType", "GPUmesh")

@@ -5,7 +5,7 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'ChrMaarten')
 scene.addAssetPath('motion', 'ChrRachel')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
@@ -58,7 +58,7 @@ for i in range(15):
 	brad.getAttribute('collisionShapeScale').setValue(SrVec(.01, .01, .01))
 	# Set defomable mesh
 	brad.setDoubleAttribute('deformableMeshScale', .01)
-	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	# Retarget character

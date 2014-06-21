@@ -1347,7 +1347,7 @@ std::vector<std::string> SBScene::getEventHandlerNames()
 	
 	std::vector<std::string> ret;
 
-	for(SBEventHandlerMap::iterator iter = eventManager->getEventHandlers().begin();
+	for(std::map<std::string, SBEventHandler*>::iterator iter = eventManager->getEventHandlers().begin();
 		iter != eventManager->getEventHandlers().end();
 		iter++)
 	{

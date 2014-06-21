@@ -475,8 +475,8 @@ void ResourceWindow::updateGUI()
 
 	// update event handler list
 	SmartBody::SBEventManager* eventManager = SmartBody::SBScene::getScene()->getEventManager();
-	SmartBody::SBEventHandlerMap& eventMap = eventManager->getEventHandlers();
-	SmartBody::SBEventHandlerMap::iterator ei;
+	std::map<std::string, SmartBody::SBEventHandler*>& eventMap = eventManager->getEventHandlers();
+	std::map<std::string, SmartBody::SBEventHandler*>::iterator ei;
 	resourceTree->clear_children(getTreeFromName("eventhandler"));
 	for ( ei  = eventMap.begin();
 		  ei != eventMap.end();

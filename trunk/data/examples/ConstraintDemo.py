@@ -7,7 +7,7 @@ import math
 scene.setScale(1.0)
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'ChrMaarten')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()

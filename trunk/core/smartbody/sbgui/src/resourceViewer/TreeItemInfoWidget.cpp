@@ -521,7 +521,7 @@ EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char
 	updateWidget();
 
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
-	SmartBody::SBEventHandlerMap& eventMap = manager->getEventHandlers();		
+	std::map<std::string, SmartBody::SBEventHandler*>& eventMap = manager->getEventHandlers();		
 	eventInfoObject->registerObserver(this);
 	this->begin();
 		attrWindow = new AttributeWindow(eventInfoObject,x,y,w,h,name);
@@ -539,8 +539,8 @@ EventItemInfoWidget::EventItemInfoWidget( int x, int y, int w, int h, const char
 void EventItemInfoWidget::updateWidget()
 {	
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
-	SmartBody::SBEventHandlerMap& eventMap = manager->getEventHandlers();	
-	SmartBody::SBEventHandlerMap::iterator mi = eventMap.find(eventName);
+	std::map<std::string, SmartBody::SBEventHandler*>& eventMap = manager->getEventHandlers();	
+	std::map<std::string, SmartBody::SBEventHandler*>::iterator mi = eventMap.find(eventName);
 	if (mi != eventMap.end())
 	{
 		SmartBody::SBEventHandler* handler = mi->second;
@@ -556,8 +556,8 @@ void EventItemInfoWidget::updateWidget()
 void EventItemInfoWidget::notify( SmartBody::SBSubject* subject )
 {
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
-	SmartBody::SBEventHandlerMap& eventMap = manager->getEventHandlers();
-	SmartBody::SBEventHandlerMap::iterator mi = eventMap.find(eventName);
+	std::map<std::string, SmartBody::SBEventHandler*>& eventMap = manager->getEventHandlers();
+	std::map<std::string, SmartBody::SBEventHandler*>::iterator mi = eventMap.find(eventName);
 	if (mi != eventMap.end())
 	{
 		SmartBody::SBEventHandler* handler = mi->second;

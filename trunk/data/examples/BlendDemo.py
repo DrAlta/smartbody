@@ -4,7 +4,7 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'ChrMaarten')
 scene.addAssetPath('motion', 'ChrRachel')
 scene.addAssetPath('motion', 'Sinbad')
 scene.addAssetPath('script', 'behaviorsets')
