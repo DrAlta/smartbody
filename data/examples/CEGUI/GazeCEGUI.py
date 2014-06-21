@@ -5,8 +5,7 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrBrad')
-#scene.addAssetPath('motion', 'ChrRachel')
+scene.addAssetPath('motion', 'ChrMaarten')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
@@ -27,16 +26,13 @@ obj.setNearPlane(0.1)
 obj.setAspectRatio(1.39286)
 scene.getPawn('camera').setPosition(SrVec(0, -5, 0))
 
-# Set joint map for Brad and Rachel
-print 'Setting up joint map for Brad and Rachel'
+# Set joint map for Brad 
+print 'Setting up joint map for Brad'
 scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
 bradSkeleton = scene.getSkeleton('ChrBrad.sk')
 zebra2Map.applySkeleton(bradSkeleton)
-zebra2Map.applyMotionRecurse('ChrBrad')
-rachelSkeleton = scene.getSkeleton('ChrRachel.sk')
-zebra2Map.applySkeleton(rachelSkeleton)
-zebra2Map.applyMotionRecurse('ChrRachel')
+zebra2Map.applyMotionRecurse('ChrMaarten')
 
 # Retarget setup
 steerManager = scene.getSteerManager()
@@ -44,6 +40,7 @@ steerManager = scene.getSteerManager()
 print 'Setting up Brads'
 bradList = []
 bradPosX = 0.0
+# set up the characters
 for i in range(4):
 	baseName = 'ChrBrad%s' % i
 	brad = scene.createCharacter(baseName, '')
@@ -58,11 +55,8 @@ for i in range(4):
 	brad.getAttribute('collisionShapeScale').setValue(SrVec(.01, .01, .01))
 	# Set defomable mesh
 	brad.setDoubleAttribute('deformableMeshScale', .01)
-	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
-	# Play idle animation
-	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
+	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 	# Retarget character
-	#retargetCharacter(baseName, 'ChrBrad.sk', False)
 	if i== 0 : 
 		scene.run('BehaviorSetMaleMocapLocomotion.py')
 		setupBehaviorSet()
@@ -72,9 +66,35 @@ for i in range(4):
 
 # Turn on GPU deformable geometry for all
 for name in scene.getCharacterNames():
-	scene.command("char %s viewer deformableGPU" % name)
+	scene.getCharacter(name).setStringAttribute("displayType", "GPUmesh")	
+	
+# retarget locomotion
+for i in range(4):
+	baseName = 'ChrBrad%s' % i	
+	if i== 0 : 
+		scene.run('BehaviorSetMaleMocapLocomotion.py')
+		setupBehaviorSet()
+	retargetBehaviorSet(baseName)
+	
+# retarget gestures
+for i in range(4):
+	baseName = 'ChrBrad%s' % i	
+	if i== 0 : 
+		scene.run('BehaviorSetGestures.py')
+		setupBehaviorSet()
+	retargetBehaviorSet(baseName)
 
-# Paths for Brad and Rachel
+	
+	
+
+
+# set to idle pose
+for i in range(4):
+	# Play idle animation
+	bml.execBML('ChrBrad%s' % i, '<body posture="ChrBrad@Idle01"/>')
+
+	
+# Paths for Brad
 
 print 'Setting up GUI'
 scene.run('GUIUtil.py')
@@ -165,3 +185,4 @@ class GazeDemo(SBScript):
 		gazeTarget.setPosition(SrVec(curWayPt.getData(0)+gazeX, curWayPt.getData(1), curWayPt.getData(2)+gazeZ))
 gazedemo = GazeDemo()
 scene.addScript('gazedemo', gazedemo)
+

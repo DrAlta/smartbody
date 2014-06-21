@@ -5,7 +5,7 @@ print "|--------------------------------------------|"
 # Add asset paths
 scene.addAssetPath('script', 'scripts')
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'ChrMaarten')
 scene.loadAssets()
 
 # Set scene parameters and camera

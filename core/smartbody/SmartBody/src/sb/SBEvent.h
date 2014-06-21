@@ -53,8 +53,6 @@ class SBBasicHandler : public SBEventHandler
 		SBAPI void notify(SBSubject* subject);
 };
 
-typedef std::map<std::string, SBEventHandler*> SBEventHandlerMap;
-
 class SBEventManager
 {
 	public:
@@ -68,10 +66,10 @@ class SBEventManager
 		SBAPI int getNumEventHandlers();
 		SBAPI SBEventHandler* getEventHandlerByIndex(int num);
 		SBAPI SBEventHandler* getEventHandler(const std::string& type);
-		SBAPI SBEventHandlerMap& getEventHandlers() { return eventHandlers; }
+		SBAPI std::map<std::string, SBEventHandler*>& getEventHandlers();
 
 	private:
-		SBEventHandlerMap eventHandlers;
+		std::map<std::string, SBEventHandler*> eventHandlers;
 };
 
 class SBMotionEvent : public SBEvent

@@ -5,7 +5,7 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'ChrMaarten')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
@@ -34,7 +34,7 @@ scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
 bradSkeleton = scene.getSkeleton('ChrBrad.sk')
 zebra2Map.applySkeleton(bradSkeleton)
-zebra2Map.applyMotionRecurse('ChrBrad')
+zebra2Map.applyMotionRecurse('ChrMaarten')
 
 # Setting up Brad
 print 'Setting up Brad'
@@ -46,7 +46,7 @@ brad.setSkeleton(bradSkeleton)
 brad.createStandardControllers()
 # Set deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', 0.01)
-brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 # Play idle animation
 bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 scene.run('BehaviorSetReaching.py')

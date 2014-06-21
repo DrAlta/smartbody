@@ -612,7 +612,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("addEventHandler", &SBEventManager::addEventHandler, "Returns the event type.")
 		.def("removeEventHandler", &SBEventManager::removeEventHandler, "Returns the event type.")
 		.def("getNumHandlers", &SBEventManager::getNumEventHandlers, "Gets the number of event handlers.")
-		.def("getEventHandler", &SBEventManager::getEventHandler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the number of event handlers.")
+		.def("getEventHandler", &SBEventManager::getEventHandler, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets an event handler by name.")
 		.def("createEvent", &SBEventManager::createEvent, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Creates an event of a given type with given parameters.")
 		;
 

@@ -41,7 +41,7 @@ def createRetargetInstance(srcSkelName, tgtSkelName):
 		
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrBrad')
+scene.addAssetPath('motion', 'ChrMaarten')
 scene.addAssetPath('motion', 'Sinbad')
 scene.addAssetPath('script', 'behaviorsets')
 scene.addAssetPath('script', 'scripts')

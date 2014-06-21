@@ -191,6 +191,10 @@ SBEventHandler* SBEventManager::getEventHandler(const std::string& type)
 	return NULL;
 }
 
+std::map<std::string, SBEventHandler*>& SBEventManager::getEventHandlers()
+{
+	return eventHandlers;
+}
 
 
 }
