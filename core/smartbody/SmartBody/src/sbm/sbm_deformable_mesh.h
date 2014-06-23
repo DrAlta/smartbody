@@ -122,6 +122,7 @@ public:
 	void readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh);
 	void loadAllFoundTextures(std::string textureDirectory);
 	SBAPI SrVec computeCenterOfMass();
+	SBAPI SrBox computeBoundingBox();
 };
 
 class DeformableMeshInstance
