@@ -1339,6 +1339,16 @@ SrVec DeformableMesh::computeCenterOfMass()
 	return CoM;
 }
 
+SBAPI SrBox DeformableMesh::computeBoundingBox()
+{
+	SrBox bbox;
+	for (unsigned int i=0;i<posBuf.size();i++)
+	{
+		bbox.extend(posBuf[i]);
+	}
+	return bbox;
+}
+
 /************************************************************************/
 /* Deformable Mesh Instance                                             */
 /************************************************************************/
