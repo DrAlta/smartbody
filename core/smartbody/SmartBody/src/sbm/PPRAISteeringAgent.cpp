@@ -1123,7 +1123,6 @@ float PPRAISteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z,
 float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, float yaw)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	
  	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
 	const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
@@ -1145,6 +1144,7 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 		// turn to face "targetDirection" - magnitude of targetDirection doesn't matter
 		float initialDot = dot(steeringCommand.targetDirection, rightSide);
 		float turningRate = (initialDot > 0.0f) ? PED_MAX_TURNING_RATE : -PED_MAX_TURNING_RATE;  // positive rate is right-turn
+		turningRate*=15.0f*dt;//Slows the turning rate
 		newForward = forward + turningRate * fabsf(steeringCommand.turningAmount) * rightSide;
 		float newDot = dot(steeringCommand.targetDirection, rightSideInXZPlane(newForward)); // dot with the new side vector
 		if (initialDot*newDot <= 0.0f) {
@@ -1213,7 +1213,6 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 	normalizeAngle(angleGlobal);
 	normalizeAngle(yaw);
 	float angleDiff = angleGlobal - yaw;
-	//LOG("turning Rate= %f\n",angleDiff/dt);
 	normalizeAngle(angleDiff);
 
 	float newSpeed = desiredSpeed;
@@ -1267,7 +1266,6 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 		forward = Util::normalize(velocity);
 		angleGlobal = radToDeg(atan2(forward.x, forward.z));
 		normalizeAngle(angleGlobal);
-
 		curSpeed = currentSpeed / scene->getScale();
 		newSpeed = currentSpeed;
 		character->new_locomotion_ct->setMovingSpd(curSpeed);

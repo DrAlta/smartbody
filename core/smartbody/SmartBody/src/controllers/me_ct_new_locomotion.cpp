@@ -52,6 +52,7 @@ MeCtNewLocomotion::~MeCtNewLocomotion()
 void MeCtNewLocomotion::init(SbmCharacter* sbChar)
 {
 	_lastTime = -1.0;
+		
 		//assert(_skeleton);	
 	// root is "world_offset", so we use root->child to get the base joint.
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sk->root()->child(0));//_skeleton->getJointByName(rootJointName);//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("base"); // test for now
@@ -61,11 +62,11 @@ void MeCtNewLocomotion::init(SbmCharacter* sbChar)
 	stopJoints.push_back("JtHeelRt");
 	ik_scenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);
 	const IKTreeNodeList& nodeList = ik_scenario.ikTreeNodes;		
-	for (unsigned int i=0;i<nodeList.size();i++)
+	/*for (unsigned int i=0;i<nodeList.size();i++)
 	{
 		SkJoint* joint = nodeList[i]->joint;
 		_channels.add(joint->getMappedJointName(), SkChannel::Quat);	
-	}	
+	}*/	
 
 	double ikReachRegion = character->getHeight()*0.02f;		
 	ikDamp        = ikReachRegion*ikReachRegion*14.0;
@@ -94,6 +95,7 @@ bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
 		float movingDist = movingSpd * Dt;
 		x += movingDist * sin(yaw * (float)M_PI / 180.0f);
 		z += movingDist * cos(yaw * (float)M_PI / 180.0f);
+		character->set_world_offset(x, y, z, yaw, pitch, roll);
 		//*/
 		std::vector<SrQuat> tempQuatList(ik_scenario.ikTreeNodes.size()); 
 		if (LeftFading.prev_time == -1.0f && RightFading.prev_time ==-1.0f) // first start
@@ -101,9 +103,10 @@ bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
 			// for first frame, update from frame buffer to joint quat in the limb
 			// any future IK solving will simply use the joint quat from the previous frame.
 			
-			character->set_world_offset(x, y, z, yaw, pitch, roll);
+			
 			updateChannelBuffer(frame);//Read from skeleton->Write on Buffer
 			updateChannelBuffer(frame,tempQuatList, true);//Read from Buffer->Write on tempQuatList	
+			//character->set_world_offset(x, y, z, yaw, pitch, roll);
 
 			ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_INIT);
 			ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_PREVREF);
@@ -113,9 +116,10 @@ bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
 		LeftFading.updateDt((float)t);
 		RightFading.updateDt((float)t);
 
-		character->set_world_offset(x, y, z, yaw, pitch, roll);
+		
 		updateChannelBuffer(frame);//Read from skeleton->Write on Buffer
 		updateChannelBuffer(frame,tempQuatList, true);//Read from Buffer->Write on tempQuatList
+		//character->set_world_offset(x, y, z, yaw, pitch, roll);
 
 		updateConstraints(motionTime/(float)S->getFrameRate());
 		
@@ -138,14 +142,27 @@ bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
 			useIKRt = false;
 		//if (useIKLf || useIKRt)	
 		{		
-
+			//*/Left
+			ik_scenario.ikPosEffectors = &posConsLf;
+			ik_scenario.ikRotEffectors = &rotConsLf;
+			ik.update(&ik_scenario);
+			ik_scenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);			
+			for (unsigned int i=0; i<7 ;i++)
+			{
+				MeCtIKTreeNode* node = ik_scenario.ikTreeNodes[i];
+				SrQuat qEval = node->getQuat(QUAT_CUR);
+				SrQuat qInit = node->getQuat(QUAT_REF);
+				qEval.normalize();
+				qInit.normalize();
+				tempQuatList[i] = slerp(qInit,qEval,LeftFading.blendWeight);
+			}	
+			//*/
 			//*/Right
 			ik_scenario.ikPosEffectors = &posConsRt;
 			ik_scenario.ikRotEffectors = &rotConsRt;
 			ik.update(&ik_scenario);
-			ik_scenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);
-			//ik_scenario.getTreeNodeQuat(tempQuatList,QUAT_CUR);			
-			for (unsigned int i=7; i<13 ;i++)
+			ik_scenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);	
+			for (unsigned int i=7; i<ik_scenario.ikTreeNodes.size() ;i++)
 			{
 				MeCtIKTreeNode* node = ik_scenario.ikTreeNodes[i];
 				SrQuat qEval = node->getQuat(QUAT_CUR);
@@ -155,26 +172,10 @@ bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
 				tempQuatList[i] = slerp(qInit,qEval,RightFading.blendWeight);
 			}
 			//*/
-			std::vector<SrQuat> tempQuatList2(tempQuatList);
-			//*/Left
-			ik_scenario.ikPosEffectors = &posConsLf;
-			ik_scenario.ikRotEffectors = &rotConsLf;
-			ik.update(&ik_scenario);
-			ik_scenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);
-			//ik_scenario.getTreeNodeQuat(tempQuatList,QUAT_CUR);			
-			for (unsigned int i=1; i<7 ;i++)
-			{
-				MeCtIKTreeNode* node = ik_scenario.ikTreeNodes[i];
-				SrQuat qEval = node->getQuat(QUAT_CUR);
-				SrQuat qInit = node->getQuat(QUAT_REF);
-				qEval.normalize();
-				qInit.normalize();
-				tempQuatList[i] = slerp(qInit,qEval,LeftFading.blendWeight);
-			}	
 		}
 		updateChannelBuffer(frame,tempQuatList);//Read from tempQuatList->Write on Buffer
+		RightFading.prev_time=LeftFading.prev_time = (float)t;
 	}
-	RightFading.prev_time=LeftFading.prev_time = (float)t;
 	return true;
 }
 
@@ -259,23 +260,15 @@ bool MeCtNewLocomotion::addEffectorJointPair( const char* effectorName, const ch
 		rootName = ik_scenario.ikTreeRoot->getNodeName();
 
 	// separate position & rotation constraint
-	//ConstraintList& jEffectorList = (cType == CONSTRAINT_ROT) ? rotConstraint : posConstraint;
 	ConstraintMap& jEffectorMap = (cType == CONSTRAINT_ROT) ? rotCons : posCons;
-	//VecOfString& effectorList  = (cType == CONSTRAINT_ROT) ? ik_scenario.ikRotEffectors : ik_scenario.ikPosEffectors;
 
 	std::string str = effectorName;
-	//assert(jEffectorList.size() == effectorList.size());
-	//std::find()
 
-	//int idx = distance(effectorList.begin(), find(effectorList.begin(),effectorList.end(),str));
-	//int idx = //MeCtIKTreeScenario::findIKTreeNodeInList(effectorName,effectorList);
 	ConstraintMap::iterator ci = jEffectorMap.find(str);
-	if (ci != jEffectorMap.end())//idx != effectorList.size())
+	if (ci != jEffectorMap.end())
 	{
-		//jEffectorList[idx].targetJoint = targetJoint;	
-		//EffectorJointConstraint& cons = jEffectorList[idx];
 		EffectorConstantConstraint* cons = dynamic_cast<EffectorConstantConstraint*>((*ci).second);
-		cons->rootName = rootName;//effectorRootName;
+		cons->rootName = rootName;
 		cons->targetPos = pos;
 		cons->targetRot = rot;
 		
@@ -284,14 +277,11 @@ bool MeCtNewLocomotion::addEffectorJointPair( const char* effectorName, const ch
 	{
 		// initialize constraint
 		EffectorConstantConstraint* cons = new EffectorConstantConstraint();
-		//constraint.node = node;
 		cons->efffectorName = effectorName;
-		cons->rootName = rootName;//effectorRootName;
+		cons->rootName = rootName;
 		cons->targetPos = pos;
 		cons->targetRot = rot;
 		jEffectorMap[str] = cons;
-		//effectorList.push_back(effectorName);
-		//jEffectorList.push_back(cons);		
 	}
 	return true;
 }
@@ -318,13 +308,12 @@ void MeCtNewLocomotion::addPawn(SrVec& pos, std::string name)
 
 void MeCtNewLocomotion::updateConstraints(float t)
 {
-	const float fadein=0.1f;
+	const float fadein=0.2f;
 	const float fadeout=0.5f;
 	if(useIKRt)
 	{
 		if(t>rplant[1] && t<rplant[2] && RightFading.fadeMode==Fading::FADING_MODE_OFF )
 		{
-			LOG("of R %f  %f", t, RightFading.blendWeight);
 			RightFading.setFadeOut(fadeout);
 		}
 	}
@@ -333,14 +322,14 @@ void MeCtNewLocomotion::updateConstraints(float t)
 		SmartBody::SBSkeleton *sk2=character->getSkeleton();
 		sk2->update_global_matrices();
 		ik_scenario.ikGlobalMat=sk2->root()->gmat();
-		LOG("on R %f  %f", t, RightFading.blendWeight);;
 		SmartBody::SBJoint* joint=sk2->getJointByName("JtHeelRt");	
 		SrVec tv = joint->gmat().get_translation();
 		SrQuat tq = SrQuat(joint->gmat());
-		ConstraintType cType = CONSTRAINT_POS;
-		addEffectorJointPair("JtHeelRt", "JtHipRt" ,tv, tq, cType, posConsRt, rotConsRt);
-		cType = CONSTRAINT_ROT;
-		addEffectorJointPair("JtHeelRt", "JtHipRt" ,tv, tq, cType, posConsRt, rotConsRt);
+		ConstraintType cType = CONSTRAINT_ROT;
+		LOG("%f Rt", t);
+		addEffectorJointPair("JtHeelRt", "JtPelvis" ,tv, tq, cType, posConsRt, rotConsRt);
+		cType = CONSTRAINT_POS;
+		addEffectorJointPair("JtHeelRt", "JtPelvis" ,tv, tq, cType, posConsRt, rotConsRt);
 		RightFading.setFadeIn(fadein);
 		//addPawn(tv, "goal");
 	}
@@ -348,7 +337,6 @@ void MeCtNewLocomotion::updateConstraints(float t)
 	{
 		if(t>lplant[1] && LeftFading.fadeMode==Fading::FADING_MODE_OFF )
 		{
-			LOG("of L %f  %f", t, LeftFading.blendWeight);
 			LeftFading.setFadeOut(fadeout);
 		}
 	}
@@ -357,14 +345,14 @@ void MeCtNewLocomotion::updateConstraints(float t)
 		SmartBody::SBSkeleton *sk2=character->getSkeleton();
 		sk2->update_global_matrices();
 		ik_scenario.ikGlobalMat=sk2->root()->gmat();
-		LOG("on L %f  %f", t, LeftFading.blendWeight);
 		SmartBody::SBJoint* joint=sk2->getJointByName("JtHeelLf");	
 		SrVec tv = joint->gmat().get_translation();
 		SrQuat tq = SrQuat(joint->gmat());
-		ConstraintType cType = CONSTRAINT_POS;
-		addEffectorJointPair("JtHeelLf", "JtHipLf" ,tv, tq, cType, posConsLf, rotConsLf);
-		cType = CONSTRAINT_ROT;
-		addEffectorJointPair("JtHeelLf", "JtHipLf" ,tv, tq, cType, posConsLf, rotConsLf);
+		ConstraintType cType = CONSTRAINT_ROT;
+		LOG("%f Lf", t);
+		addEffectorJointPair("JtHeelLf", "JtPelvis" ,tv, tq, cType, posConsLf, rotConsLf);
+		cType = CONSTRAINT_POS;
+		addEffectorJointPair("JtHeelLf", "JtPelvis" ,tv, tq, cType, posConsLf, rotConsLf);
 		LeftFading.setFadeIn(fadein);
 		//addPawn(tv, "goal");
 	}
