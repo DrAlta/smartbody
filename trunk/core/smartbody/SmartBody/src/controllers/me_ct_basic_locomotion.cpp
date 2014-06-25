@@ -21,6 +21,7 @@
  */
 
 #include "controllers/me_ct_basic_locomotion.h"
+#include <controllers/me_ct_param_animation_utilities.h>
 
 
 std::string MeCtBasicLocomotion::_type_name = "BasicLocomotion";
@@ -72,6 +73,33 @@ bool MeCtBasicLocomotion::controller_evaluate(double t, MeFrameData& frame)
 		//x += scootDist * cos(yaw * (float)M_PI / 180.0f);
 		//z += scootDist * sin(yaw * (float)M_PI / 180.0f);
 		character->set_world_offset(x, y, z, yaw, pitch, roll);
+		SrQuat woQuat;
+		SrVec woPos;
+		gwiz::quat_t q = gwiz::euler_t(pitch,yaw,roll);
+		woQuat = SrQuat(q.w(),q.x(),q.y(),q.z());
+		woPos = SrVec(x,y,z); 		
+		updateWorldOffset(frame, woQuat, woPos); // need to also update the world_offset inside the frame_buffer to ensure consistent results without jittering
 	}
 	return true;
+}
+
+void MeCtBasicLocomotion::updateWorldOffset( MeFrameData& frame, SrQuat& rot, SrVec& pos )
+{
+	SrBuffer<float>& buffer = frame.buffer();
+	JointChannelId baseChanID, baseBuffId;
+	baseChanID.x = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::XPos);
+	baseChanID.y = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::YPos);
+	baseChanID.z = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::ZPos);
+	baseChanID.q = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::Quat);
+
+	baseBuffId.x = _context->toBufferIndex(baseChanID.x);
+	baseBuffId.y = _context->toBufferIndex(baseChanID.y);
+	baseBuffId.z = _context->toBufferIndex(baseChanID.z);	
+	baseBuffId.q = _context->toBufferIndex(baseChanID.q);	
+
+	buffer[baseBuffId.x] = pos[0];
+	buffer[baseBuffId.y] = pos[1];
+	buffer[baseBuffId.z] = pos[2];	
+	for (int k = 0; k < 4; k++)
+		buffer[baseBuffId.q + k] = rot.getData(k);
 }
