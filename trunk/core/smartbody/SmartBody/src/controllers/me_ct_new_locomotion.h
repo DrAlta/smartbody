@@ -118,10 +118,11 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		float desiredHeading, motionTime;
 		double ikDamp;
 		SmartBody::SBMotion *C, *S;
-		SmartBody::SBSkeleton* sk;
+		SmartBody::SBSkeleton* sk;		
 	protected:	
 		void updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>& quatList, bool bRead = false);
 		void updateChannelBuffer(MeFrameData& frame);
+		void updateWorldOffset(MeFrameData& frame, SrQuat& rot, SrVec& pos);
 		void updateConstraints(float t);
 };
 
