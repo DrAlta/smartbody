@@ -51,6 +51,9 @@ class MeCtBasicLocomotion : public SmartBody::SBController
 		void setDesiredHeading(float v) {desiredHeading = v;}
 		float getDesiredHeading() {return desiredHeading;}
 
+	protected:
+		void updateWorldOffset(MeFrameData& frame, SrQuat& rot, SrVec& pos);
+
 	private:
 		bool _valid;
 		float scootSpd;
