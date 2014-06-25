@@ -22,8 +22,10 @@
 #include <assert.h>
 #include <boost/foreach.hpp>
 #include "controllers/me_ct_new_locomotion.h"
+#include <controllers/me_ct_param_animation_utilities.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <sb/SBScene.h>
+#include <sbm/gwiz_math.h>
 
 
 std::string MeCtNewLocomotion::_type_name = "NewLocomotion";
@@ -82,20 +84,25 @@ bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
 		Dt = float(t - _lastTime);
 	_lastTime = t;
 	motionTime=fmod((float)t, S->duration());
+	SrQuat woQuat;
+	SrVec woPos;
 	if (character && _valid)
 	{
 		//if (scootSpd == 0.0f && movingSpd == 0.0f && turningSpd == 0.0f)
 			//return true;
 		//*/
-
-		float x, y, z, yaw, pitch, roll;
-		character->get_world_offset(x, y, z, yaw, pitch, roll);
-
-		yaw = desiredHeading;
-		float movingDist = movingSpd * Dt;
-		x += movingDist * sin(yaw * (float)M_PI / 180.0f);
-		z += movingDist * cos(yaw * (float)M_PI / 180.0f);
+		float x, y, z, yaw, pitch, roll;		
+ 		character->get_world_offset(x, y, z, yaw, pitch, roll); 
+ 		yaw = desiredHeading;
+ 		float movingDist = movingSpd * Dt;
+ 		x += movingDist * sin(yaw * (float)M_PI / 180.0f);
+ 		z += movingDist * cos(yaw * (float)M_PI / 180.0f);
 		character->set_world_offset(x, y, z, yaw, pitch, roll);
+
+
+		gwiz::quat_t q = gwiz::euler_t(pitch,yaw,roll);
+		woQuat = SrQuat(q.w(),q.x(),q.y(),q.z());
+		woPos = SrVec(x,y,z); 		
 		//*/
 		std::vector<SrQuat> tempQuatList(ik_scenario.ikTreeNodes.size()); 
 		if (LeftFading.prev_time == -1.0f && RightFading.prev_time ==-1.0f) // first start
@@ -121,6 +128,8 @@ bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
 		updateChannelBuffer(frame,tempQuatList, true);//Read from Buffer->Write on tempQuatList
 		//character->set_world_offset(x, y, z, yaw, pitch, roll);
 
+
+#if 1
 		updateConstraints(motionTime/(float)S->getFrameRate());
 		
 		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_REF);	
@@ -155,6 +164,7 @@ bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
 				qEval.normalize();
 				qInit.normalize();
 				tempQuatList[i] = slerp(qInit,qEval,LeftFading.blendWeight);
+				//tempQuatList[i] = qInit;
 			}	
 			//*/
 			//*/Right
@@ -170,10 +180,13 @@ bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
 				qEval.normalize();
 				qInit.normalize();
 				tempQuatList[i] = slerp(qInit,qEval,RightFading.blendWeight);
+				//tempQuatList[i] = qInit;
 			}
 			//*/
 		}
+#endif
 		updateChannelBuffer(frame,tempQuatList);//Read from tempQuatList->Write on Buffer
+		updateWorldOffset(frame, woQuat, woPos);		
 		RightFading.prev_time=LeftFading.prev_time = (float)t;
 	}
 	return true;
@@ -296,7 +309,7 @@ void MeCtNewLocomotion::controller_start()
 	RightFading.controlRestart();
 }
 
-void MeCtNewLocomotion::addPawn(SrVec& pos, std::string name)
+void MeCtNewLocomotion::addPawn(SrVec& pos, SrQuat& rot, std::string name)
 {
 	if(SmartBody::SBScene::getScene()->getPawn(name) == NULL)
 		SmartBody::SBScene::getScene()->createPawn(name);
@@ -356,6 +369,27 @@ void MeCtNewLocomotion::updateConstraints(float t)
 		LeftFading.setFadeIn(fadein);
 		//addPawn(tv, "goal");
 	}
+}
+
+void MeCtNewLocomotion::updateWorldOffset(MeFrameData& frame, SrQuat& rot, SrVec& pos )
+{	
+	SrBuffer<float>& buffer = frame.buffer();
+	JointChannelId baseChanID, baseBuffId;
+	baseChanID.x = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::XPos);
+	baseChanID.y = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::YPos);
+	baseChanID.z = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::ZPos);
+	baseChanID.q = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::Quat);
+
+	baseBuffId.x = _context->toBufferIndex(baseChanID.x);
+	baseBuffId.y = _context->toBufferIndex(baseChanID.y);
+	baseBuffId.z = _context->toBufferIndex(baseChanID.z);	
+	baseBuffId.q = _context->toBufferIndex(baseChanID.q);	
+
+	buffer[baseBuffId.x] = pos[0];
+	buffer[baseBuffId.y] = pos[1];
+	buffer[baseBuffId.z] = pos[2];	
+	for (int k = 0; k < 4; k++)
+		buffer[baseBuffId.q + k] = rot.getData(k);
 }
 
 Fading::Fading()
