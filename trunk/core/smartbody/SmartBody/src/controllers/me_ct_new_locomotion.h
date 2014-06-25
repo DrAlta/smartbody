@@ -29,11 +29,15 @@
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
 #include <controllers/me_ct_constraint.hpp>
+#define NEW_CONTROL_RUNNING 0
 
+#if NEW_CONTROL_RUNNING
+const int rplant[]={0,1,11,15};
+const int lplant[]={4,8};
+#else
 const int rplant[]={0,8,29,36};
 const int lplant[]={10,24};
-//"JtBallLf"
-//"JtBallRt"
+#endif
 
 class Fading
 {
@@ -101,11 +105,12 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		float getDesiredHeading() {return desiredHeading;}
 
 	private:
-		void addPawn(SrVec& pos,  std::string name);
+		void addPawn(SrVec& pos, SrQuat& rot,  std::string name);
 		bool _valid;
 		float scootSpd;
 		float movingSpd;
 		float turningSpd;
+		float motionSpd;
 		int currStp;
 		SkChannelArray _channels;
 		SbmCharacter* character;
