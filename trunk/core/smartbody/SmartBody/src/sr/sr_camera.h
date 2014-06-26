@@ -28,8 +28,9 @@
  */
 
 #include <sb/SBTypes.h>
-# include <sr/sr_vec.h>
-# include <sr/sr_quat.h>
+#include <sr/sr_vec.h>
+#include <sr/sr_quat.h>
+#include <sr/sr_plane.h>
 #include <string>
 #include <sb/SBPawn.h>
 
@@ -78,6 +79,9 @@ class SrCamera : public SmartBody::SBPawn
 	SBAPI void copyCamera(const SrCamera* c);
 	SBAPI void setScale(float scale);
 	SBAPI float getScale();
+
+	//SBAPI bool getConeOfSight();
+	//SBAPI void setConeOfSight(bool);
    
 	SBAPI void setEye(float x, float y, float z);
 
@@ -87,8 +91,8 @@ class SrCamera : public SmartBody::SBPawn
 	SBAPI SrVec getCenter();
 	SBAPI void setUpVector(SrVec up);
 	SBAPI SrVec getUpVector();
-   SBAPI SrVec getForwardVector();
-   SBAPI SrVec getRightVector();
+	SBAPI SrVec getForwardVector();
+	SBAPI SrVec getRightVector();
 	SBAPI void setFov(float fov);
 	SBAPI float getFov();
 	SBAPI void setNearPlane(float n);
@@ -186,7 +190,68 @@ class SrCamera : public SmartBody::SBPawn
 	float camEndTime;		
 	bool  smoothTargetCam;
 	std::string targetCam;
+
+	bool coneOfSight;	// If the camera to visualize cone of sight of character is enabled
  };
+
+
+
+ /*
+class Plane  
+{
+
+public:
+
+	SrVec normal,point;
+	float d;
+
+
+	Plane::Plane( SrVec &v1,  SrVec &v2,  SrVec &v3);
+	Plane::Plane(void);
+	Plane::~Plane();
+
+	void set3Points( SrVec &v1,  SrVec &v2,  SrVec &v3);
+	void setNormalAndPoint(SrVec &normal, SrVec &point);
+	void setCoefficients(float a, float b, float c, float d);
+	float distance(SrVec &p);
+
+	void print();
+
+};
+*/
+
+class SrFrustum {
+
+	private:
+
+		enum {
+			TOP = 0, BOTTOM, LEFT,
+			RIGHT, NEARP, FARP
+		};
+
+	public:
+
+		static	enum {OUTSIDE, INTERSECT, INSIDE};
+		//Plane	pl[6];
+		SrVec	ntl,ntr,nbl,nbr,ftl,ftr,fbl,fbr;
+		float	nearD, farD, ratio, angle,tang;
+		float	nw,nh,fw,fh;
+		float	frustum[6][4];
+
+		SrFrustum::SrFrustum();
+		SrFrustum::~SrFrustum();
+
+	//	void	setCamInternals(float angle, float ratio, float nearD, float farD);
+	//	void	setCamDef(SrVec &p, SrVec &l, SrVec &u);
+		bool	pointInFrustum(SrVec &p);
+		void	extractFrustum();
+	//	int		sphereInFrustum(SrVec &p, float raio);
+	//	int		boxInFrustum(AABox &b);
+};
+
+
+
+
 
 //================================ End of File =================================================
 

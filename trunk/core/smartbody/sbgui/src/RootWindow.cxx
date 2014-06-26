@@ -122,6 +122,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Camera/Frame All", 0, CameraFrameCB, this, 0);
 	menubar->add("&Camera/Frame Selected Object", 0, CameraFrameObjectCB, this, 0);
 	menubar->add("&Camera/Face Camera", 0, FaceCameraCB, this, 0);
+	menubar->add("&Camera/Character Cone Sight", 0, CameraCharacterShightCB, this, 0);
 	menubar->add("&Camera/Track Character", 0, TrackCharacterCB, this, 0);
 	menubar->add("&Camera/Rotate Around Selected", 0, RotateSelectedCB, this, 0);	
    menubar->add("&Camera/Modes/Default", 0, SetDefaultCamera, this, 0);	
@@ -533,7 +534,6 @@ SrSn* BaseWindow::root()
 {
 	return SmartBody::SBScene::getScene()->getRootGroup();
 }
-
 
 void BaseWindow::resetWindow()
 {
@@ -1267,6 +1267,40 @@ void BaseWindow::SetFollowRendererCamera(Fl_Widget* widget, void* data)
       SmartBody::SBScene::getScene()->SetCameraLocked(true);
    }
 #endif
+}
+
+// Callback function for Camera->Character Camera Sight to set camera viewpoint as the character viewpoint
+void BaseWindow::CameraCharacterShightCB(Fl_Widget* widget, void* data) 
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+
+	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+	if (!camera)
+		return;
+
+	// If coneOfSight is being disabled
+	if (SmartBody::SBScene::getScene()->hasConeOfSight()) {
+		SbmCharacter* character = rootWindow->getSelectedCharacter();
+		// If an object is selected, camera frames it
+		if(character)
+			CameraFrameObjectCB(widget, data);
+		// If non object is selected, camera frames all scene
+		else
+			CameraFrameCB(widget, data);
+		SmartBody::SBScene::getScene()->removeConeOfSight();
+		LOG("Camera sight: OFF");
+	} else {
+		SbmCharacter* character = rootWindow->getSelectedCharacter();
+		if(character) {
+			if(SmartBody::SBScene::getScene()->setCameraConeOfSight(character->getName())) {
+				// Renders eye beams
+				rootWindow->fltkViewer->getData()->eyeBeamMode = FltkViewer::EyeBeamMode::ModeEyeBeams;
+				LOG("Camera sight: ON"); 
+			}
+		} else {
+			LOG("No character selected. Can't enable coneOfSight. "); 
+		}
+	}
 }
 
 void BaseWindow::FaceCameraCB(Fl_Widget* widget, void* data)

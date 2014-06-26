@@ -954,6 +954,7 @@ int main( int argc, char **argv )	{
 	SmartBody::SBScene::setSystemParameter("pythonlibpath", python_lib_path);
 	initPython(python_lib_path);
 	initAutoRigPythonModule();
+	initMiscPythonModule();
 #endif
 
 	

@@ -185,6 +185,9 @@ void SBScene::initialize()
 	_isRemoteMode = false;
    _isCameraLocked = false;
 
+   _coneOfSight			= false;
+   _coneOfSight_leftEye	= NULL;
+
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 	createStringAttribute("speechRelaySoundCacheDir","../../../..",true,"",20,false,false,false,"Directory where sound files from speech relays will be placed. ");
 	createDoubleAttribute("scale",1.f,true,"",30,false,false,false,"The scale of scene (1 = meters, .01 = centimeters, etc).");
@@ -4184,6 +4187,352 @@ boost::python::object& SBScene::getPythonMainDict()
 }
 #endif
 
+
+bool SBScene::setCameraConeOfSight(const std::string& characterName) {
+	SrCamera* camera = getActiveCamera();
+	if (!camera)
+	{
+		LOG("No active camera found. Cannot create camera track.");
+		return false;
+	}
+	SbmPawn* pawn = SmartBody::SBScene::getScene()->getPawn(characterName);
+	if (!pawn)
+	{
+		LOG("Object %s was not found, cannot track.", characterName.c_str());
+		return false;
+	}
+
+	SkSkeleton* skeleton	= pawn->getSkeleton();
+
+	if(!skeleton->search_joint("eyeball_left")) {
+		LOG("Can't enable coneOfsight: 'eyeball_left' joint not found.");
+		return false;
+	}
+
+	if(!skeleton->search_joint("eyeball_right")) {
+		LOG("Can't enable coneOfsight: 'eyeball_right' joint not found.");
+		return false;
+	}
+
+	_coneOfSight			= true;
+	_coneOfSight_character	= characterName;
+
+	return true;
+}
+
+bool SBScene::hasConeOfSight() {
+	return _coneOfSight;
+}
+
+void SBScene::removeConeOfSight() {
+	_coneOfSight			= false;
+	_coneOfSight_character	= "";
+}
+
+//
+//	void SBScene::updateConeOfSight()
+//
+//	Updates the camera location parameters when coneOfSight is enabled. This
+//	renders the scene from the characters viewpoint
+//
+void SBScene::updateConeOfSight()
+{
+	//	Gets the character from which we want to look from
+	SmartBody::SBCharacter * character = getCharacter(_coneOfSight_character);
+	character->getSkeleton()->invalidate_global_matrices();
+	character->getSkeleton()->update_global_matrices();
+
+	//	Left eye world location
+	SkJoint * leftEye			= character->getSkeleton()->search_joint("eyeball_left");
+	if(!leftEye) {
+		LOG("Can't find 'eyeball_left' joint.\n");
+	}
+	const SrMat& gmat_leftEye	= leftEye->gmat();
+	SrVec leftEye_location		= SrVec(gmat_leftEye.get(3, 0), gmat_leftEye.get(3, 1), gmat_leftEye.get(3, 2));
+
+	//	Right eye world location
+	SkJoint* rightEye			= character->getSkeleton()->search_joint("eyeball_right");
+	if(!rightEye) {
+		LOG("Can't find 'eyeball_right' joint.\n");
+	}
+	const SrMat& gmat_rightEye	= rightEye->gmat();
+	SrVec rightEye_location		= SrVec(gmat_rightEye.get(3, 0), gmat_rightEye.get(3, 1), gmat_rightEye.get(3, 2));
+
+	//	Center of the eyse world coordinates
+	SrVec center_eyes_location	= (leftEye_location + rightEye_location) / 2;
+	
+	float scale					= 1.f / getScale();
+	float znear					= 0.01f * scale;
+	float zfar					= 100.0f * scale;
+	SrCamera* camera			= getActiveCamera();
+	float eyebeamLength			= 100 * character->getHeight() / 175.0f;
+	
+	SrVec localAxis_right		= rightEye->localGlobalAxis(2)*eyebeamLength;
+	SrVec eyes_look_at_right	= localAxis_right * rightEye->gmat();
+
+	SrVec localAxis_left		= leftEye->localGlobalAxis(2)*eyebeamLength;
+	SrVec eyes_look_at_left		= localAxis_left * leftEye->gmat();
+	
+	SrVec eyes_look_at			= (eyes_look_at_right + eyes_look_at_left)/2;
+
+	//	Sets FROM where the chararacter is looking
+	camera->setEye(	center_eyes_location.x,
+					center_eyes_location.y,
+					center_eyes_location.z);
+
+	//	Sets where the character looking is AT
+	camera->setCenter(	eyes_look_at.x, 
+						eyes_look_at.y,
+						eyes_look_at.z);
+	
+	//	Sets near clip plane
+	camera->setNearPlane(znear);
+	
+	//	Sets far clip plane
+	camera->setFarPlane(zfar);
+}
+
+//	
+//		std::vector<std::string> SBScene::checkVisibility(const std::string& characterName)
+//		
+//		Returns a list of visible pawns from a given chracter
+//	
+std::vector<std::string> SBScene::checkVisibility(const std::string& characterName)
+{
+	std::vector<std::string> visible_pawns;
+
+	//	Gets the character from which we want to look from
+	SmartBody::SBCharacter* character = getCharacter(characterName);
+	
+	if(!character) {
+		LOG("Chracater %s not found.", characterName.c_str());
+		return visible_pawns;
+	}
+
+	character->getSkeleton()->invalidate_global_matrices();
+	character->getSkeleton()->update_global_matrices();
+
+	//	Left eye world location
+	SkJoint* leftEye			= character->getSkeleton()->search_joint("eyeball_left");
+	if(!leftEye) {
+		LOG("Can't find 'eyeball_left' joint.\n");
+	}
+	const SrMat& gmat_leftEye	= leftEye->gmat();
+	SrVec leftEye_location		= SrVec(gmat_leftEye.get(3, 0), gmat_leftEye.get(3, 1), gmat_leftEye.get(3, 2));
+
+	//	Right eye world location
+	SkJoint* rightEye			= character->getSkeleton()->search_joint("eyeball_right");
+	if(!rightEye) {
+		LOG("Can't find 'eyeball_right' joint.\n");
+	}
+	const SrMat& gmat_rightEye	= rightEye->gmat();
+	SrVec rightEye_location		= SrVec(gmat_rightEye.get(3, 0), gmat_rightEye.get(3, 1), gmat_rightEye.get(3, 2));
+
+	//	Center of the eyse world coordinates
+	SrVec center_eyes_location	= (leftEye_location + rightEye_location) / 2;
+	
+	float scale					= 1.f / getScale();
+	float znear					= 0.01f * scale;
+	float zfar					= 100.0f * scale;
+	float eyebeamLength			= 100 * character->getHeight() / 175.0f;
+	
+	SrVec localAxis_right		= rightEye->localGlobalAxis(2)*eyebeamLength;
+	SrVec eyes_look_at_right	= localAxis_right * rightEye->gmat();
+	SrVec localAxis_left		= leftEye->localGlobalAxis(2)*eyebeamLength;
+	SrVec eyes_look_at_left		= localAxis_left * leftEye->gmat();
+	SrVec eyes_look_at			= (eyes_look_at_right + eyes_look_at_left)/2;
+
+	//	Stores current camera setup, to restore it at the end
+	SrCamera * camera			= getActiveCamera();
+	SrVec tmp_eye				= camera->getEye();
+	SrVec tmp_center			= camera->getCenter();
+	float tmp_near				= camera->getNearPlane();
+	float tmp_far				= camera->getFarPlane();
+
+	//	Sets the camera setup to simulate characters viewport
+	//	Sets FROM where the chararacter is looking
+	camera->setEye(	center_eyes_location.x,
+					center_eyes_location.y,
+					center_eyes_location.z);
+
+	//	Sets where the character looking is AT
+	camera->setCenter(	eyes_look_at.x, 
+						eyes_look_at.y,
+						eyes_look_at.z);
+	
+	//	Sets near clip plane
+	camera->setNearPlane(znear);
+	
+	//	Sets far clip plane
+	camera->setFarPlane(zfar);
+
+	SrMat mat( SrMat::NotInitialized );
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadMatrix( camera->get_perspective_mat(mat) );
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadMatrix( camera->get_view_mat(mat) );
+
+	//	Creates characters frustrm 
+	SrFrustum frustum;
+	frustum.extractFrustum();
+
+	SmartBody::SBScene * scene	= SmartBody::SBScene::getScene();
+	const std::vector<std::string>& pawns = scene->getPawnNames();
+
+	//	Iterates over all pawns, to check which ones are visible from the characters viewport
+	for (	std::vector<std::string>::const_iterator pawnIter = pawns.begin();
+			pawnIter != pawns.end();
+			pawnIter++)
+	{
+		SmartBody::SBPawn* pawn		= scene->getPawn((*pawnIter));
+
+		SrBox pawn_bb				= pawn->getBoundingBox();
+		
+		//	If bounding box visible, adds pawn to list of visible pawns
+		if(frustum.pointInFrustum(pawn_bb.a) || frustum.pointInFrustum(pawn_bb.b)) 
+			visible_pawns.push_back(pawn->getName());
+	}
+	
+	// Restores matrices and camera set up
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	
+	//	Sets FROM where the chararacter is looking
+	camera->setEye(	tmp_eye.x,
+					tmp_eye.y,
+					tmp_eye.z);
+
+	//	Sets where the character looking is AT
+	camera->setCenter(	tmp_center.x, 
+						tmp_center.y,
+						tmp_center.z);
+
+	//	Sets near clip plane
+	camera->setNearPlane(tmp_near);
+
+	//	Sets near clip plane
+	camera->setFarPlane(tmp_far);
+
+	//	Returns visible pawns
+	return visible_pawns;
+}
+
+
+//	
+//		std::vector<std::string> SBScene::checkVisibility_current_view()
+//		
+//		Returns a list of visible pawns from current view port
+//	
+std::vector<std::string> SBScene::checkVisibility_current_view() {
+	//LOG("Checking visibility...\n");
+
+	std::vector<std::string> visible_pawns;
+	
+	SrFrustum frustum;
+	frustum.extractFrustum();
+	
+	// Checks visibility 
+	SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+	const std::vector<std::string>& pawns = scene->getPawnNames();
+
+	for (	std::vector<std::string>::const_iterator pawnIter = pawns.begin();
+			pawnIter != pawns.end();
+			pawnIter++)
+	{
+		SmartBody::SBPawn* pawn		= scene->getPawn((*pawnIter));
+
+		SrBox pawn_bb				= pawn->getBoundingBox();
+			
+		if(frustum.pointInFrustum(pawn_bb.a) || frustum.pointInFrustum(pawn_bb.b)) 
+			visible_pawns.push_back(pawn->getName());
+
+		/*
+		// Usign OgreCamera
+		SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
+		if (!camera) {
+			SrBox pawn_bb				= pawn->getBoundingBox();
+			Ogre::Vector3 point_min		= Ogre::Vector3(pawn_bb.a.x, pawn_bb.a.y, pawn_bb.a.z); 
+			Ogre::Vector3 point_max		= Ogre::Vector3(pawn_bb.b.x, pawn_bb.b.y, pawn_bb.b.z); 
+
+			if(ogreCam->isVisible(point_min) || ogreCam->isVisible(point_max))
+				LOG("Pawn %s is visible", pawn->getName().c_str());
+		}
+		*/
+	}
+	
+	return visible_pawns;
+}
+
+
+/*
+void SBScene::checkVisibility() {
+	// Checks visibility 
+	const std::vector<std::string>& pawns = getPawnNames();
+	for (	std::vector<std::string>::const_iterator pawnIter = pawns.begin();
+			pawnIter != pawns.end();
+			pawnIter++)
+	{
+		
+		SmartBody::SBPawn* pawn	= getPawn((*pawnIter));
+		SrCamera * camera		= getActiveCamera();
+				
+		SrVec p, l, u;
+		float angle, aspect, znear, zfar;
+		
+		angle	= camera->getFov() * 180 / 3.14159265358979323846;
+		aspect	= camera->getAspectRatio();
+		znear	= camera->getNearPlane();
+		zfar	= camera->getFarPlane();
+
+		p		= camera->getEye();
+		l		= camera->getCenter();
+		u		= camera->getUpVector();
+
+		//LOG("Eye:    %f, %f, %f", p.x, p.y, p.z);
+		//LOG("Center: %f, %f, %f", l.x, l.y, l.z);
+		//LOG("Up: %f, %f, %f", u.x, u.y, u.z);
+		//LOG("Fovy: %f\tAspect %f\tClip %f, %f\n", angle, aspect, znear, zfar);
+
+		SrFrustum frustum;
+		frustum.setCamInternals(angle, aspect, znear, zfar);
+		frustum.setCamDef(p, l, u);
+		
+		//if(frustum.pointInFrustum(SrVec(0,0,0)) != SrFrustum::OUTSIDE)
+		//	LOG("Center visible\n");
+		//else
+		//	LOG("Center NOt visible\n");
+		
+		SrCamera* check_is_camera = dynamic_cast<SrCamera*>(pawn);
+		if (!check_is_camera) {
+			
+	
+
+			
+			SrBox pawn_bb				= pawn->getBoundingBox();
+			SrVec min_point, max_point;
+
+			min_point.x = pawn_bb.a.x;
+			min_point.y = pawn_bb.a.y;
+			min_point.z = pawn_bb.a.z;
+
+			max_point.x = pawn_bb.b.x;
+			max_point.y = pawn_bb.b.y;
+			max_point.z = pawn_bb.b.z;
+
+			LOG("InFrustum: %d\t%d\n", frustum.pointInFrustum(min_point), frustum.pointInFrustum(min_point));
+
+			if(frustum.pointInFrustum(min_point) > 0 || frustum.pointInFrustum(max_point) > 0) 
+				LOG("Pawn %s is visible", pawn->getName().c_str());
+			
+		}
+	}
+}
+*/
+
 void SBScene::setCameraTrack(const std::string& characterName, const std::string& jointName)
 {
 	SrCamera* camera = getActiveCamera();
@@ -4248,6 +4597,8 @@ bool SBScene::hasCameraTrack()
 {
 	return _cameraTracking.size() > 0;
 }
+
+
 
 void SBScene::updateTrackedCameras()
 {

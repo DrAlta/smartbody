@@ -119,7 +119,7 @@ public:
 
 	SBAPI void setHeight( float height )	{ _height = height; }
 	SBAPI float getHeight( void ) 		{ return _height; }
-	SBAPI SrBox getBoundingBox( void ) 		{ if (_skeleton) return _skeleton->getBoundingBox(); return SrBox(); }
+	SBAPI SrBox getBoundingBox( void ); 		
 
 	SBAPI virtual int prune_controller_tree();  // removes unused or overwritten controllers
 	

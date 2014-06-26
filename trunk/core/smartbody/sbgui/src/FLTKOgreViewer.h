@@ -15,7 +15,6 @@ public:
 	FLTKOgreWindow ( int x, int y, int w, int h, const char *label=0 );
 	virtual ~FLTKOgreWindow();
 	void draw();
-
 	void updateOgreCamera();
 	void render ();
 	virtual void show_viewer();
@@ -28,6 +27,8 @@ public:
 
 	void updateOptions();
 	virtual std::string rendererType() { return "ogre3D"; }
+	
+	static void checkVisibility();
 	// handle fltk mouse events ?		
 protected:
 	void initOgreWindow();

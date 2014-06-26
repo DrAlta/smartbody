@@ -26,6 +26,7 @@ class SbmPawn;
 class SbmCharacter;
 class Heightfield;
 class KinectProcessor;
+class SkJoint;
 
 namespace SmartBody {
 
@@ -203,6 +204,14 @@ class SBScene : public SBObject
 		SBAPI void removeCameraTrack();
 		SBAPI void updateTrackedCameras();
 
+		SBAPI void updateConeOfSight();
+		SBAPI bool setCameraConeOfSight(const std::string& characterName);
+		SBAPI bool hasConeOfSight();
+		SBAPI void removeConeOfSight();
+
+		SBAPI std::vector<std::string> checkVisibility(const std::string& characterName);
+		SBAPI std::vector<std::string> checkVisibility_current_view();
+
 		// deprecated
 		SBAPI SBSkeleton* createSkeleton(const std::string&char_name);
 		SBAPI SBSkeleton* getSkeleton(const std::string& name);		
@@ -318,7 +327,7 @@ class SBScene : public SBObject
 		std::map<std::string, SBScript*> _scripts;
 		float _scale;
 		bool _isRemoteMode;
-      bool _isCameraLocked;
+		bool _isCameraLocked;
 		static bool _firstTime;
 
 		SBDebuggerServer*	_debuggerServer;
@@ -327,6 +336,11 @@ class SBScene : public SBObject
 		std::map<std::string, SrCamera*> _cameras;
 		std::string _activeCamera;
 		std::vector<CameraTrack*> _cameraTracking;
+
+		bool		_coneOfSight;
+		SkJoint *	_coneOfSight_leftEye;
+		SkJoint *	_coneOfSight_rightEye;
+		std::string	_coneOfSight_character;
 
 		std::map<std::string, SmartBody::SBFaceDefinition*> _faceDefinitions;
 

@@ -149,6 +149,30 @@ void FLTKOgreWindow::updateOgreCamera()
 	//cam.zfar = ogreCam->getFarClipDistance();
 	//cam.znear = ogreCam->getNearClipDistance();
 	ogreCam->setFOVy(Ogre::Radian(cam.getFov()));
+
+//
+//	// OLD VERSION for visibility test: Requires OgreCam->isVisible, new version is implemented in scene->checkVisibility();
+//
+//	// Checks visibility 
+//	const std::vector<std::string>& pawns = scene->getPawnNames();
+//	for (	std::vector<std::string>::const_iterator pawnIter = pawns.begin();
+//			pawnIter != pawns.end();
+//			pawnIter++)
+//	{
+//		SmartBody::SBPawn* pawn		= scene->getPawn((*pawnIter));
+//
+//		SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
+//		if (!camera) {
+//			SrBox pawn_bb				= pawn->getBoundingBox();
+//			Ogre::Vector3 point_min		= Ogre::Vector3(pawn_bb.a.x, pawn_bb.a.y, pawn_bb.a.z); 
+//			Ogre::Vector3 point_max		= Ogre::Vector3(pawn_bb.b.x, pawn_bb.b.y, pawn_bb.b.z); 
+//
+//			if(ogreCam->isVisible(point_min) || ogreCam->isVisible(point_max))
+//				LOG("Pawn %s is visible", pawn->getName().c_str());
+//		}
+//
+//	}
+
 }
 
 
@@ -294,6 +318,8 @@ void FLTKOgreWindow::menu_cmd( MenuCmd c, const char* label )
 		{
 			SbmDeformableMeshGPU::disableRendering = false;
 			ogreInterface->setCharacterVisibility(false);
+
+			std::cout << "Test\n";
 		}
 		FltkViewer::menu_cmd(c,label);
 	}
