@@ -345,7 +345,8 @@ void SbmPawn::reset_all_channels()
 	}
 }
 
-void SbmPawn::init_world_offset_channels() {
+void SbmPawn::init_world_offset_channels()
+{
 	if( WORLD_OFFSET_CHANNELS_P.size()==0 ) {
 		std::string world_offset_joint_name = WORLD_OFFSET_JOINT_NAME;
 		WORLD_OFFSET_CHANNELS_P.add( world_offset_joint_name, SkChannel::XPos );
@@ -360,7 +361,8 @@ bool SbmPawn::is_initialized() {
 	return _skeleton != NULL;
 }
 
-int SbmPawn::prune_controller_tree() {
+int SbmPawn::prune_controller_tree()
+{
 	// Unimplemented...
 	//  TODO: walk the controller tree for excessive world offset raw writers
 	return CMD_SUCCESS;
@@ -368,20 +370,31 @@ int SbmPawn::prune_controller_tree() {
 
 SrBox SbmPawn::getBoundingBox(void)
 { 
-/*
-	// Is this what I want to check for visibility??
-	SBGeomObject * geo	= getGeomObject();
-	SrVec geo_size		= geo->getGeomSize();
-	LOG("geo_size: %f, %f, %f", geo_size.x, geo_size.y, geo_size.z);
-*/
-
-	if (_skeleton) 
-		return _skeleton->getBoundingBox(); 
-	return SrBox();
+	SBGeomObject* geo = getGeomObject();
+	if (geo)
+	{
+		SBGeomNullObject* nullObject = dynamic_cast<SBGeomNullObject*>(geo);
+		if (nullObject)
+		{
+			if (_skeleton) 
+				return _skeleton->getBoundingBox(); 
+			else
+				return SrBox();
+		}
+		SrVec geo_size		= geo->getGeomSize();
+		SrBox box = geo->getBoundingBox();
+		return box;
+	}
+	else
+	{
+		if (_skeleton) 
+			return _skeleton->getBoundingBox(); 
+	}
 }
 
 //  Destructor
-SbmPawn::~SbmPawn()	{
+SbmPawn::~SbmPawn()
+{
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 

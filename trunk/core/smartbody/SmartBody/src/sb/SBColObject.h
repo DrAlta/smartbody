@@ -77,6 +77,8 @@ public:
 	virtual SrVec       getGeomSize() { return SrVec(); }
 	virtual void	    setGeomSize(SrVec& size) { return; }
 
+	virtual SrBox getBoundingBox() { return SrBox(); }
+
 	static SBGeomObject* createGeometry(const std::string& type, SrVec extends, SrVec from = SrVec(), SrVec to = SrVec() );
 };
 
@@ -91,6 +93,7 @@ public:
 	virtual std::string  geomType() { return "null"; }
 	virtual SrVec        getGeomSize() { return SrVec(1,1,1); }
 	virtual void         setGeomSize(SrVec& size) {}
+	virtual SrBox getBoundingBox();
 };
 
 class SBGeomSphere : public SBGeomObject
@@ -108,6 +111,7 @@ public:
 	virtual void         setGeomSize(SrVec& size) { radius = size[0]; }
 	virtual float getRadius();
 	virtual void setRadius(float val);
+	virtual SrBox getBoundingBox();
 
 };
 
@@ -125,6 +129,8 @@ public:
 	virtual std::string  geomType() { return "box"; }
 	virtual SrVec        getGeomSize() { return extent; }
 	virtual void         setGeomSize(SrVec& size) { extent = size; }
+	virtual SrBox getBoundingBox();
+
 };
 
 // assuming the length is along local y-axis
@@ -143,6 +149,7 @@ public:
 	virtual std::string  geomType() { return "capsule"; }
 	virtual SrVec        getGeomSize() { return SrVec(extent,radius,extent); }
 	virtual void         setGeomSize(SrVec& size);
+	virtual SrBox getBoundingBox();
 };
 
 // this is a adapting interface to integrate SrModel tri-mesh into physical simulation framework
@@ -160,6 +167,7 @@ public:
 	virtual std::string  geomType() { return "mesh"; }
 	virtual SrVec        getGeomSize() { return SrVec(1,1,1); }
 	virtual void         setGeomSize(SrVec& size) { }
+	virtual SrBox getBoundingBox() { return SrBox(); }
 };
 
 typedef std::vector<SBGeomObject*> VecOfSbmColObj;

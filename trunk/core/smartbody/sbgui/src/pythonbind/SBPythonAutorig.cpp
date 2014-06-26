@@ -66,8 +66,11 @@ std::vector<std::string> checkVisibility(const std::string& character)
 	
 	if(DEBUG_CHECK_VISIBILITY) {
 		LOG ("Visible pawns from %s: ", character.c_str());
-		for( std::vector<std::string>::const_iterator i = visible.begin(); i != visible.end(); ++i)  {
-			LOG ("%s, ", i);
+		for( std::vector<std::string>::const_iterator i = visible.begin(); 
+			 i != visible.end(); 
+			 i++)
+		{
+			LOG ("%s, ", (*i).c_str());
 		}
 	}
 

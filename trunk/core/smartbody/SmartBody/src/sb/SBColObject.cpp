@@ -179,6 +179,14 @@ bool SBGeomNullObject::estimateHandPosture( const SrQuat& naturalRot, SrVec& out
 	outHandPos = getCenter(); outHandRot = naturalRot; return false;
 }
 
+SrBox SBGeomNullObject::getBoundingBox()
+{
+	SrVec point = getCombineTransform().tran;
+	SrBox box(point);
+
+	return box;
+}
+
 /************************************************************************/
 /* Sphere collider                                                      */
 /************************************************************************/
@@ -234,6 +242,18 @@ SBGeomSphere::SBGeomSphere( float r )
 {
 	radius = r;
 }
+
+SrBox SBGeomSphere::getBoundingBox()
+{
+	SrBox box;
+
+	float max = sqrt((radius * radius) + (radius * radius));
+	SrVec center = getCenter();
+	box.set(SrVec(center.x - max, center.y - max, center.z - max), SrVec(center.x + max, center.y + max, center.z + max));
+
+	return box;
+}
+
 /************************************************************************/
 /* Box collider                                                         */
 /************************************************************************/
@@ -312,6 +332,15 @@ bool SBGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos
 	outHandPos = getCenter() + SrVec(0,objSize+offsetDist,0)*outHandRot;
 	
 	return true;
+}
+
+SrBox SBGeomBox::getBoundingBox()
+{
+	SrBox box;
+
+	box.set(SrVec(), SrVec());
+
+	return box;
 }
 
 /************************************************************************/
@@ -490,6 +519,15 @@ bool SBGeomCapsule::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHan
 	outHandRot = rot*naturalRot;//naturalRot*rot;
 	outHandPos = getCenter() + SrVec(0,radius+offsetDist,0)*outHandRot;
 	return true;
+}
+
+SrBox SBGeomCapsule::getBoundingBox()
+{
+	SrBox box;
+
+	box.set(SrVec(), SrVec());
+
+	return box;
 }
 
 
