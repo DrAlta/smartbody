@@ -127,7 +127,6 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		//std::vector<SrCamera*> cameraList;
 		//std::map<std::string,SrCamera*> cameraMap;
 
-
 		void updateCameraList();
 		void updateObjectList(std::string deleteObjectName = "");
 
@@ -171,6 +170,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void CameraResetCB(Fl_Widget* widget, void* data);
 		static void CameraFrameCB(Fl_Widget* widget, void* data);
 		static void CameraFrameObjectCB(Fl_Widget* widget, void* data);
+		static void CameraCharacterShightCB(Fl_Widget* widget, void* data);
 		static void FaceCameraCB(Fl_Widget* widget, void* data);
 		static void RotateSelectedCB(Fl_Widget* widget, void* data);
       static void SetDefaultCamera(Fl_Widget* widget, void* data);

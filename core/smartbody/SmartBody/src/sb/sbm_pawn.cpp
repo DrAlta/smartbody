@@ -366,6 +366,20 @@ int SbmPawn::prune_controller_tree() {
 	return CMD_SUCCESS;
 }
 
+SrBox SbmPawn::getBoundingBox(void)
+{ 
+/*
+	// Is this what I want to check for visibility??
+	SBGeomObject * geo	= getGeomObject();
+	SrVec geo_size		= geo->getGeomSize();
+	LOG("geo_size: %f, %f, %f", geo_size.x, geo_size.y, geo_size.z);
+*/
+
+	if (_skeleton) 
+		return _skeleton->getBoundingBox(); 
+	return SrBox();
+}
+
 //  Destructor
 SbmPawn::~SbmPawn()	{
 

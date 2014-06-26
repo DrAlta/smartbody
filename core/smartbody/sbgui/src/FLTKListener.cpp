@@ -511,6 +511,19 @@ void FLTKListener::OnSimulationUpdate()
 		scene->getViewer()->render();
 	if (scene->getOgreViewer())
 		scene->getOgreViewer()->render();
+
+	SrCamera * camera = scene->getActiveCamera();
+
+	if(scene->hasConeOfSight() ) {
+//		LOG("coneOfSight is enabled");
+//		camera->updateConeOfSight();
+
+		//SrCamera* camera = scene->getActiveCamera();
+		
+
+		scene->updateConeOfSight();
+
+	}
 }
 
 void FLTKListener::OnLogMessage( const std::string& message )

@@ -3,4 +3,5 @@
 
 #include <sb/SBTypes.h>
 void initAutoRigPythonModule();
+void initMiscPythonModule();
 #endif
