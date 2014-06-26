@@ -4391,8 +4391,16 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 		SrBox pawn_bb				= pawn->getBoundingBox();
 		
 		//	If bounding box visible, adds pawn to list of visible pawns
-		if(frustum.pointInFrustum(pawn_bb.a) || frustum.pointInFrustum(pawn_bb.b)) 
-			visible_pawns.push_back(pawn->getName());
+		if (frustum.pointInFrustum(pawn_bb.a) || 
+			frustum.pointInFrustum(pawn_bb.b) ||
+			frustum.pointInFrustum(pawn_bb.getCenter()) ||
+			frustum.pointInFrustum(SrVec(pawn_bb.a.x, pawn_bb.a.y, pawn_bb.b.z)) || 
+			frustum.pointInFrustum(SrVec(pawn_bb.a.x, pawn_bb.b.y, pawn_bb.b.z)) ||
+			frustum.pointInFrustum(SrVec(pawn_bb.b.x, pawn_bb.b.y, pawn_bb.a.z)) || 
+			frustum.pointInFrustum(SrVec(pawn_bb.b.x, pawn_bb.a.y, pawn_bb.a.z)) || 
+			frustum.pointInFrustum(SrVec(pawn_bb.a.x, pawn_bb.b.y, pawn_bb.a.z)) ||
+			frustum.pointInFrustum(SrVec(pawn_bb.b.x, pawn_bb.a.y, pawn_bb.b.z))) 
+			   visible_pawns.push_back(pawn->getName());
 	}
 	
 	// Restores matrices and camera set up
