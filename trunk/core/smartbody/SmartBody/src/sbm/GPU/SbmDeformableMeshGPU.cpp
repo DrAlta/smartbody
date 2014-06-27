@@ -559,7 +559,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glAlphaFunc ( GL_GREATER, 0.0f ) ;
+	//glAlphaFunc ( GL_GREATER, 0.0f ) ;
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_COLOR_MATERIAL);
 	glUseProgram(program);		
@@ -726,28 +726,33 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 		}
 
 		subMeshTris[i]->VBO()->BindBuffer();
-		if (mesh->isHair)
+		//if (mesh->isHair)
+		if (mesh->material.useAlphaBlend)
 		{
-			glAlphaFunc ( GL_GEQUAL, 1.f ) ; // discard all fragments with alpha value smaller than 1
-			glDisable(GL_CULL_FACE);
-			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
-
-			glAlphaFunc ( GL_LESS, 1.f ) ; // discard all fragments with alpha value smaller than 1
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_FRONT);
-			glDepthMask(GL_FALSE);
-			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
-
-			glCullFace(GL_BACK);
-			//glDepthMask(GL_TRUE);
-			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
-
-			glDepthMask(GL_TRUE);
-			glAlphaFunc( GL_GREATER, 0.05f );			
-			glEnable(GL_DEPTH_TEST);
+ 			glEnable(GL_BLEND);
+			glEnable ( GL_ALPHA_TEST );
+// 			glAlphaFunc ( GL_GEQUAL, 1.f ) ; // discard all fragments with alpha value smaller than 1
+// 			glDisable(GL_CULL_FACE);
+ 			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
+// 
+// 			glAlphaFunc ( GL_LESS, 1.f ) ; // discard all fragments with alpha value smaller than 1
+// 			glEnable(GL_CULL_FACE);
+// 			glCullFace(GL_FRONT);
+// 			glDepthMask(GL_FALSE);
+// 			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
+// 
+// 			glCullFace(GL_BACK);
+// 			//glDepthMask(GL_TRUE);
+// 			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
+// 
+// 			glDepthMask(GL_TRUE);
+// 			glAlphaFunc( GL_GREATER, 0.05f );			
+// 			glEnable(GL_DEPTH_TEST);
 		}
 		else
 		{
+			glDisable(GL_BLEND);
+			glDisable ( GL_ALPHA_TEST );
 			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
 		}		
 		subMeshTris[i]->VBO()->UnbindBuffer();

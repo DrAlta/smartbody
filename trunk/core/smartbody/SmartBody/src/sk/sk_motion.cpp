@@ -1059,7 +1059,7 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 	// smooth the first and last s frames
 	float *first_p = this->posture( 0 );
 	float *last_p  = this->posture( num_f - 1 );	
-	LOG("num_f = %d, intervalFrames = %d",num_f, intervalFrames);
+	//LOG("num_f = %d, intervalFrames = %d",num_f, intervalFrames);
 	for (int i = 0; i< num_f; i++)
 	{
 		if (i > intervalFrames && i < num_f - intervalFrames)

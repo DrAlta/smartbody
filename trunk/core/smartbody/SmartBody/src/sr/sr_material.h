@@ -42,6 +42,8 @@ class SBAPI SrMaterial
     SrColor specular;  //!< default in float coords: 0.0, 0.0, 0.0, 1.0
     SrColor emission;  //!< default in float coords: 0.0, 0.0, 0.0, 1.0
     srbyte  shininess; //!< default: 0, can be in : [0,128]	
+	float   transparency;	
+	bool    useAlphaBlend;
    public :
     
     /*! Initializes with the default values. */
