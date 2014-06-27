@@ -55,7 +55,7 @@ zebra2Map = scene.getJointMapManager().getJointMap("zebra2")
 bradSkeleton = scene.getSkeleton("ChrBrad.sk")
 bradSkeleton.rescale(6)
 zebra2Map.applySkeleton(bradSkeleton)
-zebra2Map.applyMotionRecurse("ChrBrad")
+zebra2Map.applyMotionRecurse("ChrMaarten")
 
 scene.run('ogre-sinbad-map.py')
 sinbadSkName = 'Sinbad.skeleton.xml'
