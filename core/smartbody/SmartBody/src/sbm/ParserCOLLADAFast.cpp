@@ -2533,10 +2533,38 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 							}
 							alpha = 1.f - (colorVec[0]+colorVec[1]+colorVec[2])/3;
 							//alpha = 1.f - colorVec.norm();		
-						}
-														
-					}
+							if (alpha >= 1.f)
+							{
+								M.top().useAlphaBlend = false;
+							}
+						}														
+					}				
 				}
+				else // by default it should be RGB_ZERO ?
+				{
+					rapidxml::xml_node<>* colorNode = ParserCOLLADAFast::getNode("color", transparentNode);		
+					std::string color;
+					if (colorNode)
+					{
+						color = colorNode->value();
+						std::vector<std::string> tokens;
+						vhcl::Tokenize(color, tokens, " \n");
+						SrVec colorVec;
+						if (tokens.size() >= 3)
+						{
+							for (int i=0;i<3;i++)
+							{
+								colorVec[i] = (float)atof(tokens[i].c_str());
+							}
+						}
+						alpha = 1.f - (colorVec[0]+colorVec[1]+colorVec[2])/3;
+						//alpha = 1.f - colorVec.norm();		
+						if (alpha >= 1.f)
+						{
+							M.top().useAlphaBlend = false;
+						}
+					}														
+				}				
 				//float alpha = float(1.0 - xml_utils::xml_translate_float(colorNode->getTextContent()));				
 				M.top().diffuse.a = (srbyte) ( alpha*255.0f );
 			}

@@ -28,7 +28,9 @@ SrMaterial::SrMaterial () :
             specular (   0,   0,   0, 255 ),
             emission (   0,   0,   0, 255 )			
  {
-   shininess = 0;         
+   shininess = 0;      
+   transparency = 1.f;
+   useAlphaBlend = true;   
  }
 
 void SrMaterial::init () 
@@ -38,6 +40,8 @@ void SrMaterial::init ()
    specular.set (   0,   0,   0, 255 );
    emission.set (   0,   0,   0, 255 );
    shininess = 0;       
+   transparency = 1.f;
+   useAlphaBlend = true;
  }
 
 bool operator == ( const SrMaterial& m1, const SrMaterial& m2 )
@@ -46,7 +50,8 @@ bool operator == ( const SrMaterial& m1, const SrMaterial& m2 )
             m1.diffuse==m2.diffuse &&
             m1.specular==m2.specular &&
             m1.emission==m2.emission &&
-            m1.shininess==m2.shininess)? true:false;
+            m1.shininess==m2.shininess &&
+			m1.transparency == m2.transparency)? true:false;
  }
 
 bool operator != ( const SrMaterial& m1, const SrMaterial& m2 )
@@ -55,7 +60,8 @@ bool operator != ( const SrMaterial& m1, const SrMaterial& m2 )
             m1.diffuse==m2.diffuse &&
             m1.specular==m2.specular &&
             m1.emission==m2.emission &&
-            m1.shininess==m2.shininess)? false:true;
+            m1.shininess==m2.shininess && 
+			m1.transparency == m2.transparency)? false:true;
  }
 
 SrOutput& operator<< ( SrOutput& o, const SrMaterial& m )

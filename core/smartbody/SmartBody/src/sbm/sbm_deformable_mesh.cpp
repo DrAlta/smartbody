@@ -691,6 +691,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
     
     int group = 0;
 	std::vector<SbmSubMesh*> hairMeshList;
+	std::vector<SbmSubMesh*> alphaMeshList;
 	std::map<int,std::vector<int> >::iterator vi;
 	for (vi  = meshSubsetMap.begin();
 		 vi != meshSubsetMap.end();
@@ -722,16 +723,24 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		boost::algorithm::to_lower(lowMatName);
 		//if (lowMatName.find("hair") != std::string::npos || lowMatName.find("lash") != std::string::npos 
 		//	|| lowMatName.find("shadow") != std::string::npos || lowMatName.find("shell") != std::string::npos)
+		
 		if (lowMatName.find("hair") != std::string::npos)
 		{
 			// is a hair mesh, based on a rough name searching
 			mesh->isHair = true;
+			//LOG("hair mesh = %s",mesh->matName.c_str());
 			hairMeshList.push_back(mesh);
 		}
-		else if (tex && tex->isTransparent())
+// 		else if (tex && tex->isTransparent())
+// 		{
+// 			mesh->isHair = true;
+// 			LOG("transparent mesh = %s",mesh->matName.c_str());
+// 			hairMeshList.push_back(mesh);
+// 		}
+		else if (mesh->material.useAlphaBlend)
 		{
-			mesh->isHair = true;
-			hairMeshList.push_back(mesh);
+			//LOG("alpha mesh = %s",mesh->matName.c_str());
+			alphaMeshList.push_back(mesh);
 		}
 		else
 		{
@@ -740,8 +749,9 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 #else
 		subMeshList.push_back(mesh);
 #endif			
-	}	
+	}		
 	subMeshList.insert(subMeshList.end(),hairMeshList.begin(),hairMeshList.end());
+	subMeshList.insert(subMeshList.end(),alphaMeshList.begin(),alphaMeshList.end());
 	initStaticVertexBuffer = true;
 	if (buildSkinnedBuffer)
 		initSkinnedVertexBuffer = true;

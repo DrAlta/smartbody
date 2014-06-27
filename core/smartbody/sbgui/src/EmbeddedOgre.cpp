@@ -1144,11 +1144,11 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	}
 
 // 	int nextBindIdx = bind->getNextIndex();
-
+	
 	for (unsigned int i=0;i<mesh->subMeshList.size();i++)
 	{
 		SbmSubMesh* subModel = mesh->subMeshList[i];		
-		Ogre::SubMesh* ogSubMesh = ogreMesh->createSubMesh();		
+		Ogre::SubMesh* ogSubMesh = ogreMesh->createSubMesh();	
 		ogSubMesh->useSharedVertices = true;		
 		// create index buffer
 		unsigned int* tempUIntArray;
@@ -1173,7 +1173,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		// create material for the mesh
  		addTexture(subModel->texName);
 
-		std::string materialName = meshName + boost::lexical_cast<std::string>(i) + "Mat";
+		std::string materialName = subModel->matName + boost::lexical_cast<std::string>(i); //meshName + boost::lexical_cast<std::string>(i) + "Mat";
 		Ogre::MaterialPtr ogreMat = Ogre::MaterialManager::getSingleton().create(materialName, "General");
 		Ogre::Pass* pass = ogreMat->getTechnique(0)->getPass(0);
  		Ogre::TexturePtr texPtr = Ogre::TextureManager::getSingleton().getByName(subModel->texName);
@@ -1198,7 +1198,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 			pass->setLightingEnabled(false);
 		}
 		else
-		{
+		{			
 			pass->setDiffuse(color[0],color[1],color[2],color[3]);
 			mat.specular.get(color);				
 			//LOG("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
@@ -1210,18 +1210,30 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		if (!hasColorBuf || hasTexture)
 		{
 			// disable texture alpha blending if we are using vertex color
-			pass->setAlphaRejectSettings(CMPF_GREATER, 0, true);		
-			pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
-			pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);	
+			if (mat.useAlphaBlend)
+			{
+				//pass->setAlphaRejectSettings(CMPF_GREATER, 0, true);	
+				//LOG("material %s has alpha blending", materialName.c_str());
+				pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
+				pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);
+				pass->setTransparentSortingEnabled(true);
+				pass->setTransparentSortingForced(true);
+				//pass->setDepthWriteEnabled(false);				
+				//pass->setDepthCheckEnabled(false);
+				//pass->setSceneBlending(SBF_ONE, SBF_ONE_MINUS_SOURCE_ALPHA);
+				
+			}			
 		}
-		
+		pass->setHashFunction(Pass::MIN_GPU_PROGRAM_CHANGE);		
 		//pass->setSceneBlending(Ogre::SBF_ONE, Ogre::SBF_ONE_MINUS_SOURCE_ALPHA);;
 		//pass->setShadingMode(SO_PHONG);
 		//pass->setShadowCasterVertexProgram("Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs");
 		//pass->setVertexProgram("Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs");		
 		//pass->setVertexProgram("Ogre/HardwareSkinningFourWeightsGLSL");
 		//pass->setShadowCasterVertexProgram("Ogre/HardwareSkinningFourWeightsShadowCasterGLSL");
- 		ogSubMesh->setMaterialName(materialName);				
+		//LOG("subMesh mat name = %s",materialName.c_str());
+ 		ogSubMesh->setMaterialName(materialName);	
+		ogSubMesh->generateExtremes(8);
 		//ogSubMesh->setMaterialName("smartbody");
 	}
 	ogreMesh->_setBounds(AxisAlignedBox(bbMin[0],bbMin[1],bbMin[2],bbMax[0],bbMax[1],bbMax[2]));

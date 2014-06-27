@@ -532,9 +532,11 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( param_animation_ct );
 	ct_tree_p->add_controller( motiongraph_ct );
 	ct_tree_p->add_controller( basic_locomotion_ct );
-	//ct_tree_p->add_controller( new_locomotion_ct );
+#if USE_NEW_LOCOMOTION
+	ct_tree_p->add_controller( new_locomotion_ct );
+#endif
 	ct_tree_p->add_controller( motion_sched_p );
-	ct_tree_p->add_controller( postprocess_ct );	
+	//ct_tree_p->add_controller( postprocess_ct );	
 	ct_tree_p->add_controller( reach_sched_p );	
 	ct_tree_p->add_controller( grab_sched_p );
 	ct_tree_p->add_controller( breathing_p );
