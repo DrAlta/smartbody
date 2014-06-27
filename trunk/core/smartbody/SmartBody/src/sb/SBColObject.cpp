@@ -247,9 +247,9 @@ SrBox SBGeomSphere::getBoundingBox()
 {
 	SrBox box;
 
-	float max = sqrt((radius * radius) + (radius * radius));
+	
 	SrVec center = getCenter();
-	box.set(SrVec(center.x - max, center.y - max, center.z - max), SrVec(center.x + max, center.y + max, center.z + max));
+	box.set(SrVec(center.x - radius, center.y - radius, center.z - radius), SrVec(center.x + radius, center.y + radius, center.z + radius));
 
 	return box;
 }
