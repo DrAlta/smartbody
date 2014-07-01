@@ -50,20 +50,19 @@
 
 # include <sr/sr_gl.h>
 
-
+#include <boost/algorithm/string.hpp>
 
 //=============================== render_model ====================================
 
+// Renders static mesh without Ogre3D
 void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool showSkinWeight  )
 {
 	DeformableMesh* mesh = shape->getDeformableMesh();
     if (!mesh)
     {
-        //LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
+        LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
         return; // no deformable mesh
     }
-
-	//LOG("Render deformable mesh");
 
 	if (shape->isStaticMesh())
 	{
@@ -100,7 +99,6 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 
 	if (showSkinWeight)
 	{
-		//LOG("drawSkinColor");
 		glDepthMask(GL_FALSE);
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->skinColorBuf[0]);		
@@ -121,17 +119,16 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 		//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
 		glEnable(GL_LIGHTING);
 	}
-
-	
+		
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
-	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);      
-	
-	
+	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);   
+			
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{	
 		SbmSubMesh* subMesh = subMeshList[i];
 		glMaterial(subMesh->material);		
-		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,subMesh->texName.c_str());		
+		
+		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());		
 		//LOG("submesh num of tris = %d", subMesh->numTri);
 		if (tex && !showSkinWeight)
 		{
@@ -139,7 +136,13 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
 			if (activeTexture != GL_TEXTURE0)
 				glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D,tex->getID());
+			glBindTexture(GL_TEXTURE_2D, tex->getID());
+
+			//glColor4f(0.0f, 0.0f, 0.0f, 1.0);
+			glEnable(GL_TEXTURE_2D);	
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}
 		
 #if GLES_RENDER
@@ -163,7 +166,6 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 
 void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
  {	
-   //LOG("Render Model");
    SrModel& model = ((SrSnModel*)shape)->shape();
 
    //SR_TRACE1 ( "Render Model faces="<<model.F.size() );
@@ -267,8 +269,11 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
            break;
     }    
 
+   LOG("(model.mtlnames.size() == 0 #1\n");
+
    if (model.mtlnames.size() == 0)
    {
+	   LOG("(model.mtlnames.size() == 0\n");
 	   glBegin ( GL_TRIANGLES ); // some cards do require begin/end for each triangle!
 	   for (int k=0; k<F.size(); k++ )
 	   {	
@@ -283,6 +288,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    }
    else
    {	   
+	   LOG("(model.mtlnames.size() != 0\n");
 	   for (int i=0;i<model.mtlnames.size();i++)
 	   {
 		   std::string mtlName = model.mtlnames[i];
@@ -296,6 +302,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 		   SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,texName.c_str());
 		   if ( fsize > Fn.size() || flat ) // no normal
 		   {
+			   LOG("No normal\n");
 			   glBegin ( GL_TRIANGLES ); // some cards do require begin/end for each triangle!
 			   for (unsigned int k=0; k<mtlFaces.size(); k++ )
 			   {  
@@ -310,6 +317,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 		   }
 		   else if ( fsize > Ft.size() || !tex ) // no texture
 		   {
+			   LOG("No texture\n");
 			   glBegin ( GL_TRIANGLES );
 			   for (unsigned int k=0; k<mtlFaces.size(); k++ )
 			   {	
@@ -323,7 +331,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 		   else // has normal and texture
 		   {   // to-do : figure out why texture does not work in the fixed-pipeline ?	  
 			   //glDisable(GL_LIGHTING);	
-			   
+			   LOG("Normal and texture\n");
 			   glEnable ( GL_ALPHA_TEST );
 			   glEnable (GL_BLEND);
 			   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

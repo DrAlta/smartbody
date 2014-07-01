@@ -178,6 +178,7 @@ void FLTKOgreWindow::updateOgreCamera()
 
 void FLTKOgreWindow::fltkRender()
 {
+
 	//FltkViewer::draw();
     //return;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -335,6 +336,7 @@ void FLTKOgreWindow::resetViewer()
 
 void FLTKOgreWindow::fltkRender2()
 {
+	
 	if ( !visible() ) return;
 
 	SrCamera* cam = SmartBody::SBScene::getScene()->getActiveCamera();
@@ -463,6 +465,7 @@ void FLTKOgreWindow::fltkRender2()
 	glDisable(GL_LIGHTING);
 	glDisable(GL_BLEND);
 
+	
 	drawPawns();
 	// draw the grid
 	//   if (gridList == -1)
@@ -481,7 +484,7 @@ void FLTKOgreWindow::fltkRender2()
 
 	drawMotionVectorFlow();
 	drawPlotMotion();
-
+	
 
 
 	//drawKinematicFootprints(0);
@@ -556,6 +559,7 @@ void FLTKOgreWindow::fltkRender2()
 	SBGUIManager::singleton().update();
 
 	glPopAttrib();
+
 }
 
 void FLTKOgreWindow::notify(SmartBody::SBSubject* subject)
