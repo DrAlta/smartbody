@@ -23,6 +23,9 @@
 #include <sr/sr_model.h>
 #include <sb/SBTypes.h>
 
+#include <boost/algorithm/string.hpp>
+#include <iostream>
+
 #if !defined (__ANDROID__) && !defined(SB_IPHONE)
 #include <sbm/GPU/SbmTexture.h>
 #endif
@@ -73,16 +76,22 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 	std::string imageFile = file;
 	in.init( fopen(file,"r"));
 	int i = 0;
+	
 	while ( !in.valid() && i < paths.size())
 	{
 		s = paths[i++];
 		s << file;
 		imageFile = s;
-		in.init ( fopen(s,"r") );
+		in.init (fopen(s,"r") );
 	}
-	if (!in.valid()) return;		
+	if (!in.valid()) {
+		std::cerr << "[load_texture] ERROR: Invalid inpath for texture: " << s << "\n";
+		return;		
+	}
+
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
-	texManager.loadTexture(type,file,s);	
+	texManager.loadTexture(type, file, s);
+	
 #endif
 }
 
@@ -93,60 +102,83 @@ static void read_materials ( SrArray<SrMaterial>& M,
                              const SrString& file,
                              const SrStringArray& paths )
  {
-   SrString s;
-   SrInput in;
+	SrString s;
+	SrInput in;
+	int i=0;
 
-   in.lowercase_tokens(false);
-   in.init ( fopen(file,"rt") );
-   int i=0;
-   while ( !in.valid() && i<paths.size() )
-    { s = paths[i++];
-      s << file;
-      in.init ( fopen(s,"rt") );
-    }
-   if ( !in.valid() ) return; // could not get materials
+	in.lowercase_tokens(false);
+	in.init ( fopen(file,"rt") );
+	
+	while ( !in.valid() && i < paths.size() )
+    {
+		s = paths[i++];
+		s << file;
+		in.init ( fopen(s,"rt") );
 
-   while ( !in.finished() )
-    { in.get_token();
-      if ( in.last_token()=="newmtl" )
-       { 
-	     SrMaterial material;
-		 material.init();
-		 //M.push().init();
-		 M.push(material);        
-         //SR_TRACE1 ( "new material: "<<in.last_token() );
-		 SrString matName;
-		 in.getline(matName);
-		 matName.ltrim();
-		 mnames.push ( matName );
-       }	  
-      else if ( in.last_token()=="Ka" )
-       { M.top().ambient = read_color ( in );
-       }
-      else if ( in.last_token()=="Kd" )
-       { M.top().diffuse = read_color ( in );
-       }
-      else if ( in.last_token()=="Ks" )
-       { M.top().specular = read_color ( in );
-       }
-      else if ( in.last_token()=="Ke" ) // not sure if this one exists
-       { M.top().emission = read_color ( in );
-       }
-      else if ( in.last_token()=="Ns" )
-       { in >> i;
-         M.top().shininess = i;
-       }
-	  else if ( in.last_token()=="map_Kd") // texture map
-	  {
-		  SrString mapKaName, dotstr, ext;			  
-		  in.get_token(mapKaName);		  		  
-		  in.get_token(dotstr);	
-		  in.get_token(ext);
-		  mapKaName.append(dotstr);
-		  mapKaName.append(ext);
-		  std::string texFile = (const char*) mapKaName;
-		  std::string mtlName = mnames.top();
-		  mtlTexMap[mtlName] = texFile;		  
+	}
+	
+	if ( !in.valid() )
+	{
+		std::cerr << "ERROR: Could not read materials\n";
+		return; // could not get materials
+	}
+
+	while ( !in.finished() )
+	{
+		in.get_token();
+		if ( in.last_token()=="newmtl" )
+		{ 
+			SrMaterial material;
+			material.init();
+			//M.push().init();
+			M.push(material);        
+			//SR_TRACE1 ( "new material: "<<in.last_token() );
+			SrString matName;
+			in.getline(matName);
+			matName.ltrim();
+			mnames.push ( matName );
+		}	  
+		else if ( in.last_token()=="Ka" )
+		{
+			M.top().ambient = read_color ( in );
+		}
+		else if ( in.last_token()=="Kd" )
+		{
+			M.top().diffuse = read_color ( in );
+		}
+		else if ( in.last_token()=="Ks" )
+		{
+			M.top().specular = read_color ( in );
+		}
+		else if ( in.last_token()=="Ke" ) // not sure if this one exists
+		{
+			M.top().emission = read_color ( in );
+		}
+		else if ( in.last_token()=="Ns" )
+		{
+			in >> i;
+			M.top().shininess = i;
+		}
+		else if ( in.last_token()=="map_Kd") // texture map
+		{
+		 
+		/*
+		SrString mapKaName, dotstr, ext;			  
+		in.get_token(mapKaName);		  		  
+		in.get_token(dotstr);	
+		in.get_token(ext);
+		mapKaName.append(dotstr);
+		mapKaName.append(ext);
+		std::string texFile = (const char*) mapKaName;
+		*/
+		//std::string map_Kd;
+		SrString map_Kd;
+		in.getall(map_Kd);
+		
+		std::string texFile = map_Kd;
+		std::string mtlName = mnames.top();
+		mtlTexMap[mtlName] = texFile;		  
+		std::cerr << "Reading map_kd: " << texFile << "\n";
 	  }
 	  else if ( in.last_token()=="map_bump") // texture map
 	  {
@@ -252,19 +284,20 @@ static bool process_line ( const SrString& line,
    else if ( in.last_token()=="mtllib" ) // mtllib file1 file2 ...
     { //SR_TRACE1 ( "mtllib" );
       SrString token, file;
-      int pos = line.get_next_string ( token, 0 ); // parse again mtllib
-      while ( true )
-       { pos = line.get_next_string ( token, pos );
-         if ( pos<0 ) break;
-         token.extract_file_name ( file );
-         token.replace ( "\\", "/" ); // avoid win-unix problems
-         //SR_TRACE1 ( "new path: "<<token );
-         paths.push ( token );
-         read_materials ( m.M, mnames, mtlTexMap, mtlTexBumpMap, file, paths );
-       }
-    }
+		int pos = line.get_next_string ( token, 0 ); // parse again mtllib
+		while ( true )
+		{ 
+			pos = line.get_next_string ( token, pos );
+			if (pos < 0)
+				break;
+			token.extract_file_name ( file );
+			token.replace ( "\\", "/" ); // avoid win-unix problems
 
-   return true;
+			paths.push ( token );
+			read_materials ( m.M, mnames, mtlTexMap, mtlTexBumpMap, file, paths );
+		}
+	}
+	return true;
  }
 
 
@@ -275,36 +308,41 @@ static bool process_line ( const SrString& line,
     is returned. */
 bool SrModel::import_obj ( const char* file )
 {
-  SrInput in ( fopen(file,"rt") );
-  if ( !in.valid() ) return false;
-   in.comment_style ( '#' );
-   in.lowercase_tokens ( false );
+	SrInput in ( fopen(file,"rt") );
 
-   SrString path=file;
-   SrString filename;
-   path.extract_file_name(filename);
-   SrStringArray paths;
-   paths.push ( path );
+	std::cerr << "OBJ path: " << file << "\n";
+
+	if ( !in.valid() ) 
+		return false;
+	in.comment_style ( '#' );
+	in.lowercase_tokens ( false );
+
+	SrString path = file;
+	SrString filename;
+	path.extract_file_name(filename);
+	SrStringArray paths;
+	paths.push ( path );
   
-   //SR_TRACE1 ( "First path:" << path );
+	//SR_TRACE1 ( "First path:" << path );
 
-   int curmtl = 0;
-   M.push();
-   mtlnames.push("noname");
+	int curmtl = 0;
+	M.push();
+	mtlnames.push("noname");
 
-   init ();
-   name = filename;
-   name.remove_file_extension();
+	init ();
+	name = filename;
+	name.remove_file_extension();
 
-   SrString line;
-   while ( in.getline(line)!=EOF )
-    { if ( !process_line(line,*this,paths,mtlnames,mtlTextureNameMap,mtlNormalTexNameMap,curmtl) ) return false;
+	SrString line;
+	while ( in.getline(line)!=EOF )
+	{ if ( !process_line(line, *this, paths, mtlnames, mtlTextureNameMap, mtlNormalTexNameMap, curmtl) )
+		return false;
     }
 
-   validate ();
-   remove_redundant_materials ();
-//   remove_redundant_normals ();
-   compress ();
+	validate ();
+	remove_redundant_materials ();
+//	remove_redundant_normals ();
+	compress ();
 
    // after remove all redundant materials, load the corresponding textures   
 #if !defined (__ANDROID__) && !defined(SB_IPHONE)
@@ -313,11 +351,11 @@ bool SrModel::import_obj ( const char* file )
 	   std::string matName = mtlnames[i];
 	   if (mtlTextureNameMap.find(matName) != mtlTextureNameMap.end())
 	   {
-		   load_texture(SbmTextureManager::TEXTURE_DIFFUSE,mtlTextureNameMap[matName].c_str(),paths);	   
+		   load_texture(SbmTextureManager::TEXTURE_DIFFUSE, mtlTextureNameMap[matName].c_str(),paths);	   
 	   }	
 	   if (mtlNormalTexNameMap.find(matName) != mtlNormalTexNameMap.end())
 	   {
-		   load_texture(SbmTextureManager::TEXTURE_NORMALMAP,mtlNormalTexNameMap[matName].c_str(),paths);	   
+		   load_texture(SbmTextureManager::TEXTURE_NORMALMAP, mtlNormalTexNameMap[matName].c_str(),paths);	   
 	   }
    }
 #endif

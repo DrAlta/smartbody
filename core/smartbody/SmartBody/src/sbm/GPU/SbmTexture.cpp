@@ -83,14 +83,17 @@ std::vector<std::string> SbmTextureManager::getTextureNames( int type )
 
 void SbmTextureManager::loadTexture(int iType, const char* textureName, const char* fileName )
 {
-	std::string strTex = textureName;
-	StrTextureMap& texMap = findMap(iType);
+	std::string strTex		= textureName;
+	StrTextureMap& texMap	= findMap(iType);
 	if (texMap.find(strTex) == texMap.end()) // the texture does not exist in the texture map, create a new one
 	{
 		SbmTexture* texture = new SbmTexture(textureName);
-		texture->loadImage(fileName);
+		if(!texture->loadImage(fileName))
+		{
+			LOG("ERROR: Can't load image %s. Invalid path? Is it an 8-bit image?", fileName);
+		}
 		texMap[strTex] = texture;
-	}	
+	}
 }
 
 void SbmTextureManager::updateTexture()
@@ -157,6 +160,7 @@ SBAPI void SbmTextureManager::reloadTexture()
 SbmTexture* SbmTextureManager::findTexture(int type, const char* textureName )
 {
 	std::string strTex = textureName;
+	//LOG("Tex name: %s\tType: %d", strTex.c_str(), type);
 	StrTextureMap& texMap = findMap(type);
 	if (texMap.find(strTex) != texMap.end())
 		return texMap[strTex];
@@ -188,10 +192,13 @@ SbmTexture::~SbmTexture(void)
 
 bool SbmTexture::loadImage( const char* fileName )
 {
-	buffer = SOIL_load_image(fileName,&width,&height,&channels,SOIL_LOAD_AUTO);	
+	buffer = SOIL_load_image(fileName, &width, &height, &channels, SOIL_LOAD_AUTO);	
 	if (width < 0 || height < 0 || channels < 0)
 		return false;
-	std::string testOutFileName = fileName;
+	else {
+		LOG("Loading image %s:\t%d\t%d\t%d", fileName, width, height, channels );
+	}
+	//std::string testOutFileName = fileName;
 	//testOutFileName += ".bmp";
 	//SOIL_save_image(testOutFileName.c_str(),SOIL_SAVE_TYPE_BMP,width,height,channels,buffer);
 	int transparentPixel = 0;

@@ -1365,9 +1365,9 @@ void cameraInverse(float* dst, float* src)
 	dst[15] = 1.0f;
 }
 
+// This is call when NOT using the Ogre3D rendering
 void FltkViewer::drawAllGeometries(bool shadowPass)
 {
-	
 	// update deformable mesh
     bool hasGPUSupport = SbmShaderManager::getShaderSupport() != SbmShaderManager::NO_GPU_SUPPORT;
 	SrMat shadowTexMatrix;
@@ -3562,7 +3562,6 @@ void FltkViewer::drawPawns()
 	if (_data->pawnmode == ModeNoPawns)
 		return;
 
-
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
 	// determine the size of the pawns relative to the size of the characters
@@ -3584,6 +3583,7 @@ void FltkViewer::drawPawns()
 		iter != pawnNames.end();
 		iter++)
 	{
+
 		SmartBody::SBPawn* pawn = scene->getPawn((*iter));
 		SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
 		if (camera)
@@ -5302,6 +5302,7 @@ void FltkViewer::drawDeformableModels()
 		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 		if(meshInstance)
 		{
+			//LOG("drawDeformableModels(): Rendering %s", pawn->getName().c_str());
 			//pawn->dMesh_p->update();
 			if (!meshInstance->isStaticMesh()) // is skinned mesh
 			{
