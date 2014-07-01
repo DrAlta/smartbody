@@ -175,7 +175,7 @@ static void read_materials ( SrArray<SrMaterial>& M,
 		SrString map_Kd;
 		in.getall(map_Kd);
 		
-		std::string texFile = map_Kd;
+		std::string texFile = (const char*) map_Kd;
 		std::string mtlName = mnames.top();
 		mtlTexMap[mtlName] = texFile;		  
 		std::cerr << "Reading map_kd: " << texFile << "\n";
