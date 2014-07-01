@@ -2873,4 +2873,31 @@ SBAPI bool SBMotion::downsample( int factor )
 
 	return true;
 }
+
+SBAPI void SBMotion::unrollPrerotation( const std::string& skelName )
+{
+	SBSkeleton* skel = SBScene::getScene()->getSkeleton(skelName);
+	for (int i=0;i<_frames.size();i++)
+	{
+		float* fbuffer = _frames[i].posture;
+		for (int j=0;j<_channels.size();j++)
+		{
+			if (_channels[j].type == SkChannel::Quat)
+			{
+				SmartBody::SBJoint* joint = skel->getJointByMappedName(_channels.mappedName(j));
+				if (joint)
+				{
+					int fidx = _channels.float_position(j);
+					SrQuat chanQuat = SrQuat(fbuffer[fidx], fbuffer[fidx+1], fbuffer[fidx+2], fbuffer[fidx+3]);
+					SrQuat prerot = joint->getPrerotation();
+					SrQuat newQuat = prerot.inverse()*chanQuat;
+					fbuffer[fidx] = newQuat.w;
+					fbuffer[fidx+1] = newQuat.x;
+					fbuffer[fidx+2] = newQuat.y;
+					fbuffer[fidx+3] = newQuat.z;
+				}
+			}		
+		}
+	}
+}
 };

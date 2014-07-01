@@ -138,7 +138,7 @@ void pythonFuncsMotion()
 		.def("addSimilarPose", &SBMotion::addSimilarPose, "Marks another motion as being similar to this motion. This will be used by the gesture system to retarget gestures from one poses to a similar one.")
 		.def("removeSimilarPose", &SBMotion::removeSimilarPose, "Removes a pose as being similar to this motion. This will be used by the gesture system to retarget gestures from one poses to a similar one.")
 		.def("getSimilarPoses", &SBMotion::getSimilarPoses, "Retrieves all the similar pose.")
-		
+		.def("unrollPrerotation", &SBMotion::unrollPrerotation, "Retrieves all the similar pose.")		
 		;
 
 	boost::python::class_<SBMotionNode>("SBMotionNode")
