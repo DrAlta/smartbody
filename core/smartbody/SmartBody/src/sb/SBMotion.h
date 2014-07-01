@@ -171,6 +171,8 @@ class SBMotion : public SkMotion
 		SBAPI JointTrajectory* getJointTrajectory(const std::string& effectorName);
 		SBAPI bool getTrajPosition(const std::string& effectorName, float time, SrVec& outPos);		
 
+		SBAPI void unrollPrerotation(const std::string& skelName);
+
 
 		// serializable data
 		std::string sName;
