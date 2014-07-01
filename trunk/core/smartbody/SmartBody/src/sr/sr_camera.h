@@ -238,8 +238,8 @@ class SrFrustum {
 		float	nw,nh,fw,fh;
 		float	frustum[6][4];
 
-		SrFrustum::SrFrustum();
-		SrFrustum::~SrFrustum();
+		SrFrustum();
+		~SrFrustum();
 
 	//	void	setCamInternals(float angle, float ratio, float nearD, float farD);
 	//	void	setCamDef(SrVec &p, SrVec &l, SrVec &u);
