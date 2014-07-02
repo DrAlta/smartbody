@@ -19,6 +19,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBDebuggerClient.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBAssetManager.h>
 #include <sb/SBVHMsgManager.h>
 #include <sbm/Heightfield.h>
 #include <sbm/KinectProcessor.h>
@@ -104,6 +105,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 	menubar->add("&Create/Character...", 0, CreateCharacterCB, this, 0);
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, 0);
+	menubar->add("&Create/Pawn from model...", 0, CreatePawnFromModelCB, this, 0);
 	menubar->add("&Create/Light", 0, CreateLightCB, this, 0);
 	menubar->add("&Create/Camera...", 0, CreateCameraCB, this, FL_MENU_DIVIDER);
 	deleteObjectMenuIndex = menubar->add("&Create/Delete Object", 0, 0, 0, FL_SUBMENU_POINTER);
@@ -1934,6 +1936,27 @@ void BaseWindow::CreatePawnCB(Fl_Widget* w, void* data)
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->fltkViewer->create_pawn();
+#endif
+}
+
+void BaseWindow::CreatePawnFromModelCB(Fl_Widget* w, void* data)
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	std::string pawnName = rootWindow->fltkViewer->create_pawn();
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);
+	if (!pawn)
+		return;
+	// get the first model
+	std::vector<std::string> meshes = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMeshNames();
+	if (meshes.size() > 0)
+	{
+		pawn->setStringAttribute("mesh", meshes[0]);	
+		pawn->setDoubleAttribute("rotY",180.0);
+		pawn->setDoubleAttribute("rotZ",-90.0);
+		pawn->dStaticMeshInstance_p->setVisibility(2);
+	}
+	
 #endif
 }
 

@@ -380,7 +380,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 	static void ChangeOffGroundHeight(Fl_Widget* widget, void* data);
 	void updateLights();
 
-	void create_pawn();
+	std::string create_pawn();
 
 	int gridList;
 	float gridColor[4];

@@ -2051,6 +2051,8 @@ std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 			pawnCount++;
 			SmartBody::SBPawn* pawn = scene->createPawn(strstr.str());			
 			pawn->setStringAttribute("mesh",dndMesh->getName());	
+			pawn->setDoubleAttribute("rotY",180.0);
+			pawn->setDoubleAttribute("rotZ",-90.0);
 			pawn->dStaticMeshInstance_p->setVisibility(2);
 			return;
 		}
@@ -2133,6 +2135,25 @@ std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 
 int FltkViewer::handle ( int event ) 
  {
+	switch ( event )
+	{   
+		case FL_DND_RELEASE:
+		LOG("DND Release");
+		break;
+		case FL_DND_ENTER:          // return(1) for these events to 'accept' dnd
+		LOG("DND Enter");
+		return 1;
+		break;
+		case FL_DND_DRAG:
+		LOG("DND Drag");
+		break;
+
+		case FL_DND_LEAVE:
+		LOG("DND Leave");
+		break;
+	}
+
+
    # define POPUP_MENU(e) e.ctrl && e.button3
    SrEvent &e = _data->event;
    e.type = SrEvent::EventNone;   
@@ -2144,18 +2165,18 @@ int FltkViewer::handle ( int event )
    switch ( event )
    {   
 	   case FL_DND_RELEASE:
-		   //LOG("DND Release");
+		   LOG("DND Release");
 	       ret = 1;
 	       break;
 	   case FL_DND_ENTER:          // return(1) for these events to 'accept' dnd
-		   //LOG("DND Enter");
+		   LOG("DND Enter");
 		   Fl::belowmouse(this); // send the leave events first
 		   Fl::focus(this);
 		   handle(FL_FOCUS);		
 		   ret = 1;
 		   break;
 	   case FL_DND_DRAG:
-		   //LOG("DND Drag");
+		   LOG("DND Drag");
 		   translate_event ( e, SrEvent::EventPush, w(), h(), this );
 		   dndX = e.mouse.x;
 		   dndY = e.mouse.y;
@@ -2163,7 +2184,7 @@ int FltkViewer::handle ( int event )
 		   break;
 
 	   case FL_DND_LEAVE:
-		   //LOG("DND Leave");
+		   LOG("DND Leave");
 		   ret = 1;
 		   break;	  
 	   case FL_PASTE:              // handle actual drop (paste) operation		   
@@ -2650,19 +2671,21 @@ int FltkViewer::handle_object_manipulation( const SrEvent& e)
 
 
 
-void FltkViewer::create_pawn()
+std::string FltkViewer::create_pawn()
 {
 	static int numPawn = 0;
 	std::string pawnName = "pawn" + boost::lexical_cast<std::string>(numPawn);
 	
 	const char* pawn_name = fl_input("Input Pawn Name",pawnName.c_str());
 	if (!pawn_name) // no name is input
-		return;
+		return "";
 
 	char cmd_pawn[256];
 	sprintf(cmd_pawn,"scene.createPawn(\"%s\")", pawn_name);
 	SmartBody::SBScene::getScene()->run(cmd_pawn);
 	numPawn++;
+
+	return pawnName;
 }
 
 
