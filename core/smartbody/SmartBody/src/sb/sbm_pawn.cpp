@@ -389,6 +389,8 @@ SrBox SbmPawn::getBoundingBox(void)
 	{
 		if (_skeleton) 
 			return _skeleton->getBoundingBox(); 
+		else
+			return SrBox();
 	}
 }
 

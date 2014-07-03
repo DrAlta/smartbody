@@ -15,7 +15,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
-#define TEST_HAIR_RENDER 1
+#define TEST_HAIR_RENDER 0
 
 typedef std::pair<int,int> IntPair;
 typedef std::pair<int,float> IntFloatPair;
@@ -1372,6 +1372,7 @@ DeformableMeshInstance::DeformableMeshInstance()
 	_recomputeNormal = true;
 	_meshScale = 1.f;
 	_character = NULL;
+	meshVisibleType = 1;
 }
 
 DeformableMeshInstance::~DeformableMeshInstance()
@@ -1469,7 +1470,7 @@ void DeformableMeshInstance::blendShapes()
 			}
 			if (_character->hasAttribute(ss.str()))
 			{
-				std::string mappedCName = _character->getStringAttribute(ss.str());
+				const std::string& mappedCName = _character->getStringAttribute(ss.str());
 				SmartBody::SBSkeleton* sbSkel = _character->getSkeleton();
 				if (sbSkel && mappedCName != "")
 				{
@@ -1525,6 +1526,7 @@ void DeformableMeshInstance::blendShapes()
 
 		writeToBaseModel->shape().V = newV;
 		writeToBaseModel->shape().N = newN;
+		writeToBaseModel->changed(true);
 	}
 
 	return;

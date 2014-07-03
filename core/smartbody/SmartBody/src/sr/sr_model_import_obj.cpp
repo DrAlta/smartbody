@@ -331,7 +331,7 @@ bool SrModel::import_obj ( const char* file )
 
 	init ();
 	name = filename;
-	name.remove_file_extension();
+	//name.remove_file_extension();
 
 	SrString line;
 	while ( in.getline(line)!=EOF )
