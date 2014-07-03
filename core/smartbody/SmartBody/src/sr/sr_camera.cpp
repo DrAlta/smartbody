@@ -57,6 +57,11 @@
 #endif
 
 
+
+const int SrFrustum::OUTSIDE = 1;
+const int SrFrustum::INTERSECT = 2;
+const int SrFrustum::INSIDE = 3;
+
 //=================================== SrCamera ===================================
 
 SrCamera::SrCamera () : SBPawn()

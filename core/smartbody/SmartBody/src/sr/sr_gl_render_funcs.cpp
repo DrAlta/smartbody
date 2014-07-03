@@ -43,6 +43,7 @@
 #include <sbm/GPU/SbmTexture.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBPawn.h>
 
 # include <sr/sr_sn.h>
 # include <sr/sr_sn_shape.h>
@@ -67,10 +68,38 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	if (shape->isStaticMesh())
 	{
 		SmartBody::SBSkeleton* skel = shape->getSkeleton();
-		SrMat woMat = skel->root()->gmat();
+		SmartBody::SBPawn* pawn = skel->getPawn();
+
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
-		glMultMatrix(woMat);
+
+		const std::string& parentJoint = pawn->getStringAttribute("blendShape.parentJoint");
+		if (parentJoint != "")
+		{
+			SmartBody::SBJoint* joint = skel->getJointByName(parentJoint);
+			if (joint)
+			{
+				const SrMat& woMat = joint->gmat();
+				glMultMatrix(woMat);		
+
+				const SrVec& offsetTrans = pawn->getVec3Attribute("blendShape.parentJointOffsetTrans");
+				const SrVec& offsetRot = pawn->getVec3Attribute("blendShape.parentJointOffsetRot");
+
+				SrQuat quat;
+				quat.set(offsetRot.x * M_PI / 180.0f, offsetRot.y * M_PI / 180.0f, offsetRot.z * M_PI / 180.0f);
+				SrMat mat;
+				quat.get_mat(mat);
+				mat.set_translation(offsetTrans);
+				glMultMatrix(mat);	
+			}
+		}
+		else
+		{
+			const SrMat& woMat = skel->root()->gmat();
+
+			glMultMatrix(woMat);
+		}
+
 		float meshScale = shape->getMeshScale();
 		glScalef(meshScale,meshScale,meshScale);
 	}
