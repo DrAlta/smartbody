@@ -575,6 +575,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 		curNode = curNode->next_sibling();
 	}
 
+	
 	/*
 	// cache the joint names for each skin weight
 	if (char_p && char_p->dMesh_p)

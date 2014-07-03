@@ -296,7 +296,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
 				{
 					std::string& jointName = skinWeight->infJointName[j];
-					SkJoint* curJoint = skeleton->search_joint(jointName.c_str());
+					SkJoint* curJoint = skeleton->search_joint(jointName.c_str());					
 					skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
 				}
 

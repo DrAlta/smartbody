@@ -181,8 +181,22 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			{
 				const char* jointNamePrefix = "";
 				ParserCOLLADAFast::parseLibraryControllers(controllerNode, mesh, factor, jointNamePrefix);
+			}	
+			
+			for (unsigned int skinCounter = 0; skinCounter < mesh->skinWeights.size(); skinCounter++)
+			{
+				SkinWeight* skinWeight = mesh->skinWeights[skinCounter];		
+				for (size_t j = 0; j < skinWeight->infJointName.size(); j++)
+				{
+					std::string& jointName = skinWeight->infJointName[j];
+					SkJoint* curJoint = skeleton->search_joint(jointName.c_str());					
+					if (curJoint)
+					{
+						skinWeight->infJointName[j] = curJoint->getName();
+					}
+					//skinWeight->infJoint.push_back(curJoint); // NOTE: If joints are added/removed during runtime, this list will contain stale data
+				}				
 			}
-
 	
 			std::map<std::string, std::vector<std::string> >::iterator morphTargetIter;
 			// handling morph targets
