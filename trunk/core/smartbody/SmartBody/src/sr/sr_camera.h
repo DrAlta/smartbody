@@ -231,7 +231,10 @@ class SrFrustum {
 
 	public:
 
-		static	enum {OUTSIDE, INTERSECT, INSIDE};
+		static const int OUTSIDE;
+		static const int INTERSECT;
+		static const int INSIDE;
+
 		//Plane	pl[6];
 		SrVec	ntl,ntr,nbl,nbr,ftl,ftr,fbl,fbr;
 		float	nearD, farD, ratio, angle,tang;
