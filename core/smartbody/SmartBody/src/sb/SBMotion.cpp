@@ -1829,8 +1829,10 @@ void SBMotion::saveToSkm(const std::string& fileName)
 		delete out;
 		return;
 	}
-
+	std::string oldName = this->getName();
+	this->setName(fileName);
 	this->save(*out);
+	this->setName(oldName);
 	delete out;
 }
 
@@ -2887,10 +2889,11 @@ SBAPI void SBMotion::unrollPrerotation( const std::string& skelName )
 				SmartBody::SBJoint* joint = skel->getJointByMappedName(_channels.mappedName(j));
 				if (joint)
 				{
-					int fidx = _channels.float_position(j);
+					int fidx = _channels.float_position(j);				
 					SrQuat chanQuat = SrQuat(fbuffer[fidx], fbuffer[fidx+1], fbuffer[fidx+2], fbuffer[fidx+3]);
 					SrQuat prerot = joint->getPrerotation();
 					SrQuat newQuat = prerot.inverse()*chanQuat;
+					newQuat.normalize();
 					fbuffer[fidx] = newQuat.w;
 					fbuffer[fidx+1] = newQuat.x;
 					fbuffer[fidx+2] = newQuat.y;
@@ -2900,4 +2903,26 @@ SBAPI void SBMotion::unrollPrerotation( const std::string& skelName )
 		}
 	}
 }
+
+
+SBAPI void SBMotion::addTemporalRotationOffset( const std::string& chanName, SrQuat& startQuat, SrQuat& endQuat )
+{
+	int chanID = _channels.search(chanName, SkChannel::Quat); // search for the channel index	
+	if (chanID == -1 || _frames.size() < 1) return;
+	float ratio = 1.f/_frames.size();
+	int fidx = _channels.float_position(chanID);
+	for (int i=0;i<_frames.size();i++)
+	{
+		float* fbuffer = _frames[i].posture;
+		SrQuat chanQuat = SrQuat(fbuffer[fidx], fbuffer[fidx+1], fbuffer[fidx+2], fbuffer[fidx+3]);
+		SrQuat offsetQuat = slerp(startQuat,endQuat, ratio*(i+1));
+		SrQuat newQuat = chanQuat*offsetQuat;
+		fbuffer[fidx] = newQuat.w;
+		fbuffer[fidx+1] = newQuat.x;
+		fbuffer[fidx+2] = newQuat.y;
+		fbuffer[fidx+3] = newQuat.z;
+	}
+}
+
+
 };

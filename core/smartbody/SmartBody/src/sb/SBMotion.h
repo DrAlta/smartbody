@@ -172,6 +172,7 @@ class SBMotion : public SkMotion
 		SBAPI bool getTrajPosition(const std::string& effectorName, float time, SrVec& outPos);		
 
 		SBAPI void unrollPrerotation(const std::string& skelName);
+		SBAPI void addTemporalRotationOffset(const std::string& chanName, SrQuat& startQuat, SrQuat& endQuat);
 
 
 		// serializable data
