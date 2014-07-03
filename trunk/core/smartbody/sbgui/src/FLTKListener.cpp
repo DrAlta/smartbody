@@ -350,10 +350,100 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 						}
 					}
 
-					DeformableMeshInstance* meshInsance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
-					meshInsance->setDeformableMesh(mesh);
+					if (mesh->blendShapeMap.size() == 0)
+					{
+						// if there are no blendshapes, but there are blendShape.channelName attributes, 
+						// then add the morph targets
+						std::vector<SmartBody::StringAttribute*> shapeAttributes;
+						std::map<std::string, SmartBody::SBAttribute*>& attributes = pawn->getAttributeList();
+						for (std::map<std::string, SmartBody::SBAttribute*>::iterator iter = attributes.begin(); 
+							 iter != attributes.end(); 
+							 iter++)
+						{
+							SmartBody::SBAttribute* attribute = (*iter).second;
+							const std::string& attrName = attribute->getName();
+							size_t pos = attrName.find("blendShape.channelName.");
+							if (pos != std::string::npos)
+							{
+								SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+								shapeAttributes.push_back(strAttribute);
+							}
+						}
+
+						int numShapeAttributes = shapeAttributes.size();
+						if (numShapeAttributes > 0)
+						{
+							// make space for all the attributes
+							mesh->morphTargets.insert(std::pair<std::string, std::vector<std::string> >("face", std::vector<std::string>() ));
+							std::map<std::string, std::vector<std::string> >::iterator shapeIter = mesh->morphTargets.begin();
+							(*shapeIter).second.resize(numShapeAttributes);
+
+
+							int hasNeutral = false;
+							for (std::vector<SmartBody::StringAttribute*>::iterator iter = shapeAttributes.begin();
+								 iter != shapeAttributes.end();
+								 iter++)
+							{
+								const std::string& attrName = (*iter)->getName();
+								// get the shape name and value
+								std::string shapeName = attrName.substr(23);
+								
+								std::string shapeChannel = (*iter)->getValue();
+								if (shapeChannel == "Neutral")
+								{
+									DeformableMesh* neutralMesh = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMesh(shapeName);
+									mesh->blendShapeMap.insert(std::pair<std::string, std::vector<SrSnModel*> >(neutralMesh->getName(), std::vector<SrSnModel*>() ));
+									std::map<std::string, std::vector<SrSnModel*> >::iterator blendshapeIter = mesh->blendShapeMap.begin();
+									(*blendshapeIter).second.resize(numShapeAttributes);
+									SrSnModel* staticModel = neutralMesh->dMeshStatic_p[0];
+									SrSnModel* model = new SrSnModel();
+									model->shape(staticModel->shape());
+									model->shape().name = staticModel->shape().name;
+									model->changed(true);
+									model->visible(false);
+									(*blendshapeIter).second[0] = model;
+									model->ref();
+								}
+								hasNeutral = true;
+							}
+
+							std::map<std::string, std::vector<SrSnModel*> >::iterator blendshapeIter = mesh->blendShapeMap.begin();
+							(*blendshapeIter).second.resize(numShapeAttributes);
+
+							int count = 1;
+							if (hasNeutral)
+							{
+								for (std::vector<SmartBody::StringAttribute*>::iterator iter = shapeAttributes.begin();
+									 iter != shapeAttributes.end();
+									 iter++)
+								{									
+									const std::string& attrName = (*iter)->getName();
+									// get the shape name and value
+									std::string shapeName = attrName.substr(23);
+									std::string shapeChannel = (*iter)->getValue();
+									if (shapeChannel == "Neutral")
+										continue;
+									(*shapeIter).second[count] = shapeName;
+									DeformableMesh* shapeModel = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMesh(shapeName);
+									if (shapeModel)
+									{
+										(*blendshapeIter).second[count] = shapeModel->dMeshStatic_p[0];
+										shapeModel->dMeshStatic_p[0]->ref();
+									}
+									else
+									{
+										(*blendshapeIter).second[count] = NULL;
+									}
+									count++;
+								}
+							}
+						}
+					}
+					
+					DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
+					meshInstance->setDeformableMesh(mesh);
 					//meshInsance->setSkeleton(pawn->getSkeleton());	
-					meshInsance->setPawn(pawn);
+					meshInstance->setPawn(pawn);
 					
 #if 0
 					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
@@ -452,7 +542,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 			double val = pawn->getDoubleAttribute("displayBoneScale");
 			if (pawn->scene_p)
 			{
-				pawn->scene_p->set_skeleton_radius(val);
+				pawn->scene_p->set_skeleton_radius( (float) val);
 				pawn->scene_p->init(pawn->getSkeleton());
 			}
 		}
@@ -465,10 +555,10 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 				if (skeleton)
 				{
 					int numJoints = skeleton->getNumJoints();
-					for (size_t j = 0; j < numJoints; j++)
+					for (int j = 0; j < numJoints; j++)
 					{
 						SmartBody::SBJoint* joint = skeleton->getJoint(j);
-						pawn->scene_p->setJointRadius(joint, val);
+						pawn->scene_p->setJointRadius(joint, (float)  val);
 						pawn->scene_p->init(pawn->getSkeleton());
 					}
 				}
