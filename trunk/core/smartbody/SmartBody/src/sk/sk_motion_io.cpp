@@ -553,6 +553,8 @@ bool SkMotion::save ( SrOutput& out )
 	out << "frames " << (int) _frames.size() << srnl;
 	float *pt;
 	int chsize = _channels.size();
+	int chFloatSize = _channels.floats();
+	LOG("chsize = %d, chFloatSize = %d",chsize, chFloatSize);
 	for (size_t i=0; i<_frames.size(); i++ )
 	{ out << "kt " << _frames[i].keytime << " fr ";
 		pt = _frames[i].posture;
