@@ -30,21 +30,31 @@
 
 std::string MeCtNewLocomotion::_type_name = "NewLocomotion";
 
-MeCtNewLocomotion::MeCtNewLocomotion(SbmCharacter* c) :  SmartBody::SBController(), 
-															 character(c)
+MeCtNewLocomotion::MeCtNewLocomotion() :  SmartBody::SBController()
 {
 	scootSpd = 0.0f;	//	unit: centermeter/sec
 	movingSpd = 0.0f;	//	unit: centermeter/sec
 	turningSpd = 0.0f;	//	unit: deg/sec
 	_valid = false;
 	_lastTime = -2.0;
-	C  = SmartBody::SBScene::getScene()->getMotion("ChrBrad@Walk01B");
-	S = C->smoothCycle("", 0.5f);
-	sk=new SmartBody::SBSkeleton(SmartBody::SBScene::getScene()->getSkeleton("ChrBrad.sk"));
+	startTime = -1.0;
+	C=S=NULL;
+	
 	LeftFading.prev_time = -1.0f;
 	RightFading.prev_time = -1.0f;
 	_duration = -1.0f;
-	useIKRt=useIKLf=false;
+	useIKRt = false;
+	useIKLf = false;
+
+	setDefaultAttributeGroupPriority("EnhancedLocomotion", 600);
+
+	addDefaultAttributeString("walkCycle", "ChrBrad@Walk01B", "EnhancedLocomotion");
+	addDefaultAttributeString("LEndEffectorJoint", "l_forefoot", "EnhancedLocomotion");
+	addDefaultAttributeString("REndEffectorJoint", "r_forefoot", "EnhancedLocomotion");
+	addDefaultAttributeString("CenterHipJoint", "JtPelvis", "EnhancedLocomotion");
+	addDefaultAttributeDouble("FadeIn", 0.2, "EnhancedLocomotion");
+	addDefaultAttributeDouble("FadeOut", 0.4, "EnhancedLocomotion");
+	addDefaultAttributeDouble("TurningRate", 15.0, "EnhancedLocomotion");
 }
 
 MeCtNewLocomotion::~MeCtNewLocomotion()
@@ -53,150 +63,199 @@ MeCtNewLocomotion::~MeCtNewLocomotion()
 
 void MeCtNewLocomotion::init(SbmCharacter* sbChar)
 {
-	_lastTime = -1.0;
-		
-		//assert(_skeleton);	
-	// root is "world_offset", so we use root->child to get the base joint.
-	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sk->root()->child(0));//_skeleton->getJointByName(rootJointName);//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("base"); // test for now
 	character = sbChar;
+
+	attributes_names.push_back("walkCycle");
+	attributes_names.push_back("CenterHipJoint");
+	attributes_names.push_back("LEndEffectorJoint");
+	attributes_names.push_back("REndEffectorJoint");
+	attributes_names.push_back("FadeIn");
+	attributes_names.push_back("FadeOut");
+	for(unsigned int i = 0; i< attributes_names.size(); i++)
+	{
+		SmartBody::SBAttribute* a = character->getAttribute(attributes_names[i]);
+		if (a)
+			a->registerObserver(this);
+	}
+	tempBuffer.size(1000);
+	setup();
+}
+
+void MeCtNewLocomotion::setup()
+{
+	bool SameMotion=false;
+	if(C)//If there is a motion, check if is the same one
+		SameMotion=C->getName()==character->getStringAttribute("walkCycle");
+	if(!SameMotion)
+		C  = SmartBody::SBScene::getScene()->getMotion(character->getStringAttribute("walkCycle"));
+	if (!C)
+		return;
+	hipjoint = character->getStringAttribute("CenterHipJoint");
+	lend = character->getStringAttribute("LEndEffectorJoint");
+	rend = character->getStringAttribute("REndEffectorJoint");
+	fadein  = (float)character->getDoubleAttribute("FadeIn");
+	fadeout = (float)character->getDoubleAttribute("FadeOut");
+
+	if(!SameMotion)
+	{
+		S = C->smoothCycle("", 0.5f);
+		sk = new SmartBody::SBSkeleton(SmartBody::SBScene::getScene()->getSkeleton("ChrBrad.sk"));
+		S->connect(sk);
+		motionSpd = S->getJointSpeed(sk->getJointByName(hipjoint), (float)S->getTimeStart() , (float)S->getTimeStop())*0.75f;
+		S->disconnect();
+
+	}
+	_lastTime = -1.0;
+	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sk->root()->child(0));//_skeleton->getJointByName(rootJointName);//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("l_acromioclavicular");//_skeleton->root()->child(0);//_skeleton->search_joint("base"); // test for now
+	
 	std::vector<std::string> stopJoints;
-	stopJoints.push_back("JtHeelLf");
-	stopJoints.push_back("JtHeelRt");
+	stopJoints.push_back(lend);
+	stopJoints.push_back(rend);
 	ik_scenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);
 	const IKTreeNodeList& nodeList = ik_scenario.ikTreeNodes;		
-	/*for (unsigned int i=0;i<nodeList.size();i++)
-	{
-		SkJoint* joint = nodeList[i]->joint;
-		_channels.add(joint->getMappedJointName(), SkChannel::Quat);	
-	}*/	
 
 	double ikReachRegion = character->getHeight()*0.02f;		
-	ikDamp        = ikReachRegion*ikReachRegion*14.0;
-	MeController::init(sbChar);
+	ikDamp = ikReachRegion*ikReachRegion*14.0;
+	MeController::init(character);
 	ik.dampJ = ikDamp;
 	ik.refDampRatio = 0.01;
 }
 
 bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
 {
-	float Dt = 1.0f / 60.0f;
-	if (_lastTime > 0.0)
-		Dt = float(t - _lastTime);
-	_lastTime = t;
-	motionTime=fmod((float)t, S->duration());
-	SrQuat woQuat;
-	SrVec woPos;
+	if (!C)
+		return true;
+	BufferRef=&(frame.buffer());
 	if (character && _valid)
 	{
-		//if (scootSpd == 0.0f && movingSpd == 0.0f && turningSpd == 0.0f)
-			//return true;
-		//*/
-		float x, y, z, yaw, pitch, roll;		
- 		character->get_world_offset(x, y, z, yaw, pitch, roll); 
- 		yaw = desiredHeading;
- 		float movingDist = movingSpd * Dt;
- 		x += movingDist * sin(yaw * (float)M_PI / 180.0f);
- 		z += movingDist * cos(yaw * (float)M_PI / 180.0f);
-		character->set_world_offset(x, y, z, yaw, pitch, roll);
-
-
-		gwiz::quat_t q = gwiz::euler_t(pitch,yaw,roll);
-		woQuat = SrQuat(q.w(),q.x(),q.y(),q.z());
-		woPos = SrVec(x,y,z); 		
-		//*/
-		std::vector<SrQuat> tempQuatList(ik_scenario.ikTreeNodes.size()); 
-		if (LeftFading.prev_time == -1.0f && RightFading.prev_time ==-1.0f) // first start
-		{		
-			// for first frame, update from frame buffer to joint quat in the limb
-			// any future IK solving will simply use the joint quat from the previous frame.
-			
-			
-			updateChannelBuffer(frame);//Read from skeleton->Write on Buffer
-			updateChannelBuffer(frame,tempQuatList, true);//Read from Buffer->Write on tempQuatList	
-			//character->set_world_offset(x, y, z, yaw, pitch, roll);
-
-			ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_INIT);
-			ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_PREVREF);
-			ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_CUR);
-		}
-
-		LeftFading.updateDt((float)t);
-		RightFading.updateDt((float)t);
-
-		
-		updateChannelBuffer(frame);//Read from skeleton->Write on Buffer
-		updateChannelBuffer(frame,tempQuatList, true);//Read from Buffer->Write on tempQuatList
-		//character->set_world_offset(x, y, z, yaw, pitch, roll);
-
-
-#if 1
-		updateConstraints(motionTime/(float)S->getFrameRate());
-		
-		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_REF);	
-		character->getSkeleton()->update_global_matrices();
-		ik_scenario.ikGlobalMat=character->getSkeleton()->getJointByName("JtPelvis")->gmat();
-		//*/
-		
-		//*/Character pose
-
-		ik.setDt(LeftFading.dt);
-		if (LeftFading.fadeMode == Fading::FADING_MODE_IN)
-			useIKLf = true;
-		if (RightFading.fadeMode == Fading::FADING_MODE_IN)
-			useIKRt=true;
-		
-		if (LeftFading.updateFading(LeftFading.dt))
-			useIKLf = false;
-		if( RightFading.updateFading(RightFading.dt))
-			useIKRt = false;
-		//if (useIKLf || useIKRt)	
-		{		
-			//*/Left
-			ik_scenario.ikPosEffectors = &posConsLf;
-			ik_scenario.ikRotEffectors = &rotConsLf;
-			ik.update(&ik_scenario);
-			ik_scenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);			
-			for (unsigned int i=0; i<7 ;i++)
-			{
-				MeCtIKTreeNode* node = ik_scenario.ikTreeNodes[i];
-				SrQuat qEval = node->getQuat(QUAT_CUR);
-				SrQuat qInit = node->getQuat(QUAT_REF);
-				qEval.normalize();
-				qInit.normalize();
-				tempQuatList[i] = slerp(qInit,qEval,LeftFading.blendWeight);
-				//tempQuatList[i] = qInit;
-			}	
-			//*/
-			//*/Right
-			ik_scenario.ikPosEffectors = &posConsRt;
-			ik_scenario.ikRotEffectors = &rotConsRt;
-			ik.update(&ik_scenario);
-			ik_scenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);	
-			for (unsigned int i=7; i<ik_scenario.ikTreeNodes.size() ;i++)
-			{
-				MeCtIKTreeNode* node = ik_scenario.ikTreeNodes[i];
-				SrQuat qEval = node->getQuat(QUAT_CUR);
-				SrQuat qInit = node->getQuat(QUAT_REF);
-				qEval.normalize();
-				qInit.normalize();
-				tempQuatList[i] = slerp(qInit,qEval,RightFading.blendWeight);
-				//tempQuatList[i] = qInit;
-			}
-			//*/
-		}
-#endif
-		updateChannelBuffer(frame,tempQuatList);//Read from tempQuatList->Write on Buffer
-		updateWorldOffset(frame, woQuat, woPos);		
-		RightFading.prev_time=LeftFading.prev_time = (float)t;
+		play((float)t);
 	}
 	return true;
 }
 
-void MeCtNewLocomotion::updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>& quatList, bool bRead)
+void MeCtNewLocomotion::loopMotion(float def)
 {
-	static bool printOnce=true;
-	SrBuffer<float>& buffer=frame.buffer();
-	int count=0;	
+	char pawnname[20];
+	sprintf(pawnname, "pawn%.1f", def);
+	startTime = 0.0f;
+	float diff = 1.0f/30.0f;
+	setDesiredHeading(0.0f);
+	def = def/(float)S->frames();
+	for(float t = 0; t < S->duration() + 0.01; t += diff)
+	{
+		setDesiredHeading(getDesiredHeading()+def);
+		play(t, true);
+	}
+	float x, y, z, yaw, pitch, roll;		
+ 	character->get_world_offset(x, y, z, yaw, pitch, roll); 
+	SrVec pos(x,y,z);
+	//LOG("%s : %f %f %f",pawnname, x,y,z);
+	LOG("%f   %f",legDistance(1) ,legDistance(0));
+	addPawn(pos,pawnname);
+	reset();
+}
+
+void MeCtNewLocomotion::play(float t, bool useTemp)
+{
+	if(useTemp)
+		BufferRef = &tempBuffer;
+	float Dt = 1.0f / 60.0f;
+	if (_lastTime > 0.0)
+		Dt = float(t - _lastTime);
+	_lastTime = t;
+	SrQuat woQuat;
+	SrVec woPos;
+	if(startTime < 0.0)
+	{
+		startTime = t;
+	}
+	motionTime = fmod(t-startTime, S->duration());
+	float x, y, z, yaw, pitch, roll;		
+ 	character->get_world_offset(x, y, z, yaw, pitch, roll); 
+ 	yaw = desiredHeading;
+ 	float movingDist = motionSpd*0.85f * Dt;
+ 	x += movingDist * sin(yaw * (float)M_PI / 180.0f);
+ 	z += movingDist * cos(yaw * (float)M_PI / 180.0f);
+
+	gwiz::quat_t q = gwiz::euler_t(pitch,yaw,roll);
+	woQuat = SrQuat(q.wf() ,q.xf(),q.yf(),q.zf());
+	woPos = SrVec(x,y,z); 		
+	//*/
+	std::vector<SrQuat> tempQuatList(ik_scenario.ikTreeNodes.size()); 
+	if (fabs(LeftFading.prev_time + RightFading.prev_time + 2.0f) <0.001f ) // first start
+	{					
+		updateChannelBuffer(*BufferRef);//Read from skeleton->Write on Buffer
+		updateWorldOffset(*BufferRef, woQuat, woPos);
+		updateChannelBuffer(*BufferRef,tempQuatList, true);//Read from Buffer->Write on tempQuatList
+
+
+		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_INIT);
+		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_PREVREF);
+		ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_CUR);
+	}
+
+	LeftFading.updateDt(t);
+	RightFading.updateDt(t);
+
+		
+	updateChannelBuffer(*BufferRef);//Read from skeleton->Write on Buffer
+	updateWorldOffset(*BufferRef, woQuat, woPos);
+	updateChannelBuffer(*BufferRef,tempQuatList, true);//Read from Buffer->Write on tempQuatList
+
+	updateConstraints(motionTime/(float)S->getFrameRate());
+		
+	ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_REF);	
+	character->getSkeleton()->update_global_matrices();
+	ik_scenario.ikGlobalMat = character->getSkeleton()->getJointByName("JtPelvis")->gmat();
+	//*/Character pose
+	ik.setDt(LeftFading.dt);
+	if (LeftFading.fadeMode == Fading::FADING_MODE_IN)
+		useIKLf = true;
+	if (RightFading.fadeMode == Fading::FADING_MODE_IN)
+		useIKRt = true;
+	if (LeftFading.updateFading(LeftFading.dt))
+		useIKLf = false;
+	if( RightFading.updateFading(RightFading.dt))
+		useIKRt = false;
+	//*/Left
+	ik_scenario.ikPosEffectors = &posConsLf;
+	ik_scenario.ikRotEffectors = &rotConsLf;
+	ik.update(&ik_scenario);
+	ik_scenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);			
+	for (unsigned int i = 0; i < 7; i++)
+	{
+		MeCtIKTreeNode* node = ik_scenario.ikTreeNodes[i];
+		SrQuat qEval = node->getQuat(QUAT_CUR);
+		SrQuat qInit = node->getQuat(QUAT_REF);
+		qEval.normalize();
+		qInit.normalize();
+		tempQuatList[i] = slerp(qInit,qEval,LeftFading.blendWeight);
+	}	
+	//*/
+	//*/Right
+	ik_scenario.ikPosEffectors = &posConsRt;
+	ik_scenario.ikRotEffectors = &rotConsRt;
+	ik.update(&ik_scenario);
+	ik_scenario.copyTreeNodeQuat(QUAT_CUR,QUAT_INIT);	
+	for (unsigned int i = 7; i < ik_scenario.ikTreeNodes.size(); i++)
+	{
+		MeCtIKTreeNode* node = ik_scenario.ikTreeNodes[i];
+		SrQuat qEval = node->getQuat(QUAT_CUR);
+		SrQuat qInit = node->getQuat(QUAT_REF);
+		qEval.normalize();
+		qInit.normalize();
+		tempQuatList[i] = slerp(qInit,qEval,RightFading.blendWeight);
+	}
+	//*/
+	updateChannelBuffer(*BufferRef,tempQuatList);//Read from tempQuatList->Write on Buffer
+	updateWorldOffset(*BufferRef, woQuat, woPos);	
+	character->set_world_offset(x, y, z, yaw, pitch, roll); 
+	RightFading.prev_time=LeftFading.prev_time = t;
+}
+
+void MeCtNewLocomotion::updateChannelBuffer(SrBuffer<float>& buffer, std::vector<SrQuat>& quatList, bool bRead)
+{
+	int count = 0;	
 	const IKTreeNodeList& nodeList = ik_scenario.ikTreeNodes;
 	BOOST_FOREACH(SrQuat& quat, quatList)
 	{
@@ -233,22 +292,20 @@ void MeCtNewLocomotion::updateChannelBuffer(MeFrameData& frame, std::vector<SrQu
 			}
 		}			
 	}
-	printOnce=false;
 }
 
-void MeCtNewLocomotion::updateChannelBuffer(MeFrameData& frame)
+void MeCtNewLocomotion::updateChannelBuffer(SrBuffer<float>& buffer)
 {
-	SrBuffer<float>& buffer=frame.buffer();
 	S->connect(sk);
 	S->apply(motionTime);
-	for(int i=0; i<sk->getNumJoints(); i++)
+	for(int i = 0; i < sk->getNumJoints(); i++)
 	{
-			SmartBody::SBJoint* joint=sk->getJoint(i);	
+			SmartBody::SBJoint* joint = sk->getJoint(i);	
 			int chanId = _context->channels().search(joint->getMappedJointName(), SkChannel::Quat);
 			if (chanId < 0)
 				continue;
 			int index = _context->toBufferIndex(chanId);
-			SrQuat quat= joint->quat()->rawValue();
+			SrQuat quat = joint->quat()->rawValue();
 			if(index<0)
 				continue;
 			buffer[index + 0] = quat.w;
@@ -309,71 +366,67 @@ void MeCtNewLocomotion::controller_start()
 	RightFading.controlRestart();
 }
 
-void MeCtNewLocomotion::addPawn(SrVec& pos, SrQuat& rot, std::string name)
+void MeCtNewLocomotion::addPawn(SrVec& pos, std::string name)
 {
-	if(SmartBody::SBScene::getScene()->getPawn(name) == NULL)
-		SmartBody::SBScene::getScene()->createPawn(name);
-	SmartBody::SBPawn* pawn=SmartBody::SBScene::getScene()->getPawn(name);
+	
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
+	if(pawn == NULL)
+		pawn = SmartBody::SBScene::getScene()->createPawn(name);
 	pawn->setPosition(pos);
 	pawn->setStringAttribute("collisionShape","sphere");
-	pawn->setVec3Attribute("collisionShapeScale",0.1f,0.1f,0.1f);
+	pawn->setVec3Attribute("collisionShapeScale",0.03f,0.03f,0.03f);
 }
 
 void MeCtNewLocomotion::updateConstraints(float t)
 {
-	const float fadein=0.2f;
-	const float fadeout=0.5f;
 	if(useIKRt)
 	{
-		if(t>rplant[1] && t<rplant[2] && RightFading.fadeMode==Fading::FADING_MODE_OFF )
+		if(t > rplant[1] && t < rplant[2] && RightFading.fadeMode == Fading::FADING_MODE_OFF )
 		{
 			RightFading.setFadeOut(fadeout);
 		}
 	}
-	else if(t>rplant[2] && t<rplant[3] && RightFading.fadeMode==Fading::FADING_MODE_OFF)
+	else if(((t > rplant[2] && t < rplant[3] )|| t > rplant[0] && t < rplant[1])&& RightFading.fadeMode == Fading::FADING_MODE_OFF)
 	{	
-		SmartBody::SBSkeleton *sk2=character->getSkeleton();
+		SmartBody::SBSkeleton *sk2 = character->getSkeleton();
 		sk2->update_global_matrices();
-		ik_scenario.ikGlobalMat=sk2->root()->gmat();
-		SmartBody::SBJoint* joint=sk2->getJointByName("JtHeelRt");	
+		ik_scenario.ikGlobalMat = sk2->root()->gmat();
+		SmartBody::SBJoint* joint = sk2->getJointByName(rend);	
 		SrVec tv = joint->gmat().get_translation();
 		SrQuat tq = SrQuat(joint->gmat());
+		tv.y=0.0f;
 		ConstraintType cType = CONSTRAINT_ROT;
-		LOG("%f Rt", t);
-		addEffectorJointPair("JtHeelRt", "JtPelvis" ,tv, tq, cType, posConsRt, rotConsRt);
+		addEffectorJointPair(rend.c_str(), hipjoint.c_str(), tv, tq, cType, posConsRt, rotConsRt);
 		cType = CONSTRAINT_POS;
-		addEffectorJointPair("JtHeelRt", "JtPelvis" ,tv, tq, cType, posConsRt, rotConsRt);
+		addEffectorJointPair(rend.c_str(), hipjoint.c_str(), tv, tq, cType, posConsRt, rotConsRt);
 		RightFading.setFadeIn(fadein);
-		//addPawn(tv, "goal");
 	}
 	if(useIKLf)
 	{
-		if(t>lplant[1] && LeftFading.fadeMode==Fading::FADING_MODE_OFF )
+		if(t > lplant[1] && LeftFading.fadeMode == Fading::FADING_MODE_OFF )
 		{
 			LeftFading.setFadeOut(fadeout);
 		}
 	}
-	else if(t>lplant[0] && t<lplant[1] && LeftFading.fadeMode==Fading::FADING_MODE_OFF)
+	else if(t > lplant[0] && t < lplant[1] && LeftFading.fadeMode == Fading::FADING_MODE_OFF)
 	{		
-		SmartBody::SBSkeleton *sk2=character->getSkeleton();
+		SmartBody::SBSkeleton *sk2 = character->getSkeleton();
 		sk2->update_global_matrices();
-		ik_scenario.ikGlobalMat=sk2->root()->gmat();
-		SmartBody::SBJoint* joint=sk2->getJointByName("JtHeelLf");	
+		ik_scenario.ikGlobalMat = sk2->root()->gmat();
+		SmartBody::SBJoint* joint = sk2->getJointByName(lend);	
 		SrVec tv = joint->gmat().get_translation();
 		SrQuat tq = SrQuat(joint->gmat());
+		tv.y=0.0f;
 		ConstraintType cType = CONSTRAINT_ROT;
-		LOG("%f Lf", t);
-		addEffectorJointPair("JtHeelLf", "JtPelvis" ,tv, tq, cType, posConsLf, rotConsLf);
+		addEffectorJointPair(lend.c_str(), hipjoint.c_str(), tv, tq, cType, posConsLf, rotConsLf);
 		cType = CONSTRAINT_POS;
-		addEffectorJointPair("JtHeelLf", "JtPelvis" ,tv, tq, cType, posConsLf, rotConsLf);
+		addEffectorJointPair(lend.c_str(), hipjoint.c_str(), tv, tq, cType, posConsLf, rotConsLf);
 		LeftFading.setFadeIn(fadein);
-		//addPawn(tv, "goal");
 	}
 }
 
-void MeCtNewLocomotion::updateWorldOffset(MeFrameData& frame, SrQuat& rot, SrVec& pos )
+void MeCtNewLocomotion::updateWorldOffset(SrBuffer<float>& buffer, SrQuat& rot, SrVec& pos )
 {	
-	SrBuffer<float>& buffer = frame.buffer();
 	JointChannelId baseChanID, baseBuffId;
 	baseChanID.x = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::XPos);
 	baseChanID.y = _context->channels().search(SbmPawn::WORLD_OFFSET_JOINT_NAME, SkChannel::YPos);
@@ -390,6 +443,51 @@ void MeCtNewLocomotion::updateWorldOffset(MeFrameData& frame, SrQuat& rot, SrVec
 	buffer[baseBuffId.z] = pos[2];	
 	for (int k = 0; k < 4; k++)
 		buffer[baseBuffId.q + k] = rot.getData(k);
+}
+
+
+void  MeCtNewLocomotion::notify(SmartBody::SBSubject* subject)
+{
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
+	if (attribute)
+	{
+		const std::string& name = attribute->getName();
+		bool check_attributes=false;
+		for(unsigned int i = 0; i< attributes_names.size(); i++)
+			if (name == attributes_names[i])
+				check_attributes=true;
+		if(check_attributes)
+			setup();
+	}
+}
+
+void MeCtNewLocomotion::reset()
+{	
+	scootSpd = 0.0f;
+	movingSpd = 0.0f;
+	turningSpd = 0.0f;
+	_valid = false;
+	startTime = -1.0;
+	useIKRt = false;
+	useIKLf = false;
+	setup();	
+	posConsRt.clear();
+	rotConsRt.clear();
+	posConsLf.clear();
+	rotConsLf.clear();
+	LeftFading.controlRestart();
+	RightFading.controlRestart();
+	character->set_world_offset(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f); 
+}
+
+float MeCtNewLocomotion::legDistance(bool Leftleg)
+{
+	std::vector<std::string> jointNames;
+	std::vector<SrVec> jointPositions;
+	(Leftleg)? jointNames.push_back("l_hip") : jointNames.push_back("r_hip");
+	(Leftleg)? jointNames.push_back("l_forefoot") : jointNames.push_back("r_forefoot");
+	sk->getJointPositions(jointNames, jointPositions);
+	return (jointPositions[0] - jointPositions[1]).len();;
 }
 
 Fading::Fading()
@@ -435,7 +533,6 @@ bool Fading::updateFading( float dt )
 	return finishFadeOut;
 }
 
-
 void Fading::setFadeIn( float interval )
 {
 	if (blendWeight == 1.0 && fadeMode == FADING_MODE_OFF)
@@ -458,6 +555,9 @@ void Fading::setFadeOut( float interval )
 
 void Fading::controlRestart()
 {
+	fadeMode = FADING_MODE_OFF;
+	blendWeight = 0.0;
+	prev_time = 0.0;
 	restart = true;
 }
 

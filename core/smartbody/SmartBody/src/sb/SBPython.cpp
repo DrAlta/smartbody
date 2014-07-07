@@ -52,6 +52,7 @@
 #include <stdlib.h>
 #include <sbm/GenericViewer.h>
 #include <controllers/me_ct_motion.h>
+#include <controllers/me_ct_new_locomotion.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -464,6 +465,13 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("setDebug", &SBController::setDebug, "Sets the debug state for this controller.")
 		.def("isDebug", &SBController::isDebug, "Is the controller in a debug state?")
 		.def("getDuration", &SBController::getDuration, "Gets the controller's duration.")
+		;
+
+	boost::python::class_<MeCtNewLocomotion, boost::python::bases<SBController,SBObject> >("SBNewLocomotion")
+		.def(boost::python::init<>())
+		.def("reset", &MeCtNewLocomotion::reset, "Resets.")
+		.def("setDesiredHeading", &MeCtNewLocomotion::setDesiredHeading, "Sets the desired heading")
+		.def("loopMotion", &MeCtNewLocomotion::loopMotion, "Checks a loop")
 		;
 
 	boost::python::class_<MeCtScheduler2, boost::python::bases<SBController> > ("SchedulerController")
