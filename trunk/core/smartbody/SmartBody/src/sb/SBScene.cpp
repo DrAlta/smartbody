@@ -71,6 +71,7 @@
 #include <controllers/me_ct_breathing.h>
 #include <controllers/me_ct_example_body_reach.hpp>
 #include <controllers/me_ct_saccade.h>
+#include <controllers/me_ct_new_locomotion.h>
 #include <sbm/KinectProcessor.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <sr/sr_sn_group.h>
@@ -3895,6 +3896,7 @@ void SBScene::createDefaultControllers()
 	 _defaultControllers.push_back(new MeCtExampleBodyReach(reachMap));
 	 _defaultControllers.push_back(new MeCtBreathing());
 	 _defaultControllers.push_back(new MeCtGaze());
+	 _defaultControllers.push_back(new MeCtNewLocomotion());
 
 	 for (size_t x = 0; x < _defaultControllers.size(); x++)
 		 _defaultControllers[x]->ref();

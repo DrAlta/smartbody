@@ -46,6 +46,7 @@
 
 #define DebugInfo 0
 #define FastStart 1
+#define SOLVE_HEADING_ONLY 1
 
 PPRAISteeringAgent::PPRAISteeringAgent(SmartBody::SBCharacter* c) : SmartBody::SBSteerAgent(c)
 {
@@ -54,7 +55,7 @@ PPRAISteeringAgent::PPRAISteeringAgent(SmartBody::SBCharacter* c) : SmartBody::S
 	agent = NULL;
 	target = NULL;
 
-	forward = Util::Vector(-1.0f, 0.0f, 0.0f);
+	forward = Util::Vector(0.0f, 0.0f, 1.0f);
 	rightSide = rightSideInXZPlane(forward);
 	currentSpeed = 1.0f;
 	velocity = forward * currentSpeed;
@@ -1126,11 +1127,13 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
  	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
 	const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
+	Util::Vector totalSteeringForce;
+	float angleGlobal;
+	float curSpeed;
 
 	//--------------------------------------------------------
 	// WJ added start
 	// TODO: define/initialize these vars properly:
-	Util::Vector totalSteeringForce;
 	Util::Vector newForward;
 
 	//
@@ -1144,7 +1147,7 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 		// turn to face "targetDirection" - magnitude of targetDirection doesn't matter
 		float initialDot = dot(steeringCommand.targetDirection, rightSide);
 		float turningRate = (initialDot > 0.0f) ? PED_MAX_TURNING_RATE : -PED_MAX_TURNING_RATE;  // positive rate is right-turn
-		turningRate*=15.0f*dt;//Slows the turning rate
+		turningRate *= (float)character->getDoubleAttribute("TurningRate") *dt;//Slows the turning rate
 		newForward = forward + turningRate * fabsf(steeringCommand.turningAmount) * rightSide;
 		float newDot = dot(steeringCommand.targetDirection, rightSideInXZPlane(newForward)); // dot with the new side vector
 		if (initialDot*newDot <= 0.0f) {
@@ -1159,14 +1162,13 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 			//   proper solution is to add extra conditions that verify the original direction of forward was not opposite of targetDirection.
 			//
 			// WJ: need to change here
+
 			newForward = Util::Vector(steeringCommand.targetDirection.x, 0.0f, steeringCommand.targetDirection.z);
 
 		}
 	}
 
-	//
 	// set the orientation
-	//
 	newForward = normalize(newForward);
 	forward = newForward;
 	rightSide = rightSideInXZPlane(newForward);
@@ -1175,11 +1177,10 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 	// everything else in command-based steering, however, is physcially based.
 	velocity = newForward * currentSpeed;
 
-	//
 	// choose the force of the agent.  In command-based mode, the force is always aligned 
 	// with the agent's forward facing direction, so we can use scalars until we add 
 	// side-to-side scoot at the end.
-	//
+
 	assert(fabsf(steeringCommand.acceleration) <= 1.0f); // -1.0f <= acceleration <= 1.0f;
 	if (!steeringCommand.aimForTargetSpeed) {
 		// simple "speed up" or "slow down"
@@ -1208,8 +1209,8 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 	// WJ added end
 	//---------------------------------------------------------------------------
 
-
-	float angleGlobal = radToDeg(atan2(steeringCommand.targetDirection.x, steeringCommand.targetDirection.z));
+#if !SOLVE_HEADING_ONLY
+	angleGlobal = radToDeg(atan2(steeringCommand.targetDirection.x, steeringCommand.targetDirection.z));
 	normalizeAngle(angleGlobal);
 	normalizeAngle(yaw);
 	float angleDiff = angleGlobal - yaw;
@@ -1230,7 +1231,7 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 	else
 	{
 		character->new_locomotion_ct->setValid(true);
-		float curSpeed = character->new_locomotion_ct->getMovingSpd() * scene->getScale();
+		curSpeed = character->new_locomotion_ct->getMovingSpd() * scene->getScale();
 		if (steeringCommand.aimForTargetSpeed)
 		{
 			if (curSpeed < steeringCommand.targetSpeed)
@@ -1251,11 +1252,27 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 		newSpeed = curSpeed;
 		curSpeed = curSpeed / scene->getScale();
 		character->new_locomotion_ct->setMovingSpd(curSpeed);	
-
-
+#endif
+	static bool flag=true;
 		//-------------------------------
 		// WJ added start
-
+	int numGoals = goalQueue.size();
+	if (numGoals == 0)
+	{
+		if(flag)
+		{
+			character->_reachTarget = true;
+			character->new_locomotion_ct->setValid(false);
+			//character->new_locomotion_ct->reset();
+			newSpeed = 0.0f;
+			sendLocomotionEvent("success");
+			flag= false;
+			//forward = Util::Vector(0.0f, 0.0f, 1.0f);
+		}
+	}
+	else
+	{
+		flag=true;
 		// do euler step with force
 		// compute acceleration and velocity by a simple Euler step
 		const Util::Vector clippedForce = clamp(totalSteeringForce, PED_MAX_FORCE);
@@ -1268,13 +1285,14 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 		normalizeAngle(angleGlobal);
 		curSpeed = currentSpeed / scene->getScale();
 		newSpeed = currentSpeed;
+		character->new_locomotion_ct->setValid(true);
 		character->new_locomotion_ct->setMovingSpd(curSpeed);
 		character->new_locomotion_ct->setDesiredHeading(angleGlobal); // affective setting
-
 		// WJ added end
 		//------------------------------------
+	}
 
-
+#if !SOLVE_HEADING_ONLY
 		character->new_locomotion_ct->setTurningSpd(angleDiff * newLocoAngleGain);
 		float curScoot = character->new_locomotion_ct->getScootSpd() / newLocoScootGain;
 		if (steeringCommand.scoot != 0.0)
@@ -1304,6 +1322,7 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 		}
 		character->new_locomotion_ct->setScootSpd(curScoot * newLocoScootGain);
 	}
+#endif
 	return newSpeed;
 }
 

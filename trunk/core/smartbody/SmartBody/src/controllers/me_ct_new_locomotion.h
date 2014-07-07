@@ -35,8 +35,8 @@
 const int rplant[]={0,1,11,15};
 const int lplant[]={4,8};
 #else
-const int rplant[]={0,8,29,36};
-const int lplant[]={10,24};
+const int rplant[]={0,6,29,36};
+const int lplant[]={10,22};
 #endif
 
 class Fading
@@ -72,7 +72,7 @@ class MeCtNewLocomotion : public SmartBody::SBController
 			CONSTRAINT_ROT,
 			NUM_OF_CONSTRAINT
 		};
-		MeCtNewLocomotion(SbmCharacter* c);
+		MeCtNewLocomotion();
 		~MeCtNewLocomotion();
 		void init(SbmCharacter* sbChar);
 		bool addEffectorJointPair(const char* effectorName, const char* effectorRootName, const SrVec& pos , const SrQuat& rot , 
@@ -84,6 +84,8 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		virtual SkChannelArray& controller_channels()	{return(_channels);}
 		virtual double controller_duration()			{return -1;}
 		virtual const std::string& controller_type() const		{return(_type_name);}
+
+		virtual void setup();
 		
 	protected:
 		MeCtJacobianIK       ik;
@@ -103,14 +105,22 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		void setValid(bool v) {_valid = v;}
 		void setDesiredHeading(float v) {desiredHeading = v;}
 		float getDesiredHeading() {return desiredHeading;}
-
+		void notify(SmartBody::SBSubject* subject);
+		void play(float t, bool useTemp=false);
+		void reset();
+		void loopMotion(float def);
 	private:
-		void addPawn(SrVec& pos, SrQuat& rot,  std::string name);
+		void addPawn(SrVec& pos, std::string name);
+		float legDistance(bool Leftleg);
 		bool _valid;
 		float scootSpd;
 		float movingSpd;
 		float turningSpd;
 		float motionSpd;
+		float fadein;
+		float fadeout;
+		float startTime;
+		float neutralLegDistance;
 		int currStp;
 		SkChannelArray _channels;
 		SbmCharacter* character;
@@ -118,11 +128,15 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		float desiredHeading, motionTime;
 		double ikDamp;
 		SmartBody::SBMotion *C, *S;
-		SmartBody::SBSkeleton* sk;		
+		SmartBody::SBSkeleton* sk;
+		std::string lend, rend, hipjoint;
+		vector<string> attributes_names;
+		SrBuffer<float> tempBuffer;
+		SrBuffer<float>* BufferRef;
 	protected:	
-		void updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>& quatList, bool bRead = false);
-		void updateChannelBuffer(MeFrameData& frame);
-		void updateWorldOffset(MeFrameData& frame, SrQuat& rot, SrVec& pos);
+		void updateChannelBuffer(SrBuffer<float>& buffer, std::vector<SrQuat>& quatList, bool bRead = false);
+		void updateChannelBuffer(SrBuffer<float>& buffer);
+		void updateWorldOffset(SrBuffer<float>& buffer, SrQuat& rot, SrVec& pos);
 		void updateConstraints(float t);
 };
 

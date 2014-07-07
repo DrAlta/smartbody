@@ -94,7 +94,7 @@
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #endif
 
-#define USE_NEW_LOCOMOTION 0
+#define USE_NEW_LOCOMOTION 1
 #define USE_REACH 1
 #define USE_PHYSICS_CHARACTER 1
 //#define USE_REACH_TEST 0
@@ -341,7 +341,7 @@ void SbmCharacter::createStandardControllers()
 
 	// new locomotion
 #if USE_NEW_LOCOMOTION
-	this->new_locomotion_ct = new MeCtNewLocomotion(this);
+	this->new_locomotion_ct = new MeCtNewLocomotion();
 	std::string nLocoName = getName() + "_newLocomotionController";
 	this->new_locomotion_ct->setName(nLocoName.c_str());
 	this->new_locomotion_ct->ref();
