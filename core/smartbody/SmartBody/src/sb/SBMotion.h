@@ -119,6 +119,7 @@ class SBMotion : public SkMotion
 		SBAPI void saveToSkm(const std::string& fileName);
 		SBAPI void saveToSkmByFrames(const std::string& fileName, int startFrame, int endFrame);
 		SBAPI void saveToSkb(const std::string& fileName);
+		SBAPI void saveToBVH(const std::string& fileName, const std::string& skelName);
 		SBAPI bool readFromSkb(const std::string& fileName);
 
 		SBAPI float getJointSpeed(SBJoint* joint, float startTime, float endTime);
@@ -192,8 +193,7 @@ class SBMotion : public SkMotion
 		bool getInterpolationFrames(float time, int& f1, int& f2, float& weight);
 		static bool kMeansClustering1D(int num, std::vector<double>& inputPoints, std::vector<double>& outMeans);
 		static void calculateMeans(std::vector<double>&inputPoints, std::vector<double>& means, double convergentValue);
-		int getKeyFrameFromTime(float t, int firstFrame, int lastFrame);
-
+		int getKeyFrameFromTime(float t, int firstFrame, int lastFrame);		
 		// the counter used to keep track of how deep this motion is under consecutive transformation ( mirror, smooth, etc )
 		int transformDepth;
 		std::string _motionFile;

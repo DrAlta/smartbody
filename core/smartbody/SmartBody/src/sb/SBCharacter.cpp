@@ -21,6 +21,7 @@
 #include <sb/SBReach.h>
 #include <sb/SBSceneListener.h>
 #include <sb/SBMotionGraph.h>
+#include <controllers/MeCtReachEngine.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -1288,6 +1289,18 @@ SBAPI const SBM_CharacterFrameDataMarshalFriendly & SBCharacter::GetFrameDataMar
    }
 
    return *frameDataMarshalFriendly;
+}
+
+SBAPI std::string SBCharacter::getReachAttachedPawnName(const std::string& reachType)
+{
+	std::string result = "null";
+	int reachID = MeCtReachEngine::getReachType(reachType);
+	if (reachEngineMap->find(reachID) != reachEngineMap->end())
+	{
+		MeCtReachEngine* reachEngine = (*reachEngineMap)[reachID];
+		result = reachEngine->getAttachedPawnName();
+	}
+	return result;
 }
 
 };

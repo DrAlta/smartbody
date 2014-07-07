@@ -98,6 +98,7 @@ class SBCharacter : public SbmCharacter
 		SBAPI void setDeformableMeshName(const std::string& meshName);
 
 		SBAPI const SBM_CharacterFrameDataMarshalFriendly & GetFrameDataMarshalFriendly();
+		SBAPI std::string getReachAttachedPawnName(const std::string& reachType); // get the name of pawn that is currently picked up by the character. If there is no pawn attached, then the method return name="null".
 
 	protected:
 		void InitFrameDataMarshalFriendly();

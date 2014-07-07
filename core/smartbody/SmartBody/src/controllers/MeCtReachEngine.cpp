@@ -626,3 +626,16 @@ int MeCtReachEngine::getReachType( const std::string& tag )
 	}
 	return -1;
 }
+
+std::string MeCtReachEngine::getAttachedPawnName()
+{
+	SmartBody::SBPawn* pawn = reachData->effectorState.getAttachedPawn();
+	if (pawn)
+	{
+		return pawn->getName();
+	}
+	else
+	{
+		return "null";
+	}
+}

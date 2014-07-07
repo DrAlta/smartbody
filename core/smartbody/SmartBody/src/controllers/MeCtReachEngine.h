@@ -82,6 +82,7 @@ public:
 	IKTreeNodeList& ikTreeNodes() { return ikScenario.ikTreeNodes; }
 	ConstraintMap&  getHandConstraint() { return handConstraint; }
 
+	std::string getAttachedPawnName();
 
 	bool addHandConstraint(SmartBody::SBJoint* targetJoint, const char* effectorName);
 	void updateReach(float t, float dt, BodyMotionFrame& inputFrame, float blendWeight);

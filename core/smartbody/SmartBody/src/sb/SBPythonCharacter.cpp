@@ -161,6 +161,7 @@ void pythonFuncsCharacter()
 		.def("startMotionGraphWithPath", &SBCharacter::startMotionGraphWithPath, "Start running the motion graph and synthesize a graph walk based on input path.")
 		.def("updateFaceDefinition", &SBCharacter::updateFaceDefinition, "Updates the face definition.")
 		.def("updateDefaultFacePose", &SBCharacter::updateDefaultFacePose, "Updates the default face pose.")
+		.def("getReachAttachedPawnName", &SBCharacter::getReachAttachedPawnName, "Get the name of currently attached pawn in the reach controller.")
 		;
 }
 }
