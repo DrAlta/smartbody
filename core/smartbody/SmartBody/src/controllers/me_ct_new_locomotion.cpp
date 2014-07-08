@@ -26,6 +26,8 @@
 #include <controllers/me_ct_scheduler2.h>
 #include <sb/SBScene.h>
 #include <sbm/gwiz_math.h>
+#include <sb/SBRetargetManager.h>
+#include <sb/SBRetarget.h>
 
 
 std::string MeCtNewLocomotion::_type_name = "NewLocomotion";
@@ -39,22 +41,27 @@ MeCtNewLocomotion::MeCtNewLocomotion() :  SmartBody::SBController()
 	_lastTime = -2.0;
 	startTime = -1.0;
 	C=S=NULL;
-	
 	LeftFading.prev_time = -1.0f;
 	RightFading.prev_time = -1.0f;
 	_duration = -1.0f;
 	useIKRt = false;
 	useIKLf = false;
+	sk = NULL;
+	walkScale = 1.0f;
 
 	setDefaultAttributeGroupPriority("EnhancedLocomotion", 600);
 
 	addDefaultAttributeString("walkCycle", "ChrBrad@Walk01B", "EnhancedLocomotion");
+	addDefaultAttributeString("walkSkeleton", "ChrBrad.sk", "EnhancedLocomotion");
+	addDefaultAttributeDouble("walkScale", 1.0, "EnhancedLocomotion");
 	addDefaultAttributeString("LEndEffectorJoint", "l_forefoot", "EnhancedLocomotion");
 	addDefaultAttributeString("REndEffectorJoint", "r_forefoot", "EnhancedLocomotion");
 	addDefaultAttributeString("CenterHipJoint", "JtPelvis", "EnhancedLocomotion");
 	addDefaultAttributeDouble("FadeIn", 0.2, "EnhancedLocomotion");
 	addDefaultAttributeDouble("FadeOut", 0.4, "EnhancedLocomotion");
 	addDefaultAttributeDouble("TurningRate", 15.0, "EnhancedLocomotion");
+	addDefaultAttributeString("footPlantRight", "0,6,29,36", "EnhancedLocomotion");
+	addDefaultAttributeString("footPlantLeft", "10,22", "EnhancedLocomotion");
 }
 
 MeCtNewLocomotion::~MeCtNewLocomotion()
@@ -66,11 +73,16 @@ void MeCtNewLocomotion::init(SbmCharacter* sbChar)
 	character = sbChar;
 
 	attributes_names.push_back("walkCycle");
+	attributes_names.push_back("walkSkeleton");
+	attributes_names.push_back("walkScale");
 	attributes_names.push_back("CenterHipJoint");
 	attributes_names.push_back("LEndEffectorJoint");
 	attributes_names.push_back("REndEffectorJoint");
 	attributes_names.push_back("FadeIn");
 	attributes_names.push_back("FadeOut");
+	attributes_names.push_back("TurningRate");
+	attributes_names.push_back("footPlantRight");
+	attributes_names.push_back("footPlantLeft");
 	for(unsigned int i = 0; i< attributes_names.size(); i++)
 	{
 		SmartBody::SBAttribute* a = character->getAttribute(attributes_names[i]);
@@ -96,12 +108,36 @@ void MeCtNewLocomotion::setup()
 	fadein  = (float)character->getDoubleAttribute("FadeIn");
 	fadeout = (float)character->getDoubleAttribute("FadeOut");
 
-	if(!SameMotion)
+	std::string skeletonName = character->getStringAttribute("walkSkeleton");
+	SmartBody::SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
+
+	bool isNewSkeleton = false;
+	if (!sk || sk->getName() != skeletonName)
+	{
+		SmartBody::SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
+		if (!skeleton)
+			return;
+		sk = new SmartBody::SBSkeleton(skeleton);
+		isNewSkeleton = true;
+	}
+
+	if (!sk)
+		return;
+
+	bool isNewWalkScale = false;
+	float scale = (float) character->getDoubleAttribute("walkScale");
+	if (fabs(walkScale - scale) < .0001)
+		isNewWalkScale = true;
+	walkScale = scale;
+
+	if(!SameMotion || isNewSkeleton || isNewWalkScale)
 	{
 		S = C->smoothCycle("", 0.5f);
-		sk = new SmartBody::SBSkeleton(SmartBody::SBScene::getScene()->getSkeleton("ChrBrad.sk"));
+		
 		S->connect(sk);
-		motionSpd = S->getJointSpeed(sk->getJointByName(hipjoint), (float)S->getTimeStart() , (float)S->getTimeStop())*0.75f;
+		
+		motionSpd = walkScale * S->getJointSpeed(sk->getJointByName(hipjoint), (float)S->getTimeStart() , (float)S->getTimeStop())*0.75f ;
+		LOG("Speed is %f", motionSpd);
 		S->disconnect();
 
 	}
@@ -119,6 +155,27 @@ void MeCtNewLocomotion::setup()
 	MeController::init(character);
 	ik.dampJ = ikDamp;
 	ik.refDampRatio = 0.01;
+
+	std::string rightPlants = character->getStringAttribute("footPlantRight");
+	std::vector<std::string> rPlantVector;
+	vhcl::Tokenize(rightPlants, rPlantVector, ",");
+	rplant.clear();
+	rplant.resize(rPlantVector.size());
+	for (size_t p = 0; p < rPlantVector.size(); p++)
+	{
+		rplant[p] = atoi(rPlantVector[p].c_str());
+	}
+
+	std::string leftPlants = character->getStringAttribute("footPlantLeft");
+	std::vector<std::string> lPlantVector;
+	vhcl::Tokenize(leftPlants, lPlantVector, ",");
+	lplant.clear();
+	lplant.resize(lPlantVector.size());
+	for (size_t p = 0; p < lPlantVector.size(); p++)
+	{
+		lplant[p] = atoi(lPlantVector[p].c_str());
+	}
+	
 }
 
 bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
@@ -206,7 +263,7 @@ void MeCtNewLocomotion::play(float t, bool useTemp)
 		
 	ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_REF);	
 	character->getSkeleton()->update_global_matrices();
-	ik_scenario.ikGlobalMat = character->getSkeleton()->getJointByName("JtPelvis")->gmat();
+	ik_scenario.ikGlobalMat = character->getSkeleton()->getJointByName(hipjoint)->gmat();
 	//*/Character pose
 	ik.setDt(LeftFading.dt);
 	if (LeftFading.fadeMode == Fading::FADING_MODE_IN)
@@ -296,6 +353,8 @@ void MeCtNewLocomotion::updateChannelBuffer(SrBuffer<float>& buffer, std::vector
 
 void MeCtNewLocomotion::updateChannelBuffer(SrBuffer<float>& buffer)
 {
+	SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();
+	SmartBody::SBRetarget* retarget =retargetManager->getRetarget(S->getMotionSkeletonName(),character->getSkeleton()->getName());
 	S->connect(sk);
 	S->apply(motionTime);
 	for(int i = 0; i < sk->getNumJoints(); i++)
@@ -306,12 +365,13 @@ void MeCtNewLocomotion::updateChannelBuffer(SrBuffer<float>& buffer)
 				continue;
 			int index = _context->toBufferIndex(chanId);
 			SrQuat quat = joint->quat()->rawValue();
+			SrQuat retargetQ = retarget->applyRetargetJointRotation(joint->getMappedJointName(),quat);			
 			if(index<0)
 				continue;
-			buffer[index + 0] = quat.w;
-			buffer[index + 1] = quat.x;
-			buffer[index + 2] = quat.y;
-			buffer[index + 3] = quat.z;
+			buffer[index + 0] = retargetQ.w;
+			buffer[index + 1] = retargetQ.x;
+			buffer[index + 2] = retargetQ.y;
+			buffer[index + 3] = retargetQ.z;
 	}
 	S->disconnect();
 }

@@ -71,6 +71,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 	std::string baseName = boost::filesystem::basename(motionPath);
 	motion.setName(baseName);
 	skeleton.setName(baseName);
+	motion.filename(name.c_str());
 	int state = 0;
 	char* str = NULL;
 	stack<SkJoint*> stack;
