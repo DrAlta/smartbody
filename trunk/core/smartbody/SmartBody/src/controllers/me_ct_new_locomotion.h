@@ -31,14 +31,6 @@
 #include <controllers/me_ct_constraint.hpp>
 #define NEW_CONTROL_RUNNING 0
 
-#if NEW_CONTROL_RUNNING
-const int rplant[]={0,1,11,15};
-const int lplant[]={4,8};
-#else
-const int rplant[]={0,6,29,36};
-const int lplant[]={10,22};
-#endif
-
 class Fading
 {
 public:
@@ -122,6 +114,7 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		float startTime;
 		float neutralLegDistance;
 		int currStp;
+		float walkScale;
 		SkChannelArray _channels;
 		SbmCharacter* character;
 		double _lastTime;
@@ -133,6 +126,9 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		vector<string> attributes_names;
 		SrBuffer<float> tempBuffer;
 		SrBuffer<float>* BufferRef;
+
+		std::vector<int> rplant;
+		std::vector<int> lplant;
 	protected:	
 		void updateChannelBuffer(SrBuffer<float>& buffer, std::vector<SrQuat>& quatList, bool bRead = false);
 		void updateChannelBuffer(SrBuffer<float>& buffer);

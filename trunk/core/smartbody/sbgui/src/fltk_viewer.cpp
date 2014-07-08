@@ -2138,18 +2138,18 @@ int FltkViewer::handle ( int event )
 	switch ( event )
 	{   
 		case FL_DND_RELEASE:
-		LOG("DND Release");
+//		LOG("DND Release");
 		break;
 		case FL_DND_ENTER:          // return(1) for these events to 'accept' dnd
-		LOG("DND Enter");
+//		LOG("DND Enter");
 		return 1;
 		break;
 		case FL_DND_DRAG:
-		LOG("DND Drag");
+//		LOG("DND Drag");
 		break;
 
 		case FL_DND_LEAVE:
-		LOG("DND Leave");
+//		LOG("DND Leave");
 		break;
 	}
 
@@ -2165,18 +2165,18 @@ int FltkViewer::handle ( int event )
    switch ( event )
    {   
 	   case FL_DND_RELEASE:
-		   LOG("DND Release");
+//		   LOG("DND Release");
 	       ret = 1;
 	       break;
 	   case FL_DND_ENTER:          // return(1) for these events to 'accept' dnd
-		   LOG("DND Enter");
+//		   LOG("DND Enter");
 		   Fl::belowmouse(this); // send the leave events first
 		   Fl::focus(this);
 		   handle(FL_FOCUS);		
 		   ret = 1;
 		   break;
 	   case FL_DND_DRAG:
-		   LOG("DND Drag");
+//		   LOG("DND Drag");
 		   translate_event ( e, SrEvent::EventPush, w(), h(), this );
 		   dndX = e.mouse.x;
 		   dndY = e.mouse.y;
@@ -2184,7 +2184,7 @@ int FltkViewer::handle ( int event )
 		   break;
 
 	   case FL_DND_LEAVE:
-		   LOG("DND Leave");
+//		   LOG("DND Leave");
 		   ret = 1;
 		   break;	  
 	   case FL_PASTE:              // handle actual drop (paste) operation		   
