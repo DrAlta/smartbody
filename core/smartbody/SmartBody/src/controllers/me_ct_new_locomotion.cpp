@@ -365,7 +365,9 @@ void MeCtNewLocomotion::updateChannelBuffer(SrBuffer<float>& buffer)
 				continue;
 			int index = _context->toBufferIndex(chanId);
 			SrQuat quat = joint->quat()->rawValue();
-			SrQuat retargetQ = retarget->applyRetargetJointRotation(joint->getMappedJointName(),quat);			
+			SrQuat retargetQ =  quat; 
+			if (retarget)
+				retargetQ = retarget->applyRetargetJointRotation(joint->getMappedJointName(),quat);			
 			if(index<0)
 				continue;
 			buffer[index + 0] = retargetQ.w;
