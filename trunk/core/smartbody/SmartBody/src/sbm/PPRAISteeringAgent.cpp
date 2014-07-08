@@ -1259,12 +1259,15 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 	int numGoals = goalQueue.size();
 	if (numGoals == 0)
 	{
+		character->_reachTarget = true;
+		character->new_locomotion_ct->setValid(false);
+		character->new_locomotion_ct->setMovingSpd(0.0f);
+		character->new_locomotion_ct->setTurningSpd(0.0f);
+		character->new_locomotion_ct->setScootSpd(0.0f);
+		newSpeed = 0.0f;
 		if(flag)
 		{
-			character->_reachTarget = true;
-			character->new_locomotion_ct->setValid(false);
 			//character->new_locomotion_ct->reset();
-			newSpeed = 0.0f;
 			sendLocomotionEvent("success");
 			flag= false;
 			//forward = Util::Vector(0.0f, 0.0f, 1.0f);
