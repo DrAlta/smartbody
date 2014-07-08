@@ -2932,50 +2932,9 @@ void printHierarchy(FILE* file, SmartBody::SBJoint* joint, int depth, std::vecto
 		return;
 	}
 
-	//print_tabs( depth );
-	if( depth == 0 )	{
-		//*_record_output << "ROOT " << joint_p->jointName().c_str() << "\n";
-		fprintf(file,"ROOT %s\n",joint->jointName().c_str());
-	}
-	else	{
-		//*_record_output << "JOINT " << joint_p->jointName().c_str() << "\n";
-		fprintf(file,"JOINT %s\n",joint->jointName().c_str());
-	}
-
-	jointIdxs.push_back(joint->index());
-	//print_tabs( depth );
-	//*_record_output << "{\n";
-	fprintf(file, "{\n");
-
-	//print_tabs( depth + 1 );
-	//*_record_output << "OFFSET ";
-	fprintf(file,"Offset ");
-
-	// STUPID-POLYTRANS ignores ROOT OFFSET: added to CHANNEL motion
-	if( depth == 0 )	{
-		//*_record_output << "0.0 0.0 0.0 \n";
-		fprintf(file,"0.0 0.0 0.0 \n");
-	}
-	else	{
-		SrVec offset_v = joint->offset();
-
-		fprintf(file, "%f %f %f \n", offset_v.x,offset_v.y,offset_v.z);
-		// STUPID-POLYTRANS subtracts OFFSET instead of adds
-	}
-
-	// CHANNELS: 
-	// Optimize: check 
-	//   SkJointQuat::_active, and 
-	//   SkJointPos:SkVecLimits::frozen()
-	//print_tabs( depth + 1 );
-	//*_record_output << "CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n";
-	fprintf(file, "CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n");
-
 	int num_child = joint->getNumChildren();
-	if( num_child == 0 )	{
-
-		//print_tabs( depth + 1 );
-		//*_record_output << "End Site\n";
+	if (num_child == 0)
+	{
 		fprintf(file, "End Site\n");
 		//print_tabs( depth + 1 );
 		//*_record_output << "{\n";
@@ -2985,7 +2944,10 @@ void printHierarchy(FILE* file, SmartBody::SBJoint* joint, int depth, std::vecto
 		// This is the geometric vector of the final bone segment
 		//print_tabs( depth + 2 );
 		//*_record_output << "OFFSET 0.0 0.0 0.0\n";
-		fprintf(file, "OFFSET 0.0 0.0 0.0\n");
+		SrVec offset_v = joint->offset();
+
+		fprintf(file, "OFFSET %f %f %f \n", offset_v.x,offset_v.y,offset_v.z);
+		//fprintf(file, "OFFSET 0.0 0.0 0.0\n");
 
 		//print_tabs( depth + 1 );
 		//*_record_output << "}\n";
@@ -2993,16 +2955,80 @@ void printHierarchy(FILE* file, SmartBody::SBJoint* joint, int depth, std::vecto
 	}
 	else
 	{
-		for( i = 0; i < num_child; i++ )	{
-			//SkJoint* child_p = joint_p->child( i );
-			SmartBody::SBJoint* child_p = joint->getChild(i);
-			//print_bvh_hierarchy( child_p, depth + 1 );
-			printHierarchy(file,child_p, depth+1, jointIdxs);
+		//print_tabs( depth );
+		if( depth == 0 )	{
+			//*_record_output << "ROOT " << joint_p->jointName().c_str() << "\n";
+			fprintf(file,"ROOT %s\n",joint->getMappedJointName().c_str());
 		}
+		else	{
+			//*_record_output << "JOINT " << joint_p->jointName().c_str() << "\n";
+			fprintf(file,"JOINT %s\n",joint->getMappedJointName().c_str());
+		}
+
+		jointIdxs.push_back(joint->index());
+		//print_tabs( depth );
+		//*_record_output << "{\n";
+		fprintf(file, "{\n");
+
+		//print_tabs( depth + 1 );
+		//*_record_output << "OFFSET ";
+		fprintf(file,"OFFSET ");
+
+		// STUPID-POLYTRANS ignores ROOT OFFSET: added to CHANNEL motion
+		if( depth == 0 )	{
+			//*_record_output << "0.0 0.0 0.0 \n";
+			fprintf(file,"0.0 0.0 0.0 \n");
+		}
+		else	{
+			SrVec offset_v = joint->offset();
+
+			fprintf(file, "%f %f %f \n", offset_v.x,offset_v.y,offset_v.z);
+			// STUPID-POLYTRANS subtracts OFFSET instead of adds
+		}
+
+		// CHANNELS: 
+		// Optimize: check 
+		//   SkJointQuat::_active, and 
+		//   SkJointPos:SkVecLimits::frozen()
+		//print_tabs( depth + 1 );
+		//*_record_output << "CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n";
+		fprintf(file, "CHANNELS 6 Xposition Yposition Zposition Zrotation Xrotation Yrotation\n");
+
+		{
+			for( i = 0; i < num_child; i++ )	{
+				//SkJoint* child_p = joint_p->child( i );
+				SmartBody::SBJoint* child_p = joint->getChild(i);
+				//print_bvh_hierarchy( child_p, depth + 1 );
+				printHierarchy(file,child_p, depth+1, jointIdxs);
+			}
+		}
+		fprintf(file,"}\n");
 	}
+	
+// 	if( num_child == 0 )	{
+// 
+// 		//print_tabs( depth + 1 );
+// 		//*_record_output << "End Site\n";
+// 		fprintf(file, "End Site\n");
+// 		//print_tabs( depth + 1 );
+// 		//*_record_output << "{\n";
+// 		fprintf(file, "{\n");
+// 
+// 		// End Site OFFSET not used
+// 		// This is the geometric vector of the final bone segment
+// 		//print_tabs( depth + 2 );
+// 		//*_record_output << "OFFSET 0.0 0.0 0.0\n";
+// 		fprintf(file, "OFFSET 0.0 0.0 0.0\n");
+// 
+// 		//print_tabs( depth + 1 );
+// 		//*_record_output << "}\n";
+// 		fprintf(file,"}\n");
+// 	}
+// 	else
+
 	//print_tabs( depth );
 	//*_record_output << "}\n";
-	fprintf(file,"}\n");
+	
 }
 
 SBAPI void SBMotion::saveToBVH( const std::string& fileName, const std::string& skelName )
@@ -3016,10 +3042,45 @@ SBAPI void SBMotion::saveToBVH( const std::string& fileName, const std::string& 
 	FILE* fp = fopen(fileName.c_str(),"wt");
 	SmartBody::SBJoint* root = dynamic_cast<SmartBody::SBJoint*>(skel->root());
 	std::vector<int> jointIdxs;
+	fprintf(fp,"HIERARCHY\n");
 	printHierarchy(fp,root,0,jointIdxs);
 
 	// write buffers
+	fprintf(fp,"MOTION\n");
+	fprintf(fp,"Frames : %d\n",this->getNumFrames());
+	fprintf(fp,"Frame Time: %f\n",this->getFrameRate());
+	for (int i=0;i<getNumFrames();i++)
+	{
+		float* frameBuf = posture(i);
+		for (unsigned int k=0;k<jointIdxs.size();k++)
+		{			
+			SmartBody::SBJoint* joint = skel->getJoint(k);
+			SrVec pos = joint->offset();
+			for (int c=0;c<3;c++)
+			{
+				int chanID = _channels.search(joint->getMappedJointName(), (SkChannel::Type)(SkChannel::XPos+c));
+				if (chanID != -1)
+				{
+					pos[c] = frameBuf[_channels.float_position(chanID)];
+				}
+			}
 
+			SrQuat quat;
+			int quatID = _channels.search(joint->getMappedJointName(), SkChannel::Quat);
+			if (quatID != -1)
+			{
+				//pos[c] = frameBuf[_channels.float_position(chanID)];
+				int fidx = _channels.float_position(quatID);
+				quat = SrQuat(frameBuf[fidx], frameBuf[fidx+1], frameBuf[fidx+2], frameBuf[fidx+3]);
+			}
+			SrMat rotMat;
+			quat.get_mat(rotMat);
+			float ex, ey, ez;
+			sr_euler_angles_yxz( rotMat, ex, ey, ez );
+			fprintf(fp," %f %f %f %f %f %f",pos[0],pos[1],pos[2], ez*57.295779513082323, ex*57.295779513082323, ey*57.295779513082323);
+		}
+		fprintf(fp,"\n");
+	}
 
 	fclose(fp);
 }
