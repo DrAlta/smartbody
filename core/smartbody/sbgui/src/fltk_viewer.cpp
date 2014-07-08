@@ -5335,7 +5335,7 @@ void FltkViewer::drawDeformableModels()
 					//_data->render_action.apply(character->scene_p);
 				}
 			}
-			else if (rendererType() != "ogre3D")
+			else// if (rendererType() != "ogre3D")
 			{
 				//meshInstance->blendShapes();
 				if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && meshInstance->getVisibility() == 1) || meshInstance->getVisibility() == 2)
