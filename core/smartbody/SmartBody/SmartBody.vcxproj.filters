@@ -1165,6 +1165,9 @@
     <ClCompile Include="src\controllers\me_ct_new_locomotion.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
+    <ClCompile Include="src\sbm\GPU\SbmBlendFace.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2328,6 +2331,9 @@
     <ClInclude Include="src\controllers\me_ct_new_locomotion.h">
       <Filter>controllers</Filter>
     </ClInclude>
+    <ClInclude Include="src\sbm\GPU\SbmBlendFace.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">
@@ -2393,5 +2399,17 @@
       <Filter>protocols</Filter>
     </None>
     <None Include="src\protocols\sbmotion.proto" />
+    <None Include="src\sbm\GPU\shaderFiles\blendFace.frag">
+      <Filter>GPU</Filter>
+    </None>
+    <None Include="src\sbm\GPU\shaderFiles\blendFace.vert">
+      <Filter>GPU</Filter>
+    </None>
+    <None Include="src\sbm\GPU\shaderFiles\blendTextures.frag">
+      <Filter>GPU</Filter>
+    </None>
+    <None Include="src\sbm\GPU\shaderFiles\blendTextures.vert">
+      <Filter>GPU</Filter>
+    </None>
   </ItemGroup>
 </Project>

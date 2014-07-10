@@ -11,6 +11,7 @@
 #include <sb/SBAsset.h>
 #include <sb/SBCharacter.h>
 
+#include <GL/gl.h>
 
 typedef std::vector<SkJoint*> SkJointList;
 
@@ -66,11 +67,11 @@ public:
 	std::vector<SrSnModel*>		dMeshDynamic_p;
 	std::vector<SrSnModel*>		dMeshStatic_p;
 	std::vector<SkinWeight*>	skinWeights;
-	std::map<std::string, std::vector<SrSnModel*> > blendShapeMap; // morphTargets the key store the base shape name, vector stores morph target SrModels. first one in the vector is always the base one
-	std::map<std::string, std::vector<std::string> > morphTargets; // morphTargets stores a vector of morph target names, first one is always the base one
-	std::string                 skeletonName; // binding skeleton for this deformable model
-	SkSkeleton*					skeleton;			// pointer to current skeleton
-	bool						binding;			// whether in deformable mesh mode
+	std::map<std::string, std::vector<SrSnModel*> > blendShapeMap;	// morphTargets the key store the base shape name, vector stores morph target SrModels. first one in the vector is always the base one
+	std::map<std::string, std::vector<std::string> > morphTargets;	// morphTargets stores a vector of morph target names, first one is always the base one
+	std::string                 skeletonName;						// binding skeleton for this deformable model
+	SkSkeleton*					skeleton;							// pointer to current skeleton
+	bool						binding;							// whether in deformable mesh mode
 	// unrolled all vertices into a single buffer for faster GPU rendering
 	bool initStaticVertexBuffer, initSkinnedVertexBuffer;	
 	std::vector<SrVec>          posBuf;	
@@ -138,9 +139,13 @@ protected:
 	int  meshVisibleType;
 	bool _recomputeNormal;
 	bool _isStaticMesh;
+
 public:
 	std::vector<SrVec> _deformPosBuf;	
 	std::vector<SrMat>  transformBuffer;	
+
+	GLuint _tempTex;
+	GLuint _tempFBO;
 public:
 	SBAPI DeformableMeshInstance();
 	SBAPI virtual ~DeformableMeshInstance();

@@ -499,6 +499,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\protocols\sbmesh.pb.cc" />
     <ClCompile Include="src\protocols\sbmotion.pb.cc" />
     <ClCompile Include="src\protocols\sbutilities.pb.cc" />
+    <ClCompile Include="src\sbm\GPU\SbmBlendFace.cpp" />
     <ClCompile Include="src\sbm\ParserCOLLADAFast.cpp" />
     <ClCompile Include="src\sb\SBAssetHandler.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerAmc.cpp" />
@@ -887,6 +888,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\protocols\sbmesh.pb.h" />
     <ClInclude Include="src\protocols\sbmotion.pb.h" />
     <ClInclude Include="src\protocols\sbutilities.pb.h" />
+    <ClInclude Include="src\sbm\GPU\SbmBlendFace.h" />
     <ClInclude Include="src\sbm\ParserCOLLADAFast.h" />
     <ClInclude Include="src\sb\SBAssetHandler.h" />
     <ClInclude Include="src\sb\SBAssetHandlerAmc.h" />
@@ -917,6 +919,10 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <None Include="src\protocols\sbmesh.proto" />
     <None Include="src\protocols\sbmotion.proto" />
     <None Include="src\protocols\sbutilities.proto" />
+    <None Include="src\sbm\GPU\shaderFiles\blendFace.frag" />
+    <None Include="src\sbm\GPU\shaderFiles\blendFace.vert" />
+    <None Include="src\sbm\GPU\shaderFiles\blendTextures.frag" />
+    <None Include="src\sbm\GPU\shaderFiles\blendTextures.vert" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

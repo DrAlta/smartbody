@@ -187,6 +187,10 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	frameDataMarshalFriendly = NULL;
 	frameDataMarshalFriendly = new SBM_CharacterFrameDataMarshalFriendly();
 	InitFrameDataMarshalFriendly();
+	
+
+	createBoolAttribute("useBlendFaceTextures", false, true, "Display", 200, false, false, false, "Enables use of blending textures for blendshapes.");
+	//setUseBlendFaceTextures(false);
 }
 
 
@@ -1301,6 +1305,17 @@ SBAPI std::string SBCharacter::getReachAttachedPawnName(const std::string& reach
 		result = reachEngine->getAttachedPawnName();
 	}
 	return result;
+}
+
+
+SBAPI bool SBCharacter::getUseBlendFaceTextures()
+{
+	return getBoolAttribute("useBlendFaceTextures");
+}
+
+SBAPI void SBCharacter::setUseBlendFaceTextures(bool useBlendFaceTextures)
+{
+	setBoolAttribute("useBlendFaceTextures",useBlendFaceTextures);
 }
 
 };

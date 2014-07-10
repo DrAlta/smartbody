@@ -100,6 +100,8 @@ class SBCharacter : public SbmCharacter
 		SBAPI const SBM_CharacterFrameDataMarshalFriendly & GetFrameDataMarshalFriendly();
 		SBAPI std::string getReachAttachedPawnName(const std::string& reachType); // get the name of pawn that is currently picked up by the character. If there is no pawn attached, then the method return name="null".
 
+		SBAPI bool getUseBlendFaceTextures();
+		SBAPI void setUseBlendFaceTextures(bool);
 	protected:
 		void InitFrameDataMarshalFriendly();
 		void FreeFrameDataJointsMarshalFriendly();
@@ -113,6 +115,8 @@ class SBCharacter : public SbmCharacter
 		float jointTrajBlendWeight;
 		bool useJointConstraint;
 		SBM_CharacterFrameDataMarshalFriendly * frameDataMarshalFriendly;
+
+		bool _useBlendFaceTextures;
 
 };
 
