@@ -135,7 +135,7 @@ static void read_materials ( SrArray<SrMaterial>& M,
 			//SR_TRACE1 ( "new material: "<<in.last_token() );
 			SrString matName;
 			in.getline(matName);
-			matName.ltrim();
+			matName.trim();
 			mnames.push ( matName );
 		}	  
 		else if ( in.last_token()=="Ka" )
@@ -277,7 +277,7 @@ static bool process_line ( const SrString& line,
       //in.get_token ();
 	  SrString matName;
 	  in.getline(matName);
-	  matName.ltrim();
+	  matName.trim();
       curmtl = mnames.lsearch ( matName );
       //SR_TRACE1 ( "curmtl = " << curmtl << " (" << in.last_token() << ")" );
     }

@@ -37,6 +37,8 @@ class DeformableMeshInstance;
     the ogl render action. See SrGlRenderAction class description. */
 class SBAPI SrGlRenderFuncs
  { public:
+
+	static void renderBlendFace( DeformableMeshInstance* shape);
 	
 	static void renderDeformableMesh( DeformableMeshInstance* shape, bool showSkinWeight = false );
     static void render_model ( SrSnShapeBase* shape );

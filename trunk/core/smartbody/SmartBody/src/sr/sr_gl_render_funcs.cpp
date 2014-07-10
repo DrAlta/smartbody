@@ -31,33 +31,230 @@
 #include "external/glew/glew.h"
 #endif
 #endif
-# include <sr/sr_vec.h>
-# include <sr/sr_mat.h>
-# include <sr/sr_model.h>
-# include <sr/sr_lines.h>
-# include <sr/sr_points.h>
-# include <sr/sr_box.h>
-# include <sr/sr_sphere.h>
-# include <sr/sr_cylinder.h>
-# include <sr/sr_polygons.h>
+#include <sr/sr_vec.h>
+#include <sr/sr_mat.h>
+#include <sr/sr_model.h>
+#include <sr/sr_lines.h>
+#include <sr/sr_points.h>
+#include <sr/sr_box.h>
+#include <sr/sr_sphere.h>
+#include <sr/sr_cylinder.h>
+#include <sr/sr_polygons.h>
+
+
+#include <sbm/GPU/SbmShader.h>
 #include <sbm/GPU/SbmTexture.h>
-#include <sbm/sbm_deformable_mesh.h>
+#include <sbm/GPU/SbmBlendFace.h>
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
+
 #include <sb/SBSkeleton.h>
+#include <sb/SBScene.h>
 #include <sb/SBPawn.h>
+#include <sr/sr_sn.h>
+#include <sr/sr_sn_shape.h>
+#include <sr/sr_gl_render_funcs.h>
 
-# include <sr/sr_sn.h>
-# include <sr/sr_sn_shape.h>
-# include <sr/sr_gl_render_funcs.h>
+#include <sr/sr_gl.h>
 
-# include <sr/sr_gl.h>
-
+#include <boost/version.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
 
 //=============================== render_model ====================================
 
-// Renders static mesh without Ogre3D
+
+
+void SrGlRenderFuncs::renderBlendFace(DeformableMeshInstance* shape)
+{
+	bool USE_SHADER_MANAGER = true;
+
+	SrModel* model			= new SrModel();
+	std::string model_path	= "Z:\\casas\\gale_expressions\\v1.00\\Gale_Neutral_clean2_UV_diffuse.BlendArtWarped_average.obj";	
+	bool loadSuccess		= model->import_obj(model_path.c_str());	
+	if (loadSuccess)
+	{
+		LOG("Model %s loaded OK", model_path.c_str());
+	} 
+	else
+	{
+		LOG("*** ERROR: Couldn't load %s", model_path);
+		delete model;
+		return;
+	}
+	
+	SbmDeformableMeshGPU* mesh	= new SbmDeformableMeshGPU();
+
+	boost::filesystem::path p(model_path);
+	std::string fileName		= boost::filesystem::basename(p);
+	std::string extension		= boost::filesystem::extension(p);
+
+	mesh->setName(fileName + extension);
+		
+	if (model->Fn.size() == 0)
+		model->computeNormals();
+	
+	SrSnModel* srSnModelStatic		= new SrSnModel();
+	srSnModelStatic->shape(*model);
+	srSnModelStatic->shape().name	= model->name;
+	mesh->dMeshStatic_p.push_back(srSnModelStatic);
+	srSnModelStatic->ref();
+	
+	SrSnModel* srSnModelDynamic		= new SrSnModel();
+	srSnModelDynamic->shape(*model);
+	srSnModelDynamic->changed(true);
+	srSnModelDynamic->visible(false);
+	srSnModelDynamic->shape().name = model->name;
+	mesh->dMeshDynamic_p.push_back(srSnModelDynamic);
+	srSnModelDynamic->ref();
+
+	mesh->buildSkinnedVertexBuffer();
+
+
+	SbmShaderProgram::printOglError("SrGlRenderFuncs::renderDeformableMesh #1");
+
+	SbmBlendFace * blendFace = new SbmBlendFace();
+		//	Gets DeformableMesh
+		blendFace->setDeformableMesh(shape->getDeformableMesh());
+	
+		//	Tests DeformableMesh data
+		DeformableMesh* testMesh = blendFace->getDeformableMesh();
+
+		//	Builds VBOs (reference)
+		blendFace->buildVertexBufferGPU();
+
+		//	Build VBO for rest of shapes
+		blendFace->addFace(mesh);
+
+		SbmShaderProgram::printOglError("HOLA 1");
+
+		if(USE_SHADER_MANAGER)
+			blendFace->initShader();
+		else
+			blendFace->initShaderProgram_Dan();
+
+		glBindFragDataLocation(blendFace->_programID, 0, "final_color");
+
+		glUseProgram(blendFace->_programID);
+
+		GLuint	modelviewLocation	= glGetUniformLocation(blendFace->_programID, "M");
+		GLuint	projectionLocation	= glGetUniformLocation(blendFace->_programID, "P");
+		GLuint	tex0Location		= glGetUniformLocation(blendFace->_programID, "tex0");
+		GLuint	tex1Location		= glGetUniformLocation(blendFace->_programID, "tex1");
+		GLuint	weightLocation		= glGetUniformLocation(blendFace->_programID, "weight");
+		
+		GLuint	texCoordLocation	= glGetAttribLocation(blendFace->_programID, "texCoord");
+		GLuint	pos0Location		= glGetAttribLocation(blendFace->_programID, "pos0");
+		GLuint	pos1Location		= glGetAttribLocation(blendFace->_programID, "pos1");
+
+		GLfloat mp[16], mv[16];
+		
+		glGetFloatv(GL_PROJECTION_MATRIX, mp);
+		glGetFloatv(GL_MODELVIEW_MATRIX, mv);
+
+		glUniformMatrix4fv(modelviewLocation, 1, GL_FALSE, mv);
+		glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, mp);
+				
+		//glEnableClientState(GL_VERTEX_ARRAY);	
+		//VBOPos->VBO()->BindBuffer();
+		//glVertexPointer(3, GL_FLOAT, 0, 0);
+		glEnableVertexAttribArray(pos0Location);
+		blendFace->getVBOPos(0)->VBO()->BindBuffer();
+		glVertexAttribPointer(
+		   pos0Location,        // attribute 0. No particular reason for 0, but must match the layout in the shader.
+		   3,                  // size
+		   GL_FLOAT,           // type
+		   GL_FALSE,           // normalized?
+		   0,                  // stride
+		   (void*)0            // array buffer offset
+		);
+
+		glEnableVertexAttribArray(pos1Location);
+		blendFace->getVBOPos(1)->VBO()->BindBuffer();
+		glVertexAttribPointer(
+		   pos1Location,        // attribute location
+		   3,                  // size
+		   GL_FLOAT,           // type
+		   GL_FALSE,           // normalized?
+		   0,                  // stride
+		   (void*)0            // array buffer offset
+		);
+		
+		//glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		//VBOTexCoord->VBO()->BindBuffer();
+		//glTexCoordPointer(2,GL_FLOAT,0,0);
+		glEnableVertexAttribArray(texCoordLocation);
+		blendFace->getVBOTexCoord()->VBO()->BindBuffer();
+		glVertexAttribPointer(
+		   texCoordLocation,   // attribute 0. No particular reason for 0, but must match the layout in the shader.
+		   2,                  // size
+		   GL_FLOAT,           // type
+		   GL_FALSE,           // normalized?
+		   0,                  // stride
+		   (void*)0            // array buffer offset
+		);
+		SbmShaderProgram::printOglError("HOLA 7:");
+
+
+		for(int i=0; i<testMesh->subMeshList.size(); i++)
+		{
+			SbmTextureManager::singleton().loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, "Gale_Neutral_clean2_UV_diffuse.ARTUVwarped.png", "Z:\\casas\\gale_expressions\\v1.00\\Gale_Neutral_clean2_UV_diffuse.ARTUVwarped.png");
+			
+			SbmTexture* tex;
+			SbmTexture* tex0	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, testMesh->subMeshList[i]->texName.c_str());
+			SbmTexture* tex1	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, "Gale_Neutral_clean2_UV_diffuse.ARTUVwarped.png");
+
+			float weight = SmartBody::SBScene::getScene()->getPawn("defaultPawn0")->getBoundingBox().getCenter().x;
+			glUniform1f(weightLocation, weight);
+
+			glActiveTexture(GL_TEXTURE0 + 0);
+			glBindTexture(GL_TEXTURE_2D, tex0->getID());
+			glUniform1i(tex0Location, 0);
+
+			glActiveTexture(GL_TEXTURE0 + 1);
+			glBindTexture(GL_TEXTURE_2D, tex1->getID());
+			glUniform1i(tex1Location, 1);
+
+			blendFace->subMeshTris[i]->VBO()->BindBuffer();
+			glDrawElements(GL_TRIANGLES, testMesh->triBuf.size()*3 , GL_UNSIGNED_INT,0);
+			blendFace->subMeshTris[i]->VBO()->UnbindBuffer();
+		}
+		
+		SbmShaderProgram::printOglError("HOLA 8");
+		glUseProgram(0);
+		blendFace->getVBOPos(1)->VBO()->UnbindBuffer();
+		blendFace->getVBOPos(0)->VBO()->UnbindBuffer();
+		blendFace->getVBOTexCoord()->VBO()->UnbindBuffer();
+
+		//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		//glDisableClientState(GL_VERTEX_ARRAY);	
+		glDisableVertexAttribArray(pos0Location);
+		glDisableVertexAttribArray(texCoordLocation);
+		
+		glActiveTexture(GL_TEXTURE0);
+		
+		//	If we dont use shader manager, we delete shader at every iteration
+		if(!USE_SHADER_MANAGER) {
+			//We don't need the program anymore.
+			glDeleteProgram(blendFace->_programID);
+			//Don't leak shaders either.
+			glDeleteShader(blendFace->_fsID);
+			glDeleteShader(blendFace->_vsID);
+		}
+		
+	delete blendFace;
+
+	delete mesh;
+}
+
+// Renders static mesh WITHOUT Ogre3D
 void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool showSkinWeight  )
 {
+	
+
+	// Original code
+	
 	DeformableMesh* mesh = shape->getDeformableMesh();
     if (!mesh)
     {
@@ -115,11 +312,11 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glAlphaFunc ( GL_GREATER, 0.0f ) ;
 	glEnable(GL_CULL_FACE);
-	/*
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
-	*/
+	
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
+	
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
@@ -163,9 +360,14 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 		{
 			GLint activeTexture = -1;
 			glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+			
 			if (activeTexture != GL_TEXTURE0)
 				glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, tex->getID());
+
+			if(shape->_tempTex > 0)
+				glBindTexture(GL_TEXTURE_2D, shape->_tempTex);
+			else
+				glBindTexture(GL_TEXTURE_2D, tex->getID());
 
 			//glColor4f(0.0f, 0.0f, 0.0f, 1.0);
 			glEnable(GL_TEXTURE_2D);	
@@ -191,6 +393,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 		glPopMatrix();
 	}
 	glDepthMask(GL_TRUE);
+
 }
 
 void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )

@@ -106,6 +106,8 @@
 #include "FLTKListener.h"
 #include "RootWindow.h"
 
+#include <sbm/GPU/SbmBlendFace.h>
+
 /*
 #define USE_CEGUI 1
 #if USE_CEGUI
@@ -2051,8 +2053,8 @@ std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 			pawnCount++;
 			SmartBody::SBPawn* pawn = scene->createPawn(strstr.str());			
 			pawn->setStringAttribute("mesh",dndMesh->getName());	
-			pawn->setDoubleAttribute("rotY",180.0);
-			pawn->setDoubleAttribute("rotZ",-90.0);
+			//pawn->setDoubleAttribute("rotY",180.0);
+			//pawn->setDoubleAttribute("rotZ",-90.0);
 			pawn->dStaticMeshInstance_p->setVisibility(2);
 			return;
 		}
@@ -5335,7 +5337,7 @@ void FltkViewer::drawDeformableModels()
 					//_data->render_action.apply(character->scene_p);
 				}
 			}
-			else// if (rendererType() != "ogre3D")
+			else if (rendererType() != "ogre3D")
 			{
 				//meshInstance->blendShapes();
 				if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && meshInstance->getVisibility() == 1) || meshInstance->getVisibility() == 2)
@@ -5344,6 +5346,8 @@ void FltkViewer::drawDeformableModels()
 
 					// simply draw the static mesh
 					SrGlRenderFuncs::renderDeformableMesh(meshInstance, false);
+
+					//SrGlRenderFuncs::renderBlendFace(meshInstance);
 				}				
 			}
 		}
@@ -5557,7 +5561,7 @@ void FltkViewerData::setupData()
 
 	bcolor = SrColor(.63f, .63f, .63f);
 	floorColor = SrColor(0.6f,0.6f,0.6f);
-	showFloor = true;
+	showFloor = false;
 
 	scenebox = new SrSnLines;
 	sceneaxis = new SrSnLines;

@@ -156,6 +156,10 @@ char * SbmShaderProgram::textFileRead(const char *fn )
 				content[count] = '\0';
 			}
 			fclose(fp);
+		} 
+		else
+		{
+			LOG("*** ERROR: Could not open file %s", fn);
 		}
 	}
 	return content;
@@ -302,7 +306,7 @@ bool SbmShaderManager::initGLExtension()
 #endif
 }
 
-void SbmShaderManager::addShader( const char* entryName,const char* vsName, const char* fsName, bool shaderFile )
+void SbmShaderManager::addShader(const char* entryName, const char* vsName, const char* fsName, bool shaderFile )
 {
     if (shaderSupport == NO_GPU_SUPPORT)
         return;

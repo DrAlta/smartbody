@@ -1,7 +1,19 @@
 
 #include "vhcl.h"
 
+#ifdef __ANDROID__
+#include <GLES/gl.h>
+#elif defined(SB_IPHONE)
+#include <OpenGLES/ES1/gl.h>
+#else
+#if !defined(__FLASHPLAYER__)
+#include "external/glew/glew.h"
+#endif
+#endif
+
+#include "sbm/GPU/SbmBlendFace.h"
 #include "sbm_deformable_mesh.h"
+
 
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
@@ -1365,19 +1377,34 @@ SBAPI SrBox DeformableMesh::computeBoundingBox()
 
 DeformableMeshInstance::DeformableMeshInstance()
 {
-	_mesh = NULL;
-	_skeleton = NULL;
-	_updateMesh = false;
-	_isStaticMesh = false;
-	_recomputeNormal = true;
-	_meshScale = 1.f;
-	_character = NULL;
-	meshVisibleType = 1;
+	_mesh				= NULL;
+	_skeleton			= NULL;
+	_updateMesh			= false;
+	_isStaticMesh		= false;
+	_recomputeNormal	= true;
+	_meshScale			= 1.f;
+	_character			= NULL;
+	meshVisibleType		= 1;
+
+	//	Auxiliar FBO and Texture for offline rendering to blend textures
+	_tempTex			= 0;
+	_tempFBO			= 0;
 }
 
 DeformableMeshInstance::~DeformableMeshInstance()
 {
 	cleanUp();
+
+	if(_tempFBO > 0)
+	{
+		glDeleteBuffers(1, &_tempFBO);
+	}
+
+	if(_tempTex > 0)
+	{
+		LOG("Deleting _tempTex #%d", _tempTex);
+		glDeleteTextures(1, &_tempTex);
+	}
 }
 
 
@@ -1424,6 +1451,7 @@ void DeformableMeshInstance::blendShapes()
 		{
 			if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
 			{
+				//	If base shape, copies pointer to _mesh->dMeshStatic (here is where the result resulting vertices position are stored)
 				writeToBaseModel = _mesh->dMeshStatic_p[i];
 				break;
 			}
@@ -1464,14 +1492,16 @@ void DeformableMeshInstance::blendShapes()
 			ss << "blendShape.channelName." << (const char*)mIter->second[i]->shape().name;
 			std::stringstream ss1;
 			ss1 << "blendShape.channelWeightLimit." << (const char*)mIter->second[i]->shape().name;
+					
 			if (_character->hasAttribute(ss1.str()))
 			{
 				wLimit = (float)_character->getDoubleAttribute(ss1.str());
 			}
+
 			if (_character->hasAttribute(ss.str()))
 			{
-				const std::string& mappedCName = _character->getStringAttribute(ss.str());
-				SmartBody::SBSkeleton* sbSkel = _character->getSkeleton();
+				const std::string& mappedCName	= _character->getStringAttribute(ss.str());
+				SmartBody::SBSkeleton* sbSkel	= _character->getSkeleton();
 				if (sbSkel && mappedCName != "")
 				{
 					SmartBody::SBJoint* joint = sbSkel->getJointByName(mappedCName);
@@ -1516,6 +1546,41 @@ void DeformableMeshInstance::blendShapes()
 				{
 					SrPnt diff = visemeN[n] - neutralN[n];
 					newN[n] = newN[n] + diff * w;
+				}
+
+				//if(_character->getUseBlendFaceTextures())
+				if(_character->getBoolAttribute("useBlendFaceTextures"))
+				{
+					//	Tests if we can find associated texture of second[i] in texture manager
+					std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
+				
+					SbmTexture* tex1	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, "Gale_Neutral_clean2_UV_diffuse.ARTUVwarped.png");
+					SbmTexture* tex2	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str() );
+
+					//	If auxiliar FBO for offscreen rendering doesn't exist yet
+					if(_tempFBO == 0) 
+					{
+						glGenFramebuffersEXT(1, &_tempFBO);
+						glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _tempFBO);
+					}
+
+					//	If auxiliar textyre for offscreen rendering doesn't exist yet
+					if(_tempTex == 0) 
+					{
+						glGenTextures(1, &_tempTex);
+						glBindTexture(GL_TEXTURE_2D, _tempTex);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4096, 4096, 0, GL_RGB, GL_FLOAT, NULL);
+					}
+
+					//LOG("Temporary tex: %d", _tempTex);
+					//LOG("Temporary FBO: %d", _tempFBO);
+
+					SbmBlendTextures::BlendTwoFBO(tex1->getID(), tex2->getID(), _tempFBO, _tempTex, w, SbmBlendTextures::getShader(), 4096, 4096);
 				}
 			}
 		}
@@ -1873,8 +1938,11 @@ SBAPI bool DeformableMeshInstance::isStaticMesh()
 
 SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 {
-	if (!_mesh) return;
-	if (_mesh->blendShapeMap.size() == 0) return;
+	if (!_mesh) 
+		return;
+
+	if (_mesh->blendShapeMap.size() == 0)
+		return;
 
 	DeformableMeshInstance::blendShapes();
 
@@ -1895,22 +1963,28 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 			vtxBaseIdx += _mesh->dMeshStatic_p[i]->shape().V.size();
 		}
 	}
-	if (!writeToBaseModel) return;
+
+	if (!writeToBaseModel)
+		return;
+	
 	std::map<int,std::vector<int> >& vtxNewVtxIdxMap = _mesh->vtxNewVtxIdxMap;
+	
 	SrModel& baseModel = writeToBaseModel->shape();
+	
 	for (int i=0;i<baseModel.V.size();i++)
 	{
-		int iVtx = vtxBaseIdx+i;
-		SrVec& basePos = baseModel.V[i];
+		int iVtx			= vtxBaseIdx+i;
+		SrVec& basePos		= baseModel.V[i];
 		_deformPosBuf[iVtx] = basePos;
+
 		if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
 		{
 			std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
 			// copy related vtx components 
 			for (unsigned int k=0;k<idxMap.size();k++)
 			{
-				int idx = idxMap[k];
-				_deformPosBuf[idx] = basePos;
+				int idx				= idxMap[k];
+				_deformPosBuf[idx]	= basePos;	// Here copies blended vertices position
 			}
 		}			
 	}	
