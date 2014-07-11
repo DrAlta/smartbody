@@ -11,7 +11,29 @@
 #include <sb/SBAsset.h>
 #include <sb/SBCharacter.h>
 
-#include <GL/gl.h>
+#ifdef WIN32
+	//#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
+	#include <wingdi.h>
+	#include <GL/gl.h>
+#elif defined(BUILD_ANDROID)
+	#include <GLES2/gl2.h>
+	#include <GLES2/gl2ext.h>
+#elif defined(SB_IPHONE)
+    #include <OpenGLES/ES1/gl.h>
+    #include <OpenGLES/ES1/glext.h>
+#elif defined(__APPLE__) || defined(__APPLE_CC__)
+       #include <OpenGL/gl.h>
+//       #include <Carbon/Carbon.h>
+       #define APIENTRY
+#elif defined(__FLASHPLAYER__)
+	#include <GL/gl.h>
+#elif defined(__ANDROID__)
+	#include <GLES/gl.h>
+#else
+	#include <GL/gl.h>
+	#include <GL/glx.h>
+#endif
 
 typedef std::vector<SkJoint*> SkJointList;
 
