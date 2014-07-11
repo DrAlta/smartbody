@@ -364,10 +364,16 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			if (activeTexture != GL_TEXTURE0)
 				glActiveTexture(GL_TEXTURE0);
 
-			if(shape->_tempTex > 0)
+			//	If we are using blended textures
+			if(shape->getCharacter()->getBoolAttribute("useBlendFaceTextures"))
+			{
 				glBindTexture(GL_TEXTURE_2D, shape->_tempTex);
+			}
+			//	If blended textures not used, use neutral appearance
 			else
+			{
 				glBindTexture(GL_TEXTURE_2D, tex->getID());
+			}
 
 			//glColor4f(0.0f, 0.0f, 0.0f, 1.0);
 			glEnable(GL_TEXTURE_2D);	

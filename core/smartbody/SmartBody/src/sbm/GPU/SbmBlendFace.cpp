@@ -237,30 +237,169 @@ SbmBlendTextures::~SbmBlendTextures()
 }
 
 
-GLuint SbmBlendTextures::getShader()
+GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 {
-	const std::string _shaderName	= "Blend_Textures";
-
-	SbmShaderProgram* program		= SbmShaderManager::singleton().getShader(_shaderName);
-
-	//	If GLSL program does not exist yet in SbmShaderManager
-	if(program) 
+	if(_shaderName.compare("Blend_Two_Textures") == 0)
 	{
-		return program->getShaderProgram();
+		SbmShaderProgram* program		= SbmShaderManager::singleton().getShader(_shaderName);
+
+		//	If GLSL program does not exist yet in SbmShaderManager
+		if(program) 
+		{
+			return program->getShaderProgram();
+		}
+		//	If the GLSL shader is not in the ShaderManager yet
+		else
+		{
+			LOG("Program does not exist yet");
+
+			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendTextures.vert";
+			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendTextures.frag";
+	
+			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+			SbmShaderManager::singleton().buildShaders();
+				
+			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
+		}
 	}
-	//	If the GLSL shader is not in the ShaderManager yet
+	else if(_shaderName.compare("Blend_All_Textures") == 0)
+	{
+		SbmShaderProgram* program		= SbmShaderManager::singleton().getShader(_shaderName);
+
+		//	If GLSL program does not exist yet in SbmShaderManager
+		if(program) 
+		{
+			return program->getShaderProgram();
+		}
+		//	If the GLSL shader is not in the ShaderManager yet
+		else
+		{
+			LOG("Program does not exist yet");
+
+			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendAllTextures.vert";
+			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendAllTextures.frag";
+	
+			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+			SbmShaderManager::singleton().buildShaders();
+				
+			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
+		}
+	}
 	else
 	{
-		LOG("Program does not exist yet");
-
-		const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendTextures.vert";
-		const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendTextures.frag";
-	
-		SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
-		SbmShaderManager::singleton().buildShaders();
-				
-		return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
+		LOG("*** ERROR: Invalid BlendTextures shader");
+		return 0;
 	}
+}
+
+void SbmBlendTextures::BlendAllAppearances(GLuint FBODst, GLuint texDst, std::vector<float> weights, std::vector<GLuint> texIDs, GLuint program, int w, int h)
+{
+	glPushMatrix();
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst);                                                              // Bind the framebuffer object
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst, 0);              // Attach texture to FBO
+
+		assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
+
+		glPushAttrib(GL_ENABLE_BIT);
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_LIGHTING);
+			glMatrixMode (GL_PROJECTION);
+			glPushMatrix();
+				glLoadIdentity ();
+				gluOrtho2D(-1, 1, -1, 1);
+				glMatrixMode (GL_MODELVIEW);
+				glPushAttrib(GL_VIEWPORT_BIT);
+				glPushAttrib(GL_TEXTURE_BIT);
+					glViewport(0, 0, w, h);
+					glLoadIdentity ();
+
+					glClearColor(1.0, 1.0, 1.0, 0);
+					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+					GLuint texNeutralLoc	= glGetUniformLocation(program, "texNeutral");
+					GLuint texFvLoc			= glGetUniformLocation(program, "texFv");
+					GLuint texOpenLoc		= glGetUniformLocation(program, "texOpen");
+					GLuint texPBMLoc		= glGetUniformLocation(program, "texPBM");
+					GLuint texShChLoc		= glGetUniformLocation(program, "texShCh");
+					GLuint texWLoc			= glGetUniformLocation(program, "texW");
+					GLuint texWideLoc		= glGetUniformLocation(program, "texWide");
+
+					GLuint wNeutralLoc		= glGetUniformLocation(program, "wNeutral");
+					GLuint wFvLoc			= glGetUniformLocation(program, "wFv");
+					GLuint wOpenLoc			= glGetUniformLocation(program, "wOpen");
+					GLuint wPBMLoc			= glGetUniformLocation(program, "wPBM");
+					GLuint wShChLoc			= glGetUniformLocation(program, "wShCh");
+					GLuint wWLoc			= glGetUniformLocation(program, "wW");
+					GLuint wWideLoc			= glGetUniformLocation(program, "wWide");
+				
+					glUseProgram(program);
+					glEnable(GL_TEXTURE_2D);
+
+					glUniform1f(wNeutralLoc, weights[0]);
+					glUniform1f(wFvLoc, weights[1]);
+					glUniform1f(wOpenLoc, weights[2]);
+					glUniform1f(wPBMLoc, weights[3]);
+					glUniform1f(wShChLoc, weights[4]);
+					glUniform1f(wWLoc, weights[5]);
+					glUniform1f(wWideLoc, weights[6]);
+
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+					glUniform1i(texNeutralLoc, 0);
+
+					glActiveTexture(GL_TEXTURE1);
+					glBindTexture(GL_TEXTURE_2D, texIDs[1]);
+					glUniform1i(texFvLoc, 1);
+
+					glActiveTexture(GL_TEXTURE2);
+					glBindTexture(GL_TEXTURE_2D, texIDs[2]);
+					glUniform1i(texOpenLoc, 2);
+
+					glActiveTexture(GL_TEXTURE3);
+					glBindTexture(GL_TEXTURE_2D, texIDs[3]);
+					glUniform1i(texPBMLoc, 3);
+
+					glActiveTexture(GL_TEXTURE4);
+					glBindTexture(GL_TEXTURE_2D, texIDs[4]);
+					glUniform1i(texShChLoc, 4);
+
+					glActiveTexture(GL_TEXTURE5);
+					glBindTexture(GL_TEXTURE_2D, texIDs[5]);
+					glUniform1i(texWLoc, 5);
+
+					glActiveTexture(GL_TEXTURE6);
+					glBindTexture(GL_TEXTURE_2D, texIDs[6]);
+					glUniform1i(texWideLoc, 6);
+
+					glBegin(GL_QUADS);
+						glTexCoord2f(0, 1);
+						glVertex3f(-1.0f, 1.0f, -0.5f);
+
+						glTexCoord2f(0, 0);
+						glVertex3f(-1.0f, -1.0f, -0.5f);
+
+						glTexCoord2f(1, 0);
+						glVertex3f(1.0f, -1.0f, -0.5f);
+
+						glTexCoord2f(1, 1);
+						glVertex3f(1.0f, 1.0f, -0.5f);
+					glEnd();
+
+				glUseProgram(0);
+
+				glPopAttrib();                          // Pops texture bit
+				glDisable(GL_TEXTURE_2D);
+				glPopAttrib();							// Pops viewport information
+			glMatrixMode (GL_PROJECTION);
+			glPopMatrix();                              // Pops ENABLE_BIT
+			glMatrixMode (GL_MODELVIEW);
+		glPopAttrib();
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);                                                                                                          // Bind the render buffer
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);         
+		
+		glActiveTexture(GL_TEXTURE0);
+                                                                                                   // Bind the frame buffer object
+	glPopMatrix();
 }
 
 void SbmBlendTextures::BlendTwoFBO(GLuint tex0, GLuint tex1, GLuint FBODst, GLuint texDst, float alpha, GLuint m_blendingProgram, int w, int h)
@@ -289,9 +428,10 @@ void SbmBlendTextures::BlendTwoFBO(GLuint tex0, GLuint tex1, GLuint FBODst, GLui
 
 				glColor3f(0.3f, 0.42f, 0.26f);
 
-				GLuint t1Location = glGetUniformLocation(m_blendingProgram, "tex0");
-				GLuint t2Location = glGetUniformLocation(m_blendingProgram, "tex1");
-				GLuint alphaLocation = glGetUniformLocation(m_blendingProgram, "alpha");
+				GLuint t1Location		= glGetUniformLocation(m_blendingProgram, "tex0");
+				GLuint t2Location		= glGetUniformLocation(m_blendingProgram, "tex1");
+				GLuint outLocation		= glGetUniformLocation(m_blendingProgram, "out");
+				GLuint alphaLocation	= glGetUniformLocation(m_blendingProgram, "alpha");
 
 				glUseProgram(m_blendingProgram);
 				glEnable(GL_TEXTURE_2D);
@@ -305,6 +445,10 @@ void SbmBlendTextures::BlendTwoFBO(GLuint tex0, GLuint tex1, GLuint FBODst, GLui
 				glActiveTexture(GL_TEXTURE1);
 				glBindTexture(GL_TEXTURE_2D, tex1);
 				glUniform1i(t2Location, 1);
+
+				glActiveTexture(GL_TEXTURE2);
+				glBindTexture(GL_TEXTURE_2D, texDst);
+				glUniform1i(outLocation, 2);
 
 				glBegin(GL_QUADS);
 						glTexCoord2f(0, 1);

@@ -164,6 +164,7 @@ public:
 	SBAPI virtual void updateFast();
 	SBAPI virtual void blendShapes();
 	SBAPI DeformableMesh* getDeformableMesh() { return _mesh; }
+	SBAPI SmartBody::SBCharacter* getCharacter() { return _character; }
 	void updateTransformBuffer();
 
 protected:

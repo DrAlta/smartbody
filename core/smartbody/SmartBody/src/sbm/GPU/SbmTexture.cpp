@@ -196,7 +196,7 @@ bool SbmTexture::loadImage( const char* fileName )
 	if (width < 0 || height < 0 || channels < 0)
 		return false;
 	else {
-		LOG("Loading image %s:\t%d\t%d\t%d", fileName, width, height, channels );
+		LOG("Loading image       :%s\t%d\t%d\t%d", fileName, width, height, channels );
 	}
 	//std::string testOutFileName = fileName;
 	//testOutFileName += ".bmp";

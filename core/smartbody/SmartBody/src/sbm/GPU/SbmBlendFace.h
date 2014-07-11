@@ -60,8 +60,9 @@ class SbmBlendTextures
 		SbmBlendTextures();
 		~SbmBlendTextures();
 
-		static GLuint getShader();
+		static GLuint getShader(const std::string);
 		static void BlendTwoFBO(GLuint, GLuint, GLuint, GLuint, float, GLuint, int, int);
+		static void BlendAllAppearances(GLuint, GLuint, std::vector<float>, std::vector<GLuint>, GLuint, int, int);
 
 		GLuint			_vsID;
 		GLuint			_fsID;
