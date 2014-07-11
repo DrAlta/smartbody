@@ -178,7 +178,7 @@ static void read_materials ( SrArray<SrMaterial>& M,
 		std::string texFile = (const char*) map_Kd;
 		std::string mtlName = mnames.top();
 		mtlTexMap[mtlName] = texFile;		  
-		std::cerr << "Reading map_kd: " << texFile << "\n";
+		std::cerr << "Reading map_kd:     " << texFile << "\n";
 	  }
 	  else if ( in.last_token()=="map_bump") // texture map
 	  {
@@ -310,7 +310,7 @@ bool SrModel::import_obj ( const char* file )
 {
 	SrInput in ( fopen(file,"rt") );
 
-	std::cerr << "OBJ path: " << file << "\n";
+	std::cerr << "OBJ path:           " << file << "\n";
 
 	if ( !in.valid() ) 
 		return false;

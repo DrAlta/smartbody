@@ -919,6 +919,8 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <None Include="src\protocols\sbmesh.proto" />
     <None Include="src\protocols\sbmotion.proto" />
     <None Include="src\protocols\sbutilities.proto" />
+    <None Include="src\sbm\GPU\shaderFiles\blendAllTextures.frag" />
+    <None Include="src\sbm\GPU\shaderFiles\blendAllTextures.vert" />
     <None Include="src\sbm\GPU\shaderFiles\blendFace.frag" />
     <None Include="src\sbm\GPU\shaderFiles\blendFace.vert" />
     <None Include="src\sbm\GPU\shaderFiles\blendTextures.frag" />

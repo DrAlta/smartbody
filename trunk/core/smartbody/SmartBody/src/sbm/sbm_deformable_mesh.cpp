@@ -1480,10 +1480,43 @@ void DeformableMeshInstance::blendShapes()
 		SrArray<SrPnt>& neutralN = baseModel->shape().N;
 		SrArray<SrPnt> newV = neutralV;
 		SrArray<SrPnt> newN = neutralN;
+
+
+		//	If auxiliar FBO for offscreen rendering doesn't exist yet
+		if(_tempFBO == 0) 
+		{
+			glGenFramebuffersEXT(1, &_tempFBO);
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _tempFBO);
+		}
+
+		//	If auxiliar textyre for offscreen rendering doesn't exist yet
+		if(_tempTex == 0) 
+		{
+			glGenTextures(1, &_tempTex);
+			glBindTexture(GL_TEXTURE_2D, _tempTex);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4096, 4096, 0, GL_RGB, GL_FLOAT, NULL);
+		}
+
+		//	Initializes vector of wieghts, of size (#shapes) 
+		std::vector<float> weights(mIter->second.size(), 0);
+
+		//	Initializes vector of wieghts, of size (#shapes) each shape got a texture
+		std::vector<GLuint> texIDs(mIter->second.size(), 0);
+
 		for (size_t i = 0; i < mIter->second.size(); ++i)
 		{
 			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
+			{
+				std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
+				SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str());
+				texIDs[i]			= tex->getID();
 				continue;	// don't do anything about base model
+			}
 
 			float w = 0.0f;
 			float wLimit = 1.0f;
@@ -1522,6 +1555,12 @@ void DeformableMeshInstance::blendShapes()
 			else
 				continue;
 
+
+			std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
+			SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str());
+			weights[i]			= w;
+			texIDs[i]			= tex->getID();
+
 			if (fabs(w) > gwiz::epsilon4())	// if it has weight
 			{
 				//LOG("blend in %s with weight %f", (const char*)mIter->second[i]->shape().name, w);
@@ -1547,47 +1586,14 @@ void DeformableMeshInstance::blendShapes()
 					SrPnt diff = visemeN[n] - neutralN[n];
 					newN[n] = newN[n] + diff * w;
 				}
-
-				//if(_character->getUseBlendFaceTextures())
-				if(_character->getBoolAttribute("useBlendFaceTextures"))
-				{
-					//	Tests if we can find associated texture of second[i] in texture manager
-					std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
-				
-					SbmTexture* tex1	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, "Gale_Neutral_clean2_UV_diffuse.ARTUVwarped.png");
-					SbmTexture* tex2	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str() );
-
-					//	If auxiliar FBO for offscreen rendering doesn't exist yet
-					if(_tempFBO == 0) 
-					{
-						glGenFramebuffersEXT(1, &_tempFBO);
-						glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _tempFBO);
-					}
-
-					//	If auxiliar textyre for offscreen rendering doesn't exist yet
-					if(_tempTex == 0) 
-					{
-						glGenTextures(1, &_tempTex);
-						glBindTexture(GL_TEXTURE_2D, _tempTex);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4096, 4096, 0, GL_RGB, GL_FLOAT, NULL);
-					}
-
-					//LOG("Temporary tex: %d", _tempTex);
-					//LOG("Temporary FBO: %d", _tempFBO);
-
-					SbmBlendTextures::BlendTwoFBO(tex1->getID(), tex2->getID(), _tempFBO, _tempTex, w, SbmBlendTextures::getShader(), 4096, 4096);
-				}
 			}
 		}
 		for (int n = 0; n < newN.size(); ++n)
 		{
 			newN[n].normalize();
 		}
+
+		SbmBlendTextures::BlendAllAppearances( _tempFBO, _tempTex, weights, texIDs, SbmBlendTextures::getShader("Blend_All_Textures"), 4096, 4096);
 
 		writeToBaseModel->shape().V = newV;
 		writeToBaseModel->shape().N = newN;
