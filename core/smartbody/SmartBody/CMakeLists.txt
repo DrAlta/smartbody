@@ -385,6 +385,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/controllers/me_ct_jacobian_IK.cpp
         ./src/controllers/me_ct_limb.cpp
         ./src/controllers/me_ct_locomotion_func.cpp
+		./src/controllers/me_ct_new_locomotion.cpp
         ./src/controllers/me_ct_motion_example.cpp
         ./src/controllers/me_ct_motion_parameter.cpp
         ./src/controllers/me_ct_motion_player.cpp
@@ -452,6 +453,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sbm/GPU/TBOData.cpp
         ./src/sbm/GPU/VBOData.cpp
         ./src/sbm/GPU/SbmShader.cpp
+		./sbm/GPU/SbmBlendFace.cpp
         ./src/sbm/PPRAISteeringAgent.cpp
         ./src/sbm/SteerSuiteEnginerDriver.cpp
         ./src/sbm/sr_path_list.cpp
