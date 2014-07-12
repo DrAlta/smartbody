@@ -112,7 +112,11 @@ freely, subject to the following restrictions:
 		//#include <cstdint>
 		
 		#include <memory>
+#if defined(__APPLE__)
+		#define polyvox_shared_ptr std::tr1::shared_ptr
+#else
 		#define polyvox_shared_ptr std::shared_ptr
+#endif
 		#define polyvox_function std::function
 	#endif
 	//We have a decent compiler - use real C++0x features	
