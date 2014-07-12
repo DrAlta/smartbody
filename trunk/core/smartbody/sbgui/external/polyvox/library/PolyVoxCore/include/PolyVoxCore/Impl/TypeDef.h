@@ -104,11 +104,13 @@ freely, subject to the following restrictions:
 	#else
 #if defined(__APPLE__)
 		#include <tr1/cstdint>
+		#include <tr1/functional>
 #else
 		#include <cstdint>
+		#include <functional>
 #endif
 		//#include <cstdint>
-		#include <functional>
+		
 		#include <memory>
 		#define polyvox_shared_ptr std::shared_ptr
 		#define polyvox_function std::function
