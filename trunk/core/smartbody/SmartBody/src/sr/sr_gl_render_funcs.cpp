@@ -79,7 +79,7 @@ void SrGlRenderFuncs::renderBlendFace(DeformableMeshInstance* shape)
 	} 
 	else
 	{
-		LOG("*** ERROR: Couldn't load %s", model_path);
+		LOG("*** ERROR: Couldn't load %s", model_path.c_str());
 		delete model;
 		return;
 	}
