@@ -348,6 +348,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./controllers/me_ct_jacobian_IK.cpp
         ./controllers/me_ct_limb.cpp
         ./controllers/me_ct_locomotion_func.cpp
+		./controllers/me_ct_new_locomotion.cpp
         ./controllers/me_ct_motion_example.cpp
         ./controllers/me_ct_motion_parameter.cpp
         ./controllers/me_ct_motion_player.cpp
