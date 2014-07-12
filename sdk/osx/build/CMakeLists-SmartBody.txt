@@ -3,7 +3,6 @@ include_directories( ./)
 include_directories ( ../../include/vhcl )
 include_directories ( ../../include/vhmsg)
 include_directories ( ../../include/bonebus)
-include_directories ( ../../include/wsp)
 include_directories( ../../include/protobuf )
 include_directories ( ../../include/steersuite)
 include_directories ( ../../include/steersuite/external)
@@ -484,7 +483,6 @@ set( SMARTBODY_LIB_SBM_SRC
         ./sb/SBSpeechManager.cpp
         ./sb/SBVHMsgManager.cpp
         ./sb/SBCommandManager.cpp
-        ./sb/SBWSPManager.cpp
         ./sb/SBNavigationMeshManager.cpp
 
         ./sb/SBPython.cpp
@@ -568,7 +566,6 @@ target_link_libraries( SmartBody
 	bonebus
 	vhmsg
 	vhcl
-	wsp
 	xerces-c
 	boost_filesystem
 	boost_system
