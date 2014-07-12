@@ -102,7 +102,7 @@ freely, subject to the following restrictions:
 		#define polyvox_shared_ptr std::tr1::shared_ptr
 		#define polyvox_function std::tr1::function
 	#else
-		#include <tr1/cstdint>
+		#include <cstdint>
 		//#include <cstdint>
 		#include <functional>
 		#include <memory>
