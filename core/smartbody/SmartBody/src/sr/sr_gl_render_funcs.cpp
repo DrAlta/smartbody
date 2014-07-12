@@ -197,7 +197,7 @@ void SrGlRenderFuncs::renderBlendFace(DeformableMeshInstance* shape)
 		SbmShaderProgram::printOglError("HOLA 7:");
 
 
-		for(int i=0; i<testMesh->subMeshList.size(); i++)
+		for(size_t i=0; i<testMesh->subMeshList.size(); i++)
 		{
 			SbmTextureManager::singleton().loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, "Gale_Neutral_clean2_UV_diffuse.ARTUVwarped.png", "Z:\\casas\\gale_expressions\\v1.00\\Gale_Neutral_clean2_UV_diffuse.ARTUVwarped.png");
 			
