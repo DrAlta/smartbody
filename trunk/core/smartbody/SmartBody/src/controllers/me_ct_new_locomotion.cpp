@@ -48,12 +48,14 @@ MeCtNewLocomotion::MeCtNewLocomotion() :  SmartBody::SBController()
 	useIKLf = false;
 	sk = NULL;
 	walkScale = 1.0f;
+	walkSpeedGain = 1.0f;
 
 	setDefaultAttributeGroupPriority("EnhancedLocomotion", 600);
 
 	addDefaultAttributeString("walkCycle", "ChrBrad@Walk01B", "EnhancedLocomotion");
 	addDefaultAttributeString("walkSkeleton", "ChrBrad.sk", "EnhancedLocomotion");
 	addDefaultAttributeDouble("walkScale", 1.0, "EnhancedLocomotion");
+	addDefaultAttributeDouble("walkSpeedGain", 1.0, "EnhancedLocomotion");
 	addDefaultAttributeString("LEndEffectorJoint", "l_forefoot", "EnhancedLocomotion");
 	addDefaultAttributeString("REndEffectorJoint", "r_forefoot", "EnhancedLocomotion");
 	addDefaultAttributeString("CenterHipJoint", "JtPelvis", "EnhancedLocomotion");
@@ -75,6 +77,7 @@ void MeCtNewLocomotion::init(SbmCharacter* sbChar)
 	attributes_names.push_back("walkCycle");
 	attributes_names.push_back("walkSkeleton");
 	attributes_names.push_back("walkScale");
+	attributes_names.push_back("walkSpeedGain");
 	attributes_names.push_back("CenterHipJoint");
 	attributes_names.push_back("LEndEffectorJoint");
 	attributes_names.push_back("REndEffectorJoint");
@@ -130,14 +133,20 @@ void MeCtNewLocomotion::setup()
 		isNewWalkScale = true;
 	walkScale = scale;
 
-	if(!SameMotion || isNewSkeleton || isNewWalkScale)
+	bool isNewWalkSpeedGain = false;
+	float speedGain = (float) character->getDoubleAttribute("walkSpeedGain");
+	if (fabs(walkSpeedGain - speedGain) < .0001)
+		isNewWalkSpeedGain = true;
+	walkSpeedGain = speedGain;
+
+
+	if(!SameMotion || isNewSkeleton || isNewWalkScale || isNewWalkSpeedGain)
 	{
 		S = C->smoothCycle("", 0.5f);
 		
 		S->connect(sk);
 		
-		motionSpd = walkScale * S->getJointSpeed(sk->getJointByName(hipjoint), (float)S->getTimeStart() , (float)S->getTimeStop())*0.75f ;
-		LOG("Speed is %f", motionSpd);
+		motionSpd = walkScale * S->getJointSpeed(sk->getJointByName(hipjoint), (float)S->getTimeStart() , (float)S->getTimeStop()) * walkSpeedGain ;
 		S->disconnect();
 
 	}

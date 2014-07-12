@@ -115,6 +115,7 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		float neutralLegDistance;
 		int currStp;
 		float walkScale;
+		float walkSpeedGain;
 		SkChannelArray _channels;
 		SbmCharacter* character;
 		double _lastTime;
