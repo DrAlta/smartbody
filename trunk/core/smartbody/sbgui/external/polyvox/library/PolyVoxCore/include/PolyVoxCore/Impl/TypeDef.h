@@ -102,7 +102,11 @@ freely, subject to the following restrictions:
 		#define polyvox_shared_ptr std::tr1::shared_ptr
 		#define polyvox_function std::tr1::function
 	#else
+#if defined(__APPLE__)
+		#include <tr1/cstdint>
+#else
 		#include <cstdint>
+#endif
 		//#include <cstdint>
 		#include <functional>
 		#include <memory>
