@@ -907,6 +907,11 @@ void SBScene::update()
 
 void SBScene::setScale(float val)
 {
+	if (val == 0.0)
+	{
+		LOG("Scene scale cannot be set to 0.0, keeping it at %f", val);
+		return;
+	}
 	_scale = val;
 
 	DoubleAttribute* scaleAttribute = dynamic_cast<DoubleAttribute*>(getAttribute("scale"));
@@ -4392,16 +4397,32 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 
 		SrBox pawn_bb				= pawn->getBoundingBox();
 		
+
+		float ax = pawn_bb.a.x;
+		float ay = pawn_bb.a.y;
+		float az = pawn_bb.a.z;
+		float bx = pawn_bb.b.x;
+		float by = pawn_bb.b.y;
+		float bz = pawn_bb.b.z;
+
+		SrVec pointAAB(pawn_bb.a.x, pawn_bb.a.y, pawn_bb.b.z);
+		SrVec pointABB(pawn_bb.a.x, pawn_bb.b.y, pawn_bb.b.z);
+		SrVec pointBBA(pawn_bb.b.x, pawn_bb.b.y, pawn_bb.a.z); 
+		SrVec pointBAA(pawn_bb.b.x, pawn_bb.a.y, pawn_bb.a.z); 
+		SrVec pointABA(pawn_bb.a.x, pawn_bb.b.y, pawn_bb.a.z);
+		SrVec pointBAB(pawn_bb.b.x, pawn_bb.a.y, pawn_bb.b.z); 
+
 		//	If bounding box visible, adds pawn to list of visible pawns
+		SrPnt center = pawn_bb.getCenter();
 		if (frustum.pointInFrustum(pawn_bb.a) || 
 			frustum.pointInFrustum(pawn_bb.b) ||
-			frustum.pointInFrustum(pawn_bb.getCenter()) ||
-			frustum.pointInFrustum(SrVec(pawn_bb.a.x, pawn_bb.a.y, pawn_bb.b.z)) || 
-			frustum.pointInFrustum(SrVec(pawn_bb.a.x, pawn_bb.b.y, pawn_bb.b.z)) ||
-			frustum.pointInFrustum(SrVec(pawn_bb.b.x, pawn_bb.b.y, pawn_bb.a.z)) || 
-			frustum.pointInFrustum(SrVec(pawn_bb.b.x, pawn_bb.a.y, pawn_bb.a.z)) || 
-			frustum.pointInFrustum(SrVec(pawn_bb.a.x, pawn_bb.b.y, pawn_bb.a.z)) ||
-			frustum.pointInFrustum(SrVec(pawn_bb.b.x, pawn_bb.a.y, pawn_bb.b.z))) 
+			frustum.pointInFrustum(center) ||
+			frustum.pointInFrustum(pointAAB) || 
+			frustum.pointInFrustum(pointABB) ||
+			frustum.pointInFrustum(pointBBA) || 
+			frustum.pointInFrustum(pointBAA) || 
+			frustum.pointInFrustum(pointABA) ||
+			frustum.pointInFrustum(pointBAB)) 
 			   visible_pawns.push_back(pawn->getName());
 	}
 	
