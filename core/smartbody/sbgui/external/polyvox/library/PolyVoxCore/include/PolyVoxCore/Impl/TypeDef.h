@@ -114,10 +114,11 @@ freely, subject to the following restrictions:
 		#include <memory>
 #if defined(__APPLE__)
 		#define polyvox_shared_ptr std::tr1::shared_ptr
+		#define polyvox_function std::tr1::function
 #else
 		#define polyvox_shared_ptr std::shared_ptr
-#endif
 		#define polyvox_function std::function
+#endif
 	#endif
 	//We have a decent compiler - use real C++0x features	
 	#define polyvox_bind std::bind
