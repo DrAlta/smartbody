@@ -531,10 +531,30 @@ struct CharacterListenerWrap : SmartBody::SBSceneListener, boost::python::wrappe
 
 		SBSceneListener::OnPawnDelete(name);
 	}
-	
+
+		
 	void default_OnPawnDelete( const std::string & name )
 	{
 		SBSceneListener::OnPawnDelete(name);
+	}
+
+	virtual void OnEvent( const std::string & type, const std::string & params )
+	{
+		if (boost::python::override o = this->get_override("OnEvent"))
+		{
+			try {
+				o(type, params);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		SBSceneListener::OnEvent(type, params);
+	}
+	
+	void default_OnEvent( const std::string & type, const std::string & params )
+	{
+		SBSceneListener::OnEvent(type, params);
 	}
 
 	virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )

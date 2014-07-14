@@ -7,6 +7,7 @@
 #include <sb/SBSimulationManager.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBAssetManager.h>
+#include "CommandWindow.h"
 #include <RootWindow.h>
 #include <fltk_viewer.h>
 
@@ -621,5 +622,18 @@ void FLTKListener::OnLogMessage( const std::string& message )
 #ifdef WIN32
 	LOG(message.c_str());
 #endif
+}
+
+
+void FLTKListener::OnEvent( const std::string& eventName, const std::string& eventParameters )
+{
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (window->commandWindow && 
+		window->commandWindow->isShowEvents)
+	{
+#ifdef WIN32
+		LOG("Event: [%s] %s", eventName.c_str(), eventParameters.c_str());
+#endif
+	}
 }
 

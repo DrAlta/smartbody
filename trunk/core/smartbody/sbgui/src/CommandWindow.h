@@ -96,6 +96,8 @@ public:
 	Fl_Tabs* tabGroup;
 	Fl_Button* buttonExecute;
 
+	bool isShowEvents;
+
 	static void testCB();
 	static void executecb(Fl_Widget* widget, void* data);
 	static void upcb(int key, Fl_Text_Editor* te);
@@ -107,6 +109,7 @@ public:
 
 	static void clearcb(Fl_Widget* widget, void* data);
 	static void clearhistorycb(Fl_Widget* widget, void* data);
+	static void showeventscb(Fl_Widget* widget, void* data);
 
 	static void FindFiles(char*, char*);
 
@@ -121,6 +124,7 @@ private:
 	int when;
 	char curDir[256];
 	int minOutputSize;
+	
 
 }
 ;

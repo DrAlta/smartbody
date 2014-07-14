@@ -11,7 +11,7 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r5616
+AppVersion=r5686
 OutputBaseFilename=SmartBody
 WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
@@ -58,7 +58,6 @@ Source: ".\core\smartbody\SmartBody\src\external\protobuf\include\*"; DestDir: "
 Source: ".\lib\vhcl\include\*"; DestDir: "{app}\include\vhcl"
 Source: ".\lib\vhmsg\vhmsg-c\include\*"; DestDir: "{app}\include\vhmsg"
 Source: ".\lib\bonebus\include\*"; DestDir: "{app}\include\bonebus"
-Source: ".\lib\wsp\wsp\include\*"; DestDir: "{app}\include\wsp"
 Source: ".\core\smartbody\sbgui\external\fltk-1.3.2\FL\*"; DestDir: "{app}\include\FL"
 Source: ".\core\smartbody\sbgui\external\cegui-0.8.2\include\*"; DestDir: "{app}\include\CEGUI";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\sbgui\external\Pinocchio\*.h"; DestDir: "{app}\include\Pinocchio";
@@ -102,7 +101,6 @@ Source: ".\core\smartbody\SmartBody\src\external\protobuf\lib\Debug\*.lib"; Dest
 Source: ".\lib\vhcl\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\vhmsg\vhmsg-c\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\bonebus\lib\*.lib"; DestDir: "{app}\lib"
-Source: ".\lib\wsp\wsp\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\clapack\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\*.lib"; DestDir: "{app}\lib"

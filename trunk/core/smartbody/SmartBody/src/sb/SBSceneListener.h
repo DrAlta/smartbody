@@ -24,6 +24,8 @@ public:
 	virtual SBAPI void OnChannel( const std::string & name, const std::string & channelName, const float value) {}
 	virtual SBAPI void OnLogMessage( const std::string & message) {}
 
+	virtual SBAPI void OnEvent( const std::string & eventName, const std::string & eventParameters ) {}
+
 	virtual SBAPI void OnObjectCreate(SmartBody::SBObject* object) {}
 	virtual SBAPI void OnObjectDelete(SmartBody::SBObject* object) {}
 	
