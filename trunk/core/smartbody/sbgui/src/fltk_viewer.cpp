@@ -5561,7 +5561,7 @@ void FltkViewerData::setupData()
 
 	bcolor = SrColor(.63f, .63f, .63f);
 	floorColor = SrColor(0.6f,0.6f,0.6f);
-	showFloor = false;
+	showFloor = true;
 
 	scenebox = new SrSnLines;
 	sceneaxis = new SrSnLines;
