@@ -3,6 +3,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBCommandManager.h>
 #include <sb/SBScene.h>
+#include <sb/SBSceneListener.h>
 #include <sb/SBAttribute.h>
 
 #include <boost/algorithm/string/replace.hpp>
@@ -118,7 +119,17 @@ SBEventManager::~SBEventManager()
 
 void SBEventManager::handleEvent(SBEvent* e, double time)
 {
+	std::string type = e->getType();
+	std::string params = e->getParameters();
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnEvent(type, params);
+	}
+	
 	// find the appropriate event handler
+
 	std::map<std::string, SBEventHandler*>::iterator iter = eventHandlers.find(e->getType());
 	if (iter == eventHandlers.end())
 		return;

@@ -67,6 +67,7 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 	menubar = new Fl_Menu_Bar(0, 0, w, 25); 
 	menubar->add("&Edit/&Clear", (const char*) NULL, clearcb, 0);
 	menubar->add("&Edit/C&lear History", (const char*) NULL, clearhistorycb, 0);
+	menubar->add("&Show/&Events", (const char*) NULL, showeventscb, 0);
 
 	for (int c = 0; c < 2; c++)
 	{
@@ -149,6 +150,7 @@ CommandWindow::CommandWindow(int x,int y,int w,int h, const char* s) : GenericVi
 	this->resizable(tabGroup);
 	this->size_range(640, 480);
 
+	isShowEvents = false;
 	vhcl::Log::g_log.AddListener(this);
 }
 
@@ -295,6 +297,12 @@ void CommandWindow::clearhistorycb(Fl_Widget* w, void* data)
 	CommandWindow* commandWindow = CommandWindow::getCommandWindow(w);
 	commandWindow->clearHistory(0);
 	commandWindow->clearHistory(1);
+}
+
+void CommandWindow::showeventscb(Fl_Widget* widget, void* data)
+{
+	CommandWindow* commandWindow = CommandWindow::getCommandWindow(widget);
+	commandWindow->isShowEvents = !commandWindow->isShowEvents;
 }
 
 void CommandWindow::tabcb(int key, Fl_Text_Editor* editor)

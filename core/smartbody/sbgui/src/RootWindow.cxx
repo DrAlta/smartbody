@@ -1947,6 +1947,9 @@ void BaseWindow::CreatePawnFromModelCB(Fl_Widget* w, void* data)
 	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);
 	if (!pawn)
 		return;
+
+	const std::string& currentSelection = SBSelectionManager::getSelectionManager()->getCurrentSelection();
+	LOG(currentSelection.c_str());
 	// get the first model
 	std::vector<std::string> meshes = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMeshNames();
 	if (meshes.size() > 0)

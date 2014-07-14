@@ -688,6 +688,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("OnPawnCreate", &SBSceneListener::OnPawnCreate, "Triggered when a pawn is created.")
 		.def("OnPawnDelete", &SBSceneListener::OnPawnDelete, "Triggered when a pawn is deleted.")
 		.def("OnViseme", &SBSceneListener::OnViseme, "Visemes sent every frame.")
+		.def("OnEvent", &SBSceneListener::OnEvent, "Triggered when an event occurs.")
 		;
 
 	boost::python::class_<CharacterListenerWrap, boost::noncopyable>("CharacterListener")

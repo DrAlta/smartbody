@@ -18,6 +18,7 @@ class FLTKListener : public SmartBody::SBSceneListener, public SmartBody::SBObse
       virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime );
 	  virtual void OnChannel( const std::string & name, const std::string & channelName, const float value);
 	  virtual void OnLogMessage( const std::string & message );
+	  virtual void OnEvent( const std::string & eventName, const std::string & eventParameters );
 
 	  virtual void OnSimulationStart();
 	  virtual void OnSimulationEnd();
