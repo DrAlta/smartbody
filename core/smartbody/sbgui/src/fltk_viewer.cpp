@@ -4958,14 +4958,13 @@ void FltkViewer::drawColObject( SBGeomObject* colObj, SrMat& gmat )
 	//SrMat gMat = colObj->worldState.gmat();
 	SrColor objColor;
 	objColor = colObj->color;
-	objColor.a = (srbyte)255;
-	
+	objColor.a = (srbyte)255;	
 
+	glDisable(GL_TEXTURE_2D);
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glAlphaFunc ( GL_GREATER, 0.1f ) ;
-	
+	//glAlphaFunc ( GL_GREATER, 0.1f ) ;	
 	SrMat gMat = gmat;
 	SrMat lMat = colObj->getLocalTransform().gmat();	
 	glMultMatrixf((const float*) gMat);
