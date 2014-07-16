@@ -802,7 +802,7 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 
 	DeformableMesh* deformMesh = meshInstance->getDeformableMesh();
 	if (!deformMesh) return NULL;
-	
+#if 1
 	if (deformMesh->isSkinnedMesh())	
 	{
  		ogreMesh->setSkeletonName(skeletonName);	
@@ -862,6 +862,7 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 		ogreMesh->_compileBoneAssignments();	
 #endif
 	}
+#endif
 	ogreMesh->load();
 	outChar = ogreSceneMgr->createEntity(sbChar->getName(),meshName);	
 
