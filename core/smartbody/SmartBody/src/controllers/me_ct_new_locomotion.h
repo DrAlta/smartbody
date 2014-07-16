@@ -100,11 +100,13 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		void notify(SmartBody::SBSubject* subject);
 		void play(float t, bool useTemp=false);
 		void reset();
-		void loopMotion(float def);
+		void loopMotion(float def, float speed);
 	private:
 		void addPawn(SrVec& pos, std::string name);
 		float legDistance(bool Leftleg);
-		bool _valid;
+		bool capsule_collision(SrVec  mp1, SrVec mp2, SrVec np1, SrVec np2);
+		void check_collision();
+		bool _valid, _analysis;
 		float scootSpd;
 		float movingSpd;
 		float turningSpd;
@@ -114,6 +116,7 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		float startTime;
 		float neutralLegDistance;
 		int currStp;
+		float errorSum;
 		float walkScale;
 		float walkSpeedGain;
 		SkChannelArray _channels;
@@ -132,6 +135,7 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		std::vector<int> lplant;
 	protected:	
 		void updateChannelBuffer(SrBuffer<float>& buffer, std::vector<SrQuat>& quatList, bool bRead = false);
+		void writeToSkeleton(SrBuffer<float>& buffer);
 		void updateChannelBuffer(SrBuffer<float>& buffer);
 		void updateWorldOffset(SrBuffer<float>& buffer, SrQuat& rot, SrVec& pos);
 		void updateConstraints(float t);
