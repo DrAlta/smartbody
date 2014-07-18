@@ -16,6 +16,7 @@
 
 #include <controllers/MeCtReachEngine.h>
 #include <sb/SBController.h>
+#include <sb/SBEvent.h>
 
 class ReachStateData;
 class ReachStateInterface;
@@ -27,7 +28,7 @@ using namespace std;
 typedef std::map<int,MeCtReachEngine*> ReachEngineMap; 
 
 class MeCtExampleBodyReach :
-	public SmartBody::SBController, public FadingControl
+	public SmartBody::SBController, public FadingControl, public SmartBody::SBEventHandler
 {
 private:
 	static std::string CONTROLLER_TYPE;
@@ -46,6 +47,7 @@ protected:
 	bool                  isMoving;
 	bool                  startReach;
 	bool                  endReach;
+	bool                  locomotionReachTarget;
 	float                 autoReturnDuration;
 	float                 reachVelocityScale;	
 	float                 desireLinearVel;
@@ -89,6 +91,9 @@ public:
 	void setDefaultReachType(const std::string& reachTypeName);
 	void init(SbmPawn* pawn);	
 	void notify(SBSubject* subject);
+
+	SBAPI virtual void executeAction(SmartBody::SBEvent* event);
+
 protected:			
 	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& motionFrame, bool bRead = false);
 	bool updateLocomotion(); // return true if locomotion is finished
