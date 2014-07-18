@@ -5,7 +5,7 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrMaarten')
+scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
@@ -46,9 +46,8 @@ brad.setSkeleton(bradSkeleton)
 brad.createStandardControllers()
 # Set deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', 0.01)
-brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
-# Play idle animation
-bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
+brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+
 scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
 retargetBehaviorSet(baseName)		
@@ -56,6 +55,9 @@ retargetBehaviorSet(baseName)
 scene.run('BehaviorSetMaleMocapLocomotion.py')
 setupBehaviorSet()
 retargetBehaviorSet(baseName)
+
+# Play idle animation
+bml.execBML(baseName, '<body posture="ChrMarine@Idle01"/>')
 
 # make the lights invisible
 scene.getPawn("light0").setBoolAttribute("visible", False)
