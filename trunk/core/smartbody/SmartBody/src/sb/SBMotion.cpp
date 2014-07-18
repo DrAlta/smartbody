@@ -3047,7 +3047,7 @@ SBAPI void SBMotion::saveToBVH( const std::string& fileName, const std::string& 
 
 	// write buffers
 	fprintf(fp,"MOTION\n");
-	fprintf(fp,"Frames : %d\n",this->getNumFrames());
+	fprintf(fp,"Frames: %d\n",this->getNumFrames());
 	fprintf(fp,"Frame Time: %f\n",this->getFrameRate());
 	for (int i=0;i<getNumFrames();i++)
 	{

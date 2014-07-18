@@ -41,6 +41,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 	isMoving = false;
 	startReach = false;
 	endReach = false;
+	locomotionReachTarget = false;
 	autoReturnDuration = -1.f;
 	defaultReachType = reachType;
 	reachVelocityScale = 1.f; 
@@ -237,7 +238,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 		std::string charName = character->getName();		
 		SrVec curXZ = curPos; curXZ.y = 0.f;
 		SrVec targetDir = targetXZ - curXZ; targetDir.normalize();					
-		SrVec steerTarget = curXZ + targetDir*(dist);// - character->getHeight()*0.2f);
+		SrVec steerTarget = curXZ + targetDir*(dist - character->getHeight()*0.15f);
 		float facing = ((float)acos(dot(targetDir,SrVec(0,0,1))))*180.f/(float)M_PI;
 		if (dot(cross(targetDir,SrVec(0,0,1)),SrVec(0,1,0)) > 0.f)
 			facing = -facing;
@@ -248,7 +249,9 @@ bool MeCtExampleBodyReach::updateLocomotion()
 		SmartBody::SBScene::getScene()->getCommandManager()->execute(const_cast<char*>(cmd.c_str()));
 		isMoving = true;
 		//currentReachData->startReach = false;
-		startReach = false;
+		startReach = false;		
+		SmartBody::SBEventManager* eventManager = SmartBody::SBScene::getScene()->getEventManager();
+		eventManager->addEventHandler("locomotion",this);
 		return false;
 	}
 	else if (!isMoving && startReach)//currentReachData->startReach) // the object is already close to character, no need to move
@@ -259,8 +262,10 @@ bool MeCtExampleBodyReach::updateLocomotion()
 		return true;
 	}
 
-	if (isMoving && character->_reachTarget && !character->_lastReachStatus) // character is moving and has reached the target
-	{		
+	//if (isMoving && character->_reachTarget && !character->_lastReachStatus) // character is moving and has reached the target
+	if (isMoving && locomotionReachTarget)
+	{	
+		locomotionReachTarget = false;
 		if (dist < character->getHeight()*0.35f)
 		{			
 			// choose the correct hand
@@ -577,4 +582,11 @@ void MeCtExampleBodyReach::notify(SBSubject* subject)
 // 			currentReachData->endReach = true;
 // 		}
 // 	}
+}
+
+SBAPI void MeCtExampleBodyReach::executeAction( SmartBody::SBEvent* event )
+{
+	locomotionReachTarget = true;
+	SmartBody::SBEventManager* eventManager = SmartBody::SBScene::getScene()->getEventManager();
+	eventManager->removeEventHandler("locomotion");
 }
