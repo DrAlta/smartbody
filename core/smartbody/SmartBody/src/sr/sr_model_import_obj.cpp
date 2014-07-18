@@ -82,7 +82,8 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 		s = paths[i++];
 		s << file;
 		imageFile = s;
-		in.init (fopen(s,"r") );
+		FILE* fp = fopen(imageFile.c_str(),"r") ;
+		in.init (fp);
 	}
 	if (!in.valid()) {
 		std::cerr << "[load_texture] ERROR: Invalid inpath for texture: " << s << "\n";
@@ -174,6 +175,7 @@ static void read_materials ( SrArray<SrMaterial>& M,
 		//std::string map_Kd;
 		SrString map_Kd;
 		in.getall(map_Kd);
+		map_Kd.replace("\n","");
 		
 		std::string texFile = (const char*) map_Kd;
 		std::string mtlName = mnames.top();
