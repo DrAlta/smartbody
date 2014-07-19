@@ -536,7 +536,7 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( new_locomotion_ct );
 #endif
 	ct_tree_p->add_controller( motion_sched_p );
-	//ct_tree_p->add_controller( postprocess_ct );	
+	ct_tree_p->add_controller( postprocess_ct );	
 	ct_tree_p->add_controller( reach_sched_p );	
 	ct_tree_p->add_controller( grab_sched_p );
 	ct_tree_p->add_controller( breathing_p );
