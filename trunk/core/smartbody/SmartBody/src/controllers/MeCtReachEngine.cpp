@@ -108,18 +108,42 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 	std::string consRootName = preFix + consJointList[0];	
 
 	std::string thumbName = preFix+"thumb1";
+	std::string fingerName = preFix + "finger1";
+	std::string ringName = preFix + "ring1";
+	std::string middle2Name = preFix + "middle2";
+
 	SmartBody::SBJoint* thumbJoint = skeletonCopy->getJointByName(thumbName);
 	SmartBody::SBJoint* effectorParent = effectorJoint->getParent();
-	SrVec effectorUp = SrVec(0,1,0);
-	if (thumbJoint && effectorParent) // find up-axis for effector joint
+	SmartBody::SBJoint* middle2Joint = skeletonCopy->getJointByName(middle2Name);
+	SmartBody::SBJoint* fingerJoint = skeletonCopy->getJointByName(fingerName);
+	SmartBody::SBJoint* ringJoint = skeletonCopy->getJointByName(ringName);
+
+	SmartBody::SBJoint *pivotJoint = NULL, *firstJoint = NULL, *secondJoint = NULL;
+	if (effectorParent && ringJoint) // ideal configuration
 	{
-		SrVec v1 = thumbJoint->gmatZero().get_translation() - effectorParent->gmatZero().get_translation();
-		SrVec v2 = effectorJoint->gmatZero().get_translation() - effectorParent->gmatZero().get_translation();
+		pivotJoint = effectorParent;
+		firstJoint = effectorJoint;
+		secondJoint = ringJoint;
+	}
+	else if (thumbJoint && effectorParent)
+	{
+		pivotJoint = effectorParent;
+		firstJoint = thumbJoint;
+		secondJoint = effectorJoint;
+	}
+
+	SrVec effectorUp = SrVec(0,1,0);
+	if (pivotJoint && firstJoint && secondJoint) // find up-axis for effector joint
+	{
+		SrVec v1 = firstJoint->gmatZero().get_translation() - pivotJoint->gmatZero().get_translation();
+		SrVec v2 = secondJoint->gmatZero().get_translation() - pivotJoint->gmatZero().get_translation();
 		effectorUp = cross(v2,v1); 
 		effectorUp.normalize();
 		if (preFix == "l_")
 			effectorUp = -effectorUp;
 	}
+
+	//LOG("preFix = %s, effector up = %f %f %f", preFix.c_str(), effectorUp[0], effectorUp[1], effectorUp[2]);
 
 	SrQuat offsetQuat = SrQuat(effectorUp,SrVec(0,1,0));
 	SrMat offsetMat; offsetQuat.get_mat(offsetMat);
@@ -130,9 +154,7 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 		if (skeletonCopy->search_joint(consRootName.c_str()) != NULL)
 			break;
  	}
-	//if (!skeletonCopy->search_joint(consRootName.c_str()))
-// 	if (reachType == LEFT_ARM || reachType == LEFT_JUMP)
-// 		consRootName = "l_shoulder";
+	
 	cons->rootName = consRootName;
 	reachPosConstraint[cons->efffectorName] = cons;
 	// if there is a child	
@@ -205,7 +227,7 @@ void MeCtReachEngine::init(int rtype, SmartBody::SBJoint* effectorJoint)
 	EffectorState& estate = reachData->effectorState;
 	estate.effectorName = reachEndEffector->getMappedJointName().c_str();
 	estate.curIKTargetState = reachData->getPoseState(idleMotionFrame);
-	estate.gmatZero = copyEffector->gmatZero()*offsetMat;
+	estate.gmatZero = copyEffector->gmatZero()*offsetMat;//copyEffector->gmatZero()*offsetMat;
 
 
 	stateTable["Idle"] = new ReachStateIdle();

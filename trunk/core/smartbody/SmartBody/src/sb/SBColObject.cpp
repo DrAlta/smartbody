@@ -316,7 +316,7 @@ bool SBGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos
 	for (int i=0;i<6;i++)
 	{
 		float rotAngle = acosf(dot(ly,axis[i]));
-		if (rotAngle < minAngle)
+		if (fabs(rotAngle) < minAngle)
 		{
 			minAngle = rotAngle;
 			graspAxis = axis[i];
@@ -327,10 +327,8 @@ bool SBGeomBox::estimateHandPosture( const SrQuat& naturalRot, SrVec& outHandPos
 	graspAxis = graspAxis*getCombineTransform().rot;
 	SrVec rotAxis = cross(yAxis,graspAxis); rotAxis.normalize();
 	SrQuat alignRot = SrQuat(rotAxis,minAngle);
-
 	outHandRot = alignRot*naturalRot;	
 	outHandPos = getCenter() + SrVec(0,objSize+offsetDist,0)*outHandRot;
-	
 	return true;
 }
 
