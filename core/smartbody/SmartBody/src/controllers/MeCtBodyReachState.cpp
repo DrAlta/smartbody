@@ -200,7 +200,11 @@ SRT ReachHandAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalS
 		float grabOffset = rd->characterHeight*0.01f;
 		SRT handState = rd->reachTarget.getGrabTargetState(naturalState,grabOffset);	
 		rd->desireHandState = handState;
-		return SRT::diff(naturalState,handState);
+		SRT diff;
+		diff = SRT::diff(naturalState, handState);
+		diff.rot = handState.rot*naturalState.rot.inverse();
+		return diff;
+		//return SRT::diff(naturalState,handState);
 	}	
 	else
 	{
@@ -721,16 +725,14 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 	tsBlend.tran = ts.tran;
 	tsBlendGlobal = tsBlend;
 	SrQuat newRot = SrQuat(rd->effectorState.gmatZero.inverse()*tsBlendGlobal.gmat());
+	newRot.normalize();
 	tsBlendGlobal.rot = newRot;
-	SRT offset = rd->curHandAction->getHandTargetStateOffset(rd,tsBlendGlobal);	
-	SrQuat quatZero = SrQuat(rd->effectorState.gmatZero);
-	SrQuat newOffsetRot = quatZero*offset.rot*quatZero.inverse();
-	offset.rot = newOffsetRot;
-	tsBlend.add(offset);		
-	//LOG("reach target after offset = %f %f %f\n",tsBlend.tran[0],tsBlend.tran[1],tsBlend.tran[2]);
+	SRT offset = rd->curHandAction->getHandTargetStateOffset(rd,tsBlendGlobal);		
+	SrQuat newOffsetRot = offset.rot;
+	tsBlend.rot = newOffsetRot*tsBlend.rot;
+	tsBlend.tran = tsBlend.tran + offset.tran;	
 	estate.ikTargetState = tsBlend;
 	estate.grabStateError = offset;
-	//LOG("reach target position = %f %f %f\n",
 }
 
 

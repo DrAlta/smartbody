@@ -40,8 +40,7 @@ public:
 	SRT curState; 
 	SRT grabStateError;
 	SrVec paraTarget;
-	SrMat gmatZero;
-
+	SrMat gmatZero;	
 	//SbmPawn* attachedPawn;	
 	std::string attachedPawnName;
 	SrMat    attachMat;
@@ -124,7 +123,8 @@ public:
 	BodyMotionFrame curMotionFrame; 
 	EffectorState   effectorState;
 	ReachTarget     reachTarget;
-	SRT             desireHandState;
+	SRT             desireHandState;	
+	SrVec           HandUpVector;
 	// flags for state transition
 	float           autoReturnTime;
 	float           characterHeight;
