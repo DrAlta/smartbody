@@ -91,6 +91,7 @@ MeCtHand::MeCtHand( SmartBody::SBSkeleton* sk, SmartBody::SBJoint* wrist)
 	grabSpeed = 50.f;
 	jointSpeed = 20.f;
 	_duration = -1.f;	
+	prev_time = -1.f;
 }
 
 MeCtHand::~MeCtHand( void )

@@ -266,6 +266,7 @@ bool MeCtExampleBodyReach::updateLocomotion()
 	if (isMoving && locomotionReachTarget)
 	{	
 		locomotionReachTarget = false;
+		
 		if (dist < character->getHeight()*0.35f)
 		{			
 			// choose the correct hand
