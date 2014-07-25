@@ -60,8 +60,10 @@ public:
 	virtual void reachPreReturnAction(ReachStateData* rd);
 	virtual void reachNewTargetAction(ReachStateData* rd) ;
 	virtual void reachReturnAction(ReachStateData* rd) ;
+	virtual void reachPostCompleteAction(ReachStateData* rd);
 	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
 	virtual bool isPickingUpNewPawn(ReachStateData* rd) ;
+	
 
 	void sendReachEvent(const std::string& etype, const std::string& cmd, float time = 0.0);	
 public:
@@ -80,6 +82,7 @@ public:
 	virtual void reachNewTargetAction(ReachStateData* rd);
 	virtual void reachPreReturnAction(ReachStateData* rd) {} ;
 	virtual void reachReturnAction(ReachStateData* rd); // do nothing when return
+	virtual void reachPostCompleteAction(ReachStateData* rd); 
 	virtual int getType();
 };
 
@@ -87,7 +90,8 @@ class ReachHandPutDownAction : public ReachHandAction
 {
 public:	
 	virtual void reachPreCompleteAction(ReachStateData* rd) {}; // do nothing when moving toward target
-	virtual void reachCompleteAction(ReachStateData* rd);	
+	virtual void reachCompleteAction(ReachStateData* rd);
+	virtual void reachPreReturnAction(ReachStateData* rd);
 	virtual void reachReturnAction(ReachStateData* rd);	
 	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
 	virtual int getType();
@@ -99,7 +103,8 @@ public:
 	virtual void reachPreCompleteAction(ReachStateData* rd);
 	virtual void reachCompleteAction(ReachStateData* rd) {};	
 	virtual void reachPreReturnAction(ReachStateData* rd) {};
-	virtual void reachNewTargetAction(ReachStateData* rd) {};	
+	virtual void reachNewTargetAction(ReachStateData* rd) {};
+	virtual void reachPostCompleteAction(ReachStateData* rd) {};
 	virtual SRT getHandTargetStateOffset(ReachStateData* rd, SRT& naturalState);
 	virtual bool isPickingUpNewPawn(ReachStateData* rd);
 	virtual int getType();

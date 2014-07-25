@@ -33,7 +33,7 @@ void EffectorState::setAttachedPawn( ReachStateData* rd )
 		SmartBody::SBPawn* attachedPawn = target.getTargetPawn();
 		attachedPawnName = target.getTargetPawnName();
 		//attachMat = attachedPawn->get_world_offset_joint()->gmat()*curState.gmat().inverse();	
-		attachMat = attachedPawn->get_world_offset()*curState.gmat().inverse();
+		//attachMat = attachedPawn->get_world_offset()*curState.gmat().inverse();
 		//SRT state = target.getTargetState();
 		//target.setTargetState(state);
 	}
@@ -319,10 +319,12 @@ bool ReachHandAction::isPickingUpNewPawn( ReachStateData* rd )
 	ReachTarget& rtarget = rd->reachTarget;
 	EffectorState& estate = rd->effectorState;
 	if (rd->startReach && rtarget.targetIsPawn()) // a new target pawn
+	//if (rtarget.targetIsPawn()) // a new target pawn
 	{
 		return (estate.getAttachedPawn() != rtarget.getTargetPawn());
 	}
 	else if (rd->startReach && !rtarget.targetIsPawn() && !rtarget.targetIsJoint()) // a new target position
+	//else if (!rtarget.targetIsPawn() && !rtarget.targetIsJoint()) // a new target position
 	{
 		return (estate.getAttachedPawn() != NULL);
 	}
@@ -353,9 +355,9 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 	
 	cmd = "pawn " + targetName + " physics off";
 	rd->curHandAction->sendReachEvent("reach",cmd);	
-	SRT prevParaState = rd->reachTarget.getParaTargetState();
-	rd->reachTarget.setTargetState(rd->effectorState.ikTargetState);	
-	rd->reachTarget.paraTargetState = prevParaState;
+	//SRT prevParaState = rd->reachTarget.getParaTargetState();
+	//rd->reachTarget.setTargetState(rd->effectorState.ikTargetState);	
+	//rd->reachTarget.paraTargetState = prevParaState;
 	//rd->reachTarget.setTargetState(rd->reachTarget.getTargetState());
 	//rd->effectorState.ikTargetState = rd->effectorState.curIKTargetState;
 }
@@ -390,6 +392,16 @@ void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
 void ReachHandAction::reachPreReturnAction( ReachStateData* rd )
 {
 	ReachHandAction::reachNewTargetAction(rd);	
+}
+
+void ReachHandAction::reachPostCompleteAction(ReachStateData* rd)
+{
+// 	LOG("reachPostCompleteAction");
+// 	if (rd->effectorState.getAttachedPawn())
+// 	{
+// 		LOG("Pick-up attached pawn = '%s'",rd->effectorState.getAttachedPawn()->getName().c_str());
+// 		pickUpAttachedPawn(rd);
+// 	}
 }
 
 std::string ReachHandAction::generateGrabCmd( const std::string& charName, const std::string& targetName, const std::string& grabState, int type, float grabSpeed )
@@ -429,7 +441,7 @@ std::string ReachHandAction::generateAttachCmd( const std::string& charName, con
 	std::string targetStr = "";
 	if (targetName != "")
 	{
-		targetStr = " sbm:attach-pawn=\"" + targetName + "\"";
+		targetStr = " sbm:attach-pawn=\"" + targetName + "\" start=\"0.5\"";
 	}	
 	else
 		targetStr = " sbm:release-pawn=\"true\"";
@@ -463,6 +475,7 @@ void ReachHandPickUpAction::reachCompleteAction( ReachStateData* rd )
 	}
 	ReachHandAction::reachCompleteAction(rd);	
 	pickUpAttachedPawn(rd);
+	//rd->effectorState.setAttachedPawn(rd);
 }
 
 void ReachHandPickUpAction::reachNewTargetAction( ReachStateData* rd )
@@ -470,6 +483,13 @@ void ReachHandPickUpAction::reachNewTargetAction( ReachStateData* rd )
 	//putDownAttachedPawn(rd);
 	//rd->effectorState.removeAttachedPawn(rd);
 	ReachHandAction::reachNewTargetAction(rd);
+}
+
+void ReachHandPickUpAction::reachPostCompleteAction( ReachStateData* rd )
+{
+	//sendReachEvent(cmd);
+	//pickUpAttachedPawn(rd);
+	ReachHandAction::reachPostCompleteAction(rd);
 }
 
 void ReachHandPickUpAction::reachReturnAction( ReachStateData* rd )
@@ -492,6 +512,12 @@ void ReachHandPutDownAction::reachCompleteAction( ReachStateData* rd )
 {
 	putDownAttachedPawn(rd);
 	//rd->effectorState.removeAttachedPawn(rd);
+	ReachHandAction::reachNewTargetAction(rd);	
+}
+
+void ReachHandPutDownAction::reachPreReturnAction( ReachStateData* rd )
+{
+	putDownAttachedPawn(rd);
 	ReachHandAction::reachNewTargetAction(rd);	
 }
 
@@ -973,22 +999,32 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 	//LOG("ReachComplete:rd->stateTime = %f",rd->stateTime);
 	if (rd->endReach)
 		toNextState = true;
+	static int counter = 0;
+	if (counter %100 == 0)
+	{
+		LOG("In ReachStateComplete::nextState");
+	}
+	counter++;
 
 	if (rd->curHandAction->isPickingUpNewPawn(rd))
 	{
+		//rd->curHandAction->reachPostCompleteAction(rd);
 		rd->curHandAction->reachNewTargetAction(rd);
 		rd->newTarget = true;	
 		rd->retimingFactor = 0.f;
 		//completeTime = 0.f;		
 		nextStateName = "PreReturn";//"NewTarget";
+		counter = 0;
 	}
 	else if (toNextState)
 	{
+		//rd->curHandAction->reachPostCompleteAction(rd);
 		//rd->curHandAction->reachNewTargetAction(rd);
 		rd->curHandAction->reachPreReturnAction(rd);
 		rd->endReach = false;		
 		//completeTime = 0.f; // reset complete time
 		nextStateName = "PreReturn";
+		counter = 0;
 	}	
 	return nextStateName;
 }

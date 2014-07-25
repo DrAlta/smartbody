@@ -63,6 +63,7 @@ protected:
 	//SbmPawn*              attachedPawn;
 	std::string           attachedPawnName;
 	SrMat                 attachMat;
+	bool                  needToAttachPawn;
 
 public:
 	float                 grabSpeed;
@@ -87,12 +88,13 @@ public:
 	int  getGrabType() { return grabType; }
 	void setGrabState(GrabState state);
 	void setGrabTargetObject(SbmPawn* targetObj);
-
+	bool isFingerChainLocked();
 	void attachPawnTarget(SbmPawn* pawn, std::string jointName);
 	void releasePawn();
 	void updateAttachedPawn();
 protected:
 	void solveIK(float dt);
+	void pawnAttachImpl();
 	void updateChannelBuffer(MeFrameData& frame, BodyMotionFrame& handMotionFrame, bool bRead = false);
 	void getPinchFrame(BodyMotionFrame& pinchFrame, SrVec& wristOffset);
 	FingerID findFingerID(const char* jointName);
