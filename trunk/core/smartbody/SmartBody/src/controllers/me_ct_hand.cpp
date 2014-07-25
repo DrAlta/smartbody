@@ -92,6 +92,7 @@ MeCtHand::MeCtHand( SmartBody::SBSkeleton* sk, SmartBody::SBJoint* wrist)
 	jointSpeed = 20.f;
 	_duration = -1.f;	
 	prev_time = -1.f;
+	needToAttachPawn = false;
 }
 
 MeCtHand::~MeCtHand( void )
@@ -121,14 +122,12 @@ SbmPawn* MeCtHand::getTargetObject()
 	return targetObject;
 }
 
-void MeCtHand::attachPawnTarget( SbmPawn* pawn, std::string jointName )
-{	
-	SkJoint* attachJoint = skeletonRef->search_joint(jointName.c_str());
+void MeCtHand::pawnAttachImpl()
+{
+	SkJoint* attachJoint = skeletonRef->search_joint(attachJointName.c_str());
 	if (!attachJoint)
 		return;
-	//printf("attach pawn\n");
-	attachJointName = jointName;
-	attachedPawnName = pawn->getName();
+
 	SbmPawn* attachedPawn = getAttachedPawn();
 	if (!attachedPawn) // if the pawn does not exist
 	{
@@ -137,7 +136,35 @@ void MeCtHand::attachPawnTarget( SbmPawn* pawn, std::string jointName )
 	}
 	//attachMat = attachedPawn->get_world_offset_joint()->gmat()*attachJoint->gmat().inverse();	
 	skeletonRef->update_global_matrices();
+	attachedPawn->wo_cache_update();
 	attachMat = attachedPawn->get_world_offset()*attachJoint->gmat().inverse();	
+	//LOG("attachPawn WO = %s",attachedPawn->get_world_offset().toString().c_str());
+}
+
+void MeCtHand::attachPawnTarget( SbmPawn* pawn, std::string jointName )
+{	
+	SkJoint* attachJoint = skeletonRef->search_joint(jointName.c_str());
+	if (!attachJoint)
+		return;
+	//printf("attach pawn\n");
+	attachJointName = jointName;
+	attachedPawnName = pawn->getName();
+	needToAttachPawn = false;
+	//needToAttachPawn = true;
+	pawnAttachImpl();
+	/*
+	SbmPawn* attachedPawn = getAttachedPawn();
+	if (!attachedPawn) // if the pawn does not exist
+	{
+		releasePawn();		
+		return;
+	}
+	//attachMat = attachedPawn->get_world_offset_joint()->gmat()*attachJoint->gmat().inverse();	
+	skeletonRef->update_global_matrices();
+	attachedPawn->wo_cache_update();
+	attachMat = attachedPawn->get_world_offset()*attachJoint->gmat().inverse();	
+	LOG("attachPawn WO = %s",attachedPawn->get_world_offset().toString().c_str());
+	*/
 }
 
 void MeCtHand::releasePawn()
@@ -147,13 +174,36 @@ void MeCtHand::releasePawn()
 	attachJointName = "";
 }
 
+bool MeCtHand::isFingerChainLocked()
+{
+	bool chainLocked = true;
+	for (unsigned int i=0;i<fingerChains.size();i++)
+	{
+		if (!fingerChains[i].isLock)
+			chainLocked = false;
+	}
+	return chainLocked;
+}
+
 void MeCtHand::updateAttachedPawn()
 {
+#if 0 // testing hack to delay pawn attachment. 
+	if (needToAttachPawn)
+	{
+		if (!isFingerChainLocked())
+			return;
+
+		pawnAttachImpl();
+		needToAttachPawn = false;
+	}
+#endif
+
 	SkJoint* attachJoint = skeletonRef->search_joint(attachJointName.c_str());
 	SbmPawn* attachedPawn = getAttachedPawn();
 	if (!attachJoint || !attachedPawn)
 		return;
 	//printf("update pawn\n");
+	attachJoint->update_gmat();
 	SrMat effectorWorld = attachJoint->gmat();// motionParameter->getMotionFrameJoint(ikMotionFrame,reachEndEffector->name().get_string())->gmat();
 	SrMat newWorld = attachMat*effectorWorld;
 	SrVec pos = newWorld.get_translation();
