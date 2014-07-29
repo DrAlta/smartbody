@@ -80,7 +80,7 @@ def reachSetup(characterName, interpolatorType, originalSkeleton, preFix):
 	character = scene.getCharacter(characterName)
 	skeleton = character.getSkeleton()
 	reachManager = scene.getReachManager()
-	reach = reachManager.createReach(characterName)	
+	reach = reachManager.createReachWithTag(characterName,'mocap')	
 	reach.setInterpolatorType(interpolatorType)
 	for i in range(0,len(rightHandMotions)):
 		right = scene.getMotion(rightHandMotions[i])
