@@ -69,7 +69,7 @@ def reachSetup(characterName, interpolatorType, originalSkeleton, preFix):
 	character = scene.getCharacter(characterName)
 	skeleton = character.getSkeleton()
 	reachManager = scene.getReachManager()
-	reach = reachManager.createReach(characterName)	
+	reach = reachManager.createReachWithTag(characterName,'default')	
 	print 'setting up reach for ' + characterName + ' , numReach()=' + str(reachManager.getNumReaches())
 	reach.setInterpolatorType(interpolatorType)
 	for i in range(0,len(rightHandMotions)):
