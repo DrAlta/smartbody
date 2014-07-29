@@ -999,13 +999,6 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 	//LOG("ReachComplete:rd->stateTime = %f",rd->stateTime);
 	if (rd->endReach)
 		toNextState = true;
-	static int counter = 0;
-	if (counter %100 == 0)
-	{
-		LOG("In ReachStateComplete::nextState");
-	}
-	counter++;
-
 	if (rd->curHandAction->isPickingUpNewPawn(rd))
 	{
 		//rd->curHandAction->reachPostCompleteAction(rd);
@@ -1014,7 +1007,6 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 		rd->retimingFactor = 0.f;
 		//completeTime = 0.f;		
 		nextStateName = "PreReturn";//"NewTarget";
-		counter = 0;
 	}
 	else if (toNextState)
 	{
@@ -1024,7 +1016,6 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 		rd->endReach = false;		
 		//completeTime = 0.f; // reset complete time
 		nextStateName = "PreReturn";
-		counter = 0;
 	}	
 	return nextStateName;
 }

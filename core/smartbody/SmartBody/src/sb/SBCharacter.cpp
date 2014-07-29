@@ -931,7 +931,15 @@ void SBCharacter::copy( SmartBody::SBCharacter* origChar )
 
 void SBCharacter::setReach( SmartBody::SBReach* reach )
 {
-	_reach = reach;
+	if (!reach) return;
+	if (reach->getReachEngineMap().size() != 0)
+	{
+		_reach = reach;
+	}
+	else
+	{
+		LOG("Can't set SBReach '%s', the corresponding reach engine is not initialized. Do reach.build() before set to character.", reach->getReachTag().c_str());
+	}
 }
 
 SmartBody::SBReach* SBCharacter::getReach()
@@ -1298,12 +1306,16 @@ SBAPI const SBM_CharacterFrameDataMarshalFriendly & SBCharacter::GetFrameDataMar
 SBAPI std::string SBCharacter::getReachAttachedPawnName(const std::string& reachType)
 {
 	std::string result = "null";
-	int reachID = MeCtReachEngine::getReachType(reachType);
-	if (reachEngineMap->find(reachID) != reachEngineMap->end())
+	//ReachEngineMap* reachEngineMap = NULL;
+	//getCurrentReachEngineMap();
+	if (getReach())
 	{
-		MeCtReachEngine* reachEngine = (*reachEngineMap)[reachID];
-		result = reachEngine->getAttachedPawnName();
+		MeCtReachEngine* reachEngine = getReach()->getReachEngine(reachType);
+		if (reachEngine)
+			result = reachEngine->getAttachedPawnName();
+		
 	}
+
 	return result;
 }
 

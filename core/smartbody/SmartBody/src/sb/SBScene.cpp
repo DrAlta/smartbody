@@ -3269,10 +3269,10 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 		strstr << "# -------------------- reaching for character " << character->getName() << "\n";
 		// reach
 		SBReachManager* reachManager = this->getReachManager();
-		SBReach* reach = reachManager->getReach(character->getName());
+		SBReach* reach = character->getReach();
 		if (reach)
 		{
-			strstr << "reach = scene.getReachManager().createReach(\"" << character->getName() << "\")\n";
+			strstr << "reach = scene.getReachManager().createReach(\"" << character->getName() << "\",\"" << reach->getReachTag() << "\")\n";
 			std::string interpType = reach->getInterpolatorType();
 			strstr << "reach.setInterpolatorType(\"" << interpType << "\")\n";
 			// motions
@@ -3898,7 +3898,7 @@ void SBScene::createDefaultControllers()
 	 _defaultControllers.push_back(new MeCtEyeLidRegulator());
 	 _defaultControllers.push_back(new MeCtSaccade(NULL));
 	 std::map<int, MeCtReachEngine*> reachMap;
-	 _defaultControllers.push_back(new MeCtExampleBodyReach(reachMap));
+	 _defaultControllers.push_back(new MeCtExampleBodyReach(NULL));
 	 _defaultControllers.push_back(new MeCtBreathing());
 	 _defaultControllers.push_back(new MeCtGaze());
 	 _defaultControllers.push_back(new MeCtNewLocomotion());

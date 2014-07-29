@@ -97,7 +97,6 @@
 #define USE_NEW_LOCOMOTION 1
 #define USE_REACH 1
 #define USE_PHYSICS_CHARACTER 1
-//#define USE_REACH_TEST 0
 
 const bool LOG_PRUNE_CMD_TIME							= false;
 const bool LOG_CONTROLLER_TREE_PRUNING					= false;
@@ -151,8 +150,6 @@ SbmCharacter::SbmCharacter( const char* character_name, std::string type)
 {
 	SbmCharacter::initData();
 	setClassType(type);
-
-	reachEngineMap = new ReachEngineMap();	
 }
 
 //  Constructor
@@ -186,17 +183,7 @@ new_locomotion_ct(NULL),
 face_neutral( NULL ),
 _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 {
-	/*
-	posture_sched_p->ref();
-	motion_sched_p->ref();
-	breathing_p->ref();
-	gaze_sched_p->ref();
-	head_sched_p->ref();
-	param_sched_p->ref();
-	eyelid_ct->ref();	
-	*/
-
-	reachEngineMap = new ReachEngineMap();	
+	
 }
 
 
@@ -266,16 +253,6 @@ SbmCharacter::~SbmCharacter( void )	{
 	if (motiongraph_ct)
 		motiongraph_ct->unref();
 
-	std::map<int,MeCtReachEngine*>::iterator mi;
-	for ( mi  = reachEngineMap->begin();
-		mi != reachEngineMap->end();
-		mi++)
-	{
-		MeCtReachEngine* re = mi->second;
-		delete re;
-	}
-	reachEngineMap->clear();
-	delete reachEngineMap;
 	
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	
@@ -367,41 +344,6 @@ void SbmCharacter::createStandardControllers()
 	if (!effector)
 		effector = sbSkel->getJointByMappedName("r_wrist");
 
-
-#if !defined(__FLASHPLAYER__)
-	createReachEngine();
-	/*
-	if (effector)
-	{
-		MeCtReachEngine* rengine = new MeCtReachEngine(this,sbSkel);
-		rengine->init(MeCtReachEngine::RIGHT_ARM,effector);
-		(*this->reachEngineMap)[MeCtReachEngine::RIGHT_ARM] = rengine;	
-
-		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,sbSkel);
-		rengineJump->init(MeCtReachEngine::RIGHT_JUMP,effector);
-		(*this->reachEngineMap)[MeCtReachEngine::RIGHT_JUMP] = rengineJump;	
-	}	
-
-	SmartBody::SBJoint* leftEffector = sbSkel->getJointByMappedName("l_middle1");
-
-	if (!leftEffector) 
-		leftEffector = sbSkel->getJointByMappedName("l_index1");
-
-	if (!leftEffector)
-		leftEffector = sbSkel->getJointByMappedName("l_wrist");
-	if (leftEffector)
-	{
-		MeCtReachEngine* rengine = new MeCtReachEngine(this,sbSkel);
-		rengine->init(MeCtReachEngine::LEFT_ARM,leftEffector);
-		(*this->reachEngineMap)[MeCtReachEngine::LEFT_ARM] = rengine;	
-
-		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,sbSkel);
-		rengineJump->init(MeCtReachEngine::LEFT_JUMP,effector);
-		(*this->reachEngineMap)[MeCtReachEngine::LEFT_JUMP] = rengineJump;
-	}
-	*/
-#endif
-	
 
 	constraint_sched_p = CreateSchedulerCt( getName().c_str(), "constraint" );
 	reach_sched_p = CreateSchedulerCt( getName().c_str(), "reach" );
@@ -786,24 +728,6 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	this->basic_locomotion_ct->name(bLocoName.c_str());
 	//this->basic_locomotion_ct->set_pass_through(false);
 
-	// init reach engine
-	{
-	SkJoint* effector = this->_skeleton->search_joint("r_middle1");
-	if (effector)
-	{
-	MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
-	rengine->init(MeCtReachEngine::RIGHT_ARM,effector);
-	this->reachEngineMap[MeCtReachEngine::RIGHT_ARM] = rengine;		
-	}	
-
-	SkJoint* leftEffector = this->_skeleton->search_joint("l_middle1");
-	if (leftEffector)
-	{
-	MeCtReachEngine* rengine = new MeCtReachEngine(this,this->_skeleton);
-	rengine->init(MeCtReachEngine::LEFT_ARM,leftEffector);
-	this->reachEngineMap[MeCtReachEngine::LEFT_ARM] = rengine;		
-	}	
-	}
 	//if (use_locomotion) 
 	{
 	this->locomotion_ct =  new MeCtLocomotionClass();
@@ -935,25 +859,6 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 	}
 #endif
 
-#ifdef USE_REACH_TEST	
-	// init left and right arm IKs for the character	
-	string r_effector_name, l_effector_name;
-	r_effector_name = std::string(name)+"_right_effector";
-	l_effector_name = std::string(name)+"_left_effector";	
-	// initialize two pawns as end effector
-	
-	char pawnInitCmd[256];
-	sprintf(pawnInitCmd,"pawn %s init",r_effector_name.c_str());
-	mcu.execute(pawnInitCmd);
-	sprintf(pawnInitCmd,"pawn %s init",l_effector_name.c_str());
-	mcu.execute(pawnInitCmd);
-
-	char reachCmd[256];
-	sprintf(reachCmd,"bml char %s <reach target=\"%s\" reach-arm=\"right\" end=\"1000\"/>",name,r_effector_name.c_str());
-	mcu.execute(reachCmd);
-	sprintf(reachCmd,"bml char %s <reach target=\"%s\" reach-arm=\"left\" end=\"1000\"/>",name,l_effector_name.c_str());
-	mcu.execute(reachCmd);
-#endif
 
 	//buildJointPhyObjs();
 
@@ -2099,48 +2004,6 @@ bool SbmCharacter::is_face_controller_enabled() {
 
 ///////////////////////////////////////////////////////////////////////////
 
-
-#if 0
-
-
-bool SbmCharacter::removeReachMotion( int tag, SkMotion* motion )
-{
-	TagMotion tagMotion = TagMotion(tag, motion);
-	if (reachMotionData->find(tagMotion) != reachMotionData->end()) 
-	{
-		reachMotionData->erase(tagMotion);
-		return true;
-	}
-	return false;
-}
-
-bool SbmCharacter::addReachMotion( int tag, SkMotion* motion )
-{
-	TagMotion tagMotion = TagMotion(tag, motion);
-	if (reachMotionData->find(tagMotion) == reachMotionData->end()) 
-	{
-
-		reachMotionData->insert(tagMotion);
-		return true;
-	}
-	return false;
-}
-
-SkMotion* SbmCharacter::getReachMotion( int index )
-{
-	MotionDataSet::iterator vi;
-	int icount = 0;
-	for (vi  = reachMotionData->begin();
-		vi != reachMotionData->end();
-		vi++)
-	{
-		if (icount == index)
-			return vi->second;
-		icount++;
-	}
-	return NULL;
-}
-#endif
 void SbmCharacter::setMinVisemeTime(float minTime)
 {
 	_minVisemeTime = minTime;
@@ -2651,62 +2514,6 @@ bool SbmCharacter::checkExamples()
 	}
 	LOG("%s: Steering cannot work under example mode, reverting back to basic mode", this->getName().c_str());
 	return false;
-}
-
-#if 0
-SkMotion* SbmCharacter::findTagSkMotion( int tag, const MotionDataSet& motionSet )
-{
-	MotionDataSet::const_iterator vi;
-	for ( vi  = motionSet.begin();
-		vi != motionSet.end();
-		vi++)
-	{
-		TagMotion tagMotion = *vi;
-		if (tagMotion.first == tag)
-			return tagMotion.second;
-	}
-	return NULL;
-}
-#endif
-
-void SbmCharacter::createReachEngine()
-{
-	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
-	SmartBody::SBJoint* effector = sbSkel->getJointByMappedName("r_middle1");
-	if (!effector) 
-		effector = sbSkel->getJointByMappedName("r_index1");
-
-	if (!effector)
-		effector = sbSkel->getJointByMappedName("r_wrist");
-
-	if (effector && reachEngineMap->find(MeCtReachEngine::RIGHT_ARM) == reachEngineMap->end())
-	{
-		MeCtReachEngine* rengine = new MeCtReachEngine(this,sbSkel);
-		rengine->init(MeCtReachEngine::RIGHT_ARM,effector);
-		(*this->reachEngineMap)[MeCtReachEngine::RIGHT_ARM] = rengine;	
-
-		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,sbSkel);
-		rengineJump->init(MeCtReachEngine::RIGHT_JUMP,effector);
-		(*this->reachEngineMap)[MeCtReachEngine::RIGHT_JUMP] = rengineJump;	
-	}	
-
-	SmartBody::SBJoint* leftEffector = sbSkel->getJointByMappedName("l_middle1");
-
-	if (!leftEffector) 
-		leftEffector = sbSkel->getJointByMappedName("l_index1");
-
-	if (!leftEffector)
-		leftEffector = sbSkel->getJointByMappedName("l_wrist");
-	if (leftEffector && reachEngineMap->find(MeCtReachEngine::LEFT_ARM) == reachEngineMap->end())
-	{
-		MeCtReachEngine* rengine = new MeCtReachEngine(this,sbSkel);
-		rengine->init(MeCtReachEngine::LEFT_ARM,leftEffector);
-		(*this->reachEngineMap)[MeCtReachEngine::LEFT_ARM] = rengine;	
-
-		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,sbSkel);
-		rengineJump->init(MeCtReachEngine::LEFT_JUMP,effector);
-		(*this->reachEngineMap)[MeCtReachEngine::LEFT_JUMP] = rengineJump;
-	}
 }
 
 void SbmCharacter::addFootStep( int iLeg, SrVec& footPos, bool Update /*= false*/ )

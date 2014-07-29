@@ -77,8 +77,9 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	MeCtExampleBodyReach* bodyReachCt = NULL; 
 	SbmCharacter* curCharacter = const_cast<SbmCharacter*>(request->actor);
 	SmartBody::SBCharacter* curSBChar = dynamic_cast<SmartBody::SBCharacter*>(curCharacter);
-	std::map<int,MeCtReachEngine*>& reMap = curCharacter->getReachEngineMap();
-	if (reMap.size() == 0)
+	SmartBody::SBReach* reach = curSBChar->getReach();
+	//std::map<int,MeCtReachEngine*>* reMapPtr = curCharacter->getCurrentReachEngineMap();
+	if (!reach || reach->getReachEngineMap().size() == 0)
 	{
 		LOG("Character : %s, no reach engine initialized.", request->actor->getName().c_str());
 		return BehaviorRequestPtr();
@@ -148,7 +149,7 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 	if (!bodyReachCt)
 	{
 		// the new controller should start with the character's current hand.
-		bodyReachCt = new MeCtExampleBodyReach(curCharacter->getReachEngineMap(),curCharacter->getCurrentReachType());
+		bodyReachCt = new MeCtExampleBodyReach(reach);
 		bodyReachCt->handle(handle);
 		bodyReachCt->init(curCharacter);
 		bCreateNewController = true;

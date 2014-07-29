@@ -1640,16 +1640,17 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											return CMD_SUCCESS;
 										}
 										else if (reach_cmd == "build")
-										{			
-											if (character->reachEngineMap->size() == 0)
+										{				
+											SmartBody::SBReach* reach = sbChar->getReach();
+											if (!reach || reach->getReachEngineMap().size() == 0)
 											{
 												LOG("character %s, reach engine is not initialized.", character->getName().c_str());
 												return CMD_FAILURE;
-											}				
-											SmartBody::SBReach* reach = sbChar->getReach();
+											}
+											std::map<int,MeCtReachEngine*>& reachEngineMap = reach->getReachEngineMap();
 											ReachEngineMap::iterator mi;
-											for ( mi  = character->reachEngineMap->begin();
-												mi != character->reachEngineMap->end();
+											for ( mi  = reachEngineMap.begin();
+												mi != reachEngineMap.end();
 												mi++)
 											{
 												MeCtReachEngine* re = mi->second;
