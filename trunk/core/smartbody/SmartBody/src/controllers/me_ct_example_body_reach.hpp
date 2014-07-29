@@ -17,6 +17,7 @@
 #include <controllers/MeCtReachEngine.h>
 #include <sb/SBController.h>
 #include <sb/SBEvent.h>
+#include <sb/SBReach.h>
 
 class ReachStateData;
 class ReachStateInterface;
@@ -56,12 +57,13 @@ protected:
 	BodyMotionFrame       inputMotionFrame;		
 	float 			      _duration;
 	SkChannelArray	      _channels;
+	SmartBody::SBReach*   _reach;
 
 public:	
 	ReachStateData*       currentReachData;		
 
 public:	
-	MeCtExampleBodyReach(std::map<int,MeCtReachEngine*>& reMap, int reachType = -1);
+	MeCtExampleBodyReach(SmartBody::SBReach* reach);
 	virtual ~MeCtExampleBodyReach(void);		
 	virtual void controller_map_updated();
 	virtual void controller_start();	

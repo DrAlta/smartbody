@@ -36,6 +36,7 @@
 
 #include <sb/nvbg.h>
 #include <sb/MiniBrain.h>
+#include <sb/SBReach.h>
 
 //#include <controllers/me_spline_1d.hpp>
 class MeCtMotionPlayer;
@@ -90,18 +91,6 @@ public:
 public:
 	// Static Constants
 	std::map<std::string, GeneralParam*>*   param_map;
-
-		// reach motion database for example-based IK reaching
-#if 0
-	std::set<std::pair<int,SkMotion*> >*      reachMotionData;
-	std::set<std::pair<int,SkMotion*> >*      reachHandData;
-	std::set<std::pair<int,SkMotion*> >*      grabHandData;
-	std::set<std::pair<int,SkMotion*> >*      releaseHandData;
-	std::set<std::pair<int,SkMotion*> >*      pointHandData;
-#endif
-		// reach engine map
-	std::map<int,MeCtReachEngine*>* reachEngineMap;
-	int            currentReachType;
 
 	std::vector<SrVec> footStepList[2];	
 	int footStepIdx[2];
@@ -173,7 +162,6 @@ public:
 
 	virtual void createStandardControllers();
 
-	void createReachEngine();
 	//* Overrides SbmPawn::prune_controller_tree()
 	virtual int prune_controller_tree();
 
@@ -247,7 +235,6 @@ public:
 	MeCtSaccade*		saccade_ct;
 	MeCtNoiseController* noise_ct;
 	MeCtMotionRecorder*  record_ct;
-	//MeCtReachEngine*	reachEngine[2];	
 	MeCtBreathing*			breathing_p;
 	MeCtBasicLocomotion*	basic_locomotion_ct;
 	MeCtNewLocomotion*		new_locomotion_ct;
@@ -306,28 +293,6 @@ public:
 	SBAPI void addBlendShapeChannel(std::string bShapeName);
 
 	static void addTagSkMotion(int tag, SkMotion* motion, std::set<std::pair<int,SkMotion*> >& motionSet);
-
-	/*
-	bool addReachMotion(int tag, SkMotion* motion);
-	bool removeReachMotion(int tag, SkMotion* motion);
-	SkMotion* getReachMotion(int index);
-	const std::set<std::pair<int,SkMotion*> >& getReachMotionDataSet() const { return *reachMotionData;}
-
-	const std::set<std::pair<int,SkMotion*> >& getPointHandData() const { return *pointHandData;}
-	const std::set<std::pair<int,SkMotion*> >& getGrabHandData() const { return *grabHandData;}
-	const std::set<std::pair<int,SkMotion*> >& getReachHandData() const { return *reachHandData;}
-	const std::set<std::pair<int,SkMotion*> >& getReleaseHandData() const { return *releaseHandData;}
-	*/
-	std::map<int,MeCtReachEngine*>& getReachEngineMap() { return *reachEngineMap; }
-	int   getCurrentReachType() { return currentReachType; }
-	void   setCurrentReachType(int type) { currentReachType = type; }
-
-	//SBPhysicsCharacter* getPhysicsCharacter() { return phyChar; }
-	//void buildJointPhyObjs();
-	//void updateJointPhyObjs(bool phySim = false);
-	//void setJointCollider(std::string jointName, float size);	
-	//void setJointPhyCollision(bool useCollision);
-	//void setJointCollider(std::string jointName, float len, float radius);
 		
 	// viseme curve related functions
 	void set_viseme_curve_mode( bool mode )		{ use_viseme_curve = mode; }

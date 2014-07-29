@@ -28,10 +28,15 @@ using namespace boost;
 
 std::string MeCtExampleBodyReach::CONTROLLER_TYPE = "BodyReach";
 
-MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMap, int reachType)  : SmartBody::SBController()
+MeCtExampleBodyReach::MeCtExampleBodyReach( SmartBody::SBReach* reach)  : SmartBody::SBController()
 {
 	currentReachData = NULL;
 	currentReachEngine = NULL;
+
+	_reach = reach;
+	int reachType = -1;
+	if (reach)
+		reachType = reach->getCurrentReachType();
 
 	_duration = -1.f;	
 	footIKFix = true;
@@ -54,7 +59,10 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( std::map<int,MeCtReachEngine*>& reMa
 	addDefaultAttributeBool("reach.useProfileInterpolation",false, "Reaching", &useProfileInterpolation);
 	addDefaultAttributeBool("reach.useRetiming",false, "Reaching", &useRetiming);
 
-	reachEngineMap = reMap;
+	//reachEngineMap = reMap;
+	if (reach)
+		reachEngineMap = reach->getReachEngineMap();
+	
 	ReachEngineMap::iterator mi;
 	for (mi  = reachEngineMap.begin();
 		mi != reachEngineMap.end();
@@ -352,6 +360,8 @@ int  MeCtExampleBodyReach::getReachTypeWithAttachedPawn()
 
 void MeCtExampleBodyReach::updateReachType(SrVec& targetPos)
 {	
+	if (!_reach)
+		return;
 	MeCtReachEngine* newEngine = currentReachEngine;		
 
 	int reachType = determineReachType(targetPos); // the best hand according to target position
@@ -370,7 +380,8 @@ void MeCtExampleBodyReach::updateReachType(SrVec& targetPos)
 	MeCtReachEngine* re = reachEngineMap[reachType];		
 	newEngine = reachEngineMap[reachType];	
 	setNewReachEngine(newEngine);
-	newEngine->getCharacter()->setCurrentReachType(reachType); // update the character reach type
+	_reach->setCurrentReachType(reachType);
+	//newEngine->getCharacter()->setCurrentReachType(reachType); // update the character reach type
 }
 
 

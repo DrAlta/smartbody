@@ -2,6 +2,7 @@
 #include <sb/SBCharacter.h>
 #include <sb/SBMotion.h>
 #include <controllers/MeCtBodyReachState.h>
+#include <controllers/MeCtReachEngine.h>
 
 namespace SmartBody {
 
@@ -9,12 +10,16 @@ SBReach::SBReach()
 {
 	_character = NULL;
 	interpolatorType = "KNN";	
+	currentReachType = -1;
+	reachTag = "default";
 }
 
-SBReach::SBReach(SBCharacter* character)
+SBReach::SBReach(SBCharacter* character, std::string reTag)
 {
 	_character = character;
 	interpolatorType = "KNN";	
+	currentReachType = -1;
+	reachTag = reTag;
 }
 
 SBReach::~SBReach()
@@ -113,11 +118,11 @@ void SBReach::build(SBCharacter* character)
 		return;
 
 	// create the reach engine if the character does not have one.
-	character->createReachEngine();
-	character->setReach(this);
-
-	for (ReachEngineMap::iterator mi = character->getReachEngineMap().begin();
-		mi != character->getReachEngineMap().end();
+	//character->createReachEngine(this);
+	createReachEngineMap();
+	//ReachEngineMap* reMapPtr = &reachEngineMap;//character->getReachEngineMap(this->getReachTag());
+	for (ReachEngineMap::iterator mi = reachEngineMap.begin();
+		mi != reachEngineMap.end();
 		mi++)
 	{
 		MeCtReachEngine* re = mi->second;
@@ -126,6 +131,7 @@ void SBReach::build(SBCharacter* character)
 			re->updateMotionExamples(reachMotionData, interpolatorType);
 		}
 	}
+	character->setReach(this);
 }
 
 
@@ -134,8 +140,8 @@ bool SBReach::isPawnAttached( std::string pawnName )
 	if (!_character)
 		return false;
 
-	for (ReachEngineMap::iterator mi = _character->getReachEngineMap().begin();
-		mi != _character->getReachEngineMap().end();
+	for (ReachEngineMap::iterator mi = reachEngineMap.begin();
+		mi != reachEngineMap.end();
 		mi++)
 	{
 		MeCtReachEngine* re = mi->second;
@@ -277,6 +283,61 @@ SBMotion* SBReach::findTagMotion( int tag, const MotionDataSet& motionSet )
 			return tagMotion.second;
 	}
 	return NULL;
+}
+
+void SBReach::createReachEngineMap()
+{
+	if (!_character)
+		return;
+
+	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(_character->getSkeleton());
+	SmartBody::SBJoint* effector = sbSkel->getJointByMappedName("r_middle1");
+	if (!effector) 
+		effector = sbSkel->getJointByMappedName("r_index1");
+
+	if (!effector)
+		effector = sbSkel->getJointByMappedName("r_wrist");
+
+
+	if (effector && reachEngineMap.find(MeCtReachEngine::RIGHT_ARM) == reachEngineMap.end())
+	{
+		MeCtReachEngine* rengine = new MeCtReachEngine(_character,sbSkel);
+		rengine->init(MeCtReachEngine::RIGHT_ARM,effector);
+		reachEngineMap[MeCtReachEngine::RIGHT_ARM] = rengine;	
+
+		// 		MeCtReachEngine* rengineJump = new MeCtReachEngine(this,sbSkel);
+		// 		rengineJump->init(MeCtReachEngine::RIGHT_JUMP,effector);
+		// 		(*this->reachEngineMap)[MeCtReachEngine::RIGHT_JUMP] = rengineJump;	
+	}	
+
+	SmartBody::SBJoint* leftEffector = sbSkel->getJointByMappedName("l_middle1");
+
+	if (!leftEffector) 
+		leftEffector = sbSkel->getJointByMappedName("l_index1");
+
+	if (!leftEffector)
+		leftEffector = sbSkel->getJointByMappedName("l_wrist");
+	if (leftEffector && reachEngineMap.find(MeCtReachEngine::LEFT_ARM) == reachEngineMap.end())
+	{
+		MeCtReachEngine* rengine = new MeCtReachEngine(_character,sbSkel);
+		rengine->init(MeCtReachEngine::LEFT_ARM,leftEffector);
+		reachEngineMap[MeCtReachEngine::LEFT_ARM] = rengine;	
+		//MeCtReachEngine* rengineJump = new MeCtReachEngine(this,sbSkel);
+		//rengineJump->init(MeCtReachEngine::LEFT_JUMP,effector);
+		//(*this->reachEngineMap)[MeCtReachEngine::LEFT_JUMP] = rengineJump;
+	}
+
+}
+
+MeCtReachEngine* SBReach::getReachEngine( const std::string& reachType )
+{
+	int reachID = MeCtReachEngine::getReachType(reachType);
+	MeCtReachEngine* reachEngine = NULL;
+	if (reachEngineMap.find(reachID) != reachEngineMap.end())
+	{
+		reachEngine = reachEngineMap[reachID];
+	}
+	return reachEngine;
 }
 
 }
