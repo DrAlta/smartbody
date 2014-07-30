@@ -312,7 +312,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inMo
 	//exportPolyVoxMeshToObj(lowResMesh,"testVolLowRes.obj");
 
 	Mesh m, origMesh;
-	Skeleton sk = SmartBodySkeleton();
+	Skeleton sk = SmartBodyNewSkeleton();
 	bool isValidModel = PolyVoxMeshToPinoMesh(*voxelMesh,m);
 	SrModelToMesh(inModel,origMesh, false);
 	if (!isValidModel) return false; // no auto-rigging if the model is not valid
@@ -425,7 +425,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 	//exportPolyVoxMeshToObj(lowResMesh,"testVolLowRes.obj");
 
 	Mesh m, origMesh;
-	Skeleton sk = SmartBodySkeleton();
+	Skeleton sk = SmartBodyNewSkeleton();
 	bool isValidModel = PolyVoxMeshToPinoMesh(*voxelMesh,m);
 	SrModelToMesh(inModel,origMesh, false);
 	if (!isValidModel) return false; // no auto-rigging if the model is not valid
@@ -468,7 +468,7 @@ bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName
 #if USE_AUTO_RIGGING
 	Mesh m;
 	//Skeleton sk = HumanSkeleton(); // default human skeleton from Pinocchio. Should define our own custom skeleton to account for gaze and other behavior
-	Skeleton sk = SmartBodySkeleton();
+	Skeleton sk = SmartBodyNewSkeleton();
 	inModel.computeNormals();
 	bool isValidModel = SrModelToMesh(inModel,m);
 	if (!isValidModel) return false; // no auto-rigging if the model is not valid
@@ -1012,6 +1012,11 @@ void boneWeightHarmonicSmoothing(std::vector<std::map<int,float> >& vtxBoneWeigh
 	delete Ainv;
 }
 
+void buildHarmonicSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, SkinWeight& skinWeigh)
+{
+
+}
+
 void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, SkinWeight& skinWeight)
 {
 	IntVolume* origVoxels = voxelWindow.getVoxels();
@@ -1311,7 +1316,7 @@ void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, Voxelizer
 						SrVec vDir = vPos - visibleBone[b];
 						SrVec vUnitDir = vDir; vUnitDir.normalize();
 						float vLen = vDir.norm2();
-						float Rv = 1.f/vLen;//(dot(vUnitDir,vN))/vLen;
+						float Rv = (dot(vUnitDir,vN))/vLen;
 						float Tv = cross(vUnitDir,boneDir).norm();
 						weight[infJointIdx] += (Rv*Tv);
 					}
@@ -1478,7 +1483,9 @@ bool AutoRigToDeformableMesh( PinocchioOutput& out, SrModel& m, SmartBody::SBSke
 	//int boneIdxMap[] = { 1, 2, 0, 2, 4, 5, 6, 2, 8, 9, 10, 0, 12, 13, 0, 15, 16  }; // hard coded for HumanSkeleton for now
 	//int boneIdxMap[] = { 1, 2, 3, 4, 0, 5, 4, 7, 8, 9, 4, 11, 12, 13, 0, 15, 16, 0, 18, 19};
 	//int boneIdxMap[] = {1, 2, 3}
-	int prevJointIdx[] = { 1, 2, 3, 4, -1, 0, 5, 6,  4, 8, 9, 10, 11, 4, 13, 14, 15, 16, 0, 18, 19, 20, 0, 22, 23, 24};
+	//int prevJointIdx[] = { 1, 2, 3, 4, -1, 0, 5, 6,  4, 8, 9, 10, 11, 4, 13, 14, 15, 16, 0, 18, 19, 20, 0, 22, 23, 24};
+	int prevJointIdx[] = { 1, 2, 3, -1, 0, 4, 5, 6,  3, 8, 9, 10, 11, 3, 13, 14, 15, 16, 0, 18, 19, 20, 0, 22, 23, 24};
+
 	std::vector<int> boneIdxMap;
 	for (int i=0;i< (int) out.embedding.size();i++)
 	{
@@ -1550,8 +1557,13 @@ bool AutoRigToSBSk( PinocchioOutput& out, Skeleton& sk, SmartBody::SBSkeleton& s
 	//int prevJointIdx[] = { 1, 2, -1, 0, 2, 4, 5, 6, 2, 8, 9, 10, 0, 12, 13, 0, 15, 16};
 
 	// SmartBody skeleton
-	std::string jointNameMap[] = {"spine4", "spine3", "spine2", "spine1", "base", "spine5", "skullbase", "head", "r_hip", "r_knee", "r_ankle", "r_forefoot", "r_toe", "l_hip", "l_knee", "l_ankle", "l_forefoot", "l_toe", "r_shoulder", "r_elbow", "r_wrist", "r_hand", "l_shoulder", "l_elbow", "l_wrist", "l_hand" };
-	int prevJointIdx[] = { 1, 2, 3, 4, -1, 0, 5, 6,  4, 8, 9, 10, 11, 4, 13, 14, 15, 16, 0, 18, 19, 20, 0, 22, 23, 24};
+	//std::string jointNameMap[] = {"spine4", "spine3", "spine2", "spine1", "base", "spine5", "skullbase", "head", "r_hip", "r_knee", "r_ankle", "r_forefoot", "r_toe", "l_hip", "l_knee", "l_ankle", "l_forefoot", "l_toe", "r_shoulder", "r_elbow", "r_wrist", "r_hand", "l_shoulder", "l_elbow", "l_wrist", "l_hand" };
+	//int prevJointIdx[] = { 1, 2, 3, 4, -1, 0, 5, 6,  4, 8, 9, 10, 11, 4, 13, 14, 15, 16, 0, 18, 19, 20, 0, 22, 23, 24};
+
+	// new smartbody skeleton
+	std::string jointNameMap[] = {"spine3", "spine2", "spine1",  "base", "spine4", "spine5", "skullbase", "head", "r_hip", "r_knee", "r_ankle", "r_forefoot", "r_toe", "l_hip", "l_knee", "l_ankle", "l_forefoot", "l_toe", "r_shoulder", "r_elbow", "r_wrist", "r_hand", "l_shoulder", "l_elbow", "l_wrist", "l_hand" };
+	int prevJointIdx[] = { 1, 2, 3, -1, 0, 4, 5, 6,  3, 8, 9, 10, 11, 3, 13, 14, 15, 16, 0, 18, 19, 20, 0, 22, 23, 24};
+
 
 	// build all joints
 	for(int i = 0; i < (int)out.embedding.size(); ++i) // number of joints
