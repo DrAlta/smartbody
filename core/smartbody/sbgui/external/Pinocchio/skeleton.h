@@ -87,6 +87,12 @@ public:
 	SmartBodySkeleton();
 };
 
+class PINOCCHIO_API SmartBodyNewSkeleton : public Skeleton
+{
+public:
+	SmartBodyNewSkeleton();
+};
+
 class PINOCCHIO_API QuadSkeleton : public Skeleton
 {
 public:
