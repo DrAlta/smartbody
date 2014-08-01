@@ -805,6 +805,57 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 #if 1
 	if (deformMesh->isSkinnedMesh())	
 	{
+		// update the bind pose 
+#if 1
+		float meshScale = meshInstance->getMeshScale();
+		charSkel->updateGlobalMatricesZero();
+		std::map<std::string,int>& boneIdxMap = deformMesh->boneJointIdxMap;
+		std::map<std::string,int>::iterator mi;	
+		for ( mi  = boneIdxMap.begin();
+			 mi != boneIdxMap.end();
+			 mi++)	
+		{
+			int bindPoseIdx = mi->second;
+			SmartBody::SBJoint* joint = charSkel->getJointByName(mi->first);
+			if (!joint)
+				continue;
+			int jid = joint->getIndex();
+			SmartBody::SBJoint* parent = joint->getParent();
+			const std::string& jointName = joint->getName();
+			if (jointName == "")
+				continue;
+
+			Ogre::Bone* bone = ogreSkel->getBone(jointName);			
+			if (bone)
+			{				
+
+				SrMat bindPoseMat = deformMesh->bindPoseMatList[bindPoseIdx];
+				SrMat parentBindPose;
+
+				bindPoseMat.set_translation(bindPoseMat.get_translation()*meshScale);
+				if (parent && boneIdxMap.find(parent->getName()) != boneIdxMap.end())
+				{
+					int parentBindPoseIdx = boneIdxMap[parent->getName()];
+					parentBindPose = deformMesh->bindPoseMatList[parentBindPoseIdx];
+					parentBindPose.set_translation(parentBindPose.get_translation()*meshScale);
+				}
+				//SrMat newbindPoseMat = bindPoseMat.inverse()*parentBindPose;//bindPoseMat.inverse()*joint->gmatZero();
+				SrMat finalBindMat = bindPoseMat.inverse()*parentBindPose;		
+				SrVec bindP = finalBindMat.get_translation();
+				SrQuat bindQ =  SrQuat(finalBindMat);
+				
+				bone->setPosition(bindP[0], bindP[1], bindP[2]);				
+				bone->setOrientation(bindQ.w, bindQ.x, bindQ.y, bindQ.z);	
+				bone->setInitialState();		
+				bone->setBindingPose();
+			}
+			//catch (ItemIdentityException&)
+			//{
+			//printf("Could not find bone name %s", jointName.c_str());
+			//}
+		}		
+#endif
+
  		ogreMesh->setSkeletonName(skeletonName);	
  		ogreMesh->_notifySkeleton(ogreSkel);
 		// combine skeleton and mesh with skinning information	
