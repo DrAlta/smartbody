@@ -6,6 +6,7 @@
 #include <vector>
 #include <sr/sr_event.h>
 #include <sr/sr_model.h>
+#include <sbm/sbm_deformable_mesh.h>
 
 class Mesh;
 
@@ -40,6 +41,8 @@ class SBAutoRigManager // build auto rigging given a static character mesh
 		bool buildAutoRiggingFromPawnMesh(const std::string& pawnName, int riggingType, const std::string& outSkName, const std::string& outDeformableMeshName);	
 
 		bool updateSkinWeightFromCharacterMesh(const std::string& charName, int weightType);
+protected:
+		void transferSkinWeight(SmartBody::SBSkeleton& skel, SrModel& inModel, std::vector<std::map<int,float> >& inWeight, SrModel& outModel, std::vector<std::map<int,float> >& outWeight);
 
 };
 
