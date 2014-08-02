@@ -16,13 +16,13 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "pinocchioApi.h"
 #include "debugging.h"
+#include "pinocchioApi.h"
 #include <fstream>
 
 ostream *Debugging::outStream = new ofstream();
 
-Vector3 barycentricCoord(Vector3& projPos, Tri3Object& tri);
+
 
 PinocchioOutput autorig(const Skeleton &given, const Mesh &m, bool computeSkinWeights)
 {
@@ -78,7 +78,7 @@ PinocchioOutput autorig(const Skeleton &given, const Mesh &m, bool computeSkinWe
     return out;
 }
 
-Vector3 barycentricCoord(Vector3& pt, Tri3Object& tri)
+Vector3 PINOCCHIO_API barycentricCoord(Vector3& pt, Tri3Object& tri)
 {
 	float w1,w2,w3;
 	Vector3 ptToV1 = tri.v1 - pt;

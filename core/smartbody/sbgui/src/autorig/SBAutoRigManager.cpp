@@ -31,9 +31,11 @@ bool PolyVoxMeshToSrModel( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>
 bool PolyVoxMeshToPinoMesh( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& polyMesh, Mesh& mesh );
 void exportPolyVoxMeshToObj( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, std::string filename );
 void buildVoxelSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, SkinWeight& skinWeight);
-void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, SkinWeight& skinWeight);
+void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, std::vector<std::map<int,float>>& skinWeight);
+void WeightMapToSkinWeight(std::vector<std::map<int,float>>& weightMap, SkinWeight& skinWeight);
 #endif
 
+ostream *Debugging::outStream = new ofstream();
 
 SBAutoRigManager* SBAutoRigManager::_singleton = NULL;
 SBAutoRigManager::SBAutoRigManager()
@@ -95,6 +97,51 @@ bool SBAutoRigManager::buildAutoRiggingFromPawnMesh( const std::string& pawnName
 	return autoRigSuccess;
 }
 
+void SBAutoRigManager::transferSkinWeight(SmartBody::SBSkeleton& skel, SrModel& inModel, std::vector<std::map<int,float> >& inWeight, SrModel& outModel, std::vector<std::map<int,float> >& outWeight)
+{
+	
+	vector<Tri3Object> triobjvec;
+	for(int i = 0; i < inModel.F.size(); i++) {
+		SrVec p1,p2,p3;
+		SrModel::Face& F = inModel.F[i];
+		p1 = inModel.V[F[0]];
+		p2 = inModel.V[F[1]];
+		p3 = inModel.V[F[2]];
+		Vector3 v1 = Vector3(p1[0],p1[1],p1[2]);
+		Vector3 v2 = Vector3(p2[0],p2[1],p2[2]);
+		Vector3 v3 = Vector3(p3[0],p3[1],p3[2]);
+		triobjvec.push_back(Tri3Object(v1, v2, v3,i));
+	}
+
+	ObjectProjector<3, Tri3Object> proj(triobjvec);
+	Tri3Object projTri;
+	int numBones = skel.getNumJoints();
+	outWeight.clear();
+	for (unsigned int i=0;i<outModel.V.size();i++)
+	{
+		std::map<int,float> vtxWeight;
+		Vector3 vtxPos = Vector3(outModel.V[i][0],outModel.V[i][1],outModel.V[i][2]);
+		Vector3 projPos = proj.projectObj(vtxPos,projTri);	
+		Vector3 baryW = barycentricCoord(projPos, projTri);	
+
+		for (int v=0;v<3;v++)
+		{
+			int vidx = inModel.F[projTri.triIdx][v];
+			std::map<int,float>& origWeight = inWeight[vidx];
+			std::map<int,float>::iterator mi;
+			//for (int k=0;k<origWeight.size();k++)
+			for ( mi  = origWeight.begin();
+					mi != origWeight.end();
+					mi++)
+			{	
+				if (vtxWeight.find(mi->first) == vtxWeight.end())
+					vtxWeight[mi->first] = 0.f;
+				vtxWeight[mi->first] += mi->second*baryW[v];		
+			}
+		}	
+		outWeight.push_back(vtxWeight);
+	}
+}
 
 bool SBAutoRigManager::updateSkinWeightFromCharacterMesh( const std::string& charName, int weightType )
 {
@@ -160,8 +207,10 @@ bool SBAutoRigManager::updateSkinWeightFromCharacterMesh( const std::string& cha
 		sw->weightIndex.clear();
 		sw->bindWeight.clear();
 		sw->jointNameIndex.clear();
-
-		buildBoneGlowSkinWeights(model, *sbSk, *voxelWindow, *sw);
+		
+		std::vector<std::map<int,float>> skinWeightMap;
+		buildBoneGlowSkinWeights(model, *sbSk, *voxelWindow, skinWeightMap);
+		WeightMapToSkinWeight(skinWeightMap,*sw);
 
 		SmartBody::SBSkeleton* sbOrigSk = sbSk;
 		for (int k=0;k<sw->infJointName.size();k++)
@@ -356,7 +405,18 @@ bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inMo
 	sw->sourceMesh = meshName;	
 	// build voxel skin weights
 	//buildVoxelSkinWeights(inModel, *sbSk, *voxelWindow, *sw);
-	buildBoneGlowSkinWeights(inModel, *sbSk, *voxelWindow, *sw);
+	SrModel voxelSrModel;
+	PolyVoxMeshToSrModel(*voxelMesh, voxelSrModel);
+	std::vector<std::map<int,float>> skinWeightMap;
+#if 0
+	buildBoneGlowSkinWeights(inModel, *sbSk, *voxelWindow, skinWeightMap);
+#else
+	std::vector<std::map<int,float>> voxelWeightMap;
+	buildBoneGlowSkinWeights(voxelSrModel, *sbSk, *voxelWindow, voxelWeightMap);
+	transferSkinWeight(*sbSk, voxelSrModel, voxelWeightMap, inModel, skinWeightMap);
+#endif
+
+	WeightMapToSkinWeight(skinWeightMap, *sw);
 	deformMesh->skinWeights.push_back(sw);
 	LOG("after normalize weights");
 
@@ -1017,13 +1077,34 @@ void buildHarmonicSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, Voxelizer
 
 }
 
-void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, SkinWeight& skinWeight)
+void WeightMapToSkinWeight(std::vector<std::map<int,float>>& weightMap, SkinWeight& skinWeight)
+{
+	for (unsigned int i=0;i< weightMap.size();i++)
+	{		
+		std::map<int, float>& weights = weightMap[i];
+		std::map<int,float>::iterator mi;
+		skinWeight.numInfJoints.push_back(weights.size());
+		for ( mi  = weights.begin(); mi != weights.end(); mi++)
+		{
+			skinWeight.weightIndex.push_back(skinWeight.bindWeight.size());
+			skinWeight.bindWeight.push_back(mi->second);
+			skinWeight.jointNameIndex.push_back(mi->first);				
+		}
+		//LOG("after convert weights");
+	}
+	//LOG("after transfer skin weights");
+	skinWeight.normalizeWeights();
+
+}
+
+void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, std::vector<std::map<int,float>>& skinWeight)
 {
 	IntVolume* origVoxels = voxelWindow.getVoxels();
 	// store the voxel map for each vertex		
 	std::map<SrVec3i, std::vector<int> > voxelVtxMap;
 	std::map<SrVec3i, std::pair<int,float> > voxClosestBoneMap;
 	std::map<SrVec3i, std::pair<int,float> > vox2ndClosestBoneMap;
+
 	m.computeNormals();
 	for (int i=0;i<m.V.size();i++)
 	{
@@ -1332,48 +1413,8 @@ void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, Voxelizer
 	LOG("Smooth Skin Weights");
 	boneWeightLaplacianSmoothing(vtxBoneWeights, vtxClosestBoneDist, m);
 	LOG("Finish Smooth Skin Weights");
+	skinWeight = vtxBoneWeights;
 	
-	for (unsigned int i=0;i<(size_t) m.V.size();i++)
-	{		
-		std::map<int, float>& weights = vtxBoneWeights[i];
-		std::map<int,float>::iterator mi;
-#if 0
-		std::map<int, DistMap>::iterator distIter;
-		SrVec vPos = m.V[i];
-		SrVec3i vtxVoxID = voxelWindow.getVoxelIDFromPosition(vPos);
-		float voxDeltaDist = (vPos - voxelWindow.getVoxelCenterByID(vtxVoxID)).norm();
-		for ( distIter  = distanceMapList.begin();
-			  distIter != distanceMapList.end();
-			  distIter++)
-		{	
-			int jointIdx = distIter->first;
-			DistMap& boneDistMap = distIter->second;
-			if (boneDistMap.find(vtxVoxID) != boneDistMap.end())
-			{
-				float d_j = (boneDistMap[vtxVoxID] + voxDeltaDist);//extentD;
-				float w_j = 1.f/(d_j*d_j);//1.f/((1.f-alpha)*d_j + alpha*d_j*d_j);
-				weights[jointIdx] += w_j; //w_j*w_j;
-				//LOG("Unnormalized weight, v = %d, bone = %d, d_j = %f, w = %f", i, jointIdx, d_j, weights[jointIdx]);
-			}
-			else
-			{
-				LOG("Error, can not find bone dist map");
-				// error, this should not even happen !!
-			}
-		}
-#endif
-
-		skinWeight.numInfJoints.push_back(weights.size());
-		for ( mi  = weights.begin(); mi != weights.end(); mi++)
-		{
-			skinWeight.weightIndex.push_back(skinWeight.bindWeight.size());
-			skinWeight.bindWeight.push_back(mi->second);
-			skinWeight.jointNameIndex.push_back(mi->first);				
-		}
-		//LOG("after convert weights");
-	}
-	LOG("after transfer skin weights");
-	skinWeight.normalizeWeights();
 }
 
 void buildVoxelSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, SkinWeight& skinWeight)

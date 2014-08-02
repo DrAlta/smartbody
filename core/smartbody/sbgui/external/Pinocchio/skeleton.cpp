@@ -185,7 +185,7 @@ SmartBodyNewSkeleton::SmartBodyNewSkeleton()
 	//order of makeJoint calls is very important
 	makeJoint("shoulders",  Vector3(0., 0.6, 0.));                          //0
 	//makeJoint("spine3",     Vector3(0., 0.25, 0.),      "shoulders");       //1
-	makeJoint("spine2",     Vector3(0., 0.35, 0.),      "spine3");       //1
+	makeJoint("spine2",     Vector3(0., 0.35, 0.),      "shoulders");       //1
 	makeJoint("back",       Vector3(0., 0.2, 0.),      "spine2");       //2
 	makeJoint("hips",       Vector3(0., 0., 0.),        "back");          //3
 	makeJoint("spine4",     Vector3(0., 0.68, 0.),      "shoulders");       //4
@@ -205,13 +205,13 @@ SmartBodyNewSkeleton::SmartBodyNewSkeleton()
 	makeJoint("rfoot",      Vector3(0.15, -0.85, 0.06),   "rankle");        //16
 	makeJoint("rtoe",      Vector3(0.15, -0.85, 0.1),   "rfoot");          //17
 
-	makeJoint("lshoulder",  Vector3(-0.35, 0.6, 0.),     "shoulders");       //18
+	makeJoint("lshoulder",  Vector3(-0.3, 0.55, 0.),     "shoulders");       //18
 	makeJoint("lelbow",     Vector3(-0.45, 0.25, 0.075), "lshoulder");       //19
 	makeJoint("lhand",      Vector3(-0.65, 0.0, 0.15),   "lelbow");          //20
 	makeJoint("lthumb",      Vector3(-0.67, -0.03, 0.225),   "lhand");          //21
 
 
-	makeJoint("rshoulder",  Vector3(0.35, 0.6, 0.),      "shoulders");       //22
+	makeJoint("rshoulder",  Vector3(0.3, 0.55, 0.),      "shoulders");       //22
 	makeJoint("relbow",     Vector3(0.45, 0.25, 0.075),  "rshoulder");       //23
 	makeJoint("rhand",      Vector3(0.65, 0.0, 0.15),    "relbow");          //24
 	makeJoint("rthumb",      Vector3(0.67, -0.03, 0.225),   "rhand");          //25
