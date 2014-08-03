@@ -35,8 +35,6 @@ void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, Voxelizer
 void WeightMapToSkinWeight(std::vector<std::map<int,float>>& weightMap, SkinWeight& skinWeight);
 #endif
 
-ostream *Debugging::outStream = new ofstream();
-
 SBAutoRigManager* SBAutoRigManager::_singleton = NULL;
 SBAutoRigManager::SBAutoRigManager()
 {

@@ -22,7 +22,6 @@
 #include <set>
 #include <iostream>
 #include "hashutils.h"
-#include "debugging.h"
 
 #ifdef TAUCS //TAUCS
 
@@ -55,7 +54,7 @@ public:
         char* solve [] = {"taucs.factor=false", NULL};
         int rc = taucs_linsolve(m, &(cthis->factorization), 1, &(*x.begin()), &(*b.begin()), solve, NULL);
         if(rc != TAUCS_SUCCESS) {
-            Debugging::out() << "Taucs error solving: rc = " << rc << endl;
+            std::cout  << "Taucs error solving: rc = " << rc << endl;
             assert(false);
         }
         b = x;
@@ -78,7 +77,7 @@ LLTMatrix *SPDMatrix::factor() const
     TaucsLLTMatrix *out = new TaucsLLTMatrix();
     int sz = out->sz = m.size();
     int nz = 0;
-    Debugging::out() << "Size = " << sz << endl;
+    std::cout  << "Size = " << sz << endl;
     
     for(i = 0; i < sz; ++i)
         nz += m[i].size();
@@ -98,7 +97,7 @@ LLTMatrix *SPDMatrix::factor() const
         out->m->colptr[i + 1] = cur + mt[i].size();
         for(j = 0; j < (int)mt[i].size(); ++j) {
             if(mt[i][j].first < i)
-                Debugging::out() << "Err!" << endl;
+                std::cout  << "Err!" << endl;
             out->m->rowind[cur + j] = mt[i][j].first;
             out->m->values.d[cur + j] = mt[i][j].second;
         }
@@ -112,10 +111,10 @@ LLTMatrix *SPDMatrix::factor() const
     rc = taucs_linsolve(out->m, &(out->factorization), 0, NULL, NULL, def, NULL);
     
     if(rc != TAUCS_SUCCESS) {
-        Debugging::out() << "Taucs error factoring: rc = " << rc << endl;
+        std::cout  << "Taucs error factoring: rc = " << rc << endl;
         assert(false);
     }
-    else Debugging::out() << "Factored!" << endl;
+    else std::cout  << "Factored!" << endl;
     
     return out;
 }
@@ -211,11 +210,11 @@ LLTMatrix *SPDMatrix::factor() const
     out.m.resize(sz);
     out.diag.resize(sz);
 
-    Debugging::out() << "Factoring size = " << sz << endl;
+    std::cout  << "Factoring size = " << sz << endl;
     
     out.perm = computePerm();
 
-    Debugging::out() << "Perm computed" << endl;
+    std::cout  << "Perm computed" << endl;
     
     //permute matrix according to the permuation
     vector<vector<pair<int, double> > > pm(sz);

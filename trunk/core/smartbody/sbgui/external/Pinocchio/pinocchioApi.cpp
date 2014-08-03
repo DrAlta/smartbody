@@ -16,12 +16,8 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "debugging.h"
 #include "pinocchioApi.h"
 #include <fstream>
-
-ostream *Debugging::outStream = new ofstream();
-
 
 
 PinocchioOutput autorig(const Skeleton &given, const Mesh &m, bool computeSkinWeights)

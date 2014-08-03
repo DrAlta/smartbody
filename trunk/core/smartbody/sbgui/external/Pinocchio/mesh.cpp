@@ -19,7 +19,6 @@
 #include "mesh.h"
 #include "hashutils.h"
 #include "utils.h"
-#include "debugging.h"
 #include <fstream>
 #include <sstream>
 #include <map>
@@ -34,14 +33,14 @@ Mesh::Mesh(const string &file)
     ifstream obj(file.c_str());
     
     if(!obj.is_open()) {
-        Debugging::out() << "Error opening file " << file << endl;
+        std::cout  << "Error opening file " << file << endl;
         return;
     }
     
-    Debugging::out() << "Reading " << file << endl;
+    std::cout  << "Reading " << file << endl;
     
     if(file.length() < 4) {
-        Debugging::out() << "I don't know what kind of file it is" << endl;
+        std::cout  << "I don't know what kind of file it is" << endl;
         return;
     }
     
@@ -56,7 +55,7 @@ Mesh::Mesh(const string &file)
     else if(string(file.end() - 4, file.end()) == string(".stl"))
         readStl(obj);        
     else {
-        Debugging::out() << "I don't know what kind of file it is" << endl;
+        std::cout  << "I don't know what kind of file it is" << endl;
         return;
     }
     
@@ -68,7 +67,7 @@ Mesh::Mesh(const string &file)
     
     for(i = 0; i < (int)edges.size(); ++i) { //make sure all vertex indices are valid
         if(edges[i].vertex < 0 || edges[i].vertex >= verts) {
-            Debugging::out() << "Error: invalid vertex index " << edges[i].vertex << endl;
+            std::cout  << "Error: invalid vertex index " << edges[i].vertex << endl;
             OUT;
         }
     }
@@ -78,9 +77,9 @@ Mesh::Mesh(const string &file)
     computeTopology();
     
     if(integrityCheck())
-        Debugging::out() << "Successfully read " << file << ": " << vertices.size() << " vertices, " << edges.size() << " edges" << endl;
+        std::cout  << "Successfully read " << file << ": " << vertices.size() << " vertices, " << edges.size() << " edges" << endl;
     else
-        Debugging::out() << "Somehow read " << file << ": " << vertices.size() << " vertices, " << edges.size() << " edges" << endl;
+        std::cout  << "Somehow read " << file << ": " << vertices.size() << " vertices, " << edges.size() << " edges" << endl;
     
     computeVertexNormals();
 }
@@ -99,7 +98,7 @@ void Mesh::computeTopology()
         vertices[v1].edge = edges[edges[i].prev].prev; //assign the vertex' edge
         
         if(halfEdgeMap[v1].count(v2)) {
-            Debugging::out() << "Error: duplicate edge detected: " << v1 << " to " << v2 << endl;
+            std::cout  << "Error: duplicate edge detected: " << v1 << " to " << v2 << endl;
             OUT;
         }
         halfEdgeMap[v1][v2] = i;
@@ -252,7 +251,7 @@ void Mesh::readObj(istream &strm)
         //deal with the line based on the first word
         else if(words[0][0] == 'v' && words[0].size() == 1) {
             if(words.size() != 4) {
-                Debugging::out() << "Error on line " << lineNum << endl;
+                std::cout  << "Error on line " << lineNum << endl;
                 OUT;
             }
             
@@ -271,7 +270,7 @@ void Mesh::readObj(istream &strm)
         
         if(words[0][0] == 'f') {
             if(words.size() < 4 || words.size() > 15) {
-                Debugging::out() << "Error on line " << lineNum << endl;
+                std::cout  << "Error on line " << lineNum << endl;
                 OUT;
             }
             
@@ -320,7 +319,7 @@ void Mesh::readPly(istream &strm)
         if(!outOfHeader) { //look for end_header or verts
             if(words[0] == string("end_header")) {
                 if(vertsLeft < 0) {
-                    Debugging::out() << "Error: no vertex count in header" << endl;
+                    std::cout  << "Error: no vertex count in header" << endl;
                     OUT;
                 }
                 outOfHeader = true;
@@ -338,7 +337,7 @@ void Mesh::readPly(istream &strm)
         if(vertsLeft > 0) {
             --vertsLeft;
             if(words.size() < 3) {
-                Debugging::out() << "Error on line " << lineNum << endl;
+                std::cout  << "Error on line " << lineNum << endl;
                 OUT;
             }
             
@@ -354,7 +353,7 @@ void Mesh::readPly(istream &strm)
         
         //otherwise it's a face
         if(words.size() != 4) {
-            Debugging::out() << "Error on line " << lineNum << endl;
+            std::cout  << "Error on line " << lineNum << endl;
             OUT;
         }
             
@@ -402,7 +401,7 @@ void Mesh::readOff(istream &strm)
         if(vertsLeft > 0) {
             --vertsLeft;
             if(words.size() < 3) {
-                Debugging::out() << "Error on line " << lineNum << endl;
+                std::cout  << "Error on line " << lineNum << endl;
                 OUT;
             }
             
@@ -419,7 +418,7 @@ void Mesh::readOff(istream &strm)
         
         //otherwise it's a face
         if(words.size() != 4) {
-            Debugging::out() << "Error on line " << lineNum << endl;
+            std::cout  << "Error on line " << lineNum << endl;
             OUT;
         }
             
@@ -471,7 +470,7 @@ void Mesh::readGts(istream &strm)
         if(vertsLeft > 0) {
             --vertsLeft;
             if(words.size() < 3) {
-                Debugging::out() << "Error on line " << lineNum << endl;
+                std::cout  << "Error on line " << lineNum << endl;
                 OUT;
             }
             
@@ -489,7 +488,7 @@ void Mesh::readGts(istream &strm)
         if(edgesLeft > 0) {
             --edgesLeft;
             if(words.size() != 2) {
-                Debugging::out() << "Error (edge) on line " << lineNum << endl;
+                std::cout  << "Error (edge) on line " << lineNum << endl;
                 OUT;
             }
             int e1, e2;
@@ -501,7 +500,7 @@ void Mesh::readGts(istream &strm)
         
         //otherwise it's a face
         if(words.size() != 3) {
-            Debugging::out() << "Error on line " << lineNum << endl;
+            std::cout  << "Error on line " << lineNum << endl;
             OUT;
         }
             
@@ -588,7 +587,7 @@ void Mesh::readStl(istream &strm)
         
         if(words[0] == string("endfacet")) {
             if(lastIdxs[0] == lastIdxs[1] || lastIdxs[1] == lastIdxs[2] || lastIdxs[0] == lastIdxs[2]) {
-                Debugging::out() << "Duplicate vertex in triangle" << endl;
+                std::cout  << "Duplicate vertex in triangle" << endl;
                 continue;
             }
             int first = edges.size();
@@ -643,7 +642,7 @@ bool Mesh::isConnected() const
     return reachedCount == vertices.size();
 }
 
-#define CHECK(pred) { if(!(pred)) { Debugging::out() << "Mesh integrity error: " #pred << " in line " << __LINE__ << endl; return false; } }
+#define CHECK(pred) { if(!(pred)) { std::cout  << "Mesh integrity error: " #pred << " in line " << __LINE__ << endl; return false; } }
 
 bool Mesh::integrityCheck() const
 {

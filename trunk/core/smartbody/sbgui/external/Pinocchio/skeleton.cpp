@@ -18,7 +18,6 @@
 
 #include "skeleton.h"
 #include "utils.h"
-#include "debugging.h"
 #include <fstream>
 
 void Skeleton::initCompressed()
@@ -470,7 +469,7 @@ FileSkeleton::FileSkeleton(const std::string &filename)
     ifstream strm(filename.c_str());
   
     if(!strm.is_open()) {
-        Debugging::out() << "Error opening file " << filename << endl;
+        std::cout  << "Error opening file " << filename << endl;
         return;
     }
 

@@ -18,7 +18,6 @@
 
 #include "pinocchioApi.h"
 #include "deriv.h"
-#include "debugging.h"
 
 //fits mesh inside unit cube, makes sure there's exactly one connected component
 Mesh  prepareMesh(const Mesh &m)
@@ -26,7 +25,7 @@ Mesh  prepareMesh(const Mesh &m)
     Mesh out = m;
 
     if(!m.isConnected()) {
-        Debugging::out() << "Bad mesh: should be a single connected component" << endl;
+        std::cout  << "Bad mesh: should be a single connected component" << endl;
         return Mesh();
     }
 
@@ -53,7 +52,7 @@ TreeType *constructDistanceField(const Mesh &m, double tol)
 
     TreeType *out = OctTreeMaker<TreeType>().make(proj, m, tol);
 
-    Debugging::out() << "Done fullSplit " << out->countNodes() << " " << out->maxLevel() << endl;
+    std::cout  << "Done fullSplit " << out->countNodes() << " " << out->maxLevel() << endl;
 
     return out;
 }
@@ -147,7 +146,7 @@ vector<Sphere> sampleMedialSurface(TreeType *distanceField, double tol)
         }
     }
     
-    Debugging::out() << "Medial axis points = " << out.size() << endl;
+    std::cout  << "Medial axis points = " << out.size() << endl;
     
     sort(out.begin(), out.end(), sphereComp);
 
