@@ -12,6 +12,7 @@
 #include <FL/Fl_Tabs.H>
 #include "jointmapviewer/JointMapViewer.h"
 #include "retargetviewer/RetargetViewer.h"
+#include "autorig/AutoRigViewer.h"
 #include <SBWindowListener.h>
 
 
@@ -40,7 +41,7 @@ public:
 	void applyRetargetSteps();
 	void applyAutoRig(int riggingType = 0);
 	void updateSkinWeight(int weightType = 0);
-
+	
 	void updateCharacterList();
 	void updatePawnList();
 	void refreshAll();
@@ -58,6 +59,7 @@ public:
 public:
 	JointMapViewer* jointMapViewer;
 	RetargetViewer* retargetViewer;
+	AutoRigViewer*  autoRigViewer;
 
 protected:
 	Fl_Choice* _choiceCharacters;
