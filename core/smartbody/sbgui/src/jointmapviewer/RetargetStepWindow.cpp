@@ -53,27 +53,35 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	_choiceCharacters->callback(CharacterCB, this);
 	updateCharacterList();
 
-	_choicePawns = new Fl_Choice(410, yDis, 150, 20, "Mesh Pawn");
+	//_choicePawns = new Fl_Choice(410, yDis, 150, 20, "Mesh Pawn");
 	//_choicePawns->callback(CharacterCB, this);
-	updatePawnList();
+	//updatePawnList();
 
-	_buttonAutoRig = new Fl_Button(570, yDis, 120, 25, "Apply AutoRig");
-	_buttonAutoRig->callback(ApplyAutoRigCB, this);
+	//_buttonAutoRig = new Fl_Button(570, yDis, 120, 25, "Apply AutoRig");
+	//_buttonAutoRig->callback(ApplyAutoRigCB, this);
 	//_choiceCharacters->callback(CharacterCB,this);
 
-	_buttonUpdateSkinWeight = new Fl_Button(890, yDis, 120, 25, "Update Weight");
-	_buttonUpdateSkinWeight->callback(UpdateSkinWeightCB, this);
+	//_buttonUpdateSkinWeight = new Fl_Button(890, yDis, 120, 25, "Update Weight");
+	//_buttonUpdateSkinWeight->callback(UpdateSkinWeightCB, this);
 
-	_buttonVoxelRigging = new Fl_Choice(750, yDis, 120, 25, "Type");
-	_buttonVoxelRigging->add("Voxel Weight");
-	_buttonVoxelRigging->add("Glow Weight");
-	_buttonVoxelRigging->add("Diffusion Weight");
+	//_buttonVoxelRigging = new Fl_Choice(750, yDis, 120, 25, "Type");
+	//_buttonVoxelRigging->add("Voxel Weight");
+	//_buttonVoxelRigging->add("Glow Weight");
+	//_buttonVoxelRigging->add("Diffusion Weight");
 
-	_buttonVoxelRigging->value(0);
+	//_buttonVoxelRigging->value(0);
 
 	tabGroup = new Fl_Tabs(tabGroupX, tabGroupY, tabGroupW, tabGroupH);
 	//tabGroup->callback(changeTabGroup, this);
 	tabGroup->begin();
+		Fl_Group* zeroGroup = new Fl_Group(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, "Auto Rig");
+		zeroGroup->begin();	
+		autoRigViewer = new AutoRigViewer(windowGroupX + childGroupX + tabGroupX, windowGroupY + childGroupY + tabGroupY , windowGroupW, windowGroupH,"Auto Rig");
+		autoRigViewer->setRetargetStepWindow(this);
+		autoRigViewer->begin();
+		autoRigViewer->end();
+		zeroGroup->end();
+
 		Fl_Group* firstGroup = new Fl_Group(childGroupX + tabGroupX, childGroupY + tabGroupY, childGroupW, childGroupH, "Joint Mapper");
 		firstGroup->begin();	
 		jointMapViewer = new JointMapViewer(windowGroupX + childGroupX + tabGroupX, windowGroupY + childGroupY + tabGroupY , windowGroupW, windowGroupH,"Joint Mapper");
@@ -153,10 +161,11 @@ void RetargetStepWindow::RefreshCB( Fl_Widget* widget, void* data )
 
 void RetargetStepWindow::refreshAll()
 {
-	updatePawnList();
+	//updatePawnList();
 	updateCharacterList();
 	jointMapViewer->updateUI();
 	retargetViewer->updateBehaviorSet();
+	autoRigViewer->updateAutoRigViewer();
 	redraw();
 }
 
@@ -327,132 +336,13 @@ void RetargetStepWindow::updateSkinWeight( int weightType /*= 0*/ )
 	bool autoRigSuccess = autoRigManager.updateSkinWeightFromCharacterMesh(charName, weightType);
 }
 
+
+
+
 void RetargetStepWindow::applyAutoRig(int riggingType)
 {
-	if (!_choicePawns->text())
-		return;
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::string pawnName = _choicePawns->text();	
-	SBAutoRigManager& autoRigManager = SBAutoRigManager::singleton();
-
-
-
-	SmartBody::SBPawn* sbPawn = scene->getPawn(pawnName);	
-	DeformableMeshInstance* meshInstance = sbPawn->dStaticMeshInstance_p;
-	if (!sbPawn || !meshInstance || meshInstance->getDeformableMesh() == NULL)
-	{
-
-		LOG("AutoRigging Fail : No pawn is selected, or the selected pawn does not contain 3D mesh for rigging.");
-		return;
-	}
-	DeformableMesh* mesh = meshInstance->getDeformableMesh();	
-
-	std::string modelName = mesh->getName();//(const char*) model.name;
-	std::string filebasename = boost::filesystem::basename(modelName);
-	std::string fileextension = boost::filesystem::extension(modelName);
-	std::string skelName = filebasename+".sk";
-	std::string deformMeshName = filebasename+"AutoRig.dae"; 
-
-	bool autoRigSuccess = autoRigManager.buildAutoRiggingFromPawnMesh(pawnName, riggingType, skelName, deformMeshName);
-#if 0
-
-	SrModel& model = mesh->dMeshStatic_p[0]->shape();		
-	SrModel scaleModel = SrModel(model);
-	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
-	bool autoRigSuccess = false;
-	SrMat worldRotation = sbPawn->get_world_offset().get_rotation(); 
-	if (!assetManager->getDeformableMesh(deformMeshName))
-	{			
-		//model.scale(meshInstance->getMeshScale()); // resize the vertices
-		float meshScale = meshInstance->getMeshScale();
-		for (int i=0;i<scaleModel.V.size();i++)
-			scaleModel.V[i] *= meshScale;
-		for (int i=0;i<scaleModel.V.size();i++)
-			scaleModel.V[i] = scaleModel.V[i]*worldRotation;
-
-		if (riggingType == 0)
-			autoRigSuccess = autoRigManager.buildAutoRiggingVoxels(scaleModel,skelName,deformMeshName);
-			//autoRigSuccess = autoRigManager.buildAutoRiggingVoxelsWithVoxelSkinWeights(scaleModel,skelName,deformMeshName);
-		else if (riggingType == 1)
-			autoRigSuccess = autoRigManager.buildAutoRiggingVoxelsWithVoxelSkinWeights(scaleModel,skelName,deformMeshName);
-		else if (riggingType == 2)
-			autoRigSuccess = autoRigManager.buildAutoRigging(scaleModel, skelName, deformMeshName);		
-	}
-	else
-	{
-		LOG("Deformable mesh %s already exists. Skip auto-rigging and create the character directly.");
-	}
-#endif
-
-	if (!autoRigSuccess && riggingType == 2)		
-	{
-		std::string errorMsg = "AutoRigging Fail : The input mesh must be a single component and water tight mesh. Try to enable 'voxelRigging'.";
-		LOG(errorMsg.c_str());
-		fl_alert(errorMsg.c_str());
-		return;
-	}		
-
 	
-
-
-	std::string charName = sbPawn->getName()+"autoRig";
-
-	SmartBody::SBJointMapManager* jointMapManager = scene->getJointMapManager();
-	SmartBody::SBJointMap* jointMap = jointMapManager->getJointMap(skelName);
-	if (!jointMap)
-	{
-		jointMap = jointMapManager->createJointMap(skelName);
-		jointMap->guessMapping(scene->getSkeleton(skelName), false);
-	}
-
-	SmartBody::SBSkeleton* skel = scene->createSkeleton(skelName);
-
-	SmartBody::SBCharacter* character = scene->createCharacter(charName, "");
-	character->setSkeleton(skel);
-	character->createStandardControllers();
-	character->setStringAttribute("deformableMesh",deformMeshName);	
-
-	SrVec dest = sbPawn->getPosition();
-	float yOffset = -skel->getBoundingBox().a.y;
-	dest.y = yOffset;		
-	character->setPosition(SrVec(dest.x,dest.y,dest.z));
-	character->setStringAttribute("displayType","GPUmesh");
-
-
-	// setup behavior set
-	SmartBody::SBBehaviorSetManager* manager = scene->getBehaviorSetManager();
-	if (manager->getNumBehaviorSets() == 0)
-	{
-		// look for the behavior set directory under the media path
-		scene->addAssetPath("script", "behaviorsets");
-		scene->runScript("default-behavior-sets.py");
-
-		if (manager->getNumBehaviorSets() == 0)
-		{
-			LOG("Can not find any behavior sets under path %s/behaviorsets.", scene->getMediaPath().c_str());
-		}
-		else
-		{
-			LOG("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
-		}
-	}
-#define TEST_ROCKETBOX 1
-#if TEST_ROCKETBOX
-	scene->addAssetPath("script", "scripts");
-	scene->run("scene.run('characterUnitTest.py')");
-
-	character->createActionAttribute("_1testHead", true, "TestHead", 300, false, false, false, "Test Head");
-	character->createActionAttribute("_2testGaze", true, "TestHead", 300, false, false, false, "Test Head");
-	character->createActionAttribute("_3testGesture", true, "TestHead", 300, false, false, false, "Test Head");
-	character->createActionAttribute("_4testReach", true, "TestHead", 300, false, false, false, "Test Head");
-	character->createActionAttribute("_5testLocomotion", true, "TestHead", 300, false, false, false, "Test Head");
-#endif	
-	//updateCharacterList();	
-	scene->removePawn(pawnName);	
-	this->refreshAll();		
-	this->setApplyType(true);
-	setCharacterName(charName);
-	setJointMapName(skelName);		
+	
 }
 
 
@@ -489,6 +379,8 @@ void RetargetStepWindow::draw()
 {
 	if (jointMapViewer)
 		jointMapViewer->redraw();
+	if (autoRigViewer)
+		autoRigViewer->redraw();
 	Fl_Double_Window::draw();
 }
 
@@ -546,9 +438,11 @@ void RetargetStepWindow::OnPawnCreate( const std::string & name )
 
 void RetargetStepWindow::OnPawnDelete( const std::string & name )
 {
-	_removePawnName = name;
+	//_removePawnName = name;
+	autoRigViewer->_deletePawnName = name;
 	refreshAll();
-	_removePawnName = "";
+	autoRigViewer->_deletePawnName = "";
+	//_removePawnName = "";
 }
 
 void RetargetStepWindow::hide()

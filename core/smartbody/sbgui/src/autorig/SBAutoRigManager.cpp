@@ -460,6 +460,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 	voxelWindow->show();
 	while(!voxelWindow->isFinishBuildVoxels())
 	{
+		voxelWindow->draw();
 		Fl::check();
 	}
 	voxelWindow->hide();
