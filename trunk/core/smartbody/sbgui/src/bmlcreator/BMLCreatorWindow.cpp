@@ -13,6 +13,7 @@
 #include "BMLAnimationObject.h"
 #include "BMLGestureObject.h"
 #include "BMLReachObject.h"
+#include "BMLHandObject.h"
 #include "BMLGazeObject.h"
 #include "BMLConstraintObject.h"
 #include "BMLHeadObject.h"
@@ -40,6 +41,8 @@ BMLCreatorWindow::BMLCreatorWindow(int x,int y,int w,int h, const char* s) : Fl_
 	gesture->setName("gesture");
 	BMLObject* reach = new BMLReachObject();
 	reach->setName("sbm:reach");
+	BMLObject* hand = new BMLHandObject();
+	hand->setName("sbm:grab");
 	BMLObject* gaze = new BMLGazeObject();
 	gaze->setName("gaze");
 	BMLObject* constraint = new BMLConstraintObject();
@@ -62,6 +65,7 @@ BMLCreatorWindow::BMLCreatorWindow(int x,int y,int w,int h, const char* s) : Fl_
 	_bmlObjects.push_back(animation);
 	_bmlObjects.push_back(gesture);
 	_bmlObjects.push_back(reach);
+	_bmlObjects.push_back(hand);
 	_bmlObjects.push_back(gaze);
 	_bmlObjects.push_back(constraint);
 	_bmlObjects.push_back(head);
