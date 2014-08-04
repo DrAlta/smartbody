@@ -574,8 +574,10 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\autorig\AutoRigViewer.cpp" />
     <ClCompile Include="..\src\autorig\SBAutoRigManager.cpp" />
     <ClCompile Include="..\src\autorig\VoxelizerWindow.cpp" />
+    <ClCompile Include="..\src\bmlcreator\BMLHandObject.cpp" />
     <ClCompile Include="..\src\bmlcreator\TextEditor.cpp" />
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp" />
     <ClCompile Include="..\src\EmbeddedOgre.cpp" />
@@ -666,8 +668,10 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\SmartBody\src\external\glew\glew.h" />
+    <ClInclude Include="..\src\autorig\AutoRigViewer.h" />
     <ClInclude Include="..\src\autorig\SBAutoRigManager.h" />
     <ClInclude Include="..\src\autorig\VoxelizerWindow.h" />
+    <ClInclude Include="..\src\bmlcreator\BMLHandObject.h" />
     <ClInclude Include="..\src\bmlcreator\TextEditor.h" />
     <ClInclude Include="..\src\CharacterCreatorWindow.h" />
     <ClInclude Include="..\src\EmbeddedOgre.h" />

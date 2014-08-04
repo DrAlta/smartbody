@@ -322,6 +322,12 @@
     <ClCompile Include="..\src\pythonbind\SBPythonAutorig.cpp">
       <Filter>pythonbind</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLHandObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\autorig\AutoRigViewer.cpp">
+      <Filter>autorig</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -589,6 +595,12 @@
     </ClInclude>
     <ClInclude Include="..\src\pythonbind\SBPythonAutoRig.h">
       <Filter>pythonbind</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLHandObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\autorig\AutoRigViewer.h">
+      <Filter>autorig</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
