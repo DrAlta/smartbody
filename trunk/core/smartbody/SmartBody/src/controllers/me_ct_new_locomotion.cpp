@@ -37,11 +37,13 @@ MeCtNewLocomotion::MeCtNewLocomotion() :  SmartBody::SBController()
 	scootSpd = 0.0f;	//	unit: centermeter/sec
 	movingSpd = 0.0f;	//	unit: centermeter/sec
 	turningSpd = 0.0f;	//	unit: deg/sec
+	motionSpd = 0.0f;
 	_valid = false;
 	_analysis = false;
-	_lastTime = -2.0;
+	_lastTime = -1.0f;
+	_prevTime = -1.0f;
 	startTime = -1.0;
-	C=S=NULL;
+	dataCycle = smoothCycle = NULL;
 	LeftFading.prev_time = -1.0f;
 	RightFading.prev_time = -1.0f;
 	_duration = -1.0f;
@@ -50,9 +52,9 @@ MeCtNewLocomotion::MeCtNewLocomotion() :  SmartBody::SBController()
 	sk = NULL;
 	walkScale = 1.0f;
 	walkSpeedGain = 1.0f;
+	motionSpeed = 0.0f;
 
 	setDefaultAttributeGroupPriority("EnhancedLocomotion", 600);
-
 	addDefaultAttributeString("walkCycle", "", "EnhancedLocomotion");
 	addDefaultAttributeString("walkSkeleton", "", "EnhancedLocomotion");
 	addDefaultAttributeDouble("walkScale", 1.0, "EnhancedLocomotion");
@@ -106,11 +108,18 @@ void MeCtNewLocomotion::setup()
 		return;
 
 	bool SameMotion=false;
-	if(C)//If there is a motion, check if is the same one
-		SameMotion=C->getName()==character->getStringAttribute("walkCycle");
+	if(dataCycle)//If there is a motion, check if is the same one
+	{	
+		SameMotion = dataCycle->getName() == character->getStringAttribute("walkCycle");
+	}
 	if(!SameMotion)
-		C  = SmartBody::SBScene::getScene()->getMotion(character->getStringAttribute("walkCycle"));
-	if (!C)
+	{
+		dataCycle  = SmartBody::SBScene::getScene()->getMotion(character->getStringAttribute("walkCycle"));
+		if (!dataCycle)
+		return;
+		dataCycle->setName(character->getStringAttribute("walkCycle"));
+	}
+	if (!dataCycle)
 		return;
 	hipjoint = character->getStringAttribute("CenterHipJoint");
 	lend = character->getStringAttribute("LEndEffectorJoint");
@@ -119,16 +128,7 @@ void MeCtNewLocomotion::setup()
 	fadeout = (float)character->getDoubleAttribute("FadeOut");
 
 	std::string skeletonName = character->getStringAttribute("walkSkeleton");
-	SmartBody::SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
-
-	bool isNewSkeleton = false;
-	if (!sk || sk->getName() != skeletonName)
-	{
-		SmartBody::SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
-		if (!skeleton)
-			return;
-		isNewSkeleton = true;
-	}
+	dataCycle->setMotionSkeletonName(skeletonName);
 
 	sk = new SmartBody::SBSkeleton(character->getSkeleton());
 
@@ -137,69 +137,80 @@ void MeCtNewLocomotion::setup()
 
 	bool isNewWalkScale = false;
 	float scale = (float) character->getDoubleAttribute("walkScale");
-	if (fabs(walkScale - scale) < .0001)
+	if (fabs(walkScale - scale) > .0001)
 		isNewWalkScale = true;
 	walkScale = scale;
 
 	bool isNewWalkSpeedGain = false;
 	float speedGain = (float) character->getDoubleAttribute("walkSpeedGain");
-	if (fabs(walkSpeedGain - speedGain) < .0001)
+	if (fabs(walkSpeedGain - speedGain) > .0001)
 		isNewWalkSpeedGain = true;
 	walkSpeedGain = speedGain;
 
 
-	if(!SameMotion || isNewSkeleton || isNewWalkScale || isNewWalkSpeedGain)
+	if(!SameMotion)
 	{
 		if(!character->getBoolAttribute("startsWithRight"))
-			C = C->mirror("", skeletonName);
-		S = C->smoothCycle("", 0.5f);
-		
-		S->connect(sk);
-		
-		motionSpd = walkScale * S->getJointSpeed(sk->getJointByName(hipjoint), (float)S->getTimeStart() , (float)S->getTimeStop()) * walkSpeedGain ;
-		S->disconnect();
-
+		{
+			dataCycle = dataCycle->mirror("", skeletonName);
+			dataCycle->setName(character->getStringAttribute("walkCycle"));
+			dataCycle->setMotionSkeletonName(skeletonName);
+		}
+		smoothCycle = dataCycle->smoothCycle("", 0.5f);
+		smoothCycle->setMotionSkeletonName(skeletonName);
+		smoothCycle->connect(sk);
+		motionSpeed = smoothCycle->getJointSpeed(sk->getJointByName(hipjoint), (float)smoothCycle->getTimeStart() , (float)smoothCycle->getTimeStop());
+		smoothCycle->disconnect();
 	}
-	_lastTime = -1.0;
-	SmartBody::SBJoint* rootJoint = character->getSkeleton()->getJointByName(hipjoint);
-	ik_scenario.ikTreeNodes.clear();
-	std::vector<std::string> stopJoints;
-	stopJoints.push_back(lend);
-	stopJoints.push_back(rend);
-	stopJoints.push_back("spine1");
-	ik_scenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);	
-
-	double ikReachRegion = character->getHeight()*0.02f;		
-	ikDamp = ikReachRegion*ikReachRegion*14.0;
-	MeController::init(character);
-	ik.dampJ = ikDamp;
-	ik.refDampRatio = 0.01;
-
-	std::string rightPlants = character->getStringAttribute("footPlantRight");
-	std::vector<std::string> rPlantVector;
-	vhcl::Tokenize(rightPlants, rPlantVector, ",");
-	rplant.clear();
-	rplant.resize(rPlantVector.size());
-	for (size_t p = 0; p < rPlantVector.size(); p++)
+	if(!smoothCycle)
+		return;
+	if( isNewWalkScale || isNewWalkSpeedGain || motionSpd == 0.0f)
 	{
-		rplant[p] = atoi(rPlantVector[p].c_str());
+		motionSpd = walkScale * motionSpeed * walkSpeedGain ;
 	}
-
-	std::string leftPlants = character->getStringAttribute("footPlantLeft");
-	std::vector<std::string> lPlantVector;
-	vhcl::Tokenize(leftPlants, lPlantVector, ",");
-	lplant.clear();
-	lplant.resize(lPlantVector.size());
-	for (size_t p = 0; p < lPlantVector.size(); p++)
+	if(!SameMotion)
 	{
-		lplant[p] = atoi(lPlantVector[p].c_str());
+		_lastTime = -1.0;
+		SmartBody::SBJoint* rootJoint = character->getSkeleton()->getJointByName(hipjoint);
+		ik_scenario.ikTreeNodes.clear();
+		std::vector<std::string> stopJoints;
+		stopJoints.push_back(lend);
+		stopJoints.push_back(rend);
+		stopJoints.push_back("spine1");
+		ik_scenario.buildIKTreeFromJointRoot(rootJoint,stopJoints);	
+
+		double ikReachRegion = character->getHeight()*0.02f;		
+		ikDamp = ikReachRegion*ikReachRegion*14.0;
+		MeController::init(character);
+		ik.dampJ = ikDamp;
+		ik.refDampRatio = 0.01;
+
+		std::string rightPlants = character->getStringAttribute("footPlantRight");
+		std::vector<std::string> rPlantVector;
+		vhcl::Tokenize(rightPlants, rPlantVector, ",");
+		rplant.clear();
+		rplant.resize(rPlantVector.size());
+		for (size_t p = 0; p < rPlantVector.size(); p++)
+		{
+			rplant[p] = atoi(rPlantVector[p].c_str());
+		}
+
+		std::string leftPlants = character->getStringAttribute("footPlantLeft");
+		std::vector<std::string> lPlantVector;
+		vhcl::Tokenize(leftPlants, lPlantVector, ",");
+		lplant.clear();
+		lplant.resize(lPlantVector.size());
+		for (size_t p = 0; p < lPlantVector.size(); p++)
+		{
+			lplant[p] = atoi(lPlantVector[p].c_str());
+		}
 	}
 	
 }
 
 bool MeCtNewLocomotion::controller_evaluate(double t, MeFrameData& frame)
 {
-	if (!S)
+	if (!smoothCycle)
 		return true;
 	BufferRef=&(frame.buffer());
 	if (character && _valid)
@@ -213,19 +224,14 @@ float MeCtNewLocomotion::legDistance(bool Leftleg)
 {
 	SmartBody::SBSkeleton *sk2 = character->getSkeleton();
 	sk2->update_global_matrices();
-	std::vector<std::string> jointNames(2);
-	std::vector<SrVec> jointPositions(2);
-	jointNames[0] = (Leftleg)? "l_hip" : "r_hip";
-	jointNames[1] = (Leftleg)? lend : rend;
+	std::string jointName;
+	jointName = (Leftleg)? "l_hip" : "r_hip";
 	SrVec goal;
 	if(posConsLf.count(lend) && posConsRt.count(rend))
 		goal = (Leftleg)? posConsLf[lend]->getPosConstraint() : posConsRt[rend]->getPosConstraint();
-	SmartBody::SBJoint* joint = sk2->getJointByName(jointNames[0]);	
-	jointPositions[0] = joint->gmat().get_translation();
-	/*joint = sk2->getJointByName(jointNames[1]);	
-	jointPositions[1] = joint->gmat().get_translation();*/
-	//LOG("(%.2f, %.2f, %.2f)  (%.2f, %.2f, %.2f)",jointPositions[0].x, jointPositions[0].y, jointPositions[0].z, jointPositions[1].x, jointPositions[1].y, jointPositions[1].z );
-	return (jointPositions[0] - goal).len()-0.9f;
+	SmartBody::SBJoint* joint = sk2->getJointByName(jointName);	
+	SrVec jointPosition = joint->gmat().get_translation();
+	return (jointPosition - goal).len()-0.9f;
 }
 
 void MeCtNewLocomotion::loopMotion(float def, float speed)
@@ -239,8 +245,8 @@ void MeCtNewLocomotion::loopMotion(float def, float speed)
 	setDesiredHeading(0.0f);
 	float temp = motionSpd;
 	motionSpd = speed;
-	def = def/(float)S->frames();
-	for(float t = 0; t < S->duration() + 0.01; t += diff)
+	def = def/(float)smoothCycle->frames();
+	for(float t = 0; t < smoothCycle->duration() + 0.01; t += diff)
 	{
 		setDesiredHeading(getDesiredHeading()+def);
 		play(t, true);
@@ -250,44 +256,43 @@ void MeCtNewLocomotion::loopMotion(float def, float speed)
  	character->get_world_offset(x, y, z, yaw, pitch, roll); 
 	SrVec pos(x,y,z);
 	addPawn(pos,pawnname);
-	//LOG("Angle %f Speed %f Error %f", def*S->frames(), speed, errorSum);
-	reset();
-	character->set_world_offset(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+	reset(true);
 	motionSpd = temp;
 	_analysis = false;
 }
 
 void MeCtNewLocomotion::play(float t, bool useTemp)
 {
-	static bool printOnce=true;
 	if(useTemp)
 		BufferRef = &tempBuffer;
-	float Dt = 1.0f / 60.0f;
+	float dt = 1.0f / 60.0f;
 	if (_lastTime > 0.0)
-		Dt = float(t - _lastTime);
+		dt = float(t - _lastTime);
+	dt *= walkSpeedGain;
 	_lastTime = t;
-	SrQuat woQuat;
-	SrVec woPos;
+	if(_prevTime > 0.0f)
+		t = _prevTime + dt;
+	else
+		_prevTime = 0.0f;
+	_prevTime = t;
 	if(startTime < 0.0)
-	{
 		startTime = t;
-	}
-	motionTime = fmod(t-startTime, S->duration());
+	motionTime = fmod(t-startTime, smoothCycle->duration());
 	float x, y, z, yaw, pitch, roll;		
  	character->get_world_offset(x, y, z, yaw, pitch, roll); 
  	yaw = desiredHeading;
- 	float movingDist = motionSpd * Dt;
+ 	float movingDist = motionSpd * dt;
  	x += movingDist * sin(yaw * (float)M_PI / 180.0f);
  	z += movingDist * cos(yaw * (float)M_PI / 180.0f);
 
 	gwiz::quat_t q = gwiz::euler_t(pitch,yaw,roll);
-	woQuat = SrQuat(q.wf() ,q.xf(),q.yf(),q.zf());
-	woPos = SrVec(x,y,z); 		
+	SrQuat woQuat = SrQuat(q.wf() ,q.xf(),q.yf(),q.zf());
+	SrVec woPos = SrVec(x,y,z); 		
 	//*/
 	std::vector<SrQuat> tempQuatList(ik_scenario.ikTreeNodes.size()); 
 	if (fabs(LeftFading.prev_time + RightFading.prev_time + 2.0f) <0.001f ) // first start
 	{					
-		updateChannelBuffer(*BufferRef);//Read from skeleton->Write on Buffer
+		updateChannelBuffer(*BufferRef, motionTime);//Read from skeleton->Write on Buffer
 		updateWorldOffset(*BufferRef, woQuat, woPos);
 		updateChannelBuffer(*BufferRef,tempQuatList, true);//Read from Buffer->Write on tempQuatList
 		
@@ -299,11 +304,11 @@ void MeCtNewLocomotion::play(float t, bool useTemp)
 	LeftFading.updateDt(t);
 	RightFading.updateDt(t);
 
-	updateChannelBuffer(*BufferRef);//Read from skeleton->Write on Buffer
+	updateChannelBuffer(*BufferRef, motionTime);//Read from skeleton->Write on Buffer
 	updateWorldOffset(*BufferRef, woQuat, woPos);
 	updateChannelBuffer(*BufferRef,tempQuatList, true);//Read from Buffer->Write on tempQuatList
 
-	updateConstraints(motionTime/(float)S->getFrameRate());
+	updateConstraints(motionTime/(float)smoothCycle->getFrameRate());
 		
 	ik_scenario.setTreeNodeQuat(tempQuatList,QUAT_REF);	
 	character->getSkeleton()->update_global_matrices();
@@ -322,11 +327,11 @@ void MeCtNewLocomotion::play(float t, bool useTemp)
 	if( RightFading.updateFading(RightFading.dt))
 		useIKRt = false;
 
-	if(useIKLf && _analysis)
+	if(useIKLf && _analysis && LeftFading.fadeMode == Fading::FADING_MODE_OFF)
 	{
 		errorSum += max(legDistance(1), 0.0f);
 	}
-	if(useIKRt && _analysis)
+	if(useIKRt && _analysis && RightFading.fadeMode == Fading::FADING_MODE_OFF)
 	{
 		errorSum += max(legDistance(0), 0.0f);
 	}
@@ -343,14 +348,13 @@ void MeCtNewLocomotion::play(float t, bool useTemp)
 		qEval.normalize();
 		qInit.normalize();
 		char a=node->getNodeName().c_str()[0];
-		if(a!='l' && i!=0)
+		if(a!='l')
 			continue;
+		float tempdist = d(qInit,qEval);
+		//if(tempdist>0.7f)
+			//LOG("%s  :  %f", node->getNodeName().c_str(), tempdist);
 		tempQuatList[i] = slerp(qInit,qEval,LeftFading.blendWeight);
-		if(printOnce)
-			LOG("%d %s", i, node->getNodeName().c_str());
 	}
-	if(printOnce)
-		LOG("------------------------");
 	//*/
 	//*/Right
 	ik_scenario.ikPosEffectors = &posConsRt;
@@ -367,9 +371,12 @@ void MeCtNewLocomotion::play(float t, bool useTemp)
 		char a=node->getNodeName().c_str()[0];
 		if(a!='r')
 			continue;
+		float tempdist = d(qInit,qEval);
+		//if(tempdist>0.7f)
+		//{
+			//LOG("%s  :  %f", node->getNodeName().c_str(), tempdist);
+		//}
 		tempQuatList[i] = slerp(qInit,qEval,RightFading.blendWeight);
-		if(printOnce)
-			LOG("%d %s", i, node->getNodeName().c_str());
 	}
 	//*/
 	updateChannelBuffer(*BufferRef,tempQuatList);//Read from tempQuatList->Write on Buffer
@@ -381,7 +388,6 @@ void MeCtNewLocomotion::play(float t, bool useTemp)
 		writeToSkeleton(*BufferRef);
 		check_collision();
 	}
-	printOnce=false;
 }
 
 void MeCtNewLocomotion::updateChannelBuffer(SrBuffer<float>& buffer, std::vector<SrQuat>& quatList, bool bRead)
@@ -425,12 +431,12 @@ void MeCtNewLocomotion::updateChannelBuffer(SrBuffer<float>& buffer, std::vector
 	}
 }
 
-void MeCtNewLocomotion::updateChannelBuffer(SrBuffer<float>& buffer)
+void MeCtNewLocomotion::updateChannelBuffer(SrBuffer<float>& buffer, float t)
 {
 	SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();
-	SmartBody::SBRetarget* retarget =retargetManager->getRetarget(S->getMotionSkeletonName(),character->getSkeleton()->getName());
-	S->connect(sk);
-	S->apply(motionTime);
+	SmartBody::SBRetarget* retarget =retargetManager->getRetarget(smoothCycle->getMotionSkeletonName(),character->getSkeleton()->getName());
+	smoothCycle->connect(sk);
+	smoothCycle->apply(t);//,SkMotion::Linear, 0, retarget);
 	for(int i = 0; i < sk->getNumJoints(); i++)
 	{
 			SmartBody::SBJoint* joint = sk->getJoint(i);	
@@ -449,7 +455,7 @@ void MeCtNewLocomotion::updateChannelBuffer(SrBuffer<float>& buffer)
 			buffer[index + 2] = retargetQ.y;
 			buffer[index + 3] = retargetQ.z;
 	}
-	S->disconnect();
+	smoothCycle->disconnect();
 }
 
 
@@ -522,17 +528,25 @@ void MeCtNewLocomotion::controller_start()
 void MeCtNewLocomotion::addPawn(SrVec& pos, std::string name)
 {
 	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
+	float maxerror = 0.30f;
 	if(pawn == NULL)
 		pawn = SmartBody::SBScene::getScene()->createPawn(name);
-	pawn->setPosition(pos);
 	pawn->setStringAttribute("collisionShape","sphere");
 	pawn->setVec3Attribute("collisionShapeScale",0.025f,0.025f,0.025f);
-	if(errorSum/2.0f<1.0f )
-		pawn->setVec3Attribute("color",0.0f,max(1.0f - errorSum/2.0f,0.0f),min(errorSum/2.0f, 1.0f));
+	if(errorSum/maxerror<1.0f )
+	{
+		//pos.y= max(1.0f - errorSum/maxerror,0.0f);
+		pawn->setVec3Attribute("color",0.0f,max(1.0f - errorSum/maxerror,0.0f),min(errorSum/maxerror, 1.0f));
+	}
 	else if (errorSum > 99.0f)
+	{
 		pawn->setVec3Attribute("color",1.0f,0.0f,0.0f);
+	}
 	else
+	{
 		pawn->setVec3Attribute("color",1.0f,1.0f,0.0f);
+	}
+	pawn->setPosition(pos);
 }
 
 void MeCtNewLocomotion::updateConstraints(float t)
@@ -558,7 +572,6 @@ void MeCtNewLocomotion::updateConstraints(float t)
 		cType = CONSTRAINT_POS;
 		addEffectorJointPair(rend.c_str(), hipjoint.c_str(), tv, tq, cType, posConsRt, rotConsRt);
 		RightFading.setFadeIn(fadein);
-		//addPawn(tv, "Eff");
 	}
 	if(useIKLf)
 	{
@@ -581,7 +594,6 @@ void MeCtNewLocomotion::updateConstraints(float t)
 		cType = CONSTRAINT_POS;
 		addEffectorJointPair(lend.c_str(), hipjoint.c_str(), tv, tq, cType, posConsLf, rotConsLf);
 		LeftFading.setFadeIn(fadein);
-		//addPawn(tv, "Eff");
 	}
 }
 
@@ -621,15 +633,15 @@ void  MeCtNewLocomotion::notify(SmartBody::SBSubject* subject)
 	}
 }
 
-void MeCtNewLocomotion::reset()
+void MeCtNewLocomotion::reset(bool resetPos)
 {	
 	scootSpd = 0.0f;
 	movingSpd = 0.0f;
 	turningSpd = 0.0f;
 	_valid = false;
-	startTime = -1.0;
+	startTime = -1.0f;
+	_prevTime = -1.0f;
 	_lastTime = -1.0f;
-	//LOG("Error : %f",errorSum);
 	errorSum = 0.0f; 
 	useIKRt = false;
 	useIKLf = false;
@@ -639,8 +651,110 @@ void MeCtNewLocomotion::reset()
 	rotConsLf.clear();
 	LeftFading.controlRestart();
 	RightFading.controlRestart();
+	if(resetPos)
+	{
+		character->set_world_offset(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+		setDesiredHeading(0.0f);
+	}
 }
 
+bool MeCtNewLocomotion::capsule_collision(SrVec  mp1, SrVec mp2, SrVec np1, SrVec np2)
+{
+    SrVec   u = mp2 - mp1;
+    SrVec   v = np2 - np1;
+    SrVec   w = mp1 - np1;
+    float    a = dot(u,u);         // always >= 0
+    float    b = dot(u,v);
+    float    c = dot(v,v);         // always >= 0
+    float    d = dot(u,w);
+    float    e = dot(v,w);
+    float    D = a*c - b*b;        // always >= 0
+    float    sc, sN, sD = D;       // sc = sN / sD, default sD = D >= 0
+    float    tc, tN, tD = D;       // tc = tN / tD, default tD = D >= 0
+
+    // compute the line parameters of the two closest points
+    if (D < 0.0001f) { // the lines are almost parallel
+        sN = 0.0;         // force using point P0 on segment S1
+        sD = 1.0;         // to prevent possible division by 0.0 later
+        tN = e;
+        tD = c;
+    }
+    else {                 // get the closest points on the infinite lines
+        sN = (b*e - c*d);
+        tN = (a*e - b*d);
+        if (sN < 0.0) {        // sc < 0 => the s=0 edge is visible
+            sN = 0.0;
+            tN = e;
+            tD = c;
+        }
+        else if (sN > sD) {  // sc > 1  => the s=1 edge is visible
+            sN = sD;
+            tN = e + b;
+            tD = c;
+        }
+    }
+
+    if (tN < 0.0) {            // tc < 0 => the t=0 edge is visible
+        tN = 0.0;
+        // recompute sc for this edge
+        if (-d < 0.0)
+            sN = 0.0;
+        else if (-d > a)
+            sN = sD;
+        else {
+            sN = -d;
+            sD = a;
+        }
+    }
+    else if (tN > tD) {      // tc > 1  => the t=1 edge is visible
+        tN = tD;
+        // recompute sc for this edge
+        if ((-d + b) < 0.0)
+            sN = 0;
+        else if ((-d + b) > a)
+            sN = sD;
+        else {
+            sN = (-d +  b);
+            sD = a;
+        }
+    }
+    // finally do the division to get sc and tc
+    sc = (fabs(sN) < 0.0001f ? 0.0f : sN / sD);
+    tc = (fabs(tN) < 0.0001f ? 0.0f : tN / tD);
+
+    // get the difference of the two closest points
+    SrVec   dP = w + (sc * u) - (tc * v);  // =  S1(sc) - S2(tc)
+    return dP.norm()< 0.175f;
+}
+
+void MeCtNewLocomotion::check_collision()
+ {
+	sk->update_global_matrices();
+	SmartBody::SBJoint* Rhip = sk->getJointByName("r_hip");
+	SmartBody::SBJoint* Rknee = sk->getJointByName("r_knee");
+	SmartBody::SBJoint* Rfoot = sk->getJointByName("r_ankle");
+	SmartBody::SBJoint* Rend = sk->getJointByName("r_forefoot");
+	SmartBody::SBJoint* Lhip = sk->getJointByName("l_hip");
+	SmartBody::SBJoint* Lknee = sk->getJointByName("l_knee");
+	SmartBody::SBJoint* Lfoot = sk->getJointByName("l_ankle");
+	SmartBody::SBJoint* Lend = sk->getJointByName("l_forefoot");
+    SrVec r[4]={Rhip->gmat().get_translation(), Rknee->gmat().get_translation(), Rfoot->gmat().get_translation(), Rend->gmat().get_translation()};
+    SrVec l[4]={Lhip->gmat().get_translation(), Lknee->gmat().get_translation(), Lfoot->gmat().get_translation(), Lend->gmat().get_translation()};
+    bool collide=false;
+    for(int i=0;i<3;i++)
+        for(int j=0; j<3; j++)
+        {
+            bool temp=capsule_collision(r[i], r[i+1], l[i], l[i+1]);
+            collide=collide||temp;
+        }
+    if(collide)
+	{
+        errorSum+=100.0f;
+	}
+}
+//------------------------------------------------------------------------------------------------------//
+//-----------------------------------------FADING-------------------------------------------------------//
+//------------------------------------------------------------------------------------------------------//
 Fading::Fading()
 {
 	fadeMode = FADING_MODE_OFF;
@@ -724,99 +838,4 @@ void Fading::updateDt( float curTime )
 		dt = curTime - prev_time;
 	}	
 	prev_time = curTime;
-}
-
-bool MeCtNewLocomotion::capsule_collision(SrVec  mp1, SrVec mp2, SrVec np1, SrVec np2)
-{
-    SrVec   u = mp2 - mp1;
-    SrVec   v = np2 - np1;
-    SrVec   w = mp1 - np1;
-    float    a = dot(u,u);         // always >= 0
-    float    b = dot(u,v);
-    float    c = dot(v,v);         // always >= 0
-    float    d = dot(u,w);
-    float    e = dot(v,w);
-    float    D = a*c - b*b;        // always >= 0
-    float    sc, sN, sD = D;       // sc = sN / sD, default sD = D >= 0
-    float    tc, tN, tD = D;       // tc = tN / tD, default tD = D >= 0
-
-    // compute the line parameters of the two closest points
-    if (D < 0.0001f) { // the lines are almost parallel
-        sN = 0.0;         // force using point P0 on segment S1
-        sD = 1.0;         // to prevent possible division by 0.0 later
-        tN = e;
-        tD = c;
-    }
-    else {                 // get the closest points on the infinite lines
-        sN = (b*e - c*d);
-        tN = (a*e - b*d);
-        if (sN < 0.0) {        // sc < 0 => the s=0 edge is visible
-            sN = 0.0;
-            tN = e;
-            tD = c;
-        }
-        else if (sN > sD) {  // sc > 1  => the s=1 edge is visible
-            sN = sD;
-            tN = e + b;
-            tD = c;
-        }
-    }
-
-    if (tN < 0.0) {            // tc < 0 => the t=0 edge is visible
-        tN = 0.0;
-        // recompute sc for this edge
-        if (-d < 0.0)
-            sN = 0.0;
-        else if (-d > a)
-            sN = sD;
-        else {
-            sN = -d;
-            sD = a;
-        }
-    }
-    else if (tN > tD) {      // tc > 1  => the t=1 edge is visible
-        tN = tD;
-        // recompute sc for this edge
-        if ((-d + b) < 0.0)
-            sN = 0;
-        else if ((-d + b) > a)
-            sN = sD;
-        else {
-            sN = (-d +  b);
-            sD = a;
-        }
-    }
-    // finally do the division to get sc and tc
-    sc = (fabs(sN) < 0.0001f ? 0.0f : sN / sD);
-    tc = (fabs(tN) < 0.0001f ? 0.0f : tN / tD);
-
-    // get the difference of the two closest points
-    SrVec   dP = w + (sc * u) - (tc * v);  // =  S1(sc) - S2(tc)
-    return dP.norm()< 0.175f;   // return the closest distance
-}
-
-void MeCtNewLocomotion::check_collision()
- {
-	sk->update_global_matrices();
-	SmartBody::SBJoint* Rhip = sk->getJointByName("r_hip");
-	SmartBody::SBJoint* Rknee = sk->getJointByName("r_knee");
-	SmartBody::SBJoint* Rfoot = sk->getJointByName("r_ankle");
-	SmartBody::SBJoint* Rend = sk->getJointByName("r_forefoot");
-	SmartBody::SBJoint* Lhip = sk->getJointByName("l_hip");
-	SmartBody::SBJoint* Lknee = sk->getJointByName("l_knee");
-	SmartBody::SBJoint* Lfoot = sk->getJointByName("l_ankle");
-	SmartBody::SBJoint* Lend = sk->getJointByName("l_forefoot");
-    SrVec r[4]={Rhip->gmat().get_translation(), Rknee->gmat().get_translation(), Rfoot->gmat().get_translation(), Rend->gmat().get_translation()};
-    SrVec l[4]={Lhip->gmat().get_translation(), Lknee->gmat().get_translation(), Lfoot->gmat().get_translation(), Lend->gmat().get_translation()};
-    bool collide=false;
-    for(int i=0;i<3;i++)
-        for(int j=0; j<3; j++)
-        {
-            bool temp=capsule_collision(r[i], r[i+1], l[i], l[i+1]);
-            collide=collide||temp;
-        }
-    if(collide)
-	{
-        errorSum+=100.0f;
-	}
 }

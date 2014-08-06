@@ -88,25 +88,25 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		ConstraintMap   posConsLf, rotConsLf;
 	public:
 		static std::string _type_name;
-		void setScootSpd(float v) {scootSpd = v;}
+		void  setScootSpd(float v) {scootSpd = v;}
 		float getScootSpd() {return scootSpd;}
-		void setMovingSpd(float v) {movingSpd = v;}
+		void  setMovingSpd(float v) {movingSpd = v;}
 		float getMovingSpd() {return movingSpd;}
-		void setTurningSpd(float v) {turningSpd = v;}
+		void  setTurningSpd(float v) {turningSpd = v;}
 		float getTurningSpd() {return turningSpd;}
-		void setValid(bool v) {_valid = v;}
-		void setDesiredHeading(float v) {desiredHeading = v;}
+		void  setValid(bool v) {_valid = v;}
+		void  setDesiredHeading(float v) {desiredHeading = v;}
 		float getDesiredHeading() {return desiredHeading;}
-		void notify(SmartBody::SBSubject* subject);
-		void play(float t, bool useTemp=false);
-		void reset();
-		void loopMotion(float def, float speed);
+		void  notify(SmartBody::SBSubject* subject);
+		void  play(float t, bool useTemp=false);
+		void  reset(bool resetPos=false);
+		void  loopMotion(float def, float speed);
 	private:
-		void addPawn(SrVec& pos, std::string name);
+		void  addPawn(SrVec& pos, std::string name);
 		float legDistance(bool Leftleg);
-		bool capsule_collision(SrVec  mp1, SrVec mp2, SrVec np1, SrVec np2);
-		void check_collision();
-		bool _valid, _analysis;
+		bool  capsule_collision(SrVec  mp1, SrVec mp2, SrVec np1, SrVec np2);
+		void  check_collision();
+		bool  _valid, _analysis;
 		float scootSpd;
 		float movingSpd;
 		float turningSpd;
@@ -114,31 +114,32 @@ class MeCtNewLocomotion : public SmartBody::SBController
 		float fadein;
 		float fadeout;
 		float startTime;
-		float neutralLegDistance;
-		int currStp;
 		float errorSum;
 		float walkScale;
 		float walkSpeedGain;
+		float motionSpeed;
 		SkChannelArray _channels;
 		SbmCharacter* character;
-		double _lastTime;
+		float _lastTime, _prevTime;
 		float desiredHeading, motionTime;
 		double ikDamp;
-		SmartBody::SBMotion *C, *S;
+		SmartBody::SBMotion *dataCycle, *smoothCycle;
 		SmartBody::SBSkeleton* sk;
 		std::string lend, rend, hipjoint;
 		vector<string> attributes_names;
 		SrBuffer<float> tempBuffer;
 		SrBuffer<float>* BufferRef;
-
 		std::vector<int> rplant;
 		std::vector<int> lplant;
+		float d(SrQuat a, SrQuat b){
+			float v = a.w*b.w+a.x*b.x+a.y*b.y+a.z*b.z;
+			return 1.0f - v*v;
+		}
 	protected:	
 		void updateChannelBuffer(SrBuffer<float>& buffer, std::vector<SrQuat>& quatList, bool bRead = false);
 		void writeToSkeleton(SrBuffer<float>& buffer);
-		void updateChannelBuffer(SrBuffer<float>& buffer);
+		void updateChannelBuffer(SrBuffer<float>& buffer, float t);
 		void updateWorldOffset(SrBuffer<float>& buffer, SrQuat& rot, SrVec& pos);
 		void updateConstraints(float t);
 };
-
 #endif
