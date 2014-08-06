@@ -19,6 +19,7 @@
 #ifndef QUADDISTTREE_H
 #define QUADDISTTREE_H
 
+
 #include "hashutils.h"
 #include "dtree.h"
 #include "multilinear.h"

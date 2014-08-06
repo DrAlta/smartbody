@@ -19,6 +19,7 @@
 #ifndef PINOCCHIOAPI_H
 #define PINOCCHIOAPI_H
 
+#include "PinnocchioCallback.h"
 #include "mesh.h"
 #include "quaddisttree.h"
 #include "attachment.h"
@@ -30,6 +31,10 @@ struct PinocchioOutput
     vector<Vector3> embedding;
     Attachment *attachment; //user responsible for deletion
 };
+
+
+
+
 
 Vector3 PINOCCHIO_API barycentricCoord(Vector3& projPos, Tri3Object& tri);
 //calls the other functions and does the whole rigging process

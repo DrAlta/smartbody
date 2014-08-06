@@ -377,7 +377,7 @@ public:
 			{
 				childIdx = boneChildIdxs[j];
 			}
-			printf("child idx size = %d\n",childIdx.size());
+			//printf("child idx size = %d\n",childIdx.size());
 			for(i = 0; i < nv; ++i) {
 				
 				if (boneDists[i][j] <= boneDists[i][closest[i]] * 1.00001)
@@ -482,7 +482,7 @@ Mesh Attachment::deform(const Mesh &mesh, const vector<Transform<> > &transforms
 
 Attachment::Attachment(const Mesh &mesh, const Skeleton &skeleton, const vector<Vector3> &match, const VisibilityTester *tester)
 {
-#if 0
+#if 1
     a = new AttachmentPrivate1(mesh, skeleton, match, tester);
 #else
 	a = new AttachmentPrivate2(mesh, skeleton, match, tester);
@@ -491,7 +491,7 @@ Attachment::Attachment(const Mesh &mesh, const Skeleton &skeleton, const vector<
 
 vector<Vector<double, -1> >& Attachment::getAllWeights()
 {
-#if 0
+#if 1
 	if (!a)
 		a = new AttachmentPrivate1();
 	AttachmentPrivate1* aprivate = dynamic_cast<AttachmentPrivate1*>(a);

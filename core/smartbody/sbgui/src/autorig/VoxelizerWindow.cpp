@@ -187,14 +187,21 @@ void VoxelizerWindow::draw()
 	//Create a surface extractor. Comment out one of the following two lines to decide which type gets created.
 	//PolyVox::CubicSurfaceExtractor< PolyVox::SimpleVolume<uint8_t> > surfaceExtractor(voxels, voxels->getEnclosingRegion(), &mesh);
 	voxelMesh = new PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>();
-	PolyVox::MarchingCubesSurfaceExtractor< PolyVox::SimpleVolume<uint8_t> > surfaceExtractor(voxels, voxels->getEnclosingRegion(), voxelMesh);
+	cubicMesh = new PolyVox::SurfaceMesh<PolyVox::PositionMaterial>();
+	PolyVox::MarchingCubesSurfaceExtractor< PolyVox::SimpleVolume<uint8_t> > surfaceExtractorMC(voxels, voxels->getEnclosingRegion(), voxelMesh);
+	PolyVox::CubicSurfaceExtractor< PolyVox::SimpleVolume<uint8_t>> surfaceExtractorCubic(voxels, voxels->getEnclosingRegion(), cubicMesh);
+
 	//Execute the surface extractor.
-	surfaceExtractor.execute();
+	surfaceExtractorMC.execute();
+	surfaceExtractorCubic.execute();
 
 	float meshRescale = voxelScale/voxels->getDepth();
 	SrVec mtran = -SrVec(0.5f,0.5f,0.5f)*voxelScale + voxelCenter;
 	voxelMesh->scaleVertices(meshRescale);
 	voxelMesh->translateVertices(PolyVox::Vector3DFloat(mtran[0],mtran[1],mtran[2]));
+
+	cubicMesh->scaleVertices(meshRescale);
+	cubicMesh->translateVertices(PolyVox::Vector3DFloat(mtran[0],mtran[1],mtran[2]));
 	
 	startBuildVoxels = false;
 	finishBuildVoxels = true;
@@ -569,6 +576,12 @@ PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>* VoxelizerWindow::getNorma
 {
 	return voxelMesh;
 }
+
+PolyVox::SurfaceMesh<PolyVox::PositionMaterial>* VoxelizerWindow::getNormalizedCubicMesh()
+{
+	return cubicMesh;
+}
+
 
 SrVec VoxelizerWindow::getVoxelCenterByID( SrVec3i& voxID )
 {

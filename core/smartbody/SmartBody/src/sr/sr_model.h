@@ -126,7 +126,7 @@ class SrModel : public SrSharedClass
     SBAPI virtual ~SrModel ();
 
 	SBAPI void computeTangentBiNormal(); // build the tangent and binormal vectors for each vertex. Used for tangent space normal mapping
-	SBAPI void computeNormals();
+	SBAPI void computeNormals(int flat = 0);
 
     /*! Returns true if the model has no faces, and false otherwise */
     SBAPI bool empty () { return F.empty(); }

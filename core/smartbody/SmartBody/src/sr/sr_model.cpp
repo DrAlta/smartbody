@@ -1345,21 +1345,38 @@ void SrModel::restoreOriginalVertices()
 	}
 }
 
-SBAPI void SrModel::computeNormals()
+SBAPI void SrModel::computeNormals(int flat)
 {
-	N.size(V.size()); // set normal vector to the same size
-	N.setall(SrPnt(0,0,0));
-	Fn.size(F.size());
+	
 
-	for (int i=0;i<F.size();i++)
+	if (flat)
 	{
-		SrVec fn = face_normal(i);
-		Fn[i].set(F[i].a, F[i].b, F[i].c);
-		for (int j=0;j<3;j++)
+		N.size(F.size()); // set normal vector to the same size
+		N.setall(SrPnt(0,0,0));
+		Fn.size(F.size());
+		for (int i=0;i<F.size();i++)
 		{
-			N[F[i][j]] += fn;			
+			SrVec fn = face_normal(i);
+			Fn[i].set(i, i, i);
+			N[i] = fn;
 		}
 	}
+	else
+	{
+		N.size(V.size()); // set normal vector to the same size
+		N.setall(SrPnt(0,0,0));
+		Fn.size(F.size());
+		for (int i=0;i<F.size();i++)
+		{
+			SrVec fn = face_normal(i);
+			Fn[i].set(F[i].a, F[i].b, F[i].c);
+			for (int j=0;j<3;j++)
+			{
+				N[F[i][j]] += fn;			
+			}
+		}
+	}
+	
 
 	for (int i=0;i<N.size();i++)
 		N[i].normalize();

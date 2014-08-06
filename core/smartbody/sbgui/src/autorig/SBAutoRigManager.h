@@ -8,7 +8,16 @@
 #include <sr/sr_model.h>
 #include <sbm/sbm_deformable_mesh.h>
 
+
 class Mesh;
+
+class AutoRigCallBack
+{
+public:
+	virtual void voxelComplete(SrModel& voxelModel) = 0;
+	virtual void skeletonComplete(SmartBody::SBSkeleton* sk) = 0;
+	virtual void skinComplete(DeformableMesh* defMesh) = 0;
+};
 
 class SBAutoRigManager // build auto rigging given a static character mesh
 {
@@ -41,9 +50,11 @@ class SBAutoRigManager // build auto rigging given a static character mesh
 		bool buildAutoRiggingFromPawnMesh(const std::string& pawnName, int riggingType, const std::string& outSkName, const std::string& outDeformableMeshName);	
 
 		bool updateSkinWeightFromCharacterMesh(const std::string& charName, int weightType);
+
+		void setAutoRigCallBack(AutoRigCallBack* callback) { autoRigCallBack = callback; }
 protected:
 		void transferSkinWeight(SmartBody::SBSkeleton& skel, SrModel& inModel, std::vector<std::map<int,float> >& inWeight, SrModel& outModel, std::vector<std::map<int,float> >& outWeight);
-
+		AutoRigCallBack* autoRigCallBack;
 };
 
 SBAutoRigManager* getAutoRigManager();

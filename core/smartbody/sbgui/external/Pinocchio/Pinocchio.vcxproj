@@ -100,6 +100,7 @@ copy /Y "$(Configuration)\$(ProjectName).pdb" lib
     <ClCompile Include="lsqSolver.cpp" />
     <ClCompile Include="matrix.cpp" />
     <ClCompile Include="mesh.cpp" />
+    <ClCompile Include="PinnocchioCallback.cpp" />
     <ClCompile Include="Pinocchio.cpp" />
     <ClCompile Include="pinocchioApi.cpp" />
     <ClCompile Include="refinement.cpp" />
@@ -119,6 +120,7 @@ copy /Y "$(Configuration)\$(ProjectName).pdb" lib
     <ClInclude Include="matrix.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="multilinear.h" />
+    <ClInclude Include="PinnocchioCallback.h" />
     <ClInclude Include="Pinocchio.h" />
     <ClInclude Include="pinocchioApi.h" />
     <ClInclude Include="pointprojector.h" />
