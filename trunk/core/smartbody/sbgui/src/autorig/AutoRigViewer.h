@@ -15,10 +15,43 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
 #include <string>
+#include <jointmapviewer/JointMapViewer.h>
+#include "autorig/SBAutoRigManager.h"
 
 class RetargetStepWindow;
 
-class AutoRigViewer : public Fl_Double_Window
+class ModelViewer : public MouseViewer
+{
+public:
+	ModelViewer(int x, int y, int w, int h, char* name);
+	~ModelViewer();
+	void setModel(SrModel& model);
+	void focusOnModel();
+	virtual void draw();
+
+protected:
+	void updateFancyLights();
+	SrSnModel* _model;
+};
+
+class SkinViewer : public MouseViewer
+{
+public:
+	SkinViewer(int x, int y, int w, int h, char* name);
+	~SkinViewer();
+	void setSkeleton(SmartBody::SBSkeleton* sk);
+	void setDeformableMesh(DeformableMesh* mesh);
+	virtual void draw();
+	void focusOnSkeleton();
+protected:
+	void drawSkinWeight();
+	SkScene* skeletonScene;
+	SrSaGlRender renderFunction;
+	SmartBody::SBSkeleton* skeleton;
+	DeformableMesh* mesh;
+};
+
+class AutoRigViewer : public Fl_Double_Window, AutoRigCallBack
 {
 	public:
 		AutoRigViewer(int x, int y, int w, int h, char* name);
@@ -32,11 +65,18 @@ class AutoRigViewer : public Fl_Double_Window
 		void updateAutoRigViewer();
 
 		void setRetargetStepWindow(RetargetStepWindow* val) { retargetStepWindow = val; }
+
+		virtual void voxelComplete(SrModel& voxelModel);
+		virtual void skeletonComplete(SmartBody::SBSkeleton* sk);
+		virtual void skinComplete(DeformableMesh* defMesh);
 	public:
 		std::string _deletePawnName;
 		Fl_Choice* _choicePawns;
 		Fl_Choice* _choiceVoxelRigging;
 		Fl_Button* _buttonAutoRig;	
+
+		ModelViewer* modelViewer;
+		SkinViewer*  skinViewer;
 	protected:
 		RetargetStepWindow* retargetStepWindow;		
 };

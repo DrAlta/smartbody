@@ -55,6 +55,7 @@ public:
 	
 	PolyVox::SimpleVolume<uint8_t>* getVoxels();	
 	PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>* getNormalizedVoxelMesh();	
+	PolyVox::SurfaceMesh<PolyVox::PositionMaterial>* getNormalizedCubicMesh();	
 	virtual void draw();	
 protected:
 	bool finishBuildVoxels;
@@ -62,6 +63,7 @@ protected:
 	SrModel* mesh;
 	PolyVox::SimpleVolume<uint8_t>* voxels; // use uint8 to tell between inside, outside, and shell
 	PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>* voxelMesh;
+	PolyVox::SurfaceMesh<PolyVox::PositionMaterial>* cubicMesh;
 	SrVec voxelCenter;
 	float voxelScale;
 	int   voxelResolution;

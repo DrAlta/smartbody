@@ -50,6 +50,9 @@
     <ClCompile Include="skeleton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PinnocchioCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="attachment.h">
@@ -119,6 +122,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vecutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PinnocchioCallback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -165,6 +165,7 @@ void SkScene::initInternal()
 	sphere = createSphere(scaleFactor*1.0f);	 
 	group_p->add ( new SrSnMatrix, MatrixPos );
 	group_p->add ( sphere, SpherePos );
+	//group_p->add (axis);
 	if (!_showJoints)
 		group_p->visible(false);
 

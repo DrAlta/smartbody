@@ -316,7 +316,6 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
-	
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
@@ -507,11 +506,11 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
            break;
     }    
 
-   LOG("(model.mtlnames.size() == 0 #1\n");
+   //LOG("(model.mtlnames.size() == 0 #1\n");
 
    if (model.mtlnames.size() == 0)
    {
-	   LOG("(model.mtlnames.size() == 0\n");
+	   //LOG("(model.mtlnames.size() == 0\n");
 	   glBegin ( GL_TRIANGLES ); // some cards do require begin/end for each triangle!
 	   for (int k=0; k<F.size(); k++ )
 	   {	
@@ -526,7 +525,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    }
    else
    {	   
-	   LOG("(model.mtlnames.size() != 0\n");
+	   //LOG("(model.mtlnames.size() != 0\n");
 	   for (int i=0;i<model.mtlnames.size();i++)
 	   {
 		   std::string mtlName = model.mtlnames[i];

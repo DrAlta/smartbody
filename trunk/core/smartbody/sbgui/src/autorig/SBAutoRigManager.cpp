@@ -25,20 +25,51 @@
 
 #if USE_AUTO_RIGGING
 bool SrModelToMesh( SrModel& model, Mesh& mesh, bool sanityCheck = true );
-bool AutoRigToSBSk( PinocchioOutput& out, Skeleton& sk, SmartBody::SBSkeleton& sbSk);
+bool AutoRigToSBSk( PinocchioOutput& out, SmartBody::SBSkeleton& sbSk);
 bool AutoRigToDeformableMesh(PinocchioOutput& out, SrModel& m, SmartBody::SBSkeleton& sbSk, DeformableMesh& deformMesh);
 bool PolyVoxMeshToSrModel( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, SrModel& model);
 bool PolyVoxMeshToPinoMesh( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& polyMesh, Mesh& mesh );
 void exportPolyVoxMeshToObj( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, std::string filename );
+void exportCubicMeshToObj( PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, std::string filename );
 void buildVoxelSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, SkinWeight& skinWeight);
 void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, std::vector<std::map<int,float>>& skinWeight);
 void WeightMapToSkinWeight(std::vector<std::map<int,float>>& weightMap, SkinWeight& skinWeight);
 #endif
 
+class PinoAutoRigCallback : public PinnocchioCallBack
+{
+public:
+	PinoAutoRigCallback(AutoRigCallBack* callback)
+	{
+		autoRigCallBack = callback;
+	}
+
+	virtual void callbackFunc()
+	{
+		Fl::check();
+	}
+	virtual void skeletonCompleteCallBack(std::vector<Vector3>& embedding)
+	{
+		if (autoRigCallBack)
+		{
+			SmartBody::SBSkeleton* autoRigSk = new SmartBody::SBSkeleton();
+			PinocchioOutput out;
+			out.embedding = embedding;
+			AutoRigToSBSk(out, *autoRigSk);
+			autoRigCallBack->skeletonComplete(autoRigSk);
+			Fl::check();
+		}
+	}
+
+
+protected:
+	AutoRigCallBack* autoRigCallBack;
+};
+
 SBAutoRigManager* SBAutoRigManager::_singleton = NULL;
 SBAutoRigManager::SBAutoRigManager()
 {
-	
+	autoRigCallBack = NULL;
 }
 
 SBAutoRigManager::~SBAutoRigManager()
@@ -377,7 +408,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inMo
 	SmartBody::SBSkeleton* sbSk = new SmartBody::SBSkeleton();
 	//sbSk->setName("testAutoRig.sk");
 	//sbSk->setFileName()
-	bool isValidSkeleton = AutoRigToSBSk(out, sk, *sbSk);	
+	bool isValidSkeleton = AutoRigToSBSk(out, *sbSk);	
 
 	// build deformable model using voxel skinning weights
 	SbmDeformableMeshGPU* deformMesh = new SbmDeformableMeshGPU();
@@ -453,6 +484,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inMo
 
 bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
+	
 #if USE_AUTO_RIGGING
 	int voxelSize = 150;
 	VoxelizerWindow* voxelWindow = new VoxelizerWindow(0,0,voxelSize,voxelSize,"voxelWindow");
@@ -481,6 +513,21 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 	//SrModel tempMesh;
 	//PolyVoxMeshToSrModel(mesh,tempMesh);
 	exportPolyVoxMeshToObj(*voxelMesh,"testVol.obj");
+
+	
+
+	if (autoRigCallBack)
+	{
+		PolyVox::SurfaceMesh<PolyVox::PositionMaterial>* cubicMesh = voxelWindow->getNormalizedCubicMesh();
+		exportCubicMeshToObj(*cubicMesh,"testVolCubic.obj");
+		SrModel srCubicMesh; srCubicMesh.import_obj("testVolCubic.obj");
+		srCubicMesh.computeNormals(0);
+		autoRigCallBack->voxelComplete(srCubicMesh);
+		
+		Fl::check();
+	}
+	
+	
 	//exportPolyVoxMeshToObj(lowResMesh,"testVolLowRes.obj");
 
 	Mesh m, origMesh;
@@ -490,7 +537,12 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 	if (!isValidModel) return false; // no auto-rigging if the model is not valid
 	
 	//PinocchioOutput out = autorig(sk,m);	
+
+	PinoAutoRigCallback* pinoCallback = new PinoAutoRigCallback(autoRigCallBack);
+	PinnocchioCallBackManager::singletonPtr()->setCallBack(pinoCallback);
 	PinocchioOutput out = autorigVoxelTransfer(sk,m,origMesh);	
+	PinnocchioCallBackManager::singletonPtr()->setCallBack(NULL);
+
 	//LOG("embedding = %d",out.embedding.size());
 	if (out.embedding.size() == 0)
 		return false;	
@@ -500,12 +552,12 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 	SmartBody::SBSkeleton* sbSk = new SmartBody::SBSkeleton();
 	//sbSk->setName("testAutoRig.sk");
 	//sbSk->setFileName()
-	bool isValidSkeleton = AutoRigToSBSk(out, sk, *sbSk);	
+	bool isValidSkeleton = AutoRigToSBSk(out, *sbSk);	
 	SbmDeformableMeshGPU* deformMesh = new SbmDeformableMeshGPU();
 	deformMesh->meshName = outDeformableMeshName;	
 	deformMesh->setName(outDeformableMeshName);
 	bool isValidDeformableMesh = AutoRigToDeformableMesh(out, inModel, *sbSk, *deformMesh);
-
+	
 
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	sbSk->ref();
@@ -515,6 +567,15 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 
 	assetManager->addSkeleton(sbSk);
 	assetManager->addDeformableMesh(outDeformableMeshName, deformMesh);
+
+	//deformMesh->buildSkinnedVertexBuffer();
+	if (autoRigCallBack)
+	{
+		deformMesh->buildVertexBufferGPU();
+		autoRigCallBack->skinComplete(assetManager->getDeformableMesh(outDeformableMeshName));
+		Fl::check();
+	}
+
 	
 	delete voxelWindow;
 	return true;	
@@ -540,7 +601,7 @@ bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName
 	SmartBody::SBSkeleton* sbSk = new SmartBody::SBSkeleton();
 	//sbSk->setName("testAutoRig.sk");
 	//sbSk->setFileName()
-	bool isValidSkeleton = AutoRigToSBSk(out, sk, *sbSk);	
+	bool isValidSkeleton = AutoRigToSBSk(out, *sbSk);	
 	//LOG("autoRig result, num joints = %d",out.embedding.size());
 	//LOG("AutoRig Skeleton = %s", sbSk->saveToString().c_str());
 	SbmDeformableMeshGPU* deformMesh = new SbmDeformableMeshGPU();
@@ -1591,7 +1652,7 @@ bool AutoRigToDeformableMesh( PinocchioOutput& out, SrModel& m, SmartBody::SBSke
 	return true;
 }
 
-bool AutoRigToSBSk( PinocchioOutput& out, Skeleton& sk, SmartBody::SBSkeleton& sbSk)
+bool AutoRigToSBSk( PinocchioOutput& out, SmartBody::SBSkeleton& sbSk)
 {
 	//std::string jointNameMap[] = {"spine3","spine1", "base", "skullbase", "r_hip", "r_knee", "r_ankle", "r_forefoot", "l_hip", "l_knee", "l_ankle", "l_forefoot", "r_shoulder", "r_elbow", "r_wrist", "l_shoulder", "l_elbow", "l_wrist" };
 	//int prevJointIdx[] = { 1, 2, -1, 0, 2, 4, 5, 6, 2, 8, 9, 10, 0, 12, 13, 0, 15, 16};
@@ -1758,6 +1819,34 @@ void exportPolyVoxMeshToObj( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNorma
 	for (int i=0;i<nVtx;i++)
 	{
 		PolyVox::PositionMaterialNormal& vtx = mesh.m_vecVertices[i];
+		x = vtx.position.getX();
+		y = vtx.position.getY();
+		z = vtx.position.getZ();
+		fprintf(fp,"v %f %f %f\n",x,y,z);
+	}
+
+	int a,b,c;
+	for (int i=0;i<nTri;i++)
+	{
+		a = mesh.m_vecTriangleIndices[i*3]+1;
+		b = mesh.m_vecTriangleIndices[i*3+1]+1;
+		c = mesh.m_vecTriangleIndices[i*3+2]+1;
+		fprintf(fp,"f %d %d %d\n",a,b,c);
+	}
+
+	fclose(fp);
+}
+
+void exportCubicMeshToObj( PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, std::string filename )
+{
+	FILE* fp = fopen(filename.c_str(),"wt");
+	int nVtx = mesh.getNoOfVertices();
+	int nTri = mesh.getNoOfIndices()/3;	
+
+	float x,y,z;
+	for (int i=0;i<nVtx;i++)
+	{
+		PolyVox::PositionMaterial& vtx = mesh.m_vecVertices[i];
 		x = vtx.position.getX();
 		y = vtx.position.getY();
 		z = vtx.position.getZ();

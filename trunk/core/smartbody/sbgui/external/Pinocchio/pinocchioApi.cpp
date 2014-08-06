@@ -17,7 +17,9 @@
 */
 
 #include "pinocchioApi.h"
+#include "PinnocchioCallback.h"
 #include <fstream>
+#include <ctime>
 
 
 PinocchioOutput autorig(const Skeleton &given, const Mesh &m, bool computeSkinWeights)
@@ -177,27 +179,31 @@ PinocchioOutput PINOCCHIO_API autorigVoxelTransfer( const Skeleton &given, Mesh 
 	int i;
 	PinocchioOutput out;
 
+	PinnocchioCallBackManager& callbackManager = PinnocchioCallBackManager::singleton();
 	Mesh newMesh = prepareMesh(voxelMesh);
 
 	if(newMesh.vertices.size() == 0)
 		return out;
 
 	TreeType *distanceField = constructDistanceField(newMesh);
-
+	callbackManager.runCallBack();
 	//discretization
 	vector<Sphere> medialSurface = sampleMedialSurface(distanceField);
+	callbackManager.runCallBack();
 
 	vector<Sphere> spheres = packSpheres(medialSurface);
+	callbackManager.runCallBack();
 
 	PtGraph graph = connectSamples(distanceField, spheres);
-
+	callbackManager.runCallBack();
 	//discrete embedding
 	vector<vector<int> > possibilities = computePossibilities(graph, spheres, given);
-
+	callbackManager.runCallBack();
 	//constraints can be set by respecifying possibilities for skeleton joints:
 	//to constrain joint i to sphere j, use: possiblities[i] = vector<int>(1, j);
 
 	vector<int> embeddingIndices = discreteEmbed(graph, spheres, given, possibilities);
+	callbackManager.runCallBack();
 
 	if(embeddingIndices.size() == 0) { //failure
 		delete distanceField;
@@ -205,7 +211,7 @@ PinocchioOutput PINOCCHIO_API autorigVoxelTransfer( const Skeleton &given, Mesh 
 	}
 
 	vector<Vector3> discreteEmbedding = splitPaths(embeddingIndices, graph, given);
-
+	callbackManager.runCallBack();
 	//continuous refinement
 	vector<Vector3> medialCenters(medialSurface.size());
 	for(i = 0; i < (int)medialSurface.size(); ++i)
@@ -213,6 +219,28 @@ PinocchioOutput PINOCCHIO_API autorigVoxelTransfer( const Skeleton &given, Mesh 
 
 	out.embedding = refineEmbedding(distanceField, medialCenters, discreteEmbedding, given);
 	
+	PinnocchioCallBack* callBack = callbackManager.getCallBack();
+	if (callBack)
+	{
+		std::vector<Vector3> outSk(out.embedding.size());
+		for (unsigned int i=0;i<outSk.size();i++)
+		{
+			outSk[i] = (out.embedding[i] - voxelMesh.toAdd) / voxelMesh.scale;
+		}
+
+		callBack->skeletonCompleteCallBack(outSk);
+
+		std::clock_t start;
+		double duration = 0.f;
+
+		start = std::clock();
+		while (duration < 0.1f) // delay 1sec to show the skeleton
+		{
+			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+			callbackManager.runCallBack();
+		}
+	}
+	callbackManager.runCallBack();
 
 	if (computeSkinWeights)
 	{
@@ -257,10 +285,12 @@ PinocchioOutput PINOCCHIO_API autorigVoxelTransfer( const Skeleton &given, Mesh 
 				}
 			}	
 		}
+		callbackManager.runCallBack();
 		//cleanup
 		delete tester;
 		delete voxelAttachment;
 	}		
+	callbackManager.runCallBack();
 	delete distanceField;
 	return out;
 }
