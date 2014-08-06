@@ -466,30 +466,37 @@ double srLinearCurve::tail_boundary( double t, bool *cropped_p ) {
 
 double srLinearCurve::evaluate( double t, bool *cropped_p )	{
 
-	if( cropped_p ) {
+	if( cropped_p ) 
+	{
 		*cropped_p = false;
 	}
 	// find_floor_key checks dirty bit update...
 	Key *floor_p = find_floor_key( t ); // if defined, ( floor-param <= t )
-	if( floor_p )	{
-
+	if( floor_p )	
+	{
 		curr_p = floor_p; // evaluate() establishes curr = floor
 		double curr_param = curr_p->param;
 
-		if( t > curr_param )	{
-			if( curr_p->next() ) {
+		if( t > curr_param )	
+		{
+			if( curr_p->next() ) 
+			{
 				return( curr_p->lerp( t ) );
 			}
 		}
 		else
-		if( t == curr_param )	{
-			if( tail_bound_mode == REPEAT )	{
+		if( t == curr_param )	
+		{
+			if( tail_bound_mode == REPEAT )	
+			{
 				
-				if( curr_p->next() ) {
+				if( curr_p->next() ) 
+				{
 					return( curr_p->lerp( t ) );
 				}
 			}
-			else	{
+			else	
+			{
 				return( curr_p->value );
 			}
 		}
@@ -497,12 +504,14 @@ double srLinearCurve::evaluate( double t, bool *cropped_p )	{
 		// after tail, or repeat-tail_bound = head condition:
 		return( tail_boundary( t, cropped_p ) );
 	}
-	if( head_p )	{
+	if( head_p )	
+	{
 		// before head:
 		return( head_boundary( t, cropped_p ) );
 	}
 	curr_p = NULL;
-	if( cropped_p ) {
+	if( cropped_p ) 
+	{
 		*cropped_p = true;
 	}
 	return( 0.0 );

@@ -504,7 +504,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 			goal.desiredSpeed = desiredSpeed;
 			goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
 			goal.targetIsRandom = false;
-			//goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
+			// goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
 			// compute a collision free goal toward the target
 			goal.targetLocation = Util::Point(newGoal.x , 0.0f, newGoal.z);
 			// make sure that the desired goal is within the bounds of the steering grid
@@ -1130,7 +1130,6 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 	Util::Vector totalSteeringForce;
 	float angleGlobal;
 	float curSpeed;
-
 	//--------------------------------------------------------
 	// WJ added start
 	// TODO: define/initialize these vars properly:
@@ -1261,17 +1260,13 @@ float PPRAISteeringAgent::evaluateNewLoco(float dt, float x, float y, float z, f
 	{
 		if(flag)
 		{
-			//character->new_locomotion_ct->reset();
 			flag= false;
-			//forward = Util::Vector(0.0f, 0.0f, 1.0f);
 			character->_reachTarget = true;
-			character->new_locomotion_ct->setValid(false);
-			character->new_locomotion_ct->setMovingSpd(0.0f);
-			character->new_locomotion_ct->setTurningSpd(0.0f);
-			character->new_locomotion_ct->setScootSpd(0.0f);
-			newSpeed = 0.0f;
 			sendLocomotionEvent("success");
 			character->new_locomotion_ct->reset();
+			//forward = Util::Vector(0.0f, 0.0f, 1.0f);
+			//rightSide = rightSideInXZPlane(forward);
+			newSpeed = 0.0f;
 		}
 	}
 	else
