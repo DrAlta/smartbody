@@ -286,7 +286,7 @@ void MeCtReachEngine::updateMotionExamples( const MotionDataSet& inMotionSet, st
 		ex->timeWarp = new SimpleTimeWarp(refMotion->duration(),motion->duration());
 		ex->motionParameterFunc = motionParameter;
 		ex->motionProfile = new MotionProfile(motion);
-		ex->updateRootOffset(skeletonCopy,rootJoint);
+		//ex->updateRootOffset(skeletonCopy,rootJoint);
 #if 0
 		ex->motionProfile->buildVelocityProfile(0.f,motion->duration()*0.999f,0.005f);
 		ex->motionProfile->buildInterpolationProfile(0.f,(float)motion->time_stroke_emphasis(),0.005f);
@@ -471,7 +471,7 @@ ReachStateInterface* MeCtReachEngine::getState( const std::string& stateName )
 SmartBody::SBJoint* MeCtReachEngine::findRootJoint( SmartBody::SBSkeleton* sk )
 {
 
-	SkJoint* rootJoint = sk->root()->child(0); // skip world offset
+	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sk->root()->child(0)); // skip world offset
 // 	if (sk->search_joint("base"))
 // 	{
 // 		rootJoint = sk->search_joint("base");
@@ -483,7 +483,7 @@ SmartBody::SBJoint* MeCtReachEngine::findRootJoint( SmartBody::SBSkeleton* sk )
 	{
 		if (rootJoint->num_children() == 0)
 			return dynamic_cast<SmartBody::SBJoint*>(rootJoint);
-		SkJoint* child = rootJoint->child(0);
+		SmartBody::SBJoint* child = rootJoint->getChild(0);
 		SkJointPos* skRootPos = rootJoint->pos();		
 		SkJointPos* skPos = child->pos();
 		bool rootFrozen = (skRootPos->frozen(0) && skRootPos->frozen(1) && skRootPos->frozen(2));
@@ -499,11 +499,11 @@ SmartBody::SBJoint* MeCtReachEngine::findRootJoint( SmartBody::SBSkeleton* sk )
 		else
 		{
 			// error ? 
-			rootJoint = sk->root()->child(0);
+			rootJoint = dynamic_cast<SmartBody::SBJoint*>(sk->root()->child(0));
 			bStop = true;
 		}
 	}
-	//LOG("ReachEngine Root Name = %s\n",rootJoint->name().c_str());
+	LOG("ReachEngine Root Name = %s\n",rootJoint->getName().c_str());
 	return dynamic_cast<SmartBody::SBJoint*>(rootJoint);
 }
 
