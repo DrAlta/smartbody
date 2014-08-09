@@ -373,8 +373,6 @@ Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, c
 	cam.setCenter(0, 0, 0);
 	cam.setEye(300, -300, 400);
 	cam.setUpVector(SrVec(0, 0, 1));
-	gridSize = 700;
-	gridStep = 40;
 	floorHeight = 0;
 	for (int t = 0; t < 4; t++)
 		tet.push_back(SrVec());
@@ -383,8 +381,11 @@ Parameter3DVisualization::Parameter3DVisualization(int x, int y, int w, int h, c
 	SrVec scale;
 	float largestScale;
 	scale = determineScale(largestScale);
-	viewScale = largestScale/300.f;
-	cam.setEye(300*viewScale, -300*viewScale, 400*viewScale);
+	viewScale = largestScale;
+
+	gridSize = 2.0 * viewScale;
+	gridStep = gridSize / 20.0;
+	cam.setEye(viewScale, -1.0*viewScale, 1.3*viewScale);
 
 	lastMouseX = -1;
 	lastMouseY = -1;
