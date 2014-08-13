@@ -17,6 +17,7 @@
 #include "MeCtBodyReachState.h"
 #include <sb/SBSteerManager.h>
 #include <controllers/me_ct_example_body_reach.hpp>
+#include <controllers/me_ct_pose_postprocessing.hpp>
 #include <sbm/SteerSuiteEngineDriver.h>
 
 using namespace boost;
@@ -33,11 +34,6 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SmartBody::SBReach* reach)  : SmartB
 	currentReachData = NULL;
 	currentReachEngine = NULL;
 
-	_reach = reach;
-	int reachType = -1;
-	if (reach)
-		reachType = reach->getCurrentReachType();
-
 	_duration = -1.f;	
 	footIKFix = true;
 	useProfileInterpolation = false;
@@ -47,8 +43,7 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SmartBody::SBReach* reach)  : SmartB
 	startReach = false;
 	endReach = false;
 	locomotionReachTarget = false;
-	autoReturnDuration = -1.f;
-	defaultReachType = reachType;
+	autoReturnDuration = -1.f;	
 	reachVelocityScale = 1.f; 
 	desireLinearVel = -1.f;
 	desireGrabSpeed = -1.f;
@@ -59,33 +54,8 @@ MeCtExampleBodyReach::MeCtExampleBodyReach( SmartBody::SBReach* reach)  : SmartB
 	addDefaultAttributeBool("reach.useProfileInterpolation",false, "Reaching", &useProfileInterpolation);
 	addDefaultAttributeBool("reach.useRetiming",false, "Reaching", &useRetiming);
 
-	//reachEngineMap = reMap;
-	if (reach)
-		reachEngineMap = reach->getReachEngineMap();
-	
-	ReachEngineMap::iterator mi;
-	for (mi  = reachEngineMap.begin();
-		mi != reachEngineMap.end();
-		mi++)
-	{
-		MeCtReachEngine* re = mi->second;
-		if (re)
-		{
-			re->getReachData()->reachControl = this;
-		}
-	}
-	//if (reachEngineMap.size() > 0)
-	if (defaultReachType != -1 && reachEngineMap.find(defaultReachType) != reachEngineMap.end())
-	{
 
-		currentReachEngine = reachEngineMap[defaultReachType];
-		currentReachData = currentReachEngine->getReachData();
-	}	
-	else if (reachEngineMap.size() > 0)
-	{
-		currentReachEngine = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
-		currentReachData = currentReachEngine->getReachData();
-	}
+	setReach(reach);
 }
 
 MeCtExampleBodyReach::~MeCtExampleBodyReach( void )
@@ -451,11 +421,36 @@ bool MeCtExampleBodyReach::controller_evaluate( double t, MeFrameData& frame )
 	{		
 		//LOG("update reach");
 		currentReachEngine->updateReach((float)t,dt,inputMotionFrame,blendWeight);	
-		curCharacter->setBoolAttribute("isReaching", true);		
+		curCharacter->setBoolAttribute("isReaching", true);	
+#if 0
+		SmartBody::SBController* controller = curCharacter->getControllerByName(curCharacter->getName() + "_postprocessController");
+		if (controller)
+		{
+			MeCtPosePostProcessing* postProcessController = dynamic_cast<MeCtPosePostProcessing*>(controller);
+			if (postProcessController)
+			{
+				postProcessController->setEnable(false);
+				//LOG("disable IK");
+			}
+		}
+#endif
+
 	}
 	else
 	{
 		curCharacter->setBoolAttribute("isReaching",false);
+#if 0
+		SmartBody::SBController* controller = curCharacter->getControllerByName(curCharacter->getName() + "_postprocessController");
+		if (controller)
+		{
+			MeCtPosePostProcessing* postProcessController = dynamic_cast<MeCtPosePostProcessing*>(controller);
+			if (postProcessController)
+			{
+				postProcessController->setEnable(true);
+				//LOG("enable IK");
+			}
+		}
+#endif
 	}
 	
 	//printf("blend weight = %f\n",blendWeight);
@@ -601,4 +596,41 @@ SBAPI void MeCtExampleBodyReach::executeAction( SmartBody::SBEvent* event )
 	locomotionReachTarget = true;
 	SmartBody::SBEventManager* eventManager = SmartBody::SBScene::getScene()->getEventManager();
 	eventManager->removeEventHandler("locomotion");
+}
+
+void MeCtExampleBodyReach::setReach( SmartBody::SBReach* reach )
+{
+	_reach = reach;
+	int reachType = -1;
+	if (reach)
+		reachType = reach->getCurrentReachType();
+
+	defaultReachType = reachType;
+	//reachEngineMap = reMap;
+	if (reach)
+		reachEngineMap = reach->getReachEngineMap();
+
+	ReachEngineMap::iterator mi;
+	for (mi  = reachEngineMap.begin();
+		mi != reachEngineMap.end();
+		mi++)
+	{
+		MeCtReachEngine* re = mi->second;
+		if (re)
+		{
+			re->getReachData()->reachControl = this;
+		}
+	}
+	//if (reachEngineMap.size() > 0)
+	if (defaultReachType != -1 && reachEngineMap.find(defaultReachType) != reachEngineMap.end())
+	{
+
+		currentReachEngine = reachEngineMap[defaultReachType];
+		currentReachData = currentReachEngine->getReachData();
+	}	
+	else if (reachEngineMap.size() > 0)
+	{
+		currentReachEngine = reachEngineMap[MeCtReachEngine::RIGHT_ARM];
+		currentReachData = currentReachEngine->getReachData();
+	}
 }

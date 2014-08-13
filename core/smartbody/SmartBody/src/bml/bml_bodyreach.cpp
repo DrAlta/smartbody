@@ -153,9 +153,9 @@ BehaviorRequestPtr BML::parse_bml_bodyreach( DOMElement* elem, const std::string
 		bodyReachCt->handle(handle);
 		bodyReachCt->init(curCharacter);
 		bCreateNewController = true;
-
 	}
 
+	bodyReachCt->setReach(reach);
 	bodyReachCt->setDefaultReachType(reachType);
 
 	std::string attrReachAction = xml_parse_string( BMLDefs::ATTR_REACH_ACTION, elem, "", REQUIRED_ATTR );	
