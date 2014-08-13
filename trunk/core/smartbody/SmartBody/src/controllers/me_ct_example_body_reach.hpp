@@ -64,6 +64,8 @@ public:
 
 public:	
 	MeCtExampleBodyReach(SmartBody::SBReach* reach);
+
+	void setReach( SmartBody::SBReach* reach );
 	virtual ~MeCtExampleBodyReach(void);		
 	virtual void controller_map_updated();
 	virtual void controller_start();	
