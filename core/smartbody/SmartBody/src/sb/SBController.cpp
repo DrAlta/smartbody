@@ -129,5 +129,30 @@ void SBController::getJointChannelValues( const std::string& jointName, MeFrameD
 	}
 }
 
+void SBController::addControllerModifier(SBControllerModifier* modifier)
+{
+}
+
+void SBController::removeControllerModifier(SBControllerModifier* modifier)
+{
+}
+
+void SBController::removeAllControllerModifiers()
+{
+}
+
+SmartBody::SBControllerModifier* SBController::getControllerModifier(const std::string& name)
+{
+	return NULL;
+}
+
+std::vector<SmartBody::SBControllerModifier*>& SBController::getControllerModifiers()
+{
+	return _modifiers;
+}
+
+
+
+
 };
 
