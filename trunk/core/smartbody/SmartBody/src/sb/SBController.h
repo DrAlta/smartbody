@@ -4,7 +4,11 @@
 #include <sb/SBTypes.h>
 #include "controllers/me_controller.h"
 
+
 namespace SmartBody {
+
+class SBControllerModifier;
+
 
 class SBController : public MeController
 {
@@ -47,9 +51,17 @@ class SBController : public MeController
 		SBAPI virtual SkChannelArray& controller_channels () { return channelArray; }
 		SBAPI virtual const std::string& controller_type () const { return controllerType; }
 
+		SBAPI void addControllerModifier(SBControllerModifier* modifier);
+ 		SBAPI void removeControllerModifier(SBControllerModifier* modifier);
+		SBAPI void removeAllControllerModifiers();
+		SBAPI SmartBody::SBControllerModifier* getControllerModifier(const std::string& name);
+		SBAPI std::vector<SmartBody::SBControllerModifier*>& getControllerModifiers();
+
+
 	private:
 		SkChannelArray channelArray;
 		std::string controllerType;
+		std::vector<SmartBody::SBControllerModifier*> _modifiers;
 
 };
 
