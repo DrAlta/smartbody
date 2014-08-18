@@ -49,6 +49,10 @@ class SbmPawn;
 class MeControllerContext;
 class MePrunePolicy;
 
+namespace SmartBody {
+	class SBPawn;
+}
+
 //=================================== MeController =====================================
 
 /*! The Base class of all controllers. It contains few parameters which are
@@ -77,6 +81,8 @@ private :
 
 	//std::string _handle;	  // handle of the controller - used to match requests to changes in the controller parameters
 	MePrunePolicy* _prune_policy;  // controller tree pruning policy for this controller
+
+
 
 protected :
 
@@ -121,6 +127,8 @@ protected :
 	bool		_buffer_changes_toggle_reset;	// flag to initialize the buffer_changes
 	bool		_enable;						// determines if this controller does not get evaluated. 	
 	std::string	_handle;
+	SmartBody::SBPawn* _pawn;
+	MeFrameData* _curFrame;
 
 protected :
     /*! Constructor */

@@ -457,6 +457,7 @@ boost::python::class_<SBObserver>("SBObserver")
 
 	boost::python::class_<SBController, boost::python::bases<SBObject> >("SBController")
 		.def(boost::python::init<>())
+		.def("addChannel", &SBController::addChannel, "Adds a channel to this controller's context.")
 		.def("setName", &SBController::setName, "Sets the name for the controller.")
 		.def("getName", &SBController::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name for this controller.")
 		.def("getType", &SBController::getType, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the type for this controller.")
@@ -465,6 +466,13 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("setDebug", &SBController::setDebug, "Sets the debug state for this controller.")
 		.def("isDebug", &SBController::isDebug, "Is the controller in a debug state?")
 		.def("getDuration", &SBController::getDuration, "Gets the controller's duration.")
+		.def("getChannelValue", &SBController::getChannelValue, boost::python::return_value_policy<boost::python::return_by_value>(),"Gets the channel's value.")
+		.def("getChannelPos", &SBController::getChannelPos, boost::python::return_value_policy<boost::python::return_by_value>(),"Gets the channel's translation value.")
+		.def("getChannelQuat", &SBController::getChannelQuat, boost::python::return_value_policy<boost::python::return_by_value>(),"Gets the channel's rotation value.")
+		.def("setChannelValue", &SBController::setChannelValue, boost::python::return_value_policy<boost::python::return_by_value>(),"Sets the channel's value.")
+		.def("setChannelPos", &SBController::setChannelPos, boost::python::return_value_policy<boost::python::return_by_value>(),"Sets the channel's translation value.")
+		.def("setChannelQuat", &SBController::setChannelQuat, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets the channel's rotation value.")
+
 		;
 
 	boost::python::class_<MeCtNewLocomotion, boost::python::bases<SBController,SBObject> >("SBNewLocomotion")
