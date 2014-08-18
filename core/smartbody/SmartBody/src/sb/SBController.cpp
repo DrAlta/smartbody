@@ -1,4 +1,5 @@
 #include "SBController.h"
+#include <SB/SBPawn.h>
 
 namespace SmartBody {
 
@@ -14,6 +15,41 @@ SBController::SBController(const SBController& controller)
 
 SBController::~SBController()
 {
+}
+
+void SBController::addChannel(std::string channelName, std::string type)
+{
+	SkChannel::Type channelType = SkChannel::XPos;
+	if (type == "XPos")
+	{
+		channelType = SkChannel::XPos;
+	}
+	else if (type == "YPos")
+	{
+		channelType = SkChannel::YPos;
+	}
+	else if (type == "ZPos")
+	{
+		channelType = SkChannel::ZPos;
+	}
+	else if (type == "Quat")
+	{
+		channelType = SkChannel::Quat;
+	}
+	else 
+	{
+		LOG("Channel type %s not valid, must be one of: XPos, YPos, ZPos, Quat. Channel %s not added.", type.c_str(), channelName.c_str());
+		return;
+	}
+
+	int index = _context->channels().search(channelName, channelType);
+	if (index != -1)
+	{
+		LOG("Channel %s of type %s already present in motion, duplicate channel not added.", channelName.c_str(), type.c_str());
+		return;
+	}
+
+	 _context->channels().add(channelName, channelType);
 }
 
 const std::string& SBController::getType()
@@ -127,6 +163,85 @@ void SBController::getJointChannelValues( const std::string& jointName, MeFrameD
 		outPos.y = frame.buffer()[posBufferID + 1];
 		outPos.z = frame.buffer()[posBufferID + 2];				
 	}
+}
+
+double SBController::getChannelValue(const std::string& channelName)
+{
+	if (!_pawn)
+		return 0.0;
+
+	if (!_curFrame)
+		return 0.0;
+	
+	SrVec data;
+	SrQuat quat;
+	getJointChannelValues(channelName, *_curFrame, quat, data);
+	return data[0];
+}
+
+SrVec SBController::getChannelPos(const std::string& channelName)
+{
+	if (!_pawn)
+		return SrVec();
+
+	if (!_curFrame)
+		return SrVec();
+
+	SrVec data;
+	SrQuat quat;
+	getJointChannelValues(channelName, *_curFrame, quat, data);
+	return data;
+}
+
+SrQuat SBController::getChannelQuat(const std::string& channelName)
+{
+	if (!_pawn)
+		return SrQuat();
+
+	if (!_curFrame)
+		return SrQuat();
+
+	SrVec data;
+	SrQuat quat;
+	getJointChannelValues(channelName, *_curFrame, quat, data);
+	return quat;
+}
+
+void SBController::setChannelValue(const std::string& channelName, double val)
+{
+	if (!_pawn)
+		return;
+
+	if (!_curFrame)
+		return;
+
+	SrVec data;
+	data[0] = val;
+	setJointChannelPos(channelName, *_curFrame, data);
+}
+
+void SBController::setChannelPos(const std::string& channelName, SrVec pos)
+{
+	if (!_pawn)
+		return;	
+	if (!_curFrame)
+		return;
+
+	SrVec data;
+	data = pos;
+	setJointChannelPos(channelName, *_curFrame, data);
+}
+
+void SBController::setChannelQuat(const std::string& channelName, SrQuat quat)
+{
+	if (!_pawn)
+		return;
+	if (_curFrame)
+		return;
+
+	SrQuat data;
+	data = quat;
+	setJointChannelQuat(channelName, *_curFrame, data);
 }
 
 void SBController::addControllerModifier(SBControllerModifier* modifier)

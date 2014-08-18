@@ -264,7 +264,16 @@ int SBCharacter::getNumControllers()
 		return 0;
 }
 
+void SBCharacter::addController(int index, SBController* controller)
+{
+	controller->init(this);
+	ct_tree_p->add_controller(controller, index);
+}
 
+void SBCharacter::removeController(SBController* controller)
+{
+	ct_tree_p->remove_controller(controller);
+}
 
 void SBCharacter::setAutomaticPruning(bool val)
 {

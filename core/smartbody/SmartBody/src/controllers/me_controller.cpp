@@ -36,6 +36,7 @@
 #include <sb/sbm_pawn.hpp>
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
+#include <sb/SBPawn.h>
 
 #include "sbm/lin_win.h"
 using namespace std;
@@ -80,6 +81,8 @@ MeController::MeController ()
 	_buffer_changes_toggle = false;
 	_buffer_changes_toggle_reset = true;
 	_record_duration = 0.0;
+	_pawn = NULL;
+	_curFrame = NULL;
 
 	SBObject::createBoolAttribute("enable", true, true, "Basic", 220, false, false, false, "whether to evaluate this controller");
 	SBObject::createStringAttribute("handle", "", true, "Basic", 220, false, false, false, "handle for this controller");
@@ -142,6 +145,7 @@ void MeController::remove_all_children() {
 }
 
 void MeController::init (SbmPawn* pawn) {
+	_pawn = dynamic_cast<SmartBody::SBPawn*>(pawn);
 	_active = false;
 	controller_init ();
 
@@ -323,7 +327,7 @@ void MeController::dumpChannelMap()
 }
 
 void MeController::evaluate ( double time, MeFrameData& frame ) {
-
+	_curFrame = &frame;
 	// Reevaluate controller. Even for the same evaluation time as _lastEval, results may be influenced by differing buffer values
 	if (isEnabled())
 		_active = controller_evaluate ( time, frame );
@@ -334,6 +338,7 @@ void MeController::evaluate ( double time, MeFrameData& frame ) {
 	if( _record_mode ) 
 		cont_record( time, frame );
 #endif
+	_curFrame = NULL;
 
 }
 

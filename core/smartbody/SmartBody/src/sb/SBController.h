@@ -22,7 +22,7 @@ class SBController : public MeController
 		SBAPI SBController* getParent();			// how to get parent?
 		SBAPI SBController* getChild(int index);
 		SBAPI int getNumChildren();
-		SBAPI void addChannel(std::string jointName, std::string channelName);
+		SBAPI void addChannel(std::string channelName, std::string type);
 
 		SBAPI const std::string& getCharacterName();
 
@@ -45,6 +45,14 @@ class SBController : public MeController
 		SBAPI void getJointChannelValues(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat, SrVec& outPos);
 		SBAPI void setJointChannelQuat(const std::string& jointName, MeFrameData& frame, SrQuat& outQuat);
 		SBAPI void setJointChannelPos(const std::string& jointName, MeFrameData& frame, SrVec& outPos);
+
+		SBAPI double getChannelValue(const std::string& channelName);
+		SBAPI SrVec getChannelPos(const std::string& channelName);
+		SBAPI SrQuat getChannelQuat(const std::string& channelName);
+
+		SBAPI void setChannelValue(const std::string& channelName, double val);
+		SBAPI void setChannelPos(const std::string& channelName, SrVec pos);
+		SBAPI void setChannelQuat(const std::string& channelName, SrQuat quat);
 
 		SBAPI virtual bool controller_evaluate ( double t, MeFrameData& frame ) { return true;}
 		SBAPI virtual double controller_duration () { return 0.0; }
