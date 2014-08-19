@@ -130,6 +130,8 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
    menubar->add("&Camera/Modes/Default", 0, SetDefaultCamera, this, 0);	
    menubar->add("&Camera/Modes/Free Look", 0, SetFreeLookCamera, this, 0);	
    menubar->add("&Camera/Modes/Follow Renderer", 0, SetFollowRendererCamera, this, 0);	
+   menubar->add("&Camera/Take Snapshot/JPG...", 0, SetTakeSnapshotCB, this, 0);	
+   menubar->add("&Camera/Take Snapshot/TGA...", 0, SetTakeSnapshot_tgaCB, this, 0);	
 	
 //	menubar->add("&Window/Resource View", 0, LaunchResourceViewerCB, this, NULL);
 	menubar->add("&Window/Command Window", 0, LaunchConsoleCB, this, 0);
@@ -2055,6 +2057,48 @@ void BaseWindow::CreateTerrainCB(Fl_Widget* w, void* data)
 		SmartBody::SBScene::getScene()->getHeightfield()->set_scale( 5000.0f, 300.0f, 5000.0f );
 		SmartBody::SBScene::getScene()->getHeightfield()->set_auto_origin();
 	}
+}
+
+//	Callback function to enable screengrab in JPG format, per frame
+void BaseWindow::SetTakeSnapshotCB(Fl_Widget* w, void* data)
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	
+	if(!rootWindow->fltkViewer->getData()->saveSnapshot)
+	{
+		FltkViewerData* data	= rootWindow->fltkViewer->getData();
+		std::string framesPath	= "C:/tmp/frames/";
+		const char* userInput	= fl_input("Path to store JPG files:", framesPath.c_str());
+		data->snapshotPath		= userInput;
+		
+	}
+	else
+	{
+		fl_message("Store JPG: Disabled");
+	}
+
+	rootWindow->fltkViewer->getData()->saveSnapshot  = !rootWindow->fltkViewer->getData()->saveSnapshot;
+}
+
+
+//	Callback function to enable screengrab in TGA format, per frame
+void BaseWindow::SetTakeSnapshot_tgaCB(Fl_Widget* w, void* data)
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+		
+	if(!rootWindow->fltkViewer->getData()->saveSnapshot_tga)
+	{
+		FltkViewerData* data	= rootWindow->fltkViewer->getData();
+		std::string framesPath	= "C:/tmp/frames/";
+		const char* userInput	= fl_input("Path to store TGA files:", framesPath.c_str());
+		data->snapshotPath		= userInput;
+	}
+	else
+	{
+		fl_message("Store TGA: Disabled");
+	}
+	
+	rootWindow->fltkViewer->getData()->saveSnapshot_tga  = !rootWindow->fltkViewer->getData()->saveSnapshot_tga;
 }
 
 void BaseWindow::TrackCharacterCB(Fl_Widget* w, void* data)

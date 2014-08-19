@@ -20,6 +20,7 @@
 #include "FL/Fl_Slider.H"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
 #include "vhcl.h"
 #include "external/glew/glew.h"
+#include "external/SOIL/SOIL.h"
 //#include <FL/enumerations.H>
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
 #include "sbm/GPU/SbmShader.h"
@@ -107,6 +108,9 @@
 #include "RootWindow.h"
 
 #include <sbm/GPU/SbmBlendFace.h>
+#include <sbm/GPU/SbmTexture.h>
+
+#include <sr/jpge.h>
 
 /*
 #define USE_CEGUI 1
@@ -485,6 +489,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 	//	new CEGUI::OpenGLRenderer( 0 );
 	
 	//make_current();	
+
 }
 
 
@@ -1753,8 +1758,75 @@ void FltkViewer::draw()
    // draw UI
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
    SBGUIManager::singleton().update();
+
    //----- Fltk will then flush and swap buffers -----------------------------
+   
+	
+	if(getData()->saveSnapshot)
+	{
+		snapshot(w(), h(), static_cast<int>(_data->fcounter.measurements()));
+	}
+
+	if(getData()->saveSnapshot_tga)
+	{
+		snapshot_tga(w(), h(), static_cast<int>(_data->fcounter.measurements()));
+	}
+		
  }
+
+
+std::string FltkViewer::ZeroPadNumber(int num)
+{
+	std::stringstream ss;
+	
+	// the number is converted to string with the help of stringstream
+	ss << num; 
+	std::string ret;
+	ss >> ret;
+	
+	// Append zero chars
+	int str_length = ret.length();
+	for (int i = 0; i < 5 - str_length; i++)
+		ret = "0" + ret;
+	return ret;
+}
+
+ void FltkViewer::snapshot(int width, int height, int frame )
+ {
+	int channels = 3;
+
+	GLubyte *image = (GLubyte *) malloc(width * height * sizeof(GLubyte) * channels);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, image);
+
+	std::string path = getData()->snapshotPath + "/frame." + ZeroPadNumber(frame) + ".jpg";
+	
+	jpge::compress_image_to_jpeg_file(path.c_str(),  width, height, 3, image);
+
+	free(image);
+ }
+
+
+void FltkViewer::snapshot_tga(int width, int height, int frame)
+{
+	int channels = 3;
+
+	GLubyte *image = (GLubyte *) malloc(width * height * sizeof(GLubyte) * channels);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, image);
+
+	std::string path = getData()->snapshotPath + "/frame." + ZeroPadNumber(frame) + ".tga";
+
+	int save_result = SOIL_save_image
+	(
+		path.c_str(),
+		SOIL_SAVE_TYPE_TGA,
+		width, height, channels,
+		image
+	);
+
+	free(image);
+}
 
 // Fl::event_x/y() variates from (0,0) to (w(),h())
 // transformed coords in SrEvent are in "normalized device coordinates" [-1,-1]x[1,1]
@@ -3837,6 +3909,7 @@ void FltkViewer::drawActiveArrow(SrVec& from, SrVec& to, int num, float width, S
 	glEnd();
 	glDisable(GL_BLEND); 
 }
+
 /*void FltkViewer::drawActiveArrow(SrVec& from, SrVec& to, int num, float width, SrVec& color, bool spin)
 {
 	spin_angle += 0.02f;
@@ -5561,6 +5634,9 @@ void FltkViewerData::setupData()
 	bcolor = SrColor(.63f, .63f, .63f);
 	floorColor = SrColor(0.6f,0.6f,0.6f);
 	showFloor = true;
+
+	saveSnapshot		= false;
+	saveSnapshot_tga	= false;
 
 	scenebox = new SrSnLines;
 	sceneaxis = new SrSnLines;

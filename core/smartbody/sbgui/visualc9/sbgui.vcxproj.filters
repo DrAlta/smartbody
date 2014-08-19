@@ -61,6 +61,9 @@
     <Filter Include="pythonbind">
       <UniqueIdentifier>{4dc282ee-eda1-4034-a71b-4c1afa79c981}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SOIL">
+      <UniqueIdentifier>{5490d996-cdef-4047-bedc-d720428ccf81}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -327,8 +330,18 @@
     </ClCompile>
     <ClCompile Include="..\src\autorig\AutoRigViewer.cpp">
       <Filter>autorig</Filter>
+    </ClCompile>    <ClCompile Include="..\..\SmartBody\src\external\SOIL\image_DXT.c">
+      <Filter>SOIL</Filter>
     </ClCompile>
-  </ItemGroup>
+    <ClCompile Include="..\..\SmartBody\src\external\SOIL\image_helper.c">
+      <Filter>SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SmartBody\src\external\SOIL\SOIL.c">
+      <Filter>SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SmartBody\src\external\SOIL\stb_image_aug.c">
+      <Filter>SOIL</Filter>
+    </ClCompile>  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
       <Filter>viewer</Filter>
@@ -602,5 +615,23 @@
     <ClInclude Include="..\src\autorig\AutoRigViewer.h">
       <Filter>autorig</Filter>
     </ClInclude>
-  </ItemGroup>
+
+    <ClInclude Include="..\..\SmartBody\src\external\SOIL\image_DXT.h">
+      <Filter>SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SmartBody\src\external\SOIL\image_helper.h">
+      <Filter>SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SmartBody\src\external\SOIL\SOIL.h">
+      <Filter>SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SmartBody\src\external\SOIL\stbi_DDS_aug.h">
+      <Filter>SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SmartBody\src\external\SOIL\stbi_DDS_aug_c.h">
+      <Filter>SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SmartBody\src\external\SOIL\stb_image_aug.h">
+      <Filter>SOIL</Filter>
+    </ClInclude>  </ItemGroup>
 </Project>

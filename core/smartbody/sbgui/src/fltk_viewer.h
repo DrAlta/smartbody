@@ -50,6 +50,8 @@
 #include <SBSelectionManager.h>
 //#include <CEGUI.h>
 
+#include <GL/glu.h>
+
 class SBGeomObject;
 class SrQuat;
 class SrVec;
@@ -368,6 +370,10 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 	void drawPlotMotion();
 	void drawNavigationMesh();
 
+	std::string ZeroPadNumber(int);
+	void snapshot(int, int, int);
+	void snapshot_tga(int, int, int);
+
 	void drawTetra(SrVec vtxPos[4], SrVec& color);
 	void drawArrow(SrVec& from, SrVec& to, float width, SrVec& color);
 	void drawCircle(float cx, float cy, float cz, float r, int num_segments, SrVec& color);
@@ -389,6 +395,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 	float gridStep;
 
 	SrVec interactivePoint;
+
 	
 	virtual void notify(SmartBody::SBSubject* subject);
 
@@ -488,6 +495,10 @@ protected:
    bool showtrajectory;
    bool showgesture;
    bool interactiveLocomotion;
+
+   bool	saveSnapshot;
+   bool	saveSnapshot_tga;
+   std::string	snapshotPath;
 
    std::string message;   // user msg to display in the window
    SrLight light;
