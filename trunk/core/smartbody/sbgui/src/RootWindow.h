@@ -29,7 +29,7 @@ class SbmCharacter;
 
  
 #ifdef WIN_BUILD
-#define USE_OGRE_VIEWER 1
+#define USE_OGRE_VIEWER 0
 #elif LINUX_BUILD
 #define USE_OGRE_VIEWER 0
 #else
@@ -210,6 +210,8 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void SettingsDefaultMediaPathCB(Fl_Widget* w, void* data);
 		static void SettingsPythonLibCB(Fl_Widget* w, void* data);
 		static void TrackCharacterCB(Fl_Widget* w, void* data);
+		static void SetTakeSnapshotCB(Fl_Widget* w, void* data);
+		static void SetTakeSnapshot_tgaCB(Fl_Widget* w, void* data);
 		static void AudioCB(Fl_Widget* w, void* data);
 		static void CreateCharacterCB(Fl_Widget* w, void* data);
 		static void CreatePawnCB(Fl_Widget* w, void* data);

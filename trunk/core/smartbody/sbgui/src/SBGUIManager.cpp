@@ -1,3 +1,7 @@
+#if !defined(__FLASHPLAYER__)
+#include "external/glew/glew.h"
+#endif
+
 #ifdef WIN32
 #define USE_CEGUI 1
 #else
@@ -9,6 +13,10 @@
 #include <CEGUI/RendererModules/OpenGL/GLRenderer.h>
 #include <FL/Fl.H>
 #include <sb/SBScene.h>
+
+#include <sr/sr_gl_render_funcs.h>
+#include <sr/jpge.h>
+
 #endif
 
 #include "SBGUIManager.h"
@@ -23,6 +31,7 @@ SBGUIManager::~SBGUIManager()
 {
 
 }
+
 
 void SBGUIManager::update()
 {

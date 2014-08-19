@@ -29,6 +29,7 @@
 #else
 #if !defined(__FLASHPLAYER__)
 #include "external/glew/glew.h"
+#include "external/SOIL/SOIL.h"
 #endif
 #endif
 #include <sr/sr_vec.h>
@@ -61,6 +62,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
+
+#include <sr/jpge.h>
 
 //=============================== render_model ====================================
 
@@ -362,17 +365,30 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			
 			if (activeTexture != GL_TEXTURE0)
 				glActiveTexture(GL_TEXTURE0);
-
+			
 			//	If we are using blended textures
-			if(shape->getCharacter()->getBoolAttribute("useBlendFaceTextures"))
+
+			if(!shape->getCharacter())
 			{
-				glBindTexture(GL_TEXTURE_2D, shape->_tempTex);
+				glBindTexture(GL_TEXTURE_2D, tex->getID());
+			} 
+			else if (shape->getCharacter()->getBoolAttribute("useBlendFaceTextures"))
+			{
+				if(shape->_tempTex > 0)
+				{
+					glBindTexture(GL_TEXTURE_2D, shape->_tempTex);
+				}
+				else 
+				{
+					std::cerr << "*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead\n";
+					glBindTexture(GL_TEXTURE_2D, tex->getID());
+				}
 			}
-			//	If blended textures not used, use neutral appearance
-			else
+			else 		//	If blended textures not used, use neutral appearance
 			{
 				glBindTexture(GL_TEXTURE_2D, tex->getID());
 			}
+			//glBindTexture(GL_TEXTURE_2D, tex->getID());
 
 			//glColor4f(0.0f, 0.0f, 0.0f, 1.0);
 			glEnable(GL_TEXTURE_2D);	

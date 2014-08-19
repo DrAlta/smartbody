@@ -80,4 +80,5 @@ public:
 
 	SBAPI void setBuffer(unsigned char* buffer, int size);
 	SBAPI void setTextureSize(int w, int h, int numChannels);
+
 };
