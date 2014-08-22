@@ -23,6 +23,7 @@
 #include <sb/SBAnimationTransitionRule.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBSteerManager.h>
+#include <sb/SBFaceShiftManager.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBReach.h>
 #include <sb/SBReachManager.h>
@@ -182,6 +183,8 @@ void pythonFuncsScene()
 		.def("getVHMsgManager", &SBScene::getVHMsgManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the VH message manager.")
 		.def("getNavigationMeshManager", &SBScene::getNavigationMeshManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the navigation mesh manager.")
 		.def("getMotionGraphManager", &SBScene::getMotionGraphManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the motion graph manager.")
+		.def("getFaceShiftManager", &SBScene::getFaceShiftManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the FaceShift manager.")
+
 
 
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")

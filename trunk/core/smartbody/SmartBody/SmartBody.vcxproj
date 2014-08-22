@@ -495,6 +495,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\controllers\me_ct_motion_graph.cpp" />
     <ClCompile Include="src\controllers\me_ct_new_locomotion.cpp" />
     <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp" />
+    <ClCompile Include="src\external\faceshift\fsbinarystream.cpp" />
     <ClCompile Include="src\external\rply\rply.c" />
     <ClCompile Include="src\protocols\sbmesh.pb.cc" />
     <ClCompile Include="src\protocols\sbmotion.pb.cc" />
@@ -513,6 +514,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\sb\SBAssetHandlerSk.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkmb.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkm.cpp" />
+    <ClCompile Include="src\sb\SBFaceShiftManager.cpp" />
     <ClCompile Include="src\sb\SBMotionGraph.cpp" />
     <ClCompile Include="src\sb\SBNavigationMeshManager.cpp" />
     <ClCompile Include="src\sb\SBPythonMesh.cpp" />
@@ -884,6 +886,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\controllers\me_ct_motion_graph.hpp" />
     <ClInclude Include="src\controllers\me_ct_new_locomotion.h" />
     <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp" />
+    <ClInclude Include="src\external\faceshift\fsbinarystream.h" />
     <ClInclude Include="src\external\rply\rply.h" />
     <ClInclude Include="src\protocols\sbmesh.pb.h" />
     <ClInclude Include="src\protocols\sbmotion.pb.h" />
@@ -903,6 +906,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\sb\SBAssetHandlerSkmb.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSkm.h" />
     <ClInclude Include="src\sb\SBCharacterFrameData.h" />
+    <ClInclude Include="src\sb\SBFaceShiftManager.h" />
     <ClInclude Include="src\sb\SBMotionGraph.h" />
     <ClInclude Include="src\sb\SBNavigationMeshManager.h" />
     <ClInclude Include="src\sb\SBSceneListener.h" />
