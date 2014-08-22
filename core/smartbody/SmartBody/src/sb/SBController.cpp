@@ -1,5 +1,7 @@
 #include "SBController.h"
 #include <SB/SBPawn.h>
+#include <SB/SBSkeleton.h>
+#include <SB/SBJoint.h>
 
 namespace SmartBody {
 
@@ -96,17 +98,19 @@ double SBController::getDuration()
 void SBController::setJointChannelPos( const std::string& jointName, MeFrameData& frame, SrVec& outPos )
 {
 	bool hasTranslation = true;
-	int positionChannelID = _context->channels().search(jointName, SkChannel::XPos);
-	if (positionChannelID < 0) hasTranslation = false;
-	int posBufferID = frame.toBufferIndex(positionChannelID);
-	if (posBufferID < 0) hasTranslation = false;
-	//LOG("SBController : posChannelID = %d, posBufferID = %d",positionChannelID, posBufferID);
-	if (hasTranslation)
-	{		
-		frame.buffer()[posBufferID + 0] = outPos[0];
-		frame.buffer()[posBufferID + 1] = outPos[1];
-		frame.buffer()[posBufferID + 2] = outPos[2];				
-	}
+
+	for (int i=0;i<3;i++)
+	{
+		int positionChannelID = _context->channels().search(jointName, (SkChannel::Type)(SkChannel::XPos+i));
+		if (positionChannelID < 0) hasTranslation = false;
+		int posBufferID = frame.toBufferIndex(positionChannelID);
+		if (posBufferID < 0) hasTranslation = false;
+		//LOG("SBController : posChannelID = %d, posBufferID = %d",positionChannelID, posBufferID);
+		if (hasTranslation)
+		{		
+			frame.buffer()[posBufferID] = outPos[i];				
+		}
+	}	
 }
 
 void SBController::setJointChannelQuat( const std::string& jointName, MeFrameData& frame, SrQuat& inQuat )
@@ -236,12 +240,27 @@ void SBController::setChannelQuat(const std::string& channelName, SrQuat quat)
 {
 	if (!_pawn)
 		return;
-	if (_curFrame)
+	if (!_curFrame)
 		return;
 
 	SrQuat data;
 	data = quat;
 	setJointChannelQuat(channelName, *_curFrame, data);
+}
+
+SBAPI void SBController::setChannelQuatGlobal( const std::string& channelName, SrQuat quat )
+{
+	if (!_pawn)
+		return;
+	if (!_curFrame)
+		return;
+
+	SmartBody::SBJoint* joint = _pawn->getSkeleton()->getJointByMappedName(channelName);
+	if (!joint)
+		return;
+
+	SrQuat preRot = SrQuat(joint->gmatZero());
+	setJointChannelQuat(channelName, *_curFrame, preRot.inverse()*quat*preRot);
 }
 
 void SBController::addControllerModifier(SBControllerModifier* modifier)
@@ -265,6 +284,7 @@ std::vector<SmartBody::SBControllerModifier*>& SBController::getControllerModifi
 {
 	return _modifiers;
 }
+
 
 
 

@@ -35,6 +35,7 @@
 #include <sb/SBParser.h>
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBCollisionManager.h>
+#include <sb/SBFaceShiftManager.h>
 #include <sb/SBSteerAgent.h>
 #include <sb/SBPhoneme.h>
 #include <sb/SBPhonemeManager.h>
@@ -317,7 +318,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("execBMLFileAt", &SBBmlProcessor::execBMLFileAt, "Execute the BML instructions contained in a file for a given character at a time in the future..")
 		.def("execXMLAt", &SBBmlProcessor::execXMLAt, "Execute a generic XML instruction to a given character at a time in the future.. Adds the <?xml..> header.")
 		.def("interruptCharacter", &SBBmlProcessor::interruptCharacter, "Interrupts all BML behaviors associated with a given character at a future time in seconds (zero seconds means immediately).")
-		.def("interruptBML", &SBBmlProcessor::interruptBML, "Interrupts a soecific BML block behaviors associated with a given character at a future time in seconds (zero seconds means immediately).")
+		.def("interruptBML", &SBBmlProcessor::interruptBML, "InterrufaceShiftManager.getCoeffValuepts a soecific BML block behaviors associated with a given character at a future time in seconds (zero seconds means immediately).")
 
 		;
 
@@ -340,6 +341,10 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("stop", &SBCollisionManager::stop, "Stops the collision manager.")
 		;
 
+	boost::python::class_<SBFaceShiftManager, boost::python::bases<SBService> >("SBFaceShiftManager")
+		.def("getCoeffValue", &SBFaceShiftManager::getCoeffValue, "Get coefficient value of a specific blend shape.")
+		.def("getHeadRotation", &SBFaceShiftManager::getHeadRotation, "Get head rotation.")
+		;
 
 	boost::python::class_<SBPhysicsManager, boost::python::bases<SBService> >("SBPhysicsManager")
 		.def("createPhysicsCharacter", &SBPhysicsManager::createPhysicsCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a physics character.")
@@ -472,6 +477,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("setChannelValue", &SBController::setChannelValue, boost::python::return_value_policy<boost::python::return_by_value>(),"Sets the channel's value.")
 		.def("setChannelPos", &SBController::setChannelPos, boost::python::return_value_policy<boost::python::return_by_value>(),"Sets the channel's translation value.")
 		.def("setChannelQuat", &SBController::setChannelQuat, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets the channel's rotation value.")
+		.def("setChannelQuatGlobal", &SBController::setChannelQuatGlobal, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets the channel's rotation value.")
 
 		;
 

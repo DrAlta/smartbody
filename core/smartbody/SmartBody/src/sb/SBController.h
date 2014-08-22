@@ -53,7 +53,8 @@ class SBController : public MeController
 		SBAPI void setChannelValue(const std::string& channelName, double val);
 		SBAPI void setChannelPos(const std::string& channelName, SrVec pos);
 		SBAPI void setChannelQuat(const std::string& channelName, SrQuat quat);
-
+		SBAPI void setChannelQuatGlobal(const std::string& channelName, SrQuat quat);
+		
 		SBAPI virtual bool controller_evaluate ( double t, MeFrameData& frame ) { return true;}
 		SBAPI virtual double controller_duration () { return 0.0; }
 		SBAPI virtual SkChannelArray& controller_channels () { return channelArray; }
