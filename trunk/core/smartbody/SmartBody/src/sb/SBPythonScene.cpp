@@ -184,11 +184,8 @@ void pythonFuncsScene()
 		.def("getVHMsgManager", &SBScene::getVHMsgManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the VH message manager.")
 		.def("getNavigationMeshManager", &SBScene::getNavigationMeshManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the navigation mesh manager.")
 		.def("getMotionGraphManager", &SBScene::getMotionGraphManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the motion graph manager.")
-<<<<<<< .mine
 		.def("getHandConfigurationManager", &SBScene::getHandConfigurationManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the hand configuration manager.")
-=======
 		.def("getFaceShiftManager", &SBScene::getFaceShiftManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the FaceShift manager.")
->>>>>>> .r5797
 
 
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")
