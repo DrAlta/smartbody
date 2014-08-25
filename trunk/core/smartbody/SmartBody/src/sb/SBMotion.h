@@ -62,7 +62,7 @@ class SBMotion : public SkMotion
 		SBAPI SBMotion(const SBMotion& motion);
 		SBAPI SBMotion(std::string motionFile);
 		SBAPI ~SBMotion();
-		SBAPI const std::string& getMotionFileName();
+		SBAPI const std::string& getMotionFileName() const;
 		SBAPI int getNumFrames();
 		SBAPI std::vector<float> getFrameData(int i);
 		SBAPI int getFrameSize();
@@ -70,7 +70,7 @@ class SBMotion : public SkMotion
 
 		SBAPI void addSimilarPose(const std::string& motionName);
 		SBAPI void removeSimilarPose(const std::string& motionName);
-		SBAPI std::vector<std::string> getSimilarPoses();
+		SBAPI std::vector<std::string> getSimilarPoses() const;
 		
 		SBAPI void getAllChannelQuat(const std::vector<std::string>& channeNames, float t, std::vector<SrQuat>& outQuatList);
 		SBAPI void getAllChannelPos(const std::vector<std::string>& channeNames, float t, std::vector<SrVec>& outPosList);
@@ -95,7 +95,7 @@ class SBMotion : public SkMotion
 
 		SBAPI void alignToBegin(int numFrames);
 		SBAPI void alignToEnd(int numFrames);
-		SBAPI int getAlignIndex();
+		SBAPI int getAlignIndex() const;
 		SBAPI void recoverAlign();
 		SBAPI SBMotion* duplicateCycle(int num, std::string name);
 
@@ -126,9 +126,12 @@ class SBMotion : public SkMotion
 		SBAPI float getJointSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
 		SBAPI float getJointAngularSpeed(SBJoint* joint, float startTime, float endTime);
 		SBAPI float getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis, float startTime, float endTime);
+		SBAPI SrVec getJointAngularVelocity(SBJoint* joint, float startTime, float endTime);
 		
 		SBAPI std::vector<float> getJointTransition(SBJoint* joint, float startTime, float endTime);
 		SBAPI SrVec getJointPosition(SBJoint* joint, float time);
+		SBAPI SrVec getJointPositionFromBase(SBJoint* joint, SBJoint* baseJoint, float time);
+		SBAPI SrQuat getJointRotation(SBJoint* joint, float time);
 
 		SBAPI SBJointMap* getJointMap();
 
@@ -175,6 +178,11 @@ class SBMotion : public SkMotion
 		SBAPI void unrollPrerotation(const std::string& skelName);
 		SBAPI void addTemporalRotationOffset(const std::string& chanName, SrQuat& startQuat, SrQuat& endQuat);
 
+		MotionType getMotionType() const {return _motionType;}
+		float getScale() const;
+
+		void setMotion(const SBMotion& motion);
+		
 
 		// serializable data
 		std::string sName;

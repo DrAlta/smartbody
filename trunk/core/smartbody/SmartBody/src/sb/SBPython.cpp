@@ -45,6 +45,8 @@
 #include <sb/SBRetargetManager.h>
 #include <sb/SBNavigationMesh.h>
 #include <sb/SBNavigationMeshManager.h>
+#include <sb/SBHandConfigurationManager.h>
+#include <sb/SBHandConfiguration.h>
 #include <sb/SBEvent.h>
 #include <sb/SBSceneListener.h>
 #include <sb/SBNavigationMesh.h>
@@ -594,6 +596,20 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("removeGestureMap", &SBGestureMapManager::removeGestureMap, "Remove a gesture map for a character given character name.")
 		.def("getNumGestureMaps", &SBGestureMapManager::getNumGestureMaps, "Return number of gesture maps in the scene.")
 		.def("getGestureMap", &SBGestureMapManager::getGestureMap, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return gesture map given character name.")
+		;
+
+	boost::python::class_<SBHandConfigurationManager>("SBHandConfigurationManager")
+		.def("createHandConfiguration", &SBHandConfigurationManager::createHandConfiguration, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a hand configuration.")
+		.def("removeHandConfiguration", &SBHandConfigurationManager::removeHandConfiguration, "Remove a hand configuration")
+		.def("getNumHandConfiguration", &SBHandConfigurationManager::getNumHandConfigurations, "Get the number of hand configuration")
+		.def("printHandConfiguration", &SBHandConfigurationManager::printHandConfiguration, "Print the hand configuration.")
+		;
+
+	boost::python::class_<SBHandConfiguration>("SBHandConfiguration")
+		.def("addMotion", &SBHandConfiguration::addMotion, "Add a new motion to the configuration")
+		.def("removeMotion", &SBHandConfiguration::removeMotion, "Remove the motion from the configuration")
+		.def("getNumMotions", &SBHandConfiguration::getNumMotions, "Get the number of motions")
+		.def("printMotionNames", &SBHandConfiguration::printMotionNames, "Print the names of the motion")
 		;
 
 	boost::python::class_<SBJointMap>("SBJointMap")

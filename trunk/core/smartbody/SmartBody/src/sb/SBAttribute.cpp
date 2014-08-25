@@ -1092,6 +1092,8 @@ ActionAttribute::ActionAttribute()
 
 ActionAttribute::ActionAttribute(const std::string& name)
 {
+	// adding this 
+	m_name = name;
 }
 
 ActionAttribute::~ActionAttribute()
@@ -1146,6 +1148,7 @@ void ActionAttribute::read()
 SBAttribute* ActionAttribute::copy()
 {
 	ActionAttribute* a = new ActionAttribute();
+	a->setName(getName());
 
 	a->getAttributeInfo()->setPriority(this->getAttributeInfo()->getPriority());
 	a->getAttributeInfo()->setReadOnly(this->getAttributeInfo()->getReadOnly());

@@ -32,6 +32,7 @@
 #include <sb/SBRetarget.h>
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
+#include "controllers/me_ct_generic_hand.h"
 
 //=================================== MeCtMotion =====================================
 
@@ -98,6 +99,9 @@ void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, double time_offset, double t
 	controlRestart();
 	_lastCycle = -1;
 	loadMotionEvents();
+
+	// intialize hand controller 
+	//_character->generic_hand_ct->init(_motion);
 }
 
 void MeCtMotion::init (SbmPawn* pawn, SkMotion* m_p ) {

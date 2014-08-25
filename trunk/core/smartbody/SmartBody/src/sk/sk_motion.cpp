@@ -68,7 +68,8 @@ SkMotion::~SkMotion()
 
    for (size_t f = 0; f < _frames.size(); f++ )
    {
-      free( _frames[f].posture );
+      //free( _frames[f].posture );
+	   delete [] _frames[f].posture;
       _frames[f].posture = NULL;
    }
 
@@ -1785,6 +1786,33 @@ SkMotion* SkMotion::copyMotion()
 		memcpy(new_p,ref_p,sizeof(float)*posture_size());
 	}
 	return cpMotion;	
+}
+
+/*
+	this function returns the data frames
+*/
+std::vector<SkMotion::Frame> SkMotion::data_frames() const
+{
+	std::vector<SkMotion::Frame> frame_copy;
+	for (int i=0; i < _frames.size(); i++)
+	{
+		Frame frame = _frames[i];
+		Frame temp_frame;
+		temp_frame.keytime = frame.keytime;
+		temp_frame.posture = new float[posture_size()];
+		memcpy(temp_frame.posture,frame.posture,sizeof(float)*posture_size());
+		frame_copy.push_back(temp_frame);
+	}
+	return frame_copy;
+}
+
+/*
+	This function returns copy of the channels
+*/
+SkChannelArray& SkMotion::copy_channels() const
+{
+	SkChannelArray* temp_array = new SkChannelArray(_channels);
+	return *temp_array;
 }
 
 

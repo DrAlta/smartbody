@@ -9,7 +9,7 @@
 class VariablePointer
 {
 public:
-	enum { TYPE_BOOL, TYPE_INT, TYPE_FLOAT, TYPE_DOUBLE, TYPE_STRING, TYPE_VEC3, TYPE_MATRIX };
+	enum { TYPE_BOOL, TYPE_INT, TYPE_FLOAT, TYPE_DOUBLE, TYPE_STRING, TYPE_VEC3, TYPE_MATRIX, TYPE_ACTION };
 	int varType;
 	void* varPtr;
 public:
@@ -38,6 +38,7 @@ public:
 	void addDefaultAttributeString(const std::string& name, const std::string& defaultValue, const std::string& attributeGroup, std::string* varPtr = NULL);
 	void addDefaultAttributeVec3(const std::string&name, SrVec& defaultValue, const std::string& attributeGroup, SrVec* varPtr = NULL);
 	void addDefaultAttributeMatrix(const std::string& name, SrMat& defaultValue, const std::string& attributeGroup, SrMat* varPtr = NULL);
+	void addDefaultAttributeAction(const std::string& name, const std::string& attributeGroup, bool* varPtr = NULL);
 
 	std::vector<AttributeVarPair>& getDefaultAttributes();
 	std::map<std::string, SmartBody::SBAttributeGroup*>& getDefaultGroups();	
