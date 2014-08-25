@@ -105,7 +105,7 @@ def setupBehaviorSet():
 			motion = scene.getMotion(gestureMotions[i])
 		#print 'motionName = ' + locoMotions[i]
 		if motion != None:
-			motion.setMotionSkeletonName("ChrBrad.sk")
+			motion.setMotionSkeletonName("ChrBrad2.sk")
 			zebra2Map.applyMotion(motion)				
 		
 	print "| BradGestureMap.py |"
