@@ -751,7 +751,10 @@ void BML::BmlRequest::speechRequestProcess()
 				behList.push_back(gestureRequest->group_id);
 				types.push_back("gesture");
 				times.push_back(readyTime);
-				sbMotion->connect(actor->getSkeleton());
+				SmartBody::SBSkeleton* connectedSkeleton = dynamic_cast<SmartBody::SBSkeleton*>(sbMotion->connected_skeleton());
+				SmartBody::SBSkeleton* skeleton = new SmartBody::SBSkeleton(actor->getSkeleton());
+				sbMotion->disconnect();
+				sbMotion->connect(skeleton);
 				float lWristSpeed = sbMotion->getJointSpeed(l_wrist, (float)sbMotion->getTimeStart(), (float)sbMotion->getTimeStop());
 				float rWristSpeed = sbMotion->getJointSpeed(r_wrist, (float)sbMotion->getTimeStart(), (float)sbMotion->getTimeStop());
 				if (lWristSpeed > rWristSpeed)
@@ -770,6 +773,9 @@ void BML::BmlRequest::speechRequestProcess()
 					ss << rWristSpeed;
 					info.push_back(ss.str());
 				}
+				sbMotion->disconnect();
+				delete skeleton;
+				sbMotion->connect(connectedSkeleton);
 			}
 		}
 	}
@@ -1907,7 +1913,9 @@ void ParameterizedAnimationRequest::realize_impl( BmlRequestPtr request, SmartBo
 
 void ParameterizedAnimationRequest::unschedule( SmartBody::SBScene* scene, BmlRequestPtr request, time_sec duration )
 {
-	// TODO: ... ???
+	std::vector<double> weights;
+	paramAnimCt->schedule(NULL, weights);
+
 }
 
 /**
