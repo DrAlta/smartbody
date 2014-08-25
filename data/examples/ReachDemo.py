@@ -208,9 +208,9 @@ def checkPass():
 	bml.execBML('ChrRachel1', '<gaze target="passPawn" sbm:joint-range="EYES NECK"/>')
 		
 # Run the update script
-scene.removeScript('reachdemo')
+scene.removeScript('ReachDemo')
 reachdemo = ReachDemo()
-scene.addScript('reachdemo', reachdemo)
+scene.addScript('ReachDemo', reachdemo)
 
 class ReachingHandler(SBEventHandler):
 	def executeAction(self, ev):
