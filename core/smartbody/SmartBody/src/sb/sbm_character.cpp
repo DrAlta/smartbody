@@ -85,6 +85,7 @@
 #include <controllers/me_ct_example_body_reach.hpp>
 #include <controllers/me_ct_pose_postprocessing.hpp>
 #include <controllers/me_ct_motion_graph.hpp>
+#include <controllers/me_ct_generic_hand.h>
 
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_physics_controller.h>
@@ -179,8 +180,8 @@ motionplayer_ct( NULL ),
 noise_ct(NULL),
 record_ct(NULL),
 basic_locomotion_ct(NULL),
-new_locomotion_ct(NULL),
-face_neutral( NULL ),
+generic_hand_ct(NULL),
+new_locomotion_ct(NULL),face_neutral( NULL ),
 _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 {
 	
@@ -249,6 +250,8 @@ SbmCharacter::~SbmCharacter( void )	{
 #endif
 	if (postprocess_ct)
 		postprocess_ct->unref();
+	if (generic_hand_ct)
+		generic_hand_ct->unref();
 
 	if (motiongraph_ct)
 		motiongraph_ct->unref();
@@ -324,7 +327,16 @@ void SbmCharacter::createStandardControllers()
 	this->new_locomotion_ct->ref();
 	this->new_locomotion_ct->init(this);
 #endif
-	// example-based head movement
+	
+	// Added by Adil
+	// generic hand controller
+	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+
+	this->generic_hand_ct = new MeCtGenericHand(sbSkel,this);
+	std::string gHandName = getName() + "_genericHandController";
+	this->generic_hand_ct->setName(gHandName.c_str());
+	this->generic_hand_ct->ref();	
+	
 	this->head_param_anim_ct = new MeCtParamAnimation(this, world_offset_writer_p);
 	std::string headParamAnimName = getName() + "_paramAnimHeadController";
 	this->head_param_anim_ct->setName(headParamAnimName.c_str());
@@ -336,7 +348,7 @@ void SbmCharacter::createStandardControllers()
 	this->motiongraph_ct->setName(motionGraphName);
 	this->motiongraph_ct->ref();
 
-	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+	//SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	SmartBody::SBJoint* effector = sbSkel->getJointByMappedName("r_middle1");
 	if (!effector) 
 		effector =sbSkel->getJointByMappedName("r_index1");
@@ -479,7 +491,7 @@ void SbmCharacter::createStandardControllers()
 #endif
 	ct_tree_p->add_controller( motion_sched_p );
 	ct_tree_p->add_controller( postprocess_ct );	
-	ct_tree_p->add_controller( reach_sched_p );	
+	ct_tree_p->add_controller( generic_hand_ct);		ct_tree_p->add_controller( reach_sched_p );	
 	ct_tree_p->add_controller( grab_sched_p );
 	ct_tree_p->add_controller( breathing_p );
 	ct_tree_p->add_controller( gaze_sched_p );
@@ -541,6 +553,8 @@ void SbmCharacter::createStandardControllers()
 					attributeCopy->registerObserver(new_locomotion_ct);
 				else if (dynamic_cast<MeCtBreathing*>(controller))
 					attributeCopy->registerObserver(breathing_p);
+				else if (dynamic_cast<MeCtGenericHand*>(controller))
+					attributeCopy->registerObserver(generic_hand_ct);
 			}
 		}
 	}
@@ -899,6 +913,8 @@ int SbmCharacter::init(SkSkeleton* new_skeleton_p,
 					attributeCopy->registerObserver(new_locomotion_ct);
 				else if (dynamic_cast<MeCtBreathing*>(controller))
 					attributeCopy->registerObserver(breathing_p);
+				else if (dynamic_cast<MeCtGenericHand*>(controller))
+					attributeCopy->registerObserver(generic_hand_ct);
 			}
 		}
 	}

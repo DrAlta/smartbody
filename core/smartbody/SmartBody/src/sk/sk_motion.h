@@ -195,6 +195,15 @@ public :
 
 	SBAPI void getChannelValueAtFrame(int f, int index, float* val);
 
+	/*! return a copy of the frames */
+	std::vector<Frame> data_frames() const;
+
+	/*! get the last apply frame */
+	int last_apply_frame () const { return _last_apply_frame;}
+
+	/*! get the copy of the channels */
+	SkChannelArray& copy_channels() const ;
+
 	
 	/*! Interpolation type used by apply */
 	enum InterpType { Linear, CubicSpline };

@@ -60,7 +60,7 @@ class MeCtBasicLocomotion;
 class MeCtReachEngine;
 class MeCtPosePostProcessing;
 class MeCtMotionGraph;
-
+class MeCtGenericHand;
 class ActionUnit;
 class SkMotion;
 struct GeneralParam;
@@ -240,6 +240,7 @@ public:
 	MeCtNewLocomotion*		new_locomotion_ct;
 	MeCtPosePostProcessing* postprocess_ct;
 	MeCtMotionGraph*        motiongraph_ct;
+	MeCtGenericHand*		generic_hand_ct;
 
 	int 	viseme_channel_start_pos;
 	int 	viseme_channel_end_pos;

@@ -110,6 +110,8 @@ void DefaultAttributeTable::addDefaultAttributeInt( const std::string& name, int
 		curGroup = (*iter).second;
 	}
 
+	hf->getAttributeInfo()->setGroup(curGroup);
+
 	VariablePointer var;
 	var.varType = VariablePointer::TYPE_INT;
 	var.varPtr  = varPtr;
@@ -220,6 +222,30 @@ void DefaultAttributeTable::addDefaultAttributeMatrix( const std::string& name, 
 	_defaultAttributes.push_back(AttributeVarPair(hf,var));	
 }
 
+void DefaultAttributeTable::addDefaultAttributeAction( const std::string& name, const std::string& attributeGroup, bool* varPtr )
+{
+	SmartBody::ActionAttribute* hf = new SmartBody::ActionAttribute(name);
+
+	SmartBody::SBAttributeGroup* curGroup = NULL;
+	std::map<std::string, SmartBody::SBAttributeGroup*>::iterator iter = _defaultGroups.find(attributeGroup);
+	if (iter == _defaultGroups.end())
+	{
+		curGroup = new SmartBody::SBAttributeGroup(attributeGroup);
+		_defaultGroups.insert(std::pair<std::string, SmartBody::SBAttributeGroup*>(attributeGroup, curGroup));
+	}
+	else
+	{
+		curGroup = (*iter).second;
+	}
+
+	hf->getAttributeInfo()->setGroup(curGroup);
+
+	VariablePointer var;
+	var.varType = VariablePointer::TYPE_ACTION;
+	var.varPtr  = varPtr;
+	_defaultAttributes.push_back(AttributeVarPair(hf,var));	
+}
+
 std::vector<AttributeVarPair>& DefaultAttributeTable::getDefaultAttributes()
 {
 		return _defaultAttributes;
@@ -285,4 +311,7 @@ void VariablePointer::updateVariableFromAttribute( SmartBody::SBAttribute* attr 
 		SrMat* matPtr = (SrMat*)varPtr; 
 		*matPtr = matrixAttr->getValue();
 	}	
+	else if (varType == TYPE_ACTION)
+	{
+	}
 }

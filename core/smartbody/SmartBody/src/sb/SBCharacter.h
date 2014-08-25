@@ -105,6 +105,7 @@ class SBCharacter : public SbmCharacter
 
 		SBAPI bool getUseBlendFaceTextures();
 		SBAPI void setUseBlendFaceTextures(bool);
+
 	protected:
 		void InitFrameDataMarshalFriendly();
 		void FreeFrameDataJointsMarshalFriendly();

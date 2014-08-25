@@ -492,6 +492,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\sr\sr_vec.cpp" />
     <ClCompile Include="..\SmartBody\src\sr\sr_vec2.cpp" />
     <ClCompile Include="..\SmartBody\src\sr\sr_viewer.cpp" />
+    <ClCompile Include="src\controllers\me_ct_generic_hand.cpp" />
     <ClCompile Include="src\controllers\me_ct_motion_graph.cpp" />
     <ClCompile Include="src\controllers\me_ct_new_locomotion.cpp" />
     <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp" />
@@ -514,7 +515,13 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\sb\SBAssetHandlerSk.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkmb.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerSkm.cpp" />
+<<<<<<< .mine
+    <ClCompile Include="src\sb\SBHandConfiguration.cpp" />
+    <ClCompile Include="src\sb\SBHandConfigurationManager.cpp" />
+    <ClCompile Include="src\sb\SBHandSynthesis.cpp" />
+=======
     <ClCompile Include="src\sb\SBFaceShiftManager.cpp" />
+>>>>>>> .r5797
     <ClCompile Include="src\sb\SBMotionGraph.cpp" />
     <ClCompile Include="src\sb\SBNavigationMeshManager.cpp" />
     <ClCompile Include="src\sb\SBPythonMesh.cpp" />
@@ -883,6 +890,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\SmartBody\src\sr\sr_vec.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_vec2.h" />
     <ClInclude Include="..\SmartBody\src\sr\sr_viewer.h" />
+    <ClInclude Include="src\controllers\me_ct_generic_hand.h" />
     <ClInclude Include="src\controllers\me_ct_motion_graph.hpp" />
     <ClInclude Include="src\controllers\me_ct_new_locomotion.h" />
     <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp" />
@@ -906,7 +914,13 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\sb\SBAssetHandlerSkmb.h" />
     <ClInclude Include="src\sb\SBAssetHandlerSkm.h" />
     <ClInclude Include="src\sb\SBCharacterFrameData.h" />
+<<<<<<< .mine
+    <ClInclude Include="src\sb\SBHandConfiguration.h" />
+    <ClInclude Include="src\sb\SBHandConfigurationManager.h" />
+    <ClInclude Include="src\sb\SBHandSynthesis.h" />
+=======
     <ClInclude Include="src\sb\SBFaceShiftManager.h" />
+>>>>>>> .r5797
     <ClInclude Include="src\sb\SBMotionGraph.h" />
     <ClInclude Include="src\sb\SBNavigationMeshManager.h" />
     <ClInclude Include="src\sb\SBSceneListener.h" />

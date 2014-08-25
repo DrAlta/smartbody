@@ -1168,12 +1168,27 @@
     <ClCompile Include="src\sbm\GPU\SbmBlendFace.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
+<<<<<<< .mine
+    <ClCompile Include="src\controllers\me_ct_generic_hand.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBHandSynthesis.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBHandConfigurationManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBHandConfiguration.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+=======
     <ClCompile Include="src\sb\SBFaceShiftManager.cpp">
       <Filter>sb</Filter>
     </ClCompile>
     <ClCompile Include="src\external\faceshift\fsbinarystream.cpp">
       <Filter>external\faceshift</Filter>
     </ClCompile>
+>>>>>>> .r5797
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2340,12 +2355,27 @@
     <ClInclude Include="src\sbm\GPU\SbmBlendFace.h">
       <Filter>sbm</Filter>
     </ClInclude>
+<<<<<<< .mine
+    <ClInclude Include="src\controllers\me_ct_generic_hand.h">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBHandSynthesis.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBHandConfigurationManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBHandConfiguration.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+=======
     <ClInclude Include="src\sb\SBFaceShiftManager.h">
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="src\external\faceshift\fsbinarystream.h">
       <Filter>external\faceshift</Filter>
     </ClInclude>
+>>>>>>> .r5797
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">

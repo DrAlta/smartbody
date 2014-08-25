@@ -113,6 +113,28 @@ SBMotion::SBMotion(const SBMotion& motion)
 	_motionType = Unknown;
 	_scale = 1.f;
 	_offsetMotion = NULL;
+
+}
+
+void SBMotion::setMotion(const SBMotion& motion)
+{
+
+	// copy everything here
+	_postsize = motion.posture_size();
+	//_skeleton = motion.connected_skeleton();
+	_floatbuffer = motion.connected_buffer();
+	_filename = motion.filename();
+	_frames = motion.data_frames();
+	_channels = motion.copy_channels();
+	_last_apply_frame = motion.last_apply_frame();
+	transformDepth = motion.getTransformDepth();
+	_motionFile = motion.getMotionFileName();
+	_emptyString = "";
+	_motionSkeleton = "";
+	alignIndex = motion.getAlignIndex();
+	_similarPoses = motion.getSimilarPoses();
+	_scale = motion.getScale();
+	_motionType = motion.getMotionType();
 }
 
 SBMotion::SBMotion(std::string file) : SkMotion()
@@ -128,6 +150,8 @@ SBMotion::SBMotion(std::string file) : SkMotion()
 SBMotion::~SBMotion()
 {
 	_motionFile = "";
+
+	
 
 	std::map<std::string, JointTrajectory*>::iterator jointTrajectoryIter;
 	for (jointTrajectoryIter = trajMap.begin(); jointTrajectoryIter != trajMap.end(); ++jointTrajectoryIter)
@@ -147,7 +171,7 @@ void SBMotion::setMotionType(MotionType type)
 	_motionType = type;
 }
 
-const std::string& SBMotion::getMotionFileName()
+const std::string& SBMotion::getMotionFileName() const
 {
 	return filename();
 }
@@ -155,6 +179,11 @@ const std::string& SBMotion::getMotionFileName()
 int SBMotion::getNumFrames()
 {
 	return frames();
+}
+
+float SBMotion::getScale() const
+{
+	return _scale;
 }
 
 std::vector<float> SBMotion::getFrameData(int frameId)
@@ -359,7 +388,7 @@ void SBMotion::alignToEnd(int numFrames)
 	alignToSide(numFrames, 0);
 }
 
-int SBMotion::getAlignIndex()
+int SBMotion::getAlignIndex() const
 {
 	return alignIndex;
 }
@@ -586,10 +615,10 @@ void SBMotion::removeSimilarPose(const std::string& motionName)
 	LOG("Could not find similar pose '%s' for motion '%s'.", motionName.c_str(), this->getName().c_str());
 }
 
-std::vector<std::string> SBMotion::getSimilarPoses()
+std::vector<std::string> SBMotion::getSimilarPoses() const
 {
 	std::vector<std::string> poses;
-	for (std::vector<std::string>::iterator iter = _similarPoses.begin();
+	for (std::vector<std::string>::const_iterator iter = _similarPoses.begin();
 		 iter != _similarPoses.end();
 		 iter++)
 	{
@@ -729,7 +758,7 @@ void SBMotion::pertainMotionChannelsByEndJoints( std::string skelName, std::vect
 			{
 				pertainJoints.push_back(descendents[j]->getName());
 			}
-			pertainJoints.push_back(eJoint->getName());
+			//pertainJoints.push_back(eJoint->getName());
 		}		
 	}
 	std::vector<std::string> removeJoints;
@@ -771,7 +800,7 @@ void SBMotion::removeMotionChannelsByEndJoints(std::string skelName, std::vector
 			{
 				removeJoints.push_back(descendents[j]->getName());
 			}
-			removeJoints.push_back(eJoint->getName());
+			//removeJoints.push_back(eJoint->getName());
 		}		
 	}
 	this->removeMotionChannels(removeJoints);
@@ -1353,6 +1382,8 @@ float SBMotion::getJointSpeedAxis(SBJoint* joint, const std::string& axis, float
 	return accSpd;
 }
 
+
+
 float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endTime)
 {
 	if (!joint)
@@ -1464,6 +1495,50 @@ float SBMotion::getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis
 	return accAngularSpd;
 }
 
+// Added by Adil . gets angular velocity
+SrVec SBMotion::getJointAngularVelocity(SBJoint* joint, float startTime, float endTime)
+{	
+
+	if (!joint)
+	{
+		LOG("Joint is NULL");
+		return SrVec();
+	}
+	if (connected_skeleton() == NULL)
+	{
+		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
+		return SrVec();
+	}
+	float dt = duration() / float(frames() - 1);
+	int minFrameId = int(startTime / dt);
+	int maxFrameId = int(endTime / dt);
+	SrVec diff;
+	for (int i = minFrameId; i < maxFrameId + 1; i++)
+	{
+		apply_frame(i);
+		connected_skeleton()->update_global_matrices();
+		const SrMat& srcMat = joint->gmat();
+		SrQuat srcQuat(srcMat);
+		
+		apply_frame(i + 1);
+		connected_skeleton()->update_global_matrices();
+		const SrMat& destMat = joint->gmat();
+		SrQuat destQuat(srcMat);
+		
+		SrQuat diffQuat = destQuat.inverse()*srcQuat;
+		diffQuat.normalize();
+		SrVec diffAngle = diffQuat.axisAngle();
+
+		diff += diffAngle;
+	}
+
+	SrVec accAngularVelocity = diff/(endTime-startTime);
+
+	connected_skeleton()->clearJointValues(); // reset the joint quat/pos
+
+	return accAngularVelocity;
+}
+
 std::vector<float> SBMotion::getJointTransition(SBJoint* joint, float startTime, float endTime)
 {
 	std::vector<float> transitions;
@@ -1534,6 +1609,58 @@ SrVec SBMotion::getJointPosition(SBJoint* joint, float time)
 	connected_skeleton()->clearJointValues(); // reset the joint quat/pos
 	
 	return point;
+}
+
+SrVec SBMotion::getJointPositionFromBase(SBJoint* joint, SBJoint* baseJoint, float time)
+{
+	if (!joint || !baseJoint)
+		return SrVec();
+	if (connected_skeleton() == NULL)
+	{
+		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
+		return SrVec();
+	}
+
+	float dt = duration() / float(frames() - 1);
+	int frameId = int(time / dt);
+	float distance = 0;
+	
+	apply_frame(frameId);
+	connected_skeleton()->update_global_matrices();
+	
+	const SrMat& srcMat = joint->gmat();
+	const SrMat& baseMat = baseJoint->gmat();
+
+	// find the different
+	const SrMat& diffMat = srcMat * baseMat.inverse();
+	
+	SrVec point = SrVec(diffMat.get(12), diffMat.get(13), diffMat.get(14));
+	connected_skeleton()->clearJointValues(); // reset the joint quat/pos
+	
+	return point;
+}
+
+SrQuat SBMotion::getJointRotation(SBJoint* joint, float time)
+{
+	if (!joint)
+		return SrVec();
+	if (connected_skeleton() == NULL)
+	{
+		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
+		return SrVec();
+	}
+
+	float dt = duration() / float(frames() - 1);
+	int frameId = int(time / dt);
+	float distance = 0;
+	
+	apply_frame(frameId);
+	connected_skeleton()->update_global_matrices();
+	const SrMat& srcMat = joint->gmat();
+	SrQuat rot = SrQuat(srcMat);
+	connected_skeleton()->clearJointValues(); // reset the joint quat/pos
+	
+	return rot;	
 }
 
 SBJointMap* SBMotion::getJointMap()
@@ -1783,7 +1910,7 @@ bool SBMotion::retime(float factor)
 		keytime(f, keytime(f) * factor);
 	}
 
-	LOG("Motion %s with %d frames retimed by a factor of %f", getName().c_str(), frames(), factor);
+	//LOG("Motion %s with %d frames retimed by a factor of %f", getName().c_str(), frames(), factor);
 	return true;
 }
 
@@ -1813,7 +1940,8 @@ bool SBMotion::trim(int numFramesFromFront, int numFramesFromBack)
 	for (int i=frames()-1; i>= newFrames; i--)
 	{
 		Frame& delFrame = _frames[i];
-		free(delFrame.posture);
+		//free(delFrame.posture);
+		delete [] delFrame.posture;
 		_frames.pop_back();
 	}
 

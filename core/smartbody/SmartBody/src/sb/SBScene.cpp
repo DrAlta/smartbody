@@ -40,6 +40,7 @@
 #include <sb/SBSpeechManager.h>
 #include <sb/SBCommandManager.h>
 #include <sb/SBNavigationMeshManager.h>
+#include <sb/SBHandConfigurationManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBParser.h>
 #include <sb/SBRetarget.h>
@@ -73,6 +74,7 @@
 #include <controllers/me_ct_example_body_reach.hpp>
 #include <controllers/me_ct_saccade.h>
 #include <controllers/me_ct_new_locomotion.h>
+#include <controllers/me_ct_generic_hand.h>
 #include <sbm/KinectProcessor.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <sr/sr_sn_group.h>
@@ -169,6 +171,7 @@ void SBScene::initialize()
 	_commandManager = new SBCommandManager();
 	_naviMeshManager = new SBNavigationMeshManager();
 	_motionGraphManager = new SBMotionGraphManager();
+	_handConfigManager = new SBHandConfigurationManager();
 
 	//_scale = .01f; // default scale is centimeters
 	_scale = 1.f;
@@ -374,6 +377,7 @@ void SBScene::cleanup()
 	delete _commandManager;
 	delete _naviMeshManager;
 	delete _kinectProcessor;
+	delete _handConfigManager;
 
 	_sim = NULL;
 	_profiler = NULL;
@@ -1584,6 +1588,11 @@ SBBoneBusManager* SBScene::getBoneBusManager()
 SBGestureMapManager* SBScene::getGestureMapManager()
 {
 	return _gestureMapManager;
+}
+
+SBHandConfigurationManager* SBScene::getHandConfigurationManager()
+{
+	return _handConfigManager;
 }
 
 SBJointMapManager* SBScene::getJointMapManager()
@@ -3911,6 +3920,7 @@ void SBScene::createDefaultControllers()
 	 _defaultControllers.push_back(new MeCtBreathing());
 	 _defaultControllers.push_back(new MeCtGaze());
 	 _defaultControllers.push_back(new MeCtNewLocomotion());
+	 _defaultControllers.push_back(new MeCtGenericHand());
 
 	 for (size_t x = 0; x < _defaultControllers.size(); x++)
 		 _defaultControllers[x]->ref();

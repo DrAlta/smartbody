@@ -166,6 +166,7 @@ void pythonFuncsCharacter()
 		.def("getReach", &SBCharacter::getReach, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get current reach instance used by the character.")
 		.def("setReach", &SBCharacter::setReach, "Get current reach instance used by the character.")
 		.def("getReachAttachedPawnName", &SBCharacter::getReachAttachedPawnName, "Get the name of currently attached pawn in the reach controller.")
+
 		;
 }
 }
