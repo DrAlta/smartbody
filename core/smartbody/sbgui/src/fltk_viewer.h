@@ -1,30 +1,3 @@
-/*
- *  sr_viewer - part of SBM: SmartBody Module
- *  Copyright (C) 2008  University of Southern California
- *
- *  SBM is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SBM is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SBM.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
- */
-
-
-/** \file fltk_viewer.h
- * A fltk-opengl viewer
- */
-
 # ifndef FLTK_VIEWER_H
 # define FLTK_VIEWER_H
 
@@ -50,7 +23,11 @@
 #include <SBSelectionManager.h>
 //#include <CEGUI.h>
 
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#else
 #include <GL/glu.h>
+#endif
 
 class SBGeomObject;
 class SrQuat;
