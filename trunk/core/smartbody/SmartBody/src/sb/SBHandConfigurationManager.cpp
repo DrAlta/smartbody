@@ -68,7 +68,7 @@ SBAPI SBHandConfiguration* SBHandConfigurationManager::getHandConfiguration(std:
 	{
 		return iter->second;
 	}else{
-		LOG("Unable to find hand configuration named %s",configName);
+		LOG("Unable to find hand configuration named %s",configName.c_str());
 		return NULL;
 	}
 }
