@@ -260,7 +260,9 @@ SBAPI void SBController::setChannelQuatGlobal( const std::string& channelName, S
 		return;
 
 	SrQuat preRot = SrQuat(joint->gmatZero());
-	setJointChannelQuat(channelName, *_curFrame, preRot.inverse()*quat*preRot);
+	SrQuat inversePreRot = preRot.inverse();
+	SrQuat temp = inversePreRot * quat * preRot;
+	setJointChannelQuat(channelName, *_curFrame, temp);
 }
 
 void SBController::addControllerModifier(SBControllerModifier* modifier)
