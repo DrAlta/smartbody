@@ -56,6 +56,12 @@ public:
 	// synthesize hand motion for one hand
 	void synthesizeHandMotion();
 
+	// synthesize hand motion with random picks
+	void synthesizeRandomHandMotion();
+
+	// fill random hand segments
+	void fillRandomHandSegments();
+
 	// find similar segments
 	void findSimilarSegments();
 
