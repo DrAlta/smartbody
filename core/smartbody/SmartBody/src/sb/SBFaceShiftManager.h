@@ -48,10 +48,16 @@ namespace SmartBody {
 		SBAPI ~SBFaceShiftManager() {}
 
 		SBAPI virtual void setEnable(bool val) {}
-		SBAPI virtual bool isEnable() {}
+		SBAPI virtual bool isEnable() { return false; }
+		SBAPI virtual void start() {}
+		SBAPI virtual void stop() {}
 
 		SBAPI void initConnection() {}
-		SBAPI void stopConnection() {}			
+		SBAPI void stopConnection() {}
+		SBAPI virtual void update(double timee) {}
+		SBAPI double getCoeffValue(const std::string& blendName) { return 0.0; }
+		SBAPI SrQuat getHeadRotation() { return SrQuat(); }
+	
 	};
 
 }
