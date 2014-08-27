@@ -173,24 +173,6 @@ void SBHandSynthesis::addDatabaseMotion(SmartBody::SBMotion* dbMotion)
 // load the database motions
 bool SBHandSynthesis::loadDatabase()
 {
-	// get the path to the folder
-	// std::string mediaPath = SmartBody::SBScene::getScene()->getMediaPath(), motionFileName =  "";
-
-	// // open the file 
-	// std::ifstream file(mediaPath + "/Hand/database.txt"); std::string line;
-
-	// // file motions from the database
-	// if (file.is_open())
-	// {
-	// 	while (	getline(file,line))
-	// 	{
-	// 		addDatabaseMotion(line);
-	// 	}
-		
-	// 	file.close();
-	// }
-
-	
 	// check what the hand configuration is
 	if (_configName.compare("") == 0)
 	{
@@ -373,11 +355,11 @@ void SBHandSynthesis::synthesizeHands(SmartBody::SBMotion* bodyMotion, int maxLe
 
 	// generate body motion segments
 	changeState(RIGHT_HAND);
-	synthesizeHandMotion();
+	synthesizeRandomHandMotion();
 
 	// do the same for the second hand
 	changeState(LEFT_HAND);
-	synthesizeHandMotion();
+	synthesizeRandomHandMotion();
 	
 }
 
@@ -405,6 +387,25 @@ void SBHandSynthesis::synthesizeHandMotion()
 	// print final
 	LOG("Creating Final Motion ...");
 	
+	// create the final motion
+	createFinalMotion();
+
+	// print the results
+	printResults();
+}
+
+// synthesize random hand motion
+void SBHandSynthesis::synthesizeRandomHandMotion()
+{
+	// print first
+	LOG("Generating motion segments ... ");
+
+	// generate the motion segments
+	generateMotionSegments();
+
+	// assign random segments
+	fillRandomHandSegments();
+
 	// create the final motion
 	createFinalMotion();
 
@@ -485,6 +486,17 @@ SmartBody::SBMotion* SBHandSynthesis::createSegment(SmartBody::SBMotion* motion,
 bool sortFunction(std::pair<int,float> a, std::pair<int,float> b)
 {
 	return a.second < b.second;
+}
+
+// fill with random hand segments from body Db
+void SBHandSynthesis::fillRandomHandSegments()
+{
+	for (int i = 0 ; i < _selectDb->getMotionSegments().size() ; i++)
+	{
+		int randomSegIndex = std::rand()%_selectDb->getHandDbSegments().size();
+
+		_selectDb->addMotionIndex(randomSegIndex);
+	}
 }
 
 // find similar segments here
