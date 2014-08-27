@@ -23,7 +23,7 @@ void SBHandConfiguration::addMotion(std::string motionName)
 
 	if (!motion)
 	{
-		LOG("Unable to find motion named %s",motionName);
+		LOG("Unable to find motion named %s",motionName.c_str());
 		return;
 	}
 
@@ -37,7 +37,7 @@ void SBHandConfiguration::removeMotion(std::string motionName)
 
 	if (!motion)
 	{
-		LOG("Unable to find motion named %s",motionName);
+		LOG("Unable to find motion named %s",motionName.c_str());
 		return;
 	}
 
@@ -61,7 +61,7 @@ void SBHandConfiguration::printMotionNames()
 	for (; iter != _motions.end() ; iter++)
 	{
 		SBMotion* motion = *iter;
-		LOG("Motion name is %s", motion->getName());
+		LOG("Motion name is %s", motion->getName().c_str());
 	}
 }
 

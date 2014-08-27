@@ -264,7 +264,7 @@ void SBHandSynthesis::generateDatabaseSegments()
 		// print some stats here 
 		if (_printDebug)
 		{
-			LOG( "Processing body database named %s ", curBodyDbMotion->getName());
+			LOG( "Processing body database named %s ", curBodyDbMotion->getName().c_str());
 			LOG( "Time of original body motion is %f ", curBodyDbMotion->duration() );
 		}
 
@@ -1262,7 +1262,8 @@ void SBHandSynthesis::combineMotion(SmartBody::SBMotion* destMotion, SmartBody::
 				// multiply with the offset 
 				float weight = ( (float)( i - startFrame) / (float)(endFrame - startFrame));
 				//LOG ("weight is %f ", weight);
-				SrQuat newOffset = slerp( SrQuat(1,0,0,0) , offsets[j], weight);
+				SrQuat identity(1,0,0,0);
+				SrQuat newOffset = slerp( identity, offsets[j], weight);
 				//LOG("new offset is %s ", newOffset.toString().c_str());
 				SrQuat newRot = rot * newOffset;
 
@@ -1345,7 +1346,7 @@ void SBHandSynthesis::printResults()
 								+ "/Hand/" + fileName + "_" + _selectDb->getJointName() + ".txt";
 
 	if (_printDebug)
-		LOG ("Saving to file path %s ", filePath);
+		LOG ("Saving to file path %s ", filePath.c_str());
 
 	// open stream
 	std::ofstream myFile(filePath);
