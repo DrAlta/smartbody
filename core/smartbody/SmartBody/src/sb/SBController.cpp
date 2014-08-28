@@ -219,9 +219,17 @@ void SBController::setChannelValue(const std::string& channelName, double val)
 	if (!_curFrame)
 		return;
 
-	SrVec data;
-	data[0] = val;
-	setJointChannelPos(channelName, *_curFrame, data);
+	bool hasTranslation = true;
+
+	int positionChannelID = _context->channels().search(channelName, (SkChannel::Type)(SkChannel::XPos));
+	if (positionChannelID < 0) hasTranslation = false;
+	int posBufferID = (*_curFrame).toBufferIndex(positionChannelID);
+	if (posBufferID < 0) hasTranslation = false;
+	//LOG("SBController : posChannelID = %d, posBufferID = %d",positionChannelID, posBufferID);
+	if (hasTranslation)
+	{		
+		(*_curFrame).buffer()[posBufferID] = val;				
+	}
 }
 
 void SBController::setChannelPos(const std::string& channelName, SrVec pos)
