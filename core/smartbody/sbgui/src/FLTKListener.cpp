@@ -380,7 +380,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 							(*shapeIter).second.resize(numShapeAttributes);
 
 
-							int hasNeutral = false;
+							bool hasNeutral = false;
 							for (std::vector<SmartBody::StringAttribute*>::iterator iter = shapeAttributes.begin();
 								 iter != shapeAttributes.end();
 								 iter++)
@@ -409,33 +409,37 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 							}
 
 							std::map<std::string, std::vector<SrSnModel*> >::iterator blendshapeIter = mesh->blendShapeMap.begin();
-							(*blendshapeIter).second.resize(numShapeAttributes);
-
-							int count = 1;
-							if (hasNeutral)
+							if (blendshapeIter !=  mesh->blendShapeMap.end())
 							{
-								for (std::vector<SmartBody::StringAttribute*>::iterator iter = shapeAttributes.begin();
-									 iter != shapeAttributes.end();
-									 iter++)
-								{									
-									const std::string& attrName = (*iter)->getName();
-									// get the shape name and value
-									std::string shapeName = attrName.substr(23);
-									std::string shapeChannel = (*iter)->getValue();
-									if (shapeChannel == "Neutral")
-										continue;
-									(*shapeIter).second[count] = shapeName;
-									DeformableMesh* shapeModel = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMesh(shapeName);
-									if (shapeModel)
-									{
-										(*blendshapeIter).second[count] = shapeModel->dMeshStatic_p[0];
-										shapeModel->dMeshStatic_p[0]->ref();
+								(*blendshapeIter).second.resize(numShapeAttributes);
+
+								int count = 1;
+								if (hasNeutral)
+								{
+									for (std::vector<SmartBody::StringAttribute*>::iterator iter = shapeAttributes.begin();
+										 iter != shapeAttributes.end();
+										 iter++)
+									{									
+										const std::string& attrName = (*iter)->getName();
+										// get the shape name and value
+										std::string shapeName = attrName.substr(23);
+										std::string shapeChannel = (*iter)->getValue();
+										if (shapeChannel == "Neutral")
+											continue;
+										if (blendshapeIter !=  mesh->blendShapeMap.end())
+											(*shapeIter).second[count] = shapeName;
+										DeformableMesh* shapeModel = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMesh(shapeName);
+										if (shapeModel)
+										{
+											(*blendshapeIter).second[count] = shapeModel->dMeshStatic_p[0];
+											shapeModel->dMeshStatic_p[0]->ref();
+										}
+										else
+										{
+											(*blendshapeIter).second[count] = NULL;
+										}
+										count++;
 									}
-									else
-									{
-										(*blendshapeIter).second[count] = NULL;
-									}
-									count++;
 								}
 							}
 						}

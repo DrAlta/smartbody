@@ -1486,7 +1486,7 @@ void DeformableMeshInstance::blendShapes()
 		if(_tempFBO == 0) 
 		{
 			glGenFramebuffersEXT(1, &_tempFBO);
-			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _tempFBO);
+	//		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _tempFBO);
 		}
 
 		//	If auxiliar textyre for offscreen rendering doesn't exist yet
@@ -1514,7 +1514,10 @@ void DeformableMeshInstance::blendShapes()
 			{
 				std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
 				SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str());
-				texIDs[i]			= tex->getID();
+				if (tex)
+					texIDs[i]			= tex->getID();
+				else
+					texIDs[i]			= 0;
 				continue;	// don't do anything about base model
 			}
 
@@ -1559,7 +1562,10 @@ void DeformableMeshInstance::blendShapes()
 			std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
 			SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str());
 			weights[i]			= w;
-			texIDs[i]			= tex->getID();
+			if (tex)
+				texIDs[i]			= tex->getID();
+			else
+				texIDs[i]			=  0;
 
 			if (fabs(w) > gwiz::epsilon4())	// if it has weight
 			{
@@ -1593,7 +1599,9 @@ void DeformableMeshInstance::blendShapes()
 			newN[n].normalize();
 		}
 
-		SbmBlendTextures::BlendAllAppearances( _tempFBO, _tempTex, weights, texIDs, SbmBlendTextures::getShader("Blend_All_Textures"), 4096, 4096);
+		if (texIDs.size() > 0 &&
+			texIDs[0] != 0)
+			SbmBlendTextures::BlendAllAppearances( _tempFBO, _tempTex, weights, texIDs, SbmBlendTextures::getShader("Blend_All_Textures"), 4096, 4096);
 
 		writeToBaseModel->shape().V = newV;
 		writeToBaseModel->shape().N = newN;
