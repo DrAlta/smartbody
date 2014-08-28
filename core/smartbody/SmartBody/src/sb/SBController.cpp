@@ -1,7 +1,7 @@
 #include "SBController.h"
-#include <SB/SBPawn.h>
-#include <SB/SBSkeleton.h>
-#include <SB/SBJoint.h>
+#include <sb/SBPawn.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBJoint.h>
 
 namespace SmartBody {
 
