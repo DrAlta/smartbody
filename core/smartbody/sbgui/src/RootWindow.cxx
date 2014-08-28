@@ -140,6 +140,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&Window/Blend Viewer", 0, LaunchParamAnimViewerCB, this, 0);
 	menubar->add("&Window/BML Creator", 0, LaunchBMLCreatorCB, this, 0);
 	menubar->add("&Window/Face Viewer", 0, LaunchFaceViewerCB, this, 0);
+	menubar->add("&Window/FaceShift Viewer", 0, LaunchFaceShiftViewerCB, this, 0);
 	menubar->add("&Window/Lip Sync Viewer", 0, LaunchVisemeViewerCB, this, 0);
 	//menubar->add("&Window/Retarget Creator", 0, LaunchRetargetCreatorCB, this, NULL);
 	//menubar->add("&Window/Behavior Sets", 0, LaunchBehaviorSetsCB, this, NULL);
@@ -314,6 +315,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	retargetCreatorWindow = NULL;
 
 	faceViewerWindow = NULL;
+	faceShiftViewerWindow = NULL;
 	bmlViewerWindow = NULL;
 	dataViewerWindow = NULL;
 	
@@ -337,6 +339,8 @@ BaseWindow::~BaseWindow() {
 	if (retargetCreatorWindow)
 		delete retargetCreatorWindow;
 	if (faceViewerWindow)
+		delete faceViewerWindow;
+	if (faceShiftViewerWindow)
 		delete faceViewerWindow;
 	if (bmlViewerWindow)
 		delete bmlViewerWindow;
@@ -916,6 +920,16 @@ void BaseWindow::LaunchFaceViewerCB( Fl_Widget* widget, void* data )
 		rootWindow->faceViewerWindow = new FaceViewer(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "Face Viewer");
 	}
 	rootWindow->faceViewerWindow->show();
+}
+
+void BaseWindow::LaunchFaceShiftViewerCB( Fl_Widget* widget, void* data )
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->faceShiftViewerWindow)
+	{
+		rootWindow->faceShiftViewerWindow = new FaceShiftViewer(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "FaceShift Viewer");
+	}
+	rootWindow->faceShiftViewerWindow->show();
 }
 
 void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
