@@ -19,6 +19,7 @@
 #include "motioneditor/MotionEditorWindow.h"
 #include "panimationviewer/PanimationWindow.h"
 #include "faceviewer/FaceViewer.h"
+#include "faceshiftviewer/FaceShiftViewer.h"
 #include "channelbufferviewer/channelbufferWindow.hpp"
 #include "retargetviewer/RetargetViewer.h"
 #include "jointmapviewer/RetargetStepWindow.h"
@@ -86,6 +87,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		MotionEditorWindow* motionEditorWindow;
 		RetargetCreatorWindow* retargetCreatorWindow;
 		FaceViewer* faceViewerWindow;
+		FaceShiftViewer* faceShiftViewerWindow;
 		BehaviorWindow* bmlViewerWindow;
 		ChannelBufferWindow* dataViewerWindow;
 		ResourceWindow* resourceWindow;
@@ -154,6 +156,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void LaunchMotionEditorCB(Fl_Widget* widget, void* data);
 		static void LaunchResourceViewerCB(Fl_Widget* widget, void* data);		
 		static void LaunchFaceViewerCB(Fl_Widget* widget, void* data);
+		static void LaunchFaceShiftViewerCB(Fl_Widget* widget, void* data);
 		static void LaunchSpeechRelayCB(Fl_Widget* widget, void* data);
 		static void LaunchJointMapViewerCB(Fl_Widget* widget, void* data);
 		static void NewCB(Fl_Widget* widget, void* data);
