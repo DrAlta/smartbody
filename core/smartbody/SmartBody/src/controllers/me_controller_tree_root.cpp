@@ -357,6 +357,20 @@ public:
 	 */
 	void remove_controller( MeController* ct )
 	{	
+		std::vector<controller_ptr>::iterator iterPos = _controllers.end();
+		for (std::vector<controller_ptr>::iterator  iter = _controllers.begin();
+			 iter != _controllers.end();
+			 iter++)
+		{
+			if (*iter == ct)
+			{
+				iterPos = iter;
+				break;
+			}
+		}
+		if (iterPos != _controllers.end())
+			_controllers.erase(iterPos);
+
 		MeControllerContext::remove_controller( ct );
 	}
 
