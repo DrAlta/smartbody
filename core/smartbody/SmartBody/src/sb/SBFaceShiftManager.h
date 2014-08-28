@@ -6,6 +6,7 @@
 #include <sb/SBService.h>
 #include <sr/sr_quat.h>
 #include <string>
+#include <sb/SBSubject.h>
 
 #ifdef WIN32
 #include <WinSock2.h>
@@ -23,16 +24,22 @@ class SBFaceShiftManager : public SBService
 		SBAPI virtual void start();
 		SBAPI virtual void stop();
 
+		SBAPI void notify(SBSubject* subject);
+
 		SBAPI void initConnection();
 		SBAPI void stopConnection();
 		SBAPI virtual void update(double time);
 		SBAPI double getCoeffValue(const std::string& blendName);
 		SBAPI SrQuat getHeadRotation();
+		SBAPI std::vector<std::string>& getShapeNames();
+
+
 	protected:
 		SOCKET connectSocket;	
 		std::vector<std::string> blendShapeNames;
 		std::map<std::string, double> coeffTable;
 		SrQuat headRotation;
+		std::vector<std::string> shapeNames;
 };
 
 }
@@ -52,15 +59,16 @@ namespace SmartBody {
 		SBAPI virtual void start() {}
 		SBAPI virtual void stop() {}
 
+		SBAPI void notify(SBSubject* subject);
+
 		SBAPI void initConnection() {}
 		SBAPI void stopConnection() {}
-		SBAPI virtual void update(double timee) {}
+		SBAPI virtual void update(double time) {}
 		SBAPI double getCoeffValue(const std::string& blendName) { return 0.0; }
 		SBAPI SrQuat getHeadRotation() { return SrQuat(); }
-	
+
 	};
 
 }
 #endif
-
 #endif
