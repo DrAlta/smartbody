@@ -225,6 +225,7 @@ set( SBM_FLTK_SRC
 	./src/jointmapviewer/RetargetStepWindow.cpp
 
 	./src/faceviewer/FaceViewer.cpp
+	./src/faceshiftviewer/FaceShiftViewer.cpp
 	./src/FLTKListener.cpp
 	./src/SBGUIManager.cpp
 	
