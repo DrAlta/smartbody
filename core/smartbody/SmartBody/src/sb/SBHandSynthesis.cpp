@@ -30,6 +30,7 @@ SBHandSynthesis.cpp - implementation for the algorithm
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <ostream>
 
 
 using namespace boost;
