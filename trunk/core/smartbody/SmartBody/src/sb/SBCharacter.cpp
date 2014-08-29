@@ -191,7 +191,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	InitFrameDataMarshalFriendly();
 	
 
-	createBoolAttribute("useBlendFaceTextures", true, true, "Display", 200, false, false, false, "Enables use of blending textures for blendshapes.");
+	createBoolAttribute("useBlendFaceTextures", false, true, "Display", 200, false, false, false, "Enables use of blending textures for blendshapes.");
 	//setUseBlendFaceTextures(false);
 }
 
@@ -268,6 +268,16 @@ int SBCharacter::getNumControllers()
 
 void SBCharacter::addController(int index, SBController* controller)
 {
+	int numControllers = this->getNumControllers();
+	for (int c = 0; c < numControllers; c++)
+	{
+		if (this->getControllerByIndex(c) == controller)
+		{
+			LOG("Controller %s already exists in controller tree for character %s.", controller->getName().c_str(), this->getName().c_str());
+			return;
+		}
+	}
+	// make sure the controller doesn't already exist in the tree
 	controller->init(this);
 	ct_tree_p->add_controller(controller, index);
 }
