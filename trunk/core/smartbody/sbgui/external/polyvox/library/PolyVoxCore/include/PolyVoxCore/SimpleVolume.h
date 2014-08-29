@@ -36,7 +36,7 @@ freely, subject to the following restrictions:
 #include <cstring> //For memcpy
 #include <limits>
 #ifdef __APPLE__
-#include <tr1/memory>
+#include <memory>
 #else
 #include <memory>
 #endif

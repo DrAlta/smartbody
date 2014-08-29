@@ -103,8 +103,10 @@ freely, subject to the following restrictions:
 		#define polyvox_function std::tr1::function
 	#else
 #if defined(__APPLE__)
-		#include <tr1/cstdint>
-		#include <tr1/functional>
+		//#include <tr1/cstdint>
+		//#include <tr1/functional>
+		#include <cstdint>
+		#include <functional>
 #else
 		#include <cstdint>
 		#include <functional>
@@ -113,8 +115,8 @@ freely, subject to the following restrictions:
 		
 		#include <memory>
 #if defined(__APPLE__)
-		#define polyvox_shared_ptr std::tr1::shared_ptr
-		#define polyvox_function std::tr1::function
+		#define polyvox_shared_ptr std::shared_ptr
+		#define polyvox_function std::function
 #else
 		#define polyvox_shared_ptr std::shared_ptr
 		#define polyvox_function std::function

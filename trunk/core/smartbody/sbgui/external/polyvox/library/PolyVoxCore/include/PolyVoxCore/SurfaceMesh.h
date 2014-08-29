@@ -33,7 +33,7 @@ freely, subject to the following restrictions:
 #include <cstdlib>
 #include <list>
 #ifdef __APPLE__
-#include <tr1/memory>
+#include <memory>
 #else
 #include <memory>
 #endif

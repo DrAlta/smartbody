@@ -59,7 +59,7 @@ namespace SmartBody {
 		SBAPI virtual void start() {}
 		SBAPI virtual void stop() {}
 
-		SBAPI void notify(SBSubject* subject);
+		SBAPI void notify(SBSubject* subject) {}
 
 		SBAPI void initConnection() {}
 		SBAPI void stopConnection() {}
@@ -71,4 +71,5 @@ namespace SmartBody {
 
 }
 #endif
+
 #endif

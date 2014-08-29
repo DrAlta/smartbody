@@ -27,27 +27,27 @@
 class PinnocchioCallBack
 {
 public:
-	PinnocchioCallBack() {}
-	~PinnocchioCallBack() {}
-	virtual void callbackFunc() = 0;
-	virtual void skeletonCompleteCallBack(std::vector<Vector3>& embedding) = 0;
+	PINOCCHIO_API PinnocchioCallBack() {}
+	PINOCCHIO_API ~PinnocchioCallBack() {}
+	PINOCCHIO_API virtual void callbackFunc() = 0;
+	PINOCCHIO_API virtual void skeletonCompleteCallBack(std::vector<Vector3>& embedding) = 0;
 };
 
-class PINOCCHIO_API PinnocchioCallBackManager
+class PinnocchioCallBackManager
 {
 public:
-	PinnocchioCallBackManager();
-	~PinnocchioCallBackManager();
-	void setCallBack(PinnocchioCallBack* pinoCallBack);
-	PinnocchioCallBack* getCallBack();
-	void runCallBack();
-	static PinnocchioCallBackManager* _singleton;
+	PINOCCHIO_API PinnocchioCallBackManager();
+	PINOCCHIO_API ~PinnocchioCallBackManager();
+	PINOCCHIO_API void setCallBack(PinnocchioCallBack* pinoCallBack);
+	PINOCCHIO_API PinnocchioCallBack* getCallBack();
+	PINOCCHIO_API void runCallBack();
+	PINOCCHIO_API static PinnocchioCallBackManager* _singleton;
 public:
-	static PinnocchioCallBackManager& singleton();
+	PINOCCHIO_API static PinnocchioCallBackManager& singleton();
 
-	static PinnocchioCallBackManager* singletonPtr();
+	PINOCCHIO_API static PinnocchioCallBackManager* singletonPtr();
 
-	static void destroy_singleton();	
+	PINOCCHIO_API static void destroy_singleton();	
 protected:
 	PinnocchioCallBack* callBack;
 };

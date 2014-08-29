@@ -1004,7 +1004,11 @@ static void gl_draw_string ( const char* s, float x, float y )
    glLoadIdentity ();
    glDisable ( GL_LIGHTING );
    glColor ( SrColor::red );
+#ifdef __APPLE__
+   Fl::set_font(FL_HELVETICA, 12 ); // from fltk
+#else
    Fl::set_font(FL_TIMES, 12 ); // from fltk
+#endif
    fl_draw(s, (int) x, (int) y );      // from fltk
  }
 
