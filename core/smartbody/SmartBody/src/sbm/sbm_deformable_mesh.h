@@ -79,6 +79,13 @@ namespace SmartBodyBinary
 	class StaticMesh;
 }
 
+struct BlendShapeData
+{
+	std::vector<int> vertex;
+	std::vector<SrVec> diffV;
+	std::vector<SrVec> diffN;
+};
+
 /* This class is used to simulate and represent deformed mesh
    for Smartbody Characters.
 */
@@ -89,8 +96,10 @@ public:
 	std::vector<SrSnModel*>		dMeshDynamic_p;
 	std::vector<SrSnModel*>		dMeshStatic_p;
 	std::vector<SkinWeight*>	skinWeights;
-	std::map<std::string, std::vector<SrSnModel*> > blendShapeMap;	// morphTargets the key store the base shape name, vector stores morph target SrModels. first one in the vector is always the base one
-	std::map<std::string, std::vector<std::string> > morphTargets;	// morphTargets stores a vector of morph target names, first one is always the base one
+	std::map<std::string, std::vector<SrSnModel*> > blendShapeMap;	// the key store the base shape name, vector stores morph target SrModels. first one in the vector is always the base one
+	std::map<std::string, std::vector<std::string> > morphTargets;	// stores a vector of morph target names, first one is always the base one
+	std::vector<BlendShapeData> blendShapeData;						// stores optimized information when calculating blend shapes; list of vertices affected, and their differential vector and normal amounts
+	
 	std::string                 skeletonName;						// binding skeleton for this deformable model
 	SkSkeleton*					skeleton;							// pointer to current skeleton
 	bool						binding;							// whether in deformable mesh mode

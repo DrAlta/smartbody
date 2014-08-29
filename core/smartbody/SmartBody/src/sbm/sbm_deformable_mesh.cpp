@@ -1510,6 +1510,8 @@ void DeformableMeshInstance::blendShapes()
 
 		for (size_t i = 0; i < mIter->second.size(); ++i)
 		{
+			if (!mIter->second[i])
+				continue;
 			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
 			{
 				std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
@@ -1585,12 +1587,18 @@ void DeformableMeshInstance::blendShapes()
 				for (int v = 0; v < visemeV.size(); ++v)
 				{
 					SrPnt diff = visemeV[v] - neutralV[v];
-					newV[v] = newV[v] + diff * w;
+					if (fabs(diff[0]) >  gwiz::epsilon4() ||
+						fabs(diff[1]) >  gwiz::epsilon4() ||
+						fabs(diff[2]) >  gwiz::epsilon4())	
+						newV[v] = newV[v] + diff * w;
 				}
 				for (int n = 0; n < visemeN.size(); ++n)
 				{
 					SrPnt diff = visemeN[n] - neutralN[n];
-					newN[n] = newN[n] + diff * w;
+					if (fabs(diff[0]) >  gwiz::epsilon4() ||
+						fabs(diff[1]) >  gwiz::epsilon4() ||
+						fabs(diff[2]) >  gwiz::epsilon4())	
+						newN[n] = newN[n] + diff * w;
 				}
 			}
 		}

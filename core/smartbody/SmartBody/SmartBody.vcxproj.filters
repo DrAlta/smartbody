@@ -1186,6 +1186,9 @@
     <ClCompile Include="src\external\faceshift\fsbinarystream.cpp">
       <Filter>external\faceshift</Filter>
     </ClCompile>
+    <ClCompile Include="src\sb\SBRigNode.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2369,6 +2372,9 @@
     </ClInclude>
     <ClInclude Include="src\external\faceshift\fsbinarystream.h">
       <Filter>external\faceshift</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBRigNode.h">
+      <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
