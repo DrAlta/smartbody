@@ -66,11 +66,9 @@ double SBSetDrivenKeySequenceNode::getValue(double value, int index)
 
 	// how big are the partitions
 	double partitionSize = _range / (double) _numValues;
-	LOG("PARTITION SIZE = %f", partitionSize);
 
 	// which partition are we in?
 	int whichPart = (int) (value / partitionSize);
-	LOG("WHICH PART = %d", whichPart);
 
 	// in the i_th part, bring the i_th value up
 	if (index == whichPart)
