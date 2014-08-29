@@ -31,7 +31,7 @@
 #ifdef _MSC_VER
 #include <memory>
 #else
-#include <tr1/memory>
+#include <memory>
 #endif
 
 #include <string>
@@ -221,7 +221,7 @@ public:
 
     virtual MessageType id() const = 0;
 };
-typedef std::tr1::shared_ptr<fsMsg> fsMsgPtr;
+typedef std::shared_ptr<fsMsg> fsMsgPtr;
 
 
 /*************

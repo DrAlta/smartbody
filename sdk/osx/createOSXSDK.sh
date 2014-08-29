@@ -14,7 +14,6 @@ rsync -ap --exclude=".svn" ../../core/smartbody/ode/include/ode ./SmartBodySDK/i
 rsync -ap --exclude=".svn" ../../lib/boost/boost ./SmartBodySDK/include/
 rsync -ap --exclude=".svn" ./include/xercesc ./SmartBodySDK/include/
 rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/include/*.h ./SmartBodySDK/include/vhmsg/
-rsync -ap --exclude=".svn" ../../lib/wsp/wsp/include/*.h ./SmartBodySDK/include/wsp/
 rsync -ap --exclude=".svn" ../../lib/bonebus/include/*.h ./SmartBodySDK/include/bonebus/
 rsync -ap --exclude=".svn" ../../lib/vhcl/include/*.h ./SmartBodySDK/include/vhcl/
 rsync -ap --exclude=".svn" ../../core/smartbody/SmartBody/src/external/protobuf/include/* ./SmartBodySDK/include/protobuf/

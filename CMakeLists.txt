@@ -16,6 +16,7 @@ include_directories(
 	/usr/include
 	/usr/X11/include
 	/usr/include/xercesc
+	/usr/local/include/activemq-cpp-3.8.2
 
 	lib/vhcl/include
 	lib/vhmsg/vhmsg-c/include

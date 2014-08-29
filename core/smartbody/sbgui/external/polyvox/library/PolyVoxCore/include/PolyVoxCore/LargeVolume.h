@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 #include <list>
 #include <map>
 #ifdef __APPLE__
-#include <tr1/memory>
+#include <memory>
 #else
 #include <memory>
 #endif

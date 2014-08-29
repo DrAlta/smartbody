@@ -39,10 +39,24 @@ set ( SRC
 	./pinocchioApi.cpp	
 	./refinement.cpp	
 	./skeleton.cpp	
+	./PinnocchioCallback.cpp	
+
 )
 
 add_library( pinocchio
-   STATIC 
+  SHARED 
+
    ${SRC}
 )
 
+set_target_properties(
+	pinocchio
+	PROPERTIES
+	INSTALL_RPATH			"${APP_LIBRARY_SOURCE_PATHS}"
+	BUILD_WITH_INSTALL_RPATH	TRUE
+)
+
+install(
+	TARGETS pinocchio
+	DESTINATION core/smartbody/sbgui/bin
+)
