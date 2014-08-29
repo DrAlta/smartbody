@@ -10,6 +10,7 @@
 #include "SBBehavior.h"
 #include <sb/SBMotion.h>
 #include <sb/SBParseNode.h>
+#include <sb/SBRigNode.h>
 
 #include <sb/SBScene.h>
 #include <sb/SBScript.h>
@@ -166,8 +167,22 @@ void pythonFuncsCharacter()
 		.def("getReach", &SBCharacter::getReach, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get current reach instance used by the character.")
 		.def("setReach", &SBCharacter::setReach, "Get current reach instance used by the character.")
 		.def("getReachAttachedPawnName", &SBCharacter::getReachAttachedPawnName, "Get the name of currently attached pawn in the reach controller.")
-
 		;
+
+
+		boost::python::class_<SBSetDrivenKeyNode>("SBSetDrivenKeyNode")
+		.def(boost::python::init<>())
+		.def("setRange", &SBSetDrivenKeyNode::setRange, "Sets the range of this linear mapping.")
+		.def("getValue", &SBSetDrivenKeyNode::getValue, "Gets the value based on the input.")
+		;
+
+		boost::python::class_<SBSetDrivenKeySequenceNode>("SBSetDrivenKeySequenceNode")
+		.def(boost::python::init<>())
+		.def("setRange", &SBSetDrivenKeySequenceNode::setRange, "Sets the range of this linear mapping.")
+		.def("getValue", &SBSetDrivenKeySequenceNode::getValue, "Gets the value based on the input.")
+		;
+
+
 }
 }
 

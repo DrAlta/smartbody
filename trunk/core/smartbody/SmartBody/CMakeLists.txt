@@ -559,6 +559,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBDebuggerClient.cpp
         ./src/sb/SBDebuggerUtility.cpp
         ./src/sb/SBFaceShiftManager.cpp
+		./src/sb/SBRigNode.cpp
         ./src/sbm/SteerPath.cpp
         ./src/sbm/MiscCommands.cpp
 		
