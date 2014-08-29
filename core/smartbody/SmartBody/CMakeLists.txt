@@ -238,6 +238,7 @@ set( SMARTBODY_LIB_ME_SRC
         ./src/controllers/me_default_prune_policy.cpp
         ./src/controllers/me_spline_1d.cpp
         ./src/controllers/me_ct_pose_postprocessing.cpp
+        ./src/controllers/me_ct_generic_hand.cpp
 )
 
 set( SMARTBODY_LIB_SK_SRC
@@ -315,6 +316,7 @@ set( SMARTBODY_LIB_SR_SRC
         ./src/sr/sr_vec2.cpp
         ./src/sr/sr_vec.cpp
         ./src/sr/sr_viewer.cpp
+        ./src/sr/jpge.cpp
         ./src/sr/planner/sk_blend_cfg.cpp
         ./src/sr/planner/sk_pos_planner.cpp
         ./src/sr/planner/sk_blend_cfg_manager.cpp
@@ -489,6 +491,9 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBSteerAgent.cpp
         ./src/sb/SBReachManager.cpp
         ./src/sb/SBReach.cpp
+        ./src/sb/SBHandSynthesis.cpp
+        ./src/sb/SBHandConfiguration.cpp
+        ./src/sb/SBHandConfigurationManager.cpp
         ./src/sb/SBGestureMapManager.cpp
         ./src/sb/SBGestureMap.cpp
         ./src/sb/SBServiceManager.cpp
