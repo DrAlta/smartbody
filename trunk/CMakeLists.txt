@@ -6,8 +6,8 @@ set( BUILD_OGRE FALSE)
 set( GOOGLE_PROFILER FALSE)
 set( BUILD_FESTIVAL FALSE)
 #add_definitions(	-D__linux__	-fPIC -m32 -Ignore -fpermissive -g3 )
-#add_definitions(	-g3 -fPIC )
-add_definitions(	-O3 -fPIC )
+add_definitions(	-g3 -fPIC )
+#add_definitions(	-O3 -fPIC )
 #add_definitions(	-v -W -Wall -Wextra -pedantic )
 
 include_directories(
@@ -16,7 +16,7 @@ include_directories(
 	/usr/include
 	/usr/X11/include
 	/usr/include/xercesc
-	/usr/local/include/activemq-cpp-3.8.2
+	/usr/local/include/activemq-cpp-3.8.3
 
 	lib/vhcl/include
 	lib/vhmsg/vhmsg-c/include
