@@ -11,6 +11,8 @@
 #include <sb/SBAsset.h>
 #include <sb/SBCharacter.h>
 
+#define USE_SKIN_WEIGHT_SIZE_8 0
+
 #ifdef WIN32
 	//#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
@@ -138,7 +140,7 @@ public:
 	SBAPI void setSkeleton(SkSkeleton* skel);
 	SBAPI virtual void update();
 	SkinWeight* getSkinWeight(const std::string& skinSourceName);
-	int	getMesh(const std::string& meshName);				// get the position given the mesh name
+	SBAPI int	getMesh(const std::string& meshName);				// get the position given the mesh name
 	int getValidSkinMesh(const std::string& meshName);
     /*! Set the visibility state of the deformable geometry,
         The integers mean 1:show, 0:hide, and -1:don't change the visibility state. */

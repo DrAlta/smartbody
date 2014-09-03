@@ -482,9 +482,16 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	boneCountBuf.resize(nTotalVtxs);
 	triBuf.resize(nTotalTris);	
 
+#if USE_SKIN_WEIGHT_SIZE_8
+	int skinWeightIter = 2;
+#else
+	int skinWeightIter = 1; 
+#endif
+
 	if (buildSkinnedBuffer)
 	{
-		for (int i=0;i<2;i++)
+		
+		for (int i=0;i<skinWeightIter;i++)
 		{
 			boneIDBuf[i].resize(nTotalVtxs);
 			boneIDBuf_f[i].resize(nTotalVtxs);
@@ -564,7 +571,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			if (buildSkinnedBuffer && skinWeight)
 			{
 				int numOfInfJoints = skinWeight->numInfJoints[i];
-				for (int k=0;k<2;k++)
+				for (int k=0;k<skinWeightIter;k++)
 				{
 					boneIDBuf[k][iVtx] = SrVec4i(0,0,0,0);
 					boneIDBuf_f[k][iVtx] = SrVec4(0,0,0,0);
@@ -594,18 +601,22 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 					if (j >= (int)weightList.size())
 						continue;
 					IntFloatPair& w = weightList[j];
-					weightSum += w.second;
+					
 					if ( j < 4)
 					{
 						boneIDBuf[0][iVtx][j] = w.first;
 						boneIDBuf_f[0][iVtx][j] = (float)w.first;
 						boneWeightBuf[0][iVtx][j] = w.second;
+						weightSum += w.second;
 					}
 					else if (j < 8)
 					{
+#if USE_SKIN_WEIGHT_SIZE_8
 						boneIDBuf[1][iVtx][j-4] = w.first;
 						boneIDBuf_f[1][iVtx][j-4] = (float)w.first;
 						boneWeightBuf[1][iVtx][j-4] = w.second;
+						weightSum += w.second;
+#endif
 					}	
 
 					if (w.first >= 0 && w.first < (int) boneJointList.size())
@@ -618,7 +629,9 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				for (int j=0;j<4;j++)
 				{
 					boneWeightBuf[0][iVtx][j] /= weightSum;
+#if USE_SKIN_WEIGHT_SIZE_8
 					boneWeightBuf[1][iVtx][j] /= weightSum;
+#endif
 				}	
 
 			}
@@ -637,12 +650,14 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 
 					if (buildSkinnedBuffer)
 					{
-						boneIDBuf[0][idxMap[k]] = boneIDBuf[0][iVtx];
-						boneIDBuf[1][idxMap[k]] = boneIDBuf[1][iVtx];
+						boneIDBuf[0][idxMap[k]] = boneIDBuf[0][iVtx];						
 						boneIDBuf_f[0][idxMap[k]] = boneIDBuf_f[0][iVtx];
-						boneIDBuf_f[1][idxMap[k]] = boneIDBuf_f[1][iVtx];
 						boneWeightBuf[0][idxMap[k]] = boneWeightBuf[0][iVtx];
-						boneWeightBuf[1][idxMap[k]] = boneWeightBuf[1][iVtx];
+#if USE_SKIN_WEIGHT_SIZE_8
+						boneIDBuf[1][idxMap[k]] = boneIDBuf[1][iVtx];
+						boneIDBuf_f[1][idxMap[k]] = boneIDBuf_f[1][iVtx];	
+						boneWeightBuf[1][idxMap[k]] = boneWeightBuf[1][iVtx];						
+#endif						
 						skinColorBuf[idxMap[k]] = skinColorBuf[iVtx];
 						boneCountBuf[idxMap[k]] = boneCountBuf[iVtx];
 					}	
@@ -1810,8 +1825,16 @@ SBAPI void DeformableMeshInstance::updateFast()
 		for (int k=0;k<_mesh->boneCountBuf[i];k++)
 		//for (int k=0;k<8;k++)
 		{	
+				
+#if USE_SKIN_WEIGHT_SIZE_8
 			int a = (k<4) ? 0 : 1;
-			int b = k%4;			
+			int b = k%4;		
+#else
+			if (k >= 4)
+				break;
+			int a = 0;
+			int b = k;			
+#endif
 			vSkinPos += (vPos*transformBuffer[_mesh->boneIDBuf[a][i][b]])*_mesh->boneWeightBuf[a][i][b];
 		}
 
