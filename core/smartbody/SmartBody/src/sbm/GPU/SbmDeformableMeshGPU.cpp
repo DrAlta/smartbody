@@ -183,6 +183,82 @@ bv     = normalize(gl_NormalMatrix * binormal.xyz);\n\
 //}\n\
 }\n";
 
+std::string shaderVS_Weight4 = 
+	"#version 120 \n\
+	const int NumLight =2;\n\
+	uniform mat4 Transform[120]; \n\
+	uniform int  updateNormal;\n\
+	uniform float meshScale;\n\
+	attribute vec4 BoneID1;   \n\
+	attribute vec4 BoneWeight1;\n \
+	attribute vec3 tangent, binormal;\n\
+	varying vec4 vPos;\n\
+	varying vec3 normal,lightDir[NumLight],halfVector[NumLight];\n\
+	varying vec3 tv,bv;\n\
+	mat4 GetTransformation(float id)\n \
+	{ \n\
+	int idx = int(id);\n \
+	return Transform[idx];\n \
+	}\n \
+	mat4 TransformPos(vec3 position, vec3 normal, vec3 tang, vec3 binorm, vec4 boneid, vec4 boneweight)\n\
+	{\n\
+	vec3 pos = vec3(0,0,0);\n\
+	vec3 n = vec3(0,0,0);\n\
+	vec3 t = vec3(0,0,0);\n\
+	vec3 b = vec3(0,0,0);\n\
+	mat4 tempT;\n\
+	vec3 tempt;\n\
+	for (int i=0;i<4;i++)\n\
+	{\n\
+	tempT = GetTransformation(boneid[i]);\n\
+	pos += (vec4(position,1.0)*tempT).xyz*boneweight[i];\n\
+	n   += (vec4(normal,0.0)*tempT).xyz*boneweight[i];\n\
+	t   += (vec4(tang,0.0)*tempT).xyz*boneweight[i];\n\
+	b   += (vec4(binorm,0.0)*tempT).xyz*boneweight[i];\n\
+	}	\n\
+	mat4 result;\n\
+	result[0] = vec4(pos,1.0);\n\
+	result[1] = vec4(n,1.0);\n\
+	result[2] = vec4(t,1.0);\n\
+	result[3] = vec4(b,1.0);\n\
+	return result;\n\
+	}\n\
+	void main()\n \
+	{\n	\
+	// the following three lines provide the same result\n \
+	vec3 pos = vec3(gl_Vertex.xyz)*meshScale;\n \
+	mat4 skin = TransformPos(pos,gl_Normal,tangent,binormal,BoneID1,BoneWeight1);\n\
+	vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix * vec4(skin[0].xyz,1.0);\n\
+	gl_Position = gl_ModelViewProjectionMatrix*vec4(skin[0].xyz,1.0);\n\
+	//vPos = gl_TextureMatrix[7]* gl_ModelViewMatrix * vec4(pos.xyz,1.0);\n\
+	//gl_Position = gl_ModelViewProjectionMatrix*vec4(pos.xyz,1.0);\n\
+	//dist[0] = 0.0;\n\
+	//vec3 posDir = vec3(gl_LightSource[1].position);// - gl_ModelViewMatrix * vec4(skin[0].xyz,1.0));\n\
+	//dist[1] = 0.0;//length(posDir);\n\
+	//lightDir[0] = normalize((vec4(gl_LightSource[0].position.xyz,0.0)).xyz);\n\
+	//halfVector[0] = normalize((vec4(gl_LightSource[0].halfVector.xyz,0.0)).xyz);\n\
+	for (int i=0;i<NumLight;i++)\n\
+	{\n\
+	vec3 posDir = vec3(gl_LightSource[i].position);\n\
+	vec4 hv = vec4(gl_LightSource[i].halfVector);\n\
+	lightDir[i] = normalize(posDir);\n\
+	halfVector[i] = normalize(hv.xyz);\n\
+	}\n\
+	int colorIdx = int(gl_Vertex.w); \n\
+	gl_TexCoord[0] = gl_MultiTexCoord0;\n\
+	//if (updateNormal == 1 )\n\
+	//{\n\
+	//normal = normalize(gl_NormalMatrix * skin[1].xyz);\n\
+	//tv     = normalize(gl_NormalMatrix * skin[2].xyz);\n\
+	//bv     = normalize(gl_NormalMatrix * skin[3].xyz);\n\
+	//}\n\
+	//else {\n\
+	normal = normalize(gl_NormalMatrix * gl_Normal.xyz);\n\
+	tv     = normalize(gl_NormalMatrix * tangent.xyz);\n\
+	bv     = normalize(gl_NormalMatrix * binormal.xyz);\n\
+	//}\n\
+	}\n";
+
 std::string shaderBasicFS =
 "void main (void)\n\
 {  \n\
@@ -524,10 +600,13 @@ SbmDeformableMeshGPU::~SbmDeformableMeshGPU(void)
 	if (VBOBiNormal) delete VBOBiNormal;
 	if (VBOTexCoord) delete VBOTexCoord;
 	if (VBOTri) delete VBOTri;
-	if (VBOBoneID1) delete VBOBoneID1;
-	if (VBOBoneID2) delete VBOBoneID2;
+	if (VBOBoneID1) delete VBOBoneID1;	
 	if (VBOWeight1) delete VBOWeight1;
+
+#if USE_SKIN_WEIGHT_SIZE_8
 	if (VBOWeight2) delete VBOWeight2;
+	if (VBOBoneID2) delete VBOBoneID2;
+#endif
 	if (TBOTran) delete TBOTran;
 	for (unsigned int i=0;i<subMeshTris.size();i++)
 	{
@@ -572,8 +651,10 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	GLuint meshScale_location = glGetUniformLocation(program,"meshScale");	
 	GLuint bone_loc1 = glGetAttribLocation(program,"BoneID1");
 	GLuint weight_loc1 = glGetAttribLocation(program,"BoneWeight1");	
+#if USE_SKIN_WEIGHT_SIZE_8
 	GLuint bone_loc2 = glGetAttribLocation(program,"BoneID2");
 	GLuint weight_loc2 = glGetAttribLocation(program,"BoneWeight2");
+#endif
 	GLuint tangent_loc = glGetAttribLocation(program,"tangent");
 	GLuint binormal_loc = glGetAttribLocation(program,"binormal");
 	GLuint diffuseLoc = glGetUniformLocation(program,"diffuseMaterial");	
@@ -628,7 +709,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	glVertexAttribPointer(bone_loc1,4,GL_FLOAT,0,0,0);	
 	//glBindAttribLocation(program,VBOBoneID1->VBO()->m_ArrayType,"BoneID1");
 	//glVertexAttribPointer(VBOBoneID1->VBO()->m_ArrayType,4,GL_FLOAT,0,0,0);	
-	
+#if USE_SKIN_WEIGHT_SIZE_8
 	glEnableVertexAttribArray(weight_loc2);
 	VBOWeight2->VBO()->BindBuffer();
 	glVertexAttribPointer(weight_loc2,4,GL_FLOAT,0,0,0);	
@@ -640,7 +721,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	VBOBoneID2->VBO()->BindBuffer();
 	//glVertexAttribIPointer(bone_loc2,4,GL_INT,0,0);	
 	glVertexAttribPointer(bone_loc2,4,GL_FLOAT,0,0,0);	
-	
+#endif	
 	
 	glEnableVertexAttribArray(tangent_loc);
 	VBOTangent->VBO()->BindBuffer();
@@ -776,16 +857,21 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	VBOBiNormal->VBO()->UnbindBuffer();
 	VBOTangent->VBO()->UnbindBuffer();
 	
-
+#if USE_SKIN_WEIGHT_SIZE_8
 	VBOBoneID2->VBO()->UnbindBuffer();	
 	VBOWeight2->VBO()->UnbindBuffer();	
+#endif
+
 	VBOBoneID1->VBO()->UnbindBuffer();	
-	VBOWeight1->VBO()->UnbindBuffer();
-	
+	VBOWeight1->VBO()->UnbindBuffer();	
 	VBOPos->VBO()->UnbindBuffer();
+
+#if USE_SKIN_WEIGHT_SIZE_8
 	glDisableVertexAttribArray(bone_loc2);
-	glDisableVertexAttribArray(bone_loc1);
 	glDisableVertexAttribArray(weight_loc2);
+#endif
+
+	glDisableVertexAttribArray(bone_loc1);
 	glDisableVertexAttribArray(weight_loc1);
 	glDisableVertexAttribArray(binormal_loc);
 	glDisableVertexAttribArray(tangent_loc);
@@ -821,13 +907,18 @@ void SbmDeformableMeshGPU::initShaderProgram()
 	}
 	else if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_2_0)
 	{
-		SbmShaderManager::singleton().addShader(shadowShaderName.c_str(),shaderVS_2.c_str(),shaderBasicFS.c_str(),false);
-#ifdef __APPLE__
-		SbmShaderManager::singleton().addShader(shaderName.c_str(),shaderVS_2.c_str(),shaderFSMac.c_str(),false);
-        SbmShaderManager::singleton().addShader(shaderFaceName.c_str(),shaderVS_2.c_str(),shaderFSMac.c_str(),false);
+#if USE_SKIN_WEIGHT_SIZE_8
+		std::string VSShaderName = shaderVS_2;
 #else
-        SbmShaderManager::singleton().addShader(shaderName.c_str(),shaderVS_2.c_str(),shaderFS.c_str(),false);
-        SbmShaderManager::singleton().addShader(shaderFaceName.c_str(),shaderVS_2.c_str(),shaderFSFace.c_str(),false);
+		std::string VSShaderName = shaderVS_Weight4;
+#endif
+		SbmShaderManager::singleton().addShader(shadowShaderName.c_str(),VSShaderName.c_str(),shaderBasicFS.c_str(),false);
+#ifdef __APPLE__
+		SbmShaderManager::singleton().addShader(shaderName.c_str(),VSShaderName.c_str(),shaderFSMac.c_str(),false);
+        SbmShaderManager::singleton().addShader(shaderFaceName.c_str(),VSShaderName.c_str(),shaderFSMac.c_str(),false);
+#else
+        SbmShaderManager::singleton().addShader(shaderName.c_str(),VSShaderName.c_str(),shaderFS.c_str(),false);
+        SbmShaderManager::singleton().addShader(shaderFaceName.c_str(),VSShaderName.c_str(),shaderFSFace.c_str(),false);
 #endif
 		
 	}
@@ -1288,13 +1379,16 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 	VBOBiNormal = new VBOVec3f((char*)"BiNormal",VERTEX_BINORMAL, binormalBuf);
 	VBONormal  =  new VBOVec3f((char*)"Normal",VERTEX_VBONORMAL, normalBuf);
 	VBOTexCoord = new VBOVec2f((char*)"TexCoord",VERTEX_TEXCOORD, texCoordBuf);
+	VBOBoneID1 = new VBOVec4f((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf_f[0]);
 	VBOWeight1 = new VBOVec4f((char*)"Weight1",VERTEX_BONE_WEIGHT_1,boneWeightBuf[0]);
+
+#if USE_SKIN_WEIGHT_SIZE_8
+	VBOBoneID2 = new VBOVec4f((char*)"BoneID2",VERTEX_BONE_ID_2,boneIDBuf_f[1]);
 	VBOWeight2 = new VBOVec4f((char*)"Weight2",VERTEX_BONE_WEIGHT_2,boneWeightBuf[1]);
+#endif
 	//VBOOutPos  = new VBOVec4f((char*)"OutPos",VERTEX_POSITION,posBuffer);
 	VBOTri     = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,triBuf);
-
-	VBOBoneID1 = new VBOVec4f((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf_f[0]);
-	VBOBoneID2 = new VBOVec4f((char*)"BoneID2",VERTEX_BONE_ID_2,boneIDBuf_f[1]);
+	
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{
 		SbmSubMesh* subMesh = subMeshList[i];
@@ -1314,8 +1408,9 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 
 bool SbmDeformableMeshGPU::initBuffer()
 {
-	this->buildVertexBufferGPU();
 
+	return this->buildVertexBufferGPU();
+#if 0
 	GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
 
 	VBOPos = new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuf);		
@@ -1345,6 +1440,7 @@ bool SbmDeformableMeshGPU::initBuffer()
 		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 	}
 	return true;
+#endif	
 }
 
 SbmDeformableMeshGPUInstance::SbmDeformableMeshGPUInstance()
