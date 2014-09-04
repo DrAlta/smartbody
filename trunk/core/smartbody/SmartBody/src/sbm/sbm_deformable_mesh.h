@@ -83,9 +83,8 @@ namespace SmartBodyBinary
 
 struct BlendShapeData
 {
-	std::vector<int> vertex;
-	std::vector<SrVec> diffV;
-	std::vector<SrVec> diffN;
+	std::vector<std::pair<int, SrVec> > diffV;
+	std::vector<std::pair<int, SrVec> > diffN;
 };
 
 /* This class is used to simulate and represent deformed mesh
@@ -100,7 +99,7 @@ public:
 	std::vector<SkinWeight*>	skinWeights;
 	std::map<std::string, std::vector<SrSnModel*> > blendShapeMap;	// the key store the base shape name, vector stores morph target SrModels. first one in the vector is always the base one
 	std::map<std::string, std::vector<std::string> > morphTargets;	// stores a vector of morph target names, first one is always the base one
-	std::vector<BlendShapeData> blendShapeData;						// stores optimized information when calculating blend shapes; list of vertices affected, and their differential vector and normal amounts
+	std::vector<BlendShapeData> optimizedBlendShapeData;						// stores optimized information when calculating blend shapes; list of vertices affected, and their differential vector and normal amounts
 	
 	std::string                 skeletonName;						// binding skeleton for this deformable model
 	SkSkeleton*					skeleton;							// pointer to current skeleton

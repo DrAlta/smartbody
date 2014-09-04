@@ -157,8 +157,10 @@ void DeformableMesh::update()
 		std::map<std::string, std::vector<std::string> >::iterator iter = this->morphTargets.find(skinWeight->sourceMesh);
 		int pos;
 		int globalCounter = 0;
-		if (iter != this->morphTargets.end() && iter->second.size() > 0)	pos = this->getMesh(iter->second[0]);
-		else																pos = this->getMesh(skinWeight->sourceMesh);
+		if (iter != this->morphTargets.end() && iter->second.size() > 0)
+			pos = this->getMesh(iter->second[0]);
+		else
+			pos = this->getMesh(skinWeight->sourceMesh);
 		if (pos != -1)
 		{
 			SrSnModel* dMeshStatic = dMeshStatic_p[pos];
@@ -1456,10 +1458,12 @@ void DeformableMeshInstance::blendShapes()
 		return;
 	}
 
+
 	// find the base shape from static meshes
 	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
 	for (mIter = _mesh->blendShapeMap.begin(); mIter != _mesh->blendShapeMap.end(); ++mIter)
 	{
+		bool foundBaseModel = false;
 		SrSnModel* writeToBaseModel = NULL;
 		SrSnModel* baseModel = NULL;
 		for (size_t i = 0; i < _mesh->dMeshStatic_p.size(); ++i)
@@ -1482,6 +1486,7 @@ void DeformableMeshInstance::blendShapes()
 			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
 			{
 				baseModel = mIter->second[i];
+				foundBaseModel = true;
 				break;
 			}
 		}
@@ -1495,6 +1500,57 @@ void DeformableMeshInstance::blendShapes()
 		SrArray<SrPnt>& neutralN = baseModel->shape().N;
 		SrArray<SrPnt> newV = neutralV;
 		SrArray<SrPnt> newN = neutralN;
+
+
+		if (foundBaseModel && 
+			_character->getBoolAttribute("useOptimizedBlendShapes"))
+		{
+			if (_mesh->optimizedBlendShapeData.size() !=  mIter->second.size())
+			{
+				LOG("Optimizing blend shapes. Only have %d/%d shapes.", _mesh->optimizedBlendShapeData.size(), mIter->second.size());
+				_mesh->optimizedBlendShapeData.clear();
+				// optimize the blend shape maps as needed
+				for (size_t i = 0; i < mIter->second.size(); ++i)
+				{
+					_mesh->optimizedBlendShapeData.push_back(BlendShapeData());
+					if (i == 0)
+					{
+						continue;
+					}
+					if (!mIter->second[i])
+					{
+						continue;
+					}
+					BlendShapeData& blendData = _mesh->optimizedBlendShapeData[i];
+					SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
+					SrArray<SrPnt>& visemeN = mIter->second[i]->shape().N;
+
+					SrVec vVec;
+					SrVec nVec;
+					for (int v = 0; v < visemeV.size(); ++v)
+					{
+						vVec = visemeV[v] - neutralV[v];
+						if (fabs(vVec[0]) >  gwiz::epsilon4() ||
+							fabs(vVec[1]) >  gwiz::epsilon4() ||
+							fabs(vVec[2]) >  gwiz::epsilon4())
+						{
+							blendData.diffV.push_back(std::pair<int, SrVec>(v, vVec));
+						}
+					}
+					for (int n = 0; n < visemeN.size(); ++n)
+					{
+						nVec = visemeN[n] - neutralN[n];
+						if (fabs(nVec[0]) >  gwiz::epsilon4() ||
+							fabs(nVec[1]) >  gwiz::epsilon4() ||
+							fabs(nVec[2]) >  gwiz::epsilon4())	
+						{
+							blendData.diffN.push_back(std::pair<int, SrVec>(n, nVec));
+						}
+					}
+					LOG("Optimized blend %s has %d/%d vertices, %d/%d normals.", (const char*) mIter->second[i]->shape().name, blendData.diffV.size(), visemeV.size(), blendData.diffN.size(), visemeN.size());
+				}
+			}
+		}
 
 
 		//	If auxiliar FBO for offscreen rendering doesn't exist yet
@@ -1599,21 +1655,45 @@ void DeformableMeshInstance::blendShapes()
 					LOG("number of normals for %s is not same as neutral", mIter->first.c_str());
 					continue;
 				}
-				for (int v = 0; v < visemeV.size(); ++v)
+
+				if (_character->getBoolAttribute("useOptimizedBlendShapes"))
 				{
-					SrPnt diff = visemeV[v] - neutralV[v];
-					if (fabs(diff[0]) >  gwiz::epsilon4() ||
-						fabs(diff[1]) >  gwiz::epsilon4() ||
-						fabs(diff[2]) >  gwiz::epsilon4())	
-						newV[v] = newV[v] + diff * w;
+					// loop through a shorter list of different vertices and normals
+					BlendShapeData& blendData = _mesh->optimizedBlendShapeData[i];
+					int vSize = _mesh->optimizedBlendShapeData[i].diffV.size();
+					for (int v = 0; v < vSize; ++v)
+					{
+						int index = blendData.diffV[v].first;
+						SrVec& diff = blendData.diffV[v].second;
+						newV[index] = newV[index] + diff * w;
+					}
+					int nSize = _mesh->optimizedBlendShapeData[i].diffN.size();
+					for (int n = 0; n < nSize; ++n)
+					{
+						int index = blendData.diffN[n].first;
+						SrVec& diff = blendData.diffN[n].second;
+						newN[index] = newN[index] + diff * w;
+					}
 				}
-				for (int n = 0; n < visemeN.size(); ++n)
+				else
 				{
-					SrPnt diff = visemeN[n] - neutralN[n];
-					if (fabs(diff[0]) >  gwiz::epsilon4() ||
-						fabs(diff[1]) >  gwiz::epsilon4() ||
-						fabs(diff[2]) >  gwiz::epsilon4())	
-						newN[n] = newN[n] + diff * w;
+					// loop through all vertices and normals
+					for (int v = 0; v < visemeV.size(); ++v)
+					{
+						SrPnt diff = visemeV[v] - neutralV[v];
+						if (fabs(diff[0]) >  gwiz::epsilon4() ||
+							fabs(diff[1]) >  gwiz::epsilon4() ||
+							fabs(diff[2]) >  gwiz::epsilon4())	
+							newV[v] = newV[v] + diff * w;
+					}
+					for (int n = 0; n < visemeN.size(); ++n)
+					{
+						SrPnt diff = visemeN[n] - neutralN[n];
+						if (fabs(diff[0]) >  gwiz::epsilon4() ||
+							fabs(diff[1]) >  gwiz::epsilon4() ||
+							fabs(diff[2]) >  gwiz::epsilon4())	
+							newN[n] = newN[n] + diff * w;
+					}
 				}
 			}
 		}

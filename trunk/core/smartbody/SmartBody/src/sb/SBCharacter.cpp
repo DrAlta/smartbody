@@ -191,7 +191,9 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	InitFrameDataMarshalFriendly();
 	
 
-	createBoolAttribute("useBlendFaceTextures", false, true, "Display", 200, false, false, false, "Enables use of blending textures for blendshapes.");
+	createBoolAttribute("useBlendFaceTextures", false, true, "Display", 710, false, false, false, "Enables use of blending textures for blendshapes.");
+	createBoolAttribute("useOptimizedBlendShapes", true, true, "Display", 720, false, false, false, "Enables faster blend shape computation by caching blend shape data.");
+	
 	//setUseBlendFaceTextures(false);
 }
 
