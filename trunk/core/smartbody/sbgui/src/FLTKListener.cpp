@@ -624,7 +624,7 @@ void FLTKListener::OnSimulationUpdate()
 void FLTKListener::OnLogMessage( const std::string& message )
 {
 #ifdef WIN32
-	LOG("%s", message.c_str();
+	LOG("%s", message.c_str());
 #endif
 #ifdef __APPLE__
 	std::cout << message << std::endl;
