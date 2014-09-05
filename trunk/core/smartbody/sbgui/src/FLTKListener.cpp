@@ -517,10 +517,6 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 #if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)
 					SbmDeformableMeshGPU::useGPUDeformableMesh = true;
 #endif
-#if defined (__APPLE__)
-// disable GPU rendering on OSx for now
-					SbmDeformableMeshGPU::useGPUDeformableMesh = false;
-#endif
 					if (pawn->dMeshInstance_p)
 						pawn->dMeshInstance_p->setVisibility(1);
 
