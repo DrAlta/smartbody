@@ -609,7 +609,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("addMotion", &SBHandConfiguration::addMotion, "Add a new motion to the configuration")
 		.def("removeMotion", &SBHandConfiguration::removeMotion, "Remove the motion from the configuration")
 		.def("getNumMotions", &SBHandConfiguration::getNumMotions, "Get the number of motions")
-		.def("printMotionNames", &SBHandConfiguration::printMotionNames, "Print the names of the motion")
+		.def("getMotionNames", &SBHandConfiguration::getMotionNames, "Returns a list of motion names from the hand configuration.")
 		;
 
 	boost::python::class_<SBJointMap>("SBJointMap")

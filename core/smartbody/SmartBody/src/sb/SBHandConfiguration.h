@@ -18,6 +18,7 @@ public:
 	SBAPI int getNumMotions();
 	SBAPI void printMotionNames();
 	SBAPI SBMotion* getMotion(int i);
+	SBAPI std::vector<std::string> getMotionNames();
 
 private:
 	

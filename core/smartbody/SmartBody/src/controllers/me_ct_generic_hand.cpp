@@ -87,11 +87,10 @@ MeCtGenericHand::MeCtGenericHand() : SmartBody::SBController()
 	addDefaultAttributeBool("hand.enableHand", true, "Hand");
 	addDefaultAttributeBool("hand.enableBody", true, "Hand");
 	addDefaultAttributeBool("hand.debug", false, "Hand");
-	addDefaultAttributeAction("hand.init", "Hand");
-	addDefaultAttributeAction("hand.switchConfig", "Hand");
-	addDefaultAttributeString("hand.motionName", "brad_body_motion.skm", "Hand");
-	addDefaultAttributeString("hand.config", "test_config", "Hand");
+	addDefaultAttributeString("hand.motionName", "", "Hand");
+	addDefaultAttributeString("hand.config", "", "Hand");
 	addDefaultAttributeInt("hand.levels", -1, "Hand");
+	addDefaultAttributeBool("hand.useRandom", false, "Hand");
 }
 
 MeCtGenericHand::MeCtGenericHand( SmartBody::SBSkeleton* skeleton, SbmCharacter* c) : SmartBody::SBController()
@@ -167,8 +166,9 @@ void MeCtGenericHand::init(SmartBody::SBMotion* m , int num_levels = -1)
 	// set body motion to this motion
 	_bodyMotion = m;
 
-	// run the synthesiz
-	_handSynthesis->synthesizeHands(_bodyMotion, num_levels);
+	// run the synthesis
+	bool useRandom = this->_character->getBoolAttribute("hand.useRandom");
+	_handSynthesis->synthesizeHands(_bodyMotion, num_levels, useRandom);
 
 	SmartBody::SBMotion* _leftMotion = _handSynthesis->getLeftDb()->getFinalMotion();
 	SmartBody::SBMotion* _rightMotion = _handSynthesis->getRightDb()->getFinalMotion();
@@ -386,7 +386,7 @@ void MeCtGenericHand::notify(SBSubject* subject)
 				_handSynthesis->setDebug(boolAttr->getValue());
 			}
 		}
-		else if (name == "hand.init")
+		else if (name == "hand.motionName")
 		{
 			if (!_character)
 				return;
@@ -404,7 +404,8 @@ void MeCtGenericHand::notify(SBSubject* subject)
 				return;
 			}
 			this->init(motion, numLevels);
-		}else if (name == "hand.switchConfig")
+		}
+		else if (name == "hand.config")
 		{
 			std::string configName = _character->getStringAttribute("hand.config");
 			_handSynthesis->setConfigurationName(configName);
