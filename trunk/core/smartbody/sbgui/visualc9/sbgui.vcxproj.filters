@@ -64,6 +64,9 @@
     <Filter Include="SOIL">
       <UniqueIdentifier>{5490d996-cdef-4047-bedc-d720428ccf81}</UniqueIdentifier>
     </Filter>
+    <Filter Include="faceshiftviewer">
+      <UniqueIdentifier>{1dae2d67-bed9-4681-a9ed-4eef5ffbac5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -330,7 +333,8 @@
     </ClCompile>
     <ClCompile Include="..\src\autorig\AutoRigViewer.cpp">
       <Filter>autorig</Filter>
-    </ClCompile>    <ClCompile Include="..\..\SmartBody\src\external\SOIL\image_DXT.c">
+    </ClCompile>
+    <ClCompile Include="..\..\SmartBody\src\external\SOIL\image_DXT.c">
       <Filter>SOIL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SmartBody\src\external\SOIL\image_helper.c">
@@ -341,7 +345,12 @@
     </ClCompile>
     <ClCompile Include="..\..\SmartBody\src\external\SOIL\stb_image_aug.c">
       <Filter>SOIL</Filter>
-    </ClCompile>  </ItemGroup>
+    </ClCompile>
+    <ClCompile Include="..\..\SmartBody\src\sr\jpge.cpp" />
+    <ClCompile Include="..\src\faceshiftviewer\FaceShiftViewer.cpp">
+      <Filter>faceshiftviewer</Filter>
+    </ClCompile>
+  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
       <Filter>viewer</Filter>
@@ -615,7 +624,6 @@
     <ClInclude Include="..\src\autorig\AutoRigViewer.h">
       <Filter>autorig</Filter>
     </ClInclude>
-
     <ClInclude Include="..\..\SmartBody\src\external\SOIL\image_DXT.h">
       <Filter>SOIL</Filter>
     </ClInclude>
@@ -633,5 +641,10 @@
     </ClInclude>
     <ClInclude Include="..\..\SmartBody\src\external\SOIL\stb_image_aug.h">
       <Filter>SOIL</Filter>
-    </ClInclude>  </ItemGroup>
+    </ClInclude>
+    <ClInclude Include="..\..\SmartBody\src\sr\jpge.h" />
+    <ClInclude Include="..\src\faceshiftviewer\FaceShiftViewer.h">
+      <Filter>faceshiftviewer</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
