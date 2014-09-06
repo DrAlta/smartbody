@@ -76,5 +76,19 @@ SBMotion* SBHandConfiguration::getMotion(int i)
 	return _motions[i];
 }
 
+std::vector<std::string> SBHandConfiguration::getMotionNames()
+{
+	std::vector<std::string> motionNames;
+	std::vector<SBMotion*>::iterator iter = _motions.begin();
+	for (; iter != _motions.end() ; iter++)
+	{
+		SBMotion* motion = *iter;
+		motionNames.push_back(motion->getName());
+	}
+
+	return motionNames;
+}
+
+
 
 }

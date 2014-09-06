@@ -51,7 +51,7 @@ public:
 	void generateMotionSegments();
 
 	// starts algorithm
-	void synthesizeHands(SmartBody::SBMotion* bodyMotion, int maxLevels);
+	void synthesizeHands(SmartBody::SBMotion* bodyMotion, int maxLevels, bool useRandom);
 
 	// synthesize hand motion for one hand
 	void synthesizeHandMotion();

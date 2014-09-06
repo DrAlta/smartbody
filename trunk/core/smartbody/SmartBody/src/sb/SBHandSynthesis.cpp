@@ -188,6 +188,9 @@ bool SBHandSynthesis::loadDatabase()
 	// instead get the database from the configuration manager
 	SBHandConfiguration* config = SmartBody::SBScene::getScene()->getHandConfigurationManager()->getHandConfiguration(_configName);
 
+	if (!config)
+		return false;
+
 	// get all the motions and add them
 	for (int i = 0 ; i < config->getNumMotions(); i++)
 	{
@@ -230,7 +233,7 @@ void SBHandSynthesis::generateDatabaseSegments()
 	//LOG ("body database size is %d" , _bodyDbMotion.size());
 	//LOG ("hand database size is %d" , _handDbMotion.size());
 	
-	for (int i = 0 ; i < _bodyDbMotion.size() ; i++ ) 
+	for (size_t i = 0 ; i < _bodyDbMotion.size() ; i++ ) 
 	{
 		SmartBody::SBMotion* curBodyDbMotion = _bodyDbMotion[i];
 		SmartBody::SBMotion* curHandDbMotion = _handDbMotion[i];
@@ -331,7 +334,7 @@ void SBHandSynthesis::clearData()
 }
 
 // synthesize the hand motion
-void SBHandSynthesis::synthesizeHands(SmartBody::SBMotion* bodyMotion, int maxLevels)
+void SBHandSynthesis::synthesizeHands(SmartBody::SBMotion* bodyMotion, int maxLevels, bool useRandom)
 {
 	// check if database is present
 	if (_leftDb->getBodyDbSegments().size() == 0 && _rightDb->getBodyDbSegments().size() == 0 )
@@ -356,11 +359,17 @@ void SBHandSynthesis::synthesizeHands(SmartBody::SBMotion* bodyMotion, int maxLe
 
 	// generate body motion segments
 	changeState(RIGHT_HAND);
-	synthesizeRandomHandMotion();
+	if (useRandom)
+		synthesizeRandomHandMotion();
+	else
+		synthesizeHandMotion();
 
 	// do the same for the second hand
 	changeState(LEFT_HAND);
-	synthesizeRandomHandMotion();
+	if (useRandom)
+		synthesizeRandomHandMotion();
+	else
+		synthesizeHandMotion();
 	
 }
 
@@ -492,7 +501,7 @@ bool sortFunction(std::pair<int,float> a, std::pair<int,float> b)
 // fill with random hand segments from body Db
 void SBHandSynthesis::fillRandomHandSegments()
 {
-	for (int i = 0 ; i < _selectDb->getMotionSegments().size() ; i++)
+	for (size_t i = 0 ; i < _selectDb->getMotionSegments().size() ; i++)
 	{
 		int randomSegIndex = std::rand()%_selectDb->getHandDbSegments().size();
 
@@ -530,7 +539,7 @@ void SBHandSynthesis::findSimilarSegments()
 		segment->connect(_sk);
 
 		// compare with fragments in database 
-		for (int j=0;j<_selectDb->getBodyDbSegments().size();j++)
+		for (size_t j=0;j<_selectDb->getBodyDbSegments().size();j++)
 		{
 			SmartBody::SBMotion* databaseSegment = _selectDb->getBodyDbSegments()[j];
 
@@ -1176,7 +1185,7 @@ void SBHandSynthesis::combineMotion(SmartBody::SBMotion* destMotion, SmartBody::
 	//LOG(" Number of frames in srcMotion in start is %d", srcMotion->getNumFrames());
 
 	// find all the offsets 
-	for (int i = 0 ; i < descendants.size() ; i++)
+	for (size_t i = 0 ; i < descendants.size() ; i++)
 	{
 		// get the channel id 
 		int chanIdx = channels.search(descendants[i]->getMappedJointName(), SkChannel::Quat);
@@ -1329,8 +1338,7 @@ void SBHandSynthesis::combineMotion(SmartBody::SBMotion* destMotion, SmartBody::
 	// print out some stuff 
 	if (_printDebug)
 	{
-		LOG(" Duration of the destMotion at the end is %f", destMotion->duration());
-		LOG(" Number of frames in destMotion at the end is %d", destMotion->getNumFrames());
+		LOG(" Num frames and Duration of the motion %s is %d/%f", destMotion->getName().c_str(), destMotion->getNumFrames(), destMotion->duration());
 	}
 
 	//LOG(" Combining motions completed ");
@@ -1375,14 +1383,14 @@ void SBHandSynthesis::printResults()
 
 	// print all the database motion names
 	myFile << "\n Body Database Motions : \n";
-	for ( int i = 0 ; i < _bodyDbMotion.size() ; i++)
+	for ( size_t i = 0 ; i < _bodyDbMotion.size() ; i++)
 	{
 		_selectDb->printMotion(_bodyDbMotion[i], myFile);
 	}
 
 	// print the hand db motions 
 	myFile << "\n Hand Database Motions : \n";
-	for ( int i = 0 ; i < _handDbMotion.size() ; i++)
+	for ( size_t i = 0 ; i < _handDbMotion.size() ; i++)
 	{
 		_selectDb->printMotion(_handDbMotion[i], myFile);
 	}	
@@ -1403,13 +1411,13 @@ MotionDatabase::~MotionDatabase()
 	clearDb();
 
 	// clear body segments
-	for (int i = 0 ; i < _bodyDatabaseSegments.size() ; i++)
+	for (size_t i = 0 ; i < _bodyDatabaseSegments.size() ; i++)
 	{
 		delete _bodyDatabaseSegments[i];
 	}
 
 	// clear hand segments
-	for (int i = 0 ; i < _handDatabaseSegments.size() ; i++)
+	for (size_t i = 0 ; i < _handDatabaseSegments.size() ; i++)
 	{
 		delete _handDatabaseSegments[i];
 	}
@@ -1432,7 +1440,7 @@ void MotionDatabase::clearDb()
 	}
 
 	// clera motion segments
-	for (int i = 0 ; i < _motionSegments.size() ; i++ )
+	for (size_t i = 0 ; i < _motionSegments.size() ; i++ )
 	{
 		delete _motionSegments[i];
 	}
@@ -1544,14 +1552,14 @@ void MotionDatabase::printDatabase(std::ofstream& myFile)
 
 	// first print the body database segments
 	myFile << "\n Body Database : \n";
-	for (int i = 0 ; i < _bodyDatabaseSegments.size() ; i++ )
+	for (size_t i = 0 ; i < _bodyDatabaseSegments.size() ; i++ )
 	{
 		printMotion(_bodyDatabaseSegments[i], myFile);
 	}
 
 	// print the hand database segments
 	myFile << "\n Hand Database : \n";
-	for ( int i = 0 ; i < _handDatabaseSegments.size() ; i++ )
+	for ( size_t i = 0 ; i < _handDatabaseSegments.size() ; i++ )
 	{
 		printMotion(_handDatabaseSegments[i], myFile);
 	}
@@ -1565,7 +1573,7 @@ void MotionDatabase::printDatabase(std::ofstream& myFile)
 
 	// printing segments
 	myFile << "\n Similar Segments : \n";
-	for (int i = 0 ; i < _similarSegments.size() ; i++)
+	for (size_t i = 0 ; i < _similarSegments.size() ; i++)
 	{
 		// retrieve the cost list
 		CostList list = _similarSegments[i];
@@ -1589,7 +1597,7 @@ void MotionDatabase::printDatabase(std::ofstream& myFile)
 
 	// final indices calculated
 	myFile << "\n Final motion indices : ";
-	for ( int i = 0 ; i < _finalMotionIndices.size() ; i++ )
+	for ( size_t i = 0 ; i < _finalMotionIndices.size() ; i++ )
 	{
 		myFile << _finalMotionIndices[i] << " , ";
 	}
