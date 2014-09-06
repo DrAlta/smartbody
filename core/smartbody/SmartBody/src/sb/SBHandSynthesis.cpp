@@ -1370,7 +1370,7 @@ void SBHandSynthesis::printResults()
 		LOG ("Saving to file path %s ", filePath.c_str());
 
 	// open stream
-	std::ofstream myFile(filePath);
+	std::ofstream myFile(filePath.c_str());
 
 	if (!myFile.is_open())
 	{
