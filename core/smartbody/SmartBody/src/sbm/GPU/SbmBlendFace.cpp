@@ -258,6 +258,8 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 	
 			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
 			SbmShaderManager::singleton().buildShaders();
+
+			std::cout << "Program Blend_Two_Textures #" << SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram() << "compiled OK\n";
 				
 			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
 		}
@@ -285,6 +287,29 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
 		}
 	}
+	else if(_shaderName.compare("Blend_All_Textures_Pairwise") == 0)
+	{
+		SbmShaderProgram* program		= SbmShaderManager::singleton().getShader(_shaderName);
+
+		//	If GLSL program does not exist yet in SbmShaderManager
+		if(program) 
+		{
+			return program->getShaderProgram();
+		}
+		//	If the GLSL shader is not in the ShaderManager yet
+		else
+		{
+			LOG("Program does not exist yet");
+
+			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendAllTexturesPairwise.vert";
+			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendAllTexturesPairwise.frag";
+	
+			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+			SbmShaderManager::singleton().buildShaders();
+				
+			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
+		}
+	}
 	else
 	{
 		LOG("*** ERROR: Invalid BlendTextures shader");
@@ -292,8 +317,124 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 	}
 }
 
+void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, GLuint program, int w, int h)
+{
+	int numTextures		= weights.size();
+
+	float sumOfWeights	= 0;
+
+	for(std::vector<float>::iterator j=weights.begin(); j!=weights.end(); ++j)
+		sumOfWeights += *j;
+
+	for(int i = numTextures-1; i >= 0; i--) 
+	{
+		glPushMatrix();
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst[i]);                                                              // Bind the framebuffer object
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst[i], 0);              // Attach texture to FBO
+
+			assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
+
+			glPushAttrib(GL_ENABLE_BIT);
+				glDisable(GL_DEPTH_TEST);
+				glDisable(GL_LIGHTING);
+				glMatrixMode (GL_PROJECTION);
+				glPushMatrix();
+					glLoadIdentity ();
+					gluOrtho2D(-1, 1, -1, 1);
+					glMatrixMode (GL_MODELVIEW);
+					glPushAttrib(GL_VIEWPORT_BIT);
+					glPushAttrib(GL_TEXTURE_BIT);
+						glViewport(0, 0, w, h);
+						glLoadIdentity ();
+
+						glClearColor(1.0, 1.0, 1.0, 0);
+						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+						GLuint uNumberOfTextures		= glGetUniformLocation(program, "uNumberOfTextures");
+						GLuint uIteration				= glGetUniformLocation(program, "uIteration");
+						GLuint uWeight					= glGetUniformLocation(program, "uWeight");
+						GLuint uTotalWeights			= glGetUniformLocation(program, "uTotalWeights");
+						GLuint uNeutralSampler			= glGetUniformLocation(program, "uNeutralSampler");
+						GLuint uExpressionSampler		= glGetUniformLocation(program, "uExpressionSampler");
+						GLuint uPreviousResultSampler	= glGetUniformLocation(program, "uPreviousResultSampler");
+
+						glUseProgram(program);
+						glEnable(GL_TEXTURE_2D);
+
+						glUniform1i(uNumberOfTextures, numTextures);
+						glUniform1i(uIteration, i);
+						glUniform1f(uWeight, weights[i]);
+						glUniform1f(uTotalWeights, sumOfWeights);
+						glUniform1i(uNeutralSampler, 0);
+						glUniform1i(uExpressionSampler, 1);
+						glUniform1i(uPreviousResultSampler, 2);
+
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+
+						glActiveTexture(GL_TEXTURE1);
+						glBindTexture(GL_TEXTURE_2D, texIDs[i]);
+
+						// if first iteration, previous result will not be used, passing neutral 
+						if(i == numTextures-1) {
+							glActiveTexture(GL_TEXTURE2);
+							glBindTexture(GL_TEXTURE_2D, texDst[0]);
+						} else {
+							glActiveTexture(GL_TEXTURE2);
+							glBindTexture(GL_TEXTURE_2D, texDst[i+1]);
+						}
+
+						glBegin(GL_QUADS);
+							glTexCoord2f(0, 1);
+							glVertex3f(-1.0f, 1.0f, -0.5f);
+
+							glTexCoord2f(0, 0);
+							glVertex3f(-1.0f, -1.0f, -0.5f);
+
+							glTexCoord2f(1, 0);
+							glVertex3f(1.0f, -1.0f, -0.5f);
+
+							glTexCoord2f(1, 1);
+							glVertex3f(1.0f, 1.0f, -0.5f);
+						glEnd();
+
+					glUseProgram(0);
+
+					glPopAttrib();                          // Pops texture bit
+					glDisable(GL_TEXTURE_2D);
+					glPopAttrib();							// Pops viewport information
+				glMatrixMode (GL_PROJECTION);
+				glPopMatrix();                              // Pops ENABLE_BIT
+				glMatrixMode (GL_MODELVIEW);
+			glPopAttrib();
+			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);                                                                                                          // Bind the render buffer
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);         
+		
+			glActiveTexture(GL_TEXTURE0);
+																									   // Bind the frame buffer object
+		glPopMatrix();
+	}
+}
+
 void SbmBlendTextures::BlendAllAppearances(GLuint FBODst, GLuint texDst, std::vector<float> weights, std::vector<GLuint> texIDs, GLuint program, int w, int h)
 {
+	const int MAX_SHAPES = 50;
+
+	unsigned int numberOfShapes	= weights.size();
+
+	if(numberOfShapes > MAX_SHAPES) {
+		std::cerr << "ERROR: SbmBlendTextures::BlendAllAppearances can't handle more than 50 shapes" << "\n";
+	}
+
+	std::vector<float> weights_up_to_50(weights);
+	weights_up_to_50.resize(MAX_SHAPES);
+	float * weights_array = &(weights_up_to_50[0]);
+
+	GLint texIDs_array[MAX_SHAPES];
+	for(int i=0; i<MAX_SHAPES; i++) {
+		texIDs_array[i] = i;
+	}
+
 	glPushMatrix();
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst);                                                              // Bind the framebuffer object
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst, 0);              // Attach texture to FBO
@@ -316,60 +457,69 @@ void SbmBlendTextures::BlendAllAppearances(GLuint FBODst, GLuint texDst, std::ve
 					glClearColor(1.0, 1.0, 1.0, 0);
 					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-					GLuint texNeutralLoc	= glGetUniformLocation(program, "texNeutral");
-					GLuint texFvLoc			= glGetUniformLocation(program, "texFv");
-					GLuint texOpenLoc		= glGetUniformLocation(program, "texOpen");
-					GLuint texPBMLoc		= glGetUniformLocation(program, "texPBM");
-					GLuint texShChLoc		= glGetUniformLocation(program, "texShCh");
-					GLuint texWLoc			= glGetUniformLocation(program, "texW");
-					GLuint texWideLoc		= glGetUniformLocation(program, "texWide");
+					//GLuint texNeutralLoc	= glGetUniformLocation(program, "texNeutral");
+					//GLuint texFvLoc		= glGetUniformLocation(program, "texFv");
+					//GLuint texOpenLoc		= glGetUniformLocation(program, "texOpen");
+					//GLuint texPBMLoc		= glGetUniformLocation(program, "texPBM");
+					//GLuint texShChLoc		= glGetUniformLocation(program, "texShCh");
+					//GLuint texWLoc		= glGetUniformLocation(program, "texW");
+					//GLuint texWideLoc		= glGetUniformLocation(program, "texWide");
+					GLuint uTextures		= glGetUniformLocation(program, "uTextures");
 
-					GLuint wNeutralLoc		= glGetUniformLocation(program, "wNeutral");
-					GLuint wFvLoc			= glGetUniformLocation(program, "wFv");
-					GLuint wOpenLoc			= glGetUniformLocation(program, "wOpen");
-					GLuint wPBMLoc			= glGetUniformLocation(program, "wPBM");
-					GLuint wShChLoc			= glGetUniformLocation(program, "wShCh");
-					GLuint wWLoc			= glGetUniformLocation(program, "wW");
-					GLuint wWideLoc			= glGetUniformLocation(program, "wWide");
+					//GLuint wNeutralLoc	= glGetUniformLocation(program, "wNeutral");
+					//GLuint wFvLoc			= glGetUniformLocation(program, "wFv");
+					//GLuint wOpenLoc		= glGetUniformLocation(program, "wOpen");
+					//GLuint wPBMLoc		= glGetUniformLocation(program, "wPBM");
+					//GLuint wShChLoc		= glGetUniformLocation(program, "wShCh");
+					//GLuint wWLoc			= glGetUniformLocation(program, "wW");
+					//GLuint wWideLoc		= glGetUniformLocation(program, "wWide");
+					GLuint uWeights			= glGetUniformLocation(program, "uWeights");
+
+					GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
 				
 					glUseProgram(program);
 					glEnable(GL_TEXTURE_2D);
 
-					glUniform1f(wNeutralLoc, weights[0]);
-					glUniform1f(wFvLoc, weights[1]);
-					glUniform1f(wOpenLoc, weights[2]);
-					glUniform1f(wPBMLoc, weights[3]);
-					glUniform1f(wShChLoc, weights[4]);
-					glUniform1f(wWLoc, weights[5]);
-					glUniform1f(wWideLoc, weights[6]);
+					//glUniform1f(wNeutralLoc, weights[0]);
+					//glUniform1f(wFvLoc, weights[1]);
+					//glUniform1f(wOpenLoc, weights[2]);
+					//glUniform1f(wPBMLoc, weights[3]);
+					//glUniform1f(wShChLoc, weights[4]);
+					//glUniform1f(wWLoc, weights[5]);
+					//glUniform1f(wWideLoc, weights[6]);
+					glUniform1fv(uWeights, MAX_SHAPES, weights_array);
+
+					glUniform1iv(uTextures, MAX_SHAPES, texIDs_array);
+
+					glUniform1i(uNumberOfShapes, numberOfShapes);
 
 					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_2D, texIDs[0]);
-					glUniform1i(texNeutralLoc, 0);
+					//glUniform1i(texNeutralLoc, 0);
 
 					glActiveTexture(GL_TEXTURE1);
 					glBindTexture(GL_TEXTURE_2D, texIDs[1]);
-					glUniform1i(texFvLoc, 1);
+					//glUniform1i(texFvLoc, 1);
 
 					glActiveTexture(GL_TEXTURE2);
 					glBindTexture(GL_TEXTURE_2D, texIDs[2]);
-					glUniform1i(texOpenLoc, 2);
+					//glUniform1i(texOpenLoc, 2);
 
 					glActiveTexture(GL_TEXTURE3);
 					glBindTexture(GL_TEXTURE_2D, texIDs[3]);
-					glUniform1i(texPBMLoc, 3);
+					//glUniform1i(texPBMLoc, 3);
 
 					glActiveTexture(GL_TEXTURE4);
 					glBindTexture(GL_TEXTURE_2D, texIDs[4]);
-					glUniform1i(texShChLoc, 4);
+					//glUniform1i(texShChLoc, 4);
 
 					glActiveTexture(GL_TEXTURE5);
 					glBindTexture(GL_TEXTURE_2D, texIDs[5]);
-					glUniform1i(texWLoc, 5);
+					//glUniform1i(texWLoc, 5);
 
 					glActiveTexture(GL_TEXTURE6);
 					glBindTexture(GL_TEXTURE_2D, texIDs[6]);
-					glUniform1i(texWideLoc, 6);
+					//glUniform1i(texWideLoc, 6);
 
 					glBegin(GL_QUADS);
 						glTexCoord2f(0, 1);

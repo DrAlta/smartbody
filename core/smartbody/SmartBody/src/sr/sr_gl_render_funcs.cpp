@@ -351,52 +351,55 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
 	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);   
 			
+
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{	
 		SbmSubMesh* subMesh = subMeshList[i];
-		glMaterial(subMesh->material);		
-		
-		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());		
-		//LOG("submesh num of tris = %d", subMesh->numTri);
-		if (tex && !showSkinWeight)
-		{
-			GLint activeTexture = -1;
-			glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
-			
-			if (activeTexture != GL_TEXTURE0)
-				glActiveTexture(GL_TEXTURE0);
-			
-			//	If we are using blended textures
+		glMaterial(subMesh->material);	
 
-			if(!shape->getCharacter())
+		std::string texturesType = shape->getCharacter()->getStringAttribute("texturesType");
+		if( texturesType == "static" || texturesType == "dynamic")
+		{
+			SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());		
+
+			if (tex && !showSkinWeight)
 			{
-				glBindTexture(GL_TEXTURE_2D, tex->getID());
-			} 
-			else if (shape->getCharacter()->getBoolAttribute("useBlendFaceTextures"))
-			{
-				if(shape->_tempTex > 0)
+				GLint activeTexture = -1;
+				glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+			
+				if (activeTexture != GL_TEXTURE0)
+					glActiveTexture(GL_TEXTURE0);
+			
+				//	If we are using blended textures
+
+				if(!shape->getCharacter())
 				{
-					glBindTexture(GL_TEXTURE_2D, shape->_tempTex);
+					glBindTexture(GL_TEXTURE_2D, tex->getID());
+				} 
+				else if (texturesType == "dynamic")
+				{
+					if(shape->_tempTexPairs != NULL)
+					{
+						glBindTexture(GL_TEXTURE_2D, shape->_tempTexPairs[0]); 
+					}
+					else 
+					{
+						std::cerr << "*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead\n";
+						glBindTexture(GL_TEXTURE_2D, tex->getID());
+					}
 				}
-				else 
+				else 		//	If blended textures not used, use neutral appearance
 				{
-					std::cerr << "*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead\n";
 					glBindTexture(GL_TEXTURE_2D, tex->getID());
 				}
+				
+				//glColor4f(0.0f, 0.0f, 0.0f, 1.0);
+				glEnable(GL_TEXTURE_2D);	
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 			}
-			else 		//	If blended textures not used, use neutral appearance
-			{
-				glBindTexture(GL_TEXTURE_2D, tex->getID());
-			}
-			//glBindTexture(GL_TEXTURE_2D, tex->getID());
-
-			//glColor4f(0.0f, 0.0f, 0.0f, 1.0);
-			glEnable(GL_TEXTURE_2D);	
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		}
-		
 #if GLES_RENDER
 		glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &subMesh->triBuf[0]);
 #else

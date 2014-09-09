@@ -190,8 +190,13 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	frameDataMarshalFriendly = new SBM_CharacterFrameDataMarshalFriendly();
 	InitFrameDataMarshalFriendly();
 	
-
-	createBoolAttribute("useBlendFaceTextures", false, true, "Display", 710, false, false, false, "Enables use of blending textures for blendshapes.");
+	SmartBody::StringAttribute* textureAttribute = createStringAttribute("texturesType", "none", true, "Display", 210, false, false, false, "How to display textures");
+	std::vector<std::string> textureVec;
+	textureVec.push_back("none");
+	textureVec.push_back("static");
+	textureVec.push_back("dynamic");
+	textureAttribute->setValidValues(textureVec);
+	
 	createBoolAttribute("useOptimizedBlendShapes", true, true, "Display", 720, false, false, false, "Enables faster blend shape computation by caching blend shape data.");
 	
 	//setUseBlendFaceTextures(false);
@@ -1343,6 +1348,7 @@ SBAPI std::string SBCharacter::getReachAttachedPawnName(const std::string& reach
 }
 
 
+/*
 SBAPI bool SBCharacter::getUseBlendFaceTextures()
 {
 	return getBoolAttribute("useBlendFaceTextures");
@@ -1352,5 +1358,21 @@ SBAPI void SBCharacter::setUseBlendFaceTextures(bool useBlendFaceTextures)
 {
 	setBoolAttribute("useBlendFaceTextures",useBlendFaceTextures);
 }
+
+SBAPI bool SBCharacter::getUseFaceTextures()
+{
+	return getBoolAttribute("useFaceTextures");
+}
+
+SBAPI void SBCharacter::setUseFaceTextures(bool useFaceTextures)
+{
+	setBoolAttribute("useFaceTextures",useFaceTextures);
+
+	cerr << "Here";
+
+	if(!useFaceTextures)
+		setUseBlendFaceTextures(!useFaceTextures);
+}
+*/
 
 };
