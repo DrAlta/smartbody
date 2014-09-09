@@ -1406,6 +1406,9 @@ DeformableMeshInstance::DeformableMeshInstance()
 	//	Auxiliar FBO and Texture for offline rendering to blend textures
 	_tempTex			= 0;
 	_tempFBO			= 0;
+
+	_tempTexPairs		= NULL;
+	_tempFBOPairs		= NULL;
 }
 
 DeformableMeshInstance::~DeformableMeshInstance()
@@ -1422,6 +1425,19 @@ DeformableMeshInstance::~DeformableMeshInstance()
 		LOG("Deleting _tempTex #%d", _tempTex);
 		glDeleteTextures(1, &_tempTex);
 	}
+
+	if(_tempFBOPairs != NULL)
+	{
+		glDeleteBuffers(_mesh->blendShapeMap.size(), _tempFBOPairs);
+	}
+	delete _tempFBOPairs;
+
+	if(_tempTexPairs != NULL)
+	{
+		glDeleteTextures(_mesh->blendShapeMap.size(), _tempTexPairs);
+		std::cerr << "Deleting _tempTexPairs\n";
+	}
+	delete _tempTexPairs;
 }
 
 
@@ -1501,7 +1517,6 @@ void DeformableMeshInstance::blendShapes()
 		SrArray<SrPnt> newV = neutralV;
 		SrArray<SrPnt> newN = neutralN;
 
-
 		if (foundBaseModel && 
 			_character->getBoolAttribute("useOptimizedBlendShapes"))
 		{
@@ -1553,26 +1568,6 @@ void DeformableMeshInstance::blendShapes()
 		}
 
 
-		//	If auxiliar FBO for offscreen rendering doesn't exist yet
-		if(_tempFBO == 0) 
-		{
-			glGenFramebuffersEXT(1, &_tempFBO);
-	//		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _tempFBO);
-		}
-
-		//	If auxiliar textyre for offscreen rendering doesn't exist yet
-		if(_tempTex == 0) 
-		{
-			glGenTextures(1, &_tempTex);
-			glBindTexture(GL_TEXTURE_2D, _tempTex);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4096, 4096, 0, GL_RGB, GL_FLOAT, NULL);
-		}
-
 		//	Initializes vector of wieghts, of size (#shapes) 
 		std::vector<float> weights(mIter->second.size(), 0);
 
@@ -1583,16 +1578,6 @@ void DeformableMeshInstance::blendShapes()
 		{
 			if (!mIter->second[i])
 				continue;
-			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
-			{
-				std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
-				SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str());
-				if (tex)
-					texIDs[i]			= tex->getID();
-				else
-					texIDs[i]			= 0;
-				continue;	// don't do anything about base model
-			}
 
 			float w = 0.0f;
 			float wLimit = 1.0f;
@@ -1631,14 +1616,10 @@ void DeformableMeshInstance::blendShapes()
 			else
 				continue;
 
+			// Stores weights of each face
+			weights[i] = w;
 
-			std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
-			SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str());
-			weights[i]			= w;
-			if (tex)
-				texIDs[i]			= tex->getID();
-			else
-				texIDs[i]			=  0;
+			//std::cerr << "weights[" << i << "]: " << w << "\n";
 
 			if (fabs(w) > gwiz::epsilon4())	// if it has weight
 			{
@@ -1702,9 +1683,117 @@ void DeformableMeshInstance::blendShapes()
 			newN[n].normalize();
 		}
 
-		if (texIDs.size() > 0 &&
-			texIDs[0] != 0)
+
+
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if (!mIter->second[i])
+				continue;
+
+			// If base model
+			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
+			{
+				std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
+				SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str());
+				if (tex)
+				{
+					texIDs[i] = tex->getID();
+					// std::cout << "Retriving texture " << matName << "\ttexIDs[" << i << "]: " << texIDs[i] << "\n";
+				} 
+				else
+				{
+					texIDs[i] = 0;
+				}
+				continue;	// don't do anything about base model
+			}
+
+			// Rest of the models
+			std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
+			SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str());
+			if (tex)
+			{
+				texIDs[i] = tex->getID();
+				//std::cout << "Retriving texture " << matName << "\ttexIDs[" << i << "]: " << texIDs[i] << "\n";
+			}
+			else
+			{
+				texIDs[i] =  0;
+			}
+		}
+
+		/* 
+		//	NOTE:	Previous version to blend appearances. Uses Blend_All_Textures shader, which streams all textures at once and blends them
+		//			according to the vector of weights. However, GLSL code requires the vector to be static, so we need to know in advance how
+		//			many textures or expressions we have. In order to avoid this limitation, I have implemented a pairwise approach, using
+		//			another GLSL shader (see below this block)
+		//	
+		//
+		//	Sets up textures
+		//	If auxiliar FBO for offscreen rendering doesn't exist yet
+		if(_tempFBO == 0) 
+		{
+			glGenFramebuffersEXT(1, &_tempFBO);
+		}
+
+		//	If auxiliar texture for offscreen rendering doesn't exist yet
+		if(_tempTex == 0) 
+		{
+			glGenTextures(1, &_tempTex);
+			glBindTexture(GL_TEXTURE_2D, _tempTex);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4096, 4096, 0, GL_RGB, GL_FLOAT, NULL);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
+		if (texIDs.size() > 0 && texIDs[0] != 0)
+		{
 			SbmBlendTextures::BlendAllAppearances( _tempFBO, _tempTex, weights, texIDs, SbmBlendTextures::getShader("Blend_All_Textures"), 4096, 4096);
+		}
+		*/
+
+
+		//	Here I try to blend the faces two at a time. This way I avoid hardcoded constant vector size.
+				
+		if(_tempFBOPairs == NULL) 
+		{
+			_tempFBOPairs = new GLuint[weights.size()];
+			glGenFramebuffers(weights.size(), _tempFBOPairs);
+		}
+
+		if(_tempTexPairs == NULL) 
+		{
+			_tempTexPairs = new GLuint[weights.size()];
+			glGenTextures(weights.size(), _tempTexPairs);
+			for(int i=0; i<weights.size(); i++) {
+				glBindTexture(GL_TEXTURE_2D, _tempTexPairs[i]);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4096, 4096, 0, GL_RGB, GL_FLOAT, NULL);
+				glBindTexture(GL_TEXTURE_2D, 0);
+			}
+		}
+
+		
+		//float sumOfWeights	= 0;
+
+		//for(std::vector<float>::iterator j=weights.begin(); j!=weights.end(); ++j)
+		//	sumOfWeights += *j;
+
+		if (texIDs.size() > 0 && texIDs[0] != 0)
+		{
+			SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), 4096, 4096);
+		}
+
+		// END OF SECOND ATTEMPT
+
+
 
 		writeToBaseModel->shape().V = newV;
 		writeToBaseModel->shape().N = newN;

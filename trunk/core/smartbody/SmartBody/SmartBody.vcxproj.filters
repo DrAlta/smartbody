@@ -2462,5 +2462,11 @@
     <None Include="src\sbm\GPU\shaderFiles\blendAllTextures.vert">
       <Filter>GPU</Filter>
     </None>
+    <None Include="src\sbm\GPU\shaderFiles\blendAllTexturesPairwise.frag">
+      <Filter>GPU</Filter>
+    </None>
+    <None Include="src\sbm\GPU\shaderFiles\blendAllTexturesPairwise.vert">
+      <Filter>GPU</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -178,6 +178,10 @@ public:
 
 	GLuint _tempTex;
 	GLuint _tempFBO;
+
+	GLuint * _tempTexPairs;
+	GLuint * _tempFBOPairs;
+
 public:
 	SBAPI DeformableMeshInstance();
 	SBAPI virtual ~DeformableMeshInstance();
