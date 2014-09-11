@@ -10,7 +10,6 @@ cp ../../"3rd party licenses.txt" ./smartbody/
 # copy include (do not include third party ones)
 mkdir -p smartbody/include
 rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/include/*.h ./smartbody/include/vhmsg/
-rsync -ap --exclude=".svn" ../../lib/wsp/wsp/include/*.h ./smartbody/include/wsp/
 rsync -ap --exclude=".svn" ../../lib/bonebus/include/*.h ./smartbody/include/bonebus/
 rsync -ap --exclude=".svn" ../../lib/vhcl/include/*.h ./smartbody/include/vhcl/
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/pprAI/include/*.h ./smartbody/include/steersuite/
@@ -71,8 +70,6 @@ mkdir -p ./smartbody/src/vhcl
 rsync -ap --exclude=".svn" ../../lib/vhcl/src/* ./smartbody/src/vhcl/
 mkdir -p ./smartbody/src/vhmsg
 rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/src/* ./smartbody/src/vhmsg/
-mkdir -p ./smartbody/src/wsp
-rsync -ap --exclude=".svn" ../../lib/wsp/wsp/src/* ./smartbody/src/wsp/
 mkdir -p ./smartbody/src/bonebus
 rsync -ap --exclude=".svn" ../../lib/bonebus/src/* ./smartbody/src/bonebus/
 mkdir -p ./smartbody/src/steerlib
@@ -127,7 +124,6 @@ cp build/CMakeLists.txt-simplesmartbody ./smartbody/src/simplesmartbody/CMakeLis
 cp build/CMakeLists.txt-vhcl ./smartbody/src/vhcl/CMakeLists.txt
 cp build/CMakeLists.txt-vhmsg ./smartbody/src/vhmsg/CMakeLists.txt
 cp build/CMakeLists.txt-bonebus ./smartbody/src/bonebus/CMakeLists.txt
-cp build/CMakeLists.txt-wsp ./smartbody/src/wsp/CMakeLists.txt
 cp build/CMakeLists.txt-steerlib ./smartbody/src/steerlib/CMakeLists.txt
 cp build/CMakeLists.txt-pprAI ./smartbody/src/pprAI/CMakeLists.txt
 cp build/CMakeLists.txt-polyvox ./smartbody/src/sbgui/external/polyvox/CMakeLists.txt
@@ -136,7 +132,7 @@ cp build/CMakeLists.txt-ogresmartbody ./smartbody/src/ogresmartbody/CMakeLists.t
 cp build/CMakeLists.txt-irrlichtsmartbody ./smartbody/src/irrlichtsmartbody/CMakeLists.txt
 
 # supporting libraries
-cp activemq-cpp-library-3.8.1-src.tar.gz ./smartbody/
+cp activemq-cpp-library-3.8.3-src.tar.gz ./smartbody/
 
 # tar and gzip it up!
 tar -cvzf SmartBodySDK-linux.tar.gz smartbody
