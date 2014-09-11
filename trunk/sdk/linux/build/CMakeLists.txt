@@ -10,12 +10,10 @@ set( CMAKE_INSTALL_PREFIX "../" )
 add_definitions( -O3	-fPIC )
 
 include_directories(
-	/usr/include
 	/usr/local/include
 )
 
 LINK_DIRECTORIES(
-	/usr/lib
 	/usr/local/lib
 )
 
