@@ -31,7 +31,11 @@
 #ifdef _MSC_VER
 #include <memory>
 #else
+#ifdef __linux__
+#include <boost/shared_ptr.hpp>
+#else
 #include <memory>
+#endif
 #endif
 
 #include <string>
@@ -221,7 +225,12 @@ public:
 
     virtual MessageType id() const = 0;
 };
+
+#ifdef __linux__
+typedef boost::shared_ptr<fsMsg> fsMsgPtr;
+#else
 typedef std::shared_ptr<fsMsg> fsMsgPtr;
+#endif
 
 
 /*************
