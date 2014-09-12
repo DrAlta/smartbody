@@ -89,6 +89,7 @@ mkdir -p ./smartbody/data
 mkdir -p ./smartbody/data/mesh
 rsync -ap --exclude=".svn" ../../data/behaviorsets/* ./smartbody/data/behaviorsets/
 rsync -ap --exclude=".svn" ../../data/ChrBrad/* ./smartbody/data/ChrBrad/
+rsync -ap --exclude=".svn" ../../data/ChrMaarten/* ./smartbody/data/ChrMaarten/
 rsync -ap --exclude=".svn" ../../data/ChrRachel/* ./smartbody/data/ChrRachel/
 rsync -ap --exclude=".svn" ../../data/examples/* ./smartbody/data/examples/
 rsync -ap --exclude=".svn" ../../data/fonts/* ./smartbody/data/fonts/
