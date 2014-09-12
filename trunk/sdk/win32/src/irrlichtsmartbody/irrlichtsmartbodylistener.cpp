@@ -1,5 +1,5 @@
 #include "irrlichtsmartbodylistener.h"
-#include <SB/SBSceneListener.h>
+#include <sb/SBSceneListener.h>
 #include <IAnimatedMesh.h>
 #include <vhcl.h>
 #include <sstream>
