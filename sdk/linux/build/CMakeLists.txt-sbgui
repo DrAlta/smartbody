@@ -6,7 +6,6 @@ include_directories( ../SmartBody )
 include_directories( ../../include/vhcl )
 include_directories( ../../include/vhmsg )
 include_directories( ../../include/bonebus )
-include_directories( ../../include/wsp )
 include_directories( ../../include/steersuite )
 include_directories( ../../include/steersuite/external )
 include_directories( ../../include/steersuite/external/tinyxml )
@@ -182,6 +181,7 @@ set( SBM_FLTK_SRC
 	./bmlcreator/BMLReachObject.cpp
 	./bmlcreator/BMLSpeechObject.cpp
 	./bmlcreator/BMLSaccadeObject.cpp
+	./bmlcreator/BMLHandObject.cpp
 	./bmlcreator/BMLStateObject.cpp
 
 	./resourceViewer/Fl_Tree_Horizontal.cpp
@@ -201,11 +201,14 @@ set( SBM_FLTK_SRC
 	./retargetcreator/RetargetCreatorWindow.cpp
 	./autorig/SBAutoRigManager.cpp
 	./autorig/VoxelizerWindow.cpp
+	./autorig/AutoRigViewer.cpp
 
 	./monitorviewer/MonitorConnectWindow.cpp 
 	./motioneditor/MotionEditorWindow.cpp
 	./jointmapviewer/JointMapViewer.cpp
 	./jointmapviewer/RetargetStepWindow.cpp
+	
+	./faceshiftviewer/FaceShiftViewer.cpp
 
 	./faceviewer/FaceViewer.cpp
 	./FLTKListener.cpp

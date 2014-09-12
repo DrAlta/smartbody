@@ -1,7 +1,6 @@
 
 add_subdirectory (vhcl)
 add_subdirectory (vhmsg)
-add_subdirectory (wsp)
 add_subdirectory (bonebus)
 add_subdirectory (steerlib)
 add_subdirectory (pprAI)

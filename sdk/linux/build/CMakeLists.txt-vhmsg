@@ -12,7 +12,7 @@ endif()
 
 
 if (UNIX)
-   include_directories(/usr/local/include/activemq-cpp-3.8.1)
+   include_directories(/usr/local/include/activemq-cpp-3.8.3)
 endif (UNIX)
 
 if (APPLE)

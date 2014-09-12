@@ -3,7 +3,6 @@ include_directories( ./)
 include_directories ( ../../include/vhcl )
 include_directories ( ../../include/vhmsg)
 include_directories ( ../../include/bonebus)
-include_directories ( ../../include/wsp)
 include_directories ( ../../include/steersuite)
 include_directories ( ../../include/steersuite/external)
 include_directories ( ../../include/steersuite/external/tinyxml)
@@ -300,6 +299,7 @@ set( SMARTBODY_LIB_SR_SRC
         ./sr/planner/sr_cfg_path.cpp
         ./sr/planner/sr_cfg_tree.cpp
         ./sr/planner/sk_pos_cfg_manager.cpp
+	./sr/jpge.cpp
 )
 
 set( SMARTBODY_LIB_SBM_SRC
@@ -384,6 +384,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ./controllers/MeCtBlendEngine.cpp
         ./controllers/me_ct_motion_blend.cpp
         ./controllers/me_ct_motion_graph.cpp
+        ./controllers/me_ct_generic_hand.cpp
+        ./controllers/me_ct_new_locomotion.cpp
         ./controllers/MotionAnalysis.cpp
 
         ./sbm/ParserBVH.cxx
@@ -425,6 +427,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./sbm/GPU/TBOData.cpp
         ./sbm/GPU/VBOData.cpp
         ./sbm/GPU/SbmShader.cpp
+        ./sbm/GPU/SbmBlendFace.cpp
         ./sbm/PPRAISteeringAgent.cpp
         ./sbm/SteerSuiteEnginerDriver.cpp
         ./sbm/sr_path_list.cpp
@@ -492,7 +495,6 @@ set( SMARTBODY_LIB_SBM_SRC
         ./sb/SBSpeechManager.cpp
         ./sb/SBVHMsgManager.cpp
         ./sb/SBCommandManager.cpp
-        ./sb/SBWSPManager.cpp
         ./sb/SBNavigationMeshManager.cpp
         ./sb/SBMotionGraph.cpp
 
@@ -525,10 +527,14 @@ set( SMARTBODY_LIB_SBM_SRC
         ./sb/SBDebuggerServer.cpp
         ./sb/SBDebuggerClient.cpp
         ./sb/SBDebuggerUtility.cpp
+        ./sb/SBHandConfiguration.cpp
+        ./sb/SBHandConfigurationManager.cpp
+        ./sb/SBHandSynthesis.cpp
+        ./sb/SBRigNode.cpp
+        ./sb/SBFaceShiftManager.cpp
         ./sbm/SteerPath.cpp
         ./sbm/MiscCommands.cpp
 		
-	./sb/smartbody-dll.cpp
 	./sb/smartbody-c-dll.cpp
 		
 	./protocols/sbmotion.pb.cc
@@ -581,7 +587,6 @@ target_link_libraries( SmartBody
 	bonebus
 	vhmsg
 	vhcl
-	wsp
 	xerces-c
 	boost_filesystem
 	boost_system
