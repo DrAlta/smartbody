@@ -1690,11 +1690,21 @@ void DeformableMeshInstance::blendShapes()
 			if (!mIter->second[i])
 				continue;
 
+			//	Gets the map of (material name, texture) for the current mesh
+			std::vector<std::string> materials;
+			std::map<std::string, std::string> textures_map = mIter->second[i]->shape().mtlTextureNameMap;
+			for(std::map<std::string,std::string>::iterator it = textures_map.begin(); it != textures_map.end(); ++it) {
+				materials.push_back(it->first);
+			}
+
+			//	In a face there will be just one texture, material name will be always the first
+			std::string matName = materials[0];
+
 			// If base model
 			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
 			{
-				std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
-				SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str());
+				std::string fileName = (std::string)mIter->second[i]->shape().mtlTextureNameMap[matName];
+				SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, fileName.c_str());
 				if (tex)
 				{
 					texIDs[i] = tex->getID();
@@ -1708,8 +1718,8 @@ void DeformableMeshInstance::blendShapes()
 			}
 
 			// Rest of the models
-			std::string matName = (std::string)mIter->second[i]->shape().mtlTextureNameMap["initialShadingGroup"];
-			SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, matName.c_str());
+			std::string fileName = (std::string)mIter->second[i]->shape().mtlTextureNameMap[matName];
+			SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, fileName.c_str());
 			if (tex)
 			{
 				texIDs[i] = tex->getID();
