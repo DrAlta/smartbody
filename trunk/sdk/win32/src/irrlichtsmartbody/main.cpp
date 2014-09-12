@@ -46,7 +46,11 @@ int main()
 	const bool shadows = true;
 
 		IrrlichtDevice *device =
+#ifdef WIN32
 			createDevice( video::EDT_DIRECT3D9, dimension2d<u32>(640, 480), 16,
+#else
+			createDevice( video::EDT_OPENGL, dimension2d<u32>(640, 480), 16,
+#endif
 		false, shadows);
 
 	if (!device)
@@ -61,8 +65,10 @@ int main()
 
 	std::map<std::string, int> characterMap;
 
+#ifdef WIN32
 	guienv->addStaticText(L"Hello World! This is the SmartBody Irrlicht Software renderer!",
 		rect<s32>(10,10,260,22), true);
+#endif
 
 
 	// set up SmartBody
