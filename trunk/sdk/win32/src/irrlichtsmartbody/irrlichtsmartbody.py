@@ -36,7 +36,7 @@ setupBehaviorSet()
 numCharacters = 5
 for c in range(0, numCharacters):
 	sinbadName = 'sinbad' + str(c)
-	sinbad = scene.createCharacter(sinbadName,'sinbad')
+	sinbad = scene.createCharacter(sinbadName,'Sinbad')
 	sinbadSk = scene.createSkeleton(sinbadSkName)
 	sinbad.setSkeleton(sinbadSk)
 	sinbadPos = SrVec(0 + c * 5, 4.50, 0 + c * 5)

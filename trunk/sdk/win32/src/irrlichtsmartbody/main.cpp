@@ -103,7 +103,7 @@ int main()
                            core::dimension2d<f32>(10.0f, 10.0f)); // textureRepeatCount
                                           
    irr::scene::IAnimatedMeshSceneNode* terrain_node = smgr->addAnimatedMeshSceneNode(terrain_model);
-   terrain_node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8/media/wall.jpg"));   
+   terrain_node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8.1/media/wall.jpg"));   
    terrain_node->setMaterialFlag(EMF_LIGHTING, false);
    
    // Insert it into the scene
@@ -124,7 +124,7 @@ int main()
 	node = smgr->addBillboardSceneNode(node, core::dimension2d<f32>(50, 50));
 	node->setMaterialFlag(video::EMF_LIGHTING, false);
 	node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
-	node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8/media/particlewhite.bmp"));
+	node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8.1/media/particlewhite.bmp"));
 
 	smgr->setShadowColor(video::SColor(150,0,0,0));
 
@@ -162,7 +162,7 @@ int main()
 				continue;
 
 			irr::scene::ISceneNode* node = smgr->getSceneNodeFromId((*iter).second);
-			irr::scene::IAnimatedMeshSceneNode* animatedMeshNode  = dynamic_cast<irr::scene::IAnimatedMeshSceneNode*>(node);
+			irr::scene::IAnimatedMeshSceneNode* animatedMeshNode  = (irr::scene::IAnimatedMeshSceneNode*)(node);
 
 
 			if (!animatedMeshNode)
