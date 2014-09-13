@@ -3,6 +3,7 @@
 #include <IAnimatedMesh.h>
 #include <vhcl.h>
 #include <sstream>
+#include <iostream>
 
 IrrlichtSmartBodyListener::IrrlichtSmartBodyListener(irr::scene::ISceneManager* sceneMgr, std::map<std::string, int>* characterMap)
 {
@@ -19,24 +20,25 @@ void IrrlichtSmartBodyListener::OnCharacterCreate( const std::string & name, con
 {
 	std::stringstream strstr;
 	strstr << "../irrlicht-1.8.1/media/" << objectClass<< ".mesh";
+	std::cout << "Getting mesh " << strstr.str() << std::endl;
 
-	irr::scene::ISkinnedMesh* mesh = (irr::scene::ISkinnedMesh*)mSceneMgr->getMesh(strstr.str().c_str());
+	irr::scene::ISkinnedMesh* skinnedMesh = (irr::scene::ISkinnedMesh*)mSceneMgr->getMesh(strstr.str().c_str());
 
-	if (!mesh)
+	if (!skinnedMesh)
 	{
 		LOG("Cannot find mesh named '%s", objectClass.c_str());
 		return;
 	}
 
-	irr::scene::IAnimatedMeshSceneNode* node = mSceneMgr->addAnimatedMeshSceneNode( mesh, NULL, id );
+	irr::scene::IAnimatedMeshSceneNode* node = mSceneMgr->addAnimatedMeshSceneNode( skinnedMesh, NULL, id );
 	
 	//must set to allow manual joint control
 	node->setJointMode(irr::scene::EJUOR_CONTROL);
 
 	irr::scene::IAnimatedMesh* animMesh  = node->getMesh();
-	irr::scene::ISkinnedMesh* skinmesh = dynamic_cast<irr::scene::ISkinnedMesh*> (animMesh);
+	irr::scene::E_ANIMATED_MESH_TYPE type = animMesh->getMeshType();
 
-	irr::core::array<irr::scene::ISkinnedMesh::SJoint*> jointssss  =skinmesh->getAllJoints();
+	irr::core::array<irr::scene::ISkinnedMesh::SJoint*> jointssss  = skinnedMesh->getAllJoints();
 
 
 	for(irr::u32 i = 1; i < jointssss.size(); i++)
@@ -53,15 +55,22 @@ void IrrlichtSmartBodyListener::OnCharacterCreate( const std::string & name, con
 	id++;
 
 	//set texture
-	node->getMaterial(0).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../irrlicht-1.8.1/media/sinbad_body.tga"));
-	node->getMaterial(1).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../irrlicht-1.8.1/media/sinbad_body.tga"));
-	node->getMaterial(2).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../irrlicht-1.8.1/media/sinbad_clothes.tga"));
-	node->getMaterial(3).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../irrlicht-1.8.1/media/sinbad_body.tga"));
-	node->getMaterial(4).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../irrlicht-1.8.1/media/sinbad_sword.tga"));
-	node->getMaterial(5).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../irrlicht-1.8.1/media/sinbad_clothes.tga"));
-	node->getMaterial(6).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../irrlicht-1.8.1/media/sinbad_clothes.tga"));
-	node->getMaterial(7).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../irrlicht-1.8.1/media/sinbad_clothes.tga"));
+	std::string textures[9];
+	textures[0] = "../irrlicht-1.8.1/media/sinbad_body.tga";
+	textures[1] = "../irrlicht-1.8.1/media/sinbad_body.tga";
+	textures[2] = "../irrlicht-1.8.1/media/sinbad_clothes.tga";
+	textures[3] = "../irrlicht-1.8.1/media/sinbad_body.tga";
+	textures[4] = "../irrlicht-1.8.1/media/sinbad_sword.tga";
+	textures[5] = "../irrlicht-1.8.1/media/sinbad_clothes.tga";
+	textures[6] = "../irrlicht-1.8.1/media/sinbad_clothes.tga";
+	textures[7] = "../irrlicht-1.8.1/media/sinbad_clothes.tga";
+	textures[8] = "../irrlicht-1.8.1/media/irrlicht2_dn.jpg";
 	node->getMaterial(8).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../irrlicht-1.8.1/media/irrlicht2_dn.jpg"));
+	for (int t = 0; t < 8; t++)
+	{
+		std::cout << "Attempting to retrieve " << textures[t] << std::endl;
+		node->getMaterial(t).setTexture(0,mSceneMgr->getVideoDriver()->getTexture(textures[t].c_str()));
+	}
 
 	node->setPosition(irr::core::vector3df(0,-80,0));
 
