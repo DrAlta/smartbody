@@ -8,6 +8,7 @@
 #include <sb/SBAssetManager.h>
 #include <sb/SBSceneListener.h>
 #include <sr/sr_string.h>
+#include <controllers/me_controller_tree_root.hpp>
 
 namespace SmartBody {
 
@@ -83,6 +84,12 @@ SBAPI SBJoint* SBSkeleton::createJoint(const std::string& name, SBJoint* parent)
 	
 	_joints.push_back(joint);
 	joint->index(_joints.size() - 1);
+
+	if (this->getPawn())
+	{
+		this->getPawn()->ct_tree_p->child_channels_updated(NULL);
+		this->getPawn()->ct_tree_p->applySkeletonToBuffer();
+	}
 	
 	return joint;
 }
