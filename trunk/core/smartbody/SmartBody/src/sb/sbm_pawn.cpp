@@ -319,7 +319,7 @@ void SbmPawn::reset_all_channels()
 	if (!_skeleton)
 		return;
 
-	SkChannelArray& channels = ct_tree_p->channels();
+	SkChannelArray& channels = _skeleton->channels();
 	MeFrameData& frameData = ct_tree_p->getLastFrame();
 	SrBuffer<float>& sr_fbuff = frameData.buffer();
 	int n = channels.size();
