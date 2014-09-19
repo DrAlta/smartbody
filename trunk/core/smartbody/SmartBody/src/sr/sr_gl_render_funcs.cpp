@@ -380,7 +380,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				{
 					if(shape->_tempTexPairs != NULL)
 					{
-						glBindTexture(GL_TEXTURE_2D, shape->_tempTexPairs[0]); 
+						glBindTexture(GL_TEXTURE_2D, shape->_tempTexPairs[0]);
+						//std::cerr << "Using tex: " << shape->_tempTexPairs[0] << "\n";
 					}
 					else 
 					{

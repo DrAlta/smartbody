@@ -375,19 +375,18 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 						glActiveTexture(GL_TEXTURE1);
 						glBindTexture(GL_TEXTURE_2D, texIDs[i]);
 
-						//std::cerr << "uNeutralSampler: " << texIDs[0] << "\tuExpressionSampler: " << texIDs[i];
+						//std::cerr << "uNeutral: " << texIDs[0] << "\tuExpression: " << texIDs[i];
 
 						// if first iteration, previous result will not be used, passing a random texture just for completeness  
 						if(i == numTextures-1) {
 							glActiveTexture(GL_TEXTURE2);
 							glBindTexture(GL_TEXTURE_2D, texIDs[1]);
-							//std::cerr  << "\tprevious: " << texIDs[1] <<  "\ti = " << i << "\n";
+							//std::cerr  << "\tprevious: " << texIDs[1] << "\tDest:" << texDst[i] << "\ti = " << i << "\n";
 						} else {
 							glActiveTexture(GL_TEXTURE2);
 							glBindTexture(GL_TEXTURE_2D, texDst[i+1]);
-							//std::cerr << "\tprevious: " << texDst[i+1] <<  "\ti = " << i << "\n";
+							//std::cerr << "\tprevious: " << texDst[i+1] << "\tDest:" << texDst[i] <<  "\ti = " << i << "\n";
 						}
-
 
 						glBegin(GL_QUADS);
 							glTexCoord2f(0, 1);
