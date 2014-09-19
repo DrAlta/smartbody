@@ -1708,7 +1708,7 @@ void DeformableMeshInstance::blendShapes()
 				if (tex)
 				{
 					texIDs[i] = tex->getID();
-					// std::cout << "Retriving texture " << matName << "\ttexIDs[" << i << "]: " << texIDs[i] << "\n";
+					//std::cerr << "Retriving texture " << matName << "\ttexIDs[" << i << "]: " << texIDs[i] << "\n";
 				} 
 				else
 				{
@@ -1785,20 +1785,14 @@ void DeformableMeshInstance::blendShapes()
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4096, 4096, 0, GL_RGB, GL_FLOAT, NULL);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_FLOAT, NULL);
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 		}
 
-		
-		//float sumOfWeights	= 0;
-
-		//for(std::vector<float>::iterator j=weights.begin(); j!=weights.end(); ++j)
-		//	sumOfWeights += *j;
-
 		if (texIDs.size() > 0 && texIDs[0] != 0)
 		{
-			SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), 4096, 4096);
+			SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), 512, 512);
 		}
 
 		// END OF SECOND ATTEMPT
