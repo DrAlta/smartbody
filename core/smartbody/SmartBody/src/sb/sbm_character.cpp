@@ -2312,7 +2312,7 @@ void SbmCharacter::addVisemeChannel(std::string visemeName, SkMotion* motion)
 	visemeJoint->setName(visemeName);
 	visemeJoint->setJointType(SkJoint::TypeViseme);
 	visemeJoint->setUsePosition(0, true);
-	visemeJoint->pos()->limits(SkJointPos::X, 0, 2);  // Setting upper bound to 2 allows some exageration
+//	visemeJoint->pos()->limits(SkJointPos::X, 0, 2);  // Setting upper bound to 2 allows some exageration
 	rootJoint->addChild(visemeJoint);
 	viseme_channel_count++;
 }
@@ -2427,7 +2427,7 @@ void SbmCharacter::addActionUnitChannel(int auNum, ActionUnit* au)
 		auJoint->setJointType(SkJoint::TypeViseme);
 		auJoint->setName(allUnits[a]);
 		auJoint->setUsePosition(0, true);
-		auJoint->pos()->limits(SkJointPos::X, 0, 2);  // Setting upper bound to 2 allows some exageration
+//		auJoint->pos()->limits(SkJointPos::X, 0, 2);  // Setting upper bound to 2 allows some exageration
 		rootJoint->addChild(auJoint);
 		viseme_channel_count++;
 	}
