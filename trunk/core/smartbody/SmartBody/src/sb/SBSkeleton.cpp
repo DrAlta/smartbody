@@ -58,7 +58,6 @@ SBAPI SBJoint* SBSkeleton::createChannel(const std::string& name)
 	joint->setJointType(SkJoint::TypeViseme);
 	joint->skeleton(this);
 	joint->setUsePosition(0, true);
-	joint->pos()->limits(SkJointPos::X, 0, 2);
 	
 	rootJoint->addChild(joint);
 	joint->setParent(rootJoint);
