@@ -36,6 +36,45 @@ SBSkeleton::SBSkeleton(SBSkeleton* copySkel) : SkSkeleton(copySkel)
 	//jointMap = copySkel->getJointMapName();
 }
 
+SBAPI SBJoint* SBSkeleton::createChannel(const std::string& name)
+{
+	if (this->getJointByName(name))
+	{
+		LOG("Joint or channel %s already created.", name.c_str());
+		return NULL;
+	}
+
+	SmartBody::SBJoint* rootJoint = this->getJoint(0);
+	if (!rootJoint)
+	{
+		LOG("Root joint not present. Please add root joint before adding channels.");
+		return NULL;
+	}
+
+	SBJoint* joint = new SBJoint();
+	joint->setName(name);
+	joint->name(name);
+	joint->extName(name);
+	joint->setJointType(SkJoint::TypeViseme);
+	joint->skeleton(this);
+	joint->setUsePosition(0, true);
+	joint->pos()->limits(SkJointPos::X, 0, 2);
+	
+	rootJoint->addChild(joint);
+	joint->setParent(rootJoint);
+	
+	_joints.push_back(joint);
+	joint->index(_joints.size() - 1);
+
+	if (this->getPawn())
+	{
+		this->getPawn()->ct_tree_p->child_channels_updated(NULL);
+		this->getPawn()->ct_tree_p->applySkeletonToBuffer();
+	}
+	
+	return joint;
+}
+
 SBAPI SBJoint* SBSkeleton::createJoint(const std::string& name, SBJoint* parent)
 {
 	if (this->getJointByName(name))

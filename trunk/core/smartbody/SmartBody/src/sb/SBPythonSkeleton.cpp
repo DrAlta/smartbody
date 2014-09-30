@@ -53,6 +53,7 @@ void pythonFuncsSkeleton()
 		.def("createSkelWithoutPreRot", &SBSkeleton::createSkelWithoutPreRot, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a new standard T-pose skel from source but without pre-rotations")	
 		.def("orientJointsLocalAxesToWorld", &SBSkeleton::orientJointsLocalAxesToWorld, "Orient skeleton joints local axes to match world coordinate axes (Y-up Z-front)")
 		.def("createJoint", &SBSkeleton::createJoint, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Adds a joint to the skeleton. First parameter is the joint, second is the joints parent (null for root).")
+		.def("createChannel", &SBSkeleton::createChannel, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Adds a channel to the skeleton. First parameter is the joint, second is the channels parent (null for root).")		
 		.def("update", &SBSkeleton::update, "Creates channels from the joints. Used after all the joints have been created.")
 		; 
 
@@ -83,7 +84,9 @@ void pythonFuncsSkeleton()
 		.def("getPrerotation", &SBJoint::getPrerotation, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the prerotation values for the joint.")
 		.def("setPrerotation", &SBJoint::setPrerotation, "Sets the prerotation values for the joint.")
 		.def("getPostrotation", &SBJoint::getPostrotation, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the postrotation values for the joint.")
-		.def("setPostrotation", &SBJoint::setPostrotation, "Sets the postrotation values for the joint.")		;
+		.def("setPostrotation", &SBJoint::setPostrotation, "Sets the postrotation values for the joint.")		
+		.def("getJointType", &SBJoint::getJointType, "Returns the type of the joint.");
+		
 
 }
 }
