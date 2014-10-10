@@ -308,9 +308,9 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 
 	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
 	glEnable(GL_LIGHTING);
-	//glEnable(GL_TEXTURE_2D);	
-	//glEnable ( GL_ALPHA_TEST );
-	//glEnable (GL_BLEND);
+	glEnable(GL_TEXTURE_2D);	
+	glEnable ( GL_ALPHA_TEST );
+	glEnable (GL_BLEND);
 #if !defined (__ANDROID__) && !defined(SB_IPHONE)
 	glDisable ( GL_POLYGON_SMOOTH );
 #endif
@@ -345,7 +345,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	else
 	{
 		glDisableClientState(GL_COLOR_ARRAY);
-		glColorPointer(3,GL_FLOAT, 0,  NULL);		
+		//glColorPointer(3,GL_FLOAT, 0,  NULL);		
 		//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
 		glEnable(GL_LIGHTING);
 	}
@@ -373,7 +373,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 					glActiveTexture(GL_TEXTURE0);
 			
 				//	If we are using blended textures
-
+				
 				if(!shape->getCharacter())
 				{
 					glBindTexture(GL_TEXTURE_2D, tex->getID());
@@ -391,7 +391,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 						glBindTexture(GL_TEXTURE_2D, tex->getID());
 					}
 				}
-				else 		//	If blended textures not used, use neutral appearance
+				else 		//	If blended textures not used, use neutral appearance				
 				{
 					glBindTexture(GL_TEXTURE_2D, tex->getID());
 				}
