@@ -424,6 +424,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_parameter.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_player.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_timewarp.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_new_locomotion.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_param_animation.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_param_animation_utilities.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_quick_draw.cpp \
@@ -438,6 +439,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_recorder.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_pose_postprocessing.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_graph.cpp \
+	$(SBM_MY_DIR)/controllers/me_ct_generic_hand.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtBlendEngine.cpp \
 	$(SBM_MY_DIR)/controllers/MotionAnalysis.cpp \
 	$(SBM_MY_DIR)/sbm/ParserFBX.cpp \
@@ -565,6 +567,10 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerSBMeshBinary.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerSkmb.cpp \
 	$(SBM_MY_DIR)/sb/SBMotionGraph.cpp \
+	$(SBM_MY_DIR)/sb/SBHandConfiguration.cpp \
+	$(SBM_MY_DIR)/sb/SBHandConfigurationManager.cpp \
+	$(SBM_MY_DIR)/sb/SBHandSynthesis.cpp \
+	$(SBM_MY_DIR)/sb/SBRigNode.cpp \
     $(SBM_MY_DIR)/sb/smartbody-c-dll.cpp \
 	$(SBM_MY_DIR)/protocols/sbmesh.pb.cc \
 	$(SBM_MY_DIR)/protocols/sbmotion.pb.cc \
