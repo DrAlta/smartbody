@@ -6,7 +6,7 @@
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>
 #else
-#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD)
 #include "external/glew/glew.h"
 #endif
 #endif
@@ -1767,7 +1767,7 @@ void DeformableMeshInstance::blendShapes()
 
 
 		//	Here I try to blend the faces two at a time. This way I avoid hardcoded constant vector size.
-				
+#if !defined(ANDROID_BUILD)
 		if(_tempFBOPairs == NULL) 
 		{
 			_tempFBOPairs = new GLuint[weights.size()];
@@ -1794,7 +1794,7 @@ void DeformableMeshInstance::blendShapes()
 		{
 			SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), 512, 512);
 		}
-
+#endif
 		// END OF SECOND ATTEMPT
 
 

@@ -5,7 +5,7 @@
 #include "TBOData.h"
 #include <sbm/sbm_deformable_mesh.h>
 
-#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD)
 #include "external/glew/glew.h"
 #endif
 
