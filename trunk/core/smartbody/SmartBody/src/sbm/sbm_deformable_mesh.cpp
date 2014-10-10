@@ -27,7 +27,11 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
+#if defined(ANDROID_BUILD)
+#define TEST_HAIR_RENDER 1
+#else
 #define TEST_HAIR_RENDER 0
+#endif
 
 typedef std::pair<int,int> IntPair;
 typedef std::pair<int,float> IntFloatPair;
