@@ -27,7 +27,7 @@
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>
 #else
-#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD)
 #include "external/glew/glew.h"
 #include "external/SOIL/SOIL.h"
 #endif
@@ -71,6 +71,7 @@
 
 void SrGlRenderFuncs::renderBlendFace(DeformableMeshInstance* shape)
 {
+#if !defined(ANDROID_BUILD)
 	bool USE_SHADER_MANAGER = true;
 
 	SrModel* model			= new SrModel();
@@ -249,6 +250,7 @@ void SrGlRenderFuncs::renderBlendFace(DeformableMeshInstance* shape)
 	delete blendFace;
 
 	delete mesh;
+#endif
 }
 
 // Renders static mesh WITHOUT Ogre3D
