@@ -3290,7 +3290,7 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 		SBReach* reach = character->getReach();
 		if (reach)
 		{
-			strstr << "reach = scene.getReachManager().createReach(\"" << character->getName() << "\",\"" << reach->getReachTag() << "\")\n";
+			strstr << "reach = scene.getReachManager().createReach(\"" << character->getName() << "\")\n";
 			std::string interpType = reach->getInterpolatorType();
 			strstr << "reach.setInterpolatorType(\"" << interpType << "\")\n";
 			// motions
@@ -4414,8 +4414,23 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	{
 		SmartBody::SBPawn* pawn		= scene->getPawn((*pawnIter));
 
-		SrBox pawn_bb				= pawn->getBoundingBox();
-		
+		SBGeomObject* geomObject = pawn->getGeomObject();
+		SBGeomBox* box = dynamic_cast<SBGeomBox*>(geomObject);
+		SrBox pawn_bb;
+		if (box)
+		{
+			SBTransform& transform = pawn->getGlobalTransform();
+			SrVec min(-box->extent[0] / 2.0, -box->extent[1] / 2.0, -box->extent[2] / 2.0);
+			SrVec max(box->extent[0] / 2.0, box->extent[1] / 2.0, box->extent[2] / 2.0);
+
+			SrVec finalMin = transform.localToGlobal(min);
+			SrVec finalMax = transform.localToGlobal(max);
+			pawn_bb.set(finalMin, finalMax);
+		}
+		else
+		{
+			pawn_bb = pawn->getBoundingBox();
+		}
 
 		float ax = pawn_bb.a.x;
 		float ay = pawn_bb.a.y;
