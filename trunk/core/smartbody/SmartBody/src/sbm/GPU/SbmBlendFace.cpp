@@ -1,7 +1,7 @@
 #include "vhcl.h"
 #if !defined(__FLASHPLAYER__)
 #include "external/glew/glew.h"
-#include "external/jpge.h"
+#include "external/jpge/jpge.h"
 #endif
 
 #include <algorithm>
@@ -13,9 +13,9 @@
 #include <sb/SBPawn.h>
 #include "SbmDeformableMeshGPU.h"
 
-#include "../../../../../../lib/glm/glm/glm.hpp"
-#include "../../../../../../lib/glm/glm/gtc/type_ptr.hpp"
-#include "../../../../../../lib/glm/glm/gtc/matrix_transform.hpp"
+#include "external/glm/glm/glm.hpp"
+#include "external/glm/glm/gtc/type_ptr.hpp"
+#include "external/glm/glm/gtc/matrix_transform.hpp"
 
 SbmBlendFace::SbmBlendFace() : DeformableMesh()
 {
