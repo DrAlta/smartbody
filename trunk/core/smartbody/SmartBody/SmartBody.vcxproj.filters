@@ -1189,8 +1189,8 @@
     <ClCompile Include="src\sb\SBRigNode.cpp">
       <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="src\external\jpge.cpp">
-      <Filter>external</Filter>
+    <ClCompile Include="src\external\jpge\jpge.cpp">
+      <Filter>external\jpge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2379,8 +2379,8 @@
     <ClInclude Include="src\sb\SBRigNode.h">
       <Filter>sb</Filter>
     </ClInclude>
-    <ClInclude Include="src\external\jpge.h">
-      <Filter>external</Filter>
+    <ClInclude Include="src\external\jpge\jpge.h">
+      <Filter>external\jpge</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2434,6 +2434,9 @@
     </Filter>
     <Filter Include="external\faceshift">
       <UniqueIdentifier>{f7035c1e-172b-4842-b771-15ef7a1d3333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\jpge">
+      <UniqueIdentifier>{aedf90ee-8bc7-4c7e-8443-404eeeb1be0d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
