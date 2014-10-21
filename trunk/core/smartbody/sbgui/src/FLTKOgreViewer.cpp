@@ -334,9 +334,28 @@ void FLTKOgreWindow::resetViewer()
 	updateOptions();
 }
 
+int printOglError(char *file, int line)
+{
+
+    GLenum glErr;
+    int    retCode = 0;
+
+    glErr = glGetError();
+    if (glErr != GL_NO_ERROR)
+    {
+        printf("glError in file %s @ line %d: %s\n",
+			     file, line, gluErrorString(glErr));
+        retCode = 1;
+    }
+
+    return retCode;
+}
+
 void FLTKOgreWindow::fltkRender2()
 {
+	printOglError("fltkRender2()", 1);
 	
+
 	if ( !visible() ) return;
 
 	SrCamera* cam = SmartBody::SBScene::getScene()->getActiveCamera();
@@ -449,6 +468,8 @@ void FLTKOgreWindow::fltkRender2()
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 	
+	printOglError("fltkRender2()", 3);
+
 	// real surface geometries
 	//drawAllGeometries();	
 	//if (_data->showSkinWeight)
@@ -457,6 +478,7 @@ void FLTKOgreWindow::fltkRender2()
 		drawDeformableModels();
 		//drawAllGeometries();
 	}
+	
 
 	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
 		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );

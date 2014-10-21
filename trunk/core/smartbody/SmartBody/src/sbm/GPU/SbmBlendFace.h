@@ -17,8 +17,9 @@ class SbmBlendFace: public DeformableMesh
 		SbmBlendFace();
 		~SbmBlendFace();
 
-		bool			buildVertexBufferGPU();
+		bool			buildVertexBufferGPU(int);
 		void			addFace(SbmDeformableMeshGPU*);
+		void			addFace(SrSnModel* newFace);
 		void			initShaderProgram();
 		void			initShaderProgram_Dan();
 		void			initShader();
@@ -63,9 +64,8 @@ class SbmBlendTextures
 		static GLuint getShader(const std::string);
 		static void BlendTwoFBO(GLuint, GLuint, GLuint, GLuint, float, GLuint, int, int);
 		static void BlendAllAppearances(GLuint, GLuint, std::vector<float>, std::vector<GLuint>, GLuint, int, int);
-		static void BlendAllAppearancesPairwise(GLuint *, GLuint *, std::vector<float>, std::vector<GLuint>, GLuint, int, int);
-
-
+		static void BlendAllAppearancesPairwise(GLuint *, GLuint *, std::vector<float>, std::vector<GLuint>,  std::vector<std::string>, GLuint, int, int);
+		static void BlendGeometry(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance/*_mesh*/, GLuint program);
 
 		GLuint			_vsID;
 		GLuint			_fsID;

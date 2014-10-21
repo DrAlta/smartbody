@@ -305,6 +305,22 @@ Fl_Menu_Item MenuTable[] =
    { 0 }
  };
 
+int printOglError2(char *file, int line)
+{
+
+    GLenum glErr;
+    int    retCode = 0;
+
+    glErr = glGetError();
+    if (glErr != GL_NO_ERROR)
+    {
+        printf("glError in file %s @ line %d: %s\n",
+			     file, line, gluErrorString(glErr));
+        retCode = 1;
+    }
+
+    return retCode;
+}
 
 void FltkViewer::create_popup_menus()
 {
@@ -1379,9 +1395,13 @@ void cameraInverse(float* dst, float* src)
 // This is call when NOT using the Ogre3D rendering
 void FltkViewer::drawAllGeometries(bool shadowPass)
 {
+	printOglError2("drawAllGeometries()", 1);
+
 	// update deformable mesh
     bool hasGPUSupport = SbmShaderManager::getShaderSupport() != SbmShaderManager::NO_GPU_SUPPORT;
+	
 	SrMat shadowTexMatrix;
+	
 	if (_data->shadowmode == ModeShadows && !shadowPass && hasGPUSupport) // update the texture transform matrix
 	{		
 		float cam_inverse_modelview[16];
@@ -1413,25 +1433,32 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	bool updateSim = SmartBody::SBScene::getScene()->getSimulationManager()->updateTimer();
 	SbmDeformableMeshGPU::useShadowPass = shadowPass;
 
+	printOglError2("drawAllGeometries()", 2);
+
 	drawDeformableModels();
 	
-
+	
 	_data->fcounter.start();
 	if ( _data->displayaxis ) _data->render_action.apply ( _data->sceneaxis );
 	if ( _data->boundingbox ) _data->render_action.apply ( _data->scenebox );
 
-	
+	/*
     if (hasGPUSupport)// && _data->shadowmode == ModeShadows)
     {
         std::string shaderName = _data->shadowmode == ModeShadows && !shadowPass ? "Basic" : "BasicShadow";
 	    SbmShaderProgram* basicShader = SbmShaderManager::singleton().getShader(shaderName);
 	    GLuint program = basicShader->getShaderProgram();
-	    if (_data->shadowmode == ModeShadows && !shadowPass)
+	   
+		if (_data->shadowmode == ModeShadows && !shadowPass)
 			glUseProgram(program);		
-	    GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
+	    
+		GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
+
+		
 	    if (_data->shadowmode == ModeShadows && !shadowPass) // attach the texture
 	    {		
-    		
+    		cerr << "HERE PASS\n";
+			printOglError2("drawAllGeometries()", 3);
 		    glActiveTexture(GL_TEXTURE7);
 		    glBindTexture(GL_TEXTURE_2D, _data->depthMapID);
 		    //glMatrixMode(GL_TEXTURE);
@@ -1441,20 +1468,25 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		    glUniform1i(glGetUniformLocation(program, "tex"), 7); 	
 			glUniform1i(glGetUniformLocation(program, "diffuseTex"), 0); 
 		    glMatrixMode(GL_MODELVIEW);			
-		    glUniform1i(useShadowMapLoc,1);		
+		    glUniform1i(useShadowMapLoc,1);	
+			printOglError2("drawAllGeometries()", 4);
 	    }
 	    else
 	    {
+			printOglError2("drawAllGeometries()", 30);
 			glUniform1i(glGetUniformLocation(program, "diffuseTex"), 0); 
+			printOglError2("drawAllGeometries()", 31);
 		    glUniform1i(useShadowMapLoc,0);		
+			printOglError2("drawAllGeometries()", 32);
 	    }
     }
-
+	*/
+	printOglError2("drawAllGeometries()", 5);
 	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
 		_data->render_action.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
 	}	
 
-	
+	printOglError2("drawAllGeometries()", 6);
 	
 #if USE_OGRE_VIEWER  < 1 // ogre will draw its own floor
 	if (_data->showFloor)
@@ -1502,6 +1534,8 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
    
 void FltkViewer::draw() 
 {	
+	printOglError2("draw()", 1);
+
 	if ( !visible() ) return;
 	
 	SrCamera* cam = SmartBody::SBScene::getScene()->getActiveCamera();
@@ -1678,9 +1712,11 @@ void FltkViewer::draw()
 		
 	}
 */
-
+	printOglError2("draw()", 2);
 	// real surface geometries
 	drawAllGeometries();	
+
+	printOglError2("draw()", 3);
 
 	drawPawns();
     // draw the grid
@@ -5373,8 +5409,13 @@ void FltkViewer::updateOptions()
 {
 }
 
+
+
+
 void FltkViewer::drawDeformableModels()
 {
+	printOglError2("drawDeformableModels()", 1);
+
 	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		pawnIter != pawns.end();
@@ -5428,6 +5469,8 @@ void FltkViewer::drawDeformableModels()
 			}
 		}
 	}
+
+	printOglError2("s",2);
 }
 
 int FltkViewer::deleteSelectedObject( int ret )

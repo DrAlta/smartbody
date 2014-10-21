@@ -497,6 +497,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\controllers\me_ct_new_locomotion.cpp" />
     <ClCompile Include="src\controllers\me_ct_pose_postprocessing.cpp" />
     <ClCompile Include="src\external\faceshift\fsbinarystream.cpp" />
+    <ClCompile Include="src\external\jpge.cpp" />
     <ClCompile Include="src\external\rply\rply.c" />
     <ClCompile Include="src\protocols\sbmesh.pb.cc" />
     <ClCompile Include="src\protocols\sbmotion.pb.cc" />
@@ -893,6 +894,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\controllers\me_ct_new_locomotion.h" />
     <ClInclude Include="src\controllers\me_ct_pose_postprocessing.hpp" />
     <ClInclude Include="src\external\faceshift\fsbinarystream.h" />
+    <ClInclude Include="src\external\jpge.h" />
     <ClInclude Include="src\external\rply\rply.h" />
     <ClInclude Include="src\protocols\sbmesh.pb.h" />
     <ClInclude Include="src\protocols\sbmotion.pb.h" />
@@ -939,6 +941,8 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <None Include="src\sbm\GPU\shaderFiles\blendAllTexturesPairwise.vert" />
     <None Include="src\sbm\GPU\shaderFiles\blendFace.frag" />
     <None Include="src\sbm\GPU\shaderFiles\blendFace.vert" />
+    <None Include="src\sbm\GPU\shaderFiles\blendGeometry.frag" />
+    <None Include="src\sbm\GPU\shaderFiles\blendGeometry.vert" />
     <None Include="src\sbm\GPU\shaderFiles\blendTextures.frag" />
     <None Include="src\sbm\GPU\shaderFiles\blendTextures.vert" />
   </ItemGroup>

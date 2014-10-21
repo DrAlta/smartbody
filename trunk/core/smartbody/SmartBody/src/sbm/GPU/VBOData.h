@@ -80,6 +80,7 @@ protected:
 	VBOData*   m_pVBO;	
 public:
 	VBODataArray(char* name, int type, std::vector<S>& data);
+	VBODataArray(char* name, int type, std::vector<S>& data, int number_of_shapes);
 	VBODataArray(char* name, int type, int nSize);
 	~VBODataArray();
 	VBOData* VBO() const { return m_pVBO; }
@@ -102,6 +103,16 @@ VBODataArray<S>::~VBODataArray()
 
 template<class S>
 VBODataArray<S>::VBODataArray( char* name, int type, std::vector<S>& data )
+{
+	m_Data.resize(data.size());
+	//copy(data,m_Data);
+	m_Data = data;
+	m_pVBO = new VBOData(name,type,m_Data);
+	m_pVBO->Update();
+}
+
+template<class S>
+VBODataArray<S>::VBODataArray( char* name, int type, std::vector<S>& data, int number_of_shapes )
 {
 	m_Data.resize(data.size());
 	//copy(data,m_Data);

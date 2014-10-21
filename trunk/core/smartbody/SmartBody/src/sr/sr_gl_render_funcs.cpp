@@ -126,7 +126,7 @@ void SrGlRenderFuncs::renderBlendFace(DeformableMeshInstance* shape)
 		DeformableMesh* testMesh = blendFace->getDeformableMesh();
 
 		//	Builds VBOs (reference)
-		blendFace->buildVertexBufferGPU();
+		blendFace->buildVertexBufferGPU(1);
 
 		//	Build VBO for rest of shapes
 		blendFace->addFace(mesh);
@@ -270,7 +270,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	if (shape->isStaticMesh())
 	{
 		SmartBody::SBSkeleton* skel = shape->getSkeleton();
-		SmartBody::SBPawn* pawn = skel->getPawn();
+		SmartBody::SBPawn* pawn		= skel->getPawn();
 
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
@@ -284,8 +284,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				const SrMat& woMat = joint->gmat();
 				glMultMatrix(woMat);		
 
-				const SrVec& offsetTrans = pawn->getVec3Attribute("blendShape.parentJointOffsetTrans");
-				const SrVec& offsetRot = pawn->getVec3Attribute("blendShape.parentJointOffsetRot");
+				const SrVec& offsetTrans	= pawn->getVec3Attribute("blendShape.parentJointOffsetTrans");
+				const SrVec& offsetRot		= pawn->getVec3Attribute("blendShape.parentJointOffsetRot");
 
 				SrQuat quat;
 				quat.set(offsetRot.x * M_PI / 180.0f, offsetRot.y * M_PI / 180.0f, offsetRot.z * M_PI / 180.0f);
@@ -420,6 +420,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 		glPopMatrix();
 	}
 	glDepthMask(GL_TRUE);
+
+	SbmShaderProgram::printOglError("SrGlRenderFuncs::renderDeformableMesh FINAL");
 
 }
 

@@ -1374,13 +1374,13 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 	if (initGPUVertexBuffer) return true;
 	bool hasSkinBuffer = DeformableMesh::buildSkinnedVertexBuffer();
 	//GLuint program = SbmShaderManager::singleton().getShader(shaderName)->getShaderProgram();	
-	VBOPos = new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuf);		
-	VBOTangent = new VBOVec3f((char*)"Tangent",VERTEX_TANGENT, tangentBuf);
+	VBOPos		= new VBOVec3f((char*)"RestPos",VERTEX_POSITION,posBuf);		
+	VBOTangent	= new VBOVec3f((char*)"Tangent",VERTEX_TANGENT, tangentBuf);
 	VBOBiNormal = new VBOVec3f((char*)"BiNormal",VERTEX_BINORMAL, binormalBuf);
-	VBONormal  =  new VBOVec3f((char*)"Normal",VERTEX_VBONORMAL, normalBuf);
+	VBONormal	= new VBOVec3f((char*)"Normal",VERTEX_VBONORMAL, normalBuf);
 	VBOTexCoord = new VBOVec2f((char*)"TexCoord",VERTEX_TEXCOORD, texCoordBuf);
-	VBOBoneID1 = new VBOVec4f((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf_f[0]);
-	VBOWeight1 = new VBOVec4f((char*)"Weight1",VERTEX_BONE_WEIGHT_1,boneWeightBuf[0]);
+	VBOBoneID1	= new VBOVec4f((char*)"BoneID1",VERTEX_BONE_ID_1,boneIDBuf_f[0]);
+	VBOWeight1	= new VBOVec4f((char*)"Weight1",VERTEX_BONE_WEIGHT_1,boneWeightBuf[0]);
 
 #if USE_SKIN_WEIGHT_SIZE_8
 	VBOBoneID2 = new VBOVec4f((char*)"BoneID2",VERTEX_BONE_ID_2,boneIDBuf_f[1]);
@@ -1541,9 +1541,9 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 
 	for (int i=0;i<baseModel.V.size();i++)
 	{
-		int iVtx = vtxBaseIdx+i;
-		SrVec basePos = baseModel.V[i]*skinWeight->bindShapeMat;
-		pData[iVtx*3] = basePos[0];
+		int iVtx		= vtxBaseIdx+i;
+		SrVec basePos	= baseModel.V[i]*skinWeight->bindShapeMat;
+		pData[iVtx*3]	= basePos[0];
 		pData[iVtx*3+1] = basePos[1];
 		pData[iVtx*3+2] = basePos[2];
 		if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
@@ -1552,10 +1552,10 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 			// copy related vtx components 
 			for (unsigned int k=0;k<idxMap.size();k++)
 			{
-				int idx = idxMap[k];
-				pData[idx*3] = basePos[0];
-				pData[idx*3+1] = basePos[1];
-				pData[idx*3+2] = basePos[2];
+				int idx			= idxMap[k];
+				pData[idx*3]	= basePos[0];
+				pData[idx*3+1]	= basePos[1];
+				pData[idx*3+2]	= basePos[2];
 			}
 		}			
 	}	
