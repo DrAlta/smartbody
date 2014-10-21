@@ -1,13 +1,21 @@
 #include "vhcl.h"
 #if !defined(__FLASHPLAYER__)
 #include "external/glew/glew.h"
+#include "external/jpge.h"
 #endif
 
+#include <algorithm>
 #include "SbmBlendFace.h"
 #include "sbm/sbm_deformable_mesh.h"
-
+#include <sr/jpge.h>
+#include <sb/SBSkeleton.h>
+#include <sb/SBScene.h>
+#include <sb/SBPawn.h>
 #include "SbmDeformableMeshGPU.h"
 
+#include "../../../../../../lib/glm/glm/glm.hpp"
+#include "../../../../../../lib/glm/glm/gtc/type_ptr.hpp"
+#include "../../../../../../lib/glm/glm/gtc/matrix_transform.hpp"
 
 SbmBlendFace::SbmBlendFace() : DeformableMesh()
 {
@@ -93,7 +101,7 @@ VBOVec3i* SbmBlendFace::getVBOTri()
 }
 	
 		
-bool SbmBlendFace::buildVertexBufferGPU()
+bool SbmBlendFace::buildVertexBufferGPU(int number_of_shapes)
 {
 	bool hasGLContext = SbmShaderManager::singleton().initOpenGL() && SbmShaderManager::singleton().initGLExtension();
 	if (!hasGLContext) 
@@ -105,7 +113,7 @@ bool SbmBlendFace::buildVertexBufferGPU()
 	_faceCounter	= 1;
 
 	_VBOPos.resize(_faceCounter);
-	_VBOPos[_faceCounter-1]	= new VBOVec3f((char*)"RestPos", VERTEX_POSITION, _mesh->posBuf);		
+	_VBOPos[_faceCounter-1]	= new VBOVec3f((char*)"RestPos", VERTEX_POSITION, _mesh->posBuf, number_of_shapes);		
 	_VBONormal				= new VBOVec3f((char*)"Normal", VERTEX_VBONORMAL, _mesh->normalBuf);
 	_VBOTexCoord			= new VBOVec2f((char*)"TexCoord", VERTEX_TEXCOORD, _mesh->texCoordBuf);
 	_VBOTri					= new VBOVec3i((char*)"TriIdx", GL_ELEMENT_ARRAY_BUFFER, _mesh->triBuf);
@@ -128,6 +136,23 @@ void SbmBlendFace::addFace(SbmDeformableMeshGPU* newFace)
 	_VBOPos.resize(_faceCounter);
 	_VBOPos[_faceCounter-1]	= new VBOVec3f((char*)"RestPos", VERTEX_POSITION, newFace->posBuf );
 }
+
+
+void SbmBlendFace::addFace(SrSnModel* newFace) 
+{
+	SrArray<SrVec> v = newFace->shape().V;
+	
+	std::vector<SrVec> vertices;
+	for (int i = 0; i < v.size(); i++) {
+		//std::cerr << "Adding face "<< i << ": " << v[i].x << ", " << v[i].y << ", " << v[i].z << "\n";
+		vertices.push_back( v[i] );
+	}
+	_faceCounter++;
+	_VBOPos.resize(_faceCounter);
+	_VBOPos[_faceCounter-1]	= new VBOVec3f((char*)"RestPos", VERTEX_POSITION, vertices );
+	
+}
+
 
 void SbmBlendFace::initShaderProgram_Dan() {
 	
@@ -310,6 +335,29 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
 		}
 	}
+	else if(_shaderName.compare("BlendGeometry") == 0)
+	{
+		SbmShaderProgram* program		= SbmShaderManager::singleton().getShader(_shaderName);
+
+		//	If GLSL program does not exist yet in SbmShaderManager
+		if(program) 
+		{
+			return program->getShaderProgram();
+		}
+		//	If the GLSL shader is not in the ShaderManager yet
+		else
+		{
+			LOG("Program does not exist yet");
+
+			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendGeometry.vert";
+			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendGeometry.frag";
+	
+			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+			SbmShaderManager::singleton().buildShaders();
+				
+			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
+		}
+	}
 	else
 	{
 		LOG("*** ERROR: Invalid BlendTextures shader");
@@ -317,17 +365,328 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 	}
 }
 
-void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, GLuint program, int w, int h)
+
+std::string ZeroPadNumber(int num)
+{
+	std::stringstream ss;
+	
+	// the number is converted to string with the help of stringstream
+	ss << num; 
+	std::string ret;
+	ss >> ret;
+	
+	// Append zero chars
+	int str_length = ret.length();
+	for (int i = 0; i < 5 - str_length; i++)
+		ret = "0" + ret;
+	return ret;
+}
+
+
+
+/*
+
+	if (shape->isStaticMesh())
+	{
+		SmartBody::SBSkeleton* skel = shape->getSkeleton();
+		SmartBody::SBPawn* pawn		= skel->getPawn();
+
+		const std::string& parentJoint = pawn->getStringAttribute("blendShape.parentJoint");
+		if (parentJoint != "")
+		{
+			SmartBody::SBJoint* joint = skel->getJointByName(parentJoint);
+			if (joint)
+			{
+				const SrMat& woMat = joint->gmat();
+				glMultMatrix(woMat);		
+
+				const SrVec& offsetTrans	= pawn->getVec3Attribute("blendShape.parentJointOffsetTrans");
+				const SrVec& offsetRot		= pawn->getVec3Attribute("blendShape.parentJointOffsetRot");
+
+
+			}
+		}
+
+		float meshScale = shape->getMeshScale();
+	*/
+
+
+void SbmBlendTextures::BlendGeometry(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance/*_mesh*/, GLuint program)
+{
+	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
+
+
+	glm::mat4x4 translation	= glm::mat4x4();
+	translation = glm::translate(translation, glm::vec3(20.0, 65.0, 20.0));
+
+	if (meshInstance->isStaticMesh())
+	{
+		SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
+		SmartBody::SBPawn* pawn		= skel->getPawn();
+		const std::string& parentJoint = pawn->getStringAttribute("blendShape.parentJoint");
+		if (parentJoint != "")
+		{
+			SmartBody::SBJoint* joint = skel->getJointByName(parentJoint);
+			if (joint)
+			{
+				const SrVec& offsetTrans	= pawn->getVec3Attribute("blendShape.parentJointOffsetTrans");
+				const SrVec& offsetRot		= pawn->getVec3Attribute("blendShape.parentJointOffsetRot");
+
+				translation = glm::translate(translation, glm::vec3(offsetTrans.x,offsetTrans.y,offsetTrans.z ));
+			}
+		}
+	}
+
+
+	SbmShaderProgram::printOglError("SbmBlendTextures::BlendGeometry #0");
+
+	SbmBlendFace * aux = new SbmBlendFace();
+
+	std::vector<int> verticesUsed(_mesh->posBuf.size(), 0);
+	std::vector<SrVec2> edges;
+	/*
+	// Creates lists of edges
+	for(int i=0; i< _mesh->triBuf.size(); i++)
+	{
+			int id1 = _mesh->triBuf[i][0];
+			int id2 = _mesh->triBuf[i][1];
+			int id3 = _mesh->triBuf[i][2];
+			
+			edges.push_back(SrVec2(id1,id2));
+			edges.push_back(SrVec2(id1,id3));
+			edges.push_back(SrVec2(id3,id2));
+	}
+
+	for(int i=0; i<edges.size(); i++)
+	{
+		SrVec2 edge			= edges[i];
+		SrVec2 edge_reverse = SrVec2(edge.y, edge.x);
+		int count			= 0;
+		
+		count			= std::count (edges.begin(), edges.end(), edge);
+		count			+= std::count (edges.begin(), edges.end(), edge_reverse);
+
+		if(count == 1)
+		{
+			verticesUsed[edge.x] = 1;
+			verticesUsed[edge.y] = 1;
+
+//			std::cerr << "Vertex " << edge.x << " is in the edge.\n";
+//			std::cerr << "Vertex " << edge.y << " is in the edge.\n";
+		}
+	}
+	*/
+	GLuint tbo, verticesUsedBuffer;
+	glGenTextures(1, &tbo);
+	
+	glGenBuffers( 1, &verticesUsedBuffer);
+    glBindBuffer( GL_TEXTURE_BUFFER, verticesUsedBuffer);
+	glBufferData( GL_TEXTURE_BUFFER, verticesUsed.size() * sizeof(int), verticesUsed.data(), GL_DYNAMIC_DRAW);
+	
+	aux->setDeformableMesh(_mesh);
+	aux->buildVertexBufferGPU(weights.size());
+
+	SrSnModel* writeToBaseModel = NULL;
+	SrSnModel* baseModel		= NULL;
+	bool foundBaseModel			= false;
+
+	std::vector<SrArray<SrPnt>*> shapes;
+
+	SrArray<SrPnt> neutralV;
+	SrArray<SrPnt> visemeV;
+	// find the base shape and other shapes
+	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
+	for (mIter = _mesh->blendShapeMap.begin(); mIter != _mesh->blendShapeMap.end(); ++mIter)
+	{
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
+			{
+				baseModel		= mIter->second[i];
+				foundBaseModel	= true;
+				break;
+			}
+		}
+		if (baseModel == NULL)
+		{
+			LOG("original base model cannot be found");
+			continue;
+		}
+
+		neutralV	= (baseModel->shape().V);
+
+		// Copies reference to the shape vector
+		shapes.push_back(&(baseModel->shape().V));
+
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if ((i == 0) ||(!mIter->second[i]))
+			{
+				continue;
+			}
+		
+			visemeV = mIter->second[i]->shape().V;
+			aux->addFace(mIter->second[i]);
+
+			// Copies reference to the shape vector
+			shapes.push_back(&(baseModel->shape().V));
+		}
+	}
+	
+	const int MAX_SHAPES = 14;	// I can't enable more than 16 attributes (15 vertex buffer + 1 texture coordinate buffer)
+								// NOTE: Also change #define in shader if you change this value
+
+	std::vector<float>	usedWeights;
+	std::vector<int>	usedShapeIDs;
+	std::vector<int>	areas;
+
+	GLfloat modelview_matrix[16];
+	GLfloat projection_matrix[16];
+	
+	glGetFloatv(GL_PROJECTION_MATRIX, projection_matrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
+
+	glUseProgram(program);
+		GLuint aVertexTexcoord	= glGetAttribLocation(program, "aVertexTexcoord");
+		GLuint aVertexPosition	= glGetAttribLocation(program, "aVertexPosition");
+
+		for(int i=0; i<weights.size(); i++)
+		{
+			// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
+			if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
+			{
+				glEnableVertexAttribArray(aVertexPosition + usedWeights.size());
+				aux->getVBOPos(i)->VBO()->BindBuffer();
+				glVertexAttribPointer(aVertexPosition + usedWeights.size(), 3, GL_FLOAT, GL_FALSE, 0,0);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+				// Pushes this weight to the vector of used weights
+				usedWeights.push_back(weights[i]);
+				usedShapeIDs.push_back(i);
+
+				// Areas is a vector<int> used to set which areas each shape affect (0 -> all, 1-> upper)
+				// If this shape is for eye_blink, sets area to upper
+				//if(
+				//	(texture_names[i].find("eye") != std::string::npos) ||
+				//	(texture_names[i].find("brows") != std::string::npos) 
+				//	)
+				//	areas.push_back(1);										
+				//else
+					areas.push_back(0);
+			}
+		}
+
+		glEnableVertexAttribArray(aVertexTexcoord);
+		aux->getVBOTexCoord()->VBO()->BindBuffer();
+		glVertexAttribPointer(aVertexTexcoord, 2, GL_FLOAT, GL_FALSE, 0,0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		GLuint uMatrixMV		= glGetUniformLocation(program, "uMatrixMV");
+		GLuint uMatrixProj		= glGetUniformLocation(program, "uMatrixProj");
+		GLuint uWeights			= glGetUniformLocation(program, "uWeights");
+		GLuint uAreas			= glGetUniformLocation(program, "uAreas");
+		GLuint uBorderVertices	= glGetUniformLocation(program, "uBorderVertices");
+		GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
+		GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
+		GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
+
+		int * image_array		= new int[MAX_SHAPES];
+		float * w				= new float[usedWeights.size()];
+		
+		for(int i=0; i<MAX_SHAPES; i++)
+		{
+			if(i < usedWeights.size())
+			{
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(GL_TEXTURE_2D, texIDs[usedShapeIDs[i]]);
+				image_array[i]	= i;
+				w[i]			= usedWeights[i];
+			}
+			// Textures not used, but we still need to pass 15 textures to the fragment shader for completeness
+			else
+			{
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+				image_array[i]	= i;
+			}
+		}
+
+		glActiveTexture(GL_TEXTURE14);
+		glBindTexture(GL_TEXTURE_BUFFER, tbo);
+		glTexBuffer(GL_TEXTURE_BUFFER, GL_R8I, verticesUsedBuffer);
+
+
+		glUniformMatrix4fv(uMatrixMV, 1, GL_FALSE, modelview_matrix);
+		glUniformMatrix4fv(uMatrixProj, 1, GL_FALSE, projection_matrix);
+		glUniformMatrix4fv(uTranslate, 1, GL_FALSE, glm::value_ptr(translation));
+		glUniform1iv(uAreas, areas.size(), &(areas[0]));
+		glUniform1fv(uWeights, usedWeights.size(), w);
+		glUniform1i(uNumberOfShapes, usedWeights.size());
+		glUniform1iv(uNeutralSampler, MAX_SHAPES, image_array);
+		glUniform1i(uBorderVertices,  14);
+
+
+		aux->subMeshTris[0]->VBO()->BindBuffer();
+			glDrawElements(GL_TRIANGLES, _mesh->triBuf.size()*3 , GL_UNSIGNED_INT,0);
+		aux->subMeshTris[0]->VBO()->UnbindBuffer();
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+		aux->getVBOPos(0)->VBO()->UnbindBuffer();
+		aux->getVBOPos(1)->VBO()->UnbindBuffer();
+		aux->getVBOTexCoord()->VBO()->UnbindBuffer();
+
+		for(int i=0; i<usedWeights.size(); i++)
+		{
+			glDisableVertexAttribArray(aVertexPosition + i);
+		}
+
+		glDisableVertexAttribArray(aVertexTexcoord);
+
+	glUseProgram(0);
+
+	glDeleteTextures(1, &tbo);
+	
+	glDeleteBuffers( 1, &verticesUsedBuffer);
+
+	delete aux;
+
+	SbmShaderProgram::printOglError("BlendGeometry FINAL");
+
+}
+
+void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, GLuint program, int w, int h)
 {
 	int numTextures		= weights.size();
 
 	float sumOfWeights	= 0;
+
+	float WeightUpToNow = 0;
 
 	for(std::vector<float>::iterator j=weights.begin(); j!=weights.end(); ++j)
 		sumOfWeights += *j;
 
 	for(int i = numTextures-1; i >= 0; i--) 
 	{
+		WeightUpToNow += weights[i];
+
+		int faceArea;
+		if((texture_names[i].find("eye_blink") != std::string::npos) && (weights[i] > 0.001))
+		{
+			faceArea = 1;
+			//std::cerr << "eye_blink\t" << weights[i] << "\n";
+		} 
+		else if((texture_names[i].find("mouth_right") != std::string::npos) && (weights[i] > 0.001))
+		{
+			faceArea = 2;
+			//std::cerr << texture_names[i] <<"\t" << weights[i] << "\n";
+		}
+		else
+		{
+			faceArea = 0;
+		}
+
+	
+
 		glPushMatrix();
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst[i]);                                                              // Bind the framebuffer object
 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst[i], 0);              // Attach texture to FBO
@@ -347,12 +706,14 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 						glViewport(0, 0, w, h);
 						glLoadIdentity ();
 
-						glClearColor(1.0, 1.0, 1.0, 0);
+						glClearColor(1.0f, 1.0f, 1.0f, 0);
 						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 						GLuint uNumberOfTextures		= glGetUniformLocation(program, "uNumberOfTextures");
 						GLuint uIteration				= glGetUniformLocation(program, "uIteration");
 						GLuint uWeight					= glGetUniformLocation(program, "uWeight");
+						GLuint uWeightUpToNow			= glGetUniformLocation(program, "uWeightUpToNow");
+						GLuint uFaceArea				= glGetUniformLocation(program, "uFaceArea");
 						GLuint uTotalWeights			= glGetUniformLocation(program, "uTotalWeights");
 						GLuint uNeutralSampler			= glGetUniformLocation(program, "uNeutralSampler");
 						GLuint uExpressionSampler		= glGetUniformLocation(program, "uExpressionSampler");
@@ -364,6 +725,8 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 						glUniform1i(uNumberOfTextures, numTextures);
 						glUniform1i(uIteration, i);
 						glUniform1f(uWeight, weights[i]);
+						glUniform1f(uWeightUpToNow, WeightUpToNow);
+						glUniform1i(uFaceArea, faceArea);
 						glUniform1f(uTotalWeights, sumOfWeights);
 						glUniform1i(uNeutralSampler, 0);
 						glUniform1i(uExpressionSampler, 1);
@@ -411,12 +774,25 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 				glPopMatrix();                              // Pops ENABLE_BIT
 				glMatrixMode (GL_MODELVIEW);
 			glPopAttrib();
+
 			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);                                                                                                          // Bind the render buffer
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);         
 		
 			glActiveTexture(GL_TEXTURE0);
 																									   // Bind the frame buffer object
 		glPopMatrix();
+
+		/*
+		//	Saves USColorCode for current weight i in EXR32 format
+		int channels = 3;
+		std::string path =  "C:/tmp/iteration." + ZeroPadNumber(i) + ".jpg";
+		GLubyte *image = (GLubyte *) malloc(512 * 512 * sizeof(GLubyte) * channels);
+		glBindTexture(GL_TEXTURE_2D, texDst[i]);
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		jpge::compress_image_to_jpeg_file(path.c_str(),  512, 512, 3, image);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		delete(image);
+		*/
 	}
 }
 

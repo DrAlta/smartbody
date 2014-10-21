@@ -11,6 +11,7 @@
 #endif
 #endif
 
+#include "sbm/GPU/SbmDeformableMeshGPU.h"
 #include "sbm/GPU/SbmBlendFace.h"
 #include "sbm_deformable_mesh.h"
 
@@ -698,22 +699,27 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			for (int k=0;k<3;k++)
 			{
 				SrVec nvec;
-				SrPnt2 tvec = SrPnt2(0,0);
-				int nidx = nIdx[k];
+				SrPnt2 tvec	= SrPnt2(0,0);
+				int nidx	= nIdx[k];
+
 				if (dMeshStatic->shape().N.size() > nidx)
 					nvec = dMeshStatic->shape().N[nIdx[k]];
 				else
 					nvec = faceNormal;
+
 				if (dMeshStatic->shape().T.size() > tIdx[k] && dMeshStatic->shape().T.size() > 0 && dMeshStatic->shape().Ft.size() > 0)
 					tvec = dMeshStatic->shape().T[tIdx[k]];
+
 				int newNIdx = nIdx[k] + iNormalIdxOffset;
-				int newTIdx = tIdx[k] + iTextureIdxOffset;
-				int vIdx = fIdx[k] + iFaceIdxOffset;
+				int newTIdx	= tIdx[k] + iTextureIdxOffset;
+				int vIdx	= fIdx[k] + iFaceIdxOffset;
+
 				if (ntNewVtxIdxMap.find(IntPair(newNIdx,newTIdx)) != ntNewVtxIdxMap.end())
 					vIdx = ntNewVtxIdxMap[IntPair(newNIdx,newTIdx)];
-				normalBuf[vIdx] = nvec;
-				texCoordBuf[vIdx] = SrVec2(tvec.x, tvec.y);
-				triBuf[iFace][k] = vIdx;
+
+				normalBuf[vIdx]		= nvec;
+				texCoordBuf[vIdx]	= SrVec2(tvec.x, tvec.y);
+				triBuf[iFace][k]	= vIdx;
 			}			
 			iFace++;
 		}
@@ -1473,19 +1479,24 @@ void DeformableMeshInstance::cleanUp()
 
 void DeformableMeshInstance::blendShapes()
 {
+
+	SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapes() #0 ");
+
 	if (!_character)
 	{
 		return;
 	}
 
 
+	SrSnModel* writeToBaseModel = NULL;
+	SrSnModel* baseModel = NULL;
+
 	// find the base shape from static meshes
 	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
 	for (mIter = _mesh->blendShapeMap.begin(); mIter != _mesh->blendShapeMap.end(); ++mIter)
 	{
 		bool foundBaseModel = false;
-		SrSnModel* writeToBaseModel = NULL;
-		SrSnModel* baseModel = NULL;
+
 		for (size_t i = 0; i < _mesh->dMeshStatic_p.size(); ++i)
 		{
 			if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
@@ -1505,8 +1516,8 @@ void DeformableMeshInstance::blendShapes()
 		{
 			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
 			{
-				baseModel = mIter->second[i];
-				foundBaseModel = true;
+				baseModel		= mIter->second[i];
+				foundBaseModel	= true;
 				break;
 			}
 		}
@@ -1544,6 +1555,7 @@ void DeformableMeshInstance::blendShapes()
 					SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
 					SrArray<SrPnt>& visemeN = mIter->second[i]->shape().N;
 
+
 					SrVec vVec;
 					SrVec nVec;
 					for (int v = 0; v < visemeV.size(); ++v)
@@ -1577,6 +1589,8 @@ void DeformableMeshInstance::blendShapes()
 
 		//	Initializes vector of wieghts, of size (#shapes) each shape got a texture
 		std::vector<GLuint> texIDs(mIter->second.size(), 0);
+
+		std::vector<std::string> texture_names(mIter->second.size());
 
 		for (size_t i = 0; i < mIter->second.size(); ++i)
 		{
@@ -1621,7 +1635,8 @@ void DeformableMeshInstance::blendShapes()
 				continue;
 
 			// Stores weights of each face
-			weights[i] = w;
+			weights[i]		= w;
+
 
 			//std::cerr << "weights[" << i << "]: " << w << "\n";
 
@@ -1648,14 +1663,14 @@ void DeformableMeshInstance::blendShapes()
 					int vSize = _mesh->optimizedBlendShapeData[i].diffV.size();
 					for (int v = 0; v < vSize; ++v)
 					{
-						int index = blendData.diffV[v].first;
+						int index	= blendData.diffV[v].first;
 						SrVec& diff = blendData.diffV[v].second;
 						newV[index] = newV[index] + diff * w;
 					}
 					int nSize = _mesh->optimizedBlendShapeData[i].diffN.size();
 					for (int n = 0; n < nSize; ++n)
 					{
-						int index = blendData.diffN[n].first;
+						int index	= blendData.diffN[n].first;
 						SrVec& diff = blendData.diffN[n].second;
 						newN[index] = newN[index] + diff * w;
 					}
@@ -1689,6 +1704,10 @@ void DeformableMeshInstance::blendShapes()
 
 
 
+
+		
+
+		// Starts computing blended textures
 		for (size_t i = 0; i < mIter->second.size(); ++i)
 		{
 			if (!mIter->second[i])
@@ -1711,7 +1730,8 @@ void DeformableMeshInstance::blendShapes()
 				SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, fileName.c_str());
 				if (tex)
 				{
-					texIDs[i] = tex->getID();
+					texIDs[i]		= tex->getID();
+					texture_names[i]= fileName;
 					//std::cerr << "Retriving texture " << matName << "\ttexIDs[" << i << "]: " << texIDs[i] << "\n";
 				} 
 				else
@@ -1726,7 +1746,8 @@ void DeformableMeshInstance::blendShapes()
 			SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, fileName.c_str());
 			if (tex)
 			{
-				texIDs[i] = tex->getID();
+				texIDs[i]		= tex->getID();
+				texture_names[i]= fileName;
 				//std::cout << "Retriving texture " << matName << "\ttexIDs[" << i << "]: " << texIDs[i] << "\n";
 			}
 			else
@@ -1778,6 +1799,8 @@ void DeformableMeshInstance::blendShapes()
 			glGenFramebuffers(weights.size(), _tempFBOPairs);
 		}
 
+//		SbmShaderProgram::printOglError("HERE #4 ");
+
 		if(_tempTexPairs == NULL) 
 		{
 			_tempTexPairs = new GLuint[weights.size()];
@@ -1794,9 +1817,15 @@ void DeformableMeshInstance::blendShapes()
 			}
 		}
 
+
+
 		if (texIDs.size() > 0 && texIDs[0] != 0)
 		{
-			SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), 512, 512);
+			SbmShaderProgram::printOglError("texIDs.size() > 0 ");
+			// Blends geometry
+			SbmBlendTextures::BlendGeometry( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, this,  SbmBlendTextures::getShader("BlendGeometry"));
+
+			SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), 512, 512);
 		}
 #endif
 		// END OF SECOND ATTEMPT
@@ -2160,6 +2189,9 @@ SBAPI bool DeformableMeshInstance::isStaticMesh()
 
 SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 {
+
+	SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #0 ");
+
 	if (!_mesh) 
 		return;
 
@@ -2169,9 +2201,11 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 	DeformableMeshInstance::blendShapes();
 
 	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
-	mIter = _mesh->blendShapeMap.begin();
+
+	mIter						= _mesh->blendShapeMap.begin();
 	SrSnModel* writeToBaseModel = NULL;	
-	int vtxBaseIdx = 0;
+	int vtxBaseIdx				= 0;
+
 	for (size_t i = 0; i < _mesh->dMeshStatic_p.size(); ++i)
 	{		
 		if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
@@ -2210,5 +2244,5 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 			}
 		}			
 	}	
-
+	SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #FINAL");
 }

@@ -1189,6 +1189,9 @@
     <ClCompile Include="src\sb\SBRigNode.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="src\external\jpge.cpp">
+      <Filter>external</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2376,6 +2379,9 @@
     <ClInclude Include="src\sb\SBRigNode.h">
       <Filter>sb</Filter>
     </ClInclude>
+    <ClInclude Include="src\external\jpge.h">
+      <Filter>external</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">
@@ -2466,6 +2472,12 @@
       <Filter>GPU</Filter>
     </None>
     <None Include="src\sbm\GPU\shaderFiles\blendAllTexturesPairwise.vert">
+      <Filter>GPU</Filter>
+    </None>
+    <None Include="src\sbm\GPU\shaderFiles\blendGeometry.frag">
+      <Filter>GPU</Filter>
+    </None>
+    <None Include="src\sbm\GPU\shaderFiles\blendGeometry.vert">
       <Filter>GPU</Filter>
     </None>
   </ItemGroup>
