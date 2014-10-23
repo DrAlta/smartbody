@@ -116,6 +116,8 @@ MeCtIKTreeScenario::~MeCtIKTreeScenario()
 void MeCtIKTreeScenario::updateEndEffectorValidNodes(EffectorConstraint* cons, std::set<MeCtIKTreeNode*>& validNodes)
 {	
 	MeCtIKTreeNode* endNode = findIKTreeNode(cons->efffectorName.c_str());
+	if (!endNode)
+		return;
 	MeCtIKTreeNode* node = endNode->parent;		
 	bool bStop = false;
 	if (endNode->getNodeName() == cons->rootName)
