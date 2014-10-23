@@ -518,15 +518,15 @@ int SBJointMap::getNumMappings()
 const std::string& SBJointMap::getTarget(int num)
 {
 #ifdef USE_TWO_MAPS
-	int count = 0;
-	for (std::map<std::string, std::string>::iterator iter = _targetMap.begin();
-		 iter != _targetMap.end();
-		 iter++)
-	{
-		if (count == num)
-			return (*iter).first;
-		count++;
-	}
+	  int count = 0;
+  for (std::map<std::string, std::string>::iterator iter = _sourceMap.begin();
+        iter != _sourceMap.end();
+        iter++)
+  {
+    if (count == num)
+    return (*iter).second;
+    count++;
+  }
 #else
 #if USE_STL_MAP
 	_map = getMappingList();

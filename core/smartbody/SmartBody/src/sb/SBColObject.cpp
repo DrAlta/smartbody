@@ -336,7 +336,13 @@ SrBox SBGeomBox::getBoundingBox()
 {
 	SrBox box;
 
-	box.set(SrVec(), SrVec());
+	SrVec min(-extent[0] / 2.0, -extent[1] / 2.0, -extent[2] / 2.0);
+	SrVec max(extent[0] / 2.0, extent[1] / 2.0, extent[2] / 2.0);
+
+	SrVec finalMin = globalTransform.localToGlobal(min);
+	SrVec finalMax = globalTransform.localToGlobal(max);
+	
+	box.set(finalMin, finalMax);
 
 	return box;
 }

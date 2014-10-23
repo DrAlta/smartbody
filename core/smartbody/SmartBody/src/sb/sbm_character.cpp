@@ -181,7 +181,8 @@ noise_ct(NULL),
 record_ct(NULL),
 basic_locomotion_ct(NULL),
 generic_hand_ct(NULL),
-new_locomotion_ct(NULL),face_neutral( NULL ),
+new_locomotion_ct(NULL),
+face_neutral( NULL ),
 _soft_eyes_enabled( ENABLE_EYELID_CORRECTIVE_CT )
 {
 	
@@ -565,6 +566,110 @@ void SbmCharacter::createStandardControllers()
 		listeners[i]->OnCharacterUpdate( getName() );
 	}
 }
+
+void SbmCharacter::createMinimalControllers()
+{
+	posture_sched_p = CreateSchedulerCt( getName().c_str(), "posture" );
+	motion_sched_p = CreateSchedulerCt( getName().c_str(), "motion" );
+
+	gaze_sched_p = CreateSchedulerCt( getName().c_str(), "gaze" );
+
+	head_sched_p = CreateSchedulerCt( getName().c_str(), "head" );
+	face_ct = new MeCtFace();
+	string faceCtName( getName() );
+	faceCtName += "_faceController";
+	face_ct->setName(faceCtName);
+
+	eyelid_reg_ct_p = new MeCtEyeLidRegulator();
+	eyelid_reg_ct_p->ref();
+	if (!_faceDefinition || !_faceDefinition->getFaceNeutral())
+	{
+		eyelid_reg_ct_p->set_use_blink_viseme( true );
+//		LOG("Character %s will use 'blink' viseme to control blinking.", getName().c_str());
+	}
+	else
+	{
+//		LOG("Character %s will use FAC 45 left and right to control blinking.", getName().c_str());
+	}
+	eyelid_reg_ct_p->init(this, true);
+	eyelid_reg_ct_p->set_upper_range( -30.0, 30.0 );
+	eyelid_reg_ct_p->set_close_angle( 30.0 );
+	ostringstream ct_name;
+	ct_name << getName() << "_eyelidController";
+	eyelid_reg_ct_p->setName( ct_name.str().c_str() );
+
+	this->saccade_ct = new MeCtSaccade(this);
+	this->saccade_ct->init(this);
+	std::string saccadeCtName = getName() + "_eyeSaccadeController";
+	this->saccade_ct->setName(saccadeCtName.c_str());
+
+	posture_sched_p->ref();
+	motion_sched_p->ref();
+	gaze_sched_p->ref();
+	head_sched_p->ref();
+	face_ct->ref();
+
+	posture_sched_p->init(this);
+	motion_sched_p->init(this);
+
+	gaze_sched_p->init(this);
+
+	head_sched_p->init(this);
+	face_ct->init( this );
+
+	ct_tree_p->add_controller( posture_sched_p );
+	//ct_tree_p->add_controller( locomotion_ct );
+	
+	ct_tree_p->add_controller( motion_sched_p );
+	ct_tree_p->add_controller( gaze_sched_p );
+	ct_tree_p->add_controller( saccade_ct );
+	ct_tree_p->add_controller( eyelid_reg_ct_p );
+	ct_tree_p->add_controller( head_sched_p );
+	//ct_tree_p->add_controller( head_param_anim_ct );
+	ct_tree_p->add_controller( face_ct );
+
+	// get the default attributes from the default controllers
+	
+	std::vector<SmartBody::SBController*>& defaultControllers = SmartBody::SBScene::getScene()->getDefaultControllers();
+	for (size_t x = 0; x < defaultControllers.size(); x++)
+	{
+		MeController* controller = defaultControllers[x];
+		const std::vector<AttributeVarPair>& defaultAttributes = controller->getDefaultAttributes();
+		std::string groupName = controller->getName();		
+		for (size_t a = 0; a < defaultAttributes.size(); a++)
+		{
+			SmartBody::SBAttribute* attribute = defaultAttributes[a].first;
+			int groupPriority = attribute->getAttributeInfo()->getGroup()->getPriority();
+			SmartBody::SBAttribute* attributeCopy = attribute->copy();
+			this->addAttribute(attributeCopy, attribute->getAttributeInfo()->getGroup()->getName());
+			// make sure the group's priority is set properly
+			attributeCopy->getAttributeInfo()->getGroup()->setPriority(groupPriority);
+			// if the controller isn't a scheduler, then add the controller as an observer
+			MeCtScheduler2* scheduler = dynamic_cast<MeCtScheduler2*>(controller);
+			if (!scheduler)
+			{
+				if (dynamic_cast<MeCtEyeLidRegulator*>(controller))
+					attributeCopy->registerObserver(eyelid_reg_ct_p);
+				else if (dynamic_cast<MeCtSaccade*>(controller))
+					attributeCopy->registerObserver(saccade_ct);
+				else if (dynamic_cast<MeCtFace*>(controller))
+					attributeCopy->registerObserver(face_ct);
+				else if (dynamic_cast<MeCtParamAnimation*>(controller))
+				{
+					attributeCopy->registerObserver(controller);
+				}
+			}
+		}
+	}
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
+	for (size_t i = 0; i < listeners.size(); i++)
+	{
+		listeners[i]->OnCharacterUpdate( getName() );
+	}
+}
+
+
 void SbmCharacter::initData()
 {
 	posture_sched_p = NULL;
@@ -584,7 +689,9 @@ void SbmCharacter::initData()
 	physics_ct = NULL;
 	postprocess_ct = NULL;
 	motiongraph_ct = NULL;
-
+	new_locomotion_ct = NULL;
+	basic_locomotion_ct = NULL;
+	generic_hand_ct = NULL;
 
 	speech_impl = NULL;
 	speech_impl_backup = NULL;
@@ -1496,12 +1603,18 @@ int SbmCharacter::prune_controller_tree( )
 	SkChannelArray raw_channels;
 
 	// Traverse the controller tree from highest priority down, most recent to earliest
-	prune_schedule( this, head_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
-	prune_schedule( this, reach_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
-	prune_schedule( this, grab_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
-	prune_schedule( this, gaze_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
-	prune_schedule( this, constraint_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
-	prune_schedule( this, motion_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	if (head_sched_p)
+		prune_schedule( this, head_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	if (reach_sched_p)
+		prune_schedule( this, reach_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	if (grab_sched_p)
+		prune_schedule( this, grab_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	if (gaze_sched_p)
+		prune_schedule( this, gaze_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	if (constraint_sched_p)
+		prune_schedule( this, constraint_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
+	if (motion_sched_p)
+		prune_schedule( this, motion_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 
 	// For the posture track, ignore prior controllers, as they should never be used to mark a posture as unused
 	for( int key=0; key<MeCtGaze::NUM_GAZE_KEYS; ++key )

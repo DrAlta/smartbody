@@ -1823,7 +1823,7 @@ void DeformableMeshInstance::blendShapes()
 		{
 			SbmShaderProgram::printOglError("texIDs.size() > 0 ");
 			// Blends geometry
-			SbmBlendTextures::BlendGeometry( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, this,  SbmBlendTextures::getShader("BlendGeometry"));
+			//SbmBlendTextures::BlendGeometry( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, this,  SbmBlendTextures::getShader("BlendGeometry"));
 
 			SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), 512, 512);
 		}

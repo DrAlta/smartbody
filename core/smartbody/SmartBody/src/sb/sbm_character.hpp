@@ -161,6 +161,7 @@ public:
 	virtual int setup();
 
 	virtual void createStandardControllers();
+	virtual void createMinimalControllers();
 
 	//* Overrides SbmPawn::prune_controller_tree()
 	virtual int prune_controller_tree();
