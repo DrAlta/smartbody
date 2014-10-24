@@ -106,6 +106,7 @@ bool PATimeManager::step(double timeStep)
 	prevMotionTimes.resize(motionTimes.size());
 	std::copy(motionTimes.begin(),motionTimes.end(),prevMotionTimes.begin());
 
+	double deltaTime = localTime - prevLocalTime;
 	prevLocalTime = localTime;
 	double newLocalTime = localTime + timeStep;
 	int loopcounter = 0;
@@ -135,6 +136,17 @@ bool PATimeManager::step(double timeStep)
 			}
 			newLocalTime = offsetLocalTime + key[0];
 		}		
+		if (blendData->wrapMode == PABlendData::Clamp)
+		{
+			double d = key[key.size() - 1] - key[0];		
+			// consider the case when key[0] > 0
+			double offsetLocalTime = newLocalTime - key[0];
+			int times = (int) (offsetLocalTime / d);
+			if (times > 0)
+			{
+				newLocalTime = key[key.size() - 1];
+			}
+		}
 		notReachDuration = false;
 	}
 
@@ -278,7 +290,7 @@ int PATimeManager::getSection(double time)
 {
 	for (int i = 0; i < getNumKeys() - 1; i++)
 	{
-		if (key[i] <= time && key[i + 1] > time)
+		if ((key[i] <= time || key[i] - time < gwiz::epsilon4()) && (key[i + 1] > time || time - key[i + 1] < gwiz::epsilon4()))
 			return i;
 	}
 	if (time > key[getNumKeys()-1])
@@ -315,6 +327,50 @@ void PATimeManager::getParallelTimes(double time, std::vector<double>& times)
 	{
 		double t = blendData->getStateKeyTime(i,section) + (blendData->getStateKeyTime(i,section+1) - blendData->getStateKeyTime(i,section)) * (offsetTime - key[section]) / (key[section + 1] - key[section]);
 		times.push_back(t);
+	}
+}
+
+void PATimeManager::getParallelTimes(int motionIndex, double time, std::vector<double>& times)
+{
+	if (motionIndex < 0 || motionIndex >= blendData->state->getNumMotions())
+		return;
+
+	// get section number
+	int motionSectionId = -1;
+	std::vector<double> motionKey = blendData->state->keys[motionIndex];
+	if (motionKey.empty())
+		return;
+
+	for (size_t i = 0; i < motionKey.size() - 1; i++)
+	{
+		if ((motionKey[i] <= time || (motionKey[i] - time) < gwiz::epsilon4()) && ((motionKey[i + 1] > time || (time - motionKey[i + 1]) < gwiz::epsilon4())))
+		{
+			motionSectionId = i;
+			break;
+		}
+	}
+
+	if (motionSectionId < 0 || motionSectionId == motionKey.size())
+	{
+		LOG("getParallelTimes ERR:: motion time %f(%d) is not valid", time, motionIndex);
+		for  (int i = 0; i < blendData->state->getNumMotions(); ++i)
+			times.push_back(time);
+		return;
+	}
+
+	times.clear();
+	// get times for other motions
+	for (int i = 0; i < blendData->state->getNumMotions(); ++i)
+	{
+		if (i == motionSectionId)
+			times.push_back(time);
+		else
+		{
+			float ri = blendData->getStateKeyTime(i, motionSectionId + 1) - blendData->getStateKeyTime(i, motionSectionId);
+			float rmotion = blendData->getStateKeyTime(motionIndex, motionSectionId + 1) - blendData->getStateKeyTime(motionIndex, motionSectionId);
+			double t = blendData->state->keys[i][motionSectionId] + (time - motionKey[motionSectionId]) * ri / rmotion;
+			times.push_back(t);
+		}
 	}
 }
 
@@ -1039,20 +1095,28 @@ void PABlendData::evaluate(double timeStep, SrBuffer<float>& buffer)
 	bool notReachCycle = true;
 	notReachCycle = timeManager->step(timeStep*playSpeed);
 	SrBuffer<float> buffCopy = buffer;
-	bool isZeroD = isZeroDState();
-	bool OnceAndReachCycle = (wrapMode != Loop && !notReachCycle);
-	{		
-		if (wrapMode == Loop || ((wrapMode != Loop) && notReachCycle))
-		{
-			//LOG("motion time = %f",timeManager->motionTimes[0]);			
-			interpolator->blending(timeManager->motionTimes, buffer);
-			woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffCopy);
+	if (wrapMode == Loop || ((wrapMode == Once) && notReachCycle) || wrapMode == Clamp)
+	{
+		//LOG("motion time = %f",timeManager->motionTimes[0]);			
+		interpolator->blending(timeManager->motionTimes, buffer);
+		woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffCopy);
 			
-			active = true;
+		active = true;
+	}
+	else
+	{
+		active = false;	
+
+		/*
+		// reset parameters
+		for (int i = 0; i < state->getNumMotions(); ++i)
+		{
+			SmartBody::SBMotion* sbMotion = state->motions[i];
+			if (sbMotion->getOffsetParent())
+				state->motions[i] = sbMotion->getOffsetParent();
 		}
-		else
-			active = false;	
-	}	
+		*/
+	}
 }
 
 std::string PABlendData::getStateName()

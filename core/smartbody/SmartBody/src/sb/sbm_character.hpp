@@ -162,7 +162,6 @@ public:
 
 	virtual void createStandardControllers();
 	virtual void createMinimalControllers();
-
 	//* Overrides SbmPawn::prune_controller_tree()
 	virtual int prune_controller_tree();
 
@@ -229,7 +228,9 @@ public:
 
 	MeCtPhysicsController* physics_ct;
 	MeCtDataReceiver*	datareceiver_ct;
-	MeCtParamAnimation* param_animation_ct;
+	MeCtParamAnimation* param_animation_ct;			// layer0
+	MeCtParamAnimation* param_animation_ct_layer1;	// layer1
+	MeCtParamAnimation* param_animation_ct_layer2;	// layer2
 	MeCtParamAnimation* head_param_anim_ct;
 	
 	MeCtMotionPlayer*	motionplayer_ct;

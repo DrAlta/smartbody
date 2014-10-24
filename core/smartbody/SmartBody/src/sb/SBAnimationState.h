@@ -39,6 +39,7 @@ class SBAnimationBlend : public PABlend
 
 		SBAPI virtual int getNumMotions();
 		SBAPI virtual std::string getMotion(int num);
+		SBAPI virtual SBMotion* getSBMotion(int num);
 		SBAPI SkMotion* getSkMotion(const std::string& motionName);
 		SBAPI virtual int getNumCorrespondencePoints();
 		SBAPI virtual std::vector<double> getCorrespondencePoints(int num);
@@ -50,6 +51,11 @@ class SBAnimationBlend : public PABlend
 		SBAPI virtual SBMotionEvent* getEvent(int index);
 		SBAPI virtual void removeAllEvents();
 		SBAPI virtual int getNumEvents();
+
+		SBAPI virtual void offsetMotion(int index, double time);
+		SBAPI virtual void unoffsetMotions();
+
+		SBAPI virtual void backupMotionKey();
 
 		SBAPI virtual std::string getDimension();
 		SBAPI bool validateState();

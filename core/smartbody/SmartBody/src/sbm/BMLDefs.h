@@ -38,6 +38,7 @@ class BMLDefs
 		static XMLCh* ATTR_GROUP;
 		static XMLCh* ATTR_EMOTION;
 		static XMLCh* ATTR_FILTERED;
+		static XMLCh* ATTR_LAYER;
 
 		static XMLCh* TM_START;
 		static XMLCh* TM_READY;

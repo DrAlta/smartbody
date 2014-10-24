@@ -350,6 +350,9 @@
     <ClCompile Include="..\src\faceshiftviewer\FaceShiftViewer.cpp">
       <Filter>faceshiftviewer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLNoiseObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -645,6 +648,9 @@
     <ClInclude Include="..\..\SmartBody\src\sr\jpge.h" />
     <ClInclude Include="..\src\faceshiftviewer\FaceShiftViewer.h">
       <Filter>faceshiftviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLNoiseObject.h">
+      <Filter>bmlcreator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

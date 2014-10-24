@@ -15,6 +15,7 @@ BMLStateObject::BMLStateObject() : BMLObject()
 	std::vector<std::string> loops;
 	loops.push_back("Loop");
 	loops.push_back("Once");
+	loops.push_back("Clamp");
 	loopAttr->setValidValues(loops);
 
 	SmartBody::StringAttribute* startNowAttr = createStringAttribute("sbm:schedule-mode", "", "", "Basic", 40, false, false, false, "Schedule mode for the blend. Now or Queued.Default is Queued");

@@ -48,6 +48,7 @@ MeCtMotion::MeCtMotion ()
    _last_apply_frame = 0;
    _offset = 0;
    _isAdditive = false;
+   _useOffset = false;
  }
 
 MeCtMotion::~MeCtMotion ()
@@ -367,6 +368,18 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 			retarget->addJointRotOffset("l_shoulder",lShlderQuat);
 			retarget->addJointRotOffset("r_shoulder",rShlderQuat);
 		}
+	}
+
+	// whether use offset
+	if (_useOffset)
+	{
+		if (!sbMotion->getOffsetParent())
+			_motion = sbMotion->getOffset();
+	}
+	else
+	{
+		if (sbMotion->getOffsetParent())
+			_motion = sbMotion->getOffsetParent();
 	}
 
 	// Controller Context and FrameData set, use the new available buffer

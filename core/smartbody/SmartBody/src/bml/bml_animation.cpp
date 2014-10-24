@@ -51,6 +51,15 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 	const XMLCh* id = elem->getAttribute(BMLDefs::ATTR_ID);
 	std::string localId;
 	xml_utils::xml_translate(&localId, id);
+
+	std::string additive;
+	const XMLCh* additiveID = elem->getAttribute(BMLDefs::ATTR_ADDITIVE);
+	xml_utils::xml_translate(&additive, additiveID);
+
+	std::string loop;
+	const XMLCh* loopID = elem->getAttribute(BMLDefs::ATTR_LOOP);
+	xml_utils::xml_translate(&loop, loopID);
+
 	
 	if( animName != 0 && *animName != 0 )	{
 
@@ -70,9 +79,20 @@ BML::BehaviorRequestPtr BML::parse_bml_animation( DOMElement* elem, const std::s
 			delete [] speedStr;
 */
 			double twarp = xml_utils::xml_parse_double( BMLDefs::ATTR_SPEED, elem, 1.0 );
-
 			
 			MeCtMotion* motionCt = new MeCtMotion();
+
+			if (additive == "true")
+			{
+				motionCt->isAdditive(true);
+				motion = motion->getOffset();
+			}
+
+			if (loop == "true")
+			{
+				motionCt->loop(true);
+			}
+
 
 			// Name controller with behavior unique_id
 			ostringstream name;

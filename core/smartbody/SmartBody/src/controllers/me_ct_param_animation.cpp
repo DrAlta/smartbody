@@ -774,12 +774,11 @@ void MeCtParamAnimation::autoScheduling(double time)
 				waitingList.pop_front();
 				return;
 			}
-			else
-				if (nextUnit.data->stateName == PseudoIdleState)
-				{
-					waitingList.pop_front();
-					return;
-				}
+			else if (nextUnit.data->stateName == PseudoIdleState)
+			{
+				waitingList.pop_front();
+				return;
+			}
 		}
 	}
 
@@ -820,10 +819,21 @@ void MeCtParamAnimation::autoScheduling(double time)
 				{
 					// check to see if the current local time cannot afford the defaultTransition time					
 					double actualTransitionTime = transitionLen;
+
 					if (curStateData->timeManager->getNormalizeLocalTime() >= (curStateData->timeManager->getDuration() - transitionLen))
+					{
 						actualTransitionTime = curStateData->timeManager->getDuration() - curStateData->timeManager->getNormalizeLocalTime();
+						//LOG("adjust transition duration for %s and %s to %f", curStateData->getStateName().c_str(), nextStateData->getStateName().c_str(), actualTransitionTime);
+					}
+
 					double easeOutStart = curStateData->timeManager->getDuration() - actualTransitionTime;
 					double easeOutDur = actualTransitionTime;
+
+					if (actualTransitionTime < 0)
+					{
+						LOG("transition warning, current state %s is too short(%f), next state is %s", curStateData->getStateName().c_str(), curStateData->timeManager->getDuration(), nextStateData->getStateName().c_str());
+					}
+
 					//LOG("easeOutStart = %f, duration = %f",easeOutStart, easeOutDur);
 					transitionManager = new PATransitionManager(easeOutStart, easeOutDur);					
 					//transitionManager = new PATransitionManager(curStateData->timeManager->getDuration(), 0.0);
@@ -862,19 +872,29 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 		module->transitionLength = su.transitionLength;
 		module->playSpeed = su.playSpeed;
 		module->baseJointName = baseJointName;
-		if (su.duration > 0.f) // the user set a state duration, adjut playSpeed
+		if (su.duration > 0.f) // the user set a state duration, adjust playSpeed
 		{
 			module->playSpeed = float(module->timeManager->getDuration()/su.duration);
 		}
-		std::vector<std::string> joints;
-		SkJoint* j = character->getSkeleton()->search_joint(su.partialJoint.c_str());
-		if (j)
+		if (su.blend == PABlendData::Additive)
 		{
-			std::vector<SkJoint*> jVec;
-			SkJoint::recursive_children(jVec, j);
-			for (size_t i = 0; i < jVec.size(); i++)
+			if (su.partialJoint == "" || su.partialJoint == "null")
+				su.partialJoint = "base";
+		}
+		std::vector<std::string> joints;
+		std::vector<std::string> jointNameVec;
+		vhcl::Tokenize(su.partialJoint, jointNameVec);
+		for (size_t jointId = 0; jointId < jointNameVec.size(); ++jointId)
+		{
+			SkJoint* j = character->getSkeleton()->search_joint(jointNameVec[jointId].c_str());
+			if (j)
 			{
-				joints.push_back(jVec[i]->jointName());
+				std::vector<SkJoint*> jVec;
+				SkJoint::recursive_children(jVec, j);
+				for (size_t i = 0; i < jVec.size(); i++)
+				{
+					joints.push_back(jVec[i]->getMappedJointName());//jointName());
+				}
 			}
 		}
 		module->interpolator->setBlendingJoints(joints);
@@ -900,6 +920,24 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 	}
 	else
 		return NULL;
+
+	/*
+	for (int i = 0; i < module->state->getNumMotions(); ++i)
+	{
+		SmartBody::SBMotion* sbMotion = module->state->motions[i];
+		if (su.blend == PABlendData::Additive)
+		{
+			if (!sbMotion->getOffsetParent())
+				module->state->motions[i] = sbMotion->getOffset();
+		}
+		else
+		{
+			if (sbMotion->getOffsetParent())
+				module->state->motions[i] = sbMotion->getOffsetParent();
+		}
+	}
+	*/
+
 	return module;
 }
 

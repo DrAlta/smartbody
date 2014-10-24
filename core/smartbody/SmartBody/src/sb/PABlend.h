@@ -121,7 +121,7 @@ class PABlend : public SmartBody::SBObject
 		std::string stateName;
 		std::vector<SmartBody::SBMotion*> motions;
 		std::vector<std::vector<double> > keys;
-
+		std::vector<std::vector<double> > backupKeys;
 		bool cycle;
 		bool incrementWorldOffsetY;
 

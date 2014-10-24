@@ -66,6 +66,7 @@ class MeCtMotion : public SmartBody::SBController, public FadingControl
 	SmartBody::SBCharacter* _character;
 	double motionTime;
 	bool				_isAdditive;
+	bool				_useOffset;
 
    public :
 	   static std::string type_name;
@@ -125,6 +126,8 @@ class MeCtMotion : public SmartBody::SBController, public FadingControl
 
 	/*! Change the motion apply state. Additive or Overwrite */
 	void isAdditive(bool b) { _isAdditive = b; }
+
+	void useOffset(bool b) { _useOffset = b; }
 
     /*! This method will return the fixed total duration time that the controller
         will take, or will return -1 if the controller is looped */
