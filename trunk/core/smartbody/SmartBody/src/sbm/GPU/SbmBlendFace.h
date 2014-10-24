@@ -1,12 +1,12 @@
 #pragma once
 #include <sb/SBTypes.h>
+#include <sbm/sbm_deformable_mesh.h>
 #include "SbmShader.h"
 #include "VBOData.h"
-#include "TBOData.h"
-#include <sbm/sbm_deformable_mesh.h>
 
 #if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD)
 #include "external/glew/glew.h"
+#include "TBOData.h"
 #endif
 
 class SbmDeformableMeshGPU;
