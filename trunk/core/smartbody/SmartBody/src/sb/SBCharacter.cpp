@@ -50,6 +50,7 @@ SBCharacter::SBCharacter() : SbmCharacter()
 
 SBCharacter::SBCharacter(const std::string& name, const std::string& type) : SbmCharacter(name.c_str(), type)
 {
+	setAttributeGroupPriority("Gestures", 80);
 	setAttributeGroupPriority("Display", 110);
 	setAttributeGroupPriority("Voice", 170);
 	setAttributeGroupPriority("Lip Sync", 180);
@@ -61,10 +62,13 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	setAttributeGroupPriority("Remote", 800);
 	setAttributeGroupPriority("Baldi Lip Sync", 2000);
 
+	createBoolAttribute("posture.useDifference", false, true, "Posture", 90, false, false, false, "Whether to use body posture difference"); 
+
 	createBoolAttribute("useCustomizedLipSyncIfPresent", true, true, "Lip Sync", 60, false, false, false, "If motion name exists inside pre-recorded audio file bml, use it by default"); 
 	
 	createBoolAttribute("reach.useLocomotion", false, true, "Reaching", 110, false, false, false, "Whether to use locomotion for reach by default.");
 
+	createBoolAttribute("gestureUseBlends", false, true, "Gestures", 88, false, false, false, "Whether SmartBody should use blend as gesture.");
 	createBoolAttribute("gestureRequest.autoGestureTransition", true, true, "Gestures", 89, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
 	createBoolAttribute("gestureRequest.matchingHandness", true, true, "Gestures", 90, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
 	createBoolAttribute("gestureRequest.enableTransitionToStroke", false, true, "Gestures", 91, false, false, false, "Enable Transition to stroke posture directly if time is too limited."); 
@@ -718,7 +722,23 @@ void SBCharacter::notify(SBSubject* subject)
 		}
 
 		const std::string& attrName = attribute->getName();
-		if (attrName == "visemecurve")
+		if (attrName == "posture.useDifference")
+		{
+			SmartBody::BoolAttribute* postureDiff = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			if (this->posture_sched_p)
+			{
+				MeCtScheduler2::VecOfTrack tracks = this->posture_sched_p->tracks();
+				for (size_t t = 0; t < tracks.size(); t++)
+				{
+					MeCtMotion* motionCt = dynamic_cast<MeCtMotion*>(tracks[t]->animation_ct());
+					if (motionCt)
+					{
+						motionCt->useOffset(postureDiff->getValue());
+					}
+				}
+			}
+		}
+		else if (attrName == "visemecurve")
 		{
 			SmartBody::BoolAttribute* curveAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
 			set_viseme_curve_mode(curveAttribute->getValue());

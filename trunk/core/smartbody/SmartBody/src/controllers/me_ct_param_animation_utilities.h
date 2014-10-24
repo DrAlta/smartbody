@@ -60,6 +60,7 @@ class PATimeManager
 		double getNormalizeLocalTime();
 		double getPrevNormalizeLocalTime();
 		SBAPI void getParallelTimes(double time, std::vector<double>& times);
+		SBAPI void getParallelTimes(int motionIndex, double time, std::vector<double>& times);
 		std::vector<double>& getKey();
 
 		void loadEvents();
@@ -166,7 +167,7 @@ class PABlend;
 class PABlendData
 {
 	public:
-		enum WrapMode { Loop, Once };
+		enum WrapMode { Loop, Once, Clamp };
 		enum BlendMode { Overwrite, Additive };
 		enum ScheduleMode { Now, Queued };
 

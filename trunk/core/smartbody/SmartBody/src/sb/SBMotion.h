@@ -107,7 +107,8 @@ class SBMotion : public SkMotion
 		SBAPI void pertainMotionChannelsByEndJoints(std::string skelName, std::vector<std::string>& endJoints);
 		SBAPI void removeMotionChannels(std::vector<std::string> channelNames);
 
-		SBAPI SBMotion* getOffset(std::string motionName = "");
+		SBAPI SBMotion* getOffset(std::string motionName = "", int index = 0);
+		SBAPI SBMotion* getOffsetParent();
 
 		SBAPI bool translate(float x, float y, float z, const std::string& baseJointName);
 		SBAPI bool rotate(float xaxis, float yaxis, float zaxis, const std::string& baseJointName);
@@ -216,6 +217,9 @@ class SBMotion : public SkMotion
 
 		SBMotion* _offsetMotion;
 		std::vector<std::string> _similarPoses;
+
+		std::map<int, SBMotion*> _offsetMotions;
+		SBMotion* _offsetParent;
 };
 
 bool motionComp(const SBMotion *a, const SBMotion *b);

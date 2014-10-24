@@ -521,8 +521,8 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			if (additiveString != "additive")
 				return CMD_FAILURE;
 			std::string addtive = args.read_token();
-			if (addtive == "true") blendMode = PABlendData::Overwrite;
-			else if (addtive == "false") blendMode = PABlendData::Additive;
+			if (addtive == "true") blendMode = PABlendData::Additive;
+			else if (addtive == "false") blendMode = PABlendData::Overwrite;
 			else
 				return CMD_FAILURE;
 			std::string jointString = args.read_token();

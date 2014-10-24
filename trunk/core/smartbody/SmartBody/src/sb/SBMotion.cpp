@@ -103,6 +103,7 @@ SBMotion::SBMotion() : SkMotion()
 	_motionType = Unknown;
 	_scale = 1.f;
 	_offsetMotion = NULL;
+	_offsetParent = NULL;
 }
 
 SBMotion::SBMotion(const SBMotion& motion)
@@ -113,7 +114,7 @@ SBMotion::SBMotion(const SBMotion& motion)
 	_motionType = Unknown;
 	_scale = 1.f;
 	_offsetMotion = NULL;
-
+	_offsetParent = NULL;
 }
 
 void SBMotion::setMotion(const SBMotion& motion)
@@ -145,6 +146,7 @@ SBMotion::SBMotion(std::string file) : SkMotion()
 	_motionType = Unknown;
 	_scale = 1.f;
 	_offsetMotion = NULL;
+	_offsetParent = NULL;
 }
 
 SBMotion::~SBMotion()
@@ -164,6 +166,7 @@ SBMotion::~SBMotion()
 	if (_offsetMotion)
 		delete _offsetMotion;
 	_offsetMotion = NULL;
+	_offsetParent = NULL;
 }
 
 void SBMotion::setMotionType(MotionType type)
@@ -1745,24 +1748,33 @@ SBAPI SBMotion* SBMotion::getOffset(SBMotion* baseMotion, std::string motionName
 	return offsetMotion;
 }
 */
-SBAPI SBMotion* SBMotion::getOffset(std::string motionName)
+
+SBMotion* SBMotion::getOffsetParent()
 {
-	if (_offsetMotion)
+	return _offsetParent;
+}
+
+SBMotion* SBMotion::getOffset(std::string motionName, int index)
+{
+	if (_offsetMotions.find(index) != _offsetMotions.end())
 	{
-		return _offsetMotion;
+		if (_offsetMotions[index] != NULL)
+			return _offsetMotions[index];
 	}
+
 	SkChannelArray& ch = channels();
 	int numFrames = frames();
 	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
 	SmartBody::SBMotion* offsetMotion = new SmartBody::SBMotion();
-	offsetMotion->setMotionSkeletonName(originalMotion->getMotionSkeletonName());	
+	offsetMotion->setMotionSkeletonName(originalMotion->getMotionSkeletonName());
+	std::stringstream ss;
 	if (motionName == "")
-		motionName = originalMotion->getName() + "_offset";
-	offsetMotion->setName(motionName);
+		ss << originalMotion->getName() << "_offset_" << index;
+	offsetMotion->setName(ss.str().c_str());
 	srSynchPoints sp(synch_points);
 	offsetMotion->synch_points = sp;
 	offsetMotion->init(ch);
-	float* baseP = this->posture(0);
+	float* baseP = this->posture(index);
 	for (int f = 0; f < numFrames; f++)
 	{
 		offsetMotion->insert_frame(f, this->keytime(f));
@@ -1800,8 +1812,17 @@ SBAPI SBMotion* SBMotion::getOffset(std::string motionName)
 		LOG("Add motion %s to scene", offsetMotion->getName().c_str());
 	}
 
-	_offsetMotion = offsetMotion;
-	return _offsetMotion;
+	// insert into the map
+	if (_offsetMotions.find(index) != _offsetMotions.end())
+	{
+		_offsetMotions[index] = offsetMotion;
+	}
+	else
+	{
+		_offsetMotions.insert(std::make_pair(index, offsetMotion));
+	}
+	_offsetMotions[index]->_offsetParent = this;
+	return _offsetMotions[index];
 }
 
 bool SBMotion::translate(float x, float y, float z, const std::string& baseJointName)

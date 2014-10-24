@@ -37,6 +37,7 @@
 #include "bml_processor.hpp"
 #include "bml_speech.hpp"
 #include "bml_xml_consts.hpp"
+#include "bml_event.hpp"
 
 #include "controllers/me_ct_blend.hpp"
 #include "controllers/me_ct_blend.hpp"
@@ -343,6 +344,121 @@ BehaviorSpan BmlRequest::getBehaviorSpan() {
 
 void BmlRequest::gestureRequestProcess()
 {
+	if (actor->getBoolAttribute("gestureUseBlends"))
+	{
+		std::vector<EventRequest*> blends;
+		for (VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behaviors.end(); ++i) 
+		{
+			BehaviorRequest* behavior = (*i).get();
+			EventRequest* blend = dynamic_cast<EventRequest*> (behavior);
+			if (blend)
+			{
+				blends.push_back(blend);
+			}
+		}
+		for (size_t i = 0; i < blends.size(); ++i)
+		{
+			float start = (float)blends[i]->behav_syncs.sync_start()->time();
+			std::vector<std::string> tokens;
+			std::string blendCommand = blends[i]->getMessage();
+			SmartBody::SBAnimationBlend* blendObject = NULL;
+			bool isScheduling = false;
+			double x = 0;
+			double y = 0;
+			double z = 0;
+			vhcl::Tokenize(blendCommand, tokens, "=\\\" ");
+			for (size_t j = 0; j < tokens.size(); ++j)
+			{
+				if (tokens[j] == "name")
+				{
+					if (j + 1 < tokens.size())
+					{
+						LOG("blend name is %s", tokens[j + 1].c_str());
+						blendObject = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(tokens[j + 1]);
+					}
+				}
+				if (tokens[j] == "x")
+				{
+					if (j + 1 < tokens.size())
+					{
+						LOG("x is %s", tokens[j + 1].c_str());
+						x = atof(tokens[j + 1].c_str());
+					}
+				}
+				if (tokens[j] == "y")
+				{
+					if (j + 1 < tokens.size())
+					{
+						LOG("y is %s", tokens[j + 1].c_str());
+						y = atof(tokens[j + 1].c_str());
+					}
+				}
+				if (tokens[j] == "z")
+				{
+					if (j + 1 < tokens.size())
+					{
+						LOG("z is %s", tokens[j + 1].c_str());
+						z = atof(tokens[j + 1].c_str());
+					}
+				}
+				if (tokens[j] == "schedule")
+					isScheduling = true;
+			}
+			if (blendObject && isScheduling &&  blendObject->stateName != PseudoIdleState)
+			{
+				std::vector<float> weights;
+				SrVec param((float)x, (float)y, (float)z);
+				blendObject->getWeightsFromParameters(param, weights);
+				std::vector<double> floatWeights;
+				for (size_t k = 0; k < weights.size(); ++k)
+				{
+					floatWeights.push_back(weights[k]);
+				} 
+				PABlendData* tempBlendData = new PABlendData(blendObject, floatWeights);
+				tempBlendData->timeManager->updateWeights();
+				std::vector<double> strokeTimes;
+				std::vector<double> startTimes;
+				// take down current key
+				std::vector<std::vector<double> > tempKeys = blendObject->keys;
+				bool canUseBackup = false;
+				if (blendObject->backupKeys.size() == blendObject->keys.size())
+				{
+					canUseBackup = true;
+					for (int i = 0; i < blendObject->getNumMotions(); ++i)
+					{
+						if (blendObject->keys[i].size() < 2)
+						{
+							canUseBackup = false;
+							break;
+						}
+					}
+				}
+				if (canUseBackup)
+					blendObject->keys = blendObject->backupKeys;
+				tempBlendData->timeManager->getParallelTimes(0, blendObject->getSBMotion(0)->getTimeStroke(), strokeTimes);
+				tempBlendData->timeManager->getParallelTimes(0, blendObject->getSBMotion(0)->getTimeStart(), startTimes);
+				if (canUseBackup)
+					blendObject->backupKeys = blendObject->keys;
+				// get local stroke time
+				double localStrokeTime = 0;
+				double localStartTime = 0;
+				for (int k = 0; k < blendObject->getNumMotions(); ++k)
+				{
+					localStrokeTime += strokeTimes[k] * tempBlendData->weights[k];
+					localStartTime += startTimes[k] * tempBlendData->weights[k];
+				}
+				float offset = localStrokeTime - localStartTime;
+				blends[i]->behav_syncs.sync_start()->set_time(start - offset);
+				LOG("stroke time for blend is %f, start time for blend is %f", start, start - offset);
+				delete tempBlendData;
+				tempBlendData = NULL;
+			}
+			else
+				continue;
+		}
+		return;
+	}
+
 	// handle gesture transition
 	if (!actor->getBoolAttribute("gestureRequest.autoGestureTransition"))
 		return;

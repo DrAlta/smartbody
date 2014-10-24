@@ -114,6 +114,23 @@ SrSnColorSurf* SBAnimationBlend::createFlatSurface( float depth, unsigned int di
 	return surf;
 }
 
+void SBAnimationBlend::backupMotionKey()
+{
+	for (size_t i = 0; i < backupKeys.size(); ++i)
+	{
+		backupKeys[i].clear();
+	}
+	backupKeys.clear();
+
+	for (size_t i = 0; i < keys.size(); ++i)
+	{
+		backupKeys.push_back(std::vector<double>());
+		for (size_t j = 0; j < keys[i].size(); ++j)
+		{
+			backupKeys[i].push_back(keys[i][j]);
+		}
+	}
+}
 
 SrSnColorSurf* SBAnimationBlend::createCurveSurface( float radius, unsigned int dimension, SrVec center, SrVec2 phiRange, SrVec2 thetaRange )
 {
@@ -1004,6 +1021,18 @@ std::string SBAnimationBlend::getMotion(int num)
 	}
 }
 
+SBMotion* SBAnimationBlend::getSBMotion(int num)
+{
+	if (motions.size() > (size_t) num && num >= 0)
+	{
+		return motions[num];
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
 int SBAnimationBlend::getNumCorrespondencePoints()
 {
 	return getNumKeys();
@@ -1158,6 +1187,27 @@ void SBAnimationBlend::removeAllEvents()
 int SBAnimationBlend::getNumEvents()
 {
 	return _events.size();
+}
+
+void SBAnimationBlend::offsetMotion(int index, double time)
+{
+	if (index < 0 || index >= getNumMotions())
+		return;
+
+	SmartBody::SBMotion* sbMotion = motions[index];
+	int frameId = int(time * sbMotion->getNumFrames() / sbMotion->getDuration());
+	if (!sbMotion->getOffsetParent())
+		motions[index] = sbMotion->getOffset("", frameId);
+}
+
+void SBAnimationBlend::unoffsetMotions()
+{
+	for (int i = 0; i < getNumMotions(); ++i)
+	{
+		SmartBody::SBMotion* sbMotion = motions[i];
+		if (sbMotion->getOffsetParent())
+			motions[i] = sbMotion->getOffsetParent();
+	}
 }
 
 std::string SBAnimationBlend::saveToString()

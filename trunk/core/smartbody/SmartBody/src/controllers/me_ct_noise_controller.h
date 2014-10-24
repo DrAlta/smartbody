@@ -12,6 +12,12 @@ class MeCtNoiseController : public SmartBody::SBController
 		static std::string CONTROLLER_TYPE;
 
 	private:
+		// fade parameters
+		double			_fadeStartTime;
+		double			_fadeInInterval;
+		double			_fadeOutInterval;
+		int				_fadeType;
+
 		double			_prevTime;
 		double			_dt;
 		float 			_duration;
@@ -26,7 +32,9 @@ class MeCtNoiseController : public SmartBody::SBController
 		~MeCtNoiseController();
 
 		bool getValid()						{return _valid;}
-		void setValid(bool v)				{_valid = v;}	
+		void setValid(bool v);
+		void setFadeInInterval(double v)		{_fadeInInterval = v;}
+		void setFadeOutInterval(double v)		{_fadeOutInterval = v;}
 		void setJointNoise(std::vector<std::string>& jointNames, float scale, float frequency);
 	protected:
 		float getNormalizeTime(float t, float offset);

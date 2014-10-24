@@ -22,6 +22,7 @@
 #include "BMLEventObject.h"
 #include "BMLSaccadeObject.h"
 #include "BMLStateObject.h"
+#include "BMLNoiseObject.h"
 
 #ifndef WIN32
 #define _strdup strdup
@@ -59,6 +60,8 @@ BMLCreatorWindow::BMLCreatorWindow(int x,int y,int w,int h, const char* s) : Fl_
 	event->setName("event");
 	BMLObject* state = new BMLStateObject();
 	state->setName("blend");
+	BMLObject* noise = new BMLNoiseObject();
+	noise->setName("sbm:noise");
 
 	_bmlObjects.push_back(body);
 	_bmlObjects.push_back(locomotion);
@@ -74,6 +77,7 @@ BMLCreatorWindow::BMLCreatorWindow(int x,int y,int w,int h, const char* s) : Fl_
 	_bmlObjects.push_back(saccade);
 	_bmlObjects.push_back(event);
 	_bmlObjects.push_back(state);
+	_bmlObjects.push_back(noise);
 
 	for (size_t i = 0; i < _bmlObjects.size(); i++)
 	{

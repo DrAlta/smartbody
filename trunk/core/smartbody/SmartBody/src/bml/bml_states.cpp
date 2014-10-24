@@ -33,7 +33,17 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 		return BehaviorRequestPtr();
 	}
 
-	if (!character->param_animation_ct)
+
+	MeCtParamAnimation* paramCt = character->param_animation_ct;
+	std::string layer = xml_parse_string(BMLDefs::ATTR_LAYER, elem);
+	if (layer == "1")
+		paramCt = character->param_animation_ct;
+	if (layer == "2")
+		paramCt = character->param_animation_ct_layer1;
+	if (layer == "3")
+		paramCt = character->param_animation_ct_layer2;
+
+	if (!paramCt)
 	{
 		LOG("No parameterized animation controller present for character %s.", character->getName().c_str());
 		return BehaviorRequestPtr();
@@ -96,6 +106,8 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	scType.wrap = PABlendData::Loop;
 	if (wrap == "once")
 		scType.wrap = PABlendData::Once;
+	if (wrap == "clamp")
+		scType.wrap = PABlendData::Clamp;
 
 	// schedule mode
 	std::string schedule = xml_parse_string(BMLDefs::ATTR_SCHEDULEMODE, elem);
@@ -144,15 +156,19 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	{
 		if (state)
 			//character->param_animation_ct->schedule(state, x, y, z, wrapMode, scheduleMode, blendMode, joint, timeOffset, stateStartOffset, stateEndTrim, transitionLen, directPlay);
-			character->param_animation_ct->schedule(state, weights, scType);
+			//character->param_animation_ct->schedule(state, weights, scType);
+			paramCt->schedule(state, weights, scType);
 		else
-			character->param_animation_ct->schedule(state, weights, scType);
+			//character->param_animation_ct->schedule(state, weights, scType);
+			paramCt->schedule(state, weights, scType);
 	}
 
 	// update parameter
 	if (mode == "update")
 	{
-		character->param_animation_ct->updateWeights(weights);
+		// character->param_animation_ct->updateWeights(weights);
+		paramCt->updateWeights(weights);
+		paramCt->getCurrentPABlendData()->wrapMode = scType.wrap;
 	}
 
 	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", "", behav_syncs, ""));

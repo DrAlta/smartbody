@@ -172,6 +172,8 @@ reach_sched_p( NULL ),
 head_sched_p( CreateSchedulerCt( character_name, "head" ) ),
 param_sched_p( CreateSchedulerCt( character_name, "param" ) ),
 param_animation_ct( NULL ),
+param_animation_ct_layer1(NULL),
+param_animation_ct_layer2(NULL),
 motiongraph_ct(NULL),
 head_param_anim_ct( NULL ),
 face_ct( NULL ),
@@ -232,6 +234,10 @@ SbmCharacter::~SbmCharacter( void )	{
 		param_animation_ct->unref();
 	if (head_param_anim_ct)
 		head_param_anim_ct->unref();
+	if (param_animation_ct_layer1)
+		param_animation_ct_layer1->unref();
+	if (param_animation_ct_layer2)
+		param_animation_ct_layer2->unref();
 	if (motionplayer_ct)
 		motionplayer_ct->unref();
 	if (saccade_ct)
@@ -312,6 +318,16 @@ void SbmCharacter::createStandardControllers()
 	std::string paramAnimationName = getName() + "_paramAnimationController";
 	this->param_animation_ct->setName(paramAnimationName.c_str());
 	this->param_animation_ct->ref();
+
+	this->param_animation_ct_layer1 = new MeCtParamAnimation(this, world_offset_writer_p);
+	std::string paramAnimationName1 = getName() + "_paramAnimationController_Layer1";
+	this->param_animation_ct_layer1->setName(paramAnimationName1.c_str());
+	this->param_animation_ct_layer1->ref();
+
+	this->param_animation_ct_layer2 = new MeCtParamAnimation(this, world_offset_writer_p);
+	std::string paramAnimationName2 = getName() + "_paramAnimationController_Layer2";
+	this->param_animation_ct_layer2->setName(paramAnimationName2.c_str());
+	this->param_animation_ct_layer2->ref();
 
 	// basic locomotion
 	this->basic_locomotion_ct = new MeCtBasicLocomotion(this);
@@ -485,6 +501,8 @@ void SbmCharacter::createStandardControllers()
 	//ct_tree_p->add_controller( locomotion_ct );
 	
 	ct_tree_p->add_controller( param_animation_ct );
+	ct_tree_p->add_controller( param_animation_ct_layer1 );
+	ct_tree_p->add_controller( param_animation_ct_layer1 );
 	ct_tree_p->add_controller( motiongraph_ct );
 	ct_tree_p->add_controller( basic_locomotion_ct );
 #if USE_NEW_LOCOMOTION
@@ -497,7 +515,6 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( breathing_p );
 	ct_tree_p->add_controller( gaze_sched_p );
 	ct_tree_p->add_controller( saccade_ct );
-	ct_tree_p->add_controller( constraint_sched_p );	
 	ct_tree_p->add_controller( eyelid_reg_ct_p );
 	ct_tree_p->add_controller( head_sched_p );
 	//ct_tree_p->add_controller( head_param_anim_ct );
@@ -507,6 +524,7 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( physics_ct );
 #endif
 	ct_tree_p->add_controller( noise_ct );
+	ct_tree_p->add_controller( constraint_sched_p );	
 	ct_tree_p->add_controller( motionplayer_ct );
 	ct_tree_p->add_controller( datareceiver_ct );
 	ct_tree_p->add_controller( record_ct );
@@ -682,6 +700,8 @@ void SbmCharacter::initData()
 	grab_sched_p = NULL;
 	constraint_sched_p = NULL;
 	param_animation_ct = NULL;
+	param_animation_ct_layer1 = NULL;
+	param_animation_ct_layer2 = NULL;
 	head_param_anim_ct = NULL;
 	saccade_ct = NULL;	
 	noise_ct = NULL;

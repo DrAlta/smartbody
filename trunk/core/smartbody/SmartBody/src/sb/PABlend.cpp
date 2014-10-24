@@ -117,10 +117,12 @@ int PABlend::getNumKeys()
 
 int PABlend::getMotionId(const std::string& motion)
 {
+	//std::string offsetMotionName = motion.substr(0, motion.length() - 7); //hack, substract the "_offset"
+	std::string offsetMotionName = motion + "_offset"; //hack, substract the "_offset"
 	for (int i = 0; i < getNumMotions(); i++)
 	{
 		const std::string& mName = motions[i]->getName();
-		if (motion == mName)
+		if (motion == mName || mName.find(offsetMotionName) != std::string::npos)
 			return i;
 	}
 	LOG("PABlend::getMotionId Warning: cannot get motion with name %s", motion.c_str());
