@@ -8,10 +8,10 @@
 #else
 #if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD)
 #include "external/glew/glew.h"
+#include "sbm/GPU/SbmDeformableMeshGPU.h"
 #endif
 #endif
 
-#include "sbm/GPU/SbmDeformableMeshGPU.h"
 #include "sbm/GPU/SbmBlendFace.h"
 #include "sbm_deformable_mesh.h"
 

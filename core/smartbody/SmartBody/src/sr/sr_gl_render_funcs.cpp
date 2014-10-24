@@ -43,10 +43,15 @@
 #include <sr/sr_polygons.h>
 
 
-#include <sbm/GPU/SbmShader.h>
+
 #include <sbm/GPU/SbmTexture.h>
 #include <sbm/GPU/SbmBlendFace.h>
+#include <sbm/sbm_deformable_mesh.h>
+
+#if !defined(ANDROID_BUILD)
+#include <sbm/GPU/SbmShader.h>
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
+#endif
 
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>

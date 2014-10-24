@@ -36,6 +36,45 @@ enum
 };
 
 
+#if defined (ANDROID_BUILD)
+class VBOData
+{
+public:
+	unsigned int m_iVBO_ID;
+	bool m_bUpdate;
+	GLuint m_ArrayType;
+
+	char m_Name[20];		
+	std::vector<SrVec2> *data_Vec2f;
+	std::vector<SrVec> *data_Vec3f;
+	std::vector<SrVec3i> *data_Vec3i;
+	std::vector<SrVec4> *data_Vec4f;
+	std::vector<SrVec4i> *data_Vec4i;	
+	std::vector<float> *data_float;
+public:	
+	VBOData(char* name, int type, std::vector<SrVec2>& Data) {}
+	VBOData(char* name, int type, std::vector<SrVec>& Data) {}
+	VBOData(char* name, int type, std::vector<SrVec3i>& Data) {}
+	VBOData(char* name, int type, std::vector<SrVec4>& Data) {}
+	VBOData(char* name, int type, std::vector<SrVec4i>& Data) {}
+	VBOData(char* name, int type, std::vector<float>& Data) {}
+public:
+	~VBOData(void) {}
+
+	void BindBuffer() {}
+	void UnbindBuffer() {}
+	void Update() {}
+
+	void Debug(const char* tag = "VBO") {}
+
+protected:
+	void EnableClient(int ArrayType) {}
+	void DisableClient(int ArrayType) {}
+};
+
+
+
+#else
 
 class VBOData
 {
@@ -71,6 +110,8 @@ protected:
 	void EnableClient(int ArrayType);
 	void DisableClient(int ArrayType);
 };
+
+#endif
 
 template<class S>
 class VBODataArray
@@ -133,4 +174,5 @@ typedef VBODataArray<SrVec> VBOVec3f;
 typedef VBODataArray<SrVec4> VBOVec4f;
 typedef VBODataArray<SrVec3i> VBOVec3i;
 typedef VBODataArray<SrVec4i> VBOVec4i;
+
 
