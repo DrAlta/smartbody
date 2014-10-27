@@ -20,6 +20,7 @@ public:
 	SBAPI SBSkeleton(SBSkeleton* copySkel);
 
 	SBAPI SBJoint* createJoint(const std::string& name, SBJoint* parent);
+	SBAPI SBJoint* createStaticJoint(const std::string& name, SBJoint* parent);
 	SBAPI SBJoint* createChannel(const std::string& name);
 
 	SBAPI virtual bool load(const std::string& skeletonFile);
