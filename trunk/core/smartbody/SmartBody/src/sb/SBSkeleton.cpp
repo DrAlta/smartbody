@@ -133,6 +133,64 @@ SBAPI SBJoint* SBSkeleton::createJoint(const std::string& name, SBJoint* parent)
 	return joint;
 }
 
+SBAPI SBJoint* SBSkeleton::createStaticJoint(const std::string& name, SBJoint* parent)
+{
+	if (this->getJointByName(name))
+	{
+		LOG("Joint %s already created.", name.c_str());
+		return NULL;
+	}
+	SBJoint* joint = new SBJoint();
+	joint->setName(name);
+	joint->name(name);
+	joint->extName(name);
+	joint->skeleton(this);
+	if (!parent) // enable translation only for the root joint
+	{
+		joint->rot_type ( SkJoint::TypeQuat );
+		//joint->quat()->activate();
+		joint->pos()->limits(0, false);
+		joint->pos()->limits(1, false);
+		joint->pos()->limits(2, false);
+		joint->pos()->value(0, 0);
+		joint->pos()->value(1, 0);
+		joint->pos()->value(2, 0);
+	}
+	else
+	{
+		joint->rot_type ( SkJoint::TypeQuat );
+		//joint->quat()->activate();
+		joint->pos()->limits(0, false);
+		joint->pos()->limits(1, false);
+		joint->pos()->limits(2, false);
+		joint->pos()->value(0, 0);
+		joint->pos()->value(1, 0);
+		joint->pos()->value(2, 0);
+	}
+
+	int parentId = -1;
+	if (parent)
+	{
+		joint->setParent(parent);
+		parent->addChild(joint);
+	}
+	else
+	{
+		this->root(joint);
+	}
+	
+	_joints.push_back(joint);
+	joint->index(_joints.size() - 1);
+
+	if (this->getPawn())
+	{
+		this->getPawn()->ct_tree_p->child_channels_updated(NULL);
+		this->getPawn()->ct_tree_p->applySkeletonToBuffer();
+	}
+	
+	return joint;
+}
+
 void SBSkeleton::setFileName(const std::string& fname)
 {
 	skfilename(fname.c_str());
