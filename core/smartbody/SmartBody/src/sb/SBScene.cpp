@@ -4331,7 +4331,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	SmartBody::SBCharacter* character = getCharacter(characterName);
 	
 	if(!character) {
-		LOG("Chracater %s not found.", characterName.c_str());
+		LOG("Character %s not found.", characterName.c_str());
 		return visible_pawns;
 	}
 
@@ -4342,6 +4342,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	SkJoint* leftEye			= character->getSkeleton()->search_joint("eyeball_left");
 	if(!leftEye) {
 		LOG("Can't find 'eyeball_left' joint.\n");
+		return visible_pawns;
 	}
 	const SrMat& gmat_leftEye	= leftEye->gmat();
 	SrVec leftEye_location		= SrVec(gmat_leftEye.get(3, 0), gmat_leftEye.get(3, 1), gmat_leftEye.get(3, 2));
@@ -4350,6 +4351,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	SkJoint* rightEye			= character->getSkeleton()->search_joint("eyeball_right");
 	if(!rightEye) {
 		LOG("Can't find 'eyeball_right' joint.\n");
+		return visible_pawns;
 	}
 	const SrMat& gmat_rightEye	= rightEye->gmat();
 	SrVec rightEye_location		= SrVec(gmat_rightEye.get(3, 0), gmat_rightEye.get(3, 1), gmat_rightEye.get(3, 2));
