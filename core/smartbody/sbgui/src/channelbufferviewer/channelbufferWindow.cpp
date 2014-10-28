@@ -497,7 +497,9 @@ void ChannelBufferWindow::loadChannels(ChannelBufferWindow* window)
 	SkChannelArray* pchannel = NULL;
 	if (actor)
 	{
-		pchannel = &actor->ct_tree_p->channels(); 
+		if (!actor->getSkeleton())
+			return;
+		pchannel = &actor->getSkeleton()->channels(); 
 	}
 	else if (motion)
 	{
