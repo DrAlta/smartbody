@@ -58,7 +58,7 @@ Source: ".\core\smartbody\SmartBody\src\external\protobuf\include\*"; DestDir: "
 Source: ".\lib\vhcl\include\*"; DestDir: "{app}\include\vhcl"
 Source: ".\lib\vhmsg\vhmsg-c\include\*"; DestDir: "{app}\include\vhmsg"
 Source: ".\lib\bonebus\include\*"; DestDir: "{app}\include\bonebus"
-Source: ".\core\smartbody\sbgui\external\fltk-1.3.2\FL\*"; DestDir: "{app}\include\FL"
+Source: ".\core\smartbody\sbgui\external\fltk-1.3.3\FL\*"; DestDir: "{app}\include\FL"
 Source: ".\core\smartbody\sbgui\external\cegui-0.8.2\include\*"; DestDir: "{app}\include\CEGUI";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\sbgui\external\Pinocchio\*.h"; DestDir: "{app}\include\Pinocchio";
 Source: ".\core\smartbody\sbgui\external\polyvox\library\PolyVoxCore\include\*"; DestDir: "{app}\include\polyvox";   Excludes: ".svn"; Flags: recursesubdirs
@@ -114,7 +114,7 @@ Source: ".\core\smartbody\ode\lib\ode*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\steersuite-1.3\build\win32\Release\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\steersuite-1.3\build\win32\Debug\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\pthreads\lib\pthreadVSE2.lib"; DestDir: "{app}\lib"
-Source: ".\core\smartbody\sbgui\external\fltk-1.3.2\lib\*.lib"; DestDir: "{app}\lib"
+Source: ".\core\smartbody\sbgui\external\fltk-1.3.3\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\sbgui\external\cegui-0.8.2\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\sbgui\external\Pinocchio\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\sbgui\external\polyvox\build\lib\*.lib"; DestDir: "{app}\lib"
