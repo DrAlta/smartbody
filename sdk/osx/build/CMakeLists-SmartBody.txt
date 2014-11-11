@@ -371,6 +371,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./controllers/me_ct_noise_controller.cpp
         ./controllers/me_ct_motion_recorder.cpp
 	./controllers/me_ct_motion_graph.cpp
+	./controllers/me_ct_generic_hand.cpp
 
 
         ./controllers/MeCtBlendEngine.cpp
@@ -451,6 +452,9 @@ set( SMARTBODY_LIB_SBM_SRC
         ./sb/SBSteerAgent.cpp
         ./sb/SBReachManager.cpp
         ./sb/SBReach.cpp
+        ./sb/SBHandSynthesis.cpp
+        ./sb/SBHandConfiguration.cpp
+        ./sb/SBHandConfigurationManager.cpp
         ./sb/SBGestureMapManager.cpp
         ./sb/SBGestureMap.cpp
         ./sb/SBServiceManager.cpp
@@ -516,6 +520,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./sb/SBDebuggerServer.cpp
         ./sb/SBDebuggerClient.cpp
         ./sb/SBDebuggerUtility.cpp
+        ./sb/SBRigNode.cpp
         ./sbm/SteerPath.cpp
         ./sbm/MiscCommands.cpp
 		
