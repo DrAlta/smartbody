@@ -7,9 +7,9 @@ cp ../../"3rd party licenses.txt" ./SmartBodySDK/
 
 # copy include
 # (xerces is not matching the windows distribution)
-# (boost, ode, FL are from windows distribution)
+# (boost, ode are from windows distribution)
 mkdir -p SmartBodySDK/include
-rsync -ap --exclude=".svn" ../../core/smartbody/sbgui/external/fltk-1.3.2/FL ./SmartBodySDK/include/
+rsync -ap --exclude=".svn" /usr/local/include/FL ./SmartBodySDK/include/
 rsync -ap --exclude=".svn" ../../core/smartbody/ode/include/ode ./SmartBodySDK/include/
 rsync -ap --exclude=".svn" ../../lib/boost/boost ./SmartBodySDK/include/
 rsync -ap --exclude=".svn" ./include/xercesc ./SmartBodySDK/include/
@@ -91,4 +91,4 @@ rsync -ap --exclude=".svn" ../../data/mesh/Ogre/* ./SmartBodySDK/data/mesh/Ogre/
 # after copying, rebuild it
 cd SmartBodySDK
 ./buildCMake.sh
-rm -rf buildCMake
+#rm -rf buildCMake
