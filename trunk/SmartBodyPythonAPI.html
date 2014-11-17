@@ -49,6 +49,8 @@
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBFaceDefinition">SBFaceDefinition</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBGestureMap">SBGestureMap</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBGestureMapManager">SBGestureMapManager</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBHandConfiguration">SBHandConfiguration</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBHandConfigurationManager">SBHandConfigurationManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBJointMap">SBJointMap</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBJointMapManager">SBJointMapManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBMotionGraph">SBMotionGraph</a>
@@ -79,6 +81,7 @@
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#GazeController">GazeController</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#MotionController">MotionController</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#PythonController">PythonController</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBNewLocomotion">SBNewLocomotion</a>(<a href="SmartBody.html#SBController">SBController</a>, <a href="SmartBody.html#SBObject">SBObject</a>)
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SchedulerController">SchedulerController</a>
 </font></dt></dl>
 </dd>
@@ -98,6 +101,7 @@
 <dl>
 <dt><font face="helvetica, arial"><a href="SmartBody.html#SBBoneBusManager">SBBoneBusManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBCollisionManager">SBCollisionManager</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBFaceShiftManager">SBFaceShiftManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBPhysicsManager">SBPhysicsManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBSteerManager">SBSteerManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBVHMsgManager">SBVHMsgManager</a>
@@ -116,6 +120,8 @@
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBSceneListener">SBSceneListener</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBScript">SBScript</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBServiceManager">SBServiceManager</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBSetDrivenKeyNode">SBSetDrivenKeyNode</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBSetDrivenKeySequenceNode">SBSetDrivenKeySequenceNode</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBSimulationManager">SBSimulationManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBSteerAgent">SBSteerAgent</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBSubject">SBSubject</a>
@@ -241,7 +247,7 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Execute&nbsp;a&nbsp;generic&nbsp;XML&nbsp;instruction&nbsp;to&nbsp;a&nbsp;given&nbsp;character&nbsp;at&nbsp;a&nbsp;time&nbsp;in&nbsp;the&nbsp;future..&nbsp;Adds&nbsp;the&nbsp;&lt;?xml..&gt;&nbsp;header.</tt></dd></dl>
 
 <dl><dt><a name="BmlProcessor-interruptBML"><strong>interruptBML</strong></a>(...)</dt><dd><tt><a href="#BmlProcessor-interruptBML">interruptBML</a>(&nbsp;(<a href="#BmlProcessor">BmlProcessor</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(float)arg4)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Interrupts&nbsp;a&nbsp;soecific&nbsp;BML&nbsp;block&nbsp;behaviors&nbsp;associated&nbsp;with&nbsp;a&nbsp;given&nbsp;character&nbsp;at&nbsp;a&nbsp;future&nbsp;time&nbsp;in&nbsp;seconds&nbsp;(zero&nbsp;seconds&nbsp;means&nbsp;immediately).</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;InterrufaceShiftManager.getCoeffValuepts&nbsp;a&nbsp;soecific&nbsp;BML&nbsp;block&nbsp;behaviors&nbsp;associated&nbsp;with&nbsp;a&nbsp;given&nbsp;character&nbsp;at&nbsp;a&nbsp;future&nbsp;time&nbsp;in&nbsp;seconds&nbsp;(zero&nbsp;seconds&nbsp;means&nbsp;immediately).</tt></dd></dl>
 
 <dl><dt><a name="BmlProcessor-interruptCharacter"><strong>interruptCharacter</strong></a>(...)</dt><dd><tt><a href="#BmlProcessor-interruptCharacter">interruptCharacter</a>(&nbsp;(<a href="#BmlProcessor">BmlProcessor</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Interrupts&nbsp;all&nbsp;BML&nbsp;behaviors&nbsp;associated&nbsp;with&nbsp;a&nbsp;given&nbsp;character&nbsp;at&nbsp;a&nbsp;future&nbsp;time&nbsp;in&nbsp;seconds&nbsp;(zero&nbsp;seconds&nbsp;means&nbsp;immediately).</tt></dd></dl>
@@ -413,10 +419,13 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 560</dl>
+<dl><dt><strong>__instance_size__</strong> = 568</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBPawn">SBPawn</a>:<br>
+<dl><dt><a name="Camera-getBoundingBox"><strong>getBoundingBox</strong></a>(...)</dt><dd><tt><a href="#Camera-getBoundingBox">getBoundingBox</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SrBox">SrBox</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;boundary&nbsp;dimensions&nbsp;of&nbsp;the&nbsp;character.</tt></dd></dl>
+
 <dl><dt><a name="Camera-getHPR"><strong>getHPR</strong></a>(...)</dt><dd><tt><a href="#Camera-getHPR">getHPR</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;heading,&nbsp;pitch&nbsp;and&nbsp;roll&nbsp;of&nbsp;the&nbsp;character's&nbsp;world&nbsp;offset.</tt></dd></dl>
 
@@ -631,10 +640,22 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 776</dl>
+<dl><dt><strong>__instance_size__</strong> = 800</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
+<dl><dt><a name="CurveWriterController-addChannel"><strong>addChannel</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-addChannel">addChannel</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;channel&nbsp;to&nbsp;this&nbsp;controller's&nbsp;context.</tt></dd></dl>
+
+<dl><dt><a name="CurveWriterController-getChannelPos"><strong>getChannelPos</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-getChannelPos">getChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="CurveWriterController-getChannelQuat"><strong>getChannelQuat</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-getChannelQuat">getChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrQuat">SrQuat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="CurveWriterController-getChannelValue"><strong>getChannelValue</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-getChannelValue">getChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
+
 <dl><dt><a name="CurveWriterController-getDuration"><strong>getDuration</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-getDuration">getDuration</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;controller's&nbsp;duration.</tt></dd></dl>
 
@@ -649,6 +670,18 @@ Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<b
 
 <dl><dt><a name="CurveWriterController-isIgnore"><strong>isIgnore</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-isIgnore">isIgnore</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Will&nbsp;the&nbsp;controller&nbsp;be&nbsp;ignored&nbsp;during&nbsp;evaluation.</tt></dd></dl>
+
+<dl><dt><a name="CurveWriterController-setChannelPos"><strong>setChannelPos</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-setChannelPos">setChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrVec">SrVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="CurveWriterController-setChannelQuat"><strong>setChannelQuat</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-setChannelQuat">setChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="CurveWriterController-setChannelQuatGlobal"><strong>setChannelQuatGlobal</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-setChannelQuatGlobal">setChannelQuatGlobal</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="CurveWriterController-setChannelValue"><strong>setChannelValue</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-setChannelValue">setChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="CurveWriterController-setDebug"><strong>setDebug</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-setDebug">setDebug</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;debug&nbsp;state&nbsp;for&nbsp;this&nbsp;controller.</tt></dd></dl>
@@ -881,10 +914,22 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 776</dl>
+<dl><dt><strong>__instance_size__</strong> = 800</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
+<dl><dt><a name="EyelidController-addChannel"><strong>addChannel</strong></a>(...)</dt><dd><tt><a href="#EyelidController-addChannel">addChannel</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;channel&nbsp;to&nbsp;this&nbsp;controller's&nbsp;context.</tt></dd></dl>
+
+<dl><dt><a name="EyelidController-getChannelPos"><strong>getChannelPos</strong></a>(...)</dt><dd><tt><a href="#EyelidController-getChannelPos">getChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="EyelidController-getChannelQuat"><strong>getChannelQuat</strong></a>(...)</dt><dd><tt><a href="#EyelidController-getChannelQuat">getChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrQuat">SrQuat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="EyelidController-getChannelValue"><strong>getChannelValue</strong></a>(...)</dt><dd><tt><a href="#EyelidController-getChannelValue">getChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
+
 <dl><dt><a name="EyelidController-getDuration"><strong>getDuration</strong></a>(...)</dt><dd><tt><a href="#EyelidController-getDuration">getDuration</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;controller's&nbsp;duration.</tt></dd></dl>
 
@@ -899,6 +944,18 @@ Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<b
 
 <dl><dt><a name="EyelidController-isIgnore"><strong>isIgnore</strong></a>(...)</dt><dd><tt><a href="#EyelidController-isIgnore">isIgnore</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Will&nbsp;the&nbsp;controller&nbsp;be&nbsp;ignored&nbsp;during&nbsp;evaluation.</tt></dd></dl>
+
+<dl><dt><a name="EyelidController-setChannelPos"><strong>setChannelPos</strong></a>(...)</dt><dd><tt><a href="#EyelidController-setChannelPos">setChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrVec">SrVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="EyelidController-setChannelQuat"><strong>setChannelQuat</strong></a>(...)</dt><dd><tt><a href="#EyelidController-setChannelQuat">setChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="EyelidController-setChannelQuatGlobal"><strong>setChannelQuatGlobal</strong></a>(...)</dt><dd><tt><a href="#EyelidController-setChannelQuatGlobal">setChannelQuatGlobal</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="EyelidController-setChannelValue"><strong>setChannelValue</strong></a>(...)</dt><dd><tt><a href="#EyelidController-setChannelValue">setChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="EyelidController-setDebug"><strong>setDebug</strong></a>(...)</dt><dd><tt><a href="#EyelidController-setDebug">setDebug</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;debug&nbsp;state&nbsp;for&nbsp;this&nbsp;controller.</tt></dd></dl>
@@ -1194,10 +1251,22 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 1080</dl>
+<dl><dt><strong>__instance_size__</strong> = 1104</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
+<dl><dt><a name="GazeController-addChannel"><strong>addChannel</strong></a>(...)</dt><dd><tt><a href="#GazeController-addChannel">addChannel</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;channel&nbsp;to&nbsp;this&nbsp;controller's&nbsp;context.</tt></dd></dl>
+
+<dl><dt><a name="GazeController-getChannelPos"><strong>getChannelPos</strong></a>(...)</dt><dd><tt><a href="#GazeController-getChannelPos">getChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="GazeController-getChannelQuat"><strong>getChannelQuat</strong></a>(...)</dt><dd><tt><a href="#GazeController-getChannelQuat">getChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrQuat">SrQuat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="GazeController-getChannelValue"><strong>getChannelValue</strong></a>(...)</dt><dd><tt><a href="#GazeController-getChannelValue">getChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
+
 <dl><dt><a name="GazeController-getDuration"><strong>getDuration</strong></a>(...)</dt><dd><tt><a href="#GazeController-getDuration">getDuration</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;controller's&nbsp;duration.</tt></dd></dl>
 
@@ -1212,6 +1281,18 @@ Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<b
 
 <dl><dt><a name="GazeController-isIgnore"><strong>isIgnore</strong></a>(...)</dt><dd><tt><a href="#GazeController-isIgnore">isIgnore</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Will&nbsp;the&nbsp;controller&nbsp;be&nbsp;ignored&nbsp;during&nbsp;evaluation.</tt></dd></dl>
+
+<dl><dt><a name="GazeController-setChannelPos"><strong>setChannelPos</strong></a>(...)</dt><dd><tt><a href="#GazeController-setChannelPos">setChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrVec">SrVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="GazeController-setChannelQuat"><strong>setChannelQuat</strong></a>(...)</dt><dd><tt><a href="#GazeController-setChannelQuat">setChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="GazeController-setChannelQuatGlobal"><strong>setChannelQuatGlobal</strong></a>(...)</dt><dd><tt><a href="#GazeController-setChannelQuatGlobal">setChannelQuatGlobal</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="GazeController-setChannelValue"><strong>setChannelValue</strong></a>(...)</dt><dd><tt><a href="#GazeController-setChannelValue">setChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="GazeController-setDebug"><strong>setDebug</strong></a>(...)</dt><dd><tt><a href="#GazeController-setDebug">setDebug</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;debug&nbsp;state&nbsp;for&nbsp;this&nbsp;controller.</tt></dd></dl>
@@ -1701,10 +1782,22 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 776</dl>
+<dl><dt><strong>__instance_size__</strong> = 800</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
+<dl><dt><a name="MotionController-addChannel"><strong>addChannel</strong></a>(...)</dt><dd><tt><a href="#MotionController-addChannel">addChannel</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;channel&nbsp;to&nbsp;this&nbsp;controller's&nbsp;context.</tt></dd></dl>
+
+<dl><dt><a name="MotionController-getChannelPos"><strong>getChannelPos</strong></a>(...)</dt><dd><tt><a href="#MotionController-getChannelPos">getChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="MotionController-getChannelQuat"><strong>getChannelQuat</strong></a>(...)</dt><dd><tt><a href="#MotionController-getChannelQuat">getChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrQuat">SrQuat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="MotionController-getChannelValue"><strong>getChannelValue</strong></a>(...)</dt><dd><tt><a href="#MotionController-getChannelValue">getChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
+
 <dl><dt><a name="MotionController-getDuration"><strong>getDuration</strong></a>(...)</dt><dd><tt><a href="#MotionController-getDuration">getDuration</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;controller's&nbsp;duration.</tt></dd></dl>
 
@@ -1719,6 +1812,18 @@ Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<b
 
 <dl><dt><a name="MotionController-isIgnore"><strong>isIgnore</strong></a>(...)</dt><dd><tt><a href="#MotionController-isIgnore">isIgnore</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Will&nbsp;the&nbsp;controller&nbsp;be&nbsp;ignored&nbsp;during&nbsp;evaluation.</tt></dd></dl>
+
+<dl><dt><a name="MotionController-setChannelPos"><strong>setChannelPos</strong></a>(...)</dt><dd><tt><a href="#MotionController-setChannelPos">setChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrVec">SrVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="MotionController-setChannelQuat"><strong>setChannelQuat</strong></a>(...)</dt><dd><tt><a href="#MotionController-setChannelQuat">setChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="MotionController-setChannelQuatGlobal"><strong>setChannelQuatGlobal</strong></a>(...)</dt><dd><tt><a href="#MotionController-setChannelQuatGlobal">setChannelQuatGlobal</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="MotionController-setChannelValue"><strong>setChannelValue</strong></a>(...)</dt><dd><tt><a href="#MotionController-setChannelValue">setChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="MotionController-setDebug"><strong>setDebug</strong></a>(...)</dt><dd><tt><a href="#MotionController-setDebug">setDebug</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;debug&nbsp;state&nbsp;for&nbsp;this&nbsp;controller.</tt></dd></dl>
@@ -2182,10 +2287,22 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 776</dl>
+<dl><dt><strong>__instance_size__</strong> = 800</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
+<dl><dt><a name="PythonController-addChannel"><strong>addChannel</strong></a>(...)</dt><dd><tt><a href="#PythonController-addChannel">addChannel</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;channel&nbsp;to&nbsp;this&nbsp;controller's&nbsp;context.</tt></dd></dl>
+
+<dl><dt><a name="PythonController-getChannelPos"><strong>getChannelPos</strong></a>(...)</dt><dd><tt><a href="#PythonController-getChannelPos">getChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="PythonController-getChannelQuat"><strong>getChannelQuat</strong></a>(...)</dt><dd><tt><a href="#PythonController-getChannelQuat">getChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrQuat">SrQuat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="PythonController-getChannelValue"><strong>getChannelValue</strong></a>(...)</dt><dd><tt><a href="#PythonController-getChannelValue">getChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
+
 <dl><dt><a name="PythonController-getDuration"><strong>getDuration</strong></a>(...)</dt><dd><tt><a href="#PythonController-getDuration">getDuration</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;controller's&nbsp;duration.</tt></dd></dl>
 
@@ -2200,6 +2317,18 @@ Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<b
 
 <dl><dt><a name="PythonController-isIgnore"><strong>isIgnore</strong></a>(...)</dt><dd><tt><a href="#PythonController-isIgnore">isIgnore</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Will&nbsp;the&nbsp;controller&nbsp;be&nbsp;ignored&nbsp;during&nbsp;evaluation.</tt></dd></dl>
+
+<dl><dt><a name="PythonController-setChannelPos"><strong>setChannelPos</strong></a>(...)</dt><dd><tt><a href="#PythonController-setChannelPos">setChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrVec">SrVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="PythonController-setChannelQuat"><strong>setChannelQuat</strong></a>(...)</dt><dd><tt><a href="#PythonController-setChannelQuat">setChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="PythonController-setChannelQuatGlobal"><strong>setChannelQuatGlobal</strong></a>(...)</dt><dd><tt><a href="#PythonController-setChannelQuatGlobal">setChannelQuatGlobal</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="PythonController-setChannelValue"><strong>setChannelValue</strong></a>(...)</dt><dd><tt><a href="#PythonController-setChannelValue">setChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="PythonController-setDebug"><strong>setDebug</strong></a>(...)</dt><dd><tt><a href="#PythonController-setDebug">setDebug</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;debug&nbsp;state&nbsp;for&nbsp;this&nbsp;controller.</tt></dd></dl>
@@ -2368,6 +2497,9 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;:&nbsp;motion&nbsp;name,&nbsp;tag&nbsp;type,&nbsp;tag&nbsp;name,&nbsp;value.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output&nbsp;:&nbsp;NULL</tt></dd></dl>
 
+<dl><dt><a name="SBAnimationBlend-backupMotionKey"><strong>backupMotionKey</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend-backupMotionKey">backupMotionKey</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;backup&nbsp;the&nbsp;motion&nbsp;keys</tt></dd></dl>
+
 <dl><dt><a name="SBAnimationBlend-buildMotionAnalysis"><strong>buildMotionAnalysis</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend-buildMotionAnalysis">buildMotionAnalysis</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(<a href="#StringVec">StringVec</a>)arg4,&nbsp;(str)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;build&nbsp;the&nbsp;motion&nbsp;analysis&nbsp;structure&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;:&nbsp;NULL.&nbsp;<br>
@@ -2414,6 +2546,11 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
 
+<dl><dt><a name="SBAnimationBlend-getMotionObject"><strong>getMotionObject</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend-getMotionObject">getMotionObject</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;the&nbsp;motion&nbsp;name&nbsp;given&nbsp;index.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
+
 <dl><dt><a name="SBAnimationBlend-getNumCorrespondancePoints"><strong>getNumCorrespondancePoints</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend-getNumCorrespondancePoints">getNumCorrespondancePoints</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;correspondence&nbsp;points&nbsp;for&nbsp;the&nbsp;motions&nbsp;in&nbsp;the&nbsp;blend</tt></dd></dl>
 
@@ -2425,6 +2562,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBAnimationBlend-getNumMotions"><strong>getNumMotions</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend-getNumMotions">getNumMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;motions&nbsp;inside&nbsp;the&nbsp;blend.</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend-offsetMotion"><strong>offsetMotion</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend-offsetMotion">offsetMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;offset&nbsp;motion&nbsp;x&nbsp;from&nbsp;the&nbsp;blend&nbsp;using&nbsp;motion&nbsp;time&nbsp;t</tt></dd></dl>
 
 <dl><dt><a name="SBAnimationBlend-plotMotion"><strong>plotMotion</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend-plotMotion">plotMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(object)arg4,&nbsp;(object)arg5,&nbsp;(object)arg6)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Plot&nbsp;motion&nbsp;frames&nbsp;with&nbsp;stick&nbsp;skeleton.&nbsp;<br>
@@ -2456,9 +2596,12 @@ Methods defined here:<br>
 <dl><dt><a name="SBAnimationBlend-setIncrementWorldOffsetY"><strong>setIncrementWorldOffsetY</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend-setIncrementWorldOffsetY">setIncrementWorldOffsetY</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Boolean&nbsp;flag&nbsp;that&nbsp;increment&nbsp;world&nbsp;offset&nbsp;y-axis&nbsp;value&nbsp;according&nbsp;to&nbsp;the&nbsp;base&nbsp;joint&nbsp;value.</tt></dd></dl>
 
+<dl><dt><a name="SBAnimationBlend-unoffsetMotions"><strong>unoffsetMotions</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend-unoffsetMotions">unoffsetMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;un-offset&nbsp;motions&nbsp;for&nbsp;the&nbsp;blend</tt></dd></dl>
+
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 672</dl>
+<dl><dt><strong>__instance_size__</strong> = 688</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -2496,7 +2639,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 672</dl>
+<dl><dt><strong>__instance_size__</strong> = 688</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -2513,6 +2656,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 &nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;the&nbsp;key&nbsp;time&nbsp;tag&nbsp;for&nbsp;motion&nbsp;analysis.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;:&nbsp;motion&nbsp;name,&nbsp;tag&nbsp;type,&nbsp;tag&nbsp;name,&nbsp;value.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output&nbsp;:&nbsp;NULL</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend0D-backupMotionKey"><strong>backupMotionKey</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend0D-backupMotionKey">backupMotionKey</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;backup&nbsp;the&nbsp;motion&nbsp;keys</tt></dd></dl>
 
 <dl><dt><a name="SBAnimationBlend0D-buildMotionAnalysis"><strong>buildMotionAnalysis</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend0D-buildMotionAnalysis">buildMotionAnalysis</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(<a href="#StringVec">StringVec</a>)arg4,&nbsp;(str)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;build&nbsp;the&nbsp;motion&nbsp;analysis&nbsp;structure&nbsp;<br>
@@ -2560,6 +2706,11 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
 
+<dl><dt><a name="SBAnimationBlend0D-getMotionObject"><strong>getMotionObject</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend0D-getMotionObject">getMotionObject</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;the&nbsp;motion&nbsp;name&nbsp;given&nbsp;index.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
+
 <dl><dt><a name="SBAnimationBlend0D-getNumCorrespondancePoints"><strong>getNumCorrespondancePoints</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend0D-getNumCorrespondancePoints">getNumCorrespondancePoints</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;correspondence&nbsp;points&nbsp;for&nbsp;the&nbsp;motions&nbsp;in&nbsp;the&nbsp;blend</tt></dd></dl>
 
@@ -2571,6 +2722,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 
 <dl><dt><a name="SBAnimationBlend0D-getNumMotions"><strong>getNumMotions</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend0D-getNumMotions">getNumMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;motions&nbsp;inside&nbsp;the&nbsp;blend.</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend0D-offsetMotion"><strong>offsetMotion</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend0D-offsetMotion">offsetMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;offset&nbsp;motion&nbsp;x&nbsp;from&nbsp;the&nbsp;blend&nbsp;using&nbsp;motion&nbsp;time&nbsp;t</tt></dd></dl>
 
 <dl><dt><a name="SBAnimationBlend0D-plotMotion"><strong>plotMotion</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend0D-plotMotion">plotMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(object)arg4,&nbsp;(object)arg5,&nbsp;(object)arg6)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Plot&nbsp;motion&nbsp;frames&nbsp;with&nbsp;stick&nbsp;skeleton.&nbsp;<br>
@@ -2601,6 +2755,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 
 <dl><dt><a name="SBAnimationBlend0D-setIncrementWorldOffsetY"><strong>setIncrementWorldOffsetY</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend0D-setIncrementWorldOffsetY">setIncrementWorldOffsetY</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Boolean&nbsp;flag&nbsp;that&nbsp;increment&nbsp;world&nbsp;offset&nbsp;y-axis&nbsp;value&nbsp;according&nbsp;to&nbsp;the&nbsp;base&nbsp;joint&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend0D-unoffsetMotions"><strong>unoffsetMotions</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend0D-unoffsetMotions">unoffsetMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;un-offset&nbsp;motions&nbsp;for&nbsp;the&nbsp;blend</tt></dd></dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -2643,7 +2800,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 672</dl>
+<dl><dt><strong>__instance_size__</strong> = 688</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -2660,6 +2817,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 &nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;the&nbsp;key&nbsp;time&nbsp;tag&nbsp;for&nbsp;motion&nbsp;analysis.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;:&nbsp;motion&nbsp;name,&nbsp;tag&nbsp;type,&nbsp;tag&nbsp;name,&nbsp;value.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output&nbsp;:&nbsp;NULL</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend1D-backupMotionKey"><strong>backupMotionKey</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend1D-backupMotionKey">backupMotionKey</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;backup&nbsp;the&nbsp;motion&nbsp;keys</tt></dd></dl>
 
 <dl><dt><a name="SBAnimationBlend1D-buildMotionAnalysis"><strong>buildMotionAnalysis</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend1D-buildMotionAnalysis">buildMotionAnalysis</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(<a href="#StringVec">StringVec</a>)arg4,&nbsp;(str)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;build&nbsp;the&nbsp;motion&nbsp;analysis&nbsp;structure&nbsp;<br>
@@ -2707,6 +2867,11 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
 
+<dl><dt><a name="SBAnimationBlend1D-getMotionObject"><strong>getMotionObject</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend1D-getMotionObject">getMotionObject</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;the&nbsp;motion&nbsp;name&nbsp;given&nbsp;index.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
+
 <dl><dt><a name="SBAnimationBlend1D-getNumCorrespondancePoints"><strong>getNumCorrespondancePoints</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend1D-getNumCorrespondancePoints">getNumCorrespondancePoints</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;correspondence&nbsp;points&nbsp;for&nbsp;the&nbsp;motions&nbsp;in&nbsp;the&nbsp;blend</tt></dd></dl>
 
@@ -2718,6 +2883,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 
 <dl><dt><a name="SBAnimationBlend1D-getNumMotions"><strong>getNumMotions</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend1D-getNumMotions">getNumMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;motions&nbsp;inside&nbsp;the&nbsp;blend.</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend1D-offsetMotion"><strong>offsetMotion</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend1D-offsetMotion">offsetMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;offset&nbsp;motion&nbsp;x&nbsp;from&nbsp;the&nbsp;blend&nbsp;using&nbsp;motion&nbsp;time&nbsp;t</tt></dd></dl>
 
 <dl><dt><a name="SBAnimationBlend1D-plotMotion"><strong>plotMotion</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend1D-plotMotion">plotMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(object)arg4,&nbsp;(object)arg5,&nbsp;(object)arg6)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Plot&nbsp;motion&nbsp;frames&nbsp;with&nbsp;stick&nbsp;skeleton.&nbsp;<br>
@@ -2748,6 +2916,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 
 <dl><dt><a name="SBAnimationBlend1D-setIncrementWorldOffsetY"><strong>setIncrementWorldOffsetY</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend1D-setIncrementWorldOffsetY">setIncrementWorldOffsetY</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Boolean&nbsp;flag&nbsp;that&nbsp;increment&nbsp;world&nbsp;offset&nbsp;y-axis&nbsp;value&nbsp;according&nbsp;to&nbsp;the&nbsp;base&nbsp;joint&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend1D-unoffsetMotions"><strong>unoffsetMotions</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend1D-unoffsetMotions">unoffsetMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;un-offset&nbsp;motions&nbsp;for&nbsp;the&nbsp;blend</tt></dd></dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -2793,7 +2964,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 672</dl>
+<dl><dt><strong>__instance_size__</strong> = 688</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -2810,6 +2981,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 &nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;the&nbsp;key&nbsp;time&nbsp;tag&nbsp;for&nbsp;motion&nbsp;analysis.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;:&nbsp;motion&nbsp;name,&nbsp;tag&nbsp;type,&nbsp;tag&nbsp;name,&nbsp;value.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output&nbsp;:&nbsp;NULL</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend2D-backupMotionKey"><strong>backupMotionKey</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend2D-backupMotionKey">backupMotionKey</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;backup&nbsp;the&nbsp;motion&nbsp;keys</tt></dd></dl>
 
 <dl><dt><a name="SBAnimationBlend2D-buildMotionAnalysis"><strong>buildMotionAnalysis</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend2D-buildMotionAnalysis">buildMotionAnalysis</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(<a href="#StringVec">StringVec</a>)arg4,&nbsp;(str)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;build&nbsp;the&nbsp;motion&nbsp;analysis&nbsp;structure&nbsp;<br>
@@ -2857,6 +3031,11 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
 
+<dl><dt><a name="SBAnimationBlend2D-getMotionObject"><strong>getMotionObject</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend2D-getMotionObject">getMotionObject</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;the&nbsp;motion&nbsp;name&nbsp;given&nbsp;index.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
+
 <dl><dt><a name="SBAnimationBlend2D-getNumCorrespondancePoints"><strong>getNumCorrespondancePoints</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend2D-getNumCorrespondancePoints">getNumCorrespondancePoints</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;correspondence&nbsp;points&nbsp;for&nbsp;the&nbsp;motions&nbsp;in&nbsp;the&nbsp;blend</tt></dd></dl>
 
@@ -2868,6 +3047,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 
 <dl><dt><a name="SBAnimationBlend2D-getNumMotions"><strong>getNumMotions</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend2D-getNumMotions">getNumMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;motions&nbsp;inside&nbsp;the&nbsp;blend.</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend2D-offsetMotion"><strong>offsetMotion</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend2D-offsetMotion">offsetMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;offset&nbsp;motion&nbsp;x&nbsp;from&nbsp;the&nbsp;blend&nbsp;using&nbsp;motion&nbsp;time&nbsp;t</tt></dd></dl>
 
 <dl><dt><a name="SBAnimationBlend2D-plotMotion"><strong>plotMotion</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend2D-plotMotion">plotMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(object)arg4,&nbsp;(object)arg5,&nbsp;(object)arg6)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Plot&nbsp;motion&nbsp;frames&nbsp;with&nbsp;stick&nbsp;skeleton.&nbsp;<br>
@@ -2898,6 +3080,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 
 <dl><dt><a name="SBAnimationBlend2D-setIncrementWorldOffsetY"><strong>setIncrementWorldOffsetY</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend2D-setIncrementWorldOffsetY">setIncrementWorldOffsetY</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Boolean&nbsp;flag&nbsp;that&nbsp;increment&nbsp;world&nbsp;offset&nbsp;y-axis&nbsp;value&nbsp;according&nbsp;to&nbsp;the&nbsp;base&nbsp;joint&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend2D-unoffsetMotions"><strong>unoffsetMotions</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend2D-unoffsetMotions">unoffsetMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;un-offset&nbsp;motions&nbsp;for&nbsp;the&nbsp;blend</tt></dd></dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -2943,7 +3128,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 672</dl>
+<dl><dt><strong>__instance_size__</strong> = 688</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -2960,6 +3145,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 &nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;the&nbsp;key&nbsp;time&nbsp;tag&nbsp;for&nbsp;motion&nbsp;analysis.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;:&nbsp;motion&nbsp;name,&nbsp;tag&nbsp;type,&nbsp;tag&nbsp;name,&nbsp;value.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output&nbsp;:&nbsp;NULL</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend3D-backupMotionKey"><strong>backupMotionKey</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend3D-backupMotionKey">backupMotionKey</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;backup&nbsp;the&nbsp;motion&nbsp;keys</tt></dd></dl>
 
 <dl><dt><a name="SBAnimationBlend3D-buildMotionAnalysis"><strong>buildMotionAnalysis</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend3D-buildMotionAnalysis">buildMotionAnalysis</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(<a href="#StringVec">StringVec</a>)arg4,&nbsp;(str)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;build&nbsp;the&nbsp;motion&nbsp;analysis&nbsp;structure&nbsp;<br>
@@ -3007,6 +3195,11 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
 
+<dl><dt><a name="SBAnimationBlend3D-getMotionObject"><strong>getMotionObject</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend3D-getMotionObject">getMotionObject</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;the&nbsp;motion&nbsp;name&nbsp;given&nbsp;index.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
+
 <dl><dt><a name="SBAnimationBlend3D-getNumCorrespondancePoints"><strong>getNumCorrespondancePoints</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend3D-getNumCorrespondancePoints">getNumCorrespondancePoints</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;correspondence&nbsp;points&nbsp;for&nbsp;the&nbsp;motions&nbsp;in&nbsp;the&nbsp;blend</tt></dd></dl>
 
@@ -3018,6 +3211,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 
 <dl><dt><a name="SBAnimationBlend3D-getNumMotions"><strong>getNumMotions</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend3D-getNumMotions">getNumMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;motions&nbsp;inside&nbsp;the&nbsp;blend.</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend3D-offsetMotion"><strong>offsetMotion</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend3D-offsetMotion">offsetMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;offset&nbsp;motion&nbsp;x&nbsp;from&nbsp;the&nbsp;blend&nbsp;using&nbsp;motion&nbsp;time&nbsp;t</tt></dd></dl>
 
 <dl><dt><a name="SBAnimationBlend3D-plotMotion"><strong>plotMotion</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend3D-plotMotion">plotMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(object)arg4,&nbsp;(object)arg5,&nbsp;(object)arg6)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Plot&nbsp;motion&nbsp;frames&nbsp;with&nbsp;stick&nbsp;skeleton.&nbsp;<br>
@@ -3048,6 +3244,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 
 <dl><dt><a name="SBAnimationBlend3D-setIncrementWorldOffsetY"><strong>setIncrementWorldOffsetY</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend3D-setIncrementWorldOffsetY">setIncrementWorldOffsetY</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Boolean&nbsp;flag&nbsp;that&nbsp;increment&nbsp;world&nbsp;offset&nbsp;y-axis&nbsp;value&nbsp;according&nbsp;to&nbsp;the&nbsp;base&nbsp;joint&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBAnimationBlend3D-unoffsetMotions"><strong>unoffsetMotions</strong></a>(...)</dt><dd><tt><a href="#SBAnimationBlend3D-unoffsetMotions">unoffsetMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;un-offset&nbsp;motions&nbsp;for&nbsp;the&nbsp;blend</tt></dd></dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -3901,20 +4100,23 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBCharacter-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
 
+<dl><dt><a name="SBCharacter-addController"><strong>addController</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-addController">addController</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(int)arg2,&nbsp;(<a href="#SBController">SBController</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;controller&nbsp;to&nbsp;the&nbsp;character.</tt></dd></dl>
+
 <dl><dt><a name="SBCharacter-addJointTrajectoryConstraint"><strong>addJointTrajectoryConstraint</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-addJointTrajectoryConstraint">addJointTrajectoryConstraint</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Add&nbsp;IK&nbsp;constraint&nbsp;to&nbsp;a&nbsp;specific&nbsp;end&nbsp;effector&nbsp;joint&nbsp;to&nbsp;be&nbsp;enforced&nbsp;in&nbsp;the&nbsp;post-processing.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-createBlendShapeChannel"><strong>createBlendShapeChannel</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-createBlendShapeChannel">createBlendShapeChannel</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Create&nbsp;a&nbsp;blend&nbsp;shape&nbsp;channel&nbsp;given&nbsp;its&nbsp;name.</tt></dd></dl>
 
+<dl><dt><a name="SBCharacter-createMinimalControllers"><strong>createMinimalControllers</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-createMinimalControllers">createMinimalControllers</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;basic&nbsp;set&nbsp;of&nbsp;controllers&nbsp;for&nbsp;posture,&nbsp;animation,&nbsp;gaze,&nbsp;head&nbsp;and&nbsp;face&nbsp;control.</tt></dd></dl>
+
 <dl><dt><a name="SBCharacter-createStandardControllers"><strong>createStandardControllers</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-createStandardControllers">createStandardControllers</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;number&nbsp;of&nbsp;top&nbsp;level&nbsp;controllers&nbsp;inside&nbsp;this&nbsp;character.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;full&nbsp;set&nbsp;of&nbsp;controllers&nbsp;for&nbsp;the&nbsp;character.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-getBehavior"><strong>getBehavior</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getBehavior">getBehavior</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;<a href="#SBBehavior">SBBehavior</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;ith&nbsp;behavior&nbsp;of&nbsp;the&nbsp;character.</tt></dd></dl>
-
-<dl><dt><a name="SBCharacter-getBoundingBox"><strong>getBoundingBox</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getBoundingBox">getBoundingBox</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SrBox">SrBox</a>&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;boundary&nbsp;dimensions&nbsp;of&nbsp;the&nbsp;character.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-getControllerByIndex"><strong>getControllerByIndex</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getControllerByIndex">getControllerByIndex</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;<a href="#SBController">SBController</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;ith&nbsp;controller.</tt></dd></dl>
@@ -3942,6 +4144,12 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBCharacter-getNvbg"><strong>getNvbg</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getNvbg">getNvbg</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#Nvbg">Nvbg</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;NVBG&nbsp;handler&nbsp;for&nbsp;this&nbsp;character.</tt></dd></dl>
+
+<dl><dt><a name="SBCharacter-getReach"><strong>getReach</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getReach">getReach</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBReach">SBReach</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;current&nbsp;reach&nbsp;instance&nbsp;used&nbsp;by&nbsp;the&nbsp;character.</tt></dd></dl>
+
+<dl><dt><a name="SBCharacter-getReachAttachedPawnName"><strong>getReachAttachedPawnName</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getReachAttachedPawnName">getReachAttachedPawnName</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;name&nbsp;of&nbsp;currently&nbsp;attached&nbsp;pawn&nbsp;in&nbsp;the&nbsp;reach&nbsp;controller.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-getVisemeTimeOffset"><strong>getVisemeTimeOffset</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getVisemeTimeOffset">getVisemeTimeOffset</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;time&nbsp;delay&nbsp;for&nbsp;viseme&nbsp;curve&nbsp;mode.</tt></dd></dl>
@@ -3973,6 +4181,9 @@ Methods defined here:<br>
 <dl><dt><a name="SBCharacter-pruneControllers"><strong>pruneControllers</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-pruneControllers">pruneControllers</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Prunes&nbsp;the&nbsp;controller&nbsp;tree.</tt></dd></dl>
 
+<dl><dt><a name="SBCharacter-removeController"><strong>removeController</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-removeController">removeController</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(<a href="#SBController">SBController</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;a&nbsp;controller&nbsp;from&nbsp;the&nbsp;character.</tt></dd></dl>
+
 <dl><dt><a name="SBCharacter-setAutomaticPruning"><strong>setAutomaticPruning</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setAutomaticPruning">setAutomaticPruning</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Toggles&nbsp;the&nbsp;automatic&nbsp;pruning&nbsp;mechanism&nbsp;on&nbsp;or&nbsp;off.</tt></dd></dl>
 
@@ -3990,6 +4201,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBCharacter-setNvbg"><strong>setNvbg</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setNvbg">setNvbg</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(<a href="#Nvbg">Nvbg</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;NVBG&nbsp;handler&nbsp;for&nbsp;this&nbsp;character.</tt></dd></dl>
+
+<dl><dt><a name="SBCharacter-setReach"><strong>setReach</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setReach">setReach</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(<a href="#SBReach">SBReach</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;current&nbsp;reach&nbsp;instance&nbsp;used&nbsp;by&nbsp;the&nbsp;character.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-setSoftEyes"><strong>setSoftEyes</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setSoftEyes">setSoftEyes</a>(&nbsp;(<a href="#SBCharacter">SBCharacter</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;soft&nbsp;eyes&nbsp;feature.</tt></dd></dl>
@@ -4038,10 +4252,13 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 920</dl>
+<dl><dt><strong>__instance_size__</strong> = 936</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBPawn">SBPawn</a>:<br>
+<dl><dt><a name="SBCharacter-getBoundingBox"><strong>getBoundingBox</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getBoundingBox">getBoundingBox</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SrBox">SrBox</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;boundary&nbsp;dimensions&nbsp;of&nbsp;the&nbsp;character.</tt></dd></dl>
+
 <dl><dt><a name="SBCharacter-getHPR"><strong>getHPR</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getHPR">getHPR</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;heading,&nbsp;pitch&nbsp;and&nbsp;roll&nbsp;of&nbsp;the&nbsp;character's&nbsp;world&nbsp;offset.</tt></dd></dl>
 
@@ -4308,6 +4525,18 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBController-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
 
+<dl><dt><a name="SBController-addChannel"><strong>addChannel</strong></a>(...)</dt><dd><tt><a href="#SBController-addChannel">addChannel</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;channel&nbsp;to&nbsp;this&nbsp;controller's&nbsp;context.</tt></dd></dl>
+
+<dl><dt><a name="SBController-getChannelPos"><strong>getChannelPos</strong></a>(...)</dt><dd><tt><a href="#SBController-getChannelPos">getChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBController-getChannelQuat"><strong>getChannelQuat</strong></a>(...)</dt><dd><tt><a href="#SBController-getChannelQuat">getChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrQuat">SrQuat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBController-getChannelValue"><strong>getChannelValue</strong></a>(...)</dt><dd><tt><a href="#SBController-getChannelValue">getChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
+
 <dl><dt><a name="SBController-getDuration"><strong>getDuration</strong></a>(...)</dt><dd><tt><a href="#SBController-getDuration">getDuration</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;controller's&nbsp;duration.</tt></dd></dl>
 
@@ -4323,6 +4552,18 @@ Methods defined here:<br>
 <dl><dt><a name="SBController-isIgnore"><strong>isIgnore</strong></a>(...)</dt><dd><tt><a href="#SBController-isIgnore">isIgnore</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Will&nbsp;the&nbsp;controller&nbsp;be&nbsp;ignored&nbsp;during&nbsp;evaluation.</tt></dd></dl>
 
+<dl><dt><a name="SBController-setChannelPos"><strong>setChannelPos</strong></a>(...)</dt><dd><tt><a href="#SBController-setChannelPos">setChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrVec">SrVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBController-setChannelQuat"><strong>setChannelQuat</strong></a>(...)</dt><dd><tt><a href="#SBController-setChannelQuat">setChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBController-setChannelQuatGlobal"><strong>setChannelQuatGlobal</strong></a>(...)</dt><dd><tt><a href="#SBController-setChannelQuatGlobal">setChannelQuatGlobal</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBController-setChannelValue"><strong>setChannelValue</strong></a>(...)</dt><dd><tt><a href="#SBController-setChannelValue">setChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
+
 <dl><dt><a name="SBController-setDebug"><strong>setDebug</strong></a>(...)</dt><dd><tt><a href="#SBController-setDebug">setDebug</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;debug&nbsp;state&nbsp;for&nbsp;this&nbsp;controller.</tt></dd></dl>
 
@@ -4334,7 +4575,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 624</dl>
+<dl><dt><strong>__instance_size__</strong> = 648</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -4631,7 +4872,7 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;an&nbsp;event&nbsp;of&nbsp;a&nbsp;given&nbsp;type&nbsp;with&nbsp;given&nbsp;parameters.</tt></dd></dl>
 
 <dl><dt><a name="SBEventManager-getEventHandler"><strong>getEventHandler</strong></a>(...)</dt><dd><tt><a href="#SBEventManager-getEventHandler">getEventHandler</a>(&nbsp;(<a href="#SBEventManager">SBEventManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBEventHandler">SBEventHandler</a>&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;number&nbsp;of&nbsp;event&nbsp;handlers.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;an&nbsp;event&nbsp;handler&nbsp;by&nbsp;name.</tt></dd></dl>
 
 <dl><dt><a name="SBEventManager-getNumHandlers"><strong>getNumHandlers</strong></a>(...)</dt><dd><tt><a href="#SBEventManager-getNumHandlers">getNumHandlers</a>(&nbsp;(<a href="#SBEventManager">SBEventManager</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;number&nbsp;of&nbsp;event&nbsp;handlers.</tt></dd></dl>
@@ -4731,6 +4972,131 @@ Data and other attributes inherited from Boost.Python.instance:<br>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBFaceShiftManager">class <strong>SBFaceShiftManager</strong></a>(<a href="SmartBody.html#SBService">SBService</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBFaceShiftManager">SBFaceShiftManager</a></dd>
+<dd><a href="SmartBody.html#SBService">SBService</a></dd>
+<dd><a href="SmartBody.html#SBObject">SBObject</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBFaceShiftManager-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBFaceShiftManager-getCoeffValue"><strong>getCoeffValue</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getCoeffValue">getCoeffValue</a>(&nbsp;(<a href="#SBFaceShiftManager">SBFaceShiftManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;coefficient&nbsp;value&nbsp;of&nbsp;a&nbsp;specific&nbsp;blend&nbsp;shape.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-getHeadRotation"><strong>getHeadRotation</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getHeadRotation">getHeadRotation</a>(&nbsp;(<a href="#SBFaceShiftManager">SBFaceShiftManager</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SrQuat">SrQuat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;head&nbsp;rotation.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 228</dl>
+
+<hr>
+Methods inherited from <a href="SmartBody.html#SBService">SBService</a>:<br>
+<dl><dt><a name="SBFaceShiftManager-isEnable"><strong>isEnable</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-isEnable">isEnable</a>(&nbsp;(<a href="#SBService">SBService</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Is&nbsp;the&nbsp;service&nbsp;enabled?</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setEnable"><strong>setEnable</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setEnable">setEnable</a>(&nbsp;(<a href="#SBService">SBService</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Enables&nbsp;or&nbsp;disables&nbsp;the&nbsp;service.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
+<dl><dt><a name="SBFaceShiftManager-clearAttributes"><strong>clearAttributes</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-clearAttributes">clearAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Clear&nbsp;all&nbsp;the&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-createActionAttribute"><strong>createActionAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-createActionAttribute">createActionAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3,&nbsp;(str)arg4,&nbsp;(int)arg5,&nbsp;(object)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(str)arg9)&nbsp;-&gt;&nbsp;<a href="#ActionAttribute">ActionAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;action&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-createBoolAttribute"><strong>createBoolAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-createBoolAttribute">createBoolAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#BoolAttribute">BoolAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;boolean&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-createDoubleAttribute"><strong>createDoubleAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-createDoubleAttribute">createDoubleAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#DoubleAttribute">DoubleAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;double&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-createIntAttribute"><strong>createIntAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-createIntAttribute">createIntAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#IntAttribute">IntAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;an&nbsp;integer&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-createStringAttribute"><strong>createStringAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-createStringAttribute">createStringAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#StringAttribute">StringAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;string&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-createVec3Attribute"><strong>createVec3Attribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-createVec3Attribute">createVec3Attribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5,&nbsp;(object)arg6,&nbsp;(str)arg7,&nbsp;(int)arg8,&nbsp;(object)arg9,&nbsp;(object)arg10,&nbsp;(object)arg11,&nbsp;(str)arg12)&nbsp;-&gt;&nbsp;<a href="#Vec3Attribute">Vec3Attribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;vec3&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-getAttribute"><strong>getAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getAttribute">getAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBAttribute">SBAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;an&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-getAttributeNames"><strong>getAttributeNames</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getAttributeNames">getAttributeNames</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setActionAttribute"><strong>setActionAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setActionAttribute">setActionAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setBool"><strong>setBool</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setBool">setBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setBoolAttribute"><strong>setBoolAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setBoolAttribute">setBoolAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setDouble"><strong>setDouble</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setDouble">setDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setDoubleAttribute"><strong>setDoubleAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setDoubleAttribute">setDoubleAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setInt"><strong>setInt</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setInt">setInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setIntAttribute"><strong>setIntAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setIntAttribute">setIntAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setMatrix"><strong>setMatrix</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setMatrix">setMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrMat">SrMat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setMatrixAttribute"><strong>setMatrixAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setMatrixAttribute">setMatrixAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrMat">SrMat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setString"><strong>setString</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setString">setString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setStringAttribute"><strong>setStringAttribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setStringAttribute">setStringAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setVec3"><strong>setVec3</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setVec3">setVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;vector&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-setVec3Attribute"><strong>setVec3Attribute</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setVec3Attribute">setVec3Attribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;vector&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBFaceShiftManager-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="SBGestureMap">class <strong>SBGestureMap</strong></a>(Boost.Python.instance)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
@@ -4825,6 +5191,94 @@ Data and other attributes inherited from Boost.Python.instance:<br>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBHandConfiguration">class <strong>SBHandConfiguration</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBHandConfiguration">SBHandConfiguration</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBHandConfiguration-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBHandConfiguration-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBHandConfiguration-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBHandConfiguration-addMotion"><strong>addMotion</strong></a>(...)</dt><dd><tt><a href="#SBHandConfiguration-addMotion">addMotion</a>(&nbsp;(<a href="#SBHandConfiguration">SBHandConfiguration</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Add&nbsp;a&nbsp;new&nbsp;motion&nbsp;to&nbsp;the&nbsp;configuration</tt></dd></dl>
+
+<dl><dt><a name="SBHandConfiguration-getMotionNames"><strong>getMotionNames</strong></a>(...)</dt><dd><tt><a href="#SBHandConfiguration-getMotionNames">getMotionNames</a>(&nbsp;(<a href="#SBHandConfiguration">SBHandConfiguration</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;motion&nbsp;names&nbsp;from&nbsp;the&nbsp;hand&nbsp;configuration.</tt></dd></dl>
+
+<dl><dt><a name="SBHandConfiguration-getNumMotions"><strong>getNumMotions</strong></a>(...)</dt><dd><tt><a href="#SBHandConfiguration-getNumMotions">getNumMotions</a>(&nbsp;(<a href="#SBHandConfiguration">SBHandConfiguration</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;number&nbsp;of&nbsp;motions</tt></dd></dl>
+
+<dl><dt><a name="SBHandConfiguration-removeMotion"><strong>removeMotion</strong></a>(...)</dt><dd><tt><a href="#SBHandConfiguration-removeMotion">removeMotion</a>(&nbsp;(<a href="#SBHandConfiguration">SBHandConfiguration</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Remove&nbsp;the&nbsp;motion&nbsp;from&nbsp;the&nbsp;configuration</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 24</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBHandConfiguration-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBHandConfigurationManager">class <strong>SBHandConfigurationManager</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBHandConfigurationManager">SBHandConfigurationManager</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBHandConfigurationManager-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBHandConfigurationManager-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBHandConfigurationManager-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBHandConfigurationManager-createHandConfiguration"><strong>createHandConfiguration</strong></a>(...)</dt><dd><tt><a href="#SBHandConfigurationManager-createHandConfiguration">createHandConfiguration</a>(&nbsp;(<a href="#SBHandConfigurationManager">SBHandConfigurationManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBHandConfiguration">SBHandConfiguration</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Create&nbsp;a&nbsp;hand&nbsp;configuration.</tt></dd></dl>
+
+<dl><dt><a name="SBHandConfigurationManager-getNumHandConfiguration"><strong>getNumHandConfiguration</strong></a>(...)</dt><dd><tt><a href="#SBHandConfigurationManager-getNumHandConfiguration">getNumHandConfiguration</a>(&nbsp;(<a href="#SBHandConfigurationManager">SBHandConfigurationManager</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;the&nbsp;number&nbsp;of&nbsp;hand&nbsp;configuration</tt></dd></dl>
+
+<dl><dt><a name="SBHandConfigurationManager-printHandConfiguration"><strong>printHandConfiguration</strong></a>(...)</dt><dd><tt><a href="#SBHandConfigurationManager-printHandConfiguration">printHandConfiguration</a>(&nbsp;(<a href="#SBHandConfigurationManager">SBHandConfigurationManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;the&nbsp;hand&nbsp;configuration.</tt></dd></dl>
+
+<dl><dt><a name="SBHandConfigurationManager-removeHandConfiguration"><strong>removeHandConfiguration</strong></a>(...)</dt><dd><tt><a href="#SBHandConfigurationManager-removeHandConfiguration">removeHandConfiguration</a>(&nbsp;(<a href="#SBHandConfigurationManager">SBHandConfigurationManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Remove&nbsp;a&nbsp;hand&nbsp;configuration</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 24</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBHandConfigurationManager-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="SBJoint">class <strong>SBJoint</strong></a>(<a href="SmartBody.html#SBObject">SBObject</a>)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
@@ -4850,6 +5304,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBJoint-getIndex"><strong>getIndex</strong></a>(...)</dt><dd><tt><a href="#SBJoint-getIndex">getIndex</a>(&nbsp;(<a href="#SBJoint">SBJoint</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;index&nbsp;of&nbsp;the&nbsp;joint&nbsp;in&nbsp;current&nbsp;skeleton.</tt></dd></dl>
+
+<dl><dt><a name="SBJoint-getJointType"><strong>getJointType</strong></a>(...)</dt><dd><tt><a href="#SBJoint-getJointType">getJointType</a>(&nbsp;(<a href="#SBJoint">SBJoint</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;type&nbsp;of&nbsp;the&nbsp;joint.</tt></dd></dl>
 
 <dl><dt><a name="SBJoint-getMass"><strong>getMass</strong></a>(...)</dt><dd><tt><a href="#SBJoint-getMass">getMass</a>(&nbsp;(<a href="#SBJoint">SBJoint</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;mass&nbsp;of&nbsp;the&nbsp;joint.</tt></dd></dl>
@@ -5073,7 +5530,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 316</dl>
+<dl><dt><strong>__instance_size__</strong> = 332</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -5164,7 +5621,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 720</dl>
+<dl><dt><strong>__instance_size__</strong> = 752</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -5284,6 +5741,12 @@ Methods defined here:<br>
 <dl><dt><a name="SBMotion-addMetaData"><strong>addMetaData</strong></a>(...)</dt><dd><tt><a href="#SBMotion-addMetaData">addMetaData</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Add&nbsp;a&nbsp;tagged&nbsp;metadata&nbsp;as&nbsp;string&nbsp;to&nbsp;the&nbsp;motion.</tt></dd></dl>
 
+<dl><dt><a name="SBMotion-addSimilarPose"><strong>addSimilarPose</strong></a>(...)</dt><dd><tt><a href="#SBMotion-addSimilarPose">addSimilarPose</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Marks&nbsp;another&nbsp;motion&nbsp;as&nbsp;being&nbsp;similar&nbsp;to&nbsp;this&nbsp;motion.&nbsp;This&nbsp;will&nbsp;be&nbsp;used&nbsp;by&nbsp;the&nbsp;gesture&nbsp;system&nbsp;to&nbsp;retarget&nbsp;gestures&nbsp;from&nbsp;one&nbsp;poses&nbsp;to&nbsp;a&nbsp;similar&nbsp;one.</tt></dd></dl>
+
+<dl><dt><a name="SBMotion-addTemporalRotationOffset"><strong>addTemporalRotationOffset</strong></a>(...)</dt><dd><tt><a href="#SBMotion-addTemporalRotationOffset">addTemporalRotationOffset</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg4)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Add&nbsp;a&nbsp;rotation&nbsp;offset&nbsp;on&nbsp;a&nbsp;joint.</tt></dd></dl>
+
 <dl><dt><a name="SBMotion-alignToBegin"><strong>alignToBegin</strong></a>(...)</dt><dd><tt><a href="#SBMotion-alignToBegin">alignToBegin</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Cut&nbsp;the&nbsp;last&nbsp;x&nbsp;number&nbsp;of&nbsp;frames&nbsp;and&nbsp;stitch&nbsp;them&nbsp;to&nbsp;the&nbsp;begin.&nbsp;x&nbsp;is&nbsp;the&nbsp;input&nbsp;number</tt></dd></dl>
 
@@ -5393,8 +5856,11 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;NULL&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;number&nbsp;of&nbsp;frames&nbsp;in&nbsp;the&nbsp;motion</tt></dd></dl>
 
-<dl><dt><a name="SBMotion-getOffset"><strong>getOffset</strong></a>(...)</dt><dd><tt><a href="#SBMotion-getOffset">getOffset</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
+<dl><dt><a name="SBMotion-getOffset"><strong>getOffset</strong></a>(...)</dt><dd><tt><a href="#SBMotion-getOffset">getOffset</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Offset&nbsp;the&nbsp;current&nbsp;motion&nbsp;to&nbsp;input&nbsp;base&nbsp;motion.</tt></dd></dl>
+
+<dl><dt><a name="SBMotion-getSimilarPoses"><strong>getSimilarPoses</strong></a>(...)</dt><dd><tt><a href="#SBMotion-getSimilarPoses">getSimilarPoses</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Retrieves&nbsp;all&nbsp;the&nbsp;similar&nbsp;pose.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-getTimeReady"><strong>getTimeReady</strong></a>(...)</dt><dd><tt><a href="#SBMotion-getTimeReady">getTimeReady</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;ready&nbsp;time&nbsp;of&nbsp;the&nbsp;motion.</tt></dd></dl>
@@ -5438,11 +5904,17 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Remove&nbsp;all&nbsp;the&nbsp;motion&nbsp;channels&nbsp;corresponding&nbsp;to&nbsp;the&nbsp;descendents&nbsp;of&nbsp;end&nbsp;joints.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;:&nbsp;skeleton&nbsp;name,&nbsp;end&nbsp;joint&nbsp;names</tt></dd></dl>
 
+<dl><dt><a name="SBMotion-removeSimilarPose"><strong>removeSimilarPose</strong></a>(...)</dt><dd><tt><a href="#SBMotion-removeSimilarPose">removeSimilarPose</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;a&nbsp;pose&nbsp;as&nbsp;being&nbsp;similar&nbsp;to&nbsp;this&nbsp;motion.&nbsp;This&nbsp;will&nbsp;be&nbsp;used&nbsp;by&nbsp;the&nbsp;gesture&nbsp;system&nbsp;to&nbsp;retarget&nbsp;gestures&nbsp;from&nbsp;one&nbsp;poses&nbsp;to&nbsp;a&nbsp;similar&nbsp;one.</tt></dd></dl>
+
 <dl><dt><a name="SBMotion-retarget"><strong>retarget</strong></a>(...)</dt><dd><tt><a href="#SBMotion-retarget">retarget</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(str)arg4,&nbsp;(<a href="#StringVec">StringVec</a>)arg5,&nbsp;(<a href="#StringVec">StringVec</a>)arg6,&nbsp;(<a href="#VecMap">VecMap</a>)arg7)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Retarget&nbsp;the&nbsp;motion&nbsp;to&nbsp;a&nbsp;different&nbsp;skeleton.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-rotate"><strong>rotate</strong></a>(...)</dt><dd><tt><a href="#SBMotion-rotate">rotate</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(float)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(str)arg5)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Rotates&nbsp;the&nbsp;base&nbsp;joint&nbsp;name&nbsp;by&nbsp;x,y,z&nbsp;axis.</tt></dd></dl>
+
+<dl><dt><a name="SBMotion-saveToBVH"><strong>saveToBVH</strong></a>(...)</dt><dd><tt><a href="#SBMotion-saveToBVH">saveToBVH</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;file&nbsp;in&nbsp;.bvh&nbsp;format&nbsp;to&nbsp;a&nbsp;given&nbsp;file&nbsp;name&nbsp;and&nbsp;skeleton&nbsp;name.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-saveToSkm"><strong>saveToSkm</strong></a>(...)</dt><dd><tt><a href="#SBMotion-saveToSkm">saveToSkm</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Saves&nbsp;the&nbsp;file&nbsp;in&nbsp;.skm&nbsp;format&nbsp;to&nbsp;a&nbsp;given&nbsp;file&nbsp;name.</tt></dd></dl>
@@ -5474,9 +5946,12 @@ Methods defined here:<br>
 <dl><dt><a name="SBMotion-trim"><strong>trim</strong></a>(...)</dt><dd><tt><a href="#SBMotion-trim">trim</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(int)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Trims&nbsp;the&nbsp;starting&nbsp;and&nbsp;ending&nbsp;frames&nbsp;in&nbsp;the&nbsp;motion.</tt></dd></dl>
 
+<dl><dt><a name="SBMotion-unrollPrerotation"><strong>unrollPrerotation</strong></a>(...)</dt><dd><tt><a href="#SBMotion-unrollPrerotation">unrollPrerotation</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Remove&nbsp;pre-rotation&nbsp;from&nbsp;joints.</tt></dd></dl>
+
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 792</dl>
+<dl><dt><strong>__instance_size__</strong> = 824</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -5619,7 +6094,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 760</dl>
+<dl><dt><strong>__instance_size__</strong> = 776</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlend</a>:<br>
@@ -5636,6 +6111,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 &nbsp;&nbsp;&nbsp;&nbsp;add&nbsp;the&nbsp;key&nbsp;time&nbsp;tag&nbsp;for&nbsp;motion&nbsp;analysis.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input&nbsp;:&nbsp;motion&nbsp;name,&nbsp;tag&nbsp;type,&nbsp;tag&nbsp;name,&nbsp;value.&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output&nbsp;:&nbsp;NULL</tt></dd></dl>
+
+<dl><dt><a name="SBMotionBlendBase-backupMotionKey"><strong>backupMotionKey</strong></a>(...)</dt><dd><tt><a href="#SBMotionBlendBase-backupMotionKey">backupMotionKey</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;backup&nbsp;the&nbsp;motion&nbsp;keys</tt></dd></dl>
 
 <dl><dt><a name="SBMotionBlendBase-buildMotionAnalysis"><strong>buildMotionAnalysis</strong></a>(...)</dt><dd><tt><a href="#SBMotionBlendBase-buildMotionAnalysis">buildMotionAnalysis</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(<a href="#StringVec">StringVec</a>)arg4,&nbsp;(str)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;build&nbsp;the&nbsp;motion&nbsp;analysis&nbsp;structure&nbsp;<br>
@@ -5683,6 +6161,11 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
 
+<dl><dt><a name="SBMotionBlendBase-getMotionObject"><strong>getMotionObject</strong></a>(...)</dt><dd><tt><a href="#SBMotionBlendBase-getMotionObject">getMotionObject</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;<a href="#SBMotion">SBMotion</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;the&nbsp;motion&nbsp;name&nbsp;given&nbsp;index.&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;index&nbsp;of&nbsp;motion&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;motion&nbsp;name</tt></dd></dl>
+
 <dl><dt><a name="SBMotionBlendBase-getNumCorrespondancePoints"><strong>getNumCorrespondancePoints</strong></a>(...)</dt><dd><tt><a href="#SBMotionBlendBase-getNumCorrespondancePoints">getNumCorrespondancePoints</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;correspondence&nbsp;points&nbsp;for&nbsp;the&nbsp;motions&nbsp;in&nbsp;the&nbsp;blend</tt></dd></dl>
 
@@ -5694,6 +6177,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 
 <dl><dt><a name="SBMotionBlendBase-getNumMotions"><strong>getNumMotions</strong></a>(...)</dt><dd><tt><a href="#SBMotionBlendBase-getNumMotions">getNumMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Number&nbsp;of&nbsp;motions&nbsp;inside&nbsp;the&nbsp;blend.</tt></dd></dl>
+
+<dl><dt><a name="SBMotionBlendBase-offsetMotion"><strong>offsetMotion</strong></a>(...)</dt><dd><tt><a href="#SBMotionBlendBase-offsetMotion">offsetMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(int)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;offset&nbsp;motion&nbsp;x&nbsp;from&nbsp;the&nbsp;blend&nbsp;using&nbsp;motion&nbsp;time&nbsp;t</tt></dd></dl>
 
 <dl><dt><a name="SBMotionBlendBase-plotMotion"><strong>plotMotion</strong></a>(...)</dt><dd><tt><a href="#SBMotionBlendBase-plotMotion">plotMotion</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(object)arg4,&nbsp;(object)arg5,&nbsp;(object)arg6)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Plot&nbsp;motion&nbsp;frames&nbsp;with&nbsp;stick&nbsp;skeleton.&nbsp;<br>
@@ -5724,6 +6210,9 @@ Methods inherited from <a href="SmartBody.html#SBAnimationBlend">SBAnimationBlen
 
 <dl><dt><a name="SBMotionBlendBase-setIncrementWorldOffsetY"><strong>setIncrementWorldOffsetY</strong></a>(...)</dt><dd><tt><a href="#SBMotionBlendBase-setIncrementWorldOffsetY">setIncrementWorldOffsetY</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Boolean&nbsp;flag&nbsp;that&nbsp;increment&nbsp;world&nbsp;offset&nbsp;y-axis&nbsp;value&nbsp;according&nbsp;to&nbsp;the&nbsp;base&nbsp;joint&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMotionBlendBase-unoffsetMotions"><strong>unoffsetMotions</strong></a>(...)</dt><dd><tt><a href="#SBMotionBlendBase-unoffsetMotions">unoffsetMotions</a>(&nbsp;(<a href="#SBAnimationBlend">SBAnimationBlend</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;un-offset&nbsp;motions&nbsp;for&nbsp;the&nbsp;blend</tt></dd></dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -5991,6 +6480,175 @@ Data and other attributes inherited from Boost.Python.instance:<br>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBNewLocomotion">class <strong>SBNewLocomotion</strong></a>(<a href="SmartBody.html#SBController">SBController</a>, <a href="SmartBody.html#SBObject">SBObject</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBNewLocomotion">SBNewLocomotion</a></dd>
+<dd><a href="SmartBody.html#SBController">SBController</a></dd>
+<dd><a href="SmartBody.html#SBObject">SBObject</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBNewLocomotion-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None<br>
+&nbsp;<br>
+<a href="#SBNewLocomotion-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBNewLocomotion-loopMotion"><strong>loopMotion</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-loopMotion">loopMotion</a>(&nbsp;(<a href="#SBNewLocomotion">SBNewLocomotion</a>)arg1,&nbsp;(float)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Checks&nbsp;a&nbsp;loop</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-reset"><strong>reset</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-reset">reset</a>(&nbsp;(<a href="#SBNewLocomotion">SBNewLocomotion</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Resets.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setDesiredHeading"><strong>setDesiredHeading</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setDesiredHeading">setDesiredHeading</a>(&nbsp;(<a href="#SBNewLocomotion">SBNewLocomotion</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;desired&nbsp;heading</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 1584</dl>
+
+<hr>
+Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
+<dl><dt><a name="SBNewLocomotion-addChannel"><strong>addChannel</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-addChannel">addChannel</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;channel&nbsp;to&nbsp;this&nbsp;controller's&nbsp;context.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-getChannelPos"><strong>getChannelPos</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getChannelPos">getChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-getChannelQuat"><strong>getChannelQuat</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getChannelQuat">getChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrQuat">SrQuat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-getChannelValue"><strong>getChannelValue</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getChannelValue">getChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-getDuration"><strong>getDuration</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getDuration">getDuration</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;controller's&nbsp;duration.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getName">getName</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;for&nbsp;this&nbsp;controller.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-getType"><strong>getType</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getType">getType</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;type&nbsp;for&nbsp;this&nbsp;controller.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-isDebug"><strong>isDebug</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-isDebug">isDebug</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Is&nbsp;the&nbsp;controller&nbsp;in&nbsp;a&nbsp;debug&nbsp;state?</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-isIgnore"><strong>isIgnore</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-isIgnore">isIgnore</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Will&nbsp;the&nbsp;controller&nbsp;be&nbsp;ignored&nbsp;during&nbsp;evaluation.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setChannelPos"><strong>setChannelPos</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setChannelPos">setChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrVec">SrVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setChannelQuat"><strong>setChannelQuat</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setChannelQuat">setChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setChannelQuatGlobal"><strong>setChannelQuatGlobal</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setChannelQuatGlobal">setChannelQuatGlobal</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setChannelValue"><strong>setChannelValue</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setChannelValue">setChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setDebug"><strong>setDebug</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setDebug">setDebug</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;debug&nbsp;state&nbsp;for&nbsp;this&nbsp;controller.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setIgnore"><strong>setIgnore</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setIgnore">setIgnore</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Ignore&nbsp;this&nbsp;controller&nbsp;when&nbsp;evaluating&nbsp;controller&nbsp;tree.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setName"><strong>setName</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setName">setName</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;name&nbsp;for&nbsp;the&nbsp;controller.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
+<dl><dt><a name="SBNewLocomotion-clearAttributes"><strong>clearAttributes</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-clearAttributes">clearAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Clear&nbsp;all&nbsp;the&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-createActionAttribute"><strong>createActionAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-createActionAttribute">createActionAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3,&nbsp;(str)arg4,&nbsp;(int)arg5,&nbsp;(object)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(str)arg9)&nbsp;-&gt;&nbsp;<a href="#ActionAttribute">ActionAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;action&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-createBoolAttribute"><strong>createBoolAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-createBoolAttribute">createBoolAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#BoolAttribute">BoolAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;boolean&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-createDoubleAttribute"><strong>createDoubleAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-createDoubleAttribute">createDoubleAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#DoubleAttribute">DoubleAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;double&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-createIntAttribute"><strong>createIntAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-createIntAttribute">createIntAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#IntAttribute">IntAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;an&nbsp;integer&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-createStringAttribute"><strong>createStringAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-createStringAttribute">createStringAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(object)arg4,&nbsp;(str)arg5,&nbsp;(int)arg6,&nbsp;(object)arg7,&nbsp;(object)arg8,&nbsp;(object)arg9,&nbsp;(str)arg10)&nbsp;-&gt;&nbsp;<a href="#StringAttribute">StringAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;string&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-createVec3Attribute"><strong>createVec3Attribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-createVec3Attribute">createVec3Attribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5,&nbsp;(object)arg6,&nbsp;(str)arg7,&nbsp;(int)arg8,&nbsp;(object)arg9,&nbsp;(object)arg10,&nbsp;(object)arg11,&nbsp;(str)arg12)&nbsp;-&gt;&nbsp;<a href="#Vec3Attribute">Vec3Attribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;vec3&nbsp;attribute.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-getAttribute"><strong>getAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getAttribute">getAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBAttribute">SBAttribute</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;an&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-getAttributeNames"><strong>getAttributeNames</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getAttributeNames">getAttributeNames</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setActionAttribute"><strong>setActionAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setActionAttribute">setActionAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setBool"><strong>setBool</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setBool">setBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setBoolAttribute"><strong>setBoolAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setBoolAttribute">setBoolAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(object)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setDouble"><strong>setDouble</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setDouble">setDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setDoubleAttribute"><strong>setDoubleAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setDoubleAttribute">setDoubleAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setInt"><strong>setInt</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setInt">setInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setIntAttribute"><strong>setIntAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setIntAttribute">setIntAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setMatrix"><strong>setMatrix</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setMatrix">setMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrMat">SrMat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setMatrixAttribute"><strong>setMatrixAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setMatrixAttribute">setMatrixAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrMat">SrMat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setString"><strong>setString</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setString">setString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setStringAttribute"><strong>setStringAttribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setStringAttribute">setStringAttribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setVec3"><strong>setVec3</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setVec3">setVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;vector&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-setVec3Attribute"><strong>setVec3Attribute</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setVec3Attribute">setVec3Attribute</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;vector&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBNewLocomotion-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="SBObject">class <strong>SBObject</strong></a>(Boost.Python.instance)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
@@ -6247,6 +6905,9 @@ Methods defined here:<br>
 <dl><dt><a name="SBPawn-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBPawn-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
 
 <dl><dt><a name="SBPawn-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBPawn-getBoundingBox"><strong>getBoundingBox</strong></a>(...)</dt><dd><tt><a href="#SBPawn-getBoundingBox">getBoundingBox</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SrBox">SrBox</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;boundary&nbsp;dimensions&nbsp;of&nbsp;the&nbsp;character.</tt></dd></dl>
 
 <dl><dt><a name="SBPawn-getHPR"><strong>getHPR</strong></a>(...)</dt><dd><tt><a href="#SBPawn-getHPR">getHPR</a>(&nbsp;(<a href="#SBPawn">SBPawn</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;heading,&nbsp;pitch&nbsp;and&nbsp;roll&nbsp;of&nbsp;the&nbsp;character's&nbsp;world&nbsp;offset.</tt></dd></dl>
@@ -6598,7 +7259,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 120</dl>
+<dl><dt><strong>__instance_size__</strong> = 168</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -6631,10 +7292,13 @@ Methods defined here:<br>
 <dl><dt><a name="SBReachManager-createReach"><strong>createReach</strong></a>(...)</dt><dd><tt><a href="#SBReachManager-createReach">createReach</a>(&nbsp;(<a href="#SBReachManager">SBReachManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBReach">SBReach</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;reach&nbsp;engine&nbsp;for&nbsp;a&nbsp;character.</tt></dd></dl>
 
+<dl><dt><a name="SBReachManager-createReachWithTag"><strong>createReachWithTag</strong></a>(...)</dt><dd><tt><a href="#SBReachManager-createReachWithTag">createReachWithTag</a>(&nbsp;(<a href="#SBReachManager">SBReachManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;<a href="#SBReach">SBReach</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Creates&nbsp;a&nbsp;reach&nbsp;engine&nbsp;for&nbsp;a&nbsp;character&nbsp;with&nbsp;specified&nbsp;tag.</tt></dd></dl>
+
 <dl><dt><a name="SBReachManager-getNumReaches"><strong>getNumReaches</strong></a>(...)</dt><dd><tt><a href="#SBReachManager-getNumReaches">getNumReaches</a>(&nbsp;(<a href="#SBReachManager">SBReachManager</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;reach&nbsp;engines&nbsp;present.</tt></dd></dl>
 
-<dl><dt><a name="SBReachManager-getReach"><strong>getReach</strong></a>(...)</dt><dd><tt><a href="#SBReachManager-getReach">getReach</a>(&nbsp;(<a href="#SBReachManager">SBReachManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBReach">SBReach</a>&nbsp;:<br>
+<dl><dt><a name="SBReachManager-getReach"><strong>getReach</strong></a>(...)</dt><dd><tt><a href="#SBReachManager-getReach">getReach</a>(&nbsp;(<a href="#SBReachManager">SBReachManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;<a href="#SBReach">SBReach</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;a&nbsp;reach&nbsp;engine&nbsp;for&nbsp;a&nbsp;given&nbsp;character.</tt></dd></dl>
 
 <dl><dt><a name="SBReachManager-removeReach"><strong>removeReach</strong></a>(...)</dt><dd><tt><a href="#SBReachManager-removeReach">removeReach</a>(&nbsp;(<a href="#SBReachManager">SBReachManager</a>)arg1,&nbsp;(<a href="#SBReach">SBReach</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
@@ -6892,8 +7556,14 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Input:&nbsp;NULL&nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Output:&nbsp;list&nbsp;of&nbsp;face&nbsp;definition&nbsp;names.</tt></dd></dl>
 
+<dl><dt><a name="SBScene-getFaceShiftManager"><strong>getFaceShiftManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getFaceShiftManager">getFaceShiftManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBFaceShiftManager">SBFaceShiftManager</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;FaceShift&nbsp;manager.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-getGestureMapManager"><strong>getGestureMapManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getGestureMapManager">getGestureMapManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBGestureMapManager">SBGestureMapManager</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;gesture&nbsp;map&nbsp;manager&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBScene-getHandConfigurationManager"><strong>getHandConfigurationManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getHandConfigurationManager">getHandConfigurationManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBHandConfigurationManager">SBHandConfigurationManager</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;hand&nbsp;configuration&nbsp;manager.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getJointMapManager"><strong>getJointMapManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getJointMapManager">getJointMapManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBJointMapManager">SBJointMapManager</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;joint&nbsp;mapping&nbsp;manager&nbsp;object.</tt></dd></dl>
@@ -7134,7 +7804,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 576</dl>
+<dl><dt><strong>__instance_size__</strong> = 620</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -7245,6 +7915,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBSceneListener-OnCharacterUpdate"><strong>OnCharacterUpdate</strong></a>(...)</dt><dd><tt><a href="#SBSceneListener-OnCharacterUpdate">OnCharacterUpdate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;character&nbsp;is&nbsp;updated.</tt></dd></dl>
+
+<dl><dt><a name="SBSceneListener-OnEvent"><strong>OnEvent</strong></a>(...)</dt><dd><tt><a href="#SBSceneListener-OnEvent">OnEvent</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;an&nbsp;event&nbsp;occurs.</tt></dd></dl>
 
 <dl><dt><a name="SBSceneListener-OnPawnCreate"><strong>OnPawnCreate</strong></a>(...)</dt><dd><tt><a href="#SBSceneListener-OnPawnCreate">OnPawnCreate</a>(&nbsp;(<a href="#CharacterListener">CharacterListener</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Triggered&nbsp;when&nbsp;a&nbsp;pawn&nbsp;is&nbsp;created.</tt></dd></dl>
@@ -7497,6 +8170,86 @@ Data and other attributes inherited from Boost.Python.instance:<br>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBSetDrivenKeyNode">class <strong>SBSetDrivenKeyNode</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBSetDrivenKeyNode">SBSetDrivenKeyNode</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBSetDrivenKeyNode-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBSetDrivenKeyNode-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None<br>
+&nbsp;<br>
+<a href="#SBSetDrivenKeyNode-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBSetDrivenKeyNode-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBSetDrivenKeyNode-getValue"><strong>getValue</strong></a>(...)</dt><dd><tt><a href="#SBSetDrivenKeyNode-getValue">getValue</a>(&nbsp;(<a href="#SBSetDrivenKeyNode">SBSetDrivenKeyNode</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;based&nbsp;on&nbsp;the&nbsp;input.</tt></dd></dl>
+
+<dl><dt><a name="SBSetDrivenKeyNode-setRange"><strong>setRange</strong></a>(...)</dt><dd><tt><a href="#SBSetDrivenKeyNode-setRange">setRange</a>(&nbsp;(<a href="#SBSetDrivenKeyNode">SBSetDrivenKeyNode</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;range&nbsp;of&nbsp;this&nbsp;linear&nbsp;mapping.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 16</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBSetDrivenKeyNode-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBSetDrivenKeySequenceNode">class <strong>SBSetDrivenKeySequenceNode</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBSetDrivenKeySequenceNode">SBSetDrivenKeySequenceNode</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBSetDrivenKeySequenceNode-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBSetDrivenKeySequenceNode-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None<br>
+&nbsp;<br>
+<a href="#SBSetDrivenKeySequenceNode-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBSetDrivenKeySequenceNode-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBSetDrivenKeySequenceNode-getValue"><strong>getValue</strong></a>(...)</dt><dd><tt><a href="#SBSetDrivenKeySequenceNode-getValue">getValue</a>(&nbsp;(<a href="#SBSetDrivenKeySequenceNode">SBSetDrivenKeySequenceNode</a>)arg1,&nbsp;(float)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;based&nbsp;on&nbsp;the&nbsp;input.</tt></dd></dl>
+
+<dl><dt><a name="SBSetDrivenKeySequenceNode-setRange"><strong>setRange</strong></a>(...)</dt><dd><tt><a href="#SBSetDrivenKeySequenceNode-setRange">setRange</a>(&nbsp;(<a href="#SBSetDrivenKeySequenceNode">SBSetDrivenKeySequenceNode</a>)arg1,&nbsp;(float)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;range&nbsp;of&nbsp;this&nbsp;linear&nbsp;mapping.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 24</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBSetDrivenKeySequenceNode-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#000000" face="helvetica, arial"><a name="SBSimulationManager">class <strong>SBSimulationManager</strong></a>(Boost.Python.instance)</font></td></tr>
     
 <tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
@@ -7618,11 +8371,17 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBSkeleton-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
 
+<dl><dt><a name="SBSkeleton-createChannel"><strong>createChannel</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-createChannel">createChannel</a>(&nbsp;(<a href="#SBSkeleton">SBSkeleton</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBJoint">SBJoint</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;channel&nbsp;to&nbsp;the&nbsp;skeleton.&nbsp;First&nbsp;parameter&nbsp;is&nbsp;the&nbsp;joint,&nbsp;second&nbsp;is&nbsp;the&nbsp;channels&nbsp;parent&nbsp;(null&nbsp;for&nbsp;root).</tt></dd></dl>
+
 <dl><dt><a name="SBSkeleton-createJoint"><strong>createJoint</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-createJoint">createJoint</a>(&nbsp;(<a href="#SBSkeleton">SBSkeleton</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SBJoint">SBJoint</a>)arg3)&nbsp;-&gt;&nbsp;<a href="#SBJoint">SBJoint</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;joint&nbsp;to&nbsp;the&nbsp;skeleton.&nbsp;First&nbsp;parameter&nbsp;is&nbsp;the&nbsp;joint,&nbsp;second&nbsp;is&nbsp;the&nbsp;joints&nbsp;parent&nbsp;(null&nbsp;for&nbsp;root).</tt></dd></dl>
 
 <dl><dt><a name="SBSkeleton-createSkelWithoutPreRot"><strong>createSkelWithoutPreRot</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-createSkelWithoutPreRot">createSkelWithoutPreRot</a>(&nbsp;(<a href="#SBSkeleton">SBSkeleton</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SBSkeleton">SBSkeleton</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Create&nbsp;a&nbsp;new&nbsp;standard&nbsp;T-pose&nbsp;skel&nbsp;from&nbsp;source&nbsp;but&nbsp;without&nbsp;pre-rotations</tt></dd></dl>
+
+<dl><dt><a name="SBSkeleton-createStaticJoint"><strong>createStaticJoint</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-createStaticJoint">createStaticJoint</a>(&nbsp;(<a href="#SBSkeleton">SBSkeleton</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SBJoint">SBJoint</a>)arg3)&nbsp;-&gt;&nbsp;<a href="#SBJoint">SBJoint</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;joint&nbsp;to&nbsp;the&nbsp;skeleton.&nbsp;First&nbsp;parameter&nbsp;is&nbsp;the&nbsp;joint,&nbsp;second&nbsp;is&nbsp;the&nbsp;joints&nbsp;parent&nbsp;(null&nbsp;for&nbsp;root).</tt></dd></dl>
 
 <dl><dt><a name="SBSkeleton-getChannelSize"><strong>getChannelSize</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-getChannelSize">getChannelSize</a>(&nbsp;(<a href="#SBSkeleton">SBSkeleton</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;size&nbsp;of&nbsp;the&nbsp;channel&nbsp;given&nbsp;index.</tt></dd></dl>
@@ -7671,7 +8430,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 416</dl>
+<dl><dt><strong>__instance_size__</strong> = 444</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -8162,10 +8921,22 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 840</dl>
+<dl><dt><strong>__instance_size__</strong> = 848</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<br>
+<dl><dt><a name="SchedulerController-addChannel"><strong>addChannel</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-addChannel">addChannel</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;channel&nbsp;to&nbsp;this&nbsp;controller's&nbsp;context.</tt></dd></dl>
+
+<dl><dt><a name="SchedulerController-getChannelPos"><strong>getChannelPos</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-getChannelPos">getChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SchedulerController-getChannelQuat"><strong>getChannelQuat</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-getChannelQuat">getChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrQuat">SrQuat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SchedulerController-getChannelValue"><strong>getChannelValue</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-getChannelValue">getChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
+
 <dl><dt><a name="SchedulerController-getDuration"><strong>getDuration</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-getDuration">getDuration</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;controller's&nbsp;duration.</tt></dd></dl>
 
@@ -8180,6 +8951,18 @@ Methods inherited from <a href="SmartBody.html#SBController">SBController</a>:<b
 
 <dl><dt><a name="SchedulerController-isIgnore"><strong>isIgnore</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-isIgnore">isIgnore</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Will&nbsp;the&nbsp;controller&nbsp;be&nbsp;ignored&nbsp;during&nbsp;evaluation.</tt></dd></dl>
+
+<dl><dt><a name="SchedulerController-setChannelPos"><strong>setChannelPos</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-setChannelPos">setChannelPos</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrVec">SrVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;translation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SchedulerController-setChannelQuat"><strong>setChannelQuat</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-setChannelQuat">setChannelQuat</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SchedulerController-setChannelQuatGlobal"><strong>setChannelQuatGlobal</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-setChannelQuatGlobal">setChannelQuatGlobal</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;rotation&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SchedulerController-setChannelValue"><strong>setChannelValue</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-setChannelValue">setChannelValue</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(str)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;channel's&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SchedulerController-setDebug"><strong>setDebug</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-setDebug">setDebug</a>(&nbsp;(<a href="#SBController">SBController</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;debug&nbsp;state&nbsp;for&nbsp;this&nbsp;controller.</tt></dd></dl>
