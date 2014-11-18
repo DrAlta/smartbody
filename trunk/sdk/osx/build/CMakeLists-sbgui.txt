@@ -122,6 +122,8 @@ set( SBM_FLTK_SRC
 	./bmlcreator/BMLSpeechObject.cpp
 	./bmlcreator/BMLSaccadeObject.cpp
 	./bmlcreator/BMLStateObject.cpp
+	./bmlcreator/BMLHandObject.cpp
+	./bmlcreator/BMLNoiseObject.cpp
 
 	./resourceViewer/Fl_Tree_Horizontal.cpp
 	./resourceViewer/TreeItemInfoWidget.cpp
@@ -140,6 +142,7 @@ set( SBM_FLTK_SRC
 	./retargetcreator/RetargetCreatorWindow.cpp
 	./autorig/SBAutoRigManager.cpp
 	./autorig/VoxelizerWindow.cpp
+	./autorig/AutoRigViewer.cpp
 
 	./monitorviewer/MonitorConnectWindow.cpp 
 	./motioneditor/MotionEditorWindow.cpp
@@ -147,12 +150,15 @@ set( SBM_FLTK_SRC
 	./jointmapviewer/RetargetStepWindow.cpp
 
 	./faceviewer/FaceViewer.cpp
+	./faceshiftviewer/FaceShiftViewer.cpp
 	./FLTKListener.cpp
 	./SBGUIManager.cpp
 	
 	./flu/Flu_Button.cpp
 	./flu/Flu_Collapsable_Group.cpp
 	./flu/FluSimpleString.cpp
+
+	./pythonbind/SBPythonAutorig.cpp
 )
 
 add_executable( sbgui
