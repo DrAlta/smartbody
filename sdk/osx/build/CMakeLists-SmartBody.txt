@@ -278,6 +278,7 @@ set( SMARTBODY_LIB_SR_SRC
         ./sr/sr_vec2.cpp
         ./sr/sr_vec.cpp
         ./sr/sr_viewer.cpp
+	./sr/jpge.cpp
         ./sr/planner/sk_blend_cfg.cpp
         ./sr/planner/sk_pos_planner.cpp
         ./sr/planner/sk_blend_cfg_manager.cpp

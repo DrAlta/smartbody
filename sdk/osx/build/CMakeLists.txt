@@ -3,7 +3,7 @@ project( SmartBody )
 SET(CMAKE_SYSTEM_NAME Darwin)
 
 set( CMAKE_INSTALL_PREFIX "../" )
-set( CMAKE_OSX_DEPLOYMENT_TARGET "10.6" )
+#set( CMAKE_OSX_DEPLOYMENT_TARGET "10.9" )
 #debug
 #add_definitions(	-g3 -fPIC )
 #release
@@ -16,7 +16,7 @@ include_directories(
 )
 
 LINK_DIRECTORIES(
-	/usr/lib
+	${CMAKE_CURRENT_SOURCE_DIR}/lib
 )
 
 add_subdirectory( src )
