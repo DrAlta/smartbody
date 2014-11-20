@@ -4,6 +4,9 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
+#include <sb/SBPawn.h>
+#include <sb/SBCharacter.h>
+#include <controllers/me_controller_tree_root.hpp>
 
 namespace SmartBody {
 
@@ -116,6 +119,127 @@ void SBBoneBusManager::update(double time)
 
 void SBBoneBusManager::afterUpdate(double time)
 {
+#ifndef SB_NO_BONEBUS
+	bool isClosingBoneBus = false;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	const std::vector<std::string>& pawns = scene->getPawnNames();
+	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
+		pawnIter != pawns.end();
+		pawnIter++)
+	{
+		SBPawn* pawn = scene->getPawn((*pawnIter));
+		SBCharacter* character = scene->getCharacter(pawn->getName().c_str() );
+		if (!character)
+		{
+
+			if (pawn->bonebusCharacter && pawn->bonebusCharacter->GetNumErrors() > 3)
+			{
+				// connection is bad, remove the bonebus character 
+				LOG("BoneBus cannot connect to server. Removing pawn %s", pawn->getName().c_str());
+				this->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
+				character->bonebusCharacter = NULL;
+				isClosingBoneBus = true;
+				if (getBoneBus().GetNumCharacters() == 0)
+				{
+					getBoneBus().CloseConnection();
+				}
+			}
+		}
+		else
+		{
+			if( character->bonebusCharacter )
+			{
+				SkChannelArray& channels = character->getSkeleton()->channels();
+				MeFrameData& frameData = character->ct_tree_p->getLastFrame();
+
+				int i = 0;
+				for( int c = character->viseme_channel_start_pos; c < character->viseme_channel_end_pos; c++, i++ )
+				{
+					SkChannel& chan = channels[c];
+					int buffIndex = character->ct_tree_p->toBufferIndex(c);
+
+					if( buffIndex > -1 )	
+					{
+						float value = frameData.buffer()[ buffIndex ];
+						if( value != character->viseme_history_arr[ i ] )
+						{
+							if( character->bonebusCharacter )
+							{
+								character->bonebusCharacter->SetViseme( channels.name(c).c_str(), value, 0 );
+							}
+							character->viseme_history_arr[ i ] = value;
+						}
+					}
+				}
+			}
+			
+			if (character->bonebusCharacter && 
+				character->bonebusCharacter->GetNumErrors() > 3)
+			{
+				// connection is bad, remove the bonebus character
+				isClosingBoneBus = true;
+				LOG("BoneBus cannot connect to server after visemes sent. Removing all characters.");
+			}
+
+			if ( character->getSkeleton() && 
+				 character->bonebusCharacter)
+			{
+				NetworkSendSkeleton( character->bonebusCharacter, character->getSkeleton(), &scene->getGeneralParameters() );
+
+				const SkJoint * joint = character->get_world_offset_joint();
+
+				const SkJointPos * pos = joint->const_pos();
+				float x = pos->value( SkJointPos::X );
+				float y = pos->value( SkJointPos::Y );
+				float z = pos->value( SkJointPos::Z );
+
+				SkJoint::RotType rot_type = joint->rot_type();
+				if ( rot_type != SkJoint::TypeQuat ) {
+					//strstr << "ERROR: Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")"<<endl;
+				}
+
+				// const_cast because the SrQuat does validation (no const version of value())
+				const SrQuat & q = ((SkJoint *)joint)->quat()->value();
+
+				character->bonebusCharacter->SetPosition( x, y, z, scene->getSimulationManager()->getTime() );
+				character->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, scene->getSimulationManager()->getTime() );
+
+				if (character->bonebusCharacter->GetNumErrors() > 3)
+				{
+					// connection is bad, remove the bonebus character 
+					isClosingBoneBus = true;
+					LOG("BoneBus cannot connect to server. Removing all characters");
+				}
+			}
+			else if (!isClosingBoneBus && !character->bonebusCharacter && getBoneBus().IsOpen())
+			{
+				// bonebus was connected after character creation, create it now
+				character->bonebusCharacter = getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
+			}
+
+
+		}
+	}
+
+	if (isClosingBoneBus)
+	{
+		const std::vector<std::string>& pawnNames = scene->getPawnNames();
+		for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
+			iter != pawnNames.end();
+			iter++)
+		{
+			SBPawn* pawn = scene->getPawn(*iter);
+			if (pawn->bonebusCharacter)
+			{
+				getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
+				pawn->bonebusCharacter = NULL;
+			}
+		}
+
+		getBoneBus().CloseConnection();
+	}
+#endif
+
 }
 
 void SBBoneBusManager::stop()
