@@ -698,27 +698,9 @@ void SBScene::update()
 			pawn->updateToSteeringSpaceObject();
 		}
 		SbmCharacter* char_p = getCharacter(pawn->getName().c_str() );
-		if (!char_p)
+
+		if( char_p )
 		{
-#ifndef SB_NO_BONEBUS
-			if (getBoneBusManager()->isEnable())
-			{
-				if (pawn->bonebusCharacter && pawn->bonebusCharacter->GetNumErrors() > 3)
-				{
-					// connection is bad, remove the bonebus character 
-					LOG("BoneBus cannot connect to server. Removing pawn %s", pawn->getName().c_str());
-					getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
-					char_p->bonebusCharacter = NULL;
-					isClosingBoneBus = true;
-					if (getBoneBusManager()->getBoneBus().GetNumCharacters() == 0)
-					{
-						getBoneBusManager()->getBoneBus().CloseConnection();
-					}
-				}
-			}
-#endif
-		}
-		if( char_p ) {
 
 			// run the minibrain, if available
 			SmartBody::MiniBrain* brain = char_p->getMiniBrain();
@@ -743,74 +725,9 @@ void SBScene::update()
 			char_p->forward_visemes( getSimulationManager()->getTime() );	
 			//char_p->forward_parameters( getSimulationManager()->getTime() );	
 
-#ifndef SB_NO_BONEBUS
-			if (char_p->bonebusCharacter && char_p->bonebusCharacter->GetNumErrors() > 3)
-			{
-				// connection is bad, remove the bonebus character
-				isClosingBoneBus = true;
-				LOG("BoneBus cannot connect to server after visemes sent. Removing all characters.");
-			}
 
-
-			if ( getBoneBusManager()->isEnable() && 
-				 char_p->getSkeleton() && 
-				 char_p->bonebusCharacter)
-			{
-				getBoneBusManager()->NetworkSendSkeleton( char_p->bonebusCharacter, char_p->getSkeleton(), &getGeneralParameters() );
-
-				const SkJoint * joint = char_p->get_world_offset_joint();
-
-				const SkJointPos * pos = joint->const_pos();
-				float x = pos->value( SkJointPos::X );
-				float y = pos->value( SkJointPos::Y );
-				float z = pos->value( SkJointPos::Z );
-
-				SkJoint::RotType rot_type = joint->rot_type();
-				if ( rot_type != SkJoint::TypeQuat ) {
-					//strstr << "ERROR: Unsupported world_offset rotation type: " << rot_type << " (Expected TypeQuat, "<<SkJoint::TypeQuat<<")"<<endl;
-				}
-
-				// const_cast because the SrQuat does validation (no const version of value())
-				const SrQuat & q = ((SkJoint *)joint)->quat()->value();
-
-				char_p->bonebusCharacter->SetPosition( x, y, z, getSimulationManager()->getTime() );
-				char_p->bonebusCharacter->SetRotation( (float)q.w, (float)q.x, (float)q.y, (float)q.z, getSimulationManager()->getTime() );
-
-				if (char_p->bonebusCharacter->GetNumErrors() > 3)
-				{
-					// connection is bad, remove the bonebus character 
-					isClosingBoneBus = true;
-					LOG("BoneBus cannot connect to server. Removing all characters");
-				}
-			}
-			else if (!isClosingBoneBus && !char_p->bonebusCharacter && getBoneBusManager()->getBoneBus().IsOpen())
-			{
-				// bonebus was connected after character creation, create it now
-				char_p->bonebusCharacter = getBoneBusManager()->getBoneBus().CreateCharacter( char_p->getName().c_str(), char_p->getClassType().c_str(), true );
-			}
-#endif
 		}  // end of char_p processing
 	} // end of loop
-
-#ifndef SB_NO_BONEBUS
-	if (isClosingBoneBus)
-	{
-		const std::vector<std::string>& pawnNames = getPawnNames();
-		for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
-			iter != pawnNames.end();
-			iter++)
-		{
-			SBPawn* pawn = getPawn(*iter);
-			if (pawn->bonebusCharacter)
-			{
-				getBoneBusManager()->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
-				pawn->bonebusCharacter = NULL;
-			}
-		}
-
-		getBoneBusManager()->getBoneBus().CloseConnection();
-	}
-#endif
 
 	const std::vector<std::string>& pawnNames = getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();

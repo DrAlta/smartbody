@@ -1645,11 +1645,6 @@ int SbmCharacter::prune_controller_tree( )
 	raw_channels = SkChannelArray::empty_channel_array();
 	prune_schedule( this, posture_sched_p, time, posture_sched_p, gaze_key_cts, nod_ct,  motion_ct, pose_ct, raw_channels );
 
-	if( LOG_CONTROLLER_TREE_PRUNING ) {
-		LOG("");
-		print_controller_schedules();
-	}
-
 	delete[] gaze_key_cts;
 
 	return CMD_SUCCESS;
@@ -1984,12 +1979,7 @@ void SbmCharacter::forward_visemes( double curTime )
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::vector<SmartBody::SBSceneListener*>& listeners = scene->getSceneListeners();
 	
-	bool sendVisemes = false;
-#ifndef SB_NO_BONEBUS
-	if (bonebusCharacter)
-		sendVisemes = true;
-#endif
-	if( sendVisemes || listeners.size() )
+	if( listeners.size() )
 	{
 		SkChannelArray& channels = _skeleton->channels();
 		MeFrameData& frameData = ct_tree_p->getLastFrame();
@@ -2003,14 +1993,9 @@ void SbmCharacter::forward_visemes( double curTime )
 			if( buffIndex > -1 )	
 			{
 				float value = frameData.buffer()[ buffIndex ];
-				if( value != viseme_history_arr[ i ] )	{
+				if( value != viseme_history_arr[ i ] )
+				{
 
-#ifndef SB_NO_BONEBUS
-					if( bonebusCharacter )
-					{
-						bonebusCharacter->SetViseme( channels.name(c).c_str(), value, 0 );
-					}
-#endif
 					for (size_t l = 0; l < listeners.size();l++)
 					{
 						listeners[l]->OnViseme( getName(), channels.name(c), value, 0  );
@@ -2124,27 +2109,6 @@ void SbmCharacter::inspect_skeleton_world_transform( SkJoint* joint_p, int depth
 			inspect_skeleton_world_transform( joint_p->child( i ), depth + 1 );
 		}
 	}
-}
-
-int SbmCharacter::print_controller_schedules() {
-	//  Command: print character <character id> schedule
-	//  Print out the current state of the character's schedule
-	LOG("Character %s's schedule:", getName().c_str());
-	LOG("POSTURE Schedule:");
-	posture_sched_p->print_state( 0 );
-	LOG("MOTION Schedule");
-	motion_sched_p->print_state( 0 );
-	LOG("GAZE Schedule:");
-	gaze_sched_p->print_state( 0 );
-	LOG("HEAD Schedule:");
-	head_sched_p->print_state( 0 );
-	LOG("REACH Schedule:");
-	reach_sched_p->print_state( 0 );
-	LOG("Grab Schedule:");
-	grab_sched_p->print_state( 0 );
-	// Print Face?
-
-	return CMD_SUCCESS;
 }
 
 bool SbmCharacter::is_face_controller_enabled() {

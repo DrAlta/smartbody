@@ -138,8 +138,6 @@ protected:
 	int 	viseme_channel_count;
 	std::string _diphoneSetName;
 
-	float	*viseme_history_arr;
-
 	SmartBody::SBFaceDefinition* _faceDefinition;
 
 	bool _isControllerPruning;
@@ -244,6 +242,7 @@ public:
 	MeCtMotionGraph*        motiongraph_ct;
 	MeCtGenericHand*		generic_hand_ct;
 
+	float	*viseme_history_arr;
 	int 	viseme_channel_start_pos;
 	int 	viseme_channel_end_pos;
 
@@ -279,8 +278,6 @@ public:
 	void inspect_skeleton( SkJoint* joint_p, int depth = 0 );
 	void inspect_skeleton_local_transform( SkJoint* joint_p, int depth = 0 );
 	void inspect_skeleton_world_transform( SkJoint* joint_p, int depth = 0 );
-
-	int print_controller_schedules();
 
 	/** Returns true if face controller is active on this character. */
 	bool is_face_controller_enabled();
