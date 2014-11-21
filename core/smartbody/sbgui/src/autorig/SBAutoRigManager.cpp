@@ -32,8 +32,8 @@ bool PolyVoxMeshToPinoMesh( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal
 void exportPolyVoxMeshToObj( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>& mesh, std::string filename );
 void exportCubicMeshToObj( PolyVox::SurfaceMesh<PolyVox::PositionMaterial>& mesh, std::string filename );
 void buildVoxelSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, SkinWeight& skinWeight);
-void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, std::vector<std::map<int,float>>& skinWeight);
-void WeightMapToSkinWeight(std::vector<std::map<int,float>>& weightMap, SkinWeight& skinWeight);
+void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, std::vector<std::map<int,float> >& skinWeight);
+void WeightMapToSkinWeight(std::vector<std::map<int,float> >& weightMap, SkinWeight& skinWeight);
 #endif
 
 class PinoAutoRigCallback : public PinnocchioCallBack
@@ -237,7 +237,7 @@ bool SBAutoRigManager::updateSkinWeightFromCharacterMesh( const std::string& cha
 		sw->bindWeight.clear();
 		sw->jointNameIndex.clear();
 		
-		std::vector<std::map<int,float>> skinWeightMap;
+		std::vector<std::map<int,float> > skinWeightMap;
 		buildBoneGlowSkinWeights(model, *sbSk, *voxelWindow, skinWeightMap);
 		WeightMapToSkinWeight(skinWeightMap,*sw);
 
@@ -436,11 +436,11 @@ bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inMo
 	//buildVoxelSkinWeights(inModel, *sbSk, *voxelWindow, *sw);
 	SrModel voxelSrModel;
 	PolyVoxMeshToSrModel(*voxelMesh, voxelSrModel);
-	std::vector<std::map<int,float>> skinWeightMap;
+	std::vector<std::map<int,float> > skinWeightMap;
 #if 0
 	buildBoneGlowSkinWeights(inModel, *sbSk, *voxelWindow, skinWeightMap);
 #else
-	std::vector<std::map<int,float>> voxelWeightMap;
+	std::vector<std::map<int,float> > voxelWeightMap;
 	buildBoneGlowSkinWeights(voxelSrModel, *sbSk, *voxelWindow, voxelWeightMap);
 	transferSkinWeight(*sbSk, voxelSrModel, voxelWeightMap, inModel, skinWeightMap);
 #endif
@@ -739,7 +739,7 @@ void boneWeightInPainting(std::vector<std::map<int,float> >& vtxBoneWeights, std
 {
 	if (vtxBoneWeights.size() == 0) return;
 	int nv = m.V.size();
-	std::vector<std::set<int>> vtxNeighbors;
+	std::vector<std::set<int> > vtxNeighbors;
 	std::vector<float> vtxAreas;
 	std::vector<int> boneIdxs;
 	std::map<int,int> validVtxMap;
@@ -782,7 +782,7 @@ void boneWeightInPainting(std::vector<std::map<int,float> >& vtxBoneWeights, std
 			}
 		}		
 	}
-	std::vector<std::map<int,float>> vtxNeighborWeights;
+	std::vector<std::map<int,float> > vtxNeighborWeights;
 	vtxNeighborWeights.resize(nv);
 	std::map<int,int>::iterator vi;
 	for ( vi  = validVtxMap.begin();
@@ -898,7 +898,7 @@ void boneWeightLaplacianSmoothing(std::vector<std::map<int,float> >& vtxBoneWeig
 {
 	if (vtxBoneWeights.size() == 0) return;
 	int nv = m.V.size();	
-	std::vector<std::set<int>> vtxNeighbors;	
+	std::vector<std::set<int> > vtxNeighbors;	
 	std::map<int,float>& boneWeight = vtxBoneWeights[0];
 	std::vector<int> boneIdxs;
 	std::map<int,float>::iterator mi;
@@ -926,7 +926,7 @@ void boneWeightLaplacianSmoothing(std::vector<std::map<int,float> >& vtxBoneWeig
 		}
 	}
 
-	std::vector<std::map<int,float>> vtxNeighborWeights;
+	std::vector<std::map<int,float> > vtxNeighborWeights;
 	vtxNeighborWeights.resize(nv);
 	for (int i = 0; i < nv; i++)
 	{
@@ -992,7 +992,7 @@ void boneWeightHarmonicSmoothing(std::vector<std::map<int,float> >& vtxBoneWeigh
 	//return;
 	if (vtxBoneWeights.size() == 0) return;
 	int nv = m.V.size();
-	std::vector<std::set<int>> vtxNeighbors;
+	std::vector<std::set<int> > vtxNeighbors;
 	std::vector<float> vtxAreas;
 	std::vector<int> boneIdxs;
 	std::map<int,float>& boneWeight = vtxBoneWeights[0];
@@ -1038,7 +1038,7 @@ void boneWeightHarmonicSmoothing(std::vector<std::map<int,float> >& vtxBoneWeigh
 			vtxAreas[f[j]] += faceArea;
 		}
 	}
-	std::vector<std::map<int,float>> vtxNeighborWeights;
+	std::vector<std::map<int,float> > vtxNeighborWeights;
 	vtxNeighborWeights.resize(nv);
 	for (int i = 0; i < nv; i++)
 	{
@@ -1137,7 +1137,7 @@ void buildHarmonicSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, Voxelizer
 
 }
 
-void WeightMapToSkinWeight(std::vector<std::map<int,float>>& weightMap, SkinWeight& skinWeight)
+void WeightMapToSkinWeight(std::vector<std::map<int,float> >& weightMap, SkinWeight& skinWeight)
 {
 	for (unsigned int i=0;i< weightMap.size();i++)
 	{		
@@ -1157,7 +1157,7 @@ void WeightMapToSkinWeight(std::vector<std::map<int,float>>& weightMap, SkinWeig
 
 }
 
-void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, std::vector<std::map<int,float>>& skinWeight)
+void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWindow& voxelWindow, std::vector<std::map<int,float> >& skinWeight)
 {
 	IntVolume* origVoxels = voxelWindow.getVoxels();
 	// store the voxel map for each vertex		
