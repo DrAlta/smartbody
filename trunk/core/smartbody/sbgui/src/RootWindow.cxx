@@ -1312,7 +1312,7 @@ void BaseWindow::CameraCharacterShightCB(Fl_Widget* widget, void* data)
 		if(character) {
 			if(SmartBody::SBScene::getScene()->setCameraConeOfSight(character->getName())) {
 				// Renders eye beams
-				rootWindow->fltkViewer->getData()->eyeBeamMode = FltkViewer::EyeBeamMode::ModeEyeBeams;
+				rootWindow->fltkViewer->getData()->eyeBeamMode = FltkViewer::ModeEyeBeams;
 				LOG("Camera sight: ON"); 
 			}
 		} else {
