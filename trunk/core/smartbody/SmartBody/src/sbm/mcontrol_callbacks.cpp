@@ -1583,8 +1583,13 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 
         if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
         {
+			std::stringstream strstr;
+			strstr << soundFile << " " << characterName;
+			SmartBody::SBEvent* sbevent = SmartBody::SBScene::getScene()->getEventManager()->createEvent("sound", strstr.str().c_str());
+			SmartBody::SBScene::getScene()->getEventManager()->handleEvent(sbevent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 #if !defined(__FLASHPLAYER__)
 		LOG("Play AudioFile = %s", soundFile.c_str() );
+		
         AUDIO_Play( soundFile.c_str() );			
 #else
 		std::string souldFileBase = boost::filesystem::basename(soundFile);
