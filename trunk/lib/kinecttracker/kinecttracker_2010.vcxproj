@@ -184,7 +184,7 @@ copy /Y ..\activemq\apr\apr-util\lib\libaprutil-1.dll bin
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\OpenNI\Include;C:\Program Files %28x86%29\PrimeSense\NITE\Include;../vhmsg/vhmsg-c/include;../vhcl/include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\OpenNI\Include;C:\Program Files (x86)\PrimeSense\NITE\Include;../vhmsg/vhmsg-c/include;../vhcl/include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -198,8 +198,8 @@ copy /Y ..\activemq\apr\apr-util\lib\libaprutil-1.dll bin
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>openNI.lib;glut32.lib;XnVCNITE_1_5_2.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(ProjectName)64.exe</OutputFile>
-      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\OpenNI\Lib;C:\Program Files %28x86%29\PrimeSense\NITE\Lib;./libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\OpenNI\Lib;C:\Program Files (x86)\PrimeSense\NITE\Lib;./libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
