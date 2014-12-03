@@ -23,6 +23,7 @@ class SBVHMsgManager : public SBService
 		SBAPI virtual void setEnable(bool val);
 		SBAPI virtual bool isEnable();
 
+		SBAPI bool isConnected();
 		SBAPI bool connect();
 		SBAPI void disconnect();
 

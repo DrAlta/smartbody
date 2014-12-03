@@ -364,6 +364,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 		SbmSubMesh* subMesh = subMeshList[i];
 		glMaterial(subMesh->material);	
 
+		if (!shape->getCharacter())
+			continue;
 		std::string texturesType = shape->getCharacter()->getStringAttribute("texturesType");
 		if( texturesType == "static" || texturesType == "dynamic")
 		{

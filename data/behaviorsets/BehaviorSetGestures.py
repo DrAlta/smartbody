@@ -390,7 +390,7 @@ def retargetBehaviorSet(charName):
 	#		print "Cannot find motion " + gestureMotions[n] + ", it will be excluded from the gesture setup..."
 	
 	sbChar.setStringAttribute("gestureMap", "BradGesture")
-	sbChar.setStringAttribute("gestureMapAngry", "BradGesture")
-	sbChar.setStringAttribute("gestureMapSad", "BradGesture")
+	sbChar.setStringAttribute("gestureMapAngry", "BradGestureAngry")
+	sbChar.setStringAttribute("gestureMapSad", "BradGestureSad")
 
 		

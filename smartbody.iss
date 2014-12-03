@@ -11,7 +11,7 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r5686
+AppVersion=r5897
 OutputBaseFilename=SmartBody
 WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
@@ -82,6 +82,8 @@ Source: ".\bin\TtsRelay\bin\x86\Release\pthreadVSE.dll"; DestDir: "{app}\bin";
 Source: ".\bin\TtsRelay\bin\x86\Release\rhetrapi.dll"; DestDir: "{app}\bin"; 
 Source: ".\bin\TtsRelay\bin\x86\Release\TtsRelay.dll"; DestDir: "{app}\bin"; 
 Source: ".\bin\TtsRelay\bin\x86\Release\Apache.NMS.ActiveMQ.dll"; DestDir: "{app}\bin"; 
+Source: ".\bin\TtsRelay\bin\x86\Release\vhmsg-net.dll"; DestDir: "{app}\bin"; 
+Source: ".\bin\TtsRelay\bin\x86\Release\FestivalDLL.dll"; DestDir: "{app}\bin"; 
 
 ; build
 Source: ".\core\smartbody\SmartBody\SmartBody.vcxproj"; DestDir: "{app}\build"; Flags:
