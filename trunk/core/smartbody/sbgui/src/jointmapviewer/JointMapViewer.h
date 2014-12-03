@@ -111,6 +111,7 @@ class JointMapViewer : public Fl_Double_Window
 		static void ApplyMapCB(Fl_Widget* widget, void* data);
 		static void CancelCB(Fl_Widget* widget, void* data);
 		static void SelectMapCB(Fl_Widget* widget, void* data);
+		static void SaveMapCB(Fl_Widget* widget, void* data);
 		static void SelectCharacterCB(Fl_Widget* widget, void* data);
 		static void JointNameChange(Fl_Widget* widget, void* data);
 		static void AddJointMapCB(Fl_Widget* widget, void* data);
