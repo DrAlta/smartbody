@@ -41,7 +41,7 @@ D:        Step right
 #include "OGRE/Ogre.h"
 #include "OGRE/OgreStringConverter.h"
 #include "OGRE/OgreException.h"
-#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 10
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 9
 #include "OGRE/Overlay/OgreOverlay.h"
 #else
 #include "OGRE/OgreOverlay.h"

@@ -755,7 +755,11 @@ void EmbeddedOgre::finishRender()
 {
 	bool lVerticalSynchro = true;	
 #ifdef WIN32
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 9
+	ogreWnd->swapBuffers();		
+#else
 	ogreWnd->swapBuffers(lVerticalSynchro);		
+#endif
 #else
 	ogreWnd->swapBuffers();		
 #endif

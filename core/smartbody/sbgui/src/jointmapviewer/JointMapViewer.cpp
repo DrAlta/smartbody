@@ -1249,6 +1249,7 @@ void SkeletonViewer::draw()
 
 	if (!visible()) 
 		return;
+	
 	if (!valid()) 
 	{
 		init_opengl();
@@ -1439,6 +1440,7 @@ JointMapViewer::JointMapViewer(int x, int y, int w, int h, char* name) : Fl_Doub
 
 	_buttonAutoMap = new Fl_Button(220, curY, 80, 20, "Auto Map");
 	_buttonAutoMap->callback(ResetMapCB,this);
+
 
 
 // 
@@ -1829,6 +1831,15 @@ void JointMapViewer::applyJointMap()
 }
 
 void JointMapViewer::SelectMapCB( Fl_Widget* widget, void* data )
+{
+	Fl_Choice* mapChoice = dynamic_cast<Fl_Choice*>(widget);	
+	JointMapViewer* viewer = (JointMapViewer*) data;
+	viewer->setJointMapName(mapChoice->text());
+	//viewer->updateSelectMap();
+	//viewer->updateCharacter();	
+}
+
+void JointMapViewer::SaveMapCB( Fl_Widget* widget, void* data )
 {
 	Fl_Choice* mapChoice = dynamic_cast<Fl_Choice*>(widget);	
 	JointMapViewer* viewer = (JointMapViewer*) data;
