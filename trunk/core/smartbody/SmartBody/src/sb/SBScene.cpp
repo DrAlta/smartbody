@@ -379,6 +379,7 @@ void SBScene::cleanup()
 	delete _kinectProcessor;
 	delete _handConfigManager;
 
+
 	_sim = NULL;
 	_profiler = NULL;
 	_bml = NULL;
@@ -428,10 +429,11 @@ void SBScene::cleanup()
 	AUDIO_Close();
 	AUDIO_Init();
 
-	if (_vhmsgManager->isEnable())
+	if (_vhmsgManager->isEnable() && _vhmsgManager->isConnected())
 		_vhmsgManager->send( "vrProcEnd sbm" );
 	
-	delete _vhmsgManager;	
+//	delete _vhmsgManager;	
+//	_vhmsgManager = NULL;
 
 #if !defined(SB_IPHONE)
 	SbmTextureManager::destroy_singleton();
@@ -498,22 +500,6 @@ SBScene::~SBScene(void)
 	{
 	//	delete (*iter).second;
 	}
-
-	delete _sim;
-	delete _profiler;
-	delete _bml;
-	delete _blendManager;
-	delete _reachManager;
-	delete _steerManager;
-	delete _physicsManager;
-	delete _boneBusManager;
-	delete _collisionManager;
-	delete _gestureMapManager;
-	delete _jointMapManager;
-	delete _diphoneManager;
-	delete _behaviorSetManager;
-	delete _serviceManager;
-	delete _eventManager;
 
 	delete _parser;
 

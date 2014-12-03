@@ -488,13 +488,14 @@ void cleanup( void )	{
 		}
 
 		SmartBody::SBScene::getScene()->getVHMsgManager()->send("vrProcEnd sbm");
-
+		/*
 #if LINK_VHMSG_CLIENT
 		if (SmartBody::SBScene::getScene()->getVHMsgManager()->isEnable())
 		{
 			SmartBody::SBScene::getScene()->getVHMsgManager()->disconnect();
 		}
 #endif
+		*/
 
 		/*BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 		if (rootWindow)
@@ -1011,12 +1012,8 @@ int main( int argc, char **argv )	{
 		if (vhmsgPortStr != "")
 			vhmsgManager->setPort(vhmsgPortStr);
 		
-		bool success = vhmsgManager->connect();
-		if (success)
-		{
-			vhmsgManager->setEnable(true);
-		}
-		else
+		vhmsgManager->setEnable(true);
+		if (!vhmsgManager->isEnable())
 		{
 			LOG("Could not connect to server %s, VHMSG service not enabled.", vhmsg_server);
 		}

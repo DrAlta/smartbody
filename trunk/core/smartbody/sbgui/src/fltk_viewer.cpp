@@ -1033,6 +1033,10 @@ static void gl_draw_string ( const char* s, float x, float y )
 
 void FltkViewer::initShadowMap()
 {    
+
+	// currently getting an error when activating shadow map, not sure why AS 12/2/14
+	return;
+
 	// init basic shader for rendering 
 	SbmShaderManager::singleton().addShader("Basic",Std_VS.c_str(),Std_FS.c_str(),false);
 	SbmShaderManager::singleton().addShader("BasicShadow","",Shadow_FS.c_str(),false);
@@ -1085,7 +1089,7 @@ void FltkViewer::initShadowMap()
 		printf("GL_FRAMEBUFFER_COMPLETE_EXT failed, CANNOT use FBO\n");
 
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-	
+
 	/*
 	glGenRenderbuffersEXT(1, &_data->rboID);
 	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, _data->rboID);

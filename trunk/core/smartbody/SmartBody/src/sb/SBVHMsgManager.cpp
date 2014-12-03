@@ -62,6 +62,9 @@ SBVHMsgManager::SBVHMsgManager() : SBService()
 
 SBVHMsgManager::~SBVHMsgManager()
 {
+	if (vhmsg::ttu_is_open())
+		vhmsg::ttu_close();
+
 	if (_logListener)
 	{
 		vhcl::Log::g_log.RemoveListener(_logListener);	
@@ -94,6 +97,11 @@ bool SBVHMsgManager::isEnable()
 		return true;
 	
 	return SBService::isEnable();
+}
+
+bool SBVHMsgManager::isConnected()
+{
+	return vhmsg::ttu_is_open();
 }
 
 bool SBVHMsgManager::connect()
@@ -139,6 +147,8 @@ bool SBVHMsgManager::connect()
 
 void SBVHMsgManager::disconnect()
 {
+	if (vhmsg::ttu_is_open())
+		vhmsg::ttu_close();
 }
 
 int SBVHMsgManager::send2( const char *op, const char* message )
@@ -192,7 +202,7 @@ int SBVHMsgManager::send( const char* message )
 {
 #ifndef SB_NO_VHMSG
 #if LINK_VHMSG_CLIENT
-	if( isEnable())
+	if( isEnable() && vhmsg::ttu_is_open())
 	{
 		int err = vhmsg::ttu_notify1( message );
 		if( err != vhmsg::TTU_SUCCESS )	{
