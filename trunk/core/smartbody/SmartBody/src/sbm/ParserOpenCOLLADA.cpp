@@ -3385,7 +3385,7 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 			std::string controllerID = skinWeight->sourceMesh+"-skin";
 			int validMeshIdx = defMesh->getValidSkinMesh(skinWeight->sourceMesh);
 			SrModel& model = defMesh->dMeshStatic_p[validMeshIdx]->shape();
-			std::string matName = "default";
+			std::string matName = "defaultMaterial";
 			if (model.mtlnames.size() > 0)
 				matName = model.mtlnames[0];
 			std::string matID = matName+"_SG";

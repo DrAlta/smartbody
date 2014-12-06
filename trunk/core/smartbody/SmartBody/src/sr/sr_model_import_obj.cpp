@@ -330,13 +330,15 @@ bool SrModel::import_obj ( const char* file )
   
 	//SR_TRACE1 ( "First path:" << path );
 
-	int curmtl = 0;
-	M.push();
-	mtlnames.push("noname");
+	
 
 	init ();
 	name = filename;
 	//name.remove_file_extension();
+	int curmtl = 0;
+	M.push();
+	M.top().diffuse = SrColor::gray;
+	mtlnames.push("noname");
 
 	SrString line;
 	while ( in.getline(line)!=EOF )
