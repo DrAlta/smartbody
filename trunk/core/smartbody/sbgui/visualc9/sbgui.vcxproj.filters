@@ -61,9 +61,6 @@
     <Filter Include="pythonbind">
       <UniqueIdentifier>{4dc282ee-eda1-4034-a71b-4c1afa79c981}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SOIL">
-      <UniqueIdentifier>{5490d996-cdef-4047-bedc-d720428ccf81}</UniqueIdentifier>
-    </Filter>
     <Filter Include="faceshiftviewer">
       <UniqueIdentifier>{1dae2d67-bed9-4681-a9ed-4eef5ffbac5f}</UniqueIdentifier>
     </Filter>
@@ -333,18 +330,6 @@
     </ClCompile>
     <ClCompile Include="..\src\autorig\AutoRigViewer.cpp">
       <Filter>autorig</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\SmartBody\src\external\SOIL\image_DXT.c">
-      <Filter>SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\SmartBody\src\external\SOIL\image_helper.c">
-      <Filter>SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\SmartBody\src\external\SOIL\SOIL.c">
-      <Filter>SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\SmartBody\src\external\SOIL\stb_image_aug.c">
-      <Filter>SOIL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\SmartBody\src\sr\jpge.cpp" />
     <ClCompile Include="..\src\faceshiftviewer\FaceShiftViewer.cpp">
@@ -626,24 +611,6 @@
     </ClInclude>
     <ClInclude Include="..\src\autorig\AutoRigViewer.h">
       <Filter>autorig</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\image_DXT.h">
-      <Filter>SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\image_helper.h">
-      <Filter>SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\SOIL.h">
-      <Filter>SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\stbi_DDS_aug.h">
-      <Filter>SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\stbi_DDS_aug_c.h">
-      <Filter>SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\stb_image_aug.h">
-      <Filter>SOIL</Filter>
     </ClInclude>
     <ClInclude Include="..\..\SmartBody\src\sr\jpge.h" />
     <ClInclude Include="..\src\faceshiftviewer\FaceShiftViewer.h">
