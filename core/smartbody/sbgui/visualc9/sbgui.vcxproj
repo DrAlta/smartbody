@@ -1129,10 +1129,6 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\autorig\AutoRigViewer.cpp" />
-    <ClCompile Include="..\..\SmartBody\src\external\SOIL\image_DXT.c" />
-    <ClCompile Include="..\..\SmartBody\src\external\SOIL\image_helper.c" />
-    <ClCompile Include="..\..\SmartBody\src\external\SOIL\SOIL.c" />
-    <ClCompile Include="..\..\SmartBody\src\external\SOIL\stb_image_aug.c" />
     <ClCompile Include="..\..\SmartBody\src\sr\jpge.cpp" />
     <ClCompile Include="..\src\autorig\SBAutoRigManager.cpp" />
     <ClCompile Include="..\src\autorig\VoxelizerWindow.cpp" />
@@ -1230,12 +1226,6 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
   <ItemGroup>
     <ClInclude Include="..\..\SmartBody\src\external\glew\glew.h" />
     <ClInclude Include="..\src\autorig\AutoRigViewer.h" />
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\image_DXT.h" />
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\image_helper.h" />
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\SOIL.h" />
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\stbi_DDS_aug.h" />
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\stbi_DDS_aug_c.h" />
-    <ClInclude Include="..\..\SmartBody\src\external\SOIL\stb_image_aug.h" />
     <ClInclude Include="..\..\SmartBody\src\sr\jpge.h" />
     <ClInclude Include="..\src\autorig\SBAutoRigManager.h" />
     <ClInclude Include="..\src\autorig\VoxelizerWindow.h" />
