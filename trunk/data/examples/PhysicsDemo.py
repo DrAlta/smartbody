@@ -62,9 +62,6 @@ doctor.setPosition(SrVec(75, 102, 0))
 doctor.setHPR(SrVec(90, 0, 0))
 doctor.createStandardControllers()
 doctor.setStringAttribute('deformableMesh', 'Doctor.dae')
-scene.run('BehaviorSetMocapReaching.py')
-setupBehaviorSet()
-#retargetBehaviorSet('doctor')
 
 bml.execBML('doctor', '<body posture="LHandOnHip_Motex"/>')
 # Brad2
@@ -75,9 +72,15 @@ brad2.setPosition(SrVec(135, 102, 0))
 brad2.setHPR(SrVec(-90, 0, 0))
 brad2.createStandardControllers()
 brad2.setStringAttribute('deformableMesh', 'Brad.dae')
-scene.run('BehaviorSetMocapReaching.py')
+
+# setup reach 
+scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
-#retargetBehaviorSet('brad2')
+retargetBehaviorSet('doctor')
+retargetBehaviorSet('brad2')
+
+
+
 
 bml.execBML('brad2', '<body posture="HandsAtSide_Motex"/>')
 
