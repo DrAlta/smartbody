@@ -61,6 +61,12 @@
     <Filter Include="pythonbind">
       <UniqueIdentifier>{e981edbf-6e00-447b-9168-26006c8a974e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="faceshiftviewer">
+      <UniqueIdentifier>{14c552ac-4dba-4ce6-970d-56caa091ab6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SOIL">
+      <UniqueIdentifier>{8cd9ab2e-5a18-4a72-b614-3ad793ad7771}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\sbgui\glfont2.cpp" />
@@ -321,6 +327,30 @@
     </ClCompile>
     <ClCompile Include="..\src\sbgui\pythonbind\SBPythonAutorig.cpp">
       <Filter>pythonbind</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\autorig\AutoRigViewer.cpp">
+      <Filter>autorig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\bmlcreator\BMLHandObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\bmlcreator\BMLNoiseObject.cpp">
+      <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\faceshiftviewer\FaceShiftViewer.cpp">
+      <Filter>faceshiftviewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\external\SOIL\image_DXT.c">
+      <Filter>SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\external\SOIL\image_helper.c">
+      <Filter>SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\external\SOIL\SOIL.c">
+      <Filter>SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\external\SOIL\stb_image_aug.c">
+      <Filter>SOIL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -589,6 +619,36 @@
     </ClInclude>
     <ClInclude Include="..\src\sbgui\pythonbind\SBPythonAutoRig.h">
       <Filter>pythonbind</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\autorig\AutoRigViewer.h">
+      <Filter>autorig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\bmlcreator\BMLHandObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\bmlcreator\BMLNoiseObject.h">
+      <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\faceshiftviewer\FaceShiftViewer.h">
+      <Filter>faceshiftviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\SOIL\image_DXT.h">
+      <Filter>SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\SOIL\image_helper.h">
+      <Filter>SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\SOIL\SOIL.h">
+      <Filter>SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\SOIL\stb_image_aug.h">
+      <Filter>SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug.h">
+      <Filter>SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug_c.h">
+      <Filter>SOIL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
