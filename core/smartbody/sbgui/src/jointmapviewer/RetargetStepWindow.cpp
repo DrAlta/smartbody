@@ -486,5 +486,16 @@ void RetargetStepWindow::SaveCharacterCB( Fl_Widget* widget, void* data )
 	std::string outDir = "";
 	outDir = BaseWindow::chooseDirectory("Save To:", mediaPath);	
 	std::vector<std::string> moNames;
-	ParserOpenCOLLADA::exportCollada(outDir,skelName,defMeshName,moNames,true,true,false);
+	bool ok = ParserOpenCOLLADA::exportCollada(outDir,skelName,defMeshName,moNames,true,true,false);
+	if (ok)
+	{
+		std::stringstream strstr;
+		strstr << "Saved to directory " << outDir << "/" << defMeshName;
+
+		fl_alert(strstr.str().c_str());
+	}
+	else
+	{
+		fl_alert("Failed to save character.");
+	}
 }

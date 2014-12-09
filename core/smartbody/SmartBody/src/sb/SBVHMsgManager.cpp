@@ -161,7 +161,10 @@ int SBVHMsgManager::send2( const char *op, const char* message )
 		int err = vhmsg::ttu_notify2( op, message );
 		if( err != vhmsg::TTU_SUCCESS )	{
 			std::stringstream strstr;
-			strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify2 failed on message \"" << op << "  " << message << "\"." << std::endl;
+			if (!op || !message)
+				strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify2 failed on message." << std::endl;
+			else
+				strstr << "ERROR: mcuCBHandle::vhmsg_send(..): ttu_notify2 failed on message \"" << op << "  " << message << "\"." << std::endl;
 			LOG(strstr.str().c_str());
 		}
 	}

@@ -101,6 +101,8 @@ static void read_materials ( SrArray<SrMaterial>& M,
                              SrStringArray& mnames,
 							 std::map<std::string,std::string>& mtlTexMap,
 							 std::map<std::string,std::string>& mtlTexBumpMap,
+							 std::map<std::string,std::string>& mtlTexKsMap,
+							 std::map<std::string,std::string>& mtlTexNsMap,
                              const SrString& file,
                              const SrStringArray& paths )
  {
@@ -198,6 +200,32 @@ static void read_materials ( SrArray<SrMaterial>& M,
 		  std::string mtlName = mnames.top();
 		  mtlTexBumpMap[mtlName] = texFile;		  
 	  }
+	else if ( in.last_token()=="map_Ks") // texture map
+	  {
+		  SrString mapKs, dotstr, ext;
+		  //in >> mapKaName;		  		 		  
+		  in.get_token(mapKs);
+		  in.get_token(dotstr);	
+		  in.get_token(ext);
+		  mapKs.append(dotstr);
+		  mapKs.append(ext);
+		  std::string texFile = (const char*) mapKs;
+		  std::string mtlName = mnames.top();
+		  mtlTexKsMap[mtlName] = texFile;		  
+	  }
+	else if ( in.last_token()=="map_Ns") // texture map
+	  {
+		  SrString mapNs, dotstr, ext;
+		  //in >> mapKaName;		  		 		  
+		  in.get_token(mapNs);
+		  in.get_token(dotstr);	
+		  in.get_token(ext);
+		  mapNs.append(dotstr);
+		  mapNs.append(ext);
+		  std::string texFile = (const char*) mapNs;
+		  std::string mtlName = mnames.top();
+		  mtlTexNsMap[mtlName] = texFile;		  
+	  }
       else if ( in.last_token()=="illum" ) // dont know what is this one
        { in >> i;
        }
@@ -210,6 +238,8 @@ static bool process_line ( const SrString& line,
                            SrStringArray& mnames,
 						   std::map<std::string,std::string>& mtlTexMap,
 						   std::map<std::string,std::string>& mtlTexBumpMap,
+						   std::map<std::string,std::string>& mtlTexKsMap,
+						   std::map<std::string,std::string>& mtlTexNsMap,
                            int& curmtl )
  {
    SrInput in (line);
@@ -299,7 +329,7 @@ static bool process_line ( const SrString& line,
 			token.replace ( "\\", "/" ); // avoid win-unix problems
 
 			paths.push ( token );
-			read_materials ( m.M, mnames, mtlTexMap, mtlTexBumpMap, file, paths );
+			read_materials ( m.M, mnames, mtlTexMap, mtlTexBumpMap, mtlTexKsMap, mtlTexNsMap, file, paths );
 		}
 	}
 	return true;
@@ -342,7 +372,7 @@ bool SrModel::import_obj ( const char* file )
 
 	SrString line;
 	while ( in.getline(line)!=EOF )
-	{ if ( !process_line(line, *this, paths, mtlnames, mtlTextureNameMap, mtlNormalTexNameMap, curmtl) )
+	{ if ( !process_line(line, *this, paths, mtlnames, mtlTextureNameMap, mtlNormalTexNameMap, mtlSpecularTexNameMap, mtlNormalTexNameMap, curmtl) )
 		return false;
     }
 
