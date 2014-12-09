@@ -493,9 +493,6 @@
     <ClCompile Include="..\src\SmartBody\sb\SBVHMsgManager.cpp">
       <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SmartBody\sb\SBWSPManager.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SmartBody\sb\SBAnimationState.cpp">
       <Filter>sb</Filter>
     </ClCompile>
@@ -1162,6 +1159,36 @@
     <ClCompile Include="..\src\SmartBody\external\rply\rply.c">
       <Filter>external\ply</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBHandConfiguration.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBHandConfigurationManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBHandSynthesis.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sbm\GPU\SbmBlendFace.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_new_locomotion.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBFaceShiftManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\controllers\me_ct_generic_hand.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBRigNode.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\external\faceshift\fsbinarystream.cpp">
+      <Filter>external\faceshift</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\external\jpge\jpge.cpp">
+      <Filter>external\jpge</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\SmartBody\bml\bml_noise.hpp">
@@ -1696,9 +1723,6 @@
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\sb\SBVHMsgManager.h">
-      <Filter>sb</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\sb\SBWSPManager.h">
       <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\sb\SBAnimationState.h">
@@ -2313,6 +2337,36 @@
     <ClInclude Include="..\src\SmartBody\external\rply\rply.h">
       <Filter>external\ply</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBHandConfiguration.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBHandConfigurationManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBHandSynthesis.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sbm\GPU\SbmBlendFace.h">
+      <Filter>sbm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_new_locomotion.h">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBFaceShiftManager.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\controllers\me_ct_generic_hand.h">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBRigNode.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\faceshift\fsbinarystream.h">
+      <Filter>external\faceshift</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\jpge\jpge.h">
+      <Filter>external\jpge</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">
@@ -2362,6 +2416,12 @@
     </Filter>
     <Filter Include="external\ply">
       <UniqueIdentifier>{2f3ade32-1f08-4d24-b5f5-f0c3c635529e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\faceshift">
+      <UniqueIdentifier>{f8819292-9487-45d8-9425-10719ea57dff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\jpge">
+      <UniqueIdentifier>{83687d68-fb0a-461f-aa83-8007f08088e2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

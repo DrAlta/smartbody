@@ -11,14 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\irrlichtsmartbody\irrlichtsmartbodylistener.cpp" />
-    <ClCompile Include="..\src\irrlichtsmartbody\main.cpp" />
+    <ClCompile Include="src\ogresmartbody.cpp" />
+    <ClCompile Include="src\ogresmartbodylistener.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\irrlichtsmartbody\irrlichtsmartbodylistener.h" />
+    <ClInclude Include="src\ogresmartbody.h" />
+    <ClInclude Include="src\ogresmartbodylistener.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{B19F5657-AA08-4D34-B3A3-58045374DBBB}</ProjectGuid>
+    <ProjectGuid>{B19F5657-AA08-4D34-B3A3-58045174DBBB}</ProjectGuid>
     <RootNamespace>OgreExample</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
@@ -43,10 +44,10 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\core\smartbody\sbgui\bin</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\bin\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\core\smartbody\sbgui\bin</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
@@ -61,8 +62,8 @@
     <ClCompile>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\src\irrlichtsmartbody;..\src\SmartBody;..\include;..\include\vhcl;..\include\boost;..\include\steersuite;..\include\bonebus;..\include\wsp;..\python27\include;..\irrlicht-1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\lib\vhcl\include;..\..\lib\vhmsg\vhmsg-c\include;..\..\core\smartbody\SmartBody\src;..\..\lib\bonebus\include;..\..\lib\OgreSDK\include\OGRE;..\..\lib\OgreSDK\include;..\..\lib\boost;..\..\core\smartbody\Python27\include;..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\core\smartbody\steersuite-1.3\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MAINSBBUILD;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -75,8 +76,8 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>SmartBody_d.lib;vhcl_d.lib;pthreadVSE2.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;Irrlicht.lib;boost_system-vc100-mt-gd-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\irrlicht-1.8.1\lib\Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SmartBody_d.lib;vhcl_d.lib;pthreadVSE2.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;OgreMain_d.lib;OIS_d.lib;boost_system-vc100-mt-gd-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\core\smartbody\SmartBody\lib;..\..\core\smartbody\SmartBody\src\external\glew;..\..\lib\vhcl\lib;..\..\lib\vhcl\openal\libs\Win32;..\..\lib\vhcl\libsndfile\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\bonebus\lib;..\..\lib\OgreSDK\lib\debug;..\..\lib\pthreads\lib;..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\lib\boost\lib;..\..\core\smartbody\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)OgreExample_d.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -86,8 +87,16 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y ..\src\irrlichtsmartbody\irrlichtsmartbody.py ..\data
-copy /Y ..\irrlicht-1.8.1\bin\Win32-VisualStudio\Irrlicht.dll ..\bin
+      <Command>copy /Y .\src\ogresmartbody.py ..\..\data
+copy /Y .\src\resources_d.cfg ..\..\core\smartbody\sbgui\bin
+copy /Y .\src\plugins_d.cfg ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\debug\Plugin_OctreeSceneManager_d.dll ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\debug\Plugin_BSPSceneManager_d.dll ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\debug\Plugin_ParticleFX_d.dll ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\debug\Plugin_CgProgramManager_d.dll ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\debug\OgreRTShaderSystem_d.dll ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\debug\RenderSystem_GL_d.dll ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\debug\cg.dll ..\..\core\smartbody\sbgui\bin
 
 </Command>
     </PostBuildEvent>
@@ -96,8 +105,8 @@ copy /Y ..\irrlicht-1.8.1\bin\Win32-VisualStudio\Irrlicht.dll ..\bin
     <ClCompile>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\src\irrlichtsmartbody;..\src\SmartBody;..\include;..\include\vhcl;..\include\boost;..\include\steersuite;..\include\bonebus;..\include\wsp;..\python27\include;..\irrlicht-1.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\lib\vhcl\include;..\..\lib\vhmsg\vhmsg-c\include;..\..\core\smartbody\SmartBody\src;..\..\lib\bonebus\include;..\..\lib\OgreSDK\include\OGRE;..\..\lib\OgreSDK\include;..\..\lib\boost;..\..\core\smartbody\Python27\include;..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\core\smartbody\steersuite-1.3\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MAINSBBUILD;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -111,8 +120,8 @@ copy /Y ..\irrlicht-1.8.1\bin\Win32-VisualStudio\Irrlicht.dll ..\bin
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>SmartBody.lib;vhcl.lib;pthreadVSE2.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;Irrlicht.lib;boost_system-vc100-mt-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\irrlicht-1.8.1\lib\Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SmartBody.lib;vhcl.lib;pthreadVSE2.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;OgreMain.lib;OIS.lib;boost_system-vc100-mt-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\core\smartbody\SmartBody\lib;..\..\core\smartbody\SmartBody\src\external\glew;..\..\lib\vhcl\lib;..\..\lib\vhcl\openal\libs\Win32;..\..\lib\vhcl\libsndfile\lib;..\..\lib\vhmsg\vhmsg-c\lib;..\..\lib\bonebus\lib;..\..\lib\OgreSDK\lib\release;..\..\lib\pthreads\lib;..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\lib\boost\lib;..\..\core\smartbody\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -123,8 +132,16 @@ copy /Y ..\irrlicht-1.8.1\bin\Win32-VisualStudio\Irrlicht.dll ..\bin
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y ..\src\irrlichtsmartbody\irrlichtsmartbody.py ..\data
-copy /Y ..\irrlicht-1.8.1\bin\Win32-VisualStudio\Irrlicht.dll ..\bin</Command>
+      <Command>copy /Y .\src\ogresmartbody.py ..\..\data
+copy /Y .\src\resources.cfg ..\..\core\smartbody\sbgui\bin
+copy /Y .\src\plugins.cfg ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\release\Plugin_OctreeSceneManager.dll ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\release\Plugin_BSPSceneManager.dll ..\..\core\smartbody\sbgui\bin
+copy /Y ...\..\lib\OgreSDK\bin\release\Plugin_ParticleFX.dll ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\release\Plugin_CgProgramManager.dll ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\release\OgreRTShaderSystem.dll ..\..\core\smartbody\sbgui\bin
+copy /Y ..\..\lib\OgreSDK\bin\release\RenderSystem_GL.dll ..\..\core\smartbody\sbgui\bin
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

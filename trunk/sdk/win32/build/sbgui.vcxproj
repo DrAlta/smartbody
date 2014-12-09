@@ -83,7 +83,7 @@
     </ProjectReference>
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>glew32.lib;SmartBody_d.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;wspd.lib;blasd.lib;libf2cd.lib;lapackd.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;boost_serialization-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;fltkgld.lib;fltkd.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAId.lib;steerlibd.lib;ode_doubled.lib;python27.lib;OgreMain_d.lib;OIS_d.lib;OgreRTShaderSystem_d.lib;CEGUIBase-0_d.lib;CEGUIExpatParser_d.lib;CEGUICoreWindowRendererSet_d.lib;CEGUIOpenGLRenderer-0_d.lib;CEGUISILLYImageCodec_d.lib;PyCEGUI_d.lib;PyCEGUIOpenGLRenderer_d.lib;Pinocchio_d.lib;PolyVoxCore_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;SmartBody_d.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;blasd.lib;libf2cd.lib;lapackd.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;boost_serialization-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;fltkgld.lib;fltkd.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAId.lib;steerlibd.lib;ode_doubled.lib;python27.lib;OgreMain_d.lib;OIS_d.lib;OgreRTShaderSystem_d.lib;CEGUIBase-0_d.lib;CEGUIExpatParser_d.lib;CEGUICoreWindowRendererSet_d.lib;CEGUIOpenGLRenderer-0_d.lib;CEGUISILLYImageCodec_d.lib;PyCEGUI_d.lib;PyCEGUIOpenGLRenderer_d.lib;Pinocchio_d.lib;PolyVoxCore_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\OgreSDK\lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -131,7 +131,7 @@
     </ProjectReference>
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>glew32.lib;Smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;wsp.lib;blas.lib;libf2c.lib;lapack.lib;fltk.lib;fltkgl.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;dbghelp.lib;opengl32.lib;glu32.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAI.lib;steerlib.lib;ode_double.lib;python27.lib;OgreMain.lib;OIS.lib;OgreRTShaderSystem.lib;CEGUIBase-0.lib;CEGUIExpatParser.lib;CEGUICoreWindowRendererSet.lib;CEGUIOpenGLRenderer-0.lib;CEGUISILLYImageCodec.lib;PyCEGUI.lib;PyCEGUIOpenGLRenderer.lib;Pinocchio.lib;PolyVoxCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;Smartbody.lib;vhcl.lib;vhmsg.lib;bonebus.lib;fltk.lib;fltkgl.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;dbghelp.lib;opengl32.lib;glu32.lib;OpenAL32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;pprAI.lib;steerlib.lib;python27.lib;OgreMain.lib;OIS.lib;OgreRTShaderSystem.lib;CEGUIBase-0.lib;CEGUIExpatParser.lib;CEGUICoreWindowRendererSet.lib;CEGUIOpenGLRenderer-0.lib;CEGUISILLYImageCodec.lib;PyCEGUI.lib;PyCEGUIOpenGLRenderer.lib;Pinocchio.lib;PolyVoxCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\OgreSDK\lib\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -148,13 +148,17 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\sbgui\autorig\AutoRigViewer.cpp" />
     <ClCompile Include="..\src\sbgui\autorig\SBAutoRigManager.cpp" />
     <ClCompile Include="..\src\sbgui\autorig\VoxelizerWindow.cpp" />
+    <ClCompile Include="..\src\sbgui\bmlcreator\BMLHandObject.cpp" />
+    <ClCompile Include="..\src\sbgui\bmlcreator\BMLNoiseObject.cpp" />
     <ClCompile Include="..\src\sbgui\bmlcreator\TextEditor.cpp" />
     <ClCompile Include="..\src\sbgui\CharacterCreatorWindow.cpp" />
     <ClCompile Include="..\src\sbgui\EmbeddedOgre.cpp" />
     <ClCompile Include="..\src\sbgui\ExampleFrameListener.cpp" />
     <ClCompile Include="..\src\sbgui\ExportWindow.cpp" />
+    <ClCompile Include="..\src\sbgui\faceshiftviewer\FaceShiftViewer.cpp" />
     <ClCompile Include="..\src\sbgui\FLTKListener.cpp" />
     <ClCompile Include="..\src\sbgui\FLTKOgreViewer.cpp" />
     <ClCompile Include="..\src\sbgui\fltk_viewer.cpp" />
@@ -237,16 +241,24 @@
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeRTCurveViewer.cpp" />
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeRunTimeWindow.cpp" />
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeViewerWindow.cpp" />
+    <ClCompile Include="..\src\SmartBody\external\SOIL\image_DXT.c" />
+    <ClCompile Include="..\src\SmartBody\external\SOIL\image_helper.c" />
+    <ClCompile Include="..\src\SmartBody\external\SOIL\SOIL.c" />
+    <ClCompile Include="..\src\SmartBody\external\SOIL\stb_image_aug.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\smartbody-lib\src\external\glew\glew.h" />
+    <ClInclude Include="..\src\sbgui\autorig\AutoRigViewer.h" />
     <ClInclude Include="..\src\sbgui\autorig\SBAutoRigManager.h" />
     <ClInclude Include="..\src\sbgui\autorig\VoxelizerWindow.h" />
+    <ClInclude Include="..\src\sbgui\bmlcreator\BMLHandObject.h" />
+    <ClInclude Include="..\src\sbgui\bmlcreator\BMLNoiseObject.h" />
     <ClInclude Include="..\src\sbgui\bmlcreator\TextEditor.h" />
     <ClInclude Include="..\src\sbgui\CharacterCreatorWindow.h" />
     <ClInclude Include="..\src\sbgui\EmbeddedOgre.h" />
     <ClInclude Include="..\src\sbgui\ExampleFrameListener.h" />
     <ClInclude Include="..\src\sbgui\ExportWindow.h" />
+    <ClInclude Include="..\src\sbgui\faceshiftviewer\FaceShiftViewer.h" />
     <ClInclude Include="..\src\sbgui\FLTKListener.h" />
     <ClInclude Include="..\src\sbgui\FLTKOgreViewer.h" />
     <ClInclude Include="..\src\sbgui\fltk_viewer.h" />
@@ -329,6 +341,12 @@
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeRTCurveViewer.h" />
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeRunTimeWindow.h" />
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeViewerWindow.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\image_DXT.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\image_helper.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\SOIL.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug_c.h" />
+    <ClInclude Include="..\src\SmartBody\external\SOIL\stb_image_aug.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
