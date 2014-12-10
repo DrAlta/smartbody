@@ -86,7 +86,18 @@ rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 rachel.setStringAttribute('lipSyncSetName', 'default')
 rachel.setBoolAttribute('usePhoneBigram', True)
 rachel.setVoice('remote')
-rachel.setVoiceCode('Microsoft|Anna')
+
+import platform
+if platform.system() == "Windows":
+	windowsVer = platform.platform()
+	if windowsVer.find("Windows-7") == 0:
+		rachel.setVoiceCode('Microsoft|Anna')
+	else:
+		if windowsVer.find("Windows-8") == 0 or windowsVer.find("post2008server") == 0:
+			rachel.setVoiceCode('Microsoft|Zira|Desktop')
+else: # non-Windows platform, use Festival voices
+	rachel.setVoiceCode('voice_kal_diphone')
+
 # Gesture map setup
 rachel.setStringAttribute('gestureMap', 'ChrRachel')
 rachel.setBoolAttribute('gestureRequest.autoGestureTransition', True)
@@ -147,7 +158,7 @@ class MyEventHandler(SBEventHandler):
 		if 'beat' in params:
 			bml.execBML('ChrRachel', '<speech type="text/plain">What is the meaning of this?</speech><face type="FACS" au="1" amount=".7" start="0" end="2"/><face type="FACS" au="2" amount=".7" start="0" end="2"/>')
 		if 'contemplate' in params:
-			bml.execBML('ChrRachel', '<speech type="text/plain">Let me see, where did I last see him</speech><face type="FACS" au="7" amount="1.0" start="0" end="3"/><face type="FACS" au="7" amount="1.0" start="0" end="3"/><face type="FACS" au="2" side="right" amount="1.0" start="0" end="3"/>')
+			bml.execBML('ChrRachel', '<speech type="text/plain">No, I don\'t want any more of those</speech><face type="FACS" au="7" amount="1.0" start="0" end="3"/><face type="FACS" au="7" amount="1.0" start="0" end="3"/><face type="FACS" au="2" side="right" amount="1.0" start="0" end="3"/>')
 		if 'negative' in params:
 			bml.execBML('ChrRachel', '<speech type="text/plain">This is unacceptable</speech><face type="FACS" au="4" amount="1.0" start="0" end="3"/>')
 			

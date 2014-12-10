@@ -4,7 +4,7 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrMaarten')
+scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
@@ -87,13 +87,27 @@ brad.setFaceDefinition(bradFace)
 brad.createStandardControllers()
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
+brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 
 # Lip syncing diphone setup
 brad.setStringAttribute('lipSyncSetName', 'default')
 brad.setBoolAttribute('usePhoneBigram', True)
 brad.setVoice('remote')
-brad.setVoiceCode('Microsoft|Anna')
+
+import platform
+if platform.system() == "Windows":
+	windowsVer = platform.platform()
+	if windowsVer.find("Windows-7") == 0:
+		brad.setVoiceCode('Microsoft|Anna')
+	else:
+		if windowsVer.find("Windows-8") == 0 or windowsVer.find("post2008server") == 0:
+			brad.setVoiceCode('Microsoft|David|Desktop')
+else: # non-Windows platform, use Festival voices
+	brad.setVoiceCode('voice_kal_diphone')
+# note that Microsoft|Anna is the default Windows 7 voice.
+
+# Windows 8 includes other voices: 
+#Microsoft|David|Desktop
 
 # setup locomotion
 scene.run('BehaviorSetMaleMocapLocomotion.py')

@@ -6,7 +6,7 @@ print "|--------------------------------------------|"
 # Add asset paths
 scene.addAssetPath('script', 'scripts')
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrMaarten')
+scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
 scene.addAssetPath("script", "behaviorsets")
 scene.loadAssets()
@@ -116,22 +116,37 @@ brad.createStandardControllers()
 brad.setFaceDefinition(bradFace)
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
+brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 # Lip syncing diphone setup
 brad.setStringAttribute('lipSyncSetName', 'default')
 brad.setBoolAttribute('usePhoneBigram', True)
 brad.setVoice('remote')
-brad.setVoiceCode('Microsoft|Anna')
+
+import platform
+if platform.system() == "Windows":
+	windowsVer = platform.platform()
+	if windowsVer.find("Windows-7") == 0:
+		brad.setVoiceCode('Microsoft|Anna')
+	else:
+		if windowsVer.find("Windows-8") == 0 or windowsVer.find("post2008server") == 0:
+			brad.setVoiceCode('Microsoft|David|Desktop')
+else: # non-Windows platform, use Festival voices
+	brad.setVoiceCode('voice_kal_diphone')
+
+
 # Gesture map setup
 brad.setStringAttribute('gestureMap', 'ChrBrad')
 brad.setBoolAttribute('bmlRequest.autoGestureTransition', True)
-# Idle pose
-bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01"/>')
 
 # setup gestures
 scene.run('BehaviorSetGestures.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrBrad')
+
+
+# Idle pose
+bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01" ready="0" relax="0"/>')
+
 
 print 'Setting up Rachel'
 rachel = scene.createCharacter('ChrRachel', '')
@@ -150,17 +165,28 @@ rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 rachel.setStringAttribute('lipSyncSetName', 'default')
 rachel.setBoolAttribute('usePhoneBigram', True)
 rachel.setVoice('remote')
-rachel.setVoiceCode('Microsoft|Anna')
+if platform.system() == "Windows":
+	windowsVer = platform.platform()
+	if windowsVer.find("Windows-7") == 0:
+		rachel.setVoiceCode('Microsoft|Anna')
+	else:
+		if windowsVer.find("Windows-8") == 0 or windowsVer.find("post2008server") == 0:
+			rachel.setVoiceCode('Microsoft|David|Desktop')
+else: # non-Windows platform, use Festival voices
+	rachel.setVoiceCode('voice_kal_diphone')
+
 # Gesture map setup
 rachel.setStringAttribute('gestureMap', 'ChrRachel')
 rachel.setBoolAttribute('bmlRequest.autoGestureTransition', True)
-# Idle pose
-bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01" start=".4"/>')
 
 # setup gestures
 scene.run('BehaviorSetFemaleGestures.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrRachel')
+
+# Idle pose
+bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01" start=".4" ready="0" relax="0"/>')
+
 
 # Turning on deformable GPU 
 brad.setStringAttribute("displayType", "GPUmesh")
@@ -226,7 +252,7 @@ def speakRandomSentence():
 			else:
 				break
 		lastSentence = randomSentence
-		bml.execBML('ChrBrad', '<speech type="text/plain">' + randomSentence + '</speech>')
+		bml.execBML('ChrBrad', '<speech type="text/plain">' + randomSentence + '</speech><head type="NOD" amount=".3"/><gaze target="ChrRachel" sbm:joint-range="NECK EYES"/>')
 		currentTurn = 'ChrRachel'
 	# If Rachel's turn
 	elif currentTurn == 'ChrRachel':
@@ -237,7 +263,7 @@ def speakRandomSentence():
 			else:
 				break
 		lastSentence = randomSentence
-		bml.execBML('ChrRachel', '<speech type="text/plain">' + randomSentence + '</speech>')
+		bml.execBML('ChrRachel', '<speech type="text/plain">' + randomSentence + '</speech><head type="NOD" amount=".3"/><gaze target="ChrBrad" sbm:joint-range="NECK EYES"/>')
 		currentTurn = 'ChrBrad'
 
 # List of gesture types

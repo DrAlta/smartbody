@@ -93,7 +93,17 @@ Rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 Rachel.setStringAttribute('lipSyncSetName', 'default')
 Rachel.setBoolAttribute('usePhoneBigram', True)
 Rachel.setVoice('remote')
-Rachel.setVoiceCode('Microsoft|Anna')
+
+import platform
+if platform.system() == "Windows":
+	windowsVer = platform.platform()
+	if windowsVer.find("Windows-7") == 0:
+		Rachel.setVoiceCode('Microsoft|Anna')
+	else:
+		if windowsVer.find("Windows-8") == 0 or windowsVer.find("post2008server") == 0:
+			Rachel.setVoiceCode('Microsoft|Zira|Desktop')
+else: # non-Windows platform, use Festival voices
+	Rachel.setVoiceCode('voice_kal_diphone')
 
 # setup locomotion
 scene.run('BehaviorSetMaleMocapLocomotion.py')
