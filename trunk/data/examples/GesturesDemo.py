@@ -4,7 +4,7 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrMaarten')
+scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
 scene.addAssetPath('script', 'scripts')
 scene.addAssetPath("script", "behaviorsets")
@@ -57,7 +57,7 @@ for i in range(2):
 	brad.createStandardControllers()
 	# Set deformable mesh
 	brad.setDoubleAttribute('deformableMeshScale', 0.01)
-	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
+	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01" ready="0" relax="0"/>')
 	retargetBehaviorSet(baseName)
