@@ -100,7 +100,7 @@ if platform.system() == "Windows":
 	if windowsVer.find("Windows-7") == 0:
 		Rachel.setVoiceCode('Microsoft|Anna')
 	else:
-		if windowsVer.find("Windows-8") == 0 or windowsVer.find("post2008server") == 0:
+		if windowsVer.find("Windows-8") == 0 or windowsVer.find("Windows-post2008server") == 0:
 			Rachel.setVoiceCode('Microsoft|Zira|Desktop')
 else: # non-Windows platform, use Festival voices
 	Rachel.setVoiceCode('voice_kal_diphone')
