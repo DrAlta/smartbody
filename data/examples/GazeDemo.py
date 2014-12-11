@@ -4,7 +4,8 @@ print "|--------------------------------------------|"
 
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrMaarten')
+scene.addAssetPath("script", "behaviorsets")
+scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
 scene.addAssetPath('script','scripts')
 scene.addAssetPath('script','examples')
@@ -37,8 +38,6 @@ rachelSkeleton = scene.getSkeleton('ChrRachel.sk')
 zebra2Map.applySkeleton(rachelSkeleton)
 zebra2Map.applyMotionRecurse('ChrRachel')
 
-# Animation setup
-scene.run('init-param-animation.py')
 
 # Setting up Brad and Rachel
 print 'Setting up Brad'
@@ -51,8 +50,15 @@ brad.setHPR(SrVec(-17, 0, 0))
 brad.createStandardControllers()
 # Deformable mesh
 brad.setDoubleAttribute('deformableMeshScale', .01)
-brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
+brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
+
+# setup gestures
+scene.run('BehaviorSetGestures.py')
+setupBehaviorSet()
+retargetBehaviorSet('ChrBrad')
+
 bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01" ready="0" relax="0"/>')
+
 
 print 'Setting up Rachel'
 rachel = scene.createCharacter('ChrRachel', '')
@@ -65,7 +71,13 @@ rachel.createStandardControllers()
 # Deformable mesh
 rachel.setDoubleAttribute('deformableMeshScale', .01)
 rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
-bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01" ready=".2" relax=".2"/>')
+
+# setup gestures
+scene.run('BehaviorSetFemaleGestures.py')
+setupBehaviorSet()
+retargetBehaviorSet('ChrRachel')
+
+bml.execBML('ChrRachel', '<body posture="ChrConnor@IdleStand01" ready=".2" relax=".2"/>')
 
 # Add pawns in scene
 print 'Adding pawn to scene'
