@@ -64,9 +64,6 @@
     <Filter Include="faceshiftviewer">
       <UniqueIdentifier>{14c552ac-4dba-4ce6-970d-56caa091ab6c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SOIL">
-      <UniqueIdentifier>{8cd9ab2e-5a18-4a72-b614-3ad793ad7771}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\sbgui\glfont2.cpp" />
@@ -339,18 +336,6 @@
     </ClCompile>
     <ClCompile Include="..\src\sbgui\faceshiftviewer\FaceShiftViewer.cpp">
       <Filter>faceshiftviewer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\external\SOIL\image_DXT.c">
-      <Filter>SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\external\SOIL\image_helper.c">
-      <Filter>SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\external\SOIL\SOIL.c">
-      <Filter>SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\external\SOIL\stb_image_aug.c">
-      <Filter>SOIL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -631,24 +616,6 @@
     </ClInclude>
     <ClInclude Include="..\src\sbgui\faceshiftviewer\FaceShiftViewer.h">
       <Filter>faceshiftviewer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\image_DXT.h">
-      <Filter>SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\image_helper.h">
-      <Filter>SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\SOIL.h">
-      <Filter>SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stb_image_aug.h">
-      <Filter>SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug.h">
-      <Filter>SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug_c.h">
-      <Filter>SOIL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

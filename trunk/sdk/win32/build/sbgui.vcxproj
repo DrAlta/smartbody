@@ -241,10 +241,6 @@
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeRTCurveViewer.cpp" />
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeRunTimeWindow.cpp" />
     <ClCompile Include="..\src\sbgui\visemeviewer\VisemeViewerWindow.cpp" />
-    <ClCompile Include="..\src\SmartBody\external\SOIL\image_DXT.c" />
-    <ClCompile Include="..\src\SmartBody\external\SOIL\image_helper.c" />
-    <ClCompile Include="..\src\SmartBody\external\SOIL\SOIL.c" />
-    <ClCompile Include="..\src\SmartBody\external\SOIL\stb_image_aug.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\smartbody-lib\src\external\glew\glew.h" />
@@ -341,12 +337,6 @@
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeRTCurveViewer.h" />
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeRunTimeWindow.h" />
     <ClInclude Include="..\src\sbgui\visemeviewer\VisemeViewerWindow.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\image_DXT.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\image_helper.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\SOIL.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug_c.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stb_image_aug.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
