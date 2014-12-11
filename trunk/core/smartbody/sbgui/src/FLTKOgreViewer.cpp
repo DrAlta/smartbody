@@ -78,8 +78,9 @@ void FLTKOgreWindow::draw()
 {	
 	//fl_set_gl_context(this,ogreInterface->getGLContext());
 	make_current();
+	
 	if (ogreInterface)
-	static int counter = 0;
+		static int counter = 0;
     //if (1)
 	{
 		
@@ -123,6 +124,8 @@ void FLTKOgreWindow::draw()
 	}
 	//FltkViewer::draw();
 	//Ogre::WindowEventUtilities::messagePump();
+
+	
 }
 
 
@@ -336,7 +339,7 @@ void FLTKOgreWindow::resetViewer()
 
 int printOglError(char *file, int line)
 {
-
+	/*
     GLenum glErr;
     int    retCode = 0;
 
@@ -349,6 +352,8 @@ int printOglError(char *file, int line)
     }
 
     return retCode;
+	*/
+	return 0;
 }
 
 void FLTKOgreWindow::fltkRender2()
@@ -367,8 +372,9 @@ void FLTKOgreWindow::fltkRender2()
 	if (!context_valid())
 	{			
 		hasShaderSupport = ssm.initGLExtension();
-		if (hasShaderSupport)
-			initShadowMap();		
+		// no shadow map in Ogre view
+		//if (hasShaderSupport)
+			//initShadowMap();		
 	}
 
 	glPushAttrib(GL_ENABLE_BIT);
@@ -487,7 +493,6 @@ void FLTKOgreWindow::fltkRender2()
 	glDisable(GL_LIGHTING);
 	glDisable(GL_BLEND);
 
-	
 	drawPawns();
 	// draw the grid
 	//   if (gridList == -1)
@@ -518,6 +523,7 @@ void FLTKOgreWindow::fltkRender2()
 	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, terrainMatSpecular );
 	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
 	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+
 	if (_data->terrainMode == FltkViewer::ModeTerrain)
 	{
 		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();		
@@ -581,7 +587,7 @@ void FLTKOgreWindow::fltkRender2()
 	SBGUIManager::singleton().update();
 
 	glPopAttrib();
-
+	
 }
 
 void FLTKOgreWindow::notify(SmartBody::SBSubject* subject)
