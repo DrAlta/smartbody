@@ -6,7 +6,7 @@ print "|--------------------------------------------|"
 	
 # Add asset paths
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrMaarten')
+scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
@@ -52,7 +52,7 @@ for i in range(amount):
 	brad.createStandardControllers()
 	# Set deformable mesh
 	brad.setDoubleAttribute('deformableMeshScale', .01)
-	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
+	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Retarget character
 	#retargetCharacter(baseName, 'ChrBrad.sk', False)
 	# setup mocap locomotion
@@ -60,6 +60,9 @@ for i in range(amount):
 		scene.run('BehaviorSetMaleLocomotion.py')
 		setupBehaviorSet()
 		retargetBehaviorSet(baseName)
+		scene.run('BehaviorSetGestures.py')
+		setupBehaviorSet()
+		retargetBehaviorSet(baseName)		
 	steerAgent = steerManager.createSteerAgent(baseName)
 	steerAgent.setSteerStateNamePrefix("all")
 	steerAgent.setSteerType("example")
@@ -68,6 +71,7 @@ for i in range(amount):
 	brad.setBoolAttribute('steering.pathFollowingMode', False)
 	# Play default animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
+	
 
 steerManager.setEnable(False)
 steerManager.setEnable(True)
