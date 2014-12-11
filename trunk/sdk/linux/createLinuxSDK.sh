@@ -111,9 +111,9 @@ cp ../win32/src/ogresmartbody/*.py smartbody/data
 mkdir smartbody/src/irrlichtsmartbody
 cp ../win32/src/irrlichtsmartbody/*.cpp  smartbody/src/irrlichtsmartbody
 cp ../win32/src/irrlichtsmartbody/*.h smartbody/src/irrlichtsmartbody
+cp -R ../../irrlicht-1.8.1 smartbody 
+cp -R ../../core/irrlichtsmartbody/media/* smartbody/irrlicht-1.8.1/media
 cp ../win32/src/irrlichtsmartbody/*.py smartbody/src/irrlichtsmartbody/data
-mkdir smartbody/data/irrlichtmedia
-cp ../win32/src/irrlichtsmartbody/media/* smartbody/data/irrlichtmedia
 
 # build files
 cp build/CMakeLists.txt ./smartbody/
