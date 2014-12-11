@@ -1,4 +1,4 @@
-11/12/13
+12/12/14
 Ari Shapiro, Ph.D.
 
 Download
@@ -21,8 +21,7 @@ sudo apt-get install cmake g++ libxerces-c3-dev libgl1-mesa-dev libglu1-mesa-dev
 #packages needed for Ogre rendering
 sudo apt-get install libzzip-dev libxaw7-dev libxxf86vm-dev libxrandr-dev libfreeimage-dev nvidia-cg-toolkit libois-dev libogre-dev ogre-1.8-samples-data
 
-#packages needed for irrlicht rendering
-sudo apt-get install libirrlicht-dev
+# irrlicht code is included in the sdk
 
 In addition, the activemq-cpp libraries will need to be installed. 
 The source code is included in this distribution. Other versions can be found here:
