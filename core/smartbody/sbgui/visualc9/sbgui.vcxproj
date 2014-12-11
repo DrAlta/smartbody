@@ -196,6 +196,7 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">sbgui</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">sbm-fltk</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Emscripten'">sbm-fltk</TargetName>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
