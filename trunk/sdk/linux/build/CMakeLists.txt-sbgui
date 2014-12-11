@@ -183,6 +183,7 @@ set( SBM_FLTK_SRC
 	./bmlcreator/BMLSaccadeObject.cpp
 	./bmlcreator/BMLHandObject.cpp
 	./bmlcreator/BMLStateObject.cpp
+	./bmlcreator/BMLNoiseObject.cpp
 
 	./resourceViewer/Fl_Tree_Horizontal.cpp
 	./resourceViewer/TreeItemInfoWidget.cpp
