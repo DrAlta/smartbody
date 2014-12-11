@@ -6,7 +6,7 @@ include_directories( ../../include/steersuite )
 include_directories( ../../include/steersuite/external )
 include_directories( ../../include/steersuite/external/tinyxml )
 include_directories( /usr/include/python2.7 )
-include_directories( /usr/include/irrlicht)
+include_directories( /usr/local/include/irrlicht)
 
 
 add_executable( irrlichtsmartbody
