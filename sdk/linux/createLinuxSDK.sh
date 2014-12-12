@@ -107,13 +107,14 @@ cp ../win32/src/ogresmartbody/*.cpp smartbody/src/ogresmartbody
 cp ../win32/src/ogresmartbody/*.h smartbody/src/ogresmartbody
 cp ../win32/src/ogresmartbody/plugins.cfg-linux smartbody/bin/plugins.cfg
 cp ../win32/src/ogresmartbody/resources.cfg-linux smartbody/bin/resources.cfg
-cp ../win32/src/ogresmartbody/*.py smartbody/data
+cp ../win32/src/ogresmartbody/*.py smartbody/data/
 mkdir smartbody/src/irrlichtsmartbody
 cp ../win32/src/irrlichtsmartbody/*.cpp  smartbody/src/irrlichtsmartbody
 cp ../win32/src/irrlichtsmartbody/*.h smartbody/src/irrlichtsmartbody
-cp -R ../../irrlicht-1.8.1 smartbody 
+mkdir smartbody/irrlicht-1.8.1
+cp -R ../../lib/irrlicht-1.8.1/* smartbody/irrlicht-1.8.1 
 cp -R ../../core/irrlichtsmartbody/media/* smartbody/irrlicht-1.8.1/media
-cp ../win32/src/irrlichtsmartbody/*.py smartbody/src/irrlichtsmartbody/data
+cp ../win32/src/irrlichtsmartbody/*.py smartbody/data/
 
 # build files
 cp build/CMakeLists.txt ./smartbody/
