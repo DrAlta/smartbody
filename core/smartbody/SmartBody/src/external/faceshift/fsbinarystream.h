@@ -28,13 +28,18 @@
 #include <Eigen/Geometry>
 #endif
 
+#include <boost/shared_ptr.hpp>
 #ifdef _MSC_VER
 #include <memory>
 #else
 #ifdef __linux__
 #include <boost/shared_ptr.hpp>
 #else
+#ifdef __APPLE__
+#include <boost/shared_ptr.hpp>
+#else
 #include <memory>
+#endif
 #endif
 #endif
 
@@ -229,7 +234,11 @@ public:
 #ifdef __linux__
 typedef boost::shared_ptr<fsMsg> fsMsgPtr;
 #else
+#ifdef __APPLE__
+typedef boost::shared_ptr<fsMsg> fsMsgPtr;
+#else
 typedef std::shared_ptr<fsMsg> fsMsgPtr;
+#endif
 #endif
 
 
