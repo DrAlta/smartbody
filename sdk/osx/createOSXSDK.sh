@@ -36,6 +36,7 @@ chmod +x ./SmartBodySDK/bin/protoc
 # copy dylib for pprAI and steerlib (assuming it's prebuilt)
 #cp ../../core/smartbody/sbgui/bin/libpprAI.dylib ./SmartBodySDK/bin
 #cp ../../core/smartbody/sbgui/bin/libsteerlib.dylib ./SmartBodySDK/bin
+#cp ../../core/smartbody/sbgui/bin/libpinocchio.dylib ./SmartBodySDK/bin
 
 # copy readme.txt
 rsync -ap --exclude=".svn" ./readme.txt ./SmartBodySDK/readme.txt
