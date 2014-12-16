@@ -663,7 +663,6 @@ void SBScene::update()
 	}
 	activeSequences->cleanupMarkedSequences();
 
-	bool isClosingBoneBus = false;
 	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		pawnIter != pawns.end();

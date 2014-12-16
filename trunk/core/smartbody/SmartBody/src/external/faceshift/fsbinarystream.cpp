@@ -13,7 +13,10 @@
 // ==========================================================================
 
 #include "fsbinarystream.h"
+#if __MSC_VER > 1500
 #include <stdint.h>
+#endif
+
 
 #define FSNETWORKVERSION 1
 
@@ -284,14 +287,22 @@ fsMsgPtr fsBinaryStream::get_message() {
         return fsMsgPtr(new fsMsgHeadPoseAbsolute() );
     }; break;
     case fsMsg::MSG_OUT_MARKER_NAMES: {
+#if _MSC_VER == 1500
+        boost::shared_ptr< fsMsgMarkerNames > msg(new fsMsgMarkerNames());
+#else
         std::tr1::shared_ptr< fsMsgMarkerNames > msg(new fsMsgMarkerNames());
+#endif
         if( !decodeMarkerNames(*msg, m_buffer, m_start )) { LOG_RELEASE_ERROR("Could not decode marker names"); m_valid = false; return fsMsgPtr(); }
         uint64_t actual_size = m_start-super_block_data_start;
         if( actual_size != super_block.size ) { LOG_RELEASE_ERROR("Block was promised to be of size %d, not %d", super_block.size, actual_size); m_valid = false; return fsMsgPtr(); }
         return msg;
     }; break;
     case fsMsg::MSG_OUT_BLENDSHAPE_NAMES: {
-        std::tr1::shared_ptr< fsMsgBlendshapeNames > msg(new fsMsgBlendshapeNames() );
+#if _MSC_VER == 1500
+        boost::shared_ptr< fsMsgBlendshapeNames > msg(new fsMsgBlendshapeNames() );
+#else
+		std::tr1::shared_ptr< fsMsgBlendshapeNames > msg(new fsMsgBlendshapeNames() );
+#endif
         if( !decodeBlendshapeNames(*msg, m_buffer, m_start) ) { LOG_RELEASE_ERROR("Could not decode blendshape names"); m_valid = false; return fsMsgPtr(); }
         uint64_t actual_size = m_start-super_block_data_start;
         if( actual_size != super_block.size ) { LOG_RELEASE_ERROR("Block was promised to be of size %d, not %d", super_block.size, actual_size); m_valid = false; return fsMsgPtr(); }
@@ -301,7 +312,11 @@ fsMsgPtr fsBinaryStream::get_message() {
         BlockHeader sub_block;
         uint16_t num_blocks = 0;
         if( !read_pod(num_blocks, m_buffer, m_start) ) { LOG_RELEASE_ERROR("Could not read num_blocks"); m_valid = false; return fsMsgPtr(); }
+#if _MSC_VER == 1500
+        boost::shared_ptr<fsMsgTrackingState> msg = boost::shared_ptr<fsMsgTrackingState>(new fsMsgTrackingState());
+#else
         std::tr1::shared_ptr<fsMsgTrackingState> msg = std::tr1::shared_ptr<fsMsgTrackingState>(new fsMsgTrackingState());
+#endif
         for(int i = 0; i < num_blocks; i++) {
             if( !headerAvailable(sub_block, m_buffer, m_start, m_end) ) { LOG_RELEASE_ERROR("could not read sub-header %d", i); m_valid = false; return fsMsgPtr(); }
             if( !blockAvailable(            m_buffer, m_start, m_end) ) { LOG_RELEASE_ERROR("could not read sub-block %d",  i); m_valid = false; return fsMsgPtr(); }
@@ -337,7 +352,11 @@ fsMsgPtr fsBinaryStream::get_message() {
         return msg;
     }; break;
     case fsMsg::MSG_OUT_RIG: {
+#if _MSC_VER == 1500
+        boost::shared_ptr< fsMsgRig > msg(new fsMsgRig() );
+#else
         std::tr1::shared_ptr< fsMsgRig > msg(new fsMsgRig() );
+#endif
         if( !decodeRig(*msg, m_buffer, m_start)                ) { LOG_RELEASE_ERROR("Could not decode rig"); m_valid = false; return fsMsgPtr(); }
         if( m_start-super_block_data_start != super_block.size ) { LOG_RELEASE_ERROR("Could not decode rig unexpected size"); m_valid = false; return fsMsgPtr(); }
         return msg;
