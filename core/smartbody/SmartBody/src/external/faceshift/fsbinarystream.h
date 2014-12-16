@@ -45,7 +45,17 @@
 
 #include <string>
 #include <vector>
+#if __MSC_VER > 1500
 #include <stdint.h>
+#else
+#include <boost/shared_ptr.hpp>
+typedef unsigned __int16 uint16_t;
+typedef __int16 int16_t;
+typedef unsigned __int32 uint32_t;
+typedef __int32 int32_t;
+typedef unsigned __int64 uint64_t;
+typedef __int64 int64_t;
+#endif
 
 /*******************************************************************************************
   * This first part of the file contains a definition of the datastructures holding the
@@ -234,10 +244,14 @@ public:
 #ifdef __linux__
 typedef boost::shared_ptr<fsMsg> fsMsgPtr;
 #else
+#if _MSC_VER == 1500
+typedef boost::shared_ptr<fsMsg> fsMsgPtr;
+#else
 #ifdef __APPLE__
 typedef boost::shared_ptr<fsMsg> fsMsgPtr;
 #else
 typedef std::shared_ptr<fsMsg> fsMsgPtr;
+#endif
 #endif
 #endif
 

@@ -69,7 +69,7 @@
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
 				AdditionalOptions="/Stack:10000000"
-				AdditionalDependencies="glew32.lib SmartBody_d.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_51.lib boost_system-vc90-mt-gd-1_51.lib boost_regex-vc90-mt-gd-1_51.lib boost_python-vc90-mt-gd-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib fltkgld.lib fltkd.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAId.lib steerlibd.lib ode_doubled.lib python27.lib OgreMain.lib OgreRTShaderSystem.lib OIS.lib CEGUIBase-0.lib PyCEGUI.lib PyCEGUIOpenGLRenderer.lib CEGUIExpatParser.lib CEGUICoreWindowRendererSet.lib CEGUIOpenGLRenderer-0.lib CEGUISILLYImageCodec.lib Pinocchio.lib PolyVoxCore.lib libprotobufd.lib"
+				AdditionalDependencies="glew32.lib SmartBody_d.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib blasd.lib libf2cd.lib lapackd.lib pthreadVSE2.lib xerces-c_3D.lib activemq-cppd.lib boost_filesystem-vc90-mt-gd-1_51.lib boost_system-vc90-mt-gd-1_51.lib boost_regex-vc90-mt-gd-1_51.lib boost_python-vc90-mt-gd-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib fltkgld.lib fltkd.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAId.lib steerlibd.lib ode_doubled.lib python27.lib OgreMain.lib OgreRTShaderSystem.lib OIS.lib CEGUIBase-0.lib PyCEGUI.lib PyCEGUIOpenGLRenderer.lib CEGUIExpatParser.lib CEGUICoreWindowRendererSet.lib CEGUIOpenGLRenderer-0.lib CEGUISILLYImageCodec.lib Pinocchio.lib PolyVoxCore90_d.lib libprotobufd.lib"
 				OutputFile="..\bin\sbguid.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\SmartBody\src\external\glew;..\..\SmartBody\lib;..\..\SmartBody\src\external\protobuf\lib9;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\wsp\wsp\lib;&quot;..\external\cegui-0.8.2\lib&quot;;..\external\polyvox\build\lib;..\external\Pinocchio\lib;&quot;..\external\fltk-1.3.2\lib&quot;;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib9&quot;;..\..\..\..\lib\boost\lib;..\panimationviewer\lib;..\bmlviewer\lib;..\..\ode\lib9;..\..\clapack\lib9;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\..\core\smartbody\Python27\libs9;..\..\..\..\lib\OgreSDK\lib9\Release;..\..\..\..\lib\festival\speech_tools\lib9;..\..\..\..\lib\festival\festival\src\lib9"
@@ -163,7 +163,7 @@
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
 				AdditionalOptions="/Stack:10000000"
-				AdditionalDependencies="glew32.lib SmartBody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib pthreadVSE2.lib xerces-c_3.lib activemq-cpp.lib boost_filesystem-vc90-mt-1_51.lib boost_system-vc90-mt-1_51.lib boost_regex-vc90-mt-1_51.lib boost_python-vc90-mt-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib fltkgl.lib fltk.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAI.lib steerlib.lib ode_double.lib python27.lib OgreMain.lib OgreRTShaderSystem.lib OIS.lib CEGUIBase-0.lib PyCEGUI.lib PyCEGUIOpenGLRenderer.lib CEGUIExpatParser.lib CEGUICoreWindowRendererSet.lib CEGUIOpenGLRenderer-0.lib CEGUISILLYImageCodec.lib Pinocchio.lib PolyVoxCore.lib libprotobuf.lib"
+				AdditionalDependencies="glew32.lib SmartBody.lib vhcl.lib vhmsg.lib bonebus.lib wsp.lib blas.lib libf2c.lib lapack.lib pthreadVSE2.lib xerces-c_3.lib activemq-cpp.lib boost_filesystem-vc90-mt-1_51.lib boost_system-vc90-mt-1_51.lib boost_regex-vc90-mt-1_51.lib boost_python-vc90-mt-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib fltkgl.lib fltk.lib opengl32.lib glu32.lib dbghelp.lib ws2_32.lib winmm.lib comctl32.lib rpcrt4.lib pprAI.lib steerlib.lib ode_double.lib python27.lib OgreMain.lib OgreRTShaderSystem.lib OIS.lib CEGUIBase-0.lib PyCEGUI.lib PyCEGUIOpenGLRenderer.lib CEGUIExpatParser.lib CEGUICoreWindowRendererSet.lib CEGUIOpenGLRenderer-0.lib CEGUISILLYImageCodec.lib Pinocchio.lib PolyVoxCore90.lib libprotobuf.lib"
 				OutputFile="..\bin\sbgui.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\SmartBody\src\external\glew;..\..\SmartBody\lib;..\..\SmartBody\src\external\protobuf\lib9;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\OgreSDK\lib\release;..\..\..\..\lib\wsp\wsp\lib;&quot;..\external\cegui-0.8.2\lib&quot;;..\external\polyvox\build\lib;..\external\Pinocchio\lib;&quot;..\external\fltk-1.3.2\lib&quot;;..\..\..\..\lib\pthreads\lib9;&quot;..\..\..\..\lib\activemq\activemq-cpp\vs2008-build\ReleaseDLL&quot;;&quot;..\..\..\..\lib\xerces-c\lib9&quot;;..\..\..\..\lib\boost\lib;..\panimationviewer\lib;..\bmlviewer\lib;..\..\ode\lib9;..\..\clapack\lib9;&quot;..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release&quot;;..\..\..\..\core\smartbody\Python27\libs9;..\..\..\..\lib\OgreSDK\lib9\release;..\..\..\..\lib\festival\speech_tools\lib9;..\..\..\..\lib\festival\festival\src\lib9"
@@ -907,6 +907,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\bmlcreator\BMLHandObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLHandObject.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\bmlcreator\BMLHeadObject.cpp"
 				>
 			</File>
@@ -920,6 +928,14 @@
 			</File>
 			<File
 				RelativePath="..\src\bmlcreator\BMLLocomotionObject.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLNoiseObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\bmlcreator\BMLNoiseObject.h"
 				>
 			</File>
 			<File
@@ -1147,6 +1163,14 @@
 			Name="autorig"
 			>
 			<File
+				RelativePath="..\src\autorig\AutoRigViewer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\autorig\AutoRigViewer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\autorig\SBAutoRigManager.cpp"
 				>
 			</File>
@@ -1172,6 +1196,18 @@
 			</File>
 			<File
 				RelativePath="..\src\pythonbind\SBPythonAutoRig.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="FaceShiftViewer"
+			>
+			<File
+				RelativePath="..\src\faceshiftviewer\FaceShiftViewer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\faceshiftviewer\FaceShiftViewer.h"
 				>
 			</File>
 		</Filter>

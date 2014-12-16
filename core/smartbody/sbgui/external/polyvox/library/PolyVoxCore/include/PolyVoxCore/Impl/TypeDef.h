@@ -79,6 +79,17 @@ freely, subject to the following restrictions:
 	#include <boost/static_assert.hpp>
 	#define static_assert BOOST_STATIC_ASSERT
 
+#if _MSC_VER == 1500 
+#ifdef POLYVOXVS2008FIX
+	using boost::int8_t;
+	using boost::int16_t;
+	using boost::int32_t;
+	using boost::uint8_t;
+	using boost::uint16_t;
+	using boost::uint32_t;
+#endif
+	
+#endif
 
 	//As long as we're requiring boost, we'll use it to compensate
 	//for the missing cstdint header too.

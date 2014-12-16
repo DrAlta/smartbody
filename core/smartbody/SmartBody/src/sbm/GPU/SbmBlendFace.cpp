@@ -481,7 +481,11 @@ void SbmBlendTextures::BlendGeometry(GLuint * FBODst, GLuint * texDst, std::vect
 	
 	glGenBuffers( 1, &verticesUsedBuffer);
     glBindBuffer( GL_TEXTURE_BUFFER, verticesUsedBuffer);
+#if _MSC_VER == 1500
+	glBufferData( GL_TEXTURE_BUFFER, verticesUsed.size() * sizeof(int), &verticesUsed.front(), GL_DYNAMIC_DRAW);
+#else
 	glBufferData( GL_TEXTURE_BUFFER, verticesUsed.size() * sizeof(int), verticesUsed.data(), GL_DYNAMIC_DRAW);
+#endif
 	
 	aux->setDeformableMesh(_mesh);
 	aux->buildVertexBufferGPU(weights.size());

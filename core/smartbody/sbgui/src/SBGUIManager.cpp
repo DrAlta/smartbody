@@ -3,7 +3,11 @@
 #endif
 
 #ifdef WIN32
+#if _MSC_VER == 1500
+#define USE_CEGUI 0
+#else
 #define USE_CEGUI 1
+#endif
 #else
 //#define USE_CEGUI
 #endif

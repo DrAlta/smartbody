@@ -63,7 +63,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="glew32.lib glu32.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib wspd.lib blasd.lib libf2cd.lib lapackd.lib activemq-cppd.lib xerces-c_3D.lib boost_filesystem-vc90-mt-gd-1_51.lib boost_system-vc90-mt-gd-1_51.lib boost_regex-vc90-mt-gd-1_51.lib boost_python-vc90-mt-gd-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlibd.lib pprAId.lib ode_doubled.lib libprotobufd.lib"
+				AdditionalDependencies="glew32.lib glu32.lib vhcl_d.lib vhmsg_d.lib bonebus_d.lib blasd.lib libf2cd.lib lapackd.lib activemq-cppd.lib xerces-c_3D.lib boost_filesystem-vc90-mt-gd-1_51.lib boost_system-vc90-mt-gd-1_51.lib boost_regex-vc90-mt-gd-1_51.lib boost_python-vc90-mt-gd-1_51.lib OpenAL32.lib alut.lib libsndfile-1.lib pthreadVSE2.lib opengl32.lib ws2_32.lib winmm.lib dbghelp.lib comctl32.lib rpcrt4.lib steerlibd.lib pprAId.lib ode_doubled.lib libprotobufd.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_d.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\SmartBody\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs9\Win32;..\..\..\lib\vhcl\libsndfile\lib;&quot;..\..\..\lib\vhmsg\vhmsg-c\lib&quot;;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib9;&quot;..\..\..\lib\activemq\activemq-cpp\vs2008-build\DebugDLL&quot;;&quot;..\..\..\lib\xerces-c\lib9&quot;;..\..\..\lib\boost\lib;..\clapack\lib9;&quot;..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug&quot;;..\..\..\core\smartbody\ode\lib9;..\..\..\core\smartbody\Python27\libs9;..\..\..\lib\festival\speech_tools\lib9;..\..\..\lib\festival\festival\src\lib9;..\SmartBody\src\external\glew;..\SmartBody\src\external\protobuf\lib9"
@@ -1357,6 +1357,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\controllers\me_ct_generic_hand.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\controllers\me_ct_generic_hand.h"
+				>
+			</File>
+			<File
 				RelativePath="..\SmartBody\src\controllers\me_ct_hand.cpp"
 				>
 			</File>
@@ -1498,6 +1506,14 @@
 			</File>
 			<File
 				RelativePath="..\SmartBody\src\controllers\me_ct_motion_timewarp.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\controllers\me_ct_new_locomotion.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\controllers\me_ct_new_locomotion.h"
 				>
 			</File>
 			<File
@@ -2344,6 +2360,30 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="FaceShift"
+				>
+				<File
+					RelativePath=".\src\external\faceshift\fsbinarystream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\external\faceshift\fsbinarystream.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="jpge"
+				>
+				<File
+					RelativePath=".\src\external\jpge\jpge.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\external\jpge\jpge.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="python"
@@ -2745,6 +2785,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\sb\SBFaceShiftManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBFaceShiftManager.h"
+				>
+			</File>
+			<File
 				RelativePath="..\SmartBody\src\sb\SBGestureMap.cpp"
 				>
 			</File>
@@ -2758,6 +2806,30 @@
 			</File>
 			<File
 				RelativePath="..\SmartBody\src\sb\SBGestureMapManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBHandConfiguration.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBHandConfiguration.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBHandConfigurationManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBHandConfigurationManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBHandSynthesis.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBHandSynthesis.h"
 				>
 			</File>
 			<File
@@ -2945,6 +3017,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\sb\SBRigNode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sb\SBRigNode.h"
+				>
+			</File>
+			<File
 				RelativePath="..\SmartBody\src\sb\SBScene.cpp"
 				>
 			</File>
@@ -3030,14 +3110,6 @@
 			</File>
 			<File
 				RelativePath="..\SmartBody\src\sb\SBVHMsgManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\SmartBody\src\sb\SBWSPManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\SmartBody\src\sb\SBWSPManager.h"
 				>
 			</File>
 			<File
@@ -3354,6 +3426,14 @@
 			</File>
 			<File
 				RelativePath="..\SmartBody\src\sbm\sbm_test_cmds.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sbm\GPU\SbmBlendFace.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\sbm\GPU\SbmBlendFace.h"
 				>
 			</File>
 			<File
