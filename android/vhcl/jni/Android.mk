@@ -25,7 +25,7 @@ LOCAL_SRC_FILES := $(MY_VHCL_DIR)/$(VHCL_SRC_DIR)/Pow2Assert.cpp \
 				$(MY_VHCL_DIR)/$(VHCL_SRC_DIR)/vhcl_math.cpp  \
 				$(MY_VHCL_DIR)/$(VHCL_SRC_DIR)/vhcl_audio.cpp
 LOCAL_LDLIBS    := -llog	
-LOCAL_STATIC_LIBRARIES := openal sndfile openalut
+LOCAL_STATIC_LIBRARIES := openal sndfile alut
 
 #$(MY_VHCL_DIR)/src/vhcl_audio.cpp \
 				   
