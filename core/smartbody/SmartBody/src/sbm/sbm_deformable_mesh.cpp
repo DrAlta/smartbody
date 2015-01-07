@@ -751,14 +751,14 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			mesh->triBuf[k][1] = triBuf[faceIdxList[k]][1];
 			mesh->triBuf[k][2] = triBuf[faceIdxList[k]][2];
 		}
-#if TEST_HAIR_RENDER
+
 		mesh->matName = allMatNameList[iMaterial];
 		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,mesh->texName.c_str());
-		std::string lowMatName = mesh->matName;
-		boost::algorithm::to_lower(lowMatName);
 		//if (lowMatName.find("hair") != std::string::npos || lowMatName.find("lash") != std::string::npos 
 		//	|| lowMatName.find("shadow") != std::string::npos || lowMatName.find("shell") != std::string::npos)
-		
+#if TEST_HAIR_RENDER		
+		std::string lowMatName = mesh->matName;
+		boost::algorithm::to_lower(lowMatName);
 		if (lowMatName.find("hair") != std::string::npos)
 		{
 			// is a hair mesh, based on a rough name searching

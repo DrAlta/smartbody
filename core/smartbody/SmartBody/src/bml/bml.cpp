@@ -587,6 +587,7 @@ void BmlRequest::gestureRequestProcess()
 					{
 						if (actor->getBoolAttribute("gestureRequest.gestureLog"))
 							LOG("Motion Filtered");
+						motionInList->disconnect();
 						continue;
 					}
 				}
@@ -612,6 +613,7 @@ void BmlRequest::gestureRequestProcess()
 					currRWristSpeed = rWristSpeed;
 					closestMotion = motionInList;
 				}
+				motionInList->disconnect();
 			}
 			if (closestMotion == NULL)
 			{
@@ -725,6 +727,7 @@ void BmlRequest::gestureRequestProcess()
 					}
 				}
 			}
+			prevSBMotion->disconnect();
 			delete tempSkel;
 		}
 		else
