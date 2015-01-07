@@ -936,14 +936,14 @@ std::vector<float> BML::SpeechRequest::addCurve(std::vector<float>& c1, std::vec
 	{
 		if (c1[i * 2] < c1[(i - 1) * 2])
 		{
-			LOG("addCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
+			//LOG("addCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
 		}
 	}
 	for (size_t i = 1; i < c2.size() / 2; ++i)
 	{
 		if (c2[i * 2] < c2[(i - 1) * 2])
 		{
-			LOG("addCurve: curve 2 is not in ascending order: %f %f", c2[(i - 1) * 2], c2[i * 2]);
+			//LOG("addCurve: curve 2 is not in ascending order: %f %f", c2[(i - 1) * 2], c2[i * 2]);
 		}
 	}
 
@@ -1192,14 +1192,14 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 	{
 		if (c1[i * 2] < c1[(i - 1) * 2])
 		{
-			LOG("stitchCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
+			//LOG("stitchCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
 		}
 	}
 	for (int i = 1; i < size2 / 2; ++i)
 	{
 		if (c2[i * 2] < c2[(i - 1) * 2])
 		{
-			LOG("stitchCurve: curve 2 is not in ascending order: %f %f", c2[(i - 1) * 2], c2[i * 2]);
+			//LOG("stitchCurve: curve 2 is not in ascending order: %f %f", c2[(i - 1) * 2], c2[i * 2]);
 		}
 	}
 
