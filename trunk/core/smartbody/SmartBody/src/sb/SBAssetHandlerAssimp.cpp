@@ -7,6 +7,7 @@
 #include <boost/algorithm/string.hpp>
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
+#include <sk/sk_channel.h>
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #include <assimp/Importer.hpp> 
 #include <assimp/scene.h>
@@ -18,30 +19,32 @@ namespace SmartBody {
 SBAssetHandlerAssimp::SBAssetHandlerAssimp()
 {
 	assetTypes.push_back("fbx");
+	assetTypes.push_back("blend");
 }
 
 SBAssetHandlerAssimp::~SBAssetHandlerAssimp()
 {
 }
 
-void recurseNode(aiNode* node, std::map<std::string, std::string>& hierarchyMap, int level)
+void recurseNode(aiNode* node, std::map<std::string, std::string>& hierarchyMap, std::map<int, aiNode*>& meshParents)
 {
-	/*
-	std::stringstream str;
-	for (int l = 0; l < level; l++)
-		str << "\t";
-	LOG("%s%s%s", str.str().c_str(), str.str().c_str(), node->mName.C_Str());
-	LOG("%4.4f %4.4f %4.4f %4.4f", node->mTransformation.a1, node->mTransformation.a2, node->mTransformation.a3, node->mTransformation.a4);
-	LOG("%4.4f %4.4f %4.4f %4.4f", node->mTransformation.b1, node->mTransformation.b2, node->mTransformation.b3, node->mTransformation.b4);
-	LOG("%4.4f %4.4f %4.4f %4.4f", node->mTransformation.c1, node->mTransformation.c2, node->mTransformation.c3, node->mTransformation.c4);
-	LOG("%4.4f %4.4f %4.4f %4.4f", node->mTransformation.d1, node->mTransformation.d2, node->mTransformation.d3, node->mTransformation.d4);
-	*/
+	int numMeshes = node->mNumMeshes;
+		
+	if (node->mNumMeshes > 0)
+	{
+		for (int m = 0; m < numMeshes; m++)
+		{
+			// add a mapping from the mesh to the node parent
+			meshParents.insert(std::pair<int, aiNode*>(node->mMeshes[m], node));
+
+		}
+	}
 	int numChildren = node->mNumChildren;
 	for (int c = 0; c < numChildren; c++)
 	{
 		aiNode* child = node->mChildren[c];
 		hierarchyMap.insert(std::pair<std::string, std::string>(child->mName.C_Str(), node->mName.C_Str()));
-		recurseNode(child, hierarchyMap, level + 1);
+		recurseNode(child, hierarchyMap, meshParents);
 	}
 }
 
@@ -90,44 +93,18 @@ void recurseAddMissing(aiNode* node, std::set<std::string>& existingHierarchy)
 	}
 }
 
-void recurseNecesityMap(aiNode* node, std::map<std::string, bool>& boneNecesityMap)
-{
-	if (node)
-	{
-		std::string nodeName = node->mName.C_Str();
-		LOG("%s", nodeName.c_str());
-		boneNecesityMap[nodeName] = false;
-	}
-	else
-	{
-		return;
-	}
-	
-	int numChildren = node->mNumChildren;
-	for (int c = 0; c < numChildren; c++)
-	{
-		aiNode* child = node->mChildren[c];
-		recurseNecesityMap(child, boneNecesityMap);
-	}
-}
-
-void recurseNecesityMapParent(aiNode* meshNode, aiNode* curNode, std::map<std::string, bool>& boneNecesityMap)
-{
-	// mark all parents as necessary
-	aiNode* parentNode = curNode->mParent;
-	if (parentNode == meshNode)
-		return;
-	std::string parentNodeName = parentNode->mName.C_Str();
-	boneNecesityMap[parentNodeName] = true;
-	recurseNecesityMapParent(meshNode, parentNode, boneNecesityMap); 
-}
-
 int recurseNodeLevel(aiNode* rootNode, aiNode* curNode, int level)
 {
 	if (curNode == rootNode)
 		return level;
 	aiNode* parent = curNode->mParent;
 	return recurseNodeLevel(rootNode, parent, level + 1);
+}
+
+bool has_suffix(const std::string &str, const std::string &suffix)
+{
+    return str.size() >= suffix.size() &&
+           str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
 
@@ -207,9 +184,9 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				material->emission = SrColor(emmissive.r, emmissive.g, emmissive.b, emmissive.a);
 				LOG("EMMISSIVE COLOR %.2f %.2f %.2f %.2f", material->emission.r, material->emission.g, material->emission.b, material->emission.a);
 
-				float shininess(0.0f);
+				aiColor4D shininess(0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_REFLECTIVE, shininess);
-				material->shininess = shininess;
+				material->shininess = shininess.r;
 				LOG("SHININESS COLOR %.2f ", material->shininess);
 
 				aiColor4D specular(0.0f, 0.0f, 0.0f, 0.0f);
@@ -378,15 +355,12 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 		// get the node hierarchy and determine the parent-child relationship
 		std::map<std::string, std::string> hierarchyMap;
 		hierarchyMap.insert(std::pair<std::string, std::string>(scene->mRootNode->mName.C_Str(), ""));
-		recurseNode(scene->mRootNode, hierarchyMap, 0);
+		std::map<int, aiNode*> meshParents;
+		recurseNode(scene->mRootNode, hierarchyMap, meshParents);
 		std::map<std::string, aiMatrix4x4> jointTransformMap;
 		std::map<std::string, int> boneLevelMap;
 		std::vector<std::string> topmostNodeNames;
 		int topMostNodeLevel = 999999999;
-
-		std::map<std::string, bool> boneNecesityMap;
-		// add all the nodes to the necessity map, initially set to 'false'
-		recurseNecesityMap(scene->mRootNode, boneNecesityMap);
 
 		if (scene->HasMeshes())
 		{
@@ -408,11 +382,61 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				strstr << m;
 				model->name = strstr.str().c_str();
 			
+				// need to account for rotations and scaling 
+				// for each mesh
+				// for this, we need to locate the pivot point, then rotate/scale
+				// around that point
+				// ignored for now, since this will take some extra work
+				/*
+				// get the node parent of the mesh
+				std::map<int, aiNode*>::iterator meshParentIter = meshParents.find(m);
+				
+				aiMatrix4x4 meshTransform;
+				if (meshParentIter != meshParents.end())
+				{
+					aiNode* curNode = (*meshParentIter).second;
+					while (curNode)
+					{
+						std::string nodeName = curNode->mName.C_Str();
+						int pos = nodeName.find("_$AssimpFbx$_Rotation");
+						//if (pos != std::string::npos)
+						{
+							//if (has_suffix(nodeName, "Rotation"))
+							{
+								
+								if (!curNode->mTransformation.IsIdentity())
+								{
+									// traverse from this node to the root and multiply all matrices
+									meshTransform = curNode->mTransformation * meshTransform;
+								}
+							}
+						}
+						curNode = curNode->mParent;
+					}
+				}
+				SrMat meshMat;
+				
+				bool useTransform = !meshTransform.IsIdentity();
+
+				if (useTransform)
+				{
+					// use this matrix to modify the vertices and normals of the mesh 
+					// if there is a non-identity transform
+					meshMat.setl1(meshTransform.a1,  meshTransform.b1,  meshTransform.c1,  meshTransform.d1); 
+					meshMat.setl2(meshTransform.a2,  meshTransform.b2,  meshTransform.c2,  meshTransform.d2); 
+					meshMat.setl3(meshTransform.a3,  meshTransform.b3,  meshTransform.c3,  meshTransform.d3); 
+					meshMat.setl4(meshTransform.a4,  meshTransform.b4,  meshTransform.c4,  meshTransform.d4); 
+				}
+				SrMat meshRot;
+				SrQuat quat(meshMat);
+				*/
+
 				// extract vertices and normals
 				int numVertices = scene->mMeshes[m]->mNumVertices;
 				model->V.size(numVertices);
 				model->N.size(numVertices);
 				model->T.size(numVertices);
+				
 				for (int v = 0; v < numVertices; v++)
 				{
 					model->V[v].x = scene->mMeshes[m]->mVertices[v].x;
@@ -422,6 +446,16 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					model->N[v].x = scene->mMeshes[m]->mNormals[v].x;
 					model->N[v].y = scene->mMeshes[m]->mNormals[v].y;
 					model->N[v].z = scene->mMeshes[m]->mNormals[v].z;
+
+					/*
+					if (useTransform)
+					{
+						SrVec point = meshMat * model->V[v];
+						SrVec normal = quat.multVec(model->N[v]);
+						model->V[v] = point;
+						model->N[v] = normal;
+					}
+					*/
 
 					if (scene->mMeshes[m]->HasTextureCoords(0))
 					{ 
@@ -515,18 +549,6 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 
 				// seed the bones needed for dynamic mesh
 				int numBones = scene->mMeshes[m]->mNumBones;
-
-				// set all bones used by the mesh dynamically to true
-				for (int b = 0; b < numBones; b++)
-				{
-					std::string boneName = scene->mMeshes[m]->mBones[b]->mName.C_Str();
-					boneNecesityMap[boneName] = true;
-					// mark all of the bone parents in the necessity map to true 
-					// until the mesh node or the parent of the mesh node is found
-					
-					aiNode* node = scene->mRootNode->FindNode(boneName.c_str());
-					recurseNecesityMapParent(scene->mRootNode, node, boneNecesityMap);
-				}
 				
 				for (int b = 0; b < numBones; b++)
 				{
@@ -535,12 +557,6 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				}
 			}
 
-			for (std::map<std::string, bool>::iterator iter = boneNecesityMap.begin();
-				 iter != boneNecesityMap.end();
-				 iter++)
-			{
-				LOG("'%s'", (*iter).first.c_str());
-			}
 
 			// there may be bones that are not directly controlled by the mesh (but directly
 			// controlled by other bones) that need to be part of the skeleton
@@ -925,15 +941,15 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 						skinWeight->numInfJoints.push_back(numVerts);
 						for (int v = 0; v < numVerts; v++)
 						{
-							skinWeight->bindWeight.push_back(scene->mMeshes[m]->mBones[b]->mWeights->mWeight);
-							skinWeight->weightIndex.push_back(scene->mMeshes[m]->mBones[b]->mWeights->mVertexId);
+							skinWeight->bindWeight.push_back(scene->mMeshes[m]->mBones[b]->mWeights[v].mWeight);
+							skinWeight->weightIndex.push_back(scene->mMeshes[m]->mBones[b]->mWeights[v].mVertexId);
 							skinWeight->jointNameIndex.push_back(joint->getIndex());
 						}
 						
 
 
 					}
-					mesh->skinWeights.push_back(skinWeight);
+				//	mesh->skinWeights.push_back(skinWeight);
 				}
 				/*
 x	std::vector<std::string>	infJointName;	// name array
@@ -950,6 +966,109 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 			
 			
 			assets.push_back(mesh);
+
+			// check for animations
+			int numMotionChannels = 0;
+			int numAnimations = scene->mNumAnimations;
+			for (int a = 0; a < numAnimations; a++)
+			{
+				aiAnimation* animation = scene->mAnimations[a];
+				SBMotion* motion = new SBMotion();
+				motion->setName(animation->mName.C_Str());
+
+				// first pass, collect the channels
+				int numChannels = animation->mNumChannels;
+				for (int c = 0; c < numChannels; c++)
+				{
+					aiNodeAnim* nodeAnim = animation->mChannels[c];
+					std::string channelName = nodeAnim->mNodeName.C_Str();
+					if (nodeAnim->mNumPositionKeys > 0)
+					{
+						motion->addChannel(channelName, "XPos");
+						motion->addChannel(channelName, "YPos");
+						motion->addChannel(channelName, "ZPos");
+						numMotionChannels += 3;
+					}
+					if (nodeAnim->mNumRotationKeys > 0)
+					{
+						motion->addChannel(channelName, "Quat");
+						numMotionChannels += 1;
+					}
+					if (nodeAnim->mNumScalingKeys > 0)
+					{
+						// ignore scaling in animations
+					}
+				}
+
+				double duration = animation->mDuration;
+				int fps = animation->mTicksPerSecond;
+				if (fps <= 0)
+				{
+					fps = 30;
+				}
+
+				double step = 1.0 / (float) fps;
+				int numFrames = duration / step;
+
+				// for now, create an empty animation
+				std::vector<float> data;
+				data.resize(numMotionChannels);
+
+				double curTime = 0.0;
+				for (int f = 0; f < numFrames; f++)
+				{
+					motion->addFrame(curTime, data);
+					curTime += step;
+				}
+				
+				/*
+				// second pass, create the animations
+				for (int c = 0; c < numChannels; c++)
+				{
+					aiNodeAnim* nodeAnim = animation->mChannels[c];
+					std::string channelName = nodeAnim->mNodeName.C_Str();
+
+					std::vector<double> dataX;
+					std::vector<double> dataY;
+					std::vector<double> dataZ;
+					dataX.resize(numFrames);
+					dataY.resize(numFrames);
+					dataZ.resize(numFrames);
+
+					
+
+					int numPosKeys = nodeAnim->mNumPositionKeys;
+					for (int k = 0; k < numPosKeys; k++)
+					{
+						// find the frame for the given time
+						// translation
+						aiVectorKey* key = nodeAnim->mNumPositionKeys[k];
+						int frame = int(key->mTime / step);
+						if (frame < numFrames)
+						{
+							dataX[frame] = key->mValue.x;
+							dataY[frame] = key->mValue.y;
+							dataZ[frame] = key->mValue.x;
+						}
+						else
+						{
+							LOG("Data for channel %s at time %f outside of animation duration %d", channelName.c_str(), key->mTime, duration);
+						}					
+					}
+					motion->addFrame(
+					if (nodeAnim->mNumRotationKeys > 0)
+					{
+						
+					}
+					if (nodeAnim->mNumScalingKeys > 0)
+					{
+						// ignore scaling in animations
+					}
+				}
+				*/
+
+				assets.push_back(motion);
+			}
 		}
  		
 		  // extract animations
