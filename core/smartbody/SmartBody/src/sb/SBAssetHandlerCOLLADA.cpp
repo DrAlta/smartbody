@@ -17,7 +17,9 @@ namespace SmartBody {
 
 SBAssetHandlerCOLLADA::SBAssetHandlerCOLLADA()
 {
+#ifndef USE_ASSIMP
 	assetTypes.push_back("dae");
+#endif
 }
 
 SBAssetHandlerCOLLADA::~SBAssetHandlerCOLLADA()

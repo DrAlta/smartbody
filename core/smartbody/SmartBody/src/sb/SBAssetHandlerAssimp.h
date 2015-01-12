@@ -1,4 +1,5 @@
 #ifndef _SBASSETHANDLERASSIMP_H_
+#ifdef USE_ASSIMP
 
 #include <sb/SBTypes.h>
 #include <vector>
@@ -6,6 +7,7 @@
 #include <sb/SBAssetHandler.h>
 
 namespace SmartBody {
+
 
 class SBAssetHandlerAssimp : public SBAssetHandler
 {
@@ -17,7 +19,8 @@ class SBAssetHandlerAssimp : public SBAssetHandler
 
 };
 
-
 }
+
+#endif
 
 #endif

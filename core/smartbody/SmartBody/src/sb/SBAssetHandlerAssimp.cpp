@@ -1,3 +1,4 @@
+#ifdef USE_ASSIMP
 #include "SBAssetHandlerAssimp.h"
 #include <vhcl.h>
 #include <boost/version.hpp>
@@ -20,6 +21,7 @@ SBAssetHandlerAssimp::SBAssetHandlerAssimp()
 {
 	assetTypes.push_back("fbx");
 	assetTypes.push_back("blend");
+	assetTypes.push_back("dae");
 }
 
 SBAssetHandlerAssimp::~SBAssetHandlerAssimp()
@@ -28,6 +30,7 @@ SBAssetHandlerAssimp::~SBAssetHandlerAssimp()
 
 void recurseNode(aiNode* node, std::map<std::string, std::string>& hierarchyMap, std::map<int, aiNode*>& meshParents)
 {
+	//LOG("%s", node->mName.C_Str());
 	int numMeshes = node->mNumMeshes;
 		
 	if (node->mNumMeshes > 0)
@@ -86,7 +89,7 @@ void recurseAddMissing(aiNode* node, std::set<std::string>& existingHierarchy)
 			if (iter == existingHierarchy.end())
 			{
 				existingHierarchy.insert(childName);
-				LOG("ADDED BONE %s NOT DIRECTLY CONTROLLED BY MESH", childName.c_str());
+				//LOG("ADDED BONE %s NOT DIRECTLY CONTROLLED BY MESH", childName.c_str());
 			}
 		}
 		recurseAddMissing(child, existingHierarchy);
@@ -169,34 +172,53 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 			{
 				SrMaterial* material = new SrMaterial();
 
-				aiColor4D ambient(0.0f, 0.0f, 0.0f, 0.0f);
+				aiColor4D ambient(0.0f, 0.0f, 0.0f, 1.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
 				material->ambient = SrColor(ambient.r, ambient.g, ambient.b, ambient.a);
-				LOG("AMBIENT COLOR %.2f %.2f %.2f %.2f", material->ambient.r, material->ambient.g, material->ambient.b, material->ambient.a);
+				LOG("AMBIENT COLOR %x %x %x %x", material->ambient.r, material->ambient.g, material->ambient.b, material->ambient.a);
 
-				aiColor4D diffuse(0.0f, 0.0f, 0.0f, 0.0f);
+				aiColor4D diffuse(0.0f, 0.0f, 0.0f, 1.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
 				material->diffuse = SrColor(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-				LOG("DIFFUSE COLOR %.2f %.2f %.2f %.2f", material->diffuse.r, material->diffuse.g, material->diffuse.b, material->diffuse.a);
+				LOG("DIFFUSE COLOR %x %x %x %x", material->diffuse.r, material->diffuse.g, material->diffuse.b, material->diffuse.a);
 
-				aiColor4D emmissive(0.0f, 0.0f, 0.0f, 0.0f);
+				aiColor4D emmissive(0.0f, 0.0f, 0.0f, 1.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_EMISSIVE , emmissive);
 				material->emission = SrColor(emmissive.r, emmissive.g, emmissive.b, emmissive.a);
-				LOG("EMMISSIVE COLOR %.2f %.2f %.2f %.2f", material->emission.r, material->emission.g, material->emission.b, material->emission.a);
+				LOG("EMMISSIVE COLOR %x %x %x %x", material->emission.r, material->emission.g, material->emission.b, material->emission.a);
 
-				aiColor4D shininess(0.0f);
-				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_REFLECTIVE, shininess);
-				material->shininess = shininess.r;
-				LOG("SHININESS COLOR %.2f ", material->shininess);
+				float shininess;
+				float tmpShininess;
+				unsigned int max;
+				max = 1;
+				int ret1 = aiGetMaterialFloatArray(scene->mMaterials[m], AI_MATKEY_SHININESS, &shininess, &max);
+				if(ret1 == AI_SUCCESS)
+				{
+    				max = 1;
+					float strength = 0.0f;
+    				int ret2 = aiGetMaterialFloatArray(scene->mMaterials[m], AI_MATKEY_SHININESS_STRENGTH, &strength, &max);
+					if(ret2 == AI_SUCCESS)
+					{
+						tmpShininess = shininess * strength;
+					}
+					else
+					{
+						tmpShininess = shininess;
+					}
+				}
+				// convert to byte
+				int tempIntShininess = int(tmpShininess);
+				material->shininess =  tempIntShininess & 0x000000ff;
+				LOG("SHININESS COLOR %x", material->shininess);
 
-				aiColor4D specular(0.0f, 0.0f, 0.0f, 0.0f);
+				aiColor4D specular(0.0f, 0.0f, 0.0f, 1.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-				material->specular = SrColor(specular.r, specular.g, specular.b, specular.a);
-				LOG("SPECULAR COLOR %.2f %.2f %.2f %.2f", material->specular.r, material->specular.g, material->specular.b, material->specular.a);
+				material->specular = SrColor(specular.r, specular.g, specular.b);
+				LOG("SPECULAR COLOR %x %x %x %x", material->specular.r, material->specular.g, material->specular.b, material->specular.a);
 
-				float transparency(1.0f);
+				aiColor4D transparency(0.0f, 0.0f, 0.0f, 1.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_TRANSPARENT, transparency);
-				material->transparency = transparency;
+				material->transparency = transparency.r;
 				LOG("TRANSPARENCY COLOR %.2f ", material->transparency);
 				
 				aiString matName;
@@ -382,12 +404,6 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				strstr << m;
 				model->name = strstr.str().c_str();
 			
-				// need to account for rotations and scaling 
-				// for each mesh
-				// for this, we need to locate the pivot point, then rotate/scale
-				// around that point
-				// ignored for now, since this will take some extra work
-				/*
 				// get the node parent of the mesh
 				std::map<int, aiNode*>::iterator meshParentIter = meshParents.find(m);
 				
@@ -397,19 +413,10 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					aiNode* curNode = (*meshParentIter).second;
 					while (curNode)
 					{
-						std::string nodeName = curNode->mName.C_Str();
-						int pos = nodeName.find("_$AssimpFbx$_Rotation");
-						//if (pos != std::string::npos)
+						if (!curNode->mTransformation.IsIdentity())
 						{
-							//if (has_suffix(nodeName, "Rotation"))
-							{
-								
-								if (!curNode->mTransformation.IsIdentity())
-								{
-									// traverse from this node to the root and multiply all matrices
-									meshTransform = curNode->mTransformation * meshTransform;
-								}
-							}
+							// traverse from this node to the root and multiply all matrices
+							meshTransform = curNode->mTransformation * meshTransform;
 						}
 						curNode = curNode->mParent;
 					}
@@ -426,10 +433,13 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					meshMat.setl2(meshTransform.a2,  meshTransform.b2,  meshTransform.c2,  meshTransform.d2); 
 					meshMat.setl3(meshTransform.a3,  meshTransform.b3,  meshTransform.c3,  meshTransform.d3); 
 					meshMat.setl4(meshTransform.a4,  meshTransform.b4,  meshTransform.c4,  meshTransform.d4); 
+
+
 				}
+				meshMat.transpose();
 				SrMat meshRot;
-				SrQuat quat(meshMat);
-				*/
+				SrQuat meshOrient(meshMat);
+				meshOrient.normalize();
 
 				// extract vertices and normals
 				int numVertices = scene->mMeshes[m]->mNumVertices;
@@ -446,16 +456,15 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					model->N[v].x = scene->mMeshes[m]->mNormals[v].x;
 					model->N[v].y = scene->mMeshes[m]->mNormals[v].y;
 					model->N[v].z = scene->mMeshes[m]->mNormals[v].z;
-
-					/*
+					
 					if (useTransform)
 					{
 						SrVec point = meshMat * model->V[v];
-						SrVec normal = quat.multVec(model->N[v]);
+						SrVec normal = model->N[v] * meshOrient;
 						model->V[v] = point;
 						model->N[v] = normal;
 					}
-					*/
+					
 
 					if (scene->mMeshes[m]->HasTextureCoords(0))
 					{ 
@@ -582,7 +591,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				if (parent == "")
 					currentNodes.push_back(child); // keep track of nodes at/under the root
 				reducedHierarchy.insert(std::pair<std::string, std::string>((*iter), parent));
-				LOG("%s -> %s", (*iter).c_str(), parent.c_str());
+				//LOG("%s -> %s", (*iter).c_str(), parent.c_str());
 			}
 
 			// determine the bones with empty parents
@@ -1082,3 +1091,5 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 
 
 };
+
+#endif
