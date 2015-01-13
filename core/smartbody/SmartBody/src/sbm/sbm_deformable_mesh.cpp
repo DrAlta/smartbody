@@ -437,7 +437,15 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 
 			int nMatIdx = 0; // if no corresponding materials, push into the default gray material group
 			if (i < dMeshStatic->shape().Fm.size())
+			{
 				nMatIdx = dMeshStatic->shape().Fm[i] + iMaterialOffset;		
+				std::map<int,std::vector<int> >::iterator iter = meshSubsetMap.find(nMatIdx);
+				if (iter == meshSubsetMap.end())
+				{
+					LOG("Bad material index %d", nMatIdx);
+					nMatIdx = 0;
+				}
+			}
 			meshSubsetMap[nMatIdx].push_back(iFace);			
 			iFace++;
 		}

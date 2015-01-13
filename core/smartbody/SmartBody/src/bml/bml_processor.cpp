@@ -523,7 +523,7 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 						if (i == 4) option = "stroke_end";
 						if (i == 5) option = "relax";
 						if (i == 6) option = "end";
-						msg << "<sbm:event message=\"sbm triggerevent bmlstatus &quot;syncpointprogress " << request->actorId << " " << request->msgId << ":" << localId << " " << option << " $time&quot;" << "\" stroke=\"" << localId << ":" << option << "\"/>";
+						msg << "<sbm:event message=\"sb scene.getEventManager().handleEvent(scene.getEventManager().createEvent('bmlstatus', 'syncpointprogress " << request->actorId << " " << request->msgId << ":" << localId << " " << option << " $time'))\"" << "\" start=\"" << localId << ":" << option << "\"/>";
 						std::string newId = unique_id + "_" + option;
 						DOMElement* textXml = xml_utils::parseMessageXml( SmartBody::SBScene::getScene()->getBmlProcessor()->getBMLProcessor()->xmlParser,  msg.str().c_str())->getDocumentElement();
 						feedbackSyncStart.parseStandardSyncPoints( textXml, request, newId );

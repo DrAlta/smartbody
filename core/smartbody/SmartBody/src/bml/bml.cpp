@@ -1130,7 +1130,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		{
 			// send the feedback message for the start of the bml
 			std::stringstream strstr;
-			strstr << "sbm triggerevent bmlstatus \"blockstart " << actorId << " " << request->msgId << ":" << request->localId  << " " << start_time << "\"";
+			strstr << "sb scene.getEventManager().handleEvent(scene.getEventManager().createEvent(&quot;bmlstatus&quot;, &quot;blockstart " << actorId << " " << request->msgId << ":" << request->localId  << " " << start_time << "&quot;))";
 			if (start_seq->insert( (float) start_time, strstr.str().c_str()) != CMD_SUCCESS)
 			{
 				std::stringstream strstr;
@@ -1207,7 +1207,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 		{
 			// send the feedback message for the end of the bml
 			std::stringstream strstr;
-			strstr << "sbm triggerevent bmlstatus \"blockend " << actorId << " " << request->msgId << ":" << request->localId << " " << end_time << "\"";
+			strstr << "sb scene.getEventManager().handleEvent(scene.getEventManager().createEvent(&quot;bmlstatus&quot;, &quot;blockend " << actorId << " " << request->msgId << ":" << request->localId << " " << end_time << "&quot;))";
 			if (cleanup_seq->insert( (float) end_time, strstr.str().c_str()) != CMD_SUCCESS)
 			{
 				std::stringstream strstr;
