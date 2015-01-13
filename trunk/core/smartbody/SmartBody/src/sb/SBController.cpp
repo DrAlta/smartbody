@@ -8,6 +8,7 @@ namespace SmartBody {
 SBController::SBController() : MeController()
 {
 	controllerType = "SBController";
+	this->setName("controller");
 }
 
 SBController::SBController(const SBController& controller)

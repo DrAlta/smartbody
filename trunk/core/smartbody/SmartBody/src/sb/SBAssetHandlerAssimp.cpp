@@ -172,25 +172,24 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 			{
 				SrMaterial* material = new SrMaterial();
 
-				aiColor4D ambient(0.0f, 0.0f, 0.0f, 1.0f);
+				aiColor3D ambient(0.0f, 0.0f, 0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
-				material->ambient = SrColor(ambient.r, ambient.g, ambient.b, ambient.a);
+				material->ambient = SrColor(ambient.r, ambient.g, ambient.b);
 				LOG("AMBIENT COLOR %x %x %x %x", material->ambient.r, material->ambient.g, material->ambient.b, material->ambient.a);
 
-				aiColor4D diffuse(0.0f, 0.0f, 0.0f, 1.0f);
+				aiColor3D diffuse(0.0f, 0.0f, 0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-				material->diffuse = SrColor(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+				material->diffuse = SrColor(diffuse.r, diffuse.g, diffuse.b);
 				LOG("DIFFUSE COLOR %x %x %x %x", material->diffuse.r, material->diffuse.g, material->diffuse.b, material->diffuse.a);
 
-				aiColor4D emmissive(0.0f, 0.0f, 0.0f, 1.0f);
+				aiColor3D emmissive(0.0f, 0.0f, 0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_EMISSIVE , emmissive);
-				material->emission = SrColor(emmissive.r, emmissive.g, emmissive.b, emmissive.a);
+				material->emission = SrColor(emmissive.r, emmissive.g, emmissive.b);
 				LOG("EMMISSIVE COLOR %x %x %x %x", material->emission.r, material->emission.g, material->emission.b, material->emission.a);
 
-				float shininess;
-				float tmpShininess;
-				unsigned int max;
-				max = 1;
+				float shininess = 0.0;
+				float tmpShininess = 0.0;
+				unsigned int max = 1;
 				int ret1 = aiGetMaterialFloatArray(scene->mMaterials[m], AI_MATKEY_SHININESS, &shininess, &max);
 				if(ret1 == AI_SUCCESS)
 				{
@@ -211,14 +210,14 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				material->shininess =  tempIntShininess & 0x000000ff;
 				LOG("SHININESS COLOR %x", material->shininess);
 
-				aiColor4D specular(0.0f, 0.0f, 0.0f, 1.0f);
+				aiColor3D specular(0.0f, 0.0f, 0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_SPECULAR, specular);
 				material->specular = SrColor(specular.r, specular.g, specular.b);
 				LOG("SPECULAR COLOR %x %x %x %x", material->specular.r, material->specular.g, material->specular.b, material->specular.a);
 
-				aiColor4D transparency(0.0f, 0.0f, 0.0f, 1.0f);
+				aiColor3D transparency(0.0f, 0.0f, 0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_TRANSPARENT, transparency);
-				material->transparency = transparency.r;
+				material->transparency = sqrt(transparency.r * transparency.r  + transparency.g * transparency.g *  + transparency.b * transparency.b);
 				LOG("TRANSPARENCY COLOR %.2f ", material->transparency);
 				
 				aiString matName;
@@ -979,11 +978,20 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 			// check for animations
 			int numMotionChannels = 0;
 			int numAnimations = scene->mNumAnimations;
+			std::stringstream strstr;
 			for (int a = 0; a < numAnimations; a++)
 			{
 				aiAnimation* animation = scene->mAnimations[a];
 				SBMotion* motion = new SBMotion();
+				strstr.str("");
+				
 				motion->setName(animation->mName.C_Str());
+				if (motion->getName() == "")
+				{
+					strstr << mesh->getName() << a;
+					motion->setName(strstr.str());
+				}
+				
 
 				// first pass, collect the channels
 				int numChannels = animation->mNumChannels;

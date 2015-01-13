@@ -16,6 +16,9 @@
 #include <sb/SBAssetHandlerAmc.h>
 #include <sb/SBAssetHandlerPly.h>
 #include <sb/SBAssetHandlerSBMeshBinary.h>
+#ifdef USE_ASSIMP
+#include <sb/SBAssetHandlerAssimp.h>
+#endif
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -68,6 +71,9 @@ SBAssetManager::SBAssetManager()
 	addAssetHandler(new SBAssetHandlerSkmb());	
 	addAssetHandler(new SBAssetHandlerBvh());	
 	addAssetHandler(new SBAssetHandlerSBMeshBinary());
+#ifdef USE_ASSIMP
+	addAssetHandler(new SBAssetHandlerAssimp());	
+#endif
 	uniqueSkeletonId = 0;
 
 	_motionCounter = 0;
@@ -2078,7 +2084,7 @@ SBAPI std::string SBAssetManager::getAssetNameVariation(SBAsset* asset)
 		}
 	}
 
-	return "xxxxxxx";
+	return  "xxxxxxx";
 
 	
 }
