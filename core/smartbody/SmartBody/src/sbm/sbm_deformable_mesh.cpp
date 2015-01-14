@@ -77,7 +77,6 @@ void SkinWeight::normalizeWeights()
 
 DeformableMesh::DeformableMesh() : SBAsset()
 {
-	meshName = "null";
 	binding = false;
 	initSkinnedVertexBuffer = false;
 	initStaticVertexBuffer = false;

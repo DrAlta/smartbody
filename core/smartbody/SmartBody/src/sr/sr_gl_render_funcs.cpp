@@ -394,7 +394,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 					}
 					else 
 					{
-						std::cerr << "*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead\n";
+						LOG("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
 						glBindTexture(GL_TEXTURE_2D, tex->getID());
 					}
 				}
@@ -570,7 +570,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 		   SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,texName.c_str());
 		   if ( fsize > Fn.size() || flat ) // no normal
 		   {
-			   LOG("No normal\n");
+			   //LOG("No normal\n");
 			   glBegin ( GL_TRIANGLES ); // some cards do require begin/end for each triangle!
 			   for (unsigned int k=0; k<mtlFaces.size(); k++ )
 			   {  
@@ -585,7 +585,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 		   }
 		   else if ( fsize > Ft.size() || !tex ) // no texture
 		   {
-			   LOG("No texture\n");
+			   //LOG("No texture\n");
 			   glBegin ( GL_TRIANGLES );
 			   for (unsigned int k=0; k<mtlFaces.size(); k++ )
 			   {	
@@ -599,7 +599,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 		   else // has normal and texture
 		   {   // to-do : figure out why texture does not work in the fixed-pipeline ?	  
 			   //glDisable(GL_LIGHTING);	
-			   LOG("Normal and texture\n");
+			   //LOG("Normal and texture\n");
 			   glEnable ( GL_ALPHA_TEST );
 			   glEnable (GL_BLEND);
 			   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -630,7 +630,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 				   int ft_c = Ft[f].c;
 				   if (ft_a >= T.size() || ft_b >= T.size() || ft_c >= T.size())
 				   {
-					   printf("(%s): ft %d %d %d is bigger than T size %d\n", mtlName.c_str(), ft_a, ft_b, ft_c, T.size());
+					   LOG("(%s): ft %d %d %d is bigger than T size %d\n", mtlName.c_str(), ft_a, ft_b, ft_c, T.size());
 					   continue;
 				   }				   
 

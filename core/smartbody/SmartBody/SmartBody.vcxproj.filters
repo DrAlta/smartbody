@@ -1003,6 +1003,9 @@
     <ClCompile Include="..\SmartBody\src\sb\SBPythonMath.cpp">
       <Filter>python</Filter>
     </ClCompile>
+    <ClCompile Include="..\SmartBody\src\sb\SBPythonSkeleton.cpp">
+      <Filter>python</Filter>
+    </ClCompile>
     <ClCompile Include="..\SmartBody\src\sb\SBPythonCharacter.cpp">
       <Filter>python</Filter>
     </ClCompile>
@@ -1189,8 +1192,8 @@
     <ClCompile Include="src\external\jpge\jpge.cpp">
       <Filter>external\jpge</Filter>
     </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sb\SBPythonSkeleton.cpp">
-      <Filter>sk</Filter>
+    <ClCompile Include="src\sb\SBAssetHandlerAssimp.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2381,6 +2384,9 @@
     </ClInclude>
     <ClInclude Include="src\external\jpge\jpge.h">
       <Filter>external\jpge</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBAssetHandlerAssimp.h">
+      <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
