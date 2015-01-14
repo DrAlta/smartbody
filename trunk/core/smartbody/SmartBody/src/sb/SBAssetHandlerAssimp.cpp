@@ -22,6 +22,8 @@ SBAssetHandlerAssimp::SBAssetHandlerAssimp()
 	assetTypes.push_back("fbx");
 	assetTypes.push_back("blend");
 	assetTypes.push_back("dae");
+	assetTypes.push_back("obj");
+	assetTypes.push_back("ply");
 }
 
 SBAssetHandlerAssimp::~SBAssetHandlerAssimp()
@@ -355,24 +357,6 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 			}
 		}
 
-		if (scene->HasAnimations())
-		{
-			LOG("HAS ANIMATIONS");
-		}
-		if (scene->HasCameras())
-		{
-			LOG("HAS CAMERAS");
-		}
-		if (scene->HasLights())
-		{
-			LOG("HAS LIGHTS");
-		}
-		
-		if (scene->HasTextures())
-		{
-			LOG("HAS TEXTURES");
-		}
-
 		// get the node hierarchy and determine the parent-child relationship
 		std::map<std::string, std::string> hierarchyMap;
 		hierarchyMap.insert(std::pair<std::string, std::string>(scene->mRootNode->mName.C_Str(), ""));
@@ -395,13 +379,21 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 
 			for (int m = 0; m < scene->mNumMeshes; m++)
 			{
-				LOG("FOUND MESH WITH %d VERTICES, %d FACES", scene->mMeshes[m]->mNumVertices, scene->mMeshes[m]->mNumFaces);
+				//LOG("FOUND MESH WITH %d VERTICES, %d FACES", scene->mMeshes[m]->mNumVertices, scene->mMeshes[m]->mNumFaces);
 
 				SrModel* model = new SrModel();
-				//model->name = scene->mMeshes[m]->mName.C_Str();
-				std::stringstream strstr;
-				strstr << m;
-				model->name = strstr.str().c_str();
+				if (scene->mNumMeshes == 1)
+				{
+					model->name = mesh->getName().c_str();
+				}
+				else
+				{
+					//model->name = scene->mMeshes[m]->mName.C_Str();
+					std::stringstream strstr;
+					strstr << m;
+					model->name = strstr.str().c_str();
+				}
+
 			
 				// get the node parent of the mesh
 				std::map<int, aiNode*>::iterator meshParentIter = meshParents.find(m);
@@ -448,13 +440,23 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				
 				for (int v = 0; v < numVertices; v++)
 				{
+
 					model->V[v].x = scene->mMeshes[m]->mVertices[v].x;
 					model->V[v].y = scene->mMeshes[m]->mVertices[v].y;
 					model->V[v].z = scene->mMeshes[m]->mVertices[v].z;
 
-					model->N[v].x = scene->mMeshes[m]->mNormals[v].x;
-					model->N[v].y = scene->mMeshes[m]->mNormals[v].y;
-					model->N[v].z = scene->mMeshes[m]->mNormals[v].z;
+					if (scene->mMeshes[m]->mNormals)
+					{
+						model->N[v].x = scene->mMeshes[m]->mNormals[v].x;
+						model->N[v].y = scene->mMeshes[m]->mNormals[v].y;
+						model->N[v].z = scene->mMeshes[m]->mNormals[v].z;
+					}
+					else
+					{
+						model->N[v].x = 0.0;
+						model->N[v].y = 1.0;
+						model->N[v].z = 0.0;
+					}
 					
 					if (useTransform)
 					{
@@ -563,6 +565,8 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					std::string boneName = scene->mMeshes[m]->mBones[b]->mName.C_Str();
 					skeletonBones.insert(boneName);
 				}
+
+				
 			}
 
 
@@ -663,12 +667,12 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 			// get a list of all node trees that do not have parents
 
 
-			for (std::vector<std::string>::iterator iter = topmostNodeNames.begin();
-				 iter != topmostNodeNames.end();
-				 iter++)
-			{
-				LOG("TOPMOST = %s", (*iter).c_str());
-			}
+			//for (std::vector<std::string>::iterator iter = topmostNodeNames.begin();
+			//	 iter != topmostNodeNames.end();
+			//	 iter++)
+			//{
+			//	LOG("TOPMOST = %s", (*iter).c_str());
+			//}
 
 			
 			if (reducedHierarchy.size() > 0)
@@ -972,8 +976,6 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 				*/
 			}
 			
-			
-			assets.push_back(mesh);
 
 			// check for animations
 			int numMotionChannels = 0;
@@ -1086,6 +1088,8 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 
 				assets.push_back(motion);
 			}
+
+			assets.push_back(mesh);
 		}
  		
 		  // extract animations

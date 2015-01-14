@@ -93,7 +93,7 @@ struct BlendShapeData
 class DeformableMesh : public SmartBody::SBAsset
 {
 public:
-	std::string                 meshName;
+//	std::string                 meshName;
 	std::vector<SrSnModel*>		dMeshDynamic_p;
 	std::vector<SrSnModel*>		dMeshStatic_p;
 	std::vector<SkinWeight*>	skinWeights;
