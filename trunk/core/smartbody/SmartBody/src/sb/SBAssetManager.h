@@ -116,6 +116,7 @@ protected:
 		int uniqueSkeletonId;
 		int _motionCounter;
 		int _skeletonCounter;
+		int _meshCounter;
 		std::vector<std::string> _assetHistory;
 
 };

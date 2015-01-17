@@ -78,6 +78,7 @@ SBAssetManager::SBAssetManager()
 
 	_motionCounter = 0;
 	_skeletonCounter = 0;
+	_meshCounter = 0;
 }
 
 SBAssetManager::~SBAssetManager()
@@ -2077,6 +2078,21 @@ SBAPI std::string SBAssetManager::getAssetNameVariation(SBAsset* asset)
 			std::stringstream strstr;
 			strstr << skeleton->getName() << _skeletonCounter;
 			if (!scene->getSkeleton(strstr.str()))
+			{
+				return strstr.str();
+		
+			}
+		}
+	}
+	DeformableMesh* mesh = dynamic_cast<DeformableMesh*>(asset);
+	if (mesh)
+	{
+		while (true)
+		{
+			_meshCounter++;
+			std::stringstream strstr;
+			strstr << mesh->getName() << _meshCounter;
+			if (!scene->getAssetManager()->getDeformableMesh(strstr.str()))
 			{
 				return strstr.str();
 		
