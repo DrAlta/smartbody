@@ -20,6 +20,11 @@ namespace SmartBody
 			.def("isSkinnedMesh", &DeformableMesh::isSkinnedMesh, "Whether the current mesh is static or skinned/deformable")
 			.def("saveToSmb", &DeformableMesh::saveToSmb, "Save the static mesh into a binary file with extension .smb")
 			.def("saveToDmb", &DeformableMesh::saveToDmb, "Save the dynamic mesh into a binary file with extension .dmb")
+			.def("scale", &DeformableMesh::scale, "Scale mesh")
+			.def("translate", &DeformableMesh::translate, "Translate mesh")
+			.def("rotate", &DeformableMesh::rotate, "Rotate mesh")
+			.def("centralize", &DeformableMesh::centralize, "Make the center of the mesh (0,0,0)")
+			.def("computeNormals", &DeformableMesh::computeNormals, "Recompute normals.")
 			;
 	}
 }

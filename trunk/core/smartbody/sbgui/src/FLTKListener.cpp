@@ -345,9 +345,9 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 							ss << "blendShape.channelName." << (const char*)iter->second[c]->shape().name;
 							std::stringstream ss1;
 							ss1 << "blendShape.channelWeightLimit." << (const char*)iter->second[c]->shape().name;
-							character->createStringAttribute(ss.str().c_str(), "", true, "Blend Shape", c + 1, false, false, false, "blend shape channel name");
-							character->createDoubleAttribute(ss1.str().c_str(), 1.0f, true, "Blend Shape", c + 1, false, false, false, "blend shape channel weight limit");
-							character->createActionAttribute("updateChannel", true, "Blend Shape", 0, false, false, false, "update blend shape channel");
+							pawn->createStringAttribute(ss.str().c_str(), "", true, "Blend Shape", c + 1, false, false, false, "blend shape channel name");
+							pawn->createDoubleAttribute(ss1.str().c_str(), 1.0f, true, "Blend Shape", c + 1, false, false, false, "blend shape channel weight limit");
+							pawn->createActionAttribute("updateChannel", true, "Blend Shape", 0, false, false, false, "update blend shape channel");
 						}
 					}
 
@@ -404,8 +404,9 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 									model->visible(false);
 									(*blendshapeIter).second[0] = model;
 									model->ref();
+									hasNeutral = true;
 								}
-								hasNeutral = true;
+								
 							}
 
 							std::map<std::string, std::vector<SrSnModel*> >::iterator blendshapeIter = mesh->blendShapeMap.begin();

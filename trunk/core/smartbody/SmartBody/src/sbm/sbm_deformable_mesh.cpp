@@ -1108,6 +1108,67 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 	}
 }
 
+void DeformableMesh::translate(SrVec trans)
+{
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshDynamic_p[i]->shape().translate(trans);
+	}
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshStatic_p[i]->shape().translate(trans);
+	}
+}
+
+void DeformableMesh::rotate(SrVec rot)
+{
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshDynamic_p[i]->shape().rotate(rot);
+	}
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshStatic_p[i]->shape().translate(rot);
+	}
+}
+
+void DeformableMesh::scale(float factor)
+{
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshDynamic_p[i]->shape().scale(factor);
+	}
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshStatic_p[i]->shape().scale(factor);
+	}
+}
+
+void DeformableMesh::centralize()
+{
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshDynamic_p[i]->shape().centralize();
+	}
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshStatic_p[i]->shape().centralize();
+	}
+}
+
+void DeformableMesh::computeNormals()
+{
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshDynamic_p[i]->shape().computeNormals();
+	}
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshStatic_p[i]->shape().computeNormals();
+	}
+}
+
+
 bool DeformableMesh::saveToSmb(std::string inputFileName)
 {
 	SmartBodyBinary::StaticMesh* outputStaticMesh = new SmartBodyBinary::StaticMesh();
@@ -1724,7 +1785,9 @@ void DeformableMeshInstance::blendShapes()
 			}
 
 			//	In a face there will be just one texture, material name will be always the first
-			std::string matName = materials[0];
+			std::string matName = "";
+			if (materials.size() > 0)
+				matName = materials[0];
 
 			// If base model
 			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
@@ -2249,3 +2312,4 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 	}	
 	SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #FINAL");
 }
+

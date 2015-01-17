@@ -15,7 +15,9 @@ namespace SmartBody {
 
 SBAssetHandlerPly::SBAssetHandlerPly()
 {
+#ifndef USE_ASSIMP
 	assetTypes.push_back("ply");
+#endif
 }
 
 SBAssetHandlerPly::~SBAssetHandlerPly()
