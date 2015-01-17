@@ -156,6 +156,13 @@ public:
 	void loadAllFoundTextures(std::string textureDirectory);
 	SBAPI SrVec computeCenterOfMass();
 	SBAPI SrBox computeBoundingBox();
+
+	SBAPI void translate(SrVec trans);
+	SBAPI void rotate(SrVec trans);
+	SBAPI void scale(float factor);
+	SBAPI void centralize();
+	SBAPI void computeNormals();
+
 };
 
 class DeformableMeshInstance

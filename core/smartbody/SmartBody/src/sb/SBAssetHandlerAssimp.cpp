@@ -131,8 +131,8 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 	Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile( convertedPath, 
 		aiProcess_CalcTangentSpace       | 
-		aiProcess_Triangulate            |
-		aiProcess_JoinIdenticalVertices  |
+//		aiProcess_Triangulate            |
+//		aiProcess_JoinIdenticalVertices  |
 		aiProcess_SortByPType);
   
 
@@ -177,17 +177,17 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				aiColor3D ambient(0.0f, 0.0f, 0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
 				material->ambient = SrColor(ambient.r, ambient.g, ambient.b);
-				LOG("AMBIENT COLOR %x %x %x %x", material->ambient.r, material->ambient.g, material->ambient.b, material->ambient.a);
+				//LOG("AMBIENT COLOR %x %x %x %x", material->ambient.r, material->ambient.g, material->ambient.b, material->ambient.a);
 
 				aiColor3D diffuse(0.0f, 0.0f, 0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
 				material->diffuse = SrColor(diffuse.r, diffuse.g, diffuse.b);
-				LOG("DIFFUSE COLOR %x %x %x %x", material->diffuse.r, material->diffuse.g, material->diffuse.b, material->diffuse.a);
+				//LOG("DIFFUSE COLOR %x %x %x %x", material->diffuse.r, material->diffuse.g, material->diffuse.b, material->diffuse.a);
 
 				aiColor3D emmissive(0.0f, 0.0f, 0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_EMISSIVE , emmissive);
 				material->emission = SrColor(emmissive.r, emmissive.g, emmissive.b);
-				LOG("EMMISSIVE COLOR %x %x %x %x", material->emission.r, material->emission.g, material->emission.b, material->emission.a);
+				//LOG("EMMISSIVE COLOR %x %x %x %x", material->emission.r, material->emission.g, material->emission.b, material->emission.a);
 
 				float shininess = 0.0;
 				float tmpShininess = 0.0;
@@ -210,17 +210,17 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				// convert to byte
 				int tempIntShininess = int(tmpShininess);
 				material->shininess =  tempIntShininess & 0x000000ff;
-				LOG("SHININESS COLOR %x", material->shininess);
+				//LOG("SHININESS COLOR %x", material->shininess);
 
 				aiColor3D specular(0.0f, 0.0f, 0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_SPECULAR, specular);
 				material->specular = SrColor(specular.r, specular.g, specular.b);
-				LOG("SPECULAR COLOR %x %x %x %x", material->specular.r, material->specular.g, material->specular.b, material->specular.a);
+				//LOG("SPECULAR COLOR %x %x %x %x", material->specular.r, material->specular.g, material->specular.b, material->specular.a);
 
 				aiColor3D transparency(0.0f, 0.0f, 0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_TRANSPARENT, transparency);
 				material->transparency = sqrt(transparency.r * transparency.r  + transparency.g * transparency.g *  + transparency.b * transparency.b);
-				LOG("TRANSPARENCY COLOR %.2f ", material->transparency);
+				//LOG("TRANSPARENCY COLOR %.2f ", material->transparency);
 				
 				aiString matName;
 				scene->mMaterials[m]->Get(AI_MATKEY_NAME, matName);
