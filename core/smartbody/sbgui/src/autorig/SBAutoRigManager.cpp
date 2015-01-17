@@ -412,7 +412,6 @@ bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inMo
 
 	// build deformable model using voxel skinning weights
 	SbmDeformableMeshGPU* deformMesh = new SbmDeformableMeshGPU();
-	deformMesh->meshName = outDeformableMeshName;	
 	deformMesh->setName(outDeformableMeshName);
 		
 	std::string meshName = (const char*) inModel.name;
@@ -554,7 +553,6 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 	//sbSk->setFileName()
 	bool isValidSkeleton = AutoRigToSBSk(out, *sbSk);	
 	SbmDeformableMeshGPU* deformMesh = new SbmDeformableMeshGPU();
-	deformMesh->meshName = outDeformableMeshName;	
 	deformMesh->setName(outDeformableMeshName);
 	bool isValidDeformableMesh = AutoRigToDeformableMesh(out, inModel, *sbSk, *deformMesh);
 	
@@ -605,7 +603,6 @@ bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName
 	//LOG("autoRig result, num joints = %d",out.embedding.size());
 	//LOG("AutoRig Skeleton = %s", sbSk->saveToString().c_str());
 	SbmDeformableMeshGPU* deformMesh = new SbmDeformableMeshGPU();
-	deformMesh->meshName = outDeformableMeshName;	
 	deformMesh->setName(outDeformableMeshName);
 	bool isValidDeformableMesh = AutoRigToDeformableMesh(out, inModel, *sbSk, *deformMesh);
 
