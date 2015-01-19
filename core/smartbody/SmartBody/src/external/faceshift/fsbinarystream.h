@@ -45,6 +45,7 @@
 
 #include <string>
 #include <vector>
+#ifdef WIN32
 #if __MSC_VER > 1500
 #include <stdint.h>
 #else
@@ -56,6 +57,8 @@ typedef __int32 int32_t;
 typedef unsigned __int64 uint64_t;
 typedef __int64 int64_t;
 #endif
+#endif
+
 
 /*******************************************************************************************
   * This first part of the file contains a definition of the datastructures holding the
