@@ -5,6 +5,13 @@ set( CMAKE_INSTALL_PREFIX "../" )
 set( BUILD_OGRE FALSE)
 set( GOOGLE_PROFILER FALSE)
 set( BUILD_FESTIVAL FALSE)
+
+set( USE_ASSIMP TRUE)
+set( SB_NO_PYTHON FALSE)
+set( SB_NO_VHMSG FALSE)
+set( SB_NO_BONEBUS FALSE)
+set( SB_NO_ODE_PHYSICS FALSE)
+
 #add_definitions(	-D__linux__	-fPIC -m32 -Ignore -fpermissive -g3 )
 #add_definitions(	-g3 -fPIC )
 add_definitions(	-O3 -fPIC )
