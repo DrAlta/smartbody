@@ -32,9 +32,6 @@ target_link_libraries( simplesmartbody
 	SmartBody
 	pthread
 	${MORE_LIBS}
-#	tcmalloc
-#	profiler
-#	${CMAKE_REQUIRED_LIBRARIES} 
 )
 
 set( EXEC_LIST
