@@ -2,22 +2,22 @@ if (${GOOGLE_PROFILER})
 	add_definitions ( -DUSE_GOOGLE_PROFILER )
 endif()
 
+if (${SB_NO_PYTHON})
+set (PYTHON_INCLUDE
+)
+else()
+set (PYTHON_INCLUDE
+	/usr/include/python2.7
+        )
+endif()
+
 include_directories(
-	../../lib/vhcl/include
-	../../lib/vhmsg/vhmsg-c/include
-	../../lib/bonebus/include
 	steersuite-1.3/steerlib/include
 	steersuite-1.3/pprAI/include
 	steersuite-1.3/external
-	sbm-debugger/lib
 	/usr/local/include
-	/usr/include/python2.7
+	${PYTHON_INCLUDE}
 )
-
-include_directories(
-	/usr/local/python2.7
-)
-
 
 LINK_DIRECTORIES(
 	/usr/local/lib

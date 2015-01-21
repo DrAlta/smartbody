@@ -1,5 +1,4 @@
 include_directories( ./src)
-include_directories( /usr/include )
 
 add_definitions( "-DdDOUBLE" )
 
@@ -97,6 +96,56 @@ set( MORE_LIBS
 )       
 endif()
 endif()
+
+if (${SB_NO_VHMSG})
+set( VHMSG_LIB
+)
+else()
+set( VHMSG_LIB
+	vhmsg
+	activemq-cpp
+)
+endif()
+
+if (${SB_NO_BONEBUS})
+set( BONEBUS_LIB
+)
+else()
+set( BONEBUS_LIB
+	bonebus
+)
+endif()
+
+if (${SB_NO_PYTHON})
+set( PYTHON_LIB
+)
+else()
+set( PYTHON_LIB
+	boost_python
+	python2.7
+)
+endif()
+
+if (${SB_NO_ODE_PHYSICS})
+set( ODE_LIB
+)
+else()
+set( ODE_LIB
+	ode
+)
+endif()
+
+if (${USE_ASSIMP})
+include_directories( ../../../lib/assimp-3.1.1/include)
+set( ASSIMP_LIB
+	assimp
+)
+else()
+set( ASSIMP_LIB
+)
+endif()
+
+
 
 
 find_package(OpenGL REQUIRED)
@@ -552,6 +601,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	./src/sb/SBAssetHandlerObj.cpp
 	./src/sb/SBAssetHandlerBvh.cpp
 	./src/sb/SBAssetHandlerPly.cpp
+	./src/sb/SBAssetHandlerAssimp.cpp
         ./src/sb/SBBehavior.cpp
 	./src/sb/SBAssetHandlerSkmb.cpp
 	./src/sb/SBAssetHandlerSBMeshBinary.cpp
@@ -612,22 +662,21 @@ endif()
 target_link_libraries( SmartBody
 
 	${PROFILER_LIBS}
-	bonebus
-	vhmsg
+	${BONEBUS_LIB}
+	${VHMSG_LIB}
+	${PYTHON_LIB}
 	vhcl
 	xerces-c
 	boost_filesystem
 	boost_system
 	boost_regex
-	boost_python
 	blas
 	lapack
 	${OPENGL_LIBRARIES}
-	activemq-cpp
 	steerlib
 	pprAI
-	ode
-	python2.7
+	${ODE_LIB}
+	${ASSIMP_LIB}
 	ncurses
 	${MORE_LIBS}
 	protoc
