@@ -15,6 +15,22 @@
 #include <assimp/postprocess.h> 
 #include <sbm/GPU/SbmTexture.h>
 
+struct materialTextures {
+	std::vector<std::string> diffuseTextures;
+	std::vector<std::string> ambientTextures;
+	std::vector<std::string> specularTextures;
+	std::vector<std::string> emissiveTextures;
+	std::vector<std::string> heightTextures;
+	std::vector<std::string> shininessTextures;
+	std::vector<std::string> normalsTextures;
+	std::vector<std::string> opacityTextures;
+	std::vector<std::string> displacementTextures;
+	std::vector<std::string> lightmapTextures;
+	std::vector<std::string> reflectionTextures;
+	std::vector<std::string> unknownTextures;
+};
+
+
 namespace SmartBody {
 
 SBAssetHandlerAssimp::SBAssetHandlerAssimp()
@@ -138,21 +154,6 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 
 	std::vector<SrMaterial*> allMaterials;
 	std::vector<std::string> allMaterialNames;
-
-	struct materialTextures {
-		std::vector<std::string> diffuseTextures;
-		std::vector<std::string> ambientTextures;
-		std::vector<std::string> specularTextures;
-		std::vector<std::string> emissiveTextures;
-		std::vector<std::string> heightTextures;
-		std::vector<std::string> shininessTextures;
-		std::vector<std::string> normalsTextures;
-		std::vector<std::string> opacityTextures;
-		std::vector<std::string> displacementTextures;
-		std::vector<std::string> lightmapTextures;
-		std::vector<std::string> reflectionTextures;
-		std::vector<std::string> unknownTextures;
-	};
 
 	std::vector< materialTextures > allTextureSets;
 

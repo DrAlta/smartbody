@@ -57,6 +57,37 @@ set (OGRE_LIBS
 	#${RTSHADERLIB}		
 )
 
+if (${SB_NO_VHMSG})
+set( VHMSG_LIB
+)
+else()
+set( VHMSG_LIB
+        vhmsg
+	activemq-cpp
+)
+endif()
+
+if (${SB_NO_BONEBUS})
+set( BONEBUS_LIB
+)
+else()
+set( BONEBUS_LIB
+        bonebus
+)
+endif()
+
+if (${SB_NO_PYTHON})
+set( PYTHON_LIB
+)
+else()
+set( PYTHON_LIB
+        boost_python
+        python2.7
+)
+endif()
+
+
+
 set (OGRE_SRCS
 	src/EmbeddedOgre.cpp
 	src/ExampleFrameListener.cpp	
@@ -262,20 +293,18 @@ target_link_libraries( sbgui
 
 	${PROFILER_LIBS}
 	SmartBody
-	bonebus
-	vhmsg
+	${BONEBUS_LIB}
+	${VHMSG_LIB}
 	vhcl
 	boost_filesystem
 	boost_system
 	boost_regex
-	boost_python
+	${PYTHON_LIB}
 	${XFT}
 	fltk_images 
 	fltk 
 	fltk_gl 
 	${OPENGL_LIBRARIES}
-	activemq-cpp
-	python2.7
     	ncurses	
 	pthread
 	pinocchio

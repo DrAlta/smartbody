@@ -62,8 +62,10 @@ SBVHMsgManager::SBVHMsgManager() : SBService()
 
 SBVHMsgManager::~SBVHMsgManager()
 {
+#ifndef SB_NO_VHMSG
 	if (vhmsg::ttu_is_open())
 		vhmsg::ttu_close();
+#endif
 
 	if (_logListener)
 	{
@@ -101,7 +103,12 @@ bool SBVHMsgManager::isEnable()
 
 bool SBVHMsgManager::isConnected()
 {
+#ifndef SB_NO_VHMSG
 	return vhmsg::ttu_is_open();
+#else
+	return false;
+#endif
+
 }
 
 bool SBVHMsgManager::connect()
@@ -147,8 +154,11 @@ bool SBVHMsgManager::connect()
 
 void SBVHMsgManager::disconnect()
 {
+
+#ifndef SB_NO_VHMSG
 	if (vhmsg::ttu_is_open())
 		vhmsg::ttu_close();
+#endif
 }
 
 int SBVHMsgManager::send2( const char *op, const char* message )
