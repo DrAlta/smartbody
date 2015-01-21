@@ -1,7 +1,14 @@
 
 add_subdirectory( vhcl )
+
+if($(SB_NO_BONEBUS))
 add_subdirectory( bonebus )
+endif()
+
+if($(SB_NO_VHMSG))
 add_subdirectory( vhmsg/vhmsg-c )
+endif()
+
 #add_subdirectory( kinecttracker )
 
 if(${USE_ASSIMP})

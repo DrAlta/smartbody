@@ -153,6 +153,16 @@ code/VertexTriangleAdjacency.cpp
 code/XFileImporter.cpp
 code/XFileParser.cpp
 code/XGLLoader.cpp
+
+contrib/clipper/clipper.cpp
+contrib/ConvertUTF/ConvertUTF.c
+contrib/irrXML/irrXML.cpp
+contrib/poly2tri/poly2tri/common/shapes.cc
+contrib/poly2tri/poly2tri/sweep/advancing_front.cc
+contrib/poly2tri/poly2tri/sweep/cdt.cc
+contrib/poly2tri/poly2tri/sweep/sweep.cc
+contrib/poly2tri/poly2tri/sweep/sweep_context.cc
+
 )
 
 add_library( assimp
