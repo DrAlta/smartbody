@@ -1,4 +1,4 @@
-#ifdef USE_ASSIMP
+#ifndef SB_NO_ASSIMP
 #include "SBAssetHandlerAssimp.h"
 #include <vhcl.h>
 #include <boost/version.hpp>
