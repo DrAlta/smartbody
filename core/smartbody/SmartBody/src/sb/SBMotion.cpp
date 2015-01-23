@@ -27,6 +27,7 @@
 #include <fstream>
 #include <protocols/sbmotion.pb.h>
 
+
 namespace SmartBody {
 
 FootStepRecord::FootStepRecord()
@@ -104,6 +105,7 @@ SBMotion::SBMotion() : SkMotion()
 	_scale = 1.f;
 	_offsetMotion = NULL;
 	_offsetParent = NULL;
+	_maxFrameValue = 0.0;
 }
 
 SBMotion::SBMotion(const SBMotion& motion)
@@ -167,6 +169,24 @@ SBMotion::~SBMotion()
 		delete _offsetMotion;
 	_offsetMotion = NULL;
 	_offsetParent = NULL;
+
+	for (std::map<std::string, srLinearCurve* >::iterator iter = _channelFrameValues.begin();
+		 iter != _channelFrameValues.end();
+		 iter++)
+	{
+		delete (*iter).second;
+	}
+
+	for (std::map<std::string, rotationCurve* >::iterator iter = _quatFrameValues.begin();
+		 iter != _quatFrameValues.end();
+		 iter++)
+	{
+		delete (*iter).second->x;
+		delete (*iter).second->y;
+		delete (*iter).second->z;
+		delete (*iter).second;
+	}
+
 }
 
 void SBMotion::setMotionType(MotionType type)
@@ -304,6 +324,163 @@ void SBMotion::addFrame(float frameTime, const std::vector<float>& frameData)
 		return;
 	}
 
+}
+
+void SBMotion::addKeyFrameChannel(const std::string& channelName, const std::string& channelType, float keyTime, float value)
+{
+	srLinearCurve* curve = NULL;
+	std::string key = channelName + "/" + channelType;
+	std::map<std::string, srLinearCurve* >::iterator iter = _channelFrameValues.find(key);
+	if (iter == _channelFrameValues.end())
+	{
+		curve = new srLinearCurve();
+		_channelFrameValues.insert(std::pair<std::string, srLinearCurve*>(key, curve));
+	}
+	else
+	{
+		curve = (*iter).second;
+	}
+	curve->insert(keyTime, value);
+	if (keyTime > _maxFrameValue)
+		_maxFrameValue = keyTime;
+}
+
+void SBMotion::addKeyFrameQuat(const std::string& channelName, const std::string& channelType, float keyTime, SrQuat value)
+{
+	rotationCurve* curve = NULL;
+	std::string key = channelName;
+	std::map<std::string, rotationCurve* >::iterator iter = _quatFrameValues.find(key);
+	if (iter == _quatFrameValues.end())
+	{
+		curve = new rotationCurve();
+		curve->x = new srLinearCurve();
+		curve->y = new srLinearCurve();
+		curve->z = new srLinearCurve();
+		_quatFrameValues.insert(std::pair<std::string, rotationCurve*>(key, curve));
+	}
+	else
+	{
+		curve = (*iter).second;
+	}
+	// convert the quaternion to xyz rotations
+	SrMat mat;
+	value.get_mat(mat);
+	SrVec euler;
+	sr_euler_angles_xyz(mat, euler.x, euler.y, euler.z);
+	curve->x->insert(keyTime, euler.x);
+	curve->y->insert(keyTime, euler.y);
+	curve->z->insert(keyTime, euler.z);
+	if (keyTime > _maxFrameValue)
+		_maxFrameValue = keyTime;
+
+}
+
+void SBMotion::bakeFrames(float fps)
+{
+	if (_channelFrameValues.size() == 0 &&
+		_quatFrameValues.size() == 0)
+	{
+		LOG("No motion data to bake.");
+		return;
+	} 
+
+	if (fabs(fps) < .0001)
+	{
+		LOG("FPS set to zero, resetting to 30.");
+		fps = 30.0;
+	}
+	float step = float(1.0) / fps;
+	if (step < .033)
+		step = .033;
+	int numChannels = _channels.size();
+	for (float curTime = 0.0; curTime <= _maxFrameValue; curTime += step)
+	{
+		std::vector<float> data;
+		for (int c = 0; c < numChannels; c++)
+		{
+			const std::string channelName = _channels.name(c);
+			SkChannel& channel = _channels.get(c);
+			SkChannel::Type channelType = _channels.type(c);
+			std::string keyName = "";
+			if (channelType == SkChannel::XPos)
+			{
+				keyName = channelName + "/" + "XPos";
+			}
+			else if (channelType == SkChannel::YPos)
+			{
+				keyName = channelName + "/" + "YPos";
+			}
+			else if (channelType == SkChannel::ZPos)
+			{
+				keyName = channelName + "/" + "ZPos";
+			}
+			else if (channelType == SkChannel::Quat)
+			{
+				keyName = channelName;
+			}
+			else
+			{
+				keyName = channelName;
+			}
+
+			if (channelType == SkChannel::XPos ||
+				channelType == SkChannel::YPos ||
+				channelType == SkChannel::ZPos)
+			{
+				std::map<std::string, srLinearCurve* >::iterator iter = _channelFrameValues.find(keyName);
+				if (iter == _channelFrameValues.end())
+				{
+					data.push_back(0.0);
+					continue;
+				}
+
+				srLinearCurve* curve = (*iter).second;
+				double value = curve->evaluate(curTime);
+				data.push_back(value);
+			}
+			else if (channelType == SkChannel::Quat)
+			{
+				std::map<std::string, rotationCurve* >::iterator iter = _quatFrameValues.find(keyName);
+				if (iter == _quatFrameValues.end())
+				{
+					data.push_back(1.0);
+					data.push_back(0.0);
+					data.push_back(0.0);
+					data.push_back(0.0);
+					continue;
+				}
+
+				rotationCurve* curve = (*iter).second;
+				// need to slerp between quaternions
+				SrVec euler;
+				euler.x = curve->x->evaluate(curTime);
+				euler.y = curve->y->evaluate(curTime);
+				euler.z = curve->z->evaluate(curTime);
+
+				SrMat mat;
+				sr_euler_mat_xyz(mat, euler.x, euler.y, euler.z);
+				SrQuat quat(mat);
+				data.push_back(quat.w);
+				data.push_back(quat.x);
+				data.push_back(quat.y);
+				data.push_back(quat.z);
+			}
+		}
+		this->addFrame(curTime, data);
+	}
+
+	this->setSyncPoint("start", 0.0);
+	this->setSyncPoint("end", this->duration());
+	if (this->duration() > .5)
+	{
+		this->setSyncPoint("ready", .25);
+		this->setSyncPoint("relax", this->duration() - .25);
+	}
+	else
+	{
+		this->setSyncPoint("ready", 0.0);
+		this->setSyncPoint("relax", this->duration());
+	}
 }
 
 void SBMotion::checkSkeleton(std::string skel)

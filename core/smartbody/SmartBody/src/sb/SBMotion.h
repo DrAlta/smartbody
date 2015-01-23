@@ -51,6 +51,13 @@ public:
 	bool isEnable;
 };
 
+struct rotationCurve {
+	srLinearCurve* x;
+	srLinearCurve* y;
+	srLinearCurve* z;
+};
+
+
 class SBMotion : public SkMotion
 {
 	public:
@@ -80,6 +87,10 @@ class SBMotion : public SkMotion
 
 		SBAPI void addChannel(const std::string& channelName, const std::string& channelType);
 		SBAPI void addFrame(float frameTime, const std::vector<float>& frameData);
+
+		SBAPI void addKeyFrameChannel(const std::string& channelName, const std::string& channelType, float keyTime, float value);
+		SBAPI void addKeyFrameQuat(const std::string& channelName, const std::string& channelType, float keyTime, SrQuat value);
+		SBAPI void bakeFrames(float fps);
 
 		SBAPI void setMotionSkeletonName(std::string skelName);
 		SBAPI const std::string& getMotionSkeletonName();
@@ -220,6 +231,10 @@ class SBMotion : public SkMotion
 
 		std::map<int, SBMotion*> _offsetMotions;
 		SBMotion* _offsetParent;
+
+		std::map<std::string, srLinearCurve* > _channelFrameValues;
+		std::map<std::string, rotationCurve* > _quatFrameValues;
+		float _maxFrameValue;
 };
 
 bool motionComp(const SBMotion *a, const SBMotion *b);
