@@ -147,8 +147,8 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 	Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile( convertedPath, 
 		aiProcess_CalcTangentSpace       | 
-//		aiProcess_Triangulate            |
-//		aiProcess_JoinIdenticalVertices  |
+		aiProcess_Triangulate            |
+		aiProcess_JoinIdenticalVertices  |
 		aiProcess_SortByPType);
   
 
@@ -367,6 +367,8 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 		std::map<std::string, int> boneLevelMap;
 		std::vector<std::string> topmostNodeNames;
 		int topMostNodeLevel = 999999999;
+
+		SBSkeleton* lastSkeleton = NULL;
 
 		if (scene->HasMeshes())
 		{
@@ -706,6 +708,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					joint->setSkeleton(skeleton);
 
 					joint->rot_type ( SkJoint::TypeQuat );
+					joint->quat()->activate();
 					joint->pos()->limits(0, false);
 					joint->pos()->limits(1, false);
 					joint->pos()->limits(2, false);
@@ -912,6 +915,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					}
 				}
 				skeleton->refresh_joints();
+				lastSkeleton = skeleton;
 
 				assets.push_back(skeleton);
 
@@ -977,7 +981,7 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 				*/
 			}
 			
-
+			
 			// check for animations
 			int numMotionChannels = 0;
 			int numAnimations = scene->mNumAnimations;
@@ -1002,6 +1006,7 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 				{
 					aiNodeAnim* nodeAnim = animation->mChannels[c];
 					std::string channelName = nodeAnim->mNodeName.C_Str();
+
 					if (nodeAnim->mNumPositionKeys > 0)
 					{
 						motion->addChannel(channelName, "XPos");
@@ -1018,80 +1023,54 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 					{
 						// ignore scaling in animations
 					}
-				}
-
-				double duration = animation->mDuration;
-				int fps = animation->mTicksPerSecond;
-				if (fps <= 0)
-				{
-					fps = 30;
-				}
-
-				double step = 1.0 / (float) fps;
-				int numFrames = duration / step;
-
-				// for now, create an empty animation
-				std::vector<float> data;
-				data.resize(numMotionChannels);
-
-				double curTime = 0.0;
-				for (int f = 0; f < numFrames; f++)
-				{
-					motion->addFrame(curTime, data);
-					curTime += step;
-				}
+				}			
 				
-				/*
 				// second pass, create the animations
 				for (int c = 0; c < numChannels; c++)
 				{
 					aiNodeAnim* nodeAnim = animation->mChannels[c];
 					std::string channelName = nodeAnim->mNodeName.C_Str();
 
-					std::vector<double> dataX;
-					std::vector<double> dataY;
-					std::vector<double> dataZ;
-					dataX.resize(numFrames);
-					dataY.resize(numFrames);
-					dataZ.resize(numFrames);
-
-					
+					// get the joint and subtract the joint offset
+					SBJoint* joint = NULL;
+					SrVec offset;
+					if (lastSkeleton)
+					{
+						joint = lastSkeleton->getJointByName(channelName);
+						offset = joint->getOffset();
+					}
 
 					int numPosKeys = nodeAnim->mNumPositionKeys;
 					for (int k = 0; k < numPosKeys; k++)
 					{
-						// find the frame for the given time
 						// translation
-						aiVectorKey* key = nodeAnim->mNumPositionKeys[k];
-						int frame = int(key->mTime / step);
-						if (frame < numFrames)
-						{
-							dataX[frame] = key->mValue.x;
-							dataY[frame] = key->mValue.y;
-							dataZ[frame] = key->mValue.x;
-						}
-						else
-						{
-							LOG("Data for channel %s at time %f outside of animation duration %d", channelName.c_str(), key->mTime, duration);
-						}					
+						aiVectorKey& key = nodeAnim->mPositionKeys[k];
+						motion->addKeyFrameChannel(channelName, "XPos", key.mTime / animation->mTicksPerSecond, key.mValue.x - offset.x);
+						motion->addKeyFrameChannel(channelName, "YPos", key.mTime / animation->mTicksPerSecond, key.mValue.y - offset.y);
+						motion->addKeyFrameChannel(channelName, "ZPos", key.mTime / animation->mTicksPerSecond, key.mValue.z - offset.z);
 					}
-					motion->addFrame(
-					if (nodeAnim->mNumRotationKeys > 0)
+					
+					int numRotKeys = nodeAnim->mNumRotationKeys;
+					for (int k = 0; k < numRotKeys; k++)
 					{
-						
+						aiQuatKey& key = nodeAnim->mRotationKeys[k];
+						motion->addKeyFrameQuat(channelName, "Quat", key.mTime / animation->mTicksPerSecond, SrQuat(key.mValue.w, key.mValue.x, key.mValue.y, key.mValue.z));
 					}
 					if (nodeAnim->mNumScalingKeys > 0)
 					{
 						// ignore scaling in animations
 					}
 				}
-				*/
+
+				// bake the animation
+				motion->bakeFrames(animation->mTicksPerSecond);
 
 				assets.push_back(motion);
-			}
+			}	
 
 			assets.push_back(mesh);
 		}
+		
  		
 		  // extract animations
 
