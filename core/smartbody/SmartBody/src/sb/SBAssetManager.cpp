@@ -16,7 +16,7 @@
 #include <sb/SBAssetHandlerAmc.h>
 #include <sb/SBAssetHandlerPly.h>
 #include <sb/SBAssetHandlerSBMeshBinary.h>
-#ifdef USE_ASSIMP
+#ifndef SB_NO_ASSIMP
 #include <sb/SBAssetHandlerAssimp.h>
 #endif
 #include <boost/version.hpp>
@@ -71,7 +71,7 @@ SBAssetManager::SBAssetManager()
 	addAssetHandler(new SBAssetHandlerSkmb());	
 	addAssetHandler(new SBAssetHandlerBvh());	
 	addAssetHandler(new SBAssetHandlerSBMeshBinary());
-#ifdef USE_ASSIMP
+#ifndef SB_NO_ASSIMP
 	addAssetHandler(new SBAssetHandlerAssimp());	
 #endif
 	uniqueSkeletonId = 0;

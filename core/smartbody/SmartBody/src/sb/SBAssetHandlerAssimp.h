@@ -1,5 +1,5 @@
 #ifndef _SBASSETHANDLERASSIMP_H_
-#ifdef USE_ASSIMP
+#ifndef SB_NO_ASSIMP
 
 #include <sb/SBTypes.h>
 #include <vector>
