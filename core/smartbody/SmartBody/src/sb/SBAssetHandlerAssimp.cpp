@@ -387,14 +387,15 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				SrModel* model = new SrModel();
 				if (scene->mNumMeshes == 1)
 				{
-					model->name = mesh->getName().c_str();
+					//model->name = mesh->getName().c_str();
+					model->name = scene->mMeshes[m]->mName.C_Str();
 				}
 				else
 				{
-					//model->name = scene->mMeshes[m]->mName.C_Str();
-					std::stringstream strstr;
-					strstr << m;
-					model->name = strstr.str().c_str();
+					model->name = scene->mMeshes[m]->mName.C_Str();
+					//std::stringstream strstr;
+					//strstr << m;
+					//model->name = strstr.str().c_str();
 				}
 
 			
@@ -923,9 +924,12 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				// add in skinweights
 				for (int m = 0; m < scene->mNumMeshes; m++)
 				{
+					std::vector<std::vector<std::pair<int,float> > > jointNameIndexWeightMap;
+					jointNameIndexWeightMap.resize(scene->mMeshes[m]->mNumVertices);
 					SkinWeight* skinWeight = new SkinWeight();
 					skinWeight->sourceMesh = scene->mMeshes[m]->mName.C_Str();
 					int numBones = scene->mMeshes[m]->mNumBones;
+					int nTotalCount = 0;
 					for (int b = 0; b < numBones; b++)
 					{
 						std::string boneName = scene->mMeshes[m]->mBones[b]->mName.C_Str();
@@ -955,18 +959,35 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 						skinWeight->bindPoseMat.push_back(mat);
 				
 						int numVerts = scene->mMeshes[m]->mBones[b]->mNumWeights;
-						skinWeight->numInfJoints.push_back(numVerts);
+						//skinWeight->numInfJoints.push_back(numVerts);
 						for (int v = 0; v < numVerts; v++)
 						{
-							skinWeight->bindWeight.push_back(scene->mMeshes[m]->mBones[b]->mWeights[v].mWeight);
-							skinWeight->weightIndex.push_back(scene->mMeshes[m]->mBones[b]->mWeights[v].mVertexId);
-							skinWeight->jointNameIndex.push_back(joint->getIndex());
+							int vIdx = scene->mMeshes[m]->mBones[b]->mWeights[v].mVertexId;
+							jointNameIndexWeightMap[vIdx].push_back(std::pair<int,float>(b,scene->mMeshes[m]->mBones[b]->mWeights[v].mWeight));
+							//skinWeight->bindWeight.push_back(scene->mMeshes[m]->mBones[b]->mWeights[v].mWeight);
+							//skinWeight->weightIndex.push_back(scene->mMeshes[m]->mBones[b]->mWeights[v].mVertexId);
+							//skinWeight->jointNameIndex.push_back(b);
 						}
-						
-
-
+						nTotalCount += numVerts;
 					}
-				//	mesh->skinWeights.push_back(skinWeight);
+					skinWeight->bindWeight.resize(nTotalCount);
+					skinWeight->weightIndex.resize(nTotalCount);
+					skinWeight->jointNameIndex.resize(nTotalCount);
+					int idxCount = 0;
+					for (unsigned int v=0;v<jointNameIndexWeightMap.size();v++)
+					{
+						std::vector<std::pair<int,float> >& idxWeightList = jointNameIndexWeightMap[v];
+						skinWeight->numInfJoints.push_back(idxWeightList.size());
+						for (unsigned int idx = 0; idx < idxWeightList.size(); idx++)
+						{
+							std::pair<int,float>& idxWeight = idxWeightList[idx];
+							skinWeight->bindWeight[idxCount] = idxWeight.second;
+							skinWeight->weightIndex[idxCount] = idxCount;
+							skinWeight->jointNameIndex[idxCount] = idxWeight.first;
+							idxCount++;
+						}
+					}
+					mesh->skinWeights.push_back(skinWeight);
 				}
 				/*
 x	std::vector<std::string>	infJointName;	// name array
