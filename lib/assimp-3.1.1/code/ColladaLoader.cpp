@@ -158,10 +158,16 @@ void ColladaLoader::InternReadFile( const std::string& pFile, aiScene* pScene, I
 	FillMaterials(parser, pScene);
 
         // Apply unitsize scale calculation
-        pScene->mRootNode->mTransformation *= aiMatrix4x4(parser.mUnitSize, 0,  0,  0, 
-                                                          0,  parser.mUnitSize,  0,  0,
-                                                          0,  0,  parser.mUnitSize,  0,
+    //    pScene->mRootNode->mTransformation *= aiMatrix4x4(parser.mUnitSize, 0,  0,  0, 
+    //                                                    0,  parser.mUnitSize,  0,  0,
+      //                                                    0,  0,  parser.mUnitSize,  0,
+       //                                                   0,  0,  0,  1);
+		        // Apply unitsize scale calculation
+        pScene->mRootNode->mTransformation *= aiMatrix4x4(1.0, 0,  0,  0, 
+                                                          0,  1.0,  0,  0,
+                                                          0,  0,  1.0,  0,
                                                           0,  0,  0,  1);
+
         if( !ignoreUpDirection ) {
         // Convert to Y_UP, if different orientation
 		if( parser.mUpDirection == ColladaParser::UP_X)
