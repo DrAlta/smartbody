@@ -368,6 +368,8 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 		std::vector<std::string> topmostNodeNames;
 		int topMostNodeLevel = 999999999;
 
+		std::map<int, SrMat> allMeshTransforms;
+
 		SBSkeleton* lastSkeleton = NULL;
 
 		if (scene->HasMeshes())
@@ -385,17 +387,19 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				//LOG("FOUND MESH WITH %d VERTICES, %d FACES", scene->mMeshes[m]->mNumVertices, scene->mMeshes[m]->mNumFaces);
 
 				SrModel* model = new SrModel();
-				if (scene->mNumMeshes == 1)
+				std::string sceneMeshName = scene->mMeshes[m]->mName.C_Str();
+				if (sceneMeshName != "")
 				{
 					//model->name = mesh->getName().c_str();
 					model->name = scene->mMeshes[m]->mName.C_Str();
 				}
 				else
 				{
-					model->name = scene->mMeshes[m]->mName.C_Str();
-					//std::stringstream strstr;
-					//strstr << m;
-					//model->name = strstr.str().c_str();
+					//model->name = scene->mMeshes[m]->mName.C_Str();
+					std::stringstream strstr;
+					strstr << m;
+					model->name = strstr.str().c_str();
+					scene->mMeshes[m]->mName = model->name;
 				}
 
 			
@@ -435,6 +439,8 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				SrMat meshRot;
 				SrQuat meshOrient(meshMat);
 				meshOrient.normalize();
+
+				allMeshTransforms.insert(std::pair<int, SrMat>(m, meshMat));
 
 				// extract vertices and normals
 				int numVertices = scene->mMeshes[m]->mNumVertices;
@@ -936,7 +942,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 						skinWeight->infJointName.push_back(boneName);
 						// find the corresponding SBJoint
 						SBJoint* joint = skeleton->getJointByName(boneName);
-						skinWeight->infJoint.push_back(joint);
+						//skinWeight->infJoint.push_back(joint);
 						int numWeights = scene->mMeshes[m]->mBones[b]->mNumWeights;
 						aiMatrix4x4 transmat =  scene->mMeshes[m]->mBones[b]->mOffsetMatrix;
 						SrMat mat(
@@ -956,7 +962,23 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 							  transmat.b4, 
 							  transmat.c4, 
 							  transmat.d4);
+
+						// if there was a mesh transform, get it and extract the scale
+#if 1
+						std::map<int, SrMat>::iterator iter = allMeshTransforms.find(m);
+						if (iter != allMeshTransforms.end())
+						{
+							SrMat& meshTransform = (*iter).second;
+							SrVec translation = mat.get_translation();
+							SrVec scaledTranslation(	translation.x * meshTransform.e11(), 
+														translation.y * meshTransform.e22(),
+														translation.z * meshTransform.e33());
+							mat.set_translation(scaledTranslation);
+						}
+#endif
 						skinWeight->bindPoseMat.push_back(mat);
+						
+						
 				
 						int numVerts = scene->mMeshes[m]->mBones[b]->mNumWeights;
 						//skinWeight->numInfJoints.push_back(numVerts);
