@@ -1173,12 +1173,12 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 			//jointQueues.push(child->name());
 			srcDirList.push_back(srcdir);			
 			dstDirList.push_back(dstdir);			
-			break;
+			//break;
 		}
-		for (int k=0;k<child->num_children();k++)
-		{
-			childJointNameQueue.push(child->child(k)->getMappedJointName());
-		}
+		//for (int k=0;k<child->num_children();k++)
+		//{
+		//	childJointNameQueue.push(child->child(k)->getMappedJointName());
+		//}
 	}
 #endif	
 
@@ -1190,7 +1190,7 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		//for (unsigned int k=0;k<srcDirList.size();k++)
 		for (unsigned int k=0;k<srcDirList.size();k++)
 		{
-			if (k>=1) continue;
+			//if (k>=1) continue;
 			srcDir += srcDirList[k];
 			dstDir += dstDirList[k];
 		}
