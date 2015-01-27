@@ -37,8 +37,8 @@ SBAssetHandlerAssimp::SBAssetHandlerAssimp()
 {
 	assetTypes.push_back("fbx");
 	assetTypes.push_back("blend");
-	assetTypes.push_back("dae");
-	assetTypes.push_back("obj");
+	//assetTypes.push_back("dae");
+//	assetTypes.push_back("obj");
 	assetTypes.push_back("ply");
 }
 
@@ -220,7 +220,12 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 
 				aiColor3D transparency(0.0f, 0.0f, 0.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_TRANSPARENT, transparency);
-				material->transparency = sqrt(transparency.r * transparency.r  + transparency.g * transparency.g *  + transparency.b * transparency.b);
+				material->transparency = (transparency.r + transparency.g  + transparency.b) / 3.0;
+				if (material->transparency < .99)
+					material->useAlphaBlend = false;
+				else
+					material->useAlphaBlend = true;
+				material->diffuse.a = (srbyte) ( material->transparency * 255.0f );
 				//LOG("TRANSPARENCY COLOR %.2f ", material->transparency);
 				
 				aiString matName;
