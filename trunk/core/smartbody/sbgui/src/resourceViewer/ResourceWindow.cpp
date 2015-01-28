@@ -454,9 +454,9 @@ void ResourceWindow::updateGUI()
 	std::vector<std::string> meshNames = assetManager->getDeformableMeshNames();
 	for (size_t i = 0; i < meshNames.size(); i++)
 	{
-		//resourceTree->add(treeItemList[ITEM_MOTION],mi->first.c_str());
 		DeformableMesh* mesh = assetManager->getDeformableMesh(meshNames[i]);
-		updateMesh(getTreeFromName("mesh"), mesh);
+		Fl_Tree_Item* meshItem = resourceTree->add(getTreeFromName("mesh"), mesh->getName().c_str());
+		updateMesh(meshItem, mesh);
 	}
 
 
@@ -757,8 +757,23 @@ void ResourceWindow::updateSkeleton( Fl_Tree_Item* tree, SmartBody::SBSkeleton* 
 
 void ResourceWindow::updateMesh( Fl_Tree_Item* tree, DeformableMesh* mesh )
 {
-	Fl_Tree_Item* item = resourceTree->add(tree, mesh->getName().c_str());
 //	item->user_data((void*)ITEM_MESH);
+
+	for (int i=0; i< mesh->getNumMeshes();i++)
+	{
+		std::string meshName = mesh->getMeshName(i);
+		
+		Fl_Tree_Item* item = resourceTree->add(tree,meshName.c_str());	
+		// for each mesh, get the materials associated with it
+		SrModel& model = mesh->getStaticModel(i);
+		for (int m = 0; m < model.M.size(); m++)
+		{
+			std::string materialName = model.mtlnames[m];
+			Fl_Tree_Item* materialItem = resourceTree->add(item, materialName.c_str());	
+
+		}
+	}
+
 }
 
 void ResourceWindow::updateAnimationBlend( Fl_Tree_Item* tree, SmartBody::SBAnimationBlend* blend )
