@@ -1382,4 +1382,16 @@ SBAPI void SrModel::computeNormals(int flat)
 		N[i].normalize();
 }
 
+int SrModel::getNumMaterials()
+{
+	return M.size();
+}
+
+SrMaterial& SrModel::getMaterial(int num)
+{
+	if (num >= 0 && num < M.size())
+		return M[num];
+}
+
+
 //================================ End of File =================================================

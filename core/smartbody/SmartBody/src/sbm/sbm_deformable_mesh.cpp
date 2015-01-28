@@ -2161,7 +2161,10 @@ void DeformableMeshInstance::update()
 				SrVec finalVec;
 				//printf("Vtx bind pose = \n");
 
-
+				if (numOfInfJoints >= 5 )
+				{
+					int a = 0; // dummy for break point
+				}
 
 
 				for (int j = 0; j < numOfInfJoints; j++)
@@ -2176,7 +2179,8 @@ void DeformableMeshInstance::update()
 					double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
 					globalCounter ++;
 					SrVec transformVec = _meshScale*(skinLocalVec * skinWeight->bindShapeMat * invBMat);
-					finalVec = finalVec + (float(jointWeight) * (transformVec  * gMat));		
+					SrVec finalTransformVec = (transformVec  * gMat);
+					finalVec = finalVec + (float(jointWeight) * finalTransformVec);		
 					//finalVec = finalVec + (float(jointWeight) * (skinLocalVec * skinWeight->bindShapeMat * invBMat  * gMat));	
 				}
 
@@ -2313,3 +2317,25 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 	SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #FINAL");
 }
 
+int DeformableMesh::getNumMeshes()
+{
+	return dMeshStatic_p.size();
+}
+
+const std::string DeformableMesh::getMeshName(int index)
+{
+	if (dMeshStatic_p.size() > index &&
+		index >= 0)
+		return dMeshStatic_p[index]->shape().name;
+	else
+		return "";
+}
+
+SrModel& DeformableMesh::getStaticModel(int index)
+{
+	if (dMeshStatic_p.size() > index &&
+		index >= 0)
+		return dMeshStatic_p[index]->shape();
+	else
+		return SrModel();
+}

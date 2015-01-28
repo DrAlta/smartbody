@@ -258,6 +258,9 @@ class SrModel : public SrSharedClass
 	SBAPI void restoreOriginalVertices();
 
 	SBAPI void recalculateVertices();
+
+	SBAPI int getNumMaterials();
+	SBAPI SrMaterial& getMaterial(int num);
  };
 
 //================================ End of File =================================================
