@@ -363,6 +363,17 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	{	
 		SbmSubMesh* subMesh = subMeshList[i];
 		glMaterial(subMesh->material);	
+		if (subMesh->material.useAlphaBlend)
+		{
+			glEnable(GL_ALPHA_TEST);
+			glEnable(GL_BLEND);
+			
+		}
+		else
+		{
+			glDisable(GL_ALPHA_TEST);
+			glDisable(GL_BLEND);
+		}
 
 		std::string texturesType = "static";
 		if (shape->getCharacter())

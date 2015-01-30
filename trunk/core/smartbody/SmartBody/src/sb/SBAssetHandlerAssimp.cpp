@@ -37,9 +37,9 @@ SBAssetHandlerAssimp::SBAssetHandlerAssimp()
 {
 	assetTypes.push_back("fbx");
 	assetTypes.push_back("blend");
-	assetTypes.push_back("dae");
+//	assetTypes.push_back("dae");
 //	assetTypes.push_back("obj");
-	assetTypes.push_back("ply");
+//	assetTypes.push_back("ply");
 }
 
 SBAssetHandlerAssimp::~SBAssetHandlerAssimp()
@@ -229,6 +229,16 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					material->useAlphaBlend = true;
 				material->diffuse.a = (srbyte) ( material->transparency * 255.0f );
 				LOG("TRANSPARENCY COLOR %.2f ", material->transparency);
+
+				float matOpacity = 1.f;
+				scene->mMaterials[m]->Get(AI_MATKEY_OPACITY, matOpacity);
+				if (matOpacity < 1.f)
+				{
+					material->useAlphaBlend = true;
+					material->diffuse.a = matOpacity;
+				}
+				else
+					material->useAlphaBlend = false;
 				
 				float opacity = 1.0f;
 				scene->mMaterials[m]->Get(AI_MATKEY_OPACITY, opacity);
@@ -243,6 +253,8 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				aiString matName;
 				scene->mMaterials[m]->Get(AI_MATKEY_NAME, matName);
 				allMaterialNames.push_back(matName.C_Str());
+				LOG("mat name = %s, opacity = %f, transparency = %f %f %f", matName.C_Str(), matOpacity, transparency.r, transparency.g, transparency.b);
+
 
 				SbmTextureManager& texManager = SbmTextureManager::singleton();
 				materialTextures matTex;

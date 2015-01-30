@@ -638,7 +638,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glAlphaFunc ( GL_GREATER, 0.0f ) ;
+	glAlphaFunc ( GL_GREATER, 0.0f ) ;
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_COLOR_MATERIAL);
 	glUseProgram(program);		

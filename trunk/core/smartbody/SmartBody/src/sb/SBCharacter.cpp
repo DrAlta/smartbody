@@ -194,7 +194,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	frameDataMarshalFriendly = new SBM_CharacterFrameDataMarshalFriendly();
 	InitFrameDataMarshalFriendly();
 	
-	SmartBody::StringAttribute* textureAttribute = createStringAttribute("texturesType", "none", true, "Display", 210, false, false, false, "How to display textures");
+	SmartBody::StringAttribute* textureAttribute = createStringAttribute("texturesType", "static", true, "Display", 210, false, false, false, "How to display textures");
 	std::vector<std::string> textureVec;
 	textureVec.push_back("none");
 	textureVec.push_back("static");
