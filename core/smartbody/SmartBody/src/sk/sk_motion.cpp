@@ -1175,15 +1175,18 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 			dstDirList.push_back(dstdir);			
 			//break;
 		}
-		//for (int k=0;k<child->num_children();k++)
-		//{
-		//	childJointNameQueue.push(child->child(k)->getMappedJointName());
-		//}
+		else
+		{
+			for (int k=0;k<child->num_children();k++)
+			{
+				childJointNameQueue.push(child->child(k)->getMappedJointName());
+			}
+		}		
 	}
 #endif	
 
 	SrQuat jointRotation;
-	//if (srcDirList.size() == 1 || srcDirList.size() == 2)
+	if (srcDirList.size() == 1 || srcDirList.size() == 2)
 	{
 
 		SrVec srcDir, dstDir;
