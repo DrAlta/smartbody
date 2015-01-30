@@ -168,7 +168,7 @@ int JoinVerticesProcess::ProcessMesh( aiMesh* pMesh, unsigned int meshIndex)
 
 	// Run an optimized code path if we don't have multiple UVs or vertex colors.
 	// This should yield false in more than 99% of all imports ...
-	const bool complex = ( pMesh->GetNumColorChannels() > 0 || pMesh->GetNumUVChannels() > 1);
+	const bool complex = false;//( pMesh->GetNumColorChannels() > 0 || pMesh->GetNumUVChannels() > 1);
 
 	// Now check each vertex if it brings something new to the table
 	for( unsigned int a = 0; a < pMesh->mNumVertices; a++)	{
@@ -193,13 +193,16 @@ int JoinVerticesProcess::ProcessMesh( aiMesh* pMesh, unsigned int meshIndex)
 			// We just test the other attributes even if they're not present in the mesh.
 			// In this case they're initialized to 0 so the comparision succeeds. 
 			// By this method the non-present attributes are effectively ignored in the comparision.
+#if 0 // only care about position and texture coordinate
 			if( (uv.normal - v.normal).SquareLength() > squareEpsilon)
-				continue;
-			if( (uv.texcoords[0] - v.texcoords[0]).SquareLength() > squareEpsilon)
-				continue;
+				continue;			
+				
 			if( (uv.tangent - v.tangent).SquareLength() > squareEpsilon)
 				continue;
 			if( (uv.bitangent - v.bitangent).SquareLength() > squareEpsilon)
+				continue;
+#endif
+			if( (uv.texcoords[0] - v.texcoords[0]).SquareLength() > squareEpsilon)
 				continue;
 
 			// Usually we won't have vertex colors or multiple UVs, so we can skip from here

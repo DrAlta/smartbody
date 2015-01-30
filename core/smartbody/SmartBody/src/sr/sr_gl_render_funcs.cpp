@@ -406,7 +406,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 					}
 					else 
 					{
-						LOG("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
+						//LOG("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
 						glBindTexture(GL_TEXTURE_2D, tex->getID());
 					}
 				}
