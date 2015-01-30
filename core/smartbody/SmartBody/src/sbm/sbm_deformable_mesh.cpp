@@ -2126,6 +2126,9 @@ void DeformableMeshInstance::update()
 	if (!_skeleton || !_mesh) return;	
 	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
 	_skeleton->update_global_matrices();
+	updateFast();
+	return;
+
 	int maxJoint = -1;
 	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
 	if (skinWeights.size() != _boneJointList.size()) updateJointList();
