@@ -38,7 +38,7 @@ SBAssetHandlerAssimp::SBAssetHandlerAssimp()
 	assetTypes.push_back("fbx");
 	assetTypes.push_back("blend");
 //	assetTypes.push_back("dae");
-//	assetTypes.push_back("obj");
+	assetTypes.push_back("obj");
 //	assetTypes.push_back("ply");
 }
 
@@ -419,14 +419,19 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 
 			for (int m = 0; m < scene->mNumMeshes; m++)
 			{
-				//LOG("FOUND MESH WITH %d VERTICES, %d FACES", scene->mMeshes[m]->mNumVertices, scene->mMeshes[m]->mNumFaces);
+				LOG("FOUND MESH WITH %d VERTICES, %d FACES", scene->mMeshes[m]->mNumVertices, scene->mMeshes[m]->mNumFaces);
 
 				SrModel* model = new SrModel();
 				std::string sceneMeshName = scene->mMeshes[m]->mName.C_Str();
-				if (sceneMeshName != "")
+				if (sceneMeshName != "") // if mesh name exist, use it directly
 				{
 					//model->name = mesh->getName().c_str();
 					model->name = scene->mMeshes[m]->mName.C_Str();
+				}
+				else if (scene->mNumMeshes == 1) // otherwise, if there is only one single mesh exist, use the file name
+				{
+					model->name = scene->mRootNode->mName.C_Str();
+					scene->mMeshes[m]->mName = model->name;
 				}
 				else
 				{
