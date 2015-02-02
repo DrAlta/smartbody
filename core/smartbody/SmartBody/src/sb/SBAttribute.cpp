@@ -379,8 +379,8 @@ std::string BoolAttribute::write()
 	bool curVal = getValue();
 	strstr << "\tattr.setDefaultValue(";
 	val? strstr << "True)\n" : strstr << "False)\n"; 
-	//strstr << "attr.setValue(";
-	//curVal? strstr << "True)\n" : strstr << "False)\n"; 
+	strstr << "\tattr.setValue(";
+	curVal? strstr << "True)\n" : strstr << "False)\n"; 
 
 	return strstr.str();
 }
@@ -526,7 +526,7 @@ std::string IntAttribute::write()
 	int val = getDefaultValue();
 	int curVal = getValue();
 	strstr << "\tattr.setDefaultValue(" << val << ")\n";
-	//strstr << "attr.setValue(" << curVal << ")\n";
+	strstr << "\tattr.setValue(" << curVal << ")\n";
 
 	return strstr.str();
 }
@@ -675,7 +675,7 @@ std::string DoubleAttribute::write()
 	double val = getDefaultValue();
 	double curVal = getValue();
 	strstr << "\tattr.setDefaultValue(" << val << ")\n";	
-	//strstr << "attr.setValue(" << curVal << ")\n";
+	strstr << "\tattr.setValue(" << curVal << ")\n";
 	return strstr.str();
 }
 
@@ -796,7 +796,7 @@ std::string StringAttribute::write()
 	{
 		strstr << "\tattr.setDefaultValue(\"" << defaultVal << "\")\n";		
 	}
-	//strstr << "attr.setValue(\"" << curVal << "\")\n";
+	strstr << "\tattr.setValue(\"" << curVal << "\")\n";
 	strstr << "\tvalidValues = StringVec()\n";
 	const std::vector<std::string>& values = getValidValues();
 	for (std::vector<std::string>::const_iterator iter = values.begin();
@@ -928,8 +928,8 @@ std::string Vec3Attribute::write()
 	strstr << "vec.setData(1, " << val.y << ")\n";
 	strstr << "vec.setData(2, " << val.z << ")\n";
 	strstr << "attr.setDefaultValue(vec)\n";
-	//strstr << "vec1 = SrVec(" << curVal.x << ", " << curVal.y << ", " << curVal.z << ")\n";
-	//strstr << "attr.setValue(vec1)\n";
+	strstr << "vec1 = SrVec(" << curVal.x << ", " << curVal.y << ", " << curVal.z << ")\n";
+	strstr << "attr.setValue(vec1)\n";
 
 	return strstr.str();
 }
@@ -1053,7 +1053,7 @@ std::string MatrixAttribute::write()
 		for (int c = 0; c < 4; c++)
 			strstr << "curMat.setData(" << curMat.getData(r, c) << ")\n";
 	strstr << "attr.setDefaultValue(defMat)\n";
-	//strstr << "attr.setValue(curMat)\n";
+	strstr << "attr.setValue(curMat)\n";
 
 	return strstr.str();
 }

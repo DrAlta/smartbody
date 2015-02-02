@@ -383,7 +383,11 @@ int SBSteerManager::getNumSteerAgents()
 
 SBSteerAgent* SBSteerManager::getSteerAgent(std::string name)
 {
-	return _steerAgents[name];
+	std::map<std::string, SBSteerAgent*>::iterator iter = _steerAgents.find(name);
+	if (iter == _steerAgents.end())
+		return NULL;
+	else
+		return (*iter).second;
 }
 
 std::vector<std::string> SBSteerManager::getSteerAgentNames()
