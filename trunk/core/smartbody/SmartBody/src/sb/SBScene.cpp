@@ -3268,9 +3268,11 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 		SBSteerAgent* steerAgent = steerManager->getSteerAgent(character->getName());
 		if (steerAgent)
 		{
-			strstr << "steeragent = scene.getSteerManager().createSteerAgent(\"" << character->getName() << "\")\n";
-			strstr << "steeragent.setSteerStateNamePrefix(\"" << steerAgent->getSteerStateNamePrefix() << "\")\n";
-			strstr << "steeragent.setSteerType(\"" << steerAgent->getSteerType() << "\")\n";
+			strstr << "steeragent = scene.getSteerManager().getSteerAgent(\"" << character->getName() << "\")\n";
+			strstr << "if steeragent is None:\n";
+			strstr << "\tsteeragent = scene.getSteerManager().createSteerAgent(\"" << character->getName() << "\")\n";
+			strstr << "\tsteeragent.setSteerStateNamePrefix(\"" << steerAgent->getSteerStateNamePrefix() << "\")\n";
+			strstr << "\tsteeragent.setSteerType(\"" << steerAgent->getSteerType() << "\")\n";
 		}
 		else
 		{
