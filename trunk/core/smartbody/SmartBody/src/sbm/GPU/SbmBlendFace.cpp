@@ -570,13 +570,24 @@ void SbmBlendTextures::BlendGeometry(GLuint * FBODst, GLuint * texDst, std::vect
 
 				// Areas is a vector<int> used to set which areas each shape affect (0 -> all, 1-> upper)
 				// If this shape is for eye_blink, sets area to upper
-				//if(
-				//	(texture_names[i].find("eye") != std::string::npos) ||
-				//	(texture_names[i].find("brows") != std::string::npos) 
-				//	)
-				//	areas.push_back(1);										
-				//else
+				if(
+					//(texture_names[i].find("eye") != std::string::npos) ||
+					(texture_names[i].find("brows") != std::string::npos) 
+					)
+					areas.push_back(1);										
+				else if(
+						(texture_names[i].find("smile") != std::string::npos)||
+						(texture_names[i].find("bmp") != std::string::npos)||
+						(texture_names[i].find("fv") != std::string::npos) ||
+						(texture_names[i].find("w") != std::string::npos) 
+						)
+				{
+					areas.push_back(2);
+				}
+				else
+				{
 					areas.push_back(0);
+				}
 			}
 		}
 
@@ -674,23 +685,22 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 		WeightUpToNow += weights[i];
 
 		int faceArea;
-		if((texture_names[i].find("eye_blink") != std::string::npos) && (weights[i] > 0.001))
-		{
-			faceArea = 1;
-			//std::cerr << "eye_blink\t" << weights[i] << "\n";
-		} 
-		else if((texture_names[i].find("mouth_right") != std::string::npos) && (weights[i] > 0.001))
-		{
-			faceArea = 2;
-			//std::cerr << texture_names[i] <<"\t" << weights[i] << "\n";
-		}
-		else
+//		if((texture_names[i].find("eyebrowsUp") != std::string::npos) && (weights[i] > 0.001))
+//		{
+//			faceArea = 1;
+//			//std::cerr << "eye_blink\t" << weights[i] << "\n";
+//		} 
+//		else if((texture_names[i].find("smile") != std::string::npos) && (weights[i] > 0.001))
+//		{
+//			faceArea = 2;
+//			//std::cerr << texture_names[i] <<"\t" << weights[i] << "\n";
+//		}
+//		else
 		{
 			faceArea = 0;
 		}
 
 	
-
 		glPushMatrix();
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst[i]);                                                              // Bind the framebuffer object
 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst[i], 0);              // Attach texture to FBO

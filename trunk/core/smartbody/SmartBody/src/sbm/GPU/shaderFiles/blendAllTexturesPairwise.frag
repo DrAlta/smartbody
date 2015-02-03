@@ -97,6 +97,10 @@ void main()
 				gl_FragColor	= color_other;
 			}
 		}
+
+//		if(uFaceArea == 2)
+//			gl_FragColor	= vec4(1.0,0.0,0.0,1.0);
+
 //		else if(uFaceArea == 2)	// Lower face
 //		{
 //			if(gl_TexCoord[0].t < 0.5)
