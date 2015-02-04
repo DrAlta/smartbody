@@ -1120,7 +1120,8 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 					if (lastSkeleton)
 					{
 						joint = lastSkeleton->getJointByName(channelName);
-						offset = joint->getOffset();
+						if (joint)
+							offset = joint->getOffset();
 					}
 
 					int numPosKeys = nodeAnim->mNumPositionKeys;

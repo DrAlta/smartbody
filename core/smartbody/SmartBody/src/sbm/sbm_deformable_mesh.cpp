@@ -75,6 +75,55 @@ void SkinWeight::normalizeWeights()
 	}
 }
 
+void SkinWeight::copyWeights(SkinWeight* copy, const std::string& morphName)
+{
+	infJointName.clear();
+	for (size_t jn = 0; jn < copy->infJointName.size(); jn++)
+	{
+		infJointName.push_back(copy->infJointName[jn]);
+	}
+
+	infJoint.clear();
+	for (size_t j = 0; j < copy->infJoint.size(); j++)
+	{
+		infJoint.push_back(copy->infJoint[j]);
+	}
+
+	bindWeight.clear();
+	for (size_t bw = 0; bw < copy->bindWeight.size(); bw++)
+	{
+		bindWeight.push_back(copy->bindWeight[bw]);
+	}
+
+	bindPoseMat.clear();
+	for (size_t bp = 0; bp < copy->bindPoseMat.size(); bp++)
+	{
+		bindPoseMat.push_back(copy->bindPoseMat[bp]);
+	}
+
+	bindShapeMat = copy->bindShapeMat;
+	sourceMesh = morphName; // set the name to the input parameter, instead of the source name (i.e. copy->sourceMesh)
+
+	numInfJoints.clear();
+	for (size_t n = 0; n < copy->numInfJoints.size(); n++)
+	{
+		numInfJoints.push_back(copy->numInfJoints[n]);
+	}
+
+	weightIndex.clear();
+	for (size_t wi = 0; wi < copy->weightIndex.size(); wi++)
+	{
+		weightIndex.push_back(copy->weightIndex[wi]);
+	}
+
+	jointNameIndex.clear();
+	for (size_t jni = 0; jni < copy->jointNameIndex.size(); jni++)
+	{
+		jointNameIndex.push_back(copy->jointNameIndex[jni]);
+	}
+}
+
+
 DeformableMesh::DeformableMesh() : SBAsset()
 {
 	binding = false;
@@ -2139,8 +2188,8 @@ void DeformableMeshInstance::update()
 	if (!_skeleton || !_mesh) return;	
 	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
 	_skeleton->update_global_matrices();
-	updateFast();
-	return;
+	//updateFast();
+	//return;
 
 	int maxJoint = -1;
 	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
@@ -2354,4 +2403,23 @@ SrModel& DeformableMesh::getStaticModel(int index)
 		return dMeshStatic_p[index]->shape();
 	else
 		return _emptyModel;
+}
+
+void DeformableMesh::copySkinWeights(DeformableMesh* fromMesh, const std::string& morphName)
+{
+	// clear any existing skin weights
+	for (size_t w = 0; w < this->skinWeights.size(); w++)
+	{
+		SkinWeight* weight = this->skinWeights[w];
+		delete weight;
+	}
+	this->skinWeights.clear();
+
+
+	for (size_t w = 0; w < fromMesh->skinWeights.size(); w++)
+	{
+		SkinWeight* weight = new SkinWeight();
+		weight->copyWeights(fromMesh->skinWeights[w], morphName);
+		this->skinWeights.push_back(weight);
+	}
 }
