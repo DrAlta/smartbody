@@ -2353,5 +2353,5 @@ SrModel& DeformableMesh::getStaticModel(int index)
 		index >= 0)
 		return dMeshStatic_p[index]->shape();
 	else
-		return SrModel();
+		return _emptyModel;
 }
