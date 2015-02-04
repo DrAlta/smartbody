@@ -5431,6 +5431,7 @@ void FltkViewer::drawDeformableModels()
 		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 		if(meshInstance)
 		{
+			meshInstance->blendShapeStaticMesh();
 			//LOG("drawDeformableModels(): Rendering %s", pawn->getName().c_str());
 			//pawn->dMesh_p->update();
 			if (!meshInstance->isStaticMesh()) // is skinned mesh
@@ -5465,8 +5466,6 @@ void FltkViewer::drawDeformableModels()
 				//meshInstance->blendShapes();
 				if ( (!SbmDeformableMeshGPU::useGPUDeformableMesh && meshInstance->getVisibility() == 1) || meshInstance->getVisibility() == 2)
 				{
-					meshInstance->blendShapeStaticMesh();
-
 					// simply draw the static mesh
 					SrGlRenderFuncs::renderDeformableMesh(meshInstance, false);
 

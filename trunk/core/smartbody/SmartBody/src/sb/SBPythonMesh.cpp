@@ -25,6 +25,8 @@ namespace SmartBody
 			.def("rotate", &DeformableMesh::rotate, "Rotate mesh")
 			.def("centralize", &DeformableMesh::centralize, "Make the center of the mesh (0,0,0)")
 			.def("computeNormals", &DeformableMesh::computeNormals, "Recompute normals.")
+			.def("copySkinWeights", &DeformableMesh::copySkinWeights, "Copies the skin weights from the input mesh to this mesh.")
+
 			;
 	}
 }

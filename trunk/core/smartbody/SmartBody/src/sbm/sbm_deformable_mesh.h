@@ -54,8 +54,10 @@ public:
 
 public:
 	SBAPI SkinWeight();
+	
 	SBAPI ~SkinWeight();
 	SBAPI void normalizeWeights();
+	SBAPI void copyWeights(SkinWeight* copy, const std::string& morphName);
 };
 
 class SbmSubMesh
@@ -133,6 +135,8 @@ public:
 	std::vector<SrSnModel*>		dMeshBlend_p;
 	bool hasVertexColor;	
 	bool hasTexCoord;
+
+	SrModel _emptyModel;
 public:
 	SBAPI DeformableMesh();
 	SBAPI virtual ~DeformableMesh();	
@@ -165,6 +169,7 @@ public:
 	SBAPI void scale(float factor);
 	SBAPI void centralize();
 	SBAPI void computeNormals();
+	SBAPI void copySkinWeights(DeformableMesh* fromMesh, const std::string& morphName);
 
 };
 

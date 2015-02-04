@@ -325,6 +325,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					{
 						pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
+
 					}
 					else if (!pawn->dStaticMeshInstance_p && name == "mesh")
 					{
