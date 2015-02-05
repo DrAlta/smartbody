@@ -1622,7 +1622,7 @@ void DeformableMeshInstance::blendShapes()
 
 		if (writeToBaseModel == NULL)
 		{
-			LOG("base model to write to cannot be found");
+			//LOG("base model to write to cannot be found");
 			continue;
 		}
 		for (size_t i = 0; i < mIter->second.size(); ++i)

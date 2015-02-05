@@ -377,7 +377,11 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 
 		std::string texturesType = "static";
 		if (shape->getCharacter())
-			texturesType = shape->getCharacter()->getStringAttribute("texturesType");
+			texturesType = shape->getCharacter()->getStringAttribute("texturesType");	
+
+		SmartBody::SBSkeleton* skel = shape->getSkeleton();
+		SmartBody::SBPawn* pawn		= skel->getPawn();
+		bool useTexBlend = pawn->getBoolAttribute("textureBlend");
 
 		if( texturesType == "static" || texturesType == "dynamic")
 		{
@@ -392,10 +396,13 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 					glActiveTexture(GL_TEXTURE0);
 			
 				//	If we are using blended textures
-				
+				glEnable(GL_TEXTURE_2D);	
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+
 				if(!shape->getCharacter())
 				{
-					glBindTexture(GL_TEXTURE_2D, tex->getID());
+					glBindTexture(GL_TEXTURE_2D, tex->getID());					
 				} 
 				else if (texturesType == "dynamic")
 				{
@@ -409,17 +416,23 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 						//LOG("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
 						glBindTexture(GL_TEXTURE_2D, tex->getID());
 					}
+					
 				}
 				else 		//	If blended textures not used, use neutral appearance				
 				{
 					glBindTexture(GL_TEXTURE_2D, tex->getID());
+					
+				}				
+
+				if (useTexBlend)
+				{
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
 				}
-				
-				//glColor4f(0.0f, 0.0f, 0.0f, 1.0);
-				glEnable(GL_TEXTURE_2D);	
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+				else
+				{
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+				}
+				//glColor4f(0.0f, 0.0f, 0.0f, 1.0);				
 			}
 		}
 #if GLES_RENDER
