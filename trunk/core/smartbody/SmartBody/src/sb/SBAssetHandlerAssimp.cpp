@@ -591,6 +591,9 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					model->mtlnames.push("unknown");
 				}
 
+				//if (!scene->mMeshes[m]->mNormals)
+				//	model->computeNormals();
+
 				SrSnModel* srSnModelStatic = new SrSnModel();
 				srSnModelStatic->shape(*model);
 				if (model->name.len() > 0)
