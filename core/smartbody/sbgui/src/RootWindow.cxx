@@ -1121,7 +1121,7 @@ void BaseWindow::LaunchVisemeViewerCB(Fl_Widget* widget, void* data)
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	if (!rootWindow->visemeViewerWindow)
 	{
-		rootWindow->visemeViewerWindow = new VisemeViewerWindow(150, 150, 800, 600, "Viseme Configuration");
+		rootWindow->visemeViewerWindow = new VisemeViewerWindow(150, 150, 800, 800, "Viseme Configuration");
 	}
 
 	rootWindow->visemeViewerWindow->show();

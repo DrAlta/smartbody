@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <FL/Fl_Device.H>
 #include <FL/fl_draw.H>
-#include <FL/Fl_File_Chooser.H>
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBFaceDefinition.h>
@@ -55,7 +54,7 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_buttonRunTimeCurves = new Fl_Button(560, 500, 100, 30, "RunTime Curves");
 	_buttonRunTimeCurves->callback(OnRunTimeCurvesCB, this);
 
-	_buttonPlayImageSequence = new Fl_Button(660, 500, 100, 30, "PlayImageSequence");
+	_buttonPlayImageSequence = new Fl_Button(660, 500, 100, 30, "Play Image Sequence");
 	_buttonPlayImageSequence->callback(OnPlayImageSequence, this);
 
 	_buttonPlayAudioFile = new Fl_Button(40, 535, 70, 30, "Play Audio");
@@ -63,7 +62,8 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_inputAudioFile = new Fl_Input(115, 535, 435, 30);
 	_choiceAudioFile = new Fl_Choice(560, 535, 100, 30, "");
 	_choiceAudioFile->callback(OnAudioFileSelectCB, this);
-
+	_buttonSetCharacterAudioFolder = new Fl_Button(40, 535, 70, 30, "Play Audio");
+	_buttonSetCharacterAudioFolder->callback(OnPlayAudioFileCB, this);
 
 	_choiceCharacter = new Fl_Choice(70, 35, 100, 25, "Character");
 	_choiceCharacter->callback(OnCharacterSelectCB, this);
@@ -71,19 +71,19 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_buttonRefreshCharacter = new Fl_Button(180, 35, 80, 25, "Refresh");
 	_buttonRefreshCharacter->callback(OnCharacterRefreshCB, this);
 
-	_checkStats = new Fl_Check_Button(300, 35, 100, 25, "Gather Stats");
+	_checkStats = new Fl_Check_Button(330, 35, 100, 25, "Gather Stats");
 	_checkStats->callback(OnGatherStatsCB, this);
 
-	_buttonReset = new Fl_Button(400, 35, 60, 25, "Reset Stats");
+	_buttonReset = new Fl_Button(430, 35, 60, 25, "Reset Stats");
 	_buttonReset->callback(OnStatsResetCB, this);
 
-	_buttonShowStats = new Fl_Button(470, 35, 60, 25, "Save Stats");
+	_buttonShowStats = new Fl_Button(500, 35, 60, 25, "Save Stats");
 	_buttonShowStats->callback(OnShowStatsCB, this);
 
-	_buttonNormalize = new Fl_Button(590, 35, 80, 25, "Normalize");
+	_buttonNormalize = new Fl_Button(620, 35, 80, 25, "Normalize");
 	_buttonNormalize->callback(OnNormalizeCB, this);
 	
-	_buttonDump = new Fl_Button(660, 35, 80, 25, "Dump");
+	_buttonDump = new Fl_Button(700, 35, 80, 25, "Dump");
 	_buttonDump->callback(OnDumpCB, this);
 
 	_browserPhoneme[0] = new Fl_Hold_Browser(10, 80, 70, 350, "Phoneme1");
@@ -100,8 +100,10 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	
 	Fl_Menu_Bar* menuBar = new Fl_Menu_Bar(0, 0, w, 30);
 	//menuBar->menu(menu_);
-	menuBar->add("&File/Save", 0, OnSaveCB, this, 0);
-	menuBar->add("&File/Load", 0, OnLoadCB, this, 0);
+	menuBar->add("&File/Save lip sync file", 0, OnSaveCB, this, 0);
+	menuBar->add("&File/Load lip sync file", 0, OnLoadCB, this, 0);
+
+	menuBar->add("&Lip Sync/Phoneme Alignment Command", 0, OnPhonemeAlignmentCommandCB, this, 0);
 	//menuBar->callback(OnMenuSelectCB, this);
 
 	_curveEditor = new VisemeCurveEditor(235, 80, 395, 355, "Animation Curve");
@@ -115,6 +117,33 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_browserDiphone = new Fl_Hold_Browser(725, 80, 70, 350, "Diphones");
 	_browserDiphone->align(FL_ALIGN_TOP); 
 	_browserDiphone->callback(OnDiphoneSelectCB, this);
+
+	Fl_Group* phonemeAlignmentGroup = new Fl_Group(10, 590, 700, 165);
+	phonemeAlignmentGroup->begin();
+
+	Fl_Box* box = new Fl_Box(10, 590, 700, 165, "Phoneme Alignment");
+	box->align(FL_ALIGN_TOP | FL_ALIGN_LEFT);
+	box->box(FL_BORDER_BOX);
+	
+	_buttonSpeechFile = new Fl_Button(560, 600, 30, 25, "...");
+	_buttonSpeechFile->callback(OnSoundFileLoadCB, this);
+	_inputSpeechFile = new Fl_Input(115, 600, 435, 25, "Speech File");
+	_inputTranscription = new Fl_Input(115, 630, 435, 25, "Transcription");
+	_inputTranscription->when(FL_WHEN_CHANGED);
+	_inputTranscription->callback(OnPhonemeTranslateCB, this);
+	_buttonGeneratePhonemes = new Fl_Button(560, 630, 100, 25, "Generate Phonemes");
+	_buttonGeneratePhonemes->callback(OnPhonemeTranslateCB, this);
+	_inputPhonemes = new Fl_Input(115, 660, 435, 25, "Phonemes");
+	_buttonDictionaryFile = new Fl_Button(560, 660, 100, 25, "Dictionary");
+	_buttonDictionaryFile->callback(OnDictionaryLoadCB, this);
+	_inputLipSyncFolder = new Fl_Input(115, 690, 435, 25, "Batch lip sync folder");
+	_buttonLipSyncFolder = new Fl_Button(560, 690, 30, 25, "...");
+	_buttonLipSyncFolder->callback(OnChangeLipSyncFolderCB, this);
+	_checkRunBatchMode = new Fl_Check_Button(115, 720, 30, 25, "Batch Mode");
+	_buttonGenerateLipSync = new Fl_Button(560, 720, 100, 25, "Generate lip sync");
+	_buttonGenerateLipSync->callback(OnGenerateLipSyncCB, this);
+
+	phonemeAlignmentGroup->end();
 
 	this->end();
 
@@ -324,7 +353,10 @@ SmartBody::SBDiphone* VisemeViewerWindow::getCurrentDiphone()
 		return NULL;
 
 	const std::string& diphoneMap = SmartBody::SBScene::getScene()->getCharacter(getCurrentCharacterName())->getStringAttribute("lipSyncSetName");
-	SmartBody::SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(phoneme1, phoneme2, diphoneMap);
+	// map the phones to their common set partner
+	SmartBody::SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
+
+	SmartBody::SBDiphone* diphone = diphoneManager->getMappedDiphone(phoneme1, phoneme2, diphoneMap);
 	return diphone;
 }
 
@@ -535,9 +567,9 @@ void VisemeViewerWindow::selectViseme(const char * phoneme1, const char * phonem
 
 	const std::string& diphoneMap = SmartBody::SBScene::getScene()->getCharacter(getCurrentCharacterName())->getStringAttribute("lipSyncSetName");
 
-	SmartBody::SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(p1, p2, diphoneMap);
-	SmartBody::SBDiphone* diphone1 = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(p1, "-", diphoneMap);
-	SmartBody::SBDiphone* diphone2 = SmartBody::SBScene::getScene()->getDiphoneManager()->getDiphone(p2, "-", diphoneMap);
+	SmartBody::SBDiphone* diphone = SmartBody::SBScene::getScene()->getDiphoneManager()->getMappedDiphone(p1, p2, diphoneMap);
+	SmartBody::SBDiphone* diphone1 = SmartBody::SBScene::getScene()->getDiphoneManager()->getMappedDiphone(p1, "-", diphoneMap);
+	SmartBody::SBDiphone* diphone2 = SmartBody::SBScene::getScene()->getDiphoneManager()->getMappedDiphone(p2, "-", diphoneMap);
 	
 	_browserViseme->deselect();
 	bool shouldProcess = true;
@@ -946,6 +978,19 @@ void VisemeViewerWindow::OnLoadCB(Fl_Widget* widget, void* data)
 	viewer->redraw();
 }
 
+void VisemeViewerWindow::OnPhonemeAlignmentCommandCB(Fl_Widget* widget, void* data)
+{
+	std::string lipSyncCommand = "";
+	lipSyncCommand = SmartBody::SBScene::getSystemParameter("lipsynccommand");
+
+	const char* cmd = fl_input("Command to run phoneme scheduler:\n<command> <wavfile> <phones file> <transcriptionfile>", lipSyncCommand.c_str());
+	if (cmd)
+	{
+		std::string newLipSyncCommand = cmd;
+		SmartBody::SBScene::setSystemParameter("lipsynccommand", newLipSyncCommand);
+	}
+}
+
 void VisemeViewerWindow::OnBmlRequestCB(BML::BmlRequest* request, void* data)
 {
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
@@ -1050,9 +1095,13 @@ void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
 			return;
 	}
 
+	// get the mapped phoneme
+	std::string mappedPhoneme[2];
+	mappedPhoneme[0] = SmartBody::SBScene::getScene()->getDiphoneManager()->getPhonemeMapping(diphones[0]);
+	mappedPhoneme[1] = SmartBody::SBScene::getScene()->getDiphoneManager()->getPhonemeMapping(diphones[1]);
 	// convert the chosen diphones to lower case
-	std::transform(diphones[0].begin(), diphones[0].end(), diphones[0].begin(), ::tolower);
-	std::transform(diphones[1].begin(), diphones[1].end(), diphones[1].begin(), ::tolower);
+	std::transform(mappedPhoneme[0].begin(), mappedPhoneme[0].end(), mappedPhoneme[0].begin(), ::tolower);
+	std::transform(mappedPhoneme[1].begin(), mappedPhoneme[1].end(), mappedPhoneme[1].begin(), ::tolower);
 
 	viewer->_browserPhoneme[0]->deselect();
 	viewer->_browserPhoneme[1]->deselect();
@@ -1061,7 +1110,7 @@ void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
 		for(int j = 1; j <= viewer->_browserPhoneme[0]->size(); j++){
 			std::string diphone = viewer->_browserPhoneme[i]->text(j);
 			
-			if(diphone == diphones[i])
+			if(diphone == mappedPhoneme[i])
 			{
 				viewer->_browserPhoneme[i]->select(j);
 				break;
@@ -1186,7 +1235,7 @@ void VisemeViewerWindow::OnShowStatsCB(Fl_Widget* widget, void* data)
 		vhcl::Tokenize((*iter).first, tmp, " -");
 		if (tmp.size() == 2)
 		{
-			SmartBody::SBDiphone* diphone = diphoneManager->getDiphone(tmp[0], tmp[1], curDiphoneSet);
+			SmartBody::SBDiphone* diphone = diphoneManager->getMappedDiphone(tmp[0], tmp[1], curDiphoneSet);
 			if (!diphone)
 				strstr << "**** missing";
 		}
@@ -1395,4 +1444,243 @@ void VisemeViewerWindow::OnPlayImageSequence(Fl_Widget* widget, void* data)
 		viewer->_imageSequenceViewer = new ImageSequenceViewer(100, 100, 500, 500, "Image Sequence Viewer");
 	}
 	viewer->_imageSequenceViewer->show();
+}
+
+
+void VisemeViewerWindow::OnDictionaryLoadCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	std::string file = BaseWindow::chooseFile("Dictionary File", "*.*", SmartBody::SBScene::getScene()->getMediaPath());
+
+	SmartBody::SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
+	if (file != "")
+	{
+		diphoneManager->loadDictionary("English", file);
+
+		fl_alert("Dictionary loaded with %d words.", diphoneManager->getNumDictionaryWords("English"));
+	}
+}
+
+std::string VisemeViewerWindow::translateWordsToPhonemes(const std::string& utterance)
+{
+	SmartBody::SBDiphoneManager* diphoneManager = SmartBody::SBScene::getScene()->getDiphoneManager();
+
+	std::stringstream strstr;
+
+	std::vector<std::string> tokens;
+	vhcl::Tokenize(utterance, tokens, " .,?!\n\r\t");
+	for (size_t i = 0; i < tokens.size(); i++)
+	{
+		if (tokens[i] == "<sil>" ||
+			tokens[i] == "<SIL>")
+		{
+			strstr << "sil ";
+		}
+		std::vector<std::string> phonemes = diphoneManager->getDictionaryWord("English", tokens[i]);
+		for (size_t p = 0; p < phonemes.size(); p++)
+		{
+			strstr << phonemes[p] << " ";
+		}
+	}
+
+	std::string phonemes = strstr.str();
+	std::transform(phonemes.begin(), phonemes.end(), phonemes.begin(), tolower);
+
+	return phonemes;
+}
+
+
+void VisemeViewerWindow::OnPhonemeTranslateCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	std::string utterance = viewer->_inputTranscription->value();
+
+	std::string phonemes = VisemeViewerWindow::translateWordsToPhonemes(utterance);
+
+
+	viewer->_inputPhonemes->value(phonemes.c_str());
+}
+
+
+void VisemeViewerWindow::OnSoundFileLoadCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	std::string curFile = viewer->_inputAudioFile->value();
+
+	std::string startingDirectory = SmartBody::SBScene::getScene()->getMediaPath();
+	if (curFile != "")
+	{
+		boost::filesystem::path p(curFile);
+		std::string extension = boost::filesystem::extension(p);
+		std::string basename = boost::filesystem::basename(p);
+		boost::filesystem::path parentPath = p.parent_path();
+		startingDirectory = parentPath.string();
+	}
+	std::string file = BaseWindow::chooseFile("Sound File", "*.wav", startingDirectory);
+	if (file != "")
+	{
+		viewer->_inputSpeechFile->value(file.c_str());
+	}
+}
+
+void VisemeViewerWindow::OnChangeLipSyncFolderCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	std::string curFile = viewer->_inputLipSyncFolder->value();
+
+	std::string startingDirectory = SmartBody::SBScene::getScene()->getMediaPath();
+	if (curFile != "")
+	{
+		boost::filesystem::path p(curFile);
+		std::string extension = boost::filesystem::extension(p);
+		std::string basename = boost::filesystem::basename(p);
+		boost::filesystem::path parentPath = p.parent_path();
+		startingDirectory = parentPath.string();
+	}
+	std::string file = BaseWindow::chooseDirectory("Lip sync output folder", startingDirectory);
+	if (file != "")
+	{
+		viewer->_inputLipSyncFolder->value(file.c_str());
+	}
+}
+
+void VisemeViewerWindow::OnGenerateLipSyncCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
+
+	bool useBatchMode = viewer->_checkRunBatchMode->value();
+
+	std::vector<boost::filesystem::path> filesToProcess;
+	if (useBatchMode)
+	{
+		std::string batchFolder = viewer->_inputLipSyncFolder->value();
+		if (batchFolder == "")
+		{
+			fl_alert("No batch processing folder specified.\nPlease enter a folder in the Batch Lip Sync Folder input\nthat contains both .wav and .txt files.");
+			return;
+		}
+		LOG("Running forced alignment on folder %s", viewer->_inputLipSyncFolder->value());
+		boost::filesystem::path someDir(viewer->_inputLipSyncFolder->value());
+		boost::filesystem::directory_iterator end_iter;
+
+		if ( boost::filesystem::exists(someDir) && 
+			 boost::filesystem::is_directory(someDir))
+		{
+
+		  for( boost::filesystem::directory_iterator dir_iter(someDir) ; 
+			   dir_iter != end_iter ; 
+			   ++dir_iter)
+		  {
+			if (boost::filesystem::is_regular_file(dir_iter->status()) )
+			{
+				std::string fileExtension = boost::filesystem::extension((*dir_iter).path());
+
+				std::transform(fileExtension.begin(), fileExtension.end(), fileExtension.begin(), toupper);
+				if (fileExtension == ".WAV")
+				{
+					filesToProcess.push_back((*dir_iter).path());
+					LOG("Found sound file %s", (*dir_iter).path().string().c_str());
+				}
+			}
+		  }
+		}
+	}
+	else
+	{
+		std::string wavFile = viewer->_inputSpeechFile->value();
+		if (wavFile == "")
+		{
+			fl_alert("No .wav files .\nPlease enter a .wav file in the Speech File input.");
+			return;
+		}
+		std::string transcription = viewer->_inputTranscription->value();
+		if (transcription == "")
+		{
+			fl_alert("No transcription.\nPlease enter a transcription of the .wav file in the Transcription input.\nMake sure to add <sil> to mark periods of silence in the recording.");
+			return;
+		}
+		filesToProcess.push_back(viewer->_inputSpeechFile->value());
+	}
+	LOG("Running forced alignment on %d files.", filesToProcess.size());
+
+	for (size_t f = 0; f < filesToProcess.size(); f++)
+	{
+		std::string extension = boost::filesystem::extension(filesToProcess[f]);
+		std::string basename = boost::filesystem::basename(filesToProcess[f]);
+		boost::filesystem::path wavPath = filesToProcess[f].parent_path();
+
+		// create a transcription (.txt) file
+		boost::filesystem::path transcriptionPath = wavPath;
+		transcriptionPath /= basename + ".txt";
+		if (useBatchMode)
+		{
+			// make sure the .txt file exists
+			if (!boost::filesystem::exists(transcriptionPath) || 
+				boost::filesystem::is_directory(transcriptionPath))
+			{
+				LOG("Transcription file %s does not exist, speech for file %s will not be processed.", 
+					transcriptionPath.string().c_str(), filesToProcess[f].string().c_str());
+				continue;
+			}
+		}
+		else
+		{
+			ofstream mytxtfile;
+			mytxtfile.open (transcriptionPath.string());
+			mytxtfile << viewer->_inputTranscription->value();
+			mytxtfile.close();
+		}
+
+		// create a .phones file
+		boost::filesystem::path phonePath = wavPath;
+		phonePath /= basename + ".phones";
+		std::string transcription =  viewer->_inputTranscription->value();
+		std::string phonemes = viewer->_inputPhonemes->value();
+		if (useBatchMode)
+		{
+			std::stringstream strstr;
+			std::string line;
+			std::ifstream myfile (transcriptionPath.string().c_str());
+			if (myfile.is_open())
+			{
+				while ( getline (myfile,line) )
+				{
+					strstr << line << " ";
+				}
+				myfile.close();
+			}
+			transcription = strstr.str();
+			phonemes = VisemeViewerWindow::translateWordsToPhonemes(transcription);
+		}
+		
+		ofstream myphonesfile;
+		myphonesfile.open (phonePath.string());
+		myphonesfile << phonemes;
+		myphonesfile.close();
+
+		// run the forced alignment command
+		std::string lipSyncCommand = "";
+		lipSyncCommand = SmartBody::SBScene::getSystemParameter("lipsynccommand");
+		if (lipSyncCommand == "")
+		{
+			fl_alert("No lip sync command present in .smartbodysettings file.\nAdd to .smartbodysettings file: \nlipsynccommand=<command> <wavfile> <phones file> <transcriptionfile>"); 
+			return;
+		}
+	
+		std::string finalLipSyncCommand = vhcl::Replace(lipSyncCommand, "%1", filesToProcess[f].string());
+		finalLipSyncCommand = vhcl::Replace(finalLipSyncCommand, "%2", phonePath.string());
+		finalLipSyncCommand = vhcl::Replace(finalLipSyncCommand, "%3", transcriptionPath.string());
+	
+		LOG("Running lip sync with command: %s", finalLipSyncCommand.c_str());
+
+		int ret = system(finalLipSyncCommand.c_str());
+		if (ret == -1)
+		{
+			LOG("Lip sync command failed: %s", lipSyncCommand.c_str());
+		}
+	}
 }

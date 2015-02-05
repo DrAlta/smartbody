@@ -386,6 +386,10 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("getNumDiphones", &SBDiphoneManager::getNumDiphones, "Return number of diphones given the diphone set name.")
 		.def("getDiphoneMapNames", &SBDiphoneManager::getDiphoneMapNames, "Returns the names of all the diphone sets.")
 		.def("deleteDiphoneSet", &SBDiphoneManager::deleteDiphoneSet, "Delete all the diphones given diphone sets.")
+		.def("loadDictionary", &SBDiphoneManager::loadDictionary, "Loads a dictionary for a given language.")
+		.def("addDictionaryWord", &SBDiphoneManager::addDictionaryWord, "Adds a word and its phoneme parts to a dictionary for a given language.")
+		.def("getDictionaryWord", &SBDiphoneManager::getDictionaryWord, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the phonemes associated with a word for a given language.")
+
 		;
 
 	boost::python::class_<SBDiphone>("SBDiphone")

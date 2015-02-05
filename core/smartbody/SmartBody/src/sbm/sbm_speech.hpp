@@ -92,6 +92,7 @@ namespace SmartBody {
 		{
 		}
 
+		void setId(const std::string& str) { _id = str; } 
 
 		/** Return the viseme identifier/name.  */
 		const char * id() const { return _id.c_str(); }

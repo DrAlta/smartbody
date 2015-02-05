@@ -518,6 +518,17 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 	if (!character)
 		return finalCurves;
 
+	SmartBody::SBDiphoneManager* phonemeManager =  SmartBody::SBScene::getScene()->getDiphoneManager();
+
+	// map the visemes to the common set
+	for ( size_t i = 0; i < (*visemes).size(); i++ )
+	{
+		VisemeData* v = (*visemes)[i];
+		std::string commonSetId = phonemeManager->getPhonemeMapping(v->id());
+		if (commonSetId != "")
+			v->setId(commonSetId);
+	}
+
 	const std::string& diphoneMap = mappingName;
 	VisemeData* curViseme = NULL;
 	VisemeData* prevViseme = NULL;
