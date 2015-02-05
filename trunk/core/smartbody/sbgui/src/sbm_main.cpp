@@ -752,8 +752,17 @@ int main( int argc, char **argv )	{
 				}
 				else
 				{
-					LOG("Unknown setting found in .smartbodysettings file: %s", line.c_str());
-					LOG("Valid settings are: pythonlibpath=<dir>  or mediapath=<dir> or ogrepath=<dir> or speechrelaycommand=<command>");
+					if (tokens.size() > t + 1)
+					{
+						LOG("Setting system parameter %s to %s", tokens[t].c_str(), tokens[t + 1].c_str());
+						SmartBody::SBScene::setSystemParameter(tokens[t], tokens[t + 1]);
+						t++;
+					}
+					else
+					{
+						LOG("Setting system parameter %s to \"\"", tokens[t].c_str());
+						SmartBody::SBScene::setSystemParameter(tokens[t], "");
+					}
 				}
 			}
 		}
