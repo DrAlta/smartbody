@@ -28,8 +28,8 @@ class SBDiphoneManager
 		SBAPI void normalizeCurves(const std::string& name);
 		SBAPI void deleteDiphoneSet(const std::string& name);
 
-		SBAPI void SBDiphoneManager::addPhonemeMapping(const std::string& from, const std::string& to);
-		SBAPI std::string SBDiphoneManager::getPhonemeMapping(const std::string& from);
+		SBAPI void addPhonemeMapping(const std::string& from, const std::string& to);
+		SBAPI std::string getPhonemeMapping(const std::string& from);
 
 		SBAPI void loadDictionary(const std::string& language, const std::string& file);
 		SBAPI void addDictionaryWord(const std::string& language, const std::string& word, std::vector<std::string>& phonemes);
