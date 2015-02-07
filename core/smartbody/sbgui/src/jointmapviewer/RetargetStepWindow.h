@@ -39,18 +39,15 @@ public:
 	//void setSkeletonName(std::string skName);
 	void setJointMapName(std::string jointMapName);
 	void applyRetargetSteps();
-	void applyAutoRig(int riggingType = 0);
 	void updateSkinWeight(int weightType = 0);
 	
 	void updateCharacterList();
-	void updatePawnList();
 	void refreshAll();
 
 	static void CharacterCB(Fl_Widget* widget, void* data);
 	static void ApplyJointMapCB(Fl_Widget* widget, void* data);
 	static void ApplyBehaviorSetCB(Fl_Widget* widget, void* data);
 	static void ApplyCB(Fl_Widget* widget, void* data);
-	static void ApplyAutoRigCB(Fl_Widget* widget, void* data);
 	static void UpdateSkinWeightCB(Fl_Widget* widget, void* data);
 	static void CancelCB(Fl_Widget* widget, void* data);
 	static void RefreshCB(Fl_Widget* widget, void* data);
@@ -63,7 +60,6 @@ public:
 
 protected:
 	Fl_Choice* _choiceCharacters;
-	Fl_Choice* _choicePawns;
 	Fl_Tabs*	tabGroup;	
 	Fl_Button* _buttonAutoRig;
 	Fl_Button* _buttonUpdateSkinWeight;
