@@ -403,7 +403,7 @@ SrVec PPRAISteeringAgent::getCollisionFreeGoal( SrVec targetPos, SrVec curPos )
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSteerManager* manager = scene->getSteerManager();
 
-	SBCharacter* character = this->getCharacter();
+	SmartBody::SBCharacter* character = this->getCharacter();
 	if (character->hasAttribute("steering.useCollisionFreeGoal"))
 	{
 		if (!character->getBoolAttribute("steering.useCollisionFreeGoal"))
