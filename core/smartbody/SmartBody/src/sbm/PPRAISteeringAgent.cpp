@@ -213,6 +213,9 @@ void PPRAISteeringAgent::addSteeringAttributes()
 	if (!character->hasAttribute("steering.terrainMode"))
 		character->createBoolAttribute("steering.terrainMode", false, true, "steering", 450, false, false, false, ""); 
 
+	if (!character->hasAttribute("steering.useCollisionFreeGoal"))
+		character->createBoolAttribute("steering.useCollisionFreeGoal", true, true, "steering", 450, false, false, false, ""); 
+
 	setSteerParamsDirty(false);
 }
 
@@ -399,6 +402,17 @@ SrVec PPRAISteeringAgent::getCollisionFreeGoal( SrVec targetPos, SrVec curPos )
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSteerManager* manager = scene->getSteerManager();
+
+	SBCharacter* character = this->getCharacter();
+	if (character->hasAttribute("steering.useCollisionFreeGoal"))
+	{
+		if (!character->getBoolAttribute("steering.useCollisionFreeGoal"))
+		{
+			// if steering.useCollisionFreeGoal is set to False, use the original target
+			return targetPos;
+		}
+	}
+	
 	SrVec scaleCurPos = curPos;
 	SrVec scaleTarget = targetPos;	
 	SrVec newGoal = scaleTarget;
