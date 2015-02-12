@@ -327,10 +327,16 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
 
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);
+	if (shape->_deformPosBuf.size() > 0)
+	{
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
+	}
+	if (mesh->normalBuf.size() > 0)
+	{
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);
+	}
 
 	if (showSkinWeight)
 	{
@@ -355,8 +361,11 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 		glEnable(GL_LIGHTING);
 	}
 		
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
-	glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);   
+	if (mesh->texCoordBuf.size() > 0)
+	{
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
+		glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);   
+	}
 			
 
 	for (unsigned int i=0;i<subMeshList.size();i++)

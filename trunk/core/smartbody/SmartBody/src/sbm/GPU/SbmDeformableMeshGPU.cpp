@@ -1521,7 +1521,10 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 		if (strcmp(gpuMesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
 		{
 			writeToBaseModel = gpuMesh->dMeshStatic_p[i];
-			skinWeight = gpuMesh->skinWeights[i];
+			if (gpuMesh->skinWeights.size() > i)
+				skinWeight = gpuMesh->skinWeights[i];
+			else
+				skinWeight = NULL;
 			break;
 		}
 		else
@@ -1530,8 +1533,11 @@ void SbmDeformableMeshGPUInstance::gpuBlendShape()
 			vtxBaseIdx += gpuMesh->dMeshStatic_p[i]->shape().V.size();
 		}
 	}
-	if (!writeToBaseModel) return;
+	if (!writeToBaseModel)
+		return;
 
+	if (!skinWeight)
+		return;
 	DeformableMeshInstance::blendShapes();
 	VBOVec3f* posVBO = gpuMesh->getPosVBO();	
 	glBindBuffer(GL_ARRAY_BUFFER, posVBO->VBO()->m_iVBO_ID);	
