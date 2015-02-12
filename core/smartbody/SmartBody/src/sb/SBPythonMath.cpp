@@ -112,6 +112,8 @@ void pythonFuncsMath()
 		.def("getData", &SrQuat::getData, "gets the data in the quaterion at location indicated by the index w,x,y,z")
 		.def("setData", &SrQuat::setData, "sets the data in the quaterion at location indicated by the index w,x,y,z")
 		.def("multVec", &SrQuat::multVec, "multiply the quaternion with a vector")
+		.def("normalize", &SrQuat::normalize, "normalize the quaternion")
+		.def("setAxisAngle", &SrQuat::setAxisAngle, "sets the axis and angle of the quaternion")
 		;	
 	
 	boost::python::class_<SrBox>("SrBox")

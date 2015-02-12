@@ -378,17 +378,20 @@ boost::python::class_<SBObserver>("SBObserver")
 		;
 
 
-	boost::python::class_<SBDiphoneManager>("SBDiphoneManager")
-		.def("createDiphone", &SBDiphoneManager::createDiphone, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a diphone.")
-		.def("getDiphones", &SBDiphoneManager::getDiphones, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get diphones given diphone set name.")
-		.def("getDiphone", &SBDiphoneManager::getDiphone, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get diphone given from phoneme, to phoneme and diphone set name.")
-		.def("getNumDiphoneMap", &SBDiphoneManager::getNumDiphoneMap, "Return number of diphone set.")
-		.def("getNumDiphones", &SBDiphoneManager::getNumDiphones, "Return number of diphones given the diphone set name.")
-		.def("getDiphoneMapNames", &SBDiphoneManager::getDiphoneMapNames, "Returns the names of all the diphone sets.")
-		.def("deleteDiphoneSet", &SBDiphoneManager::deleteDiphoneSet, "Delete all the diphones given diphone sets.")
-		.def("loadDictionary", &SBDiphoneManager::loadDictionary, "Loads a dictionary for a given language.")
-		.def("addDictionaryWord", &SBDiphoneManager::addDictionaryWord, "Adds a word and its phoneme parts to a dictionary for a given language.")
-		.def("getDictionaryWord", &SBDiphoneManager::getDictionaryWord, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the phonemes associated with a word for a given language.")
+	boost::python::class_<SBPhonemeManager>("SBPhonemeManager")
+		.def("createDiphone", &SBPhonemeManager::createDiphone, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a diphone.")
+		.def("getDiphones", &SBPhonemeManager::getDiphones, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get diphones given diphone set name.")
+		.def("getDiphone", &SBPhonemeManager::getDiphone, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get diphone given from phoneme, to phoneme and diphone set name.")
+		.def("getNumDiphoneMap", &SBPhonemeManager::getNumDiphoneMap, "Return number of diphone set.")
+		.def("getNumDiphones", &SBPhonemeManager::getNumDiphones, "Return number of diphones given the diphone set name.")
+		.def("getDiphoneMapNames", &SBPhonemeManager::getDiphoneMapNames, "Returns the names of all the diphone sets.")
+		.def("deleteDiphoneSet", &SBPhonemeManager::deleteDiphoneSet, "Delete all the diphones given diphone sets.")
+		.def("loadDictionary", &SBPhonemeManager::loadDictionary, "Loads a dictionary for a given language.")
+		.def("addDictionaryWord", &SBPhonemeManager::addDictionaryWord, "Adds a word and its phoneme parts to a dictionary for a given language.")
+		.def("getDictionaryWord", &SBPhonemeManager::getDictionaryWord, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the phonemes associated with a word for a given language.")
+		.def("clearPhonemesRealtime", &SBPhonemeManager::clearPhonemesRealtime, "Removes all realtime phonemes associated with the given character.")
+		.def("setPhonemesRealtime", &SBPhonemeManager::setPhonemesRealtime, "Sets the phonemes associated with the given character for realtime.")
+		.def("getPhonemesRealtime", &SBPhonemeManager::getPhonemesRealtime, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the realtime phonemes associated with the given character.")
 
 		;
 

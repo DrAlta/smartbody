@@ -5,17 +5,23 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "SBService.h"
 
 namespace SmartBody{
 
 class SBDiphone;
 
-class SBDiphoneManager
+class SBPhonemeManager : public SBService
 {
 	public:
-		SBAPI SBDiphoneManager();
-		SBAPI ~SBDiphoneManager();
+		SBAPI SBPhonemeManager();
+		SBAPI ~SBPhonemeManager();
 
+		SBAPI virtual void setEnable(bool val);
+		SBAPI void setPhonemesRealtime(const std::string& character, const std::string& phoneme);
+		SBAPI void clearPhonemesRealtime(const std::string& character, const std::string& phoneme);
+		SBAPI std::vector<std::string> getPhonemesRealtime(const std::string& character, const std::string& phoneme);
+		
 		SBAPI std::vector<std::string> getCommonPhonemes();
 	
 		SBAPI SBDiphone* createDiphone(const std::string& fromPhoneme, const std::string& toPhoneme, const std::string& name);
@@ -45,6 +51,8 @@ class SBDiphoneManager
 		std::map<std::string, std::map<std::string, std::vector<std::string> > > _wordToPhonemeMaps;
 		std::vector<std::string> _emptyPhonemes;
 		std::map<std::string, std::string> _dictionaryFileMap;
+
+		std::map<std::string, std::vector<std::string> > _realtimePhonemes;
 };
 
 }

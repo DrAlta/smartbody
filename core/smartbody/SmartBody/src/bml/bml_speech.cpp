@@ -518,7 +518,7 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 	if (!character)
 		return finalCurves;
 
-	SmartBody::SBDiphoneManager* phonemeManager =  SmartBody::SBScene::getScene()->getDiphoneManager();
+	SmartBody::SBPhonemeManager* phonemeManager =  SmartBody::SBScene::getScene()->getDiphoneManager();
 
 	// map the visemes to the common set
 	for ( size_t i = 0; i < (*visemes).size(); i++ )
