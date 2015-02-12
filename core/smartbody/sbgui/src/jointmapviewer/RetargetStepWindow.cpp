@@ -86,10 +86,7 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 	int curY = tabGroupH + 60;	
 	_buttonApplyAll = new Fl_Button(100, curY, 120, 25, "Apply All");
 	_buttonApplyAll->callback(ApplyCB, this);
-// 	_buttonApplyMap = new Fl_Button(100, curY, 120, 25, "Apply Joint Map");
-// 	_buttonApplyMap->callback(ApplyJointMapCB,this);
-// 	_buttonApplyBehaviorSet = new Fl_Button(220, curY, 120, 25, "Apply Behavior Set");
-// 	_buttonApplyBehaviorSet->callback(ApplyBehaviorSetCB,this);			
+
 	_buttonCancel = new Fl_Button(260, curY, 120, 25, "Cancel");
 	_buttonCancel->callback(CancelCB, this);
 
@@ -101,24 +98,7 @@ RetargetStepWindow::RetargetStepWindow(int x, int y, int w, int h, char* name) :
 
 	retargetViewer->setShowButton(false);
 	jointMapViewer->setShowButton(false);
-	/*
-	Fl_Group* firstGroup = new Fl_Group(xOffset, yOffset, w/2 - 20, h - 20, "Joint Mapper");
-	firstGroup->begin();		
-	jointMapViewer = new JointMapViewer(xOffset,yOffset, w/2 - 20, h - 20, "");
-	firstGroup->resizable(jointMapViewer);
-	firstGroup->end();
-	this->resizable(firstGroup);
 
-	//yOffset =  h/4+30; 
-	xOffset += w/2+20;	
-	Fl_Group* secondGroup = new Fl_Group(xOffset, yOffset, w/2 - 40 , h - 20, "Behavior Selection");
-	secondGroup->begin();
-	retargetViewer = new RetargetViewer(xOffset, yOffset, w/2 - 40 , h - 20, "");		
-	secondGroup->end();
-	*/
-	//secondGroup->resizable(retargetViewer);
-	//this->resizable(secondGroup);
-	//this->size_range(800, 480);
 	updateCharacterList();
 }
 
@@ -180,7 +160,8 @@ void RetargetStepWindow::updateCharacterList()
 			oldCharacterName = _choiceCharacters->text(oldValue);
 	}
 	const std::vector<std::string>& allPawns = scene->getPawnNames();
-	_choiceCharacters->clear();		
+	for (int s = _choiceCharacters->size() - 1; s >= 0; s--) 
+		_choiceCharacters->remove(s);		
 	bool hasOldCharacter = false;
 	int charCount = 0;
 	for (size_t c = 0; c < allPawns.size(); c++)
@@ -196,6 +177,7 @@ void RetargetStepWindow::updateCharacterList()
 		}	
 		charCount++;
 	}
+
 	if (!hasOldCharacter) // no character, set to default character
 	{
 		std::string newCharName = "";
@@ -209,11 +191,6 @@ void RetargetStepWindow::updateCharacterList()
 		}
 		setCharacterName(newCharName);
 	}	
-// 	if (oldValue < _choiceCharacters->size() && oldValue >= 0)
-// 	{
-// 		_choiceCharacters->value(oldValue);
-// 	}
-	
 }
 
 void RetargetStepWindow::setCharacterName( std::string charName )
@@ -228,6 +205,8 @@ void RetargetStepWindow::setCharacterName( std::string charName )
 		}
 	}
 
+	if (autoRigViewer)
+		autoRigViewer->setCharacterName(_charName);
 	if (jointMapViewer)
 		jointMapViewer->setCharacterName(_charName);
 	if (retargetViewer)
@@ -356,7 +335,7 @@ void RetargetStepWindow::show()
 {
 	SBWindowListener::windowShow();
 	Fl_Double_Window::show();
-	refreshAll();
+//	refreshAll();
 }
 
 void RetargetStepWindow::SaveCharacterCB( Fl_Widget* widget, void* data )

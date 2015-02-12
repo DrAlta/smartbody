@@ -1289,7 +1289,8 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		//pass->setShadowCasterVertexProgram("Ogre/HardwareSkinningFourWeightsShadowCasterGLSL");
 		//LOG("subMesh mat name = %s",materialName.c_str());
  		ogSubMesh->setMaterialName(materialName);	
-		ogSubMesh->generateExtremes(8);
+		if (ogSubMesh->vertexData)
+			ogSubMesh->generateExtremes(8);
 		//ogSubMesh->setMaterialName("smartbody");
 	}
 	ogreMesh->_setBounds(AxisAlignedBox(bbMin[0],bbMin[1],bbMin[2],bbMax[0],bbMax[1],bbMax[2]));

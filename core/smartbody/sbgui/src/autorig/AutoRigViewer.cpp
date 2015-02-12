@@ -40,8 +40,6 @@ AutoRigViewer::AutoRigViewer(int x, int y, int w, int h, char* name) : Fl_Double
 	int curY = 10;
 	int startY = 10;	
 	int yDis = 10;
-	_choicePawns = new Fl_Choice(60, yDis, 150, 25, "Mesh Pawn");
-	updatePawnList();
 	yDis += 30;
 	_choiceVoxelRigging = new Fl_Choice(60, yDis, 120, 25, "Type");
 	_choiceVoxelRigging->add("Voxel Weight");
@@ -59,6 +57,7 @@ AutoRigViewer::AutoRigViewer(int x, int y, int w, int h, char* name) : Fl_Double
 
 	end();
 	_deletePawnName = "";
+	_characterName = "";
 	retargetStepWindow = NULL;
 }
 
@@ -105,69 +104,39 @@ void AutoRigViewer::draw()
 
 void AutoRigViewer::updateAutoRigViewer()
 {
-	updatePawnList();
+	redraw();
 }
 
-void AutoRigViewer::updatePawnList()
+void AutoRigViewer::setCharacterName(const std::string& name)
 {
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	int oldValue = _choicePawns->value();
-	std::string oldPawnName = "";
-	if (oldValue >= 0 && oldValue < _choicePawns->size())
+	_characterName = name;
+	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
+	if (pawn)
 	{
-		if (_choicePawns->text(oldValue))
-			oldPawnName = _choicePawns->text(oldValue);
-	}
-
-	const std::vector<std::string>& pawns = scene->getPawnNames();
-	_choicePawns->clear();
-	int pawnCount = 0;
-	bool hasPawn = false;
-	for (size_t c = 0; c < pawns.size(); c++)
-	{
-		if (pawns[c] == _deletePawnName) // don't add remove character name
-			continue;
-
-		SmartBody::SBPawn* pawn = scene->getPawn(pawns[c]);
-		SmartBody::SBCharacter* sbChar = dynamic_cast<SmartBody::SBCharacter*>(pawn);
-		if (!sbChar && pawn->dStaticMeshInstance_p && pawn->dStaticMeshInstance_p->getDeformableMesh()) // only add pawns that has attached mesh
+		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
+		if (meshInstance)
 		{
-			_choicePawns->add(pawns[c].c_str());
-			if (pawns[c] == oldPawnName)
+			if (meshInstance->getDeformableMesh()->getNumMeshes() > 0)
 			{
-				_choicePawns->value(pawnCount);
-				hasPawn = true;
-			}
-			pawnCount++;
-		}		
-	}
-
-	if (!hasPawn) // no character, set to default character
-	{		
-		for (int c = 0; c < _choicePawns->size(); c++)
-		{
-			if (_choicePawns->text(c))
-			{
-				_choicePawns->value(c);
-				//setCharacterName(_choiceCharacters->text());
+				this->modelViewer->setModel(meshInstance->getDeformableMesh()->getStaticModel(0));
 			}
 		}
+		
 	}
+	updateAutoRigViewer();
 }
-
-
 
 void AutoRigViewer::applyAutoRig( int riggingType /*= 0*/ )
 {
-	if (!_choicePawns->text())
+	if (_characterName == "")
 		return;
+
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::string pawnName = _choicePawns->text();	
+
 	SBAutoRigManager& autoRigManager = SBAutoRigManager::singleton();
 	autoRigManager.setAutoRigCallBack(this);
 
-
-	SmartBody::SBPawn* sbPawn = scene->getPawn(pawnName);	
+	SmartBody::SBPawn* sbPawn = scene->getPawn(_characterName);	
 	DeformableMeshInstance* meshInstance = sbPawn->dStaticMeshInstance_p;
 	if (!sbPawn || !meshInstance || meshInstance->getDeformableMesh() == NULL)
 	{
@@ -183,8 +152,8 @@ void AutoRigViewer::applyAutoRig( int riggingType /*= 0*/ )
 	std::string skelName = filebasename+".sk";
 	std::string deformMeshName = filebasename+"AutoRig.dae"; 
 	LOG("Start Build Auto Rigging");
-	bool autoRigSuccess = autoRigManager.buildAutoRiggingFromPawnMesh(pawnName, riggingType, skelName, deformMeshName);
-	LOG("Auto Rigging Donw");
+	bool autoRigSuccess = autoRigManager.buildAutoRiggingFromPawnMesh(_characterName, riggingType, skelName, deformMeshName);
+	LOG("Auto Rigging Done");
 #if 0
 
 	SrModel& model = mesh->dMeshStatic_p[0]->shape();		
@@ -276,7 +245,7 @@ void AutoRigViewer::applyAutoRig( int riggingType /*= 0*/ )
 	character->createActionAttribute("_5testLocomotion", true, "TestHead", 300, false, false, false, "Test Head");
 #endif	
 	//updateCharacterList();	
-	scene->removePawn(pawnName);	
+	scene->removePawn(_characterName);	
 
 	
 	if (retargetStepWindow)
@@ -347,7 +316,7 @@ void ModelViewer::setModel( SrModel& model )
 		delete _model;
 	_model = new SrSnModel();
 	_model->shape(model);
-	//_model->render_mode(srRenderModeFlat);
+	_model->render_mode(srRenderModeFlat);
 	focusOnModel();
 }
 
@@ -421,7 +390,10 @@ void SkinViewer::setSkeleton(SmartBody::SBSkeleton* sk)
 }
 void SkinViewer::setDeformableMesh(DeformableMesh* defMesh)
 {
-	LOG("SkinViewer::setDeformableMesh = %d", defMesh);
+	if (defMesh)
+		LOG("SkinViewer::setDeformableMesh = %s", defMesh->getName().c_str());
+	else
+		LOG("SkinViewer::setDeformableMesh to NULL.");
 	mesh = defMesh;
 	redraw();
 }
