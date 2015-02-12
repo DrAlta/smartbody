@@ -305,6 +305,13 @@ SrMat& SrQuat::get_mat ( SrMat& m ) const
    return m;
  }
 
+
+void SrQuat::setAxisAngle(SrVec axis, double angle)
+{
+	set(axis, angle);
+}
+
+
 SrVec SrQuat::axisAngle() const
 {
 	return axis()*angle();

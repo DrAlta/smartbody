@@ -1132,7 +1132,7 @@ void FltkViewer::init_opengl ( int w, int h )
    
    // camera near = 0.1 m, camera far plane is 100 m
    cam->setNearPlane(0.1f*scale);
-   cam->setFarPlane(100.f*scale);
+   cam->setFarPlane(10000.f*scale);
 
 
    // init shader

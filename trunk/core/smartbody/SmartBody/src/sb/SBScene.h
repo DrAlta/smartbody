@@ -50,7 +50,7 @@ class SBBoneBusManager;
 class SBGestureMapManager;
 class SBJointMapManager;
 class SBCollisionManager;
-class SBDiphoneManager;
+class SBPhonemeManager;
 class SBBehaviorSetManager;
 class SBRetargetManager;
 class SBAssetManager;
@@ -161,7 +161,7 @@ class SBScene : public SBObject
 		SBAPI SBGestureMapManager* getGestureMapManager();
 		SBAPI SBJointMapManager* getJointMapManager();
 		SBAPI SBCollisionManager* getCollisionManager();
-		SBAPI SBDiphoneManager* getDiphoneManager();
+		SBAPI SBPhonemeManager* getDiphoneManager();
 		SBAPI SBBehaviorSetManager* getBehaviorSetManager();
 		SBAPI SBRetargetManager* getRetargetManager();
 		SBAPI SBAssetManager* getAssetManager();
@@ -313,7 +313,7 @@ class SBScene : public SBObject
 		SBGestureMapManager* _gestureMapManager;
 		SBJointMapManager* _jointMapManager;
 		SBCollisionManager* _collisionManager;
-		SBDiphoneManager* _diphoneManager;
+		SBPhonemeManager* _phonemeManager;
 		SBRetargetManager* _retargetManager;
 		SBEventManager* _eventManager;
 		SBAssetManager* _assetManager;

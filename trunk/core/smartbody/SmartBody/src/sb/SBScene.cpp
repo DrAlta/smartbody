@@ -161,7 +161,7 @@ void SBScene::initialize()
 	_jointMapManager = new SBJointMapManager();
 	_boneBusManager = new SBBoneBusManager();
 	_collisionManager = new SBCollisionManager();
-	_diphoneManager = new SBDiphoneManager();
+	_phonemeManager = new SBPhonemeManager();
 	_behaviorSetManager = new SBBehaviorSetManager();
 	_retargetManager = new SBRetargetManager();
 	_eventManager = new SBEventManager();
@@ -183,6 +183,7 @@ void SBScene::initialize()
 	_serviceManager->addService(_collisionManager);
 	_serviceManager->addService(_vhmsgManager);
 	_serviceManager->addService(_faceShiftManager);
+	_serviceManager->addService(_phonemeManager);
 
 	_parser = new SBParser();
 
@@ -368,7 +369,7 @@ void SBScene::cleanup()
 	delete _jointMapManager;
 	delete _boneBusManager;
 	delete _collisionManager;
-	delete _diphoneManager;
+	delete _phonemeManager;
 	delete _behaviorSetManager;
 	delete _retargetManager;
 	delete _eventManager;
@@ -392,7 +393,7 @@ void SBScene::cleanup()
 	_jointMapManager = NULL;
 	_boneBusManager = NULL;
 	_collisionManager = NULL;
-	_diphoneManager = NULL;
+	_phonemeManager = NULL;
 	_behaviorSetManager = NULL;
 	_retargetManager = NULL;
 	_eventManager = NULL;
@@ -1447,9 +1448,9 @@ SBCollisionManager* SBScene::getCollisionManager()
 	return _collisionManager;
 }
 
-SBDiphoneManager* SBScene::getDiphoneManager()
+SBPhonemeManager* SBScene::getDiphoneManager()
 {
-	return _diphoneManager;
+	return _phonemeManager;
 }
 
 SBBehaviorSetManager* SBScene::getBehaviorSetManager()
@@ -3541,7 +3542,7 @@ void SBScene::saveLipSyncing(std::stringstream& strstr, bool remoteSetup)
 	strstr << "# -------------------- lip syncing\n";
 	strstr << "print \"Save Lip Syncing\"\n";
 	// diphones
-	SBDiphoneManager* diphoneManager = getDiphoneManager();
+	SBPhonemeManager* diphoneManager = getDiphoneManager();
 	std::vector<std::string> diphoneMapNames = diphoneManager->getDiphoneMapNames();
 	strstr << "diphoneMapManager = scene.getDiphoneManager()\n";
 	for (std::vector<std::string>::iterator iter = diphoneMapNames.begin(); iter != diphoneMapNames.end(); iter++)

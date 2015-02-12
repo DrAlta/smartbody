@@ -129,6 +129,8 @@ class SBAPI SrQuat
     /*! Returns the angle in radians. */
     float angle () const;
 
+	void setAxisAngle(SrVec axis, double angle);
+
 	SrVec axisAngle() const;
 
 	SrVec getEuler() const;

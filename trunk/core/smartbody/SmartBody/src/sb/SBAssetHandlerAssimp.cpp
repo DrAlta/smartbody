@@ -37,7 +37,7 @@ SBAssetHandlerAssimp::SBAssetHandlerAssimp()
 {
 	assetTypes.push_back("fbx");
 	assetTypes.push_back("blend");
-//	assetTypes.push_back("dae");
+	//assetTypes.push_back("dae");
 	assetTypes.push_back("obj");
 //	assetTypes.push_back("ply");
 }
@@ -178,17 +178,17 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				aiColor4D ambient(0.0f, 0.0f, 0.0f, 1.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
 				material->ambient = SrColor(ambient.r, ambient.g, ambient.b, ambient.a);
-				LOG("AMBIENT COLOR %x %x %x %x", material->ambient.r, material->ambient.g, material->ambient.b, material->ambient.a);
+				//LOG("AMBIENT COLOR %x %x %x %x", material->ambient.r, material->ambient.g, material->ambient.b, material->ambient.a);
 
 				aiColor4D diffuse(0.0f, 0.0f, 0.0f, 1.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
 				material->diffuse = SrColor(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-				LOG("DIFFUSE COLOR %x %x %x %x", material->diffuse.r, material->diffuse.g, material->diffuse.b, material->diffuse.a);
+				//LOG("DIFFUSE COLOR %x %x %x %x", material->diffuse.r, material->diffuse.g, material->diffuse.b, material->diffuse.a);
 
 				aiColor4D emmissive(0.0f, 0.0f, 0.0f, 1.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_EMISSIVE , emmissive);
 				material->emission = SrColor(emmissive.r, emmissive.g, emmissive.b, emmissive.a);
-				LOG("EMMISSIVE COLOR %x %x %x %x", material->emission.r, material->emission.g, material->emission.b, material->emission.a);
+				//LOG("EMMISSIVE COLOR %x %x %x %x", material->emission.r, material->emission.g, material->emission.b, material->emission.a);
 
 				float shininess = 0.0;
 				float tmpShininess = 0.0;
@@ -216,11 +216,11 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				aiColor4D specular(0.0f, 0.0f, 0.0f, 1.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_SPECULAR, specular);
 				material->specular = SrColor(specular.r, specular.g, specular.b);
-				LOG("SPECULAR COLOR %x %x %x %x", material->specular.r, material->specular.g, material->specular.b, material->specular.a);
+				//LOG("SPECULAR COLOR %x %x %x %x", material->specular.r, material->specular.g, material->specular.b, material->specular.a);
 
 				aiColor4D transparency(0.0f, 0.0f, 0.0f, 1.0f);
 				scene->mMaterials[m]->Get(AI_MATKEY_COLOR_TRANSPARENT, transparency);
-				LOG("TRANSPARENCY %x %x %x %x", transparency.r, transparency.g, transparency.b, transparency.a);
+				//LOG("TRANSPARENCY %x %x %x %x", transparency.r, transparency.g, transparency.b, transparency.a);
 
 				material->transparency = (transparency.r + transparency.g  + transparency.b) / 3.0;
 				if (material->transparency < .99)
@@ -228,7 +228,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				else
 					material->useAlphaBlend = true;
 				material->diffuse.a = (srbyte) ( material->transparency * 255.0f );
-				LOG("TRANSPARENCY COLOR %.2f ", material->transparency);
+				//LOG("TRANSPARENCY COLOR %.2f ", material->transparency);
 
 				float matOpacity = 1.f;
 				scene->mMaterials[m]->Get(AI_MATKEY_OPACITY, matOpacity);
@@ -242,7 +242,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				
 				float opacity = 1.0f;
 				scene->mMaterials[m]->Get(AI_MATKEY_OPACITY, opacity);
-				LOG("OPACITY %.2f ", opacity);
+				//LOG("OPACITY %.2f ", opacity);
 				if (opacity < .99)
 					material->useAlphaBlend = true;
 				else
@@ -253,7 +253,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				aiString matName;
 				scene->mMaterials[m]->Get(AI_MATKEY_NAME, matName);
 				allMaterialNames.push_back(matName.C_Str());
-				LOG("mat name = %s, opacity = %f, transparency = %f %f %f", matName.C_Str(), matOpacity, transparency.r, transparency.g, transparency.b);
+				//LOG("mat name = %s, opacity = %f, transparency = %f %f %f", matName.C_Str(), matOpacity, transparency.r, transparency.g, transparency.b);
 
 
 				SbmTextureManager& texManager = SbmTextureManager::singleton();
@@ -542,6 +542,20 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 						model->F[f].a = scene->mMeshes[m]->mFaces[f].mIndices[0];
 						model->F[f].b = scene->mMeshes[m]->mFaces[f].mIndices[1];
 						model->F[f].c = scene->mMeshes[m]->mFaces[f].mIndices[2];
+
+						model->Ft[f].a = model->F[f].a;
+						model->Ft[f].b = model->F[f].b;
+						model->Ft[f].c = model->F[f].c;
+
+						model->Fn[f].a = model->F[f].a;
+						model->Fn[f].b = model->F[f].b;
+						model->Fn[f].c = model->F[f].c;
+					}
+					else if (numIndices == 2)
+					{
+						model->F[f].a = scene->mMeshes[m]->mFaces[f].mIndices[0];
+						model->F[f].b = scene->mMeshes[m]->mFaces[f].mIndices[1];
+						model->F[f].c = scene->mMeshes[m]->mFaces[f].mIndices[1];
 
 						model->Ft[f].a = model->F[f].a;
 						model->Ft[f].b = model->F[f].b;

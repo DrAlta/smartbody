@@ -9,8 +9,10 @@
 
 namespace SmartBody {
 
-SBDiphoneManager::SBDiphoneManager()
+SBPhonemeManager::SBPhonemeManager()
 {
+	setName("PhonemeManager");
+
 	addPhonemeMapping("SIL", "_");
 	addPhonemeMapping("PAU", "_");
 	addPhonemeMapping("AA", "Aa");
@@ -57,7 +59,7 @@ SBDiphoneManager::SBDiphoneManager()
 	addPhonemeMapping("ZH", "Sh");
 }
 
-void SBDiphoneManager::addPhonemeMapping(const std::string& from, const std::string& to)
+void SBPhonemeManager::addPhonemeMapping(const std::string& from, const std::string& to)
 {
 	std::string upperCaseFrom = from;
 	std::string upperCaseTo = to;
@@ -72,7 +74,7 @@ void SBDiphoneManager::addPhonemeMapping(const std::string& from, const std::str
 	_phonemeToCommonPhonemeMap[from] = upperCaseTo;
 }
 
-std::string SBDiphoneManager::getPhonemeMapping(const std::string& from)
+std::string SBPhonemeManager::getPhonemeMapping(const std::string& from)
 {
 	std::string uppercaseFrom = from;
 	std::transform(uppercaseFrom.begin(), uppercaseFrom.end(), uppercaseFrom.begin(), toupper);
@@ -90,7 +92,7 @@ std::string SBDiphoneManager::getPhonemeMapping(const std::string& from)
 
 
 
-std::vector<std::string> SBDiphoneManager::getCommonPhonemes()
+std::vector<std::string> SBPhonemeManager::getCommonPhonemes()
 {
 	std::set<std::string> commonPhonemeSet;
 
@@ -112,7 +114,7 @@ std::vector<std::string> SBDiphoneManager::getCommonPhonemes()
 	return commonPhonemesVector;
 }
 
-SBDiphoneManager::~SBDiphoneManager()
+SBPhonemeManager::~SBPhonemeManager()
 {
 	std::map<std::string, std::vector<SBDiphone*> >::iterator iter = _diphoneMap.begin();
 	for (; iter != _diphoneMap.end(); iter++)
@@ -127,7 +129,7 @@ SBDiphoneManager::~SBDiphoneManager()
 	}
 }
 
-void SBDiphoneManager::deleteDiphoneSet(const std::string& name)
+void SBPhonemeManager::deleteDiphoneSet(const std::string& name)
 {
 	if (_diphoneMap.find(name) != _diphoneMap.end())
 	{
@@ -135,7 +137,7 @@ void SBDiphoneManager::deleteDiphoneSet(const std::string& name)
 	}
 }
 
-SBDiphone* SBDiphoneManager::createDiphone(const std::string& fromPhoneme, const std::string& toPhoneme, const std::string& name)
+SBDiphone* SBPhonemeManager::createDiphone(const std::string& fromPhoneme, const std::string& toPhoneme, const std::string& name)
 {
 	std::string upperCaseFromPhoneme = fromPhoneme;
 	std::string upperCaseToPhoneme = toPhoneme;
@@ -154,7 +156,7 @@ SBDiphone* SBDiphoneManager::createDiphone(const std::string& fromPhoneme, const
 	return diphone;
 }
 
-std::vector<SBDiphone*>& SBDiphoneManager::getDiphones(const std::string& name)
+std::vector<SBDiphone*>& SBPhonemeManager::getDiphones(const std::string& name)
 {	
 	std::map<std::string, std::vector<SBDiphone*> >::iterator iter = _diphoneMap.find(name);
 	if (iter == _diphoneMap.end())
@@ -165,14 +167,14 @@ std::vector<SBDiphone*>& SBDiphoneManager::getDiphones(const std::string& name)
 	return _diphoneMap[name];
 }
 
-SBDiphone* SBDiphoneManager::getMappedDiphone(const std::string& fromPhoneme, const std::string& toPhoneme, const std::string& name)
+SBDiphone* SBPhonemeManager::getMappedDiphone(const std::string& fromPhoneme, const std::string& toPhoneme, const std::string& name)
 {
 	std::string mappedFrom = getPhonemeMapping(fromPhoneme);
 	std::string mappedTo = getPhonemeMapping(toPhoneme);
 	return getDiphone(fromPhoneme, toPhoneme, name);
 }
 
-SBDiphone* SBDiphoneManager::getDiphone(const std::string& fromPhoneme, const std::string& toPhoneme, const std::string& name)
+SBDiphone* SBPhonemeManager::getDiphone(const std::string& fromPhoneme, const std::string& toPhoneme, const std::string& name)
 {
 	std::string upperCaseFromPhoneme = fromPhoneme;
 	std::string upperCaseToPhoneme = toPhoneme;
@@ -191,18 +193,18 @@ SBDiphone* SBDiphoneManager::getDiphone(const std::string& fromPhoneme, const st
 	return NULL;
 }
 
-int SBDiphoneManager::getNumDiphoneMap()
+int SBPhonemeManager::getNumDiphoneMap()
 {
 	return _diphoneMap.size();
 }
 
-int SBDiphoneManager::getNumDiphones(const std::string& name)
+int SBPhonemeManager::getNumDiphones(const std::string& name)
 {
 	std::vector<SBDiphone*>& diphones = getDiphones(name);
 	return diphones.size();
 }
 
-std::vector<std::string> SBDiphoneManager::getDiphoneMapNames()
+std::vector<std::string> SBPhonemeManager::getDiphoneMapNames()
 {
 	std::vector<std::string> diphoneMaps;
 	for (std::map<std::string, std::vector<SBDiphone*> >::iterator iter = _diphoneMap.begin();
@@ -217,7 +219,7 @@ std::vector<std::string> SBDiphoneManager::getDiphoneMapNames()
 
 }
 
-void SBDiphoneManager::normalizeCurves(const std::string& name)
+void SBPhonemeManager::normalizeCurves(const std::string& name)
 {
 	std::map<std::string, std::vector<SBDiphone*> >::iterator iter = _diphoneMap.find(name);
 	if (iter != _diphoneMap.end())
@@ -299,7 +301,7 @@ void SBDiphoneManager::normalizeCurves(const std::string& name)
 	}
 }
 
-void SBDiphoneManager::loadDictionary(const std::string& language, const std::string& file)
+void SBPhonemeManager::loadDictionary(const std::string& language, const std::string& file)
 {
 	std::ifstream filestream( file.c_str() );
 	if (!filestream.good())
@@ -351,7 +353,7 @@ void SBDiphoneManager::loadDictionary(const std::string& language, const std::st
 	_dictionaryFileMap[language] = file;
 }
 
-void SBDiphoneManager::addDictionaryWord(const std::string& language, const std::string& word, std::vector<std::string>& phonemes)
+void SBPhonemeManager::addDictionaryWord(const std::string& language, const std::string& word, std::vector<std::string>& phonemes)
 {
 	std::map<std::string, std::map<std::string, std::vector<std::string> > >::iterator iter = _wordToPhonemeMaps.find(language);
 	if (iter == _wordToPhonemeMaps.end())
@@ -371,7 +373,7 @@ void SBDiphoneManager::addDictionaryWord(const std::string& language, const std:
 	(*iter).second[word] = phonemes;
 }
 
-std::vector<std::string>& SBDiphoneManager::getDictionaryWord(const std::string& language, const std::string& word)
+std::vector<std::string>& SBPhonemeManager::getDictionaryWord(const std::string& language, const std::string& word)
 {
 	std::string uppercaseWord = vhcl::ToUpper(word);
 	
@@ -394,7 +396,7 @@ std::vector<std::string>& SBDiphoneManager::getDictionaryWord(const std::string&
 	return (*phonemeLookupIter).second;
 }
 
-std::string SBDiphoneManager::getDictionaryFile(const std::string& language)
+std::string SBPhonemeManager::getDictionaryFile(const std::string& language)
 {
 	std::map<std::string, std::string>::iterator iter = _dictionaryFileMap.find(language);
 	if (iter == _dictionaryFileMap.end())
@@ -403,7 +405,7 @@ std::string SBDiphoneManager::getDictionaryFile(const std::string& language)
 
 }
 
-int SBDiphoneManager::getNumDictionaryWords(const std::string& language)
+int SBPhonemeManager::getNumDictionaryWords(const std::string& language)
 {
 	std::map<std::string, std::map<std::string, std::vector<std::string> > >::iterator iter = _wordToPhonemeMaps.find(language);
 	if (iter != _wordToPhonemeMaps.end())
@@ -416,5 +418,42 @@ int SBDiphoneManager::getNumDictionaryWords(const std::string& language)
 	}
 }
 
+void SBPhonemeManager::setEnable(bool val)
+{
+	SBService::setEnable(val);
+}
+
+std::vector<std::string> SBPhonemeManager::getPhonemesRealtime(const std::string& character, const std::string& phoneme)
+{
+	std::map<std::string, std::vector<std::string> >::iterator iter = _realtimePhonemes.find(character);
+	if (iter != _realtimePhonemes.end())
+	{
+		return (*iter).second;
+	}
+	else
+	{
+		return _emptyPhonemes;
+	}
+}
+
+void SBPhonemeManager::setPhonemesRealtime(const std::string& character, const std::string& phoneme)
+{
+	std::map<std::string, std::vector<std::string> >::iterator iter = _realtimePhonemes.find(character);
+	if (iter == _realtimePhonemes.end())
+	{
+		_realtimePhonemes[character] = std::vector<std::string>();
+		iter = _realtimePhonemes.find(character);
+	}
+	(*iter).second.push_back(phoneme);
+}
+
+void SBPhonemeManager::clearPhonemesRealtime(const std::string& character, const std::string& phoneme)
+{
+	std::map<std::string, std::vector<std::string> >::iterator iter = _realtimePhonemes.find(character);
+	if (iter != _realtimePhonemes.end())
+	{
+		(*iter).second.clear();
+	}
+}
 
 }
