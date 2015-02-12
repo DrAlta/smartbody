@@ -544,11 +544,20 @@ bool SrModel::load ( SrInput &in )
 		 int tidx[3]; tidx[0] = Ft[i].a; tidx[1] = Ft[i].b; tidx[2] = Ft[i].c;
 		 SrVec sv[2];
 		 SrPnt2 st[2];		
-		 for (int k=0;k<2;k++)
+		 if (idx[0] < 0 || 
+			 idx[1] < 0 ||
+			 idx[2] < 0)
 		 {
-			 sv[k] = V[idx[k+1]] - V[idx[0]];
-			 st[k] = T[tidx[k+1]] - T[tidx[0]];
-		 }	
+			 // bad indices
+		 }
+		 else
+		 {
+			 for (int k=0;k<2;k++)
+			 {
+				 sv[k] = V[idx[k+1]] - V[idx[0]];
+				 st[k] = T[tidx[k+1]] - T[tidx[0]];
+			 }	
+		 }
 		 float cp = st[0].y * st[1].x - st[0].x * st[1].y;
 		 SrVec nvec = cross(sv[0],sv[1]); nvec.normalize(); 
 		 SrVec tvec = (sv[0]*st[1].y - sv[1]*st[0].y)/cp; tvec.normalize();
@@ -560,11 +569,20 @@ bool SrModel::load ( SrInput &in )
 			 bvec = -bvec;
 		 }
 		 
-		 for (int k=0;k<3;k++)
+		  if (idx[0] < 0 || 
+			 idx[1] < 0 ||
+			 idx[2] < 0)
 		 {
-			 Tangent[idx[k]] += tvec;
-			 BiNormal[idx[k]] += bvec;
-			 //N[idx[k]] += nvec;
+			 // bad indices
+		 }
+		 else
+		 {
+			 for (int k=0;k<3;k++)
+			 {
+				 Tangent[idx[k]] += tvec;
+				 BiNormal[idx[k]] += bvec;
+				 //N[idx[k]] += nvec;
+			 }
 		 }
 	 }
 
@@ -1032,7 +1050,12 @@ SrVec SrModel::face_normal ( int f ) const
  { 
    SrVec n; 
    const Face& fac = F[f];
-   n.cross ( V[fac.b]-V[fac.a], V[fac.c]-V[fac.a] ); 
+   if (fac.a >= 0 ||
+	   fac.b >= 0 ||
+	   fac.c >= 0)
+   {
+	n.cross ( V[fac.b]-V[fac.a], V[fac.c]-V[fac.a] ); 
+   }
    n.normalize(); 
    return n; 
  }

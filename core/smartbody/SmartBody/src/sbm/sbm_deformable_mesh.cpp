@@ -479,9 +479,14 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			if (model.Ft.size() > i)
 				tIdx = model.Ft[i];
 
-			vtxNormalIdxMap[faceIdx.a + iFaceIdxOffset].insert(IntPair(nIdx.a+iNormalIdxOffset,tIdx.a+iTextureIdxOffset));
-			vtxNormalIdxMap[faceIdx.b + iFaceIdxOffset].insert(IntPair(nIdx.b+iNormalIdxOffset,tIdx.b+iTextureIdxOffset));
-			vtxNormalIdxMap[faceIdx.c + iFaceIdxOffset].insert(IntPair(nIdx.c+iNormalIdxOffset,tIdx.c+iTextureIdxOffset));
+			if (tIdx.a >= 0 || 
+				tIdx.b >= 0 || 
+				tIdx.c >= 0)
+			{
+				vtxNormalIdxMap[faceIdx.a + iFaceIdxOffset].insert(IntPair(nIdx.a+iNormalIdxOffset,tIdx.a+iTextureIdxOffset));
+				vtxNormalIdxMap[faceIdx.b + iFaceIdxOffset].insert(IntPair(nIdx.b+iNormalIdxOffset,tIdx.b+iTextureIdxOffset));
+				vtxNormalIdxMap[faceIdx.c + iFaceIdxOffset].insert(IntPair(nIdx.c+iNormalIdxOffset,tIdx.c+iTextureIdxOffset));
+			}
 
 			int nMatIdx = 0; // if no corresponding materials, push into the default gray material group
 			if (i < dMeshStatic->shape().Fm.size())
@@ -731,6 +736,10 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			if (dMeshStatic->shape().F.size() <= i)
 				continue;				
 			SrModel::Face& faceIdx = dMeshStatic->shape().F[i];
+			if (faceIdx.a < 0 ||
+				faceIdx.b < 0 ||
+				faceIdx.c < 0)
+				continue;
 			SrModel::Face normalIdx;// = dMeshStatic->shape().F[i];
 			normalIdx.set(faceIdx.a,faceIdx.b,faceIdx.c);
 
@@ -754,12 +763,15 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				SrPnt2 tvec	= SrPnt2(0,0);
 				int nidx	= nIdx[k];
 
-				if (dMeshStatic->shape().N.size() > nidx)
+				if (dMeshStatic->shape().N.size() > nidx &&
+					nidx > 0)
 					nvec = dMeshStatic->shape().N[nIdx[k]];
 				else
 					nvec = faceNormal;
 
-				if (dMeshStatic->shape().T.size() > tIdx[k] && dMeshStatic->shape().T.size() > 0 && dMeshStatic->shape().Ft.size() > 0)
+				if (dMeshStatic->shape().T.size() > tIdx[k] && 
+					dMeshStatic->shape().T.size() > 0 && 
+					dMeshStatic->shape().Ft.size() > 0)
 					tvec = dMeshStatic->shape().T[tIdx[k]];
 
 				int newNIdx = nIdx[k] + iNormalIdxOffset;
@@ -2391,7 +2403,7 @@ const std::string DeformableMesh::getMeshName(int index)
 {
 	if (dMeshStatic_p.size() > index &&
 		index >= 0)
-		return dMeshStatic_p[index]->shape().name;
+		return (const char*) dMeshStatic_p[index]->shape().name;
 	else
 		return "";
 }
