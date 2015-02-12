@@ -390,7 +390,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 
 		SmartBody::SBSkeleton* skel = shape->getSkeleton();
 		SmartBody::SBPawn* pawn		= skel->getPawn();
-		bool useTexBlend = pawn->getBoolAttribute("textureBlend");
+		bool useTexBlend = pawn->getBoolAttribute("blendTexturesWithLighting");
 
 		if( texturesType == "static" || texturesType == "dynamic")
 		{
