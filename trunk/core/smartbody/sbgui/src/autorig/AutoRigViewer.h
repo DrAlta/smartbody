@@ -59,19 +59,19 @@ class AutoRigViewer : public Fl_Double_Window, AutoRigCallBack
 		~AutoRigViewer();
 		
 		virtual void draw();
-		void updatePawnList();
 		void applyAutoRig(int riggingType = 0);
 		static void ApplyAutoRigCB(Fl_Widget* widget, void* data);
 		void updateAutoRigViewer();
+		void setCharacterName(const std::string& name);
 
 		void setRetargetStepWindow(RetargetStepWindow* val) { retargetStepWindow = val; }
 
 		virtual void voxelComplete(SrModel& voxelModel);
 		virtual void skeletonComplete(SmartBody::SBSkeleton* sk);
 		virtual void skinComplete(DeformableMesh* defMesh);
-	public:
+
+		std::string _characterName;
 		std::string _deletePawnName;
-		Fl_Choice* _choicePawns;
 		Fl_Choice* _choiceVoxelRigging;
 		Fl_Button* _buttonAutoRig;	
 
