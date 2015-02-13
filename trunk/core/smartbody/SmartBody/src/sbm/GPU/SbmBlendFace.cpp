@@ -579,6 +579,9 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 
 	glm::mat4x4 translation	= glm::mat4x4();
 	translation = glm::translate(translation, glm::vec3(20.0, 65.0, 0.0));
+	
+	glm::mat4x4 rotation	= glm::mat4x4();
+	
 	bool showMasks = false;
 
 	if (meshInstance->isStaticMesh())
@@ -594,7 +597,13 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 				const SrVec& offsetTrans	= pawn->getVec3Attribute("blendShape.parentJointOffsetTrans");
 				const SrVec& offsetRot		= pawn->getVec3Attribute("blendShape.parentJointOffsetRot");
 
+				// Generates translation matrix for GLSL shader
 				translation = glm::translate(translation, glm::vec3(offsetTrans.x,offsetTrans.y,offsetTrans.z));
+
+				// Generates rotation matrix for GLSL shader
+				rotation	= glm::rotate(rotation, offsetRot.x, glm::vec3(1.0, 0.0, 0.0));
+				rotation	= glm::rotate(rotation, offsetRot.y, glm::vec3(0.0, 1.0, 0.0));
+				rotation	= glm::rotate(rotation, offsetRot.z, glm::vec3(0.0, 0.0, 1.0));
 			}
 		}
 		showMasks	= pawn->getBoolAttribute("blendShape.showMasks");
@@ -712,8 +721,10 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		GLuint uBorderVertices	= glGetUniformLocation(program, "uBorderVertices");
 		GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
 		GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
+		GLuint uRotate			= glGetUniformLocation(program, "uRotate");
 		GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
 		GLuint uShowMasks		= glGetUniformLocation(program, "uShowMasks");
+
 
 		int * image_array		= new int[MAX_SHAPES];
 		float * w				= new float[usedWeights.size()];
@@ -736,10 +747,6 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 			}
 		}
 
-//		glActiveTexture(GL_TEXTURE14);
-//		glBindTexture(GL_TEXTURE_BUFFER, tbo);
-//		glTexBuffer(GL_TEXTURE_BUFFER, GL_R8I, verticesUsedBuffer);
-
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texIDs[0]);
 		glUniform1i(uNeutralSampler, 0);
@@ -747,6 +754,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		glUniformMatrix4fv(uMatrixMV, 1, GL_FALSE, modelview_matrix);
 		glUniformMatrix4fv(uMatrixProj, 1, GL_FALSE, projection_matrix);
 		glUniformMatrix4fv(uTranslate, 1, GL_FALSE, glm::value_ptr(translation));
+		glUniformMatrix4fv(uRotate, 1, GL_FALSE, glm::value_ptr(rotation));
 		glUniform1fv(uWeights, usedWeights.size(), w);
 		glUniform1i(uNumberOfShapes, usedWeights.size());
 		glUniform1iv(uNeutralSampler, MAX_SHAPES, image_array);
