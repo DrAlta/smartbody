@@ -945,8 +945,12 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <None Include="src\sbm\GPU\shaderFiles\blendFace.vert" />
     <None Include="src\sbm\GPU\shaderFiles\blendGeometry.frag" />
     <None Include="src\sbm\GPU\shaderFiles\blendGeometry.vert" />
+    <None Include="src\sbm\GPU\shaderFiles\blendGeometryWithMasks.frag" />
+    <None Include="src\sbm\GPU\shaderFiles\blendGeometryWithMasks.vert" />
     <None Include="src\sbm\GPU\shaderFiles\blendTextures.frag" />
     <None Include="src\sbm\GPU\shaderFiles\blendTextures.vert" />
+    <None Include="src\sbm\GPU\shaderFiles\readMasks.frag" />
+    <None Include="src\sbm\GPU\shaderFiles\readMasks.vert" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

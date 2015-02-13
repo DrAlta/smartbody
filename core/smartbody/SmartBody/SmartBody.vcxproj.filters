@@ -2489,5 +2489,17 @@
     <None Include="src\sbm\GPU\shaderFiles\blendGeometry.vert">
       <Filter>GPU</Filter>
     </None>
+    <None Include="src\sbm\GPU\shaderFiles\readMasks.frag">
+      <Filter>GPU</Filter>
+    </None>
+    <None Include="src\sbm\GPU\shaderFiles\readMasks.vert">
+      <Filter>GPU</Filter>
+    </None>
+    <None Include="src\sbm\GPU\shaderFiles\blendGeometryWithMasks.frag">
+      <Filter>GPU</Filter>
+    </None>
+    <None Include="src\sbm\GPU\shaderFiles\blendGeometryWithMasks.vert">
+      <Filter>GPU</Filter>
+    </None>
   </ItemGroup>
 </Project>

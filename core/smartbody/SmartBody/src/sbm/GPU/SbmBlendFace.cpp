@@ -12,10 +12,14 @@
 #include <sb/SBScene.h>
 #include <sb/SBPawn.h>
 #include "SbmDeformableMeshGPU.h"
+#include <sbm/GPU/SbmTexture.h>
 
 #include "external/glm/glm/glm.hpp"
 #include "external/glm/glm/gtc/type_ptr.hpp"
 #include "external/glm/glm/gtc/matrix_transform.hpp"
+
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/filesystem.hpp>
 
 SbmBlendFace::SbmBlendFace() : DeformableMesh()
 {
@@ -358,6 +362,52 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
 		}
 	}
+	else if(_shaderName.compare("ReadMasks") == 0)
+	{
+		SbmShaderProgram* program		= SbmShaderManager::singleton().getShader(_shaderName);
+
+		//	If GLSL program does not exist yet in SbmShaderManager
+		if(program) 
+		{
+			return program->getShaderProgram();
+		}
+		//	If the GLSL shader is not in the ShaderManager yet
+		else
+		{
+			LOG("Program does not exist yet");
+
+			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/readMasks.vert";
+			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/readMasks.frag";
+	
+			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+			SbmShaderManager::singleton().buildShaders();
+				
+			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
+		}
+	}
+	else if(_shaderName.compare("BlendGeometryWithMasks") == 0)
+	{
+		SbmShaderProgram* program		= SbmShaderManager::singleton().getShader(_shaderName);
+
+		//	If GLSL program does not exist yet in SbmShaderManager
+		if(program) 
+		{
+			return program->getShaderProgram();
+		}
+		//	If the GLSL shader is not in the ShaderManager yet
+		else
+		{
+			LOG("Program does not exist yet");
+
+			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendGeometryWithMasks.vert";
+			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendGeometryWithMasks.frag";
+	
+			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+			SbmShaderManager::singleton().buildShaders();
+				
+			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
+		}
+	}
 	else
 	{
 		LOG("*** ERROR: Invalid BlendTextures shader");
@@ -411,13 +461,336 @@ std::string ZeroPadNumber(int num)
 	*/
 
 
-void SbmBlendTextures::BlendGeometry(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance/*_mesh*/, GLuint program)
+
+void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names,  GLuint program, int w, int h)
+{
+	int numTextures		= weights.size();
+
+	for(int i = 0; i< numTextures; i++) 
+	{
+		std::string mask		= boost::replace_all_copy(texture_names[i], ".png", "_mask.png");
+		SbmTexture* tex_mask;
+		// Checks if mask file exists
+		if (!boost::filesystem::exists(mask))
+		{
+			std::cout << "WARNING! Can't find mask " << mask << ", using a white mask instead.\n" << std::endl;
+			SbmTextureManager::singleton().createWhiteTexture("white");
+			tex_mask	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,"white");
+		}
+		else
+		{
+			// Loads the mask using SBmTextureManager
+			SbmTextureManager::singleton().loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, mask.c_str(), mask.c_str());
+			tex_mask	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, mask.c_str());
+	
+			if(tex_mask == NULL)
+				printf("ERROR loading texture %s",mask.c_str());
+		
+			// Builds mask to generate OpenGL texture ID
+			tex_mask->buildTexture();
+		}
+		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #1");
+
+		glPushMatrix();
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst[i]);                                                              // Bind the framebuffer object
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst[i], 0);              // Attach texture to FBO
+
+			assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
+
+			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #2");
+
+			glPushAttrib(GL_ENABLE_BIT);
+				glDisable(GL_DEPTH_TEST);
+				glDisable(GL_LIGHTING);
+				glMatrixMode (GL_PROJECTION);
+				glPushMatrix();
+
+				SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #3");
+					glLoadIdentity ();
+					gluOrtho2D(-1, 1, -1, 1);
+					glMatrixMode (GL_MODELVIEW);
+					glPushAttrib(GL_VIEWPORT_BIT);
+					glPushAttrib(GL_TEXTURE_BIT);
+					
+						glViewport(0, 0, w, h);
+						glLoadIdentity ();
+						glClearColor(1.0, 1.0, 1.0, 0);
+						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+						
+						glUseProgram(program);
+						
+						glEnable(GL_TEXTURE_2D);
+
+							GLuint uExpressionSampler	= glGetUniformLocation(program, "uExpressionSampler");
+							GLuint uMaskSampler			= glGetUniformLocation(program, "uMaskSampler");
+							
+							SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #7_");
+						
+							glUniform1i(uExpressionSampler, 0);
+							glUniform1i(uMaskSampler, 1);
+
+							glActiveTexture(GL_TEXTURE0);
+							glBindTexture(GL_TEXTURE_2D, texIDs[i]);
+						
+							glActiveTexture(GL_TEXTURE1);
+							glBindTexture(GL_TEXTURE_2D, tex_mask->getID());
+							
+							glBegin(GL_QUADS);
+								glTexCoord2f(0, 1);
+								glVertex3f(-1.0f, 1.0f, -0.5f);
+
+								glTexCoord2f(0, 0);
+								glVertex3f(-1.0f, -1.0f, -0.5f);
+
+								glTexCoord2f(1, 0);
+								glVertex3f(1.0f, -1.0f, -0.5f);
+
+								glTexCoord2f(1, 1);
+								glVertex3f(1.0f, 1.0f, -0.5f);
+							glEnd();
+
+						glUseProgram(0);
+						SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #9");
+
+					glPopAttrib();                          // Pops texture bit
+					glDisable(GL_TEXTURE_2D);
+					glPopAttrib();							// Pops viewport information
+				glMatrixMode (GL_PROJECTION);
+				glPopMatrix();                              
+				glMatrixMode (GL_MODELVIEW);
+			glPopAttrib();								// Pops ENABLE_BIT
+
+			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #10");
+
+			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);    // Bind the render buffer
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);         
+		
+			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #6");
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, 0);																							
+		glPopMatrix();
+	}
+}
+
+void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance/*_mesh*/, GLuint program)
+{
+	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
+
+	glm::mat4x4 translation	= glm::mat4x4();
+	translation = glm::translate(translation, glm::vec3(20.0, 65.0, 0.0));
+	bool showMasks = false;
+
+	if (meshInstance->isStaticMesh())
+	{
+		SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
+		SmartBody::SBPawn* pawn		= skel->getPawn();
+		const std::string& parentJoint = pawn->getStringAttribute("blendShape.parentJoint");
+		if (parentJoint != "")
+		{
+			SmartBody::SBJoint* joint = skel->getJointByName(parentJoint);
+			if (joint)
+			{
+				const SrVec& offsetTrans	= pawn->getVec3Attribute("blendShape.parentJointOffsetTrans");
+				const SrVec& offsetRot		= pawn->getVec3Attribute("blendShape.parentJointOffsetRot");
+
+				translation = glm::translate(translation, glm::vec3(offsetTrans.x,offsetTrans.y,offsetTrans.z));
+			}
+		}
+		showMasks	= pawn->getBoolAttribute("blendShape.showMasks");
+	}
+
+	SbmShaderProgram::printOglError("SbmBlendTextures::BlendGeometry #0");
+
+	SbmBlendFace * aux = new SbmBlendFace();
+
+	std::vector<int> verticesUsed(_mesh->posBuf.size(), 0);
+	std::vector<SrVec2> edges;
+
+	GLuint tbo, verticesUsedBuffer;
+	glGenTextures(1, &tbo);
+	
+	glGenBuffers( 1, &verticesUsedBuffer);
+    glBindBuffer( GL_TEXTURE_BUFFER, verticesUsedBuffer);
+#if _MSC_VER == 1500
+	glBufferData( GL_TEXTURE_BUFFER, verticesUsed.size() * sizeof(int), &verticesUsed.front(), GL_DYNAMIC_DRAW);
+#else
+	glBufferData( GL_TEXTURE_BUFFER, verticesUsed.size() * sizeof(int), verticesUsed.data(), GL_DYNAMIC_DRAW);
+#endif
+	
+	aux->setDeformableMesh(_mesh);
+	aux->buildVertexBufferGPU(weights.size());
+
+	SrSnModel* writeToBaseModel = NULL;
+	SrSnModel* baseModel		= NULL;
+	bool foundBaseModel			= false;
+
+	std::vector<SrArray<SrPnt>*> shapes;
+
+	SrArray<SrPnt> neutralV;
+	SrArray<SrPnt> visemeV;
+
+	// find the base shape and other shapes
+	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
+	for (mIter = _mesh->blendShapeMap.begin(); mIter != _mesh->blendShapeMap.end(); ++mIter)
+	{
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
+			{
+				baseModel		= mIter->second[i];
+				foundBaseModel	= true;
+				break;
+			}
+		}
+		if (baseModel == NULL)
+		{
+			LOG("original base model cannot be found");
+			continue;
+		}
+
+		neutralV	= (baseModel->shape().V);
+
+		// Copies reference to the shape vector
+		shapes.push_back(&(baseModel->shape().V));
+
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if ((i == 0) ||(!mIter->second[i]))
+			{
+				continue;
+			}
+		
+			visemeV = mIter->second[i]->shape().V;
+			aux->addFace(mIter->second[i]);
+
+			// Copies reference to the shape vector
+			shapes.push_back(&(baseModel->shape().V));
+		}
+	}
+	
+	const int MAX_SHAPES = 14;	// I can't enable more than 16 attributes (15 vertex buffer + 1 texture coordinate buffer)
+								// NOTE: Also change #define in shader if you change this value
+
+	std::vector<float>	usedWeights;
+	std::vector<int>	usedShapeIDs;
+
+	GLfloat modelview_matrix[16];
+	GLfloat projection_matrix[16];
+	
+	glGetFloatv(GL_PROJECTION_MATRIX, projection_matrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
+
+	glUseProgram(program);
+		GLuint aVertexTexcoord	= glGetAttribLocation(program, "aVertexTexcoord");
+		GLuint aVertexPosition	= glGetAttribLocation(program, "aVertexPosition");
+
+		for(int i=0; i<weights.size(); i++)
+		{
+			// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
+			if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
+			{
+				glEnableVertexAttribArray(aVertexPosition + usedWeights.size());
+				aux->getVBOPos(i)->VBO()->BindBuffer();
+				glVertexAttribPointer(aVertexPosition + usedWeights.size(), 3, GL_FLOAT, GL_FALSE, 0,0);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+				// Pushes this weight to the vector of used weights
+				usedWeights.push_back(weights[i]);
+				usedShapeIDs.push_back(i);
+			}
+		}
+
+		glEnableVertexAttribArray(aVertexTexcoord);
+		aux->getVBOTexCoord()->VBO()->BindBuffer();
+		glVertexAttribPointer(aVertexTexcoord, 2, GL_FLOAT, GL_FALSE, 0,0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		GLuint uMatrixMV		= glGetUniformLocation(program, "uMatrixMV");
+		GLuint uMatrixProj		= glGetUniformLocation(program, "uMatrixProj");
+		GLuint uWeights			= glGetUniformLocation(program, "uWeights");
+		GLuint uBorderVertices	= glGetUniformLocation(program, "uBorderVertices");
+		GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
+		GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
+		GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
+		GLuint uShowMasks		= glGetUniformLocation(program, "uShowMasks");
+
+		int * image_array		= new int[MAX_SHAPES];
+		float * w				= new float[usedWeights.size()];
+		
+		for(int i=0; i<MAX_SHAPES; i++)
+		{
+			if(i < usedWeights.size())
+			{
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(GL_TEXTURE_2D, texIDs[usedShapeIDs[i]]);
+				image_array[i]	= i;
+				w[i]			= usedWeights[i];
+			}
+			// Textures not used, but we still need to pass 15 textures to the fragment shader for completeness
+			else
+			{
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+				image_array[i]	= i;
+			}
+		}
+
+//		glActiveTexture(GL_TEXTURE14);
+//		glBindTexture(GL_TEXTURE_BUFFER, tbo);
+//		glTexBuffer(GL_TEXTURE_BUFFER, GL_R8I, verticesUsedBuffer);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+		glUniform1i(uNeutralSampler, 0);
+
+		glUniformMatrix4fv(uMatrixMV, 1, GL_FALSE, modelview_matrix);
+		glUniformMatrix4fv(uMatrixProj, 1, GL_FALSE, projection_matrix);
+		glUniformMatrix4fv(uTranslate, 1, GL_FALSE, glm::value_ptr(translation));
+		glUniform1fv(uWeights, usedWeights.size(), w);
+		glUniform1i(uNumberOfShapes, usedWeights.size());
+		glUniform1iv(uNeutralSampler, MAX_SHAPES, image_array);
+		glUniform1i(uBorderVertices,  14);
+		glUniform1i(uShowMasks,  showMasks);
+
+		aux->subMeshTris[0]->VBO()->BindBuffer();
+			glDrawElements(GL_TRIANGLES, _mesh->triBuf.size()*3 , GL_UNSIGNED_INT,0);
+		aux->subMeshTris[0]->VBO()->UnbindBuffer();
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		
+		aux->getVBOPos(0)->VBO()->UnbindBuffer();
+		aux->getVBOPos(1)->VBO()->UnbindBuffer();
+		aux->getVBOTexCoord()->VBO()->UnbindBuffer();
+
+		for(int i=0; i<usedWeights.size(); i++)
+		{
+			glDisableVertexAttribArray(aVertexPosition + i);
+		}
+
+		glDisableVertexAttribArray(aVertexTexcoord);
+
+	glUseProgram(0);
+
+	glDeleteTextures(1, &tbo);
+	
+	glDeleteBuffers( 1, &verticesUsedBuffer);
+
+	delete aux;
+
+	SbmShaderProgram::printOglError("BlendGeometry FINAL");
+
+}
+
+
+void SbmBlendTextures::BlendGeometry(GLuint * FBODst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance/*_mesh*/, GLuint program)
 {
 	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
 
 
 	glm::mat4x4 translation	= glm::mat4x4();
-	translation = glm::translate(translation, glm::vec3(20.0, 65.0, 20.0));
+	translation = glm::translate(translation, glm::vec3(40.0, 65.0, 0.0));
 
 	if (meshInstance->isStaticMesh())
 	{

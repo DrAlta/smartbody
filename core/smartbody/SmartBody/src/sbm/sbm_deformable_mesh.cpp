@@ -1544,6 +1544,9 @@ DeformableMeshInstance::DeformableMeshInstance()
 
 	_tempTexPairs		= NULL;
 	_tempFBOPairs		= NULL;
+
+	_tempTexWithMask	= NULL;
+	_tempFBOTexWithMask = NULL;
 }
 
 DeformableMeshInstance::~DeformableMeshInstance()
@@ -1927,6 +1930,7 @@ void DeformableMeshInstance::blendShapes()
 
 		//	Here I try to blend the faces two at a time. This way I avoid hardcoded constant vector size.
 #if !defined(ANDROID_BUILD)
+
 		if(_tempFBOPairs == NULL) 
 		{
 			_tempFBOPairs = new GLuint[weights.size()];
@@ -1941,6 +1945,7 @@ void DeformableMeshInstance::blendShapes()
 		if(tex_h > 2048)
 			tex_h = 2048;
 
+		// Aux textures used when calling BlendAllAppearancesPairwise to store temporary results for texture blending pair wise
 		if(_tempTexPairs == NULL) 
 		{
 			_tempTexPairs = new GLuint[weights.size()];
@@ -1958,13 +1963,49 @@ void DeformableMeshInstance::blendShapes()
 		}
 
 
+		if(_tempFBOTexWithMask == NULL) 
+		{
+			_tempFBOTexWithMask = new GLuint[weights.size()];
+			glGenFramebuffers(weights.size(), _tempFBOTexWithMask);
+		}
+
+		// If images with masks in the alpha channel have not been created
+		if(_tempTexWithMask == NULL)
+		{
+			_tempTexWithMask = new GLuint[weights.size()];
+			glGenTextures(weights.size(), _tempTexWithMask);
+			for(int i=0; i<weights.size(); i++) 
+			{
+				glBindTexture(GL_TEXTURE_2D, _tempTexWithMask[i]);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT, NULL);
+				glBindTexture(GL_TEXTURE_2D, 0);
+			}
+
+			// Adds masking images to the alpha channel of the textures
+			SbmBlendTextures::ReadMasks(_tempFBOTexWithMask, _tempTexWithMask, weights, texIDs, texture_names, SbmBlendTextures::getShader("ReadMasks"), tex_w, tex_h); 
+		}
+
+
 
 		if (texIDs.size() > 0 && texIDs[0] != 0)
 		{
+	
 			SbmShaderProgram::printOglError("texIDs.size() > 0 ");
-			// Blends geometry
-			//SbmBlendTextures::BlendGeometry( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, this,  SbmBlendTextures::getShader("BlendGeometry"));
 
+			// New attempt to blend textures with masks (also renders a face). It uses the _tempTexWithMask, which are the texture maps with the masking encoded in its ALPHA channel.
+			// The _tempTexWithMask texture were created above in the SbmBlendTextures::ReadMasks call
+			//SbmBlendTextures::ReadMasks(_tempFBOTexWithMask, _tempTexWithMask, weights, texIDs, texture_names, SbmBlendTextures::getShader("ReadMasks"), tex_w, tex_h);
+			SbmBlendTextures::BlendGeometryWithMasks( _tempFBOTexWithMask, weights, _tempTexWithMask, texture_names, this,  SbmBlendTextures::getShader("BlendGeometryWithMasks"));
+
+			// Blends geometry and texture in the same GLSL (also renders a face)
+			SbmBlendTextures::BlendGeometry( _tempFBOPairs, weights, texIDs, texture_names, this,  SbmBlendTextures::getShader("BlendGeometry"));
+
+			// Computes blended texture pairwise, and saves it into _tempTexPairs[0], which is going to be used later as a texture (in the normal blendshape pipeline)
 			SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), tex_w, tex_h);
 		}
 #endif
