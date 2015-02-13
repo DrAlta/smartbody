@@ -43,6 +43,9 @@ public:
 	SBAPI void reloadTexture();
 	SBAPI std::vector<std::string> getTextureNames(int type);
 
+	// Creates a 1x1 white texture
+	SBAPI void createWhiteTexture(const char* textureName);
+
 	void releaseAllTextures();	
 protected:
 	StrTextureMap& findMap(int type);
@@ -80,5 +83,8 @@ public:
 
 	SBAPI void setBuffer(unsigned char* buffer, int size);
 	SBAPI void setTextureSize(int w, int h, int numChannels);
+
+	// Creates a 1x1 white texture
+	SBAPI void createWhiteTexture();
 
 };

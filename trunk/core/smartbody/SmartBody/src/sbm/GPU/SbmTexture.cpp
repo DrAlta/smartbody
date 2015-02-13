@@ -84,8 +84,12 @@ std::vector<std::string> SbmTextureManager::getTextureNames( int type )
 void SbmTextureManager::loadTexture(int iType, const char* textureName, const char* fileName )
 {
 	std::string strTex		= textureName;
+
+	// Retrieves texture map type: DIFFUSE, SPECULAR or NORMAL
 	StrTextureMap& texMap	= findMap(iType);
-	if (texMap.find(strTex) == texMap.end()) // the texture does not exist in the texture map, create a new one
+
+	// If the texture does not exist in the texture map, create a new one
+	if (texMap.find(strTex) == texMap.end()) 
 	{
 		SbmTexture* texture = new SbmTexture(textureName);
 		if(!texture->loadImage(fileName))
@@ -94,6 +98,21 @@ void SbmTextureManager::loadTexture(int iType, const char* textureName, const ch
 		}
 		texMap[strTex] = texture;
 	}
+}
+
+void SbmTextureManager::createWhiteTexture(const char* textureName)
+{
+	StrTextureMap& texMap	= findMap(SbmTextureManager::TEXTURE_DIFFUSE);
+
+	// If the texture does not exist in the texture map, create a new one
+	if (texMap.find(std::string(textureName)) == texMap.end()) 
+	{
+		SbmTexture* texture = new SbmTexture(textureName);
+		texture->createWhiteTexture();
+		texMap[std::string(textureName)] = texture;
+		texture->buildTexture();
+	}
+	
 }
 
 void SbmTextureManager::updateTexture()
@@ -172,14 +191,14 @@ SbmTexture* SbmTextureManager::findTexture(int type, const char* textureName )
 
 SbmTexture::SbmTexture( const char* texName )
 {
-	textureName = texName;
-	texID = 0;
-	buffer = NULL;
-	finishBuild = false;
-	transparentTexture = false;
-	width = -1;
-	height = -1;
-	channels = -1;
+	textureName			= texName;
+	texID				= 0;
+	buffer				= NULL;
+	finishBuild			= false;
+	transparentTexture	= false;
+	width				= -1;
+	height				= -1;
+	channels			= -1;
 }
 
 SbmTexture::~SbmTexture(void)
@@ -233,11 +252,14 @@ bool SbmTexture::loadImage( const char* fileName )
 
 	if (transparentPixel*20 > height*width)
 		transparentTexture = true;
+
 	imgBuffer.resize(width*height*channels);
+
 	for (int i=0;i<width*height*channels;i++)
 	{
 		imgBuffer[i] = buffer[i];
 	}
+
 	// set the texture file name
 	textureFileName = fileName;	
 	SOIL_free_image_data(buffer);
@@ -352,7 +374,41 @@ void SbmTexture::setBuffer(unsigned char* buffer, int size)
 
 void SbmTexture::setTextureSize(int w, int h, int numChannels)
 {
-	width = w;
-	height = h;
-	channels = numChannels;
+	width		= w;
+	height		= h;
+	channels	= numChannels;
+}
+
+void SbmTexture::createWhiteTexture()
+{
+	unsigned char* data;
+
+	width		= 1;
+	height		= 1;
+	channels	= 4;
+
+	data = new unsigned char[width * height * channels * sizeof(unsigned char)];
+
+	for(int i = 0; i < (int)(width * height * channels * sizeof(unsigned char)); i++)
+	{
+		data[i] = 255;
+	}
+
+//	// Generate white OpenGL texture.
+ //   GLuint whiteTextureID;
+ //   glGenTextures(1, &whiteTextureID);
+ //   glBindTexture(GL_TEXTURE_2D, whiteTextureID);
+ //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+ //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+ //   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	imgBuffer.resize(width*height*channels);
+
+	for (int i=0;i<width*height*channels;i++)
+	{
+		imgBuffer[i] = data[i];
+	}
+
+	textureFileName		= "white";	
+	textureName			= "white";
 }
