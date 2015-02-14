@@ -41,7 +41,7 @@
 #include <sr/sr_sphere.h>
 #include <sr/sr_cylinder.h>
 #include <sr/sr_polygons.h>
-
+#include <sr/sr_euler.h>
 
 
 #include <sbm/GPU/SbmTexture.h>
@@ -266,7 +266,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	DeformableMesh* mesh = shape->getDeformableMesh();
     if (!mesh)
     {
-        LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
+        //LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
         return; // no deformable mesh
     }
 
@@ -276,8 +276,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			SrVec offsetTrans_;
 			SrVec offsetRot_;
 
-			glm::mat4x4 translation = glm::mat4x4();
-			glm::mat4x4 rotation = glm::mat4x4();
+			glm::mat4x4 translation = glm::mat4x4(1);
+			glm::mat4x4 rotation = glm::mat4x4(1);
 
 			if (shape->isStaticMesh())
 			{
@@ -299,8 +299,23 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 						const SrVec & offsetTrans	 		= (pawn->getVec3Attribute("blendShape.parentJointOffsetTrans"));
 						const SrVec & offsetRotoffsetRot	= (pawn->getVec3Attribute("blendShape.parentJointOffsetRot"));
 
-						offsetTrans_	= offsetTrans;
-						offsetRot_		= offsetRotoffsetRot;
+						SrQuat quat;
+						quat.set(offsetRotoffsetRot.x * M_PI / 180.0f, offsetRotoffsetRot.y * M_PI / 180.0f, offsetRotoffsetRot.z * M_PI / 180.0f);
+						SrMat mat;
+						quat.get_mat(mat);
+						mat.set_translation(offsetTrans);
+
+						SrMat finalMat = woMat * mat;
+
+						offsetTrans_ = finalMat.get_translation();
+						sr_euler_angles_xyz (finalMat, offsetRot_.x,  offsetRot_.y,  offsetRot_.z );
+						offsetRot_.x = offsetRot_.x * 180.0 / M_PI;
+						offsetRot_.y = offsetRot_.y * 180.0 / M_PI;
+						offsetRot_.z = offsetRot_.z * 180.0 / M_PI;
+
+
+						//offsetTrans_	= offsetTrans;
+						//offsetRot_		= offsetRotoffsetRot;
 
 						// Generates translation matrix for GLSL shader
 						translation = glm::translate(translation, glm::vec3(offsetTrans_.x,offsetTrans_.y,offsetTrans_.z));
@@ -310,12 +325,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 						rotation	= glm::rotate(rotation, offsetRot_.y, glm::vec3(0.0, 1.0, 0.0));
 						rotation	= glm::rotate(rotation, offsetRot_.z, glm::vec3(0.0, 0.0, 1.0));
 
-						//SrQuat quat;
-						//quat.set(offsetRot.x * M_PI / 180.0f, offsetRot.y * M_PI / 180.0f, offsetRot.z * M_PI / 180.0f);
-						//SrMat mat;
-						//quat.get_mat(mat);
-						//mat.set_translation(offsetTrans);
-						//glMultMatrix(mat);	
+						
 					}
 				}
 				else
