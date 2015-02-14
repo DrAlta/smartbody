@@ -1612,14 +1612,13 @@ void DeformableMeshInstance::cleanUp()
 }
 
 
-void DeformableMeshInstance::GPUblendShapes(SrVec trans, SrVec rot)
+void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4 rotation)
 {
 	DeformableMesh * _mesh		= this->getDeformableMesh();
 
-	glm::mat4x4 translation	= glm::mat4x4();
-	translation = glm::translate(translation, glm::vec3(20.0, 65.0, 0.0));
-	
-	glm::mat4x4 rotation	= glm::mat4x4();
+//	glm::mat4x4 translation	= glm::mat4x4();
+//	translation = glm::translate(translation, glm::vec3(20.0, 65.0, 0.0));
+//	glm::mat4x4 rotation	= glm::mat4x4();
 	
 	bool showMasks = false;
 
@@ -1958,9 +1957,9 @@ void DeformableMeshInstance::GPUblendShapes(SrVec trans, SrVec rot)
 
 	if (texIDs.size() > 0 && texIDs[0] != 0)
 	{
-		glm::mat4x4 translation	= glm::mat4x4();
-		glm::mat4x4 rotation	= glm::mat4x4();
-		translation = glm::translate(translation, glm::vec3(20.0, 65.0, 0.0));
+//		glm::mat4x4 translation	= glm::mat4x4();
+//		glm::mat4x4 rotation	= glm::mat4x4();
+//		translation = glm::translate(translation, glm::vec3(20.0, 65.0, 0.0));
 	
 
 
