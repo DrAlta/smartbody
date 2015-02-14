@@ -261,9 +261,7 @@ void SrGlRenderFuncs::renderBlendFace(DeformableMeshInstance* shape)
 // Renders static mesh WITHOUT Ogre3D
 void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool showSkinWeight  )
 {
-	
-
-	// Original code
+	bool USE_GPU_BLENDSHAPES = true;
 	
 	DeformableMesh* mesh = shape->getDeformableMesh();
     if (!mesh)
@@ -272,195 +270,251 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
         return; // no deformable mesh
     }
 
-	if (shape->isStaticMesh())
+	if(USE_GPU_BLENDSHAPES)
 	{
-		SmartBody::SBSkeleton* skel = shape->getSkeleton();
-		SmartBody::SBPawn* pawn		= skel->getPawn();
 
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
+			SrVec offsetTrans_;
+			SrVec offsetRot_;
 
-		const std::string& parentJoint = pawn->getStringAttribute("blendShape.parentJoint");
-		if (parentJoint != "")
-		{
-			SmartBody::SBJoint* joint = skel->getJointByName(parentJoint);
-			if (joint)
+			if (shape->isStaticMesh())
 			{
-				const SrMat& woMat = joint->gmat();
-				glMultMatrix(woMat);		
+				SmartBody::SBSkeleton* skel = shape->getSkeleton();
+				SmartBody::SBPawn* pawn		= skel->getPawn();
 
-				const SrVec& offsetTrans	= pawn->getVec3Attribute("blendShape.parentJointOffsetTrans");
-				const SrVec& offsetRot		= pawn->getVec3Attribute("blendShape.parentJointOffsetRot");
+				//glMatrixMode(GL_MODELVIEW);
+				//glPushMatrix();
 
-				SrQuat quat;
-				quat.set(offsetRot.x * M_PI / 180.0f, offsetRot.y * M_PI / 180.0f, offsetRot.z * M_PI / 180.0f);
-				SrMat mat;
-				quat.get_mat(mat);
-				mat.set_translation(offsetTrans);
-				glMultMatrix(mat);	
-			}
-		}
-		else
-		{
-			const SrMat& woMat = skel->root()->gmat();
-
-			glMultMatrix(woMat);
-		}
-
-		float meshScale = shape->getMeshScale();
-		glScalef(meshScale,meshScale,meshScale);
-	}
-
-	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
-	glEnable(GL_LIGHTING);
-	glEnable(GL_TEXTURE_2D);	
-	glEnable ( GL_ALPHA_TEST );
-	glEnable (GL_BLEND);
-#if !defined (__ANDROID__) && !defined(SB_IPHONE)
-	glDisable ( GL_POLYGON_SMOOTH );
-#endif
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glAlphaFunc ( GL_GREATER, 0.0f ) ;
-	glEnable(GL_CULL_FACE);
-	
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
-	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
-
-	if (shape->_deformPosBuf.size() > 0)
-	{
-		glEnableClientState(GL_VERTEX_ARRAY);
-		glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
-	}
-	if (mesh->normalBuf.size() > 0)
-	{
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);
-	}
-
-	if (showSkinWeight)
-	{
-		glDepthMask(GL_FALSE);
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->skinColorBuf[0]);		
-		//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
-		glDisable(GL_LIGHTING);
-	}
-	else if (mesh->hasVertexColor)
-	{
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);		
-		//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
-		glDisable(GL_LIGHTING);
-	}
-	else
-	{
-		glDisableClientState(GL_COLOR_ARRAY);
-		//glColorPointer(3,GL_FLOAT, 0,  NULL);		
-		//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
-		glEnable(GL_LIGHTING);
-	}
-		
-	if (mesh->texCoordBuf.size() > 0)
-	{
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
-		glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);   
-	}
-			
-
-	for (unsigned int i=0;i<subMeshList.size();i++)
-	{	
-		SbmSubMesh* subMesh = subMeshList[i];
-		glMaterial(subMesh->material);	
-		if (subMesh->material.useAlphaBlend)
-		{
-			glEnable(GL_ALPHA_TEST);
-			glEnable(GL_BLEND);
-			
-		}
-		else
-		{
-			glDisable(GL_ALPHA_TEST);
-			glDisable(GL_BLEND);
-		}
-
-		std::string texturesType = "static";
-		if (shape->getCharacter())
-			texturesType = shape->getCharacter()->getStringAttribute("texturesType");	
-
-		SmartBody::SBSkeleton* skel = shape->getSkeleton();
-		SmartBody::SBPawn* pawn		= skel->getPawn();
-		bool useTexBlend = pawn->getBoolAttribute("blendTexturesWithLighting");
-
-		if( texturesType == "static" || texturesType == "dynamic")
-		{
-			SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());		
-
-			if (tex && !showSkinWeight)
-			{
-				GLint activeTexture = -1;
-				glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
-			
-				if (activeTexture != GL_TEXTURE0)
-					glActiveTexture(GL_TEXTURE0);
-			
-				//	If we are using blended textures
-				glEnable(GL_TEXTURE_2D);	
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
-
-				if(!shape->getCharacter())
+				const std::string& parentJoint = pawn->getStringAttribute("blendShape.parentJoint");
+				if (parentJoint != "")
 				{
-					glBindTexture(GL_TEXTURE_2D, tex->getID());					
-				} 
-				else if (texturesType == "dynamic")
-				{
-					if(shape->_tempTexPairs != NULL)
+					SmartBody::SBJoint* joint = skel->getJointByName(parentJoint);
+					if (joint)
 					{
-						glBindTexture(GL_TEXTURE_2D, shape->_tempTexPairs[0]);
-						//std::cerr << "Using tex: " << shape->_tempTexPairs[0] << "\n";
-					}
-					else 
-					{
-						//LOG("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
-						glBindTexture(GL_TEXTURE_2D, tex->getID());
-					}
-					
-				}
-				else 		//	If blended textures not used, use neutral appearance				
-				{
-					glBindTexture(GL_TEXTURE_2D, tex->getID());
-					
-				}				
+						const SrMat& woMat = joint->gmat();
+						//glMultMatrix(woMat);		
 
-				if (useTexBlend)
-				{
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+						const SrVec & offsetTrans	 	= (pawn->getVec3Attribute("blendShape.parentJointOffsetTrans"));
+						const SrVec & offsetRotoffsetRot	= (pawn->getVec3Attribute("blendShape.parentJointOffsetRot"));
+
+						offsetTrans_	= offsetTrans;
+						offsetRot_		= offsetRotoffsetRot;
+						//SrQuat quat;
+						//quat.set(offsetRot.x * M_PI / 180.0f, offsetRot.y * M_PI / 180.0f, offsetRot.z * M_PI / 180.0f);
+						//SrMat mat;
+						//quat.get_mat(mat);
+						//mat.set_translation(offsetTrans);
+						//glMultMatrix(mat);	
+					}
 				}
 				else
 				{
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+					const SrMat& woMat = skel->root()->gmat();
+
+					//glMultMatrix(woMat);
 				}
-				//glColor4f(0.0f, 0.0f, 0.0f, 1.0);				
+
+				float meshScale = shape->getMeshScale();
+				//glScalef(meshScale,meshScale,meshScale);
 			}
-		}
-#if GLES_RENDER
-		glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &subMesh->triBuf[0]);
-#else
-		glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_INT, &subMesh->triBuf[0]);
-#endif
-		glBindTexture(GL_TEXTURE_2D,0);
-	}	
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_BLEND);	
-	if (shape->isStaticMesh())
-	{
-		glPopMatrix();
+
+
+
+		shape->GPUblendShapes(offsetTrans_, offsetRot_);
 	}
-	glDepthMask(GL_TRUE);
+	// no USE_GPU_BLENDSHAPES
+	else
+	{
+		
+			if (shape->isStaticMesh())
+			{
+				SmartBody::SBSkeleton* skel = shape->getSkeleton();
+				SmartBody::SBPawn* pawn		= skel->getPawn();
+
+				glMatrixMode(GL_MODELVIEW);
+				glPushMatrix();
+
+				const std::string& parentJoint = pawn->getStringAttribute("blendShape.parentJoint");
+				if (parentJoint != "")
+				{
+					SmartBody::SBJoint* joint = skel->getJointByName(parentJoint);
+					if (joint)
+					{
+						const SrMat& woMat = joint->gmat();
+						glMultMatrix(woMat);		
+
+						const SrVec& offsetTrans	= pawn->getVec3Attribute("blendShape.parentJointOffsetTrans");
+						const SrVec& offsetRot		= pawn->getVec3Attribute("blendShape.parentJointOffsetRot");
+
+						SrQuat quat;
+						quat.set(offsetRot.x * M_PI / 180.0f, offsetRot.y * M_PI / 180.0f, offsetRot.z * M_PI / 180.0f);
+						SrMat mat;
+						quat.get_mat(mat);
+						mat.set_translation(offsetTrans);
+						glMultMatrix(mat);	
+					}
+				}
+				else
+				{
+					const SrMat& woMat = skel->root()->gmat();
+
+					glMultMatrix(woMat);
+				}
+
+				float meshScale = shape->getMeshScale();
+				glScalef(meshScale,meshScale,meshScale);
+			}
+
+			std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
+			glEnable(GL_LIGHTING);
+			glEnable(GL_TEXTURE_2D);	
+			glEnable ( GL_ALPHA_TEST );
+			glEnable (GL_BLEND);
+			#if !defined (__ANDROID__) && !defined(SB_IPHONE)
+			glDisable ( GL_POLYGON_SMOOTH );
+			#endif
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glAlphaFunc ( GL_GREATER, 0.0f ) ;
+			glEnable(GL_CULL_FACE);
+	
+			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+			//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
+
+			if (shape->_deformPosBuf.size() > 0)
+			{
+				glEnableClientState(GL_VERTEX_ARRAY);
+				glVertexPointer(3, GL_FLOAT, 0, (GLfloat*)&shape->_deformPosBuf[0]);  
+			}
+			if (mesh->normalBuf.size() > 0)
+			{
+				glEnableClientState(GL_NORMAL_ARRAY);
+				glNormalPointer(GL_FLOAT, 0, (GLfloat*)&mesh->normalBuf[0]);
+			}
+
+			if (showSkinWeight)
+			{
+				glDepthMask(GL_FALSE);
+				glEnableClientState(GL_COLOR_ARRAY);
+				glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->skinColorBuf[0]);		
+				//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
+				glDisable(GL_LIGHTING);
+			}
+			else if (mesh->hasVertexColor)
+			{
+				glEnableClientState(GL_COLOR_ARRAY);
+				glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);		
+				//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
+				glDisable(GL_LIGHTING);
+			}
+			else
+			{
+				glDisableClientState(GL_COLOR_ARRAY);
+				//glColorPointer(3,GL_FLOAT, 0,  NULL);		
+				//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
+				glEnable(GL_LIGHTING);
+			}
+		
+			if (mesh->texCoordBuf.size() > 0)
+			{
+				glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
+				glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);   
+			}
+			
+
+			for (unsigned int i=0;i<subMeshList.size();i++)
+			{	
+				SbmSubMesh* subMesh = subMeshList[i];
+				glMaterial(subMesh->material);	
+				if (subMesh->material.useAlphaBlend)
+				{
+					glEnable(GL_ALPHA_TEST);
+					glEnable(GL_BLEND);
+			
+				}
+				else
+				{
+					glDisable(GL_ALPHA_TEST);
+					glDisable(GL_BLEND);
+				}
+
+				std::string texturesType = "static";
+				if (shape->getCharacter())
+					texturesType = shape->getCharacter()->getStringAttribute("texturesType");	
+
+				SmartBody::SBSkeleton* skel = shape->getSkeleton();
+				SmartBody::SBPawn* pawn		= skel->getPawn();
+				bool useTexBlend = pawn->getBoolAttribute("blendTexturesWithLighting");
+
+				if( texturesType == "static" || texturesType == "dynamic")
+				{
+					SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());		
+
+					if (tex && !showSkinWeight)
+					{
+						GLint activeTexture = -1;
+						glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+			
+						if (activeTexture != GL_TEXTURE0)
+							glActiveTexture(GL_TEXTURE0);
+			
+						//	If we are using blended textures
+						glEnable(GL_TEXTURE_2D);	
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+
+						if(!shape->getCharacter())
+						{
+							glBindTexture(GL_TEXTURE_2D, tex->getID());					
+						} 
+						else if (texturesType == "dynamic")
+						{
+							if(shape->_tempTexPairs != NULL)
+							{
+								glBindTexture(GL_TEXTURE_2D, shape->_tempTexPairs[0]);
+								//std::cerr << "Using tex: " << shape->_tempTexPairs[0] << "\n";
+							}
+							else 
+							{
+								//LOG("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
+								glBindTexture(GL_TEXTURE_2D, tex->getID());
+							}
+					
+						}
+						else 		//	If blended textures not used, use neutral appearance				
+						{
+							glBindTexture(GL_TEXTURE_2D, tex->getID());
+					
+						}				
+
+						if (useTexBlend)
+						{
+							glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+						}
+						else
+						{
+							glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+						}
+						//glColor4f(0.0f, 0.0f, 0.0f, 1.0);				
+					}
+				}
+			#if GLES_RENDER
+				glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &subMesh->triBuf[0]);
+			#else
+				glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_INT, &subMesh->triBuf[0]);
+			#endif
+				glBindTexture(GL_TEXTURE_2D,0);
+			}	
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glDisableClientState(GL_NORMAL_ARRAY);
+			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+			glDisable(GL_TEXTURE_2D);
+			glDisable(GL_BLEND);	
+			if (shape->isStaticMesh())
+			{
+				glPopMatrix();
+			}
+			glDepthMask(GL_TRUE);
+	}
 
 	SbmShaderProgram::printOglError("SrGlRenderFuncs::renderDeformableMesh FINAL");
 
