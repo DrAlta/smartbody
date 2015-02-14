@@ -11,6 +11,8 @@
 #include <sb/SBAsset.h>
 #include <sb/SBCharacter.h>
 
+#include "external/glm/glm/glm.hpp"
+
 #define USE_SKIN_WEIGHT_SIZE_8 0
 
 #ifdef WIN32
@@ -216,7 +218,7 @@ public:
 	SBAPI SmartBody::SBSkeleton* getSkeleton();	
 	SBAPI virtual void update();
 	SBAPI virtual void updateFast();
-	SBAPI virtual void GPUblendShapes(SrVec, SrVec);
+	SBAPI virtual void GPUblendShapes(glm::mat4x4, glm::mat4x4);
 	SBAPI virtual void blendShapes();
 	SBAPI DeformableMesh* getDeformableMesh() { return _mesh; }
 	SBAPI SmartBody::SBCharacter* getCharacter() { return _character; }

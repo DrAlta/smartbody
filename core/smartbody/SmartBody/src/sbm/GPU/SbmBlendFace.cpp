@@ -575,6 +575,18 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 
 void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program, glm::mat4x4 translation, glm::mat4x4 rotation)
 {
+	
+	
+  for (int j=0; j<4; j++)
+  {
+	for (int i=0; i<4; i++)	
+	{
+		printf("%f ",translation[i][j]);
+		}
+		printf("\n");
+  }	
+  printf("\n");
+
 	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
 
 	//glm::mat4x4 translation	= glm::mat4x4();

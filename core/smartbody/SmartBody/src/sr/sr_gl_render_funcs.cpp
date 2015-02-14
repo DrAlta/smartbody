@@ -276,6 +276,9 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			SrVec offsetTrans_;
 			SrVec offsetRot_;
 
+			glm::mat4x4 translation = glm::mat4x4();
+			glm::mat4x4 rotation = glm::mat4x4();
+
 			if (shape->isStaticMesh())
 			{
 				SmartBody::SBSkeleton* skel = shape->getSkeleton();
@@ -293,11 +296,20 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 						const SrMat& woMat = joint->gmat();
 						//glMultMatrix(woMat);		
 
-						const SrVec & offsetTrans	 	= (pawn->getVec3Attribute("blendShape.parentJointOffsetTrans"));
+						const SrVec & offsetTrans	 		= (pawn->getVec3Attribute("blendShape.parentJointOffsetTrans"));
 						const SrVec & offsetRotoffsetRot	= (pawn->getVec3Attribute("blendShape.parentJointOffsetRot"));
 
 						offsetTrans_	= offsetTrans;
 						offsetRot_		= offsetRotoffsetRot;
+
+						// Generates translation matrix for GLSL shader
+						translation = glm::translate(translation, glm::vec3(offsetTrans_.x,offsetTrans_.y,offsetTrans_.z));
+
+						// Generates rotation matrix for GLSL shader
+						rotation	= glm::rotate(rotation, offsetRot_.x, glm::vec3(1.0, 0.0, 0.0));
+						rotation	= glm::rotate(rotation, offsetRot_.y, glm::vec3(0.0, 1.0, 0.0));
+						rotation	= glm::rotate(rotation, offsetRot_.z, glm::vec3(0.0, 0.0, 1.0));
+
 						//SrQuat quat;
 						//quat.set(offsetRot.x * M_PI / 180.0f, offsetRot.y * M_PI / 180.0f, offsetRot.z * M_PI / 180.0f);
 						//SrMat mat;
@@ -319,7 +331,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 
 
 
-		shape->GPUblendShapes(offsetTrans_, offsetRot_);
+		shape->GPUblendShapes(translation, rotation);
 	}
 	// no USE_GPU_BLENDSHAPES
 	else
