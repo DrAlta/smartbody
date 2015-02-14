@@ -28,6 +28,12 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 
+#include "external/glm/glm/glm.hpp"
+#include "external/glm/glm/gtc/type_ptr.hpp"
+#include "external/glm/glm/gtc/matrix_transform.hpp"
+
+#include <boost/filesystem.hpp>
+
 #define TEST_HAIR_RENDER 1
 
 typedef std::pair<int,int> IntPair;
@@ -1605,6 +1611,381 @@ void DeformableMeshInstance::cleanUp()
 #endif
 }
 
+
+void DeformableMeshInstance::GPUblendShapes(SrVec trans, SrVec rot)
+{
+	DeformableMesh * _mesh		= this->getDeformableMesh();
+
+	glm::mat4x4 translation	= glm::mat4x4();
+	translation = glm::translate(translation, glm::vec3(20.0, 65.0, 0.0));
+	
+	glm::mat4x4 rotation	= glm::mat4x4();
+	
+	bool showMasks = false;
+
+	SrSnModel* writeToBaseModel = NULL;
+	SrSnModel* baseModel		= NULL;
+
+	int tex_h = 1024;
+	int tex_w = 1024;
+
+	// find the base shape from static meshes
+	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
+
+		//	Initializes vector of wieghts, of size (#shapes) 
+	std::vector<float> weights(_mesh->blendShapeMap.begin()->second.size(), 0);
+
+	//	Initializes vector of wieghts, of size (#shapes) each shape got a texture
+	std::vector<GLuint> texIDs(_mesh->blendShapeMap.begin()->second.size(), 0);
+
+	std::vector<std::string> texture_names(_mesh->blendShapeMap.begin()->second.size());
+
+
+	for (mIter = _mesh->blendShapeMap.begin(); mIter != _mesh->blendShapeMap.end(); ++mIter)
+	{
+		bool foundBaseModel = false;
+
+		for (size_t i = 0; i < _mesh->dMeshStatic_p.size(); ++i)
+		{
+			if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
+			{
+				//	If base shape, copies pointer to _mesh->dMeshStatic (here is where the result resulting vertices position are stored)
+				writeToBaseModel = _mesh->dMeshStatic_p[i];
+				break;
+			}
+		}
+
+		if (writeToBaseModel == NULL)
+		{
+			//LOG("base model to write to cannot be found");
+			continue;
+		}
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
+			{
+				baseModel		= mIter->second[i];
+				foundBaseModel	= true;
+				break;
+			}
+		}
+		if (baseModel == NULL)
+		{
+			LOG("original base model cannot be found");
+			continue;
+		}
+
+		/*
+		if (foundBaseModel && _character->getBoolAttribute("useOptimizedBlendShapes"))
+		{
+			if (_mesh->optimizedBlendShapeData.size() !=  mIter->second.size())
+			{
+				LOG("Optimizing blend shapes. Only have %d/%d shapes.", _mesh->optimizedBlendShapeData.size(), mIter->second.size());
+				_mesh->optimizedBlendShapeData.clear();
+				// optimize the blend shape maps as needed
+				for (size_t i = 0; i < mIter->second.size(); ++i)
+				{
+					_mesh->optimizedBlendShapeData.push_back(BlendShapeData());
+					if (i == 0)
+					{
+						continue;
+					}
+					if (!mIter->second[i])
+					{
+						continue;
+					}
+					BlendShapeData& blendData = _mesh->optimizedBlendShapeData[i];
+					SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
+					SrArray<SrPnt>& visemeN = mIter->second[i]->shape().N;
+
+
+					SrVec vVec;
+					SrVec nVec;
+					for (int v = 0; v < visemeV.size(); ++v)
+					{
+						vVec = visemeV[v] - neutralV[v];
+						if (fabs(vVec[0]) >  gwiz::epsilon4() ||
+							fabs(vVec[1]) >  gwiz::epsilon4() ||
+							fabs(vVec[2]) >  gwiz::epsilon4())
+						{
+							blendData.diffV.push_back(std::pair<int, SrVec>(v, vVec));
+						}
+					}
+					for (int n = 0; n < visemeN.size(); ++n)
+					{
+						nVec = visemeN[n] - neutralN[n];
+						if (fabs(nVec[0]) >  gwiz::epsilon4() ||
+							fabs(nVec[1]) >  gwiz::epsilon4() ||
+							fabs(nVec[2]) >  gwiz::epsilon4())	
+						{
+							blendData.diffN.push_back(std::pair<int, SrVec>(n, nVec));
+						}
+					}
+					LOG("Optimized blend %s has %d/%d vertices, %d/%d normals.", (const char*) mIter->second[i]->shape().name, blendData.diffV.size(), visemeV.size(), blendData.diffN.size(), visemeN.size());
+				}
+			}
+		}
+		*/
+/*
+		//	Initializes vector of wieghts, of size (#shapes) 
+		std::vector<float> weights(mIter->second.size(), 0);
+
+		//	Initializes vector of wieghts, of size (#shapes) each shape got a texture
+		std::vector<GLuint> texIDs(mIter->second.size(), 0);
+
+		std::vector<std::string> texture_names(mIter->second.size());
+
+		int tex_h = 1024;
+		int tex_w = 1024;
+*/
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if (!mIter->second[i])
+				continue;
+
+			float w = 0.0f;
+			float wLimit = 1.0f;
+			// get weight
+			std::stringstream ss;
+			ss << "blendShape.channelName." << (const char*)mIter->second[i]->shape().name;
+			std::stringstream ss1;
+			ss1 << "blendShape.channelWeightLimit." << (const char*)mIter->second[i]->shape().name;
+					
+			if (_character->hasAttribute(ss1.str()))
+			{
+				wLimit = (float)_character->getDoubleAttribute(ss1.str());
+			}
+
+			if (_character->hasAttribute(ss.str()))
+			{
+				const std::string& mappedCName	= _character->getStringAttribute(ss.str());
+				SmartBody::SBSkeleton* sbSkel	= _character->getSkeleton();
+				if (sbSkel && mappedCName != "")
+				{
+					SmartBody::SBJoint* joint = sbSkel->getJointByName(mappedCName);
+					if (joint)
+					{
+						SrVec pos = joint->getPosition();
+						w = pos.x;
+						//LOG("shape %s(%s) with weight %f", (const char*)mIter->second[i]->shape().name, mappedCName.c_str(), w);
+						// clamp
+						//if (w > wLimit)
+						//	w = wLimit;
+						
+						// multiplier
+						w = w * wLimit;
+					}
+				}
+			}
+			else
+				continue;
+
+			// Stores weights of each face
+			weights[i]		= w;
+
+
+			//std::cerr << "weights[" << i << "]: " << w << "\n";
+
+			/*
+			if (fabs(w) > gwiz::epsilon4())	// if it has weight
+			{
+				//LOG("blend in %s with weight %f", (const char*)mIter->second[i]->shape().name, w);
+				SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
+				SrArray<SrPnt>& visemeN = mIter->second[i]->shape().N;
+				if (visemeV.size() != neutralV.size())
+				{
+					LOG("number of vertices for %s is not same as neutral", mIter->first.c_str());
+					continue;
+				}
+				if (visemeN.size() != neutralN.size())
+				{
+					LOG("number of normals for %s is not same as neutral", mIter->first.c_str());
+					continue;
+				}
+
+				if (_character->getBoolAttribute("useOptimizedBlendShapes"))
+				{
+					// loop through a shorter list of different vertices and normals
+					BlendShapeData& blendData = _mesh->optimizedBlendShapeData[i];
+					int vSize = _mesh->optimizedBlendShapeData[i].diffV.size();
+					for (int v = 0; v < vSize; ++v)
+					{
+						int index	= blendData.diffV[v].first;
+						SrVec& diff = blendData.diffV[v].second;
+						newV[index] = newV[index] + diff * w;
+					}
+					int nSize = _mesh->optimizedBlendShapeData[i].diffN.size();
+					for (int n = 0; n < nSize; ++n)
+					{
+						int index	= blendData.diffN[n].first;
+						SrVec& diff = blendData.diffN[n].second;
+						newN[index] = newN[index] + diff * w;
+					}
+				}
+				else
+				{
+					// loop through all vertices and normals
+					for (int v = 0; v < visemeV.size(); ++v)
+					{
+						SrPnt diff = visemeV[v] - neutralV[v];
+						if (fabs(diff[0]) >  gwiz::epsilon4() ||
+							fabs(diff[1]) >  gwiz::epsilon4() ||
+							fabs(diff[2]) >  gwiz::epsilon4())	
+							newV[v] = newV[v] + diff * w;
+					}
+					for (int n = 0; n < visemeN.size(); ++n)
+					{
+						SrPnt diff = visemeN[n] - neutralN[n];
+						if (fabs(diff[0]) >  gwiz::epsilon4() ||
+							fabs(diff[1]) >  gwiz::epsilon4() ||
+							fabs(diff[2]) >  gwiz::epsilon4())	
+							newN[n] = newN[n] + diff * w;
+					}
+				}
+			}
+			*/
+		}
+		
+		/*
+		for (int n = 0; n < newN.size(); ++n)
+		{
+			newN[n].normalize();
+		}
+		*/
+
+		// Starts computing blended textures
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if (!mIter->second[i])
+				continue;
+
+			//	Gets the map of (material name, texture) for the current mesh
+			std::vector<std::string> materials;
+			std::map<std::string, std::string> textures_map = mIter->second[i]->shape().mtlTextureNameMap;
+			for(std::map<std::string,std::string>::iterator it = textures_map.begin(); it != textures_map.end(); ++it) {
+				materials.push_back(it->first);
+			}
+
+			//	In a face there will be just one texture, material name will be always the first
+			std::string matName = "";
+			if (materials.size() > 0)
+				matName = materials[0];
+
+			// If base model
+			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
+			{
+				std::string fileName = (std::string)mIter->second[i]->shape().mtlTextureNameMap[matName];
+				SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, fileName.c_str());
+				if (tex)
+				{
+					texIDs[i]		= tex->getID();
+					texture_names[i]= fileName;
+					//std::cerr << "Retriving texture " << matName << "\ttexIDs[" << i << "]: " << texIDs[i] << "\n";
+
+					tex_h			= tex->getHeight();
+					tex_w			= tex->getWidth();
+				} 
+				else
+				{
+					texIDs[i] = 0;
+				}
+				continue;	// don't do anything about base model
+			}
+
+			// Rest of the models
+			std::string fileName = (std::string)mIter->second[i]->shape().mtlTextureNameMap[matName];
+			SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, fileName.c_str());
+			if (tex)
+			{
+				texIDs[i]		= tex->getID();
+				
+				texture_names[i]= fileName;
+				//std::cout << "Retriving texture " << matName << "\ttexIDs[" << i << "]: " << texIDs[i] << "\n";
+			}
+			else
+			{
+				texIDs[i] =  0;
+			}
+		}
+	}
+
+	// Aux textures used when calling BlendAllAppearancesPairwise to store temporary results for texture blending pair wise
+	if(_tempTexPairs == NULL) 
+	{
+		_tempTexPairs = new GLuint[weights.size()];
+		glGenTextures(weights.size(), _tempTexPairs);
+		for(int i=0; i<weights.size(); i++) {
+			glBindTexture(GL_TEXTURE_2D, _tempTexPairs[i]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_w, tex_h, 0, GL_RGB, GL_FLOAT, NULL);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+	}
+
+
+	if(_tempFBOTexWithMask == NULL) 
+	{
+		_tempFBOTexWithMask = new GLuint[weights.size()];
+		glGenFramebuffers(weights.size(), _tempFBOTexWithMask);
+	}
+
+	// If images with masks in the alpha channel have not been created
+	if(_tempTexWithMask == NULL)
+	{
+		_tempTexWithMask = new GLuint[weights.size()];
+		glGenTextures(weights.size(), _tempTexWithMask);
+		for(int i=0; i<weights.size(); i++) 
+		{
+			glBindTexture(GL_TEXTURE_2D, _tempTexWithMask[i]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT, NULL);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
+		// Adds masking images to the alpha channel of the textures
+		SbmBlendTextures::ReadMasks(_tempFBOTexWithMask, _tempTexWithMask, weights, texIDs, texture_names, SbmBlendTextures::getShader("ReadMasks"), tex_w, tex_h); 
+	}
+
+
+
+	if (texIDs.size() > 0 && texIDs[0] != 0)
+	{
+		glm::mat4x4 translation	= glm::mat4x4();
+		glm::mat4x4 rotation	= glm::mat4x4();
+		translation = glm::translate(translation, glm::vec3(20.0, 65.0, 0.0));
+	
+
+
+		SbmShaderProgram::printOglError("texIDs.size() > 0 ");
+
+		// New attempt to blend textures with masks (also renders a face). It uses the _tempTexWithMask, which are the texture maps with the masking encoded in its ALPHA channel.
+		// The _tempTexWithMask texture were created above in the SbmBlendTextures::ReadMasks call
+		//SbmBlendTextures::ReadMasks(_tempFBOTexWithMask, _tempTexWithMask, weights, texIDs, texture_names, SbmBlendTextures::getShader("ReadMasks"), tex_w, tex_h);
+		SbmBlendTextures::BlendGeometryWithMasks( _tempFBOTexWithMask, weights, _tempTexWithMask, texture_names, this,  SbmBlendTextures::getShader("BlendGeometryWithMasks"), translation, rotation);
+
+		// Blends geometry and texture in the same GLSL (also renders a face) (this does NOT use masking)
+		//SbmBlendTextures::BlendGeometry( _tempFBOPairs, weights, texIDs, texture_names, this,  SbmBlendTextures::getShader("BlendGeometry"));
+
+		// Computes blended texture pairwise, and saves it into _tempTexPairs[0], which is going to be used later as a texture (in the normal blendshape pipeline)
+		SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), tex_w, tex_h);
+	}
+	
+	
+	
+
+
+	
+
+}
+
 void DeformableMeshInstance::blendShapes()
 {
 
@@ -2000,13 +2381,13 @@ void DeformableMeshInstance::blendShapes()
 			// New attempt to blend textures with masks (also renders a face). It uses the _tempTexWithMask, which are the texture maps with the masking encoded in its ALPHA channel.
 			// The _tempTexWithMask texture were created above in the SbmBlendTextures::ReadMasks call
 			//SbmBlendTextures::ReadMasks(_tempFBOTexWithMask, _tempTexWithMask, weights, texIDs, texture_names, SbmBlendTextures::getShader("ReadMasks"), tex_w, tex_h);
-			SbmBlendTextures::BlendGeometryWithMasks( _tempFBOTexWithMask, weights, _tempTexWithMask, texture_names, this,  SbmBlendTextures::getShader("BlendGeometryWithMasks"));
+			//SbmBlendTextures::BlendGeometryWithMasks( _tempFBOTexWithMask, weights, _tempTexWithMask, texture_names, this,  SbmBlendTextures::getShader("BlendGeometryWithMasks"));
 
 			// Blends geometry and texture in the same GLSL (also renders a face) (this does NOT use masking)
 			//SbmBlendTextures::BlendGeometry( _tempFBOPairs, weights, texIDs, texture_names, this,  SbmBlendTextures::getShader("BlendGeometry"));
 
 			// Computes blended texture pairwise, and saves it into _tempTexPairs[0], which is going to be used later as a texture (in the normal blendshape pipeline)
-			SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), tex_w, tex_h);
+			//SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), tex_w, tex_h);
 		}
 #endif
 		// END OF SECOND ATTEMPT

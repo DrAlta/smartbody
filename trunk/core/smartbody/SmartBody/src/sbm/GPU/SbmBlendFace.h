@@ -4,6 +4,10 @@
 #include "SbmShader.h"
 #include "VBOData.h"
 
+#include "external/glm/glm/glm.hpp"
+#include "external/glm/glm/gtc/type_ptr.hpp"
+#include "external/glm/glm/gtc/matrix_transform.hpp"
+
 #if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD)
 #include "external/glew/glew.h"
 #include "TBOData.h"
@@ -68,7 +72,7 @@ class SbmBlendTextures
 		static void BlendGeometry(GLuint * FBODst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance/*_mesh*/, GLuint program);
 		
 		static void ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, GLuint program, int w, int h);
-		static void BlendGeometryWithMasks(GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program);
+		static void BlendGeometryWithMasks(GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program, glm::mat4x4 translation, glm::mat4x4 rotation);
 
 
 		GLuint			_vsID;
