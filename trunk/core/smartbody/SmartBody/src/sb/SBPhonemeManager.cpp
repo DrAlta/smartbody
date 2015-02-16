@@ -6,6 +6,7 @@
 #include <vhcl.h>
 #include <fstream>
 #include <cctype>
+#include <cstring>
 
 namespace SmartBody {
 
