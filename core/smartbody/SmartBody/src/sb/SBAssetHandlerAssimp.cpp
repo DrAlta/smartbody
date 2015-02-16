@@ -407,7 +407,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 
 		SBSkeleton* lastSkeleton = NULL;
 
-		if (scene->HasMeshes())
+		if (1) //scene->HasMeshes())
 		{
 #if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__)
 			SbmDeformableMeshGPU* mesh = new SbmDeformableMeshGPU();
@@ -647,6 +647,8 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				aiNode* node = scene->mRootNode->FindNode((*bonesIter).c_str());
 				recurseAddMissing(node, skeletonBones);
 			}
+
+
 
 			// determine the skeleton
 			// create a new skeleton hierarchy consisting only of bones used for models
@@ -1092,7 +1094,7 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 				SBMotion* motion = new SBMotion();
 				strstr.str("");
 				
-				motion->setName(animation->mName.C_Str());
+				motion->setName(basename + extension + animation->mName.C_Str());
 				if (motion->getName() == "")
 				{
 					strstr << mesh->getName() << a;
@@ -1106,6 +1108,14 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 				{
 					aiNodeAnim* nodeAnim = animation->mChannels[c];
 					std::string channelName = nodeAnim->mNodeName.C_Str();
+
+					if (channelName.find("_$AssimpFbx$_") != std::string::npos)
+					{
+						// ignore keys on auto-created bones
+						// this may cause problems... :(
+						//continue;
+					}
+
 
 					if (nodeAnim->mNumPositionKeys > 0)
 					{
@@ -1130,6 +1140,13 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 				{
 					aiNodeAnim* nodeAnim = animation->mChannels[c];
 					std::string channelName = nodeAnim->mNodeName.C_Str();
+
+					if (channelName.find("_$AssimpFbx$_") != std::string::npos)
+					{
+						// ignore keys on auto-created bones
+						// this may cause problems... :(
+						//continue;
+					}
 
 					// get the joint and subtract the joint offset
 					SBJoint* joint = NULL;
@@ -1169,7 +1186,10 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 				assets.push_back(motion);
 			}	
 
-			assets.push_back(mesh);
+			if (scene->HasMeshes())
+				assets.push_back(mesh);
+			else
+				delete mesh;
 		}
 		
  		
