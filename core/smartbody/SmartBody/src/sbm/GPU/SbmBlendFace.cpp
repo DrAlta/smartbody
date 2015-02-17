@@ -581,7 +581,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
   {
 	for (int i=0; i<4; i++)	
 	{
-		printf("%f ",translation[i][j]);
+		printf("%f ",rotation[i][j]);
 		}
 		printf("\n");
   }	
@@ -600,6 +600,8 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 	{
 		SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
 		SmartBody::SBPawn* pawn		= skel->getPawn();
+
+		/*
 		const std::string& parentJoint = pawn->getStringAttribute("blendShape.parentJoint");
 		if (parentJoint != "")
 		{
@@ -618,6 +620,8 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 				rotation	= glm::rotate(rotation, offsetRot.z, glm::vec3(0.0, 0.0, 1.0));
 			}
 		}
+		*/
+
 		showMasks	= pawn->getBoolAttribute("blendShape.showMasks");
 	}
 
@@ -732,7 +736,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		GLuint uWeights			= glGetUniformLocation(program, "uWeights");
 		GLuint uBorderVertices	= glGetUniformLocation(program, "uBorderVertices");
 		GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
-		GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
+		//GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
 		GLuint uRotate			= glGetUniformLocation(program, "uRotate");
 		GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
 		GLuint uShowMasks		= glGetUniformLocation(program, "uShowMasks");
@@ -765,7 +769,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 
 		glUniformMatrix4fv(uMatrixMV, 1, GL_FALSE, modelview_matrix);
 		glUniformMatrix4fv(uMatrixProj, 1, GL_FALSE, projection_matrix);
-		glUniformMatrix4fv(uTranslate, 1, GL_FALSE, glm::value_ptr(translation));
+		//glUniformMatrix4fv(uTranslate, 1, GL_FALSE, glm::value_ptr(translation));
 		glUniformMatrix4fv(uRotate, 1, GL_FALSE, glm::value_ptr(rotation));
 		glUniform1fv(uWeights, usedWeights.size(), w);
 		glUniform1i(uNumberOfShapes, usedWeights.size());
