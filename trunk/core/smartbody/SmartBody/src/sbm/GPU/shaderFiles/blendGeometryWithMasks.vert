@@ -4,7 +4,7 @@
 
 uniform mat4		uMatrixMV;
 uniform mat4 		uMatrixProj;
-uniform mat4 		uTranslate;
+//uniform mat4 		uTranslate;
 uniform mat4 		uRotate;
 uniform float		uWeights[MAX_SHAPES];
 uniform int			uNumberOfShapes;
@@ -48,7 +48,8 @@ void main()
 	//	Computes vertex point in world coordinates
 	for(int i=0; i < uNumberOfShapes; i++)
 	{
-		pos_shape[i]	= uMatrixProj * uMatrixMV * uTranslate * uRotate  * vec4(aVertexPosition[i], 1.0); 
+		//pos_shape[i]	= uMatrixProj * uMatrixMV * uTranslate * uRotate  * vec4(aVertexPosition[i], 1.0); 
+		pos_shape[i]	= uMatrixProj * uMatrixMV * uRotate  * vec4(aVertexPosition[i], 1.0); 
 	}
 
 	//	Differente of each shape wrt neutral
