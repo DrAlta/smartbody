@@ -64,40 +64,8 @@ void main()
 
 	for(int i=1; i < uNumberOfShapes; i++)
 	{
-
 		interpolatedWeight = uWeights[i] * tex[i].a;
-
 		result_shape = result_shape + diff_shape[i] * interpolatedWeight;
-
-		// Full face
-		//if(uAreas[i] == 0)
-		//{
-		//	result_shape = result_shape + diff_shape[i] * uWeights[i];
-		//}
-		//// Upper face
-		//else if(uAreas[i] == 1)
-		//{
-		//	if(texCoords.y > 0.45)
-		//	{
-		//		float MIN_Y = 0.45;
-		//		float MAX_Y = 0.55;
-		//		float interpolatedWeight = uWeights[i] * clamp((texCoords.y - MIN_Y)/(MAX_Y - MIN_Y), 0.0, 1.0);
-
-		//		result_shape = result_shape + diff_shape[i] * interpolatedWeight;
-		//	}
-		//}
-		//// Lower face
-		//else if(uAreas[i] == 2)
-		//{
-		//	if(texCoords.y < 0.55)
-		//	{
-		//		float MIN_Y = 0.45;
-		//		float MAX_Y = 0.55;
-		//		float interpolatedWeight = uWeights[i] * clamp((abs(texCoords.y - MAX_Y))/(abs(MIN_Y - MAX_Y)), 0.0, 1.0);
-
-		//		result_shape = result_shape + diff_shape[i] * interpolatedWeight;
-		//	}
-		//}
 	}
 
 	gl_Position = result_shape;

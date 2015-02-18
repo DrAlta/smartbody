@@ -701,19 +701,22 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		GLuint uRotate			= glGetUniformLocation(program, "uRotate");
 		GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
 		GLuint uShowMasks		= glGetUniformLocation(program, "uShowMasks");
-
+		GLuint uUsedShapeIDs	= glGetUniformLocation(program, "uUsedShapeIDs");
 
 		int * image_array		= new int[MAX_SHAPES];
 		float * w				= new float[usedWeights.size()];
-		
+		int * usedShapesID_array = new int[usedShapeIDs.size()];
+
 		for(int i=0; i<MAX_SHAPES; i++)
 		{
 			if(i < usedWeights.size())
 			{
 				glActiveTexture(GL_TEXTURE0 + i);
 				glBindTexture(GL_TEXTURE_2D, texIDs[usedShapeIDs[i]]);
-				image_array[i]	= i;
-				w[i]			= usedWeights[i];
+
+				image_array[i]			= i;
+				w[i]					= usedWeights[i];
+				usedShapesID_array[i]	= usedShapeIDs[i];
 			}
 			// Textures not used, but we still need to pass 15 textures to the fragment shader for completeness
 			else
@@ -733,6 +736,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		//glUniformMatrix4fv(uTranslate, 1, GL_FALSE, glm::value_ptr(translation));
 		glUniformMatrix4fv(uRotate, 1, GL_FALSE, glm::value_ptr(rotation));
 		glUniform1fv(uWeights, usedWeights.size(), w);
+		glUniform1iv(uUsedShapeIDs, usedShapeIDs.size(), usedShapesID_array);
 		glUniform1i(uNumberOfShapes, usedWeights.size());
 		glUniform1iv(uNeutralSampler, MAX_SHAPES, image_array);
 		glUniform1i(uBorderVertices,  14);
