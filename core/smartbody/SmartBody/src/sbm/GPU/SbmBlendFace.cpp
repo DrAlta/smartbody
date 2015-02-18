@@ -583,7 +583,15 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 	{
 		SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
 		SmartBody::SBPawn* pawn		= skel->getPawn();
-		showMasks	= pawn->getBoolAttribute("blendShape.showMasks");
+		SmartBody::SBAttribute* maskAttribute = pawn->getAttribute("blendShape.showMasks");
+		if (!maskAttribute)
+		{
+			showMasks = false;
+		}
+		else
+		{
+			showMasks	= pawn->getBoolAttribute("blendShape.showMasks");
+		}
 	}
 
 	SbmShaderProgram::printOglError("SbmBlendTextures::BlendGeometry #0");
