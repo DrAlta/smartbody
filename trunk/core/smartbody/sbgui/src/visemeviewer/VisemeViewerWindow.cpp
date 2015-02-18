@@ -1485,7 +1485,7 @@ std::string VisemeViewerWindow::translateWordsToPhonemes(const std::string& utte
 	}
 
 	std::string phonemes = strstr.str();
-	std::transform(phonemes.begin(), phonemes.end(), phonemes.begin(), tolower);
+	std::transform(phonemes.begin(), phonemes.end(), phonemes.begin(), ::tolower);
 
 	return phonemes;
 }
@@ -1579,7 +1579,7 @@ void VisemeViewerWindow::OnGenerateLipSyncCB(Fl_Widget* widget, void* data)
 			{
 				std::string fileExtension = boost::filesystem::extension((*dir_iter).path());
 
-				std::transform(fileExtension.begin(), fileExtension.end(), fileExtension.begin(), toupper);
+				std::transform(fileExtension.begin(), fileExtension.end(), fileExtension.begin(), ::toupper);
 				if (fileExtension == ".WAV")
 				{
 					filesToProcess.push_back((*dir_iter).path());
