@@ -7,9 +7,15 @@
 #include <map>
 #include "SBService.h"
 
-namespace SmartBody{
+namespace SmartBody {
 
 class SBDiphone;
+
+SBAPI struct RealTimePhoneme {
+	std::string phoneme;
+	double time;
+};
+
 
 class SBPhonemeManager : public SBService
 {
@@ -20,7 +26,7 @@ class SBPhonemeManager : public SBService
 		SBAPI virtual void setEnable(bool val);
 		SBAPI void setPhonemesRealtime(const std::string& character, const std::string& phoneme);
 		SBAPI void clearPhonemesRealtime(const std::string& character, const std::string& phoneme);
-		SBAPI std::vector<std::string> getPhonemesRealtime(const std::string& character, const std::string& phoneme);
+		SBAPI std::vector<RealTimePhoneme> getPhonemesRealtime(const std::string& character, const std::string& phoneme);
 		
 		SBAPI std::vector<std::string> getCommonPhonemes();
 	
@@ -49,10 +55,11 @@ class SBPhonemeManager : public SBService
 		std::map<std::string, std::vector<SBDiphone*> > _diphoneMap;
 		std::map<std::string, std::string> _phonemeToCommonPhonemeMap;
 		std::map<std::string, std::map<std::string, std::vector<std::string> > > _wordToPhonemeMaps;
-		std::vector<std::string> _emptyPhonemes;
+		std::vector<std::string> _emptyPhonemeSet;
+		std::vector<RealTimePhoneme> _emptyPhonemes;
 		std::map<std::string, std::string> _dictionaryFileMap;
 
-		std::map<std::string, std::vector<std::string> > _realtimePhonemes;
+		std::map<std::string, std::vector<RealTimePhoneme> > _realtimePhonemes;
 };
 
 }

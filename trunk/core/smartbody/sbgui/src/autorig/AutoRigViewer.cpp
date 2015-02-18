@@ -405,7 +405,7 @@ void SkinViewer::drawSkinWeight()
 
 	if (!mesh)
 	{
-		LOG("Render SkinWeight ERR: no deformable mesh found!");
+		//LOG("Render SkinWeight ERR: no deformable mesh found!");
 		return; // no deformable mesh
 	}
 	//SrGlRenderFuncs::render_model(mesh->dMeshStatic_p[0]);

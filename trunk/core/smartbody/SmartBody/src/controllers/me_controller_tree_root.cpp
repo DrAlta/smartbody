@@ -412,6 +412,9 @@ public:
 	 *  Evaluates all the controllers.
 	 */
 	void evaluate( double time ) {
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SmartBody::SBProfiler* profiler = scene->getProfiler();
+
 		SR_ASSERT( _state!=REMAPPING );  // simple lock
 		if( _state==INVALID ) {
 			remapFrameData();
@@ -430,7 +433,11 @@ public:
 		//          _controllers.end(),
 		//          Evaluate_Func( time, _frame_data ) );
 		for (unsigned int i=0;i<_controllers.size();i++)
+		{
+			profiler->mark_time("controllers", 1, _controllers[i]->getName().c_str(), SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 			_controllers[i]->evaluate(time,_frame_data);
+			profiler->mark("controllers");
+		}
 
 		if( _logger )
 			_logger->context_post_evaluate( time, *this, _frame_data );
