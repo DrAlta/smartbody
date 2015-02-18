@@ -1615,10 +1615,6 @@ void DeformableMeshInstance::cleanUp()
 void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4 rotation)
 {
 	DeformableMesh * _mesh		= this->getDeformableMesh();
-
-//	glm::mat4x4 translation	= glm::mat4x4();
-//	translation = glm::translate(translation, glm::vec3(20.0, 65.0, 0.0));
-//	glm::mat4x4 rotation	= glm::mat4x4();
 	
 	bool showMasks = false;
 
@@ -1674,69 +1670,6 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 			continue;
 		}
 
-		/*
-		if (foundBaseModel && _character->getBoolAttribute("useOptimizedBlendShapes"))
-		{
-			if (_mesh->optimizedBlendShapeData.size() !=  mIter->second.size())
-			{
-				LOG("Optimizing blend shapes. Only have %d/%d shapes.", _mesh->optimizedBlendShapeData.size(), mIter->second.size());
-				_mesh->optimizedBlendShapeData.clear();
-				// optimize the blend shape maps as needed
-				for (size_t i = 0; i < mIter->second.size(); ++i)
-				{
-					_mesh->optimizedBlendShapeData.push_back(BlendShapeData());
-					if (i == 0)
-					{
-						continue;
-					}
-					if (!mIter->second[i])
-					{
-						continue;
-					}
-					BlendShapeData& blendData = _mesh->optimizedBlendShapeData[i];
-					SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
-					SrArray<SrPnt>& visemeN = mIter->second[i]->shape().N;
-
-
-					SrVec vVec;
-					SrVec nVec;
-					for (int v = 0; v < visemeV.size(); ++v)
-					{
-						vVec = visemeV[v] - neutralV[v];
-						if (fabs(vVec[0]) >  gwiz::epsilon4() ||
-							fabs(vVec[1]) >  gwiz::epsilon4() ||
-							fabs(vVec[2]) >  gwiz::epsilon4())
-						{
-							blendData.diffV.push_back(std::pair<int, SrVec>(v, vVec));
-						}
-					}
-					for (int n = 0; n < visemeN.size(); ++n)
-					{
-						nVec = visemeN[n] - neutralN[n];
-						if (fabs(nVec[0]) >  gwiz::epsilon4() ||
-							fabs(nVec[1]) >  gwiz::epsilon4() ||
-							fabs(nVec[2]) >  gwiz::epsilon4())	
-						{
-							blendData.diffN.push_back(std::pair<int, SrVec>(n, nVec));
-						}
-					}
-					LOG("Optimized blend %s has %d/%d vertices, %d/%d normals.", (const char*) mIter->second[i]->shape().name, blendData.diffV.size(), visemeV.size(), blendData.diffN.size(), visemeN.size());
-				}
-			}
-		}
-		*/
-/*
-		//	Initializes vector of wieghts, of size (#shapes) 
-		std::vector<float> weights(mIter->second.size(), 0);
-
-		//	Initializes vector of wieghts, of size (#shapes) each shape got a texture
-		std::vector<GLuint> texIDs(mIter->second.size(), 0);
-
-		std::vector<std::string> texture_names(mIter->second.size());
-
-		int tex_h = 1024;
-		int tex_w = 1024;
-*/
 		for (size_t i = 0; i < mIter->second.size(); ++i)
 		{
 			if (!mIter->second[i])
@@ -1781,76 +1714,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 
 			// Stores weights of each face
 			weights[i]		= w;
-
-
-			//std::cerr << "weights[" << i << "]: " << w << "\n";
-
-			/*
-			if (fabs(w) > gwiz::epsilon4())	// if it has weight
-			{
-				//LOG("blend in %s with weight %f", (const char*)mIter->second[i]->shape().name, w);
-				SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
-				SrArray<SrPnt>& visemeN = mIter->second[i]->shape().N;
-				if (visemeV.size() != neutralV.size())
-				{
-					LOG("number of vertices for %s is not same as neutral", mIter->first.c_str());
-					continue;
-				}
-				if (visemeN.size() != neutralN.size())
-				{
-					LOG("number of normals for %s is not same as neutral", mIter->first.c_str());
-					continue;
-				}
-
-				if (_character->getBoolAttribute("useOptimizedBlendShapes"))
-				{
-					// loop through a shorter list of different vertices and normals
-					BlendShapeData& blendData = _mesh->optimizedBlendShapeData[i];
-					int vSize = _mesh->optimizedBlendShapeData[i].diffV.size();
-					for (int v = 0; v < vSize; ++v)
-					{
-						int index	= blendData.diffV[v].first;
-						SrVec& diff = blendData.diffV[v].second;
-						newV[index] = newV[index] + diff * w;
-					}
-					int nSize = _mesh->optimizedBlendShapeData[i].diffN.size();
-					for (int n = 0; n < nSize; ++n)
-					{
-						int index	= blendData.diffN[n].first;
-						SrVec& diff = blendData.diffN[n].second;
-						newN[index] = newN[index] + diff * w;
-					}
-				}
-				else
-				{
-					// loop through all vertices and normals
-					for (int v = 0; v < visemeV.size(); ++v)
-					{
-						SrPnt diff = visemeV[v] - neutralV[v];
-						if (fabs(diff[0]) >  gwiz::epsilon4() ||
-							fabs(diff[1]) >  gwiz::epsilon4() ||
-							fabs(diff[2]) >  gwiz::epsilon4())	
-							newV[v] = newV[v] + diff * w;
-					}
-					for (int n = 0; n < visemeN.size(); ++n)
-					{
-						SrPnt diff = visemeN[n] - neutralN[n];
-						if (fabs(diff[0]) >  gwiz::epsilon4() ||
-							fabs(diff[1]) >  gwiz::epsilon4() ||
-							fabs(diff[2]) >  gwiz::epsilon4())	
-							newN[n] = newN[n] + diff * w;
-					}
-				}
-			}
-			*/
 		}
-		
-		/*
-		for (int n = 0; n < newN.size(); ++n)
-		{
-			newN[n].normalize();
-		}
-		*/
 
 		// Starts computing blended textures
 		for (size_t i = 0; i < mIter->second.size(); ++i)
@@ -1925,7 +1789,6 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 		}
 	}
 
-
 	if(_tempFBOTexWithMask == NULL) 
 	{
 		_tempFBOTexWithMask = new GLuint[weights.size()];
@@ -1957,17 +1820,11 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 
 	if (texIDs.size() > 0 && texIDs[0] != 0)
 	{
-//		glm::mat4x4 translation	= glm::mat4x4();
-//		glm::mat4x4 rotation	= glm::mat4x4();
-//		translation = glm::translate(translation, glm::vec3(20.0, 65.0, 0.0));
-	
-
 
 		SbmShaderProgram::printOglError("texIDs.size() > 0 ");
 
 		// New attempt to blend textures with masks (also renders a face). It uses the _tempTexWithMask, which are the texture maps with the masking encoded in its ALPHA channel.
 		// The _tempTexWithMask texture were created above in the SbmBlendTextures::ReadMasks call
-		//SbmBlendTextures::ReadMasks(_tempFBOTexWithMask, _tempTexWithMask, weights, texIDs, texture_names, SbmBlendTextures::getShader("ReadMasks"), tex_w, tex_h);
 		SbmBlendTextures::BlendGeometryWithMasks( _tempFBOTexWithMask, weights, _tempTexWithMask, texture_names, this,  SbmBlendTextures::getShader("BlendGeometryWithMasks"), translation, rotation);
 
 		// Blends geometry and texture in the same GLSL (also renders a face) (this does NOT use masking)
@@ -1976,13 +1833,6 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 		// Computes blended texture pairwise, and saves it into _tempTexPairs[0], which is going to be used later as a texture (in the normal blendshape pipeline)
 		SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), tex_w, tex_h);
 	}
-	
-	
-	
-
-
-	
-
 }
 
 void DeformableMeshInstance::blendShapes()

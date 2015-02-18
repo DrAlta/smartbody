@@ -575,53 +575,14 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 
 void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program, glm::mat4x4 translation, glm::mat4x4 rotation)
 {
-	
-	
-  for (int j=0; j<4; j++)
-  {
-	for (int i=0; i<4; i++)	
-	{
-		printf("%f ",rotation[i][j]);
-		}
-		printf("\n");
-  }	
-  printf("\n");
-
 	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
 
-	//glm::mat4x4 translation	= glm::mat4x4();
-	//translation = glm::translate(translation, glm::vec3(20.0, 65.0, 0.0));
-	
-	//glm::mat4x4 rotation	= glm::mat4x4();
-	
 	bool showMasks = false;
 
 	if (meshInstance->isStaticMesh())
 	{
 		SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
 		SmartBody::SBPawn* pawn		= skel->getPawn();
-
-		/*
-		const std::string& parentJoint = pawn->getStringAttribute("blendShape.parentJoint");
-		if (parentJoint != "")
-		{
-			SmartBody::SBJoint* joint = skel->getJointByName(parentJoint);
-			if (joint)
-			{
-				const SrVec& offsetTrans	= pawn->getVec3Attribute("blendShape.parentJointOffsetTrans");
-				const SrVec& offsetRot		= pawn->getVec3Attribute("blendShape.parentJointOffsetRot");
-
-				// Generates translation matrix for GLSL shader
-				translation = glm::translate(translation, glm::vec3(offsetTrans.x,offsetTrans.y,offsetTrans.z));
-
-				// Generates rotation matrix for GLSL shader
-				rotation	= glm::rotate(rotation, offsetRot.x, glm::vec3(1.0, 0.0, 0.0));
-				rotation	= glm::rotate(rotation, offsetRot.y, glm::vec3(0.0, 1.0, 0.0));
-				rotation	= glm::rotate(rotation, offsetRot.z, glm::vec3(0.0, 0.0, 1.0));
-			}
-		}
-		*/
-
 		showMasks	= pawn->getBoolAttribute("blendShape.showMasks");
 	}
 
