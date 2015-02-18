@@ -184,6 +184,7 @@ void SBScene::initialize()
 	_serviceManager->addService(_vhmsgManager);
 	_serviceManager->addService(_faceShiftManager);
 	_serviceManager->addService(_phonemeManager);
+	_serviceManager->addService(_profiler);
 
 	_parser = new SBParser();
 
@@ -222,7 +223,7 @@ void SBScene::initialize()
 	vhcl::Log::g_log.RemoveAllListeners();
 	ForwardLogListener* forwardListener = new ForwardLogListener();
 	vhcl::Log::g_log.AddListener(forwardListener);
-
+	
 	//consoleAttr->setValue(true); // set up the console logging
 	
 	_mediaPath = ".";
@@ -379,7 +380,6 @@ void SBScene::cleanup()
 	delete _naviMeshManager;
 	delete _kinectProcessor;
 	delete _handConfigManager;
-
 
 	_sim = NULL;
 	_profiler = NULL;
@@ -565,7 +565,8 @@ const std::string& SBScene::getProcessId()
 
 void SBScene::update()
 {
-	
+	this->getProfiler()->updateProfiler(this->getSimulationManager()->getTime());
+	this->getProfiler()->mark("SBScene::update()", 1, "start");
 	// remote mode
 	if (isRemoteMode())
 	{
@@ -592,6 +593,7 @@ void SBScene::update()
 	}
 
 	// scripts
+	this->getProfiler()->mark("scripts", 1, "beforeUpdate()");
 	std::map<std::string, SmartBody::SBScript*>& scripts = getScripts();
 	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
@@ -600,8 +602,10 @@ void SBScene::update()
 		if ((*iter).second->isEnable())
 			(*iter).second->beforeUpdate(getSimulationManager()->getTime());
 	}
+	this->getProfiler()->mark("scripts");
 
 	// services
+	this->getProfiler()->mark("services", 1, "beforeUpdate()");
 	std::map<std::string, SmartBody::SBService*>& services = getServiceManager()->getServices();
 	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
 		iter != services.end();
@@ -610,6 +614,7 @@ void SBScene::update()
 		if ((*iter).second->isEnable())
 			(*iter).second->beforeUpdate(getSimulationManager()->getTime());
 	}
+	this->getProfiler()->mark("services");
 
 // 	if (physicsEngine && physicsEngine->getBoolAttribute("enable"))
 // 	{		
@@ -629,6 +634,7 @@ void SBScene::update()
 // 		physicsTime = this->time;
 // 	}
 
+	this->getProfiler()->mark("allsequences", 1, "commands");
 	std::string seqName = "";
 	std::vector<std::string> sequencesToDelete;
 	SequenceManager* activeSequences = getCommandManager()->getActiveSequences();
@@ -644,11 +650,13 @@ void SBScene::update()
 				if (cmd != "")			
 				{
 					//LOG("execute command = %s",cmd);
+					this->getProfiler()->mark("commands", 1, cmd.c_str() );
 					int err = getCommandManager()->execute( (char*)  cmd.c_str() );
 					if( err != CMD_SUCCESS )
 					{
 						LOG( "update ERR: execute FAILED: '%s'\n", cmd.c_str() );
 					}
+					this->getProfiler()->mark("commands");
 				} 
 			} while( cmd != "" );
 			if( seq->get_count() < 1 )
@@ -663,13 +671,16 @@ void SBScene::update()
 		activeSequences->removeSequence(sequencesToDelete[d], true);
 	}
 	activeSequences->cleanupMarkedSequences();
+	this->getProfiler()->mark("allsequences");
 
+	this->getProfiler()->mark("pawn", 1, "controller evaluation");
 	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
 		pawnIter != pawns.end();
 		pawnIter++)
 	{
 		SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn((*pawnIter));
+		this->getProfiler()->mark(pawn->getName().c_str(), 1, "controller evaluation");
 		pawn->reset_all_channels();
 		pawn->ct_tree_p->evaluate( getSimulationManager()->getTime() );
 		pawn->ct_tree_p->applyBufferToAllSkeletons();
@@ -713,8 +724,12 @@ void SBScene::update()
 
 
 		}  // end of char_p processing
+		
+		this->getProfiler()->mark(pawn->getName().c_str());
 	} // end of loop
-
+	this->getProfiler()->mark("pawn");
+	
+	this->getProfiler()->mark("pawn", 1, "afterUpdate()");
 	const std::vector<std::string>& pawnNames = getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		iter != pawnNames.end();
@@ -723,6 +738,7 @@ void SBScene::update()
 		SBPawn* pawn = getPawn(*iter);
 		pawn->afterUpdate(getSimulationManager()->getTime());
 	}
+	this->getProfiler()->mark("pawn");
 
 	
 	SrCamera* camera = getActiveCamera();
@@ -768,16 +784,19 @@ void SBScene::update()
 	}
 	*/
 
+	this->getProfiler()->mark("listeners", 1, "OnSimulationUpdate()");
 	std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
 	for (size_t i = 0; i < listeners.size(); i++)
 	{
 		listeners[i]->OnSimulationUpdate( );
 	}
+	this->getProfiler()->mark("listeners");
 
 
 	if (!SmartBody::SBScene::getScene()->isRemoteMode())
 		getDebuggerServer()->Update();
 
+	this->getProfiler()->mark("scripts", 1, "update()");
 	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
 		iter++)
@@ -785,15 +804,19 @@ void SBScene::update()
 		if ((*iter).second->isEnable())
 			(*iter).second->update(getSimulationManager()->getTime());
 	}
+	this->getProfiler()->mark("scripts");
 
+	this->getProfiler()->mark("services", 1, "update()");
 	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
 		iter != services.end();
 		iter++)
 	{
 		(*iter).second->update(getSimulationManager()->getTime());
 	}
+	this->getProfiler()->mark("services");
 
 	// scripts
+	this->getProfiler()->mark("scripts", 1, "afterUpdate()");
 	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
 		iter++)
@@ -801,8 +824,10 @@ void SBScene::update()
 		if ((*iter).second->isEnable())
 			(*iter).second->afterUpdate(getSimulationManager()->getTime());
 	}
+	this->getProfiler()->mark("scripts");
 
 	// services
+	this->getProfiler()->mark("services", 1, "afterUpdate()");
 	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
 		iter != services.end();
 		iter++)
@@ -810,6 +835,9 @@ void SBScene::update()
 		if ((*iter).second->isEnable())
 			(*iter).second->afterUpdate(getSimulationManager()->getTime());
 	}
+	this->getProfiler()->mark("services");
+
+	this->getProfiler()->mark("SBScene::update()");
 
 }
 

@@ -1,5 +1,7 @@
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBPhoneme.h>
+#include <sb/SBScene.h>
+#include <sb/SBSimulationManager.h>
 #include <algorithm>
 #include <vector>
 #include <set>
@@ -382,7 +384,7 @@ std::vector<std::string>& SBPhonemeManager::getDictionaryWord(const std::string&
 	if (iter == _wordToPhonemeMaps.end())
 	{
 		LOG("Dictionary word %s cannot be found: no lanugage %s present.", uppercaseWord.c_str(), language.c_str());
-		return _emptyPhonemes;
+		return _emptyPhonemeSet;
 	}
 
 	std::map<std::string, std::vector<std::string> >& wordPhonemeMap = (*iter).second;
@@ -391,7 +393,7 @@ std::vector<std::string>& SBPhonemeManager::getDictionaryWord(const std::string&
 	if (phonemeLookupIter == wordPhonemeMap.end())
 	{
 		LOG("Dictionary word %s in language %s cannot be found.", uppercaseWord.c_str(), language.c_str());
-		return _emptyPhonemes;
+		return _emptyPhonemeSet;
 	}
 
 	return (*phonemeLookupIter).second;
@@ -424,9 +426,9 @@ void SBPhonemeManager::setEnable(bool val)
 	SBService::setEnable(val);
 }
 
-std::vector<std::string> SBPhonemeManager::getPhonemesRealtime(const std::string& character, const std::string& phoneme)
+std::vector<RealTimePhoneme> SBPhonemeManager::getPhonemesRealtime(const std::string& character, const std::string& phoneme)
 {
-	std::map<std::string, std::vector<std::string> >::iterator iter = _realtimePhonemes.find(character);
+	std::map<std::string, std::vector<RealTimePhoneme> >::iterator iter = _realtimePhonemes.find(character);
 	if (iter != _realtimePhonemes.end())
 	{
 		return (*iter).second;
@@ -439,18 +441,21 @@ std::vector<std::string> SBPhonemeManager::getPhonemesRealtime(const std::string
 
 void SBPhonemeManager::setPhonemesRealtime(const std::string& character, const std::string& phoneme)
 {
-	std::map<std::string, std::vector<std::string> >::iterator iter = _realtimePhonemes.find(character);
+	std::map<std::string, std::vector<RealTimePhoneme> >::iterator iter = _realtimePhonemes.find(character);
 	if (iter == _realtimePhonemes.end())
 	{
-		_realtimePhonemes[character] = std::vector<std::string>();
+		_realtimePhonemes[character] = std::vector<RealTimePhoneme>();
 		iter = _realtimePhonemes.find(character);
 	}
-	(*iter).second.push_back(phoneme);
+	RealTimePhoneme rtp;
+	rtp.phoneme = phoneme;
+	rtp.time = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
+	(*iter).second.push_back(rtp);
 }
 
 void SBPhonemeManager::clearPhonemesRealtime(const std::string& character, const std::string& phoneme)
 {
-	std::map<std::string, std::vector<std::string> >::iterator iter = _realtimePhonemes.find(character);
+	std::map<std::string, std::vector<RealTimePhoneme> >::iterator iter = _realtimePhonemes.find(character);
 	if (iter != _realtimePhonemes.end())
 	{
 		(*iter).second.clear();

@@ -563,7 +563,9 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 void BML::Processor::parseBML( DOMElement *bmlElem, BmlRequestPtr request, SmartBody::SBScene* scene ) {
 	size_t behavior_ordinal	= 0;
 
+	SmartBody::SBScene::getScene()->getProfiler()->mark_time("BML", 1, "parseBML", SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 	parseBehaviorGroup( bmlElem, request, scene, behavior_ordinal, false );
+	SmartBody::SBScene::getScene()->getProfiler()->mark("BML");
 
 	if( behavior_ordinal==0 ) { // No change
 		return;

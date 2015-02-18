@@ -1,4 +1,5 @@
 #include "SBSimulationManager.h"
+#include <sb/SBAttribute.h>
 #include <sb/SBScene.h>
 #include <sb/SBScript.h>
 #include <sb/SBSteerManager.h>
@@ -10,23 +11,164 @@ namespace SmartBody {
 
 SBProfiler::SBProfiler()
 {
-	_profiler = new TimeIntervalProfiler();
+	setName("Profiler");
+
+	setAttributeGroupPriority("Settings", 200);
+	createIntAttribute("suppression", -1,true,"Settings",10,false,false,false,"");
+	createIntAttribute("selection", -1,true,"Settings",20,false,false,false,"");
+	createDoubleAttribute("absThreshold", 0.0,true,"Settings",30,false,false,false,"");
+	createDoubleAttribute("relThreshold",0.0,true,"Settings",40,false,false,false,"");
+	createBoolAttribute("dynamicAbs",false,true,"Settings",50,false,false,false,"");
+	createBoolAttribute("dynamicRel",false,true,"Settings",60,false,false,false,"");
+	createDoubleAttribute("sniff", 0.9,true,"Settings",70,false,false,false,"");
+	createDoubleAttribute("avoid", 1.5,true,"Settings",80,false,false,false,"");
+	createDoubleAttribute("decaying", .95,true,"Settings",90,false,false,false,"");
+	createIntAttribute("rolling", 1 ,true,"Settings",100,false,false,false,"");
+
+	profiler_p = new TimeIntervalProfiler();
+
+	internal_profiler_p = NULL;
+	external_profiler_p = NULL;
+	setEnable(false);
 }
 
 SBProfiler::~SBProfiler()
 {
 }
 
+void SBProfiler::setEnable(bool val)
+{
+	SBService::setEnable(true);
+
+	profiler_p->bypass(!val);
+}
+
+bool SBProfiler::isEnable()
+{
+	return SBService::isEnable();
+}
+
 void SBProfiler::printLegend()
 {
-	_profiler->print_legend();
+	profiler_p->print_legend();
 }
 
 void SBProfiler::printStats()
 {
-	_profiler->print();
+	profiler_p->print();
 }
 
+void SBProfiler::printReport()
+{
+	profiler_p->print();
+}
+
+void SBProfiler::setupProfiler()
+{
+	external_profiler_p = new TimeIntervalProfiler();
+	profiler_p = external_profiler_p;
+}
+
+void SBProfiler::switch_internal_profiler( void )	{
+	if( internal_profiler_p == NULL ) internal_profiler_p = new TimeIntervalProfiler;
+	profiler_p = internal_profiler_p;
+}
+
+void SBProfiler::mark( const char* group_name, int level, const char* label )	{
+	if( profiler_p ) profiler_p->mark( group_name, level, label );
+}
+
+
+void SBProfiler::mark_time( const char* group_name, int level, const char* label, double time )
+{
+	if (profiler_p)
+		profiler_p->mark_time(group_name, level, label, time);
+}
+
+
+int SBProfiler::mark( const char* group_name )	{
+	if( profiler_p ) return( profiler_p->mark( group_name ) );
+	return( 0 );
+}
+
+void SBProfiler::updateProfiler( double in_time )
+{
+	if( profiler_p )	{
+		profiler_p->update(in_time);
+	}
+}
+
+void SBProfiler::notify( SBSubject* subject )
+{
+	SBService::notify(subject);
+
+	SBAttribute* attribute = dynamic_cast<SBAttribute*>(subject);
+
+	if (attribute)
+	{
+		std::string name = attribute->getName();
+		if (name == "suppression")
+		{
+			IntAttribute* intAttr = dynamic_cast<IntAttribute*>(attribute);
+			if (profiler_p)
+				profiler_p->set_suppression(intAttr->getValue());
+		}
+		else if (name == "selection")
+		{
+			IntAttribute* intAttr = dynamic_cast<IntAttribute*>(attribute);
+			if (profiler_p)
+				profiler_p->set_selection(intAttr->getValue());
+		}
+		else if (name == "absThreshold")
+		{
+			DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(attribute);
+			if (profiler_p)
+				profiler_p->set_abs_threshold(doubleAttr->getValue());
+		}
+		else if (name == "relThreshold")
+		{
+			DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(attribute);
+			if (profiler_p)
+				profiler_p->set_rel_threshold(doubleAttr->getValue());
+		}
+		else if (name == "dynamicAbs")
+		{
+			BoolAttribute* boolAttr = dynamic_cast<BoolAttribute*>(attribute);
+			if (profiler_p)
+				profiler_p->set_dynamic_abs(boolAttr->getValue());
+		}
+		else if (name == "dynamicRel")
+		{
+			BoolAttribute* boolAttr = dynamic_cast<BoolAttribute*>(attribute);
+			if (profiler_p)
+				profiler_p->set_dynamic_rel(boolAttr->getValue());
+		}
+		else if (name == "sniff")
+		{
+			DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(attribute);
+			if (profiler_p)
+				profiler_p->set_sniff(doubleAttr->getValue());
+		}
+		else if (name == "avoid")
+		{
+			DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(attribute);
+			if (profiler_p)
+				profiler_p->set_avoid(doubleAttr->getValue());
+		}
+		else if (name == "decaying")
+		{
+			DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(attribute);
+			if (profiler_p)
+				profiler_p->set_decaying(doubleAttr->getValue());
+		}
+		else if (name == "rolling")
+		{
+			IntAttribute* intAttr = dynamic_cast<IntAttribute*>(attribute);
+			if (profiler_p)
+				profiler_p->set_rolling(intAttr->getValue());
+		}
+	}
+}
 
 SBSimulationManager::SBSimulationManager()
 {
@@ -35,16 +177,12 @@ SBSimulationManager::SBSimulationManager()
 	_hasTimer = false;
 	_simStopped = false;
 
-	internal_profiler_p = NULL;
-	external_profiler_p = NULL;
-	profiler_p = NULL;
+	
 	internal_timer_p = NULL;
 	external_timer_p = NULL;
 	timer_p = NULL;
 	time = 0.0;
 	time_dt = 0.16;
-
-	_profiler = new SBProfiler();
 }
 
 SBSimulationManager::~SBSimulationManager()
@@ -54,14 +192,9 @@ SBSimulationManager::~SBSimulationManager()
 		timer_p;
 	}
 
-	internal_profiler_p = NULL;
-	external_profiler_p = NULL;
-	profiler_p = NULL;
 	internal_timer_p = NULL;
 	external_timer_p = NULL;
 	timer_p = NULL;
-
-	delete _profiler;
 }
 
 void SBSimulationManager::printInfo()
@@ -329,28 +462,6 @@ void SBSimulationManager::setSleepLock()
 	timer_p->set_sleep_lock();
 }
 
-SBProfiler* SBSimulationManager::getProfiler()
-{
-	return _profiler;
-}
-
-void SBSimulationManager::setupProfiler()
-{
-	external_profiler_p = new TimeIntervalProfiler();
-	profiler_p = external_profiler_p;
-}
-void SBSimulationManager::switch_internal_profiler( void )	{
-	if( internal_profiler_p == NULL ) internal_profiler_p = new TimeIntervalProfiler;
-	profiler_p = internal_profiler_p;
-}
-void SBSimulationManager::mark( const char* group_name, int level, const char* label )	{
-	if( profiler_p ) profiler_p->mark( group_name, level, label );
-}
-int SBSimulationManager::mark( const char* group_name )	{
-	if( profiler_p ) return( profiler_p->mark( group_name ) );
-	return( 0 );
-}
-
 void SBSimulationManager::set_perf(float val)
 {
 	if (timer_p)
@@ -365,12 +476,7 @@ void SBSimulationManager::switch_internal_timer( void )	{
 	if( internal_timer_p == NULL ) internal_timer_p = new TimeRegulator;
 	timer_p = internal_timer_p;
 }
-void SBSimulationManager::updateProfiler( double in_time )
-{
-	if( profiler_p )	{
-		profiler_p->update();
-	}
-}
+
 bool SBSimulationManager::updateTimer( double in_time)
 {
 	if( timer_p )	{

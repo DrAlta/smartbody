@@ -374,6 +374,7 @@ class SBScene : public SBObject
 		Heightfield* _heightField;
 		SBNavigationMesh* _navigationMesh;
 		std::map<std::string, GeneralParam*> _generalParams;
+
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__
 		boost::python::object _mainModule;

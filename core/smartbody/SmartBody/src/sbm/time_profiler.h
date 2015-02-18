@@ -23,6 +23,7 @@
 #ifndef TIME_INTERVAL_PROFILER_H
 #define TIME_INTERVAL_PROFILER_H
 
+#include <vhcl.h>
 #include <stdio.h>
 #include <iostream>
 #include "sbm/sr_hash_map.h"
@@ -123,7 +124,7 @@ class TimeIntervalProfiler { // T.I.P.
 		} group_entry_t;
 
 
-		srHashMap <group_entry_t> group_map;
+		srHashMap <group_entry_t>* group_map;
 		group_entry_t* group_p_arr[ MAX_GROUPS ];
 		bool	full_err;
 		
@@ -172,166 +173,29 @@ class TimeIntervalProfiler { // T.I.P.
 
 	public:
 
-		TimeIntervalProfiler( void ) { reset(); }
-		~TimeIntervalProfiler( void ) {}
+		TimeIntervalProfiler( void );
+		~TimeIntervalProfiler( void );
 
-		void bypass( bool bp ) {
-			if( bp )	{
-				sys_bypass = true;
-			}
-			else	{
-				bool has_disable = req_disable;
-				reset();
-				dis_sys_bypass = true;
-				req_enable = !has_disable;
-				pending_request = true;
-			}
-		}
-		void reset( void )	{
-			null();
-			sys_bypass = DEFAULT_BYPASS;
-			req_enable = DEFAULT_ENABLED;
-			rel_threshold = DEFAULT_THRESHOLD;
-			dyn_sniff = DEFAULT_SNIFF;
-			dyn_avoid = DEFAULT_AVOID;
-			decaying_factor = DEFAULT_DECAYING;
-			rolling_length = DEFAULT_ROLLING;
-		}
-
+		void bypass( bool bp );
+		void reset( void );
 		void print_legend( void );
-
-		void print( void )	{
-			if( sys_bypass )	{
-				printf( "TIP BYPASS: print request ignored\n" );
-				return;
-			}
-			req_print = true;
-			pending_request = true;
-		}
-		void report( void )	{
-			if( sys_bypass )	{
-				printf( "TIP BYPASS: report request ignored\n" );
-				return;
-			}
-			req_report = true;
-			pending_request = true;
-		}
-
-		void erase( void )	{
-			if( sys_bypass )	{
-				printf( "TIP BYPASS: erase request ignored\n" );
-				return;
-			}
-			req_erase = true;
-			pending_request = true;
-		}
-		void enable( bool en )	{
-			if( sys_bypass )
-				printf( "TIP BYPASS: %s request noted\n", en ? "enable" : "disable" );
-			if( en )
-				req_enable = true;
-			else
-				req_disable = true;
-			pending_request = true;
-		}
-		void preload( void )	{
-			if( sys_bypass )	{
-				printf( "TIP BYPASS: preload request ignored\n" );
-				return;
-			}
-			req_preload = true;
-			pending_request = true;
-		}
-
-		bool enable( const char* group_name, bool en )	{
-			if( sys_bypass )	{
-				printf( "TIP BYPASS: group %s request ignored\n", en ? "enable" : "disable" );
-				return( false );
-			}
-			group_entry_t* group_p = get_group( group_name );
-			if( group_p )	{
-				if( en )
-					group_p->req_enable = true;
-				else
-					group_p->req_disable = true;
-				return( true );
-			}
-			return( false );
-		}
-		bool preload( const char* group_name )	{
-			if( sys_bypass )	{
-				printf( "TIP BYPASS: group preload request ignored\n" );
-				return( false );
-			}
-			group_entry_t* group_p = get_group( group_name );
-			if( group_p )	{
-				group_p->req_preload = true;
-				return( true );
-			}
-			return( false );
-		}
-
-		void set_suppression( int sup )	{
-			suppression = sup;
-			selection = -1;
-		}
-		void set_selection( int sel )	{
-			selection = sel;
-			suppression = -1;
-		}
-
-		void set_abs_threshold( double delta )	{
-			abs_threshold = delta;
-			if( abs_threshold <= 0.0 )    {
-				abs_threshold = 0.0;
-			}
-		}
-		void set_rel_threshold( double factor ) {
-			rel_threshold = factor;
-			if( rel_threshold <= 0.0 )    {
-				rel_threshold = 100.0;
-			}
-		}
-		void set_dynamic_abs( bool dyn )	{
-			dyn_abs_thr = dyn;
-		}
-		void set_dynamic_rel( bool dyn )	{
-			dyn_rel_thr = dyn;
-		}
-
-		void set_sniff( double sniff )	{
-			if( sniff > 0.0 ) dyn_sniff = sniff;
-			if( dyn_sniff >= 1.0 ) dyn_sniff = 0.999;
-		}
-		void set_avoid( double avoid )	{
-			if( avoid > 1.0 ) dyn_avoid = avoid;
-			if( dyn_avoid <= 1.0 ) dyn_avoid = 1.01;
-		}
-		void set_decaying( double s )	{
-			decaying_factor = s;
-			if( decaying_factor < 0.0 ) decaying_factor = 0.0;
-			if( decaying_factor > 0.999 ) decaying_factor = 0.999;
-		}
-		void set_rolling( int len )	{
-
-			rolling_length = len;
-			if( rolling_length < 1 ) rolling_length = 1;
-			if( rolling_length > MAX_ROLLING ) rolling_length = MAX_ROLLING;
-			
-			// for now, just set counts to 0:
-			group_entry_t *group_p;
-			group_map.reset();
-			while( ( group_p = group_map.next() ) != NULL ) {
-				profile_entry_t *profile_p;
-				group_p->profile_map.reset();
-				while( ( profile_p = group_p->profile_map.next() ) != NULL ) {
-					profile_p->accum_roll_dt = 0.0;
-					profile_p->accum_count = 0;
-					profile_p->roll_index = 0;
-				}
-			}
-		}
-
+		void print( void );
+		void report( void );
+		void erase( void );
+		void enable( bool en );
+		void preload( void );
+		bool enable( const char* group_name, bool en );
+		bool preload( const char* group_name );
+		void set_suppression( int sup );
+		void set_selection( int sel );
+		void set_abs_threshold( double delta );
+		void set_rel_threshold( double factor );
+		void set_dynamic_abs( bool dyn );
+		void set_dynamic_rel( bool dyn );
+		void set_sniff( double sniff );
+		void set_avoid( double avoid );
+		void set_decaying( double s );
+		void set_rolling( int len );
 ///////////////////////////////////////////////////
 
 	private:
@@ -360,96 +224,18 @@ class TimeIntervalProfiler { // T.I.P.
 		profile_entry_t* get_profile( group_entry_t *group_p, const char* label );
 
 		void accum_mark( group_entry_t *group_p, double time );
-		void touch_profile( profile_entry_t *profile_p, int level )	{
-			if( level > profile_p->level )	{
-				profile_p->level = level;
-			}
-		}
-		void touch_group( const char* group_name, int level, const char* label )	{
-			group_entry_t *group_p = get_group( group_name );
-			profile_entry_t *profile_p = get_profile( group_p, label );
-			touch_profile( profile_p, level );
-		}
-		
-		double convert_time( double time )	{
-			if( time < 0.0 )	{
-				return( SBM_get_real_time() );
-			}
-			return( time );
-		}
+		void touch_profile( profile_entry_t *profile_p, int level );
+		void touch_group( const char* group_name, int level, const char* label );
+		double convert_time( double time );
 		
 	public:
 
-		void update( double time ) {
-			if( dis_sys_bypass ) { sys_bypass = false; dis_sys_bypass = false; }
-			if( sys_bypass ) return;
-			sys_update( convert_time( time ) );
-		}
-		void update( void ) {
-			update( -1.0 );
-		}
-
-		void mark_time( const char* group_name, int level, const char* label, double time )	{
-
-			if( sys_bypass ) return;
-			double curr_time = convert_time( time );
-			if( enabled )	{
-
-				group_entry_t *group_p = get_group( group_name );
-				if( group_p ) {
-
-					profile_entry_t *profile_p = get_profile( group_p, label );
-					if( group_p->enabled )	{
-
-						if( group_p->open ) {  // continuation
-							accum_mark( group_p, curr_time );
-						}
-						else	{  // new segment
-							group_p->open = true;
-						}
-						touch_profile( profile_p, level );
-						profile_p->event_time = curr_time;
-						group_p->curr_profile_p = profile_p;
-					}
-					else
-					if( group_p->preloading )	{
-						touch_profile( profile_p, level );
-					}
-				}
-			}
-			else
-			if( preloading )	{
-				touch_group( group_name, level, label );
-			}
-		}
-
-		int mark_time( const char* group_name, double time )	{
-
-			if( sys_bypass ) return( 0 );
-			double curr_time = convert_time( time );
-			if( enabled )	{
-				group_entry_t *group_p = group_map.lookup( group_name );
-				if( group_p ) {
-					if( group_p->enabled )	{
-						if( group_p->open ) {  // close...
-							accum_mark( group_p, curr_time );
-							group_p->open = false;
-							group_p->curr_profile_p = NULL;
-							return( group_p->profile_event_count );
-						}
-					}
-				}
-			}
-			return( 0 );
-		}
-
-		void mark( const char* group_name, int level, const char* label )	{
-			mark_time( group_name, level, label, -1.0 );
-		}
-		int mark( const char* group_name )	{
-			return( mark_time( group_name, -1.0 ) );
-		}
-
+		void update( double time );
+		void update( void );
+		void mark_time( const char* group_name, int level, const char* label, double time );
+		int mark_time( const char* group_name, double time );
+		void mark( const char* group_name, int level, const char* label );
+		int mark( const char* group_name );
 		static double test_clock( int reps = 0 );
 };
 

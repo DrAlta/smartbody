@@ -64,6 +64,7 @@ void pythonFuncsSimulation()
 	boost::python::class_<SBProfiler>("Profiler")
 		.def("printLegend", &SBProfiler::printLegend, "Print time profiler legend. ")
 		.def("printStats", &SBProfiler::printStats, "Print time profiler statistics. ")
+		.def("printReport", &SBProfiler::printReport, "Print time profiler report. ")
 		;
 
 	

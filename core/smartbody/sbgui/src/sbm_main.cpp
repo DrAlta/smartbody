@@ -978,8 +978,6 @@ int main( int argc, char **argv )	{
 
 	scene->getSimulationManager()->setupTimer();
 
-	scene->getSimulationManager()->setupProfiler();
-
 	if( lock_dt_mode )	{ 
 		scene->getSimulationManager()->setSleepLock();
 	}
@@ -1195,7 +1193,6 @@ int main( int argc, char **argv )	{
 
 
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-		scene->getSimulationManager()->updateProfiler();
 //		mcu.update_profiler( SBM_get_real_time() );
 		bool update_sim = scene->getSimulationManager()->updateTimer();
 //		bool update_sim = mcu.update_timer( SBM_get_real_time() );
