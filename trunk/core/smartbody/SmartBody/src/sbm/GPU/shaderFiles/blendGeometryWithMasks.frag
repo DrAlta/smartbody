@@ -5,9 +5,77 @@
 uniform sampler2D	uNeutralSampler[MAX_SHAPES];
 uniform int			uNumberOfShapes;
 uniform float		uWeights[MAX_SHAPES];
+uniform int			uUsedShapeIDs[MAX_SHAPES];
 uniform bool		uShowMasks;
+
 in vec2				texCoords;
 out vec4			final_color;
+
+// Function used to retreive the color used for each shape, when using the show masking mode.
+// which renders the area of influence of each particular shape, when using masking, with a different color
+vec4 getColorFromID(int shapeID)
+{
+	vec4 weightColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	
+	if(shapeID == 1)
+	{
+		weightColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	}
+	else if (shapeID == 2)
+	{
+		weightColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+	}
+	else if (shapeID == 3)
+	{
+		weightColor = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+	}
+	else if (shapeID == 4)
+	{
+		weightColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);
+	}
+	else if (shapeID == 5)
+	{
+		weightColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);
+	}
+	else if (shapeID == 6)
+	{
+		weightColor = vec4(0.75f, 0.23f, 1.0f, 1.0f);
+	}
+	else if (shapeID == 7)
+	{
+		weightColor = vec4(0.75f, 0.0f, 0.4f, 1.0f);
+	}
+	else if (shapeID == 8)
+	{
+		weightColor = vec4(0.0f, 0.57f, 0.60f, 1.0f);
+	}
+	else if (shapeID == 9)
+	{
+		weightColor = vec4(0.4f, 1.0f, 0.3f, 1.0f);
+	}
+	else if (shapeID == 10)
+	{
+		weightColor = vec4(0.9f, 0.10f, 0.55f, 1.0f);
+	}
+	else if (shapeID == 11)
+	{
+		weightColor = vec4(0.55f, 0.15f, 0.12f, 1.0f);
+	}
+	else if (shapeID == 12)
+	{
+		weightColor = vec4(0.2f, 0.75f, 0.4f, 1.0f);
+	}
+	else if (shapeID == 13)
+	{
+		weightColor = vec4(0.2f, 0.4f, 0.8f, 1.0f);
+	}
+	else
+	{
+		weightColor = vec4(0.0f, 0.5f, 1.0f, 1.0f);
+	}
+
+	return weightColor;
+}
 
 void main()
 {
@@ -44,7 +112,7 @@ void main()
 	{
 		float totalWeights				= 0.0;
 		float totalInterpolatedWeights	= 0.0;
-	
+
 		// Per-shape interpolation with neutral
 		for(int i=1; i < uNumberOfShapes; i++)
 		{
@@ -54,9 +122,15 @@ void main()
 			interpolatedWeight = float(uWeights[i]) * float(tex[i].a);
 			interpolatedWeights[i] = interpolatedWeight;
 
+			// If showing weights
 			if(uShowWeights)
 			{
-				tex[i] = vec4(0.0f, interpolatedWeight, 0.0f, 1.0f);
+				// Gets current shape ID
+				int shapeID = uUsedShapeIDs[i];
+
+				// Gets the color for that particular shape
+				vec4 weightColor = getColorFromID(shapeID);
+				tex[i] = weightColor;
 			}
 
 			tex[i] = tex[0] * (1.0 - interpolatedWeight) + tex[i] * interpolatedWeight;
