@@ -9,7 +9,7 @@ uniform mat4 		uRotate;
 uniform float		uWeights[MAX_SHAPES];
 uniform int			uNumberOfShapes;
 uniform sampler2D	uNeutralSampler[MAX_SHAPES];
-
+uniform bool		uUseMasks;
 uniform usamplerBuffer	uBorderVertices;
 
 in vec2			aVertexTexcoord;
@@ -62,8 +62,15 @@ void main()
 	vec4 result_shape = pos_shape[0];
 	float interpolatedWeight	= 0.0;
 
+
+
 	for(int i=1; i < uNumberOfShapes; i++)
 	{
+		if(!uUseMasks)
+		{
+			tex[i].a = 1.0f;
+		}
+
 		interpolatedWeight = uWeights[i] * tex[i].a;
 		result_shape = result_shape + diff_shape[i] * interpolatedWeight;
 	}

@@ -7,6 +7,7 @@ uniform int			uNumberOfShapes;
 uniform float		uWeights[MAX_SHAPES];
 uniform int			uUsedShapeIDs[MAX_SHAPES];
 uniform bool		uShowMasks;
+uniform bool		uUseMasks;
 
 in vec2				texCoords;
 out vec4			final_color;
@@ -117,6 +118,11 @@ void main()
 		for(int i=1; i < uNumberOfShapes; i++)
 		{
 			interpolatedWeights[i] = 0.0;
+
+			if(!uUseMasks)
+			{
+				tex[i].a = 1.0f;
+			}
 
 			// Interpolates blending weight by masking (encoded in alpha channel)
 			interpolatedWeight = float(uWeights[i]) * float(tex[i].a);
