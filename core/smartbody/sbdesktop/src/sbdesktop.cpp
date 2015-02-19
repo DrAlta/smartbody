@@ -552,8 +552,6 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 
 	SmartBody::SBScene::getScene()->getSimulationManager()->setupTimer();
 
-	SmartBody::SBScene::getScene()->getSimulationManager()->setupProfiler();
-
 	std::string python_lib_path = "../../../../core/smartbody/Python27/Lib";
 	std::string festivalLibDir = "../../../../lib/festival/festival/lib/";
 	std::string festivalCacheDir = "../../../../data/cache/festival/";
@@ -931,7 +929,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 	while( scene->getSimulationManager()->isRunning())
 	{
 
-		scene->getSimulationManager()->updateProfiler();
+		scene->getProfiler()->updateProfiler(scene->getSimulationManager()->getTime());
 		bool update_sim = scene->getSimulationManager()->updateTimer();
 		
 
