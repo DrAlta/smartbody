@@ -577,9 +577,9 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 {
 	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
 
-	bool showMasks	= false;
-	bool useMasks	= false;
-
+	bool showMasks		= false;
+	bool useMasks		= false;
+	bool overlayMasks	= false;
 
 	if (meshInstance->isStaticMesh())
 	{
@@ -597,7 +597,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 			showMasks	= pawn->getBoolAttribute("blendShape.showMasks");
 		}
 
-		// Checks showMasks attribute: If masks for the blendshape are present, user can enable or disable the visualization for debugging purposes
+		// Checks useMasks attribute: If masks for the blendshape are present, user can enable or disable the use of them
 		maskAttribute = pawn->getAttribute("blendShape.useMasks");
 		if (!maskAttribute)
 		{
@@ -606,6 +606,17 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		else
 		{
 			useMasks	= pawn->getBoolAttribute("blendShape.useMasks");
+		}
+
+		// Checks overlayMasks attribute
+		maskAttribute = pawn->getAttribute("blendShape.overlayMasks");
+		if (!maskAttribute)
+		{
+			overlayMasks = false;
+		}
+		else
+		{
+			overlayMasks	= pawn->getBoolAttribute("blendShape.overlayMasks");
 		}
 	}
 
@@ -725,6 +736,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
 		GLuint uShowMasks		= glGetUniformLocation(program, "uShowMasks");
 		GLuint uUseMasks		= glGetUniformLocation(program, "uUseMasks");
+		GLuint uOverlayMasks	= glGetUniformLocation(program, "uOverlayMasks");
 		GLuint uUsedShapeIDs	= glGetUniformLocation(program, "uUsedShapeIDs");
 
 		int * image_array		= new int[MAX_SHAPES];
@@ -766,6 +778,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		glUniform1i(uBorderVertices,  14);
 		glUniform1i(uShowMasks,  showMasks);
 		glUniform1i(uUseMasks,  useMasks);
+		glUniform1i(uOverlayMasks,  overlayMasks);
 
 		aux->subMeshTris[0]->VBO()->BindBuffer();
 			glDrawElements(GL_TRIANGLES, _mesh->triBuf.size()*3 , GL_UNSIGNED_INT,0);
