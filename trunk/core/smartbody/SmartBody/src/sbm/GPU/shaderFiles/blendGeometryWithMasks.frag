@@ -8,6 +8,7 @@ uniform float		uWeights[MAX_SHAPES];
 uniform int			uUsedShapeIDs[MAX_SHAPES];
 uniform bool		uShowMasks;
 uniform bool		uUseMasks;
+uniform bool		uOverlayMasks;
 
 in vec2				texCoords;
 out vec4			final_color;
@@ -125,7 +126,7 @@ void main()
 			}
 
 			// Interpolates blending weight by masking (encoded in alpha channel)
-			interpolatedWeight = float(uWeights[i]) * float(tex[i].a);
+			interpolatedWeight		= float(uWeights[i]) * float(tex[i].a);
 			interpolatedWeights[i] = interpolatedWeight;
 
 			// If showing weights
@@ -137,6 +138,14 @@ void main()
 				// Gets the color for that particular shape
 				vec4 weightColor = getColorFromID(shapeID);
 				tex[i] = weightColor;
+			}
+
+			if(uOverlayMasks)
+			{
+				// Gets current shape ID
+				int shapeID = uUsedShapeIDs[i];
+				vec4 weightColor = getColorFromID(shapeID);
+				tex[i] = mix(tex[i], weightColor, 0.4);
 			}
 
 			tex[i] = tex[0] * (1.0 - interpolatedWeight) + tex[i] * interpolatedWeight;
@@ -164,4 +173,7 @@ void main()
 	{
 		final_color =  tex[0];
 	}
+
+
+
 }
