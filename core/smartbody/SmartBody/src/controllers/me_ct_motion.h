@@ -163,7 +163,8 @@ class MeCtMotion : public SmartBody::SBController, public FadingControl
 
 	// callbacks for the base class
 	virtual void controller_map_updated();
-	virtual void controller_start ();
+	virtual void controller_start();
+	virtual void controller_stop();
 	virtual bool controller_evaluate ( double t, MeFrameData& frame );
     virtual SkChannelArray& controller_channels ();
     virtual const std::string& controller_type () const;
