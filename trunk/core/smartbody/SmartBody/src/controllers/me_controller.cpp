@@ -204,9 +204,9 @@ void MeController::stop (double time) {
 	*/
 	
 	_active = false;
+	_stopTime = time;
 	stop_record();
 	controller_stop ();
-	_stopTime = time;
 
 // LOG( ">>> MeController::stop <<<\n" );
 }

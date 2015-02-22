@@ -318,6 +318,14 @@ void MeCtMotion::controller_start ()
 
 }
 
+void MeCtMotion::controller_stop ()
+{
+
+	updateDt((float)stop_time());
+	motionTime += dt;	
+	checkMotionEvents(motionTime);
+}
+
 bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 
 	bool continuing = true;
