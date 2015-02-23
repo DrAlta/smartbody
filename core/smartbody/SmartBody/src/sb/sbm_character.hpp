@@ -61,6 +61,7 @@ class MeCtReachEngine;
 class MeCtPosePostProcessing;
 class MeCtMotionGraph;
 class MeCtGenericHand;
+class RealTimeLipSyncController;
 class ActionUnit;
 class SkMotion;
 struct GeneralParam;
@@ -241,6 +242,7 @@ public:
 	MeCtPosePostProcessing* postprocess_ct;
 	MeCtMotionGraph*        motiongraph_ct;
 	MeCtGenericHand*		generic_hand_ct;
+	RealTimeLipSyncController* realTimeLipSyncCt;
 
 	float	*viseme_history_arr;
 	int 	viseme_channel_start_pos;
