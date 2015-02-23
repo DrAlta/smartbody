@@ -117,6 +117,7 @@ BOOST_PYTHON_MODULE(SmartBody)
     ;
 
 
+
 	boost::python::class_< QuatMap >("QuatMap")
 		.def("__len__", &QuatMap::size)
 		.def("clear", &QuatMap::clear)
@@ -391,7 +392,8 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("getDictionaryWord", &SBPhonemeManager::getDictionaryWord, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the phonemes associated with a word for a given language.")
 		.def("clearPhonemesRealtime", &SBPhonemeManager::clearPhonemesRealtime, "Removes all realtime phonemes associated with the given character.")
 		.def("setPhonemesRealtime", &SBPhonemeManager::setPhonemesRealtime, "Sets the phonemes associated with the given character for realtime.")
-		//.def("getPhonemesRealtime", &SBPhonemeManager::getPhonemesRealtime, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the realtime phonemes associated with the given character.")
+		.def("getPhonemesRealtime", &SBPhonemeManager::getPhonemesRealtime, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the realtime phonemes associated with the given character.")
+		.def("getPhonemesRealtimeTimings", &SBPhonemeManager::getPhonemesRealtimeTimings, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the realtime phoneme timings associated with the given character.")
 
 		;
 

@@ -75,6 +75,7 @@
 #include <controllers/me_ct_saccade.h>
 #include <controllers/me_ct_new_locomotion.h>
 #include <controllers/me_ct_generic_hand.h>
+#include <controllers/RealTimeLipSyncController.h>
 #include <sbm/KinectProcessor.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <sr/sr_sn_group.h>
@@ -3854,6 +3855,7 @@ void SBScene::createDefaultControllers()
 	 _defaultControllers.push_back(new MeCtGaze());
 	 _defaultControllers.push_back(new MeCtNewLocomotion());
 	 _defaultControllers.push_back(new MeCtGenericHand());
+	 _defaultControllers.push_back(new RealTimeLipSyncController());
 
 	 for (size_t x = 0; x < _defaultControllers.size(); x++)
 		 _defaultControllers[x]->ref();

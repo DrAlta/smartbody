@@ -426,18 +426,46 @@ void SBPhonemeManager::setEnable(bool val)
 	SBService::setEnable(val);
 }
 
-std::vector<RealTimePhoneme> SBPhonemeManager::getPhonemesRealtime(const std::string& character, const std::string& phoneme)
+std::vector<std::string> SBPhonemeManager::getPhonemesRealtime(const std::string& character)
 {
+	std::vector<std::string> phonemes;
 	std::map<std::string, std::vector<RealTimePhoneme> >::iterator iter = _realtimePhonemes.find(character);
 	if (iter != _realtimePhonemes.end())
 	{
-		return (*iter).second;
+		for (std::vector<RealTimePhoneme>::iterator phonemeIter = (*iter).second.begin();
+			 phonemeIter != (*iter).second.end();
+			 phonemeIter++)
+		{
+			phonemes.push_back((*phonemeIter).phoneme);
+		}
+		return phonemes;
 	}
 	else
 	{
-		return _emptyPhonemes;
+		return std::vector<std::string>();
 	}
 }
+
+std::vector<double> SBPhonemeManager::getPhonemesRealtimeTimings(const std::string& character)
+{
+	std::vector<double> phonemeTimings;
+	std::map<std::string, std::vector<RealTimePhoneme> >::iterator iter = _realtimePhonemes.find(character);
+	if (iter != _realtimePhonemes.end())
+	{
+		for (std::vector<RealTimePhoneme>::iterator phonemeIter = (*iter).second.begin();
+			 phonemeIter != (*iter).second.end();
+			 phonemeIter++)
+		{
+			phonemeTimings.push_back((*phonemeIter).time);
+		}
+		return phonemeTimings;
+	}
+	else
+	{
+		return std::vector<double>();
+	}
+}
+
 
 void SBPhonemeManager::setPhonemesRealtime(const std::string& character, const std::string& phoneme)
 {

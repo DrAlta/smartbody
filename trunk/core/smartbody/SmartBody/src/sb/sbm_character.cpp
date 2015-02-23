@@ -86,7 +86,7 @@
 #include <controllers/me_ct_pose_postprocessing.hpp>
 #include <controllers/me_ct_motion_graph.hpp>
 #include <controllers/me_ct_generic_hand.h>
-
+#include <controllers/RealTimeLipSyncController.h>
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_physics_controller.h>
 
@@ -469,7 +469,9 @@ void SbmCharacter::createStandardControllers()
 	std::string recordCtName = getName() + "_recorderController";
 	this->record_ct->setName(recordCtName.c_str());
 
-	
+	this->realTimeLipSyncCt = new RealTimeLipSyncController();
+	std::string realTimeLipSyncName = getName() + "_realTimeLipSyncController";
+	this->realTimeLipSyncCt->setName(realTimeLipSyncName);
 
 	posture_sched_p->ref();
 	motion_sched_p->ref();
@@ -497,6 +499,8 @@ void SbmCharacter::createStandardControllers()
 	head_sched_p->init(this);
 	face_ct->init( this );
 
+	realTimeLipSyncCt->init(this);
+
 	ct_tree_p->add_controller( posture_sched_p );
 	//ct_tree_p->add_controller( locomotion_ct );
 	
@@ -517,6 +521,8 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( saccade_ct );
 	ct_tree_p->add_controller( eyelid_reg_ct_p );
 	ct_tree_p->add_controller( head_sched_p );
+
+	ct_tree_p->add_controller(realTimeLipSyncCt);
 	//ct_tree_p->add_controller( head_param_anim_ct );
 	ct_tree_p->add_controller( face_ct );
 	ct_tree_p->add_controller( param_sched_p );
