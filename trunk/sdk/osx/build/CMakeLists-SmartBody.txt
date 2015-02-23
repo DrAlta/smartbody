@@ -371,8 +371,9 @@ set( SMARTBODY_LIB_SBM_SRC
         ./controllers/me_ct_physics_controller.cpp
         ./controllers/me_ct_noise_controller.cpp
         ./controllers/me_ct_motion_recorder.cpp
-	./controllers/me_ct_motion_graph.cpp
-	./controllers/me_ct_generic_hand.cpp
+		./controllers/me_ct_motion_graph.cpp
+		./controllers/me_ct_generic_hand.cpp
+		./controllers/RealTimeLipSyncController.cpp
 
 
         ./controllers/MeCtBlendEngine.cpp

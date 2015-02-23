@@ -387,6 +387,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./controllers/me_ct_generic_hand.cpp
         ./controllers/me_ct_new_locomotion.cpp
         ./controllers/MotionAnalysis.cpp
+		./controllers/RealTimeLipSyncController.cpp
 
         ./sbm/ParserBVH.cxx
         ./sbm/ParserASFAMC.cxx
