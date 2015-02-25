@@ -1553,6 +1553,7 @@ DeformableMeshInstance::DeformableMeshInstance()
 
 	_tempTexWithMask	= NULL;
 	_tempFBOTexWithMask = NULL;
+	_pawn = _character = NULL;
 }
 
 DeformableMeshInstance::~DeformableMeshInstance()
@@ -1593,6 +1594,7 @@ void DeformableMeshInstance::setPawn(SmartBody::SBPawn* pawn)
 		_skeleton = pawn->getSkeleton();
 	if (_skeleton)
 		_skeleton->ref();
+	_pawn = pawn;
 	_character = dynamic_cast<SmartBody::SBCharacter*>(pawn);
 	updateJointList();
 }
@@ -1614,6 +1616,7 @@ void DeformableMeshInstance::cleanUp()
 
 void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4 rotation)
 {
+#if WIN_BUILD
 	DeformableMesh * _mesh		= this->getDeformableMesh();
 	
 	bool showMasks = false;
@@ -1837,6 +1840,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 		// Computes blended texture pairwise, and saves it into _tempTexPairs[0], which is going to be used later as a texture (in the normal blendshape pipeline)
 		SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), tex_w, tex_h);
 	}
+#endif
 }
 
 void DeformableMeshInstance::blendShapes()
