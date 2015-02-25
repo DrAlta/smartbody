@@ -255,7 +255,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := smartbody
 #LOCAL_CFLAGS    :=  -gstabs -g -DBUILD_ANDROID -frtti 
 #$(SBM_LOCAL_PATH)/../../cerevoice/cerevoice_eng/include \
-LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions -g
+LOCAL_CFLAGS    := -O3 -DSB_NO_ASSIMP -DBUILD_ANDROID -frtti -fexceptions -g 
 LOCAL_C_INCLUDES := $(SBM_LOCAL_PATH)/$(SBM_MY_DIR) \
 					$(SBM_LOCAL_PATH)/../../pythonLib/include/python2.6 \
 					$(SBM_LOCAL_PATH)/../../boost \
@@ -554,6 +554,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/sb/SBVHMsgManager.cpp \
 	$(SBM_MY_DIR)/sb/SBCommandManager.cpp \
 	$(SBM_MY_DIR)/sb/SBNavigationMeshManager.cpp \
+	$(SBM_MY_DIR)/sb/SBAssetHandlerAssimp.cpp \
 	$(SBM_MY_DIR)/sb/SBAssetHandler.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerCOLLADA.cpp \
     $(SBM_MY_DIR)/sb/SBAssetHandlerSk.cpp \
