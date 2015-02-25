@@ -265,7 +265,11 @@ void SrGlRenderFuncs::renderBlendFace(DeformableMeshInstance* shape)
 // Renders static mesh WITHOUT Ogre3D
 void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool showSkinWeight  )
 {
-	bool USE_GPU_BLENDSHAPES = true;
+#if ANDROID_BUILD
+	bool USE_GPU_BLENDSHAPES = false;
+#else
+	bool USE_GPU_BLENDSHAPES = false;
+#endif
 	
 	DeformableMesh* mesh = shape->getDeformableMesh();
     if (!mesh)

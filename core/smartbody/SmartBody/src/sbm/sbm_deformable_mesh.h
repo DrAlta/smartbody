@@ -182,6 +182,7 @@ protected:
 	//std::vector<SrSnModel*>	dynamicMesh; 
 	SkSkeleton*				_skeleton;
 	SmartBody::SBCharacter*	_character;		// pointer to current character
+	SmartBody::SBPawn*      _pawn;
 	bool				  _updateMesh;
 	std::vector<SkJointList> _boneJointList;
 	float _meshScale;
@@ -222,6 +223,7 @@ public:
 	SBAPI virtual void blendShapes();
 	SBAPI DeformableMesh* getDeformableMesh() { return _mesh; }
 	SBAPI SmartBody::SBCharacter* getCharacter() { return _character; }
+	SBAPI SmartBody::SBPawn* getPawn() { return _pawn; }
 	void updateTransformBuffer();
 
 protected:
