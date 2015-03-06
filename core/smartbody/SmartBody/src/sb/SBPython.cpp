@@ -872,16 +872,18 @@ void appendPythonModule(const char* moduleName, void (*initfunc)(void))
 
 void initPython(std::string pythonLibPath)
 {	
-
+	//LOG("Start Init Python");
 	XMLPlatformUtils::Initialize(); 
-
+	//LOG("After XML Platform Initialize");
 	
 	std::string pythonHome = pythonLibPath + "/..";
-#ifdef __ANDROID__
-	std::string libPath = getenv("LD_LIBRARY_PATH");
-	LOG("LD_LIBRARY_PATH  = %s", libPath.c_str());	
-#endif
+// #ifdef __ANDROID__
+// 	LOG("before LD_LIBRARY_PATH");
+// 	std::string libPath = getenv("LD_LIBRARY_PATH");
+// 	LOG("LD_LIBRARY_PATH  = %s", libPath.c_str());	
+// #endif
 
+	//LOG("After LD_LIBRARY_PATH");
 	Py_NoSiteFlag = 1;
 
 #ifndef SB_NO_PYTHON
@@ -896,6 +898,7 @@ void initPython(std::string pythonLibPath)
 	Py_SetPythonHome((char*)pythonHome.c_str());
 #endif
 #endif	
+	//LOG("After SetProgramName");
 #ifdef __ANDROID__
 	appendPythonModule("pyexpat", initpyexpat);
 	appendPythonModule("_functools", init_functools);
@@ -954,8 +957,9 @@ void initPython(std::string pythonLibPath)
 	appendPythonModule("_ctypes", init_ctypes);
 	//appendPythonModule("_hashlib", init_hashlib);
 #endif
+	//LOG("After appendPythonModule");
 	Py_Initialize();
-	
+	//LOG("After Py_Initialize");
 	try {
 #ifndef SB_NO_PYTHON
 		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -994,7 +998,9 @@ void initPython(std::string pythonLibPath)
 		PyRun_SimpleString(strstr.str().c_str());
 #endif
 
+		//LOG("Before initSmartBody");
 		SmartBody::initSmartBody();
+		//LOG("After initSmartBody");
 		
 		
 
@@ -1004,6 +1010,7 @@ void initPython(std::string pythonLibPath)
 		//LOG("Before redirect stdout");
 
 		setupPython();
+		//LOG("After setupPython");
 	} catch (...) {
 		PyErr_Print();
 		//LOG("PyError Exception");
