@@ -440,6 +440,7 @@ LOCAL_SRC_FILES := $(SBM_MY_DIR)/sr/sr_alg.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_pose_postprocessing.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_motion_graph.cpp \
 	$(SBM_MY_DIR)/controllers/me_ct_generic_hand.cpp \
+	$(SBM_MY_DIR)/controllers/RealTimeLipSyncController.cpp \
 	$(SBM_MY_DIR)/controllers/MeCtBlendEngine.cpp \
 	$(SBM_MY_DIR)/controllers/MotionAnalysis.cpp \
 	$(SBM_MY_DIR)/sbm/ParserFBX.cpp \
