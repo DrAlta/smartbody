@@ -724,9 +724,13 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 
 	std::string filebasename = boost::filesystem::basename(file);
 	std::string fileextension = boost::filesystem::extension(file);
+
+	std::string finalFile = filebasename + "." + fileextension;
+	size_t filenameSize = finalFile.size();
+
 	std::string fullfilename = std::string(file);
-	size_t pos = fullfilename.find(filebasename);
-	std::string path = fullfilename.substr(0, pos - 1);
+
+	std::string path = fullfilename.substr(0, fullfilename.size() - filenameSize);
 	SmartBody::SBScene::getScene()->addAssetPath("script", path);
 	SmartBody::SBScene::getScene()->runScript(filebasename);
 }
