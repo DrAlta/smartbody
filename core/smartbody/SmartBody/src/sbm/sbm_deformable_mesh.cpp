@@ -1838,7 +1838,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 		//SbmBlendTextures::BlendGeometry( _tempFBOPairs, weights, texIDs, texture_names, this,  SbmBlendTextures::getShader("BlendGeometry"));
 
 		// Computes blended texture pairwise, and saves it into _tempTexPairs[0], which is going to be used later as a texture (in the normal blendshape pipeline)
-		SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), tex_w, tex_h);
+		//SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), tex_w, tex_h);
 	}
 #endif
 }
@@ -2202,7 +2202,7 @@ void DeformableMeshInstance::blendShapes()
 			}
 		}
 
-
+		/*
 		if(_tempFBOTexWithMask == NULL) 
 		{
 			_tempFBOTexWithMask = new GLuint[weights.size()];
@@ -2231,7 +2231,7 @@ void DeformableMeshInstance::blendShapes()
 			// Adds masking images to the alpha channel of the textures
 			SbmBlendTextures::ReadMasks(_tempFBOTexWithMask, _tempTexWithMask, weights, texIDs, texture_names, SbmBlendTextures::getShader("ReadMasks"), tex_w, tex_h); 
 		}
-
+		*/
 
 
 		if (texIDs.size() > 0 && texIDs[0] != 0)
