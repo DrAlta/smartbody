@@ -268,7 +268,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 #if ANDROID_BUILD
 	bool USE_GPU_BLENDSHAPES = false;
 #else
-	bool USE_GPU_BLENDSHAPES = true;
+	bool USE_GPU_BLENDSHAPES = false;
 #endif
 	
 	DeformableMesh* mesh = shape->getDeformableMesh();

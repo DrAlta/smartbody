@@ -140,6 +140,7 @@ void main()
 				tex[i] = weightColor;
 			}
 
+			// If overlayMasks attribute is on, we want to render a blendedcolor mask on the top of the texture
 			if(uOverlayMasks)
 			{
 				// Gets current shape ID
