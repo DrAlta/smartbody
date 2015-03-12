@@ -117,6 +117,12 @@ SBSkeleton* SBPawn::getSkeleton()
 
 void SBPawn::setSkeleton(SBSkeleton* skel)
 {
+	if (!skel)
+	{
+		LOG("Skeleton is nonexistent. Skeleton not set on pawn %s", this->getName().c_str());
+		return;
+	}
+
 	SrVec position;
 	SrVec hpr;	
 	SBSkeleton* sk = this->getSkeleton();

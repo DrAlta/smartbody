@@ -2946,6 +2946,8 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 
 bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skeletonName, std::string deformMeshName, std::vector<std::string> motionNames, bool exportSk, bool exportMesh, bool exportMotion )
 {	
+	if (deformMeshName == "")
+		deformMeshName = "smartbodycharacter.dae";
 	std::string colladaName = deformMeshName ;
 	std::string fullColladaPathName = outPathname + "/" + colladaName;
 	FILE* fp = fopen(fullColladaPathName.c_str(),"wt");
