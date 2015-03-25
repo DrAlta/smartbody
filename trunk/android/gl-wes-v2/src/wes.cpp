@@ -219,15 +219,15 @@ wes_init(const char *gles2)
         *ptr++ = pfunc;
     }
 #endif
-	PRINT_DEBUG("Start Init\n");
+	//PRINT_DEBUG("Start Init\n");
     wes_shader_init();
-	PRINT_DEBUG("After shader Init\n");
+	//PRINT_DEBUG("After shader Init\n");
     wes_matrix_init();
-	PRINT_DEBUG("After matrix Init\n");
+	//PRINT_DEBUG("After matrix Init\n");
     wes_begin_init();
-	PRINT_DEBUG("After begin Init\n");
+	//PRINT_DEBUG("After begin Init\n");
     wes_state_init();
-	PRINT_DEBUG("After state Init\n");
+	//PRINT_DEBUG("After state Init\n");
 }
 
 GLvoid
