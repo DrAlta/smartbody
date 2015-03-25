@@ -26,7 +26,7 @@
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 
-#if !defined (__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(SB_IPHONE)
 #include <sbm/GPU/SbmTexture.h>
 #endif
 
@@ -70,7 +70,7 @@ static SrColor read_color ( SrInput& in )
 
 static void load_texture(int type, const char* file, const SrStringArray& paths)
 {
-#if !defined (__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(SB_IPHONE)
 	SrString s;
 	SrInput in;
 	std::string imageFile = file;
@@ -382,7 +382,7 @@ bool SrModel::import_obj ( const char* file )
 	compress ();
 
    // after remove all redundant materials, load the corresponding textures   
-#if !defined (__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(SB_IPHONE)
    for (int i=0;i<M.size();i++)
    {
 	   std::string matName = mtlnames[i];

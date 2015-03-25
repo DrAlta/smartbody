@@ -3389,6 +3389,7 @@ int mcuFestivalRemoteSpeechCmd_func( srArgBuffer& args, SmartBody::SBCommandMana
 {
 	//FestivalSpeechRelayLocal* speechRelay = mcu.festivalRelay();
 	SpeechRelayLocal* speechRelay = SmartBody::SBScene::getScene()->getSpeechManager()->cereprocRelay();
+	if (!speechRelay) return 0;
 	const char* message = args.read_remainder_raw();
 	speechRelay->processSpeechMessage(message);
 	//processSpeechMessage(

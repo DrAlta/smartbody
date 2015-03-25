@@ -1372,19 +1372,19 @@ SBAPI void SrModel::computeNormals(int flat)
 {
 	
 
-	if (flat)
-	{
-		N.size(F.size()); // set normal vector to the same size
-		N.setall(SrPnt(0,0,0));
-		Fn.size(F.size());
-		for (int i=0;i<F.size();i++)
-		{
-			SrVec fn = face_normal(i);
-			Fn[i].set(i, i, i);
-			N[i] = fn;
-		}
-	}
-	else
+// 	if (flat)
+// 	{
+// 		N.size(F.size()); // set normal vector to the same size
+// 		N.setall(SrPnt(0,0,0));
+// 		Fn.size(F.size());
+// 		for (int i=0;i<F.size();i++)
+// 		{
+// 			SrVec fn = face_normal(i);
+// 			Fn[i].set(i, i, i);
+// 			N[i] = fn;
+// 		}
+// 	}
+// 	else
 	{
 		N.size(V.size()); // set normal vector to the same size
 		N.setall(SrPnt(0,0,0));

@@ -1,5 +1,4 @@
 #pragma once
-#include <sr/sr_gl.h>
 #include <map>
 #include <string>
 #include <vector>

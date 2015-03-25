@@ -126,6 +126,7 @@ bool SBVHMsgManager::connect()
 		err = vhmsg::ttu_register( "vrAgentBML" );
 		err = vhmsg::ttu_register( "vrExpress" );
 		err = vhmsg::ttu_register( "vrSpeak" );
+		err = vhmsg::ttu_register( "RemoteSpeechCmd" ); // for local speech relay
 		err = vhmsg::ttu_register( "RemoteSpeechReply" );
 		err = vhmsg::ttu_register( "PlaySound" );
 		err = vhmsg::ttu_register( "StopSound" );
@@ -138,6 +139,7 @@ bool SBVHMsgManager::connect()
 		err = vhmsg::ttu_register( "vrPerception" );
 		err = vhmsg::ttu_register( "vrBCFeedback" );
 		err = vhmsg::ttu_register( "vrSpeech" );
+		LOG("VHMSG connected successfully");
 		return true;
 	} 
 	else
@@ -165,7 +167,7 @@ int SBVHMsgManager::send2( const char *op, const char* message )
 {
 #ifndef SB_NO_VHMSG
 #if LINK_VHMSG_CLIENT
-
+	
 	if( isEnable() )
 	{
 		int err = vhmsg::ttu_notify2( op, message );
@@ -310,6 +312,7 @@ void SBVHMsgManager::vhmsgCallback( const char *op, const char *args, void * use
 		SmartBody::SBScene::getScene()->getDebuggerServer()->ProcessVHMsgs(op, args);
 	}
 
+	//LOG("Get VHMSG , op = %s, args = %s", op, args);
 	switch( SmartBody::SBScene::getScene()->getCommandManager()->execute( op, (char *)args ) )
 	{
         case CMD_NOT_FOUND:
@@ -336,6 +339,16 @@ bool SBVHMsgManager::isEnableLogging()
 		return true;
 	else
 		return false;
+}
+
+SBAPI int SBVHMsgManager::sendMessage( const std::string& message )
+{
+	return send(message.c_str());
+}
+
+SBAPI int SBVHMsgManager::sendOpMessage( const std::string& op, const std::string& message )
+{
+	return send2(op.c_str(), message.c_str());
 }
 
 }

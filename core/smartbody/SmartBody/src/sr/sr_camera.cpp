@@ -38,8 +38,8 @@
 	#include <wingdi.h>
 	#include <GL/gl.h>
 #elif defined(BUILD_ANDROID)
-	#include <GLES2/gl2.h>
-	#include <GLES2/gl2ext.h>
+	//#include <GLES2/gl2.h>
+	//#include <GLES2/gl2ext.h>
 #elif defined(SB_IPHONE)
     #include <OpenGLES/ES1/gl.h>
     #include <OpenGLES/ES1/glext.h>
@@ -50,7 +50,9 @@
 #elif defined(__FLASHPLAYER__)
 	#include <GL/gl.h>
 #elif defined(__ANDROID__)
-	#include <GLES/gl.h>
+	//#include <GLES/gl.h>
+	//#include <GLES2/gl2.h>
+	#include <wes_gl.h>
 #else
 	#include <GL/gl.h>
 	#include <GL/glx.h>
@@ -629,11 +631,13 @@ bool SrFrustum::pointInFrustum(SrVec &point) {
 
 void SrFrustum::extractFrustum()
 {
+#if !defined(__ANDROID__)
    float   proj[16];
    float   modl[16];
    float   clip[16];
    float   t;
  
+
    /* Get the current PROJECTION matrix from OpenGL */
    glGetFloatv( GL_PROJECTION_MATRIX, proj );
  
@@ -738,6 +742,7 @@ void SrFrustum::extractFrustum()
    frustum[5][1] /= t;
    frustum[5][2] /= t;
    frustum[5][3] /= t;
+#endif
 }
 
 //================================ End of File =========================================

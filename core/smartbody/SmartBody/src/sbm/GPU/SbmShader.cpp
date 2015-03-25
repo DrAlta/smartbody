@@ -1,6 +1,8 @@
 #include "vhcl.h"
-#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
 #include "external/glew/glew.h"
+#elif defined(__ANDROID__)
+#include "wes_gl.h"
 #endif
 #include "SbmShader.h"
 //#include <GL/glew.h>
@@ -45,13 +47,13 @@ SbmShaderProgram::~SbmShaderProgram()
 {
 #if !defined(__FLASHPLAYER__)
 	if (programID > 0 )
-		glDeleteObjectARB(programID);
+		glDeleteProgram(programID);
 	if (vsID > 0)
-		glDeleteObjectARB(vsID);
+		glDeleteShader(vsID);
 	if (fsID > 0)
-		glDeleteObjectARB(fsID);
-	isBuilt = false;
+		glDeleteShader(fsID);
 #endif
+	isBuilt = false;
 }
 
 
@@ -95,14 +97,18 @@ void SbmShaderProgram::buildShader()
 	fsID = -1;
 	if (vsShaderStr.size() > 0)
 	{
+		LOG("Create Vertex Shader");
 		vsID = glCreateShader(GL_VERTEX_SHADER);
 		loadShaderStr(vsID,vsShaderStr.c_str());
+		LOG("After Build Vertex Shader");
 	}	
 	
 	if (fsShaderStr.size() > 0)
 	{
+		LOG("Create Fragment Shader");
 		fsID = glCreateShader(GL_FRAGMENT_SHADER);
 		loadShaderStr(fsID,fsShaderStr.c_str());
+		LOG("After Build Fragment Shader");
 	}
 
 	printShaderInfoLog(vsID);
@@ -205,6 +211,7 @@ void SbmShaderProgram::printOglError(const char* tag)
 	int    retCode = 0;
 
 	glErr = glGetError();
+#if 0
 	while (glErr != GL_NO_ERROR)
 	{
 #if !defined(__FLASHPLAYER__)
@@ -213,6 +220,7 @@ void SbmShaderProgram::printOglError(const char* tag)
 		retCode = 1;
 		glErr = glGetError();
 	}
+#endif
 }
 /************************************************************************/
 /* Shader Manager                                                       */
@@ -224,7 +232,11 @@ SbmShaderManager::SbmShaderManager(void)
 {
 	viewer = NULL;
 	shaderInit = false;
+#ifdef __ANDROID__
+	shaderSupport = SUPPORT_OPENGL_2_0;
+#else
 	shaderSupport = NO_GPU_SUPPORT;
+#endif
 }
 
 void SbmShaderManager::setViewer( SrViewer* vw )
@@ -264,12 +276,13 @@ bool SbmShaderManager::initGLExtension()
     if (shaderInit && shaderSupport == NO_GPU_SUPPORT)
         return false;
 
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
 	if (!viewer)
 		return false;
         static int counter = 0;
 
 	//viewer->makeGLContext();
-#if !defined(__FLASHPLAYER__)
+
 	glewInit();
 
 /*
@@ -301,7 +314,9 @@ bool SbmShaderManager::initGLExtension()
 		return false;
     }
     //return false;
-#else
+#elif defined(__ANDROID__)
+	shaderInit = true;
+	return true;
 	return false;
 #endif
 }

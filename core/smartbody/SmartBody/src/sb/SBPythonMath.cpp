@@ -89,7 +89,7 @@ void pythonFuncsMath()
 		.def("vecYaw", &SrVec::vecYaw, "Returns Yaw angle on X-Z plane of given vec (radian)")
 		.def("addVec", &SrVec::operator+=, "Add the input SrVec to the current SrVec")
 		;
-
+	boost::python::def("rotatePoint", rotatePoint, "Rotate a point along a center");
 	boost::python::class_<SrMat>("SrMat")
 		.def(boost::python::init<>())
 		.def("__str__", &SrMat::toString)

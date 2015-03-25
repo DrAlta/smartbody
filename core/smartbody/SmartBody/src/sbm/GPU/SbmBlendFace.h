@@ -14,7 +14,7 @@
 #endif
 
 class SbmDeformableMeshGPU;
-
+#if !defined(__ANDROID__)
 class SbmBlendFace: public DeformableMesh
 {
 	public:
@@ -57,7 +57,7 @@ class SbmBlendFace: public DeformableMesh
 	
 
 };
-
+#endif
 
 class SbmBlendTextures
 {

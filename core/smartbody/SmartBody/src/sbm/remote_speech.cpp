@@ -98,7 +98,7 @@ RequestId remote_speech::requestSpeechAudio( const char* agentName, const std::s
 
 RequestId remote_speech::requestSpeechAudio( const char* agentName, std::string voiceCode, std::string text, const char* callbackCmd ){
 	
-
+	//LOG("remote_speech::requestSpeechAudio");
     
 	msgNumber++; //to make the message number unique it must not belong to any single object instantiation and thus resides in "lookup" along with other items that must be globally accessable among all remote_speech objects
 	ostringstream myStream; //creates an ostringstream object
@@ -197,7 +197,7 @@ The timestamp is 20051121_150427 (that is, YYYYMMDD_HHMMSS ), so we can check ol
 
 void remote_speech::sendSpeechCommand(const char* cmd)
 {
-	//LOG("send speech command");
+	//LOG("remote_speech::sendSpeechCommand");
 	
 	SmartBody::SBScene::getScene()->getVHMsgManager()->send2( "RemoteSpeechCmd", cmd ); //sends the remote speech command using singleton* MCU_p
 }
@@ -656,7 +656,7 @@ int remote_speech::handleRemoteSpeechResult( SbmCharacter* character, char* msgI
 			string callbackCmd= string(remote_speech::commandLookUp.lookup(msgID)) +" "+ character->getName() +" "+ string(msgID)+" SUCCESS";
 			char* callback= new char[callbackCmd.length() + 1];
 			strcpy(callback,callbackCmd.c_str());
-			//LOG("callbackCmd = %s",callback);
+			//LOG("remote_speech, callbackCmd = %s",callback);
 			SmartBody::SBScene::getScene()->getCommandManager()->execute(callback);
 			//mcu_p->execute(callback);
 

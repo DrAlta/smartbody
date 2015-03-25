@@ -46,9 +46,13 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #elif __native_client__
-#include <GLES2/gl2.h>
+//#include <GLES2/gl2.h>
 #elif defined(__ANDROID__)
-#include <GLES/gl.h>
+//#include <GLES/gl.h>
+//#include <GLES2/gl2.h>
+#include "wes_gl.h"
+#include "wes_glu.h"
+
 # else
 # include <GL/gl.h>
 # include <GL/glu.h>
@@ -65,6 +69,14 @@ class SrMaterial;
 #if defined(__ANDROID__) || defined(SB_IPHONE)
 #define GLES_RENDER 1
 #define GLdouble GLfloat
+#endif
+
+#if defined(__ANDRID__)
+#define myGLEnable glEnable_wes
+#define myGLDisable glDisable_wes
+#else
+#define myGLEnable glEnable
+#define myGLDisable glDisable
 #endif
 
 #if !defined(GLES_RENDER)
