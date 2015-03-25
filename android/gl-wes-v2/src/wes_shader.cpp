@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <string>
 #include "wes.h"
 #include "wes_shader.h"
 #include "wes_matrix.h"
@@ -35,6 +36,31 @@ program_t       sh_pbuffer[WES_PBUFFER_SIZE];
 GLuint          sh_pbuffer_count;
 GLuint          sh_vertex;
 
+std::string wesShaderStr = 
+"attribute highp vec4 	aPosition;\n\
+attribute lowp vec4 	aColor;\n\
+attribute mediump vec4 	aTexCoord0;\n\
+attribute mediump vec4 	aTexCoord1;\n\
+attribute mediump vec4 	aTexCoord2;\n\
+attribute mediump vec4 	aTexCoord3;\n\
+uniform highp mat4		uMVP;		//model-view-projection matrix\n\
+uniform highp mat4		uMV;		//model-view matrix\n\
+uniform highp mat3		uMVIT;		//model-view inverted & transformed matrix \n\
+\n\
+varying lowp vec4 		vColor;\n\
+varying lowp vec2		vFactor;\n\
+varying mediump vec4 	vTexCoord[4];\n\
+\n\
+void main(){\n\
+	gl_Position = uMVP * aPosition;\n\
+	vColor = aColor;\n\
+	vTexCoord[0] = aTexCoord0;\n\
+	vTexCoord[1] = aTexCoord1;\n\
+	vTexCoord[2] = aTexCoord2;\n\
+	vTexCoord[3] = aTexCoord3;\n\
+	vFactor.x = 1.0;\n\
+	vFactor.y = 1.0;\n\
+}\n\ ";
 //function declarations:
 GLvoid
 wes_shader_error(GLuint ind)
@@ -74,19 +100,19 @@ wes_shader_create(char* data, GLenum type)
 
     //Compile:
     index = glCreateShader(type);
-	PRINT_DEBUG("glCreateShader, index = %d\n", index);
+	//PRINT_DEBUG("glCreateShader, index = %d\n", index);
     glShaderSource(index, 1, (const char**) src, NULL);
-    PRINT_DEBUG("glShaderSource\n");
+    //PRINT_DEBUG("glShaderSource\n");
     glCompileShader(index);
-    PRINT_DEBUG("glCompileShader\n");
+    //PRINT_DEBUG("glCompileShader\n");
     //test status:
     glGetShaderiv(index, GL_COMPILE_STATUS, &success);
-	PRINT_DEBUG("glGetShaderiv\n");
+	//PRINT_DEBUG("glGetShaderiv\n");
     if (success){
-		PRINT_DEBUG("shader success\n");
+		//PRINT_DEBUG("shader success\n");
         return index;
     } else {
-		PRINT_DEBUG("shader error\n");
+		//PRINT_DEBUG("shader error\n");
         wes_shader_error(index);
         glDeleteShader(index);
         return (0xFFFFFFFF);
@@ -337,7 +363,8 @@ wes_shader_init()
 
     sh_pbuffer_count = 0;
     sh_program_mod = GL_TRUE;
-
+#define USE_SHADER_FILE 0
+#if USE_SHADER_FILE
     //Load file into mem:
 	// load android shader
 	PRINT_DEBUG("before loading shader\n");
@@ -366,6 +393,14 @@ wes_shader_init()
     sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
 	PRINT_DEBUG("after shader create\n");
     free(data);
+#else
+	data = (char*) malloc(wesShaderStr.size() + 1);
+	strcpy(data, wesShaderStr.c_str());
+	//PRINT_DEBUG("Shader = %s\n", data);
+	sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
+	//PRINT_DEBUG("after shader create\n");
+	free(data);
+#endif
 }
 
 
