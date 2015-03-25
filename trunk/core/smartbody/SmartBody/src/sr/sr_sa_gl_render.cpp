@@ -135,13 +135,17 @@ void SrSaGlRender::override_render_mode ( SrSn* n, srRenderMode m )
 
 void SrSaGlRender::get_top_matrix ( SrMat& mat )
  {
+#if !GLES_RENDER
    glGetFloatv ( GL_MODELVIEW_MATRIX, (float*)mat );
+#endif
  }
 
 int SrSaGlRender::matrix_stack_size ()
- {
+{
    int value;
+#if !GLES_RENDER
    glGetIntegerv ( GL_MODELVIEW_STACK_DEPTH, &value );
+#endif
    return value;
  }
 
@@ -154,7 +158,8 @@ void SrSaGlRender::init_matrix ()
 void SrSaGlRender::mult_matrix ( const SrMat& mat )
  {
    //SR_TRACE3("Mult Matrix");
-   glMultMatrixf ( (const float*)mat );
+	 SrMat tm = mat;
+   glMultMatrixf ( (float*)tm );
  }
 
 void SrSaGlRender::push_matrix ()

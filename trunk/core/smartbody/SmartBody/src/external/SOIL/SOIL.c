@@ -23,8 +23,9 @@
 	#include <wingdi.h>
 	#include <GL/gl.h>
 #elif defined(BUILD_ANDROID)
-	#include <GLES2/gl2.h>
-	#include <GLES2/gl2ext.h>
+	//#include <GLES2/gl2.h>
+	//#include <GLES2/gl2ext.h>
+	#include "wes_gl.h"
 #elif defined(SB_IPHONE)
     #include <OpenGLES/ES1/gl.h>
     #include <OpenGLES/ES1/glext.h>
@@ -35,7 +36,9 @@
 #elif defined(__FLASHPLAYER__)
 	#include <GL/gl.h>
 #elif defined(__ANDROID__)
-	#include <GLES/gl.h>
+	//#include <GLES/gl.h>
+	//#include <GLES2/gl2.h>
+	#include "wes_gl.h"
 #else
 	#include <GL/gl.h>
 	#include <GL/glx.h>
@@ -217,6 +220,7 @@ unsigned int
 		RGBE_to_RGBdivA2( img, width, height, rescale_to_max );
 	}
 	/*	OK, make it a texture!	*/
+
 	tex_id = SOIL_internal_create_OGL_texture(
 			img, width, height, channels,
 			reuse_texture_ID, flags,

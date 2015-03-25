@@ -77,6 +77,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	BML::BmlRequestPtr request,
 	SmartBody::SBScene* scene )
 {
+	//LOG("parse BML speech");
 	if (!request->actor->face_ct)
 	{
 		LOG("Character %s does not have a face controller, so cannot create speech.", request->actor->getName().c_str());
@@ -232,6 +233,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	// Found speech implementation.  Making request.
 	RequestId speech_request_id;
 	try {
+		//LOG("cur_speech, requestSpeechAudio");
 		speech_request_id = cur_speech_impl->requestSpeechAudio( request->actorId.c_str(), request->actor->get_voice_code(), xml, "bp speech_ready " );
 	} catch (...) {
 		if (cur_speech_impl_backup) {
@@ -1863,6 +1865,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 
 void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
+	//LOG("SpeechRequest, realize impl");
 	// Get times from SyncPoints
 	time_sec startAt  = behav_syncs.sync_start()->time();
 	time_sec readyAt  = behav_syncs.sync_ready()->time();

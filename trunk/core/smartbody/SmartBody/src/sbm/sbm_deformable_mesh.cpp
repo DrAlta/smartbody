@@ -2,7 +2,9 @@
 #include "vhcl.h"
 
 #ifdef __ANDROID__
-#include <GLES/gl.h>
+//#include <GLES/gl.h>
+//#include <GLES2/gl2.h>
+#include "wes_gl.h"
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>
 #else
@@ -2167,7 +2169,7 @@ void DeformableMeshInstance::blendShapes()
 
 
 		//	Here I try to blend the faces two at a time. This way I avoid hardcoded constant vector size.
-#if !defined(ANDROID_BUILD)
+#if 1
 
 		if(_tempFBOPairs == NULL) 
 		{
@@ -2178,7 +2180,7 @@ void DeformableMeshInstance::blendShapes()
 //		SbmShaderProgram::printOglError("HERE #4 ");
 
 		if(tex_w > 2048)
-			tex_w = 2084;
+			tex_w = 2048;
 
 		if(tex_h > 2048)
 			tex_h = 2048;
@@ -2194,10 +2196,12 @@ void DeformableMeshInstance::blendShapes()
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#if !defined(ANDROID_BUILD)
+#if defined(__ANDROID__)
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_w, tex_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+#else
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-#endif
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_w, tex_h, 0, GL_RGB, GL_FLOAT, NULL);
+#endif
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 		}
@@ -2237,7 +2241,8 @@ void DeformableMeshInstance::blendShapes()
 		if (texIDs.size() > 0 && texIDs[0] != 0)
 		{
 	
-			SbmShaderProgram::printOglError("texIDs.size() > 0 ");
+			//SbmShaderProgram::printOglError("texIDs.size() > 0 ");
+			//LOG("texID size= %d", texIDs.size());
 
 			// New attempt to blend textures with masks (also renders a face). It uses the _tempTexWithMask, which are the texture maps with the masking encoded in its ALPHA channel.
 			// The _tempTexWithMask texture were created above in the SbmBlendTextures::ReadMasks call
@@ -2477,7 +2482,7 @@ SBAPI void DeformableMeshInstance::updateFast()
 void DeformableMeshInstance::update()
 {
 	//blendShapes();
-
+	//LOG("Update deformable mesh");
 #define RECOMPUTE_NORMAL 0
 	if (!_updateMesh)	return;
 	if (!_skeleton || !_mesh) return;	
@@ -2507,6 +2512,7 @@ void DeformableMeshInstance::update()
 		else																pos = _mesh->getMesh(skinWeight->sourceMesh);
 		if (pos != -1)
 		{
+			//LOG("update skinning, skin counter = %d", skinCounter);
 			SrSnModel* dMeshStatic = _mesh->dMeshStatic_p[pos];
 			//SrSnModel* dMeshDynamic = dynamicMesh[pos];
 			int numVertices = dMeshStatic->shape().V.size();
@@ -2542,8 +2548,15 @@ void DeformableMeshInstance::update()
 					SrVec finalTransformVec = (transformVec  * gMat);
 					finalVec = finalVec + (float(jointWeight) * finalTransformVec);		
 					//finalVec = finalVec + (float(jointWeight) * (skinLocalVec * skinWeight->bindShapeMat * invBMat  * gMat));	
-				}
 
+// 					if (iVtx == 150)
+// 					{
+// 						SrMat jointGmat = gMat;
+// 						LOG("inf joint %d, gmat = %s",j,jointGmat.toString().c_str());
+// 						LOG("finalVec = %f %f %f", finalVec[0],finalVec[1],finalVec[2]);
+// 					}
+				}
+				
 				_deformPosBuf[iVtx] = finalVec;
 				if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
 				{
@@ -2619,12 +2632,13 @@ SBAPI bool DeformableMeshInstance::isStaticMesh()
 
 SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 {
+	//LOG("Running blendShapeStaticMesh");
 
 	SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #0 ");
 
 	if (!_mesh) 
 		return;
-
+	//LOG("Mesh blendshape size = %d", _mesh->blendShapeMap.size());
 	if (_mesh->blendShapeMap.size() == 0)
 		return;
 
@@ -2702,6 +2716,7 @@ SrModel& DeformableMesh::getStaticModel(int index)
 
 void DeformableMesh::copySkinWeights(DeformableMesh* fromMesh, const std::string& morphName)
 {
+	LOG("Start copy skin weights");
 	// clear any existing skin weights
 	for (size_t w = 0; w < this->skinWeights.size(); w++)
 	{
@@ -2713,8 +2728,10 @@ void DeformableMesh::copySkinWeights(DeformableMesh* fromMesh, const std::string
 
 	for (size_t w = 0; w < fromMesh->skinWeights.size(); w++)
 	{
+		LOG("copy weight %d...", w);
 		SkinWeight* weight = new SkinWeight();
 		weight->copyWeights(fromMesh->skinWeights[w], morphName);
 		this->skinWeights.push_back(weight);
 	}
+	LOG("Finish copy skin weights");
 }

@@ -1,9 +1,12 @@
 #include "vhcl.h"
-#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
 #include "external/glew/glew.h"
 #include "external/jpge/jpge.h"
 #endif
 
+#if defined(__ANDROID__)
+#include "wes_matrix.h"
+#endif
 #include <algorithm>
 #include "SbmBlendFace.h"
 #include "sbm/sbm_deformable_mesh.h"
@@ -20,6 +23,8 @@
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
+
+#if !defined(__ANDROID__)
 
 SbmBlendFace::SbmBlendFace() : DeformableMesh()
 {
@@ -257,6 +262,8 @@ void SbmBlendFace::initShaderProgram()
 	*/
 }
 
+#endif
+
 SbmBlendTextures::SbmBlendTextures()
 {
 }
@@ -268,6 +275,12 @@ SbmBlendTextures::~SbmBlendTextures()
 
 GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 {
+#if defined(__ANDROID__)
+	std::string shaderPath = "/sdcard/uscict_virtualhumandata/shaders/";
+#else
+	std::string shaderPath = "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/";
+#endif
+
 	if(_shaderName.compare("Blend_Two_Textures") == 0)
 	{
 		SbmShaderProgram* program		= SbmShaderManager::singleton().getShader(_shaderName);
@@ -282,8 +295,8 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		{
 			LOG("Program does not exist yet");
 
-			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendTextures.vert";
-			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendTextures.frag";
+			const std::string shaderVs	= shaderPath + "blendTextures.vert";
+			const std::string shaderFs	= shaderPath + "blendTextures.frag";
 	
 			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
 			SbmShaderManager::singleton().buildShaders();
@@ -307,8 +320,8 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		{
 			LOG("Program does not exist yet");
 
-			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendAllTextures.vert";
-			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendAllTextures.frag";
+			const std::string shaderVs	= shaderPath + "blendAllTextures.vert";
+			const std::string shaderFs	= shaderPath + "blendAllTextures.frag";
 	
 			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
 			SbmShaderManager::singleton().buildShaders();
@@ -330,8 +343,8 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		{
 			LOG("Program does not exist yet");
 
-			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendAllTexturesPairwise.vert";
-			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendAllTexturesPairwise.frag";
+			const std::string shaderVs	= shaderPath + "blendAllTexturesPairwise.vert";
+			const std::string shaderFs	= shaderPath + "blendAllTexturesPairwise.frag";
 	
 			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
 			SbmShaderManager::singleton().buildShaders();
@@ -353,8 +366,8 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		{
 			LOG("Program does not exist yet");
 
-			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendGeometry.vert";
-			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendGeometry.frag";
+			const std::string shaderVs	= shaderPath + "blendGeometry.vert";
+			const std::string shaderFs	= shaderPath + "blendGeometry.frag";
 	
 			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
 			SbmShaderManager::singleton().buildShaders();
@@ -376,11 +389,13 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		{
 			LOG("Program does not exist yet");
 
-			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/readMasks.vert";
-			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/readMasks.frag";
+			const std::string shaderVs	= shaderPath + "readMasks.vert";
+			const std::string shaderFs	= shaderPath + "readMasks.frag";
 	
 			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+			LOG("Before build shader");
 			SbmShaderManager::singleton().buildShaders();
+			LOG("After build shader");
 				
 			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
 		}
@@ -399,8 +414,8 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		{
 			LOG("Program does not exist yet");
 
-			const std::string shaderVs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendGeometryWithMasks.vert";
-			const std::string shaderFs	= "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/blendGeometryWithMasks.frag";
+			const std::string shaderVs	= shaderPath + "blendGeometryWithMasks.vert";
+			const std::string shaderFs	= shaderPath + "blendGeometryWithMasks.frag";
 	
 			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
 			SbmShaderManager::singleton().buildShaders();
@@ -473,7 +488,7 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 		// Checks if mask file exists
 		if (!boost::filesystem::exists(mask))
 		{
-			std::cout << "WARNING! Can't find mask " << mask << ", using a white mask instead.\n" << std::endl;
+			LOG("WARNING! Can't find mask %s, using a white mask instead.\n", mask.c_str());
 			SbmTextureManager::singleton().createWhiteTexture("white");
 			tex_mask	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,"white");
 		}
@@ -484,7 +499,7 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 			tex_mask	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, mask.c_str());
 	
 			if(tex_mask == NULL)
-				printf("ERROR loading texture %s",mask.c_str());
+				LOG("ERROR loading texture %s",mask.c_str());
 		
 			// Builds mask to generate OpenGL texture ID
 			tex_mask->buildTexture();
@@ -499,6 +514,7 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 
 			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #2");
 
+#if !defined(__ANDROID__)
 			glPushAttrib(GL_ENABLE_BIT);
 				glDisable(GL_DEPTH_TEST);
 				glDisable(GL_LIGHTING);
@@ -559,7 +575,74 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 				glPopMatrix();                              
 				glMatrixMode (GL_MODELVIEW);
 			glPopAttrib();								// Pops ENABLE_BIT
+#elif defined(__ANDROID__)
+			glDisable(GL_DEPTH_TEST);
+			//glDisable(GL_LIGHTING);
+			glMatrixMode (GL_PROJECTION);
+			glPushMatrix();
 
+			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #3");
+			glLoadIdentity ();
+			gluOrtho2D(-1, 1, -1, 1);
+			glMatrixMode (GL_MODELVIEW);
+			int viewport[4];
+			glGetIntegerv(GL_VIEWPORT, viewport);
+			glViewport(0, 0, w, h);
+			glLoadIdentity ();
+			GLfloat clearColors[4];
+			glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColors);
+			glClearColor(1.0, 1.0, 1.0, 0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			glUseProgram(program);
+
+			//glEnable(GL_TEXTURE_2D);
+
+			GLuint uExpressionSampler	= glGetUniformLocation(program, "uExpressionSampler");
+			GLuint uMaskSampler			= glGetUniformLocation(program, "uMaskSampler");
+
+			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #7_");
+
+			glUniform1i(uExpressionSampler, 0);
+			glUniform1i(uMaskSampler, 1);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texIDs[i]);
+
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, tex_mask->getID());
+
+			SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, -0.5f, 1.f), SrVec4(-1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, 1.0f, -0.5f, 1.f) };
+			SrVec4 quadT[4] = { SrVec4(0.f, 1.f, 0.f, 0.f), SrVec4(0.f, 0.f, 0.f, 0.f), SrVec4(1.f, 0.f, 0.f, 0.f), SrVec4(1.f, 1.f, 0.f, 0.f) };
+			unsigned short indices[] = {0,1,2, 0,2,3};
+
+			GLuint pos_loc = glGetAttribLocation(program,"aPosition");
+			GLuint texcoord_loc = glGetAttribLocation(program,"aTexCoord0");
+			GLuint mvp_loc = glGetUniformLocation(program, "uMVP");
+			glEnableVertexAttribArray(pos_loc);
+			glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,(GLfloat*)&quad[0]);
+			glEnableVertexAttribArray(texcoord_loc);
+			glVertexAttribPointer(texcoord_loc,4,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
+			glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, m_modelview_proj->data);
+
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+
+			glDisableVertexAttribArray(pos_loc);
+			glDisableVertexAttribArray(texcoord_loc);
+
+			glUseProgram(0);
+			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #9");
+
+			glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+			glClearColor(clearColors[0],clearColors[1],clearColors[2],clearColors[3]);
+			//glDisable(GL_TEXTURE_2D);						// Pops viewport information
+			glMatrixMode (GL_PROJECTION);
+			glPopMatrix();                              
+			glMatrixMode (GL_MODELVIEW);
+			glEnable(GL_DEPTH_TEST);
+			//glEnable(GL_LIGHTING);							// Pops ENABLE_BIT
+
+#endif
 			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #10");
 
 			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);    // Bind the render buffer
@@ -575,6 +658,7 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 
 void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program, glm::mat4x4 translation, glm::mat4x4 rotation)
 {
+#if !defined(__ANDROID__)
 	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
 
 	bool showMasks		= false;
@@ -807,12 +891,13 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 	delete aux;
 
 	SbmShaderProgram::printOglError("BlendGeometry FINAL");
-
+#endif
 }
 
 
 void SbmBlendTextures::BlendGeometry(GLuint * FBODst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance/*_mesh*/, GLuint program)
 {
+#if !defined(__ANDROID__)
 	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
 
 
@@ -1066,7 +1151,7 @@ void SbmBlendTextures::BlendGeometry(GLuint * FBODst, std::vector<float> weights
 	delete aux;
 
 	SbmShaderProgram::printOglError("BlendGeometry FINAL");
-
+#endif
 }
 
 void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, GLuint program, int w, int h)
@@ -1079,9 +1164,10 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 
 	for(std::vector<float>::iterator j=weights.begin(); j!=weights.end(); ++j)
 		sumOfWeights += *j;
-
+	//LOG("Blend ApperancePairWise");
 	for(int i = numTextures-1; i >= 0; i--) 
 	{
+		//LOG("BlendTexture %d", i);
 		WeightUpToNow += weights[i];
 
 		int faceArea;
@@ -1101,12 +1187,13 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 		}
 
 	
-		glPushMatrix();
-			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst[i]);                                                              // Bind the framebuffer object
-			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst[i], 0);              // Attach texture to FBO
-
-			assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
-
+		
+			glBindFramebuffer(GL_FRAMEBUFFER, FBODst[i]);                                                              // Bind the framebuffer object
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst[i], 0);              // Attach texture to FBO
+		//LOG("After bind framebuffer");
+			assert( glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE );
+			
+#if !defined(__ANDROID__)
 			glPushAttrib(GL_ENABLE_BIT);
 				glDisable(GL_DEPTH_TEST);
 				glDisable(GL_LIGHTING);
@@ -1115,6 +1202,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 					glLoadIdentity ();
 					gluOrtho2D(-1, 1, -1, 1);
 					glMatrixMode (GL_MODELVIEW);
+					glPushMatrix();
 					glPushAttrib(GL_VIEWPORT_BIT);
 					glPushAttrib(GL_TEXTURE_BIT);
 						glViewport(0, 0, w, h);
@@ -1187,15 +1275,130 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 				glMatrixMode (GL_PROJECTION);
 				glPopMatrix();                              // Pops ENABLE_BIT
 				glMatrixMode (GL_MODELVIEW);
+				glPopMatrix();
 			glPopAttrib();
+#elif defined(__ANDROID__)
+			GLint frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+// 			if (frameBufferStatus == GL_FRAMEBUFFER_COMPLETE)
+// 				LOG("frameBufferStatus = GL_FRAMEBUFFER_COMPLETE");
+// 			else if (frameBufferStatus == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
+// 				LOG("frameBufferStatus = GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+// 			else if (frameBufferStatus == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
+// 				LOG("frameBufferStatus = GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+// 			else if (frameBufferStatus == GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS)
+// 				LOG("frameBufferStatus = GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
+// 			else if (frameBufferStatus == GL_FRAMEBUFFER_UNSUPPORTED)
+// 				LOG("frameBufferStatus = GL_FRAMEBUFFER_UNSUPPORTED");
+			
+			glMatrixMode (GL_MODELVIEW);
+			glPushMatrix();
+			glLoadIdentity ();
+			
+			glMatrixMode (GL_PROJECTION);
+			glPushMatrix();
+			glLoadIdentity();
+			gluOrtho2D(-1, 1, -1, 1);
+			
+			glDisable(GL_DEPTH_TEST);
+			//glDisable(GL_LIGHTING);
+			int viewport[4];
+			glGetIntegerv(GL_VIEWPORT, viewport);
+			GLfloat clearColors[4];
+			glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColors);
 
-			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);                                                                                                          // Bind the render buffer
-			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);         
+			glViewport(0, 0, w, h);
+			
+
+			glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			
+			//LOG("After clear buffer");
+			GLuint uNumberOfTextures		= glGetUniformLocation(program, "uNumberOfTextures");
+			GLuint uIteration				= glGetUniformLocation(program, "uIteration");
+			GLuint uWeight					= glGetUniformLocation(program, "uWeight");
+			GLuint uWeightUpToNow			= glGetUniformLocation(program, "uWeightUpToNow");
+			GLuint uFaceArea				= glGetUniformLocation(program, "uFaceArea");
+			GLuint uTotalWeights			= glGetUniformLocation(program, "uTotalWeights");
+			GLuint uNeutralSampler			= glGetUniformLocation(program, "uNeutralSampler");
+			GLuint uExpressionSampler		= glGetUniformLocation(program, "uExpressionSampler");
+			GLuint uPreviousResultSampler	= glGetUniformLocation(program, "uPreviousResultSampler");
+			
+			glUseProgram(program);
+			
+			//glEnable(GL_TEXTURE_2D);
+			//LOG("After use program");
+			glUniform1i(uNumberOfTextures, numTextures);
+			glUniform1i(uIteration, i);
+			glUniform1f(uWeight, weights[i]);
+			glUniform1f(uWeightUpToNow, WeightUpToNow);
+			glUniform1i(uFaceArea, faceArea);
+			glUniform1f(uTotalWeights, sumOfWeights);
+			glUniform1i(uNeutralSampler, 0);
+			glUniform1i(uExpressionSampler, 1);
+			glUniform1i(uPreviousResultSampler, 2);
+			//LOG("After glUniform1i");
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+			//LOG("after bind tedIDs[0]");
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, texIDs[i]);
+			//LOG("After bindTexture");
+			//std::cerr << "uNeutral: " << texIDs[0] << "\tuExpression: " << texIDs[i];
+
+			// if first iteration, previous result will not be used, passing a random texture just for completeness  
+			if(i == numTextures-1) {
+				glActiveTexture(GL_TEXTURE2);
+				glBindTexture(GL_TEXTURE_2D, texIDs[1]);
+				//std::cerr  << "\tprevious: " << texIDs[1] << "\tDest:" << texDst[i] << "\ti = " << i << "\n";
+			} else {
+				glActiveTexture(GL_TEXTURE2);
+				glBindTexture(GL_TEXTURE_2D, texDst[i+1]);
+				//std::cerr << "\tprevious: " << texDst[i+1] << "\tDest:" << texDst[i] <<  "\ti = " << i << "\n";
+			}
+			
+			//LOG("before bindAttrib");
+			SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, -0.5f, 1.f), SrVec4(-1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, 1.0f, -0.5f, 1.f) };
+			SrVec4 quadT[4] = { SrVec4(0.f, 1.f, 0.f, 0.f), SrVec4(0.f, 0.f, 0.f, 0.f), SrVec4(1.f, 0.f, 0.f, 0.f), SrVec4(1.f, 1.f, 0.f, 0.f) };
+			unsigned short indices[] = {0,1,2, 0,2,3};
+
+			GLuint pos_loc = glGetAttribLocation(program,"aPosition");
+			GLuint texcoord_loc = glGetAttribLocation(program,"aTexCoord0");
+			GLuint mvp_loc = glGetUniformLocation(program, "uMVP");
+			glEnableVertexAttribArray(pos_loc);
+			glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,(GLfloat*)&quad[0]);
+			glEnableVertexAttribArray(texcoord_loc);
+			glVertexAttribPointer(texcoord_loc,4,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
+			wes_matrix_mvp();
+			glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, m_modelview_proj->data);
+			//LOG("Before draw elements");
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+			//LOG("After draw elements");
+			
+			glDisableVertexAttribArray(pos_loc);
+			glDisableVertexAttribArray(texcoord_loc);
+			
+			glUseProgram(0);
+			
+			glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+			glClearColor(clearColors[0],clearColors[1],clearColors[2],clearColors[3]);                        
+			//glDisable(GL_TEXTURE_2D);
+			glEnable(GL_DEPTH_TEST);
+			//glEnable(GL_LIGHTING);
+			
+			glMatrixMode (GL_PROJECTION);
+			glPopMatrix(); 
+			
+			glMatrixMode (GL_MODELVIEW);
+			glPopMatrix();
+#endif
+			glBindRenderbuffer(GL_RENDERBUFFER, 0);                                                                                                          // Bind the render buffer
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);         
 		
 			glActiveTexture(GL_TEXTURE0);
 																									   // Bind the frame buffer object
-		glPopMatrix();
-
+		
+		//LOG("After bind framebuffer");
 		/*
 		//	Saves USColorCode for current weight i in EXR32 format
 		int channels = 3;
@@ -1208,6 +1411,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 		delete(image);
 		*/
 	}
+	//LOG("Finish BlendAllAppearancesPairwise");
 }
 
 void SbmBlendTextures::BlendAllAppearances(GLuint FBODst, GLuint texDst, std::vector<float> weights, std::vector<GLuint> texIDs, GLuint program, int w, int h)
@@ -1234,7 +1438,7 @@ void SbmBlendTextures::BlendAllAppearances(GLuint FBODst, GLuint texDst, std::ve
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst, 0);              // Attach texture to FBO
 
 		assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
-
+#if !defined(__ANDROID__)
 		glPushAttrib(GL_ENABLE_BIT);
 			glDisable(GL_DEPTH_TEST);
 			glDisable(GL_LIGHTING);
@@ -1338,6 +1542,7 @@ void SbmBlendTextures::BlendAllAppearances(GLuint FBODst, GLuint texDst, std::ve
 			glPopMatrix();                              // Pops ENABLE_BIT
 			glMatrixMode (GL_MODELVIEW);
 		glPopAttrib();
+#endif
 		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);                                                                                                          // Bind the render buffer
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);         
 		
@@ -1353,7 +1558,7 @@ void SbmBlendTextures::BlendTwoFBO(GLuint tex0, GLuint tex1, GLuint FBODst, GLui
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst, 0);              // Attach texture to FBO
 
 	assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
-
+#if !defined(__ANDROID__)
 	glPushAttrib(GL_ENABLE_BIT);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
@@ -1419,6 +1624,7 @@ void SbmBlendTextures::BlendTwoFBO(GLuint tex0, GLuint tex1, GLuint FBODst, GLui
 		glMatrixMode (GL_MODELVIEW);
 
 		glPopAttrib();
+#endif
 		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);                                                                                                          // Bind the render buffer
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);                                                                                                            // Bind the frame buffer object
 	glPopMatrix();

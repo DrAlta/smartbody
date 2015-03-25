@@ -274,9 +274,9 @@ void SbmTexture::buildTexture(bool buildMipMap)
 #if !defined(__native_client__)
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:10");		
 	GLuint iType = GL_TEXTURE_2D;
-	glEnable(GL_TEXTURE_2D);
+	myGLEnable(GL_TEXTURE_2D);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glEnable(iType);	
+	myGLEnable(iType);	
 	glGenTextures(1,&texID);
 	glBindTexture(iType,texID);
 #if !defined(__ANDROID__) && !defined(SB_IPHONE)
@@ -346,7 +346,7 @@ void SbmTexture::buildTexture(bool buildMipMap)
 	finishBuild = true;
 	//LOG("Finish build texture");
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:300");
-	//printf("Texture name = %s, texture ID = %d\n",textureName.c_str(),texID);	
+	//LOG("Texture name = %s, texture ID = %d",textureName.c_str(),texID);	
 	//imdebug("rgb w=%d h=%d %p", width, height, buffer);
 #endif
 }

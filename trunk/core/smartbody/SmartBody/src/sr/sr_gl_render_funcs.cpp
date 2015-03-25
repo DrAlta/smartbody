@@ -23,7 +23,9 @@
 #include "vhcl.h"
 #include <sb/SBTypes.h>
 #ifdef __ANDROID__
-#include <GLES/gl.h>
+//#include <GLES/gl.h>
+//#include <GLES2/gl2.h>
+#include <wes_gl.h>
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>
 #else
@@ -270,7 +272,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 #else
 	bool USE_GPU_BLENDSHAPES = true;
 #endif
-	
+	//LOG("Render Deformable Model");
 	DeformableMesh* mesh = shape->getDeformableMesh();
     if (!mesh)
     {
@@ -330,6 +332,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	else
 	{
 		
+			//LOG("No GPU BlendShapes");
 			if (shape->isStaticMesh())
 			{
 				SmartBody::SBSkeleton* skel = shape->getSkeleton();
@@ -370,21 +373,23 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			}
 
 			std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
-			glEnable(GL_LIGHTING);
-			glEnable(GL_TEXTURE_2D);	
-			glEnable ( GL_ALPHA_TEST );
-			glEnable (GL_BLEND);
+			myGLEnable(GL_LIGHTING);
+			myGLEnable(GL_TEXTURE_2D);	
+			myGLEnable ( GL_ALPHA_TEST );
+			myGLEnable (GL_BLEND);
 			#if !defined (__ANDROID__) && !defined(SB_IPHONE)
-			glDisable ( GL_POLYGON_SMOOTH );
+			myGLDisable ( GL_POLYGON_SMOOTH );
 			#endif
 			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			glAlphaFunc ( GL_GREATER, 0.0f ) ;
-			glEnable(GL_CULL_FACE);
+			myGLEnable(GL_CULL_FACE);
 	
 			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 			//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
 
+			//SrVec tempPos = shape->_deformPosBuf[150];
+			//LOG("deformPos = %f %f %f",tempPos[0],tempPos[1],tempPos[2]);
 			if (shape->_deformPosBuf.size() > 0)
 			{
 				glEnableClientState(GL_VERTEX_ARRAY);
@@ -402,21 +407,21 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				glEnableClientState(GL_COLOR_ARRAY);
 				glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->skinColorBuf[0]);		
 				//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
-				glDisable(GL_LIGHTING);
+				myGLDisable(GL_LIGHTING);
 			}
 			else if (mesh->hasVertexColor)
 			{
 				glEnableClientState(GL_COLOR_ARRAY);
 				glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);		
 				//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
-				glDisable(GL_LIGHTING);
+				myGLDisable(GL_LIGHTING);
 			}
 			else
 			{
 				glDisableClientState(GL_COLOR_ARRAY);
 				//glColorPointer(3,GL_FLOAT, 0,  NULL);		
 				//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
-				glEnable(GL_LIGHTING);
+				myGLEnable(GL_LIGHTING);
 			}
 		
 			if (mesh->texCoordBuf.size() > 0)
@@ -425,21 +430,21 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);   
 			}
 			
-
+			//LOG("subMeshList size = %d", subMeshList.size());
 			for (unsigned int i=0;i<subMeshList.size();i++)
 			{	
 				SbmSubMesh* subMesh = subMeshList[i];
 				glMaterial(subMesh->material);	
 				if (subMesh->material.useAlphaBlend)
 				{
-					glEnable(GL_ALPHA_TEST);
-					glEnable(GL_BLEND);
+					myGLEnable(GL_ALPHA_TEST);
+					myGLEnable(GL_BLEND);
 			
 				}
 				else
 				{
-					glDisable(GL_ALPHA_TEST);
-					glDisable(GL_BLEND);
+					myGLDisable(GL_ALPHA_TEST);
+					myGLDisable(GL_BLEND);
 				}
 
 				std::string texturesType = "static";
@@ -449,11 +454,11 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				SmartBody::SBSkeleton* skel = shape->getSkeleton();
 				SmartBody::SBPawn* pawn		= skel->getPawn();
 				bool useTexBlend = pawn->getBoolAttribute("blendTexturesWithLighting");
-
+				//LOG("textureType = %s", texturesType.c_str());
 				if( texturesType == "static" || texturesType == "dynamic")
 				{
 					SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());		
-
+					//LOG("tex = %d", tex);
 					if (tex && !showSkinWeight)
 					{
 						GLint activeTexture = -1;
@@ -463,7 +468,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 							glActiveTexture(GL_TEXTURE0);
 			
 						//	If we are using blended textures
-						glEnable(GL_TEXTURE_2D);	
+						myGLEnable(GL_TEXTURE_2D);	
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 
@@ -477,6 +482,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 							{
 								glBindTexture(GL_TEXTURE_2D, shape->_tempTexPairs[0]);
 								//std::cerr << "Using tex: " << shape->_tempTexPairs[0] << "\n";
+								//LOG("Use Blended texture");
 							}
 							else 
 							{
@@ -488,14 +494,14 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 						else 		//	If blended textures not used, use neutral appearance				
 						{
 							glBindTexture(GL_TEXTURE_2D, tex->getID());
-					
+							//LOG("Use original texture, texID = %d", tex->getID());
 						}				
 
-						if (useTexBlend)
-						{
-							glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-						}
-						else
+// 						if (useTexBlend)
+// 						{
+// 							glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+// 						}
+// 						else
 						{
 							glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 						}
@@ -503,7 +509,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 					}
 				}
 			#if GLES_RENDER
-				glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &subMesh->triBuf[0]);
+				//glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &subMesh->triBuf[0]);
+				glDrawElements_wes(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &subMesh->triBuf[0]);
 			#else
 				glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_INT, &subMesh->triBuf[0]);
 			#endif
@@ -512,8 +519,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_NORMAL_ARRAY);
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-			glDisable(GL_TEXTURE_2D);
-			glDisable(GL_BLEND);	
+			myGLDisable(GL_TEXTURE_2D);
+			myGLDisable(GL_BLEND);	
 			if (shape->isStaticMesh())
 			{
 				glPopMatrix();
@@ -522,7 +529,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	}
 
 	SbmShaderProgram::printOglError("SrGlRenderFuncs::renderDeformableMesh FINAL");
-
+	//LOG("Finish render deformable model");
 }
 
 void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
@@ -548,13 +555,13 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 
    if ( shape->material_is_overriden() ) fmsize=0; // model materials are ignored
   
-//   glEnable ( GL_LIGHTING );
+//   myGLEnable ( GL_LIGHTING );
    glShadeModel ( GL_SMOOTH );
 
    if ( model.culling )
-    glEnable ( GL_CULL_FACE );
+    myGLEnable ( GL_CULL_FACE );
    else
-    glDisable ( GL_CULL_FACE );
+    myGLDisable ( GL_CULL_FACE );
 
    bool flat = true;   
    SrVec fn(SrVec::i);
@@ -576,16 +583,16 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 
    if (tex && T.size() != 0) // apply textures
    {
-      glEnable ( GL_ALPHA_TEST );
-      glEnable (GL_BLEND);
+      myGLEnable ( GL_ALPHA_TEST );
+      myGLEnable (GL_BLEND);
       glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       glAlphaFunc ( GL_GREATER, 0.3f ) ;
    
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);   
 
-      glDisable(GL_COLOR_MATERIAL);	   
+      myGLDisable(GL_COLOR_MATERIAL);	   
       glActiveTexture(GL_TEXTURE0);
-      glEnable(GL_TEXTURE_2D);	 	
+      myGLEnable(GL_TEXTURE_2D);	 	
       glBindTexture(GL_TEXTURE_2D,tex->getID());	   	      
       //LOG("mtlName = %s, has texture = %s, texID = %d", mtlName.c_str(), texName.c_str(), tex->getID());
 #if !defined (__FLASHPLAYER__)
@@ -691,16 +698,16 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 		   }
 		   else // has normal and texture
 		   {   // to-do : figure out why texture does not work in the fixed-pipeline ?	  
-			   //glDisable(GL_LIGHTING);	
+			   //myGLDisable(GL_LIGHTING);	
 			   //LOG("Normal and texture\n");
-			   glEnable ( GL_ALPHA_TEST );
-			   glEnable (GL_BLEND);
+			   myGLEnable ( GL_ALPHA_TEST );
+			   myGLEnable (GL_BLEND);
 			   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			   glAlphaFunc ( GL_GREATER, 0.3f ) ;
 			   
-			   glDisable(GL_COLOR_MATERIAL);	   
+			   myGLDisable(GL_COLOR_MATERIAL);	   
 			   glActiveTexture(GL_TEXTURE0);
-			   glEnable(GL_TEXTURE_2D);	 	
+			   myGLEnable(GL_TEXTURE_2D);	 	
 			   glBindTexture(GL_TEXTURE_2D,tex->getID());	   	   
 			   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_CLAMP);
 			   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_CLAMP);
@@ -744,7 +751,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 			   }
 			   glEnd (); 	   
 			   glBindTexture(GL_TEXTURE_2D, 0);	   
-			   glDisable(GL_BLEND);
+			   myGLDisable(GL_BLEND);
 		   }
 
 	   }
@@ -794,7 +801,7 @@ void SrGlRenderFuncs::render_lines ( SrSnShapeBase* shape )
 
    if ( V.size()<2 ) return;
 
-   glDisable ( GL_LIGHTING );
+   myGLDisable ( GL_LIGHTING );
    glColor ( shape->color() );
 
 /*
@@ -857,7 +864,7 @@ void SrGlRenderFuncs::render_points ( SrSnShapeBase* shape )
 
 	if ( P.size()==0 ) return;
 
-	glDisable ( GL_LIGHTING );
+	myGLDisable ( GL_LIGHTING );
 	glColor ( shape->material().diffuse );
 
 	if ( shape->render_mode()==srRenderModeSmooth )
@@ -903,8 +910,8 @@ void SrGlRenderFuncs::render_box ( SrSnShapeBase* shape )
    glColor ( shape->material().diffuse );
    glMaterial ( shape->material() );
    glShadeModel ( GL_SMOOTH );
-//   glEnable ( GL_LIGHTING );
-   glEnable ( GL_CULL_FACE );
+//   myGLEnable ( GL_LIGHTING );
+   myGLEnable ( GL_CULL_FACE );
 
    switch ( shape->render_mode() )
     { case srRenderModeDefault :
@@ -965,8 +972,8 @@ void SrGlRenderFuncs::render_sphere ( SrSnShapeBase* shape )
    SrSphere& sphere = ((SrSnSphere*)shape)->shape();
 
    srRenderMode rm = shape->render_mode();
-   glEnable ( GL_CULL_FACE );
-//   glEnable ( GL_LIGHTING );
+   myGLEnable ( GL_CULL_FACE );
+//   myGLEnable ( GL_LIGHTING );
    glMaterial ( shape->material() );
 
    switch ( rm )
@@ -1114,8 +1121,8 @@ void SrGlRenderFuncs::render_cylinder ( SrSnShapeBase* shape )
    SrCylinder& cyl = ((SrSnCylinder*)shape)->shape();
 
    srRenderMode rm = shape->render_mode();
-   glEnable ( GL_CULL_FACE );
-//   glEnable ( GL_LIGHTING );
+   myGLEnable ( GL_CULL_FACE );
+//   myGLEnable ( GL_LIGHTING );
 
    glMaterial ( shape->material() );
 
@@ -1244,7 +1251,7 @@ void SrGlRenderFuncs::render_polygon ( SrSnShapeBase* shape )
 
    float resolution = shape->resolution();
 
-   glDisable ( GL_LIGHTING );
+   myGLDisable ( GL_LIGHTING );
    glColor ( shape->material().diffuse );
    glLineWidth ( resolution ); // default is 1.0
 
@@ -1262,7 +1269,7 @@ void SrGlRenderFuncs::render_polygons ( SrSnShapeBase* shape )
    if ( p.size()==0 ) return;
 
    float resolution = shape->resolution();
-   glDisable ( GL_LIGHTING );
+   myGLDisable ( GL_LIGHTING );
    glColor ( shape->material().diffuse );
    glLineWidth ( resolution ); // default is 1.0
 

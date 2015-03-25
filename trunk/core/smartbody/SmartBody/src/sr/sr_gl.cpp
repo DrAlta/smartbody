@@ -173,7 +173,7 @@ void glLight ( int id, const SrLight& l, bool bind_pos )
 	f[3] = l.directional? 0.0f:1.0f;
 	glLightfv ( n, GL_POSITION, f );
    }
-   glEnable( n );
+   myGLEnable( n );
  }
 
 void glLightPos( int id, const SrLight& l )	{
@@ -212,12 +212,14 @@ void glMaterial ( const SrMaterial &m )
 
 void glMultMatrix ( const SrMat &m )
  {
-   glMultMatrixf ( (const float*)m );
+	 SrMat tm = m;
+   glMultMatrixf ( (float*)tm );
  }
 
 void glLoadMatrix ( const SrMat &m )
  {
-   glLoadMatrixf ( (const float*)m );
+	 SrMat tm = m;
+   glLoadMatrixf ( (float*)tm );
  }
 
 void glTranslate ( const SrVec &v )
@@ -249,6 +251,7 @@ void glPerspective ( float fovy, float aspect, float znear, float zfar )
    GLdouble ymax = (GLdouble)znear * tan ( fovy/2 );
 
 #if GLES_RENDER
+   /*
    glFrustumf( (GLdouble) ((-ymax)*(GLdouble)aspect), // xmin
                (GLdouble) (( ymax)*(GLdouble)aspect), // xmax
                (GLdouble) (-ymax),                    // ymin
@@ -256,6 +259,8 @@ void glPerspective ( float fovy, float aspect, float znear, float zfar )
                (GLdouble) znear, 
                (GLdouble) zfar   
              );
+			 */
+   gluPerspective(fovy, aspect, znear, zfar);
 #else
    glFrustum ( (GLdouble) ((-ymax)*(GLdouble)aspect), // xmin
                (GLdouble) (( ymax)*(GLdouble)aspect), // xmax
@@ -269,12 +274,20 @@ void glPerspective ( float fovy, float aspect, float znear, float zfar )
 
 void glGetViewMatrix ( SrMat &m )
  {
+#if GLES_RENDER
+	 // no implementation
+#else
    glGetFloatv ( GL_MODELVIEW_MATRIX, (float*)m );
+#endif
  }
 
 void glGetProjectionMatrix ( SrMat &m )
  {
+#if GLES_RENDER
+	 // no implementation
+#else
    glGetFloatv ( GL_PROJECTION_MATRIX, (float*)m );
+#endif
  }
 
 //=================================== info ====================================
@@ -286,8 +299,10 @@ static const char* sr_error_string ()
       case GL_INVALID_ENUM : return "invalid enum";
       case GL_INVALID_VALUE : return "invalid value";
       case GL_INVALID_OPERATION : return "invalid operation";
+#if !GLES_RENDER
       case GL_STACK_OVERFLOW : return "stack overflow";
       case GL_STACK_UNDERFLOW : return "stack underflow";
+#endif
       case GL_OUT_OF_MEMORY : return "out of memory";
       default : return "error not recognized";
     }
@@ -334,7 +349,7 @@ void glPrintInfo ( SrOutput &o )
 
    glGetIntegerv(GL_ACCUM_ALPHA_BITS ,&i); 
    o<<"GL_ACCUM_ALPHA_BITS : " << (int)i << '\n';
-#endif
+
 
    glGetIntegerv(GL_MAX_LIGHTS,&i);  
    o<<"GL_MAX_LIGHTS : " << (int)i << '\n';   
@@ -370,6 +385,7 @@ void glPrintInfo ( SrOutput &o )
       if ( inp.finished() ) break;
       o << srspc << srspc << (++n) << ": " << inp.last_token() << srnl;
     }
+ #endif
 
  }
 

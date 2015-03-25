@@ -359,6 +359,7 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 	_prev_time = t;
 
 	float angle_deg = 0;
+	bool writeOut = t <= (double) _duration;
 	if (t <= (double) _duration)
 	{
 		if( _mode == NOD_SIMPLE )	{
@@ -456,7 +457,7 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 #else
 		const std::string& jointName = _channels.name(local_channel_index);
 		SkJoint* channelJoint = frame.context()->channels().skeleton()->search_joint(jointName.c_str());
-		SrVec rotAxis;
+		SrVec rotAxis = SrVec(0,0,1);
 		if (_movementType == BML::HEAD_NOD )
 		{
 			 rotAxis = channelJoint->localGlobalAxis(0);
@@ -511,7 +512,7 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 			prev_out = Q_out.degrees();
 		}
 #endif
-
+		//LOG("localChan %d, quat = %f %f %f %f", local_channel_index, Q_out.w(), Q_out.x(), Q_out.y(), Q_out.z());
 		buff[ index + 0 ] = (float) Q_out.w();
 		buff[ index + 1 ] = (float) Q_out.x();
 		buff[ index + 2 ] = (float) Q_out.y();

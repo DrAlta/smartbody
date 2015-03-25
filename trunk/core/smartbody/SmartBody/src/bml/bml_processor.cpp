@@ -1382,6 +1382,7 @@ int BML::Processor::bp_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager*
         bp->reset();
         return CMD_SUCCESS;
 	} else if( command == "speech_ready" ) {
+		//LOG("bp speech ready");
 		// bp speech_ready <CharacterId> <RequestId> SUCCESS/ERROR reason
 		char* actorId = args.read_token();
 		SmartBody::SBCharacter* actor = scene->getCharacter( actorId );
