@@ -28,6 +28,7 @@ class SBPhonemeManager : public SBService
 		SBAPI void clearPhonemesRealtime(const std::string& character, const std::string& phoneme);
 		SBAPI std::vector<std::string> getPhonemesRealtime(const std::string& character);
 		SBAPI std::vector<double> getPhonemesRealtimeTimings(const std::string& character);
+		SBAPI void removePhonemesRealtime(const std::string& character);
 		
 		SBAPI std::vector<std::string> getCommonPhonemes();
 	

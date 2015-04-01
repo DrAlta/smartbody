@@ -270,7 +270,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 #if ANDROID_BUILD
 	bool USE_GPU_BLENDSHAPES = false;
 #else
-	bool USE_GPU_BLENDSHAPES = true;
+	bool USE_GPU_BLENDSHAPES = true; // set to false for no masks, true for masks
 #endif
 	//LOG("Render Deformable Model");
 	DeformableMesh* mesh = shape->getDeformableMesh();
@@ -280,7 +280,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
         return; // no deformable mesh
     }
 
-	if(USE_GPU_BLENDSHAPES)
+	bool useGPUBlendShapes = SmartBody::SBScene::getScene()->getBoolAttribute("useGPUBlendshapes");
+	if(useGPUBlendShapes)
 	{
 
 			SrVec offsetTrans_;

@@ -3,6 +3,7 @@
 #include <sb/SBController.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBMotion.h>
+#include <sbm/sr_linear_curve.h>
 
 class RealTimeLipSyncController : public SmartBody::SBController
 {
@@ -24,8 +25,9 @@ class RealTimeLipSyncController : public SmartBody::SBController
 		std::string _lastPhoneme;
 		std::vector<double> _currentPhonemeTimings;
 		std::vector<std::string> _currentPhonemes;
-		SmartBody::SBMotion* _motion;
 		double _startTime;
 		SkChannelArray  _channels;
+
+		std::map<std::string, srLinearCurve* > _currentCurves;
 };
 		
