@@ -218,9 +218,15 @@ void SBScene::initialize()
 	createBoolAttribute("enableExportProcessedBMLLOG",false,true,"",81,false,false,false,"Enable log for exporting of bml after realization.");
 	createStringAttribute("processedBMLPath","./processedXML.xml",true,"",90,false,false,false,"path of exported bml file after realization.");
 
+
 	createIntAttribute("shadowMapSize", 1024, true, "RenderingParameters", 100, false, false, false, "Size of the shadow map");
 	createIntAttribute("shadowMapCount", 1, true, "RenderingParameters", 110, false, false, false, "Num of the shadow maps");
 
+#if ANDROID_BUILD
+	createBoolAttribute("useGPUBlendshapes",false,true,"",120,false,false,false,"Use the GPU for processing blendshapes.");
+#else
+	createBoolAttribute("useGPUBlendshapes",true,true,"",120,false,false,false,"Use the GPU for processing blendshapes.");
+#endif
 	vhcl::Log::g_log.RemoveAllListeners();
 	ForwardLogListener* forwardListener = new ForwardLogListener();
 	vhcl::Log::g_log.AddListener(forwardListener);
@@ -2236,8 +2242,9 @@ void SBScene::exportCharacter( std::string charName, std::string outDir )
 	{
 		fs::create_directories(newOutPath);
 	}
-	std::vector<std::string> motions;	
-	ParserOpenCOLLADA::exportCollada(outDir, sbChar->getSkeleton()->getName(), sbChar->getStringAttribute("deformableMesh"), motions, true, true, false);
+	std::vector<std::string> motions;
+	double scale = sbChar->getDoubleAttribute("deformableMeshScale");
+	ParserOpenCOLLADA::exportCollada(outDir, sbChar->getSkeleton()->getName(), sbChar->getStringAttribute("deformableMesh"), motions, true, true, false, scale);
 
 }
 
@@ -2464,7 +2471,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 				fs::create_directories(meshPath);
 			}
 			LOG("mesh %s is not loaded from a file. Export the mesh to %s",meshName.c_str(),exportMeshFullPath.c_str());
-			ParserOpenCOLLADA::exportCollada(exportMeshFullPath,meshSkName,meshName,moNames,true,true,false);
+			ParserOpenCOLLADA::exportCollada(exportMeshFullPath,meshSkName,meshName,moNames,true,true,false, 1.0);
 			//LOG("finish exporting mesh as Collada files");
 			mesh->setFullFilePath(exportMeshFullPath +  "/" + meshName);
 			//continue;

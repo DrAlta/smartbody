@@ -3,6 +3,7 @@
 #include <sb/SBMotion.h>
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBPhoneme.h>
+#include <bml/bml_speech.hpp>
 
 RealTimeLipSyncController::RealTimeLipSyncController(SmartBody::SBCharacter* c) : SmartBody::SBController()
 {
@@ -75,28 +76,54 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 	if (!_pawn->getBoolAttribute("lipsync.useRealTimeLipSync"))
 		return false;
 
-	if (_motion)
+	// remove any curves that are no longer valid
+	if (_currentCurves.size() > 0)
 	{
-		double curTime = t - _startTime;
-		if (curTime > _motion->getDuration())
+		bool removeCurves = true;
+		while (removeCurves)
 		{
-			delete _motion;
-			_motion = NULL;
-		}
-		else
-		{
-			// apply the motion to the frame
-			// ...
+			removeCurves = false;
+			for (std::map<std::string, srLinearCurve* >::iterator iter = _currentCurves.begin();
+				 iter != _currentCurves.end();
+				 iter++)
+			{
+				srLinearCurve* curve = (*iter).second;
+				double lastKeyTime = curve->get_tail_param();
+				if (lastKeyTime < t)
+				{
+					delete curve;
+					_currentCurves.erase(iter);
+					removeCurves = true;
+					break;
+				}
+			}
 		}
 	}
 
+	if (_currentCurves.size() > 0)
+	{
+		for (std::map<std::string, srLinearCurve* >::iterator iter = _currentCurves.begin();
+			 iter != _currentCurves.end();
+			 iter++)
+		{
+			const std::string& visemeName = (*iter).first;
+			srLinearCurve* curve = (*iter).second;
+
+			double value = curve->evaluate(t - _lastPhonemeTime);
+
+			this->setChannelValue(visemeName, value);
+			LOG("%s %f", visemeName.c_str(), value);
+		}
+	}
+	
 	SmartBody::SBPhonemeManager* phonemeManager = SmartBody::SBScene::getScene()->getDiphoneManager();
 
 	const std::string& realTimeLipSyncName = _pawn->getStringAttribute("lipsync.realTimeLipSyncName");
 
-	const std::string& lipSyncSetName = _pawn->getStringAttribute("lipsyncSetName");
+	const std::string& lipSyncSetName = _pawn->getStringAttribute("lipSyncSetName");
 	std::vector<std::string> phonemeList = phonemeManager->getPhonemesRealtime(realTimeLipSyncName);
 	std::vector<double> phonemeTimingsList = phonemeManager->getPhonemesRealtimeTimings(realTimeLipSyncName);
+	phonemeManager->removePhonemesRealtime(realTimeLipSyncName);
 
 	for (size_t p = 0; p < phonemeTimingsList.size(); p++)
 	{
@@ -106,14 +133,16 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 
 	if (_currentPhonemes.size() >= 2)
 	{
-		if (_motion)
+		for (std::map<std::string, srLinearCurve* >::iterator iter = _currentCurves.begin();
+			 iter != _currentCurves.end();
+			 iter++)
 		{
-			delete _motion;
-			_motion = new SmartBody::SBMotion();
+			delete (*iter).second;
 		}
+		_currentCurves.clear();
 
-		double fromTime = _currentPhonemeTimings.size() - 2;
-		double toTime = _currentPhonemeTimings.size() - 1;
+		double fromTime = _currentPhonemeTimings[_currentPhonemeTimings.size() - 2];
+		double toTime = _currentPhonemeTimings[_currentPhonemeTimings.size() - 1];
 
 		double diphoneInterval = toTime - fromTime;
 		if (diphoneInterval <= 0.0)
@@ -126,26 +155,33 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 		std::string fromPhoneme = _currentPhonemes[_currentPhonemes.size() - 2];
 		std::string toPhoneme = _currentPhonemes[_currentPhonemes.size() - 1];
 
-		SmartBody::SBDiphone* diphone = phonemeManager->getDiphone(fromPhoneme, toPhoneme, lipSyncSetName);
-		if (diphone)
+		
+		SmartBody::VisemeData* visemeStart = new SmartBody::VisemeData(fromPhoneme, 0);
+		SmartBody::VisemeData* visemeEnd = new SmartBody::VisemeData(toPhoneme, (float) diphoneInterval);
+		std::vector<SmartBody::VisemeData*> visemes;
+		visemes.push_back(visemeStart);
+		visemes.push_back(visemeEnd);
+
+		_lastPhonemeTime = t;
+		std::map<std::string, std::vector<float> > lipSyncCurves = BML::SpeechRequest::generateCurvesGivenDiphoneSet(&visemes, lipSyncSetName, _pawn->getName());
+
+		for (std::map<std::string, std::vector<float> >::iterator iter = lipSyncCurves.begin();
+			 iter != lipSyncCurves.end();
+			 iter++)
 		{
-			double diphoneTiming = toTime - fromTime;
-			
-			if (diphoneTiming > 0.0)
+			srLinearCurve* curve = new srLinearCurve();
+			for (std::vector<float>::iterator fiter = (*iter).second.begin();
+				 fiter != (*iter).second.end();
+				 fiter++)
 			{
-				// rescale the curves according to the timing and start playing them	
-				std::vector<std::string> diphoneVisemes = diphone->getVisemeNames();
-				for (size_t v = 0; v < diphoneVisemes.size(); v++)
-				{
-					std::vector<float>& diphoneKeys = diphone->getKeys(diphoneVisemes[v]);
-					for (size_t k = 0; k < diphoneKeys.size(); k++)
-					{
-						_motion->addKeyFrameChannel(diphoneVisemes[v], "XPos", diphoneKeys[k], diphoneKeys[k + 1]);
-					}
-				}
-				_motion->bakeFrames(60.0);
+				float time = (*fiter);
+				fiter++;
+				float value = (*fiter);
+				curve->insert(time, value);
 			}
-		}
+			_currentCurves.insert(std::pair<std::string, srLinearCurve*>((*iter).first, curve));
+			
+		}		
 	}
 
 	_currentPhonemes.clear();

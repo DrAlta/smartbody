@@ -26,6 +26,10 @@
 #include "behavior_scheduler.hpp"
 #include "controllers/me_controller.h"
 
+#include <vector>
+#include <string>
+#include <map>
+#include <boost/shared_ptr.hpp>
 
 
 

@@ -438,6 +438,7 @@ std::vector<std::string> SBPhonemeManager::getPhonemesRealtime(const std::string
 		{
 			phonemes.push_back((*phonemeIter).phoneme);
 		}
+
 		return phonemes;
 	}
 	else
@@ -458,11 +459,21 @@ std::vector<double> SBPhonemeManager::getPhonemesRealtimeTimings(const std::stri
 		{
 			phonemeTimings.push_back((*phonemeIter).time);
 		}
+
 		return phonemeTimings;
 	}
 	else
 	{
 		return std::vector<double>();
+	}
+}
+
+void SBPhonemeManager::removePhonemesRealtime(const std::string& character)
+{
+	std::map<std::string, std::vector<RealTimePhoneme> >::iterator iter = _realtimePhonemes.find(character);
+	if (iter != _realtimePhonemes.end())
+	{
+		_realtimePhonemes.erase(iter);
 	}
 }
 
