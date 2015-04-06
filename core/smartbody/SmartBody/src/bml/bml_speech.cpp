@@ -61,6 +61,7 @@ const char* VISEME_NEUTRAL = "_";
 //       or transition fully to <text> detection and processing.
 #define ENABLE_BMLR_SPEECH_REQUEST_CODE  0
 
+VecOfVisemeData BML::SpeechRequest::debugVisemeCurves;
 
 // SpeechRequest Helper functions
 void BML::SpeechRequest::createStandardSyncPoint( const std::wstring& sync_id, SyncPointPtr& sync ) {
