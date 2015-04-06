@@ -76,6 +76,11 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 	if (!_pawn->getBoolAttribute("lipsync.useRealTimeLipSync"))
 		return false;
 
+	// _currentPhonemes and _currentPhonemeTimings contain a list phonemes that are
+	//    gathered from the real time phoneme manager
+	// _currentCurves contain the animation data that should be played
+	// the algorithm converts the phonemes+timings into animation curves
+
 	// remove any curves that are no longer valid
 	if (_currentCurves.size() > 0)
 	{
@@ -89,7 +94,7 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 			{
 				srLinearCurve* curve = (*iter).second;
 				double lastKeyTime = curve->get_tail_param();
-				if (lastKeyTime < t)
+				if (lastKeyTime + 100.0 < t)
 				{
 					delete curve;
 					_currentCurves.erase(iter);
@@ -109,10 +114,12 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 			const std::string& visemeName = (*iter).first;
 			srLinearCurve* curve = (*iter).second;
 
-			double value = curve->evaluate(t - _lastPhonemeTime);
-
-			this->setChannelValue(visemeName, value);
-			LOG("%s %f", visemeName.c_str(), value);
+			double value = curve->evaluate(t);
+			if (value > 0.0)
+			{
+				this->setChannelValue(visemeName, value);
+				LOG("%s %f", visemeName.c_str(), value);
+			}
 		}
 	}
 	
@@ -123,7 +130,8 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 	const std::string& lipSyncSetName = _pawn->getStringAttribute("lipSyncSetName");
 	std::vector<std::string> phonemeList = phonemeManager->getPhonemesRealtime(realTimeLipSyncName);
 	std::vector<double> phonemeTimingsList = phonemeManager->getPhonemesRealtimeTimings(realTimeLipSyncName);
-	phonemeManager->removePhonemesRealtime(realTimeLipSyncName);
+	if (phonemeTimingsList.size() > 0)
+		phonemeManager->removePhonemesRealtime(realTimeLipSyncName);
 
 	for (size_t p = 0; p < phonemeTimingsList.size(); p++)
 	{
@@ -133,6 +141,9 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 
 	if (_currentPhonemes.size() >= 2)
 	{
+		// since we now have at least two phonemes, remove the existing animation curves
+		// this probably shouldn't be done like this...would be better to fade out the current curves
+		// rather than to remove them entirely
 		for (std::map<std::string, srLinearCurve* >::iterator iter = _currentCurves.begin();
 			 iter != _currentCurves.end();
 			 iter++)
@@ -147,6 +158,8 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 		double diphoneInterval = toTime - fromTime;
 		if (diphoneInterval <= 0.0)
 		{
+			// if the timings are improper (end time > start time) 
+			// then assume this data is bad, and remove the phonemes from the list
 			_currentPhonemes.clear();
 			_currentPhonemeTimings.clear();
 			return true;
@@ -154,7 +167,6 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 
 		std::string fromPhoneme = _currentPhonemes[_currentPhonemes.size() - 2];
 		std::string toPhoneme = _currentPhonemes[_currentPhonemes.size() - 1];
-
 		
 		SmartBody::VisemeData* visemeStart = new SmartBody::VisemeData(fromPhoneme, 0);
 		SmartBody::VisemeData* visemeEnd = new SmartBody::VisemeData(toPhoneme, (float) diphoneInterval);
@@ -163,6 +175,7 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 		visemes.push_back(visemeEnd);
 
 		_lastPhonemeTime = t;
+		// obtain a set of curves from the phoneme manager based on the two phonemes
 		std::map<std::string, std::vector<float> > lipSyncCurves = BML::SpeechRequest::generateCurvesGivenDiphoneSet(&visemes, lipSyncSetName, _pawn->getName());
 
 		for (std::map<std::string, std::vector<float> >::iterator iter = lipSyncCurves.begin();
@@ -177,15 +190,18 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 				float time = (*fiter);
 				fiter++;
 				float value = (*fiter);
-				curve->insert(time, value);
+				curve->insert(time + _lastPhonemeTime, value);
 			}
 			_currentCurves.insert(std::pair<std::string, srLinearCurve*>((*iter).first, curve));
 			
-		}		
+		}
+
+		// since we have converted the phonemes into animation curves, remove the phonemes from the list
+		_currentPhonemes.clear();
+		_currentPhonemeTimings.clear();
 	}
 
-	_currentPhonemes.clear();
-	_currentPhonemeTimings.clear();
+
 
 	return true;
 }
