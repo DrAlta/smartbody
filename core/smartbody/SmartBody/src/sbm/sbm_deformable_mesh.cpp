@@ -1633,6 +1633,8 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
 
 		//	Initializes vector of wieghts, of size (#shapes) 
+	if (_mesh->blendShapeMap.begin() == _mesh->blendShapeMap.end())
+		return;
 	std::vector<float> weights(_mesh->blendShapeMap.begin()->second.size(), 0);
 
 	//	Initializes vector of wieghts, of size (#shapes) each shape got a texture

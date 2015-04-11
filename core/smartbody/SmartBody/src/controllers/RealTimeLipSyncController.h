@@ -21,6 +21,8 @@ class RealTimeLipSyncController : public SmartBody::SBController
 	protected:
 		void updateLipSyncChannels();
 		void setup();
+		void smoothCurve(std::vector<float>& c, float windowSize);
+
 		double _lastPhonemeTime;
 		std::string _lastPhoneme;
 		std::vector<double> _currentPhonemeTimings;
@@ -28,6 +30,6 @@ class RealTimeLipSyncController : public SmartBody::SBController
 		double _startTime;
 		SkChannelArray  _channels;
 
-		std::map<std::string, srLinearCurve* > _currentCurves;
+		std::vector<std::pair<std::string, srLinearCurve*> > _currentCurves;
 };
 		

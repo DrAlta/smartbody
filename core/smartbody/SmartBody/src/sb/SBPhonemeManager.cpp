@@ -9,6 +9,7 @@
 #include <fstream>
 #include <cctype>
 #include <cstring>
+#include <sbm/sbm_speech.hpp>
 
 namespace SmartBody {
 
@@ -31,6 +32,8 @@ SBPhonemeManager::SBPhonemeManager()
 	addPhonemeMapping("DH", "Th");
 	addPhonemeMapping("DX", "D");
 	addPhonemeMapping("EH", "Eh");
+	addPhonemeMapping("EL", "Eh");
+	addPhonemeMapping("EN", "Eh");
 	addPhonemeMapping("ER", "Er");
 	addPhonemeMapping("EY", "Eh");
 	addPhonemeMapping("F", "F");
@@ -40,6 +43,7 @@ SBPhonemeManager::SBPhonemeManager()
 	addPhonemeMapping("IY", "Ih");
 	addPhonemeMapping("JH", "Sh");
 	addPhonemeMapping("K", "Kg");
+	addPhonemeMapping("EL", "L");
 	addPhonemeMapping("L", "L");
 	addPhonemeMapping("M", "BMP");
 	addPhonemeMapping("N", "D");
@@ -426,17 +430,21 @@ void SBPhonemeManager::setEnable(bool val)
 	SBService::setEnable(val);
 }
 
-std::vector<std::string> SBPhonemeManager::getPhonemesRealtime(const std::string& character)
+std::vector<std::string> SBPhonemeManager::getPhonemesRealtime(const std::string& character, int amount)
 {
 	std::vector<std::string> phonemes;
 	std::map<std::string, std::vector<RealTimePhoneme> >::iterator iter = _realtimePhonemes.find(character);
 	if (iter != _realtimePhonemes.end())
 	{
+		int num = 0;
 		for (std::vector<RealTimePhoneme>::iterator phonemeIter = (*iter).second.begin();
 			 phonemeIter != (*iter).second.end();
 			 phonemeIter++)
 		{
+			if (num >= amount)
+				break;
 			phonemes.push_back((*phonemeIter).phoneme);
+			num++;
 		}
 
 		return phonemes;
@@ -447,17 +455,21 @@ std::vector<std::string> SBPhonemeManager::getPhonemesRealtime(const std::string
 	}
 }
 
-std::vector<double> SBPhonemeManager::getPhonemesRealtimeTimings(const std::string& character)
+std::vector<double> SBPhonemeManager::getPhonemesRealtimeTimings(const std::string& character, int amount)
 {
 	std::vector<double> phonemeTimings;
 	std::map<std::string, std::vector<RealTimePhoneme> >::iterator iter = _realtimePhonemes.find(character);
 	if (iter != _realtimePhonemes.end())
 	{
+		int num = 0;
 		for (std::vector<RealTimePhoneme>::iterator phonemeIter = (*iter).second.begin();
 			 phonemeIter != (*iter).second.end();
 			 phonemeIter++)
 		{
+			if (num >= amount)
+				break;
 			phonemeTimings.push_back((*phonemeIter).time);
+			num++;
 		}
 
 		return phonemeTimings;
@@ -468,12 +480,51 @@ std::vector<double> SBPhonemeManager::getPhonemesRealtimeTimings(const std::stri
 	}
 }
 
-void SBPhonemeManager::removePhonemesRealtime(const std::string& character)
+void SBPhonemeManager::removePhonemesRealtime(const std::string& character, int amount)
 {
+
 	std::map<std::string, std::vector<RealTimePhoneme> >::iterator iter = _realtimePhonemes.find(character);
 	if (iter != _realtimePhonemes.end())
 	{
-		_realtimePhonemes.erase(iter);
+		if ((*iter).second.size() < amount)
+			amount = (*iter).second.size();
+		int num = 0;
+		while (num < amount)
+		{
+			for (std::vector<RealTimePhoneme>::iterator phonemeIter = (*iter).second.begin();
+				 phonemeIter != (*iter).second.end();
+				 phonemeIter++)
+			{
+				(*iter).second.erase(phonemeIter);
+				break;
+			}
+			num++;
+		}
+	}
+}
+
+void SBPhonemeManager::removePhonemesRealtimeByTime(const std::string& character, double minTime)
+{
+
+	std::map<std::string, std::vector<RealTimePhoneme> >::iterator iter = _realtimePhonemes.find(character);
+	if (iter != _realtimePhonemes.end())
+	{
+		bool remove = true;
+		while (remove)
+		{
+			remove = false;
+			for (std::vector<RealTimePhoneme>::iterator phonemeIter = (*iter).second.begin();
+				 phonemeIter != (*iter).second.end();
+				 phonemeIter++)
+			{
+				if ((*phonemeIter).time < minTime)
+				{
+					(*iter).second.erase(phonemeIter);
+					remove = true;
+					break;
+				}
+			}
+		}
 	}
 }
 
@@ -490,6 +541,7 @@ void SBPhonemeManager::setPhonemesRealtime(const std::string& character, const s
 	rtp.phoneme = phoneme;
 	rtp.time = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 	(*iter).second.push_back(rtp);
+	LOG("Got phoneme %s at time %f",  rtp.phoneme.c_str(), rtp.time);
 }
 
 void SBPhonemeManager::clearPhonemesRealtime(const std::string& character, const std::string& phoneme)
@@ -500,5 +552,53 @@ void SBPhonemeManager::clearPhonemesRealtime(const std::string& character, const
 		(*iter).second.clear();
 	}
 }
+
+
+void SBPhonemeManager::generatePhoneTrigrams(const std::string& lipsyncSetName)
+{
+	
+	std::map<std::string, std::vector<SBDiphone*> >::iterator iter = _diphoneMap.find(lipsyncSetName);
+	if (iter == _diphoneMap.end())
+	{
+		LOG("Cannot produce trigrams for lip sync set name: %s, does not exist.", lipsyncSetName.c_str());
+		return;
+	}
+
+	std::vector<SBDiphone*>& allDiphones = (*iter).second;
+	for (std::vector<SBDiphone*>::iterator bigramIter = allDiphones.begin();
+		 bigramIter != allDiphones.end();
+		 bigramIter++)
+	{
+		for (std::vector<SBDiphone*>::iterator bigramIter2 = (bigramIter + 1);
+			 bigramIter2 != allDiphones.end();
+			 bigramIter2++)
+		{
+			std::vector<SmartBody::VisemeData*> visemes;
+			const std::string& fromPhoneme = (*bigramIter)->getFromPhonemeName();
+			const std::string& toPhoneme = (*bigramIter)->getToPhonemeName();
+
+			const std::string& fromPhoneme2 = (*bigramIter2)->getFromPhonemeName();
+			const std::string& toPhoneme2 = (*bigramIter2)->getToPhonemeName();
+
+			if (toPhoneme != fromPhoneme2)
+				continue;
+
+			VisemeData* phoneme1 = new VisemeData(fromPhoneme, 0);
+			visemes.push_back(phoneme1);
+			VisemeData* phoneme2 = new VisemeData(toPhoneme, 1);
+			visemes.push_back(phoneme2);
+			VisemeData* phoneme3 = new VisemeData(fromPhoneme2, 1);
+			visemes.push_back(phoneme3);
+			VisemeData* phoneme4 = new VisemeData(toPhoneme2, 2);
+			visemes.push_back(phoneme4);
+
+			//std::map<std::string, std::vector<float> > trigramCurves = BML::SpeechRequest::generateCurvesGivenDiphoneSet(&visemes, lipsyncSetName, std::string characterName)
+		
+		}
+		
+	}
+
+}
+
 
 }
