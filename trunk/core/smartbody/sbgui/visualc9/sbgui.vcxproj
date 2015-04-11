@@ -1130,7 +1130,6 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\autorig\AutoRigViewer.cpp" />
-    <ClCompile Include="..\..\SmartBody\src\sr\jpge.cpp" />
     <ClCompile Include="..\src\autorig\SBAutoRigManager.cpp" />
     <ClCompile Include="..\src\autorig\VoxelizerWindow.cpp" />
     <ClCompile Include="..\src\bmlcreator\BMLHandObject.cpp" />
@@ -1227,7 +1226,6 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
   <ItemGroup>
     <ClInclude Include="..\..\SmartBody\src\external\glew\glew.h" />
     <ClInclude Include="..\src\autorig\AutoRigViewer.h" />
-    <ClInclude Include="..\..\SmartBody\src\sr\jpge.h" />
     <ClInclude Include="..\src\autorig\SBAutoRigManager.h" />
     <ClInclude Include="..\src\autorig\VoxelizerWindow.h" />
     <ClInclude Include="..\src\bmlcreator\BMLHandObject.h" />

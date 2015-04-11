@@ -11,7 +11,7 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r5904
+AppVersion=r6039
 OutputBaseFilename=SmartBody
 WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
@@ -147,7 +147,7 @@ Source: ".\data\scripts\*"; DestDir: "{app}\data\scripts";  Excludes: ".svn"; Fl
 Source: ".\data\Hand\*"; DestDir: "{app}\data\Hand"; Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\data\cegui\datafiles-0.8.2\*"; DestDir: "{app}\data\cegui\datafiles-0.8.2";  Excludes: ".svn"; Flags: recursesubdirs
 
-Source: "c:\users\shapiro\smartbody\externalprograms\vcredist_x86.exe"; DestDir: "{app}"
+Source: "e:\smartbody\externalprograms\vcredist_x86.exe"; DestDir: "{app}"
 
 ; sdk build
 Source: ".\sdk\README.txt"; DestDir: "{app}\"

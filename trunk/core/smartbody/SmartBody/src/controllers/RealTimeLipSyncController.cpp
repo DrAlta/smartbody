@@ -4,6 +4,7 @@
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBPhoneme.h>
 #include <bml/bml_speech.hpp>
+#include <vector>
 
 RealTimeLipSyncController::RealTimeLipSyncController(SmartBody::SBCharacter* c) : SmartBody::SBController()
 {
@@ -22,6 +23,10 @@ void RealTimeLipSyncController::setup()
 	setDefaultAttributeGroupPriority("Lip Sync", 450);
 	addDefaultAttributeBool("lipsync.useRealTimeLipSync", false, "Lip Sync");
 	addDefaultAttributeString("lipsync.realTimeLipSyncName", "", "Lip Sync");
+	addDefaultAttributeDouble("lipsync.realTimeLipSyncDelay", .25, "Lip Sync");
+	addDefaultAttributeDouble("lipsync.realTimeLipSyncMaxCoarticulationTime", 1.0, "Lip Sync");
+	addDefaultAttributeBool("lipsync.useRealTimeCurveCleanup", true, "Lip Sync");
+	addDefaultAttributeBool("lipsync.useRealTimeDebug", false, "Lip Sync");
 }
 
 void RealTimeLipSyncController::updateLipSyncChannels()
@@ -81,78 +86,135 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 	// _currentCurves contain the animation data that should be played
 	// the algorithm converts the phonemes+timings into animation curves
 
+	// get the offset between the actual phoneme timings and when it will be played on the character
+	double timeDelay = _pawn->getDoubleAttribute("lipsync.realTimeLipSyncDelay");
+
 	// remove any curves that are no longer valid
 	if (_currentCurves.size() > 0)
 	{
-		bool removeCurves = true;
-		while (removeCurves)
+		if (_pawn->getBoolAttribute("lipsync.useRealTimeCurveCleanup"))
 		{
-			removeCurves = false;
-			for (std::map<std::string, srLinearCurve* >::iterator iter = _currentCurves.begin();
-				 iter != _currentCurves.end();
-				 iter++)
+			bool removeCurves = true;
+			while (removeCurves)
 			{
-				srLinearCurve* curve = (*iter).second;
-				double lastKeyTime = curve->get_tail_param();
-				if (lastKeyTime + 100.0 < t)
+				removeCurves = false;
+				for (std::vector<std::pair<std::string, srLinearCurve*> >::iterator iter = _currentCurves.begin();
+					 iter != _currentCurves.end();
+					 iter++)
 				{
-					delete curve;
-					_currentCurves.erase(iter);
-					removeCurves = true;
-					break;
+					srLinearCurve* curve = (*iter).second;
+					double lastKeyTime = curve->get_tail_param();
+					if (lastKeyTime + timeDelay < t)
+					{
+						delete curve;
+						_currentCurves.erase(iter);
+						removeCurves = true;
+						break;
+					}
 				}
 			}
 		}
 	}
 
+
+
 	if (_currentCurves.size() > 0)
 	{
-		for (std::map<std::string, srLinearCurve* >::iterator iter = _currentCurves.begin();
+		
+		std::vector<std::pair<std::string, double> > curveData;
+		for (std::vector<std::pair<std::string, srLinearCurve*> >::iterator iter = _currentCurves.begin();
 			 iter != _currentCurves.end();
 			 iter++)
 		{
 			const std::string& visemeName = (*iter).first;
 			srLinearCurve* curve = (*iter).second;
 
-			double value = curve->evaluate(t);
+			double value = curve->evaluate(t - timeDelay);
 			if (value > 0.0)
 			{
-				this->setChannelValue(visemeName, value);
-				LOG("%s %f", visemeName.c_str(), value);
+				curveData.push_back(std::pair<std::string, double>(visemeName, value));
 			}
 		}
+		
+		// at this point, there might be several curves of the same name with different timings.
+		// need to derive a single value based on multiple curve data.
+		// loop through all the evaluated data and take the max value of any duplicated curve
+		std::set<std::string> finishedVisemes;
+		std::vector<std::pair<std::string, double> >::iterator startIter = curveData.begin();
+		while (startIter != curveData.end())
+		{
+
+			std::string curCurveName = "";
+			double val = 0.0;
+			for (std::vector<std::pair<std::string, double> >::iterator curIter = startIter;
+				 curIter != curveData.end();
+				 curIter++)
+			{
+				if (curCurveName == "")
+				{
+					std::set<std::string>::iterator existIter = finishedVisemes.find((*curIter).first);
+					if (existIter != finishedVisemes.end())
+						continue;
+					curCurveName = (*curIter).first;
+					val = (*curIter).second;
+					
+				}
+				else
+				{
+					if (curCurveName == (*curIter).first)
+					{
+						// use the max value
+						if (val < (*curIter).second)
+							val = (*curIter).second;
+					}
+				}
+			}
+			if (curCurveName != "")
+			{
+				this->setChannelValue(curCurveName, val);
+			}
+			if (_pawn->getBoolAttribute("lipsync.useRealTimeDebug"))
+				LOG("%s %f", curCurveName.c_str(), val);
+			finishedVisemes.insert(curCurveName);
+			startIter++;
+		}
 	}
+
 	
 	SmartBody::SBPhonemeManager* phonemeManager = SmartBody::SBScene::getScene()->getDiphoneManager();
 
 	const std::string& realTimeLipSyncName = _pawn->getStringAttribute("lipsync.realTimeLipSyncName");
 
 	const std::string& lipSyncSetName = _pawn->getStringAttribute("lipSyncSetName");
-	std::vector<std::string> phonemeList = phonemeManager->getPhonemesRealtime(realTimeLipSyncName);
-	std::vector<double> phonemeTimingsList = phonemeManager->getPhonemesRealtimeTimings(realTimeLipSyncName);
-	if (phonemeTimingsList.size() > 0)
-		phonemeManager->removePhonemesRealtime(realTimeLipSyncName);
+	bool hasRealtimePhonemes = true;
+	double maxCoarticulationTime = _pawn->getDoubleAttribute("lipsync.realTimeLipSyncMaxCoarticulationTime");
+	// eliminate any phonemes that exceed the maximum coarticulation time
+	phonemeManager->removePhonemesRealtimeByTime(realTimeLipSyncName, t - maxCoarticulationTime);
 
-	for (size_t p = 0; p < phonemeTimingsList.size(); p++)
+	while (hasRealtimePhonemes)
 	{
-		_currentPhonemes.push_back(phonemeList[p]);
-		_currentPhonemeTimings.push_back(phonemeTimingsList[p]);
-	}
-
-	if (_currentPhonemes.size() >= 2)
-	{
-		// since we now have at least two phonemes, remove the existing animation curves
-		// this probably shouldn't be done like this...would be better to fade out the current curves
-		// rather than to remove them entirely
-		for (std::map<std::string, srLinearCurve* >::iterator iter = _currentCurves.begin();
-			 iter != _currentCurves.end();
-			 iter++)
+		hasRealtimePhonemes = false;
+		std::vector<std::string> phonemeList = phonemeManager->getPhonemesRealtime(realTimeLipSyncName, 3);
+		std::vector<double> phonemeTimingsList = phonemeManager->getPhonemesRealtimeTimings(realTimeLipSyncName, 3);
+		if (phonemeTimingsList.size() == 3)
 		{
-			delete (*iter).second;
+			phonemeManager->removePhonemesRealtime(realTimeLipSyncName, 1);
+			hasRealtimePhonemes = true;
 		}
-		_currentCurves.clear();
+		else
+		{
+			// less than three phonemes, wait until at least three are present
+			break;
+		}
 
-		double fromTime = _currentPhonemeTimings[_currentPhonemeTimings.size() - 2];
+
+		for (size_t p = 0; p < phonemeTimingsList.size(); p++)
+		{
+			_currentPhonemes.push_back(phonemeList[p]);
+			_currentPhonemeTimings.push_back(phonemeTimingsList[p]);
+		}
+
+		double fromTime = _currentPhonemeTimings[_currentPhonemeTimings.size() - 3];
 		double toTime = _currentPhonemeTimings[_currentPhonemeTimings.size() - 1];
 
 		double diphoneInterval = toTime - fromTime;
@@ -165,8 +227,8 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 			return true;
 		}
 
-		std::string fromPhoneme = _currentPhonemes[_currentPhonemes.size() - 2];
-		std::string toPhoneme = _currentPhonemes[_currentPhonemes.size() - 1];
+		std::string fromPhoneme = _currentPhonemes[_currentPhonemes.size() - 3];
+		std::string toPhoneme = _currentPhonemes[_currentPhonemes.size() - 2];
 		
 		SmartBody::VisemeData* visemeStart = new SmartBody::VisemeData(fromPhoneme, 0);
 		SmartBody::VisemeData* visemeEnd = new SmartBody::VisemeData(toPhoneme, (float) diphoneInterval);
@@ -178,21 +240,29 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 		// obtain a set of curves from the phoneme manager based on the two phonemes
 		std::map<std::string, std::vector<float> > lipSyncCurves = BML::SpeechRequest::generateCurvesGivenDiphoneSet(&visemes, lipSyncSetName, _pawn->getName());
 
+		// smooth the curves
 		for (std::map<std::string, std::vector<float> >::iterator iter = lipSyncCurves.begin();
-			 iter != lipSyncCurves.end();
-			 iter++)
+				iter != lipSyncCurves.end();
+				iter++)
+		{
+			smoothCurve((*iter).second,  _pawn->getDoubleAttribute("lipSyncSmoothWindow"));
+		}
+
+		for (std::map<std::string, std::vector<float> >::iterator iter = lipSyncCurves.begin();
+				iter != lipSyncCurves.end();
+				iter++)
 		{
 			srLinearCurve* curve = new srLinearCurve();
 			for (std::vector<float>::iterator fiter = (*iter).second.begin();
-				 fiter != (*iter).second.end();
-				 fiter++)
+					fiter != (*iter).second.end();
+					fiter++)
 			{
 				float time = (*fiter);
 				fiter++;
 				float value = (*fiter);
 				curve->insert(time + _lastPhonemeTime, value);
 			}
-			_currentCurves.insert(std::pair<std::string, srLinearCurve*>((*iter).first, curve));
+			_currentCurves.push_back(std::pair<std::string, srLinearCurve*>((*iter).first, curve));
 			
 		}
 
@@ -219,9 +289,79 @@ void RealTimeLipSyncController::notify(SmartBody::SBSubject* subject)
 			updateLipSyncChannels();
 		}
 	}
-
-
-
 }
+
+
+void RealTimeLipSyncController::smoothCurve(std::vector<float>& c, float windowSize)
+{
+	if (windowSize <= 0)
+		return;
+
+	bool keepSmoothing = true;
+	int numIter = 0;
+
+	while (keepSmoothing)
+	{
+		numIter++;
+		std::vector<float> x;
+		std::vector<float> y;
+		std::vector<bool> markDelete;
+		for (size_t i = 0; i < c.size(); i++)
+		{
+			if ((i % 2) == 0)
+			{
+				x.push_back(c[i]);
+				markDelete.push_back(false);
+			}
+			else
+				y.push_back(c[i]);
+		}
+
+
+		// global smoothing by window size
+		std::vector<int> localMaxId;
+		for (size_t i = 1; i < x.size() - 1; ++i)
+		{
+			if ((y[i] - y[i - 1]) >= 0 &&
+				(y[i] - y[i + 1]) >= 0)
+			{
+				localMaxId.push_back(i);
+			}
+		}
+
+		if (localMaxId.size() == 0)
+			return;
+
+		for (size_t i = 0; i < localMaxId.size() - 1; ++i)
+		{
+			if (x[localMaxId[i + 1]] - x[localMaxId[i]] <= windowSize)
+			{
+				for (int markeId = (localMaxId[i] + 1); markeId < localMaxId[i + 1]; ++markeId)
+				{
+					float toDeleteY = y[markeId];
+					float ratio = (x[markeId] - x[localMaxId[i]]) / (x[localMaxId[i +1]] - x[localMaxId[i]]);
+					float actualY = ratio * (y[localMaxId[i + 1]] - y[localMaxId[i]]) + y[localMaxId[i]];
+					if (actualY >= toDeleteY)
+						markDelete[markeId] = true;
+				}
+			}
+		}
+
+		c.clear();
+		for (size_t i = 0; i < markDelete.size(); i++)
+		{
+			if (!markDelete[i])
+			{
+				c.push_back(x[i]);
+				c.push_back(y[i]);
+			}
+		}
+
+		if (c.size() == x.size() * 2)
+			keepSmoothing = false;
+	}
+//	LOG("Number of smoothing iteration %d", numIter);
+}
+
 
 

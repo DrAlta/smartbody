@@ -331,7 +331,6 @@
     <ClCompile Include="..\src\autorig\AutoRigViewer.cpp">
       <Filter>autorig</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SmartBody\src\sr\jpge.cpp" />
     <ClCompile Include="..\src\faceshiftviewer\FaceShiftViewer.cpp">
       <Filter>faceshiftviewer</Filter>
     </ClCompile>
@@ -612,7 +611,6 @@
     <ClInclude Include="..\src\autorig\AutoRigViewer.h">
       <Filter>autorig</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\SmartBody\src\sr\jpge.h" />
     <ClInclude Include="..\src\faceshiftviewer\FaceShiftViewer.h">
       <Filter>faceshiftviewer</Filter>
     </ClInclude>

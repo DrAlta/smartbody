@@ -26,9 +26,10 @@ class SBPhonemeManager : public SBService
 		SBAPI virtual void setEnable(bool val);
 		SBAPI void setPhonemesRealtime(const std::string& character, const std::string& phoneme);
 		SBAPI void clearPhonemesRealtime(const std::string& character, const std::string& phoneme);
-		SBAPI std::vector<std::string> getPhonemesRealtime(const std::string& character);
-		SBAPI std::vector<double> getPhonemesRealtimeTimings(const std::string& character);
-		SBAPI void removePhonemesRealtime(const std::string& character);
+		SBAPI std::vector<std::string> getPhonemesRealtime(const std::string& character, int amount);
+		SBAPI std::vector<double> getPhonemesRealtimeTimings(const std::string& character, int amount);
+		SBAPI void removePhonemesRealtime(const std::string& character, int amount);
+		SBAPI void removePhonemesRealtimeByTime(const std::string& character, double minTime);
 		
 		SBAPI std::vector<std::string> getCommonPhonemes();
 	
@@ -51,7 +52,7 @@ class SBPhonemeManager : public SBService
 		SBAPI int getNumDictionaryWords(const std::string& language);
 
 		SBAPI std::string getDictionaryFile(const std::string& language);
-
+		SBAPI void generatePhoneTrigrams(const std::string& lipsyncSetName);
 
 	protected:
 		std::map<std::string, std::vector<SBDiphone*> > _diphoneMap;
