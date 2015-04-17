@@ -135,13 +135,13 @@ set( ODE_LIB
 )
 endif()
 
-if (${USE_ASSIMP})
+if (${SB_NO_ASSIMP})
+set( ASSIMP_LIB
+)
+else()
 include_directories( ../../../lib/assimp-3.1.1/include)
 set( ASSIMP_LIB
 	assimp
-)
-else()
-set( ASSIMP_LIB
 )
 endif()
 
@@ -665,6 +665,7 @@ target_link_libraries( SmartBody
 	${BONEBUS_LIB}
 	${VHMSG_LIB}
 	${PYTHON_LIB}
+	${ASSIMP_LIB}
 	vhcl
 	xerces-c
 	boost_filesystem

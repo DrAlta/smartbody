@@ -7,19 +7,19 @@ set( GOOGLE_PROFILER FALSE)
 set( BUILD_FESTIVAL FALSE)
 
 # uses the Assimp asset importer
-set( USE_ASSIMP TRUE)
+#set( SB_NO_ASSIMP FALSE)
 
 # uses Python as a scripting language
 #set( SB_NO_PYTHON TRUE)
 
 # uses the Virtual Human Message system
-set( SB_NO_VHMSG TRUE)
+#set( SB_NO_VHMSG TRUE)
 
 # uses the bonebus network 
-set( SB_NO_BONEBUS TRUE)
+#set( SB_NO_BONEBUS TRUE)
 
 # uses the Open Dynamics Engine (ODE) physics library
-set( SB_NO_ODE_PHYSICS FALSE)
+#set( SB_NO_ODE_PHYSICS TRUE)
 
 
 #add_definitions(	-D__linux__	-fPIC -m32 -Ignore -fpermissive -g3 )
@@ -49,8 +49,8 @@ set (BONEBUS_INCLUDE
 	)
 endif()
 
-if (${USE_ASSIMP})
-add_definitions(-DUSE_ASSIMP)
+if (${SB_NO_ASSIMP})
+add_definitions(-DSB_NO_ASSIMP)
 endif()
 
 if (${SB_NO_PYTHON})
@@ -59,6 +59,10 @@ endif()
 
 if (${SB_NO_ODE_PHYSICS})
 add_definitions(-DSB_NO_ODE_PHYSICS)
+endif()
+
+if (${SB_NO_ASSIMP})
+add_definitions(-DSB_NO_ASSIMP)
 endif()
 
 include_directories(
