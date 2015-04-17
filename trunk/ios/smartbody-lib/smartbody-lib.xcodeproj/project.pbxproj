@@ -771,6 +771,8 @@
 		C44B488B18EB9BED007E8081 /* me_ct_motion_graph.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C44B488918EB9BED007E8081 /* me_ct_motion_graph.hpp */; };
 		C44B488E18EB9C24007E8081 /* SBAssetHandlerPly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C44B488C18EB9C24007E8081 /* SBAssetHandlerPly.cpp */; };
 		C44B488F18EB9C24007E8081 /* SBAssetHandlerPly.h in Headers */ = {isa = PBXBuildFile; fileRef = C44B488D18EB9C24007E8081 /* SBAssetHandlerPly.h */; };
+		C4735D0C199311A100D9D1A7 /* sbm_remote_speech_audiofile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4735D0A199311A100D9D1A7 /* sbm_remote_speech_audiofile.cpp */; };
+		C4735D0D199311A100D9D1A7 /* sbm_remote_speech_audiofile.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C4735D0B199311A100D9D1A7 /* sbm_remote_speech_audiofile.hpp */; };
 		C48ED0C618EB9E6E00BBA419 /* rply.c in Sources */ = {isa = PBXBuildFile; fileRef = C48ED0C418EB9E6E00BBA419 /* rply.c */; };
 		C48ED0C718EB9E6E00BBA419 /* rply.h in Headers */ = {isa = PBXBuildFile; fileRef = C48ED0C518EB9E6E00BBA419 /* rply.h */; };
 		C4F0FDDA18EB9DB10099F20F /* sr_model_import_ply.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4F0FDD918EB9DB10099F20F /* sr_model_import_ply.cpp */; };
@@ -1546,6 +1548,8 @@
 		C44B488918EB9BED007E8081 /* me_ct_motion_graph.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_motion_graph.hpp; sourceTree = "<group>"; };
 		C44B488C18EB9C24007E8081 /* SBAssetHandlerPly.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerPly.cpp; sourceTree = "<group>"; };
 		C44B488D18EB9C24007E8081 /* SBAssetHandlerPly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerPly.h; sourceTree = "<group>"; };
+		C4735D0A199311A100D9D1A7 /* sbm_remote_speech_audiofile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sbm_remote_speech_audiofile.cpp; sourceTree = "<group>"; };
+		C4735D0B199311A100D9D1A7 /* sbm_remote_speech_audiofile.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sbm_remote_speech_audiofile.hpp; sourceTree = "<group>"; };
 		C48ED0C418EB9E6E00BBA419 /* rply.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rply.c; path = rply/rply.c; sourceTree = "<group>"; };
 		C48ED0C518EB9E6E00BBA419 /* rply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rply.h; path = rply/rply.h; sourceTree = "<group>"; };
 		C4F0FDD918EB9DB10099F20F /* sr_model_import_ply.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_model_import_ply.cpp; sourceTree = "<group>"; };
@@ -2235,6 +2239,8 @@
 		AAD459F017A98E5C005905B2 /* sbm */ = {
 			isa = PBXGroup;
 			children = (
+				C4735D0A199311A100D9D1A7 /* sbm_remote_speech_audiofile.cpp */,
+				C4735D0B199311A100D9D1A7 /* sbm_remote_speech_audiofile.hpp */,
 				AA0AA8B1185144190061EE9A /* ParserASFAMC.cxx */,
 				AA9AC3B117E78F030077D800 /* ParserCOLLADAFast.cpp */,
 				AA9AC3B217E78F030077D800 /* ParserCOLLADAFast.h */,
@@ -2903,6 +2909,7 @@
 				AA2D77B2180F1C3A00D12F24 /* SBSceneListener.h in Headers */,
 				AA2D77B3180F1C3A00D12F24 /* SBVersion.hpp in Headers */,
 				AA2D77B4180F1C3A00D12F24 /* SBVersionTemplate.hpp in Headers */,
+				C4735D0D199311A100D9D1A7 /* sbm_remote_speech_audiofile.hpp in Headers */,
 				AA0AA89B18512DA20061EE9A /* SBAssetHandlerSBMeshBinary.h in Headers */,
 				AA0AA89D18512DA20061EE9A /* SBAssetHandlerSkmb.h in Headers */,
 				AA0AA89F18512DA20061EE9A /* SBNavigationMeshManager.h in Headers */,
@@ -2943,6 +2950,8 @@
 /* Begin PBXProject section */
 		AA9CD5DB141FF8610064C27A /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = AA9CD5DE141FF8610064C27A /* Build configuration list for PBXProject "smartbody-lib" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -3302,6 +3311,7 @@
 				AAD45DF517A98E5D005905B2 /* sr_material.cpp in Sources */,
 				AAD45DF717A98E5D005905B2 /* sr_model.cpp in Sources */,
 				AAD45DF917A98E5D005905B2 /* sr_model_export_iv.cpp in Sources */,
+				C4735D0C199311A100D9D1A7 /* sbm_remote_speech_audiofile.cpp in Sources */,
 				AAD45DFA17A98E5D005905B2 /* sr_model_import_obj.cpp in Sources */,
 				AAD45DFB17A98E5D005905B2 /* sr_output.cpp in Sources */,
 				AAD45DFD17A98E5D005905B2 /* sr_path_array.cpp in Sources */,
@@ -3408,10 +3418,11 @@
 					SB_NO_ODE_PHYSICS,
 				);
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
+					/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7,
 					../boost/boost_1_51_0,
 					"../boost/boost-numeric-bindings",
 					"../xerces-c/iphoneos/include",
@@ -3476,10 +3487,11 @@
 					SB_NO_ODE_PHYSICS,
 				);
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = "";
 				"HEADER_SEARCH_PATHS[sdk=iphoneos*][arch=*]" = (
+					/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7,
 					../boost/boost_1_51_0,
 					"../boost/boost-numeric-bindings",
 					"../xerces-c/iphoneos/include",
