@@ -37,6 +37,7 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode);
 VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle, const char * pythonPath, bool logToFile );
 VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle );
 VHWRAPPERDLL_API bool WRAPPER_SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds );
+VHWRAPPERDLL_API bool WRAPPER_SBM_UpdateUsingDelta( SBMHANDLE sbmHandle, double deltaTimeInSeconds );
 VHWRAPPERDLL_API bool WRAPPER_SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args );
 VHWRAPPERDLL_API bool WRAPPER_SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_CharacterFrameDataMarshalFriendly * character );
 VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_CharacterFrameDataMarshalFriendly * character );
@@ -49,6 +50,8 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char 
 VHWRAPPERDLL_API bool WRAPPER_SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime );
 VHWRAPPERDLL_API bool WRAPPER_SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * channelName, int maxChannelNameLen, float * value );
 VHWRAPPERDLL_API bool WRAPPER_SBM_IsLogMessageWaiting( SBMHANDLE sbmHandle, char * logMessage, int maxLogMessageLen, int * messageType );
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsBmlRequestWaiting( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * requestId, int maxRequestIdLength, char * bmlName, int maxBmlNameLength );
+VHWRAPPERDLL_API void WRAPPER_SBM_SendBmlReply(SBMHANDLE sbmHandle, const char * charName, const char * requestId, const char * utteranceId, const char * bmlText);
 
 // functions can't be distinguished by return type alone so they are named differently
 VHWRAPPERDLL_API bool   WRAPPER_SBM_PythonCommandVoid(SBMHANDLE sbmHandle, const char * command);
@@ -65,15 +68,29 @@ VHWRAPPERDLL_API void WRAPPER_SBM_SBDebuggerServer_SetCameraValues( SBMHANDLE sb
 VHWRAPPERDLL_API void WRAPPER_SBM_SBDebuggerServer_SetRendererIsRightHanded( SBMHANDLE sbmHandle, bool enabled );
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBMotion_AddChannel(SBMHANDLE sbmHandle, const char * motionName, const char * channelName, const char * channelType);
+VHWRAPPERDLL_API void WRAPPER_SBM_SBMotion_AddChannels(SBMHANDLE sbmHandle, const char * motionName, const char ** channelNames, const char ** channelTypes, int count);
 VHWRAPPERDLL_API void WRAPPER_SBM_SBMotion_AddFrame(SBMHANDLE sbmHandle, const char * motionName, float frameTime, const float * frameData, int numFrameData);
 VHWRAPPERDLL_API void WRAPPER_SBM_SBMotion_SetSyncPoint(SBMHANDLE sbmHandle, const char * motionName, const char * syncTag, double time);
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBJointMap_GetMapTarget(SBMHANDLE sbmHandle, const char * jointMap, const char * jointName, char * mappedJointName, int maxMappedJointName);
 
+VHWRAPPERDLL_API void WRAPPER_SBM_SBDiphoneManager_CreateDiphone(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name);
+VHWRAPPERDLL_API void WRAPPER_SBM_SBDiphone_AddKey(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name, const char * viseme, float time, float weight);
+
 VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetServer( SBMHANDLE sbmHandle, const char * server );
 VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetScope( SBMHANDLE sbmHandle, const char * scope );
 VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetPort( SBMHANDLE sbmHandle, const char * port );
 VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetEnable( SBMHANDLE sbmHandle, bool enable );
+
+
+// MS Speech API   http://msdn.microsoft.com/en-us/library/ms717071%28v=VS.85%29.aspx
+
+typedef intptr_t MSSPEECHHANDLE;
+
+VHWRAPPERDLL_API MSSPEECHHANDLE WRAPPER_MSSPEECH_Create();
+VHWRAPPERDLL_API bool WRAPPER_MSSPEECH_Init(MSSPEECHHANDLE handle);
+VHWRAPPERDLL_API bool WRAPPER_MSSPEECH_Free(MSSPEECHHANDLE handle);
+VHWRAPPERDLL_API bool WRAPPER_MSSPEECH_Recognize(MSSPEECHHANDLE handle, const char * waveFileName, char * buffer, int maxLen, int msFreqEnumVal);
 
 
 // VHCL AUDIO
