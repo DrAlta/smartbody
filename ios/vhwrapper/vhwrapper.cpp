@@ -10,6 +10,22 @@
 
 #ifdef WIN_BUILD
 #include <windows.h>
+#include <atlbase.h>
+
+// sphelper.h is required for certain SAPI functions, but includes intsafe.h which causes these warnings because stdint.h is already loaded (in vhcl_types.h).  Force the warnings off
+#undef INT8_MIN
+#undef INT16_MIN
+#undef INT32_MIN
+#undef INT64_MIN
+#undef INT8_MAX
+#undef UINT8_MAX
+#undef INT16_MAX
+#undef UINT16_MAX
+#undef INT32_MAX
+#undef UINT32_MAX
+#undef INT64_MAX
+#undef UINT64_MAX
+#include <sphelper.h>
 #endif
 
 #ifdef ENABLE_VHMSG_WRAPPER
@@ -40,10 +56,25 @@ std::map<AUDIOHANDLE, Audio*> g_audioInstances;
 int g_audioHandleId = 0;
 
 
+#if defined(WIN_BUILD)
+struct MSSpeechData
+{
+   CComPtr<ISpStream> cpInputStream;
+   CComPtr<ISpRecognizer> cpRecognizer;
+   CComPtr<ISpRecoContext> cpRecoContext;
+   CComPtr<ISpRecoGrammar> cpRecoGrammar;
+};
+
+std::map<MSSPEECHHANDLE, MSSpeechData*> g_msspeechInstances;
+int g_msspeechHandleId = 0;
+#endif
+
+
 typedef SBMHANDLE (*SBM_CreateSBM_DEF)();
 typedef bool (*SBM_Init_DEF)( SBMHANDLE, const char *, bool );
 typedef bool (*SBM_Shutdown_DEF)( SBMHANDLE );
 typedef bool (*SBM_Update_DEF)(SBMHANDLE, double);
+typedef bool (*SBM_UpdateUsingDelta_DEF)(SBMHANDLE, double);
 typedef bool (*SBM_ProcessVHMsgs_DEF)(SBMHANDLE, const char *, const char*);
 typedef bool (*SBM_InitCharacter_DEF)( SBMHANDLE sbmHandle, const char*, SBM_CharacterFrameDataMarshalFriendly * );
 typedef bool (*SBM_GetCharacter_DEF)( SBMHANDLE sbmHandle, const char*, SBM_CharacterFrameDataMarshalFriendly * );
@@ -52,22 +83,27 @@ typedef bool (*SBM_IsCharacterCreated_DEF)( SBMHANDLE sbmHandle, char * name, in
 typedef bool (*SBM_IsLogMessageWaiting_DEF)( SBMHANDLE sbmHandle, char *logMessage, int maxLogMessageLen, int * messageType );
 typedef bool (*SBM_IsCharacterDeleted_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen );
 typedef bool (*SBM_IsCharacterChanged_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen );
+typedef bool (*SBM_IsBmlRequestWaiting_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * requestId, int maxRequestIdLength, char * bmlName, int maxBmlNameLength );
+typedef void (*SBM_SendBmlReply_DEF)(SBMHANDLE sbmHandle, const char * charName, const char * requestId, const char * utteranceId, const char * bmlText);
 typedef bool (*SBM_IsVisemeSet_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime );
 typedef bool (*SBM_IsChannelSet_DEF)( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * channelName, int maxChannelNameLen, float * value );
 typedef bool (*SBM_PythonCommandVoid_DEF)(SBMHANDLE sbmHandle, const char * command);
 typedef bool (*SBM_PythonCommandBool_DEF)(SBMHANDLE sbmHandle, const char * command);
 typedef int  (*SBM_PythonCommandInt_DEF)(SBMHANDLE sbmHandle, const char *command);
 typedef float (*SBM_PythonCommandFloat_DEF)(SBMHANDLE sbmHandle, const char * command);
-typedef char * (*SBM_PythonCommandString_DEF)(SBMHANDLE sbmHandle, const char * command, char * output, int maxLen);
+typedef void (*SBM_PythonCommandString_DEF)(SBMHANDLE sbmHandle, const char * command, char * output, int maxLen);
 typedef bool (*SBM_SBAssetManager_LoadSkeleton_DEF)( SBMHANDLE, const void *, int, const char * );
 typedef bool (*SBM_SBAssetManager_LoadMotion_DEF)( SBMHANDLE, const void *, int, const char * );
-typedef bool (*SBM_SBDebuggerServer_SetID_DEF)(SBMHANDLE, const char * );
-typedef bool (*SBM_SBDebuggerServer_SetCameraValues_DEF)(SBMHANDLE, double, double, double, double, double, double, double, double, double, double, double );
-typedef bool (*SBM_SBDebuggerServer_SetRendererIsRightHanded_DEF)(SBMHANDLE, bool );
+typedef void (*SBM_SBDebuggerServer_SetID_DEF)(SBMHANDLE, const char * );
+typedef void (*SBM_SBDebuggerServer_SetCameraValues_DEF)(SBMHANDLE, double, double, double, double, double, double, double, double, double, double, double );
+typedef void (*SBM_SBDebuggerServer_SetRendererIsRightHanded_DEF)(SBMHANDLE, bool );
 typedef void (*SBM_SBMotion_AddChannel_DEF)(SBMHANDLE sbmHandle, const char * motionName, const char * channelName, const char * channelType);
+typedef void (*SBM_SBMotion_AddChannels_DEF)(SBMHANDLE sbmHandle, const char * motionName, const char ** channelNames, const char ** channelTypes, int count);
 typedef void (*SBM_SBMotion_AddFrame_DEF)(SBMHANDLE sbmHandle, const char * motionName, float frameTime, const float * frameData, int numFrameData);
 typedef void (*SBM_SBMotion_SetSyncPoint_DEF)(SBMHANDLE sbmHandle, const char * motionName, const char * syncTag, double time);
 typedef void (*SBM_SBJointMap_GetMapTarget_DEF)(SBMHANDLE sbmHandle, const char * jointMap, const char * jointName, char * mappedJointName, int maxMappedJointName);
+typedef void (*SBM_SBDiphoneManager_CreateDiphone_DEF)(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name);
+typedef void (*SBM_SBDiphone_AddKey_DEF)(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name, const char * viseme, float time, float weight);
 typedef void (*SBM_SBVHMsgManager_SetServer_DEF)(SBMHANDLE sbmHandle, const char * server);
 typedef void (*SBM_SBVHMsgManager_SetScope_DEF)(SBMHANDLE sbmHandle, const char * scope);
 typedef void (*SBM_SBVHMsgManager_SetPort_DEF)(SBMHANDLE sbmHandle, const char * port);
@@ -77,6 +113,7 @@ SBM_CreateSBM_DEF                  g_SBM_CreateSBM = NULL;
 SBM_Init_DEF                       g_SBM_Init = NULL;
 SBM_Shutdown_DEF                   g_SBM_Shutdown = NULL;
 SBM_Update_DEF                     g_SBM_Update = NULL;
+SBM_UpdateUsingDelta_DEF           g_SBM_UpdateUsingDelta = NULL;
 SBM_ProcessVHMsgs_DEF              g_SBM_ProcessVHMsgs = NULL;
 SBM_InitCharacter_DEF              g_SBM_InitCharacter = NULL;
 SBM_GetCharacter_DEF               g_SBM_GetCharacter = NULL;
@@ -85,6 +122,8 @@ SBM_IsCharacterCreated_DEF         g_SBM_IsCharacterCreated = NULL;
 SBM_IsLogMessageWaiting_DEF        g_SBM_IsLogMessageWaiting = NULL;
 SBM_IsCharacterDeleted_DEF         g_SBM_IsCharacterDeleted = NULL;
 SBM_IsCharacterChanged_DEF         g_SBM_IsCharacterChanged = NULL;
+SBM_IsBmlRequestWaiting_DEF        g_SBM_IsBmlRequestWaiting = NULL;
+SBM_SendBmlReply_DEF               g_SBM_SendBmlReply = NULL;
 SBM_IsVisemeSet_DEF                g_SBM_IsVisemeSet = NULL;
 SBM_IsChannelSet_DEF               g_SBM_IsChannelSet = NULL;
 SBM_PythonCommandVoid_DEF          g_SBM_PythonCommandVoid = NULL;
@@ -98,9 +137,12 @@ SBM_SBDebuggerServer_SetID_DEF     g_SBM_SBDebuggerServer_SetID = NULL;
 SBM_SBDebuggerServer_SetCameraValues_DEF g_SBM_SBDebuggerServer_SetCameraValues = NULL;
 SBM_SBDebuggerServer_SetRendererIsRightHanded_DEF g_SBM_SBDebuggerServer_SetRendererIsRightHanded = NULL;
 SBM_SBMotion_AddChannel_DEF        g_SBM_SBMotion_AddChannel = NULL;
+SBM_SBMotion_AddChannels_DEF       g_SBM_SBMotion_AddChannels = NULL;
 SBM_SBMotion_AddFrame_DEF          g_SBM_SBMotion_AddFrame = NULL;
 SBM_SBMotion_SetSyncPoint_DEF      g_SBM_SBMotion_SetSyncPoint = NULL;
 SBM_SBJointMap_GetMapTarget_DEF    g_SBM_SBJointMap_GetMapTarget = NULL;
+SBM_SBDiphoneManager_CreateDiphone_DEF g_SBM_SBDiphoneManager_CreateDiphone = NULL;
+SBM_SBDiphone_AddKey_DEF           g_SBM_SBDiphone_AddKey = NULL;
 SBM_SBVHMsgManager_SetServer_DEF   g_SBM_SBVHMsgManager_SetServer = NULL;
 SBM_SBVHMsgManager_SetScope_DEF    g_SBM_SBVHMsgManager_SetScope = NULL;
 SBM_SBVHMsgManager_SetPort_DEF     g_SBM_SBVHMsgManager_SetPort = NULL;
@@ -129,6 +171,7 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    g_SBM_Init                       = (SBM_Init_DEF)GetProcAddress(g_SBM_HINST, "SBM_Init");
    g_SBM_Shutdown                   = (SBM_Shutdown_DEF)GetProcAddress(g_SBM_HINST, "SBM_Shutdown");
    g_SBM_Update                     = (SBM_Update_DEF)GetProcAddress(g_SBM_HINST, "SBM_Update");
+   g_SBM_UpdateUsingDelta           = (SBM_UpdateUsingDelta_DEF)GetProcAddress(g_SBM_HINST, "SBM_UpdateUsingDelta");
    g_SBM_ProcessVHMsgs              = (SBM_ProcessVHMsgs_DEF)GetProcAddress(g_SBM_HINST, "SBM_ProcessVHMsgs");
    g_SBM_InitCharacter              = (SBM_InitCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_InitCharacter");
    g_SBM_GetCharacter               = (SBM_GetCharacter_DEF)GetProcAddress(g_SBM_HINST, "SBM_GetCharacter");
@@ -137,6 +180,8 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    g_SBM_IsLogMessageWaiting        = (SBM_IsLogMessageWaiting_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsLogMessageWaiting");
    g_SBM_IsCharacterDeleted         = (SBM_IsCharacterDeleted_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterDeleted");
    g_SBM_IsCharacterChanged         = (SBM_IsCharacterChanged_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsCharacterChanged");
+   g_SBM_IsBmlRequestWaiting        = (SBM_IsBmlRequestWaiting_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsBmlRequestWaiting");
+   g_SBM_SendBmlReply               = (SBM_SendBmlReply_DEF)GetProcAddress(g_SBM_HINST, "SBM_SendBmlReply");
    g_SBM_IsVisemeSet                = (SBM_IsVisemeSet_DEF )GetProcAddress(g_SBM_HINST, "SBM_IsVisemeSet");
    g_SBM_IsChannelSet               = (SBM_IsChannelSet_DEF)GetProcAddress(g_SBM_HINST, "SBM_IsChannelSet");
    g_SBM_PythonCommandVoid          = (SBM_PythonCommandVoid_DEF)GetProcAddress(g_SBM_HINST, "SBM_PythonCommandVoid");
@@ -150,13 +195,56 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    g_SBM_SBDebuggerServer_SetCameraValues          = (SBM_SBDebuggerServer_SetCameraValues_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBDebuggerServer_SetCameraValues");
    g_SBM_SBDebuggerServer_SetRendererIsRightHanded = (SBM_SBDebuggerServer_SetRendererIsRightHanded_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBDebuggerServer_SetRendererIsRightHanded");
    g_SBM_SBMotion_AddChannel        = (SBM_SBMotion_AddChannel_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBMotion_AddChannel");
+   g_SBM_SBMotion_AddChannels       = (SBM_SBMotion_AddChannels_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBMotion_AddChannels");
    g_SBM_SBMotion_AddFrame          = (SBM_SBMotion_AddFrame_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBMotion_AddFrame");
    g_SBM_SBMotion_SetSyncPoint      = (SBM_SBMotion_SetSyncPoint_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBMotion_SetSyncPoint");
    g_SBM_SBJointMap_GetMapTarget    = (SBM_SBJointMap_GetMapTarget_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBJointMap_GetMapTarget");
+   g_SBM_SBDiphoneManager_CreateDiphone = (SBM_SBDiphoneManager_CreateDiphone_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBDiphoneManager_CreateDiphone");
+   g_SBM_SBDiphone_AddKey           = (SBM_SBDiphone_AddKey_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBDiphone_AddKey");
    g_SBM_SBVHMsgManager_SetServer   = (SBM_SBVHMsgManager_SetServer_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBVHMsgManager_SetServer");
    g_SBM_SBVHMsgManager_SetScope    = (SBM_SBVHMsgManager_SetScope_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBVHMsgManager_SetScope");
    g_SBM_SBVHMsgManager_SetPort     = (SBM_SBVHMsgManager_SetPort_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBVHMsgManager_SetPort");
    g_SBM_SBVHMsgManager_SetEnable   = (SBM_SBVHMsgManager_SetEnable_DEF)GetProcAddress(g_SBM_HINST, "SBM_SBVHMsgManager_SetEnable");
+#else
+   g_SBM_CreateSBM                  = SBM_CreateSBM;
+   g_SBM_Init                       = SBM_Init;
+   g_SBM_Shutdown                   = SBM_Shutdown;
+   g_SBM_Update                     = SBM_Update;
+   g_SBM_UpdateUsingDelta           = SBM_UpdateUsingDelta;
+   g_SBM_ProcessVHMsgs              = SBM_ProcessVHMsgs;
+   g_SBM_InitCharacter              = SBM_InitCharacter;
+   g_SBM_GetCharacter               = SBM_GetCharacter;
+   g_SBM_ReleaseCharacter           = SBM_ReleaseCharacter;
+   g_SBM_IsCharacterCreated         = SBM_IsCharacterCreated;
+   g_SBM_IsLogMessageWaiting        = SBM_IsLogMessageWaiting;
+   g_SBM_IsCharacterDeleted         = SBM_IsCharacterDeleted;
+   g_SBM_IsCharacterChanged         = SBM_IsCharacterChanged;
+   g_SBM_IsBmlRequestWaiting        = SBM_IsBmlRequestWaiting;
+   g_SBM_SendBmlReply               = SBM_SendBmlReply;
+   g_SBM_IsVisemeSet                = SBM_IsVisemeSet;
+   g_SBM_IsChannelSet               = SBM_IsChannelSet;
+   g_SBM_PythonCommandVoid          = SBM_PythonCommandVoid;
+   g_SBM_PythonCommandBool          = SBM_PythonCommandBool;
+   g_SBM_PythonCommandInt           = SBM_PythonCommandInt;
+   g_SBM_PythonCommandFloat         = SBM_PythonCommandFloat;
+   g_SBM_PythonCommandString        = SBM_PythonCommandString;
+   g_SBM_SBAssetManager_LoadSkeleton = SBM_SBAssetManager_LoadSkeleton;
+   g_SBM_SBAssetManager_LoadMotion   = SBM_SBAssetManager_LoadMotion;
+   g_SBM_SBDebuggerServer_SetID                    = SBM_SBDebuggerServer_SetID;
+   g_SBM_SBDebuggerServer_SetCameraValues          = SBM_SBDebuggerServer_SetCameraValues;
+   g_SBM_SBDebuggerServer_SetRendererIsRightHanded = SBM_SBDebuggerServer_SetRendererIsRightHanded;
+   g_SBM_SBMotion_AddChannel        = SBM_SBMotion_AddChannel;
+   g_SBM_SBMotion_AddChannels       = SBM_SBMotion_AddChannels;
+   g_SBM_SBMotion_AddFrame          = SBM_SBMotion_AddFrame;
+   g_SBM_SBMotion_SetSyncPoint      = SBM_SBMotion_SetSyncPoint;
+   g_SBM_SBJointMap_GetMapTarget    = SBM_SBJointMap_GetMapTarget;
+   g_SBM_SBDiphoneManager_CreateDiphone = SBM_SBDiphoneManager_CreateDiphone;
+   g_SBM_SBDiphone_AddKey           = SBM_SBDiphone_AddKey;
+   g_SBM_SBVHMsgManager_SetServer   = SBM_SBVHMsgManager_SetServer;
+   g_SBM_SBVHMsgManager_SetScope    = SBM_SBVHMsgManager_SetScope;
+   g_SBM_SBVHMsgManager_SetPort     = SBM_SBVHMsgManager_SetPort;
+   g_SBM_SBVHMsgManager_SetEnable   = SBM_SBVHMsgManager_SetEnable;
+#endif
 
    if (g_SBM_CreateSBM)
    {
@@ -164,33 +252,26 @@ VHWRAPPERDLL_API SBMHANDLE WRAPPER_SBM_CreateSBM(const bool releaseMode)
    }
 
    return -1;
-#else
-   return SBM_CreateSBM();
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_Init( SBMHANDLE sbmHandle, const char * pythonPath, bool logToFile )
 {
-#ifdef WIN_BUILD
    if (g_SBM_Init)
    {
       return g_SBM_Init(sbmHandle, pythonPath, logToFile);
    }
    return false;
-#else
-   return SBM_Init(sbmHandle, pythonPath, logToFile);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle )
 {
-#ifdef WIN_BUILD
    bool retVal = false;
    if (g_SBM_Shutdown)
    {
       retVal = g_SBM_Shutdown(sbmHandle);
    }
 
+#ifdef WIN_BUILD
    BOOL freeSuccessful = FreeLibrary(g_SBM_HINST);
    g_SBM_HINST = NULL;
    if (!freeSuccessful)
@@ -202,377 +283,505 @@ VHWRAPPERDLL_API bool WRAPPER_SBM_Shutdown( SBMHANDLE sbmHandle )
    {
       //WRAPPER_SBM_LogMessage("SUCCESS!: FreeLibrary SmartBody.dll", 0);
    }
+#endif
 
    return retVal;
-#else
-   return SBM_Shutdown(sbmHandle);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
 {
-#ifdef WIN_BUILD
    if (g_SBM_Update)
    {
       return g_SBM_Update(sbmHandle, timeInSeconds);
    }
    return false;
-#else
-   return SBM_Update(sbmHandle, timeInSeconds);
-#endif
+}
+
+VHWRAPPERDLL_API bool WRAPPER_SBM_UpdateUsingDelta( SBMHANDLE sbmHandle, double deltaTimeInSeconds )
+{
+   if (g_SBM_UpdateUsingDelta)
+   {
+      return g_SBM_UpdateUsingDelta(sbmHandle, deltaTimeInSeconds);
+   }
+   return false;
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_ProcessVHMsgs( SBMHANDLE sbmHandle, const char * op, const char * args )
 {
-#ifdef WIN_BUILD
    if (g_SBM_ProcessVHMsgs)
    {
       return g_SBM_ProcessVHMsgs(sbmHandle, op, args);
    }
    return false;
-#else
-   return SBM_ProcessVHMsgs(sbmHandle, op, args);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_InitCharacter( SBMHANDLE sbmHandle, const char * name, SBM_CharacterFrameDataMarshalFriendly * character )
 {
-#ifdef WIN_BUILD
    if (g_SBM_InitCharacter)
    {
       return g_SBM_InitCharacter(sbmHandle, name, character);
    }
    return false;
-#else
-   return SBM_InitCharacter(sbmHandle, name, character);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_CharacterFrameDataMarshalFriendly * character )
 {
-#ifdef WIN_BUILD
    if (g_SBM_GetCharacter)
    {
       return g_SBM_GetCharacter(sbmHandle, name, character);
    }
    return false;
-#else
-   return SBM_GetCharacter(sbmHandle, name, character);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_ReleaseCharacter( SBM_CharacterFrameDataMarshalFriendly * character )
 {
-#ifdef WIN_BUILD
    if (g_SBM_ReleaseCharacter)
    {
       return g_SBM_ReleaseCharacter(character);
    }
    return false;
-#else
-   return SBM_ReleaseCharacter(character);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterCreated( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * objectClass, int maxObjectClassLen )
 {
-#ifdef WIN_BUILD
    if (g_SBM_IsCharacterCreated)
    {
       return g_SBM_IsCharacterCreated(sbmHandle, name, maxNameLen, objectClass, maxObjectClassLen);
    }
    return false;
-#else
-   return SBM_IsCharacterCreated(sbmHandle, name, maxNameLen, objectClass, maxObjectClassLen);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_IsLogMessageWaiting( SBMHANDLE sbmHandle, char * logMessage, int maxLogMessageLen, int * messageType)
 {
-#ifdef WIN_BUILD
     if (g_SBM_IsLogMessageWaiting)
     {
         return g_SBM_IsLogMessageWaiting(sbmHandle, logMessage, maxLogMessageLen, messageType);
     }
     return false;
-#else
-    return SBM_IsLogMessageWaiting(sbmHandle, logMessage, maxLogMessageLen, messageType);
-#endif
+}
+
+VHWRAPPERDLL_API bool WRAPPER_SBM_IsBmlRequestWaiting( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * requestId, int maxRequestIdLength, char * bmlName, int maxBmlNameLength )
+{
+    if (g_SBM_IsBmlRequestWaiting)
+    {
+        return g_SBM_IsBmlRequestWaiting(sbmHandle, name, maxNameLen, requestId, maxRequestIdLength, bmlName, maxBmlNameLength);
+    }
+    return false;
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SendBmlReply(SBMHANDLE sbmHandle, const char * charName, const char * requestId, const char * utteranceId, const char * bmlText)
+{
+    if (g_SBM_SendBmlReply)
+    {
+        g_SBM_SendBmlReply(sbmHandle, charName, requestId, utteranceId, bmlText);
+    }
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterDeleted( SBMHANDLE sbmHandle, char * name, int maxNameLen )
 {
-#ifdef WIN_BUILD
    if (g_SBM_IsCharacterDeleted)
    {
       return g_SBM_IsCharacterDeleted(sbmHandle, name, maxNameLen);
    }
    return false;
-#else
-   return SBM_IsCharacterDeleted(sbmHandle, name, maxNameLen);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_IsCharacterChanged( SBMHANDLE sbmHandle, char * name, int maxNameLen )
 {
-#ifdef WIN_BUILD
    if (g_SBM_IsCharacterChanged)
    {
       return g_SBM_IsCharacterChanged(sbmHandle, name, maxNameLen);
    }
    return false;
-#else
-   return SBM_IsCharacterChanged(sbmHandle, name, maxNameLen);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_IsVisemeSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * visemeName, int maxVisemeNameLen, float * weight, float * blendTime )
 {
-#ifdef WIN_BUILD
    if (g_SBM_IsVisemeSet)
    {
       return g_SBM_IsVisemeSet(sbmHandle, name, maxNameLen, visemeName, maxVisemeNameLen, weight, blendTime);
    }
    return false;
-#else
-   return SBM_IsVisemeSet(sbmHandle, name, maxNameLen, visemeName, maxVisemeNameLen, weight, blendTime);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_IsChannelSet( SBMHANDLE sbmHandle, char * name, int maxNameLen, char * channelName, int maxChannelNameLen, float * value )
 {
-#ifdef WIN_BUILD
    if (g_SBM_IsChannelSet)
    {
       return g_SBM_IsChannelSet(sbmHandle, name, maxNameLen, channelName, maxChannelNameLen, value);
    }
    return false;
-#else
-   return SBM_IsChannelSet(sbmHandle, name, maxNameLen, channelName, maxChannelNameLen, value);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_PythonCommandVoid(SBMHANDLE sbmHandle, const char * command)
 {
-#ifdef WIN_BUILD
    if (g_SBM_PythonCommandVoid)
    {
       return g_SBM_PythonCommandVoid(sbmHandle, command);
    }
    return false;
-#else
-   return SBM_PythonCommandVoid(sbmHandle, command);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_PythonCommandBool(SBMHANDLE sbmHandle, const char * command)
 {
-#ifdef WIN_BUILD
    if (g_SBM_PythonCommandBool)
    {
       return g_SBM_PythonCommandBool(sbmHandle, command);
    }
    return false;
-#else
-   return SBM_PythonCommandBool(sbmHandle, command);
-#endif
 }
 
 VHWRAPPERDLL_API int WRAPPER_SBM_PythonCommandInt(SBMHANDLE sbmHandle, const char * command)
 {
-#ifdef WIN_BUILD
    if (g_SBM_PythonCommandInt)
    {
       return g_SBM_PythonCommandInt(sbmHandle, command);
    }
    return 0;
-#else
-   return SBM_PythonCommandInt(sbmHandle, command);
-#endif
 }
 
 VHWRAPPERDLL_API float WRAPPER_SBM_PythonCommandFloat(SBMHANDLE sbmHandle, const char *command)
 {
-#ifdef WIN_BUILD
    if (g_SBM_PythonCommandFloat)
    {
       return g_SBM_PythonCommandFloat(sbmHandle, command);
    }
    return 0;
-#else
-    return SBM_PythonCommandFloat(sbmHandle, command);
-#endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_PythonCommandString(SBMHANDLE sbmHandle, const char * command, char * output, int maxLen)
 {
-#ifdef WIN_BUILD
    if (g_SBM_PythonCommandString)
    {
       g_SBM_PythonCommandString(sbmHandle, command, output, maxLen);
    }
-#else
-    SBM_PythonCommandString(sbmHandle, command, output, maxLen);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_SBAssetManager_LoadSkeleton( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * skeletonName )
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBAssetManager_LoadSkeleton)
    {
       return g_SBM_SBAssetManager_LoadSkeleton(sbmHandle, data, sizeBytes, skeletonName);
    }
    return false;
-#else
-   return SBM_SBAssetManager_LoadSkeleton(sbmHandle, data, sizeBytes, skeletonName);
-#endif
 }
 
 VHWRAPPERDLL_API bool WRAPPER_SBM_SBAssetManager_LoadMotion( SBMHANDLE sbmHandle, const void * data, int sizeBytes, const char * motionName )
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBAssetManager_LoadMotion)
    {
       return g_SBM_SBAssetManager_LoadMotion(sbmHandle, data, sizeBytes, motionName);
    }
    return false;
-#else
-   return SBM_SBAssetManager_LoadMotion(sbmHandle, data, sizeBytes, motionName);
-#endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBDebuggerServer_SetID( SBMHANDLE sbmHandle, const char * id )
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBDebuggerServer_SetID)
    {
       g_SBM_SBDebuggerServer_SetID(sbmHandle, id );
    }
-#else
-   SBM_SBDebuggerServer_SetID(sbmHandle, id);
-#endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBDebuggerServer_SetCameraValues( SBMHANDLE sbmHandle, double x, double y, double z, double rx, double ry, double rz, double rw, double fov, double aspect, double zNear, double zFar )
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBDebuggerServer_SetCameraValues)
    {
       g_SBM_SBDebuggerServer_SetCameraValues(sbmHandle, x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
    }
-#else
-   SBM_SBDebuggerServer_SetCameraValues(sbmHandle, x, y, z, rx, ry, rz, rw, fov, aspect, zNear, zFar );
-#endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBDebuggerServer_SetRendererIsRightHanded( SBMHANDLE sbmHandle, bool enabled )
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBDebuggerServer_SetRendererIsRightHanded)
    {
       g_SBM_SBDebuggerServer_SetRendererIsRightHanded(sbmHandle, enabled );
    }
-#else
-   SBM_SBDebuggerServer_SetRendererIsRightHanded(sbmHandle, enabled );
-#endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBMotion_AddChannel(SBMHANDLE sbmHandle, const char * motionName, const char * channelName, const char * channelType)
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBMotion_AddChannel)
    {
       g_SBM_SBMotion_AddChannel(sbmHandle, motionName, channelName, channelType);
    }
-#else
-    SBM_SBMotion_AddChannel(sbmHandle, motionName, channelName, channelType);
-#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SBMotion_AddChannels(SBMHANDLE sbmHandle, const char * motionName, const char ** channelNames, const char ** channelTypes, int count)
+{
+   if (g_SBM_SBMotion_AddChannel)
+   {
+      g_SBM_SBMotion_AddChannels(sbmHandle, motionName, channelNames, channelTypes, count);
+   }
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBMotion_AddFrame(SBMHANDLE sbmHandle, const char * motionName, float frameTime, const float * frameData, int numFrameData)
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBMotion_AddFrame)
    {
       g_SBM_SBMotion_AddFrame(sbmHandle, motionName, frameTime, frameData, numFrameData);
    }
-#else
-    SBM_SBMotion_AddFrame(sbmHandle, motionName, frameTime, frameData, numFrameData);
-#endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBMotion_SetSyncPoint(SBMHANDLE sbmHandle, const char * motionName, const char * syncTag, double time)
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBMotion_SetSyncPoint)
    {
       g_SBM_SBMotion_SetSyncPoint(sbmHandle, motionName, syncTag, time);
    }
-#else
-    SBM_SBMotion_SetSyncPoint(sbmHandle, motionName, syncTag, time);
-#endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBJointMap_GetMapTarget(SBMHANDLE sbmHandle, const char * jointMap, const char * jointName, char * mappedJointName, int maxMappedJointName)
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBJointMap_GetMapTarget)
    {
       g_SBM_SBJointMap_GetMapTarget(sbmHandle, jointMap, jointName, mappedJointName, maxMappedJointName);
    }
-#else
-    SBM_SBJointMap_GetMapTarget(sbmHandle, jointMap, jointName, mappedJointName, maxMappedJointName);
-#endif
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SBDiphoneManager_CreateDiphone(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name)
+{
+   if (g_SBM_SBDiphoneManager_CreateDiphone)
+   {
+      g_SBM_SBDiphoneManager_CreateDiphone(sbmHandle, fromPhoneme, toPhoneme, name);
+   }
+}
+
+VHWRAPPERDLL_API void WRAPPER_SBM_SBDiphone_AddKey(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name, const char * viseme, float time, float weight)
+{
+   if (g_SBM_SBDiphone_AddKey)
+   {
+      g_SBM_SBDiphone_AddKey(sbmHandle, fromPhoneme, toPhoneme, name, viseme, time, weight);
+   }
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetServer( SBMHANDLE sbmHandle, const char * server )
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBVHMsgManager_SetServer)
    {
       g_SBM_SBVHMsgManager_SetServer(sbmHandle, server);
    }
-#else
-    SBM_SBVHMsgManager_SetServer(sbmHandle, server);
-#endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetScope( SBMHANDLE sbmHandle, const char * scope )
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBVHMsgManager_SetScope)
    {
       g_SBM_SBVHMsgManager_SetScope(sbmHandle, scope);
    }
-#else
-    SBM_SBVHMsgManager_SetScope(sbmHandle, scope);
-#endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetPort( SBMHANDLE sbmHandle, const char * port )
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBVHMsgManager_SetPort)
    {
       g_SBM_SBVHMsgManager_SetPort(sbmHandle, port);
    }
-#else
-    SBM_SBVHMsgManager_SetPort(sbmHandle, port);
-#endif
 }
 
 VHWRAPPERDLL_API void WRAPPER_SBM_SBVHMsgManager_SetEnable( SBMHANDLE sbmHandle, bool enable )
 {
-#ifdef WIN_BUILD
    if (g_SBM_SBVHMsgManager_SetEnable)
    {
       g_SBM_SBVHMsgManager_SetEnable(sbmHandle, enable);
    }
-#else
-    SBM_SBVHMsgManager_SetEnable(sbmHandle, enable);
-#endif
 }
+
+
+////////////////////////////////////////////////////////////////////////////
+
+#if defined(WIN_BUILD)
+
+VHWRAPPERDLL_API MSSPEECHHANDLE WRAPPER_MSSPEECH_Create()
+{
+   g_msspeechHandleId++;
+   return g_msspeechHandleId;
+}
+
+
+VHWRAPPERDLL_API bool WRAPPER_MSSPEECH_Init(MSSPEECHHANDLE handle)
+{
+   MSSpeechData * speechData = new MSSpeechData();
+
+   HRESULT hr = speechData->cpInputStream.CoCreateInstance(CLSID_SpStream);
+   if (FAILED(hr))
+   {
+      printf("input formatting failed");
+      return false;
+   }
+
+   //Initialize the recognition Engine
+   hr = speechData->cpRecognizer.CoCreateInstance(CLSID_SpInprocRecognizer);
+   if (FAILED(hr))
+   {
+      printf("Failed to created recognition engine");
+      return FALSE;
+   }
+
+   //Create recognition context
+   hr = speechData->cpRecognizer->CreateRecoContext(&speechData->cpRecoContext);
+   hr = speechData->cpRecoContext->CreateGrammar(NULL, &speechData->cpRecoGrammar);
+   hr = speechData->cpRecoGrammar->LoadDictation(NULL, SPLO_STATIC);
+
+
+   //Check for things that are recognized and the end of the stream
+   hr = speechData->cpRecoContext->SetInterest(SPFEI_ALL_SR_EVENTS | SPFEI(SPEI_END_SR_STREAM),
+                                 SPFEI_ALL_SR_EVENTS | SPFEI(SPEI_END_SR_STREAM));
+
+
+   //hook up the Win32 event
+   hr = speechData->cpRecoContext->SetNotifyWin32Event();
+   if (FAILED(hr))
+   {
+      printf("Wiring up win32 Event failed");
+      return FALSE;
+   }
+
+   //Activate Dictation
+   hr = speechData->cpRecoGrammar->SetDictationState(SPRS_ACTIVE);
+   if (FAILED(hr))
+   {
+      printf("failed to active dictionary");
+      return FALSE;
+   }
+
+
+   g_msspeechInstances[handle] = speechData;
+
+   return true;
+}
+
+
+VHWRAPPERDLL_API bool WRAPPER_MSSPEECH_Free(MSSPEECHHANDLE handle)
+{
+   MSSpeechData * speechData = g_msspeechInstances[handle];
+   if (speechData != NULL)
+   {
+      speechData->cpRecoGrammar->SetDictationState(SPRS_INACTIVE);
+      speechData->cpRecoGrammar->UnloadDictation();
+      speechData->cpInputStream->Close();
+      delete speechData;
+   }
+
+   std::map<MSSPEECHHANDLE, MSSpeechData *>::iterator it = g_msspeechInstances.find(handle);
+   g_msspeechInstances.erase(it);
+
+   return true;
+}
+
+
+VHWRAPPERDLL_API bool WRAPPER_MSSPEECH_Recognize(MSSPEECHHANDLE handle, const char * waveFileName, char * buffer, int maxLen, int msFreqEnumVal)
+{
+   MSSpeechData * speechData = g_msspeechInstances[handle];
+   if (speechData == NULL)
+   {
+      return false;
+   }
+
+   HRESULT hr;
+
+   wchar_t MY_WAVE_AUDIO_FILENAME[MAX_PATH] = {0};
+
+   size_t s;
+
+   mbstowcs_s(&s, MY_WAVE_AUDIO_FILENAME, (size_t)MAX_PATH, waveFileName, (size_t)strlen(waveFileName));
+
+   //LPCWSTR TEST_CFG = LPCWSTR(L"helloworld.xml\0");
+
+   CComPtr<ISpRecoResult> cpResult;
+
+   CSpStreamFormat sInputFormat;
+   hr = sInputFormat.AssignFormat(/*SPSF_22kHz16BitMono*/(SPSTREAMFORMAT)msFreqEnumVal);
+   if (FAILED(hr))
+   {
+      printf("input formatting failed");
+      return FALSE;
+   }
+
+   //bind input stream to a file
+   hr = speechData->cpInputStream->BindToFile(MY_WAVE_AUDIO_FILENAME,
+                                              SPFM_OPEN_READONLY,
+                                              &sInputFormat.FormatId(),
+                                              sInputFormat.WaveFormatExPtr(),
+                                              SPFEI_ALL_EVENTS);
+   if (FAILED(hr))
+   {
+      printf("binding to file failed. check file value, etc... ");
+      return FALSE;
+   }
+
+   //hook up wav input to the recognizer
+   hr = speechData->cpRecognizer->SetInput(speechData->cpInputStream, TRUE);
+   if (FAILED(hr))
+   {
+      printf("Linking WAV to recognizer failed. ");
+      return FALSE;
+   }
+
+
+   bool fEndStreamReached = FALSE;
+
+   //Do stuff, like analyze the wave or something...
+   while (!fEndStreamReached && S_OK == speechData->cpRecoContext->WaitForNotifyEvent(10000))
+   {
+      CSpEvent spEvent;
+
+      //extract queued events from reco context's event queue!
+      while (!fEndStreamReached && S_OK == spEvent.GetFrom(speechData->cpRecoContext))
+      {
+         //Figure out the event type
+         switch (spEvent.eEventId)
+         {
+            //recognized something
+            case SPEI_RECOGNITION:
+               //fFoundSomething = true;
+               LPWSTR bufferLP;
+
+               cpResult = spEvent.RecoResult();
+               cpResult->GetText((ULONG)SP_GETWHOLEPHRASE, (ULONG)SP_GETWHOLEPHRASE, TRUE, &bufferLP, NULL);
+
+               size_t   i;
+               wcstombs_s(&i, buffer, (size_t)maxLen, bufferLP, (size_t)maxLen);
+               break;
+
+            case SPEI_END_SR_STREAM:
+               fEndStreamReached = true;
+               break;
+         }
+
+         //Clear the event
+         spEvent.Clear();
+      }
+   }
+
+   hr = speechData->cpInputStream->Close();
+
+   return TRUE;
+}
+
+#else
+
+VHWRAPPERDLL_API MSSPEECHHANDLE WRAPPER_MSSPEECH_Create()
+{
+    return 0;
+}
+
+VHWRAPPERDLL_API bool WRAPPER_MSSPEECH_Init(MSSPEECHHANDLE handle)
+{
+    return true;
+}
+
+VHWRAPPERDLL_API bool WRAPPER_MSSPEECH_Free(MSSPEECHHANDLE handle)
+{
+    return true;
+}
+
+VHWRAPPERDLL_API bool WRAPPER_MSSPEECH_Recognize(MSSPEECHHANDLE handle, const char * waveFileName, char * buffer, int maxLen, int msFreqEnumVal)
+{
+    return true;
+}
+
+#endif
 
 ////////////////////////////////////////////////////////////////////////////
 
