@@ -366,7 +366,8 @@ void RetargetStepWindow::SaveCharacterCB( Fl_Widget* widget, void* data )
 	std::string outDir = "";
 	outDir = BaseWindow::chooseDirectory("Save To:", mediaPath);	
 	std::vector<std::string> moNames;
-	bool ok = ParserOpenCOLLADA::exportCollada(outDir,skelName,defMeshName,moNames,true,true,false);
+	double meshScale = selectChar->getDoubleAttribute("deformableMeshScale");
+	bool ok = ParserOpenCOLLADA::exportCollada(outDir,skelName,defMeshName,moNames,true,true,false, meshScale);
 	if (ok)
 	{
 		std::stringstream strstr;

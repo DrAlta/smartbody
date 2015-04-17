@@ -52,7 +52,14 @@ void setPawnMesh(const std::string& pawnName, const std::string& meshName, float
 void saveDeformableMesh(const std::string& meshName, const std::string& skelName, const std::string& outDir)
 {
 	std::vector<std::string> moNames;
-	ParserOpenCOLLADA::exportCollada(outDir,skelName,meshName,moNames,true,true,false);
+	double scale = 1.0;
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(skelName);
+	if (character)
+	{
+		scale = character->getDoubleAttribute("deformableMeshScale");
+	}
+
+	ParserOpenCOLLADA::exportCollada(outDir, skelName, meshName, moNames, true, true, false, scale);
 }
 
 //	Callback function for Python module Misc to run the checkVisibility function
