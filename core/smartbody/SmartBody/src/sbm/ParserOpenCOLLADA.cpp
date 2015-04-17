@@ -2944,7 +2944,7 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 
 
 
-bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skeletonName, std::string deformMeshName, std::vector<std::string> motionNames, bool exportSk, bool exportMesh, bool exportMotion )
+bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skeletonName, std::string deformMeshName, std::vector<std::string> motionNames, bool exportSk, bool exportMesh, bool exportMotion, double meshScale )
 {	
 	if (deformMeshName == "")
 		deformMeshName = "smartbodycharacter.dae";
@@ -2983,7 +2983,8 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 	if (exportMesh && defMesh)
 	{		
 		ParserOpenCOLLADA::exportMaterials(fp,deformMeshName);
-		ParserOpenCOLLADA::exportSkinMesh(fp,deformMeshName);
+		// get the mesh scale from the character
+		ParserOpenCOLLADA::exportSkinMesh(fp, deformMeshName, meshScale);
 		SbmTextureManager& texManager = SbmTextureManager::singleton();
 		for (unsigned int i=0;i<defMesh->subMeshList.size();i++)
 		{
@@ -3101,7 +3102,7 @@ bool ParserOpenCOLLADA::exportMaterials( FILE* fp, std::string deformMeshName )
 }
 
 
-bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
+bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, double scale)
 {
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	DeformableMesh* defMesh = assetManager->getDeformableMesh(deformMeshName);
@@ -3133,7 +3134,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName )
 			fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",positionID.c_str(),positionID.c_str());
 			fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", positionArrayID.c_str(),model.V.size()*3);
 			for (int k=0;k<model.V.size();k++)
-				fprintf(fp,"%f %f %f ",model.V[k][0],model.V[k][1],model.V[k][2]);
+				fprintf(fp,"%f %f %f ",model.V[k][0] * scale, model.V[k][1] * scale, model.V[k][2] * scale);
 			fprintf(fp,"</float_array>\n");
 			fprintf(fp,"<technique_common>\n");
 			fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n",positionArrayID.c_str(),model.V.size(),3);
