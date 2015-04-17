@@ -12,7 +12,7 @@ include_directories( ./external/polyvox/library/PolyVoxCore/include )
 link_directories( /usr/local/lib )
 link_directories( /usr/lib )                                                           
 
-set (BUILD_OGRE TRUE)
+set (BUILD_OGRE FALSE)
 # never build ogre if in osx
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set (BUILD_OGRE FALSE)

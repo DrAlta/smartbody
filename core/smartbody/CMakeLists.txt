@@ -11,12 +11,22 @@ set (PYTHON_INCLUDE
         )
 endif()
 
+if (${USE_ASSIMP})
+set (ASSIMP_INCLUDE
+)
+else()
+set (ASSIMP_INCLUDE
+        ../../lib/assimp-3.1.1/include
+        )
+endif()
+
 include_directories(
 	steersuite-1.3/steerlib/include
 	steersuite-1.3/pprAI/include
 	steersuite-1.3/external
 	/usr/local/include
 	${PYTHON_INCLUDE}
+	${ASSIMP_INCLUDE}
 )
 
 LINK_DIRECTORIES(
