@@ -17,7 +17,7 @@
 #include "sbm/local_speech.h"
 #include "sbm/mcontrol_callbacks.h"
 #include "sbm/sbm_constants.h"
-#include "sbm/sbm_remote_speech_audiofile.hpp"
+//#include "sbm/sbm_remote_speech_audiofile.hpp"
 #ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
@@ -618,7 +618,7 @@ SBAPI void SBM_SendBmlReply(SBMHANDLE sbmHandle, const char * charName, const ch
         return;
     }
 
-    remoteBmlResult_func(charName, requestId, utteranceId, bmlText);
+    //remoteBmlResult_func(charName, requestId, utteranceId, bmlText);
 }
 
 SBAPI bool SBM_PythonCommandVoid( SBMHANDLE sbmHandle, const char * command)
@@ -898,7 +898,7 @@ SBAPI void SBM_SBJointMap_GetMapTarget( SBMHANDLE sbmHandle, const char * jointM
 }
 
 
-SBAPI void SBM_SBDiphoneManager_CreateDiphone(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name)
+SBAPI void SBM_SBPhonemeManager_CreateDiphone(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name)
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
@@ -906,7 +906,7 @@ SBAPI void SBM_SBDiphoneManager_CreateDiphone(SBMHANDLE sbmHandle, const char * 
    }
 
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
-   SmartBody::SBDiphoneManager * diphoneManager = scene->getDiphoneManager();
+   SmartBody::SBPhonemeManager * diphoneManager = scene->getDiphoneManager();
 
    diphoneManager->createDiphone(fromPhoneme, toPhoneme, name);
 }
@@ -920,7 +920,7 @@ SBAPI void SBM_SBDiphone_AddKey(SBMHANDLE sbmHandle, const char * fromPhoneme, c
    }
 
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
-   SmartBody::SBDiphoneManager * diphoneManager = scene->getDiphoneManager();
+   SmartBody::SBPhonemeManager * diphoneManager = scene->getDiphoneManager();
    SmartBody::SBDiphone * diphone = diphoneManager->getDiphone(fromPhoneme, toPhoneme, name);
 
    diphone->addKey(viseme, time, weight);
