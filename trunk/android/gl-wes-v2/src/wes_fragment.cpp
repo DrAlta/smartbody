@@ -585,7 +585,7 @@ wes_frag_build(char* buff, progstate_t *s)
         }
     }
 
-    fprintf(stdout, buff);
+    fprintf(stdout, "%s", buff);
     fprintf(stdout, "\n===========================\n");
     fflush(stdout);
 #endif
