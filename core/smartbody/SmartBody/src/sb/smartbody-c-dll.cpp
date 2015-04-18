@@ -11,11 +11,13 @@
 #include "sb/SBSceneListener.h"
 #include "sb/SBSimulationManager.h"
 #include "sb/SBSpeechManager.h"
+#include "sb/SBPhoneme.h"
+#include "sb/SBPhonemeManager.h"
 #include "sb/SBVHMsgManager.h"
 #include "sbm/local_speech.h"
 #include "sbm/mcontrol_callbacks.h"
 #include "sbm/sbm_constants.h"
-
+#include "sbm/sbm_remote_speech_audiofile.hpp"
 #ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
@@ -81,6 +83,7 @@ public:
    virtual void OnCharacterDelete( const std::string & name );
    virtual void OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime );
    virtual void OnChannel( const std::string & name, const std::string & channelName, const float value );
+   virtual void OnRemoteBml(const std::string & name, const std::string & requestId, const std::string & bmlName);
 };
 
 
@@ -96,6 +99,7 @@ public:
    std::queue<SBM_CallbackInfo> m_visemeCallbackInfo;
    std::queue<SBM_CallbackInfo> m_channelCallbackInfo;
    std::queue<SBM_CallbackInfo> m_logCallbackInfo;
+   std::queue<SBM_CallbackInfo> m_bmlCallbackInfo;
 
 public:
    Smartbody_c_Dll(SBMHANDLE handle)
@@ -120,6 +124,7 @@ int g_handleId_DLL = 0;
 bool SBM_ReleaseCharacterJoints( SBM_CharacterFrameDataMarshalFriendly * character );
 bool SBM_HandleExists( SBMHANDLE sbmHandle );
 void SBM_InitLocalSpeechRelay();
+void SBM_SanityCheckCallbackQueues(SBMHANDLE sbmHandle);
 
 
 void LogMessageListener::OnMessage( const std::string & message )
@@ -177,6 +182,14 @@ void SBM_SmartbodyListener::OnChannel( const std::string & name, const std::stri
     g_smartbodyDLLInstances[m_sbmHandle]->m_channelCallbackInfo.push(info);
 }
 
+void SBM_SmartbodyListener::OnRemoteBml( const std::string & name, const std::string & requestId, const std::string & bmlName )
+{
+    SBM_CallbackInfo info;
+    info.name = name;
+    info.objectClass = requestId;
+    info.visemeName = bmlName;
+    g_smartbodyDLLInstances[m_sbmHandle]->m_bmlCallbackInfo.push(info);
+}
 
 
 #ifdef WIN_BUILD
@@ -270,17 +283,8 @@ SBAPI bool SBM_Shutdown( SBMHANDLE sbmHandle )
 }
 
 
-SBAPI bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
+void SBM_SanityCheckCallbackQueues(SBMHANDLE sbmHandle)
 {
-   if ( !SBM_HandleExists( sbmHandle ) )
-   {
-      return false;
-   }
-
-   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
-   scene->getSimulationManager()->setTime(timeInSeconds);
-   scene->update();
-
    // sanity check the queues to make sure they don't grow unchecked
    const int maxQueueSize = 10000;
    while (g_smartbodyDLLInstances[sbmHandle]->m_createCallbackInfo.size() > maxQueueSize)
@@ -300,6 +304,41 @@ SBAPI bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
 
    while (g_smartbodyDLLInstances[sbmHandle]->m_logCallbackInfo.size() > maxQueueSize)
        g_smartbodyDLLInstances[sbmHandle]->m_logCallbackInfo.pop();
+
+   while (g_smartbodyDLLInstances[sbmHandle]->m_bmlCallbackInfo.size() > maxQueueSize)
+       g_smartbodyDLLInstances[sbmHandle]->m_bmlCallbackInfo.pop();
+}
+
+
+SBAPI bool SBM_Update( SBMHANDLE sbmHandle, double timeInSeconds )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   scene->getSimulationManager()->setTime(timeInSeconds);
+   scene->update();
+
+   SBM_SanityCheckCallbackQueues(sbmHandle);
+
+   return true;
+}
+
+
+SBAPI bool SBM_UpdateUsingDelta( SBMHANDLE sbmHandle, double deltaTimeInSeconds )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return false;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   scene->getSimulationManager()->stepDt(deltaTimeInSeconds);
+   scene->update();
+
+   SBM_SanityCheckCallbackQueues(sbmHandle);
 
    return true;
 }
@@ -380,7 +419,7 @@ SBAPI bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_Charact
       character->jry = new float [ character->m_numJoints ];
       character->jrz = new float [ character->m_numJoints ];
 
-      for ( size_t i = 0; i < character->m_numJoints; i++ )
+      for ( int i = 0; i < character->m_numJoints; i++ )
       {
          character->jname[ i ] = new char[ strlen(data.jname[ i ]) + 1 ];
          strcpy( character->jname[ i ], data.jname[ i ] );
@@ -430,7 +469,7 @@ bool SBM_ReleaseCharacterJoints( SBM_CharacterFrameDataMarshalFriendly * charact
       return false;
    }
 
-   for ( size_t i = 0; i < character->m_numJoints; i++ )
+   for ( int i = 0; i < character->m_numJoints; i++ )
    {
       delete [] character->jname[ i ];
    }
@@ -557,6 +596,30 @@ SBAPI bool SBM_IsLogMessageWaiting( SBMHANDLE sbmHandle, char * logMessage, int 
     return true;
 }
 
+SBAPI bool SBM_IsBmlRequestWaiting( SBMHANDLE sbmHandle, char * charName, int maxNameLen, char * requestId, int maxRequestIdLength, char * bmlName, int maxBmlNameLength)
+{
+    if ( !SBM_HandleExists( sbmHandle ) || g_smartbodyDLLInstances[sbmHandle]->m_bmlCallbackInfo.size() == 0)
+    {
+        return false;
+    }
+
+    SBM_CallbackInfo info = g_smartbodyDLLInstances[sbmHandle]->m_bmlCallbackInfo.front();
+    g_smartbodyDLLInstances[sbmHandle]->m_bmlCallbackInfo.pop();
+    strncpy(charName, info.name.c_str(), maxNameLen);
+    strncpy(requestId, info.objectClass.c_str(), maxRequestIdLength);
+    strncpy(bmlName, info.visemeName.c_str(), maxBmlNameLength);
+    return true;
+}
+
+SBAPI void SBM_SendBmlReply(SBMHANDLE sbmHandle, const char * charName, const char * requestId, const char * utteranceId, const char * bmlText)
+{
+    if ( !SBM_HandleExists( sbmHandle ))
+    {
+        return;
+    }
+
+    remoteBmlResult_func(charName, requestId, utteranceId, bmlText);
+}
 
 SBAPI bool SBM_PythonCommandVoid( SBMHANDLE sbmHandle, const char * command)
 {
@@ -768,6 +831,25 @@ SBAPI void SBM_SBMotion_AddChannel( SBMHANDLE sbmHandle, const char * motionName
 }
 
 
+SBAPI void SBM_SBMotion_AddChannels( SBMHANDLE sbmHandle, const char * motionName, const char ** channelNames, const char ** channelTypes, int count )
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBMotion * motion = scene->getMotion(motionName);
+
+   for (int i = 0; i < count; i++)
+   {
+       //LOG("%s - %s - %s", motionName, channelNames[i], channelTypes[i]);
+
+       motion->addChannel(channelNames[i], channelTypes[i]);
+   }
+}
+
+
 SBAPI void SBM_SBMotion_AddFrame( SBMHANDLE sbmHandle, const char * motionName, float frameTime, const float * frameData, int numFrameData )
 {
    if ( !SBM_HandleExists( sbmHandle ) )
@@ -813,6 +895,35 @@ SBAPI void SBM_SBJointMap_GetMapTarget( SBMHANDLE sbmHandle, const char * jointM
    const std::string & mapTarget = jointMap->getMapTarget(jointName);
 
    strncpy(mappedJointName, mapTarget.c_str(), maxMappedJointName);
+}
+
+
+SBAPI void SBM_SBDiphoneManager_CreateDiphone(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name)
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBDiphoneManager * diphoneManager = scene->getDiphoneManager();
+
+   diphoneManager->createDiphone(fromPhoneme, toPhoneme, name);
+}
+
+
+SBAPI void SBM_SBDiphone_AddKey(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name, const char * viseme, float time, float weight)
+{
+   if ( !SBM_HandleExists( sbmHandle ) )
+   {
+      return;
+   }
+
+   SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
+   SmartBody::SBDiphoneManager * diphoneManager = scene->getDiphoneManager();
+   SmartBody::SBDiphone * diphone = diphoneManager->getDiphone(fromPhoneme, toPhoneme, name);
+
+   diphone->addKey(viseme, time, weight);
 }
 
 
