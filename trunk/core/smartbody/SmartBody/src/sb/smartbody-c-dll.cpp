@@ -898,7 +898,7 @@ SBAPI void SBM_SBJointMap_GetMapTarget( SBMHANDLE sbmHandle, const char * jointM
 }
 
 
-SBAPI void SBM_SBPhonemeManager_CreateDiphone(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name)
+SBAPI void SBM_SBDiphoneManager_CreateDiphone(SBMHANDLE sbmHandle, const char * fromPhoneme, const char * toPhoneme, const char * name)
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
