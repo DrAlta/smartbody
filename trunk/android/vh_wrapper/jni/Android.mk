@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 SBM_ANDROID_LOCAL_PATH := $(call my-dir)
 IOS_PATH := ../../../ios/vhwrapper/
 SBM_PATH := ../../../core/smartbody/SmartBody/
@@ -45,9 +46,9 @@ LOCAL_SRC_FILES := $(IOS_PATH)/vhwrapper.cpp
                    
 			
 #LOCAL_LDLIBS    := -llog -lOpenSLES  -fuse-ld=gold
-LOCAL_LDLIBS    := -llog -lOpenSLES -lEGL -lGLESv1_CM
-#LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt 
-LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt python-prebuilt 
+LOCAL_LDLIBS    := -llog -lOpenSLES -lGLESv2
+#LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt  python-prebuilt assimp gl-wes $(CEREVOICE_LIBS)
+LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt festival estools estbase eststring openal sndfile alut festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt python-prebuilt  assimp gl-wes $(CEREVOICE_LIBS)
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
 include $(BUILD_SHARED_LIBRARY) 
 
