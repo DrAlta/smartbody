@@ -389,14 +389,33 @@ bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inMo
 	exportPolyVoxMeshToObj(*voxelMesh,"testVol.obj"); // for debuging only
 	//exportPolyVoxMeshToObj(lowResMesh,"testVolLowRes.obj");
 
+
+	if (autoRigCallBack)
+	{
+		PolyVox::SurfaceMesh<PolyVox::PositionMaterial>* cubicMesh = voxelWindow->getNormalizedCubicMesh();
+		exportCubicMeshToObj(*cubicMesh,"testVolCubic.obj");
+		SrModel srCubicMesh; srCubicMesh.import_obj("testVolCubic.obj");
+		srCubicMesh.computeNormals(0);
+		autoRigCallBack->voxelComplete(srCubicMesh);
+
+		Fl::check();
+	}
+
+
 	Mesh m, origMesh;
 	Skeleton sk = SmartBodyNewSkeleton();
 	bool isValidModel = PolyVoxMeshToPinoMesh(*voxelMesh,m);
 	SrModelToMesh(inModel,origMesh, false);
 	if (!isValidModel) return false; // no auto-rigging if the model is not valid
 
+
+	PinoAutoRigCallback* pinoCallback = new PinoAutoRigCallback(autoRigCallBack);
+	PinnocchioCallBackManager::singletonPtr()->setCallBack(pinoCallback);
+	PinocchioOutput out = autorigVoxelTransfer(sk,m,origMesh);	
+	PinnocchioCallBackManager::singletonPtr()->setCallBack(NULL);
+
 	//PinocchioOutput out = autorig(sk,m);	
-	PinocchioOutput out = autorigVoxelTransfer(sk,m,origMesh, false); // don't compute the skin weights
+	//PinocchioOutput out = autorigVoxelTransfer(sk,m,origMesh, false); // don't compute the skin weights
 	LOG("embedding = %d",out.embedding.size());
 	if (out.embedding.size() == 0)
 		return false;	
@@ -471,6 +490,13 @@ bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inMo
 	assetManager->addSkeleton(sbSk);
 	assetManager->addDeformableMesh(outDeformableMeshName, deformMesh);
 
+	if (autoRigCallBack)
+	{
+		deformMesh->buildVertexBufferGPU();
+		autoRigCallBack->skinComplete(assetManager->getDeformableMesh(outDeformableMeshName));
+		Fl::check();
+	}
+
 	delete voxelWindow;
 	return true;	
 #else
@@ -485,7 +511,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 {
 	
 #if USE_AUTO_RIGGING
-	int voxelSize = 150;
+	int voxelSize = 250;
 	VoxelizerWindow* voxelWindow = new VoxelizerWindow(0,0,voxelSize,voxelSize,"voxelWindow");
 	voxelWindow->initVoxelizer(&inModel,voxelSize);
 	voxelWindow->show();
