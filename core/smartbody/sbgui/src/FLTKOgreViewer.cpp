@@ -342,7 +342,7 @@ int printOglError(char *file, int line)
 	/*
     GLenum glErr;
     int    retCode = 0;
-
+#if 0 // disable for now
     glErr = glGetError();
     if (glErr != GL_NO_ERROR)
     {
@@ -350,6 +350,7 @@ int printOglError(char *file, int line)
 			     file, line, gluErrorString(glErr));
         retCode = 1;
     }
+#endif
 
     return retCode;
 	*/

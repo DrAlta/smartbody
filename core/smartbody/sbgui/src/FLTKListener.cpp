@@ -333,6 +333,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
 					}
 
+#if 0
 					// create attributes for all the blend shapes if there's any
 					std::map<std::string, std::vector<SrSnModel*> > ::iterator iter = mesh->blendShapeMap.begin();
 					for (; iter != mesh->blendShapeMap.end(); ++iter)
@@ -353,6 +354,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					}
 
 					if (mesh->blendShapeMap.size() == 0)
+#endif
 					{
 						// if there are no blendshapes, but there are blendShape.channelName attributes, 
 						// then add the morph targets

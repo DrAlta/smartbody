@@ -310,7 +310,7 @@ int printOglError2(char *file, int line)
 	/*
     GLenum glErr;
     int    retCode = 0;
-
+#if 0
     glErr = glGetError();
     if (glErr != GL_NO_ERROR)
     {
@@ -318,7 +318,7 @@ int printOglError2(char *file, int line)
 			     file, line, gluErrorString(glErr));
         retCode = 1;
     }
-
+#endif
     return retCode;
 	*/
 	return 0;
@@ -2171,8 +2171,8 @@ std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 			pawnCount++;
 			SmartBody::SBPawn* pawn = scene->createPawn(strstr.str());			
 			pawn->setStringAttribute("mesh",dndMesh->getName());	
-			//pawn->setDoubleAttribute("rotY",180.0);
-			//pawn->setDoubleAttribute("rotZ",-90.0);
+			pawn->setDoubleAttribute("rotY",180.0);
+			pawn->setDoubleAttribute("rotZ",-90.0);
 			pawn->dStaticMeshInstance_p->setVisibility(2);
 			return;
 		}
@@ -5011,43 +5011,51 @@ void FltkViewer::drawReach()
 // 		PositionControl::drawSphere(reachTraj,sphereSize,sphereColor);
 		SrVec ikTraj = es.curIKTargetState.tran;		
 		SrVec color(1,0,1);
-		PositionControl::drawSphere(ikTraj,sphereSize,color);
+		//PositionControl::drawSphere(ikTraj,sphereSize,color);
 		SrVec ikTarget = es.ikTargetState.tran;
 		std::string effectorJointName = rd->effectorState.effectorName;
 		SmartBody::SBJoint* effectorJoint = character->getSkeleton()->getJointByName(effectorJointName);
 		if (effectorJoint)
 		{
+			//effectorJoint->updateGmatZero();
 			SrVec pos = effectorJoint->gmat().get_translation();
-			SrQuat rot = SrQuat(rd->effectorState.gmatZero.inverse()*effectorJoint->gmat().get_rotation());
+			SrQuat rot = SrQuat(effectorJoint->gmat().get_rotation());
+			SrMat targetState = rd->effectorState.ikTargetState.gmat();
+			SrQuat desireIKRot = SrQuat(targetState);
 			SrQuat desireRot = SrQuat(rd->desireHandState.gmat());
+			
 			SrVec yaxis = SrVec(0,1,0)*rot;
-			SrVec xaxis = SrVec(1,0,0)*rot;
-			SrVec zaxis = SrVec(0,0,1)*rot;
+			//SrVec xaxis = SrVec(1,0,0)*rot;
+			//SrVec zaxis = SrVec(0,0,1)*rot;
+			
+			SrVec yaxis1 = SrVec(0,1,0)*desireIKRot;
+			//SrVec xaxis1 = SrVec(1,0,0)*desireIKRot;
+			//SrVec zaxis1 = SrVec(0,0,1)*desireIKRot;
 
 			SrVec desireAxis = SrVec(0,1,0)*desireRot;
 			float lineScale = character->getHeight() / 30.0f;	
 			SrSnLines effectorUpLine;
 			SrLines& line = effectorUpLine.shape();
-			line.push_color(SrColor(0.f,0.f,1.f,1.f));
-			line.push_line(pos, pos+zaxis*lineScale);
+			line.push_color(SrColor(1.f,0.f,0.f,1.f));
+			line.push_line(pos, pos+yaxis1*lineScale);
 			line.push_color(SrColor(0.f,1.f,0.f,1.f));
 			line.push_line(pos, pos+yaxis*lineScale);
-			line.push_color(SrColor(1.f,0.f,0.f,1.f));
-			line.push_line(pos, pos+xaxis*lineScale);
+			//line.push_color(SrColor(1.f,0.f,0.f,1.f));
+			//line.push_line(pos, pos+xaxis*lineScale);
 			line.push_color(SrColor(1.f,0.f,1.f,1.f));
 			line.push_line(pos, pos+desireAxis*lineScale);
 			SrGlRenderFuncs::render_lines(&effectorUpLine);			
 			
 		}
-		MeCtIKTreeScenario& ikTree = re->ikScenario;
-
-		for (unsigned int i=0;i<ikTree.ikValidNodes.size();i++)
-		{
-			MeCtIKTreeNode* node = ikTree.ikValidNodes[i];
-			SrVec nodePos = node->getGlobalPos();
-			SrVec color(0,1,1);
-			PositionControl::drawSphere(nodePos,sphereSize,color);
-		}
+// 		MeCtIKTreeScenario& ikTree = re->ikScenario;
+// 
+// 		for (unsigned int i=0;i<ikTree.ikValidNodes.size();i++)
+// 		{
+// 			MeCtIKTreeNode* node = ikTree.ikValidNodes[i];
+// 			SrVec nodePos = node->getGlobalPos();
+// 			SrVec color(0,1,1);
+// 			PositionControl::drawSphere(nodePos,sphereSize,color);
+// 		}
 
 // 		glColor3f(1.0, 0.0, 0.0);
 // 		glBegin(GL_LINES);

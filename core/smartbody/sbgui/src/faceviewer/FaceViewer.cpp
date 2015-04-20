@@ -303,6 +303,7 @@ void FaceViewer::FaceCB(Fl_Widget* widget, void* data)
 		return;
 
 	std::string name = slider->label();
+#if 0
 	std::string message = vhcl::Format("char %s viseme %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), name.c_str(), slider->value());
 	if (!SmartBody::SBScene::getScene()->isRemoteMode())
 	{
@@ -313,6 +314,22 @@ void FaceViewer::FaceCB(Fl_Widget* widget, void* data)
 		std::string sendStr = "send sbm " + message;
 		SmartBody::SBScene::getScene()->command(sendStr);
 	}
+#else
+	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (unsigned int i=0;i<charNames.size();i++)
+	{
+		std::string message = vhcl::Format("char %s viseme %s %f", charNames[i].c_str(), name.c_str(), slider->value());
+		if (!SmartBody::SBScene::getScene()->isRemoteMode())
+		{
+			SmartBody::SBScene::getScene()->command(message);
+		}
+		else
+		{
+			std::string sendStr = "send sbm " + message;
+			SmartBody::SBScene::getScene()->command(sendStr);
+		}
+	}
+#endif
 }
 
 void FaceViewer::FaceWeightCB(Fl_Widget* widget, void* data)
@@ -332,6 +349,7 @@ void FaceViewer::FaceWeightCB(Fl_Widget* widget, void* data)
 		visemeName = labelName.substr(0, pos);
 	}
 
+#if 1
 	std::string message = vhcl::Format("char %s visemeweight %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), visemeName.c_str(), weightSlider->value());
 	if (!SmartBody::SBScene::getScene()->isRemoteMode())
 	{
@@ -342,6 +360,22 @@ void FaceViewer::FaceWeightCB(Fl_Widget* widget, void* data)
 		std::string sendStr = "send sbm " + message;
 		SmartBody::SBScene::getScene()->command(sendStr);
 	}
+#else
+	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
+	for (unsigned int i=0;i<charNames.size();i++)
+	{
+		std::string message = vhcl::Format("char %s visemeweight %s %f", charNames[i].c_str(), visemeName.c_str(), weightSlider->value());
+		if (!SmartBody::SBScene::getScene()->isRemoteMode())
+		{
+			SmartBody::SBScene::getScene()->command(message);
+		}
+		else
+		{
+			std::string sendStr = "send sbm " + message;
+			SmartBody::SBScene::getScene()->command(sendStr);
+		}
+	}
+#endif
 }
 
 void FaceViewer::updateGUI()
