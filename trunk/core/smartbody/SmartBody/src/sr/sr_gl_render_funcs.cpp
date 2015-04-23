@@ -270,7 +270,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 #if ANDROID_BUILD
 	bool USE_GPU_BLENDSHAPES = false;
 #else
-	bool USE_GPU_BLENDSHAPES = true; // set to false for no masks, true for masks
+	bool USE_GPU_BLENDSHAPES = false; // set to false for no masks, true for masks
 #endif
 	//LOG("Render Deformable Model");
 	DeformableMesh* mesh = shape->getDeformableMesh();
