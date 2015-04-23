@@ -794,9 +794,11 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 			// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
 			if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
 			{
-				glEnableVertexAttribArray(aVertexPosition + usedWeights.size());
+				GLuint vertexAttribLoc = aVertexPosition + usedWeights.size();
+				//LOG("vertexAttribLoc = %d", vertexAttribLoc);
+				glEnableVertexAttribArray(vertexAttribLoc);
 				aux->getVBOPos(i)->VBO()->BindBuffer();
-				glVertexAttribPointer(aVertexPosition + usedWeights.size(), 3, GL_FLOAT, GL_FALSE, 0,0);
+				glVertexAttribPointer(vertexAttribLoc, 3, GL_FLOAT, GL_FALSE, 0,0);
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 				// Pushes this weight to the vector of used weights
@@ -804,7 +806,8 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 				usedShapeIDs.push_back(i);
 			}
 		}
-
+	   //SbmShaderProgram::printOglError("BlendGeometry glVertexAttributePointer");
+		
 		glEnableVertexAttribArray(aVertexTexcoord);
 		aux->getVBOTexCoord()->VBO()->BindBuffer();
 		glVertexAttribPointer(aVertexTexcoord, 2, GL_FLOAT, GL_FALSE, 0,0);
@@ -823,6 +826,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		GLuint uOverlayMasks	= glGetUniformLocation(program, "uOverlayMasks");
 		GLuint uUsedShapeIDs	= glGetUniformLocation(program, "uUsedShapeIDs");
 
+		SbmShaderProgram::printOglError("BlendGeometry GetUniformLocation");
 		int * image_array		= new int[MAX_SHAPES];
 		float * w				= new float[usedWeights.size()];
 		int * usedShapesID_array = new int[usedShapeIDs.size()];
@@ -881,7 +885,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		}
 
 		glDisableVertexAttribArray(aVertexTexcoord);
-
+		
 	glUseProgram(0);
 
 	glDeleteTextures(1, &tbo);

@@ -1832,7 +1832,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 	if (texIDs.size() > 0 && texIDs[0] != 0)
 	{
 
-		SbmShaderProgram::printOglError("texIDs.size() > 0 ");
+		//SbmShaderProgram::printOglError("texIDs.size() > 0 ");
 
 		// New attempt to blend textures with masks (also renders a face). It uses the _tempTexWithMask, which are the texture maps with the masking encoded in its ALPHA channel.
 		// The _tempTexWithMask texture were created above in the SbmBlendTextures::ReadMasks call

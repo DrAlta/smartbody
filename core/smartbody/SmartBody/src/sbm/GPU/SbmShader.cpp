@@ -211,7 +211,7 @@ void SbmShaderProgram::printOglError(const char* tag)
 	int    retCode = 0;
 
 	glErr = glGetError();
-#if 0
+#if 1
 	while (glErr != GL_NO_ERROR)
 	{
 #if !defined(__FLASHPLAYER__)

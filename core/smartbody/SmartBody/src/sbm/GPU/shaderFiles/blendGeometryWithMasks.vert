@@ -62,8 +62,6 @@ void main()
 	vec4 result_shape = pos_shape[0];
 	float interpolatedWeight	= 0.0;
 
-
-
 	for(int i=1; i < uNumberOfShapes; i++)
 	{
 		if(!uUseMasks)
@@ -76,6 +74,7 @@ void main()
 	}
 
 	gl_Position = result_shape;
+	//gl_Position = pos_shape[0];
 
 //	if(int(isBorder) == 1)
 //		gl_Position =  pos_shape[0];
