@@ -1,22 +1,21 @@
 
 #include "vhcl.h"
-
+#include <sb/SBTypes.h>
 #ifdef __ANDROID__
 //#include <GLES/gl.h>
 //#include <GLES2/gl2.h>
 #include "wes_gl.h"
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>
-#else
-#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD)
+#endif
+
+#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
 #include "external/glew/glew.h"
 #include "sbm/GPU/SbmDeformableMeshGPU.h"
-#endif
 #endif
 
 #include "sbm/GPU/SbmBlendFace.h"
 #include "sbm_deformable_mesh.h"
-
 
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
@@ -24,6 +23,9 @@
 #include <sr/sr_random.h>
 #include <sbm/gwiz_math.h>
 #include <sbm/GPU/SbmTexture.h>
+
+
+
 #include <boost/algorithm/string.hpp>
 #include <protocols/sbmesh.pb.h>
 #include <boost/filesystem/path.hpp>
@@ -1850,7 +1852,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 void DeformableMeshInstance::blendShapes()
 {
 
-	SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapes() #0 ");
+	//SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapes() #0 ");
 
 	if (!_character)
 	{
@@ -2171,7 +2173,7 @@ void DeformableMeshInstance::blendShapes()
 
 
 		//	Here I try to blend the faces two at a time. This way I avoid hardcoded constant vector size.
-#if 1
+#if !defined(SB_IPHONE)
 
 		if(_tempFBOPairs == NULL) 
 		{
@@ -2198,7 +2200,7 @@ void DeformableMeshInstance::blendShapes()
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) || defined(SB_IPHONE)
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_w, tex_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 #else
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
@@ -2419,9 +2421,10 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 void DeformableMeshInstance::updateTransformBuffer()
 {
 	if (!_mesh) return;
-
-	if (transformBuffer.size() != _mesh->boneJointIdxMap.size())
-		transformBuffer.resize(_mesh->boneJointIdxMap.size());
+	unsigned long boneSize = 120;
+	int transformSize = max(boneSize,_mesh->boneJointIdxMap.size());
+	if (transformBuffer.size() != transformSize)
+		transformBuffer.resize(transformSize);
 	std::map<std::string,int>& boneIdxMap = _mesh->boneJointIdxMap;
 	std::map<std::string,int>::iterator mi;	
 	for ( mi  = boneIdxMap.begin();
@@ -2636,7 +2639,7 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 {
 	//LOG("Running blendShapeStaticMesh");
 
-	SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #0 ");
+	//SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #0 ");
 
 	if (!_mesh) 
 		return;
@@ -2690,7 +2693,7 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 			}
 		}			
 	}	
-	SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #FINAL");
+	//SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #FINAL");
 }
 
 int DeformableMesh::getNumMeshes()

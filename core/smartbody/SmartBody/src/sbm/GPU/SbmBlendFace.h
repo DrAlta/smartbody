@@ -1,20 +1,21 @@
 #pragma once
 #include <sb/SBTypes.h>
-#include <sbm/sbm_deformable_mesh.h>
-#include "SbmShader.h"
-#include "VBOData.h"
+
 
 #include "external/glm/glm/glm.hpp"
 #include "external/glm/glm/gtc/type_ptr.hpp"
 #include "external/glm/glm/gtc/matrix_transform.hpp"
 
-#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD)
+#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
 #include "external/glew/glew.h"
 #include "TBOData.h"
+#include <sbm/sbm_deformable_mesh.h>
+#include "SbmShader.h"
+#include "VBOData.h"
 #endif
 
 class SbmDeformableMeshGPU;
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 class SbmBlendFace: public DeformableMesh
 {
 	public:
@@ -59,6 +60,7 @@ class SbmBlendFace: public DeformableMesh
 };
 #endif
 
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 class SbmBlendTextures
 {
 	public:
@@ -82,3 +84,4 @@ class SbmBlendTextures
 	private:
 		std::string		_shaderName;
 };
+#endif

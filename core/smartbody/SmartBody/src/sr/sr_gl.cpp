@@ -260,7 +260,11 @@ void glPerspective ( float fovy, float aspect, float znear, float zfar )
                (GLdouble) zfar   
              );
 			 */
+#if defined(SB_IPHONE)
+   glPerspective(fovy, aspect, znear, zfar);
+#else
    gluPerspective(fovy, aspect, znear, zfar);
+#endif
 #else
    glFrustum ( (GLdouble) ((-ymax)*(GLdouble)aspect), // xmin
                (GLdouble) (( ymax)*(GLdouble)aspect), // xmax

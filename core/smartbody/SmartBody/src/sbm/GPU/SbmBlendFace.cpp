@@ -1,5 +1,5 @@
 #include "vhcl.h"
-#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
 #include "external/glew/glew.h"
 #include "external/jpge/jpge.h"
 #endif
@@ -9,22 +9,25 @@
 #endif
 #include <algorithm>
 #include "SbmBlendFace.h"
-#include "sbm/sbm_deformable_mesh.h"
+
 #include <sr/jpge.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
 #include <sb/SBPawn.h>
+
+#if !defined(SB_IPHONE)
+#include "sbm/sbm_deformable_mesh.h"
 #include "SbmDeformableMeshGPU.h"
 #include <sbm/GPU/SbmTexture.h>
 
 #include "external/glm/glm/glm.hpp"
 #include "external/glm/glm/gtc/type_ptr.hpp"
 #include "external/glm/glm/gtc/matrix_transform.hpp"
-
+#endif
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 
 SbmBlendFace::SbmBlendFace() : DeformableMesh()
 {
@@ -264,6 +267,8 @@ void SbmBlendFace::initShaderProgram()
 
 #endif
 
+
+#if !defined(__ANDROID__) && !defined(SB_IPHONE)
 SbmBlendTextures::SbmBlendTextures()
 {
 }
@@ -1633,3 +1638,4 @@ void SbmBlendTextures::BlendTwoFBO(GLuint tex0, GLuint tex1, GLuint FBODst, GLui
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);                                                                                                            // Bind the frame buffer object
 	glPopMatrix();
 }
+#endif

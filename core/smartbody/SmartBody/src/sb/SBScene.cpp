@@ -4336,6 +4336,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	//	Sets far clip plane
 	camera->setFarPlane(zfar);
 
+#if !defined(SB_IPHONE)
 	SrMat mat( SrMat::NotInitialized );
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -4343,7 +4344,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadMatrix( camera->get_view_mat(mat) );
-
+#endif
 	//	Creates characters frustrm 
 	SrFrustum frustum;
 	frustum.extractFrustum();
