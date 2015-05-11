@@ -9,12 +9,12 @@ scene.addAssetPath("mesh", "mesh")
 scene.addAssetPath("audio", ".")
 
 scene.setBoolAttribute("internalAudio", True)
-
+scene.setBoolAttribute("useGPUBlendshapes",False)
 scene.run("default-viewer.py")
 
 camera = scene.getActiveCamera()
-camera.setEye(0, 1.7, 2)
-camera.setCenter(0.0, 1.4, 0)
+camera.setEye(0.0, 1.7, 2)
+camera.setCenter(0.08, 1.4, 0)
 camera.setUpVector(SrVec(0, 1, 0))
 camera.setFov(0.4)
 camera.setFarPlane(100)
@@ -30,6 +30,9 @@ scene.loadAssets()
 
 # establish lip syncing data set
 scene.run("init-diphoneDefault.py")
+
+# load up gesture map
+scene.run("gestureMap.py")
 
 
 ############################# rachel
@@ -79,16 +82,20 @@ rachel.setHPR(rachelHPR)
 rachel.createStandardControllers()
 # deformable mesh
 rachel.setDoubleAttribute("deformableMeshScale", 0.01)
-rachel.setStringAttribute("deformableMesh", "ChrRachel")
+rachel.setStringAttribute("deformableMesh", "ChrRachel.dmb")
+rachel.setStringAttribute("displayType", "mesh")
 # lip syncing diphone setup
 rachel.setStringAttribute("lipSyncSetName", "default")
 rachel.setBoolAttribute("usePhoneBigram", True)
 rachel.setVoice("audiofile")
 rachel.setVoiceCode("Sounds")
+# setup gesture map
+rachel.setStringAttribute("gestureMap", "ChrRachel")
+rachel.setBoolAttribute("gestureRequest.autoGestureTransition", True)
 
 # start the simulation
 sim.start()
-bml.execBML('ChrRachel', '<body posture="ChrRachel@Idle02"/>')
+bml.execBML('ChrRachel', '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 bml.execBML('ChrRachel', '<saccade mode="listen"/>')
 sim.resume()
 

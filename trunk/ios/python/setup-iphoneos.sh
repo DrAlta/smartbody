@@ -6,13 +6,13 @@ set -o errexit
 # http://latenitesoft.blogspot.com/2008/10/iphone-programming-tips-building-unix.html
 
 
-export SBROOT="/Users/yxu/smartbody/trunk"
+export SBROOT="/Users/feng/Development/SmartBodyTrunk/trunk"
 if [ ! -d "$SBROOT" ]; then
     echo smartbody trunk location set incorrect
     exit 1
 fi
 
-export IOS_VERSION="4.3"
+export IOS_VERSION="8.2"
 
 # download python and patch if they aren't there
 if [[ ! -a Python-2.6.5.tar.bz2 ]]; then
@@ -36,33 +36,22 @@ make distclean
 # patch python to cross-compile
 patch -p1 < ../Python-2.6.5-xcompile.patch
 
+export SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.2.sdk
+export TOOLCHAIN=/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain
+#export CLANG_VERBOSE="--verbose"
+export CPPFLAGS="$CLANG_VERBOSE -arch armv7 -pipe -miphoneos-version-min=6.0 -isysroot $SDKROOT"
+export CFLAGS="$CLANG_VERBOSE -arch armv7 -pipe -miphoneos-version-min=6.0 -isysroot $SDKROOT -g -O0 -std=c99 -fPIC"
+export CXXFLAGS="$CLANG_VERBOSE -arch armv7 -pipe -miphoneos-version-min=6.0 -isysroot $SDKROOT -g -O0 -std=c++11 -stdlib=libc++ -fPIC -fcxx-exceptions"
+export LDFLAGS="-arch armv7 -miphoneos-version-min=6.0 -stdlib=libc++ -L$SDKROOT/usr/lib -L$SDKROOT/usr/lib/system"
+#export LIBS="-lc++ -lc++abi"
+export CPP="$TOOLCHAIN/usr/bin/clang -E"
+export CXX="$TOOLCHAIN/usr/bin/clang++"
+export CC="$TOOLCHAIN/usr/bin/clang"
+export LD="$TOOLCHAIN/usr/bin/ld"
 
-# set up environment variables for cross compilation
-export DEVROOT="/Developer/Platforms/iPhoneOS.platform/Developer"
-export SDKROOT="$DEVROOT/SDKs/iPhoneOS${IOS_VERSION}.sdk"
-
-if [ ! -d "$DEVROOT" ]; then
-    echo "DEVROOT doesn't exist. DEVROOT=$DEVROOT"
-    exit 1
-fi
-
-if [ ! -d "$SDKROOT" ]; then
-    echo "SDKROOT doesn't exist. SDKROOT=$SDKROOT"
-    exit 1
-fi
-
-export CPPFLAGS="-I$SDKROOT/usr/lib/gcc/arm-apple-darwin10/4.2.1/include/ -I$SDKROOT/usr/include/"
-export CFLAGS="$CPPFLAGS -pipe -no-cpp-precomp -isysroot $SDKROOT"
-export LDFLAGS="-isysroot $SDKROOT -Lextralibs/"
-export CPP="/usr/bin/cpp $CPPFLAGS"
-
-# make a link to a differently named library for who knows what reason
-mkdir extralibs
-ln -s "$SDKROOT/usr/lib/libgcc_s.1.dylib" extralibs/libgcc_s.10.4.dylib
-
+export RANLIB="$SDKROOT/../../usr/bin/ranlib"
 # build for iPhone
-./configure CC="$DEVROOT/usr/bin/arm-apple-darwin10-llvm-gcc-4.2" \
-            LD="$DEVROOT/usr/bin/ld" --disable-toolbox-glue --host=armv7-apple-darwin --prefix=/python
+./configure --build=x86_64-apple-darwin --host="arm-apple-darwin" --disable-toolbox-glue
 
 make HOSTPYTHON=./hostpython HOSTPGEN=./Parser/hostpgen \
      CROSS_COMPILE_TARGET=yes

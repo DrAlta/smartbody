@@ -4,7 +4,7 @@
 # Modify PREFIX
 # Modify variables if needed
 
-export SBROOT=""
+export SBROOT="/Users/feng/Development/SmartBodyTrunk"
 export ARMVERSION=7
 export PREFIX="$SBROOT/ios/xerces-c/iphoneos"
 export DEVROOT=/Developer/Platforms/iPhoneOS.platform/Developer

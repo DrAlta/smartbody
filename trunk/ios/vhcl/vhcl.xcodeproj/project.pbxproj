@@ -141,6 +141,8 @@
 /* Begin PBXProject section */
 		AA9CD00F141EE17D0064C27A /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = AA9CD012141EE17D0064C27A /* Build configuration list for PBXProject "vhcl" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -231,7 +233,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vhcl/vhcl-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					../../lib/vhcl/include,
 					../libsndfile/iphoneos/include,
@@ -254,7 +256,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vhcl/vhcl-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					../../lib/vhcl/include,
 					../libsndfile/iphoneos/include,

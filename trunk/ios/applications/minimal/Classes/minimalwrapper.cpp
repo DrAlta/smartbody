@@ -616,7 +616,8 @@ void SBInitialize(const char* mediapath)
 	scene->runScript("default-init.py");
     
     // store the camera information for resetting
-    cameraReset = new SrCamera(cam);
+    cameraReset = new SrCamera();
+    cameraReset->copyCamera(&cam);
 }
     
 void SBDrawFrame(int width, int height)
