@@ -29,7 +29,7 @@
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>
 #else
-#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD)
+#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
 #include "external/glew/glew.h"
 #include "external/SOIL/SOIL.h"
 #endif
@@ -50,7 +50,7 @@
 #include <sbm/GPU/SbmBlendFace.h>
 #include <sbm/sbm_deformable_mesh.h>
 
-#if !defined(ANDROID_BUILD)
+#if !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
 #include <sbm/GPU/SbmShader.h>
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #endif
@@ -82,7 +82,7 @@
 
 void SrGlRenderFuncs::renderBlendFace(DeformableMeshInstance* shape)
 {
-#if !defined(ANDROID_BUILD)
+#if !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
 	bool USE_SHADER_MANAGER = true;
 
 	SrModel* model			= new SrModel();
@@ -328,7 +328,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			}
 
 		shape->GPUblendShapes(translation, rotation);
-	}
+    }
 	// no USE_GPU_BLENDSHAPES
 	else
 	{
@@ -509,9 +509,11 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 						//glColor4f(0.0f, 0.0f, 0.0f, 1.0);				
 					}
 				}
-			#if GLES_RENDER
+			#if GLES_RENDER && defined(__ANDROID__)
 				//glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &subMesh->triBuf[0]);
 				glDrawElements_wes(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &subMesh->triBuf[0]);
+            #elif defined(SB_IPHONE)
+                glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &subMesh->triBuf[0]);
 			#else
 				glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_INT, &subMesh->triBuf[0]);
 			#endif
@@ -529,7 +531,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			glDepthMask(GL_TRUE);
 	}
 
-	SbmShaderProgram::printOglError("SrGlRenderFuncs::renderDeformableMesh FINAL");
+	//SbmShaderProgram::printOglError("SrGlRenderFuncs::renderDeformableMesh FINAL");
 	//LOG("Finish render deformable model");
 }
 
