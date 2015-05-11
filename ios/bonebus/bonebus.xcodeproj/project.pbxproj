@@ -120,6 +120,8 @@
 /* Begin PBXProject section */
 		AA9CD193141FC9490064C27A /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = AA9CD196141FC9490064C27A /* Build configuration list for PBXProject "bonebus" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -202,7 +204,7 @@
 				DSTROOT = /tmp/bonebus.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "bonebus/bonebus-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					../../lib/bonebus/include,
 					../../lib/vhcl/include,
@@ -223,7 +225,7 @@
 				DSTROOT = /tmp/bonebus.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "bonebus/bonebus-Prefix.pch";
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					../../lib/bonebus/include,
 					../../lib/vhcl/include,

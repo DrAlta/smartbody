@@ -476,6 +476,8 @@
 /* Begin PBXProject section */
 		AA9CD1E1141FCD7A0064C27A /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = AA9CD1E4141FCD7A0064C27A /* Build configuration list for PBXProject "boost" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -644,11 +646,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					/usr/include/python2.6,
 					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
@@ -668,11 +672,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = (
 					/usr/include/python2.6,
 					"$PROJECT_DIR/../python/Python-2.6.5/_install/include/python2.6",
@@ -731,11 +737,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = $PROJECT_DIR/boost_1_51_0;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
@@ -750,11 +758,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = $PROJECT_DIR/boost_1_51_0;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
@@ -769,11 +779,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = $PROJECT_DIR/boost_1_51_0;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
@@ -788,11 +800,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = $PROJECT_DIR/boost_1_51_0;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
@@ -807,11 +821,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = $PROJECT_DIR/boost_1_51_0;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;
@@ -826,11 +842,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				DSTROOT = /tmp/boost.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "boost/boost-Prefix.pch";
 				GCC_THUMB_SUPPORT = NO;
-				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_VERSION = "";
 				HEADER_SEARCH_PATHS = $PROJECT_DIR/boost_1_51_0;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.1;
 				ONLY_ACTIVE_ARCH = YES;

@@ -541,12 +541,8 @@
 		AAD45D3117A98E5D005905B2 /* vec2.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD459FD17A98E5C005905B2 /* vec2.h */; };
 		AAD45D3217A98E5D005905B2 /* vec3.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD459FE17A98E5C005905B2 /* vec3.h */; };
 		AAD45D3317A98E5D005905B2 /* vec4.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD459FF17A98E5C005905B2 /* vec4.h */; };
-		AAD45D3517A98E5D005905B2 /* SbmDeformableMeshGPU.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A0117A98E5C005905B2 /* SbmDeformableMeshGPU.h */; };
-		AAD45D3717A98E5D005905B2 /* SbmShader.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A0317A98E5C005905B2 /* SbmShader.h */; };
 		AAD45D3817A98E5D005905B2 /* SbmTexture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A0417A98E5C005905B2 /* SbmTexture.cpp */; };
 		AAD45D3917A98E5D005905B2 /* SbmTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A0517A98E5C005905B2 /* SbmTexture.h */; };
-		AAD45D3D17A98E5D005905B2 /* TBOData.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A0A17A98E5C005905B2 /* TBOData.h */; };
-		AAD45D3F17A98E5D005905B2 /* VBOData.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A0C17A98E5C005905B2 /* VBOData.h */; };
 		AAD45D4017A98E5D005905B2 /* gwiz_cmdl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A0D17A98E5C005905B2 /* gwiz_cmdl.cpp */; };
 		AAD45D4117A98E5D005905B2 /* gwiz_cmdl.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45A0E17A98E5C005905B2 /* gwiz_cmdl.h */; };
 		AAD45D4217A98E5D005905B2 /* gwiz_math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD45A0F17A98E5C005905B2 /* gwiz_math.cpp */; };
@@ -765,17 +761,31 @@
 		AAD45E3A17A98E5D005905B2 /* sr_vec2.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45B0B17A98E5C005905B2 /* sr_vec2.h */; };
 		AAD45E3B17A98E5D005905B2 /* sr_viewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AAD45B0C17A98E5C005905B2 /* sr_viewer.cpp */; };
 		AAD45E3C17A98E5D005905B2 /* sr_viewer.h in Headers */ = {isa = PBXBuildFile; fileRef = AAD45B0D17A98E5C005905B2 /* sr_viewer.h */; };
-		C44B488618EB78F6007E8081 /* SBMotionGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C44B488418EB78F6007E8081 /* SBMotionGraph.cpp */; };
-		C44B488718EB78F6007E8081 /* SBMotionGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = C44B488518EB78F6007E8081 /* SBMotionGraph.h */; };
-		C44B488A18EB9BED007E8081 /* me_ct_motion_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C44B488818EB9BED007E8081 /* me_ct_motion_graph.cpp */; };
-		C44B488B18EB9BED007E8081 /* me_ct_motion_graph.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C44B488918EB9BED007E8081 /* me_ct_motion_graph.hpp */; };
-		C44B488E18EB9C24007E8081 /* SBAssetHandlerPly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C44B488C18EB9C24007E8081 /* SBAssetHandlerPly.cpp */; };
-		C44B488F18EB9C24007E8081 /* SBAssetHandlerPly.h in Headers */ = {isa = PBXBuildFile; fileRef = C44B488D18EB9C24007E8081 /* SBAssetHandlerPly.h */; };
-		C4735D0C199311A100D9D1A7 /* sbm_remote_speech_audiofile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4735D0A199311A100D9D1A7 /* sbm_remote_speech_audiofile.cpp */; };
-		C4735D0D199311A100D9D1A7 /* sbm_remote_speech_audiofile.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C4735D0B199311A100D9D1A7 /* sbm_remote_speech_audiofile.hpp */; };
-		C48ED0C618EB9E6E00BBA419 /* rply.c in Sources */ = {isa = PBXBuildFile; fileRef = C48ED0C418EB9E6E00BBA419 /* rply.c */; };
-		C48ED0C718EB9E6E00BBA419 /* rply.h in Headers */ = {isa = PBXBuildFile; fileRef = C48ED0C518EB9E6E00BBA419 /* rply.h */; };
-		C4F0FDDA18EB9DB10099F20F /* sr_model_import_ply.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C4F0FDD918EB9DB10099F20F /* sr_model_import_ply.cpp */; };
+		B20B5B041AFAC93100A9DA1E /* SBHandConfiguration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20B5AFE1AFAC93100A9DA1E /* SBHandConfiguration.cpp */; };
+		B20B5B051AFAC93100A9DA1E /* SBHandConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = B20B5AFF1AFAC93100A9DA1E /* SBHandConfiguration.h */; };
+		B20B5B061AFAC93100A9DA1E /* SBHandConfigurationManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20B5B001AFAC93100A9DA1E /* SBHandConfigurationManager.cpp */; };
+		B20B5B071AFAC93100A9DA1E /* SBHandConfigurationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = B20B5B011AFAC93100A9DA1E /* SBHandConfigurationManager.h */; };
+		B20B5B081AFAC93100A9DA1E /* SBHandSynthesis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20B5B021AFAC93100A9DA1E /* SBHandSynthesis.cpp */; };
+		B20B5B091AFAC93100A9DA1E /* SBHandSynthesis.h in Headers */ = {isa = PBXBuildFile; fileRef = B20B5B031AFAC93100A9DA1E /* SBHandSynthesis.h */; };
+		B20B5B0C1AFAC97A00A9DA1E /* RealTimeLipSyncController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20B5B0A1AFAC97A00A9DA1E /* RealTimeLipSyncController.cpp */; };
+		B20B5B0D1AFAC97A00A9DA1E /* RealTimeLipSyncController.h in Headers */ = {isa = PBXBuildFile; fileRef = B20B5B0B1AFAC97A00A9DA1E /* RealTimeLipSyncController.h */; };
+		B20B5B101AFAC99500A9DA1E /* me_ct_new_locomotion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20B5B0E1AFAC99500A9DA1E /* me_ct_new_locomotion.cpp */; };
+		B20B5B111AFAC99500A9DA1E /* me_ct_new_locomotion.h in Headers */ = {isa = PBXBuildFile; fileRef = B20B5B0F1AFAC99500A9DA1E /* me_ct_new_locomotion.h */; };
+		B20B5B141AFAC9C500A9DA1E /* me_ct_generic_hand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20B5B121AFAC9C500A9DA1E /* me_ct_generic_hand.cpp */; };
+		B20B5B151AFAC9C500A9DA1E /* me_ct_generic_hand.h in Headers */ = {isa = PBXBuildFile; fileRef = B20B5B131AFAC9C500A9DA1E /* me_ct_generic_hand.h */; };
+		B20B5B181AFAC9EE00A9DA1E /* SBRigNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B20B5B161AFAC9EE00A9DA1E /* SBRigNode.cpp */; };
+		B20B5B191AFAC9EE00A9DA1E /* SBRigNode.h in Headers */ = {isa = PBXBuildFile; fileRef = B20B5B171AFAC9EE00A9DA1E /* SBRigNode.h */; };
+		B25B7F9218A071DD004C2724 /* SBAssetHandlerPly.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B25B7F8E18A071DD004C2724 /* SBAssetHandlerPly.cpp */; };
+		B25B7F9318A071DD004C2724 /* SBAssetHandlerPly.h in Headers */ = {isa = PBXBuildFile; fileRef = B25B7F8F18A071DD004C2724 /* SBAssetHandlerPly.h */; };
+		B25B7F9418A071DD004C2724 /* SBMotionGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B25B7F9018A071DD004C2724 /* SBMotionGraph.cpp */; };
+		B25B7F9518A071DD004C2724 /* SBMotionGraph.h in Headers */ = {isa = PBXBuildFile; fileRef = B25B7F9118A071DD004C2724 /* SBMotionGraph.h */; };
+		B25B7F9818A071F4004C2724 /* me_ct_motion_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B25B7F9618A071F4004C2724 /* me_ct_motion_graph.cpp */; };
+		B25B7F9918A071F4004C2724 /* me_ct_motion_graph.hpp in Headers */ = {isa = PBXBuildFile; fileRef = B25B7F9718A071F4004C2724 /* me_ct_motion_graph.hpp */; };
+		B25B7F9D18A07231004C2724 /* rply.c in Sources */ = {isa = PBXBuildFile; fileRef = B25B7F9B18A07231004C2724 /* rply.c */; };
+		B25B7F9E18A07231004C2724 /* rply.h in Headers */ = {isa = PBXBuildFile; fileRef = B25B7F9C18A07231004C2724 /* rply.h */; };
+		B25B7FA018A0728A004C2724 /* sr_model_import_ply.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B25B7F9F18A0728A004C2724 /* sr_model_import_ply.cpp */; };
+		B2C212201AF8394F00766484 /* SbmBlendFace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B2C2121E1AF8394F00766484 /* SbmBlendFace.cpp */; };
+		B2C212211AF8394F00766484 /* SbmBlendFace.h in Headers */ = {isa = PBXBuildFile; fileRef = B2C2121F1AF8394F00766484 /* SbmBlendFace.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -1318,12 +1328,8 @@
 		AAD459FD17A98E5C005905B2 /* vec2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec2.h; sourceTree = "<group>"; };
 		AAD459FE17A98E5C005905B2 /* vec3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec3.h; sourceTree = "<group>"; };
 		AAD459FF17A98E5C005905B2 /* vec4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vec4.h; sourceTree = "<group>"; };
-		AAD45A0117A98E5C005905B2 /* SbmDeformableMeshGPU.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmDeformableMeshGPU.h; sourceTree = "<group>"; };
-		AAD45A0317A98E5C005905B2 /* SbmShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmShader.h; sourceTree = "<group>"; };
 		AAD45A0417A98E5C005905B2 /* SbmTexture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SbmTexture.cpp; sourceTree = "<group>"; };
 		AAD45A0517A98E5C005905B2 /* SbmTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SbmTexture.h; sourceTree = "<group>"; };
-		AAD45A0A17A98E5C005905B2 /* TBOData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TBOData.h; sourceTree = "<group>"; };
-		AAD45A0C17A98E5C005905B2 /* VBOData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VBOData.h; sourceTree = "<group>"; };
 		AAD45A0D17A98E5C005905B2 /* gwiz_cmdl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gwiz_cmdl.cpp; sourceTree = "<group>"; };
 		AAD45A0E17A98E5C005905B2 /* gwiz_cmdl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gwiz_cmdl.h; sourceTree = "<group>"; };
 		AAD45A0F17A98E5C005905B2 /* gwiz_math.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gwiz_math.cpp; sourceTree = "<group>"; };
@@ -1542,17 +1548,31 @@
 		AAD45B0B17A98E5C005905B2 /* sr_vec2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_vec2.h; sourceTree = "<group>"; };
 		AAD45B0C17A98E5C005905B2 /* sr_viewer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_viewer.cpp; sourceTree = "<group>"; };
 		AAD45B0D17A98E5C005905B2 /* sr_viewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sr_viewer.h; sourceTree = "<group>"; };
-		C44B488418EB78F6007E8081 /* SBMotionGraph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBMotionGraph.cpp; sourceTree = "<group>"; };
-		C44B488518EB78F6007E8081 /* SBMotionGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBMotionGraph.h; sourceTree = "<group>"; };
-		C44B488818EB9BED007E8081 /* me_ct_motion_graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_motion_graph.cpp; sourceTree = "<group>"; };
-		C44B488918EB9BED007E8081 /* me_ct_motion_graph.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_motion_graph.hpp; sourceTree = "<group>"; };
-		C44B488C18EB9C24007E8081 /* SBAssetHandlerPly.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerPly.cpp; sourceTree = "<group>"; };
-		C44B488D18EB9C24007E8081 /* SBAssetHandlerPly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerPly.h; sourceTree = "<group>"; };
-		C4735D0A199311A100D9D1A7 /* sbm_remote_speech_audiofile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sbm_remote_speech_audiofile.cpp; sourceTree = "<group>"; };
-		C4735D0B199311A100D9D1A7 /* sbm_remote_speech_audiofile.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sbm_remote_speech_audiofile.hpp; sourceTree = "<group>"; };
-		C48ED0C418EB9E6E00BBA419 /* rply.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rply.c; path = rply/rply.c; sourceTree = "<group>"; };
-		C48ED0C518EB9E6E00BBA419 /* rply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rply.h; path = rply/rply.h; sourceTree = "<group>"; };
-		C4F0FDD918EB9DB10099F20F /* sr_model_import_ply.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_model_import_ply.cpp; sourceTree = "<group>"; };
+		B20B5AFE1AFAC93100A9DA1E /* SBHandConfiguration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBHandConfiguration.cpp; sourceTree = "<group>"; };
+		B20B5AFF1AFAC93100A9DA1E /* SBHandConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBHandConfiguration.h; sourceTree = "<group>"; };
+		B20B5B001AFAC93100A9DA1E /* SBHandConfigurationManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBHandConfigurationManager.cpp; sourceTree = "<group>"; };
+		B20B5B011AFAC93100A9DA1E /* SBHandConfigurationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBHandConfigurationManager.h; sourceTree = "<group>"; };
+		B20B5B021AFAC93100A9DA1E /* SBHandSynthesis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBHandSynthesis.cpp; sourceTree = "<group>"; };
+		B20B5B031AFAC93100A9DA1E /* SBHandSynthesis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBHandSynthesis.h; sourceTree = "<group>"; };
+		B20B5B0A1AFAC97A00A9DA1E /* RealTimeLipSyncController.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RealTimeLipSyncController.cpp; sourceTree = "<group>"; };
+		B20B5B0B1AFAC97A00A9DA1E /* RealTimeLipSyncController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RealTimeLipSyncController.h; sourceTree = "<group>"; };
+		B20B5B0E1AFAC99500A9DA1E /* me_ct_new_locomotion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_new_locomotion.cpp; sourceTree = "<group>"; };
+		B20B5B0F1AFAC99500A9DA1E /* me_ct_new_locomotion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = me_ct_new_locomotion.h; sourceTree = "<group>"; };
+		B20B5B121AFAC9C500A9DA1E /* me_ct_generic_hand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_generic_hand.cpp; sourceTree = "<group>"; };
+		B20B5B131AFAC9C500A9DA1E /* me_ct_generic_hand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = me_ct_generic_hand.h; sourceTree = "<group>"; };
+		B20B5B161AFAC9EE00A9DA1E /* SBRigNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBRigNode.cpp; sourceTree = "<group>"; };
+		B20B5B171AFAC9EE00A9DA1E /* SBRigNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBRigNode.h; sourceTree = "<group>"; };
+		B25B7F8E18A071DD004C2724 /* SBAssetHandlerPly.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBAssetHandlerPly.cpp; sourceTree = "<group>"; };
+		B25B7F8F18A071DD004C2724 /* SBAssetHandlerPly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBAssetHandlerPly.h; sourceTree = "<group>"; };
+		B25B7F9018A071DD004C2724 /* SBMotionGraph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SBMotionGraph.cpp; sourceTree = "<group>"; };
+		B25B7F9118A071DD004C2724 /* SBMotionGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBMotionGraph.h; sourceTree = "<group>"; };
+		B25B7F9618A071F4004C2724 /* me_ct_motion_graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = me_ct_motion_graph.cpp; sourceTree = "<group>"; };
+		B25B7F9718A071F4004C2724 /* me_ct_motion_graph.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = me_ct_motion_graph.hpp; sourceTree = "<group>"; };
+		B25B7F9B18A07231004C2724 /* rply.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rply.c; sourceTree = "<group>"; };
+		B25B7F9C18A07231004C2724 /* rply.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rply.h; sourceTree = "<group>"; };
+		B25B7F9F18A0728A004C2724 /* sr_model_import_ply.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sr_model_import_ply.cpp; sourceTree = "<group>"; };
+		B2C2121E1AF8394F00766484 /* SbmBlendFace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SbmBlendFace.cpp; path = GPU/SbmBlendFace.cpp; sourceTree = "<group>"; };
+		B2C2121F1AF8394F00766484 /* SbmBlendFace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SbmBlendFace.h; path = GPU/SbmBlendFace.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1707,8 +1727,14 @@
 		AAD4580417A98E5B005905B2 /* controllers */ = {
 			isa = PBXGroup;
 			children = (
-				C44B488818EB9BED007E8081 /* me_ct_motion_graph.cpp */,
-				C44B488918EB9BED007E8081 /* me_ct_motion_graph.hpp */,
+				B20B5B121AFAC9C500A9DA1E /* me_ct_generic_hand.cpp */,
+				B20B5B131AFAC9C500A9DA1E /* me_ct_generic_hand.h */,
+				B20B5B0E1AFAC99500A9DA1E /* me_ct_new_locomotion.cpp */,
+				B20B5B0F1AFAC99500A9DA1E /* me_ct_new_locomotion.h */,
+				B20B5B0A1AFAC97A00A9DA1E /* RealTimeLipSyncController.cpp */,
+				B20B5B0B1AFAC97A00A9DA1E /* RealTimeLipSyncController.h */,
+				B25B7F9618A071F4004C2724 /* me_ct_motion_graph.cpp */,
+				B25B7F9718A071F4004C2724 /* me_ct_motion_graph.hpp */,
 				AA93021317E02E3000958769 /* me_ct_pose_postprocessing.cpp */,
 				AA93021417E02E3000958769 /* me_ct_pose_postprocessing.hpp */,
 				AAD4580517A98E5B005905B2 /* me_blend_cover.h */,
@@ -1852,8 +1878,7 @@
 		AAD458B717A98E5B005905B2 /* external */ = {
 			isa = PBXGroup;
 			children = (
-				C48ED0C418EB9E6E00BBA419 /* rply.c */,
-				C48ED0C518EB9E6E00BBA419 /* rply.h */,
+				B25B7F9A18A07231004C2724 /* rply */,
 				AAD458BE17A98E5B005905B2 /* nanoflann */,
 				AAD458C017A98E5B005905B2 /* parser */,
 				AAD4590D17A98E5B005905B2 /* perlin */,
@@ -2060,10 +2085,18 @@
 		AAD4595E17A98E5B005905B2 /* sb */ = {
 			isa = PBXGroup;
 			children = (
-				C44B488C18EB9C24007E8081 /* SBAssetHandlerPly.cpp */,
-				C44B488D18EB9C24007E8081 /* SBAssetHandlerPly.h */,
-				C44B488418EB78F6007E8081 /* SBMotionGraph.cpp */,
-				C44B488518EB78F6007E8081 /* SBMotionGraph.h */,
+				B20B5B161AFAC9EE00A9DA1E /* SBRigNode.cpp */,
+				B20B5B171AFAC9EE00A9DA1E /* SBRigNode.h */,
+				B20B5AFE1AFAC93100A9DA1E /* SBHandConfiguration.cpp */,
+				B20B5AFF1AFAC93100A9DA1E /* SBHandConfiguration.h */,
+				B20B5B001AFAC93100A9DA1E /* SBHandConfigurationManager.cpp */,
+				B20B5B011AFAC93100A9DA1E /* SBHandConfigurationManager.h */,
+				B20B5B021AFAC93100A9DA1E /* SBHandSynthesis.cpp */,
+				B20B5B031AFAC93100A9DA1E /* SBHandSynthesis.h */,
+				B25B7F8E18A071DD004C2724 /* SBAssetHandlerPly.cpp */,
+				B25B7F8F18A071DD004C2724 /* SBAssetHandlerPly.h */,
+				B25B7F9018A071DD004C2724 /* SBMotionGraph.cpp */,
+				B25B7F9118A071DD004C2724 /* SBMotionGraph.h */,
 				AA0AA8B8185154490061EE9A /* SBAssetHandlerBvh.cpp */,
 				AA0AA8B9185154490061EE9A /* SBAssetHandlerBvh.h */,
 				AA0AA89318512DA20061EE9A /* SBAssetHandlerSBMeshBinary.cpp */,
@@ -2239,8 +2272,8 @@
 		AAD459F017A98E5C005905B2 /* sbm */ = {
 			isa = PBXGroup;
 			children = (
-				C4735D0A199311A100D9D1A7 /* sbm_remote_speech_audiofile.cpp */,
-				C4735D0B199311A100D9D1A7 /* sbm_remote_speech_audiofile.hpp */,
+				B2C2121E1AF8394F00766484 /* SbmBlendFace.cpp */,
+				B2C2121F1AF8394F00766484 /* SbmBlendFace.h */,
 				AA0AA8B1185144190061EE9A /* ParserASFAMC.cxx */,
 				AA9AC3B117E78F030077D800 /* ParserCOLLADAFast.cpp */,
 				AA9AC3B217E78F030077D800 /* ParserCOLLADAFast.h */,
@@ -2340,13 +2373,9 @@
 			isa = PBXGroup;
 			children = (
 				AAD459F917A98E5C005905B2 /* gfx */,
-				AAD45A0117A98E5C005905B2 /* SbmDeformableMeshGPU.h */,
-				AAD45A0317A98E5C005905B2 /* SbmShader.h */,
 				AAD45A0417A98E5C005905B2 /* SbmTexture.cpp */,
 				AAD45A0517A98E5C005905B2 /* SbmTexture.h */,
 				AAD45A0617A98E5C005905B2 /* shaderFiles */,
-				AAD45A0A17A98E5C005905B2 /* TBOData.h */,
-				AAD45A0C17A98E5C005905B2 /* VBOData.h */,
 			);
 			path = GPU;
 			sourceTree = "<group>";
@@ -2409,7 +2438,7 @@
 		AAD45A8417A98E5C005905B2 /* sr */ = {
 			isa = PBXGroup;
 			children = (
-				C4F0FDD918EB9DB10099F20F /* sr_model_import_ply.cpp */,
+				B25B7F9F18A0728A004C2724 /* sr_model_import_ply.cpp */,
 				AAD45A9E17A98E5C005905B2 /* sr.cpp */,
 				AAD45A9F17A98E5C005905B2 /* sr.h */,
 				AAD45AA017A98E5C005905B2 /* sr_alg.cpp */,
@@ -2524,6 +2553,15 @@
 			path = sr;
 			sourceTree = "<group>";
 		};
+		B25B7F9A18A07231004C2724 /* rply */ = {
+			isa = PBXGroup;
+			children = (
+				B25B7F9B18A07231004C2724 /* rply.c */,
+				B25B7F9C18A07231004C2724 /* rply.h */,
+			);
+			path = rply;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -2554,6 +2592,7 @@
 				AAD45B3617A98E5C005905B2 /* bml_quickdraw.hpp in Headers */,
 				AAD45B3817A98E5C005905B2 /* bml_reach.hpp in Headers */,
 				AAD45B3A17A98E5C005905B2 /* bml_saccade.hpp in Headers */,
+				B25B7F9518A071DD004C2724 /* SBMotionGraph.h in Headers */,
 				AAD45B3B17A98E5C005905B2 /* bml_schedule.hpp in Headers */,
 				AAD45B3D17A98E5C005905B2 /* bml_speech.hpp in Headers */,
 				AAD45B3F17A98E5C005905B2 /* bml_states.hpp in Headers */,
@@ -2580,6 +2619,7 @@
 				AAD45B6617A98E5C005905B2 /* me_ct_data_driven_reach.hpp in Headers */,
 				AAD45B6817A98E5C005905B2 /* me_ct_data_interpolation.h in Headers */,
 				AAD45B6A17A98E5C005905B2 /* me_ct_data_receiver.h in Headers */,
+				B25B7F9918A071F4004C2724 /* me_ct_motion_graph.hpp in Headers */,
 				AAD45B6C17A98E5C005905B2 /* me_ct_example_body_reach.hpp in Headers */,
 				AAD45B6E17A98E5C005905B2 /* me_ct_examples.h in Headers */,
 				AAD45B7017A98E5C005905B2 /* me_ct_eyelid.h in Headers */,
@@ -2615,6 +2655,7 @@
 				AAD45BD717A98E5D005905B2 /* me_ct_reach.hpp in Headers */,
 				AAD45BD917A98E5D005905B2 /* me_ct_reach_IK.hpp in Headers */,
 				AAD45BDB17A98E5D005905B2 /* me_ct_saccade.h in Headers */,
+				B20B5B091AFAC93100A9DA1E /* SBHandSynthesis.h in Headers */,
 				AAD45BDD17A98E5D005905B2 /* me_ct_scheduler2.h in Headers */,
 				AAD45BDF17A98E5D005905B2 /* me_ct_simple_gaze.h in Headers */,
 				AAD45BE317A98E5D005905B2 /* me_ct_tether.h in Headers */,
@@ -2632,6 +2673,7 @@
 				AAD45BFC17A98E5D005905B2 /* nanoflann.hpp in Headers */,
 				AAD45BFE17A98E5D005905B2 /* AnsHeap.h in Headers */,
 				AAD45C0017A98E5D005905B2 /* AnswerTree.h in Headers */,
+				B20B5B191AFAC9EE00A9DA1E /* SBRigNode.h in Headers */,
 				AAD45C0217A98E5D005905B2 /* Bchart.h in Headers */,
 				AAD45C0517A98E5D005905B2 /* Bst.h in Headers */,
 				AAD45C0717A98E5D005905B2 /* ChartBase.h in Headers */,
@@ -2651,6 +2693,7 @@
 				AAD45C2317A98E5D005905B2 /* FeatureTree.h in Headers */,
 				AAD45C2517A98E5D005905B2 /* fhSubFns.h in Headers */,
 				AAD45C2717A98E5D005905B2 /* Field.h in Headers */,
+				B2C212211AF8394F00766484 /* SbmBlendFace.h in Headers */,
 				AAD45C2917A98E5D005905B2 /* FullHist.h in Headers */,
 				AAD45C2B17A98E5D005905B2 /* GotIter.h in Headers */,
 				AAD45C2D17A98E5D005905B2 /* headFinder.h in Headers */,
@@ -2681,6 +2724,7 @@
 				AAD45C5C17A98E5D005905B2 /* RecastAlloc.h in Headers */,
 				AAD45C5E17A98E5D005905B2 /* RecastAssert.h in Headers */,
 				AAD45C6717A98E5D005905B2 /* image_DXT.h in Headers */,
+				B20B5B111AFAC99500A9DA1E /* me_ct_new_locomotion.h in Headers */,
 				AAD45C6917A98E5D005905B2 /* image_helper.h in Headers */,
 				AAD45C6B17A98E5D005905B2 /* SOIL.h in Headers */,
 				AAD45C6D17A98E5D005905B2 /* stb_image_aug.h in Headers */,
@@ -2698,6 +2742,7 @@
 				AAD45C8C17A98E5D005905B2 /* trees.h in Headers */,
 				AAD45C8F17A98E5D005905B2 /* unzip.h in Headers */,
 				AAD45C9017A98E5D005905B2 /* zconf.h in Headers */,
+				B20B5B051AFAC93100A9DA1E /* SBHandConfiguration.h in Headers */,
 				AAD45C9217A98E5D005905B2 /* zip.h in Headers */,
 				AAD45C9317A98E5D005905B2 /* zlib.h in Headers */,
 				AAD45C9517A98E5D005905B2 /* zutil.h in Headers */,
@@ -2778,11 +2823,7 @@
 				AAD45D3117A98E5D005905B2 /* vec2.h in Headers */,
 				AAD45D3217A98E5D005905B2 /* vec3.h in Headers */,
 				AAD45D3317A98E5D005905B2 /* vec4.h in Headers */,
-				AAD45D3517A98E5D005905B2 /* SbmDeformableMeshGPU.h in Headers */,
-				AAD45D3717A98E5D005905B2 /* SbmShader.h in Headers */,
 				AAD45D3917A98E5D005905B2 /* SbmTexture.h in Headers */,
-				AAD45D3D17A98E5D005905B2 /* TBOData.h in Headers */,
-				AAD45D3F17A98E5D005905B2 /* VBOData.h in Headers */,
 				AAD45D4117A98E5D005905B2 /* gwiz_cmdl.h in Headers */,
 				AAD45D4317A98E5D005905B2 /* gwiz_math.h in Headers */,
 				AAD45D4617A98E5D005905B2 /* Heightfield.h in Headers */,
@@ -2822,6 +2863,7 @@
 				AAD45D8A17A98E5D005905B2 /* sr_spline_curve.h in Headers */,
 				AAD45D8C17A98E5D005905B2 /* sr_synch_points.h in Headers */,
 				AAD45D8E17A98E5D005905B2 /* SteerPath.h in Headers */,
+				B25B7F9318A071DD004C2724 /* SBAssetHandlerPly.h in Headers */,
 				AAD45D8F17A98E5D005905B2 /* SteerSuiteEngineDriver.h in Headers */,
 				AAD45D9217A98E5D005905B2 /* text_speech.h in Headers */,
 				AAD45D9417A98E5D005905B2 /* time_profiler.h in Headers */,
@@ -2849,6 +2891,7 @@
 				AAD45DD917A98E5D005905B2 /* sr_class_manager.h in Headers */,
 				AAD45DDB17A98E5D005905B2 /* sr_color.h in Headers */,
 				AAD45DDD17A98E5D005905B2 /* sr_cylinder.h in Headers */,
+				B25B7F9E18A07231004C2724 /* rply.h in Headers */,
 				AAD45DDF17A98E5D005905B2 /* sr_euler.h in Headers */,
 				AAD45DE117A98E5D005905B2 /* sr_event.h in Headers */,
 				AAD45DE317A98E5D005905B2 /* sr_geo2.h in Headers */,
@@ -2872,6 +2915,7 @@
 				AAD45E0817A98E5D005905B2 /* sr_quat.h in Headers */,
 				AAD45E0A17A98E5D005905B2 /* sr_random.h in Headers */,
 				AAD45E0C17A98E5D005905B2 /* sr_sa.h in Headers */,
+				B20B5B0D1AFAC97A00A9DA1E /* RealTimeLipSyncController.h in Headers */,
 				AAD45E0E17A98E5D005905B2 /* sr_sa_bbox.h in Headers */,
 				AAD45E1017A98E5D005905B2 /* sr_sa_event.h in Headers */,
 				AAD45E1217A98E5D005905B2 /* sr_sa_gl_render.h in Headers */,
@@ -2894,10 +2938,12 @@
 				AAD45E3417A98E5D005905B2 /* sr_tree.h in Headers */,
 				AAD45E3617A98E5D005905B2 /* sr_triangle.h in Headers */,
 				AAD45E3817A98E5D005905B2 /* sr_vec.h in Headers */,
+				B20B5B151AFAC9C500A9DA1E /* me_ct_generic_hand.h in Headers */,
 				AAD45E3A17A98E5D005905B2 /* sr_vec2.h in Headers */,
 				AAD45E3C17A98E5D005905B2 /* sr_viewer.h in Headers */,
 				AA93021617E02E3000958769 /* me_ct_pose_postprocessing.hpp in Headers */,
 				AA9AC3B417E78F040077D800 /* ParserCOLLADAFast.h in Headers */,
+				B20B5B071AFAC93100A9DA1E /* SBHandConfigurationManager.h in Headers */,
 				AA2D77A3180F1C3A00D12F24 /* SBAssetHandler.h in Headers */,
 				AA2D77A5180F1C3A00D12F24 /* SBAssetHandlerAmc.h in Headers */,
 				AA2D77A7180F1C3A00D12F24 /* SBAssetHandlerAsf.h in Headers */,
@@ -2909,7 +2955,6 @@
 				AA2D77B2180F1C3A00D12F24 /* SBSceneListener.h in Headers */,
 				AA2D77B3180F1C3A00D12F24 /* SBVersion.hpp in Headers */,
 				AA2D77B4180F1C3A00D12F24 /* SBVersionTemplate.hpp in Headers */,
-				C4735D0D199311A100D9D1A7 /* sbm_remote_speech_audiofile.hpp in Headers */,
 				AA0AA89B18512DA20061EE9A /* SBAssetHandlerSBMeshBinary.h in Headers */,
 				AA0AA89D18512DA20061EE9A /* SBAssetHandlerSkmb.h in Headers */,
 				AA0AA89F18512DA20061EE9A /* SBNavigationMeshManager.h in Headers */,
@@ -2917,10 +2962,6 @@
 				AA0AA8AE18512DD10061EE9A /* sbmotion.pb.h in Headers */,
 				AA0AA8B018512DD10061EE9A /* sbutilities.pb.h in Headers */,
 				AA0AA8BB185154490061EE9A /* SBAssetHandlerBvh.h in Headers */,
-				C44B488718EB78F6007E8081 /* SBMotionGraph.h in Headers */,
-				C44B488B18EB9BED007E8081 /* me_ct_motion_graph.hpp in Headers */,
-				C44B488F18EB9C24007E8081 /* SBAssetHandlerPly.h in Headers */,
-				C48ED0C718EB9E6E00BBA419 /* rply.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2999,6 +3040,7 @@
 				AAD45B1A17A98E5C005905B2 /* bml_animation.cpp in Sources */,
 				AAD45B1C17A98E5C005905B2 /* bml_bodyreach.cpp in Sources */,
 				AAD45B1E17A98E5C005905B2 /* bml_constraint.cpp in Sources */,
+				B2C212201AF8394F00766484 /* SbmBlendFace.cpp in Sources */,
 				AAD45B2017A98E5C005905B2 /* bml_event.cpp in Sources */,
 				AAD45B2317A98E5C005905B2 /* bml_face.cpp in Sources */,
 				AAD45B2517A98E5C005905B2 /* bml_gaze.cpp in Sources */,
@@ -3054,6 +3096,7 @@
 				AAD45B8C17A98E5C005905B2 /* me_ct_limb.cpp in Sources */,
 				AAD45BB417A98E5D005905B2 /* me_ct_motion.cpp in Sources */,
 				AAD45BB617A98E5D005905B2 /* me_ct_motion_blend.cpp in Sources */,
+				B20B5B0C1AFAC97A00A9DA1E /* RealTimeLipSyncController.cpp in Sources */,
 				AAD45BB817A98E5D005905B2 /* me_ct_motion_example.cpp in Sources */,
 				AAD45BBA17A98E5D005905B2 /* me_ct_motion_parameter.cpp in Sources */,
 				AAD45BBC17A98E5D005905B2 /* me_ct_motion_player.cpp in Sources */,
@@ -3061,6 +3104,7 @@
 				AAD45BC017A98E5D005905B2 /* me_ct_motion_recorder.cpp in Sources */,
 				AAD45BC217A98E5D005905B2 /* me_ct_motion_timewarp.cpp in Sources */,
 				AAD45BC817A98E5D005905B2 /* me_ct_noise_controller.cpp in Sources */,
+				B25B7F9818A071F4004C2724 /* me_ct_motion_graph.cpp in Sources */,
 				AAD45BCA17A98E5D005905B2 /* me_ct_param_animation.cpp in Sources */,
 				AAD45BCC17A98E5D005905B2 /* me_ct_param_animation_utilities.cpp in Sources */,
 				AAD45BCE17A98E5D005905B2 /* me_ct_periodic_replay.cpp in Sources */,
@@ -3079,8 +3123,10 @@
 				AAD45BEA17A98E5D005905B2 /* me_default_prune_policy.cpp in Sources */,
 				AAD45BEE17A98E5D005905B2 /* me_spline_1d.cpp in Sources */,
 				AAD45BF017A98E5D005905B2 /* MeCtBlendEngine.cpp in Sources */,
+				B25B7F9D18A07231004C2724 /* rply.c in Sources */,
 				AAD45BF217A98E5D005905B2 /* MeCtBodyReachState.cpp in Sources */,
 				AAD45BF417A98E5D005905B2 /* MeCtReachEngine.cpp in Sources */,
+				B20B5B081AFAC93100A9DA1E /* SBHandSynthesis.cpp in Sources */,
 				AAD45BF617A98E5D005905B2 /* MotionAnalysis.cpp in Sources */,
 				AAD45BFD17A98E5D005905B2 /* AnsHeap.C in Sources */,
 				AAD45BFF17A98E5D005905B2 /* AnswerTree.C in Sources */,
@@ -3105,6 +3151,7 @@
 				AAD45C2417A98E5D005905B2 /* fhSubFns.cpp in Sources */,
 				AAD45C2617A98E5D005905B2 /* Field.cpp in Sources */,
 				AAD45C2817A98E5D005905B2 /* FullHist.cpp in Sources */,
+				B20B5B061AFAC93100A9DA1E /* SBHandConfigurationManager.cpp in Sources */,
 				AAD45C2A17A98E5D005905B2 /* GotIter.cpp in Sources */,
 				AAD45C2C17A98E5D005905B2 /* headFinder.cpp in Sources */,
 				AAD45C2E17A98E5D005905B2 /* headFinderCh.cpp in Sources */,
@@ -3118,6 +3165,7 @@
 				AAD45C3E17A98E5D005905B2 /* Term.cpp in Sources */,
 				AAD45C4017A98E5D005905B2 /* TimeIt.cpp in Sources */,
 				AAD45C4217A98E5D005905B2 /* UnitRules.cpp in Sources */,
+				B20B5B101AFAC99500A9DA1E /* me_ct_new_locomotion.cpp in Sources */,
 				AAD45C4417A98E5D005905B2 /* utils.cpp in Sources */,
 				AAD45C4617A98E5D005905B2 /* ValHeap.cpp in Sources */,
 				AAD45C4917A98E5D005905B2 /* perlin.cpp in Sources */,
@@ -3180,6 +3228,7 @@
 				AAD45CB717A98E5D005905B2 /* SBBoneBusManager.cpp in Sources */,
 				AAD45CB917A98E5D005905B2 /* SBCharacter.cpp in Sources */,
 				AAD45CBC17A98E5D005905B2 /* SBCollisionManager.cpp in Sources */,
+				B20B5B141AFAC9C500A9DA1E /* me_ct_generic_hand.cpp in Sources */,
 				AAD45CBE17A98E5D005905B2 /* SBColObject.cpp in Sources */,
 				AAD45CC017A98E5D005905B2 /* SBCommandManager.cpp in Sources */,
 				AAD45CC217A98E5D005905B2 /* SBController.cpp in Sources */,
@@ -3245,6 +3294,7 @@
 				AAD45D4917A98E5D005905B2 /* KinectProcessor.cpp in Sources */,
 				AAD45D4B17A98E5D005905B2 /* lin_win.cpp in Sources */,
 				AAD45D4D17A98E5D005905B2 /* local_speech.cpp in Sources */,
+				B25B7F9418A071DD004C2724 /* SBMotionGraph.cpp in Sources */,
 				AAD45D5117A98E5D005905B2 /* mcontrol_callbacks.cpp in Sources */,
 				AAD45D5417A98E5D005905B2 /* MiscCommands.cpp in Sources */,
 				AAD45D5617A98E5D005905B2 /* ODEPhysicsSim.cpp in Sources */,
@@ -3290,6 +3340,7 @@
 				AAD45DB217A98E5D005905B2 /* sk_skeleton_io.cpp in Sources */,
 				AAD45DB317A98E5D005905B2 /* sk_vec_limits.cpp in Sources */,
 				AAD45DCD17A98E5D005905B2 /* sr.cpp in Sources */,
+				B20B5B181AFAC9EE00A9DA1E /* SBRigNode.cpp in Sources */,
 				AAD45DCF17A98E5D005905B2 /* sr_alg.cpp in Sources */,
 				AAD45DD117A98E5D005905B2 /* sr_array.cpp in Sources */,
 				AAD45DD317A98E5D005905B2 /* sr_box.cpp in Sources */,
@@ -3311,8 +3362,8 @@
 				AAD45DF517A98E5D005905B2 /* sr_material.cpp in Sources */,
 				AAD45DF717A98E5D005905B2 /* sr_model.cpp in Sources */,
 				AAD45DF917A98E5D005905B2 /* sr_model_export_iv.cpp in Sources */,
-				C4735D0C199311A100D9D1A7 /* sbm_remote_speech_audiofile.cpp in Sources */,
 				AAD45DFA17A98E5D005905B2 /* sr_model_import_obj.cpp in Sources */,
+				B25B7F9218A071DD004C2724 /* SBAssetHandlerPly.cpp in Sources */,
 				AAD45DFB17A98E5D005905B2 /* sr_output.cpp in Sources */,
 				AAD45DFD17A98E5D005905B2 /* sr_path_array.cpp in Sources */,
 				AAD45DFF17A98E5D005905B2 /* sr_plane.cpp in Sources */,
@@ -3327,6 +3378,7 @@
 				AAD45E1117A98E5D005905B2 /* sr_sa_gl_render.cpp in Sources */,
 				AAD45E1317A98E5D005905B2 /* sr_sa_render_mode.cpp in Sources */,
 				AAD45E1817A98E5D005905B2 /* sr_shared_ptr.cpp in Sources */,
+				B20B5B041AFAC93100A9DA1E /* SBHandConfiguration.cpp in Sources */,
 				AAD45E1A17A98E5D005905B2 /* sr_sn.cpp in Sources */,
 				AAD45E1C17A98E5D005905B2 /* sr_sn_colorsurf.cpp in Sources */,
 				AAD45E1E17A98E5D005905B2 /* sr_sn_editor.cpp in Sources */,
@@ -3344,6 +3396,7 @@
 				AAD45E3717A98E5D005905B2 /* sr_vec.cpp in Sources */,
 				AAD45E3917A98E5D005905B2 /* sr_vec2.cpp in Sources */,
 				AAD45E3B17A98E5D005905B2 /* sr_viewer.cpp in Sources */,
+				B25B7FA018A0728A004C2724 /* sr_model_import_ply.cpp in Sources */,
 				AA93021517E02E3000958769 /* me_ct_pose_postprocessing.cpp in Sources */,
 				AA9AC3B317E78F040077D800 /* ParserCOLLADAFast.cpp in Sources */,
 				AA2D77A2180F1C3900D12F24 /* SBAssetHandler.cpp in Sources */,
@@ -3363,11 +3416,6 @@
 				AA0AA8AF18512DD10061EE9A /* sbutilities.pb.cc in Sources */,
 				AA0AA8B2185144190061EE9A /* ParserASFAMC.cxx in Sources */,
 				AA0AA8BA185154490061EE9A /* SBAssetHandlerBvh.cpp in Sources */,
-				C44B488618EB78F6007E8081 /* SBMotionGraph.cpp in Sources */,
-				C44B488A18EB9BED007E8081 /* me_ct_motion_graph.cpp in Sources */,
-				C44B488E18EB9C24007E8081 /* SBAssetHandlerPly.cpp in Sources */,
-				C4F0FDDA18EB9DB10099F20F /* sr_model_import_ply.cpp in Sources */,
-				C48ED0C618EB9E6E00BBA419 /* rply.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3378,6 +3426,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
@@ -3386,6 +3436,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DSB_NO_ASSIMP",
+				);
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -3394,11 +3448,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DSB_NO_ASSIMP",
+				);
 				SDKROOT = iphoneos;
 			};
 			name = Release;
