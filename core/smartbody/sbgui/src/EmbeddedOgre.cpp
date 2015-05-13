@@ -810,7 +810,7 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 	if (deformMesh->isSkinnedMesh())	
 	{
 		// update the bind pose 
-#if 1
+#if 0
 		float meshScale = meshInstance->getMeshScale();
 		charSkel->updateGlobalMatricesZero();
 		std::map<std::string,int>& boneIdxMap = deformMesh->boneJointIdxMap;
@@ -910,6 +910,10 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 					{
 						ogreMesh->addBoneAssignment(vba);		
 						//LOG("jName = %s, origID = %d, ogreBoneID = %d, weight = %f",jName.c_str(),origBoneID,vba.boneIndex, vba.weight);
+					}
+					else if (vba.weight < 0)
+					{
+						LOG("negative weight, jName = %s, origID = %d, ogreBoneID = %d, weight = %f",jName.c_str(),origBoneID,vba.boneIndex, vba.weight);	
 					}
 				}	
 			}			
