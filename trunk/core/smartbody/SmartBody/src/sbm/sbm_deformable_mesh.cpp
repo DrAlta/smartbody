@@ -37,6 +37,7 @@
 #include "external/glm/glm/gtc/matrix_transform.hpp"
 
 #include <boost/filesystem.hpp>
+#include <algorithm>
 
 #define TEST_HAIR_RENDER 1
 
@@ -2421,8 +2422,8 @@ void DeformableMeshInstance::setVisibility(int deformableMesh)
 void DeformableMeshInstance::updateTransformBuffer()
 {
 	if (!_mesh) return;
-	unsigned long boneSize = 120;
-	int transformSize = max(boneSize,_mesh->boneJointIdxMap.size());
+	unsigned int boneSize = 120;
+	int transformSize = std::max(boneSize,_mesh->boneJointIdxMap.size());
 	if (transformBuffer.size() != transformSize)
 		transformBuffer.resize(transformSize);
 	std::map<std::string,int>& boneIdxMap = _mesh->boneJointIdxMap;
