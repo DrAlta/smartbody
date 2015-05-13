@@ -1079,11 +1079,4 @@ if( G_debug_c_SG )	{
 	return( TRUE );
 }
 
-void MeCtSimpleGaze::print_state( int tabs )	{
-	LOG("MeCtSimpleGaze" );
-	const char* str = getName().c_str();
-	if( str )
-		LOG(" \"%s\"\n", str );
-}
-
 ///////////////////////////////////////////////////////////////////////////

@@ -97,12 +97,6 @@ public:
 	 */
 	bool controller_evaluate( double time, MeFrameData& frame );
 
-	/*! Implements MeController::printe_state.
-	    Print the info about the controller and its state to stdout.  The first 
-	    line of output should begin immediately, and second and following lines 
-		should be indented by tabCount number of tabs.  Child controller should 
-		be indented by an additional tab. All output should end with a new line.  */
-	virtual void print_state( int tab_count );
 };
 
 

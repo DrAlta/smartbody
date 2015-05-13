@@ -52,9 +52,6 @@ class MeCtGenericHand : public SmartBody::SBController
 		// set the controller type
 		virtual const std::string& controller_type() const	{ return _controller_type; }
 
-		// this is supposed to print states (does nothing for now)
-		virtual void print_state( int tabs );
-
 		// might wanna do something when the controller starts
 		virtual void controller_start();
 

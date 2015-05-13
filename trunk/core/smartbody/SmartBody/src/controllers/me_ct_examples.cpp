@@ -134,17 +134,6 @@ bool MeCtHeadOrient::controller_evaluate( double t, MeFrameData& frame )	{
 	return( TRUE );
 }
 
-void MeCtHeadOrient::print_state( int tabs )	{
-	LOG("MeCtSimpleTilt" );
-
-	const char* str = getName().c_str();
-	if( str )
-		LOG(" \"%s\"", str );
-
-	LOG(" p:%.3g h:%.3g r:%.3g degs for %.3g sec\n", 
-		_pitch_deg, _heading_deg, _roll_deg, _duration );
-}
-
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
@@ -242,15 +231,6 @@ bool MeCtSimpleTilt::controller_evaluate( double t, MeFrameData& frame )	{
 	return( TRUE );
 }
 
-void MeCtSimpleTilt::print_state( int tabs )	{
-	LOG("MeCtSimpleTilt" );
-
-	const char* str = getName().c_str();
-	if( str )
-		LOG(" \"%s\"", str );
-
-	LOG(" %.3g degs for %.3g sec\n", _angle_deg, _duration );
-}
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -528,23 +508,6 @@ bool MeCtSimpleNod::controller_evaluate( double t, MeFrameData& frame )	{
 	//printf( "mag: %f deg: %f out: %f\n", _magnitude, angle_deg, deg_sum );
 
 	return( TRUE );
-}
-
-void MeCtSimpleNod::print_state( int tabs )	{
-	LOG("MeCtSimpleNod" );
-
-	const char* str = getName().c_str();
-	if( str )
-		LOG(" \"%s\"", str );
-
-	if (_movementType == BML::HEAD_NOD)
-		LOG(" affirmative" );
-	else if (_movementType == BML::HEAD_SHAKE)
-		LOG(" negative" );
-	else if (_movementType == BML::HEAD_TOSS)
-		LOG(" tilt" );
-
-	LOG(" %.3g reps @ %.3g degs for %.3g sec\n", _repetitions, _magnitude, _duration );
 }
 
 ///////////////////////////////////////////////////////////////////////////

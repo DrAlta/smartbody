@@ -562,17 +562,6 @@ const std::string& MeCtEyeLidRegulator::controller_type( void )	const {
 	return( type_name );
 }
 
-void MeCtEyeLidRegulator::print_state( int tabCount ) {
-
-	LOG("MeCtEyeLidRegulator" );
-
-	const char* str = getName().c_str();
-	if( str )
-		LOG(" \"%s\"", str );
-
-	LOG("\n" );
-}
-
 void MeCtEyeLidRegulator::set_use_blink_viseme(bool val)
 {
 	use_blink_viseme = val;
@@ -965,17 +954,6 @@ double MeCtEyeLid::controller_duration( void ) {
 
 const std::string& MeCtEyeLid::controller_type( void )	const {
 	return( type_name );
-}
-
-void MeCtEyeLid::print_state( int tabCount ) {
-
-	LOG("MeCtEyeLid" );
-
-	const char* str = getName().c_str();
-	if( str )
-		LOG(" \"%s\"", str );
-
-	LOG("\n" );
 }
 
 

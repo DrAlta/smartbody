@@ -245,7 +245,6 @@ class MeCtEyeLidRegulator : public SmartBody::SBController	{
 		virtual SkChannelArray& controller_channels ();
 		virtual double controller_duration ();
 		virtual const std::string& controller_type () const;
-		virtual void print_state( int tabCount );
 };
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -341,7 +340,6 @@ class MeCtEyeLid : public SmartBody::SBController	{
 		virtual SkChannelArray& controller_channels ();
 		virtual double controller_duration ();
 		virtual const std::string& controller_type () const;
-		virtual void print_state( int tabCount );
 };
 
 //////////////////////////////////////////////////////////////////////////////////

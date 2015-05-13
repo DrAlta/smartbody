@@ -294,10 +294,6 @@ public :
 	* \brief Returns -1 to signal that this controller has infinite duration
 	*/
 	virtual double controller_duration () { return -1; }
-	/** 
-	* \brief Prints the controller state
-	*/
-	virtual void print_state( int tabCount );
 
 	/** 
 	* \brief Implements MeController::controller_evaluate

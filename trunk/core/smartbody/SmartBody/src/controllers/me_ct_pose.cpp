@@ -226,17 +226,5 @@ const std::string& MeCtPose::controller_type () const
    return type_name;
  }
 
-void MeCtPose::print_state( int tabCount ) {
-	LOG("MeCtPose" );
-
-	const char* str = getName().c_str();
-	if( str )
-		LOG(" \"%s\"", str );
-
-	if( _posture_name )
-		LOG(", posture \"%s\"", _posture_name );
-	LOG("\n" );
-}
-
 //======================================= EOF =====================================
 

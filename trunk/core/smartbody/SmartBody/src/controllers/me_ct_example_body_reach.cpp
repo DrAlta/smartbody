@@ -549,11 +549,6 @@ void MeCtExampleBodyReach::updateChannelBuffer( MeFrameData& frame, BodyMotionFr
 	}
 }
 
-void MeCtExampleBodyReach::print_state( int tabs )
-{
-
-}
-
 void MeCtExampleBodyReach::controller_start()
 {
 	//restart = true;

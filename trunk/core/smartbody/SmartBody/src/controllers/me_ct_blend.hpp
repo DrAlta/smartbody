@@ -169,7 +169,6 @@ protected:
 public:
     const std::string& controller_type() const;
     //SkChannelArray& controller_channels();  // MeCtUnary provides this
-	void print_state( int tabCount );
 
 	////// Anm - Rolling back change to prevent crash until further testing
 	///**

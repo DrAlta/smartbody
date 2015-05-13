@@ -163,18 +163,6 @@ bool MeCtUnary::remove_child( MeController* child ) {
 }
 
 
-void MeCtUnary::print_children( int tab_count ) {
-	++tab_count;  // we indent the track info also
-	string indent( tab_count, '\t' );
-
-	cout << endl << indent;
-	if( _child ) {
-		_child->print_state( tab_count );
-	} else {
-		cout << "_child is NULL" << endl;
-	}
-}
-
 void MeCtUnary::update_timing_from_child() {
 	if( _child != NULL ) {
 		inoutdt( _child->indt(), _child->outdt() );

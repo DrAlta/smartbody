@@ -45,7 +45,7 @@ public:
 
     double controller_duration();
     //SkChannelArray& controller_channels(); // implemented in MeCtUnary
-	void print_state( int tabCount );
+
 protected:
 	bool controller_evaluate( double t, MeFrameData & frame );
 };

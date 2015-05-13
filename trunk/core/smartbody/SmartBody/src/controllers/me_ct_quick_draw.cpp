@@ -824,44 +824,6 @@ const std::string& MeCtQuickDraw::controller_type( void ) const	{
 	return type_name;
 }
 
-void MeCtQuickDraw::print_state( int tabCount ) {
-
-	LOG("MeCtQuickDraw" );
-
-	const char* str = getName().c_str();
-	if( str )
-		LOG(" \"%s\"", str );
-
-	LOG(", motion" );
-	if( _gundraw_motion ) {
-
-		// motion name
-		str = _gundraw_motion->getName().c_str();
-		if( str )
-			LOG(" \"%s\"", str );
-
-		// motion filename
-		str = _gundraw_motion->filename().c_str();
-		if( str )
-			LOG(" file \"%s\"", str );
-	} 
-	if( _holster_motion ) {
-
-		// motion name
-		str = _holster_motion->getName().c_str();
-		if( str )
-			LOG(" \"%s\"", str );
-
-		// motion filename
-		str = _holster_motion->filename().c_str();
-		if( str )
-			LOG(" file \"%s\"", str );
-	} 
-	else {
-		LOG("=NULL" );
-	}
-	LOG("\n" );
-}
 
 //////////////////////////////////////////////////////////////////////////////////
 

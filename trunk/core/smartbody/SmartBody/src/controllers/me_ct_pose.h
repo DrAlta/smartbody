@@ -92,8 +92,6 @@ class MeCtPose : public SmartBody::SBController
         given hash table of SkPostures */
     bool input ( SrInput& inp, const SrHashTable<SkPosture*>& postures );
 
-	virtual void print_state( int tabCount );
-
 
    private : // callbacks for the base class
 

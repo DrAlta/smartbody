@@ -1553,13 +1553,6 @@ printf( "eyelim: %f %f %f %f\n",
 	return( TRUE );
 }
 
-void MeCtGaze::print_state( int tabs )	{
-	LOG("MeCtGaze" );
-	const char* str = getName().c_str();
-	if( str )
-		LOG(" \"%s\"\n", str );
-}
-
 ///////////////////////////////////////////////////////////////////////////
 
 int MeCtGaze::getStart()

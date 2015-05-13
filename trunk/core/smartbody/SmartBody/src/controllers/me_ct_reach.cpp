@@ -202,10 +202,6 @@ void MeCtReach::controller_start()
 {
 }
 
-void MeCtReach::print_state(int tabs)
-{
-}
-
 
 
 

@@ -1414,6 +1414,8 @@ SrMaterial& SrModel::getMaterial(int num)
 {
 	if (num >= 0 && num < M.size())
 		return M[num];
+	else
+		return _emptyMaterial;
 }
 
 

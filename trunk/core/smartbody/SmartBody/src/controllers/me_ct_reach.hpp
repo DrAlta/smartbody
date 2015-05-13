@@ -74,7 +74,6 @@ public:
 	virtual double controller_duration()			{ return( (double)_duration ); }
 	void set_duration(float duration) { _duration = duration; }
 	virtual const std::string& controller_type() const		{ return( CONTROLLER_TYPE ); }
-	virtual void print_state( int tabs );	
 
 	void setReachArm(MeCtReach::ReachArm val) { reach_arm = val; }
 	MeCtReach::ReachArm getReachArm() { return reach_arm; }

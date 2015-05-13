@@ -3198,7 +3198,7 @@ int mcu_character_breathing( const char* name, srArgBuffer& args, SmartBody::SBC
 	}
 	else if( strcmp( breathing_cmd, "print" ) == 0 )
 	{
-		breathing_p->print_state(0);
+		//breathing_p->print_state(0);
 		return( CMD_SUCCESS );
 	}
 	else if( strcmp( breathing_cmd, "help" ) == 0 )

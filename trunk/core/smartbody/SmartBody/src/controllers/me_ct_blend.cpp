@@ -321,8 +321,8 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 							if( !has_printed_error_header ) {
 								has_printed_error_header = true;
 								LOG("===================================================================");
-								print_state( 0 );
-								print_children( 0 );
+								//print_state( 0 );
+								//print_children( 0 );
 							}
 							LOG("ERROR: MeCtBlend: parent_index out of bounds.");
 							std::stringstream strstr;
@@ -350,8 +350,8 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 								if( !has_printed_error_header ) {
 									has_printed_error_header = true;
 									cout << "===================================================================" << endl;
-									print_state( 0 );
-									print_children( 0 );
+									//print_state( 0 );
+									//print_children( 0 );
 								}
 								LOG("ERROR: MeCtBlend: local_buffer_index out of bounds.");
 								std::stringstream strstr;
@@ -416,30 +416,3 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 	}
 }
 
-void MeCtBlend::print_state( int tab_count ) {
-	using namespace std;
-
-	string indent( tab_count, '\t' );
-	ostringstream out;
-	out << controller_type();
-	
-	const std::string& name_str = getName();
-	if( name_str != "") {
-		out << " \"" << name_str << "\"";
-	}
-
-#if 0
-	Knot* knot = _blend_curve.knot_first();
-	if( knot ) {
-		out  << ":" << endl << indent << "blend_curve: " << *knot;
-		knot = knot->get_next();
-		while( knot ) {
-			out << "; " << ((Knot)*knot);
-			knot = knot->get_next();
-		}
-	}
-#endif
-	LOG("%s", out.str().c_str());
-
-	print_children( tab_count );
-}

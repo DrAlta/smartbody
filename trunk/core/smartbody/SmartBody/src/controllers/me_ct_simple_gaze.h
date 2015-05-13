@@ -149,7 +149,6 @@ class MeCtSimpleGaze : public SmartBody::SBController	{
 		virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 		virtual double controller_duration()			{ return( (double)_duration ); }
 		virtual const std::string& controller_type() const		{ return( type_name ); }
-		virtual void print_state( int tabs );
 };
 
 ///////////////////////////////////////////////////////////////////////////

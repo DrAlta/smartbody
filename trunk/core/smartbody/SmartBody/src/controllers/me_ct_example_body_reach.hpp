@@ -74,7 +74,6 @@ public:
 	virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 	virtual double controller_duration()			{ return( (double)_duration ); }	
 	virtual const std::string& controller_type() const		{ return( CONTROLLER_TYPE ); }
-	virtual void print_state( int tabs );
 
 	MeCtReachEngine* getReachEngine() const { return currentReachEngine; }	
 	void set_duration(float duration) { _duration = duration; }

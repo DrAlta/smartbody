@@ -368,10 +368,6 @@ void MeCtConstraint::controller_start()
 	controlRestart();
 }
 
-void MeCtConstraint::print_state(int tabs)
-{
-}
-
 bool MeCtConstraint::addEffectorJointPair( SmartBody::SBJoint* targetJoint, const char* effectorName, const char* effectorRootName, const SrVec& posOffset, const SrQuat& rotOffset, ConstraintType cType )
 {
 	MeCtIKTreeNode* node = ik_scenario.findIKTreeNode(effectorName);

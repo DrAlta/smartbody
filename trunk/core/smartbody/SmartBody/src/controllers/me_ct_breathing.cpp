@@ -188,44 +188,6 @@ void MeCtBreathing::breaths_per_minute(float bpm, bool smooth_transition)
 	else
 		immediate_breaths_per_minute(bpm);
 }
-void MeCtBreathing::print_state( int tabCount ) 
-{
-	LOG( "MeCtBreathing" );
-
-	std::string str = getName();
-	if( str != "")
-		LOG(" \"%s\"", str.c_str() );
-
-	LOG( ", motion" );
-	if( _motion ) 
-	{
-		// motion name
-		str = _motion->getName();
-		if( str != "")
-			LOG("=\"%s\"", str.c_str() );
-
-		// motion filename
-		str = _motion->filename();
-		if( str != "")
-			LOG(" file=\"%s\"", str.c_str() );
-	} 
-	else
-		LOG( "=NULL" );
-	// bpm
-	LOG( ", bpm=%d", _bpm );
-	LOG( ", topBreathCycle" );
-	if( current_breath_layer() != NULL ) 
-	{
-		// top layer's breath cycle name
-		LOG( " name=\"%s\"", current_breath_layer()->cycle->type() );
-		// top layer's cycles remaining
-		LOG( " cyclesRemaining=%d", current_breath_layer()->cycles_remaining );
-	}
-	else
-		LOG( "=NULL" );
-
-	LOG( "\n" );
-}
 
 void MeCtBreathing::immediate_push_breath_layer(BreathLayer* layer)
 {

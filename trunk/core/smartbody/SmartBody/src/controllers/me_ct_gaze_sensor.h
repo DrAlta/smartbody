@@ -125,7 +125,6 @@ class MeCtGazeSensor	{
 		virtual double controller_duration()			{ return( (double)_duration ); }
 		virtual const std::string& controller_type() const		{ return( type_name ); }
 #endif
-		virtual void print_state( int tabs )			{}
 };
 
 ///////////////////////////////////////////////////////////////////////////

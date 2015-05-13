@@ -151,8 +151,6 @@ class MeCtMotion : public SmartBody::SBController, public FadingControl
         given hash table of motions */
     bool input ( SrInput& inp, const SrHashTable<SkMotion*>& motions );
 
-	virtual void print_state( int tabCount );
-	
 	SrBuffer<int>& get_context_map();
 
 	void checkMotionEvents(double time);
