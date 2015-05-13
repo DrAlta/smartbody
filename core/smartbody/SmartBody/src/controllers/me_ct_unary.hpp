@@ -147,9 +147,6 @@ protected:
 	 */
 	virtual void controller_map_updated();
 
-	//!  Overrides MeController::print_state since we know there is only at more one child
-	virtual void print_children( int tab_count );
-
 	/**
 	 *  Copies timing metadata from the child to the unary meta-controller.
 	 */

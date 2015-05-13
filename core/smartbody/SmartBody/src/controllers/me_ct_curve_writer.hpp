@@ -105,7 +105,6 @@ class MeCtCurveWriter : public SmartBody::SBController {
 		virtual double controller_duration();
 		virtual bool controller_evaluate( double time, MeFrameData& frame );
 
-		virtual void print_state( int tab_count );
 };
 
 #endif // ME_CT_CURVE_WRITER_HPP

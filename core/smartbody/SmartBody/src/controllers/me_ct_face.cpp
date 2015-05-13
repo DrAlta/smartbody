@@ -584,17 +584,6 @@ const std::string& MeCtFace::controller_type( void ) const	{
 	return( type_name );
 }
 
-void MeCtFace::print_state( int tabCount ) {
-
-	LOG("MeCtFace" );
-
-	const char* str = getName().c_str();
-	if( str )
-		LOG(" \"%s\"", str );
-
-	LOG("\n" );
-}
-
 //////////////////////////////////////////////////////////////////////////////////
 
 #if 0

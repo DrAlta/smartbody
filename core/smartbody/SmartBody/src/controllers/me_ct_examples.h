@@ -58,7 +58,6 @@ class MeCtHeadOrient : public SmartBody::SBController	{
 		virtual SkChannelArray& controller_channels() 	{ return( _channels ); }
 		virtual double controller_duration()			{ return( (double)_duration ); }
 		virtual const std::string& controller_type()			{ return( _type_name ); }
-		virtual void print_state( int tabs );
 		
 		SkChannelArray _channels;
 		
@@ -89,7 +88,6 @@ class MeCtSimpleTilt : public SmartBody::SBController	{
 		virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 		virtual double controller_duration()			{ return( (double)_duration ); }
 		virtual const std::string& controller_type()			{ return( _type_name ); }
-		virtual void print_state( int tabs );
 		
 		SkChannelArray _channels;
 		
@@ -184,7 +182,6 @@ class MeCtSimpleNod : public SmartBody::SBController	{
 		virtual SkChannelArray& controller_channels()	{ return( _channels ); }
 		virtual double controller_duration()			{ return( (double)_duration ); }
 		virtual const std::string& controller_type() const		{ return( _type_name ); }
-		virtual void print_state( int tabs );
 		
 		SkChannelArray _channels;
 		

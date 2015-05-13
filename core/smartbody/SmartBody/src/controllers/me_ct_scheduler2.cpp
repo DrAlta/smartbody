@@ -1089,38 +1089,5 @@ const std::string& MeCtScheduler2::controller_type () const
    return type_name;
  }
 
-void MeCtScheduler2::print_state( int tab_count ) {
-	++tab_count;  // we indent the track info also
-	string indent( tab_count, '\t' );
-
-	cout << "MeCtScheduler2";
-
-	const char* str_name = getName().c_str();
-	if( str_name[0] )
-		cout << " \"" << str_name << "\"";
-	cout << ":";
-
-	//  Print tracks in reverse order (highest priority first)
-	if( _tracks.size()>0 ) {
-		cout << endl;
-		
-		int count = 0;
-		VecOfTrack::iterator end = _tracks.end();
-		for( VecOfTrack::iterator it = _tracks.begin(); it != end; ++it )
-		{
-			TrackPtr track = (*it);
-
-			cout << indent << "Track #" << (++count) << ": ";
-
-			MeController* ct = track->_root;
-			if( ct )
-				ct->print_state( tab_count );
-			else
-				cout <<  "NULL _root!!!" << endl;
-		}
-	} else {
-		cout << " No Tracks" << endl;
-	}
-}
 
 //======================================= EOF =====================================

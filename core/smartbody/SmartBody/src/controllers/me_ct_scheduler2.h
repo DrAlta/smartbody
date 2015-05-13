@@ -361,9 +361,6 @@ public:
         currently scheduled to play */
     int track( MeController* c );
     
-	virtual void print_state( int tabCount );
-
-
 protected:
 	///////////////////////////////////////////////////////////////////////
 	//  Private Methods

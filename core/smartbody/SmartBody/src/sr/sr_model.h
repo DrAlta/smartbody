@@ -104,6 +104,8 @@ class SrModel : public SrSharedClass
 	std::map<std::string,std::string> mtlSpecularTexNameMap;
 	std::map<std::string,std::vector<int> > mtlFaceIndices;
 
+	SrMaterial _emptyMaterial;
+
 	SrVec _translation;
 	SrVec _rotation;
 	float _scale;

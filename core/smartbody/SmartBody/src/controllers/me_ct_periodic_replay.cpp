@@ -75,24 +75,3 @@ bool MeCtPeriodicReplay::controller_evaluate( double t, MeFrameData & frame ) {
 	}
 }
 
-void MeCtPeriodicReplay::print_state( int tab_count ) {
-	using namespace std;
-
-	string indent( tab_count, '\t' );
-	ostringstream out;
-	out << CONTROLLER_TYPE;
-	const char* name = this->getName().c_str();
-	if( name && name[0]!='\0' )
-		out << " \"" << name << "\"";
-
-	// Don't show scientific notation
-	out << fixed << setprecision(2);
-	out << " period=" << period;
-	if( period_offset != 0 || child_time_offset!= 0 ) {  // abbreviate if it isn't interesting
-		out << "; period_offset=" << period_offset;
-		out << "; child_time_offset=" << child_time_offset;
-	}
-	LOG("%s", out.str().c_str());
-
-	print_children( tab_count );
-}

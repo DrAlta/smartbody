@@ -57,31 +57,3 @@ bool MeCtTimeShiftWarp::controller_evaluate( double t, MeFrameData & frame ) {
 		return false;
 	}
 }
-
-void MeCtTimeShiftWarp::print_state( int tab_count ) {
-	using namespace std;
-
-	string indent( tab_count, '\t' );
-	ostringstream out;
-	out << "MeCtTimeShiftWarp";
-	const char* name = this->getName().c_str();
-	if( name && name[0]!='\0' )
-		out << " \"" << name << "\"";
-
-#if 0
-	// Don't show scientific notation
-	out << fixed << setprecision(2);
-	Knot* knot = _time_func.knot_first();
-	if( knot ) {
-		out << ":" << endl << indent << "time_func: " << *knot;
-		knot = knot->get_next();
-		while( knot ) {
-			out << "; " << *knot;
-			knot = knot->get_next();
-		}
-	}
-#endif
-	cout << out.str();
-
-	print_children( tab_count );
-}

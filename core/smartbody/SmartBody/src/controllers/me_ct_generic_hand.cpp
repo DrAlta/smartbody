@@ -344,12 +344,6 @@ void MeCtGenericHand::updateChannelBuffer(MeFrameData& frame)
 	_bodyMotion->disconnect();
 }
 
-// this is supposed to print states (does nothing for now)
-void MeCtGenericHand::print_state( int tabs )
-{
-
-}
-
 // might wanna do something when the controller starts
 void MeCtGenericHand::controller_start()
 {

@@ -125,19 +125,3 @@ bool MeCtChannelWriter::controller_evaluate( double time, MeFrameData& frame ) {
 
 	return true;
 }
-
-
-void MeCtChannelWriter::print_state( int tab_count ) {
-	using namespace std;
-	string indent( tab_count, '\t' );
-
-	const char* name = this->getName().c_str();
-	SkChannelArray& channels = controller_channels();
-
-	std::stringstream strstr;
-	strstr << controller_type();
-	if( name!=NULL && name[0]!='\0' )
-		strstr << " \"" << name << "\"";
-	strstr << " @0x" << this;
-	LOG("%s", strstr.str().c_str());
-}

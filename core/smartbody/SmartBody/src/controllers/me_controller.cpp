@@ -813,37 +813,6 @@ void MeController::input ( SrInput& i )
     { _emphasist=-1.0; i.unget_token(); }
  }
 
-void MeController::print_state( int tab_count ) {
-	using namespace std;
-
-	const char* name = this->getName().c_str();
-
-	cout << controller_type();
-	if( name!=NULL && name[0]!='\0' )
-		cout << " \"" << name << "\"";
-	cout << " @0x" << this << endl;
-
-	print_children( tab_count );
-}
-
-void MeController::print_children( int tab_count ) {
-	using namespace std;
-
-	int count = count_children();
-	if( count>0 ) {
-		std::string indent( ++tab_count, '\t' );
-		for( int i=0; i<count; ++i ) {
-			MeController* ct = child( i );
-			if( ct ) {
-				cout << endl << indent;
-				ct->print_state( tab_count );
-			} else {
-				cout << endl << indent << "Child " << i << " is NULL" << endl;
-			}
-		}
-	}
-}
-
 const std::string& MeController::handle() const
 {
 	return _handle;

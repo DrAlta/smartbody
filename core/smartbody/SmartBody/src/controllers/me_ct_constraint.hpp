@@ -117,7 +117,6 @@ public:
 	virtual double controller_duration()			{ return( (double)_duration ); }
 	void set_duration(float duration) { _duration = duration; }
 	virtual const std::string& controller_type() const		{ return( CONTROLLER_TYPE ); }
-	virtual void print_state( int tabs );	
 
 protected:	
 	void  updateChannelBuffer(MeFrameData& frame, std::vector<SrQuat>& quatList, bool bRead = false);

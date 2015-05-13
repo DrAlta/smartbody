@@ -249,14 +249,4 @@ const std::string& MeCtTether::controller_type( void )	const {
 	return( type_name );
 }
 
-void MeCtTether::print_state( int tabCount ) {
-
-	LOG("MeCtTether" );
-
-	const char* str = getName().c_str();
-	if( str )
-		LOG(" \"%s\"", str );
-
-	LOG("\n" );
-}
 

@@ -108,7 +108,6 @@ class MeCtFace : public SmartBody::SBController	{
 		virtual bool controller_evaluate ( double t, MeFrameData& frame );
 		virtual SkChannelArray& controller_channels ();
 		virtual const std::string& controller_type () const;
-		virtual void print_state( int tabCount );
 };
 
 //////////////////////////////////////////////////////////////////////////////////

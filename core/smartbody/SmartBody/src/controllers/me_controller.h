@@ -201,7 +201,7 @@ public :
 	 *  Default implementation utilizes the child(n) and remove_child(..) interfaces,
 	 *  but the method is virtual to enable more optimized implementations.
 	 */
-	virtual void remove_all_children();
+	SBAPI virtual void remove_all_children();
 
     /**
      *  Sets the evaluation context, or unset if context is NULL.
@@ -237,7 +237,7 @@ public :
         Both controller_init() and controller_channels() are called here.
         The convention is that, if there is another init method in the derived
         class, the derived class will be responsible for calling MeController::init() */
-    virtual void init (SbmPawn* pawn);
+    SBAPI virtual void init (SbmPawn* pawn);
 
 
 	/*! Returns the controller's prune policy, if set.  Otherwise, NULL. */
@@ -247,14 +247,14 @@ public :
 	void prune_policy( MePrunePolicy* prune_policy );
 
     /*! This method is to be called before starting to evaluate the controller. */
-    virtual void start (double time);
+    SBAPI virtual void start (double time);
 
 	/*! Returns the time that when this controller was started. */
     double start_time ();
 
     /*! This method will simply set the active flag of the controller to false and
         notify the derived class by calling the virtual method controller_stop(). */
-    virtual void stop (double time);
+    SBAPI virtual void stop (double time);
 
 	/*! Returns the time that when this controller was stopped. */
     double stop_time ();
@@ -371,17 +371,7 @@ public :
         the string corresponds with the derived class name without the 'SrCn' prefix */
 	virtual const std::string& controller_type () const = 0;
 
-	/*! Print the info about the controller and its state to stdout.  The first 
-	    line of output should begin immediately, and second and following lines 
-		should be indented by tabCount number of tabs.  Child controller should 
-		be indented by an additional tab. All output should end with a new line.  */
-	virtual void print_state( int tab_count );
-
-	/*! Convience method for printing children. Takes in the same tab_count as
-	    print_state (that is, before it is increment for the child's print_state).  */
-	virtual void print_children( int tab_count );
-
-    virtual void notify(SmartBody::SBSubject* subject);
+    SBAPI virtual void notify(SmartBody::SBSubject* subject);
 
 	friend class MeControllerContext;
 };

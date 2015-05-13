@@ -1303,7 +1303,7 @@ void prune_schedule( SbmCharacter*   actor,
 											std::stringstream strstr;
 											strstr << "DEBUG: prune_schedule(..): sched \""<<sched->getName()<<"\", anim_source \""<<anim_source->getName()<<"\": blend_ct without spline knots.";
 											LOG(strstr.str().c_str());
-											blend_ct->print_state(1);  // Prints controller type, name, and blend curve
+											//blend_ct->print_state(1);  // Prints controller type, name, and blend curve
 										}
 										in_use = false; // A spline with no knots evaluates to 0
 									}

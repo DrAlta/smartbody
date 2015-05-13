@@ -522,12 +522,6 @@ void MeCtHand::updateChannelBuffer( MeFrameData& frame, BodyMotionFrame& handMot
 	}
 }
 
-
-void MeCtHand::print_state( int tabs )
-{
-
-}
-
 void MeCtHand::controller_start()
 {
 	controlRestart();
