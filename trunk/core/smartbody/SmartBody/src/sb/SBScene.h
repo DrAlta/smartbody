@@ -215,6 +215,8 @@ class SBScene : public SBObject
 
 		SBAPI std::vector<std::string> checkVisibility(const std::string& characterName);
 		SBAPI std::vector<std::string> checkVisibility_current_view();
+		std::vector<std::string> occlusionTest(const std::vector<std::string>& testPawns);
+		std::vector<std::string> frustumTest(const std::vector<std::string>& testPawnNames);
 
 		// deprecated
 		SBAPI SBSkeleton* createSkeleton(const std::string&char_name);

@@ -19,6 +19,9 @@
 #include <boost/python.hpp>
 #endif
 
+#include <RootWindow.h>
+#include <fltk_viewer.h>
+
 
 #ifndef SB_NO_PYTHON
 
@@ -69,6 +72,10 @@ std::vector<std::string> checkVisibility(const std::string& character)
 	
 	SmartBody::SBScene* scene			= SmartBody::SBScene::getScene();
 
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (window && window->fltkViewer)
+		window->fltkViewer->make_current(); // make sure the OpenGL context is current
+
 	std::vector<std::string> visible	= scene->checkVisibility(character);
 	
 	if(DEBUG_CHECK_VISIBILITY) {
@@ -91,6 +98,11 @@ std::vector<std::string> checkVisibility_current_view()
 	
 	SmartBody::SBScene* scene			= SmartBody::SBScene::getScene();
 
+	// make current
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (window && window->fltkViewer)
+		window->fltkViewer->make_current(); // make sure the OpenGL context is current
+	
 	std::vector<std::string> visible	= scene->checkVisibility_current_view();
 
 	if(DEBUG_CHECK_VISIBILITY) {

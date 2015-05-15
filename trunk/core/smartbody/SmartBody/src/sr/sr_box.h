@@ -28,6 +28,7 @@
  */
 #include <sb/SBTypes.h>
 # include <sr/sr_vec.h>
+#include <vector>
 
 class SrMat;
 
@@ -138,6 +139,7 @@ class SBAPI SrBox
         Side 4 has all z coordinates equal to a.z, side 5 equal to b.z.
         Order is ccw, starting with the point with more SrBox::a coordinates */
     void get_side ( SrPnt& p1, SrPnt& p2, SrPnt& p3, SrPnt& p4, int s ) const;
+	std::vector<SrVec> getCorners();
 
     /*! The bounding box is identical to SrBox (needed by SrSceneShapeTpl). */
     void get_bounding_box ( SrBox &box ) const { box=*this; }

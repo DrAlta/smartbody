@@ -192,6 +192,21 @@ void SrBox::operator *= ( float s )
    b *= s;
  }
 
+std::vector<SrVec> SrBox::getCorners()
+{
+	std::vector<SrVec> corners(8);
+	corners[0] = SrVec(a.x,a.y,a.z);
+	corners[1] = SrVec(a.x,a.y,b.z);
+	corners[2] = SrVec(a.x,b.y,b.z);
+	corners[3] = SrVec(b.x,b.y,a.z);
+	corners[4] = SrVec(b.x,a.y,a.z);
+	corners[5] = SrVec(a.x,b.y,a.z);
+	corners[6] = SrVec(b.x,a.y,b.z);
+	corners[7] = SrVec(b.x,b.y,b.z);
+
+	return corners;
+}
+
 //============================== friends ========================================
 
 SrBox operator * ( const SrBox& b, const SrMat& m )
