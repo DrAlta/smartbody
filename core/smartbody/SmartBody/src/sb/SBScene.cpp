@@ -6,6 +6,13 @@
 #include <direct.h>
 #endif
 
+
+#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
+#include "external/glew/glew.h"
+#include "sbm/GPU/SbmDeformableMeshGPU.h"
+#endif
+
+
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include <sb/SBTypes.h>
@@ -94,6 +101,7 @@
 #if !defined(__FLASHPLAYER__)
 #include <external/zlib-1.2.5/zip.h>
 #endif
+
 
 #ifndef WIN32
 #define _stricmp strcasecmp
@@ -2602,7 +2610,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 #endif
 			fs::copy_file(motionFile,fs::path(newFileName));
 		}
-		else
+else
 		{
 #if (BOOST_VERSION > 104400)
 			std::string zipFileName = diffPath.string()+"/"+motionFile.filename().string();
@@ -4267,7 +4275,7 @@ void SBScene::updateConeOfSight()
 //	
 std::vector<std::string> SBScene::checkVisibility(const std::string& characterName)
 {
-	std::vector<std::string> visible_pawns;
+	std::vector<std::string> visible_pawns, nonOccludePawns;
 
 	//	Gets the character from which we want to look from
 	SmartBody::SBCharacter* character = getCharacter(characterName);
@@ -4346,16 +4354,177 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	glLoadMatrix( camera->get_view_mat(mat) );
 #endif
 	//	Creates characters frustrm 
+	SmartBody::SBScene * scene	= SmartBody::SBScene::getScene();
+	std::vector<std::string> pawnNames = scene->getPawnNames();
+	std::vector<std::string>::iterator removeItem = std::remove(pawnNames.begin(),pawnNames.end(), characterName);
+	pawnNames.erase(removeItem, pawnNames.end());
+	visible_pawns = frustumTest(pawnNames);
+	nonOccludePawns = occlusionTest(visible_pawns);
+	// Restores matrices and camera set up
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	
+	//	Sets FROM where the chararacter is looking
+	camera->setEye(	tmp_eye.x,
+					tmp_eye.y,
+					tmp_eye.z);
+
+	//	Sets where the character looking is AT
+	camera->setCenter(	tmp_center.x, 
+						tmp_center.y,
+						tmp_center.z);
+
+	//	Sets near clip plane
+	camera->setNearPlane(tmp_near);
+
+	//	Sets near clip plane
+	camera->setFarPlane(tmp_far);
+
+	//	Returns visible pawns
+	return nonOccludePawns;
+}
+
+
+std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>& testPawns)
+{
+	std::vector<std::string> visiblePawns;
+	float m[16];
+	glGetFloatv(GL_MODELVIEW_MATRIX, m);
+	SrMat modelViewMat = SrMat(m);
+	SmartBody::SBScene * scene	= SmartBody::SBScene::getScene();
+	// sort the pawn from front to back
+	std::vector<std::pair<float,int>> pawnZSortedList;
+	for (unsigned int i=0;i<testPawns.size();i++)
+	{
+		SmartBody::SBPawn* pawn		= scene->getPawn(testPawns[i]);
+
+		SBGeomObject* geomObject = pawn->getGeomObject();
+		SBGeomBox* box = dynamic_cast<SBGeomBox*>(geomObject);
+		SrBox pawn_bb;
+		pawn_bb = pawn->getBoundingBox();		
+		std::vector<SrVec> bbPts = pawn_bb.getCorners();
+		float zMin = -1e30;
+		for (unsigned int k=0;k<bbPts.size();k++)
+		{
+			SrVec camPt = bbPts[k]*modelViewMat;
+			if (camPt.z >  zMin)
+				zMin = camPt.z;
+		}	
+		pawnZSortedList.push_back(std::pair<float,int>(zMin,i));
+	}
+	std::sort(pawnZSortedList.begin(),pawnZSortedList.end()); // sort pawns from back to front
+	reverse(pawnZSortedList.begin(),pawnZSortedList.end()); // reverse the order so the order is front to back
+
+	//for (unsigned int i=0;i<pawnZSortedList.size();i++)
+	//	LOG("Pawn %d, zMin = %f", pawnZSortedList[i].second, pawnZSortedList[i].first);
+
+	// occlusion window width/height
+	int width = 256, height = 256;
+	// create render buffer
+	GLuint fb, color_rb, depth_rb;
+	//RGBA8 RenderBuffer, 24 bit depth RenderBuffer, 256x256
+	glGenFramebuffers(1, &fb);
+    glBindFramebuffer(GL_FRAMEBUFFER, fb);
+    //Create and attach a color buffer
+    glGenRenderbuffers(1, &color_rb);
+    //We must bind color_rb before we call glRenderbufferStorageEXT
+    glBindRenderbuffer(GL_RENDERBUFFER, color_rb);
+    //The storage format is RGBA8
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width, height);
+    //Attach color buffer to FBO
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, color_rb);
+    //-------------------------
+    glGenRenderbuffers(1, &depth_rb);
+    glBindRenderbuffer(GL_RENDERBUFFER, depth_rb);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
+    //-------------------------
+    //Attach depth buffer to FBO
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rb);
+    //-------------------------
+    //Does the GPU support current FBO configuration?
+	/*
+    GLenum status;
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    switch(status)
+    {
+		case GL_FRAMEBUFFER_COMPLETE:
+            LOG("FrameBufferObject success");
+			break;
+	
+	   default:
+			LOG("FrameBufferObject error");
+	}
+	*/
+    //-------------------------
+   	// bind FBO for rendering
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //-------------------------
+    glViewport(0, 0, width, height);
+   
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+  
+	// perform occlusion test
+	GLuint uiOcclusionQuery;
+	glGenQueries(1, &uiOcclusionQuery);
+	for (int i=0;i<pawnZSortedList.size();i++)
+	{
+		int pawnIdx = pawnZSortedList[i].second;
+		SmartBody::SBPawn* pawn		= scene->getPawn(testPawns[pawnIdx]);
+		SrBox pawn_bb;
+		pawn_bb = pawn->getBoundingBox();		
+		//LOG("pawn %s, min = %.3f %.3f %.3f, max = %.3f %.3f %.3f", pawn->getName().c_str(), pawn_bb.a[0], pawn_bb.a[1], pawn_bb.a[2], pawn_bb.b[0], pawn_bb.b[1], pawn_bb.b[2]);
+		glBeginQuery(GL_SAMPLES_PASSED, uiOcclusionQuery); 
+		// Every pixel that passes the depth test now gets added to the result		
+		glDrawBox(pawn_bb.a, pawn_bb.b);
+		glEndQuery(GL_SAMPLES_PASSED); 
+		// Now get tthe number of pixels passed
+		int iSamplesPassed = 0; 
+		glGetQueryObjectiv(uiOcclusionQuery, GL_QUERY_RESULT, &iSamplesPassed); 
+		if (iSamplesPassed > 0) // not occluded
+		{
+			//LOG("pawn %s, visible samples = %d", pawn->getName().c_str(), iSamplesPassed);
+			visiblePawns.push_back(pawn->getName());
+			//glDrawBox(pawn_bb.a, pawn_bb.b);
+		}		
+	}
+	glDeleteQueries(1, &uiOcclusionQuery);
+    //Bind 0, which means render to back buffer
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+	//Delete resources
+	glDeleteRenderbuffersEXT(1, &color_rb);
+	glDeleteRenderbuffersEXT(1, &depth_rb);
+	//Bind 0, which means render to back buffer, as a result, fb is unbound
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	glDeleteFramebuffersEXT(1, &fb);
+
+	//for (unsigned int i=0;i<visiblePawns.size();i++)
+	//	LOG("Visible pawn %d = %s", i, visiblePawns[i].c_str());
+
+	return visiblePawns;
+}
+
+
+std::vector<std::string> SBScene::frustumTest(const std::vector<std::string>& testPawnNames)
+{
+	std::vector<std::string> visiblePawns;
+
 	SrFrustum frustum;
 	frustum.extractFrustum();
 
 	SmartBody::SBScene * scene	= SmartBody::SBScene::getScene();
-	const std::vector<std::string>& pawns = scene->getPawnNames();
+	const std::vector<std::string>& pawns = testPawnNames;
 
 	//	Iterates over all pawns, to check which ones are visible from the characters viewport
 	for (	std::vector<std::string>::const_iterator pawnIter = pawns.begin();
-			pawnIter != pawns.end();
-			pawnIter++)
+		pawnIter != pawns.end();
+		pawnIter++)
 	{
 		SmartBody::SBPawn* pawn		= scene->getPawn((*pawnIter));
 
@@ -4402,34 +4571,11 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 			frustum.pointInFrustum(pointBAA) || 
 			frustum.pointInFrustum(pointABA) ||
 			frustum.pointInFrustum(pointBAB)) 
-			   visible_pawns.push_back(pawn->getName());
+			visiblePawns.push_back(pawn->getName());
 	}
-	
-	// Restores matrices and camera set up
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	
-	//	Sets FROM where the chararacter is looking
-	camera->setEye(	tmp_eye.x,
-					tmp_eye.y,
-					tmp_eye.z);
-
-	//	Sets where the character looking is AT
-	camera->setCenter(	tmp_center.x, 
-						tmp_center.y,
-						tmp_center.z);
-
-	//	Sets near clip plane
-	camera->setNearPlane(tmp_near);
-
-	//	Sets near clip plane
-	camera->setFarPlane(tmp_far);
-
-	//	Returns visible pawns
-	return visible_pawns;
+	return visiblePawns;
 }
+
 
 
 //	
@@ -4439,9 +4585,13 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 //	
 std::vector<std::string> SBScene::checkVisibility_current_view() {
 	//LOG("Checking visibility...\n");
-
-	std::vector<std::string> visible_pawns;
+	SmartBody::SBScene * scene	= SmartBody::SBScene::getScene();
+	std::vector<std::string> pawnNames = scene->getPawnNames();
+	std::vector<std::string>::iterator removeItem = std::remove(pawnNames.begin(),pawnNames.end(), "cameraDefault");
+	pawnNames.erase(removeItem, pawnNames.end());
+	std::vector<std::string> visible_pawns = frustumTest(pawnNames);
 	
+#if 0
 	SrFrustum frustum;
 	frustum.extractFrustum();
 	
@@ -4473,9 +4623,12 @@ std::vector<std::string> SBScene::checkVisibility_current_view() {
 		}
 		*/
 	}
-	
-	return visible_pawns;
+#endif
+	std::vector<std::string> nonOccludePawns = occlusionTest(visible_pawns);
+
+	return nonOccludePawns;
 }
+
 
 
 /*
