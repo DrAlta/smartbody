@@ -74,6 +74,11 @@ void FLTKOgreWindow::initOgreWindow()
 	//fl_set_gl_context(this,ogreInterface->getGLContext());	
 }
 
+EmbeddedOgre* FLTKOgreWindow::getOgreInterface()
+{
+	return ogreInterface;
+}
+
 void FLTKOgreWindow::draw()
 {	
 	//fl_set_gl_context(this,ogreInterface->getGLContext());
@@ -178,6 +183,11 @@ void FLTKOgreWindow::updateOgreCamera()
 
 }
 
+void drawFloor(bool shadowPass)
+{
+	// floor is managed separately
+	// this function overrides the drawFloor() in FltkViewer
+}
 
 void FLTKOgreWindow::fltkRender()
 {

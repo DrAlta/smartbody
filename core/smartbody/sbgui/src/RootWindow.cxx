@@ -28,6 +28,7 @@
 #include <sb/SBBehaviorSetManager.h>
 #include"resourceViewer/AttributeEditor.h"
 
+
 #include "SBGUIManager.h"
 
 #define TEST_EXPORT_SMARTBODY_PACKAGE 1
@@ -101,7 +102,6 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Steer/Characters and Goals", 0, SteeringCharactersCB, this, 0);
 	menubar->add("&View/Steer/All Steering", 0, SteeringAllCB, this, 0);
 	menubar->add("&View/Steer/No Steering", 0, SteeringNoneCB, this, 0);
-
 
 	menubar->add("&Create/Character...", 0, CreateCharacterCB, this, 0);
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, 0);
@@ -281,16 +281,38 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	// add the viewer
 	int viewerWidth = 640 ;
 	int viewerHeight = h - curY - 10;
-#if USE_OGRE_VIEWER < 1
-	fltkViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
+#if USE_OGRE_VIEWER > 0
+	std::string renderer = SmartBody::SBScene::getScene()->getSystemParameter("renderer");
+	if (renderer == "ogre" || renderer == "OGRE")
+	{
+		ogreViewer = new FLTKOgreWindow(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);	
+		curViewer = ogreViewer;
+		customViewer = NULL;
+	}
+	else
+	{
+		if (renderer != "custom" && renderer != "CUSTOM")
+		{
+			LOG("Renderer '%s' not recognized. Use 'custom' instead.");
+		}
+		customViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
+		curViewer = customViewer;
+		ogreViewer = NULL;
+	}
 #else
-	fltkViewer = new FLTKOgreWindow(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);	
+	if (renderer != "custom" && renderer != "CUSTOM")
+	{
+		LOG("Renderer '%s' not recognized. Use 'custom' instead.");
+	}
+	customViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
+	curViewer = customViewer;
+	ogreViewer = NULL;
 #endif
-	fltkViewer->box(FL_UP_BOX);
-	fltkViewer->baseWin = this;
+	curViewer->box(FL_UP_BOX);
+	curViewer->baseWin = this;
 
 	_mainGroup->end();
-	_mainGroup->resizable(fltkViewer);
+	_mainGroup->resizable(curViewer);
 
 	this->end();
 
@@ -325,7 +347,12 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 
 BaseWindow::~BaseWindow() {
 
-	delete fltkViewer;
+#if USE_OGRE_VIEWER > 0
+	if (ogreViewer)
+       delete ogreViewer;
+#endif
+	if (customViewer)
+       delete customViewer;
 	if (commandWindow)
 		delete commandWindow;
 	if (characterCreator)
@@ -403,23 +430,23 @@ void BaseWindow::changeLayoutMode(int mode)
 
 
 		// resize the main window according to the viewer size
-		int viewerX = fltkViewer->x();
-		int viewerY = fltkViewer->y();
-		int viewerW = fltkViewer->w();
-		int viewerH = fltkViewer->h();
+		int viewerX = curViewer->x();
+		int viewerY = curViewer->y();
+		int viewerW = curViewer->w();
+		int viewerH = curViewer->h();
 
 		int curX = x();
 		int curY = y();
-		fltkViewer->resize(10, 28, viewerW, viewerH);
+		curViewer->resize(10, 28, viewerW, viewerH);
 
-		_mainGroup->add(fltkViewer);
+		_mainGroup->add(curViewer);
 		this->resizable(_mainGroup);
-		_mainGroup->resizable(fltkViewer);
+		_mainGroup->resizable(curViewer);
 
 		_mainGroup->resize(curX + 10, curY + 28, viewerW, viewerH);
 		this->resize(curX, curY, viewerW + 20, viewerH + 28);
 	
-		fltkViewer->damage(FL_DAMAGE_ALL);
+		curViewer->damage(FL_DAMAGE_ALL);
 		_mainGroup->damage(FL_DAMAGE_ALL);
 		this->damage(FL_DAMAGE_ALL);
 		
@@ -492,7 +519,7 @@ std::string BaseWindow::chooseDirectory(const std::string& label, const std::str
 SbmCharacter* BaseWindow::getSelectedCharacter()
 {
 #if !NO_OGRE_VIEWER_CMD
-	 SbmPawn* selectedPawn = fltkViewer->getObjectManipulationHandle().get_selected_pawn();
+	 SbmPawn* selectedPawn = curViewer->getObjectManipulationHandle().get_selected_pawn();
 	 if (!selectedPawn)
 		 return NULL;
 
@@ -509,7 +536,7 @@ void BaseWindow::show_viewer()
 		SbmShaderManager::singleton().setViewer(this);
 	#endif	
 	show();
-	fltkViewer->show_viewer();	
+	curViewer->show_viewer();	
 }
 
 void BaseWindow::hide_viewer()
@@ -520,17 +547,17 @@ void BaseWindow::hide_viewer()
 
 void BaseWindow::set_camera ( const SrCamera* cam )
 {
-   fltkViewer->set_camera(cam);
+   curViewer->set_camera(cam);
 }
 
 SrCamera* BaseWindow::get_camera()
 {
-	return fltkViewer->get_camera();
+	return curViewer->get_camera();
 }
 
 void BaseWindow::render () 
 { 
-	fltkViewer->redraw();
+	curViewer->redraw();
 } 
 
 void BaseWindow::root(SrSn* r)
@@ -564,11 +591,11 @@ void BaseWindow::resetWindow()
 		retargetCreatorWindow = NULL;
 	}
 
-	if (fltkViewer->_retargetStepWindow)
+	if (curViewer->_retargetStepWindow)
 	{
-		fltkViewer->_retargetStepWindow->hide();
-		delete fltkViewer->_retargetStepWindow;
-		fltkViewer->_retargetStepWindow = NULL;
+		curViewer->_retargetStepWindow->hide();
+		delete curViewer->_retargetStepWindow;
+		curViewer->_retargetStepWindow = NULL;
 	}
 
 	if (visemeViewerWindow)
@@ -640,7 +667,7 @@ void BaseWindow::ResetScene()
 	std::string mediaPath = SmartBody::SBScene::getSystemParameter("mediapath");
 	resetWindow();
 	SBGUIManager::singleton().resetGUI();
-	fltkViewer->resetViewer();
+	curViewer->resetViewer();
 
 	std::vector<SmartBody::SBSceneListener*> listeners;
 	std::vector<SmartBody::SBSceneListener*>& currentListeners = SmartBody::SBScene::getScene()->getSceneListeners();
@@ -1100,12 +1127,12 @@ void BaseWindow::LaunchJointMapViewerCB( Fl_Widget* widget, void* data )
 		}
 	}
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer && !rootWindow->fltkViewer->_retargetStepWindow)
+	if (rootWindow->curViewer && !rootWindow->curViewer->_retargetStepWindow)
 	{
-		rootWindow->fltkViewer->_retargetStepWindow = new RetargetStepWindow(150, 150, 1024, 500, "Rigging and Retargeting");
+		rootWindow->curViewer->_retargetStepWindow = new RetargetStepWindow(150, 150, 1024, 500, "Rigging and Retargeting");
 	}
-	rootWindow->fltkViewer->_retargetStepWindow->setApplyType(true);
-	rootWindow->fltkViewer->_retargetStepWindow->show();
+	rootWindow->curViewer->_retargetStepWindow->setApplyType(true);
+	rootWindow->curViewer->_retargetStepWindow->show();
 }
 
 
@@ -1203,7 +1230,7 @@ void BaseWindow::CameraFrameCB(Fl_Widget* widget, void* data)
 void BaseWindow::CameraFrameObjectCB(Fl_Widget* widget, void* data)
 {
 	BaseWindow* rootWindow = (BaseWindow*) data;
-	SbmPawn* pawn = rootWindow->fltkViewer->getObjectManipulationHandle().get_selected_pawn();
+	SbmPawn* pawn = rootWindow->curViewer->getObjectManipulationHandle().get_selected_pawn();
 	if (!pawn)
 	{
 		pawn = rootWindow->getSelectedCharacter();
@@ -1239,7 +1266,7 @@ void BaseWindow::RotateSelectedCB(Fl_Widget* widget, void* data)
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	
 #if !NO_OGRE_VIEWER_CMD
-	SbmPawn* pawn = rootWindow->fltkViewer->getObjectManipulationHandle().get_selected_pawn();
+	SbmPawn* pawn = rootWindow->curViewer->getObjectManipulationHandle().get_selected_pawn();
 	if (!pawn)
 	{
 		pawn = rootWindow->getSelectedCharacter();
@@ -1265,7 +1292,7 @@ void BaseWindow::SetDefaultCamera(Fl_Widget* widget, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->getData()->cameraMode = FltkViewer::Default;
+	rootWindow->curViewer->getData()->cameraMode = FltkViewer::Default;
    SmartBody::SBScene::getScene()->SetCameraLocked(false);
 #endif
 }
@@ -1274,7 +1301,7 @@ void BaseWindow::SetFreeLookCamera(Fl_Widget* widget, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->getData()->cameraMode = FltkViewer::FreeLook;
+	rootWindow->curViewer->getData()->cameraMode = FltkViewer::FreeLook;
    SmartBody::SBScene::getScene()->SetCameraLocked(false);
 #endif
 }
@@ -1285,7 +1312,7 @@ void BaseWindow::SetFollowRendererCamera(Fl_Widget* widget, void* data)
    if (SmartBody::SBScene::getScene()->isRemoteMode())
    {
       BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	   rootWindow->fltkViewer->getData()->cameraMode = FltkViewer::FollowRenderer;
+	  rootWindow->curViewer->getData()->cameraMode = FltkViewer::FollowRenderer;
       SmartBody::SBScene::getScene()->SetCameraLocked(true);
    }
 #endif
@@ -1316,7 +1343,7 @@ void BaseWindow::CameraCharacterShightCB(Fl_Widget* widget, void* data)
 		if(character) {
 			if(SmartBody::SBScene::getScene()->setCameraConeOfSight(character->getName())) {
 				// Renders eye beams
-				rootWindow->fltkViewer->getData()->eyeBeamMode = FltkViewer::ModeEyeBeams;
+				rootWindow->curViewer->getData()->eyeBeamMode = FltkViewer::ModeEyeBeams;
 				LOG("Camera sight: ON"); 
 			}
 		} else {
@@ -1449,7 +1476,7 @@ void BaseWindow::runScript(std::string filename)
 	if (character)
 		selectedCharacterName = character->getName();
 #if !NO_OGRE_VIEWER_CMD
-	SbmPawn* pawn = fltkViewer->getObjectManipulationHandle().get_selected_pawn();
+	SbmPawn* pawn = curViewer->getObjectManipulationHandle().get_selected_pawn();
 	std::string selectedTargetName = "";
 	if (pawn)
 		selectedTargetName = pawn->getName();
@@ -1720,10 +1747,10 @@ void BaseWindow::ModeEyebeamsCB(Fl_Widget* w, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
-	if (rootWindow->fltkViewer->getData()->eyeBeamMode)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoEyeBeams, NULL);
+	if (rootWindow->curViewer->getData()->eyeBeamMode)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdNoEyeBeams, NULL);
 	else
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdEyeBeams, NULL);
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdEyeBeams, NULL);
 }
 
 void BaseWindow::ModeGazeLimitCB(Fl_Widget* w, void* data)
@@ -1731,10 +1758,10 @@ void BaseWindow::ModeGazeLimitCB(Fl_Widget* w, void* data)
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
-	if (rootWindow->fltkViewer->getData()->gazeLimitMode)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoGazeLimit, NULL);
+	if (rootWindow->curViewer->getData()->gazeLimitMode)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdNoGazeLimit, NULL);
 	else
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdGazeLimit, NULL);
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdGazeLimit, NULL);
 #endif
 }
 
@@ -1742,10 +1769,10 @@ void BaseWindow::ModeEyelidCalibrationCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->eyeLidMode == FltkViewer::ModeNoEyeLids)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdEyeLids, NULL);
+	if (rootWindow->curViewer->getData()->eyeLidMode == FltkViewer::ModeNoEyeLids)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdEyeLids, NULL);
 	else
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoEyeLids, NULL);
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdNoEyeLids, NULL);
 #endif
 }
 
@@ -1754,7 +1781,7 @@ void BaseWindow::ShowSelectedCB(Fl_Widget* w, void* data)
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowSelection, NULL);
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdShowSelection, NULL);
 #endif
 }
 
@@ -1762,10 +1789,10 @@ void BaseWindow::ShadowsCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->shadowmode == FltkViewer::ModeNoShadows)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShadows, NULL);
+	if (rootWindow->curViewer->getData()->shadowmode == FltkViewer::ModeNoShadows)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdShadows, NULL);
 	else
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoShadows, NULL);
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdNoShadows, NULL);
 #endif
 }
 
@@ -1773,36 +1800,36 @@ void BaseWindow::ShadowsCB(Fl_Widget* w, void* data)
 void BaseWindow::ShadowsNoneCB( Fl_Widget* w, void* data )
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->getData()->shadowmode = FltkViewer::ModeNoShadows;
-	rootWindow->fltkViewer->updateOptions();
+	rootWindow->curViewer->getData()->shadowmode = FltkViewer::ModeNoShadows;
+	rootWindow->curViewer->updateOptions();
 }
 
 void BaseWindow::ShadowsMapCB( Fl_Widget* w, void* data )
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->getData()->shadowmode = FltkViewer::ModeShadowMap;
-	rootWindow->fltkViewer->updateOptions();
+	rootWindow->curViewer->getData()->shadowmode = FltkViewer::ModeShadowMap;
+	rootWindow->curViewer->updateOptions();
 }
 
 void BaseWindow::ShadowsStencilCB( Fl_Widget* w, void* data )
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->getData()->shadowmode = FltkViewer::ModeShadowStencil;
-	rootWindow->fltkViewer->updateOptions();
+	rootWindow->curViewer->getData()->shadowmode = FltkViewer::ModeShadowStencil;
+	rootWindow->curViewer->updateOptions();
 }
 
 void BaseWindow::FloorCB( Fl_Widget* w, void* data )
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->getData()->showFloor = !rootWindow->fltkViewer->getData()->showFloor;
-	rootWindow->fltkViewer->updateOptions();
+	rootWindow->curViewer->getData()->showFloor = !rootWindow->curViewer->getData()->showFloor;
+	rootWindow->curViewer->updateOptions();
 }
 
 void BaseWindow::FloorColorCB( Fl_Widget* w, void* data )
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdFloorColor, NULL);	
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdFloorColor, NULL);	
 #endif
 
 }
@@ -1810,16 +1837,16 @@ void BaseWindow::FloorColorCB( Fl_Widget* w, void* data )
 void BaseWindow::BackgroundColorCB( Fl_Widget* w, void* data )
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdBackground, NULL);
-	rootWindow->fltkViewer->updateOptions();
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdBackground, NULL);
+	rootWindow->curViewer->updateOptions();
 }
 
 void BaseWindow::TerrainShadedCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->terrainMode != FltkViewer::ModeTerrain)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdTerrain, NULL);
+	if (rootWindow->curViewer->getData()->terrainMode != FltkViewer::ModeTerrain)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdTerrain, NULL);
 #endif
 }
 
@@ -1827,16 +1854,16 @@ void BaseWindow::TerrainWireframeCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->terrainMode != FltkViewer::ModeTerrainWireframe)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdTerrainWireframe, NULL);
+	if (rootWindow->curViewer->getData()->terrainMode != FltkViewer::ModeTerrainWireframe)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdTerrainWireframe, NULL);
 #endif
 }
 void BaseWindow::TerrainNoneCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->terrainMode != FltkViewer::ModeNoTerrain)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoTerrain, NULL);
+	if (rootWindow->curViewer->getData()->terrainMode != FltkViewer::ModeNoTerrain)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdNoTerrain, NULL);
 #endif
 }
 
@@ -1844,8 +1871,8 @@ void BaseWindow::NavigationMeshNaviMeshCB( Fl_Widget* w, void* data )
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->navigationMeshMode != FltkViewer::ModeNavigationMesh)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNavigationMesh, NULL);
+	if (rootWindow->curViewer->getData()->navigationMeshMode != FltkViewer::ModeNavigationMesh)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdNavigationMesh, NULL);
 #endif
 }
 
@@ -1853,8 +1880,8 @@ void BaseWindow::NavigationMeshRawMeshCB( Fl_Widget* w, void* data )
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->navigationMeshMode != FltkViewer::ModeRawMesh)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdRawMesh, NULL);
+	if (rootWindow->curViewer->getData()->navigationMeshMode != FltkViewer::ModeRawMesh)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdRawMesh, NULL);
 #endif
 
 }
@@ -1863,8 +1890,8 @@ void BaseWindow::NavigationMeshNoneCB( Fl_Widget* w, void* data )
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->navigationMeshMode != FltkViewer::ModeNoNavigationMesh)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoNavigationMesh, NULL);
+	if (rootWindow->curViewer->getData()->navigationMeshMode != FltkViewer::ModeNoNavigationMesh)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdNoNavigationMesh, NULL);
 #endif
 }
 
@@ -1872,10 +1899,10 @@ void BaseWindow::ShowPawns(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->pawnmode != FltkViewer::ModePawnShowAsSpheres)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdPawnShowAsSpheres, NULL);
+	if (rootWindow->curViewer->getData()->pawnmode != FltkViewer::ModePawnShowAsSpheres)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdPawnShowAsSpheres, NULL);
 	else
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoPawns, NULL);
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdNoPawns, NULL);
 #endif
 }
 
@@ -1883,8 +1910,8 @@ void BaseWindow::ModeDynamicsCOMCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->dynamicsMode != FltkViewer::ModeShowCOM)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowCOM, NULL);
+	if (rootWindow->curViewer->getData()->dynamicsMode != FltkViewer::ModeShowCOM)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdShowCOM, NULL);
 #endif
 }
 
@@ -1892,8 +1919,8 @@ void BaseWindow::ModeDynamicsSupportPolygonCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->dynamicsMode != FltkViewer::ModeShowCOMSupportPolygon)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowCOMSupportPolygon, NULL);
+	if (rootWindow->curViewer->getData()->dynamicsMode != FltkViewer::ModeShowCOMSupportPolygon)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdShowCOMSupportPolygon, NULL);
 #endif
 }
 
@@ -1901,8 +1928,8 @@ void BaseWindow::ModeDynamicsMassesCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->dynamicsMode != FltkViewer::ModeShowMasses)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowMasses, NULL);
+	if (rootWindow->curViewer->getData()->dynamicsMode != FltkViewer::ModeShowMasses)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdShowMasses, NULL);
 #endif
 }
 
@@ -1910,7 +1937,7 @@ void BaseWindow::ModeDynamicsMassesCB(Fl_Widget* w, void* data)
 void BaseWindow::ShowBoundingVolumeCB( Fl_Widget* w, void* data )
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowBoundingVolume, NULL);
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdShowBoundingVolume, NULL);
 }
 
 void BaseWindow::SettingsDefaultMediaPathCB(Fl_Widget* w, void* data)
@@ -1955,7 +1982,7 @@ void BaseWindow::CreatePawnCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->create_pawn();
+	rootWindow->curViewer->create_pawn();
 #endif
 }
 
@@ -1963,7 +1990,7 @@ void BaseWindow::CreatePawnFromModelCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	std::string pawnName = rootWindow->fltkViewer->create_pawn();
+	std::string pawnName = rootWindow->curViewer->create_pawn();
 	SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(pawnName);
 	if (!pawn)
 		return;
@@ -2082,9 +2109,9 @@ void BaseWindow::SetTakeSnapshotCB(Fl_Widget* w, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	
-	if(!rootWindow->fltkViewer->getData()->saveSnapshot)
+	if(!rootWindow->curViewer->getData()->saveSnapshot)
 	{
-		FltkViewerData* data	= rootWindow->fltkViewer->getData();
+		FltkViewerData* data	= rootWindow->curViewer->getData();
 		std::string framesPath	= "C:/tmp/frames/";
 		const char* userInput	= fl_input("Path to store JPG files:", framesPath.c_str());
 		data->snapshotPath		= userInput;
@@ -2095,7 +2122,7 @@ void BaseWindow::SetTakeSnapshotCB(Fl_Widget* w, void* data)
 		fl_message("Store JPG: Disabled");
 	}
 
-	rootWindow->fltkViewer->getData()->saveSnapshot  = !rootWindow->fltkViewer->getData()->saveSnapshot;
+	rootWindow->curViewer->getData()->saveSnapshot  = !rootWindow->curViewer->getData()->saveSnapshot;
 }
 
 
@@ -2104,9 +2131,9 @@ void BaseWindow::SetTakeSnapshot_tgaCB(Fl_Widget* w, void* data)
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 		
-	if(!rootWindow->fltkViewer->getData()->saveSnapshot_tga)
+	if(!rootWindow->curViewer->getData()->saveSnapshot_tga)
 	{
-		FltkViewerData* data	= rootWindow->fltkViewer->getData();
+		FltkViewerData* data	= rootWindow->curViewer->getData();
 		std::string framesPath	= "C:/tmp/frames/";
 		const char* userInput	= fl_input("Path to store TGA files:", framesPath.c_str());
 		data->snapshotPath		= userInput;
@@ -2116,7 +2143,7 @@ void BaseWindow::SetTakeSnapshot_tgaCB(Fl_Widget* w, void* data)
 		fl_message("Store TGA: Disabled");
 	}
 	
-	rootWindow->fltkViewer->getData()->saveSnapshot_tga  = !rootWindow->fltkViewer->getData()->saveSnapshot_tga;
+	rootWindow->curViewer->getData()->saveSnapshot_tga  = !rootWindow->curViewer->getData()->saveSnapshot_tga;
 }
 
 void BaseWindow::TrackCharacterCB(Fl_Widget* w, void* data)
@@ -2151,7 +2178,7 @@ void BaseWindow::KinematicFootstepsCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowKinematicFootprints, NULL);
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdShowKinematicFootprints, NULL);
 #endif
 }
 
@@ -2159,7 +2186,7 @@ void BaseWindow::TrajectoryCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowTrajectory, NULL);	
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdShowTrajectory, NULL);	
 #endif
 }
 
@@ -2167,7 +2194,7 @@ void BaseWindow::GestureCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowGesture, NULL);	
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdShowGesture, NULL);	
 #endif
 }
 
@@ -2175,7 +2202,7 @@ void BaseWindow::JointLabelCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowJoints, NULL);	
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdShowJoints, NULL);	
 #endif
 }
 
@@ -2183,7 +2210,7 @@ void BaseWindow::SteeringCharactersCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdSteerCharactersGoalsOnly, NULL);
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdSteerCharactersGoalsOnly, NULL);
 #endif
 }
 
@@ -2191,7 +2218,7 @@ void BaseWindow::SteeringAllCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdSteerAll, NULL);
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdSteerAll, NULL);
 #endif
 }
 
@@ -2199,7 +2226,7 @@ void BaseWindow::SteeringNoneCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoSteer, NULL);	
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdNoSteer, NULL);	
 #endif
 }
 
@@ -2207,7 +2234,7 @@ void BaseWindow::LocomotionFootstepsCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowLocomotionFootprints, NULL);
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdShowLocomotionFootprints, NULL);
 #endif
 }
 
@@ -2215,7 +2242,7 @@ void BaseWindow::VelocityCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdShowVelocity, NULL);
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdShowVelocity, NULL);
 #endif
 }
 
@@ -2223,10 +2250,10 @@ void BaseWindow::GridCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->gridMode != FltkViewer::ModeShowGrid)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdGrid, NULL);
+	if (rootWindow->curViewer->getData()->gridMode != FltkViewer::ModeShowGrid)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdGrid, NULL);
 	else
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdNoGrid, NULL);
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdNoGrid, NULL);
 #endif
 }
 
@@ -2234,10 +2261,10 @@ void BaseWindow::ShowPoseExamples( Fl_Widget* w, void* data )
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->fltkViewer->getData()->reachRenderMode != FltkViewer::ModeShowExamples)
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdReachShowExamples, NULL);
+	if (rootWindow->curViewer->getData()->reachRenderMode != FltkViewer::ModeShowExamples)
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdReachShowExamples, NULL);
 	else
-		rootWindow->fltkViewer->menu_cmd(FltkViewer::CmdReachNoExamples, NULL);
+		rootWindow->curViewer->menu_cmd(FltkViewer::CmdReachNoExamples, NULL);
 #endif
 }
 
@@ -2301,8 +2328,8 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	Fl_Choice* resChoice = static_cast<Fl_Choice*>(widget);
 
-	int origX = rootWindow->fltkViewer->x();
-	int origY = rootWindow->fltkViewer->y();
+	int origX = rootWindow->curViewer->x();
+	int origY = rootWindow->curViewer->y();
 
 	size_t windowIndex = (size_t) data;	
 	
@@ -2311,7 +2338,7 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 	std::string resStr = menuItem->label();
 	if (resStr == "Default")
 	{
-		rootWindow->fltkViewer->resize(origX,origY,800,600);
+		rootWindow->curViewer->resize(origX,origY,800,600);
 		return;
 	}
 	else if (resStr == "Custom...")
@@ -2342,8 +2369,8 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 	int leftH = rootWindow->_leftGroup->h();
 
 	//std::cout << width << " " << height << std::endl;
-	rootWindow->fltkViewer->resize(rootWindow->fltkViewer->x(), rootWindow->fltkViewer->y(), width, height);
-	rootWindow->fltkViewer->damage(1);
+	rootWindow->curViewer->resize(rootWindow->curViewer->x(), rootWindow->curViewer->y(), width, height);
+	rootWindow->curViewer->damage(1);
 	rootWindow->resize(rootWindow->x(), rootWindow->y(), width + leftW + 20, height + leftH + 20);
 }
 
@@ -2517,8 +2544,8 @@ void BaseWindow::ShowCamerasCB( Fl_Widget* w, void* data )
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->getData()->showCameras = !rootWindow->fltkViewer->getData()->showCameras;
-	bool showCamera = rootWindow->fltkViewer->getData()->showCameras;
+	rootWindow->curViewer->getData()->showCameras = !rootWindow->curViewer->getData()->showCameras;
+	bool showCamera = rootWindow->curViewer->getData()->showCameras;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	std::vector<std::string> camNames = scene->getCameraNames();
 	for (unsigned int i=0;i<camNames.size();i++)
@@ -2537,8 +2564,8 @@ void BaseWindow::ShowLightsCB( Fl_Widget* w, void* data )
 {
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->getData()->showLights = !rootWindow->fltkViewer->getData()->showLights;
-	bool showLight = rootWindow->fltkViewer->getData()->showLights;
+	rootWindow->curViewer->getData()->showLights = !rootWindow->curViewer->getData()->showLights;
+	bool showLight = rootWindow->curViewer->getData()->showLights;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	const std::vector<std::string>& pawnNames = scene->getPawnNames();
 	for (unsigned int i=0;i<pawnNames.size();i++)
@@ -2565,7 +2592,7 @@ void BaseWindow::ShowSelectedCharacterCB( Fl_Widget* w, void* data )
 void BaseWindow::DeleteSelectionCB( Fl_Widget* widget, void* data )
 {
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->fltkViewer->deleteSelectedObject(0);
+	rootWindow->curViewer->deleteSelectedObject(0);
 }
 
 //== Viewer Factory ========================================================

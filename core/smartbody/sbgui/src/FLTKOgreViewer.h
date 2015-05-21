@@ -17,6 +17,7 @@ public:
 	void draw();
 	void updateOgreCamera();
 	void render ();
+	void drawFloor(bool shadowPass);
 	virtual void show_viewer();
 	virtual void hide_viewer();	
 	virtual void resize(int x, int y, int w, int h);
@@ -29,9 +30,12 @@ public:
 	virtual std::string rendererType() { return "ogre3D"; }
 	
 	static void checkVisibility();
+
+	void initOgreWindow();
+	EmbeddedOgre* getOgreInterface();	
 	// handle fltk mouse events ?		
 protected:
-	void initOgreWindow();
+	
 	void fltkRender();
 	void fltkRender2();
 	// ogre related stuff

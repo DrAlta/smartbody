@@ -73,8 +73,8 @@ std::vector<std::string> checkVisibility(const std::string& character)
 	SmartBody::SBScene* scene			= SmartBody::SBScene::getScene();
 
 	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
-	if (window && window->fltkViewer)
-		window->fltkViewer->make_current(); // make sure the OpenGL context is current
+	if (window && window->curViewer)
+		window->curViewer->make_current(); // make sure the OpenGL context is current
 
 	std::vector<std::string> visible	= scene->checkVisibility(character);
 	
@@ -100,8 +100,8 @@ std::vector<std::string> checkVisibility_current_view()
 
 	// make current
 	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
-	if (window && window->fltkViewer)
-		window->fltkViewer->make_current(); // make sure the OpenGL context is current
+	if (window && window->curViewer)
+		window->curViewer->make_current(); // make sure the OpenGL context is current
 	
 	std::vector<std::string> visible	= scene->checkVisibility_current_view();
 

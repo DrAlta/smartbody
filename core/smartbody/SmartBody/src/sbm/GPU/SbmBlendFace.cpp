@@ -802,7 +802,10 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 				GLuint vertexAttribLoc = aVertexPosition + usedWeights.size();
 				//LOG("vertexAttribLoc = %d", vertexAttribLoc);
 				glEnableVertexAttribArray(vertexAttribLoc);
-				aux->getVBOPos(i)->VBO()->BindBuffer();
+				VBOVec3f* vbo = aux->getVBOPos(i);
+				if (!vbo)
+					continue;
+				vbo->VBO()->BindBuffer();
 				glVertexAttribPointer(vertexAttribLoc, 3, GL_FLOAT, GL_FALSE, 0,0);
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 

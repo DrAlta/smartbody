@@ -285,6 +285,7 @@ copy /Y ..\..\..\..\core\smartbody\sbgui\external\cegui-0.8.2\bin\PyCEGUIOpenGLR
 copy /Y ..\..\..\..\core\smartbody\sbgui\external\Pinocchio\lib\Pinocchio_d.dll ..\bin
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..\bin
 copy /Y ..\bin\default.py .
+copy /Y ..\bin\.smartbodysettings .
 
 if not exist ..\..\..\..\bin\smartbody\sbgui\bin mkdir ..\..\..\..\bin\smartbody\sbgui\bin
 copy "$(TargetPath)" ..\..\..\..\bin\smartbody\sbgui\bin

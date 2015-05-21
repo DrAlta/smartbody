@@ -78,7 +78,7 @@ void FLTKListener::OnCharacterCreate( const std::string & name, const std::strin
 		pawn->registerObserver(this);		
 		if (window)
 		{
-			window->fltkViewer->updateLights();
+			window->curViewer->updateLights();
 		}
 	
 	}
@@ -134,11 +134,11 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 	if (window)
 	{
 		window->updateObjectList(name);
-		if (window->fltkViewer->_objManipulator.get_selected_pawn() == pawn)
+		if (window->curViewer->_objManipulator.get_selected_pawn() == pawn)
 		{
-			window->fltkViewer->_objManipulator.set_selected_pawn(NULL);
-			window->fltkViewer->_objManipulator.get_active_control()->detach_pawn();
-			window->fltkViewer->_objManipulator.removeActiveControl();
+			window->curViewer->_objManipulator.set_selected_pawn(NULL);
+			window->curViewer->_objManipulator.get_active_control()->detach_pawn();
+			window->curViewer->_objManipulator.removeActiveControl();
 		}
 	}
 
@@ -155,11 +155,11 @@ void FLTKListener::OnCharacterDelete( const std::string & name )
 
 	if (window)
 	{		
-		if (window->fltkViewer->_objManipulator.get_selected_pawn() == pawn)
+		if (window->curViewer->_objManipulator.get_selected_pawn() == pawn)
 		{
-			window->fltkViewer->_objManipulator.set_selected_pawn(NULL);
-			window->fltkViewer->_objManipulator.get_active_control()->detach_pawn();
-			window->fltkViewer->_objManipulator.removeActiveControl();
+			window->curViewer->_objManipulator.set_selected_pawn(NULL);
+			window->curViewer->_objManipulator.get_active_control()->detach_pawn();
+			window->curViewer->_objManipulator.removeActiveControl();
 		}
 	}
 
@@ -232,9 +232,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 			BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 			if (window)
 			{
-#if 1 //!USE_OGRE_VIEWER
-				window->fltkViewer->updateLights();
-#endif
+				window->curViewer->updateLights();
 			}
 
 
