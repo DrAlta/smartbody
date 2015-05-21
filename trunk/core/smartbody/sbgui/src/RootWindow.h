@@ -75,10 +75,13 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
       void ResetScene();
 
 #if USE_OGRE_VIEWER > 0
-		FLTKOgreWindow* fltkViewer;
+		FLTKOgreWindow* ogreViewer;
+		FltkViewer* customViewer;
 #else
-		FltkViewer* fltkViewer;
+		FltkViewer* customViewer;
 #endif
+		FltkViewer* curViewer;
+
 		int _layoutMode;
 
 		void changeLayoutMode(int mode);
@@ -235,6 +238,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void SteeringCharactersCB(Fl_Widget* w, void* data);
 		static void SteeringAllCB(Fl_Widget* w, void* data);
 		static void SteeringNoneCB(Fl_Widget* w, void* data);	
+
 		static void GridCB(Fl_Widget* w, void* data);	
 		static void FloorCB(Fl_Widget* w, void* data);	
 		static void FloorColorCB(Fl_Widget* w, void* data);	

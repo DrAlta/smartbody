@@ -395,8 +395,8 @@ int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 	string output_file = args.read_token();
 
-	if( windowHeight == 0 )		windowHeight = rootWindow->fltkViewer->h();;							// default window size
-	if( windowWidth == 0 )		windowWidth = rootWindow->fltkViewer->w();
+	if( windowHeight == 0 )		windowHeight = rootWindow->curViewer->h();;							// default window size
+	if( windowWidth == 0 )		windowWidth = rootWindow->curViewer->w();
 	if( output_file == "" )		
 	{
 		std::stringstream output_file_os;
@@ -684,7 +684,7 @@ int main( int argc, char **argv )	{
 	std::string festivalLibDir = "../../../../lib/festival/festival/lib/";
 	std::string festivalCacheDir = "../../../../data/cache/festival/";
 	std::string mediaPath = "../../../../data";
-
+	std::string renderer = "custom";
 
 	std::string cereprocLibDir = "../../../../lib/cerevoice/voices/";	
 
@@ -747,6 +747,16 @@ int main( int argc, char **argv )	{
 					{
 						LOG("Setting speech relay command to %s", tokens[t + 1].c_str());
 						SmartBody::SBScene::setSystemParameter("speechrelaycommand", tokens[t + 1]);
+						t++;
+					}
+				}
+				else if (tokens[t] == "renderer")
+				{
+					if (tokens.size() > t + 1)
+					{
+						renderer = tokens[t + 1];
+						LOG("Setting renderer to %s", tokens[t + 1].c_str());
+						SmartBody::SBScene::setSystemParameter("renderer", renderer);
 						t++;
 					}
 				}
@@ -934,6 +944,11 @@ int main( int argc, char **argv )	{
         else if ( s.compare("-noninteractive") == 0)
         {
                 isInteractive = false;
+        }
+		else if ( s.compare("-renderer=") == 0)
+        {
+				renderer = s;
+				renderer.erase( 0, 10 );
         }
 		else if ( s.compare("-env") == 0)
         {

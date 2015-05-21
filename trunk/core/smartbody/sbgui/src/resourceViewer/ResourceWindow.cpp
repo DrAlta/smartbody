@@ -733,7 +733,7 @@ void ResourceWindow::updateGestureMap( Fl_Tree_Item* tree, SmartBody::SBGestureM
 		SmartBody::SBGestureMap::GestureInfo& info = gestureMap->getGestureByIndex(i);
 
 		std::stringstream strstr;
-		strstr << info._lexeme << ", " << info._type << ", " << info._hand << ", " << info._style << ", " << info._posture;
+		strstr << info._lexeme << ", " << info._type << ", " << info._hand << ", " << info._style << ", " << info._posture << "-> " << info._animation;
 		Fl_Tree_Item* item = resourceTree->add(tree, strstr.str().c_str());	
 	}
 }

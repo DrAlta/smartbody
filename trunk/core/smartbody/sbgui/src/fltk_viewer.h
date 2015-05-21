@@ -324,6 +324,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 	void processDragAndDrop(std::string dndMsg, float x, float y);
 	void initGridList();	
 	void drawAllGeometries(bool shadowPass = false); // draw all objects with geometry ( so no debug rendering included )
+	void drawFloor(bool shadowPass = false);
 
 	void drawDeformableModels();
 	void drawGrid();
@@ -373,6 +374,8 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 
 	SrVec interactivePoint;
 
+	FLTKListener* fltkListener;	
+
 	
 	virtual void notify(SmartBody::SBSubject* subject);
 
@@ -416,7 +419,7 @@ protected:
 	std::vector<SrLight> _lights;
 
 	SmartBody::SBAnimationBlend* getCurrentCharacterAnimationBlend(); // for visualization plots	
-	FLTKListener* fltkListener;	
+
  };
 
 

@@ -1398,6 +1398,43 @@ void cameraInverse(float* dst, float* src)
 	dst[15] = 1.0f;
 }
 
+void FltkViewer::drawFloor(bool shadowPass)
+{
+	if (_data->showFloor)
+	{
+		static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
+		static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
+		static GLfloat mat_diffuse[] = { 0.5f,  0.5f,    0.5f,    1.f };
+		static GLfloat mat_speclar[] = { 0.f,  0.f,    0.f,    1.f }; 
+		glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
+		glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );
+
+		_data->floorColor.get(mat_diffuse);
+		glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse );	
+		glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar );
+		glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
+		glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
+		glEnable(GL_LIGHTING);
+		float floorSize = 1200;
+		float planeY = -0.0f;
+		glBegin(GL_QUADS);
+		glTexCoord2f(0,0);
+		glNormal3f(0,1,0);
+		glVertex3f(-floorSize,planeY,floorSize);	
+		glTexCoord2f(0,1);
+		glNormal3f(0,1,0);
+		glVertex3f(floorSize,planeY,floorSize);
+		glTexCoord2f(1,1);
+		glNormal3f(0,1,0);
+		glVertex3f(floorSize,planeY,-floorSize);
+		glTexCoord2f(1,0);
+		glNormal3f(0,1,0);
+		glVertex3f(-floorSize,planeY,-floorSize);	
+		glEnd();
+	}	
+}
+
+
 // This is call when NOT using the Ogre3D rendering
 void FltkViewer::drawAllGeometries(bool shadowPass)
 {
@@ -1494,40 +1531,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 
 	printOglError2("drawAllGeometries()", 6);
 	
-#if USE_OGRE_VIEWER  < 1 // ogre will draw its own floor
-	if (_data->showFloor)
-	{
-		static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
-		static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
-		static GLfloat mat_diffuse[] = { 0.5f,  0.5f,    0.5f,    1.f };
-		static GLfloat mat_speclar[] = { 0.f,  0.f,    0.f,    1.f }; 
-		glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
-		glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );
-
-		_data->floorColor.get(mat_diffuse);
-		glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse );	
-		glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar );
-		glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
-		glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
-		glEnable(GL_LIGHTING);
-		float floorSize = 1200;
-		float planeY = -0.0f;
-		glBegin(GL_QUADS);
-		glTexCoord2f(0,0);
-		glNormal3f(0,1,0);
-		glVertex3f(-floorSize,planeY,floorSize);	
-		glTexCoord2f(0,1);
-		glNormal3f(0,1,0);
-		glVertex3f(floorSize,planeY,floorSize);
-		glTexCoord2f(1,1);
-		glNormal3f(0,1,0);
-		glVertex3f(floorSize,planeY,-floorSize);
-		glTexCoord2f(1,0);
-		glNormal3f(0,1,0);
-		glVertex3f(-floorSize,planeY,-floorSize);	
-		glEnd();
-	}	
-#endif
+	drawFloor(shadowPass);
 
 	
 	
