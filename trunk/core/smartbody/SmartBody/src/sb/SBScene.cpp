@@ -4395,7 +4395,7 @@ std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>&
 	SrMat modelViewMat = SrMat(m);
 	SmartBody::SBScene * scene	= SmartBody::SBScene::getScene();
 	// sort the pawn from front to back
-	std::vector<std::pair<float,int>> pawnZSortedList;
+	std::vector<std::pair<float,int> > pawnZSortedList;
 	for (unsigned int i=0;i<testPawns.size();i++)
 	{
 		SmartBody::SBPawn* pawn		= scene->getPawn(testPawns[i]);
