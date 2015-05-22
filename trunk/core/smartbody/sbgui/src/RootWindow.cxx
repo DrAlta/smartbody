@@ -281,8 +281,9 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	// add the viewer
 	int viewerWidth = 640 ;
 	int viewerHeight = h - curY - 10;
+	std::string renderer = "custom";
 #if USE_OGRE_VIEWER > 0
-	std::string renderer = SmartBody::SBScene::getScene()->getSystemParameter("renderer");
+	renderer = SmartBody::SBScene::getScene()->getSystemParameter("renderer");
 	if (renderer == "ogre" || renderer == "OGRE")
 	{
 		ogreViewer = new FLTKOgreWindow(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);	
