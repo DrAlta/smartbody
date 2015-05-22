@@ -2423,7 +2423,8 @@ void DeformableMeshInstance::updateTransformBuffer()
 {
 	if (!_mesh) return;
 	unsigned int boneSize = 120;
-	int transformSize = std::max(boneSize,_mesh->boneJointIdxMap.size());
+	size_t jointMapSize = _mesh->boneJointIdxMap.size();
+	int transformSize = (boneSize > jointMapSize) ? boneSize : jointMapSize;
 	if (transformBuffer.size() != transformSize)
 		transformBuffer.resize(transformSize);
 	std::map<std::string,int>& boneIdxMap = _mesh->boneJointIdxMap;
