@@ -226,7 +226,7 @@ public:
 	SBAPI DeformableMesh* getDeformableMesh() { return _mesh; }
 	SBAPI SmartBody::SBCharacter* getCharacter() { return _character; }
 	SBAPI SmartBody::SBPawn* getPawn() { return _pawn; }
-	void updateTransformBuffer();
+	SBAPI void updateTransformBuffer();
 
 protected:
 	void cleanUp();
