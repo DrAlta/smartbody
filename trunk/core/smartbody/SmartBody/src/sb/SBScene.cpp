@@ -2006,8 +2006,7 @@ bool copyDir(boost::filesystem2::path const & source,boost::filesystem2::path co
 				// Found file: Copy
 				fs::copy_file(
 					current,
-					destination / current.filename()
-					);
+					destination / current.filename(), fs::copy_option::none);
 			}
 		}
 		catch(fs::filesystem_error const & e)
@@ -2373,7 +2372,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 			std::string newFileName = outPath.string()+"/"+motionFile.filename();
 #endif
 			if (!fs::exists(newFileName))
-				fs::copy_file(motionFile,fs::path(newFileName));
+				fs::copy_file(motionFile,fs::path(newFileName), fs::copy_option::none);
 		}
 		else
 		{
@@ -2441,7 +2440,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 			std::string newFileName = outPath.string()+"/"+skelFile.filename();
 #endif
 			if (!fs::exists(newFileName))
-				fs::copy_file(skelFile,fs::path(newFileName));
+				fs::copy_file(skelFile,fs::path(newFileName), fs::copy_option::none);
 		}
 		else
 		{
@@ -2608,7 +2607,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 #else
 			std::string newFileName = newPath.string()+"/"+motionFile.filename();
 #endif
-			fs::copy_file(motionFile,fs::path(newFileName));
+			fs::copy_file(motionFile,fs::path(newFileName), fs::copy_option::none);
 		}
 else
 		{
@@ -2640,7 +2639,7 @@ else
 
 		  //LOG("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
 		//skel->save(newFileName);
-		//copy_file(path(skelFile),path(newFileName));
+		//copy_file(path(skelFile),path(newFileName), fs::copy_option::none);
 
 		if (!writeToZip)
 		{	
@@ -2654,7 +2653,7 @@ else
 			std::string newFileName = newPath.string()+"/"+skelFile.filename();
 #endif
 
-			fs::copy_file(skelFile,fs::path(newFileName));
+			fs::copy_file(skelFile,fs::path(newFileName), fs::copy_option::none);
 		}
 		else
 		{
