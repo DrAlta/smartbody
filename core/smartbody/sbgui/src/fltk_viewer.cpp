@@ -2107,7 +2107,7 @@ std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 					// copy over the file if it is an image file
 					std::string targetImgFile = meshDir+meshName+"/"+basename+extname;
 					if (!boost::filesystem::exists(targetImgFile))
-						boost::filesystem::copy_file(filename,targetImgFile);
+						boost::filesystem::copy_file(filename,targetImgFile, fs::copy_option::none);
 				}
 			}
 		}
@@ -2149,9 +2149,9 @@ std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 			std::string targetSkelFile = skeletonDir+filebasename+fileextension;
 			std::string targetMeshFile = meshDir+meshName+"/"+filebasename+fileextension;
 			if (!boost::filesystem::exists(targetSkelFile))
-				boost::filesystem::copy_file(fullPathName,targetSkelFile);			
+				boost::filesystem::copy_file(fullPathName,targetSkelFile, fs::copy_option::none);	
 			if (!boost::filesystem::exists(targetMeshFile))
-				boost::filesystem::copy_file(fullPathName,targetMeshFile);
+				boost::filesystem::copy_file(fullPathName,targetMeshFile, fs::copy_option::none);
 			scene->loadAsset(targetSkelFile);
 		}
 #endif

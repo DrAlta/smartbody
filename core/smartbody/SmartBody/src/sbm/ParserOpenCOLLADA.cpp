@@ -2996,7 +2996,7 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 				std::string texBaseName = boost::filesystem::basename( tex->getFileName() );
 				std::string newFileName = outPathname + "/" + texBaseName + ext;
 				if (!fs::exists(fs::path(newFileName)))
-					fs::copy_file(fs::path(tex->getFileName()),fs::path(newFileName));
+					fs::copy_file(fs::path(tex->getFileName()),fs::path(newFileName), fs::copy_option::none);
 			}
 		}
 	}
