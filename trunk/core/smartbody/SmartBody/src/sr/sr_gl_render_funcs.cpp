@@ -283,7 +283,6 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	bool useGPUBlendShapes = SmartBody::SBScene::getScene()->getBoolAttribute("useGPUBlendshapes");
 	if(useGPUBlendShapes)
 	{
-
 			SrVec offsetTrans_;
 			SrVec offsetRot_;
 

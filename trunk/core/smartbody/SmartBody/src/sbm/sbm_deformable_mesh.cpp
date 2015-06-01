@@ -1782,6 +1782,18 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 		}
 	}
 
+	if(tex_w > 2048)
+		tex_w = 2048;
+
+	if(tex_h > 2048)
+		tex_h = 2048;
+
+	if(_tempFBO == 0) 
+	{
+		glGenFramebuffersEXT(1, &_tempFBO);
+	}
+
+
 	// Aux textures used when calling BlendAllAppearancesPairwise to store temporary results for texture blending pair wise
 	if(_tempTexPairs == NULL) 
 	{
@@ -1793,10 +1805,12 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#if !defined(ANDROID_BUILD)
+#if defined(__ANDROID__) || defined(SB_IPHONE)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_w, tex_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+#else
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-#endif
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_w, tex_h, 0, GL_RGB, GL_FLOAT, NULL);
+#endif
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}
@@ -1839,7 +1853,11 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 
 		// New attempt to blend textures with masks (also renders a face). It uses the _tempTexWithMask, which are the texture maps with the masking encoded in its ALPHA channel.
 		// The _tempTexWithMask texture were created above in the SbmBlendTextures::ReadMasks call
-		SbmBlendTextures::BlendGeometryWithMasks( _tempFBOTexWithMask, weights, _tempTexWithMask, texture_names, this,  SbmBlendTextures::getShader("BlendGeometryWithMasks"), translation, rotation);
+		//SbmBlendTextures::BlendGeometryWithMasks( _tempFBOTexWithMask, weights, _tempTexWithMask, texture_names, this,  SbmBlendTextures::getShader("BlendGeometryWithMasks"), translation, rotation);
+		
+		SbmBlendTextures::BlendGeometryWithMasksFeedback( _tempFBOTexWithMask, weights, _tempTexWithMask, texture_names, this,  SbmBlendTextures::getShader("BlendGeometryWithMasksFeedback"), translation, rotation);
+		//SbmBlendTextures::BlendTextureWithMasks(_tempFBO, _tempTexPairs[0], weights, _tempTexWithMask, texture_names, this,  SbmBlendTextures::getShader("BlendAllTexturesWithMask"),tex_w, tex_h);
+		SbmBlendTextures::RenderGeometryWithMasks( _tempFBOTexWithMask, weights, _tempTexWithMask, texture_names, this,  SbmBlendTextures::getShader("RenderGeometryWithMasks"), translation, rotation);
 
 		// Blends geometry and texture in the same GLSL (also renders a face) (this does NOT use masking)
 		//SbmBlendTextures::BlendGeometry( _tempFBOPairs, weights, texIDs, texture_names, this,  SbmBlendTextures::getShader("BlendGeometry"));
@@ -2447,11 +2465,49 @@ void DeformableMeshInstance::updateTransformBuffer()
 }
 
 
+void DeformableMeshInstance::updateSkin( const std::vector<SrVec>& restPos, std::vector<SrVec>& deformPos )
+{
+	_skeleton->update_global_matrices();
+	updateTransformBuffer();
+
+	for (unsigned int i=0;i<restPos.size();i++)
+	{
+		SrVec vPos = restPos[i]*_meshScale;
+		SrVec vSkinPos = SrVec(0,0,0);
+		// 		SrVec4i& boneID1 = _mesh->boneIDBuf[0][i];
+		// 		SrVec4&  boneWeight1 = _mesh->boneWeightBuf[0][i];
+		// 		SrVec4i& boneID2 = _mesh->boneIDBuf[1][i];
+		// 		SrVec4&  boneWeight2 = _mesh->boneWeightBuf[1][i];
+		for (int k=0;k<_mesh->boneCountBuf[i];k++)
+			//for (int k=0;k<8;k++)
+		{	
+
+#if USE_SKIN_WEIGHT_SIZE_8
+			int a = (k<4) ? 0 : 1;
+			int b = k%4;		
+#else
+			if (k >= 4)
+				break;
+			int a = 0;
+			int b = k;			
+#endif
+			vSkinPos += (vPos*transformBuffer[_mesh->boneIDBuf[a][i][b]])*_mesh->boneWeightBuf[a][i][b];
+		}
+
+		deformPos[i] = vSkinPos;
+	}
+}
+
+
 SBAPI void DeformableMeshInstance::updateFast()
 {
 	if (!_updateMesh)	return;
 	if (!_skeleton || !_mesh) return;	
 	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
+
+	updateSkin(_mesh->posBuf,  _deformPosBuf);
+
+#if 0
 	_skeleton->update_global_matrices();
 	updateTransformBuffer();
 
@@ -2481,8 +2537,7 @@ SBAPI void DeformableMeshInstance::updateFast()
 
 		_deformPosBuf[i] = vSkinPos;
 	}
-
-	
+#endif
 }
 
 
@@ -2495,8 +2550,8 @@ void DeformableMeshInstance::update()
 	if (!_skeleton || !_mesh) return;	
 	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
 	_skeleton->update_global_matrices();
-	//updateFast();
-	//return;
+	updateFast();
+	return;
 
 	int maxJoint = -1;
 	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
