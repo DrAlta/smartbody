@@ -227,7 +227,7 @@ public:
 	SBAPI SmartBody::SBCharacter* getCharacter() { return _character; }
 	SBAPI SmartBody::SBPawn* getPawn() { return _pawn; }
 	SBAPI void updateTransformBuffer();
-
+	void updateSkin(const std::vector<SrVec>& restPos, std::vector<SrVec>& deformPos);
 protected:
 	void cleanUp();
 };

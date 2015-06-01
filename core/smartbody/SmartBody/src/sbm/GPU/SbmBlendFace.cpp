@@ -428,6 +428,75 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
 		}
 	}
+	else if(_shaderName.compare("BlendGeometryWithMasksFeedback") == 0)
+	{
+		SbmShaderProgram* program		= SbmShaderManager::singleton().getShader(_shaderName);
+
+		//	If GLSL program does not exist yet in SbmShaderManager
+		if(program) 
+		{
+			return program->getShaderProgram();
+		}
+		//	If the GLSL shader is not in the ShaderManager yet
+		else
+		{
+			LOG("Program does not exist yet");
+
+			const std::string shaderVs	= shaderPath + "blendGeometryWithMasksFeedback.vert";
+			const std::string shaderFs	= ""; // no fragment shader//shaderPath + "blendGeometryWithMasks.frag";
+
+			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+			SbmShaderManager::singleton().buildShaders();
+
+			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
+		}
+	}
+	else if(_shaderName.compare("RenderGeometryWithMasks") == 0)
+	{
+		SbmShaderProgram* program		= SbmShaderManager::singleton().getShader(_shaderName);
+
+		//	If GLSL program does not exist yet in SbmShaderManager
+		if(program) 
+		{
+			return program->getShaderProgram();
+		}
+		//	If the GLSL shader is not in the ShaderManager yet
+		else
+		{
+			LOG("Program does not exist yet");
+
+			const std::string shaderVs	= shaderPath + "renderGeometryWithMask.vert";
+			const std::string shaderFs	= shaderPath + "renderGeometryWithMask.frag";
+
+			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+			SbmShaderManager::singleton().buildShaders();
+
+			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
+		}
+	}
+	else if(_shaderName.compare("BlendAllTexturesWithMask") == 0)
+	{
+		SbmShaderProgram* program		= SbmShaderManager::singleton().getShader(_shaderName);
+
+		//	If GLSL program does not exist yet in SbmShaderManager
+		if(program) 
+		{
+			return program->getShaderProgram();
+		}
+		//	If the GLSL shader is not in the ShaderManager yet
+		else
+		{
+			LOG("Program does not exist yet");
+
+			const std::string shaderVs	= shaderPath + "blendAllTexturesWithMask.vert";
+			const std::string shaderFs	= shaderPath + "blendAllTexturesWithMask.frag";
+
+			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+			SbmShaderManager::singleton().buildShaders();
+
+			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
+		}
+	}
 	else
 	{
 		LOG("*** ERROR: Invalid BlendTextures shader");
@@ -670,7 +739,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 	bool useMasks		= false;
 	bool overlayMasks	= false;
 
-	if (meshInstance->isStaticMesh())
+	//if (meshInstance->isStaticMesh())
 	{
 		SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
 		SmartBody::SBPawn* pawn		= skel->getPawn();
@@ -902,6 +971,174 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 
 	delete aux;
 
+	SbmShaderProgram::printOglError("BlendGeometry FINAL");
+#endif
+}
+
+void SbmBlendTextures::RenderGeometryWithMasks(GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program, glm::mat4x4 translation, glm::mat4x4 rotation)
+{
+#if !defined(__ANDROID__)
+	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
+
+	bool showMasks		= false;
+	bool useMasks		= false;
+	bool overlayMasks	= false;
+
+	//if (meshInstance->isStaticMesh())
+	{
+		SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
+		SmartBody::SBPawn* pawn		= skel->getPawn();
+		SmartBody::SBAttribute* maskAttribute;
+		// Checks showMasks attribute: If masks for the blendshape are present, user can enable or disable the visualization for debugging purposes
+		maskAttribute = pawn->getAttribute("blendShape.showMasks");
+		if (!maskAttribute)
+		{
+			showMasks = false;
+		}
+		else
+		{
+			showMasks	= pawn->getBoolAttribute("blendShape.showMasks");
+		}
+
+		// Checks useMasks attribute: If masks for the blendshape are present, user can enable or disable the use of them
+		maskAttribute = pawn->getAttribute("blendShape.useMasks");
+		if (!maskAttribute)
+		{
+			useMasks = false;
+		}
+		else
+		{
+			useMasks	= pawn->getBoolAttribute("blendShape.useMasks");
+		}
+
+		// Checks overlayMasks attribute
+		maskAttribute = pawn->getAttribute("blendShape.overlayMasks");
+		if (!maskAttribute)
+		{
+			overlayMasks = false;
+		}
+		else
+		{
+			overlayMasks	= pawn->getBoolAttribute("blendShape.overlayMasks");
+		}
+	}
+
+	SbmShaderProgram::printOglError("SbmBlendTextures::BlendGeometry #0");
+
+	SbmBlendFace * aux = new SbmBlendFace();
+
+	
+	SrSnModel* writeToBaseModel = NULL;
+	SrSnModel* baseModel		= NULL;
+	bool foundBaseModel			= false;
+
+	const int MAX_SHAPES = 14;	// I can't enable more than 16 attributes (15 vertex buffer + 1 texture coordinate buffer)
+	// NOTE: Also change #define in shader if you change this value
+
+	std::vector<float>	usedWeights;
+	std::vector<int>	usedShapeIDs;
+
+	GLfloat modelview_matrix[16];
+	GLfloat projection_matrix[16];
+
+	glGetFloatv(GL_PROJECTION_MATRIX, projection_matrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
+
+	glUseProgram(program);
+	GLuint aVertexTexcoord	= glGetAttribLocation(program, "aVertexTexcoord");
+	GLuint aVertexPosition	= glGetAttribLocation(program, "aVertexPosition");
+
+	for(int i=0; i<weights.size(); i++)
+	{
+		// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
+		if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
+ 		{
+// 			GLuint vertexAttribLoc = aVertexPosition + usedWeights.size();
+// 			//LOG("vertexAttribLoc = %d", vertexAttribLoc);
+// 			glEnableVertexAttribArray(vertexAttribLoc);
+// 			VBOVec3f* vbo = aux->getVBOPos(i);
+// 			if (!vbo)
+// 				continue;
+// 			vbo->VBO()->BindBuffer();
+// 			glVertexAttribPointer(vertexAttribLoc, 3, GL_FLOAT, GL_FALSE, 0,0);
+// 			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			// Pushes this weight to the vector of used weights
+			usedWeights.push_back(weights[i]);
+			usedShapeIDs.push_back(i);
+		}
+	}
+	glEnableVertexAttribArray(aVertexPosition);
+	glVertexAttribPointer(aVertexPosition, 3, GL_FLOAT, GL_FALSE, 0, &meshInstance->_deformPosBuf[0]);
+	glEnableVertexAttribArray(aVertexTexcoord);
+	glVertexAttribPointer(aVertexTexcoord, 2, GL_FLOAT, GL_FALSE, 0,&_mesh->texCoordBuf[0]);
+	
+	GLuint uMatrixMV		= glGetUniformLocation(program, "uMatrixMV");
+	GLuint uMatrixProj		= glGetUniformLocation(program, "uMatrixProj");
+	GLuint uWeights			= glGetUniformLocation(program, "uWeights");
+	GLuint uBorderVertices	= glGetUniformLocation(program, "uBorderVertices");
+	GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
+	//GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
+	GLuint uRotate			= glGetUniformLocation(program, "uRotate");
+	GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
+	GLuint uShowMasks		= glGetUniformLocation(program, "uShowMasks");
+	GLuint uUseMasks		= glGetUniformLocation(program, "uUseMasks");
+	GLuint uOverlayMasks	= glGetUniformLocation(program, "uOverlayMasks");
+	GLuint uUsedShapeIDs	= glGetUniformLocation(program, "uUsedShapeIDs");
+
+	SbmShaderProgram::printOglError("BlendGeometry GetUniformLocation");
+	int * image_array		= new int[MAX_SHAPES];
+	float * w				= new float[usedWeights.size()];
+	int * usedShapesID_array = new int[usedShapeIDs.size()];
+
+	for(int i=0; i<MAX_SHAPES; i++)
+	{
+		if(i < usedWeights.size())
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texIDs[usedShapeIDs[i]]);
+
+			image_array[i]			= i;
+			w[i]					= usedWeights[i];
+			usedShapesID_array[i]	= usedShapeIDs[i];
+		}
+		// Textures not used, but we still need to pass 15 textures to the fragment shader for completeness
+		else
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+			image_array[i]	= i;
+		}
+	}
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+	glUniform1i(uNeutralSampler, 0);
+
+	glUniformMatrix4fv(uMatrixMV, 1, GL_FALSE, modelview_matrix);
+	glUniformMatrix4fv(uMatrixProj, 1, GL_FALSE, projection_matrix);
+	//glUniformMatrix4fv(uTranslate, 1, GL_FALSE, glm::value_ptr(translation));
+	glUniformMatrix4fv(uRotate, 1, GL_FALSE, glm::value_ptr(rotation));
+	glUniform1fv(uWeights, usedWeights.size(), w);
+	glUniform1iv(uUsedShapeIDs, usedShapeIDs.size(), usedShapesID_array);
+	glUniform1i(uNumberOfShapes, usedWeights.size());
+	glUniform1iv(uNeutralSampler, MAX_SHAPES, image_array);
+	glUniform1i(uBorderVertices,  14);
+	glUniform1i(uShowMasks,  showMasks);
+	glUniform1i(uUseMasks,  useMasks);
+	glUniform1i(uOverlayMasks,  overlayMasks);
+
+	//aux->subMeshTris[0]->VBO()->BindBuffer();
+	glDrawElements(GL_TRIANGLES, _mesh->triBuf.size()*3 , GL_UNSIGNED_INT,&_mesh->triBuf[0]);
+	//aux->subMeshTris[0]->VBO()->UnbindBuffer();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glDisableVertexAttribArray(aVertexPosition );
+	glDisableVertexAttribArray(aVertexTexcoord);
+
+	glUseProgram(0);
 	SbmShaderProgram::printOglError("BlendGeometry FINAL");
 #endif
 }
@@ -1641,4 +1878,407 @@ void SbmBlendTextures::BlendTwoFBO(GLuint tex0, GLuint tex1, GLuint FBODst, GLui
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);                                                                                                            // Bind the frame buffer object
 	glPopMatrix();
 }
+
+void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program, glm::mat4x4 translation, glm::mat4x4 rotation )
+{
+#if 1
+	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
+
+	bool showMasks		= false;
+	bool useMasks		= false;
+	bool overlayMasks	= false;
+
+	//if (meshInstance->isStaticMesh())
+	{
+		SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
+		SmartBody::SBPawn* pawn		= skel->getPawn();
+		SmartBody::SBAttribute* maskAttribute;
+		// Checks showMasks attribute: If masks for the blendshape are present, user can enable or disable the visualization for debugging purposes
+		maskAttribute = pawn->getAttribute("blendShape.showMasks");
+		if (!maskAttribute)
+		{
+			showMasks = false;
+		}
+		else
+		{
+			showMasks	= pawn->getBoolAttribute("blendShape.showMasks");
+		}
+
+		// Checks useMasks attribute: If masks for the blendshape are present, user can enable or disable the use of them
+		maskAttribute = pawn->getAttribute("blendShape.useMasks");
+		if (!maskAttribute)
+		{
+			useMasks = false;
+		}
+		else
+		{
+			useMasks	= pawn->getBoolAttribute("blendShape.useMasks");
+		}
+
+		// Checks overlayMasks attribute
+		maskAttribute = pawn->getAttribute("blendShape.overlayMasks");
+		if (!maskAttribute)
+		{
+			overlayMasks = false;
+		}
+		else
+		{
+			overlayMasks	= pawn->getBoolAttribute("blendShape.overlayMasks");
+		}
+	}
+
+	SbmBlendFace * aux = new SbmBlendFace();
+
+	SbmShaderProgram::printOglError("Setup Transform Feedback begin");
+	std::vector<SrVec> blendedVerties(_mesh->posBuf.size());
+	GLuint verticesFeedback;
+	const char* attr[1]= {"outPos"};
+	glGenBuffers( 1, &verticesFeedback);
+	SbmShaderProgram::printOglError("Setup Transform Feedback glGenBuffer");
+	glBindBuffer( GL_ARRAY_BUFFER, verticesFeedback);
+	SbmShaderProgram::printOglError("Setup Transform Feedback glBindBuffer");
+	glBufferData( GL_ARRAY_BUFFER, blendedVerties.size() * sizeof(SrVec), 0,  GL_DYNAMIC_READ);
+	SbmShaderProgram::printOglError("Setup Transform Feedback glBufferData");
+	glBindBufferBase( GL_TRANSFORM_FEEDBACK_BUFFER, 0, verticesFeedback );
+	SbmShaderProgram::printOglError("Setup Transform Feedback glBufferBase");
+	glTransformFeedbackVaryings( program, 1, attr, GL_INTERLEAVED_ATTRIBS );
+	glLinkProgram(program);
+	SbmShaderProgram::printOglError("Setup Transform Feedback end");
+	aux->setDeformableMesh(_mesh);
+	aux->buildVertexBufferGPU(weights.size());
+	SbmShaderProgram::printOglError("Build vertex buffer end");
+	SrSnModel* writeToBaseModel = NULL;
+	SrSnModel* baseModel		= NULL;
+	bool foundBaseModel			= false;
+
+	std::vector<SrArray<SrPnt>*> shapes;
+
+	SrArray<SrPnt> neutralV;
+	SrArray<SrPnt> visemeV;
+
+	// find the base shape and other shapes
+	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
+	for (mIter = _mesh->blendShapeMap.begin(); mIter != _mesh->blendShapeMap.end(); ++mIter)
+	{
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
+			{
+				baseModel		= mIter->second[i];
+				foundBaseModel	= true;
+				break;
+			}
+		}
+		if (baseModel == NULL)
+		{
+			LOG("original base model cannot be found");
+			continue;
+		}
+
+		neutralV	= (baseModel->shape().V);
+
+		// Copies reference to the shape vector
+		shapes.push_back(&(baseModel->shape().V));
+
+		for (size_t i = 0; i < mIter->second.size(); ++i)
+		{
+			if ((i == 0) ||(!mIter->second[i]))
+			{
+				continue;
+			}
+
+			visemeV = mIter->second[i]->shape().V;
+			aux->addFace(mIter->second[i]);
+
+			// Copies reference to the shape vector
+			shapes.push_back(&(baseModel->shape().V));
+		}
+	}
+
+	const int MAX_SHAPES = 14;	// I can't enable more than 16 attributes (15 vertex buffer + 1 texture coordinate buffer)
+	// NOTE: Also change #define in shader if you change this value
+
+	std::vector<float>	usedWeights;
+	std::vector<int>	usedShapeIDs;
+
+	
+	glUseProgram(program);
+	glEnable(GL_RASTERIZER_DISCARD);
+
+	GLuint aVertexTexcoord	= glGetAttribLocation(program, "aVertexTexcoord");
+	GLuint aVertexPosition	= glGetAttribLocation(program, "aVertexPosition");
+
+	for(int i=0; i<weights.size(); i++)
+	{
+		// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
+		if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
+		{
+			GLuint vertexAttribLoc = aVertexPosition + usedWeights.size();
+			//LOG("vertexAttribLoc = %d", vertexAttribLoc);
+			glEnableVertexAttribArray(vertexAttribLoc);
+			VBOVec3f* vbo = aux->getVBOPos(i);
+			if (!vbo)
+				continue;
+			vbo->VBO()->BindBuffer();
+			glVertexAttribPointer(vertexAttribLoc, 3, GL_FLOAT, GL_FALSE, 0,0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			// Pushes this weight to the vector of used weights
+			usedWeights.push_back(weights[i]);
+			usedShapeIDs.push_back(i);
+		}
+	}
+	SbmShaderProgram::printOglError("BlendGeometry glVertexAttributePointer");
+
+	glEnableVertexAttribArray(aVertexTexcoord);
+	aux->getVBOTexCoord()->VBO()->BindBuffer();
+	glVertexAttribPointer(aVertexTexcoord, 2, GL_FLOAT, GL_FALSE, 0,0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	GLuint uWeights			= glGetUniformLocation(program, "uWeights");
+	GLuint uBorderVertices	= glGetUniformLocation(program, "uBorderVertices");
+	GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
+	//GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
+	//GLuint uRotate			= glGetUniformLocation(program, "uRotate");
+	GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
+	GLuint uUseMasks		= glGetUniformLocation(program, "uUseMasks");
+
+	SbmShaderProgram::printOglError("BlendGeometry GetUniformLocation");
+	int * image_array		= new int[MAX_SHAPES];
+	float * w				= new float[usedWeights.size()];
+	int * usedShapesID_array = new int[usedShapeIDs.size()];
+
+	for(int i=0; i<MAX_SHAPES; i++)
+	{
+		if(i < usedWeights.size())
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texIDs[usedShapeIDs[i]]);
+
+			image_array[i]			= i;
+			w[i]					= usedWeights[i];
+			usedShapesID_array[i]	= usedShapeIDs[i];
+		}
+		// Textures not used, but we still need to pass 15 textures to the fragment shader for completeness
+		else
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+			image_array[i]	= i;
+		}
+	}
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+	glUniform1i(uNeutralSampler, 0);
+
+
+	glUniform1fv(uWeights, usedWeights.size(), w);
+	glUniform1i(uNumberOfShapes, usedWeights.size());
+	glUniform1iv(uNeutralSampler, MAX_SHAPES, image_array);
+	glUniform1i(uBorderVertices,  14);
+	glUniform1i(uUseMasks,  useMasks);
+	
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, verticesFeedback);
+
+	SbmShaderProgram::printOglError("BlendGeometry TransformFeedback Begin");
+	glBeginTransformFeedback(GL_POINTS);
+	SbmShaderProgram::printOglError("BlendGeometry TransformFeedback glBeginTransformFeedback");
+	glDrawArrays(GL_POINTS, 0, blendedVerties.size());
+	SbmShaderProgram::printOglError("BlendGeometry TransformFeedback glDrawArrays");
+	glEndTransformFeedback();
+	SbmShaderProgram::printOglError("BlendGeometry TransformFeedback End");
+
+	//aux->subMeshTris[0]->VBO()->BindBuffer();
+	//glDrawElements(GL_TRIANGLES, _mesh->triBuf.size()*3 , GL_UNSIGNED_INT,0);
+	//aux->subMeshTris[0]->VBO()->UnbindBuffer();
+
+	std::vector<SrVec>& deformPosBuf = meshInstance->_deformPosBuf;
+	std::vector<SrVec> blendRestPos; blendRestPos.resize(deformPosBuf.size());
+	// read the data back to buffer
+	SbmShaderProgram::printOglError("BlendGeometry Feedback GetBuffer Begin");
+	glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, blendRestPos.size()*sizeof(SrVec),&blendRestPos[0]);
+	SbmShaderProgram::printOglError("BlendGeometry Feedback GetBuffer End");
+
+	meshInstance->updateSkin(blendRestPos, deformPosBuf);
+
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	aux->getVBOPos(0)->VBO()->UnbindBuffer();
+	aux->getVBOPos(1)->VBO()->UnbindBuffer();
+	aux->getVBOTexCoord()->VBO()->UnbindBuffer();
+
+	for(int i=0; i<usedWeights.size(); i++)
+	{
+		glDisableVertexAttribArray(aVertexPosition + i);
+	}
+
+	glDisableVertexAttribArray(aVertexTexcoord);
+	glDisable(GL_RASTERIZER_DISCARD);
+	glUseProgram(0);
+
+	delete aux;
+
+	SbmShaderProgram::printOglError("BlendGeometry FINAL");
+#endif
+}
+
+void SbmBlendTextures::BlendTextureWithMasks(GLuint FBODst, GLuint FBOTex,std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program, int width, int height )
+{
+	DeformableMesh * _mesh		= meshInstance->getDeformableMesh();
+
+	bool showMasks		= false;
+	bool useMasks		= false;
+	bool overlayMasks	= false;
+
+	//if (meshInstance->isStaticMesh())
+	{
+		SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
+		SmartBody::SBPawn* pawn		= skel->getPawn();
+		SmartBody::SBAttribute* maskAttribute;
+		// Checks showMasks attribute: If masks for the blendshape are present, user can enable or disable the visualization for debugging purposes
+		maskAttribute = pawn->getAttribute("blendShape.showMasks");
+		if (!maskAttribute)
+		{
+			showMasks = false;
+		}
+		else
+		{
+			showMasks	= pawn->getBoolAttribute("blendShape.showMasks");
+		}
+
+		// Checks useMasks attribute: If masks for the blendshape are present, user can enable or disable the use of them
+		maskAttribute = pawn->getAttribute("blendShape.useMasks");
+		if (!maskAttribute)
+		{
+			useMasks = false;
+		}
+		else
+		{
+			useMasks	= pawn->getBoolAttribute("blendShape.useMasks");
+		}
+
+		// Checks overlayMasks attribute
+		maskAttribute = pawn->getAttribute("blendShape.overlayMasks");
+		if (!maskAttribute)
+		{
+			overlayMasks = false;
+		}
+		else
+		{
+			overlayMasks	= pawn->getBoolAttribute("blendShape.overlayMasks");
+		}
+	}
+
+
+
+	const int MAX_SHAPES = 14;	// I can't enable more than 16 attributes (15 vertex buffer + 1 texture coordinate buffer)
+	// NOTE: Also change #define in shader if you change this value
+
+	std::vector<float>	usedWeights;
+	std::vector<int>	usedShapeIDs;
+
+	for(int i=0; i<weights.size(); i++)
+	{
+		// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
+		if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
+		{
+			// Pushes this weight to the vector of used weights
+			usedWeights.push_back(weights[i]);
+			usedShapeIDs.push_back(i);
+		}
+	}
+
+	SbmShaderProgram::printOglError("BlendTextureWithMask glUseProgram");
+
+	glUseProgram(program);
+	SbmShaderProgram::printOglError("BlendTextureWithMask GetUniformLocation start");
+
+	GLuint uWeights			= glGetUniformLocation(program, "uWeights");
+	GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
+	//GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
+	GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
+	GLuint uShowMasks		= glGetUniformLocation(program, "uShowMasks");
+	GLuint uUseMasks		= glGetUniformLocation(program, "uUseMasks");
+	GLuint uOverlayMasks	= glGetUniformLocation(program, "uOverlayMasks");
+	GLuint uUsedShapeIDs	= glGetUniformLocation(program, "uUsedShapeIDs");
+
+	SbmShaderProgram::printOglError("BlendTextureWithMask GetUniformLocation end");
+	int * image_array		= new int[MAX_SHAPES];
+	float * w				= new float[usedWeights.size()];
+	int * usedShapesID_array = new int[usedShapeIDs.size()];
+
+	for(int i=0; i<MAX_SHAPES; i++)
+	{
+		if(i < usedWeights.size())
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texIDs[usedShapeIDs[i]]);
+
+			image_array[i]			= i;
+			w[i]					= usedWeights[i];
+			usedShapesID_array[i]	= usedShapeIDs[i];
+		}
+		// Textures not used, but we still need to pass 15 textures to the fragment shader for completeness
+		else
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+			image_array[i]	= i;
+		}
+	}
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+	glUniform1i(uNeutralSampler, 0);
+
+	glUniform1fv(uWeights, usedWeights.size(), w);
+	glUniform1iv(uUsedShapeIDs, usedShapeIDs.size(), usedShapesID_array);
+	glUniform1i(uNumberOfShapes, usedWeights.size());
+	glUniform1iv(uNeutralSampler, MAX_SHAPES, image_array);
+	glUniform1i(uShowMasks,  showMasks);
+	glUniform1i(uUseMasks,  useMasks);
+	glUniform1i(uOverlayMasks,  overlayMasks);
+
+
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst);                                                              // Bind the framebuffer object
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, FBOTex, 0);              // Attach texture to FBO
+	assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
+
+	glPushAttrib(GL_ENABLE_BIT);
+	glDisable(GL_DEPTH_TEST);
+	glPushAttrib(GL_VIEWPORT_BIT);
+	glPushAttrib(GL_TEXTURE_BIT);
+	glViewport(0, 0, width, height);
+	glClearColor(1.0, 0.0, 0.0, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// render to FBO texture
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 1);
+	glVertex3f(-1.0f, 1.0f, -0.5f);
+
+	glTexCoord2f(0, 0);
+	glVertex3f(-1.0f, -1.0f, -0.5f);
+
+	glTexCoord2f(1, 0);
+	glVertex3f(1.0f, -1.0f, -0.5f);
+
+	glTexCoord2f(1, 1);
+	glVertex3f(1.0f, 1.0f, -0.5f);
+	glEnd();
+
+	glPopAttrib();
+	glPopAttrib();
+	glPopAttrib();
+	
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);                                                                                                          // Bind the render buffer
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);         
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glUseProgram(0);
+}
+
 #endif
