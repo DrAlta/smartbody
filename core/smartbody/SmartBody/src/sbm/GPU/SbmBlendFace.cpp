@@ -2119,6 +2119,7 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 	glDisable(GL_RASTERIZER_DISCARD);
 	glUseProgram(0);
 
+	glDeleteBuffers(1, &verticesFeedback);
 	delete aux;
 
 	SbmShaderProgram::printOglError("BlendGeometry FINAL");
