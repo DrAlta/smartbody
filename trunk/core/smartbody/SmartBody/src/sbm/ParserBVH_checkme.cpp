@@ -46,9 +46,6 @@ that is distributed: */
 #include <sstream>
 #include <cstdlib>
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/convenience.hpp>
 #include <map>
 #include "sr/sr_mat.h"
 #include "sr/sr_quat.h"
@@ -67,11 +64,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 		return false;
 	}
 	char line[8192];
-	boost::filesystem::path motionPath(name);
-	std::string baseName = boost::filesystem::basename(motionPath);
-	motion.setName(baseName);
-	skeleton.setName(baseName);
-	motion.filename(name.c_str());
+	skeleton.setName(name);
 	int state = 0;
 	char* str = NULL;
 	stack<SkJoint*> stack;
@@ -88,7 +81,6 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 	std::vector<std::pair<int, int> > bvhIndex;
 	SkChannelArray& skChannels = skeleton.channels();
 	SkChannelArray motionChannels;
-	std::vector<SkJoint*> endEffectorJoint;
 
 	while(!file.eof() && file.good())
 	{
@@ -130,7 +122,6 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						root->quat()->activate();
 						jointCounter++;
 						root->name(strstr.str());
-						skeleton.root(root);
 						//skeleton.make_active_channels();
 						cur = root;
 						state = 2;
@@ -304,7 +295,7 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 						if (pos != std::string::npos)
 							trimmedname = trimmedname.substr(pos + 1, trimmedname.size() - pos + 1);
 						SkJoint* parent = stack.top();
-						SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, parent->index());						
+						SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, parent->index());
 						joint->quat()->activate();
 						jointCounter++;
 						joint->name(trimmedname);
@@ -386,10 +377,6 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 					str = strtok(NULL, " \t");
 					z = atof(str);
 					cur->endEffectorOffset(SrVec(float(x) * scale, float(y)* scale, float(z) * scale));
- 					endEffectorJoint.push_back(cur);
-// 					joint->offset(cur->endEffectoroffset());
-// 					skeleton.make_active_channels();
-
 					//cur->setEndEffector(true);
 					//LOG("Found end effector at %s", cur->getName());
 					//cout << "Found end effector offset of " << x << " " << y << " " << z << " " << endl;
@@ -576,14 +563,6 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				return false;
 		}
 	}
-
-	for (unsigned int i=0;i<endEffectorJoint.size();i++)
-	{
-		SkJoint* cur = endEffectorJoint[i];
-		SkJoint* endJoint = skeleton.add_joint(SkJoint::TypeQuat, cur->index());
-		endJoint->name(cur->getName()+"EndSite");
-		endJoint->offset(cur->endEffectoroffset());		
-	}
 	//LOG("Finished parsing motion with %d frames...", numFrames);
 	file.close();
 	//skeleton.recalculateJointList();
@@ -607,7 +586,6 @@ void ParserBVH::convertBVHtoSmartBody(SkJoint* joint, SkMotion& motion, ChannelI
 
 	int skChannelOffset = 0;
 	bool hasRotation = false;
-	float convertAngleRatio = float(M_PI) / 180.0f;
 
 	for (int c = 0; c < channelInfo->numBVHChannels; c++)
 	{
@@ -617,8 +595,7 @@ void ParserBVH::convertBVHtoSmartBody(SkJoint* joint, SkMotion& motion, ChannelI
 		{
 			if (motion.posture_size() <= channelInfo->startingChannelIndex + skChannelOffset)
 				std::cout << "WARNING!" << std::endl;
-			//if (!joint->parent())
-			if (true)
+			if (!joint->parent())
 			{ 
 				float finalValue = float(data[c]) * scale;
 				if (channelInfo->channels[c] == BVHXPOSITION)
@@ -637,17 +614,17 @@ void ParserBVH::convertBVHtoSmartBody(SkJoint* joint, SkMotion& motion, ChannelI
 		}
 		else if (channelInfo->channels[c] == BVHXROTATION)
 		{
-			rot.x = float(data[c]) * convertAngleRatio;
+			rot.x = float(data[c]) * float(M_PI) / 180.0f;
 			hasRotation = true;
 		}
 		else if (channelInfo->channels[c] == BVHYROTATION)
 		{
-			rot.y = float(data[c]) * convertAngleRatio;
+			rot.y = float(data[c]) * float(M_PI) / 180.0f;
 			hasRotation = true;
 		}
 		else if (channelInfo->channels[c] == BVHZROTATION)
 		{
-			rot.z = float(data[c]) * convertAngleRatio;
+			rot.z = float(data[c]) * float(M_PI) / 180.0f;
 			hasRotation = true;
 		}
 	}

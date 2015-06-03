@@ -465,8 +465,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/controllers/me_ct_motion_blend.cpp
         ./src/controllers/MotionAnalysis.cpp
 
-        ./src/sbm/ParserBVH.cxx
-        ./src/sbm/ParserASFAMC.cxx
+        ./src/sbm/ParserBVH.cpp
+        ./src/sbm/ParserASFAMC.cpp
         ./src/sbm/ParserFBX.cpp
         ./src/sbm/ParserOgre.cpp
         ./src/sbm/ParserCOLLADAFast.cpp
