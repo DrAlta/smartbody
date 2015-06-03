@@ -387,7 +387,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\sbm\mcontrol_callbacks.cpp" />
     <ClCompile Include="..\SmartBody\src\sbm\MiscCommands.cpp" />
     <ClCompile Include="..\SmartBody\src\sbm\ODEPhysicsSim.cpp" />
-    <ClCompile Include="..\SmartBody\src\sbm\ParserASFAMC.cxx" />
     <ClCompile Include="..\SmartBody\src\sbm\ParserBVH.cxx" />
     <ClCompile Include="..\SmartBody\src\sbm\ParserFBX.cpp" />
     <ClCompile Include="..\SmartBody\src\sbm\ParserOgre.cpp" />

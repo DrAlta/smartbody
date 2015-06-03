@@ -48,13 +48,14 @@ that is distributed: */
 #include <cctype>
 #include <string>
 #include <string.h>
+#include <sb/SBJoint.h>
 
 using namespace std;
 #ifdef WIN32
 	#define strcasecmp _stricmp
 #endif
 
-bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& metaFile, std::ifstream& dataFile, float scale)
+bool ParserASFAMC::parseAsf(SmartBody::SBSkeleton& skeleton, std::ifstream& metaFile, float scale)
 {
 	// parse .asf file first
 	// check to make sure we have properly opened the file
@@ -67,13 +68,12 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 	char line[4096];
 	int state = 0;
 	char* str;
-	SkJoint* cur = NULL;
+	SmartBody::SBJoint* cur = NULL;
 	int curFrame = -1;
 	double frameTime = 0.016777f;	// assume fps = 60
 	bool useDegrees = true;
 	vector<JointInfo*> jointInfoList;
 	JointInfo* curJointInfo = NULL;
-	char frameStr[128];
 
 	while(!metaFile.eof() && metaFile.good())
 	{
@@ -155,7 +155,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 				str = strtok(line, " ");
 				if (strcmp(str, ":root") == 0)
 				{
-					cur = skeleton.add_joint(SkJoint::TypeQuat);
+					cur = dynamic_cast<SmartBody::SBJoint*>(skeleton.add_joint(SkJoint::TypeQuat));
 					skeleton.root(cur);
 					cur->name("root");
 					cur->quat()->activate();
@@ -221,6 +221,9 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 								LOG("Unrecognized channel '%s', continuing...", str);
 							}
 						}
+						for (size_t d = 0; d < curJointInfo->dof.size(); d++)
+							cur->setAsfChannels(curJointInfo->dof);
+						
 					}
 					else if (strcmp(str, "axis") == 0)
 					{
@@ -478,7 +481,7 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 							metaFile.close();
 							return false;
 						}
-						SkJoint* child = skeleton.add_joint(SkJoint::TypeQuat, parentId);
+						SmartBody::SBJoint* child = dynamic_cast<SmartBody::SBJoint*>(skeleton.add_joint(SkJoint::TypeQuat, parentId));
 						child->name(childInfo->name);
 						child->quat()->activate();
 						child->pos()->limits(SkVecLimits::X, false);
@@ -486,6 +489,9 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 						child->pos()->limits(SkVecLimits::Z, false);
 						SrVec offset = parentInfo->direction * parentInfo->length;
 						child->offset(offset);
+						child->setAsfAxis(childInfo->axis);
+						child->setAsfChannels(childInfo->dof);
+
 						bool hasRotation = false;
 						for (unsigned int i = 0; i < childInfo->dof.size(); i++)
 						{
@@ -515,13 +521,46 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 	skeleton.make_active_channels();
 	skeleton.updateGlobalMatricesZero();
 
+	return true;
+
+}
+
+
+bool ParserASFAMC::parseAmc(SmartBody::SBMotion& motion, SmartBody::SBSkeleton* skeleton, std::ifstream& dataFile, float scale)
+{
 	// parse .amc files
 	if (!dataFile.good())
 		return true;
 
-	motion.init(skeleton.channels());
+	std::map<std::string, JointInfo*> jointInfoMap;
+
+	// load the joint info for each joint
+	int numJoints = skeleton->getNumJoints();
+	for (int j = 0; j < numJoints; j++)
+	{
+		SmartBody::SBJoint* joint = skeleton->getJoint(j);
+		JointInfo* jointInfo = new JointInfo();
+		jointInfo->name = joint->getName();
+		std::vector<std::string>& asfChannels = joint->getAsfChannels();
+		for (size_t c = 0; c < asfChannels.size(); c++)
+		{
+			jointInfo->dof.push_back(asfChannels[c]);
+		}
+		jointInfo->axis = joint->getAsfAxis();
+		jointInfoMap[jointInfo->name] = jointInfo;
+	}
+	
+	char line[4096];
+
+	int state = 17;
+	char* str = NULL;
+	bool useDegrees = true;
+	double frameTime = 0.016777f;
+	char frameStr[128];
+
+	motion.init(skeleton->channels());
 	SkChannelArray& motionChannels = motion.channels();
-	curFrame = 0;
+	int curFrame = 0;
 	int parsedFrameNum;
 	while(!dataFile.eof() && dataFile.good())
 	{
@@ -581,10 +620,16 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 					break;
 				}
 				// find the joint
-				JointInfo* jointInfo = getJointInfo(str, jointInfoList);
+				JointInfo* jointInfo = NULL;//getJointInfo(str, jointInfoList);
+				std::map<std::string, JointInfo*>::iterator iter = jointInfoMap.find(str);
+				if (iter != jointInfoMap.end())
+				{
+					jointInfo = (*iter).second;
+				}
+				
 				if (!jointInfo)
 				{
-					LOG("Unknow joint '%s', continue...", str);
+					LOG("Unknown joint '%s', continue...", str);
 					break;
 				}
 				// get the data
@@ -628,8 +673,15 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 	// Here assume all the joints are the same order with root joint, maybe there's case where each joint has independent rotation order
 	int order = -1;
 	JointInfo* rootInfo = NULL;
-	if (jointInfoList.size() > 0)
-		rootInfo = jointInfoList[0];
+	if (jointInfoMap.size() > 0)
+	{
+		std::map<std::string, JointInfo*>::iterator iter = jointInfoMap.find("root");
+		if (iter != jointInfoMap.end())
+		{
+			rootInfo = (*iter).second;
+		}
+	}
+
 	if (rootInfo)
 	{
 		std::vector<std::string> orderVec;
@@ -686,15 +738,11 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 			// Matrix C
 			const std::string& jName = motion.channels().name(quatIndices[i]);
 			JointInfo* jointInfo = NULL;
-			for (unsigned int cnum = 0; cnum < jointInfoList.size(); cnum++)
-			{
-				std::string jointName =  jointInfoList[cnum]->name;
-				if (jointName == jName)
-				{
-					jointInfo = jointInfoList[cnum];
-					break;
-				}
-			}
+
+			std::map<std::string, JointInfo*>::iterator iter = jointInfoMap.find(jName);
+			if (iter != jointInfoMap.end())
+				jointInfo = (*iter).second;
+
 			SrMat C;
 			sr_euler_mat(order, C, jointInfo->axis.x, jointInfo->axis.y, jointInfo->axis.z);
 		
@@ -709,6 +757,14 @@ bool ParserASFAMC::parse(SkSkeleton& skeleton, SkMotion& motion, std::ifstream& 
 	double duration = double(motion.duration());
 	motion.synch_points.set_time(0.0, duration / 4.0, duration / 3.0, duration / 2.0, duration * 2.0 / 3.0, duration * 3.0 / 4.0, duration);
 	motion.compress();	
+
+	// clean up
+	for (std::map<std::string, JointInfo*>::iterator iter = jointInfoMap.begin();
+		 iter != jointInfoMap.end();
+		 iter++)
+	{
+		delete (*iter).second;
+	}
 	return true;
 }
 
