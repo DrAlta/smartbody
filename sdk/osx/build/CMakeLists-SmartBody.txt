@@ -191,7 +191,6 @@ set( SMARTBODY_LIB_ME_SRC
         ./controllers/me_ct_container.cpp
         ./controllers/me_ct_curve_writer.cpp
         ./controllers/me_ct_interpolator.cpp
-        ./controllers/me_ct_lifecycle_test.cpp
         ./controllers/me_ct_motion.cpp
         ./controllers/me_ct_periodic_replay.cpp
         ./controllers/me_ct_pose.cpp
@@ -380,8 +379,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ./controllers/me_ct_motion_blend.cpp
         ./controllers/MotionAnalysis.cpp
 
-        ./sbm/ParserBVH.cxx
-        ./sbm/ParserASFAMC.cxx
+        ./sbm/ParserBVH.cpp
+        ./sbm/ParserASFAMC.cpp
         ./sbm/ParserFBX.cpp
         ./sbm/ParserOgre.cpp
         ./sbm/ParserCOLLADAFast.cpp
