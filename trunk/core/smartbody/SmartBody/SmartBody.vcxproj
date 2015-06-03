@@ -387,7 +387,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\sbm\mcontrol_callbacks.cpp" />
     <ClCompile Include="..\SmartBody\src\sbm\MiscCommands.cpp" />
     <ClCompile Include="..\SmartBody\src\sbm\ODEPhysicsSim.cpp" />
-    <ClCompile Include="..\SmartBody\src\sbm\ParserBVH.cxx" />
     <ClCompile Include="..\SmartBody\src\sbm\ParserFBX.cpp" />
     <ClCompile Include="..\SmartBody\src\sbm\ParserOgre.cpp" />
     <ClCompile Include="..\SmartBody\src\sbm\ParserOpenCOLLADA.cpp" />
@@ -503,6 +502,8 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\protocols\sbmotion.pb.cc" />
     <ClCompile Include="src\protocols\sbutilities.pb.cc" />
     <ClCompile Include="src\sbm\GPU\SbmBlendFace.cpp" />
+    <ClCompile Include="src\sbm\ParserASFAMC.cpp" />
+    <ClCompile Include="src\sbm\ParserBVH.cpp" />
     <ClCompile Include="src\sbm\ParserCOLLADAFast.cpp" />
     <ClCompile Include="src\sb\SBAssetHandler.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerAmc.cpp" />
