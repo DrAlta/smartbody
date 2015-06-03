@@ -625,9 +625,6 @@
     <ClCompile Include="..\SmartBody\src\sbm\ODEPhysicsSim.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\SmartBody\src\sbm\ParserBVH.cxx">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\SmartBody\src\sbm\ParserFBX.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
@@ -1194,6 +1191,12 @@
     </ClCompile>
     <ClCompile Include="src\controllers\RealTimeLipSyncController.cpp">
       <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sbm\ParserBVH.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sbm\ParserASFAMC.cpp">
+      <Filter>sbm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
