@@ -647,7 +647,7 @@ void TreeRootFrameData::remapBuffers( SkChannelArray& cur, SkChannelArray& prev 
 	for( int i=0; i<cur_size; ++i ) {
 		SkChannel::Type type = cur.type(i);
 		int size = SkChannel::size( type );
-		int oldChannel = prev.search( cur.name(i), type );
+		int oldChannel = prev.search( cur.mappedName(i), type );
 		if( oldChannel==-1 ) {
 			// New Channel
 			// new Updated was already zeroed out

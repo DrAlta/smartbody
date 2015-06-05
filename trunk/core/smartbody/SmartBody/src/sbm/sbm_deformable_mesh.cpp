@@ -2459,8 +2459,12 @@ void DeformableMeshInstance::updateTransformBuffer()
 		bindPoseMat.set_translation(bindPoseMat.get_translation()*_meshScale);
 		transformBuffer[idx] = bindPoseMat*joint->gmat();	
 		//SrQuat q = SrQuat(transformBuffer[idx]);
+		//SrVec v = bindPoseMat.get_translation();
+		//SrVec v1 = joint->gmat().get_translation();
 		//LOG("transform buffer %d , quat = %f %f %f %f",idx,q.w,q.x,q.y,q.z);
 		//sr_out << " transform buffer = " << transformBuffer[idx];
+		//if (idx == 0)
+		//	LOG("transform buffer %d , bindPose tran = %f %f %f, joint tran = %f %f %f",idx,v[0],v[1],v[2], v1[0],v1[1],v1[2]);
 	}
 }
 
