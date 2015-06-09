@@ -2100,7 +2100,12 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 	glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, blendRestPos.size()*sizeof(SrVec),&blendRestPos[0]);
 	SbmShaderProgram::printOglError("BlendGeometry Feedback GetBuffer End");
 
-	meshInstance->updateSkin(blendRestPos, deformPosBuf);
+	if (meshInstance->isStaticMesh())
+	{
+		deformPosBuf = blendRestPos;
+	}
+	else
+		meshInstance->updateSkin(blendRestPos, deformPosBuf);
 
 
 	glActiveTexture(GL_TEXTURE0);
