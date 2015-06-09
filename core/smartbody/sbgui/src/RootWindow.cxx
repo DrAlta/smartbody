@@ -307,7 +307,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	}
 	customViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
 	curViewer = customViewer;
-	ogreViewer = NULL;
+	//ogreViewer = NULL;
 #endif
 	curViewer->box(FL_UP_BOX);
 	curViewer->baseWin = this;
