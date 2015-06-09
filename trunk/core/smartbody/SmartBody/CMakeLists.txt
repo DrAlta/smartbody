@@ -277,7 +277,7 @@ set( SMARTBODY_LIB_ME_SRC
         ./src/controllers/me_ct_container.cpp
         ./src/controllers/me_ct_curve_writer.cpp
         ./src/controllers/me_ct_interpolator.cpp
-        ./src/controllers/me_ct_lifecycle_test.cpp
+#        ./src/controllers/me_ct_lifecycle_test.cpp
         ./src/controllers/me_ct_motion.cpp
         ./src/controllers/me_ct_periodic_replay.cpp
         ./src/controllers/me_ct_pose.cpp

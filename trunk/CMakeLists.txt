@@ -10,7 +10,7 @@ set( BUILD_FESTIVAL FALSE)
 #set( SB_NO_ASSIMP FALSE)
 
 # uses Python as a scripting language
-#set( SB_NO_PYTHON TRUE)
+#set( SB_NO_PYTHON FALSE)
 
 # uses the Virtual Human Message system
 #set( SB_NO_VHMSG TRUE)
