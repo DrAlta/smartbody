@@ -132,6 +132,12 @@ SrQuat SBJoint::getQuaternion()
 	return quat()->value();
 }
 
+
+SrQuat SBJoint::getLocalRawQuaternion()
+{
+	return quat()->rawValue();
+}
+
 SrMat SBJoint::getMatrixGlobal()
 {
 	update_gmat();
