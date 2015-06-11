@@ -45,6 +45,7 @@ class SBJoint : public SkJoint, public SBTransformObjInterface
 
 		SBAPI SrVec getPosition();
 		SBAPI SrQuat getQuaternion();
+		SBAPI SrQuat getLocalRawQuaternion();
 		SBAPI SrMat getMatrixGlobal();
 		SBAPI SrMat getMatrixLocal();
 
