@@ -511,6 +511,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 {
 	
 #if USE_AUTO_RIGGING
+	inModel.computeNormals();
 	int voxelSize = 250;
 	VoxelizerWindow* voxelWindow = new VoxelizerWindow(0,0,voxelSize,voxelSize,"voxelWindow");
 	voxelWindow->initVoxelizer(&inModel,voxelSize);
