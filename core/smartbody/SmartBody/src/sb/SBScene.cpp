@@ -233,7 +233,7 @@ void SBScene::initialize()
 #if ANDROID_BUILD
 	createBoolAttribute("useGPUBlendshapes",false,true,"",120,false,false,false,"Use the GPU for processing blendshapes.");
 #else
-	createBoolAttribute("useGPUBlendshapes",true,true,"",120,false,false,false,"Use the GPU for processing blendshapes.");
+	createBoolAttribute("useGPUBlendshapes",false,true,"",120,false,false,false,"Use the GPU for processing blendshapes.");
 #endif
 	vhcl::Log::g_log.RemoveAllListeners();
 	ForwardLogListener* forwardListener = new ForwardLogListener();

@@ -487,7 +487,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				model->V.size(numVertices);
 				model->N.size(numVertices);
 				model->T.size(numVertices);
-				
+				bool hasNormal = false;
 				for (int v = 0; v < numVertices; v++)
 				{
 
@@ -497,6 +497,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 
 					if (scene->mMeshes[m]->mNormals)
 					{
+						hasNormal = true;
 						model->N[v].x = scene->mMeshes[m]->mNormals[v].x;
 						model->N[v].y = scene->mMeshes[m]->mNormals[v].y;
 						model->N[v].z = scene->mMeshes[m]->mNormals[v].z;
@@ -528,6 +529,8 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					}
 				}
 			
+			
+
 				// extract faces
 				int numFaces = scene->mMeshes[m]->mNumFaces;
 				model->F.size(numFaces);
@@ -605,6 +608,8 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					model->mtlnames.push("unknown");
 				}
 
+				if (!hasNormal)
+					model->computeNormals();
 				//if (!scene->mMeshes[m]->mNormals)
 				//	model->computeNormals();
 
