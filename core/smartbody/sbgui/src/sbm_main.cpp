@@ -980,6 +980,7 @@ int main( int argc, char **argv )	{
 	initPython(python_lib_path);
 	initAutoRigPythonModule();
 	initMiscPythonModule();
+	initGUIInterfacePythonModule();
 #endif
 
 	

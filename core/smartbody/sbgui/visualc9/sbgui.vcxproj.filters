@@ -337,6 +337,9 @@
     <ClCompile Include="..\src\bmlcreator\BMLNoiseObject.cpp">
       <Filter>bmlcreator</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\SBInterfaceListener.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\CharacterCreatorWindow.h">
@@ -616,6 +619,9 @@
     </ClInclude>
     <ClInclude Include="..\src\bmlcreator\BMLNoiseObject.h">
       <Filter>bmlcreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SBInterfaceListener.h">
+      <Filter>viewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
