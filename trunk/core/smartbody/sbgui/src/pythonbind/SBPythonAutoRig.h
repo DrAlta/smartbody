@@ -4,4 +4,6 @@
 #include <sb/SBTypes.h>
 void initAutoRigPythonModule();
 void initMiscPythonModule();
+void initGUIInterfacePythonModule();
+
 #endif

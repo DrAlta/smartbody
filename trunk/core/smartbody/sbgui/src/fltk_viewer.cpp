@@ -106,6 +106,7 @@
 #include <sbm/sbm_deformable_mesh.h>
 #include "FLTKListener.h"
 #include "RootWindow.h"
+#include "SBInterfaceListener.h"
 
 #include <sbm/GPU/SbmBlendFace.h>
 #include <sbm/GPU/SbmTexture.h>
@@ -2264,9 +2265,13 @@ int FltkViewer::handle ( int event )
    e.type = SrEvent::EventNone;   
    translate_keyboard_state();  
 
+   // find any interface listeners
+
+   std::vector<SBInterfaceListener*> interfaceListeners = SBInterfaceManager::getInterfaceManager()->getInterfaceListeners();
+
    int ret = SBGUIManager::singleton().handleEvent(event);  
    std::string dndText;
-   static float dndX,dndY;      
+   static float dndX,dndY;     
    switch ( event )
    {   
 	   case FL_DND_RELEASE:
@@ -2308,7 +2313,16 @@ int FltkViewer::handle ( int event )
 		   ret = 1;
 		   break;		
        case FL_PUSH:
-       { //SR_TRACE1 ( "Mouse Push : but="<<Fl::event_button()<<" ("<<Fl::event_x()<<", "<<Fl::event_y()<<")" <<" Ctrl:"<<Fl::event_state(FL_CTRL) );
+       { 
+		   for (size_t l = 0; l < interfaceListeners.size(); l++)
+		   {
+				int mouseX = Fl::event_x();
+				int mouseY = Fl::event_y();
+				int button = Fl::event_button();
+				interfaceListeners[l]->onMouseClick(mouseX, mouseY, button);
+		   }
+		   
+		   //SR_TRACE1 ( "Mouse Push : but="<<Fl::event_button()<<" ("<<Fl::event_x()<<", "<<Fl::event_y()<<")" <<" Ctrl:"<<Fl::event_state(FL_CTRL) );
          translate_event ( e, SrEvent::EventPush, w(), h(), this );
 //          if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::EventNone; }
 // 		 // Mouse Button Push Handling for CEGUI
@@ -2420,6 +2434,11 @@ int FltkViewer::handle ( int event )
 	   break;
 
       case FL_RELEASE:
+		  e.key = Fl::event_key();
+		  for (size_t l = 0; l < interfaceListeners.size(); l++)
+		   {
+			   interfaceListeners[l]->onKeyboardRelease(e.key);
+		   }
         //SR_TRACE1 ( "Mouse Release : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
          //            <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
         //translate_event ( e, SrEvent::EventRelease, w(), h(), this);		
@@ -2439,6 +2458,12 @@ int FltkViewer::handle ( int event )
         break;
 
       case FL_MOVE:
+		   for (size_t l = 0; l < interfaceListeners.size(); l++)
+		   {
+				int mouseX = Fl::event_x();
+				int mouseY = Fl::event_y();
+			   interfaceListeners[l]->onMouseMove(e.mouse.x, e.mouse.y);
+		   }
         //SR_TRACE2 ( "Move buts: "<<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
 		//LOG("Move mouse cursor to %f %f",e.mouseCoord.x, e.mouseCoord.y);
 		//translate_event ( e, SrEvent::EventNone, w(), h(), this );
@@ -2447,6 +2472,12 @@ int FltkViewer::handle ( int event )
         // otherwise, this is a drag: enter in the drag case.
         // not sure if this is a hack or a feature.
       case FL_DRAG:
+		   for (size_t l = 0; l < interfaceListeners.size(); l++)
+		   {
+				int mouseX = Fl::event_x();
+				int mouseY = Fl::event_y();
+			   interfaceListeners[l]->onMouseDrag(e.mouse.x, e.mouse.y);
+		   }
         //SR_TRACE2 ( "Mouse Drag : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
         //             <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
         translate_event ( e, SrEvent::EventDrag, w(), h(), this );		
@@ -2461,6 +2492,12 @@ int FltkViewer::handle ( int event )
 		 //LOG("Receiving FL_KEYDOWN");
          e.type = SrEvent::EventKeyboard;
          e.key = Fl::event_key();
+
+		for (size_t l = 0; l < interfaceListeners.size(); l++)
+		{
+			interfaceListeners[l]->onKeyboardPress(e.key);
+		}
+
 		  switch (Fl::event_key())
 		  {
 			case 'w': // translate mode

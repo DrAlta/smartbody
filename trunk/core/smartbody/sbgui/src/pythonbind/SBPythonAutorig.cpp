@@ -1,5 +1,6 @@
 #include "vhcl.h"
 #include "SBPythonAutoRig.h"
+#include "SBInterfaceListener.h"
 #include <sb/SBObject.h>
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>
@@ -24,6 +25,126 @@
 
 
 #ifndef SB_NO_PYTHON
+
+
+struct SBInterfaceListenerWrap : SBInterfaceListener, boost::python::wrapper<SBInterfaceListener>
+{
+	virtual bool onMouseClick(int x, int y, int button)
+	{
+		if (boost::python::override o = this->get_override("onMouseClick"))
+		{
+			try {
+				return o(x, y, button);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return SBInterfaceListener::onMouseClick(x, y, button);
+	};
+
+	bool default_onMouseClick(int x, int y, int button)
+	{
+		return SBInterfaceListener::onMouseClick(x, y, button);
+	}
+
+	virtual bool onMouseMove(int x, int y)
+	{
+		if (boost::python::override o = this->get_override("onMouseMove"))
+		{
+			try {
+				return o(x, y);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return SBInterfaceListener::onMouseMove(x, y);
+	};
+
+	bool default_onMouseMove(int x, int y)
+	{
+		return SBInterfaceListener::onMouseMove(x, y);
+	}
+
+	virtual bool onMouseRelease(int x, int y, int button)
+	{
+		if (boost::python::override o = this->get_override("onMouseRelease"))
+		{
+			try {
+				return o(x, y);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return SBInterfaceListener::onMouseRelease(x, y, button);
+	};
+
+	bool default_onMouseRelease(int x, int y, int button)
+	{
+		return SBInterfaceListener::onMouseRelease(x, y, button);
+	}
+
+	virtual bool onMouseDrag(int x, int y)
+	{
+		if (boost::python::override o = this->get_override("onMouseDrag"))
+		{
+			try {
+				return o(x, y);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return SBInterfaceListener::onMouseDrag(x, y);
+	};
+
+	bool default_onMouseDrag(int x, int y)
+	{
+		return SBInterfaceListener::onMouseDrag(x, y);
+	}
+
+	virtual bool onKeyboardPress(char c)
+	{
+		if (boost::python::override o = this->get_override("onKeyboardPress"))
+		{
+			try {
+				return o(c);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return SBInterfaceListener::onKeyboardPress(c);
+	};
+
+	bool default_onKeyboardPress(char c)
+	{
+		return SBInterfaceListener::onKeyboardPress(c);
+	}
+
+	virtual bool onKeyboardRelease(char c)
+	{
+		if (boost::python::override o = this->get_override("onKeyboardRelease"))
+		{
+			try {
+				return o(c);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		return SBInterfaceListener::onKeyboardRelease(c);
+	};
+
+	bool default_onKeyboardRelease(char c)
+	{
+		return SBInterfaceListener::onKeyboardRelease(c);
+	}
+
+};
+
 
 
 
@@ -115,6 +236,27 @@ std::vector<std::string> checkVisibility_current_view()
 	return visible;
 }
 
+BOOST_PYTHON_MODULE(GUIInterface)
+{	
+	boost::python::class_<SBInterfaceListenerWrap, boost::noncopyable> ("SBInterfaceListener")
+		.def("onMouseClick", &SBInterfaceListener::onMouseClick, &SBInterfaceListenerWrap::default_onMouseClick, "onMouseClick")
+		.def("onMouseMove", &SBInterfaceListener::onMouseMove, &SBInterfaceListenerWrap::default_onMouseMove, "onMouseMove")
+		.def("onMouseRelease", &SBInterfaceListener::onMouseRelease, &SBInterfaceListenerWrap::default_onMouseRelease, "onMouseRelease")
+		.def("onMouseDrag", &SBInterfaceListener::onMouseDrag, &SBInterfaceListenerWrap::default_onMouseDrag, "onMouseDrag")
+		.def("onKeyboardPress", &SBInterfaceListener::onKeyboardPress, &SBInterfaceListenerWrap::default_onKeyboardPress, "onKeyboardPress")
+		.def("onKeyboardRelease", &SBInterfaceListener::onKeyboardRelease, &SBInterfaceListenerWrap::default_onKeyboardRelease, "onKeyboardRelease")
+	;
+
+	boost::python::def("getInterfaceManager", SBInterfaceManager::getInterfaceManager, boost::python::return_value_policy<boost::python::reference_existing_object>(),"Gets the interface manager.");
+	
+	boost::python::class_<SBInterfaceManager, boost::noncopyable> ("SBInterfaceManager")
+		.def("addInterfaceListener", &SBInterfaceManager::addInterfaceListener, "Adds an interface listener.")
+		.def("removeInterfaceListener", &SBInterfaceManager::removeInterfaceListener, "Removes an interface listener.")
+		.def("convertScreenSpaceTo3D", &SBInterfaceManager::convertScreenSpaceTo3D, "Converts screen space to 3D space given a point on a plane and a normal to that plane.")
+		.def("getSelectedObject", &SBInterfaceManager::getSelectedObject, "Returns the name of the currently selection object.")
+;
+}
+
 
 BOOST_PYTHON_MODULE(AutoRig)
 {	
@@ -135,6 +277,11 @@ BOOST_PYTHON_MODULE(Misc)
 	boost::python::def("checkVisibility", checkVisibility, boost::python::return_value_policy<boost::python::return_by_value>(), "Lists visible pawns for a given character");
 	boost::python::def("checkVisibility_current_view", checkVisibility_current_view, boost::python::return_value_policy<boost::python::return_by_value>(), "Lists visible pawns from current viewport");
 
+}
+
+void initGUIInterfacePythonModule()
+{
+	initGUIInterface();
 }
 
 void initMiscPythonModule()
