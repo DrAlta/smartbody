@@ -29,6 +29,25 @@
 
 struct SBInterfaceListenerWrap : SBInterfaceListener, boost::python::wrapper<SBInterfaceListener>
 {
+	virtual void onStart()
+	{
+		if (boost::python::override o = this->get_override("onStart"))
+		{
+			try {
+				o();
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		SBInterfaceListener::onStart();
+	};
+
+	void default_onStart()
+	{
+		SBInterfaceListener::onStart();
+	}
+
 	virtual bool onMouseClick(int x, int y, int button)
 	{
 		if (boost::python::override o = this->get_override("onMouseClick"))
@@ -143,6 +162,25 @@ struct SBInterfaceListenerWrap : SBInterfaceListener, boost::python::wrapper<SBI
 		return SBInterfaceListener::onKeyboardRelease(c);
 	}
 
+	virtual void onEnd()
+	{
+		if (boost::python::override o = this->get_override("onEnd"))
+		{
+			try {
+				o();
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+
+		SBInterfaceListener::onEnd();
+	};
+
+	void default_onEnd()
+	{
+		SBInterfaceListener::onEnd();
+	}
+
 };
 
 
@@ -239,12 +277,15 @@ std::vector<std::string> checkVisibility_current_view()
 BOOST_PYTHON_MODULE(GUIInterface)
 {	
 	boost::python::class_<SBInterfaceListenerWrap, boost::noncopyable> ("SBInterfaceListener")
+		.def(boost::python::init<>())
+		.def("onStart", &SBInterfaceListener::onStart, "onStart")
 		.def("onMouseClick", &SBInterfaceListener::onMouseClick, &SBInterfaceListenerWrap::default_onMouseClick, "onMouseClick")
 		.def("onMouseMove", &SBInterfaceListener::onMouseMove, &SBInterfaceListenerWrap::default_onMouseMove, "onMouseMove")
 		.def("onMouseRelease", &SBInterfaceListener::onMouseRelease, &SBInterfaceListenerWrap::default_onMouseRelease, "onMouseRelease")
 		.def("onMouseDrag", &SBInterfaceListener::onMouseDrag, &SBInterfaceListenerWrap::default_onMouseDrag, "onMouseDrag")
 		.def("onKeyboardPress", &SBInterfaceListener::onKeyboardPress, &SBInterfaceListenerWrap::default_onKeyboardPress, "onKeyboardPress")
 		.def("onKeyboardRelease", &SBInterfaceListener::onKeyboardRelease, &SBInterfaceListenerWrap::default_onKeyboardRelease, "onKeyboardRelease")
+		.def("onEnd", &SBInterfaceListener::onEnd, "onEnd")
 	;
 
 	boost::python::def("getInterfaceManager", SBInterfaceManager::getInterfaceManager, boost::python::return_value_policy<boost::python::reference_existing_object>(),"Gets the interface manager.");

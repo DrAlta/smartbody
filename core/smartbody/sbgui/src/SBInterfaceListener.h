@@ -10,12 +10,14 @@ class SBInterfaceListener
 		SBInterfaceListener();
 		~SBInterfaceListener();
 
+		virtual void onStart();
 		virtual bool onMouseClick(int x, int y, int button);
 		virtual bool onMouseMove(int x, int y);
 		virtual bool onMouseRelease(int x, int y, int button);
 		virtual bool onMouseDrag(int x, int y);
 		virtual bool onKeyboardPress(char c);
 		virtual bool onKeyboardRelease(char c);
+		virtual void onEnd();
 
 };
 
