@@ -13,6 +13,10 @@ SBInterfaceListener::~SBInterfaceListener()
 {
 }
 
+void SBInterfaceListener::onStart()
+{
+}
+
 bool SBInterfaceListener::onMouseClick(int x, int y, int button)
 {
 	return false;
@@ -43,6 +47,10 @@ bool SBInterfaceListener::onKeyboardRelease(char c)
 	return false;
 }
 
+void SBInterfaceListener::onEnd()
+{
+}
+
 
 
 
@@ -67,6 +75,7 @@ void SBInterfaceManager::addInterfaceListener(SBInterfaceListener* listener)
 			return;
 	}
 	_interfaceListeners.push_back(listener);
+	listener->onStart();
 }
 
 void SBInterfaceManager::removeInterfaceListener(SBInterfaceListener* listener)
@@ -78,6 +87,7 @@ void SBInterfaceManager::removeInterfaceListener(SBInterfaceListener* listener)
 		if ((*iter) == listener)
 		{
 			_interfaceListeners.erase(iter);
+			(*iter)->onStart();
 			return;
 		}
 	}
