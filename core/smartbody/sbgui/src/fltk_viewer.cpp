@@ -2314,13 +2314,18 @@ int FltkViewer::handle ( int event )
 		   break;		
        case FL_PUSH:
        { 
+		   bool earlyReturn = false;
 		   for (size_t l = 0; l < interfaceListeners.size(); l++)
 		   {
 				int mouseX = Fl::event_x();
 				int mouseY = Fl::event_y();
 				int button = Fl::event_button();
-				interfaceListeners[l]->onMouseClick(mouseX, mouseY, button);
+				bool ret = interfaceListeners[l]->onMouseClick(mouseX, mouseY, button);
+				if (ret)
+					earlyReturn = true;
 		   }
+		   if (earlyReturn)
+			   return true;
 		   
 		   //SR_TRACE1 ( "Mouse Push : but="<<Fl::event_button()<<" ("<<Fl::event_x()<<", "<<Fl::event_y()<<")" <<" Ctrl:"<<Fl::event_state(FL_CTRL) );
          translate_event ( e, SrEvent::EventPush, w(), h(), this );
@@ -2434,13 +2439,21 @@ int FltkViewer::handle ( int event )
 	   break;
 
       case FL_RELEASE:
+		  {
+		  bool earlyReturn = false;
 		  for (size_t l = 0; l < interfaceListeners.size(); l++)
 		   {
 				int mouseX = Fl::event_x();
 				int mouseY = Fl::event_y();
 				int button = Fl::event_button();
-				interfaceListeners[l]->onMouseRelease(mouseX, mouseY, button);
+				bool ret = interfaceListeners[l]->onMouseRelease(mouseX, mouseY, button);
+				if (ret)
+					earlyReturn = true;
 		   }
+		  if (earlyReturn)
+			  return true;
+		  }
+
         //SR_TRACE1 ( "Mouse Release : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
          //            <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
         //translate_event ( e, SrEvent::EventRelease, w(), h(), this);		
@@ -2460,12 +2473,19 @@ int FltkViewer::handle ( int event )
         break;
 
       case FL_MOVE:
+		  {
+			bool earlyReturn = false;
 		   for (size_t l = 0; l < interfaceListeners.size(); l++)
 		   {
 				int mouseX = Fl::event_x();
 				int mouseY = Fl::event_y();
-			   interfaceListeners[l]->onMouseMove(e.mouse.x, e.mouse.y);
+			   bool ret = interfaceListeners[l]->onMouseMove(e.mouse.x, e.mouse.y);
+			   if (ret)
+				   earlyReturn = true;
 		   }
+		   if (earlyReturn)
+			   return true;
+		  }
         //SR_TRACE2 ( "Move buts: "<<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
 		//LOG("Move mouse cursor to %f %f",e.mouseCoord.x, e.mouseCoord.y);
 		//translate_event ( e, SrEvent::EventNone, w(), h(), this );
@@ -2474,15 +2494,22 @@ int FltkViewer::handle ( int event )
         // otherwise, this is a drag: enter in the drag case.
         // not sure if this is a hack or a feature.
       case FL_DRAG:
+		  {
+		  bool earlyReturn = false;
 		   for (size_t l = 0; l < interfaceListeners.size(); l++)
 		   {
 				int mouseX = Fl::event_x();
 				int mouseY = Fl::event_y();
-			   interfaceListeners[l]->onMouseDrag(e.mouse.x, e.mouse.y);
+			   bool ret = interfaceListeners[l]->onMouseDrag(e.mouse.x, e.mouse.y);
+			   if (ret)
+				   earlyReturn = true;
 		   }
+		   if (earlyReturn)
+			   return true;
         //SR_TRACE2 ( "Mouse Drag : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
         //             <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
         translate_event ( e, SrEvent::EventDrag, w(), h(), this );		
+		  }
         break;
 
       case FL_SHORTCUT: // not sure the relationship between a shortcut and keyboard event...
@@ -2496,10 +2523,16 @@ int FltkViewer::handle ( int event )
          e.type = SrEvent::EventKeyboard;
          e.key = Fl::event_key();
 
+		 bool earlyReturn = false;
 		for (size_t l = 0; l < interfaceListeners.size(); l++)
 		{	
-				interfaceListeners[l]->onKeyboardPress(e.key);
+				bool ret = interfaceListeners[l]->onKeyboardPress(e.key);
+				if (ret)
+					earlyReturn = true;
 		}
+		if (earlyReturn)
+			return true;
+
 
 		  switch (Fl::event_key())
 		  {
@@ -2625,14 +2658,20 @@ int FltkViewer::handle ( int event )
 		  {
 			e.type = SrEvent::EventKeyboard;
 			e.key = Fl::event_key();
+			bool earlyReturn = false;
 			 int lastKey = Fl::event_key(e.key);
+
 			 if (lastKey != e.key)
 			 {
 				for (size_t l = 0; l < interfaceListeners.size(); l++)
 				{
-					interfaceListeners[l]->onKeyboardRelease(e.key);
+					bool ret = interfaceListeners[l]->onKeyboardRelease(e.key);
+					if (ret)
+						earlyReturn = true;
 				}
 			 }
+			 if (earlyReturn)
+				 return true;
 		  }
 		  break;
       case FL_HIDE: // Called when the window is iconized
