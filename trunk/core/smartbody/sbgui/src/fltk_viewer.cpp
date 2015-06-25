@@ -2434,10 +2434,12 @@ int FltkViewer::handle ( int event )
 	   break;
 
       case FL_RELEASE:
-		  e.key = Fl::event_key();
 		  for (size_t l = 0; l < interfaceListeners.size(); l++)
 		   {
-			   interfaceListeners[l]->onKeyboardRelease(e.key);
+				int mouseX = Fl::event_x();
+				int mouseY = Fl::event_y();
+				int button = Fl::event_button();
+				interfaceListeners[l]->onMouseRelease(mouseX, mouseY, button);
 		   }
         //SR_TRACE1 ( "Mouse Release : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
          //            <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
@@ -2489,13 +2491,14 @@ int FltkViewer::handle ( int event )
         //break;
 
 	  case FL_KEYDOWN:
+		  {
 		 //LOG("Receiving FL_KEYDOWN");
          e.type = SrEvent::EventKeyboard;
          e.key = Fl::event_key();
 
 		for (size_t l = 0; l < interfaceListeners.size(); l++)
-		{
-			interfaceListeners[l]->onKeyboardPress(e.key);
+		{	
+				interfaceListeners[l]->onKeyboardPress(e.key);
 		}
 
 		  switch (Fl::event_key())
@@ -2617,6 +2620,21 @@ int FltkViewer::handle ( int event )
 				ret = deleteSelectedObject(ret);
 				break;
 		  }
+		  }
+	  case FL_KEYUP:
+		  {
+			e.type = SrEvent::EventKeyboard;
+			e.key = Fl::event_key();
+			 int lastKey = Fl::event_key(e.key);
+			 if (lastKey != e.key)
+			 {
+				for (size_t l = 0; l < interfaceListeners.size(); l++)
+				{
+					interfaceListeners[l]->onKeyboardRelease(e.key);
+				}
+			 }
+		  }
+		  break;
       case FL_HIDE: // Called when the window is iconized
         { //SR_TRACE1 ( "Hide" );
           _data->iconized = true;
