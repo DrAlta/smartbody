@@ -86,8 +86,8 @@ void SBInterfaceManager::removeInterfaceListener(SBInterfaceListener* listener)
 	{
 		if ((*iter) == listener)
 		{
+			(*iter)->onEnd();
 			_interfaceListeners.erase(iter);
-			(*iter)->onStart();
 			return;
 		}
 	}
