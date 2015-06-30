@@ -298,8 +298,13 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 		}
 	}
 	*/
+
 	
-	SpeechRequestPtr speechResult( new SpeechRequest( unique_id, localId, behav_syncs, cur_speech_impl, cur_speech_impl_backup, speech_request_id, policyStr, marks, request ) );
+	// extract the XML and store it in the request
+	std::string speechXML;
+	xml_utils::xmlToString( xml, speechXML ); 
+	
+	SpeechRequestPtr speechResult( new SpeechRequest( unique_id, localId, behav_syncs, cur_speech_impl, cur_speech_impl_backup, speech_request_id, policyStr, marks, request, speechXML ) );
 	return speechResult;
 
 }
@@ -315,7 +320,8 @@ BML::SpeechRequest::SpeechRequest(
 	RequestId speech_request_id,
 	const std::string& policyOverride,
 	vector<SpeechMark>& marks,
-	BmlRequestPtr request
+	BmlRequestPtr request,
+	const std::string& speechAsXML
 )
 :	SequenceRequest( unique_id, localId, syncs_in, 0, 0, 0, 0, 0 ),
 	speech_impl( speech_impl ),
@@ -324,6 +330,7 @@ BML::SpeechRequest::SpeechRequest(
 	trigger( behav_syncs.sync_start()->sync()->trigger.lock() ),
 	policy(policyOverride)
 {
+	speechXML = speechAsXML;
 	// Add SyncPoints for SpeechMarks
 	vector<SpeechMark>::const_iterator end = marks.end();
 	for( vector<SpeechMark>::const_iterator mark = marks.begin(); mark != end; ++mark ) {
@@ -393,6 +400,53 @@ MapOfSyncPoint& BML::SpeechRequest::getWorkBreakSync()
 const std::vector<SpeechMark>& BML::SpeechRequest::getMarks()
 {
 	return speechMarks;
+}
+
+std::string BML::SpeechRequest::getSpeechXML()
+{
+	return speechXML;
+}
+
+void recurseSpeechNodes(rapidxml::xml_node<>* curNode, std::stringstream& strstr)
+{
+	strstr<< curNode->value();
+	rapidxml::xml_node<>* childNode = curNode->first_node(NULL);
+	while (childNode)
+	{
+		recurseSpeechNodes(childNode, strstr);
+		childNode = childNode->first_node(NULL);
+	}
+
+	rapidxml::xml_node<>* siblingNode = curNode->next_sibling(NULL);
+	while (siblingNode)
+	{
+		recurseSpeechNodes(siblingNode, strstr);
+		siblingNode = siblingNode->next_sibling(NULL);
+	}
+}
+
+std::string BML::SpeechRequest::getSpeechText()
+{ 
+	// if the speech text is empty but speech xml is not, extract the text from the XML
+	if (speechText == "" && speechXML != "")
+	{
+		std::stringstream strstr;
+		vector<char> xml_copy(speechXML.begin(), speechXML.end());
+		xml_copy.push_back('\0');
+
+		rapidxml::xml_document<> doc;
+	
+		doc.parse<rapidxml::parse_declaration_node | rapidxml::parse_no_data_nodes>(&xml_copy[0]);
+
+		rapidxml::xml_node<>* speechNode = doc.first_node("speech");
+		if (speechNode)
+		{
+			recurseSpeechNodes(speechNode, strstr);
+		}
+		speechText = strstr.str();
+	}
+
+	return speechText;
 }
 
 void BML::SpeechRequest::speech_response( srArgBuffer& response_args ) {
