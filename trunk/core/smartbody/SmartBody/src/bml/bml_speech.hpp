@@ -66,8 +66,10 @@ namespace BML {
 
 		std::string			   audioPlay;
 		std::string			   audioStop;
-		
 
+		std::string				speechXML;
+		std::string				speechText;
+		
 		VecOfVisemeData	visemes;
 		VecOfVisemeData	phonemes;
 		static VecOfVisemeData debugVisemeCurves;	// viseme curves that's stored for display and debugging purpose
@@ -93,7 +95,8 @@ namespace BML {
 			SmartBody::RequestId speech_request_id,
 			const std::string& policyOverride,
 			std::vector<SpeechMark>& marks,
-			BmlRequestPtr request
+			BmlRequestPtr request,
+			const std::string& speechAsXML
 		);
 		virtual ~SpeechRequest();
 
@@ -169,6 +172,9 @@ namespace BML {
 		* Returns the phonemes and timings
 		*/
 		VecOfVisemeData& getPhonemes() { return phonemes; }
+
+		std::string getSpeechXML();
+		std::string getSpeechText();
 
 		/**
 		* Returns the debugging viseme curves

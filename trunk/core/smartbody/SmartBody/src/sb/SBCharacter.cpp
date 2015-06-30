@@ -581,6 +581,7 @@ std::vector<SBBehavior*>& SBCharacter::getBehaviors()
 				SpeechBehavior* speechBehavior = new SpeechBehavior();
 				// what information do we need here?
 				speechBehavior->setId((*bmlRequestPtr).msgId);
+				speechBehavior->setUtterance(bmlRequestPtr->speech_request->getSpeechText());
 
 				_curBehaviors.push_back(speechBehavior);
 			}

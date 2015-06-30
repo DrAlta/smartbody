@@ -293,10 +293,12 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("setVec3", &SBObject::setVec3Attribute, "Sets a vector attribute of a given name to the given value.")
 		.def("setMatrix", &SBObject::setMatrixAttribute, "Sets a matrix attribute of a given name to the given value.")
 		.def("setAction", &SBObject::setActionAttribute, "Sets a action attribute of a given name.")
-		.def("getBool", &SBObject::getBoolAttribute, boost::python::return_value_policy<boost::python::return_by_value>(),"Sets a boolean attribute of a given name to the given value.")
-		.def("getInt", &SBObject::getIntAttribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets an integer attribute of a given name to the given value.")
-		.def("getDouble", &SBObject::getDoubleAttribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets a floating point attribute of a given name to the given value.")
-		.def("getString", &SBObject::getStringAttribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets a string attribute of a given name to the given value.")
+		.def("getBool", &SBObject::getBoolAttribute, boost::python::return_value_policy<boost::python::return_by_value>(),"Gets the value of a boolean attribute of a given name to the given value.")
+		.def("getInt", &SBObject::getIntAttribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the value of an integer attribute of a given name to the given value.")
+		.def("getDouble", &SBObject::getDoubleAttribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the value of a floating point attribute of a given name to the given value.")
+		.def("getString", &SBObject::getStringAttribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the value of a string attribute of a given name to the given value.")
+		.def("getVec3", &SBObject::getVec3Attribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the value of a string attribute of a given name to the given value.")
+		.def("getMatrix", &SBObject::getMatrixAttribute, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the value of a matrix attribute of a given name to the given value.")
 		;
 
 
@@ -960,7 +962,7 @@ void initPython(std::string pythonLibPath)
 	//appendPythonModule("_hashlib", init_hashlib);
 #endif
 	//LOG("After appendPythonModule");
-	Py_Initialize();
+	Py_InitializeEx(0);
 	//LOG("After Py_Initialize");
 	try {
 #ifndef SB_NO_PYTHON
