@@ -894,8 +894,11 @@ std::string Vec3Attribute::write()
 {
 	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
-	strstr << "attr = obj.createVec3Attribute(\"" << getName() << "\", ";
 	const SrVec& vec = getValue();
+	strstr << "if obj.getAttribute(\""<< getName() << "\") != None :\n";
+	strstr << "\tobj.setVec3Attribute(\"" << getName() << "\"," << vec.x << ", " << vec.y << ", " << vec.z << ")\n";
+	strstr << "else:\n";
+	strstr << "\tattr = obj.createVec3Attribute(\"" << getName() << "\", ";
 	strstr << " " << vec.x << ", " << vec.y << ", " << vec.z;
 	SBObject* object = this->getObject();
 	if (object->hasDependency(this))
@@ -923,13 +926,13 @@ std::string Vec3Attribute::write()
 
 	const SrVec& val = getDefaultValue();
 	const SrVec& curVal = getValue();
-	strstr << "vec = SrVec()\n";
-	strstr << "vec.setData(0, " << val.x << ")\n";
-	strstr << "vec.setData(1, " << val.y << ")\n";
-	strstr << "vec.setData(2, " << val.z << ")\n";
-	strstr << "attr.setDefaultValue(vec)\n";
-	strstr << "vec1 = SrVec(" << curVal.x << ", " << curVal.y << ", " << curVal.z << ")\n";
-	strstr << "attr.setValue(vec1)\n";
+	strstr << "\tvec = SrVec()\n";
+	strstr << "\tvec.setData(0, " << val.x << ")\n";
+	strstr << "\tvec.setData(1, " << val.y << ")\n";
+	strstr << "\tvec.setData(2, " << val.z << ")\n";
+	strstr << "\tattr.setDefaultValue(vec)\n";
+	strstr << "\tvec1 = SrVec(" << curVal.x << ", " << curVal.y << ", " << curVal.z << ")\n";
+	strstr << "\tattr.setValue(vec1)\n";
 
 	return strstr.str();
 }
@@ -1009,6 +1012,9 @@ std::string MatrixAttribute::write()
 {
 	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
+
+
+
 	strstr << "attr = obj.createMatrixAttribute(\"" << getName() << "\", ";
 	const SrMat& mat = getValue();
 	strstr << "mat = SrMat()\n";
@@ -1113,7 +1119,8 @@ std::string ActionAttribute::write()
 {
 	SBAttributeInfo* info = this->getAttributeInfo();
 	std::stringstream strstr;
-	strstr << "attr = obj.createActionAttribute(\"" << getName() << "\", ";
+	strstr << "if obj.getAttribute(\""<< getName() << "\") == None :\n";
+	strstr << "\tattr = obj.createActionAttribute(\"" << getName() << "\", ";
 	SBObject* object = this->getObject();
 	if (object->hasDependency(this))
 	{
