@@ -294,7 +294,7 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	{
 		if (renderer != "custom" && renderer != "CUSTOM")
 		{
-			LOG("Renderer '%s' not recognized. Use 'custom' instead.");
+			LOG("Renderer '%s' not recognized. Use 'custom' instead.", renderer.c_str());
 		}
 		customViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
 		curViewer = customViewer;
