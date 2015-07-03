@@ -23,6 +23,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <stack>
 
 #include "bml_speech.hpp"
 
@@ -407,24 +408,6 @@ std::string BML::SpeechRequest::getSpeechXML()
 	return speechXML;
 }
 
-void recurseSpeechNodes(rapidxml::xml_node<>* curNode, std::stringstream& strstr)
-{
-	strstr<< curNode->value();
-	rapidxml::xml_node<>* childNode = curNode->first_node(NULL);
-	while (childNode)
-	{
-		recurseSpeechNodes(childNode, strstr);
-		childNode = childNode->first_node(NULL);
-	}
-
-	rapidxml::xml_node<>* siblingNode = curNode->next_sibling(NULL);
-	while (siblingNode)
-	{
-		recurseSpeechNodes(siblingNode, strstr);
-		siblingNode = siblingNode->next_sibling(NULL);
-	}
-}
-
 std::string BML::SpeechRequest::getSpeechText()
 { 
 	// if the speech text is empty but speech xml is not, extract the text from the XML
@@ -436,16 +419,50 @@ std::string BML::SpeechRequest::getSpeechText()
 
 		rapidxml::xml_document<> doc;
 	
-		doc.parse<rapidxml::parse_declaration_node | rapidxml::parse_no_data_nodes>(&xml_copy[0]);
+		//doc.parse<rapidxml::parse_declaration_node | rapidxml::parse_no_data_nodes>(&xml_copy[0]);
+		doc.parse<rapidxml::parse_declaration_node>(&xml_copy[0]);
 
+		std::stack<rapidxml::xml_node<>*> mystack;
 		rapidxml::xml_node<>* speechNode = doc.first_node("speech");
 		if (speechNode)
 		{
-			recurseSpeechNodes(speechNode, strstr);
+			mystack.push(speechNode);
 		}
+
+		while (!mystack.empty())
+		{
+			rapidxml::xml_node<>* curNode = mystack.top();
+			mystack.pop();
+
+			rapidxml::xml_node<>* childNode = curNode->first_node(NULL);
+			if (childNode)
+			{
+				std::vector<rapidxml::xml_node<>*> children;
+				children.push_back(childNode);
+				rapidxml::xml_node<>* siblingNode = childNode->next_sibling(NULL);
+				while (siblingNode)
+				{
+					children.push_back(siblingNode);
+					siblingNode = siblingNode->next_sibling(NULL);
+				}
+				size_t numChildren = children.size();
+				size_t i = numChildren - 1;
+				for (size_t i = 0; i < numChildren; i++)
+					mystack.push(children[numChildren - i - 1]);
+			}
+			
+
+			rapidxml::node_type t = curNode->type();
+
+			if (t == rapidxml::node_data)
+				strstr << curNode->value();	
+			else if (t == rapidxml::node_element)
+				strstr << " ";
+		}
+
 		speechText = strstr.str();
 	}
-
+	
 	return speechText;
 }
 
