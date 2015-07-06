@@ -12,7 +12,7 @@
 #include <fltk_viewer.h>
 
 
-FLTKListener::FLTKListener()
+FLTKListener::FLTKListener() : SmartBody::SBSceneListener(), SmartBody::SBObserver()
 {
 	otherListener = NULL;
 }
@@ -222,6 +222,7 @@ void FLTKListener::OnChannel( const std::string & name, const std::string & chan
 void FLTKListener::notify(SmartBody::SBSubject* subject)
 {
 	SmartBody::SBScene* scene =	SmartBody::SBScene::getScene();
+
 	SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(subject);
 	if (pawn)
 	{
@@ -571,6 +572,43 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 				}
 			}
 		}
+
+		// check for scene attributes
+		/*
+		if (name == "showGrid")
+		{
+			SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			bool showGrid = boolAttribute->getValue();
+			BaseWindow* window = dynamic_cast<BaseWindow*>(scene->getViewer());
+			if (window)
+			{
+				window->updateObjectList(name);
+				if (showGrid)
+					window->curViewer->_data->gridMode = ModeShowGrid;
+				else
+					window->curViewer->_data->gridMode = ModeNoGrid;
+
+		}
+		else if (name == "gridSize")
+		{
+		}
+		else if (name == "showFloor")
+		{
+		}
+		else if (name == "floorColor")
+		{
+		}
+		else if (name == "floorTexture")
+		{
+		}
+		else if (name == "floorSize")
+		{
+		}
+		else if (name == "backgroundColor")
+		{
+		}
+		*/
+		
 
 	}
 }

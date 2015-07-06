@@ -36,6 +36,7 @@ public:
 	void finishRender();
 	void setCharacterVisibility(bool bVisible);
 	bool getCharacterVisiblility();
+	void resetOgreLights();
 	void updateOgreLights();
 	void updateOgreCharacterRenderMode(bool renderSkinWeight);
 	void resetOgreScene();

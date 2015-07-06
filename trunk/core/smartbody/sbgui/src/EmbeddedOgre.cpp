@@ -162,6 +162,11 @@ bool EmbeddedOgre::getCharacterVisiblility()
 	return ogreCharacterVisible;
 }
 
+void EmbeddedOgre::resetOgreLights()
+{
+	ogreSceneMgr->destroyAllLights();
+	firstTime = true;
+}
 
 void EmbeddedOgre::updateOgreLights()
 {
