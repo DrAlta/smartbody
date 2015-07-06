@@ -63,6 +63,11 @@ SBInterfaceManager::SBInterfaceManager()
 
 SBInterfaceManager::~SBInterfaceManager()
 {
+	std::vector<SBInterfaceListener*> listeners = getInterfaceListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		this->removeInterfaceListener(listeners[l]);
+	}
 }
 
 void SBInterfaceManager::addInterfaceListener(SBInterfaceListener* listener)

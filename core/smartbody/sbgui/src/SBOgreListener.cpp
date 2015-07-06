@@ -334,11 +334,20 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 void OgreListener::OnPawnCreate( const std::string & name )
 {
 	OgreListener::OnCharacterCreate(name, "");
+
+	if (name.compare(0, 5, "light") == 0)
+	{
+		ogreInterface->resetOgreLights();
+	}
 }
 
 void OgreListener::OnPawnDelete( const std::string & name )
 {
 	OgreListener::OnCharacterDelete(name);
+	if (name.compare(0, 5, "light") == 0)
+	{
+		ogreInterface->resetOgreLights();
+	}
 }
 
 void OgreListener::OnViseme( const std::string & name, const std::string & visemeName, const float weight, const float blendTime )
