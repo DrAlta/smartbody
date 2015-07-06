@@ -33,8 +33,7 @@
 #include <sb/SBAssetManager.h>
 
 #if defined(ANDROID_BUILD)
-#include <EGL/egl.h>
-#include <GLES/gl.h>
+#include "wes_gl.h"
 #elif defined(IPHONE_BUILD)
 #import <OpenGLES/ES1/gl.h>
 #import <OpenGLES/ES1/glext.h>
@@ -626,10 +625,10 @@ void SBDrawFrame(int width, int height)
 	SrMat mat;
 	glMatrixMode ( GL_PROJECTION );
     glLoadIdentity();
-	glLoadMatrixf ( (const float*)cam.get_perspective_mat(mat) );
+	glLoadMatrixf ( (GLfloat*)cam.get_perspective_mat(mat) );
 	glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity();
-	glLoadMatrixf ( (const float*)cam.get_view_mat(mat) );
+	glLoadMatrixf ( (GLfloat*)cam.get_view_mat(mat) );
 	glScalef ( cam.getScale(), cam.getScale(), cam.getScale());
     glViewport( 0, 0, width, height);
 
