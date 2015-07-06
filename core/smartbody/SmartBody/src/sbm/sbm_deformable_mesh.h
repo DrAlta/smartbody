@@ -20,9 +20,6 @@
 	#include <windows.h>
 	#include <wingdi.h>
 	#include <GL/gl.h>
-#elif defined(BUILD_ANDROID)
-	//#include <GLES2/gl2.h>
-	//#include <GLES2/gl2ext.h>
 #elif defined(SB_IPHONE)
     #include <OpenGLES/ES1/gl.h>
     #include <OpenGLES/ES1/glext.h>

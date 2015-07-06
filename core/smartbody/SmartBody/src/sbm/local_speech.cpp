@@ -25,7 +25,11 @@
 #include "vhcl.h"
 
 #define USE_FESTIVAL_RELAY 0
+#ifdef __ANDROID__
 #define USE_CEREPROC_RELAY 0
+#else
+#define USE_CEREPROC_RELAY 0
+#endif
 
 #include "local_speech.h"
 #ifdef WIN32
@@ -504,6 +508,7 @@ CereprocSpeechRelayLocal::~CereprocSpeechRelayLocal()
 
 void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string cacheDir )
 {	
+	LOG("start init cerevoice relay");
 	std::string voiceNames[] = {"cerevoice_star_3.0.0_22k.voice", "cerevoice_heather_3.0.7_22k.voice", "cerevoice_katherine_3.0.8_22k.voice" };
 	std::string licenseNames[] = {"star2.lic", "heather.lic", "katherine2.lic" };	
 	voiceEngine = CPRCEN_engine_new();
@@ -1462,6 +1467,7 @@ local_speech::~local_speech()
 void local_speech::sendSpeechCommand(const char* cmd)
 {
 	//LOG("speech cmd = %s",cmd);
+	//LOG("local_speech::sendSpeechCommand");
 	char* cmdConst = const_cast<char*>(cmd);
 	//SmartBody::SBScene::getScene()->getCommandManager()->execute_later( cmdConst ); //sends the remote speech command using singleton* MCU_p
 	SBScene::getScene()->getVHMsgManager()->send2( "RemoteSpeechCmd", cmdConst );

@@ -4389,6 +4389,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>& testPawns)
 {
 	std::vector<std::string> visiblePawns;
+#if !defined(__ANDROID__)
 	float m[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, m);
 	SrMat modelViewMat = SrMat(m);
@@ -4505,7 +4506,7 @@ std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>&
 
 	//for (unsigned int i=0;i<visiblePawns.size();i++)
 	//	LOG("Visible pawn %d = %s", i, visiblePawns[i].c_str());
-
+#endif
 	return visiblePawns;
 }
 

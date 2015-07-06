@@ -14,6 +14,8 @@
 #endif
 #include <vhcl.h>
 
+
+#if !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
 /************************************************************************/
 /* Shader program class                                                 */
 /************************************************************************/
@@ -365,3 +367,4 @@ SbmShaderProgram* SbmShaderManager::getShader( const std::string& entryName )
 	}
 	return program;	
 }
+#endif
