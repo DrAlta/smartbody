@@ -2192,7 +2192,7 @@ void DeformableMeshInstance::blendShapes()
 
 
 		//	Here I try to blend the faces two at a time. This way I avoid hardcoded constant vector size.
-#if !defined(SB_IPHONE)
+#if !defined(SB_IPHONE) && !defined(__ANDROID__)
 
 		if(_tempFBOPairs == NULL) 
 		{
@@ -2554,8 +2554,8 @@ void DeformableMeshInstance::update()
 	if (!_skeleton || !_mesh) return;	
 	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
 	_skeleton->update_global_matrices();
-	updateFast();
-	return;
+	//updateFast();
+	//return;
 
 	int maxJoint = -1;
 	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
