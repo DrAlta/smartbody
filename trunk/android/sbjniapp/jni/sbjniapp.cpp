@@ -45,9 +45,6 @@
 #include <sb/SBPython.h>
 #endif
 
-#include <EGL/egl.h>
-#include <GLES/gl.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -293,11 +290,11 @@ void renderFrame() {
 
 	SrMat mat;
 	glMatrixMode ( GL_PROJECTION );
-	glLoadMatrixf ( (const float*)cam.get_perspective_mat(mat) );
+	glLoadMatrixf ( (GLfloat*)cam.get_perspective_mat(mat) );
 
 	//----- Set Visualisation -------------------------------------------
 	glMatrixMode ( GL_MODELVIEW );
-	glLoadMatrixf ( (const float*)cam.get_view_mat(mat) );
+	glLoadMatrixf ( (GLfloat*)cam.get_view_mat(mat) );
 
         SbmTextureManager& texm = SbmTextureManager::singleton();
         texm.updateTexture();

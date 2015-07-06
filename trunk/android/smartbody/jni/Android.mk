@@ -546,7 +546,6 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_container.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_curve_writer.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_interpolator.cpp \
-	$(SB_MY_DIR)/controllers/me_ct_lifecycle_test.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_motion.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_periodic_replay.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_pose.cpp \
@@ -723,7 +722,7 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/sb/MiniBrain.cpp \
 	$(SB_MY_DIR)/sb/SBBehavior.cpp \
 	$(SB_MY_DIR)/sbm/ParserBVH.cpp \
-	$(SB_MY_DIR)/sbm/ParserASFAMC.cxx \
+	$(SB_MY_DIR)/sbm/ParserASFAMC.cpp \
 	$(SB_MY_DIR)/sb/SBBoneBusManager.cpp \
 	$(SB_MY_DIR)/sb/SBGestureMapManager.cpp \
 	$(SB_MY_DIR)/sb/SBGestureMap.cpp \
