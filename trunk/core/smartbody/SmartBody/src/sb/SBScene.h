@@ -140,6 +140,9 @@ class SBScene : public SBObject
 
 		SBAPI void reset();
 
+		SBAPI std::string getLastScriptDirectory();
+		SBAPI void setLastScriptDirectory(std::string dir);
+
 		SBAPI void addScript(const std::string& name, SBScript* script);
 		SBAPI void removeScript(const std::string& name);
 		SBAPI int getNumScripts();
@@ -376,6 +379,8 @@ class SBScene : public SBObject
 		Heightfield* _heightField;
 		SBNavigationMesh* _navigationMesh;
 		std::map<std::string, GeneralParam*> _generalParams;
+
+		std::string _lastScriptDirectory;
 
 #ifndef SB_NO_PYTHON
 #ifndef __native_client__

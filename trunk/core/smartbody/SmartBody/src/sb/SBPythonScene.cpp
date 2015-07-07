@@ -214,6 +214,10 @@ void pythonFuncsScene()
 		.def("getNumSkeletons", &SBScene::getNumSkeletons, "Returns the number of skeletons available.")
 		.def("getSkeletonNames", &SBScene::getSkeletonNames, "Returns a list of all skeleton names.\n Input: NULL \nOutput: list of skeleton names")
 
+		.def("setLastScriptDirectory", &SBScene::setLastScriptDirectory, "Sets the path that to run a script.")
+		.def("getLastScriptDirectory", &SBScene::getLastScriptDirectory, "Returns the last path that was used to run a script.")
+
+
 	;
 }
 }
