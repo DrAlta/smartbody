@@ -84,6 +84,10 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 					  ModeSteerAll,
                 };
 
+	enum CollisionMode {  ModeCollisionShow,
+					  ModeCollisionHide,
+                };
+
 	enum CharacterMode { ModeShowGeometry,
                          ModeShowCollisionGeometry,
 						 ModeShowDeformableGeometry,
@@ -216,6 +220,8 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 				   CmdNoSteer,
 				   CmdSteerCharactersGoalsOnly,
 				   CmdSteerAll,
+				   CmdCollisionShow,
+				   CmdCollisionHide
                  };
 
   
@@ -343,7 +349,8 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 	void drawCharacterPhysicsObjs();
 	void drawCharacterBoundingVolumes();
 	void drawSteeringInfo();
-	void drawColObject(SBGeomObject* colObj, SrMat& gmat);		
+	void drawCollisionInfo();
+	void drawColObject(SBGeomObject* colObj, SrMat& gmat, float alpha);	
 	void drawMotionVectorFlow();
 	void drawPlotMotion();
 	void drawNavigationMesh();
@@ -441,6 +448,7 @@ protected:
    FltkViewer::LocomotionMode locomotionMode;   // locomotion mode
    FltkViewer::ReachRenderMode reachRenderMode;
    FltkViewer::SteerMode steerMode;
+   FltkViewer::CollisionMode collisionMode;
    FltkViewer::CameraMode cameraMode;
    FltkViewer::GridMode gridMode;
    FltkViewer::NavigationMeshMode navigationMeshMode;

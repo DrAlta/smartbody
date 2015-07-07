@@ -8,6 +8,7 @@
 #include <sb/SBEvent.h>
 #include <sbm/ODEPhysicsSim.h>
 #include <boost/lexical_cast.hpp>
+#include <sr/sr_color.h>
 
 
 namespace SmartBody {
@@ -434,6 +435,7 @@ SBGeomObject* SBCollisionManager::createCollisionObject( const std::string& geom
 	{
 		removeCollisionObject(geomName); // remove existing one
 		geomObjectMap[geomName] = newObj;
+		newObj->color.set(1.0f, 1.0f, 0.0f);
 	}	
 	return newObj;
 }
@@ -483,6 +485,11 @@ bool SBCollisionManager::removeObjectFromCollisionSpace( const std::string& geom
 		return true;
 	}
 	return false;
+}
+
+std::map<std::string, SBGeomObject*>& SBCollisionManager::getAllCollisionObjects()
+{
+	return geomObjectMap;
 }
 
 

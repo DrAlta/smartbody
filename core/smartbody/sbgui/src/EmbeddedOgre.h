@@ -3,6 +3,7 @@
 #undef WIN32_LEAN_AND_MEAN
 #endif
 #include <OGRE/Ogre.h>
+#include <sr/sr_color.h>
 
 #define USE_RTSHADER 0
 #if USE_RTSHADER
@@ -38,6 +39,9 @@ public:
 	bool getCharacterVisiblility();
 	void resetOgreLights();
 	void updateOgreLights();
+	void updateOgreFloorMaterial(std::string material);
+	void updateOgreFloor(SrColor floorColor, std::string floorMaterial, bool showFloor);
+	void updateOgreEnvironment(SrColor background, int shadowType);
 	void updateOgreCharacterRenderMode(bool renderSkinWeight);
 	void resetOgreScene();
 

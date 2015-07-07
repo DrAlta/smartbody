@@ -33,6 +33,7 @@ class SBCollisionManager : public SBService
 		SBAPI bool           removeCollisionObject(const std::string& geomName);
 		SBAPI bool           addObjectToCollisionSpace(const std::string& geomName);
 		SBAPI bool           removeObjectFromCollisionSpace(const std::string& geomName);
+		SBAPI std::map<std::string, SBGeomObject*>& getAllCollisionObjects();
 
 	protected:
 		SBCollisionSpace* collisionSpace;
