@@ -94,10 +94,11 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					#$(LOCAL_PATH)/$(OGRE_DIR)/Dependencies/include/OIS
 #LOCAL_CFLAGS    := -gstabs -g -DBUILD_ANDROID -frtti
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions
-LOCAL_SRC_FILES := Main.cpp OgreDemoApp.cpp OgreFramework.cpp test.cpp SBListener.cpp AndroidLogListener.cpp AndroidInputManager.cpp
+LOCAL_SRC_FILES := Main.cpp OgreDemoApp.cpp OgreFramework.cpp test.cpp SBListener.cpp AndroidLogListener.cpp 
 LOCAL_LDLIBS    := -landroid -llog -lEGL -lGLESv2
 #LOCAL_LDLIBS    := -llog -lEGL -lGLESv2 -gstabs
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
-LOCAL_STATIC_LIBRARIES := rs_gles2 libogre cpufeatures  librts libois libfreeimage libfreetype libzzip smartbody xerces-prebuilt python-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt
+#LOCAL_STATIC_LIBRARIES := rs_gles2 libogre cpufeatures  librts libois libfreeimage libfreetype libzzip smartbody xerces-prebuilt python-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt
+LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt python-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt libogre rs_gles2 cpufeatures librts libois libfreeimage libfreetype libzzip 
 include $(BUILD_SHARED_LIBRARY) 
-$(call import-module,android/cpufeatures)
+#$(call import-module,android/cpufeatures)
