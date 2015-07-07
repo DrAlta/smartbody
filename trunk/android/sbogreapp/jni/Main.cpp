@@ -62,9 +62,22 @@ AndroidLogListener gLogListener;
 DemoApp ogreApp;
 
 vhcl::Log::AndroidListener sbLogListener;
+extern "C" {
+    //JNIEXPORT
+	JNIEXPORT jboolean Java_com_android_sbogreapp_Main_init(JNIEnv* env, jobject thiz, jstring arg, jint width, jint height);
+	JNIEXPORT jboolean Java_com_android_sbogreapp_Main_executeSB(JNIEnv* env, jobject thiz, jstring arg);
+	JNIEXPORT jboolean Java_com_android_sbogreapp_Main_openConnection(JNIEnv* env, jobject thiz);
+	JNIEXPORT void Java_com_android_sbogreapp_Main_closeConnection(JNIEnv* env, jobject thiz);
+	JNIEXPORT void Java_com_android_sbogreapp_Main_setDeformable(JNIEnv* env, jobject thiz, jint isDeformable);
+	JNIEXPORT jboolean Java_com_android_sbogreapp_Main_render(JNIEnv* env, jobject thiz, jint drawWidth, jint drawHeight, jboolean forceRedraw);
+	JNIEXPORT void Java_com_android_sbogreapp_Main_cleanup(JNIEnv* env);
+	JNIEXPORT jstring Java_com_android_sbogreapp_Main_getLogStr(JNIEnv* env, jobject thiz);
+	JNIEXPORT jboolean Java_com_android_sbogreapp_Main_inputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my);
+	JNIEXPORT jboolean Java_com_android_sbogreapp_Main_keyEvent(JNIEnv* env, jobject thiz, jint action, jint unicodeChar, jint keyCode, jobject keyEvent);
+	JNIEXPORT void Java_com_android_sbogreapp_Main_setOffsets(JNIEnv* env, jobject thiz, jint x, jint y);
+}
 
-
-jboolean init(JNIEnv* env, jobject thiz, jstring arg, jint width, jint height)
+jboolean Java_com_android_sbogreapp_Main_init(JNIEnv* env, jobject thiz, jstring arg, jint width, jint height)
 {
 	//LOG_FOOT;
 	//sleep(10);
@@ -114,7 +127,7 @@ jboolean init(JNIEnv* env, jobject thiz, jstring arg, jint width, jint height)
 	return JNI_TRUE;
 }
 
-jboolean executeSB(JNIEnv* env, jobject thiz, jstring arg)
+jboolean Java_com_android_sbogreapp_Main_executeSB(JNIEnv* env, jobject thiz, jstring arg)
 {
 	if (!mcuInit) return false;
 	const char* sbCmd = (env)->GetStringUTFChars(arg,NULL);
@@ -122,7 +135,7 @@ jboolean executeSB(JNIEnv* env, jobject thiz, jstring arg)
 	return true;
 }
 
-jboolean openConnection(JNIEnv* env, jobject thiz)//, jstring serverName, jstring portName)
+jboolean Java_com_android_sbogreapp_Main_openConnection(JNIEnv* env, jobject thiz)//, jstring serverName, jstring portName)
 {
 	//if (!mcuInit) return false;
 	LOGI("open vhmsg connection");
@@ -132,12 +145,12 @@ jboolean openConnection(JNIEnv* env, jobject thiz)//, jstring serverName, jstrin
 	return true;
 }
 
-void closeConnection(JNIEnv* env, jobject thiz)
+void Java_com_android_sbogreapp_Main_closeConnection(JNIEnv* env, jobject thiz)
 {
 	endConnection();
 }
 
-void setDeformable(JNIEnv* env, jobject thiz, jint isDeformable)
+void Java_com_android_sbogreapp_Main_setDeformable(JNIEnv* env, jobject thiz, jint isDeformable)
 {
 	if (isDeformable == 1)
 		OgreFramework::m_ShowDeformModel = true;
@@ -146,7 +159,7 @@ void setDeformable(JNIEnv* env, jobject thiz, jint isDeformable)
 }
 
 
-jboolean render(JNIEnv* env, jobject thiz, jint drawWidth, jint drawHeight, jboolean forceRedraw)
+jboolean Java_com_android_sbogreapp_Main_render(JNIEnv* env, jobject thiz, jint drawWidth, jint drawHeight, jboolean forceRedraw)
 {
 	//LOG_FOOT;
 	//LOGI("Update sbOgreApp");
@@ -158,12 +171,12 @@ jboolean render(JNIEnv* env, jobject thiz, jint drawWidth, jint drawHeight, jboo
 	return JNI_TRUE;	
 }
 
-void cleanup(JNIEnv* env)
+void Java_com_android_sbogreapp_Main_cleanup(JNIEnv* env)
 {
 	LOG_FOOT;
 }
 
-jstring getLogStr(JNIEnv* env, jobject thiz)
+jstring Java_com_android_sbogreapp_Main_getLogStr(JNIEnv* env, jobject thiz)
 {
 	std::string logStr;
 	std::list<std::string>::iterator vi;
@@ -179,7 +192,7 @@ jstring getLogStr(JNIEnv* env, jobject thiz)
 	return env->NewStringUTF(logStr.c_str());
 }
 
-jboolean inputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my)
+jboolean Java_com_android_sbogreapp_Main_inputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my)
 {
 	LOG_FOOT;
 	OIS::AndroidInputManager* inputManager = ogreApp.getInputManager();
@@ -189,14 +202,14 @@ jboolean inputEvent(JNIEnv* env, jobject thiz, jint action, jfloat mx, jfloat my
 	return JNI_TRUE;
 }
 
-jboolean keyEvent(JNIEnv* env, jobject thiz, jint action, jint unicodeChar, jint keyCode, jobject keyEvent)
+jboolean Java_com_android_sbogreapp_Main_keyEvent(JNIEnv* env, jobject thiz, jint action, jint unicodeChar, jint keyCode, jobject keyEvent)
 {
 	LOG_FOOT;
 
 	return JNI_TRUE;  
 }
 
-void setOffsets(JNIEnv* env, jobject thiz, jint x, jint y)
+void Java_com_android_sbogreapp_Main_setOffsets(JNIEnv* env, jobject thiz, jint x, jint y)
 {
 	LOGI("%s %d %d", __FUNCTION__, x, y);
 	OIS::AndroidInputManager* inputManager = ogreApp.getInputManager();
@@ -204,6 +217,7 @@ void setOffsets(JNIEnv* env, jobject thiz, jint x, jint y)
 	    inputManager->setOffsets(x,y);
 }
 
+#if 0
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
     JNIEnv *env;
@@ -279,3 +293,4 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 
     return JNI_VERSION_1_4;
 }
+#endif
