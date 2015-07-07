@@ -238,6 +238,8 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void SteeringCharactersCB(Fl_Widget* w, void* data);
 		static void SteeringAllCB(Fl_Widget* w, void* data);
 		static void SteeringNoneCB(Fl_Widget* w, void* data);	
+		static void ShowCollisionCB(Fl_Widget* w, void* data);
+		static void HideCollisionCB(Fl_Widget* w, void* data);	
 
 		static void GridCB(Fl_Widget* w, void* data);	
 		static void FloorCB(Fl_Widget* w, void* data);	

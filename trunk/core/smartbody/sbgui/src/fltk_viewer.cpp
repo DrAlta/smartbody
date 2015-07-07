@@ -839,6 +839,12 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	   case CmdSteerCharactersGoalsOnly:
 			_data->steerMode = ModeSteerCharactersGoalsOnly;
 		 break;
+	   case CmdCollisionShow:
+			_data->collisionMode = ModeCollisionShow;
+		break;
+	   case CmdCollisionHide:
+			_data->collisionMode = ModeCollisionHide;
+		break;
 	  case CmdConstraintToggleIK:
 		  if (constraintCt)
 		  {
@@ -1737,6 +1743,7 @@ void FltkViewer::draw()
 	
 	drawGrid();
 	drawSteeringInfo();
+	drawCollisionInfo();
 	drawEyeBeams();
 	drawGazeJointLimits();
 	drawEyeLids();
@@ -3632,7 +3639,7 @@ void FltkViewer::drawCharacterBoundingVolumes()
 			if (character && character->getGeomObject())
 			{
 				SrMat gmat = character->getGeomObject()->getGlobalTransform().gmat();
-				this->drawColObject(character->getGeomObject(), gmat);
+				this->drawColObject(character->getGeomObject(), gmat, .5);
 			}
 		}
 		else
@@ -3657,7 +3664,7 @@ void FltkViewer::drawCharacterBoundingVolumes()
 						SBGeomObject* geomObj = colManager->getCollisionObject(colObjName);
 						if(!geomObj) continue;
 						const SrMat& gmat = j->gmat();
-						this->drawColObject(geomObj, (SrMat&)gmat);
+						this->drawColObject(geomObj, (SrMat&)gmat, .5);
 					}
 				}
 			}
@@ -3773,7 +3780,7 @@ void FltkViewer::drawCharacterPhysicsObjs()
 				}
 				glPopAttrib();				
 			}
-			this->drawColObject(obj->getColObj(), gmat);
+			this->drawColObject(obj->getColObj(), gmat, .5);
 		}		
 
 	}
@@ -3837,7 +3844,7 @@ void FltkViewer::drawPawns()
 			//}
 			//SrMat gmatPhy = pawn->getPhysicsObject()->getGlobalTransform().gmat();
 
-			drawColObject(pawn->getGeomObject(),gmat);
+			drawColObject(pawn->getGeomObject(),gmat, 1.0f);
 		}
 		else
 		{
@@ -5175,7 +5182,7 @@ void FltkViewer::makeGLContext()
 
 
 
-void FltkViewer::drawColObject( SBGeomObject* colObj, SrMat& gmat )
+void FltkViewer::drawColObject( SBGeomObject* colObj, SrMat& gmat, float alpha)
 {
 	glPushAttrib(GL_ENABLE_BIT);
 	glEnable(GL_LIGHTING);
@@ -5183,7 +5190,7 @@ void FltkViewer::drawColObject( SBGeomObject* colObj, SrMat& gmat )
 	//SrMat gMat = colObj->worldState.gmat();
 	SrColor objColor;
 	objColor = colObj->color;
-	objColor.a = (srbyte)255;	
+	objColor.a = (srbyte) (int) (alpha * 255.0f);
 
 	glDisable(GL_TEXTURE_2D);
 	glEnable ( GL_ALPHA_TEST );
@@ -5297,6 +5304,31 @@ void FltkViewer::drawSteeringInfo()
 	glPopMatrix();
 	glPopAttrib();
 
+}
+
+
+void FltkViewer::drawCollisionInfo()
+{
+	if (_data->collisionMode == ModeCollisionHide)
+		return;
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_LIGHTING | GL_LINE_BIT);
+	//glDisable(GL_LIGHTING);
+	glColor3f(1.0f, 1.0, 0.0f);
+	glLineWidth(5.f);
+	glPushMatrix();
+	std::map<std::string, SBGeomObject*>& collisionObjects = scene->getCollisionManager()->getAllCollisionObjects();
+	for (std::map<std::string, SBGeomObject*>::iterator iter = collisionObjects.begin();
+		 iter != collisionObjects.end();
+		 iter++)
+	{
+		SBGeomObject* collisionObject = (*iter).second;
+		drawColObject(collisionObject, collisionObject->getGlobalTransform().gmat(), .5);
+	}
+	glPopMatrix();
+	glPopAttrib();
 }
 
 
@@ -5763,6 +5795,7 @@ void FltkViewerData::setupData()
 	locomotionMode = FltkViewer::ModeEnableLocomotion;
 	reachRenderMode = FltkViewer::ModeNoExamples;
 	steerMode = FltkViewer::ModeNoSteer;
+	collisionMode = FltkViewer::ModeCollisionHide;
 	gridMode = FltkViewer::ModeShowGrid;
 	cameraMode = FltkViewer::Default;
 

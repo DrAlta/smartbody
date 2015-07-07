@@ -231,6 +231,8 @@ void SBScene::initialize()
 	createIntAttribute("shadowMapSize", 1024, true, "RenderingParameters", 100, false, false, false, "Size of the shadow map");
 	createIntAttribute("shadowMapCount", 1, true, "RenderingParameters", 110, false, false, false, "Num of the shadow maps");
 
+	createStringAttribute("floorMaterial", "", true, "RenderingParameters", 110, false, false, false, "Material to be used for the floor.");
+
 #if ANDROID_BUILD
 	createBoolAttribute("useGPUBlendshapes",false,true,"",120,false,false,false,"Use the GPU for processing blendshapes.");
 #else

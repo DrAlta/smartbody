@@ -512,6 +512,7 @@ void FLTKOgreWindow::fltkRender2()
 
 	drawGrid();
 	drawSteeringInfo();
+	drawCollisionInfo();
 	drawEyeBeams();
 	drawGazeJointLimits();
 	drawEyeLids();
@@ -611,17 +612,20 @@ void FLTKOgreWindow::notify(SmartBody::SBSubject* subject)
 		if (attr->getObject() == SmartBody::SBScene::getScene())
 		{
 			SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attr);
-			if (boolAttribute->getName() == "scale")
+			if (boolAttribute)
 			{
-				try {
-					Ogre::Entity * pPlaneEnt = ogreInterface->getSceneManager()->getEntity( "plane" );
-					Ogre::MeshPtr planeMesh = pPlaneEnt->getMesh();
-					// modify the scale of the plane mesh. Can this be done?
-					// ...
-					// ...
-				} catch ( Ogre::Exception&) {
-				}
+				if (boolAttribute->getName() == "scale")
+				{
+					try {
+						Ogre::Entity * pPlaneEnt = ogreInterface->getSceneManager()->getEntity( "plane" );
+						Ogre::MeshPtr planeMesh = pPlaneEnt->getMesh();
+						// modify the scale of the plane mesh. Can this be done?
+						// ...
+						// ...
+					} catch ( Ogre::Exception&) {
+					}
 
+				}
 			}
 		}
 	}
@@ -629,33 +633,11 @@ void FLTKOgreWindow::notify(SmartBody::SBSubject* subject)
 
 void FLTKOgreWindow::updateOptions()
 {
-	// background color
-	Ogre::Viewport* vp = ogreInterface->getRenderWindow()->getViewport(0);
-	vp->setBackgroundColour(Ogre::ColourValue(background().r / 255.0f, background().g / 255.0f, background().b / 255.0f));
-
-	// floor
-	try {
-		Ogre::Entity * pPlaneEnt = ogreInterface->getSceneManager()->getEntity( "plane" );	
-		Ogre::MaterialPtr mat = pPlaneEnt->getSubEntity(0)->getMaterial();
-		mat->setDiffuse(Ogre::ColourValue(_data->floorColor.r / 255.0f, _data->floorColor.g / 255.0f, _data->floorColor.b / 255.0f));
-		pPlaneEnt->setVisible(_data->showFloor);
-	} catch ( Ogre::Exception&) {
-	}
-
-	Ogre::SceneManager* sceneMgr = ogreInterface->getSceneManager();
-	if (_data->shadowmode == FltkViewer::ModeNoShadows)
-	{
-		sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
-	}
-	else if (_data->shadowmode == FltkViewer::ModeShadowMap)
-	{
-		sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
-	}
-	else if (_data->shadowmode == FltkViewer::ModeShadowStencil)
-	{
-		sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
-	}
+	std::string floorMaterial = SmartBody::SBScene::getScene()->getStringAttribute("floorMaterial");
+	ogreInterface->updateOgreFloor(_data->floorColor, floorMaterial, _data->showFloor);
+	ogreInterface->updateOgreEnvironment(background(), _data->shadowmode);
 }
+
 
 #if 0
 // Ogre viewer factory

@@ -162,6 +162,50 @@ bool EmbeddedOgre::getCharacterVisiblility()
 	return ogreCharacterVisible;
 }
 
+
+void EmbeddedOgre::updateOgreFloorMaterial(std::string material)
+{
+	try {
+		Ogre::Entity * pPlaneEnt = getSceneManager()->getEntity( "plane" );	
+		pPlaneEnt->setMaterialName( material );
+	} catch ( Ogre::Exception&) {
+	}
+}
+
+
+void EmbeddedOgre::updateOgreFloor(SrColor floorColor, std::string floorMaterial, bool showFloor)
+{
+	try {
+		Ogre::Entity * pPlaneEnt = getSceneManager()->getEntity( "plane" );	
+		Ogre::MaterialPtr mat = pPlaneEnt->getSubEntity(0)->getMaterial();
+		mat->setDiffuse(Ogre::ColourValue(floorColor.r / 255.0f, floorColor.g / 255.0f, floorColor.b / 255.0f));
+		pPlaneEnt->setMaterialName( floorMaterial );
+		pPlaneEnt->setVisible(showFloor);
+	} catch ( Ogre::Exception&) {
+	}
+}
+
+void EmbeddedOgre::updateOgreEnvironment(SrColor background, int shadowType)
+{
+	// background color
+	Ogre::Viewport* vp = getRenderWindow()->getViewport(0);
+	vp->setBackgroundColour(Ogre::ColourValue(background.r / 255.0f, background.g / 255.0f, background.b / 255.0f));
+
+	Ogre::SceneManager* sceneMgr = getSceneManager();
+	if (shadowType == 0)
+	{
+		sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+	}
+	else if (shadowType == 1)
+	{
+		sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE);
+	}
+	else if (shadowType == 2)
+	{
+		sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+	}
+}
+
 void EmbeddedOgre::resetOgreLights()
 {
 	ogreSceneMgr->destroyAllLights();

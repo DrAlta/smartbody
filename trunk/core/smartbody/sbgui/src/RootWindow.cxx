@@ -102,6 +102,9 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	menubar->add("&View/Steer/Characters and Goals", 0, SteeringCharactersCB, this, 0);
 	menubar->add("&View/Steer/All Steering", 0, SteeringAllCB, this, 0);
 	menubar->add("&View/Steer/No Steering", 0, SteeringNoneCB, this, 0);
+	
+	menubar->add("&View/Collisions/Show Collision Info", 0, ShowCollisionCB, this, 0);
+	menubar->add("&View/Collisions/Hide Collisions Info", 0, HideCollisionCB, this, 0);
 
 	menubar->add("&Create/Character...", 0, CreateCharacterCB, this, 0);
 	menubar->add("&Create/Pawn...", 0, CreatePawnCB, this, 0);
@@ -2228,6 +2231,22 @@ void BaseWindow::SteeringNoneCB(Fl_Widget* w, void* data)
 #if !NO_OGRE_VIEWER_CMD
 	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
 	rootWindow->curViewer->menu_cmd(FltkViewer::CmdNoSteer, NULL);	
+#endif
+}
+
+void BaseWindow::ShowCollisionCB(Fl_Widget* w, void* data)
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdCollisionShow, NULL);	
+#endif
+}
+
+void BaseWindow::HideCollisionCB(Fl_Widget* w, void* data)
+{
+#if !NO_OGRE_VIEWER_CMD
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	rootWindow->curViewer->menu_cmd(FltkViewer::CmdCollisionHide, NULL);
 #endif
 }
 

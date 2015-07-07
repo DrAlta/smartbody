@@ -237,11 +237,27 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 {
 	// notify the FLTKListener first
 	FLTKListener::notify(subject);
+
+
 	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attribute)
 	{
-		SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(attribute->getObject());
 		const std::string& name = attribute->getName();		
+		
+		SmartBody::SBScene* scene = dynamic_cast<SmartBody::SBScene*>(attribute->getObject());
+		if (scene)
+		{
+			if (name == "floorMaterial")
+			{
+				SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+				const std::string& value = strAttribute->getValue();
+				ogreInterface->updateOgreFloorMaterial(value);
+			}
+		}
+
+
+		SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(attribute->getObject());
+		
 		if (name == "deformableMesh" || name == "mesh")
 		{
 			OnCharacterUpdate(pawn->getName());
@@ -363,4 +379,8 @@ void OgreListener::OnChannel( const std::string & name, const std::string & chan
 void OgreListener::OnSimulationStart()
 {
 	FLTKListener::OnSimulationStart();
+
+	SmartBody::SBAttribute* attribute = SmartBody::SBScene::getScene()->getAttribute("floorMaterial");
+	if (attribute)
+		attribute->registerObserver(this);
 }
