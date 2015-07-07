@@ -1668,6 +1668,7 @@ void SBScene::addScript(const std::string& name, SBScript* script)
 	script->setName(name);
 
 	_scripts.insert(std::pair<std::string, SBScript*>(name, script));
+	script->start();
 }
 
 void SBScene::removeScript(const std::string& name)
@@ -1675,10 +1676,12 @@ void SBScene::removeScript(const std::string& name)
 	std::map<std::string, SBScript*>::iterator iter = _scripts.find(name);
 	if (iter != _scripts.end())
 	{
+		(*iter).second->stop();
 		_scripts.erase(iter);
 		return;
 	}
 	LOG("Script with name %s does not exist.", name.c_str());
+
 
 }
 
