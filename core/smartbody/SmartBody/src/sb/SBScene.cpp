@@ -152,6 +152,7 @@ void SBScene::initialize()
 #endif
 #endif
 	_processId = "";
+	_lastScriptDirectory = "";
 
 	createDefaultControllers();
 
@@ -1425,6 +1426,11 @@ bool SBScene::runScript(const std::string& script)
 	if (curFilename != "")
 	{
 		try {
+			// save the last directory so that a script path can be used as a relative pathing for asset loading or other use
+			boost::filesystem::path scriptPath = curFilename;
+			boost::filesystem::path scriptDir = scriptPath.parent_path();
+			this->setLastScriptDirectory(scriptDir.string());
+
 			std::stringstream strstr;
 			strstr << "execfile(\"" << curFilename << "\")";
 			PyRun_SimpleString(strstr.str().c_str());
@@ -5161,7 +5167,15 @@ SmartBody::SBObject* SBScene::getObjectFromString(const std::string& value)
 	return NULL;
 }
 
+std::string SBScene::getLastScriptDirectory()
+{
+	return _lastScriptDirectory;
+}
 
+void SBScene::setLastScriptDirectory(std::string dir)
+{
+	_lastScriptDirectory = dir;
+}
 
 };
 

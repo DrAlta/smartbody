@@ -155,8 +155,10 @@ void SrCamera::setEye(float x, float y, float z)
 	eye.y = y;
 	eye.z = z;
 
-	this->setPosition(SrVec(eye.x, eye.y, eye.z));
-
+	float xold, yold, zold, h, p, r;
+	get_world_offset(xold, yold, zold, h, p, r);
+	set_world_offset(x, y, z, h, p, r);	
+	
 	SmartBody::DoubleAttribute* posX = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("posX"));
 	posX->setValueFast(x);
 	SmartBody::DoubleAttribute* posY = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("posY"));
@@ -165,7 +167,6 @@ void SrCamera::setEye(float x, float y, float z)
 	posZ->setValueFast(z);
 	
 	updateOrientation();	
-	setPosition(SrVec(x,y,z));
 }
 
 SrVec SrCamera::getEye()
@@ -464,6 +465,11 @@ void SrCamera::reset()
 	float zfar = 100.0f*scale;
 	setNearPlane(znear);
 	setFarPlane(zfar);
+}
+
+void SrCamera::setPosition(SrVec position)
+{
+	this->setEye(position.x, position.y, position.z);
 }
 
 void SrCamera::notify(SmartBody::SBSubject* subject)

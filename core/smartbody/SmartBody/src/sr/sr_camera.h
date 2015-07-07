@@ -104,6 +104,8 @@ class SrCamera : public SmartBody::SBPawn
 
 	SBAPI void print();
 	SBAPI void reset();
+
+	SBAPI virtual void setPosition(SrVec pos);
 	
     /*! Set the parameters to their default values, which are :
         eye=(0,0,2), center=(0,0,0), up=(0,1,0), fovy=60, znear=0.1, zfar=1000, aspect=1. */
