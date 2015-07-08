@@ -833,17 +833,6 @@ void SBScene::update()
 	}
 	this->getProfiler()->mark("services");
 
-	// scripts
-	this->getProfiler()->mark("scripts", 1, "afterUpdate()");
-	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
-		iter != scripts.end();
-		iter++)
-	{
-		if ((*iter).second->isEnable())
-			(*iter).second->afterUpdate(getSimulationManager()->getTime());
-	}
-	this->getProfiler()->mark("scripts");
-
 	// services
 	this->getProfiler()->mark("services", 1, "afterUpdate()");
 	for (std::map<std::string, SmartBody::SBService*>::iterator iter = services.begin();
@@ -854,6 +843,18 @@ void SBScene::update()
 			(*iter).second->afterUpdate(getSimulationManager()->getTime());
 	}
 	this->getProfiler()->mark("services");
+
+
+	// scripts
+	this->getProfiler()->mark("scripts", 1, "afterUpdate()");
+	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
+		iter != scripts.end();
+		iter++)
+	{
+		if ((*iter).second->isEnable())
+			(*iter).second->afterUpdate(getSimulationManager()->getTime());
+	}
+	this->getProfiler()->mark("scripts");
 
 	this->getProfiler()->mark("SBScene::update()");
 
