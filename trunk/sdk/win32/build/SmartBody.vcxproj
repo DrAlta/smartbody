@@ -47,7 +47,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\include\bonebus;..\include\;..\include\steersuite;..\include\vhcl;..\include\vhmsg;..\include\wsp;..\include\xercesc;..\python27\include;..\src\SmartBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include\bonebus;..\include\;..\include\steersuite;..\include\vhcl;..\include\vhmsg;..\include\wsp;..\include\assimp-3.1.1;..\include\xercesc;..\python27\include;..\src\SmartBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <MinimalRebuild>false</MinimalRebuild>
@@ -56,7 +56,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;boost_serialization-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;python27.lib;libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;boost_serialization-vc100-mt-gd-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;python27.lib;libprotobufd.lib;assimpd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib;..\python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <OutputFile>..\bin\$(TargetName)$(TargetExt)</OutputFile>
       <ImportLibrary>..\lib\$(TargetName).lib</ImportLibrary>
@@ -75,7 +75,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\include\bonebus;..\include\;..\include\steersuite;..\include\vhcl;..\include\vhmsg;..\include\wsp;..\include\xercesc;..\python27\include;..\src\SmartBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include\bonebus;..\include\;..\include\steersuite;..\include\vhcl;..\include\vhmsg;..\include\wsp;..\include\assimp-3.1.1;..\include\xercesc;..\python27\include;..\src\SmartBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <WarningLevel>Level3</WarningLevel>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -90,7 +90,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\lib;..\python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;boost_serialization-vc100-mt-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;python27.lib;libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;boost_serialization-vc100-mt-1_51.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;python27.lib;libprotobuf.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <PerUserRedirection>true</PerUserRedirection>
       <OutputFile>..\bin\$(TargetName)$(TargetExt)</OutputFile>
@@ -110,6 +110,7 @@
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion_graph.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_new_locomotion.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_pose_postprocessing.cpp" />
+    <ClCompile Include="..\src\SmartBody\controllers\RealTimeLipSyncController.cpp" />
     <ClCompile Include="..\src\SmartBody\external\faceshift\fsbinarystream.cpp" />
     <ClCompile Include="..\src\SmartBody\external\jpge\jpge.cpp" />
     <ClCompile Include="..\src\SmartBody\external\rply\rply.c" />
@@ -137,6 +138,8 @@
     <ClCompile Include="..\src\SmartBody\protocols\sbmotion.pb.cc" />
     <ClCompile Include="..\src\SmartBody\protocols\sbutilities.pb.cc" />
     <ClCompile Include="..\src\SmartBody\sbm\GPU\SbmBlendFace.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\ParserASFAMC.cpp" />
+    <ClCompile Include="..\src\SmartBody\sbm\ParserBVH.cpp" />
     <ClCompile Include="..\src\SmartBody\sbm\ParserCOLLADAFast.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\DefaultAttributeTable.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\MiniBrain.cpp" />
@@ -150,6 +153,7 @@
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandler.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerAmc.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerAsf.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerAssimp.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerBvh.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerCOLLADA.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerObj.cpp" />
@@ -398,8 +402,6 @@
     <ClCompile Include="..\src\SmartBody\sbm\mcontrol_callbacks.cpp" />
     <ClCompile Include="..\src\SmartBody\sbm\MiscCommands.cpp" />
     <ClCompile Include="..\src\SmartBody\sbm\ODEPhysicsSim.cpp" />
-    <ClCompile Include="..\src\SmartBody\sbm\ParserASFAMC.cxx" />
-    <ClCompile Include="..\src\SmartBody\sbm\ParserBVH.cxx" />
     <ClCompile Include="..\src\SmartBody\sbm\ParserFBX.cpp" />
     <ClCompile Include="..\src\SmartBody\sbm\ParserOgre.cpp" />
     <ClCompile Include="..\src\SmartBody\sbm\ParserOpenCOLLADA.cpp" />
@@ -607,6 +609,7 @@
     <ClInclude Include="..\src\SmartBody\controllers\me_prune_policy.hpp" />
     <ClInclude Include="..\src\SmartBody\controllers\me_spline_1d.hpp" />
     <ClInclude Include="..\src\SmartBody\controllers\MotionAnalysis.h" />
+    <ClInclude Include="..\src\SmartBody\controllers\RealTimeLipSyncController.h" />
     <ClInclude Include="..\src\SmartBody\external\faceshift\fsbinarystream.h" />
     <ClInclude Include="..\src\SmartBody\external\jpge\jpge.h" />
     <ClInclude Include="..\src\SmartBody\external\parser\Bchart.h" />
@@ -752,6 +755,7 @@
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandler.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerAmc.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerAsf.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerAssimp.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerBvh.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerCOLLADA.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerObj.h" />

@@ -337,6 +337,9 @@
     <ClCompile Include="..\src\sbgui\faceshiftviewer\FaceShiftViewer.cpp">
       <Filter>faceshiftviewer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sbgui\SBInterfaceListener.cpp">
+      <Filter>viewer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\smartbody-lib\src\external\glew\glew.h">
@@ -616,6 +619,9 @@
     </ClInclude>
     <ClInclude Include="..\src\sbgui\faceshiftviewer\FaceShiftViewer.h">
       <Filter>faceshiftviewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\SBInterfaceListener.h">
+      <Filter>viewer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
