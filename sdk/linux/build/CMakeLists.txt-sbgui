@@ -50,7 +50,7 @@ find_library (OISLIB OIS)
 find_library (RTSHADERLIB OgreRTShaderSystem)
 endif()
 if (${BUILD_OGRE})
-include_directories( /usr/local/include/OGRE )
+include_directories( /usr/include/OGRE )
 set (OGREMAINLIB OgreMain)
 set (OISLIB OIS)
 set (OGRE_LIBS
@@ -58,6 +58,41 @@ set (OGRE_LIBS
 	${OISLIB}		
 	${RTSHADERLIB}		
 )
+
+
+
+if (${SB_NO_VHMSG})
+set( VHMSG_LIB
+)
+else()
+set( VHMSG_LIB
+        vhmsg
+        activemq-cpp
+)
+endif()
+
+if (${SB_NO_BONEBUS})
+set( BONEBUS_LIB
+)
+else()
+set( BONEBUS_LIB
+        bonebus
+)
+endif()
+
+if (${SB_NO_PYTHON})
+set( PYTHON_LIB
+)
+else()
+set( PYTHON_LIB
+        boost_python
+        python2.7
+)
+endif()
+
+
+
+
 
 set (OGRE_SRCS
 	EmbeddedOgre.cpp
@@ -135,6 +170,7 @@ set( SBM_FLTK_SRC
 	./fltk_viewer.cpp
 	./SBWindowListener.cpp
 	./SBSelectionManager.cpp
+	./SBInterfaceListener.cpp
 	${OGRE_SRCS}
 	./pic.cpp
 	./ppm.cpp
@@ -246,8 +282,8 @@ target_link_libraries( sbgui
 
 	${PROFILER_LIBS}
 	SmartBody
-	bonebus
-	vhmsg
+	${BONEBUS_LIBS}
+	${VHMSG_LIBS}
 	vhcl
 	boost_filesystem
 	boost_system
@@ -259,7 +295,7 @@ target_link_libraries( sbgui
 	fltk_gl 
 	${OPENGL_LIBRARIES}
 	activemq-cpp
-	python2.7
+	${PYTHON_LIBS}
     	ncurses	
 	pthread
 	pinocchio

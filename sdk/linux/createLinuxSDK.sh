@@ -82,6 +82,8 @@ mkdir -p ./smartbody/src/external/glfw
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/lib/*.c ./smartbody/src/external/glfw/
 mkdir -p ./smartbody/src/external/glfw/x11
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/glfw/lib/x11/*.c ./smartbody/src/external/glfw/x11
+mkdir -p smartbody/src/assimp-3.1.1
+rsync -ap --exclude=".svn" ../../lib/assimp-3.1.1/* ./smartbody/src/assimp-3.1.1/
 
 # first need to create data & data/mesh folder
 # copy data folder
