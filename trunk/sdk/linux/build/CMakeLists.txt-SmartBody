@@ -72,6 +72,54 @@ set( MORE_LIBS
 )       
 endif()
 
+if (${SB_NO_VHMSG})
+set( VHMSG_LIB
+)
+else()
+set( VHMSG_LIB
+        vhmsg
+        activemq-cpp
+)
+endif()
+
+if (${SB_NO_BONEBUS})
+set( BONEBUS_LIB
+)
+else()
+set( BONEBUS_LIB
+        bonebus
+)
+endif()
+
+if (${SB_NO_PYTHON})
+set( PYTHON_LIB
+)
+else()
+set( PYTHON_LIB
+        boost_python
+        python2.7
+)
+endif()
+
+if (${SB_NO_ODE_PHYSICS})
+set( ODE_LIB
+)
+else()
+set( ODE_LIB
+        ode
+)
+endif()
+
+if (${SB_NO_ASSIMP})
+set( ASSIMP_LIB
+)
+else()
+include_directories( ../../src/assimp-3.1.1/include)
+set( ASSIMP_LIB
+        assimp
+)
+endif()
+
 
 find_package(OpenGL REQUIRED)
 
@@ -201,7 +249,6 @@ set( SMARTBODY_LIB_ME_SRC
         ./controllers/me_ct_container.cpp
         ./controllers/me_ct_curve_writer.cpp
         ./controllers/me_ct_interpolator.cpp
-        ./controllers/me_ct_lifecycle_test.cpp
         ./controllers/me_ct_motion.cpp
         ./controllers/me_ct_periodic_replay.cpp
         ./controllers/me_ct_pose.cpp
@@ -389,8 +436,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ./controllers/MotionAnalysis.cpp
 		./controllers/RealTimeLipSyncController.cpp
 
-        ./sbm/ParserBVH.cxx
-        ./sbm/ParserASFAMC.cxx
+        ./sbm/ParserBVH.cpp
+        ./sbm/ParserASFAMC.cpp
         ./sbm/ParserFBX.cpp
         ./sbm/ParserOgre.cpp
         ./sbm/ParserCOLLADAFast.cpp
@@ -522,6 +569,7 @@ set( SMARTBODY_LIB_SBM_SRC
 	./sb/SBAssetHandlerObj.cpp
 	./sb/SBAssetHandlerBvh.cpp
 	./sb/SBAssetHandlerPly.cpp
+	./sb/SBAssetHandlerAssimp.cpp
 	./sb/SBAssetHandlerSkmb.cpp
 	./sb/SBAssetHandlerSBMeshBinary.cpp
         ./sb/SBBehavior.cpp
@@ -585,8 +633,9 @@ endif()
 target_link_libraries( SmartBody
 
 	${PROFILER_LIBS}
-	bonebus
-	vhmsg
+	${BONEBUS_LIB}
+	${VHMSG_LIB}
+	${ASSIMP_LIB}
 	vhcl
 	xerces-c
 	boost_filesystem
@@ -602,7 +651,7 @@ target_link_libraries( SmartBody
 	steerlib
 	pprAI
 	ode
-	python2.7
+	${PYTHON_LIB}
 	ncurses
 	${MORE_LIBS}
 	protoc
