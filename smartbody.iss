@@ -66,6 +66,7 @@ Source: ".\core\smartbody\SmartBody\src\external\protobuf\include\*"; DestDir: "
 Source: ".\lib\vhcl\include\*"; DestDir: "{app}\include\vhcl"
 Source: ".\lib\vhmsg\vhmsg-c\include\*"; DestDir: "{app}\include\vhmsg"
 Source: ".\lib\bonebus\include\*"; DestDir: "{app}\include\bonebus"
+Source: ".\lib\assimp-3.1.1\include\assimp\*"; DestDir: "{app}\include\assimp-3.1.1\assimp"; Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\sbgui\external\fltk-1.3.2\FL\*"; DestDir: "{app}\include\FL"
 Source: ".\core\smartbody\sbgui\external\cegui-0.8.2\include\*"; DestDir: "{app}\include\CEGUI";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\sbgui\external\Pinocchio\*.h"; DestDir: "{app}\include\Pinocchio";
@@ -130,6 +131,10 @@ Source: ".\core\smartbody\sbgui\external\fltk-1.3.2\lib\*.lib"; DestDir: "{app}\
 Source: ".\core\smartbody\sbgui\external\cegui-0.8.2\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\sbgui\external\Pinocchio\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\sbgui\external\polyvox\build\lib\*.lib"; DestDir: "{app}\lib"
+Source: ".\lib\assimp-3.1.1\Release\assimp.lib"; DestDir: "{app}\lib"
+Source: ".\lib\assimp-3.1.1\Debug\assimpd.lib"; DestDir: "{app}\lib"
+
+
 
 ; data
 Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs

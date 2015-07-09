@@ -625,12 +625,6 @@
     <ClCompile Include="..\src\SmartBody\sbm\ODEPhysicsSim.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SmartBody\sbm\ParserASFAMC.cxx">
-      <Filter>sbm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\sbm\ParserBVH.cxx">
-      <Filter>sbm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SmartBody\sbm\ParserFBX.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
@@ -1188,6 +1182,18 @@
     </ClCompile>
     <ClCompile Include="..\src\SmartBody\external\jpge\jpge.cpp">
       <Filter>external\jpge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sbm\ParserASFAMC.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sbm\ParserBVH.cpp">
+      <Filter>sbm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\controllers\RealTimeLipSyncController.cpp">
+      <Filter>controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerAssimp.cpp">
+      <Filter>sb</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2366,6 +2372,12 @@
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\external\jpge\jpge.h">
       <Filter>external\jpge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\controllers\RealTimeLipSyncController.h">
+      <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerAssimp.h">
+      <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
