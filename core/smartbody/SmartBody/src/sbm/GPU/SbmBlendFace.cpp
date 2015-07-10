@@ -557,12 +557,14 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 
 	for(int i = 0; i< numTextures; i++) 
 	{
-		std::string mask		= boost::replace_all_copy(texture_names[i], ".png", "_mask.png");
+		boost::filesystem::path path(texture_names[i]);
+		std::string extension = path.extension().string();
+		std::string mask		= boost::replace_all_copy(texture_names[i], "extension", "_mask" + extension);
 		SbmTexture* tex_mask;
 		// Checks if mask file exists
 		if (!boost::filesystem::exists(mask))
 		{
-			LOG("WARNING! Can't find mask %s, using a white mask instead.\n", mask.c_str());
+			LOG("WARNING! Can't find mask named %s for texture %s, using a white mask instead.\n", mask.c_str(), texture_names[i].c_str());
 			SbmTextureManager::singleton().createWhiteTexture("white");
 			tex_mask	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,"white");
 		}
