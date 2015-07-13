@@ -42,7 +42,6 @@
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBBehaviorSet">SBBehaviorSet</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBBehaviorSetManager">SBBehaviorSetManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBDiphone">SBDiphone</a>
-</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBDiphoneManager">SBDiphoneManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBEvent">SBEvent</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBEventHandler">SBEventHandler</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBEventManager">SBEventManager</a>
@@ -113,6 +112,7 @@
 <dt><font face="helvetica, arial"><a href="SmartBody.html#SBObserver">SBObserver</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBParseNode">SBParseNode</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBParser">SBParser</a>
+</font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBPhonemeManager">SBPhonemeManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBReach">SBReach</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBReachManager">SBReachManager</a>
 </font></dt><dt><font face="helvetica, arial"><a href="SmartBody.html#SBRetarget">SBRetarget</a>
@@ -492,19 +492,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="Camera-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#Camera-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="Camera-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#Camera-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="Camera-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#Camera-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#Camera-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="Camera-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#Camera-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="Camera-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#Camera-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Camera-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#Camera-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="Camera-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#Camera-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -734,19 +740,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="CurveWriterController-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="CurveWriterController-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="CurveWriterController-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="CurveWriterController-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="CurveWriterController-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="CurveWriterController-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="CurveWriterController-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="CurveWriterController-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#CurveWriterController-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -1020,19 +1032,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="EyelidController-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#EyelidController-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="EyelidController-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#EyelidController-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="EyelidController-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#EyelidController-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="EyelidController-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#EyelidController-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="EyelidController-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#EyelidController-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="EyelidController-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#EyelidController-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="EyelidController-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#EyelidController-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="EyelidController-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#EyelidController-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -1208,13 +1226,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="GazeBehavior-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#GazeBehavior-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="GazeBehavior-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#GazeBehavior-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="GazeBehavior-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#GazeBehavior-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="GazeBehavior-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#GazeBehavior-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="GazeBehavior-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#GazeBehavior-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -1223,7 +1244,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="GazeBehavior-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#GazeBehavior-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="GazeBehavior-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#GazeBehavior-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="GazeBehavior-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#GazeBehavior-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -1381,19 +1405,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="GazeController-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#GazeController-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="GazeController-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#GazeController-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="GazeController-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#GazeController-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="GazeController-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#GazeController-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="GazeController-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#GazeController-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="GazeController-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#GazeController-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="GazeController-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#GazeController-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="GazeController-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#GazeController-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -1695,13 +1725,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="LocomotionBehavior-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#LocomotionBehavior-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="LocomotionBehavior-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#LocomotionBehavior-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="LocomotionBehavior-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#LocomotionBehavior-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="LocomotionBehavior-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#LocomotionBehavior-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="LocomotionBehavior-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#LocomotionBehavior-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -1710,7 +1743,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="LocomotionBehavior-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#LocomotionBehavior-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="LocomotionBehavior-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#LocomotionBehavior-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="LocomotionBehavior-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#LocomotionBehavior-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -1936,19 +1972,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="MotionController-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#MotionController-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="MotionController-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#MotionController-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="MotionController-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#MotionController-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="MotionController-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#MotionController-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="MotionController-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#MotionController-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="MotionController-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#MotionController-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="MotionController-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#MotionController-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="MotionController-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#MotionController-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -2115,13 +2157,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="Nvbg-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#Nvbg-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="Nvbg-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#Nvbg-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="Nvbg-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#Nvbg-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Nvbg-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#Nvbg-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="Nvbg-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#Nvbg-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -2130,7 +2175,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="Nvbg-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#Nvbg-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="Nvbg-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#Nvbg-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="Nvbg-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#Nvbg-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -2246,13 +2294,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="PostureBehavior-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#PostureBehavior-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="PostureBehavior-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#PostureBehavior-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="PostureBehavior-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#PostureBehavior-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="PostureBehavior-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#PostureBehavior-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="PostureBehavior-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#PostureBehavior-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -2261,7 +2312,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="PostureBehavior-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#PostureBehavior-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="PostureBehavior-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#PostureBehavior-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="PostureBehavior-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#PostureBehavior-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -2336,12 +2390,15 @@ Methods defined here:<br>
 <dl><dt><a name="Profiler-printLegend"><strong>printLegend</strong></a>(...)</dt><dd><tt><a href="#Profiler-printLegend">printLegend</a>(&nbsp;(<a href="#Profiler">Profiler</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;time&nbsp;profiler&nbsp;legend.</tt></dd></dl>
 
+<dl><dt><a name="Profiler-printReport"><strong>printReport</strong></a>(...)</dt><dd><tt><a href="#Profiler-printReport">printReport</a>(&nbsp;(<a href="#Profiler">Profiler</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;time&nbsp;profiler&nbsp;report.</tt></dd></dl>
+
 <dl><dt><a name="Profiler-printStats"><strong>printStats</strong></a>(...)</dt><dd><tt><a href="#Profiler-printStats">printStats</a>(&nbsp;(<a href="#Profiler">Profiler</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Print&nbsp;time&nbsp;profiler&nbsp;statistics.</tt></dd></dl>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 12</dl>
+<dl><dt><strong>__instance_size__</strong> = 172</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -2477,19 +2534,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="PythonController-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#PythonController-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="PythonController-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#PythonController-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="PythonController-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#PythonController-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="PythonController-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#PythonController-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="PythonController-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#PythonController-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="PythonController-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#PythonController-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="PythonController-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#PythonController-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="PythonController-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#PythonController-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -3679,7 +3742,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 280</dl>
+<dl><dt><strong>__instance_size__</strong> = 284</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -3711,13 +3774,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBAssetManager-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBAssetManager-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBAssetManager-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBAssetManager-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBAssetManager-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -3726,7 +3792,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBAssetManager-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBAssetManager-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBAssetManager-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBAssetManager-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -3942,13 +4011,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBBehavior-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBBehavior-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBBehavior-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBBehavior-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBBehavior-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBBehavior-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBBehavior-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBBehavior-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBBehavior-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBBehavior-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -3957,7 +4029,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBBehavior-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBBehavior-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBBehavior-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBBehavior-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBBehavior-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBBehavior-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -4167,13 +4242,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBBoneBusManager-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBBoneBusManager-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBBoneBusManager-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBBoneBusManager-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBBoneBusManager-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBBoneBusManager-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBBoneBusManager-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBBoneBusManager-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBBoneBusManager-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBBoneBusManager-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -4182,7 +4260,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBBoneBusManager-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBBoneBusManager-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBBoneBusManager-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBBoneBusManager-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBBoneBusManager-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBBoneBusManager-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -4481,19 +4562,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBCharacter-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBCharacter-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBCharacter-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBCharacter-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -4615,13 +4702,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBCollisionManager-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBCollisionManager-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBCollisionManager-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBCollisionManager-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBCollisionManager-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBCollisionManager-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBCollisionManager-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBCollisionManager-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBCollisionManager-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBCollisionManager-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -4630,7 +4720,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBCollisionManager-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBCollisionManager-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBCollisionManager-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBCollisionManager-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBCollisionManager-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBCollisionManager-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -4787,19 +4880,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBController-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBController-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBController-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBController-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBController-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBController-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBController-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBController-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBController-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#SBController-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBController-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBController-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBController-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBController-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBController-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBController-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -4902,59 +5001,6 @@ Data descriptors inherited from Boost.Python.instance:<br>
 <hr>
 Data and other attributes inherited from Boost.Python.instance:<br>
 <dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBDiphone-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
-
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="SBDiphoneManager">class <strong>SBDiphoneManager</strong></a>(Boost.Python.instance)</font></td></tr>
-    
-<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="SmartBody.html#SBDiphoneManager">SBDiphoneManager</a></dd>
-<dd>Boost.Python.instance</dd>
-<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
-</dl>
-<hr>
-Methods defined here:<br>
-<dl><dt><a name="SBDiphoneManager-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBDiphoneManager-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
-
-<dl><dt><a name="SBDiphoneManager-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
-
-<dl><dt><a name="SBDiphoneManager-createDiphone"><strong>createDiphone</strong></a>(...)</dt><dd><tt><a href="#SBDiphoneManager-createDiphone">createDiphone</a>(&nbsp;(<a href="#SBDiphoneManager">SBDiphoneManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(str)arg4)&nbsp;-&gt;&nbsp;<a href="#SBDiphone">SBDiphone</a>&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Create&nbsp;a&nbsp;diphone.</tt></dd></dl>
-
-<dl><dt><a name="SBDiphoneManager-deleteDiphoneSet"><strong>deleteDiphoneSet</strong></a>(...)</dt><dd><tt><a href="#SBDiphoneManager-deleteDiphoneSet">deleteDiphoneSet</a>(&nbsp;(<a href="#SBDiphoneManager">SBDiphoneManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Delete&nbsp;all&nbsp;the&nbsp;diphones&nbsp;given&nbsp;diphone&nbsp;sets.</tt></dd></dl>
-
-<dl><dt><a name="SBDiphoneManager-getDiphone"><strong>getDiphone</strong></a>(...)</dt><dd><tt><a href="#SBDiphoneManager-getDiphone">getDiphone</a>(&nbsp;(<a href="#SBDiphoneManager">SBDiphoneManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(str)arg4)&nbsp;-&gt;&nbsp;<a href="#SBDiphone">SBDiphone</a>&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;diphone&nbsp;given&nbsp;from&nbsp;phoneme,&nbsp;to&nbsp;phoneme&nbsp;and&nbsp;diphone&nbsp;set&nbsp;name.</tt></dd></dl>
-
-<dl><dt><a name="SBDiphoneManager-getDiphoneMapNames"><strong>getDiphoneMapNames</strong></a>(...)</dt><dd><tt><a href="#SBDiphoneManager-getDiphoneMapNames">getDiphoneMapNames</a>(&nbsp;(<a href="#SBDiphoneManager">SBDiphoneManager</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;names&nbsp;of&nbsp;all&nbsp;the&nbsp;diphone&nbsp;sets.</tt></dd></dl>
-
-<dl><dt><a name="SBDiphoneManager-getDiphones"><strong>getDiphones</strong></a>(...)</dt><dd><tt><a href="#SBDiphoneManager-getDiphones">getDiphones</a>(&nbsp;(<a href="#SBDiphoneManager">SBDiphoneManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;object&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;diphones&nbsp;given&nbsp;diphone&nbsp;set&nbsp;name.</tt></dd></dl>
-
-<dl><dt><a name="SBDiphoneManager-getNumDiphoneMap"><strong>getNumDiphoneMap</strong></a>(...)</dt><dd><tt><a href="#SBDiphoneManager-getNumDiphoneMap">getNumDiphoneMap</a>(&nbsp;(<a href="#SBDiphoneManager">SBDiphoneManager</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;number&nbsp;of&nbsp;diphone&nbsp;set.</tt></dd></dl>
-
-<dl><dt><a name="SBDiphoneManager-getNumDiphones"><strong>getNumDiphones</strong></a>(...)</dt><dd><tt><a href="#SBDiphoneManager-getNumDiphones">getNumDiphones</a>(&nbsp;(<a href="#SBDiphoneManager">SBDiphoneManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;number&nbsp;of&nbsp;diphones&nbsp;given&nbsp;the&nbsp;diphone&nbsp;set&nbsp;name.</tt></dd></dl>
-
-<hr>
-Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 24</dl>
-
-<hr>
-Data descriptors inherited from Boost.Python.instance:<br>
-<dl><dt><strong>__dict__</strong></dt>
-</dl>
-<dl><dt><strong>__weakref__</strong></dt>
-</dl>
-<hr>
-Data and other attributes inherited from Boost.Python.instance:<br>
-<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBDiphoneManager-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -5228,13 +5274,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBFaceShiftManager-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBFaceShiftManager-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBFaceShiftManager-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBFaceShiftManager-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -5243,7 +5292,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBFaceShiftManager-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBFaceShiftManager-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBFaceShiftManager-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBFaceShiftManager-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -5615,19 +5667,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBJoint-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBJoint-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBJoint-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBJoint-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBJoint-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBJoint-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBJoint-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBJoint-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBJoint-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#SBJoint-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBJoint-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBJoint-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBJoint-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBJoint-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBJoint-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBJoint-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -5826,8 +5884,20 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBMesh-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
 
+<dl><dt><a name="SBMesh-centralize"><strong>centralize</strong></a>(...)</dt><dd><tt><a href="#SBMesh-centralize">centralize</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Make&nbsp;the&nbsp;center&nbsp;of&nbsp;the&nbsp;mesh&nbsp;(0,0,0)</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-computeNormals"><strong>computeNormals</strong></a>(...)</dt><dd><tt><a href="#SBMesh-computeNormals">computeNormals</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Recompute&nbsp;normals.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-copySkinWeights"><strong>copySkinWeights</strong></a>(...)</dt><dd><tt><a href="#SBMesh-copySkinWeights">copySkinWeights</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1,&nbsp;(<a href="#SBMesh">SBMesh</a>)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Copies&nbsp;the&nbsp;skin&nbsp;weights&nbsp;from&nbsp;the&nbsp;input&nbsp;mesh&nbsp;to&nbsp;this&nbsp;mesh.</tt></dd></dl>
+
 <dl><dt><a name="SBMesh-isSkinnedMesh"><strong>isSkinnedMesh</strong></a>(...)</dt><dd><tt><a href="#SBMesh-isSkinnedMesh">isSkinnedMesh</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Whether&nbsp;the&nbsp;current&nbsp;mesh&nbsp;is&nbsp;static&nbsp;or&nbsp;skinned/deformable</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-rotate"><strong>rotate</strong></a>(...)</dt><dd><tt><a href="#SBMesh-rotate">rotate</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1,&nbsp;(<a href="#SrVec">SrVec</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Rotate&nbsp;mesh</tt></dd></dl>
 
 <dl><dt><a name="SBMesh-saveToDmb"><strong>saveToDmb</strong></a>(...)</dt><dd><tt><a href="#SBMesh-saveToDmb">saveToDmb</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Save&nbsp;the&nbsp;dynamic&nbsp;mesh&nbsp;into&nbsp;a&nbsp;binary&nbsp;file&nbsp;with&nbsp;extension&nbsp;.dmb</tt></dd></dl>
@@ -5835,9 +5905,15 @@ Methods defined here:<br>
 <dl><dt><a name="SBMesh-saveToSmb"><strong>saveToSmb</strong></a>(...)</dt><dd><tt><a href="#SBMesh-saveToSmb">saveToSmb</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Save&nbsp;the&nbsp;static&nbsp;mesh&nbsp;into&nbsp;a&nbsp;binary&nbsp;file&nbsp;with&nbsp;extension&nbsp;.smb</tt></dd></dl>
 
+<dl><dt><a name="SBMesh-scale"><strong>scale</strong></a>(...)</dt><dd><tt><a href="#SBMesh-scale">scale</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Scale&nbsp;mesh</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-translate"><strong>translate</strong></a>(...)</dt><dd><tt><a href="#SBMesh-translate">translate</a>(&nbsp;(<a href="#SBMesh">SBMesh</a>)arg1,&nbsp;(<a href="#SrVec">SrVec</a>)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Translate&nbsp;mesh</tt></dd></dl>
+
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 752</dl>
+<dl><dt><strong>__instance_size__</strong> = 1076</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -5869,13 +5945,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBMesh-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBMesh-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBMesh-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBMesh-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBMesh-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBMesh-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBMesh-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBMesh-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBMesh-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -5884,7 +5963,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBMesh-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBMesh-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMesh-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBMesh-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBMesh-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBMesh-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -5966,6 +6048,12 @@ Methods defined here:<br>
 <dl><dt><a name="SBMotion-addFrame"><strong>addFrame</strong></a>(...)</dt><dd><tt><a href="#SBMotion-addFrame">addFrame</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(float)arg2,&nbsp;(<a href="#FloatVec">FloatVec</a>)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;frame&nbsp;to&nbsp;the&nbsp;motion&nbsp;a&nbsp;given&nbsp;time.</tt></dd></dl>
 
+<dl><dt><a name="SBMotion-addKeyFrameChannel"><strong>addKeyFrameChannel</strong></a>(...)</dt><dd><tt><a href="#SBMotion-addKeyFrameChannel">addKeyFrameChannel</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(float)arg4,&nbsp;(float)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;time/value&nbsp;for&nbsp;a&nbsp;particular&nbsp;translation&nbsp;or&nbsp;other&nbsp;channel&nbsp;for&nbsp;non-baked&nbsp;animation.</tt></dd></dl>
+
+<dl><dt><a name="SBMotion-addKeyFrameQuat"><strong>addKeyFrameQuat</strong></a>(...)</dt><dd><tt><a href="#SBMotion-addKeyFrameQuat">addKeyFrameQuat</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(float)arg4,&nbsp;(<a href="#SrQuat">SrQuat</a>)arg5)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;time/value&nbsp;for&nbsp;a&nbsp;particular&nbsp;quaternion&nbsp;channel&nbsp;for&nbsp;non-baked&nbsp;animation.</tt></dd></dl>
+
 <dl><dt><a name="SBMotion-addMetaData"><strong>addMetaData</strong></a>(...)</dt><dd><tt><a href="#SBMotion-addMetaData">addMetaData</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Add&nbsp;a&nbsp;tagged&nbsp;metadata&nbsp;as&nbsp;string&nbsp;to&nbsp;the&nbsp;motion.</tt></dd></dl>
 
@@ -5980,6 +6068,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBMotion-alignToEnd"><strong>alignToEnd</strong></a>(...)</dt><dd><tt><a href="#SBMotion-alignToEnd">alignToEnd</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(int)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Cut&nbsp;the&nbsp;first&nbsp;x&nbsp;number&nbsp;of&nbsp;frames&nbsp;and&nbsp;stitch&nbsp;them&nbsp;to&nbsp;the&nbsp;end.&nbsp;x&nbsp;is&nbsp;the&nbsp;input&nbsp;number</tt></dd></dl>
+
+<dl><dt><a name="SBMotion-bakeFrames"><strong>bakeFrames</strong></a>(...)</dt><dd><tt><a href="#SBMotion-bakeFrames">bakeFrames</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(float)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Bakes&nbsp;frames&nbsp;added&nbsp;from&nbsp;addkeyFrameChannel&nbsp;and&nbsp;addKeyFrameQuat.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-buildJointTrajectory"><strong>buildJointTrajectory</strong></a>(...)</dt><dd><tt><a href="#SBMotion-buildJointTrajectory">buildJointTrajectory</a>(&nbsp;(<a href="#SBMotion">SBMotion</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Build&nbsp;the&nbsp;positional&nbsp;trajectory&nbsp;of&nbsp;a&nbsp;given&nbsp;joint&nbsp;in&nbsp;this&nbsp;motion.</tt></dd></dl>
@@ -6179,7 +6270,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 824</dl>
+<dl><dt><strong>__instance_size__</strong> = 864</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -6211,13 +6302,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBMotion-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBMotion-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBMotion-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMotion-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBMotion-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBMotion-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -6226,7 +6320,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBMotion-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBMotion-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBMotion-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBMotion-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBMotion-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -6831,19 +6928,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBNewLocomotion-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBNewLocomotion-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBNewLocomotion-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBNewLocomotion-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBNewLocomotion-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBNewLocomotion-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBNewLocomotion-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBNewLocomotion-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -6943,13 +7046,16 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBObject-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBObject-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBObject-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBObject-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBObject-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBObject-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBObject-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBObject-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBObject-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBObject-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -6958,7 +7064,10 @@ Methods defined here:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBObject-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBObject-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBObject-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBObject-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBObject-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBObject-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -7243,19 +7352,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBPawn-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBPawn-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBPawn-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBPawn-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBPawn-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBPawn-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBPawn-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBPawn-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBPawn-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#SBPawn-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBPawn-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBPawn-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBPawn-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBPawn-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBPawn-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBPawn-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -7308,6 +7423,80 @@ Data descriptors inherited from Boost.Python.instance:<br>
 <hr>
 Data and other attributes inherited from Boost.Python.instance:<br>
 <dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBPawn-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="SBPhonemeManager">class <strong>SBPhonemeManager</strong></a>(Boost.Python.instance)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="SmartBody.html#SBPhonemeManager">SBPhonemeManager</a></dd>
+<dd>Boost.Python.instance</dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SBPhonemeManager-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-__init__">__init__</a>(&nbsp;(object)arg1)&nbsp;-&gt;&nbsp;None</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-__reduce__"><strong>__reduce__</strong></a> = <unnamed Boost.Python function>(...)</dt></dl>
+
+<dl><dt><a name="SBPhonemeManager-addDictionaryWord"><strong>addDictionaryWord</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-addDictionaryWord">addDictionaryWord</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(<a href="#StringVec">StringVec</a>)arg4)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Adds&nbsp;a&nbsp;word&nbsp;and&nbsp;its&nbsp;phoneme&nbsp;parts&nbsp;to&nbsp;a&nbsp;dictionary&nbsp;for&nbsp;a&nbsp;given&nbsp;language.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-clearPhonemesRealtime"><strong>clearPhonemesRealtime</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-clearPhonemesRealtime">clearPhonemesRealtime</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Removes&nbsp;all&nbsp;realtime&nbsp;phonemes&nbsp;associated&nbsp;with&nbsp;the&nbsp;given&nbsp;character.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-createDiphone"><strong>createDiphone</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-createDiphone">createDiphone</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(str)arg4)&nbsp;-&gt;&nbsp;<a href="#SBDiphone">SBDiphone</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Create&nbsp;a&nbsp;diphone.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-deleteDiphoneSet"><strong>deleteDiphoneSet</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-deleteDiphoneSet">deleteDiphoneSet</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Delete&nbsp;all&nbsp;the&nbsp;diphones&nbsp;given&nbsp;diphone&nbsp;sets.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-getDictionaryWord"><strong>getDictionaryWord</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-getDictionaryWord">getDictionaryWord</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;phonemes&nbsp;associated&nbsp;with&nbsp;a&nbsp;word&nbsp;for&nbsp;a&nbsp;given&nbsp;language.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-getDiphone"><strong>getDiphone</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-getDiphone">getDiphone</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3,&nbsp;(str)arg4)&nbsp;-&gt;&nbsp;<a href="#SBDiphone">SBDiphone</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;diphone&nbsp;given&nbsp;from&nbsp;phoneme,&nbsp;to&nbsp;phoneme&nbsp;and&nbsp;diphone&nbsp;set&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-getDiphoneMapNames"><strong>getDiphoneMapNames</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-getDiphoneMapNames">getDiphoneMapNames</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;names&nbsp;of&nbsp;all&nbsp;the&nbsp;diphone&nbsp;sets.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-getDiphones"><strong>getDiphones</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-getDiphones">getDiphones</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;object&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Get&nbsp;diphones&nbsp;given&nbsp;diphone&nbsp;set&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-getNumDiphoneMap"><strong>getNumDiphoneMap</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-getNumDiphoneMap">getNumDiphoneMap</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;number&nbsp;of&nbsp;diphone&nbsp;set.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-getNumDiphones"><strong>getNumDiphones</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-getNumDiphones">getNumDiphones</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Return&nbsp;number&nbsp;of&nbsp;diphones&nbsp;given&nbsp;the&nbsp;diphone&nbsp;set&nbsp;name.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-getPhonemesRealtime"><strong>getPhonemesRealtime</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-getPhonemesRealtime">getPhonemesRealtime</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;realtime&nbsp;phonemes&nbsp;associated&nbsp;with&nbsp;the&nbsp;given&nbsp;character.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-getPhonemesRealtimeTimings"><strong>getPhonemesRealtimeTimings</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-getPhonemesRealtimeTimings">getPhonemesRealtimeTimings</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(int)arg3)&nbsp;-&gt;&nbsp;<a href="#DoubleVec">DoubleVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;realtime&nbsp;phoneme&nbsp;timings&nbsp;associated&nbsp;with&nbsp;the&nbsp;given&nbsp;character.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-loadDictionary"><strong>loadDictionary</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-loadDictionary">loadDictionary</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Loads&nbsp;a&nbsp;dictionary&nbsp;for&nbsp;a&nbsp;given&nbsp;language.</tt></dd></dl>
+
+<dl><dt><a name="SBPhonemeManager-setPhonemesRealtime"><strong>setPhonemesRealtime</strong></a>(...)</dt><dd><tt><a href="#SBPhonemeManager-setPhonemesRealtime">setPhonemesRealtime</a>(&nbsp;(<a href="#SBPhonemeManager">SBPhonemeManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;phonemes&nbsp;associated&nbsp;with&nbsp;the&nbsp;given&nbsp;character&nbsp;for&nbsp;realtime.</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__instance_size__</strong> = 256</dl>
+
+<hr>
+Data descriptors inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+</dl>
+<hr>
+Data and other attributes inherited from Boost.Python.instance:<br>
+<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of Boost.Python.class object&gt;<dd><tt>T.<a href="#SBPhonemeManager-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;object&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -7404,13 +7593,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBPhysicsManager-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBPhysicsManager-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBPhysicsManager-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBPhysicsManager-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBPhysicsManager-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBPhysicsManager-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBPhysicsManager-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBPhysicsManager-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBPhysicsManager-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBPhysicsManager-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -7419,7 +7611,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBPhysicsManager-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBPhysicsManager-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBPhysicsManager-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBPhysicsManager-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBPhysicsManager-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBPhysicsManager-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -7825,7 +8020,7 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-getCollisionManager"><strong>getCollisionManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getCollisionManager">getCollisionManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBCollisionManager">SBCollisionManager</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;collision&nbsp;manager&nbsp;object.</tt></dd></dl>
 
-<dl><dt><a name="SBScene-getDiphoneManager"><strong>getDiphoneManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getDiphoneManager">getDiphoneManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBDiphoneManager">SBDiphoneManager</a>&nbsp;:<br>
+<dl><dt><a name="SBScene-getDiphoneManager"><strong>getDiphoneManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getDiphoneManager">getDiphoneManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBPhonemeManager">SBPhonemeManager</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;diphone&nbsp;manager&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getEventHandlerNames"><strong>getEventHandlerNames</strong></a>(...)</dt><dd><tt><a href="#SBScene-getEventHandlerNames">getEventHandlerNames</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
@@ -7855,6 +8050,9 @@ Methods defined here:<br>
 
 <dl><dt><a name="SBScene-getJointMapManager"><strong>getJointMapManager</strong></a>(...)</dt><dd><tt><a href="#SBScene-getJointMapManager">getJointMapManager</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;<a href="#SBJointMapManager">SBJointMapManager</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;joint&nbsp;mapping&nbsp;manager&nbsp;object.</tt></dd></dl>
+
+<dl><dt><a name="SBScene-getLastScriptDirectory"><strong>getLastScriptDirectory</strong></a>(...)</dt><dd><tt><a href="#SBScene-getLastScriptDirectory">getLastScriptDirectory</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;last&nbsp;path&nbsp;that&nbsp;was&nbsp;used&nbsp;to&nbsp;run&nbsp;a&nbsp;script.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getLocalAssetPaths"><strong>getLocalAssetPaths</strong></a>(...)</dt><dd><tt><a href="#SBScene-getLocalAssetPaths">getLocalAssetPaths</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#StringVec">StringVec</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;all&nbsp;path&nbsp;names&nbsp;for&nbsp;a&nbsp;given&nbsp;type&nbsp;excluding&nbsp;the&nbsp;media&nbsp;path:&nbsp;seq,&nbsp;me,&nbsp;audio,&nbsp;mesh.</tt></dd></dl>
@@ -8056,6 +8254,9 @@ Methods defined here:<br>
 <dl><dt><a name="SBScene-setDefaultRecipient"><strong>setDefaultRecipient</strong></a>(...)</dt><dd><tt><a href="#SBScene-setDefaultRecipient">setDefaultRecipient</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;default&nbsp;recipient.</tt></dd></dl>
 
+<dl><dt><a name="SBScene-setLastScriptDirectory"><strong>setLastScriptDirectory</strong></a>(...)</dt><dd><tt><a href="#SBScene-setLastScriptDirectory">setLastScriptDirectory</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;path&nbsp;that&nbsp;to&nbsp;run&nbsp;a&nbsp;script.</tt></dd></dl>
+
 <dl><dt><a name="SBScene-setMediaPath"><strong>setMediaPath</strong></a>(...)</dt><dd><tt><a href="#SBScene-setMediaPath">setMediaPath</a>(&nbsp;(<a href="#SBScene">SBScene</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;the&nbsp;media&nbsp;path.</tt></dd></dl>
 
@@ -8092,7 +8293,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 620</dl>
+<dl><dt><strong>__instance_size__</strong> = 648</dl>
 
 <hr>
 Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
@@ -8124,13 +8325,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBScene-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBScene-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBScene-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBScene-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBScene-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBScene-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -8139,7 +8343,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBScene-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBScene-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBScene-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBScene-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBScene-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -8362,13 +8569,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBService-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBService-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBService-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBService-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBService-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBService-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBService-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBService-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBService-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBService-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -8377,7 +8587,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBService-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBService-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBService-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBService-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBService-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBService-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -8650,7 +8863,7 @@ Methods defined here:<br>
 
 <hr>
 Data and other attributes defined here:<br>
-<dl><dt><strong>__instance_size__</strong> = 64</dl>
+<dl><dt><strong>__instance_size__</strong> = 200</dl>
 
 <hr>
 Data descriptors inherited from Boost.Python.instance:<br>
@@ -8774,19 +8987,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBSkeleton-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBSkeleton-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBSkeleton-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBSkeleton-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBSkeleton-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBSkeleton-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBSkeleton-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBSkeleton-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBSkeleton-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -8970,13 +9189,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBSteerManager-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBSteerManager-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBSteerManager-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBSteerManager-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBSteerManager-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBSteerManager-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBSteerManager-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBSteerManager-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBSteerManager-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBSteerManager-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -8985,7 +9207,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBSteerManager-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBSteerManager-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBSteerManager-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBSteerManager-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBSteerManager-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBSteerManager-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -9124,6 +9349,12 @@ Methods defined here:<br>
 <dl><dt><a name="SBVHMsgManager-send"><strong>send</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-send">send</a>(&nbsp;(<a href="#SBVHMsgManager">SBVHMsgManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sends&nbsp;a&nbsp;VH&nbsp;message.</tt></dd></dl>
 
+<dl><dt><a name="SBVHMsgManager-sendMessage"><strong>sendMessage</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-sendMessage">sendMessage</a>(&nbsp;(<a href="#SBVHMsgManager">SBVHMsgManager</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sends&nbsp;a&nbsp;VH&nbsp;message.</tt></dd></dl>
+
+<dl><dt><a name="SBVHMsgManager-sendOpMessage"><strong>sendOpMessage</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-sendOpMessage">sendOpMessage</a>(&nbsp;(<a href="#SBVHMsgManager">SBVHMsgManager</a>)arg1,&nbsp;(str)arg2,&nbsp;(str)arg3)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Sends&nbsp;a&nbsp;VH&nbsp;message&nbsp;with&nbsp;OP.</tt></dd></dl>
+
 <dl><dt><a name="SBVHMsgManager-setEnableLogging"><strong>setEnableLogging</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-setEnableLogging">setEnableLogging</a>(&nbsp;(<a href="#SBVHMsgManager">SBVHMsgManager</a>)arg1,&nbsp;(object)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Enables&nbsp;logging&nbsp;over&nbsp;the&nbsp;VH&nbsp;Message&nbsp;bus.&nbsp;Messages&nbsp;will&nbsp;start&nbsp;with&nbsp;the&nbsp;prefix&nbsp;'vhlog'</tt></dd></dl>
 
@@ -9178,13 +9409,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBVHMsgManager-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBVHMsgManager-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBVHMsgManager-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBVHMsgManager-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBVHMsgManager-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -9193,7 +9427,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SBVHMsgManager-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SBVHMsgManager-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SBVHMsgManager-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SBVHMsgManager-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -9354,19 +9591,25 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SchedulerController-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SchedulerController-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SchedulerController-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SchedulerController-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SchedulerController-getNumAttributes"><strong>getNumAttributes</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-getNumAttributes">getNumAttributes</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SchedulerController-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SchedulerController-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SchedulerController-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SchedulerController-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -9482,13 +9725,16 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;attributes&nbsp;names&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SpeechBehavior-getBool"><strong>getBool</strong></a>(...)</dt><dd><tt><a href="#SpeechBehavior-getBool">getBool</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;bool&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;boolean&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SpeechBehavior-getDouble"><strong>getDouble</strong></a>(...)</dt><dd><tt><a href="#SpeechBehavior-getDouble">getDouble</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;float&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;floating&nbsp;point&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SpeechBehavior-getInt"><strong>getInt</strong></a>(...)</dt><dd><tt><a href="#SpeechBehavior-getInt">getInt</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;int&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;an&nbsp;integer&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SpeechBehavior-getMatrix"><strong>getMatrix</strong></a>(...)</dt><dd><tt><a href="#SpeechBehavior-getMatrix">getMatrix</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrMat">SrMat</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;matrix&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SpeechBehavior-getName"><strong>getName</strong></a>(...)</dt><dd><tt><a href="#SpeechBehavior-getName">getName</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;name&nbsp;of&nbsp;the&nbsp;object.</tt></dd></dl>
@@ -9497,7 +9743,10 @@ Methods inherited from <a href="SmartBody.html#SBObject">SBObject</a>:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Returns&nbsp;the&nbsp;number&nbsp;of&nbsp;attributes&nbsp;associated&nbsp;with&nbsp;this&nbsp;object.</tt></dd></dl>
 
 <dl><dt><a name="SpeechBehavior-getString"><strong>getString</strong></a>(...)</dt><dd><tt><a href="#SpeechBehavior-getString">getString</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;str&nbsp;:<br>
-&nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
+
+<dl><dt><a name="SpeechBehavior-getVec3"><strong>getVec3</strong></a>(...)</dt><dd><tt><a href="#SpeechBehavior-getVec3">getVec3</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Gets&nbsp;the&nbsp;value&nbsp;of&nbsp;a&nbsp;string&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name&nbsp;to&nbsp;the&nbsp;given&nbsp;value.</tt></dd></dl>
 
 <dl><dt><a name="SpeechBehavior-setAction"><strong>setAction</strong></a>(...)</dt><dd><tt><a href="#SpeechBehavior-setAction">setAction</a>(&nbsp;(<a href="#SBObject">SBObject</a>)arg1,&nbsp;(str)arg2)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Sets&nbsp;a&nbsp;action&nbsp;attribute&nbsp;of&nbsp;a&nbsp;given&nbsp;name.</tt></dd></dl>
@@ -9718,6 +9967,12 @@ Methods defined here:<br>
 
 <dl><dt><a name="SrQuat-multVec"><strong>multVec</strong></a>(...)</dt><dd><tt><a href="#SrQuat-multVec">multVec</a>(&nbsp;(<a href="#SrQuat">SrQuat</a>)arg1,&nbsp;(<a href="#SrVec">SrVec</a>)arg2)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;multiply&nbsp;the&nbsp;quaternion&nbsp;with&nbsp;a&nbsp;vector</tt></dd></dl>
+
+<dl><dt><a name="SrQuat-normalize"><strong>normalize</strong></a>(...)</dt><dd><tt><a href="#SrQuat-normalize">normalize</a>(&nbsp;(<a href="#SrQuat">SrQuat</a>)arg1)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;normalize&nbsp;the&nbsp;quaternion</tt></dd></dl>
+
+<dl><dt><a name="SrQuat-setAxisAngle"><strong>setAxisAngle</strong></a>(...)</dt><dd><tt><a href="#SrQuat-setAxisAngle">setAxisAngle</a>(&nbsp;(<a href="#SrQuat">SrQuat</a>)arg1,&nbsp;(<a href="#SrVec">SrVec</a>)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sets&nbsp;the&nbsp;axis&nbsp;and&nbsp;angle&nbsp;of&nbsp;the&nbsp;quaternion</tt></dd></dl>
 
 <dl><dt><a name="SrQuat-setData"><strong>setData</strong></a>(...)</dt><dd><tt><a href="#SrQuat-setData">setData</a>(&nbsp;(<a href="#SrQuat">SrQuat</a>)arg1,&nbsp;(int)arg2,&nbsp;(float)arg3)&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;sets&nbsp;the&nbsp;data&nbsp;in&nbsp;the&nbsp;quaterion&nbsp;at&nbsp;location&nbsp;indicated&nbsp;by&nbsp;the&nbsp;index&nbsp;w,x,y,z</tt></dd></dl>
@@ -10232,4 +10487,6 @@ Data and other attributes inherited from Boost.Python.instance:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Quit&nbsp;SBM.</tt></dd></dl>
  <dl><dt><a name="-reset"><strong>reset</strong></a>(...)</dt><dd><tt><a href="#-reset">reset</a>()&nbsp;-&gt;&nbsp;None&nbsp;:<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Reset&nbsp;SBM.</tt></dd></dl>
+ <dl><dt><a name="-rotatePoint"><strong>rotatePoint</strong></a>(...)</dt><dd><tt><a href="#-rotatePoint">rotatePoint</a>(&nbsp;(<a href="#SrVec">SrVec</a>)arg1,&nbsp;(<a href="#SrVec">SrVec</a>)arg2,&nbsp;(<a href="#SrVec">SrVec</a>)arg3,&nbsp;(float)arg4)&nbsp;-&gt;&nbsp;<a href="#SrVec">SrVec</a>&nbsp;:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Rotate&nbsp;a&nbsp;point&nbsp;along&nbsp;a&nbsp;center</tt></dd></dl>
 </td></tr></table>
