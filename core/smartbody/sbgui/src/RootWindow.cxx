@@ -33,7 +33,7 @@
 
 #define TEST_EXPORT_SMARTBODY_PACKAGE 1
 
-BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
+BaseWindow::BaseWindow(bool useEditor, int x, int y, int w, int h, const char* name) : SrViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name)
 {
 	standaloneResourceWindow = NULL;
 	commandWindow = NULL;
@@ -289,7 +289,14 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	renderer = SmartBody::SBScene::getScene()->getSystemParameter("renderer");
 	if (renderer == "ogre" || renderer == "OGRE")
 	{
-		ogreViewer = new FLTKOgreWindow(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);	
+		if (!useEditor)
+		{
+			ogreViewer = new FLTKOgreWindow(0, 0, w, h);	
+		}
+		else
+		{
+			ogreViewer = new FLTKOgreWindow(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);	
+		}
 		curViewer = ogreViewer;
 		customViewer = NULL;
 	}
@@ -299,7 +306,14 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 		{
 			LOG("Renderer '%s' not recognized. Use 'custom' instead.", renderer.c_str());
 		}
-		customViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
+		if (!useEditor)
+		{
+			customViewer = new FltkViewer(0,0, w, h);
+		}
+		else
+		{
+			customViewer = new FltkViewer(outlinerWidth + leftBorderSize, curY, viewerWidth, viewerHeight, NULL);
+		}
 		curViewer = customViewer;
 		ogreViewer = NULL;
 	}
@@ -347,6 +361,13 @@ BaseWindow::BaseWindow(int x, int y, int w, int h, const char* name) : SrViewer(
 	
 	panimationWindow = NULL;	
 	exportWindow = NULL;
+
+	if (!useEditor)
+	{
+		// in non-editor mode, remove all widgets except for the viewer
+		_leftGroup->hide();
+		menubar->hide();
+	}
 }
 
 BaseWindow::~BaseWindow() {
@@ -2621,12 +2642,42 @@ SrViewer* FltkViewerFactory::s_viewer = NULL;
 FltkViewerFactory::FltkViewerFactory()
 {
 	s_viewer = NULL;
+	_useEditor = true;
+	_maximize = false;
+	_windowName = "SmartBody";
 }
+
+void FltkViewerFactory::setUseEditor(bool val)
+{
+	_useEditor = val;
+}
+
+void FltkViewerFactory::setMaximize(bool val)
+{
+	_maximize = val;
+}
+
+void FltkViewerFactory::setWindowName(std::string name)
+{
+	_windowName = name;
+}
+
 
 SrViewer* FltkViewerFactory::create(int x, int y, int w, int h)
 {
 	if (!s_viewer)
-		s_viewer = new BaseWindow(x, y, w, h, "SmartBody");
+	{
+		if (_maximize)
+		{
+			int screenX, screenY, screenW, screenH;
+			Fl::screen_xywh(screenX, screenY, screenW, screenH);
+			s_viewer = new BaseWindow(_useEditor, screenX, screenY + 10, screenW, screenH - 10, _windowName.c_str());
+		}
+		else
+		{
+			s_viewer = new BaseWindow(_useEditor, x, y, w, h, _windowName.c_str());
+		}
+	}
 	return s_viewer;
 }
 

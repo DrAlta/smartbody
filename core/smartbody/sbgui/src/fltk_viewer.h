@@ -51,6 +51,21 @@ class PALocomotionData;
 class FLTKListener;
 class BaseWindow;
 
+
+struct Point3D
+{
+	SrVec point;
+	SrColor color;
+	int size;
+};
+
+struct Line3D
+{
+	std::vector<SrVec> points;
+	SrColor color;
+	int width;
+};
+
 /*! \class SrViewer sr_viewer.h
     \brief A fltk-opengl viewer
 
@@ -281,6 +296,20 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 	FltkViewerData* getData() { return _data; };
 	ObjectManipulationHandle& getObjectManipulationHandle() { return _objManipulator; };
 	std::string _lastSelectedCharacter;
+
+	// 3d drawing interface
+	void addPoint(const std::string& pointName, SrVec point, SrVec color, float size);
+	void removePoint(const std::string& pointName);
+	void removeAllPoints();
+	void addLine(const std::string& lineName, std::vector<SrVec>& points, SrVec color, float width);
+	void removeLine(const std::string& lineName);
+	void removeAllLines();
+	void drawDynamicVisuals();
+
+	protected:
+	std::map<std::string, Point3D> _points3D;
+	std::map<std::string, Line3D> _lines3D;
+
 
    public : // virtual methods
 

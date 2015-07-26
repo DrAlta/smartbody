@@ -186,7 +186,7 @@ struct SBInterfaceListenerWrap : SBInterfaceListener, boost::python::wrapper<SBI
 
 
 
-void setPawnMesh(const std::string& pawnName, const std::string& meshName, float meshScale)
+void setPawnMesh(const std::string& pawnName, const std::string& meshName, SrVec meshScale)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBAssetManager* assetManager = scene->getAssetManager();
@@ -274,8 +274,71 @@ std::vector<std::string> checkVisibility_current_view()
 	return visible;
 }
 
+void addPoint(const std::string& pointName, SrVec point, SrVec color, int size)
+{
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (window->curViewer)
+	{
+		window->curViewer->addPoint(pointName, point, color, size);
+	}
+}
+
+void removePoint(const std::string& pointName)
+{
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (window->curViewer)
+	{
+		window->curViewer->removePoint(pointName);
+	}
+}
+
+void removeAllPoints()
+{
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (window->curViewer)
+	{
+		window->curViewer->removeAllPoints();
+	}
+}
+
+void addLine(const std::string& lineName, std::vector<SrVec>& points, SrVec color, int width)
+{
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (window->curViewer)
+	{
+		window->curViewer->addLine(lineName, points, color, width);
+	}
+}
+
+void removeLine(const std::string& lineName)
+{
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (window->curViewer)
+	{
+		window->curViewer->removeLine(lineName);
+	}
+}
+
+void removeAllLines()
+{
+	BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (window->curViewer)
+	{
+		window->curViewer->removeAllLines();
+	}
+}
+
 BOOST_PYTHON_MODULE(GUIInterface)
-{	
+{
+	boost::python::def("addPoint", addPoint, "addPoint");
+	boost::python::def("removePoint", removePoint, "removePoint");
+	boost::python::def("removeAllPoints", removePoint, "removeAllPoints");
+	boost::python::def("addLine", addLine, "addLine");
+	boost::python::def("removeLine", removeLine, "removeLine");
+	boost::python::def("removeAllLines", removeAllLines, "removeAllLines");
+
+
+
 	boost::python::class_<SBInterfaceListenerWrap, boost::noncopyable> ("SBInterfaceListener")
 		.def(boost::python::init<>())
 		.def("onStart", &SBInterfaceListener::onStart, "onStart")

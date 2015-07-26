@@ -668,7 +668,8 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 
 	// update normal vectors for the deformable mesh. it is significantly slower to do this. So turn off by default. 
 	glUniform1i(updateNormalLoc,1);
-	glUniform1f(meshScale_location, meshInstance->getMeshScale());
+	SrVec scale = meshInstance->getMeshScale();
+	glUniform1f(meshScale_location, (float) scale[0]);
 
 	GLuint idQuery;
 	GLuint count = 0;

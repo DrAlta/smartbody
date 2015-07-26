@@ -7,6 +7,7 @@
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmTexture.h>
 #include <sr/sr_euler.h>
+#include <exception>
 
 #if !defined(WIN32)
 #include <GL/glx.h>
@@ -225,9 +226,14 @@ void EmbeddedOgre::updateOgreLights()
 	SmartBody::IntAttribute* shadowMapSizeAttr = dynamic_cast<SmartBody::IntAttribute*>(scene->getAttribute("shadowMapSize"));
 	SmartBody::IntAttribute* shadowMapCountAttr = dynamic_cast<SmartBody::IntAttribute*>(scene->getAttribute("shadowMapCount"));
 	
+	SmartBody::DoubleAttribute* optimalAdjustFactorAttr = dynamic_cast<SmartBody::DoubleAttribute*>(scene->getAttribute("optimalAdjustFactor"));
+	SmartBody::DoubleAttribute* shadowFarDistanceAttr = dynamic_cast<SmartBody::DoubleAttribute*>(scene->getAttribute("shadowFarDistance"));
+
 	if (shadowMapSizeAttr)
 	{				
 		bool changeShadowMapSize = false;
+		bool changeShadowFarDistance = false;
+
 		int numShadowTextures = ogreSceneMgr->getShadowTextureCount();
 		for (int s = 0; s < numShadowTextures; s++)
 		{
@@ -238,9 +244,22 @@ void EmbeddedOgre::updateOgreLights()
 				//ogreSceneMgr->setShadowTextureSize(shadowMapSize->getValue());
 				changeShadowMapSize = true;
 			}
+			
+			const Ogre::Real shadowFarDistance = ogreSceneMgr->getShadowFarDistance();
+			if (shadowFarDistance == shadowFarDistanceAttr->getValue())
+			{
+				changeShadowFarDistance = true;
+			}
+
+			
+
+
 		}
 		if (changeShadowMapSize)
-			ogreSceneMgr->setShadowTextureSize(shadowMapSizeAttr->getValue());			
+			ogreSceneMgr->setShadowTextureSize(shadowMapSizeAttr->getValue());		
+		if (changeShadowFarDistance)
+			ogreSceneMgr->setShadowFarDistance(shadowFarDistanceAttr->getValue());		
+
 	}
 
 	if (shadowMapCountAttr)
@@ -452,10 +471,11 @@ void EmbeddedOgre::createDefaultScene()
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_MODULATIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_STENCIL_ADDITIVE );
 	//ogreSceneMgr->setShadowTechnique( SHADOWTYPE_NONE );
+	ogreSceneMgr->setShadowFarDistance( 100000.f );
 	ogreSceneMgr->setShadowTextureCount(1);
 	ogreSceneMgr->setShadowTextureSize(1024);
-	MovablePlane* shadowPlane;
-	shadowPlane = new MovablePlane(Vector3::UNIT_Y,Ogre::Vector3(0,0,0));
+	//MovablePlane* shadowPlane;
+	//shadowPlane = new MovablePlane(Vector3::UNIT_Y,Ogre::Vector3(0,0,0));
 	
 
 	Ogre::LiSPSMShadowCameraSetup* LiSPSMSetup = new LiSPSMShadowCameraSetup();
@@ -464,7 +484,7 @@ void EmbeddedOgre::createDefaultScene()
 	LiSPSMSetup->setUseAggressiveFocusRegion(true);
 	LiSPSMSetup->setCameraLightDirectionThreshold(Ogre::Degree(60));
 
-	Ogre::PlaneOptimalShadowCameraSetup* POptimalSetup = new PlaneOptimalShadowCameraSetup(shadowPlane);
+	//Ogre::PlaneOptimalShadowCameraSetup* POptimalSetup = new PlaneOptimalShadowCameraSetup(shadowPlane);
 	Ogre::ShadowCameraSetupPtr shadowCameraSetup = Ogre::ShadowCameraSetupPtr(LiSPSMSetup);
 	//Ogre::ShadowCameraSetupPtr shadowCameraSetup = Ogre::ShadowCameraSetupPtr(POptimalSetup);
 	ogreSceneMgr->setShadowCameraSetup(shadowCameraSetup);
@@ -569,6 +589,8 @@ void EmbeddedOgre::createDefaultScene()
 	ogreSceneMgr->getRootSceneNode()->createChildSceneNode("plane_node", Vector3( 0, 0, 0 ) )->attachObject( pPlaneEnt );
 	ogreSceneMgr->getSceneNode("plane_node")->setVisible(true);
 
+
+
 	firstTime = true;
 }
 
@@ -589,18 +611,22 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 	unsigned long oldGLContext = getCurrentGLContext();//glContext;
 	printf("embeddedOgre, current GL context = %lu, input GL context = %lu, winHandle = %lu\n",oldGLContext, glContext, winHandle);
 	try 
-	{		
-		ogreRoot = OGRE_NEW Ogre::Root();
+	{	
+		std::string pluginsFile = "Plugins.cfg";
+		bool lIsInDebugMode = OGRE_DEBUG_MODE;
+		if (lIsInDebugMode)
+			pluginsFile = "Plugins_d.cfg";
+		ogreRoot = OGRE_NEW Ogre::Root(pluginsFile);
 
 		Ogre::MaterialManager& matManager = Ogre::MaterialManager::getSingleton();
 
-		ogreRoot->restoreConfig();
+		//ogreRoot->restoreConfig();
 		//LogManager::getSingletonPtr()->setLogDetail(LL_BOREME);
 		Ogre::LogManager::getSingleton().setLogDetail(Ogre::LL_LOW);
 #ifdef WIN32
 		Ogre::String pluginName = "RenderSystem_GL";	
 		Ogre::String sceneManagerPlugin = "Plugin_OctreeSceneManager";
-		bool lIsInDebugMode = OGRE_DEBUG_MODE;
+		
 		if(lIsInDebugMode)
 		{
 			pluginName.append("_d");
@@ -633,16 +659,27 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 			ogrePath = "/usr/share/OGRE-1.8.0";
 #endif
 		}
-
-		ogreRoot->addResourceLocation(ogrePath + "/media/materials/programs","FileSystem");
-		ogreRoot->addResourceLocation(ogrePath + "/media/materials/scripts","FileSystem");
-		ogreRoot->addResourceLocation(ogrePath + "/media/materials/textures","FileSystem");
-		ogreRoot->addResourceLocation(ogrePath + "/media/RTShaderLib/","FileSystem");
-		ogreRoot->addResourceLocation(ogrePath + "/media/RTShaderLib/materials/","FileSystem");
-
+		
+		
 
 		ogreWnd = ogreRoot->initialise( false );
+		
+		//ogreRoot->addResourceLocation(ogrePath + "/media/materials/","FileSystem");
+		//ogreRoot->addResourceLocation(ogrePath + "/media/materials/programs","FileSystem");
+		//ogreRoot->addResourceLocation(ogrePath + "/media/materials/scripts","FileSystem");
+		//ogreRoot->addResourceLocation(ogrePath + "/media/materials/textures","FileSystem");
+		//ogreRoot->addResourceLocation(ogrePath + "/media/particle","FileSystem");
+		//ogreRoot->addResourceLocation(ogrePath + "/media/RTShaderLib/","FileSystem");
+		//ogreRoot->addResourceLocation(ogrePath + "/media/RTShaderLib/materials/","FileSystem");
+		
+		//Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+		
+		
 		Ogre::NameValuePairList params;
+
+
+
+
 	
 		// determine system capabilities
 		Ogre::ConfigOptionMap& configMap = lRenderSystem->getConfigOptions();
@@ -778,6 +815,11 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		Ogre::LogManager::getSingleton().logMessage( s, Ogre::LML_CRITICAL );		
 		LOG("Ogre error: %s", s.c_str());		
 	}
+	if (!ogreWnd)
+	{
+		LOG("Cannot launch Ogre window...");
+		return;
+	}
 	//LOG("Finish setup resource");
 	// create frame listener
 	ogreFrameListener = new OgreFrameListener(ogreWnd,ogreCamera,"Create Ogre Frame Listener", ogreSceneMgr, this);
@@ -821,17 +863,22 @@ Ogre::Entity* EmbeddedOgre::createOgrePawn( SmartBody::SBPawn* sbPawn )
 	Ogre::Entity* outPawn = NULL;
 	std::string meshName = sbPawn->getStringAttribute("mesh");
 	DeformableMeshInstance* meshInstance = sbPawn->dStaticMeshInstance_p;
-	if (meshName == "") meshName = sbPawn->getName();
+	if (meshName == "") 
+		meshName = sbPawn->getName();
 
 	addDeformableMesh(meshName, meshInstance);
 	Ogre::MeshPtr     ogreMesh = Ogre::MeshManager::getSingleton().getByName(meshName);	
-	if (ogreMesh.isNull()) return NULL;
-	if (!meshInstance) return NULL;
+	if (ogreMesh.isNull()) 
+		return NULL;
+	if (!meshInstance) 
+		return NULL;
 	DeformableMesh* deformMesh = meshInstance->getDeformableMesh();
-	if (!deformMesh) return NULL;
+	if (!deformMesh) 
+		return NULL;
 
 	ogreMesh->load();
 	outPawn = ogreSceneMgr->createEntity(sbPawn->getName(),meshName);	
+	outPawn->setCastShadows(true);
 	return outPawn;
 }
 
@@ -1157,7 +1204,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	}
 	bool isAutoRig = meshName == "AutoRig.dae";
 	int perVertexSize = 6;
-	float meshScale = meshInstance->getMeshScale();
+	float meshScale = meshInstance->getMeshScale()[0];
 	Ogre::MeshPtr ogreMesh = meshManager.create(meshName,"General",true);
 	mesh->buildSkinnedVertexBuffer(); // if not already built
 	LOG("Generating Deformable Model Name = %s, size of pos buffer = %d, size of color buffer = %d", meshName.c_str(), meshInstance->getDeformableMesh()->posBuf.size(), meshInstance->getDeformableMesh()->meshColorBuf.size());
@@ -1203,6 +1250,11 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 				bbMin[k] = meshPos[k];
 		}		
 		//LOG("vtx %d, mesh normal = %f %f %f", j, mesh->normalBuf[j][0], mesh->normalBuf[j][1], mesh->normalBuf[j][2]);
+	}
+	if (vtxData->vertexCount == 0)
+	{
+		bbMax = SrVec((float)1,(float)1,(float)1);
+		bbMin = SrVec((float)-1,(float)-1,(float)-1);
 	}
 	vbuf->writeData(0, vbuf->getSizeInBytes(), tempFloatArray, true);
 	Ogre::VertexBufferBinding* bind = vtxData->vertexBufferBinding;
@@ -1284,6 +1336,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 
 		std::string materialName = subModel->matName + boost::lexical_cast<std::string>(i); //meshName + boost::lexical_cast<std::string>(i) + "Mat";
 		Ogre::MaterialPtr ogreMat = Ogre::MaterialManager::getSingleton().create(materialName, "General");
+		ogreMat->setTransparencyCastsShadows(true);
 		Ogre::Pass* pass = ogreMat->getTechnique(0)->getPass(0);
  		Ogre::TexturePtr texPtr = Ogre::TextureManager::getSingleton().getByName(subModel->texName);
 		if (!texPtr.isNull())

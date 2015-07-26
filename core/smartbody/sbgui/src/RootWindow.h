@@ -52,7 +52,7 @@ class ResolutionWindow;
 class  BaseWindow : public SrViewer, public Fl_Double_Window
 {
 	public:	
-		BaseWindow(int x, int y, int w, int h, const char* name);
+		BaseWindow(bool useEditor, int x, int y, int w, int h, const char* name);
 		~BaseWindow();
 
 		virtual void show_viewer();
@@ -266,9 +266,15 @@ class FltkViewerFactory : public SrViewerFactory
 		virtual SrViewer* create(int x, int y, int w, int h);
 		virtual void remove(SrViewer* viewer);
 		virtual void reset(SrViewer* viewer);
+		void setUseEditor(bool val);
+		void setMaximize(bool val);
+		void setWindowName(std::string name);
 
 	private:
 		static SrViewer* s_viewer;
+		bool _useEditor;
+		bool _maximize;
+		std::string _windowName;
 
  };
 #endif

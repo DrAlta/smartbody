@@ -14,6 +14,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h> 
 #include <sbm/GPU/SbmTexture.h>
+#include <exception>
 
 struct materialTextures {
 	std::vector<std::string> diffuseTextures;
@@ -40,6 +41,7 @@ SBAssetHandlerAssimp::SBAssetHandlerAssimp()
 	//assetTypes.push_back("dae");
 	assetTypes.push_back("obj");
 //	assetTypes.push_back("ply");
+	assetTypes.push_back("mesh");
 }
 
 SBAssetHandlerAssimp::~SBAssetHandlerAssimp()
@@ -143,7 +145,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 	boost::filesystem::path parentPath = p.parent_path();
 
 	////////////////////////////////////////////
-	
+	try {
 	Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile( convertedPath, 
 		aiProcess_CalcTangentSpace       | 
@@ -1201,7 +1203,9 @@ x	std::vector<unsigned int>	weightIndex;	// looking up the weight according to t
 		  // extract animations
 
 	  }
-
+	} catch (std::exception& e) {
+		LOG("Could not load asset %s: %s", path.c_str(), e.what());
+	}
 	return assets;
 
 }

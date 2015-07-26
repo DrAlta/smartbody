@@ -785,6 +785,10 @@ int main( int argc, char **argv )	{
 	float intervalAmount = -1;
 	bool isInteractive = true;
 
+	bool useEditor = true;
+	bool maximize = false;
+	std::string windowName = "SmartBody";
+
 	std::vector<std::string> envNames;
 	std::vector<std::string> envValues;
 
@@ -945,6 +949,21 @@ int main( int argc, char **argv )	{
         {
                 isInteractive = false;
         }
+		else if ( s.compare("-noeditor") == 0)
+        {
+                useEditor = false;
+        }
+		else if ( s.compare("-maximize") == 0)
+        {
+                maximize = true;
+        }
+		else if ( s.compare("-name") == 0)
+        {
+            if( ++i < argc )
+			{
+				windowName = argv[i];
+			}
+        }
 		else if ( s.compare("-renderer=") == 0)
         {
 				renderer = s;
@@ -1008,6 +1027,9 @@ int main( int argc, char **argv )	{
 // change the default font size
 	FL_NORMAL_SIZE = 11;
 	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
+	viewerFactory->setUseEditor(useEditor);
+	viewerFactory->setMaximize(maximize);
+	viewerFactory->setWindowName(windowName);
 	//viewerFactory->setFltkViewer(sbmWindow->getFltkViewer());
 	//viewerFactory->setFltkViewer(viewer);
 	SmartBody::SBScene::getScene()->setViewerFactory(viewerFactory);
@@ -1189,6 +1211,15 @@ int main( int argc, char **argv )	{
 	mcu_vrAllCall_func( argBuff, SmartBody::SBScene::getScene()->getCommandManager() );
 
 	scene->getSimulationManager()->start();
+
+	class MyController : public SmartBody::SBController
+	{
+	public:
+		MyController() {}
+		~MyController() {}
+
+	};	
+
 
 #if ENABLE_808_TEST
 	return( 0 );
