@@ -322,8 +322,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 					rotation = glm::make_mat4((float*)&woMat);
 				}
 
-				float meshScale = shape->getMeshScale();
-				//glScalef(meshScale,meshScale,meshScale);
+				SrVec meshScale = shape->getMeshScale();
+				//glScalef(meshScale[0], meshScale[1], meshScale[2]);
 			}
 
 		shape->GPUblendShapes(translation, rotation);
@@ -368,8 +368,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 					glMultMatrix(woMat);
 				}
 
-				float meshScale = shape->getMeshScale();
-				glScalef(meshScale,meshScale,meshScale);
+				SrVec meshScale = shape->getMeshScale();
+				glScalef(meshScale[0], meshScale[1], meshScale[2]);
 			}
 
 			std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;

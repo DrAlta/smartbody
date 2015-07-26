@@ -279,7 +279,8 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
 				
 				DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
-				meshInstance->setMeshScale((float) doubleAttribute->getValue());
+				SrVec scale(doubleAttribute->getValue(), doubleAttribute->getValue(), doubleAttribute->getValue());
+				meshInstance->setMeshScale(scale);
 				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
 			}			
 		}

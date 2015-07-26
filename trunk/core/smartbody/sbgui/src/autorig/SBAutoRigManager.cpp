@@ -104,9 +104,9 @@ bool SBAutoRigManager::buildAutoRiggingFromPawnMesh( const std::string& pawnName
 	if (!assetManager->getDeformableMesh(outDeformableMeshName))
 	{			
 		//model.scale(meshInstance->getMeshScale()); // resize the vertices
-		float meshScale = meshInstance->getMeshScale();
+		SrVec meshScale = meshInstance->getMeshScale();
 		for (int i=0;i<scaleModel.V.size();i++)
-			scaleModel.V[i] *= meshScale;
+			scaleModel.V[i] *= meshScale[0];
 		for (int i=0;i<scaleModel.V.size();i++)
 			scaleModel.V[i] = scaleModel.V[i]*worldRotation;
 

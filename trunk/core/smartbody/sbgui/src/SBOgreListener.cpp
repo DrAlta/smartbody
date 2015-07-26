@@ -124,9 +124,11 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 		return;
 	}		
 	// Add entity to the scene node	
+	SrVec meshScale = pawn->getVec3Attribute("meshScale");
 	SceneNode * mSceneNode = ogreInterface->getSceneManager()->getRootSceneNode()->createChildSceneNode(name);
 	mSceneNode->attachObject(ent);
 	mSceneNode->setVisible(ogreInterface->getCharacterVisiblility());
+	mSceneNode->setScale(meshScale[0], meshScale[1], meshScale[2]);
 	
 	
 

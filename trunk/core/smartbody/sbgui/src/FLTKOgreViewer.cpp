@@ -523,6 +523,7 @@ void FLTKOgreWindow::fltkRender2()
 
 	drawMotionVectorFlow();
 	drawPlotMotion();
+	drawDynamicVisuals();
 	
 
 

@@ -1784,6 +1784,8 @@ void FltkViewer::draw()
 	if (_data->showBoundingVolume)
 		drawCharacterBoundingVolumes();
 
+	drawDynamicVisuals();
+
 	drawInteractiveLocomotion();	
 	//_posControl.Draw();
 	_objManipulator.draw(*cam);
@@ -3326,6 +3328,43 @@ void FltkViewer::drawGrid()
 	glPopAttrib();
 }
 
+void FltkViewer::drawDynamicVisuals()
+{
+	if (_points3D.size() == 0 &&
+		_lines3D.size() == 0)
+		return;
+
+	glPushAttrib(GL_COLOR_BUFFER_BIT);
+	glDisable(GL_LIGHTING);
+	
+	glBegin(GL_POINTS);
+	for (std::map<std::string, Point3D>::iterator iter = _points3D.begin();
+		 iter != _points3D.end();
+		 iter++)
+	{
+		glPointSize((*iter).second.size);
+		glColor3f((*iter).second.color.r, (*iter).second.color.g, (*iter).second.color.b);
+		glVertex3f((*iter).second.point.x, (*iter).second.point.y, (*iter).second.point.z);
+	}
+	glEnd();
+
+	for (std::map<std::string, Line3D>::iterator iter = _lines3D.begin();
+		 iter != _lines3D.end();
+		 iter++)
+	{
+		glColor3f((*iter).second.color.r, (*iter).second.color.g, (*iter).second.color.b);
+		glLineWidth((*iter).second.width);
+		glBegin(GL_LINES);
+		for (size_t p = 0; p < (*iter).second.points.size(); p++)
+			glVertex3f((*iter).second.points[p].x, (*iter).second.points[p].y, (*iter).second.points[p].z);
+		glEnd();
+	}
+
+
+	glPopAttrib();
+}
+
+
 
 void FltkViewer::drawJointLimitCone( SmartBody::SBJoint* joint, float coneSize, float pitchUpLimit, float pitchDownLimit, float headLimit )
 {
@@ -3843,8 +3882,8 @@ void FltkViewer::drawPawns()
 			//	gmat = pawn->getPhysicsObject()->getGlobalTransform().gmat();
 			//}
 			//SrMat gmatPhy = pawn->getPhysicsObject()->getGlobalTransform().gmat();
-
-			drawColObject(pawn->getGeomObject(),gmat, 1.0f);
+			if (pawn->getBoolAttribute("showCollisionShape"))
+				drawColObject(pawn->getGeomObject(),gmat, 1.0f);
 		}
 		else
 		{
@@ -5647,6 +5686,62 @@ int FltkViewer::deleteSelectedObject( int ret )
 	//baseWin->updateObjectList();
 	return ret;
 }
+
+void FltkViewer::addPoint(const std::string& pointName, SrVec point, SrVec color, float size)
+{
+	removePoint(pointName);
+	Point3D p;
+	p.point.set(point);
+	p.color.r = color.x;
+	p.color.g = color.y;
+	p.color.b = color.z;
+	p.size = size;
+	_points3D.insert(std::pair<std::string, Point3D>(pointName, p));
+}
+
+void FltkViewer::removePoint(const std::string& pointName)
+{
+	std::map<std::string, Point3D>::iterator iter = _points3D.find(pointName);
+	if (iter != _points3D.end())
+	{
+		_points3D.erase(pointName);
+	}
+}
+
+void FltkViewer::removeAllPoints()
+{
+	_points3D.clear();
+}
+
+void FltkViewer::addLine(const std::string& lineName, std::vector<SrVec>& points, SrVec color, float width)
+{
+	removeLine(lineName);
+	Line3D l;
+	for (size_t i = 0; i < points.size(); i++)
+	{
+		l.points.push_back(points[i]);
+	}
+	l.color.r = color.x;
+	l.color.g = color.y;
+	l.color.b = color.z;
+	l.width = width;
+	_lines3D.insert(std::pair<std::string, Line3D>(lineName, l));
+}
+
+void FltkViewer::removeLine(const std::string& lineName)
+{
+	std::map<std::string, Line3D>::iterator iter = _lines3D.find(lineName);
+	if (iter != _lines3D.end())
+	{
+		_lines3D.erase(lineName);
+	}
+}
+
+void FltkViewer::removeAllLines()
+{
+	_lines3D.clear();
+}
+
 GestureVisualizationHandler::GestureVisualizationHandler()
 {
 	_gestureData = NULL;

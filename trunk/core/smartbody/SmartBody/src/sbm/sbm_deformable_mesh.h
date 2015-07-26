@@ -184,7 +184,7 @@ protected:
 	SmartBody::SBPawn*      _pawn;
 	bool				  _updateMesh;
 	std::vector<SkJointList> _boneJointList;
-	float _meshScale;
+	SrVec _meshScale;
 	int  meshVisibleType;
 	bool _recomputeNormal;
 	bool _isStaticMesh;
@@ -210,8 +210,8 @@ public:
 	SBAPI void updateJointList();
 	SBAPI virtual void setPawn(SmartBody::SBPawn* pawn);
 	SBAPI virtual void setVisibility(int deformableMesh);
-	SBAPI virtual void setMeshScale(float scale);
-	SBAPI float   getMeshScale() { return _meshScale; }
+	SBAPI virtual void setMeshScale(SrVec scale);
+	SBAPI SrVec   getMeshScale() { return _meshScale; }
 	SBAPI int    getVisibility();
 	SBAPI void    setToStaticMesh(bool isStatic);
 	SBAPI bool    isStaticMesh();

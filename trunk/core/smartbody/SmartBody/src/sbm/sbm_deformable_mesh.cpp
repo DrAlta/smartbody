@@ -1545,7 +1545,7 @@ DeformableMeshInstance::DeformableMeshInstance()
 	_updateMesh			= false;
 	_isStaticMesh		= false;
 	_recomputeNormal	= true;
-	_meshScale			= 1.f;
+	_meshScale			= SrVec(1.f, 1.f, 1.f);
 	_character			= NULL;
 	meshVisibleType		= 1;
 
@@ -2456,7 +2456,7 @@ void DeformableMeshInstance::updateTransformBuffer()
 		if (!joint)
 			continue;
 		SrMat bindPoseMat = _mesh->bindPoseMatList[idx];
-		bindPoseMat.set_translation(bindPoseMat.get_translation()*_meshScale);
+		bindPoseMat.set_translation(bindPoseMat.get_translation()*_meshScale[0]);
 		transformBuffer[idx] = bindPoseMat*joint->gmat();	
 		//SrQuat q = SrQuat(transformBuffer[idx]);
 		//SrVec v = bindPoseMat.get_translation();
@@ -2476,7 +2476,7 @@ void DeformableMeshInstance::updateSkin( const std::vector<SrVec>& restPos, std:
 
 	for (unsigned int i=0;i<restPos.size();i++)
 	{
-		SrVec vPos = restPos[i]*_meshScale;
+		SrVec vPos = restPos[i]*_meshScale[0];
 		SrVec vSkinPos = SrVec(0,0,0);
 		// 		SrVec4i& boneID1 = _mesh->boneIDBuf[0][i];
 		// 		SrVec4&  boneWeight1 = _mesh->boneWeightBuf[0][i];
@@ -2610,7 +2610,7 @@ void DeformableMeshInstance::update()
 					SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
 					double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
 					globalCounter ++;
-					SrVec transformVec = _meshScale*(skinLocalVec * skinWeight->bindShapeMat * invBMat);
+					SrVec transformVec = _meshScale[0]*(skinLocalVec * skinWeight->bindShapeMat * invBMat);
 					SrVec finalTransformVec = (transformVec  * gMat);
 					finalVec = finalVec + (float(jointWeight) * finalTransformVec);		
 					//finalVec = finalVec + (float(jointWeight) * (skinLocalVec * skinWeight->bindShapeMat * invBMat  * gMat));	
@@ -2674,7 +2674,7 @@ int DeformableMeshInstance::getVisibility()
 	return meshVisibleType;
 }
 
-void DeformableMeshInstance::setMeshScale( float scale )
+void DeformableMeshInstance::setMeshScale( SrVec scale )
 {
 	_meshScale = scale;
 }

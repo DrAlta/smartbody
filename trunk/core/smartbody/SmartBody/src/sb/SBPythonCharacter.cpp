@@ -90,6 +90,7 @@ void pythonFuncsCharacter()
 		.def("getHPR", &SBPawn::getHPR, "Gets the heading, pitch and roll of the character's world offset.")
 		.def("setHPRSmooth", &SBPawn::setHPRSmooth, "Sets the heading, pitch and roll of the character's world offset. The character will be rotated smoothly overtime to avoid popping.")
 		.def("getBoundingBox", &SBCharacter::getBoundingBox, "Gets the boundary dimensions of the character.")
+		.def("createMeshFromCollisionSurface", &SBPawn::createMeshFromCollisionSurface, "Creates a mesh based on the current collision surface.")
 	;
 
 	boost::python::class_<SrCamera, boost::python::bases<SBPawn> >("Camera")
