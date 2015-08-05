@@ -559,8 +559,9 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 	{
 		boost::filesystem::path path(texture_names[i]);
 		std::string extension = path.extension().string();
-		std::string mask		= boost::replace_all_copy(texture_names[i], "extension", "_mask" + extension);
+		std::string mask		= boost::replace_all_copy(texture_names[i], extension, "_mask" + extension);
 		SbmTexture* tex_mask;
+		LOG("mask name = %s\n",mask.c_str());
 		// Checks if mask file exists
 		if (!boost::filesystem::exists(mask))
 		{
