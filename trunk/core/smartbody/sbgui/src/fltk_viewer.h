@@ -432,6 +432,8 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 
 	virtual void updateOptions();
 
+	virtual void registerUIControls();
+
 public:
 	RetargetStepWindow* _retargetStepWindow;	
 	ObjectManipulationHandle::ControlType _transformMode;

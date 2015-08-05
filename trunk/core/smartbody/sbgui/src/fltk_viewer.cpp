@@ -509,6 +509,7 @@ FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 	
 	//make_current();	
 
+	registerUIControls();
 }
 
 
@@ -519,6 +520,25 @@ FltkViewer::~FltkViewer ()
    delete _data->scenebox;
    delete _data->sceneaxis;
    delete _data;
+}
+
+void FltkViewer::registerUIControls()
+{
+	// add UI controls to the scene
+	SmartBody::SBAttribute* attribute = NULL;
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	attribute = scene->createBoolAttribute("GUI.ShowCameras",false,true,"GUI",10,false,false,false,"Show/hide the cameras.");
+	attribute->registerObserver(this);
+	attribute = scene->createBoolAttribute("GUI.ShowLights",false,true,"GUI",10,false,false,false,"Show/hide the lights.");
+	attribute->registerObserver(this);
+	attribute = scene->createBoolAttribute("GUI.ShowGrid",true,true,"GUI",10,false,false,false,"Show/hide the grid.");
+	attribute->registerObserver(this);
+	attribute = scene->createBoolAttribute("GUI.ShowFloor",true,true,"GUI",10,false,false,false,"Show/hide the floor.");
+	attribute->registerObserver(this);
+	attribute = scene->createVec3Attribute("GUI.FloorColor",0.6, 0.6, 0.6,true,"GUI",10,false,false,false,"Floor color.");
+	attribute->registerObserver(this);
+	attribute = scene->createVec3Attribute("GUI.BackgroundColor",0.63, 0.63, 0.63,true,"GUI",10,false,false,false,"Background color.");
+	attribute->registerObserver(this);
 }
 
 void FltkViewer::draw_message ( const char* s )
@@ -3334,7 +3354,7 @@ void FltkViewer::drawDynamicVisuals()
 		_lines3D.size() == 0)
 		return;
 
-	glPushAttrib(GL_COLOR_BUFFER_BIT);
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_PROGRAM_POINT_SIZE);
 	glDisable(GL_LIGHTING);
 	
 	glBegin(GL_POINTS);
@@ -5415,7 +5435,73 @@ void FltkViewer::drawPlotMotion()
 
 void FltkViewer::notify(SmartBody::SBSubject* subject)
 {
-	
+	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
+	if (attribute)
+	{
+		std::string attrName = attribute->getName();
+		if (attrName == "GUI.ShowCameras")
+		{
+			SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			bool value = boolAttribute->getValue();
+			SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+			std::vector<std::string> camNames = scene->getCameraNames();
+			for (unsigned int i=0;i<camNames.size();i++)
+			{
+				SrCamera* cam = scene->getCamera(camNames[i]);
+				if (cam)
+				{
+					cam->setBoolAttribute("visible", value);
+				}
+			}
+		}
+		else if (attrName == "GUI.ShowLights")
+		{
+			SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			bool value = boolAttribute->getValue();
+			SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+			const std::vector<std::string>& pawnNames = scene->getPawnNames();
+			for (unsigned int i=0;i<pawnNames.size();i++)
+			{
+				std::string name = pawnNames[i];
+				SmartBody::SBPawn* pawn = scene->getPawn(name);
+				if (name.find("light") == 0 && pawn) // is light
+				{
+					pawn->setBoolAttribute("visible", value);			
+				}
+			}
+		}
+		else if (attrName == "GUI.ShowGrid")
+		{
+			SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			bool value = boolAttribute->getValue();
+			if (getData()->gridMode != FltkViewer::ModeShowGrid)
+				menu_cmd(FltkViewer::CmdGrid, NULL);
+			else
+				menu_cmd(FltkViewer::CmdNoGrid, NULL);
+		}
+		else if (attrName == "GUI.ShowFloor")
+		{
+			SmartBody::BoolAttribute* boolAttribute = dynamic_cast<SmartBody::BoolAttribute*>(attribute);
+			bool value = boolAttribute->getValue();
+			getData()->showFloor = !getData()->showFloor;
+			updateOptions();
+		}
+		else if (attrName == "GUI.FloorColor")
+		{
+			SmartBody::Vec3Attribute* vec3Attribute = dynamic_cast<SmartBody::Vec3Attribute*>(attribute);
+			SrVec val = vec3Attribute->getValue();
+			_data->floorColor = SrColor(val.x, val.y, val.z);
+			updateOptions();
+		}
+		else if (attrName == "GUI.BackgroundColor")
+		{
+			SmartBody::Vec3Attribute* vec3Attribute = dynamic_cast<SmartBody::Vec3Attribute*>(attribute);
+			SrVec val = vec3Attribute->getValue();
+			_data->bcolor = SrColor(val.x, val.y, val.z);
+			updateOptions();
+		}
+	}
+
 }
 
 void FltkViewer::makeShadowMap()
@@ -5586,6 +5672,8 @@ void FltkViewer::resetViewer()
 	if (_objManipulator.get_active_control())
 		_objManipulator.get_active_control()->detach_pawn();
 	_objManipulator.removeActiveControl();
+
+	registerUIControls();
 }
 
 void FltkViewer::updateOptions()
