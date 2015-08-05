@@ -738,6 +738,8 @@ void BaseWindow::ResetScene()
 
 	scene->getVHMsgManager()->setEnable(true);		
 	updateObjectList();
+
+	this->curViewer->registerUIControls();
 }
 
 
@@ -2290,11 +2292,9 @@ void BaseWindow::VelocityCB(Fl_Widget* w, void* data)
 void BaseWindow::GridCB(Fl_Widget* w, void* data)
 {
 #if !NO_OGRE_VIEWER_CMD
-	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	if (rootWindow->curViewer->getData()->gridMode != FltkViewer::ModeShowGrid)
-		rootWindow->curViewer->menu_cmd(FltkViewer::CmdGrid, NULL);
-	else
-		rootWindow->curViewer->menu_cmd(FltkViewer::CmdNoGrid, NULL);
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	bool value = scene->getBoolAttribute("GUI.ShowGrid");
+	scene->setBoolAttribute("GUI.ShowGrid", !value);
 #endif
 }
 
@@ -2584,19 +2584,9 @@ void BaseWindow::updateCameraList()
 void BaseWindow::ShowCamerasCB( Fl_Widget* w, void* data )
 {
 #if !NO_OGRE_VIEWER_CMD
-	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->curViewer->getData()->showCameras = !rootWindow->curViewer->getData()->showCameras;
-	bool showCamera = rootWindow->curViewer->getData()->showCameras;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::vector<std::string> camNames = scene->getCameraNames();
-	for (unsigned int i=0;i<camNames.size();i++)
-	{
-		SrCamera* cam = scene->getCamera(camNames[i]);
-		if (cam)
-		{
-			cam->setBoolAttribute("visible", showCamera);
-		}
-	}
+	bool value = scene->getBoolAttribute("GUI.ShowCameras");
+	scene->setBoolAttribute("GUI.ShowCameras", !value);
 #endif
 
 }
@@ -2604,24 +2594,11 @@ void BaseWindow::ShowCamerasCB( Fl_Widget* w, void* data )
 void BaseWindow::ShowLightsCB( Fl_Widget* w, void* data )
 {
 #if !NO_OGRE_VIEWER_CMD
-	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
-	rootWindow->curViewer->getData()->showLights = !rootWindow->curViewer->getData()->showLights;
-	bool showLight = rootWindow->curViewer->getData()->showLights;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	const std::vector<std::string>& pawnNames = scene->getPawnNames();
-	for (unsigned int i=0;i<pawnNames.size();i++)
-	{
-		std::string name = pawnNames[i];
-		SmartBody::SBPawn* pawn = scene->getPawn(name);
-		if (name.find("light") == 0 && pawn) // is light
-		{
-			pawn->setBoolAttribute("visible",showLight);			
-		}
-	}
+	bool value = scene->getBoolAttribute("GUI.ShowLights");
+	scene->setBoolAttribute("GUI.ShowLights", !value);
 #endif
-
 }
-
 
 void BaseWindow::ShowSelectedCharacterCB( Fl_Widget* w, void* data )
 {
