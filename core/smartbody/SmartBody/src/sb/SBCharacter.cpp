@@ -141,6 +141,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	displayVec.push_back("visgeo");
 	displayVec.push_back("axis");
 	displayVec.push_back("skinWeight");
+	displayVec.push_back("wireframeMesh");
 	displayVec.push_back("mesh");
 	displayVec.push_back("GPUmesh");
 	displayAttribute->setValidValues(displayVec);
