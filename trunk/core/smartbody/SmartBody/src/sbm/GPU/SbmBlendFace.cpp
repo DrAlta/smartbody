@@ -1130,7 +1130,7 @@ void SbmBlendTextures::RenderGeometryWithMasks(GLuint * FBODst, std::vector<floa
 	glUniform1i(uShowMasks,  showMasks);
 	glUniform1i(uUseMasks,  useMasks);
 	glUniform1i(uOverlayMasks,  overlayMasks);
-
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//aux->subMeshTris[0]->VBO()->BindBuffer();
 	glDrawElements(GL_TRIANGLES, _mesh->triBuf.size()*3 , GL_UNSIGNED_INT,&_mesh->triBuf[0]);
 	//aux->subMeshTris[0]->VBO()->UnbindBuffer();

@@ -279,6 +279,16 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
         //LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
         return; // no deformable mesh
     }
+	//LOG("Shape visibility = %d", shape->getVisibility());
+	if (SmartBody::SBScene::getScene()->getBoolAttribute("drawMeshWireframe"))
+	{
+		//LOG("Render in Wireframe mode\n");
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	else
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 
 	bool useGPUBlendShapes = SmartBody::SBScene::getScene()->getBoolAttribute("useGPUBlendshapes");
 	if(useGPUBlendShapes)
