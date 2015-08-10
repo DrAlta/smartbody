@@ -366,6 +366,8 @@ const std::string& MeCtBreathing::controller_type () const
 
 void MeCtBreathing::notify(SBSubject* subject)
 {
+	SmartBody::SBController::notify(subject);
+
 	addDefaultAttributeString("breathing.motion", "", "Breathing");
 	addDefaultAttributeBool("breathing.useBlendChannels", false, "Breathing");
 	addDefaultAttributeFloat("breathing.bpm", 15, "Breathing");
