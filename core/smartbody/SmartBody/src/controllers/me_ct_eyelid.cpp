@@ -574,6 +574,8 @@ bool MeCtEyeLidRegulator::get_use_blink_viseme()
 
 void MeCtEyeLidRegulator::notify(SBSubject* subject)
 {
+	SmartBody::SBController::notify(subject);
+
 	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attribute)
 	{

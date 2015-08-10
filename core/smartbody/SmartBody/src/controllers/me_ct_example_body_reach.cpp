@@ -572,6 +572,7 @@ bool MeCtExampleBodyReach::isValidReachEngine( int reachType )
 
 void MeCtExampleBodyReach::notify(SBSubject* subject)
 {
+	SmartBody::SBController::notify(subject);
 // 	SbmPawn* pawn = dynamic_cast<SbmPawn*>(subject);
 // 	if (pawn)
 // 	{

@@ -91,5 +91,37 @@ void SrViewerFactory::reset(SrViewer* viewer)
 {
 }
 
+void SrViewerFactory::setDefaultSize(int x, int y, int w, int h)
+{
+	if (x != -1)
+		_x = x;
+	if (y != -1)
+		_y = y;
+	if (w != -1)
+		_w = w;
+	if (h != -1)
+		_h = h;
+}
+
+int SrViewerFactory::getX()
+{
+	return _x;
+}
+
+int SrViewerFactory::getY()
+{
+	return _y;
+}
+
+int SrViewerFactory::getW()
+{
+	return _w;
+}
+
+int SrViewerFactory::getH()
+{
+	return _h;
+}
+
 
 //================================ End of File =================================================

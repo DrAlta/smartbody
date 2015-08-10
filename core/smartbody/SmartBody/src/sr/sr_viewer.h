@@ -99,10 +99,23 @@ class SrViewerFactory
 {
 	public:
 		SBAPI SrViewerFactory();
+
+		SBAPI void setDefaultSize(int x, int y, int w, int h);
+		SBAPI int getX();
+		SBAPI int getY();
+		SBAPI int getW();
+		SBAPI int getH();
 		
 		SBAPI virtual SrViewer* create(int x, int y, int w, int h);
 		SBAPI virtual void remove(SrViewer* viewer);
 		SBAPI virtual void reset(SrViewer* viewer);
+
+protected:
+		int _x;
+		int _y;
+		int _w;
+		int _h;
+
 };
 
 //================================ End of File =================================================

@@ -789,6 +789,11 @@ int main( int argc, char **argv )	{
 	bool maximize = false;
 	std::string windowName = "SmartBody";
 
+	int locX = -1;
+	int locY = -1;
+	int locW = -1;
+	int locH = -1;
+
 	std::vector<std::string> envNames;
 	std::vector<std::string> envValues;
 
@@ -964,6 +969,34 @@ int main( int argc, char **argv )	{
 				windowName = argv[i];
 			}
         }
+		else if ( s.compare("-x") == 0)
+		{
+            if( ++i < argc )
+			{
+				locX = atoi(argv[i]);
+			}
+		}
+		else if ( s.compare("-y") == 0)
+		{
+            if( ++i < argc )
+			{
+				locY = atoi(argv[i]);
+			}
+		}
+		else if ( s.compare("-w") == 0)
+		{
+            if( ++i < argc )
+			{
+				locW = atoi(argv[i]);
+			}
+		}
+		else if ( s.compare("-h") == 0)
+		{
+            if( ++i < argc )
+			{
+				locH = atoi(argv[i]);
+			}
+		}
 		else if ( s.compare("-renderer=") == 0)
         {
 				renderer = s;
@@ -1027,6 +1060,7 @@ int main( int argc, char **argv )	{
 // change the default font size
 	FL_NORMAL_SIZE = 11;
 	FltkViewerFactory* viewerFactory = new FltkViewerFactory();
+	viewerFactory->setDefaultSize(locX, locY, locW, locH);
 	viewerFactory->setUseEditor(useEditor);
 	viewerFactory->setMaximize(maximize);
 	viewerFactory->setWindowName(windowName);

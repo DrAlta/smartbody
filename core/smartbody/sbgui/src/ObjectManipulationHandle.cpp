@@ -50,15 +50,18 @@ void ObjectManipulationHandle::draw(SrCamera& cam)
 			SmartBody::SBPawn* sbPawn = dynamic_cast<SmartBody::SBPawn*>(active_control->get_attach_pawn());
 			if (sbPawn)
 			{
-				SrBox box = sbPawn->getBoundingBox();
-				if (box.max_size() < 1e-9) // no bounding box
+				if (sbPawn->getBoolAttribute("showSelected"))
 				{
-					SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-					float boxSize = 0.05f / scene->getScale();
-					box.a = sbPawn->getPosition() - SrVec(boxSize,boxSize,boxSize);
-					box.b = sbPawn->getPosition() + SrVec(boxSize,boxSize,boxSize);
+					SrBox box = sbPawn->getBoundingBox();
+					if (box.max_size() < 1e-9) // no bounding box
+					{
+						SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+						float boxSize = 0.05f / scene->getScale();
+						box.a = sbPawn->getPosition() - SrVec(boxSize,boxSize,boxSize);
+						box.b = sbPawn->getPosition() + SrVec(boxSize,boxSize,boxSize);
+					}
+					PositionControl::drawBox(box,true, defaultColor);
 				}
-				PositionControl::drawBox(box,true, defaultColor);
 			}
 		}
 	}

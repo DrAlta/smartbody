@@ -2622,6 +2622,10 @@ FltkViewerFactory::FltkViewerFactory()
 	_useEditor = true;
 	_maximize = false;
 	_windowName = "SmartBody";
+	_x = 0;
+	_y = 0;
+	_w = 1024;
+	_h = 768;
 }
 
 void FltkViewerFactory::setUseEditor(bool val)
@@ -2638,7 +2642,6 @@ void FltkViewerFactory::setWindowName(std::string name)
 {
 	_windowName = name;
 }
-
 
 SrViewer* FltkViewerFactory::create(int x, int y, int w, int h)
 {

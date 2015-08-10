@@ -31,6 +31,7 @@ SBFaceShiftManager::SBFaceShiftManager() : SBService()
 	setEnable(false);
 	setName("FaceShift");
 	connectSocket = INVALID_SOCKET;
+	createStringAttribute("defaultIP", "127.0.0.1", true, "Basic", 60, false, false, false, "IP address for connection with FaceShift software.");
 	createIntAttribute("defaultPort", 33433, true, "Basic", 60, false, false, false, "Port No. for connection with FaceShift software.");
 	createBoolAttribute("debug", false, true, "Basic", 60, false, false, false, "Show debugging information.");
 	createActionAttribute("dumpData", true, "Basic", 60, false, false, false, "Dump the faceshift data.");
@@ -182,8 +183,8 @@ void SBFaceShiftManager::initConnection()
 	// The sockaddr_in structure specifies the address family,
 	// IP address, and port of the server to be connected to.
 	clientService.sin_family = AF_INET;
-	clientService.sin_addr.s_addr = inet_addr( "127.0.0.1" );
-	clientService.sin_port = htons( 33433 );
+	clientService.sin_addr.s_addr = inet_addr( getStringAttribute("defaultIP").c_str() );
+	clientService.sin_port = htons( getIntAttribute("defaultPort") );
 
 
 	iResult = connect( connectSocket, (SOCKADDR*) &clientService, sizeof(clientService));

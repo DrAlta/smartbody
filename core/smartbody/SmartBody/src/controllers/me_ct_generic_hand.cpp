@@ -352,6 +352,8 @@ void MeCtGenericHand::controller_start()
 
 void MeCtGenericHand::notify(SBSubject* subject)
 {
+	SmartBody::SBController::notify(subject);
+
 	SmartBody::SBAttribute* attribute = dynamic_cast<SmartBody::SBAttribute*>(subject);
 	if (attribute)
 	{
