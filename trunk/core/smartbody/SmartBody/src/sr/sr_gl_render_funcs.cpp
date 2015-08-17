@@ -279,6 +279,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
         //LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
         return; // no deformable mesh
     }
+#if !defined(__ANDROID__)
 	//LOG("Shape visibility = %d", shape->getVisibility());
 	if (SmartBody::SBScene::getScene()->getBoolAttribute("drawMeshWireframe"))
 	{
@@ -289,6 +290,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+#endif
 
 	bool useGPUBlendShapes = SmartBody::SBScene::getScene()->getBoolAttribute("useGPUBlendshapes");
 	if(useGPUBlendShapes)
