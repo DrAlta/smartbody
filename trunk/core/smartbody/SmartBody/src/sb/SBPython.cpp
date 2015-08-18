@@ -683,11 +683,20 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("initialize", &SBParser::initialize, "Initializes the Charniak parser with parameters.")
 		.def("cleanUp", &SBParser::cleanUp, "Deletes parse tree.")
 		.def("isInitialized", &SBParser::isInitialized, "Return boolean telling if Charniak parser is initialized.")
+		.def("parseUtterance", &SBParser::parseUtterance, "Parse utterance and send output to listeners.")
 		;
 
 
 	pythonFuncsMath();
 
+
+	boost::python::class_<SBParserListenerWrap, boost::python::bases<SBObject>, boost::noncopyable>("SBParserListener")
+		.def("onWord", &SBParserListener::onWord, &SBParserListenerWrap::default_onWord, "Callback for word in utterance.")
+		.def("onPartOfSpeech", &SBParserListener::onPartOfSpeech, &SBParserListenerWrap::default_onPartOfSpeech, "Callback for part of speech in utterance.")
+		.def("resetBML", &SBParserListener::resetBML, "Restores the BML to Callback for word in utterance.")
+		.def("addBML", &SBParserListener::addBML, "Adds a BML instruction to the current BML construct.")
+		.def("getCurrentBML", &SBParserListener::getCurrentBML, "Returns the current BML construct.")
+		;
 
 	boost::python::class_<NvbgWrap, boost::python::bases<SBObject>, boost::noncopyable>("Nvbg")
 		.def("objectEvent", &Nvbg::objectEvent, &NvbgWrap::default_objectEvent, "An event indicating that an object of interest is present.")

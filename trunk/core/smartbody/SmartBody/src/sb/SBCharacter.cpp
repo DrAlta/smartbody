@@ -21,6 +21,7 @@
 #include <sb/SBReach.h>
 #include <sb/SBSceneListener.h>
 #include <sb/SBMotionGraph.h>
+#include <sb/SBParser.h>
 #include <controllers/MeCtReachEngine.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -206,6 +207,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	
 	createBoolAttribute("useOptimizedBlendShapes", true, true, "Display", 720, false, false, false, "Enables faster blend shape computation by caching blend shape data.");
 	
+	_parserListener = NULL;
 	//setUseBlendFaceTextures(false);
 }
 
@@ -1398,5 +1400,21 @@ SBAPI void SBCharacter::setUseFaceTextures(bool useFaceTextures)
 		setUseBlendFaceTextures(!useFaceTextures);
 }
 */
+
+void SBCharacter::addParserListener(SBParserListener* parserListener)
+{
+	_parserListener = parserListener;
+}
+
+void SBCharacter::removeParserListener()
+{
+	_parserListener = NULL;
+}
+
+SBParserListener* SBCharacter::getParserListener()
+{
+	return _parserListener;
+}
+
 
 };

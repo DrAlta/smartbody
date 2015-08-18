@@ -15,6 +15,7 @@ class SBController;
 class SBDiphone;
 class SBReach;
 class SBMotionGraph;
+class SBParserListener;
 
 class SBCharacter : public SbmCharacter
 {
@@ -109,6 +110,10 @@ class SBCharacter : public SbmCharacter
 		SBAPI bool getUseFaceTextures();
 		SBAPI void setUseFaceTextures(bool);
 
+		SBAPI void addParserListener(SBParserListener* parserListener);
+		SBAPI void removeParserListener();
+		SBAPI SBParserListener* getParserListener();
+
 	protected:
 		void InitFrameDataMarshalFriendly();
 		void FreeFrameDataJointsMarshalFriendly();
@@ -124,6 +129,7 @@ class SBCharacter : public SbmCharacter
 		SBM_CharacterFrameDataMarshalFriendly * frameDataMarshalFriendly;
 
 		bool _useBlendFaceTextures;
+		SBParserListener* _parserListener;
 
 };
 

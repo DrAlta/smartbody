@@ -11,6 +11,21 @@ namespace SmartBody {
 
 class SBParseNode;
 
+class SBParserListener
+{
+	public:
+		SBParserListener();
+		SBAPI virtual void onWord(std::string timeMarker, std::string word);
+		SBAPI virtual void onPartOfSpeech(std::string timeMarker, std::string partOfSpeech);
+		SBAPI std::string getCurrentBML();
+		SBAPI void addBML(std::string bml);
+		SBAPI void resetBML();
+
+	protected:
+		std::string _bml;
+};
+
+
 class SBParser
 {
 	public:
@@ -22,14 +37,16 @@ class SBParser
 		SBAPI void cleanUp(SmartBody::SBParseNode* node);
 		SBAPI bool isInitialized();
 
+		SBAPI std::string parseUtterance(SBParserListener* listener, std::string utterance);
+
 	protected:
 		void createParseTree(InputTree* inputTree, SBParseNode* node);
+		void parseTraverse(SBParserListener* listener, SmartBody::SBParseNode* node, int& curWord);
 
 		bool _initialized;
 		Params params;
 		bool release;
 		string agent_id;
-
 };
 
 }
