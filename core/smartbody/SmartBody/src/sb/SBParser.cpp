@@ -28,6 +28,34 @@ MeChart* curChart;
 
 namespace SmartBody {
 
+SBParserListener::SBParserListener()
+{
+}
+
+void SBParserListener::onWord(std::string timeMarker, std::string word)
+{
+}
+
+void SBParserListener::onPartOfSpeech(std::string timeMarker, std::string partOfSpeech)
+{
+}
+
+std::string SBParserListener::getCurrentBML()
+{
+	return _bml;
+}
+
+void SBParserListener::addBML(std::string bml)
+{
+	_bml.append(bml);
+}
+
+void SBParserListener::resetBML()
+{
+	_bml = "";
+}
+
+
 SBParser::SBParser()
 {
 	_initialized = false;
@@ -256,6 +284,88 @@ bool SBParser::isInitialized()
 {
 	return _initialized;
 }
+
+std::string SBParser::parseUtterance(SBParserListener* listener, std::string utterance)
+{
+	if (!listener)
+	{
+		LOG("Parse listener not available. Use SBParser::parse() to parse directly, or add a listener.");
+		return "";
+	}
+
+	listener->resetBML();
+
+	std::string encapsulatedUtterance = "<s> ";
+	encapsulatedUtterance.append(utterance);
+	encapsulatedUtterance.append(" </s>");
+	SmartBody::SBParseNode* node = this->parse(encapsulatedUtterance);
+
+	std::stringstream strstr;
+	strstr << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
+	strstr << "<act xmlns:sbm=\"http://ict.usc.edu\">" << std::endl;
+	strstr << "\t<bml>" << std::endl;
+	strstr << "\t\t<speech id=\"sp1\" type=\"application/ssml+xml\">" << std::endl;
+
+	std::vector<std::string> tokens;
+	vhcl::Tokenize(utterance, tokens, " ");
+
+	for (size_t i = 0; i < tokens.size(); i++)
+	{
+		strstr << "\t\t\t<mark name=\"T" << (i * 2) << "\"/>" << tokens[i] << std::endl;
+		strstr << "\t\t\t<mark name=\"T" << (i * 2 + 1) << "\"/>" << std::endl;
+	}
+	strstr << "\t\t</speech>" << std::endl;
+
+	std::string parseBML = strstr.str();
+
+	listener->addBML(parseBML);
+
+	int curWord = 0;
+	if (isInitialized())
+	{
+		// if the parser is initialized, traverse
+		parseTraverse(listener, node, curWord);
+	}
+	else
+	{
+		for (size_t i = 0; i < tokens.size(); i++)
+		{
+			std::stringstream strstr;
+			strstr << "T" << (i * 2);
+			listener->onWord(strstr.str(), tokens[i]);
+		}
+	}
+
+	listener->addBML("\r\n");
+	listener->addBML("\t</bml>\r\n</act>\r\n");
+
+	return listener->getCurrentBML();
+}
+
+void SBParser::parseTraverse(SBParserListener* listener, SmartBody::SBParseNode* node, int& curWord)
+{
+	if (!node)
+		return;
+	if (!node->isTerminal())
+	{
+		std::stringstream strstr;
+		strstr << "T" << (2 * curWord);
+		curWord++;
+		listener->onWord(strstr.str(), node->getWord());
+	}
+
+	std::stringstream strstr;
+	strstr << "T" << (2 * curWord);
+	listener->onPartOfSpeech(strstr.str(), node->getTerm());
+
+	for (int c = 0; c < node->getNumChildren(); c++)
+	{
+		SmartBody::SBParseNode* child = node->getChild(c);
+		parseTraverse(listener, child, curWord);
+	}
+
+}
+
 
 }
 

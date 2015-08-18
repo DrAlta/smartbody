@@ -4,6 +4,7 @@
 #include <string>
 #include <sb/SBScript.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBParser.h>
 #include <sr/sr_vec.h>
 
 #ifndef SB_NO_PYTHON
@@ -225,6 +226,43 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 	}
 
 
+};
+
+struct SBParserListenerWrap : SBParserListener, boost::python::wrapper<SBParserListener>
+{
+	virtual void onWord(std::string& curBML, std::string timeMarker, std::string word)
+	{
+		if (boost::python::override o = this->get_override("onWord"))
+		{
+			try {
+				o(curBML, timeMarker, word);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_onWord(std::string timeMarker, std::string word)
+	{
+		return SBParserListener::onWord(timeMarker, word);
+	}
+
+	virtual void onPartOfSpeech(std::string timeMarker, std::string partOfSpeech)
+	{
+		if (boost::python::override o = this->get_override("onPartOfSpeech"))
+		{
+			try {
+				o(timeMarker, partOfSpeech);
+			} catch (...) {
+				PyErr_Print();
+			}
+		}
+	}
+
+	void default_onPartOfSpeech(std::string timeMarker, std::string partOfSpeech)
+	{
+		return SBParserListener::onPartOfSpeech(timeMarker, partOfSpeech);
+	}
 };
 
 
