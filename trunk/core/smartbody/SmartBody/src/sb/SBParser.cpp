@@ -298,10 +298,9 @@ std::string SBParser::parseUtterance(SBParserListener* listener, std::string utt
 	std::string encapsulatedUtterance = "<s> ";
 	encapsulatedUtterance.append(utterance);
 	encapsulatedUtterance.append(" </s>");
-	SmartBody::SBParseNode* node = this->parse(encapsulatedUtterance);
+	
 
 	std::stringstream strstr;
-	strstr << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
 	strstr << "<act xmlns:sbm=\"http://ict.usc.edu\">" << std::endl;
 	strstr << "\t<bml>" << std::endl;
 	strstr << "\t\t<speech id=\"sp1\" type=\"application/ssml+xml\">" << std::endl;
@@ -324,6 +323,7 @@ std::string SBParser::parseUtterance(SBParserListener* listener, std::string utt
 	if (isInitialized())
 	{
 		// if the parser is initialized, traverse
+		SmartBody::SBParseNode* node = this->parse(encapsulatedUtterance);
 		parseTraverse(listener, node, curWord);
 	}
 	else

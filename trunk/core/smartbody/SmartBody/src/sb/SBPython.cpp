@@ -689,8 +689,7 @@ boost::python::class_<SBObserver>("SBObserver")
 
 	pythonFuncsMath();
 
-
-	boost::python::class_<SBParserListenerWrap, boost::python::bases<SBObject>, boost::noncopyable>("SBParserListener")
+	boost::python::class_<SBParserListenerWrap, boost::noncopyable, boost::shared_ptr<SBParserListenerWrap> >("SBParserListener")
 		.def("onWord", &SBParserListener::onWord, &SBParserListenerWrap::default_onWord, "Callback for word in utterance.")
 		.def("onPartOfSpeech", &SBParserListener::onPartOfSpeech, &SBParserListenerWrap::default_onPartOfSpeech, "Callback for part of speech in utterance.")
 		.def("resetBML", &SBParserListener::resetBML, "Restores the BML to Callback for word in utterance.")
