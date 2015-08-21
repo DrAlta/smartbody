@@ -26,7 +26,7 @@
 
 #define USE_FESTIVAL_RELAY 0
 #ifdef __ANDROID__
-#define USE_CEREPROC_RELAY 0
+#define USE_CEREPROC_RELAY 1
 #else
 #define USE_CEREPROC_RELAY 0
 #endif
@@ -787,6 +787,15 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    std::string command = tokens.at( 0 );
 
    std::string agent_name = tokens.at( 1 );
+
+   // if the agent doesn't exist locally, don't create a voice for it
+   SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(agent_name):
+   if (!character)
+   {
+	   LOG("Character '%s' does not exist in this context. Speech will not be generated for it.", agent_name.c_str());
+	   return;
+   }
+
    std::string message_id = tokens.at( 2 );
    std::string voice_id = tokens.at( 3 );
    std::string file_name = tokens.at( 4 );
@@ -1169,6 +1178,13 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	std::string command = tokens.at( 0 );
 
 	std::string agent_name = tokens.at( 1 );
+   // if the agent doesn't exist locally, don't create a voice for it
+   SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(agent_name):
+   if (!character)
+   {
+	   LOG("Character '%s' does not exist in this context. Speech will not be generated for it.", agent_name.c_str());
+	   return;
+   }
 	std::string message_id = tokens.at( 2 );
 	std::string voice_id = tokens.at( 3 );
 	std::string file_name = tokens.at( 4 );
