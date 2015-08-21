@@ -230,12 +230,12 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 
 struct SBParserListenerWrap : SBParserListener, boost::python::wrapper<SBParserListener>
 {
-	virtual void onWord(std::string& curBML, std::string timeMarker, std::string word)
+	virtual void onWord(std::string timeMarker, std::string word)
 	{
 		if (boost::python::override o = this->get_override("onWord"))
 		{
 			try {
-				o(curBML, timeMarker, word);
+				o(timeMarker, word);
 			} catch (...) {
 				PyErr_Print();
 			}
