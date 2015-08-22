@@ -818,7 +818,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    std::string agent_name = tokens.at( 1 );
 
    // if the agent doesn't exist locally, don't create a voice for it
-   SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(agent_name):
+   SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(agent_name);
    if (!character)
    {
 	   LOG("Character '%s' does not exist in this context. Speech will not be generated for it.", agent_name.c_str());
