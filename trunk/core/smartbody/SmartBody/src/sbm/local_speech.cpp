@@ -767,6 +767,35 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
 	return reply;
 }
 
+// from http://stackoverflow.com/questions/13739924/remove-all-xml-tags-from-a-stdstring
+std::string ParseXMLOutput(std::string &xmlBuffer)
+{
+    bool copy = true;
+    std::string plainString = "";   
+    std::stringstream convertStream;
+
+    // remove all xml tags
+    for (int i=0; i < xmlBuffer.length(); i++)
+    {                   
+        convertStream << xmlBuffer[i];
+
+        if(convertStream.str().compare("<") == 0) copy = false;
+        else if(convertStream.str().compare(">") == 0) 
+        {
+            copy = true;
+            convertStream.str(std::string());
+            continue;
+        }
+
+        if(copy) plainString.append(convertStream.str());       
+
+        convertStream.str(std::string());
+    }
+
+    return plainString;
+}
+
+
 void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
 {
 // 	CPRCEN_channel_handle chan = CPRCEN_engine_open_default_channel(voiceEngine); /* Create channel */
@@ -807,6 +836,8 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    if ( postfix_pos != std::string::npos )
       utterance = utterance.substr( 0, postfix_pos + 9 );
 
+   std::string strippedUtterance = ParseXMLOutput(utterance);
+
    // parse out just the sound file name and give it a .wav file type
    int pos = file_name.find( ".aiff" );
    int pos2 = file_name.find( "utt" );   
@@ -815,7 +846,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    string cereproc_file_name = cacheDirectory + file_name;
 
    /// Generate the audio
-   std::string xml = textToSpeech(utterance.c_str(), cereproc_file_name.c_str(), voice_id);
+   std::string xml = textToSpeech(strippedUtterance.c_str(), cereproc_file_name.c_str(), voice_id);
    // Only send out a reply when result is not empty, ignore otherwise as a nother voice relay might pick up the request
    //LOG("Cerevoice reply Cmd = %s",xml.c_str());
    if ( xml.compare("") != 0 )
