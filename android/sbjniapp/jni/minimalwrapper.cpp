@@ -208,13 +208,13 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 		if ( name == "deformableMeshScale")
 		{
 			//LOG("name = deformableMeshScale");
-			SmartBody::DoubleAttribute* doubleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
-			if (doubleAttribute)
+			SmartBody::Vec3Attribute* vec3Attribute = dynamic_cast<SmartBody::Vec3Attribute*>(attribute);
+			if (vec3Attribute)
 			{
 				if (!pawn->dMeshInstance_p)
 					pawn->dMeshInstance_p = new DeformableMeshInstance();
-				pawn->dMeshInstance_p->setMeshScale(doubleAttribute->getValue());
-				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
+				pawn->dMeshInstance_p->setMeshScale(vec3Attribute->getValue(0));
+				//LOG("Set mesh scale = %f",vec3Attribute->getValue(0));
 			}			
 		}
 		else if (name == "deformableMesh" || name == "mesh")
