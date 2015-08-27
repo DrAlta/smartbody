@@ -26,7 +26,7 @@
 
 #define USE_FESTIVAL_RELAY 0
 #ifdef __ANDROID__
-#define USE_CEREPROC_RELAY 1
+#define USE_CEREPROC_RELAY 0
 #else
 #define USE_CEREPROC_RELAY 0
 #endif
