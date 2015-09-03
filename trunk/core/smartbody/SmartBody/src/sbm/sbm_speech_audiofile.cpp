@@ -297,12 +297,12 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
 		   p /= voiceCode;
 #if (BOOST_VERSION > 104400)
 		   abs_p = boost::filesystem::absolute( p );	
-		   if( !boost::filesystem::exists( abs_p ))
+		   if( !boost::filesystem::is_directory( abs_p ))
 		   {
 			   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.string().c_str());
 #else
 		   abs_p = boost::filesystem::complete( p );	
-		   if( !boost::filesystem2::exists( abs_p ))
+		   if( !boost::filesystem2::is_directory( abs_p ))
 		   {
 			   //LOG( "AudioFileSpeech: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
 #endif

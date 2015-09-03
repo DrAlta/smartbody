@@ -356,7 +356,8 @@ void SBParser::parseTraverse(SBParserListener* listener, SmartBody::SBParseNode*
 
 	std::stringstream strstr;
 	strstr << "T" << (2 * curWord);
-	listener->onPartOfSpeech(strstr.str(), node->getTerm());
+	std::string terminal = vhcl::Replace(node->getTerm(), " ", "");
+	listener->onPartOfSpeech(strstr.str(), terminal);
 
 	for (int c = 0; c < node->getNumChildren(); c++)
 	{
