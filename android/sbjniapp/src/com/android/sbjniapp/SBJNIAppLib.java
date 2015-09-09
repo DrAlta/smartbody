@@ -41,7 +41,7 @@ public class SBJNIAppLib {
      public static native void executeSB(String sbmCmd);
      //public static native void executePython(String pyCmd);
      public static native String getLog();
-     public static native boolean handleInputEvent(int action, float x, float y, MotionEvent event);
+     public static native boolean handleInputEvent(int action, float x, float y);
      public static native void reloadTexture();
      
      //public static native void closeConnection();

@@ -54,6 +54,7 @@ public class SBJNIAppActivity extends Activity {
     public boolean onTouchEvent(MotionEvent event)
     {
         boolean ret = super.onTouchEvent(event);
+        /*
         if (!ret)
         {
         	if (wantsMultitouch)
@@ -78,6 +79,7 @@ public class SBJNIAppActivity extends Activity {
                 ret = inputEvent(event.getAction(), event.getX(), event.getY(), event);
         	}
         }
+        */
         return ret;
     }
     
@@ -89,7 +91,7 @@ public class SBJNIAppActivity extends Activity {
     
     public boolean inputEvent(int action, float x, float y, MotionEvent event) 
     { 
-    	return SBJNIAppLib.handleInputEvent(action,x,y,event);
+    	return SBJNIAppLib.handleInputEvent(action,x,y);
     }
 
     @Override protected void onResume() {
