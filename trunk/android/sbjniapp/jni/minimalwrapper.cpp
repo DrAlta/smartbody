@@ -213,7 +213,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 			{
 				if (!pawn->dMeshInstance_p)
 					pawn->dMeshInstance_p = new DeformableMeshInstance();
-				pawn->dMeshInstance_p->setMeshScale(vec3Attribute->getValue(0));
+				pawn->dMeshInstance_p->setMeshScale(vec3Attribute->getValue());
 				//LOG("Set mesh scale = %f",vec3Attribute->getValue(0));
 			}			
 		}
