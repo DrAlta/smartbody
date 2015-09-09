@@ -38,11 +38,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 
-import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLContext;
-import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
 
 class SBJNIAppView extends GLSurfaceView {
@@ -88,8 +86,17 @@ class SBJNIAppView extends GLSurfaceView {
         if (translucent) {
             this.getHolder().setFormat(PixelFormat.TRANSLUCENT);
         }       
-        setEGLContextClientVersion(1);       
+        setEGLContextClientVersion(2);
         setRenderer(new Renderer());
+        setPreserveEGLContextOnPause(true);
+        
+        this.setOnTouchListener(new OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return SBJNIAppLib.handleInputEvent(event.getAction(), event.getX(), event.getY());
+            }
+        });
     }   
 
     private static class Renderer implements GLSurfaceView.Renderer {

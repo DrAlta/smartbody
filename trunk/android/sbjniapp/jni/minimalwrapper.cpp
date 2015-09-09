@@ -7,32 +7,44 @@
 //
 
 #include "vhcl.h"
+#include <vhmsg-tt.h>
 #include "minimalwrapper.h"
-#include <sbm/mcontrol_callbacks.h>
+
 #include <sb/SBScene.h>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/convenience.hpp>
-#include <boost/filesystem/path.hpp>
-#include <sbm/xercesc_utils.hpp>
-#include <sr/sr_camera.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBPython.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBAttribute.h>
+#include <sb/SBSceneListener.h>
+#include <sb/SBAssetManager.h>
+
+#include <sbm/mcontrol_callbacks.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmTexture.h>
+#include <sbm/xercesc_utils.hpp>
+
+#include <sr/sr_camera.h>
 #include <sr/sr_sa_gl_render.h>
 #include <sr/sr_gl.h>
 #include <sr/sr_light.h>
 #include <sr/sr_camera.h>
 #include <sr/sr_gl_render_funcs.h>
 #include <sr/sr_euler.h>
-#include <sb/SBSceneListener.h>
-#include <sb/SBAssetManager.h>
+#include <sbm/gwiz_math.h>
+
+
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem/path.hpp>
 
 #if defined(ANDROID_BUILD)
+//#include <EGL/egl.h>
+//#include <GLES/gl.h>
+//#include <GLES2/gl2.h>
+#include "wes.h"
 #include "wes_gl.h"
 #elif defined(IPHONE_BUILD)
 #import <OpenGLES/ES1/gl.h>
@@ -55,16 +67,25 @@ extern "C"
 static SrCamera* cameraReset;
 static vhcl::Log::StdoutListener listener;
 std::vector<SrLight> _lights;
-void SBSetupDrawing(int w, int h)
-{   
-    glViewport(0, 0, w, h);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-	glEnable(GL_CULL_FACE);
-	glShadeModel(GL_SMOOTH);
-	glDisable(GL_DEPTH_TEST);
-}
 
 
+
+class AppListener : public SmartBody::SBSceneListener, public SmartBody::SBObserver
+{
+   public:
+	  AppListener();
+	  ~AppListener();
+
+      virtual void OnCharacterCreate( const std::string & name, const std::string & objectClass );
+      virtual void OnCharacterDelete( const std::string & name );
+	  virtual void OnCharacterUpdate( const std::string & name );
+      virtual void OnPawnCreate( const std::string & name );
+      virtual void OnPawnDelete( const std::string & name );
+
+	  virtual void OnSimulationUpdate();
+
+	  virtual void notify(SmartBody::SBSubject* subject);
+};
 
 AppListener::AppListener()
 {
@@ -214,7 +235,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 				if (!pawn->dMeshInstance_p)
 					pawn->dMeshInstance_p = new DeformableMeshInstance();
 				pawn->dMeshInstance_p->setMeshScale(vec3Attribute->getValue());
-				//LOG("Set mesh scale = %f",vec3Attribute->getValue(0));
+				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
 			}			
 		}
 		else if (name == "deformableMesh" || name == "mesh")
@@ -223,7 +244,6 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 			if (strAttribute)
 			{
 				const std::string& value = strAttribute->getValue();
-				LOG("handle deformableMesh = %s", value.c_str());
 				// clean up any old meshes
 #if 0
 				if (pawn->dMesh_p)
@@ -245,7 +265,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 				DeformableMesh* mesh = assetManager->getDeformableMesh(value);
 				if (!mesh)
 				{
-					LOG("cannot find mesh '%s', load from the file...", value.c_str());
+					LOG("Can't find mesh '%s'", value.c_str());
 					int index = value.find(".");
 					if (index != std::string::npos)
 					{
@@ -253,9 +273,9 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 						const std::vector<std::string>& meshPaths = assetManager->getAssetPaths("mesh");
 						for (size_t x = 0; x < meshPaths.size(); x++)
 						{
-							std::string assetLoc = meshPaths[x] + "/" + prefix + "/" + value;
-							LOG("try to load mesh at '%s'", assetLoc.c_str());
-							assetManager->loadAsset(assetLoc);
+							std::string assetName = meshPaths[x] + "/" + prefix + "/" + value;
+							LOG("Try to load mesh from '%s'", assetName.c_str());
+							assetManager->loadAsset(assetName);
 						}
 					}
 					mesh = assetManager->getDeformableMesh(value);
@@ -272,9 +292,102 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 					{
 						pawn->dMeshInstance_p->setToStaticMesh(true);
 					}
-					LOG("has mesh %s, num. of vertices = %d", mesh->getName().c_str(), mesh->posBuf.size());
+					LOG("mesh '%s', vertex count = %d", value.c_str(),  mesh->posBuf.size());
+
+					// add blendshapes
+					{
+						// if there are no blendshapes, but there are blendShape.channelName attributes, 
+						// then add the morph targets
+						std::vector<SmartBody::StringAttribute*> shapeAttributes;
+						std::map<std::string, SmartBody::SBAttribute*>& attributes = pawn->getAttributeList();
+						for (std::map<std::string, SmartBody::SBAttribute*>::iterator iter = attributes.begin(); 
+							iter != attributes.end(); 
+							iter++)
+						{
+							SmartBody::SBAttribute* attribute = (*iter).second;
+							const std::string& attrName = attribute->getName();
+							size_t pos = attrName.find("blendShape.channelName.");
+							if (pos != std::string::npos)
+							{
+								SmartBody::StringAttribute* strAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+								shapeAttributes.push_back(strAttribute);
+							}
+						}
+
+						int numShapeAttributes = shapeAttributes.size();
+						if (numShapeAttributes > 0)
+						{
+							// make space for all the attributes
+							mesh->morphTargets.insert(std::pair<std::string, std::vector<std::string> >("face", std::vector<std::string>() ));
+							std::map<std::string, std::vector<std::string> >::iterator shapeIter = mesh->morphTargets.begin();
+							(*shapeIter).second.resize(numShapeAttributes);
 
 
+							bool hasNeutral = false;
+							for (std::vector<SmartBody::StringAttribute*>::iterator iter = shapeAttributes.begin();
+								iter != shapeAttributes.end();
+								iter++)
+							{
+								const std::string& attrName = (*iter)->getName();
+								// get the shape name and value
+								std::string shapeName = attrName.substr(23);
+
+								std::string shapeChannel = (*iter)->getValue();
+								if (shapeChannel == "Neutral")
+								{
+									DeformableMesh* neutralMesh = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMesh(shapeName);
+									mesh->blendShapeMap.insert(std::pair<std::string, std::vector<SrSnModel*> >(neutralMesh->getName(), std::vector<SrSnModel*>() ));
+									std::map<std::string, std::vector<SrSnModel*> >::iterator blendshapeIter = mesh->blendShapeMap.begin();
+									(*blendshapeIter).second.resize(numShapeAttributes);
+									SrSnModel* staticModel = neutralMesh->dMeshStatic_p[0];
+									SrSnModel* model = new SrSnModel();
+									model->shape(staticModel->shape());
+									model->shape().name = staticModel->shape().name;
+									model->changed(true);
+									model->visible(false);
+									(*blendshapeIter).second[0] = model;
+									model->ref();
+									hasNeutral = true;
+								}
+
+							}
+
+							std::map<std::string, std::vector<SrSnModel*> >::iterator blendshapeIter = mesh->blendShapeMap.begin();
+							if (blendshapeIter !=  mesh->blendShapeMap.end())
+							{
+								(*blendshapeIter).second.resize(numShapeAttributes);
+
+								int count = 1;
+								if (hasNeutral)
+								{
+									for (std::vector<SmartBody::StringAttribute*>::iterator iter = shapeAttributes.begin();
+										iter != shapeAttributes.end();
+										iter++)
+									{									
+										const std::string& attrName = (*iter)->getName();
+										// get the shape name and value
+										std::string shapeName = attrName.substr(23);
+										std::string shapeChannel = (*iter)->getValue();
+										if (shapeChannel == "Neutral")
+											continue;
+										if (blendshapeIter !=  mesh->blendShapeMap.end())
+											(*shapeIter).second[count] = shapeName;
+										DeformableMesh* shapeModel = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMesh(shapeName);
+										if (shapeModel)
+										{
+											(*blendshapeIter).second[count] = shapeModel->dMeshStatic_p[0];
+											shapeModel->dMeshStatic_p[0]->ref();
+										}
+										else
+										{
+											(*blendshapeIter).second[count] = NULL;
+										}
+										count++;
+									}
+								}
+							}
+						}
+					}
 #if 0
 					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
 					{
@@ -324,7 +437,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 						pawn->scene_p->set_visibility(0,0,0,0);
 					if (pawn->dMeshInstance_p)
 						pawn->dMeshInstance_p->setVisibility(1);
-#if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)
+ #if !defined(__ANDROID__) && !defined(__FLASHPLAYER__) && !defined(SB_IPHONE)						
 					SbmDeformableMeshGPU::useGPUDeformableMesh = false;
 #endif          
 				}
@@ -347,6 +460,7 @@ void AppListener::notify(SmartBody::SBSubject* subject)
 
 void AppListener::OnSimulationUpdate()
 {
+	//return;
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 
 	const std::vector<std::string>& pawns = scene->getPawnNames();
@@ -359,7 +473,10 @@ void AppListener::OnSimulationUpdate()
         {
  			pawn->scene_p->update();
             if (pawn->dMeshInstance_p)
+			{
+				pawn->dMeshInstance_p->blendShapeStaticMesh();
                 pawn->dMeshInstance_p->update();
+			}
         }
 	}
 	
@@ -529,7 +646,7 @@ void drawLights()
 	}
     
     
-    glEnable(GL_LIGHTING);
+    myGLEnable(GL_LIGHTING);
 	int maxLight = -1;
 	for (size_t x = 0; x < _lights.size(); x++)
 	{
@@ -539,54 +656,62 @@ void drawLights()
     
 	if (maxLight < 0)
 	{
-		glDisable(GL_LIGHT0);
+		myGLDisable(GL_LIGHT0);
 	}
 	if (maxLight < 1)
 	{
-		glDisable(GL_LIGHT1);
+		myGLDisable(GL_LIGHT1);
 	}
 	if (maxLight < 2)
 	{
-		glDisable(GL_LIGHT2);
+		myGLDisable(GL_LIGHT2);
 	}
 	if (maxLight < 3)
 	{
-		glDisable(GL_LIGHT3);
+		myGLDisable(GL_LIGHT3);
 	}
 	if (maxLight < 4)
 	{
-		glDisable(GL_LIGHT4);
+		myGLDisable(GL_LIGHT4);
 	}
 	if (maxLight < 5)
 	{
-		glDisable(GL_LIGHT5);
+		myGLDisable(GL_LIGHT5);
 	}
     
 	if (maxLight > 0)
 	{
-		glEnable(GL_LIGHT0);
+		myGLEnable(GL_LIGHT0);
 	}
 	if (maxLight > 1)
 	{
-		glEnable(GL_LIGHT1);
+		myGLEnable(GL_LIGHT1);
 	}
 	if (maxLight > 2)
 	{
-		glEnable(GL_LIGHT2);
+		myGLEnable(GL_LIGHT2);
 	}
 	if (maxLight > 3)
 	{
-		glEnable(GL_LIGHT3);
+		myGLEnable(GL_LIGHT3);
 	}
 	if (maxLight > 4)
 	{
-		glEnable(GL_LIGHT4);
+		myGLEnable(GL_LIGHT4);
 	}
 	if (maxLight > 5)
 	{
-		glEnable(GL_LIGHT5);
+		myGLEnable(GL_LIGHT5);
 	}
-    
+}
+
+void SBSetupDrawing(int w, int h)
+{   
+	glViewport(0, 0, w, h);
+	//glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+	//myGLEnable(GL_CULL_FACE);
+	//glShadeModel(GL_SMOOTH);
+	//myGLDisable(GL_DEPTH_TEST);
 }
     
     
@@ -596,6 +721,8 @@ void SBInitialize(const char* mediapath)
     XMLPlatformUtils::Initialize();
     LOG("media path%s", mediapath);
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+    //SmartBody::SBScene::getScene()->createStringAttribute("appStatus", "started", true, "Status", 100, false, false, false, "Reports status of SmartBody scene during loading");
+	
 	AppListener* appListener = new AppListener();
 	scene->addSceneListener(appListener);
     SrCamera& cam = *scene->createCamera("activeCamera");
@@ -604,52 +731,90 @@ void SBInitialize(const char* mediapath)
     SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
     sim->setupTimer();
     scene->setMediaPath(mediapath);
-	scene->addAssetPath("script", "sbm-common/scripts");
-	scene->runScript("default-init.py");
-    // store the camera information for resetting
-    cameraReset = new SrCamera(cam);
+}
+
+
+void SBInitScene( const char* initScriptName )
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
+	scene->addAssetPath("script", ".");
+	scene->runScript(initScriptName);
+	SrCamera& cam = *scene->getCamera("activeCamera");
+	cameraReset = new SrCamera(cam);
 }
     
 void SBDrawFrame(int width, int height)
 {
+	static bool initWes = false;
+	if (!initWes)
+	{
+		wes_init(NULL);
+		initWes = true;
+	}
+	
+	//LOG("Getting Scene");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	if(!scene)
+		return;
+	//LOG("Got Scene");
+
+#if 0
+	SmartBody::SBAttribute* attribute = scene->getAttribute("appStatus");
+	if (!attribute)
+		return;
+
+	SmartBody::StringAttribute* strattribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
+	if (!strattribute)
+		return;
+
+	if (strattribute->getValue() != "finished")
+		return;
+
+	if (scene->getSimulationManager()->getTime() < .033)
+		return;
+#endif
+
     SrCamera& cam = *scene->getActiveCamera();
     
 	// clear background
-	glClearColor(1.0f,1.0f,1.0f,1);
-	glEnable(GL_DEPTH_TEST);
+	glViewport( 0, 0, width, height);
+	glClearColor(0.4f,0.4f,0.4f,1);
+	myGLEnable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    
+	//LOG("Preparing to DrawCharacter");
     // setup view
     cam.setAspectRatio(float(width) / float(height));
 	SrMat mat;
 	glMatrixMode ( GL_PROJECTION );
     glLoadIdentity();
-	glLoadMatrixf ( (GLfloat*)cam.get_perspective_mat(mat) );
+	cam.get_perspective_mat(mat);
+	glLoadMatrixf ( (float*) mat);
 	glMatrixMode ( GL_MODELVIEW );
     glLoadIdentity();
-	glLoadMatrixf ( (GLfloat*)cam.get_view_mat(mat) );
+	cam.get_view_mat(mat);
+	glLoadMatrixf ( (float*) mat);
 	glScalef ( cam.getScale(), cam.getScale(), cam.getScale());
-    glViewport( 0, 0, width, height);
 
+	//LOG("Set camera");
+#if 1
     // draw lights
-    drawLights();
+   // drawLights();
     
     // update texture
-    glEnable(GL_TEXTURE_2D);
+    myGLEnable(GL_TEXTURE_2D);
     SbmTextureManager& texm = SbmTextureManager::singleton();
     texm.updateTexture();
     
     /*
     // draw a ground plane
-	glDisable(GL_LIGHTING);
+	myGLDisable(GL_LIGHTING);
 	float planeSize  = 300.f;
 	SrVec quad[4] = { SrVec(planeSize, 0.f, planeSize), SrVec(-planeSize, 0.f, planeSize), SrVec(-planeSize,0.f,-planeSize), SrVec(planeSize, 0.f, -planeSize) };
 	SrVec quadN[4] = { SrVec(0.f, 1.f, 0.f), SrVec(0.f, 1.f, 0.f), SrVec(0.f, 1.f, 0.f), SrVec(0.f, 1.f, 0.f) };
 	GLfloat quadColor[16] = { 0.2f,0.2f, 0.2f, 1.f , 0.3f,0.3f,0.3f, 1.f, 0.5f,0.5f,0.5f,1.f, 0.25f,0.25f,0.25f,1.f };
 	unsigned short indices[] = {0,1,2, 0,2,3};
 	glShadeModel(GL_SMOOTH);
-	glDisable(GL_CULL_FACE);
+	myGLDisable(GL_CULL_FACE);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -659,17 +824,73 @@ void SBDrawFrame(int width, int height)
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_COLOR_ARRAY);
-	glEnable(GL_LIGHTING);
+	myGLEnable(GL_LIGHTING);
      */
     
     // draw characters
+    //LOG("Drawing Character");
+	//SBDrawBackground();
     SBDrawCharacters();
+#endif
 }
     
+
+void SBDrawBackground()
+{
+	SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,"background_img");
+	if (!tex)
+	{
+		//LOG("cannot find texture image .....");
+		return; // no background image
+	}
+
+	//LOG("texture image id = %d", tex->getID());
+	glMatrixMode (GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity ();
+
+	glMatrixMode (GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluOrtho2D(-1, 1, -1, 1);
+
+	
+	myGLEnable(GL_TEXTURE_2D);	
+	glBindTexture(GL_TEXTURE_2D, tex->getID());	
+	
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+	//LOG("before bindAttrib");
+	float z_max = -(1.f - gwiz::epsilon10());
+	SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, z_max, 1.f), SrVec4(-1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, -1.0f, z_max, 1.f), SrVec4(1.0f, 1.0f, z_max, 1.f) };
+	SrVec4 quadT[4] = { SrVec4(0.f, 1.f, 0.f, 0.f), SrVec4(0.f, 0.f, 0.f, 0.f), SrVec4(1.f, 0.f, 0.f, 0.f), SrVec4(1.f, 1.f, 0.f, 0.f) };
+	unsigned short indices[] = {0,1,2, 0,2,3};
+	
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(4, GL_FLOAT, 0, (GLfloat*)&quad[0]);  
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
+	glTexCoordPointer(4, GL_FLOAT, 0, (GLfloat*)&quadT[0]); 
+
+	glDrawElements_wes(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	myGLDisable(GL_TEXTURE_2D);	
+
+	glMatrixMode (GL_PROJECTION);
+	glPopMatrix(); 
+
+	glMatrixMode (GL_MODELVIEW);
+	glPopMatrix();
+}
+
+
 void SBDrawCharacters()
 {
-    
-#if 0   // draw bone figure
+
+#define DRAW_DEBUG_BONE 0
+#if DRAW_DEBUG_BONE   // draw bone figure
     const std::vector<std::string>& chars = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (std::vector<std::string>::const_iterator charIter = chars.begin();
          charIter != chars.end();
@@ -690,6 +911,7 @@ void SBDrawCharacters()
             jointPos[i * 3 + 0] = pos.x;
             jointPos[i * 3 + 1] = pos.y;
             jointPos[i * 3 + 2] = pos.z;
+			//LOG("Joint %d, Position = %f %f %f", i, pos.x,pos.y,pos.z);
             indexMap[joint->index()] = i;
             boneIdx[i*2+0] = joint->index();
             if (joint->parent())
@@ -702,8 +924,8 @@ void SBDrawCharacters()
             boneIdx[i*2] = indexMap[boneIdx[i*2]];
             boneIdx[i*2+1] = indexMap[boneIdx[i*2+1]];
         }
-        glPointSize(2.0f);
-        glLineWidth(1.0f);
+        //glPointSize(2.0f);
+        //glLineWidth(1.0f);
         glColor4f(1, 1, 1, 1);
         glEnableClientState(GL_VERTEX_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, (const GLfloat*)&jointPos[0]);
@@ -712,6 +934,7 @@ void SBDrawCharacters()
         glDisableClientState(GL_VERTEX_ARRAY);
     }
 #else   // draw CPU deformable mesh
+
 	const std::vector<std::string>& pawns = SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator pawnIter = pawns.begin();
          pawnIter != pawns.end();
@@ -721,7 +944,7 @@ void SBDrawCharacters()
 		if(pawn->dMeshInstance_p)
 		{
 			pawn->dMeshInstance_p->setVisibility(1);
-			//pawn->dMeshInstance_p->update();
+			//pawn->dMeshInstance_p->blendShapeStaticMesh();
 			SrGlRenderFuncs::renderDeformableMesh(pawn->dMeshInstance_p);
 		}
 	}
@@ -732,6 +955,15 @@ void SBUpdate(float t)
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
+    if((!scene)  || (!sim))
+    	return;
+	if (SmartBody::SBScene::getScene()->getVHMsgManager()->isEnable())
+	{
+		int err = SmartBody::SBScene::getScene()->getVHMsgManager()->poll();
+		if( err == CMD_FAILURE )   {
+			LOG("ttu_poll ERROR\n" );
+		}
+	}
     sim->update();
     scene->update();
 }
@@ -740,7 +972,7 @@ void SBExecuteCmd(const char* command)
 {
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
     scene->command(command);
-    printf("%s\n", command);
+    LOG("%s\n", command);
 }
     
 void SBExecutePythonCmd(const char* command)
@@ -749,6 +981,58 @@ void SBExecutePythonCmd(const char* command)
     scene->run(command);
     printf("%s\n", command);
 }
+
+
+void sb_vhmsg_callback( const char *op, const char *args, void * user_data ) {
+	// Replace singleton with a user_data pointer
+	//if (!mcuInit) return;
+	//LOG("VHMSG Callback : op = %s ,args = %s\n",op,args);
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	switch( scene->getCommandManager()->execute( op, (char *)args ) ) {
+	case CMD_NOT_FOUND:
+		LOG("SBM ERR: command NOT FOUND: '%s' + '%s'", op, args );
+		break;
+	case CMD_FAILURE:
+		LOG("SBM ERR: command FAILED: '%s' + '%s'", op, args );
+		break;
+	}
+}
+
+
+void SBInitVHMSGConnection()
+{
+	//if (!mcuInit) return;	
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	const char* serverName = "172.16.33.14";
+	const char* scope = "DEFAULT_SCOPE";
+	const char* port = "61616";
+	int err;
+	int openConnection = vhmsg::ttu_open(serverName,scope,port);
+	if( openConnection == vhmsg::TTU_SUCCESS )
+	{
+		vhmsg::ttu_set_client_callback( sb_vhmsg_callback );
+		err = vhmsg::ttu_register( "sb" );
+		err = vhmsg::ttu_register( "sbm" );
+		err = vhmsg::ttu_register( "vrAgentBML" );
+		err = vhmsg::ttu_register( "vrExpress" );
+		err = vhmsg::ttu_register( "vrSpeak" );
+		err = vhmsg::ttu_register( "RemoteSpeechReply" );
+		err = vhmsg::ttu_register( "PlaySound" );
+		err = vhmsg::ttu_register( "StopSound" );
+		err = vhmsg::ttu_register( "CommAPI" );
+		err = vhmsg::ttu_register( "object-data" );
+		err = vhmsg::ttu_register( "vrAllCall" );
+		err = vhmsg::ttu_register( "vrKillComponent" );
+		err = vhmsg::ttu_register( "wsp" );
+		err = vhmsg::ttu_register( "receiver" );
+		scene->getVHMsgManager()->setEnable(true);
+		LOG("TTU Open Success : server = %s, scope = %s, port = %s",serverName,scope,port);
+	}
+	else
+	{
+		LOG("TTU Open Failed : server = %s, scope = %s, port = %s",serverName,scope,port);
+	}
+}
     
     
 void SBCameraOperation(float dx, float dy)
@@ -756,8 +1040,8 @@ void SBCameraOperation(float dx, float dy)
     SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SrCamera* cam = scene->getActiveCamera();
     
-    float camDx = dx * cam->getAspectRatio() * 0.01f;
-    float camDy = dy * cam->getAspectRatio() * 0.01f;
+    float camDx = dx * cam->getAspectRatio() ;
+    float camDy = dy * cam->getAspectRatio() ;
     int cameraMode = 1; // hard coded for now
     if (cameraMode == 0) // zoom
     {
@@ -775,7 +1059,7 @@ void SBCameraOperation(float dx, float dy)
         dirY.cross(origUp, (origCenter - origCamera));
         dirY /= dirY.len();
         
-        SrVec cameraPoint = rotatePoint(origCamera, origCenter, dirX, -camDx * float(M_PI));
+        SrVec cameraPoint = rotatePoint(origCamera, origCenter, dirX, camDx * float(M_PI));
         //cameraPoint = rotatePoint(origCamera, origCenter, dirX, -camDy * float(M_PI));
         cam->setEye(cameraPoint.x, cameraPoint.y, cameraPoint.z);
     }
@@ -808,4 +1092,11 @@ void SBCameraOperation(float dx, float dy)
 }
 #if __cplusplus
 }
+
+void SBCloseVHMSGConnection()
+{
+	vhmsg::ttu_close();
+}
+
+
 #endif

@@ -13,8 +13,8 @@ scene.setScale(1.0)
 
 # set the default camera 
 camera = scene.getActiveCamera()
-camera.setEye(0, 2.0478, 4.69259)
-camera.setCenter(0.012, 1.60887, 2.75628)
+camera.setEye(0.012, 1.30, 4.69259)
+camera.setCenter(0.012, 1.20887, 0.0)
 camera.setUpVector(SrVec(0, 1, 0))
 camera.setScale(1)
 camera.setFov(0.4)
