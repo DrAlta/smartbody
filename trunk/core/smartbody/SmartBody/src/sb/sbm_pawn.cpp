@@ -650,19 +650,24 @@ void SbmPawn::initSteeringSpaceObject()
 	float steerScale = 1.0f / scene->getScale();
 
 	// get the size of the steering object
-	SrVec size = this->getVec3Attribute("collisionShapeScale");
-	steeringSpaceObjSize.x = size.x;
-	steeringSpaceObjSize.y = size.y;
-	steeringSpaceObjSize.z = size.z;
-
 	float x, y, z, h, p, r;
 	this->get_world_offset(x, y, z, h, p, r);	
+	gwiz::quat_t q = gwiz::euler_t(p,h,r);	
+	SrQuat pawnQ = SrQuat((float)q.w(), (float)q.x(), (float)q.y(), (float)q.z());
+	SrVec size = this->getVec3Attribute("collisionShapeScale");
+	size = size*pawnQ;
+	steeringSpaceObjSize.x = fabs(size.x);
+	steeringSpaceObjSize.y = fabs(size.y);
+	steeringSpaceObjSize.z = fabs(size.z);	
+	
 	float xmin = (x - steeringSpaceObjSize.x) / steerScale;
 	float xmax = (x + steeringSpaceObjSize.x) / steerScale;
 	float ymin = (y - steeringSpaceObjSize.y) / steerScale;
 	float ymax = (y + steeringSpaceObjSize.y) / steerScale;
 	float zmin = (z - steeringSpaceObjSize.z) / steerScale;
 	float zmax = (z + steeringSpaceObjSize.z) / steerScale;
+	
+	
 
 	//LOG("steeringSpaceObjSize = %f %f %f, scale = %f", steeringSpaceObjSize.x, steeringSpaceObjSize.y, steeringSpaceObjSize.z, steerScale);
 
