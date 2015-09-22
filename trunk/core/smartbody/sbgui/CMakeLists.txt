@@ -183,6 +183,7 @@ set( SBM_FLTK_SRC
 	./src/fltk_viewer.cpp
 	./src/SBWindowListener.cpp
 	./src/SBSelectionManager.cpp
+	./src/SBInterfaceListener.cpp
 	${OGRE_SRCS}
 	./src/pic.cpp
 	./src/ppm.cpp
