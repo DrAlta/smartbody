@@ -5384,7 +5384,8 @@ void FltkViewer::drawCollisionInfo()
 		 iter++)
 	{
 		SBGeomObject* collisionObject = (*iter).second;
-		drawColObject(collisionObject, collisionObject->getGlobalTransform().gmat(), .5);
+		SrMat mat = collisionObject->getGlobalTransform().gmat();
+		drawColObject(collisionObject, mat, .5);
 	}
 	glPopMatrix();
 	glPopAttrib();
