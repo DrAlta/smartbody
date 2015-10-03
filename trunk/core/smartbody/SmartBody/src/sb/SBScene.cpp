@@ -2266,8 +2266,8 @@ void SBScene::exportCharacter( std::string charName, std::string outDir )
 		fs::create_directories(newOutPath);
 	}
 	std::vector<std::string> motions;
-	double scale = sbChar->getDoubleAttribute("deformableMeshScale");
-	ParserOpenCOLLADA::exportCollada(outDir, sbChar->getSkeleton()->getName(), sbChar->getStringAttribute("deformableMesh"), motions, true, true, false, scale);
+	SrVec scale = sbChar->getVec3Attribute("deformableMeshScale");
+	ParserOpenCOLLADA::exportCollada(outDir, sbChar->getSkeleton()->getName(), sbChar->getStringAttribute("deformableMesh"), motions, true, true, false, scale.x);
 
 }
 

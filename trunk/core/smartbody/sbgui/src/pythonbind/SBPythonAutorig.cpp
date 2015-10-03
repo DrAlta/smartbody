@@ -218,7 +218,8 @@ void saveDeformableMesh(const std::string& meshName, const std::string& skelName
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(skelName);
 	if (character)
 	{
-		scale = character->getDoubleAttribute("deformableMeshScale");
+		SrVec scale3 = character->getVec3Attribute("deformableMeshScale");
+		scale = scale3.x;
 	}
 
 	ParserOpenCOLLADA::exportCollada(outDir, skelName, meshName, moNames, true, true, false, scale);

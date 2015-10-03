@@ -147,7 +147,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	displayVec.push_back("GPUmesh");
 	displayAttribute->setValidValues(displayVec);
 
-	createDoubleAttribute("deformableMeshScale", 1, true, "Display", 220, false, false, false, "Scale factor when loading mesh.");
+	createVec3Attribute("deformableMeshScale", 1.0, 1.0, 1.0, true, "Display", 220, false, false, false, "Scale factor when loading mesh.");
 	createStringAttribute("deformableMesh", "", true, "Display", 230, false, false, false, "Directory that contains mesh information.");
 	createBoolAttribute("showSelected", true, true, "Display", 250, false, false, false, "Shows selection indicator when selected.");
 
@@ -1003,10 +1003,10 @@ SmartBody::SBReach* SBCharacter::getReach()
 
 void SBCharacter::setDeformableMeshScale( double meshScale )
 {
-	SmartBody::DoubleAttribute* meshScaleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(getAttribute("deformableMeshScale"));
+	SmartBody::Vec3Attribute* meshScaleAttribute = dynamic_cast<SmartBody::Vec3Attribute*>(getAttribute("deformableMeshScale"));
 	if (meshScaleAttribute)
 	{
-		meshScaleAttribute->setValue(meshScale);
+		meshScaleAttribute->setValue(SrVec(meshScale, meshScale, meshScale));
 	}
 }
 
