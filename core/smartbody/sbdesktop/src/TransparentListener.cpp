@@ -203,8 +203,8 @@ void TransparentListener::notify(SmartBody::SBSubject* subject)
 		{
 			//LOG("name = deformableMeshScale");
 			bool useDeformableMesh = (name == "deformableMeshScale");
-			SmartBody::DoubleAttribute* doubleAttribute = dynamic_cast<SmartBody::DoubleAttribute*>(attribute);
-			if (doubleAttribute)
+			SmartBody::Vec3Attribute* vec3Attribute = dynamic_cast<SmartBody::Vec3Attribute*>(attribute);
+			if (vec3Attribute)
 			{
 				if (!pawn->dMeshInstance_p && useDeformableMesh)
 					pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
@@ -212,7 +212,7 @@ void TransparentListener::notify(SmartBody::SBSubject* subject)
 					pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
 				
 				DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
-				meshInstance->setMeshScale((float) doubleAttribute->getValue());
+				meshInstance->setMeshScale((float) vec3Attribute->getValue().x);
 				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
 			}			
 		}
