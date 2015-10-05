@@ -17,11 +17,24 @@ set(_COMPILING_STEERLIB 1)
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
+
+
+find_library (ACTIVEMQLIB activemq-cpp PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (XERCESLIB xerces-c PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (BOOSTPYTHONLIB boost_python PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (BOOSTFILESYSTEMLIB boost_filesystem PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (BOOSTSYSTEMLIB boost_system PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (BOOSTREGEXLIB boost_regex PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (ODELIB ode PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (PROTOCLIB protoc PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (PROTOBUFLIB protobuf PATHS ${PROJECT_SOURCE_DIR}/lib )
+
+
 find_library (COREAUDIO_LIBRARY CoreAudio)
 find_library (AUDIOUNIT_LIBRARY AudioUnit)
 find_library (CORESERVICES_LIBRARY CoreServices)
 find_library (LIBSNDFILE sndfile )
-find_library (ALUT alut )
+find_library (ALUT alut PATHS ${PROJECT_SOURCE_DIR}/lib)
 find_library (OPENAL openal)
 find_library (GLEW GLEW)
 if (${BUILD_FESTIVAL})
@@ -34,7 +47,19 @@ else()
 find_library (LIBSNDFILE sndfile )
 find_library (ALUT alut )
 find_library (OPENAL openal)
+find_library (ACTIVEMQLIB activemq)
+find_library (XERCESLIB xerces)
+find_library (BOOSTPYTHONLIB boost_python )
+find_library (BOOSTFILESYSTEMLIB boost_filesystem )
+find_library (BOOSTSYSTEMLIB boost_system )
+find_library (BOOSTREGEXLIB boost_regex )
+find_library (ODELIB ode )
 endif()
+
+
+
+
+
 
 # osx c++ version >= clang 4.2.0
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -103,7 +128,7 @@ set( VHMSG_LIB
 else()
 set( VHMSG_LIB
 	vhmsg
-	activemq-cpp
+	${ACTIVEMQLIB}
 )
 endif()
 
@@ -121,7 +146,7 @@ set( PYTHON_LIB
 )
 else()
 set( PYTHON_LIB
-	boost_python
+	${BOOSTPYTHONLIB}
 	python2.7
 )
 endif()
@@ -131,7 +156,7 @@ set( ODE_LIB
 )
 else()
 set( ODE_LIB
-	ode
+	${ODELIB}
 )
 endif()
 
@@ -150,10 +175,15 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set ( PROTOC ${PROJECT_SOURCE_DIR}/bin/protoc)
+else()
+set ( PROTOC protoc)
+endif()
 add_custom_target(protoctarget
-		COMMAND protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbmotion.proto 
-		COMMAND protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbutilities.proto 
-		COMMAND protoc --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbmesh.proto 
+		COMMAND ${PROTOC} --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbmotion.proto 
+		COMMAND ${PROTOC} --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbutilities.proto 
+		COMMAND ${PROTOC} --proto_path=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols --cpp_out=${CMAKE_CURRENT_SOURCE_DIR}/src/protocols ${CMAKE_CURRENT_SOURCE_DIR}/src/protocols/sbmesh.proto 
 		)
 
 
@@ -666,10 +696,10 @@ target_link_libraries( SmartBody
 	${PYTHON_LIB}
 	${ASSIMP_LIB}
 	vhcl
-	xerces-c
-	boost_filesystem
-	boost_system
-	boost_regex
+	${XERCESLIB}
+	${BOOSTFILESYSTEMLIB}
+	${BOOSTSYSTEMLIB}
+	${BOOSTREGEXLIB}
 	blas
 	lapack
 	${OPENGL_LIBRARIES}
@@ -679,8 +709,8 @@ target_link_libraries( SmartBody
 	${ASSIMP_LIB}
 	ncurses
 	${MORE_LIBS}
-	protoc
-	protobuf
+	${PROTOCLIB}
+	${PROTOBUFLIB}
 )
 
 add_dependencies(SmartBody protoctarget)

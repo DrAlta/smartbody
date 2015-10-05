@@ -24,13 +24,11 @@ include_directories(
 	steersuite-1.3/steerlib/include
 	steersuite-1.3/pprAI/include
 	steersuite-1.3/external
-	/usr/local/include
 	${PYTHON_INCLUDE}
 	${ASSIMP_INCLUDE}
 )
 
 LINK_DIRECTORIES(
-	/usr/local/lib
 )
 
 
