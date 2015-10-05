@@ -7,7 +7,7 @@ set( GOOGLE_PROFILER FALSE)
 set( BUILD_FESTIVAL FALSE)
 
 # uses the Assimp asset importer
-#set( SB_NO_ASSIMP FALSE)
+set( SB_NO_ASSIMP TRUE)
 
 # uses Python as a scripting language
 #set( SB_NO_PYTHON FALSE)
@@ -27,6 +27,8 @@ set( BUILD_FESTIVAL FALSE)
 add_definitions(	-O3 -fPIC )
 #add_definitions(	-v -W -Wall -Wextra -pedantic )
 
+set ( ACTIVEMQ_VERSION activemq-cpp-3.9.0)
+
 
 if (${SB_NO_VHMSG})
 add_definitions(-DSB_NO_VHMSG)
@@ -35,7 +37,7 @@ set (VHMSG_INCLUDE
 else()
 set (VHMSG_INCLUDE
 	lib/vhmsg/vhmsg-c/include
-	/usr/local/include/activemq-cpp-3.8.3
+	include/${ACTIVEMQ_VERSION}
 	)
 endif()
 
@@ -67,19 +69,15 @@ endif()
 
 include_directories(
 
-	/usr/local/include
-	/usr/include/xercesc
 	${VHMSG_INCLUDE}
 	${BONEBUS_INCLUDE}
 	lib/vhcl/include
 #	lib/boost
-	/usr/local/include/boost
-
+	include
 )
 
 
-LINK_DIRECTORIES(
-	/usr/local/lib
+link_directories(
 )
 
 add_subdirectory( lib )

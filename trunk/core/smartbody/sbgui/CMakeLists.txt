@@ -9,7 +9,7 @@ include_directories( ../SmartBody/src )
 include_directories( ./external/Pinocchio )
 include_directories( ./external/polyvox/library/PolyVoxCore/include )
 #include_directories( /usr/local/include/CEGUI )
-link_directories( /usr/local/lib )
+#link_directories( /usr/local/lib )
 link_directories( /usr/lib )                                                           
 
 set (BUILD_OGRE FALSE)
@@ -28,11 +28,32 @@ find_library (COREAUDIO_LIBRARY CoreAudio)
 find_library (AUDIOUNIT_LIBRARY AudioUnit)
 find_library (CORESERVICES_LIBRARY CoreServices)
 find_library (GLEW GLEW)
+find_library (ACTIVEMQLIB activemq-cpp PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (XERCESLIB xerces-c PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (BOOSTPYTHONLIB boost_python PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (BOOSTFILESYSTEMLIB boost_filesystem PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (BOOSTSYSTEMLIB boost_system PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (BOOSTREGEXLIB boost_regex PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (ODELIB ode PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (FLTKLIB fltk PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (FLTKIMAGESLIB fltk_images PATHS ${PROJECT_SOURCE_DIR}/lib )
+find_library (FLTKGLLIB fltk_gl PATHS ${PROJECT_SOURCE_DIR}/lib )
 if (${BUILD_FESTIVAL})
 find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
 find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
 find_library (ESTSTRING eststring ../../../lib/festival/speech_tools/lib)
 find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
+else()
+find_library (ACTIVEMQLIB activemq-cpp )
+find_library (XERCESLIB xerces-c )
+find_library (BOOSTPYTHONLIB boost_python )
+find_library (BOOSTFILESYSTEMLIB boost_filesystem )
+find_library (BOOSTSYSTEMLIB boost_system )
+find_library (BOOSTREGEXLIB boost_regex )
+find_library (ODELIB ode )
+find_library (FLTKLIB fltk )
+find_library (FLTKIMAGESLIB fltk_images )
+find_library (FLTKGLLIB fltk_gl )
 endif()
 # these are the libraries necessary for osx, but disable it for now
 #find_library (IOKIT_LIBRARY IOKit)
@@ -63,6 +84,7 @@ set( VHMSG_LIB
 else()
 set( VHMSG_LIB
         vhmsg
+	${ACTIVEMQLIB}
 	activemq-cpp
 )
 endif()
@@ -81,7 +103,7 @@ set( PYTHON_LIB
 )
 else()
 set( PYTHON_LIB
-        boost_python
+	${BOOSTPYTHONLIB}
         python2.7
 )
 endif()
@@ -102,13 +124,14 @@ set (OGRE_SRCS
 )
 endif()
 
-find_library (LIBSNDFILE sndfile )
-find_library (ALUT alut )
-find_library (OPENAL openal)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+find_library (LIBSNDFILE sndfile PATHS ${PROJECT_DOURCE_DIR}/lib)
+find_library (ALUT alut PATHS ${PROJECT_DOURCE_DIR}/lib)
+find_library (OPENAL openal PATHS ${PROJECT_DOURCE_DIR}/lib)
+
 link_directories(/usr/X11R6/lib)
-link_directories(/usr/local/lib)
+#link_directories(/usr/local/lib)
 if (${BUILD_FESTIVAL})
 set( FESTIVAL_LIBS 
         ${FESTIVAL}
@@ -119,6 +142,9 @@ set( FESTIVAL_LIBS
 else()
 set( FESTIVAL_LIBS
 )
+find_library (LIBSNDFILE sndfile )
+find_library (ALUT alut )
+find_library (OPENAL openal)
 endif()
 set( MORE_LIBS
         ${COREAUDIO_LIBRARY}
@@ -297,14 +323,14 @@ target_link_libraries( sbgui
 	${BONEBUS_LIB}
 	${VHMSG_LIB}
 	vhcl
-	boost_filesystem
-	boost_system
-	boost_regex
+	${BOOSTFILESYSTEMLIB}
+	${BOOSTSYSTEMLIB}
+	${BOOSTREGEXLIB}
 	${PYTHON_LIB}
 	${XFT}
-	fltk_images 
-	fltk 
-	fltk_gl 
+	${FLTKLIB}
+	${FLTKIMAGESLIB}
+	${FLTKGLLIB}
 	${OPENGL_LIBRARIES}
     	ncurses	
 	pthread
@@ -315,8 +341,8 @@ target_link_libraries( sbgui
 	${OGRE_LIBS}
 	#CEGUIBase
 	#CEGUIOpenGLRenderer
-	protobuf
-	protoc
+	${PROTOCLIB}
+	${PROTOBUFLIB}
 )
 
 set( EXEC_LIST
