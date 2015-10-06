@@ -531,7 +531,9 @@ glLightfv(GLenum light, GLenum pname, GLfloat *params)
         case GL_AMBIENT:
             SetUniform4fv(uLight[ind].ColorAmbient, params); break;
         case GL_DIFFUSE:
-            SetUniform4fv(uLight[ind].ColorDiffuse, params); break;
+            SetUniform4fv(uLight[ind].ColorDiffuse, params); 
+			//PRINT_DEBUG("glLightfv, set GL_DIFFUSE, param = %f %f %f\n", params[0], params[1], params[2]);
+			break;
         case GL_SPECULAR:
             SetUniform4fv(uLight[ind].ColorSpec, params); break;
 

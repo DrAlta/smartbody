@@ -527,11 +527,13 @@ wes_frag_tex(char* buff, progstate_t *s)
             switch(s->uTexture[i].Mode)
             {
                 case WES_FUNC_REPLACE:
-                    str += sprintf(str, "gl_FragColor = tex%i;\n", i);
+                    //str += sprintf(str, "gl_FragColor = tex%i;\n", i);
+					//str += sprintf(str, "gl_FragColor = vColor;\n");
+					str += sprintf(str, "gl_FragColor = tex%i;\n", i);
                     break;
 
                 case WES_FUNC_MODULATE:
-                    str += sprintf(str, "gl_FragColor *= tex%i;\n", i);
+                    str += sprintf(str, "gl_FragColor = tex%i*vColor;\n", i);
                     break;
 
                 case WES_FUNC_DECAL:

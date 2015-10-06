@@ -61,6 +61,255 @@ void main(){\n\
 	vFactor.x = 1.0;\n\
 	vFactor.y = 1.0;\n\
 }\n\ ";
+
+std::string wesShaderTestStr = 
+"#define LIGHT_NUM						8\n\
+#define FACE_NUM						2\n\
+#define FACE_FRONT						0\n\
+#define FACE_BACK						1\n\
+struct sLightModel {\n\
+	lowp vec4 	ColorAmbient;\n\
+	bool		TwoSided;\n\
+	bool		LocalViewer;\n\
+	int			ColorControl;\n\
+};\n\
+struct sLight {\n\
+	highp vec4 	Position;\n\
+	lowp vec4 	ColorAmbient, ColorDiffuse, ColorSpec;\n\
+	highp vec3 	Attenuation; 	// Constant, Linear & Quadratic factors\n\
+	highp vec3	SpotDir;\n\
+	highp vec2 	SpotVar;		// Spot Shinniness & Cutoff angle\n\
+};\n\
+struct sMaterial {\n\
+	int 		ColorMaterial;\n\
+	lowp vec4 	ColorAmbient, ColorDiffuse, ColorSpec, ColorEmissive;\n\
+	float 		SpecExponent;\n\
+};\n\
+attribute highp vec4 	aPosition;\n\
+attribute highp vec3 	aNormal;\n\
+attribute lowp vec4 	aColor;\n\
+attribute mediump vec4 	aTexCoord0;\n\
+attribute mediump vec4 	aTexCoord1;\n\
+attribute mediump vec4 	aTexCoord2;\n\
+attribute mediump vec4 	aTexCoord3;\n\
+uniform highp mat4		uMVP;		//model-view-projection matrix\n\
+uniform highp mat4		uMV;		//model-view matrix\n\
+uniform highp mat3		uMVIT;		//model-view inverted & transformed matrix \n\
+uniform	bool			uEnableLight[LIGHT_NUM];\n\
+uniform sLight			uLight[LIGHT_NUM];\n\
+uniform sLightModel		uLightModel;\n\
+uniform sMaterial		uMaterial[FACE_NUM];\n\
+\n\
+varying lowp vec4 		vColor;\n\
+varying lowp vec2		vFactor;\n\
+varying mediump vec4 	vTexCoord[4];\n\
+\n\
+highp vec4				lEye;\n\
+highp vec3				lNormal;\n\
+lowp vec4				lMaterialAmbient;\n\
+lowp vec4				lMaterialDiffuse;\n\
+lowp vec4				lMaterialSpecular;\n\
+lowp vec4				lMaterialEmissive;\n\
+float					lMaterialSpecExponent;\n\
+int						lFace;\n\
+\n\
+vec4 ComputeLightFrom(int i){\n\
+	highp vec3 	dpos;\n\
+	highp vec4	col;\n\
+	float 	dist, dist2, spot;\n\
+	float 	att;\n\
+	float 	ndoth, ndotl;\n\
+	dpos = uLight[i].Position.xyz;\n\
+	att = 1.0;\n\
+	col = (uLight[i].ColorAmbient * lMaterialAmbient);\n\
+	ndotl = dot(lNormal, dpos);\n\
+	if (ndotl > 0.0){\n\
+		col += ndotl * (uLight[i].ColorDiffuse * lMaterialDiffuse);\n\
+	}\n\
+	dpos.z += 1.0;\n\
+	dpos = normalize(dpos);\n\
+	ndoth = dot(lNormal, dpos);\n\
+	if (ndoth > 0.0){ \n\
+		col += pow(ndoth, lMaterialSpecExponent) * (lMaterialSpecular * uLight[i].ColorSpec);\n\
+	}\n\
+	return att * col;\n\
+}\n\
+vec4 ComputeLighting(){\n\
+	lFace = FACE_FRONT;\n\
+	/* Determine which materials are to be used	*/\n\
+	lMaterialAmbient = uMaterial[lFace].ColorAmbient;\n\
+	lMaterialDiffuse = uMaterial[lFace].ColorDiffuse;\n\
+	lMaterialSpecular = uMaterial[lFace].ColorSpec;\n\
+	lMaterialEmissive = uMaterial[lFace].ColorEmissive;\n\
+	lMaterialSpecExponent = uMaterial[lFace].SpecExponent;\n\
+	//vColor = vec4(1.0,1.0,0.0,1.0);//lMaterialDiffuse;\n\
+	vec4 curColor = lMaterialEmissive + lMaterialAmbient;\n\
+	for(int i = 0; i < LIGHT_NUM; i++){\n\
+		//if (uEnableLight[i]){\n\
+		curColor += ComputeLightFrom(i);\n\
+		//curColor += uLight[i].ColorDiffuse;\n\
+		//}\n\
+	}\n\
+	//curColor.rgb = vec3(1.0,0.0,0.0);\n\
+	curColor.w = lMaterialDiffuse.w;\n\
+	return curColor;\n\
+}\n\
+\n\
+void main(){\n\
+	gl_Position = uMVP * aPosition;\n\
+	lNormal = uMVIT * aNormal;\n\
+	//vColor = vec4(1.0,1.0,1.0,1.0);\n\
+	vColor = ComputeLighting();\n\
+	vTexCoord[0] = aTexCoord0;\n\
+	vTexCoord[1] = aTexCoord1;\n\
+	vTexCoord[2] = aTexCoord2;\n\
+	vTexCoord[3] = aTexCoord3;\n\
+	vFactor.x = 1.0;\n\
+	vFactor.y = 1.0;\n\
+}\n\ ";
+
+std::string wesShaderLightingStr =
+"\n\
+/*#define LIGHT_NUM						8\n\
+#define FACE_NUM						2\n\
+#define FACE_FRONT						0\n\
+#define FACE_BACK						1\n\
+struct sLightModel {\n\
+	lowp vec4 	ColorAmbient;\n\
+	bool		TwoSided;\n\
+	bool		LocalViewer;\n\
+	int			ColorControl;\n\
+};\n\
+struct sLight {\n\
+	highp vec4 	Position;\n\
+	lowp vec4 	ColorAmbient, ColorDiffuse, ColorSpec;\n\
+	highp vec3 	Attenuation; 	// Constant, Linear & Quadratic factors\n\
+	highp vec3	SpotDir;\n\
+	highp vec2 	SpotVar;		// Spot Shinniness & Cutoff angle\n\
+};\n\
+struct sMaterial {\n\
+	int 		ColorMaterial;\n\
+	lowp vec4 	ColorAmbient, ColorDiffuse, ColorSpec, ColorEmissive;\n\
+	float 		SpecExponent;\n\
+};*/\n\
+attribute highp vec4 	aPosition;\n\
+attribute lowp vec4 	aColor;\n\
+attribute mediump vec4 	aTexCoord0;\n\
+attribute mediump vec4 	aTexCoord1;\n\
+attribute mediump vec4 	aTexCoord2;\n\
+attribute mediump vec4 	aTexCoord3;\n\
+attribute highp vec3 	aNormal;\n\
+uniform highp mat4		uMVP;		//model-view-projection matrix\n\
+uniform highp mat4		uMV;		//model-view matrix\n\
+uniform highp mat3		uMVIT;		//model-view inverted & transformed matrix \n\
+\n\
+varying lowp vec4 		vColor;\n\
+varying lowp vec2		vFactor;\n\
+varying mediump vec4 	vTexCoord[4];\n\
+/*uniform	bool			uEnableLight[LIGHT_NUM];\n\
+uniform sLight			uLight[LIGHT_NUM];\n\
+uniform sLightModel		uLightModel;\n\
+uniform sMaterial		uMaterial[FACE_NUM];*/\n\
+highp vec4				lEye;\n\
+/*highp vec3				lNormal;\n\
+lowp vec4				lMaterialAmbient;\n\
+lowp vec4				lMaterialDiffuse;\n\
+lowp vec4				lMaterialSpecular;\n\
+lowp vec4				lMaterialEmissive;\n\
+float					lMaterialSpecExponent;\n\
+int						lFace;*/\n\
+\n\
+/*vec4 ComputeLightFrom(int i){\n\
+	highp vec3 	dpos;\n\
+	highp vec4	col;\n\
+	float 	dist, dist2, spot;\n\
+	float 	att;\n\
+	float 	ndoth, ndotl;\n\
+	dpos = uLight[i].Position.xyz;\n\
+	att = 1.0;\n\
+	if (uLight[i].Position.w != 0.0){\n\
+		dpos -= lEye.xyz;\n\
+		if (uLight[i].Attenuation.x != 1.0 || uLight[i].Attenuation.y != 0.0 ||uLight[i].Attenuation.z != 0.0){\n\
+			dist2 = dot(dpos, dpos);\n\
+			dist = sqrt(dist2);\n\
+			att = 1.0 / dot(uLight[i].Attenuation, vec3(1.0, dist, dist2));\n\
+		}\n\
+		dpos = normalize(dpos);\n\
+		if(uLight[i].SpotVar.y < 180.0){\n\
+			spot = dot(-dpos, uLight[i].SpotDir);\n\
+			if(spot >= cos(radians(uLight[i].SpotVar.y))){\n\
+				att *= pow(spot, uLight[i].SpotVar.x);\n\
+			} else {\n\
+				return vec4(0,0,0,0);\n\
+			}\n\
+		}\n\
+	}\n\
+	col = (uLight[i].ColorAmbient * lMaterialAmbient);\n\
+	ndotl = dot(lNormal, dpos);\n\
+	if (ndotl > 0.0){\n\
+		col += ndotl * (uLight[i].ColorDiffuse * lMaterialDiffuse);\n\
+	}\n\
+	dpos.z += 1.0;\n\
+	dpos = normalize(dpos);\n\
+	ndoth = dot(lNormal, dpos);\n\
+	if (ndoth > 0.0){ \n\
+		col += pow(ndoth, lMaterialSpecExponent) * (lMaterialSpecular * uLight[i].ColorSpec);\n\
+	}\n\
+	return att * col;\n\
+}\n\
+void ComputeLighting(){\n\
+	/* 	Determine Face 	*/\n\
+	/*if (uLightModel.TwoSided){\n\
+		if (lNormal.z > 0.0){\n\
+			lFace = FACE_FRONT;\n\
+		} else {\n\
+			lNormal = -lNormal;\n\
+			lFace = FACE_BACK;\n\
+		}\n\
+	} else {\n\
+		lFace = FACE_FRONT;\n\
+	}*/\n\
+	lFace = FACE_FRONT;\n\
+	/* Determine which materials are to be used	*/\n\
+	lMaterialAmbient = uMaterial[lFace].ColorAmbient;\n\
+	lMaterialDiffuse = uMaterial[lFace].ColorDiffuse;\n\
+	lMaterialSpecular = uMaterial[lFace].ColorSpec;\n\
+	lMaterialEmissive = uMaterial[lFace].ColorEmissive;\n\
+	lMaterialSpecExponent = uMaterial[lFace].SpecExponent;\n\
+	/*if (uEnableColorMaterial){\n\
+		if (uMaterial[lFace].ColorMaterial == COLORMAT_AMBIENT){\n\
+			lMaterialAmbient = aColor;\n\
+		} else if (uMaterial[lFace].ColorMaterial == COLORMAT_DIFFUSE){\n\
+			lMaterialDiffuse = aColor;\n\
+		} else if (uMaterial[lFace].ColorMaterial == COLORMAT_AMBIENT_AND_DIFFUSE){\n\
+			lMaterialAmbient = aColor;\n\
+			lMaterialDiffuse = aColor;\n\
+		} else if (uMaterial[lFace].ColorMaterial == COLORMAT_SPECULAR){\n\
+			lMaterialSpecular = aColor;\n\
+		} else {\n\
+			lMaterialEmissive =  aColor;\n\
+		}\n\
+	}*/\n\
+	vColor = lMaterialEmissive + lMaterialAmbient * uLightModel.ColorAmbient;\n\
+	for(int i = 0; i < LIGHT_NUM; i++){\n\
+		if (uEnableLight[i]){\n\
+			vColor += ComputeLightFrom(i);\n\
+		}\n\
+	}\n\
+	vColor.w = lMaterialDiffuse.w;\n\
+}*/\n\
+void main(){\n\
+	gl_Position = uMVP * aPosition;\n\
+	//vColor = aColor;\n\
+	//ComputeLighting();\n\
+	vTexCoord[0] = aTexCoord0;\n\
+	vTexCoord[1] = aTexCoord1;\n\
+	vTexCoord[2] = aTexCoord2;\n\
+	vTexCoord[3] = aTexCoord3;\n\
+	vFactor.x = 1.0;\n\
+	vFactor.y = 1.0;\n\
+	vColor = vec4(1.0,0.0,0.0,1.0);\n\
+}\n\ ";
 //function declarations:
 GLvoid
 wes_shader_error(GLuint ind)
@@ -170,6 +419,7 @@ wes_uniform_loc(program_t *p)
         LocateUniformIndex(uLight, .ColorSpec, i);
         LocateUniformIndex(uLight, .SpotDir, i);
         LocateUniformIndex(uLight, .SpotVar, i);
+		//PRINT_DEBUG("Light %d, ColorDiffuse Loc = %d\n",i, p->uloc.uLight[i].ColorDiffuse);
     }
 
     LocateUniform(uLightModel.ColorAmbient);
@@ -394,8 +644,17 @@ wes_shader_init()
 	PRINT_DEBUG("after shader create\n");
     free(data);
 #else
+#define SHADER_COMPUTE_LIGHTING
+#ifdef SHADER_COMPUTE_LIGHTING
+	//data = (char*) malloc(wesShaderLightingStr.size() + 1);
+	//strcpy(data, wesShaderLightingStr.c_str());
+	
+	data = (char*) malloc(wesShaderTestStr.size() + 1);
+	strcpy(data, wesShaderTestStr.c_str());
+#else
 	data = (char*) malloc(wesShaderStr.size() + 1);
 	strcpy(data, wesShaderStr.c_str());
+#endif
 	//PRINT_DEBUG("Shader = %s\n", data);
 	sh_vertex = wes_shader_create(data, GL_VERTEX_SHADER);
 	//PRINT_DEBUG("after shader create\n");
