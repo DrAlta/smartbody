@@ -174,7 +174,7 @@ source.setPosition(sourcePos)
 source.createStandardControllers()
 
 # Deformable mesh
-source.setDoubleAttribute('deformableMeshScale', 0.01)
+source.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 
 # enable these to show the deformable mesh, otherwise only the skeleton will be shown
 #source.setStringAttribute('deformableMesh', 'ChrMaarten.dae')

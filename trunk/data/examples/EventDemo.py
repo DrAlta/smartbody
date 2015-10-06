@@ -80,7 +80,7 @@ rachel.setPosition(rachelPos)
 rachel.setHPR(SrVec(17, 0, 0))
 rachel.createStandardControllers()
 # Deformable mesh
-rachel.setDoubleAttribute('deformableMeshScale', .01)
+rachel.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 # Lip syncing diphone setup
 rachel.setStringAttribute('lipSyncSetName', 'default')

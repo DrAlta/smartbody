@@ -86,7 +86,7 @@ Rachel.setFaceDefinition(RachelFace)
 # Set standard controller
 Rachel.createStandardControllers()
 # Deformable mesh
-Rachel.setDoubleAttribute('deformableMeshScale', .01)
+Rachel.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 Rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 
 # Lip syncing diphone setup

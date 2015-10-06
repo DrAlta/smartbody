@@ -56,7 +56,7 @@ for i in range(2):
 	brad.setPosition(bradPos)
 	brad.createStandardControllers()
 	# Set deformable mesh
-	brad.setDoubleAttribute('deformableMeshScale', 0.01)
+	brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01" ready="0" relax="0"/>')

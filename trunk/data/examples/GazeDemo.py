@@ -49,7 +49,7 @@ brad.setPosition(bradPos)
 brad.setHPR(SrVec(-17, 0, 0))
 brad.createStandardControllers()
 # Deformable mesh
-brad.setDoubleAttribute('deformableMeshScale', .01)
+brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 
 # setup gestures
@@ -69,7 +69,7 @@ rachel.setPosition(rachelPos)
 rachel.setHPR(SrVec(17, 0, 0))
 rachel.createStandardControllers()
 # Deformable mesh
-rachel.setDoubleAttribute('deformableMeshScale', .01)
+rachel.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 
 # setup gestures
