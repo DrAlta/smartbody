@@ -903,7 +903,7 @@ void initPython(std::string pythonLibPath)
 
 #ifdef __ANDROID__
 	Py_SetProgramName((char*)pythonHome.c_str());
-        Py_SetPythonHome((char*)pythonHome.c_str());
+    Py_SetPythonHome((char*)pythonHome.c_str());
 #else
 	Py_SetProgramName((char*)"../../../../core/smartbody/Python27/");
 #ifdef WIN32
@@ -911,7 +911,8 @@ void initPython(std::string pythonLibPath)
 #endif
 #endif	
 	//LOG("After SetProgramName");
-#ifdef __ANDROID__
+//#ifdef __ANDROID__
+#if 0
 	appendPythonModule("pyexpat", initpyexpat);
 	appendPythonModule("_functools", init_functools);
 	appendPythonModule("itertools", inititertools);

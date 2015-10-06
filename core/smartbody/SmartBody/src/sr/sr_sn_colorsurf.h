@@ -28,9 +28,10 @@
  * color interpolation in a mesh
  */
 #include <sb/SBTypes.h>
+#include <vector>
 # include <sr/sr_model.h>
 # include <sr/sr_sn_shape.h>
-#include <vector>
+
 
 /*! \class SrSnColorSurf sr_sn_colorsurf.h
     \brief model color interpolation in a mesh

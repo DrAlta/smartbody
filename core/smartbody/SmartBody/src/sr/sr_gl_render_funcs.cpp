@@ -512,11 +512,11 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 							//LOG("Use original texture, texID = %d", tex->getID());
 						}				
 
-// 						if (useTexBlend)
-// 						{
-// 							glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-// 						}
-// 						else
+						if (useTexBlend)
+						{
+							glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+						}
+						else
 						{
 							glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 						}

@@ -21,7 +21,7 @@ void MeCtUBLAS::matrixMatMult(const dMatrix& mat1, const dMatrix& mat2, dMatrix&
 {
 	if (mat3.size1() != mat1.size1() || mat3.size2() != mat2.size2())
 		mat3.resize(mat1.size1(),mat2.size2());	
-#if !defined(__FLASHPLAYER__)
+#if !defined(__ANDROID__) &&  !defined(__FLASHPLAYER__)
 	blas::gemm(mat1,mat2,mat3);	
 #endif
 }
@@ -32,7 +32,7 @@ void MeCtUBLAS::matrixVecMult(const dMatrix& mat1, const dVector& vin, dVector& 
 		vout.resize(mat1.size1());
 	if (vin.size() != mat1.size2())
 		return;
-#if !defined(__FLASHPLAYER__)
+#if !defined(__ANDROID__) &&  !defined(__FLASHPLAYER__)
 	blas::gemv('N',1.0,mat1,vin,0.0,vout);	
 #endif
 }
@@ -42,7 +42,7 @@ bool MeCtUBLAS::inverseMatrix( const dMatrix& mat, dMatrix& inv )
 	using namespace boost::numeric::ublas;
 	dMatrix A(mat);
 	inv = identity_matrix<double>(mat.size1());
-#if !defined(__FLASHPLAYER__)
+#if !defined(__ANDROID__) &&  !defined(__FLASHPLAYER__)
 	lapack::gesv(A,inv);
 #endif
 	return true;
