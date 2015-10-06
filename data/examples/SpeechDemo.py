@@ -115,7 +115,7 @@ brad.createStandardControllers()
 # Set face definition
 brad.setFaceDefinition(bradFace)
 # Deformable mesh
-brad.setDoubleAttribute('deformableMeshScale', .01)
+brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 # Lip syncing diphone setup
 brad.setStringAttribute('lipSyncSetName', 'default')
@@ -159,7 +159,7 @@ rachel.createStandardControllers()
 # Set face definition
 rachel.setFaceDefinition(rachelFace)
 # Deformable mesh
-rachel.setDoubleAttribute('deformableMeshScale', .01)
+rachel.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 # Lip syncing diphone setup
 rachel.setStringAttribute('lipSyncSetName', 'default')

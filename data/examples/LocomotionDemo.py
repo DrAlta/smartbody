@@ -58,7 +58,7 @@ for i in range(amount):
 	# Set up standard controllers
 	brad.createStandardControllers()
 	# Set deformable mesh
-	brad.setDoubleAttribute('deformableMeshScale', .01)
+	brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 	# Retarget character
 	if i== 0 : 

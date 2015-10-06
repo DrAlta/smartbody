@@ -101,7 +101,7 @@ char.getAttribute('createPhysics').setValue()
 phyManager.getPhysicsCharacter('ChrBrad').setBoolAttribute('usePD', True)
 #phyManager.getPhysicsCharacter('ChrBrad').setBoolAttribute('enable', True)
 # Deformable mesh
-brad.setDoubleAttribute('deformableMeshScale', .01)
+brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 
 # Lip syncing diphone setup

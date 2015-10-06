@@ -52,7 +52,7 @@ for i in range(2):
 	brad.setSkeleton(bradSkeleton)
 	brad.createStandardControllers()
 	# Set deformable mesh
-	brad.setDoubleAttribute('deformableMeshScale', 0.01)
+	brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
@@ -72,7 +72,7 @@ for i in range(2):
 	rachel.setSkeleton(rachelSkeleton)
 	rachel.createStandardControllers()
 	# Set deformable mesh
-	rachel.setDoubleAttribute('deformableMeshScale', 0.01)
+	rachel.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 	rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01"/>')
