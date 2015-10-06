@@ -20,7 +20,7 @@ echo "Downloading xerces..."
 curl http://download.nextag.com/apache//xerces/c/3/sources/xerces-c-3.1.2.tar.gz > dependencies/xerces-c-3.1.2.tar.gz
 
 echo "Downloading google protocol buffers..."
-curl https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz > dependencies/protobuf-2.5.0.tar.gz
+curl http://smartbody.ict.usc.edu/dependencies/protobuf-2.5.0.tar.gz > dependencies/protobuf-2.5.0.tar.gz 
 
 echo "Downloading glew..."
 curl http://skylineservers.dl.sourceforge.net/project/glew/glew/1.6.0/glew-1.6.0.tgz > dependencies/glew-1.6.0.tgz
