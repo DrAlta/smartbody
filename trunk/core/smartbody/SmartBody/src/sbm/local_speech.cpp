@@ -55,7 +55,8 @@
 #include <cerevoice_eng_int.h>
 #endif
 
-
+#include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
@@ -71,6 +72,7 @@
 #include <xercesc/framework/MemBufFormatTarget.hpp>
 #include "sbm/BMLDefs.h"
 #include <sb/SBScene.h>
+#include <sb/SBCharacter.h>
 #include <sb/SBCommandManager.h>
 #include <sb/SBVHMsgManager.h>
 
@@ -544,7 +546,6 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
 	char* fileName = const_cast<char*>(cereproc_file_name);
 	CPRCEN_engine_channel_to_file(voiceEngine, chan, fileName, CPRCEN_RIFF); /* File output on channel */
 	// 	/* Speak with streaming input */
-	CPRC_abuf* abuf = CPRCEN_engine_channel_speak(voiceEngine, chan, text, strlen(text),1);
 	//LOG("text to speech, voice_id = %s",voice_id.c_str());
 
 	SpeechRequestMessageData xmlMetaData;
@@ -553,6 +554,8 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
 	//Replacing . and , with "" so because there seems to be a bug in CPRCPMOD_spurt_synth while synthesizing multiple spurts
 	//Apparently a time of 0.0 and 0.1 seems to be added just after the , or .
 	std::string text_string = removeXMLTagsAndNewLines( text, xmlMetaData);
+
+	CPRC_abuf* abuf = CPRCEN_engine_channel_speak(voiceEngine, chan, text_string.c_str(), strlen(text_string.c_str()),1);
 
 	if (xmlMetaData.tags.size() <= 0 )
 	{
@@ -791,7 +794,11 @@ std::string ParseXMLOutput(std::string &xmlBuffer)
 
         convertStream.str(std::string());
     }
-
+	boost::replace_all(plainString, "\n", " ");
+	boost::replace_all(plainString, "\r", " ");
+	boost::replace_all(plainString, "\t", " ");
+	boost::trim(plainString);
+	boost::regex_replace(plainString, boost::regex("[' ']{2,}"), " ");
     return plainString;
 }
 
@@ -831,12 +838,15 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    size_t prefix_length = message_c.find( file_name, 0 ) + file_name.length() + 1;
    std::string utterance = message_c.substr( prefix_length );  // strip off the prefix, only using the xml
 
+   //LOG("voice_id = %s", voice_id.c_str());
    // remove anything after </speech> tag
    size_t postfix_pos = utterance.rfind( "</speech>" );
    if ( postfix_pos != std::string::npos )
       utterance = utterance.substr( 0, postfix_pos + 9 );
-
-   std::string strippedUtterance = ParseXMLOutput(utterance);
+   //LOG("utterane = %s", utterance.c_str());
+   //std::string newUtterance = ParseXMLOutput(utterance);
+   //LOG("strippedUtterance = %s", newUtterance.c_str());
+   //utterance = newUtterance;
 
    // parse out just the sound file name and give it a .wav file type
    int pos = file_name.find( ".aiff" );
@@ -846,7 +856,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    string cereproc_file_name = cacheDirectory + file_name;
 
    /// Generate the audio
-   std::string xml = textToSpeech(strippedUtterance.c_str(), cereproc_file_name.c_str(), voice_id);
+   std::string xml = textToSpeech(utterance.c_str(), cereproc_file_name.c_str(), voice_id);
    // Only send out a reply when result is not empty, ignore otherwise as a nother voice relay might pick up the request
    //LOG("Cerevoice reply Cmd = %s",xml.c_str());
    if ( xml.compare("") != 0 )

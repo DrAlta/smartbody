@@ -28,7 +28,7 @@
 # include <sr/sr_material.h>
 # include <sr/sr_light.h>
 # include <sr/sr_gl.h>
-
+#include <vhcl_log.h>
 # include <math.h>
 
 # ifdef SR_TARGET_WINDOWS
@@ -148,7 +148,7 @@ void glClearColor ( const SrColor& c )
 void glLight ( int id, const SrLight& l, bool bind_pos )
  {
    float f[4];
-
+   //LOG("Enable GLLight, id = %d", id);
    GLenum n = id==0? GL_LIGHT0 :
               id==1? GL_LIGHT1 :
               id==2? GL_LIGHT2 :

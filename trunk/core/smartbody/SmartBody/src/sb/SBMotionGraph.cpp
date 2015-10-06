@@ -1,3 +1,6 @@
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/strong_components.hpp>
+
 #include <sb/SBMotionGraph.h>
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>
@@ -8,8 +11,6 @@
 #include <controllers/me_ct_param_animation_utilities.h>
 #include <controllers/me_ct_jacobian_IK.hpp>
 #include <sr/sr_random.h>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/strong_components.hpp>
 #include "external/SOIL/SOIL.h"
 
 namespace SmartBody {
