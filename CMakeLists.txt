@@ -37,7 +37,12 @@ set (VHMSG_INCLUDE
 else()
 set (VHMSG_INCLUDE
 	lib/vhmsg/vhmsg-c/include
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	include/${ACTIVEMQ_VERSION}
+else()
+	/usr/local/include/${ACTIVEMQ_VERSION}
+endif()
+
 	)
 endif()
 
