@@ -23,15 +23,17 @@
 # $(SB_LOCAL_PATH)/../../include/festival/include/VHDuration \
 
 
-USE_CEREVOICE:=false
+USE_CEREVOICE:=true
 
 
 SB_LOCAL_PATH := $(call my-dir)
 LOCAL_PATH := $(SB_LOCAL_PATH)
 SB_MY_DIR := ../../../core/smartbody/SmartBody/src
 ANDROID_LIB_DIR := ../../lib
+BOOST_LIB_DIR := ../../boost_1_59/lib
+BOOST_INCLUDE_DIR := ../../boost_1_59/include
 ANDROID_DIR := ../../
-CEREVOICE_LIB_DIR := ../../cerevoice/libs
+CEREVOICE_LIB_DIR := ../../cerevoice_lib
 LIB_DIR := ../../../lib
 
 
@@ -39,22 +41,22 @@ ifeq ($(USE_CEREVOICE),true)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := cerevoice-eng
-LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libcerevoice_eng.a
+LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libs/libcerevoice_eng.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := cerevoice-pmod
-LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libcerevoice_pmod.a
+LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libs/libcerevoice_pmod.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := cerevoice
-LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libcerevoice.a
+LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libs/libcerevoice.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := cerehts
-LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libcerehts.a
+LOCAL_SRC_FILES := $(CEREVOICE_LIB_DIR)/libs/libcerehts.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 CEREVOICE_LIBS:= cerevoice-eng cerevoice-pmod cerehts cerevoice
@@ -71,18 +73,38 @@ include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := boost-filesystem-prebuilt
 #LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_filesystem.a
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_filesystem-gcc-mt-1_53.a
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_filesystem-gcc-mt-1_53.a
+LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_filesystem-gcc-mt-1_59.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := boost-system-prebuilt
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_system.a
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_system.a
+LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_system-gcc-mt-1_59.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := boost-regex-prebuilt
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_regex.a
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_regex.a
+LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_regex-gcc-mt-1_59.a
 include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := python-prebuilt
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.6.a
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.7.a
+include $(PREBUILT_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := boost-python-prebuilt
+#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_python.a
+LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_python-gcc-mt-1_59.a
+LOCAL_STATIC_LIBRARIES := python-prebuilt	
+include $(PREBUILT_STATIC_LIBRARY)
+
+
+
+
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := lapack
@@ -109,16 +131,6 @@ include $(PREBUILT_STATIC_LIBRARY)
 #LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.6.so
 #include $(PREBUILT_SHARED_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := python-prebuilt
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.6.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := boost-python-prebuilt
-LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_python.a
-LOCAL_STATIC_LIBRARIES := python-prebuilt	
-include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := estbase-prebuilt
@@ -188,7 +200,8 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := assimp
 LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions -DASSIMP_BUILD_NO_OWN_ZLIB
 LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(LIB_DIR)/assimp-3.1.1/include \
-					$(SB_LOCAL_PATH)/$(LIB_DIR)/boost \
+					$(SB_LOCAL_PATH)/$(BOOST_INCLUDE_DIR) \
+					#$(SB_LOCAL_PATH)/$(LIB_DIR)/boost \
 LOCAL_LDLIBS    := -lz
 
 LOCAL_SRC_FILES :=  $(LIB_DIR)/assimp-3.1.1/code/3DSConverter.cpp \
@@ -445,11 +458,11 @@ LOCAL_MODULE := smartbody
 #$(SB_LOCAL_PATH)/../../cerevoice/cerevoice_eng/include \
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions -g -DASSIMP_BUILD_NO_OWN_ZLIB
 LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(SB_MY_DIR) \
-					$(SB_LOCAL_PATH)/../../pythonLib/include/python2.6 \
+					$(SB_LOCAL_PATH)/../../pythonLib_27/include/python2.7 \
 					$(SB_LOCAL_PATH)/../../boost \
-					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/boost \
+					$(SB_LOCAL_PATH)/$(BOOST_INCLUDE_DIR) \
 					$(SB_LOCAL_PATH)/../../include \
-					$(SB_LOCAL_PATH)/../../cerevoice/cerevoice_eng/include \
+					$(SB_LOCAL_PATH)/$(CEREVOICE_LIB_DIR)/cerevoice_eng/include \
 					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/festival/speech_tools/include \
 					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/include \
 					$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/modules/VHDuration \
@@ -465,6 +478,8 @@ LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(SB_MY_DIR) \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/ode/include \
 					$(LOCAL_PATH)/$(ANDROID_DIR)/gl-wes-v2/src \
 					$(SB_LOCAL_PATH)/$(LIB_DIR)/assimp-3.1.1/include \
+					#$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/boost \
+					
 					
 LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/sr/sr_array.cpp \
