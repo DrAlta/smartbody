@@ -25,8 +25,9 @@
 #include "vhcl.h"
 
 #define USE_FESTIVAL_RELAY 0
-#ifdef __ANDROID__
-#define USE_CEREPROC_RELAY 0
+
+#ifdef USE_CEREVOICE
+#define USE_CEREPROC_RELAY 1
 #else
 #define USE_CEREPROC_RELAY 0
 #endif
