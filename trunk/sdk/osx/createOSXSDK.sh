@@ -6,13 +6,8 @@ cp ../../SmartBodyPythonAPI.html ./SmartBodySDK/
 cp ../../"3rd party licenses.txt" ./SmartBodySDK/
 
 # copy include
-# (xerces is not matching the windows distribution)
-# (boost, ode are from windows distribution)
 mkdir -p SmartBodySDK/include
-rsync -ap --exclude=".svn" /usr/local/include/FL ./SmartBodySDK/include/
-rsync -ap --exclude=".svn" ../../core/smartbody/ode/include/ode ./SmartBodySDK/include/
-rsync -ap --exclude=".svn" ../../lib/boost/boost ./SmartBodySDK/include/
-rsync -ap --exclude=".svn" ./include/xercesc ./SmartBodySDK/include/
+rsync -ap --exclude=".svn" ../../include ./SmartBodySDK
 rsync -ap --exclude=".svn" ../../lib/vhmsg/vhmsg-c/include/*.h ./SmartBodySDK/include/vhmsg/
 rsync -ap --exclude=".svn" ../../lib/bonebus/include/*.h ./SmartBodySDK/include/bonebus/
 rsync -ap --exclude=".svn" ../../lib/vhcl/include/*.h ./SmartBodySDK/include/vhcl/
@@ -22,21 +17,25 @@ rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/steerlib/include/
 rsync -ap --exclude=".svn" ../../core/smartbody/steersuite-1.3/external/* ./SmartBodySDK/include/steersuite/
 
 # copy lib
-rsync -ap --exclude=".svn" ./lib/* ./SmartBodySDK/lib/
+rsync -ap --exclude=".svn" ../../lib/*.dylib ./SmartBodySDK/lib
+rsync -ap --exclude=".svn" ../../lib/*.a ./SmartBodySDK/lib
+rsync -ap --exclude=".svn" ../../lib/*.la ./SmartBodySDK/lib
+# copy libraries already built
+cp ../../foo/lib/vhcl/libvhcl.a ./SmartBodySDK/lib
+cp ../../foo/lib/vhmsg/vhmsg-c/libvhmsg.a ./SmartBodySDK/lib
+cp ../../foo/lib/bonebus/libbonebus.a ./SmartBodySDK/lib
+cp ../../core/smartbody/sbgui/bin/libsteerlib.dylib ./SmartBodySDK/lib
+cp ../../core/smartbody/sbgui/bin/libpprAI.dylib ./SmartBodySDK/lib
+cp ../../core/smartbody/sbgui/bin/libpinocchio.dylib ./SmartBodySDK/lib
 
 # copy bin & copy all the dynamic libraries to bin folder
-rsync -ap --exclude=".svn" ./bin ./SmartBodySDK
+mkdir SmartBodySDK/bin
+cp ../../bin/protoc ./SmartBodySDK/bin
 chmod +x ./SmartBodySDK/bin/protoc
 
-# copy dylib for SmartBody 
-#cp ../../core/smartbody/sbgui/bin/sbgui ./SmartBodySDK/bin
-#cp ../../core/smartbody/sbgui/bin/simplesmartbody ./SmartBodySDK/bin
-#cp ../../core/smartbody/sbgui/bin/libSmartBody.dylib ./SmartBodySDK/bin
-
-# copy dylib for pprAI and steerlib (assuming it's prebuilt)
-#cp ../../core/smartbody/sbgui/bin/libpprAI.dylib ./SmartBodySDK/bin
-#cp ../../core/smartbody/sbgui/bin/libsteerlib.dylib ./SmartBodySDK/bin
-#cp ../../core/smartbody/sbgui/bin/libpinocchio.dylib ./SmartBodySDK/bin
+# copy startup commands
+cp ../../bin/startSBGUI.command ./SmartBodySDK/bin
+cp ../../bin/startSimpleSmartBody.command ./SmartBodySDK/bin
 
 # copy readme.txt
 rsync -ap --exclude=".svn" ./readme.txt ./SmartBodySDK/readme.txt
