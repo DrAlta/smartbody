@@ -621,8 +621,8 @@ endif()
 target_link_libraries( SmartBody
 
 	${PROFILER_LIBS}
-	bonebus
-	vhmsg
+	${BONEBUS_LIB}
+	${VHMSG_LIB}
 	vhcl
 	xerces-c
 	boost_filesystem
@@ -638,7 +638,7 @@ target_link_libraries( SmartBody
 	steerlib
 	pprAI
 	ode
-	python2.7
+	${PYTHON_LIB}
 	ncurses
 	alut
 	sndfile

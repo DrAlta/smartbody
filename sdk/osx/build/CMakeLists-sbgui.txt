@@ -153,6 +153,7 @@ set( SBM_FLTK_SRC
 	./faceshiftviewer/FaceShiftViewer.cpp
 	./FLTKListener.cpp
 	./SBGUIManager.cpp
+	./SBInterfaceListener.cpp
 	
 	./flu/Flu_Button.cpp
 	./flu/Flu_Collapsable_Group.cpp
