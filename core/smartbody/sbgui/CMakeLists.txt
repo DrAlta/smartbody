@@ -9,8 +9,8 @@ include_directories( ../SmartBody/src )
 include_directories( ./external/Pinocchio )
 include_directories( ./external/polyvox/library/PolyVoxCore/include )
 #include_directories( /usr/local/include/CEGUI )
-#link_directories( /usr/local/lib )
 link_directories( /usr/lib )                                                           
+link_directories( /usr/local/lib )                                                           
 
 set (BUILD_OGRE FALSE)
 # never build ogre if in osx
@@ -44,16 +44,17 @@ find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
 find_library (ESTSTRING eststring ../../../lib/festival/speech_tools/lib)
 find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
 else()
-find_library (ACTIVEMQLIB activemq-cpp )
-find_library (XERCESLIB xerces-c )
+find_library (ACTIVEMQLIB activemq-cpp PATHS /usr/local/lib)
+find_library (XERCESLIB xerces-c  PATHS /usr/local/lib)
 find_library (BOOSTPYTHONLIB boost_python )
 find_library (BOOSTFILESYSTEMLIB boost_filesystem )
 find_library (BOOSTSYSTEMLIB boost_system )
 find_library (BOOSTREGEXLIB boost_regex )
 find_library (ODELIB ode )
-find_library (FLTKLIB fltk )
-find_library (FLTKIMAGESLIB fltk_images )
-find_library (FLTKGLLIB fltk_gl )
+ 
+find_library (FLTKLIB fltk PATHS /usr/local/lib )
+find_library (FLTKIMAGESLIB fltk_images PATHS /usr/local/lib) 
+find_library (FLTKGLLIB fltk_gl PATHS /usr/local/lib )
 endif()
 # these are the libraries necessary for osx, but disable it for now
 #find_library (IOKIT_LIBRARY IOKit)
@@ -316,9 +317,15 @@ else()
 set ( PROFILER_LIBS "")
 endif()
 
+message(STATUS "FLTK" ${FLTKLIB})
+
 target_link_libraries( sbgui
 
 	${PROFILER_LIBS}
+	${FLTKLIB}
+	${FLTKIMAGESLIB}
+	${FLTKGLLIB}
+	${OPENGL_LIBRARIES}
 	SmartBody
 	${BONEBUS_LIB}
 	${VHMSG_LIB}
@@ -328,11 +335,7 @@ target_link_libraries( sbgui
 	${BOOSTREGEXLIB}
 	${PYTHON_LIB}
 	${XFT}
-	${FLTKLIB}
-	${FLTKIMAGESLIB}
-	${FLTKGLLIB}
-	${OPENGL_LIBRARIES}
-    	ncurses	
+   	ncurses	
 	pthread
 	pinocchio
         polyvoxcore

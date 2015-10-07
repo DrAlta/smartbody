@@ -35,15 +35,20 @@ add_definitions(-DSB_NO_VHMSG)
 set (VHMSG_INCLUDE
 )	
 else()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
 set (VHMSG_INCLUDE
 	lib/vhmsg/vhmsg-c/include
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	include/${ACTIVEMQ_VERSION}
+)
 else()
+set (VHMSG_INCLUDE
+	lib/vhmsg/vhmsg-c/include
 	/usr/local/include/${ACTIVEMQ_VERSION}
+)
 endif()
 
-	)
 endif()
 
 if (${SB_NO_BONEBUS})
