@@ -542,6 +542,8 @@ set( SMARTBODY_LIB_SBM_SRC
         ./sb/SBVHMsgManager.cpp
         ./sb/SBCommandManager.cpp
         ./sb/SBNavigationMeshManager.cpp
+		./sb/SBFaceShiftManager.cpp
+		./sb/SBNRealtimeManager.cpp
 
         ./sb/SBPython.cpp
         ./sb/SBPythonAnimation.cpp

@@ -581,6 +581,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./sb/SBHandSynthesis.cpp
         ./sb/SBRigNode.cpp
         ./sb/SBFaceShiftManager.cpp
+        ./sb/SBRealtimeManager.cpp
         ./sbm/SteerPath.cpp
         ./sbm/MiscCommands.cpp
 		
