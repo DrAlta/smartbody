@@ -726,6 +726,8 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/sb/SBMotion.cpp \
 	$(SB_MY_DIR)/sb/SBScript.cpp	\
 	$(SB_MY_DIR)/sb/SBFaceDefinition.cpp \
+	$(SB_MY_DIR)/sb/SBFaceShiftManager.cpp \
+	$(SB_MY_DIR)/sb/SBRealtimeManager.cpp \
 	$(SB_MY_DIR)/sb/SBPhysicsManager.cpp \
 	$(SB_MY_DIR)/sb/SBCollisionManager.cpp \
 	$(SB_MY_DIR)/sb/SBJointMapManager.cpp \
