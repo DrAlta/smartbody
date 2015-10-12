@@ -189,7 +189,8 @@ HRESULT CSkeletalViewerApp::Nui_Init( )
     }
 
 	if (vhmsg::ttu_open() == vhmsg::TTU_SUCCESS)
-		vhmsg::ttu_notify2("receiver", "echo Kinect Connected...");
+		//vhmsg::ttu_notify2("receiver", "echo Kinect Connected...");
+		vhmsg::ttu_notify2("sb", "print \"Remote Kinect connected, ready to send data...\"");
 
 	// add skeleton mapping. seems unncessary since the default kinect joint index matches ours exactly.
 	m_skeletonJointMapping.clear();
@@ -632,28 +633,47 @@ void CSkeletalViewerApp::processAndSendSkeleton( const NUI_SKELETON_DATA & skel 
 			reliableJointCount++;
 	}
 	// only send out skeleton info when it is fully reliable
-	std::stringstream command;
+	//std::stringstream command;
+
+	std::vector<std::string> jointNames;
+	jointNames.push_back("HIP_CENTER");
+	jointNames.push_back("SPINE");
+	jointNames.push_back("SHOULDER_CENTER");
+	jointNames.push_back("SHOULDER_LEFT");
+	jointNames.push_back("HEAD");
+	jointNames.push_back("ELBOW_LEFT");
+	jointNames.push_back("WRIST_LEFT");
+	jointNames.push_back("HAND_LEFT");
+	jointNames.push_back("SHOULDER_RIGHT");
+	jointNames.push_back("ELBOW_RIGHT");
+	jointNames.push_back("WRIST_RIGHT");
+	jointNames.push_back("HAND_RIGHT");
+	jointNames.push_back("HIP_LEFT");
+	jointNames.push_back("KNEE_LEFT");
+	jointNames.push_back("ANKLE_LEFT");
+	jointNames.push_back("FOOT_LEFT");
+	jointNames.push_back("HIP_RIGHT");
+	jointNames.push_back("KNEE_RIGHT");
+	jointNames.push_back("ANKLE_RIGHT");
+	jointNames.push_back("FOOT_RIGHT");
+
+	if (!m_initSkeleton)
+	{
+		// send out skeleton names
+		std::stringstream strstr;
+		strstr << "scene.getRealtimeManager().setChannelNames(\"";
+		for (size_t s = 0; s < jointNames.size(); s++)
+		{
+			strstr << jointNames[s] << " ";
+			strstr << "_pos_" << jointNames[s] << " ";
+		}
+		strstr << "\")";
+		vhmsg::ttu_notify2("sb", strstr.str().c_str());
+	}
 
 	if (reliableTrack && !m_initSkeleton)
 	{
 		m_initSkeletonCount++;
-		if (m_initSkeletonCount >= 20) // after it is stablized
-		{	
-			
-			// send out skeleton information
-			vhmsg::ttu_notify2("sbm", "receiver echo init Kinect Skeleton...");	
-			command << "receiver skeleton " << skeletonName << " kinect initsk ";
-			for (int k=0; k < NUI_SKELETON_POSITION_COUNT; k++)
-			{
-				int jidx = m_skeletonJointMapping[k];
-				NUI_SKELETON_BONE_ORIENTATION& jointRot = boneOrientations[jidx];
-				const Vector4& jp = skel.SkeletonPositions[jidx];
-				const Vector4& jq = jointRot.absoluteRotation.rotationQuaternion;				
-				// send out absolute joint rotation & position
-				command << jq.w << " " << jq.x << " " << jq.y << " " << jq.z << " ";
-				command << jp.x << " " << jp.y << " " << jp.z << " ";
-			}
-		}
 
 		if (m_initSkeletonCount >= 50)
 		{
@@ -661,29 +681,39 @@ void CSkeletalViewerApp::processAndSendSkeleton( const NUI_SKELETON_DATA & skel 
 			m_initSkeletonCount = 0;
 		}
 	}
-	else if (reliableJointCount >= 6) // the data is reliable enough, send out joint angles
+	else if (reliableJointCount >= 10) // the data is reliable enough, send out joint angles
 	{		
-		// send out skeleton information
-		//vhmsg::ttu_notify2("receiver", "echo init Kinect Skeleton...");	
-		command << "receiver skeleton " << skeletonName << " kinect rotations ";
+		// send the local rotations information
 		for (int k=0; k < NUI_SKELETON_POSITION_COUNT; k++)
 		{
+			std::stringstream jointstr;
 			int jidx = m_skeletonJointMapping[k];
 			NUI_SKELETON_BONE_ORIENTATION& jointRot = boneOrientations[jidx];
 			const Vector4& jq = jointRot.hierarchicalRotation.rotationQuaternion;	
-			command << jq.w << " " << jq.x << " " << jq.y << " " << jq.z << " ";
+			jointstr << "scene.getRealtimeManager().setData(\"";
+			jointstr << jointNames[k];
+			jointstr << "\", \"";
+			jointstr << jq.w << " " << jq.x << " " << jq.y << " " << jq.z << " ";
+			jointstr << "\")";
+			vhmsg::ttu_notify2("sb", jointstr.str().c_str());
 		}		
 
-		// send out global position
-		std::stringstream command1;
-		const Vector4& jp = skel.SkeletonPositions[0];
-		command1 << "receiver skeleton " << skeletonName << " kinect position 0 ";
-		command1 << jp.x << " " << jp.y << " " << jp.z;
-		vhmsg::ttu_notify2("sbm", command1.str().c_str());
-	}
-	vhmsg::ttu_notify2("sbm", command.str().c_str());
+		// send the global positions using the prefix _pos_ before each joint name (i.e. "_pos_CENTER_JOINT")
+		for (int k=0; k < NUI_SKELETON_POSITION_COUNT; k++)
+		{
+			std::stringstream jointstr;
+			int jidx = m_skeletonJointMapping[k];
+			const Vector4& jp = skel.SkeletonPositions[jidx];;
+			jointstr << "scene.getRealtimeManager().setData(\"";
+			jointstr << "_pos_" << jointNames[k];
+			jointstr << "\", \"";
+			jointstr << jp.x << " " << jp.y << " " << jp.z << " ";
+			jointstr << "\")";
+			vhmsg::ttu_notify2("sb", jointstr.str().c_str());
+		}	
 
-	
+
+	}
 	
 }
 
