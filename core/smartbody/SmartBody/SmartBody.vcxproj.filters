@@ -1198,6 +1198,9 @@
     <ClCompile Include="src\sbm\ParserASFAMC.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
+    <ClCompile Include="src\sb\SBRealtimeManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2393,6 +2396,9 @@
     </ClInclude>
     <ClInclude Include="src\controllers\RealTimeLipSyncController.h">
       <Filter>controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBRealtimeManager.h">
+      <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

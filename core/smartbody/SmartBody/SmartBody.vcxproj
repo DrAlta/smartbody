@@ -525,6 +525,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\sb\SBMotionGraph.cpp" />
     <ClCompile Include="src\sb\SBNavigationMeshManager.cpp" />
     <ClCompile Include="src\sb\SBPythonMesh.cpp" />
+    <ClCompile Include="src\sb\SBRealtimeManager.cpp" />
     <ClCompile Include="src\sb\SBRigNode.cpp" />
     <ClCompile Include="src\sb\smartbody-c-dll.cpp" />
     <ClCompile Include="src\sr\sr_model_import_ply.cpp" />
@@ -924,6 +925,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\sb\SBFaceShiftManager.h" />
     <ClInclude Include="src\sb\SBMotionGraph.h" />
     <ClInclude Include="src\sb\SBNavigationMeshManager.h" />
+    <ClInclude Include="src\sb\SBRealtimeManager.h" />
     <ClInclude Include="src\sb\SBRigNode.h" />
     <ClInclude Include="src\sb\SBSceneListener.h" />
     <ClInclude Include="src\sb\SBVersion.hpp" />

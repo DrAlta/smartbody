@@ -152,6 +152,8 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createBoolAttribute("showSelected", true, true, "Display", 250, false, false, false, "Shows selection indicator when selected.");
 
 	createStringAttribute("receiverName", "kinect1", true, "Remote", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
+	createDoubleAttribute("receiverScale", 100.0, true, "Remote", 300, false, false, false, "Scaling factor when receiving a joint position.");
+
 	createVec3Attribute("leftSholderOffset",0.f,0.f,0.f,true, "Retargeting", 320, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
 	createVec3Attribute("rightSholderOffset",0.f,0.f,0.f,true, "Retargeting", 340, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
 	createBoolAttribute("isReaching", false, true, "Reaching", 158, false, false, false, "Whether a character is reaching.");
