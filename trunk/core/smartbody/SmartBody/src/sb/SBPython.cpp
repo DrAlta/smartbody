@@ -35,6 +35,7 @@
 #include <sb/SBParser.h>
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBCollisionManager.h>
+#include <sb/SBRealtimeManager.h>
 #include <sb/SBFaceShiftManager.h>
 #include <sb/SBSteerAgent.h>
 #include <sb/SBPhoneme.h>
@@ -349,6 +350,19 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("start", &SBCollisionManager::start, "Starts the collision manager.")
 		.def("stop", &SBCollisionManager::stop, "Stops the collision manager.")
 		;
+
+	boost::python::class_<SBRealtimeManager, boost::python::bases<SBService> >("SBRealtimeManager")
+		.def("setChannelNames", &SBRealtimeManager::setChannelNames, "Sets the names of the channels that will be used.")
+		.def("getChannelNames", &SBRealtimeManager::getChannelNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets the names of the channels that will be used.")
+		.def("setData", &SBRealtimeManager::setData, "Sets a stream of data that matches the channel names and types.")
+		.def("getData", &SBRealtimeManager::getData, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets data from a particular channel.")
+		.def("getDataQuat", &SBRealtimeManager::getDataQuat, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets data from a particular channel interpreted as a quaternion.")
+		.def("getDataVec", &SBRealtimeManager::getDataVec, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets data from a particular channel interpreted as a vector.")
+		.def("getDataMat", &SBRealtimeManager::getDataMat, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets data from a particular channel interpreted as a matrix.")
+		.def("getDataDouble", &SBRealtimeManager::getDataDouble, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets data from a particular channel interpreted as a double.")
+		.def("getDataInt", &SBRealtimeManager::getDataInt, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets data from a particular channel interpreted as an integer.")
+		;
+
 
 	boost::python::class_<SBFaceShiftManager, boost::python::bases<SBService> >("SBFaceShiftManager")
 		.def("getCoeffValue", &SBFaceShiftManager::getCoeffValue, "Get coefficient value of a specific blend shape.")

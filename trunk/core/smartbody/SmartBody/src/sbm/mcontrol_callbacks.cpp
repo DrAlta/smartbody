@@ -2872,8 +2872,10 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 		
 		float scale = 1.0f;
 		if (emitterName == "kinect")
+		{
 			//scale = .1f;
 			scale = 100.f;
+		}
 
 		std::string skeletonType = args.read_token();
 		if (skeletonType == "position")
@@ -2883,16 +2885,20 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 				jName = scene->getKinectProcessor()->getSBJointName(args.read_int());
 			else
 				jName = args.read_token();
-			float x = args.read_float() * scale;
-			float y = args.read_float() * scale;
-			float z = args.read_float() * scale;
+			float x = args.read_float();
+			float y = args.read_float();
+			float z = args.read_float();
 
 			for (std::vector<SmartBody::SBCharacter*>::iterator iter = controlledCharacters.begin();
 				 iter != controlledCharacters.end();
 				 iter++)
 			{
 				SmartBody::SBCharacter* character = (*iter);
-				SrVec vec(x, y, z);
+				double characterScale = character->getDoubleAttribute("receiverScale");
+				float scaledX = x * characterScale;
+				float scaledY = y * characterScale;
+				float scaledZ = z * characterScale;
+				SrVec vec(scaledX, scaledY, scaledZ);
 				SrVec outVec;
 				scene->getKinectProcessor()->processRetargetPosition(character->getSkeleton()->getName(),vec, outVec);
 				
@@ -3035,7 +3041,6 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 					quat.normalize();
 					quats.push_back(quat);
 					
-				
 					SrVec tran;
 					tran.x = args.read_float() * scale;
 					tran.y = args.read_float() * scale;

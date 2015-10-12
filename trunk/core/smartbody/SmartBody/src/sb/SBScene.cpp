@@ -31,6 +31,7 @@
 #include <sb/SBReachManager.h>
 #include <sb/SBSteerAgent.h>
 #include <sb/SBSteerManager.h>
+#include <sb/SBRealtimeManager.h>
 #include <sb/SBFaceShiftManager.h>
 #include <sb/SBServiceManager.h>
 #include <sb/SBService.h>
@@ -165,6 +166,7 @@ void SBScene::initialize()
 	_reachManager = new SBReachManager();
 	_steerManager = new SBSteerManager();
 	_faceShiftManager = new SBFaceShiftManager();
+	_realtimeManager = new SBRealtimeManager();
 	_serviceManager = new SBServiceManager();
 	_physicsManager = new SBPhysicsManager();
 	_gestureMapManager = new SBGestureMapManager();
@@ -192,6 +194,7 @@ void SBScene::initialize()
 	_serviceManager->addService(_boneBusManager);
 	_serviceManager->addService(_collisionManager);
 	_serviceManager->addService(_vhmsgManager);
+	_serviceManager->addService(_realtimeManager);
 	_serviceManager->addService(_faceShiftManager);
 	_serviceManager->addService(_phonemeManager);
 	_serviceManager->addService(_profiler);
@@ -1487,6 +1490,10 @@ SBSteerManager* SBScene::getSteerManager()
 	return _steerManager;
 }
 
+SBAPI SBRealtimeManager* SBScene::getRealtimeManager()
+{
+	return _realtimeManager;
+}
 
 SBAPI SBFaceShiftManager* SBScene::getFaceShiftManager()
 {

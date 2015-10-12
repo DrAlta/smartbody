@@ -273,14 +273,21 @@ void KinectProcessor::processGlobalRotation(std::vector<SrQuat>& quats)
 void KinectProcessor::processRetargetPosition( std::string targetSkelName, SrVec& inPos, SrVec& outPos )
 {
 	std::string kinectSkName = "kinect.sk";
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	SmartBody::SBSkeleton* kinectSk = assetManager->getSkeleton(kinectSkName);
+	if (!kinectSk)
+	{
+		LOG("No Kinect skeleton found when processing translations.");
+		return;
+	}
+
 	SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();
 	SmartBody::SBRetarget* retarget = retargetManager->getRetarget(kinectSkName, targetSkelName);
 
-	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
-	if (!assetManager->getSkeleton(targetSkelName) || !assetManager->getSkeleton(kinectSkName))
+	
+	if (!assetManager->getSkeleton(targetSkelName))
 		return; // don't do anything
 
-	SmartBody::SBSkeleton* kinectSk = assetManager->getSkeleton(kinectSkName);
 	if (!retarget)
 	{
 		retarget = retargetManager->createRetarget(kinectSkName,targetSkelName);
@@ -313,14 +320,20 @@ void KinectProcessor::processRetargetPosition( std::string targetSkelName, SrVec
 void KinectProcessor::processRetargetRotation(std::string targetSkelName, std::vector<SrQuat>& quats, std::vector<SrQuat>& outQuat )
 {	
 	std::string kinectSkName = "kinect.sk";
+	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
+	SmartBody::SBSkeleton* kinectSk = assetManager->getSkeleton(kinectSkName);
+	if (!kinectSk)
+	{
+		LOG("No Kinect skeleton found when processing rotations.");
+		return;
+	}
+
 	SmartBody::SBRetargetManager* retargetManager = SmartBody::SBScene::getScene()->getRetargetManager();
 	SmartBody::SBRetarget* retarget = retargetManager->getRetarget(kinectSkName, targetSkelName);
 	
-	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
-	if (!assetManager->getSkeleton(targetSkelName) || !assetManager->getSkeleton(kinectSkName))
+	if (!assetManager->getSkeleton(targetSkelName))
 		return; // don't do anything
 
-	SmartBody::SBSkeleton* kinectSk = assetManager->getSkeleton(kinectSkName);
 	if (!retarget)
 	{
 		retarget = retargetManager->createRetarget(kinectSkName,targetSkelName);

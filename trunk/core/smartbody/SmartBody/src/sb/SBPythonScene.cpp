@@ -23,6 +23,7 @@
 #include <sb/SBAnimationTransitionRule.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBSteerManager.h>
+#include <sb/SBRealtimeManager.h>
 #include <sb/SBFaceShiftManager.h>
 #include <sb/SBPhysicsManager.h>
 #include <sb/SBReach.h>
@@ -185,6 +186,7 @@ void pythonFuncsScene()
 		.def("getNavigationMeshManager", &SBScene::getNavigationMeshManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the navigation mesh manager.")
 		.def("getMotionGraphManager", &SBScene::getMotionGraphManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the motion graph manager.")
 		.def("getHandConfigurationManager", &SBScene::getHandConfigurationManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the hand configuration manager.")
+		.def("getRealtimeManager", &SBScene::getRealtimeManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the real time data manager.")
 		.def("getFaceShiftManager", &SBScene::getFaceShiftManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the FaceShift manager.")
 
 
