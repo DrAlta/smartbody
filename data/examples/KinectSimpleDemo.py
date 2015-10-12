@@ -101,25 +101,6 @@ scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
 retargetBehaviorSet('ChrBrad')
 
-class KinectController (PythonController):
-	
-	
-	def init(self, pawn):
-		print "Initializing kinect controller..."
-		
-		
-	def evaluate(self):
-		realtime = scene.getRealtimeManager()
-		channels = realtime.getChannelNames()
-		red = SrVec(1, 0, 0)
-		size = 10
-		
-		
-# instantiate this controller once for each character
-myc = KinectController()
-kinectChar.addController(30, myc)
-#kinectChar.removeController(myc)
-
 # set up the user interface to allow switching between different capabilities
 
 print 'Setting up GUI'
