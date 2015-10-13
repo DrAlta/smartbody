@@ -78,6 +78,18 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	if (attr)
 		attr->registerObserver(this);
 
+	attr = pawn->getAttribute("meshPivot");
+	if (attr)
+		attr->registerObserver(this);
+
+	attr = pawn->getAttribute("meshRotate");
+	if (attr)
+		attr->registerObserver(this);
+
+	attr = pawn->getAttribute("meshTranslate");
+	if (attr)
+		attr->registerObserver(this);
+
 	attr = pawn->getAttribute("deformableMeshScale");
 	if (attr)
 		attr->registerObserver(this);
@@ -122,10 +134,19 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 				LOG("Can not create character %s, no mesh or skeleton exists with type %s",sbChar->getName().c_str(), objectClass.c_str());
 		}
 		return;
-	}		
+	}
+
+
+
 	// Add entity to the scene node	
 	SrVec meshScale = pawn->getVec3Attribute("meshScale");
 	SceneNode * mSceneNode = ogreInterface->getSceneManager()->getRootSceneNode()->createChildSceneNode(name);
+	// scale the node
+	SmartBody::SBAttribute* scaleAttr = pawn->getAttribute("meshScale");
+	SmartBody:Vec3Attribute* vec3Attr = dynamic_cast<SmartBody::Vec3Attribute*>(scaleAttr);
+	if (vec3Attr)
+		mSceneNode->setScale(vec3Attr->getValue().x, vec3Attr->getValue().y, vec3Attr->getValue().z);
+
 	mSceneNode->attachObject(ent);
 	mSceneNode->setVisible(ogreInterface->getCharacterVisiblility());
 	mSceneNode->setScale(meshScale[0], meshScale[1], meshScale[2]);
@@ -260,7 +281,7 @@ void OgreListener::notify(SmartBody::SBSubject* subject)
 
 		SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(attribute->getObject());
 		
-		if (name == "deformableMesh" || name == "mesh")
+		if (name == "deformableMesh" || name == "mesh" || name == "meshScale" || name == "meshPivot")
 		{
 			OnCharacterUpdate(pawn->getName());
 		}		
