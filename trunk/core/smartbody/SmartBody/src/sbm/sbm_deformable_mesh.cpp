@@ -2041,12 +2041,12 @@ void DeformableMeshInstance::blendShapes()
 				SrArray<SrPnt>& visemeN = mIter->second[i]->shape().N;
 				if (visemeV.size() != neutralV.size())
 				{
-					LOG("number of vertices for %s is not same as neutral", mIter->first.c_str());
+					LOG("number of vertices for %s (%d) is not same as neutral (%d)", mIter->first.c_str(), visemeV.size(), neutralV.size());
 					continue;
 				}
 				if (visemeN.size() != neutralN.size())
 				{
-					LOG("number of normals for %s is not same as neutral", mIter->first.c_str());
+					LOG("number of normals for %s (%d) is not same as neutral (%d)", mIter->first.c_str(), visemeN.size(), neutralN.size());
 					continue;
 				}
 
@@ -2340,7 +2340,7 @@ void DeformableMeshInstance::blendShapes()
 					SrArray<SrPnt>& visemeN = visemeShapeMap[iter->first][j]->shape().N;
 					if (visemeV.size() != neutralV.size())
 					{
-						LOG("number of vertices for %s is not same as neutral", iter->first.c_str());
+						LOG("number of vertices for %s (%d) is not same as neutral", iter->first.c_str());
 						continue;
 					}
 					if (visemeN.size() != neutralN.size())

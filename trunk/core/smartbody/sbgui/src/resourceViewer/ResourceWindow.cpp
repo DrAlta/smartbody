@@ -770,6 +770,24 @@ void ResourceWindow::updateMesh( Fl_Tree_Item* tree, DeformableMesh* mesh )
 		{
 			std::string materialName = model.mtlnames[m];
 			Fl_Tree_Item* materialItem = resourceTree->add(item, materialName.c_str());	
+		}
+		// display the blend shapes
+		for (std::map<std::string, std::vector<SrSnModel*> >::iterator blendShapeIter = mesh->blendShapeMap.begin();
+			 blendShapeIter != mesh->blendShapeMap.end();
+			 blendShapeIter++)
+		{
+			std::string baseShape = (*blendShapeIter).first;
+			if (meshName == baseShape)
+			{
+				Fl_Tree_Item* shapeItem = resourceTree->add(item, "blend shapes");	
+				for (size_t s = 0; s < (*blendShapeIter).second.size(); s++)
+				{
+					SrSnModel* model = (*blendShapeIter).second[s];
+					SrModel& shape = model->shape();
+					resourceTree->add(shapeItem, (const char*) shape.name);	
+				}
+			}
+			
 
 		}
 	}
