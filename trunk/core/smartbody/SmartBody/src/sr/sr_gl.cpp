@@ -38,56 +38,72 @@
 
 //======================================= geometry ================================
 
-#if !defined(GLES_RENDER)
 void glNormal ( const SrVec &v )
 {
+#if USE_GL_FIXED_PIPELINE
    glNormal3fv ( (const float*) v );
+#endif
  }
 
 void glVertex ( const SrVec &v )
  {
+#if USE_GL_FIXED_PIPELINE
    glVertex3fv ( (const float*) v );
+#endif
  }
 
 void glVertex ( const SrVec &v1, const SrVec &v2 )
  {
+#if USE_GL_FIXED_PIPELINE
    glVertex3fv ( (const float*) v1 );
    glVertex3fv ( (const float*) v2 );
+#endif
  }
 
 void glVertex ( const SrVec &v1, const SrVec &v2, const SrVec &v3 )
  {
+#if USE_GL_FIXED_PIPELINE
    glVertex3fv ( (const float*) v1 );
    glVertex3fv ( (const float*) v2 );
    glVertex3fv ( (const float*) v3 );
+#endif
  }
 
 void glVertex ( const SrVec &v1, const SrVec &v2, const SrVec &v3, const SrVec &v4 )
  {
+#if USE_GL_FIXED_PIPELINE
    glVertex3fv ( (const float*) v1 );
    glVertex3fv ( (const float*) v2 );
    glVertex3fv ( (const float*) v3 );
    glVertex3fv ( (const float*) v4 );
+#endif
  }
 
 void glVertex ( float x, float y, float z )
  {
+#if USE_GL_FIXED_PIPELINE
    glVertex3f ( x, y, z );
+#endif
  }
 
 void glVertex ( float x, float y, float z, float a, float b, float c )
  {
+#if USE_GL_FIXED_PIPELINE
    glVertex3f ( x, y, z );
    glVertex3f ( a, b, c );
+#endif
  }
 
 void glVertex ( float x, float y )
  {
+#if USE_GL_FIXED_PIPELINE
    glVertex2f ( x, y );
+#endif
  }
 
 void glDrawBox ( const SrVec& a, const SrVec& b )
  {
+#if USE_GL_FIXED_PIPELINE
    glBegin ( GL_QUADS );
 
    glNormal3f ( 0, 0, 1 );
@@ -127,15 +143,17 @@ void glDrawBox ( const SrVec& a, const SrVec& b )
    glVertex3f ( b.x, a.y, a.z );
 
    glEnd ();
+#endif
  }
 //====================================== appearance ================================
 
 void glColor ( const SrColor& c )
  {
+#if USE_GL_FIXED_PIPELINE
    glColor4ubv ( (const GLubyte*)&c );
+#endif
  }
 
-#endif
 
 void glClearColor ( const SrColor& c )
  {
@@ -147,6 +165,7 @@ void glClearColor ( const SrColor& c )
 
 void glLight ( int id, const SrLight& l, bool bind_pos )
  {
+#if USE_GL_FIXED_PIPELINE
    float f[4];
    //LOG("Enable GLLight, id = %d", id);
    GLenum n = id==0? GL_LIGHT0 :
@@ -174,9 +193,11 @@ void glLight ( int id, const SrLight& l, bool bind_pos )
 	glLightfv ( n, GL_POSITION, f );
    }
    myGLEnable( n );
+#endif
  }
 
 void glLightPos( int id, const SrLight& l )	{
+#if USE_GL_FIXED_PIPELINE
    float f[4];
    GLenum n = id==0? GL_LIGHT0 :
               id==1? GL_LIGHT1 :
@@ -189,10 +210,12 @@ void glLightPos( int id, const SrLight& l )	{
 	l.position.get ( f );
 	f[3] = l.directional? 0.0f:1.0f;
 	glLightfv ( n, GL_POSITION, f );
+#endif
 }
 
 void glMaterial ( const SrMaterial &m )
  {
+#if USE_GL_FIXED_PIPELINE
    float f[4];
    m.diffuse.get(f);  glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,f);
 
@@ -206,48 +229,62 @@ void glMaterial ( const SrMaterial &m )
 #else
    glMateriali ( GL_FRONT_AND_BACK, GL_SHININESS, int(m.shininess) );
 #endif
+#endif
  }
 
 //==================================== matrices ==============================
 
 void glMultMatrix ( const SrMat &m )
  {
+#if USE_GL_FIXED_PIPELINE
 	 SrMat tm = m;
    glMultMatrixf ( (float*)tm );
+#endif
  }
 
 void glLoadMatrix ( const SrMat &m )
- {
+{
+#if USE_GL_FIXED_PIPELINE
 	 SrMat tm = m;
    glLoadMatrixf ( (float*)tm );
- }
+#endif
+}
 
 void glTranslate ( const SrVec &v )
  {
+#if USE_GL_FIXED_PIPELINE
    glTranslatef ( v.x, v.y, v.z );
+#endif
  }
 
 void glScale ( float s )
- {
+{
+#if USE_GL_FIXED_PIPELINE
    glScalef ( (float)s, (float)s, (float)s );
- }
+#endif
+}
 
 void glRotate ( const SrQuat &q )
- {
+{
+#if USE_GL_FIXED_PIPELINE
    SrMat m(SrMat::NotInitialized);
    q.get_mat(m);
    glMultMatrixf ( (float*)m );
- }
+#endif
+}
 
 void glLookAt ( const SrVec &eye, const SrVec &center, const SrVec &up )
  {
+#if USE_GL_FIXED_PIPELINE
    SrMat m(SrMat::NotInitialized);
    m.look_at ( eye, center, up );
    glMultMatrixf ( (float*)m );
+#endif
  }
 
 void glPerspective ( float fovy, float aspect, float znear, float zfar )
  {
+#if USE_GL_FIXED_PIPELINE
    GLdouble ymax = (GLdouble)znear * tan ( fovy/2 );
 
 #if GLES_RENDER
@@ -274,23 +311,28 @@ void glPerspective ( float fovy, float aspect, float znear, float zfar )
                (GLdouble) zfar   
              );
 #endif
+#endif
  }
 
 void glGetViewMatrix ( SrMat &m )
  {
+#if USE_GL_FIXED_PIPELINE
 #if GLES_RENDER
 	 // no implementation
 #else
    glGetFloatv ( GL_MODELVIEW_MATRIX, (float*)m );
 #endif
+#endif
  }
 
 void glGetProjectionMatrix ( SrMat &m )
  {
+#if USE_GL_FIXED_PIPELINE
 #if GLES_RENDER
 	 // no implementation
 #else
    glGetFloatv ( GL_PROJECTION_MATRIX, (float*)m );
+#endif
 #endif
  }
 
@@ -298,6 +340,7 @@ void glGetProjectionMatrix ( SrMat &m )
 
 static const char* sr_error_string ()
  {
+#if USE_GL_FIXED_PIPELINE
    switch ( glGetError() )
     { case GL_NO_ERROR : return "no error";
       case GL_INVALID_ENUM : return "invalid enum";
@@ -310,6 +353,9 @@ static const char* sr_error_string ()
       case GL_OUT_OF_MEMORY : return "out of memory";
       default : return "error not recognized";
     }
+#else
+	 return "error not recognized";
+#endif
  }
 
 /*
@@ -323,7 +369,7 @@ void glPrintInfo ( SrOutput &o )
 
    o << "Last Error : " << sr_error_string() << srnl;
 
-#if !GLES_RENDER
+#if USE_GL_FIXED_PIPELINE
    glGetIntegerv(GL_STEREO,&i);
    o<<"GL_STEREO : " << (int)i << '\n';
    glGetIntegerv(GL_MAX_LIST_NESTING,&i);  

@@ -1,13 +1,13 @@
 
 #include "vhcl.h"
 #include <sb/SBTypes.h>
-#ifdef __ANDROID__
-//#include <GLES/gl.h>
-//#include <GLES2/gl2.h>
-#include "wes_gl.h"
-#elif defined(SB_IPHONE)
-#include <OpenGLES/ES1/gl.h>
-#endif
+// #ifdef __ANDROID__
+// //#include <GLES/gl.h>
+// #include <GLES2/gl2.h>
+// //#include "wes_gl.h"
+// #elif defined(SB_IPHONE)
+// #include <OpenGLES/ES1/gl.h>
+// #endif
 
 #if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
 #include "external/glew/glew.h"

@@ -39,24 +39,51 @@
 # endif
 
 
-#if defined(SB_IPHONE)
+#ifdef WIN32
+//#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <wingdi.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>
 #include <OpenGLES/ES1/glext.h>
-#elif __APPLE__
+#elif defined(__APPLE__) || defined(__APPLE_CC__)
 #include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
+//       #include <Carbon/Carbon.h>
+#define APIENTRY
+#elif defined(__FLASHPLAYER__)
+#include <GL/gl.h>
 #elif __native_client__
-//#include <GLES2/gl2.h>
+#include <GLES2/gl2.h>
 #elif defined(__ANDROID__)
 //#include <GLES/gl.h>
-//#include <GLES2/gl2.h>
-#include "wes_gl.h"
-#include "wes_glu.h"
+#include <GLES2/gl2.h>
+//#include "wes_gl.h"
+#else
+#include <GL/gl.h>
+#include <GL/glx.h>
+#endif
 
-# else
-# include <GL/gl.h>
-# include <GL/glu.h>
-# endif
+
+// #if defined(SB_IPHONE)
+// #include <OpenGLES/ES1/gl.h>
+// #include <OpenGLES/ES1/glext.h>
+// #elif __APPLE__
+// #include <OpenGL/gl.h>
+// #include <OpenGL/glu.h>
+// #elif __native_client__
+// #include <GLES2/gl2.h>
+// #elif defined(__ANDROID__)
+// //#include <GLES/gl.h>
+// #include <GLES2/gl2.h>
+// //#include "wes_gl.h"
+// //#include "wes_glu.h"
+// 
+// # else
+// # include <GL/gl.h>
+// # include <GL/glu.h>
+// # endif
 
 class SrVec;
 class SrMat;
@@ -68,10 +95,14 @@ class SrMaterial;
 
 #if defined(__ANDROID__) || defined(SB_IPHONE)
 #define GLES_RENDER 1
+#define USE_GL_FIXED_PIPELINE 0
 #define GLdouble GLfloat
+#else
+#define GLES_RENDER 0
+#define USE_GL_FIXED_PIPELINE 1
 #endif
 
-#if defined(__ANDRID__)
+#if 0 //defined(__ANDRID__)
 #define myGLEnable glEnable_wes
 #define myGLDisable glDisable_wes
 #else
@@ -79,7 +110,6 @@ class SrMaterial;
 #define myGLDisable glDisable
 #endif
 
-#if !defined(GLES_RENDER)
 //======================================= geometry ================================
 SBAPI void glNormal ( const SrVec &v );
 
@@ -94,7 +124,6 @@ SBAPI void glDrawBox ( const SrVec& a, const SrVec& b ); //!< Send quads with no
 
 //====================================== appearance ================================
 SBAPI void glColor ( const SrColor& c );
-#endif
 
 SBAPI void glClearColor ( const SrColor& c );
 SBAPI void glLight ( int id, const SrLight& l, bool bind_pos = true ); //!< id = x E {0,...,7}, from GL_LIGHTx
