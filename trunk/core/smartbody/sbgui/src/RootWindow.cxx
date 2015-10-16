@@ -153,6 +153,7 @@ BaseWindow::BaseWindow(bool useEditor, int x, int y, int w, int h, const char* n
 	menubar->add("&Help/About", 0, HelpCB, this, 0);
 	menubar->add("&Help/Documentation", 0, DocumentationCB, this, 0);
 	menubar->add("&Help/Create Python API", 0, CreatePythonAPICB, this, 0);
+	menubar->add("&Help/Switch Renderer", 0, SwitchRendererCB, this, 0);
 	//menubar->add("&Scripts/Reload Scripts", 0, ReloadScriptsCB, this, NULL);
 	//menubar->add("&Scripts/Set Script Folder", 0, SetScriptDirCB, this, FL_MENU_DIVIDER);
 
@@ -1249,7 +1250,7 @@ void BaseWindow::CameraFrameCB(Fl_Widget* widget, void* data)
 	camera->view_all(sceneBox, camera->getFov());	
 	float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
 	float znear = 0.01f*scale;
-	float zfar = 100.0f*scale;
+	float zfar = 1000.0f*scale;
 	camera->setNearPlane(znear);
 	camera->setFarPlane(zfar);
 }
@@ -1282,7 +1283,7 @@ void BaseWindow::CameraFrameObjectCB(Fl_Widget* widget, void* data)
 	camera->view_all(sceneBox, camera->getFov());	
 	float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
 	float znear = 0.01f*scale;
-	float zfar = 100.0f*scale;
+	float zfar = 1000.0f*scale;
 	camera->setNearPlane(znear);
 	camera->setFarPlane(zfar);
 }
@@ -1309,7 +1310,7 @@ void BaseWindow::RotateSelectedCB(Fl_Widget* widget, void* data)
 	camera->setCenter(x, y, z);
 	float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
 	float znear = 0.01f*scale;
-	float zfar = 100.0f*scale;
+	float zfar = 1000.0f*scale;
 	camera->setNearPlane(znear);
 	camera->setFarPlane(zfar);
 #endif
@@ -1429,7 +1430,7 @@ void BaseWindow::FaceCameraCB(Fl_Widget* widget, void* data)
 		camera->setEye(tmp.x, tmp.y, tmp.z);
 		float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
 		float znear = 0.01f*scale;
-		float zfar = 100.0f*scale;
+		float zfar = 1000.0f*scale;
 		camera->setNearPlane(znear);
 		camera->setFarPlane(zfar);
 	}
@@ -2103,7 +2104,7 @@ void BaseWindow::CreateCameraCB(Fl_Widget* w, void* data)
 	SrVec camEye = SrVec(0,1.66f,1.85f)*scale;
 	SrVec camCenter = SrVec(0,0.92f,0)*scale;	
 	float znear = 0.01f*scale;
-	float zfar = 100.0f*scale;
+	float zfar = 1000.0f*scale;
 	camera->setEye(camEye[0],camEye[1],camEye[2]);
 	camera->setCenter(camCenter[0],camCenter[1],camCenter[2]);
 	camera->setNearPlane(znear);
@@ -2338,6 +2339,65 @@ void BaseWindow::CreatePythonAPICB(Fl_Widget* widget, void* data)
 
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	scene->run(strstr.str());
+}
+
+void BaseWindow::SwitchRendererCB(Fl_Widget* widget, void* data)
+{
+	BaseWindow* window = static_cast<BaseWindow*>(data);
+
+	// find the .smartbodysettings file
+	std::string settingsPathStr = SmartBody::SBScene::getSystemParameter(".smartbodysettings");
+	boost::filesystem::path settingsPath(settingsPathStr);
+	if (boost::filesystem::exists(settingsPath))
+	{
+		std::ifstream fin;
+		fin.open(settingsPath.string());
+		if (!fin.good())
+		{
+			fl_alert("Could not open .smartbodysettings file %s.", settingsPath.string().c_str());
+			return;
+		}
+
+		// read each line of the file
+		std::vector<std::string> lines;
+		while (!fin.eof())
+		{
+			// read an entire line into memory
+			char buf[4096];
+			fin.getline(buf, 4096);
+
+			std::string curLine = buf;
+			if (curLine.substr(0, 9) == "renderer=")
+			{
+				std::string curRenderer = curLine.substr(9);
+				if (curRenderer == "custom")
+				{
+					lines.push_back("renderer=ogre");
+				}
+				else
+				{
+					lines.push_back("renderer=custom");
+				}
+			}
+			else
+			{
+				lines.push_back(curLine);
+			}
+		}
+		fin.close();
+
+		std::ofstream fout;
+		fout.open(settingsPathStr.c_str());
+		if (fout.good())
+		{
+			for (size_t l = 0; l < lines.size(); l++)
+			{
+				fout << lines[l] << std::endl;
+			}
+		}
+		fout.close();
+	}
+	fl_alert("Please restart sbgui to activate the new renderer.");
 }
 
 void BaseWindow::DocumentationCB(Fl_Widget* widget, void* data)

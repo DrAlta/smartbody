@@ -29,6 +29,9 @@
 #include "sbm/GPU/SbmShader.h"
 #include <sb/SBBoneBusManager.h>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 #include <pythonbind/SBPythonAutoRig.h>
 
@@ -700,6 +703,13 @@ int main( int argc, char **argv )	{
 	}
 	else
 	{
+		boost::filesystem::path settingsPath(".smartbodysettings");
+		// save the .smartbodysettings file location
+#if (BOOST_VERSION > 104400)
+			SmartBody::SBScene::setSystemParameter(".smartbodysettings",  boost::filesystem::absolute(settingsPath).string());
+#else
+		SmartBody::SBScene::setSystemParameter(".smartbodysettings",  boost::filesystem::complete(settingsPath).string());
+#endif
 		LOG("Found .smartbodysettings file.");
 		std::string line;
 		while (!settingsFile.eof())
