@@ -39,7 +39,7 @@ struct SrOGLData : public SrSnShapeBase::RenderLibData
    public :
     SrOGLData ( SrSnShapeBase* s );
    ~SrOGLData () { 
-#if !GLES_RENDER
+#if USE_GL_FIXED_PIPELINE
 	glDeleteLists(list,1); 
 #endif
    }
@@ -70,7 +70,7 @@ SrOGLData::SrOGLData ( SrSnShapeBase* s )
    }
 
    rfunc = rfuncs[i].rfunc;
-#if !GLES_RENDER
+#if USE_GL_FIXED_PIPELINE
    list = glGenLists ( 1 ); // creates one list
 // sr_out<<"is list: "<<glIsList(list)<<srnl;
 #endif
@@ -135,7 +135,7 @@ void SrSaGlRender::override_render_mode ( SrSn* n, srRenderMode m )
 
 void SrSaGlRender::get_top_matrix ( SrMat& mat )
  {
-#if !GLES_RENDER
+#if USE_GL_FIXED_PIPELINE
    glGetFloatv ( GL_MODELVIEW_MATRIX, (float*)mat );
 #endif
  }
@@ -143,7 +143,7 @@ void SrSaGlRender::get_top_matrix ( SrMat& mat )
 int SrSaGlRender::matrix_stack_size ()
 {
    int value;
-#if !GLES_RENDER
+#if USE_GL_FIXED_PIPELINE
    glGetIntegerv ( GL_MODELVIEW_STACK_DEPTH, &value );
 #endif
    return value;
@@ -157,21 +157,27 @@ void SrSaGlRender::init_matrix ()
 
 void SrSaGlRender::mult_matrix ( const SrMat& mat )
  {
+#if USE_GL_FIXED_PIPELINE
    //SR_TRACE3("Mult Matrix");
 	 SrMat tm = mat;
    glMultMatrixf ( (float*)tm );
+#endif
  }
 
 void SrSaGlRender::push_matrix ()
  {
+#if USE_GL_FIXED_PIPELINE
    //SR_TRACE3("Push Matrix");
    glPushMatrix ();
+#endif
  }
 
 void SrSaGlRender::pop_matrix ()
  {
+#if USE_GL_FIXED_PIPELINE
    //SR_TRACE3("Pop Matrix");
    glPopMatrix ();
+#endif
  }
 
 bool SrSaGlRender::shape_apply ( SrSnShapeBase* s )
@@ -191,7 +197,7 @@ bool SrSaGlRender::shape_apply ( SrSnShapeBase* s )
    bool isSrModel = sr_compare(s->inst_class_name(),"model") == 0;
    //LOG("check isSrModel");
    // 3. Check if lists are up to date
-#if !GLES_RENDER // no display list for OpenGL ES Rendering
+#if USE_GL_FIXED_PIPELINE // no display list for OpenGL ES Rendering
    if ( !s->haschanged() && !isSrModel)
    { //SR_TRACE2 ( "Calling list..." );	  
       glCallList ( ogl->list ); 

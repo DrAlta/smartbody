@@ -51,8 +51,8 @@
 	#include <GL/gl.h>
 #elif defined(__ANDROID__)
 	//#include <GLES/gl.h>
-	//#include <GLES2/gl2.h>
-	#include <wes_gl.h>
+	#include <GLES2/gl2.h>
+	//#include <wes_gl.h>
 #else
 	#include <GL/gl.h>
 	#include <GL/glx.h>

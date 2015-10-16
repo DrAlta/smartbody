@@ -303,15 +303,17 @@ void SbmTexture::buildTexture(bool buildMipMap)
 		glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 	else
 		glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-#else
-	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-#endif
 	//LOG("After Texture parameters : GL_TEXTURE_MIN_FILTER");
-	glTexParameteri(iType, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+	
 	//LOG("After Texture parameters : GL_TEXTURE_MAX_FILTER");
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	//LOG("After glTexEnvf");
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:100");	
+#else
+	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+#endif
+	glTexParameteri(iType, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+	
 	if (channels == 3)
 	{
 		internal_format = GL_RGB8;

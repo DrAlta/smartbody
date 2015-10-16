@@ -22,10 +22,11 @@
 
 #include "vhcl.h"
 #include <sb/SBTypes.h>
+
 #ifdef __ANDROID__
 //#include <GLES/gl.h>
-//#include <GLES2/gl2.h>
-#include <wes_gl.h>
+#include <GLES2/gl2.h>
+//#include <wes_gl.h>
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>
 #else
@@ -34,6 +35,8 @@
 #include "external/SOIL/SOIL.h"
 #endif
 #endif
+
+
 #include <sr/sr_vec.h>
 #include <sr/sr_mat.h>
 #include <sr/sr_model.h>
@@ -272,6 +275,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 #else
 	bool USE_GPU_BLENDSHAPES = false; // set to false for no masks, true for masks
 #endif
+#if USE_GL_FIXED_PIPELINE
 	//LOG("Render Deformable Model");
 	DeformableMesh* mesh = shape->getDeformableMesh();
     if (!mesh)
@@ -544,13 +548,14 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			}
 			glDepthMask(GL_TRUE);
 	}
-
+#endif
 	//SbmShaderProgram::printOglError("SrGlRenderFuncs::renderDeformableMesh FINAL");
 	//LOG("Finish render deformable model");
 }
 
 void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
  {	
+#if USE_GL_FIXED_PIPELINE
    SrModel& model = ((SrSnModel*)shape)->shape();
 
    //SR_TRACE1 ( "Render Model faces="<<model.F.size() );
@@ -588,6 +593,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 
 #if GLES_RENDER  
 
+   // disable fixed rendering pipeline from OpenGL 1.x
    std::string mtlName = "defaultMaterial";
    if (model.mtlnames.size() > 0)
    {
@@ -635,7 +641,6 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    glDisableClientState(GL_VERTEX_ARRAY);
    glDisableClientState(GL_NORMAL_ARRAY);
    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
 #else
    switch ( shape->render_mode() )
     { case srRenderModeDefault :
@@ -801,6 +806,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 //     }
 
    //SR_TRACE1 ( "End Render Model." );
+#endif
 #endif
  }
 

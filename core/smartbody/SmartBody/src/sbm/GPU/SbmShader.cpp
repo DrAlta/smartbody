@@ -1,11 +1,8 @@
 #include "vhcl.h"
 #if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
 #include "external/glew/glew.h"
-#elif defined(__ANDROID__)
-#include "wes_gl.h"
 #endif
 #include "SbmShader.h"
-//#include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

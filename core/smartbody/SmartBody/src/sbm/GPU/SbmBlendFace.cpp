@@ -4,9 +4,16 @@
 #include "external/jpge/jpge.h"
 #endif
 
-#if defined(__ANDROID__)
-#include "wes_matrix.h"
+#if !defined(SB_IPHONE)
+#include "sbm/sbm_deformable_mesh.h"
+#include "SbmDeformableMeshGPU.h"
+#include <sbm/GPU/SbmTexture.h>
+#include "external/glm/glm/glm.hpp"
+#include "external/glm/glm/gtc/type_ptr.hpp"
+#include "external/glm/glm/gtc/matrix_transform.hpp"
 #endif
+
+
 #include <algorithm>
 #include "SbmBlendFace.h"
 
@@ -15,15 +22,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBPawn.h>
 
-#if !defined(SB_IPHONE)
-#include "sbm/sbm_deformable_mesh.h"
-#include "SbmDeformableMeshGPU.h"
-#include <sbm/GPU/SbmTexture.h>
 
-#include "external/glm/glm/glm.hpp"
-#include "external/glm/glm/gtc/type_ptr.hpp"
-#include "external/glm/glm/gtc/matrix_transform.hpp"
-#endif
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 

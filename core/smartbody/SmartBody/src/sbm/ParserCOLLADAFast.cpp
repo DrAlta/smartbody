@@ -2360,7 +2360,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 			specularTexture = "";
 			rapidxml::xml_node<>* diffuseNode = ParserCOLLADAFast::getNode("diffuse",node);
 			rapidxml::xml_node<>* bumpNode = ParserCOLLADAFast::getNode("bump",node);
-			rapidxml::xml_node<>* specularNode = ParserCOLLADAFast::getNode("specularLevel",node);
+			rapidxml::xml_node<>* specularNode = ParserCOLLADAFast::getNode("specular",node);
 			if (diffuseNode)
 			{
 				rapidxml::xml_node<>* texNode = ParserCOLLADAFast::getNode("texture",diffuseNode);

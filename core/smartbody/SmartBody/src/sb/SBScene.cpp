@@ -90,9 +90,9 @@
 #if !defined(SB_IPHONE) && !defined(__ANDROID__)
 #include <sbm/GPU/SbmShader.h>
 #endif
-#if !defined(SB_IPHONE)
+
 #include <sbm/GPU/SbmTexture.h>
-#endif
+#include <sr/sr_gl.h>
 #include <sbm/KinectProcessor.h>
 #include <sr/sr_sn_group.h>
 #include <fstream>
@@ -4366,7 +4366,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	//	Sets far clip plane
 	camera->setFarPlane(zfar);
 
-#if !defined(SB_IPHONE)
+#if USE_GL_FIXED_PIPELINE
 	SrMat mat( SrMat::NotInitialized );
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -4374,7 +4374,6 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadMatrix( camera->get_view_mat(mat) );
-#endif
 	//	Creates characters frustrm 
 	SmartBody::SBScene * scene	= SmartBody::SBScene::getScene();
 	std::vector<std::string> pawnNames = scene->getPawnNames();
@@ -4387,7 +4386,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-	
+#endif
 	//	Sets FROM where the chararacter is looking
 	camera->setEye(	tmp_eye.x,
 					tmp_eye.y,
