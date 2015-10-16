@@ -476,9 +476,9 @@ LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(SB_MY_DIR) \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/pprAI/include \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/sbm-debugger/lib \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/ode/include \
-					$(LOCAL_PATH)/$(ANDROID_DIR)/gl-wes-v2/src \
 					$(SB_LOCAL_PATH)/$(LIB_DIR)/assimp-3.1.1/include \
 					#$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/boost \
+					#$(LOCAL_PATH)/$(ANDROID_DIR)/gl-wes-v2/src \
 					
 					
 LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
