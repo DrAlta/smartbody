@@ -32,7 +32,7 @@ SBParserListener::SBParserListener()
 {
 }
 
-void SBParserListener::onWord(std::string timeMarker, std::string word)
+void SBParserListener::onWord(std::string timeMarker, std::string word, std::string emphasis)
 {
 }
 
@@ -295,6 +295,27 @@ std::string SBParser::parseUtterance(SBParserListener* listener, std::string utt
 
 	listener->resetBML();
 
+	std::vector<std::string> tokens;
+	vhcl::Tokenize(utterance, tokens, " ");
+
+	// users can put a '-' to indicate negative expression, or a '+' to indicate positive expression
+	// in front of a word. This information must be extracted from the utterance, and presented
+	// later when doing per-word processing
+	std::map<int, std::string> wordEmphasisMap;
+	for (size_t w = 0; w < tokens.size(); w++)
+	{
+		if (tokens[w][0] == '-')
+		{
+			wordEmphasisMap[w] = "-";
+			tokens[w] = tokens[w].substr(1);
+		}
+		else if (tokens[w][0] == '+')
+		{
+			wordEmphasisMap[w] = "+";
+			tokens[w] = tokens[w].substr(1);
+		}	
+	}
+
 	std::string encapsulatedUtterance = "<s> ";
 	encapsulatedUtterance.append(utterance);
 	encapsulatedUtterance.append(" </s>");
@@ -304,9 +325,6 @@ std::string SBParser::parseUtterance(SBParserListener* listener, std::string utt
 	strstr << "<act xmlns:sbm=\"http://ict.usc.edu\">" << std::endl;
 	strstr << "\t<bml>" << std::endl;
 	strstr << "\t\t<speech id=\"sp1\" type=\"application/ssml+xml\">" << std::endl;
-
-	std::vector<std::string> tokens;
-	vhcl::Tokenize(utterance, tokens, " ");
 
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
@@ -320,20 +338,25 @@ std::string SBParser::parseUtterance(SBParserListener* listener, std::string utt
 	listener->addBML(parseBML);
 
 	int curWord = 0;
+
+	// syntactic analysis
 	if (isInitialized())
 	{
 		// if the parser is initialized, traverse
 		SmartBody::SBParseNode* node = this->parse(encapsulatedUtterance);
 		parseTraverse(listener, node, curWord);
 	}
-	else
+
+	// per-word analysis
+	for (size_t i = 0; i < tokens.size(); i++)
 	{
-		for (size_t i = 0; i < tokens.size(); i++)
-		{
-			std::stringstream strstr;
-			strstr << "T" << (i * 2);
-			listener->onWord(strstr.str(), tokens[i]);
-		}
+		std::stringstream strstr;
+		strstr << "T" << (i * 2);
+		std::map<int, std::string>::iterator iter = wordEmphasisMap.find(i);
+		if (iter == wordEmphasisMap.end())
+			listener->onWord(strstr.str(), tokens[i], "");
+		else
+			listener->onWord(strstr.str(), tokens[i], (*iter).second);
 	}
 
 	listener->addBML("\r\n");
@@ -346,13 +369,15 @@ void SBParser::parseTraverse(SBParserListener* listener, SmartBody::SBParseNode*
 {
 	if (!node)
 		return;
-	if (!node->isTerminal())
-	{
-		std::stringstream strstr;
-		strstr << "T" << (2 * curWord);
-		curWord++;
-		listener->onWord(strstr.str(), node->getWord());
-	}
+
+	// removed per-word processing; run that separately
+	//if (!node->isTerminal())
+	//{
+		//std::stringstream strstr;
+		//strstr << "T" << (2 * curWord);
+		//curWord++;
+		//listener->onWord(strstr.str(), node->getWord());
+	//}
 
 	std::stringstream strstr;
 	strstr << "T" << (2 * curWord);

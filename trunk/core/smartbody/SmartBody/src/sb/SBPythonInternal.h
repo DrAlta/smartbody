@@ -230,21 +230,21 @@ struct NvbgWrap :  Nvbg, boost::python::wrapper<Nvbg>
 
 struct SBParserListenerWrap : SBParserListener, boost::python::wrapper<SBParserListener>
 {
-	virtual void onWord(std::string timeMarker, std::string word)
+	virtual void onWord(std::string timeMarker, std::string word, std::string emphasis)
 	{
 		if (boost::python::override o = this->get_override("onWord"))
 		{
 			try {
-				o(timeMarker, word);
+				o(timeMarker, word, emphasis);
 			} catch (...) {
 				PyErr_Print();
 			}
 		}
 	}
 
-	void default_onWord(std::string timeMarker, std::string word)
+	void default_onWord(std::string timeMarker, std::string word, std::string emphasis)
 	{
-		return SBParserListener::onWord(timeMarker, word);
+		return SBParserListener::onWord(timeMarker, word, emphasis);
 	}
 
 	virtual void onPartOfSpeech(std::string timeMarker, std::string partOfSpeech)

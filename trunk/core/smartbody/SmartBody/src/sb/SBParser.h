@@ -15,7 +15,7 @@ class SBParserListener
 {
 	public:
 		SBParserListener();
-		SBAPI virtual void onWord(std::string timeMarker, std::string word);
+		SBAPI virtual void onWord(std::string timeMarker, std::string word, std::string emphasis);
 		SBAPI virtual void onPartOfSpeech(std::string timeMarker, std::string partOfSpeech);
 		SBAPI std::string getCurrentBML();
 		SBAPI void addBML(std::string bml);
