@@ -212,7 +212,7 @@ void TransparentListener::notify(SmartBody::SBSubject* subject)
 					pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
 				
 				DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
-				meshInstance->setMeshScale((float) vec3Attribute->getValue().x);
+				meshInstance->setMeshScale(SrVec((float) vec3Attribute->getValue().x, (float) vec3Attribute->getValue().y, (float) vec3Attribute->getValue().z));
 				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
 			}			
 		}
