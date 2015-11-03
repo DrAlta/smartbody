@@ -32,36 +32,20 @@ BMLCreatorWindow::BMLCreatorWindow(int x,int y,int w,int h, const char* s) : Fl_
 {
 
 	BMLObject* body = new BMLBodyObject();
-	body->setName("body");
-
 	BMLObject* locomotion = new BMLLocomotionObject();
-	locomotion->setName("locomotion");
 	BMLObject* animation = new BMLAnimationObject();
-	locomotion->setName("locomotion");
 	BMLObject* gesture = new BMLGestureObject();
-	gesture->setName("gesture");
 	BMLObject* reach = new BMLReachObject();
-	reach->setName("sbm:reach");
 	BMLObject* hand = new BMLHandObject();
-	hand->setName("sbm:grab");
 	BMLObject* gaze = new BMLGazeObject();
-	gaze->setName("gaze");
 	BMLObject* constraint = new BMLConstraintObject();
-	constraint->setName("sbm:constraint");
 	BMLObject* head = new BMLHeadObject();
-	head->setName("head");
 	BMLObject* face = new BMLFaceObject();
-	face->setName("face");
 	BMLObject* speech = new BMLSpeechObject();
-	speech->setName("speech");
 	BMLObject* saccade = new BMLSaccadeObject();
-	saccade->setName("saccade");
 	BMLObject* event = new BMLEventObject();
-	event->setName("event");
 	BMLObject* state = new BMLStateObject();
-	state->setName("blend");
 	BMLObject* noise = new BMLNoiseObject();
-	noise->setName("sbm:noise");
 
 	_bmlObjects.push_back(body);
 	_bmlObjects.push_back(locomotion);
