@@ -441,6 +441,23 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/bml/bml_saccade.cpp
         ./src/bml/bml_noise.cpp
 		./src/bml/bml_states.cpp
+		./src/bml/BMLAnimationObject.cpp
+		./src/bml/BMLBodyObject.cpp
+		./src/bml/BMLConstraintObject.cpp
+		./src/bml/BMLEventObject.cpp
+		./src/bml/BMLFaceObject.cpp
+		./src/bml/BMLGazeObject.cpp
+		./src/bml/BMLGestureObject.cpp
+		./src/bml/BMLHeadObject.cpp
+		./src/bml/BMLLocomotionObject.cpp
+		./src/bml/BMLObject.cpp
+		./src/bml/BMLReachObject.cpp
+		./src/bml/BMLSpeechObject.cpp
+		./src/bml/BMLSaccadeObject.cpp
+		./src/bml/BMLHandObject.cpp
+		./src/bml/BMLStateObject.cpp
+		./src/bml/BMLNoiseObject.cpp
+
         ./src/sbm/GenericViewer.cpp
         ./src/sbm/gwiz_cmdl.cpp
         ./src/sbm/gwiz_math.cpp

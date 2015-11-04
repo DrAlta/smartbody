@@ -594,6 +594,23 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/bml/bml_saccade.cpp \
 	$(SB_MY_DIR)/bml/bml_states.cpp \
 	$(SB_MY_DIR)/bml/bml_noise.cpp \
+	$(SB_MY_DIR)/bml/BMLAnimationObject.cpp
+	$(SB_MY_DIR)/bml/BMLBodyObject.cpp
+	$(SB_MY_DIR)/bml/BMLConstraintObject.cpp
+	$(SB_MY_DIR)/bml/BMLEventObject.cpp
+	$(SB_MY_DIR)/bml/BMLFaceObject.cpp
+	$(SB_MY_DIR)/bml/BMLGazeObject.cpp
+	$(SB_MY_DIR)/bml/BMLGestureObject.cpp
+	$(SB_MY_DIR)/bml/BMLHeadObject.cpp
+	$(SB_MY_DIR)/bml/BMLLocomotionObject.cpp
+	$(SB_MY_DIR)/bml/BMLObject.cpp
+	$(SB_MY_DIR)/bml/BMLReachObject.cpp
+	$(SB_MY_DIR)/bml/BMLSpeechObject.cpp
+	$(SB_MY_DIR)/bml/BMLSaccadeObject.cpp
+	$(SB_MY_DIR)/bml/BMLHandObject.cpp
+	$(SB_MY_DIR)/bml/BMLStateObject.cpp
+	$(SB_MY_DIR)/bml/BMLNoiseObject.cpp	
+	
 	$(SB_MY_DIR)/sbm/GenericViewer.cpp \
 	$(SB_MY_DIR)/sbm/gwiz_cmdl.cpp \
 	$(SB_MY_DIR)/sbm/gwiz_math.cpp \
