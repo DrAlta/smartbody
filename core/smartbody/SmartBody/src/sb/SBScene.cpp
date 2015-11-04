@@ -210,6 +210,7 @@ void SBScene::initialize()
    _coneOfSight			= false;
    _coneOfSight_leftEye	= NULL;
 
+	createBoolAttribute("useNewBMLParsing",false,true,"",10,false,false,false,"Use new BML parsing scheme.");
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 	createStringAttribute("speechRelaySoundCacheDir","../../../..",true,"",20,false,false,false,"Directory where sound files from speech relays will be placed. ");
 	createDoubleAttribute("scale",1.f,true,"",30,false,false,false,"The scale of scene (1 = meters, .01 = centimeters, etc).");
@@ -2958,7 +2959,8 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 				//skelSaveStr.replace('\n',)
 				boost::replace_all(skelSaveStr,"\n","\\n");
 				boost::replace_all(skelSaveStr,"\"","");
-				LOG("Skeleton %s :\n%s",skelName.c_str(),skelSaveStr.c_str());
+				//LOG("Skeleton %s :\n%s",skelName.c_str(),skelSaveStr.c_str());
+				LOG("Skeleton %s :\n",skelName.c_str());
 				strstr << "tempSkel.loadFromString(\"" << skelSaveStr << "\")\n";
 				charSkelMap[skelName] = charName;
 			}

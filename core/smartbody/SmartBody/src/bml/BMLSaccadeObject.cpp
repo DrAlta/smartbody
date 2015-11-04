@@ -46,3 +46,9 @@ void BMLSaccadeObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }
+
+BMLObject* BMLSaccadeObject::copy()
+{
+	return new BMLSaccadeObject();
+}
+

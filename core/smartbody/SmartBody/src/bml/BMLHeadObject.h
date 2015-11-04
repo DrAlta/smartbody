@@ -6,10 +6,11 @@
 class BMLHeadObject : public BMLObject
 {
 	public:
-		BMLHeadObject();
-		~BMLHeadObject();
+		SBAPI BMLHeadObject();
+		SBAPI ~BMLHeadObject();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 
 };
 #endif

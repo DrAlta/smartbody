@@ -6,10 +6,11 @@
 class BMLNoiseObject : public BMLObject
 {
 public:
-	BMLNoiseObject();
-	~BMLNoiseObject();
+	SBAPI BMLNoiseObject();
+	SBAPI ~BMLNoiseObject();
 
-	virtual void notify(SBSubject* subject);
+	SBAPI virtual BMLObject* copy();
+	SBAPI virtual void notify(SBSubject* subject);
 
 };
 #endif

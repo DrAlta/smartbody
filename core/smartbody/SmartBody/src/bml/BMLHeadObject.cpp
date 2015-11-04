@@ -48,3 +48,7 @@ void BMLHeadObject::notify(SBSubject* subject)
 	BMLObject::notify(subject);
 }
 
+BMLObject* BMLHeadObject::copy()
+{
+	return new BMLHeadObject();
+}

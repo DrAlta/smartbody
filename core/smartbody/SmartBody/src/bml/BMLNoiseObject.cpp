@@ -34,3 +34,8 @@ void BMLNoiseObject::notify(SBSubject* subject)
 
 	notifyObservers();
 }
+
+BMLObject* BMLNoiseObject::copy()
+{
+	return new BMLNoiseObject();
+}

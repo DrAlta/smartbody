@@ -1008,7 +1008,7 @@ void SBCharacter::setDeformableMeshScale( double meshScale )
 	SmartBody::Vec3Attribute* meshScaleAttribute = dynamic_cast<SmartBody::Vec3Attribute*>(getAttribute("deformableMeshScale"));
 	if (meshScaleAttribute)
 	{
-		meshScaleAttribute->setValue(SrVec(meshScale, meshScale, meshScale));
+		meshScaleAttribute->setValue(SrVec((float) meshScale, (float) meshScale, (float) meshScale));
 	}
 }
 

@@ -21,3 +21,8 @@ void BMLBodyObject::notify(SmartBody::SBSubject* subject)
 
 	notifyObservers();
 }
+
+BMLObject* BMLBodyObject::copy()
+{
+	return new BMLBodyObject();
+}

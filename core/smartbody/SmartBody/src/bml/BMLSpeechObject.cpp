@@ -64,3 +64,8 @@ void BMLSpeechObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }
+
+BMLObject* BMLSpeechObject::copy()
+{
+	return new BMLSpeechObject();
+}

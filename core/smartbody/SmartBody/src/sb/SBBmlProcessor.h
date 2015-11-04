@@ -4,6 +4,7 @@
 #include <sb/SBTypes.h>
 #include <string>
 #include <ostream>
+#include <bml/BMLObject.h>
 
 namespace BML {
 	class Processor;
@@ -33,11 +34,16 @@ class SBBmlProcessor
 		SBAPI BML::Processor* getBMLProcessor();
 
 	protected:
+		std::vector<BMLObject*> parseBML(const std::string& bml);
+		void scheduleBML(std::vector<BMLObject*>& behaviors);
+
 		std::string build_vrX(std::ostringstream& buffer, const std::string& cmd, const std::string& char_id, const std::string& recip_id, const std::string& content, bool for_seq );
 		std::string send_vrX( const char* cmd, const std::string& char_id, const std::string& recip_id,
 			const std::string& seq_id, bool echo, bool send, const std::string& bml );
 
 		BML::Processor* _bmlProcessor;
+
+		std::map<std::string, BMLObject*> _bmlHandlers;
 };
 
 }

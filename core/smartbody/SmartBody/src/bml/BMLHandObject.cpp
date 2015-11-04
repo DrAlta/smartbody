@@ -40,3 +40,8 @@ void BMLHandObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }
+
+BMLObject* BMLHandObject::copy()
+{
+	return new BMLHandObject();
+}

@@ -84,3 +84,8 @@ void BMLGazeObject::notify(SmartBody::SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }
+
+BMLObject* BMLGazeObject::copy()
+{
+	return new BMLGazeObject();
+}

@@ -6,10 +6,11 @@
 class BMLGestureObject : public BMLObject
 {
 	public:
-		BMLGestureObject();
-		~BMLGestureObject();
+		SBAPI BMLGestureObject();
+		SBAPI ~BMLGestureObject();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 
 };
 #endif

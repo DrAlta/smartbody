@@ -6,12 +6,13 @@
 class BMLSpeechObject : public BMLObject
 {
 	public:
-		BMLSpeechObject();
-		~BMLSpeechObject();
+		SBAPI BMLSpeechObject();
+		SBAPI ~BMLSpeechObject();
 
-		virtual std::string getBML();
+		SBAPI virtual std::string getBML();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 
 	protected:
 		SmartBody::StringAttribute* typeAttr;

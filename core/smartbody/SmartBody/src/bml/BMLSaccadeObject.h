@@ -6,10 +6,11 @@
 class BMLSaccadeObject : public BMLObject
 {
 	public:
-		BMLSaccadeObject();
-		~BMLSaccadeObject();
+		SBAPI BMLSaccadeObject();
+		SBAPI ~BMLSaccadeObject();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 };
 
 #endif

@@ -165,51 +165,6 @@
     <ClCompile Include="..\src\bmlcreator\AttributeWindow.cpp">
       <Filter>bmlcreator</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLAnimationObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLBodyObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLConstraintObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLCreatorWindow.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLEventObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLFaceObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLGazeObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLGestureObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLHeadObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLLocomotionObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLReachObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLSaccadeObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLSpeechObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLStateObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\glfont2.cpp" />
     <ClCompile Include="..\src\pic.cpp" />
     <ClCompile Include="..\src\ppm.cpp" />
@@ -325,20 +280,17 @@
     <ClCompile Include="..\src\pythonbind\SBPythonAutorig.cpp">
       <Filter>pythonbind</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLHandObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\autorig\AutoRigViewer.cpp">
       <Filter>autorig</Filter>
     </ClCompile>
     <ClCompile Include="..\src\faceshiftviewer\FaceShiftViewer.cpp">
       <Filter>faceshiftviewer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\bmlcreator\BMLNoiseObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SBInterfaceListener.cpp">
       <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bmlcreator\BMLCreatorWindow.cpp">
+      <Filter>bmlcreator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -439,51 +391,6 @@
       <Filter>faceviewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\bmlcreator\AttributeWindow.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLAnimationObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLBodyObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLConstraintObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLCreatorWindow.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLEventObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLFaceObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLGazeObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLGestureObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLHeadObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLLocomotionObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLReachObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLSaccadeObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLSpeechObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLStateObject.h">
       <Filter>bmlcreator</Filter>
     </ClInclude>
     <ClInclude Include="..\src\glfont2.h" />
@@ -608,20 +515,17 @@
     <ClInclude Include="..\src\pythonbind\SBPythonAutoRig.h">
       <Filter>pythonbind</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLHandObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\autorig\AutoRigViewer.h">
       <Filter>autorig</Filter>
     </ClInclude>
     <ClInclude Include="..\src\faceshiftviewer\FaceShiftViewer.h">
       <Filter>faceshiftviewer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\bmlcreator\BMLNoiseObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\SBInterfaceListener.h">
       <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\bmlcreator\BMLCreatorWindow.h">
+      <Filter>bmlcreator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
