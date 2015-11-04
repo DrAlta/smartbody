@@ -243,23 +243,7 @@ set( SBM_FLTK_SRC
 	./src/CharacterCreatorWindow.cpp
 	./src/bmlcreator/AttributeWindow.cpp
 	./src/bmlcreator/TextEditor.cpp
-	./src/bmlcreator/BMLAnimationObject.cpp
-	./src/bmlcreator/BMLBodyObject.cpp
-	./src/bmlcreator/BMLConstraintObject.cpp
 	./src/bmlcreator/BMLCreatorWindow.cpp
-	./src/bmlcreator/BMLEventObject.cpp
-	./src/bmlcreator/BMLFaceObject.cpp
-	./src/bmlcreator/BMLGazeObject.cpp
-	./src/bmlcreator/BMLGestureObject.cpp
-	./src/bmlcreator/BMLHeadObject.cpp
-	./src/bmlcreator/BMLLocomotionObject.cpp
-	./src/bmlcreator/BMLObject.cpp
-	./src/bmlcreator/BMLReachObject.cpp
-	./src/bmlcreator/BMLSpeechObject.cpp
-	./src/bmlcreator/BMLSaccadeObject.cpp
-	./src/bmlcreator/BMLHandObject.cpp
-	./src/bmlcreator/BMLStateObject.cpp
-	./src/bmlcreator/BMLNoiseObject.cpp
 
 	./src/resourceViewer/Fl_Tree_Horizontal.cpp
 	./src/resourceViewer/TreeItemInfoWidget.cpp
