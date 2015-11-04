@@ -55,3 +55,7 @@ void BMLGestureObject::notify(SBSubject* subject)
 	BMLObject::notify(subject);
 }
 
+BMLObject* BMLGestureObject::copy()
+{
+	return new BMLGestureObject();
+}

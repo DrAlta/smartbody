@@ -6,9 +6,10 @@
 class BMLEventObject : public BMLObject
 {
 	public:
-		BMLEventObject();
-		~BMLEventObject();
+		SBAPI BMLEventObject();
+		SBAPI ~BMLEventObject();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 };
 #endif

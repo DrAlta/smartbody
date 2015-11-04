@@ -6,10 +6,11 @@
 class BMLBodyObject : public BMLObject
 {
 	public:
-		BMLBodyObject();
-		~BMLBodyObject();
+		SBAPI BMLBodyObject();
+		SBAPI ~BMLBodyObject();
 
-		virtual void notify(SmartBody::SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SmartBody::SBSubject* subject);
 
 };
 #endif

@@ -27,3 +27,8 @@ void BMLAnimationObject::notify(SmartBody::SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }
+
+BMLObject* BMLAnimationObject::copy()
+{
+	return new BMLAnimationObject();
+}

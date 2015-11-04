@@ -40,3 +40,8 @@ void BMLConstraintObject::notify(SmartBody::SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }
+
+BMLObject* BMLConstraintObject::copy()
+{
+	return new BMLConstraintObject();
+}

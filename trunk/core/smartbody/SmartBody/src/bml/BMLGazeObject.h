@@ -6,10 +6,11 @@
 class BMLGazeObject : public BMLObject
 {
 	public:
-		BMLGazeObject();
-		~BMLGazeObject();
+		SBAPI BMLGazeObject();
+		SBAPI ~BMLGazeObject();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 
 };
 #endif

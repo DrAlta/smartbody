@@ -6,10 +6,11 @@
 class BMLHandObject : public BMLObject
 {
 	public:
-		BMLHandObject();
-		~BMLHandObject();
+		SBAPI BMLHandObject();
+		SBAPI ~BMLHandObject();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 
 };
 #endif

@@ -6,10 +6,11 @@
 class BMLStateObject : public BMLObject
 {
 	public:
-		BMLStateObject();
-		~BMLStateObject();
+		SBAPI BMLStateObject();
+		SBAPI ~BMLStateObject();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 
 };
 #endif

@@ -6,10 +6,11 @@
 class BMLFaceObject : public BMLObject
 {
 	public:
-		BMLFaceObject();
-		~BMLFaceObject();
+		SBAPI BMLFaceObject();
+		SBAPI ~BMLFaceObject();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 
 };
 #endif

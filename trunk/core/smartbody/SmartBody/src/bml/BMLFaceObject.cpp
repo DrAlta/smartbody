@@ -45,3 +45,8 @@ void BMLFaceObject::notify(SmartBody::SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }
+
+BMLObject* BMLFaceObject::copy()
+{
+	return new BMLFaceObject();
+}

@@ -52,3 +52,8 @@ void BMLReachObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }
+
+BMLObject* BMLReachObject::copy()
+{
+	return new BMLReachObject();
+}

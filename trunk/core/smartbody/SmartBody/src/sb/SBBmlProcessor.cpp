@@ -5,12 +5,75 @@
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBScene.h>
 #include <bml/bml_processor.hpp>
+#include <sbm/rapidxml_utils.hpp>
+#include <bml/BMLAnimationObject.h>
+#include <bml/BMLBodyObject.h>
+#include <bml/BMLConstraintObject.h>
+#include <bml/BMLEventObject.h>
+#include <bml/BMLFaceObject.h>
+#include <bml/BMLGazeObject.h>
+#include <bml/BMLGestureObject.h>
+#include <bml/BMLHandObject.h>
+#include <bml/BMLHeadObject.h>
+#include <bml/BMLLocomotionObject.h>
+#include <bml/BMLNoiseObject.h>
+#include <bml/BMLReachObject.h>
+#include <bml/BMLSaccadeObject.h>
+#include <bml/BMLSpeechObject.h>
+#include <bml/BMLStateObject.h>
 
 namespace SmartBody {
 
 SBBmlProcessor::SBBmlProcessor()
 {
 	_bmlProcessor = new BML::Processor();
+	
+	BMLObject* obj = NULL;
+	obj = new BMLAnimationObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLBodyObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLConstraintObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLEventObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLFaceObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLGazeObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLGestureObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLHandObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLHeadObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLLocomotionObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLNoiseObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLReachObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLSaccadeObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLSpeechObject();
+	_bmlHandlers[obj->getName()] = obj;
+
+	obj = new BMLStateObject();
+	_bmlHandlers[obj->getName()] = obj;
+	
 }
 
 SBBmlProcessor::~SBBmlProcessor()
@@ -182,6 +245,11 @@ std::string SBBmlProcessor::execBML(std::string character, std::string bml)
 				<< "\t\t" << bml
 				<< "\t</bml>\n"
 				<< "</act>";		
+
+	if (SmartBody::SBScene::getScene()->getBoolAttribute("useNewBMLParsing"))
+	{
+		parseBML(entireBml.str());
+	}
 	//return send_vrX( "vrSpeak", character, "ALL", "", true, true, entireBml.str() );
 	return send_vrX( "vrSpeak", character, "ALL", "", false, true, entireBml.str() );	
 }
@@ -265,6 +333,69 @@ BML::Processor* SBBmlProcessor::getBMLProcessor()
 	return _bmlProcessor;
 }
 
+std::vector<BMLObject*> SBBmlProcessor::parseBML(const std::string& bml)
+{
+	rapidxml::xml_document<> doc;
+	doc.parse< 0 >((char*) bml.c_str());
+	
+	std::string participant = "";
+	std::vector<BMLObject*> behaviors;
+
+	// process each act
+	rapidxml::xml_node<>* actNode = doc.first_node("act"); 
+	while (actNode)
+	{
+		// process each bml
+		rapidxml::xml_node<>* participantNode = actNode->first_node("participant");
+		if (participantNode)
+		{
+			rapidxml::xml_attribute<>* attr = participantNode->first_attribute("id");
+			if (attr)
+			{
+				participant = attr->name();
+			}
+		}
+
+		rapidxml::xml_node<>* bmlNode = actNode->first_node("bml");
+		while (bmlNode)
+		{
+			rapidxml::xml_node<>* behaviorNode = bmlNode->first_node();
+			while (behaviorNode)
+			{
+				char* behaviorName = behaviorNode->name();
+				std::map<std::string, BMLObject*>::iterator iter = _bmlHandlers.find(behaviorName);
+				if (iter == _bmlHandlers.end())
+				{
+					LOG("BML parsing problem: cannot find handler for BML instruction: '%s'", behaviorName);
+					continue;
+				}
+				BMLObject* bmlHandlerObject = (*iter).second;
+				// create an instance of this object that will handle the parsing
+				BMLObject* bmlInstance = bmlHandlerObject->copy();
+				// parse the XML
+				bmlInstance->parse(behaviorNode);
+
+				behaviors.push_back(bmlInstance);
+
+				behaviorNode = behaviorNode->next_sibling();
+			}
+			bmlNode = bmlNode->next_sibling("bml");
+
+		}
+		actNode = actNode->next_sibling();
+	}
+
+	return behaviors;
+}
+
+void SBBmlProcessor::scheduleBML(std::vector<BMLObject*>& behaviors)
+{
+	for (std::vector<BMLObject*>::iterator iter = behaviors.begin();
+		 iter != behaviors.end();
+		 iter++)
+	{
+	}
+}
 
 } // namespace
 

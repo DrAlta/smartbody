@@ -53,3 +53,8 @@ void BMLStateObject::notify(SBSubject* subject)
 
 	notifyObservers();
 }
+
+BMLObject* BMLStateObject::copy()
+{
+	return new BMLStateObject();
+}

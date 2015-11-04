@@ -6,9 +6,10 @@
 class BMLConstraintObject : public BMLObject
 {
 	public:
-		BMLConstraintObject();
-		~BMLConstraintObject();
+		SBAPI BMLConstraintObject();
+		SBAPI ~BMLConstraintObject();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 };
 #endif

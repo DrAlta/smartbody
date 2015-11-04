@@ -6,10 +6,11 @@
 class BMLLocomotionObject : public BMLObject
 {
 	public:
-		BMLLocomotionObject();
-		~BMLLocomotionObject();
+		SBAPI BMLLocomotionObject();
+		SBAPI ~BMLLocomotionObject();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 
 };
 #endif

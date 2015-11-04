@@ -6,10 +6,11 @@
 class BMLReachObject : public BMLObject
 {
 	public:
-		BMLReachObject();
-		~BMLReachObject();
+		SBAPI BMLReachObject();
+		SBAPI ~BMLReachObject();
 
-		virtual void notify(SBSubject* subject);
+		SBAPI virtual BMLObject* copy();
+		SBAPI virtual void notify(SBSubject* subject);
 
 };
 #endif

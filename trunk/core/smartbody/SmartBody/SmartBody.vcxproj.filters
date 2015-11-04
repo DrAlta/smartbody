@@ -1201,6 +1201,54 @@
     <ClCompile Include="src\sb\SBRealtimeManager.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="src\bml\BMLAnimationObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLBodyObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLConstraintObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLEventObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLFaceObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLGazeObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLGestureObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLHandObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLHeadObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLLocomotionObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLNoiseObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLReachObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLSaccadeObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLSpeechObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bml\BMLStateObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2399,6 +2447,54 @@
     </ClInclude>
     <ClInclude Include="src\sb\SBRealtimeManager.h">
       <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLAnimationObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLBodyObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLConstraintObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLEventObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLFaceObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLGazeObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLGestureObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLHandObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLHeadObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLLocomotionObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLNoiseObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLReachObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLSaccadeObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLSpeechObject.h">
+      <Filter>bml</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bml\BMLStateObject.h">
+      <Filter>bml</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

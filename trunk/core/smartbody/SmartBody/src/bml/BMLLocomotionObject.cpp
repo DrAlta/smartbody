@@ -40,3 +40,8 @@ void BMLLocomotionObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }
+
+BMLObject* BMLLocomotionObject::copy()
+{
+	return new BMLLocomotionObject();
+}

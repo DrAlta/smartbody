@@ -18,3 +18,8 @@ void BMLEventObject::notify(SBSubject* subject)
 {
 	BMLObject::notify(subject);
 }
+
+BMLObject* BMLEventObject::copy()
+{
+	return new BMLEventObject();
+}
