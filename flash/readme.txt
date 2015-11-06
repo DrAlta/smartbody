@@ -1,1 +1,0 @@
-For more details please go to smartbody documentation "Building SmartBody for Flash" session.
