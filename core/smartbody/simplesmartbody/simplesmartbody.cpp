@@ -60,6 +60,8 @@ int main( int argc, char ** argv )
 	int numMotions = scene->getNumMotions();
 	LOG("Loaded %d motions...", numMotions);
 
+	scene->loadAssetsFromPath("behaviorsets/MaleMocapLocomotion/motions/ChrMarine@RunCircleRt01.skm");
+
 	// create a character
 	LOG("Creating the character...");
 	SmartBody::SBCharacter* character = scene->createCharacter("mycharacter", "");
@@ -89,7 +91,7 @@ int main( int argc, char ** argv )
 	}
 
 	// make the character do something
-	scene->getBmlProcessor()->execBML("mycharacter", "<body posture=\"ChrBrad@Idle01\"/>");
+	scene->getBmlProcessor()->execBML("mycharacter", "<body posture=\"ChrMarine@RunCircleRt01\"/>");
 	
 	LOG("Starting the simulation...");
 	double lastPrint = 0;
