@@ -54,6 +54,8 @@ class SBPhonemeManager : public SBService
 		SBAPI std::string getDictionaryFile(const std::string& language);
 		SBAPI void generatePhoneTrigrams(const std::string& lipsyncSetName);
 
+		SBAPI void saveLipSyncAnimation(const std::string characterName, const std::string lipsyncFile, const std::string outputFile);
+
 	protected:
 		std::map<std::string, std::vector<SBDiphone*> > _diphoneMap;
 		std::map<std::string, std::string> _phonemeToCommonPhonemeMap;
@@ -62,6 +64,7 @@ class SBPhonemeManager : public SBService
 		std::map<std::string, std::string> _dictionaryFileMap;
 
 		std::map<std::string, std::vector<RealTimePhoneme> > _realtimePhonemes;
+		std::map<std::string, std::vector<float> > _lastLipSyncAnimation;
 };
 
 }

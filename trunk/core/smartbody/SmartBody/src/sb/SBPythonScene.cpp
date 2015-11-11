@@ -50,6 +50,7 @@
 #include <sb/SBSceneListener.h>
 #include <sb/SBNavigationMeshManager.h>
 #include <sb/SBHandConfigurationManager.h>
+#include <sb/SBDebuggerServer.h>
 #include <sb/SBMotionGraph.h>
 #include <sr/sr_box.h>
 #include <sr/sr_camera.h>
@@ -188,6 +189,7 @@ void pythonFuncsScene()
 		.def("getHandConfigurationManager", &SBScene::getHandConfigurationManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the hand configuration manager.")
 		.def("getRealtimeManager", &SBScene::getRealtimeManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the real time data manager.")
 		.def("getFaceShiftManager", &SBScene::getFaceShiftManager, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the FaceShift manager.")
+		.def("getDebuggerServer", &SBScene::getDebuggerServer, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the debugger server.")
 
 
 		.def("getParser", &SBScene::getParser, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the Charniak parser.")

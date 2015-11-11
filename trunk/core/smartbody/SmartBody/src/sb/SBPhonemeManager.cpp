@@ -2,6 +2,7 @@
 #include <sb/SBPhoneme.h>
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBCharacter.h>
 #include <algorithm>
 #include <vector>
 #include <set>
@@ -10,6 +11,9 @@
 #include <cctype>
 #include <cstring>
 #include <sbm/sbm_speech.hpp>
+#include <sbm/rapidxml_utils.hpp>
+#include <sbm/rapidxml.hpp>
+#include <bml/bml_speech.hpp>
 
 namespace SmartBody {
 
@@ -70,8 +74,8 @@ void SBPhonemeManager::addPhonemeMapping(const std::string& from, const std::str
 {
 	std::string upperCaseFrom = from;
 	std::string upperCaseTo = to;
-	std::transform(upperCaseFrom.begin(), upperCaseFrom.end(), upperCaseFrom.begin(), toupper);
-	std::transform(upperCaseTo.begin(), upperCaseTo.end(), upperCaseTo.begin(), toupper);
+	std::transform(upperCaseFrom.begin(), upperCaseFrom.end(), upperCaseFrom.begin(), ::toupper);
+	std::transform(upperCaseTo.begin(), upperCaseTo.end(), upperCaseTo.begin(), ::toupper);
 
 	std::map<std::string, std::string>::iterator iter = _phonemeToCommonPhonemeMap.find(upperCaseFrom);
 	if (iter != _phonemeToCommonPhonemeMap.end())
@@ -84,7 +88,7 @@ void SBPhonemeManager::addPhonemeMapping(const std::string& from, const std::str
 std::string SBPhonemeManager::getPhonemeMapping(const std::string& from)
 {
 	std::string uppercaseFrom = from;
-	std::transform(uppercaseFrom.begin(), uppercaseFrom.end(), uppercaseFrom.begin(), toupper);
+	std::transform(uppercaseFrom.begin(), uppercaseFrom.end(), uppercaseFrom.begin(), ::toupper);
 	std::map<std::string, std::string>::iterator iter = _phonemeToCommonPhonemeMap.find(uppercaseFrom);
 	if (iter != _phonemeToCommonPhonemeMap.end())
 	{
@@ -486,7 +490,7 @@ void SBPhonemeManager::removePhonemesRealtime(const std::string& character, int 
 	std::map<std::string, std::vector<RealTimePhoneme> >::iterator iter = _realtimePhonemes.find(character);
 	if (iter != _realtimePhonemes.end())
 	{
-		if ((*iter).second.size() < amount)
+		if ((*iter).second.size() < (size_t) amount)
 			amount = (*iter).second.size();
 		int num = 0;
 		while (num < amount)
@@ -599,6 +603,178 @@ void SBPhonemeManager::generatePhoneTrigrams(const std::string& lipsyncSetName)
 	}
 
 }
+
+void SBPhonemeManager::saveLipSyncAnimation(const std::string characterName, const std::string lipsyncFile, const std::string outputFile)
+{
+	// load the lip sync file (.bml)
+	rapidxml::file<char> bmlFile(lipsyncFile.c_str());
+	rapidxml::xml_document<> bmldoc;
+	bmldoc.parse< 0 >((char*) lipsyncFile.data());
+	rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
+
+	if (!bmlnode)
+	{
+		LOG( "Could not find <bml> tag in %s. No output file named '%s' written.", lipsyncFile.c_str(), outputFile.c_str());
+		return;
+	}
+
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+	if (character)
+	{
+		LOG("Could not find character with name '%s'. No output file named '%s' written.", characterName.c_str(), outputFile.c_str());
+		return;
+	}
+
+	std::string lipSyncSetName = character->getStringAttribute("lipsyncSetName");
+	if (lipSyncSetName == "")
+	{
+		LOG("Could not find lip sync data set '%s' for character with name '%s'. Please set the 'lipsyncSetName' attribute to a valid lip sync set first. No output file named '%s' written.", lipSyncSetName.c_str(), characterName.c_str(), outputFile.c_str());
+		return;
+	}
+
+	std::vector<SmartBody::SBDiphone*>& diphones = this->getDiphones(lipSyncSetName);
+	if (diphones.size() == 0)
+	{
+		LOG("Lip sync data for set '%s' is empty. Please load a lip sync set first. No output file named '%s' written.", lipSyncSetName.c_str(), outputFile.c_str());
+		return;
+	}
+
+	std::vector<VisemeData*> visemes;
+
+	rapidxml::xml_node<>* node = bmlnode->first_node("lips");
+	while (node)
+	{
+		rapidxml::xml_attribute<>* visemeAttr = node->first_attribute("viseme");
+		std::string viseme = "";
+		if (visemeAttr)
+			viseme = visemeAttr->value();
+
+		rapidxml::xml_attribute<>* artiulationAttr = node->first_attribute("articulation");
+		std::string articulation = "";
+		if (artiulationAttr)
+			articulation = artiulationAttr->value();
+
+		rapidxml::xml_attribute<>* startAttr = node->first_attribute("start");
+		std::string start = "";
+		if (startAttr)
+			start = startAttr->value();
+
+		rapidxml::xml_attribute<>* endAttr = node->first_attribute("end");
+		std::string end = "";
+		if (endAttr)
+			end = endAttr->value();
+
+
+		float startTime = (float)atof( start.c_str() );
+		float endTime = (float)atof( end.c_str() );
+
+		float weight = (float) atof( articulation.c_str());
+		VisemeData* curViseme = new VisemeData(viseme, weight, startTime,  endTime - startTime);
+
+		visemes.push_back(curViseme);
+
+		node = node->next_sibling("lips");
+	}
+
+	// generate the curves
+	std::map<std::string, std::vector<float> > tempCurves = BML::SpeechRequest::generateCurvesGivenDiphoneSet(&visemes, lipSyncSetName, characterName);
+	
+
+	// save the curves to a .dae file
+	std::ofstream daeStream (outputFile, std::ios::out);
+	if (!daeStream.good())
+	{
+		LOG("Cannot write to file '%s'. No output file written.", outputFile.c_str());
+		return;
+	}
+
+	daeStream << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
+	daeStream << "<COLLADA xmlns=\"http://www.collada.org/2005/11/COLLADASchema\" version=\"1.4.1\">" << std::endl;
+	daeStream << "<asset>" << std::endl;
+	daeStream << "<contributor>" << std::endl;
+	daeStream << "<author>SmartBody</author>" << std::endl;
+	daeStream << "<authoring_tool>SmartBody</authoring_tool>" << std::endl;
+	daeStream << "<comments>" << std::endl;
+	daeStream << "Lip sync data generated by SmartBody" << std::endl;
+	daeStream << "</comments>" << std::endl;
+	daeStream << "<source_data>" << lipsyncFile << "</source_data>" << std::endl;
+	daeStream << "</contributor>" << std::endl;
+
+	time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+
+	daeStream << "<created>" << buf << "</created>" << std::endl;
+	daeStream << "<modified>" << buf << "</modified>" << std::endl;
+
+	daeStream << "<library_animations>" << std::endl;
+	daeStream << "<animation name=\"" << lipsyncFile << "\" id=\"" << lipsyncFile << "\">" << std::endl;
+
+	for (std::map<std::string, std::vector<float> >::iterator curvesIter = tempCurves.begin();
+		 curvesIter != tempCurves.end();
+		 curvesIter++)
+	{
+		std::string channelName = (*curvesIter).first;
+
+		// input
+		daeStream << "<source id=\"" << channelName << "-input\">" << std::endl;
+		daeStream << "<float_array id=\"" << channelName << "-input-array\" count=\"";
+		std::vector<float>& values = (*curvesIter).second;
+		daeStream << values.size() << "\">";
+		for (size_t i = 0; i < values.size(); i+2)
+		{
+			daeStream << values[i] << " ";
+		}
+		daeStream << "</float_array>" << std::endl;
+		daeStream << "<technique_common>" << std::endl;
+		daeStream << "<accessor source=\"#" << channelName << "-input-array\" count=\"" << values.size() << "\" stride=\"1\">" << std::endl;
+		daeStream << "<param name=\"TIME\" type=\"float\"/>" << std::endl;
+		daeStream << "</accessor>" << std::endl;
+		daeStream << "</technique_common>" << std::endl;
+		daeStream << "</source>" << std::endl;
+
+		// output
+		daeStream << "<source id=\"" << channelName << "-output\">" << std::endl;
+		daeStream << "<float_array id=\"" << channelName << "-output-array\" count=\"";
+
+		daeStream << values.size() << "\">";
+		for (size_t i = 1; i < values.size(); i+2)
+		{
+			daeStream << values[i] << " ";
+		}
+		daeStream << "</float_array>" << std::endl;
+		daeStream << "<technique_common>" << std::endl;
+		daeStream << "<accessor source=\"#" << channelName << "-output-array\" count=\"" << values.size() << "\" stride=\"1\">" << std::endl;
+		daeStream << "<param name=\"TIME\" type=\"float\"/>" << std::endl;
+		daeStream << "</accessor>" << std::endl;
+		daeStream << "</technique_common>" << std::endl;
+		daeStream << "</source>" << std::endl;
+
+		// interpolation
+		daeStream << "<source id=\"" << channelName << "-interpolations\">" << std::endl;
+		daeStream << "<NAME_array id=\"" << channelName << "-interpolations-array\" count=\"2\">LINEAR LINEAR</NAME_array>" << std::endl;
+		daeStream << "<technique_common>" << std::endl;
+		daeStream << "< accessor source=\"#" << channelName << "-interpolations-array\" count=\"2\" stride=\"1\">" << std::endl;
+		daeStream << "<param name=\"INTERPOLATION\" type=\"float\"/>" << std::endl;
+		daeStream << "</accessor >" << std::endl;
+		daeStream << "</technique_common>" << std::endl;
+		daeStream << "</source>" << std::endl;
+
+		// sampler
+		daeStream << "<channel source=\"#\"" << channelName << "Skeleton-sampler\" target=\"" << channelName << "_Skeleton/trans.X\"/>" << std::endl;
+	}
+
+
+	daeStream << "</animation>" << std::endl;
+
+	daeStream.close();
+
+
+}
+
+
 
 
 }

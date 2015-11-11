@@ -22,8 +22,9 @@
 # $(SB_LOCAL_PATH)/../../include/festival/include \
 # $(SB_LOCAL_PATH)/../../include/festival/include/VHDuration \
 
+LOCAL_SHORT_COMMANDS := true
 
-#USE_CEREVOICE:=true
+USE_CEREVOICE:=true
 
 
 SB_LOCAL_PATH := $(call my-dir)

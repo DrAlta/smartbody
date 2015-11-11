@@ -300,6 +300,11 @@ void SBAttribute::copyAttrValue( SBAttribute* inAttr )
 
 }
 
+bool SBAttribute::isDefaultValue()
+{
+	return false;
+}
+
 BoolAttribute::BoolAttribute() : SBAttribute()
 {
 	m_value = false;
@@ -411,6 +416,14 @@ void BoolAttribute::copyAttrValue( SBAttribute* inAttr )
 	if (!boolAttr) return; // do nothing
 	setValue(boolAttr->getValue());
 	setDefaultValue(boolAttr->getDefaultValue());
+}
+
+bool BoolAttribute::isDefaultValue()
+{
+	if (this->getValue() == this->getDefaultValue())
+		return true;
+	else
+		return false;
 }
 
 //////////////////////////////////////////////////
@@ -560,6 +573,17 @@ void IntAttribute::copyAttrValue( SBAttribute* inAttr )
 	setValue(intAttr->getValue());
 	setDefaultValue(intAttr->getDefaultValue());
 }
+
+
+bool IntAttribute::isDefaultValue()
+{
+	if (this->getValue() == this->getDefaultValue())
+		return true;
+	else
+		return false;
+}
+
+
 //////////////////////////////////////////////////
 
 DoubleAttribute::DoubleAttribute() : SBAttribute()
@@ -708,6 +732,15 @@ void DoubleAttribute::copyAttrValue( SBAttribute* inAttr )
 	setValue(doubleAttr->getValue());
 	setDefaultValue(doubleAttr->getDefaultValue());
 }
+
+bool DoubleAttribute::isDefaultValue()
+{
+	if (this->getValue() == this->getDefaultValue())
+		return true;
+	else
+		return false;
+}
+
 //////////////////////////////////////////////////
 
 StringAttribute::StringAttribute() : SBAttribute()
@@ -850,6 +883,14 @@ void StringAttribute::copyAttrValue( SBAttribute* inAttr )
 	setDefaultValue(strAttr->getDefaultValue());
 }
 
+bool StringAttribute::isDefaultValue()
+{
+	if (this->getValue() == this->getDefaultValue())
+		return true;
+	else
+		return false;
+}
+
 //////////////////////////////////////////////////
 
 Vec3Attribute::Vec3Attribute() : SBAttribute()
@@ -966,6 +1007,15 @@ void Vec3Attribute::copyAttrValue( SBAttribute* inAttr )
 	setValue(vec3Attr->getValue());
 	setDefaultValue(vec3Attr->getDefaultValue());
 }
+
+bool Vec3Attribute::isDefaultValue()
+{
+	if (this->getValue() == this->getDefaultValue())
+		return true;
+	else
+		return false;
+}
+
 MatrixAttribute::MatrixAttribute()
 {
 	m_value.identity();
@@ -1091,6 +1141,15 @@ void MatrixAttribute::copyAttrValue( SBAttribute* inAttr )
 	setValue(matAttr->getValue());
 	setDefaultValue(matAttr->getDefaultValue());
 }
+
+bool MatrixAttribute::isDefaultValue()
+{
+	if (this->getValue() == this->getDefaultValue())
+		return true;
+	else
+		return false;
+}
+
 
 ActionAttribute::ActionAttribute()
 {

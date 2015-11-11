@@ -20,8 +20,9 @@
 using std::string;
 using std::vector;
 
+namespace SmartBody {
 
-SBDebuggerServer::SBDebuggerServer()
+SBDebuggerServer::SBDebuggerServer() : SBService()
 {
 #ifndef SB_NO_VHMSG
    m_sbmFriendlyName = "sbm";
@@ -60,8 +61,8 @@ void SBDebuggerServer::Init()
    }
 
 
-   m_hostname = vhcl::SocketGetHostname();
-
+   if (m_hostname == "")
+	   m_hostname = vhcl::SocketGetHostname();
 
    m_sockTCP = vhcl::SocketOpenTcp();
 #ifdef WIN32
@@ -146,6 +147,18 @@ void SBDebuggerServer::SetID(const std::string & id)
 const std::string& SBDebuggerServer::GetID()
 {
 	return m_fullId;
+}
+
+void SBDebuggerServer::setHostname(const std::string & name)
+{
+	m_hostname = name;
+
+	m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
+}
+
+const std::string& SBDebuggerServer::getHostname()
+{
+	return m_hostname;
 }
 
 void SBDebuggerServer::Update()
@@ -260,6 +273,10 @@ void SBDebuggerServer::Update()
          vhcl::SocketSetBlocking(socket, false);
          m_sockConnectionsTCP.push_back(socket);
       }
+	  else
+	  {
+		  LOG("Could not create socket on %s");
+	  }
    }
 
 
@@ -511,4 +528,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
       }
    }
 #endif
+}
+
+
 }

@@ -219,3 +219,51 @@ void BMLObject::parse(rapidxml::xml_node<>* node)
 		}
 	}
 }
+
+std::vector<SmartBody::SBSyncPoint*> BMLObject::getSyncPointObjects()
+{
+	std::vector<SmartBody::SBSyncPoint*> syncPoints;
+
+	std::string id = this->getStringAttribute("id");
+	if (id != "")
+	{
+			SmartBody::SBSyncPoint* spStart = new SmartBody::SBSyncPoint(id + ":start");
+			SmartBody::SBSyncPoint* spEnd = new SmartBody::SBSyncPoint(id + ":end");
+			syncPoints.push_back(spStart);
+			syncPoints.push_back(spEnd);
+	}
+
+	return syncPoints;
+}
+
+std::vector<SmartBody::SBTrigger*> BMLObject::getTriggers()
+{
+	std::vector<SmartBody::SBTrigger*> triggers;
+
+	std::string start = this->getStringAttribute("start");
+	if (start != "")
+	{
+		SmartBody::SBTrigger* trigger = new SmartBody::SBTrigger();
+		trigger->setStartTag(start);
+		triggers.push_back(trigger);
+	}
+
+	std::string end = this->getStringAttribute("end");
+	if (end != "")
+	{
+		SmartBody::SBTrigger* trigger = new SmartBody::SBTrigger();
+		trigger->setEndTag(end);
+		triggers.push_back(trigger);
+	}
+
+	return triggers;
+
+}
+
+void BMLObject::start()
+{
+}
+
+void BMLObject::stop()
+{
+}

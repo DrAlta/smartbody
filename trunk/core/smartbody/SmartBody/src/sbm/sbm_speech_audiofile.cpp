@@ -1068,7 +1068,7 @@ void AudioFileSpeech::ReadVisemeDataBMLFast( const char * filename, std::vector<
 				start = startAttr->value();
 
 
-			rapidxml::xml_attribute<>* readyAttr = node->first_attribute("start");
+			rapidxml::xml_attribute<>* readyAttr = node->first_attribute("ready");
 			string ready = "";
 			if (readyAttr)
 				ready = readyAttr->value();

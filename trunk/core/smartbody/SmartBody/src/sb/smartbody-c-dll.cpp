@@ -773,7 +773,7 @@ SBAPI void SBM_SBDebuggerServer_SetID( SBMHANDLE sbmHandle, const char * id )
    }
 
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
-   SBDebuggerServer * debuggerServer = scene->getDebuggerServer();
+   SmartBody::SBDebuggerServer * debuggerServer = scene->getDebuggerServer();
 
    debuggerServer->SetID( id );
 }
@@ -787,7 +787,7 @@ SBAPI void SBM_SBDebuggerServer_SetCameraValues( SBMHANDLE sbmHandle, double x, 
    }
 
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
-   SBDebuggerServer * debuggerServer = scene->getDebuggerServer();
+   SmartBody::SBDebuggerServer * debuggerServer = scene->getDebuggerServer();
 
    debuggerServer->m_cameraPos.x = x;
    debuggerServer->m_cameraPos.y = y;
@@ -811,7 +811,7 @@ SBAPI void SBM_SBDebuggerServer_SetRendererIsRightHanded( SBMHANDLE sbmHandle, b
    }
 
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
-   SBDebuggerServer * debuggerServer = scene->getDebuggerServer();
+   SmartBody::SBDebuggerServer * debuggerServer = scene->getDebuggerServer();
 
    debuggerServer->m_rendererIsRightHanded = enabled;
 }

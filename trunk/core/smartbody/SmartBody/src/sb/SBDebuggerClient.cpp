@@ -21,6 +21,8 @@
 using std::string;
 using std::vector;
 
+namespace SmartBody {
+
 SBDebuggerClient::SBDebuggerClient()
 {
 	m_sockTCP_client = 0;
@@ -476,4 +478,6 @@ void SBDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
       }
    }
 #endif
+}
+
 }

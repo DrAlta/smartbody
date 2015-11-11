@@ -34,6 +34,7 @@ class SBAttribute : public SBSubject
 		SBAPI virtual SBAttribute* copy();
 		// set the value according to input attribute
 		SBAPI virtual void copyAttrValue(SBAttribute* inAttr);
+		SBAPI virtual bool isDefaultValue();
 
 
 	protected:
@@ -116,6 +117,7 @@ class BoolAttribute : public SBAttribute
 		SBAPI virtual void read();
 		SBAPI virtual SBAttribute* copy();
 		SBAPI virtual void copyAttrValue(SBAttribute* inAttr);
+		SBAPI virtual bool isDefaultValue();
 
 	private:
 		bool m_value;
@@ -143,6 +145,7 @@ class IntAttribute : public SBAttribute
 		SBAPI virtual void read();
 		SBAPI virtual SBAttribute* copy();
 		SBAPI virtual void copyAttrValue(SBAttribute* inAttr);
+		SBAPI virtual bool isDefaultValue();
 
 	private:
 		int m_value;
@@ -172,6 +175,7 @@ class DoubleAttribute : public SBAttribute
 		SBAPI virtual void read();
 		SBAPI virtual SBAttribute* copy();
 		SBAPI virtual void copyAttrValue(SBAttribute* inAttr);
+		SBAPI virtual bool isDefaultValue();
 
 	private:
 		double m_value;
@@ -199,6 +203,7 @@ class StringAttribute : public SBAttribute
 		SBAPI virtual void read();
 		SBAPI virtual SBAttribute* copy();
 		SBAPI virtual void copyAttrValue(SBAttribute* inAttr);
+		SBAPI virtual bool isDefaultValue();
 
 	private:
 		std::string m_value;
@@ -223,6 +228,7 @@ class Vec3Attribute : public SBAttribute
 		SBAPI virtual void read();
 		SBAPI virtual SBAttribute* copy();
 		SBAPI virtual void copyAttrValue(SBAttribute* inAttr);
+		SBAPI virtual bool isDefaultValue();
 
 	private:
 		SrVec m_value;
@@ -246,6 +252,7 @@ class MatrixAttribute : public SBAttribute
 		SBAPI virtual void read();
 		SBAPI virtual SBAttribute* copy();
 		SBAPI virtual void copyAttrValue(SBAttribute* inAttr);
+		SBAPI virtual bool isDefaultValue();
 
 	private:
 		SrMat m_value;
@@ -264,7 +271,7 @@ class ActionAttribute : public SBAttribute
 
 		SBAPI virtual std::string write();
 		SBAPI virtual void read();
-		SBAPI virtual SBAttribute* copy();		
+		SBAPI virtual SBAttribute* copy();
 };
 
 };

@@ -9,6 +9,9 @@ class BMLHeadObject : public BMLObject
 		SBAPI BMLHeadObject();
 		SBAPI ~BMLHeadObject();
 
+		SBAPI void start();
+		SBAPI void stop();
+
 		SBAPI virtual BMLObject* copy();
 		SBAPI virtual void notify(SBSubject* subject);
 

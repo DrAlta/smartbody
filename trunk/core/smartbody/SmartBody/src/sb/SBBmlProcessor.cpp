@@ -6,6 +6,7 @@
 #include <sb/SBScene.h>
 #include <bml/bml_processor.hpp>
 #include <sbm/rapidxml_utils.hpp>
+#include <bml/BMLObject.h>
 #include <bml/BMLAnimationObject.h>
 #include <bml/BMLBodyObject.h>
 #include <bml/BMLConstraintObject.h>
@@ -23,6 +24,78 @@
 #include <bml/BMLStateObject.h>
 
 namespace SmartBody {
+
+SBTrigger::SBTrigger()
+{
+	_offset = 0;
+}
+
+SBTrigger::~SBTrigger()
+{
+}
+
+void SBTrigger::setOffset(double val)
+{
+	_offset = val;
+}
+
+double SBTrigger::getOffset()
+{
+	return _offset;
+}
+
+void SBTrigger::setStartTag(std::string tag)
+{
+	_startTag = tag;
+}
+
+std::string SBTrigger::getStartTag()
+{
+	return _startTag;
+}
+
+void SBTrigger::setEndTag(std::string tag)
+{
+	_endTag = tag;
+}
+
+std::string SBTrigger::getEndTag()
+{
+	return _endTag;
+}
+
+SBSyncPoint::SBSyncPoint(const std::string& name)
+{
+	_name = name;
+}
+
+SBSyncPoint::~SBSyncPoint()
+{
+}
+
+
+SBBMLSchedule::SBBMLSchedule()
+{
+}
+
+SBBMLSchedule::~SBBMLSchedule()
+{
+}
+
+void SBBMLSchedule::setCharacter(std::string name)
+{
+	_characterName = name;
+}
+
+std::string SBBMLSchedule::getCharacter()
+{
+	return _characterName;
+}
+
+void SBBMLSchedule::remove()
+{
+	// mark any dependent blocks since they are no longer valid
+}
 
 SBBmlProcessor::SBBmlProcessor()
 {
@@ -248,7 +321,8 @@ std::string SBBmlProcessor::execBML(std::string character, std::string bml)
 
 	if (SmartBody::SBScene::getScene()->getBoolAttribute("useNewBMLParsing"))
 	{
-		parseBML(entireBml.str());
+		std::vector<BMLObject*> behaviors = parseBML(entireBml.str());
+		scheduleBML(behaviors);
 	}
 	//return send_vrX( "vrSpeak", character, "ALL", "", true, true, entireBml.str() );
 	return send_vrX( "vrSpeak", character, "ALL", "", false, true, entireBml.str() );	
@@ -394,6 +468,29 @@ void SBBmlProcessor::scheduleBML(std::vector<BMLObject*>& behaviors)
 		 iter != behaviors.end();
 		 iter++)
 	{
+
+
+	}
+}
+
+void SBBmlProcessor::processBML(double time)
+{
+	for (std::map<std::string, SBBMLSchedule*>::iterator iter = _bmlSchedules.begin();
+		 iter != _bmlSchedules.end();
+		 iter++)
+	{
+		SBBMLSchedule* schedule = (*iter).second;
+		std::string characterName = (*iter).first;
+		SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
+		if (!character)
+		{
+			// character no longer exists, remove the schedule
+			schedule->remove();
+		}
+
+		// go through all the 
+
+
 	}
 }
 
