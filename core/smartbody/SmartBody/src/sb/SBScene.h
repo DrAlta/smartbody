@@ -16,8 +16,7 @@
 #endif
 #endif
 
-class SBDebuggerServer;
-class SBDebuggerClient;
+
 class SBDebuggerUtility;
 class SrCamera;
 class CameraTrack;
@@ -65,6 +64,8 @@ class SBCommandManager;
 class SBNavigationMesh;
 class SBMotionGraphManager;
 class SBHandConfigurationManager;
+class SBDebuggerServer;
+class SBDebuggerClient;
 
 class SBScene : public SBObject
 {

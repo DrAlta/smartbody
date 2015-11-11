@@ -48,6 +48,7 @@
 #include <sb/SBNavigationMeshManager.h>
 #include <sb/SBHandConfigurationManager.h>
 #include <sb/SBHandConfiguration.h>
+#include <sb/SBDebuggerServer.h>
 #include <sb/SBEvent.h>
 #include <sb/SBSceneListener.h>
 #include <sb/SBNavigationMesh.h>
@@ -365,9 +366,15 @@ boost::python::class_<SBObserver>("SBObserver")
 
 
 	boost::python::class_<SBFaceShiftManager, boost::python::bases<SBService> >("SBFaceShiftManager")
-		.def("getCoeffValue", &SBFaceShiftManager::getCoeffValue, "Get coefficient value of a specific blend shape.")
-		.def("getHeadRotation", &SBFaceShiftManager::getHeadRotation, "Get head rotation.")
+		.def("getCoeffValue", &SBFaceShiftManager::getCoeffValue, boost::python::return_value_policy<boost::python::return_by_value>(), "Get coefficient value of a specific blend shape.")
+		.def("getHeadRotation", &SBFaceShiftManager::getHeadRotation, boost::python::return_value_policy<boost::python::return_by_value>(), "Get head rotation.")
 		;
+
+	boost::python::class_<SBDebuggerServer, boost::python::bases<SBService> >("SBDebuggerServer")
+		.def("getHostname", &SBDebuggerServer::getHostname, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the hostname for use with the debugger.")
+		.def("setHostname", &SBDebuggerServer::setHostname, "Sets the hostname for use with the debugger.")
+		;
+
 
 	boost::python::class_<SBPhysicsManager, boost::python::bases<SBService> >("SBPhysicsManager")
 		.def("createPhysicsCharacter", &SBPhysicsManager::createPhysicsCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a physics character.")
@@ -395,7 +402,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		;
 
 
-	boost::python::class_<SBPhonemeManager>("SBPhonemeManager")
+	boost::python::class_<SBPhonemeManager, boost::python::bases<SBService> >("SBPhonemeManager")
 		.def("createDiphone", &SBPhonemeManager::createDiphone, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a diphone.")
 		.def("getDiphones", &SBPhonemeManager::getDiphones, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get diphones given diphone set name.")
 		.def("getDiphone", &SBPhonemeManager::getDiphone, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get diphone given from phoneme, to phoneme and diphone set name.")

@@ -37,7 +37,7 @@ void SBDebuggerUtility::initScene()
 void SBDebuggerUtility::queryResources()
 {
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
-	SBDebuggerClient* client = sbScene->getDebuggerClient();
+	SmartBody::SBDebuggerClient* client = sbScene->getDebuggerClient();
 	if (!client)
 		return;
 

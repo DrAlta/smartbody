@@ -4,6 +4,7 @@
 #include "sb/SBObject.h"
 #include <string>
 #include <sbm/rapidxml_utils.hpp>
+#include <sb/SBBmlProcessor.h>
 
 class BMLObject : public SmartBody::SBObject
 {
@@ -17,6 +18,12 @@ class BMLObject : public SmartBody::SBObject
 		SBAPI virtual BMLObject* copy();
 		SBAPI virtual void constructBML();
 		SBAPI virtual std::string getBML();
+
+		SBAPI std::vector<SmartBody::SBSyncPoint*> getSyncPointObjects();
+		SBAPI std::vector<SmartBody::SBTrigger*> getTriggers();
+
+		SBAPI void start();
+		SBAPI void stop();
 
 	protected:
 		std::string _bml;

@@ -71,8 +71,8 @@ void MonitorConnectWindow::loadProcesses()
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
 	SmartBody::SBScene::getScene()->setRemoteMode(true);
 
-	SBDebuggerClient* c = sbScene->getDebuggerClient();
-	SBDebuggerServer* s = sbScene->getDebuggerServer();
+	SmartBody::SBDebuggerClient* c = sbScene->getDebuggerClient();
+	SmartBody::SBDebuggerServer* s = sbScene->getDebuggerServer();
 	c->QuerySbmProcessIds();
 	vhcl::Sleep(2);
 	sbScene->getVHMsgManager()->poll();
@@ -95,8 +95,8 @@ void MonitorConnectWindow::OnConfirmCB(Fl_Widget* widget, void* data)
 #ifndef SB_NO_VHMSG
 	MonitorConnectWindow* monitorConnectWindow = (MonitorConnectWindow*) data;
 	SmartBody::SBScene* sbScene = SmartBody::SBScene::getScene();
-	SBDebuggerClient* c = sbScene->getDebuggerClient();
-	SBDebuggerServer* s = sbScene->getDebuggerServer();
+	SmartBody::SBDebuggerClient* c = sbScene->getDebuggerClient();
+	SmartBody::SBDebuggerServer* s = sbScene->getDebuggerServer();
 
 	if (monitorConnectWindow->_browserSBProcesses->value() <= 0)
 		return;

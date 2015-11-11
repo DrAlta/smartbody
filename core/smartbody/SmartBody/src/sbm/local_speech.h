@@ -45,6 +45,8 @@ public:
 	virtual void initSpeechRelay(std::string libPath, std::string cacheDirectory) = 0;
 	virtual void processSpeechMessage(const char* message) = 0;
 	virtual void setVoice(std::string voice) = 0;
+	virtual void setVoiceAndLicenses(const std::vector<std::string>& voiceList, const std::vector<std::string>& licenseList);
+
 protected:
 	std::string TransformTextWithTimes(std::string txt);	
 	std::string CreateMarkTimeStamps(std::string text);
@@ -62,6 +64,7 @@ public:
 	virtual void initSpeechRelay(std::string libPath, std::string cacheDirectory);
 	virtual void processSpeechMessage( const char * message );
 	virtual void setVoice(std::string voice);
+	virtual void setVoiceAndLicenses(const std::vector<std::string>& voiceList, const std::vector<std::string>& licenseList);
     //void evalFestivalCommand( const char * cmd );	
 protected:
 	std::string generateReply(const char * utterance,const char * soundFileName);	
@@ -82,15 +85,20 @@ protected:
 	std::string fullAudioDir;
 	CPRCEN_engine* voiceEngine;
 	std::map<std::string, std::string> phonemeToViseme;
+	std::vector<std::string> voices;
+	std::vector<std::string> licenses;
+
 public:
 	CereprocSpeechRelayLocal();
 	~CereprocSpeechRelayLocal();
 	virtual void initSpeechRelay(std::string libPath, std::string cacheDirectory);
 	virtual void processSpeechMessage( const char * message );
 	virtual void setVoice(std::string voice);	
+	virtual void setVoiceAndLicenses(const std::vector<std::string>& voiceList, const std::vector<std::string>& licenseList);
 protected:
 	std::string textToSpeech(const char * text, const char * cereproc_file_name, std::string voice_id);
 	void set_phonemes_to_visemes();
+
 };
 
 

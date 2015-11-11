@@ -8,6 +8,8 @@
 
 #include "sb/NetRequest.h"
 
+namespace SmartBody {
+
 class SBDebuggerClient
 {
 private:
@@ -42,5 +44,8 @@ public:
 
    SBAPI void ProcessVHMsgs(const char * op, const char * args);
 };
+
+}
+
 
 #endif

@@ -134,6 +134,11 @@ struct SpeechRequestMessageData {
 };
 #endif
 
+void SpeechRelayLocal::setVoiceAndLicenses(const std::vector<std::string>& voiceList, const std::vector<std::string>& licenseList)
+{
+}
+
+
 /// Cleans up spurious whitespaces in string, and removes weird \n's
 void SpeechRelayLocal::cleanString(std::string &message)
 {
@@ -509,25 +514,32 @@ CereprocSpeechRelayLocal::~CereprocSpeechRelayLocal()
 
 }
 
+void CereprocSpeechRelayLocal::setVoiceAndLicenses(const std::vector<std::string>& voicelist, const std::vector<std::string>& licenseList)
+{
+	for (size_t v = 0; v < voicelist.size(); v++)
+		voices.push_back(voicelist[v]);
+
+	for (size_t l = 0; l < licenseList.size(); l++)
+		licenses.push_back(licenseList[l]);
+}
+
+
 void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string cacheDir )
 {	
 	LOG("start init cerevoice relay");
-	std::string voiceNames[] = {"cerevoice_star_3.0.0_22k.voice", "cerevoice_heather_3.0.7_22k.voice", "cerevoice_katherine_3.0.8_22k.voice" };
-	std::string licenseNames[] = {"star2.lic", "heather.lic", "katherine2.lic" };	
 	voiceEngine = CPRCEN_engine_new();
-	for (int i=0;i<3;i++)	
+
+	for (int i=0;i<voices.size();i++)	
 	{
-		std::string fullVoiceName = libPath + voiceNames[i];
-		std::string fullLicenseName = libPath + licenseNames[i];
+		std::string fullVoiceName = libPath + "/" + voices[i];
+		std::string fullLicenseName = libPath + "/" + licenses[i];
 		int success = CPRCEN_engine_load_voice(voiceEngine, fullLicenseName.c_str(), NULL, fullVoiceName.c_str(),CPRC_VOICE_LOAD_EMB_AUDIO);
 		if (!success)
 			LOG("Cerevoice Local Relay : load voice %s fail.",fullVoiceName.c_str());
 		else
 			LOG("Cerevoice Local Relay : load voice %s success.",fullVoiceName.c_str());
-
 	}
 	
-
 	if (!voiceEngine)
 	{
 		LOG("fail to initialize Cerevoice engine");
@@ -754,7 +766,7 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
          }
          catch ( const XMLException & toCatch )
          {
-            printf( "XMLException occurred: %s", toCatch.getCode() );
+            printf( "XMLException occurred: %d", toCatch.getCode() );
             errorCode = 4;
          }
          catch (...)
@@ -947,6 +959,11 @@ CereprocSpeechRelayLocal::~CereprocSpeechRelayLocal()
 {
 
 }
+
+void CereprocSpeechRelayLocal::setVoiceAndLicenses(const std::vector<std::string>& voiceList, const std::vector<std::string>& licenseList)
+{
+}
+
 void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string cacheDirectory )
 {
 
@@ -986,6 +1003,10 @@ FestivalSpeechRelayLocal::FestivalSpeechRelayLocal()
 }
 
 FestivalSpeechRelayLocal::~FestivalSpeechRelayLocal()
+{
+}
+
+void FestivalSpeechRelayLocal::setVoiceAndLicenses(const std::vector<std::string>& voiceList, const std::vector<std::string>& licenseList)
 {
 }
 
@@ -1479,6 +1500,11 @@ FestivalSpeechRelayLocal::FestivalSpeechRelayLocal()
 FestivalSpeechRelayLocal::~FestivalSpeechRelayLocal()
 {
 }
+
+void FestivalSpeechRelayLocal::setVoiceAndLicenses(const std::vector<std::string>& voiceList, const std::vector<std::string>& licenseList)
+{
+}
+
 void FestivalSpeechRelayLocal::setVoice(std::string voice)
 {
 }

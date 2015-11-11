@@ -1790,8 +1790,11 @@ std::string SBScene::saveSceneSetting()
 			iter++)
 		{
 			SmartBody::SBAttribute* attr = camera->getAttribute((*iter));
-			std::string attrWrite = attr->write();
-			strstr << attrWrite;
+			if (!attr->isDefaultValue())
+			{
+				std::string attrWrite = attr->write();
+				strstr << attrWrite;
+			}
 		}
 	}	
 
@@ -1820,8 +1823,11 @@ std::string SBScene::saveSceneSetting()
 			iter++)
 		{
 			SmartBody::SBAttribute* attr = pawn->getAttribute((*iter));
-			std::string attrWrite = attr->write();
-			strstr << attrWrite;
+			if (!attr->isDefaultValue())
+			{
+				std::string attrWrite = attr->write();
+				strstr << attrWrite;
+			}
 		}
 	}
 
@@ -1923,8 +1929,11 @@ void SBScene::saveScene(std::stringstream& strstr, bool remoteSetup)
 			iter++)
 	{
 		SmartBody::SBAttribute* attr = this->getAttribute((*iter));
-		std::string attrWrite = attr->write();
-		strstr << attrWrite;
+		if (!attr->isDefaultValue())
+		{
+			std::string attrWrite = attr->write();
+			strstr << attrWrite;
+		}
 	}
 	
 }
@@ -2837,6 +2846,8 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
     //using boost::filesystem2::dot;
     //using boost::filesystem2::slash;
 #endif
+
+
 	SmartBody::SBAssetManager* assetManager = getAssetManager();
 	// feng : since we may have use "loadAssetsFromPath" to load the motions, we should infer all other motion paths from existing motions
 	for (unsigned int i=0;i<motionNames.size();i++)
@@ -2846,12 +2857,14 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 		path motionPath = motionFile.parent_path();
 		if (motionPath.empty()) // don't care about empty path
 			continue;
-
 		std::string ext = boost::filesystem::extension(motionFile);
 		std::string base = boost::filesystem::basename(motionFile);
 		std::string assetName = base+ext;
+		if (remoteSetup)
+		{
+			continue;
+		}
 		std::string assetExist = assetManager->findAsset("motion",assetName);
-
 		path mePath(systemMediaPath);
 		path diffPath = naive_uncomplete(motionPath,mePath);
 		if (diffPath.is_absolute()) // the path is not under media path, skip
@@ -2874,6 +2887,11 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 		path skelPath = skelFile.parent_path();
 		if (skelPath.empty()) // don't care about empty path
 			continue;
+
+		if (remoteSetup)
+		{
+			continue;
+		}
 
 		std::string ext = boost::filesystem::extension(skelFile);
 		std::string base = boost::filesystem::basename(skelFile);
@@ -2899,7 +2917,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 		const std::string& path = (*iter);
 		strstr << "scene.addAssetPath(\"motion\", \"" << path << "\")\n";
 	}
-	
+
 	std::vector<std::string> scriptPaths = getLocalAssetPaths("script");
 	for (iter = scriptPaths.begin(); iter != scriptPaths.end(); iter++)
 	{
@@ -2926,6 +2944,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 		std::vector<std::string> skeletonNames = getSkeletonNames();
 		const std::vector<std::string>& charNames = getCharacterNames();
 		std::map<std::string, std::string> charSkelMap;
+
 		for (unsigned int i=0;i<skeletonNames.size();i++)
 		{
 			std::string skelName = skeletonNames[i];
@@ -2943,6 +2962,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 				charSkelMap[skelName] = skelName;
 			}			
 		}
+
 		for (unsigned int i=0;i<charNames.size(); i++)
 		{
 			std::string charName = charNames[i];
@@ -2965,6 +2985,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 				charSkelMap[skelName] = charName;
 			}
 		}
+
 		std::vector<std::string> motionNames = getMotionNames();
 		for (unsigned int i=0;i<motionNames.size();i++)
 		{
@@ -3039,6 +3060,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 	// sort motion array according to its transformation depth level
 	std::sort(motionList.begin(),motionList.end(),SmartBody::motionComp);
 	// process motion from low depth to high depth to capture all dependency of motion operations
+
 	for (unsigned int i=0;i<motionList.size();i++)
 	{
 		SBMotion* motion = motionList[i];
@@ -3122,8 +3144,11 @@ void SBScene::saveCameras(std::stringstream& strstr, bool remoteSetup)
 			iter++)
 		{
 			SmartBody::SBAttribute* attr = camera->getAttribute((*iter));
-			std::string attrWrite = attr->write();
-			strstr << attrWrite;
+			if (!attr->isDefaultValue())
+			{
+				std::string attrWrite = attr->write();
+				strstr << attrWrite;
+			}
 		}
 	}	
 }
@@ -3165,8 +3190,11 @@ void SBScene::savePawns(std::stringstream& strstr, bool remoteSetup)
 			 iter++)
 		{
 			SmartBody::SBAttribute* attr = pawn->getAttribute((*iter));
-			std::string attrWrite = attr->write();
-			strstr << attrWrite;
+			if (!attr->isDefaultValue())
+			{
+				std::string attrWrite = attr->write();
+				strstr << attrWrite;
+			}
 		}	
 	}
 }
@@ -3250,8 +3278,11 @@ void SBScene::saveCharacters(std::stringstream& strstr, bool remoteSetup)
 			 iter++)
 		{
 			SmartBody::SBAttribute* attr = character->getAttribute((*iter));
-			std::string attrWrite = attr->write();
-			strstr << attrWrite;
+			if (!attr->isDefaultValue())
+			{
+				std::string attrWrite = attr->write();
+				strstr << attrWrite;
+			}
 		}
 
 		// reach
@@ -3392,8 +3423,11 @@ void SBScene::saveLights(std::stringstream& strstr, bool remoteSetup)
 			 iter++)
 		{
 			SmartBody::SBAttribute* attr = pawn->getAttribute((*iter));
-			std::string attrWrite = attr->write();
-			strstr << attrWrite;
+			if (!attr->isDefaultValue())
+			{
+				std::string attrWrite = attr->write();
+				strstr << attrWrite;
+			}
 		}
 	}
 }
@@ -3647,7 +3681,7 @@ void SBScene::saveLipSyncing(std::stringstream& strstr, bool remoteSetup)
 
 void SBScene::saveServices(std::stringstream& strstr, bool remoteSetup)
 {
-	strstr << "# -------------------- lip syncing\n";
+	strstr << "# -------------------- Services\n";
 	// services
 	SmartBody::SBServiceManager* serviceManager = this->getServiceManager();
 	std::vector<std::string> serviceNames = serviceManager->getServiceNames();
@@ -3663,8 +3697,11 @@ void SBScene::saveServices(std::stringstream& strstr, bool remoteSetup)
 			 iter++)
 		{
 			SmartBody::SBAttribute* attr = service->getAttribute((*iter));
-			std::string attrWrite = attr->write();
-			strstr << attrWrite;
+			if (!attr->isDefaultValue())
+			{
+				std::string attrWrite = attr->write();
+				strstr << attrWrite;
+			}
 		}
 
 	}

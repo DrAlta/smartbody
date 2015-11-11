@@ -52,3 +52,12 @@ BMLObject* BMLHeadObject::copy()
 {
 	return new BMLHeadObject();
 }
+
+void BMLHeadObject::start()
+{
+}
+
+void BMLHeadObject::stop()
+{
+}
+
