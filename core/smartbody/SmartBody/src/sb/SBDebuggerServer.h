@@ -11,17 +11,14 @@ class SBScene;
 class SBDebuggerServer : public SBService
 {
 	public:
-	   SBAPI SBDebuggerServer();
-	   SBAPI virtual ~SBDebuggerServer();
+		SBAPI SBDebuggerServer();
+		SBAPI virtual ~SBDebuggerServer();
 
-	   void Init();
-	   void Close();
+		SBAPI virtual void setEnable(bool val);
 
-	   void SetSBScene(SmartBody::SBScene * scene) { m_scene = scene; }
-	   SBAPI void SetID(const std::string & id);
-	   SBAPI const std::string& GetID();
-	   SBAPI void setHostname(const std::string & name);
-	   SBAPI const std::string& getHostname();
+		SBAPI virtual void afterUpdate(double time);
+
+		SBAPI virtual void notify(SBSubject* subject);
 
 	   void Update();
 
@@ -38,17 +35,21 @@ class SBDebuggerServer : public SBService
 		double m_cameraZFar;
 		bool m_rendererIsRightHanded;
 
-   private:
-	   std::vector<std::string> m_processIdList;
-	   std::string m_sbmFriendlyName;
-	   std::string m_hostname;
-	   int m_port;
-	   std::string m_fullId;
-	   bool m_connectResult;
-	   double m_updateFrequencyS;
-	   double m_lastUpdate;
-	   vhcl::Timer m_timer;
-	   SmartBody::SBScene * m_scene;
+	protected:
+		void Init();
+		void Close();
+
+
+	private:
+		std::vector<std::string> m_processIdList;
+		std::string m_sbmFriendlyName;
+		std::string m_hostname;
+		int m_port;
+		std::string m_fullId;
+		bool m_connectResult;
+		double m_updateFrequencyS;
+		double m_lastUpdate;
+		vhcl::Timer m_timer;
 
 public:
 

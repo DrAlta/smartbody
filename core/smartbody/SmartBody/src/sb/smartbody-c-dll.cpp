@@ -775,7 +775,7 @@ SBAPI void SBM_SBDebuggerServer_SetID( SBMHANDLE sbmHandle, const char * id )
    SmartBody::SBScene * scene = SmartBody::SBScene::getScene();
    SmartBody::SBDebuggerServer * debuggerServer = scene->getDebuggerServer();
 
-   debuggerServer->SetID( id );
+   debuggerServer->setStringAttribute("id", id);
 }
 
 

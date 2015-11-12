@@ -184,6 +184,7 @@ void SBScene::initialize()
 	_naviMeshManager = new SBNavigationMeshManager();
 	_motionGraphManager = new SBMotionGraphManager();
 	_handConfigManager = new SBHandConfigurationManager();
+	_debuggerServer = new SBDebuggerServer();
 
 	//_scale = .01f; // default scale is centimeters
 	_scale = 1.f;
@@ -198,10 +199,10 @@ void SBScene::initialize()
 	_serviceManager->addService(_faceShiftManager);
 	_serviceManager->addService(_phonemeManager);
 	_serviceManager->addService(_profiler);
+	_serviceManager->addService(_debuggerServer);
 
 	_parser = new SBParser();
 
-	_debuggerServer = new SBDebuggerServer();
 	_debuggerClient = new SBDebuggerClient();
 	_debuggerUtility = new SBDebuggerUtility();
 	_isRemoteMode = false;
@@ -276,8 +277,6 @@ void SBScene::initialize()
 	//_scene = SmartBody::SBScene::getScene();
 	addSceneListener(listener);
 	*/
-	_debuggerServer->Init();
-	_debuggerServer->SetSBScene(_scene);
 	getBlendManager()->createBlend0D(PseudoIdleState);
 
 	// reset timer & viewer window
@@ -406,6 +405,7 @@ void SBScene::cleanup()
 	delete _naviMeshManager;
 	delete _kinectProcessor;
 	delete _handConfigManager;
+	delete _debuggerServer;
 
 	_sim = NULL;
 	_profiler = NULL;
@@ -531,8 +531,7 @@ SBScene::~SBScene(void)
 	delete _parser;
 
 	_debuggerClient->Disconnect();
-	_debuggerServer->Close();
-	delete _debuggerServer;  // TODO: should delete these in reverse order?
+  // TODO: should delete these in reverse order?
 	delete _debuggerClient;
 	delete _debuggerUtility;
 //	
@@ -642,24 +641,6 @@ void SBScene::update()
 	}
 	this->getProfiler()->mark("services");
 
-// 	if (physicsEngine && physicsEngine->getBoolAttribute("enable"))
-// 	{		
-// 		float dt = (float)physicsEngine->getDoubleAttribute("dT");//timeStep*0.03f;
-// 		//elapseTime += time_dt;
-// 		while (physicsTime < this->time)		
-// 		//if (physicsTime < this->time)
-// 		{
-// 			//printf("elapse time = %f\n",elapseTime);
-// 			physicsEngine->updateSimulation(dt);
-// 			physicsTime += dt;
-// 			//curDt -= dt;
-// 		}		
-// 	}
-// 	else
-// 	{
-// 		physicsTime = this->time;
-// 	}
-
 	this->getProfiler()->mark("allsequences", 1, "commands");
 	std::string seqName = "";
 	std::vector<std::string> sequencesToDelete;
@@ -765,50 +746,6 @@ void SBScene::update()
 		pawn->afterUpdate(getSimulationManager()->getTime());
 	}
 	this->getProfiler()->mark("pawn");
-
-	
-	SrCamera* camera = getActiveCamera();
-	if (_viewer && camera)
-	{
-		SrMat m;
-		SrQuat quat = SrQuat(camera->get_view_mat(m).get_rotation());
-
-		getDebuggerServer()->m_cameraPos.x = camera->getEye().x;
-		getDebuggerServer()->m_cameraPos.y = camera->getEye().y;
-		getDebuggerServer()->m_cameraPos.z = camera->getEye().z;
-		getDebuggerServer()->m_cameraLookAt.x = camera->getCenter().x;
-		getDebuggerServer()->m_cameraLookAt.y = camera->getCenter().y;
-		getDebuggerServer()->m_cameraLookAt.z = camera->getCenter().z;
-		getDebuggerServer()->m_cameraRot.x = quat.x;
-		getDebuggerServer()->m_cameraRot.y = quat.y;
-		getDebuggerServer()->m_cameraRot.z = quat.z;
-		getDebuggerServer()->m_cameraRot.w = quat.w;
-		getDebuggerServer()->m_cameraFovY   = sr_todeg(camera->getFov());
-		getDebuggerServer()->m_cameraAspect = camera->getAspectRatio();
-		getDebuggerServer()->m_cameraZNear  = camera->getNearPlane();
-		getDebuggerServer()->m_cameraZFar   = camera->getFarPlane();
-	}
-	
-	/*
-	else
-	{
-		SrCamera defaultCam;
-		SrMat m;
-		SrQuat quat = SrQuat(defaultCam.get_view_mat(m).get_rotation());
-
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.x = defaultCam.eye.x;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.y = defaultCam.eye.y;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraPos.z = defaultCam.eye.z;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.x = quat.x;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.y = quat.y;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.z = quat.z;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraRot.w = quat.w;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraFovY   = sr_todeg(defaultCam.fovy);
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraAspect = defaultCam.aspect;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZNear  = defaultCam.znear;
-		SmartBody::SBScene::getScene()->getDebuggerServer()->m_cameraZFar   = defaultCam.zfar;
-	}
-	*/
 
 	this->getProfiler()->mark("listeners", 1, "OnSimulationUpdate()");
 	std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
