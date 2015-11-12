@@ -10,12 +10,14 @@
 #include "vhmsg-tt.h"
 #endif
 
+#include <sb/SBAttribute.h>
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationTransition.h>
+#include <sr/sr_camera.h>
 
 using std::string;
 using std::vector;
@@ -24,19 +26,31 @@ namespace SmartBody {
 
 SBDebuggerServer::SBDebuggerServer() : SBService()
 {
+	this->setName("debugger");
 #ifndef SB_NO_VHMSG
-   m_sbmFriendlyName = "sbm";
+   m_sbmFriendlyName = "sb";
    m_connectResult = false;
    m_updateFrequencyS = 0;
    m_lastUpdate = m_timer.GetTime();
-   m_scene = NULL;
    m_rendererIsRightHanded = true;
 #endif
+
+	createStringAttribute("hostname", "", true, "Basic", 60, false, false, false, "IP address/hostname for connection with debugger.");
+	createStringAttribute("id", "sb", true, "Basic", 60, false, false, false, "Id of the debugging instance.");
 }
 
 
 SBDebuggerServer::~SBDebuggerServer()
 {
+}
+
+void SBDebuggerServer::setEnable(bool val)
+{
+	SBService::setEnable(val);
+
+	Close();
+	if (val)
+		Init();
 }
 
 
@@ -62,7 +76,10 @@ void SBDebuggerServer::Init()
 
 
    if (m_hostname == "")
+   {
 	   m_hostname = vhcl::SocketGetHostname();
+	   setStringAttribute("hostname", m_hostname);
+   }
 
    m_sockTCP = vhcl::SocketOpenTcp();
 #ifdef WIN32
@@ -136,31 +153,6 @@ void SBDebuggerServer::Close()
 #endif
 }
 
-void SBDebuggerServer::SetID(const std::string & id)
-{
-#ifndef SB_NO_VHMSG
-   m_sbmFriendlyName = id;
-   m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
-#endif
-}
-
-const std::string& SBDebuggerServer::GetID()
-{
-	return m_fullId;
-}
-
-void SBDebuggerServer::setHostname(const std::string & name)
-{
-	m_hostname = name;
-
-	m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
-}
-
-const std::string& SBDebuggerServer::getHostname()
-{
-	return m_hostname;
-}
-
 void SBDebuggerServer::Update()
 {
 #ifndef SB_NO_VHMSG
@@ -180,13 +172,14 @@ void SBDebuggerServer::Update()
          // call otherwise there is a massive delay on the receiving end
          bool sentCamUpdate = false;
          bool sentPawnUpdates = false;
-         if (m_scene)
+		 SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+         if (true)
          {
-            const std::vector<std::string>& charNames = m_scene->getCharacterNames();
+			 const std::vector<std::string>& charNames = scene->getCharacterNames();
 			string msg = "";
             for (size_t i = 0; i < charNames.size(); i++)
             {
-				SmartBody::SBCharacter * c = m_scene->getCharacter(charNames[i]);
+				SmartBody::SBCharacter * c = scene->getCharacter(charNames[i]);
 
                size_t numBones = c->getSkeleton()->getNumJoints();
 
@@ -228,10 +221,10 @@ void SBDebuggerServer::Update()
                if (!sentPawnUpdates)
                {
                   // sbmdebugger <sbmid> update pawn <name> pos <x y z> rot <x y z w> geom <s> size <s> 
-                  const std::vector<std::string>& pawnNames = m_scene->getPawnNames();
+                  const std::vector<std::string>& pawnNames = scene->getPawnNames();
                   for (size_t i = 0; i < pawnNames.size(); i++)
                   {
-                     SmartBody::SBPawn* p = m_scene->getPawn(pawnNames[i]);
+                     SmartBody::SBPawn* p = scene->getPawn(pawnNames[i]);
                      msg += vhcl::Format("sbmdebugger %s update pawn %s", m_fullId.c_str(), p->getName().c_str());
                      SrVec pos = p->getPosition();
                      SrQuat rot = p->getOrientation();
@@ -393,11 +386,11 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                   }
                   else if (split[2] == "send_init")
                   {
-                     if (m_scene != NULL)
+                     if (true)
                      {
 						 std::string message = vhcl::Format("sbmdebugger %s init scene\n", m_fullId.c_str());	
 						 //LOG("before scene save");
-						 std::string initScript = m_scene->save(true); // save for remote connection	 
+						 std::string initScript = SmartBody::SBScene::getScene()->save(true); // save for remote connection	 
 						 //LOG("initScript = %s",initScript.c_str());
 						 message += initScript;
 						 //LOG("initScript size = %d",initScript.size());
@@ -528,6 +521,57 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
       }
    }
 #endif
+}
+
+void SBDebuggerServer::afterUpdate(double time)
+{
+	if (!SmartBody::SBScene::getScene()->isRemoteMode())
+		Update();
+
+	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+	if (SmartBody::SBScene::getScene()->getViewer() && camera)
+	{
+		SrMat m;
+		SrQuat quat = SrQuat(camera->get_view_mat(m).get_rotation());
+
+		m_cameraPos.x = camera->getEye().x;
+		m_cameraPos.y = camera->getEye().y;
+		m_cameraPos.z = camera->getEye().z;
+		m_cameraLookAt.x = camera->getCenter().x;
+		m_cameraLookAt.y = camera->getCenter().y;
+		m_cameraLookAt.z = camera->getCenter().z;
+		m_cameraRot.x = quat.x;
+		m_cameraRot.y = quat.y;
+		m_cameraRot.z = quat.z;
+		m_cameraRot.w = quat.w;
+		m_cameraFovY   = sr_todeg(camera->getFov());
+		m_cameraAspect = camera->getAspectRatio();
+		m_cameraZNear  = camera->getNearPlane();
+		m_cameraZFar   = camera->getFarPlane();
+	}
+
+
+}
+
+void SBDebuggerServer::notify(SBSubject* subject)
+{
+	SBService::notify(subject);
+
+	SBAttribute* attribute = dynamic_cast<SBAttribute*>(subject);
+	if (attribute)
+	{
+		if (attribute->getName() == "hostname")
+		{
+			m_hostname = this->getStringAttribute("hostname");
+			m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
+		}
+		else if (attribute->getName() == "id")
+		{
+		   m_sbmFriendlyName = this->getStringAttribute("id");
+		   m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
+		}
+	}
+
 }
 
 

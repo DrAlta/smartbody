@@ -80,7 +80,7 @@ void MonitorConnectWindow::loadProcesses()
 	std::vector<std::string> ids = c->GetSbmProcessIds();
 	for (size_t i = 0; i < ids.size(); i++)
 	{
-		if (s->GetID() != ids[i])
+		if (s->getStringAttribute("id")  != ids[i])
 			_browserSBProcesses->add(ids[i].c_str());
 	}
 

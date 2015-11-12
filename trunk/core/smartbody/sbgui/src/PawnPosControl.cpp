@@ -11,6 +11,7 @@
 #include <sr/sr_sa_gl_render.h>
 #include <sr/sr_gl_render_funcs.h>
 #include <sb/SBScene.h>
+#include <sb/SBVHMSGManager.h>
 #include <sbm/gwiz_math.h>
 
 PawnControl::PawnControl()
@@ -72,6 +73,22 @@ void PawnControl::set_pawn_pos(SbmPawn* pawn, SrVec& pos)
 	float x,y,z,h,p,r;
 	pawn->get_world_offset(x,y,z,h,p,r);
 	//printf("h = %f, p = %f, r = %f\n",h,p,r);
+
+	if (SmartBody::SBScene::getScene()->isRemoteMode())
+	{
+		std::stringstream strstr;
+		strstr << "sb scene.getCharacter(\"" << pawn->getName() << "\").setDoubleAttribute(\"posX\", " << pos.x<< ")";
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
+
+		std::stringstream strstr2;
+		strstr << "sb scene.getCharacter(\"" << pawn->getName() << "\").setDoubleAttribute(\"posY\", " << pos.y << ")";
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr2.str().c_str());
+
+		std::stringstream strstr3;
+		strstr3 << "sb scene.getCharacter(\"" << pawn->getName() << "\").setDoubleAttribute(\"posZ\", " << pos.z << ")";
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr3.str().c_str());
+		return;
+	}
 	
 	pawn->set_world_offset(pos.x,pos.y,pos.z,h,p,r);
 	pawn->updateToColObject();	
@@ -96,6 +113,24 @@ void PawnControl::set_pawn_rot( SbmPawn* pawn, SrQuat& quat )
 	pawn->get_world_offset(x,y,z,h,p,r);
 	gwiz::quat_t q = gwiz::quat_t(quat.w,quat.x,quat.y,quat.z);
 	gwiz::euler_t e = gwiz::euler_t(q);
+
+	if (SmartBody::SBScene::getScene()->isRemoteMode())
+	{
+		std::stringstream strstr;
+		strstr << "sb scene.getCharacter(\"" << pawn->getName() << "\").setDoubleAttribute(\"rotX\", " << e.h() << ")";
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
+
+		std::stringstream strstr2;
+		strstr << "sb scene.getCharacter(\"" << pawn->getName() << "\").setDoubleAttribute(\"rotY\", " << e.p() << ")";
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr2.str().c_str());
+
+		std::stringstream strstr3;
+		strstr3 << "sb scene.getCharacter(\"" << pawn->getName() << "\").setDoubleAttribute(\"rotZ\", " << e.r() << ")";
+		SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr3.str().c_str());
+		return;
+	}
+
+
 	pawn->set_world_offset(x,y,z,(float)e.h(),(float)e.p(),(float)e.r());	
 	pawn->updateToColObject();
 }

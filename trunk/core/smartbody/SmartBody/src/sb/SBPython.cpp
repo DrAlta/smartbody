@@ -371,10 +371,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		;
 
 	boost::python::class_<SBDebuggerServer, boost::python::bases<SBService> >("SBDebuggerServer")
-		.def("getHostname", &SBDebuggerServer::getHostname, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the hostname for use with the debugger.")
-		.def("setHostname", &SBDebuggerServer::setHostname, "Sets the hostname for use with the debugger.")
 		;
-
 
 	boost::python::class_<SBPhysicsManager, boost::python::bases<SBService> >("SBPhysicsManager")
 		.def("createPhysicsCharacter", &SBPhysicsManager::createPhysicsCharacter, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Create a physics character.")
@@ -417,6 +414,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("setPhonemesRealtime", &SBPhonemeManager::setPhonemesRealtime, "Sets the phonemes associated with the given character for realtime.")
 		.def("getPhonemesRealtime", &SBPhonemeManager::getPhonemesRealtime, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the realtime phonemes associated with the given character.")
 		.def("getPhonemesRealtimeTimings", &SBPhonemeManager::getPhonemesRealtimeTimings, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the realtime phoneme timings associated with the given character.")
+		.def("saveLipSyncAnimation", &SBPhonemeManager::saveLipSyncAnimation, "Saves the lip sync animation to a .dae (COLLADA) file.")
 
 		;
 

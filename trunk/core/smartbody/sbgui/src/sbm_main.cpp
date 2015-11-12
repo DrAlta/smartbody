@@ -1149,7 +1149,7 @@ int main( int argc, char **argv )	{
 		}
 	}
 
-	SmartBody::SBScene::getScene()->getDebuggerServer()->SetID("sbgui");
+	SmartBody::SBScene::getScene()->getDebuggerServer()->setStringAttribute("id", "sbgui");
 
 #ifndef SB_NO_PYTHON
 	// initialize any Python environment variables from the command line
