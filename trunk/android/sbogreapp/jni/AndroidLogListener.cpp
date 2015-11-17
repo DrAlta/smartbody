@@ -46,10 +46,10 @@ void AndroidLogListener::messageLogged(const String& message, LogMessageLevel lm
 
 	if(lml < Ogre::LML_CRITICAL)
 	{
-		LOGI(message.c_str());
+		LOGI("%s", message.c_str());
 	}
 	else
 	{
-		LOGE(message.c_str());
+		LOGE("%s", message.c_str());
 	}
 }
