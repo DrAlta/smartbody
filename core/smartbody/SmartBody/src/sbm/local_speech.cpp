@@ -138,6 +138,16 @@ void SpeechRelayLocal::setVoiceAndLicenses(const std::vector<std::string>& voice
 {
 }
 
+void SpeechRelayLocal::setLicenseInfo(const std::string& voice, const std::string& key, const std::string& value)
+{
+	std::map<std::string, std::map<std::string, std::string> >::iterator iter = _voiceLicenseInfo.find(voice);
+	if (iter == _voiceLicenseInfo.end())
+	{
+		_voiceLicenseInfo[voice] = std::map<std::string, std::string>();
+		iter = _voiceLicenseInfo.find(voice);
+	}
+	(*iter).second[key] = value;
+}
 
 /// Cleans up spurious whitespaces in string, and removes weird \n's
 void SpeechRelayLocal::cleanString(std::string &message)
@@ -538,6 +548,42 @@ void CereprocSpeechRelayLocal::initSpeechRelay( std::string libPath, std::string
 			LOG("Cerevoice Local Relay : load voice %s fail.",fullVoiceName.c_str());
 		else
 			LOG("Cerevoice Local Relay : load voice %s success.",fullVoiceName.c_str());
+	}
+
+	// if there are any voices that needed to be loaded directly from the license information:
+	for (std::map<std::string, std::map<std::string, std::string> >::iterator iter = _voiceLicenseInfo.begin();
+		 iter != _voiceLicenseInfo.end();
+		 iter++)
+	{
+		std::string voice = (*iter).first;
+		std::string licenseText = "";
+		std::string signature = "";
+		std::string voiceFile = "";
+		
+		for (std::map<std::string, std::string>::iterator iter2 = (*iter).second.begin();
+			 iter2 != (*iter).second.end();
+			 iter2++)
+		{
+			if ((*iter2).first == "licenseText")
+				licenseText = (*iter2).second;
+			if ((*iter2).first == "signature")
+				signature = (*iter2).second;
+			if ((*iter2).first == "voiceFile")
+				voiceFile = (*iter2).second;
+		}
+		/*
+		LOG("LOADING VOICE %s WITH:", voice.c_str());
+		LOG("(%s)", licenseText.c_str());
+		LOG("(%s)", signature.c_str());
+		LOG("(%s)", voiceFile.c_str());
+		*/
+		int success = CPRCEN_engine_load_voice_licensestr(voiceEngine, licenseText.c_str(), signature.c_str(), "", voiceFile.c_str(), CPRC_VOICE_LOAD_EMB_AUDIO);
+		if (!success)
+			LOG("Cerevoice Local Relay : load voice %s with direct engine licensing fail.", voice.c_str());
+		else
+			LOG("Cerevoice Local Relay : load voice %s with direct engine licensing success.", voice.c_str());
+
+
 	}
 	
 	if (!voiceEngine)
