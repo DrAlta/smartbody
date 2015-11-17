@@ -28,6 +28,7 @@
 // Predeclare class
 
 #include <string>
+#include <map>
 #include "sbm/sbm_speech.hpp"
 #include "remote_speech.h"
 #include "sr_hash_map.h"
@@ -46,12 +47,15 @@ public:
 	virtual void processSpeechMessage(const char* message) = 0;
 	virtual void setVoice(std::string voice) = 0;
 	virtual void setVoiceAndLicenses(const std::vector<std::string>& voiceList, const std::vector<std::string>& licenseList);
+	virtual void setLicenseInfo(const std::string& voice, const std::string& key, const std::string& value); 
 
 protected:
 	std::string TransformTextWithTimes(std::string txt);	
 	std::string CreateMarkTimeStamps(std::string text);
 	std::string removeXMLTagsAndNewLines( const std::string & txt , SpeechRequestMessageData & xmlMetaData);
 	void cleanString(std::string &message);
+
+	std::map<std::string, std::map<std::string, std::string> > _voiceLicenseInfo;
 };
 
 class FestivalSpeechRelayLocal : public SpeechRelayLocal
