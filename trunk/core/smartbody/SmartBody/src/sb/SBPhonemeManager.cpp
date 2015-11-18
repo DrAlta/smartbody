@@ -14,6 +14,9 @@
 #include <sbm/rapidxml_utils.hpp>
 #include <sbm/rapidxml.hpp>
 #include <bml/bml_speech.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
+#include <fstream>
 
 namespace SmartBody {
 
@@ -609,7 +612,7 @@ void SBPhonemeManager::saveLipSyncAnimation(const std::string characterName, con
 	// load the lip sync file (.bml)
 	rapidxml::file<char> bmlFile(lipsyncFile.c_str());
 	rapidxml::xml_document<> bmldoc;
-	bmldoc.parse< 0 >((char*) lipsyncFile.data());
+	bmldoc.parse< 0 >((char*) bmlFile.data());
 	rapidxml::xml_node<>* bmlnode = bmldoc.first_node("bml");
 
 	if (!bmlnode)
@@ -619,13 +622,13 @@ void SBPhonemeManager::saveLipSyncAnimation(const std::string characterName, con
 	}
 
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
-	if (character)
+	if (!character)
 	{
 		LOG("Could not find character with name '%s'. No output file named '%s' written.", characterName.c_str(), outputFile.c_str());
 		return;
 	}
 
-	std::string lipSyncSetName = character->getStringAttribute("lipsyncSetName");
+	std::string lipSyncSetName = character->getStringAttribute("lipSyncSetName");
 	if (lipSyncSetName == "")
 	{
 		LOG("Could not find lip sync data set '%s' for character with name '%s'. Please set the 'lipsyncSetName' attribute to a valid lip sync set first. No output file named '%s' written.", lipSyncSetName.c_str(), characterName.c_str(), outputFile.c_str());
@@ -681,7 +684,7 @@ void SBPhonemeManager::saveLipSyncAnimation(const std::string characterName, con
 	
 
 	// save the curves to a .dae file
-	std::ofstream daeStream (outputFile, std::ios::out);
+	std::ofstream daeStream (outputFile.c_str(), std::ios::out);
 	if (!daeStream.good())
 	{
 		LOG("Cannot write to file '%s'. No output file written.", outputFile.c_str());
@@ -710,64 +713,89 @@ void SBPhonemeManager::saveLipSyncAnimation(const std::string characterName, con
 	daeStream << "<modified>" << buf << "</modified>" << std::endl;
 
 	daeStream << "<library_animations>" << std::endl;
-	daeStream << "<animation name=\"" << lipsyncFile << "\" id=\"" << lipsyncFile << "\">" << std::endl;
+
+	boost::filesystem::path p(lipsyncFile);
+	std::string extension = boost::filesystem::extension(p);
+	std::string basename = boost::filesystem::basename(p);
+
+	std::string animName = basename + "-anim";
+
+	daeStream << "<animation name=\"" << basename << "\" id=\"" << animName << "\">" << std::endl;
 
 	for (std::map<std::string, std::vector<float> >::iterator curvesIter = tempCurves.begin();
 		 curvesIter != tempCurves.end();
 		 curvesIter++)
 	{
 		std::string channelName = (*curvesIter).first;
+		std::string sourceName = animName + "-" + channelName;
 
 		// input
-		daeStream << "<source id=\"" << channelName << "-input\">" << std::endl;
-		daeStream << "<float_array id=\"" << channelName << "-input-array\" count=\"";
+		daeStream << "<source id=\"" << sourceName << "-input\">" << std::endl;
+		daeStream << "<float_array id=\"" << sourceName << "-input-array\" count=\"";
 		std::vector<float>& values = (*curvesIter).second;
-		daeStream << values.size() << "\">";
-		for (size_t i = 0; i < values.size(); i+2)
+		daeStream << values.size() / 2.0 << "\">";
+		for (size_t i = 0; i < values.size(); i+=2)
 		{
 			daeStream << values[i] << " ";
 		}
 		daeStream << "</float_array>" << std::endl;
 		daeStream << "<technique_common>" << std::endl;
-		daeStream << "<accessor source=\"#" << channelName << "-input-array\" count=\"" << values.size() << "\" stride=\"1\">" << std::endl;
+		daeStream << "<accessor source=\"#" << sourceName << "-input-array\" count=\"" << values.size() / 2.0 << "\" stride=\"1\">" << std::endl;
 		daeStream << "<param name=\"TIME\" type=\"float\"/>" << std::endl;
 		daeStream << "</accessor>" << std::endl;
 		daeStream << "</technique_common>" << std::endl;
 		daeStream << "</source>" << std::endl;
 
 		// output
-		daeStream << "<source id=\"" << channelName << "-output\">" << std::endl;
-		daeStream << "<float_array id=\"" << channelName << "-output-array\" count=\"";
+		daeStream << "<source id=\"" << sourceName << "-output\">" << std::endl;
+		daeStream << "<float_array id=\"" << sourceName << "-output-array\" count=\"";
 
-		daeStream << values.size() << "\">";
-		for (size_t i = 1; i < values.size(); i+2)
+		daeStream << values.size() / 2.0 << "\">";
+		for (size_t i = 1; i < values.size(); i+=2)
 		{
 			daeStream << values[i] << " ";
 		}
 		daeStream << "</float_array>" << std::endl;
 		daeStream << "<technique_common>" << std::endl;
-		daeStream << "<accessor source=\"#" << channelName << "-output-array\" count=\"" << values.size() << "\" stride=\"1\">" << std::endl;
-		daeStream << "<param name=\"TIME\" type=\"float\"/>" << std::endl;
+		daeStream << "<accessor source=\"#" << sourceName << "-output-array\" count=\"" << values.size() / 2.0 << "\" stride=\"1\">" << std::endl;
+		daeStream << "<param name=\"TRANSFORM\" type=\"float\"/>" << std::endl;
 		daeStream << "</accessor>" << std::endl;
 		daeStream << "</technique_common>" << std::endl;
 		daeStream << "</source>" << std::endl;
 
 		// interpolation
-		daeStream << "<source id=\"" << channelName << "-interpolations\">" << std::endl;
-		daeStream << "<NAME_array id=\"" << channelName << "-interpolations-array\" count=\"2\">LINEAR LINEAR</NAME_array>" << std::endl;
+		daeStream << "<source id=\"" << sourceName << "-interpolations\">" << std::endl;
+		daeStream << "<NAME_array id=\"" << sourceName << "-interpolations-array\" count=\"";
+		daeStream << values.size() / 2.0 << "\">";
+		for (size_t i = 1; i < values.size(); i+=2)
+		{
+			daeStream << "LINEAR ";
+		}
+		daeStream << "</NAME_array>" << std::endl;
+		
 		daeStream << "<technique_common>" << std::endl;
-		daeStream << "< accessor source=\"#" << channelName << "-interpolations-array\" count=\"2\" stride=\"1\">" << std::endl;
+		daeStream << "<accessor source=\"#" << sourceName << "-interpolations-array\" count=\"" << values.size() / 2.0 << "\" stride=\"1\">" << std::endl;
 		daeStream << "<param name=\"INTERPOLATION\" type=\"float\"/>" << std::endl;
 		daeStream << "</accessor >" << std::endl;
 		daeStream << "</technique_common>" << std::endl;
 		daeStream << "</source>" << std::endl;
 
 		// sampler
-		daeStream << "<channel source=\"#\"" << channelName << "Skeleton-sampler\" target=\"" << channelName << "_Skeleton/trans.X\"/>" << std::endl;
+		daeStream << "<sampler id=\"" << sourceName << "-sampler\">";
+		daeStream << "<input semantic=\"INPUT\" source=\"#" << sourceName << "-input\"/>";
+		daeStream << "<input semantic=\"OUTPUT\" source=\"#" << sourceName << "-output\"/>";
+		daeStream << "<input semantic=\"INTERPOLATION\" source=\"#" << sourceName << "-interpolations\"/>";
+		daeStream << "</sampler>";
+
+
+		daeStream << "<channel source=\"#" << sourceName << "-sampler\" target=\"" << channelName << "\"/>" << std::endl;
 	}
 
 
 	daeStream << "</animation>" << std::endl;
+	daeStream << "</library_animations>" << std::endl;
+	daeStream << "</asset>" << std::endl;
+	daeStream << "</COLLADA>" << std::endl;
 
 	daeStream.close();
 

@@ -78,6 +78,7 @@ void SBDebuggerServer::Init()
    if (m_hostname == "")
    {
 	   m_hostname = vhcl::SocketGetHostname();
+	   LOG("Setting debugger server hostname to %s", m_hostname.c_str());
 	   setStringAttribute("hostname", m_hostname);
    }
 
@@ -562,6 +563,8 @@ void SBDebuggerServer::notify(SBSubject* subject)
 	{
 		if (attribute->getName() == "hostname")
 		{
+			std::string hostname = this->getStringAttribute("hostname");
+			LOG("Debugger hostname set to %s", hostname.c_str());
 			m_hostname = this->getStringAttribute("hostname");
 			m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
 		}
