@@ -243,15 +243,22 @@ bool SbmTexture::loadImage( const char* fileName )
 			for (int i=0;i<width;i++)
 			{
 				unsigned char alphaVal = buffer[j*width*channels+i*channels+3];
-				if (alphaVal < 250)
+				if (alphaVal < 255)
 					transparentPixel++;
 			}
 		}
 	}
 	
 
-	if (transparentPixel*20 > height*width)
+	if (transparentPixel*50 > height*width)
+	{
 		transparentTexture = true;
+		LOG("Texture %s is transparent.",fileName);
+	}
+	else
+	{
+		LOG("Texture %s is opaque",fileName);
+	}
 
 	imgBuffer.resize(width*height*channels);
 
@@ -306,13 +313,16 @@ void SbmTexture::buildTexture(bool buildMipMap)
 	//LOG("After Texture parameters : GL_TEXTURE_MIN_FILTER");
 	
 	//LOG("After Texture parameters : GL_TEXTURE_MAX_FILTER");
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	
 	//LOG("After glTexEnvf");
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:100");	
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 #else
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 #endif
 	glTexParameteri(iType, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+
+	
 	
 	if (channels == 3)
 	{

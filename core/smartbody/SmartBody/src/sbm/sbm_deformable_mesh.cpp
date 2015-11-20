@@ -842,18 +842,18 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		{
 			// is a hair mesh, based on a rough name searching
 			mesh->isHair = true;
-			//LOG("hair mesh = %s",mesh->matName.c_str());
+			LOG("hair mesh = %s",mesh->matName.c_str());
 			hairMeshList.push_back(mesh);
 		}
-// 		else if (tex && tex->isTransparent())
-// 		{
-// 			mesh->isHair = true;
-// 			LOG("transparent mesh = %s",mesh->matName.c_str());
-// 			hairMeshList.push_back(mesh);
-// 		}
+		else if (tex && tex->isTransparent())
+		{
+			mesh->isHair = true;
+			LOG("transparent mesh = %s",mesh->matName.c_str());
+			hairMeshList.push_back(mesh);
+		}
 		else if (mesh->material.useAlphaBlend)
 		{
-			//LOG("alpha mesh = %s",mesh->matName.c_str());
+			LOG("alpha mesh = %s",mesh->matName.c_str());
 			alphaMeshList.push_back(mesh);
 		}
 		else
@@ -1044,6 +1044,11 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 			newMat.diffuse.g = material.diffuse(1);
 			newMat.diffuse.b = material.diffuse(2);
 			newMat.diffuse.a = material.diffuse(3);
+			if (newMat.diffuse.a < 1.0)
+			{
+				LOG("mesh %d, mat %d, useAlphaBlending",numMeshModels, numMaterials);
+				newMat.useAlphaBlend = true;
+			}
 			// 3
 			newMat.specular.r = material.specular(0);
 			newMat.specular.g = material.specular(1);
