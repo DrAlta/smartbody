@@ -1,0 +1,1320 @@
+/*
+	Shader code for Smartbody JS
+	Note: due to the hardware implementation, the maximum number of vertex uniform vectors vary from vendors to vendors
+	Some hardware supports 1024 at maximum, but some old one's only support 254 at maximum.
+	Also for Windows platform, WebGL uses ANGEL - thin layer between DirectX and OpenGL which interprets OGL commands to DirectX.
+	But it is said, DirectX 9.0 version of ANGEL only supports 254 uniform vectors, while DirectX 11 supports more than that.
+	For Firefox, you could disable ANGEL and use native OPENGL, but it is not the case for Chrome.
+	To accommodate very limited number of vertex uniform vectors, let's say 254 at most, we did the following changes:
+	1. Use Quaternion + Translation representation of Xforms to reduce half of the uniform needed. 
+	2. Hard coded Material in Shader
+	3. Supports only two light source each only with position + diffuse
+	Thus, total uniform vector needed is:
+	QT(vec4 * 120 * 2) + light(vec4 * 3) + MVP(vec4 * 4) + MV(vec4 * 4) + meshScale(vec4 * 1) = 252 vec4
+*/
+#include "Shader.h"
+#include "sb/SBScene.h"
+#include "sb/SBAttribute.h"
+#include "sbm/GPU/SbmTexture.h"
+#include "sr/sr_camera.h"
+#include "sr/sr_light.h"
+#include "sr/sr_euler.h"
+#include "sr/sr_quat.h"
+#include <string>
+#include <vector>
+#include <stdlib.h>
+#include "boost/lexical_cast.hpp"
+#include "esUtil.h"
+#include <vhcl_log.h>
+
+#if defined(ANDROID_BUILD)
+#include <EGL/egl.h>
+#include <GLES/gl.h>
+#elif defined(IPHONE_BUILD)
+#import <OpenGLES/ES1/gl.h>
+#import <OpenGLES/ES1/glext.h>
+#elif defined(EMSCRIPTEN)
+#include <EGL/egl.h>
+#include <GLES/gl.h>
+#include <GLES2/gl2.h>
+#endif
+
+#define MAX_VERTEX_UNIFORM_1024 1024
+#if !defined(__ANDROID__)
+#include<emscripten.h>
+#endif
+
+using namespace std;
+using namespace SmartBody;
+
+#if __cplusplus
+extern "C"
+{
+#endif
+
+	char vShaderStr[] =  
+		"struct lightSource {							\n"
+		"	vec4	position;							\n"
+		"	vec4	ambient;							\n"
+		"	vec4	diffuse;							\n"
+		"};												\n"
+		"struct material {								\n"
+		"	vec4	ambient;							\n"
+		"	vec4    diffuse;							\n"
+		"};												\n"
+		"const int numOfLights = 2;						\n"
+		"attribute vec4 aPosition;						\n"
+		"attribute vec3 aNormal;						\n"
+		"uniform   mat4 uMVPMatrix;						\n"
+		"uniform   mat4 uMVMatrix;						\n"
+		"attribute vec2 aTexCoord;						\n"
+		"uniform   material	uMtrl;						\n"
+		"uniform   lightSource uLights[numOfLights];    \n"
+		"varying   vec4 vComputedLightColor;			\n"
+		"varying   vec2 vTexCoord;						\n"
+		"uniform   vec4 uQuaternion[120];				\n"
+		"uniform   vec4 uTranslation[120];				\n"
+		"uniform   float uMeshScale;					\n"
+		"attribute vec4 BoneID1;						\n"
+		"attribute vec4 BoneWeight1;					\n"
+		"const float c_zero = 0.0;											\n"
+		"const float c_one  = 1.0;											\n"
+		"vec4 calculateDirectionalShading(int i){							\n"
+		"	vec4 computedColor = vec4(c_zero, c_zero, c_zero, c_zero);		\n"
+		//	ambient
+		"   computedColor += (uLights[i].ambient * uMtrl.ambient);			\n"
+		//	diffuse light direction is normalized and in eye space
+		"   vec3 normal = normalize((uMVMatrix * vec4(aNormal, c_zero)).xyz);  \n"
+		"   vec3 nlightDir = normalize((uMVMatrix * uLights[i].position).xyz);\n" 
+		"   float ndotl = max(dot(normal, nlightDir), c_zero);					\n"
+		"   computedColor += (ndotl * uLights[i].diffuse * uMtrl.diffuse);	\n"
+		"   return computedColor;											\n"
+		"}																    \n"
+		"vec4 GetRotationQuaternion(float id){								\n"
+		"	int idx = int(id);												\n"
+		"	return uQuaternion[idx];										\n"
+		"}																	\n"
+		"vec3 GetTranslation(float id){										\n"
+		"	int idx = int(id);												\n"
+		"	return uTranslation[idx].xyz;									\n"
+		"}																	\n"
+		"vec4 quaternionMul(vec4 q1, vec4 q2){								\n"
+		"	vec4 q;															\n"
+		"	q.w = (q1.w*q2.w) - (q1.x*q2.x + q1.y*q2.y + q1.z*q2.z);		\n"
+		"	q.x = q1.y*q2.z - q1.z*q2.y;									\n"
+		"	q.y = q1.z*q2.x - q1.x*q2.z;									\n"
+		"	q.z = q1.x*q2.y - q1.y*q2.x;									\n"
+		"	q.x += (q1.x*q2.w) + (q2.x*q1.w);								\n"
+		"	q.y += (q1.y*q2.w) + (q2.y*q1.w);								\n"
+		"	q.z += (q1.z*q2.w) + (q2.z*q1.w);								\n"
+		"	return q;"
+		"}																	\n"
+		"vec4 TransformPos(vec3 position, vec4 boneid, vec4 boneweight){	\n"
+		"	vec3 pos = vec3(c_zero,c_zero,c_zero);							\n"
+		"	vec4 tempQ, tempQConj;											\n"
+		"   vec3 tempT;														\n"
+		"	for (int i = int(c_zero); i < 4; i++)							\n"
+		"	{																\n"
+		"		tempQ = GetRotationQuaternion(boneid[i]);					\n"
+		"		tempQConj = vec4(-tempQ.xyz, tempQ.w);						\n"
+		"		tempT = GetTranslation(boneid[i]);							\n"
+		//transform a point by QT v' = Q * v * conj(Q) + T
+		"		pos += (quaternionMul(quaternionMul(tempQ, vec4(position, c_zero)),tempQConj).xyz + tempT)*boneweight[i];\n"		
+		"	}															    \n"
+		"	return vec4(pos,c_one);											\n"
+		"}										 							\n"
+		"void main()						\n"
+		"{									\n"
+		"	gl_PointSize = 2.0;				\n"
+		"   vTexCoord = aTexCoord;			\n"
+		"   vec3 pos = vec3(aPosition.xyz)*uMeshScale;						\n"
+		"	vec4 skinPos = TransformPos(pos.xyz,BoneID1,BoneWeight1);		\n"
+		"	gl_Position = uMVPMatrix * skinPos;								\n"
+		"   vec4 shadeColor = vec4(c_zero, c_zero, c_zero, c_zero);			\n"
+		"	for(int i = 0; i < numOfLights; i++){						    \n"
+		"		shadeColor += calculateDirectionalShading(i);				\n"
+		"	}																\n"
+		"	vComputedLightColor = shadeColor;								\n"
+		"}																    \n"
+
+		;
+	char vShaderLimitedStr[] =
+		"struct lightSource {												\n"
+				"	vec4	position;												\n"
+				"	vec4	diffuse;												\n"
+				"};																	\n"
+				"const int numOfLights = 2;											\n"
+				"const vec4 mtrlAmbient = vec4(0.2, 0.2, 0.2, 1.0);					\n"
+				"const vec4 mtrlDiffuse = vec4(0.8, 0.8, 0.8, 1.0);					\n"
+				"const vec4 lightAmbient = vec4(0.1, 0.1, 0.1, 1.0);				\n"
+				"attribute vec4 aPosition;											\n"
+				"attribute vec3 aNormal;											\n"
+				"uniform   mat4 uMVPMatrix;											\n"
+				"uniform   mat4 uMVMatrix;											\n"
+				"attribute vec2 aTexCoord;											\n"
+				"uniform   lightSource uLights[numOfLights];						\n"
+				"varying   vec4 vComputedLightColor;								\n"
+				"varying   vec2 vTexCoord;											\n"
+				"uniform   vec4 uQuaternion[120];									\n"
+				"uniform   vec4 uTranslation[120];									\n"
+				"uniform   float uMeshScale;										\n"
+				"attribute vec4 BoneID1;											\n"
+				"attribute vec4 BoneWeight1;										\n"
+				"const float c_zero = 0.0;											\n"
+				"const float c_one  = 1.0;											\n"
+				"vec4 calculateDirectionalShading(int i){							\n"
+				"	vec4 computedColor = vec4(c_zero, c_zero, c_zero, c_zero);		\n"
+				"   computedColor += (lightAmbient * mtrlAmbient);					\n"
+				"   vec3 normal = normalize((uMVMatrix * vec4(aNormal, c_zero)).xyz);  \n"
+				"   vec3 nlightDir = normalize((uMVMatrix * uLights[i].position).xyz);\n"
+				"   float ndotl = max(dot(normal, nlightDir), c_zero);				\n"
+				"   computedColor += (ndotl * uLights[i].diffuse * mtrlDiffuse);	\n"
+				"   return computedColor;											\n"
+				"}																    \n"
+				"vec4 GetRotationQuaternion(float id){								\n"
+				"	int idx = int(id);												\n"
+				"	return uQuaternion[idx];										\n"
+				"}																	\n"
+				"vec3 GetTranslation(float id){										\n"
+				"	int idx = int(id);												\n"
+				"	return uTranslation[idx].xyz;									\n"
+				"}																	\n"
+				"vec4 quaternionMul(vec4 q1, vec4 q2){								\n"
+				"	vec4 q;															\n"
+				"	q.w = (q1.w*q2.w) - (q1.x*q2.x + q1.y*q2.y + q1.z*q2.z);		\n"
+				"	q.x = q1.y*q2.z - q1.z*q2.y;									\n"
+				"	q.y = q1.z*q2.x - q1.x*q2.z;									\n"
+				"	q.z = q1.x*q2.y - q1.y*q2.x;									\n"
+				"	q.x += (q1.x*q2.w) + (q2.x*q1.w);								\n"
+				"	q.y += (q1.y*q2.w) + (q2.y*q1.w);								\n"
+				"	q.z += (q1.z*q2.w) + (q2.z*q1.w);								\n"
+				"	return q;"
+				"}																	\n"
+				"vec4 TransformPos(vec3 position, vec4 boneid, vec4 boneweight){	\n"
+				"	vec3 pos = vec3(c_zero,c_zero,c_zero);							\n"
+				"	vec4 tempQ, tempQConj;											\n"
+				"   vec3 tempT;														\n"
+				"	for (int i = int(c_zero); i < 4; i++)							\n"
+				"	{																\n"
+				"		tempQ = GetRotationQuaternion(boneid[i]);					\n"
+				"		tempQConj = vec4(-tempQ.xyz, tempQ.w);						\n"
+				"		tempT = GetTranslation(boneid[i]);							\n"
+				//transform a point by QT v' = Q * v * conj(Q) + T
+				"		pos += (quaternionMul(quaternionMul(tempQ, vec4(position, c_zero)),tempQConj).xyz + tempT)*boneweight[i];\n"
+				"	}															    \n"
+				"	return vec4(pos,c_one);											\n"
+				"}										 							\n"
+				"void main()						\n"
+				"{									\n"
+				"	gl_PointSize = 2.0;				\n"
+				"   vTexCoord = aTexCoord;			\n"
+				"   vec3 pos = vec3(aPosition.xyz) * uMeshScale;					\n"
+				//"	gl_Position = uMVPMatrix * vec4(aPosition.xyz, 1.0);			\n"
+				"	vec4 skinPos = TransformPos(pos.xyz,BoneID1,BoneWeight1);		\n"
+				"	gl_Position = uMVPMatrix * skinPos;								\n"
+				"   vec4 shadeColor = vec4(c_zero, c_zero, c_zero, c_zero);			\n"
+				"	for(int i = 0; i < numOfLights; i++){						    \n"
+				"		shadeColor += calculateDirectionalShading(i);				\n"
+				"	}																\n"
+				"	vComputedLightColor = shadeColor;								\n"
+				"}																    \n"
+
+;
+
+	char vShaderStaticMeshStr[] =
+		"struct lightSource {							\n"
+				"	vec4	position;							\n"
+				"	vec4	ambient;							\n"
+				"	vec4	diffuse;							\n"
+				"};												\n"
+				"struct material {								\n"
+				"	vec4	ambient;							\n"
+				"	vec4    diffuse;							\n"
+				"};												\n"
+				"const int numOfLights = 2;						\n"
+				"attribute vec4 aPosition;						\n"
+				"attribute vec3 aNormal;						\n"
+				"uniform   mat4 uMVPMatrix;						\n"
+				"uniform   mat4 uMVMatrix;						\n"
+				"attribute vec2 aTexCoord;						\n"
+				"uniform   material	uMtrl;						\n"
+				"uniform   lightSource uLights[numOfLights];    \n"
+				"varying   vec4 vComputedLightColor;			\n"
+				"varying   vec2 vTexCoord;						\n"
+				"uniform   float uMeshScale;					\n"
+				"const float c_zero = 0.0;											\n"
+				"const float c_one  = 1.0;											\n"
+				"vec4 calculateDirectionalShading(int i){							\n"
+				"	vec4 computedColor = vec4(c_zero, c_zero, c_zero, c_zero);		\n"
+				//	ambient
+				"   computedColor += (uLights[i].ambient * uMtrl.ambient);			\n"
+				//	diffuse light direction is normalized and in eye space
+				"   vec3 normal = normalize((uMVMatrix * vec4(aNormal, c_zero)).xyz);  \n"
+				"   vec3 nlightDir = normalize((uMVMatrix * uLights[i].position).xyz);\n"
+				"   float ndotl = max(dot(normal, nlightDir), c_zero);					\n"
+				"   computedColor += (ndotl * uLights[i].diffuse * uMtrl.diffuse);	\n"
+				"   return computedColor;											\n"
+				"}																    \n"
+				"void main()						\n"
+				"{									\n"
+				"	gl_PointSize = 2.0;				\n"
+				"   vTexCoord = aTexCoord;			\n"
+				"   vec3 pos = vec3(aPosition.xyz)*uMeshScale;						\n"
+				"	vec4 skinPos = vec4(pos.xyz,1.0);		\n"
+				"	gl_Position = uMVPMatrix * skinPos;								\n"
+				"   vec4 shadeColor = vec4(c_zero, c_zero, c_zero, c_zero);			\n"
+				"	for(int i = 0; i < numOfLights; i++){						    \n"
+				"		shadeColor += calculateDirectionalShading(i);				\n"
+				"	}																\n"
+				"	vComputedLightColor = shadeColor;						\n"
+				"}																    \n"
+
+;
+
+
+	char fShaderStr[] = 
+		"precision mediump float;											\n"
+		"varying   vec2 vTexCoord;											\n"
+		"uniform   sampler2D sTexture;										\n"
+		"varying   vec4 vComputedLightColor;								\n"
+		"void main()														\n"
+		"{																	\n"
+		"  vec4 texColor = texture2D( sTexture, vTexCoord );				\n"
+		"  gl_FragColor  = texColor * vComputedLightColor;				\n"
+		"  //gl_FragColor  =  vComputedLightColor;//texColor;               \n"
+		"}																	\n"
+
+		;
+
+
+    char vShaderNormalMapStr[] =
+                    "precision mediump float;                       \n"
+                    "struct lightSource {							\n"
+                    "	mediump vec4	position;							\n"
+                    "	mediump vec4	ambient;							\n"
+                    "	mediump vec4	diffuse;							\n"
+                    "};												\n"
+                    "const int numOfLights = 4;						\n"
+                    "attribute vec4 aPosition;						\n"
+                    "attribute vec3 aNormal, aTangent;				\n"
+                    "uniform   mat4 uMVPMatrix;						\n"
+                    "uniform   mat4 uMVMatrix;						\n"
+                    "attribute vec2 aTexCoord;						\n"
+                    "uniform   lightSource uLights[numOfLights];    \n"
+                    "varying   vec2 vTexCoord;						\n"
+                    "varying   vec3 lightDir[numOfLights], halfVec[numOfLights];  \n"
+                    "uniform   float uMeshScale;					\n"
+                    "const float c_zero = 0.0;											\n"
+                    "const float c_one  = 1.0;											\n"
+                    "void main()						\n"
+                    "{									\n"
+                    "	gl_PointSize = 2.0;				\n"
+                    "   vTexCoord = aTexCoord;			\n"
+                    "   vec3 pos = vec3(aPosition.xyz)*uMeshScale;						\n"
+                    "	vec4 skinPos = vec4(pos.xyz,1.0);		                        \n"
+                    "	gl_Position = uMVPMatrix * skinPos;								\n"
+                    "   vec3 vertexPos = -normalize(vec3(uMVMatrix * vec4(skinPos.xyz,0.0)));          \n"
+                    "   mat3 tangentMat;                                                \n"
+                    "   tangentMat[0] = (uMVMatrix * vec4(aTangent,0.0)).xyz;            \n"
+                    "   tangentMat[2] = (uMVMatrix * vec4(aNormal,0.0)).xyz;           \n"
+                    "   tangentMat[1] = cross(tangentMat[0], tangentMat[2]);            \n"
+                    "   vec3 eyeVec = normalize(vertexPos*tangentMat);                  \n"
+                    "   for (int i=0;i<numOfLights;i++)                                \n"
+                    "   {                                                              \n"
+                    "       vec3 v = normalize((uMVMatrix * vec4(uLights[i].position.xyz,0)).xyz); \n"
+                    "       lightDir[i] = normalize(v*tangentMat);                     \n"
+                    "       halfVec[i] = normalize(lightDir[i]+eyeVec);                \n"
+                    "   }                                                              \n"
+                    "}																    \n"
+
+    ;
+
+
+    char fShaderNormalMapStr[] =
+                    "precision mediump float;                       \n"
+                    "struct material {								\n"
+                    "	vec4	ambient;							\n"
+                    "	vec4    diffuse;							\n"
+                    "};												\n"
+                    "struct lightSource {							\n"
+                    "	mediump vec4	position;							\n"
+                    "	mediump vec4	ambient;							\n"
+                    "	mediump vec4	diffuse;							\n"
+                    "};												\n"
+                    "const int numOfLights = 4;						\n"
+                    "varying   vec3 lightDir[numOfLights], halfVec[numOfLights];\n"
+                    "varying   vec2 vTexCoord;											\n"
+                    "uniform   sampler2D sTexture, normalTexture, specularTexture;			            \n"
+                    "uniform   lightSource uLights[numOfLights];    \n"
+                    "uniform   material	uMtrl;						\n"
+                    ""
+                    "vec4 calculateLighting(vec4 lightDiffuse, vec4 specularColor, vec3 normal, vec3 vlightDir, vec3 vHalfVec) {							\n"
+                    "	vec4 computedColor = vec4(0.0, 0.0, 0.0, 0.0);		\n"
+                    "   float ndotl = max(dot(normal, vlightDir), 0.0);					\n"
+                    "   computedColor += (ndotl * lightDiffuse * uMtrl.diffuse);	\n"
+                    "   float specularIntensity = pow (max (dot (vHalfVec, normal), 0.0), 4.0);\n"
+                    "   computedColor += (specularIntensity * specularColor);        \n"
+                    //"   computedColor += (specularIntensity * vec4(1.0,1.0,1.0,1.0));        \n"
+                    "   return computedColor;											\n"
+                    "}																    \n"
+                    "void main()														\n"
+                    "{																	\n"
+                    "  vec4 texColor = texture2D( sTexture, vTexCoord );				\n"
+					"  if (texColor.a < 0.8) discard;                                   \n"
+                    "  vec3 normal = 2.0 * texture2D(normalTexture, vTexCoord.st).rgb - 1.0;\n"
+                    "  vec4 specularColor = texture2D( specularTexture, vTexCoord );				\n"
+                    "  normal = normalize (normal);                                  \n"
+                    "  vec4 vComputedLightColor = vec4(0.0,0.0,0.0,0.0);             \n"
+                    "  for (int i=0;i<numOfLights; i++)                              \n"
+                    "  {                                                             \n"
+                    "       vComputedLightColor += calculateLighting(uLights[i].diffuse, specularColor, normal, lightDir[i], halfVec[i]); \n"
+                    "  }                                                             \n"
+                    "  vComputedLightColor.a = 1.0;                                  \n"
+                    "  gl_FragColor  = texColor * vComputedLightColor;				 \n"
+                    "  //gl_FragColor  =  vec4(normal,1.0);                   			     \n"
+                    "}																	\n"
+
+    ;
+	char vShaderStrSphere[] = 
+		"struct lightSource {				\n"
+		"	vec4	position;				\n"
+		"	vec4	ambient;				\n"
+		"	vec4	diffuse;				\n"
+		"};									\n"
+		"attribute vec4 aPosition;											\n"
+		"attribute vec3 aNormal;											\n"
+		"uniform   vec4 uColor;												\n"
+		"uniform   mat4 uMVPMatrix;											\n"
+		"uniform   mat4 uMVMatrix;											\n"
+		"uniform   int uLightEnabled;										\n"
+		"const int numOfLights = 2;											\n"
+		"const float c_zero = 0.0;											\n"
+		"const float c_one  = 1.0;											\n"
+		"uniform   lightSource uLights[numOfLights];						\n"
+		"varying   vec4 vComputedColor;										\n"
+		"varying   vec4 vColor;												\n"
+		"vec4 calculateDirectionalShading(int i){							\n"
+		"	vec4 computedColor = vec4(c_zero, c_zero, c_zero, c_zero);		\n"
+		//	ambient
+		"   computedColor += (uLights[i].ambient * vec4(0.2, 0.2, 0.2, 1.0));\n"
+		//	diffuse light direction is normalized and in eye space
+		"   vec3 normal = normalize((uMVMatrix * vec4(aNormal, c_zero)).xyz);\n"
+		"   vec3 nlightDir = normalize((uMVMatrix * uLights[i].position).xyz);\n" 
+		"   float ndotl = max(dot(normal, nlightDir), c_zero);				\n"
+		"   computedColor += (ndotl * uLights[i].diffuse * vec4(0.8, 0.8, 0.8, 1.0));\n"
+		"   return computedColor;											\n"
+		"}																    \n"
+		"void main()														\n"
+		"{																	\n"
+		"	gl_PointSize = 5.0;												\n"
+		"   vec4 shadeColor;												\n"
+		"	gl_Position = uMVPMatrix * aPosition;							\n"
+		"	if( uLightEnabled == 1 ){										\n"
+		"			shadeColor = vec4(c_zero, c_zero, c_zero, c_zero);		\n"
+		"		for(int i = 0; i < numOfLights; i++){						\n"
+		"			shadeColor += calculateDirectionalShading(i);			\n"
+		"		}															\n"
+		"	}																\n"
+		"	else															\n"
+		"		shadeColor = vec4(c_one, c_one, c_one, c_one);				\n"														
+		"	vComputedColor = shadeColor;									\n"
+		"   vColor		   = uColor;										\n"
+		"}																	\n"
+
+		;
+	char fShaderStrSphere[] =  
+		"precision mediump float;											\n"
+		"varying   vec4 vComputedColor;										\n"
+		"varying   vec4 vColor;												\n"
+		"void main()														\n"
+		"{																	\n"
+		"  gl_FragColor  = vComputedColor * vColor;							\n"
+		//"  gl_FragColor  = vColor;											\n"
+		"}																	\n"
+
+		;
+	std::vector<SrLight> _lights;
+	GLint maxVUniforms = 0;
+	GLuint SHADER_API esLoadShader(GLenum type, const char *shaderSrc)
+	{
+
+		GLuint shader;
+		GLint compiled;
+
+		//step 1: create the Shader object
+		shader = glCreateShader(type);
+
+		if(shader == NULL)
+			return 0;
+		//step 2: load the Shader source
+		glShaderSource(shader, 1, &shaderSrc, NULL);
+
+		//step 3: compile the Shader
+		glCompileShader(shader);
+
+		//step 4: check the compilation
+		glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+
+		if(!compiled)
+		{
+			GLint infoLen = 0;
+			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
+
+			if(infoLen > 0){ 
+				char* infoLog = (char*)malloc(sizeof(char) * infoLen);
+				glGetShaderInfoLog(shader, infoLen, NULL, infoLog);
+                LOG("Shader Build Log = %s", infoLog);
+				free(infoLog);
+			}
+
+			glDeleteShader(shader);
+			return 0;
+		}
+
+		return shader;
+	}
+
+	GLuint SHADER_API esLoadProgram(const char *vertShaderSrc, const char *fragShaderSrc)
+	{
+		GLuint vertexShader;
+		GLuint fragmentShader;
+		GLuint programObject;
+		GLint  linked;
+		//step 1: load vertex shader
+		vertexShader		= esLoadShader(GL_VERTEX_SHADER, vertShaderSrc);
+		if(vertexShader == NULL)
+		{
+			glDeleteShader(vertexShader);
+			return 0;
+		}
+		//step 2: load fragment shader
+		fragmentShader		= esLoadShader(GL_FRAGMENT_SHADER, fragShaderSrc);
+		if(fragmentShader ==  NULL)
+		{
+			glDeleteShader(fragmentShader);
+			return 0;
+		}
+		//setp 3: create program object
+		programObject = glCreateProgram();
+		if(programObject == NULL)
+			return 0;
+
+		//step 4: attach vertexShader and fragmentShader to the program
+		glAttachShader(programObject, vertexShader);
+		glAttachShader(programObject, fragmentShader);
+
+		//step 5: link the program
+		glLinkProgram(programObject);
+
+		//step 6: check linking result
+		glGetProgramiv(programObject, GL_LINK_STATUS, &linked);
+		if(!linked)
+		{
+			GLint infoLen = 0;
+			glGetProgramiv(programObject, GL_INFO_LOG_LENGTH, &infoLen);
+
+			if(infoLen > 0)
+			{
+				char *infoLog = (char*)malloc(sizeof(char) * infoLen);
+
+				glGetProgramInfoLog(programObject, infoLen, NULL, infoLog);
+				LOG("Error linking program:\n%s\n", infoLog);
+				free(infoLog);
+
+			}
+
+			glDeleteProgram(programObject);
+			return 0;
+		}
+
+		//setp 7: free shader resources
+		glDeleteShader(vertexShader);
+		glDeleteShader(fragmentShader);
+
+		return programObject;
+	}
+
+
+	void SHADER_API shaderInit(ESContext *esContext){
+
+		//query number of vertex uniform vector support
+
+
+		//load Vertex and Fragment Shader and link them into program object
+		esContext->userData = malloc(sizeof(UserData)); 
+		esContext->shapeData = malloc(sizeof(ShapeData)); 
+		
+		UserData *userData = (UserData*)esContext->userData;
+
+
+#define GPU_SKINNING 0
+#if GPU_SKINNING
+        glGetIntegerv(GL_MAX_VERTEX_UNIFORM_VECTORS, &maxVUniforms);
+		LOG("Web browser supports %d number of Vertex uniform vectors", maxVUniforms);
+		if(maxVUniforms >= MAX_VERTEX_UNIFORM_1024)
+			userData->programObject = esLoadProgram(vShaderStr, fShaderStr);
+		else
+			userData->programObject = esLoadProgram(vShaderLimitedStr, fShaderStr);
+#else
+        maxVUniforms = 2048; // fake the maxVUniform for non-GPU skinning
+		userData->programObject = esLoadProgram(vShaderStaticMeshStr, fShaderStr);
+        //userData->programObject = esLoadProgram(vShaderNormalMapStr, fShaderNormalMapStr);
+
+#endif
+		
+		ShapeData *shapeData = (ShapeData*)esContext->shapeData;
+		shapeData->programObject = esLoadProgram(vShaderStrSphere, fShaderStrSphere);
+
+		glUseProgram ( userData->programObject );
+		//mesh part
+		userData->positionLoc = glGetAttribLocation(userData->programObject, "aPosition");
+		userData->normalLoc   = glGetAttribLocation(userData->programObject, "aNormal");
+        userData->tangentLoc   = glGetAttribLocation(userData->programObject, "aTangent");
+		userData->texCoordLoc = glGetAttribLocation(userData->programObject, "aTexCoord");
+		userData->mvpLoc	  = glGetUniformLocation(userData->programObject, "uMVPMatrix");
+		userData->mvLoc		  = glGetUniformLocation(userData->programObject, "uMVMatrix");
+		userData->samplerLoc  = glGetUniformLocation(userData->programObject, "sTexture");
+        userData->normalMapLoc = glGetUniformLocation(userData->programObject, "normalTexture");
+        userData->specularMapLoc = glGetUniformLocation(userData->programObject, "specularTexture");
+#if GPU_SKINNING
+		userData->boneIDLoc   = glGetAttribLocation(userData->programObject, "BoneID1");
+		userData->boneWeightLoc = glGetAttribLocation(userData->programObject, "BoneWeight1");
+#endif
+
+		if(maxVUniforms >= MAX_VERTEX_UNIFORM_1024){
+			//material
+			userData->mtrlAmbientLoc = glGetUniformLocation(userData->programObject, "uMtrl.ambient");
+			userData->mtrlDiffuseLoc = glGetUniformLocation(userData->programObject, "uMtrl.diffuse");
+			glUniform4f(userData->mtrlAmbientLoc, 0.2, 0.2, 0.2, 1.0);
+			glUniform4f(userData->mtrlDiffuseLoc, 0.8, 0.8, 0.8, 1.0);
+			
+		}
+#if GPU_SKINNING
+		userData->QuaternionLoc	  = glGetUniformLocation(userData->programObject, "uQuaternion");
+		userData->TranslationLoc  = glGetUniformLocation(userData->programObject, "uTranslation");
+#endif
+		userData->meshScaleLoc = glGetUniformLocation(userData->programObject, "uMeshScale");
+
+		//generate buffers
+		glGenBuffers(1, &userData->meshPosObject);
+		glGenBuffers(1, &userData->meshNormalObject);
+        glGenBuffers(1, &userData->meshTangentObject);
+		glGenBuffers(1, &userData->meshTexCoordObject);
+		glGenBuffers(1, &userData->subMeshTriObject);
+		glGenBuffers(1, &userData->boneWeightObject);
+		glGenBuffers(1, &userData->boneIdObject);
+
+
+		//sphere part
+		glUseProgram ( shapeData->programObject );
+		shapeData->positionLoc = glGetAttribLocation(shapeData->programObject, "aPosition");
+		shapeData->normalLoc   = glGetAttribLocation(shapeData->programObject, "aNormal");
+		shapeData->colorLoc    = glGetUniformLocation(shapeData->programObject, "uColor");
+		shapeData->mvpLoc	   = glGetUniformLocation(shapeData->programObject, "uMVPMatrix");
+		shapeData->mvLoc	   = glGetUniformLocation(shapeData->programObject, "uMVMatrix");
+		shapeData->lightEnabledLoc = glGetUniformLocation(shapeData->programObject, "uLightEnabled");
+
+		glGenBuffers(1, &shapeData->posObject);
+		glGenBuffers(1, &shapeData->indexObject);
+		glGenBuffers(1, &shapeData->normalObject);
+		glGenBuffers(1, &shapeData->jointPosObject);
+		glGenBuffers(1, &shapeData->boneIdxObject);
+
+		
+		//glClearColor ( 0.0f, 0.0f, 0.0f, 1.0f );
+		glClearColor ( 0.6f, 0.6f, 0.6f, 1.0f );
+
+	}
+	void SHADER_API drawLights(ESContext *esContext)
+	{
+		//test for drawing a directional light
+		UserData *userData = (UserData*)esContext->userData;
+		ShapeData *shapeData = (ShapeData*)esContext->shapeData;
+
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		SrCamera& cam = *scene->getActiveCamera();
+		SrVec eye = cam.getEye();
+
+		const int numOfLights = 5;
+		GLint loc;
+		string str;
+
+#if 1
+		_lights.clear();
+		int numLightsInScene = 0;
+		const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
+		SrLight light;
+		for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
+			iter != pawnNames.end();
+			iter++)
+		{
+			SmartBody::SBPawn* sbpawn = SmartBody::SBScene::getScene()->getPawn(*iter);
+			const std::string& name = sbpawn->getName();
+			if (name.find("light") == 0)
+			{
+				numLightsInScene++;
+				SmartBody::BoolAttribute* enabledAttr = dynamic_cast<SmartBody::BoolAttribute*>(sbpawn->getAttribute("enabled"));
+				if (enabledAttr && !enabledAttr->getValue())
+				{
+					continue;
+				}
+				//position
+				light.position = sbpawn->getPosition();
+				SrQuat orientation = sbpawn->getOrientation();
+				if (light.directional)
+				{
+					light.position = -SrVec(0, 1, 0) * orientation;
+				}			
+				//diffuse
+				SmartBody::Vec3Attribute* diffuseColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightDiffuseColor"));
+				if (diffuseColorAttr)
+				{
+					const SrVec& color = diffuseColorAttr->getValue();
+					light.diffuse = SrColor( color.x, color.y, color.z );
+				}
+				else
+				{
+					light.diffuse = SrColor( 1.0f, 0.95f, 0.8f );
+				}
+				//ambient
+				SmartBody::Vec3Attribute* ambientColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightAmbientColor"));
+				if (ambientColorAttr)
+				{
+					const SrVec& color = ambientColorAttr->getValue();
+					light.ambient = SrColor( color.x, color.y, color.z );
+				}
+				else
+				{
+					light.ambient = SrColor( 0.0f, 0.0f, 0.0f );
+				}
+				//specular
+				SmartBody::Vec3Attribute* specularColorAttr = dynamic_cast<SmartBody::Vec3Attribute*>(sbpawn->getAttribute("lightSpecularColor"));
+				if (specularColorAttr)
+				{
+					const SrVec& color = specularColorAttr->getValue();
+					light.specular = SrColor( color.x, color.y, color.z );
+				}
+				else
+				{
+					light.specular = SrColor( 0.0f, 0.0f, 0.0f );
+				}
+
+				_lights.push_back(light);
+			}
+		}
+
+		if (_lights.size() == 0 && numLightsInScene == 0)
+		{
+			SrLight light;		
+			light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
+			SrMat mat;
+			sr_euler_mat_xyz (mat, SR_TORAD(0), SR_TORAD(0), SR_TORAD(135	));
+			SrQuat orientation(mat);
+			SrVec up(0,1,0);
+			SrVec lightDirection = -up * orientation;
+			light.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
+			_lights.push_back(light);
+
+			SrLight light2 = light;
+			light2.diffuse = SrColor( 0.8f, 0.8f, 0.8f );
+			sr_euler_mat_xyz (mat, SR_TORAD(0), SR_TORAD(0), SR_TORAD(-135));
+			SrQuat orientation2(mat);
+			lightDirection = -up * orientation2;
+			light2.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
+			_lights.push_back(light2);
+		}
+		//pass lights to mesh shader 
+		glUseProgram ( userData->programObject );
+		if(maxVUniforms >= MAX_VERTEX_UNIFORM_1024){
+			for(int i = 0; i < _lights.size(); ++i){
+				light = _lights[i];
+				str = "uLights[" + boost::lexical_cast<std::string>(i) +  "].position";
+				loc = glGetUniformLocation(userData->programObject, str.c_str());
+				glUniform4f(loc, light.position.x, light.position.y, light.position.z, 0.0);			
+				str = "uLights[" + boost::lexical_cast<std::string>(i) +  "].diffuse";
+				loc = glGetUniformLocation(userData->programObject, str.c_str());
+				glUniform4f(loc, (float)light.diffuse.r / 255.0f, (float)light.diffuse.g / 255.0f, (float)light.diffuse.b / 255.0f, 1.0f);
+				str = "uLights[" + boost::lexical_cast<std::string>(i) +  "].ambient";
+				loc = glGetUniformLocation(userData->programObject, str.c_str());
+				glUniform4f(loc, (float)light.ambient.r / 255.0f, (float)light.ambient.g / 255.0f, (float)light.ambient.b / 255.0f, 1.0f);
+			}
+		}else{
+			light = _lights[0];
+			str = "uLights[" + boost::lexical_cast<std::string>(0) +  "].position";
+			loc = glGetUniformLocation(userData->programObject, str.c_str());
+			glUniform4f(loc, light.position.x, light.position.y, light.position.z, 0.0);			
+			str = "uLights[" + boost::lexical_cast<std::string>(0) +  "].diffuse";
+			loc = glGetUniformLocation(userData->programObject, str.c_str());
+			glUniform4f(loc, (float)light.diffuse.r / 255.0f, (float)light.diffuse.g / 255.0f, (float)light.diffuse.b / 255.0f, 1.0f);
+
+			light = _lights[1];
+			str = "uLights[" + boost::lexical_cast<std::string>(1) +  "].position";
+			loc = glGetUniformLocation(userData->programObject, str.c_str());
+			glUniform4f(loc, light.position.x, light.position.y, light.position.z, 0.0);			
+			str = "uLights[" + boost::lexical_cast<std::string>(1) +  "].diffuse";
+			loc = glGetUniformLocation(userData->programObject, str.c_str());
+			glUniform4f(loc, (float)light.diffuse.r / 255.0f, (float)light.diffuse.g / 255.0f, (float)light.diffuse.b / 255.0f, 1.0f);
+		}
+		
+		glUseProgram ( shapeData->programObject );
+		//pass lights to shape shader
+		for(int i = 0; i < _lights.size(); ++i){
+			light = _lights[i];
+			str = "uLights[" + boost::lexical_cast<std::string>(i) +  "].position";
+			loc = glGetUniformLocation(shapeData->programObject, str.c_str());
+			glUniform4f(loc, light.position.x, light.position.y, light.position.z, 0.0);			
+			str = "uLights[" + boost::lexical_cast<std::string>(i) +  "].diffuse";
+			loc = glGetUniformLocation(shapeData->programObject, str.c_str());
+			glUniform4f(loc, (float)light.diffuse.r / 255.0f, (float)light.diffuse.g / 255.0f, (float)light.diffuse.b / 255.0f, 1.0f);
+			
+			str = "uLights[" + boost::lexical_cast<std::string>(i) +  "].ambient";
+			loc = glGetUniformLocation(shapeData->programObject, str.c_str());
+			glUniform4f(loc, (float)light.ambient.r / 255.0f, (float)light.ambient.g / 255.0f, (float)light.ambient.b / 255.0f, 1.0f);
+			
+		}
+#endif
+	}
+	void SHADER_API drawMesh(DeformableMeshInstance *shape, ESContext *esContext, bool showSkinWeight)
+	{
+		UserData *userData = (UserData*)esContext->userData;
+		SmartBody::SBScene *scene = SmartBody::SBScene::getScene();
+		//LOG("Render Deformable Model");
+		DeformableMesh *mesh = shape->getDeformableMesh();
+		std::vector<SrVec4>          QuaternionBuf;
+		std::vector<SrVec4>			 TranslationBuf;
+		if(!mesh){
+			//printf("no deformable mesh found!\n");
+			return;
+		}
+		//get submesh
+		std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
+
+		glEnable(GL_CULL_FACE);
+		if(scene->getBoolAttribute("enableAlphaBlend")){
+			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		}
+		glEnable( GL_MULTISAMPLE );
+		glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+		//LOG("meshScale = %f", shape->getMeshScale());
+		glUniform1f(userData->meshScaleLoc, shape->getMeshScale()[0]);
+		
+		if (shape->_deformPosBuf.size() > 0)
+		{
+			glEnableVertexAttribArray(userData->positionLoc);
+			glBindBuffer(GL_ARRAY_BUFFER, userData->meshPosObject);
+			glBufferData(GL_ARRAY_BUFFER, shape->_deformPosBuf.size() * sizeof(GLfloat) * 3, (GLfloat*)&shape->_deformPosBuf[0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(userData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			//glDrawArrays(GL_POINTS, 0, shape->_deformPosBuf.size());
+		}
+		
+		if (mesh->normalBuf.size () > 0)
+		{
+			glEnableVertexAttribArray(userData->normalLoc);
+			glBindBuffer(GL_ARRAY_BUFFER, userData->meshNormalObject);
+			glBufferData(GL_ARRAY_BUFFER, mesh->normalBuf.size () * sizeof(GLfloat) * 3, (GLfloat*)&mesh->normalBuf[0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(userData->normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		}
+
+		//load the texture coordinates
+		if (mesh->texCoordBuf.size() > 0)
+		{
+			glEnableVertexAttribArray(userData->texCoordLoc);
+			glBindBuffer(GL_ARRAY_BUFFER, userData->meshTexCoordObject);
+			glBufferData(GL_ARRAY_BUFFER, mesh->texCoordBuf.size () * sizeof(GLfloat) * 2, (GLfloat*)&mesh->texCoordBuf[0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(userData->texCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		}
+		//load transform
+		if(shape->transformBuffer.size() > 0){
+			
+			//convert transform from 4x4 matrix to QT(Quaternion + Translation) representation
+			for(size_t i = 0; i < shape->transformBuffer.size(); ++i){
+				SrQuat temp = SrQuat(shape->transformBuffer[i].get_rotation());
+				temp.normalize();
+				QuaternionBuf.push_back(SrVec4(temp.getData(1), temp.getData(2), temp.getData(3), temp.getData(0)));
+				SrVec tempT = SrVec(shape->transformBuffer[i].get_translation());
+				TranslationBuf.push_back(SrVec4(tempT.getData(0), tempT.getData(1), tempT.getData(2), 0.0));
+			}
+			//submit QT to the Vertex shader
+			glUniform4fv(userData->QuaternionLoc, QuaternionBuf.size(), (GLfloat*)&QuaternionBuf[0]);
+			glUniform4fv(userData->TranslationLoc, TranslationBuf.size(), (GLfloat*)&TranslationBuf[0]);
+				
+			QuaternionBuf.clear();
+			TranslationBuf.clear();
+			
+		}
+		
+		//load weight
+		if(mesh->boneWeightBuf[0].size() > 0){
+			glEnableVertexAttribArray(userData->boneWeightLoc);
+			glBindBuffer(GL_ARRAY_BUFFER, userData->boneWeightObject);
+			glBufferData(GL_ARRAY_BUFFER, mesh->boneWeightBuf[0].size() * sizeof(GLfloat) * 4, (GLfloat*)&mesh->boneWeightBuf[0][0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(userData->boneWeightLoc,4,GL_FLOAT,0,0,0);
+		}
+		//load boneId
+		if(mesh->boneIDBuf_f[0].size() > 0){
+			glEnableVertexAttribArray(userData->boneIDLoc);
+			glBindBuffer(GL_ARRAY_BUFFER, userData->boneIdObject);
+			glBufferData(GL_ARRAY_BUFFER, mesh->boneIDBuf_f[0].size() * sizeof(GLfloat) * 4, (GLfloat*)&mesh->boneIDBuf_f[0][0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(userData->boneIDLoc,4,GL_FLOAT,0,0,0);
+		}
+
+		for(unsigned int i = 0; i < subMeshList.size(); i++)
+		{
+			SbmSubMesh *subMesh = subMeshList[i];
+			std::string texturesType = "static";
+			if (shape->getCharacter())
+				texturesType = shape->getCharacter()->getStringAttribute("texturesType");	
+			//printf("textureType = %s", texturesType.c_str());
+
+			if( texturesType == "static" || texturesType == "dynamic")
+			{
+				SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());		
+				//printf("tex = %d", tex);
+				if (tex && !showSkinWeight)
+				{
+					GLint activeTexture = -1;
+					glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+
+					if (activeTexture != GL_TEXTURE0)
+						glActiveTexture(GL_TEXTURE0);
+
+					//	If we are using blended textures
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
+
+					if(!shape->getCharacter())
+					{
+						glBindTexture(GL_TEXTURE_2D, tex->getID());					
+					} 
+					else if (texturesType == "dynamic")
+					{
+						if(shape->_tempTexPairs != NULL)
+						{
+							glBindTexture(GL_TEXTURE_2D, shape->_tempTexPairs[0]);
+							//std::cerr << "Using tex: " << shape->_tempTexPairs[0] << "\n";
+							//LOG("Use Blended texture");
+						}
+						else 
+						{
+							//LOG("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
+							glBindTexture(GL_TEXTURE_2D, tex->getID());
+						}
+
+					}
+					else 		//	If blended textures not used, use neutral appearance				
+					{
+						glBindTexture(GL_TEXTURE_2D, tex->getID());
+						//printf("Use original texture, texID = %d", tex->getID());
+					}	
+					glUniform1i (userData->samplerLoc, 0);
+				}
+			}
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, userData->subMeshTriObject);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, subMesh->triBuf.size() * sizeof(GLushort) * 3, (GLushort *)&subMesh->triBuf[0], GL_DYNAMIC_DRAW);
+			glDrawElements(GL_TRIANGLES, subMesh->triBuf.size() * 3, GL_UNSIGNED_SHORT, 0);
+		}
+		if(scene->getBoolAttribute("enableAlphaBlend")){
+			glDisable(GL_BLEND);
+		}
+		glDisable(GL_CULL_FACE);
+		//unbind buffers
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+
+	void SHADER_API drawMeshStatic(DeformableMeshInstance *shape, ESContext *esContext, bool showSkinWeight)
+	{
+		UserData *userData = (UserData*)esContext->userData;
+		SmartBody::SBScene *scene = SmartBody::SBScene::getScene();
+		//LOG("Render Deformable Model");
+		DeformableMesh *mesh = shape->getDeformableMesh();
+		std::vector<SrVec4>          QuaternionBuf;
+		std::vector<SrVec4>			 TranslationBuf;
+		if(!mesh){
+			//printf("no deformable mesh found!\n");
+			return;
+		}
+		//get submesh
+		std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
+
+		glEnable(GL_CULL_FACE);
+		if(scene->getBoolAttribute("enableAlphaBlend")){
+			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		//LOG("meshScale = %f", shape->getMeshScale());
+		glUniform1f(userData->meshScaleLoc, shape->getMeshScale()[0]);
+
+		if (shape->_deformPosBuf.size() > 0)
+		{
+			glEnableVertexAttribArray(userData->positionLoc);
+			glBindBuffer(GL_ARRAY_BUFFER, userData->meshPosObject);
+			glBufferData(GL_ARRAY_BUFFER, shape->_deformPosBuf.size() * sizeof(GLfloat) * 3, (GLfloat*)&shape->_deformPosBuf[0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(userData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			//glDrawArrays(GL_POINTS, 0, shape->_deformPosBuf.size());
+		}
+
+		if (mesh->normalBuf.size () > 0)
+		{
+			glEnableVertexAttribArray(userData->normalLoc);
+			glBindBuffer(GL_ARRAY_BUFFER, userData->meshNormalObject);
+			glBufferData(GL_ARRAY_BUFFER, mesh->normalBuf.size () * sizeof(GLfloat) * 3, (GLfloat*)&mesh->normalBuf[0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(userData->normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+		}
+
+
+        if (mesh->tangentBuf.size () > 0)
+        {
+            glEnableVertexAttribArray(userData->tangentLoc);
+            glBindBuffer(GL_ARRAY_BUFFER, userData->meshTangentObject);
+            glBufferData(GL_ARRAY_BUFFER, mesh->tangentBuf.size () * sizeof(GLfloat) * 3, (GLfloat*)&mesh->tangentBuf[0], GL_DYNAMIC_DRAW);
+            glVertexAttribPointer(userData->tangentLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        }
+
+		//load the texture coordinates
+		if (mesh->texCoordBuf.size() > 0)
+		{
+			glEnableVertexAttribArray(userData->texCoordLoc);
+			glBindBuffer(GL_ARRAY_BUFFER, userData->meshTexCoordObject);
+			glBufferData(GL_ARRAY_BUFFER, mesh->texCoordBuf.size () * sizeof(GLfloat) * 2, (GLfloat*)&mesh->texCoordBuf[0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(userData->texCoordLoc, 2, GL_FLOAT, GL_FALSE, 0, 0);
+		}
+		
+		SbmTextureManager::singleton().createWhiteTexture("white");
+		SbmTexture* texWhite = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,"white");
+		for(unsigned int i = 0; i < subMeshList.size(); i++)
+		{
+			SbmSubMesh *subMesh = subMeshList[i];
+			std::string texturesType = "static";
+			if (shape->getCharacter())
+				texturesType = shape->getCharacter()->getStringAttribute("texturesType");
+			//printf("textureType = %s", texturesType.c_str());
+
+			if( texturesType == "static" || texturesType == "dynamic")
+			{
+				SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());
+                SbmTexture* normalMap = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_NORMALMAP, subMesh->normalMapName.c_str());
+                SbmTexture* specularMap = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, subMesh->specularMapName.c_str());
+				// set the default texture for missing maps
+				if (!tex) tex = texWhite;
+				if (!normalMap) normalMap = texWhite;
+				if (!specularMap) specularMap = texWhite;
+				//LOG("Render StaticMesh tex = %d", tex);
+				if (tex && !showSkinWeight)
+				{
+					//LOG("Render StaticMesh texID = %d", tex->getID());
+					GLint activeTexture = -1;
+					glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+
+					if (activeTexture != GL_TEXTURE0)
+						glActiveTexture(GL_TEXTURE0);
+
+					//	If we are using blended textures
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+					glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+					if(!shape->getCharacter())
+					{
+						glBindTexture(GL_TEXTURE_2D, tex->getID());
+					}
+					else if (texturesType == "dynamic")
+					{
+						if(shape->_tempTexPairs != NULL)
+						{
+							glBindTexture(GL_TEXTURE_2D, shape->_tempTexPairs[0]);
+						}
+						else
+						{
+							//LOG("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
+							glBindTexture(GL_TEXTURE_2D, tex->getID());
+						}
+
+					}
+					else 		//	If blended textures not used, use neutral appearance
+					{
+						glBindTexture(GL_TEXTURE_2D, tex->getID());
+						//LOG("Use original texture, texID = %d", tex->getID());
+					}
+                    //LOG("sTexture uniform loc = %d", userData->samplerLoc);
+					glUniform1i (userData->samplerLoc, 0);
+				}
+				
+                if (normalMap)
+                {
+                    GLint activeTexture = -1;
+                    glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+
+                    if (activeTexture != GL_TEXTURE1)
+                        glActiveTexture(GL_TEXTURE1);
+                    glBindTexture(GL_TEXTURE_2D, normalMap->getID());
+                    glUniform1i (userData->normalMapLoc, 1);
+                }
+                if (specularMap)
+                {
+                    GLint activeTexture = -1;
+                    glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+
+                    if (activeTexture != GL_TEXTURE2)
+                        glActiveTexture(GL_TEXTURE2);
+                    glBindTexture(GL_TEXTURE_2D, specularMap->getID());
+                    glUniform1i (userData->specularMapLoc, 2);
+                }
+			}
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, userData->subMeshTriObject);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, subMesh->triBuf.size() * sizeof(GLushort) * 3, (GLushort *)&subMesh->triBuf[0], GL_DYNAMIC_DRAW);
+			glDrawElements(GL_TRIANGLES, subMesh->triBuf.size() * 3, GL_UNSIGNED_SHORT, 0);
+		}
+		if(scene->getBoolAttribute("enableAlphaBlend")){
+			glDisable(GL_BLEND);
+		}
+		glDisable(GL_CULL_FACE);
+		//unbind buffers
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+
+	void SHADER_API drawSphere(ESContext *esContext, SrVec pos, float r, int p, SrVec color){
+		ShapeData *shapeData = (ShapeData*)esContext->shapeData;
+		float theta1 = 0.0, theta2 = 0.0, theta3 = 0.0;
+
+		float ex = 0.0f, ey = 0.0f, ez = 0.0f;
+		float px = 0.0f, py = 0.0f, pz = 0.0f;
+		GLfloat *vertices = new GLfloat[p*6+6];
+		GLfloat *normals = new GLfloat[p*6+6];
+
+		if( r < 0 )
+			r = -r;
+
+		if( p < 0 )
+			p = -p;
+
+		for(int i = 0; i < p/2; ++i)
+		{
+			theta1 = i * (M_PI*2) / p - M_PI_2;
+			theta2 = (i + 1) * (M_PI*2) / p - M_PI_2;
+
+			for(int j = 0; j <= p; ++j)
+			{
+				theta3 = j * (M_PI*2) / p;
+
+				ex = cosf(theta2) * cosf(theta3);
+				ey = sinf(theta2);
+				ez = cosf(theta2) * sinf(theta3);
+				px = pos.x + r * ex;
+				py = pos.y + r * ey;
+				pz = pos.z + r * ez;
+
+				vertices[(6*j)+(0%6)] = px;
+				vertices[(6*j)+(1%6)] = py;
+				vertices[(6*j)+(2%6)] = pz;
+
+				normals[(6*j)+(0%6)] = ex;
+				normals[(6*j)+(1%6)] = ey;
+				normals[(6*j)+(2%6)] = ez;
+
+				ex = cosf(theta1) * cosf(theta3);
+				ey = sinf(theta1);
+				ez = cosf(theta1) * sinf(theta3);
+				px = pos.x + r * ex;
+				py = pos.y + r * ey;
+				pz = pos.z + r * ez;
+
+				vertices[(6*j)+(3%6)] = px;
+				vertices[(6*j)+(4%6)] = py;
+				vertices[(6*j)+(5%6)] = pz;
+
+				normals[(6*j)+(3%6)] = ex;
+				normals[(6*j)+(4%6)] = ey;
+				normals[(6*j)+(5%6)] = ez;
+			}
+			//bind position buffer
+			glEnableVertexAttribArray(shapeData->positionLoc);
+			glBindBuffer(GL_ARRAY_BUFFER, shapeData->posObject);
+			glBufferData(GL_ARRAY_BUFFER,  (p*6+6) * sizeof(GLfloat), (GLfloat*)&vertices[0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(shapeData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			//bind normal buffer
+			glEnableVertexAttribArray(shapeData->normalLoc);
+			glBindBuffer(GL_ARRAY_BUFFER, shapeData->normalObject);
+			glBufferData(GL_ARRAY_BUFFER,  (p*6+6) * sizeof(GLfloat), (GLfloat*)&normals[0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(shapeData->normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			//pass uniform color
+			glUniform4f(shapeData->colorLoc, 1.0, 0.0, 0.0, 1.0);
+			glUniform1i(shapeData->lightEnabledLoc, 1);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, (p+1)*2);
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(shapeData->positionLoc);
+		glDisableVertexAttribArray(shapeData->normalLoc);
+
+		delete [] vertices;
+		delete [] normals;
+	}
+
+	void drawBox(ESContext *esContext, SrVec pos, SrVec extent, SrVec color){
+		ShapeData *shapeData = (ShapeData*)esContext->shapeData;
+		GLfloat vertices[] = {-extent.x + pos.x, -extent.y + pos.y,  extent.z + pos.z,
+			extent.x + pos.x, -extent.y + pos.y,  extent.z + pos.z,  
+			extent.x + pos.x,  extent.y + pos.y,  extent.z + pos.z, 
+			-extent.x + pos.x,  extent.y + pos.y,  extent.z + pos.z,
+			-extent.x + pos.x, -extent.y + pos.y, -extent.z + pos.z,  
+			extent.x + pos.x, -extent.y + pos.y, -extent.z + pos.z,  
+			extent.x + pos.x,  extent.y + pos.y, -extent.z + pos.z, 
+			-extent.x + pos.x,  extent.y + pos.y, -extent.z + pos.z
+		};
+
+		GLfloat normals[]  = {-1.0, -1.0,  1.0,  1.0, -1.0,  1.0,  1.0,  1.0,  1.0, -1.0,  1.0,  1.0,
+			-1.0, -1.0, -1.0,  1.0, -1.0, -1.0,  1.0,  1.0, -1.0, -1.0,  1.0, -1.0
+		};
+
+		GLuint indices[]  = {0, 1, 2, 2, 3, 0, 3, 2, 6, 6, 7, 3, 7, 6, 5, 5, 4, 7, 
+			4, 0, 3, 3, 7, 4, 5, 1, 0, 0, 4, 5, 1, 5, 6, 6, 2, 1
+		}; 
+
+		//vertex position buffer
+		glEnableVertexAttribArray(shapeData->positionLoc);
+		glBindBuffer(GL_ARRAY_BUFFER, shapeData->posObject);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), (GLfloat*)&vertices[0], GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(shapeData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glEnableVertexAttribArray(shapeData->normalLoc);
+		glBindBuffer(GL_ARRAY_BUFFER, shapeData->normalObject);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(normals), (GLfloat*)&normals[0], GL_DYNAMIC_DRAW);
+		glVertexAttribPointer(shapeData->normalLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glUniform4f(shapeData->colorLoc, 1.0, 0.0, 0.0, 1.0);
+		glUniform1i(shapeData->lightEnabledLoc, 1);
+		//index buffer
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shapeData->indexObject);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), (GLuint*)&indices[0], GL_DYNAMIC_DRAW);
+		glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(shapeData->positionLoc);
+		glDisableVertexAttribArray(shapeData->normalLoc);
+
+	}
+	void drawGrid(ESContext *esContext){
+		ShapeData *shapeData = (ShapeData*)esContext->shapeData;
+
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		float sceneScale = scene->getScale();
+		GLfloat gridHeight = 0.0f + 0.001f/scene->getScale();
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		GLint loc;
+		string str;
+
+		glLineWidth(3.f);
+		float gridStep = 20.0, gridSize = 400.0;
+		float adjustedGridStep = gridStep;
+		float adjustGridSize = gridSize * .01f / sceneScale;
+
+		GLfloat vertices[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+		GLfloat normals[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+		if (sceneScale > 0.f)
+		{
+			adjustedGridStep *= .01f / sceneScale;
+		}
+		//pass uniform color
+		glUniform4f(shapeData->colorLoc, 0.7, 0.7, 0.7, 1.0);
+		glUniform1i(shapeData->lightEnabledLoc, 0);
+		glEnableVertexAttribArray(shapeData->positionLoc);
+		glBindBuffer(GL_ARRAY_BUFFER, shapeData->posObject);
+
+		for (float x = -adjustGridSize; x <= adjustGridSize + .001; x += adjustedGridStep)
+		{
+			vertices[0] = x; vertices[1] = gridHeight; vertices[2] = -adjustGridSize;
+			vertices[3] = x; vertices[4] = gridHeight; vertices[5] = adjustGridSize;
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), (GLfloat*)&vertices[0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(shapeData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glDrawArrays(GL_LINES, 0, 2);
+		}
+		for (float x = -adjustGridSize; x <= adjustGridSize + .001; x += adjustedGridStep)
+		{
+
+			vertices[0] = -adjustGridSize; vertices[1] = gridHeight; vertices[2] = x;
+			vertices[3] = adjustGridSize; vertices[4] = gridHeight; vertices[5] = x;
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), (GLfloat*)&vertices[0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(shapeData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glDrawArrays(GL_LINES, 0, 2);
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(shapeData->positionLoc); 
+		glDisable(GL_BLEND);
+
+	}
+
+	void drawSkeleton(ESContext *esContext){
+		ShapeData *shapeData = (ShapeData*)esContext->shapeData;
+		glUseProgram (shapeData->programObject);
+		const std::vector<std::string>& chars = SmartBody::SBScene::getScene()->getCharacterNames();
+		for (std::vector<std::string>::const_iterator charIter = chars.begin();
+			charIter != chars.end();
+			charIter++)
+		{
+			SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter((*charIter));
+			
+			int numJoints;
+			SmartBody::SBSkeleton* sk = character->getSkeleton();
+			sk->update_global_matrices();
+			std::map<int,int> indexMap;
+			numJoints = sk->joints().size();
+
+			GLfloat *jointPos = new GLfloat[3 * numJoints];
+			GLushort *boneIdx = new GLushort[2 * numJoints];
+			
+			for (int i=0;i<sk->joints().size();i++)
+			{
+				SkJoint* joint = sk->joints()[i];
+				SrVec pos = joint->gmat().get_translation();
+				jointPos[i * 3 + 0] = pos.x;
+				jointPos[i * 3 + 1] = pos.y;
+				jointPos[i * 3 + 2] = pos.z;
+				//printf("Joint[%d]:(%f, %f, %f)\n", i, pos.x, pos.y, pos.z);
+				indexMap[joint->index()] = i;
+				boneIdx[i*2+0] = joint->index();
+				if (joint->parent())
+					boneIdx[i*2+1] = joint->parent()->index();
+				else
+					boneIdx[i*2+1] = joint->index();
+			}
+			for (int i=0;i<sk->joints().size();i++)
+			{
+				boneIdx[i*2] = indexMap[boneIdx[i*2]];
+				boneIdx[i*2+1] = indexMap[boneIdx[i*2+1]];
+			}
+
+			glUniform4f(shapeData->colorLoc, 0.0, 0.0, 0.0, 1.0);
+			glUniform1i(shapeData->lightEnabledLoc, 0);
+
+			glEnableVertexAttribArray(shapeData->positionLoc); //Enable position vertex array attribute
+			glLineWidth(2.0f);
+
+			//draw joints
+			glBindBuffer(GL_ARRAY_BUFFER, shapeData->jointPosObject);
+			glBufferData(GL_ARRAY_BUFFER, numJoints * sizeof(GLfloat) * 3, (GLfloat*)&jointPos[0], GL_DYNAMIC_DRAW);
+			glVertexAttribPointer(shapeData->positionLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
+			glDrawArrays(GL_POINTS, 0, numJoints);
+
+			glUniform4f(shapeData->colorLoc, 1.0, 1.0, 1.0, 1.0);
+			//draw bones
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shapeData->boneIdxObject);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, numJoints * 2 * sizeof(GL_UNSIGNED_SHORT), (GLushort*)&boneIdx[0], GL_DYNAMIC_DRAW);
+			glDrawElements(GL_LINES, numJoints * 2, GL_UNSIGNED_SHORT, 0); 
+			
+			delete [] jointPos;
+			delete [] boneIdx;
+		}
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+#if __cplusplus
+}
+#endif

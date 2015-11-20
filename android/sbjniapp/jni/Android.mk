@@ -23,9 +23,9 @@ SB_LIB_PATH := ../../../lib
 ANDROID_DIR := ../../
 LOCAL_MODULE    := libsbjniapp
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
-					$(LOCAL_PATH)/../../pythonLib/include/python2.6 \
+					$(LOCAL_PATH)/../../pythonLib_27/include/python2.7 \
 					$(LOCAL_PATH)/../../boost \
-					$(LOCAL_PATH)/../../../lib/boost \
+					$(LOCAL_PATH)/$(BOOST_INCLUDE_DIR) \
 					$(LOCAL_PATH)/$(SB_LIB_PATH)/festival/speech_tools/include \
 					$(LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/include \
 					$(LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/modules/VHDuration \
@@ -40,7 +40,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(SBM_PATH)/../ode/include \
 					$(LOCAL_PATH)/$(SB_LIB_PATH)/assimp-3.1.1/include \
 					$(LOCAL_PATH)/$(SBM_PATH)/src
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions -g
-LOCAL_SRC_FILES := sbjniapp.cpp minimalwrapper.cpp
+LOCAL_SRC_FILES := sbjniapp.cpp  Shader.cpp esUtil.c AppListener.cpp SBWrapper.cpp
 LOCAL_LDLIBS    := -landroid -llog -lGLESv2
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 
 LOCAL_STATIC_LIBRARIES := smartbody xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt python-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode activemq-prebuilt apr-prebuilt apr-util-prebuilt expat-prebuilt 

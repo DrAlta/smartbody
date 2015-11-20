@@ -38,7 +38,10 @@
 #include <sr/sr_camera.h>
 #include <sr/sr_gl_render_funcs.h>
 
-#include "minimalwrapper.h"
+#include "SBWrapper.h"
+#include "esUtil.h"
+
+ESContext esContext;
 
 #define ANDROID_PYTHON
 #ifdef ANDROID_PYTHON
@@ -135,40 +138,8 @@ void initConnection()
 	}
 }
 
-
-bool setupGraphics(int w, int h) {
-
-	
-	//SrCamera& cam = engine.camera;	
-	//camera.setAspectRatio(0.966897);
-	curW = w;
-	curH = h;
-        glViewport(0, 0, w, h);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-	glEnable(GL_CULL_FACE);
-	glShadeModel(GL_SMOOTH);
-	glDisable(GL_DEPTH_TEST);
-
-	// light
-	light1.directional = true;
-	light1.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
-	light1.position = SrVec( 100.0, 250.0, 400.0 );
-	//light1.constant_attenuation = 1.0f;
-
-	light2 = light1;
-	light2.directional = true;
-	light2.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
-	light2.position = SrVec( 100.0, 500.0, -1000.0 );
-
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();	
-	SrCamera& camera = *scene->createCamera("defaultCamera");	
-	camera.init();
 /*
-	cam.setCenter(0, 92, 0);
-	cam.setUpVector(SrVec::j);
-	cam.setEye( 0, 166, 185 );
-	cam.setScale(1.f);
-*/
+bool setupGraphics(int w, int h) {
 
 	camera.setEye(0.0, 1.7, 1);
 	camera.setCenter(0.08, 1.4, 0);
@@ -177,19 +148,11 @@ bool setupGraphics(int w, int h) {
 	camera.setFov(0.4);
 	camera.setFarPlane(100);
 	camera.setNearPlane(0.1);
-/*
-	camera.setCenter(0.0, 1.60887, 0.0);
-	camera.setUpVector(SrVec(0, 1, 0));
-	camera.setEye(0, 1.0478, 3.69259);
-	camera.setScale(1);
-	camera.setFov(1.0);
-	camera.setFarPlane(100);
-	camera.setNearPlane(0.1);
-*/
 	float aspectRatio = ((float)w)/h;
 	camera.setAspectRatio(aspectRatio);	
     return true;
 }
+*/
 
 const GLfloat gTriangleVertices[] = { 0.0f, 0.5f, -0.5f, -0.5f,
         0.5f, -0.5f };
@@ -298,7 +261,12 @@ void initSmartBody()
 	initPython(python_lib_path);
 	LOGI("Before init SBScene");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	SBInitialize("/sdcard/sbjniappdir/"); // initialize smartbody with media path
+	SBSetup("/sdcard/sbjniappdir/","setup.py");
+	
+	esInitContext(&esContext);
+	
+	SBInitialize();
+	//SBInitialize("/sdcard/sbjniappdir/"); // initialize smartbody with media path
 	/*
 	AppListener* appListener = new AppListener();
 	scene->addSceneListener(appListener);
@@ -308,6 +276,7 @@ void initSmartBody()
 	scene->getSimulationManager()->start();
 	*/
 	scene->addAssetPath("script", ".");
+	//scene->runScript("main.py");
 	scene->runScript("brad.py");
 	//initCharacterScene();
 
@@ -427,7 +396,10 @@ JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_init(JNIEnv * env, 
 	if (mcuInit)
 		return;
 
-	setupGraphics(width, height);    
+	//setupGraphics(width, height);    
+	curW = width;
+	curH = height;
+	SBSetupDrawing(width, height);
 	initSmartBody();
 	vhcl::Log::g_log.AddListener(&engine.androidListener);
 	
@@ -444,7 +416,9 @@ JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_step(JNIEnv * env, 
 	scene->getSimulationManager()->updateTimer();
 	scene->update();
 	//renderFrame();
-	SBDrawFrame(curW, curH);
+	//SBDrawFrame(curW, curH);
+	SrMat eyeViewMat;
+	SBDrawFrame_ES20(curW, curH, &esContext, eyeViewMat);
 }
 
 JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_reloadTexture(JNIEnv * env, jobject obj)
@@ -483,7 +457,8 @@ JNIEXPORT void JNICALL Java_com_android_sbjniapp_SBJNIAppLib_restart( JNIEnv * e
 	SmartBody::SBScene::destroyScene();
 	LOG("after destroyScene");
 	initSmartBody();	
-	setupGraphics(curW,curH);
+	//setupGraphics(curW,curH);
+	SBSetupDrawing(curW, curH);
 	mcuInit = true;
 	LOG("after Restart");
 #endif	
