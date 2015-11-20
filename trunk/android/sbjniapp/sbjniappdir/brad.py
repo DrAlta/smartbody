@@ -11,6 +11,7 @@ scene.addAssetPath("mesh", "mesh")
 scene.loadAssets()
 scene.setScale(1.0)
 
+scene.run("light.py")
 # set the default camera 
 camera = scene.getActiveCamera()
 camera.setEye(0.012, 1.30, 4.69259)
