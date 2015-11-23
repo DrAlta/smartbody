@@ -1,4 +1,4 @@
-12/12/14
+11/23/15
 Ari Shapiro, Ph.D.
 
 Download
@@ -16,7 +16,7 @@ Preparation
 -----------------
 
 # packages needed for basic build 
-sudo apt-get install cmake g++ libxerces-c3-dev libgl1-mesa-dev libglu1-mesa-dev xutils-dev libxi-dev freeglut3-dev libglew-dev libxft-dev libapr1-dev libaprutil1-dev libcppunit-dev liblapack-dev libblas-dev libf2c2-dev build-essential python-dev libopenal-dev libsndfile-dev libalut-dev libfltk1.3-dev libboost-all-dev libode-dev libncurses5-dev
+sudo apt-get install cmake g++ libxerces-c3-dev libgl1-mesa-dev libglu1-mesa-dev xutils-dev libxi-dev freeglut3-dev libglew-dev libxft-dev libapr1-dev libaprutil1-dev libcppunit-dev liblapack-dev libblas-dev libf2c2-dev build-essential mono-devel mono-xbuild python-dev libopenal-dev libsndfile-dev libalut-dev ncurses-dev fltk1.3-dev
 
 #packages needed for Ogre rendering
 sudo apt-get install libzzip-dev libxaw7-dev libxxf86vm-dev libxrandr-dev libfreeimage-dev nvidia-cg-toolkit libois-dev libogre-1.9-dev ogre-1.9-samples-data
@@ -30,15 +30,11 @@ http://activemq.apache.org/cms/
 
 Build
 -------------------
-First, build the activemq-cpp libraries and install them:
+First, build the dependencies by running:
 
-tar -xvzf activemq-cpp-library-3.8.1-src.tar.gz
-cd activemq-cpp-library-3.8.1
-./configure --disable-ssl
-make 
-sudo make install
+./linuxbuildlibs.sh
 
-This will install the activemq-cpp libraries in /usr/local.
+This will install the needed headers into the ./include folder, and the libraries into the ./lib folder.
 
 Next, build SmartBody.
 The build uses the cmake system as follows:
