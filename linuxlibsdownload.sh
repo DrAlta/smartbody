@@ -15,4 +15,7 @@ curl http://iweb.dl.sourceforge.net/project/opende/ODE/0.12/ode-0.12.tar.gz > de
 echo "Downloading google protocol buffers..."
 curl http://smartbody.ict.usc.edu/dependencies/protobuf-2.5.0.tar.gz > dependencies/protobuf-2.5.0.tar.gz 
 
+echo "Downloading Irrlicht engine..."
+wget --directory-prefix=dependencies http://downloads.sourceforge.net/project/irrlicht/Irrlicht%20SDK/1.8/1.8.3/irrlicht-1.8.3.zip 
+
 echo "Finished downloading dependencies for SmartBody on linux"

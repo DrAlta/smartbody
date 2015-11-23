@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 2.8 )
 project( SmartBody )
 
 set( CMAKE_INSTALL_PREFIX "../" )
-set( BUILD_OGRE FALSE)
+set( BUILD_OGRE TRUE)
 set( GOOGLE_PROFILER FALSE)
 set( BUILD_FESTIVAL FALSE)
 

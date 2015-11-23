@@ -37,6 +37,17 @@ make -j6 install
 
 cd ..
 
+echo "Building Irrlicht engine..."
+unzip irrlicht-1.8.3.zip
+cd irrlicht-1.8.3
+cd source/Irrlicht
+make -j6
+cd ..
+mv irrlicht-1.8.3 ..
+
+cd ..
+
+
 
 echo "Finished building linux dependencies for SmartBody"
 

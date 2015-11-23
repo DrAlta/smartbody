@@ -113,9 +113,8 @@ cp ../win32/src/ogresmartbody/*.py smartbody/data/
 mkdir smartbody/src/irrlichtsmartbody
 cp ../win32/src/irrlichtsmartbody/*.cpp  smartbody/src/irrlichtsmartbody
 cp ../win32/src/irrlichtsmartbody/*.h smartbody/src/irrlichtsmartbody
-mkdir smartbody/irrlicht-1.8.1
-cp -R ../../lib/irrlicht-1.8.1/* smartbody/irrlicht-1.8.1 
-cp -R ../../core/irrlichtsmartbody/media/* smartbody/irrlicht-1.8.1/media
+mkdir -p smartbody/irrlicht-1.8.3
+cp -R ../../core/irrlichtsmartbody/media/* smartbody/irrlicht-1.8.3/media
 cp ../win32/src/irrlichtsmartbody/*.py smartbody/data/
 
 # build files
