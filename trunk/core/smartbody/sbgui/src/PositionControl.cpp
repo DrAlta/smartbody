@@ -2,6 +2,7 @@
 
 #include "vhcl.h"
 #include <FL/gl.h>
+#include <FL/glu.h>
 #include <sr/sr_gl.h>
 #include <sr/sr_plane.h>
 #include <sr/sr_sphere.h>

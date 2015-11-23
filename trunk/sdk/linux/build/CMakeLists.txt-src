@@ -24,6 +24,11 @@ add_subdirectory (sbgui)
 add_subdirectory (simplesmartbody)
 
 # uncomment these lines to build the Ogre and/or Irrlicht samples
-#add_subdirectory (ogresmartbody)
-#add_subdirectory (irrlichtsmartbody)
+if ($BUILD_OGRE})
+add_subdirectory (ogresmartbody)
+endif()
+
+if ($BUILD_IRRLICHT})
+add_subdirectory (irrlichtsmartbody)
+endif()
 

@@ -11,7 +11,7 @@
 #include <sr/sr_sa_gl_render.h>
 #include <sr/sr_gl_render_funcs.h>
 #include <sb/SBScene.h>
-#include <sb/SBVHMSGManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sbm/gwiz_math.h>
 
 PawnControl::PawnControl()

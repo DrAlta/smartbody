@@ -1,6 +1,12 @@
 cmake_minimum_required( VERSION 2.8 )
 project( SmartBody )
 
+set( CMAKE_INSTALL_PREFIX "../" )
+set( BUILD_OGRE FALSE)
+set( BUILD_IRRLICHT FALSE)
+set( GOOGLE_PROFILER FALSE)
+set( BUILD_FESTIVAL FALSE)
+
 
 # uses the Assimp asset importer
 #set( SB_NO_ASSIMP FALSE)
@@ -32,8 +38,8 @@ set (VHMSG_INCLUDE
 )
 else()
 set (VHMSG_INCLUDE
-        lib/vhmsg/vhmsg-c/include
-        /usr/local/include/activemq-cpp-3.8.3
+        ${CMAKE_SOURCE_DIR}/lib/vhmsg/vhmsg-c/include
+        ${CMAKE_SOURCE_DIR}/include/activemq-cpp-3.9.0
         )
 endif()
 
@@ -43,7 +49,7 @@ set (BONEBUS_INCLUDE
 )
 else()
 set (BONEBUS_INCLUDE
-        lib/bonebus/include
+        ${CMAKE_SOURCE_DIR}/lib/bonebus/include
         )
 endif()
 
@@ -65,11 +71,11 @@ endif()
 
 
 include_directories(
-	/usr/local/include
+	${CMAKE_SOURCE_DIR}/include
 )
 
 LINK_DIRECTORIES(
-	/usr/local/lib
+	${CMAKE_SOURCE_DIR}/lib
 )
 
 add_subdirectory( src )

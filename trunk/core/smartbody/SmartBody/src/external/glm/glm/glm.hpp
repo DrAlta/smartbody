@@ -92,6 +92,9 @@
 #	pragma message("GLM: Core library included")
 #endif//GLM_MESSAGE
 
+
+#define GLM_FORCE_RADIANS 
+
 #include "vec2.hpp"
 #include "vec3.hpp"
 #include "vec4.hpp"

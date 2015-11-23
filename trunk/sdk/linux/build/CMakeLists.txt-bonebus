@@ -1,8 +1,9 @@
 cmake_minimum_required (VERSION 2.8)
 project(bonebus)
 
-include_directories ( ../../include/bonebus )
-include_directories ( ../../include/vhcl )
+include_directories ( ${CMAKE_SOURCE_DIR}/include/bonebus )
+include_directories ( ${CMAKE_SOURCE_DIR}/include/vhcl)
+
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")

@@ -19,49 +19,44 @@ set(_COMPILING_STEERLIB 1)
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
 
 
-find_library (ACTIVEMQLIB activemq-cpp PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (XERCESLIB xerces-c PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (BOOSTPYTHONLIB boost_python PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (BOOSTFILESYSTEMLIB boost_filesystem PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (BOOSTSYSTEMLIB boost_system PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (BOOSTREGEXLIB boost_regex PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (ODELIB ode PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (PROTOCLIB protoc PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (PROTOBUFLIB protobuf PATHS ${PROJECT_SOURCE_DIR}/lib )
-
-
+find_library (ACTIVEMQLIB activemq-cpp PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (XERCESLIB xerces-c PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTPYTHONLIB boost_python PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTFILESYSTEMLIB boost_filesystem PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTSYSTEMLIB boost_system PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTREGEXLIB boost_regex PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (ODELIB ode PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (PROTOCLIB protoc PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (PROTOBUFLIB protobuf PATHS ${CMAKE_SOURCE_DIR}/lib )
 find_library (COREAUDIO_LIBRARY CoreAudio)
 find_library (AUDIOUNIT_LIBRARY AudioUnit)
 find_library (CORESERVICES_LIBRARY CoreServices)
 find_library (LIBSNDFILE sndfile )
-find_library (ALUT alut PATHS ${PROJECT_SOURCE_DIR}/lib)
+find_library (ALUT alut PATHS ${CMAKE_SOURCE_DIR}/lib)
 find_library (OPENAL openal)
 find_library (GLEW GLEW)
+else()
+find_library (ACTIVEMQLIB activemq-cpp PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (XERCESLIB xerces-c PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTPYTHONLIB boost_python PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTFILESYSTEMLIB boost_filesystem PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTSYSTEMLIB boost_system PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTREGEXLIB boost_regex PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (ODELIB ode PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (PROTOCLIB protoc PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (PROTOBUFLIB protobuf PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (LIBSNDFILE sndfile )
+find_library (ALUT alut )
+find_library (OPENAL openal)
+endif()
+
+
 if (${BUILD_FESTIVAL})
 find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
 find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
 find_library (ESTSTRING eststring ../../..//lib/festival/speech_tools/lib)
 find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
 endif()
-else()
-find_library (ACTIVEMQLIB activemq-cpp )
-find_library (XERCESLIB xerces-c  )
-find_library (LIBSNDFILE sndfile )
-find_library (ALUT alut )
-find_library (OPENAL openal)
-find_library (ACTIVEMQLIB activemq)
-find_library (XERCESLIB xerces)
-find_library (BOOSTPYTHONLIB boost_python )
-find_library (BOOSTFILESYSTEMLIB boost_filesystem )
-find_library (BOOSTSYSTEMLIB boost_system )
-find_library (BOOSTREGEXLIB boost_regex )
-find_library (ODELIB ode )
-find_library (PROTOCLIB protoc )
-find_library (PROTOBUFLIB protobuf )
-endif()
-
-
-
 
 
 
@@ -180,7 +175,7 @@ endif()
 find_package(OpenGL REQUIRED)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-set ( PROTOC ${PROJECT_SOURCE_DIR}/bin/protoc)
+set ( PROTOC ${CMAKE_SOURCE_DIR}/bin/protoc)
 else()
 set ( PROTOC protoc)
 endif()
@@ -744,7 +739,7 @@ set( EXEC_LIST
 
 set( APP_LIBRARY_SOURCE_PATHS
 
-${PROJECT_SOURCE_DIR}/core/smartbody/sbgui/bin
+${CMAKE_SOURCE_DIR}/core/smartbody/sbgui/bin
 )       
 
 set_target_properties(
