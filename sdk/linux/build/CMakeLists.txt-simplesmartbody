@@ -1,11 +1,11 @@
 
 include_directories( /usr/include/python2.7 )
-include_directories( ../SmartBody )
-include_directories( ../../include/vhcl )
-include_directories( ../../include/bonebus )
-include_directories( ../../include/steersuite )
-include_directories( ../../include/steersuite/external )
-include_directories( ../../include/steersuite/external/tinyxml )
+include_directories( ${CMAKE_SOURCE_DIR}/src/SmartBody )
+include_directories( ${CMAKE_SOURCE_DIR}/include/vhcl )
+include_directories( ${CMAKE_SOURCE_DIR}/include/bonebus )
+include_directories( ${CMAKE_SOURCE_DIR}/include/steersuite )
+include_directories( ${CMAKE_SOURCE_DIR}/include/steersuite/external )
+include_directories( ${CMAKE_SOURCE_DIR}/include/steersuite/external/tinyxml )
 
 
 set( SIMPLESMARTBODY_SRC
@@ -34,9 +34,6 @@ target_link_libraries( simplesmartbody
 	SmartBody
 	pthread
 	${MORE_LIBS}
-#	tcmalloc
-#	profiler
-#	${CMAKE_REQUIRED_LIBRARIES} 
 )
 
 set( EXEC_LIST
@@ -63,7 +60,7 @@ set_target_properties(
 	PROPERTIES
 
 	## link with install tree:
-	INSTALL_RPATH                   .
+	INSTALL_RPATH                   .:${CMAKE_SOURCE_DIR}/lib
 	BUILD_WITH_INSTALL_RPATH        TRUE
 )
 

@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 2.8)
 project(vhmsg)
 
-include_directories ( ../../include/vhcl )
-include_directories ( ../../include/vhmsg )
+include_directories ( ${CMAKE_SOURCE_DIR}/include/vhcl )
+include_directories ( ${CMAKE_SOURCE_DIR}/include/vhmsg )
 
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -12,7 +12,7 @@ endif()
 
 
 if (UNIX)
-   include_directories(/usr/local/include/activemq-cpp-3.8.3)
+   include_directories(${CMAKE_SOURCE_DIR}/include/activemq-cpp-3.9.0)
 endif (UNIX)
 
 if (APPLE)

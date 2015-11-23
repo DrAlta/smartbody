@@ -1,53 +1,23 @@
 include_directories( ./)
 
-include_directories ( ../../include/vhcl )
-include_directories ( ../../include/vhmsg)
-include_directories ( ../../include/bonebus)
-include_directories ( ../../include/steersuite)
-include_directories ( ../../include/steersuite/external)
-include_directories ( ../../include/steersuite/external/tinyxml)
+include_directories ( ${CMAKE_SOURCE_DIR}/include/vhcl )
+include_directories ( ${CMAKE_SOURCE_DIR}/include/vhmsg)
+include_directories ( ${CMAKE_SOURCE_DIR}/include/bonebus)
+include_directories ( ${CMAKE_SOURCE_DIR}/include/steersuite)
+include_directories ( ${CMAKE_SOURCE_DIR}/include/steersuite/external)
+include_directories ( ${CMAKE_SOURCE_DIR}/include/steersuite/external/tinyxml)
 include_directories ( /usr/include/python2.7 )
 
 add_definitions( "-DdDOUBLE" )
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
-add_definitions( "-Dfopen64=fopen" )
-add_definitions( "-Dfseeko64=fseeko" )
-add_definitions( "-Dftello64=ftello" )
-endif()
-
-
 
 set(SB_EXPORTS 1)
 set(SMARTBODY_DLL_EXPORTS 1)
 set(SMARTBODY_C_DLL_EXPORTS 1)
 set(_COMPILING_STEERLIB 1)
 
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
-find_library (COREAUDIO_LIBRARY CoreAudio)
-find_library (AUDIOUNIT_LIBRARY AudioUnit)
-find_library (CORESERVICES_LIBRARY CoreServices)
 find_library (LIBSNDFILE sndfile )
 find_library (ALUT alut )
 find_library (OPENAL openal)
-find_library (GLEW GLEW)
-find_library (FESTIVAL Festival ../../../lib/festival/festival/lib)
-find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
-find_library (ESTSTRING eststring ../../..//lib/festival/speech_tools/lib)
-find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
-else()
-find_library (LIBSNDFILE sndfile )
-find_library (ALUT alut )
-find_library (OPENAL openal)
-endif()
-
-#if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-#	if (${CMAKE_C_COMPILER_VERSION} VERSION_GREATER 4.2.0)
-#		add_definitions(-Wno-unused-value)
-#	endif()
-#endif()
-
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 set( MORE_LIBS
@@ -114,7 +84,7 @@ if (${SB_NO_ASSIMP})
 set( ASSIMP_LIB
 )
 else()
-include_directories( ../../src/assimp-3.1.1/include)
+include_directories( ../assimp-3.1.1/include)
 set( ASSIMP_LIB
         assimp
 )

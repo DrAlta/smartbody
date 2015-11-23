@@ -8,16 +8,12 @@ include_directories( ./src )
 include_directories( ../SmartBody/src )
 include_directories( ./external/Pinocchio )
 include_directories( ./external/polyvox/library/PolyVoxCore/include )
-#include_directories( /usr/local/include/CEGUI )
 link_directories( /usr/lib )                                                           
-link_directories( /usr/local/lib )                                                           
 
 set (BUILD_OGRE FALSE)
 # never build ogre if in osx
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set (BUILD_OGRE FALSE)
-	#include_directories( /Users/feng/SmartBodyDev/OgreSDK_1.7/include/ )
-	#include_directories( /Users/feng/SmartBodyDev/OgreSDK_1.7/include/Ogre/ )
 endif()
 
 
@@ -28,41 +24,32 @@ find_library (COREAUDIO_LIBRARY CoreAudio)
 find_library (AUDIOUNIT_LIBRARY AudioUnit)
 find_library (CORESERVICES_LIBRARY CoreServices)
 find_library (GLEW GLEW)
-find_library (ACTIVEMQLIB activemq-cpp PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (XERCESLIB xerces-c PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (BOOSTPYTHONLIB boost_python PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (BOOSTFILESYSTEMLIB boost_filesystem PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (BOOSTSYSTEMLIB boost_system PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (BOOSTREGEXLIB boost_regex PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (ODELIB ode PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (FLTKLIB fltk PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (FLTKIMAGESLIB fltk_images PATHS ${PROJECT_SOURCE_DIR}/lib )
-find_library (FLTKGLLIB fltk_gl PATHS ${PROJECT_SOURCE_DIR}/lib )
-if (${BUILD_FESTIVAL})
-find_library (FESTIVAL Festival ../../../lib/festival/festival/src/lib)
-find_library (ESTBASE estbase ../../../lib/festival/speech_tools/lib)
-find_library (ESTSTRING eststring ../../../lib/festival/speech_tools/lib)
-find_library (ESTOOLS estools ../../../lib/festival/speech_tools/lib)
+find_library (ACTIVEMQLIB activemq-cpp PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (XERCESLIB xerces-c PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTPYTHONLIB boost_python PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTFILESYSTEMLIB boost_filesystem PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTSYSTEMLIB boost_system PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTREGEXLIB boost_regex PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (ODELIB ode PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (FLTKLIB fltk PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (FLTKIMAGESLIB fltk_images PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (FLTKGLLIB fltk_gl PATHS ${CMAKE_SOURCE_DIR}/lib )
+
 else()
-find_library (ACTIVEMQLIB activemq-cpp PATHS /usr/local/lib)
-find_library (XERCESLIB xerces-c  PATHS /usr/local/lib)
-find_library (BOOSTPYTHONLIB boost_python )
-find_library (BOOSTFILESYSTEMLIB boost_filesystem )
-find_library (BOOSTSYSTEMLIB boost_system )
-find_library (BOOSTREGEXLIB boost_regex )
-find_library (ODELIB ode )
- 
-find_library (FLTKLIB fltk PATHS /usr/local/lib )
-find_library (FLTKIMAGESLIB fltk_images PATHS /usr/local/lib) 
-find_library (FLTKGLLIB fltk_gl PATHS /usr/local/lib )
-endif()
-# these are the libraries necessary for osx, but disable it for now
-#find_library (IOKIT_LIBRARY IOKit)
-#find_library (FOUNDATION_LIBRARY Foundation)
-#find_library (COCOA_LIBRARY Cocoa)
-#find_library (X11_LIBRARY X11)
+
+find_library (ACTIVEMQLIB activemq-cpp PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (XERCESLIB xerces-c PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTPYTHONLIB boost_python PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTFILESYSTEMLIB boost_filesystem PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTSYSTEMLIB boost_system PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (BOOSTREGEXLIB boost_regex PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (ODELIB ode PATHS ${CMAKE_SOURCE_DIR}/lib )
+find_library (FLTKLIB fltk )
+find_library (FLTKIMAGESLIB fltk_images )
+find_library (FLTKGLLIB fltk_gl )
 
 endif()
+
 
 if (${BUILD_OGRE})
 find_library (OGREMAIN Ogre)
@@ -70,7 +57,7 @@ find_library (OISLIB OIS)
 #find_library (RTSHADERLIB OgreRTShaderSystem)
 endif()
 if (${BUILD_OGRE})
-include_directories( /usr/local/include/OGRE )
+include_directories( /usr/include/OGRE )
 set (OGREMAINLIB OgreMain)
 set (OISLIB OIS)
 set (OGRE_LIBS
@@ -132,7 +119,6 @@ find_library (ALUT alut PATHS ${PROJECT_DOURCE_DIR}/lib)
 find_library (OPENAL openal PATHS ${PROJECT_DOURCE_DIR}/lib)
 
 link_directories(/usr/X11R6/lib)
-#link_directories(/usr/local/lib)
 if (${BUILD_FESTIVAL})
 set( FESTIVAL_LIBS 
         ${FESTIVAL}
@@ -301,8 +287,6 @@ else()
 set ( PROFILER_LIBS "")
 endif()
 
-message(STATUS "FLTK" ${FLTKLIB})
-
 target_link_libraries( sbgui
 
 	${PROFILER_LIBS}
@@ -323,7 +307,6 @@ target_link_libraries( sbgui
 	pthread
 	pinocchio
         polyvoxcore
-	#pinocchio
 	${MORE_LIBS}
 	${OGRE_LIBS}
 	#CEGUIBase
@@ -337,34 +320,13 @@ set( EXEC_LIST
 	sbgui
 )
 
-set( APP_LIBRARY_BINARY_PATHS
-
-#	${PROJECT_BINARY_DIR}/core/smartbody/steersuite-1.3/pprAI ;
-#	${PROJECT_BINARY_DIR}/core/smartbody/steersuite-1.3/steerlib
-
-	${PROJECT_BINARY_DIR}/core/smartbody/sbgui/bin
-)
-
-set( APP_LIBRARY_SOURCE_PATHS
-
-#	${PROJECT_SOURCE_DIR}/core/smartbody/steersuite-1.3/pprAI/bin ;
-#	${PROJECT_SOURCE_DIR}/core/smartbody/steersuite-1.3/steerlib/bin
-
-	${PROJECT_SOURCE_DIR}/core/smartbody/sbgui/bin
-)
-
 set_target_properties( 
 
 	${EXEC_LIST} 
 
 	PROPERTIES 
 
-## link with binary tree:
-#	INSTALL_RPATH				"${APP_LIBRARY_BINARY_PATHS}"
-
-## link with install tree:
-	#INSTALL_RPATH				"${APP_LIBRARY_SOURCE_PATHS}"
-	INSTALL_RPATH				lib
+	INSTALL_RPATH				.:${CMAKE_SOURCE_DIR}/lib 
 
 	BUILD_WITH_INSTALL_RPATH	TRUE
 )

@@ -135,8 +135,16 @@ cp build/CMakeLists.txt-Pinocchio ./smartbody/src/sbgui/external/Pinocchio/CMake
 cp build/CMakeLists.txt-ogresmartbody ./smartbody/src/ogresmartbody/CMakeLists.txt
 cp build/CMakeLists.txt-irrlichtsmartbody ./smartbody/src/irrlichtsmartbody/CMakeLists.txt
 
-# supporting libraries
-cp activemq-cpp-library-3.8.3-src.tar.gz ./smartbody/
+mkdir ./smartbody/dependencies 
+cp ../../dependencies/boost_1_59_0.tar.gz ./smartbody/dependencies
+cp ../../dependencies/boost-numeric-bindings-20081116.tar.gz ./smartbody/dependencies
+cp ../../dependencies/activemq-cpp-library-3.9.0-src.tar.gz ./smartbody/dependencies
+cp ../../dependencies/ode-0.12.tar.gz ./smartbody/dependencies
+cp ../../dependencies/protobuf-2.5.0.tar.gz ./smartbody/dependencies
+cp ../../dependencies/xerces-c-3.1.2.tar.gz ./smartbody/dependencies
+
+# build script
+cp ../../linuxlibsbuild.sh ./smartbody
 
 # tar and gzip it up!
 tar -cvzf SmartBodySDK-linux.tar.gz smartbody

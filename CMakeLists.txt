@@ -35,20 +35,10 @@ add_definitions(-DSB_NO_VHMSG)
 set (VHMSG_INCLUDE
 )	
 else()
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-
 set (VHMSG_INCLUDE
 	lib/vhmsg/vhmsg-c/include
 	include/${ACTIVEMQ_VERSION}
 )
-else()
-set (VHMSG_INCLUDE
-	lib/vhmsg/vhmsg-c/include
-	/usr/local/include/${ACTIVEMQ_VERSION}
-)
-endif()
-
 endif()
 
 if (${SB_NO_BONEBUS})
@@ -82,7 +72,6 @@ include_directories(
 	${VHMSG_INCLUDE}
 	${BONEBUS_INCLUDE}
 	lib/vhcl/include
-#	lib/boost
 	include
 )
 

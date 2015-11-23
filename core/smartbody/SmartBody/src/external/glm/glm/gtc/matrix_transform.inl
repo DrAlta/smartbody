@@ -30,6 +30,8 @@
 #include "../trigonometric.hpp"
 #include "../matrix.hpp"
 
+#define GLM_FORCE_RADIANS
+
 namespace glm
 {
 	template <typename T, precision P>
