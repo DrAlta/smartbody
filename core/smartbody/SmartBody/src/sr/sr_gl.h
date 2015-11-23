@@ -50,6 +50,7 @@
 #include <OpenGLES/ES1/glext.h>
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
 #include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 //       #include <Carbon/Carbon.h>
 #define APIENTRY
 #elif defined(__FLASHPLAYER__)
@@ -63,6 +64,7 @@
 #else
 #include <GL/gl.h>
 #include <GL/glx.h>
+#include <GL/glu.h>
 #endif
 
 
