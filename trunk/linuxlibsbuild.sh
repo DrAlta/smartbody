@@ -4,18 +4,11 @@ MAINDIR=`pwd`
 mkdir -p dependencies
 cd dependencies
 
-echo "Building boost..."
-tar -xvzf boost_1_59_0.tar.gz 
-cd boost_1_59_0
-./bootstrap.sh --prefix=${MAINDIR}
-./bjam -j6
-./bjam install
-
-cd ..
-
 echo "Building boost numeric bindings..."
 tar -xvzf boost-numeric-bindings-20081116.tar.gz
 cd boost-numeric-bindings
+mkdir -p ${MAINDIR}/include/boost
+mkdir -p ${MAINDIR}/include/boost/numeric
 cp -R boost/numeric/bindings ${MAINDIR}/include/boost/numeric
 
 cd ..

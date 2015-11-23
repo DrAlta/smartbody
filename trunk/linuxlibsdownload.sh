@@ -3,9 +3,6 @@
 mkdir -p dependencies
 
 
-echo "Downloading boost..."
-curl http://iweb.dl.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz > dependencies/boost_1_59_0.tar.gz
-
 echo "Downloading boost numeric bindings..."
 curl http://mathema.tician.de/dl/software/boost-numeric-bindings/boost-numeric-bindings-20081116.tar.gz > dependencies/boost-numeric-bindings-20081116.tar.gz
 
