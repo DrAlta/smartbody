@@ -42,7 +42,7 @@ unzip irrlicht-1.8.3.zip
 cd irrlicht-1.8.3
 cd source/Irrlicht
 make -j6
-cd ..
+cd ../../..
 mv irrlicht-1.8.3 ..
 
 cd ..
