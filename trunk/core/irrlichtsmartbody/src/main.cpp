@@ -80,10 +80,14 @@ int main()
 #endif
 	// set the following to the location of the Python libraries. 
 	// if you downloaded SmartBody, it will be in core/smartbody/Python27/Lib
+#ifdef __linux__
+	initPython("/usr/lib/Python27");
+#else
 #ifdef MAINSBBUILD
 	initPython(smartbodyRoot + "/core/smartbody/Python27/lib");
 #else
 	initPython(smartbodyRoot + "/Python27/lib");
+#endif
 #endif
 	SmartBody::SBScene* m_pScene = SmartBody::SBScene::getScene();
 
@@ -110,7 +114,7 @@ int main()
                            core::dimension2d<f32>(10.0f, 10.0f)); // textureRepeatCount
                                           
    irr::scene::IAnimatedMeshSceneNode* terrain_node = smgr->addAnimatedMeshSceneNode(terrain_model);
-   terrain_node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8.1/media/wall.jpg"));   
+   terrain_node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8.3/media/wall.jpg"));   
    terrain_node->setMaterialFlag(EMF_LIGHTING, false);
    
    // Insert it into the scene
