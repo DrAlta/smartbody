@@ -755,10 +755,6 @@ void SBScene::update()
 	}
 	this->getProfiler()->mark("listeners");
 
-
-	if (!SmartBody::SBScene::getScene()->isRemoteMode())
-		getDebuggerServer()->Update();
-
 	this->getProfiler()->mark("scripts", 1, "update()");
 	for (std::map<std::string, SmartBody::SBScript*>::iterator iter = scripts.begin();
 		iter != scripts.end();
@@ -982,7 +978,12 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 
 #ifndef SB_NO_BONEBUS
 		if (getBoneBusManager()->isEnable())
-			getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), character->getClassType().c_str(), true );
+		{
+			std::string classType = character->getClassType();
+			if (classType == "")
+				classType = "<unknown>"; // make sure that the class type has some data. Empty string will cause problems with parsing.
+			getBoneBusManager()->getBoneBus().CreateCharacter( character->getName().c_str(), classType.c_str(), true );
+		}
 #endif
 
 		std::vector<SmartBody::SBSceneListener*>& listeners = this->getSceneListeners();
