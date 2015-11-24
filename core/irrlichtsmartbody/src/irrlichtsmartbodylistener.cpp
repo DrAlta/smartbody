@@ -20,9 +20,9 @@ void IrrlichtSmartBodyListener::OnCharacterCreate( const std::string & name, con
 {
 	std::stringstream strstr;
 #ifdef MAINSBBUILD
-	strstr << "../../../../lib/irrlicht-1.8.1/media/" << objectClass<< ".mesh";
+	strstr << "../../../../lib/irrlicht-1.8.3/media/" << objectClass<< ".mesh";
 #else
-	strstr << "../irrlicht-1.8.1/media/" << objectClass<< ".mesh";
+	strstr << "../irrlicht-1.8.3/media/" << objectClass<< ".mesh";
 #endif
 	std::cout << "Getting mesh " << strstr.str() << std::endl;
 
@@ -61,26 +61,26 @@ void IrrlichtSmartBodyListener::OnCharacterCreate( const std::string & name, con
 	//set texture
 	std::string textures[9];
 #ifdef MAINSBBUILD
-	textures[0] = "../../../../lib/irrlicht-1.8.1/media/sinbad_body.tga";
-	textures[1] = "../../../../lib/irrlicht-1.8.1/media/sinbad_body.tga";
-	textures[2] = "../../../../lib/irrlicht-1.8.1/media/sinbad_clothes.tga";
-	textures[3] = "../../../../lib/irrlicht-1.8.1/media/sinbad_body.tga";
-	textures[4] = "../../../../lib/irrlicht-1.8.1/media/sinbad_sword.tga";
-	textures[5] = "../../../../lib/irrlicht-1.8.1/media/sinbad_clothes.tga";
-	textures[6] = "../../../../lib/irrlicht-1.8.1/media/sinbad_clothes.tga";
-	textures[7] = "../../../../lib/irrlicht-1.8.1/media/sinbad_clothes.tga";
-	textures[8] = "../../../../lib/irrlicht-1.8.1/media/irrlicht2_dn.jpg";
-	node->getMaterial(8).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../../../../lib/irrlicht-1.8.1/media/irrlicht2_dn.jpg"));
+	textures[0] = "../../../../lib/irrlicht-1.8.3/media/sinbad_body.tga";
+	textures[1] = "../../../../lib/irrlicht-1.8.3/media/sinbad_body.tga";
+	textures[2] = "../../../../lib/irrlicht-1.8.3/media/sinbad_clothes.tga";
+	textures[3] = "../../../../lib/irrlicht-1.8.3/media/sinbad_body.tga";
+	textures[4] = "../../../../lib/irrlicht-1.8.3/media/sinbad_sword.tga";
+	textures[5] = "../../../../lib/irrlicht-1.8.3/media/sinbad_clothes.tga";
+	textures[6] = "../../../../lib/irrlicht-1.8.3/media/sinbad_clothes.tga";
+	textures[7] = "../../../../lib/irrlicht-1.8.3/media/sinbad_clothes.tga";
+	textures[8] = "../../../../lib/irrlicht-1.8.3/media/irrlicht2_dn.jpg";
+	node->getMaterial(8).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../../../../lib/irrlicht-1.8.3/media/irrlicht2_dn.jpg"));
 #else
-	textures[0] = "../irrlicht-1.8.1/media/sinbad_body.tga";
-	textures[1] = "../irrlicht-1.8.1/media/sinbad_body.tga";
-	textures[2] = "../irrlicht-1.8.1/media/sinbad_clothes.tga";
-	textures[3] = "../irrlicht-1.8.1/media/sinbad_body.tga";
-	textures[4] = "../irrlicht-1.8.1/media/sinbad_sword.tga";
-	textures[5] = "../irrlicht-1.8.1/media/sinbad_clothes.tga";
-	textures[6] = "../irrlicht-1.8.1/media/sinbad_clothes.tga";
-	textures[7] = "../irrlicht-1.8.1/media/sinbad_clothes.tga";
-	textures[8] = "../irrlicht-1.8.1/media/irrlicht2_dn.jpg";
+	textures[0] = "../irrlicht-1.8.3/media/sinbad_body.tga";
+	textures[1] = "../irrlicht-1.8.3/media/sinbad_body.tga";
+	textures[2] = "../irrlicht-1.8.3/media/sinbad_clothes.tga";
+	textures[3] = "../irrlicht-1.8.3/media/sinbad_body.tga";
+	textures[4] = "../irrlicht-1.8.3/media/sinbad_sword.tga";
+	textures[5] = "../irrlicht-1.8.3/media/sinbad_clothes.tga";
+	textures[6] = "../irrlicht-1.8.3/media/sinbad_clothes.tga";
+	textures[7] = "../irrlicht-1.8.3/media/sinbad_clothes.tga";
+	textures[8] = "../irrlicht-1.8.3/media/irrlicht2_dn.jpg";
 	node->getMaterial(8).setTexture(0,mSceneMgr->getVideoDriver()->getTexture("../irrlicht-1.8.1/media/irrlicht2_dn.jpg"));
 #endif
 	for (int t = 0; t < 8; t++)

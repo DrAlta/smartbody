@@ -41,8 +41,8 @@ Source: ".\lib\OgreSDK\lib\*"; DestDir: "{app}\OgreSDK\lib"; Excludes: ".svn"; F
 Source: ".\lib\OgreSDK\media\*"; DestDir: "{app}\OgreSDK\media"; Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\lib\OgreSDK\samples\*"; DestDir: "{app}\OgreSDK\samples"; Excludes: ".svn"; Flags: recursesubdirs
 
-; supporting libraries - Irrlicht 1.8.1
-Source: ".\lib\irrlicht-1.8.1\*"; DestDir: "{app}\irrlicht-1.8.1";  Excludes: ".svn";  Flags: recursesubdirs
+; supporting libraries - Irrlicht 1.8.3
+Source: ".\lib\irrlicht-1.8.3\*"; DestDir: "{app}\irrlicht-1.8.3";  Excludes: ".svn";  Flags: recursesubdirs
 Source: ".\core\irrlichtsmartbody\src\*"; DestDir: "{app}\src\irrlichtsmartbody";  Excludes: ".svn";  Flags: recursesubdirs
 Source: ".\core\irrlichtsmartbody\media\*"; DestDir: "{app}\src\irrlichtsmartbody\media";  Excludes: ".svn";  Flags: recursesubdirs
 
