@@ -19,6 +19,9 @@
 #ifndef SB_NO_ASSIMP
 #include <sb/SBAssetHandlerAssimp.h>
 #endif
+#ifdef USE_FBX_PARSER
+#include <sb/SBAssetHandlerFbx.h>
+#endif
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -30,7 +33,6 @@
 #include <sbm/ParserOgre.h>
 #include <sbm/ParserASFAMC.h>
 #include <sbm/ParserBVH.h>
-#include <sbm/ParserFBX.h>
 #include <sbm/lin_win.h>
 #include <sbm/sr_path_list.h>
 #include <sbm/sbm_constants.h>
@@ -73,6 +75,9 @@ SBAssetManager::SBAssetManager()
 	addAssetHandler(new SBAssetHandlerSBMeshBinary());
 #ifndef SB_NO_ASSIMP
 	addAssetHandler(new SBAssetHandlerAssimp());	
+#endif
+#ifdef USE_FBX_PARSER
+	addAssetHandler(new SBAssetHandlerFbx());
 #endif
 	uniqueSkeletonId = 0;
 

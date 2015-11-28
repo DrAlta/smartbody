@@ -69,7 +69,6 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/algorithm/string.hpp>
-#include "ParserFBX.h"
 #include "sb/SBCharacter.h"
 #include <sbm/BMLDefs.h>
 #include <sb/SBSteerManager.h>

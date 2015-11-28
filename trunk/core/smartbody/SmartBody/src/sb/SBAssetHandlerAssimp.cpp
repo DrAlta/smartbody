@@ -36,11 +36,15 @@ namespace SmartBody {
 
 SBAssetHandlerAssimp::SBAssetHandlerAssimp()
 {
+#ifndef USE_FBX_PARSER
 	assetTypes.push_back("fbx");
+#endif
 	assetTypes.push_back("blend");
 	//assetTypes.push_back("dae");
-	assetTypes.push_back("obj");
+#ifndef SB_NO_ASSIMP
+//	assetTypes.push_back("obj");
 //	assetTypes.push_back("ply");
+#endif
 	assetTypes.push_back("mesh");
 }
 
