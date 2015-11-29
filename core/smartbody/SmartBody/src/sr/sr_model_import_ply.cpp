@@ -29,6 +29,8 @@
 #include <sbm/GPU/SbmTexture.h>
 #endif
 
+#include <sstream>
+
 #define TEST_TEXTURE 1
 
 static int vertex_cb(p_ply_argument argument) {
@@ -99,14 +101,37 @@ static int texCoord_cb(p_ply_argument argument) {
 	else if (value_index >= 0 && value_index <= 5) // a triangle face
 	{
 		double argumentValue = ply_get_argument_value(argument);
-		int fidx = (value_index/2);
-		int vidx = model->Ft.top()[fidx];
-		int texIdx = value_index%2;
-		model->T[vidx][texIdx] = argumentValue;
-		//model->F.top()[value_index] = (float) argumentValue;		
+		int faceIndex = model->Ft.size() - 1;
+		int faceNumber = (value_index/2);
+		if (value_index == 0 || value_index == 2 || value_index == 4)
+			model->T[faceIndex * 3 + faceNumber].x = (float) argumentValue;
+		else
+			model->T[faceIndex * 3 + faceNumber].y = (float) argumentValue;
+
 	}		
 	return 1;
 }
+
+static int texNumber_cb(p_ply_argument argument) {	
+	long length, value_index;
+	long idx;
+	SrModel* model;
+	ply_get_argument_user_data(argument, (void**)&model, &idx);
+	ply_get_argument_property(argument, NULL, &length, &value_index);
+
+	if (value_index == -1) // first entry in the list
+	{
+	}
+	else if (value_index >= 0 && value_index <= 5) // a triangle face
+	{
+		double argumentValue = ply_get_argument_value(argument);
+		int materialIndex = (int) argumentValue;
+		model->Fm[model->Fm.size() - 1] = materialIndex + 1;
+	}		
+	return 1;
+}
+
+
 
 #if 1
 
@@ -149,6 +174,7 @@ bool SrModel::import_ply( const char* file )
 
 #if TEST_TEXTURE
 	const char* comment = ply_get_next_comment(ply, NULL);
+	int materialNum =  1;
 	while (comment)
 	{
 		std::string commentStr = comment;
@@ -157,7 +183,10 @@ bool SrModel::import_ply( const char* file )
 		if (tokens.size() > 1 && tokens[0] == "TextureFile")
 		{
 			std::string texFile = tokens[1];
-			std::string mtlName = "mat1";			
+			std::stringstream strstr; 
+			strstr << "mat" << materialNum;
+			materialNum++;
+			std::string mtlName = strstr.str();	
 			SrMaterial material;
 			material.init();
 			material.diffuse = SrColor::white;
@@ -190,9 +219,12 @@ bool SrModel::import_ply( const char* file )
 	ntriangles = ply_set_read_cb(ply, "face", "vertex_indices", face_cb, this, 0);
 #if TEST_TEXTURE
 	ntriangles = ply_set_read_cb(ply, "face", "texcoord", texCoord_cb, this, 0);
+	ply_set_read_cb(ply, "face", "texnumber", texNumber_cb, this, 0);
+
 #endif
-	printf("%ld\n%ld\n", nvertices, ntriangles);
-	if (!ply_read(ply)) return false;
+	LOG("%ld\n%ld\n", nvertices, ntriangles);
+	if (!ply_read(ply))
+		return false;
 	ply_close(ply);
 
 	validate ();
