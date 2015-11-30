@@ -166,87 +166,62 @@ static void read_materials ( SrArray<SrMaterial>& M,
 		else if ( in.last_token()=="map_Kd") // texture map
 		{
 		 
-		/*
-		SrString mapKaName, dotstr, ext;			  
-		in.get_token(mapKaName);		  		  
-		in.get_token(dotstr);	
-		in.get_token(ext);
-		mapKaName.append(dotstr);
-		mapKaName.append(ext);
-		std::string texFile = (const char*) mapKaName;
-		*/
-		//std::string map_Kd;
-		SrString map_Kd, dotstr, ext;
-		in.getline(map_Kd);
-		map_Kd.trim();
+			SrString map_Kd, dotstr, ext;
+			in.getline(map_Kd);
+			// in.getline may retrieve the EOF marker, eliminate it
+			if (map_Kd[map_Kd.len() - 1] == EOF)
+				map_Kd.substring(0, map_Kd.len() - 2);
+			map_Kd.trim();
 		  
-		  std::string texFile = (const char*) map_Kd;
-		  std::string mtlName = mnames.top();
-		  mtlTexMap[mtlName] = texFile;		  
-
-	//	in.getall(map_Kd);
-
-	//	map_Kd.rtrim();	// Trims possible newline chars
-		
-	//	std::string texFile = (const char*) map_Kd;
-	//	std::string mtlName = mnames.top();
-	//	mtlTexMap[mtlName] = texFile;		  
-		std::cerr << "Reading map_kd:     " << texFile << "\n";
+			std::string texFile = (const char*) map_Kd;
+			std::string mtlName = mnames.top();
+			mtlTexMap[mtlName] = texFile;		  
+	  
+			std::cerr << "Reading map_kd:     " << texFile << "\n";
 	  }
 	  else if ( in.last_token()=="map_bump") // texture map
 	  {
-		  SrString mapBump, dotstr, ext;
-		in.getline(mapBump);
-		mapBump.trim();
+			SrString mapBump, dotstr, ext;
+			in.getline(mapBump);
+			// in.getline may retrieve the EOF marker, eliminate it
+			if (mapBump[mapBump.len() - 1] == EOF)
+				mapBump.substring(0, mapBump.len() - 2);
 
+			mapBump.trim();
 
-		  //in >> mapKaName;		  		 		  
-/*		  in.get_token(mapBump);
-		  in.get_token(dotstr);	
-		  in.get_token(ext);
-		  mapBump.append(dotstr);
-		  mapBump.append(ext);
-*/
-		  std::string texFile = (const char*) mapBump;
-		  std::string mtlName = mnames.top();
-		  mtlTexBumpMap[mtlName] = texFile;		  
+			std::string texFile = (const char*) mapBump;
+			std::string mtlName = mnames.top();
+			mtlTexBumpMap[mtlName] = texFile;		  
 	  }
 	else if ( in.last_token()=="map_Ks") // texture map
 	  {
-		  SrString mapKs, dotstr, ext;
-		  //in >> mapKaName;		  		 		  
-		in.getline(mapKs);
-		mapKs.trim();
+			SrString mapKs, dotstr, ext;	 		  
+			in.getline(mapKs);
+			// in.getline may retrieve the EOF marker, eliminate it
+			if (mapKs[mapKs.len() - 1] == EOF)
+				mapKs.substring(0, mapKs.len() - 2);
+			mapKs.trim();
 
-		/*in.get_token(mapKs);
-		  in.get_token(dotstr);	
-		  in.get_token(ext);
-		  mapKs.append(dotstr);
-		  mapKs.append(ext);
-		  */
-		  std::string texFile = (const char*) mapKs;
-		  std::string mtlName = mnames.top();
-		  mtlTexKsMap[mtlName] = texFile;		  
+			std::string texFile = (const char*) mapKs;
+			std::string mtlName = mnames.top();
+			mtlTexKsMap[mtlName] = texFile;		  
 	  }
 	else if ( in.last_token()=="map_Ns") // texture map
 	  {
-		  SrString mapNs, dotstr, ext;
-		  //in >> mapKaName;		
-		  in.getline(mapNs);
-		  mapNs.trim();
-		  /*
-		  in.get_token(mapNs);
-		  in.get_token(dotstr);	
-		  in.get_token(ext);
-		  mapNs.append(dotstr);
-		  mapNs.append(ext);
-		  */
-		  std::string texFile = (const char*) mapNs;
-		  std::string mtlName = mnames.top();
-		  mtlTexNsMap[mtlName] = texFile;		  
+			SrString mapNs, dotstr, ext;
+			in.getline(mapNs);
+			// in.getline may retrieve the EOF marker, eliminate it
+			if (mapNs[mapNs.len() - 1] == EOF)
+				mapNs.substring(0, mapNs.len() - 2);
+			mapNs.trim();
+		 
+			std::string texFile = (const char*) mapNs;
+			std::string mtlName = mnames.top();
+			mtlTexNsMap[mtlName] = texFile;		  
 	  }
       else if ( in.last_token()=="illum" ) // dont know what is this one
-       { in >> i;
+       { 
+		   in >> i;
        }
     }
  }
