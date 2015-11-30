@@ -550,21 +550,21 @@ std::string ZeroPadNumber(int num)
 
 
 
-void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names,  GLuint program, int w, int h)
+void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string>& texture_names, std::vector<std::string>& textureFileNames, GLuint program, int w, int h)
 {
 	int numTextures		= weights.size();
 
 	for(int i = 0; i< numTextures; i++) 
 	{
-		boost::filesystem::path path(texture_names[i]);
+		boost::filesystem::path path(textureFileNames[i]);
 		std::string extension = path.extension().string();
-		std::string mask		= boost::replace_all_copy(texture_names[i], extension, "_mask" + extension);
+		std::string mask		= boost::replace_all_copy(textureFileNames[i], extension, "_mask" + extension);
 		SbmTexture* tex_mask;
 		LOG("mask name = %s\n",mask.c_str());
 		// Checks if mask file exists
 		if (!boost::filesystem::exists(mask))
 		{
-			LOG("WARNING! Can't find mask named %s for texture %s, using a white mask instead.\n", mask.c_str(), texture_names[i].c_str());
+			LOG("WARNING! Can't find mask named %s for texture %s, using a white mask instead.\n", mask.c_str(), textureFileNames[i].c_str());
 			SbmTextureManager::singleton().createWhiteTexture("white");
 			tex_mask	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,"white");
 		}

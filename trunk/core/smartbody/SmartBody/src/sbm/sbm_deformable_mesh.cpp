@@ -1649,7 +1649,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 	std::vector<GLuint> texIDs(_mesh->blendShapeMap.begin()->second.size(), 0);
 
 	std::vector<std::string> texture_names(_mesh->blendShapeMap.begin()->second.size());
-
+	std::vector<std::string> textureFileNames(_mesh->blendShapeMap.begin()->second.size());
 
 	for (mIter = _mesh->blendShapeMap.begin(); mIter != _mesh->blendShapeMap.end(); ++mIter)
 	{
@@ -1758,6 +1758,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 				{
 					texIDs[i]		= tex->getID();
 					texture_names[i]= fileName;
+					textureFileNames[i] = tex->getFileName();
 					//std::cerr << "Retriving texture " << matName << "\ttexIDs[" << i << "]: " << texIDs[i] << "\n";
 
 					tex_h			= tex->getHeight();
@@ -1778,6 +1779,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 				texIDs[i]		= tex->getID();
 				
 				texture_names[i]= fileName;
+				textureFileNames[i] = tex->getFileName();
 				//std::cout << "Retriving texture " << matName << "\ttexIDs[" << i << "]: " << texIDs[i] << "\n";
 			}
 			else
@@ -1846,7 +1848,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 		}
 
 		// Adds masking images to the alpha channel of the textures
-		SbmBlendTextures::ReadMasks(_tempFBOTexWithMask, _tempTexWithMask, weights, texIDs, texture_names, SbmBlendTextures::getShader("ReadMasks"), tex_w, tex_h); 
+		SbmBlendTextures::ReadMasks(_tempFBOTexWithMask, _tempTexWithMask, weights, texIDs, texture_names, textureFileNames, SbmBlendTextures::getShader("ReadMasks"), tex_w, tex_h); 
 	}
 
 
