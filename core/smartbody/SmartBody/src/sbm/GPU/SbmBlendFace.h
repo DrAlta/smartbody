@@ -73,7 +73,7 @@ class SbmBlendTextures
 		static void BlendAllAppearancesPairwise(GLuint *, GLuint *, std::vector<float>, std::vector<GLuint>,  std::vector<std::string>, GLuint, int, int);
 		static void BlendGeometry(GLuint * FBODst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance/*_mesh*/, GLuint program);
 		
-		static void ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, GLuint program, int w, int h);
+		static void ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string>& texture_names, std::vector<std::string>& textureFileNames, GLuint program, int w, int h);
 		static void BlendGeometryWithMasks(GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program, glm::mat4x4 translation, glm::mat4x4 rotation);
 
 		static void BlendGeometryWithMasksFeedback(GLuint * FBODst, std::vector<float> weights, GLuint * texIDs, std::vector<std::string> texture_names, DeformableMeshInstance* meshInstance, GLuint program, glm::mat4x4 translation, glm::mat4x4 rotation);
