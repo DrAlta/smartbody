@@ -69,15 +69,15 @@ const int SrFrustum::INSIDE = 3;
 SrCamera::SrCamera () : SBPawn()
  {
 	setAttributeGroupPriority("Camera", 50);
-	createDoubleAttribute("centerX", true, true, "Camera", 200, false, false, false, "");
-	createDoubleAttribute("centerY", true, true, "Camera", 210, false, false, false, "");
-	createDoubleAttribute("centerZ", true, true, "Camera", 220, false, false, false, "");
+	createDoubleAttribute("centerX", 0.0, true, "Camera", 200, false, false, false, "");
+	createDoubleAttribute("centerY", 0.0, true, "Camera", 210, false, false, false, "");
+	createDoubleAttribute("centerZ", 0.0, true, "Camera", 220, false, false, false, "");
 	createVec3Attribute("up", 0, 1, 0, true, "Camera", 230, false, false, false, "");
-	createDoubleAttribute("fov", true, true, "Camera", 240, false, false, false, "");
-	createDoubleAttribute("near", true, true, "Camera", 250, false, false, false, "");
-	createDoubleAttribute("far", true, true, "Camera", 260, false, false, false, "");
-	createDoubleAttribute("aspectRatio", true, true, "Camera", 270, false, false, false, "");
-	createDoubleAttribute("scale", true, true, "Camera", 280, false, false, false, "");
+	createDoubleAttribute("fov", 1.0472, true, "Camera", 240, false, false, false, "");
+	createDoubleAttribute("near", .01, true, "Camera", 250, false, false, false, "");
+	createDoubleAttribute("far", 1000, true, "Camera", 260, false, false, false, "");
+	createDoubleAttribute("aspectRatio", .879121, true, "Camera", 270, false, false, false, "");
+	createDoubleAttribute("scale", 1.0, true, "Camera", 280, false, false, false, "");
 	
    init ();
    setBoolAttribute("visible", false); // don't show the camera in the scene by default

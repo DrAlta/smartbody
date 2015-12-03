@@ -2673,7 +2673,7 @@ int FltkViewer::handle ( int event )
 				camera->view_all(sceneBox, camera->getFov());	
 				float scale = 1.f/SmartBody::SBScene::getScene()->getScale();
 				float znear = 0.01f*scale;
-				float zfar = 100.0f*scale;
+				float zfar = 1000.0f*scale;
 				camera->setNearPlane(znear);
 				camera->setFarPlane(zfar);
 				}

@@ -45,7 +45,7 @@
   <PropertyGroup Label="Globals">
     <ProjectName>sbgui</ProjectName>
     <ProjectGuid>{2C18CD04-407B-420A-8CDC-1C6325F87072}</ProjectGuid>
-    <RootNamespace>sbm-fltk-1.3</RootNamespace>
+    <RootNamespace>sbgui</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" Label="Configuration">
@@ -1299,6 +1299,10 @@ copy /Y ..\bin\default.py ..\..\..\..\bin\smartbody\sbm\bin
       <Project>{49840c67-5a25-4d7a-af21-5976735f7d7d}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\..\kinectavatar\SCAPEModelFit\sbautorig\autoriggerandreshaper.ico" />
+    <None Include="icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
