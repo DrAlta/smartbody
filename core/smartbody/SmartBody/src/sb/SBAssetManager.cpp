@@ -36,6 +36,8 @@
 #include <sbm/lin_win.h>
 #include <sbm/sr_path_list.h>
 #include <sbm/sbm_constants.h>
+#include <sbm/GPU/SbmTexture.h>
+#include <external/soil/SOIL.h>
 
 #include <boost/filesystem/path.hpp>
 
@@ -448,7 +450,7 @@ void SBAssetManager::loadAssets()
 	}
 }
 
-void SBAssetManager::loadAsset(const std::string& assetPath)
+std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 {
 	//LOG("Loading asset [%s]", assetPath.c_str());
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
@@ -484,6 +486,9 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 
 	std::string finalPath = p.string();
 
+
+	std::vector<SBAsset*> allAssets;
+	
 	//LOG("Asset loading from final path = %s", finalPath.c_str());
 
 	// make sure the file exists and is readable
@@ -491,13 +496,13 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 	if (!file.good())
 	{
 		LOG("File %s cannot be read, asset will not be loaded.", finalPath.c_str());
-		return;
+		return allAssets;
 	}
 
 	if (boost::filesystem::is_directory(p))
 	{
 		LOG("%s is a directory, cannot load asset.", finalPath.c_str());
-		return;
+		return allAssets;
 	}
 
 	 
@@ -513,7 +518,7 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 	// get all the asset handlers for that extension
 	const std::vector<SBAssetHandler*>& assetHandlers = this->getAssetHandlers(extNoDot);
 
-	std::vector<SBAsset*> allAssets;
+
 	for (size_t h = 0; h < assetHandlers.size(); h++)
 	{
 		SBAssetHandler* assetHandler = assetHandlers[h];
@@ -576,131 +581,8 @@ void SBAssetManager::loadAsset(const std::string& assetPath)
 
 
 	}
-	/*
-	// determine the type of asset: skeleton, motion, mesh, texture, ...
-	if( _stricmp( ext.c_str(), ".skm" ) == 0)
-	{
-		FILE* myfile = fopen(finalPath.c_str(), "rt");
-		SrInput in( myfile );
-		SmartBody::SBMotion* motion = new SmartBody::SBMotion();
-		bool parseSuccessful = motion->load( in, 1.0 );
-		if (parseSuccessful)
-			_motions.insert(std::pair<std::string, SBMotion*>(motion->getName(), motion));
-		else
-			delete motion;
-		return;
-	}
 
-	if( _stricmp( ext.c_str(), ".bvh" ) == 0)
-	{
-		SmartBody::SBSkeleton* skeleton = new SmartBody::SBSkeleton();
-		SmartBody::SBMotion* motion = new SmartBody::SBMotion();
-		bool parseSuccessful = ParserBVH::parse(*skeleton, *motion, finalPath, file, 1.0);
-		if (parseSuccessful)
-		{
-			if (skeleton)
-			{
-				skeleton->setName(fileName);
-				skeleton->setFileName(finalPath);
-			}
-			if (motion)
-				motion->setName(baseName);
-			_motions.insert(std::pair<std::string, SBMotion*>(motion->getName(), motion));
-			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skeleton->getName(), skeleton));			
-		}
-		else
-		{
-			delete motion;
-			delete skeleton;
-		}
-			
-		return;
-	}
-
-	if( _stricmp( ext.c_str(), ".sk" ) == 0)
-	{
-		FILE* myfile = fopen(finalPath.c_str(), "rt");
-		SrInput input(myfile);
-		SmartBody::SBSkeleton* skeleton = new SmartBody::SBSkeleton();
-		SkSkeleton* skel = skeleton;
-		if( skel->loadSk( input, 1.0) )
-		{
-			skeleton->ref();
-			skeleton->setFileName(finalPath);
-			skeleton->setName(fileName);
-			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skel->getName(), skeleton));
-		}
-		else
-		{
-			delete skeleton;
-		}
-		return;
-	}
-
-	if( _stricmp( ext.c_str(), ".dae" ) == 0)
-	{
-		SmartBody::SBSkeleton*skeleton =  new SmartBody::SBSkeleton();					
-		SkMotion motion;
-		bool ok = false;
-		if (SmartBody::SBScene::getScene()->getBoolAttribute("useFastCOLLADAParsing"))
-			ok = ParserCOLLADAFast::parse(*skeleton, motion, finalPath, 1.f, true, false);
-		else
-			ok = ParserOpenCOLLADA::parse(*skeleton, motion, finalPath, 1.f, true, false);
-
-		if (ok)
-		{
-			std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = _skeletons.find(fileName);
-			if (motionIter != _skeletons.end()) {
-				LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", fileName.c_str(), finalPath.c_str());
-				delete skeleton;
-				return;
-			}
-			skeleton->ref();
-			skeleton->skfilename(finalPath.c_str());				
-			skeleton->setName(fileName.c_str());
-			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skeleton->getName(), skeleton));
-		}
-		else
-		{
-			LOG("Problem loading skeleton from file '%s'.", finalPath.c_str());
-			return;
-		}
-	}
-
-	if( _stricmp( ext.c_str(), ".xml" ) == 0)
-	{
-		SmartBody::SBSkeleton*skeleton =  new SmartBody::SBSkeleton();					
-		std::vector<SmartBody::SBMotion*> motions;
-		bool ok = ParserOgre::parse(*skeleton,motions, finalPath, 1.f, true, false);		
-		if (ok)
-		{
-			std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = _skeletons.find(fileName);
-			if (motionIter != _skeletons.end()) {
-				LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", fileName.c_str(), finalPath.c_str());
-				delete skeleton;
-				return;
-			}
-			skeleton->ref();
-			skeleton->skfilename(finalPath.c_str());				
-			skeleton->setName(fileName.c_str());
-			_skeletons.insert(std::pair<std::string, SBSkeleton*>(skeleton->getName(), skeleton));
-		}
-		else
-		{
-			LOG("Problem loading skeleton from file '%s'.", finalPath.c_str());
-			return;
-		}
-	}
-
-	if( _stricmp( ext.c_str(), ".asf" ) == 0)
-	{
-
-	}
-	if( _stricmp( ext.c_str(), ".amc" ) == 0)
-	{
-
-	}
-	*/
+	return allAssets;
 }
 
 void SBAssetManager::loadAssetsFromPath(const std::string& assetPath)
@@ -2124,6 +2006,283 @@ void SBAssetManager::clearAssetHistory()
 {
 	_assetHistory.clear();
 }
+
+bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFile, const std::string& neutralTextureFile, const std::string& expressiveShapeFile, const std::string& expressiveTextureFile, const std::string& maskTextureFile, const std::string& outputMeshFile, const std::string& outputTextureFile)
+{
+	bool ok = true;
+
+	SbmTextureManager& texManager = SbmTextureManager::singleton();
+
+	// load the neutral shape
+	DeformableMesh* neutralMesh = NULL;
+	std::vector<SBAsset*> assets = this->loadAsset(neutralShapeFile);
+	for (size_t a = 0; a < assets.size(); a++)
+	{
+		DeformableMesh* mesh = dynamic_cast<DeformableMesh*>(assets[a]);
+		if (mesh)
+		{
+			neutralMesh = mesh;
+		}
+	}
+	if (!neutralMesh)
+	{
+		LOG("Could not find neutral mesh in file %s.", neutralShapeFile.c_str());
+		ok = false;
+	}
+
+	// make sure that a diffuse texture exists
+	SbmTexture* neutralTexture = NULL;
+
+	if (neutralMesh)
+	{
+		for (unsigned int i=0; i < neutralMesh->subMeshList.size(); i++)
+		{
+			SbmSubMesh* subMesh = neutralMesh->subMeshList[i];
+			neutralTexture = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());
+			if (neutralTexture)
+			{
+				break;
+			}
+		}
+	}
+	if (!neutralTexture)
+	{
+		LOG("Could not find neutral diffuse texture in file %s.", neutralShapeFile.c_str());
+		ok = false;
+	}
+
+	// load the expressive shape
+	DeformableMesh* expressiveMesh = NULL;
+	assets = this->loadAsset(neutralShapeFile);
+	for (size_t a = 0; a < assets.size(); a++)
+	{
+		DeformableMesh* mesh = dynamic_cast<DeformableMesh*>(assets[a]);
+		if (mesh)
+		{
+			expressiveMesh = mesh;
+		}
+	}
+	if (!expressiveMesh)
+	{
+		LOG("Could not find neutral mesh in file %s.", neutralShapeFile.c_str());
+		ok = false;
+	}
+
+	// make sure that an expressive diffuse texture exists
+	SbmTexture* expressiveTexture = NULL;
+
+	if (expressiveMesh)
+	{
+		for (unsigned int i=0; i < expressiveMesh->subMeshList.size(); i++)
+		{
+			SbmSubMesh* subMesh = expressiveMesh->subMeshList[i];
+			expressiveTexture = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());
+			if (expressiveTexture)
+			{
+				break;
+			}
+		}
+	}
+	if (!expressiveTexture)
+	{
+		LOG("Could not find expressive diffuse texture in file %s.", expressiveShapeFile.c_str());
+		ok = false;
+	}
+
+	// load the masked texture
+	texManager.loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, maskTextureFile.c_str(), maskTextureFile.c_str());
+	SbmTexture* maskedTexture = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, maskTextureFile.c_str());
+	if (maskedTexture)
+	{
+		LOG("Could not load masked texture file %s.", maskTextureFile.c_str());
+		ok = false;
+	}
+
+	// make sure the neutral and the expression have the same number of vertices
+	int numEMeshes = expressiveMesh->dMeshStatic_p.size();
+	int numNMeshes = neutralMesh->dMeshStatic_p.size();
+	if (numEMeshes != numNMeshes)
+	{
+		LOG("Neutral mesh %s has different number of meshes as expresive mesh %s (%d vs %d).", neutralShapeFile, expressiveShapeFile, numNMeshes, numEMeshes);
+		ok = false;
+	}
+	
+	int numEVertices = 0;
+	int numNVertices = 0;
+	for (size_t i = 0; i < expressiveMesh->dMeshStatic_p.size(); i++)
+	{
+		numEVertices += expressiveMesh->dMeshStatic_p[i]->shape().V.size();
+	}
+	for (size_t i = 0; i < neutralMesh->dMeshStatic_p.size(); i++)
+	{
+		numNVertices += neutralMesh->dMeshStatic_p[i]->shape().V.size();
+	}
+	if (numEVertices != numNVertices)
+	{
+		LOG("Neutral mesh %s has different number of vertices as expresive mesh %s (%d vs %d).", neutralShapeFile, expressiveShapeFile, numNMeshes, numEMeshes);
+		ok = false;
+	}
+
+	// make sure the neutral, expression and mask textures are the same size
+	int eHeight = expressiveTexture->getHeight();
+	int eWidth = expressiveTexture->getWidth();
+
+	int nHeight = neutralTexture->getHeight();
+	int nWidth = neutralTexture->getWidth();
+
+	int mHeight = maskedTexture->getHeight();
+	int mWidth = maskedTexture->getWidth();
+
+	if (eHeight != nHeight || 
+		eHeight != mHeight ||
+		nHeight != mHeight)
+	{
+		LOG("Texture heights don't match (%s: %d, %s: %d, %s: %d", neutralTextureFile, nHeight, expressiveTextureFile, eHeight, maskTextureFile, mHeight);
+		ok = false;
+	}
+	if (eWidth != nWidth || 
+		eWidth != mWidth ||
+		nWidth != mWidth)
+	{
+		LOG("Texture heights don't match (%s: %d, %s: %d, %s: %d", neutralTextureFile, nWidth, expressiveTextureFile, eWidth, maskTextureFile, mWidth);
+		ok = false;
+	}
+
+	if (!ok)
+		return false;
+
+	// create a template for the final mesh
+	// load the expressive shape
+	DeformableMesh* maskedMesh = NULL;
+	assets = this->loadAsset(neutralShapeFile);
+	for (size_t a = 0; a < assets.size(); a++)
+	{
+		DeformableMesh* mesh = dynamic_cast<DeformableMesh*>(assets[a]);
+		if (mesh)
+		{
+			maskedMesh = mesh;
+		}
+	}
+
+	unsigned char* maskedBuffer = maskedTexture->getBuffer();
+	for (size_t m = 0; m < maskedMesh->dMeshStatic_p.size(); m++)
+	{
+		SrModel& neutralModel = neutralMesh->dMeshStatic_p[m]->shape();
+		SrModel& expressiveModel = expressiveMesh->dMeshStatic_p[m]->shape();
+		SrModel& maskedModel = maskedMesh->dMeshStatic_p[m]->shape();
+
+		for (int v = 0; v < neutralModel.V.size(); v++)
+		{
+			// get the texture coordinates for the vertex
+			SrPnt2& uv = neutralModel.T[v];
+			// normalize uv to size of texture
+			float rf = ((float) mHeight) * uv.x;
+			float cf = ((float) mWidth) * uv.y;
+			int rpos = (int) rf;
+			int cpos = (int) cf;
+			
+			// find the greyscale color of the mask texture
+			int position = rpos * mWidth + (cpos * 4);
+			SrColor maskColor;
+			maskColor.r = maskedBuffer[position];
+			maskColor.g = maskedBuffer[position + 1];
+			maskColor.b = maskedBuffer[position + 2];
+			maskColor.a = maskedBuffer[position + 3];
+			// assuming masks are in greyscale, use only red channel to determine 'whiteness'
+			float maskGreyAmount = (float) maskColor.r  / 255.0f;
+			SrPnt& pointNeutral = neutralModel.V[v];
+			SrPnt& pointExpressive = expressiveModel.V[v];
+			SrPnt& pointMasked = maskedModel.V[v];
+			for (int n = 0; n < 3; n++)
+				pointMasked[0] = maskGreyAmount * pointExpressive[n] + (1.0f - maskGreyAmount) * pointNeutral[n];
+		}
+
+	}
+	
+	// save the final mesh
+	for (size_t m = 0; m < maskedMesh->dMeshStatic_p.size(); m++)
+	{
+		maskedMesh->dMeshStatic_p[m]->shape().export_obj(outputMeshFile.c_str());
+	}
+	
+	// for each texture:
+	// get the color of the mask
+	// interpolate the vertex according to the mask color (black = neutral, white = expression, gray = interpolated)
+	
+	unsigned char* neutralBuffer = neutralTexture->getBuffer();
+	unsigned char* expressiveBuffer = expressiveTexture->getBuffer();
+
+	unsigned char* outData = new unsigned char[mWidth * mHeight * 4 * sizeof(unsigned char)];
+	SbmTexture* outputExpressiveTexture = new SbmTexture("maskedTexture");
+	outputExpressiveTexture->setTextureSize(mWidth, mHeight, 4);
+	for (int h = 0; h < mHeight; h++)
+	{
+		for (int w = 0; w < mWidth; w++)
+		{
+			int position = h * mWidth + (w * 4);
+			SrColor maskColor;
+			maskColor.r = maskedBuffer[position];
+			maskColor.g = maskedBuffer[position + 1];
+			maskColor.b = maskedBuffer[position + 2];
+			maskColor.a = maskedBuffer[position + 3];
+			// assuming masks are in greyscale, use only red channel to determine 'whiteness'
+			float maskGreyAmount = (float) maskColor.r / 255.0f;
+
+			SrColor expressiveColor;
+			expressiveColor.r = expressiveBuffer[position];
+			expressiveColor.g = expressiveBuffer[position + 1];
+			expressiveColor.b = expressiveBuffer[position + 2];
+			expressiveColor.a = expressiveBuffer[position + 3];
+			float erf = (float) expressiveColor.r; 
+			float egf = (float) expressiveColor.g; 
+			float ebf = (float) expressiveColor.b;
+			float eaf = (float) expressiveColor.a; 
+
+			SrColor neutralColor;
+			neutralColor.r = neutralBuffer[position];
+			neutralColor.g = neutralBuffer[position + 1];
+			neutralColor.b = neutralBuffer[position + 2];
+			neutralColor.a = neutralBuffer[position + 3];		
+			float nrf = (float) neutralColor.r; 
+			float ngf = (float) neutralColor.g;
+			float nbf = (float) neutralColor.b;
+			float naf = (float) neutralColor.a;
+
+			// white = use expressive mask, black = use neutral mask, grey = interpolate values
+			float finalRf = erf * maskGreyAmount + (1.0f - maskGreyAmount) * nrf;
+			float finalGf = egf * maskGreyAmount + (1.0f - maskGreyAmount) * ngf;
+			float finalBf = ebf * maskGreyAmount + (1.0f - maskGreyAmount) * nbf;
+			float finalAf = eaf * maskGreyAmount + (1.0f - maskGreyAmount) * naf;
+
+			SrColor finalColor;
+			finalColor.r = (const char) finalRf;
+			finalColor.g = (const char) finalGf;
+			finalColor.b = (const char) finalBf;
+			finalColor.a = (const char) finalAf;
+
+			outData[position] = finalColor.r;
+			outData[position + 1] = finalColor.g;
+			outData[position + 2] = finalColor.b;
+			outData[position + 3] = finalColor.a;
+		}
+	}
+	outputExpressiveTexture->setBuffer(outData, mWidth * mHeight * 4);
+	// save the texture here....
+	int ret = SOIL_save_image(outputTextureFile.c_str(), SOIL_SAVE_TYPE_BMP, mWidth, mHeight, 4, outData);
+
+	if (ret == 0)
+	{
+		LOG("Could not save masked texture image to file %s.", outputTextureFile.c_str());
+	}
+	else
+	{
+		LOG("Successfully saved masked texture image to file %s.", outputTextureFile.c_str());
+	}
+
+	return true;
+
+}
+
 
 
 }

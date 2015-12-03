@@ -34,7 +34,7 @@ class SBAssetManager : public SBObject
 		SBAPI void removeAssetPath(const std::string& type, const std::string& path);
 		SBAPI void removeAllAssetPaths(const std::string& type);
 		SBAPI void loadAssets();
-		SBAPI void loadAsset(const std::string& assetPath);
+		SBAPI std::vector<SBAsset*> loadAsset(const std::string& assetPath);
 		SBAPI void loadAssetsFromPath(const std::string& assetPath);
 		SBAPI std::string findAsset(const std::string& type, const std::string& assetName);
 
@@ -60,7 +60,7 @@ class SBAssetManager : public SBObject
 		SBAPI void removeMesh(DeformableMesh* mesh);
 		SBAPI int getNumMeshes();
 		SBAPI std::vector<std::string> getMeshNames();
-
+		SBAPI bool createMeshFromBlendMasks(const std::string& neutralShapeFile, const std::string& neutralTextureFile, const std::string& expressiveShapeFile, const std::string& expressiveTextureFile, const std::string& maskTextureFile, const std::string& outputMeshFile, const std::string& outputTextureFile);
 		SBAPI int load_motion( const void* data, int sizeBytes, const char* motionName );
 		SBAPI int load_skeleton( const void* data, int sizeBytes, const char* skeletonName );
 

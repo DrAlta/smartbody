@@ -118,6 +118,10 @@ BOOST_PYTHON_MODULE(SmartBody)
         .def(boost::python::vector_indexing_suite<std::vector<double> >())
     ;
 
+	boost::python::class_<std::vector<SBAsset*> >("AssetVec")
+        .def(boost::python::vector_indexing_suite<std::vector<SBAsset*> >())
+    ;
+
 
 
 	boost::python::class_< QuatMap >("QuatMap")
@@ -786,7 +790,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("removeAllAssetPaths", &SBAssetManager::removeAllAssetPaths, "Removes all paths resource given path type and actual path string. \n Input: type(can be script|motion|audio), path \n Output: NULL")
 		.def("getAssetPaths", &SBAssetManager::getAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type: seq, me, audio, mesh.")
 		.def("getLocalAssetPaths", &SBAssetManager::getLocalAssetPaths, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns a list of all path names for a given type excluding the media path: seq, me, audio, mesh.")
-		.def("loadAsset", &SBAssetManager::loadAsset, "Loads the skeletons and motions from the file.")
+		.def("loadAsset", &SBAssetManager::loadAsset, boost::python::return_value_policy<boost::python::return_by_value>(), "Loads the skeletons and motions from the file.")
 		.def("loadAssets", &SBAssetManager::loadAssets, "Loads the skeletons and motions from the asset paths.")
 		.def("loadAssetsFromPath", &SBAssetManager::loadAssetsFromPath, "Loads the skeletons and motions from a given path. The path will not be stored for later use.")
 		.def("addMotion", &SBAssetManager::addMotion, "Adds a motion to the scene.")
@@ -802,6 +806,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("removeMesh", &SBAssetManager::removeMesh, "Removes a mesh from the scene.")
 		.def("getMeshNames", &SBAssetManager::getMeshNames, "Returns a list of all mesh names.\n Input: NULL \nOutput: list of skeleton names")
 		.def("getMesh", &SBAssetManager::getDeformableMesh, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Return a deformable mesh given name")
+		.def("createMeshFromBlendMasks", &SBAssetManager::createMeshFromBlendMasks, "Writes out a mesh and texture based on: neutralShapeFile, neutralTextureFile, expressiveShapeFile, expressiveTextureFile, maskTextureFile, outputMeshFile, outputTextureFile")
 		;
 
 
