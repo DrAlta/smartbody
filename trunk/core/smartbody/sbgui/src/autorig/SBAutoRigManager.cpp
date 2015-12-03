@@ -95,6 +95,10 @@ bool SBAutoRigManager::buildAutoRiggingFromPawnMesh( const std::string& pawnName
 	SrModel& model = mesh->dMeshStatic_p[0]->shape();	
 
 	SrModel scaleModel = SrModel(model);
+	for (unsigned int i=1; i< mesh->dMeshStatic_p.size();i++)
+	{
+		scaleModel.add_model(mesh->dMeshStatic_p[i]->shape());
+	}
 
 	
 
