@@ -1205,7 +1205,7 @@ void AttributeWindow::Vec3CB(Fl_Widget *w, void *data)
 				if (character)
 				{
 					std::stringstream strstr;
-					strstr << "sb scene.getCharacter(\"" << character->getName() << "\").setStringAttribute(\"" << attr->getName() << "\", SrVec(\"" <<  val.x <<  ", " << val.y << ", " << val.z << "))";
+					strstr << "sb scene.getCharacter(\"" << character->getName() << "\").setVec3Attribute(\"" << attr->getName() << "\", " <<  val.x <<  ", " << val.y << ", " << val.z << ")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
 					vec3attr->setValueFast(val);
 				}
@@ -1213,7 +1213,7 @@ void AttributeWindow::Vec3CB(Fl_Widget *w, void *data)
 				if (pawn && !character)
 				{
 					std::stringstream strstr;
-					strstr << "sb scene.getPawn(\"" << pawn->getName() << "\").setStringAttribute(\"" << attr->getName() << "\", SrVec(\"" <<  val.x <<  ", " << val.y << ", " << val.z << "))";
+					strstr << "sb scene.getPawn(\"" << pawn->getName() << "\").setVec3Attribute(\"" << attr->getName() << "\", " <<  val.x <<  ", " << val.y << ", " << val.z << ")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
 					vec3attr->setValueFast(val);
 				}
