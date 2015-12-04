@@ -848,7 +848,14 @@ void AttributeWindow::ActionCB(Fl_Widget *w, void *data)
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
 					aattr->setValueFast();
 				}
-				else	// if it's not a character attribute, set locally
+				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
+				if (pawn && !character)
+				{
+					std::string sendStr = "sb scene.getPawn(\"" + pawn->getName() + "\").setActionAttribute(\"" + attr->getName() + "\")";
+					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
+					aattr->setValueFast();
+				}
+				if (!pawn && !character) // if it's not a character attribute, set locally
 				{
 					aattr->setValue();
 				}
@@ -898,7 +905,15 @@ void AttributeWindow::BoolCB(Fl_Widget *w, void *data)
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
 					battr->setValueFast(check->value()? true : false);
 				}
-				else	// if it's not a character attribute, set locally
+				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
+				if (pawn && !character)
+				{
+					std::string str = check->value()? "True" : "False";
+					std::string sendStr = "sb scene.getPawn(\"" + pawn->getName() + "\").setBoolAttribute(\"" + attr->getName() + "\", " + str + ")";
+					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
+					battr->setValueFast(check->value()? true : false);
+				}
+				if (!pawn && !character)	// if it's not a character attribute, set locally
 				{
 					battr->setValue(check->value()? true : false);
 				}
@@ -970,7 +985,16 @@ void AttributeWindow::IntCB(Fl_Widget *w, void *data)
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
 					iattr->setValueFast(val);
 				}
-				else	// if it's not a character attribute, set locally
+				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
+				if (pawn && !character)
+				{
+					std::stringstream strstr;
+					strstr << val;
+					std::string sendStr = "sb scene.getPawn(\"" + pawn->getName() + "\").setIntAttribute(\"" + attr->getName() + "\", " + strstr.str() + ")";
+					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
+					iattr->setValueFast(val);
+				}
+				if (!pawn && !character)	// if it's not a character attribute, set locally
 				{
 					iattr->setValue(val);
 				}
@@ -1040,7 +1064,16 @@ void AttributeWindow::DoubleCB(Fl_Widget *w, void *data)
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
 					dattr->setValueFast(val);
 				}
-				else	// if it's not a character attribute, set locally
+				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
+				if (pawn && !character)
+				{
+					std::stringstream strstr;
+					strstr << val;
+					std::string sendStr = "sb scene.getPawn(\"" + pawn->getName() + "\").setDoubleAttribute(\"" + attr->getName() + "\", " + strstr.str() + ")";
+					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
+					dattr->setValueFast(val);
+				}
+				if (!pawn && !character)	// if it's not a character attribute, set locally
 				{
 					dattr->setValue(val);
 				}
@@ -1106,7 +1139,15 @@ void AttributeWindow::StringCB(Fl_Widget *w, void *data)
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
 					strattr->setValueFast(finalValue);
 				}
-				else	// if it's not a character attribute, set locally
+				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
+				if (pawn && !character)
+				{
+					std::stringstream strstr;
+					strstr << "sb scene.getPawn(\"" << pawn->getName() << "\").setStringAttribute(\"" << attr->getName() << "\", \"" << finalValue << "\")";
+					SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
+					strattr->setValueFast(finalValue);
+				}
+				if (!pawn && !character)// if it's not a character attribute, set locally
 				{
 					strattr->setValue(finalValue);
 				}
@@ -1168,7 +1209,15 @@ void AttributeWindow::Vec3CB(Fl_Widget *w, void *data)
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
 					vec3attr->setValueFast(val);
 				}
-				else	// if it's not a character attribute, set locally
+				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
+				if (pawn && !character)
+				{
+					std::stringstream strstr;
+					strstr << "sb scene.getPawn(\"" << pawn->getName() << "\").setStringAttribute(\"" << attr->getName() << "\", SrVec(\"" <<  val.x <<  ", " << val.y << ", " << val.z << "))";
+					SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
+					vec3attr->setValueFast(val);
+				}
+				if (!pawn && !character)	// if it's not a character attribute, set locally
 				{
 					vec3attr->setValue(val);
 				}
