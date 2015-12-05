@@ -2232,11 +2232,17 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 		}
 
 	}
+
+	boost::filesystem::path p(outputMeshFile);
+	std::string fileName = boost::filesystem::basename( p );
+	std::string extension =  boost::filesystem::extension( p );
+	std::stringstream strstr; 
+	strstr << fileName << ".mtl";
 	
 	// save the final mesh
 	for (size_t m = 0; m < maskedMesh->dMeshStatic_p.size(); m++)
 	{
-		maskedMesh->dMeshStatic_p[m]->shape().export_obj(outputMeshFile.c_str());
+		maskedMesh->dMeshStatic_p[m]->shape().export_obj(outputMeshFile.c_str(), strstr.str().c_str(), outputTextureFile.c_str());
 	}
 	
 	// for each texture:
@@ -2246,6 +2252,10 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	unsigned char* neutralBuffer = neutralTexture->getBuffer();
 	unsigned char* expressiveBuffer = expressiveTexture->getBuffer();
 
+
+	int numExpressiveChannels = expressiveTexture->getNumChannels();
+	int numNeutralChannels = neutralTexture->getNumChannels();
+	int numMaskChannels = maskedTexture->getNumChannels();
 
 	int maxSize = mWidth * mHeight * 4 * sizeof(unsigned char);
 	unsigned char* outData = new unsigned char[maxSize];
@@ -2259,29 +2269,68 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 			int flippedPosition = (mHeight - h - 1) * mWidth * 4 + w * 4;
 
 			int position3 = h * mWidth * 3 + w * 3;
+			int flippedPosition3 = (mHeight - h - 1) * mWidth * 3 + w * 3;
+
 			SrColor maskColor;
-			maskColor.r = maskedBuffer[position3];
-			maskColor.g = maskedBuffer[position3 + 1];
-			maskColor.b = maskedBuffer[position3 + 2];
-			maskColor.a = maskedBuffer[position3 + 3];
+			if (numMaskChannels == 4)
+			{
+				maskColor.r = maskedBuffer[position];
+				maskColor.g = maskedBuffer[position + 1];
+				maskColor.b = maskedBuffer[position + 2];
+				maskColor.a = maskedBuffer[position + 3];
+			}
+			else if (numMaskChannels == 3)
+			{
+				maskColor.r = maskedBuffer[position3];
+				maskColor.g = maskedBuffer[position3 + 1];
+				maskColor.b = maskedBuffer[position3 + 2];
+				maskColor.a = 1.0f;
+			}
+
+			
 			// assuming masks are in greyscale, use only red channel to determine 'whiteness'
 			float mcolor[4];
 			maskColor.get(mcolor);
 			float maskGreyAmount = mcolor[0];
+			
+			bool stop = false;
+			if (maskGreyAmount > 0.0f)
+				stop = true;
+
 
 			SrColor expressiveColor;
-			expressiveColor.r = expressiveBuffer[position3];
-			expressiveColor.g = expressiveBuffer[position3 + 1];
-			expressiveColor.b = expressiveBuffer[position3 + 2];
-			expressiveColor.a = (srbyte) 255;
+			if (numExpressiveChannels == 4)
+			{
+				expressiveColor.r = expressiveBuffer[position];
+				expressiveColor.g = expressiveBuffer[position + 1];
+				expressiveColor.b = expressiveBuffer[position + 2];
+				expressiveColor.a = expressiveBuffer[position + 3];
+			}
+			else if (numExpressiveChannels == 3)
+			{
+				expressiveColor.r = expressiveBuffer[position3];
+				expressiveColor.g = expressiveBuffer[position3 + 1];
+				expressiveColor.b = expressiveBuffer[position3 + 2];
+				expressiveColor.a = 1.0f;
+			}
 			float ecolor[4];
 			expressiveColor.get(ecolor);
 
 			SrColor neutralColor;
-			neutralColor.r = neutralBuffer[position3];
-			neutralColor.g = neutralBuffer[position3 + 1];
-			neutralColor.b = neutralBuffer[position3 + 2];
-			neutralColor.a = (srbyte) 255;
+			if (numNeutralChannels == 4)
+			{
+				neutralColor.r = neutralBuffer[position];
+				neutralColor.g = neutralBuffer[position + 1];
+				neutralColor.b = neutralBuffer[position + 2];
+				neutralColor.a = neutralBuffer[position + 3];
+			}
+			else if (numNeutralChannels == 3)
+			{
+				neutralColor.r = neutralBuffer[position3];
+				neutralColor.g = neutralBuffer[position3 + 1];
+				neutralColor.b = neutralBuffer[position3 + 2];
+				neutralColor.a = 1.0f;
+			}
 			float ncolor[4];
 			neutralColor.get(ncolor);
 			
@@ -2290,19 +2339,19 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 			float finalGf = ecolor[1] * maskGreyAmount + (1.0f - maskGreyAmount) * ncolor[1];
 			float finalBf = ecolor[2] * maskGreyAmount + (1.0f - maskGreyAmount) * ncolor[2];
 			float finalAf = ecolor[3] * maskGreyAmount + (1.0f - maskGreyAmount) * ncolor[3];
-
+			
 			SrColor finalColor(finalRf, finalGf, finalBf, finalAf);
 
 			// make sure to flip the data so that it gets written correctly
-			outData[flippedPosition] = finalColor.r;
-			outData[flippedPosition + 1] = finalColor.g;
-			outData[flippedPosition + 2] = finalColor.b;
-			outData[flippedPosition + 3] = finalColor.a;
+			outData[flippedPosition3] = finalColor.r;
+			outData[flippedPosition3 + 1] = finalColor.g;
+			outData[flippedPosition3 + 2] = finalColor.b;
+			outData[flippedPosition3 + 3] = finalColor.a;
 		}
 	}
 	outputExpressiveTexture->setBuffer(outData, maxSize);
 	// save the texture here....
-	int ret = SOIL_save_image(outputTextureFile.c_str(), SOIL_SAVE_TYPE_BMP, mWidth, mHeight, 4, outData);
+	int ret = SOIL_save_image(outputTextureFile.c_str(), SOIL_SAVE_TYPE_BMP, mWidth, mHeight, 3, outData);
 
 	if (ret == 0)
 	{

@@ -227,19 +227,22 @@ void SBDebuggerClient::Update()
 // 						  }
                           for (size_t i = 7; i < split.size(); i++)
                           {
-                             string name = split[i];
-                             string pos  = split[i + 1];
-							 float posX = vhcl::ToFloat(split[i + 2]);
-                             float posY = vhcl::ToFloat(split[i + 3]);
-                             float posZ = vhcl::ToFloat(split[i + 4]);
-                             string rot  = split[i + 5];
-                             float rotX = vhcl::ToFloat(split[i + 6]);
-                             float rotY = vhcl::ToFloat(split[i + 7]);
-                             float rotZ = vhcl::ToFloat(split[i + 8]);
-                             float rotW = vhcl::ToFloat(split[i + 9]);
-                             i += 9;
+							 if (i +9 <= split.size() - 1)
+							 {
+								 string name = split[i];
+								 string pos  = split[i + 1];
+								 float posX = vhcl::ToFloat(split[i + 2]);
+								 float posY = vhcl::ToFloat(split[i + 3]);
+								 float posZ = vhcl::ToFloat(split[i + 4]);
+								 string rot  = split[i + 5];
+								 float rotX = vhcl::ToFloat(split[i + 6]);
+								 float rotY = vhcl::ToFloat(split[i + 7]);
+								 float rotZ = vhcl::ToFloat(split[i + 8]);
+								 float rotW = vhcl::ToFloat(split[i + 9]);
+								 i += 9;
 
-							SmartBody::SBScene::getScene()->getDebuggerUtility()->updateCharacter(split[4], name, posX, posY, posZ, rotX, rotY, rotZ, rotW);
+								SmartBody::SBScene::getScene()->getDebuggerUtility()->updateCharacter(split[4], name, posX, posY, posZ, rotX, rotY, rotZ, rotW);
+							 }
 						  }
                        }
                      }
