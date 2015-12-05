@@ -2044,6 +2044,22 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 				break;
 			}
 		}
+		if (!neutralTexture)
+		{
+			if (neutralMesh->dMeshStatic_p.size() > 0)
+			{
+				SrModel& model = neutralMesh->dMeshStatic_p[0]->shape();
+				for (std::map<std::string,std::string>::iterator iter = model.mtlTextureNameMap.begin(); 
+					 iter != model.mtlTextureNameMap.end();
+					 iter++)
+				{
+					std::string textureCandidate = (*iter).second;
+					neutralTexture = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, textureCandidate.c_str());
+					if (neutralTexture)
+						break;
+				}
+			}
+		}
 	}
 	if (!neutralTexture)
 	{
@@ -2053,7 +2069,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 
 	// load the expressive shape
 	DeformableMesh* expressiveMesh = NULL;
-	assets = this->loadAsset(neutralShapeFile);
+	assets = this->loadAsset(expressiveShapeFile);
 	for (size_t a = 0; a < assets.size(); a++)
 	{
 		DeformableMesh* mesh = dynamic_cast<DeformableMesh*>(assets[a]);
@@ -2064,7 +2080,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	}
 	if (!expressiveMesh)
 	{
-		LOG("Could not find neutral mesh in file %s.", neutralShapeFile.c_str());
+		LOG("Could not find expressive mesh in file %s.", expressiveShapeFile.c_str());
 		ok = false;
 	}
 
@@ -2082,6 +2098,22 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 				break;
 			}
 		}
+		if (!expressiveTexture)
+		{
+			if (expressiveMesh->dMeshStatic_p.size() > 0)
+			{
+				SrModel& model = expressiveMesh->dMeshStatic_p[0]->shape();
+				for (std::map<std::string,std::string>::iterator iter = model.mtlTextureNameMap.begin(); 
+					 iter != model.mtlTextureNameMap.end();
+					 iter++)
+				{
+					std::string textureCandidate = (*iter).second;
+					expressiveTexture = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, textureCandidate.c_str());
+					if (expressiveTexture)
+						break;
+				}
+			}
+		}
 	}
 	if (!expressiveTexture)
 	{
@@ -2092,7 +2124,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	// load the masked texture
 	texManager.loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, maskTextureFile.c_str(), maskTextureFile.c_str());
 	SbmTexture* maskedTexture = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, maskTextureFile.c_str());
-	if (maskedTexture)
+	if (!maskedTexture)
 	{
 		LOG("Could not load masked texture file %s.", maskTextureFile.c_str());
 		ok = false;
@@ -2103,7 +2135,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	int numNMeshes = neutralMesh->dMeshStatic_p.size();
 	if (numEMeshes != numNMeshes)
 	{
-		LOG("Neutral mesh %s has different number of meshes as expresive mesh %s (%d vs %d).", neutralShapeFile, expressiveShapeFile, numNMeshes, numEMeshes);
+		LOG("Neutral mesh %s has different number of meshes as expresive mesh %s (%d vs %d).", neutralShapeFile.c_str(), expressiveShapeFile.c_str(), numNMeshes, numEMeshes);
 		ok = false;
 	}
 	
@@ -2119,7 +2151,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	}
 	if (numEVertices != numNVertices)
 	{
-		LOG("Neutral mesh %s has different number of vertices as expresive mesh %s (%d vs %d).", neutralShapeFile, expressiveShapeFile, numNMeshes, numEMeshes);
+		LOG("Neutral mesh %s has different number of vertices as expresive mesh %s (%d vs %d).", neutralShapeFile.c_str(), expressiveShapeFile.c_str(), numNMeshes, numEMeshes);
 		ok = false;
 	}
 
@@ -2137,14 +2169,14 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 		eHeight != mHeight ||
 		nHeight != mHeight)
 	{
-		LOG("Texture heights don't match (%s: %d, %s: %d, %s: %d", neutralTextureFile, nHeight, expressiveTextureFile, eHeight, maskTextureFile, mHeight);
+		LOG("Texture heights don't match (%s: %d, %s: %d, %s: %d", neutralTextureFile.c_str(), nHeight, expressiveTextureFile.c_str(), eHeight, maskTextureFile.c_str(), mHeight);
 		ok = false;
 	}
 	if (eWidth != nWidth || 
 		eWidth != mWidth ||
 		nWidth != mWidth)
 	{
-		LOG("Texture heights don't match (%s: %d, %s: %d, %s: %d", neutralTextureFile, nWidth, expressiveTextureFile, eWidth, maskTextureFile, mWidth);
+		LOG("Texture heights don't match (%s: %d, %s: %d, %s: %d", neutralTextureFile.c_str(), nWidth, expressiveTextureFile.c_str(), eWidth, maskTextureFile.c_str(), mWidth);
 		ok = false;
 	}
 
@@ -2189,12 +2221,12 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 			maskColor.b = maskedBuffer[position + 2];
 			maskColor.a = maskedBuffer[position + 3];
 			// assuming masks are in greyscale, use only red channel to determine 'whiteness'
-			float maskGreyAmount = (float) maskColor.r  / 255.0f;
+			float maskGreyAmount = ((float) maskColor.r)  / 255.0f;
 			SrPnt& pointNeutral = neutralModel.V[v];
 			SrPnt& pointExpressive = expressiveModel.V[v];
 			SrPnt& pointMasked = maskedModel.V[v];
 			for (int n = 0; n < 3; n++)
-				pointMasked[0] = maskGreyAmount * pointExpressive[n] + (1.0f - maskGreyAmount) * pointNeutral[n];
+				pointMasked[n] = maskGreyAmount * pointExpressive[n] + (1.0f - maskGreyAmount) * pointNeutral[n];
 		}
 
 	}
@@ -2226,7 +2258,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 			maskColor.b = maskedBuffer[position + 2];
 			maskColor.a = maskedBuffer[position + 3];
 			// assuming masks are in greyscale, use only red channel to determine 'whiteness'
-			float maskGreyAmount = (float) maskColor.r / 255.0f;
+			float maskGreyAmount = ((float) maskColor.r) / 255.0f;
 
 			SrColor expressiveColor;
 			expressiveColor.r = expressiveBuffer[position];
