@@ -2221,7 +2221,9 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 			maskColor.b = maskedBuffer[position + 2];
 			maskColor.a = maskedBuffer[position + 3];
 			// assuming masks are in greyscale, use only red channel to determine 'whiteness'
-			float maskGreyAmount = ((float) maskColor.r)  / 255.0f;
+			float mcolor[4];
+			maskColor.get(mcolor);
+			float maskGreyAmount = mcolor[0];
 			SrPnt& pointNeutral = neutralModel.V[v];
 			SrPnt& pointExpressive = expressiveModel.V[v];
 			SrPnt& pointMasked = maskedModel.V[v];
@@ -2244,61 +2246,61 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	unsigned char* neutralBuffer = neutralTexture->getBuffer();
 	unsigned char* expressiveBuffer = expressiveTexture->getBuffer();
 
-	unsigned char* outData = new unsigned char[mWidth * mHeight * 4 * sizeof(unsigned char)];
+
+	int maxSize = mWidth * mHeight * 4 * sizeof(unsigned char);
+	unsigned char* outData = new unsigned char[maxSize];
 	SbmTexture* outputExpressiveTexture = new SbmTexture("maskedTexture");
 	outputExpressiveTexture->setTextureSize(mWidth, mHeight, 4);
 	for (int h = 0; h < mHeight; h++)
 	{
 		for (int w = 0; w < mWidth; w++)
 		{
-			int position = h * mWidth + (w * 4);
+			int position = h * mWidth * 4 + w * 4;
+			int flippedPosition = (mHeight - h - 1) * mWidth * 4 + w * 4;
+
+			int position3 = h * mWidth * 3 + w * 3;
 			SrColor maskColor;
-			maskColor.r = maskedBuffer[position];
-			maskColor.g = maskedBuffer[position + 1];
-			maskColor.b = maskedBuffer[position + 2];
-			maskColor.a = maskedBuffer[position + 3];
+			maskColor.r = maskedBuffer[position3];
+			maskColor.g = maskedBuffer[position3 + 1];
+			maskColor.b = maskedBuffer[position3 + 2];
+			maskColor.a = maskedBuffer[position3 + 3];
 			// assuming masks are in greyscale, use only red channel to determine 'whiteness'
-			float maskGreyAmount = ((float) maskColor.r) / 255.0f;
+			float mcolor[4];
+			maskColor.get(mcolor);
+			float maskGreyAmount = mcolor[0];
 
 			SrColor expressiveColor;
-			expressiveColor.r = expressiveBuffer[position];
-			expressiveColor.g = expressiveBuffer[position + 1];
-			expressiveColor.b = expressiveBuffer[position + 2];
-			expressiveColor.a = expressiveBuffer[position + 3];
-			float erf = (float) expressiveColor.r; 
-			float egf = (float) expressiveColor.g; 
-			float ebf = (float) expressiveColor.b;
-			float eaf = (float) expressiveColor.a; 
+			expressiveColor.r = expressiveBuffer[position3];
+			expressiveColor.g = expressiveBuffer[position3 + 1];
+			expressiveColor.b = expressiveBuffer[position3 + 2];
+			expressiveColor.a = (srbyte) 255;
+			float ecolor[4];
+			expressiveColor.get(ecolor);
 
 			SrColor neutralColor;
-			neutralColor.r = neutralBuffer[position];
-			neutralColor.g = neutralBuffer[position + 1];
-			neutralColor.b = neutralBuffer[position + 2];
-			neutralColor.a = neutralBuffer[position + 3];		
-			float nrf = (float) neutralColor.r; 
-			float ngf = (float) neutralColor.g;
-			float nbf = (float) neutralColor.b;
-			float naf = (float) neutralColor.a;
-
+			neutralColor.r = neutralBuffer[position3];
+			neutralColor.g = neutralBuffer[position3 + 1];
+			neutralColor.b = neutralBuffer[position3 + 2];
+			neutralColor.a = (srbyte) 255;
+			float ncolor[4];
+			neutralColor.get(ncolor);
+			
 			// white = use expressive mask, black = use neutral mask, grey = interpolate values
-			float finalRf = erf * maskGreyAmount + (1.0f - maskGreyAmount) * nrf;
-			float finalGf = egf * maskGreyAmount + (1.0f - maskGreyAmount) * ngf;
-			float finalBf = ebf * maskGreyAmount + (1.0f - maskGreyAmount) * nbf;
-			float finalAf = eaf * maskGreyAmount + (1.0f - maskGreyAmount) * naf;
+			float finalRf = ecolor[0] * maskGreyAmount + (1.0f - maskGreyAmount) * ncolor[0];
+			float finalGf = ecolor[1] * maskGreyAmount + (1.0f - maskGreyAmount) * ncolor[1];
+			float finalBf = ecolor[2] * maskGreyAmount + (1.0f - maskGreyAmount) * ncolor[2];
+			float finalAf = ecolor[3] * maskGreyAmount + (1.0f - maskGreyAmount) * ncolor[3];
 
-			SrColor finalColor;
-			finalColor.r = (const char) finalRf;
-			finalColor.g = (const char) finalGf;
-			finalColor.b = (const char) finalBf;
-			finalColor.a = (const char) finalAf;
+			SrColor finalColor(finalRf, finalGf, finalBf, finalAf);
 
-			outData[position] = finalColor.r;
-			outData[position + 1] = finalColor.g;
-			outData[position + 2] = finalColor.b;
-			outData[position + 3] = finalColor.a;
+			// make sure to flip the data so that it gets written correctly
+			outData[flippedPosition] = finalColor.r;
+			outData[flippedPosition + 1] = finalColor.g;
+			outData[flippedPosition + 2] = finalColor.b;
+			outData[flippedPosition + 3] = finalColor.a;
 		}
 	}
-	outputExpressiveTexture->setBuffer(outData, mWidth * mHeight * 4);
+	outputExpressiveTexture->setBuffer(outData, maxSize);
 	// save the texture here....
 	int ret = SOIL_save_image(outputTextureFile.c_str(), SOIL_SAVE_TYPE_BMP, mWidth, mHeight, 4, outData);
 
