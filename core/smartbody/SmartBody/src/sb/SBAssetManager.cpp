@@ -2196,6 +2196,9 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 		}
 	}
 
+	
+	int numMaskChannels = maskedTexture->getNumChannels();
+
 	unsigned char* maskedBuffer = maskedTexture->getBuffer();
 	for (size_t m = 0; m < maskedMesh->dMeshStatic_p.size(); m++)
 	{
@@ -2203,32 +2206,60 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 		SrModel& expressiveModel = expressiveMesh->dMeshStatic_p[m]->shape();
 		SrModel& maskedModel = maskedMesh->dMeshStatic_p[m]->shape();
 
-		for (int v = 0; v < neutralModel.V.size(); v++)
+
+		std::set<int> vertexUsed;
+		for (int f = 0; f < neutralModel.F.size(); f++)
 		{
-			// get the texture coordinates for the vertex
-			SrPnt2& uv = neutralModel.T[v];
-			// normalize uv to size of texture
-			float rf = ((float) mHeight) * uv.x;
-			float cf = ((float) mWidth) * uv.y;
-			int rpos = (int) rf;
-			int cpos = (int) cf;
+			SrModel::Face& face = neutralModel.F[f];
+			SrModel::Face& faceTextureIndex = neutralModel.Ft[f];
+
+			int curVertex = -1;
+			int curTextureIndex = -1;
+			for (int v = 0; v < 3; v++)
+			{
+				curVertex = face[v];
+				std::set<int>::iterator iter = vertexUsed.find(curVertex);
+				if (iter == vertexUsed.end())
+				{
+					vertexUsed.insert(curVertex);
+				}
+				else
+				{
+					continue;
+				}
+				curTextureIndex = faceTextureIndex[v];
 			
-			// find the greyscale color of the mask texture
-			int position = rpos * mWidth + (cpos * 4);
-			SrColor maskColor;
-			maskColor.r = maskedBuffer[position];
-			maskColor.g = maskedBuffer[position + 1];
-			maskColor.b = maskedBuffer[position + 2];
-			maskColor.a = maskedBuffer[position + 3];
-			// assuming masks are in greyscale, use only red channel to determine 'whiteness'
-			float mcolor[4];
-			maskColor.get(mcolor);
-			float maskGreyAmount = mcolor[0];
-			SrPnt& pointNeutral = neutralModel.V[v];
-			SrPnt& pointExpressive = expressiveModel.V[v];
-			SrPnt& pointMasked = maskedModel.V[v];
-			for (int n = 0; n < 3; n++)
-				pointMasked[n] = maskGreyAmount * pointExpressive[n] + (1.0f - maskGreyAmount) * pointNeutral[n];
+				// get the texture coordinates for the vertex
+				SrPnt2& uv = neutralModel.T[curTextureIndex];
+				// normalize uv to size of texture
+				float cf = ((float) mWidth) * uv.x;
+				float rf = ((float) mHeight) * uv.y;
+				int rpos = (int) rf;
+				int cpos = (int) cf;
+			
+				// find the greyscale color of the mask texture
+				int position = rpos * mWidth * numMaskChannels + (cpos * numMaskChannels);
+				SrColor maskColor;
+				maskColor.r = maskedBuffer[position];
+				maskColor.g = maskedBuffer[position + 1];
+				maskColor.b = maskedBuffer[position + 2];
+				if (numMaskChannels == 4)
+					maskColor.a = maskedBuffer[position + 3];
+				else
+					maskColor.a = 255;
+
+				// assuming masks are in greyscale, use only red channel to determine 'whiteness'
+				float mcolor[4];
+				maskColor.get(mcolor);
+				float maskGreyAmount = mcolor[0];
+
+				SrPnt& pointNeutral = neutralModel.V[curVertex];
+				SrPnt& pointExpressive = expressiveModel.V[curVertex];
+				SrPnt& pointMasked = maskedModel.V[curVertex];
+				for (int n = 0; n < 3; n++)
+					pointMasked[n] = maskGreyAmount * pointExpressive[n] + (1.0f - maskGreyAmount) * pointNeutral[n];
+	
+			}
 		}
 
 	}
@@ -2255,7 +2286,6 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 
 	int numExpressiveChannels = expressiveTexture->getNumChannels();
 	int numNeutralChannels = neutralTexture->getNumChannels();
-	int numMaskChannels = maskedTexture->getNumChannels();
 
 	int maxSize = mWidth * mHeight * 4 * sizeof(unsigned char);
 	unsigned char* outData = new unsigned char[maxSize];
