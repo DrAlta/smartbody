@@ -6,7 +6,7 @@
 #include <sr/sr_gl.h>
 #include <sr/sr_viewer.h>
 
-#if defined(ANDROID_BUILD) || defined(SB_IPHONE)
+#if defined(SB_IPHONE)
 
 class SbmShaderProgram
 {

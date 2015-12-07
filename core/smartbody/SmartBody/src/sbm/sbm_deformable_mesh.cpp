@@ -2199,7 +2199,7 @@ void DeformableMeshInstance::blendShapes()
 
 
 		//	Here I try to blend the faces two at a time. This way I avoid hardcoded constant vector size.
-#if !defined(SB_IPHONE) && !defined(__ANDROID__)
+#if !defined(SB_IPHONE) 
 
 		if(_tempFBOPairs == NULL) 
 		{

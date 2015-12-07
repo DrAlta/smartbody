@@ -12,6 +12,9 @@
 #include <sbm/sbm_deformable_mesh.h>
 #include "SbmShader.h"
 #include "VBOData.h"
+#elif defined(__ANDROID__)
+#include <sbm/sbm_deformable_mesh.h>
+#include "SbmShader.h"
 #endif
 
 class SbmDeformableMeshGPU;
@@ -86,5 +89,21 @@ class SbmBlendTextures
 
 	private:
 		std::string		_shaderName;
+};
+#elif defined(__ANDROID__)
+class SbmBlendTextures
+{
+public:
+	SbmBlendTextures();
+	~SbmBlendTextures();
+
+	static GLuint getShader(const std::string);
+	static void BlendAllAppearancesPairwise(GLuint *, GLuint *, std::vector<float>, std::vector<GLuint>,  std::vector<std::string>, GLuint, int, int);
+	GLuint			_vsID;
+	GLuint			_fsID;
+	GLuint			_programID;
+
+private:
+	std::string		_shaderName;
 };
 #endif
