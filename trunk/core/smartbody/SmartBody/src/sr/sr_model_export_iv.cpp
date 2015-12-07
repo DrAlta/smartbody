@@ -169,19 +169,22 @@ bool SrModel::export_obj ( const char* file, const char* mtlFile, const char* te
 
 
 	o << "usemtl material_0" << srnl;
-   // save faces (F)
+     // save textures (T)
+	if ( T.size() )
+	{ 
+		for ( i=0; i < T.size(); i++ )
+			o << "vt " << T[i].x << " " << T[i].y << srnl;
+	} 
+	
+	
+	// save faces (F)
 	if ( F.size()  && Fn.size() && Fm.size())
 	{ 
 		for ( i=0; i < F.size(); i++ )
 			o << "f " << (F[i].a + 1) << "/" << (Ft[i].a + 1) << "/" << (Fn[i].a) << " " << (F[i].b + 1) << "/" << (Ft[i].b + 1) << "/" << (Fn[i].b) << " " << (F[i].c + 1)  << "/" << (Ft[i].c + 1) << "/" << (Fn[i].c)<< srnl;
 	}
 
-    // save textures (T)
-	if ( T.size() )
-	{ 
-		for ( i=0; i < T.size(); i++ )
-			o << "vt " << T[i].x << " " << T[i].y << srnl;
-	} 
+
 	/*
    // save materials (M)
    if ( M.size() )
