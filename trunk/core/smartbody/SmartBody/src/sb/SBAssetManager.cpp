@@ -2186,7 +2186,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	// create a template for the final mesh
 	// load the expressive shape
 	DeformableMesh* maskedMesh = NULL;
-	assets = this->loadAsset(neutralShapeFile);
+	assets = this->loadAsset(expressiveShapeFile);
 	for (size_t a = 0; a < assets.size(); a++)
 	{
 		DeformableMesh* mesh = dynamic_cast<DeformableMesh*>(assets[a]);
