@@ -267,7 +267,7 @@ void SbmBlendFace::initShaderProgram()
 #endif
 
 
-#if !defined(__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(SB_IPHONE)
 SbmBlendTextures::SbmBlendTextures()
 {
 }
@@ -280,7 +280,7 @@ SbmBlendTextures::~SbmBlendTextures()
 GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 {
 #if defined(__ANDROID__)
-	std::string shaderPath = "/sdcard/uscict_virtualhumandata/shaders/";
+	std::string shaderPath = "/sdcard/vhdata/shaders/";
 #else
 	std::string shaderPath = "../../../../core/smartbody/SmartBody/src/sbm/GPU/shaderFiles/";
 #endif
@@ -503,6 +503,245 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 	}
 }
 
+void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, GLuint program, int w, int h)
+{
+	int numTextures		= weights.size();
+
+	float sumOfWeights	= 0;
+
+	float WeightUpToNow = 0;
+
+	for(std::vector<float>::iterator j=weights.begin(); j!=weights.end(); ++j)
+		sumOfWeights += *j;
+	//LOG("Blend ApperancePairWise");
+	for(int i = numTextures-1; i >= 0; i--) 
+	{
+		//LOG("BlendTexture %d", i);
+		WeightUpToNow += weights[i];
+
+		int faceArea;
+//		if((texture_names[i].find("eyebrowsUp") != std::string::npos) && (weights[i] > 0.001))
+//		{
+//			faceArea = 1;
+//			//std::cerr << "eye_blink\t" << weights[i] << "\n";
+//		} 
+//		else if((texture_names[i].find("smile") != std::string::npos) && (weights[i] > 0.001))
+//		{
+//			faceArea = 2;
+//			//std::cerr << texture_names[i] <<"\t" << weights[i] << "\n";
+//		}
+//		else
+		{
+			faceArea = 0;
+		}
+
+	
+		
+			glBindFramebuffer(GL_FRAMEBUFFER, FBODst[i]);                                                              // Bind the framebuffer object
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst[i], 0);              // Attach texture to FBO
+		//LOG("After bind framebuffer");
+			assert( glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE );
+			
+#if !defined(__ANDROID__)
+			glPushAttrib(GL_ENABLE_BIT);
+				glDisable(GL_DEPTH_TEST);
+				glDisable(GL_LIGHTING);
+				glMatrixMode (GL_PROJECTION);
+				glPushMatrix();
+					glLoadIdentity ();
+					gluOrtho2D(-1, 1, -1, 1);
+					glMatrixMode (GL_MODELVIEW);
+					glPushMatrix();
+					glPushAttrib(GL_VIEWPORT_BIT);
+					glPushAttrib(GL_TEXTURE_BIT);
+						glViewport(0, 0, w, h);
+						glLoadIdentity ();
+
+						glClearColor(1.0f, 1.0f, 1.0f, 0);
+						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+						GLuint uNumberOfTextures		= glGetUniformLocation(program, "uNumberOfTextures");
+						GLuint uIteration				= glGetUniformLocation(program, "uIteration");
+						GLuint uWeight					= glGetUniformLocation(program, "uWeight");
+						GLuint uWeightUpToNow			= glGetUniformLocation(program, "uWeightUpToNow");
+						GLuint uFaceArea				= glGetUniformLocation(program, "uFaceArea");
+						GLuint uTotalWeights			= glGetUniformLocation(program, "uTotalWeights");
+						GLuint uNeutralSampler			= glGetUniformLocation(program, "uNeutralSampler");
+						GLuint uExpressionSampler		= glGetUniformLocation(program, "uExpressionSampler");
+						GLuint uPreviousResultSampler	= glGetUniformLocation(program, "uPreviousResultSampler");
+
+						glUseProgram(program);
+						glEnable(GL_TEXTURE_2D);
+
+						glUniform1i(uNumberOfTextures, numTextures);
+						glUniform1i(uIteration, i);
+						glUniform1f(uWeight, weights[i]);
+						glUniform1f(uWeightUpToNow, WeightUpToNow);
+						glUniform1i(uFaceArea, faceArea);
+						glUniform1f(uTotalWeights, sumOfWeights);
+						glUniform1i(uNeutralSampler, 0);
+						glUniform1i(uExpressionSampler, 1);
+						glUniform1i(uPreviousResultSampler, 2);
+
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+
+						glActiveTexture(GL_TEXTURE1);
+						glBindTexture(GL_TEXTURE_2D, texIDs[i]);
+
+						//std::cerr << "uNeutral: " << texIDs[0] << "\tuExpression: " << texIDs[i];
+
+						// if first iteration, previous result will not be used, passing a random texture just for completeness  
+						if(i == numTextures-1) {
+							glActiveTexture(GL_TEXTURE2);
+							glBindTexture(GL_TEXTURE_2D, texIDs[1]);
+							//std::cerr  << "\tprevious: " << texIDs[1] << "\tDest:" << texDst[i] << "\ti = " << i << "\n";
+						} else {
+							glActiveTexture(GL_TEXTURE2);
+							glBindTexture(GL_TEXTURE_2D, texDst[i+1]);
+							//std::cerr << "\tprevious: " << texDst[i+1] << "\tDest:" << texDst[i] <<  "\ti = " << i << "\n";
+						}
+
+						glBegin(GL_QUADS);
+							glTexCoord2f(0, 1);
+							glVertex3f(-1.0f, 1.0f, -0.5f);
+
+							glTexCoord2f(0, 0);
+							glVertex3f(-1.0f, -1.0f, -0.5f);
+
+							glTexCoord2f(1, 0);
+							glVertex3f(1.0f, -1.0f, -0.5f);
+
+							glTexCoord2f(1, 1);
+							glVertex3f(1.0f, 1.0f, -0.5f);
+						glEnd();
+
+					glUseProgram(0);
+
+					glPopAttrib();                          // Pops texture bit
+					glDisable(GL_TEXTURE_2D);
+					glPopAttrib();							// Pops viewport information
+				glMatrixMode (GL_PROJECTION);
+				glPopMatrix();                              // Pops ENABLE_BIT
+				glMatrixMode (GL_MODELVIEW);
+				glPopMatrix();
+			glPopAttrib();
+#elif defined(__ANDROID__) // why there is a step here that void all the rendering ?
+			GLint frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			//gluOrtho2D(-1, 1, -1, 1);
+			glm::mat4 projMat = glm::ortho<float>(-1,1,-1,1);
+			glDisable(GL_DEPTH_TEST);
+			//glDisable(GL_LIGHTING);
+			int viewport[4];
+			glGetIntegerv(GL_VIEWPORT, viewport);
+			GLfloat clearColors[4];
+			glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColors);
+			//LOG("Viewport size = %d %d %d %d", viewport[0], viewport[1], viewport[2], viewport[3]);
+
+			glViewport(0, 0, w, h);
+			
+
+			glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			
+			//LOG("After clear buffer");
+			GLuint uNumberOfTextures		= glGetUniformLocation(program, "uNumberOfTextures");
+			GLuint uIteration				= glGetUniformLocation(program, "uIteration");
+			GLuint uWeight					= glGetUniformLocation(program, "uWeight");
+			GLuint uWeightUpToNow			= glGetUniformLocation(program, "uWeightUpToNow");
+			GLuint uFaceArea				= glGetUniformLocation(program, "uFaceArea");
+			GLuint uTotalWeights			= glGetUniformLocation(program, "uTotalWeights");
+			GLuint uNeutralSampler			= glGetUniformLocation(program, "uNeutralSampler");
+			GLuint uExpressionSampler		= glGetUniformLocation(program, "uExpressionSampler");
+			GLuint uPreviousResultSampler	= glGetUniformLocation(program, "uPreviousResultSampler");
+			//LOG("program = %d", program);
+	
+			glUseProgram(program);
+	#if 1		
+			//glEnable(GL_TEXTURE_2D);
+			//LOG("After use program");
+			glUniform1i(uNumberOfTextures, numTextures);
+			glUniform1i(uIteration, i);
+			glUniform1f(uWeight, weights[i]);
+			glUniform1f(uWeightUpToNow, WeightUpToNow);
+			glUniform1i(uFaceArea, faceArea);
+			glUniform1f(uTotalWeights, sumOfWeights);
+			glUniform1i(uNeutralSampler, 0);
+			glUniform1i(uExpressionSampler, 1);
+			glUniform1i(uPreviousResultSampler, 2);
+			//LOG("After glUniform1i");
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+			//LOG("after bind tedIDs[0]");
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, texIDs[i]);
+			//LOG("After bindTexture");
+			//std::cerr << "uNeutral: " << texIDs[0] << "\tuExpression: " << texIDs[i];
+
+			// if first iteration, previous result will not be used, passing a random texture just for completeness  
+			if(i == numTextures-1) {
+				glActiveTexture(GL_TEXTURE2);
+				glBindTexture(GL_TEXTURE_2D, texIDs[1]);
+				//std::cerr  << "\tprevious: " << texIDs[1] << "\tDest:" << texDst[i] << "\ti = " << i << "\n";
+			} else {
+				glActiveTexture(GL_TEXTURE2);
+				glBindTexture(GL_TEXTURE_2D, texDst[i+1]);
+				//std::cerr << "\tprevious: " << texDst[i+1] << "\tDest:" << texDst[i] <<  "\ti = " << i << "\n";
+			}
+			
+			//LOG("before bindAttrib");
+			SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, -0.5f, 1.f), SrVec4(-1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, 1.0f, -0.5f, 1.f) };
+			SrVec4 quadT[4] = { SrVec4(0.f, 1.f, 0.f, 0.f), SrVec4(0.f, 0.f, 0.f, 0.f), SrVec4(1.f, 0.f, 0.f, 0.f), SrVec4(1.f, 1.f, 0.f, 0.f) };
+			unsigned short indices[] = {0,1,2, 0,2,3};
+
+			GLuint pos_loc = glGetAttribLocation(program,"aPosition");
+			GLuint texcoord_loc = glGetAttribLocation(program,"aTexCoord0");
+			GLuint mvp_loc = glGetUniformLocation(program, "uMVP");
+			glEnableVertexAttribArray(pos_loc);
+			glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,(GLfloat*)&quad[0]);
+			glEnableVertexAttribArray(texcoord_loc);
+			glVertexAttribPointer(texcoord_loc,4,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
+			//wes_matrix_mvp();
+			glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(projMat));
+			//LOG("Before draw elements");
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+			//LOG("After draw elements");
+			
+			glDisableVertexAttribArray(pos_loc);
+			glDisableVertexAttribArray(texcoord_loc);
+#endif
+			glUseProgram(0);
+
+			glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+			glClearColor(clearColors[0],clearColors[1],clearColors[2],clearColors[3]);                        
+			glEnable(GL_DEPTH_TEST);
+		
+#endif
+			glBindRenderbuffer(GL_RENDERBUFFER, 0);                                                                                                          // Bind the render buffer
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);         
+		
+			glActiveTexture(GL_TEXTURE0);
+																									   // Bind the frame buffer object
+		
+		//LOG("After bind framebuffer");
+		/*
+		//	Saves USColorCode for current weight i in EXR32 format
+		int channels = 3;
+		std::string path =  "C:/tmp/iteration." + ZeroPadNumber(i) + ".jpg";
+		GLubyte *image = (GLubyte *) malloc(512 * 512 * sizeof(GLubyte) * channels);
+		glBindTexture(GL_TEXTURE_2D, texDst[i]);
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		jpge::compress_image_to_jpeg_file(path.c_str(),  512, 512, 3, image);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		delete(image);
+		*/
+	}
+	//LOG("Finish BlendAllAppearancesPairwise");
+}
+
+
+
 
 std::string ZeroPadNumber(int num)
 {
@@ -549,7 +788,7 @@ std::string ZeroPadNumber(int num)
 	*/
 
 
-
+#if !defined(__ANDROID__)
 void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string>& texture_names, std::vector<std::string>& textureFileNames, GLuint program, int w, int h)
 {
 	int numTextures		= weights.size();
@@ -1405,265 +1644,6 @@ void SbmBlendTextures::BlendGeometry(GLuint * FBODst, std::vector<float> weights
 #endif
 }
 
-void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, GLuint program, int w, int h)
-{
-	int numTextures		= weights.size();
-
-	float sumOfWeights	= 0;
-
-	float WeightUpToNow = 0;
-
-	for(std::vector<float>::iterator j=weights.begin(); j!=weights.end(); ++j)
-		sumOfWeights += *j;
-	//LOG("Blend ApperancePairWise");
-	for(int i = numTextures-1; i >= 0; i--) 
-	{
-		//LOG("BlendTexture %d", i);
-		WeightUpToNow += weights[i];
-
-		int faceArea;
-//		if((texture_names[i].find("eyebrowsUp") != std::string::npos) && (weights[i] > 0.001))
-//		{
-//			faceArea = 1;
-//			//std::cerr << "eye_blink\t" << weights[i] << "\n";
-//		} 
-//		else if((texture_names[i].find("smile") != std::string::npos) && (weights[i] > 0.001))
-//		{
-//			faceArea = 2;
-//			//std::cerr << texture_names[i] <<"\t" << weights[i] << "\n";
-//		}
-//		else
-		{
-			faceArea = 0;
-		}
-
-	
-		
-			glBindFramebuffer(GL_FRAMEBUFFER, FBODst[i]);                                                              // Bind the framebuffer object
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst[i], 0);              // Attach texture to FBO
-		//LOG("After bind framebuffer");
-			assert( glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE );
-			
-#if !defined(__ANDROID__)
-			glPushAttrib(GL_ENABLE_BIT);
-				glDisable(GL_DEPTH_TEST);
-				glDisable(GL_LIGHTING);
-				glMatrixMode (GL_PROJECTION);
-				glPushMatrix();
-					glLoadIdentity ();
-					gluOrtho2D(-1, 1, -1, 1);
-					glMatrixMode (GL_MODELVIEW);
-					glPushMatrix();
-					glPushAttrib(GL_VIEWPORT_BIT);
-					glPushAttrib(GL_TEXTURE_BIT);
-						glViewport(0, 0, w, h);
-						glLoadIdentity ();
-
-						glClearColor(1.0f, 1.0f, 1.0f, 0);
-						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-						GLuint uNumberOfTextures		= glGetUniformLocation(program, "uNumberOfTextures");
-						GLuint uIteration				= glGetUniformLocation(program, "uIteration");
-						GLuint uWeight					= glGetUniformLocation(program, "uWeight");
-						GLuint uWeightUpToNow			= glGetUniformLocation(program, "uWeightUpToNow");
-						GLuint uFaceArea				= glGetUniformLocation(program, "uFaceArea");
-						GLuint uTotalWeights			= glGetUniformLocation(program, "uTotalWeights");
-						GLuint uNeutralSampler			= glGetUniformLocation(program, "uNeutralSampler");
-						GLuint uExpressionSampler		= glGetUniformLocation(program, "uExpressionSampler");
-						GLuint uPreviousResultSampler	= glGetUniformLocation(program, "uPreviousResultSampler");
-
-						glUseProgram(program);
-						glEnable(GL_TEXTURE_2D);
-
-						glUniform1i(uNumberOfTextures, numTextures);
-						glUniform1i(uIteration, i);
-						glUniform1f(uWeight, weights[i]);
-						glUniform1f(uWeightUpToNow, WeightUpToNow);
-						glUniform1i(uFaceArea, faceArea);
-						glUniform1f(uTotalWeights, sumOfWeights);
-						glUniform1i(uNeutralSampler, 0);
-						glUniform1i(uExpressionSampler, 1);
-						glUniform1i(uPreviousResultSampler, 2);
-
-						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, texIDs[0]);
-
-						glActiveTexture(GL_TEXTURE1);
-						glBindTexture(GL_TEXTURE_2D, texIDs[i]);
-
-						//std::cerr << "uNeutral: " << texIDs[0] << "\tuExpression: " << texIDs[i];
-
-						// if first iteration, previous result will not be used, passing a random texture just for completeness  
-						if(i == numTextures-1) {
-							glActiveTexture(GL_TEXTURE2);
-							glBindTexture(GL_TEXTURE_2D, texIDs[1]);
-							//std::cerr  << "\tprevious: " << texIDs[1] << "\tDest:" << texDst[i] << "\ti = " << i << "\n";
-						} else {
-							glActiveTexture(GL_TEXTURE2);
-							glBindTexture(GL_TEXTURE_2D, texDst[i+1]);
-							//std::cerr << "\tprevious: " << texDst[i+1] << "\tDest:" << texDst[i] <<  "\ti = " << i << "\n";
-						}
-
-						glBegin(GL_QUADS);
-							glTexCoord2f(0, 1);
-							glVertex3f(-1.0f, 1.0f, -0.5f);
-
-							glTexCoord2f(0, 0);
-							glVertex3f(-1.0f, -1.0f, -0.5f);
-
-							glTexCoord2f(1, 0);
-							glVertex3f(1.0f, -1.0f, -0.5f);
-
-							glTexCoord2f(1, 1);
-							glVertex3f(1.0f, 1.0f, -0.5f);
-						glEnd();
-
-					glUseProgram(0);
-
-					glPopAttrib();                          // Pops texture bit
-					glDisable(GL_TEXTURE_2D);
-					glPopAttrib();							// Pops viewport information
-				glMatrixMode (GL_PROJECTION);
-				glPopMatrix();                              // Pops ENABLE_BIT
-				glMatrixMode (GL_MODELVIEW);
-				glPopMatrix();
-			glPopAttrib();
-#elif defined(__ANDROID__)
-			GLint frameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-// 			if (frameBufferStatus == GL_FRAMEBUFFER_COMPLETE)
-// 				LOG("frameBufferStatus = GL_FRAMEBUFFER_COMPLETE");
-// 			else if (frameBufferStatus == GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
-// 				LOG("frameBufferStatus = GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
-// 			else if (frameBufferStatus == GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
-// 				LOG("frameBufferStatus = GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
-// 			else if (frameBufferStatus == GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS)
-// 				LOG("frameBufferStatus = GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
-// 			else if (frameBufferStatus == GL_FRAMEBUFFER_UNSUPPORTED)
-// 				LOG("frameBufferStatus = GL_FRAMEBUFFER_UNSUPPORTED");
-			
-			glMatrixMode (GL_MODELVIEW);
-			glPushMatrix();
-			glLoadIdentity ();
-			
-			glMatrixMode (GL_PROJECTION);
-			glPushMatrix();
-			glLoadIdentity();
-			gluOrtho2D(-1, 1, -1, 1);
-			
-			glDisable(GL_DEPTH_TEST);
-			//glDisable(GL_LIGHTING);
-			int viewport[4];
-			glGetIntegerv(GL_VIEWPORT, viewport);
-			GLfloat clearColors[4];
-			glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColors);
-
-			glViewport(0, 0, w, h);
-			
-
-			glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			
-			//LOG("After clear buffer");
-			GLuint uNumberOfTextures		= glGetUniformLocation(program, "uNumberOfTextures");
-			GLuint uIteration				= glGetUniformLocation(program, "uIteration");
-			GLuint uWeight					= glGetUniformLocation(program, "uWeight");
-			GLuint uWeightUpToNow			= glGetUniformLocation(program, "uWeightUpToNow");
-			GLuint uFaceArea				= glGetUniformLocation(program, "uFaceArea");
-			GLuint uTotalWeights			= glGetUniformLocation(program, "uTotalWeights");
-			GLuint uNeutralSampler			= glGetUniformLocation(program, "uNeutralSampler");
-			GLuint uExpressionSampler		= glGetUniformLocation(program, "uExpressionSampler");
-			GLuint uPreviousResultSampler	= glGetUniformLocation(program, "uPreviousResultSampler");
-			
-			glUseProgram(program);
-			
-			//glEnable(GL_TEXTURE_2D);
-			//LOG("After use program");
-			glUniform1i(uNumberOfTextures, numTextures);
-			glUniform1i(uIteration, i);
-			glUniform1f(uWeight, weights[i]);
-			glUniform1f(uWeightUpToNow, WeightUpToNow);
-			glUniform1i(uFaceArea, faceArea);
-			glUniform1f(uTotalWeights, sumOfWeights);
-			glUniform1i(uNeutralSampler, 0);
-			glUniform1i(uExpressionSampler, 1);
-			glUniform1i(uPreviousResultSampler, 2);
-			//LOG("After glUniform1i");
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texIDs[0]);
-			//LOG("after bind tedIDs[0]");
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, texIDs[i]);
-			//LOG("After bindTexture");
-			//std::cerr << "uNeutral: " << texIDs[0] << "\tuExpression: " << texIDs[i];
-
-			// if first iteration, previous result will not be used, passing a random texture just for completeness  
-			if(i == numTextures-1) {
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, texIDs[1]);
-				//std::cerr  << "\tprevious: " << texIDs[1] << "\tDest:" << texDst[i] << "\ti = " << i << "\n";
-			} else {
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, texDst[i+1]);
-				//std::cerr << "\tprevious: " << texDst[i+1] << "\tDest:" << texDst[i] <<  "\ti = " << i << "\n";
-			}
-			
-			//LOG("before bindAttrib");
-			SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, -0.5f, 1.f), SrVec4(-1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, 1.0f, -0.5f, 1.f) };
-			SrVec4 quadT[4] = { SrVec4(0.f, 1.f, 0.f, 0.f), SrVec4(0.f, 0.f, 0.f, 0.f), SrVec4(1.f, 0.f, 0.f, 0.f), SrVec4(1.f, 1.f, 0.f, 0.f) };
-			unsigned short indices[] = {0,1,2, 0,2,3};
-
-			GLuint pos_loc = glGetAttribLocation(program,"aPosition");
-			GLuint texcoord_loc = glGetAttribLocation(program,"aTexCoord0");
-			GLuint mvp_loc = glGetUniformLocation(program, "uMVP");
-			glEnableVertexAttribArray(pos_loc);
-			glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,(GLfloat*)&quad[0]);
-			glEnableVertexAttribArray(texcoord_loc);
-			glVertexAttribPointer(texcoord_loc,4,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
-			wes_matrix_mvp();
-			glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, m_modelview_proj->data);
-			//LOG("Before draw elements");
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
-			//LOG("After draw elements");
-			
-			glDisableVertexAttribArray(pos_loc);
-			glDisableVertexAttribArray(texcoord_loc);
-			
-			glUseProgram(0);
-			
-			glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
-			glClearColor(clearColors[0],clearColors[1],clearColors[2],clearColors[3]);                        
-			//glDisable(GL_TEXTURE_2D);
-			glEnable(GL_DEPTH_TEST);
-			//glEnable(GL_LIGHTING);
-			
-			glMatrixMode (GL_PROJECTION);
-			glPopMatrix(); 
-			
-			glMatrixMode (GL_MODELVIEW);
-			glPopMatrix();
-#endif
-			glBindRenderbuffer(GL_RENDERBUFFER, 0);                                                                                                          // Bind the render buffer
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);         
-		
-			glActiveTexture(GL_TEXTURE0);
-																									   // Bind the frame buffer object
-		
-		//LOG("After bind framebuffer");
-		/*
-		//	Saves USColorCode for current weight i in EXR32 format
-		int channels = 3;
-		std::string path =  "C:/tmp/iteration." + ZeroPadNumber(i) + ".jpg";
-		GLubyte *image = (GLubyte *) malloc(512 * 512 * sizeof(GLubyte) * channels);
-		glBindTexture(GL_TEXTURE_2D, texDst[i]);
-		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-		jpge::compress_image_to_jpeg_file(path.c_str(),  512, 512, 3, image);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		delete(image);
-		*/
-	}
-	//LOG("Finish BlendAllAppearancesPairwise");
-}
 
 void SbmBlendTextures::BlendAllAppearances(GLuint FBODst, GLuint texDst, std::vector<float> weights, std::vector<GLuint> texIDs, GLuint program, int w, int h)
 {
@@ -2288,5 +2268,6 @@ void SbmBlendTextures::BlendTextureWithMasks(GLuint FBODst, GLuint FBOTex,std::v
 
 	glUseProgram(0);
 }
+#endif
 
 #endif

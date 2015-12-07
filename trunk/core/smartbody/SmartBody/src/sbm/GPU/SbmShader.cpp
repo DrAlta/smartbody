@@ -12,7 +12,7 @@
 #include <vhcl.h>
 
 
-#if !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
+#if !defined(SB_IPHONE)
 /************************************************************************/
 /* Shader program class                                                 */
 /************************************************************************/
@@ -97,7 +97,9 @@ void SbmShaderProgram::buildShader()
 	if (vsShaderStr.size() > 0)
 	{
 		LOG("Create Vertex Shader");
+		//LOG("Vertex Shader Text = %s", vsShaderStr.c_str());
 		vsID = glCreateShader(GL_VERTEX_SHADER);
+		//LOG("vsID = %d", vsID);
 		loadShaderStr(vsID,vsShaderStr.c_str());
 		LOG("After Build Vertex Shader");
 	}	
@@ -105,8 +107,10 @@ void SbmShaderProgram::buildShader()
 	if (fsShaderStr.size() > 0)
 	{
 		LOG("Create Fragment Shader");
+		//LOG("Fragment Shader Text = %s", fsShaderStr.c_str());
 		fsID = glCreateShader(GL_FRAGMENT_SHADER);
 		loadShaderStr(fsID,fsShaderStr.c_str());
+		//LOG("fsID = %d", fsID);
 		LOG("After Build Fragment Shader");
 	}
 
@@ -114,6 +118,7 @@ void SbmShaderProgram::buildShader()
     printShaderInfoLog(fsID);
     
 	programID = glCreateProgram();
+	//LOG("programID = %d", programID);
 	if (vsID != -1)
 		glAttachShader(programID,vsID);
 	if (fsID != -1)
@@ -141,6 +146,7 @@ void SbmShaderProgram::loadShaderStr( GLuint sID, const char* shaderStr )
 {		
 	glShaderSource(sID, 1, &shaderStr,NULL);	
 	glCompileShader(sID);
+	LOG("Finish compile shader, sid = %d", sID);
 }
 
 
@@ -177,7 +183,7 @@ void SbmShaderProgram::printShaderInfoLog( GLuint obj )
 	char *infoLog;
 
 	glGetShaderiv(obj, GL_INFO_LOG_LENGTH,&infologLength);
-
+	//LOG("printShaderInfoLog, infologLength = %d", infologLength);
 	if (infologLength > 0)
 	{
 		infoLog = (char *)malloc(infologLength);
@@ -194,7 +200,7 @@ void SbmShaderProgram::printProgramInfoLog( GLuint obj )
 	char *infoLog;
 
 	glGetProgramiv(obj, GL_INFO_LOG_LENGTH,&infologLength);
-
+	//LOG("printProgramInfoLog, infologLength = %d", infologLength);
 	if (infologLength > 0)
 	{
 		infoLog = (char *)malloc(infologLength);
@@ -213,7 +219,7 @@ void SbmShaderProgram::printOglError(const char* tag)
 #if 1
 	while (glErr != GL_NO_ERROR)
 	{
-#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
 		LOG("glError %s: %s\n", tag,gluErrorString(glErr));
 #endif
 		retCode = 1;
