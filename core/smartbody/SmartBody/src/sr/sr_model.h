@@ -172,7 +172,7 @@ class SrModel : public SrSharedClass
        is returned, and otherwise false is returned. */
     SBAPI bool export_iv ( const char* file );
 
-	SBAPI bool export_obj ( const char* file );
+	SBAPI bool export_obj ( const char* file, const char* mtlFile, const char* texturefile );
 
     /*! Makes E to be an array containing the indices of the model edges. */
     SBAPI void make_edges ( SrArray<int>& E );
