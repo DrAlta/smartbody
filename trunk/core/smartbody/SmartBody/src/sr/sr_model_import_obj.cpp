@@ -19,6 +19,7 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
+#include <vhcl.h>
 #include <sr/sr_string_array.h>
 #include <sr/sr_model.h>
 #include <sb/SBTypes.h>
@@ -76,18 +77,19 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 	std::string imageFile = file;
 	in.init( fopen(file,"r"));
 	int i = 0;
-	
+	LOG("[load_texture] Loading texture: '%s' \n", file);
 	while ( !in.valid() && i < paths.size())
 	{
 		s = paths[i++];
+		LOG("Path = '%s'\n", (const char*)s);
 		s << file;
-		std::cerr << "Evaluating path " << i << " / " <<  paths.size() << ":\t" << s << "\n";
+		//LOG("Evaluating path " << i << " / " <<  paths.size() << ":\t" << s << "\n";
+		LOG("Evaluating path %d / %d:\t '%s' \n", i, paths.size(), (const char*)s);
 		imageFile = s;
-		
 		in.init (fopen(s,"r") );
 	}
 	if (!in.valid()) {
-		std::cerr << "[load_texture] ERROR: Invalid inpath for texture: " << s << "\n";
+		LOG("[load_texture] ERROR: Invalid inpath for texture: '%s' \n", file);
 		return;		
 	}
 
@@ -168,11 +170,13 @@ static void read_materials ( SrArray<SrMaterial>& M,
 		 
 			SrString map_Kd, dotstr, ext;
 			in.getline(map_Kd);
+			
 			// in.getline may retrieve the EOF marker, eliminate it
-			if (map_Kd[map_Kd.len() - 1] == EOF)
-				map_Kd.substring(0, map_Kd.len() - 2);
+			//if (map_Kd[map_Kd.len() - 1] == EOF)
+			// WW 2015/12/2 : either way there will be one char with '\n' or EOF, remove it unconditionally.
+			map_Kd.substring(0, map_Kd.len() - 2);
+
 			map_Kd.trim();
-		  
 			std::string texFile = (const char*) map_Kd;
 			std::string mtlName = mnames.top();
 			mtlTexMap[mtlName] = texFile;		  
