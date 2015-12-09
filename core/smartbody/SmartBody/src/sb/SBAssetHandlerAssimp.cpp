@@ -41,6 +41,7 @@ SBAssetHandlerAssimp::SBAssetHandlerAssimp()
 #endif
 	assetTypes.push_back("blend");
 	//assetTypes.push_back("dae");
+	//assetTypes.push_back("obj");
 #ifndef SB_NO_ASSIMP
 //	assetTypes.push_back("obj");
 //	assetTypes.push_back("ply");

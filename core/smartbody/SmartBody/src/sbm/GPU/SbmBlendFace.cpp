@@ -152,16 +152,19 @@ void SbmBlendFace::addFace(SbmDeformableMeshGPU* newFace)
 void SbmBlendFace::addFace(SrSnModel* newFace) 
 {
 	SrArray<SrVec> v = newFace->shape().V;
-	
 	std::vector<SrVec> vertices;
 	for (int i = 0; i < v.size(); i++) {
 		//std::cerr << "Adding face "<< i << ": " << v[i].x << ", " << v[i].y << ", " << v[i].z << "\n";
 		vertices.push_back( v[i] );
 	}
+	addFaceVertices(vertices);
+}
+
+void SbmBlendFace::addFaceVertices( std::vector<SrVec> vertices )
+{
 	_faceCounter++;
 	_VBOPos.resize(_faceCounter);
 	_VBOPos[_faceCounter-1]	= new VBOVec3f((char*)"RestPos", VERTEX_POSITION, vertices );
-	
 }
 
 
@@ -1910,7 +1913,7 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 	}
 
 	SbmBlendFace * aux = new SbmBlendFace();
-
+	aux->vtxNewVtxIdxMap = _mesh->vtxNewVtxIdxMap;
 	SbmShaderProgram::printOglError("Setup Transform Feedback begin");
 	std::vector<SrVec> blendedVerties(_mesh->posBuf.size());
 	GLuint verticesFeedback;
@@ -1957,10 +1960,12 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 			continue;
 		}
 
-		neutralV	= (baseModel->shape().V);
+
+
+		//neutralV	= (baseModel->shape().V);
 
 		// Copies reference to the shape vector
-		shapes.push_back(&(baseModel->shape().V));
+		//shapes.push_back(&(baseModel->shape().V));
 
 		for (size_t i = 0; i < mIter->second.size(); ++i)
 		{
@@ -1970,10 +1975,27 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 			}
 
 			visemeV = mIter->second[i]->shape().V;
-			aux->addFace(mIter->second[i]);
+			std::vector<SrVec> visemeBuf(_mesh->posBuf.size());
+			// convert to vertex buffer by adding all new vertices
+			//LOG("visemeV size = %d, visemeBuf size = %d", visemeV.size(), visemeBuf.size());
+			for (int j=0;j<visemeV.size();j++)
+			{
+				visemeBuf[j] = visemeV[j];
+				if (_mesh->vtxNewVtxIdxMap.find(j) != _mesh->vtxNewVtxIdxMap.end())
+				{
+					std::vector<int>& idxMap = _mesh->vtxNewVtxIdxMap[j];
+					// copy related vtx components 
+					for (unsigned int k=0;k<idxMap.size();k++)
+					{
+						visemeBuf[idxMap[k]] = visemeV[j];
+					}
+				}		
+			}
+			aux->addFaceVertices(visemeBuf);
+			//aux->addFace(mIter->second[i]);
 
 			// Copies reference to the shape vector
-			shapes.push_back(&(baseModel->shape().V));
+			//shapes.push_back(&(baseModel->shape().V));
 		}
 	}
 
@@ -2081,7 +2103,7 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 	SbmShaderProgram::printOglError("BlendGeometry Feedback GetBuffer Begin");
 	glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, blendRestPos.size()*sizeof(SrVec),&blendRestPos[0]);
 	SbmShaderProgram::printOglError("BlendGeometry Feedback GetBuffer End");
-
+	//LOG("blendRestPos size = %d, deformPosBuf size = %d", blendRestPos.size(), deformPosBuf.size());
 	if (meshInstance->isStaticMesh())
 	{
 		deformPosBuf = blendRestPos;

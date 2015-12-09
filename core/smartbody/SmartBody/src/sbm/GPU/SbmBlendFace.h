@@ -28,6 +28,9 @@ class SbmBlendFace: public DeformableMesh
 		bool			buildVertexBufferGPU(int);
 		void			addFace(SbmDeformableMeshGPU*);
 		void			addFace(SrSnModel* newFace);
+
+		void addFaceVertices( std::vector<SrVec> vertices );
+
 		void			initShaderProgram();
 		void			initShaderProgram_Dan();
 		void			initShader();
