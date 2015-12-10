@@ -560,7 +560,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 						glViewport(0, 0, w, h);
 						glLoadIdentity ();
 
-						glClearColor(1.0f, 1.0f, 1.0f, 0);
+						glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
 						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 						GLuint uNumberOfTextures		= glGetUniformLocation(program, "uNumberOfTextures");

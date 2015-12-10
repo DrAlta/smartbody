@@ -19,6 +19,7 @@ protected:
 	StrTextureMap textureMap;
 	StrTextureMap normalTexMap;
 	StrTextureMap specularTexMap;
+	std::map<std::string, GLuint> FBOMap;
 private:
 	static SbmTextureManager* _singleton;
 	SbmTextureManager(void);
@@ -37,13 +38,15 @@ public:
 		_singleton = NULL;
 	}	
 	SBAPI SbmTexture* findTexture(int type, const char* textureName);
+	SBAPI GLuint findFBO(const char* fboName);
 	SBAPI void loadTexture(int type, const char* textureName, const char* fileName);
 	SBAPI void updateTexture();
 	SBAPI void reloadTexture();
 	SBAPI std::vector<std::string> getTextureNames(int type);
 
 	// Creates a 1x1 white texture
-	SBAPI void createWhiteTexture(const char* textureName);
+	SBAPI void createWhiteTexture(const char* textureName, int width = 1, int height = 1);
+	SBAPI void createFBO(const char* fboName);
 
 	void releaseAllTextures();	
 protected:
@@ -84,6 +87,6 @@ public:
 	SBAPI void setTextureSize(int w, int h, int numChannels);
 
 	// Creates a 1x1 white texture
-	SBAPI void createWhiteTexture();
+	SBAPI void createWhiteTexture(int w = 1, int h = 1);
 
 };

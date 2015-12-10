@@ -2201,10 +2201,23 @@ void DeformableMeshInstance::blendShapes()
 		//	Here I try to blend the faces two at a time. This way I avoid hardcoded constant vector size.
 #if !defined(SB_IPHONE) 
 
+		SbmTextureManager& texManager = SbmTextureManager::singleton();
 		if(_tempFBOPairs == NULL) 
 		{
 			_tempFBOPairs = new GLuint[weights.size()];
-			glGenFramebuffers(weights.size(), _tempFBOPairs);
+			//glGenFramebuffers(weights.size(), _tempFBOPairs);
+			std::string FBOName = "TempFBO";
+			for (unsigned int i=0;i<weights.size();i++)
+			{
+				std::string tempName = FBOName + "_weight" + boost::lexical_cast<std::string>(i);
+				texManager.createFBO(tempName.c_str());
+			}
+		}
+		std::string FBOName = "TempFBO";
+		for (unsigned int i=0;i<weights.size();i++)
+		{
+			std::string tempName = FBOName + "_weight" + boost::lexical_cast<std::string>(i);
+			_tempFBOPairs[i] = texManager.findFBO(tempName.c_str());
 		}
 
 //		SbmShaderProgram::printOglError("HERE #4 ");
@@ -2215,10 +2228,21 @@ void DeformableMeshInstance::blendShapes()
 		if(tex_h > 2048)
 			tex_h = 2048;
 
+		
 		// Aux textures used when calling BlendAllAppearancesPairwise to store temporary results for texture blending pair wise
 		if(_tempTexPairs == NULL) 
 		{
+#define USE_TEXTURE_MANAGER 1
+#if USE_TEXTURE_MANAGER
 			_tempTexPairs = new GLuint[weights.size()];
+			std::string meshName = this->getDeformableMesh()->getName();
+			
+			for (int i=0;i<weights.size();i++)
+			{
+				std::string tempTexName = meshName + "_weight" + boost::lexical_cast<std::string>(i);
+				texManager.createWhiteTexture(tempTexName.c_str(), tex_w, tex_h);
+			}
+#else
 			glGenTextures(weights.size(), _tempTexPairs);
 			for(int i=0; i<weights.size(); i++) {
 				glBindTexture(GL_TEXTURE_2D, _tempTexPairs[i]);
@@ -2233,6 +2257,21 @@ void DeformableMeshInstance::blendShapes()
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex_w, tex_h, 0, GL_RGB, GL_FLOAT, NULL);
 #endif
 				glBindTexture(GL_TEXTURE_2D, 0);
+			}
+#endif
+		}
+		for (unsigned int i=0;i<weights.size();i++)
+		{
+			std::string meshName = this->getDeformableMesh()->getName();
+			std::string tempTexName = meshName + "_weight" + boost::lexical_cast<std::string>(i);
+			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, tempTexName.c_str());
+			if (tex)
+			{
+				_tempTexPairs[i] = tex->getID();
+			}
+			else
+			{
+				LOG("Error : BlendShape Texture, '%s' does not exist.", tempTexName.c_str());
 			}
 		}
 

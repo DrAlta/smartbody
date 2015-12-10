@@ -361,6 +361,19 @@ void SbmShaderManager::buildShaders()
 	}
 }
 
+void SbmShaderManager::rebuildShaders()
+{
+	std::map<std::string,SbmShaderProgram*>::iterator vi;
+	for ( vi  = shaderMap.begin();
+		vi != shaderMap.end();
+		vi++)
+	{
+		SbmShaderProgram* program = vi->second;
+		program->buildShader();
+	}
+}
+
+
 SbmShaderProgram* SbmShaderManager::getShader( const std::string& entryName )
 {
 	SbmShaderProgram* program = NULL;
@@ -370,4 +383,5 @@ SbmShaderProgram* SbmShaderManager::getShader( const std::string& entryName )
 	}
 	return program;	
 }
+
 #endif

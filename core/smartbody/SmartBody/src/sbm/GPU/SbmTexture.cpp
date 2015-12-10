@@ -1,3 +1,7 @@
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
+#include "external/glew/glew.h"
+#include "sbm/GPU/SbmDeformableMeshGPU.h"
+#endif
 #include "SbmTexture.h"
 #include "SbmShader.h"
 #include "external/SOIL/SOIL.h"
@@ -100,7 +104,7 @@ void SbmTextureManager::loadTexture(int iType, const char* textureName, const ch
 	}
 }
 
-void SbmTextureManager::createWhiteTexture(const char* textureName)
+void SbmTextureManager::createWhiteTexture(const char* textureName, int width, int height)
 {
 	StrTextureMap& texMap	= findMap(SbmTextureManager::TEXTURE_DIFFUSE);
 
@@ -108,12 +112,34 @@ void SbmTextureManager::createWhiteTexture(const char* textureName)
 	if (texMap.find(std::string(textureName)) == texMap.end()) 
 	{
 		SbmTexture* texture = new SbmTexture(textureName);
-		texture->createWhiteTexture();
+		texture->createWhiteTexture(width, height);
 		texMap[std::string(textureName)] = texture;
-		texture->buildTexture();
-	}
-	
+		texture->buildTexture(false);
+	}	
 }
+
+SBAPI void SbmTextureManager::createFBO( const char* fboName )
+{
+	std::string strFBO = fboName;
+	if (FBOMap.find(strFBO) == FBOMap.end())
+	{
+		GLuint fboID;
+		glGenFramebuffers(1, &fboID);
+		FBOMap[strFBO] = fboID;
+	}
+}
+
+
+SBAPI GLuint SbmTextureManager::findFBO( const char* fboName )
+{
+	std::string strFBO = fboName;
+	if (FBOMap.find(strFBO) != FBOMap.end()) 
+	{
+		return FBOMap[strFBO];
+	}
+	return 0;
+}
+
 
 void SbmTextureManager::updateTexture()
 {
@@ -144,6 +170,8 @@ void SbmTextureManager::updateTexture()
 		if (!tex->hasBuild())
 			tex->buildTexture();
 	}
+
+	
 }
 
 
@@ -173,6 +201,17 @@ SBAPI void SbmTextureManager::reloadTexture()
 		SbmTexture* tex = vi->second;
 		tex->buildTexture();
 	}
+
+	// recreate FBO when reloading texture
+	std::map<std::string, GLuint>::iterator mi;
+	for ( mi  = FBOMap.begin();
+		  mi != FBOMap.end();
+		  mi++)
+	{
+		GLuint fboID;
+		glGenFramebuffers(1, &fboID);
+		mi->second = fboID;
+	}
 }
 
 
@@ -185,6 +224,8 @@ SbmTexture* SbmTextureManager::findTexture(int type, const char* textureName )
 		return texMap[strTex];
 	return NULL;
 }
+
+
 /************************************************************************/
 /* Sbm Texture                                                          */
 /************************************************************************/
@@ -392,12 +433,12 @@ void SbmTexture::setTextureSize(int w, int h, int numChannels)
 	channels	= numChannels;
 }
 
-void SbmTexture::createWhiteTexture()
+void SbmTexture::createWhiteTexture(int w, int h)
 {
 	unsigned char* data;
 
-	width		= 1;
-	height		= 1;
+	width		= w;
+	height		= h;
 	channels	= 4;
 
 	data = new unsigned char[width * height * channels * sizeof(unsigned char)];
@@ -407,14 +448,6 @@ void SbmTexture::createWhiteTexture()
 		data[i] = 255;
 	}
 
-//	// Generate white OpenGL texture.
- //   GLuint whiteTextureID;
- //   glGenTextures(1, &whiteTextureID);
- //   glBindTexture(GL_TEXTURE_2D, whiteTextureID);
- //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
- //   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
- //   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
 	imgBuffer.resize(width*height*channels);
 
 	for (int i=0;i<width*height*channels;i++)
@@ -422,6 +455,6 @@ void SbmTexture::createWhiteTexture()
 		imgBuffer[i] = data[i];
 	}
 
-	textureFileName		= "white";	
-	textureName			= "white";
+	//textureFileName		= "white";	
+	//textureName			= "white";
 }
