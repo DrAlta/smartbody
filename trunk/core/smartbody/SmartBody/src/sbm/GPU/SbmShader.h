@@ -114,6 +114,7 @@ public:
 	SBAPI void addShader(const char* entryName,const char* vsName, const char* fsName, bool shaderFile = true);
 	SBAPI SbmShaderProgram* getShader(const std::string& entryName);
 	SBAPI void buildShaders();
+	SBAPI void rebuildShaders();
 	SBAPI static int getShaderSupport();
 };
 #endif
