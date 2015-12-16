@@ -153,7 +153,7 @@ def swattingSetup(origSkelName, skeletonName, baseJoint, prefix, statePreFix):
 	# add 'concentration' events during the blend
 	blendSwattingRight.addEvent(rightMotions[0], points1[0] - .50, "concentration", "", False)
 	blendSwattingLeft.addEvent(leftMotions[0], points1[0] - .50, "concentration", "", False)
-'''
+
 	# strange crash in the GUI when activating the UI, disabled for now
 	class SwatConcentrationEventHandler(SBEventHandler):
 	   def executeAction(self, event):
@@ -164,5 +164,5 @@ def swattingSetup(origSkelName, skeletonName, baseJoint, prefix, statePreFix):
 	myHandler = SwatConcentrationEventHandler()
 	eventManager = scene.getEventManager()
 	eventManager .addEventHandler("concentration", myHandler)
-'''	
+	
 
