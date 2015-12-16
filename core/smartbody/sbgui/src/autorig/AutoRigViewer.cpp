@@ -116,10 +116,14 @@ void AutoRigViewer::setCharacterName(const std::string& name)
 		DeformableMeshInstance* meshInstance = pawn->getActiveMesh();
 		if (meshInstance)
 		{
-			if (meshInstance->getDeformableMesh()->getNumMeshes() > 0)
+			if (meshInstance->getDeformableMesh())
 			{
-				this->modelViewer->setModel(meshInstance->getDeformableMesh()->getStaticModel(0));
+				if (meshInstance->getDeformableMesh()->getNumMeshes() > 0)
+				{
+					this->modelViewer->setModel(meshInstance->getDeformableMesh()->getStaticModel(0));
+				}
 			}
+			
 		}
 		
 	}
