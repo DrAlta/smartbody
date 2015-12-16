@@ -72,15 +72,15 @@ void JointInfoObject::notify( SBSubject* subject )
 
 		if (attribute->getName() == "offset X")
 		{
-			offset.x = offsetAttr->getValue();
+			offset.x = (float) offsetAttr->getValue();
 		}
 		else if (attribute->getName() == "offset Y")
 		{
-			offset.y = offsetAttr->getValue();
+			offset.y = (float) offsetAttr->getValue();
 		}
 		else if (attribute->getName() == "offset Z")
 		{
-			offset.z = offsetAttr->getValue();
+			offset.z = (float) offsetAttr->getValue();
 		}	
 		selectJoint->setOffset(offset);
 		templateSelectJoint->setOffset(offset);
@@ -292,7 +292,9 @@ void MotionItemInfoWidget::updateWidget()
 	{
 		const std::string& chanName = channels.name(i).c_str();
 		std::string typeName = channels[i].type_name();
-		channelBrowser->add((chanName+"."+typeName).c_str());
+		std::stringstream strstr;
+		strstr << chanName << " (" << channels.mappedName(i).c_str() << ")." << typeName;
+		channelBrowser->add(strstr.str().c_str());
 	}
 }
 
