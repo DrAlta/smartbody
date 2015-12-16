@@ -783,8 +783,11 @@ void ResourceWindow::updateMesh( Fl_Tree_Item* tree, DeformableMesh* mesh )
 				for (size_t s = 0; s < (*blendShapeIter).second.size(); s++)
 				{
 					SrSnModel* model = (*blendShapeIter).second[s];
-					SrModel& shape = model->shape();
-					resourceTree->add(shapeItem, (const char*) shape.name);	
+					if (model)
+					{
+						SrModel& shape = model->shape();
+						resourceTree->add(shapeItem, (const char*) shape.name);	
+					}
 				}
 			}
 			

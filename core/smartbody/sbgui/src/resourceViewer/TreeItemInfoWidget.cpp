@@ -196,7 +196,13 @@ void SkeletonItemInfoWidget::updateSkeletonTree( Fl_Tree_Item* root, SmartBody::
 		return;
 	if (!skelRoot)
 		return;
-	root->label(skelRoot->jointName().c_str());	
+	std::stringstream strstr;
+	std::string mappedName = skelRoot->getMappedJointName();
+	if (mappedName != "")
+		strstr << skelRoot->jointName() << "(" << skelRoot->getMappedJointName() << ")";
+	else
+		strstr << skelRoot->jointName();
+	root->label(strstr.str().c_str());	
 	for (int i=0;i<skelRoot->num_children();i++)
 	{
 		updateJointTree(root, skelRoot->child(i));
@@ -207,7 +213,13 @@ void SkeletonItemInfoWidget::updateJointTree( Fl_Tree_Item* root, SkJoint* node 
 {	
 	//skeletonTree->sortorder(FL_TREE_SORT_ASCENDING);	
 
-	Fl_Tree_Item* treeItem = skeletonTree->add(root,node->jointName().c_str());
+	std::stringstream strstr;
+	std::string mappedName = node->getMappedJointName();
+	if (mappedName != "")
+		strstr << node->jointName() << "(" << node->getMappedJointName() << ")";
+	else
+		strstr << node->jointName();
+	Fl_Tree_Item* treeItem = skeletonTree->add(root, strstr.str().c_str());
 
 	std::string posName[3] = { "pos X", "pos Y", "pos Z" };
 	skeletonTree->sortorder(FL_TREE_SORT_NONE);
