@@ -63,27 +63,15 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		isAdditive = true;
 	}
 
-	std::string emotion = xml_utils::xml_parse_string(BMLDefs::ATTR_EMOTION, elem, "neutral");
-	GestureRequest::EmotionTag tag = GestureRequest::NEUTRAL;
-	if (emotion == "sad")
-		tag = GestureRequest::MEEK;
-	else if (emotion == "angry")
-		tag = GestureRequest::EMPHATIC;
-	else if (emotion == "furious")
-		tag = GestureRequest::FURIOUS;
-	else
-		tag = GestureRequest::NEUTRAL;
+	std::string emotion = xml_utils::xml_parse_string(BMLDefs::ATTR_EMOTION, elem, "");
 
 	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(request->actor);
 	std::string gestureMapName = "";
-	if (tag == GestureRequest::EMPHATIC)
-		gestureMapName = character->getStringAttribute("gestureMapEmphatic");
-	if (tag == GestureRequest::MEEK)
-		gestureMapName = character->getStringAttribute("gestureMapMeek");
-	if (tag == GestureRequest::FURIOUS)
-		gestureMapName = character->getStringAttribute("gestureMapFurious");
-	if (gestureMapName == "")
-		gestureMapName = character->getStringAttribute("gestureMap");
+	std::string mapNameLower = vhcl::ToLower(emotion);
+	// capitalize the first letter 
+	if (mapNameLower.size() > 0)
+		mapNameLower[0] = toupper(mapNameLower[0]);
+	gestureMapName = character->getStringAttribute("gestureMap" + mapNameLower);
 
 	std::vector<std::string> animationList;
 	if (animationName == "")	// If you have assigned the animation name, do not look for the map
@@ -211,7 +199,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		}
 
 		int priority = xml_utils::xml_parse_int(BMLDefs::ATTR_PRIORITY, elem, 0);
-		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs, animationList, joints, scale, freq, priority, tag) );
+		BehaviorRequestPtr behavPtr(new GestureRequest( unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs, animationList, joints, scale, freq, priority) );
 		return behavPtr; 
 	} 
 	else 

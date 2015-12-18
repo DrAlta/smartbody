@@ -86,6 +86,7 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 		//LOG("Evaluating path " << i << " / " <<  paths.size() << ":\t" << s << "\n";
 		LOG("Evaluating path %d / %d:\t '%s' \n", i, paths.size(), (const char*)s);
 		imageFile = s;
+		
 		in.init (fopen(s,"r") );
 	}
 	if (!in.valid()) {
@@ -170,13 +171,13 @@ static void read_materials ( SrArray<SrMaterial>& M,
 		 
 			SrString map_Kd, dotstr, ext;
 			in.getline(map_Kd);
-			
 			// in.getline may retrieve the EOF marker, eliminate it
-			//if (map_Kd[map_Kd.len() - 1] == EOF)
-			// WW 2015/12/2 : either way there will be one char with '\n' or EOF, remove it unconditionally.
-			map_Kd.substring(0, map_Kd.len() - 2);
-
+#ifndef __ANDROID__
+			if (map_Kd[map_Kd.len() - 1] == EOF)
+#endif
+				map_Kd.substring(0, map_Kd.len() - 2);
 			map_Kd.trim();
+		  
 			std::string texFile = (const char*) map_Kd;
 			std::string mtlName = mnames.top();
 			mtlTexMap[mtlName] = texFile;		  
@@ -188,7 +189,9 @@ static void read_materials ( SrArray<SrMaterial>& M,
 			SrString mapBump, dotstr, ext;
 			in.getline(mapBump);
 			// in.getline may retrieve the EOF marker, eliminate it
+#ifndef __ANDROID__
 			if (mapBump[mapBump.len() - 1] == EOF)
+#endif
 				mapBump.substring(0, mapBump.len() - 2);
 
 			mapBump.trim();
@@ -202,7 +205,9 @@ static void read_materials ( SrArray<SrMaterial>& M,
 			SrString mapKs, dotstr, ext;	 		  
 			in.getline(mapKs);
 			// in.getline may retrieve the EOF marker, eliminate it
+#ifndef __ANDROID__
 			if (mapKs[mapKs.len() - 1] == EOF)
+#endif
 				mapKs.substring(0, mapKs.len() - 2);
 			mapKs.trim();
 
@@ -215,7 +220,9 @@ static void read_materials ( SrArray<SrMaterial>& M,
 			SrString mapNs, dotstr, ext;
 			in.getline(mapNs);
 			// in.getline may retrieve the EOF marker, eliminate it
+#ifndef __ANDROID__
 			if (mapNs[mapNs.len() - 1] == EOF)
+#endif
 				mapNs.substring(0, mapNs.len() - 2);
 			mapNs.trim();
 		 
