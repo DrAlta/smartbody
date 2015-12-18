@@ -1930,7 +1930,9 @@ std::vector<SBAssetHandler*>& SBAssetManager::getAssetHandlers()
 
 std::vector<SBAssetHandler*> SBAssetManager::getAssetHandlers(const std::string& assetTypes)
 {
-	std::map<std::string, std::vector<SBAssetHandler*> >::iterator mapIter = _assetHandlerMap.find(assetTypes);
+	// search for file extensions in lower case only
+	std::string lowerCaseAssetTypes = vhcl::ToLower(assetTypes);
+	std::map<std::string, std::vector<SBAssetHandler*> >::iterator mapIter = _assetHandlerMap.find(lowerCaseAssetTypes);
 	if (mapIter == _assetHandlerMap.end())
 		return std::vector<SBAssetHandler*>();
 	else
@@ -2131,8 +2133,13 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	}
 
 	// make sure the neutral and the expression have the same number of vertices
-	int numEMeshes = expressiveMesh->dMeshStatic_p.size();
-	int numNMeshes = neutralMesh->dMeshStatic_p.size();
+	
+	int numEMeshes = 0;
+	if (expressiveMesh)
+		numEMeshes = expressiveMesh->dMeshStatic_p.size();
+	int numNMeshes = 0;
+	if (neutralMesh)
+		numNMeshes = neutralMesh->dMeshStatic_p.size();
 	if (numEMeshes != numNMeshes)
 	{
 		LOG("Neutral mesh %s has different number of meshes as expresive mesh %s (%d vs %d).", neutralShapeFile.c_str(), expressiveShapeFile.c_str(), numNMeshes, numEMeshes);
@@ -2141,13 +2148,19 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	
 	int numEVertices = 0;
 	int numNVertices = 0;
-	for (size_t i = 0; i < expressiveMesh->dMeshStatic_p.size(); i++)
+	if (expressiveMesh)
 	{
-		numEVertices += expressiveMesh->dMeshStatic_p[i]->shape().V.size();
+		for (size_t i = 0; i < expressiveMesh->dMeshStatic_p.size(); i++)
+		{
+			numEVertices += expressiveMesh->dMeshStatic_p[i]->shape().V.size();
+		}
 	}
-	for (size_t i = 0; i < neutralMesh->dMeshStatic_p.size(); i++)
+	if (neutralMesh)
 	{
-		numNVertices += neutralMesh->dMeshStatic_p[i]->shape().V.size();
+		for (size_t i = 0; i < neutralMesh->dMeshStatic_p.size(); i++)
+		{
+			numNVertices += neutralMesh->dMeshStatic_p[i]->shape().V.size();
+		}
 	}
 	if (numEVertices != numNVertices)
 	{
@@ -2156,14 +2169,30 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	}
 
 	// make sure the neutral, expression and mask textures are the same size
-	int eHeight = expressiveTexture->getHeight();
-	int eWidth = expressiveTexture->getWidth();
+	int eHeight = 0;
+	int eWidth = 0;
+	if (expressiveTexture)
+	{
+		eHeight = expressiveTexture->getHeight();
+		eWidth = expressiveTexture->getWidth();
+	}
 
-	int nHeight = neutralTexture->getHeight();
-	int nWidth = neutralTexture->getWidth();
+	int nHeight = 0;
+	int nWidth = 0;
+	if (neutralTexture)
+	{
+		nHeight = neutralTexture->getHeight();
+		nWidth = neutralTexture->getWidth();
+	}
 
-	int mHeight = maskedTexture->getHeight();
-	int mWidth = maskedTexture->getWidth();
+	int mHeight = 0;
+	int mWidth = 0;
+	if (maskedTexture)
+	{
+		mHeight = maskedTexture->getHeight();
+		mWidth = maskedTexture->getWidth();
+	}
+
 
 	if (eHeight != nHeight || 
 		eHeight != mHeight ||
