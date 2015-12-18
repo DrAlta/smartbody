@@ -27,6 +27,7 @@ BMLGestureObject::BMLGestureObject() : BMLObject()
 	SmartBody::StringAttribute* modeAttr = createStringAttribute("mode", "", "", "Basic", 70, false, false, false, "Which hand is involved. Should be one of the following: left, right, both.");
 	modeAttr->setValidValues(modes);
 
+	createStringAttribute("emotion", "", "", "Basic", 80, false, false, false, "Emotion of the gesture. This determines which set of gesture maps to use. 'emphatic', 'meek', 'furious'");
 	createStringAttribute("sbm:style", "", "", "Basic", 80, false, false, false, "Style of the gestures. Used to differentiate gestures with same type, posture and mode.");
 	createBoolAttribute("sbm:additive", false, true, "Basic", 90, false, false, false, "Whether this gesture is additive or not.");
 

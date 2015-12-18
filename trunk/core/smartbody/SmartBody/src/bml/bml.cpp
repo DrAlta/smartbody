@@ -2108,7 +2108,7 @@ MotionRequest::MotionRequest( const std::string& unique_id, const std::string& l
 {}
 
 GestureRequest::GestureRequest( const std::string& unique_id, const std::string& local, MeCtMotion* motion_ct, MeCtSchedulerClass* schedule_ct,
-								const BehaviorSyncPoints& syncs_in, std::vector<std::string>& gl, const std::string& js, float s, float f, int p, EmotionTag tag)
+								const BehaviorSyncPoints& syncs_in, std::vector<std::string>& gl, const std::string& js, float s, float f, int p)
 :	MeControllerRequest( unique_id,
 						 local,
                          motion_ct,
@@ -2126,7 +2126,6 @@ GestureRequest::GestureRequest( const std::string& unique_id, const std::string&
 	joints = js;
 	scale = s;
 	freq = f;
-	emotion = tag;
 }
 
 // Parameterized Animation Request
