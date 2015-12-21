@@ -185,7 +185,7 @@ int mcu_viewer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 				if (!scene->getViewerFactory())
 					return CMD_FAILURE;
 				scene->setViewer(scene->getViewerFactory()->create( px, py, width, height));
-				scene->getViewer()->label_viewer( "SBM Viewer - Local Mode" );
+				scene->getViewer()->label_viewer( "SB Viewer - Local Mode" );
 				SrCamera* camera = scene->createCamera("activeCamera");
 				scene->getViewer()->set_camera( camera );
 				//((FltkViewer*)viewer_p)->set_mcu(this);

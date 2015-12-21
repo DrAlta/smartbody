@@ -501,6 +501,8 @@ void MeCtJacobianIK::computeJacobianReduce(MeCtIKTreeScenario* s)
 	{
 		EffectorConstraint* cons = ci->second;
 		MeCtIKTreeNode* endNode = s->findIKTreeNode(cons->efffectorName.c_str());
+		if (!endNode)
+			continue;
 		MeCtIKTreeNode* rootNode = s->findIKTreeNode(cons->rootName.c_str());
 		// find the length of IK chain
 
