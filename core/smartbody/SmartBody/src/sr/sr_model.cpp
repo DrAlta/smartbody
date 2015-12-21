@@ -1100,6 +1100,7 @@ void SrModel::add_model ( const SrModel& m )
    int origv = V.size();
    int origf = F.size();
    int orign = N.size();
+   int origt = T.size();
    int origm = M.size();
    int mfsize = m.F.size();
    int i;
@@ -1127,6 +1128,17 @@ void SrModel::add_model ( const SrModel& m )
          Fn[origf+i].set ( f.a+orign, f.b+orign, f.c+orign );
        }
     }
+
+   if ( m.Ft.size()>0 )
+   { T.size ( origt+m.T.size() );
+   for ( i=0; i<m.T.size(); i++ ) T[orign+i] = m.T.get(i);
+
+   Ft.size ( origf+mfsize );
+   for ( i=0; i<mfsize; i++ )
+   { const Face& f = m.Ft.get(i);
+   Ft[origf+i].set ( f.a+origt, f.b+origt, f.c+origt );
+   }
+   }
 
    // add material names
    // add the materials:
