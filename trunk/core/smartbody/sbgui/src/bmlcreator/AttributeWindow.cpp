@@ -818,14 +818,14 @@ void AttributeWindow::CollapseAllCB(Fl_Widget* w, void *data)
 
 void AttributeWindow::ActionCB(Fl_Widget *w, void *data)
 {
-	AttributeWindow *cw = (AttributeWindow*) data;
+	AttributeWindow *attrWin = (AttributeWindow*) data;
 	
 	Fl_Button* check = (Fl_Button*) w;
-	SmartBody::SBObject* obj = cw->getObject();
+	SmartBody::SBObject* obj = attrWin->getObject();
 	
 	std::string name = "";
-	std::map<Fl_Widget*, std::string>::iterator iter = cw->reverseWidgetMap.find(w);
-	if (iter !=  cw->reverseWidgetMap.end())
+	std::map<Fl_Widget*, std::string>::iterator iter = attrWin->reverseWidgetMap.find(w);
+	if (iter !=  attrWin->reverseWidgetMap.end())
 		name = iter->second;
 		
 	if (name != "")
@@ -846,19 +846,14 @@ void AttributeWindow::ActionCB(Fl_Widget *w, void *data)
 				{
 					std::string sendStr = "sb scene.getCharacter(\"" + character->getName() + "\").setActionAttribute(\"" + attr->getName() + "\")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
-					aattr->setValueFast();
 				}
 				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
 				if (pawn && !character)
 				{
 					std::string sendStr = "sb scene.getPawn(\"" + pawn->getName() + "\").setActionAttribute(\"" + attr->getName() + "\")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
-					aattr->setValueFast();
 				}
-				if (!pawn && !character) // if it's not a character attribute, set locally
-				{
-					aattr->setValue();
-				}
+				aattr->setValue();
 			}
 		}
 		else
@@ -874,14 +869,14 @@ void AttributeWindow::ActionCB(Fl_Widget *w, void *data)
 
 void AttributeWindow::BoolCB(Fl_Widget *w, void *data)
 {
-	AttributeWindow *cw = (AttributeWindow*) data;
+	AttributeWindow *attrWin = (AttributeWindow*) data;
 	
 	Fl_Check_Button* check = (Fl_Check_Button*) w;
-	SmartBody::SBObject* obj = cw->getObject();
+	SmartBody::SBObject* obj = attrWin->getObject();
 	
 	std::string name = "";
-	std::map<Fl_Widget*, std::string>::iterator iter = cw->reverseWidgetMap.find(w);
-	if (iter !=  cw->reverseWidgetMap.end())
+	std::map<Fl_Widget*, std::string>::iterator iter = attrWin->reverseWidgetMap.find(w);
+	if (iter !=  attrWin->reverseWidgetMap.end())
 		name = iter->second;
 		
 	if (name != "")
@@ -903,7 +898,6 @@ void AttributeWindow::BoolCB(Fl_Widget *w, void *data)
 					std::string str = check->value()? "True" : "False";
 					std::string sendStr = "sb scene.getCharacter(\"" + character->getName() + "\").setBoolAttribute(\"" + attr->getName() + "\", " + str + ")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
-					battr->setValueFast(check->value()? true : false);
 				}
 				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
 				if (pawn && !character)
@@ -911,12 +905,8 @@ void AttributeWindow::BoolCB(Fl_Widget *w, void *data)
 					std::string str = check->value()? "True" : "False";
 					std::string sendStr = "sb scene.getPawn(\"" + pawn->getName() + "\").setBoolAttribute(\"" + attr->getName() + "\", " + str + ")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
-					battr->setValueFast(check->value()? true : false);
 				}
-				if (!pawn && !character)	// if it's not a character attribute, set locally
-				{
-					battr->setValue(check->value()? true : false);
-				}
+				battr->setValue(check->value()? true : false);
 			}
 		}
 		else
@@ -983,7 +973,6 @@ void AttributeWindow::IntCB(Fl_Widget *w, void *data)
 					strstr << val;
 					std::string sendStr = "sb scene.getCharacter(\"" + character->getName() + "\").setIntAttribute(\"" + attr->getName() + "\", " + strstr.str() + ")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
-					iattr->setValueFast(val);
 				}
 				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
 				if (pawn && !character)
@@ -992,12 +981,8 @@ void AttributeWindow::IntCB(Fl_Widget *w, void *data)
 					strstr << val;
 					std::string sendStr = "sb scene.getPawn(\"" + pawn->getName() + "\").setIntAttribute(\"" + attr->getName() + "\", " + strstr.str() + ")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
-					iattr->setValueFast(val);
 				}
-				if (!pawn && !character)	// if it's not a character attribute, set locally
-				{
-					iattr->setValue(val);
-				}
+				iattr->setValue(val);
 			}
 		}
 		else
@@ -1062,7 +1047,6 @@ void AttributeWindow::DoubleCB(Fl_Widget *w, void *data)
 					strstr << val;
 					std::string sendStr = "sb scene.getCharacter(\"" + character->getName() + "\").setDoubleAttribute(\"" + attr->getName() + "\", " + strstr.str() + ")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
-					dattr->setValueFast(val);
 				}
 				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
 				if (pawn && !character)
@@ -1071,12 +1055,8 @@ void AttributeWindow::DoubleCB(Fl_Widget *w, void *data)
 					strstr << val;
 					std::string sendStr = "sb scene.getPawn(\"" + pawn->getName() + "\").setDoubleAttribute(\"" + attr->getName() + "\", " + strstr.str() + ")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(sendStr.c_str());
-					dattr->setValueFast(val);
 				}
-				if (!pawn && !character)	// if it's not a character attribute, set locally
-				{
-					dattr->setValue(val);
-				}
+				dattr->setValue(val);
 			}
 		}
 		else
@@ -1092,17 +1072,17 @@ void AttributeWindow::DoubleCB(Fl_Widget *w, void *data)
 
 void AttributeWindow::StringCB(Fl_Widget *w, void *data)
 {
-	AttributeWindow *cw = (AttributeWindow*) data;
+	AttributeWindow *attrWin = (AttributeWindow*) data;
 	
 	Fl_Input* input = dynamic_cast<Fl_Input*>(w);
 	Fl_Choice* choice = dynamic_cast<Fl_Choice*>(w);
 
-	SmartBody::SBObject* obj = cw->getObject();
+	SmartBody::SBObject* obj = attrWin->getObject();
 	
 	// get the name of the attribute
 	std::string name = "";
-	std::map<Fl_Widget*, std::string>::iterator iter = cw->reverseWidgetMap.find(w);
-	if (iter !=  cw->reverseWidgetMap.end())
+	std::map<Fl_Widget*, std::string>::iterator iter = attrWin->reverseWidgetMap.find(w);
+	if (iter !=  attrWin->reverseWidgetMap.end())
 		name = iter->second;
 
 	if (name != "")
@@ -1137,7 +1117,6 @@ void AttributeWindow::StringCB(Fl_Widget *w, void *data)
 					std::stringstream strstr;
 					strstr << "sb scene.getCharacter(\"" << character->getName() << "\").setStringAttribute(\"" << attr->getName() << "\", \"" << finalValue << "\")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
-					strattr->setValueFast(finalValue);
 				}
 				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
 				if (pawn && !character)
@@ -1145,12 +1124,8 @@ void AttributeWindow::StringCB(Fl_Widget *w, void *data)
 					std::stringstream strstr;
 					strstr << "sb scene.getPawn(\"" << pawn->getName() << "\").setStringAttribute(\"" << attr->getName() << "\", \"" << finalValue << "\")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
-					strattr->setValueFast(finalValue);
 				}
-				if (!pawn && !character)// if it's not a character attribute, set locally
-				{
-					strattr->setValue(finalValue);
-				}
+				strattr->setValue(finalValue);
 			}
 		}
 		else
@@ -1207,7 +1182,6 @@ void AttributeWindow::Vec3CB(Fl_Widget *w, void *data)
 					std::stringstream strstr;
 					strstr << "sb scene.getCharacter(\"" << character->getName() << "\").setVec3Attribute(\"" << attr->getName() << "\", " <<  val.x <<  ", " << val.y << ", " << val.z << ")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
-					vec3attr->setValueFast(val);
 				}
 				SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(object);
 				if (pawn && !character)
@@ -1215,12 +1189,8 @@ void AttributeWindow::Vec3CB(Fl_Widget *w, void *data)
 					std::stringstream strstr;
 					strstr << "sb scene.getPawn(\"" << pawn->getName() << "\").setVec3Attribute(\"" << attr->getName() << "\", " <<  val.x <<  ", " << val.y << ", " << val.z << ")";
 					SmartBody::SBScene::getScene()->getVHMsgManager()->send(strstr.str().c_str());
-					vec3attr->setValueFast(val);
 				}
-				if (!pawn && !character)	// if it's not a character attribute, set locally
-				{
-					vec3attr->setValue(val);
-				}
+				vec3attr->setValue(val);
 			}
 		}
 		else
