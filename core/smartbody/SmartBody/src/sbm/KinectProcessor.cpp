@@ -362,8 +362,15 @@ void KinectProcessor::processRetargetRotation(std::string targetSkelName, std::v
 	for (int i = 0; i < numOfKinectJoints; i++)
 	{
 		int pindex = parentIndexMap[i];
+		if (i == 3) // copy head rotation..?
+		{
+			outQuat[i] = quats[i];
+			continue;
+		}
 		if (pindex < 0 || pindex == 0 || pindex == 2)
+		{
 			continue;		
+		}
 		
 		outQuat[pindex] = retarget->applyRetargetJointRotation(getSBJointName(pindex),quats[i]);
 		//outQuat[i] = retarget->applyRetargetJointRotation(getSBJointName(i),SrQuat());
