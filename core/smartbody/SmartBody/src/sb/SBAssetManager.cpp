@@ -37,7 +37,7 @@
 #include <sbm/sr_path_list.h>
 #include <sbm/sbm_constants.h>
 #include <sbm/GPU/SbmTexture.h>
-#include <external/soil/SOIL.h>
+#include <external/SOIL/SOIL.h>
 
 #include <boost/filesystem/path.hpp>
 

@@ -117,7 +117,7 @@ bool SrModel::export_obj ( const char* file, const char* mtlFile, const char* te
 	int i;
 
 	// write the material file
-	std::ofstream mfile(boost::filesystem::complete(materialFile).string());
+	std::ofstream mfile(boost::filesystem::complete(materialFile).string().c_str());
 	if (mfile.is_open() != true)
 	{
 		LOG("Could not export file %s, problem opening that file for writing.", mtlFile);
