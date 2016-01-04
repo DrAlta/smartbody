@@ -1155,6 +1155,8 @@ void SrModel::add_model ( const SrModel& m )
 	   bool newMat = true;
 	   mtlnames.push ( m.mtlnames[i] );
    }   
+
+   validate();
     
 //    save(sr_out);
  }

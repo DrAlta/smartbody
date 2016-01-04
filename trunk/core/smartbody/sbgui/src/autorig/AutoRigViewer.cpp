@@ -120,7 +120,14 @@ void AutoRigViewer::setCharacterName(const std::string& name)
 			{
 				if (meshInstance->getDeformableMesh()->getNumMeshes() > 0)
 				{
-					this->modelViewer->setModel(meshInstance->getDeformableMesh()->getStaticModel(0));
+					SrModel allModel = SrModel(meshInstance->getDeformableMesh()->getStaticModel(0));
+					for (unsigned int i=1; i< meshInstance->getDeformableMesh()->getNumMeshes();i++)
+					{
+						allModel.add_model(meshInstance->getDeformableMesh()->getStaticModel(i));
+					}
+					allModel.computeNormals();
+					this->modelViewer->setModel(allModel);
+					//this->modelViewer->setModel(meshInstance->getDeformableMesh()->getStaticModel(0));
 				}
 			}
 			
