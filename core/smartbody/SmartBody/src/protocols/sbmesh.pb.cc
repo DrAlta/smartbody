@@ -46,12 +46,14 @@ void protobuf_AssignDesc_sbmesh_2eproto() {
       "sbmesh.proto");
   GOOGLE_CHECK(file != NULL);
   Material_descriptor_ = file->message_type(0);
-  static const int Material_offsets_[5] = {
+  static const int Material_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Material, ambient_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Material, diffuse_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Material, specular_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Material, emission_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Material, shininess_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Material, transparency_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Material, usealphablend_),
   };
   Material_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -199,38 +201,39 @@ void protobuf_AddDesc_sbmesh_2eproto() {
   ::SmartBodyBinary::protobuf_AddDesc_sbutilities_2eproto();
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\014sbmesh.proto\022\017SmartBodyBinary\032\021sbutili"
-    "ties.proto\"c\n\010Material\022\017\n\007ambient\030\001 \003(\005\022"
-    "\017\n\007diffuse\030\002 \003(\005\022\020\n\010specular\030\003 \003(\005\022\020\n\010em"
-    "ission\030\004 \003(\005\022\021\n\tshininess\030\005 \002(\005\"\375\004\n\tMesh"
-    "Model\022\020\n\010meshName\030\001 \002(\t\022,\n\tmaterials\030\002 \003"
-    "(\0132\031.SmartBodyBinary.Material\022\031\n\021vertexC"
-    "oordinates\030\003 \003(\002\022\017\n\007normals\030\004 \003(\002\022\020\n\010tan"
-    "gents\030\005 \003(\002\022\021\n\tbinormals\030\006 \003(\002\022\032\n\022textur"
-    "eCoordinates\030\007 \003(\002\022\033\n\023triangleFaceIndice"
-    "s\030\010 \003(\005\022\027\n\017materialIndices\030\t \003(\005\022\025\n\rnorm"
-    "alIndices\030\n \003(\005\022!\n\031textureCoordinatesInd"
-    "ices\030\013 \003(\005\022\017\n\007culling\030\014 \002(\010\022\025\n\rmaterialN"
-    "ames\030\r \003(\t\022K\n\037materialToDiffuseTextureMa"
-    "pping\030\016 \003(\0132\".SmartBodyBinary.StringToSt"
-    "ringMap\022J\n\036materialToNormalTextureMappin"
-    "g\030\017 \003(\0132\".SmartBodyBinary.StringToString"
-    "Map\022L\n materialToSpecularTextureMapping\030"
-    "\020 \003(\0132\".SmartBodyBinary.StringToStringMa"
-    "p\022D\n\025materialToFaceIndices\030\021 \003(\0132%.Smart"
-    "BodyBinary.StringToIntVectorMap\"\332\001\n\nSkin"
-    "Weight\022\026\n\016sourceMeshName\030\001 \002(\t\022\033\n\023influe"
-    "nceJointNames\030\002 \003(\t\022\023\n\013bindWeights\030\003 \003(\002"
-    "\022\027\n\017bindPoseMatrice\030\004 \003(\002\022\027\n\017bindShapeMa"
-    "trix\030\005 \003(\002\022\037\n\027numberOfInfluenceJoints\030\006 "
-    "\003(\005\022\025\n\rweightIndices\030\007 \003(\005\022\030\n\020jointNameI"
-    "ndices\030\010 \003(\005\"T\n\nStaticMesh\022\026\n\016staticMesh"
-    "Name\030\001 \002(\t\022.\n\nmeshModels\030\002 \003(\0132\032.SmartBo"
-    "dyBinary.MeshModel\"\317\001\n\016DeformableMesh\022\032\n"
-    "\022deformableMeshName\030\001 \002(\t\022/\n\nstaticMesh\030"
-    "\002 \002(\0132\033.SmartBodyBinary.StaticMesh\0220\n\013sk"
-    "inWeights\030\003 \003(\0132\033.SmartBodyBinary.SkinWe"
-    "ight\022>\n\014morphTargets\030\004 \003(\0132(.SmartBodyBi"
-    "nary.StringToStringVectorMap", 1308);
+    "ties.proto\"\220\001\n\010Material\022\017\n\007ambient\030\001 \003(\005"
+    "\022\017\n\007diffuse\030\002 \003(\005\022\020\n\010specular\030\003 \003(\005\022\020\n\010e"
+    "mission\030\004 \003(\005\022\021\n\tshininess\030\005 \002(\005\022\024\n\014tran"
+    "sparency\030\006 \002(\002\022\025\n\ruseAlphaBlend\030\007 \002(\010\"\375\004"
+    "\n\tMeshModel\022\020\n\010meshName\030\001 \002(\t\022,\n\tmateria"
+    "ls\030\002 \003(\0132\031.SmartBodyBinary.Material\022\031\n\021v"
+    "ertexCoordinates\030\003 \003(\002\022\017\n\007normals\030\004 \003(\002\022"
+    "\020\n\010tangents\030\005 \003(\002\022\021\n\tbinormals\030\006 \003(\002\022\032\n\022"
+    "textureCoordinates\030\007 \003(\002\022\033\n\023triangleFace"
+    "Indices\030\010 \003(\005\022\027\n\017materialIndices\030\t \003(\005\022\025"
+    "\n\rnormalIndices\030\n \003(\005\022!\n\031textureCoordina"
+    "tesIndices\030\013 \003(\005\022\017\n\007culling\030\014 \002(\010\022\025\n\rmat"
+    "erialNames\030\r \003(\t\022K\n\037materialToDiffuseTex"
+    "tureMapping\030\016 \003(\0132\".SmartBodyBinary.Stri"
+    "ngToStringMap\022J\n\036materialToNormalTexture"
+    "Mapping\030\017 \003(\0132\".SmartBodyBinary.StringTo"
+    "StringMap\022L\n materialToSpecularTextureMa"
+    "pping\030\020 \003(\0132\".SmartBodyBinary.StringToSt"
+    "ringMap\022D\n\025materialToFaceIndices\030\021 \003(\0132%"
+    ".SmartBodyBinary.StringToIntVectorMap\"\332\001"
+    "\n\nSkinWeight\022\026\n\016sourceMeshName\030\001 \002(\t\022\033\n\023"
+    "influenceJointNames\030\002 \003(\t\022\023\n\013bindWeights"
+    "\030\003 \003(\002\022\027\n\017bindPoseMatrice\030\004 \003(\002\022\027\n\017bindS"
+    "hapeMatrix\030\005 \003(\002\022\037\n\027numberOfInfluenceJoi"
+    "nts\030\006 \003(\005\022\025\n\rweightIndices\030\007 \003(\005\022\030\n\020join"
+    "tNameIndices\030\010 \003(\005\"T\n\nStaticMesh\022\026\n\016stat"
+    "icMeshName\030\001 \002(\t\022.\n\nmeshModels\030\002 \003(\0132\032.S"
+    "martBodyBinary.MeshModel\"\317\001\n\016DeformableM"
+    "esh\022\032\n\022deformableMeshName\030\001 \002(\t\022/\n\nstati"
+    "cMesh\030\002 \002(\0132\033.SmartBodyBinary.StaticMesh"
+    "\0220\n\013skinWeights\030\003 \003(\0132\033.SmartBodyBinary."
+    "SkinWeight\022>\n\014morphTargets\030\004 \003(\0132(.Smart"
+    "BodyBinary.StringToStringVectorMap", 1354);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "sbmesh.proto", &protobuf_RegisterTypes);
   Material::default_instance_ = new Material();
@@ -261,6 +264,8 @@ const int Material::kDiffuseFieldNumber;
 const int Material::kSpecularFieldNumber;
 const int Material::kEmissionFieldNumber;
 const int Material::kShininessFieldNumber;
+const int Material::kTransparencyFieldNumber;
+const int Material::kUseAlphaBlendFieldNumber;
 #endif  // !_MSC_VER
 
 Material::Material()
@@ -280,6 +285,8 @@ Material::Material(const Material& from)
 void Material::SharedCtor() {
   _cached_size_ = 0;
   shininess_ = 0;
+  transparency_ = 0;
+  usealphablend_ = false;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -316,6 +323,8 @@ Material* Material::New() const {
 void Material::Clear() {
   if (_has_bits_[4 / 32] & (0xffu << (4 % 32))) {
     shininess_ = 0;
+    transparency_ = 0;
+    usealphablend_ = false;
   }
   ambient_.Clear();
   diffuse_.Clear();
@@ -431,6 +440,38 @@ bool Material::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(53)) goto parse_transparency;
+        break;
+      }
+
+      // required float transparency = 6;
+      case 6: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_transparency:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &transparency_)));
+          set_has_transparency();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(56)) goto parse_useAlphaBlend;
+        break;
+      }
+
+      // required bool useAlphaBlend = 7;
+      case 7: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_useAlphaBlend:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &usealphablend_)));
+          set_has_usealphablend();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -482,6 +523,16 @@ void Material::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->shininess(), output);
   }
 
+  // required float transparency = 6;
+  if (has_transparency()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(6, this->transparency(), output);
+  }
+
+  // required bool useAlphaBlend = 7;
+  if (has_usealphablend()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(7, this->usealphablend(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -519,6 +570,16 @@ void Material::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->shininess(), target);
   }
 
+  // required float transparency = 6;
+  if (has_transparency()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(6, this->transparency(), target);
+  }
+
+  // required bool useAlphaBlend = 7;
+  if (has_usealphablend()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(7, this->usealphablend(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -535,6 +596,16 @@ int Material::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->shininess());
+    }
+
+    // required float transparency = 6;
+    if (has_transparency()) {
+      total_size += 1 + 4;
+    }
+
+    // required bool useAlphaBlend = 7;
+    if (has_usealphablend()) {
+      total_size += 1 + 1;
     }
 
   }
@@ -611,6 +682,12 @@ void Material::MergeFrom(const Material& from) {
     if (from.has_shininess()) {
       set_shininess(from.shininess());
     }
+    if (from.has_transparency()) {
+      set_transparency(from.transparency());
+    }
+    if (from.has_usealphablend()) {
+      set_usealphablend(from.usealphablend());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -628,7 +705,7 @@ void Material::CopyFrom(const Material& from) {
 }
 
 bool Material::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000010) != 0x00000010) return false;
+  if ((_has_bits_[0] & 0x00000070) != 0x00000070) return false;
 
   return true;
 }
@@ -640,6 +717,8 @@ void Material::Swap(Material* other) {
     specular_.Swap(&other->specular_);
     emission_.Swap(&other->emission_);
     std::swap(shininess_, other->shininess_);
+    std::swap(transparency_, other->transparency_);
+    std::swap(usealphablend_, other->usealphablend_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
