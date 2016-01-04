@@ -1977,7 +1977,10 @@ void DeformableMeshInstance::blendShapes()
 							fabs(vVec[1]) >  gwiz::epsilon4() ||
 							fabs(vVec[2]) >  gwiz::epsilon4())
 						{
-							blendData.diffV.push_back(std::pair<int, SrVec>(v, vVec));
+							std::pair<int, SrVec> temp;
+							temp.first = v;
+							temp.second = vVec;
+							blendData.diffV.push_back(temp);
 						}
 					}
 					for (int n = 0; n < visemeN.size(); ++n)

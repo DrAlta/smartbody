@@ -1978,7 +1978,7 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 			int bufSize = _mesh->posBuf.size();
 			if (visemeV.size() > bufSize)
 			{
-				LOG("Warning: inconsistent number of vertices in shape %s, shape %d %s", _mesh->getName().c_str(), i,  mIter->second[i]->shape().name);
+				LOG("Warning: inconsistent number of vertices in shape %s, shape %d %s", _mesh->getName().c_str(), i,  (const char*) mIter->second[i]->shape().name);
 				bufSize = visemeV.size();
 			}
 			std::vector<SrVec> visemeBuf(bufSize);
