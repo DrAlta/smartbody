@@ -921,7 +921,7 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 			// 6
 			newMaterial->set_transparency(curModel.M[m].transparency);
 			// 7
-			newMaterial->set_useAlphaBlend(curModel.M[m].useAlphaBlend);
+			newMaterial->set_usealphablend(curModel.M[m].useAlphaBlend);
 
 		}
 		// 3
@@ -1074,7 +1074,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 			newMat.transparency = material.transparency();
 
 			// 7 useAlphaBlend
-			newMat.useAlphaBlend = material.useAlphaBlend();
+			newMat.useAlphaBlend = material.usealphablend();
 
 			newModel->M.push(newMat);
 		}
