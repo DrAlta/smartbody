@@ -151,10 +151,28 @@ class Material : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 shininess() const;
   inline void set_shininess(::google::protobuf::int32 value);
 
+  // required float transparency = 6;
+  inline bool has_transparency() const;
+  inline void clear_transparency();
+  static const int kTransparencyFieldNumber = 6;
+  inline float transparency() const;
+  inline void set_transparency(float value);
+
+  // required bool useAlphaBlend = 7;
+  inline bool has_usealphablend() const;
+  inline void clear_usealphablend();
+  static const int kUseAlphaBlendFieldNumber = 7;
+  inline bool usealphablend() const;
+  inline void set_usealphablend(bool value);
+
   // @@protoc_insertion_point(class_scope:SmartBodyBinary.Material)
  private:
   inline void set_has_shininess();
   inline void clear_has_shininess();
+  inline void set_has_transparency();
+  inline void clear_has_transparency();
+  inline void set_has_usealphablend();
+  inline void clear_has_usealphablend();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -163,9 +181,11 @@ class Material : public ::google::protobuf::Message {
   ::google::protobuf::RepeatedField< ::google::protobuf::int32 > specular_;
   ::google::protobuf::RepeatedField< ::google::protobuf::int32 > emission_;
   ::google::protobuf::int32 shininess_;
+  float transparency_;
+  bool usealphablend_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
 
   friend void  protobuf_AddDesc_sbmesh_2eproto();
   friend void protobuf_AssignDesc_sbmesh_2eproto();
@@ -1004,6 +1024,50 @@ inline ::google::protobuf::int32 Material::shininess() const {
 inline void Material::set_shininess(::google::protobuf::int32 value) {
   set_has_shininess();
   shininess_ = value;
+}
+
+// required float transparency = 6;
+inline bool Material::has_transparency() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void Material::set_has_transparency() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void Material::clear_has_transparency() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void Material::clear_transparency() {
+  transparency_ = 0;
+  clear_has_transparency();
+}
+inline float Material::transparency() const {
+  return transparency_;
+}
+inline void Material::set_transparency(float value) {
+  set_has_transparency();
+  transparency_ = value;
+}
+
+// required bool useAlphaBlend = 7;
+inline bool Material::has_usealphablend() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void Material::set_has_usealphablend() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void Material::clear_has_usealphablend() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void Material::clear_usealphablend() {
+  usealphablend_ = false;
+  clear_has_usealphablend();
+}
+inline bool Material::usealphablend() const {
+  return usealphablend_;
+}
+inline void Material::set_usealphablend(bool value) {
+  set_has_usealphablend();
+  usealphablend_ = value;
 }
 
 // -------------------------------------------------------------------
