@@ -19,6 +19,9 @@ message Material
 	repeated int32 specular = 3;
 	repeated int32 emission = 4;
 	required int32 shininess = 5;
+	required float transparency = 6;
+	required bool useAlphaBlend = 7;
+
 }
 
 message MeshModel
