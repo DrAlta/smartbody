@@ -838,6 +838,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 #if TEST_HAIR_RENDER		
 		std::string lowMatName = mesh->matName;
 		boost::algorithm::to_lower(lowMatName);
+		/*
 		if (lowMatName.find("hair") != std::string::npos)
 		{
 			// is a hair mesh, based on a rough name searching
@@ -851,7 +852,9 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			LOG("transparent mesh = %s",mesh->matName.c_str());
 			hairMeshList.push_back(mesh);
 		}
-		else if (mesh->material.useAlphaBlend)
+		else 
+		*/
+		if (mesh->material.useAlphaBlend)
 		{
 			LOG("alpha mesh = %s",mesh->matName.c_str());
 			alphaMeshList.push_back(mesh);
@@ -915,6 +918,11 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 			newMaterial->add_emission(curModel.M[m].emission.a);
 			// 5
 			newMaterial->set_shininess(curModel.M[m].shininess);
+			// 6
+			newMaterial->set_transparency(curModel.M[m].transparency);
+			// 7
+			newMaterial->set_useAlphaBlend(curModel.M[m].useAlphaBlend);
+
 		}
 		// 3
 		for (int v = 0; v < curModel.V.size(); ++v)
@@ -1061,6 +1069,12 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 			newMat.emission.a = material.emission(3);
 			// 5
 			newMat.shininess = material.shininess();
+
+			// 6 transparency
+			newMat.transparency = material.transparency();
+
+			// 7 useAlphaBlend
+			newMat.useAlphaBlend = material.useAlphaBlend();
 
 			newModel->M.push(newMat);
 		}

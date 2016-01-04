@@ -2539,7 +2539,12 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 								M.top().useAlphaBlend = false;
 							}
 						}														
-					}				
+					}
+					else if (opaqueMode == "A_ONE")
+					{
+						alpha = 1.0f;
+						M.top().useAlphaBlend = true;
+					}
 				}
 				else // by default it should be RGB_ZERO ?
 				{
