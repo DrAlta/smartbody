@@ -71,7 +71,8 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	// capitalize the first letter 
 	if (mapNameLower.size() > 0)
 		mapNameLower[0] = toupper(mapNameLower[0]);
-	gestureMapName = character->getStringAttribute("gestureMap" + mapNameLower);
+	std::string finalGestureMapName = "gestureMap" + mapNameLower;
+	gestureMapName = character->getStringAttribute(finalGestureMapName);
 
 	std::vector<std::string> animationList;
 	if (animationName == "")	// If you have assigned the animation name, do not look for the map
@@ -79,8 +80,16 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		SmartBody::SBGestureMap* gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(gestureMapName);
 		if (!gestureMap)
 		{
-			LOG("WARNING: BML::parse_bml_gesture(): gesture map for character %s doesn't exist.", request->actor->getName().c_str());
-			return BehaviorRequestPtr();		
+			LOG("WARNING: BML::parse_bml_gesture(): gesture map '%s' for emotion '%s' on character %s doesn't exist.", gestureMapName.c_str(), finalGestureMapName.c_str(), request->actor->getName().c_str());
+			// get the default gesture map if the emotional one isn't available
+			if (gestureMapName != "gestureMap")
+			{
+				gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(character->getStringAttribute("gestureMap"));		
+			}
+			if (gestureMap)
+				LOG("Using default gesture map.");
+			else
+				return BehaviorRequestPtr();		
 		}
 
 		// Get current posture
