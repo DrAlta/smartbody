@@ -397,7 +397,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			myGLDisable ( GL_POLYGON_SMOOTH );
 			#endif
 			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glAlphaFunc ( GL_GREATER, 0.0f ) ;
+			//glAlphaFunc ( GL_GREATER, 0.0f ) ;
+			glAlphaFunc(GL_GREATER, 0.5f);
 			myGLEnable(GL_CULL_FACE);
 	
 			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
@@ -456,12 +457,14 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				glMaterial(subMesh->material);	
 				if (subMesh->material.useAlphaBlend)
 				{
+					myGLDisable(GL_CULL_FACE);
 					myGLEnable(GL_ALPHA_TEST);
 					myGLEnable(GL_BLEND);
 			
 				}
 				else
 				{
+					myGLEnable(GL_CULL_FACE);
 					myGLDisable(GL_ALPHA_TEST);
 					myGLDisable(GL_BLEND);
 				}

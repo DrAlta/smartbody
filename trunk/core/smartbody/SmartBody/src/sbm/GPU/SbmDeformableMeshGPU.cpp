@@ -638,7 +638,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glAlphaFunc ( GL_GREATER, 0.0f ) ;
+	glAlphaFunc ( GL_GREATER, 0.5f ) ;
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_COLOR_MATERIAL);
 	glUseProgram(program);		
@@ -752,6 +752,22 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 		glUniform1f(shinenessLoc,mesh->material.shininess);
 		//LOG("mat color = %f %f %f\n",color[0],color[1],color[2]);
 		SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE,mesh->texName.c_str());
+
+		if (mesh->material.useAlphaBlend)
+		{
+			myGLDisable(GL_CULL_FACE);
+			myGLEnable(GL_ALPHA_TEST);
+			myGLEnable(GL_BLEND);
+
+		}
+		else
+		{
+			myGLEnable(GL_CULL_FACE);
+			myGLDisable(GL_ALPHA_TEST);
+			myGLDisable(GL_BLEND);
+		}
+
+
 		if (tex)
 		{
 			glActiveTexture(GL_TEXTURE1_ARB);
