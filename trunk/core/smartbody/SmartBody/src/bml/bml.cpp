@@ -1630,9 +1630,18 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 
 			MapOfSyncPoint::iterator mySearchIter = idToSync.find(key);
 			if( mySearchIter == idToSync.end() ) {
-				std::wstringstream wstrstr;
-				wstrstr<<"WARNING: BmlRequest::getSyncPoint: BML offset refers to unknown "<<key<<" point.  Ignoring...";
-				LOG(convertWStringToString(wstrstr.str()).c_str());
+				// if the key is a number add or subtract the offset
+				try
+				{
+				  float keyNumber = boost::lexical_cast<float>(key);
+				  sync = start_trigger->addSyncPoint( bml_start, keyNumber + offset );
+				}
+				catch(boost::bad_lexical_cast& e)
+				{
+					std::wstringstream wstrstr;
+					wstrstr<<"WARNING: BmlRequest::getSyncPoint: BML offset refers to unknown "<<key<<" point.  Ignoring...";
+					LOG(convertWStringToString(wstrstr.str()).c_str());
+				}				
 			} else {
 				SyncPointPtr parent = mySearchIter->second;
 				if( parent ) {
