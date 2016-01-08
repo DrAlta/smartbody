@@ -62,14 +62,14 @@ void SrModel::init ()
  {
    culling = true;
    M.capacity ( 0 );
-   V.capacity ( 0 );
-   Vc.capacity( 0 );
-   N.capacity ( 0 );
-   T.capacity ( 0 );
-   F.capacity ( 0 );
-   Fm.capacity ( 0 );
-   Fn.capacity ( 0 );
-   Ft.capacity ( 0 );
+   //V.capacity ( 0 );
+   //Vc.capacity( 0 );
+   //N.capacity ( 0 );
+   //T.capacity ( 0 );
+   //F.capacity ( 0 );
+   //Fm.capacity ( 0 );
+   //Fn.capacity ( 0 );
+   //Ft.capacity ( 0 );
    mtlnames.capacity ( 0 );
    name = "";
  }
@@ -77,14 +77,14 @@ void SrModel::init ()
 void SrModel::compress ()
  {
    M.compress();
-   V.compress();
-   Vc.compress();
-   N.compress();
-   T.compress();
-   F.compress();
-   Fm.compress();
-   Fn.compress();
-   Ft.compress();
+   //V.compress();
+   //Vc.compress();
+   //N.compress();
+   //T.compress();
+   //F.compress();
+   //Fm.compress();
+   //Fn.compress();
+   //Ft.compress();
    mtlnames.compress();
    name.compress();
  }
@@ -106,24 +106,24 @@ void SrModel::validate ()
 
    // check size of Fn
    if ( Fn.size()!=fsize || N.size()==0 )
-    { Fn.size(0);
-      N.size(0);
+    { Fn.resize(0);
+      N.resize(0);
     }
 
    // check size of Ft
    if ( Ft.size()!=fsize || T.size()==0 )
-    { Ft.size(0);
-      T.size(0);
+    { Ft.resize(0);
+      T.resize(0);
     }
 
    // check size of Fm
    if ( M.size()==0 )
-    { Fm.size(0);
+    { Fm.resize(0);
 	  mtlnames.size(0);
     }
    else if ( Fm.size()!=fsize )
     { j = Fm.size();
-      Fm.size ( fsize );
+      Fm.resize ( fsize );
       for ( i=j; i<fsize; i++ ) Fm[i]=0;
     }
 
@@ -150,11 +150,11 @@ void SrModel::remove_redundant_materials ()
    int fsize = F.size();
 
    if ( M.size()==0 )
-    { Fm.size(0);
+    { Fm.resize(0);
     }
    else 
     { j = Fm.size();
-      Fm.size ( fsize );
+      Fm.resize ( fsize );
       for ( i=j; i<fsize; i++ ) Fm[i]=0;
 
       // remove references to duplicated materials
@@ -228,8 +228,8 @@ void SrModel::remove_redundant_texcoord()
 	int fsize = F.size();
 
 	if ( T.size()==0 || Ft.size()!=fsize )
-	{ T.size(0); 
-	Ft.size(0);
+	{ T.resize(0); 
+	Ft.resize(0);
 	}
 	else 
 	{ // remove references to duplicated normals
@@ -260,7 +260,7 @@ void SrModel::remove_redundant_texcoord()
 				Ft[k][i] = tNewIdxMap[oldIdx];
 			}
 		}
-		T.size(newTexCoordList.size());
+		T.resize(newTexCoordList.size());
 		for (unsigned int i=0;i<newTexCoordList.size();i++)
 			T[i] = newTexCoordList[i];
 #if 0
@@ -324,8 +324,8 @@ void SrModel::remove_redundant_normals ( float dang )
    int fsize = F.size();
 
    if ( N.size()==0 || Fn.size()!=fsize )
-    { N.size(0); 
-      Fn.size(0);
+    { N.resize(0); 
+      Fn.resize(0);
     }
    else 
     { // remove references to duplicated normals
@@ -372,7 +372,10 @@ void SrModel::remove_redundant_normals ( float dang )
 
       for ( i=0,j=0; i<iarray.size(); i++ ) // compress N
        { if ( iarray[i]<0 )
-          { N.remove(j); }
+          { 
+			  //N.remove(j); 
+			  N.erase(N.begin()+j);
+		  }
          else
           { j++; }
        }
@@ -416,7 +419,7 @@ void SrModel::merge_redundant_vertices ( float prec )
       iarray[i] = ind;
       if ( newv ) ind++;
     }
-   V.size ( ind );
+   V.resize ( ind );
 
    // fix face indices again:
    for ( i=0; i<fsize; i++ )
@@ -462,13 +465,13 @@ bool SrModel::load ( SrInput &in )
          if ( !in.close_field(s) ) return false;
        }
       else if ( s=="vertices" ) // read vertices: x y z
-       { in >> i; V.size(i);
+       { in >> i; V.resize(i);
          for ( i=0; i<V.size(); i++ ) 
           fscanf ( in.filept(), "%f %f %f", &V[i].x, &V[i].y, &V[i].z ); // equiv to: in >> V[i];
          if ( !in.close_field(s) ) return false;
        }
       else if ( s=="vertices_per_face" ) // read F: a b c
-       { in >> i; F.size(i);
+       { in >> i; F.resize(i);
          for ( i=0; i<F.size(); i++ )
           { fscanf ( in.filept(), "%d %d %d", &F[i].a, &F[i].b, &F[i].c ); // equiv to: in >> F[i];
             F[i].validate(); 
@@ -476,29 +479,29 @@ bool SrModel::load ( SrInput &in )
          if ( !in.close_field(s) ) return false;
        }
       else if ( s=="normals_per_face" ) // read Fn: a b c
-       { in >> i; Fn.size(i);
+       { in >> i; Fn.resize(i);
          for ( i=0; i<Fn.size(); i++ )
           fscanf ( in.filept(), "%d %d %d", &Fn[i].a, &Fn[i].b, &Fn[i].c ); // equiv to: in >> Fn[i];
          if ( !in.close_field(s) ) return false;
        }
       else if ( s=="textcoords_per_face" ) // read Ft: a b c
-       { in >> i; Ft.size(i);
+       { in >> i; Ft.resize(i);
          for ( i=0; i<Ft.size(); i++ ) in >> Ft[i];
          if ( !in.close_field(s) ) return false;
        }
       else if ( s=="materials_per_face" ) // read Fm: i
-       { in >> i; Fm.size(i);
+       { in >> i; Fm.resize(i);
          for ( i=0; i<Fm.size(); i++ ) fscanf ( in.filept(), "%d", &Fm[i] ); // equiv to: in >> Fm[i];
          if ( !in.close_field(s) ) return false;
        }
       else if ( s=="normals" ) // read N: x y z
-       { in >> i; N.size(i);
+       { in >> i; N.resize(i);
          for ( i=0; i<N.size(); i++ )
           fscanf ( in.filept(), "%f %f %f", &N[i].x, &N[i].y, &N[i].z ); // equiv to: in >> N[i];
          if ( !in.close_field(s) ) return false;
        }
       else if ( s=="textcoords" ) // read T: x y
-       { in >> i; T.size(i);
+       { in >> i; T.resize(i);
          for ( i=0; i<T.size(); i++ ) in >> T[i];
          if ( !in.close_field(s) ) return false;
        }
@@ -532,8 +535,8 @@ bool SrModel::load ( SrInput &in )
  void SrModel::computeTangentBiNormal()
  {	 
 	 int nVtx = V.size();
-	 Tangent.size(nVtx); Tangent.setall(SrVec(0,0,0));
-	 BiNormal.size(nVtx); BiNormal.setall(SrVec(0,0,0));
+	 Tangent.resize(nVtx); Tangent.assign(Tangent.size(),SrVec(0,0,0));//Tangent.setall(SrVec(0,0,0));
+	 BiNormal.resize(nVtx); BiNormal.assign(BiNormal.size(),SrVec(0,0,0));//BiNormal.setall(SrVec(0,0,0));
 	 //N.setall(SrVec(0,0,0));
 
 	 if (Ft.size() != F.size())
@@ -881,8 +884,8 @@ int SrModel::common_vertices_of_faces ( int i1, int i2 )
 
 void SrModel::flat ()
  {
-   N.size(0);
-   Fn.size(0);
+   N.resize(0);
+   Fn.resize(0);
    compress ();
  }
 
@@ -892,7 +895,7 @@ void SrModel::set_one_material ( const SrMaterial& m )
    mtlnames.capacity(1);
    mtlnames.size(1);
    M.size(1);
-   Fm.size ( F.size() );
+   Fm.resize ( F.size() );
    M[0] = m;
    for ( i=0; i<Fm.size(); i++ ) Fm[i]=0;
    compress ();
@@ -902,14 +905,14 @@ void SrModel::clear_materials ()
  {
    mtlnames.capacity (0);
    M.size (0);
-   Fm.size (0);
+   Fm.resize (0);
    compress ();
  }
 
 void SrModel::clear_textures ()
  {
-   T.size(0);
-   Ft.size(0);
+   T.resize(0);
+   Ft.resize(0);
    compress ();
  }
 
@@ -957,7 +960,7 @@ static void gen_normal ( int v, SrArray<SrVec>& vec, SrArray<int>& vi, SrModel *
    SrVec n;
    float x=1.0f;
    int init=0;
-   SrArray<SrVec>& N = self->N;
+   std::vector<SrVec>& N = self->N;
    for ( i=0; i<vec.size(); i++ )
     { ang = angle ( vec[i], vec[(i+1)%vec.size()]);
 
@@ -978,7 +981,7 @@ static void gen_normal ( int v, SrArray<SrVec>& vec, SrArray<int>& vi, SrModel *
             if ( v==fn.a ) fn.a = N.size();
 	         else if ( v==fn.b ) fn.b = N.size();
 	          else fn.c = N.size();
-            N.push() = n;
+            N.push_back(n);
           }
 
          init = i+1;
@@ -995,7 +998,7 @@ void SrModel::smooth ( float crease_angle )
 
    if ( !V.size() || !F.size() ) return;
 
-   Fn.size ( F.size() );
+   Fn.resize ( F.size() );
 
    vi.size(V.size());
    for ( i=0; i<vi.size(); i++ ) vi[i]=0;
@@ -1010,7 +1013,7 @@ void SrModel::smooth ( float crease_angle )
     }
 
    // first pass will interpolate face normals around each vertex:
-   N.size ( V.size() );
+   N.resize ( V.size() );
    vi.size(0);
    t.gofirst ();
    while ( t.cur()!=SrTreeNode::null )
@@ -1108,34 +1111,34 @@ void SrModel::add_model ( const SrModel& m )
    if ( m.V.size()==0 || mfsize==0 ) return;
 
    // add vertices and faces:
-   V.size ( origv+m.V.size() );
-   for ( i=0; i<m.V.size(); i++ ) V[origv+i] = m.V.get(i);
+   V.resize ( origv+m.V.size() );
+   for ( i=0; i<m.V.size(); i++ ) V[origv+i] = m.V[i];
 
-   F.size ( origf+mfsize );
+   F.resize ( origf+mfsize );
    for ( i=0; i<mfsize; i++ )
-    { const Face& f = m.F.get(i);
+    { const Face& f = m.F[i];
       F[origf+i].set ( f.a+origv, f.b+origv, f.c+origv );
     }
    
    // add the normals:
    if ( m.Fn.size()>0 )
-    { N.size ( orign+m.N.size() );
-      for ( i=0; i<m.N.size(); i++ ) N[orign+i] = m.N.get(i);
+    { N.resize ( orign+m.N.size() );
+      for ( i=0; i<m.N.size(); i++ ) N[orign+i] = m.N[i];
 
-      Fn.size ( origf+mfsize );
+      Fn.resize ( origf+mfsize );
       for ( i=0; i<mfsize; i++ )
-       { const Face& f = m.Fn.get(i);
+       { const Face& f = m.Fn[i];
          Fn[origf+i].set ( f.a+orign, f.b+orign, f.c+orign );
        }
     }
 
    if ( m.Ft.size()>0 )
-   { T.size ( origt+m.T.size() );
-   for ( i=0; i<m.T.size(); i++ ) T[orign+i] = m.T.get(i);
+   { T.resize ( origt+m.T.size() );
+   for ( i=0; i<m.T.size(); i++ ) T[orign+i] = m.T[i];
 
-   Ft.size ( origf+mfsize );
+   Ft.resize ( origf+mfsize );
    for ( i=0; i<mfsize; i++ )
-   { const Face& f = m.Ft.get(i);
+   { const Face& f = m.Ft[i];
    Ft[origf+i].set ( f.a+origt, f.b+origt, f.c+origt );
    }
    }
@@ -1144,8 +1147,8 @@ void SrModel::add_model ( const SrModel& m )
    // add the materials:
    if ( m.Fm.size()>0 )
     { M.size ( origm+m.M.size() );
-      for ( i=0; i<m.M.size(); i++ ) M[origm+i] = m.M.get(i);
-      Fm.size ( origf+mfsize );
+      for ( i=0; i<m.M.size(); i++ ) M[origm+i] = m.M[i];
+      Fm.resize ( origf+mfsize );
       for ( i=0; i<mfsize; i++ )
        { Fm[origf+i] = m.Fm[i]+origm;
        }
@@ -1191,13 +1194,13 @@ void SrModel::make_box ( const SrBox& b )
 
    name = "box";
 
-   V.size ( 8 );
+   V.resize ( 8 );
 
    // side 4 has all z coordinates equal to a.z, side 5 equal to b.z
    b.get_side ( V[0], V[1], V[2], V[3], 4 );
    b.get_side ( V[4], V[5], V[6], V[7], 5 );
 
-   F.size ( 12 );
+   F.resize ( 12 );
    F[0].set(1,0,4); F[1].set(1,4,7); // plane crossing -X
    F[2].set(3,2,6); F[3].set(3,6,5); // plane crossing +X
    F[4].set(7,4,6); F[5].set(4,5,6); // plane crossing +Z
@@ -1205,7 +1208,7 @@ void SrModel::make_box ( const SrBox& b )
    F[8].set(2,1,7); F[9].set(2,7,6); // plane crossing +Y
    F[10].set(0,3,4); F[11].set(4,3,5); // plane crossing -Y
 
-   F.size ( 12 );
+   F.resize ( 12 );
 
  }
 
@@ -1252,9 +1255,10 @@ void SrModel::make_cylinder ( const SrCylinder& c, float resolution, bool smooth
    int i=1;
 
    do { if ( smooth )
-         { N.push()=(a1-c.a)/c.radius; //normalized normal
+         { N.push_back((a1-c.a)/c.radius); //normalized normal
          }
-        V.push()=a1; V.push()=b1;
+        //V.push()=a1; V.push()=b1;
+		V.push_back(a1); V.push_back(b1);
         if ( i==nfaces ) break;
         a1=a2; b1=b2; a2=a1*rot; b2=a2+vaxis;
         i++;
@@ -1265,16 +1269,17 @@ void SrModel::make_cylinder ( const SrCylinder& c, float resolution, bool smooth
    int i1, i2, i3;
    int size = V.size();
    for ( i=0; i<size; i+=2 )
-    { i1 = V.validate ( i+1 );
-      i2 = V.validate ( i+2 );
-      i3 = V.validate ( i+3 );
-      F.push().set ( i, i2, i1 );
-      F.push().set ( i1, i2, i3 );
+    { 
+	  i1 = (i+1)%V.size();//V.validate ( i+1 );
+      i2 = (i+2)%V.size();//V.validate ( i+2 );
+      i3 = (i+3)%V.size();//V.validate ( i+3 );
+      F.push_back(SrModel::Face(i, i2, i1));
+      F.push_back(SrModel::Face( i1, i2, i3 ));
 
       if ( smooth )
-       { n1 = N.validate ( n+1 );
-         Fn.push().set ( n, n1, n );
-         Fn.push().set ( n, n1, n1 );
+       { n1 = (n+1)%N.size();//N.validate ( n+1 );
+         Fn.push_back(SrModel::Face( n, n1, n ));
+         Fn.push_back(SrModel::Face( n, n1, n1 ));
          n++;
        }
     }
@@ -1283,25 +1288,25 @@ void SrModel::make_cylinder ( const SrCylinder& c, float resolution, bool smooth
    n=0;
    size = V.size()+1;
    for ( i=0; i<size; i+=2 )
-    { i1 = V.validate ( i+1 );
-      i2 = V.validate ( i+2 );
-      i3 = V.validate ( i+3 );
-      F.push().set ( V.size(), i2, i );
-      F.push().set ( V.size()+1, i1, i3 );
+    { i1 = (i+1)%V.size();//V.validate ( i+1 );
+      i2 = (i+2)%V.size();//V.validate ( i+2 );
+      i3 = (i+3)%V.size();//V.validate ( i+3 );
+      F.push_back(SrModel::Face(V.size(), i2, i ));
+      F.push_back(SrModel::Face(V.size()+1, i1, i3 ));
 
       if ( smooth )
-       { n1 = N.validate ( n+1 );
-         Fn.push().set ( N.size(), N.size(), N.size() );
-         Fn.push().set ( N.size()+1, N.size()+1, N.size()+1 );
+       { n1 = (n+1)%N.size();//N.validate ( n+1 );
+         Fn.push_back(SrModel::Face(N.size(), N.size(), N.size() ));
+         Fn.push_back(SrModel::Face(N.size()+1, N.size()+1, N.size()+1 ));
          n++;
        }
     }
 
-   V.push(c.a);
-   V.push(c.b);
+   V.push_back(c.a);
+   V.push_back(c.b);
    if ( smooth )
-    { N.push()=minus_va;
-      N.push()=va;
+    { N.push_back(minus_va);
+      N.push_back(va);
     }
 
    compress ();
@@ -1400,9 +1405,9 @@ SBAPI void SrModel::computeNormals(int flat)
 // 	}
 // 	else
 	{
-		N.size(V.size()); // set normal vector to the same size
-		N.setall(SrPnt(0,0,0));
-		Fn.size(F.size());
+		N.resize(V.size()); // set normal vector to the same size
+		N.assign(N.size(),SrPnt(0,0,0));
+		Fn.resize(F.size());
 		for (int i=0;i<F.size();i++)
 		{
 			SrVec fn = face_normal(i);

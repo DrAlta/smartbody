@@ -79,7 +79,9 @@ SrSnColorSurf* SBAnimationBlend::createFlatSurface( float depth, unsigned int di
 			pnt = SrVec( xPos, yPos, zPos );
 
 			//surf_model->V.push(pnt); // set sphere as surf
-			surf_model->V.push().set(grid_array[i*dim + j]);
+			SrVec tempV; tempV.set(grid_array[i*dim + j]);
+			surf_model->V.push_back(tempV);
+			//surf_model->V.push().set(grid_array[i*dim + j]);
 			VecOfInt adjs;
 			for (int x=-1;x<=1;x++) // get adjacent vertices
 			{
@@ -104,8 +106,11 @@ SrSnColorSurf* SBAnimationBlend::createFlatSurface( float depth, unsigned int di
 	{
 		for (int j=0; j<dim-1; j++)
 		{
-			surf_model->F.push().set( i*dim+j, i*dim+j+1, (i+1)*dim+j+1 );
-			surf_model->F.push().set( i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j );
+			//surf_model->F.push().set( i*dim+j, i*dim+j+1, (i+1)*dim+j+1 );
+			//surf_model->F.push().set( i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j );
+			surf_model->F.push_back(SrModel::Face(i*dim+j, i*dim+j+1, (i+1)*dim+j+1 ));
+			surf_model->F.push_back(SrModel::Face(i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j ));
+			
 		}
 	}
 	surf->changed(true); // force update surf
@@ -179,7 +184,9 @@ SrSnColorSurf* SBAnimationBlend::createCurveSurface( float radius, unsigned int 
 			pnt = SrVec( float(ctr.x+r*sin(phi)*sin(theta)), float(ctr.y+r*cos(phi)), float(ctr.z+r*sin(phi)*cos(theta)) );
 
 			//surf_model->V.push(pnt); // set sphere as surf
-			surf_model->V.push().set(grid_array[i*dim + j]);
+			//surf_model->V.push().set(grid_array[i*dim + j]);
+			SrVec tempV; tempV.set(grid_array[i*dim + j]);
+			surf_model->V.push_back(tempV);
 			VecOfInt adjs;
 			for (int x=-1;x<=1;x++) // get adjacent vertices
 			{
@@ -205,8 +212,11 @@ SrSnColorSurf* SBAnimationBlend::createCurveSurface( float radius, unsigned int 
 	{
 		for (int j=0; j<dim-1; j++)
 		{
-			surf_model->F.push().set( i*dim+j, i*dim+j+1, (i+1)*dim+j+1 );
-			surf_model->F.push().set( i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j );
+			//surf_model->F.push().set( i*dim+j, i*dim+j+1, (i+1)*dim+j+1 );
+			//surf_model->F.push().set( i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j );
+
+			surf_model->F.push_back(SrModel::Face( i*dim+j, i*dim+j+1, (i+1)*dim+j+1 ));
+			surf_model->F.push_back(SrModel::Face( i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j  ));
 		}
 	}
 	surf->changed(true); // force update surf

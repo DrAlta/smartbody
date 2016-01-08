@@ -2123,19 +2123,19 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 							
 						for (size_t x = 2; x < fVec.size(); x++)
 						{
-							newModel->F.push().set(fVec[0], fVec[x - 1], fVec[x]);
-							newModel->Fm.push() = curmtl;
+							newModel->F.push_back(SrModel::Face(fVec[0], fVec[x - 1], fVec[x]));
+							newModel->Fm.push_back(curmtl);
 							if (ftVec.size() > x)
-								newModel->Ft.push().set(ftVec[0], ftVec[x - 1], ftVec[x]);
+								newModel->Ft.push_back(SrModel::Face(ftVec[0], ftVec[x - 1], ftVec[x]));
 							else if (ftVec.size() > 2)
-								newModel->Ft.push().set(ftVec[0], ftVec[1], ftVec[2]);
+								newModel->Ft.push_back(SrModel::Face(ftVec[0], ftVec[1], ftVec[2]));
 							else
-								newModel->Ft.push().set(0, 0, 0);
+								newModel->Ft.push_back(SrModel::Face(0, 0, 0));
 							
 							if (fnVec.size() > x)
-								newModel->Fn.push().set(fnVec[0], fnVec[x - 1], fnVec[x]);
+								newModel->Fn.push_back(SrModel::Face(fnVec[0], fnVec[x - 1], fnVec[x]));
 							else
-								newModel->Fn.push().set(fnVec[0], fnVec[1], fnVec[2]);
+								newModel->Fn.push_back(SrModel::Face(fnVec[0], fnVec[1], fnVec[2]));
 						}
 					}
 					/*
@@ -2217,14 +2217,14 @@ void ParserCOLLADAFast::setModelVertexSource( std::string& sourceName, std::stri
 // 				SrVec pos = (*sourceArray)[i];
 // 				LOG("pos = %f %f %f",pos[0],pos[1],pos[2]);
 // 			}
-			model->V.push((*sourceArray)[i]);										
+			model->V.push_back((*sourceArray)[i]);										
 		}
 	}
 	else if (semanticName == "NORMAL" && sourceArray && model->N.size() == 0)
 	{
 		for (unsigned int i=0;i<sourceArray->size();i++)
 		{
-			model->N.push((*sourceArray)[i]);										
+			model->N.push_back((*sourceArray)[i]);										
 		}
 	}
 	else if (semanticName == "TEXCOORD" && sourceArray && model->T.size() == 0)
@@ -2232,14 +2232,14 @@ void ParserCOLLADAFast::setModelVertexSource( std::string& sourceName, std::stri
 		for (unsigned int i=0;i<sourceArray->size();i++)
 		{
 			SrVec ts = (*sourceArray)[i];
-			model->T.push(SrVec2(ts[0],ts[1]));										
+			model->T.push_back(SrVec2(ts[0],ts[1]));										
 		}
 	}
 	else if (semanticName == "COLOR" && sourceArray && model->Vc.size() == 0)
 	{
 		for (unsigned int i=0;i<sourceArray->size();i++)
 		{			
-			model->Vc.push((*sourceArray)[i]);										
+			model->Vc.push_back((*sourceArray)[i]);										
 		}
 	}
 }

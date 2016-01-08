@@ -254,8 +254,10 @@ static bool process_line ( const SrString& line,
 
    if ( in.last_token()=="v" ) // v x y z [w]
     { //SR_TRACE1 ( "v" );
-      m.V.push();
-      in >> m.V.top();	 
+      //m.V.push();
+	  SrVec topVec;
+      in >> topVec;	 
+	  m.V.push_back(topVec);
 	  // more to read after the 
 	  if (in.get_token() != SrInput::EndOfFile)
 	  {
@@ -263,19 +265,21 @@ static bool process_line ( const SrString& line,
 		  SrVec vColor;
 		  in >> vColor;
 		  vColor /= 255.f; // normalize color
-		  m.Vc.push();
-		  m.Vc.top() = vColor;		 
+		  m.Vc.push_back(vColor);
 	  }
     }
    else if ( in.last_token()=="vn" ) // vn i j k
     { //SR_TRACE1 ( "vn" );
-      m.N.push();
-      in >> m.N.top();
+      SrVec vN;
+      in >> vN;
+	  m.N.push_back(vN);
     }
    else if ( in.last_token()=="vt" ) // vt u v [w]
     { //SR_TRACE1 ( "vt" );
-      m.T.push();
-      in >> m.T.top();
+	
+		SrVec2 vT;
+		in >> vT;
+		m.T.push_back(vT);
     }
    else if ( in.last_token()=="g" )
     { //SR_TRACE1 ( "g" );
@@ -295,14 +299,14 @@ static bool process_line ( const SrString& line,
       if ( v.size()<3 ) return false;
 
       for ( i=2; i<v.size(); i++ )
-       { m.F.push().set ( v[0], v[i-1], v[i] );
-         m.Fm.push() = curmtl;
+       { m.F.push_back(SrModel::Face( v[0], v[i-1], v[i] ));
+         m.Fm.push_back(curmtl);
 
          if ( t[0]>=0 && t[1]>=0 && t[i]>=0 )
-          m.Ft.push().set( t[0], t[i-1], t[i] );
+          m.Ft.push_back(SrModel::Face( t[0], t[i-1], t[i] ));
 
          if ( n[0]>=0 && n[1]>=0 && n[i]>=0 )
-          m.Fn.push().set ( n[0], n[i-1], n[i] );
+          m.Fn.push_back(SrModel::Face(  n[0], n[i-1], n[i] ));
        }
     }
    else if ( in.last_token()=="s" ) // smoothing groups not supported

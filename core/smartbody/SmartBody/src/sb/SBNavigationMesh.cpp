@@ -88,7 +88,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	inMesh.get_bounding_box(bBox);
 	const float* bmin = &bBox.a[0];
 	const float* bmax = &bBox.b[0];
-	const float* verts = &inMesh.V.get(0)[0];
+	const float* verts = &inMesh.V[0][0];
  	const int nverts = inMesh.V.size();
 #if defined(__ANDROID__) || defined(SB_IPHONE)
  	//const int* tris = &inMesh.F.get(0)[0];
@@ -101,7 +101,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
               tris[i*3+2] = inMesh.F.get(i)[2];
         }
 #else
-	const int* tris = &inMesh.F.get(0)[0];
+	const int* tris = &inMesh.F[0][0];
 #endif
  	const int ntris = inMesh.F.size();
 
@@ -316,8 +316,8 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	{
 		// copy navigation mesh to SrModel
 		naviMesh = new SrModel();
-		naviMesh->V.size(m_dmesh->nverts);
-		naviMesh->F.size(m_dmesh->ntris);
+		naviMesh->V.resize(m_dmesh->nverts);
+		naviMesh->F.resize(m_dmesh->ntris);
 
 		for (int i=0;i<m_dmesh->nverts;i++)
 		{

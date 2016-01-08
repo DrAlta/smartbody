@@ -1111,9 +1111,9 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 										xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
 									offset.z = (float) atof(zAttr.c_str());									
 									if (transformNodeName == "position")
-										model->V.push(offset);
+										model->V.push_back(offset);
 									else if (transformNodeName == "normal")
-										model->N.push(offset);
+										model->N.push_back(offset);
 								}
 								
 							}							
@@ -1134,7 +1134,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 										xml_utils::xml_translate(&yAttr, yNode->getNodeValue());
 									offset.y = 1.f - (float) atof(yAttr.c_str());	
 									//offset.y = (float) atof(yAttr.c_str());	
-									model->T.push(offset);									
+									model->T.push_back(offset);									
 								}
 							}						
 						}
@@ -1209,10 +1209,10 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 						}
 						
 						// no material for now.
-						model->Fm.push(0); // use first material
-						model->F.push().set(v1,v2,v3);
-						model->Ft.push().set(t1,t2,t3);
-						model->Fn.push().set(v1,v2,v3);
+						model->Fm.push_back(0); // use first material
+						model->F.push_back(SrModel::Face(v1,v2,v3));
+						model->Ft.push_back(SrModel::Face(t1,t2,t3));
+						model->Fn.push_back(SrModel::Face(v1,v2,v3));
 					}	
 					faceNode = faceNode->getNextSibling();
 				}

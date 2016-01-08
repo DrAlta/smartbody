@@ -491,9 +491,9 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 
 				// extract vertices and normals
 				int numVertices = scene->mMeshes[m]->mNumVertices;
-				model->V.size(numVertices);
-				model->N.size(numVertices);
-				model->T.size(numVertices);
+				model->V.resize(numVertices);
+				model->N.resize(numVertices);
+				model->T.resize(numVertices);
 				bool hasNormal = false;
 				for (int v = 0; v < numVertices; v++)
 				{
@@ -540,10 +540,10 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 
 				// extract faces
 				int numFaces = scene->mMeshes[m]->mNumFaces;
-				model->F.size(numFaces);
-				model->Fm.size(numFaces);
-				model->Ft.size(numFaces);
-				model->Fn.size(numFaces);
+				model->F.resize(numFaces);
+				model->Fm.resize(numFaces);
+				model->Ft.resize(numFaces);
+				model->Fn.resize(numFaces);
 				for (int f = 0; f < numFaces; f++)
 				{
 					int numIndices = scene->mMeshes[m]->mFaces[f].mNumIndices;
@@ -588,7 +588,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					model->M.size(1);
 					model->M[0] = SrMaterial(*allMaterials[materialIndex]);
 					model->mtlnames.push(allMaterialNames[0].c_str());
-					model->Fm.size(numFaces);
+					model->Fm.resize(numFaces);
 					for (int fm = 0; fm < numFaces; fm++)
 					{
 						model->Fm[fm] = 0;

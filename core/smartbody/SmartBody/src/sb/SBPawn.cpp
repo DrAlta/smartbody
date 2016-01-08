@@ -489,30 +489,30 @@ void SBPawn::createMeshFromCollisionSurface(std::string name, SrVec color)
 
 	SrModel* model = new SrModel();
 
-	model->V.push(SrPnt(  1.0f * boxSize[0], -1.0f * boxSize[1], -1.0f * boxSize[2]  ));  // 0
-	model->V.push(SrPnt(  1.0f * boxSize[0],  1.0f * boxSize[1], -1.0f * boxSize[2]  ));  // 1
-	model->V.push(SrPnt(  1.0f * boxSize[0],  1.0f * boxSize[1],  1.0f * boxSize[2]  ));  // 2
-	model->V.push(SrPnt(  1.0f * boxSize[0], -1.0f * boxSize[1],  1.0f * boxSize[2]  ));  // 3
+	model->V.push_back(SrPnt(  1.0f * boxSize[0], -1.0f * boxSize[1], -1.0f * boxSize[2]  ));  // 0
+	model->V.push_back(SrPnt(  1.0f * boxSize[0],  1.0f * boxSize[1], -1.0f * boxSize[2]  ));  // 1
+	model->V.push_back(SrPnt(  1.0f * boxSize[0],  1.0f * boxSize[1],  1.0f * boxSize[2]  ));  // 2
+	model->V.push_back(SrPnt(  1.0f * boxSize[0], -1.0f * boxSize[1],  1.0f * boxSize[2]  ));  // 3
 
-	model->V.push(SrPnt( -1.0f * boxSize[0], -1.0f * boxSize[1],  1.0f * boxSize[2] ));  // 4
-	model->V.push(SrPnt( -1.0f * boxSize[0],  1.0f * boxSize[1],  1.0f * boxSize[2]  ));  // 5
-	model->V.push(SrPnt( -1.0f * boxSize[0],  1.0f * boxSize[1], -1.0f * boxSize[2]  ));  // 6
-	model->V.push(SrPnt( -1.0f * boxSize[0], -1.0f * boxSize[1], -1.0f * boxSize[2] ));  // 7
+	model->V.push_back(SrPnt( -1.0f * boxSize[0], -1.0f * boxSize[1],  1.0f * boxSize[2] ));  // 4
+	model->V.push_back(SrPnt( -1.0f * boxSize[0],  1.0f * boxSize[1],  1.0f * boxSize[2]  ));  // 5
+	model->V.push_back(SrPnt( -1.0f * boxSize[0],  1.0f * boxSize[1], -1.0f * boxSize[2]  ));  // 6
+	model->V.push_back(SrPnt( -1.0f * boxSize[0], -1.0f * boxSize[1], -1.0f * boxSize[2] ));  // 7
 
 	
 	// CW
-	model->F.push().set(7, 1, 0);
-	model->F.push().set(6, 1, 7);
-	model->F.push().set(1, 2, 3);
-	model->F.push().set(0, 1, 3);
-	model->F.push().set(6, 2, 1);
-	model->F.push().set(5, 2, 6);
-	model->F.push().set(7, 5, 6);
-	model->F.push().set(5, 7, 4);
-	model->F.push().set(2, 4, 3);
-	model->F.push().set(2, 5, 4);
-	model->F.push().set(7, 0, 3);
-	model->F.push().set(4, 7, 3);
+	model->F.push_back(SrModel::Face( 7, 1, 0));
+	model->F.push_back(SrModel::Face(6, 1, 7));
+	model->F.push_back(SrModel::Face(1, 2, 3));
+	model->F.push_back(SrModel::Face(0, 1, 3));
+	model->F.push_back(SrModel::Face(6, 2, 1));
+	model->F.push_back(SrModel::Face(5, 2, 6));
+	model->F.push_back(SrModel::Face(7, 5, 6));
+	model->F.push_back(SrModel::Face(5, 7, 4));
+	model->F.push_back(SrModel::Face(2, 4, 3));
+	model->F.push_back(SrModel::Face(2, 5, 4));
+	model->F.push_back(SrModel::Face(7, 0, 3));
+	model->F.push_back(SrModel::Face(4, 7, 3));
 
 	// edges
 	SrArray<int> edges;
@@ -544,7 +544,7 @@ void SBPawn::createMeshFromCollisionSurface(std::string name, SrVec color)
 
 
 	int numFaces = model->F.size();
-	model->Fm.size(numFaces);
+	model->Fm.resize(numFaces);
 
 	model->computeNormals(); 
 
