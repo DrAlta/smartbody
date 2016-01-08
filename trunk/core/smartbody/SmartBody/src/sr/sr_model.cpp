@@ -620,28 +620,28 @@ bool SrModel::save ( SrOutput &o ) const
 
    // save vertices (V)
    if ( V.size() ) 
-    { o << "<vertices> " << V.size() << srnl;
+    { o << "<vertices> " << (int) V.size() << srnl;
       for ( i=0; i<V.size(); i++ ) o << V[i] << srnl;
       o << "</vertices>\n\n";
     }
 
    // save faces (F)
    if ( F.size() )
-    { o << "<vertices_per_face> " << F.size() << srnl;
+    { o << "<vertices_per_face> " << (int) F.size() << srnl;
       for ( i=0; i<F.size(); i++ ) o << F[i] << srnl;
       o << "</vertices_per_face>\n\n";
     }
 
    // save normals (N)
    if ( N.size() )
-    { o << "<normals> " << N.size() << srnl;
+    { o << "<normals> " << (int) N.size() << srnl;
       for ( i=0; i<N.size(); i++ ) o << N[i] << srnl;
       o << "</normals>\n\n";
     }
 
    // save normals per face (Fn)
    if ( Fn.size() )
-    { o << "<normals_per_face> " << Fn.size() << srnl;
+    { o << "<normals_per_face> " << (int) Fn.size() << srnl;
       for ( i=0; i<Fn.size(); i++ ) o << Fn[i] << srnl;
       o << "</normals_per_face>\n\n";
     }
@@ -664,14 +664,14 @@ bool SrModel::save ( SrOutput &o ) const
 
    // save materials (M)
    if ( M.size() )
-    { o << "<materials> " << M.size() << srnl;
+    { o << "<materials> " << (int) M.size() << srnl;
       for ( i=0; i<M.size(); i++ ) o << M[i] << srnl;
       o << "</materials>\n\n";
     }
 
    // save materials per face (Fm)
    if ( Fm.size() )
-    { o << "<materials_per_face> " << Fm.size() << srnl;
+    { o << "<materials_per_face> " << (int) Fm.size() << srnl;
       for ( i=0; i<Fm.size(); i++ ) o << Fm[i] << srnl;
       o << "</materials_per_face>\n\n";
     }
