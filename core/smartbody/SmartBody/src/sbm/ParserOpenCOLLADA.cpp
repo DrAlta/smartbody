@@ -1996,7 +1996,7 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 	return "";
 }
 
-void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale )
+void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file, std::vector<SrMaterial>& M, std::vector<SrString>& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale )
 {
 	std::map<std::string,bool> vertexSemantics;
 	//const DOMNodeList* list = node->getChildNodes();
@@ -2178,7 +2178,12 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 					std::string materialID = materialName;
 					if (materialId2Name.find(materialName) != materialId2Name.end())
 						materialID = materialId2Name[materialName];
-					curmtl = mnames.lsearch(materialID.c_str());
+					//curmtl = mnames.lsearch(materialID.c_str());
+					std::vector<SrString>::iterator mi = std::find(mnames.begin(),mnames.end(), materialID.c_str());
+					if ( mi != mnames.end())
+					{
+						curmtl = mi - mnames.begin();//*mi;
+					}
 					//curmtl = mnames.lsearch(materialName.c_str());
 					std::map<int, std::string> inputMap;
 					int pStride = 0;
@@ -2509,7 +2514,7 @@ void ParserOpenCOLLADA::parseLibraryImages(DOMNode* node, std::map<std::string, 
 	}
 }
 
-void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
+void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name,std::vector<SrMaterial>& M, std::vector<SrString>& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
 {
 	//const DOMNodeList* list = node->getChildNodes();
 	DOMNode* curNode = node->getFirstChild();
@@ -2530,9 +2535,9 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 			//std::string materialName = materialId2Name[materialId];
 			SrMaterial material;
 			material.init();
-			M.push(material);
+			M.push_back(material);
 			SrString matName(materialId.c_str());
-			mnames.push(matName);
+			mnames.push_back(matName);
 
 			std::vector<DOMNode*> initNodes;
 			ParserOpenCOLLADA::getChildNodes("init_from", node, initNodes);
@@ -2557,7 +2562,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 
 					std::string imageId = diffuseTexture;
 					std::string imageFile = pictureId2File[imageId];
-					std::string mtlName = mnames.top();
+					std::string mtlName = mnames.back();
 #if (BOOST_VERSION > 104400)
 					std::string fileExt = boost::filesystem::extension(imageFile);
 #else
@@ -2578,7 +2583,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 					float w = 1;
 					if (tokens.size() == 4)
 						w = (float)atof(tokens[3].c_str());
-					M.top().diffuse = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
+					M.back().diffuse = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
 				}
 			}
 
@@ -2595,7 +2600,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 
 					std::string imageId = diffuseTexture;
 					std::string imageFile = pictureId2File[imageId];
-					std::string mtlName = mnames.top();
+					std::string mtlName = mnames.back();
 #if (BOOST_VERSION > 104400)
 					std::string fileExt = boost::filesystem::extension(imageFile);
 #else
@@ -2605,8 +2610,8 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 					if (diffuseTexture.find(imageId) != std::string::npos)
 						mtlTexBumpMap[mtlName] = fileName + fileExt;	
 
-					M.top().specular = SrColor(0.1f,0.1f,0.1f,1.f);
-					M.top().shininess = 20;
+					M.back().specular = SrColor(0.1f,0.1f,0.1f,1.f);
+					M.back().shininess = 20;
 				}			
 			}
 
@@ -2623,7 +2628,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 
 					std::string imageId = diffuseTexture;
 					std::string imageFile = pictureId2File[imageId];
-					std::string mtlName = mnames.top();
+					std::string mtlName = mnames.back();
 #if (BOOST_VERSION > 104400)
 					std::string fileExt = boost::filesystem::extension(imageFile);
 #else
@@ -2633,8 +2638,8 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 					if (diffuseTexture.find(imageId) != std::string::npos)
 						mtlTexSpecularMap[mtlName] = fileName + fileExt;	
 
-					M.top().specular = SrColor(0.1f,0.1f,0.1f,1.f);
-					M.top().shininess = 20;
+					M.back().specular = SrColor(0.1f,0.1f,0.1f,1.f);
+					M.back().shininess = 20;
 				}			
 			}
 			//DOMNode* initFromNode = ParserOpenCOLLADA::getNode("init_from", node);
@@ -2652,7 +2657,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 				std::string imageFile = pictureId2File[imageId];
 				SrString mapKaName(imageFile.c_str());
 				std::string texFile = (const char*) mapKaName;
-				std::string mtlName = mnames.top();
+				std::string mtlName = mnames.back();
 #if (BOOST_VERSION > 104400)
 				std::string fileExt = boost::filesystem::extension(texFile);
 #else
@@ -2678,7 +2683,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 				float w = 1;
 				if (tokens.size() == 4)
 					w = (float)atof(tokens[3].c_str());
-				M.top().emission = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
+				M.back().emission = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
 			}
 
 			DOMNode* ambientNode = ParserOpenCOLLADA::getNode("ambient", node);
@@ -2692,7 +2697,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 				float w = 1;
 				if (tokens.size() == 4)
 					w = (float)atof(tokens[3].c_str());
-				M.top().ambient = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
+				M.back().ambient = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
 			}
 			DOMNode* transparentNode = ParserOpenCOLLADA::getNode("transparent", node);
 			if (transparentNode)
@@ -2729,7 +2734,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 					}
 				}
 				//float alpha = float(1.0 - xml_utils::xml_translate_float(colorNode->getTextContent()));				
-				M.top().diffuse.a = (srbyte) ( alpha*255.0f );
+				M.back().diffuse.a = (srbyte) ( alpha*255.0f );
 			}
 		}
 		curNode = curNode->getNextSibling();
@@ -2915,8 +2920,8 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 			ParserOpenCOLLADA::parseLibraryMaterials(materialNode, effectId2MaterialId);
 
 		// start parsing effect
-		SrArray<SrMaterial> M;
-		SrStringArray mnames;
+		std::vector<SrMaterial> M;
+		std::vector<SrString> mnames;
 		std::map<std::string,std::string> mtlTextMap;
 		std::map<std::string,std::string> mtlTextBumpMap;
 		std::map<std::string,std::string> mtlTextSpecularMap;

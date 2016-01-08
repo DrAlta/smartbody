@@ -548,10 +548,10 @@ void SBPawn::createMeshFromCollisionSurface(std::string name, SrVec color)
 
 	model->computeNormals(); 
 
-	model->M.size(1);
+	model->M.resize(1);
 	model->M[0] = SrMaterial();
 	model->M[0].diffuse.set(color[0], color[1], color[2], 1.0f);
-	model->mtlnames.push("unknown");
+	model->mtlnames.push_back("unknown");
 	model->set_one_material(model->M[0]);
 	
 	SrSnModel* srSnModelStatic = new SrSnModel();

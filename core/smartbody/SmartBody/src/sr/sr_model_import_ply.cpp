@@ -164,10 +164,10 @@ bool SrModel::import_ply( const char* file )
 {
 
 	long nvertices, ntriangles;
-	M.push();
-	M.top().diffuse = SrColor::gray;
+	M.push_back(SrMaterial());
+	M.back().diffuse = SrColor::gray;
 
-	mtlnames.push("noname");
+	mtlnames.push_back("noname");
 	p_ply ply = ply_open(file, NULL, 0, NULL);
 	if (!ply) return false;
 	if (!ply_read_header(ply)) return false;
@@ -191,9 +191,9 @@ bool SrModel::import_ply( const char* file )
 			material.init();
 			material.diffuse = SrColor::white;
 			//M.push().init();
-			M.push(material);        
+			M.push_back(material);        
 			//SR_TRACE1 ( "new material: "<<in.last_token() );	
-			mtlnames.push ( mtlName.c_str() );
+			mtlnames.push_back ( mtlName.c_str() );
 			LOG("texture found : %s", texFile.c_str());
 			mtlTextureNameMap[mtlName] = texFile;	
 		}

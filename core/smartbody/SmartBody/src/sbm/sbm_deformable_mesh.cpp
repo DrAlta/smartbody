@@ -402,7 +402,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
 		SrSnModel* dMeshStatic = dMeshStatic_p[pos];
 		dMeshStatic->shape().computeTangentBiNormal();
-		SrArray<SrMaterial>& matList = dMeshDynamic->shape().M; 	
+		std::vector<SrMaterial>& matList = dMeshDynamic->shape().M; 	
 		std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
 		std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;		
 		std::map<std::string,std::string> mtlSpecularTexMap = dMeshDynamic->shape().mtlSpecularTexNameMap;		
@@ -1076,7 +1076,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 			// 7 useAlphaBlend
 			newMat.useAlphaBlend = material.usealphablend();
 
-			newModel->M.push(newMat);
+			newModel->M.push_back(newMat);
 		}
 		// 3
 		for (int x = 0; x < meshModel.vertexcoordinates_size() / 3; ++x)
@@ -1145,7 +1145,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 		// 13
 		for (int x = 0; x < meshModel.materialnames_size(); ++x)
 		{
-			newModel->mtlnames.push(meshModel.materialnames(x).c_str());
+			newModel->mtlnames.push_back(meshModel.materialnames(x).c_str());
 		}
 		// 14
 		for (int x = 0; x < meshModel.materialtodiffusetexturemapping_size(); ++x)

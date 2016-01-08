@@ -1793,7 +1793,7 @@ std::string ParserCOLLADAFast::getGeometryType(std::string idString)
 	return "";
 }
 
-void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, const char* file, SrArray<SrMaterial>& M, SrStringArray& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale )
+void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, const char* file, std::vector<SrMaterial>& M, std::vector<SrString>& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale )
 {
 	SrTimer timer;
 	timer.start();
@@ -1978,7 +1978,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					std::string materialID = materialName;
 					if (materialId2Name.find(materialName) != materialId2Name.end())
 						materialID = materialId2Name[materialName];
-					curmtl = mnames.lsearch(materialID.c_str());
+					curmtl = std::find(mnames.begin(),mnames.end(), materialID.c_str()) - mnames.begin();
 					//curmtl = mnames.lsearch(materialName.c_str());
 					//LOG("Material name is %s", materialName.c_str());
 					std::map<int, std::string> inputMap;
@@ -2330,7 +2330,7 @@ void ParserCOLLADAFast::parseLibraryImages(rapidxml::xml_node<>* node, std::map<
 	}
 }
 
-void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, SrArray<SrMaterial>& M, SrStringArray& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
+void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, std::vector<SrMaterial>& M, std::vector<SrString>& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
 {
 	//const DOMNodeList* list = node->getChildNodes();
 	rapidxml::xml_node<>* curNode = node->first_node();
@@ -2348,9 +2348,9 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 			//std::string materialName = materialId2Name[materialId];
 			SrMaterial material;
 			material.init();
-			M.push(material);
+			M.push_back(material);
 			SrString matName(materialId.c_str());
-			mnames.push(matName);
+			mnames.push_back(matName);
 
 			std::vector<rapidxml::xml_node<>*> initNodes;
 			ParserCOLLADAFast::getChildNodes("init_from", node, initNodes);
@@ -2372,7 +2372,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 
 					std::string imageId = diffuseTexture;
 					std::string imageFile = pictureId2File[imageId];
-					std::string mtlName = mnames.top();
+					std::string mtlName = mnames.back();
 #if (BOOST_VERSION > 104400)
 					std::string fileExt = boost::filesystem::extension(imageFile);
 #else
@@ -2392,7 +2392,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 					float w = 1;
 					if (tokens.size() == 4)
 						w = (float)atof(tokens[3].c_str());
-					M.top().diffuse = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
+					M.back().diffuse = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
 				}
 			}
 
@@ -2407,7 +2407,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 
 					std::string imageId = diffuseTexture;
 					std::string imageFile = pictureId2File[imageId];
-					std::string mtlName = mnames.top();
+					std::string mtlName = mnames.back();
 #if (BOOST_VERSION > 104400)
 					std::string fileExt = boost::filesystem::extension(imageFile);
 #else
@@ -2417,8 +2417,8 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 					if (diffuseTexture.find(imageId) != std::string::npos)
 						mtlTexBumpMap[mtlName] = fileName + fileExt;		
 
-					M.top().specular = SrColor(0.1f,0.1f,0.1f,1.f);
-					M.top().shininess = 20;
+					M.back().specular = SrColor(0.1f,0.1f,0.1f,1.f);
+					M.back().shininess = 20;
 				}			
 			}
 
@@ -2433,7 +2433,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 
 					std::string imageId = diffuseTexture;
 					std::string imageFile = pictureId2File[imageId];
-					std::string mtlName = mnames.top();
+					std::string mtlName = mnames.back();
 #if (BOOST_VERSION > 104400)
 					std::string fileExt = boost::filesystem::extension(imageFile);
 #else
@@ -2443,8 +2443,8 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 					if (diffuseTexture.find(imageId) != std::string::npos)
 						mtlTexSpecularMap[mtlName] = fileName + fileExt;	
 
-					M.top().specular = SrColor(0.1f,0.1f,0.1f,1.f);
-					M.top().shininess = 20;
+					M.back().specular = SrColor(0.1f,0.1f,0.1f,1.f);
+					M.back().shininess = 20;
 				}			
 			}
 			//rapidxml::xml_node<>* initFromNode = ParserCOLLADAFast::getNode("init_from", node);
@@ -2461,7 +2461,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 				std::string imageFile = pictureId2File[imageId];
 				std::string mapKaName = imageFile;
 				std::string texFile = mapKaName;
-				std::string mtlName = mnames.top();
+				std::string mtlName = mnames.back();
 #if (BOOST_VERSION > 104400)
 				std::string fileExt = boost::filesystem::extension(texFile);
 #else
@@ -2487,7 +2487,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 				float w = 1;
 				if (tokens.size() == 4)
 					w = (float)atof(tokens[3].c_str());
-				M.top().emission = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
+				M.back().emission = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
 			}
 
 			rapidxml::xml_node<>* ambientNode = ParserCOLLADAFast::getNode("ambient", node);
@@ -2502,7 +2502,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 					float w = 1;
 					if (tokens.size() == 4)
 						w = (float)atof(tokens[3].c_str());
-					M.top().ambient = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
+					M.back().ambient = SrColor((float)atof(tokens[0].c_str()), (float)atof(tokens[1].c_str()), (float)atof(tokens[2].c_str()), w);
 				}
 			}
 			rapidxml::xml_node<>* transparentNode = ParserCOLLADAFast::getNode("transparent", node);
@@ -2536,14 +2536,14 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 							//alpha = 1.f - colorVec.norm();		
 							if (alpha >= 1.f)
 							{
-								M.top().useAlphaBlend = false;
+								M.back().useAlphaBlend = false;
 							}
 						}														
 					}
 					else if (opaqueMode == "A_ONE")
 					{
 						alpha = 1.0f;
-						M.top().useAlphaBlend = true;
+						M.back().useAlphaBlend = true;
 					}
 				}
 				else // by default it should be RGB_ZERO ?
@@ -2567,12 +2567,12 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 						//alpha = 1.f - colorVec.norm();		
 						if (alpha >= 1.f)
 						{
-							M.top().useAlphaBlend = false;
+							M.back().useAlphaBlend = false;
 						}
 					}														
 				}				
 				//float alpha = float(1.0 - xml_utils::xml_translate_float(colorNode->getTextContent()));				
-				M.top().diffuse.a = (srbyte) ( alpha*255.0f );
+				M.back().diffuse.a = (srbyte) ( alpha*255.0f );
 			}
 		}
 		curNode = curNode->next_sibling();
@@ -2761,8 +2761,8 @@ bool ParserCOLLADAFast::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 			ParserCOLLADAFast::parseLibraryMaterials(materialNode, effectId2MaterialId);
 
 		// start parsing effect
-		SrArray<SrMaterial> M;
-		SrStringArray mnames;
+		std::vector<SrMaterial> M;
+		std::vector<SrString> mnames;
 		std::map<std::string,std::string> mtlTextMap;
 		std::map<std::string,std::string> mtlTextBumpMap;
 		std::map<std::string,std::string> mtlTextSpecularMap;

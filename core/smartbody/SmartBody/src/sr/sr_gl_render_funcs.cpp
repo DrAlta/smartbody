@@ -571,7 +571,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    std::vector<SrVec>&         V = model.V;
    std::vector<SrVec>&         N = model.N;
    std::vector<SrPnt2>&        T = model.T;
-   SrArray<SrMaterial>&    M = model.M;
+   std::vector<SrMaterial>&    M = model.M;
 
    //LOG("F = %d, V = %d",F.size(), V.size());
    int fsize = F.size();

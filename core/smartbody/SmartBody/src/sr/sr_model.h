@@ -94,7 +94,7 @@ class SrModel : public SrSharedClass
        void set ( int i, int j, int k ) { a=i; b=j; c=k; }    
      };
 
-    SrArray<SrMaterial> M;  //!< Used materials
+    std::vector<SrMaterial> M;  //!< Used materials
     //SrArray<SrPnt>      V;  //!< Vertices coordinates
 	std::vector<SrVec>  V;
 	std::vector<SrVec>      Vc; // color of vertices
@@ -106,7 +106,7 @@ class SrModel : public SrSharedClass
 	std::vector<Face>      Fn;  //!< Indices to the normals in N (size can be<F.size())
 	std::vector<Face>      Ft;  //!< Indices to the texture coordinates in T
 
-	SrArray<SrPnt>      VOrig;  //!< Vertices original (if changed)
+	std::vector<SrPnt>      VOrig;  //!< Vertices original (if changed)
 
 #if 0
 	SrArray<SrVec>      Vc; // color of vertices
@@ -138,7 +138,7 @@ class SrModel : public SrSharedClass
 
     /*! Stores a name description for the materials in M.
         Will have size 0 if no names defined, otherwise will have size M.size() */
-    SrStringArray mtlnames;
+    std::vector<SrString> mtlnames;
     
     /*! May contain any desired name for the model. */
 	SrString name;
