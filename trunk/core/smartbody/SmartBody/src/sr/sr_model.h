@@ -138,7 +138,7 @@ class SrModel : public SrSharedClass
 
     /*! Stores a name description for the materials in M.
         Will have size 0 if no names defined, otherwise will have size M.size() */
-    std::vector<SrString> mtlnames;
+    std::vector<std::string> mtlnames;
     
     /*! May contain any desired name for the model. */
 	SrString name;

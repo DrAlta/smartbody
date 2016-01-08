@@ -406,7 +406,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
 		std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;		
 		std::map<std::string,std::string> mtlSpecularTexMap = dMeshDynamic->shape().mtlSpecularTexNameMap;		
-		for (int j=0;j<matList.size();j++)
+		for (size_t j=0;j<matList.size();j++)
 		{			
 			SrMaterial& mat = matList[j];	
 			std::string mtlName = dMeshDynamic->shape().mtlnames[j];
@@ -741,8 +741,8 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			iVtx++;
 		}
 
-		int numTris = dMeshStatic->shape().F.size();
-		for (int i=0; i < numTris ; i++)
+		size_t numTris = dMeshStatic->shape().F.size();
+		for (size_t i=0; i < numTris ; i++)
 		{
 			if (dMeshStatic->shape().F.size() <= i)
 				continue;				
@@ -989,7 +989,7 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		// 13
 		for (int m = 0; m < curModel.mtlnames.size(); ++m)
 		{
-			newMeshModel->add_materialnames((const char*)curModel.mtlnames[m]);
+			newMeshModel->add_materialnames( curModel.mtlnames[m].c_str());
 		}
 		// 14
 		std::map<std::string,std::string>::iterator iter;

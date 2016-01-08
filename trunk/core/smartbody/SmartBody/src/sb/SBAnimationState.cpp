@@ -333,7 +333,7 @@ void SBAnimationBlend::updateSmoothSurface( SrSnColorSurf* surf )
 	std::vector<VecOfDouble> weightList;
 	float maxError = 1e-30f;
 	float totalError = 0.f;
-	for (int i=0;i<surfModel->V.size();i++)
+	for (size_t i=0;i<surfModel->V.size();i++)
 	{
 		SrVec para = surfModel->V[i];
 		std::vector<double> weights;
@@ -346,7 +346,7 @@ void SBAnimationBlend::updateSmoothSurface( SrSnColorSurf* surf )
 	std::vector<float> smoothList;
 	float maxSmooth = 1e-30f;
 	float totalSmooth = 0.f;
-	for (int i=0;i<surfModel->V.size();i++)
+	for (size_t i=0;i<surfModel->V.size();i++)
 	{
 		const VecOfInt& adjIdx = surf->vtxAdjList[i];
 		VecOfDouble laplacian = weightList[i];
@@ -397,7 +397,7 @@ void SBAnimationBlend::updateErrorSurace( SrSnColorSurf* errorSurf, SrVec center
 	std::vector<VecOfDouble> weightList;
 	float maxError = 1e-30f;
 	float totalError = 0.f;
-	for (int i=0;i<surfModel->V.size();i++)
+	for (size_t i=0;i<surfModel->V.size();i++)
 	{
 		SrVec para = surfModel->V[i];
 		std::vector<double> weights;

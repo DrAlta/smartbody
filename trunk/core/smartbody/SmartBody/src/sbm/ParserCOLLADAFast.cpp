@@ -1793,7 +1793,7 @@ std::string ParserCOLLADAFast::getGeometryType(std::string idString)
 	return "";
 }
 
-void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, const char* file, std::vector<SrMaterial>& M, std::vector<SrString>& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale )
+void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, const char* file, std::vector<SrMaterial>& M, std::vector<std::string>& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale )
 {
 	SrTimer timer;
 	timer.start();
@@ -2168,7 +2168,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 			path.extract_file_name(filename);
 			SrStringArray paths;
 			paths.push ( path );
-			for (int i = 0; i < newModel->M.size(); i++)
+			for (size_t i = 0; i < newModel->M.size(); i++)
 			{
 			   std::string matName = newModel->mtlnames[i];
 			   if (newModel->mtlTextureNameMap.find(matName) != newModel->mtlTextureNameMap.end())
@@ -2330,7 +2330,7 @@ void ParserCOLLADAFast::parseLibraryImages(rapidxml::xml_node<>* node, std::map<
 	}
 }
 
-void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, std::vector<SrMaterial>& M, std::vector<SrString>& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
+void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, std::vector<SrMaterial>& M, std::vector<std::string>& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
 {
 	//const DOMNodeList* list = node->getChildNodes();
 	rapidxml::xml_node<>* curNode = node->first_node();
@@ -2350,7 +2350,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 			material.init();
 			M.push_back(material);
 			SrString matName(materialId.c_str());
-			mnames.push_back(matName);
+			mnames.push_back((const char*) matName);
 
 			std::vector<rapidxml::xml_node<>*> initNodes;
 			ParserCOLLADAFast::getChildNodes("init_from", node, initNodes);
@@ -2762,7 +2762,7 @@ bool ParserCOLLADAFast::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 
 		// start parsing effect
 		std::vector<SrMaterial> M;
-		std::vector<SrString> mnames;
+		std::vector<std::string> mnames;
 		std::map<std::string,std::string> mtlTextMap;
 		std::map<std::string,std::string> mtlTextBumpMap;
 		std::map<std::string,std::string> mtlTextSpecularMap;

@@ -2343,7 +2343,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 				maskColor.r = maskedBuffer[position3];
 				maskColor.g = maskedBuffer[position3 + 1];
 				maskColor.b = maskedBuffer[position3 + 2];
-				maskColor.a = 1.0f;
+				maskColor.a = 255;
 			}
 
 			
@@ -2370,7 +2370,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 				expressiveColor.r = expressiveBuffer[position3];
 				expressiveColor.g = expressiveBuffer[position3 + 1];
 				expressiveColor.b = expressiveBuffer[position3 + 2];
-				expressiveColor.a = 1.0f;
+				expressiveColor.a = 255;
 			}
 			float ecolor[4];
 			expressiveColor.get(ecolor);
@@ -2388,7 +2388,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 				neutralColor.r = neutralBuffer[position3];
 				neutralColor.g = neutralBuffer[position3 + 1];
 				neutralColor.b = neutralBuffer[position3 + 2];
-				neutralColor.a = 1.0f;
+				neutralColor.a = 255;
 			}
 			float ncolor[4];
 			neutralColor.get(ncolor);

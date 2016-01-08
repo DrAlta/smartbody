@@ -685,7 +685,9 @@ bool SrModel::save ( SrOutput &o ) const
    if ( savemtl )
     { o << "<material_names> " << srnl;
       for ( i=0; i<mtlnames.size(); i++ )
-       { if ( mtlnames[i][0] ) o << i << srspc << mtlnames[i] << srnl;
+       { 
+		   if ( mtlnames[i].size() > 0 ) 
+			   o << i << srspc << mtlnames[i].c_str() << srnl;
        }
       o << "</material_names>\n\n";
     }
@@ -708,14 +710,12 @@ struct EdgeNode : public SrTreeNode // EdgeNode is only internally used :
 
 void SrModel::make_edges ( SrArray<int> &E )
  {
-   int i;
-
    SrTree<EdgeNode> t;
 
    E.size(0);
    if ( F.empty() ) return;
    
-   for ( i=0; i<F.size(); i++ )
+   for (size_t i=0; i<F.size(); i++ )
     { t.insert_or_del ( new EdgeNode ( SR_MIN(F[i].a,F[i].b), SR_MAX(F[i].a,F[i].b) ) );
       t.insert_or_del ( new EdgeNode ( SR_MIN(F[i].b,F[i].c), SR_MAX(F[i].b,F[i].c) ) );
       t.insert_or_del ( new EdgeNode ( SR_MIN(F[i].c,F[i].a), SR_MAX(F[i].c,F[i].a) ) );
@@ -730,17 +730,16 @@ void SrModel::make_edges ( SrArray<int> &E )
 
 float SrModel::count_mean_vertex_degree ()
  {
-   int i;
    if ( F.empty() ) return 0.0f;
 
    SrArray<int> vi(V.size());
-   for ( i=0; i<vi.size(); i++ ) vi[i]=0;
+   for (size_t i=0; i<vi.size(); i++ ) vi[i]=0;
 
-   for ( i=0; i<F.size(); i++ )
+   for (size_t i=0; i<F.size(); i++ )
     { vi[F[i].a]++; vi[F[i].b]++; vi[F[i].c]++; }
 
    double k=0;
-   for ( i=0; i<vi.size(); i++ ) k += double(vi[i]);
+   for (size_t i=0; i<vi.size(); i++ ) k += double(vi[i]);
    return float( k/double(vi.size()) );
 
    /* old way:
@@ -893,13 +892,12 @@ void SrModel::flat ()
 
 void SrModel::set_one_material ( const SrMaterial& m )
  {
-   int i;
    mtlnames.resize(1);
    //mtlnames.size(1);
    M.resize(1);
    Fm.resize ( F.size() );
    M[0] = m;
-   for ( i=0; i<Fm.size(); i++ ) Fm[i]=0;
+   for (size_t i=0; i<Fm.size(); i++ ) Fm[i]=0;
    compress ();
  }
 
@@ -993,7 +991,7 @@ static void gen_normal ( int v, SrArray<SrVec>& vec, SrArray<int>& vi, SrModel *
 
 void SrModel::smooth ( float crease_angle )
  {
-   int v, i;
+   int i, v;
    SrTree<VertexNode> t;
    SrArray<int> vi;
    SrArray<SrVec> vec; // this is just a buffer to be used in gen_normal()
@@ -1003,15 +1001,15 @@ void SrModel::smooth ( float crease_angle )
    Fn.resize ( F.size() );
 
    vi.size(V.size());
-   for ( i=0; i<vi.size(); i++ ) vi[i]=0;
+   for (size_t j=0; j<vi.size(); j++ ) vi[j]=0;
 
-   for ( i=0; i<F.size(); i++ )
-    { insertv ( t, vi, F[i].a, i );
-      insertv ( t, vi, F[i].b, i );
-      insertv ( t, vi, F[i].c, i );
-      Fn[i].a = F[i].a;
-      Fn[i].b = F[i].b;
-      Fn[i].c = F[i].c;
+   for (size_t j=0; j<F.size(); j++ )
+    { insertv ( t, vi, F[j].a, j );
+      insertv ( t, vi, F[j].b, j );
+      insertv ( t, vi, F[j].c, j );
+      Fn[j].a = F[j].a;
+      Fn[j].b = F[j].b;
+      Fn[j].c = F[j].c;
     }
 
    // first pass will interpolate face normals around each vertex:
