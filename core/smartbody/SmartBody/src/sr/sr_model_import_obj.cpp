@@ -101,7 +101,7 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 }
 
 static void read_materials ( std::vector<SrMaterial>& M,
-                             std::vector<SrString>& mnames,
+                             std::vector<std::string>& mnames,
 							 std::map<std::string,std::string>& mtlTexMap,
 							 std::map<std::string,std::string>& mtlTexBumpMap,
 							 std::map<std::string,std::string>& mtlTexKsMap,
@@ -143,7 +143,7 @@ static void read_materials ( std::vector<SrMaterial>& M,
 			SrString matName;
 			in.getline(matName);
 			matName.trim();
-			mnames.push_back( matName );
+			mnames.push_back( (const char*) matName );
 		}	  
 		else if ( in.last_token()=="Ka" )
 		{
@@ -240,7 +240,7 @@ static void read_materials ( std::vector<SrMaterial>& M,
 static bool process_line ( const SrString& line,
                            SrModel& m,
                            SrStringArray& paths,
-                           std::vector<SrString>& mnames,
+                           std::vector<std::string>& mnames,
 						   std::map<std::string,std::string>& mtlTexMap,
 						   std::map<std::string,std::string>& mtlTexBumpMap,
 						   std::map<std::string,std::string>& mtlTexKsMap,
@@ -322,7 +322,7 @@ static bool process_line ( const SrString& line,
 	  SrString matName;
 	  in.getline(matName);
 	  matName.trim();
-	  curmtl = std::find(mnames.begin(),mnames.end(), matName) - mnames.begin();
+	  curmtl = std::find(mnames.begin(), mnames.end(), (const char*) matName) - mnames.begin();
       //curmtl = mnames.lsearch ( matName );
       //SR_TRACE1 ( "curmtl = " << curmtl << " (" << in.last_token() << ")" );
     }
@@ -393,7 +393,7 @@ bool SrModel::import_obj ( const char* file )
 
    // after remove all redundant materials, load the corresponding textures   
 #if !defined(SB_IPHONE)
-   for (int i=0;i<M.size();i++)
+   for (size_t i=0;i<M.size();i++)
    {
 	   std::string matName = mtlnames[i];
 	   if (mtlTextureNameMap.find(matName) != mtlTextureNameMap.end())

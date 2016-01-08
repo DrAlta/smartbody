@@ -3205,7 +3205,7 @@ SBAPI bool SBMotion::downsample( int factor )
 SBAPI void SBMotion::unrollPrerotation( const std::string& skelName )
 {
 	SBSkeleton* skel = SBScene::getScene()->getSkeleton(skelName);
-	for (int i=0;i<_frames.size();i++)
+	for (size_t i=0;i<_frames.size();i++)
 	{
 		float* fbuffer = _frames[i].posture;
 		for (int j=0;j<_channels.size();j++)
@@ -3237,7 +3237,7 @@ SBAPI void SBMotion::addTemporalRotationOffset( const std::string& chanName, SrQ
 	if (chanID == -1 || _frames.size() < 1) return;
 	float ratio = 1.f/_frames.size();
 	int fidx = _channels.float_position(chanID);
-	for (int i=0;i<_frames.size();i++)
+	for (size_t i=0;i<_frames.size();i++)
 	{
 		float* fbuffer = _frames[i].posture;
 		SrQuat chanQuat = SrQuat(fbuffer[fidx], fbuffer[fidx+1], fbuffer[fidx+2], fbuffer[fidx+3]);
