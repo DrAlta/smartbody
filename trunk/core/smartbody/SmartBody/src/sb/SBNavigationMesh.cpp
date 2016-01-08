@@ -96,9 +96,9 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
         int* tris = new int[inMesh.F.size()*3];
 	for (int i=0;i<inMesh.F.size();i++)
 	{
-              tris[i*3+0] = inMesh.F.get(i)[0];
-              tris[i*3+1] = inMesh.F.get(i)[1];
-              tris[i*3+2] = inMesh.F.get(i)[2];
+              tris[i*3+0] = inMesh.F[i][0];
+              tris[i*3+1] = inMesh.F[i][1];
+              tris[i*3+2] = inMesh.F[i][2];
         }
 #else
 	const int* tris = &inMesh.F[0][0];
