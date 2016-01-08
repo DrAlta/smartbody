@@ -83,7 +83,7 @@ void SrSnColorSurf::gl_render_node(bool alphaBlend) const
 	std::vector<SrModel::Face>& F = model.F;
 	std::vector<SrVec>&         V = model.V;
 	std::vector<SrVec>&         N = model.N;
-	SrArray<SrMaterial>&    M = model.M;
+	std::vector<SrMaterial>&    M = model.M;
 
 	int fsize = F.size();
 	int vsize = V.size();

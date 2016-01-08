@@ -97,7 +97,7 @@ SrSnColorSurf* SBAnimationBlend::createFlatSurface( float depth, unsigned int di
 			surf->vtxAdjList.push_back(adjs);
 			temp_c = SrColor::interphue((float)i / dim);
 			mtl.diffuse.set(temp_c.r, temp_c.g, temp_c.b, (srbyte)255);
-			surf_model->M.push(mtl);
+			surf_model->M.push_back(mtl);
 		}
 	}
 
@@ -203,7 +203,7 @@ SrSnColorSurf* SBAnimationBlend::createCurveSurface( float radius, unsigned int 
 
 			temp_c = SrColor::interphue((float)i / dim);
 			mtl.diffuse.set(temp_c.r, temp_c.g, temp_c.b, (srbyte)255);
-			surf_model->M.push(mtl);
+			surf_model->M.push_back(mtl);
 		}
 	}
 
@@ -374,7 +374,8 @@ void SBAnimationBlend::updateSmoothSurface( SrSnColorSurf* surf )
 	LOG("total avg smooth = %f",totalSmooth);
 	SrColor temp_c;
 	SrMaterial mtl;
-	surfModel->M.remove(0,smoothList.size());
+	//surfModel->M.remove(0,smoothList.size());
+	surfModel->M.clear();
 	for (unsigned int i=0;i<smoothList.size();i++)
 	{
 		//surfModel->M.push()		
@@ -383,7 +384,7 @@ void SBAnimationBlend::updateSmoothSurface( SrSnColorSurf* surf )
 
 		temp_c = SrColor::interphue(curError);
 		mtl.diffuse.set(temp_c.r, temp_c.g, temp_c.b, (srbyte)160);
-		surfModel->M.push(mtl);	
+		surfModel->M.push_back(mtl);	
 	}
 	surf->changed(true);
 }
@@ -417,7 +418,8 @@ void SBAnimationBlend::updateErrorSurace( SrSnColorSurf* errorSurf, SrVec center
 	SrColor temp_c;
 	SrMaterial mtl;
 	//maxError = 0.4f;
-	surfModel->M.remove(0,errorList.size());
+	//surfModel->M.remove(0,errorList.size());
+	surfModel->M.clear();
 	for (unsigned int i=0;i<errorList.size();i++)
 	{
 		//surfModel->M.push()		
@@ -426,7 +428,7 @@ void SBAnimationBlend::updateErrorSurace( SrSnColorSurf* errorSurf, SrVec center
 
 		temp_c = SrColor::interphue(curError);
 		mtl.diffuse.set(temp_c.r, temp_c.g, temp_c.b, (srbyte)160);
-		surfModel->M.push(mtl);	
+		surfModel->M.push_back(mtl);	
 	}
 	errorSurf->changed(true);
 }

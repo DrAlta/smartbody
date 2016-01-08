@@ -61,7 +61,7 @@ SrModel::~SrModel ()
 void SrModel::init ()
  {
    culling = true;
-   M.capacity ( 0 );
+   //M.capacity ( 0 );
    //V.capacity ( 0 );
    //Vc.capacity( 0 );
    //N.capacity ( 0 );
@@ -70,13 +70,13 @@ void SrModel::init ()
    //Fm.capacity ( 0 );
    //Fn.capacity ( 0 );
    //Ft.capacity ( 0 );
-   mtlnames.capacity ( 0 );
+   //mtlnames.capacity ( 0 );
    name = "";
  }
 
 void SrModel::compress ()
  {
-   M.compress();
+   //M.compress();
    //V.compress();
    //Vc.compress();
    //N.compress();
@@ -85,7 +85,7 @@ void SrModel::compress ()
    //Fm.compress();
    //Fn.compress();
    //Ft.compress();
-   mtlnames.compress();
+   //mtlnames.compress();
    name.compress();
  }
 
@@ -119,7 +119,7 @@ void SrModel::validate ()
    // check size of Fm
    if ( M.size()==0 )
     { Fm.resize(0);
-	  mtlnames.size(0);
+	  mtlnames.resize(0);
     }
    else if ( Fm.size()!=fsize )
     { j = Fm.size();
@@ -208,8 +208,8 @@ void SrModel::remove_redundant_materials ()
        }
       for ( i=0,j=0; i<iarray.size(); i++ ) // compress materials
        { if ( iarray[i]<0 )
-          { M.remove(j);
-            mtlnames.remove(j);
+          { M.erase(M.begin()+j);
+            mtlnames.erase(mtlnames.begin()+j);
           }
          else
           { j++; }
@@ -506,19 +506,21 @@ bool SrModel::load ( SrInput &in )
          if ( !in.close_field(s) ) return false;
        }
       else if ( s=="materials" ) // read M: mtls
-       { in >> i; M.size(i);
+       { in >> i; M.resize(i);
          for ( i=0; i<M.size(); i++ ) in >> M[i];
          if ( !in.close_field(s) ) return false;
        }
       else if ( s=="material_names" ) // read materials
        { SrString buf1, buf2;
-         mtlnames.capacity ( 0 ); // clear all
-         mtlnames.size ( M.size() ); // realloc
+         //mtlnames.capacity ( 0 ); // clear all
+		 mtlnames.clear();
+         mtlnames.resize ( M.size() ); // realloc
+
          while ( 1 )
           { if ( in.get_token()!=SrInput::Integer ) { in.unget_token(); break; }
             i = atoi ( in.last_token() );
             in.get_token();
-            mtlnames.set ( i, in.last_token() );
+            mtlnames[i] = in.last_token() ;
           }
          if ( !in.close_field(s) ) return false;
        }
@@ -892,9 +894,9 @@ void SrModel::flat ()
 void SrModel::set_one_material ( const SrMaterial& m )
  {
    int i;
-   mtlnames.capacity(1);
-   mtlnames.size(1);
-   M.size(1);
+   mtlnames.resize(1);
+   //mtlnames.size(1);
+   M.resize(1);
    Fm.resize ( F.size() );
    M[0] = m;
    for ( i=0; i<Fm.size(); i++ ) Fm[i]=0;
@@ -903,8 +905,8 @@ void SrModel::set_one_material ( const SrMaterial& m )
 
 void SrModel::clear_materials ()
  {
-   mtlnames.capacity (0);
-   M.size (0);
+   mtlnames.resize (0);
+   M.resize (0);
    Fm.resize (0);
    compress ();
  }
@@ -1146,7 +1148,7 @@ void SrModel::add_model ( const SrModel& m )
    // add material names
    // add the materials:
    if ( m.Fm.size()>0 )
-    { M.size ( origm+m.M.size() );
+    { M.resize ( origm+m.M.size() );
       for ( i=0; i<m.M.size(); i++ ) M[origm+i] = m.M[i];
       Fm.resize ( origf+mfsize );
       for ( i=0; i<mfsize; i++ )
@@ -1156,7 +1158,7 @@ void SrModel::add_model ( const SrModel& m )
    for ( i=0; i<m.mtlnames.size(); i++ )
    {
 	   bool newMat = true;
-	   mtlnames.push ( m.mtlnames[i] );
+	   mtlnames.push_back ( m.mtlnames[i] );
    }   
 
    validate();
@@ -1367,8 +1369,7 @@ void SrModel::saveOriginalVertices()
 {
 	if (VOrig.size() != V.size())
 	{
-		VOrig.capacity(V.capacity());
-		VOrig.size(V.capacity());
+		VOrig.resize(V.capacity());
 		for (int x = 0; x < V.size(); x++)
 		{
 			VOrig[x] = V[x];

@@ -1037,7 +1037,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 			materialName = matAttr;
 		}
 		if (materialName != "")
-			model->mtlnames.push(materialName.c_str());
+			model->mtlnames.push_back(materialName.c_str());
 
 		meshModelVec.push_back(model);
 		//LOG("SubMesh %d ... ",i);
@@ -1339,7 +1339,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 		SrModel* model = meshModelVec[i];
 		if (model->mtlnames.size() > 0)
 		{			
-			std::string matName = model->mtlnames.get(0);
+			std::string matName = model->mtlnames[0];
 			if (materialModelIndexMap.find(matName) == materialModelIndexMap.end())
 			{
 				materialModelIndexMap[matName] = std::vector<int>();
@@ -1487,8 +1487,8 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 		{
 			int modelIdx = modelIdxList[j];
 			SrModel* model = meshModelVec[modelIdx];
-			model->M.size(1);
-			model->M.set(0,materialMap[matName]);
+			model->M.resize(1);
+			model->M[0]=materialMap[matName];
 			if (textureName != "")
 				model->mtlTextureNameMap[matName] = textureName;
 		}

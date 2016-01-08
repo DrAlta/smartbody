@@ -148,8 +148,8 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				ParserCOLLADAFast::parseLibraryMaterials(materialNode, effectId2MaterialId);
 
 			// start parsing effect
-			SrArray<SrMaterial> M;
-			SrStringArray mnames;
+			std::vector<SrMaterial> M;
+			std::vector<SrString> mnames;
 			std::map<std::string,std::string> mtlTextMap;
 			std::map<std::string,std::string> mtlTextBumpMap;
 			std::map<std::string,std::string> mtlTextSpecularMap;

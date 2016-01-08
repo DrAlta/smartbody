@@ -585,9 +585,9 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				int materialIndex = scene->mMeshes[m]->mMaterialIndex;
 				if (materialIndex < allMaterials.size())
 				{
-					model->M.size(1);
+					model->M.resize(1);
 					model->M[0] = SrMaterial(*allMaterials[materialIndex]);
-					model->mtlnames.push(allMaterialNames[0].c_str());
+					model->mtlnames.push_back(allMaterialNames[0].c_str());
 					model->Fm.resize(numFaces);
 					for (int fm = 0; fm < numFaces; fm++)
 					{
@@ -609,10 +609,10 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 				}
 				else
 				{
-					model->M.size(1);
+					model->M.resize(1);
 					model->M[0] = SrMaterial();
 					model->M[0].diffuse.r = 1.0;
-					model->mtlnames.push("unknown");
+					model->mtlnames.push_back("unknown");
 				}
 
 				if (!hasNormal)

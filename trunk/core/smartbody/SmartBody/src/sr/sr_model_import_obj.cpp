@@ -100,8 +100,8 @@ static void load_texture(int type, const char* file, const SrStringArray& paths)
 #endif
 }
 
-static void read_materials ( SrArray<SrMaterial>& M,
-                             SrStringArray& mnames,
+static void read_materials ( std::vector<SrMaterial>& M,
+                             std::vector<SrString>& mnames,
 							 std::map<std::string,std::string>& mtlTexMap,
 							 std::map<std::string,std::string>& mtlTexBumpMap,
 							 std::map<std::string,std::string>& mtlTexKsMap,
@@ -138,33 +138,33 @@ static void read_materials ( SrArray<SrMaterial>& M,
 			SrMaterial material;
 			material.init();
 			//M.push().init();
-			M.push(material);        
+			M.push_back(material);        
 			//SR_TRACE1 ( "new material: "<<in.last_token() );
 			SrString matName;
 			in.getline(matName);
 			matName.trim();
-			mnames.push ( matName );
+			mnames.push_back( matName );
 		}	  
 		else if ( in.last_token()=="Ka" )
 		{
-			M.top().ambient = read_color ( in );
+			M.back().ambient = read_color ( in );
 		}
 		else if ( in.last_token()=="Kd" )
 		{
-			M.top().diffuse = read_color ( in );
+			M.back().diffuse = read_color ( in );
 		}
 		else if ( in.last_token()=="Ks" )
 		{
-			M.top().specular = read_color ( in );
+			M.back().specular = read_color ( in );
 		}
 		else if ( in.last_token()=="Ke" ) // not sure if this one exists
 		{
-			M.top().emission = read_color ( in );
+			M.back().emission = read_color ( in );
 		}
 		else if ( in.last_token()=="Ns" )
 		{
 			in >> i;
-			M.top().shininess = i;
+			M.back().shininess = i;
 		}
 		else if ( in.last_token()=="map_Kd") // texture map
 		{
@@ -179,7 +179,7 @@ static void read_materials ( SrArray<SrMaterial>& M,
 			map_Kd.trim();
 		  
 			std::string texFile = (const char*) map_Kd;
-			std::string mtlName = mnames.top();
+			std::string mtlName = mnames.back();
 			mtlTexMap[mtlName] = texFile;		  
 	  
 			std::cerr << "Reading map_kd:     " << texFile << "\n";
@@ -197,7 +197,7 @@ static void read_materials ( SrArray<SrMaterial>& M,
 			mapBump.trim();
 
 			std::string texFile = (const char*) mapBump;
-			std::string mtlName = mnames.top();
+			std::string mtlName = mnames.back();
 			mtlTexBumpMap[mtlName] = texFile;		  
 	  }
 	else if ( in.last_token()=="map_Ks") // texture map
@@ -212,7 +212,7 @@ static void read_materials ( SrArray<SrMaterial>& M,
 			mapKs.trim();
 
 			std::string texFile = (const char*) mapKs;
-			std::string mtlName = mnames.top();
+			std::string mtlName = mnames.back();
 			mtlTexKsMap[mtlName] = texFile;		  
 	  }
 	else if ( in.last_token()=="map_Ns") // texture map
@@ -227,7 +227,7 @@ static void read_materials ( SrArray<SrMaterial>& M,
 			mapNs.trim();
 		 
 			std::string texFile = (const char*) mapNs;
-			std::string mtlName = mnames.top();
+			std::string mtlName = mnames.back();
 			mtlTexNsMap[mtlName] = texFile;		  
 	  }
       else if ( in.last_token()=="illum" ) // dont know what is this one
@@ -240,7 +240,7 @@ static void read_materials ( SrArray<SrMaterial>& M,
 static bool process_line ( const SrString& line,
                            SrModel& m,
                            SrStringArray& paths,
-                           SrStringArray& mnames,
+                           std::vector<SrString>& mnames,
 						   std::map<std::string,std::string>& mtlTexMap,
 						   std::map<std::string,std::string>& mtlTexBumpMap,
 						   std::map<std::string,std::string>& mtlTexKsMap,
@@ -322,7 +322,8 @@ static bool process_line ( const SrString& line,
 	  SrString matName;
 	  in.getline(matName);
 	  matName.trim();
-      curmtl = mnames.lsearch ( matName );
+	  curmtl = std::find(mnames.begin(),mnames.end(), matName) - mnames.begin();
+      //curmtl = mnames.lsearch ( matName );
       //SR_TRACE1 ( "curmtl = " << curmtl << " (" << in.last_token() << ")" );
     }
    else if ( in.last_token()=="mtllib" ) // mtllib file1 file2 ...
@@ -375,9 +376,9 @@ bool SrModel::import_obj ( const char* file )
 	name = filename;
 	//name.remove_file_extension();
 	int curmtl = 0;
-	M.push();
-	M.top().diffuse = SrColor::gray;
-	mtlnames.push("noname");
+	M.push_back(SrMaterial());
+	M.back().diffuse = SrColor::gray;
+	mtlnames.push_back("noname");
 
 	SrString line;
 	while ( in.getline(line)!=EOF )
