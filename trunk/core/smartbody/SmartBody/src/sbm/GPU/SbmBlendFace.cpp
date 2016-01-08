@@ -151,7 +151,7 @@ void SbmBlendFace::addFace(SbmDeformableMeshGPU* newFace)
 
 void SbmBlendFace::addFace(SrSnModel* newFace) 
 {
-	SrArray<SrVec> v = newFace->shape().V;
+	std::vector<SrVec> v = newFace->shape().V;
 	std::vector<SrVec> vertices;
 	for (int i = 0; i < v.size(); i++) {
 		//std::cerr << "Adding face "<< i << ": " << v[i].x << ", " << v[i].y << ", " << v[i].z << "\n";
@@ -1047,10 +1047,10 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 	SrSnModel* baseModel		= NULL;
 	bool foundBaseModel			= false;
 
-	std::vector<SrArray<SrPnt>*> shapes;
+	std::vector<std::vector<SrPnt>*> shapes;
 
-	SrArray<SrPnt> neutralV;
-	SrArray<SrPnt> visemeV;
+	std::vector<SrPnt> neutralV;
+	std::vector<SrPnt> visemeV;
 
 	// find the base shape and other shapes
 	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
@@ -1472,10 +1472,10 @@ void SbmBlendTextures::BlendGeometry(GLuint * FBODst, std::vector<float> weights
 	SrSnModel* baseModel		= NULL;
 	bool foundBaseModel			= false;
 
-	std::vector<SrArray<SrPnt>*> shapes;
+	std::vector<std::vector<SrPnt>*> shapes;
 
-	SrArray<SrPnt> neutralV;
-	SrArray<SrPnt> visemeV;
+	std::vector<SrPnt> neutralV;
+	std::vector<SrPnt> visemeV;
 	// find the base shape and other shapes
 	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
 	for (mIter = _mesh->blendShapeMap.begin(); mIter != _mesh->blendShapeMap.end(); ++mIter)
@@ -1936,10 +1936,10 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 	SrSnModel* baseModel		= NULL;
 	bool foundBaseModel			= false;
 
-	std::vector<SrArray<SrPnt>*> shapes;
+	std::vector<std::vector<SrPnt>*> shapes;
 
-	SrArray<SrPnt> neutralV;
-	SrArray<SrPnt> visemeV;
+	std::vector<SrPnt> neutralV;
+	std::vector<SrPnt> visemeV;
 
 	// find the base shape and other shapes
 	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;

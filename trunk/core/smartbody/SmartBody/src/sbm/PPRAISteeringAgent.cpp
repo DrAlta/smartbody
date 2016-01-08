@@ -676,6 +676,7 @@ void PPRAISteeringAgent::sendLocomotionEvent(const std::string& status)
 	motionEvent.setParameters(strstr.str());
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 	manager->handleEvent(&motionEvent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+	LOG("locomotio sucess");
 }
 
 void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, float yaw)
@@ -1480,6 +1481,8 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 	{
 		reachTarget = true;		
 		character->_reachTarget = reachTarget;
+		//if (!character->_lastReachStatus)
+		//	LOG("locomotion complete:reachTarget = true");
 	}
 	if (_numSteeringGoal == 0 && numGoals != 0 && distToTarget < distThreshold)
 	{
@@ -1590,6 +1593,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 			character->param_animation_ct->schedule(NULL, weights);
 			if (!sentLocomotionEvent)
 				sendLocomotionEvent("success");	
+			//LOG("locomotion complete:numGoals = 0");
 			facingAdjust = true;	
 			//LOG("no next goal now. stop locomotion");
 		}

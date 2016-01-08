@@ -1816,8 +1816,8 @@ bool PolyVoxMeshToSrModel( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>
 {
 	int nVtx = mesh.getNoOfVertices();
 	int nTri = mesh.getNoOfIndices()/3;	
-	model.V.size(mesh.getNoOfVertices());
-	model.F.size(mesh.getNoOfIndices()/3);
+	model.V.resize(mesh.getNoOfVertices());
+	model.F.resize(mesh.getNoOfIndices()/3);
 	float x,y,z;
 	for (int i=0;i<nVtx;i++)
 	{

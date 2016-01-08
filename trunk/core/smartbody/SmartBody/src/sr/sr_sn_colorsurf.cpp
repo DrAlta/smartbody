@@ -80,9 +80,9 @@ void SrSnColorSurf::gl_render_node(bool alphaBlend) const
 
 	//SR_TRACE2 ( "Faces="<<model.F.size() );
 
-	SrArray<SrModel::Face>& F = model.F;
-	SrArray<SrVec>&         V = model.V;
-	SrArray<SrVec>&         N = model.N;
+	std::vector<SrModel::Face>& F = model.F;
+	std::vector<SrVec>&         V = model.V;
+	std::vector<SrVec>&         N = model.N;
 	SrArray<SrMaterial>&    M = model.M;
 
 	int fsize = F.size();

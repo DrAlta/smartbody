@@ -2309,16 +2309,16 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 						// process each polylist
 						for (size_t x = 2; x < fVec.size(); x++)
 						{
-							newModel->F.push().set(fVec[0], fVec[x - 1], fVec[x]);
-							newModel->Fm.push() = curmtl;
+							newModel->F.push_back(SrModel::Face(fVec[0], fVec[x - 1], fVec[x]));
+							newModel->Fm.push_back(curmtl);
 							if (ftVec.size() > x)
-								newModel->Ft.push().set(ftVec[0], ftVec[x - 1], ftVec[x]);
+								newModel->Ft.push_back(SrModel::Face(ftVec[0], ftVec[x - 1], ftVec[x]));
 							else
-								newModel->Ft.push().set(0, 0, 0);
+								newModel->Ft.push_back(SrModel::Face(0, 0, 0));
 							if (fnVec.size() > x)
-								newModel->Fn.push().set(fnVec[0], fnVec[x - 1], fnVec[x]);
+								newModel->Fn.push_back(SrModel::Face(fnVec[0], fnVec[x - 1], fnVec[x]));
 							else
-								newModel->Fn.push().set(0, 1, 0);
+								newModel->Fn.push_back(SrModel::Face(0, 1, 0));
 						}
 					}
 					/*
@@ -2394,14 +2394,14 @@ void ParserOpenCOLLADA::setModelVertexSource( std::string& sourceName, std::stri
 // 				SrVec pos = (*sourceArray)[i];
 // 				LOG("pos = %f %f %f",pos[0],pos[1],pos[2]);
 // 			}
-			model->V.push((*sourceArray)[i]);										
+			model->V.push_back((*sourceArray)[i]);										
 		}
 	}
 	else if (semanticName == "NORMAL" && sourceArray && model->N.size() == 0)
 	{
 		for (unsigned int i=0;i<sourceArray->size();i++)
 		{
-			model->N.push((*sourceArray)[i]);										
+			model->N.push_back((*sourceArray)[i]);										
 		}
 	}
 	else if (semanticName == "TEXCOORD" && sourceArray && model->T.size() == 0)
@@ -2409,7 +2409,7 @@ void ParserOpenCOLLADA::setModelVertexSource( std::string& sourceName, std::stri
 		for (unsigned int i=0;i<sourceArray->size();i++)
 		{
 			SrVec ts = (*sourceArray)[i];
-			model->T.push(SrVec2(ts[0],ts[1]));										
+			model->T.push_back(SrVec2(ts[0],ts[1]));										
 		}
 	}
 }
@@ -2986,6 +2986,7 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 		// get the mesh scale from the character
 		ParserOpenCOLLADA::exportSkinMesh(fp, deformMeshName, meshScale);
 		SbmTextureManager& texManager = SbmTextureManager::singleton();
+		printf("export textures\n");
 		for (unsigned int i=0;i<defMesh->subMeshList.size();i++)
 		{
 			SbmSubMesh* subMesh = defMesh->subMeshList[i];
@@ -3003,6 +3004,7 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 	if (exportSk)
 	{
 		// decide whether to export instance of geometry as well
+		printf("export skeleton\n");
 		std::string defMeshName = "";
 		if (exportMesh)
 			defMeshName = deformMeshName;
@@ -3010,6 +3012,7 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 	}
 	fprintf(fp,"</COLLADA>\n");
 	fclose(fp);
+	printf("finish export Collada\n");
 	return true;
 }
 
@@ -3104,10 +3107,11 @@ bool ParserOpenCOLLADA::exportMaterials( FILE* fp, std::string deformMeshName )
 
 bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, double scale)
 {
+	printf("before export skin mesh\n");
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	DeformableMesh* defMesh = assetManager->getDeformableMesh(deformMeshName);
 	if (!defMesh) return false;
-
+	printf("start export geometry\n");
 	fprintf(fp,"<library_geometries>\n");
 	// export geometry
 	for (unsigned int i=0;i<defMesh->dMeshStatic_p.size();i++)
@@ -3270,6 +3274,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 	}
 	fprintf(fp,"</library_geometries>\n");
 
+	printf("start export skin\n");
 	// export skin binding
 	fprintf(fp,"<library_controllers>\n");
 	for (unsigned int i=0;i<defMesh->skinWeights.size();i++)
@@ -3361,7 +3366,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 	}
 
 	fprintf(fp,"</library_controllers>\n");
-
+	printf("end export skin\n");
 	return true;
 }
 
@@ -3387,6 +3392,7 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 			std::string meshID = skinWeight->sourceMesh;
 			std::string controllerID = skinWeight->sourceMesh+"-skin";
 			int validMeshIdx = defMesh->getValidSkinMesh(skinWeight->sourceMesh);
+			printf("meshID = %s, controllerID = %s, valid mesh idx = %d\n", meshID.c_str(), controllerID.c_str(), validMeshIdx);
 			SrModel& model = defMesh->dMeshStatic_p[validMeshIdx]->shape();
 			std::string matName = "defaultMaterial";
 			if (model.mtlnames.size() > 0)
@@ -3426,17 +3432,18 @@ void ParserOpenCOLLADA::writeJointNode( FILE* fp, SmartBody::SBJoint* joint )
 	SrVec pos = joint->getOffset();
 	fprintf(fp,"<translate sid=\"translate\">%f %f %f</translate>\n", pos[0],pos[1],pos[2]);
 	// output joint pre-rotation & orientation
-	SrQuat quat = joint->quat()->prerot();
+	SrQuat quat = joint->quat()->orientation()*joint->quat()->prerot();
 	SrVec eulerPrerot = quat.getEuler();
 	fprintf(fp,"<rotate sid=\"rotateY\">0 1 0 %f</rotate>\n",eulerPrerot[1]);	
 	fprintf(fp,"<rotate sid=\"rotateX\">1 0 0 %f</rotate>\n",eulerPrerot[0]);	
 	fprintf(fp,"<rotate sid=\"rotateZ\">0 0 1 %f</rotate>\n",eulerPrerot[2]);	
+#if 0
 	SrQuat jorient = joint->quat()->orientation();
 	SrVec eulerOrient = jorient.getEuler();
 	fprintf(fp,"<rotate sid=\"jointOrientY\">0 1 0 %f</rotate>\n",eulerOrient[1]);	
 	fprintf(fp,"<rotate sid=\"jointOrientX\">1 0 0 %f</rotate>\n",eulerOrient[0]);	
 	fprintf(fp,"<rotate sid=\"jointOrientZ\">0 0 1 %f</rotate>\n",eulerOrient[2]);	
-
+#endif
 	// recursively output child joints
 	for (int i=0;i<joint->getNumChildren();i++)
 	{

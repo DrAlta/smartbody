@@ -564,13 +564,13 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    //SR_TRACE1 ( "Render Model faces="<<model.F.size() );
    //initTex();
 
-   SrArray<SrModel::Face>& F = model.F;
-   SrArray<SrModel::Face>& Fn = model.Fn;
-   SrArray<SrModel::Face>& Ft = model.Ft;
-   SrArray<int>&           Fm = model.Fm;
-   SrArray<SrVec>&         V = model.V;
-   SrArray<SrVec>&         N = model.N;
-   SrArray<SrPnt2>&        T = model.T;
+   std::vector<SrModel::Face>& F = model.F;
+   std::vector<SrModel::Face>& Fn = model.Fn;
+   std::vector<SrModel::Face>& Ft = model.Ft;
+   std::vector<int>&           Fm = model.Fm;
+   std::vector<SrVec>&         V = model.V;
+   std::vector<SrVec>&         N = model.N;
+   std::vector<SrPnt2>&        T = model.T;
    SrArray<SrMaterial>&    M = model.M;
 
    //LOG("F = %d, V = %d",F.size(), V.size());

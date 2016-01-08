@@ -61,6 +61,14 @@ class SrModel : public SrSharedClass
         information in V, N, and T to each face */
     struct Face 
      { 
+		 Face()
+		 {
+
+		 }
+		 Face(int f1, int f2, int f3)
+		 {
+			 set(f1,f2,f3);
+		 }
 #if defined(__ANDROID__) || defined(SB_IPHONE)
        unsigned short a,b,c;
        void validate () { }
@@ -87,7 +95,20 @@ class SrModel : public SrSharedClass
      };
 
     SrArray<SrMaterial> M;  //!< Used materials
-    SrArray<SrPnt>      V;  //!< Vertices coordinates
+    //SrArray<SrPnt>      V;  //!< Vertices coordinates
+	std::vector<SrVec>  V;
+	std::vector<SrVec>      Vc; // color of vertices
+	std::vector<SrVec>      N;  //!< Normals table		
+	std::vector<SrVec>      Tangent, BiNormal; // tangent and bi normal vectors
+	std::vector<SrPnt2>     T;  //!< Texture coordinates
+	std::vector<Face>       F;  //!< Triangular faces indices to V
+	std::vector<int>       Fm;  //!< Indices to the materials in M (size can be<F.size())
+	std::vector<Face>      Fn;  //!< Indices to the normals in N (size can be<F.size())
+	std::vector<Face>      Ft;  //!< Indices to the texture coordinates in T
+
+	SrArray<SrPnt>      VOrig;  //!< Vertices original (if changed)
+
+#if 0
 	SrArray<SrVec>      Vc; // color of vertices
     SrArray<SrVec>      N;  //!< Normals table		
 	SrArray<SrVec>      Tangent, BiNormal; // tangent and bi normal vectors
@@ -98,6 +119,7 @@ class SrModel : public SrSharedClass
     SrArray<Face>      Ft;  //!< Indices to the texture coordinates in T
 
 	SrArray<SrPnt>      VOrig;  //!< Vertices original (if changed)
+#endif
 
 	std::map<std::string,std::string> mtlTextureNameMap; // map from material name to texture name
 	std::map<std::string,std::string> mtlNormalTexNameMap;

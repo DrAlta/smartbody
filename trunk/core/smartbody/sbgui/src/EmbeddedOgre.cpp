@@ -1354,7 +1354,8 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		//pass->setAmbient(color[0],color[1],color[2]);
 		mat.diffuse.get(color);	
 		//LOG("diffuse color = %f %f %f %f",color[0],color[1],color[2],color[3]);
-		if (hasColorBuf && !hasTexture)
+		//if (hasColorBuf && !hasTexture)
+		if (hasTexture || hasColorBuf)
 		{
 			pass->setVertexColourTracking(TVC_DIFFUSE);
 			pass->setLightingEnabled(false);

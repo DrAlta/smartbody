@@ -40,11 +40,11 @@ static int vertex_cb(p_ply_argument argument) {
 	ply_get_argument_user_data(argument, (void**)&model, &idx);
 	if (idx == 0)
 	{
-		model->V.push();
-		model->T.push();
+		model->V.push_back(SrVec());
+		model->T.push_back(SrVec2());
 	}
 	double argumentValue = ply_get_argument_value(argument);
-	model->V.top()[(int)idx] = (float) argumentValue;	
+	model->V.back()[(int)idx] = (float) argumentValue;	
 	return 1;
 }
 
@@ -54,9 +54,9 @@ static int vertex_color_cb(p_ply_argument argument) {
 	SrModel* model;
 	ply_get_argument_user_data(argument, (void**)&model, &idx);
 	if (idx == 0)
-		model->Vc.push();
+		model->Vc.push_back(SrVec());
 	double argumentValue = ply_get_argument_value(argument);
-	model->Vc.top()[(int)idx] = (float) argumentValue/255.0f;	
+	model->Vc.back()[(int)idx] = (float) argumentValue/255.0f;	
 	return 1;
 }
 
@@ -69,14 +69,14 @@ static int face_cb(p_ply_argument argument) {
 	
 	if (value_index == -1) // first entry in the list
 	{
-		model->F.push();
+		model->F.push_back(SrModel::Face());
 		int mtlIdx = model->M.size()-1;
-		model->Fm.push(mtlIdx);
+		model->Fm.push_back(mtlIdx);
 	}
 	else if (value_index >= 0 && value_index <= 2) // a triangle face
 	{
 		double argumentValue = ply_get_argument_value(argument);
-		model->F.top()[value_index] = (int)(float) argumentValue;		
+		model->F.back()[value_index] = (int)(float) argumentValue;		
 	}		
 	return 1;
 }
@@ -90,13 +90,13 @@ static int texCoord_cb(p_ply_argument argument) {
 
 	if (value_index == -1) // first entry in the list
 	{
-		model->Ft.push();
+		model->Ft.push_back(SrModel::Face());
 		//SrModel::Face& fid = model->F[model->Ft.size()-1];
 		//model->Ft.top().set(fid[0],fid[1],fid[2]);
 		int tsize = (model->Ft.size()-1)*3;
-		model->Ft.top().set(tsize+0,tsize+1,tsize+2); 
+		model->Ft.back().set(tsize+0,tsize+1,tsize+2); 
 		for (int i=0;i<3;i++)
-			model->T.push();
+			model->T.push_back(SrVec2());
 	}
 	else if (value_index >= 0 && value_index <= 5) // a triangle face
 	{

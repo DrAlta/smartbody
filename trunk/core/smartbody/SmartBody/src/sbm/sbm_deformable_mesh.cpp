@@ -1082,31 +1082,31 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 		for (int x = 0; x < meshModel.vertexcoordinates_size() / 3; ++x)
 		{
 			SrPnt newPoint(meshModel.vertexcoordinates(x * 3 + 0), meshModel.vertexcoordinates(x * 3 + 1), meshModel.vertexcoordinates(x * 3 + 2));
-			newModel->V.push(newPoint);
+			newModel->V.push_back(newPoint);
 		}
 		// 4
 		for (int x = 0; x < meshModel.normals_size() / 3; ++x)
 		{
 			SrPnt newPoint(meshModel.normals(x * 3 + 0), meshModel.normals(x * 3 + 1), meshModel.normals(x * 3 + 2));
-			newModel->N.push(newPoint);
+			newModel->N.push_back(newPoint);
 		}
 		// 5
 		for (int x = 0; x < meshModel.tangents_size() / 3; ++x)
 		{
 			SrPnt newPoint(meshModel.tangents(x * 3 + 0), meshModel.tangents(x * 3 + 1), meshModel.tangents(x * 3 + 2));
-			newModel->Tangent.push(newPoint);
+			newModel->Tangent.push_back(newPoint);
 		}
 		// 6
 		for (int x = 0; x < meshModel.binormals_size() / 3; ++x)
 		{
 			SrPnt newPoint(meshModel.binormals(x * 3 + 0), meshModel.binormals(x * 3 + 1), meshModel.binormals(x * 3 + 2));
-			newModel->BiNormal.push(newPoint);
+			newModel->BiNormal.push_back(newPoint);
 		}
 		// 7
 		for (int x = 0; x < meshModel.texturecoordinates_size() / 2; ++x)
 		{
 			SrPnt2 newPoint(meshModel.texturecoordinates(x * 2 + 0), meshModel.texturecoordinates(x * 2 + 1));
-			newModel->T.push(newPoint);
+			newModel->T.push_back(newPoint);
 		}
 		// 8
 		for (int x = 0; x < meshModel.trianglefaceindices_size() / 3; ++x)
@@ -1115,12 +1115,12 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 			newFace.a = meshModel.trianglefaceindices(x * 3 + 0);
 			newFace.b = meshModel.trianglefaceindices(x * 3 + 1);
 			newFace.c = meshModel.trianglefaceindices(x * 3 + 2);
-			newModel->F.push(newFace);
+			newModel->F.push_back(newFace);
 		}
 		// 9
 		for (int x = 0; x < meshModel.materialindices_size(); ++x)
 		{
-			newModel->Fm.push(meshModel.materialindices(x));
+			newModel->Fm.push_back(meshModel.materialindices(x));
 		}
 		// 10
 		for (int x = 0; x < meshModel.normalindices_size() / 3; ++x)
@@ -1129,7 +1129,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 			newFace.a = meshModel.normalindices(x * 3 + 0);
 			newFace.b = meshModel.normalindices(x * 3 + 1);
 			newFace.c = meshModel.normalindices(x * 3 + 2);
-			newModel->Fn.push(newFace);
+			newModel->Fn.push_back(newFace);
 		}
 		// 11
 		for (int x = 0; x < meshModel.texturecoordinatesindices_size() / 3; ++x)
@@ -1138,7 +1138,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 			newFace.a = meshModel.texturecoordinatesindices(x * 3 + 0);
 			newFace.b = meshModel.texturecoordinatesindices(x * 3 + 1);
 			newFace.c = meshModel.texturecoordinatesindices(x * 3 + 2);
-			newModel->Ft.push(newFace);
+			newModel->Ft.push_back(newFace);
 		}
 		// 12
 		newModel->culling = meshModel.culling();
@@ -1939,10 +1939,11 @@ void DeformableMeshInstance::blendShapes()
 			continue;
 		}
 
-		SrArray<SrPnt>& neutralV = baseModel->shape().V;
-		SrArray<SrPnt>& neutralN = baseModel->shape().N;
-		SrArray<SrPnt> newV = neutralV;
-		SrArray<SrPnt> newN = neutralN;
+		//SrArray<SrPnt>& neutralV = baseModel->shape().V;
+		std::vector<SrVec>& neutralV = baseModel->shape().V;
+		std::vector<SrPnt>& neutralN = baseModel->shape().N;
+		std::vector<SrVec> newV = neutralV;
+		std::vector<SrPnt> newN = neutralN;
 
 		if (foundBaseModel && 
 			_character->getBoolAttribute("useOptimizedBlendShapes"))
@@ -1964,8 +1965,9 @@ void DeformableMeshInstance::blendShapes()
 						continue;
 					}
 					BlendShapeData& blendData = _mesh->optimizedBlendShapeData[i];
-					SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
-					SrArray<SrPnt>& visemeN = mIter->second[i]->shape().N;
+					//SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
+					std::vector<SrVec>& visemeV = mIter->second[i]->shape().V;
+					std::vector<SrPnt>& visemeN = mIter->second[i]->shape().N;
 
 
 					SrVec vVec;
@@ -2061,8 +2063,9 @@ void DeformableMeshInstance::blendShapes()
 			if (fabs(w) > gwiz::epsilon4())	// if it has weight
 			{
 				//LOG("blend in %s with weight %f", (const char*)mIter->second[i]->shape().name, w);
-				SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
-				SrArray<SrPnt>& visemeN = mIter->second[i]->shape().N;
+				//SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
+				std::vector<SrVec>& visemeV = mIter->second[i]->shape().V;
+				std::vector<SrPnt>& visemeN = mIter->second[i]->shape().N;
 				if (visemeV.size() != neutralV.size())
 				{
 					LOG("number of vertices for %s (%d) is not same as neutral (%d)", mIter->first.c_str(), visemeV.size(), neutralV.size());
