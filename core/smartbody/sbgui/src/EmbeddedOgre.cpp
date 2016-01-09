@@ -1393,7 +1393,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		//pass->setShadowCasterVertexProgram("Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs");
 		//pass->setVertexProgram("Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs");		
 		//pass->setVertexProgram("Ogre/HardwareSkinningFourWeightsGLSL");
-		//pass->setShadowCasterVertexProgram("Ogre/HardwareSkinningFourWeightsShadowCasterGLSL");
+		//pass->setShadowCasterVertexProgram("Ogre/HardwareSkinningFourWeightsShadowCasterGLSL");		
 		//LOG("subMesh mat name = %s",materialName.c_str());
  		ogSubMesh->setMaterialName(materialName);	
 		if (ogSubMesh->vertexData)

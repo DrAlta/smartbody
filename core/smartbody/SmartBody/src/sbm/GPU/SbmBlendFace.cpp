@@ -2104,6 +2104,7 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 	//aux->subMeshTris[0]->VBO()->UnbindBuffer();
 
 	std::vector<SrVec>& deformPosBuf = meshInstance->_deformPosBuf;
+	//std::vector<SrVec>& restPosBuf = meshInstance->getDeformableMesh()->posBuf;
 	std::vector<SrVec> blendRestPos; blendRestPos.resize(deformPosBuf.size());
 	// read the data back to buffer
 	SbmShaderProgram::printOglError("BlendGeometry Feedback GetBuffer Begin");
@@ -2116,6 +2117,7 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 	}
 	else
 		meshInstance->updateSkin(blendRestPos, deformPosBuf);
+	//meshInstance->updateSkin(blendRestPos, deformPosBuf);
 
 
 	glActiveTexture(GL_TEXTURE0);

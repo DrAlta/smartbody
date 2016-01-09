@@ -1,13 +1,6 @@
 
 #include "vhcl.h"
 #include <sb/SBTypes.h>
-// #ifdef __ANDROID__
-// //#include <GLES/gl.h>
-// #include <GLES2/gl2.h>
-// //#include "wes_gl.h"
-// #elif defined(SB_IPHONE)
-// #include <OpenGLES/ES1/gl.h>
-// #endif
 
 #if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
 #include "external/glew/glew.h"
@@ -136,8 +129,7 @@ void SkinWeight::copyWeights(SkinWeight* copy, const std::string& morphName)
 
 
 DeformableMesh::DeformableMesh() : SBAsset()
-{
-	binding = false;
+{	
 	initSkinnedVertexBuffer = false;
 	initStaticVertexBuffer = false;
 	hasVertexColor = false;	
@@ -179,82 +171,6 @@ DeformableMesh::~DeformableMesh()
 			delete subMeshList[i];
 	}
 	subMeshList.clear();
-}
-
-
-void DeformableMesh::setSkeleton(SkSkeleton* skel)
-{
-	//if (skeleton)
-	//	skeleton->unref();
-	skeleton = skel;
-	skel->ref();
-
-	// when set the skeleton, update bind joints on skin weights
-	for (size_t i = 0; i < skinWeights.size(); ++i)
-	{
-		if (skinWeights[i]->infJoint.size() == 0)	// if influence joints are not set
-		{
-			for (size_t j = 0; j < skinWeights[i]->infJointName.size(); ++j)
-			{
-				SkJoint* joint = skeleton->linear_search_joint(skinWeights[i]->infJointName[j].c_str());
-				if (joint)
-				{
-					skinWeights[i]->infJoint.push_back(joint);
-				}
-			}
-		}
-	}
-}
-
-void DeformableMesh::update()
-{
-	if (!binding)	return;
-	skeleton->update_global_matrices();
-	int maxJoint = -1;
-	for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
-	{
-		SkinWeight* skinWeight = skinWeights[skinCounter];
-		std::map<std::string, std::vector<std::string> >::iterator iter = this->morphTargets.find(skinWeight->sourceMesh);
-		int pos;
-		int globalCounter = 0;
-		if (iter != this->morphTargets.end() && iter->second.size() > 0)
-			pos = this->getMesh(iter->second[0]);
-		else
-			pos = this->getMesh(skinWeight->sourceMesh);
-		if (pos != -1)
-		{
-			SrSnModel* dMeshStatic = dMeshStatic_p[pos];
-			SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
-			int numVertices = dMeshStatic->shape().V.size();
-			for (int i = 0; i < numVertices; i++)
-			{
-				if (i >= (int) skinWeight->numInfJoints.size())
-					continue;
-				int numOfInfJoints = skinWeight->numInfJoints[i];
-				//if (numOfInfJoints > maxJoint)
-				//	maxJoint = numOfInfJoints;
-				SrVec& skinLocalVec = dMeshStatic->shape().V[i];					
-				SrVec finalVec;
-				//printf("Vtx bind pose = \n");
-				for (int j = 0; j < numOfInfJoints; j++)
-				{
-					const SkJoint* curJoint = skinWeight->infJoint[skinWeight->jointNameIndex[globalCounter]];
-					if (curJoint == NULL) continue;
-					const SrMat& gMat = curJoint->gmat();
-					SrMat& invBMat = skinWeight->bindPoseMat[skinWeight->jointNameIndex[globalCounter]];	
-					double jointWeight = skinWeight->bindWeight[skinWeight->weightIndex[globalCounter]];
-					globalCounter ++;
-					finalVec = finalVec + (float(jointWeight) * (skinLocalVec * skinWeight->bindShapeMat * invBMat  * gMat));						
-				}
-				dMeshDynamic->shape().V[i] = finalVec;
-			}
-			dMeshDynamic->changed(true);	
-		}
-		else
-			continue;
-	}
-
-	//printf("Max Influence Joints = %d\n",maxJoint);
 }
 
 SkinWeight* DeformableMesh::getSkinWeight(const std::string& skinSourceName)
@@ -299,17 +215,6 @@ int	DeformableMesh::getMesh(const std::string& meshName)
 			return i;
 	}
 	return -1;
-}
-
-void DeformableMesh::set_visibility(int deformableMesh)
-{
-	if (deformableMesh != -1)
-	{
-		for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
-			dMeshDynamic_p[i]->visible(deformableMesh? true:false );
-
-		binding = deformableMesh? true:false;		
-	}
 }
 
 bool DeformableMesh::buildSkinnedVertexBuffer()
@@ -837,23 +742,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		//	|| lowMatName.find("shadow") != std::string::npos || lowMatName.find("shell") != std::string::npos)
 #if TEST_HAIR_RENDER		
 		std::string lowMatName = mesh->matName;
-		boost::algorithm::to_lower(lowMatName);
-		/*
-		if (lowMatName.find("hair") != std::string::npos)
-		{
-			// is a hair mesh, based on a rough name searching
-			mesh->isHair = true;
-			LOG("hair mesh = %s",mesh->matName.c_str());
-			hairMeshList.push_back(mesh);
-		}
-		else if (tex && tex->isTransparent())
-		{
-			mesh->isHair = true;
-			LOG("transparent mesh = %s",mesh->matName.c_str());
-			hairMeshList.push_back(mesh);
-		}
-		else 
-		*/
+		boost::algorithm::to_lower(lowMatName);		
 		if (mesh->material.useAlphaBlend)
 		{
 			LOG("alpha mesh = %s",mesh->matName.c_str());
@@ -1582,8 +1471,6 @@ DeformableMeshInstance::DeformableMeshInstance()
 
 DeformableMeshInstance::~DeformableMeshInstance()
 {
-	cleanUp();
-
 	if(_tempFBO > 0)
 	{
 		glDeleteBuffers(1, &_tempFBO);
@@ -1623,19 +1510,6 @@ void DeformableMeshInstance::setPawn(SmartBody::SBPawn* pawn)
 	updateJointList();
 }
 
-void DeformableMeshInstance::cleanUp()
-{
-#if 0
-	for (unsigned int i = 0; i < dynamicMesh.size(); i++)
-	{
-
-		//SmartBody::SBScene::getScene()->getRootGroup()->remove(dynamicMesh[i]);
-		//dynamicMesh[i]->unref();		
-		//delete dynamicMesh[i];
-	}
-	dynamicMesh.clear();
-#endif
-}
 
 
 void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4 rotation)
@@ -2183,40 +2057,7 @@ void DeformableMeshInstance::blendShapes()
 			}
 		}
 
-		/* 
-		//	NOTE:	Previous version to blend appearances. Uses Blend_All_Textures shader, which streams all textures at once and blends them
-		//			according to the vector of weights. However, GLSL code requires the vector to be static, so we need to know in advance how
-		//			many textures or expressions we have. In order to avoid this limitation, I have implemented a pairwise approach, using
-		//			another GLSL shader (see below this block)
-		//	
-		//
-		//	Sets up textures
-		//	If auxiliar FBO for offscreen rendering doesn't exist yet
-		if(_tempFBO == 0) 
-		{
-			glGenFramebuffersEXT(1, &_tempFBO);
-		}
-
-		//	If auxiliar texture for offscreen rendering doesn't exist yet
-		if(_tempTex == 0) 
-		{
-			glGenTextures(1, &_tempTex);
-			glBindTexture(GL_TEXTURE_2D, _tempTex);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4096, 4096, 0, GL_RGB, GL_FLOAT, NULL);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-
-		if (texIDs.size() > 0 && texIDs[0] != 0)
-		{
-			SbmBlendTextures::BlendAllAppearances( _tempFBO, _tempTex, weights, texIDs, SbmBlendTextures::getShader("Blend_All_Textures"), 4096, 4096);
-		}
-		*/
-
+	
 
 		//	Here I try to blend the faces two at a time. This way I avoid hardcoded constant vector size.
 #if !defined(SB_IPHONE) 
@@ -2293,156 +2134,21 @@ void DeformableMeshInstance::blendShapes()
 			{
 				LOG("Error : BlendShape Texture, '%s' does not exist.", tempTexName.c_str());
 			}
-		}
-
-		/*
-		if(_tempFBOTexWithMask == NULL) 
-		{
-			_tempFBOTexWithMask = new GLuint[weights.size()];
-			glGenFramebuffers(weights.size(), _tempFBOTexWithMask);
-		}
-
-		// If images with masks in the alpha channel have not been created
-		if(_tempTexWithMask == NULL)
-		{
-			_tempTexWithMask = new GLuint[weights.size()];
-			glGenTextures(weights.size(), _tempTexWithMask);
-			for(int i=0; i<weights.size(); i++) 
-			{
-				glBindTexture(GL_TEXTURE_2D, _tempTexWithMask[i]);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#if !defined(ANDROID_BUILD)
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-#endif
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT, NULL);
-				glBindTexture(GL_TEXTURE_2D, 0);
-			}
-
-			// Adds masking images to the alpha channel of the textures
-			SbmBlendTextures::ReadMasks(_tempFBOTexWithMask, _tempTexWithMask, weights, texIDs, texture_names, SbmBlendTextures::getShader("ReadMasks"), tex_w, tex_h); 
-		}
-		*/
-
+		}		
 
 		if (texIDs.size() > 0 && texIDs[0] != 0)
-		{
-	
-			//SbmShaderProgram::printOglError("texIDs.size() > 0 ");
-			//LOG("texID size= %d", texIDs.size());
-
-			// New attempt to blend textures with masks (also renders a face). It uses the _tempTexWithMask, which are the texture maps with the masking encoded in its ALPHA channel.
-			// The _tempTexWithMask texture were created above in the SbmBlendTextures::ReadMasks call
- 		//SbmBlendTextures::ReadMasks(_tempFBOTexWithMask, _tempTexWithMask, weights, texIDs, texture_names, SbmBlendTextures::getShader("ReadMasks"), tex_w, tex_h);
-			//SbmBlendTextures::BlendGeometryWithMasks( _tempFBOTexWithMask, weights, _tempTexWithMask, texture_names, this,  SbmBlendTextures::getShader("BlendGeometryWithMasks"));
-
-			// Blends geometry and texture in the same GLSL (also renders a face) (this does NOT use masking)
-			//SbmBlendTextures::BlendGeometry( _tempFBOPairs, weights, texIDs, texture_names, this,  SbmBlendTextures::getShader("BlendGeometry"));
-
+		{			
 			// Computes blended texture pairwise, and saves it into _tempTexPairs[0], which is going to be used later as a texture (in the normal blendshape pipeline)
 			SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), tex_w, tex_h);
 		}
 #endif
 		// END OF SECOND ATTEMPT
-
-
-
 		writeToBaseModel->shape().V = newV;
 		writeToBaseModel->shape().N = newN;
 		writeToBaseModel->changed(true);
 	}
 
 	return;
-
-#if 0
-	for (size_t i = 0; i < dMeshBlend_p.size(); ++i)
-	{
-		delete dMeshBlend_p[i];
-	}
-	dMeshBlend_p.clear();
-
-	for (size_t i = 0; i < dMeshStatic_p.size(); ++i)
-	{
-		delete dMeshStatic_p[i];
-	}
-	dMeshStatic_p.clear();
-
-	if (visemeShapeMap.find("neutral") == visemeShapeMap.end())
-	{
-		LOG("neutral blend shape has not been defined!");
-		return;
-	}
-
-
-
-	std::vector<SrSnModel*>& neutralModel = visemeShapeMap["neutral"];
-	for (size_t i = 0; i < neutralModel.size(); ++i)
-	{
-		SrArray<SrPnt>& neutralV = neutralModel[i]->shape().V;
-		SrArray<SrPnt>& neutralN = neutralModel[i]->shape().N;
-		SrArray<SrPnt> newV = neutralV;
-		SrArray<SrPnt> newN = neutralN;
-
-		bool isBlending = false;
-		std::map<std::string, float>::iterator iter;
-		for (iter = visemeWeightMap.begin(); iter != visemeWeightMap.end(); ++iter)
-		{
-			for (size_t j = 0; j < visemeShapeMap[iter->first].size(); j++)
-			{
-				LOG("Shape %s", (const char*)visemeShapeMap[iter->first][j]->shape().name);
-			}
-			LOG("%s", (const char*) neutralModel[i]->shape().name);
-			if (iter->second > 0.01f && iter->first != "neutral")
-			{
-				for (size_t j = 0; j < visemeShapeMap[iter->first].size(); j++)
-				{
-					if (visemeShapeMap[iter->first][j]->shape().name != neutralModel[i]->shape().name)
-						continue;
-
-					isBlending = true;
-					SrArray<SrPnt>& visemeV = visemeShapeMap[iter->first][j]->shape().V;
-					SrArray<SrPnt>& visemeN = visemeShapeMap[iter->first][j]->shape().N;
-					if (visemeV.size() != neutralV.size())
-					{
-						LOG("number of vertices for %s (%d) is not same as neutral", iter->first.c_str());
-						continue;
-					}
-					if (visemeN.size() != neutralN.size())
-					{
-						LOG("number of normals for %s is not same as neutral", iter->first.c_str());
-						continue;
-					}
-					for (int v = 0; v < visemeV.size(); ++v)
-					{
-						SrPnt diff = visemeV[v] - neutralV[v];
-						newV[v] = newV[v] + diff * iter->second;
-					}
-					for (int n = 0; n < visemeN.size(); ++n)
-					{
-						SrPnt diff = visemeN[n] - neutralN[n];
-						newN[n] = newN[n] + diff * iter->second;
-					}
-				}
-			}
-		}
-		for (int n = 0; n < newN.size(); ++n)
-		{
-			newN[n].normalize();
-		}
-
-		SrSnModel* blendedModel = new SrSnModel();
-		//SrSnModel* blendedModel = dMeshStatic_p[i];
-		blendedModel->shape(neutralModel[i]->shape());
-		if (isBlending)
-		{
-			blendedModel->shape().V = newV;
-			blendedModel->shape().N = newN;			
-		}
-		dMeshStatic_p.push_back(blendedModel);
-	}
-#endif
 }
 
 
@@ -2450,23 +2156,7 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 {
     //LOG("setDeformableMesh to be %s", mesh->meshName.c_str());
 	_mesh = mesh;
-	cleanUp(); // remove all previous dynamic mesh
 	_mesh->buildSkinnedVertexBuffer(); // make sure the deformable mesh has vertex buffer
-#if 0
-	for (unsigned int i=0;i<_mesh->dMeshStatic_p.size();i++)
-	{
-		SrSnModel* srSnModel = _mesh->dMeshStatic_p[i];
-		SrSnModel* srSnModelDynamic = new SrSnModel();
-		srSnModelDynamic->shape(srSnModel->shape());
-		srSnModelDynamic->changed(true);
-		srSnModelDynamic->visible(false);
-		srSnModelDynamic->shape().name = srSnModel->shape().name;	
-		dynamicMesh.push_back(srSnModelDynamic);
-		srSnModelDynamic->ref();
-		//LOG("rootGroup add mesh %d, vtx = %d, face = %d",i, dynamicMesh[i]->shape().V.size(), dynamicMesh[i]->shape().F.size());
-		//SmartBody::SBScene::getScene()->getRootGroup()->add(dynamicMesh[i]);
-	}
-#endif
 	_deformPosBuf.resize(_mesh->posBuf.size()); // initialized deformation posBuffer
 	for (unsigned int i=0;i<_deformPosBuf.size();i++)
 		_deformPosBuf[i] = _mesh->posBuf[i];
@@ -2495,9 +2185,7 @@ void DeformableMeshInstance::updateJointList()
 void DeformableMeshInstance::setVisibility(int deformableMesh)
 {
 	if (deformableMesh != -1)
-	{
-		//for (unsigned int i = 0; i < dynamicMesh.size(); i++)
-		//	dynamicMesh[i]->visible(deformableMesh? true:false );
+	{		
 		_updateMesh = deformableMesh? true:false;
 		meshVisibleType = deformableMesh;
 	}
@@ -2523,14 +2211,7 @@ void DeformableMeshInstance::updateTransformBuffer()
 			continue;
 		SrMat bindPoseMat = _mesh->bindPoseMatList[idx];
 		bindPoseMat.set_translation(bindPoseMat.get_translation()*_meshScale[0]);
-		transformBuffer[idx] = bindPoseMat*joint->gmat();	
-		//SrQuat q = SrQuat(transformBuffer[idx]);
-		//SrVec v = bindPoseMat.get_translation();
-		//SrVec v1 = joint->gmat().get_translation();
-		//LOG("transform buffer %d , quat = %f %f %f %f",idx,q.w,q.x,q.y,q.z);
-		//sr_out << " transform buffer = " << transformBuffer[idx];
-		//if (idx == 0)
-		//	LOG("transform buffer %d , bindPose tran = %f %f %f, joint tran = %f %f %f",idx,v[0],v[1],v[2], v1[0],v1[1],v1[2]);
+		transformBuffer[idx] = bindPoseMat*joint->gmat();			
 	}
 }
 
@@ -2543,13 +2224,8 @@ void DeformableMeshInstance::updateSkin( const std::vector<SrVec>& restPos, std:
 	for (unsigned int i=0;i<restPos.size();i++)
 	{
 		SrVec vPos = restPos[i]*_meshScale[0];
-		SrVec vSkinPos = SrVec(0,0,0);
-		// 		SrVec4i& boneID1 = _mesh->boneIDBuf[0][i];
-		// 		SrVec4&  boneWeight1 = _mesh->boneWeightBuf[0][i];
-		// 		SrVec4i& boneID2 = _mesh->boneIDBuf[1][i];
-		// 		SrVec4&  boneWeight2 = _mesh->boneWeightBuf[1][i];
-		for (int k=0;k<_mesh->boneCountBuf[i];k++)
-			//for (int k=0;k<8;k++)
+		SrVec vSkinPos = SrVec(0,0,0);	
+		for (int k=0;k<_mesh->boneCountBuf[i];k++)		
 		{	
 
 #if USE_SKIN_WEIGHT_SIZE_8
@@ -2576,38 +2252,6 @@ SBAPI void DeformableMeshInstance::updateFast()
 	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
 
 	updateSkin(_mesh->posBuf,  _deformPosBuf);
-
-#if 0
-	_skeleton->update_global_matrices();
-	updateTransformBuffer();
-
-	for (unsigned int i=0;i<_mesh->posBuf.size();i++)
-	{
-		SrVec vPos = _mesh->posBuf[i]*_meshScale;
-		SrVec vSkinPos = SrVec(0,0,0);
-// 		SrVec4i& boneID1 = _mesh->boneIDBuf[0][i];
-// 		SrVec4&  boneWeight1 = _mesh->boneWeightBuf[0][i];
-// 		SrVec4i& boneID2 = _mesh->boneIDBuf[1][i];
-// 		SrVec4&  boneWeight2 = _mesh->boneWeightBuf[1][i];
-		for (int k=0;k<_mesh->boneCountBuf[i];k++)
-		//for (int k=0;k<8;k++)
-		{	
-				
-#if USE_SKIN_WEIGHT_SIZE_8
-			int a = (k<4) ? 0 : 1;
-			int b = k%4;		
-#else
-			if (k >= 4)
-				break;
-			int a = 0;
-			int b = k;			
-#endif
-			vSkinPos += (vPos*transformBuffer[_mesh->boneIDBuf[a][i][b]])*_mesh->boneWeightBuf[a][i][b];
-		}
-
-		_deformPosBuf[i] = vSkinPos;
-	}
-#endif
 }
 
 
@@ -2656,8 +2300,7 @@ void DeformableMeshInstance::update()
 				if (numOfInfJoints > maxJoint)
 					maxJoint = numOfInfJoints;
 				SrVec& skinLocalVec = dMeshStatic->shape().V[i];
-				SrVec finalVec;
-				//printf("Vtx bind pose = \n");
+				SrVec finalVec;		
 
 				if (numOfInfJoints >= 5 )
 				{
@@ -2678,15 +2321,7 @@ void DeformableMeshInstance::update()
 					globalCounter ++;
 					SrVec transformVec = _meshScale[0]*(skinLocalVec * skinWeight->bindShapeMat * invBMat);
 					SrVec finalTransformVec = (transformVec  * gMat);
-					finalVec = finalVec + (float(jointWeight) * finalTransformVec);		
-					//finalVec = finalVec + (float(jointWeight) * (skinLocalVec * skinWeight->bindShapeMat * invBMat  * gMat));	
-
-// 					if (iVtx == 150)
-// 					{
-// 						SrMat jointGmat = gMat;
-// 						LOG("inf joint %d, gmat = %s",j,jointGmat.toString().c_str());
-// 						LOG("finalVec = %f %f %f", finalVec[0],finalVec[1],finalVec[2]);
-// 					}
+					finalVec = finalVec + (float(jointWeight) * finalTransformVec);							
 				}
 				
 				_deformPosBuf[iVtx] = finalVec;
