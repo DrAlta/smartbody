@@ -96,7 +96,6 @@ struct BlendShapeData
 class DeformableMesh : public SmartBody::SBAsset
 {
 public:
-//	std::string                 meshName;
 	std::vector<SrSnModel*>		dMeshDynamic_p;
 	std::vector<SrSnModel*>		dMeshStatic_p;
 	std::vector<SkinWeight*>	skinWeights;
@@ -106,7 +105,7 @@ public:
 	
 	std::string                 skeletonName;						// binding skeleton for this deformable model
 	SkSkeleton*					skeleton;							// pointer to current skeleton
-	bool						binding;							// whether in deformable mesh mode
+	
 	// unrolled all vertices into a single buffer for faster GPU rendering
 	bool initStaticVertexBuffer, initSkinnedVertexBuffer;	
 	std::vector<SrVec>          posBuf;	
@@ -130,28 +129,20 @@ public:
 	std::vector<SrMat>          bindPoseMatList;	
 	std::map<int,std::vector<int> > vtxNewVtxIdxMap;
 
-	// blend shape
-	std::map<std::string, std::vector<SrSnModel*> >	visemeShapeMap;
-	std::map<std::string, float>	visemeWeightMap;
-	std::vector<SrSnModel*>		dMeshBlend_p;
 	bool hasVertexColor;	
 	bool hasTexCoord;
 
 	SrModel _emptyModel;
 public:
 	SBAPI DeformableMesh();
-	SBAPI virtual ~DeformableMesh();	
-	SBAPI void setSkeleton(SkSkeleton* skel);
-	SBAPI virtual void update();
+	SBAPI virtual ~DeformableMesh();		
 	SkinWeight* getSkinWeight(const std::string& skinSourceName);
 	SBAPI int getNumMeshes();
 	SBAPI const std::string getMeshName(int index);
 	SBAPI SrModel& getStaticModel(int index);
 	SBAPI int	getMesh(const std::string& meshName);				// get the position given the mesh name
 	int getValidSkinMesh(const std::string& meshName);
-    /*! Set the visibility state of the deformable geometry,
-        The integers mean 1:show, 0:hide, and -1:don't change the visibility state. */
-	void set_visibility(int deformableMesh);
+    
 	SBAPI virtual bool buildSkinnedVertexBuffer(); // unrolled all models inside this deformable mesh into a GPU-friendly format
 	SBAPI bool isSkinnedMesh();
 	SBAPI bool saveToSmb(std::string inputFileName);
@@ -204,8 +195,7 @@ public:
 
 public:
 	SBAPI DeformableMeshInstance();
-	SBAPI virtual ~DeformableMeshInstance();
-	SBAPI void blendShapeStaticMesh();
+	SBAPI virtual ~DeformableMeshInstance();	
 	SBAPI virtual void setDeformableMesh(DeformableMesh* mesh);
 	SBAPI void updateJointList();
 	SBAPI virtual void setPawn(SmartBody::SBPawn* pawn);
@@ -218,6 +208,8 @@ public:
 	SBAPI SmartBody::SBSkeleton* getSkeleton();	
 	SBAPI virtual void update();
 	SBAPI virtual void updateFast();
+
+	SBAPI void blendShapeStaticMesh();
 	SBAPI virtual void GPUblendShapes(glm::mat4x4, glm::mat4x4);
 	SBAPI virtual void blendShapes();
 	SBAPI DeformableMesh* getDeformableMesh() { return _mesh; }
