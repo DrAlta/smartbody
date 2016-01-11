@@ -101,10 +101,17 @@ class SrModel : public SrSharedClass
 	std::vector<SrVec>      N;  //!< Normals table		
 	std::vector<SrVec>      Tangent, BiNormal; // tangent and bi normal vectors
 	std::vector<SrPnt2>     T;  //!< Texture coordinates
-	std::vector<Face>       F;  //!< Triangular faces indices to V
 	std::vector<int>       Fm;  //!< Indices to the materials in M (size can be<F.size())
+
+#if 0
+	std::vector<Face>       F;  //!< Triangular faces indices to V
 	std::vector<Face>      Fn;  //!< Indices to the normals in N (size can be<F.size())
 	std::vector<Face>      Ft;  //!< Indices to the texture coordinates in T
+#else
+	std::vector<SrVec3i>       F;  //!< Triangular faces indices to V
+	std::vector<SrVec3i>      Fn;  //!< Indices to the normals in N (size can be<F.size())
+	std::vector<SrVec3i>      Ft;  //!< Indices to the texture coordinates in T
+#endif
 
 	std::vector<SrPnt>      VOrig;  //!< Vertices original (if changed)
 

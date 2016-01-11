@@ -69,7 +69,7 @@ static int face_cb(p_ply_argument argument) {
 	
 	if (value_index == -1) // first entry in the list
 	{
-		model->F.push_back(SrModel::Face());
+		model->F.push_back(SrVec3i());
 		int mtlIdx = model->M.size()-1;
 		model->Fm.push_back(mtlIdx);
 	}
@@ -90,11 +90,11 @@ static int texCoord_cb(p_ply_argument argument) {
 
 	if (value_index == -1) // first entry in the list
 	{
-		model->Ft.push_back(SrModel::Face());
+		model->Ft.push_back(SrVec3i());
 		//SrModel::Face& fid = model->F[model->Ft.size()-1];
 		//model->Ft.top().set(fid[0],fid[1],fid[2]);
 		int tsize = (model->Ft.size()-1)*3;
-		model->Ft.back().set(tsize+0,tsize+1,tsize+2); 
+		model->Ft.back() = SrVec3i(tsize+0,tsize+1,tsize+2); 
 		for (int i=0;i<3;i++)
 			model->T.push_back(SrVec2());
 	}

@@ -80,7 +80,7 @@ void SrSnColorSurf::gl_render_node(bool alphaBlend) const
 
 	//SR_TRACE2 ( "Faces="<<model.F.size() );
 
-	std::vector<SrModel::Face>& F = model.F;
+	std::vector<SrVec3i>& F = model.F;
 	std::vector<SrVec>&         V = model.V;
 	std::vector<SrVec>&         N = model.N;
 	std::vector<SrMaterial>&    M = model.M;
@@ -132,21 +132,21 @@ void SrSnColorSurf::gl_render_node(bool alphaBlend) const
    int f;
    if ( nsize<vsize )
     { for ( f=0; f<fsize; f++ )
-       { SrModel::Face& fac = F[f];
+       { SrVec3i& fac = F[f];
          glBegin ( GL_TRIANGLES );
-         glColor(M[fac.a].diffuse); glVertex ( V[fac.a] );
-         glColor(M[fac.b].diffuse); glVertex ( V[fac.b] );
-         glColor(M[fac.c].diffuse); glVertex ( V[fac.c] );
+         glColor(M[fac[0]].diffuse); glVertex ( V[fac[0]] );
+         glColor(M[fac[1]].diffuse); glVertex ( V[fac[1]] );
+         glColor(M[fac[2]].diffuse); glVertex ( V[fac[2]] );
          glEnd (); 
        }
     }
    else
     { for ( f=0; f<fsize; f++ )
-       { SrModel::Face& fac = F[f];
+       { SrVec3i& fac = F[f];
          glBegin ( GL_TRIANGLES );
-         glNormal ( N[fac.a] ); glMaterial(M[fac.a]); glVertex ( V[fac.a] );
-         glNormal ( N[fac.b] ); glMaterial(M[fac.b]); glVertex ( V[fac.b] );
-         glNormal ( N[fac.c] ); glMaterial(M[fac.c]); glVertex ( V[fac.c] );
+         glNormal ( N[fac[0]] ); glMaterial(M[fac[0]]); glVertex ( V[fac[0]] );
+         glNormal ( N[fac[1]] ); glMaterial(M[fac[1]]); glVertex ( V[fac[1]] );
+         glNormal ( N[fac[2]] ); glMaterial(M[fac[2]]); glVertex ( V[fac[2]] );
          glEnd (); 
        }
     }

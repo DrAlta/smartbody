@@ -299,14 +299,14 @@ static bool process_line ( const SrString& line,
       if ( v.size()<3 ) return false;
 
       for ( i=2; i<v.size(); i++ )
-       { m.F.push_back(SrModel::Face( v[0], v[i-1], v[i] ));
+       { m.F.push_back(SrVec3i( v[0], v[i-1], v[i] ));
          m.Fm.push_back(curmtl);
 
          if ( t[0]>=0 && t[1]>=0 && t[i]>=0 )
-          m.Ft.push_back(SrModel::Face( t[0], t[i-1], t[i] ));
+          m.Ft.push_back(SrVec3i( t[0], t[i-1], t[i] ));
 
          if ( n[0]>=0 && n[1]>=0 && n[i]>=0 )
-          m.Fn.push_back(SrModel::Face(  n[0], n[i-1], n[i] ));
+          m.Fn.push_back(SrVec3i(  n[0], n[i-1], n[i] ));
        }
     }
    else if ( in.last_token()=="s" ) // smoothing groups not supported

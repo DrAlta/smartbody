@@ -2239,8 +2239,8 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 		std::set<int> vertexUsed;
 		for (int f = 0; f < neutralModel.F.size(); f++)
 		{
-			SrModel::Face& face = neutralModel.F[f];
-			SrModel::Face& faceTextureIndex = neutralModel.Ft[f];
+			SrVec3i& face = neutralModel.F[f];
+			SrVec3i& faceTextureIndex = neutralModel.Ft[f];
 
 			int curVertex = -1;
 			int curTextureIndex = -1;

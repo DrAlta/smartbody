@@ -85,7 +85,7 @@ bool SrModel::export_iv ( const char* file )
    o << "  IndexedFaceSet { coordIndex [\n";
 
    for ( i=0; i<F.size(); i++ )
-    { o << srtab << F[i].a << ", " << F[i].b << ", " << F[i].c << ", -1";
+    { o << srtab << F[i][0] << ", " << F[i][1] << ", " << F[i][2] << ", -1";
       if ( i<F.size()-1 ) o<<",\n"; else o<<"]\n";
     }
 
@@ -181,7 +181,7 @@ bool SrModel::export_obj ( const char* file, const char* mtlFile, const char* te
 	if ( F.size()  && Fn.size() && Fm.size())
 	{ 
 		for ( i=0; i < F.size(); i++ )
-			o << "f " << (F[i].a + 1) << "/" << (Ft[i].a + 1) << "/" << (Fn[i].a) << " " << (F[i].b + 1) << "/" << (Ft[i].b + 1) << "/" << (Fn[i].b) << " " << (F[i].c + 1)  << "/" << (Ft[i].c + 1) << "/" << (Fn[i].c)<< srnl;
+			o << "f " << (F[i][0] + 1) << "/" << (Ft[i][0] + 1) << "/" << (Fn[i][0]) << " " << (F[i][1] + 1) << "/" << (Ft[i][1] + 1) << "/" << (Fn[i][1]) << " " << (F[i][2] + 1)  << "/" << (Ft[i][2] + 1) << "/" << (Fn[i][2])<< srnl;
 	}
 
 
