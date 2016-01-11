@@ -2314,16 +2314,16 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 						// process each polylist
 						for (size_t x = 2; x < fVec.size(); x++)
 						{
-							newModel->F.push_back(SrModel::Face(fVec[0], fVec[x - 1], fVec[x]));
+							newModel->F.push_back(SrVec3i(fVec[0], fVec[x - 1], fVec[x]));
 							newModel->Fm.push_back(curmtl);
 							if (ftVec.size() > x)
-								newModel->Ft.push_back(SrModel::Face(ftVec[0], ftVec[x - 1], ftVec[x]));
+								newModel->Ft.push_back(SrVec3i(ftVec[0], ftVec[x - 1], ftVec[x]));
 							else
-								newModel->Ft.push_back(SrModel::Face(0, 0, 0));
+								newModel->Ft.push_back(SrVec3i(0, 0, 0));
 							if (fnVec.size() > x)
-								newModel->Fn.push_back(SrModel::Face(fnVec[0], fnVec[x - 1], fnVec[x]));
+								newModel->Fn.push_back(SrVec3i(fnVec[0], fnVec[x - 1], fnVec[x]));
 							else
-								newModel->Fn.push_back(SrModel::Face(0, 1, 0));
+								newModel->Fn.push_back(SrVec3i(0, 1, 0));
 						}
 					}
 					/*
@@ -3253,8 +3253,8 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 			for (unsigned int k=0;k<mtlFaces.size();k++)
 			{
 				int fidx = mtlFaces[k];
-				SrModel::Face* f = &model.F[fidx];
-				SrModel::Face *fn = NULL, *ft = NULL;
+				SrVec3i* f = &model.F[fidx];
+				SrVec3i *fn = NULL, *ft = NULL;
 				if (hasNormal)
 					fn =  &model.Fn[fidx];
 				if (hasTexCoord)

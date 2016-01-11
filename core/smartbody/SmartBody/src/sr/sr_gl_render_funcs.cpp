@@ -564,9 +564,9 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    //SR_TRACE1 ( "Render Model faces="<<model.F.size() );
    //initTex();
 
-   std::vector<SrModel::Face>& F = model.F;
-   std::vector<SrModel::Face>& Fn = model.Fn;
-   std::vector<SrModel::Face>& Ft = model.Ft;
+   std::vector<SrVec3i>& F = model.F;
+   std::vector<SrVec3i>& Fn = model.Fn;
+   std::vector<SrVec3i>& Ft = model.Ft;
    std::vector<int>&           Fm = model.Fm;
    std::vector<SrVec>&         V = model.V;
    std::vector<SrVec>&         N = model.N;
@@ -672,10 +672,10 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 	   {	
 		   int f = k;
 		   SrVec n1,n2,n3;
-		   n1 = N[Fn[f].a]; n2 = N[Fn[f].b]; n3 = N[Fn[f].c];
-		   glNormal ( n1 ); glVertex ( V[F[f].a] );
-		   glNormal ( n2 ); glVertex ( V[F[f].b] );
-		   glNormal ( n3 ); glVertex ( V[F[f].c] );		   
+		   n1 = N[Fn[f][0]]; n2 = N[Fn[f][1]]; n3 = N[Fn[f][2]];
+		   glNormal ( n1 ); glVertex ( V[F[f][0]] );
+		   glNormal ( n2 ); glVertex ( V[F[f][1]] );
+		   glNormal ( n3 ); glVertex ( V[F[f][2]] );		   
 	   }
 	   glEnd ();
    }
@@ -702,9 +702,9 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 				   int f = mtlFaces[k];			   
 				   fn = model.face_normal(f);
 				   glNormal ( fn );		   
-				   glVertex ( V[F[f].a] );
-				   glVertex ( V[F[f].b] );
-				   glVertex ( V[F[f].c] );		   
+				   glVertex ( V[F[f][0]] );
+				   glVertex ( V[F[f][1]] );
+				   glVertex ( V[F[f][2]] );		   
 			   }
 			   glEnd ();
 		   }
@@ -715,9 +715,9 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 			   for (unsigned int k=0; k<mtlFaces.size(); k++ )
 			   {	
 				   int f = mtlFaces[k];
-				   glNormal ( N[Fn[f].a] ); glVertex ( V[F[f].a] );
-				   glNormal ( N[Fn[f].b] ); glVertex ( V[F[f].b] );
-				   glNormal ( N[Fn[f].c] ); glVertex ( V[F[f].c] );		   
+				   glNormal ( N[Fn[f][0]] ); glVertex ( V[F[f][0]] );
+				   glNormal ( N[Fn[f][1]] ); glVertex ( V[F[f][1]] );
+				   glNormal ( N[Fn[f][2]] ); glVertex ( V[F[f][2]] );		   
 			   }
 			   glEnd (); 
 		   }
@@ -750,29 +750,29 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 			   for (unsigned int k=0; k<mtlFaces.size(); k++ )
 			   {	
 				   int f = mtlFaces[k];
-				   int ft_a = Ft[f].a;
-				   int ft_b = Ft[f].b;
-				   int ft_c = Ft[f].c;
+				   int ft_a = Ft[f][0];
+				   int ft_b = Ft[f][1];
+				   int ft_c = Ft[f][2];
 				   if (ft_a >= T.size() || ft_b >= T.size() || ft_c >= T.size())
 				   {
 					   LOG("(%s): ft %d %d %d is bigger than T size %d\n", mtlName.c_str(), ft_a, ft_b, ft_c, T.size());
 					   continue;
 				   }				   
 
-				   glNormal ( N[Fn[f].a] ); 
+				   glNormal ( N[Fn[f][0]] ); 
 				   //glColor3f(T[Ft[f].a].x, T[Ft[f].a].y, 0.f);
-				   glTexCoord2f(T[Ft[f].a].x, T[Ft[f].a].y); 
-				   glVertex ( V[F[f].a] );
+				   glTexCoord2f(T[Ft[f][0]].x, T[Ft[f][0]].y); 
+				   glVertex ( V[F[f][0]] );
 
-				   glNormal ( N[Fn[f].b] ); 
+				   glNormal ( N[Fn[f][1]] ); 
 				   //glColor3f(T[Ft[f].b].x, T[Ft[f].b].y, 0.f);
-				   glTexCoord2f(T[Ft[f].b].x, T[Ft[f].b].y); 
-				   glVertex ( V[F[f].b] ); 
+				   glTexCoord2f(T[Ft[f][1]].x, T[Ft[f][1]].y); 
+				   glVertex ( V[F[f][1]] ); 
 
-				   glNormal ( N[Fn[f].c] ); 
+				   glNormal ( N[Fn[f][2]] ); 
 				   //glColor3f(T[Ft[f].b].x, T[Ft[f].b].y, 0.f);
-				   glTexCoord2f(T[Ft[f].c].x, T[Ft[f].c].y); 
-				   glVertex ( V[F[f].c] ); 		   
+				   glTexCoord2f(T[Ft[f][2]].x, T[Ft[f][2]].y); 
+				   glVertex ( V[F[f][2]] ); 		   
 			   }
 			   glEnd (); 	   
 			   glBindTexture(GL_TEXTURE_2D, 0);	   

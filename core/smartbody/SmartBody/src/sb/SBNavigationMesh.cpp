@@ -338,7 +338,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 				a = m_dmesh->tris[(j+btris)*4+0] + bverts;
 				b = m_dmesh->tris[(j+btris)*4+1] + bverts;
 				c = m_dmesh->tris[(j+btris)*4+2] + bverts;
-				naviMesh->F[j+btris].set(a,b,c);
+				naviMesh->F[j+btris] = SrVec3i(a,b,c);
 				//LOG("face %d, idx = %d %d %d",j+btris, a,b,c);
 			}
 		}

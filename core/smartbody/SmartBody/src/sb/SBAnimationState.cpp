@@ -108,8 +108,8 @@ SrSnColorSurf* SBAnimationBlend::createFlatSurface( float depth, unsigned int di
 		{
 			//surf_model->F.push().set( i*dim+j, i*dim+j+1, (i+1)*dim+j+1 );
 			//surf_model->F.push().set( i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j );
-			surf_model->F.push_back(SrModel::Face(i*dim+j, i*dim+j+1, (i+1)*dim+j+1 ));
-			surf_model->F.push_back(SrModel::Face(i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j ));
+			surf_model->F.push_back(SrVec3i(i*dim+j, i*dim+j+1, (i+1)*dim+j+1 ));
+			surf_model->F.push_back(SrVec3i(i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j ));
 			
 		}
 	}
@@ -215,8 +215,8 @@ SrSnColorSurf* SBAnimationBlend::createCurveSurface( float radius, unsigned int 
 			//surf_model->F.push().set( i*dim+j, i*dim+j+1, (i+1)*dim+j+1 );
 			//surf_model->F.push().set( i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j );
 
-			surf_model->F.push_back(SrModel::Face( i*dim+j, i*dim+j+1, (i+1)*dim+j+1 ));
-			surf_model->F.push_back(SrModel::Face( i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j  ));
+			surf_model->F.push_back(SrVec3i( i*dim+j, i*dim+j+1, (i+1)*dim+j+1 ));
+			surf_model->F.push_back(SrVec3i( i*dim+j, (i+1)*dim+j+1, (i+1)*dim+j  ));
 		}
 	}
 	surf->changed(true); // force update surf

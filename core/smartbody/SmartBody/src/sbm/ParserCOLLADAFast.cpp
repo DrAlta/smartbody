@@ -2123,19 +2123,19 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 							
 						for (size_t x = 2; x < fVec.size(); x++)
 						{
-							newModel->F.push_back(SrModel::Face(fVec[0], fVec[x - 1], fVec[x]));
+							newModel->F.push_back(SrVec3i(fVec[0], fVec[x - 1], fVec[x]));
 							newModel->Fm.push_back(curmtl);
 							if (ftVec.size() > x)
-								newModel->Ft.push_back(SrModel::Face(ftVec[0], ftVec[x - 1], ftVec[x]));
+								newModel->Ft.push_back(SrVec3i(ftVec[0], ftVec[x - 1], ftVec[x]));
 							else if (ftVec.size() > 2)
-								newModel->Ft.push_back(SrModel::Face(ftVec[0], ftVec[1], ftVec[2]));
+								newModel->Ft.push_back(SrVec3i(ftVec[0], ftVec[1], ftVec[2]));
 							else
-								newModel->Ft.push_back(SrModel::Face(0, 0, 0));
+								newModel->Ft.push_back(SrVec3i(0, 0, 0));
 							
 							if (fnVec.size() > x)
-								newModel->Fn.push_back(SrModel::Face(fnVec[0], fnVec[x - 1], fnVec[x]));
+								newModel->Fn.push_back(SrVec3i(fnVec[0], fnVec[x - 1], fnVec[x]));
 							else
-								newModel->Fn.push_back(SrModel::Face(fnVec[0], fnVec[1], fnVec[2]));
+								newModel->Fn.push_back(SrVec3i(fnVec[0], fnVec[1], fnVec[2]));
 						}
 					}
 					/*

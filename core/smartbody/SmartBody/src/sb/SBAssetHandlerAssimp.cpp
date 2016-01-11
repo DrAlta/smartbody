@@ -549,31 +549,21 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					int numIndices = scene->mMeshes[m]->mFaces[f].mNumIndices;
 					if (numIndices == 3)
 					{
-						model->F[f].a = scene->mMeshes[m]->mFaces[f].mIndices[0];
-						model->F[f].b = scene->mMeshes[m]->mFaces[f].mIndices[1];
-						model->F[f].c = scene->mMeshes[m]->mFaces[f].mIndices[2];
+						model->F[f][0] = scene->mMeshes[m]->mFaces[f].mIndices[0];
+						model->F[f][1] = scene->mMeshes[m]->mFaces[f].mIndices[1];
+						model->F[f][2] = scene->mMeshes[m]->mFaces[f].mIndices[2];
 
-						model->Ft[f].a = model->F[f].a;
-						model->Ft[f].b = model->F[f].b;
-						model->Ft[f].c = model->F[f].c;
-
-						model->Fn[f].a = model->F[f].a;
-						model->Fn[f].b = model->F[f].b;
-						model->Fn[f].c = model->F[f].c;
+						model->Ft[f] =  model->F[f];
+						model->Fn[f] = model->F[f];
 					}
 					else if (numIndices == 2)
 					{
-						model->F[f].a = scene->mMeshes[m]->mFaces[f].mIndices[0];
-						model->F[f].b = scene->mMeshes[m]->mFaces[f].mIndices[1];
-						model->F[f].c = scene->mMeshes[m]->mFaces[f].mIndices[1];
+						model->F[f][0] = scene->mMeshes[m]->mFaces[f].mIndices[0];
+						model->F[f][1] = scene->mMeshes[m]->mFaces[f].mIndices[1];
+						model->F[f][2] = scene->mMeshes[m]->mFaces[f].mIndices[1];
 
-						model->Ft[f].a = model->F[f].a;
-						model->Ft[f].b = model->F[f].b;
-						model->Ft[f].c = model->F[f].c;
-
-						model->Fn[f].a = model->F[f].a;
-						model->Fn[f].b = model->F[f].b;
-						model->Fn[f].c = model->F[f].c;
+						model->Ft[f] = model->F[f];
+						model->Fn[f] = model->F[f];
 					}
 					else
 					{

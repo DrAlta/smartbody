@@ -136,7 +136,7 @@ void SBAutoRigManager::transferSkinWeight(SmartBody::SBSkeleton& skel, SrModel& 
 	vector<Tri3Object> triobjvec;
 	for(int i = 0; i < inModel.F.size(); i++) {
 		SrVec p1,p2,p3;
-		SrModel::Face& F = inModel.F[i];
+		SrVec3i& F = inModel.F[i];
 		p1 = inModel.V[F[0]];
 		p2 = inModel.V[F[1]];
 		p3 = inModel.V[F[2]];
@@ -790,7 +790,7 @@ void boneWeightInPainting(std::vector<std::map<int,float> >& vtxBoneWeights, std
 	// add all vertex neighbors into the list
 	for (int i=0;i<m.F.size();i++)
 	{
-		SrModel::Face& f = m.F[i];
+		SrVec3i& f = m.F[i];
 		float faceArea = m.face_area(i);
 		if (badBoneVtxList[f[0]] || badBoneVtxList[f[1]] || badBoneVtxList[f[2]])
 		{
@@ -944,7 +944,7 @@ void boneWeightLaplacianSmoothing(std::vector<std::map<int,float> >& vtxBoneWeig
 	// add all vertex neighbors into the list
 	for (int i=0;i<m.F.size();i++)
 	{
-		SrModel::Face& f = m.F[i];
+		SrVec3i& f = m.F[i];
 		float faceArea = m.face_area(i);
 		for (int j=0;j<3;j++)
 		{
@@ -1057,7 +1057,7 @@ void boneWeightHarmonicSmoothing(std::vector<std::map<int,float> >& vtxBoneWeigh
 	// add all vertex neighbors into the list
 	for (int i=0;i<m.F.size();i++)
 	{
-		SrModel::Face& f = m.F[i];
+		SrVec3i& f = m.F[i];
 		float faceArea = m.face_area(i);
 		for (int j=0;j<3;j++)
 		{
@@ -1788,10 +1788,10 @@ bool SrModelToMesh( SrModel& model, Mesh& mesh, bool sanityCheck )
 	mesh.edges.resize(model.F.size()*3);
 	for (int i=0;i<model.F.size();i++)
 	{
-		SrModel::Face& f = model.F[i];
-		mesh.edges[i*3].vertex = f.a;
-		mesh.edges[i*3+1].vertex = f.b;
-		mesh.edges[i*3+2].vertex = f.c;
+		SrVec3i& f = model.F[i];
+		mesh.edges[i*3].vertex = f[0];
+		mesh.edges[i*3+1].vertex = f[1];
+		mesh.edges[i*3+2].vertex = f[2];
 	}
 
 	if (sanityCheck)
@@ -1829,9 +1829,9 @@ bool PolyVoxMeshToSrModel( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal>
 	}
 	for (int i=0;i<nTri;i++)
 	{
-		model.F[i].a = mesh.m_vecTriangleIndices[i*3];
-		model.F[i].b = mesh.m_vecTriangleIndices[i*3+1];
-		model.F[i].c = mesh.m_vecTriangleIndices[i*3+2];
+		model.F[i][0] = mesh.m_vecTriangleIndices[i*3];
+		model.F[i][1] = mesh.m_vecTriangleIndices[i*3+1];
+		model.F[i][2] = mesh.m_vecTriangleIndices[i*3+2];
 	}
 	model.computeNormals();
 	return true;

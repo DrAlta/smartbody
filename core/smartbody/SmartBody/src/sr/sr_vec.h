@@ -303,6 +303,7 @@ class SBAPI SrVec
 	 SrVec4i() {}
 	 SrVec4i(int a, int b, int c, int d) { data[0] = a; data[1] = b; data[2] = c; data[3] = d; }
 	 int& operator[] ( int i ) { return data[i]; }
+	 int operator[] ( int i ) const { return data[i]; }
 	 void operator = ( const SrVec4i& v )
 	 {
 		 for (int i=0;i<4;i++)
@@ -313,11 +314,37 @@ class SBAPI SrVec
  class SrVec3i 
  {
  public:
-	 int data[3];
 	 SrVec3i() {}
 	 SrVec3i(int a, int b, int c) { data[0] = a; data[1] = b; data[2] = c; }
+#if defined(__ANDROID__) || defined(SB_IPHONE)
+	 unsigned short data[3];
+	 unsigned short& operator[] ( int i ) { return data[i]; }
+	 unsigned short operator[] ( int i ) const { return data[i]; }
+	 friend SrOutput& operator<< ( SrOutput& o, const SrVec3i& f ) { 
+		 int ia,ib,ic; ia = f[0]; ib = f[1]; ic = f[2];
+		 return o<<f.data[0]<<srspc<<f.data[1]<<srspc<<f.data[2]; 
+	 }
+	 friend SrInput& operator>> ( SrInput& i, SrVec3i& f ) { 
+
+		 int ia,ib,ic;
+		 //return i>>f.a>>f.b>>f.c; 
+		 SrInput& t = i>>ia>>ib>>ic; 
+		 f[0] = ia; f[1] = ib; f[2] = ic;
+		 return t;
+	 }
+#else
+	 int data[3];
 	 int& operator[] ( int i ) { return data[i]; }
+	 int operator[] ( int i ) const { return data[i]; }
+	 friend SrOutput& operator<< ( SrOutput& o, const SrVec3i& f ) { return o<<f.data[0]<<srspc<<f.data[1]<<srspc<<f.data[2]; }
+	 friend SrInput& operator>> ( SrInput& i, SrVec3i& f ) { return i>>f[0]>>f[1]>>f[2]; }
+#endif
 	 void operator = ( const SrVec4i& v )
+	 {
+		 for (int i=0;i<3;i++)
+			 data[i] = v.data[i];
+	 }
+	 void operator = ( const SrVec3i& v )
 	 {
 		 for (int i=0;i<3;i++)
 			 data[i] = v.data[i];

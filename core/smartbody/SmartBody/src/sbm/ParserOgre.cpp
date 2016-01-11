@@ -1210,9 +1210,9 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 						
 						// no material for now.
 						model->Fm.push_back(0); // use first material
-						model->F.push_back(SrModel::Face(v1,v2,v3));
-						model->Ft.push_back(SrModel::Face(t1,t2,t3));
-						model->Fn.push_back(SrModel::Face(v1,v2,v3));
+						model->F.push_back(SrVec3i(v1,v2,v3));
+						model->Ft.push_back(SrVec3i(t1,t2,t3));
+						model->Fn.push_back(SrVec3i(v1,v2,v3));
 					}	
 					faceNode = faceNode->getNextSibling();
 				}

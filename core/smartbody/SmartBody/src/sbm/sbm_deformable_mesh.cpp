@@ -355,9 +355,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	int iMaterialOffset = 1;	
 	int iFaceIdxOffset = 0, iNormalIdxOffset = 0, iTextureIdxOffset = 0;
 	int iFace = 0;
-	SrModel::Face defaultIdx;
-	defaultIdx.a = defaultIdx.b = defaultIdx.c = -1;
-	LOG("meshIndexList size = %d",meshIndexList.size());
+	SrVec3i defaultIdx = SrVec3i(-1,-1,-1);
 	for (unsigned int i=0;i<meshIndexList.size();i++)
 	{
 		int pos = meshIndexList[i];
@@ -382,26 +380,26 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			SrModel& model = dMeshStatic->shape();
 			if (dMeshStatic->shape().F.size() == 0)
 				continue;
-			SrModel::Face& faceIdx = dMeshStatic->shape().F[i];	
-			SrModel::Face nIdx;
-			nIdx.set(faceIdx.a,faceIdx.b,faceIdx.c);
+			SrVec3i& faceIdx = dMeshStatic->shape().F[i];	
+			SrVec3i nIdx;
+			nIdx = faceIdx; 
 			if (dMeshStatic->shape().Fn.size() != 0)
 			{
-				SrModel::Face& fnIdx = dMeshStatic->shape().Fn[i];	
-				nIdx.set(fnIdx.a,fnIdx.b,fnIdx.c);
+				SrVec3i& fnIdx = dMeshStatic->shape().Fn[i];	
+				nIdx = fnIdx;
 			}
 			//SrModel::Face& nIdx = dMeshStatic->shape().Fn[i];
-			SrModel::Face& tIdx = defaultIdx;
+			SrVec3i& tIdx = defaultIdx;
 			if (model.Ft.size() > i)
 				tIdx = model.Ft[i];
 
-			if (tIdx.a >= 0 || 
-				tIdx.b >= 0 || 
-				tIdx.c >= 0)
+			if (tIdx[0] >= 0 || 
+				tIdx[1] >= 0 || 
+				tIdx[2] >= 0)
 			{
-				vtxNormalIdxMap[faceIdx.a + iFaceIdxOffset].insert(IntPair(nIdx.a+iNormalIdxOffset,tIdx.a+iTextureIdxOffset));
-				vtxNormalIdxMap[faceIdx.b + iFaceIdxOffset].insert(IntPair(nIdx.b+iNormalIdxOffset,tIdx.b+iTextureIdxOffset));
-				vtxNormalIdxMap[faceIdx.c + iFaceIdxOffset].insert(IntPair(nIdx.c+iNormalIdxOffset,tIdx.c+iTextureIdxOffset));
+				vtxNormalIdxMap[faceIdx[0] + iFaceIdxOffset].insert(IntPair(nIdx[0]+iNormalIdxOffset,tIdx[0]+iTextureIdxOffset));
+				vtxNormalIdxMap[faceIdx[1] + iFaceIdxOffset].insert(IntPair(nIdx[1]+iNormalIdxOffset,tIdx[1]+iTextureIdxOffset));
+				vtxNormalIdxMap[faceIdx[2] + iFaceIdxOffset].insert(IntPair(nIdx[2]+iNormalIdxOffset,tIdx[2]+iTextureIdxOffset));
 			}
 
 			int nMatIdx = 0; // if no corresponding materials, push into the default gray material group
@@ -651,26 +649,23 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		{
 			if (dMeshStatic->shape().F.size() <= i)
 				continue;				
-			SrModel::Face& faceIdx = dMeshStatic->shape().F[i];
-			if (faceIdx.a < 0 ||
-				faceIdx.b < 0 ||
-				faceIdx.c < 0)
+			SrVec3i& faceIdx = dMeshStatic->shape().F[i];
+			if (faceIdx[0] < 0 ||
+				faceIdx[1] < 0 ||
+				faceIdx[2] < 0)
 				continue;
-			SrModel::Face normalIdx;// = dMeshStatic->shape().F[i];
-			normalIdx.set(faceIdx.a,faceIdx.b,faceIdx.c);
-
+			SrVec3i normalIdx = faceIdx;
+			
 			if (dMeshStatic->shape().Fn.size() > i)
 			{
-				//normalIdx = dMeshStatic->shape().Fn[i];							
-				SrModel::Face& fnIdx = dMeshStatic->shape().Fn[i];	
-				normalIdx.set(fnIdx.a,fnIdx.b,fnIdx.c);
+				normalIdx = dMeshStatic->shape().Fn[i];							
 			}
-			SrModel::Face& texCoordIdx = defaultIdx;
+			SrVec3i& texCoordIdx = defaultIdx;
 			if (dMeshStatic->shape().Ft.size() > i)
 				texCoordIdx = dMeshStatic->shape().Ft[i];
-			int fIdx[3] = { faceIdx.a, faceIdx.b, faceIdx.c};
-			int nIdx[3] = { normalIdx.a, normalIdx.b, normalIdx.c};
-			int tIdx[3] = { texCoordIdx.a, texCoordIdx.b, texCoordIdx.c};
+			SrVec3i fIdx = faceIdx; //{ faceIdx.a, faceIdx.b, faceIdx.c};
+			SrVec3i nIdx = normalIdx; //{ normalIdx.a, normalIdx.b, normalIdx.c};
+			SrVec3i tIdx = texCoordIdx; //{ texCoordIdx.a, texCoordIdx.b, texCoordIdx.c};
 				
 			SrVec faceNormal = dMeshStatic->shape().face_normal(i);
 			for (int k=0;k<3;k++)
@@ -850,9 +845,9 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		//8
 		for (int t = 0; t < curModel.F.size(); ++t)
 		{
-			newMeshModel->add_trianglefaceindices(curModel.F[t].a);
-			newMeshModel->add_trianglefaceindices(curModel.F[t].b);
-			newMeshModel->add_trianglefaceindices(curModel.F[t].c);
+			newMeshModel->add_trianglefaceindices(curModel.F[t][0]);
+			newMeshModel->add_trianglefaceindices(curModel.F[t][1]);
+			newMeshModel->add_trianglefaceindices(curModel.F[t][2]);
 		}
 		// 9
 		for (int t = 0; t < curModel.Fm.size(); ++t)
@@ -862,16 +857,16 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		// 10
 		for (int t = 0; t < curModel.Fn.size(); ++t)
 		{
-			newMeshModel->add_normalindices(curModel.Fn[t].a);
-			newMeshModel->add_normalindices(curModel.Fn[t].b);
-			newMeshModel->add_normalindices(curModel.Fn[t].c);
+			newMeshModel->add_normalindices(curModel.Fn[t][0]);
+			newMeshModel->add_normalindices(curModel.Fn[t][1]);
+			newMeshModel->add_normalindices(curModel.Fn[t][2]);
 		}
 		// 11
 		for (int t = 0; t < curModel.Ft.size(); ++t)
 		{
-			newMeshModel->add_texturecoordinatesindices(curModel.Ft[t].a);
-			newMeshModel->add_texturecoordinatesindices(curModel.Ft[t].b);
-			newMeshModel->add_texturecoordinatesindices(curModel.Ft[t].c);
+			newMeshModel->add_texturecoordinatesindices(curModel.Ft[t][0]);
+			newMeshModel->add_texturecoordinatesindices(curModel.Ft[t][1]);
+			newMeshModel->add_texturecoordinatesindices(curModel.Ft[t][2]);
 		}
 		// 12
 		newMeshModel->set_culling(curModel.culling);
@@ -1000,10 +995,10 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 		// 8
 		for (int x = 0; x < meshModel.trianglefaceindices_size() / 3; ++x)
 		{
-			SrModel::Face newFace;
-			newFace.a = meshModel.trianglefaceindices(x * 3 + 0);
-			newFace.b = meshModel.trianglefaceindices(x * 3 + 1);
-			newFace.c = meshModel.trianglefaceindices(x * 3 + 2);
+			SrVec3i newFace;
+			newFace[0] = meshModel.trianglefaceindices(x * 3 + 0);
+			newFace[1] = meshModel.trianglefaceindices(x * 3 + 1);
+			newFace[2] = meshModel.trianglefaceindices(x * 3 + 2);
 			newModel->F.push_back(newFace);
 		}
 		// 9
@@ -1014,19 +1009,19 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 		// 10
 		for (int x = 0; x < meshModel.normalindices_size() / 3; ++x)
 		{
-			SrModel::Face newFace;
-			newFace.a = meshModel.normalindices(x * 3 + 0);
-			newFace.b = meshModel.normalindices(x * 3 + 1);
-			newFace.c = meshModel.normalindices(x * 3 + 2);
+			SrVec3i newFace;
+			newFace[0] = meshModel.normalindices(x * 3 + 0);
+			newFace[1] = meshModel.normalindices(x * 3 + 1);
+			newFace[2] = meshModel.normalindices(x * 3 + 2);
 			newModel->Fn.push_back(newFace);
 		}
 		// 11
 		for (int x = 0; x < meshModel.texturecoordinatesindices_size() / 3; ++x)
 		{
-			SrModel::Face newFace;
-			newFace.a = meshModel.texturecoordinatesindices(x * 3 + 0);
-			newFace.b = meshModel.texturecoordinatesindices(x * 3 + 1);
-			newFace.c = meshModel.texturecoordinatesindices(x * 3 + 2);
+			SrVec3i newFace;
+			newFace[0] = meshModel.texturecoordinatesindices(x * 3 + 0);
+			newFace[1] = meshModel.texturecoordinatesindices(x * 3 + 1);
+			newFace[2] = meshModel.texturecoordinatesindices(x * 3 + 2);
 			newModel->Ft.push_back(newFace);
 		}
 		// 12
