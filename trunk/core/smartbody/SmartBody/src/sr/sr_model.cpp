@@ -795,20 +795,26 @@ void SrModel::scale ( float factor )
 
 void SrModel::recalculateVertices()
 {
+#if 0
 	SrVec xaxis(1, 0, 0);
 	SrVec yaxis(0, 1, 0);
 	SrVec zaxis(0, 0, 1);
-
 	SrQuat xrot(xaxis, _rotation[0]);
 	SrQuat yrot(yaxis, _rotation[1]);
 	SrQuat zrot(zaxis, _rotation[2]);
-
 	SrQuat finalRot = xrot * yrot * zrot;
+#endif
+
+	SrQuat finalRot = SrQuat(_rotation); // use axis angle instead of Euler angle ?
 
 	int i, s=V.size();
 	for ( i=0; i<s; i++ ) 
-		V[i] = ((VOrig[i] + _translation) * _scale * finalRot);
-		//V[i] = (VOrig[i] * _scale * finalRot) + _translation;
+	{
+		SrVec vTemp = VOrig[i]*_scale;
+		V[i] = vTemp*finalRot + _translation;
+		//V[i] = ((VOrig[i] + _translation) * _scale * finalRot);
+		//V[i] = (VOrig[i] * _scale) * finalRot + _translation;
+	}
 }
 
 
@@ -824,14 +830,16 @@ void SrModel::centralize ()
 
 void SrModel::normalize ( float maxcoord )
  {
-   SrVec p; SrBox box;
+   SrVec boxCenter;
+   SrVec p; 
+   SrBox box;
 
    get_bounding_box(box);
 
-   p = box.center() * -1.0;
-   translate ( p );
+   boxCenter = box.center() * -1.0;
+   //translate ( p );
 
-   box+=p;
+   box+=boxCenter;
    SR_POS(box.a.x); SR_POS(box.a.y); SR_POS(box.a.z);
    SR_POS(box.b.x); SR_POS(box.b.y); SR_POS(box.b.z);
 
@@ -842,6 +850,8 @@ void SrModel::normalize ( float maxcoord )
    float maxactual = SR_MAX3(p.x,p.y,p.z);
    float resizeScale = maxcoord/maxactual;   
    scale ( resizeScale );  // Now we normalize to get the desired radius
+   SrVec newP = boxCenter*resizeScale;
+   translate(newP);
  }
 
 struct VertexNode : public SrTreeNode // only internally used

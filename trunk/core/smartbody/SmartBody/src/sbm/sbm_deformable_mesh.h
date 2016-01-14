@@ -127,6 +127,8 @@ public:
 	std::vector<SkJoint*>		boneJointList;	
 	std::vector<std::string>    boneJointNameList;
 	std::vector<SrMat>          bindPoseMatList;	
+
+	std::vector<int> meshIndexList;
 	std::map<int,std::vector<int> > vtxNewVtxIdxMap;
 
 	bool hasVertexColor;	
@@ -135,7 +137,8 @@ public:
 	SrModel _emptyModel;
 public:
 	SBAPI DeformableMesh();
-	SBAPI virtual ~DeformableMesh();		
+	SBAPI virtual ~DeformableMesh();	
+	SBAPI void initDeformMesh(std::vector<SrModel*>& meshVec);
 	SkinWeight* getSkinWeight(const std::string& skinSourceName);
 	SBAPI int getNumMeshes();
 	SBAPI const std::string getMeshName(int index);
@@ -144,6 +147,7 @@ public:
 	int getValidSkinMesh(const std::string& meshName);
     
 	SBAPI virtual bool buildSkinnedVertexBuffer(); // unrolled all models inside this deformable mesh into a GPU-friendly format
+	SBAPI void updateVertexBuffer(); // update the values in the vertex buffer based on dMeshStatic_p
 	SBAPI bool isSkinnedMesh();
 	SBAPI bool saveToSmb(std::string inputFileName);
 	SBAPI bool saveToDmb(std::string inputFileName);

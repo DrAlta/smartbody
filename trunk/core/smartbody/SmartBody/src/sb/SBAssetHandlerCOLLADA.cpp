@@ -83,36 +83,41 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			std::map<std::string, std::string> materialId2Name;
 			rapidxml::xml_node<>* visualSceneNode = ParserCOLLADAFast::getNode("library_visual_scenes", colladaNode, 0, 1);
 			if (!visualSceneNode)
-				LOG(" .dae file %s doesn't contain correct geometry information.", convertedPath.c_str());
+				LOG(" .dae file %s doesn't contain visual scene information.", convertedPath.c_str());
 			SBSkeleton* skeleton = new SBSkeleton();
 			skeleton->setName(basename + extension);
 			SBMotion* motion = new SBMotion();
 			motion->setName(basename + extension);
 			int order;
-			ParserCOLLADAFast::parseLibraryVisualScenes(visualSceneNode, *skeleton, *motion, 1.0, order, materialId2Name);
+			if (visualSceneNode)
+			{
+				ParserCOLLADAFast::parseLibraryVisualScenes(visualSceneNode, *skeleton, *motion, 1.0, order, materialId2Name);
 
-			if (zaxis)
-			{				
-				// get the root node
-				SkJoint* root = skeleton->root();
-				if (root)
-				{
-					if (root->quat())
+				if (zaxis)
+				{				
+					// get the root node
+					SkJoint* root = skeleton->root();
+					if (root)
 					{
-						SrQuat prerot = root->quat()->prerot();
-						SrVec xaxis(1, 0, 0);
-						SrQuat adjust(xaxis, 3.14159f / -2.0f);
-						SrQuat adjustY(SrVec(0,1,0), 3.14159f );
-						//SrQuat final = adjustY * adjust * prerot; 
-						SrQuat final = adjust * prerot;
-						//LOG("before = %f %f %f %f", prerot.w, prerot.x, prerot.y, prerot.z);
-						//LOG("after = %f %f %f %f", final.w, final.x, final.y, final.z);
-						root->quat()->prerot(final);
-						root->offset(root->offset()*adjust);
+						if (root->quat())
+						{
+							SrQuat prerot = root->quat()->prerot();
+							SrVec xaxis(1, 0, 0);
+							SrQuat adjust(xaxis, 3.14159f / -2.0f);
+							SrQuat adjustY(SrVec(0,1,0), 3.14159f );
+							//SrQuat final = adjustY * adjust * prerot; 
+							SrQuat final = adjust * prerot;
+							//LOG("before = %f %f %f %f", prerot.w, prerot.x, prerot.y, prerot.z);
+							//LOG("after = %f %f %f %f", final.w, final.x, final.y, final.z);
+							root->quat()->prerot(final);
+							root->offset(root->offset()*adjust);
+						}
 					}
-				}
-			}		
+				}		
 
+
+			}
+			
 			rapidxml::xml_node<>* skmNode = ParserCOLLADAFast::getNode("library_animations", colladaNode, 0, 1);
 			if (skmNode)
 			{
