@@ -3380,44 +3380,74 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	SmartBody::SBSkeleton* sbSk = assetManager->getSkeleton(skeletonName);
 	DeformableMesh* defMesh = assetManager->getDeformableMesh(defMeshName);
-	if (!sbSk) return false;
+	//if (!sbSk) return false;
 	fprintf(fp,"<library_visual_scenes>\n");
 	fprintf(fp,"<visual_scene id=\"RootNode\" name=\"RootNode\">\n");
 	// write-out skeleton hierarchy
-	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSk->root());
-	writeJointNode(fp,rootJoint);
+	SmartBody::SBJoint* rootJoint = NULL;
+	if (sbSk)
+	{
+		rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSk->root());
+		writeJointNode(fp,rootJoint);
+	}
+	
 	// write-out instance of skinned mesh, if it exists
 	if (defMesh)
 	{
 		//fprintf(fp,"<node id=\"SkinnedMesh\" name=\"SkinnedMesh\" type=\"NODE\">\n");
-		std::string rootJointName = rootJoint->getName();
-		for (unsigned int i=0;i<defMesh->skinWeights.size();i++)
+		if (rootJoint && defMesh->skinWeights.size() > 0)
 		{
-			SkinWeight* skinWeight = defMesh->skinWeights[i];
-			std::string meshID = skinWeight->sourceMesh;
-			std::string controllerID = skinWeight->sourceMesh+"-skin";
-			int validMeshIdx = defMesh->getValidSkinMesh(skinWeight->sourceMesh);
-			printf("meshID = %s, controllerID = %s, valid mesh idx = %d\n", meshID.c_str(), controllerID.c_str(), validMeshIdx);
-			SrModel& model = defMesh->dMeshStatic_p[validMeshIdx]->shape();
-			std::string matName = "defaultMaterial";
-			if (model.mtlnames.size() > 0)
-				matName = model.mtlnames[0];
-			std::string matID = matName+"_SG";
-			
-			fprintf(fp,"<node id=\"%s\" name=\"%s\" type=\"NODE\">\n",meshID.c_str(),meshID.c_str());
-			fprintf(fp,"<translate side=\"translate\">0 0 0</translate>\n");
-			fprintf(fp,"<instance_controller url=\"#%s\">\n",controllerID.c_str());
-			fprintf(fp,"<skeleton>#%s</skeleton>\n",rootJointName.c_str());
-			// write-out bind material for this mesh
-			fprintf(fp,"<bind_material>\n");
-			fprintf(fp,"<technique_common>\n");
-			fprintf(fp,"<instance_material symbol=\"%s\" target=\"#%s\"/>\n",matID.c_str(),matName.c_str());
-			fprintf(fp,"</technique_common>\n");
-			fprintf(fp,"</bind_material>\n");
-			fprintf(fp,"</instance_controller>\n");
-			fprintf(fp,"</node>\n");
+			std::string rootJointName = rootJoint->getName();
+			for (unsigned int i=0;i<defMesh->skinWeights.size();i++)
+			{
+				SkinWeight* skinWeight = defMesh->skinWeights[i];
+				std::string meshID = skinWeight->sourceMesh;
+				std::string controllerID = skinWeight->sourceMesh+"-skin";
+				int validMeshIdx = defMesh->getValidSkinMesh(skinWeight->sourceMesh);
+				printf("meshID = %s, controllerID = %s, valid mesh idx = %d\n", meshID.c_str(), controllerID.c_str(), validMeshIdx);
+				SrModel& model = defMesh->dMeshStatic_p[validMeshIdx]->shape();
+				std::string matName = "defaultMaterial";
+				if (model.mtlnames.size() > 0)
+					matName = model.mtlnames[0];
+				std::string matID = matName+"_SG";
+
+				fprintf(fp,"<node id=\"%s\" name=\"%s\" type=\"NODE\">\n",meshID.c_str(),meshID.c_str());
+				fprintf(fp,"<translate side=\"translate\">0 0 0</translate>\n");
+				fprintf(fp,"<instance_controller url=\"#%s\">\n",controllerID.c_str());
+				fprintf(fp,"<skeleton>#%s</skeleton>\n",rootJointName.c_str());
+				// write-out bind material for this mesh
+				fprintf(fp,"<bind_material>\n");
+				fprintf(fp,"<technique_common>\n");
+				fprintf(fp,"<instance_material symbol=\"%s\" target=\"#%s\"/>\n",matID.c_str(),matName.c_str());
+				fprintf(fp,"</technique_common>\n");
+				fprintf(fp,"</bind_material>\n");
+				fprintf(fp,"</instance_controller>\n");
+				fprintf(fp,"</node>\n");
+			}
 		}
-		//fprintf(fp,"</node>\n");
+		else // static mesh
+		{
+			//fprintf(fp,"</node>\n");
+			for (unsigned int i=0; i < defMesh->dMeshStatic_p.size(); i++)
+			{
+				SrModel& model = defMesh->dMeshStatic_p[i]->shape();
+				std::string meshID = model.name;
+				std::string matName = "defaultMaterial";
+				if (model.mtlnames.size() > 0)
+					matName = model.mtlnames[0];
+				std::string matID = matName+"_SG";
+
+				fprintf(fp,"<node id=\"%s\" name=\"%s\" type=\"NODE\">\n",meshID.c_str(),meshID.c_str());
+				fprintf(fp,"<translate side=\"translate\">0 0 0</translate>\n");
+				// write-out bind material for this mesh
+				fprintf(fp,"<bind_material>\n");
+				fprintf(fp,"<technique_common>\n");
+				fprintf(fp,"<instance_material symbol=\"%s\" target=\"#%s\"/>\n",matID.c_str(),matName.c_str());
+				fprintf(fp,"</technique_common>\n");
+				fprintf(fp,"</bind_material>\n");
+				fprintf(fp,"</node>\n");
+			}
+		}	
 	}
 
 	fprintf(fp,"</visual_scene>\n");

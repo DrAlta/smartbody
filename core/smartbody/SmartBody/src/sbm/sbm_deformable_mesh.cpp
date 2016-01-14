@@ -173,6 +173,37 @@ DeformableMesh::~DeformableMesh()
 	subMeshList.clear();
 }
 
+
+SBAPI void DeformableMesh::initDeformMesh( std::vector<SrModel*>& meshModelVec )
+{
+	dMeshStatic_p.clear();
+	dMeshDynamic_p.clear();
+	for (unsigned int i = 0; i < meshModelVec.size(); i++)
+	{
+		if (meshModelVec[i]->Fn.size() == 0)
+		{
+			meshModelVec[i]->computeNormals();
+		}
+
+		SrSnModel* srSnModelStatic = new SrSnModel();
+		srSnModelStatic->shape(*meshModelVec[i]);
+		srSnModelStatic->shape().name = meshModelVec[i]->name;
+
+		SrSnModel* srSnModelDynamic = new SrSnModel();
+		srSnModelDynamic->shape(*meshModelVec[i]);
+		srSnModelDynamic->changed(true);
+		srSnModelDynamic->visible(false);
+		srSnModelDynamic->shape().name = meshModelVec[i]->name;
+
+		dMeshStatic_p.push_back(srSnModelStatic);
+		srSnModelStatic->ref();
+		dMeshDynamic_p.push_back(srSnModelDynamic);
+		srSnModelDynamic->ref();		
+	}
+	
+}
+
+
 SkinWeight* DeformableMesh::getSkinWeight(const std::string& skinSourceName)
 {
 	for (unsigned int i = 0; i < skinWeights.size(); i++)
@@ -217,6 +248,47 @@ int	DeformableMesh::getMesh(const std::string& meshName)
 	return -1;
 }
 
+
+SBAPI void DeformableMesh::updateVertexBuffer()
+{
+	int iVtx = 0;
+	for (unsigned int c=0;c<meshIndexList.size();c++)
+	{
+		int pos = meshIndexList[c];
+		int globalCounter = 0;
+		SrSnModel* dMeshStatic = dMeshStatic_p[pos];
+		SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
+		dMeshDynamic->visible(false);
+		int numVertices = dMeshStatic->shape().V.size();
+		SrMat bindShapeMat;
+		SkinWeight* skinWeight = NULL;
+		
+		if ( pos >= 0 && skinWeights.size() > pos)
+		{
+			skinWeight = skinWeights[pos];
+			bindShapeMat = skinWeight->bindShapeMat;
+		}
+		for (int i = 0; i < numVertices; i++)
+		{
+			SrVec& lv = dMeshStatic->shape().V[i];					
+			posBuf[iVtx] = lv*bindShapeMat;
+		
+			if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
+			{
+				std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
+				// copy related vtx components 
+				for (unsigned int k=0;k<idxMap.size();k++)
+				{
+					posBuf[idxMap[k]] = posBuf[iVtx];
+				}
+			}
+			iVtx++;
+		}
+	}
+
+}
+
+
 bool DeformableMesh::buildSkinnedVertexBuffer()
 {	
 	if (initSkinnedVertexBuffer) return true;
@@ -254,8 +326,9 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	allSpecularTexNameList.push_back("");
 	meshSubsetMap[0] = std::vector<int>(); // default material group : gray color
 
-	std::vector<int> meshIndexList;
+	//std::vector<int> meshIndexList;
 	std::vector<SkinWeight*> skinWeightList;
+	meshIndexList.clear();
 	boneJointIdxMap.clear();
 	LOG("dynamic mesh size = %d, skin weight size = %d",dMeshDynamic_p.size(), skinWeights.size());
 	if (buildSkinnedBuffer)
@@ -1103,7 +1176,7 @@ void DeformableMesh::rotate(SrVec rot)
 	}
 	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
 	{
-		dMeshStatic_p[i]->shape().translate(rot);
+		dMeshStatic_p[i]->shape().rotate(rot);
 	}
 }
 
