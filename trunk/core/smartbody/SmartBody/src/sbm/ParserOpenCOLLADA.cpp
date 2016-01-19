@@ -3431,7 +3431,7 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 			for (unsigned int i=0; i < defMesh->dMeshStatic_p.size(); i++)
 			{
 				SrModel& model = defMesh->dMeshStatic_p[i]->shape();
-				std::string meshID = model.name;
+				std::string meshID = (const char*) model.name;
 				std::string matName = "defaultMaterial";
 				if (model.mtlnames.size() > 0)
 					matName = model.mtlnames[0];
