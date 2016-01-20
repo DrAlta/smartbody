@@ -416,7 +416,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 
 		if (1) //scene->HasMeshes())
 		{
-#if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__) && !defined(EMSCRIPTEN)
 			SbmDeformableMeshGPU* mesh = new SbmDeformableMeshGPU();
 #else
 			DeformableMesh* mesh = new DeformableMesh();

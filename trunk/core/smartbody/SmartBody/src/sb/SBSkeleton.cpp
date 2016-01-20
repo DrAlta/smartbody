@@ -616,4 +616,5 @@ void SBSkeleton::setPawnName( const std::string& pawnName )
 {
 	linkedPawnName = pawnName;
 }
+
 }; //namespace

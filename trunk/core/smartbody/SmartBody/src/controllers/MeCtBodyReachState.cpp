@@ -185,12 +185,23 @@ ReachTarget& ReachTarget::operator=( const ReachTarget& rt )
 /************************************************************************/
 void ReachHandAction::sendReachEvent(const std::string& etype, const std::string& cmd, float time /*= 0.0*/ )
 {
+#if defined(EMSCRIPTEN)
+	std::string eventType = etype;		
+	SmartBody::SBMotionEvent* motionEvent = new SmartBody::SBMotionEvent();
+	motionEvent->setType(eventType);			
+	motionEvent->setParameters(cmd);
+	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
+	manager->handleEvent(motionEvent,time);
+	
+#else
 	std::string eventType = etype;		
 	SmartBody::SBMotionEvent motionEvent;
 	motionEvent.setType(eventType);			
 	motionEvent.setParameters(cmd);
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 	manager->handleEvent(&motionEvent,time);
+#endif
+
 }
 
 SRT ReachHandAction::getHandTargetStateOffset( ReachStateData* rd, SRT& naturalState )

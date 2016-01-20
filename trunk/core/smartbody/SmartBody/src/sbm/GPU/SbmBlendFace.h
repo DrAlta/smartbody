@@ -6,7 +6,7 @@
 #include "external/glm/glm/gtc/type_ptr.hpp"
 #include "external/glm/glm/gtc/matrix_transform.hpp"
 
-#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
+#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #include "TBOData.h"
 #include <sbm/sbm_deformable_mesh.h>
@@ -18,7 +18,7 @@
 #endif
 
 class SbmDeformableMeshGPU;
-#if !defined(__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 class SbmBlendFace: public DeformableMesh
 {
 	public:
@@ -66,7 +66,7 @@ class SbmBlendFace: public DeformableMesh
 };
 #endif
 
-#if !defined(__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 class SbmBlendTextures
 {
 	public:

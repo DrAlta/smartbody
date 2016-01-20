@@ -908,6 +908,7 @@ void appendPythonModule(const char* moduleName, void (*initfunc)(void))
 
 void initPython(std::string pythonLibPath)
 {	
+#ifndef SB_NO_PYTHON
 	//LOG("Start Init Python");
 	XMLPlatformUtils::Initialize(); 
 	//LOG("After XML Platform Initialize");
@@ -921,9 +922,6 @@ void initPython(std::string pythonLibPath)
 
 	//LOG("After LD_LIBRARY_PATH");
 	Py_NoSiteFlag = 1;
-
-#ifndef SB_NO_PYTHON
-
 
 #ifdef __ANDROID__
 	Py_SetProgramName((char*)pythonHome.c_str());

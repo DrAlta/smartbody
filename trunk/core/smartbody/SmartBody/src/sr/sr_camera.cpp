@@ -53,6 +53,9 @@
 	//#include <GLES/gl.h>
 	#include <GLES2/gl2.h>
 	//#include <wes_gl.h>
+#elif defined(EMSCRIPTEN)
+	#include<GLES2/gl2.h>
+	#include<GLES2/gl2ext.h>
 #else
 	#include <GL/gl.h>
 	#include <GL/glx.h>
@@ -637,7 +640,7 @@ bool SrFrustum::pointInFrustum(SrVec &point) {
 
 void SrFrustum::extractFrustum()
 {
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(EMSCRIPTEN)
    float   proj[16];
    float   modl[16];
    float   clip[16];

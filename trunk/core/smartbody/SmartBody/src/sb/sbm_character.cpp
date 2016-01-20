@@ -378,11 +378,11 @@ void SbmCharacter::createStandardControllers()
 	reach_sched_p = CreateSchedulerCt( getName().c_str(), "reach" );
 	grab_sched_p = CreateSchedulerCt( getName().c_str(), "grab" );
 	param_sched_p = CreateSchedulerCt( getName().c_str(), "param" );
-
+#if !defined(EMSCRIPTEN)
 	postprocess_ct = new MeCtPosePostProcessing(sbSkel);
 	postprocess_ct->setName(getName() + "_postprocessController");
 	postprocess_ct->ref();
-	
+#endif
 	breathing_p = new MeCtBreathing();
 	breathing_p->setName(getName() + "_breathingController");
 	breathing_p->ref();
@@ -487,7 +487,9 @@ void SbmCharacter::createStandardControllers()
 	motion_sched_p->init(this);
 	param_sched_p->init(this);
 
+#if !defined(EMSCRIPTEN)
 	postprocess_ct->init(dynamic_cast<SmartBody::SBCharacter*>(this),"base");
+#endif
 	//locomotion_ct->init(this);
 	breathing_p->init(this);
 	gaze_sched_p->init(this);
@@ -513,7 +515,9 @@ void SbmCharacter::createStandardControllers()
 	ct_tree_p->add_controller( new_locomotion_ct );
 #endif
 	ct_tree_p->add_controller( motion_sched_p );
+#if !defined(EMSCRIPTEN)
 	ct_tree_p->add_controller( postprocess_ct );	
+#endif
 	ct_tree_p->add_controller( generic_hand_ct);		ct_tree_p->add_controller( reach_sched_p );	
 	ct_tree_p->add_controller( grab_sched_p );
 	ct_tree_p->add_controller( breathing_p );

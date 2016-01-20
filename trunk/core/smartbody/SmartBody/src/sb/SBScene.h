@@ -16,6 +16,11 @@
 #endif
 #endif
 
+#ifndef SB_NO_JAVASCRIPT
+#if defined(EMSCRIPTEN)
+#include <emscripten.h>
+#endif
+#endif
 
 class SBDebuggerUtility;
 class SrCamera;
@@ -88,10 +93,10 @@ class SBScene : public SBObject
 		SBAPI std::string saveSceneSetting();
 		SBAPI std::string exportScene(const std::vector<std::string>& aspects, std::string mediaPath = "", bool remoteSetup = false);
 
-		#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 		SBAPI void exportScenePackage(std::string outDir, std::string outZipArchiveName = "");
 		SBAPI void exportCharacter(std::string charName, std::string outDir);
-		#endif
+#endif
 
 		SBAPI static SBScene* getScene();		
 		SBAPI static void destroyScene();
@@ -204,8 +209,8 @@ class SBScene : public SBObject
 		SBAPI void setActiveCamera(SrCamera* camera);
 		SBAPI SrCamera* getActiveCamera();
 		SBAPI SrCamera* getCamera(const std::string& name);
-      SBAPI void SetCameraLocked(bool locked);
-      SBAPI bool IsCameraLocked();
+		SBAPI void SetCameraLocked(bool locked);
+		SBAPI bool IsCameraLocked();
 		SBAPI int getNumCameras();
 		SBAPI std::vector<std::string> getCameraNames();
 		SBAPI std::vector<SBController*>& getDefaultControllers();

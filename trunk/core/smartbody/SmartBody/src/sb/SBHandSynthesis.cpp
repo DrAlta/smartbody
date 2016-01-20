@@ -10,7 +10,7 @@ SBHandSynthesis.cpp - implementation for the algorithm
 #include <fstream>
 
 #include <boost/config.hpp>
- 
+#include <boost/lexical_cast.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/graph_traits.hpp>

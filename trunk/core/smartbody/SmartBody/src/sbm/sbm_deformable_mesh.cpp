@@ -2,7 +2,7 @@
 #include "vhcl.h"
 #include <sb/SBTypes.h>
 
-#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
+#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #include "sbm/GPU/SbmDeformableMeshGPU.h"
 #endif
@@ -24,6 +24,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "external/glm/glm/glm.hpp"
 #include "external/glm/glm/gtc/type_ptr.hpp"
@@ -464,7 +465,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			//SrModel::Face& nIdx = dMeshStatic->shape().Fn[i];
 			SrVec3i& tIdx = defaultIdx;
 			if (model.Ft.size() > i)
-				tIdx = model.Ft[i];
+				tIdx = model.Ft[i]; 
 
 			if (tIdx[0] >= 0 || 
 				tIdx[1] >= 0 || 
@@ -776,13 +777,13 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		iTextureIdxOffset += numTexCoords;		
 	}
     
-    int group = 0;
+	int group = 0;
 	std::vector<SbmSubMesh*> hairMeshList;
 	std::vector<SbmSubMesh*> alphaMeshList;
 	std::map<int,std::vector<int> >::iterator vi;
 	for (vi  = meshSubsetMap.begin();
-		 vi != meshSubsetMap.end();
-		 vi++)
+		vi != meshSubsetMap.end();
+		vi++)
 	{
 		int iMaterial = vi->first;
 
@@ -1596,7 +1597,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 	// find the base shape from static meshes
 	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
 
-		//	Initializes vector of wieghts, of size (#shapes) 
+	//	Initializes vector of wieghts, of size (#shapes) 
 	if (_mesh->blendShapeMap.begin() == _mesh->blendShapeMap.end())
 		return;
 	std::vector<float> weights(_mesh->blendShapeMap.begin()->second.size(), 0);
@@ -1768,7 +1769,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#if defined(__ANDROID__) || defined(SB_IPHONE)
+#if defined(__ANDROID__) || defined(SB_IPHONE) || defined(EMSCRIPTEN)
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_w, tex_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 #else
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
@@ -1796,7 +1797,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#if !defined(ANDROID_BUILD)
+#if !defined(ANDROID_BUILD) && !defined(EMSCRIPTEN)
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 #endif
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_w, tex_h, 0, GL_RGBA, GL_FLOAT, NULL);
@@ -2140,7 +2141,7 @@ void DeformableMeshInstance::blendShapes()
 			{
 				std::string tempName = FBOName + "_weight" + boost::lexical_cast<std::string>(i);
 				texManager.createFBO(tempName.c_str());
-			}
+		}
 		}
 		std::string FBOName = "TempFBO";
 		for (unsigned int i=0;i<weights.size();i++)
@@ -2179,7 +2180,7 @@ void DeformableMeshInstance::blendShapes()
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#if defined(__ANDROID__) || defined(SB_IPHONE)
+#if defined(__ANDROID__) || defined(SB_IPHONE) || defined(EMSCRIPTEN)
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_w, tex_h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 #else
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
@@ -2205,9 +2206,11 @@ void DeformableMeshInstance::blendShapes()
 		}		
 
 		if (texIDs.size() > 0 && texIDs[0] != 0)
-		{			
+		{		
+#if !defined(EMSCRIPTEN)
 			// Computes blended texture pairwise, and saves it into _tempTexPairs[0], which is going to be used later as a texture (in the normal blendshape pipeline)
 			SbmBlendTextures::BlendAllAppearancesPairwise( _tempFBOPairs, _tempTexPairs, weights, texIDs, texture_names, SbmBlendTextures::getShader("Blend_All_Textures_Pairwise"), tex_w, tex_h);
+#endif
 		}
 #endif
 		// END OF SECOND ATTEMPT
@@ -2222,7 +2225,7 @@ void DeformableMeshInstance::blendShapes()
 
 void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 {
-    //LOG("setDeformableMesh to be %s", mesh->meshName.c_str());
+	//LOG("setDeformableMesh to be %s", mesh->meshName.c_str());
 	_mesh = mesh;
 	_mesh->buildSkinnedVertexBuffer(); // make sure the deformable mesh has vertex buffer
 	_deformPosBuf.resize(_mesh->posBuf.size()); // initialized deformation posBuffer
@@ -2332,6 +2335,10 @@ void DeformableMeshInstance::update()
 	if (!_skeleton || !_mesh) return;	
 	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
 	_skeleton->update_global_matrices();
+#if defined(EMSCRIPTEN)
+	updateTransformBuffer();
+	return;
+#endif
 	//updateFast();
 	//return;
 

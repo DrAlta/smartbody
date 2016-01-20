@@ -36,7 +36,7 @@ enum
 };
 
 
-#if defined (ANDROID_BUILD)
+#if defined (ANDROID_BUILD) || defined(EMSCRIPTEN)
 class VBOData
 {
 public:

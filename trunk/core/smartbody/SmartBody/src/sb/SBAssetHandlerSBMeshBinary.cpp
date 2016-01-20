@@ -32,7 +32,7 @@ namespace SmartBody {
 		std::string fileName = boost::filesystem::basename(p);
 		std::string extension =  boost::filesystem::extension(p);
 
-#if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__) && !defined(EMSCRIPTEN)
 		SbmDeformableMeshGPU* mesh = new SbmDeformableMeshGPU();
 #else
 		DeformableMesh* mesh = new DeformableMesh();

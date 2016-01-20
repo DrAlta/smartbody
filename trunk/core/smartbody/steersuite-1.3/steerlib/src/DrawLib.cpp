@@ -328,7 +328,9 @@ int DrawLib::_drawDisplayList(int displayList)
 {
 	if(displayList < 0 || displayList >= (int)_displayLists.size())
 		return -1;
+#if !defined(EMSCRIPTEN)
 	glCallList(_displayLists[displayList]);
+#endif
 	return displayList;
 }
 

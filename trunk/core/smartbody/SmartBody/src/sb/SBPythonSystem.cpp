@@ -9,9 +9,9 @@
 #include <sb/SBEvent.h>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/convenience.hpp>
-#include <sb/SBVersion.hpp>
 
 #ifndef SB_NO_PYTHON
+#include <sb/SBVersion.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp> 
 #include <boost/python/return_internal_reference.hpp>
 #include <boost/python/args.hpp>

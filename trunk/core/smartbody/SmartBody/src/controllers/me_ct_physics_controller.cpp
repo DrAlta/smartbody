@@ -94,12 +94,21 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			sprintf(eventMsg,"start %s %s %s %f %f %f %f",_character->getName().c_str(),col.collider->getName().c_str(),hitJoint->jointName().c_str(),hitPos[0],hitPos[1],hitPos[2], col.momentum.len());			
 			LOG("eventMsg = %s",eventMsg);
 			std::string cmd = eventMsg;
+#if !defined(EMSCRIPTEN)
 			SmartBody::SBMotionEvent motionEvent;
 			std::string eventType = "collision";
 			motionEvent.setType(eventType);			
 			motionEvent.setParameters(cmd);
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 			manager->handleEvent(&motionEvent,t);
+#else
+			SmartBody::SBMotionEvent* motionEvent = new SmartBody::SBMotionEvent();
+			std::string eventType = "collision";
+			motionEvent->setType(eventType);			
+			motionEvent->setParameters(cmd);
+			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
+			manager->handleEvent(motionEvent,t);
+#endif
 			colRecords.clear();
 			hasGaze = true;
 			fadeOutTime = (float)t+2.f;
@@ -112,12 +121,21 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 // 			if (!hasPD)
 // 				phyChar->setBoolAttribute("usePD",false);
 			std::string cmd = eventMsg;
+#if !defined(EMSCRIPTEN)
 			SmartBody::SBMotionEvent motionEvent;
 			std::string eventType = "collision";
 			motionEvent.setType(eventType);						
 			motionEvent.setParameters(cmd);
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();	
 			manager->handleEvent(&motionEvent,t);
+#else
+			SmartBody::SBMotionEvent *motionEvent = new SmartBody::SBMotionEvent();
+			std::string eventType = "collision";
+			motionEvent->setType(eventType);						
+			motionEvent->setParameters(cmd);
+			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();	
+			manager->handleEvent(motionEvent,t);
+#endif
 			hasGaze = false;
 			hasPD = true;
 			fadeOutTime = 0.f;

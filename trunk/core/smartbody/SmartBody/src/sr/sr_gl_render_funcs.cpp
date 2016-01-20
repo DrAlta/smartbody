@@ -30,7 +30,7 @@
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>
 #else
-#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
+#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #include "external/SOIL/SOIL.h"
 #endif
@@ -53,7 +53,7 @@
 #include <sbm/GPU/SbmBlendFace.h>
 #include <sbm/sbm_deformable_mesh.h>
 
-#if !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
+#if !defined(ANDROID_BUILD) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include <sbm/GPU/SbmShader.h>
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #endif
@@ -79,6 +79,7 @@
 #include "external/glm/glm/gtc/matrix_transform.hpp"
 #include "external/glm/glm/gtc/type_ptr.hpp"
 
+#if !defined(EMSCRIPTEN)
 //=============================== render_model ====================================
 
 
@@ -1304,5 +1305,17 @@ void SrGlRenderFuncs::render_polygons ( SrSnShapeBase* shape )
     ::render_polygon ( p[i], shape->render_mode(), resolution );
 #endif
  }
+#else
+static void renderBlendFace( DeformableMeshInstance* shape){};
+static void renderDeformableMesh( DeformableMeshInstance* shape, bool showSkinWeight = false ){};
+static void render_model ( SrSnShapeBase* shape ){};
+static void render_lines ( SrSnShapeBase* shape ){};
+static void render_points ( SrSnShapeBase* shape ){};
+static void render_box ( SrSnShapeBase* shape ){};
+static void render_sphere ( SrSnShapeBase* shape ){};
+static void render_cylinder ( SrSnShapeBase* shape ){};
+static void render_polygon ( SrSnShapeBase* shape ){};
+static void render_polygons ( SrSnShapeBase* shape ){};
 
+#endif
 //======================================= EOF ====================================

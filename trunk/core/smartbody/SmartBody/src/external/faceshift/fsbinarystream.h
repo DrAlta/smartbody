@@ -247,7 +247,7 @@ public:
 #ifdef __linux__
 typedef boost::shared_ptr<fsMsg> fsMsgPtr;
 #else
-#if _MSC_VER == 1500
+#if _MSC_VER == 1500 || defined(EMSCRIPTEN)
 typedef boost::shared_ptr<fsMsg> fsMsgPtr;
 #else
 #ifdef __APPLE__

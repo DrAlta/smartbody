@@ -1,5 +1,5 @@
 #include "vhcl.h"
-#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #include "external/jpge/jpge.h"
 #endif
@@ -26,7 +26,7 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 
-#if !defined(__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 
 SbmBlendFace::SbmBlendFace() : DeformableMesh()
 {
@@ -176,7 +176,7 @@ void SbmBlendFace::initShaderProgram_Dan() {
 
 	GLint success = 0;
 
-		// build the shader after there is an opengl context
+	// build the shader after there is an opengl context
 	_vsID = -1;
 	_fsID = -1;
 	
@@ -211,7 +211,7 @@ void SbmBlendFace::initShaderProgram_Dan() {
 	}
 
 	SbmShaderProgram::printShaderInfoLog(_vsID);
-    SbmShaderProgram::printShaderInfoLog(_fsID);
+	SbmShaderProgram::printShaderInfoLog(_fsID);
     
 	_programID = glCreateProgram();
 	if (_vsID != -1)
@@ -249,20 +249,20 @@ void SbmBlendFace::initShaderProgram()
 
 	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_3_0)
 	{
-		SbmShaderManager::singleton().addShader(shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+	SbmShaderManager::singleton().addShader(shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
 	}
 	else if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_2_0)
 	{
 #ifdef __APPLE__
-		SbmShaderManager::singleton().addShader(shaderName.c_str(), shaderVs.c_str(),shaderFs.c_str(), true);
+	SbmShaderManager::singleton().addShader(shaderName.c_str(), shaderVs.c_str(),shaderFs.c_str(), true);
 #else
-		SbmShaderManager::singleton().addShader(shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+	SbmShaderManager::singleton().addShader(shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
 #endif
 		
 	}
 	else
 	{
-		_initShader = false;	
+	_initShader = false;	
 	}
 	*/
 }
@@ -270,7 +270,7 @@ void SbmBlendFace::initShaderProgram()
 #endif
 
 
-#if !defined(SB_IPHONE)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 SbmBlendTextures::SbmBlendTextures()
 {
 }
@@ -825,151 +825,151 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #1");
 
 		glPushMatrix();
-			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst[i]);                                                              // Bind the framebuffer object
-			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst[i], 0);              // Attach texture to FBO
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst[i]);                                                              // Bind the framebuffer object
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst[i], 0);              // Attach texture to FBO
 
-			assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
+		assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
 
-			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #2");
+		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #2");
 
 #if !defined(__ANDROID__)
-			glPushAttrib(GL_ENABLE_BIT);
-				glDisable(GL_DEPTH_TEST);
-				glDisable(GL_LIGHTING);
-				glMatrixMode (GL_PROJECTION);
-				glPushMatrix();
+		glPushAttrib(GL_ENABLE_BIT);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_LIGHTING);
+		glMatrixMode (GL_PROJECTION);
+		glPushMatrix();
 
-				SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #3");
-					glLoadIdentity ();
-					gluOrtho2D(-1, 1, -1, 1);
-					glMatrixMode (GL_MODELVIEW);
-					glPushAttrib(GL_VIEWPORT_BIT);
-					glPushAttrib(GL_TEXTURE_BIT);
+		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #3");
+		glLoadIdentity ();
+		gluOrtho2D(-1, 1, -1, 1);
+		glMatrixMode (GL_MODELVIEW);
+		glPushAttrib(GL_VIEWPORT_BIT);
+		glPushAttrib(GL_TEXTURE_BIT);
 					
-						glViewport(0, 0, w, h);
-						glLoadIdentity ();
-						glClearColor(1.0, 1.0, 1.0, 0);
-						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glViewport(0, 0, w, h);
+		glLoadIdentity ();
+		glClearColor(1.0, 1.0, 1.0, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 						
-						glUseProgram(program);
+		glUseProgram(program);
 						
-						glEnable(GL_TEXTURE_2D);
+		glEnable(GL_TEXTURE_2D);
 
-							GLuint uExpressionSampler	= glGetUniformLocation(program, "uExpressionSampler");
-							GLuint uMaskSampler			= glGetUniformLocation(program, "uMaskSampler");
+		GLuint uExpressionSampler	= glGetUniformLocation(program, "uExpressionSampler");
+		GLuint uMaskSampler			= glGetUniformLocation(program, "uMaskSampler");
 							
-							SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #7_");
+		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #7_");
 						
-							glUniform1i(uExpressionSampler, 0);
-							glUniform1i(uMaskSampler, 1);
+		glUniform1i(uExpressionSampler, 0);
+		glUniform1i(uMaskSampler, 1);
 
-							glActiveTexture(GL_TEXTURE0);
-							glBindTexture(GL_TEXTURE_2D, texIDs[i]);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texIDs[i]);
 						
-							glActiveTexture(GL_TEXTURE1);
-							glBindTexture(GL_TEXTURE_2D, tex_mask->getID());
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, tex_mask->getID());
 							
-							glBegin(GL_QUADS);
-								glTexCoord2f(0, 1);
-								glVertex3f(-1.0f, 1.0f, -0.5f);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0, 1);
+		glVertex3f(-1.0f, 1.0f, -0.5f);
 
-								glTexCoord2f(0, 0);
-								glVertex3f(-1.0f, -1.0f, -0.5f);
+		glTexCoord2f(0, 0);
+		glVertex3f(-1.0f, -1.0f, -0.5f);
 
-								glTexCoord2f(1, 0);
-								glVertex3f(1.0f, -1.0f, -0.5f);
+		glTexCoord2f(1, 0);
+		glVertex3f(1.0f, -1.0f, -0.5f);
 
-								glTexCoord2f(1, 1);
-								glVertex3f(1.0f, 1.0f, -0.5f);
-							glEnd();
+		glTexCoord2f(1, 1);
+		glVertex3f(1.0f, 1.0f, -0.5f);
+		glEnd();
 
-						glUseProgram(0);
-						SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #9");
+		glUseProgram(0);
+		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #9");
 
-					glPopAttrib();                          // Pops texture bit
-					glDisable(GL_TEXTURE_2D);
-					glPopAttrib();							// Pops viewport information
-				glMatrixMode (GL_PROJECTION);
-				glPopMatrix();                              
-				glMatrixMode (GL_MODELVIEW);
-			glPopAttrib();								// Pops ENABLE_BIT
+		glPopAttrib();                          // Pops texture bit
+		glDisable(GL_TEXTURE_2D);
+		glPopAttrib();							// Pops viewport information
+		glMatrixMode (GL_PROJECTION);
+		glPopMatrix();                              
+		glMatrixMode (GL_MODELVIEW);
+		glPopAttrib();								// Pops ENABLE_BIT
 #elif defined(__ANDROID__)
-			glDisable(GL_DEPTH_TEST);
-			//glDisable(GL_LIGHTING);
-			glMatrixMode (GL_PROJECTION);
-			glPushMatrix();
+		glDisable(GL_DEPTH_TEST);
+		//glDisable(GL_LIGHTING);
+		glMatrixMode (GL_PROJECTION);
+		glPushMatrix();
 
-			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #3");
-			glLoadIdentity ();
-			gluOrtho2D(-1, 1, -1, 1);
-			glMatrixMode (GL_MODELVIEW);
-			int viewport[4];
-			glGetIntegerv(GL_VIEWPORT, viewport);
-			glViewport(0, 0, w, h);
-			glLoadIdentity ();
-			GLfloat clearColors[4];
-			glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColors);
-			glClearColor(1.0, 1.0, 1.0, 0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #3");
+		glLoadIdentity ();
+		gluOrtho2D(-1, 1, -1, 1);
+		glMatrixMode (GL_MODELVIEW);
+		int viewport[4];
+		glGetIntegerv(GL_VIEWPORT, viewport);
+		glViewport(0, 0, w, h);
+		glLoadIdentity ();
+		GLfloat clearColors[4];
+		glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColors);
+		glClearColor(1.0, 1.0, 1.0, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glUseProgram(program);
+		glUseProgram(program);
 
-			//glEnable(GL_TEXTURE_2D);
+		//glEnable(GL_TEXTURE_2D);
 
-			GLuint uExpressionSampler	= glGetUniformLocation(program, "uExpressionSampler");
-			GLuint uMaskSampler			= glGetUniformLocation(program, "uMaskSampler");
+		GLuint uExpressionSampler	= glGetUniformLocation(program, "uExpressionSampler");
+		GLuint uMaskSampler			= glGetUniformLocation(program, "uMaskSampler");
 
-			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #7_");
+		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #7_");
 
-			glUniform1i(uExpressionSampler, 0);
-			glUniform1i(uMaskSampler, 1);
+		glUniform1i(uExpressionSampler, 0);
+		glUniform1i(uMaskSampler, 1);
 
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texIDs[i]);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texIDs[i]);
 
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, tex_mask->getID());
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, tex_mask->getID());
 
-			SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, -0.5f, 1.f), SrVec4(-1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, 1.0f, -0.5f, 1.f) };
-			SrVec4 quadT[4] = { SrVec4(0.f, 1.f, 0.f, 0.f), SrVec4(0.f, 0.f, 0.f, 0.f), SrVec4(1.f, 0.f, 0.f, 0.f), SrVec4(1.f, 1.f, 0.f, 0.f) };
-			unsigned short indices[] = {0,1,2, 0,2,3};
+		SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, -0.5f, 1.f), SrVec4(-1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, 1.0f, -0.5f, 1.f) };
+		SrVec4 quadT[4] = { SrVec4(0.f, 1.f, 0.f, 0.f), SrVec4(0.f, 0.f, 0.f, 0.f), SrVec4(1.f, 0.f, 0.f, 0.f), SrVec4(1.f, 1.f, 0.f, 0.f) };
+		unsigned short indices[] = {0,1,2, 0,2,3};
 
-			GLuint pos_loc = glGetAttribLocation(program,"aPosition");
-			GLuint texcoord_loc = glGetAttribLocation(program,"aTexCoord0");
-			GLuint mvp_loc = glGetUniformLocation(program, "uMVP");
-			glEnableVertexAttribArray(pos_loc);
-			glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,(GLfloat*)&quad[0]);
-			glEnableVertexAttribArray(texcoord_loc);
-			glVertexAttribPointer(texcoord_loc,4,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
-			glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, m_modelview_proj->data);
+		GLuint pos_loc = glGetAttribLocation(program,"aPosition");
+		GLuint texcoord_loc = glGetAttribLocation(program,"aTexCoord0");
+		GLuint mvp_loc = glGetUniformLocation(program, "uMVP");
+		glEnableVertexAttribArray(pos_loc);
+		glVertexAttribPointer(pos_loc,4,GL_FLOAT,0,0,(GLfloat*)&quad[0]);
+		glEnableVertexAttribArray(texcoord_loc);
+		glVertexAttribPointer(texcoord_loc,4,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
+		glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, m_modelview_proj->data);
 
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
 
-			glDisableVertexAttribArray(pos_loc);
-			glDisableVertexAttribArray(texcoord_loc);
+		glDisableVertexAttribArray(pos_loc);
+		glDisableVertexAttribArray(texcoord_loc);
 
-			glUseProgram(0);
-			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #9");
+		glUseProgram(0);
+		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #9");
 
-			glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
-			glClearColor(clearColors[0],clearColors[1],clearColors[2],clearColors[3]);
-			//glDisable(GL_TEXTURE_2D);						// Pops viewport information
-			glMatrixMode (GL_PROJECTION);
-			glPopMatrix();                              
-			glMatrixMode (GL_MODELVIEW);
-			glEnable(GL_DEPTH_TEST);
-			//glEnable(GL_LIGHTING);							// Pops ENABLE_BIT
+		glViewport(viewport[0],viewport[1],viewport[2],viewport[3]);
+		glClearColor(clearColors[0],clearColors[1],clearColors[2],clearColors[3]);
+		//glDisable(GL_TEXTURE_2D);						// Pops viewport information
+		glMatrixMode (GL_PROJECTION);
+		glPopMatrix();                              
+		glMatrixMode (GL_MODELVIEW);
+		glEnable(GL_DEPTH_TEST);
+		//glEnable(GL_LIGHTING);							// Pops ENABLE_BIT
 
 #endif
-			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #10");
+		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #10");
 
-			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);    // Bind the render buffer
-			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);         
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);    // Bind the render buffer
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);         
 		
-			SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #6");
+		SbmShaderProgram::printOglError("SbmBlendTextures::ReadMasks #6");
 
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, 0);																							
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);																							
 		glPopMatrix();
 	}
 }
@@ -1033,7 +1033,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 	glGenTextures(1, &tbo);
 	
 	glGenBuffers( 1, &verticesUsedBuffer);
-    glBindBuffer( GL_TEXTURE_BUFFER, verticesUsedBuffer);
+	glBindBuffer( GL_TEXTURE_BUFFER, verticesUsedBuffer);
 #if _MSC_VER == 1500
 	glBufferData( GL_TEXTURE_BUFFER, verticesUsed.size() * sizeof(int), &verticesUsed.front(), GL_DYNAMIC_DRAW);
 #else
@@ -1092,7 +1092,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 	}
 	
 	const int MAX_SHAPES = 14;	// I can't enable more than 16 attributes (15 vertex buffer + 1 texture coordinate buffer)
-								// NOTE: Also change #define in shader if you change this value
+	// NOTE: Also change #define in shader if you change this value
 
 	std::vector<float>	usedWeights;
 	std::vector<int>	usedShapeIDs;
@@ -1104,108 +1104,108 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 	glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
 
 	glUseProgram(program);
-		GLuint aVertexTexcoord	= glGetAttribLocation(program, "aVertexTexcoord");
-		GLuint aVertexPosition	= glGetAttribLocation(program, "aVertexPosition");
+	GLuint aVertexTexcoord	= glGetAttribLocation(program, "aVertexTexcoord");
+	GLuint aVertexPosition	= glGetAttribLocation(program, "aVertexPosition");
 
-		for(int i=0; i<weights.size(); i++)
+	for(int i=0; i<weights.size(); i++)
+	{
+		// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
+		if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
 		{
-			// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
-			if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
-			{
-				GLuint vertexAttribLoc = aVertexPosition + usedWeights.size();
-				//LOG("vertexAttribLoc = %d", vertexAttribLoc);
-				glEnableVertexAttribArray(vertexAttribLoc);
-				VBOVec3f* vbo = aux->getVBOPos(i);
-				if (!vbo)
-					continue;
-				vbo->VBO()->BindBuffer();
-				glVertexAttribPointer(vertexAttribLoc, 3, GL_FLOAT, GL_FALSE, 0,0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
+			GLuint vertexAttribLoc = aVertexPosition + usedWeights.size();
+			//LOG("vertexAttribLoc = %d", vertexAttribLoc);
+			glEnableVertexAttribArray(vertexAttribLoc);
+			VBOVec3f* vbo = aux->getVBOPos(i);
+			if (!vbo)
+				continue;
+			vbo->VBO()->BindBuffer();
+			glVertexAttribPointer(vertexAttribLoc, 3, GL_FLOAT, GL_FALSE, 0,0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-				// Pushes this weight to the vector of used weights
-				usedWeights.push_back(weights[i]);
-				usedShapeIDs.push_back(i);
-			}
+			// Pushes this weight to the vector of used weights
+			usedWeights.push_back(weights[i]);
+			usedShapeIDs.push_back(i);
 		}
-	   //SbmShaderProgram::printOglError("BlendGeometry glVertexAttributePointer");
+	}
+	//SbmShaderProgram::printOglError("BlendGeometry glVertexAttributePointer");
 		
-		glEnableVertexAttribArray(aVertexTexcoord);
-		aux->getVBOTexCoord()->VBO()->BindBuffer();
-		glVertexAttribPointer(aVertexTexcoord, 2, GL_FLOAT, GL_FALSE, 0,0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glEnableVertexAttribArray(aVertexTexcoord);
+	aux->getVBOTexCoord()->VBO()->BindBuffer();
+	glVertexAttribPointer(aVertexTexcoord, 2, GL_FLOAT, GL_FALSE, 0,0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		GLuint uMatrixMV		= glGetUniformLocation(program, "uMatrixMV");
-		GLuint uMatrixProj		= glGetUniformLocation(program, "uMatrixProj");
-		GLuint uWeights			= glGetUniformLocation(program, "uWeights");
-		GLuint uBorderVertices	= glGetUniformLocation(program, "uBorderVertices");
-		GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
-		//GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
-		GLuint uRotate			= glGetUniformLocation(program, "uRotate");
-		GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
-		GLuint uShowMasks		= glGetUniformLocation(program, "uShowMasks");
-		GLuint uUseMasks		= glGetUniformLocation(program, "uUseMasks");
-		GLuint uOverlayMasks	= glGetUniformLocation(program, "uOverlayMasks");
-		GLuint uUsedShapeIDs	= glGetUniformLocation(program, "uUsedShapeIDs");
+	GLuint uMatrixMV		= glGetUniformLocation(program, "uMatrixMV");
+	GLuint uMatrixProj		= glGetUniformLocation(program, "uMatrixProj");
+	GLuint uWeights			= glGetUniformLocation(program, "uWeights");
+	GLuint uBorderVertices	= glGetUniformLocation(program, "uBorderVertices");
+	GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
+	//GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
+	GLuint uRotate			= glGetUniformLocation(program, "uRotate");
+	GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
+	GLuint uShowMasks		= glGetUniformLocation(program, "uShowMasks");
+	GLuint uUseMasks		= glGetUniformLocation(program, "uUseMasks");
+	GLuint uOverlayMasks	= glGetUniformLocation(program, "uOverlayMasks");
+	GLuint uUsedShapeIDs	= glGetUniformLocation(program, "uUsedShapeIDs");
 
-		SbmShaderProgram::printOglError("BlendGeometry GetUniformLocation");
-		int * image_array		= new int[MAX_SHAPES];
-		float * w				= new float[usedWeights.size()];
-		int * usedShapesID_array = new int[usedShapeIDs.size()];
+	SbmShaderProgram::printOglError("BlendGeometry GetUniformLocation");
+	int * image_array		= new int[MAX_SHAPES];
+	float * w				= new float[usedWeights.size()];
+	int * usedShapesID_array = new int[usedShapeIDs.size()];
 
-		for(int i=0; i<MAX_SHAPES; i++)
+	for(int i=0; i<MAX_SHAPES; i++)
+	{
+		if(i < usedWeights.size())
 		{
-			if(i < usedWeights.size())
-			{
-				glActiveTexture(GL_TEXTURE0 + i);
-				glBindTexture(GL_TEXTURE_2D, texIDs[usedShapeIDs[i]]);
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texIDs[usedShapeIDs[i]]);
 
-				image_array[i]			= i;
-				w[i]					= usedWeights[i];
-				usedShapesID_array[i]	= usedShapeIDs[i];
-			}
-			// Textures not used, but we still need to pass 15 textures to the fragment shader for completeness
-			else
-			{
-				glActiveTexture(GL_TEXTURE0 + i);
-				glBindTexture(GL_TEXTURE_2D, texIDs[0]);
-				image_array[i]	= i;
-			}
+			image_array[i]			= i;
+			w[i]					= usedWeights[i];
+			usedShapesID_array[i]	= usedShapeIDs[i];
 		}
+		// Textures not used, but we still need to pass 15 textures to the fragment shader for completeness
+		else
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+			image_array[i]	= i;
+		}
+	}
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texIDs[0]);
-		glUniform1i(uNeutralSampler, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+	glUniform1i(uNeutralSampler, 0);
 
-		glUniformMatrix4fv(uMatrixMV, 1, GL_FALSE, modelview_matrix);
-		glUniformMatrix4fv(uMatrixProj, 1, GL_FALSE, projection_matrix);
-		//glUniformMatrix4fv(uTranslate, 1, GL_FALSE, glm::value_ptr(translation));
-		glUniformMatrix4fv(uRotate, 1, GL_FALSE, glm::value_ptr(rotation));
-		glUniform1fv(uWeights, usedWeights.size(), w);
-		glUniform1iv(uUsedShapeIDs, usedShapeIDs.size(), usedShapesID_array);
-		glUniform1i(uNumberOfShapes, usedWeights.size());
-		glUniform1iv(uNeutralSampler, MAX_SHAPES, image_array);
-		glUniform1i(uBorderVertices,  14);
-		glUniform1i(uShowMasks,  showMasks);
-		glUniform1i(uUseMasks,  useMasks);
-		glUniform1i(uOverlayMasks,  overlayMasks);
+	glUniformMatrix4fv(uMatrixMV, 1, GL_FALSE, modelview_matrix);
+	glUniformMatrix4fv(uMatrixProj, 1, GL_FALSE, projection_matrix);
+	//glUniformMatrix4fv(uTranslate, 1, GL_FALSE, glm::value_ptr(translation));
+	glUniformMatrix4fv(uRotate, 1, GL_FALSE, glm::value_ptr(rotation));
+	glUniform1fv(uWeights, usedWeights.size(), w);
+	glUniform1iv(uUsedShapeIDs, usedShapeIDs.size(), usedShapesID_array);
+	glUniform1i(uNumberOfShapes, usedWeights.size());
+	glUniform1iv(uNeutralSampler, MAX_SHAPES, image_array);
+	glUniform1i(uBorderVertices,  14);
+	glUniform1i(uShowMasks,  showMasks);
+	glUniform1i(uUseMasks,  useMasks);
+	glUniform1i(uOverlayMasks,  overlayMasks);
 
-		aux->subMeshTris[0]->VBO()->BindBuffer();
-			glDrawElements(GL_TRIANGLES, _mesh->triBuf.size()*3 , GL_UNSIGNED_INT,0);
-		aux->subMeshTris[0]->VBO()->UnbindBuffer();
+	aux->subMeshTris[0]->VBO()->BindBuffer();
+	glDrawElements(GL_TRIANGLES, _mesh->triBuf.size()*3 , GL_UNSIGNED_INT,0);
+	aux->subMeshTris[0]->VBO()->UnbindBuffer();
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 		
-		aux->getVBOPos(0)->VBO()->UnbindBuffer();
-		aux->getVBOPos(1)->VBO()->UnbindBuffer();
-		aux->getVBOTexCoord()->VBO()->UnbindBuffer();
+	aux->getVBOPos(0)->VBO()->UnbindBuffer();
+	aux->getVBOPos(1)->VBO()->UnbindBuffer();
+	aux->getVBOTexCoord()->VBO()->UnbindBuffer();
 
-		for(int i=0; i<usedWeights.size(); i++)
-		{
-			glDisableVertexAttribArray(aVertexPosition + i);
-		}
+	for(int i=0; i<usedWeights.size(); i++)
+	{
+		glDisableVertexAttribArray(aVertexPosition + i);
+	}
 
-		glDisableVertexAttribArray(aVertexTexcoord);
+	glDisableVertexAttribArray(aVertexTexcoord);
 		
 	glUseProgram(0);
 
@@ -1296,7 +1296,7 @@ void SbmBlendTextures::RenderGeometryWithMasks(GLuint * FBODst, std::vector<floa
 	{
 		// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
 		if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
- 		{
+		{
 // 			GLuint vertexAttribLoc = aVertexPosition + usedWeights.size();
 // 			//LOG("vertexAttribLoc = %d", vertexAttribLoc);
 // 			glEnableVertexAttribArray(vertexAttribLoc);
@@ -1426,39 +1426,39 @@ void SbmBlendTextures::BlendGeometry(GLuint * FBODst, std::vector<float> weights
 	// Creates lists of edges
 	for(int i=0; i< _mesh->triBuf.size(); i++)
 	{
-			int id1 = _mesh->triBuf[i][0];
-			int id2 = _mesh->triBuf[i][1];
-			int id3 = _mesh->triBuf[i][2];
+	int id1 = _mesh->triBuf[i][0];
+	int id2 = _mesh->triBuf[i][1];
+	int id3 = _mesh->triBuf[i][2];
 			
-			edges.push_back(SrVec2(id1,id2));
-			edges.push_back(SrVec2(id1,id3));
-			edges.push_back(SrVec2(id3,id2));
+	edges.push_back(SrVec2(id1,id2));
+	edges.push_back(SrVec2(id1,id3));
+	edges.push_back(SrVec2(id3,id2));
 	}
 
 	for(int i=0; i<edges.size(); i++)
 	{
-		SrVec2 edge			= edges[i];
-		SrVec2 edge_reverse = SrVec2(edge.y, edge.x);
-		int count			= 0;
+	SrVec2 edge			= edges[i];
+	SrVec2 edge_reverse = SrVec2(edge.y, edge.x);
+	int count			= 0;
 		
-		count			= std::count (edges.begin(), edges.end(), edge);
-		count			+= std::count (edges.begin(), edges.end(), edge_reverse);
+	count			= std::count (edges.begin(), edges.end(), edge);
+	count			+= std::count (edges.begin(), edges.end(), edge_reverse);
 
-		if(count == 1)
-		{
-			verticesUsed[edge.x] = 1;
-			verticesUsed[edge.y] = 1;
+	if(count == 1)
+	{
+	verticesUsed[edge.x] = 1;
+	verticesUsed[edge.y] = 1;
 
 //			std::cerr << "Vertex " << edge.x << " is in the edge.\n";
 //			std::cerr << "Vertex " << edge.y << " is in the edge.\n";
-		}
+	}
 	}
 	*/
 	GLuint tbo, verticesUsedBuffer;
 	glGenTextures(1, &tbo);
 	
 	glGenBuffers( 1, &verticesUsedBuffer);
-    glBindBuffer( GL_TEXTURE_BUFFER, verticesUsedBuffer);
+	glBindBuffer( GL_TEXTURE_BUFFER, verticesUsedBuffer);
 #if _MSC_VER == 1500
 	glBufferData( GL_TEXTURE_BUFFER, verticesUsed.size() * sizeof(int), &verticesUsed.front(), GL_DYNAMIC_DRAW);
 #else
@@ -1516,7 +1516,7 @@ void SbmBlendTextures::BlendGeometry(GLuint * FBODst, std::vector<float> weights
 	}
 	
 	const int MAX_SHAPES = 14;	// I can't enable more than 16 attributes (15 vertex buffer + 1 texture coordinate buffer)
-								// NOTE: Also change #define in shader if you change this value
+	// NOTE: Also change #define in shader if you change this value
 
 	std::vector<float>	usedWeights;
 	std::vector<int>	usedShapeIDs;
@@ -1529,111 +1529,111 @@ void SbmBlendTextures::BlendGeometry(GLuint * FBODst, std::vector<float> weights
 	glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
 
 	glUseProgram(program);
-		GLuint aVertexTexcoord	= glGetAttribLocation(program, "aVertexTexcoord");
-		GLuint aVertexPosition	= glGetAttribLocation(program, "aVertexPosition");
+	GLuint aVertexTexcoord	= glGetAttribLocation(program, "aVertexTexcoord");
+	GLuint aVertexPosition	= glGetAttribLocation(program, "aVertexPosition");
 
-		for(int i=0; i<weights.size(); i++)
+	for(int i=0; i<weights.size(); i++)
+	{
+		// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
+		if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
 		{
-			// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
-			if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
+			glEnableVertexAttribArray(aVertexPosition + usedWeights.size());
+			aux->getVBOPos(i)->VBO()->BindBuffer();
+			glVertexAttribPointer(aVertexPosition + usedWeights.size(), 3, GL_FLOAT, GL_FALSE, 0,0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			// Pushes this weight to the vector of used weights
+			usedWeights.push_back(weights[i]);
+			usedShapeIDs.push_back(i);
+
+			// Areas is a vector<int> used to set which areas each shape affect (0 -> all, 1-> upper)
+			// If this shape is for eye_blink, sets area to upper
+			if(
+				//(texture_names[i].find("eye") != std::string::npos) ||
+				(texture_names[i].find("brows") != std::string::npos) 
+				)
+				areas.push_back(1);										
+			else if(
+				(texture_names[i].find("smile") != std::string::npos)||
+				(texture_names[i].find("bmp") != std::string::npos)||
+				(texture_names[i].find("fv") != std::string::npos) ||
+				(texture_names[i].find("w") != std::string::npos) 
+				)
 			{
-				glEnableVertexAttribArray(aVertexPosition + usedWeights.size());
-				aux->getVBOPos(i)->VBO()->BindBuffer();
-				glVertexAttribPointer(aVertexPosition + usedWeights.size(), 3, GL_FLOAT, GL_FALSE, 0,0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-				// Pushes this weight to the vector of used weights
-				usedWeights.push_back(weights[i]);
-				usedShapeIDs.push_back(i);
-
-				// Areas is a vector<int> used to set which areas each shape affect (0 -> all, 1-> upper)
-				// If this shape is for eye_blink, sets area to upper
-				if(
-					//(texture_names[i].find("eye") != std::string::npos) ||
-					(texture_names[i].find("brows") != std::string::npos) 
-					)
-					areas.push_back(1);										
-				else if(
-						(texture_names[i].find("smile") != std::string::npos)||
-						(texture_names[i].find("bmp") != std::string::npos)||
-						(texture_names[i].find("fv") != std::string::npos) ||
-						(texture_names[i].find("w") != std::string::npos) 
-						)
-				{
-					areas.push_back(2);
-				}
-				else
-				{
-					areas.push_back(0);
-				}
+				areas.push_back(2);
 			}
-		}
-
-		glEnableVertexAttribArray(aVertexTexcoord);
-		aux->getVBOTexCoord()->VBO()->BindBuffer();
-		glVertexAttribPointer(aVertexTexcoord, 2, GL_FLOAT, GL_FALSE, 0,0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-		GLuint uMatrixMV		= glGetUniformLocation(program, "uMatrixMV");
-		GLuint uMatrixProj		= glGetUniformLocation(program, "uMatrixProj");
-		GLuint uWeights			= glGetUniformLocation(program, "uWeights");
-		GLuint uAreas			= glGetUniformLocation(program, "uAreas");
-		GLuint uBorderVertices	= glGetUniformLocation(program, "uBorderVertices");
-		GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
-		GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
-		GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
-
-		int * image_array		= new int[MAX_SHAPES];
-		float * w				= new float[usedWeights.size()];
-		
-		for(int i=0; i<MAX_SHAPES; i++)
-		{
-			if(i < usedWeights.size())
-			{
-				glActiveTexture(GL_TEXTURE0 + i);
-				glBindTexture(GL_TEXTURE_2D, texIDs[usedShapeIDs[i]]);
-				image_array[i]	= i;
-				w[i]			= usedWeights[i];
-			}
-			// Textures not used, but we still need to pass 15 textures to the fragment shader for completeness
 			else
 			{
-				glActiveTexture(GL_TEXTURE0 + i);
-				glBindTexture(GL_TEXTURE_2D, texIDs[0]);
-				image_array[i]	= i;
+				areas.push_back(0);
 			}
 		}
+	}
 
-		glActiveTexture(GL_TEXTURE14);
-		glBindTexture(GL_TEXTURE_BUFFER, tbo);
-		glTexBuffer(GL_TEXTURE_BUFFER, GL_R8I, verticesUsedBuffer);
+	glEnableVertexAttribArray(aVertexTexcoord);
+	aux->getVBOTexCoord()->VBO()->BindBuffer();
+	glVertexAttribPointer(aVertexTexcoord, 2, GL_FLOAT, GL_FALSE, 0,0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	GLuint uMatrixMV		= glGetUniformLocation(program, "uMatrixMV");
+	GLuint uMatrixProj		= glGetUniformLocation(program, "uMatrixProj");
+	GLuint uWeights			= glGetUniformLocation(program, "uWeights");
+	GLuint uAreas			= glGetUniformLocation(program, "uAreas");
+	GLuint uBorderVertices	= glGetUniformLocation(program, "uBorderVertices");
+	GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
+	GLuint uTranslate		= glGetUniformLocation(program, "uTranslate");
+	GLuint uNeutralSampler	= glGetUniformLocation(program, "uNeutralSampler");
 
-		glUniformMatrix4fv(uMatrixMV, 1, GL_FALSE, modelview_matrix);
-		glUniformMatrix4fv(uMatrixProj, 1, GL_FALSE, projection_matrix);
-		glUniformMatrix4fv(uTranslate, 1, GL_FALSE, glm::value_ptr(translation));
-		glUniform1iv(uAreas, areas.size(), &(areas[0]));
-		glUniform1fv(uWeights, usedWeights.size(), w);
-		glUniform1i(uNumberOfShapes, usedWeights.size());
-		glUniform1iv(uNeutralSampler, MAX_SHAPES, image_array);
-		glUniform1i(uBorderVertices,  14);
-
-
-		aux->subMeshTris[0]->VBO()->BindBuffer();
-			glDrawElements(GL_TRIANGLES, _mesh->triBuf.size()*3 , GL_UNSIGNED_INT,0);
-		aux->subMeshTris[0]->VBO()->UnbindBuffer();
-
-		glBindTexture(GL_TEXTURE_2D, 0);
-		aux->getVBOPos(0)->VBO()->UnbindBuffer();
-		aux->getVBOPos(1)->VBO()->UnbindBuffer();
-		aux->getVBOTexCoord()->VBO()->UnbindBuffer();
-
-		for(int i=0; i<usedWeights.size(); i++)
+	int * image_array		= new int[MAX_SHAPES];
+	float * w				= new float[usedWeights.size()];
+		
+	for(int i=0; i<MAX_SHAPES; i++)
+	{
+		if(i < usedWeights.size())
 		{
-			glDisableVertexAttribArray(aVertexPosition + i);
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texIDs[usedShapeIDs[i]]);
+			image_array[i]	= i;
+			w[i]			= usedWeights[i];
 		}
+		// Textures not used, but we still need to pass 15 textures to the fragment shader for completeness
+		else
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+			image_array[i]	= i;
+		}
+	}
 
-		glDisableVertexAttribArray(aVertexTexcoord);
+	glActiveTexture(GL_TEXTURE14);
+	glBindTexture(GL_TEXTURE_BUFFER, tbo);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R8I, verticesUsedBuffer);
+
+
+	glUniformMatrix4fv(uMatrixMV, 1, GL_FALSE, modelview_matrix);
+	glUniformMatrix4fv(uMatrixProj, 1, GL_FALSE, projection_matrix);
+	glUniformMatrix4fv(uTranslate, 1, GL_FALSE, glm::value_ptr(translation));
+	glUniform1iv(uAreas, areas.size(), &(areas[0]));
+	glUniform1fv(uWeights, usedWeights.size(), w);
+	glUniform1i(uNumberOfShapes, usedWeights.size());
+	glUniform1iv(uNeutralSampler, MAX_SHAPES, image_array);
+	glUniform1i(uBorderVertices,  14);
+
+
+	aux->subMeshTris[0]->VBO()->BindBuffer();
+	glDrawElements(GL_TRIANGLES, _mesh->triBuf.size()*3 , GL_UNSIGNED_INT,0);
+	aux->subMeshTris[0]->VBO()->UnbindBuffer();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	aux->getVBOPos(0)->VBO()->UnbindBuffer();
+	aux->getVBOPos(1)->VBO()->UnbindBuffer();
+	aux->getVBOTexCoord()->VBO()->UnbindBuffer();
+
+	for(int i=0; i<usedWeights.size(); i++)
+	{
+		glDisableVertexAttribArray(aVertexPosition + i);
+	}
+
+	glDisableVertexAttribArray(aVertexTexcoord);
 
 	glUseProgram(0);
 
@@ -1668,120 +1668,120 @@ void SbmBlendTextures::BlendAllAppearances(GLuint FBODst, GLuint texDst, std::ve
 	}
 
 	glPushMatrix();
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst);                                                              // Bind the framebuffer object
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst, 0);              // Attach texture to FBO
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FBODst);                                                              // Bind the framebuffer object
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, texDst, 0);              // Attach texture to FBO
 
-		assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
+	assert( glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == GL_FRAMEBUFFER_COMPLETE_EXT );
 #if !defined(__ANDROID__)
-		glPushAttrib(GL_ENABLE_BIT);
-			glDisable(GL_DEPTH_TEST);
-			glDisable(GL_LIGHTING);
-			glMatrixMode (GL_PROJECTION);
-			glPushMatrix();
-				glLoadIdentity ();
-				gluOrtho2D(-1, 1, -1, 1);
-				glMatrixMode (GL_MODELVIEW);
-				glPushAttrib(GL_VIEWPORT_BIT);
-				glPushAttrib(GL_TEXTURE_BIT);
-					glViewport(0, 0, w, h);
-					glLoadIdentity ();
+	glPushAttrib(GL_ENABLE_BIT);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glMatrixMode (GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity ();
+	gluOrtho2D(-1, 1, -1, 1);
+	glMatrixMode (GL_MODELVIEW);
+	glPushAttrib(GL_VIEWPORT_BIT);
+	glPushAttrib(GL_TEXTURE_BIT);
+	glViewport(0, 0, w, h);
+	glLoadIdentity ();
 
-					glClearColor(1.0, 1.0, 1.0, 0);
-					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(1.0, 1.0, 1.0, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-					//GLuint texNeutralLoc	= glGetUniformLocation(program, "texNeutral");
-					//GLuint texFvLoc		= glGetUniformLocation(program, "texFv");
-					//GLuint texOpenLoc		= glGetUniformLocation(program, "texOpen");
-					//GLuint texPBMLoc		= glGetUniformLocation(program, "texPBM");
-					//GLuint texShChLoc		= glGetUniformLocation(program, "texShCh");
-					//GLuint texWLoc		= glGetUniformLocation(program, "texW");
-					//GLuint texWideLoc		= glGetUniformLocation(program, "texWide");
-					GLuint uTextures		= glGetUniformLocation(program, "uTextures");
+	//GLuint texNeutralLoc	= glGetUniformLocation(program, "texNeutral");
+	//GLuint texFvLoc		= glGetUniformLocation(program, "texFv");
+	//GLuint texOpenLoc		= glGetUniformLocation(program, "texOpen");
+	//GLuint texPBMLoc		= glGetUniformLocation(program, "texPBM");
+	//GLuint texShChLoc		= glGetUniformLocation(program, "texShCh");
+	//GLuint texWLoc		= glGetUniformLocation(program, "texW");
+	//GLuint texWideLoc		= glGetUniformLocation(program, "texWide");
+	GLuint uTextures		= glGetUniformLocation(program, "uTextures");
 
-					//GLuint wNeutralLoc	= glGetUniformLocation(program, "wNeutral");
-					//GLuint wFvLoc			= glGetUniformLocation(program, "wFv");
-					//GLuint wOpenLoc		= glGetUniformLocation(program, "wOpen");
-					//GLuint wPBMLoc		= glGetUniformLocation(program, "wPBM");
-					//GLuint wShChLoc		= glGetUniformLocation(program, "wShCh");
-					//GLuint wWLoc			= glGetUniformLocation(program, "wW");
-					//GLuint wWideLoc		= glGetUniformLocation(program, "wWide");
-					GLuint uWeights			= glGetUniformLocation(program, "uWeights");
+	//GLuint wNeutralLoc	= glGetUniformLocation(program, "wNeutral");
+	//GLuint wFvLoc			= glGetUniformLocation(program, "wFv");
+	//GLuint wOpenLoc		= glGetUniformLocation(program, "wOpen");
+	//GLuint wPBMLoc		= glGetUniformLocation(program, "wPBM");
+	//GLuint wShChLoc		= glGetUniformLocation(program, "wShCh");
+	//GLuint wWLoc			= glGetUniformLocation(program, "wW");
+	//GLuint wWideLoc		= glGetUniformLocation(program, "wWide");
+	GLuint uWeights			= glGetUniformLocation(program, "uWeights");
 
-					GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
+	GLuint uNumberOfShapes	= glGetUniformLocation(program, "uNumberOfShapes");
 				
-					glUseProgram(program);
-					glEnable(GL_TEXTURE_2D);
+	glUseProgram(program);
+	glEnable(GL_TEXTURE_2D);
 
-					//glUniform1f(wNeutralLoc, weights[0]);
-					//glUniform1f(wFvLoc, weights[1]);
-					//glUniform1f(wOpenLoc, weights[2]);
-					//glUniform1f(wPBMLoc, weights[3]);
-					//glUniform1f(wShChLoc, weights[4]);
-					//glUniform1f(wWLoc, weights[5]);
-					//glUniform1f(wWideLoc, weights[6]);
-					glUniform1fv(uWeights, MAX_SHAPES, weights_array);
+	//glUniform1f(wNeutralLoc, weights[0]);
+	//glUniform1f(wFvLoc, weights[1]);
+	//glUniform1f(wOpenLoc, weights[2]);
+	//glUniform1f(wPBMLoc, weights[3]);
+	//glUniform1f(wShChLoc, weights[4]);
+	//glUniform1f(wWLoc, weights[5]);
+	//glUniform1f(wWideLoc, weights[6]);
+	glUniform1fv(uWeights, MAX_SHAPES, weights_array);
 
-					glUniform1iv(uTextures, MAX_SHAPES, texIDs_array);
+	glUniform1iv(uTextures, MAX_SHAPES, texIDs_array);
 
-					glUniform1i(uNumberOfShapes, numberOfShapes);
+	glUniform1i(uNumberOfShapes, numberOfShapes);
 
-					glActiveTexture(GL_TEXTURE0);
-					glBindTexture(GL_TEXTURE_2D, texIDs[0]);
-					//glUniform1i(texNeutralLoc, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texIDs[0]);
+	//glUniform1i(texNeutralLoc, 0);
 
-					glActiveTexture(GL_TEXTURE1);
-					glBindTexture(GL_TEXTURE_2D, texIDs[1]);
-					//glUniform1i(texFvLoc, 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, texIDs[1]);
+	//glUniform1i(texFvLoc, 1);
 
-					glActiveTexture(GL_TEXTURE2);
-					glBindTexture(GL_TEXTURE_2D, texIDs[2]);
-					//glUniform1i(texOpenLoc, 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, texIDs[2]);
+	//glUniform1i(texOpenLoc, 2);
 
-					glActiveTexture(GL_TEXTURE3);
-					glBindTexture(GL_TEXTURE_2D, texIDs[3]);
-					//glUniform1i(texPBMLoc, 3);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, texIDs[3]);
+	//glUniform1i(texPBMLoc, 3);
 
-					glActiveTexture(GL_TEXTURE4);
-					glBindTexture(GL_TEXTURE_2D, texIDs[4]);
-					//glUniform1i(texShChLoc, 4);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, texIDs[4]);
+	//glUniform1i(texShChLoc, 4);
 
-					glActiveTexture(GL_TEXTURE5);
-					glBindTexture(GL_TEXTURE_2D, texIDs[5]);
-					//glUniform1i(texWLoc, 5);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, texIDs[5]);
+	//glUniform1i(texWLoc, 5);
 
-					glActiveTexture(GL_TEXTURE6);
-					glBindTexture(GL_TEXTURE_2D, texIDs[6]);
-					//glUniform1i(texWideLoc, 6);
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, texIDs[6]);
+	//glUniform1i(texWideLoc, 6);
 
-					glBegin(GL_QUADS);
-						glTexCoord2f(0, 1);
-						glVertex3f(-1.0f, 1.0f, -0.5f);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 1);
+	glVertex3f(-1.0f, 1.0f, -0.5f);
 
-						glTexCoord2f(0, 0);
-						glVertex3f(-1.0f, -1.0f, -0.5f);
+	glTexCoord2f(0, 0);
+	glVertex3f(-1.0f, -1.0f, -0.5f);
 
-						glTexCoord2f(1, 0);
-						glVertex3f(1.0f, -1.0f, -0.5f);
+	glTexCoord2f(1, 0);
+	glVertex3f(1.0f, -1.0f, -0.5f);
 
-						glTexCoord2f(1, 1);
-						glVertex3f(1.0f, 1.0f, -0.5f);
-					glEnd();
+	glTexCoord2f(1, 1);
+	glVertex3f(1.0f, 1.0f, -0.5f);
+	glEnd();
 
-				glUseProgram(0);
+	glUseProgram(0);
 
-				glPopAttrib();                          // Pops texture bit
-				glDisable(GL_TEXTURE_2D);
-				glPopAttrib();							// Pops viewport information
-			glMatrixMode (GL_PROJECTION);
-			glPopMatrix();                              // Pops ENABLE_BIT
-			glMatrixMode (GL_MODELVIEW);
-		glPopAttrib();
+	glPopAttrib();                          // Pops texture bit
+	glDisable(GL_TEXTURE_2D);
+	glPopAttrib();							// Pops viewport information
+	glMatrixMode (GL_PROJECTION);
+	glPopMatrix();                              // Pops ENABLE_BIT
+	glMatrixMode (GL_MODELVIEW);
+	glPopAttrib();
 #endif
-		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);                                                                                                          // Bind the render buffer
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);         
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);                                                                                                          // Bind the render buffer
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);         
 		
-		glActiveTexture(GL_TEXTURE0);
-                                                                                                   // Bind the frame buffer object
+	glActiveTexture(GL_TEXTURE0);
+	// Bind the frame buffer object
 	glPopMatrix();
 }
 
@@ -1798,69 +1798,69 @@ void SbmBlendTextures::BlendTwoFBO(GLuint tex0, GLuint tex1, GLuint FBODst, GLui
 	glDisable(GL_LIGHTING);
 	glMatrixMode (GL_PROJECTION);
 	glPushMatrix();
-		glLoadIdentity ();
-		gluOrtho2D(-1, 1, -1, 1);
-		glMatrixMode (GL_MODELVIEW);
-		glPushAttrib(GL_VIEWPORT_BIT);
-		glPushAttrib(GL_TEXTURE_BIT);
-				glViewport(0, 0, w, h);
-				glLoadIdentity ();
+	glLoadIdentity ();
+	gluOrtho2D(-1, 1, -1, 1);
+	glMatrixMode (GL_MODELVIEW);
+	glPushAttrib(GL_VIEWPORT_BIT);
+	glPushAttrib(GL_TEXTURE_BIT);
+	glViewport(0, 0, w, h);
+	glLoadIdentity ();
 
-				glClearColor(1.0, 1.0, 1.0, 0);
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(1.0, 1.0, 1.0, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-				glColor3f(0.3f, 0.42f, 0.26f);
+	glColor3f(0.3f, 0.42f, 0.26f);
 
-				GLuint t1Location		= glGetUniformLocation(m_blendingProgram, "tex0");
-				GLuint t2Location		= glGetUniformLocation(m_blendingProgram, "tex1");
-				GLuint outLocation		= glGetUniformLocation(m_blendingProgram, "out");
-				GLuint alphaLocation	= glGetUniformLocation(m_blendingProgram, "alpha");
+	GLuint t1Location		= glGetUniformLocation(m_blendingProgram, "tex0");
+	GLuint t2Location		= glGetUniformLocation(m_blendingProgram, "tex1");
+	GLuint outLocation		= glGetUniformLocation(m_blendingProgram, "out");
+	GLuint alphaLocation	= glGetUniformLocation(m_blendingProgram, "alpha");
 
-				glUseProgram(m_blendingProgram);
-				glEnable(GL_TEXTURE_2D);
+	glUseProgram(m_blendingProgram);
+	glEnable(GL_TEXTURE_2D);
 
-				glUniform1f(alphaLocation, alpha);
+	glUniform1f(alphaLocation, alpha);
 
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, tex0);
-				glUniform1i(t1Location, 0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex0);
+	glUniform1i(t1Location, 0);
 
-				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, tex1);
-				glUniform1i(t2Location, 1);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, tex1);
+	glUniform1i(t2Location, 1);
 
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, texDst);
-				glUniform1i(outLocation, 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, texDst);
+	glUniform1i(outLocation, 2);
 
-				glBegin(GL_QUADS);
-						glTexCoord2f(0, 1);
-						glVertex3f(-1.0f, 1.0f, -0.5f);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 1);
+	glVertex3f(-1.0f, 1.0f, -0.5f);
 
-						glTexCoord2f(0, 0);
-						glVertex3f(-1.0f, -1.0f, -0.5f);
+	glTexCoord2f(0, 0);
+	glVertex3f(-1.0f, -1.0f, -0.5f);
 
-						glTexCoord2f(1, 0);
-						glVertex3f(1.0f, -1.0f, -0.5f);
+	glTexCoord2f(1, 0);
+	glVertex3f(1.0f, -1.0f, -0.5f);
 
-						glTexCoord2f(1, 1);
-						glVertex3f(1.0f, 1.0f, -0.5f);
-				glEnd();
+	glTexCoord2f(1, 1);
+	glVertex3f(1.0f, 1.0f, -0.5f);
+	glEnd();
 
-				glUseProgram(0);
+	glUseProgram(0);
 
-				glPopAttrib();                           // Pops texture bit
-				glDisable(GL_TEXTURE_2D);
+	glPopAttrib();                           // Pops texture bit
+	glDisable(GL_TEXTURE_2D);
 
-				glPopAttrib();							// Pops viewport information
-				glMatrixMode (GL_PROJECTION);
-		glPopMatrix();                                   // Pops ENABLE_BIT
-		glMatrixMode (GL_MODELVIEW);
+	glPopAttrib();							// Pops viewport information
+	glMatrixMode (GL_PROJECTION);
+	glPopMatrix();                                   // Pops ENABLE_BIT
+	glMatrixMode (GL_MODELVIEW);
 
-		glPopAttrib();
+	glPopAttrib();
 #endif
-		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);                                                                                                          // Bind the render buffer
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);                                                                                                            // Bind the frame buffer object
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);                                                                                                          // Bind the render buffer
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);                                                                                                            // Bind the frame buffer object
 	glPopMatrix();
 }
 
@@ -2116,7 +2116,7 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 		deformPosBuf = blendRestPos;
 	}
 	else
-		meshInstance->updateSkin(blendRestPos, deformPosBuf);
+	meshInstance->updateSkin(blendRestPos, deformPosBuf);
 	//meshInstance->updateSkin(blendRestPos, deformPosBuf);
 
 

@@ -164,7 +164,9 @@ void SBEventManager::removeEventHandler(const std::string& type)
 	{
 		SBEventHandler* oldHandler = (*iter).second;
 		eventHandlers.erase(iter);
-		//delete oldHandler; // deleting old handler causes crash when handler is created with Python - need to fix this
+#if !defined(SB_NO_JAVASCRIPT) && defined(EMSCRIPTEN)
+		delete oldHandler; // deleting old handler causes crash when handler is created with Python - need to fix this
+#endif
 	}
 }
 

@@ -287,7 +287,7 @@ fsMsgPtr fsBinaryStream::get_message() {
         return fsMsgPtr(new fsMsgHeadPoseAbsolute() );
     }; break;
     case fsMsg::MSG_OUT_MARKER_NAMES: {
-#if _MSC_VER == 1500
+#if _MSC_VER == 1500 || defined(EMSCRIPTEN)
         boost::shared_ptr< fsMsgMarkerNames > msg(new fsMsgMarkerNames());
 #else
         std::tr1::shared_ptr< fsMsgMarkerNames > msg(new fsMsgMarkerNames());
@@ -298,7 +298,7 @@ fsMsgPtr fsBinaryStream::get_message() {
         return msg;
     }; break;
     case fsMsg::MSG_OUT_BLENDSHAPE_NAMES: {
-#if _MSC_VER == 1500
+#if _MSC_VER == 1500 || defined(EMSCRIPTEN)
         boost::shared_ptr< fsMsgBlendshapeNames > msg(new fsMsgBlendshapeNames() );
 #else
 		std::tr1::shared_ptr< fsMsgBlendshapeNames > msg(new fsMsgBlendshapeNames() );
@@ -312,7 +312,7 @@ fsMsgPtr fsBinaryStream::get_message() {
         BlockHeader sub_block;
         uint16_t num_blocks = 0;
         if( !read_pod(num_blocks, m_buffer, m_start) ) { LOG_RELEASE_ERROR("Could not read num_blocks"); m_valid = false; return fsMsgPtr(); }
-#if _MSC_VER == 1500
+#if _MSC_VER == 1500 || defined(EMSCRIPTEN)
         boost::shared_ptr<fsMsgTrackingState> msg = boost::shared_ptr<fsMsgTrackingState>(new fsMsgTrackingState());
 #else
         std::tr1::shared_ptr<fsMsgTrackingState> msg = std::tr1::shared_ptr<fsMsgTrackingState>(new fsMsgTrackingState());
@@ -352,7 +352,7 @@ fsMsgPtr fsBinaryStream::get_message() {
         return msg;
     }; break;
     case fsMsg::MSG_OUT_RIG: {
-#if _MSC_VER == 1500
+#if _MSC_VER == 1500 || defined(EMSCRIPTEN)
         boost::shared_ptr< fsMsgRig > msg(new fsMsgRig() );
 #else
         std::tr1::shared_ptr< fsMsgRig > msg(new fsMsgRig() );

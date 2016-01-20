@@ -9,6 +9,9 @@
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
 
+#if defined(EMSCRIPTEN)
+#include <emscripten.h>
+#endif
 
 namespace SmartBody {
 

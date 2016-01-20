@@ -1,5 +1,5 @@
 #include "vhcl.h"
-#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #endif
 #include "SbmDeformableMeshGPU.h"
@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <sb/SBScene.h>
 
+#if !defined(EMSCRIPTEN)
 typedef std::pair<int,float> IntFloatPair;
 
 static bool intFloatComp(const IntFloatPair& p1, const IntFloatPair& p2)
@@ -1622,3 +1623,4 @@ MeshSubset::~MeshSubset()
 		delete VBOTri;
 
 }
+#endif

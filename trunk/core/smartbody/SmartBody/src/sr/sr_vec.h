@@ -316,13 +316,13 @@ class SBAPI SrVec
  public:
 	 SrVec3i() {}
 	 SrVec3i(int a, int b, int c) { data[0] = a; data[1] = b; data[2] = c; }
-#if defined(__ANDROID__) || defined(SB_IPHONE)
+#if defined(__ANDROID__) || defined(SB_IPHONE) || defined(EMSCRIPTEN)
 	 unsigned short data[3];
 	 unsigned short& operator[] ( int i ) { return data[i]; }
 	 unsigned short operator[] ( int i ) const { return data[i]; }
 	 friend SrOutput& operator<< ( SrOutput& o, const SrVec3i& f ) { 
 		 int ia,ib,ic; ia = f[0]; ib = f[1]; ic = f[2];
-		 return o<<f.data[0]<<srspc<<f.data[1]<<srspc<<f.data[2]; 
+		 return o<<ia<<srspc<<ib<<srspc<<ic; 
 	 }
 	 friend SrInput& operator>> ( SrInput& i, SrVec3i& f ) { 
 

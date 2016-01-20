@@ -280,6 +280,7 @@ int ZEXPORT deflateInit2_(strm, level, method, windowBits, memLevel, strategy,
 
     s->window = (Bytef *) ZALLOC(strm, s->w_size, 2*sizeof(Byte));
     s->prev   = (Posf *)  ZALLOC(strm, s->w_size, sizeof(Pos));
+    memset(s->prev, 0, s->w_size*sizeof(Pos)); /* XXX Zero out for emscripten, to avoid SAFE_HEAP warnings */
     s->head   = (Posf *)  ZALLOC(strm, s->hash_size, sizeof(Pos));
 
     s->high_water = 0;      /* nothing written to s->window yet */
@@ -955,6 +956,7 @@ int ZEXPORT deflateCopy (dest, source)
 
     ds->window = (Bytef *) ZALLOC(dest, ds->w_size, 2*sizeof(Byte));
     ds->prev   = (Posf *)  ZALLOC(dest, ds->w_size, sizeof(Pos));
+    memset(ds->prev, 0, ds->w_size*sizeof(Pos)); /* XXX Zero out for emscripten, to avoid SAFE_HEAP warnings */
     ds->head   = (Posf *)  ZALLOC(dest, ds->hash_size, sizeof(Pos));
     overlay = (ushf *) ZALLOC(dest, ds->lit_bufsize, sizeof(ush)+2);
     ds->pending_buf = (uchf *) overlay;
@@ -1037,6 +1039,7 @@ local void lm_init (s)
     s->block_start = 0L;
     s->lookahead = 0;
     s->match_length = s->prev_length = MIN_MATCH-1;
+    s->match_start = 0; /* XXX Emscripten: initialize to 0, to prevent a SAFE_HEAP notification */
     s->match_available = 0;
     s->ins_h = 0;
 #ifndef FASTEST

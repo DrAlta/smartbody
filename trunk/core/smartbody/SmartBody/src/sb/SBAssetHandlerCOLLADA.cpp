@@ -164,7 +164,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				ParserCOLLADAFast::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
 			}
 			// parsing geometry
-#if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__) && !defined(EMSCRIPTEN)
 			SbmDeformableMeshGPU* mesh = new SbmDeformableMeshGPU();
 #else
 			DeformableMesh* mesh = new DeformableMesh();
@@ -218,8 +218,10 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
  				{
  					//meshModelVec[i]->computeNormals();
  				}
-				//meshModelVec[i]->computeNormals();
-
+				//Zengrui: need this line for Emscripten build
+#if defined(EMSCRIPTEN)
+				meshModelVec[i]->computeNormals();
+#endif
 				SrSnModel* srSnModelStatic = new SrSnModel();
 				srSnModelStatic->shape(*meshModelVec[i]);
 				srSnModelStatic->shape().name = meshModelVec[i]->name;

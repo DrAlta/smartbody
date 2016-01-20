@@ -1,6 +1,6 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/strong_components.hpp>
-
+#include <boost/lexical_cast.hpp>
 #include <sb/SBMotionGraph.h>
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>

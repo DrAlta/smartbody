@@ -1,4 +1,4 @@
-
+﻿
 #include "vhcl.h"
 
 #include "SBScene.h"
@@ -7,11 +7,16 @@
 #endif
 
 
-#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE)
+#if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #include "sbm/GPU/SbmDeformableMeshGPU.h"
 #endif
 
+#ifndef SB_NO_JAVASCRIPT
+#if defined(EMSCRIPTEN)
+#include <emscripten.h>
+#endif
+#endif
 
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 
@@ -99,7 +104,7 @@
 #include <sstream>
 // for minizip compression
 
-#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 #include <external/zlib-1.2.5/zip.h>
 #endif
 
@@ -306,7 +311,7 @@ void SBScene::initialize()
 		if (_viewerFactory)
 			_viewerFactory->reset(_viewer);
 		_viewer = NULL;
-#if !defined (__ANDROID__) && !defined(SB_IPHONE) && !defined(__native_client__)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE) && !defined(__native_client__) && !defined(EMSCRIPTEN)
 		SbmShaderManager::singleton().setViewer(NULL);
 #endif
 	}
@@ -1358,6 +1363,16 @@ bool SBScene::run(const std::string& command)
 		return false;
 	}
 #endif
+#if defined(EMSCRIPTEN)
+#ifndef SB_NO_JAVASCRIPT
+	emscripten_run_script(
+		command.c_str()
+	);
+	//otehr options:
+	//int emscripten_run_script_int(const char *script)
+	//char *emscripten_run_script_string(const char *script)
+#endif
+#endif
 	return true;
 }
 
@@ -1395,6 +1410,11 @@ bool SBScene::runScript(const std::string& script)
 	LOG("Could not find Python script '%s'", script.c_str());
 	return false;
 
+#endif
+#if defined(EMSCRIPTEN)
+#ifndef SB_NO_JAVASCRIPT
+	emscripten_run_script(script.c_str());
+#endif
 #endif
 	return true;
 }
@@ -2130,7 +2150,7 @@ naive_uncomplete(boost::filesystem2::path const p, boost::filesystem2::path cons
     return output;
 }
 
-#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 void writeFileToZip(zipFile& zf, std::string readFileName, std::string fileNameInZip)
 {
 	//LOG("writeFileToZip, srcFile = %s, fileInZip = %s",readFileName.c_str(),fileNameInZip.c_str());
@@ -4275,7 +4295,7 @@ void SBScene::updateConeOfSight()
 std::vector<std::string> SBScene::checkVisibility(const std::string& characterName)
 {
 	std::vector<std::string> visible_pawns, nonOccludePawns;
-
+#if !defined(EMSCRIPTEN)
 	//	Gets the character from which we want to look from
 	SmartBody::SBCharacter* character = getCharacter(characterName);
 	
@@ -4379,7 +4399,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 
 	//	Sets near clip plane
 	camera->setFarPlane(tmp_far);
-
+#endif
 	//	Returns visible pawns
 	return nonOccludePawns;
 }
@@ -4388,7 +4408,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>& testPawns)
 {
 	std::vector<std::string> visiblePawns;
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(EMSCRIPTEN)
 	float m[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX, m);
 	SrMat modelViewMat = SrMat(m);

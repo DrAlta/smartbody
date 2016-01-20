@@ -35,6 +35,9 @@
        #define APIENTRY
 #elif defined(__FLASHPLAYER__)
 	#include <GL/gl.h>
+#elif defined(EMSCRIPTEN)
+	#include <GLES2/gl2.h>
+	#include <GLES2/gl2ext.h>
 #elif defined(__ANDROID__)
 	//#include <GLES/gl.h>
 	#include <GLES2/gl2.h>
@@ -93,11 +96,11 @@ int query_DXT_capability( void );
 #define SOIL_RGBA_S3TC_DXT3		0x83F2
 #define SOIL_RGBA_S3TC_DXT5		0x83F3
 
-#if defined(__ANDROID__) || defined(SB_IPHONE)
+#if defined(__ANDROID__) || defined(SB_IPHONE) || defined(EMSCRIPTEN)
 #define GL_CLAMP GL_CLAMP_TO_EDGE;
 #endif
 
-#if !defined(__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 typedef void (APIENTRY* P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid * data);
 P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC soilGlCompressedTexImage2D = NULL;
 #endif
@@ -1017,7 +1020,7 @@ unsigned int
 	/*	variables	*/
 	unsigned char* img;
 	unsigned int tex_id;
-#if !defined(__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 	unsigned int internal_texture_format = 0, original_texture_format = 0;
 	int DXT_mode = SOIL_CAPABILITY_UNKNOWN;
 	int max_supported_size;
@@ -1768,7 +1771,7 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 					S3TC_type, GL_UNSIGNED_BYTE, DDS_data );
 			} else
 			{
-#if !defined(__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 				soilGlCompressedTexImage2D(
 					cf_target, 0,
 					S3TC_type, width, height, 0,
@@ -1799,7 +1802,7 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 						S3TC_type, GL_UNSIGNED_BYTE, &DDS_data[byte_offset] );
 				} else
 				{
-#if !defined(__ANDROID__)
+#if !defined(__ANDROID__) && !defined(EMSCRIPTEN)
 					mip_size = ((w+3)/4)*((h+3)/4)*block_size;
 					soilGlCompressedTexImage2D(
 						cf_target, i,
@@ -1844,7 +1847,11 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 		} else
 		{
 			/*	unsigned int clamp_mode = SOIL_CLAMP_TO_EDGE;	*/
+#if defined(EMSCRIPTEN)
+			unsigned int clamp_mode = SOIL_CLAMP_TO_EDGE;
+#else
 			unsigned int clamp_mode = GL_CLAMP;
+#endif
 			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_S, clamp_mode );
 			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_T, clamp_mode );
 			glTexParameteri( opengl_texture_type, SOIL_TEXTURE_WRAP_R, clamp_mode );
@@ -1997,7 +2004,7 @@ int query_DXT_capability( void )
 		} else
 		{
 			/*	and find the address of the extension function	*/
-			#if !defined(__ANDROID__) && !defined(SB_IPHONE)
+			#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 			P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC ext_addr = NULL;
 			#else
 			void* ext_addr = NULL;
@@ -2034,7 +2041,7 @@ int query_DXT_capability( void )
 				CFRelease( bundle );
 */
 				ext_addr = NULL;
-			#elif defined(__FLASHPLAYER__) || defined(__ANDROID__) || defined(SB_IPHONE)
+			#elif defined(__FLASHPLAYER__) || defined(__ANDROID__) || defined(SB_IPHONE) || defined (EMSCRIPTEN)
 			#else
 				ext_addr = (P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC)
 						glXGetProcAddressARB
@@ -2055,7 +2062,7 @@ int query_DXT_capability( void )
 			} else
 			{
 				/*	all's well!	*/
-			#if !defined(__ANDROID__) && !defined(SB_IPHONE)
+			#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 				soilGlCompressedTexImage2D = ext_addr;
 				has_DXT_capability = SOIL_CAPABILITY_PRESENT;
 			#endif

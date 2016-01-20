@@ -1,5 +1,5 @@
 #include "vhcl.h"
-#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__)
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #endif
 #include "SbmShader.h"
@@ -12,7 +12,7 @@
 #include <vhcl.h>
 
 
-#if !defined(SB_IPHONE)
+#if !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 /************************************************************************/
 /* Shader program class                                                 */
 /************************************************************************/

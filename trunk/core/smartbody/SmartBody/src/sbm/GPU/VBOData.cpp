@@ -1,12 +1,13 @@
 #include "vhcl.h"
 #include <cstring>
 #include <cstdio>
-#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #endif
 #include "VBOData.h"
 
-
+//Zengrui: ifdef out function definition for SmartBody Javascript
+#if !defined(EMSCRIPTEN)
 VBOData::~VBOData(void)
 {
 	if (m_iVBO_ID)
@@ -222,3 +223,4 @@ void VBOData::Debug(const char* tag/* = "TBO"*/)
 	printf("\n");
 
 }
+#endif
