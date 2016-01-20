@@ -661,9 +661,10 @@ set( SMARTBODY_LIB_SBM_SRC
 		
 	./src/sb/smartbody-c-dll.cpp
 		
-	./src/protocols/sbmotion.pb.cc
-	./src/protocols/sbutilities.pb.cc
-	./src/protocols/sbmesh.pb.cc
+	./src/protocols/sbmotion.pb.cpp
+	./src/protocols/sbutilities.pb.cpp
+	./src/protocols/sbmesh.pb.cpp
+		
 )
 
 add_library(
