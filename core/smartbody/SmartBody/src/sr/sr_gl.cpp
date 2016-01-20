@@ -35,7 +35,7 @@
 # include <Windows.h>
 # endif
 
-
+#if !defined(EMSCRIPTEN)
 //======================================= geometry ================================
 
 void glNormal ( const SrVec &v )
@@ -438,7 +438,31 @@ void glPrintInfo ( SrOutput &o )
  #endif
 
  }
+#else
+//======================================= geometry ================================
+SBAPI void glClearColor ( const SrColor& c ){};
+SBAPI void glLight ( int id, const SrLight& l, bool bind_pos){}; //!< id = x E {0,...,7}, from GL_LIGHTx
+SBAPI void glLightPos( int id, const SrLight& l ){};
+SBAPI void glMaterial ( const SrMaterial &m ){}; //!< Sets material for GL_FRONT_AND_BACK
+SBAPI void glMaterialFront ( const SrMaterial &m ){};
+SBAPI void glMaterialBack ( const SrMaterial &m ){};
 
+//==================================== matrices ==============================
+
+SBAPI void glMultMatrix ( const SrMat &m ){};
+SBAPI void glLoadMatrix ( const SrMat &m ){};
+SBAPI void glTranslate ( const SrVec &v ){};
+SBAPI void glScale ( float s ){};
+SBAPI void glRotate ( const SrQuat &q ){};
+SBAPI void glLookAt ( const SrVec &eye, const SrVec &center, const SrVec &up ){};
+SBAPI void glPerspective ( float fovy, float aspect, float znear, float zfar ){};
+SBAPI void glGetViewMatrix ( SrMat &m ){};
+SBAPI void glGetProjectionMatrix ( SrMat &m ){};
+
+//==================================== info ==============================
+
+SBAPI void glPrintInfo ( SrOutput &o ){};
+#endif
 
 /*
 OpenGL pipeline :

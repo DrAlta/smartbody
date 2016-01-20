@@ -25,6 +25,9 @@ SBSteerManager::SBSteerManager() : SBService()
 #ifdef __APPLE__
 			createStringAttribute("aimodule", "libpprAI", true, "Basic", 60, false, false, false, "Agent module library");
 #endif
+#if defined(EMSCRIPTEN)
+			createStringAttribute("aimodule", "pprAI", true, "Basic", 60, false, false, false, "Agent module library");
+#endif
 
 	createStringAttribute("engineOptions.testCaseSearchPath", "../../../../core/smartbody/steersuite-1.3/testcases/", true, "Basic", 60, false, false, false, "Path to find agent shared libraries");
 	createStringAttribute("engineOptions.moduleSearchPath", "../../../../core/smartbody/sbgui/bin/", true, "Basic", 60, false, false, false, "Path to find test cases");
@@ -142,9 +145,10 @@ void SBSteerManager::start()
 	SteerLib::SimulationOptions* steerOptions = new SteerLib::SimulationOptions();
 	steerOptions->moduleOptionsDatabase["testCasePlayer"]["testcase"] = "3-way-confusion-1.xml";
 	std::string ai = dynamic_cast<SmartBody::StringAttribute*>( SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("aimodule") )->getValue();
-
-	if (ai == "")
+	//Zengrui:this is not useful, casue the attribute is NULL, will cause null ptr error
+	if (ai == ""){
 		return;
+	}
 	steerOptions->moduleOptionsDatabase["testCasePlayer"]["ai"] = ai;
 	steerOptions->engineOptions.startupModules.insert("testCasePlayer");
 	std::string testCases = dynamic_cast<SmartBody::StringAttribute*>( SmartBody::SBScene::getScene()->getSteerManager()->getAttribute("engineOptions.testCaseSearchPath") )->getValue();

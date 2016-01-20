@@ -29,6 +29,9 @@
        #define APIENTRY
 #elif defined(__FLASHPLAYER__)
 	#include <GL/gl.h>
+#elif defined(EMSCRIPTEN)
+	#include <GLES2/gl2.h>
+	#include <GLES2/gl2ext.h>
 #elif defined(__ANDROID__)
 	//#include <GLES/gl.h>
 	#include <GLES2/gl2.h>
@@ -71,11 +74,7 @@ public:
 	std::string normalMapName;
 	std::string specularMapName;
 	int numTri;
-#if defined(__ANDROID__) || defined(SB_IPHONE)
-	std::vector<SrModel::Face> triBuf;
-#else
 	std::vector<SrVec3i> triBuf;
-#endif
 };
 
 class DeformableMeshInstance;

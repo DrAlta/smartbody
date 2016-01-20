@@ -30,13 +30,17 @@ std::string getVersion(void)
 #ifdef __ANDROID__
 	strstr << " android ";
 #else
+#ifdef EMSCRIPTEN
+	strstr << " emscripten ";
+#else
 	strstr << " other ";
 #endif
 #endif
 #endif
 #endif
 #endif
-	strstr << "version 6152 2015/08/05 14:17:25";
+#endif
+	strstr << "version 5935 2015/01/05 14:44:19";
 
 	return strstr.str();
 }

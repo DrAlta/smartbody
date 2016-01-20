@@ -668,6 +668,17 @@ void PPRAISteeringAgent::evaluate(double dtime)
 
 void PPRAISteeringAgent::sendLocomotionEvent(const std::string& status)
 {
+#if defined(EMSCRIPTEN)
+	std::string eventType = "locomotion";
+	SmartBody::SBMotionEvent* motionEvent = new SmartBody::SBMotionEvent();
+	motionEvent->setType(eventType);			
+	std::stringstream strstr;
+	strstr << character->getName() << " " << status;
+	motionEvent->setParameters(strstr.str());
+	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
+	manager->handleEvent(motionEvent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+	//LOG("PPRAISteeringAgent::sendLocomotionEvent Over");
+#else
 	std::string eventType = "locomotion";
 	SmartBody::SBMotionEvent motionEvent;
 	motionEvent.setType(eventType);			
@@ -676,7 +687,8 @@ void PPRAISteeringAgent::sendLocomotionEvent(const std::string& status)
 	motionEvent.setParameters(strstr.str());
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 	manager->handleEvent(&motionEvent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
-	LOG("locomotio sucess");
+#endif
+	//LOG("locomotio sucess");
 }
 
 void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, float yaw)

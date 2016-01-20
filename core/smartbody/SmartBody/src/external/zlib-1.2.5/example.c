@@ -528,7 +528,7 @@ int main(argc, argv)
         fprintf(stderr, "warning: different zlib version\n");
     }
 
-    printf("zlib version %s = 0x%04x, compile flags = 0x%lx\n",
+    printf("zlib version %s = %d, compile flags = %lu\n",
             ZLIB_VERSION, ZLIB_VERNUM, zlibCompileFlags());
 
     compr    = (Byte*)calloc((uInt)comprLen, 1);
@@ -542,8 +542,10 @@ int main(argc, argv)
     }
     test_compress(compr, comprLen, uncompr, uncomprLen);
 
+    /* XXX Emscripten commenting out
     test_gzio((argc > 1 ? argv[1] : TESTFILE),
               uncompr, uncomprLen);
+    */
 
     test_deflate(compr, comprLen);
     test_inflate(compr, comprLen, uncompr, uncomprLen);

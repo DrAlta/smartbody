@@ -1033,9 +1033,6 @@
     <ClCompile Include="..\SmartBody\src\external\zlib-1.2.5\deflate.c">
       <Filter>external\zlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\SmartBody\src\external\zlib-1.2.5\example.c">
-      <Filter>external\zlib</Filter>
-    </ClCompile>
     <ClCompile Include="..\SmartBody\src\external\zlib-1.2.5\gzclose.c">
       <Filter>external\zlib</Filter>
     </ClCompile>
@@ -1063,9 +1060,6 @@
     <ClCompile Include="..\SmartBody\src\external\zlib-1.2.5\ioapi.c">
       <Filter>external\zlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\SmartBody\src\external\zlib-1.2.5\iowin32.c">
-      <Filter>external\zlib</Filter>
-    </ClCompile>
     <ClCompile Include="..\SmartBody\src\external\zlib-1.2.5\trees.c">
       <Filter>external\zlib</Filter>
     </ClCompile>
@@ -1086,9 +1080,6 @@
     </ClCompile>
     <ClCompile Include="src\sb\SBNavigationMeshManager.cpp">
       <Filter>sb</Filter>
-    </ClCompile>
-    <ClCompile Include="src\protocols\sbmotion.pb.cc">
-      <Filter>protocols</Filter>
     </ClCompile>
     <ClCompile Include="src\sb\SBAssetHandler.cpp">
       <Filter>sb</Filter>
@@ -1126,14 +1117,8 @@
     <ClCompile Include="src\sb\smartbody-c-dll.cpp">
       <Filter>sbm</Filter>
     </ClCompile>
-    <ClCompile Include="src\protocols\sbmesh.pb.cc">
-      <Filter>protocols</Filter>
-    </ClCompile>
     <ClCompile Include="src\sb\SBPythonMesh.cpp">
       <Filter>python</Filter>
-    </ClCompile>
-    <ClCompile Include="src\protocols\sbutilities.pb.cc">
-      <Filter>protocols</Filter>
     </ClCompile>
     <ClCompile Include="src\sb\SBAssetHandlerSkmb.cpp">
       <Filter>sb</Filter>
@@ -1248,6 +1233,51 @@
     </ClCompile>
     <ClCompile Include="src\bml\BMLStateObject.cpp">
       <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\protocols\sbmesh.pb.cpp">
+      <Filter>protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="src\protocols\sbmotion.pb.cpp">
+      <Filter>protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="src\protocols\sbutilities.pb.cpp">
+      <Filter>protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascript.cpp">
+      <Filter>Javascript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascriptAnimation.cpp">
+      <Filter>Javascript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascriptAttribute.cpp">
+      <Filter>Javascript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascriptCharacter.cpp">
+      <Filter>Javascript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascriptClass.cpp">
+      <Filter>Javascript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascriptMath.cpp">
+      <Filter>Javascript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascriptMesh.cpp">
+      <Filter>Javascript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascriptMotion.cpp">
+      <Filter>Javascript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascriptScene.cpp">
+      <Filter>Javascript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascriptSimulation.cpp">
+      <Filter>Javascript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascriptSkeleton.cpp">
+      <Filter>Javascript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBJavascriptSystem.cpp">
+      <Filter>Javascript</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2310,9 +2340,6 @@
     <ClInclude Include="..\SmartBody\src\external\zlib-1.2.5\ioapi.h">
       <Filter>external\zlib</Filter>
     </ClInclude>
-    <ClInclude Include="..\SmartBody\src\external\zlib-1.2.5\iowin32.h">
-      <Filter>external\zlib</Filter>
-    </ClInclude>
     <ClInclude Include="..\SmartBody\src\external\zlib-1.2.5\trees.h">
       <Filter>external\zlib</Filter>
     </ClInclude>
@@ -2496,6 +2523,15 @@
     <ClInclude Include="src\bml\BMLStateObject.h">
       <Filter>bml</Filter>
     </ClInclude>
+    <ClInclude Include="src\sb\SBJavascript.h">
+      <Filter>Javascript</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBJavascriptClass.h">
+      <Filter>Javascript</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBJavascriptInternal.h">
+      <Filter>Javascript</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">
@@ -2552,6 +2588,9 @@
     <Filter Include="external\jpge">
       <UniqueIdentifier>{aedf90ee-8bc7-4c7e-8443-404eeeb1be0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Javascript">
+      <UniqueIdentifier>{5c7bc89a-224f-4846-a15d-62296326ee94}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SmartBody\src\sbm\GPU\shaderFiles\fs_skin_render.frag">
@@ -2566,7 +2605,6 @@
     <None Include="src\protocols\sbmesh.proto">
       <Filter>protocols</Filter>
     </None>
-    <None Include="src\protocols\sbmotion.proto" />
     <None Include="src\sbm\GPU\shaderFiles\blendFace.frag">
       <Filter>GPU</Filter>
     </None>
@@ -2623,6 +2661,9 @@
     </None>
     <None Include="src\sbm\GPU\shaderFiles\renderGeometryWithMask.vert">
       <Filter>GPU</Filter>
+    </None>
+    <None Include="src\protocols\sbmotion.proto">
+      <Filter>protocols</Filter>
     </None>
   </ItemGroup>
 </Project>

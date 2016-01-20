@@ -25,7 +25,7 @@
 #include <sb/SBTypes.h>
 #include <external/rply/rply.h>
 
-#if !defined (__ANDROID__) && !defined(SB_IPHONE)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include <sbm/GPU/SbmTexture.h>
 #endif
 
@@ -137,7 +137,7 @@ static int texNumber_cb(p_ply_argument argument) {
 
 static void load_texture(int type, const char* file, const SrStringArray& paths)
 {
-#if !defined (__ANDROID__) && !defined(SB_IPHONE)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 	SrString s;
 	SrInput in;
 	std::string imageFile = file;
@@ -240,7 +240,7 @@ bool SrModel::import_ply( const char* file )
 // 	}
 
 #if TEST_TEXTURE
-#if !defined (__ANDROID__) && !defined(SB_IPHONE)
+#if !defined (__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 	for (int i=0;i<M.size();i++)
 	{
 		std::string matName = mtlnames[i];

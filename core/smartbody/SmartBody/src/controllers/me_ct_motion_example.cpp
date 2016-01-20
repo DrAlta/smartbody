@@ -12,7 +12,7 @@
 #include <sb/SBRetarget.h>
 #include <sb/SBRetargetManager.h>
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(EMSCRIPTEN)
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>

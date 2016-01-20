@@ -36,37 +36,38 @@ vhcl::Audio * g_audio = NULL;
 
 bool AUDIO_Init()
 {
-   if(g_audio)
-      return false;
+	if(g_audio)
+		return false;
 
-   g_audio = new vhcl::Audio();
-   bool ret = g_audio->Open();
-   return ret;
+	g_audio = new vhcl::Audio();
+	bool ret = g_audio->Open();
+	return ret;
 }
 
 
 void AUDIO_Play( const char * audio_file )
 {
-   vhcl::Sound * sound = g_audio->CreateSoundLibSndFile( audio_file, audio_file );
-   if ( sound )
-   {
+	vhcl::Sound * sound = g_audio->CreateSoundLibSndFile( audio_file, audio_file );
+	if ( sound )
+	{
       //LOG("has sound, sound = %d",sound);
-      sound->Play();
-   }
+		sound->Play();
+	}
+
 }
 
 void AUDIO_Stop( const char * audio_file )
 {
-   if (g_audio)
-	   g_audio->DestroySound(audio_file);
+	if (g_audio)
+		g_audio->DestroySound(audio_file);
 }
 
 
 void AUDIO_Close()
 {
-   if (!g_audio)
-	   return;
-   g_audio->Close();
-   delete g_audio;
-   g_audio = NULL;
+	if (!g_audio)
+		return;
+	g_audio->Close();
+	delete g_audio;
+	g_audio = NULL;
 }

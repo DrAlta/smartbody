@@ -1,5 +1,5 @@
 #include "vhcl.h"
-#if !defined(__FLASHPLAYER__)
+#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #endif
 #include "TBOData.h"
@@ -8,8 +8,9 @@
 #include <cstdio>
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-
+//Zengrui: For Smartbody Javascript, we use another project for the rendering part
+//thus, ifdef out the implementation
+#if !defined(EMSCRIPTEN)
 TBOData::TBOData( char* name, ublas::vector<float>& Data )
 {
 	strcpy(m_Name,name);
@@ -131,3 +132,4 @@ void TBOData::ReadOutData( float* pOutData, int nSize )
 	memcpy(pOutData,pData,sizeof(float)*nSize);
 	glUnmapBuffer(GL_TEXTURE_BUFFER_EXT);
 }
+#endif

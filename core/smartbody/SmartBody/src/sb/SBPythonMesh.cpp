@@ -2,13 +2,13 @@
 #include "SBPython.h"
 #include <sbm/sbm_deformable_mesh.h>
 
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp> 
 #include <boost/python/return_internal_reference.hpp>
 #include <boost/python/args.hpp>
 #endif
 
-#ifndef NO_PYTHON
+#ifndef SB_NO_PYTHON
 
 namespace SmartBody
 {

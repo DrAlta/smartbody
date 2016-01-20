@@ -6,15 +6,19 @@
 #include <sr/sr_gl.h>
 
 class SbmTexture;
-
 typedef std::map<std::string,SbmTexture*> StrTextureMap;
 
+//support for cube map
+#if defined(EMSCRIPTEN)
+class SbmCubeMapTexture;
+typedef std::map<std::string,SbmCubeMapTexture*> StrCubeTextureMap;
+#endif
 
 
 class SbmTextureManager
 {
 public:
-	enum { TEXTURE_DIFFUSE = 0, TEXTURE_NORMALMAP, TEXTURE_SPECULARMAP };
+	enum { TEXTURE_DIFFUSE = 0, TEXTURE_NORMALMAP, TEXTURE_SPECULARMAP, TEXTURE_CUBEMAP};
 protected:
 	StrTextureMap textureMap;
 	StrTextureMap normalTexMap;
@@ -51,6 +55,15 @@ public:
 	void releaseAllTextures();	
 protected:
 	StrTextureMap& findMap(int type);
+
+//Zengrui: add some additional functions for cube-map texture
+#if defined(EMSCRIPTEN)
+protected:
+	StrCubeTextureMap cubeTextureMap;
+public:
+	SBAPI SbmCubeMapTexture* findCubeMapTexture(const char* cubeMapName);
+	SBAPI void loadCubeMapTextures(const std::string cubeMapName, const std::vector<std::string> &textureNames, const std::vector<std::string> &textureFileNames);
+#endif
 };
 
 class SbmTexture // simple place holder for OpenGL texture
@@ -88,5 +101,41 @@ public:
 
 	// Creates a 1x1 white texture
 	SBAPI void createWhiteTexture(int w = 1, int h = 1);
-
 };
+#if defined(EMSCRIPTEN)
+class SbmCubeMapTexture // simple place holder for OpenGL ES cubemap texture
+{
+protected:
+	std::vector<std::string> textureNames;
+	std::vector<std::string> textureFileNames;
+	int width, height;
+	int channels; // num of channels in the image	
+	unsigned char* buffer;
+	std::vector<unsigned char> imgBuffer;
+	bool finishBuild;
+	bool transparentTexture;
+	GLuint texID;	
+	GLuint internal_format, texture_format;		
+public:
+	SBAPI SbmCubeMapTexture(const std::vector<std::string> &textureNames, const std::vector<std::string> &fileNames);
+	SBAPI ~SbmCubeMapTexture(void);
+	SBAPI bool hasBuild() { return finishBuild; }
+	SBAPI bool isTransparent() { return transparentTexture; }
+	SBAPI const std::vector<std::string>& getNames() { return textureNames; }
+	SBAPI const std::vector<std::string>& getFileName() { return textureFileNames; }
+	SBAPI GLuint getID() { return texID; }
+	SBAPI bool loadImage(const char* fileName);	
+	SBAPI void buildCubeMapTexture(bool buildMipMap = false);
+	SBAPI unsigned char* getBuffer();
+	SBAPI int getBufferSize();
+	SBAPI int getWidth() const { return width; }	
+	SBAPI int getHeight() const { return height; }
+	SBAPI int getNumChannels() const { return channels; }	
+
+	SBAPI void setBuffer(unsigned char* buffer, int size);
+	SBAPI void setTextureSize(int w, int h, int numChannels);
+
+	// Creates a 1x1 white texture
+	SBAPI void createWhiteTexture(){};
+};
+#endif

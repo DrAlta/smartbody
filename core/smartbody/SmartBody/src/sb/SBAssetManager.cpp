@@ -41,6 +41,10 @@
 
 #include <boost/filesystem/path.hpp>
 
+#if defined(EMSCRIPTEN)
+#include <emscripten.h>
+#endif
+
 #ifdef WIN32
 #include <direct.h>
 #else

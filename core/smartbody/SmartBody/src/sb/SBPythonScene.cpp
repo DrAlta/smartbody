@@ -140,7 +140,7 @@ void pythonFuncsScene()
 		.def("removeAllSceneListeners", &SBScene::removeAllSceneListeners, "Removes all scene listeners.")
 		.def("save", &SBScene::save, "Saves the SmartBody configuration. Returns a string containing Python commands representing the configuration.")
 		.def("exportScene", &SBScene::exportScene, "Saves the entire SmartBody configuration, including assets paths as a python script into a given file location.")
-		#if !defined(__FLASHPLAYER__)
+		#if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 		.def("exportScenePackage", &SBScene::exportScenePackage, "Saves the entire SmartBody configuration and all assets into a given folder, or into a .zip archive")
 		.def("exportCharacter", &SBScene::exportCharacter, "Saves the character's skeleton, skinned mesh and all other assets into a given folder in Collada format. ")
 		#endif

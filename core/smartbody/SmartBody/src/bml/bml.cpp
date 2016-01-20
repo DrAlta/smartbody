@@ -31,6 +31,7 @@
 #include <iostream>
 #include <algorithm>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
 
 
 #include "bml_exception.hpp"

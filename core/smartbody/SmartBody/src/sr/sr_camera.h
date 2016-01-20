@@ -174,7 +174,10 @@ class SrCamera : public SmartBody::SBPawn
 
 	SBAPI void setCameraParameterSmooth(std::string camName, float smoothTime);
 
-	
+#if defined(EMSCRIPTEN)
+	SBAPI void setAdditionalXForm(SrMat &m){additionalXForm = m;}
+	SBAPI SrMat& getAdditionalXForm (SrMat &m) const{ m = additionalXForm; return m;}
+#endif
 
  protected:
     SrPnt  eye;    //!< position of the eye, default is (0,0,2).
@@ -194,6 +197,10 @@ class SrCamera : public SmartBody::SBPawn
 	std::string targetCam;
 
 	bool coneOfSight;	// If the camera to visualize cone of sight of character is enabled
+
+#if defined(EMSCRIPTEN)
+	 SrMat additionalXForm;
+#endif
  };
 
 

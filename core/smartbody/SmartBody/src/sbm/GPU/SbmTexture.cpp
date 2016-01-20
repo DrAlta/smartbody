@@ -1,4 +1,4 @@
-#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #include "sbm/GPU/SbmDeformableMeshGPU.h"
 #endif
@@ -53,6 +53,14 @@ void SbmTextureManager::releaseAllTextures()
 	textureMap.clear();
 	normalTexMap.clear();
 	specularTexMap.clear();	
+#if defined(EMSCRIPTEN)
+	StrCubeTextureMap::iterator it;
+	for(it = cubeTextureMap.begin(); it != cubeTextureMap.end(); ++it){
+		SbmCubeMapTexture* tex = it->second;
+		delete tex;
+	}
+	cubeTextureMap.clear();
+#endif
 }
 
 StrTextureMap& SbmTextureManager::findMap( int type )
@@ -63,7 +71,6 @@ StrTextureMap& SbmTextureManager::findMap( int type )
 		return normalTexMap;
 	else if (type == TEXTURE_SPECULARMAP)
 		return specularTexMap;
-
 	return textureMap;
 }
 
@@ -171,7 +178,14 @@ void SbmTextureManager::updateTexture()
 			tex->buildTexture();
 	}
 
-	
+#if defined(EMSCRIPTEN)
+	StrCubeTextureMap::iterator it;
+	for(it = cubeTextureMap.begin(); it != cubeTextureMap.end(); ++it){
+		SbmCubeMapTexture *tex = it->second;
+		if(!tex->hasBuild())
+			tex->buildCubeMapTexture();
+	}
+#endif
 }
 
 
@@ -201,7 +215,6 @@ SBAPI void SbmTextureManager::reloadTexture()
 		SbmTexture* tex = vi->second;
 		tex->buildTexture();
 	}
-
 	// recreate FBO when reloading texture
 	std::map<std::string, GLuint>::iterator mi;
 	for ( mi  = FBOMap.begin();
@@ -212,6 +225,14 @@ SBAPI void SbmTextureManager::reloadTexture()
 		glGenFramebuffers(1, &fboID);
 		mi->second = fboID;
 	}
+#if defined(EMSCRIPTEN)
+	StrCubeTextureMap::iterator it;
+	for(it = cubeTextureMap.begin(); it != cubeTextureMap.end(); ++it){
+		SbmCubeMapTexture *tex = it->second;
+		tex->buildCubeMapTexture();
+
+	}
+#endif
 }
 
 
@@ -224,8 +245,36 @@ SbmTexture* SbmTextureManager::findTexture(int type, const char* textureName )
 		return texMap[strTex];
 	return NULL;
 }
+#if defined(EMSCRIPTEN)
+SbmCubeMapTexture* SbmTextureManager::findCubeMapTexture(const char* cubeMapName){
+	std::string strTex = cubeMapName;
+	if(cubeTextureMap.find(strTex) != cubeTextureMap.end())
+		return cubeTextureMap[strTex];
+	return NULL;
+}
 
+void SbmTextureManager::loadCubeMapTextures(const std::string cubeMapName, const std::vector<std::string> &textureNames, const std::vector<std::string> &textureFileNames){
+	if(textureNames.size() != 6 || textureFileNames.size() != 6){
+		LOG("Textures provided are not enough to build cube map!\n");
+		return;
+	}
+	
+	// If the texture does not exist in the texture map, create a new one
+	if (cubeTextureMap.find(cubeMapName) == cubeTextureMap.end()) 
+	{
+		SbmCubeMapTexture* texture = new SbmCubeMapTexture(textureNames, textureFileNames);
+		for(int i = 0; i < textureNames.size(); ++i){
+			if(!texture->loadImage(textureFileNames[i].c_str()))
+			{
+				LOG("ERROR: Can't load image %s. Invalid path? Is it an 8-bit image?", textureFileNames[i].c_str());
+			}
+		}
+		
+		cubeTextureMap[cubeMapName] = texture;
+	}
 
+}
+#endif
 /************************************************************************/
 /* Sbm Texture                                                          */
 /************************************************************************/
@@ -322,12 +371,16 @@ void SbmTexture::buildTexture(bool buildMipMap)
 #if !defined(__native_client__)
 	//SbmShaderProgram::printOglError("SbmTexture.cpp:10");		
 	GLuint iType = GL_TEXTURE_2D;
+#if !defined(EMSCRIPTEN)    //OpenGL ES 2.0 no EMUN for GL_TEXTURE_2D
 	myGLEnable(GL_TEXTURE_2D);
+#endif
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+#if !defined(EMSCRIPTEN)
 	myGLEnable(iType);	
+#endif
 	glGenTextures(1,&texID);
 	glBindTexture(iType,texID);
-#if !defined(__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 	if (!glIsTexture(texID))
 	{
 		SbmShaderProgram::printOglError("SbmTexture.cpp:100");
@@ -351,37 +404,44 @@ void SbmTexture::buildTexture(bool buildMipMap)
 		glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 	else
 		glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	//LOG("After Texture parameters : GL_TEXTURE_MIN_FILTER");
-	
-	//LOG("After Texture parameters : GL_TEXTURE_MAX_FILTER");
-	
-	//LOG("After glTexEnvf");
-	//SbmShaderProgram::printOglError("SbmTexture.cpp:100");	
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 #else
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 #endif
 	glTexParameteri(iType, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 
-	
-	
+#if !defined(EMSCRIPTEN)
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+#endif
 	if (channels == 3)
 	{
+#if !defined(EMSCRIPTEN)
 		internal_format = GL_RGB8;
-		texture_format = GL_RGB;		
+		texture_format = GL_RGB;
+#else 
+		internal_format = GL_RGB;
+		texture_format = GL_RGB;
+#endif
 	}
 	else if (channels == 4)
 	{
+#if !defined(EMSCRIPTEN)
 		internal_format = GL_RGBA8;
-		texture_format = GL_RGBA;				
+		texture_format = GL_RGBA;
+#else 
+		internal_format = GL_RGBA;
+		texture_format = GL_RGBA;
+#endif			
 	}
 	//glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);	
-//#if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(__linux__)
-#if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE) 
+#if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(__linux__) &!defined(EMSCRIPTEN)
 	if (buildMipMap)
 		gluBuild2DMipmaps(iType, channels, width, height, texture_format, GL_UNSIGNED_BYTE, &imgBuffer[0] );
 	else
 		glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, &imgBuffer[0]);
+#elif defined(EMSCRIPTEN)
+	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, &imgBuffer[0]);
+	glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
+	glGenerateMipmap(GL_TEXTURE_2D);
 #else
 	glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, &imgBuffer[0]);
 	//glGenerateMipmap(GL_TEXTURE_2D);
@@ -391,7 +451,7 @@ void SbmTexture::buildTexture(bool buildMipMap)
 
 	//glGenerateMipmap(iType);
 	//SbmShaderProgram::printOglError("Sb!defined(SB_IPHONE)mTexture.cpp:200");
-#if !defined(__ANDROID__) && !defined(SB_IPHONE)
+#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 	GLclampf iPrority = 1.0;
 	glPrioritizeTextures(1,&texID,&iPrority);
 #endif
@@ -458,3 +518,141 @@ void SbmTexture::createWhiteTexture(int w, int h)
 	//textureFileName		= "white";	
 	//textureName			= "white";
 }
+
+#if defined(EMSCRIPTEN)
+SbmCubeMapTexture::SbmCubeMapTexture(const std::vector<std::string>& texNames, const std::vector<std::string> &fileNames){
+	if(texNames.size() != 6 || fileNames.size())
+		LOG("Wrong number of textures!");
+	textureNames = texNames;
+	textureFileNames = fileNames;
+	texID				= 0;
+	buffer				= NULL;
+	finishBuild			= false;
+	transparentTexture	= false;
+	width				= -1;
+	height				= -1;
+	channels			= -1;
+
+}
+SbmCubeMapTexture::~SbmCubeMapTexture(){
+	if (buffer)
+		delete [] buffer;
+	if (texID != 0)
+		glDeleteTextures(1,&texID);	
+}
+
+bool SbmCubeMapTexture::loadImage(const char* fileName){
+	
+	buffer = SOIL_load_image(fileName, &width, &height, &channels, SOIL_LOAD_AUTO);	
+	if (width < 0 || height < 0 || channels < 0)
+		return false;
+	else {
+		LOG("Loading image       :%s\t%d\t%d\t%d", fileName, width, height, channels );
+	}
+	
+	int transparentPixel = 0;
+	// invert the image in y-axis
+	for(int j = 0; j*2 < height; ++j )
+	{
+		int index1 = j * width * channels;
+		int index2 = (height - 1 - j) * width * channels;
+		for(int i = width * channels ; i > 0; --i )
+		{
+			unsigned char temp = buffer[index1];
+			buffer[index1] = buffer[index2];
+			buffer[index2] = temp;
+			++index1;
+			++index2;			
+		}
+	}
+
+	if (channels == 4)
+	{
+		for (int j=0;j<height;j++)
+		{
+			for (int i=0;i<width;i++)
+			{
+				unsigned char alphaVal = buffer[j*width*channels+i*channels+3];
+				if (alphaVal < 250)
+					transparentPixel++;
+			}
+		}
+	}
+
+
+	if (transparentPixel*20 > height*width)
+		transparentTexture = true;
+
+	//append the new image to the image buffer
+	size_t offset = imgBuffer.size();
+	imgBuffer.resize(offset + width * height * channels);
+
+	for (size_t i=0;i<width*height*channels;i++)
+	{
+		imgBuffer[i + offset] = buffer[i];
+	}
+
+	//TODO: set the texture file name
+
+	SOIL_free_image_data(buffer);
+	buffer = NULL;
+	return true;
+}
+void SbmCubeMapTexture::buildCubeMapTexture(bool buildMipMap){
+	if (!getBuffer()) return;	
+	GLuint iType = GL_TEXTURE_CUBE_MAP;
+	glGenTextures ( 1, &texID );
+	// Bind the texture object
+	glBindTexture ( iType, texID );
+	
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	//we bind them into one texId
+	glTexParameteri ( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	glTexParameteri ( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+	if (channels == 3)
+	{
+		internal_format = GL_RGB;
+		texture_format = GL_RGB;		
+	}
+	else if (channels == 4)
+	{
+		internal_format = GL_RGBA;
+		texture_format = GL_RGBA;				
+	}
+	//loading texture to the cube
+
+	for(int i = 0, offset = 0; i < 6; ++i, offset += width * height * channels){
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, texture_format, width, height, 0, texture_format, GL_UNSIGNED_BYTE, &(imgBuffer[offset]));
+	}
+	//glBindTexture(iType, 0);	
+	finishBuild = true;
+}
+unsigned char* SbmCubeMapTexture::getBuffer()
+{
+	if (imgBuffer.size() == 0) return NULL;
+
+	return &imgBuffer[0];
+}
+
+int SbmCubeMapTexture::getBufferSize()
+{
+	return imgBuffer.size();
+}
+
+void SbmCubeMapTexture::setBuffer(unsigned char* buffer, int size)
+{
+	imgBuffer.clear();
+	for (int i = 0; i < size; ++i)
+	{
+		imgBuffer.push_back(buffer[i]);
+	}
+}
+
+void SbmCubeMapTexture::setTextureSize(int w, int h, int numChannels)
+{
+	width		= w;
+	height		= h;
+	channels	= numChannels;
+}
+
+#endif

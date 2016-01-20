@@ -2102,8 +2102,10 @@ void PPRAgent::drawPlannedPath()
 			Point center,nextCenter;
 			xOffset.x = 0.5f * gSpatialDatabase->getCellSizeX();
 			zOffset.z = 0.5f * gSpatialDatabase->getCellSizeZ();
+#ifndef EMSCRIPTEN 
 			gSpatialDatabase->getLocationFromIndex(longTermPath._Get_container()[i], center);
 			gSpatialDatabase->getLocationFromIndex(longTermPath._Get_container()[i+1], nextCenter);
+#endif
 			center.y = 0.01f;
 			nextCenter.y = 0.01f;
 			DrawLib::glColor(gDarkBlue);

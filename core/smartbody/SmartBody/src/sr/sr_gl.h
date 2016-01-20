@@ -61,31 +61,17 @@
 //#include <GLES/gl.h>
 #include <GLES2/gl2.h>
 //#include "wes_gl.h"
+//#include "wes_glu.h"
+
+#elif defined(EMSCRIPTEN)
+#include <GLES/gl.h>
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
 #else
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include <GL/glu.h>
 #endif
-
-
-// #if defined(SB_IPHONE)
-// #include <OpenGLES/ES1/gl.h>
-// #include <OpenGLES/ES1/glext.h>
-// #elif __APPLE__
-// #include <OpenGL/gl.h>
-// #include <OpenGL/glu.h>
-// #elif __native_client__
-// #include <GLES2/gl2.h>
-// #elif defined(__ANDROID__)
-// //#include <GLES/gl.h>
-// #include <GLES2/gl2.h>
-// //#include "wes_gl.h"
-// //#include "wes_glu.h"
-// 
-// # else
-// # include <GL/gl.h>
-// # include <GL/glu.h>
-// # endif
 
 class SrVec;
 class SrMat;
@@ -95,7 +81,7 @@ class SrLight;
 class SrOutput;
 class SrMaterial;
 
-#if defined(__ANDROID__) || defined(SB_IPHONE)
+#if defined(__ANDROID__) || defined(SB_IPHONE) || defined(EMSCRIPTEN)
 #define GLES_RENDER 1
 #define USE_GL_FIXED_PIPELINE 0
 #define GLdouble GLfloat
@@ -112,6 +98,7 @@ class SrMaterial;
 #define myGLDisable glDisable
 #endif
 
+#if !defined(EMSCRIPTEN)
 //======================================= geometry ================================
 SBAPI void glNormal ( const SrVec &v );
 
@@ -126,6 +113,7 @@ SBAPI void glDrawBox ( const SrVec& a, const SrVec& b ); //!< Send quads with no
 
 //====================================== appearance ================================
 SBAPI void glColor ( const SrColor& c );
+#endif
 
 SBAPI void glClearColor ( const SrColor& c );
 SBAPI void glLight ( int id, const SrLight& l, bool bind_pos = true ); //!< id = x E {0,...,7}, from GL_LIGHTx

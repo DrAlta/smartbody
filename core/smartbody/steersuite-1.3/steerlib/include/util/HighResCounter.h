@@ -10,6 +10,11 @@
 /// @brief Declares timing/counter functionality.
 ///
 
+// why do we need to do this? Somewhere, _WIN32 is explicitly and errantly defined AS and ZW 7/24/15
+#if defined(EMSCRIPTEN)
+#undef _WIN32
+#endif
+
 #ifdef __APPLE__
 #include "TargetConditionals.h"
 #if defined (TARGET_OS_IPHONE)  || defined (TARGET_IPHONE_SIMULATOR)
@@ -108,7 +113,7 @@ namespace Util {
 		clock_gettime(CLOCK_HIGHRES, &timeInfo);
 		unsigned long long int nanosecs = ((unsigned long long)timeInfo.tv_sec)*1000000000  +  ((unsigned long long)timeInfo.tv_nsec);
 		return nanosecs;
-	#elif defined (BUILD_ANDROID)
+	#elif defined (BUILD_ANDROID) || defined (EMSCRIPTEN)
 		timespec timeInfo;
 		clock_gettime(CLOCK_REALTIME, &timeInfo);
 		unsigned long long int nanosecs = ((unsigned long long)timeInfo.tv_sec)*1000000000  +  ((unsigned long long)timeInfo.tv_nsec);

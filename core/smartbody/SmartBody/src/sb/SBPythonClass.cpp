@@ -17,6 +17,7 @@
 
 namespace SmartBody 
 {
+#ifndef SB_NO_PYTHON
 
 SrViewer* getViewer()
 {
@@ -34,7 +35,7 @@ SrViewer* getViewer()
 	return scene->getViewer();
 }
 
-#ifndef SB_NO_PYTHON
+
 
 
 std::string PyLogger::strBuffer = "";

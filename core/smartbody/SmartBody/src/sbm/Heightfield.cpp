@@ -122,7 +122,7 @@ void Heightfield::paste_img( void )	{
 #endif
 
 void Heightfield::render( int renderMode )	{
-#if defined (__ANDROID__) || defined (SB_IPHONE) || defined(__native_client__)
+#if defined (__ANDROID__) || defined (SB_IPHONE) || defined(__native_client__) || defined(EMSCRIPTEN)
 #else
 	if( vertex_arr && color_arr )	{
 

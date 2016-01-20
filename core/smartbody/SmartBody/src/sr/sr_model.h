@@ -69,7 +69,7 @@ class SrModel : public SrSharedClass
 		 {
 			 set(f1,f2,f3);
 		 }
-#if defined(__ANDROID__) || defined(SB_IPHONE)
+#if defined(__ANDROID__) || defined(SB_IPHONE) || defined(EMSCRIPTEN)
        unsigned short a,b,c;
        void validate () { }
        unsigned short& operator[] ( int i ) { return *((&a)+i); }
@@ -96,7 +96,7 @@ class SrModel : public SrSharedClass
 
     std::vector<SrMaterial> M;  //!< Used materials
     //SrArray<SrPnt>      V;  //!< Vertices coordinates
-	std::vector<SrVec>  V;
+	std::vector<SrVec>		V;
 	std::vector<SrVec>      Vc; // color of vertices
 	std::vector<SrVec>      N;  //!< Normals table		
 	std::vector<SrVec>      Tangent, BiNormal; // tangent and bi normal vectors
