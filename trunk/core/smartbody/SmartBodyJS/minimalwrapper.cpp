@@ -572,7 +572,7 @@ extern "C"
 				SrBox bbox = mesh->computeBoundingBox();
 				SrVec extent = (bbox.b - bbox.a) * 0.5;
 				//LOG("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",pawn->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
-				drawBBox(esContext, bbox.getCenter(), extent);
+				//drawBBox(esContext, bbox.getCenter(), extent);
 			}
 			SbmCharacter* character = dynamic_cast<SbmCharacter*>(pawn);
 			if (character){
@@ -580,7 +580,7 @@ extern "C"
 				SrBox bbox = character->getBoundingBox();
 				//LOG("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",character->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
 				SrVec extent = (bbox.b - bbox.a) * 0.5;
-				drawBBox(esContext, bbox.getCenter(), extent);
+				//drawBBox(esContext, bbox.getCenter(), extent);
 			}
 
 			const bool isVisible = pawn->getBoolAttribute("visible");

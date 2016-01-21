@@ -169,6 +169,11 @@ xcopy ..\steersuite-1.3\build\Emscripten\Release\steerlib.bc .\
 xcopy ..\SmartBody\Debug\SmartBody_d.bc .\
 xcopy ..\SmartBody\Release\SmartBody.bc .\</Command>
     </PreLinkEvent>
+    <PostBuildEvent>
+      <Command>xcopy $(Platform)\$(Configuration)\SmartBodyJS.js ..\..\..\sdk\javascript\ /Y
+xcopy $(Platform)\$(Configuration)\SmartBodyJS.js.mem ..\..\..\sdk\javascript\ /Y
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="esUtil.h" />
