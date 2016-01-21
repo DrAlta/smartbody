@@ -270,7 +270,7 @@ void SbmBlendFace::initShaderProgram()
 #endif
 
 
-#if !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
+#if !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 SbmBlendTextures::SbmBlendTextures()
 {
 }
