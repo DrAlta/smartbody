@@ -58,7 +58,6 @@ namespace SmartBody
 			.function("createStaticJoint", &SBSkeleton::createStaticJoint, emscripten::allow_raw_pointers())
 			.function("createChannel", &SBSkeleton::createChannel, emscripten::allow_raw_pointers())		
 			.function("update", &SBSkeleton::update)
-			.function("getBoundingBox", &SBSkeleton::getBoundingBox);
 			; 
 
 		emscripten::class_<SBJoint, emscripten::base<SBObject>>("SBJoint")
