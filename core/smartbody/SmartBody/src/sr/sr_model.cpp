@@ -52,6 +52,7 @@ SrModel::SrModel ()
  {
    culling = true;
    _scale = 1.0;
+   _modelTransform = SrMat::id;
  }
 
 SrModel::~SrModel ()
@@ -770,7 +771,9 @@ void SrModel::translate ( const SrVec &tr )
  {
 	saveOriginalVertices();
 
-	_translation = tr;
+	//_translation = tr;
+	SrMat transMat; transMat.set_translation(tr);
+	_modelTransform = _modelTransform*transMat;
 
 	recalculateVertices();
  }
@@ -779,7 +782,10 @@ void SrModel::rotate( const SrVec &r )
  {
 	saveOriginalVertices();
 
-	_rotation = r;
+	//_rotation = r;
+	SrQuat rotQuat = SrQuat(r); // use axis angle instead of Euler angle ?	
+	SrMat rotMat; rotQuat.get_mat(rotMat);
+	_modelTransform = _modelTransform*rotMat;
 
 	recalculateVertices();
  }
@@ -788,10 +794,35 @@ void SrModel::scale ( float factor )
  {
    saveOriginalVertices();
 
-   _scale = factor;
+   //_scale = factor;
+   SrMat scaleMat; scaleMat.scale(factor);
+   _modelTransform = _modelTransform*scaleMat;
 
 	recalculateVertices();
  }
+
+
+SBAPI void SrModel::resetTransform()
+{
+	saveOriginalVertices();
+	
+	// reset model transform to identity matrix
+	_modelTransform = SrMat::id;
+
+	recalculateVertices();
+}
+
+SBAPI void SrModel::addTransform( const SrMat& transform )
+{
+	saveOriginalVertices();
+
+	// add new transform on top of current model transform
+	_modelTransform = _modelTransform*transform;
+
+	recalculateVertices();
+}
+
+
 
 void SrModel::recalculateVertices()
 {
@@ -810,8 +841,9 @@ void SrModel::recalculateVertices()
 	int i, s=V.size();
 	for ( i=0; i<s; i++ ) 
 	{
-		SrVec vTemp = VOrig[i]*_scale;
-		V[i] = vTemp*finalRot + _translation;
+		//SrVec vTemp = VOrig[i]*_scale;
+		//V[i] = vTemp*finalRot + _translation;
+		V[i] = VOrig[i] * _modelTransform;
 		//V[i] = ((VOrig[i] + _translation) * _scale * finalRot);
 		//V[i] = (VOrig[i] * _scale) * finalRot + _translation;
 	}
@@ -1443,6 +1475,5 @@ SrMaterial& SrModel::getMaterial(int num)
 	else
 		return _emptyMaterial;
 }
-
 
 //================================ End of File =================================================

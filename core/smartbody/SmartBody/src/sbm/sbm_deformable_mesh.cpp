@@ -290,6 +290,44 @@ SBAPI void DeformableMesh::updateVertexBuffer()
 }
 
 
+bool DeformableMesh::buildBlendShapes()
+{
+	if (blendShapeMap.size() == 0) return false;
+	blendShapeNewVtxIdxMap.clear();
+	std::string neutralName = blendShapeMap.begin()->first;
+	int meshIdx = getMesh(neutralName);
+	SrModel& neutralMesh = getStaticModel(meshIdx);
+	// build Kd-tree from posBuf
+	int numKNN = 10;
+	MeshPointCloud posCloud;
+	posCloud.pts = posBuf;
+	std::vector<float> knnPtDists(numKNN);
+	std::vector<int>   knnPtIdxs(numKNN);	
+	MeshKDTree* meshKDTree = new MeshKDTree(3, posCloud, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+	meshKDTree->buildIndex();
+	// for each vertex in neutral blendshape model, search for closest vertex in Kd-tree
+	// if distance is zero, put vertex index in the blendShapeNewVtxIdxMap 
+	for (unsigned int i=0;i<neutralMesh.V.size(); i++)
+	{
+		SrVec inPt = neutralMesh.V[i];
+		meshKDTree->knnSearch((float*)&inPt, numKNN, (size_t*)&knnPtIdxs[0], &knnPtDists[0]);
+		for (unsigned int k=0;k<numKNN;k++)
+		{
+			if (knnPtDists[k] < srtiny) // almost identical vertex
+			{
+				if (blendShapeNewVtxIdxMap.find(i) == blendShapeNewVtxIdxMap.end())
+				{
+					blendShapeNewVtxIdxMap[i] = std::vector<int>();
+				}
+				blendShapeNewVtxIdxMap[i].push_back(knnPtIdxs[k]);
+			}
+		}
+	}
+
+	return true;
+}
+
+
 bool DeformableMesh::buildSkinnedVertexBuffer()
 {	
 	if (initSkinnedVertexBuffer) return true;
@@ -315,6 +353,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	std::vector<std::string> allMatNameList;
 	std::vector<std::string> allNormalTexNameList;
 	std::vector<std::string> allSpecularTexNameList;	
+	std::map<std::string, std::string> allMaterialMeshMap;
 	SrMaterial defaultMaterial;
 	defaultMaterial.diffuse = SrColor(0.6f,0.6f,0.6f);//SrColor::gray;	
 	defaultMaterial.specular = SrColor(101,101,101);//SrColor::gray;
@@ -381,6 +420,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
 		SrSnModel* dMeshStatic = dMeshStatic_p[pos];
 		dMeshStatic->shape().computeTangentBiNormal();
+		std::string meshName = dMeshStatic->shape().name;
 		std::vector<SrMaterial>& matList = dMeshDynamic->shape().M; 	
 		std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
 		std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;		
@@ -415,6 +455,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			{
 				allSpecularTexNameList.push_back("");
 			}
+			allMaterialMeshMap[mtlName] = meshName;
 			allMatList.push_back(mat);
 			allMatNameList.push_back(mtlName);
 			//colorArray[j%6].get(fcolor);				
@@ -806,6 +847,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		}
 
 		mesh->matName = allMatNameList[iMaterial];
+		mesh->modelName = allMaterialMeshMap[mesh->matName];
 		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,mesh->texName.c_str());
 		//if (lowMatName.find("hair") != std::string::npos || lowMatName.find("lash") != std::string::npos 
 		//	|| lowMatName.find("shadow") != std::string::npos || lowMatName.find("shell") != std::string::npos)
@@ -827,6 +869,9 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	}		
 	subMeshList.insert(subMeshList.end(),hairMeshList.begin(),hairMeshList.end());
 	subMeshList.insert(subMeshList.end(),alphaMeshList.begin(),alphaMeshList.end());
+
+	buildBlendShapes();
+
 	initStaticVertexBuffer = true;
 	if (buildSkinnedBuffer)
 		initSkinnedVertexBuffer = true;
@@ -1156,6 +1201,20 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 
 	}
 }
+
+
+SBAPI void DeformableMesh::addTransform( const SrMat& transform )
+{
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshDynamic_p[i]->shape().addTransform(transform);
+	}
+	for (unsigned int i = 0; i < dMeshDynamic_p.size(); i++)
+	{
+		dMeshStatic_p[i]->shape().addTransform(transform);
+	}
+}
+
 
 void DeformableMesh::translate(SrVec trans)
 {
@@ -2078,12 +2137,13 @@ void DeformableMeshInstance::blendShapes()
 				continue;
 
 			//	Gets the map of (material name, texture) for the current mesh
-			std::vector<std::string> materials;
+			std::vector<std::string> materials = mIter->second[i]->shape().mtlnames;
+#if 0
 			std::map<std::string, std::string> textures_map = mIter->second[i]->shape().mtlTextureNameMap;
 			for(std::map<std::string,std::string>::iterator it = textures_map.begin(); it != textures_map.end(); ++it) {
 				materials.push_back(it->first);
 			}
-
+#endif
 			//	In a face there will be just one texture, material name will be always the first
 			std::string matName = "";
 			if (materials.size() > 0)
@@ -2510,7 +2570,7 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 		return;
 	
 	std::map<int,std::vector<int> >& vtxNewVtxIdxMap = _mesh->vtxNewVtxIdxMap;
-	
+	std::map<int, std::vector<int> >& vtxBlendShapeVtxIdxMap = _mesh->blendShapeNewVtxIdxMap;
 	SrModel& baseModel = writeToBaseModel->shape();
 	
 	for (int i=0;i<baseModel.V.size();i++)
@@ -2528,7 +2588,17 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 				int idx				= idxMap[k];
 				_deformPosBuf[idx]	= basePos;	// Here copies blended vertices position
 			}
-		}			
+		}	
+		if (vtxBlendShapeVtxIdxMap.find(i) != vtxBlendShapeVtxIdxMap.end())
+		{
+			std::vector<int>& idxMap = vtxBlendShapeVtxIdxMap[i];
+			// copy related vtx components 
+			for (unsigned int k=0;k<idxMap.size();k++)
+			{
+				int idx				= idxMap[k];
+				_deformPosBuf[idx]	= basePos;	// Here copies blended vertices position
+			}
+		}
 	}	
 	//SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #FINAL");
 }
