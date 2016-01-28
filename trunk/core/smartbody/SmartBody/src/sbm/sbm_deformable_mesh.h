@@ -12,6 +12,7 @@
 #include <sb/SBCharacter.h>
 
 #include "external/glm/glm/glm.hpp"
+#include "external/nanoflann/nanoflann.hpp"
 
 #define USE_SKIN_WEIGHT_SIZE_8 0
 
@@ -69,6 +70,7 @@ class SbmSubMesh
 public:
 	SrMaterial  material;
 	bool isHair;
+	std::string modelName; // the name of original SrModel
 	std::string matName;
 	std::string texName;
 	std::string normalMapName;
@@ -76,6 +78,39 @@ public:
 	int numTri;
 	std::vector<SrVec3i> triBuf;
 };
+
+
+
+struct MeshPointCloud
+{	
+	std::vector<SrVec>  pts;
+
+	// Must return the number of data points
+	inline size_t kdtree_get_point_count() const { return pts.size(); }
+
+	// Returns the distance between the vector "p1[0:size-1]" and the data point with index "idx_p2" stored in the class:
+	inline float kdtree_distance(const float *p1, const size_t idx_p2,size_t size) const
+	{
+		SrVec v1 = SrVec(p1[0],p1[1],p1[2]);		
+		return (v1-pts[idx_p2]).norm2();
+	}
+
+	// Returns the dim'th component of the idx'th point in the class:
+	// Since this is inlined and the "dim" argument is typically an immediate value, the
+	//  "if/else's" are actually solved at compile time.
+	inline float kdtree_get_pt(const size_t idx, int dim) const
+	{
+		return pts[idx][dim];
+	}
+
+	// Optional bounding-box computation: return false to default to a standard bbox computation loop.
+	//   Return true if the BBOX was already computed by the class and returned in "bb" so it can be avoided to redo it again.
+	//   Look at bb.size() to find out the expected dimensionality (e.g. 2 or 3 for point clouds)
+	template <class BBOX>
+	bool kdtree_get_bbox(BBOX &bb) const { return false; }
+};
+typedef nanoflann::KDTreeSingleIndexAdaptor<nanoflann::L2_Simple_Adaptor<float, MeshPointCloud>, MeshPointCloud, 3> MeshKDTree;
+
 
 class DeformableMeshInstance;
 namespace SmartBodyBinary
@@ -99,6 +134,7 @@ public:
 	std::vector<SrSnModel*>		dMeshStatic_p;
 	std::vector<SkinWeight*>	skinWeights;
 	std::map<std::string, std::vector<SrSnModel*> > blendShapeMap;	// the key store the base shape name, vector stores morph target SrModels. first one in the vector is always the base one
+	std::map<int, std::vector<int>> blendShapeNewVtxIdxMap; 
 	std::map<std::string, std::vector<std::string> > morphTargets;	// stores a vector of morph target names, first one is always the base one
 	std::vector<BlendShapeData> optimizedBlendShapeData;						// stores optimized information when calculating blend shapes; list of vertices affected, and their differential vector and normal amounts
 	
@@ -146,7 +182,8 @@ public:
 	int getValidSkinMesh(const std::string& meshName);
     
 	SBAPI virtual bool buildSkinnedVertexBuffer(); // unrolled all models inside this deformable mesh into a GPU-friendly format
-	SBAPI void updateVertexBuffer(); // update the values in the vertex buffer based on dMeshStatic_p
+	SBAPI virtual bool buildBlendShapes();
+	SBAPI void updateVertexBuffer(); // update the values in the vertex buffer based on dMeshStatic_p	
 	SBAPI bool isSkinnedMesh();
 	SBAPI bool saveToSmb(std::string inputFileName);
 	SBAPI bool saveToDmb(std::string inputFileName);
@@ -162,6 +199,7 @@ public:
 	SBAPI void translate(SrVec trans);
 	SBAPI void rotate(SrVec trans);
 	SBAPI void scale(float factor);
+	SBAPI void addTransform(const SrMat& transform);
 	SBAPI void centralize();
 	SBAPI void computeNormals();
 	SBAPI void copySkinWeights(DeformableMesh* fromMesh, const std::string& morphName);

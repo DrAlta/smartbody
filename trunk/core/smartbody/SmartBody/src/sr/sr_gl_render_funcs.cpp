@@ -455,6 +455,10 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			for (unsigned int i=0;i<subMeshList.size();i++)
 			{	
 				SbmSubMesh* subMesh = subMeshList[i];
+				bool blendShapeMesh = false;
+				if (mesh->blendShapeMap.find(subMesh->modelName) != mesh->blendShapeMap.end())
+					blendShapeMesh == true;
+
 				glMaterial(subMesh->material);	
 				if (subMesh->material.useAlphaBlend)
 				{
@@ -499,7 +503,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 						{
 							glBindTexture(GL_TEXTURE_2D, tex->getID());					
 						} 
-						else if (texturesType == "dynamic")
+						else if (texturesType == "dynamic" && blendShapeMesh)
 						{
 							if(shape->_tempTexPairs != NULL)
 							{
@@ -537,6 +541,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
             #elif defined(SB_IPHONE)
                 glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &subMesh->triBuf[0]);
 			#else
+				//glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_SHORT, &subMesh->triBuf[0]);
 				glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_INT, &subMesh->triBuf[0]);
 			#endif
 				glBindTexture(GL_TEXTURE_2D,0);

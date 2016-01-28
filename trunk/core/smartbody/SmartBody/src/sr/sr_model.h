@@ -134,7 +134,7 @@ class SrModel : public SrSharedClass
 	std::map<std::string,std::vector<int> > mtlFaceIndices;
 
 	SrMaterial _emptyMaterial;
-
+	SrMat _modelTransform;
 	SrVec _translation;
 	SrVec _rotation;
 	float _scale;
@@ -212,6 +212,9 @@ class SrModel : public SrSharedClass
     /*! Calculates the bounding box of this model. */
     SBAPI void get_bounding_box ( SrBox &box ) const;
 
+
+	SBAPI void resetTransform();
+	SBAPI void addTransform(const SrMat& transform);
     /*! Translate the position of each vertex of the model. */
     SBAPI void translate ( const SrVec &tr );
 	SBAPI SrVec& translate () {return _translation;};
