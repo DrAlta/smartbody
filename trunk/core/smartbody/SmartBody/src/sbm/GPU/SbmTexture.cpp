@@ -404,7 +404,9 @@ void SbmTexture::buildTexture(bool buildMipMap)
 		glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 	else
 		glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+#if !defined(EMSCRIPTEN)
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+#endif
 #else
 	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 #endif
