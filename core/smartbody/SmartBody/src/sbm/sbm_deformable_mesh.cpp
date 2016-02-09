@@ -414,17 +414,19 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			meshIndexList.push_back(i);
 	}
 
+	LOG("meshIndexList.size() = %d \n", meshIndexList.size());
 	for (unsigned int i=0;i<meshIndexList.size();i++)
 	{
 		int pos = meshIndexList[i];
 		SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
 		SrSnModel* dMeshStatic = dMeshStatic_p[pos];
 		dMeshStatic->shape().computeTangentBiNormal();
-		std::string meshName = dMeshStatic->shape().name;
+		std::string meshName = (const char*)dMeshStatic->shape().name;
 		std::vector<SrMaterial>& matList = dMeshDynamic->shape().M; 	
 		std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
 		std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;		
 		std::map<std::string,std::string> mtlSpecularTexMap = dMeshDynamic->shape().mtlSpecularTexNameMap;		
+		LOG("meshIndexList %d, matList.size() = %d \n", i, matList.size());
 		for (size_t j=0;j<matList.size();j++)
 		{			
 			SrMaterial& mat = matList[j];	
@@ -822,6 +824,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	std::vector<SbmSubMesh*> hairMeshList;
 	std::vector<SbmSubMesh*> alphaMeshList;
 	std::map<int,std::vector<int> >::iterator vi;
+	LOG("subMeshList.size() = %d \n", meshSubsetMap.size());
 	for (vi  = meshSubsetMap.begin();
 		vi != meshSubsetMap.end();
 		vi++)
