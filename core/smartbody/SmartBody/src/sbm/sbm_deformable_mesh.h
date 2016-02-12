@@ -222,6 +222,7 @@ protected:
 	bool _isStaticMesh;
 
 public:
+	std::vector<SrVec> _restPosBuf;
 	std::vector<SrVec> _deformPosBuf;	
 	std::vector<SrMat>  transformBuffer;	
 

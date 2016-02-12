@@ -456,8 +456,13 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			{	
 				SbmSubMesh* subMesh = subMeshList[i];
 				bool blendShapeMesh = false;
-				if (mesh->blendShapeMap.find(subMesh->modelName) != mesh->blendShapeMap.end())
-					blendShapeMesh == true;
+				std::map<std::string, std::vector<SrSnModel*> > ::iterator mi = mesh->blendShapeMap.find(subMesh->modelName);
+				std::map<std::string, std::vector<SrSnModel*> > ::iterator endIt =  mesh->blendShapeMap.end();
+				int hitCount = mesh->blendShapeMap.count(subMesh->modelName);
+				if (mi != endIt)
+					blendShapeMesh = true;
+				//if (hitCount > 0)
+				//	blendShapeMesh = true;
 
 				glMaterial(subMesh->material);	
 				if (subMesh->material.useAlphaBlend)

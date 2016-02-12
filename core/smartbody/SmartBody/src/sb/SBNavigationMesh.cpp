@@ -90,7 +90,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	const float* bmax = &bBox.b[0];
 	const float* verts = &inMesh.V[0][0];
  	const int nverts = inMesh.V.size();
-#if defined(__ANDROID__) || defined(SB_IPHONE) || defined(EMSCRIPTEN)
+#if 1// defined(__ANDROID__) || defined(SB_IPHONE) || defined(EMSCRIPTEN)
  	//const int* tris = &inMesh.F.get(0)[0];
         // need to convert to integer array
         int* tris = new int[inMesh.F.size()*3];
