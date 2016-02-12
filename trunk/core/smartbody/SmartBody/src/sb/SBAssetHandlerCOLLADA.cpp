@@ -219,7 +219,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
  					//meshModelVec[i]->computeNormals();
  				}
 				//Zengrui: need this line for Emscripten build
-#if defined(EMSCRIPTEN)
+#if 1 //defined(EMSCRIPTEN)
 				meshModelVec[i]->computeNormals();
 #endif
 				SrSnModel* srSnModelStatic = new SrSnModel();

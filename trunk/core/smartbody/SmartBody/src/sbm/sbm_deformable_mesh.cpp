@@ -2292,8 +2292,12 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 	_mesh = mesh;
 	_mesh->buildSkinnedVertexBuffer(); // make sure the deformable mesh has vertex buffer
 	_deformPosBuf.resize(_mesh->posBuf.size()); // initialized deformation posBuffer
+	_restPosBuf.resize(_mesh->posBuf.size());
 	for (unsigned int i=0;i<_deformPosBuf.size();i++)
+	{
+		_restPosBuf[i] = _mesh->posBuf[i];
 		_deformPosBuf[i] = _mesh->posBuf[i];
+	}
 	updateJointList();
 }
 
@@ -2385,7 +2389,8 @@ SBAPI void DeformableMeshInstance::updateFast()
 	if (!_skeleton || !_mesh) return;	
 	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
 
-	updateSkin(_mesh->posBuf,  _deformPosBuf);
+	//updateSkin(_mesh->posBuf,  _deformPosBuf);
+	updateSkin(_restPosBuf, _deformPosBuf);
 }
 
 
@@ -2402,8 +2407,8 @@ void DeformableMeshInstance::update()
 	updateTransformBuffer();
 	return;
 #endif
-	//updateFast();
-	//return;
+	updateFast();
+	return;
 
 	int maxJoint = -1;
 	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
@@ -2576,11 +2581,12 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 	std::map<int, std::vector<int> >& vtxBlendShapeVtxIdxMap = _mesh->blendShapeNewVtxIdxMap;
 	SrModel& baseModel = writeToBaseModel->shape();
 	
+	std::vector<SrVec>& newPosBuf = (_mesh->isSkinnedMesh()) ? _restPosBuf : _deformPosBuf;
 	for (int i=0;i<baseModel.V.size();i++)
 	{
 		int iVtx			= vtxBaseIdx+i;
 		SrVec& basePos		= baseModel.V[i];
-		_deformPosBuf[iVtx] = basePos;
+		newPosBuf[iVtx] = basePos;
 
 		if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
 		{
@@ -2589,7 +2595,7 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 			for (unsigned int k=0;k<idxMap.size();k++)
 			{
 				int idx				= idxMap[k];
-				_deformPosBuf[idx]	= basePos;	// Here copies blended vertices position
+				newPosBuf[idx]	= basePos;	// Here copies blended vertices position
 			}
 		}	
 		if (vtxBlendShapeVtxIdxMap.find(i) != vtxBlendShapeVtxIdxMap.end())
@@ -2599,10 +2605,11 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 			for (unsigned int k=0;k<idxMap.size();k++)
 			{
 				int idx				= idxMap[k];
-				_deformPosBuf[idx]	= basePos;	// Here copies blended vertices position
+				newPosBuf[idx]	= basePos;	// Here copies blended vertices position
 			}
 		}
 	}	
+	
 	//SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #FINAL");
 }
 

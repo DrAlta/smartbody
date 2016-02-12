@@ -319,17 +319,20 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					if (!pawn->dMeshInstance_p && useDeformableMesh)
 					{
 						pawn->dMeshInstance_p = new SbmDeformableMeshGPUInstance();
+						//pawn->dMeshInstance_p = new DeformableMeshInstance();
 						pawn->dMeshInstance_p->setToStaticMesh(false);
 					}
 					else if (!pawn->dStaticMeshInstance_p && !useDeformableMesh)
 					{
 						pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
+						//pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
 
 					}
 					else if (!pawn->dStaticMeshInstance_p && name == "mesh")
 					{
 						pawn->dStaticMeshInstance_p = new SbmDeformableMeshGPUInstance();
+						//pawn->dStaticMeshInstance_p = new DeformableMeshInstance();
 						pawn->dStaticMeshInstance_p->setToStaticMesh(true);
 					}
 
@@ -396,10 +399,12 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 								if (shapeChannel == "Neutral")
 								{
 									DeformableMesh* neutralMesh = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMesh(shapeName);
-									mesh->blendShapeMap.insert(std::pair<std::string, std::vector<SrSnModel*> >(neutralMesh->getName(), std::vector<SrSnModel*>() ));
+									SrSnModel* staticModel = neutralMesh->dMeshStatic_p[0];
+									std::string blendShapeMapName = staticModel->shape().name;
+									//mesh->blendShapeMap.insert(std::pair<std::string, std::vector<SrSnModel*> >(neutralMesh->getName(), std::vector<SrSnModel*>() ));
+									mesh->blendShapeMap.insert(std::pair<std::string, std::vector<SrSnModel*> >(blendShapeMapName, std::vector<SrSnModel*>() ));
 									std::map<std::string, std::vector<SrSnModel*> >::iterator blendshapeIter = mesh->blendShapeMap.begin();
 									(*blendshapeIter).second.resize(numShapeAttributes);
-									SrSnModel* staticModel = neutralMesh->dMeshStatic_p[0];
 									SrSnModel* model = new SrSnModel();
 									model->shape(staticModel->shape());
 									model->shape().name = staticModel->shape().name;
