@@ -26,8 +26,8 @@ Module.expectedDataFileDownloads++;
     var REMOTE_PACKAGE_NAME = typeof Module['locateFile'] === 'function' ?
                               Module['locateFile'](REMOTE_PACKAGE_BASE) :
                               ((Module['filePackagePrefixURL'] || '') + REMOTE_PACKAGE_BASE);
-    var REMOTE_PACKAGE_SIZE = 9098754;
-    var PACKAGE_UUID = '5d2a1ac0-605f-4664-a2ee-8e57f3da8b2b';
+    var REMOTE_PACKAGE_SIZE = 8410101;
+    var PACKAGE_UUID = 'd93e09a0-cb5f-446e-b45c-fba56971da3d';
   
     function fetchRemotePackage(packageName, packageSize, callback, errback) {
       var xhr = new XMLHttpRequest();
@@ -168,10 +168,14 @@ Module['FS_createPath']('/ChrRachel', 'mesh', true, true);
     new DataRequest(277127, 283814, 0, 0).open('GET', '/ChrRachel/face/ChrRachel@W.skm');
     new DataRequest(283814, 290472, 0, 0).open('GET', '/ChrRachel/face/ChrRachel@wide.skm');
     new DataRequest(290472, 7796906, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel.dae');
-    new DataRequest(7796906, 8186042, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_Hair_Dif.png');
-    new DataRequest(8186042, 8637974, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_Head_Dif.png');
-    new DataRequest(8637974, 8820480, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_LowerBody_Dif.png');
-    new DataRequest(8820480, 9098754, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_UpperBody_Dif.png');
+    new DataRequest(7796906, 7932129, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_Hair_Dif.png');
+    new DataRequest(7932129, 7966618, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_Hair_Nrm.png');
+    new DataRequest(7966618, 8126654, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_Head_Dif.png');
+    new DataRequest(8126654, 8161143, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_Head_Nrm.png');
+    new DataRequest(8161143, 8217807, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_LowerBody_Dif.png');
+    new DataRequest(8217807, 8262572, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_LowerBody_Nrm.png');
+    new DataRequest(8262572, 8354256, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_UpperBody_Dif.png');
+    new DataRequest(8354256, 8410101, 0, 0).open('GET', '/ChrRachel/mesh/ChrRachel_UpperBody_Nrm.png');
 
     function processPackageData(arrayBuffer) {
       Module.finishedDataFileDownloads++;
@@ -225,9 +229,13 @@ Module['FS_createPath']('/ChrRachel', 'mesh', true, true);
           DataRequest.prototype.requests["/ChrRachel/face/ChrRachel@wide.skm"].onload();
           DataRequest.prototype.requests["/ChrRachel/mesh/ChrRachel.dae"].onload();
           DataRequest.prototype.requests["/ChrRachel/mesh/ChrRachel_Hair_Dif.png"].onload();
+          DataRequest.prototype.requests["/ChrRachel/mesh/ChrRachel_Hair_Nrm.png"].onload();
           DataRequest.prototype.requests["/ChrRachel/mesh/ChrRachel_Head_Dif.png"].onload();
+          DataRequest.prototype.requests["/ChrRachel/mesh/ChrRachel_Head_Nrm.png"].onload();
           DataRequest.prototype.requests["/ChrRachel/mesh/ChrRachel_LowerBody_Dif.png"].onload();
+          DataRequest.prototype.requests["/ChrRachel/mesh/ChrRachel_LowerBody_Nrm.png"].onload();
           DataRequest.prototype.requests["/ChrRachel/mesh/ChrRachel_UpperBody_Dif.png"].onload();
+          DataRequest.prototype.requests["/ChrRachel/mesh/ChrRachel_UpperBody_Nrm.png"].onload();
           Module['removeRunDependency']('datafile_./data-chrrachel.data');
 
     };
