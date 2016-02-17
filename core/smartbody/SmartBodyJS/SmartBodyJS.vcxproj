@@ -104,10 +104,33 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SmartBody_d.bc;vhcl_d.bc;libprotobuf.bc;libprotoc.bc;pprAId.bc;libcommon.a;libsndfile.a;libxerces-c.a;libode.a;libboost_filesystem.a;libboost_system.a;libalut.a;steerlibd.bc;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SmartBody_d.bc;vhcl_d.bc;libprotobuf.bc;libprotoc.bc;pprAId.bc;libsndfile.a;libxerces-c.a;libode.a;libboost_filesystem.a;libboost_system.a;libalut.a;steerlibd.bc;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>-s ALLOW_MEMORY_GROWTH=1 --bind -s DISABLE_EXCEPTION_CATCHING=0 -g2 %(AdditionalOptions)</AdditionalOptions>
       <LinkerOptimizationLevel>O2</LinkerOptimizationLevel>
     </Link>
+    <PreLinkEvent>
+      <Command>del .\*.a 
+del .\*.bc
+xcopy ..\..\..\lib\javascript\xerces-c\lib\libxerces-c.a .\
+xcopy ..\..\..\lib\javascript\boost\libs\libboost_filesystem.a .\
+xcopy ..\..\..\lib\javascript\boost\libs\libboost_system.a .\
+xcopy ..\..\..\lib\javascript\ode\lib\libode.a .\
+xcopy ..\..\..\lib\javascript\protobuf\lib\Debug\libprotobuf.bc .\
+xcopy ..\..\..\lib\javascript\protobuf\lib\Debug\libprotoc.bc .\
+xcopy ..\..\..\lib\javascript\vhcl\freealut\lib\libalut.a .\
+xcopy ..\..\..\lib\javascript\vhcl\libsndfile\lib\libsndfile.a .\
+xcopy ..\..\..\lib\vhcl\lib\vhcl_d.bc .\
+xcopy ..\..\..\lib\vhcl\lib\vhcl.bc .\
+xcopy ..\steersuite-1.3\build\Emscripten\Debug\pprAId.bc .\
+xcopy ..\steersuite-1.3\build\Emscripten\Debug\steerlibd.bc .\
+xcopy ..\steersuite-1.3\build\Emscripten\Release\pprAI.bc .\
+xcopy ..\steersuite-1.3\build\Emscripten\Release\steerlib.bc .\
+xcopy ..\SmartBody\Debug\SmartBody_d.bc .\
+xcopy ..\SmartBody\Release\SmartBody.bc .\</Command>
+    </PreLinkEvent>
+    <PreBuildEvent>
+      <Command>xcopy $(Platform)\$(Configuration)\SmartBodyJS.js ..\..\..\sdk\javascript\ /Y</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -145,7 +168,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalOptions>-s ALLOW_MEMORY_GROWTH=1 --bind -s DISABLE_EXCEPTION_CATCHING=0 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>SmartBody.bc;vhcl.bc;libprotobuf.bc;libprotoc.bc;pprAI.bc;libcommon.a;libsndfile.a;libxerces-c.a;libode.a;libboost_filesystem.a;libboost_system.a;libalut.a;steerlib.bc;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SmartBody.bc;vhcl.bc;libprotoc.bc;libprotobuf.bc;pprAI.bc;libsndfile.a;libxerces-c.a;libode.a;libboost_filesystem.a;libboost_system.a;libalut.a;steerlib.bc;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreLinkEvent>
       <Command>del .\*.a 
@@ -154,11 +177,9 @@ xcopy ..\..\..\lib\javascript\xerces-c\lib\libxerces-c.a .\
 xcopy ..\..\..\lib\javascript\boost\libs\libboost_filesystem.a .\
 xcopy ..\..\..\lib\javascript\boost\libs\libboost_system.a .\
 xcopy ..\..\..\lib\javascript\ode\lib\libode.a .\
-xcopy ..\..\..\lib\javascript\ode\lib\libfast.a .\
 xcopy ..\..\..\lib\javascript\protobuf\lib\Debug\libprotobuf.bc .\
 xcopy ..\..\..\lib\javascript\protobuf\lib\Debug\libprotoc.bc .\
 xcopy ..\..\..\lib\javascript\vhcl\freealut\lib\libalut.a .\
-xcopy ..\..\..\lib\javascript\vhcl\libsndfile\lib\libcommon.a .\
 xcopy ..\..\..\lib\javascript\vhcl\libsndfile\lib\libsndfile.a .\
 xcopy ..\..\..\lib\vhcl\lib\vhcl_d.bc .\
 xcopy ..\..\..\lib\vhcl\lib\vhcl.bc .\
