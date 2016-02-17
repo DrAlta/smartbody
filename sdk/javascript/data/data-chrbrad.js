@@ -26,8 +26,8 @@ Module.expectedDataFileDownloads++;
     var REMOTE_PACKAGE_NAME = typeof Module['locateFile'] === 'function' ?
                               Module['locateFile'](REMOTE_PACKAGE_BASE) :
                               ((Module['filePackagePrefixURL'] || '') + REMOTE_PACKAGE_BASE);
-    var REMOTE_PACKAGE_SIZE = 16661632;
-    var PACKAGE_UUID = '7c53e1cc-b8d7-412e-b483-7ae28c244272';
+    var REMOTE_PACKAGE_SIZE = 13474182;
+    var PACKAGE_UUID = '0796b7a9-5c48-43b8-a9ca-afdbad7ed155';
   
     function fetchRemotePackage(packageName, packageSize, callback, errback) {
       var xhr = new XMLHttpRequest();
@@ -166,25 +166,25 @@ Module['FS_createPath']('/ChrBrad', 'mesh', true, true);
     new DataRequest(314236, 320882, 0, 0).open('GET', '/ChrBrad/face/ChrBrad@tTeeth.skm');
     new DataRequest(320882, 327587, 0, 0).open('GET', '/ChrBrad/face/ChrBrad@W.skm');
     new DataRequest(327587, 334259, 0, 0).open('GET', '/ChrBrad/face/ChrBrad@wide.skm');
-    new DataRequest(334259, 12023949, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad.dae');
-    new DataRequest(12023949, 12145498, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_EyeBrown01_Dif.png');
-    new DataRequest(12145498, 12203129, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Eyelash_Dif.png');
-    new DataRequest(12203129, 12204004, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_EyeShell_Dif.png');
-    new DataRequest(12204004, 12331571, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Eye_Dif.png');
-    new DataRequest(12331571, 12731881, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Hair_Dif.png');
-    new DataRequest(12731881, 13075114, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Hands_Dif.png');
-    new DataRequest(13075114, 13253324, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Hands_Nrm.png');
-    new DataRequest(13253324, 13888103, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Head_Dif.png');
-    new DataRequest(13888103, 14123230, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Head_Nrm.png');
-    new DataRequest(14123230, 14618374, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_LowerBody_Dif.png');
-    new DataRequest(14618374, 14970292, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_LowerBody_Nrm.png');
-    new DataRequest(14970292, 15308321, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Shoes_Dif.png');
-    new DataRequest(15308321, 15518220, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Shoes_Nrm.png');
-    new DataRequest(15518220, 15839963, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Teeth_Dif.png');
-    new DataRequest(15839963, 15966253, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Teeth_Nrm.png');
-    new DataRequest(15966253, 16033226, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Teeth_Spc.png');
-    new DataRequest(16033226, 16289926, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_UpperBody_Dif.png');
-    new DataRequest(16289926, 16661632, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_UpperBody_Nrm.png');
+    new DataRequest(334259, 12023950, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad.dae');
+    new DataRequest(12023950, 12145499, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_EyeBrown01_Dif.png');
+    new DataRequest(12145499, 12203130, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Eyelash_Dif.png');
+    new DataRequest(12203130, 12204005, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_EyeShell_Dif.png');
+    new DataRequest(12204005, 12331572, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Eye_Dif.png');
+    new DataRequest(12331572, 12435185, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Hair_Dif.png');
+    new DataRequest(12435185, 12526991, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Hands_Dif.png');
+    new DataRequest(12526991, 12573604, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Hands_Nrm.png');
+    new DataRequest(12573604, 12741522, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Head_Dif.png');
+    new DataRequest(12741522, 12799352, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Head_Nrm.png');
+    new DataRequest(12799352, 12921845, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_LowerBody_Dif.png');
+    new DataRequest(12921845, 13004471, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_LowerBody_Nrm.png');
+    new DataRequest(13004471, 13092815, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Shoes_Dif.png');
+    new DataRequest(13092815, 13162847, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Shoes_Nrm.png');
+    new DataRequest(13162847, 13251845, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Teeth_Dif.png');
+    new DataRequest(13251845, 13283647, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Teeth_Nrm.png');
+    new DataRequest(13283647, 13302910, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_Teeth_Spc.png');
+    new DataRequest(13302910, 13372030, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_UpperBody_Dif.png');
+    new DataRequest(13372030, 13474182, 0, 0).open('GET', '/ChrBrad/mesh/ChrBrad_UpperBody_Nrm.png');
 
     function processPackageData(arrayBuffer) {
       Module.finishedDataFileDownloads++;

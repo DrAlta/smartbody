@@ -26,8 +26,8 @@ Module.expectedDataFileDownloads++;
     var REMOTE_PACKAGE_NAME = typeof Module['locateFile'] === 'function' ?
                               Module['locateFile'](REMOTE_PACKAGE_BASE) :
                               ((Module['filePackagePrefixURL'] || '') + REMOTE_PACKAGE_BASE);
-    var REMOTE_PACKAGE_SIZE = 10929619;
-    var PACKAGE_UUID = 'aeaec09b-b72a-4a87-b7ce-c3750144ae2d';
+    var REMOTE_PACKAGE_SIZE = 9568936;
+    var PACKAGE_UUID = '77da4ae4-e73b-445d-bc0d-f6b02dc59d2f';
   
     function fetchRemotePackage(packageName, packageSize, callback, errback) {
       var xhr = new XMLHttpRequest();
@@ -155,13 +155,13 @@ Module['FS_createPath']('/ChrMaarten', 'mesh', true, true);
     new DataRequest(190126, 196808, 0, 0).open('GET', '/ChrMaarten/face/ChrMaarten@W.skm');
     new DataRequest(196808, 203465, 0, 0).open('GET', '/ChrMaarten/face/ChrMaarten@wide.skm');
     new DataRequest(203465, 9058010, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten.dae');
-    new DataRequest(9058010, 9087218, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_Eyelash_Dif.png');
-    new DataRequest(9087218, 9215479, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_Eye_Dif.png');
-    new DataRequest(9215479, 9722986, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_Head_Dif.png');
-    new DataRequest(9722986, 10068453, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_LowerBody_Dif.png');
-    new DataRequest(10068453, 10461361, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_LowerBody_Nrm.png');
-    new DataRequest(10461361, 10604683, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_UpperBody_Dif.png');
-    new DataRequest(10604683, 10929619, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_UpperBody_Nrm.png');
+    new DataRequest(9058010, 9067326, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_Eyelash_Dif.png');
+    new DataRequest(9067326, 9102157, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_Eye_Dif.png');
+    new DataRequest(9102157, 9233799, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_Head_Dif.png');
+    new DataRequest(9233799, 9326063, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_LowerBody_Dif.png');
+    new DataRequest(9326063, 9425875, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_LowerBody_Nrm.png');
+    new DataRequest(9425875, 9468003, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_UpperBody_Dif.png');
+    new DataRequest(9468003, 9568936, 0, 0).open('GET', '/ChrMaarten/mesh/ChrMaarten_UpperBody_Nrm.png');
 
     function processPackageData(arrayBuffer) {
       Module.finishedDataFileDownloads++;

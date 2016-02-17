@@ -17,8 +17,8 @@ Module.expectedDataFileDownloads++;
     } else {
       throw 'using preloaded data can only be done on a web page or in a web worker';
     }
-    var PACKAGE_NAME = './data-audio-test.data';
-    var REMOTE_PACKAGE_BASE = 'data-audio-test.data';
+    var PACKAGE_NAME = './data-auto-rigging.data';
+    var REMOTE_PACKAGE_BASE = 'data-auto-rigging.data';
     if (typeof Module['locateFilePackage'] === 'function' && !Module['locateFile']) {
       Module['locateFile'] = Module['locateFilePackage'];
       Module.printErr('warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)');
@@ -26,8 +26,8 @@ Module.expectedDataFileDownloads++;
     var REMOTE_PACKAGE_NAME = typeof Module['locateFile'] === 'function' ?
                               Module['locateFile'](REMOTE_PACKAGE_BASE) :
                               ((Module['filePackagePrefixURL'] || '') + REMOTE_PACKAGE_BASE);
-    var REMOTE_PACKAGE_SIZE = 106974;
-    var PACKAGE_UUID = '1cfa313f-951b-4205-91a3-b3c5724e3f6f';
+    var REMOTE_PACKAGE_SIZE = 5956318;
+    var PACKAGE_UUID = 'c5fb419e-8f2d-434b-8bb7-368cff8c1188';
   
     function fetchRemotePackage(packageName, packageSize, callback, errback) {
       var xhr = new XMLHttpRequest();
@@ -89,7 +89,9 @@ Module.expectedDataFileDownloads++;
 function assert(check, msg) {
   if (!check) throw msg + new Error().stack;
 }
-Module['FS_createPath']('/', 'sounds', true, true);
+Module['FS_createPath']('/', 'AutoRigging', true, true);
+Module['FS_createPath']('/AutoRigging', 'mesh', true, true);
+Module['FS_createPath']('/AutoRigging', 'motions', true, true);
 
     function DataRequest(start, end, crunched, audio) {
       this.start = start;
@@ -125,9 +127,15 @@ Module['FS_createPath']('/', 'sounds', true, true);
         this.requests[this.name] = null;
       },
     };
-      new DataRequest(0, 4478, 0, 0).open('GET', '/sounds/test.bml');
-    new DataRequest(4478, 4526, 0, 0).open('GET', '/sounds/test.txt');
-    new DataRequest(4526, 106974, 0, 1).open('GET', '/sounds/test.wav');
+      new DataRequest(0, 3992368, 0, 0).open('GET', '/AutoRigging/mesh/SmartBodyRig.dae');
+    new DataRequest(3992368, 4022227, 0, 0).open('GET', '/AutoRigging/motions/ChrBackovic.sk');
+    new DataRequest(4022227, 4052296, 0, 0).open('GET', '/AutoRigging/motions/ChrBrad.sk');
+    new DataRequest(4052296, 4891487, 0, 0).open('GET', '/AutoRigging/motions/ChrBrad@Guitar01.skm');
+    new DataRequest(4891487, 4921502, 0, 0).open('GET', '/AutoRigging/motions/ChrGarza.sk');
+    new DataRequest(4921502, 5381311, 0, 0).open('GET', '/AutoRigging/motions/ChrGarza@IdleFight01_KickForwardHigh01.skm');
+    new DataRequest(5381311, 5793589, 0, 0).open('GET', '/AutoRigging/motions/ChrGarza@IdleFight01_PunchForwardMediumFar01.skm');
+    new DataRequest(5793589, 5956126, 0, 0).open('GET', '/AutoRigging/motions/ChrMarine@Jog01.skm');
+    new DataRequest(5956126, 5956318, 0, 0).open('GET', '/AutoRigging/motions/motion.txt');
 
     function processPackageData(arrayBuffer) {
       Module.finishedDataFileDownloads++;
@@ -139,13 +147,19 @@ Module['FS_createPath']('/', 'sounds', true, true);
       var ptr = Module['_malloc'](byteArray.length);
       Module['HEAPU8'].set(byteArray, ptr);
       DataRequest.prototype.byteArray = Module['HEAPU8'].subarray(ptr, ptr+byteArray.length);
-          DataRequest.prototype.requests["/sounds/test.bml"].onload();
-          DataRequest.prototype.requests["/sounds/test.txt"].onload();
-          DataRequest.prototype.requests["/sounds/test.wav"].onload();
-          Module['removeRunDependency']('datafile_./data-audio-test.data');
+          DataRequest.prototype.requests["/AutoRigging/mesh/SmartBodyRig.dae"].onload();
+          DataRequest.prototype.requests["/AutoRigging/motions/ChrBackovic.sk"].onload();
+          DataRequest.prototype.requests["/AutoRigging/motions/ChrBrad.sk"].onload();
+          DataRequest.prototype.requests["/AutoRigging/motions/ChrBrad@Guitar01.skm"].onload();
+          DataRequest.prototype.requests["/AutoRigging/motions/ChrGarza.sk"].onload();
+          DataRequest.prototype.requests["/AutoRigging/motions/ChrGarza@IdleFight01_KickForwardHigh01.skm"].onload();
+          DataRequest.prototype.requests["/AutoRigging/motions/ChrGarza@IdleFight01_PunchForwardMediumFar01.skm"].onload();
+          DataRequest.prototype.requests["/AutoRigging/motions/ChrMarine@Jog01.skm"].onload();
+          DataRequest.prototype.requests["/AutoRigging/motions/motion.txt"].onload();
+          Module['removeRunDependency']('datafile_./data-auto-rigging.data');
 
     };
-    Module['addRunDependency']('datafile_./data-audio-test.data');
+    Module['addRunDependency']('datafile_./data-auto-rigging.data');
   
     if (!Module.preloadResults) Module.preloadResults = {};
   
