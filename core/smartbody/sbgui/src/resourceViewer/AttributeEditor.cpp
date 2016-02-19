@@ -240,6 +240,13 @@ TreeItemInfoWidget* AttributeEditor::createInfoWidget( int x, int y, int w, int 
 		return widget;
 	}
 
+	SmartBody::Nvbg* nvbg = dynamic_cast<SmartBody::Nvbg*>(object);
+	if (nvbg)
+	{
+		widget = new AttributeItemWidget(nvbg,x,y,w,h,strdup(object->getName().c_str()),NULL);
+		return widget;
+	}
+
 	return NULL;
 	/*
 

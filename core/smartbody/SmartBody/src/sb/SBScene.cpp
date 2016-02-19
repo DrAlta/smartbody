@@ -5092,11 +5092,12 @@ SmartBody::SBObject* SBScene::getObjectFromString(const std::string& value)
 				else
 					return NULL;
 			}
-			if (part == "minibrain")
-			{
-				SmartBody::Nvbg* nvbg = character->getNvbg();
-				return nvbg;
-			}
+			
+		}
+		else if (remainder == "minibrain")
+		{
+			SmartBody::Nvbg* nvbg = character->getNvbg();
+			return nvbg;
 		}
 		
 		return NULL;

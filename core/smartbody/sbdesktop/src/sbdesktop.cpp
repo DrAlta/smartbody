@@ -823,7 +823,7 @@ int WINAPI _tWinMain(HINSTANCE hThisInst, HINSTANCE hPrevInst, LPSTR str,int nWi
 		}
 	}
 
-	SmartBody::SBScene::getScene()->getDebuggerServer()->SetID("sbdesktop");
+	SmartBody::SBScene::getScene()->getDebuggerServer()->setStringAttribute("id", "sbdesktop");
 
 
 #ifdef WIN32
