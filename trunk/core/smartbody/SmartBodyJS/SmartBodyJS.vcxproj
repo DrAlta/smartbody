@@ -68,6 +68,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Emscripten'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -96,7 +97,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>SB_NO_ASSIMP;SB_NO_PYTHON;SB_NO_BONEBUS;SB_NO_VHMSG;SB_EXPORTS;dDOUBLE;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\SmartBody\src;..\..\..\javascript\lib\protobuf\include;..\..\..\javascript\lib\xerces-c\include;..\..\..\javascript\lib\boost;..\..\..\javascript\lib\ode\include;..\..\..\lib\vhcl\include;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\SmartBody\src;..\..\..\lib\javascript\protobuf\include;..\..\..\lib\javascript\xerces-c\include;..\..\..\lib\javascript\boost;..\..\..\lib\javascript\ode\include;..\..\..\lib\javascript\vhcl\vhcl\include;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Warnings>DisableAllWarnings</Warnings>
       <AdditionalOptions>--bind %(AdditionalOptions)</AdditionalOptions>
       <OptimizationLevel>O2</OptimizationLevel>
@@ -119,18 +120,20 @@ xcopy ..\..\..\lib\javascript\protobuf\lib\Debug\libprotobuf.bc .\
 xcopy ..\..\..\lib\javascript\protobuf\lib\Debug\libprotoc.bc .\
 xcopy ..\..\..\lib\javascript\vhcl\freealut\lib\libalut.a .\
 xcopy ..\..\..\lib\javascript\vhcl\libsndfile\lib\libsndfile.a .\
-xcopy ..\..\..\lib\vhcl\lib\vhcl_d.bc .\
-xcopy ..\..\..\lib\vhcl\lib\vhcl.bc .\
+xcopy ..\..\..\lib\javascript\vhcl\vhcl\lib\Debug\vhcl_d.bc .\
 xcopy ..\steersuite-1.3\build\Emscripten\Debug\pprAId.bc .\
 xcopy ..\steersuite-1.3\build\Emscripten\Debug\steerlibd.bc .\
-xcopy ..\steersuite-1.3\build\Emscripten\Release\pprAI.bc .\
-xcopy ..\steersuite-1.3\build\Emscripten\Release\steerlib.bc .\
-xcopy ..\SmartBody\Debug\SmartBody_d.bc .\
-xcopy ..\SmartBody\Release\SmartBody.bc .\</Command>
+xcopy ..\SmartBody\Debug\SmartBody_d.bc .\</Command>
     </PreLinkEvent>
     <PreBuildEvent>
-      <Command>xcopy $(Platform)\$(Configuration)\SmartBodyJS.js ..\..\..\sdk\javascript\ /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy $(Platform)\$(Configuration)\SmartBodyJS_d.js ..\..\..\sdk\javascript\ /Y
+xcopy $(Platform)\$(Configuration)\SmartBodyJS_d.js.mem ..\..\..\sdk\javascript\ /Y
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -158,7 +161,7 @@ xcopy ..\SmartBody\Release\SmartBody.bc .\</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>SB_NO_ASSIMP;SB_NO_PYTHON;SB_NO_BONEBUS;SB_NO_VHMSG;SB_EXPORTS;dDOUBLE;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\SmartBody\src;..\..\..\lib\javascript\protobuf\include;..\..\..\lib\javascript\xerces-c\include;..\..\..\lib\javascript\boost;..\..\..\lib\javascript\ode\include;..\..\..\lib\vhcl\include;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\SmartBody\src;..\..\..\lib\javascript\protobuf\include;..\..\..\lib\javascript\xerces-c\include;..\..\..\lib\javascript\boost;..\..\..\lib\javascript\ode\include;..\..\..\lib\javascript\vhcl\vhcl\include;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Warnings>DisableAllWarnings</Warnings>
       <AdditionalOptions>--bind %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
@@ -177,14 +180,11 @@ xcopy ..\..\..\lib\javascript\xerces-c\lib\libxerces-c.a .\
 xcopy ..\..\..\lib\javascript\boost\libs\libboost_filesystem.a .\
 xcopy ..\..\..\lib\javascript\boost\libs\libboost_system.a .\
 xcopy ..\..\..\lib\javascript\ode\lib\libode.a .\
-xcopy ..\..\..\lib\javascript\protobuf\lib\Debug\libprotobuf.bc .\
-xcopy ..\..\..\lib\javascript\protobuf\lib\Debug\libprotoc.bc .\
+xcopy ..\..\..\lib\javascript\protobuf\lib\Release\libprotobuf.bc .\
+xcopy ..\..\..\lib\javascript\protobuf\lib\Release\libprotoc.bc .\
 xcopy ..\..\..\lib\javascript\vhcl\freealut\lib\libalut.a .\
 xcopy ..\..\..\lib\javascript\vhcl\libsndfile\lib\libsndfile.a .\
-xcopy ..\..\..\lib\vhcl\lib\vhcl_d.bc .\
-xcopy ..\..\..\lib\vhcl\lib\vhcl.bc .\
-xcopy ..\steersuite-1.3\build\Emscripten\Debug\pprAId.bc .\
-xcopy ..\steersuite-1.3\build\Emscripten\Debug\steerlibd.bc .\
+xcopy ..\..\..\lib\javascript\vhcl\vhcl\lib\Release\vhcl.bc .\
 xcopy ..\steersuite-1.3\build\Emscripten\Release\pprAI.bc .\
 xcopy ..\steersuite-1.3\build\Emscripten\Release\steerlib.bc .\
 xcopy ..\SmartBody\Debug\SmartBody_d.bc .\
