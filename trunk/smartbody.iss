@@ -11,13 +11,16 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r6140
+AppVersion=r6387 Yossi
 OutputBaseFilename=SmartBody
 WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
 
 
 [Files]
+Source: ".\tools\RealTimeAudio\*.exe"; DestDir: "{app}\tools\RealTimeAudio"
+Source: ".\tools\RealTimeAudio\*.dll"; DestDir: "{app}\tools\RealTimeAudio"
+
 ; documentation
 Source: ".\SmartBodyManual.pdf"; DestDir: "{app}"
 Source: ".\SmartBodyPythonAPI.html"; DestDir: "{app}"
@@ -40,6 +43,9 @@ Source: ".\lib\OgreSDK\include\*"; DestDir: "{app}\OgreSDK\include"; Excludes: "
 Source: ".\lib\OgreSDK\lib\*"; DestDir: "{app}\OgreSDK\lib"; Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\lib\OgreSDK\media\*"; DestDir: "{app}\OgreSDK\media"; Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\lib\OgreSDK\samples\*"; DestDir: "{app}\OgreSDK\samples"; Excludes: ".svn"; Flags: recursesubdirs
+
+
+
 
 ; supporting libraries - Irrlicht 1.8.3
 Source: ".\lib\irrlicht-1.8.3\*"; DestDir: "{app}\irrlicht-1.8.3";  Excludes: ".svn";  Flags: recursesubdirs
@@ -160,6 +166,10 @@ Source: ".\sdk\resources.cfg"; DestDir: "{app}\"
 Source: ".\sdk\win32\build\*"; DestDir: "{app}\build"
 Source: ".\sdk\win32\bin\*"; DestDir: "{app}\bin"
 Source: ".\sdk\win32\src\*"; DestDir: "{app}\src";  Excludes: ".svn"; Flags: recursesubdirs
+
+; SB Kinect viewer
+Source: ".\lib\SBKinectViewer\*.exe"; DestDir: "{app}\lib\SBKinectViewer"
+Source: ".\lib\SBKinectViewer\*.dll"; DestDir: "{app}\lib\SBKinectViewer"
 
 
 
