@@ -74,6 +74,16 @@ namespace SmartBody
 
 void pythonFuncsAttribute()
 {
+	boost::python::class_<SBAttributeGroup>("SBAttributeGroup")
+		.def("getPriority", &SBAttributeGroup::getPriority, "Returns the priority of the attribute. Used for display purposes.")
+		.def("setPriority", &SBAttributeGroup::setPriority, "Sets the priority of the attribute. Used for display purposes.")
+		.def("addAttribute", &SBAttributeGroup::addAttribute, "Adds an attribute to the attribute group.")
+		.def("removeAttribute", &SBAttributeGroup::removeAttribute, "Removes an attribute to the attribute group.")
+		.def("getAttributeNames", &SBAttributeGroup::getAttributeNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the attribute names from the group.")
+		.def("getAttribute", &SBAttributeGroup::getAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns the attribute from the group given the name.")
+		.def("getName", &SBAttributeGroup::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Gets the attribute group's name.")
+	;
+
 
 	boost::python::class_<SBAttributeInfo>("SBAttributeInfo")
 		.def("getPriority", &SBAttributeInfo::getPriority, "Returns the priority of the attribute. Used for display purposes.")
@@ -84,6 +94,8 @@ void pythonFuncsAttribute()
 		.def("setHidden", &SBAttributeInfo::setHidden, "Sets the hidden status of the attribute. Hidden attributes typically aren't visible to the user.")
 		.def("setDescription", &SBAttributeInfo::setDescription, "Sets the description or help text associated with this attribute.")
 		.def("getDescription", &SBAttributeInfo::getDescription, "Gets the description or help text associated with this attribute.")
+		.def("getGroup", &SBAttributeInfo::getGroup, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Gets the attribute group.")
+		.def("setGroup", &SBAttributeInfo::getDescription, "Sets the attribute group.")
 	;
 
 	boost::python::class_<SBAttribute, boost::python::bases<SBSubject> >("SBAttribute")

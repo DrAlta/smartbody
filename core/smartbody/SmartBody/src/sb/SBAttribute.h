@@ -46,6 +46,7 @@ class SBAttribute : public SBSubject
 class SBAttributeGroup 
 {
 	public:
+		SBAPI SBAttributeGroup();
 		SBAPI SBAttributeGroup(const std::string& name);
 		SBAPI ~SBAttributeGroup();
 
@@ -56,6 +57,8 @@ class SBAttributeGroup
 		SBAPI void addAttribute(SBAttribute* attr);
 		SBAPI void removeAttribute(SBAttribute* attr);
 		SBAPI std::map<std::string, SBAttribute*>& getAttributes();
+		SBAPI std::vector<std::string> getAttributeNames();
+		SBAPI SBAttribute* getAttribute(std::string name);
 
 	protected:
 		std::string m_name;

@@ -6,6 +6,12 @@
 
 namespace SmartBody {
 
+SBAttributeGroup::SBAttributeGroup()
+{
+	m_name = "";
+	m_priority = 0;
+}
+
 SBAttributeGroup::SBAttributeGroup(const std::string& name)
 {
 	m_name = name;
@@ -61,6 +67,31 @@ void  SBAttributeGroup::removeAttribute(SBAttribute* attr)
 std::map<std::string, SBAttribute*>& SBAttributeGroup::getAttributes()
 {
 	return m_attributeMap;
+}
+
+std::vector<std::string> SBAttributeGroup::getAttributeNames()
+{
+	std::vector<std::string> attributes;
+	for (std::map<std::string, SBAttribute*>::iterator iter = m_attributeMap.begin();
+		 iter != m_attributeMap.end();
+		 iter++)
+	{
+		attributes.push_back((*iter).first);
+	}
+	return attributes;
+}
+
+SBAttribute* SBAttributeGroup::getAttribute(std::string name)
+{
+	std::map<std::string, SBAttribute*>::iterator iter = m_attributeMap.find(name);
+	if (iter == m_attributeMap.end())
+	{
+		LOG("Attribute info for %s does not exists in attribute group %s!", name.c_str(), this->getName().c_str());
+	}
+	else
+	{
+		return (*iter).second;
+	}
 }
 
 
