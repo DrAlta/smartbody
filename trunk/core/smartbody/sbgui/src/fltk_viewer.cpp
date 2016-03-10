@@ -1594,6 +1594,7 @@ void FltkViewer::draw()
 		init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
 		//hasShaderSupport = SbmShaderManager::initGLExtension();	   
 		SBGUIManager::singleton().resize(w(),h());
+		SBInterfaceManager::getInterfaceManager()->resize(w(),h());
 	} 	
 	//make_current();
 	//wglMakeCurrent(fl_GetDC(fl_xid(this)),(HGLRC)context());
@@ -2344,6 +2345,7 @@ int FltkViewer::handle ( int event )
        case FL_PUSH:
        { 
 		   bool earlyReturn = false;
+		   translate_event ( e, SrEvent::EventPush, w(), h(), this );
 		   for (size_t l = 0; l < interfaceListeners.size(); l++)
 		   {
 				int mouseX = Fl::event_x();
@@ -2357,7 +2359,7 @@ int FltkViewer::handle ( int event )
 			   return true;
 		   
 		   //SR_TRACE1 ( "Mouse Push : but="<<Fl::event_button()<<" ("<<Fl::event_x()<<", "<<Fl::event_y()<<")" <<" Ctrl:"<<Fl::event_state(FL_CTRL) );
-         translate_event ( e, SrEvent::EventPush, w(), h(), this );
+         
 //          if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::EventNone; }
 // 		 // Mouse Button Push Handling for CEGUI
 //         
