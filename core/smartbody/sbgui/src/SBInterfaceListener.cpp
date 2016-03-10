@@ -59,7 +59,18 @@ SBInterfaceManager* SBInterfaceManager::_interfaceManager = NULL;
 
 SBInterfaceManager::SBInterfaceManager()
 {
+	screenWidth = screenHeight = -1;
 }
+
+
+void SBInterfaceManager::resize( int w, int h )
+{
+	screenWidth = w;
+	screenHeight = h;
+}
+
+
+
 
 SBInterfaceManager::~SBInterfaceManager()
 {
@@ -115,7 +126,13 @@ SrVec SBInterfaceManager::convertScreenSpaceTo3D(int x, int y, SrVec ground, SrV
 {
 	SrVec p1;
 	SrVec p2;
-	SmartBody::SBScene::getScene()->getActiveCamera()->get_ray(x, y, p1, p2);
+	float screenX, screenY;
+	screenX = (float)(x*2.f)/screenWidth - 1.f;
+	screenY = (float)(y*2.f)/screenHeight - 1.f;
+	screenY *= -1.0;
+
+	SmartBody::SBScene::getScene()->getActiveCamera()->get_ray(screenX, screenY, p1, p2);
+	//LOG("mouse click = %d, %d,   p1 = %f %f %f, p2 = %f %f %f", x,y, p1[0], p1[1], p1[2],  p2[0], p2[1], p2[2]);
 	bool intersectGround = true;
 	SrVec dest, src;				
 	SrPlane plane(ground, upVector);
@@ -137,6 +154,3 @@ SBInterfaceManager* SBInterfaceManager::getInterfaceManager()
 
 	return SBInterfaceManager::_interfaceManager;
 }
-
-
-

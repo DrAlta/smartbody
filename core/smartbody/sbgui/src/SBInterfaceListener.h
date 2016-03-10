@@ -28,7 +28,7 @@ class SBInterfaceManager
 		SBInterfaceManager();
 		~SBInterfaceManager();
 
-
+		void resize(int w, int h);
 		void addInterfaceListener(SBInterfaceListener* listener);
 		void removeInterfaceListener(SBInterfaceListener* listener);
 		std::vector<SBInterfaceListener*> getInterfaceListeners();
@@ -41,6 +41,7 @@ class SBInterfaceManager
 	protected:
 		static SBInterfaceManager* _interfaceManager;
 		std::vector<SBInterfaceListener*> _interfaceListeners;
+		int screenWidth, screenHeight;
 };
 
 

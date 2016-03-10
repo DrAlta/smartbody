@@ -19,6 +19,7 @@
 #include <sbm/Heightfield.h>
 #include "SBGUIManager.h"
 #include <sb/SBAttribute.h>
+#include "SBInterfaceListener.h"
 
 FLTKOgreWindow::FLTKOgreWindow( int x, int y, int w, int h, const char *label/*=0 */ ) : FltkViewer(x,y,w,h,label)//Fl_Gl_Window(x,y,w,h,label), SrViewer(x, y, w, h)
 {
@@ -396,6 +397,7 @@ void FLTKOgreWindow::fltkRender2()
 		init_opengl ( w(), h() ); // valid() is turned on by fltk after draw() returns
 		//hasShaderSupport = SbmShaderManager::initGLExtension();	   
 		SBGUIManager::singleton().resize(w(),h());
+		SBInterfaceManager::getInterfaceManager()->resize(w(),h());
 	} 	
 	//make_current();
 	//wglMakeCurrent(fl_GetDC(fl_xid(this)),(HGLRC)context());
