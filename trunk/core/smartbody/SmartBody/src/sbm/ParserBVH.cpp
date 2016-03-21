@@ -427,8 +427,8 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				else
 				{
 					LOG("Frames: not found...\n");;
-					file.close();
-					return false;
+					state = 50;
+					break;
 				}
 				break;
 			case 10: // found 'Frames', looking for 'Frame time:'
@@ -474,8 +474,8 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 				else
 				{
 					LOG("Frame Time: not found...\n");;
-					file.close();
-					return false;
+					state = 50;
+					break;
 				}
 				break;
 			case 11: // parsing 
