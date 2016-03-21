@@ -2040,6 +2040,14 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 	else // drag a file from explorer
 	{	
 		boost::filesystem::path dndPath(dndMsg);
+		bool isDir = boost::filesystem::is_directory(dndPath);
+		if (isDir) // dropping a folder tells SmartBody to load all the assets from that folder
+		{
+			LOG("Loading assets from path %s", dndPath.string().c_str());
+			SmartBody::SBScene::getScene()->loadAssetsFromPath(dndPath.string());
+			return;
+		}
+
 		std::string fullPathName = dndMsg;
 		std::string filebasename = boost::filesystem::basename(dndMsg);
 		std::string fileextension = boost::filesystem::extension(dndMsg);					
@@ -2060,6 +2068,12 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 			else
 				LOG("WARNING: can not load cam file!");
 			return;
+		}
+		else if (fileextension == ".py")
+		{
+			// run the python script
+			SmartBody::SBScene::getScene()->addAssetPath("script", fullPath);
+			SmartBody::SBScene::getScene()->runScript(filebasename + fileextension);
 		}
 
 		// process mesh or skeleton
