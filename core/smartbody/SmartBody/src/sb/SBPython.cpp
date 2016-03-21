@@ -468,6 +468,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("applyRetargetJointTranslation", &SBRetarget::applyRetargetJointTranslation, "Apply retargeting on the joint translation.")
 		.def("getEndJointNames", &SBRetarget::getEndJointNames, "Get the names of the joints that will be skipped during retargeting.")
 		.def("getRelativeJointNames", &SBRetarget::getRelativeJointNames, "Get the names of the joints that not be aligned during retargeting.")
+		.def("addJointRotOffset", &SBRetarget::addJointRotOffset, "As an additional offset to the joint to be applied during the retargeting.")
 		;
 
 
