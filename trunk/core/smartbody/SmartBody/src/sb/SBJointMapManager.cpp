@@ -1,6 +1,8 @@
 #include "vhcl.h"
 #include "SBJointMapManager.h"
 #include <sb/SBJointMap.h>
+#include <sb/SBScene.h>
+#include <sb/SBSceneListener.h>
 
 namespace SmartBody {
 
@@ -29,6 +31,13 @@ SmartBody::SBJointMap* SBJointMapManager::createJointMap(const std::string& name
 		SmartBody::SBJointMap* map = new SmartBody::SBJointMap();
 		_jointMaps[name] = map;
 		map->setName(name);
+
+		std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+		for (size_t l = 0; l < listeners.size(); l++)
+		{
+			listeners[l]->OnObjectCreate(map);
+		}
+
 		return map;
 	}
 	else
@@ -56,6 +65,12 @@ void SBJointMapManager::removeJointMap(const std::string& name)
 	if (iter != _jointMaps.end())
 	{
 		SmartBody::SBJointMap* map = (*iter).second;
+		std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+		for (size_t l = 0; l < listeners.size(); l++)
+		{
+			listeners[l]->OnObjectDelete(map);
+		}
+
 		_jointMaps.erase(iter);
 		delete map;
 		return;
