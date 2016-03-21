@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sstream>
 
+
 namespace SmartBody {
 
 SBRealtimeManager::SBRealtimeManager() : SBService()
@@ -17,11 +18,99 @@ SBRealtimeManager::SBRealtimeManager() : SBService()
 	setName("Realtime");
 	createBoolAttribute("debug", false, true, "Basic", 60, false, false, false, "Show debugging information.");
 	createActionAttribute("dumpData", true, "Basic", 60, false, false, false, "Dump the faceshift data.");
+#ifdef USE_PERCEPTIONNEURON
+	createBoolAttribute("usePerceptionNeuron", false, true, "Perception Neuron", 10, false, false, false, "Uses the Perception Neuron interface.");
+	createStringAttribute("perceptionNeuronIP", "127.0.0.1", true, "Perception Neuron", 20, false, false, false, "Perception Neuron server IP.");
+	createIntAttribute("perceptionNeuronPort", 7001, true, "Perception Neuron", 30, false, false, false, "Perception Neuron port.");
+	createStringAttribute("perceptionNeuronStatus", "Disconnected", true, "Perception Neuron", 40, false, false, false, "Perception Neuron status.");
+	
+	
+	m_sockTCPRef = 0;
+	m_sockUDPRef = 0;
+	_valuesBufferLength = 354;
+	_valuesBuffer = new float[_valuesBufferLength];
+	_frameCount = 0;
+
+	_dataIndexMap[0] = "Hips/pos"; // position
+	_dataIndexMap[1] = "Hips"; // rotation
+	_dataIndexMap[2] = "RightUpLeg";
+	_dataIndexMap[3] = "RightLeg";
+	_dataIndexMap[4] = "RightFoot";
+	_dataIndexMap[5] = "LeftUpLeg";
+	_dataIndexMap[6] = "LeftLeg";
+	_dataIndexMap[7] = "LeftFoot";
+	_dataIndexMap[8] = "Spine";
+	_dataIndexMap[9] = "Spine1";
+	_dataIndexMap[10] = "Spine2";
+	_dataIndexMap[11] = "Spine3";
+	_dataIndexMap[12] = "Neck";
+	_dataIndexMap[13] = "Head";
+	_dataIndexMap[14] = "RightShoulder";
+	_dataIndexMap[15] = "RightArm";
+	_dataIndexMap[16] = "RightForeArm";
+	_dataIndexMap[17] = "RightHand";
+	_dataIndexMap[18] = "RightHandThumb1";
+	_dataIndexMap[19] = "RightHandThumb2";
+	_dataIndexMap[20] = "RightHandThumb3";
+	_dataIndexMap[21] = "RightInHandIndex";
+	_dataIndexMap[22] = "RightHandIndex1";
+	_dataIndexMap[23] = "RightHandIndex2";
+	_dataIndexMap[24] = "RightHandIndex3";
+	_dataIndexMap[25] = "RightInHandMiddle";
+	_dataIndexMap[26] = "RightHandMiddle1";
+	_dataIndexMap[27] = "RightHandMiddle2";
+	_dataIndexMap[28] = "RightHandMiddle3";
+	_dataIndexMap[29] = "RightInHandRing";
+	_dataIndexMap[30] = "RightHandRing1";
+	_dataIndexMap[31] = "RightHandRing2";
+	_dataIndexMap[32] = "RightHandRing3";
+	_dataIndexMap[33] = "RightInHandPinky";
+	_dataIndexMap[34] = "RightHandPinky1";
+	_dataIndexMap[35] = "RightHandPinky2";
+	_dataIndexMap[36] = "RightHandPinky3";
+	_dataIndexMap[37] = "LeftShoulder";
+	_dataIndexMap[38] = "LeftArm";
+	_dataIndexMap[39] = "LeftForeArm";
+	_dataIndexMap[40] = "LeftHand";
+	_dataIndexMap[41] = "LeftHandThumb1";
+	_dataIndexMap[42] = "LeftHandThumb2";
+	_dataIndexMap[43] = "LeftHandThumb3";
+	_dataIndexMap[44] = "LeftInHandIndex";
+	_dataIndexMap[45] = "LeftHandIndex1";
+	_dataIndexMap[46] = "LeftHandIndex2";
+	_dataIndexMap[47] = "LeftHandIndex3";
+	_dataIndexMap[48] = "LeftInHandMiddle";
+	_dataIndexMap[49] = "LeftHandMiddle1";
+	_dataIndexMap[50] = "LeftHandMiddle2";
+	_dataIndexMap[51] = "LeftHandMiddle3";
+	_dataIndexMap[52] = "LeftInHandRing";
+	_dataIndexMap[53] = "LeftHandRing1";
+	_dataIndexMap[54] = "LeftHandRing2";
+	_dataIndexMap[55] = "LeftHandRing3";
+	_dataIndexMap[56] = "LeftInHandPinky";
+	_dataIndexMap[57] = "LeftHandPinky1";
+	_dataIndexMap[58] = "LeftHandPinky2";
+	_dataIndexMap[59] = "LeftHandPinky3";
+
+	std::stringstream strstr;
+	for (std::map<int, std::string>::iterator iter = _dataIndexMap.begin();
+		 iter != _dataIndexMap.end();
+		 iter++)
+	{
+		const std::string value = (*iter).second;
+		strstr << value << " ";
+	}
+	this->setChannelNames(strstr.str());
+
+#endif
 }
 
 SBRealtimeManager::~SBRealtimeManager()
 {
-	
+#ifdef USE_PERCEPTIONNEURON
+	stopPerceptionNeuron();
+	delete [] _valuesBuffer;
+#endif
 }
 
 void SBRealtimeManager::setEnable( bool val )
@@ -55,6 +144,17 @@ void SBRealtimeManager::update( double time )
 {
 	if (!this->isEnable())
 		false;
+
+#ifdef USE_PERCEPTIONNEURON
+	if (this->getStringAttribute("perceptionNeuronStatus") == "Connected")
+	{
+		if (m_sockTCPRef != 0)
+		{
+			//BRCommandFetchDataFromServer(m_sockTCPRef, Cmd_AvatarCount);
+			BRCommandFetchAvatarDataFromServer(m_sockTCPRef, 0, Cmd_AvatarCount);
+		}
+	}
+#endif
 }
 
 void SBRealtimeManager::initConnection()
@@ -206,7 +306,8 @@ void SBRealtimeManager::notify(SBSubject* subject)
 	SBAttribute* attribute = dynamic_cast<SBAttribute*>(subject);
 	if (attribute)
 	{
-		if (attribute->getName() == "dumpData")
+		const std::string name = attribute->getName();
+		if (name == "dumpData")
 		{
 			for (std::map<std::string, std::string>::iterator iter =  channelTable.begin();
 				 iter != channelTable.end();
@@ -215,9 +316,226 @@ void SBRealtimeManager::notify(SBSubject* subject)
 				LOG("[%s] = %s", (*iter).first.c_str(), (*iter).second.c_str());
 			}
 		}
+#ifdef USE_PERCEPTIONNEURON
+		else if (name == "usePerceptionNeuron")
+		{
+			bool running = isPerceptionNeuronRunning();
+			bool isEnabled = this->getBoolAttribute("usePerceptionNeuron");
+			if (isEnabled)
+			{
+				if (running)
+				{
+					restartPerceptionNeuron();
+				}
+				else
+				{
+					startPerceptionNeuron();
+				}
+			}
+			else
+			{
+				if (running)
+				{
+					stopPerceptionNeuron();
+				}
+				else
+				{
+					LOG("PerceptionNeuron already stopped.");
+				}
+			}
+		}
+#else
+		else if (name == "usePerceptionNeuron")
+		{
+			LOG("Perception neuron module not enabled. Please set USE_PERCEPTIONNEURON and rebuild.");
+		}
+#endif
 	}
 
 }
+
+#ifdef USE_PERCEPTIONNEURON
+
+void SBRealtimeManager::startPerceptionNeuron()
+{
+	BRRegisterFrameDataCallback(this, myFrameDataReceived);
+	BRRegisterCommandDataCallback(this, myCommandDataReceived);
+	BRRegisterSocketStatusCallback(this, mySocketStatusChanged);
+
+	if (BRGetSocketStatus(m_sockTCPRef) == CS_Running)
+	{
+		LOG("Perception neuron already connected...");
+		return;
+	}
+	LOG("Attempting to connect to %s:%d", this->getStringAttribute("perceptionNeuronIP").c_str(), this->getIntAttribute("perceptionNeuronPort"));
+	m_sockTCPRef = BRConnectTo((char*) this->getStringAttribute("perceptionNeuronIP").c_str(), this->getIntAttribute("perceptionNeuronPort"));
+	if (m_sockTCPRef == 0)
+	{
+		char* errorMessage = BRGetLastErrorMessage();
+		LOG("Error message from Perception Neuron: %s", errorMessage);
+		this->setStringAttribute("perceptionNeuronStatus", "Disconnected");
+		return;
+	}
+	m_sockUDPRef = BRStartUDPServiceAt(7001);
+	BRRegisterAutoSyncParmeter(m_sockTCPRef, Cmd_AvatarCount);
+	LOG("Connected to Perception Neuron!");
+
+
+	this->setStringAttribute("perceptionNeuronStatus", "Connected");
+
+	_frameCount = 0;
+	
+		
+}
+
+void SBRealtimeManager::restartPerceptionNeuron()
+{
+	stopPerceptionNeuron();
+	startPerceptionNeuron();
+}
+
+void SBRealtimeManager::stopPerceptionNeuron()
+{
+	SocketStatus status1 = BRGetSocketStatus(m_sockTCPRef);
+	BRCloseSocket(m_sockTCPRef);
+
+	SocketStatus status2 = BRGetSocketStatus(m_sockUDPRef);
+	BRCloseSocket(m_sockUDPRef);
+}
+
+bool SBRealtimeManager::isPerceptionNeuronRunning()
+{
+	if (BRGetSocketStatus(m_sockTCPRef) == CS_Running)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void SBRealtimeManager::myFrameDataReceived(void* customedObj, SOCKET_REF sender, BvhDataHeaderEx* header, float* data)
+{
+	SBRealtimeManager* realtimeManager = (SBRealtimeManager*) customedObj;
+
+	if (header->DataCount != realtimeManager->_valuesBufferLength)
+	{
+		delete [] realtimeManager->_valuesBuffer;
+		realtimeManager->_valuesBuffer = new float[header->DataCount];
+	}
+
+	memcpy(&realtimeManager->_valuesBuffer[0], data, header->DataCount * sizeof(float));
+	if (realtimeManager->m_sockTCPRef == sender)
+	{
+		realtimeManager->_frameCount++;
+
+	}
+
+	if (realtimeManager->getBoolAttribute("debug"))
+	{
+		for (int d = 0; d < header->DataCount; d += 3)
+		{
+			LOG("%f %f %f", realtimeManager->_valuesBuffer[d], realtimeManager->_valuesBuffer[d + 1], realtimeManager->_valuesBuffer[d + 2]);
+		}
+	}
+	// store the data in the realtime manager
+	for (size_t c = 0; c < realtimeManager->_dataIndexMap.size(); c++)
+	{
+		if (realtimeManager->_valuesBufferLength > (c * 3))
+		{
+			if (c == 0)
+			{
+				// write the position into (jointname)/pos:
+				std::stringstream strstr;
+				strstr << realtimeManager->_valuesBuffer[c * 3] << " " << realtimeManager->_valuesBuffer[c * 3 + 1] << " " << realtimeManager->_valuesBuffer[c * 3 + 2];
+				realtimeManager->setData(realtimeManager->_dataIndexMap[c], strstr.str());
+			}
+			else
+			{
+				// write the rotation into (jointname)/rot:
+				SrMat yrot;
+				yrot.roty(realtimeManager->_valuesBuffer[c * 3] * SR_PI / 180.0);
+				SrMat xrot;
+				xrot.rotx(realtimeManager->_valuesBuffer[c * 3 + 1] * SR_PI / 180.0);
+				SrMat zrot;
+				zrot.rotz(realtimeManager->_valuesBuffer[c * 3 + 2] * SR_PI / 180.0);
+				
+				SrMat finalMat = zrot * xrot * yrot;
+				SrQuat finalQuat(finalMat);
+			
+				std::stringstream strstr2;
+				strstr2 << finalQuat.w << " " << finalQuat.x << " " << finalQuat.y << " " << finalQuat.z;
+				realtimeManager->setData(realtimeManager->_dataIndexMap[c], strstr2.str());
+			}
+		}
+	}
+}
+
+void SBRealtimeManager::myCommandDataReceived(void* customedObj, SOCKET_REF sender, CommandPack* pack, void* data)
+{
+	if (pack->CommandId == Cmd_BoneSize)
+	{
+		LOG("Cmd_BoneSize");
+	}
+	else if (pack->CommandId == Cmd_AvatarName)
+	{
+		LOG("Cmd_AvatarName");
+	}
+	else if (pack->CommandId == Cmd_FaceDirection)
+	{
+		LOG("Cmd_BoneSize");
+	}
+	else if (pack->CommandId == Cmd_DataFrequency)
+	{
+		LOG("Cmd_DataFrequency");
+	}
+	else if (pack->CommandId == Cmd_BvhInheritanceTxt)
+	{
+		LOG("Cmd_BvhInheritanceTxt");
+	}
+	else if (pack->CommandId == Cmd_AvatarCount)
+	{
+		LOG("Cmd_AvatarCount");
+	}
+	else if (pack->CommandId == Cmd_CombinationMode)
+	{
+		LOG("Cmd_CombinationMode");
+	}
+	else if (pack->CommandId == Cmd_RegisterEvent)
+	{
+		LOG("Cmd_RegisterEvent");
+	}
+	else if (pack->CommandId == Cmd_UnRegisterEvent)
+	{
+		LOG("Cmd_UnRegisterEvent");
+	}
+}
+
+void SBRealtimeManager::mySocketStatusChanged(void* customedObj, SOCKET_REF sender, SocketStatus status, char* message)
+{
+	std::string currentStatus =  "unknown";
+	if (status == CS_Running)
+	{
+		currentStatus = "Running";
+	}
+	else if (status == CS_Running)
+	{
+		currentStatus = "Starting";
+	}
+	else if (status == CS_OffWork)
+	{
+		currentStatus = "OffWork";
+	}
+      
+	LOG("Socket status: %s", currentStatus.c_str());
+	if (message)
+	{
+		LOG("Socket message: %s", message);
+	}
+}
+
+#endif
 
 }
 
