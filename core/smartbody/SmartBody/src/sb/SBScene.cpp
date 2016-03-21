@@ -775,7 +775,8 @@ void SBScene::update()
 		iter != services.end();
 		iter++)
 	{
-		(*iter).second->update(getSimulationManager()->getTime());
+		if ((*iter).second->isEnable())
+			(*iter).second->update(getSimulationManager()->getTime());
 	}
 	this->getProfiler()->mark("services");
 
