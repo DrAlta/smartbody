@@ -1,6 +1,7 @@
 #include "SBGestureMapManager.h"
 #include <sb/SBScene.h>
 #include <sb/SBGestureMap.h>
+#include <sb/SBSceneListener.h>
 
 namespace SmartBody {
 
@@ -32,6 +33,13 @@ SBGestureMap* SBGestureMapManager::createGestureMap(std::string gestureName)
 	
 	SBGestureMap* map = new SBGestureMap(gestureName);
 	_gestureMaps.insert(std::make_pair(gestureName, map));
+
+	std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+	for (size_t l = 0; l < listeners.size(); l++)
+	{
+		listeners[l]->OnObjectCreate(map);
+	}
+
 	return map;
 }
 
@@ -40,6 +48,12 @@ void SBGestureMapManager::removeGestureMap(std::string gestureName)
 	std::map<std::string, SBGestureMap*>::iterator iter = _gestureMaps.find(gestureName);
 	if (iter != _gestureMaps.end())
 	{
+		std::vector<SBSceneListener*>& listeners = SmartBody::SBScene::getScene()->getSceneListeners();
+		for (size_t l = 0; l < listeners.size(); l++)
+		{
+			listeners[l]->OnObjectDelete((*iter).second);
+		}
+
 		delete iter->second;
 		_gestureMaps.erase(iter);
 	}
