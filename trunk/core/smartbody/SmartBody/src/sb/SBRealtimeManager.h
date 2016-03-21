@@ -7,6 +7,17 @@
 #include <sr/sr_quat.h>
 #include <string>
 #include <sb/SBSubject.h>
+
+#if 0
+#define USE_PERCEPTIONNEURON 0
+#endif
+
+#ifdef USE_PERCEPTIONNEURON
+#include <Windows.h>
+#include "NeuronDataReader.h"
+#include "SocketCommand.h"
+#endif
+
 namespace SmartBody {
 
 
@@ -37,10 +48,29 @@ class SBRealtimeManager : public SBService
 		SBAPI SrQuat getDataQuat(const std::string& channel);
 		SBAPI SrMat getDataMat(const std::string& channel);
 
+#ifdef USE_PERCEPTIONNEURON
+		void startPerceptionNeuron();
+		void restartPerceptionNeuron();
+		void stopPerceptionNeuron();
+		bool isPerceptionNeuronRunning();
+
+		static void CALLBACK myFrameDataReceived(void* customedObj, SOCKET_REF sender, BvhDataHeaderEx* header, float* data);
+		static void CALLBACK myCommandDataReceived(void* customedObj, SOCKET_REF sender, CommandPack* pack, void* data);
+		static void CALLBACK mySocketStatusChanged(void* customedObj, SOCKET_REF sender, SocketStatus status, char* message);
+#endif
+
 	protected:
 		std::vector<std::string> blendShapeNames;
 		std::map<std::string, std::string> channelTable;
 		std::vector<std::string> channelNames;
+#ifdef USE_PERCEPTIONNEURON
+		SOCKET_REF m_sockTCPRef;
+		SOCKET_REF m_sockUDPRef;
+		float* _valuesBuffer;
+		int _valuesBufferLength;
+		int _frameCount;
+		std::map<int, std::string> _dataIndexMap;
+#endif
 };
 
 }
