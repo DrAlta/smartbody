@@ -44,8 +44,8 @@ make -j6 install
 cd ..
 
 echo "Building xerces..."
-tar -xvzf xerces-c-3.1.2.tar.gz
-cd xerces-c-3.1.2
+tar -xvzf xerces-c-3.1.3.tar.gz
+cd xerces-c-3.1.3
 ./configure --prefix=${MAINDIR} --enable-shared 
 make -j6 install
 
