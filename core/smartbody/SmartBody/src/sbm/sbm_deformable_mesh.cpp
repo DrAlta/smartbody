@@ -313,7 +313,7 @@ bool DeformableMesh::buildBlendShapes()
 		meshKDTree->knnSearch((float*)&inPt, numKNN, (size_t*)&knnPtIdxs[0], &knnPtDists[0]);
 		for (unsigned int k=0;k<numKNN;k++)
 		{
-			if (knnPtDists[k] < srtiny) // almost identical vertex
+			if (knnPtDists[k] < 1e-30) // almost identical vertex
 			{
 				if (blendShapeNewVtxIdxMap.find(i) == blendShapeNewVtxIdxMap.end())
 				{
@@ -325,6 +325,16 @@ bool DeformableMesh::buildBlendShapes()
 	}
 
 	return true;
+}
+
+
+void DeformableMesh::rebuildVertexBuffer( bool rebuild )
+{
+	if (rebuild)
+	{
+		initSkinnedVertexBuffer = false;
+		buildSkinnedVertexBuffer();
+	}
 }
 
 
@@ -841,7 +851,8 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		mesh->normalMapName = allNormalTexNameList[iMaterial];		
 		mesh->specularMapName = allSpecularTexNameList[iMaterial];
 		mesh->numTri = faceIdxList.size();
-		mesh->triBuf.resize(faceIdxList.size());		
+		mesh->triBuf.resize(faceIdxList.size());	
+		mesh->faceIdxList = faceIdxList;
 		for (unsigned int k=0;k<faceIdxList.size();k++)
 		{
 			mesh->triBuf[k][0] = triBuf[faceIdxList[k]][0];
@@ -1896,7 +1907,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 
 void DeformableMeshInstance::blendShapes()
 {
-
+	
 	//SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapes() #0 ");
 
 	if (!_character)

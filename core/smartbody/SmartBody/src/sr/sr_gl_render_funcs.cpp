@@ -286,15 +286,15 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
     }
 #if !defined(__ANDROID__)
 	//LOG("Shape visibility = %d", shape->getVisibility());
-	if (SmartBody::SBScene::getScene()->getBoolAttribute("drawMeshWireframe"))
-	{
-		//LOG("Render in Wireframe mode\n");
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	else
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
+// 	if (SmartBody::SBScene::getScene()->getBoolAttribute("drawMeshWireframe"))
+// 	{
+// 		//LOG("Render in Wireframe mode\n");
+// 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+// 	}
+// 	else
+// 	{
+// 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+// 	}
 #endif
 
 	bool useGPUBlendShapes = SmartBody::SBScene::getScene()->getBoolAttribute("useGPUBlendshapes");
@@ -450,6 +450,10 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
 				glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);   
 			}
+
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glPolygonOffset(2.0, 2.0);
 			
 			//LOG("subMeshList size = %d", subMeshList.size());
 			for (unsigned int i=0;i<subMeshList.size();i++)
@@ -463,6 +467,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 					blendShapeMesh = true;
 				//if (hitCount > 0)
 				//	blendShapeMesh = true;
+				
 
 				glMaterial(subMesh->material);	
 				if (subMesh->material.useAlphaBlend)
@@ -550,7 +555,24 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				glDrawElements(GL_TRIANGLES, subMesh->triBuf.size()*3, GL_UNSIGNED_INT, &subMesh->triBuf[0]);
 			#endif
 				glBindTexture(GL_TEXTURE_2D,0);
+
+				// overlay wireframe on top of the original mesh
+				
 			}	
+			if (SmartBody::SBScene::getScene()->getBoolAttribute("drawMeshWireframe"))
+			{
+				glDisable(GL_LIGHTING);
+				glColor3f(0.0f,0.0f,0.0f);
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				glLineWidth(1.5);
+				glEnable(GL_POLYGON_OFFSET_LINE);
+				glPolygonOffset(1.0, 1.0);
+				glDrawElements(GL_TRIANGLES, mesh->triBuf.size()*3, GL_UNSIGNED_INT, &mesh->triBuf[0]);	
+				glEnable(GL_LIGHTING);
+				glDisable(GL_POLYGON_OFFSET_LINE);
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+
 			glDisableClientState(GL_VERTEX_ARRAY);
 			glDisableClientState(GL_NORMAL_ARRAY);
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
