@@ -1174,7 +1174,7 @@ void SrModel::add_model ( const SrModel& m )
 
    if ( m.Ft.size()>0 )
    { T.resize ( origt+m.T.size() );
-   for ( i=0; i<m.T.size(); i++ ) T[orign+i] = m.T[i];
+   for ( i=0; i<m.T.size(); i++ ) T[origt+i] = m.T[i];
 
    Ft.resize ( origf+mfsize );
    for ( i=0; i<mfsize; i++ )

@@ -3013,7 +3013,7 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 		std::string defMeshName = "";
 		if (exportMesh)
 			defMeshName = deformMeshName;
-		ParserOpenCOLLADA::exportVisualScene(fp,skeletonName, defMeshName);
+		ParserOpenCOLLADA::exportVisualScene(fp,skeletonName, defMeshName, meshScale);
 	}
 	fprintf(fp,"</COLLADA>\n");
 	fclose(fp);
@@ -3289,7 +3289,9 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 		fprintf(fp,"<controller id=\"%s\"  name=\"%s\">\n",skinID.c_str(),skinID.c_str());
 		fprintf(fp,"<skin source=\"#%s\">\n",skinWeight->sourceMesh.c_str());
 		SrMat& bm = skinWeight->bindShapeMat;
-		SrMat bmT = bm; bmT.transpose();
+		SrMat bmT = bm; 
+		bmT.set_translation(bmT.get_translation()*scale);
+		bmT.transpose();
 		fprintf(fp,"<bind_shape_matrix>");
 		for (int k=0;k<16;k++)
 			fprintf(fp,"%f ",bmT.get(k));
@@ -3317,7 +3319,9 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 		
 		for (unsigned int k=0;k<skinWeight->bindPoseMat.size();k++)
 		{
-			SrMat bpT = skinWeight->bindPoseMat[k]; bpT.transpose();
+			SrMat bpT = skinWeight->bindPoseMat[k]; 
+			bpT.set_translation(bpT.get_translation()*scale);
+			bpT.transpose();
 			for (int j=0;j<16;j++)
 				fprintf(fp,"%f ",bpT.get(j));
 		}
@@ -3375,7 +3379,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 	return true;
 }
 
-bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, std::string defMeshName )
+bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, std::string defMeshName, double scale )
 {
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	SmartBody::SBSkeleton* sbSk = assetManager->getSkeleton(skeletonName);
@@ -3388,7 +3392,7 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 	if (sbSk)
 	{
 		rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSk->root());
-		writeJointNode(fp,rootJoint);
+		writeJointNode(fp,rootJoint, scale);
 	}
 	
 	// write-out instance of skinned mesh, if it exists
@@ -3458,13 +3462,13 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 	return true;
 }
 
-void ParserOpenCOLLADA::writeJointNode( FILE* fp, SmartBody::SBJoint* joint )
+void ParserOpenCOLLADA::writeJointNode( FILE* fp, SmartBody::SBJoint* joint, double scale )
 {
 	if (!joint) return;
 	// write out the joint name as node id
 	fprintf(fp,"<node id=\"%s\" name=\"%s\" sid=\"%s\" type=\"JOINT\">\n",joint->getName().c_str(), joint->getName().c_str(), joint->getName().c_str());
 	// output joint local translation
-	SrVec pos = joint->getOffset();
+	SrVec pos = joint->getOffset()*scale;
 	fprintf(fp,"<translate sid=\"translate\">%f %f %f</translate>\n", pos[0],pos[1],pos[2]);
 	// output joint pre-rotation & orientation
 	SrQuat quat = joint->quat()->orientation()*joint->quat()->prerot();
@@ -3482,7 +3486,7 @@ void ParserOpenCOLLADA::writeJointNode( FILE* fp, SmartBody::SBJoint* joint )
 	// recursively output child joints
 	for (int i=0;i<joint->getNumChildren();i++)
 	{
-		writeJointNode(fp,joint->getChild(i));
+		writeJointNode(fp,joint->getChild(i), scale);
 	}
 
 	fprintf(fp,"</node>\n");

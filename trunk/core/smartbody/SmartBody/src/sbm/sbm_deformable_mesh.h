@@ -77,6 +77,7 @@ public:
 	std::string specularMapName;
 	int numTri;
 	std::vector<SrVec3i> triBuf;
+	std::vector<int> faceIdxList;
 };
 
 
@@ -181,6 +182,8 @@ public:
 	SBAPI int	getMesh(const std::string& meshName);				// get the position given the mesh name
 	int getValidSkinMesh(const std::string& meshName);
     
+	SBAPI void rebuildVertexBuffer(bool rebuild);
+
 	SBAPI virtual bool buildSkinnedVertexBuffer(); // unrolled all models inside this deformable mesh into a GPU-friendly format
 	SBAPI virtual bool buildBlendShapes();
 	SBAPI void updateVertexBuffer(); // update the values in the vertex buffer based on dMeshStatic_p	

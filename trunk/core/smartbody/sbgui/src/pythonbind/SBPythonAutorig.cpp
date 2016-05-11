@@ -225,6 +225,13 @@ void saveDeformableMesh(const std::string& meshName, const std::string& skelName
 	ParserOpenCOLLADA::exportCollada(outDir, skelName, meshName, moNames, true, true, false, scale);
 }
 
+void saveDeformableMeshScale(const std::string& meshName, const std::string& skelName, const std::string& outDir, float meshScale)
+{
+	std::vector<std::string> moNames;
+	double scale = meshScale;
+	ParserOpenCOLLADA::exportCollada(outDir, skelName, meshName, moNames, true, true, false, scale);
+}
+
 //	Callback function for Python module Misc to run the checkVisibility function
 std::vector<std::string> checkVisibility(const std::string& character)
 {
@@ -366,6 +373,7 @@ BOOST_PYTHON_MODULE(GUIInterface)
 BOOST_PYTHON_MODULE(AutoRig)
 {	
 	boost::python::def("saveDeformableMesh", saveDeformableMesh, "Save the deformable model to the target directory");
+	boost::python::def("saveDeformableMeshScale", saveDeformableMeshScale, "Save the deformable model with scaling factor to the target directory");
 	boost::python::def("setPawnMesh", setPawnMesh, "Set the deformable model to the target pawn");
 
 	boost::python::class_<SBAutoRigManager>("SBAutoRigManager")
