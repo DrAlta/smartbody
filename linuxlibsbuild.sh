@@ -24,7 +24,7 @@ cd ..
 echo "Building ode..."
 tar -xvzf ode-0.12.tar.gz
 cd ode-0.12
-./configure --prefix=${MAINDIR} --enable-shared 
+./configure --prefix=${MAINDIR} --enable-shared  --enable-double-precision
 make -j6 install
 
 cd ..
