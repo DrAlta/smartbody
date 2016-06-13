@@ -6,7 +6,7 @@
 #include <sb/SBMotion.h>
 #include <queue>
 
-#define ELITE_HACK 0
+#define ELITE_HACK 1
 
 namespace SmartBody {
 
@@ -239,7 +239,7 @@ SrQuat SBRetarget::applyRetargetJointRotation( std::string jointName, SrQuat& in
 			//outQuat = qpair.first*qpair.second;
 			outQuat = SrQuat();
 #if ELITE_HACK
-			SrQuat newInQuat = SrQuat(inQuat.axisAngle()*0.7f);
+			SrQuat newInQuat = SrQuat(inQuat.axisAngle());
 			jointAddRotMap[jointName] = newInQuat;
 #endif
 		}

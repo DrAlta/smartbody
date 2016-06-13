@@ -63,6 +63,7 @@ public:
 	SBAPI ~SkinWeight();
 	SBAPI void normalizeWeights();
 	SBAPI void copyWeights(SkinWeight* copy, const std::string& morphName);
+	SBAPI void initWeights(std::string sourceMesh, std::vector<SrVec4i>& boneID, std::vector<SrVec4>& boneWeights, std::vector<std::string>& boneJointNameList, std::vector<SrMat>& bindPoseMatList);
 };
 
 class SbmSubMesh

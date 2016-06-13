@@ -1403,10 +1403,23 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 	// l_ring1~4 (LeftHandRing1~4)
 	// l_pinky1~4 (LeftHandPinky1~4)
 
+
+	SkJoint* l_wrist2 = l_wrist;
+	SkJoint* r_wrist2 = r_wrist;
+	// use child of wrist joints to 
+	if (l_wrist2->num_children() > 0 && l_wrist2->child(0)->num_children() == 5)
+		l_wrist = l_wrist2->child(0);
+
+	if (r_wrist2->num_children() > 0 && r_wrist2->child(0)->num_children() == 5)
+		r_wrist = r_wrist2->child(0);
+
+
 	if(!l_wrist || !r_wrist)
 		LOG("guessMap: l/r_wrist NOT found, abort finding fingers...\n");
 	else if(l_wrist->num_children()!=5 || r_wrist->num_children()!=5)
+	{
 		LOG("guessMap: l/r_wrist must have 5 children joints to proceed, abort finding fingers...\n");
+	}
 	else
 	{
 		for(unsigned int i=0; i<5; i++)
@@ -1416,26 +1429,26 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 			SrString janame(ja->jointName().c_str());
 			SrString jbname(jb->jointName().c_str());
 			// name search, alternative names from wiki
-			if(!l_thumb1 && (janame.search("thumb")>=0||janame.search("pollex")>=0||janame.search("finger0")>=0))
+			if(!l_thumb1 && (janame.search("thumb")>=0||janame.search("pollex")>=0||janame.search("finger0")>=0 || janame.search("Finger_0")>=0))
 				l_thumb1 = ja;
-			if(!l_index1 && (janame.search("index")>=0||janame.search("pointer")>=0||janame.search("forefinger")>=0||janame.search("finger1")>=0))
+			if(!l_index1 && (janame.search("index")>=0||janame.search("pointer")>=0||janame.search("forefinger")>=0||janame.search("finger1")>=0|| janame.search("Finger_1")>=0))
 				l_index1 = ja;
-			if(!l_middle1 && (janame.search("middle")>=0||janame.search("medius")>=0||janame.search("mid")>=0||janame.search("finger2")>=0))
+			if(!l_middle1 && (janame.search("middle")>=0||janame.search("medius")>=0||janame.search("mid")>=0||janame.search("finger2")>=0|| janame.search("Finger_2")>=0))
 				l_middle1 = ja;
-			if(!l_ring1 && (janame.search("ring")>=0||janame.search("fourth")>=0||janame.search("finger3")>=0))
+			if(!l_ring1 && (janame.search("ring")>=0||janame.search("fourth")>=0||janame.search("finger3")>=0|| janame.search("Finger_3")>=0))
 				l_ring1 = ja;
-			if(!l_pinky1 && (janame.search("pinky")>=0||janame.search("little")>=0||janame.search("finger4")>=0))
+			if(!l_pinky1 && (janame.search("pinky")>=0||janame.search("little")>=0||janame.search("finger4")>=0|| janame.search("Finger_4")>=0))
 				l_pinky1 = ja;
 
-			if(!r_thumb1 && (jbname.search("thumb")>=0||jbname.search("pollex")>=0||jbname.search("finger0")>=0))
+			if(!r_thumb1 && (jbname.search("thumb")>=0||jbname.search("pollex")>=0||jbname.search("finger0")>=0|| janame.search("Finger_0")>=0))
 				r_thumb1 = jb;
-			if(!r_index1 && (jbname.search("index")>=0||jbname.search("pointer")>=0||jbname.search("forefinger")>=0||janame.search("finger1")>=0))
+			if(!r_index1 && (jbname.search("index")>=0||jbname.search("pointer")>=0||jbname.search("forefinger")>=0||janame.search("finger1")>=0|| janame.search("Finger_1")>=0))
 				r_index1 = jb;
-			if(!r_middle1 && (jbname.search("middle")>=0||jbname.search("medius")>=0||jbname.search("mid")>=0||janame.search("finger2")>=0))
+			if(!r_middle1 && (jbname.search("middle")>=0||jbname.search("medius")>=0||jbname.search("mid")>=0||janame.search("finger2")>=0|| janame.search("Finger_2")>=0))
 				r_middle1 = jb;
-			if(!r_ring1 && (jbname.search("ring")>=0||jbname.search("fourth")>=0||janame.search("finger3")>=0))
+			if(!r_ring1 && (jbname.search("ring")>=0||jbname.search("fourth")>=0||janame.search("finger3")>=0|| janame.search("Finger_3")>=0))
 				r_ring1 = jb;
-			if(!r_pinky1 && (jbname.search("pinky")>=0||jbname.search("little")>=0||janame.search("finger4")>=0))
+			if(!r_pinky1 && (jbname.search("pinky")>=0||jbname.search("little")>=0||janame.search("finger4")>=0|| janame.search("Finger_4")>=0))
 				r_pinky1 = jb;
 		}
 
