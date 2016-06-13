@@ -128,6 +128,38 @@ void SkinWeight::copyWeights(SkinWeight* copy, const std::string& morphName)
 	}
 }
 
+SBAPI void SkinWeight::initWeights(std::string srcMesh, std::vector<SrVec4i>& boneID, std::vector<SrVec4>& boneWeights, std::vector<std::string>& boneJointNameList, std::vector<SrMat>& bindPoseMatList )
+{
+	sourceMesh = srcMesh;
+	bindShapeMat = SrMat::id;
+
+	infJointName.clear();
+	infJoint.clear();
+	bindPoseMat.clear();
+	for (unsigned int i=0;i<boneJointNameList.size();i++)
+	{
+		bindPoseMat.push_back(bindPoseMatList[i]);
+		infJointName.push_back(boneJointNameList[i]);
+	}
+
+	numInfJoints.clear();
+	weightIndex.clear();
+	bindWeight.clear();
+	jointNameIndex.clear();
+	
+	int icount = 0;
+	for (unsigned int i=0;i<boneID.size();i++)
+	{
+		numInfJoints.push_back(4);
+		for (int k=0;k<4;k++)
+		{
+			weightIndex.push_back(icount++);
+			jointNameIndex.push_back(boneID[i][k]);
+			bindWeight.push_back(boneWeights[i][k]);
+		}
+	}
+}
+
 
 DeformableMesh::DeformableMesh() : SBAsset()
 {	
@@ -555,12 +587,14 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	if (nTotalVtxs == 0 || nTotalTris ==0)
 		return false;
 
+	vtxNewVtxIdxMap.clear();
 	//printf("orig vtxs = %d\n",nTotalVtxs);
 	for (unsigned int i=0;i<vtxNormalIdxMap.size();i++)
 	{
 		std::set<IntPair>& idxMap = vtxNormalIdxMap[i];
 		if (idxMap.size() > 1)
 		{
+			//LOG("vtx %d, idxMap size = %d", i, idxMap.size());
 			vtxNewVtxIdxMap[i] = std::vector<int>();
 			std::set<IntPair>::iterator si = idxMap.begin();
 			si++;
@@ -574,7 +608,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			}
 		}
 	}
-	//printf("new vtxs = %d\n",nTotalVtxs);
+	printf("new vtxs = %d\n",nTotalVtxs);
 
 	// temporary storage 
 	posBuf.resize(nTotalVtxs);
@@ -834,6 +868,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	std::vector<SbmSubMesh*> hairMeshList;
 	std::vector<SbmSubMesh*> alphaMeshList;
 	std::map<int,std::vector<int> >::iterator vi;
+	subMeshList.clear();
 	LOG("subMeshList.size() = %d \n", meshSubsetMap.size());
 	for (vi  = meshSubsetMap.begin();
 		vi != meshSubsetMap.end();
@@ -2418,8 +2453,8 @@ void DeformableMeshInstance::update()
 	updateTransformBuffer();
 	return;
 #endif
-	updateFast();
-	return;
+	//updateFast();
+	//return;
 
 	int maxJoint = -1;
 	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;

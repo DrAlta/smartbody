@@ -1244,8 +1244,9 @@ int main( int argc, char **argv )	{
 		std::stringstream strstr;
 		strstr << "scene.run(\"" << cmd.c_str() << "\")";
 		SmartBody::SBScene::getScene()->run(strstr.str().c_str());
+		LOG("Run Script = %s", strstr.str().c_str());
 	}
-
+	LOG("After runnig init python script");
 	me_paths.clear();
 	seq_paths.clear();
 	init_seqs.clear();

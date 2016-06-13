@@ -498,6 +498,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 					//LOG("tex = %d", tex);
 					if (tex && !showSkinWeight)
 					{
+						glEnable(GL_TEXTURE_2D);
 						GLint activeTexture = -1;
 						glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
 			
@@ -543,6 +544,10 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 							glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 						}
 						//glColor4f(0.0f, 0.0f, 0.0f, 1.0);				
+					}
+					else
+					{
+						glDisable(GL_TEXTURE_2D);
 					}
 				}
 			#if GLES_RENDER && defined(__ANDROID__)

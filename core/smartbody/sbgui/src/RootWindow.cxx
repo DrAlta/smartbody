@@ -786,6 +786,7 @@ void BaseWindow::LoadCB(Fl_Widget* widget, void* data)
 	std::string fullfilename = std::string(file);
 
 	std::string path = fullfilename.substr(0, fullfilename.size() - filenameSize);
+	LOG("Path = %s, script = %s", path.c_str(), filebasename.c_str());
 	SmartBody::SBScene::getScene()->addAssetPath("script", path);
 	SmartBody::SBScene::getScene()->runScript(filebasename);
 }
