@@ -8,9 +8,14 @@
 #include <string>
 #include <sb/SBSubject.h>
 
-#if 0
+#if defined(LINUX_BUILD) || defined(MAC_BUILD) || defined(IPHONE_BUILD) || defined(ANDROID_BUILD) || defined(FLASH_BUILD)
+#elif defined (WIN_BUILD)
 #define USE_PERCEPTIONNEURON 0
 #endif
+
+
+
+
 
 #ifdef USE_PERCEPTIONNEURON
 #include <Windows.h>
