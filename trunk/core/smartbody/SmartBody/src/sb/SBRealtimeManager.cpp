@@ -23,6 +23,7 @@ SBRealtimeManager::SBRealtimeManager() : SBService()
 	createStringAttribute("perceptionNeuronIP", "127.0.0.1", true, "Perception Neuron", 20, false, false, false, "Perception Neuron server IP.");
 	createIntAttribute("perceptionNeuronPort", 7001, true, "Perception Neuron", 30, false, false, false, "Perception Neuron port.");
 	createStringAttribute("perceptionNeuronStatus", "Disconnected", true, "Perception Neuron", 40, false, false, false, "Perception Neuron status.");
+	createBoolAttribute("useDisplacement", true, true, "Perception Neuron", 50, false, false, false, "Interpret data as displacement data.");
 	
 	
 	m_sockTCPRef = 0;
@@ -439,6 +440,8 @@ void SBRealtimeManager::myFrameDataReceived(void* customedObj, SOCKET_REF sender
 			LOG("%f %f %f", realtimeManager->_valuesBuffer[d], realtimeManager->_valuesBuffer[d + 1], realtimeManager->_valuesBuffer[d + 2]);
 		}
 	}
+	
+	bool useDisplacement = realtimeManager->getBoolAttribute("useDisplacement");
 	// store the data in the realtime manager
 	for (size_t c = 0; c < realtimeManager->_dataIndexMap.size(); c++)
 	{
@@ -454,12 +457,17 @@ void SBRealtimeManager::myFrameDataReceived(void* customedObj, SOCKET_REF sender
 			else
 			{
 				// write the rotation into (jointname)/rot:
+				int index = c * 3;
+				if (useDisplacement)
+				{
+					index = c * 6 + 3;
+				}
 				SrMat yrot;
-				yrot.roty(realtimeManager->_valuesBuffer[c * 3] * SR_PI / 180.0);
+				yrot.roty(realtimeManager->_valuesBuffer[index] * SR_PI / 180.0);
 				SrMat xrot;
-				xrot.rotx(realtimeManager->_valuesBuffer[c * 3 + 1] * SR_PI / 180.0);
+				xrot.rotx(realtimeManager->_valuesBuffer[index + 1] * SR_PI / 180.0);
 				SrMat zrot;
-				zrot.rotz(realtimeManager->_valuesBuffer[c * 3 + 2] * SR_PI / 180.0);
+				zrot.rotz(realtimeManager->_valuesBuffer[index + 2] * SR_PI / 180.0);
 				
 				SrMat finalMat = zrot * xrot * yrot;
 				SrQuat finalQuat(finalMat);
