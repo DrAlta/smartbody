@@ -18,7 +18,7 @@ SBRealtimeManager::SBRealtimeManager() : SBService()
 	setName("Realtime");
 	createBoolAttribute("debug", false, true, "Basic", 60, false, false, false, "Show debugging information.");
 	createActionAttribute("dumpData", true, "Basic", 60, false, false, false, "Dump the faceshift data.");
-#ifdef USE_PERCEPTIONNEURON
+#if USE_PERCEPTIONNEURON > 0
 	createBoolAttribute("usePerceptionNeuron", false, true, "Perception Neuron", 10, false, false, false, "Uses the Perception Neuron interface.");
 	createStringAttribute("perceptionNeuronIP", "127.0.0.1", true, "Perception Neuron", 20, false, false, false, "Perception Neuron server IP.");
 	createIntAttribute("perceptionNeuronPort", 7001, true, "Perception Neuron", 30, false, false, false, "Perception Neuron port.");
@@ -108,7 +108,7 @@ SBRealtimeManager::SBRealtimeManager() : SBService()
 
 SBRealtimeManager::~SBRealtimeManager()
 {
-#ifdef USE_PERCEPTIONNEURON
+#if USE_PERCEPTIONNEURON > 0
 	stopPerceptionNeuron();
 	delete [] _valuesBuffer;
 #endif
@@ -146,7 +146,7 @@ void SBRealtimeManager::update( double time )
 	if (!this->isEnable())
 		false;
 
-#ifdef USE_PERCEPTIONNEURON
+#if USE_PERCEPTIONNEURON > 0
 	if (this->getStringAttribute("perceptionNeuronStatus") == "Connected")
 	{
 		if (m_sockTCPRef != 0)
@@ -317,7 +317,7 @@ void SBRealtimeManager::notify(SBSubject* subject)
 				LOG("[%s] = %s", (*iter).first.c_str(), (*iter).second.c_str());
 			}
 		}
-#ifdef USE_PERCEPTIONNEURON
+#if USE_PERCEPTIONNEURON > 0
 		else if (name == "usePerceptionNeuron")
 		{
 			bool running = isPerceptionNeuronRunning();
@@ -355,7 +355,7 @@ void SBRealtimeManager::notify(SBSubject* subject)
 
 }
 
-#ifdef USE_PERCEPTIONNEURON
+#if USE_PERCEPTIONNEURON > 0
 
 void SBRealtimeManager::startPerceptionNeuron()
 {
