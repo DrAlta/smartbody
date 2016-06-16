@@ -17,7 +17,7 @@
 
 
 
-#ifdef USE_PERCEPTIONNEURON
+#if USE_PERCEPTIONNEURON > 0
 #include <Windows.h>
 #include "NeuronDataReader.h"
 #include "SocketCommand.h"
@@ -53,7 +53,7 @@ class SBRealtimeManager : public SBService
 		SBAPI SrQuat getDataQuat(const std::string& channel);
 		SBAPI SrMat getDataMat(const std::string& channel);
 
-#ifdef USE_PERCEPTIONNEURON
+#if USE_PERCEPTIONNEURON > 0
 		void startPerceptionNeuron();
 		void restartPerceptionNeuron();
 		void stopPerceptionNeuron();
@@ -68,7 +68,7 @@ class SBRealtimeManager : public SBService
 		std::vector<std::string> blendShapeNames;
 		std::map<std::string, std::string> channelTable;
 		std::vector<std::string> channelNames;
-#ifdef USE_PERCEPTIONNEURON
+#if USE_PERCEPTIONNEURON > 0
 		SOCKET_REF m_sockTCPRef;
 		SOCKET_REF m_sockUDPRef;
 		float* _valuesBuffer;
