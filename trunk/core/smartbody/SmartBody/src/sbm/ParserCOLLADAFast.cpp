@@ -973,6 +973,18 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 
 	std::map<std::string,std::vector<std::string> > jointRotationOrderMap;
 
+	std::set<int> quatIDSet;
+	std::vector<int> quatIDList;
+	for (unsigned int k=0;k<motionChannels.size();k++)
+	{
+		std::string chanName = motionChannels.name(k);
+		std::string type = "rotateX";
+		int dataID = getMotionChannelId(motionChannels, chanName, type);
+		if (dataID >= 0)
+			quatIDSet.insert(dataID);
+	}
+	std::copy(quatIDSet.begin(), quatIDSet.end(), std::back_inserter(quatIDList));
+
 	//const DOMNodeList* list = node->getChildNodes();
 	rapidxml::xml_node<>* curNode = node->first_node();
 	// load all array of floats with corresponding channel names and sample rates
@@ -1005,6 +1017,7 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 		ColladaFloatArrayFast& inFloatArray = floatArrayMap[sampler.inputName];
 		ColladaFloatArrayFast& outFloatArray = floatArrayMap[sampler.outputName];
 
+
 		// insert frames for the motion
 		if (motion.frames() == 0)
 		{
@@ -1012,7 +1025,13 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 			{
 				motion.insert_frame(frameCt, inFloatArray.floatArray[frameCt]);
 				for (int postureCt = 0; postureCt < motion.posture_size(); postureCt++)
-					motion.posture(frameCt)[postureCt] = 0.0f;										
+					motion.posture(frameCt)[postureCt] = 0.0f;
+				// reset quaternion to zero rotation
+				for (unsigned int k=0;k<quatIDList.size();k++)
+				{
+					motion.posture(frameCt)[quatIDList[k]] = 1.f;
+				}
+			
 			}								
 		}		
 		if (colChannel.targetType == "matrix")
@@ -1020,6 +1039,12 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 			int stride = 16;
 			SrMat tran;
 			std::string jName = colChannel.targetJointName;	
+
+			channelsForAdjusting.add(jName.c_str(), SkChannel::Quat);
+			channelsForAdjusting.add(jName.c_str(), SkChannel::XPos);
+			channelsForAdjusting.add(jName.c_str(), SkChannel::YPos);
+			channelsForAdjusting.add(jName.c_str(), SkChannel::ZPos);
+
 // 			SrQuat rotateOffset;
 // 			if (zaxis && jName == skeleton.root()->name())
 // 			{
@@ -1203,8 +1228,8 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 	motion.synch_points.set_time(0.0, duration / 3.0, duration / 2.0, duration / 2.0, duration / 2.0, duration * 2.0/3.0, duration);
 	motion.compress();
 	// now there's adjust for the channels by default
-	//animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
-	animationPostProcess(skeleton,motion);
+	animationPostProcessByChannels(skeleton, motion, channelsForAdjusting);
+	//animationPostProcess(skeleton,motion);
 }
 
 void ParserCOLLADAFast::parseLibraryAnimations2(rapidxml::xml_node<>* node, SkSkeleton& skeleton, SkMotion& motion, float scale, int& order)
