@@ -9,7 +9,7 @@
 #define USE_CEGUI 1
 #endif
 #else
-//#define USE_CEGUI
+#define USE_CEGUI 0
 #endif
 #if USE_CEGUI
 #include "vhcl.h"
