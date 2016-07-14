@@ -400,7 +400,8 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 								{
 									DeformableMesh* neutralMesh = SmartBody::SBScene::getScene()->getAssetManager()->getDeformableMesh(shapeName);
 									SrSnModel* staticModel = neutralMesh->dMeshStatic_p[0];
-									std::string blendShapeMapName = staticModel->shape().name;
+									SrModel& s = staticModel->shape();
+									std::string blendShapeMapName = (const char*) s.name;
 									//mesh->blendShapeMap.insert(std::pair<std::string, std::vector<SrSnModel*> >(neutralMesh->getName(), std::vector<SrSnModel*>() ));
 									mesh->blendShapeMap.insert(std::pair<std::string, std::vector<SrSnModel*> >(blendShapeMapName, std::vector<SrSnModel*>() ));
 									std::map<std::string, std::vector<SrSnModel*> >::iterator blendshapeIter = mesh->blendShapeMap.begin();

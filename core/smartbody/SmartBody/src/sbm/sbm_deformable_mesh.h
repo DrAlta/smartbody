@@ -136,7 +136,7 @@ public:
 	std::vector<SrSnModel*>		dMeshStatic_p;
 	std::vector<SkinWeight*>	skinWeights;
 	std::map<std::string, std::vector<SrSnModel*> > blendShapeMap;	// the key store the base shape name, vector stores morph target SrModels. first one in the vector is always the base one
-	std::map<int, std::vector<int>> blendShapeNewVtxIdxMap; 
+	std::map<int, std::vector<int> > blendShapeNewVtxIdxMap; 
 	std::map<std::string, std::vector<std::string> > morphTargets;	// stores a vector of morph target names, first one is always the base one
 	std::vector<BlendShapeData> optimizedBlendShapeData;						// stores optimized information when calculating blend shapes; list of vertices affected, and their differential vector and normal amounts
 	
