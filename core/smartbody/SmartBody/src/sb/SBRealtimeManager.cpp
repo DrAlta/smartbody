@@ -23,7 +23,6 @@ SBRealtimeManager::SBRealtimeManager() : SBService()
 	createStringAttribute("perceptionNeuronIP", "127.0.0.1", true, "Perception Neuron", 20, false, false, false, "Perception Neuron server IP.");
 	createIntAttribute("perceptionNeuronPort", 7001, true, "Perception Neuron", 30, false, false, false, "Perception Neuron port.");
 	createStringAttribute("perceptionNeuronStatus", "Disconnected", true, "Perception Neuron", 40, false, false, false, "Perception Neuron status.");
-	createBoolAttribute("useDisplacement", true, true, "Perception Neuron", 50, false, false, false, "Interpret data as displacement data.");
 	
 	
 	m_sockTCPRef = 0;
@@ -441,43 +440,100 @@ void SBRealtimeManager::myFrameDataReceived(void* customedObj, SOCKET_REF sender
 		}
 	}
 	
-	bool useDisplacement = realtimeManager->getBoolAttribute("useDisplacement");
-	// store the data in the realtime manager
-	for (size_t c = 0; c < realtimeManager->_dataIndexMap.size(); c++)
+	bool useDisplacement = header->WithDisp;
+	bool useReference = header->WithReference;
+	int dataCount = header->DataCount;
+
+	if (!useDisplacement)
 	{
-		if (realtimeManager->_valuesBufferLength > (c * 3))
+		// store the data in the realtime manager
+		for (size_t c = 0; c < realtimeManager->_dataIndexMap.size(); c++)
 		{
-			if (c == 0)
+			if (realtimeManager->_valuesBufferLength + 1> (c * 3))
 			{
-				// write the position into (jointname)/pos:
-				std::stringstream strstr;
-				strstr << realtimeManager->_valuesBuffer[c * 3] << " " << realtimeManager->_valuesBuffer[c * 3 + 1] << " " << realtimeManager->_valuesBuffer[c * 3 + 2];
-				realtimeManager->setData(realtimeManager->_dataIndexMap[c], strstr.str());
-			}
-			else
-			{
-				// write the rotation into (jointname)/rot:
-				int index = c * 3;
-				if (useDisplacement)
+				if (c == 0)
 				{
-					index = c * 6 + 3;
+					// write the position into (jointname)/pos:
+					std::stringstream strstr;
+					strstr << realtimeManager->_valuesBuffer[c * 3] << " " << realtimeManager->_valuesBuffer[c * 3 + 1] << " " << realtimeManager->_valuesBuffer[c * 3 + 2];
+					realtimeManager->setData(realtimeManager->_dataIndexMap[c], strstr.str());
 				}
-				SrMat yrot;
-				yrot.roty(realtimeManager->_valuesBuffer[index] * SR_PI / 180.0);
-				SrMat xrot;
-				xrot.rotx(realtimeManager->_valuesBuffer[index + 1] * SR_PI / 180.0);
-				SrMat zrot;
-				zrot.rotz(realtimeManager->_valuesBuffer[index + 2] * SR_PI / 180.0);
+				else
+				{
+					// write the rotation into (jointname)/rot:
+					int index = c * 3;
+					SrMat yrot;
+					yrot.roty(realtimeManager->_valuesBuffer[index] * SR_PI / 180.0);
+					SrMat xrot;
+					xrot.rotx(realtimeManager->_valuesBuffer[index + 1] * SR_PI / 180.0);
+					SrMat zrot;
+					zrot.rotz(realtimeManager->_valuesBuffer[index + 2] * SR_PI / 180.0);
 				
-				SrMat finalMat = zrot * xrot * yrot;
-				SrQuat finalQuat(finalMat);
+					SrMat finalMat = zrot * xrot * yrot;
+					SrQuat finalQuat(finalMat);
 			
-				std::stringstream strstr2;
-				strstr2 << finalQuat.w << " " << finalQuat.x << " " << finalQuat.y << " " << finalQuat.z;
-				realtimeManager->setData(realtimeManager->_dataIndexMap[c], strstr2.str());
+					std::stringstream strstr2;
+					strstr2 << finalQuat.w << " " << finalQuat.x << " " << finalQuat.y << " " << finalQuat.z;
+					realtimeManager->setData(realtimeManager->_dataIndexMap[c], strstr2.str());
+				}
 			}
 		}
 	}
+	else
+	{
+		// store the data in the realtime manager
+		for (size_t c = 0; c < realtimeManager->_dataIndexMap.size(); c++)
+		{
+			if (realtimeManager->_valuesBufferLength + 1 > (c * 6))
+			{
+				if (c == 0)
+				{
+					// write the position into (jointname)/pos:
+					std::stringstream strstr;
+					strstr << realtimeManager->_valuesBuffer[0] << " " << realtimeManager->_valuesBuffer[1] << " " << realtimeManager->_valuesBuffer[2];
+					realtimeManager->setData(realtimeManager->_dataIndexMap[c], strstr.str());
+
+					int index = 3;
+					// write the rotation into (jointname)/rot:
+					SrMat yrot;
+					yrot.roty(realtimeManager->_valuesBuffer[index] * SR_PI / 180.0);
+					SrMat xrot;
+					xrot.rotx(realtimeManager->_valuesBuffer[index + 1] * SR_PI / 180.0);
+					SrMat zrot;
+					zrot.rotz(realtimeManager->_valuesBuffer[index + 2] * SR_PI / 180.0);
+				
+					SrMat finalMat = zrot * xrot * yrot;
+					SrQuat finalQuat(finalMat);
+			
+					std::stringstream strstr2;
+					strstr2 << finalQuat.w << " " << finalQuat.x << " " << finalQuat.y << " " << finalQuat.z;
+					realtimeManager->setData(realtimeManager->_dataIndexMap[1], strstr2.str());
+
+
+
+				}
+				else
+				{
+					// write the rotation into (jointname)/rot:
+					int index = c * 6 + 3;
+					SrMat yrot;
+					yrot.roty(realtimeManager->_valuesBuffer[index] * SR_PI / 180.0);
+					SrMat xrot;
+					xrot.rotx(realtimeManager->_valuesBuffer[index + 1] * SR_PI / 180.0);
+					SrMat zrot;
+					zrot.rotz(realtimeManager->_valuesBuffer[index + 2] * SR_PI / 180.0);
+				
+					SrMat finalMat = zrot * xrot * yrot;
+					SrQuat finalQuat(finalMat);
+			
+					std::stringstream strstr2;
+					strstr2 << finalQuat.w << " " << finalQuat.x << " " << finalQuat.y << " " << finalQuat.z;
+					realtimeManager->setData(realtimeManager->_dataIndexMap[c + 1], strstr2.str());
+				}
+			}
+		}
+	}
+	
 }
 
 void SBRealtimeManager::myCommandDataReceived(void* customedObj, SOCKET_REF sender, CommandPack* pack, void* data)
