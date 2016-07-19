@@ -20,7 +20,7 @@
 #if USE_PERCEPTIONNEURON > 0
 #include <Windows.h>
 #include "NeuronDataReader.h"
-#include "SocketCommand.h"
+//#include "SocketCommand.h"
 #endif
 
 namespace SmartBody {
@@ -59,8 +59,8 @@ class SBRealtimeManager : public SBService
 		void stopPerceptionNeuron();
 		bool isPerceptionNeuronRunning();
 
-		static void CALLBACK myFrameDataReceived(void* customedObj, SOCKET_REF sender, BvhDataHeaderEx* header, float* data);
-		static void CALLBACK myCommandDataReceived(void* customedObj, SOCKET_REF sender, CommandPack* pack, void* data);
+		static void CALLBACK myFrameDataReceived(void* customedObj, SOCKET_REF sender, BvhDataHeader* header, float* data);
+		static void CALLBACK myCalculationDataReceived(void* customedObj, SOCKET_REF sender, CalcDataHeader* pack, float* data);
 		static void CALLBACK mySocketStatusChanged(void* customedObj, SOCKET_REF sender, SocketStatus status, char* message);
 #endif
 
