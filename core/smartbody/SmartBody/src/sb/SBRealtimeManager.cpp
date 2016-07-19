@@ -151,7 +151,7 @@ void SBRealtimeManager::update( double time )
 		if (m_sockTCPRef != 0)
 		{
 			//BRCommandFetchDataFromServer(m_sockTCPRef, Cmd_AvatarCount);
-			BRCommandFetchAvatarDataFromServer(m_sockTCPRef, 0, Cmd_AvatarCount);
+			//BRCommandFetchAvatarDataFromServer(m_sockTCPRef, 0, Cmd_AvatarCount);
 		}
 	}
 #endif
@@ -359,7 +359,7 @@ void SBRealtimeManager::notify(SBSubject* subject)
 void SBRealtimeManager::startPerceptionNeuron()
 {
 	BRRegisterFrameDataCallback(this, myFrameDataReceived);
-	BRRegisterCommandDataCallback(this, myCommandDataReceived);
+	BRRegisterCalculationDataCallback(this, myCalculationDataReceived);
 	BRRegisterSocketStatusCallback(this, mySocketStatusChanged);
 
 	if (BRGetSocketStatus(m_sockTCPRef) == CS_Running)
@@ -377,7 +377,7 @@ void SBRealtimeManager::startPerceptionNeuron()
 		return;
 	}
 	m_sockUDPRef = BRStartUDPServiceAt(7001);
-	BRRegisterAutoSyncParmeter(m_sockTCPRef, Cmd_AvatarCount);
+	//BRRegisterAutoSyncParmeter(m_sockTCPRef, Cmd_AvatarCount);
 	LOG("Connected to Perception Neuron!");
 
 
@@ -415,7 +415,7 @@ bool SBRealtimeManager::isPerceptionNeuronRunning()
 	}
 }
 
-void SBRealtimeManager::myFrameDataReceived(void* customedObj, SOCKET_REF sender, BvhDataHeaderEx* header, float* data)
+void SBRealtimeManager::myFrameDataReceived(void* customedObj, SOCKET_REF sender, BvhDataHeader* header, float* data)
 {
 	SBRealtimeManager* realtimeManager = (SBRealtimeManager*) customedObj;
 
@@ -536,8 +536,9 @@ void SBRealtimeManager::myFrameDataReceived(void* customedObj, SOCKET_REF sender
 	
 }
 
-void SBRealtimeManager::myCommandDataReceived(void* customedObj, SOCKET_REF sender, CommandPack* pack, void* data)
+void SBRealtimeManager::myCalculationDataReceived(void* customedObj, SOCKET_REF sender, CalcDataHeader* pack, float* data)
 {
+	/*
 	if (pack->CommandId == Cmd_BoneSize)
 	{
 		LOG("Cmd_BoneSize");
@@ -574,6 +575,7 @@ void SBRealtimeManager::myCommandDataReceived(void* customedObj, SOCKET_REF send
 	{
 		LOG("Cmd_UnRegisterEvent");
 	}
+	*/
 }
 
 void SBRealtimeManager::mySocketStatusChanged(void* customedObj, SOCKET_REF sender, SocketStatus status, char* message)
