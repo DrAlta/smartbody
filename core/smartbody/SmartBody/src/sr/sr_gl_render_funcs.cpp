@@ -398,8 +398,8 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			myGLDisable ( GL_POLYGON_SMOOTH );
 			#endif
 			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			//glAlphaFunc ( GL_GREATER, 0.0f ) ;
-			glAlphaFunc(GL_GREATER, 0.5f);
+			glAlphaFunc ( GL_GREATER, 0.0f ) ;
+			//glAlphaFunc(GL_GREATER, 0.5f);
 			myGLEnable(GL_CULL_FACE);
 	
 			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
@@ -421,24 +421,24 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 
 			if (showSkinWeight)
 			{
-				glDepthMask(GL_FALSE);
+				//glDepthMask(GL_FALSE);
 				glEnableClientState(GL_COLOR_ARRAY);
 				glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->skinColorBuf[0]);		
 				//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
 				myGLDisable(GL_LIGHTING);
 			}
-			else if (mesh->hasVertexColor)
-			{
-				glEnableClientState(GL_COLOR_ARRAY);
-				glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);		
-				//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
-				myGLDisable(GL_LIGHTING);
-
-#if defined(__ANDROID__)
-				glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
-				glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD);	
-#endif
-			}
+// 			else if (mesh->hasVertexColor)
+// 			{
+// 				glEnableClientState(GL_COLOR_ARRAY);
+// 				glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);		
+// 				//glColorPointer(3,GL_FLOAT, 0,  (GLfloat*)&mesh->meshColorBuf[0]);
+// 				myGLDisable(GL_LIGHTING);
+// 
+// #if defined(__ANDROID__)
+// 				glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+// 				glTexEnvf(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_ADD);	
+// #endif
+// 			}
 			else
 			{
 				glDisableClientState(GL_COLOR_ARRAY);
@@ -566,6 +566,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			}	
 			if (SmartBody::SBScene::getScene()->getBoolAttribute("drawMeshWireframe"))
 			{
+				glDisableClientState(GL_COLOR_ARRAY);
 				glDisable(GL_LIGHTING);
 				glColor3f(0.0f,0.0f,0.0f);
 				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

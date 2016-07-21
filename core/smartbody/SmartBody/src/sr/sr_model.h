@@ -162,8 +162,8 @@ class SrModel : public SrSharedClass
 	/*! Removes redundant normals, which are closer than the given angular distance. */
 	SBAPI void remove_redundant_texcoord ();
 
-    /*! Check and remove redundant vertices */
-    SBAPI void merge_redundant_vertices ( float prec );
+    /*! Check and remove redundant vertices, return the vertex map from old vertex indices to new indices */
+    SBAPI std::vector<int> merge_redundant_vertices ( float prec );
 
     /*! Reads a SrModel format. */
     SBAPI bool load ( SrInput &in );

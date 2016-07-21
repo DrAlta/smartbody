@@ -57,6 +57,10 @@ public:
 	std::vector<unsigned int>	weightIndex;	// looking up the weight according to this index
 	std::vector<unsigned int>	jointNameIndex;	// looking up the joint name according to this index
 
+	// skin weight buffer for easier access to skinning
+	std::vector<SrVec4i> boneIDs;
+	std::vector<SrVec4>  boneWeights;
+
 public:
 	SBAPI SkinWeight();
 	
@@ -64,6 +68,10 @@ public:
 	SBAPI void normalizeWeights();
 	SBAPI void copyWeights(SkinWeight* copy, const std::string& morphName);
 	SBAPI void initWeights(std::string sourceMesh, std::vector<SrVec4i>& boneID, std::vector<SrVec4>& boneWeights, std::vector<std::string>& boneJointNameList, std::vector<SrMat>& bindPoseMatList);
+
+	SBAPI void addWeight(SkinWeight* weight);
+	SBAPI void mergeRedundantWeight(std::vector<int>& vtxIdxMap);
+	SBAPI void buildSkinWeightBuf();
 };
 
 class SbmSubMesh
