@@ -383,7 +383,7 @@ void SrModel::remove_redundant_normals ( float dang )
     }
  }
 
-void SrModel::merge_redundant_vertices ( float prec )
+std::vector<int> SrModel::merge_redundant_vertices ( float prec )
  {
    prec = prec*prec;
    
@@ -392,15 +392,15 @@ void SrModel::merge_redundant_vertices ( float prec )
    int i, j;
 
    // build iarray marking replacements:
-   SrArray<int> iarray;
-   iarray.size ( vsize );
+   std::vector<int> iarray;
+   iarray.resize ( vsize );
    for ( i=0; i<vsize; i++ ) iarray[i]=i;
    
    for ( i=0; i<vsize; i++ )
-    for ( j=0; j<vsize; j++ )
-     { if ( i==j ) break; // keep i < j
+    for ( j=i+1; j<vsize; j++ )
+     { //if ( i==j ) break; // keep i < j
        if ( dist2(V[i],V[j])<prec ) // equal
-        { iarray[j]=i;
+        { iarray[j]=iarray[i];
         }
      }
 
@@ -414,20 +414,25 @@ void SrModel::merge_redundant_vertices ( float prec )
    // compress indices:   
    int ind=0;
    bool newv;
+   std::vector<int> newArrayMap(vsize);
    for ( i=0; i<vsize; i++ )
     { newv = iarray[i]==i? true:false;
       V[ind] = V[i];
-      iarray[i] = ind;
+      newArrayMap[i] = ind;
       if ( newv ) ind++;
     }
    V.resize ( ind );
-
    // fix face indices again:
    for ( i=0; i<fsize; i++ )
-    { F[i][0] = iarray[ F[i][0] ];
-      F[i][1] = iarray[ F[i][1] ];
-      F[i][2] = iarray[ F[i][2] ];
+    { F[i][0] = newArrayMap[ F[i][0] ];
+      F[i][1] = newArrayMap[ F[i][1] ];
+      F[i][2] = newArrayMap[ F[i][2] ];
     }
+
+   for (unsigned int i=0;i<iarray.size();i++)
+	   iarray[i] = newArrayMap[iarray[i]];
+
+   return iarray;
  }
 
 bool SrModel::load ( SrInput &in )
@@ -1198,9 +1203,13 @@ void SrModel::add_model ( const SrModel& m )
 	   bool newMat = true;
 	   mtlnames.push_back ( m.mtlnames[i] );
    }   
+   
+   // insert material map to texture name
+   mtlTextureNameMap.insert(m.mtlTextureNameMap.begin(), m.mtlTextureNameMap.end());
+   mtlNormalTexNameMap.insert(m.mtlNormalTexNameMap.begin(), m.mtlNormalTexNameMap.end());
+   mtlSpecularTexNameMap.insert(m.mtlSpecularTexNameMap.begin(), m.mtlSpecularTexNameMap.end());
 
-   validate();
-    
+   validate(); 
 //    save(sr_out);
  }
 

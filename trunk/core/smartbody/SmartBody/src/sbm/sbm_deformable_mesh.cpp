@@ -160,6 +160,152 @@ SBAPI void SkinWeight::initWeights(std::string srcMesh, std::vector<SrVec4i>& bo
 	}
 }
 
+SBAPI void SkinWeight::addWeight( SkinWeight* weight )
+{
+	std::map<std::string, int> newJointMap;
+	// initialize with original map
+	for (unsigned int i=0;i<infJointName.size();i++)
+	{
+		newJointMap[infJointName[i]] = i;
+	}
+	// add new joints from input weight
+	int indexCount = newJointMap.size();
+	for (unsigned int i=0;i<weight->infJointName.size();i++)
+	{
+		std::string jointName = weight->infJointName[i];
+		if (newJointMap.find(jointName) == newJointMap.end()) // add new joint
+		{
+			newJointMap[jointName] = indexCount;
+			// update new joint name and bind pose matrix
+			infJointName.push_back(jointName);
+			bindPoseMat.push_back(weight->bindPoseMat[i]);
+			indexCount++;
+		}
+	}
+	// append bind weights
+	int weightIdxOffset = bindWeight.size();
+	bindWeight.insert(bindWeight.end(), weight->bindWeight.begin(), weight->bindWeight.end());
+	numInfJoints.insert(numInfJoints.end(), weight->numInfJoints.begin(), weight->numInfJoints.end());
+	for (unsigned int i=0;i<weight->weightIndex.size();i++)
+		weightIndex.push_back(weight->weightIndex[i] + weightIdxOffset);
+	for (unsigned int i=0;i<weight->jointNameIndex.size();i++)
+	{
+		int newJointNameIdx = newJointMap[weight->infJointName[weight->jointNameIndex[i]]];
+		jointNameIndex.push_back(newJointNameIdx);
+	}
+}
+
+SBAPI void SkinWeight::mergeRedundantWeight( std::vector<int>& vtxIdxMap )
+{
+	if (vtxIdxMap.size() != numInfJoints.size())
+	{
+		LOG("Warning!! mergeRedundantWeight() : vtxIdxMap.size() != numInfJoint.size()");
+		return;
+	}
+	
+	std::vector<unsigned int>	newNumInfJoints;	// number of influenced joints for very vertex
+	std::vector<unsigned int>	newWeightIdx;	// looking up the weight according to this index
+	std::vector<unsigned int>	newJointNameIdx;	// looking up the joint name according to this index
+
+	int icount = 0;	
+	for (unsigned int i=0;i<vtxIdxMap.size();i++)
+	{
+		int numJoint = numInfJoints[i];
+		int newIdx = vtxIdxMap[i];
+		if (newIdx >= newNumInfJoints.size())
+		{
+			newNumInfJoints.push_back(numJoint);
+			for (int k=0;k<numJoint;k++)
+			{
+				newWeightIdx.push_back(weightIndex[icount+k]);
+				newJointNameIdx.push_back(jointNameIndex[icount+k]);
+			}
+		}
+		icount += numJoint;
+	}
+
+	// remove unuse binding weights
+	/* 
+	std::vector<bool> useBindWeight(bindWeight.size(), false);
+	for (unsigned int i=0;i<newWeightIdx.size();i++)
+		useBindWeight[newWeightIdx[i]] = true;
+
+	std::vector<int> weightIdxMap(bindWeight.size(),-1);
+	std::vector<float> newBindWeight;
+	int idx = 0;
+	for (unsigned int i=0;i<useBindWeight.size();i++)
+	{
+		if (useBindWeight[i])
+		{
+			newBindWeight.push_back(bindWeight[i]);
+			weightIdxMap[i] = idx++;
+		}
+	}
+	for (unsigned int i=0;i<newWeightIdx.size();i++)
+	{
+		newWeightIdx[i] = weightIdxMap[newWeightIdx[i]];
+	}
+	
+	bindWeight = newBindWeight;
+	*/
+
+	numInfJoints = newNumInfJoints;
+	weightIndex = newWeightIdx;
+	jointNameIndex = newJointNameIdx;
+}
+
+SBAPI void SkinWeight::buildSkinWeightBuf()
+{
+	int numSkinVtxs = numInfJoints.size();
+	boneIDs.resize(numSkinVtxs);
+	boneWeights.resize(numSkinVtxs);
+	int globalCounter = 0;
+	for (int i = 0; i < numInfJoints.size() ; i++)
+	{
+		int numOfInfJoints = numInfJoints[i];
+		
+		boneIDs[i] = SrVec4i(0,0,0,0);
+		boneWeights[i] = SrVec4(0,0,0,0);
+	
+		std::vector<IntFloatPair> weightList;
+		if (infJointName.size() > 0)
+		{
+			for (int j = 0; j < numOfInfJoints; j++)
+			{
+				const std::string& curJointName = infJointName[jointNameIndex[globalCounter]];					
+				float jointWeight = bindWeight[weightIndex[globalCounter]];
+				int    jointIndex = jointNameIndex[globalCounter];
+				weightList.push_back(IntFloatPair(jointIndex,jointWeight));							
+				globalCounter ++;									
+			}
+		}
+		std::sort(weightList.begin(),weightList.end(),intFloatComp); // sort for minimum weight
+		int numWeight = numOfInfJoints > 4 ? 4 : numOfInfJoints;
+		float weightSum = 0.f;
+		SrVec skinColor;
+		for (int j=0;j<numWeight;j++)
+		{
+			if (j >= (int)weightList.size())
+				continue;
+			IntFloatPair& w = weightList[j];
+
+			if ( j < 4)
+			{
+				boneIDs[i][j] = w.first;
+				boneWeights[i][j] = w.second;
+				weightSum += w.second;
+			}
+		}
+		if (weightSum != 0)
+		{
+			for (int j=0;j<4;j++)
+			{
+				boneWeights[i][j] /= weightSum;
+			}
+		}
+	}
+}
+
 
 DeformableMesh::DeformableMesh() : SBAsset()
 {	
@@ -2453,8 +2599,8 @@ void DeformableMeshInstance::update()
 	updateTransformBuffer();
 	return;
 #endif
-	//updateFast();
-	//return;
+	updateFast();
+	return;
 
 	int maxJoint = -1;
 	std::vector<SkinWeight*>& skinWeights = _mesh->skinWeights;
