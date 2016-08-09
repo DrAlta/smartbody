@@ -61,6 +61,7 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 	
 	std::map<std::string, SrQuat> jointRotationMap;
 	std::queue<std::string> jointQueues;
+	std::map<std::string, bool> processJoints;
 	std::string rootName = "base";
 	//jointQueues.push(interSk->root()->name());	
 	jointQueues.push(rootName);
@@ -85,6 +86,7 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 		if ( isRelativeJoint && targetJoint) 
 		{
 			// don't change the t-pose for these joints
+			processJoints[pjointName] = true;
 			for (int i=0;i<targetJoint->num_children();i++)
 			{					
 				jointQueues.push(targetJoint->child(i)->getMappedJointName());
@@ -92,11 +94,13 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 		}	
 		else if ( isEndJoint && targetJoint)
 		{
+			processJoints[pjointName] = true;
 			// stop aligning children
 		}
 		else
 		{
 			SkMotion::convertBoneOrientation(pjointName, interSk, tempSrcSk, endJoints);
+			processJoints[pjointName] = true;
 			interSk->invalidate_global_matrices();
 			interSk->update_global_matrices();
 			SkJoint* pjoint = interSk->search_joint(pjointName.c_str());	
@@ -139,7 +143,15 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 			SrQuat finalPostQuat = gsrc.inverse()*gdst;
 			
 			SrQuat finalRot = finalPreQuat*finalPostQuat;
-			jointPrePostRotMap[jname] = QuatPair(finalPreQuat,finalPostQuat);
+			if (processJoints.find(jname) != processJoints.end())
+			{
+				jointPrePostRotMap[jname] = QuatPair(finalPreQuat,finalPostQuat);
+			}
+			else
+			{
+				jointPrePostRotMap[jname] = QuatPair(SrQuat(), SrQuat());
+			}
+			
 
 
 			//final_q = protDst*gdst.inverse()*gsrc*protSrc.inverse()*q_orig*gsrc.inverse()*gdst;
@@ -239,7 +251,7 @@ SrQuat SBRetarget::applyRetargetJointRotation( std::string jointName, SrQuat& in
 			//outQuat = qpair.first*qpair.second;
 			outQuat = SrQuat();
 #if ELITE_HACK
-			SrQuat newInQuat = SrQuat(inQuat.axisAngle());
+			SrQuat newInQuat = SrQuat(inQuat.axisAngle()*0.5f);
 			jointAddRotMap[jointName] = newInQuat;
 #endif
 		}

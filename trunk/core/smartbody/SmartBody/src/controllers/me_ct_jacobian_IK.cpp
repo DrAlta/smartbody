@@ -268,7 +268,7 @@ int MeCtIKTreeScenario::traverseJoint(SkJoint* joint, MeCtIKTreeNode* jointNode,
 		{
 			nNodes += 1; // don't traverse their children
 		}
-		else if (std::find(stopJoints.begin(),stopJoints.end(), child->jointName()) != stopJoints.end()) // stop joints
+		else if (std::find(stopJoints.begin(),stopJoints.end(), child->getMappedJointName()) != stopJoints.end()) // stop joints
 		{
 			nNodes += 1;
 		}
