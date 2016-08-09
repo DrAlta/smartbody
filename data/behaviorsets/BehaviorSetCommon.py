@@ -10,6 +10,7 @@ def createRetargetInstance(srcSkelName, tgtSkelName):
 	endJoints.append('r_wrist')
 
 	relativeJoints = StringVec();
+	relativeJoints.append('JtPelvis')
 	relativeJoints.append('spine1')
 	relativeJoints.append('spine2')
 	relativeJoints.append('spine3')
