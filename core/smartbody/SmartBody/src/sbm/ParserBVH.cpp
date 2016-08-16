@@ -92,12 +92,17 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 
 	while(!file.eof() && file.good())
 	{
-		file.getline(line, 8192, '\n');
-                // remove any trailing \r
-                if (line[strlen(line) - 1] == '\r')
-                        line[strlen(line) - 1] = '\0';
-		if (strlen(line) == 0) // ignore blank lines
+		file.getline(line, 8192, '');
+		size_t sLen = strlen(line);
+                
+		// remove any trailing
+		while (sLen && (line[sLen - 1] == ''))
+			line[--sLen] = '\0';
+                
+		// ignore blank lines
+		if (!sLen)
 			continue;
+
 		switch (state)
 		{
 			case 0:	// looking for 'HIERARCHY'
