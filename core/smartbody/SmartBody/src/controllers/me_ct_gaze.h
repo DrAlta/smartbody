@@ -424,7 +424,7 @@ class MeCtGaze : public SmartBody::SBController	{
 		SkJoint*	offset_ref_joint( void );
 #endif
 		gwiz::vector_t	world_target_point( void );
-		gwiz::quat_t		world_target_orient( void );
+		gwiz::quat_t	world_target_orient( void );
 		
 		virtual void controller_start();
 		void controller_start_evaluate();
@@ -435,6 +435,7 @@ class MeCtGaze : public SmartBody::SBController	{
 public:
 		int getStart();
 		void setStart(int val);
+		void set_fading_normal( float nrml )	{ fading_normal = nrml; }	//II
 
 		bool isFadingIn();
 		bool isFadingOut();

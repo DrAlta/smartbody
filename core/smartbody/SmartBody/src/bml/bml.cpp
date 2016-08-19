@@ -31,7 +31,6 @@
 #include <iostream>
 #include <algorithm>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/lexical_cast.hpp>
 
 
 #include "bml_exception.hpp"
@@ -2348,14 +2347,25 @@ GazeRequest::GazeRequest(   float interval, int mode, const std::string& unique_
 
 void GazeRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
-	// if this is a gaze with a handle and it is already running, don't do anything
+	// Check we've a char
 	const SbmCharacter* character = request->actor;
-	if (character)
-	{
-		MeControllerTreeRoot* controllerTree = character->ct_tree_p;
-		MeController* controller = controllerTree->findControllerByHandle(anim_ct->handle());
-		MeCtGaze* gazeCt = dynamic_cast<MeCtGaze*>( controller );
-		if (gazeCt && gazeFadeInterval <= 0.0f && !hasGazeSchedule)
+	if (!character) return;
+
+	// get existed controller
+	MeControllerTreeRoot* controllerTree = character->ct_tree_p;
+	MeController* controller = controllerTree->findControllerByHandle(anim_ct->handle());
+	MeCtGaze* gazeCt = dynamic_cast<MeCtGaze*>( controller );
+	
+	// if this is a gaze with a handle and it is already running, don't do anything
+	if (gazeCt && (gazeFadeInterval <= 0.0f) && !hasGazeSchedule)
+		return;
+
+	// add the gaze controller if we've not it
+	if (!gazeCt) {
+		MeControllerRequest::realize_impl(request, scene);
+		controller = controllerTree->findControllerByHandle(anim_ct->handle());
+		gazeCt = dynamic_cast<MeCtGaze*>( controller );
+		if (!gazeCt)
 			return;
 	}
 
@@ -2370,58 +2380,31 @@ void GazeRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene
 
 	if (gazeFadeInterval > 0.0f)
 	{
-		// what's difference between anim_ct and gazeCt queried from controller tree?? 
-		// apparently anim_ct doesn't work
-		// need to figure out why. -Yuyu 09/04/2012
-		MeCtGaze* gazeCt = NULL;
-		const SbmCharacter* character = request->actor;
-		if (character)	{
-			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
-			MeController* controller = controllerTree->findControllerByHandle(anim_ct->handle());
-			gazeCt = dynamic_cast<MeCtGaze*>( controller );
-		}
-		if (gazeCt)
+		if (gazeFadeMode == 0)
 		{
-			if (gazeFadeMode == 0)
-			{
-				if (fabs(timeOffset) > gwiz::epsilon10())
-					gazeCt->set_fade_out_scheduled(gazeFadeInterval, timeOffset);
-				else if (!gazeCt->isFadingOut())
-					gazeCt->set_fade_out(gazeFadeInterval);
-			}
-			if (gazeFadeMode == 1)
-			{
-				if (fabs(timeOffset) > gwiz::epsilon10())
-					gazeCt->set_fade_in_scheduled(gazeFadeInterval, timeOffset);
-				else if (!gazeCt->isFadingIn())
-					gazeCt->set_fade_in(gazeFadeInterval);
-			}
+			if (fabs(timeOffset) > gwiz::epsilon10())
+				gazeCt->set_fade_out_scheduled(gazeFadeInterval, timeOffset);
+			else if (!gazeCt->isFadingOut())
+				gazeCt->set_fade_out(gazeFadeInterval);
+		}
+		if (gazeFadeMode == 1)
+		{
+			gazeCt->set_fading_normal(0.0f);	//II
+			
+			if (fabs(timeOffset) > gwiz::epsilon10())
+				gazeCt->set_fade_in_scheduled(gazeFadeInterval, timeOffset);
+			else if (!gazeCt->isFadingIn())
+				gazeCt->set_fade_in(gazeFadeInterval);
 		}
 		if (hasGazeSchedule)
 		{
 			gazeCt->setGazeSchedule(timeOffset, gazeSchedule);
 		}
 	}
-	else if (hasGazeSchedule)
-	{
-		MeCtGaze* gazeCt = NULL;
-		const SbmCharacter* character = request->actor;
-		if (character)	{
-			MeControllerTreeRoot* controllerTree = character->ct_tree_p;
-			MeController* controller = controllerTree->findControllerByHandle(anim_ct->handle());
-			gazeCt = dynamic_cast<MeCtGaze*>( controller );
-			if (gazeCt)
-				gazeCt->setGazeSchedule(timeOffset + curTime, gazeSchedule);
-
-		}
-		
-	}
 	else
-	{
-		MeControllerRequest::realize_impl(request, scene);
-	}
+		if (hasGazeSchedule)
+			gazeCt->setGazeSchedule(timeOffset + curTime, gazeSchedule);
 }
-
 
 // SequenceRequest
 SequenceRequest::SequenceRequest( const std::string& unique_id, const std::string& local, const BehaviorSyncPoints& syncs_in,

@@ -1218,6 +1218,11 @@ bool MeCtGaze::update_fading( float dt )	{
 				{
 					//LOG("fade in!");
 					set_fade_in(iter->second.fadingInterval);
+				
+				//II set zeros for FADING_MODE_IN
+					for( int i = 0; i < joint_key_count; i++ )
+						set_blend( i, 0.0 );
+				//
 				}
 			if (iter->second.fadingMode == FADING_MODE_OUT)
 				if (!isFadingOut())
@@ -1252,6 +1257,7 @@ bool MeCtGaze::update_fading( float dt )	{
 
 				float s = key_p->smooth;
 				float blend = s * key_p->blend_weight + ( 1.0f - s ) * fading_normal;
+
 				set_blend( i, blend );
 				if( blend < min_val )	{
 					min_val = blend;
