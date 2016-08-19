@@ -16,7 +16,6 @@ namespace SmartBody
 
 SBPhysicsSim::SBPhysicsSim(void)
 {
-	
 	SBObject::createDoubleAttribute("dT",0.0003, true, "Basic", 20, false, false, false, "?");
 	SBObject::createDoubleAttribute("gravity",980, true, "Basic", 20, false, false, false, "?");
 	SBObject::createDoubleAttribute("Ks",230000, true, "Basic", 20, false, false, false, "?");
@@ -570,6 +569,8 @@ void SbmJointObj::handleCollision( SrVec contactPt, SBPhysicsObj* colObj )
 
 SBPhysicsCharacter::SBPhysicsCharacter()
 {
+	root = NULL;
+
 	SBObject::createBoolAttribute("enable",false,true, "Basic", 20, false, false, false, "?");	
 	SBObject::createBoolAttribute("kinematicRoot",false,true, "Basic", 20, false, false, false, "?");	
 	SBObject::createBoolAttribute("usePD",false,true, "Basic", 20, false, false, false, "?");	
@@ -688,10 +689,12 @@ void SBPhysicsCharacter::initPhysicsCharacter( std::string& charName, std::vecto
 		  ji++)
 	{
 		SBPhysicsJoint* phyJ = ji->second;
-		if (!phyJ->getParentObj()) root = phyJ;
+		if (!phyJ->getParentObj())
+			root = phyJ;
 		updateJointAxis(phyJ);
 	}
-	root->updateTotalSupportMass();
+	if (root)
+		root->updateTotalSupportMass();
 }
 
 void SBPhysicsCharacter::cleanUpJoints()
