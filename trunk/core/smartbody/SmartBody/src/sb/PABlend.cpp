@@ -257,6 +257,10 @@ bool PABlend::getWeightsFromParameters(double x, double y, std::vector<double>& 
 		int id1 = getMotionId(triangles[i].motion1);
 		int id2 = getMotionId(triangles[i].motion2);
 		int id3 = getMotionId(triangles[i].motion3);
+		if (id1 < 0 ||
+			id2 < 0 || 
+			id3 < 0)
+			return false;
 		bool in = insideTriangle(point, v1, v2, v3);
 		if (in)
 		{
