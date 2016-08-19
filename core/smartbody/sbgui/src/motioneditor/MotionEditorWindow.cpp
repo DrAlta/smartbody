@@ -1,6 +1,8 @@
 #include "MotionEditorWindow.h"
 #include <sb/SBScene.h>
 #include <sb/SBBmlProcessor.h>
+#include <sb/SBJointMapManager.h>
+#include <sb/SBJointMap.h>
 #include <FL/Fl_File_Chooser.H>
 #include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -30,10 +32,17 @@ MotionEditorWindow::MotionEditorWindow(int x, int y, int w, int h, char* label) 
          _buttonQueryAnims = new Fl_Button(320, 140, 80, 20, "Query Anims");
 		   _buttonQueryAnims->callback(OnButtonQueryAnims, this);
       }
-		_buttonPlayMotion = new Fl_Button(320, 165, 80, 20, "Play");
+		_buttonPlayMotion = new Fl_Button(320, 90, 80, 20, "Play");
 		_buttonPlayMotion->callback(OnButtonPlayMotion, this);
-		 _buttonPlayMotion = new Fl_Button(320, 190, 80, 20, "Set Posture");
+		_buttonPlayMotion = new Fl_Button(320, 115, 80, 20, "Set Posture");
 		_buttonPlayMotion->callback(OnButtonSetPosture, this);
+
+		_choiceJointMapList = new Fl_Choice(320, 165, 80, 20, "Joint Maps");
+		_choiceJointMapList->callback(OnChoiceJointMapList, this);
+		_choiceJointMapList->align(FL_ALIGN_TOP);
+		_buttonJointMap = new Fl_Button(320, 190, 80, 20, "Map Motion");
+		_buttonJointMap->callback(OnButtonJointMap, this);
+
 		_checkButtonPlayMotion = new Fl_Check_Button(10, 240, 50, 20, "Scrub");
 		_checkButtonPlayMotion->callback(OnCheckButtonPlayMotion, this);
 		_checkButtonPlayMotion->deactivate();
@@ -312,6 +321,20 @@ void MotionEditorWindow::loadMotions()
 		_browserMotionList->add(motionNames[i].c_str());
 		if (_selectedMotion == motionNames[i])
 			_browserMotionList->value(i);
+	}
+
+	// load the joint maps
+	_choiceJointMapList->clear();
+	std::vector<std::string> jointMapNames = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMapNames();
+	int i = 0;
+	for (std::vector<std::string>::iterator iter = jointMapNames.begin();
+		 iter != jointMapNames.end();
+		 iter++)
+	{
+		_choiceJointMapList->add((*iter).c_str());
+		if (_selectedJointMap == jointMapNames[i])
+				_choiceJointMapList->value(i);
+		i++;
 	}
 }
 
@@ -962,4 +985,41 @@ void MotionEditorWindow::OnObjectDelete( SmartBody::SBObject* object )
 		redraw();
 		return;
 	}
+}
+
+void MotionEditorWindow::OnChoiceJointMapList(Fl_Widget* widget, void* data)
+{
+	MotionEditorWindow* editor = (MotionEditorWindow*) data;
+
+	int selected = editor->_choiceJointMapList->value();
+	if (selected >= 0)
+	{
+		editor->_selectedJointMap = editor->_choiceJointMapList->text(selected);
+	}
+}
+
+void MotionEditorWindow::OnButtonJointMap(Fl_Widget* widget, void* data)
+{
+	// make sure the joint map exists
+	MotionEditorWindow* editor = (MotionEditorWindow*) data;
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+
+	SmartBody::SBJointMap* jointMap = SmartBody::SBScene::getScene()->getJointMapManager()->getJointMap(editor->_selectedJointMap);
+	if (!jointMap)
+	{
+		fl_alert("No joint map named %s.", editor->_selectedJointMap.c_str());
+		editor->loadMotions();
+		return;
+	}
+
+	SmartBody::SBMotion* motion = scene->getMotion(editor->_selectedMotion);
+	if (!motion)
+	{
+		fl_alert("No motion named %s", motion->getName().c_str());
+		editor->loadMotions();
+		return;
+	}
+
+	jointMap->applyMotion(motion);
 }

@@ -58,6 +58,9 @@ public:
 	static void OnButtonStopGaze(Fl_Widget* widget, void* data);
 	static void OnAnimationFilterTextChanged(Fl_Widget* widget, void* data);
 
+	static void OnChoiceJointMapList(Fl_Widget* widget, void* data);
+	static void OnButtonJointMap(Fl_Widget* widget, void* data);
+
 	void updateSyncPointsUI();
 	void updateMotionSyncPoints(const std::string& type);
 	static void OnSliderSyncPoints(Fl_Widget* widget, void* data);
@@ -89,6 +92,9 @@ public:
 	Fl_Input*			_inputFilePath;
 	Fl_Input*			_animationSearchFilter;
 	Fl_Button*			_buttonPlayMotionFolder;
+
+	Fl_Choice*			_choiceJointMapList;
+	Fl_Button*			_buttonJointMap;
 
 	// meta information
 	Fl_Group*			_groupMetaInfo;
@@ -122,6 +128,7 @@ public:
 	std::string _selectedCharacter;
 	std::string _selectedGazeTarget;
 	std::string _selectedMotion;
+	std::string _selectedJointMap;
 	bool _isScrubbing;
 	double _scrubTime;
 
