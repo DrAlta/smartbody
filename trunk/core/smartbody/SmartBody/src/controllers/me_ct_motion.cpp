@@ -369,8 +369,8 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 			retarget = scene->getRetargetManager()->getRetarget(sbMotion->getMotionSkeletonName(),_character->getSkeleton()->getName());	
 		if (retarget)
 		{
-			SrVec leftSholderRot = _character->getVec3Attribute("leftSholderOffset");
-			SrVec rightSholderRot = _character->getVec3Attribute("rightSholderOffset");
+			SrVec leftSholderRot = _character->getVec3Attribute("leftShoulderOffset");
+			SrVec rightSholderRot = _character->getVec3Attribute("rightShoulderOffset");
 			SrQuat lShlderQuat(leftSholderRot);
 			SrQuat rShlderQuat(rightSholderRot);
 			retarget->addJointRotOffset("l_shoulder",lShlderQuat);
