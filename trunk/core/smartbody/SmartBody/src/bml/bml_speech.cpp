@@ -1700,7 +1700,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 	audioStop = speech_impl->getSpeechStopCommand( speech_request_id, actor );
 	audioFile = speech_impl->getSpeechAudioFilename(speech_request_id);
 	// save the audio file on the character
-	actor->setStringAttribute("lastAudioFile", audioFile)
+	actor->setStringAttribute("lastAudioFile", audioFile);
 	
 	if( LOG_AUDIO ) {
 		cout << "DEBUG: BML::SpeechRequest::processReply(): audioPlay = " << audioPlay << endl;
