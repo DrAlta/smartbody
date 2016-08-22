@@ -66,6 +66,7 @@ namespace BML {
 
 		std::string			   audioPlay;
 		std::string			   audioStop;
+		std::string			   audioFile;
 
 		std::string				speechXML;
 		std::string				speechText;

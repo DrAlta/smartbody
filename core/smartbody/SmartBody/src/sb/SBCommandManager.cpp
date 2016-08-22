@@ -272,7 +272,8 @@ void SBCommandManager::registerCallbacks()
 	insert( "sbmdebugger", mcu_sbmdebugger_func );
 
 	insert( "text_speech", text_speech::text_speech_func ); // [BMLR]
-
+	insert( "triggerevent",		   deprecatedMessage );
+	
 	/*
 	// deprecated callbacks
 	insert( "help",					deprecatedMessage);
@@ -283,7 +284,6 @@ void SBCommandManager::registerCallbacks()
 	insert( "syncpolicy",          deprecatedMessage );
 	insert( "adjustmotion",		   deprecatedMessage);
 	insert( "mediapath",		   deprecatedMessage);
-	insert( "triggerevent",		   deprecatedMessage );
 	insert( "addevent",			   deprecatedMessage );
 	insert( "removeevent",		   deprecatedMessage );
 	insert( "enableevents",	       deprecatedMessage );
