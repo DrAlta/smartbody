@@ -67,6 +67,7 @@ public:
 	Fl_Button* _buttonShowStats;
 	Fl_Button* _buttonNormalize;
 	Fl_Button* _buttonRefreshCharacter;
+	Fl_Button* _buttonSetAudioLocation;
 	Fl_Button* _buttonDump;
 	Fl_Input* _inputUtterance;
 	Fl_Input* _inputAudioFile;
@@ -133,6 +134,7 @@ public:
 	static void OnStatsResetCB(Fl_Widget* widget, void* data);
 	static void OnGatherStatsCB(Fl_Widget* widget, void* data);
 	static void OnCharacterRefreshCB(Fl_Widget* widget, void* data);
+	static void OnSetAudioPathCB(Fl_Widget* widget, void* data);	
 	static void OnDumpCB(Fl_Widget* widget, void* data);
 	static void OnNormalizeCB(Fl_Widget* widget, void* data);
 	static void OnRunTimeCurvesCB(Fl_Widget* widget, void* data);

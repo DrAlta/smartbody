@@ -71,6 +71,9 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_buttonRefreshCharacter = new Fl_Button(180, 35, 80, 25, "Refresh");
 	_buttonRefreshCharacter->callback(OnCharacterRefreshCB, this);
 
+	_buttonSetAudioLocation = new Fl_Button(260, 35, 60, 25, "Audio Path...");
+	_buttonSetAudioLocation->callback(OnSetAudioPathCB, this);
+
 	_checkStats = new Fl_Check_Button(330, 35, 100, 25, "Gather Stats");
 	_checkStats->callback(OnGatherStatsCB, this);
 
@@ -1279,6 +1282,39 @@ void VisemeViewerWindow::OnCharacterRefreshCB(Fl_Widget* widget, void* data)
 	viewer->OnCharacterSelectCB(widget, data);
 	viewer->loadAudioFiles();
 	viewer->redraw();
+}
+
+void VisemeViewerWindow::OnSetAudioPathCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*)data;
+
+	SmartBody::SBCharacter* character = viewer->getCurrentCharacter();
+
+	if (!character)
+	{
+		fl_alert("Please select a character before setting its path.");
+		return;
+	}
+
+
+	const char* audioDir = fl_dir_chooser("Output Dir", ".", 1);
+	if (!audioDir)
+		return;
+
+#if (BOOST_VERSION > 104400)
+	boost::filesystem::path abs_p = boost::filesystem::absolute(audioDir);
+#else
+	boost::filesystem::path abs_p = boost::filesystem::complete(audioDir);
+#endif
+
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	scene->removeAllAssetPaths("audio");
+	scene->addAssetPath("audio", abs_p.string());
+
+	character->setStringAttribute("voice", "audiofile");
+	character->setStringAttribute("voiceCode", ".");
+
+	VisemeViewerWindow::OnCharacterRefreshCB(viewer->_buttonRefreshCharacter, viewer);
 }
 
 void VisemeViewerWindow::OnDumpCB(Fl_Widget* widget, void* data)
