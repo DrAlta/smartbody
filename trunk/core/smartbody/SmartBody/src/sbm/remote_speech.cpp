@@ -566,13 +566,8 @@ char*  remote_speech::getSpeechAudioFilename( RequestId requestId ){
 	char* retSoundFile= new char[soundFile.length() + 1];
 	strcpy(retSoundFile, soundFile.c_str());
 	char* justName= new char[soundFile.length()-22];
-	for(unsigned int p=0; p<(soundFile.length()-22); p++) //basically cuts off the path information and just returns the audio file name
-	{
-		justName[p]= retSoundFile[23+p];
-	}
-
-
-	return (justName);
+	
+	return retSoundFile;
 }
 
 int remoteSpeechResult_func( srArgBuffer& args, SmartBody::SBCommandManager* manager ) { //this function is not a member function of remote_speech; it waits for and processes the RemoteSpeechReply
