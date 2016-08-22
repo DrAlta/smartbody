@@ -696,12 +696,35 @@ int main( int argc, char **argv )	{
 	// look for a file called .smartbodysettings in the current directory
 	// to determine the initial settings
 	std::ifstream settingsFile(".smartbodysettings");
-
+	// look for a .smartbodysettings file in the current folder
+	std::string binaryLocation = argv[0];
+	boost::filesystem::path path(binaryLocation);
+	boost::filesystem::path parentPath = path.parent_path();
+	bool useBinaryPath = false;
 	if (!settingsFile.good())
 	{
-		LOG("Did not find .smartbodysettings in current directory, using default paths.");
+		LOG("Did not find .smartbodysettings in current directory, checking binary location.");
+		
+		boost::filesystem::path settingsPath = parentPath;
+		settingsPath.append(".smartbodysettings");
+		settingsFile.close();
+		settingsFile.open(boost::filesystem::complete(settingsPath).string());
+		if (!settingsFile.good())
+		{
+			LOG("Did not find .smartbodysettings in binary directory, using defaults.");
+		}
+		else
+		{
+			LOG("Found .smartbodysettings file in binary folder.");
+			useBinaryPath = true;
+		}
 	}
 	else
+	{
+		LOG("Found .smartbodysettings file in current folder.");
+	}
+
+	if (settingsFile.good())
 	{
 		boost::filesystem::path settingsPath(".smartbodysettings");
 		// save the .smartbodysettings file location
@@ -726,7 +749,23 @@ int main( int argc, char **argv )	{
 					{
 						python_lib_path = tokens[t + 1];
 						LOG("Setting Python Library path to %s", tokens[t + 1].c_str());
-						SmartBody::SBScene::setSystemParameter("pythonlibpath", python_lib_path);
+						if (useBinaryPath)
+						{
+							boost::filesystem::path pythonFolderPath = parentPath;
+							pythonFolderPath.append(python_lib_path);
+							std::string absPath = boost::filesystem::canonical(pythonFolderPath).string();
+#ifdef WIN32
+							absPath = vhcl::Replace(absPath, "\\", "/");
+#endif
+							python_lib_path = absPath;
+							LOG("pythonlibpath = %s", absPath.c_str());
+							SmartBody::SBScene::setSystemParameter("pythonlibpath", absPath);
+						}
+						else
+						{
+							LOG("pythonlibpath = %s", python_lib_path);
+							SmartBody::SBScene::setSystemParameter("pythonlibpath", python_lib_path);
+						}
 						t++;
 					}
 					
@@ -736,7 +775,22 @@ int main( int argc, char **argv )	{
 					if (tokens.size() > t + 1)
 					{
 						LOG("Setting Ogre path to %s", tokens[t + 1].c_str());
-						SmartBody::SBScene::setSystemParameter("ogrepath", tokens[t + 1]);
+						if (useBinaryPath)
+						{
+							boost::filesystem::path ogreFolderPath = parentPath;
+							ogreFolderPath.append(tokens[t + 1]);
+							std::string absPath = boost::filesystem::canonical(ogreFolderPath).string();
+#ifdef WIN32
+							absPath = vhcl::Replace(absPath, "\\", "/");
+#endif
+							LOG("ogrepath = %s", absPath.c_str());
+							SmartBody::SBScene::setSystemParameter("ogrepath", absPath);
+						}
+						else
+						{
+							LOG("ogrepath = %s", tokens[t + 1]);
+							SmartBody::SBScene::setSystemParameter("ogrepath", tokens[t + 1]);
+						}
 						t++;
 					}
 					
@@ -747,7 +801,23 @@ int main( int argc, char **argv )	{
 					{
 						mediaPath = tokens[t + 1];
 						LOG("Setting mediapath to %s", tokens[t + 1].c_str());
-						SmartBody::SBScene::setSystemParameter("mediapath", mediaPath);
+						if (useBinaryPath)
+						{
+							boost::filesystem::path mediaFolderPath = parentPath;
+							mediaFolderPath.append(mediaPath);
+							std::string absPath = boost::filesystem::canonical(mediaFolderPath).string();
+#ifdef WIN32
+							absPath = vhcl::Replace(absPath, "\\", "/");
+#endif
+							LOG("mediapath = %s", absPath.c_str());
+							mediaPath = absPath;
+							SmartBody::SBScene::setSystemParameter("mediapath", absPath);
+						}
+						else
+						{
+							LOG("mediapath = %s", mediaPath.c_str());
+							SmartBody::SBScene::setSystemParameter("mediapath", mediaPath);
+						}
 						t++;
 					}
 				}
@@ -807,8 +877,8 @@ int main( int argc, char **argv )	{
 	std::vector<std::string> envNames;
 	std::vector<std::string> envValues;
 
-	int i;
-	for (	i=1; i<argc; i++ )
+	std::string logFile = "./smartbody.log";
+	for (int i=1; i<argc; i++ )
 	{
 		LOG( "SmartBody ARG[%d]: '%s'", i, argv[i] );
 		std::string s = argv[i];
@@ -1012,6 +1082,16 @@ int main( int argc, char **argv )	{
 				renderer = s;
 				renderer.erase( 0, 10 );
         }
+		else if (s.compare("-log") == 0)
+		{
+			if (++i < argc)
+			{
+				logFile = argv[i];
+#ifdef WIN32
+				logFile = vhcl::Replace(logFile, "\\", "/");
+#endif
+			}
+		}
 		else if ( s.compare("-env") == 0)
         {
 			if( ++i < argc )
@@ -1051,7 +1131,8 @@ int main( int argc, char **argv )	{
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	//scene->addSceneListener(&fltkListener);
 
-	scene->startFileLogging("./smartbody.log");
+	LOG("Logging to file %s", logFile.c_str());
+	scene->startFileLogging(logFile);
 
 
 	scene->getSimulationManager()->setupTimer();
