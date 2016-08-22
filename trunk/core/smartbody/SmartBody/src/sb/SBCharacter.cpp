@@ -171,6 +171,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	StringAttribute* voiceBackupAttribute = createStringAttribute("voiceBackup", "audiofile", true, "Voice", 420, false, false, false, "How the voice is created if the primary voice fails. local (uses local festival voice), remote (uses a speech relay), or audiofile (voice generated from prerecorded audio).");
 	voiceBackupAttribute->setValidValues(voiceTypes);
 	createStringAttribute("voiceBackupCode", ".", true, "Voice", 430, false, false, false, "For local and remote voices, the name of the backup voice to be used. For audiofile, the path to the audiofile when combined with the media path.");
+	createStringAttribute("lastAudioFile", ".", true, "Voice", 440, false, false, false, "Last audio file used for speech.");
 	
 	std::vector<std::string> utterancePolicyTypes;
 	utterancePolicyTypes.push_back("none");

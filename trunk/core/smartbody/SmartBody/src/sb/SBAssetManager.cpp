@@ -489,7 +489,9 @@ std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 #endif
 
 	std::string finalPath = p.string();
-
+#ifdef WIN32
+	finalPath = vhcl::Replace(finalPath, "\\", "/");
+#endif
 
 	std::vector<SBAsset*> allAssets;
 	

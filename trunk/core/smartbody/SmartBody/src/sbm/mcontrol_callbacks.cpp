@@ -3539,3 +3539,18 @@ int sbm_vhmsg_send_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 	char* cmdArgs = args.read_remainder_raw();
 	return SmartBody::SBScene::getScene()->getVHMsgManager()->send2( cmdName, cmdArgs );
 }
+
+int mcu_triggerevent_func(srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
+{
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBEventManager* eventManager = scene->getEventManager();
+
+	char* eventName = args.read_token();
+	char* eventParameters = args.read_remainder_raw();
+	SmartBody::SBEvent* e = eventManager->createEvent(eventName, eventParameters);
+	eventManager->handleEvent(e, scene->getSimulationManager()->getTime());
+
+	LOG("TRIGGERING EVENT %s %s AT TIME %f", eventName, eventParameters, scene->getSimulationManager()->getTime());
+	return CMD_SUCCESS;
+}
+
