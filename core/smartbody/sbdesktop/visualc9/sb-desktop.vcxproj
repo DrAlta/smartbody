@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugFBX|Win32">
       <Configuration>DebugFBX</Configuration>
@@ -33,28 +33,33 @@
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Lint|Win32'" Label="Configuration">
     <ConfigurationType>Utility</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>false</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -120,7 +125,7 @@
     </ProjectReference>
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>Smartbody_d.lib;glew32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc100-mt-gd-1_51.lib;boost_system-vc100-mt-gd-1_51.lib;boost_regex-vc100-mt-gd-1_51.lib;boost_python-vc100-mt-gd-1_51.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Smartbody_d.lib;glew32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;pthreadVSE2.lib;xerces-c_3D.lib;activemq-cppd.lib;boost_filesystem-vc140-mt-gd-1_59.lib;boost_system-vc140-mt-gd-1_59.lib;boost_regex-vc140-mt-gd-1_59.lib;boost_python-vc140-mt-gd-1_59.lib;opengl32.lib;glu32.lib;dbghelp.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\bin\sbdesktopd.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\SmartBody\lib;..\..\SmartBody\src\external\glew;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\..\..\core\smartbody\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -145,12 +150,12 @@ copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\bin
 copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\bin
 copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\bin
 copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\bin
-copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2015-build\DebugDLL\activemq-cppd.dll ..\bin
 copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_1D.dll ..\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-gd-1_51.dll ..\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc100-mt-gd-1_51.dll ..\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc100-mt-gd-1_51.dll ..\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc100-mt-gd-1_51.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc140-mt-gd-1_59.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc140-mt-gd-1_59.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc140-mt-gd-1_59.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc140-mt-gd-1_59.dll ..\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll  ..\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll  ..\bin
 copy /Y ..\..\..\..\core\smartbody\python27\libs\python27.dll  ..\bin
@@ -169,16 +174,16 @@ copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\..\..\bin\smartbody\s
 copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\..\..\bin\smartbodysbdesktop\bin
 copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2015-build\DebugDLL\activemq-cppd.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_1D.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-gd-1_51.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc100-mt-gd-1_51.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc100-mt-gd-1_51.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc100-mt-gd-1_51.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc140-mt-gd-1_59.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc140-mt-gd-1_59.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc140-mt-gd-1_59.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc140-mt-gd-1_59.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\core\smartbody\python27\libs\python27.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y "$(VS140COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y default.py ..\..\..\..\bin\smartbody\sbdesktop\bin
 </Command>
     </PostBuildEvent>
@@ -215,7 +220,7 @@ copy /Y default.py ..\..\..\..\bin\smartbody\sbdesktop\bin
     </ProjectReference>
     <Link>
       <AdditionalOptions>/Stack:10000000 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>Smartbody.lib;glew32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc100-mt-1_51.lib;boost_system-vc100-mt-1_51.lib;boost_regex-vc100-mt-1_51.lib;boost_python-vc100-mt-1_51.lib;dbghelp.lib;opengl32.lib;glu32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Smartbody.lib;glew32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;pthreadVSE2.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc140-mt-1_59.lib;boost_system-vc140-mt-1_59.lib;boost_regex-vc140-mt-1_59.lib;boost_python-vc140-mt-1_59.lib;dbghelp.lib;opengl32.lib;glu32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\bin\sbdesktop.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\SmartBody\lib;..\..\SmartBody\src\external\glew;..\..\..\..\lib\vhcl\lib;..\..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\..\lib\bonebus\lib;..\..\..\..\lib\pthreads\lib;..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\..\lib\xerces-c\lib;..\..\..\..\lib\boost\lib;..\..\..\..\core\smartbody\Python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -238,18 +243,18 @@ copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\bin
 copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\bin
 copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\bin
 copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\bin
-copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll ..\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2015-build\ReleaseDLL\activemq-cpp.dll ..\bin
 copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_1.dll ..\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-1_51.dll ..\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc100-mt-1_51.dll ..\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc100-mt-1_51.dll ..\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc100-mt-1_51.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc140-mt-1_59.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc140-mt-1_59.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc140-mt-1_59.dll ..\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc140-mt-1_59.dll ..\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll  ..\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll  ..\bin
 copy /Y ..\..\..\..\core\smartbody\python27\libs\python27.dll  ..\bin
 copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..\bin
-copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcp100.dll" ..\bin
-copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcr100.dll" ..\bin
+copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC140.CRT\msvcp140.dll" ..\bin
+copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC140.CRT\vcruntime140dll" ..\bin
 copy /Y .\default.py ..\bin
 
 if not exist ..\..\..\..\bin\smartbody\sbdesktop\bin mkdir ..\..\..\..\bin\smartbody\sbdesktop\bin
@@ -264,18 +269,18 @@ copy /Y ..\..\..\..\lib\pthreads\lib\pthreadVSE2.dll ..\..\..\..\bin\smartbody\s
 copy /Y ..\..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\lib\activemq\activemq-cpp\vs2015-build\ReleaseDLL\activemq-cpp.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\lib\xerces-c\bin\xerces-c_3_1.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-1_51.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc100-mt-1_51.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc100-mt-1_51.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc100-mt-1_51.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_filesystem-vc140-mt-1_59.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_system-vc140-mt-1_59.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_regex-vc140-mt-1_59.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc140-mt-1_59.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y ..\..\..\..\core\smartbody\python27\libs\python27.dll ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcp100.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin
-copy /Y "$(VS100COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC100.CRT\msvcr100.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y "$(VS140COMNTOOLS)\..\IDE\dbghelp.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y "$(VS140COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC140.CRT\msvcp100.dll" ..\..\..\..\bin\smartbody\sbdesktop\bin
+copy /Y "$(VS140COMNTOOLS)\..\..\VC\redist\x86\Microsoft.VC140.CRT\vcruntime140..\..\..\..\bin\smartbody\sbdesktop\bin
 copy /Y default.py ..\..\..\..\bin\smartbody\sbdesktop\bin
 </Command>
     </PostBuildEvent>
