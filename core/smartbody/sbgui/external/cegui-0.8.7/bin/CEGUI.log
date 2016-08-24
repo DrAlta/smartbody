@@ -1,0 +1,492 @@
+23/08/2016 09:41:43 (Std) 	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+23/08/2016 09:41:43 (Std) 	+                     Crazy Eddie's GUI System - Event log                    +
+23/08/2016 09:41:43 (Std) 	+                          (http://www.cegui.org.uk/)                         +
+23/08/2016 09:41:43 (Std) 	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+23/08/2016 09:41:43 (Std) 	CEGUI::Logger singleton created. (00E5FF40)
+23/08/2016 09:41:43 (Std) 	
+23/08/2016 09:41:43 (Std) 	********************************************************************************
+23/08/2016 09:41:43 (Std) 	* Important:                                                                   *
+23/08/2016 09:41:43 (Std) 	*     To get support at the CEGUI forums, you must post _at least_ the section *
+23/08/2016 09:41:43 (Std) 	*     of this log file indicated below.  Failure to do this will result in no  *
+23/08/2016 09:41:43 (Std) 	*     support being given; please do not waste our time.                       *
+23/08/2016 09:41:43 (Std) 	********************************************************************************
+23/08/2016 09:41:43 (Std) 	********************************************************************************
+23/08/2016 09:41:43 (Std) 	* -------- START OF ESSENTIAL SECTION TO BE POSTED ON THE FORUM       -------- *
+23/08/2016 09:41:43 (Std) 	********************************************************************************
+23/08/2016 09:41:43 (Std) 	---- Version: 0.8.7 (Build: Aug 22 2016 Microsoft Windows MSVC++ 14.0 (2015) 32 bit) ----
+23/08/2016 09:41:43 (Std) 	---- Renderer module is: CEGUI::OpenGLRenderer - Official OpenGL based 2nd generation renderer module.  TextureTarget support enabled via FBO extension. ----
+23/08/2016 09:41:43 (Std) 	---- XML Parser module is: CEGUI::ExpatParser - Official expat based parser module for CEGUI ----
+23/08/2016 09:41:43 (Std) 	---- Image Codec module is: SILLYImageCodec - Official SILLY based image codec ----
+23/08/2016 09:41:43 (Std) 	---- Scripting module is: None ----
+23/08/2016 09:41:43 (Std) 	********************************************************************************
+23/08/2016 09:41:43 (Std) 	* -------- END OF ESSENTIAL SECTION TO BE POSTED ON THE FORUM         -------- *
+23/08/2016 09:41:43 (Std) 	********************************************************************************
+23/08/2016 09:41:43 (Std) 	
+23/08/2016 09:41:43 (Std) 	---- Begining CEGUI System initialisation ----
+23/08/2016 09:41:43 (Std) 	[CEGUI::ImageManager] Singleton created (00E770D8)
+23/08/2016 09:41:43 (Std) 	[CEGUI::ImageManager] Registered Image type: BasicImage
+23/08/2016 09:41:43 (Std) 	CEGUI::FontManager singleton created. (00E884E0)
+23/08/2016 09:41:43 (Std) 	CEGUI::WindowFactoryManager singleton created
+23/08/2016 09:41:43 (Std) 	CEGUI::WindowManager singleton created (0684B540)
+23/08/2016 09:41:43 (Std) 	CEGUI::SchemeManager singleton created. (00E87B20)
+23/08/2016 09:41:43 (Std) 	CEGUI::GlobalEventSet singleton created. (00F2F480)
+23/08/2016 09:41:43 (Std) 	CEGUI::AnimationManager singleton created (00E4EE50)
+23/08/2016 09:41:43 (Std) 	CEGUI::WidgetLookManager singleton created. (06895860)
+23/08/2016 09:41:43 (Std) 	CEGUI::WindowRendererManager singleton created (06895878)
+23/08/2016 09:41:43 (Std) 	CEGUI::RenderEffectManager singleton created (00F2F440)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'DefaultWindow' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'DefaultWindow' windows added. (0627D380)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'DragContainer' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'DragContainer' windows added. (0627DC08)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'ScrolledContainer' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'ScrolledContainer' windows added. (0627DD58)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'ClippedContainer' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'ClippedContainer' windows added. (0627DFF8)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/PushButton' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/PushButton' windows added. (0627D428)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/RadioButton' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/RadioButton' windows added. (0627D968)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/Combobox' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/Combobox' windows added. (0627CEE8)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/ComboDropList' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/ComboDropList' windows added. (0627D4D0)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/Editbox' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/Editbox' windows added. (0627DA10)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/FrameWindow' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/FrameWindow' windows added. (0627CF90)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/ItemEntry' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/ItemEntry' windows added. (0627D038)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/Listbox' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/Listbox' windows added. (0627D0E0)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/ListHeader' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/ListHeader' windows added. (0627D230)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/ListHeaderSegment' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/ListHeaderSegment' windows added. (00E50228)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/Menubar' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/Menubar' windows added. (0686F020)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/PopupMenu' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/PopupMenu' windows added. (0686E8E8)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/MenuItem' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/MenuItem' windows added. (0686F0C8)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/MultiColumnList' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/MultiColumnList' windows added. (0686EC30)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/MultiLineEditbox' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/MultiLineEditbox' windows added. (0686F2C0)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/ProgressBar' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/ProgressBar' windows added. (0686EAE0)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/ScrollablePane' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/ScrollablePane' windows added. (0686EF78)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/Scrollbar' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/Scrollbar' windows added. (0686F170)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/Slider' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/Slider' windows added. (0686ECD8)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/Spinner' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/Spinner' windows added. (0686EB88)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/TabButton' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/TabButton' windows added. (0686F218)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/TabControl' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/TabControl' windows added. (0686E990)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/Thumb' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/Thumb' windows added. (0686EA38)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/Titlebar' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/Titlebar' windows added. (0686ED80)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/ToggleButton' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/ToggleButton' windows added. (0686EE28)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/Tooltip' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/Tooltip' windows added. (0686EED0)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/ItemListbox' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/ItemListbox' windows added. (0686E648)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/GroupBox' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/GroupBox' windows added. (0686E4F8)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'CEGUI/Tree' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'CEGUI/Tree' windows added. (0686D3E8)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'LayoutCell' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'LayoutCell' windows added. (0686E6F0)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'HorizontalLayoutContainer' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'HorizontalLayoutContainer' windows added. (0686E798)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'VerticalLayoutContainer' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'VerticalLayoutContainer' windows added. (0686E1B0)
+23/08/2016 09:41:43 (Std) 	Created WindowFactory for 'GridLayoutContainer' windows.
+23/08/2016 09:41:43 (Std) 	WindowFactory for 'GridLayoutContainer' windows added. (0686D928)
+23/08/2016 09:41:43 (Std) 	CEGUI::System singleton created. (068CB058)
+23/08/2016 09:41:43 (Std) 	---- CEGUI System initialisation completed ----
+23/08/2016 09:41:43 (Std) 	
+23/08/2016 09:41:43 (Std) 	[OpenGLRenderer] Created texture: cegui_logo
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'cegui_logo' (06872318) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	Started creation of Scheme from XML specification:
+23/08/2016 09:41:43 (Std) 	---- CEGUI GUIScheme name: SampleBrowserSkin
+23/08/2016 09:41:43 (Std) 	[ImageManager] Started creation of Imageset from XML specification:
+23/08/2016 09:41:43 (Std) 	[ImageManager] ---- CEGUI Imageset name: SampleBrowserSkin
+23/08/2016 09:41:43 (Std) 	[ImageManager] ---- Source texture file: SampleBrowser.png
+23/08/2016 09:41:43 (Std) 	[ImageManager] ---- Source texture resource group: (Default)
+23/08/2016 09:41:43 (Std) 	[OpenGLRenderer] Created texture: SampleBrowserSkin
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/GenericFiller' (08759E90) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/MouseArrow' (068FEC00) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/MouseArrowHover' (068FECF0) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/SampleFrameBottom' (068FEDE0) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/SampleFrameBottomRight' (068FEED0) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/SampleFrameBottomLeft' (088DC408) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/SampleFrameLeft' (088DC4F8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/SampleFrameTopRight' (088DC5E8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/SampleFrameRight' (088DC818) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/SampleFrameTop' (088DC908) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/SampleFrameTopLeft' (088DC9F8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TextBoxB' (088DCC28) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TextBoxTR' (068FB298) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TextBoxT' (068FACF8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TextBoxTL' (068FAED8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TextBoxR' (068FAFC8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TextBoxBR' (068FA758) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TextBoxM' (068FA668) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TextBoxBL' (068FA848) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TextBoxL' (068FB0B8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/CaptionM' (068FB1A8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/CaptionL' (068FA488) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/CaptionR' (068FA938) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TrayBL' (068FAA28) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TrayM' (068FA578) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TrayB' (068FAB18) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TrayTR' (068FAC08) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TrayL' (068FADE8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TrayTL' (0883F038) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TrayT' (0883E9A8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TrayBR' (0883FD58) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/TrayR' (0883E048) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/Handle' (0883F7B8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/HorzTrackR' (0883FB78) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/HorzTrackM' (0883F8A8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/VertTrackT' (0883E408) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/HorzTrackL' (0883E138) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/VertTrackM' (0883ED68) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/VertTrackB' (0883F218) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/MiniTrayM' (0883E228) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/MiniTrayTR' (0883EE58) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/MiniTrayTL' (0883E318) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/MiniTrayL' (0883FC68) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/MiniTrayB' (0883E4F8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/MiniTrayBR' (0883F4E8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/MiniTrayT' (0883E5E8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/MiniTrayBL' (0883F5D8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/MiniTrayR' (0883F6C8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/SamplesForeground' (0883F998) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ExitButtonNormal' (0883FA88) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/EntryButtonNormal' (0883E6D8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ExitButtonHover' (0883F308) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ExitButtonClicked' (0883E7C8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/EntryButtonHover' (0883F128) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/EntryButtonClicked' (0883E8B8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarTop' (0883EA98) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarMiddle' (0883EB88) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarBot' (0883EC78) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarTopLeft' (0883EF48) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarBotLeft' (0883F3F8) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarRight' (0883FE48) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarLeft' (08841400) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarTopRight' (08841040) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarBotRight' (08840500) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarOverTop' (088407D0) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarOverLeft' (08840050) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarOverTopLeft' (08840E60) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarOverBotRight' (08841130) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarOverBot' (08840C80) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarOverMiddle' (088409B0) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarOverBotLeft' (08840AA0) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarOverRight' (08840B90) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/ProgessBarOverTopRight' (088416D0) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/LightBackground' (08840F50) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	[ImageManager] Created image: 'SampleBrowserSkin/LightOverlay' (088405F0) of type: BasicImage
+23/08/2016 09:41:43 (Std) 	---- Returning existing instance of Font named 'DejaVuSans-12'.
+23/08/2016 09:41:43 (Std) 	===== Falagard 'root' element: look and feel parsing begins =====
+23/08/2016 09:41:43 (Std) 	===== Look and feel parsing completed =====
+23/08/2016 09:41:43 (Std) 	No window renderer factories specified for module 'CEGUICoreWindowRendererSet' - adding all available factories...
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/Button' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/Button' added. (08AE63A0)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/Default' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/Default' added. (08AE5DB8)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/Editbox' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/Editbox' added. (08AE57D0)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/FrameWindow' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/FrameWindow' added. (08AE6AD8)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/ItemEntry' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/ItemEntry' added. (08AE5FB0)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/ListHeader' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/ListHeader' added. (08AE6640)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/ListHeaderSegment' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/ListHeaderSegment' added. (08AE6058)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/Listbox' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/Listbox' added. (08AE6598)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/Menubar' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/Menubar' added. (08AE64F0)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/MenuItem' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/MenuItem' added. (08AE66E8)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/MultiColumnList' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/MultiColumnList' added. (08AE6790)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/MultiLineEditbox' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/MultiLineEditbox' added. (08AE5B18)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/PopupMenu' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/PopupMenu' added. (08AE5C68)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/ProgressBar' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/ProgressBar' added. (08AE61A8)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/ScrollablePane' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/ScrollablePane' added. (08AE68E0)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/Scrollbar' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/Scrollbar' added. (08AE6838)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/Slider' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/Slider' added. (08AE6988)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/Static' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/Static' added. (08AE6A30)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/StaticImage' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/StaticImage' added. (08AC1658)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/StaticText' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/StaticText' added. (08AC0890)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/TabButton' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/TabButton' added. (08AC0A88)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/TabControl' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/TabControl' added. (08AC0B30)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/Titlebar' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/Titlebar' added. (08AC13B8)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/ToggleButton' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/ToggleButton' added. (08AC0DD0)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/Tooltip' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/Tooltip' added. (08AC0C80)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/ItemListbox' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/ItemListbox' added. (08AC0D28)
+23/08/2016 09:41:43 (Std) 	Created WindowRendererFactory for 'Core/Tree' WindowRenderers.
+23/08/2016 09:41:43 (Std) 	WindowRendererFactory 'Core/Tree' added. (08AC0E78)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/Label' using base type 'DefaultWindow', window renderer 'Core/Default' Look'N'Feel 'SampleBrowserSkin/Label' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/SampleWindow' using base type 'DefaultWindow', window renderer 'Core/Default' Look'N'Feel 'SampleBrowserSkin/SampleWindow' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/Button' using base type 'CEGUI/PushButton', window renderer 'Core/Button' Look'N'Feel 'SampleBrowserSkin/Button' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/ProgressBar' using base type 'CEGUI/ProgressBar', window renderer 'Core/ProgressBar' Look'N'Feel 'SampleBrowserSkin/ProgressBar' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/Titlebar' using base type 'CEGUI/Titlebar', window renderer 'Core/Titlebar' Look'N'Feel 'SampleBrowserSkin/Titlebar' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/FrameWindow' using base type 'CEGUI/FrameWindow', window renderer 'Core/FrameWindow' Look'N'Feel 'SampleBrowserSkin/FrameWindow' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/StaticText' using base type 'DefaultWindow', window renderer 'Core/StaticText' Look'N'Feel 'SampleBrowserSkin/StaticText' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/VerticalScrollbar' using base type 'CEGUI/Scrollbar', window renderer 'Core/Scrollbar' Look'N'Feel 'SampleBrowserSkin/VerticalScrollbar' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/HorizontalScrollbar' using base type 'CEGUI/Scrollbar', window renderer 'Core/Scrollbar' Look'N'Feel 'SampleBrowserSkin/HorizontalScrollbar' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/Thumb' using base type 'CEGUI/Thumb', window renderer 'Core/Button' Look'N'Feel 'SampleBrowserSkin/Thumb' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/ScrollablePane' using base type 'CEGUI/ScrollablePane', window renderer 'Core/ScrollablePane' Look'N'Feel 'SampleBrowserSkin/ScrollablePane' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	Creating falagard mapping for type 'SampleBrowserSkin/Light' using base type 'DefaultWindow', window renderer 'Core/Default' Look'N'Feel 'SampleBrowserSkin/Light' and RenderEffect ''. (00E1DE80)
+23/08/2016 09:41:43 (Std) 	---- Successfully completed loading of GUI layout from 'SampleBrowserLoadScreen.layout' ----
+23/08/2016 09:41:43 (Error)	CEGUI::FileIOException in function 'void __thiscall CEGUI::DefaultResourceProvider::loadRawDataContainer(const class CEGUI::String &,class CEGUI::RawDataContainer &,const class CEGUI::String &)' (E:\smartbody\trunk\core\smartbody\sbgui\external\cegui-0.8.7\cegui\src\DefaultResourceProvider.cpp:66) : E:/smartbody/trunk/core/smartbody/sbgui/external/cegui-0.8.7/datafiles/samples/samples.xml does not exist
+23/08/2016 09:41:43 (Error)	SamplesFramework::loadSamplesDataFromXML: loading of sample data from file 'E:/smartbody/trunk/core/smartbody/sbgui/external/cegui-0.8.7/datafiles/samples/samples.xml' has failed.
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: cegui_logo
+23/08/2016 09:41:47 (Std) 	---- Begining CEGUI System destruction ----
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/Tree' windows removed. (0686D3E8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/Tree' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'LayoutCell' windows removed. (0686E6F0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'LayoutCell' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/Thumb' windows removed. (0686EA38)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/Thumb' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/Slider' windows removed. (0686ECD8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/Slider' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/Editbox' windows removed. (0627DA10)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/Editbox' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/Listbox' windows removed. (0627D0E0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/Listbox' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/Menubar' windows removed. (0686F020)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/Menubar' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/Spinner' windows removed. (0686EB88)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/Spinner' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/Tooltip' windows removed. (0686EED0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/Tooltip' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'DefaultWindow' windows removed. (0627D380)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'DefaultWindow' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'DragContainer' windows removed. (0627DC08)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'DragContainer' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/Combobox' windows removed. (0627CEE8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/Combobox' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/GroupBox' windows removed. (0686E4F8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/GroupBox' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/MenuItem' windows removed. (0686F0C8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/MenuItem' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/Titlebar' windows removed. (0686ED80)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/Titlebar' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/ItemEntry' windows removed. (0627D038)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/ItemEntry' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/PopupMenu' windows removed. (0686E8E8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/PopupMenu' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/Scrollbar' windows removed. (0686F170)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/Scrollbar' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/TabButton' windows removed. (0686F218)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/TabButton' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/ListHeader' windows removed. (0627D230)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/ListHeader' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/PushButton' windows removed. (0627D428)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/PushButton' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/TabControl' windows removed. (0686E990)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/TabControl' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'ClippedContainer' windows removed. (0627DFF8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'ClippedContainer' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/FrameWindow' windows removed. (0627CF90)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/FrameWindow' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/ItemListbox' windows removed. (0686E648)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/ItemListbox' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/ProgressBar' windows removed. (0686EAE0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/ProgressBar' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/RadioButton' windows removed. (0627D968)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/RadioButton' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'ScrolledContainer' windows removed. (0627DD58)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'ScrolledContainer' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/ToggleButton' windows removed. (0686EE28)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/ToggleButton' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/ComboDropList' windows removed. (0627D4D0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/ComboDropList' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'GridLayoutContainer' windows removed. (0686D928)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'GridLayoutContainer' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/ScrollablePane' windows removed. (0686EF78)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/ScrollablePane' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/MultiColumnList' windows removed. (0686EC30)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/MultiColumnList' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/MultiLineEditbox' windows removed. (0686F2C0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/MultiLineEditbox' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'CEGUI/ListHeaderSegment' windows removed. (00E50228)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'CEGUI/ListHeaderSegment' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'VerticalLayoutContainer' windows removed. (0686E1B0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'VerticalLayoutContainer' windows.
+23/08/2016 09:41:47 (Std) 	WindowFactory for 'HorizontalLayoutContainer' windows removed. (0686E798)
+23/08/2016 09:41:47 (Std) 	Deleted WindowFactory for 'HorizontalLayoutContainer' windows.
+23/08/2016 09:41:47 (Std) 	---- Begining cleanup of GUI Scheme system ----
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/Button' WindowRenderers removed. (08AE63A0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/Button' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/Default' WindowRenderers removed. (08AE5DB8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/Default' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/Editbox' WindowRenderers removed. (08AE57D0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/Editbox' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/FrameWindow' WindowRenderers removed. (08AE6AD8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/FrameWindow' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/ItemEntry' WindowRenderers removed. (08AE5FB0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/ItemEntry' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/ListHeader' WindowRenderers removed. (08AE6640)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/ListHeader' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/ListHeaderSegment' WindowRenderers removed. (08AE6058)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/ListHeaderSegment' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/Listbox' WindowRenderers removed. (08AE6598)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/Listbox' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/Menubar' WindowRenderers removed. (08AE64F0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/Menubar' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/MenuItem' WindowRenderers removed. (08AE66E8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/MenuItem' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/MultiColumnList' WindowRenderers removed. (08AE6790)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/MultiColumnList' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/MultiLineEditbox' WindowRenderers removed. (08AE5B18)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/MultiLineEditbox' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/PopupMenu' WindowRenderers removed. (08AE5C68)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/PopupMenu' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/ProgressBar' WindowRenderers removed. (08AE61A8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/ProgressBar' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/ScrollablePane' WindowRenderers removed. (08AE68E0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/ScrollablePane' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/Scrollbar' WindowRenderers removed. (08AE6838)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/Scrollbar' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/Slider' WindowRenderers removed. (08AE6988)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/Slider' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/Static' WindowRenderers removed. (08AE6A30)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/Static' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/StaticImage' WindowRenderers removed. (08AC1658)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/StaticImage' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/StaticText' WindowRenderers removed. (08AC0890)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/StaticText' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/TabButton' WindowRenderers removed. (08AC0A88)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/TabButton' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/TabControl' WindowRenderers removed. (08AC0B30)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/TabControl' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/Titlebar' WindowRenderers removed. (08AC13B8)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/Titlebar' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/ToggleButton' WindowRenderers removed. (08AC0DD0)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/ToggleButton' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/Tooltip' WindowRenderers removed. (08AC0C80)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/Tooltip' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/ItemListbox' WindowRenderers removed. (08AC0D28)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/ItemListbox' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	WindowRendererFactory for 'Core/Tree' WindowRenderers removed. (08AC0E78)
+23/08/2016 09:41:47 (Std) 	Deleted WindowRendererFactory for 'Core/Tree' WindowRenderers.
+23/08/2016 09:41:47 (Std) 	CEGUI::SchemeManager singleton destroyed. (00E87B20)
+23/08/2016 09:41:47 (Std) 	CEGUI::WindowManager singleton destroyed (0684B540)
+23/08/2016 09:41:47 (Std) 	CEGUI::WindowFactoryManager singleton destroyed
+23/08/2016 09:41:47 (Std) 	CEGUI::WidgetLookManager singleton destroyed. (06895860)
+23/08/2016 09:41:47 (Std) 	CEGUI::WindowRendererManager singleton destroyed (06895878)
+23/08/2016 09:41:47 (Std) 	CEGUI::AnimationManager singleton destroyed (00E4EE50)
+23/08/2016 09:41:47 (Std) 	CEGUI::RenderEffectManager singleton destroyed (00F2F440)
+23/08/2016 09:41:47 (Std) 	---- Begining cleanup of Font system ----
+23/08/2016 09:41:47 (Std) 	CEGUI::FontManager singleton destroyed. (00E884E0)
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TrayB
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TrayL
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TrayM
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TrayR
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TrayT
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/Handle
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TrayBL
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TrayBR
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TrayTL
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TrayTR
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/CaptionL
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/CaptionM
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/CaptionR
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TextBoxB
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TextBoxL
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TextBoxM
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TextBoxR
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TextBoxT
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/MiniTrayB
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/MiniTrayL
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/MiniTrayM
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/MiniTrayR
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/MiniTrayT
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TextBoxBL
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TextBoxBR
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TextBoxTL
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/TextBoxTR
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/HorzTrackL
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/HorzTrackM
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/HorzTrackR
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/MiniTrayBL
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/MiniTrayBR
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/MiniTrayTL
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/MiniTrayTR
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/MouseArrow
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/VertTrackB
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/VertTrackM
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/VertTrackT
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/LightOverlay
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/GenericFiller
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarBot
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarTop
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarLeft
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/SampleFrameTop
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ExitButtonHover
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/LightBackground
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/MouseArrowHover
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarRight
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/SampleFrameLeft
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/EntryButtonHover
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ExitButtonNormal
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarMiddle
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/SampleFrameRight
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/EntryButtonNormal
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ExitButtonClicked
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarBotLeft
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarOverBot
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarOverTop
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarTopLeft
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/SampleFrameBottom
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/SamplesForeground
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/EntryButtonClicked
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarBotRight
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarOverLeft
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarTopRight
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/SampleFrameTopLeft
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarOverRight
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/SampleFrameTopRight
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarOverMiddle
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarOverBotLeft
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarOverTopLeft
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/SampleFrameBottomLeft
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarOverBotRight
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/ProgessBarOverTopRight
+23/08/2016 09:41:47 (Std) 	[ImageManager] Deleted image: SampleBrowserSkin/SampleFrameBottomRight
+23/08/2016 09:41:47 (Std) 	[CEGUI::ImageManager] Unregistered Image type: BasicImage
+23/08/2016 09:41:47 (Std) 	[CEGUI::ImageManager] Singleton destroyed (00E770D8)
+23/08/2016 09:41:47 (Std) 	CEGUI::GlobalEventSet singleton destroyed. (00F2F480)
+23/08/2016 09:41:47 (Std) 	CEGUI::System singleton destroyed. (068CB058)
+23/08/2016 09:41:47 (Std) 	---- CEGUI System destruction completed ----
+23/08/2016 09:41:47 (Std) 	CEGUI::Logger singleton destroyed. (00E5FF40)
