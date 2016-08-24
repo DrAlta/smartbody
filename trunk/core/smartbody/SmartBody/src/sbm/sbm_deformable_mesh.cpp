@@ -2017,7 +2017,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 	{
 		_tempTexPairs = new GLuint[weights.size()];
 		glGenTextures(weights.size(), _tempTexPairs);
-		for(int i=0; i<weights.size(); i++) {
+		for(unsigned int i=0; i<weights.size(); i++) {
 			glBindTexture(GL_TEXTURE_2D, _tempTexPairs[i]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -2044,7 +2044,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 	{
 		_tempTexWithMask = new GLuint[weights.size()];
 		glGenTextures(weights.size(), _tempTexWithMask);
-		for(int i=0; i<weights.size(); i++) 
+		for(unsigned int i=0; i<weights.size(); i++)
 		{
 			glBindTexture(GL_TEXTURE_2D, _tempTexWithMask[i]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -2169,7 +2169,7 @@ void DeformableMeshInstance::blendShapes()
 
 					SrVec vVec;
 					SrVec nVec;
-					for (int v = 0; v < visemeV.size(); ++v)
+					for (unsigned int v = 0; v < visemeV.size(); ++v)
 					{
 						vVec = visemeV[v] - neutralV[v];
 						if (fabs(vVec[0]) >  gwiz::epsilon4() ||
@@ -2182,7 +2182,7 @@ void DeformableMeshInstance::blendShapes()
 							blendData.diffV.push_back(temp);
 						}
 					}
-					for (int n = 0; n < visemeN.size(); ++n)
+					for (unsigned int n = 0; n < visemeN.size(); ++n)
 					{
 						nVec = visemeN[n] - neutralN[n];
 						if (fabs(nVec[0]) >  gwiz::epsilon4() ||
@@ -2296,7 +2296,7 @@ void DeformableMeshInstance::blendShapes()
 				else
 				{
 					// loop through all vertices and normals
-					for (int v = 0; v < visemeV.size(); ++v)
+					for (unsigned int v = 0; v < visemeV.size(); ++v)
 					{
 						SrPnt diff = visemeV[v] - neutralV[v];
 						if (fabs(diff[0]) >  gwiz::epsilon4() ||
@@ -2304,7 +2304,7 @@ void DeformableMeshInstance::blendShapes()
 							fabs(diff[2]) >  gwiz::epsilon4())	
 							newV[v] = newV[v] + diff * w;
 					}
-					for (int n = 0; n < visemeN.size(); ++n)
+					for (unsigned int n = 0; n < visemeN.size(); ++n)
 					{
 						SrPnt diff = visemeN[n] - neutralN[n];
 						if (fabs(diff[0]) >  gwiz::epsilon4() ||
@@ -2315,7 +2315,7 @@ void DeformableMeshInstance::blendShapes()
 				}
 			}
 		}
-		for (int n = 0; n < newN.size(); ++n)
+		for (unsigned int n = 0; n < newN.size(); ++n)
 		{
 			newN[n].normalize();
 		}
@@ -2774,7 +2774,7 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 	SrModel& baseModel = writeToBaseModel->shape();
 	
 	std::vector<SrVec>& newPosBuf = (_mesh->isSkinnedMesh()) ? _restPosBuf : _deformPosBuf;
-	for (int i=0;i<baseModel.V.size();i++)
+	for (unsigned int i=0;i<baseModel.V.size();i++)
 	{
 		int iVtx			= vtxBaseIdx+i;
 		SrVec& basePos		= baseModel.V[i];

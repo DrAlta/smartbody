@@ -92,11 +92,11 @@ bool ParserBVH::parse(SkSkeleton& skeleton, SkMotion& motion, std::string name, 
 
 	while(!file.eof() && file.good())
 	{
-		file.getline(line, 8192, '');
+		file.getline(line, 8192, '\0');
 		size_t sLen = strlen(line);
                 
 		// remove any trailing
-		while (sLen && (line[sLen - 1] == ''))
+		while (sLen && (line[sLen - 1] == '\0'))
 			line[--sLen] = '\0';
                 
 		// ignore blank lines
