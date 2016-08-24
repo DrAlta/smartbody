@@ -25,6 +25,7 @@
 #include "jointmapviewer/RetargetStepWindow.h"
 #include "ExportWindow.h"
 #include "resourceViewer/AttributeEditor.h"
+#include "posecreator/PoseCreator.h"
 
 class SbmCharacter;
 
@@ -101,6 +102,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		AttributeEditor* _attributeEditor;
 		PanimationWindow* panimationWindow;
 		ExportWindow* exportWindow;
+		PoseCreator* poseCreator;
 		//RetargetViewer* behaviorSetViewer;
 		//JointMapViewer* jointMapViewer;
 		RetargetStepWindow* retargetStepWindow;
@@ -166,6 +168,7 @@ class  BaseWindow : public SrViewer, public Fl_Double_Window
 		static void LaunchFaceShiftViewerCB(Fl_Widget* widget, void* data);
 		static void LaunchSpeechRelayCB(Fl_Widget* widget, void* data);
 		static void LaunchJointMapViewerCB(Fl_Widget* widget, void* data);
+		static void LaunchPoseCreatorCB(Fl_Widget* widget, void* data);
 		static void NewCB(Fl_Widget* widget, void* data);
 		static void QuitCB(Fl_Widget* widget, void* data);
       static void QuickConnectCB(Fl_Widget* widget, void* data);
