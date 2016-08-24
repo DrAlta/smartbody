@@ -43,6 +43,9 @@ D:        Step right
 //(so that dll import/export macros are in effect)
 #define OIS_DYNAMIC_LIB
 #include <OIS/OIS.h>
+#include <OGRE/Overlay/OgreOverlay.h>
+#include <OGRE/Overlay/OgreOverlayManager.h>
+#include <OGRE/Overlay/OgreOverlayElement.h>
 
 using namespace Ogre;
 
@@ -94,8 +97,8 @@ public:
 		mAniso(1), mSceneDetailIndex(0), mMoveSpeed(100), mRotateSpeed(36), mDebugOverlay(0),
 		mInputManager(0), mMouse(0), mKeyboard(0), mJoy(0)
 	{
-
-		mDebugOverlay = OverlayManager::getSingleton().getByName("Core/DebugOverlay");
+		Ogre::OverlayManager *om = new Ogre::OverlayManager();
+		mDebugOverlay = Ogre::OverlayManager::getSingleton().getByName("Core/DebugOverlay");
 
 		LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
 		OIS::ParamList pl;
@@ -405,7 +408,7 @@ protected:
 	int mSceneDetailIndex ;
 	Real mMoveSpeed;
 	Degree mRotateSpeed;
-	Overlay* mDebugOverlay;
+	Ogre::Overlay* mDebugOverlay;
 
 	//OIS Input devices
 	OIS::InputManager* mInputManager;
