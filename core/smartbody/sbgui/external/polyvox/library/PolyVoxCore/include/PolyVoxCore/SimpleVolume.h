@@ -35,11 +35,7 @@ freely, subject to the following restrictions:
 #include <cstdlib> //For abort()
 #include <cstring> //For memcpy
 #include <limits>
-#ifdef __APPLE__
 #include <memory>
-#else
-#include <memory>
-#endif
 #include <stdexcept> //For invalid_argument
 
 namespace PolyVox

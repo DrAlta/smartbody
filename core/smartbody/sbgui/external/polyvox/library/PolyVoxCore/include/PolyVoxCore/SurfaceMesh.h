@@ -32,15 +32,9 @@ freely, subject to the following restrictions:
 #include <algorithm>
 #include <cstdlib>
 #include <list>
-#ifdef __APPLE__
 #include <memory>
-#else
-#include <memory>
-#endif
 #include <set>
 #include <vector>
-
-
 
 namespace PolyVox
 {
