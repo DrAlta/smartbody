@@ -178,12 +178,12 @@ void SBGUIManager::init()
 	std::string mediaPath = scene->getMediaPath();
 
 	LOG("setResourceGroupDirectory");
-	rp->setResourceGroupDirectory("schemes", mediaPath+"/cegui-0.8.7/datafiles/schemes/");
-	rp->setResourceGroupDirectory("imagesets", mediaPath+"/cegui-0.8.7/datafiles/imagesets/");
-	rp->setResourceGroupDirectory("fonts", mediaPath+"/cegui-0.8.7/datafiles/fonts/");
-	rp->setResourceGroupDirectory("layouts", mediaPath+"/cegui-0.8.7/datafile/layouts/");
-	rp->setResourceGroupDirectory("looknfeels", mediaPath+"/cegui-0.8.7/datafiles/looknfeel/");
-	rp->setResourceGroupDirectory("lua_scripts", mediaPath+"/cegui-0.8.7/datafiles/lua_scripts/");
+	rp->setResourceGroupDirectory("schemes", mediaPath+"/cegui/datafiles/schemes/");
+	rp->setResourceGroupDirectory("imagesets", mediaPath+"/cegui/datafiles/imagesets/");
+	rp->setResourceGroupDirectory("fonts", mediaPath+"/cegui/datafiles/fonts/");
+	rp->setResourceGroupDirectory("layouts", mediaPath+"/cegui/datafile/layouts/");
+	rp->setResourceGroupDirectory("looknfeels", mediaPath+"/cegui/datafiles/looknfeel/");
+	rp->setResourceGroupDirectory("lua_scripts", mediaPath+"/cegui/datafiles/lua_scripts/");
 
 	CEGUI::ImageManager::setImagesetDefaultResourceGroup("imagesets");
 	CEGUI::Font::setDefaultResourceGroup("fonts");
