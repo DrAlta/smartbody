@@ -64,6 +64,9 @@
     <Filter Include="faceshiftviewer">
       <UniqueIdentifier>{1dae2d67-bed9-4681-a9ed-4eef5ffbac5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="posecreator">
+      <UniqueIdentifier>{743ddff6-4108-4bd0-86e0-a35c4f86c1d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -291,6 +294,9 @@
     </ClCompile>
     <ClCompile Include="..\src\bmlcreator\BMLCreatorWindow.cpp">
       <Filter>bmlcreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\posecreator\PoseCreator.cpp">
+      <Filter>posecreator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -527,9 +533,11 @@
     <ClInclude Include="..\src\bmlcreator\BMLCreatorWindow.h">
       <Filter>bmlcreator</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\posecreator\PoseCreator.h">
+      <Filter>posecreator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\..\..\..\kinectavatar\SCAPEModelFit\sbautorig\autoriggerandreshaper.ico" />
     <None Include="icon1.ico" />
   </ItemGroup>
 </Project>
