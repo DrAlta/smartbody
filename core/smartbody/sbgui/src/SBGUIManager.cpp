@@ -178,12 +178,12 @@ void SBGUIManager::init()
 	std::string mediaPath = scene->getMediaPath();
 
 	LOG("setResourceGroupDirectory");
-	rp->setResourceGroupDirectory("schemes", mediaPath+"/cegui/datafiles-0.8.2/schemes/");
-	rp->setResourceGroupDirectory("imagesets", mediaPath+"/cegui/datafiles-0.8.2/imagesets/");
-	rp->setResourceGroupDirectory("fonts", mediaPath+"/cegui/datafiles-0.8.2/fonts/");
-	rp->setResourceGroupDirectory("layouts", mediaPath+"/cegui/datafiles-0.8.2/layouts/");
-	rp->setResourceGroupDirectory("looknfeels", mediaPath+"/cegui/datafiles-0.8.2/looknfeel/");
-	rp->setResourceGroupDirectory("lua_scripts", mediaPath+"/cegui/datafiles-0.8.2/lua_scripts/");
+	rp->setResourceGroupDirectory("schemes", mediaPath+"/cegui/datafiles/schemes/");
+	rp->setResourceGroupDirectory("imagesets", mediaPath+"/cegui/datafiles/imagesets/");
+	rp->setResourceGroupDirectory("fonts", mediaPath+"/cegui/datafiles/fonts/");
+	rp->setResourceGroupDirectory("layouts", mediaPath+"/cegui/datafile/layouts/");
+	rp->setResourceGroupDirectory("looknfeels", mediaPath+"/cegui/datafiles/looknfeel/");
+	rp->setResourceGroupDirectory("lua_scripts", mediaPath+"/cegui/datafiles/lua_scripts/");
 
 	CEGUI::ImageManager::setImagesetDefaultResourceGroup("imagesets");
 	CEGUI::Font::setDefaultResourceGroup("fonts");
@@ -206,7 +206,7 @@ void SBGUIManager::init()
 	//imageSet.setAutoScalingEnabled(false);
 	//CEGUI::Font& font = CEGUI::FontManager::getSingleton().get("DejaVuSans-10");
 	//font.setAutoScaled(false);
-	CEGUI::FontManager& fontManager = CEGUI::FontManager::getSingleton();		
+	CEGUI::FontManager& fontManager(CEGUI::FontManager::getSingleton());
 	CEGUI::FontManager::FontIterator pi = fontManager.getIterator();
 	while ( !pi.isAtEnd () )   {
 		CEGUI::Font* curFont = dynamic_cast<CEGUI::Font*>(pi.getCurrentValue());
@@ -218,6 +218,7 @@ void SBGUIManager::init()
 		}
 		pi++;
 	}
+
 	//CEGUI::Font& font = CEGUI::FontManager.getSingleton().get("")
 	//CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook", "MouseArrow");
 
