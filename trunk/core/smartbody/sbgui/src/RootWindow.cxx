@@ -149,6 +149,7 @@ BaseWindow::BaseWindow(bool useEditor, int x, int y, int w, int h, const char* n
 	//menubar->add("&Window/Behavior Sets", 0, LaunchBehaviorSetsCB, this, NULL);
 	menubar->add("&Window/Motion Editor", 0, LaunchMotionEditorCB, this, 0);
 	menubar->add("&Window/Retarget Viewer", 0, LaunchJointMapViewerCB, this, 0);
+	menubar->add("&Window/Pose Creator", 0, LaunchPoseCreatorCB, this, 0);
 	menubar->add("&Window/Speech Relay", 0, LaunchSpeechRelayCB, this, 0);
 	menubar->add("&Help/About", 0, HelpCB, this, 0);
 	menubar->add("&Help/Documentation", 0, DocumentationCB, this, 0);
@@ -362,6 +363,7 @@ BaseWindow::BaseWindow(bool useEditor, int x, int y, int w, int h, const char* n
 	
 	panimationWindow = NULL;	
 	exportWindow = NULL;
+	poseCreator = NULL;
 
 	if (!useEditor)
 	{
@@ -991,6 +993,17 @@ void BaseWindow::LaunchFaceShiftViewerCB( Fl_Widget* widget, void* data )
 	}
 	rootWindow->faceShiftViewerWindow->show();
 }
+
+void BaseWindow::LaunchPoseCreatorCB( Fl_Widget* widget, void* data )
+{
+	BaseWindow* rootWindow = static_cast<BaseWindow*>(data);
+	if (!rootWindow->poseCreator)
+	{
+		rootWindow->poseCreator = new PoseCreator(rootWindow->x() + 50, rootWindow->y() + 50, 800, 600, "Pose Creator");
+	}
+	rootWindow->poseCreator->show();
+}
+
 
 void BaseWindow::LaunchSpeechRelayCB( Fl_Widget* widget, void* data )
 {
