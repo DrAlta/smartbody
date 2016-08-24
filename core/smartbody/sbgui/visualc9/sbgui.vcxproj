@@ -270,6 +270,7 @@ copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc140-mt-gd-1_59.dll ..\bin
 copy /Y ..\..\..\..\lib\boost\lib\boost_serialization-vc140-mt-gd-1_59.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OgreMain_d.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OIS_d.dll ..\bin
+copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\cg.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\RenderSystem_GL_d.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OgreRTShaderSystem_d.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\Plugin_OctreeSceneManager_d.dll ..\bin
@@ -316,6 +317,7 @@ copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc140-mt-gd-1_59.dll ..\..\..\..\
 copy /Y ..\..\..\..\lib\boost\lib\boost_serialization-vc140-mt-gd-1_59.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OgreMain_d.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OIS_d.dll ..\..\..\..\bin\smartbody\sbgui\bin
+copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\cg.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\RenderSystem_GL_d.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\OgreRTShaderSystem_d.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\debug\Plugin_OctreeSceneManager_d.dll ..\..\..\..\bin\smartbody\sbgui\bin
@@ -542,6 +544,7 @@ copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc140-mt-1_59.dll ..\bin
 copy /Y ..\..\..\..\lib\boost\lib\boost_serialization-vc140-mt-1_59.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OgreMain.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OIS.dll ..\bin
+copy /Y ..\..\..\..\lib\OgreSDK\bin\release\cg.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\RenderSystem_GL.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OgreRTShaderSystem.dll ..\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\Plugin_OctreeSceneManager.dll ..\bin
@@ -590,6 +593,7 @@ copy /Y ..\..\..\..\lib\boost\lib\boost_python-vc140-mt-1_59.dll ..\..\..\..\bin
 copy /Y ..\..\..\..\lib\boost\lib\boost_serialization-vc140-mt-1_59.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OgreMain.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OIS.dll ..\..\..\..\bin\smartbody\sbgui\bin
+copy /Y ..\..\..\..\lib\OgreSDK\bin\release\cg.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\RenderSystem_GL.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\OgreRTShaderSystem.dll ..\..\..\..\bin\smartbody\sbgui\bin
 copy /Y ..\..\..\..\lib\OgreSDK\bin\release\Plugin_OctreeSceneManager.dll ..\..\..\..\bin\smartbody\sbgui\bin
