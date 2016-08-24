@@ -67,8 +67,21 @@ typedef std::map<std::string, std::string> StringMap;
 
 
 #ifndef SB_NO_PYTHON
-
-
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
+namespace boost
+{
+	template<> const volatile SmartBody::SBAttributeGroup* get_pointer(const volatile SmartBody::SBAttributeGroup* p) { return p; }
+	template<> const volatile SmartBody::SBAttributeInfo* get_pointer(const volatile SmartBody::SBAttributeInfo* p) { return p; }
+	template<> const volatile SmartBody::SBAttribute* get_pointer(const volatile SmartBody::SBAttribute* p) { return p; }
+	template<> const volatile SmartBody::ActionAttribute* get_pointer(const volatile SmartBody::ActionAttribute* p) { return p; }
+	template<> const volatile SmartBody::BoolAttribute* get_pointer(const volatile SmartBody::BoolAttribute* p) { return p; }
+	template<> const volatile SmartBody::DoubleAttribute* get_pointer(const volatile SmartBody::DoubleAttribute* p) { return p; }
+	template<> const volatile SmartBody::StringAttribute* get_pointer(const volatile SmartBody::StringAttribute* p) { return p; }
+	template<> const volatile SmartBody::IntAttribute* get_pointer(const volatile SmartBody::IntAttribute* p) { return p; }
+	template<> const volatile SmartBody::Vec3Attribute* get_pointer(const volatile SmartBody::Vec3Attribute* p) { return p; }
+	template<> const volatile SmartBody::MatrixAttribute* get_pointer(const volatile SmartBody::MatrixAttribute* p) { return p; }
+}
+#endif
 namespace SmartBody
 {
 

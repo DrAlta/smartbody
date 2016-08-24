@@ -75,10 +75,67 @@ typedef std::map<std::string,SrVec> VecMap;
 typedef std::map<std::string, std::string> StringMap;
 typedef std::vector<SrVec> VecArray;
 
+#ifndef SB_NO_PYTHON
 
-namespace SmartBody 
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
+namespace boost
+{
+	template<> const volatile SmartBody::SBSubject* get_pointer(const volatile SmartBody::SBSubject* p) { return p; }
+	template<> const volatile SmartBody::SBObserver* get_pointer(const volatile SmartBody::SBObserver* p) { return p; }
+	template<> const volatile SmartBody::SBObject* get_pointer(const volatile SmartBody::SBObject* p) { return p; }
+	template<> const volatile SmartBody::SBService* get_pointer(const volatile SmartBody::SBService* p) { return p; }
+	template<> const volatile SmartBody::SBServiceManager* get_pointer(const volatile SmartBody::SBServiceManager* p) { return p; }
+	template<> const volatile SmartBody::SBBmlProcessor* get_pointer(const volatile SmartBody::SBBmlProcessor* p) { return p; }
+	template<> const volatile SmartBody::SBSteerManager* get_pointer(const volatile SmartBody::SBSteerManager* p) { return p; }
+	template<> const volatile SmartBody::SBCollisionManager* get_pointer(const volatile SmartBody::SBCollisionManager* p) { return p; }
+	template<> const volatile SmartBody::SBBoneBusManager* get_pointer(const volatile SmartBody::SBBoneBusManager* p) { return p; }
+	template<> const volatile SmartBody::SBPhonemeManager* get_pointer(const volatile SmartBody::SBPhonemeManager* p) { return p; }
+	template<> const volatile SmartBody::SBDiphone* get_pointer(const volatile SmartBody::SBDiphone* p) { return p; }
+	template<> const volatile SmartBody::SBBehaviorSet* get_pointer(const volatile SmartBody::SBBehaviorSet* p) { return p; }
+	template<> const volatile SmartBody::SBBehaviorSetManager* get_pointer(const volatile SmartBody::SBBehaviorSetManager* p) { return p; }
+	template<> const volatile SmartBody::SBRetargetManager* get_pointer(const volatile SmartBody::SBRetargetManager* p) { return p; }
+	template<> const volatile SmartBody::SBRetarget* get_pointer(const volatile SmartBody::SBRetarget* p) { return p; }
+	template<> const volatile SmartBody::SBEvent* get_pointer(const volatile SmartBody::SBEvent* p) { return p; }
+	template<> const volatile SmartBody::SBEventManager* get_pointer(const volatile SmartBody::SBEventManager* p) { return p; }
+	template<> const volatile SmartBody::SBJointMapManager* get_pointer(const volatile SmartBody::SBJointMapManager* p) { return p; }
+	template<> const volatile SmartBody::SBAssetManager* get_pointer(const volatile SmartBody::SBAssetManager* p) { return p; }
+	template<> const volatile SmartBody::SBAsset* get_pointer(const volatile SmartBody::SBAsset* p) { return p; }
+	template<> const volatile SmartBody::CharacterListenerWrap* get_pointer(const volatile SmartBody::CharacterListenerWrap* p) { return p; }
+	template<> const volatile SmartBody::SBSceneListener* get_pointer(const volatile SmartBody::SBSceneListener* p) { return p; }
+	template<> const volatile SmartBody::TransitionRuleWrap* get_pointer(const volatile SmartBody::TransitionRuleWrap* p) { return p; }
+	template<> const volatile SmartBody::PythonControllerWrap* get_pointer(const volatile SmartBody::PythonControllerWrap* p) { return p; }
+	template<> const volatile SmartBody::SBEventHandler* get_pointer(const volatile SmartBody::SBEventHandler* p) { return p; }
+	template<> const volatile SmartBody::SBScriptWrap* get_pointer(const volatile SmartBody::SBScriptWrap* p) { return p; }
+	template<> const volatile SmartBody::NvbgWrap* get_pointer(const volatile SmartBody::NvbgWrap* p) { return p; }
+	template<> const volatile SmartBody::Nvbg* get_pointer(const volatile SmartBody::Nvbg* p) { return p; }
+	template<> const volatile SmartBody::SBParser* get_pointer(const volatile SmartBody::SBParser* p) { return p; }
+	template<> const volatile SmartBody::SBParseNode* get_pointer(const volatile SmartBody::SBParseNode* p) { return p; }
+	template<> const volatile SmartBody::SBParserListener* get_pointer(const volatile SmartBody::SBParserListener* p) { return p; }
+	template<> const volatile SmartBody::SBParserListenerWrap* get_pointer(const volatile SmartBody::SBParserListenerWrap* p) { return p; }
+	template<> const volatile SmartBody::SBJointMap* get_pointer(const volatile SmartBody::SBJointMap* p) { return p; }
+	template<> const volatile SmartBody::SBGestureMap* get_pointer(const volatile SmartBody::SBGestureMap* p) { return p; }
+	template<> const volatile SmartBody::SBGestureMapManager* get_pointer(const volatile SmartBody::SBGestureMapManager* p) { return p; }
+	template<> const volatile SmartBody::SBController* get_pointer(const volatile SmartBody::SBController* p) { return p; }
+	template<> const volatile SmartBody::SBSteerAgent* get_pointer(const volatile SmartBody::SBSteerAgent* p) { return p; }
+	template<> const volatile SmartBody::SBVHMsgManager* get_pointer(const volatile SmartBody::SBVHMsgManager* p) { return p; }
+	template<> const volatile SmartBody::SBPhysicsManager* get_pointer(const volatile SmartBody::SBPhysicsManager* p) { return p; }
+	template<> const volatile SmartBody::SBRealtimeManager* get_pointer(const volatile SmartBody::SBRealtimeManager* p) { return p; }
+	template<> const volatile SmartBody::SBDebuggerServer* get_pointer(const volatile SmartBody::SBDebuggerServer* p) { return p; }
+	template<> const volatile SmartBody::SBFaceShiftManager* get_pointer(const volatile SmartBody::SBFaceShiftManager* p) { return p; }
+	template<> const volatile SmartBody::SBScript* get_pointer(const volatile SmartBody::SBScript* p) { return p; }
+	template<> const volatile SmartBody::SBFaceDefinition* get_pointer(const volatile SmartBody::SBFaceDefinition* p) { return p; }
+	template<> const volatile SmartBody::SBBehavior* get_pointer(const volatile SmartBody::SBBehavior* p) { return p; }
+	template<> const volatile SkMotion* get_pointer(const volatile SkMotion* p) { return p; }
+
+}
+#endif
+#endif
+
+
+namespace SmartBody
 {
 #ifndef SB_NO_PYTHON
+
 
 void pythonFuncsAnimation();
 void pythonFuncsAttribute();
