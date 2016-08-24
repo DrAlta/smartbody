@@ -36,11 +36,7 @@ freely, subject to the following restrictions:
 #include <cstring> //For memcpy
 #include <list>
 #include <map>
-#ifdef __APPLE__
 #include <memory>
-#else
-#include <memory>
-#endif
 #include <stdexcept> //For invalid_argument
 #include <vector>
 

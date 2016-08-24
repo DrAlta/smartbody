@@ -79,29 +79,16 @@ freely, subject to the following restrictions:
 	#include <boost/static_assert.hpp>
 	#define static_assert BOOST_STATIC_ASSERT
 
-#if _MSC_VER == 1500 
-#ifdef POLYVOXVS2008FIX
-	using boost::int8_t;
-	using boost::int16_t;
-	using boost::int32_t;
-	using boost::uint8_t;
-	using boost::uint16_t;
-	using boost::uint32_t;
-#endif
-	
-#endif
 
 	//As long as we're requiring boost, we'll use it to compensate
 	//for the missing cstdint header too.
 	#include <boost/cstdint.hpp>
-/*
 	using boost::int8_t;
 	using boost::int16_t;
 	using boost::int32_t;
 	using boost::uint8_t;
 	using boost::uint16_t;
 	using boost::uint32_t;
-*/
 #else
 	#if defined(__APPLE__) 
 		#include <AvailabilityMacros.h>
@@ -113,34 +100,11 @@ freely, subject to the following restrictions:
 		#define polyvox_shared_ptr std::tr1::shared_ptr
 		#define polyvox_function std::tr1::function
 	#else
-#if defined(__APPLE__)
-#if !defined(MAC_OS_X_VERSION_10_9)
-		#include <tr1/cstdint>
-		#include <tr1/functional>
-#else
 		#include <cstdint>
 		#include <functional>
-#endif
-#else
-		#include <cstdint>
-		#include <functional>
-#endif
-		//#include <cstdint>
-		
 		#include <memory>
-#if defined(__APPLE__)
-#if !defined(MAC_OS_X_VERSION_10_9)
-		#include <tr1/memory>
-		#define polyvox_shared_ptr std::tr1::shared_ptr
-		#define polyvox_function std::tr1::function
-#else
 		#define polyvox_shared_ptr std::shared_ptr
 		#define polyvox_function std::function
-#endif
-#else
-		#define polyvox_shared_ptr std::shared_ptr
-		#define polyvox_function std::function
-#endif
 	#endif
 	//We have a decent compiler - use real C++0x features	
 	#define polyvox_bind std::bind

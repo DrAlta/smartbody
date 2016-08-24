@@ -32,11 +32,7 @@ freely, subject to the following restrictions:
 #include <cassert>
 #include <cstdlib> //For abort()
 #include <limits>
-#ifdef __APPLE__
 #include <memory>
-#else
-#include <memory>
-#endif
 #include <stdexcept> //For invalid_argument
 
 namespace PolyVox

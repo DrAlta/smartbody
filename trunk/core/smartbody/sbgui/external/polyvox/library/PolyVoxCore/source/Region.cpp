@@ -24,6 +24,7 @@ freely, subject to the following restrictions:
 #include "PolyVoxCore/Region.h"
 
 #include <limits>
+#include <algorithm>
 
 namespace PolyVox
 {
