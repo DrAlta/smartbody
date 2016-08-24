@@ -1,3 +1,5 @@
+#define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
+
 #ifdef WIN32
 #define USE_AUTO_RIGGING 1
 #endif
@@ -6,7 +8,7 @@
 #endif
 
 #include "SBAutoRigManager.h"
-#if USE_AUTO_RIGGING
+#if defined USE_AUTO_RIGGING && USE_AUTO_RIGGING > 0
 #include "pinocchioApi.h"
 #include "lsqSolver.h"
 #include "VoxelizerWindow.h"
@@ -23,7 +25,7 @@
 #include <FL/Fl.H>
 
 
-#if USE_AUTO_RIGGING
+#if defined USE_AUTO_RIGGING && USE_AUTO_RIGGING > 0
 bool SrModelToMesh( SrModel& model, Mesh& mesh, bool sanityCheck = true );
 bool AutoRigToSBSk( PinocchioOutput& out, SmartBody::SBSkeleton& sbSk);
 bool AutoRigToDeformableMesh(PinocchioOutput& out, SrModel& m, SmartBody::SBSkeleton& sbSk, DeformableMesh& deformMesh);
@@ -109,9 +111,9 @@ bool SBAutoRigManager::buildAutoRiggingFromPawnMesh( const std::string& pawnName
 	{			
 		//model.scale(meshInstance->getMeshScale()); // resize the vertices
 		SrVec meshScale = meshInstance->getMeshScale();
-		for (int i=0;i<scaleModel.V.size();i++)
+		for (unsigned int i=0;i<scaleModel.V.size();i++)
 			scaleModel.V[i] *= meshScale[0];
-		for (int i=0;i<scaleModel.V.size();i++)
+		for (unsigned int i=0;i<scaleModel.V.size();i++)
 			scaleModel.V[i] = scaleModel.V[i]*worldRotation;
 
 		if (riggingType == 0)
@@ -134,7 +136,7 @@ void SBAutoRigManager::transferSkinWeight(SmartBody::SBSkeleton& skel, SrModel& 
 {
 	
 	vector<Tri3Object> triobjvec;
-	for(int i = 0; i < inModel.F.size(); i++) {
+	for(unsigned int i = 0; i < inModel.F.size(); i++) {
 		SrVec p1,p2,p3;
 		SrVec3i& F = inModel.F[i];
 		p1 = inModel.V[F[0]];
@@ -246,7 +248,7 @@ bool SBAutoRigManager::updateSkinWeightFromCharacterMesh( const std::string& cha
 		WeightMapToSkinWeight(skinWeightMap,*sw);
 
 		SmartBody::SBSkeleton* sbOrigSk = sbSk;
-		for (int k=0;k<sw->infJointName.size();k++)
+		for (unsigned int k=0;k<sw->infJointName.size();k++)
 		{
 			// manually add all joint names
 			SmartBody::SBJoint* joint = sbOrigSk->getJointByName(sw->infJointName[k]);
@@ -343,7 +345,7 @@ bool SBAutoRigManager::updateSkinWeightFromCharacterMesh( const std::string& cha
 
 
 		SmartBody::SBSkeleton* sbOrigSk = sbSk;
-		for (int k=0;k<sw->infJointName.size();k++)
+		for (unsigned int k=0;k<sw->infJointName.size();k++)
 		{
 			// manually add all joint names
 			SmartBody::SBJoint* joint = sbOrigSk->getJointByName(sw->infJointName[k]);
@@ -364,7 +366,7 @@ bool SBAutoRigManager::updateSkinWeightFromCharacterMesh( const std::string& cha
 
 bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
-#if USE_AUTO_RIGGING
+#if defined USE_AUTO_RIGGING && USE_AUTO_RIGGING > 0
 	int voxelSize = 150;
 	VoxelizerWindow* voxelWindow = new VoxelizerWindow(0,0,voxelSize,voxelSize,"voxelWindow");
 	voxelWindow->initVoxelizer(&inModel,voxelSize);
@@ -514,7 +516,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxelsWithVoxelSkinWeights( SrModel& inMo
 bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
 	
-#if USE_AUTO_RIGGING
+#if defined USE_AUTO_RIGGING && USE_AUTO_RIGGING > 0
 	inModel.computeNormals();
 	int voxelSize = 250;
 	VoxelizerWindow* voxelWindow = new VoxelizerWindow(0,0,voxelSize,voxelSize,"voxelWindow");
@@ -614,7 +616,7 @@ bool SBAutoRigManager::buildAutoRiggingVoxels( SrModel& inModel, std::string out
 
 bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName, std::string outDeformableMeshName )
 {
-#if USE_AUTO_RIGGING
+#if defined USE_AUTO_RIGGING && USE_AUTO_RIGGING > 0
 	Mesh m;
 	//Skeleton sk = HumanSkeleton(); // default human skeleton from Pinocchio. Should define our own custom skeleton to account for gaze and other behavior
 	Skeleton sk = SmartBodyNewSkeleton();
@@ -652,7 +654,7 @@ bool SBAutoRigManager::buildAutoRigging( SrModel& inModel, std::string outSkName
 }
 
 
-#if USE_AUTO_RIGGING
+#if defined USE_AUTO_RIGGING && USE_AUTO_RIGGING > 0
 
 typedef PolyVox::SimpleVolume<uint8_t> IntVolume; 
 typedef PolyVox::SimpleVolume<float> FloatVolume;
@@ -788,7 +790,7 @@ void boneWeightInPainting(std::vector<std::map<int,float> >& vtxBoneWeights, std
 	vtxNeighbors.resize(nv);
 	vtxAreas.resize(nv, 0.f);
 	// add all vertex neighbors into the list
-	for (int i=0;i<m.F.size();i++)
+	for (unsigned int i=0;i<m.F.size();i++)
 	{
 		SrVec3i& f = m.F[i];
 		float faceArea = m.face_area(i);
@@ -942,7 +944,7 @@ void boneWeightLaplacianSmoothing(std::vector<std::map<int,float> >& vtxBoneWeig
 	vtxNeighbors.resize(nv);
 	//vtxAreas.resize(nv, 0.f);
 	// add all vertex neighbors into the list
-	for (int i=0;i<m.F.size();i++)
+	for (unsigned int i=0;i<m.F.size();i++)
 	{
 		SrVec3i& f = m.F[i];
 		float faceArea = m.face_area(i);
@@ -1055,7 +1057,7 @@ void boneWeightHarmonicSmoothing(std::vector<std::map<int,float> >& vtxBoneWeigh
 	vtxNeighbors.resize(nv);
 	vtxAreas.resize(nv, 0.f);
 	// add all vertex neighbors into the list
-	for (int i=0;i<m.F.size();i++)
+	for (unsigned int i=0;i<m.F.size();i++)
 	{
 		SrVec3i& f = m.F[i];
 		float faceArea = m.face_area(i);
@@ -1194,7 +1196,7 @@ void buildBoneGlowSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, Voxelizer
 	std::map<SrVec3i, std::pair<int,float> > vox2ndClosestBoneMap;
 
 	m.computeNormals();
-	for (int i=0;i<m.V.size();i++)
+	for (unsigned int i=0;i<m.V.size();i++)
 	{
 		SrVec vPos = m.V[i];
 		SrVec3i voxID = voxelWindow.getVoxelIDFromPosition(vPos);
@@ -1512,7 +1514,7 @@ void buildVoxelSkinWeights(SrModel& m, SmartBody::SBSkeleton& inSk, VoxelizerWin
 	IntVolume* origVoxels = voxelWindow.getVoxels();
 	// set all voxels with vertex values	
 	std::set<SrVec3i> vtxVoxelSet;
-	for (int i=0;i<m.V.size();i++)
+	for (unsigned int i=0;i<m.V.size();i++)
 	{
 		SrVec vPos = m.V[i];
 		SrVec3i voxID = voxelWindow.getVoxelIDFromPosition(vPos);
@@ -1779,14 +1781,14 @@ bool PolyVoxMeshToPinoMesh( PolyVox::SurfaceMesh<PolyVox::PositionMaterialNormal
 bool SrModelToMesh( SrModel& model, Mesh& mesh, bool sanityCheck )
 {
 	mesh.vertices.resize(model.V.size());
-	for (int i=0;i<model.V.size();i++)
+	for (unsigned int i=0;i<model.V.size();i++)
 	{
 		SrPnt& p = model.V[i];
 		mesh.vertices[i].pos = Vector3(p.x,p.y,p.z);
 	}
 
 	mesh.edges.resize(model.F.size()*3);
-	for (int i=0;i<model.F.size();i++)
+	for (unsigned int i=0;i<model.F.size();i++)
 	{
 		SrVec3i& f = model.F[i];
 		mesh.edges[i*3].vertex = f[0];
