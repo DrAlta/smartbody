@@ -10,6 +10,14 @@
 
 #ifndef SB_NO_PYTHON
 
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
+namespace boost
+{
+	template<> const volatile DeformableMesh* get_pointer(const volatile DeformableMesh* p) { return p; }
+}
+#endif
+
+
 namespace SmartBody
 {
 	void pythonFuncsMesh()

@@ -67,8 +67,21 @@ typedef std::map<std::string, std::string> StringMap;
 
 
 #ifndef SB_NO_PYTHON
-
-
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
+namespace boost
+{
+	template<> const volatile SmartBody::SBAnimationBlend* get_pointer(const volatile SmartBody::SBAnimationBlend* p) { return p; }
+	template<> const volatile SmartBody::SBAnimationBlend0D* get_pointer(const volatile SmartBody::SBAnimationBlend0D* p) { return p; }
+	template<> const volatile SmartBody::SBAnimationBlend1D* get_pointer(const volatile SmartBody::SBAnimationBlend1D* p) { return p; }
+	template<> const volatile SmartBody::SBAnimationBlend2D* get_pointer(const volatile SmartBody::SBAnimationBlend2D* p) { return p; }
+	template<> const volatile SmartBody::SBAnimationBlend3D* get_pointer(const volatile SmartBody::SBAnimationBlend3D* p) { return p; }
+	template<> const volatile SmartBody::SBMotionBlendBase* get_pointer(const volatile SmartBody::SBMotionBlendBase* p) { return p; }
+	template<> const volatile SmartBody::SBAnimationTransition* get_pointer(const volatile SmartBody::SBAnimationTransition* p) { return p; }
+	template<> const volatile SmartBody::SBAnimationTransitionRule* get_pointer(const volatile SmartBody::SBAnimationTransitionRule* p) { return p; }
+	template<> const volatile SmartBody::SBAnimationBlendManager* get_pointer(const volatile SmartBody::SBAnimationBlendManager* p) { return p; }
+	template<> const volatile SmartBody::SBMotionEvent* get_pointer(const volatile SmartBody::SBMotionEvent* p) { return p; }
+}
+#endif
 namespace SmartBody
 {
 

@@ -69,6 +69,16 @@ typedef std::map<std::string, std::string> StringMap;
 
 #ifndef SB_NO_PYTHON
 
+#if defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
+namespace boost
+{
+	template<> const volatile SmartBody::SBMotion* get_pointer(const volatile SmartBody::SBMotion* p) { return p; }
+	template<> const volatile SmartBody::SBMotionNode* get_pointer(const volatile SmartBody::SBMotionNode* p) { return p; }
+	template<> const volatile SmartBody::SBMotionTransitionEdge* get_pointer(const volatile SmartBody::SBMotionTransitionEdge* p) { return p; }
+	template<> const volatile SmartBody::SBMotionGraph* get_pointer(const volatile SmartBody::SBMotionGraph* p) { return p; }
+	template<> const volatile SmartBody::SBMotionGraphManager* get_pointer(const volatile SmartBody::SBMotionGraphManager* p) { return p; }
+}
+#endif 
 
 namespace SmartBody
 {
