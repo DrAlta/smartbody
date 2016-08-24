@@ -57,10 +57,12 @@ namespace _HASH_NAMESPACE {
 using namespace _HASH_NAMESPACE;
 
 namespace _HASH_NAMESPACE {
-    template<class T> struct hash
-    {
-        size_t operator()(const T &p) { return hash_compare<T>()(p); }
-    };
+#if _MSC_VER < 1900
+	template<class T> struct hash
+	{
+		size_t operator()(const T &p) { return hash_compare<T>()(p); }
+	};
+#endif
 
     template<class T1, class T2> struct hash_compare<std::pair<T1, T2> >
     {
