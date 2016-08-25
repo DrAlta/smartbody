@@ -188,6 +188,7 @@ void PositionControl::drawSphere(SrVec& pos, float fRadius, SrVec& color)
 
 void PositionControl::drawBox( SrBox& box, bool wireFrame /*= false*/, SrVec& color /*= SrVec(0.f,1.f,1.f)*/ )
 {
+	glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT);
 	glDisable(GL_LIGHTING);	
 	SrSnBox sbox;					
 	sbox.shape().a = box.a;
@@ -198,6 +199,7 @@ void PositionControl::drawBox( SrBox& box, bool wireFrame /*= false*/, SrVec& co
 		sbox.render_mode(srRenderModeSmooth);
 	sbox.color(SrColor(color[0],color[1],color[2]));
 	SrGlRenderFuncs::render_box(&sbox);
+	glPopAttrib();
 }
 
 void PositionControl::identify( std::vector<int>& path )
