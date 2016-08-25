@@ -131,7 +131,8 @@ class IntAttribute : public SBAttribute
 {
 	public:
 		SBAPI IntAttribute();
-		SBAPI IntAttribute(const std::string& name, int val = 0, int minn = -std::numeric_limits<int>::max(), int maxx = std::numeric_limits<int>::max());
+		SBAPI IntAttribute(const std::string& name, int val = 0);
+		SBAPI IntAttribute(const std::string& name, int val, int minn, int maxx);
 		SBAPI ~IntAttribute();
 
 		SBAPI const int& getValue();
@@ -161,7 +162,8 @@ class DoubleAttribute : public SBAttribute
 {
 	public:
 		SBAPI DoubleAttribute();
-		SBAPI DoubleAttribute(const std::string& name, double val = 0, double min = -std::numeric_limits<double>::max(), double max = std::numeric_limits<double>::max());
+		SBAPI DoubleAttribute(const std::string& name, double val = 0);
+		SBAPI DoubleAttribute(const std::string& name, double val, double min, double max);
 		SBAPI ~DoubleAttribute();
 
 		SBAPI const double& getValue();
