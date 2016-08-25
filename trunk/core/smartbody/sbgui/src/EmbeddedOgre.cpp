@@ -177,10 +177,16 @@ void EmbeddedOgre::updateOgreFloorMaterial(std::string material)
 void EmbeddedOgre::updateOgreFloor(SrColor floorColor, std::string floorMaterial, bool showFloor)
 {
 	try {
-		Ogre::Entity * pPlaneEnt = getSceneManager()->getEntity( "plane" );	
+		Ogre::Entity * pPlaneEnt = getSceneManager()->getEntity("plane");
+
+		MaterialManager &matMgr = MaterialManager::getSingleton();
+		MaterialPtr material = matMgr.getByName("floor");
+		
 		Ogre::MaterialPtr mat = pPlaneEnt->getSubEntity(0)->getMaterial();
 		mat->setDiffuse(Ogre::ColourValue(floorColor.r / 255.0f, floorColor.g / 255.0f, floorColor.b / 255.0f));
 		pPlaneEnt->setMaterialName( floorMaterial );
+		
+		pPlaneEnt->setMaterial(material);
 		pPlaneEnt->setVisible(showFloor);
 	} catch ( Ogre::Exception&) {
 	}
@@ -566,7 +572,7 @@ void EmbeddedOgre::createDefaultScene()
 	Plane plane;
 	plane.normal = Vector3::UNIT_Y;
 	plane.d = 0;
-    
+    /*
 	Ogre::MeshPtr planeMesh = MeshManager::getSingleton().createPlane( "Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 3500, 3500, 100, 100, true, 1, 60, 60, Vector3::UNIT_Z );
 	std::string materialName = "MyplaneMat";
     
@@ -588,6 +594,15 @@ void EmbeddedOgre::createDefaultScene()
 	pPlaneEnt->setCastShadows( false );	
 	ogreSceneMgr->getRootSceneNode()->createChildSceneNode("plane_node", Vector3( 0, 0, 0 ) )->attachObject( pPlaneEnt );
 	ogreSceneMgr->getSceneNode("plane_node")->setVisible(true);
+	*/
+
+	MeshManager::getSingleton().createPlane("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+		Plane(Vector3::UNIT_Y, 0), 1000, 1000, 10, 10, true, 1, 8, 8, Vector3::UNIT_Z);
+
+	// create a floor entity, give it a material, and place it at the origin
+	Entity* floor = ogreSceneMgr->createEntity("plane", "Myplane");
+	floor->setMaterialName("Examples/BumpyMetal");
+	ogreSceneMgr->getRootSceneNode()->attachObject(floor);
 
 
 
