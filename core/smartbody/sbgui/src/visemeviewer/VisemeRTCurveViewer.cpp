@@ -3,6 +3,11 @@
 #include <sr/sr_gl.h>
 #include <sr/sr_light.h>
 #include <sb/SBScene.h>
+
+#ifdef WIN32
+using namespace glfont;
+#endif
+
 VisemeRTCurveViewer::VisemeRTCurveViewer(int x, int y, int w, int h, char* name, RunTimeCurveData* data) : Fl_Gl_Window(x, y, w, h)
 {
 	colorTable[0] = SrVec(1.0f, 0.0f, 0.0f);

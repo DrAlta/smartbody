@@ -7,7 +7,6 @@
 #include <sr/sr_vec2.h>
 #ifdef WIN32
 #include "glfont2.h"
-using namespace glfont;
 #endif
 
 class RunTimeCurveData;
@@ -37,7 +36,7 @@ public:
 
 public:
 #ifdef WIN32
-	GLFont label;				// label
+	glfont::GLFont label;				// label
 #endif
 	float xSpan;				// default xSpan of the camera window
 	float xShift;				// shift of camera center on x axis
