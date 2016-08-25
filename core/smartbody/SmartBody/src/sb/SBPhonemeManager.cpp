@@ -35,6 +35,7 @@ SBPhonemeManager::SBPhonemeManager()
 	addPhonemeMapping("@", "Ah");
 	addPhonemeMapping("AY", "Ay");
 	addPhonemeMapping("B", "BMP");
+	addPhonemeMapping("BMP", "BMP");
 	addPhonemeMapping("CH", "Sh");
 	addPhonemeMapping("D", "D");
 	addPhonemeMapping("DH", "Th");
@@ -72,6 +73,8 @@ SBPhonemeManager::SBPhonemeManager()
 	addPhonemeMapping("Y", "Ih");
 	addPhonemeMapping("Z", "Z");
 	addPhonemeMapping("ZH", "Sh");
+
+	_fastMapDirty = true;
 }
 
 void SBPhonemeManager::addPhonemeMapping(const std::string& from, const std::string& to)
@@ -168,6 +171,8 @@ SBDiphone* SBPhonemeManager::createDiphone(const std::string& fromPhoneme, const
 		diphone = new SBDiphone(upperCaseFromPhoneme, upperCaseToPhoneme);
 		_diphoneMap[name].push_back(diphone);
 	}
+
+	_fastMapDirty = true;
 	return diphone;
 }
 
@@ -196,6 +201,27 @@ SBDiphone* SBPhonemeManager::getDiphone(const std::string& fromPhoneme, const st
 	std::transform(upperCaseFromPhoneme.begin(), upperCaseFromPhoneme.end(), upperCaseFromPhoneme.begin(), ::toupper);
 	std::transform(upperCaseToPhoneme.begin(), upperCaseToPhoneme.end(), upperCaseToPhoneme.begin(), ::toupper);
 
+	// fast access of diphones
+	if (_fastMapDirty)
+	{
+		createFastMap();
+		_fastMapDirty = false;
+	}
+
+	std::stringstream strstr;
+	strstr << name << "_" << fromPhoneme << "_" << toPhoneme;
+	std::map<std::string, SBDiphone* >::iterator iter = _fastDiphoneMap.find(strstr.str());
+	if (iter != _fastDiphoneMap.end())
+	{
+		return (*iter).second;
+	}
+	else
+	{
+		return NULL;
+	}
+
+	/*
+	// slower access - linear search of diphones
 	std::vector<SBDiphone*>& diphones = getDiphones(name);
 	for (size_t i = 0; i < diphones.size(); i++)
 	{
@@ -205,6 +231,8 @@ SBDiphone* SBPhonemeManager::getDiphone(const std::string& fromPhoneme, const st
 			return diphones[i];
 		}
 	}
+	*/
+
 	return NULL;
 }
 
@@ -803,6 +831,27 @@ void SBPhonemeManager::saveLipSyncAnimation(const std::string characterName, con
 
 }
 
+void SBPhonemeManager::createFastMap()
+{
+	_fastDiphoneMap.clear();
+
+	for (std::map<std::string, std::vector<SBDiphone*> >::iterator iter = _diphoneMap.begin();
+		iter != _diphoneMap.end();
+		iter++)
+	{
+		std::string setName = (*iter).first;
+		for (std::vector<SBDiphone*>::iterator iter2 = (*iter).second.begin();
+			iter2 != (*iter).second.end();
+			iter2++)
+		{
+			std::stringstream strstr;
+			strstr << setName << "_" << (*iter2)->getFromPhonemeName() << "_" << (*iter2)->getToPhonemeName();
+			_fastDiphoneMap.insert(std::pair<std::string, SBDiphone*>(strstr.str(), (*iter2)));
+		}
+	}
+
+	_fastMapDirty = false;
+}
 
 
 

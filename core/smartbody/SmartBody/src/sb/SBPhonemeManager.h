@@ -56,8 +56,14 @@ class SBPhonemeManager : public SBService
 
 		SBAPI void saveLipSyncAnimation(const std::string characterName, const std::string lipsyncFile, const std::string outputFile);
 
+		SBAPI void createFastMap();
+
 	protected:
+		
+
+		bool _fastMapDirty;
 		std::map<std::string, std::vector<SBDiphone*> > _diphoneMap;
+		std::map<std::string, SBDiphone* > _fastDiphoneMap;
 		std::map<std::string, std::string> _phonemeToCommonPhonemeMap;
 		std::map<std::string, std::map<std::string, std::vector<std::string> > > _wordToPhonemeMaps;
 		std::vector<std::string> _emptyPhonemeSet;
