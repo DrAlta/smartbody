@@ -595,7 +595,7 @@ void EmbeddedOgre::createDefaultScene()
 	ogreSceneMgr->getRootSceneNode()->createChildSceneNode("plane_node", Vector3( 0, 0, 0 ) )->attachObject( pPlaneEnt );
 	ogreSceneMgr->getSceneNode("plane_node")->setVisible(true);
 	*/
-
+	/*
 	MeshManager::getSingleton().createPlane("Myplane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
 		Plane(Vector3::UNIT_Y, 0), 1000, 1000, 10, 10, true, 1, 8, 8, Vector3::UNIT_Z);
 
@@ -604,7 +604,7 @@ void EmbeddedOgre::createDefaultScene()
 	floor->setMaterialName("Examples/BumpyMetal");
 	ogreSceneMgr->getRootSceneNode()->attachObject(floor);
 
-
+	*/
 
 	firstTime = true;
 }
