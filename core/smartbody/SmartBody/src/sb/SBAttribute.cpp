@@ -464,6 +464,13 @@ IntAttribute::IntAttribute() : SBAttribute()
 	m_max = std::numeric_limits<int>::max();
 }
 
+IntAttribute::IntAttribute(const std::string& name, int val) : SBAttribute(name)
+{
+	m_value = val;
+	m_min = -std::numeric_limits<int>::min();
+	m_max = std::numeric_limits<int>::max();
+}
+
 IntAttribute::IntAttribute(const std::string& name, int val, int min, int max) : SBAttribute(name)
 {
 	m_value = val;
@@ -623,13 +630,20 @@ DoubleAttribute::DoubleAttribute() : SBAttribute()
 	m_max = std::numeric_limits<double>::max();
 }
 
+DoubleAttribute::DoubleAttribute(const std::string& name, double val) : SBAttribute(name)
+{
+	m_value = val;
+	m_min = -std::numeric_limits<double>::min();
+	m_max = std::numeric_limits<double>::max();
+}
+
+
 DoubleAttribute::DoubleAttribute(const std::string& name, double val, double min, double max) : SBAttribute(name)
 {
 	m_value = val;
 	m_min = min;
 	m_max = max;
 }
-
 
 DoubleAttribute::~DoubleAttribute()
 {
