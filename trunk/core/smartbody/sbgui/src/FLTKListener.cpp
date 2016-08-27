@@ -343,15 +343,18 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					{
 						for (size_t c = 0; c < iter->second.size(); ++c)
 						{
-							if (strcmp(iter->first.c_str(), (const char*)iter->second[c]->shape().name) == 0)	// you don't create it for base shape
-								continue;
+							//if (strcmp(iter->first.c_str(), (const char*)iter->second[c]->shape().name) == 0)	// you don't create it for base shape
+								//continue;
 
 							std::stringstream ss;
 							ss << "blendShape.channelName." << (const char*)iter->second[c]->shape().name;
 							std::stringstream ss1;
 							ss1 << "blendShape.channelWeightLimit." << (const char*)iter->second[c]->shape().name;
-							pawn->createStringAttribute(ss.str().c_str(), "", true, "Blend Shape", c + 1, false, false, false, "blend shape channel name");
-							pawn->createDoubleAttribute(ss1.str().c_str(), 1.0f, true, "Blend Shape", c + 1, false, false, false, "blend shape channel weight limit");
+							std::stringstream ss2;
+							ss2 << "blendShape.controller." << (const char*)iter->second[c]->shape().name;
+							pawn->createStringAttribute(ss.str(), "", true, "Blend Shape", c * 3 + 1, false, false, false, "blend shape channel name");
+							pawn->createDoubleAttribute(ss1.str(), 1.0f, true, "Blend Shape", c * 3 + 2, false, false, false, "blend shape channel weight limit");
+							pawn->createStringAttribute(ss2.str(), iter->first, true, "Blend Shape", c * 3 + 3, false, false, false, "blend shape controller name");
 							pawn->createActionAttribute("updateChannel", true, "Blend Shape", 0, false, false, false, "update blend shape channel");
 						}
 					}
