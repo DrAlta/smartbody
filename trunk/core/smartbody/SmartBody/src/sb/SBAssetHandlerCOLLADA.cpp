@@ -238,13 +238,17 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 
 				for (morphTargetIter = mesh->morphTargets.begin(); morphTargetIter != mesh->morphTargets.end(); ++morphTargetIter)	
 				{
-					if (morphTargetIter->second.size() < 1)
+					if (morphTargetIter->second.size() < 1) // ignore any controllers that don't have targets
 						continue;
 
+					std::string morphControllerName = (*morphTargetIter).first;
+					std::vector<std::string>& targets = (*morphTargetIter).second;
+					LOG("Processing morph controller %s with %d targets.", morphControllerName.c_str(), targets.size());
+
 					baseShape = morphTargetIter->second[0];
-					for (size_t c = 0; c < morphTargetIter->second.size(); ++c)
+					for (size_t c = 0; c < targets.size(); ++c)
 					{
-						if (strcmp(morphTargetIter->second[c].c_str(), meshModelVec[i]->name) == 0)
+						if (strcmp(targets[c].c_str(), meshModelVec[i]->name) == 0)
 						{
 							if (c == 0)
 								isBaseShape = true;
