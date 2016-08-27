@@ -355,7 +355,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 		{
 			rapidxml::xml_attribute<>* idAttr = node->first_attribute("id");
 			if (!idAttr)	continue;
-			std::string skinId = idAttr->value();
+			std::string controllerId = idAttr->value();
 
 			if (rapidxml::count_children(node) > 0)
 			{
@@ -527,7 +527,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 						rapidxml::xml_attribute<>* morphAttr = childNode->first_attribute("source");
 						std::string morphName = morphAttr->value();
 						morphName = morphName.substr(1, morphName.size() - 1);
-						std::string morphFullName = morphName + "-morph";
+						
 						// futhur for children
 						//const DOMNodeList* childListOfMorph = childNode->getChildNodes();
 						rapidxml::xml_node<>* childOfMorphCurNode = childNode->first_node();
@@ -560,7 +560,7 @@ void ParserCOLLADAFast::parseLibraryControllers(rapidxml::xml_node<>* node, Defo
 										{
 											refMesh.push_back((*it));
 										}
-										mesh->morphTargets.insert(make_pair(morphFullName, refMesh));
+										mesh->morphTargets.insert(make_pair(controllerId, refMesh));
 									}
 									childOfSourceCurNode = childOfSourceCurNode->next_sibling();
 								}
