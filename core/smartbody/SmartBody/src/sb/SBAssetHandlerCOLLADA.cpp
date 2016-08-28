@@ -209,7 +209,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			// handling morph targets
 			for (unsigned int i = 0; i < meshModelVec.size(); i++)
 			{
-				for (int j = 0; j < meshModelVec[i]->V.size(); j++)
+				for (unsigned int j = 0; j < meshModelVec[i]->V.size(); j++)
 				{
 					meshModelVec[i]->V[j] *= factor;
 				}
@@ -236,35 +236,55 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				bool isBaseShape = false;
 				std::string baseShape = "";
 
-				for (morphTargetIter = mesh->morphTargets.begin(); morphTargetIter != mesh->morphTargets.end(); ++morphTargetIter)	
+				for (morphTargetIter = mesh->morphTargets.begin(); 
+					 morphTargetIter != mesh->morphTargets.end(); 
+					++morphTargetIter)	
 				{
-					if (morphTargetIter->second.size() < 1) // ignore any controllers that don't have targets
-						continue;
-
 					std::string morphControllerName = (*morphTargetIter).first;
 					std::vector<std::string>& targets = (*morphTargetIter).second;
-					LOG("Processing morph controller %s with %d targets.", morphControllerName.c_str(), targets.size());
+				
+					if (targets.size() < 1) // ignore any controllers that don't have targets
+						continue;
 
 					baseShape = morphTargetIter->second[0];
-					for (size_t c = 0; c < targets.size(); ++c)
+					if (strcmp(baseShape.c_str(), (const char*)meshModelVec[i]->name) == 0)
 					{
-						if (strcmp(targets[c].c_str(), meshModelVec[i]->name) == 0)
+						isBaseShape = true;
+						LOG("Processing morph controller %s with %d targets.", morphControllerName.c_str(), targets.size());
+						break;
+					}
+					else
+					{
+						for (size_t c = 1; c < targets.size(); c++)
 						{
-							if (c == 0)
-								isBaseShape = true;
-							else
-								isBlendShape = true;
+							if (strcmp(targets[c].c_str(), (const char*)meshModelVec[i]->name) == 0)
+							{
+									isBlendShape = true;
+									LOG("Found morph target %s for controller %s.", (const char*)meshModelVec[i]->name, morphControllerName.c_str());
+									break;
+							}
 						}
+						if (isBlendShape)
+							break;
 					}
 				}
 
 				if (isBlendShape || isBaseShape)
 				{
-					if (mesh->blendShapeMap.find(baseShape) == mesh->blendShapeMap.end())		
+					std::map<std::string, std::vector<SrSnModel*> >::iterator iter = mesh->blendShapeMap.find(baseShape);
+					if (iter == mesh->blendShapeMap.end())
 					{
 						mesh->blendShapeMap.insert(std::make_pair(baseShape, std::vector<SrSnModel*>()));
+						//LOG("ADDED BLENDSHAPE FROM BASE %s", baseShape.c_str());
+						iter = mesh->blendShapeMap.find(baseShape);
 					}
-					mesh->blendShapeMap[baseShape].push_back(srSnModelStatic);
+					else
+					{
+						//LOG("RETRIEVED BASE %s", baseShape.c_str());
+					}
+					std::vector<SrSnModel*>& models = (*iter).second;
+					models.push_back(srSnModelStatic);
+					//LOG("INSERTED BLENDSHAPE %s INTO BASE %s", (const char*) srSnModelStatic->shape().name, baseShape.c_str());
 					srSnModelStatic->ref();
 					delete srSnModelDynamic;
 					//LOG("Insert blend shape %s with base shape %s", (const char*)meshModelVec[i]->name, baseShape.c_str());
@@ -313,6 +333,23 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				*/
 				delete meshModelVec[i];
 			}
+
+			// dump the blend shape info
+			for (std::map<std::string, std::vector<SrSnModel*> >::iterator iter = mesh->blendShapeMap.begin();
+				 iter != mesh->blendShapeMap.end(); 
+				 iter++)
+			{
+				//LOG("BLENDSHAPE: %s", iter->first.c_str());
+				std::vector<SrSnModel*>& modelList = (*iter).second;
+				for (std::vector<SrSnModel*>::iterator iter2 = modelList.begin();
+					iter2 != modelList.end();
+					iter2++)
+				{
+					LOG("\t %s", (const char*) (*iter2)->shape().name);
+				}
+			}
+
+
 			assets.push_back(mesh);
 
 			if (rapidFile)

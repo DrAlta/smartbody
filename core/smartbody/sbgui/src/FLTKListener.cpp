@@ -352,7 +352,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 							ss1 << "blendShape.channelWeightLimit." << (const char*)iter->second[c]->shape().name;
 							std::stringstream ss2;
 							ss2 << "blendShape.controller." << (const char*)iter->second[c]->shape().name;
-							pawn->createStringAttribute(ss.str(), "", true, "Blend Shape", c * 3 + 1, false, false, false, "blend shape channel name");
+							pawn->createStringAttribute(ss.str(), (const char*)iter->second[c]->shape().name, true, "Blend Shape", c * 3 + 1, false, false, false, "blend shape channel name");
 							pawn->createDoubleAttribute(ss1.str(), 1.0f, true, "Blend Shape", c * 3 + 2, false, false, false, "blend shape channel weight limit");
 							pawn->createStringAttribute(ss2.str(), iter->first, true, "Blend Shape", c * 3 + 3, false, false, false, "blend shape controller name");
 							pawn->createActionAttribute("updateChannel", true, "Blend Shape", 0, false, false, false, "update blend shape channel");
