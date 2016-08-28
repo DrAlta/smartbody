@@ -433,7 +433,7 @@ SBAPI void DeformableMesh::updateVertexBuffer()
 	int iVtx = 0;
 	for (unsigned int c=0;c<meshIndexList.size();c++)
 	{
-		int pos = meshIndexList[c];
+		unsigned int pos = meshIndexList[c];
 		int globalCounter = 0;
 		SrSnModel* dMeshStatic = dMeshStatic_p[pos];
 		SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
@@ -1091,7 +1091,7 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		SrModel& curModel = dMeshStatic_p[i]->shape();
 		newMeshModel->set_meshname((const char*)curModel.name);
 		// 2
-		for (int m = 0; m < curModel.M.size(); ++m)
+		for (unsigned int m = 0; m < curModel.M.size(); ++m)
 		{
 			SmartBodyBinary::Material* newMaterial = newMeshModel->add_materials();
 			// 1 Material
@@ -1123,60 +1123,60 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 
 		}
 		// 3
-		for (int v = 0; v < curModel.V.size(); ++v)
+		for (unsigned int v = 0; v < curModel.V.size(); ++v)
 		{
 			newMeshModel->add_vertexcoordinates(curModel.V[v].x);
 			newMeshModel->add_vertexcoordinates(curModel.V[v].y);
 			newMeshModel->add_vertexcoordinates(curModel.V[v].z);
 		}
 		// 4
-		for (int n = 0; n < curModel.N.size(); ++n)
+		for (unsigned int n = 0; n < curModel.N.size(); ++n)
 		{
 			newMeshModel->add_normals(curModel.N[n].x);
 			newMeshModel->add_normals(curModel.N[n].y);
 			newMeshModel->add_normals(curModel.N[n].z);
 		}
 		// 5
-		for (int n = 0; n < curModel.Tangent.size(); ++n)
+		for (unsigned int n = 0; n < curModel.Tangent.size(); ++n)
 		{
 			newMeshModel->add_tangents(curModel.Tangent[n].x);
 			newMeshModel->add_tangents(curModel.Tangent[n].y);
 			newMeshModel->add_tangents(curModel.Tangent[n].z);
 		}
 		// 5
-		for (int n = 0; n < curModel.BiNormal.size(); ++n)
+		for (unsigned int n = 0; n < curModel.BiNormal.size(); ++n)
 		{
 			newMeshModel->add_binormals(curModel.BiNormal[n].x);
 			newMeshModel->add_binormals(curModel.BiNormal[n].y);
 			newMeshModel->add_binormals(curModel.BiNormal[n].z);
 		}
 		//7
-		for (int t = 0; t < curModel.T.size(); ++t)
+		for (unsigned int t = 0; t < curModel.T.size(); ++t)
 		{
 			newMeshModel->add_texturecoordinates(curModel.T[t].x);
 			newMeshModel->add_texturecoordinates(curModel.T[t].y);
 		}
 		//8
-		for (int t = 0; t < curModel.F.size(); ++t)
+		for (unsigned int t = 0; t < curModel.F.size(); ++t)
 		{
 			newMeshModel->add_trianglefaceindices(curModel.F[t][0]);
 			newMeshModel->add_trianglefaceindices(curModel.F[t][1]);
 			newMeshModel->add_trianglefaceindices(curModel.F[t][2]);
 		}
 		// 9
-		for (int t = 0; t < curModel.Fm.size(); ++t)
+		for (unsigned int t = 0; t < curModel.Fm.size(); ++t)
 		{
 			newMeshModel->add_materialindices(curModel.Fm[t]);
 		}
 		// 10
-		for (int t = 0; t < curModel.Fn.size(); ++t)
+		for (unsigned int t = 0; t < curModel.Fn.size(); ++t)
 		{
 			newMeshModel->add_normalindices(curModel.Fn[t][0]);
 			newMeshModel->add_normalindices(curModel.Fn[t][1]);
 			newMeshModel->add_normalindices(curModel.Fn[t][2]);
 		}
 		// 11
-		for (int t = 0; t < curModel.Ft.size(); ++t)
+		for (unsigned int t = 0; t < curModel.Ft.size(); ++t)
 		{
 			newMeshModel->add_texturecoordinatesindices(curModel.Ft[t][0]);
 			newMeshModel->add_texturecoordinatesindices(curModel.Ft[t][1]);
@@ -1185,7 +1185,7 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		// 12
 		newMeshModel->set_culling(curModel.culling);
 		// 13
-		for (int m = 0; m < curModel.mtlnames.size(); ++m)
+		for (unsigned int m = 0; m < curModel.mtlnames.size(); ++m)
 		{
 			newMeshModel->add_materialnames( curModel.mtlnames[m].c_str());
 		}
@@ -2101,14 +2101,17 @@ void DeformableMeshInstance::blendShapes()
 	SrSnModel* baseModel = NULL;
 
 	// find the base shape from static meshes
-	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
-	for (mIter = _mesh->blendShapeMap.begin(); mIter != _mesh->blendShapeMap.end(); ++mIter)
+	for (std::map<std::string, std::vector<SrSnModel*> >::iterator mIter = _mesh->blendShapeMap.begin(); 
+		 mIter != _mesh->blendShapeMap.end(); 
+		 mIter++)
 	{
 		bool foundBaseModel = false;
+		std::string baseModelName = (*mIter).first;
+		std::vector<SrSnModel*>& targets = (*mIter).second;
 
 		for (size_t i = 0; i < _mesh->dMeshStatic_p.size(); ++i)
 		{
-			if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
+			if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, baseModelName.c_str()) == 0)
 			{
 				//	If base shape, copies pointer to _mesh->dMeshStatic (here is where the result resulting vertices position are stored)
 				writeToBaseModel = _mesh->dMeshStatic_p[i];
@@ -2121,11 +2124,11 @@ void DeformableMeshInstance::blendShapes()
 			//LOG("base model to write to cannot be found");
 			continue;
 		}
-		for (size_t i = 0; i < mIter->second.size(); ++i)
+		for (size_t i = 0; i < targets.size(); ++i)
 		{
-			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
+			if (strcmp(mIter->first.c_str(), (const char*) targets[i]->shape().name) == 0)
 			{
-				baseModel		= mIter->second[i];
+				baseModel		= targets[i];
 				foundBaseModel	= true;
 				break;
 			}
@@ -2145,26 +2148,34 @@ void DeformableMeshInstance::blendShapes()
 		if (foundBaseModel && 
 			_character->getBoolAttribute("useOptimizedBlendShapes"))
 		{
-			if (_mesh->optimizedBlendShapeData.size() !=  mIter->second.size())
+			std::map<std::string, std::vector<BlendShapeData> >::iterator optIter = _mesh->optimizedBlendShapeData.find(baseModelName);
+			if (optIter == _mesh->optimizedBlendShapeData.end())
 			{
-				LOG("Optimizing blend shapes. Only have %d/%d shapes.", _mesh->optimizedBlendShapeData.size(), mIter->second.size());
-				_mesh->optimizedBlendShapeData.clear();
+				_mesh->optimizedBlendShapeData.insert(std::pair<std::string, std::vector<BlendShapeData> >(baseModelName, std::vector<BlendShapeData>()));
+				optIter = _mesh->optimizedBlendShapeData.find(baseModelName);
+			}
+
+			std::vector<BlendShapeData>& optimizedShapeData = (*optIter).second;
+			if (optimizedShapeData.size() != targets.size())
+			{
+				LOG("Optimizing blend shapes. Only have %d/%d shapes.", optimizedShapeData.size(), targets.size());
+				optimizedShapeData.clear();
 				// optimize the blend shape maps as needed
-				for (size_t i = 0; i < mIter->second.size(); ++i)
+				for (size_t i = 0; i < targets.size(); ++i)
 				{
-					_mesh->optimizedBlendShapeData.push_back(BlendShapeData());
+					optimizedShapeData.push_back(BlendShapeData());
 					if (i == 0)
 					{
 						continue;
 					}
-					if (!mIter->second[i])
+					if (!targets[i])
 					{
 						continue;
 					}
-					BlendShapeData& blendData = _mesh->optimizedBlendShapeData[i];
+					BlendShapeData& blendData = optimizedShapeData[i];
 					//SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
-					std::vector<SrVec>& visemeV = mIter->second[i]->shape().V;
-					std::vector<SrPnt>& visemeN = mIter->second[i]->shape().N;
+					std::vector<SrVec>& visemeV = targets[i]->shape().V;
+					std::vector<SrPnt>& visemeN = targets[i]->shape().N;
 
 
 					SrVec vVec;
@@ -2192,35 +2203,35 @@ void DeformableMeshInstance::blendShapes()
 							blendData.diffN.push_back(std::pair<int, SrVec>(n, nVec));
 						}
 					}
-					LOG("Optimized blend %s has %d/%d vertices, %d/%d normals.", (const char*) mIter->second[i]->shape().name, blendData.diffV.size(), visemeV.size(), blendData.diffN.size(), visemeN.size());
+					LOG("Optimized blend %s has %d/%d vertices, %d/%d normals.", (const char*) targets[i]->shape().name, blendData.diffV.size(), visemeV.size(), blendData.diffN.size(), visemeN.size());
 				}
 			}
 		}
 
 
 		//	Initializes vector of wieghts, of size (#shapes) 
-		std::vector<float> weights(mIter->second.size(), 0);
+		std::vector<float> weights(targets.size(), 0);
 
 		//	Initializes vector of wieghts, of size (#shapes) each shape got a texture
-		std::vector<GLuint> texIDs(mIter->second.size(), 0);
+		std::vector<GLuint> texIDs(targets.size(), 0);
 
-		std::vector<std::string> texture_names(mIter->second.size());
+		std::vector<std::string> texture_names(targets.size());
 
 		int tex_h = 1024;
 		int tex_w = 1024;
 
-		for (size_t i = 0; i < mIter->second.size(); ++i)
+		for (size_t i = 0; i < targets.size(); ++i)
 		{
-			if (!mIter->second[i])
+			if (!targets[i])
 				continue;
 
 			float w = 0.0f;
 			float wLimit = 1.0f;
 			// get weight
 			std::stringstream ss;
-			ss << "blendShape.channelName." << (const char*)mIter->second[i]->shape().name;
+			ss << "blendShape.channelName." << (const char*) targets[i]->shape().name;
 			std::stringstream ss1;
-			ss1 << "blendShape.channelWeightLimit." << (const char*)mIter->second[i]->shape().name;
+			ss1 << "blendShape.channelWeightLimit." << (const char*) targets[i]->shape().name;
 					
 			if (_character->hasAttribute(ss1.str()))
 			{
@@ -2261,31 +2272,33 @@ void DeformableMeshInstance::blendShapes()
 			{
 				//LOG("blend in %s with weight %f", (const char*)mIter->second[i]->shape().name, w);
 				//SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
-				std::vector<SrVec>& visemeV = mIter->second[i]->shape().V;
-				std::vector<SrPnt>& visemeN = mIter->second[i]->shape().N;
+				std::vector<SrVec>& visemeV = targets[i]->shape().V;
+				std::vector<SrPnt>& visemeN = targets[i]->shape().N;
 				if (visemeV.size() != neutralV.size())
 				{
-					LOG("number of vertices for %s (%d) is not same as neutral (%d)", mIter->first.c_str(), visemeV.size(), neutralV.size());
+					LOG("number of vertices for %s (%d) is not same as neutral (%d)", baseModelName.c_str(), visemeV.size(), neutralV.size());
 					continue;
 				}
 				if (visemeN.size() != neutralN.size())
 				{
-					LOG("number of normals for %s (%d) is not same as neutral (%d)", mIter->first.c_str(), visemeN.size(), neutralN.size());
+					LOG("number of normals for %s (%d) is not same as neutral (%d)", baseModelName.c_str(), visemeN.size(), neutralN.size());
 					continue;
 				}
 
 				if (_character->getBoolAttribute("useOptimizedBlendShapes"))
 				{
 					// loop through a shorter list of different vertices and normals
-					BlendShapeData& blendData = _mesh->optimizedBlendShapeData[i];
-					int vSize = _mesh->optimizedBlendShapeData[i].diffV.size();
+					std::map<std::string, std::vector<BlendShapeData> >::iterator optIter = _mesh->optimizedBlendShapeData.find(baseModelName);
+					std::vector<BlendShapeData>& optimizedShapeData = (*optIter).second;
+					BlendShapeData& blendData = optimizedShapeData[i];
+					int vSize = optimizedShapeData[i].diffV.size();
 					for (int v = 0; v < vSize; ++v)
 					{
 						int index	= blendData.diffV[v].first;
 						SrVec& diff = blendData.diffV[v].second;
 						newV[index] = newV[index] + diff * w;
 					}
-					int nSize = _mesh->optimizedBlendShapeData[i].diffN.size();
+					int nSize = optimizedShapeData[i].diffN.size();
 					for (int n = 0; n < nSize; ++n)
 					{
 						int index	= blendData.diffN[n].first;
@@ -2326,13 +2339,13 @@ void DeformableMeshInstance::blendShapes()
 		
 
 		// Starts computing blended textures
-		for (size_t i = 0; i < mIter->second.size(); ++i)
+		for (size_t i = 0; i < targets.size(); ++i)
 		{
 			if (!mIter->second[i])
 				continue;
 
 			//	Gets the map of (material name, texture) for the current mesh
-			std::vector<std::string> materials = mIter->second[i]->shape().mtlnames;
+			std::vector<std::string> materials = targets[i]->shape().mtlnames;
 #if 0
 			std::map<std::string, std::string> textures_map = mIter->second[i]->shape().mtlTextureNameMap;
 			for(std::map<std::string,std::string>::iterator it = textures_map.begin(); it != textures_map.end(); ++it) {
@@ -2345,9 +2358,9 @@ void DeformableMeshInstance::blendShapes()
 				matName = materials[0];
 
 			// If base model
-			if (strcmp(mIter->first.c_str(), (const char*)mIter->second[i]->shape().name) == 0)
+			if (strcmp(mIter->first.c_str(), (const char*) targets[i]->shape().name) == 0)
 			{
-				std::string fileName = (std::string)mIter->second[i]->shape().mtlTextureNameMap[matName];
+				std::string fileName = (std::string) targets[i]->shape().mtlTextureNameMap[matName];
 				SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, fileName.c_str());
 				if (tex)
 				{
@@ -2366,7 +2379,7 @@ void DeformableMeshInstance::blendShapes()
 			}
 
 			// Rest of the models
-			std::string fileName = (std::string)mIter->second[i]->shape().mtlTextureNameMap[matName];
+			std::string fileName = (std::string) targets[i]->shape().mtlTextureNameMap[matName];
 			SbmTexture* tex		= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, fileName.c_str());
 			if (tex)
 			{
@@ -2422,7 +2435,7 @@ void DeformableMeshInstance::blendShapes()
 			_tempTexPairs = new GLuint[weights.size()];
 			std::string meshName = this->getDeformableMesh()->getName();
 			
-			for (int i=0;i<weights.size();i++)
+			for (unsigned int i=0;i<weights.size();i++)
 			{
 				std::string tempTexName = meshName + "_weight" + boost::lexical_cast<std::string>(i);
 				texManager.createWhiteTexture(tempTexName.c_str(), tex_w, tex_h);

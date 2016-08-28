@@ -711,7 +711,7 @@ void SBCharacter::notify(SBSubject* subject)
 						std::string shapeName = attrName.substr(startPos + 1);
 						if (getSkeleton()->getJointByName(channelName))
 						{
-							LOG("Blend shape channel %s already existed. Skiping add shape %s...", channelName.c_str(), shapeName.c_str());
+							LOG("Blend shape channel %s already existed. Skipping add shape %s...", channelName.c_str(), shapeName.c_str());
 							continue;
 						}
 						addBlendShapeChannel(channelName);

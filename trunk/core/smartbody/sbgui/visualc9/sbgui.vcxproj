@@ -288,7 +288,7 @@ copy /Y ..\..\..\..\core\smartbody\sbgui\external\cegui-0.8.7\bin\PyCEGUI_d.pyd 
 copy /Y ..\..\..\..\core\smartbody\sbgui\external\cegui-0.8.7\bin\PyCEGUIOpenGLRenderer_d.pyd ..\bin
 copy /Y ..\..\..\..\core\smartbody\sbgui\external\cegui-0.8.7\bin\freetype_d.dll ..\bin
 copy /Y ..\..\..\..\core\smartbody\sbgui\external\cegui-0.8.7\bin\pcre_d.dll ..\bin
-copy /Y ..\..\..\..\core\smartbody\sbgui\external\cegui-0.8.7\expat_d.dll ..\bin
+copy /Y ..\..\..\..\core\smartbody\sbgui\external\cegui-0.8.7\bin\expat_d.dll ..\bin
 copy /Y ..\..\..\..\core\smartbody\sbgui\external\cegui-0.8.7\bin\SILLY_d.dll ..\bin
 copy /Y ..\..\..\..\core\smartbody\sbgui\external\cegui-0.8.7\bin\jpeg_d.dll ..\bin
 copy /Y ..\..\..\..\core\smartbody\sbgui\external\cegui-0.8.7\bin\zlib_d.dll ..\bin

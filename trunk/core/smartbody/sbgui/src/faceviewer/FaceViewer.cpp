@@ -182,10 +182,15 @@ void FaceViewer::RefreshCB(Fl_Widget* widget, void* data)
 	}
 
 	if (charNames.size() > 0)
+	{
 		faceViewer->choiceCharacters->activate();
+		faceViewer->choiceCharacters->value(0);
+		FaceViewer::CharacterCB(widget, data);
+	}
 	else
+	{
 		faceViewer->choiceCharacters->deactivate();
-
+	}
 	faceViewer->redraw();
 }
 
