@@ -6,6 +6,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Scroll.H>
+#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Value_Slider.H>
 #include <sbm/GenericViewer.h>
 #include <SBWindowListener.h>
@@ -37,7 +38,10 @@ class FaceViewer : public GenericViewer, public Fl_Double_Window, public SBWindo
 		static void FaceWeightCB(Fl_Widget* widget, void* data);
 		static void DefaultFaceCB(Fl_Widget* widget, void* data);
 		static void ResetDefaultFaceCB(Fl_Widget* widget, void* data);
-		
+		static void ShowAUsCB(Fl_Widget* widget, void* data);
+		static void ShowVisemesCB(Fl_Widget* widget, void* data);
+		static void ShowMorphsCB(Fl_Widget* widget, void* data);
+
 		Fl_Choice* choiceCharacters;
 		Fl_Button* buttonRefresh;
 		Fl_Button* buttonReset;
@@ -47,6 +51,10 @@ class FaceViewer : public GenericViewer, public Fl_Double_Window, public SBWindo
 		Fl_Scroll* bottomGroup;
 		std::vector<Fl_Value_Slider*> _sliders;
 		std::vector<Fl_Value_Slider*> _weights;
+		Fl_Check_Button* checkShowAUs;
+		Fl_Check_Button* checkShowVisemes;
+		std::vector<Fl_Check_Button*> checkShowMorphs;
+		std::string lastCharacterName;
 };
 
 class FaceViewerFactory : public GenericViewerFactory
