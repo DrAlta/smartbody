@@ -19,17 +19,18 @@ FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x
 		choiceCharacters->callback(CharacterCB, this);
 		buttonRefresh = new Fl_Button(220, 10, 60, 25, "Refresh");
 		buttonRefresh->callback(RefreshCB, this);
-		buttonReset = new Fl_Button(220, 10, 60, 25, "Reset");
+		buttonReset = new Fl_Button(300, 10, 60, 25, "Reset");
 		buttonReset->callback(ResetCB, this);
-		buttonDefaultFace = new Fl_Button(310, 10, 100, 25, "Set Default Face");
+		buttonDefaultFace = new Fl_Button(380, 10, 100, 25, "Set Default Face");
 		buttonDefaultFace->callback(DefaultFaceCB, this);
-		buttonResetDefaultFace = new Fl_Button(440, 10, 100, 25, "Reset Default Face");
+		buttonResetDefaultFace = new Fl_Button(500, 10, 100, 25, "Reset Default Face");
 		buttonResetDefaultFace->callback(ResetDefaultFaceCB, this);
 
 	topGroup->end();
 
 	bottomGroup = new Fl_Scroll(0, 45, w, h - 40);
-	bottomGroup->begin();	
+	bottomGroup->begin();
+
 	bottomGroup->box(FL_DOWN_BOX);
 		
 	bottomGroup->end();	
@@ -39,6 +40,7 @@ FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x
 	this->resizable(bottomGroup);
 
 	FaceViewer::RefreshCB(this, this);
+	lastCharacterName = "";
 
 	if (choiceCharacters->size() > 0)
 	{
@@ -56,29 +58,60 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 {
 	FaceViewer* faceViewer = (FaceViewer*) data;
 
+	const Fl_Menu_Item* menu = faceViewer->choiceCharacters->menu();
+	std::string curCharacterName = menu[faceViewer->choiceCharacters->value()].label();
+
+	bool showAUs = true;
+	bool showVisemes = true;
+	std::map<std::string, bool> showMorphs;
+
+	if (curCharacterName == faceViewer->lastCharacterName)
+	{
+		showAUs = faceViewer->checkShowAUs->value();
+		showVisemes = faceViewer->checkShowVisemes->value();
+
+		for (unsigned int i = 0; i < faceViewer->checkShowMorphs.size(); i++)
+		{
+			showMorphs.insert(std::pair<std::string, bool>(faceViewer->checkShowMorphs[i]->label(), faceViewer->checkShowMorphs[i]->value()));
+		}
+	}
+
 	faceViewer->bottomGroup->clear();
 	faceViewer->_sliders.clear();
 	faceViewer->_weights.clear();
+	faceViewer->checkShowMorphs.clear();
 
 	int curY = faceViewer->bottomGroup->y() + 25;
-	const Fl_Menu_Item* menu = faceViewer->choiceCharacters->menu();
-	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(menu[faceViewer->choiceCharacters->value()].label());
-	if (character)
-	{	
-		SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
-		if (!faceDefinition)
-		{
-			faceViewer->redraw();
-			return;
-		}
 
+	faceViewer->checkShowAUs = new Fl_Check_Button(10, curY, 100, 25, "Show AUs");
+	faceViewer->checkShowAUs->callback(ShowAUsCB, faceViewer);
+	faceViewer->checkShowAUs->value(showAUs);
+	faceViewer->bottomGroup->add(faceViewer->checkShowAUs);
+
+	faceViewer->checkShowVisemes = new Fl_Check_Button(120, curY, 100, 25, "Show Visemes");
+	faceViewer->checkShowVisemes->callback(ShowVisemesCB, faceViewer);
+	faceViewer->checkShowVisemes->value(showVisemes);
+	faceViewer->bottomGroup->add(faceViewer->checkShowVisemes);
+
+	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(curCharacterName);
+	if (!character)
+	{
+		faceViewer->lastCharacterName = "";
+		return;
+	}
+
+	faceViewer->lastCharacterName = curCharacterName;
+
+	SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
+	if (faceDefinition && showAUs)
+	{
 		const std::vector<int>& auNums = faceDefinition->getAUNumbers();
 		for (size_t a = 0; a < auNums.size(); a++)
 		{
 			ActionUnit* au = faceDefinition->getAU(auNums[a]);
 			if (au->is_left())
 			{
-				Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(au->getLeftName().c_str()));
+				Fl_Value_Slider* slider = new Fl_Value_Slider(200, curY, 150, 25, _strdup(au->getLeftName().c_str()));
 				slider->type(FL_HORIZONTAL);
 				slider->align(FL_ALIGN_LEFT);
 				slider->range(0.0, 1.0);
@@ -91,7 +124,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 
 			if (au->is_right())
 			{
-				Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(au->getRightName().c_str()));
+				Fl_Value_Slider* slider = new Fl_Value_Slider(200, curY, 150, 25, _strdup(au->getRightName().c_str()));
 				slider->type(FL_HORIZONTAL);
 				slider->align(FL_ALIGN_LEFT);
 				slider->range(0.0, 1.0);
@@ -104,7 +137,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 
 			if (au->is_bilateral())
 			{
-				Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(au->getBilateralName().c_str()));
+				Fl_Value_Slider* slider = new Fl_Value_Slider(200, curY, 150, 25, _strdup(au->getBilateralName().c_str()));
 				slider->type(FL_HORIZONTAL);
 				slider->align(FL_ALIGN_LEFT);
 				slider->range(0.0, 1.0);
@@ -114,23 +147,26 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 				faceViewer->_weights.push_back(NULL);
 				curY += 30;
 			}
-			
+
 
 		}
+	}
 
+	if (faceDefinition && showVisemes)
+	{
 		const std::vector<std::string>& visemeNames = faceDefinition->getVisemeNames();
 		for (size_t v = 0; v < visemeNames.size(); v++)
 		{
-			Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(visemeNames[v].c_str()));
+			Fl_Value_Slider* slider = new Fl_Value_Slider(200, curY, 150, 25, _strdup(visemeNames[v].c_str()));
 			slider->type(FL_HORIZONTAL);
 			slider->align(FL_ALIGN_LEFT);
 			slider->range(0.0, 1.0);
 			slider->callback(FaceCB, faceViewer);
 			faceViewer->bottomGroup->add(slider);
 			faceViewer->_sliders.push_back(slider);
-			
+
 			std::string weightLabel = visemeNames[v] + " weight";
-			Fl_Value_Slider* weightSlider = new Fl_Value_Slider(330, curY, 100, 25, _strdup(weightLabel.c_str()));
+			Fl_Value_Slider* weightSlider = new Fl_Value_Slider(430, curY, 100, 25, _strdup(weightLabel.c_str()));
 			weightSlider->type(FL_HORIZONTAL);
 			weightSlider->align(FL_ALIGN_LEFT);
 			weightSlider->range(0.0, 1.0);
@@ -140,18 +176,77 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 			float initialWeight = faceDefinition->getVisemeWeight(visemeNames[v]);
 			weightSlider->value(initialWeight);
 			faceViewer->_weights.push_back(weightSlider);
-
-			curY += 30;
 		}
+	}
 
-		// also create slider for blend shape channels
-		if (character->getSkeleton())
+	// blend shapes/morph targets
+	if (character->getSkeleton())
+	{
+		std::set<std::string> morphControllers;
+		std::vector<std::string> attrNames = character->getAttributeNames();
+		for (unsigned int a = 0; a < attrNames.size(); a++)
 		{
-			for (int jointCounter = 0; jointCounter < character->getSkeleton()->getNumJoints(); ++jointCounter)
+			if (attrNames[a].find("blendShape.controller") != std::string::npos)
+				morphControllers.insert(character->getStringAttribute(attrNames[a]));
+		}
+		if (morphControllers.size() == 0)
+		{
+			Fl_Check_Button* checkMorph = new Fl_Check_Button(10, curY, 100, 25, "Show Morphs");
+			checkMorph->callback(ShowMorphsCB, faceViewer);
+			checkMorph->value(true);
+			faceViewer->checkShowMorphs.push_back(checkMorph);
+			faceViewer->bottomGroup->add(checkMorph);
+		}
+		else
+		{
+			int counter = 0;
+			for (std::set<std::string>::iterator iterator = morphControllers.begin();
+				iterator != morphControllers.end();
+				iterator++)
 			{
-				if (character->getSkeleton()->getJoint(jointCounter)->getJointType() == SkJoint::TypeBlendShape)
+				Fl_Check_Button* checkMorph = new Fl_Check_Button(100 * counter + 220, curY, 100, 25, _strdup((*iterator).c_str()));
+				checkMorph->callback(ShowMorphsCB, faceViewer);
+				bool found = false;
+				for (std::map<std::string, bool>::iterator iterator2 = showMorphs.begin();
+					iterator2 != showMorphs.end();
+					iterator2++)
 				{
-					Fl_Value_Slider* slider = new Fl_Value_Slider(100, curY, 150, 25, _strdup(character->getSkeleton()->getJoint(jointCounter)->getName().c_str()));
+					if ((*iterator2).first == (*iterator))
+					{
+						checkMorph->value((*iterator2).second);
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					checkMorph->value(true);
+
+				faceViewer->checkShowMorphs.push_back(checkMorph);
+				faceViewer->bottomGroup->add(checkMorph);
+				counter++;
+			}
+		}
+		curY += 25;
+
+		for (int jointCounter = 0; jointCounter < character->getSkeleton()->getNumJoints(); ++jointCounter)
+		{
+			if (character->getSkeleton()->getJoint(jointCounter)->getJointType() == SkJoint::TypeBlendShape)
+			{
+				std::string morphName = character->getSkeleton()->getJoint(jointCounter)->getName();
+				std::stringstream strstr;
+				strstr << "blendShape.controller." << morphName;
+				std::string controllerName = character->getStringAttribute(strstr.str());
+				bool showThisMorph = true;
+				if (controllerName != "")
+				{
+					std::map<std::string, bool>::iterator iter = showMorphs.find(controllerName);
+					if (iter != showMorphs.end())
+						showThisMorph = (*iter).second;
+				}
+
+				if (showThisMorph)
+				{
+					Fl_Value_Slider* slider = new Fl_Value_Slider(200, curY, 150, 25, _strdup(character->getSkeleton()->getJoint(jointCounter)->getName().c_str()));
 					slider->type(FL_HORIZONTAL);
 					slider->align(FL_ALIGN_LEFT);
 					slider->range(0.0, 1.0);
@@ -163,13 +258,32 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 				}
 			}
 		}
-
-		faceViewer->updateGUI();
-		faceViewer->bottomGroup->damage(FL_DAMAGE_ALL);
-
-		faceViewer->redraw();
 	}
+
+	faceViewer->updateGUI();
+	faceViewer->bottomGroup->damage(FL_DAMAGE_ALL);
+
+	faceViewer->redraw();
+
 }
+
+void FaceViewer::ShowAUsCB(Fl_Widget* widget, void* data)
+{
+	FaceViewer* faceViewer = (FaceViewer*) data;
+	faceViewer->checkShowAUs->value(faceViewer->checkShowAUs->value());
+}
+
+void FaceViewer::ShowVisemesCB(Fl_Widget* widget, void* data)
+{
+	FaceViewer* faceViewer = (FaceViewer*) data;
+	faceViewer->checkShowVisemes->value(faceViewer->checkShowVisemes->value());
+}
+
+void FaceViewer::ShowMorphsCB(Fl_Widget* widget, void* data)
+{
+	RefreshCB(widget, data);
+}
+
 
 void FaceViewer::RefreshCB(Fl_Widget* widget, void* data)
 {
@@ -507,6 +621,9 @@ void FaceViewer::OnSimulationUpdate()
 {
 	updateGUI();
 }
+
+
+
 
 
 
