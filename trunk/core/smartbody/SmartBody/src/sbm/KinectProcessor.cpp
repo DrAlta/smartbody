@@ -9,34 +9,37 @@
 KinectProcessor::KinectProcessor()
 {
 	//Note: everything is based on below assumptions
-	//20 to 24 bones, using kinect sdk standard, the joint order is also kinect sdk order as following
-	//index		openNI					kinecSDK				SmartBody
-	//0			XN_SKEL_WAIST			HipCenter				base
-	//1			XN_SKEL_TORSO			Spine					spine2
-	//2			XN_SKEL_NECK			ShoulderCenter			spine3
-	//3			XN_SKEL_HEAD			Head					skullbase
-	//4			XN_SKEL_LEFT_SHOULDER	ShoulderLeft			l_shoulder
-	//5			XN_SKEL_LEFT_ELBOW		ElbowLeft				l_elbow
-	//6			XN_SKEL_LEFT_WRIST		WristLeft				l_wrist	
-	//7			XN_SKEL_LEFT_HAND		HandLeft				l_index1
-	//8			XN_SKEL_RIGHT_SHOULDER	ShoulderRight			r_shoulder
-	//9			XN_SKEL_RIGHT_ELBOW		ElbowRight				r_elbow
-	//10		XN_SKEL_RIGHT_WRIST		WristRight				r_wrist
-	//11		XN_SKEL_RIGHT_HAND		HandRight				r_index1
-	//12		XN_SKEL_LEFT_HIP		HipLeft					l_hip		
-	//13		XN_SKEL_LEFT_KNEE		KneeLeft				l_knee			
-	//14		XN_SKEL_LEFT_ANKLE		AnkleLeft				l_ankle		
-	//15		XN_SKEL_LEFT_FOOT		FootLeft				l_forefoot
-	//16		XN_SKEL_RIGHT_HIP		HipRight				r_hip
-	//17		XN_SKEL_RIGHT_KNEE		KneeRight				r_knee
-	//18		XN_SKEL_RIGHT_ANKLE		AnkleRight				r_ankle
-	//19		XN_SKEL_RIGHT_FOOT		FootRight				r_forefoot
-	//20		XN_SKEL_LEFT_COLLAR								l_acromioclavicular
-	//21		XN_SKEL_RIGHT_COLLAR							r_acromioclavicular
-	//22		XN_SKEL_LEFT_FINGERTIP									
-	//23		XN_SKEL_RIGHT_FINGERTIP							
+	//20 to 25 bones, using kinect sdk standard, the joint order is also kinect sdk order as following
+	//index		openNI					kinect 1 SDK			Kinect 2 SDK			SmartBody
+	//0			XN_SKEL_WAIST			HipCenter				SpineBase				base
+	//1			XN_SKEL_TORSO			Spine					SpineMid				spine2
+	//2			XN_SKEL_NECK			ShoulderCenter			Neck					spine3
+	//3			XN_SKEL_HEAD			Head					Head					skullbase
+	//4			XN_SKEL_LEFT_SHOULDER	ShoulderLeft			ShoulderLeft			l_shoulder
+	//5			XN_SKEL_LEFT_ELBOW		ElbowLeft				ElbowLeft				l_elbow
+	//6			XN_SKEL_LEFT_WRIST		WristLeft				WristLeft				l_wrist	
+	//7			XN_SKEL_LEFT_HAND		HandLeft				HandLeft				l_index1
+	//8			XN_SKEL_RIGHT_SHOULDER	ShoulderRight			ShoulderRight			r_shoulder
+	//9			XN_SKEL_RIGHT_ELBOW		ElbowRight				ElbowRight				r_elbow
+	//10		XN_SKEL_RIGHT_WRIST		WristRight				WristRight				r_wrist
+	//11		XN_SKEL_RIGHT_HAND		HandRight				HandRight				r_index1
+	//12		XN_SKEL_LEFT_HIP		HipLeft					HipLeft					l_hip		
+	//13		XN_SKEL_LEFT_KNEE		KneeLeft				KneeLeft				l_knee			
+	//14		XN_SKEL_LEFT_ANKLE		AnkleLeft				AnkleLeft				l_ankle		
+	//15		XN_SKEL_LEFT_FOOT		FootLeft				FootLeft				l_forefoot
+	//16		XN_SKEL_RIGHT_HIP		HipRight				HipRight				r_hip
+	//17		XN_SKEL_RIGHT_KNEE		KneeRight				KneeRight				r_knee
+	//18		XN_SKEL_RIGHT_ANKLE		AnkleRight				AnkleRight				r_ankle
+	//19		XN_SKEL_RIGHT_FOOT		FootRight				FootRight				r_forefoot
+	//20		XN_SKEL_LEFT_COLLAR								SpineShoulder			l_acromioclavicular
+	//21		XN_SKEL_RIGHT_COLLAR							HandTipLeft				r_acromioclavicular
+	//22		XN_SKEL_LEFT_FINGERTIP							ThumbLeft						
+	//23		XN_SKEL_RIGHT_FINGERTIP							HandTipRight
+    //24														ThumbRight
 
-	numOfKinectJoints = 20; // use only 20 joints
+	//numOfKinectJoints = 20; // use only 20 joints from Kinect1
+	numOfKinectJoints = 25; // use only 25 joints from Kinect2
+
 	// default mapping, can be user defined too
 	boneMapping.push_back("base");			
 	boneMapping.push_back("spine2");	// should it be spine2 or base
@@ -63,6 +66,7 @@ KinectProcessor::KinectProcessor()
 	boneMapping.push_back("r_acromioclavicular");
 	boneMapping.push_back("");
 	boneMapping.push_back("");
+	boneMapping.push_back("");
 
 	parentIndexMap.clear();
 	for (unsigned int i=0;i<boneMapping.size();i++)
@@ -77,9 +81,9 @@ KinectProcessor::KinectProcessor()
 			parentIndexMap[i] = i-1;		
 	}
 	filterSize = 10;
-	rotationBuffer.resize(24);
-	for (int i = 0; i < 24; i++)
-		rotationBuffer[i].resize(24);
+	rotationBuffer.resize(25);
+	for (int i = 0; i < 25; i++)
+		rotationBuffer[i].resize(25);
 }
 
 void KinectProcessor::inferJointOffsets( std::vector<SrVec>& gPos, std::vector<SrQuat>& gRot, std::vector<SrVec>& out, std::map<int, SrQuat>& bonePreRotMap )
@@ -189,7 +193,7 @@ int KinectProcessor::getNumBones()
 
 const char* KinectProcessor::getSBJointName(int i)
 {
-	if (i >= 0 && i < 24)
+	if (i >= 0 && i < 25)
 		return boneMapping[i].c_str();
 	else
 		return "";
@@ -197,17 +201,17 @@ const char* KinectProcessor::getSBJointName(int i)
 
 void KinectProcessor::setSBJointName(int i, const char* jName)
 {
-	if (i >= 0 && i < 24)
+	if (i >= 0 && i < 25)
 		boneMapping[i] = jName;
 }
 
 void KinectProcessor::processGlobalRotation(std::vector<SrQuat>& quats)
 {
-	if (quats.size() != 24)
+	if (quats.size() != 25)
 		return;
 
 	// process: get local, and reverse x-axis
-	std::vector<SrQuat> tempQuats(24);
+	std::vector<SrQuat> tempQuats(25);
 	tempQuats = quats;
 
 #if 0
@@ -235,7 +239,7 @@ void KinectProcessor::processGlobalRotation(std::vector<SrQuat>& quats)
 	// base
 	quats[0] = quats[1];
 
-	for (int i = 0; i < 24; i++)
+	for (int i = 0; i < 25; i++)
 	{
 		if (quats[i].w == 0)
 		{
@@ -264,7 +268,7 @@ void KinectProcessor::processGlobalRotation(std::vector<SrQuat>& quats)
 	}
 	quats = tempQuats;
 
-	for (unsigned int i = 0; i < 24; i++)
+	for (unsigned int i = 0; i < 25; i++)
 		quats[i].x *= -1.0f;
 }
 
@@ -362,17 +366,18 @@ void KinectProcessor::processRetargetRotation(std::string targetSkelName, std::v
 	for (int i = 0; i < numOfKinectJoints; i++)
 	{
 		int pindex = parentIndexMap[i];
-		if (i == 3) // copy head rotation..?
+		if (i != 1 && i != 3)
 		{
-			outQuat[i] = quats[i];
-			continue;
+			if (pindex < 0 || pindex == 0 || pindex == 2)
+			{
+				continue;		
+			}
 		}
-		if (pindex < 0 || pindex == 0 || pindex == 2)
-		{
-			continue;		
-		}
-		
-		outQuat[pindex] = retarget->applyRetargetJointRotation(getSBJointName(pindex),quats[i]);
+
+		if (i == 1 || i == 3)
+			outQuat[i] = retarget->applyRetargetJointRotation(getSBJointName(pindex),quats[i]);
+		else
+			outQuat[pindex] = retarget->applyRetargetJointRotation(getSBJointName(pindex),quats[i]);
 		//outQuat[i] = retarget->applyRetargetJointRotation(getSBJointName(i),SrQuat());
 	}		
 
