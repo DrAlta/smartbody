@@ -2274,18 +2274,24 @@ void ParserCOLLADAFast::load_texture(int type, const char* file, const SrStringA
 	SrString s;
 	SrInput in;
 	std::string imageFile = file;
-	in.init( fopen(file,"r"));
-	int i = 0;
-	while ( !in.valid() && i < paths.size())
+	std::string finalTexturePath = "";
+	std::string textureName = file;
+	for (int p = 0; p < paths.size(); p++)
 	{
-		s = paths[i++];
-		s << file;
-		imageFile = s;
-		in.init ( fopen(s,"r") );
+		boost::filesystem::path texturePath(paths[0]);
+		texturePath.append(imageFile);
+		finalTexturePath = boost::filesystem::complete(texturePath).string();
+		in.init(fopen(finalTexturePath.c_str(), "r"));
+		if (in.valid())
+			break;
 	}
-	if (!in.valid()) return;		
+	if (!in.valid())
+	{
+		LOG("Could not find texture in file %s", file);
+		return;
+	}
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
-	texManager.loadTexture(type,file,s);	
+	texManager.loadTexture(type, file, finalTexturePath.c_str());
 }
 
 
@@ -2405,7 +2411,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 #endif
 					std::string fileName = boost::filesystem::basename(imageFile);
 					if (diffuseTexture.find(imageId) != std::string::npos)
-						mtlTexMap[mtlName] = fileName + fileExt;		
+						mtlTexMap[mtlName] = imageFile;
 
 				}
 				rapidxml::xml_node<>* colorNode = ParserCOLLADAFast::getNode("color", diffuseNode);
@@ -2440,7 +2446,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 #endif
 					std::string fileName = boost::filesystem::basename(imageFile);
 					if (diffuseTexture.find(imageId) != std::string::npos)
-						mtlTexBumpMap[mtlName] = fileName + fileExt;		
+						mtlTexBumpMap[mtlName] = imageFile; // fileName + fileExt;
 
 					M.back().specular = SrColor(0.1f,0.1f,0.1f,1.f);
 					M.back().shininess = 20;
@@ -2466,7 +2472,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 #endif
 					std::string fileName = boost::filesystem::basename(imageFile);
 					if (diffuseTexture.find(imageId) != std::string::npos)
-						mtlTexSpecularMap[mtlName] = fileName + fileExt;	
+						mtlTexSpecularMap[mtlName] = imageFile; // fileName + fileExt;
 
 					M.back().specular = SrColor(0.1f,0.1f,0.1f,1.f);
 					M.back().shininess = 20;
@@ -2494,11 +2500,11 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 #endif
 				std::string fileName = boost::filesystem::basename(texFile);
 				if (diffuseTexture.find(imageName) != std::string::npos)
-					mtlTexMap[mtlName] = fileName + fileExt;	
+					mtlTexMap[mtlName] = imageFile;// fileName + fileExt;
 				else if (normalTexture.find(imageName) != std::string::npos)
-					mtlTexBumpMap[mtlName] = fileName + fileExt;
+					mtlTexBumpMap[mtlName] = imageFile; // fileName + fileExt;
 				else if (specularTexture.find(imageName) != std::string::npos)
-					mtlTexSpecularMap[mtlName] = fileName + fileExt;				
+					mtlTexSpecularMap[mtlName] = imageFile; // fileName + fileExt;
 			}
 
 
