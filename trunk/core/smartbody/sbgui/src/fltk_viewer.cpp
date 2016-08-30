@@ -1376,7 +1376,9 @@ void FltkViewer::updateLights()
 	}
 	//LOG("light size = %d\n",_lights.size());
 	
-	if (_lights.size() == 0 && numLightsInScene == 0)
+	if (_lights.size() == 0 && 
+		numLightsInScene == 0 &&
+		SmartBody::SBScene::getScene()->getBoolAttribute("useDefaultLights"))
 	{
 		SrLight light;		
 		light.directional = true;
