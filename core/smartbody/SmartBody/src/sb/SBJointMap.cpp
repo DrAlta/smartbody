@@ -645,6 +645,11 @@ bool SBJointMap::guessMapping(SmartBody::SBSkeleton* skeleton, bool prtMap)
 #define BASE_SEARCHES 10
 	
 	base = skeleton->root();
+	if (!base)
+	{
+		LOG("Could not find base for skeleton %s, aborting joint name matching.", skeleton->getName().c_str());
+		return false;
+	}
 	const unsigned int base_searchs = jnts.size()<BASE_SEARCHES ? jnts.size() : BASE_SEARCHES;
 	if (base->num_children() == 3)
 	{
