@@ -138,6 +138,16 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			else
 				assets.push_back(motion);
 
+			// parsing geometry
+#if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__) && !defined(EMSCRIPTEN)
+			SbmDeformableMeshGPU* mesh = new SbmDeformableMeshGPU();
+#else
+			DeformableMesh* mesh = new DeformableMesh();
+#endif
+			boost::filesystem::path meshPath(path);
+			std::string meshBaseName = boost::filesystem::basename(meshPath);
+			std::string extension = boost::filesystem::extension(meshPath);
+			mesh->setName(meshBaseName + extension);
 
 			// get picture id to file mapping
 			std::map<std::string, std::string> pictureId2File;
@@ -161,18 +171,10 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			rapidxml::xml_node<>* effectNode = ParserCOLLADAFast::getNode("library_effects", colladaNode, 0, 1);
 			if (effectNode)
 			{
-				ParserCOLLADAFast::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
+				ParserCOLLADAFast::parseLibraryEffects(effectNode, mesh->getName(), effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
 			}
-			// parsing geometry
-#if !defined (__ANDROID__) && !defined(SB_IPHONE) &&  !defined(__FLASHPLAYER__) && !defined(__native_client__) && !defined(EMSCRIPTEN)
-			SbmDeformableMeshGPU* mesh = new SbmDeformableMeshGPU();
-#else
-			DeformableMesh* mesh = new DeformableMesh();
-#endif
-			boost::filesystem::path meshPath(path);
-			std::string meshBaseName = boost::filesystem::basename(meshPath);
-			std::string extension = boost::filesystem::extension(meshPath);
-			mesh->setName(meshBaseName + extension);
+			
+			
 			std::vector<SrModel*> meshModelVec;
 			if (geometryNode)
 				ParserCOLLADAFast::parseLibraryGeometries(geometryNode, convertedPath.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f);

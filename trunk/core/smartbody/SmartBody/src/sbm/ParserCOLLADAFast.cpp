@@ -2196,18 +2196,29 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 			for (size_t i = 0; i < newModel->M.size(); i++)
 			{
 			   std::string matName = newModel->mtlnames[i];
+			   std::stringstream strstr;
+			   strstr << filename << "|";
 			   if (newModel->mtlTextureNameMap.find(matName) != newModel->mtlTextureNameMap.end())
 			   {
-				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_DIFFUSE, newModel->mtlTextureNameMap[matName].c_str(), paths);	   
+				   strstr << newModel->mtlTextureNameMap[matName];
+				   std::string prefixedName = strstr.str();
+				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_DIFFUSE, prefixedName.c_str(), newModel->mtlTextureNameMap[matName].c_str(), paths);
+				   newModel->mtlTextureNameMap[matName] = prefixedName;
 			   }	
 			   if (newModel->mtlNormalTexNameMap.find(matName) != newModel->mtlNormalTexNameMap.end())
 			   {
-				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_NORMALMAP, newModel->mtlNormalTexNameMap[matName].c_str(), paths);	   
+				   strstr << newModel->mtlNormalTexNameMap[matName];
+				   std::string prefixedName = strstr.str();
+				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_NORMALMAP, prefixedName.c_str(), newModel->mtlNormalTexNameMap[matName].c_str(), paths);
+				   newModel->mtlNormalTexNameMap[matName] = prefixedName;
 			   }
 			   if (newModel->mtlSpecularTexNameMap.find(matName) != newModel->mtlSpecularTexNameMap.end())
 			   {
+				   strstr << newModel->mtlSpecularTexNameMap[matName];
+				   std::string prefixedName = strstr.str();
 				   //LOG("Load specular map = %s",newModel->mtlSpecularTexNameMap[matName].c_str());
-				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, newModel->mtlSpecularTexNameMap[matName].c_str(), paths);	   
+				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, prefixedName.c_str(), newModel->mtlSpecularTexNameMap[matName].c_str(), paths);
+				   newModel->mtlSpecularTexNameMap[matName] = prefixedName;
 			   }
 			}
 		}
@@ -2269,13 +2280,12 @@ void ParserCOLLADAFast::setModelVertexSource( std::string& sourceName, std::stri
 	}
 }
 
-void ParserCOLLADAFast::load_texture(int type, const char* file, const SrStringArray& paths)
+void ParserCOLLADAFast::load_texture(int type, const char* textureName, const char* file, const SrStringArray& paths)
 {
 	SrString s;
 	SrInput in;
 	std::string imageFile = file;
 	std::string finalTexturePath = "";
-	std::string textureName = file;
 	for (int p = 0; p < paths.size(); p++)
 	{
 		boost::filesystem::path texturePath(paths[0]);
@@ -2291,7 +2301,7 @@ void ParserCOLLADAFast::load_texture(int type, const char* file, const SrStringA
 		return;
 	}
 	SbmTextureManager& texManager = SbmTextureManager::singleton();
-	texManager.loadTexture(type, file, finalTexturePath.c_str());
+	texManager.loadTexture(type, textureName, finalTexturePath.c_str());
 }
 
 
@@ -2361,7 +2371,7 @@ void ParserCOLLADAFast::parseLibraryImages(rapidxml::xml_node<>* node, std::map<
 	}
 }
 
-void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, std::vector<SrMaterial>& M, std::vector<std::string>& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
+void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::string assetName, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, std::vector<SrMaterial>& M, std::vector<std::string>& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap )
 {
 	//const DOMNodeList* list = node->getChildNodes();
 	rapidxml::xml_node<>* curNode = node->first_node();
@@ -2499,6 +2509,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::ma
 				std::string fileExt = boost::filesystem2::extension(texFile);
 #endif
 				std::string fileName = boost::filesystem::basename(texFile);
+
 				if (diffuseTexture.find(imageName) != std::string::npos)
 					mtlTexMap[mtlName] = imageFile;// fileName + fileExt;
 				else if (normalTexture.find(imageName) != std::string::npos)
@@ -2802,7 +2813,7 @@ bool ParserCOLLADAFast::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 		rapidxml::xml_node<>* effectNode = getNode("library_effects", node, depth, 2);	
 		if (effectNode)
 		{
-			ParserCOLLADAFast::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
+			ParserCOLLADAFast::parseLibraryEffects(effectNode,"unknown", effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
 		}
 		// parsing geometry
 		ParserCOLLADAFast::parseLibraryGeometries(geometryNode, fileName.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVecs, 1.0f);
