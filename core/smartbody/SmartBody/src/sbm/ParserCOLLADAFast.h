@@ -85,11 +85,12 @@ class ParserCOLLADAFast
 	
 		static void animationPostProcess(SkSkeleton& skeleton, SkMotion& motion);
 		static void animationPostProcessByChannels(SkSkeleton& skeleton, SkMotion& motion, SkChannelArray& channels);
-		static void parseLibraryGeometries(rapidxml::xml_node<>* node, const char* file, std::vector<SrMaterial>& M, std::vector<std::string>& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale);
+		static void parseLibraryGeometries(rapidxml::xml_node<>* node, const char* file, std::vector<SrMaterial>& M, std::vector<std::string>& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap, std::map<std::string, std::string>& mtlTransparentMap, std::vector<SrModel*>& meshModelVec, float scale);
 		static void load_texture(int type, const char* textureName, const char* file, const SrStringArray& paths);
+		static std::string getFinalTextureFileName(std::string filename, const SrStringArray& paths);
 		static void parseLibraryMaterials(rapidxml::xml_node<>* node, std::map<std::string, std::string>& effectId2MaterialId);
 		static void parseLibraryImages(rapidxml::xml_node<>* node, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name);
-		static void parseLibraryEffects(rapidxml::xml_node<>* node, std::string assetName, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, std::vector<SrMaterial>& M, std::vector<std::string>& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap);
+		static void parseLibraryEffects(rapidxml::xml_node<>* node, std::string assetName, std::map<std::string, std::string>&effectId2MaterialId, std::map<std::string, std::string>& materialId2Name, std::map<std::string, std::string>& pictureId2File, std::map<std::string, std::string>& pictureId2Name, std::vector<SrMaterial>& M, std::vector<std::string>& mnames, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap, std::map<std::string, std::string>& mtlTransparentMap);
 
 	private:
 		static int getMotionChannelId(SkChannelArray& channels, const std::string&  sourceName);

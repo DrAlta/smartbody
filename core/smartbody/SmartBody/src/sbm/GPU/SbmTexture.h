@@ -52,6 +52,7 @@ public:
 	SBAPI void createWhiteTexture(const char* textureName, int width = 1, int height = 1);
 	SBAPI void createFBO(const char* fboName);
 
+	
 	void releaseAllTextures();	
 protected:
 	StrTextureMap& findMap(int type);
@@ -99,6 +100,7 @@ public:
 	SBAPI void setBuffer(unsigned char* buffer, int size);
 	SBAPI void setTextureSize(int w, int h, int numChannels);
 
+	SBAPI void bakeAlphaIntoTexture(SbmTexture* alphaTex);
 	// Creates a 1x1 white texture
 	SBAPI void createWhiteTexture(int w = 1, int h = 1);
 };

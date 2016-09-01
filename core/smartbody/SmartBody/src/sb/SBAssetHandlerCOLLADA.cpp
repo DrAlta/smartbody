@@ -168,16 +168,18 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			std::map<std::string,std::string> mtlTextMap;
 			std::map<std::string,std::string> mtlTextBumpMap;
 			std::map<std::string,std::string> mtlTextSpecularMap;
+			std::map<std::string, std::string> mtlTransparentMap;
+
 			rapidxml::xml_node<>* effectNode = ParserCOLLADAFast::getNode("library_effects", colladaNode, 0, 1);
 			if (effectNode)
 			{
-				ParserCOLLADAFast::parseLibraryEffects(effectNode, mesh->getName(), effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
+				ParserCOLLADAFast::parseLibraryEffects(effectNode, mesh->getName(), effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, mtlTransparentMap);
 			}
 			
 			
 			std::vector<SrModel*> meshModelVec;
 			if (geometryNode)
-				ParserCOLLADAFast::parseLibraryGeometries(geometryNode, convertedPath.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVec, 1.0f);
+				ParserCOLLADAFast::parseLibraryGeometries(geometryNode, convertedPath.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, mtlTransparentMap, meshModelVec, 1.0f);
 
 			float factor = 1.0f;
 
