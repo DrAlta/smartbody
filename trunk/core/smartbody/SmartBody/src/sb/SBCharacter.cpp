@@ -698,7 +698,9 @@ void SBCharacter::notify(SBSubject* subject)
 			removeAllBlendShapeChannels();
 			
 			// add channel
+			int shapesAdded = 0;
 			std::vector<std::string> attributeNames = this->getAttributeNames();
+			std::vector<std::string> shapeNames;
 			for (size_t i = 0; i < attributeNames.size(); ++i)
 			{
 				std::string attrName = attributeNames[i];
@@ -714,11 +716,14 @@ void SBCharacter::notify(SBSubject* subject)
 							LOG("Blend shape channel %s already existed. Skipping add shape %s...", channelName.c_str(), shapeName.c_str());
 							continue;
 						}
-						addBlendShapeChannel(channelName);
+						shapeNames.push_back(channelName);
 						LOG("Blend shape channel %s added for shape %s ...", channelName.c_str(), shapeName.c_str());
 					}
 				}
 			}
+			if (shapeNames.size() > 0)
+				addBlendShapeChannels(shapeNames);
+
 		}
 		else if (attribute->getName() == "createPhysics")
 		{

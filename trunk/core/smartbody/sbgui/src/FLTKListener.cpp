@@ -589,6 +589,11 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 				}
 			}
 		}
+		else if (name == "useDefaultLights")
+		{
+			BaseWindow* window = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());	
+			window->curViewer->updateLights();
+		}
 
 		// check for scene attributes
 		/*

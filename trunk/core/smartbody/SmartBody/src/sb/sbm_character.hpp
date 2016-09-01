@@ -292,7 +292,8 @@ public:
 
 public:
 	
-	SBAPI void addBlendShapeChannel(std::string bShapeName);
+	SBAPI void addBlendShapeChannel(std::string shapeName);
+	SBAPI void addBlendShapeChannels(std::vector<std::string>& shapeNames);
 
 	static void addTagSkMotion(int tag, SkMotion* motion, std::set<std::pair<int,SkMotion*> >& motionSet);
 		

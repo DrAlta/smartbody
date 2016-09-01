@@ -2447,13 +2447,53 @@ void SbmCharacter::addVisemeChannel(std::string visemeName, std::string motionNa
 	}
 }
 
+void SbmCharacter::addBlendShapeChannels(std::vector<std::string>& shapeNames)
+{
+	// add a corresponding channel for this action unit
+	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
+	if (!sbSkel)
+	{
+		LOG("No skeleton for character %s. Blend shapes %d cannot be added.", this->getName().c_str(), shapeNames.size());
+		return;
+	}
+	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
+	if (!rootJoint)
+	{
+		LOG("No root joint for character %s. Blend shapes %d cannot be added.", this->getName().c_str(), shapeNames.size());
+		return;
+	}
+
+	if (getFaceDefinition() == NULL)
+	{
+		LOG("Current character %s doesn't have a face definition, create a default one to support blend shape", this->getName().c_str());
+		SmartBody::SBFaceDefinition* defaultFaceDef = SmartBody::SBScene::getScene()->createFaceDefinition("default");
+		defaultFaceDef->setFaceNeutral("");
+		this->setFaceDefinition(defaultFaceDef);
+	}
+
+	for (unsigned int b = 0; b < shapeNames.size(); b++)
+	{
+		SmartBody::SBJoint* shapeJoint = new SmartBody::SBJoint();
+		shapeJoint->setJointType(SkJoint::TypeBlendShape);
+		shapeJoint->setName(shapeNames[b]);
+		shapeJoint->setUsePosition(0, true);
+		shapeJoint->pos()->limits(SkJointPos::X, -10, 10);  // Setting upper bound to 2 allows some exaggeration
+		rootJoint->addChild(shapeJoint);
+		viseme_channel_count++;
+	}
+	updateFaceDefinition();
+
+	
+
+}
+
 void SbmCharacter::addBlendShapeChannel(std::string bShapeName)
 {
 	// add a corresponding channel for this action unit
 	SmartBody::SBSkeleton* sbSkel = dynamic_cast<SmartBody::SBSkeleton*>(getSkeleton());
 	if (!sbSkel)
 	{
-		LOG("No skeleton for character %s. Blend shape %d cannot be added.", this->getName().c_str(), bShapeName.c_str());
+		LOG("No skeleton for character %s. Blend shape %s cannot be added.", this->getName().c_str(), bShapeName.c_str());
 		return;
 	}
 	SmartBody::SBJoint* rootJoint = dynamic_cast<SmartBody::SBJoint*>(sbSkel->root());
