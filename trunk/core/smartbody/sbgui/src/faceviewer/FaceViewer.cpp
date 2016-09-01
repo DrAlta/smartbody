@@ -100,6 +100,57 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 		return;
 	}
 
+
+	// blend shapes/morph targets
+	if (character->getSkeleton())
+	{
+		std::set<std::string> morphControllers;
+		std::vector<std::string> attrNames = character->getAttributeNames();
+		for (unsigned int a = 0; a < attrNames.size(); a++)
+		{
+			if (attrNames[a].find("blendShape.controller") != std::string::npos)
+				morphControllers.insert(character->getStringAttribute(attrNames[a]));
+		}
+		if (morphControllers.size() == 0)
+		{
+			Fl_Check_Button* checkMorph = new Fl_Check_Button(10, curY, 100, 25, "Show Morphs");
+			checkMorph->callback(ShowMorphsCB, faceViewer);
+			checkMorph->value(true);
+			faceViewer->checkShowMorphs.push_back(checkMorph);
+			faceViewer->bottomGroup->add(checkMorph);
+		}
+		else
+		{
+			int counter = 0;
+			for (std::set<std::string>::iterator iterator = morphControllers.begin();
+				iterator != morphControllers.end();
+				iterator++)
+			{
+				Fl_Check_Button* checkMorph = new Fl_Check_Button(100 * counter + 220, curY, 100, 25, _strdup((*iterator).c_str()));
+				checkMorph->callback(ShowMorphsCB, faceViewer);
+				bool found = false;
+				for (std::map<std::string, bool>::iterator iterator2 = showMorphs.begin();
+					iterator2 != showMorphs.end();
+					iterator2++)
+				{
+					if ((*iterator2).first == (*iterator))
+					{
+						checkMorph->value((*iterator2).second);
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+					checkMorph->value(true);
+
+				faceViewer->checkShowMorphs.push_back(checkMorph);
+				faceViewer->bottomGroup->add(checkMorph);
+				counter++;
+			}
+		}
+	}
+	curY += 25;
+
 	faceViewer->lastCharacterName = curCharacterName;
 
 	SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
@@ -176,58 +227,14 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 			float initialWeight = faceDefinition->getVisemeWeight(visemeNames[v]);
 			weightSlider->value(initialWeight);
 			faceViewer->_weights.push_back(weightSlider);
+
+			curY += 25;
 		}
 	}
 
 	// blend shapes/morph targets
 	if (character->getSkeleton())
 	{
-		std::set<std::string> morphControllers;
-		std::vector<std::string> attrNames = character->getAttributeNames();
-		for (unsigned int a = 0; a < attrNames.size(); a++)
-		{
-			if (attrNames[a].find("blendShape.controller") != std::string::npos)
-				morphControllers.insert(character->getStringAttribute(attrNames[a]));
-		}
-		if (morphControllers.size() == 0)
-		{
-			Fl_Check_Button* checkMorph = new Fl_Check_Button(10, curY, 100, 25, "Show Morphs");
-			checkMorph->callback(ShowMorphsCB, faceViewer);
-			checkMorph->value(true);
-			faceViewer->checkShowMorphs.push_back(checkMorph);
-			faceViewer->bottomGroup->add(checkMorph);
-		}
-		else
-		{
-			int counter = 0;
-			for (std::set<std::string>::iterator iterator = morphControllers.begin();
-				iterator != morphControllers.end();
-				iterator++)
-			{
-				Fl_Check_Button* checkMorph = new Fl_Check_Button(100 * counter + 220, curY, 100, 25, _strdup((*iterator).c_str()));
-				checkMorph->callback(ShowMorphsCB, faceViewer);
-				bool found = false;
-				for (std::map<std::string, bool>::iterator iterator2 = showMorphs.begin();
-					iterator2 != showMorphs.end();
-					iterator2++)
-				{
-					if ((*iterator2).first == (*iterator))
-					{
-						checkMorph->value((*iterator2).second);
-						found = true;
-						break;
-					}
-				}
-				if (!found)
-					checkMorph->value(true);
-
-				faceViewer->checkShowMorphs.push_back(checkMorph);
-				faceViewer->bottomGroup->add(checkMorph);
-				counter++;
-			}
-		}
-		curY += 25;
-
 		for (int jointCounter = 0; jointCounter < character->getSkeleton()->getNumJoints(); ++jointCounter)
 		{
 			if (character->getSkeleton()->getJoint(jointCounter)->getJointType() == SkJoint::TypeBlendShape)
@@ -269,14 +276,12 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 
 void FaceViewer::ShowAUsCB(Fl_Widget* widget, void* data)
 {
-	FaceViewer* faceViewer = (FaceViewer*) data;
-	faceViewer->checkShowAUs->value(faceViewer->checkShowAUs->value());
+	RefreshCB(widget, data);
 }
 
 void FaceViewer::ShowVisemesCB(Fl_Widget* widget, void* data)
 {
-	FaceViewer* faceViewer = (FaceViewer*) data;
-	faceViewer->checkShowVisemes->value(faceViewer->checkShowVisemes->value());
+	RefreshCB(widget, data);
 }
 
 void FaceViewer::ShowMorphsCB(Fl_Widget* widget, void* data)
