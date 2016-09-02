@@ -2415,6 +2415,10 @@ void SbmCharacter::addVisemeChannel(std::string visemeName, SkMotion* motion)
 		return;
 	}
 
+
+	SmartBody::SBJoint* existingJoint = this->getSkeleton()->getJointByName(visemeName);
+	if (existingJoint)
+		return;
 	SmartBody::SBJoint* visemeJoint = new SmartBody::SBJoint();
 	visemeJoint->setName(visemeName);
 	visemeJoint->setJointType(SkJoint::TypeViseme);
@@ -2570,6 +2574,10 @@ void SbmCharacter::addActionUnitChannel(int auNum, ActionUnit* au)
 	}
 	for (size_t a = 0; a < allUnits.size(); a++)
 	{
+		// if this joint already exists, don't add it
+		SmartBody::SBJoint* existingJoint = this->getSkeleton()->getJointByName(allUnits[a]);
+		if (existingJoint)
+			continue;
 		SmartBody::SBJoint* auJoint = new SmartBody::SBJoint();
 		auJoint->setJointType(SkJoint::TypeViseme);
 		auJoint->setName(allUnits[a]);
