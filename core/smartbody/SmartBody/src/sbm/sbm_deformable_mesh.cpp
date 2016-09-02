@@ -2212,6 +2212,7 @@ void DeformableMeshInstance::blendShapes()
 		//	Initializes vector of wieghts, of size (#shapes) 
 		std::vector<float> weights(targets.size(), 0);
 
+
 		//	Initializes vector of wieghts, of size (#shapes) each shape got a texture
 		std::vector<GLuint> texIDs(targets.size(), 0);
 
@@ -2334,6 +2335,13 @@ void DeformableMeshInstance::blendShapes()
 		}
 
 
+		// END OF SECOND ATTEMPT
+		writeToBaseModel->shape().V = newV;
+		writeToBaseModel->shape().N = newN;
+		writeToBaseModel->changed(true);
+
+		if (_character->getStringAttribute("texturesType") != "dynamic")
+			continue;
 
 
 		
@@ -2481,10 +2489,7 @@ void DeformableMeshInstance::blendShapes()
 #endif
 		}
 #endif
-		// END OF SECOND ATTEMPT
-		writeToBaseModel->shape().V = newV;
-		writeToBaseModel->shape().N = newN;
-		writeToBaseModel->changed(true);
+
 	}
 
 	return;
@@ -2759,61 +2764,63 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 
 	DeformableMeshInstance::blendShapes();
 
-	std::map<std::string, std::vector<SrSnModel*> >::iterator mIter;
+	for (std::map<std::string, std::vector<SrSnModel*> >::iterator mIter = _mesh->blendShapeMap.begin();
+		mIter != _mesh->blendShapeMap.end();
+		mIter++)
+	{
+		SrSnModel* writeToBaseModel = NULL;
+		int vtxBaseIdx = 0;
 
-	mIter						= _mesh->blendShapeMap.begin();
-	SrSnModel* writeToBaseModel = NULL;	
-	int vtxBaseIdx				= 0;
-
-	for (size_t i = 0; i < _mesh->dMeshStatic_p.size(); ++i)
-	{		
-		if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
+		for (size_t i = 0; i < _mesh->dMeshStatic_p.size(); ++i)
 		{
-			writeToBaseModel = _mesh->dMeshStatic_p[i];			
-			break;
+			if (strcmp(_mesh->dMeshStatic_p[i]->shape().name, mIter->first.c_str()) == 0)
+			{
+				writeToBaseModel = _mesh->dMeshStatic_p[i];
+				break;
+			}
+			else
+			{
+				// skip vertices for this sub mesh
+				vtxBaseIdx += _mesh->dMeshStatic_p[i]->shape().V.size();
+			}
 		}
-		else
+
+		if (!writeToBaseModel)
+			continue;
+
+		std::map<int, std::vector<int> >& vtxNewVtxIdxMap = _mesh->vtxNewVtxIdxMap;
+		std::map<int, std::vector<int> >& vtxBlendShapeVtxIdxMap = _mesh->blendShapeNewVtxIdxMap;
+		SrModel& baseModel = writeToBaseModel->shape();
+
+		std::vector<SrVec>& newPosBuf = (_mesh->isSkinnedMesh()) ? _restPosBuf : _deformPosBuf;
+		for (unsigned int i = 0; i < baseModel.V.size(); i++)
 		{
-			// skip vertices for this sub mesh
-			vtxBaseIdx += _mesh->dMeshStatic_p[i]->shape().V.size();
+			int iVtx = vtxBaseIdx + i;
+			SrVec& basePos = baseModel.V[i];
+			newPosBuf[iVtx] = basePos;
+
+			if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
+			{
+				std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
+				// copy related vtx components 
+				for (unsigned int k = 0; k < idxMap.size(); k++)
+				{
+					int idx = idxMap[k];
+					newPosBuf[idx] = basePos;	// Here copies blended vertices position
+				}
+			}
+			// 		if (vtxBlendShapeVtxIdxMap.find(i) != vtxBlendShapeVtxIdxMap.end())
+			// 		{
+			// 			std::vector<int>& idxMap = vtxBlendShapeVtxIdxMap[i];
+			// 			// copy related vtx components 
+			// 			for (unsigned int k=0;k<idxMap.size();k++)
+			// 			{
+			// 				int idx				= idxMap[k];
+			// 				newPosBuf[idx]	= basePos;	// Here copies blended vertices position
+			// 			}
+			// 		}
 		}
 	}
-
-	if (!writeToBaseModel)
-		return;
-	
-	std::map<int,std::vector<int> >& vtxNewVtxIdxMap = _mesh->vtxNewVtxIdxMap;
-	std::map<int, std::vector<int> >& vtxBlendShapeVtxIdxMap = _mesh->blendShapeNewVtxIdxMap;
-	SrModel& baseModel = writeToBaseModel->shape();
-	
-	std::vector<SrVec>& newPosBuf = (_mesh->isSkinnedMesh()) ? _restPosBuf : _deformPosBuf;
-	for (unsigned int i=0;i<baseModel.V.size();i++)
-	{
-		int iVtx			= vtxBaseIdx+i;
-		SrVec& basePos		= baseModel.V[i];
-		newPosBuf[iVtx] = basePos;
-
-		if (vtxNewVtxIdxMap.find(iVtx) != vtxNewVtxIdxMap.end())
-		{
-			std::vector<int>& idxMap = vtxNewVtxIdxMap[iVtx];
-			// copy related vtx components 
-			for (unsigned int k=0;k<idxMap.size();k++)
-			{
-				int idx				= idxMap[k];
-				newPosBuf[idx]	= basePos;	// Here copies blended vertices position
-			}
-		}	
-// 		if (vtxBlendShapeVtxIdxMap.find(i) != vtxBlendShapeVtxIdxMap.end())
-// 		{
-// 			std::vector<int>& idxMap = vtxBlendShapeVtxIdxMap[i];
-// 			// copy related vtx components 
-// 			for (unsigned int k=0;k<idxMap.size();k++)
-// 			{
-// 				int idx				= idxMap[k];
-// 				newPosBuf[idx]	= basePos;	// Here copies blended vertices position
-// 			}
-// 		}
-	}	
 	
 	//SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #FINAL");
 }
