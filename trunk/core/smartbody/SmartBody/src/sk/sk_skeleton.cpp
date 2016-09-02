@@ -513,7 +513,11 @@ void SkSkeleton::updateJointMap()
 			if (mappedName != "")
 				jname = mappedName;
 		}
+		std::map<std::string, SkJoint*>::iterator iter = _jointMap.find(jname);
+		if (iter != _jointMap.end())
+			LOG("Found duplicate joint name %s", jname.c_str());
 		_jointMap.insert(std::pair<std::string, SkJoint*>(jname, _joints[i]));
+
 	}
 }
 SrVec SkSkeleton::getFacingDirection()
