@@ -27,6 +27,8 @@ class SBVHMsgManager : public SBService
 		SBAPI bool connect();
 		SBAPI void disconnect();
 
+		SBAPI void stop();
+
 		SBAPI int sendOpMessage(const std::string& op, const std::string& message);
 		SBAPI int sendMessage(const std::string& message);
 		SBAPI int send2(const char *op, const char* message);

@@ -763,7 +763,7 @@ int main( int argc, char **argv )	{
 						}
 						else
 						{
-							LOG("pythonlibpath = %s", python_lib_path);
+							LOG("pythonlibpath = %s", python_lib_path.c_str());
 							SmartBody::SBScene::setSystemParameter("pythonlibpath", python_lib_path);
 						}
 						t++;
@@ -788,7 +788,7 @@ int main( int argc, char **argv )	{
 						}
 						else
 						{
-							LOG("ogrepath = %s", tokens[t + 1]);
+							LOG("ogrepath = %s", tokens[t + 1].c_str());
 							SmartBody::SBScene::setSystemParameter("ogrepath", tokens[t + 1]);
 						}
 						t++;
@@ -1327,7 +1327,7 @@ int main( int argc, char **argv )	{
 		SmartBody::SBScene::getScene()->run(strstr.str().c_str());
 		LOG("Run Script = %s", strstr.str().c_str());
 	}
-	LOG("After runnig init python script");
+	LOG("After running init python script");
 	me_paths.clear();
 	seq_paths.clear();
 	init_seqs.clear();
