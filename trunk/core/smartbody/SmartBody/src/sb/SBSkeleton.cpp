@@ -36,6 +36,11 @@ SBSkeleton::SBSkeleton(SBSkeleton* copySkel) : SkSkeleton(copySkel)
 	//jointMap = copySkel->getJointMapName();
 }
 
+SBSkeleton::~SBSkeleton()
+{
+
+}
+
 SBAPI SBJoint* SBSkeleton::createChannel(const std::string& name)
 {
 	if (this->getJointByName(name))

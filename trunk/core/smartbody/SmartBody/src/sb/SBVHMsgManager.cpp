@@ -163,6 +163,11 @@ void SBVHMsgManager::disconnect()
 #endif
 }
 
+void SBVHMsgManager::stop()
+{
+	disconnect();
+}
+
 int SBVHMsgManager::send2( const char *op, const char* message )
 {
 #ifndef SB_NO_VHMSG
