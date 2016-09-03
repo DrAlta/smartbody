@@ -120,7 +120,9 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	setDiphoneSmoothWindow(0.18f);
 	createDoubleAttribute("lipSyncSmoothWindow-PBM", .1, true, "Lip Sync", 160, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
 	createDoubleAttribute("lipSyncSmoothWindow-FV", .1, true, "Lip Sync", 161, false, false, false, "Smooth window size for PBM. If it's less than 0, don't do smooth.");
-	createDoubleAttribute("lipSyncSpeedLimit", 6.0f, true, "Lip Sync", 162, false, false, false, "Speed Limit of facial shape movement");
+	createDoubleAttribute("lipSyncSpeedLimit", 6.0, true, "Lip Sync", 162, false, false, false, "Speed Limit of facial shape movement");
+	createDoubleAttribute("ja", .5, true, "Lip Sync", 170, false, false, false, "Jaw opening");
+	createDoubleAttribute("li", .5, true, "Lip Sync", 180, false, false, false, "Lip intensity");
 	setDiphoneSpeedLimit(6.0f);
 	
 	// Dominance curve attributes (other attributes will be created if the "dominancecurve" attribute is selected
