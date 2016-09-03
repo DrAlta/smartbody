@@ -209,7 +209,7 @@ SBDiphone* SBPhonemeManager::getDiphone(const std::string& fromPhoneme, const st
 	}
 
 	std::stringstream strstr;
-	strstr << name << "_" << fromPhoneme << "_" << toPhoneme;
+	strstr << name << "_" << upperCaseFromPhoneme << "_" << upperCaseToPhoneme;
 	std::map<std::string, SBDiphone* >::iterator iter = _fastDiphoneMap.find(strstr.str());
 	if (iter != _fastDiphoneMap.end())
 	{
