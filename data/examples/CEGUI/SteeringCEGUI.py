@@ -57,7 +57,7 @@ for i in range(15):
 	# Set collision shape scale
 	brad.getAttribute('collisionShapeScale').setValue(SrVec(.01, .01, .01))
 	# Set defomable mesh
-	brad.setDoubleAttribute('deformableMeshScale', .01)
+	brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')

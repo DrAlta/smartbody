@@ -54,7 +54,7 @@ for i in range(4):
 	# Set collision shape scale
 	brad.getAttribute('collisionShapeScale').setValue(SrVec(.01, .01, .01))
 	# Set defomable mesh
-	brad.setDoubleAttribute('deformableMeshScale', .01)
+	brad.setDoubleAttribute('deformableMeshScale', .01, .01, .01)
 	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
 	# Retarget character
 	if i== 0 : 
