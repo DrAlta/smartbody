@@ -45,7 +45,7 @@ bradSkeleton = scene.createSkeleton('ChrBrad.sk')
 brad.setSkeleton(bradSkeleton)
 brad.createStandardControllers()
 # Set deformable mesh
-brad.setDoubleAttribute('deformableMeshScale', 0.01)
+brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 
 scene.run('BehaviorSetReaching.py')
