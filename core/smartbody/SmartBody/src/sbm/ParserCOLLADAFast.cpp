@@ -975,7 +975,7 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 
 	std::set<int> quatIDSet;
 	std::vector<int> quatIDList;
-	for (unsigned int k=0;k<motionChannels.size();k++)
+	for (int k=0;k<motionChannels.size();k++)
 	{
 		std::string chanName = motionChannels.name(k);
 		std::string type = "rotateX";
@@ -2320,23 +2320,34 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 	SrInput in;
 	std::string imageFile = finalFileName;
 	std::string finalTexturePath = "";
-	for (int p = 0; p < paths.size(); p++)
+	bool foundFile = false;
+	if (isAbsolute)
 	{
-		if (isAbsolute)
-		{
-			finalTexturePath = boost::filesystem::complete(imageFile).string();
-		}
-		else
-		{
-			boost::filesystem::path texturePath(paths[0]);
-			texturePath.append(imageFile);
-			finalTexturePath = boost::filesystem::complete(texturePath).string();
-		}		
+		finalTexturePath = boost::filesystem::complete(imageFile).string();
 		in.init(fopen(finalTexturePath.c_str(), "r"));
 		if (in.valid())
-			break;
+			foundFile = true;
 	}
-	if (!in.valid())
+	if (!foundFile)
+	{
+		for (int p = 0; p < paths.size(); p++)
+		{
+			boost::filesystem::path texturePath(paths[0]);
+			boost::filesystem::path textureSource(imageFile);
+			boost::filesystem::path textureFilename(textureSource.filename());
+			texturePath.append(textureFilename.string());
+			finalTexturePath = boost::filesystem::complete(texturePath).string();
+
+			in.init(fopen(finalTexturePath.c_str(), "r"));
+			if (in.valid())
+			{
+				foundFile = true;
+				break;
+			}
+		}
+	}
+	
+	if (!foundFile)
 	{
 		LOG("Could not find texture in file %s", filename.c_str());
 		return "";
