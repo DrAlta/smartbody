@@ -2448,7 +2448,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 					rapidxml::xml_attribute<>* texAttrNode = texNode->first_attribute("texture");			
 					std::string texID = texAttrNode->value();
 					diffuseTexture = texID;
-#if 0
+#if 1
 					std::string imageId = diffuseTexture;
 					std::string imageFile = pictureId2File[imageId];
 					std::string mtlName = mnames.back();
