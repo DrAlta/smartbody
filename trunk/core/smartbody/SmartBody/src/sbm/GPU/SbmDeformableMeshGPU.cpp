@@ -184,9 +184,10 @@ bv     = normalize(gl_NormalMatrix * binormal.xyz);\n\
 //}\n\
 }\n";
 
-std::string shaderVS_Weight4 = 
-	"#version 120 \n\
-	const int NumLight =2;\n\
+std::string shaderVS_Weight4 =
+"#version 120 \n\
+	const int MaxLights =8;\n\
+	uniform int numLights=2;\n\
 	uniform mat4 Transform[120]; \n\
 	uniform int  updateNormal;\n\
 	uniform float meshScale;\n\
@@ -194,7 +195,7 @@ std::string shaderVS_Weight4 =
 	attribute vec4 BoneWeight1;\n \
 	attribute vec3 tangent, binormal;\n\
 	varying vec4 vPos;\n\
-	varying vec3 normal,lightDir[NumLight],halfVector[NumLight];\n\
+	varying vec3 normal,lightDir[MaxLights],halfVector[MaxLights];\n\
 	varying vec3 tv,bv;\n\
 	mat4 GetTransformation(float id)\n \
 	{ \n\
@@ -238,7 +239,7 @@ std::string shaderVS_Weight4 =
 	//dist[1] = 0.0;//length(posDir);\n\
 	//lightDir[0] = normalize((vec4(gl_LightSource[0].position.xyz,0.0)).xyz);\n\
 	//halfVector[0] = normalize((vec4(gl_LightSource[0].halfVector.xyz,0.0)).xyz);\n\
-	for (int i=0;i<NumLight;i++)\n\
+	for (int i=0;i<numLights;i++)\n\
 	{\n\
 	vec3 posDir = vec3(gl_LightSource[i].position);\n\
 	vec4 hv = vec4(gl_LightSource[i].halfVector);\n\
@@ -268,8 +269,9 @@ gl_FragColor = vec4(1,1,1,1);\n\
 
 std::string shaderFS =
 "#version 120\n\
-const int NumLight = 2;\n\
+const int MaxLights = 8;\n\
 const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.0)*(vec3(0.2,0.2,0.2));\n\
+uniform int numLights = 2;\n\
 uniform sampler2D diffuseTexture;\n\
 uniform sampler2D normalTexture;\n\
 uniform sampler2D specularTexture;\n\
@@ -278,7 +280,7 @@ uniform int  useTexture;\n\
 uniform int  useNormalMap;\n\
 uniform int  useSpecularMap;\n\
 uniform int  useShadowMap;\n\
-varying vec3 normal,lightDir[NumLight],halfVector[NumLight];\n\
+varying vec3 normal,lightDir[MaxLights],halfVector[MaxLights];\n\
 varying vec3 tv,bv;\n\
 varying vec4 vPos;\n\
 uniform vec4 diffuseMaterial;\n\
@@ -325,7 +327,7 @@ void main (void)\n\
 	{\n\
 		shadowWeight = shadowCoef();\n\
 	}\n\
-	for (int i=0;i<NumLight;i++)\n\
+	for (int i=0;i<numLights;i++)\n\
 	{\n\
 		//att = 1.0;//1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
         vec3 posDir = lightDir[i];//normalize(vec3(gl_LightSource[i].position));\n\
@@ -630,6 +632,9 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	std::string activeShader = shaderName;//SbmDeformableMeshGPU::useShadowPass ? shadowShaderName : shaderName;
 	if (SmartBody::SBScene::getScene()->getBoolAttribute("enableFaceShader"))
 		activeShader = shaderFaceName;
+
+	int numLightInScene = SmartBody::SBScene::getScene()->getIntAttribute("numLightsInScene");
+	bool useDefaultLights = SmartBody::SBScene::getScene()->getBoolAttribute("useDefaultLights");
 	//std::string activeShader = shaderFaceName;
 	GLuint program = SbmShaderManager::singleton().getShader(activeShader)->getShaderProgram();		
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL );	
@@ -666,6 +671,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	GLuint useNormalMapLoc = glGetUniformLocation(program,"useNormalMap");
 	GLuint useSpecularMapLoc = glGetUniformLocation(program,"useSpecularMap");
 	GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
+	GLuint numLightsLoc = glGetUniformLocation(program, "numLights");
 
 	// update normal vectors for the deformable mesh. it is significantly slower to do this. So turn off by default. 
 	glUniform1i(updateNormalLoc,1);
@@ -688,6 +694,20 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	{
 		GLuint transformLocation = glGetUniformLocation(program,"Transform");
 		glUniformMatrix4fv(transformLocation,tranBuffer.size(),true,(GLfloat*)getPtr(tranBuffer));
+	}
+
+
+	if (!useDefaultLights && numLightInScene == 0)
+	{
+		glUniform1i(numLightsLoc, 0);
+	}
+	else if (useDefaultLights && numLightInScene == 0)
+	{
+		glUniform1i(numLightsLoc, 2);
+	}
+	else
+	{ 
+		glUniform1i(numLightsLoc, numLightInScene);
 	}
 	
 	
