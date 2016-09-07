@@ -473,6 +473,8 @@ void xml_utils::xmlToString( const DOMNode* node, string& converted ){ //recursi
 
 DOMDocument* xml_utils::parseMessageXml( XercesDOMParser* xmlParser, const char *str ) {
 	try {
+		if (!str || strlen(str) == 0)
+			return xmlParser->getDocument();
 		// xml in a file?
 		if( str[0]=='<' ) {
 			if (USELOG) LOG("Parsing inline XML.");
