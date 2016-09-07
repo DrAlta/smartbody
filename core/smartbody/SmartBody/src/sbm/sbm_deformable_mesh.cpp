@@ -602,7 +602,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			meshIndexList.push_back(i);
 	}
 
-	LOG("meshIndexList.size() = %d \n", meshIndexList.size());
+	//LOG("meshIndexList.size() = %d \n", meshIndexList.size());
 	for (unsigned int i=0;i<meshIndexList.size();i++)
 	{
 		int pos = meshIndexList[i];
@@ -614,7 +614,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
 		std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;		
 		std::map<std::string,std::string> mtlSpecularTexMap = dMeshDynamic->shape().mtlSpecularTexNameMap;		
-		LOG("meshIndexList %d, matList.size() = %d \n", i, matList.size());
+		//LOG("meshIndexList %d, matList.size() = %d \n", i, matList.size());
 		for (size_t j=0;j<matList.size();j++)
 		{			
 			SrMaterial& mat = matList[j];	

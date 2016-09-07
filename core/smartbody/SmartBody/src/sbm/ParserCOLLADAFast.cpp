@@ -2309,15 +2309,29 @@ void ParserCOLLADAFast::setModelVertexSource( std::string& sourceName, std::stri
 
 std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, const SrStringArray& paths)
 {
+	std::string finalFileName = filename;
+	bool isAbsolute = false;
+	if (filename.find("file://") != std::string::npos)
+	{
+		finalFileName = filename.substr(7);
+		isAbsolute = true;
+	}
 	SrString s;
 	SrInput in;
-	std::string imageFile = filename;
+	std::string imageFile = finalFileName;
 	std::string finalTexturePath = "";
 	for (int p = 0; p < paths.size(); p++)
 	{
-		boost::filesystem::path texturePath(paths[0]);
-		texturePath.append(imageFile);
-		finalTexturePath = boost::filesystem::complete(texturePath).string();
+		if (isAbsolute)
+		{
+			finalTexturePath = boost::filesystem::complete(imageFile).string();
+		}
+		else
+		{
+			boost::filesystem::path texturePath(paths[0]);
+			texturePath.append(imageFile);
+			finalTexturePath = boost::filesystem::complete(texturePath).string();
+		}		
 		in.init(fopen(finalTexturePath.c_str(), "r"));
 		if (in.valid())
 			break;

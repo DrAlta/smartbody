@@ -426,7 +426,7 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 
 			for (int m = 0; m < scene->mNumMeshes; m++)
 			{
-				LOG("FOUND MESH WITH %d VERTICES, %d FACES", scene->mMeshes[m]->mNumVertices, scene->mMeshes[m]->mNumFaces);
+				//LOG("FOUND MESH WITH %d VERTICES, %d FACES", scene->mMeshes[m]->mNumVertices, scene->mMeshes[m]->mNumFaces);
 
 				SrModel* model = new SrModel();
 				std::string sceneMeshName = scene->mMeshes[m]->mName.C_Str();
