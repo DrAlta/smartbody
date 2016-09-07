@@ -7,6 +7,7 @@ scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('motion', 'ChrRachel')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
+scene.loadAssetsFromPath("mesh/ChrRachel")
 scene.loadAssets()
 
 # Set scene parameters and camera
@@ -30,7 +31,7 @@ scene.getPawn('camera').setPosition(cameraPos)
 print 'Setting up joint map and configuring Rachel\'s skeleton'
 scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
-RachelSkeleton = scene.getSkeleton('ChrRachel.sk')
+RachelSkeleton = scene.getSkeleton('ChrRachel.dae')
 zebra2Map.applySkeleton(RachelSkeleton)
 zebra2Map.applyMotionRecurse('ChrRachel')
 
@@ -73,7 +74,8 @@ RachelFace.setViseme("tTeeth",  "ChrRachel@tTeeth")
 print 'Adding character into scene'
 # Set up Rachel
 Rachel = scene.createCharacter('ChrRachel', '')
-RachelSkeleton = scene.createSkeleton('ChrRachel.sk')
+RachelSkeleton = scene.createSkeleton('ChrRachel.dae')
+RachelSkeleton.rescale(.01)
 Rachel.setSkeleton(RachelSkeleton)
 # Set position
 RachelPos = SrVec(0, 0, 0)
