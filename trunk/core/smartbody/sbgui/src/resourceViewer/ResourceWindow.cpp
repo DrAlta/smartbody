@@ -788,7 +788,8 @@ void ResourceWindow::updateMesh( Fl_Tree_Item* tree, DeformableMesh* mesh )
 				std::vector<SrSnModel*>& models = (*blendShapeIter).second;
 				for (unsigned int i = 0; i < models.size(); i++)
 				{
-					resourceTree->add(morphTargetsItem, (const char*)models[i]->shape().name);
+					if (models[i])
+						resourceTree->add(morphTargetsItem, (const char*)models[i]->shape().name);
 				}
 			}
 		}

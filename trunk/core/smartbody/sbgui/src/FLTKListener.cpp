@@ -462,6 +462,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 					meshInstance->setDeformableMesh(mesh);
 					//meshInsance->setSkeleton(pawn->getSkeleton());	
 					meshInstance->setPawn(pawn);
+					pawn->setStringAttribute("displayType", pawn->getStringAttribute("displayType"));
 					
 #if 0
 					for (size_t i = 0; i < pawn->dMesh_p->dMeshDynamic_p.size(); i++)
