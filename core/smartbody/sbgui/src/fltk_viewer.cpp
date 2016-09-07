@@ -169,7 +169,7 @@ void main()\n\
 	vec4 texColor = texture2D(diffuseTex,gl_TexCoord[0].st);\n\
 	if (length(texColor.rgb) < 0.01) texColor = vec4(1.0,1.0,1.0,1.0); \n\
 	vec4 color = vec4(gl_Color.rgb*texColor.rgb, texColor.a);\n\
-        gl_FragColor = vec4(color.rgb*shadow_coef*shadow_ambient,color.a);//color.a);//gl_Color*shadow_ambient * shadow_coef;\n\
+		gl_FragColor = vec4(color.rgb*shadow_coef*shadow_ambient,color.a);//color.a);//gl_Color*shadow_ambient * shadow_coef;\n\
 }";
 
 
@@ -183,7 +183,7 @@ gl_FragColor = gl_Color;\n\
 
 class srSaSetShapesChanged : public SrSa
  { public :
-    virtual bool shape_apply ( SrSnShapeBase* s ) { s->changed(true); return true; }
+	virtual bool shape_apply ( SrSnShapeBase* s ) { s->changed(true); return true; }
  };
 
 //================================= popup menu ===================================================
@@ -215,8 +215,8 @@ static std::vector<Fl_Menu_Item> gaze_submenus[NUM_GAZE_TYPES];
 Fl_Menu_Item GazeMenuTable[] = 
 {
 	{ gaze_type_name[0],   0, MCB, 0 },			
-    { gaze_type_name[1],   0, MCB, 0 },
-    { gaze_type_name[2],   0, MCB, 0 },
+	{ gaze_type_name[1],   0, MCB, 0 },
+	{ gaze_type_name[2],   0, MCB, 0 },
 	{ gaze_type_name[3],   0, MCB, 0 },
 	{ "&remove all gazes",   0, MCB, CMD(CmdRemoveAllGazeTarget) },
 	{ 0 }
@@ -236,91 +236,91 @@ Fl_Menu_Item MenuTable[] =
    { "&background", 0, MCB, CMD(CmdBackground) }, // FL_FL_MENU_DIVIDER
 
    { "&draw style", 0, 0, 0, FL_SUBMENU },
-         { "&as is",   0, MCB, CMD(CmdAsIs),    FL_MENU_RADIO },
-         { "d&efault", 0, MCB, CMD(CmdDefault), FL_MENU_RADIO },
-         { "&smooth",  0, MCB, CMD(CmdSmooth),  FL_MENU_RADIO },
-         { "&flat",    0, MCB, CMD(CmdFlat),    FL_MENU_RADIO },
-         { "&lines",   0, MCB, CMD(CmdLines),   FL_MENU_RADIO },
-         { "&points",  0, MCB, CMD(CmdPoints),  FL_MENU_RADIO },
-         { 0 },
+		 { "&as is",   0, MCB, CMD(CmdAsIs),    FL_MENU_RADIO },
+		 { "d&efault", 0, MCB, CMD(CmdDefault), FL_MENU_RADIO },
+		 { "&smooth",  0, MCB, CMD(CmdSmooth),  FL_MENU_RADIO },
+		 { "&flat",    0, MCB, CMD(CmdFlat),    FL_MENU_RADIO },
+		 { "&lines",   0, MCB, CMD(CmdLines),   FL_MENU_RADIO },
+		 { "&points",  0, MCB, CMD(CmdPoints),  FL_MENU_RADIO },
+		 { 0 },
 	{ "&shadows", 0, 0, 0, FL_SUBMENU },
-         { "&no shadows",   0, MCB, CMD(CmdNoShadows),    FL_MENU_RADIO },
-         { "&shadows",  0, MCB, CMD(CmdShadows),  FL_MENU_RADIO },
-         { 0 },
-    { "&characters", 0, 0, 0, FL_SUBMENU },
-         { "&geometry", 0, MCB, CMD(CmdCharacterShowGeometry), FL_MENU_RADIO },
-         { "&collision geometry", 0, MCB, CMD(CmdCharacterShowCollisionGeometry),   FL_MENU_RADIO },
-         { "&deformable geometry", 0, MCB, CMD(CmdCharacterShowDeformableGeometry),   FL_MENU_RADIO },
+		 { "&no shadows",   0, MCB, CMD(CmdNoShadows),    FL_MENU_RADIO },
+		 { "&shadows",  0, MCB, CMD(CmdShadows),  FL_MENU_RADIO },
+		 { 0 },
+	{ "&characters", 0, 0, 0, FL_SUBMENU },
+		 { "&geometry", 0, MCB, CMD(CmdCharacterShowGeometry), FL_MENU_RADIO },
+		 { "&collision geometry", 0, MCB, CMD(CmdCharacterShowCollisionGeometry),   FL_MENU_RADIO },
+		 { "&deformable geometry", 0, MCB, CMD(CmdCharacterShowDeformableGeometry),   FL_MENU_RADIO },
 		 { "&gpu deformable geometry", 0, MCB, CMD(CmdCharacterShowDeformableGeometryGPU),   FL_MENU_RADIO },
-         { "&bones",   0, MCB, CMD(CmdCharacterShowBones),   FL_MENU_RADIO },
-         { "&axis",   0, MCB, CMD(CmdCharacterShowAxis),   FL_MENU_RADIO },
-         { 0 },
-    { "p&references", 0, 0, 0, FL_SUBMENU },
+		 { "&bones",   0, MCB, CMD(CmdCharacterShowBones),   FL_MENU_RADIO },
+		 { "&axis",   0, MCB, CMD(CmdCharacterShowAxis),   FL_MENU_RADIO },
+		 { 0 },
+	{ "p&references", 0, 0, 0, FL_SUBMENU },
 		 { "&axis",         0, MCB, CMD(CmdAxis),        FL_MENU_TOGGLE },
 		 { "b&ounding box", 0, MCB, CMD(CmdBoundingBox), FL_MENU_TOGGLE },
 		 { "&statistics",   0, MCB, CMD(CmdStatistics),  FL_MENU_TOGGLE },
 		 { 0 },
 	{ "&pawns", 0, 0, 0, FL_SUBMENU },
 		 { "&create pawn", 0, MCB, CMD(CmdCreatePawn), FL_MENU_DIVIDER},		 
-         { "&no pawns shown", 0, MCB, CMD(CmdNoPawns), FL_MENU_RADIO },
-         { "&show pawns as spheres", 0, MCB, CMD(CmdPawnShowAsSpheres),   FL_MENU_RADIO },        
-         { 0 },
-    { "&constraint", 0, 0, 0, FL_SUBMENU },
-	     { "&use IK constraint", 0, MCB, CMD(CmdConstraintToggleIK), FL_MENU_TOGGLE},	
+		 { "&no pawns shown", 0, MCB, CMD(CmdNoPawns), FL_MENU_RADIO },
+		 { "&show pawns as spheres", 0, MCB, CMD(CmdPawnShowAsSpheres),   FL_MENU_RADIO },        
+		 { 0 },
+	{ "&constraint", 0, 0, 0, FL_SUBMENU },
+		 { "&use IK constraint", 0, MCB, CMD(CmdConstraintToggleIK), FL_MENU_TOGGLE},	
 		 //{ "&use balance", 0, MCB, CMD(CmdConstraintToggleBalance), FL_MENU_TOGGLE},		 
 		 { "&use reference joints", 0, MCB, CMD(CmdConstraintToggleReferencePose), FL_MENU_TOGGLE },		     
 		 { 0 },    
-    { gaze_on_target_menu_name, 0, 0, GazeMenuTable, FL_SUBMENU_POINTER }, 	
+	{ gaze_on_target_menu_name, 0, 0, GazeMenuTable, FL_SUBMENU_POINTER }, 	
 	{ body_reach_menu_name, 0, 0, BodyReachMenuTable, FL_SUBMENU_POINTER },        
-    { "&terrain", 0, 0, 0, FL_SUBMENU },
-         { "&no terrain",   0, MCB, CMD(CmdNoTerrain),    FL_MENU_RADIO },
-         { "&terrain wireframe",  0, MCB, CMD(CmdTerrainWireframe),  FL_MENU_RADIO },
-         { "&terrain",  0, MCB, CMD(CmdTerrain),  FL_MENU_RADIO },
-         { 0 },
+	{ "&terrain", 0, 0, 0, FL_SUBMENU },
+		 { "&no terrain",   0, MCB, CMD(CmdNoTerrain),    FL_MENU_RADIO },
+		 { "&terrain wireframe",  0, MCB, CMD(CmdTerrainWireframe),  FL_MENU_RADIO },
+		 { "&terrain",  0, MCB, CMD(CmdTerrain),  FL_MENU_RADIO },
+		 { 0 },
 	{ "&eye beams", 0, 0, 0, FL_SUBMENU },
-         { "&no eye beams",   0, MCB, CMD(CmdNoEyeBeams),    FL_MENU_RADIO },
-         { "&eye beams",  0, MCB, CMD(CmdEyeBeams),  FL_MENU_RADIO },
-         { 0 },
+		 { "&no eye beams",   0, MCB, CMD(CmdNoEyeBeams),    FL_MENU_RADIO },
+		 { "&eye beams",  0, MCB, CMD(CmdEyeBeams),  FL_MENU_RADIO },
+		 { 0 },
 	{ "&eye lids", 0, 0, 0, FL_SUBMENU },
-         { "&no eye lids",   0, MCB, CMD(CmdNoEyeLids),    FL_MENU_RADIO },
-         { "&eye lids",  0, MCB, CMD(CmdEyeLids),  FL_MENU_RADIO },
-         { 0 },
+		 { "&no eye lids",   0, MCB, CMD(CmdNoEyeLids),    FL_MENU_RADIO },
+		 { "&eye lids",  0, MCB, CMD(CmdEyeLids),  FL_MENU_RADIO },
+		 { 0 },
 	{ "&dynamics", 0, 0, 0, FL_SUBMENU },
-         { "&no dynamics",   0, MCB, CMD(CmdNoDynamics),    FL_MENU_RADIO },
-         { "&show COM",  0, MCB, CMD(CmdShowCOM),  FL_MENU_RADIO },
-         { "&show COM and support polygon",  0, MCB, CMD(CmdShowCOMSupportPolygon),  FL_MENU_RADIO },
+		 { "&no dynamics",   0, MCB, CMD(CmdNoDynamics),    FL_MENU_RADIO },
+		 { "&show COM",  0, MCB, CMD(CmdShowCOM),  FL_MENU_RADIO },
+		 { "&show COM and support polygon",  0, MCB, CMD(CmdShowCOMSupportPolygon),  FL_MENU_RADIO },
 		 { "&show masses",   0, MCB, CMD(CmdShowMasses),  FL_MENU_TOGGLE },
 		 { "&show bounding volume",   0, MCB, CMD(CmdShowBoundingVolume),  FL_MENU_TOGGLE },
-         { 0 },
+		 { 0 },
 	{ "&locomotion", 0, 0, 0, FL_SUBMENU },
-         { "&enable locomotion",   0, MCB, CMD(CmdEnableLocomotion),    FL_MENU_TOGGLE },
-         //{ "&show all",  0, MCB, CMD(CmdShowLocomotionAll),  FL_MENU_TOGGLE },
-         { "&show velocity",  0, MCB, CMD(CmdShowVelocity),  FL_MENU_TOGGLE },
+		 { "&enable locomotion",   0, MCB, CMD(CmdEnableLocomotion),    FL_MENU_TOGGLE },
+		 //{ "&show all",  0, MCB, CMD(CmdShowLocomotionAll),  FL_MENU_TOGGLE },
+		 { "&show velocity",  0, MCB, CMD(CmdShowVelocity),  FL_MENU_TOGGLE },
 		 { "&show orientation",   0, MCB, CMD(CmdShowOrientation),  FL_MENU_TOGGLE },
 		 { "&show selection",   0, MCB, CMD(CmdShowSelection),  FL_MENU_TOGGLE },
 		 { "&show kinematic footprints",   0, MCB, CMD(CmdShowKinematicFootprints),  FL_MENU_TOGGLE },
 		 { "&show locomotion footprints",   0, MCB, CMD(CmdShowLocomotionFootprints),  FL_MENU_TOGGLE },
 		 { "&show trajectory", 0, MCB, CMD(CmdShowTrajectory), FL_MENU_TOGGLE },
 		 { "&interactive",   0, MCB, CMD(CmdInteractiveLocomotion),  FL_MENU_TOGGLE },
-         { 0 },
+		 { 0 },
    { 0 }
  };
 
 int printOglError2(char *file, int line)
 {
 	/*
-    GLenum glErr;
-    int    retCode = 0;
+	GLenum glErr;
+	int    retCode = 0;
 #if 0
-    glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        printf("glError in file %s @ line %d: %s\n",
-			     file, line, gluErrorString(glErr));
-        retCode = 1;
-    }
+	glErr = glGetError();
+	if (glErr != GL_NO_ERROR)
+	{
+		printf("glError in file %s @ line %d: %s\n",
+				 file, line, gluErrorString(glErr));
+		retCode = 1;
+	}
 #endif
-    return retCode;
+	return retCode;
 	*/
 	return 0;
 }
@@ -418,7 +418,7 @@ void FltkViewer::update_submenus()
 // need to set/get data to be able to share the same popup menu with many instances of viewers
 
 static void set_menu_data ( FltkViewer::RenderMode r, FltkViewer::CharacterMode c,
-                            bool axis, bool bbox, bool stat)
+							bool axis, bool bbox, bool stat)
  {
    # define SET(i,b)  if(b) MenuTable[i].set(); else MenuTable[i].clear();
 #ifdef WIN32
@@ -456,7 +456,7 @@ static void _callback_func ( Fl_Widget* win, void* pt )
 
 FltkViewer::FltkViewer ( int x, int y, int w, int h, const char *label )
 //         : SrViewer(x, y, w, h) , Fl_Gl_Window ( x, y, w, h, label )
-         : Fl_Gl_Window ( x, y, w, h, label ), SelectionListener()
+		 : Fl_Gl_Window ( x, y, w, h, label ), SelectionListener()
  {
 	 Fl::gl_visual( FL_RGB | FL_DOUBLE | FL_DEPTH | FL_MULTISAMPLE);//| FL_ALPHA );
 
@@ -544,7 +544,7 @@ void FltkViewer::registerUIControls()
 void FltkViewer::draw_message ( const char* s )
  {
    if ( _data->message != s )
-      redraw();
+	  redraw();
    _data->message = s;
  }
 
@@ -552,7 +552,7 @@ void FltkViewer::show_menu ()
  { 
 	create_popup_menus();
 	set_menu_data (_data->rendermode, _data->charactermode, _data->displayaxis,
-                   _data->boundingbox, _data->statistics);
+				   _data->boundingbox, _data->statistics);
 	const Fl_Menu_Item *m = _data->menubut->popup();	
 	
 	if ( m ) 
@@ -614,8 +614,8 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 	 MeCtConstraint* constraintCt = getCurrentCharacterConstraintController();
 
    switch ( s )
-    { 
-      case CmdViewAll : view_all (); break;
+	{ 
+	  case CmdViewAll : view_all (); break;
 
 	  case CmdBackground:
 		  {
@@ -633,32 +633,32 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 			  updateOptions();
 		  } break;
 
-      case CmdAsIs   : _data->rendermode = ModeAsIs;
+	  case CmdAsIs   : _data->rendermode = ModeAsIs;
 					   _data->render_action.restore_render_mode ( SmartBody::SBScene::getScene()->getRootGroup());
-                       break;
-      case CmdDefault : _data->rendermode = ModeDefault;
-                       _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeDefault );
-                       break;
-      case CmdSmooth : _data->rendermode = ModeSmooth;
-                       _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeSmooth );
-                       break;
-      case CmdFlat   : _data->rendermode = ModeFlat;
-                       _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeFlat );
-                       break;
-      case CmdLines  : _data->rendermode = ModeLines;
-                       _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeLines );
-                       break;
-      case CmdPoints : _data->rendermode = ModePoints;
-                       _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModePoints );
-                       break;
+					   break;
+	  case CmdDefault : _data->rendermode = ModeDefault;
+					   _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeDefault );
+					   break;
+	  case CmdSmooth : _data->rendermode = ModeSmooth;
+					   _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeSmooth );
+					   break;
+	  case CmdFlat   : _data->rendermode = ModeFlat;
+					   _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeFlat );
+					   break;
+	  case CmdLines  : _data->rendermode = ModeLines;
+					   _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModeLines );
+					   break;
+	  case CmdPoints : _data->rendermode = ModePoints;
+					   _data->render_action.override_render_mode ( SmartBody::SBScene::getScene()->getRootGroup(), srRenderModePoints );
+					   break;
 
-      case CmdAxis : SR_SWAPB(_data->displayaxis); 
-                     if ( _data->displayaxis ) update_axis();
-                     break;
+	  case CmdAxis : SR_SWAPB(_data->displayaxis); 
+					 if ( _data->displayaxis ) update_axis();
+					 break;
 	  case CmdShadows  : _data->shadowmode = ModeShadows;             
-                       break;
-      case CmdNoShadows : _data->shadowmode = ModeNoShadows;
-                       break;
+					   break;
+	  case CmdNoShadows : _data->shadowmode = ModeNoShadows;
+					   break;
 	  case CmdGrid: 
 					   _data->gridMode = ModeShowGrid;
 					   break;
@@ -666,11 +666,11 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 					   _data->gridMode = ModeNoGrid;
 					   break;
 	  case CmdNoTerrain  : _data->terrainMode = ModeNoTerrain;             
-                       break;
-      case CmdTerrainWireframe : _data->terrainMode = ModeTerrainWireframe;
-                       break;
-      case CmdTerrain : _data->terrainMode = ModeTerrain;
-                       break;
+					   break;
+	  case CmdTerrainWireframe : _data->terrainMode = ModeTerrainWireframe;
+					   break;
+	  case CmdTerrain : _data->terrainMode = ModeTerrain;
+					   break;
 	  case CmdNoNavigationMesh  : _data->navigationMeshMode = ModeNoNavigationMesh;             
 		  break;
 	  case CmdNavigationMesh : _data->navigationMeshMode = ModeNavigationMesh;
@@ -679,30 +679,30 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  break;
 
 	  case CmdNoEyeBeams  : _data->eyeBeamMode = ModeNoEyeBeams;             
-                       break;
-      case CmdEyeBeams: _data->eyeBeamMode = ModeEyeBeams;
-                       break;
+					   break;
+	  case CmdEyeBeams: _data->eyeBeamMode = ModeEyeBeams;
+					   break;
 	  case CmdNoGazeLimit  : _data->gazeLimitMode = ModeNoGazeLimit;             
 		  break;
 	  case CmdGazeLimit: _data->gazeLimitMode = ModeGazeLimit;
 		  break;
 
 	  case CmdNoEyeLids  : _data->eyeLidMode = ModeNoEyeLids;             
-                       break;
+					   break;
 	  case CmdEyeLids: _data->eyeLidMode = ModeEyeLids;
-                       break;
+					   break;
 	  case CmdNoDynamics  : _data->dynamicsMode = ModeNoDynamics;             
-                       break;
-      case CmdShowCOM:		_data->dynamicsMode = ModeShowCOM;
-                       break;
+					   break;
+	  case CmdShowCOM:		_data->dynamicsMode = ModeShowCOM;
+					   break;
 	  case CmdShowCOMSupportPolygon: _data->dynamicsMode = ModeShowCOMSupportPolygon;
-                       break;
+					   break;
 	  case CmdShowMasses: _data->showmasses =  !_data->showmasses;
-                       break;
+					   break;
 	  case CmdShowBoundingVolume: _data->showBoundingVolume =  !_data->showBoundingVolume;
 					   break;
 	  case CmdEnableLocomotion  : _data->locomotionenabled = !_data->locomotionenabled;             
-                       break;
+					   break;
 	  case CmdShowLocomotionAll  : _data->showlocomotionall = !_data->showlocomotionall;
 						if(_data->showlocomotionall)
 						{
@@ -717,22 +717,22 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 							_data->showorientation = false;
 							_data->showselection = false;
 						}
-                       break;
-      case CmdShowVelocity  : _data->showvelocity = !_data->showvelocity;
+					   break;
+	  case CmdShowVelocity  : _data->showvelocity = !_data->showvelocity;
 						if(!_data->showvelocity) _data->showlocomotionall = false;
-                       break;
+					   break;
 	  case CmdShowOrientation  : _data->showorientation = !_data->showorientation;
 						if(!_data->showorientation) _data->showlocomotionall = false;
-                       break;
+					   break;
 	  case CmdShowSelection  : _data->showselection = !_data->showselection;
 						if(!_data->showselection) _data->showlocomotionall = false;
-                       break;
+					   break;
 	  case CmdShowKinematicFootprints  : _data->showkinematicfootprints = !_data->showkinematicfootprints;
 						if(!_data->showkinematicfootprints) _data->showlocomotionall = false;
-                       break;
+					   break;
 	  case CmdShowLocomotionFootprints  : _data->showlocofootprints = !_data->showlocofootprints;
 						if(!_data->showlocofootprints) _data->showlocomotionall = false;
-                       break;
+					   break;
 	  case CmdShowTrajectory : _data->showtrajectory = !_data->showtrajectory;
 						if (!_data->showtrajectory) _data->showtrajectory = false;
 					   break;
@@ -748,12 +748,12 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		case CmdShowJoints: _data->showJointLabels = !_data->showJointLabels;
 					   break;
 	  case CmdInteractiveLocomotion  : _data->interactiveLocomotion = !_data->interactiveLocomotion;
-                       break;
-      case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
-                            if ( _data->boundingbox ) update_bbox();
-                            break;
+					   break;
+	  case CmdBoundingBox : SR_SWAPB(_data->boundingbox); 
+							if ( _data->boundingbox ) update_bbox();
+							break;
 
-      case CmdStatistics : SR_SWAPB(_data->statistics); break;
+	  case CmdStatistics : SR_SWAPB(_data->statistics); break;
 	  case CmdCharacterShowGeometry:
 		  _data->charactermode = ModeShowGeometry;		  
 		  _data->showgeometry = true;
@@ -787,13 +787,13 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 		  break;
 	  case CmdCharacterShowSkinWeight: 
 // 		  _data->charactermode = ModeShowDeformableGeometry;		
- 		  SbmDeformableMeshGPU::useGPUDeformableMesh = false;
- 		  _data->showgeometry = false;
- 		  _data->showcollisiongeometry = false;
- 		  _data->showdeformablegeometry = true;
- 		  _data->showSkinWeight = true;
- 		  _data->showbones = false;
- 		  _data->showaxis = false;
+		  SbmDeformableMeshGPU::useGPUDeformableMesh = false;
+		  _data->showgeometry = false;
+		  _data->showcollisiongeometry = false;
+		  _data->showdeformablegeometry = true;
+		  _data->showSkinWeight = true;
+		  _data->showbones = false;
+		  _data->showaxis = false;
 		  applyToCharacter = true;
 		  break;
 
@@ -832,9 +832,9 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 						create_pawn();						
 						break;
 	  case CmdNoPawns : _data->pawnmode = ModeNoPawns;
-                       break;
+					   break;
 	  case CmdPawnShowAsSpheres  : _data->pawnmode = ModePawnShowAsSpheres;             
-                       break;
+					   break;
 	  case CmdGazeOnTargetType1:	
 	  case CmdGazeOnTargetType2:
 	  case CmdGazeOnTargetType3:
@@ -842,7 +842,7 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 					   set_gaze_target(s-CmdGazeOnTargetType1,label);
 					   break;
 	  case CmdRemoveAllGazeTarget:
-		               set_gaze_target(-1,NULL);
+					   set_gaze_target(-1,NULL);
 					   break;	  
 	  case CmdReachShowExamples:
 		  _data->reachRenderMode = ModeShowExamples;
@@ -898,23 +898,23 @@ void FltkViewer::menu_cmd ( MenuCmd s, const char* label  )
 bool FltkViewer::menu_cmd_activated ( MenuCmd c )
  {
    switch ( c )
-    { case CmdAsIs     : return _data->rendermode==ModeAsIs? true:false;
-      case CmdDefault  : return _data->rendermode==ModeDefault? true:false;
-      case CmdSmooth   : return _data->rendermode==ModeSmooth? true:false;
-      case CmdFlat     : return _data->rendermode==ModeFlat? true:false;
-      case CmdLines    : return _data->rendermode==ModeLines? true:false;
-      case CmdPoints   : return _data->rendermode==ModePoints? true:false;
-      case CmdShadows   : return _data->shadowmode==ModeShadows? true:false;
-      case CmdNoShadows   : return _data->shadowmode==ModeNoShadows? true:false;
+	{ case CmdAsIs     : return _data->rendermode==ModeAsIs? true:false;
+	  case CmdDefault  : return _data->rendermode==ModeDefault? true:false;
+	  case CmdSmooth   : return _data->rendermode==ModeSmooth? true:false;
+	  case CmdFlat     : return _data->rendermode==ModeFlat? true:false;
+	  case CmdLines    : return _data->rendermode==ModeLines? true:false;
+	  case CmdPoints   : return _data->rendermode==ModePoints? true:false;
+	  case CmdShadows   : return _data->shadowmode==ModeShadows? true:false;
+	  case CmdNoShadows   : return _data->shadowmode==ModeNoShadows? true:false;
 	  case CmdTerrain   : return _data->terrainMode==ModeTerrain? true:false;
-      case CmdTerrainWireframe   : return _data->terrainMode==ModeTerrainWireframe? true:false;
+	  case CmdTerrainWireframe   : return _data->terrainMode==ModeTerrainWireframe? true:false;
 	  case CmdNoTerrain   : return _data->terrainMode==ModeNoTerrain? true:false;
 	  case CmdNoEyeBeams  : return _data->eyeBeamMode==ModeNoEyeBeams? true:false;
-      case CmdEyeBeams   : return _data->eyeBeamMode==ModeEyeBeams? true:false;
+	  case CmdEyeBeams   : return _data->eyeBeamMode==ModeEyeBeams? true:false;
 	  case CmdNoEyeLids  : return _data->eyeLidMode==ModeNoEyeLids? true:false;
-      case CmdEyeLids  : return _data->eyeLidMode==ModeEyeLids? true:false;
+	  case CmdEyeLids  : return _data->eyeLidMode==ModeEyeLids? true:false;
 	  case CmdNoDynamics   : return _data->dynamicsMode==ModeNoDynamics? true:false;
-      case CmdShowCOM   : return _data->dynamicsMode==ModeShowCOM? true:false;
+	  case CmdShowCOM   : return _data->dynamicsMode==ModeShowCOM? true:false;
 	  case CmdShowCOMSupportPolygon   : return _data->dynamicsMode==ModeShowCOMSupportPolygon? true:false;
 	  case CmdShowMasses : return _data->showmasses? true:false;
 	  case CmdShowBoundingVolume : return _data->showBoundingVolume? true:false;
@@ -927,16 +927,16 @@ bool FltkViewer::menu_cmd_activated ( MenuCmd c )
 	  case CmdShowTrajectory : return _data->showtrajectory ? true:false;
 	  case CmdShowGesture : return _data->showgesture ? true:false;
 	  case CmdShowLocomotionFootprints : return _data->showlocofootprints? true:false;
-      case CmdAxis        : return _data->displayaxis? true:false;
-      case CmdBoundingBox : return _data->boundingbox? true:false;
-      case CmdStatistics  : return _data->statistics? true:false;
+	  case CmdAxis        : return _data->displayaxis? true:false;
+	  case CmdBoundingBox : return _data->boundingbox? true:false;
+	  case CmdStatistics  : return _data->statistics? true:false;
 	  case CmdCharacterShowGeometry : return _data->showgeometry? true:false;
 	  case CmdCharacterShowCollisionGeometry : return _data->showcollisiongeometry? true:false;
 	  case CmdCharacterShowDeformableGeometry : return _data->showdeformablegeometry? true:false;
 	  case CmdCharacterShowBones : return _data->showbones? true:false;
 	  case CmdCharacterShowAxis : return _data->showaxis? true:false;
-      default : return false;
-    }
+	  default : return false;
+	}
  }
 
 void FltkViewer::update_bbox ()
@@ -967,23 +967,23 @@ void FltkViewer::view_all ()
    camera->setEye( 0, 0, 1.0f );
 
    if ( SmartBody::SBScene::getScene()->getRootGroup() )
-    { update_bbox ();
-      SrBox box = _data->bbox_action.get();
+	{ update_bbox ();
+	  SrBox box = _data->bbox_action.get();
 
-      if ( _data->displayaxis )
-       { SrBox b;
-         _data->sceneaxis->get_bounding_box(b);
-         box.extend ( b );
-       }
+	  if ( _data->displayaxis )
+	   { SrBox b;
+		 _data->sceneaxis->get_bounding_box(b);
+		 box.extend ( b );
+	   }
 
-      float s = box.max_size();
-      // _data->light.constant_attenuation = s;
-      //_data->camera.view_all ( box, SR_TORAD(60) );
-      camera->setScale(1.0f / s);
-      //_data->camera.center = box.center();
-      //_data->camera.eye = _data->camera.center;
-      //_data->camera.eye.z = s.z;
-    }
+	  float s = box.max_size();
+	  // _data->light.constant_attenuation = s;
+	  //_data->camera.view_all ( box, SR_TORAD(60) );
+	  camera->setScale(1.0f / s);
+	  //_data->camera.center = box.center();
+	  //_data->camera.eye = _data->camera.center;
+	  //_data->camera.eye.z = s.z;
+	}
 
    render ();
  }
@@ -1034,9 +1034,9 @@ void FltkViewer::set_camera ( const SrCamera* cam )
 
 //   if ( _data->root )
   //  { update_bbox ();
-    //  SrBox box = _data->bbox_action.get();
-      //float s = box.max_size();
-    //  _data->light.constant_attenuation = s;
+	//  SrBox box = _data->bbox_action.get();
+	  //float s = box.max_size();
+	//  _data->light.constant_attenuation = s;
    // }
    //else _data->light.constant_attenuation = 1.0f; // the default value
  }
@@ -1101,7 +1101,7 @@ void FltkViewer::initShadowMap()
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);	
 	
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-    //glTexParameteri (GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);  
+	//glTexParameteri (GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);  
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_LUMINANCE);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
@@ -1188,11 +1188,11 @@ void FltkViewer::close_requested ()
 
 void MakeShadowMatrix( GLfloat points[3][3], GLfloat light[4], GLfloat matrix[4][4] )	{
 	GLfloat plane[ 2 ][ 3 ];
-    GLfloat coeff[4];
-    GLfloat dot;
+	GLfloat coeff[4];
+	GLfloat dot;
 
-    // Find the plane equation coefficients
-    // Find the first three coefficients the same way we find a normal.
+	// Find the plane equation coefficients
+	// Find the first three coefficients the same way we find a normal.
 //    calcNormal(points,planeCoeff);
 
 	plane[ 0 ][ 0 ] = points[ 1 ][ 0 ] - points[ 0 ][ 0 ];
@@ -1206,31 +1206,31 @@ void MakeShadowMatrix( GLfloat points[3][3], GLfloat light[4], GLfloat matrix[4]
 	coeff[ 1 ] = plane[ 0 ][ 2 ] * plane[ 1 ][ 0 ] - plane[ 0 ][ 0 ] * plane[ 1 ][ 2 ];
 	coeff[ 2 ] = plane[ 0 ][ 0 ] * plane[ 1 ][ 1 ] - plane[ 0 ][ 1 ] * plane[ 1 ][ 0 ];
 
-    // Find the last coefficient by back substitutions
-    coeff[3] = -( ( coeff[ 0 ] * points[ 2 ][ 0 ] ) + ( coeff[ 1 ] * points[ 2 ][ 1 ] ) + ( coeff[ 2 ] * points[ 2 ][ 2 ] ) );
+	// Find the last coefficient by back substitutions
+	coeff[3] = -( ( coeff[ 0 ] * points[ 2 ][ 0 ] ) + ( coeff[ 1 ] * points[ 2 ][ 1 ] ) + ( coeff[ 2 ] * points[ 2 ][ 2 ] ) );
 
-    // Dot product of plane and light position
-    dot = coeff[0] * light[0] + coeff[1] * light[1] + coeff[2] * light[2] + coeff[3] * light[3];
+	// Dot product of plane and light position
+	dot = coeff[0] * light[0] + coeff[1] * light[1] + coeff[2] * light[2] + coeff[3] * light[3];
 
-    matrix[0][0] = dot - light[0] * coeff[0];
-    matrix[1][0] = 0.0f - light[0] * coeff[1];
-    matrix[2][0] = 0.0f - light[0] * coeff[2];
-    matrix[3][0] = 0.0f - light[0] * coeff[3];
+	matrix[0][0] = dot - light[0] * coeff[0];
+	matrix[1][0] = 0.0f - light[0] * coeff[1];
+	matrix[2][0] = 0.0f - light[0] * coeff[2];
+	matrix[3][0] = 0.0f - light[0] * coeff[3];
 
-    matrix[0][1] = 0.0f - light[1] * coeff[0];
-    matrix[1][1] = dot - light[1] * coeff[1];
-    matrix[2][1] = 0.0f - light[1] * coeff[2];
-    matrix[3][1] = 0.0f - light[1] * coeff[3];
+	matrix[0][1] = 0.0f - light[1] * coeff[0];
+	matrix[1][1] = dot - light[1] * coeff[1];
+	matrix[2][1] = 0.0f - light[1] * coeff[2];
+	matrix[3][1] = 0.0f - light[1] * coeff[3];
 
-    matrix[0][2] = 0.0f - light[2] * coeff[0];
-    matrix[1][2] = 0.0f - light[2] * coeff[1];
-    matrix[2][2] = dot - light[2] * coeff[2];
-    matrix[3][2] = 0.0f - light[2] * coeff[3];
+	matrix[0][2] = 0.0f - light[2] * coeff[0];
+	matrix[1][2] = 0.0f - light[2] * coeff[1];
+	matrix[2][2] = dot - light[2] * coeff[2];
+	matrix[3][2] = 0.0f - light[2] * coeff[3];
 
-    matrix[0][3] = 0.0f - light[3] * coeff[0];
-    matrix[1][3] = 0.0f - light[3] * coeff[1];
-    matrix[2][3] = 0.0f - light[3] * coeff[2];
-    matrix[3][3] = dot - light[3] * coeff[3];
+	matrix[0][3] = 0.0f - light[3] * coeff[0];
+	matrix[1][3] = 0.0f - light[3] * coeff[1];
+	matrix[2][3] = 0.0f - light[3] * coeff[2];
+	matrix[3][3] = dot - light[3] * coeff[3];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1248,7 +1248,7 @@ void FltkViewer::updateLights()
 	const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
 	for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 		 iter != pawnNames.end();
-	      iter++)
+		  iter++)
 	{
 		SmartBody::SBPawn* sbpawn = SmartBody::SBScene::getScene()->getPawn(*iter);
 		const std::string& name = sbpawn->getName();
@@ -1375,7 +1375,9 @@ void FltkViewer::updateLights()
 		}
 	}
 	//LOG("light size = %d\n",_lights.size());
-	
+
+	SmartBody::SBScene::getScene()->setIntAttribute("numLightsInScene", numLightsInScene);
+	//LOG("numLightsInScene = %d\n", numLightsInScene);
 	if (_lights.size() == 0 && 
 		numLightsInScene == 0 &&
 		SmartBody::SBScene::getScene()->getBoolAttribute("useDefaultLights"))
@@ -1470,7 +1472,7 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	printOglError2("drawAllGeometries()", 1);
 
 	// update deformable mesh
-    bool hasGPUSupport = SbmShaderManager::getShaderSupport() != SbmShaderManager::NO_GPU_SUPPORT;
+	bool hasGPUSupport = SbmShaderManager::getShaderSupport() != SbmShaderManager::NO_GPU_SUPPORT;
 	
 	SrMat shadowTexMatrix;
 	
@@ -1515,43 +1517,43 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 	if ( _data->boundingbox ) _data->render_action.apply ( _data->scenebox );
 
 	/*
-    if (hasGPUSupport)// && _data->shadowmode == ModeShadows)
-    {
-        std::string shaderName = _data->shadowmode == ModeShadows && !shadowPass ? "Basic" : "BasicShadow";
-	    SbmShaderProgram* basicShader = SbmShaderManager::singleton().getShader(shaderName);
-	    GLuint program = basicShader->getShaderProgram();
+	if (hasGPUSupport)// && _data->shadowmode == ModeShadows)
+	{
+		std::string shaderName = _data->shadowmode == ModeShadows && !shadowPass ? "Basic" : "BasicShadow";
+		SbmShaderProgram* basicShader = SbmShaderManager::singleton().getShader(shaderName);
+		GLuint program = basicShader->getShaderProgram();
 	   
 		if (_data->shadowmode == ModeShadows && !shadowPass)
 			glUseProgram(program);		
-	    
+		
 		GLuint useShadowMapLoc = glGetUniformLocation(program,"useShadowMap");
 
 		
-	    if (_data->shadowmode == ModeShadows && !shadowPass) // attach the texture
-	    {		
-    		cerr << "HERE PASS\n";
+		if (_data->shadowmode == ModeShadows && !shadowPass) // attach the texture
+		{		
+			cerr << "HERE PASS\n";
 			printOglError2("drawAllGeometries()", 3);
-		    glActiveTexture(GL_TEXTURE7);
-		    glBindTexture(GL_TEXTURE_2D, _data->depthMapID);
-		    //glMatrixMode(GL_TEXTURE);
-		    //glLoadMatrixf(shadowTexMatrix.pt(0));
-		    glCullFace(GL_BACK);
-		    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-		    glUniform1i(glGetUniformLocation(program, "tex"), 7); 	
+			glActiveTexture(GL_TEXTURE7);
+			glBindTexture(GL_TEXTURE_2D, _data->depthMapID);
+			//glMatrixMode(GL_TEXTURE);
+			//glLoadMatrixf(shadowTexMatrix.pt(0));
+			glCullFace(GL_BACK);
+			//glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+			glUniform1i(glGetUniformLocation(program, "tex"), 7); 	
 			glUniform1i(glGetUniformLocation(program, "diffuseTex"), 0); 
-		    glMatrixMode(GL_MODELVIEW);			
-		    glUniform1i(useShadowMapLoc,1);	
+			glMatrixMode(GL_MODELVIEW);			
+			glUniform1i(useShadowMapLoc,1);	
 			printOglError2("drawAllGeometries()", 4);
-	    }
-	    else
-	    {
+		}
+		else
+		{
 			printOglError2("drawAllGeometries()", 30);
 			glUniform1i(glGetUniformLocation(program, "diffuseTex"), 0); 
 			printOglError2("drawAllGeometries()", 31);
-		    glUniform1i(useShadowMapLoc,0);		
+			glUniform1i(useShadowMapLoc,0);		
 			printOglError2("drawAllGeometries()", 32);
-	    }
-    }
+		}
+	}
 	*/
 	printOglError2("drawAllGeometries()", 5);
 	if( SmartBody::SBScene::getScene()->getRootGroup() )	{		
@@ -1586,8 +1588,8 @@ void FltkViewer::draw()
 	if (!context_valid())
 	{			
 		hasShaderSupport = ssm.initGLExtension();
-        if (hasShaderSupport)
-		    initShadowMap();		
+		if (hasShaderSupport)
+			initShadowMap();		
 	}
 
 	if ( !valid() ) 
@@ -1648,7 +1650,7 @@ void FltkViewer::draw()
 
    glScalef ( cam->getScale(), cam->getScale(), cam->getScale() );
 
-    updateLights();
+	updateLights();
 	glEnable ( GL_LIGHTING );
 	int maxLight = -1;
 	for (size_t x = 0; x < _lights.size(); x++)
@@ -1759,7 +1761,7 @@ void FltkViewer::draw()
 	printOglError2("draw()", 3);
 
 	drawPawns();
-    // draw the grid
+	// draw the grid
 	//   if (gridList == -1)
 	//	   initGridList();	
 	drawNavigationMesh();
@@ -1817,20 +1819,20 @@ void FltkViewer::draw()
 
 	_data->fcounter.stop();
 
-    if ( !_data->message.empty() )
-    {
-        gl_draw_string ( _data->message.c_str(), -1, -1 );
-    }
-    else if ( _data->statistics )
-    {
-        _data->message = vhcl::Format( "FPS:%5.2f frame(%2.0f):%4.1fms render:%4.1fms", 
-                  _data->fcounter.mps(),
-                  _data->fcounter.measurements(),
-                  _data->fcounter.loopdt()*1000.0,
-                  _data->fcounter.meandt()*1000.0 );
-        gl_draw_string ( _data->message.c_str(), -1.0f, -1.0f );
-        _data->message = "";
-    }
+	if ( !_data->message.empty() )
+	{
+		gl_draw_string ( _data->message.c_str(), -1, -1 );
+	}
+	else if ( _data->statistics )
+	{
+		_data->message = vhcl::Format( "FPS:%5.2f frame(%2.0f):%4.1fms render:%4.1fms", 
+				  _data->fcounter.mps(),
+				  _data->fcounter.measurements(),
+				  _data->fcounter.loopdt()*1000.0,
+				  _data->fcounter.meandt()*1000.0 );
+		gl_draw_string ( _data->message.c_str(), -1.0f, -1.0f );
+		_data->message = "";
+	}
 
    if (_retargetStepWindow)
    {
@@ -2240,7 +2242,7 @@ std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 			jointMap->guessMapping(assetManager->getSkeleton(skelName), false);
 		}
 
- 		SmartBody::SBSkeleton* skel = assetManager->createSkeleton(skelName);
+		SmartBody::SBSkeleton* skel = assetManager->createSkeleton(skelName);
 
 		std::stringstream strstr;
 		strstr << "defaultChar";
@@ -2254,8 +2256,8 @@ std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 		if (dndMesh) // set the deformable mesh if the file contatins it
 			character->setStringAttribute("deformableMesh",meshName);
 
- 		float yOffset = -skel->getBoundingBox().a.y;
- 		dest.y = yOffset;		
+		float yOffset = -skel->getBoundingBox().a.y;
+		dest.y = yOffset;		
 		character->setPosition(SrVec(dest.x,dest.y,dest.z));
 		if (dndMesh)
 			character->setStringAttribute("displayType","GPUmesh");
@@ -2322,8 +2324,8 @@ int FltkViewer::handle ( int event )
    {   
 	   case FL_DND_RELEASE:
 //		   LOG("DND Release");
-	       ret = 1;
-	       break;
+		   ret = 1;
+		   break;
 	   case FL_DND_ENTER:          // return(1) for these events to 'accept' dnd
 //		   LOG("DND Enter");
 		   Fl::belowmouse(this); // send the leave events first
@@ -2351,15 +2353,15 @@ int FltkViewer::handle ( int event )
 		   // remove any trailing newlines
 		   if (dndText.size() > 0)
 		   {
-		   	if (dndText[dndText.size() - 1] == '\n')
+			if (dndText[dndText.size() - 1] == '\n')
 				dndText = dndText.substr(0, dndText.size() - 1);
 		   }	
 			
 		   processDragAndDrop(dndText,dndX,dndY);
 		   ret = 1;
 		   break;		
-       case FL_PUSH:
-       { 
+	   case FL_PUSH:
+	   { 
 		   bool earlyReturn = false;
 		   translate_event ( e, SrEvent::EventPush, w(), h(), this );
 		   for (size_t l = 0; l < interfaceListeners.size(); l++)
@@ -2375,7 +2377,7 @@ int FltkViewer::handle ( int event )
 			   return true;
 		   
 		   //SR_TRACE1 ( "Mouse Push : but="<<Fl::event_button()<<" ("<<Fl::event_x()<<", "<<Fl::event_y()<<")" <<" Ctrl:"<<Fl::event_state(FL_CTRL) );
-         
+		 
 //          if ( POPUP_MENU(e) ) { show_menu(); e.type=SrEvent::EventNone; }
 // 		 // Mouse Button Push Handling for CEGUI
 //         
@@ -2481,11 +2483,11 @@ int FltkViewer::handle ( int event )
 				
 			 }
 		 }
-       } 
+	   } 
 	   ret = 1; // in order to receive FL_DRAG event
 	   break;
 
-      case FL_RELEASE:
+	  case FL_RELEASE:
 		  {
 		  bool earlyReturn = false;
 		  for (size_t l = 0; l < interfaceListeners.size(); l++)
@@ -2501,9 +2503,9 @@ int FltkViewer::handle ( int event )
 			  return true;
 		  }
 
-        //SR_TRACE1 ( "Mouse Release : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
-         //            <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
-        //translate_event ( e, SrEvent::EventRelease, w(), h(), this);		
+		//SR_TRACE1 ( "Mouse Release : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
+		 //            <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
+		//translate_event ( e, SrEvent::EventRelease, w(), h(), this);		
 // 		if (e.button == 1) 
 // 			ceguiButton = CEGUI::LeftButton;
 // 		else if (e.button == 2)
@@ -2517,9 +2519,9 @@ int FltkViewer::handle ( int event )
 		//if (!e.button1)	
 		//printf("Mouse Release\n");
 		//LOG("Mouse release");
-        break;
+		break;
 
-      case FL_MOVE:
+	  case FL_MOVE:
 		  {
 			bool earlyReturn = false;
 		   for (size_t l = 0; l < interfaceListeners.size(); l++)
@@ -2533,14 +2535,14 @@ int FltkViewer::handle ( int event )
 		   if (earlyReturn)
 			   return true;
 		  }
-        //SR_TRACE2 ( "Move buts: "<<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
+		//SR_TRACE2 ( "Move buts: "<<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
 		//LOG("Move mouse cursor to %f %f",e.mouseCoord.x, e.mouseCoord.y);
 		//translate_event ( e, SrEvent::EventNone, w(), h(), this );
 		//CEGUI::System::getSingleton().injectMousePosition(e.mouseCoord.x, e.mouseCoord.y);
-        if ( !Fl::event_state(FL_BUTTON1) && !Fl::event_state(FL_BUTTON2) ) break;
-        // otherwise, this is a drag: enter in the drag case.
-        // not sure if this is a hack or a feature.
-      case FL_DRAG:
+		if ( !Fl::event_state(FL_BUTTON1) && !Fl::event_state(FL_BUTTON2) ) break;
+		// otherwise, this is a drag: enter in the drag case.
+		// not sure if this is a hack or a feature.
+	  case FL_DRAG:
 		  {
 		  bool earlyReturn = false;
 		   for (size_t l = 0; l < interfaceListeners.size(); l++)
@@ -2553,22 +2555,22 @@ int FltkViewer::handle ( int event )
 		   }
 		   if (earlyReturn)
 			   return true;
-        //SR_TRACE2 ( "Mouse Drag : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
-        //             <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
-        translate_event ( e, SrEvent::EventDrag, w(), h(), this );		
+		//SR_TRACE2 ( "Mouse Drag : ("<<Fl::event_x()<<", "<<Fl::event_y()<<") buts: "
+		//             <<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
+		translate_event ( e, SrEvent::EventDrag, w(), h(), this );		
 		  }
-        break;
+		break;
 
-      case FL_SHORTCUT: // not sure the relationship between a shortcut and keyboard event...
-        //SR_TRACE1 ( "Shortcut : "<< Fl::event_key() <<" "<<fltk::event_text() );
-        //translate_event ( e, SrEvent::Keyboard, w(), h() );
-        //break;
+	  case FL_SHORTCUT: // not sure the relationship between a shortcut and keyboard event...
+		//SR_TRACE1 ( "Shortcut : "<< Fl::event_key() <<" "<<fltk::event_text() );
+		//translate_event ( e, SrEvent::Keyboard, w(), h() );
+		//break;
 
 	  case FL_KEYDOWN:
 		  {
 		 //LOG("Receiving FL_KEYDOWN");
-         e.type = SrEvent::EventKeyboard;
-         e.key = Fl::event_key();
+		 e.type = SrEvent::EventKeyboard;
+		 e.key = Fl::event_key();
 
 		 bool earlyReturn = false;
 		for (size_t l = 0; l < interfaceListeners.size(); l++)
@@ -2604,7 +2606,7 @@ int FltkViewer::handle ( int event )
 				}
 				return ret;
 			case 'e': // rotate mode
- 				_transformMode = ObjectManipulationHandle::CONTROL_ROT;
+				_transformMode = ObjectManipulationHandle::CONTROL_ROT;
 				{
 					PawnControl* posControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_POS);
 					PawnControl* rotControl = _objManipulator.getPawnControl(ObjectManipulationHandle::CONTROL_ROT);
@@ -2670,7 +2672,7 @@ int FltkViewer::handle ( int event )
 					const std::vector<std::string>& pawnNames =  SmartBody::SBScene::getScene()->getPawnNames();
 					for (std::vector<std::string>::const_iterator iter = pawnNames.begin();
 						 iter != pawnNames.end();
-					      iter++)
+						  iter++)
 					{
 						SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(*iter);
 						bool visible = pawn->getBoolAttribute("visible");
@@ -2721,44 +2723,44 @@ int FltkViewer::handle ( int event )
 				 return true;
 		  }
 		  break;
-      case FL_HIDE: // Called when the window is iconized
-        { //SR_TRACE1 ( "Hide" );
-          _data->iconized = true;
-          // the opengl lists need to be re-created when the window appears again, so
-          // we mark already here all shapes as changed:
-          _data->scenebox->changed(true);
-          _data->sceneaxis->changed(true);
-          srSaSetShapesChanged sa;
-          sa.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
-        } break;
+	  case FL_HIDE: // Called when the window is iconized
+		{ //SR_TRACE1 ( "Hide" );
+		  _data->iconized = true;
+		  // the opengl lists need to be re-created when the window appears again, so
+		  // we mark already here all shapes as changed:
+		  _data->scenebox->changed(true);
+		  _data->sceneaxis->changed(true);
+		  srSaSetShapesChanged sa;
+		  sa.apply ( SmartBody::SBScene::getScene()->getRootGroup() );
+		} break;
 
-      case FL_SHOW: // Called when the window is de-iconized or when show() is called
-        //SR_TRACE1 ( "Show" );
-        _data->iconized = false;
-        show ();
-        break;	 
-      // Other events :
-      case FL_ENTER:          
+	  case FL_SHOW: // Called when the window is de-iconized or when show() is called
+		//SR_TRACE1 ( "Show" );
+		_data->iconized = false;
+		show ();
+		break;	 
+	  // Other events :
+	  case FL_ENTER:          
 		  //SR_TRACE2 ( "Enter" );    
 		  ret = 1;
 		  break;
-      case FL_LEAVE:          
+	  case FL_LEAVE:          
 		  //SR_TRACE2 ( "Leave" ); 
 		  ret = 1;
 		  break;
-      case FL_FOCUS:          
+	  case FL_FOCUS:          
 		  //SR_TRACE2 ( "Focus" );         
 		  break;
-      case FL_UNFOCUS:        
+	  case FL_UNFOCUS:        
 		  //SR_TRACE2 ( "Unfocus" );       
 		  break;
-     // case FL_CLOSE:          
+	 // case FL_CLOSE:          
 		  //SR_TRACE2 ( "Close");          
 	//	  break;
-      case FL_ACTIVATE:       
+	  case FL_ACTIVATE:       
 		  //SR_TRACE2 ( "Activate");       
 		  break;
-      case FL_DEACTIVATE:     
+	  case FL_DEACTIVATE:     
 		  //SR_TRACE2 ( "Deactivate");     
 		  break;
 	  //case FL_PASTE:          
@@ -2767,7 +2769,7 @@ int FltkViewer::handle ( int event )
  //     case FL_SELECTIONCLEAR: 
 		  //SR_TRACE2 ( "SelectionClear"); 
 	//	  break;
-    }
+	}
 
    //SR_TRACE3 ( e );
 
@@ -2776,34 +2778,34 @@ int FltkViewer::handle ( int event )
    if ( e.type == SrEvent::EventNone && ret == 0 ) return 0; // not an interesting event
 
    if ( event==FL_PUSH || event==FL_DRAG )
-    { 
+	{ 
 		SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
 		SrPlane plane ( camera->getCenter(), SrVec::k );
-      camera->get_ray ( e.mouse.x, e.mouse.y, e.ray.p1, e.ray.p2 );
-      camera->get_ray ( e.lmouse.x, e.lmouse.y, e.lray.p1, e.lray.p2 );
-      e.mousep = plane.intersect ( e.ray.p1, e.ray.p2 );
-      e.lmousep = plane.intersect ( e.lray.p1, e.lray.p2 );
+	  camera->get_ray ( e.mouse.x, e.mouse.y, e.ray.p1, e.ray.p2 );
+	  camera->get_ray ( e.lmouse.x, e.lmouse.y, e.lray.p1, e.lray.p2 );
+	  e.mousep = plane.intersect ( e.ray.p1, e.ray.p2 );
+	  e.lmousep = plane.intersect ( e.lray.p1, e.lray.p2 );
 	  if ( event==FL_PUSH  ) // update picking precision
-       { // define a and b with 1 pixel difference:
-         SrPnt2 a ( ((float)w())/2.0f, ((float)h())/2.0f ); // ( float(Fl::event_x()), float(Fl::event_y()) );
-         SrPnt2 b (a+SrVec2::one);// ( float(Fl::event_x()+1), float(Fl::event_y()+1) );
-         // put coordinates inside [-1,1] with (0,0) in the middle :
-         a.x  = a.x*2.0f / float(w()) - 1.0f;
-         a.y  = a.y*2.0f / float(h()) - 1.0f; a.y *= -1.0f;
-         b.x  = b.x*2.0f / float(w()) - 1.0f;
-         b.y  = b.y*2.0f / float(h()) - 1.0f; b.y *= -1.0f;
-         //sr_out << "a,b: " << a << srspc << b <<srnl;
-         SrLine aray, bray;
-         camera->get_ray ( a.x, a.y, aray.p1, aray.p2 );
-         camera->get_ray ( b.x, b.y, bray.p1, bray.p2 );
-         SrPnt pa = plane.intersect ( aray.p1, aray.p2 );
-         SrPnt pb = plane.intersect ( bray.p1, bray.p2 );
-         //sr_out << "pa,pb: " << pa << srspc << pb <<srnl;
-         e.pixel_size = (SR_DIST(pa.x,pb.x)+SR_DIST(pa.y,pb.y))/2.0f;
+	   { // define a and b with 1 pixel difference:
+		 SrPnt2 a ( ((float)w())/2.0f, ((float)h())/2.0f ); // ( float(Fl::event_x()), float(Fl::event_y()) );
+		 SrPnt2 b (a+SrVec2::one);// ( float(Fl::event_x()+1), float(Fl::event_y()+1) );
+		 // put coordinates inside [-1,1] with (0,0) in the middle :
+		 a.x  = a.x*2.0f / float(w()) - 1.0f;
+		 a.y  = a.y*2.0f / float(h()) - 1.0f; a.y *= -1.0f;
+		 b.x  = b.x*2.0f / float(w()) - 1.0f;
+		 b.y  = b.y*2.0f / float(h()) - 1.0f; b.y *= -1.0f;
+		 //sr_out << "a,b: " << a << srspc << b <<srnl;
+		 SrLine aray, bray;
+		 camera->get_ray ( a.x, a.y, aray.p1, aray.p2 );
+		 camera->get_ray ( b.x, b.y, bray.p1, bray.p2 );
+		 SrPnt pa = plane.intersect ( aray.p1, aray.p2 );
+		 SrPnt pb = plane.intersect ( bray.p1, bray.p2 );
+		 //sr_out << "pa,pb: " << pa << srspc << pb <<srnl;
+		 e.pixel_size = (SR_DIST(pa.x,pb.x)+SR_DIST(pa.y,pb.y))/2.0f;
 		 interactivePoint = e.lmousep;
-         //sr_out << "pixel_size: " << e.pixel_size <<srnl;
-       }
-    }  
+		 //sr_out << "pixel_size: " << e.pixel_size <<srnl;
+	   }
+	}  
    int ret2 = handle_event ( e );    
 
    if (ret == 1)  // a drag and drop event
@@ -2825,11 +2827,11 @@ int FltkViewer::handle_event ( const SrEvent &e )
 
    //if ( (e.alt && e.mouse_event() || e.type == SrEvent::EventKeyboard) && !e.ctrl )
    if (e.alt && e.mouse_event() && !e.ctrl )
-    { 
-        res = handle_examiner_manipulation ( e );
+	{ 
+		res = handle_examiner_manipulation ( e );
 
-      if ( res ) return res;
-    }
+	  if ( res ) return res;
+	}
    
    if (e.mouse_event() )
    {
@@ -3029,21 +3031,21 @@ void FltkViewer::set_gaze_target(int itype, const char* label)
 
 int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
  {
-    SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
-    switch (getData()->cameraMode)
-    {
-    case Default:
-       handle_default_camera_manipulation(e, camera);
-       break;
+	SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
+	switch (getData()->cameraMode)
+	{
+	case Default:
+	   handle_default_camera_manipulation(e, camera);
+	   break;
 
-    case FreeLook:
-       handle_freelook_camera_manipulation(e, camera);
-       break;
+	case FreeLook:
+	   handle_freelook_camera_manipulation(e, camera);
+	   break;
 
-    case FollowRenderer:
+	case FollowRenderer:
 
-       break;
-    }
+	   break;
+	}
 	
   
    return 1;
@@ -3052,12 +3054,12 @@ int FltkViewer::handle_examiner_manipulation ( const SrEvent &e )
 int FltkViewer::handle_default_camera_manipulation ( const SrEvent &e, SrCamera* camera )
 {
    if ( e.type==SrEvent::EventDrag )
-    { 
-      float dx = e.mousedx() * camera->getAspectRatio();
-      float dy = e.mousedy() / camera->getAspectRatio();
+	{ 
+	  float dx = e.mousedx() * camera->getAspectRatio();
+	  float dy = e.mousedy() / camera->getAspectRatio();
 
 		if ( ROTATING(e) )
-       { 
+	   { 
 #if 1
 		   float deltaX = -(e.mouseCoord.x - e.origMouse.x) / e.width;
 		   float deltaY = -(e.mouseCoord.y -  e.origMouse.y) / e.height;
@@ -3089,10 +3091,10 @@ int FltkViewer::handle_default_camera_manipulation ( const SrEvent &e, SrCamera*
 		   SrVec tmpCenter = camera->getEye() + forward;
 		   camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);		  
 		   redraw();
-       }
-      else if ( ROTATING2(e) )
-       { 
- 		float deltaX = -(e.mouseCoord.x - e.origMouse.x) / e.width;
+	   }
+	  else if ( ROTATING2(e) )
+	   { 
+		float deltaX = -(e.mouseCoord.x - e.origMouse.x) / e.width;
 		float deltaY = -(e.mouseCoord.y -  e.origMouse.y) / e.height;
 		if (deltaX == 0.0 && deltaY == 0.0)
 			return 1;
@@ -3145,10 +3147,10 @@ int FltkViewer::handle_default_camera_manipulation ( const SrEvent &e, SrCamera*
 //		  camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);
 		  redraw();
 	  }
-    }   
+	}   
    else if ( e.type==SrEvent::EventRelease )
-    { 
-    }
+	{ 
+	}
 
    return 1;
 }
@@ -3181,53 +3183,53 @@ int FltkViewer::handle_freelook_camera_manipulation ( const SrEvent &e, SrCamera
 		SrVec tmpCenter = camera->getEye() + forward;
 		camera->setCenter(tmpCenter.x, tmpCenter.y, tmpCenter.z);		  
 
-      needRedraw = true;
+	  needRedraw = true;
 		//redraw();
    }
 
    const float MovementSpeed = 0.1f;
    if (e.type == SrEvent::EventKeyboard) // keyboard handling
    {
-      // forward/back
-      if (e.key == 'w')
-      { 
-         translate_camera(camera, camera->getForwardVector() * MovementSpeed);
-         needRedraw = true;
-      }
-      else if (e.key == 's')
-      { 
-         translate_camera(camera, camera->getForwardVector() * -MovementSpeed);
-         needRedraw = true;
-      }
+	  // forward/back
+	  if (e.key == 'w')
+	  { 
+		 translate_camera(camera, camera->getForwardVector() * MovementSpeed);
+		 needRedraw = true;
+	  }
+	  else if (e.key == 's')
+	  { 
+		 translate_camera(camera, camera->getForwardVector() * -MovementSpeed);
+		 needRedraw = true;
+	  }
 
-      // left/right
-      if (e.key == 'a')
-      { 
-            translate_camera(camera, camera->getRightVector() * MovementSpeed);
-            needRedraw = true;
-      }
-      else if (e.key == 'd')
-      { 
-         translate_camera(camera, camera->getRightVector() * -MovementSpeed);
-         needRedraw = true;
-      }
+	  // left/right
+	  if (e.key == 'a')
+	  { 
+			translate_camera(camera, camera->getRightVector() * MovementSpeed);
+			needRedraw = true;
+	  }
+	  else if (e.key == 'd')
+	  { 
+		 translate_camera(camera, camera->getRightVector() * -MovementSpeed);
+		 needRedraw = true;
+	  }
 
-      // up/down
-      if (e.key == 'e')
-      { 
-         translate_camera(camera, camera->getUpVector() * MovementSpeed);
-         needRedraw = true;
-      }
-      else if (e.key == 'q')
-      { 
-         translate_camera(camera, camera->getUpVector() * -MovementSpeed);
-         needRedraw = true;
-      }
+	  // up/down
+	  if (e.key == 'e')
+	  { 
+		 translate_camera(camera, camera->getUpVector() * MovementSpeed);
+		 needRedraw = true;
+	  }
+	  else if (e.key == 'q')
+	  { 
+		 translate_camera(camera, camera->getUpVector() * -MovementSpeed);
+		 needRedraw = true;
+	  }
 
-      if (needRedraw)
-      {
-         redraw();
-      } 
+	  if (needRedraw)
+	  {
+		 redraw();
+	  } 
    }
 
    return 1;
@@ -3312,7 +3314,7 @@ void FltkViewer::drawGrid()
 	bool colorChanged = false;
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
-    glDisable(GL_COLOR_MATERIAL);
+	glDisable(GL_COLOR_MATERIAL);
 
 	glColor4f(gridColor[0], gridColor[1], gridColor[2], gridColor[3]);
 	glEnable(GL_LINE_SMOOTH);
@@ -3895,7 +3897,7 @@ void FltkViewer::drawPawns()
 		if (camera)
 		{ 
 			if ((scene->getNumCameras() == 1) ||
-			    (camera == currentCamera)) // don't draw the current active camera
+				(camera == currentCamera)) // don't draw the current active camera
 			 continue;
 		}
 		
@@ -4007,14 +4009,14 @@ void FltkViewer::drawCircle(float cx, float cy, float cz, float r, int num_segme
 	float x = r;//we start at angle = 0 
 
 	float z = 0; 
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND); 
 	glColor4f(color.x, color.y, color.z, 0.3f);
 	glBegin(GL_LINE_LOOP); 
 	for(int ii = 0; ii < num_segments; ii++) 
 	{ 
 		glVertex3f(x + cx, cy, z + cz);//output vertex 
-        
+		
 		float tx = -z; 
 		float tz = x; 
 
@@ -5112,7 +5114,7 @@ void FltkViewer::drawReach()
 			//PositionControl::drawSphere(gPos,1.0f);			
 		}	
 
-	    // tetra hedron rendering, disabled for now.
+		// tetra hedron rendering, disabled for now.
 // 		const VecOfSimplex& simplexList = reachCt->simplexList;
 // 		SrVec tetraVtx[4];
 // 		for (unsigned int i=0;i<simplexList.size();i++)
