@@ -3,9 +3,9 @@ print "|         Starting Character Demo            |"
 print "|--------------------------------------------|"
 
 # Add asset paths
+scene.loadAssetsFromPath('mesh/ChrBrad')
 scene.addAssetPath('mesh', 'mesh')
-#scene.addAssetPath('motion', 'ChrBrad')
-scene.addAssetPath('motion', 'ChrMaarten')
+scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
 scene.loadAssets()
@@ -31,7 +31,8 @@ scene.getPawn('camera').setPosition(cameraPos)
 print 'Setting up joint map and configuring Brad\'s skeleton'
 scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
-bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+bradSkeleton = scene.getSkeleton('ChrBrad.dae')
+bradSkeleton.rescale(.01)
 zebra2Map.applySkeleton(bradSkeleton)
 zebra2Map.applyMotionRecurse('ChrBrad')
 
@@ -122,7 +123,7 @@ bradFace.setViseme("32",  "ChrBrad@face_neutral") # smile r
 print 'Adding character into scene'
 # Set up Brad
 brad = scene.createCharacter('ChrBrad', '')
-bradSkeleton = scene.createSkeleton('ChrBrad.sk')
+bradSkeleton = scene.createSkeleton('ChrBrad.dae')
 brad.setSkeleton(bradSkeleton)
 # Set position
 bradPos = SrVec(0, 0, 0)
@@ -136,7 +137,7 @@ brad.setFaceDefinition(bradFace)
 brad.createStandardControllers()
 # Deformable mesh
 brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
-brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
+brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 #brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 
 # Lip syncing diphone setup

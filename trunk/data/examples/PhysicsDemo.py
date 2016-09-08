@@ -111,9 +111,9 @@ pawn2.setPosition(SrVec(75, 150, 10))
 pawn3 = scene.getPawn('pawn3')
 pawn3.setPosition(SrVec(75, 150, -10))
 pawn4 = scene.getPawn('pawn4')
-pawn4.setPosition(SrVec(135, 150, 10))
+pawn4.setPosition(SrVec(130, 170, 10))
 pawn5 = scene.getPawn('pawn5')
-pawn5.setPosition(SrVec(135, 150, -10))
+pawn5.setPosition(SrVec(135, 120, -10))
 
 # Configure character physics
 print 'Configuring character physics'
