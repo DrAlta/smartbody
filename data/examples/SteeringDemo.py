@@ -4,6 +4,8 @@ print "|          Starting Steering Demo            |"
 print "|--------------------------------------------|"
 
 # Add asset paths
+scene.loadAssetsFromPath("mesh/ChrBrad")
+scene.loadAssetsFromPath("mesh/ChrRachel")
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('motion', 'ChrMaarten')
 scene.addAssetPath('motion', 'ChrRachel')
@@ -31,10 +33,12 @@ scene.getPawn('camera').setPosition(SrVec(0, -5, 0))
 print 'Setting up joint map for Brad and Rachel'
 scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
-bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+bradSkeleton = scene.getSkeleton('ChrBrad.dae')
+bradSkeleton.rescale(.01)
 zebra2Map.applySkeleton(bradSkeleton)
 zebra2Map.applyMotionRecurse('ChrBrad')
-rachelSkeleton = scene.getSkeleton('ChrRachel.sk')
+rachelSkeleton = scene.getSkeleton('ChrRachel.dae')
+rachelSkeleton.rescale(.01)
 zebra2Map.applySkeleton(rachelSkeleton)
 zebra2Map.applyMotionRecurse('ChrRachel')
 
@@ -47,7 +51,7 @@ bradPosX = -500.0
 for i in range(10):
 	baseName = 'ChrBrad%s' % i
 	brad = scene.createCharacter(baseName, '')
-	bradSkeleton = scene.createSkeleton('ChrBrad.sk')
+	bradSkeleton = scene.createSkeleton('ChrBrad.dae')
 	brad.setSkeleton(bradSkeleton)
 	# Set position
 	bradPos = SrVec((bradPosX + (i * 50.0))/100, 0, -1)
@@ -82,7 +86,7 @@ rachelPosX = -500.0
 for i in range(15):
 	baseName = 'ChrRachel%s' % i
 	rachel = scene.createCharacter(baseName, '')
-	rachelSkeleton = scene.createSkeleton('ChrRachel.sk')
+	rachelSkeleton = scene.createSkeleton('ChrRachel.dae')
 	rachel.setSkeleton(rachelSkeleton)
 	# Set position
 	rachelPos = SrVec((rachelPosX + (i * 50.0))/100, 0, 1)
