@@ -4,6 +4,8 @@ print "|        Starting Speech/Face Demo           |"
 print "|--------------------------------------------|"
 
 # Add asset paths
+scene.loadAssetsFromPath("mesh/ChrBrad")
+scene.loadAssetsFromPath("mesh/ChrRachel")
 scene.addAssetPath('script', 'scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('motion', 'ChrBrad')
@@ -31,10 +33,12 @@ scene.getPawn('camera').setPosition(SrVec(0, -2, 0))
 print 'Setting up joint map for Brad and Rachel'
 scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
-bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+bradSkeleton = scene.getSkeleton('ChrBrad.dae')
+bradSkeleton.rescale(.01)
 zebra2Map.applySkeleton(bradSkeleton)
 zebra2Map.applyMotionRecurse('ChrBrad')
-rachelSkeleton = scene.getSkeleton('ChrRachel.sk')
+rachelSkeleton = scene.getSkeleton('ChrRachel.dae')
+rachelSkeleton.rescale(.01)
 zebra2Map.applySkeleton(rachelSkeleton)
 zebra2Map.applyMotionRecurse('ChrRachel')
 
@@ -106,7 +110,7 @@ rachelFace.setViseme("tTeeth",  "ChrRachel@tTeeth")
 # Setting up Brad and Rachel
 print 'Setting up Brad'
 brad = scene.createCharacter('ChrBrad', '')
-bradSkeleton = scene.createSkeleton('ChrBrad.sk')
+bradSkeleton = scene.createSkeleton('ChrBrad.dae')
 brad.setSkeleton(bradSkeleton)
 bradPos = SrVec(.35, 0, 0)
 brad.setPosition(bradPos)
@@ -150,7 +154,7 @@ bml.execBML('ChrBrad', '<body posture="ChrBrad@Idle01" ready="0" relax="0"/>')
 
 print 'Setting up Rachel'
 rachel = scene.createCharacter('ChrRachel', '')
-rachelSkeleton = scene.createSkeleton('ChrRachel.sk')
+rachelSkeleton = scene.createSkeleton('ChrRachel.dae')
 rachel.setSkeleton(rachelSkeleton)
 rachelPos = SrVec(-.35, 0, 0)
 rachel.setPosition(rachelPos)

@@ -4,6 +4,7 @@ print "|           Starting Event Demo              |"
 print "|--------------------------------------------|"
 
 # Add asset paths
+scene.loadAssetsFromPath("mesh/ChrRachel")
 scene.addAssetPath('script', 'scripts')
 scene.addAssetPath('mesh', 'mesh')
 scene.addAssetPath('motion', 'ChrRachel')
@@ -30,7 +31,8 @@ scene.getPawn('camera').setPosition(SrVec(0, 1.55, 3))
 print 'Setting up joint map for Brad and Rachel'
 scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
-rachelSkeleton = scene.getSkeleton('ChrRachel.sk')
+rachelSkeleton = scene.getSkeleton('ChrRachel.dae')
+rachelSkeleton.rescale(.01)
 zebra2Map.applySkeleton(rachelSkeleton)
 zebra2Map.applyMotionRecurse('ChrRachel')
 
@@ -72,7 +74,7 @@ rachelFace.setViseme("tTeeth",  "ChrRachel@tTeeth")
 
 print 'Setting up Rachel'
 rachel = scene.createCharacter('ChrRachel', '')
-rachelSkeleton = scene.createSkeleton('ChrRachel.sk')
+rachelSkeleton = scene.createSkeleton('ChrRachel.dae')
 rachel.setSkeleton(rachelSkeleton)
 rachel.setFaceDefinition(rachelFace)
 rachelPos = SrVec(-.35, 0, 0)

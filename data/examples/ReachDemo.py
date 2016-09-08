@@ -4,8 +4,10 @@ print "|            Starting Reach Demo             |"
 print "|--------------------------------------------|"
 
 # Add asset paths
+scene.loadAssetsFromPath("mesh/ChrRachel")
+scene.loadAssetsFromPath("mesh/ChrBrad")
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrMaarten')
+scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
@@ -31,10 +33,12 @@ scene.getPawn('camera').setPosition(SrVec(0, -2, 0))
 print 'Setting up joint map for Brad and Rachel'
 scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
-bradSkeleton = scene.getSkeleton('ChrBrad.sk')
+bradSkeleton = scene.getSkeleton('ChrBrad.dae')
+bradSkeleton.rescale(.01)
 zebra2Map.applySkeleton(bradSkeleton)
 zebra2Map.applyMotionRecurse('ChrBrad')
-rachelSkeleton = scene.getSkeleton('ChrRachel.sk')
+rachelSkeleton = scene.getSkeleton('ChrRachel.dae')
+rachelSkeleton.rescale(.01)
 zebra2Map.applySkeleton(rachelSkeleton)
 zebra2Map.applyMotionRecurse('ChrRachel')
 
@@ -48,16 +52,16 @@ print 'Setting up Brads'
 for i in range(2):
 	baseName = 'ChrBrad%s' % i
 	brad = scene.createCharacter(baseName, '')
-	bradSkeleton = scene.createSkeleton('ChrBrad.sk')
+	bradSkeleton = scene.createSkeleton('ChrBrad.dae')
 	brad.setSkeleton(bradSkeleton)
 	brad.createStandardControllers()
 	# Set deformable mesh
 	brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
-	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
+	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
 	# Retarget character
-	#retargetCharacter(baseName, 'ChrBrad.sk')
+	#retargetCharacter(baseName, 'ChrBrad.dae')
 	if i== 0 : 
 		scene.run('BehaviorSetReaching.py')
 		setupBehaviorSet()
@@ -68,7 +72,7 @@ print 'Setting up Rachels'
 for i in range(2):
 	baseName = 'ChrRachel%s' % i
 	rachel = scene.createCharacter(baseName, '')
-	rachelSkeleton = scene.createSkeleton('ChrRachel.sk')
+	rachelSkeleton = scene.createSkeleton('ChrRachel.dae')
 	rachel.setSkeleton(rachelSkeleton)
 	rachel.createStandardControllers()
 	# Set deformable mesh
@@ -77,13 +81,13 @@ for i in range(2):
 	# Play idle animation
 	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01"/>')
 	# Retarget character
-	#retargetCharacter(baseName, 'ChrRachel.sk')
+	#retargetCharacter(baseName, 'ChrRachel.dae')
 	retargetBehaviorSet(baseName)
 
 # add locomotion for ChrBrad2
 #scene.run('BehaviorSetMaleLocomotion.py')
 #setupBehaviorSet()
-#retargetBehaviorSet('ChrBrad2', 'ChrBrad.sk')
+#retargetBehaviorSet('ChrBrad2', 'ChrBrad.dae')
 
 # Setting character positions
 print 'Setting character positions'

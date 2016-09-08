@@ -32,6 +32,7 @@ print 'Setting up joint map and configuring Rachel\'s skeleton'
 scene.run('zebra2-map.py')
 zebra2Map = scene.getJointMapManager().getJointMap('zebra2')
 RachelSkeleton = scene.getSkeleton('ChrRachel.dae')
+RachelSkeleton.rescale(.01)
 zebra2Map.applySkeleton(RachelSkeleton)
 zebra2Map.applyMotionRecurse('ChrRachel')
 
@@ -75,10 +76,10 @@ print 'Adding character into scene'
 # Set up Rachel
 Rachel = scene.createCharacter('ChrRachel', '')
 RachelSkeleton = scene.createSkeleton('ChrRachel.dae')
-RachelSkeleton.rescale(.01)
+
 Rachel.setSkeleton(RachelSkeleton)
 # Set position
-RachelPos = SrVec(0, 0, 0)
+RachelPos = SrVec(0, 1.06, 0)
 Rachel.setPosition(RachelPos)
 # Set facing direction
 RachelFacing = SrVec(0, 0, 0)
@@ -86,6 +87,7 @@ Rachel.setHPR(RachelFacing)
 # Set face definition
 Rachel.setFaceDefinition(RachelFace)
 # Set standard controller
+
 Rachel.createStandardControllers()
 # Deformable mesh
 Rachel.setVec3Attribute('deformableMeshScale', .01, .01, .01)
