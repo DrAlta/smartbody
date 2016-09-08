@@ -2326,7 +2326,10 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 		finalTexturePath = boost::filesystem::complete(imageFile).string();
 		in.init(fopen(finalTexturePath.c_str(), "r"));
 		if (in.valid())
+		{
 			foundFile = true;
+			in.close();
+		}
 	}
 	if (!foundFile)
 	{
@@ -2342,6 +2345,7 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 			if (in.valid())
 			{
 				foundFile = true;
+				in.close();
 				break;
 			}
 		}
