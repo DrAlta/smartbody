@@ -50,9 +50,12 @@ void SbmTextureManager::releaseAllTextures()
         SbmTexture* tex = vi->second;
         delete tex;
     }
+
+
     textureMap.clear();
     normalTexMap.clear();
     specularTexMap.clear();	
+	
 #if defined(EMSCRIPTEN)
     StrCubeTextureMap::iterator it;
     for(it = cubeTextureMap.begin(); it != cubeTextureMap.end(); ++it){
@@ -70,7 +73,8 @@ StrTextureMap& SbmTextureManager::findMap( int type )
     else if (type == TEXTURE_NORMALMAP)
         return normalTexMap;
     else if (type == TEXTURE_SPECULARMAP)
-        return specularTexMap;
+		return specularTexMap;
+	
     return textureMap;
 }
 
@@ -96,7 +100,7 @@ void SbmTextureManager::loadTexture(int iType, const char* textureName, const ch
 {
     std::string strTex		= textureName;
 
-    // Retrieves texture map type: DIFFUSE, SPECULAR or NORMAL
+    // Retrieves texture map type: DIFFUSE, SPECULAR, GLOSSY, or NORMAL
     StrTextureMap& texMap	= findMap(iType);
 
     // If the texture does not exist in the texture map, create a new one
@@ -215,6 +219,9 @@ SBAPI void SbmTextureManager::reloadTexture()
         SbmTexture* tex = vi->second;
         tex->buildTexture();
     }
+
+
+
     // recreate FBO when reloading texture
     std::map<std::string, GLuint>::iterator mi;
     for ( mi  = FBOMap.begin();

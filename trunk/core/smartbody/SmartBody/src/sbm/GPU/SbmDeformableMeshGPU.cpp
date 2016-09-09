@@ -57,7 +57,7 @@ vec3 GetTranslation(float id)\n \
 	int idx = int(id);\n \
 	vec3 tran;\n \
 	tran[0] = texelFetchBuffer(Transform,(idx*16+12)).x;\n \
-    tran[1] = texelFetchBuffer(Transform,(idx*16+13)).x;\n \
+	tran[1] = texelFetchBuffer(Transform,(idx*16+13)).x;\n \
 	tran[2] = texelFetchBuffer(Transform,(idx*16+14)).x;\n \
 	return tran;\n	\
 }\n  \
@@ -275,6 +275,7 @@ uniform int numLights = 2;\n\
 uniform sampler2D diffuseTexture;\n\
 uniform sampler2D normalTexture;\n\
 uniform sampler2D specularTexture;\n\
+uniform sampler2D glossyTexture;\n\
 uniform sampler2D tex;\n\
 uniform int  useTexture;\n\
 uniform int  useNormalMap;\n\
@@ -309,19 +310,23 @@ void main (void)\n\
 	vec4 texColor = texture2D(diffuseTexture,gl_TexCoord[0].st);\n\
 	vec3 normalColor = normalize(texture2D(normalTexture,gl_TexCoord[0].st).xyz* 2.0 - 1.0);\n\
 	vec3 normalMapN = normalize(-newtv*normalColor.x-newbv*normalColor.y+newn*normalColor.z); \n\
-	vec3 specularColor = texture2D(specularTexture, gl_TexCoord[0].st).xyz;\n\
+	vec4 specularColor = texture2D(specularTexture, gl_TexCoord[0].st);\n\
 	vec3 specMat = specularMaterial.rgb;\n\
+	float glossy = 1.0;\n\
 	if (useTexture == 0) \n\
 		texColor = diffuseMaterial;//vec4(matColor,1.0);\n\
 	color.a = texColor.a*diffuseMaterial.a;\n\
-    //color.rgb = texColor.rgb;\n\
+	//color.rgb = texColor.rgb;\n\
 	n = normalize(normal);\n\
 	if (useNormalMap == 1 && dot(normalMapN,n) > 	0.0)\n\
 	{\n\
 		n = normalMapN;\n\
 	}\n\
 	if (useSpecularMap == 1)\n\
-		specMat = specularColor;\n\
+	{\n\
+		specMat = specularColor.rgb;\n\
+		glossy = specularColor.a;\n\
+	}\n\
 	float shadowWeight = 1.0;\n\
 	if (useShadowMap == 1)\n\
 	{\n\
@@ -330,30 +335,33 @@ void main (void)\n\
 	for (int i=0;i<numLights;i++)\n\
 	{\n\
 		//att = 1.0;//1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
-        vec3 posDir = lightDir[i];//normalize(vec3(gl_LightSource[i].position));\n\
+		vec3 posDir = lightDir[i];//normalize(vec3(gl_LightSource[i].position));\n\
 		NdotL = max(dot(n,posDir),0.0);\n\
 		if (NdotL > 0.0) {\n\
-		    //color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0)*att;\n\
+			//color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0)*att;\n\
 			color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0);\n\
-            //color += vec4(texColor.xyz*NdotL,0);\n\
+			//color += vec4(texColor.xyz*NdotL,0);\n\
 			halfV = normalize(halfVector[i]);\n\
 			NdotHV = max(dot(n,halfV),0.0);\n\
-			color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0);\n\
+			color += vec4(specMat.rgb*pow(NdotHV, (shineness)*glossy),0);\n\
+			//color += vec4(specMat.rgb*pow(NdotHV, 20.0),0);\n\
 			//color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0)*att;\n\
 		}   \n\
 	}\n\
 	const float shadow_ambient = 1.0;\n\
 	gl_FragColor = vec4(color.rgb*shadowWeight*shadow_ambient,color.a);//color*shadow_ambient*shadowWeight;//vec4(color.rgb*shadowWeight,color.a);//color*shadowWeight;\n\
+	//gl_FragColor = vec4(n.xyz, 1.0);\n\
 	//gl_FragColor = vec4(color.rgb, color.a);\n\
-    //gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
+	//gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
 }";
 
 std::string shaderFSFace =
-	"const int NumLight = 2;\n\
+	"const int MaxLights = 8;\n\
 	const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.0)*(vec3(0.2,0.2,0.2));\n\
 	const vec3 sssColor = vec3(0.6,0.6,0.6);\n\
 	const float aspExp = 5.0;\n\
 	const float aspIntensity = 1.0;\n\
+	uniform int numLights = 2;\n\
 	uniform sampler2D diffuseTexture;\n\
 	uniform sampler2D normalTexture;\n\
 	uniform sampler2D specularTexture;\n\
@@ -362,7 +370,7 @@ std::string shaderFSFace =
 	uniform int  useNormalMap;\n\
 	uniform int  useSpecularMap;\n\
 	uniform int  useShadowMap;\n\
-	varying vec3 normal,lightDir[NumLight],halfVector[NumLight];\n\
+	varying vec3 normal,lightDir[MaxLights],halfVector[MaxLights];\n\
 	varying vec3 tv,bv;\n\
 	varying vec4 vPos;\n\
 	uniform vec4 diffuseMaterial;\n\
@@ -425,7 +433,7 @@ std::string shaderFSFace =
 	{\n\
 	shadowWeight = shadowCoef();\n\
 	}\n\
-	for (int i=0;i<NumLight;i++)\n\
+	for (int i=0;i<numLights;i++)\n\
 	{\n\
 	att = 1.0;//1.0/(gl_LightSource[i].constantAttenuation + gl_LightSource[i].linearAttenuation * dist[i] + gl_LightSource[i].quadraticAttenuation * dist[i] * dist[i]);	\n\
 	halfV = normalize(halfVector[i]);\n\
@@ -438,36 +446,36 @@ std::string shaderFSFace =
 	//gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
 	}";
 
-    
-    std::string shaderFSMac =
-    "#version 120\n\
-    const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.0)*(vec3(0.2,0.2,0.2));\n\
-    uniform sampler2D diffuseTexture;\n\
-    uniform sampler2D normalTexture;\n\
-    uniform sampler2D specularTexture;\n\
-    uniform sampler2D tex;\n\
-    uniform int  useTexture;\n\
-    uniform int  useNormalMap;\n\
-    uniform int  useSpecularMap;\n\
-    uniform int  useShadowMap;\n\
-    varying vec3 normal,lightDir[2],halfVector[2];\n\
-    varying vec3 tv,bv;\n\
-    varying vec4 vPos;\n\
-    uniform vec4 diffuseMaterial;\n\
-    uniform vec4 specularMaterial;\n\
-    uniform float  shineness;\n\
-    float shadowCoef()\n\
-    {\n\
-    int index = 0;\n\
-    vec4 shadow_coord = vPos/vPos.w;\n\
-    shadow_coord.z += 0.000005;\n\
-    float shadow_d = texture2D(tex, shadow_coord.st).x;\n\
-    float diff = 1.0;\n\
-    diff = (shadow_d - shadow_coord.z);\n\
-    return clamp( diff*850.0 + 1.0, 0.0, 1.0);//(shadow_d-0.9)*10;//clamp( diff*250.0 + 1.0, 0.0, 1.0);\n\
-    }\n\
-    void main (void)\n\
-    {  \n\
+	
+	std::string shaderFSMac =
+	"#version 120\n\
+	const vec3 ambient = vec3(0.0,0.0,0.0);//(vec3(255 + 127, 241, 0 + 2)/255.0)*(vec3(0.2,0.2,0.2));\n\
+	uniform sampler2D diffuseTexture;\n\
+	uniform sampler2D normalTexture;\n\
+	uniform sampler2D specularTexture;\n\
+	uniform sampler2D tex;\n\
+	uniform int  useTexture;\n\
+	uniform int  useNormalMap;\n\
+	uniform int  useSpecularMap;\n\
+	uniform int  useShadowMap;\n\
+	varying vec3 normal,lightDir[2],halfVector[2];\n\
+	varying vec3 tv,bv;\n\
+	varying vec4 vPos;\n\
+	uniform vec4 diffuseMaterial;\n\
+	uniform vec4 specularMaterial;\n\
+	uniform float  shineness;\n\
+	float shadowCoef()\n\
+	{\n\
+	int index = 0;\n\
+	vec4 shadow_coord = vPos/vPos.w;\n\
+	shadow_coord.z += 0.000005;\n\
+	float shadow_d = texture2D(tex, shadow_coord.st).x;\n\
+	float diff = 1.0;\n\
+	diff = (shadow_d - shadow_coord.z);\n\
+	return clamp( diff*850.0 + 1.0, 0.0, 1.0);//(shadow_d-0.9)*10;//clamp( diff*250.0 + 1.0, 0.0, 1.0);\n\
+	}\n\
+	void main (void)\n\
+	{  \n\
 	vec3 n,halfV;\n\
 	float NdotL,NdotHV;\n\
 	float att;\n\
@@ -478,31 +486,31 @@ std::string shaderFSFace =
 	vec4 texColor = texture2D(diffuseTexture,gl_TexCoord[0].st);\n\
 	vec3 specMat = specularMaterial.rgb;\n\
 	if (useTexture == 0) \n\
-    texColor = diffuseMaterial;//vec4(matColor,1.0);\n\
+	texColor = diffuseMaterial;//vec4(matColor,1.0);\n\
 	color.a = texColor.a*diffuseMaterial.a;\n\
-    //color.rgb = texColor.rgb;\n\
-    float shadowWeight = 1.0;\n\
-    n = newn; \n\
+	//color.rgb = texColor.rgb;\n\
+	float shadowWeight = 1.0;\n\
+	n = newn; \n\
 	if (useShadowMap == 1)\n\
 	{\n\
-    shadowWeight = shadowCoef();\n\
+	shadowWeight = shadowCoef();\n\
 	}\n\
 	for (int i=0;i<2;i++)\n\
 	{\n\
-    vec3 posDir = lightDir[i];//normalize(vec3(gl_LightSource[i].position));\n\
-    NdotL = max(dot(n,posDir),0.0);\n\
-    if (NdotL > 0.0) {\n\
-    color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0);\n\
-    halfV = normalize(halfVector[i]);\n\
-    NdotHV = max(dot(n,halfV),0.0);\n\
-    color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0);\n\
-    }   \n\
+	vec3 posDir = lightDir[i];//normalize(vec3(gl_LightSource[i].position));\n\
+	NdotL = max(dot(n,posDir),0.0);\n\
+	if (NdotL > 0.0) {\n\
+	color += vec4(texColor.xyz*gl_LightSource[i].diffuse.xyz*NdotL,0);\n\
+	halfV = normalize(halfVector[i]);\n\
+	NdotHV = max(dot(n,halfV),0.0);\n\
+	color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0);\n\
+	}   \n\
 	}\n\
 	const float shadow_ambient = 1.0;\n\
 	gl_FragColor = vec4(color.rgb*shadowWeight*shadow_ambient,color.a);//color*shadow_ambient*shadowWeight;//vec4(color.rgb*shadowWeight,color.a);//color*shadowWeight;\n\
 	//gl_FragColor = vec4(color.rgb, color.a);\n\
-    //gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
-    }";
+	//gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
+	}";
 
 /*
 std::string shaderFSSimple =
@@ -653,6 +661,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	GLuint diffuse_sampler_location = glGetUniformLocation(program,"diffuseTexture");	
 	GLuint normal_sampler_location = glGetUniformLocation(program,"normalTexture");	
 	GLuint specular_sampler_location = glGetUniformLocation(program,"specularTexture");	
+	GLuint glossy_sampler_location = glGetUniformLocation(program, "glossyTexture");
 	GLuint shadow_sampler_location = glGetUniformLocation(program,"tex");	
 	GLuint meshScale_location = glGetUniformLocation(program,"meshScale");	
 	GLuint bone_loc1 = glGetAttribLocation(program,"BoneID1");
@@ -802,14 +811,15 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 		}
 
 		SbmTexture* texNormal = texManager.findTexture(SbmTextureManager::TEXTURE_NORMALMAP,mesh->normalMapName.c_str());			
- 		if (texNormal)
- 		{			
- 			glActiveTexture(GL_TEXTURE2_ARB);
- 			glBindTexture(GL_TEXTURE_2D,texNormal->getID());
- 			glUniform1i(normal_sampler_location, 2);
- 			glUniform1i(useNormalMapLoc,1);
- 		}		
- 		else
+		if (texNormal)
+		{
+			//LOG("use texture normal, id = %d", texNormal->getID());
+			glActiveTexture(GL_TEXTURE2_ARB);
+			glBindTexture(GL_TEXTURE_2D,texNormal->getID());
+			glUniform1i(normal_sampler_location, 2);
+			glUniform1i(useNormalMapLoc,1);
+		}		
+		else
 		{
 			glUniform1i(useNormalMapLoc,0);
 		}
@@ -827,6 +837,20 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 		{
 			glUniform1i(useSpecularMapLoc,0);
 		}
+		
+		if (texSpecular)
+		{
+			//LOG("use texture specualr, id = %d",texSpecular->getID());
+			glActiveTexture(GL_TEXTURE3_ARB);
+			glBindTexture(GL_TEXTURE_2D, texSpecular->getID());
+			glUniform1i(specular_sampler_location, 3);
+			glUniform1i(useSpecularMapLoc, 1);
+		}
+		else
+		{
+			glUniform1i(useSpecularMapLoc, 0);
+		}
+
 		if (SbmDeformableMeshGPU::shadowMapID != -1)
 		{
 			glActiveTexture(GL_TEXTURE7_ARB);
@@ -850,11 +874,11 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 		//if (mesh->isHair)
 		if (mesh->material.useAlphaBlend)
 		{
- 			glEnable(GL_BLEND);
+			glEnable(GL_BLEND);
 			glEnable ( GL_ALPHA_TEST );
 // 			glAlphaFunc ( GL_GEQUAL, 1.f ) ; // discard all fragments with alpha value smaller than 1
 // 			glDisable(GL_CULL_FACE);
- 			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
+			glDrawElements(GL_TRIANGLES,3*mesh->numTri,GL_UNSIGNED_INT,0);
 // 
 // 			glAlphaFunc ( GL_LESS, 1.f ) ; // discard all fragments with alpha value smaller than 1
 // 			glEnable(GL_CULL_FACE);
@@ -955,10 +979,10 @@ void SbmDeformableMeshGPU::initShaderProgram()
 		SbmShaderManager::singleton().addShader(shadowShaderName.c_str(),VSShaderName.c_str(),shaderBasicFS.c_str(),false);
 #ifdef __APPLE__
 		SbmShaderManager::singleton().addShader(shaderName.c_str(),VSShaderName.c_str(),shaderFSMac.c_str(),false);
-        SbmShaderManager::singleton().addShader(shaderFaceName.c_str(),VSShaderName.c_str(),shaderFSMac.c_str(),false);
+		SbmShaderManager::singleton().addShader(shaderFaceName.c_str(),VSShaderName.c_str(),shaderFSMac.c_str(),false);
 #else
-        SbmShaderManager::singleton().addShader(shaderName.c_str(),VSShaderName.c_str(),shaderFS.c_str(),false);
-        SbmShaderManager::singleton().addShader(shaderFaceName.c_str(),VSShaderName.c_str(),shaderFSFace.c_str(),false);
+		SbmShaderManager::singleton().addShader(shaderName.c_str(),VSShaderName.c_str(),shaderFS.c_str(),false);
+		SbmShaderManager::singleton().addShader(shaderFaceName.c_str(),VSShaderName.c_str(),shaderFSFace.c_str(),false);
 #endif
 		
 	}
@@ -1234,8 +1258,8 @@ bool SbmDeformableMeshGPU::initBuffer1()
 					for (unsigned int k=0;k<idxMap.size();k++)
 					{
 						posBuffer(idxMap[k]) = posBuffer(iVtx);
- 						tangentBuffer(idxMap[k]) = tangentBuffer(iVtx);
- 						binormalBuffer(idxMap[k]) = binormalBuffer(iVtx);
+						tangentBuffer(idxMap[k]) = tangentBuffer(iVtx);
+						binormalBuffer(idxMap[k]) = binormalBuffer(iVtx);
 						boneID1(idxMap[k]) = boneID1(iVtx);
 						boneID2(idxMap[k]) = boneID2(iVtx);
 						weight1(idxMap[k]) = weight1(iVtx);

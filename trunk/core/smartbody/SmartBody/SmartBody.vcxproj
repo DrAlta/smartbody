@@ -148,7 +148,7 @@ set errorlevel=
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_ROUND;SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>E:\axisneuronsdk\Windows\include;.\src;..\SmartBody\src\external\protobuf\include;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;..\..\..\core\smartbody\steersuite-1.3\steerlib\include;..\..\..\core\smartbody\steersuite-1.3\pprAI\include;..\..\..\core\smartbody\steersuite-1.3\external;..\..\..\core\smartbody\ode\include;..\..\..\core\smartbody\Python27\include;..\..\..\lib\boostnumeric;..\..\..\lib\assimp-3.1.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <WarningLevel>Level3</WarningLevel>

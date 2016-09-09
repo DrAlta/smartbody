@@ -169,17 +169,18 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			std::map<std::string,std::string> mtlTextBumpMap;
 			std::map<std::string,std::string> mtlTextSpecularMap;
 			std::map<std::string, std::string> mtlTransparentMap;
+			std::map<std::string, std::string> mtlGlossyMap;
 
 			rapidxml::xml_node<>* effectNode = ParserCOLLADAFast::getNode("library_effects", colladaNode, 0, 1);
 			if (effectNode)
 			{
-				ParserCOLLADAFast::parseLibraryEffects(effectNode, mesh->getName(), effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, mtlTransparentMap);
+				ParserCOLLADAFast::parseLibraryEffects(effectNode, mesh->getName(), effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, mtlTransparentMap, mtlGlossyMap);
 			}
 			
 			
 			std::vector<SrModel*> meshModelVec;
 			if (geometryNode)
-				ParserCOLLADAFast::parseLibraryGeometries(geometryNode, convertedPath.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, mtlTransparentMap, meshModelVec, 1.0f);
+				ParserCOLLADAFast::parseLibraryGeometries(geometryNode, convertedPath.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, mtlTransparentMap, mtlGlossyMap, meshModelVec, 1.0f);
 
 			float factor = 1.0f;
 
@@ -218,10 +219,10 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 					meshModelVec[i]->V[j] *= factor;
 				}
 		
- 				if (meshModelVec[i]->Fn.size() == 0)
- 				{
- 					//meshModelVec[i]->computeNormals();
- 				}
+				if (meshModelVec[i]->Fn.size() == 0)
+				{
+					//meshModelVec[i]->computeNormals();
+				}
 				//Zengrui: need this line for Emscripten build
 #if 1 //defined(EMSCRIPTEN)
 				meshModelVec[i]->computeNormals();
