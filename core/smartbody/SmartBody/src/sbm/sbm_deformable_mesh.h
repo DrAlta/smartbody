@@ -83,7 +83,7 @@ public:
 	std::string matName;
 	std::string texName;
 	std::string normalMapName;
-	std::string specularMapName;
+	std::string specularMapName;	
 	int numTri;
 	std::vector<SrVec3i> triBuf;
 	std::vector<int> faceIdxList;

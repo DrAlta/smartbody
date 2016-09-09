@@ -112,7 +112,7 @@ class SrModel : public SrSharedClass
 
 	std::map<std::string,std::string> mtlTextureNameMap; // map from material name to texture name
 	std::map<std::string,std::string> mtlNormalTexNameMap;
-	std::map<std::string,std::string> mtlSpecularTexNameMap;
+	std::map<std::string,std::string> mtlSpecularTexNameMap;	
 	std::map<std::string,std::vector<int> > mtlFaceIndices;
 
 	SrMaterial _emptyMaterial;

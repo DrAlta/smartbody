@@ -23,6 +23,7 @@ protected:
 	StrTextureMap textureMap;
 	StrTextureMap normalTexMap;
 	StrTextureMap specularTexMap;
+	StrTextureMap glossyTexMap;
 	std::map<std::string, GLuint> FBOMap;
 private:
 	static SbmTextureManager* _singleton;
