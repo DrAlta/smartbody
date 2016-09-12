@@ -84,6 +84,7 @@ class SBBmlProcessor
 		SBAPI std::string execBML(std::string character, std::string bml);
 		SBAPI std::string execBMLFile(std::string character, std::string filename);
 		SBAPI std::string execXML(std::string character, std::string xml);
+		SBAPI std::string execXMLFile(std::string character, std::string filename);
 		SBAPI void execBMLAt(double time, std::string character, std::string bml);
 		SBAPI void execBMLFileAt(double time, std::string character, std::string filename);
 		SBAPI void execXMLAt(double time, std::string character, std::string xml);

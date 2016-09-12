@@ -221,6 +221,7 @@ namespace SmartBody
 			.function("execBML", &SBBmlProcessor::execBML)
 			.function("execBMLFile", &SBBmlProcessor::execBMLFile)
 			.function("execXML", &SBBmlProcessor::execXML)
+			.function("execXMLFile", &SBBmlProcessor::execXMLFile)
 			.function("execBMLAt", &SBBmlProcessor::execBMLAt)
 			.function("execBMLFileAt", &SBBmlProcessor::execBMLFileAt)
 			.function("execXMLAt", &SBBmlProcessor::execXMLAt)
