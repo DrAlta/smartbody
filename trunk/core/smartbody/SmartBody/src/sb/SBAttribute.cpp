@@ -86,7 +86,8 @@ SBAttribute* SBAttributeGroup::getAttribute(std::string name)
 	std::map<std::string, SBAttribute*>::iterator iter = m_attributeMap.find(name);
 	if (iter == m_attributeMap.end())
 	{
-		LOG("Attribute info for %s does not exists in attribute group %s!", name.c_str(), this->getName().c_str());
+		LOG("Attribute for %s does not exist in attribute group %s!", name.c_str(), this->getName().c_str());
+		return NULL;
 	}
 	else
 	{

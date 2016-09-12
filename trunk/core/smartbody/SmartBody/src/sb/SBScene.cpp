@@ -375,7 +375,7 @@ void SBScene::cleanup()
 		 iter++)
 	{
 		SBService* service = serviceManager->getService(*iter);
-		service->stop();
+		service->setEnable(false);
 	}
 
 	removePendingCommands();
