@@ -75,6 +75,7 @@ public:
 	Fl_Button* _buttonRunTimeCurves;
 	Fl_Button* _buttonPlayImageSequence;
 	Fl_Choice* _choiceAudioFile;
+	Fl_Choice* _choiceXMLFile;
 	Fl_Button* _buttonDictionaryFile;
 	Fl_Input* _inputLipSyncFolder;
 	Fl_Button* _buttonLipSyncFolder;
@@ -127,6 +128,7 @@ public:
 	static void OnPlayDialogCB(Fl_Widget* widget, void* data);
 	static void OnPlayAudioFileCB(Fl_Widget* widget, void* data);
 	static void OnAudioFileSelectCB(Fl_Widget* widget, void* data);
+	static void OnXMLFileSelectCB(Fl_Widget* widget, void* data);
 	static void OnSaveCB(Fl_Widget* widget, void* data);
 	static void OnLoadCB(Fl_Widget* widget, void* data);
 	static void OnBmlRequestCB(BML::BmlRequest* request, void* data);

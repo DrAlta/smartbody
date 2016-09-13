@@ -414,7 +414,14 @@ bool SkMotion::load ( SrInput& in, double scale ) {
 		if( metadata_flags != ALL )
 		{
 			std::stringstream strstr;
-			strstr << "WARNING: SkMotion::load(): File \""<<in.filename()<<"\": Timing Metadata incomplete before end of file (metadata_flags: "<<metadata_flags<<").";
+			if (in.filename())
+			{
+				strstr << "WARNING: SkMotion::load(): File \"" << in.filename() << "\": Timing Metadata incomplete before end of file (metadata_flags: " << metadata_flags << ").";
+			}
+			else
+			{
+				strstr << "WARNING: SkMotion::load(): Timing Metadata incomplete before end of file (metadata_flags: " << metadata_flags << ").";
+			}
 			LOG(strstr.str().c_str());
 		}
 

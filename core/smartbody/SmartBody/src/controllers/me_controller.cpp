@@ -37,6 +37,7 @@
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 #include <sb/SBPawn.h>
+#include <sb/SBSkeleton.h>
 
 #include "sbm/lin_win.h"
 using namespace std;
@@ -564,15 +565,14 @@ void MeController::saveMotionRecord( const std::string &recordname )
 	std::string filename;
 	SrOutput* fileOutput = NULL;
 	SrString stringOutput;
-	if( _record_mode == RECORD_BVH_MOTION )	{
+	if ( _record_mode == RECORD_BVH_MOTION )
+	{
 		filename = _record_full_prefix + recordname + ".bvh";
 		fileOutput = new SrOutput( filename.c_str(), "w" );
 		_record_output = new SrOutput(stringOutput);
 
-		SkSkeleton* skeleton_p = NULL;
-		if( _context->channels().size() > 0 )	{
-			skeleton_p = _context->channels().skeleton();
-		}
+		SkSkeleton* skeleton_p = _pawn->getSkeleton();
+
 		if( skeleton_p == NULL )	{
 			LOG("MeController::record_write NOTICE: SkSkeleton not available");
 			_record_mode = RECORD_NULL;
@@ -590,22 +590,23 @@ void MeController::saveMotionRecord( const std::string &recordname )
 		//		load_bvh_joint_hmap();
 		LOG("MeController::write_record BVH: %s", filename.c_str() );
 	}
-	else if( _record_mode == RECORD_MOTION )	{
-			filename = _record_full_prefix + recordname + ".skm";
-			fileOutput = new SrOutput( filename.c_str(), "w" );		
-			_record_output = new SrOutput(stringOutput);
+	else if( _record_mode == RECORD_MOTION )
+	{
+		filename = _record_full_prefix + recordname + ".skm";
+		fileOutput = new SrOutput( filename.c_str(), "w" );		
+		_record_output = new SrOutput(stringOutput);
 
-			*_record_output << "# SKM Motion Definition - M. Kallmann 2004\n";
-			*_record_output << "# Maya exporter v0.6\n";
-			*_record_output << "# Recorded output from MeController\n\n";
-			*_record_output << "SkMotion\n\n";
-			*_record_output << "name \"" << recordname.c_str() << "\"\n\n";
+		*_record_output << "# SKM Motion Definition - M. Kallmann 2004\n";
+		*_record_output << "# Maya exporter v0.6\n";
+		*_record_output << "# Recorded output from MeController\n\n";
+		*_record_output << "SkMotion\n\n";
+		*_record_output << "name \"" << recordname.c_str() << "\"\n\n";
 
-			SkChannelArray& channels = controller_channels();
-			*_record_output << channels << srnl;
-			*_record_output << "frames " << (int)_frames->size() << srnl;	
+		SkChannelArray& channels = _pawn->getSkeleton()->channels();
+		*_record_output << channels << srnl;
+		*_record_output << "frames " << (int)_frames->size() << srnl;	
 
-			LOG("MeController::write_record SKM: %s", filename.c_str() );
+		LOG("MeController::write_record SKM: %s", filename.c_str() );
 	}
 	else	
 	{
@@ -681,36 +682,43 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 			_frames->pop_front();
 		_frames->push_back(frame_data);
 	}
-	else
-	if( _record_mode == RECORD_MOTION )	{
+	else if( _record_mode == RECORD_MOTION )
+	{
 		FRAME frame_data;
 		frame_data.clear();
 		ostringstream frame_data_os;
 		frame_data_os << "kt " << time << " fr ";
 
-		SkChannelArray& channels = controller_channels();
+		SkChannelArray& channels = _pawn->getSkeleton()->channels();
 		int num_channels = channels.size();
 		SrBuffer<float>& buff = frame.buffer();
 
 		int i, j;
-		for( i=0; i<num_channels; i++ )	{
-
-			int index = frame.toBufferIndex( _toContextCh[ i ] );
+		int count = 0;
+		for( i=0; i<num_channels; i++ )
+		{
 			int channel_size = channels[ i ].size();
 
 			// SKM format does not actually store a quat, it stores an 'axisangle'
-			if( channels[ i ].type == SkChannel::Quat )	{
-				SrQuat q ( buff[ index + 0 ], buff[ index + 1 ], buff[ index + 2 ], buff[ index + 3 ] );
+			if( channels[ i ].type == SkChannel::Quat )
+			{
+				SrQuat q ( buff[count + 0 ], buff[count + 1 ], buff[count + 2 ], buff[count + 3 ] );
 				SrVec axis = q.axis();
 				float ang = q.angle();
 				axis.len ( ang );		
 				frame_data_os << axis.x << " ";
 				frame_data_os << axis.y << " ";
 				frame_data_os << axis.z << " ";
+				count += 3;
 			}
 			else
-			for( j=0; j<channel_size; j++ )	{
-				frame_data_os << buff[ index + j ] << " ";
+			{
+				for (j = 0; j<channel_size; j++)
+				{
+					frame_data_os << buff[count + j] << " ";
+				}
+				count += channel_size;
+			
 			}
 		}
 		frame_data += frame_data_os.str();

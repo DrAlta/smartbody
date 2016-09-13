@@ -246,6 +246,8 @@ public :
 		return EMPTY_CHANNELS;
 	}
 
+	void clear();
+
 private:
 	void _add ( SkJoint* j, std::string name, SkChannel::Type t, bool connect );
 };

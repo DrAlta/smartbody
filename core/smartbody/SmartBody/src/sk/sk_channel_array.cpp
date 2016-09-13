@@ -636,9 +636,23 @@ SrInput& operator>> ( SrInput& in, SkChannelArray& ca )
 
 	SrString name;
 	while ( (n--) > 0 )
-	{ in.get_token ( name );
-	in.get_token ();
-	ca.add ( std::string(name), SkChannel::get_type(in.last_token()) );
+	{ 
+		in.get_token ( name );
+		in.get_token ();
+
+		// parsing automatically excludes periods which might be part of the namae
+		bool partialName = false;
+		while (in.last_token() == '.') 
+		{
+			partialName = true;
+			name.append(".");
+			in.get_token();
+			name.append(in.last_token());
+		}
+		if (partialName)
+			in.get_token();
+
+		ca.add ( std::string(name), SkChannel::get_type(in.last_token()) );
 	}
 
 	//   ca.compress();
@@ -712,5 +726,19 @@ std::string SkChannelArray::getJointMapName() const
 {
 	return jointMapName;
 }
+
+void SkChannelArray::clear()
+{
+	_floats = 0;
+	_dirty = true;
+
+	_channelMap.clear();
+	_channelMapedNameMap.clear();
+
+	_channelList.clear();
+	_channelUpdateTable.clear();
+	jointMapName = "";
+}
+
 //============================ End of File ============================
 
