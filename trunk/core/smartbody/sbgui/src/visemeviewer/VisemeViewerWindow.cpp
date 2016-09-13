@@ -62,6 +62,8 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_inputAudioFile = new Fl_Input(115, 535, 435, 30);
 	_choiceAudioFile = new Fl_Choice(560, 535, 100, 30, "");
 	_choiceAudioFile->callback(OnAudioFileSelectCB, this);
+	_choiceXMLFile = new Fl_Choice(670, 535, 100, 30, "");
+	_choiceXMLFile->callback(OnXMLFileSelectCB, this);
 	_buttonSetCharacterAudioFolder = new Fl_Button(40, 535, 70, 30, "Play Audio");
 	_buttonSetCharacterAudioFolder->callback(OnPlayAudioFileCB, this);
 
@@ -71,7 +73,7 @@ VisemeViewerWindow::VisemeViewerWindow(int x, int y, int w, int h, char* name) :
 	_buttonRefreshCharacter = new Fl_Button(180, 35, 80, 25, "Refresh");
 	_buttonRefreshCharacter->callback(OnCharacterRefreshCB, this);
 
-	_buttonSetAudioLocation = new Fl_Button(260, 35, 60, 25, "Audio Path...");
+	_buttonSetAudioLocation = new Fl_Button(270, 35, 60, 25, "Audio Path...");
 	_buttonSetAudioLocation->callback(OnSetAudioPathCB, this);
 
 	_checkStats = new Fl_Check_Button(330, 35, 100, 25, "Gather Stats");
@@ -849,6 +851,7 @@ void VisemeViewerWindow::loadAudioFiles()
 
 
 	_choiceAudioFile->clear();
+	_choiceXMLFile->clear();
 	// if an audio path is present, use it
 	bool useAudioPaths = true;
 	std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
@@ -889,6 +892,14 @@ void VisemeViewerWindow::loadAudioFiles()
 					_choiceAudioFile->add(cur.stem().c_str());
 #endif
 				}
+				else if (_stricmp(ext.c_str(), ".xml") == 0)
+				{
+#if (BOOST_VERSION > 104400)
+					_choiceXMLFile->add(cur.stem().string().c_str());
+#else
+					_choiceXMLFile->add(cur.stem().c_str());
+#endif
+				}
 			}
 		}
 	}
@@ -903,6 +914,30 @@ void VisemeViewerWindow::OnAudioFileSelectCB(Fl_Widget* widget, void* data)
 	{
 		const char* audioFileName = viewer->_choiceAudioFile->menu()[viewer->_choiceAudioFile->value()].label();
 		viewer->_inputAudioFile->value(audioFileName);	
+	}
+}
+
+void VisemeViewerWindow::OnXMLFileSelectCB(Fl_Widget* widget, void* data)
+{
+	VisemeViewerWindow* viewer = (VisemeViewerWindow*)data;
+
+	SmartBody::SBCharacter* character = viewer->getCurrentCharacter();
+	if (!character)
+		return;
+
+	int xmlFileIndex = viewer->_choiceXMLFile->value();
+	if (xmlFileIndex >= 0)
+	{
+		const char* xmlFileName = viewer->_choiceXMLFile->menu()[viewer->_choiceXMLFile->value()].label();
+		std::vector<std::string> audioPaths = SmartBody::SBScene::getScene()->getAssetManager()->getAssetPaths("audio");
+		if (audioPaths.size() > 0)
+		{
+			boost::filesystem::path path(audioPaths[0]);
+			std::string xmlFile = xmlFileName;
+			path.append(xmlFile + ".xml");
+			LOG("Playing XML file %s", path.string().c_str());
+			SmartBody::SBScene::getScene()->getBmlProcessor()->execXMLFile(character->getName(), path.string());
+		}
 	}
 }
 
@@ -1154,6 +1189,7 @@ void VisemeViewerWindow::setUseRemote(bool val)
 	{
 		_inputAudioFile->deactivate();
 		_choiceAudioFile->deactivate();
+		_choiceXMLFile->deactivate();
 		_inputUtterance->activate();
 		_buttonPlayAudioFile->deactivate();
 		_buttonPlayDialog->activate();
@@ -1162,6 +1198,7 @@ void VisemeViewerWindow::setUseRemote(bool val)
 	{
 		_inputAudioFile->activate();
 		_choiceAudioFile->activate();
+		_choiceXMLFile->activate();
 		_inputUtterance->deactivate();
 		_buttonPlayAudioFile->activate();
 		_buttonPlayDialog->deactivate();
@@ -1296,9 +1333,8 @@ void VisemeViewerWindow::OnSetAudioPathCB(Fl_Widget* widget, void* data)
 		return;
 	}
 
-
-	const char* audioDir = fl_dir_chooser("Output Dir", ".", 1);
-	if (!audioDir)
+	std::string audioDir = BaseWindow::chooseDirectory("Audio folder", ".");
+	if (audioDir == "")
 		return;
 
 #if (BOOST_VERSION > 104400)

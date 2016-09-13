@@ -1386,7 +1386,7 @@ void FltkViewer::updateLights()
 		light.directional = true;
 		light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
 		SrMat mat;
-		sr_euler_mat_xyz (mat, SR_TORAD(0), SR_TORAD(0), SR_TORAD(135	));
+		sr_euler_mat_xyz (mat, SR_TORAD(-5), SR_TORAD(-76), SR_TORAD(-117));
 		SrQuat orientation(mat);
 		SrVec up(0,1,0);
 		SrVec lightDirection = -up * orientation;
@@ -1397,14 +1397,26 @@ void FltkViewer::updateLights()
 
 		SrLight light2 = light;
 		light2.directional = true;
-		light2.diffuse = SrColor( 0.8f, 0.8f, 0.8f );
-		sr_euler_mat_xyz (mat, SR_TORAD(0), SR_TORAD(0), SR_TORAD(-135));
+		light2.diffuse = SrColor(1.0f, 1.0f, 1.0f);
+		sr_euler_mat_xyz (mat, SR_TORAD(12), SR_TORAD(125), SR_TORAD(-121));
 		SrQuat orientation2(mat);
 		lightDirection = -up * orientation2;
 		light2.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
 	//	light2.constant_attenuation = 1.0f;
 	//	light2.linear_attenuation = 2.0f;
 		_lights.push_back(light2);
+
+
+		SrLight light3 = light;
+		light3.directional = true;
+		light3.diffuse = SrColor(1.0f, 1.0f, 1.0f);
+		sr_euler_mat_xyz(mat, SR_TORAD(-57), SR_TORAD(-134), SR_TORAD(103));
+		SrQuat orientation3(mat);
+		lightDirection = -up * orientation3;
+		light3.position = SrVec(lightDirection.x, lightDirection.y, lightDirection.z);
+		//	light2.constant_attenuation = 1.0f;
+		//	light2.linear_attenuation = 2.0f;
+		_lights.push_back(light3);
 	}
 	
 }

@@ -215,12 +215,17 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 			slider->callback(FaceCB, faceViewer);
 			faceViewer->bottomGroup->add(slider);
 			faceViewer->_sliders.push_back(slider);
-
+			double maxWeight = 1.0;
+			SmartBody::SBAttribute* maxWeightAttribute = character->getAttribute("maxVisemeWeight");
+			if (!maxWeightAttribute)
+				maxWeight = 1.0;
+			else
+				maxWeight = character->getDoubleAttribute("maxVisemeWeight");
 			std::string weightLabel = visemeNames[v] + " weight";
 			Fl_Value_Slider* weightSlider = new Fl_Value_Slider(430, curY, 100, 25, _strdup(weightLabel.c_str()));
 			weightSlider->type(FL_HORIZONTAL);
 			weightSlider->align(FL_ALIGN_LEFT);
-			weightSlider->range(0.0, 1.0);
+			weightSlider->range(0.0, maxWeight);
 			weightSlider->callback(FaceWeightCB, faceViewer);
 			faceViewer->bottomGroup->add(weightSlider);
 			// set the initial weight

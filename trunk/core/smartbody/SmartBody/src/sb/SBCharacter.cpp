@@ -123,6 +123,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createDoubleAttribute("lipSyncSpeedLimit", 6.0, true, "Lip Sync", 162, false, false, false, "Speed Limit of facial shape movement");
 	createDoubleAttribute("ja", .5, true, "Lip Sync", 170, false, false, false, "Jaw opening");
 	createDoubleAttribute("li", .5, true, "Lip Sync", 180, false, false, false, "Lip intensity");
+	createDoubleAttribute("maxVisemeWeight", 1, true, "Lip Sync", 190, false, false, false, "Maximum weighting of visemes. Default is 1.");
 	setDiphoneSpeedLimit(6.0f);
 	
 	// Dominance curve attributes (other attributes will be created if the "dominancecurve" attribute is selected

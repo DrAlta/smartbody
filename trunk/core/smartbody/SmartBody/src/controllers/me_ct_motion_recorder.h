@@ -35,7 +35,6 @@ protected:
 	SmartBody::SBCharacter*		  character;	
 	SkChannelArray				  channels;
 	bool		                  recordStart;
-	std::string			          rootJointName;
 	double                        prevTime, startTime;
 	double                        recordDt;
 };

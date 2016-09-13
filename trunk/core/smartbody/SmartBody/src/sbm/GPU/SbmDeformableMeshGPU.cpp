@@ -712,7 +712,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	}
 	else if (useDefaultLights && numLightInScene == 0)
 	{
-		glUniform1i(numLightsLoc, 2);
+		glUniform1i(numLightsLoc, 3);
 	}
 	else
 	{ 

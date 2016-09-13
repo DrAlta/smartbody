@@ -12,7 +12,6 @@ MeCtMotionRecorder::MeCtMotionRecorder(SmartBody::SBCharacter* c) : SmartBody::S
 	_record_max_frames = -1;
 	recordDt = 0.03;
 	recordStart = false;
-	rootJointName = "";
 	init(character);		
 }
 
@@ -23,6 +22,21 @@ MeCtMotionRecorder::~MeCtMotionRecorder()
 
 void MeCtMotionRecorder::startRecording( double frameRate )
 {
+	// make sure that all the channels are available for recording
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	SmartBody::SBSkeleton* skel = scene->getSkeleton(_pawn->getSkeleton()->getName());
+	if (!skel) 
+		return;
+
+	channels.clear();
+
+	SkChannelArray& skelChannels = skel->channels();
+	for (int c = 0; c < skelChannels.size(); c++)
+	{
+		SkChannel& channel = skelChannels[c];
+		channels.add(channel);
+	}
+
 	if (frameRate > 0)
 	{
 		recordDt = 1.0/frameRate;
@@ -82,28 +96,6 @@ void MeCtMotionRecorder::writeRecording(const std::string& motionName, const std
 
 void MeCtMotionRecorder::init(SbmPawn* pawn)
 {
-	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	SmartBody::SBSkeleton* skel = scene->getSkeleton(pawn->getSkeleton()->getName());	
-	if (!skel) return;
-	SkJoint* rootJoint = findRootJoint(skel);	
-	rootJointName = rootJoint->jointName();	
-	for (int i=0;i<skel->getNumJoints();i++)
-	{
-		SmartBody::SBJoint* jo = skel->getJoint(i);
-		if (jo->quat()->active()) // add quat channel
-		{
-			channels.add(jo->jointName(), (SkChannel::Type)(SkChannel::Quat));
-		}
-		
-		for (int j=0;j<3;j++)
-		{
-			if (!jo->pos()->frozen(j))
-			{
-				channels.add(jo->jointName(), (SkChannel::Type)(SkChannel::XPos+j));
-			}
-		}
-	}
-
 	MeController::init(pawn);	
 }
 
@@ -209,18 +201,18 @@ bool MeCtMotionRecorder::controller_evaluate(double t, MeFrameData& frame)
 		SmartBody::SBSkeleton* skel = character->getSkeleton();
 		skel->update_global_matrices();
 		
-		SmartBody::SBJoint* rootJoint = skel->getJointByName(rootJointName);
+		SmartBody::SBJoint* rootJoint = skel->getJoint(0);
 		SrQuat oldQuat;
 		SrVec oldPos;	
-		getJointChannelValues(rootJointName,frame, oldQuat, oldPos);
+		getJointChannelValues(rootJoint->getName(),frame, oldQuat, oldPos);
 		if (rootJoint) // set the frame buffer value from current global mat
 		{		
 			SrMat lMat = rootJoint->gmat()*rootJoint->gmatZero().inverse();
 			SrVec pos = lMat.get_translation();		
 			SrQuat temp(lMat);
-			setJointChannelQuat(rootJointName,frame,temp);
+			setJointChannelQuat(rootJoint->getName(),frame,temp);
 			SrVec trans = lMat.get_translation();
-			setJointChannelPos(rootJointName,frame,trans);
+			setJointChannelPos(rootJoint->getName(),frame,trans);
 		}
 		// record the current joint values into motion buffer
 		
@@ -229,8 +221,8 @@ bool MeCtMotionRecorder::controller_evaluate(double t, MeFrameData& frame)
 		// restore the root quat/pos so it does not interfere with current simulation
 		if (rootJoint)
 		{
-			setJointChannelQuat(rootJointName,frame,oldQuat);
-			setJointChannelPos(rootJointName,frame,oldPos);
+			setJointChannelQuat(rootJoint->getName(),frame,oldQuat);
+			setJointChannelPos(rootJoint->getName(),frame,oldPos);
 		}
 
 	}	
