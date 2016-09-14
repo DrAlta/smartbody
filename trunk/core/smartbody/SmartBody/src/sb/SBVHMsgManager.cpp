@@ -44,6 +44,8 @@ namespace SmartBody {
 
 SBVHMsgManager::SBVHMsgManager() : SBService()
 {
+	createBoolAttribute("showMessages", false, true, "Basic", 60, false, false, false, "Dumps any registered vhmsgs to the console.");
+
 	setEnable(false);
 
 	setName("VHMsg");
@@ -307,6 +309,8 @@ const std::string& SBVHMsgManager::getScope()
 
 void SBVHMsgManager::vhmsgCallback( const char *op, const char *args, void * user_data )
 {
+	if (SmartBody::SBScene::getScene()->getVHMsgManager()->getBoolAttribute("showMessages"))
+		LOG("[%s] %s", op, args);
 	if (SmartBody::SBScene::getScene()->isRemoteMode())
 	{
 		SmartBody::SBScene::getScene()->getDebuggerClient()->ProcessVHMsgs(op, args);
