@@ -509,7 +509,7 @@ DOMDocument* xml_utils::parseMessageXml( XercesDOMParser* xmlParser, const char 
 		std::string message = "";
 		xml_utils::xml_translate(&message, e.getMessage());
 		std::stringstream strstr;
-		strstr << "xml_utils::parseMessageXml(): SAXException while parsing xml: "<< message
+		strstr << "xml_utils::parseMessageXml(): SAXException while parsing xml: [" << str << "] "<< message
 				<< " (line "<< e.getLineNumber()<<", col "<< e.getColumnNumber()<<")";
 		LOG(strstr.str().c_str());
 		return NULL;
@@ -517,7 +517,7 @@ DOMDocument* xml_utils::parseMessageXml( XercesDOMParser* xmlParser, const char 
 		std::string message = "";
 		xml_utils::xml_translate(&message, e.getMessage());
 		std::stringstream strstr;
-		strstr << "xml_utils::parseMessageXml(): SAXException while parsing xml: "<<message;
+		strstr << "xml_utils::parseMessageXml(): SAXException while parsing xml: [" << str << "] "<<message;
 		LOG(strstr.str().c_str());
 		return NULL;
 	} catch( const DOMException& e ) {
