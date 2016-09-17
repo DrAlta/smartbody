@@ -24,7 +24,7 @@
 
 LOCAL_SHORT_COMMANDS := true
 
-USE_CEREVOICE:=false
+USE_CEREVOICE:=true
 
 
 SB_LOCAL_PATH := $(call my-dir)

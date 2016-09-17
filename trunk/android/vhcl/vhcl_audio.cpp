@@ -59,7 +59,7 @@ bool Audio::Open()
    device = alcOpenDevice( NULL );
    if ( device == NULL )
    {
-      printf( "Failed to Initialize Open AL\n" );
+      LOG( "Failed to Initialize Open AL\n" );
       return false;
    }
 
@@ -67,7 +67,7 @@ bool Audio::Open()
    context = alcCreateContext( device, NULL );
    if ( context == NULL )
    {
-      printf( "Failed to initialize Open AL\n" );
+      LOG( "Failed to initialize Open AL\n" );
       return false;
    }
 
@@ -76,7 +76,7 @@ bool Audio::Open()
    alcMakeContextCurrent( context );
    if ( alcGetError( device ) != ALC_NO_ERROR )
    {
-      printf( "Failed to Make Context Current\n" );
+      LOG( "Failed to Make Context Current\n" );
       return false;
    }
 

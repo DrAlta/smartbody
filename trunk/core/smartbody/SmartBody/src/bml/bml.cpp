@@ -1255,7 +1255,7 @@ void BML::BmlRequest::realize( Processor* bp, SmartBody::SBScene* scene ) {
 	// Added by Yuyu - (09-30-2013)
 	if (SmartBody::SBScene::getScene()->getBoolAttribute("enableExportProcessedBML"))
 	{
-		//LOG("xml body: %s", request->xmlBody.c_str());
+		//LOG("xml body: %s", request->xmlBody.c_str());sync
 		std::vector<std::string> gestureBMLAnimations;
 		std::vector<bool>		skippedGestures;
 		// fill all the informations for the behaviors

@@ -843,10 +843,12 @@ void SBScene::notify( SBSubject* subject )
 		bool val = boolAttr->getValue();
 		if (!val)
 		{
+			LOG("Turning off audio...");
 			AUDIO_Close();
 		}
 		else
 		{
+			LOG("Turning on audio...");
 			AUDIO_Init();
 		}
 		return;

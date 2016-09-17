@@ -127,9 +127,11 @@ namespace BML {
 		void set_offset(float t)
 		{ _sync->offset = t; }
 
+		void set_sync(SyncPointPtr new_sync) { _sync = new_sync; }
+
 	protected:
 		friend class BML::BehaviorSyncPoints;
-		void set_sync( SyncPointPtr new_sync ) { _sync = new_sync; }
+		
 	};
 
 	/**
@@ -201,7 +203,7 @@ namespace BML {
 		{	return BehaviorSyncPoints::iterator( end_it ); }
 
 		iterator insert( const std::wstring& id, SyncPointPtr sync, BehaviorSyncPoints::iterator pos ); 
-
+		
 		SetOfWstring get_sync_names();
 
 		/**
