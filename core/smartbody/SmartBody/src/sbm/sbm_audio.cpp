@@ -36,22 +36,32 @@ vhcl::Audio * g_audio = NULL;
 
 bool AUDIO_Init()
 {
-	if(g_audio)
+	LOG("Initializing AUDIO...");
+	if (g_audio)
+	{
+		LOG("Could not initialize AUDIO...");
 		return false;
+	}
 
 	g_audio = new vhcl::Audio();
 	bool ret = g_audio->Open();
+	if (!ret)
+		LOG("Could not perform AUDIO_Init()");
 	return ret;
 }
 
 
 void AUDIO_Play( const char * audio_file )
 {
+	
 	vhcl::Sound * sound = g_audio->CreateSoundLibSndFile( audio_file, audio_file );
 	if ( sound )
 	{
-      //LOG("has sound, sound = %d",sound);
 		sound->Play();
+	}
+	else
+	{
+		LOG("no sound available from %s", audio_file);
 	}
 
 }

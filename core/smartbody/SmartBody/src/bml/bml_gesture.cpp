@@ -80,16 +80,17 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		SmartBody::SBGestureMap* gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(gestureMapName);
 		if (!gestureMap)
 		{
-			LOG("WARNING: BML::parse_bml_gesture(): gesture map '%s' for emotion '%s' on character %s doesn't exist.", gestureMapName.c_str(), finalGestureMapName.c_str(), request->actor->getName().c_str());
+			//LOG("WARNING: BML::parse_bml_gesture(): gesture map '%s' for emotion '%s' on character %s doesn't exist.", gestureMapName.c_str(), finalGestureMapName.c_str(), request->actor->getName().c_str());
 			// get the default gesture map if the emotional one isn't available
 			if (gestureMapName != "gestureMap")
 			{
 				gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(character->getStringAttribute("gestureMap"));		
 			}
-			if (gestureMap)
-				LOG("Using default gesture map.");
-			else
-				return BehaviorRequestPtr();		
+			if (!gestureMap)
+			{
+				LOG("No default gesture map. Gesture will not be played.");
+				return BehaviorRequestPtr();
+			}
 		}
 
 		// Get current posture
@@ -118,7 +119,9 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 			return BehaviorRequestPtr();
 		}
 		else
-			LOG("bml_gesture gesture retrieval: %s", animationName.c_str());
+		{
+			//LOG("bml_gesture gesture retrieval: %s", animationName.c_str());
+		}
 	}
 
 	if (animationName == "")
@@ -137,6 +140,120 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 
 	if (motion)
 	{
+		if (request->actor->getBoolAttribute("gestureSimple"))
+		{
+			// don't perform any specialized gesture handling, simply play the mapped animation
+
+			double twarp = 1.0;
+			MeCtMotion* motionCt = new MeCtMotion();
+
+			// Name controller with behavior unique_id
+			ostringstream name;
+			name << unique_id << ' ' << motion->getName();
+			motionCt->setName(name.str().c_str());  // TODO: include BML act and behavior ids
+			motionCt->init(const_cast<SbmCharacter*>(request->actor), motion, 0.0, 1.0 / twarp);
+			// remove all syncs except for stroke to prevent gesture scaling
+			if (behav_syncs.sync_stroke()->sync())
+			{
+				behav_syncs.sync_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_ready()->set_time(TIME_UNSET);
+				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->set_time(TIME_UNSET);
+				behav_syncs.sync_relax()->sync()->parent = NULL;
+				behav_syncs.sync_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_end()->sync()->parent = NULL;
+			}
+			else if (behav_syncs.sync_start()->sync())
+			{
+				behav_syncs.sync_ready()->set_time(TIME_UNSET);
+				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->set_time(TIME_UNSET);
+				behav_syncs.sync_relax()->sync()->parent = NULL;
+				behav_syncs.sync_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_end()->sync()->parent = NULL;
+			}
+			else if (behav_syncs.sync_ready()->sync())
+			{
+				behav_syncs.sync_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->set_time(TIME_UNSET);
+				behav_syncs.sync_relax()->sync()->parent = NULL;
+				behav_syncs.sync_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_end()->sync()->parent = NULL;
+			}
+			else if (behav_syncs.sync_relax()->sync())
+			{
+				behav_syncs.sync_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_ready()->set_time(TIME_UNSET);
+				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
+				behav_syncs.sync_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_end()->sync()->parent = NULL;
+			}
+			else if (behav_syncs.sync_stroke_start()->sync())
+			{
+				behav_syncs.sync_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_ready()->set_time(TIME_UNSET);
+				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->set_time(TIME_UNSET);
+				behav_syncs.sync_relax()->sync()->parent = NULL;
+				behav_syncs.sync_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_end()->sync()->parent = NULL;
+			}
+			else if (behav_syncs.sync_stroke_end()->sync())
+			{
+				behav_syncs.sync_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_ready()->set_time(TIME_UNSET);
+				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->set_time(TIME_UNSET);
+				behav_syncs.sync_relax()->sync()->parent = NULL;
+				behav_syncs.sync_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_end()->sync()->parent = NULL;
+			}
+			else if (behav_syncs.sync_end()->sync())
+			{
+				behav_syncs.sync_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_ready()->set_time(TIME_UNSET);
+				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
+				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->set_time(TIME_UNSET);
+				behav_syncs.sync_relax()->sync()->parent = NULL;
+			}
+			//behav_syncs.printSyncTimes();
+			BehaviorRequestPtr behavPtr(new MotionRequest(unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs));
+			return behavPtr;
+		}
+
+
+
+
 		SkMotion* mForCt = motion;
 		MeCtMotion* motionCt = new MeCtMotion();
 		if (isAdditive)

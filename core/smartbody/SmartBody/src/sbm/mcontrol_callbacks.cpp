@@ -1515,41 +1515,41 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
     {
         string soundFile = splitArgs[ 0 ];
         string characterName = splitArgs[ 1 ];
-
+		
         // check for double-quotes around sound file
         if ( soundFile.length() > 1 )
         {
-        if ( soundFile[ 0 ] == '\"' )
-        {
-            size_t first = sArgs.find_first_of( "\"" );
-            if ( first == string::npos )
-            {
-                LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
-                return CMD_FAILURE;
-            }
+			if ( soundFile[ 0 ] == '\"' )
+			{
+				size_t first = sArgs.find_first_of( "\"" );
+				if ( first == string::npos )
+				{
+					LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
+					return CMD_FAILURE;
+				}
 
-            size_t second = sArgs.find_first_of( "\"", first + 1 );
-            if ( second == string::npos )
-            {
-                LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
-                return CMD_FAILURE;
-            }
+				size_t second = sArgs.find_first_of( "\"", first + 1 );
+				if ( second == string::npos )
+				{
+					LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
+					return CMD_FAILURE;
+				}
 
-            soundFile = sArgs.substr( first + 1, second - first - 1 );
-            characterName = sArgs.substr( second + 2 );
-        }
+				soundFile = sArgs.substr( first + 1, second - first - 1 );
+				characterName = sArgs.substr( second + 2 );
+			}
         }
 
         bool absolutePath = false;
 
         if ( soundFile.length() > 1 )
         {
-        if ( soundFile[ 0 ] == '\\' ||
-                soundFile[ 0 ] == '/' ||
-                soundFile[ 1 ] == ':' )
-        {
-            absolutePath = true;
-        }
+			if ( soundFile[ 0 ] == '\\' ||
+					soundFile[ 0 ] == '/' ||
+					soundFile[ 1 ] == ':' )
+			{
+				absolutePath = true;
+			}
         }
 
         if ( !absolutePath )
@@ -1559,33 +1559,36 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 			if (soundDir != "")
 				soundCacheDir = soundDir;
 
-		boost::filesystem::path p( soundCacheDir );
+			boost::filesystem::path p( soundCacheDir );
 #if (BOOST_VERSION > 104400)
-		boost::filesystem::path abs_p = boost::filesystem::absolute( p );
+			boost::filesystem::path abs_p = boost::filesystem::absolute( p );
 #else
-		boost::filesystem::path abs_p = boost::filesystem::complete( p );
+			boost::filesystem::path abs_p = boost::filesystem::complete( p );
 #endif
 
-//            char full[ _MAX_PATH ];
-//            if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
+	//            char full[ _MAX_PATH ];
+	//            if ( _fullpath( full, "..\\..\\..\\..\\..", _MAX_PATH ) != NULL )
 #if (BOOST_VERSION > 104400)
-        if ( boost::filesystem::exists( abs_p ) )
+			if ( boost::filesystem::exists( abs_p ) )
 #else
-        if ( boost::filesystem2::exists( abs_p ) )
+			if ( boost::filesystem2::exists( abs_p ) )
 #endif
-        {
-            //soundFile = string( full ) + string( "/" ) + soundFile;
-			p  /= soundFile;
-            soundFile = abs_p.string() + string("/") + soundFile;
-        }
+			{
+				//soundFile = string( full ) + string( "/" ) + soundFile;
+				p  /= soundFile;
+				soundFile = abs_p.string() + string("/") + soundFile;
+			}
         }
 
+		// send the sound event
+		std::stringstream strstr;
+		strstr << soundFile << " " << characterName;
+		SmartBody::SBEvent* sbevent = SmartBody::SBScene::getScene()->getEventManager()->createEvent("sound", strstr.str().c_str());
+		SmartBody::SBScene::getScene()->getEventManager()->handleEvent(sbevent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
+
+		// if internal audio is on, use the internal sound player
         if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
         {
-			std::stringstream strstr;
-			strstr << soundFile << " " << characterName;
-			SmartBody::SBEvent* sbevent = SmartBody::SBScene::getScene()->getEventManager()->createEvent("sound", strstr.str().c_str());
-			SmartBody::SBScene::getScene()->getEventManager()->handleEvent(sbevent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
 #if !defined(__FLASHPLAYER__)
 		LOG("Play AudioFile = %s", soundFile.c_str() );
 		

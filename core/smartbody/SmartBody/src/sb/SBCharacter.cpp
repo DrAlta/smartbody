@@ -69,6 +69,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	
 	createBoolAttribute("reach.useLocomotion", false, true, "Reaching", 110, false, false, false, "Whether to use locomotion for reach by default.");
 
+	createBoolAttribute("gestureSimple", false, true, "Gestures", 65, false, false, false, "Uses simple gesture handling; gestures map to an animation, but otherwise, no special handling.");
 	createBoolAttribute("gestureUseBlends", false, true, "Gestures", 88, false, false, false, "Whether SmartBody should use blend as gesture.");
 	createBoolAttribute("gestureRequest.autoGestureTransition", true, true, "Gestures", 89, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
 	createBoolAttribute("gestureRequest.matchingHandness", true, true, "Gestures", 90, false, false, false, "Whether SmartBody should filter gestures behaviors according to priority."); 
