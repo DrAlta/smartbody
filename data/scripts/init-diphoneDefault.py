@@ -1804,6 +1804,23 @@ diphone.addKey("open", 0.18799, 0.00291545)
 diphone.addKey("open", 0.634465, 0.670554)
 diphone.addKey("open", 0.989556, 0.00291545)
 
+diphone = diphoneManager.createDiphone("kg", "w", "default")
+diphone.addKey("W", 0.37859, -0.0116618)
+diphone.addKey("W", 0.686684, 0.612245)
+diphone.addKey("W", 0.791123, 0.664723)
+diphone.addKey("W", 0.997389, 0.00874636)
+
+diphone.addKey("open", -0.00522193, 0.00291545)
+diphone.addKey("open", 0.295039, 0.142857)
+diphone.addKey("open", 0.511749, 0.472303)
+diphone.addKey("open", 0.610966, 0.492711)
+diphone.addKey("open", 0.906005, 0)
+
+diphone.addKey("wide", -0.00522193, 0.0116618)
+diphone.addKey("wide", 0.0939948, 0.169096)
+diphone.addKey("wide", 0.292428, 0.206997)
+diphone.addKey("wide", 0.592689, -0.00291545)
+
 diphone = diphoneManager.createDiphone("kg", "ow", "default")
 diphone.addKey("W", 0.37859, -0.0116618)
 diphone.addKey("W", 0.686684, 0.612245)
