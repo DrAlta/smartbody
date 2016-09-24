@@ -1,8 +1,8 @@
 print "Sample Fuse Character"
 
 # location of the Fuse model as a COLLADA file
-modelName = "FuseModel.dae"
-scene.loadAssetsFromPath("e:/fuse/" + modelName)
+modelName = "FuseC"
+scene.loadAssetsFromPath("c:/users/shapi/Dropbox/fuse/" + modelName)
 
 obj = scene.createPawn("light0")
 obj.setPosition(SrVec(0, 180, 0))
@@ -21,6 +21,7 @@ obj.setBoolAttribute("visible", False)
 
 scene.addAssetPath("script", "sbm-common/scripts")
 scene.addAssetPath("script", "scripts")
+scene.addAssetPath("script", "behaviorsets")
 
 scene.setBoolAttribute("internalAudio", True)
 
@@ -31,7 +32,7 @@ mixamoMap = scene.getJointMapManager().getJointMap("mixamorig")
 mixamoMap.applySkeleton(skeleton)
 
 c = scene.createCharacter("test", "")
-c.setSkeleton(skeleton)
+c.setSkeleton(scene.createSkeleton(modelName + ".dae"))
 c.createStandardControllers()
 
 fd = scene.createFaceDefinition('fuse')
@@ -48,6 +49,7 @@ fd.setAU(7,  "both",  "")
 fd.setAU(10, "both",  "")
 fd.setAU(12, "left",  "")
 fd.setAU(12, "right", "")
+fd.setAU(24, "both", "")
 fd.setAU(25, "both",  "")
 fd.setAU(26, "both",  "")
 fd.setAU(45, "left",  "")
@@ -73,7 +75,16 @@ c.setActionAttribute("updateChannel")
 scene.run("init-diphoneDefault.py")
 c.setStringAttribute('lipSyncSetName', 'default')
 c.setBoolAttribute('usePhoneBigram', True)
+c.setStringAttribute('voiceCode', 'CereVoice|Isabella|-|English|(East|Coast|America)')
+c.setStringAttribute('voice', 'remote')
 
+scene.run("runNVBG.py")
+nvbg = c.getNvbg().nvbg
+
+# setup gestures
+scene.run('BehaviorSetGestures.py')
+setupBehaviorSet()
+retargetBehaviorSet('test')
 
 
 class MyController (PythonController):
@@ -262,6 +273,9 @@ character = scene.getCharacter('test')
 character.addController(50, myc)
 #character.removeController(myc)
 
+
+
+bml.execBML("*", "<body posture=\"ChrBrad@Idle01\"/>")
 
 
 

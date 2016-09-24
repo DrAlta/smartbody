@@ -130,6 +130,14 @@ void SBPawn::setSkeleton(SBSkeleton* skel)
 		return;
 	}
 
+	// make sure that this skeleton isn't one of the skeleton templates
+	if (SmartBody::SBScene::getScene()->getSkeleton(skel->getName()) == skel)
+	{
+		LOG("Skeleton is a template. Make a copy of this skeleton (scene.createSkeleton()) first.");
+		return;
+	}
+
+
 	SrVec position;
 	SrVec hpr;	
 	SBSkeleton* sk = this->getSkeleton();
