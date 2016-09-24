@@ -1,16 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="DebugFBX|Win32">
-      <Configuration>DebugFBX</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="ReleaseFBX|Win32">
-      <Configuration>ReleaseFBX</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
@@ -25,16 +17,6 @@
     <ProjectName>simplesmartbody</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
@@ -47,12 +29,6 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -68,26 +44,13 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">true</LinkIncremental>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">$(Configuration)\</IntDir>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">false</LinkIncremental>
-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" />
-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'" />
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" />
-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'" />
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">$(ProjectName)d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -128,16 +91,16 @@ copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .\bin
-copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll .\bin
-copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1D.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-gd-1_51.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_system-vc100-mt-gd-1_51.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_regex-vc100-mt-gd-1_51.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_python-vc100-mt-gd-1_51.dll .\bin
+copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2015-build\DebugDLL\activemq-cppd.dll .\bin
+copy /Y ..\..\..\lib\xerces-c\bin\xerces-c_3_1D.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc140-mt-gd-1_59.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_system-vc140-mt-gd-1_59.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_regex-vc140-mt-gd-1_59.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_python-vc140-mt-gd-1_59.dll .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll  .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll  .\bin
 copy /Y ..\..\..\core\smartbody\Python27\libs\python27.dll .\bin
-copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
+copy /Y "$(VS140COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -182,118 +145,16 @@ copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .\bin
-copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll .\bin
-copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-1_51.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_system-vc100-mt-1_51.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_regex-vc100-mt-1_51.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_python-vc100-mt-1_51.dll .\bin
+copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2015-build\ReleaseDLL\activemq-cpp.dll .\bin
+copy /Y ..\..\..\lib\xerces-c\bin\xerces-c_3_1.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc140-mt-1_59.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_system-vc140-mt-1_59.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_regex-vc140-mt-1_59.dll .\bin
+copy /Y ..\..\..\lib\boost\lib\boost_python-vc140-mt-1_59.dll .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll  .\bin
 copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll  .\bin
 copy /Y ..\..\..\core\smartbody\Python27\libs\python27.dll .\bin
-copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
-</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugFBX|Win32'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\smartbody-dll\include;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>dDOUBLE;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-    </ClCompile>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
-    <Link>
-      <AdditionalDependencies>SmartBody_d.lib;vhcl_d.lib;vhmsg_d.lib;pthreadVSE2.lib;activemq-cppd.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\SmartBody\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>if not exist .\bin mkdir .\bin
-copy /Y "$(TargetPath)" .\bin
-copy /Y ..\SmartBody\lib\SmartBody_d.dll .\bin
-copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin
-copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin
-copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin
-copy /Y ..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll .\bin
-copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll .\bin
-copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll .\bin
-copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .\bin
-copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .\bin
-copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll .\bin
-copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1D.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-gd-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_system-vc100-mt-gd-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_regex-vc100-mt-gd-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_python-vc100-mt-gd-1_44.dll .\bin
-copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\steerlibd.dll  .\bin
-copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Debug\pprAId.dll  .\bin
-copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
-</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFBX|Win32'">
-    <ClCompile>
-      <Optimization>Full</Optimization>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\smartbody-dll\include;..\..\..\lib\vhcl\include;..\..\..\lib\vhmsg\vhmsg-c\include;..\..\..\lib\bonebus\include;..\..\..\lib\wsp\wsp\include;..\..\..\lib\xerces-c\include;..\..\..\lib\boost;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>dDOUBLE;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>
-      </DebugInformationFormat>
-    </ClCompile>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
-    <Link>
-      <AdditionalDependencies>SmartBody.lib;vhcl.lib;vhmsg.lib;pthreadVSE2.lib;activemq-cpp.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\SmartBody\lib;..\..\..\lib\vhcl\lib;..\..\..\lib\vhcl\openal\libs\Win32;..\..\..\lib\vhcl\libsndfile\lib;..\..\..\lib\vhmsg\vhmsg-c\lib;..\..\..\lib\bonebus\lib;..\..\..\lib\wsp\wsp\lib;..\..\..\lib\pthreads\lib;..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL;..\..\..\lib\xerces-c\lib;..\..\..\lib\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <SubSystem>Console</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Command>if not exist .\bin mkdir .\bin
-copy /Y "$(TargetPath)" .\bin
-copy /Y ..\SmartBody\lib\SmartBody.dll .\bin
-copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\OpenAL32.dll .\bin
-copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\wrap_oal.dll .\bin
-copy /Y ..\..\..\lib\vhcl\openal\libs\Win32\alut.dll .\bin
-copy /Y ..\..\..\lib\vhcl\libsndfile\bin\libsndfile-1.dll .\bin
-copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll .\bin
-copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll .\bin
-copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .\bin
-copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .\bin
-copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll .\bin
-copy /Y ..\..\..\lib\xerces-c\bin9\xerces-c_3_1.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc100-mt-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_system-vc100-mt-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_regex-vc100-mt-1_44.dll .\bin
-copy /Y ..\..\..\lib\boost\lib\boost_python-vc100-mt-1_44.dll .\bin
-copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\steerlib.dll  .\bin
-copy /Y ..\..\..\core\smartbody\steersuite-1.3\build\win32\Release\pprAI.dll  .\bin
-copy /Y "$(VS100COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
+copy /Y "$(VS140COMNTOOLS)\..\IDE\dbghelp.dll" .\bin
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
