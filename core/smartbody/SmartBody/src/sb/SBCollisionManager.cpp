@@ -255,7 +255,7 @@ void SBCollisionManager::afterUpdate(double time)
 					if (c1 && c2)
 					{
 						SBEvent* collisionEvent = eventManager->createEvent("collision",c1->getName()+"/"+c2->getName());
-						eventManager->handleEvent(collisionEvent, time);
+						eventManager->handleEvent(collisionEvent);
 						//LOG("Collision detected between character %s and character %s",c1->getName().c_str(), c2->getName().c_str());
 						delete collisionEvent; // free the memory
 
@@ -312,7 +312,7 @@ void SBCollisionManager::afterUpdate(double time)
 					//if(createEvent)
 					//{
 					//	Event* collisionEvent = eventManager->createEvent("collision",obj1+"/"+obj2);
-					//	eventManager->handleEvent(collisionEvent, time);
+					//	eventManager->handleEvent(collisionEvent);
 					//	LOG("Collision detected between %s and %s", obj1.c_str(), obj2.c_str());
 					//	delete collisionEvent; // free the memory
 					//}
@@ -323,7 +323,7 @@ void SBCollisionManager::afterUpdate(double time)
 					//LOG("Collision detected between %s and %s", obj1.c_str(), obj2.c_str());
 
 					SBEvent* collisionEvent = eventManager->createEvent("collision",obj1+"/"+obj2);
-					eventManager->handleEvent(collisionEvent, time);
+					eventManager->handleEvent(collisionEvent);
 					delete collisionEvent; // free the memory
 				}
 			}

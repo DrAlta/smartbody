@@ -206,7 +206,7 @@ void PATimeManager::checkEvents()
 		if (event.first->isEnabled() && localTimes[motionIndex] >= event.first->getTime())
 		{
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
-			manager->handleEvent(event.first, localTimes[motionIndex]);
+			manager->handleEvent(event.first);
 			std::string type = event.first->getType();
 			std::string params = event.first->getParameters();
 			//LOG("EVENT: %f %s %s", time, type.c_str(), params.c_str());

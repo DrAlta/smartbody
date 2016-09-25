@@ -7,7 +7,7 @@ print "|--------------------------------------------|"
 scene.loadAssetsFromPath("mesh/ChrBrad")
 scene.loadAssetsFromPath("mesh/ChrRachel")
 scene.addAssetPath('mesh', 'mesh')
-scene.addAssetPath('motion', 'ChrMaarten')
+scene.addAssetPath('motion', 'ChrBrad')
 scene.addAssetPath('motion', 'ChrRachel')
 scene.addAssetPath("script", "behaviorsets")
 scene.addAssetPath('script', 'scripts')
@@ -62,9 +62,9 @@ for i in range(10):
 	brad.getAttribute('collisionShapeScale').setValue(SrVec(.01, .01, .01))
 	# Set defomable mesh
 	brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
-	brad.setStringAttribute('deformableMesh', 'ChrMaarten.dae')
+	brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 	# Play idle animation
-	bml.execBML(baseName, '<body posture="ChrBrad@Idle01"/>')
+	bml.execBML(baseName, '<body posture="ChrMarine@Idle01"/>')
 	# Retarget character
 	#retargetCharacter(baseName, 'ChrBrad.sk', False)
 	if i== 0 : 
@@ -83,7 +83,7 @@ for i in range(10):
 print 'Setting up Rachels'
 rachelList = []
 rachelPosX = -500.0
-for i in range(15):
+for i in range(10):
 	baseName = 'ChrRachel%s' % i
 	rachel = scene.createCharacter(baseName, '')
 	rachelSkeleton = scene.createSkeleton('ChrRachel.dae')
@@ -99,7 +99,7 @@ for i in range(15):
 	rachel.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 	rachel.setStringAttribute('deformableMesh', 'ChrRachel.dae')
 	# Play idle animation
-	bml.execBML(baseName, '<body posture="ChrRachel_ChrBrad@Idle01"/>')
+	bml.execBML(baseName, '<body posture="ChrMarine@Idle01"/>')
 	# Retarget character
 	if i == 0:
 		scene.run('BehaviorSetMaleMocapLocomotion.py')

@@ -91,6 +91,7 @@
 #include <controllers/RealTimeLipSyncController.h>
 #include <sbm/KinectProcessor.h>
 #include <controllers/me_controller_tree_root.hpp>
+#include <bml/bml_processor.hpp>
 #include <sr/sr_sn_group.h>
 #if !defined(SB_IPHONE) && !defined(__ANDROID__)
 #include <sbm/GPU/SbmShader.h>
@@ -216,6 +217,7 @@ void SBScene::initialize()
    _coneOfSight			= false;
    _coneOfSight_leftEye	= NULL;
 
+    createBoolAttribute("bmlstatus", false, true, "", 5, false, false, false, "Use BML status feedback events.");
 	createBoolAttribute("useNewBMLParsing",false,true,"",10,false,false,false,"Use new BML parsing scheme.");
 	createBoolAttribute("internalAudio",false,true,"",10,false,false,false,"Use SmartBody's internal audio player.");
 	createStringAttribute("speechRelaySoundCacheDir","../../../..",true,"",20,false,false,false,"Directory where sound files from speech relays will be placed. ");
@@ -868,6 +870,10 @@ void SBScene::notify( SBSubject* subject )
 		{		
 			vhcl::Log::g_log.RemoveAllListeners();
 		}
+	}
+	else if (boolAttr && boolAttr->getName() == "bmlstatus")
+	{
+		this->getBmlProcessor()->getBMLProcessor()->set_bml_feedback(boolAttr->getValue());
 	}
 
 	DoubleAttribute* doubleAttr = dynamic_cast<DoubleAttribute*>(subject);

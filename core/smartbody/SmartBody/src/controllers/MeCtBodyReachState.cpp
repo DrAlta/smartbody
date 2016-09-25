@@ -191,7 +191,7 @@ void ReachHandAction::sendReachEvent(const std::string& etype, const std::string
 	motionEvent->setType(eventType);			
 	motionEvent->setParameters(cmd);
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
-	manager->handleEvent(motionEvent,time);
+	manager->handleEvent(motionEvent);
 	
 #else
 	std::string eventType = etype;		
@@ -199,7 +199,7 @@ void ReachHandAction::sendReachEvent(const std::string& etype, const std::string
 	motionEvent.setType(eventType);			
 	motionEvent.setParameters(cmd);
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
-	manager->handleEvent(&motionEvent,time);
+	manager->handleEvent(&motionEvent);
 #endif
 
 }
