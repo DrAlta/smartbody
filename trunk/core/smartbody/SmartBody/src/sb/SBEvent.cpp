@@ -117,7 +117,7 @@ SBEventManager::~SBEventManager()
 	}
 }
 
-void SBEventManager::handleEvent(SBEvent* e, double time)
+void SBEventManager::handleEvent(SBEvent* e)
 {
 	std::string type = e->getType();
 	std::string params = e->getParameters();

@@ -504,7 +504,7 @@ void MeCtMotion::checkMotionEvents(double time)
 		if (motionEvent->isEnabled() && time >= motionEvent->getTime())
 		{
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();
-			manager->handleEvent(motionEvent, time);
+			manager->handleEvent(motionEvent);
 			std::string type = motionEvent->getType();
 			std::string params = motionEvent->getParameters();
 			//LOG("EVENT: %f %s %s", time, type.c_str(), params.c_str());

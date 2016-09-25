@@ -100,14 +100,14 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			motionEvent.setType(eventType);			
 			motionEvent.setParameters(cmd);
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
-			manager->handleEvent(&motionEvent,t);
+			manager->handleEvent(&motionEvent);
 #else
 			SmartBody::SBMotionEvent* motionEvent = new SmartBody::SBMotionEvent();
 			std::string eventType = "collision";
 			motionEvent->setType(eventType);			
 			motionEvent->setParameters(cmd);
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
-			manager->handleEvent(motionEvent,t);
+			manager->handleEvent(motionEvent);
 #endif
 			colRecords.clear();
 			hasGaze = true;
@@ -127,14 +127,14 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			motionEvent.setType(eventType);						
 			motionEvent.setParameters(cmd);
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();	
-			manager->handleEvent(&motionEvent,t);
+			manager->handleEvent(&motionEvent);
 #else
 			SmartBody::SBMotionEvent *motionEvent = new SmartBody::SBMotionEvent();
 			std::string eventType = "collision";
 			motionEvent->setType(eventType);						
 			motionEvent->setParameters(cmd);
 			SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();	
-			manager->handleEvent(motionEvent,t);
+			manager->handleEvent(motionEvent);
 #endif
 			hasGaze = false;
 			hasPD = true;

@@ -59,7 +59,7 @@ class SBEventManager
 		SBAPI SBEventManager();
 		SBAPI ~SBEventManager();
 
-		SBAPI void handleEvent(SBEvent* e, double time);
+		SBAPI void handleEvent(SBEvent* e);
 		SBAPI SBEvent* createEvent(const std::string& type, const std::string parameters);
 		SBAPI void addEventHandler(const std::string& type, SBEventHandler* handle);
 		SBAPI void removeEventHandler(const std::string& type);
