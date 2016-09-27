@@ -3033,25 +3033,55 @@ bool ParserOpenCOLLADA::exportMaterials( FILE* fp, std::string deformMeshName )
 {
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	DeformableMesh* defMesh = assetManager->getDeformableMesh(deformMeshName);
-	if (!defMesh) return false;
+	if (!defMesh) 
+		return false;
 	
+	std::vector<SbmSubMesh*> submeshes;
+	// write out submeshes for the deformable mesh
+	for (unsigned int i = 0; i < defMesh->subMeshList.size(); i++)
+	{
+		submeshes.push_back(defMesh->subMeshList[i]);
+	}
+	// if there are any composited blendshapes, add those submeshes as well
+	for (std::map<std::string, std::vector<std::string> >::iterator iter = defMesh->morphTargets.begin();
+		iter != defMesh->morphTargets.end();
+		iter++)
+	{
+		for (size_t m = 1; m < (*iter).second.size(); m++) // first morph is the base shape, ignore it
+		{
+			std::string& morphTarget = (*iter).second[m];
+			// if this morph isn't part of the mesh, then add its submesh
+			// this is brittle, and assumes that the composited morphs aren't part of the Deformable mesh
+			DeformableMesh* morphMesh = assetManager->getDeformableMesh(morphTarget);
+			if (morphMesh)
+			{
+				morphMesh->rebuildVertexBuffer(true);
+				for (unsigned int i = 0; i < morphMesh->subMeshList.size(); i++)
+				{
+					submeshes.push_back(morphMesh->subMeshList[i]);
+				}
+			}
+		}
+	}
+
 	// write-out material -> effect map
 	fprintf(fp,"<library_materials>\n");
-	for (unsigned int i=0;i<defMesh->subMeshList.size();i++)
+	for (unsigned int i = 0; i < submeshes.size(); i++)
 	{
-		SbmSubMesh* subMesh = defMesh->subMeshList[i];
+		SbmSubMesh* subMesh = submeshes[i];
 		std::string& matName = subMesh->matName;
 		std::string effectName = matName+"-fx";
 		fprintf(fp,"<material id=\"%s\" name=\"%s\">\n",matName.c_str(),matName.c_str());
 		fprintf(fp,"<instance_effect url=\"#%s\"/>\n",effectName.c_str());
 		fprintf(fp,"</material>\n");
 	}
+	
 	fprintf(fp,"</library_materials>\n");
 	SbmTextureManager& texManger = SbmTextureManager::singleton();
 	fprintf(fp,"<library_effects>\n");
-	for (unsigned int i=0;i<defMesh->subMeshList.size();i++)
+	for (unsigned int i=0; i < submeshes.size();i++)
 	{
-		SbmSubMesh* subMesh = defMesh->subMeshList[i];
+		SbmSubMesh* subMesh = submeshes[i];
 		std::string effectID = subMesh->matName + "-fx";
 		fprintf(fp,"<effect id=\"%s\">\n",effectID.c_str());
 		fprintf(fp,"<profile_COMMON>\n");
@@ -3102,14 +3132,22 @@ bool ParserOpenCOLLADA::exportMaterials( FILE* fp, std::string deformMeshName )
 
 	// write-out images
 	fprintf(fp,"<library_images>\n");
-	for (unsigned int i=0;i<defMesh->subMeshList.size();i++)
+	for (unsigned int i=0; i <submeshes.size();i++)
 	{
-		SbmSubMesh* subMesh = defMesh->subMeshList[i];
+		SbmSubMesh* subMesh = submeshes[i];
 		SbmTexture* diffTex = texManger.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());
 		if (diffTex) 
 		{
 			fprintf(fp,"<image id=\"%s\" name=\"%s\">\n",diffTex->getName().c_str(), diffTex->getName().c_str());
-			fprintf(fp,"<init_from>%s</init_from>\n",diffTex->getFileName().c_str());
+			// texture file names are scoped, remove any scoping information (a '|' )
+			std::string textureFileName = diffTex->getFileName();
+			std::string textureFileNameWithScope = textureFileName;
+			size_t pos = textureFileNameWithScope.find("|");
+			if (pos != std::string::npos)
+			{
+				textureFileName = textureFileNameWithScope.substr(pos + 1);
+			}
+			fprintf(fp,"<init_from>%s</init_from>\n", textureFileName.c_str());
 			fprintf(fp,"</image>\n");
 		}		
 	}
@@ -3299,7 +3337,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 		iter++)
 	{
 		std::vector<SrSnModel*>& shapes = (*iter).second;
-		for (unsigned int s = 0; s < shapes.size(); s++)
+		for (unsigned int s = 1; s < shapes.size(); s++) // first shape is the base shape, already written out
 		{
 			SrSnModel* srsnModel = shapes[s];
 			if (!srsnModel)
