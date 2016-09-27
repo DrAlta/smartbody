@@ -405,6 +405,7 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 									SrSnModel* staticModel = neutralMesh->dMeshStatic_p[0];
 									SrModel& s = staticModel->shape();
 									std::string blendShapeMapName = (const char*) s.name;
+									(*shapeIter).second[0] = blendShapeMapName;
 									//mesh->blendShapeMap.insert(std::pair<std::string, std::vector<SrSnModel*> >(neutralMesh->getName(), std::vector<SrSnModel*>() ));
 									mesh->blendShapeMap.insert(std::pair<std::string, std::vector<SrSnModel*> >(blendShapeMapName, std::vector<SrSnModel*>() ));
 									std::map<std::string, std::vector<SrSnModel*> >::iterator blendshapeIter = mesh->blendShapeMap.begin();
@@ -417,6 +418,9 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 									(*blendshapeIter).second[0] = model;
 									model->ref();
 									hasNeutral = true;
+									// add the shape to the deformable mesh
+									//mesh->dMeshStatic_p.push_back(model);
+									//mesh->dMeshDynamic_p.push_back(model);
 								}
 								
 							}
@@ -457,7 +461,8 @@ void FLTKListener::notify(SmartBody::SBSubject* subject)
 							}
 						}
 					}
-					
+					//mesh->rebuildVertexBuffer(true);
+
 					DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
 					meshInstance->setDeformableMesh(mesh);
 					//meshInsance->setSkeleton(pawn->getSkeleton());	
