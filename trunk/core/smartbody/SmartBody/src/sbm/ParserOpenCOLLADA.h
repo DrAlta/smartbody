@@ -96,6 +96,7 @@ class ParserOpenCOLLADA
 		static bool exportSkinMesh(FILE* fp, std::string deformMeshName, double scale);
 		static bool exportMaterials(FILE* fp, std::string deformMeshName);		
 		static bool exportMotions(FILE* fp, std::vector<std::string> motionNames);
+		static bool exportGeometry(FILE* fp, SrModel& model, double scale);
 
 
 

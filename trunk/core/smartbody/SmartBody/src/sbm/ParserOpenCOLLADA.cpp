@@ -2351,7 +2351,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 			path.extract_file_name(filename);
 			SrStringArray paths;
 			paths.push ( path );
-			for (int i = 0; i < newModel->M.size(); i++)
+			for (unsigned int i = 0; i < newModel->M.size(); i++)
 			{
 			   std::string matName = newModel->mtlnames[i];
 			   if (newModel->mtlTextureNameMap.find(matName) != newModel->mtlTextureNameMap.end())
@@ -2954,6 +2954,14 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 	if (deformMeshName == "")
 		deformMeshName = "smartbodycharacter.dae";
 	std::string colladaName = deformMeshName ;
+
+	// make sure the output folder has been created
+	boost::filesystem::path dir(outPathname);
+	if (boost::filesystem::create_directory(dir))
+	{
+		LOG("Folder accessed or created: %s", outPathname);
+	}
+
 	std::string fullColladaPathName = outPathname + "/" + colladaName;
 	FILE* fp = fopen(fullColladaPathName.c_str(),"wt");
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
@@ -3109,6 +3117,166 @@ bool ParserOpenCOLLADA::exportMaterials( FILE* fp, std::string deformMeshName )
 	return true;
 }
 
+bool ParserOpenCOLLADA::exportGeometry(FILE* fp, SrModel& model, double scale)
+{
+	bool hasNormal = false, hasTexCoord = false, hasColor = false;
+	if (model.N.size() > 0 && model.Fn.size() == model.F.size()) hasNormal = true; // export normal
+	if (model.T.size() > 0 && model.Ft.size() == model.F.size()) hasTexCoord = true;
+	if (model.Vc.size() == model.V.size()) hasColor = true;
+
+	std::string modelName = (const char*)model.name;
+
+	if (modelName == "") // no model name
+	{
+		modelName = "shape";//  +boost::lexical_cast<std::string>(i);
+	}
+	fprintf(fp, "<geometry id=\"%s\" name=\"%s\">\n", modelName.c_str(), modelName.c_str());
+	fprintf(fp, "<mesh>\n");
+	// write-out position array
+	std::string positionID = modelName + "-positions";
+	std::string positionArrayID = positionID + "-array";
+
+	{
+		fprintf(fp, "<source id=\"%s\" name=\"%s\">\n", positionID.c_str(), positionID.c_str());
+		fprintf(fp, "<float_array id=\"%s\" count=\"%d\">", positionArrayID.c_str(), model.V.size() * 3);
+		for (unsigned int k = 0; k<model.V.size(); k++)
+			fprintf(fp, "%f %f %f ", model.V[k][0] * scale, model.V[k][1] * scale, model.V[k][2] * scale);
+		fprintf(fp, "</float_array>\n");
+		fprintf(fp, "<technique_common>\n");
+		fprintf(fp, "<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n", positionArrayID.c_str(), model.V.size(), 3);
+		fprintf(fp, "<param name=\"X\" type=\"float\"/>\n");
+		fprintf(fp, "<param name=\"Y\" type=\"float\"/>\n");
+		fprintf(fp, "<param name=\"Z\" type=\"float\"/>\n");
+		fprintf(fp, "</accessor>\n");
+		fprintf(fp, "</technique_common>\n");
+		fprintf(fp, "</source>\n");
+	}
+
+	// write-out normal array
+	std::string normalID = modelName + "-normal";
+	std::string normalArrayID = normalID + "-array";
+	hasNormal = model.N.size() > 0;
+	if (hasNormal) // has vertex normals
+	{
+		fprintf(fp, "<source id=\"%s\" name=\"%s\">\n", normalID.c_str(), normalID.c_str());
+		fprintf(fp, "<float_array id=\"%s\" count=\"%d\">", normalArrayID.c_str(), model.N.size() * 3);
+		for (unsigned int k = 0; k<model.N.size(); k++)
+			fprintf(fp, "%f %f %f ", model.N[k][0], model.N[k][1], model.N[k][2]);
+		fprintf(fp, "</float_array>\n");
+		fprintf(fp, "<technique_common>\n");
+		fprintf(fp, "<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n", normalArrayID.c_str(), model.N.size(), 3);
+		fprintf(fp, "<param name=\"X\" type=\"float\"/>\n");
+		fprintf(fp, "<param name=\"Y\" type=\"float\"/>\n");
+		fprintf(fp, "<param name=\"Z\" type=\"float\"/>\n");
+		fprintf(fp, "</accessor>\n");
+		fprintf(fp, "</technique_common>\n");
+		fprintf(fp, "</source>\n");
+	}
+
+
+	// Note : this is a hack to support vertex color in Collada parsing, I don't think this is standard practice ... 
+	std::string colorID = modelName + "-colors";
+	std::string colorArrayID = colorID + "-array";
+
+	{
+		fprintf(fp, "<source id=\"%s\" name=\"%s\">\n", colorID.c_str(), colorID.c_str());
+		fprintf(fp, "<float_array id=\"%s\" count=\"%d\">", colorArrayID.c_str(), model.Vc.size() * 3);
+		for (unsigned int k = 0; k<model.Vc.size(); k++)
+			fprintf(fp, "%f %f %f ", model.Vc[k][0], model.Vc[k][1], model.Vc[k][2]);
+		fprintf(fp, "</float_array>\n");
+		fprintf(fp, "<technique_common>\n");
+		fprintf(fp, "<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n", colorArrayID.c_str(), model.Vc.size(), 3);
+		fprintf(fp, "<param name=\"R\" type=\"float\"/>\n");
+		fprintf(fp, "<param name=\"G\" type=\"float\"/>\n");
+		fprintf(fp, "<param name=\"B\" type=\"float\"/>\n");
+		//fprintf(fp,"<param name=\"A\" type=\"float\"/>\n");
+		fprintf(fp, "</accessor>\n");
+		fprintf(fp, "</technique_common>\n");
+		fprintf(fp, "</source>\n");
+	}
+
+	// write-out texcoord array
+	std::string texCoordID = modelName + "-map1";
+	std::string texCoordArrayID = texCoordID + "-array";
+	hasTexCoord = model.T.size() > 0;
+	if (hasTexCoord) // has vertex normals
+	{
+		fprintf(fp, "<source id=\"%s\" name=\"%s\">\n", texCoordID.c_str(), texCoordID.c_str());
+		fprintf(fp, "<float_array id=\"%s\" count=\"%d\">", texCoordArrayID.c_str(), model.T.size() * 2);
+		for (unsigned int k = 0; k<model.T.size(); k++)
+			fprintf(fp, "%f %f ", model.T[k][0], model.T[k][1]);
+		fprintf(fp, "</float_array>\n");
+		fprintf(fp, "<technique_common>\n");
+		fprintf(fp, "<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n", texCoordArrayID.c_str(), model.T.size(), 2);
+		fprintf(fp, "<param name=\"U\" type=\"float\"/>\n");
+		fprintf(fp, "<param name=\"V\" type=\"float\"/>\n");
+		fprintf(fp, "</accessor>\n");
+		fprintf(fp, "</technique_common>\n");
+		fprintf(fp, "</source>\n");
+	}
+
+	// write out vertices semantic
+	std::string vertexID = modelName + "-vertices";
+	fprintf(fp, "<vertices id=\"%s\" name=\"%s\">\n", vertexID.c_str(), vertexID.c_str());
+	fprintf(fp, "<input semantic=\"POSITION\" source=\"#%s\"/>\n", positionID.c_str());
+	fprintf(fp, "</vertices>\n");
+
+	// write out triangles
+	std::string matName = "defaultMat";
+	std::map<std::string, std::vector<int> >::iterator mi;
+	for (mi = model.mtlFaceIndices.begin();
+		mi != model.mtlFaceIndices.end();
+		mi++)
+	{
+		matName = mi->first;
+		std::string matID = matName + "_SG";
+		std::vector<int>& mtlFaces = mi->second;
+		int offset = 0;
+		fprintf(fp, "<triangles material=\"%s\" count=\"%d\">\n", matID.c_str(), mtlFaces.size());
+		fprintf(fp, "<input semantic=\"VERTEX\" source=\"#%s\" offset=\"%d\"/>\n", vertexID.c_str(), offset++);
+		if (hasNormal)
+		{
+			fprintf(fp, "<input semantic=\"NORMAL\" source=\"#%s\" offset=\"%d\"/>\n", normalID.c_str(), offset++);
+		}
+		if (hasTexCoord)
+		{
+			fprintf(fp, "<input semantic=\"TEXCOORD\" source=\"#%s\" offset=\"%d\"/>\n", texCoordID.c_str(), offset++);
+		}
+		if (hasColor)
+		{
+			fprintf(fp, "<input semantic=\"COLOR\" source=\"#%s\" offset=\"%d\"/>\n", colorID.c_str(), offset++);
+		}
+		fprintf(fp, "<p>");
+		for (unsigned int k = 0; k<mtlFaces.size(); k++)
+		{
+			int fidx = mtlFaces[k];
+			SrVec3i* f = &model.F[fidx];
+			SrVec3i *fn = NULL, *ft = NULL;
+			if (hasNormal)
+				fn = &model.Fn[fidx];
+			if (hasTexCoord)
+				ft = &model.Ft[fidx];
+
+			for (int j = 0; j<3; j++)
+			{
+				fprintf(fp, "%d ", (*f)[j]);
+				if (hasNormal)
+					fprintf(fp, "%d ", (*fn)[j]);
+				if (hasTexCoord)
+					fprintf(fp, "%d ", (*ft)[j]);
+				if (hasColor)
+					fprintf(fp, "%d ", (*f)[j]);
+			}
+		}
+		fprintf(fp, "</p>\n");
+		fprintf(fp, "</triangles>\n");
+	}
+	fprintf(fp, "</mesh>\n");
+	fprintf(fp, "</geometry>\n");
+
+	return true;
+}
+
 
 bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, double scale)
 {
@@ -3122,161 +3290,25 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 	for (unsigned int i=0;i<defMesh->dMeshStatic_p.size();i++)
 	{		
 		SrModel& model = defMesh->dMeshStatic_p[i]->shape();
-		bool hasNormal = false, hasTexCoord = false, hasColor = false;
-		if (model.N.size() > 0 && model.Fn.size() == model.F.size()) hasNormal = true; // export normal
-		if (model.T.size() > 0 && model.Ft.size() == model.F.size()) hasTexCoord = true;
-		if (model.Vc.size() == model.V.size()) hasColor = true;
-
-		std::string modelName = (const char*) model.name;
-
-		if (modelName == "") // no model name
-		{
-			modelName = "shape"+boost::lexical_cast<std::string>(i);
-		}
-		fprintf(fp,"<geometry id=\"%s\" name=\"%s\">\n",modelName.c_str(),modelName.c_str());
-		fprintf(fp,"<mesh>\n");
-		// write-out position array
-		std::string positionID = modelName + "-positions";
-		std::string positionArrayID = positionID+"-array";
-
-		{
-			fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",positionID.c_str(),positionID.c_str());
-			fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", positionArrayID.c_str(),model.V.size()*3);
-			for (int k=0;k<model.V.size();k++)
-				fprintf(fp,"%f %f %f ",model.V[k][0] * scale, model.V[k][1] * scale, model.V[k][2] * scale);
-			fprintf(fp,"</float_array>\n");
-			fprintf(fp,"<technique_common>\n");
-			fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n",positionArrayID.c_str(),model.V.size(),3);
-			fprintf(fp,"<param name=\"X\" type=\"float\"/>\n");
-			fprintf(fp,"<param name=\"Y\" type=\"float\"/>\n");
-			fprintf(fp,"<param name=\"Z\" type=\"float\"/>\n");
-			fprintf(fp,"</accessor>\n");
-			fprintf(fp,"</technique_common>\n");
-			fprintf(fp,"</source>\n");
-		}
-
-		// write-out normal array
-		std::string normalID = modelName + "-normal";
-		std::string normalArrayID = normalID+"-array";
-		hasNormal = model.N.size() > 0;
-		if (hasNormal) // has vertex normals
-		{
-			fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",normalID.c_str(),normalID.c_str());
-			fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", normalArrayID.c_str(),model.N.size()*3);
-			for (int k=0;k<model.N.size();k++)
-				fprintf(fp,"%f %f %f ",model.N[k][0],model.N[k][1],model.N[k][2]);
-			fprintf(fp,"</float_array>\n");
-			fprintf(fp,"<technique_common>\n");
-			fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n",normalArrayID.c_str(),model.N.size(),3);
-			fprintf(fp,"<param name=\"X\" type=\"float\"/>\n");
-			fprintf(fp,"<param name=\"Y\" type=\"float\"/>\n");
-			fprintf(fp,"<param name=\"Z\" type=\"float\"/>\n");
-			fprintf(fp,"</accessor>\n");
-			fprintf(fp,"</technique_common>\n");
-			fprintf(fp,"</source>\n");
-		}
-
-		
-		// Note : this is a hack to support vertex color in Collada parsing, I don't think this is standard practice ... 
-		std::string colorID = modelName + "-colors";
-		std::string colorArrayID = colorID+"-array";
-
-		{
-			fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",colorID.c_str(),colorID.c_str());
-			fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", colorArrayID.c_str(),model.Vc.size()*3);
-			for (int k=0;k<model.Vc.size();k++)
-				fprintf(fp,"%f %f %f ",model.Vc[k][0],model.Vc[k][1],model.Vc[k][2]);
-			fprintf(fp,"</float_array>\n");
-			fprintf(fp,"<technique_common>\n");
-			fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n",colorArrayID.c_str(),model.Vc.size(),3);
-			fprintf(fp,"<param name=\"R\" type=\"float\"/>\n");
-			fprintf(fp,"<param name=\"G\" type=\"float\"/>\n");
-			fprintf(fp,"<param name=\"B\" type=\"float\"/>\n");
-			//fprintf(fp,"<param name=\"A\" type=\"float\"/>\n");
-			fprintf(fp,"</accessor>\n");
-			fprintf(fp,"</technique_common>\n");
-			fprintf(fp,"</source>\n");
-		}
-
-		// write-out texcoord array
-		std::string texCoordID = modelName + "-map1";
-		std::string texCoordArrayID = texCoordID+"-array";
-		hasTexCoord = model.T.size() > 0;
-		if (hasTexCoord) // has vertex normals
-		{
-			fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",texCoordID.c_str(),texCoordID.c_str());
-			fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", texCoordArrayID.c_str(),model.T.size()*2);
-			for (int k=0;k<model.T.size();k++)
-				fprintf(fp,"%f %f ",model.T[k][0],model.T[k][1]);
-			fprintf(fp,"</float_array>\n");
-			fprintf(fp,"<technique_common>\n");
-			fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"%d\">\n",texCoordArrayID.c_str(),model.T.size(),2);
-			fprintf(fp,"<param name=\"U\" type=\"float\"/>\n");
-			fprintf(fp,"<param name=\"V\" type=\"float\"/>\n");			
-			fprintf(fp,"</accessor>\n");
-			fprintf(fp,"</technique_common>\n");
-			fprintf(fp,"</source>\n");
-		}
-
-		// write out vertices semantic
-		std::string vertexID = modelName+"-vertices";
-		fprintf(fp,"<vertices id=\"%s\" name=\"%s\">\n",vertexID.c_str(),vertexID.c_str());
-		fprintf(fp,"<input semantic=\"POSITION\" source=\"#%s\"/>\n",positionID.c_str());
-		fprintf(fp,"</vertices>\n");
-
-		// write out triangles
-		std::string matName = "defaultMat";
-		std::map<std::string,std::vector<int> >::iterator mi;
-		for ( mi  = model.mtlFaceIndices.begin();
-			  mi != model.mtlFaceIndices.end();
-			  mi++)
-		{
-			matName = mi->first;
-			std::string matID = matName+"_SG";
-			std::vector<int>& mtlFaces = mi->second;
-			int offset = 0;
-			fprintf(fp,"<triangles material=\"%s\" count=\"%d\">\n",matID.c_str(),mtlFaces.size());
-			fprintf(fp,"<input semantic=\"VERTEX\" source=\"#%s\" offset=\"%d\"/>\n",vertexID.c_str(),offset++);
-			if (hasNormal)
-			{
-				fprintf(fp,"<input semantic=\"NORMAL\" source=\"#%s\" offset=\"%d\"/>\n",normalID.c_str(),offset++);
-			}
-			if (hasTexCoord)
-			{
-				fprintf(fp,"<input semantic=\"TEXCOORD\" source=\"#%s\" offset=\"%d\"/>\n",texCoordID.c_str(),offset++);
-			}
-			if (hasColor)
-			{
-				fprintf(fp,"<input semantic=\"COLOR\" source=\"#%s\" offset=\"%d\"/>\n",colorID.c_str(),offset++);
-			}
-			fprintf(fp,"<p>");			
-			for (unsigned int k=0;k<mtlFaces.size();k++)
-			{
-				int fidx = mtlFaces[k];
-				SrVec3i* f = &model.F[fidx];
-				SrVec3i *fn = NULL, *ft = NULL;
-				if (hasNormal)
-					fn =  &model.Fn[fidx];
-				if (hasTexCoord)
-					ft = &model.Ft[fidx];
-				
-				for (int j=0;j<3;j++)
-				{
-					fprintf(fp,"%d ",(*f)[j]);
-					if (hasNormal)
-						fprintf(fp,"%d ",(*fn)[j]);
-					if (hasTexCoord)
-						fprintf(fp,"%d ",(*ft)[j]);
-					if (hasColor)
-						fprintf(fp,"%d ",(*f)[j]);
-				}
-			}
-			fprintf(fp,"</p>\n");
-			fprintf(fp,"</triangles>\n");
-		}
-		fprintf(fp,"</mesh>\n");
-		fprintf(fp,"</geometry>\n");
+		exportGeometry(fp, model, scale);
 	}
+
+	// morph targets
+	for (std::map<std::string, std::vector<SrSnModel*> >::iterator iter = defMesh->blendShapeMap.begin();
+		iter != defMesh->blendShapeMap.end();
+		iter++)
+	{
+		std::vector<SrSnModel*>& shapes = (*iter).second;
+		for (unsigned int s = 0; s < shapes.size(); s++)
+		{
+			SrSnModel* srsnModel = shapes[s];
+			if (!srsnModel)
+				continue;
+			SrModel& model = srsnModel->shape();
+			exportGeometry(fp, model, scale);
+		}
+	}
+
 	fprintf(fp,"</library_geometries>\n");
 
 	printf("start export skin\n");
@@ -3372,6 +3404,50 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 		fprintf(fp,"</vertex_weights>\n");
 		fprintf(fp,"</skin>\n");
 		fprintf(fp,"</controller>\n");
+	}
+
+	// export any morph targets
+	for (std::map<std::string, std::vector<std::string> >::iterator iter = defMesh->morphTargets.begin(); 
+		 iter != defMesh->morphTargets.end(); iter++)
+	{
+		if ((*iter).second.size() == 0)
+			continue;
+		std::string baseMeshName = (*iter).second[0];
+		int numMorphs = (*iter).second.size() - 1;
+		fprintf(fp, "<controller id=\"%s\">\n", (*iter).first.c_str());
+		fprintf(fp, "\t<morph source=\"#%s\"  method=\"RELATIVE\">\n", baseMeshName.c_str());
+		fprintf(fp, "\t\t<source id=\"%s-morph-targets\">\n", baseMeshName.c_str());
+		fprintf(fp, "\t\t\t<IDREF_array id=\"%s-morph-targets-array\" count=\"%d\">", baseMeshName.c_str(), numMorphs);
+		for (unsigned int s = 1; s < (*iter).second.size(); s++)
+		{
+			fprintf(fp, "%s ", (*iter).second[s].c_str());
+		}
+		fprintf(fp, "</IDREF_array>\n");
+		fprintf(fp, "\t\t\t<technique_common>\n");
+		fprintf(fp, "\t\t\t\t\t<accessor source=\"#%s-morph-targets-array\" count=\"%d\">", baseMeshName.c_str(), numMorphs);
+		fprintf(fp, "\t\t\t\t<param type=\"IDREF\"/>\n");
+		fprintf(fp, "\t\t\t\t\t</accessor>\n");
+		fprintf(fp, "\t\t\t\t</technique_common>\n");
+		fprintf(fp, "\t\t\t</source>\n");
+		fprintf(fp, "\t\t\t<source id=\"%s-morph-targets\">\n", baseMeshName.c_str());
+		fprintf(fp, "\t\t\t\t<float_array id=\"%s-morph-targets-array\" count=\"%d\">", baseMeshName.c_str(), numMorphs);
+		for (unsigned int s = 1; s < (*iter).second.size(); s++)
+		{
+			fprintf(fp, "0.0 ");
+		}
+		fprintf(fp, "\t\t\t\t</float_array>\n");
+		fprintf(fp, "\t\t\t\t<technique_common>\n");
+		fprintf(fp, "\t\t\t\t\t<accessor source=\"#%s-morph-targets-array\" count=\"%d\">", baseMeshName.c_str(), numMorphs);
+		fprintf(fp, "\t\t\t\t\t<param name=\"WEIGHT\" type=\"float\"/>");
+		fprintf(fp, "\t\t\t\t\t</accessor>\n");
+		fprintf(fp, "\t\t\t\t</technique_common>\n");
+		fprintf(fp, "\t\t\t</source>\n");
+		fprintf(fp, "\t\t\t<targets>\n");
+		fprintf(fp, "\t\t\t\t<input semantic=\"MORPH_TARGET\" source=\"%s-morph-targets\"/>\n", baseMeshName.c_str());
+		fprintf(fp, "\t\t\t\t<input semantic=\"MORPH_WEIGHT\" source=\"%s-morph-targets\"/>\n", baseMeshName.c_str());
+		fprintf(fp, "\t\t\t</targets>\n");
+		fprintf(fp, "\t\t</morph>\n");
+		fprintf(fp, "</controller>\n");
 	}
 
 	fprintf(fp,"</library_controllers>\n");
