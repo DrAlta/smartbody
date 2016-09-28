@@ -2997,7 +2997,7 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 	{		
 		ParserOpenCOLLADA::exportMaterials(fp,deformMeshName);
 		// get the mesh scale from the character
-		ParserOpenCOLLADA::exportSkinMesh(fp, deformMeshName, meshScale);
+		ParserOpenCOLLADA::exportSkinMesh(fp, deformMeshName, meshScale, skeletonName);
 		SbmTextureManager& texManager = SbmTextureManager::singleton();
 		printf("export textures\n");
 		for (unsigned int i=0;i<defMesh->subMeshList.size();i++)
@@ -3316,12 +3316,13 @@ bool ParserOpenCOLLADA::exportGeometry(FILE* fp, SrModel& model, double scale)
 }
 
 
-bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, double scale)
+bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, double scale, std::string skeletonName)
 {
 	printf("before export skin mesh\n");
 	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
 	DeformableMesh* defMesh = assetManager->getDeformableMesh(deformMeshName);
-	if (!defMesh) return false;
+	if (!defMesh)
+		return false;
 	printf("start export geometry\n");
 	fprintf(fp,"<library_geometries>\n");
 	// export geometry
@@ -3352,15 +3353,48 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 	printf("start export skin\n");
 	// export skin binding
 	fprintf(fp,"<library_controllers>\n");
-	for (unsigned int i=0;i<defMesh->skinWeights.size();i++)
+
+	// make sure that any missing joints are added with zero weights
+	SmartBody::SBSkeleton* sbSk = assetManager->getSkeleton(skeletonName);
+	
+	// get a list of joints involved with the binding information, remove from joint set, leaving unused joints
+	for (unsigned int i = 0; i < defMesh->skinWeights.size(); i++)
 	{
 		SkinWeight* skinWeight = defMesh->skinWeights[i];
+	}
+
+	for (unsigned int i=0;i<defMesh->skinWeights.size();i++)
+	{
+		std::set<std::string> allJoints;
+		for (int j = 0; j < sbSk->getNumJoints(); j++)
+		{
+			SmartBody::SBJoint* joint = sbSk->getJoint(j);
+			allJoints.insert(joint->getName());
+		}
+
+		SkinWeight* skinWeight = defMesh->skinWeights[i];
+		for (unsigned int k = 0; k < skinWeight->infJointName.size(); k++)
+		{
+			std::set<std::string>::iterator iter = allJoints.find(skinWeight->infJointName[k]);
+			if (iter != allJoints.end())
+			{
+				allJoints.erase(iter);
+			}
+		}
+		// joints left in allJoints set are unmatched joints, need zero-influence entries
+		for (std::set<std::string>::iterator unmatchedIter = allJoints.begin();
+			unmatchedIter != allJoints.end();
+			unmatchedIter++)
+		{
+			LOG("Joint %s unbound, adding to skinweights...", (*unmatchedIter).c_str());
+		}
+		int totalInfluences = skinWeight->infJointName.size() + allJoints.size();
 		std::string skinID = skinWeight->sourceMesh+"-skin";
 		fprintf(fp,"<controller id=\"%s\"  name=\"%s\">\n",skinID.c_str(),skinID.c_str());
 		fprintf(fp,"<skin source=\"#%s\">\n",skinWeight->sourceMesh.c_str());
 		SrMat& bm = skinWeight->bindShapeMat;
 		SrMat bmT = bm; 
-		bmT.set_translation(bmT.get_translation()*scale);
+		bmT.set_translation(bmT.get_translation() * scale);
 		bmT.transpose();
 		fprintf(fp,"<bind_shape_matrix>");
 		for (int k=0;k<16;k++)
@@ -3370,12 +3404,19 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 		std::string skinJointID = skinID + "-joints";
 		std::string skinJointArrayID = skinJointID + "-array";
 		fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",skinJointID.c_str(),skinJointID.c_str());
-		fprintf(fp,"<Name_array id=\"%s\" count=\"%d\">", skinJointArrayID.c_str(), skinWeight->infJointName.size());
-		for (unsigned int k=0;k<skinWeight->infJointName.size();k++)
+		fprintf(fp,"<Name_array id=\"%s\" count=\"%d\">", skinJointArrayID.c_str(), totalInfluences);
+		for (unsigned int k=0; k <skinWeight->infJointName.size(); k++)
 			fprintf(fp,"%s ",skinWeight->infJointName[k].c_str());
+		// add unmatched joints
+		for (std::set<std::string>::iterator unmatchedIter = allJoints.begin();
+			unmatchedIter != allJoints.end();
+			unmatchedIter++)
+		{
+			fprintf(fp, "%s ", (*unmatchedIter).c_str());
+		}
 		fprintf(fp,"</Name_array>\n");
 		fprintf(fp,"<technique_common>\n");
-		fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"1\">\n",skinJointArrayID.c_str(),skinWeight->infJointName.size());
+		fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"1\">\n",skinJointArrayID.c_str(), totalInfluences);
 		fprintf(fp,"<param name=\"JOINT\" type=\"name\"/>\n");
 		fprintf(fp,"</accessor>\n");
 		fprintf(fp,"</technique_common>\n");
@@ -3385,19 +3426,29 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 		std::string skinBindPoseID = skinID + "-bind_poses";
 		std::string skinBindPoseArrayID = skinBindPoseID + "-array";
 		fprintf(fp,"<source id=\"%s\" name=\"%s\">\n",skinBindPoseID.c_str(),skinBindPoseID.c_str());
-		fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", skinBindPoseArrayID.c_str(), skinWeight->bindPoseMat.size()*16);
+		fprintf(fp,"<float_array id=\"%s\" count=\"%d\">", skinBindPoseArrayID.c_str(), totalInfluences * 16);
 		
 		for (unsigned int k=0;k<skinWeight->bindPoseMat.size();k++)
 		{
 			SrMat bpT = skinWeight->bindPoseMat[k]; 
 			bpT.set_translation(bpT.get_translation()*scale);
 			bpT.transpose();
-			for (int j=0;j<16;j++)
+			for (int j=0;j < 16;j++)
 				fprintf(fp,"%f ",bpT.get(j));
 		}
+		// add any umatched joints
+		SrMat identity;
+		for (std::set<std::string>::iterator unmatchedIter = allJoints.begin();
+			unmatchedIter != allJoints.end();
+			unmatchedIter++)
+		{
+			for (int j = 0; j < 16; j++)
+				fprintf(fp, "%f ", identity.get(j));
+		}
+
 		fprintf(fp,"</float_array>\n");
 		fprintf(fp,"<technique_common>\n");
-		fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"16\">\n",skinBindPoseArrayID.c_str(),skinWeight->bindPoseMat.size());
+		fprintf(fp,"<accessor source=\"#%s\" count=\"%d\" stride=\"16\">\n",skinBindPoseArrayID.c_str(), totalInfluences);
 		fprintf(fp,"<param name=\"TRANSFORM\" type=\"float4x4\"/>\n");
 		fprintf(fp,"</accessor>\n");
 		fprintf(fp,"</technique_common>\n");
@@ -3452,7 +3503,7 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 			continue;
 		std::string baseMeshName = (*iter).second[0];
 		int numMorphs = (*iter).second.size() - 1;
-		fprintf(fp, "<controller id=\"%s\">\n", (*iter).first.c_str());
+		fprintf(fp, "<controller id=\"%s-morph\">\n", baseMeshName.c_str());
 		fprintf(fp, "\t<morph source=\"#%s\"  method=\"RELATIVE\">\n", baseMeshName.c_str());
 		fprintf(fp, "\t\t<source id=\"%s-morph-targets\">\n", baseMeshName.c_str());
 		fprintf(fp, "\t\t\t<IDREF_array id=\"%s-morph-targets-array\" count=\"%d\">", baseMeshName.c_str(), numMorphs);

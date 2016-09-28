@@ -93,7 +93,7 @@ class ParserOpenCOLLADA
 		// exporting functionality
 		static SBAPI bool exportCollada(std::string outPathname, std::string skeletonName, std::string deformMeshName, std::vector<std::string> motionNames, bool exportSk, bool exportMesh, bool exportMotion, double meshScale);
 		static bool exportVisualScene(FILE* fp, std::string skeletonName, std::string defMeshName, double scale);
-		static bool exportSkinMesh(FILE* fp, std::string deformMeshName, double scale);
+		static bool exportSkinMesh(FILE* fp, std::string deformMeshName, double scale, std::string skeletonName);
 		static bool exportMaterials(FILE* fp, std::string deformMeshName);		
 		static bool exportMotions(FILE* fp, std::vector<std::string> motionNames);
 		static bool exportGeometry(FILE* fp, SrModel& model, double scale);
