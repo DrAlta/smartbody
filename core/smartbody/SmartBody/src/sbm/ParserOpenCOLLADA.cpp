@@ -3582,7 +3582,7 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 				std::string matID = matName+"_SG";
 
 				fprintf(fp,"<node id=\"%s\" name=\"%s\" type=\"NODE\">\n",meshID.c_str(),meshID.c_str());
-				fprintf(fp,"<translate side=\"translate\">0 0 0</translate>\n");
+				fprintf(fp,"<translate sid=\"translate\">0 0 0</translate>\n");
 				fprintf(fp,"<instance_controller url=\"#%s\">\n",controllerID.c_str());
 				fprintf(fp,"<skeleton>#%s</skeleton>\n",rootJointName.c_str());
 				// write-out bind material for this mesh
@@ -3608,7 +3608,7 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 				std::string matID = matName+"_SG";
 
 				fprintf(fp,"<node id=\"%s\" name=\"%s\" type=\"NODE\">\n",meshID.c_str(),meshID.c_str());
-				fprintf(fp,"<translate side=\"translate\">0 0 0</translate>\n");
+				fprintf(fp,"<translate sid=\"translate\">0 0 0</translate>\n");
 				// write-out bind material for this mesh
 				fprintf(fp,"<bind_material>\n");
 				fprintf(fp,"<technique_common>\n");
