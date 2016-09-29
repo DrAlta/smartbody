@@ -3369,7 +3369,8 @@ bool ParserOpenCOLLADA::exportSkinMesh( FILE* fp, std::string deformMeshName, do
 		for (int j = 0; j < sbSk->getNumJoints(); j++)
 		{
 			SmartBody::SBJoint* joint = sbSk->getJoint(j);
-			allJoints.insert(joint->getName());
+			if (joint->getJointType() == SkJoint::TypeJoint)
+				allJoints.insert(joint->getName());
 		}
 
 		SkinWeight* skinWeight = defMesh->skinWeights[i];

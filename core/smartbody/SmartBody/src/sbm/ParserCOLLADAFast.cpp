@@ -668,6 +668,8 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 				joint->extName(nameAttr);
 				joint->extID(idAttr);
 				joint->extSID(sidAttr);
+				if (treatAsJoint)
+					joint->setJointType(SkJoint::TypeOther);
 
 
 				bool hasTranslate = false;
