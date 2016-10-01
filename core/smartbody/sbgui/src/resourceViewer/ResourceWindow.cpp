@@ -192,15 +192,30 @@ void ResourceWindow::hide()
 
 bool ResourceWindow::processedDragAndDrop( std::string& dndText )
 {
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	boost::filesystem::path dndPath(dndText);
 	std::string fullPathName = dndText;
 	std::string filebasename = boost::filesystem::basename(dndText);
 	std::string fileextension = boost::filesystem::extension(dndText);					
 	std::string fullPath = dndPath.parent_path().string();
+
+	if (fileextension == ".py")
+	{
+#ifdef WIN32
+		fullPath = vhcl::Replace(fullPath, "\\", "/");
+#endif
+		// script file, run it
+		scene->addAssetPath("script", fullPath);
+		scene->runScript(filebasename + fileextension);
+	}
+	else
+	{
+		SmartBody::SBAssetManager* assetManager = scene->getAssetManager();
+		assetManager->loadAssetsFromPath(dndText);
+	}
 	
-	SmartBody::SBAssetManager* assetManager = SmartBody::SBScene::getScene()->getAssetManager();
-	assetManager->loadAssetsFromPath(dndText);
 	updateGUI();
+
 	return true;
 }
 
@@ -869,7 +884,8 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SmartBody::SBCharacter
 		for (int c = 0; c < n; c++)
 		{
 			//LOG( "%s", ctTree->controller(c)->name() );
-			Fl_Tree_Item* ctrlItem = resourceTree->add(controllerFolder,ctTree->controller(c)->getName().c_str());
+			std::string controllerName = ctTree->controller(c)->getName();
+			Fl_Tree_Item* ctrlItem = resourceTree->add(controllerFolder, controllerName.c_str());
 //			ctrlItem->user_data((void*)ITEM_CONTROLLER);
 		}
 	}

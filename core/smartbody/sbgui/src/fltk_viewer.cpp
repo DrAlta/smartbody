@@ -2088,6 +2088,9 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		else if (fileextension == ".py")
 		{
 			// run the python script
+#ifdef WIN32
+			fullPath = vhcl::Replace(fullPath, "\\", "/");
+#endif
 			SmartBody::SBScene::getScene()->addAssetPath("script", fullPath);
 			SmartBody::SBScene::getScene()->runScript(filebasename + fileextension);
 		}

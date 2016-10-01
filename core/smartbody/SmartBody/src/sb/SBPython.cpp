@@ -332,6 +332,7 @@ boost::python::class_<SBObserver>("SBObserver")
 
 	boost::python::class_<SBObject>("SBObject")
 		.def("getName", &SBObject::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name of the object.")
+		.def("setName", &SBObject::setName, "Sets the name of the object.")
 		.def("getNumAttributes", &SBObject::getNumAttributes,  "Returns the number of attributes associated with this object.")
 		.def("getAttributeNames", &SBObject::getAttributeNames, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the attributes names associated with this object.")
 		.def("getAttribute", &SBObject::getAttribute, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Returns an attribute of a given name")
@@ -563,8 +564,6 @@ boost::python::class_<SBObserver>("SBObserver")
 	boost::python::class_<SBController, boost::python::bases<SBObject> >("SBController")
 		.def(boost::python::init<>())
 		.def("addChannel", &SBController::addChannel, "Adds a channel to this controller's context.")
-		.def("setName", &SBController::setName, "Sets the name for the controller.")
-		.def("getName", &SBController::getName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the name for this controller.")
 		.def("getType", &SBController::getType, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the type for this controller.")
 		.def("setIgnore", &SBController::setIgnore, "Ignore this controller when evaluating controller tree.")
 		.def("isIgnore", &SBController::isIgnore, "Will the controller be ignored during evaluation.")
@@ -578,6 +577,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("setChannelPos", &SBController::setChannelPos, boost::python::return_value_policy<boost::python::return_by_value>(),"Sets the channel's translation value.")
 		.def("setChannelQuat", &SBController::setChannelQuat, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets the channel's rotation value.")
 		.def("setChannelQuatGlobal", &SBController::setChannelQuatGlobal, boost::python::return_value_policy<boost::python::return_by_value>(), "Sets the channel's rotation value.")
+		.def("getCharacterName", &SBController::getCharacterName, boost::python::return_value_policy<boost::python::return_by_value>(), "Returns the controlling character's name.")
 
 		;
 
@@ -807,7 +807,7 @@ boost::python::class_<SBObserver>("SBObserver")
 		.def("executeAction", &SBEventHandler::executeAction, &SBEventHandlerWrap::default_executeAction, "Execute the event handler.")
 		;
 
-	boost::python::class_<PythonControllerWrap, boost::python::bases<SBController>, boost::noncopyable> ("PythonController")
+	boost::python::class_<PythonControllerWrap, boost::noncopyable, boost::python::bases<SBController>, boost::shared_ptr<PythonControllerWrap> > ("PythonController")
 		.def("start", &PythonController::start, &PythonControllerWrap::default_start, "start.")
 		.def("stop", &PythonController::stop, &PythonControllerWrap::default_stop, "stop.")
 		.def("init", &PythonController::init, &PythonControllerWrap::default_init, "init.")
