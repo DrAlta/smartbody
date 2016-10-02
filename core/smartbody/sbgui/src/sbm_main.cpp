@@ -380,8 +380,7 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 }
 
 
-// snapshot <windowHeight> <windowWidth> <offsetHeight> <offsetWidth> <output file>
-// The offset is according to the left bottom corner of the image frame buffer
+// snapshot <output file>
 int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
 	BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
@@ -390,20 +389,17 @@ int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		LOG("Viewer doesn't exist. Cannot take snapshot.");
 		return CMD_FAILURE;
 	}
-
-	int windowHeight = args.read_int();
-	int windowWidth = args.read_int();
-	int offsetHeight = args.read_int();
-	int offsetWidth = args.read_int();
-
 	string output_file = args.read_token();
 
-	if( windowHeight == 0 )		windowHeight = rootWindow->curViewer->h();;							// default window size
-	if( windowWidth == 0 )		windowWidth = rootWindow->curViewer->w();
-	if( output_file == "" )		
+	int windowHeight = rootWindow->curViewer->h();
+	int windowWidth = rootWindow->curViewer->w();
+	int offsetHeight = 0;
+	int offsetWidth = 0;
+
+	if (output_file == "")
 	{
 		std::stringstream output_file_os;
-		output_file_os<< "snapshot_"<< snapshotCounter<< ".ppm";	// default output name
+		output_file_os << "snapshot_" << snapshotCounter << ".ppm";	// default output name
 		snapshotCounter++;
 		output_file = output_file_os.str();
 	}
@@ -411,25 +407,25 @@ int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	Pic * in = pic_alloc(windowWidth, windowHeight, 3, NULL);
 	LOG("  File to save to: %s", output_file.c_str());
 
-	for (int i=windowHeight-1; i>=0; i--) 
+	for (int i = windowHeight - 1; i >= 0; i--)
 	{
-		glReadPixels(0 + offsetWidth, windowHeight+offsetHeight-i-1, windowWidth, 1 , GL_RGB, GL_UNSIGNED_BYTE, &in->pix[i*in->nx*in->bpp]);
+		glReadPixels(0 + offsetWidth, windowHeight + offsetHeight - i - 1, windowWidth, 1, GL_RGB, GL_UNSIGNED_BYTE, &in->pix[i*in->nx*in->bpp]);
 	}
 
 	if (ppm_write(output_file.c_str(), in))
 	{
 		pic_free(in);
 		LOG("  File saved Successfully\n");
-		return( CMD_SUCCESS );
+		return(CMD_SUCCESS);
 	}
 	else
 	{
 		pic_free(in);
 		LOG("  Error in Saving\n");
-		return( CMD_FAILURE );
-	}	
+		return(CMD_FAILURE);
+	}
 
-	return( CMD_SUCCESS );
+	return(CMD_SUCCESS);
 }
 
 int mcu_quit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )	{
