@@ -1516,7 +1516,6 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 		SbmDeformableMeshGPU::shadowMapID = -1;
 	}
 	
-	bool updateSim = SmartBody::SBScene::getScene()->getSimulationManager()->updateTimer();
 	SbmDeformableMeshGPU::useShadowPass = shadowPass;
 
 	printOglError2("drawAllGeometries()", 2);
