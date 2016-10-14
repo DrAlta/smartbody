@@ -134,8 +134,8 @@ public :
 
 	/*! Returns the declared joint name for the channel. It is the
 		user responsibility to ensure that 0<=i and i<size() */
-	SBAPI const std::string name ( int i ) const;
-	SBAPI const std::string mappedName ( int i ) const;
+	SBAPI const std::string& name ( int i ) const;
+	SBAPI const std::string& mappedName ( int i ) const;
 
 	/*! Returns the joint of channel i. The joint pointer will only be valid (i.e.!=0)
 		if the channel was succesfully connected to a skeleton joint.
