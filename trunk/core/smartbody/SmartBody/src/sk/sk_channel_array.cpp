@@ -505,7 +505,7 @@ bool SkChannelArray::merge ( SkChannelArray& ca )
 	std::vector<SkChannel::Type> typesToAdd;
 	for (int c=0; c<ca.size(); c++ ) // for each channel c in ca
 	{ 
-		std::string name = ca.name(c);
+		const std::string& name = ca.name(c);
 		SkChannel::Type t = ca.type(c);
 		int pos = search(name, t);
 		if (pos < 0) // missing channel found
@@ -703,14 +703,14 @@ const std::string& SkChannelArray::getMappedChannelName( const Channel& chan ) c
 	return chan.name;
 }
 
-const std::string SkChannelArray::name( int i ) const
+const std::string& SkChannelArray::name( int i ) const
 {
 	const Channel& ch = _channelList[i];
 	//return getChannelName(ch);
 	return ch.name;
 }
 
-const std::string SkChannelArray::mappedName( int i ) const
+const std::string& SkChannelArray::mappedName( int i ) const
 {
 	const Channel& ch = _channelList[i];
 	return ch.mappedName;
