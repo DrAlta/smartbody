@@ -2809,16 +2809,16 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 					newPosBuf[idx] = basePos;	// Here copies blended vertices position
 				}
 			}
-			// 		if (vtxBlendShapeVtxIdxMap.find(i) != vtxBlendShapeVtxIdxMap.end())
-			// 		{
-			// 			std::vector<int>& idxMap = vtxBlendShapeVtxIdxMap[i];
-			// 			// copy related vtx components 
-			// 			for (unsigned int k=0;k<idxMap.size();k++)
-			// 			{
-			// 				int idx				= idxMap[k];
-			// 				newPosBuf[idx]	= basePos;	// Here copies blended vertices position
-			// 			}
-			// 		}
+			if (vtxBlendShapeVtxIdxMap.find(i) != vtxBlendShapeVtxIdxMap.end())
+			{
+	 			std::vector<int>& idxMap = vtxBlendShapeVtxIdxMap[i];
+				// copy related vtx components 
+				for (unsigned int k=0;k<idxMap.size();k++)
+				{
+					int idx				= idxMap[k];
+					newPosBuf[idx]	= basePos;	// Here copies blended vertices position
+				}
+			}
 		}
 	}
 	
