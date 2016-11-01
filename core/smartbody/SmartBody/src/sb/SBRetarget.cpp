@@ -230,7 +230,7 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 
 SrQuat SBRetarget::applyRetargetJointRotation( std::string jointName, SrQuat& inQuat )
 {
-	SrQuat outQuat ; // identity rotation 	
+	SrQuat outQuat = inQuat; // identity rotation 	
 	if (jointPrePostRotMap.find(jointName) != jointPrePostRotMap.end())
 	{
 		QuatPair& qpair = jointPrePostRotMap[jointName];		
