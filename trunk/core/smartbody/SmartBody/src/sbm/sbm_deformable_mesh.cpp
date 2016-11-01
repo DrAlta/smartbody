@@ -558,6 +558,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	std::vector<SkinWeight*> skinWeightList;
 	meshIndexList.clear();
 	boneJointIdxMap.clear();
+	bindPoseMatList.clear();
 	LOG("dynamic mesh size = %d, skin weight size = %d",dMeshDynamic_p.size(), skinWeights.size());
 	if (buildSkinnedBuffer)
 	{
@@ -583,14 +584,20 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				for (unsigned int k=0;k<skinWeight->infJointName.size();k++)
 				{
 					std::string& jointName = skinWeight->infJointName[k];
-					SkJoint* curJoint = skinWeight->infJoint[k];
+					SkJoint* curJoint = skinWeight->infJoint[k];		
+					//printf("Joint Name = %s, idx = %d\n", jointName.c_str(), k);
+					//printf("BindPose Mat = %s\n", skinWeight->bindPoseMat[k].toString().c_str());
 					if (boneJointIdxMap.find(jointName) == boneJointIdxMap.end()) // new joint
 					{
+						int boneIdx = bindPoseMatList.size();
+						//printf("DeformableMesh Joint Name = %s, idx = %d\n", jointName.c_str(), boneIdx);
 						boneJointIdxMap[jointName] = nTotalBones++;		
 						boneJointList.push_back(curJoint);
 						boneJointNameList.push_back(jointName);
 						//bindPoseMatList.push_back(skinWeight->bindShapeMat*skinWeight->bindPoseMat[k]);
+						//printf("BindPose Mat = %s\n", skinWeight->bindPoseMat[k].toString().c_str());
 						bindPoseMatList.push_back(skinWeight->bindPoseMat[k]);
+						//printf("BindPose Mat = %s\n", bindPoseMatList[boneIdx].toString().c_str());
 					}
 				}
 			}	

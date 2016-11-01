@@ -196,8 +196,8 @@ class SkSkeleton : public SmartBody::SBAsset, public SrSharedClass
 	SBAPI SrVec getFacingDirection();
 	SBAPI void resetSearchJoint();
 
-	void setJointMapName(const std::string& jointMapName);
-	std::string getJointMapName();
+	SBAPI void setJointMapName(const std::string& jointMapName);
+	SBAPI std::string getJointMapName();
 
    protected :
     int _loadjdata ( SrInput& in, SkJoint* j, SrStringArray& paths );
