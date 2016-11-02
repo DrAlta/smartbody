@@ -325,7 +325,7 @@ void main (void)\n\
 	if (useSpecularMap == 1)\n\
 	{\n\
 		specMat = specularColor.rgb;\n\
-		glossy = specularColor.a;\n\
+		glossy = max(0.001,specularColor.a);\n\
 	}\n\
 	float shadowWeight = 1.0;\n\
 	if (useShadowMap == 1)\n\
@@ -343,13 +343,14 @@ void main (void)\n\
 			//color += vec4(texColor.xyz*NdotL,0);\n\
 			halfV = normalize(halfVector[i]);\n\
 			NdotHV = max(dot(n,halfV),0.0);\n\
-			color += vec4(specMat.rgb*pow(NdotHV, (shineness)*glossy),0);\n\
+			//color += vec4(specMat.rgb*pow(NdotHV, 10),0);\n\
+			color += vec4(specMat.rgb*pow(NdotHV, (shineness+1.0)*glossy),0);\n\
 			//color += vec4(specMat.rgb*pow(NdotHV, 20.0),0);\n\
 			//color += vec4(specMat.rgb*pow(NdotHV, shineness+1.0),0)*att;\n\
 		}   \n\
 	}\n\
 	const float shadow_ambient = 1.0;\n\
-	gl_FragColor = vec4(color.rgb*shadowWeight*shadow_ambient,color.a);//color*shadow_ambient*shadowWeight;//vec4(color.rgb*shadowWeight,color.a);//color*shadowWeight;\n\
+	gl_FragColor = vec4(color.rgb,color.a);//*shadowWeight*shadow_ambient,color.a);//color*shadow_ambient*shadowWeight;//vec4(color.rgb*shadowWeight,color.a);//color*shadowWeight;\n\
 	//gl_FragColor = vec4(n.xyz, 1.0);\n\
 	//gl_FragColor = vec4(color.rgb, color.a);\n\
 	//gl_FragColor = vec4(1.0,0.0,0.0,1.0);\n\
