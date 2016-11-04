@@ -63,6 +63,10 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	setAttributeGroupPriority("Remote", 800);
 	setAttributeGroupPriority("Baldi Lip Sync", 2000);
 
+
+	createBoolAttribute("blendShape.mergeBoundary", false, true, "Blend Shape", 0, false, false, false, "Whether to merge the boundary of blendshape faces with body mesh.");
+
+
 	createBoolAttribute("posture.useDifference", false, true, "Posture", 90, false, false, false, "Whether to use body posture difference"); 
 
 	createBoolAttribute("useCustomizedLipSyncIfPresent", true, true, "Lip Sync", 60, false, false, false, "If motion name exists inside pre-recorded audio file bml, use it by default"); 
@@ -158,6 +162,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createVec3Attribute("leftShoulderOffset",0.f,0.f,0.f,true, "Retargeting", 320, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
 	createVec3Attribute("rightShoulderOffset",0.f,0.f,0.f,true, "Retargeting", 340, false, false, false, "rotation offset added on left shoulder joint during retargeting.");
 	createBoolAttribute("isReaching", false, true, "Reaching", 158, false, false, false, "Whether a character is reaching.");
+
 
 
 
