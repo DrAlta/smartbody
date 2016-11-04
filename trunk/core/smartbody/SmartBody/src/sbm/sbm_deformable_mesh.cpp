@@ -558,7 +558,6 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	std::vector<SkinWeight*> skinWeightList;
 	meshIndexList.clear();
 	boneJointIdxMap.clear();
-	bindPoseMatList.clear();
 	LOG("dynamic mesh size = %d, skin weight size = %d",dMeshDynamic_p.size(), skinWeights.size());
 	if (buildSkinnedBuffer)
 	{
@@ -584,20 +583,14 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				for (unsigned int k=0;k<skinWeight->infJointName.size();k++)
 				{
 					std::string& jointName = skinWeight->infJointName[k];
-					SkJoint* curJoint = skinWeight->infJoint[k];		
-					//printf("Joint Name = %s, idx = %d\n", jointName.c_str(), k);
-					//printf("BindPose Mat = %s\n", skinWeight->bindPoseMat[k].toString().c_str());
+					SkJoint* curJoint = skinWeight->infJoint[k];
 					if (boneJointIdxMap.find(jointName) == boneJointIdxMap.end()) // new joint
 					{
-						int boneIdx = bindPoseMatList.size();
-						//printf("DeformableMesh Joint Name = %s, idx = %d\n", jointName.c_str(), boneIdx);
 						boneJointIdxMap[jointName] = nTotalBones++;		
 						boneJointList.push_back(curJoint);
 						boneJointNameList.push_back(jointName);
 						//bindPoseMatList.push_back(skinWeight->bindShapeMat*skinWeight->bindPoseMat[k]);
-						//printf("BindPose Mat = %s\n", skinWeight->bindPoseMat[k].toString().c_str());
 						bindPoseMatList.push_back(skinWeight->bindPoseMat[k]);
-						//printf("BindPose Mat = %s\n", bindPoseMatList[boneIdx].toString().c_str());
 					}
 				}
 			}	
@@ -2605,9 +2598,12 @@ SBAPI void DeformableMeshInstance::updateFast()
 	if (!_updateMesh)	return;
 	if (!_skeleton || !_mesh) return;	
 	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
-
+	//LOG("Update Skin...");
 	//updateSkin(_mesh->posBuf,  _deformPosBuf);
 	updateSkin(_restPosBuf, _deformPosBuf);
+
+	SrVec tempPos = _deformPosBuf[150];
+	//LOG("deformPos = %f %f %f",tempPos[0],tempPos[1],tempPos[2]);
 }
 
 
@@ -2616,14 +2612,27 @@ void DeformableMeshInstance::update()
 	//blendShapes();
 	//LOG("Update deformable mesh");
 #define RECOMPUTE_NORMAL 0
-	if (!_updateMesh)	return;
-	if (!_skeleton || !_mesh) return;	
-	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
+	if (!_updateMesh)
+	{
+		//LOG("!_updateMesh...");
+		return;
+	}
+	if (!_skeleton || !_mesh)
+	{
+		//LOG("No skeleton or no mesh...");
+		return;
+	}
+	if (isStaticMesh())
+	{
+		//LOG("is static mesh...");
+		return; // not update the buffer if it's a static mesh
+	}
 	_skeleton->update_global_matrices();
 #if defined(EMSCRIPTEN)
 	updateTransformBuffer();
 	return;
 #endif
+	//LOG("Update DeformableMeshInstance");
 	updateFast();
 	return;
 
@@ -2770,6 +2779,10 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 		return;
 
 	DeformableMeshInstance::blendShapes();
+	bool mergeBoundary = false;
+
+	if (_character)
+		mergeBoundary = _character->getBoolAttribute("blendShape.mergeBoundary");
 
 	for (std::map<std::string, std::vector<SrSnModel*> >::iterator mIter = _mesh->blendShapeMap.begin();
 		mIter != _mesh->blendShapeMap.end();
@@ -2815,16 +2828,16 @@ SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 					int idx = idxMap[k];
 					newPosBuf[idx] = basePos;	// Here copies blended vertices position
 				}
-			}
-			if (vtxBlendShapeVtxIdxMap.find(i) != vtxBlendShapeVtxIdxMap.end())
+			}			
+			if (mergeBoundary && vtxBlendShapeVtxIdxMap.find(i) != vtxBlendShapeVtxIdxMap.end())
 			{
-	 			std::vector<int>& idxMap = vtxBlendShapeVtxIdxMap[i];
-				// copy related vtx components 
-				for (unsigned int k=0;k<idxMap.size();k++)
-				{
-					int idx				= idxMap[k];
-					newPosBuf[idx]	= basePos;	// Here copies blended vertices position
-				}
+			 	std::vector<int>& idxMap = vtxBlendShapeVtxIdxMap[i];
+			 	// copy related vtx components 
+			 	for (unsigned int k=0;k<idxMap.size();k++)
+			 	{
+			 		int idx				= idxMap[k];
+			 		newPosBuf[idx]	= basePos;	// Here copies blended vertices position
+			 	}
 			}
 		}
 	}
