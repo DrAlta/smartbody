@@ -1123,15 +1123,6 @@
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSkmb.cpp">
       <Filter>sb</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SmartBody\protocols\sbmesh.pb.cc">
-      <Filter>protocols</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\protocols\sbmotion.pb.cc">
-      <Filter>protocols</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\protocols\sbutilities.pb.cc">
-      <Filter>protocols</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerSBMeshBinary.cpp">
       <Filter>sb</Filter>
     </ClCompile>
@@ -1194,6 +1185,69 @@
     </ClCompile>
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerAssimp.cpp">
       <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\protocols\sbmesh.pb.cpp">
+      <Filter>protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\protocols\sbmotion.pb.cpp">
+      <Filter>protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\protocols\sbutilities.pb.cpp">
+      <Filter>protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBRealtimeManager.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLAnimationObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLBlock.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLBodyObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLConstraintObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLEventObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLFaceObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLGazeObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLGestureObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLHandObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLHeadObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLLocomotionObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLNoiseObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLReachObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLSaccadeObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLSpeechObject.cpp">
+      <Filter>bml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\bml\BMLStateObject.cpp">
+      <Filter>bml</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2377,6 +2431,9 @@
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerAssimp.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBRealtimeManager.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>

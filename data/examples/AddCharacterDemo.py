@@ -74,7 +74,8 @@ bradFace.setViseme("tTeeth",  "ChrBrad@tTeeth")
 
 print 'Adding character into scene'
 # Set up Brad
-brad = scene.createCharacter('ChrBrad', '')
+characterName = 'brad'
+brad = scene.createCharacter(characterName, '')
 bradSkeleton = scene.createSkeleton('ChrBrad.dae')
 brad.setSkeleton(bradSkeleton)
 # Set position
@@ -114,17 +115,17 @@ else: # non-Windows platform, use Festival voices
 # setup locomotion
 scene.run('BehaviorSetMaleMocapLocomotion.py')
 setupBehaviorSet()
-retargetBehaviorSet('ChrBrad')
+retargetBehaviorSet(characterName)
 
 # setup gestures
 scene.run('BehaviorSetGestures.py')
 setupBehaviorSet()
-retargetBehaviorSet('ChrBrad')
+retargetBehaviorSet(characterName)
 
 # setup reach 
 scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
-retargetBehaviorSet('ChrBrad')
+retargetBehaviorSet(characterName)
 # Turn on GPU deformable geometry
 brad.setStringAttribute("displayType", "GPUmesh")
 
@@ -138,8 +139,8 @@ steerManager.setEnable(True)
 print 'Starting the simulation'
 sim.start()
 
-bml.execBML('ChrBrad', '<body posture="ChrMarine@Idle01"/>')
-bml.execBML('ChrBrad', '<saccade mode="listen"/>')
-#bml.execBML('ChrBrad', '<gaze sbm:handle="brad" target="camera"/>')
+bml.execBML(characterName, '<body posture="ChrMarine@Idle01"/>')
+bml.execBML(characterName, '<saccade mode="listen"/>')
+#bml.execBML(characterName, '<gaze sbm:handle="brad" target="camera"/>')
 
 sim.resume()

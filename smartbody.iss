@@ -11,16 +11,13 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r6387 Yossi
+AppVersion=r6594
 OutputBaseFilename=SmartBody
 WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
 
 
 [Files]
-Source: ".\tools\RealTimeAudio\*.exe"; DestDir: "{app}\tools\RealTimeAudio"
-Source: ".\tools\RealTimeAudio\*.dll"; DestDir: "{app}\tools\RealTimeAudio"
-
 ; documentation
 Source: ".\SmartBodyManual.pdf"; DestDir: "{app}"
 Source: ".\SmartBodyPythonAPI.html"; DestDir: "{app}"
@@ -34,8 +31,12 @@ Source: ".\sdk\.smartbodysettings"; DestDir: "{app}\bin"
 ;Source: ".\core\smartbody\sbgui\visualc9\SmartBody_48x48.ico"; DestDir: "{app}\bin"
 
 ; supporting libraries - Python 2.7
-Source: ".\core\smartbody\Python27\*"; DestDir: "{app}\python27"; Excludes: "tcl, tk, Cerebella, pyke, pyxb, scipy, .svn"; Flags: recursesubdirs
-
+Source: ".\core\smartbody\Python27\*"; DestDir: "{app}\python27"; Excludes: "site-packages, .svn"; Flags: recursesubdirs
+Source: ".\core\smartbody\Python27\Lib\site-packages\numpy\*"; DestDir: "{app}\python27\Lib\site-packages\numpy"; Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\core\smartbody\Python27\Lib\site-packages\pyke\*"; DestDir: "{app}\python27\Lib\site-packages\pyke"; Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\core\smartbody\Python27\Lib\site-packages\pyxb\*"; DestDir: "{app}\python27\Lib\site-packages\pyxb"; Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\core\smartbody\Python27\Lib\site-packages\scipy\*"; DestDir: "{app}\python27\Lib\site-packages\scipy"; Excludes: ".svn"; Flags: recursesubdirs
+  
 ; supporting libraries - Ogre 1.8.1
 Source: ".\lib\OgreSDK\bin\*"; DestDir: "{app}\OgreSDK\bin";  Excludes: ".svn";  Flags: recursesubdirs
 Source: ".\lib\OgreSDK\Docs\*"; DestDir: "{app}\OgreSDK\Docs"; Excludes: ".svn";  Flags: recursesubdirs
@@ -73,15 +74,16 @@ Source: ".\lib\vhcl\include\*"; DestDir: "{app}\include\vhcl"
 Source: ".\lib\vhmsg\vhmsg-c\include\*"; DestDir: "{app}\include\vhmsg"
 Source: ".\lib\bonebus\include\*"; DestDir: "{app}\include\bonebus"
 Source: ".\lib\assimp-3.1.1\include\assimp\*"; DestDir: "{app}\include\assimp-3.1.1\assimp"; Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\core\smartbody\sbgui\external\fltk-1.3.2\FL\*"; DestDir: "{app}\include\FL"
-Source: ".\core\smartbody\sbgui\external\cegui-0.8.2\include\*"; DestDir: "{app}\include\CEGUI";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\core\smartbody\sbgui\external\fltk-1.3.3\FL\*"; DestDir: "{app}\include\FL"
+Source: ".\core\smartbody\sbgui\external\cegui-0.8.7\include\*"; DestDir: "{app}\include\CEGUI";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\sbgui\external\Pinocchio\*.h"; DestDir: "{app}\include\Pinocchio";
 Source: ".\core\smartbody\sbgui\external\polyvox\library\PolyVoxCore\include\*"; DestDir: "{app}\include\polyvox";   Excludes: ".svn"; Flags: recursesubdirs
 
 ; libary header files
-Source: ".\lib\xerces-c\include\xercesc\*"; DestDir: "{app}\include\xercesc"; Flags: recursesubdirs
-Source: ".\lib\boost\boost\*"; DestDir: "{app}\include\boost";Flags: recursesubdirs
-Source: ".\core\SmartBody\ode\include\*"; DestDir: "{app}\include";Flags: recursesubdirs
+Source: ".\lib\xerces-c\include\xercesc\*"; DestDir: "{app}\include\xercesc";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\lib\boost\boost\*"; DestDir: "{app}\include\boost";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\core\SmartBody\ode\include\*"; DestDir: "{app}\include";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\lib\boostnumeric\*"; DestDir: "{app}\include\boostnumeric";  Excludes: ".svn"; Flags: recursesubdirs
 
 ; applications
 Source: ".\core\smartbody\SmartBody\src\*"; DestDir: "{app}\src\SmartBody";  Excludes: ".svn"; Flags: recursesubdirs
@@ -112,7 +114,7 @@ Source: ".\core\smartbody\simplesmartbody\simplesmartbody.vcxproj"; DestDir: "{a
 Source: ".\core\smartbody\SmartBody\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\SmartBody\lib\*.pdb"; DestDir: "{app}\lib"
 
-Source: ".\core\smartbody\sbgui\external\fltk-1.3.2\lib\*.pdb"; DestDir: "{app}\lib"
+Source: ".\core\smartbody\sbgui\external\fltk-1.3.3\lib\*.pdb"; DestDir: "{app}\lib"
 
 Source: ".\core\smartbody\SmartBody\src\external\glew\glew32.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\SmartBody\src\external\protobuf\lib\Release\*.lib"; DestDir: "{app}\lib"
@@ -120,12 +122,13 @@ Source: ".\core\smartbody\SmartBody\src\external\protobuf\lib\Debug\*.lib"; Dest
 Source: ".\lib\vhcl\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\vhmsg\vhmsg-c\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\bonebus\lib\*.lib"; DestDir: "{app}\lib"
+Source: ".\lib\bonebus\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\clapack\lib\*.lib"; DestDir: "{app}\lib"
-Source: ".\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\*.lib"; DestDir: "{app}\lib"
-Source: ".\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\*.lib"; DestDir: "{app}\lib"
+Source: ".\lib\activemq\activemq-cpp\vs2015-build\ReleaseDLL\*.lib"; DestDir: "{app}\lib"
+Source: ".\lib\activemq\activemq-cpp\vs2015-build\DebugDLL\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\xerces-c\lib\*.lib"; DestDir: "{app}\lib"
-Source: ".\lib\boost\lib\*vc100-mt-1_51.lib"; DestDir: "{app}\lib"
-Source: ".\lib\boost\lib\*vc100-mt-gd-1_51.lib"; DestDir: "{app}\lib"
+Source: ".\lib\boost\lib\*vc140-mt-1_59.lib"; DestDir: "{app}\lib"
+Source: ".\lib\boost\lib\*vc140-mt-gd-1_59.lib"; DestDir: "{app}\lib"
 Source: ".\lib\vhcl\openal\libs\Win32\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\vhcl\libsndfile\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\pthreads\lib\pthreadVSE2.lib"; DestDir: "{app}\lib"
@@ -133,8 +136,8 @@ Source: ".\core\smartbody\ode\lib\ode*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\steersuite-1.3\build\win32\Release\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\steersuite-1.3\build\win32\Debug\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\pthreads\lib\pthreadVSE2.lib"; DestDir: "{app}\lib"
-Source: ".\core\smartbody\sbgui\external\fltk-1.3.2\lib\*.lib"; DestDir: "{app}\lib"
-Source: ".\core\smartbody\sbgui\external\cegui-0.8.2\lib\*.lib"; DestDir: "{app}\lib"
+Source: ".\core\smartbody\sbgui\external\fltk-1.3.3\lib\*.lib"; DestDir: "{app}\lib"
+Source: ".\core\smartbody\sbgui\external\cegui-0.8.7\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\sbgui\external\Pinocchio\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\sbgui\external\polyvox\build\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\assimp-3.1.1\Release\assimp.lib"; DestDir: "{app}\lib"
@@ -156,9 +159,10 @@ Source: ".\data\mesh\ChrMaarten\*"; DestDir: "{app}\data\mesh\ChrMaarten"
 Source: ".\data\mesh\Sinbad\*"; DestDir: "{app}\data\mesh\Sinbad"
 Source: ".\data\scripts\*"; DestDir: "{app}\data\scripts";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\data\Hand\*"; DestDir: "{app}\data\Hand"; Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\data\cegui\datafiles-0.8.2\*"; DestDir: "{app}\data\cegui\datafiles-0.8.2";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\cegui\datafiles\*"; DestDir: "{app}\data\cegui\datafiles";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\perceptionneuron\*"; DestDir: "{app}\data\perceptionneuron"; Excludes: ".svn";Flags: recursesubdirs
 
-Source: "e:\smartbody\externalprograms\vcredist_x86.exe"; DestDir: "{app}"
+Source: "e:\smartbody\externalprograms\vs2015\vc_redist.x86.exe"; DestDir: "{app}"
 
 ; sdk build
 Source: ".\sdk\README.txt"; DestDir: "{app}\"
@@ -176,12 +180,12 @@ Source: ".\lib\SBKinectViewer\*.dll"; DestDir: "{app}\lib\SBKinectViewer"
 [Registry]
 
 [Icons]
-Name: "{group}\SmartBody"; Filename: "{app}\bin\smartbody\sbm\sbgui.exe"; WorkingDir: "{app}"
+Name: "{group}\SmartBody"; Filename: "{app}\bin\sbgui.exe"; WorkingDir: "{app}"
 Name: "{group}\SmartBody Manual"; Filename: "{app}\SmartBodyManual.pdf"; WorkingDir: "{app}"
 Name: "{group}\SmartBody Python API"; Filename: "{app}\SmartBodyPythonAPI.html"; WorkingDir: "{app}"
 
 [Run]
-Filename: {app}\vcredist_x86.exe; Description: "Visual Studio 2010 Redistributable"; Parameters: "/q:a /c:""install /l """; WorkingDir: {tmp}; Flags: postinstall runascurrentuser ; StatusMsg: "Installing ""Microsoft Visual C++ 2010 sp1 Redistributable Package"" if needed. This can take several minutes..."
+Filename: {app}\vcredist_x86.exe; Description: "Visual Studio 2015 Redistributable"; Parameters: "/q:a /c:""install /l """; WorkingDir: {tmp}; Flags: postinstall runascurrentuser ; StatusMsg: "Installing ""Microsoft Visual C++ 2015 Redistributable Package"" if needed. This can take several minutes..."
 Filename: {app}\bin\sbgui.exe ; Flags: postinstall ; Description: "Run SmartBody"
 
 

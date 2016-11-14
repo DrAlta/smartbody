@@ -273,13 +273,14 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					aiString texturePath;
 					scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, t, &texturePath);
 					boost::filesystem::path p(texturePath.C_Str());
-					std::string extension = boost::filesystem::extension(p);
-					std::string basename = boost::filesystem::basename(p);
-					std::string tName = basename + extension;
+					std::string textureExtension = boost::filesystem::extension(p);
+					std::string textureBasename = boost::filesystem::basename(p);
+					std::string tName = basename + textureExtension;
 					boost::filesystem::path loadPath = parentPath;
 					loadPath /= tName;
 					matTex.diffuseTextures.push_back(loadPath.string());
-					texManager.loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, loadPath.string().c_str(), loadPath.string().c_str());	
+					std::string matLabel = basename + extension + "|" + tName;
+					texManager.loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, matLabel.c_str(), loadPath.string().c_str());
 
 					LOG("Found diffuse texture with material name %s in path %s", matName.C_Str(), texturePath.C_Str());
 				}
@@ -290,13 +291,14 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					aiString texturePath;
 					scene->mMaterials[m]->GetTexture(aiTextureType_SPECULAR, t, &texturePath);
 					boost::filesystem::path p(texturePath.C_Str());
-					std::string extension = boost::filesystem::extension(p);
-					std::string basename = boost::filesystem::basename(p);
-					std::string tName = basename + extension;
+					std::string textureExtension = boost::filesystem::extension(p);
+					std::string textureBasename = boost::filesystem::basename(p);
+					std::string tName = basename + textureExtension;
 					boost::filesystem::path loadPath = parentPath;
 					loadPath /= tName;
 					matTex.specularTextures.push_back(loadPath.string());
-					texManager.loadTexture(SbmTextureManager::TEXTURE_SPECULARMAP, loadPath.string().c_str(), loadPath.string().c_str());	
+					std::string matLabel = basename + extension + "|" + tName;
+					texManager.loadTexture(SbmTextureManager::TEXTURE_SPECULARMAP, matLabel.c_str(), loadPath.string().c_str());
 
 					LOG("Found specular texture with material name %s in path %s", matName.C_Str(), texturePath.C_Str());
 				}
@@ -331,13 +333,14 @@ std::vector<SBAsset*> SBAssetHandlerAssimp::getAssets(const std::string& path)
 					aiString texturePath;
 					scene->mMaterials[m]->GetTexture(aiTextureType_NORMALS, t, &texturePath);
 					boost::filesystem::path p(texturePath.C_Str());
-					std::string extension = boost::filesystem::extension(p);
-					std::string basename = boost::filesystem::basename(p);
-					std::string tName = basename + extension;
+					std::string textureExtension = boost::filesystem::extension(p);
+					std::string textureBasename = boost::filesystem::basename(p);
+					std::string tName = basename + textureExtension;
 					boost::filesystem::path loadPath = parentPath;
 					loadPath /= tName;
 					matTex.normalsTextures.push_back(loadPath.string());
-					texManager.loadTexture(SbmTextureManager::TEXTURE_NORMALMAP, loadPath.string().c_str(), loadPath.string().c_str());	
+					std::string matLabel = basename + extension + "|" + tName;
+					texManager.loadTexture(SbmTextureManager::TEXTURE_NORMALMAP, matLabel.c_str(), loadPath.string().c_str());
 					LOG("Found normal texture with material name %s in path %s", matName.C_Str(), texturePath.C_Str());
 				}
 

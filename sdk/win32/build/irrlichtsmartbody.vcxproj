@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -26,10 +26,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -75,8 +77,8 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>SmartBody_d.lib;vhcl_d.lib;pthreadVSE2.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;Irrlicht.lib;boost_system-vc100-mt-gd-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\irrlicht-1.8.\lib\Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SmartBody_d.lib;vhcl_d.lib;pthreadVSE2.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;Irrlicht.lib;boost_system-vc140-mt-gd-1_59.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\irrlicht-1.8.3\lib\Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)OgreExample_d.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -111,7 +113,7 @@ copy /Y ..\irrlicht-1.8.3\bin\Win32-VisualStudio\Irrlicht.dll ..\bin
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <Link>
-      <AdditionalDependencies>SmartBody.lib;vhcl.lib;pthreadVSE2.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;Irrlicht.lib;boost_system-vc100-mt-1_51.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SmartBody.lib;vhcl.lib;pthreadVSE2.lib;dbghelp.lib;opengl32.lib;ws2_32.lib;winmm.lib;comctl32.lib;rpcrt4.lib;python27.lib;Irrlicht.lib;boost_system-vc140-mt-1_59.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib;..\Python27\libs;..\irrlicht-1.8.3\lib\Win32-visualstudio;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>

@@ -64,55 +64,16 @@
     <Filter Include="faceshiftviewer">
       <UniqueIdentifier>{14c552ac-4dba-4ce6-970d-56caa091ab6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="posecreator">
+      <UniqueIdentifier>{08ccd5b8-9776-44f4-9c6e-6bb4581308f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\sbgui\glfont2.cpp" />
     <ClCompile Include="..\src\sbgui\pic.cpp" />
     <ClCompile Include="..\src\sbgui\ppm.cpp" />
     <ClCompile Include="..\src\sbgui\sbm_main.cpp" />
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLAnimationObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLBodyObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLConstraintObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbgui\bmlcreator\BMLCreatorWindow.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLEventObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLFaceObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLGazeObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLGestureObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLHeadObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLLocomotionObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLReachObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLSaccadeObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLSpeechObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLStateObject.cpp">
       <Filter>bmlcreator</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbgui\panimationviewer\ParamAnimAutoMarkingEditor.cpp">
@@ -328,17 +289,14 @@
     <ClCompile Include="..\src\sbgui\autorig\AutoRigViewer.cpp">
       <Filter>autorig</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLHandObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sbgui\bmlcreator\BMLNoiseObject.cpp">
-      <Filter>bmlcreator</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sbgui\faceshiftviewer\FaceShiftViewer.cpp">
       <Filter>faceshiftviewer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sbgui\SBInterfaceListener.cpp">
       <Filter>viewer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\posecreator\PoseCreator.cpp">
+      <Filter>posecreator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -347,49 +305,7 @@
     </ClInclude>
     <ClInclude Include="..\src\sbgui\glfont2.h" />
     <ClInclude Include="..\src\sbgui\pic.h" />
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLAnimationObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLBodyObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLConstraintObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbgui\bmlcreator\BMLCreatorWindow.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLEventObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLFaceObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLGazeObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLGestureObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLHeadObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLLocomotionObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLReachObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLSaccadeObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLSpeechObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLStateObject.h">
       <Filter>bmlcreator</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbgui\panimationviewer\ParamAnimAutoMarkingEditor.h">
@@ -611,17 +527,14 @@
     <ClInclude Include="..\src\sbgui\autorig\AutoRigViewer.h">
       <Filter>autorig</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLHandObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\sbgui\bmlcreator\BMLNoiseObject.h">
-      <Filter>bmlcreator</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\sbgui\faceshiftviewer\FaceShiftViewer.h">
       <Filter>faceshiftviewer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sbgui\SBInterfaceListener.h">
       <Filter>viewer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\posecreator\PoseCreator.h">
+      <Filter>posecreator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

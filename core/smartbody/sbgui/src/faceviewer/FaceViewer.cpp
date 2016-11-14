@@ -88,10 +88,14 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 	faceViewer->checkShowAUs->value(showAUs);
 	faceViewer->bottomGroup->add(faceViewer->checkShowAUs);
 
-	faceViewer->checkShowVisemes = new Fl_Check_Button(120, curY, 100, 25, "Show Visemes");
+	curY += 25;
+
+	faceViewer->checkShowVisemes = new Fl_Check_Button(10, curY, 100, 25, "Show Visemes");
 	faceViewer->checkShowVisemes->callback(ShowVisemesCB, faceViewer);
 	faceViewer->checkShowVisemes->value(showVisemes);
 	faceViewer->bottomGroup->add(faceViewer->checkShowVisemes);
+
+	curY += 25;
 
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(curCharacterName);
 	if (!character)
@@ -126,7 +130,7 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 				iterator != morphControllers.end();
 				iterator++)
 			{
-				Fl_Check_Button* checkMorph = new Fl_Check_Button(100 * counter + 220, curY, 100, 25, _strdup((*iterator).c_str()));
+				Fl_Check_Button* checkMorph = new Fl_Check_Button(10, curY, 100, 25, _strdup((*iterator).c_str()));
 				checkMorph->callback(ShowMorphsCB, faceViewer);
 				bool found = false;
 				for (std::map<std::string, bool>::iterator iterator2 = showMorphs.begin();
@@ -146,6 +150,8 @@ void FaceViewer::CharacterCB(Fl_Widget* widget, void* data)
 				faceViewer->checkShowMorphs.push_back(checkMorph);
 				faceViewer->bottomGroup->add(checkMorph);
 				counter++;
+
+				curY += 25;
 			}
 		}
 	}
