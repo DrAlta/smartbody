@@ -232,7 +232,7 @@ void MeController::remap() {
 	for( int i=0; i<size; ++i ) {
 		const std::string& name = localChnls.mappedName( i );
 		SkChannel::Type type = localChnls.type( i );
-		_toContextCh[i] = contextChnls.search( name.c_str(), type );
+		_toContextCh[i] = contextChnls.search( name, type );
 
 		int parent_index = _toContextCh[i];
 		if( parent_index >= 0 ) {

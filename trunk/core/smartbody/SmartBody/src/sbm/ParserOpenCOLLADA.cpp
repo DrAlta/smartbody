@@ -2959,7 +2959,7 @@ bool ParserOpenCOLLADA::exportCollada( std::string outPathname, std::string skel
 	boost::filesystem::path dir(outPathname);
 	if (boost::filesystem::create_directory(dir))
 	{
-		LOG("Folder accessed or created: %s", outPathname);
+		LOG("Folder accessed or created: %s", outPathname.c_str());
 	}
 
 	std::string fullColladaPathName = outPathname + "/" + colladaName;

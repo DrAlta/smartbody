@@ -1,9 +1,9 @@
 /******************************
 SmartBody -> Irrlicht demo
 To run this demo:
-1) download the irrlicht 1.8.1 sdk and place it 
+1) download the irrlicht 1.8.3 sdk and place it 
 under the top-level SmartBody directory (at the same level as bin/ build/ etc.
-2) Extract the Sinbad.zip file from the OgreSDK/media directory into irrlicht-1.8.1/media
+2) Extract the Sinbad.zip file from the OgreSDK/media directory into irrlicht-1.8.3/media
 
 
 *******************************/
@@ -103,7 +103,7 @@ int main()
                            core::dimension2d<f32>(10.0f, 10.0f)); // textureRepeatCount
                                           
    irr::scene::IAnimatedMeshSceneNode* terrain_node = smgr->addAnimatedMeshSceneNode(terrain_model);
-   terrain_node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8.1/media/wall.jpg"));   
+   terrain_node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8.3/media/wall.jpg"));   
    terrain_node->setMaterialFlag(EMF_LIGHTING, false);
    
    // Insert it into the scene
@@ -124,7 +124,7 @@ int main()
 	node = smgr->addBillboardSceneNode(node, core::dimension2d<f32>(50, 50));
 	node->setMaterialFlag(video::EMF_LIGHTING, false);
 	node->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
-	node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8.1/media/particlewhite.bmp"));
+	node->setMaterialTexture(0, driver->getTexture("../irrlicht-1.8.3/media/particlewhite.bmp"));
 
 	smgr->setShadowColor(video::SColor(150,0,0,0));
 

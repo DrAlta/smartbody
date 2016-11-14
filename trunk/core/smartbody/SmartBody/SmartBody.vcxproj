@@ -104,6 +104,7 @@ copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
+
       <Command>svn info src &gt;nul 2&gt;nul
 if %errorlevel% == 0 (
    if exist "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" src src\sb\SBVersionTemplate.hpp src\sb\SBVersion.hpp
@@ -178,7 +179,7 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>rem if exist "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" src src\sb\SBVersionTemplate.hpp src\sb\SBVersion.hpp</Command>
+      <Command>if exist "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" src src\sb\SBVersionTemplate.hpp src\sb\SBVersion.hpp</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Emscripten'">
