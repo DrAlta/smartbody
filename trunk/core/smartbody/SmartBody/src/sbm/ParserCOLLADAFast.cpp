@@ -2531,7 +2531,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 					rapidxml::xml_attribute<>* texAttrNode = texNode->first_attribute("texture");			
 					std::string texID = texAttrNode->value();
 					diffuseTexture = texID;
-#if 0
+
 					std::string imageId = diffuseTexture;
 					std::string imageFile = pictureId2File[imageId];
 					std::string mtlName = mnames.back();
@@ -2543,7 +2543,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 					std::string fileName = boost::filesystem::basename(imageFile);
 					if (diffuseTexture.find(imageId) != std::string::npos)
 						mtlTexMap[mtlName] = imageFile;
-#endif
+
 				}
 				rapidxml::xml_node<>* colorNode = ParserCOLLADAFast::getNode("color", diffuseNode);
 				if (colorNode)
