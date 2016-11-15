@@ -82,6 +82,7 @@ void SBVHMsgManager::setEnable(bool val)
 
 	if (val)
 	{
+		vhcl::SocketStartup();
 		bool success = connect();
 		if (!success)
 			SBService::setEnable(false);
