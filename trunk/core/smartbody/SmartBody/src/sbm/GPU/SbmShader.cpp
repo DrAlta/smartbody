@@ -155,6 +155,7 @@ char * SbmShaderProgram::textFileRead(const char *fn )
 	FILE *fp;
 	char *content = NULL;
 	int count=0;
+	LOG("Loading text files...%s", fn);
 	if (fn != NULL) {
 		fp = fopen(fn,"rt");
 		if (fp != NULL) {
@@ -302,10 +303,22 @@ bool SbmShaderManager::initGLExtension()
     else 
 #endif
 	*/
+	return checkShaderInit(counter);
+
+    //return false;
+#elif defined(__ANDROID__)
+	shaderInit = true;
+	return true;
+	return false;
+#endif
+}
+
+bool SbmShaderManager::checkShaderInit(int &counter)
+{
 	if (glewIsSupported("GL_VERSION_2_0") || glewIsSupported("GL_VERSION_3_0"))
 	{
 		LOG("Ready for OpenGL 2.0.\n");
-		shaderInit = true; 
+		shaderInit = true;
 		shaderSupport = SUPPORT_OPENGL_2_0;
 		return true;
 	}
@@ -313,17 +326,11 @@ bool SbmShaderManager::initGLExtension()
 		//if (counter == 3)
 		LOG("OpenGL 2.0 not supported. GPU Shader will be disabled.\n");
 		//exit(1);
-        counter++;
-        if (counter == 3)
-            shaderInit = true;
+		counter++;
+		if (counter == 3)
+			shaderInit = true;
 		return false;
-    }
-    //return false;
-#elif defined(__ANDROID__)
-	shaderInit = true;
-	return true;
-	return false;
-#endif
+	}
 }
 
 void SbmShaderManager::addShader(const char* entryName, const char* vsName, const char* fsName, bool shaderFile )
