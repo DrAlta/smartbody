@@ -72,7 +72,7 @@ int main( int argc, char ** argv )
 	// set the relative path from the location of the simplesmartbody binary to the data directory
 	// if you are downloading the source code from SVN, it will be ../../../../data
 	//std::string mediaPath = "../../../../data";
-	std::string mediaPath = "E:/Work/SmartBodyVS2015/data/vhdata";
+	std::string mediaPath = "E:/SmartBody/trunk/data/vhdata";
 	std::string python_lib_path = "../../../../core/smartbody/Python27/Lib";
 	// if you're using the SDK, this path will be ../data
 	//std::string mediaPath = "../data";
