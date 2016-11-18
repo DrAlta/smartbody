@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="SmartBodyOculus.cpp" />
+    <ClCompile Include="common_src\InputHandlers.cpp">
+      <Filter>common_src</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\Math.cpp">
+      <Filter>common_src</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\Utils.cpp">
+      <Filter>common_src</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\Camera.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\CameraDirector.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\Font.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\OculusVR.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\OculusVRDebug.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\OpenGL.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\OVRCameraFrustum.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\OVRTrackerChaperone.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\RenderContext.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\ShaderManager.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\Texture.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="common_src\renderer\TextureManager.cpp">
+      <Filter>common_src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="common_libs\stb_image\stb_image.c">
+      <Filter>contrib</Filter>
+    </ClCompile>
+    <ClCompile Include="SBOclulusListener.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="common_src">
+      <UniqueIdentifier>{b587612a-e381-4f80-aa5e-6e8eab8c9bbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common_src\renderer">
+      <UniqueIdentifier>{45e69fda-894f-4761-8979-910b9c60608d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{d3e81985-cf86-4966-a8ee-b6cf8c58a879}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="contrib">
+      <UniqueIdentifier>{1581781a-173f-4ece-9854-a6187fd80f34}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common_src\InputHandlers.hpp">
+      <Filter>common_src</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\Math.hpp">
+      <Filter>common_src</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\Utils.hpp">
+      <Filter>common_src</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\Camera.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\CameraDirector.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\Font.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\OculusVR.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\OculusVRDebug.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\OpenGL.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\OVRCameraFrustum.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\OVRTrackerChaperone.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\RenderContext.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\Shader.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\ShaderManager.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\Texture.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="common_src\renderer\TextureManager.hpp">
+      <Filter>common_src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Application.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="common_libs\stb_image\stb_image.h">
+      <Filter>contrib</Filter>
+    </ClInclude>
+    <ClInclude Include="SBOclulusListener.h" />
+  </ItemGroup>
+</Project>
