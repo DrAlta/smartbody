@@ -110,7 +110,9 @@ public:
 
 	SBAPI bool initOpenGL();
 	SBAPI bool initGLExtension();	
-	SBAPI void setViewer(SrViewer* vw);	
+
+	SBAPI bool checkShaderInit(int &counter);
+	SBAPI void setViewer(SrViewer* vw);
 	SBAPI void addShader(const char* entryName,const char* vsName, const char* fsName, bool shaderFile = true);
 	SBAPI SbmShaderProgram* getShader(const std::string& entryName);
 	SBAPI void buildShaders();
