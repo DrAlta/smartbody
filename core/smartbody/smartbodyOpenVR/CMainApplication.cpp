@@ -4,6 +4,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBCharacter.h>
+#include <sr/sr_camera.h>
 #include <sbm/GPU/SbmTexture.h>
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #include <sr/sr_gl_render_funcs.h>
@@ -158,7 +159,7 @@ bool CMainApplication::BInit()
 	// Loading the SteamVR Runtime
 	vr::EVRInitError eError = vr::VRInitError_None;
 	m_pHMD = vr::VR_Init(&eError, vr::VRApplication_Scene);
-
+	
 	if (eError != vr::VRInitError_None)
 	{
 		m_pHMD = NULL;
@@ -1531,9 +1532,18 @@ void CMainApplication::RenderScene(vr::Hmd_Eye nEye)
 #endif
 
 #if 1
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 		Matrix4 MVMatrix = GetCurrentViewMatrix(nEye);
 		Matrix4 cameraPosMatrix;
-		cameraPosMatrix.translate(0, -0.5, 0);
+		SrCamera* camera = scene->getActiveCamera();
+		if (camera)
+		{
+			SrMat viewMat;
+			camera->get_view_mat(viewMat);
+			cameraPosMatrix.set(&viewMat[0]);
+		}
+		//cameraPosMatrix.translate(0, -0.5, 0);
+		
 		MVMatrix = MVMatrix*cameraPosMatrix;
 		Matrix4 ProjMatrix = GetCurrentProjectionMatrix(nEye);
 		Matrix4 ModelViewProjMatrix = GetCurrentViewProjectionMatrix(nEye);

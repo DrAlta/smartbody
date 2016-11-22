@@ -71,9 +71,70 @@ int main( int argc, char ** argv )
 
 	// set the relative path from the location of the simplesmartbody binary to the data directory
 	// if you are downloading the source code from SVN, it will be ../../../../data
-	//std::string mediaPath = "../../../../data";
+	//std::string mediaPath = "../../../../data/vhdata";
+	std::vector<std::string> py_paths;
+	std::vector<std::string> init_pys;
 	std::string mediaPath = "E:/SmartBody/trunk/data/vhdata";
 	std::string python_lib_path = "../../../../core/smartbody/Python27/Lib";
+	std::string scriptName = "TestDrSaxonScriptPi.py";
+	for (int i = 1; i < argc; i++)
+	{
+		LOG("SmartBody ARG[%d]: '%s'", i, argv[i]);
+		std::string s = argv[i];
+		std::string mediapathstr = "";
+		std::string fpsStr = "";
+		if (s.size() > 11)
+			mediapathstr = s.substr(0, 10);
+		if (s.size() > 5)
+			fpsStr = s.substr(0, 5);
+
+		if (s == "-scriptpath")  // -mepath <dirpath> to specify where sequence files (.seq) should be loaded from
+		{
+			if (++i < argc) {
+				LOG("    Adding sequence path '%s'\n", argv[i]);
+
+				//seq_paths.push_back( argv[i] );
+				py_paths.push_back(argv[i]);
+			}
+			else {
+				LOG("ERROR: Expected directory path to follow -seqpath\n");
+				// return -1
+			}
+		}
+		else if (s == "-script")  // -seq <filename> to load seq file (replaces old -initseq notation)
+		{
+			if (++i < argc) {
+				std::string filename = argv[i];
+				std::string::size_type idx;
+
+				idx = filename.rfind('.');
+
+				if (idx != std::string::npos)
+				{
+					std::string extension = filename.substr(idx + 1);
+					if (extension == "py")
+					{
+						LOG("    Loading Python scrypt '%s'\n", argv[i]);
+						init_pys.push_back(argv[i]);
+					}					
+				}				
+			}
+			else {
+				LOG("ERROR: Expected filename to follow -script\n");
+				// return -1
+			}
+		}
+		else if (mediapathstr == "-mediapath")
+		{
+			mediaPath = s.substr(11);
+			SmartBody::SBScene::getScene()->setMediaPath(mediaPath);
+		}
+		else
+		{
+			LOG("ERROR: Unrecognized command line argument: \"%s\"\n", s.c_str());
+		}
+	}
+
 	// if you're using the SDK, this path will be ../data
 	//std::string mediaPath = "../data";
 
@@ -91,12 +152,32 @@ int main( int argc, char ** argv )
 	SBOpenVRListener listener;
 	scene->addSceneListener(&listener);
 	// set the mediapath which dictates the top-level asset directory
-	scene->setMediaPath(mediaPath);
+	//scene->setMediaPath(mediaPath);
 	//SmartBody::SBScene::getScene()->addAssetPath("script", "examples");	
 	//scene->runScript("OculusDemo.py");
 	//scene->runScript("OgreCrowdDemo.py");
-	SmartBody::SBScene::getScene()->addAssetPath("script", ".");
-	scene->runScript("TestDrSaxonScriptPi.py");
+	//SmartBody::SBScene::getScene()->addAssetPath("script", ".");
+	//scene->runScript("TestDrSaxonScriptPi.py");
+
+	std::vector<std::string>::iterator it;
+	for (it = py_paths.begin();
+		it != py_paths.end();
+		++it)
+	{
+		std::stringstream strstr;
+		strstr << "scene.addAssetPath('script', '" << it->c_str() << "')";
+		SmartBody::SBScene::getScene()->run((char *)strstr.str().c_str());
+	}
+	for (it = init_pys.begin();
+		it != init_pys.end();
+		++it)
+	{
+		std::string cmd = it->c_str();
+		std::stringstream strstr;
+		strstr << "scene.run(\"" << cmd.c_str() << "\")";
+		SmartBody::SBScene::getScene()->run(strstr.str().c_str());
+		LOG("Run Script = %s", strstr.str().c_str());
+	}
 
 	LOG("After InitVRBuffers");
 	
