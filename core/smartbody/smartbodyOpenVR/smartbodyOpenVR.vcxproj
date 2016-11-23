@@ -133,7 +133,7 @@ copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .\bin
-copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\DebugDLL\activemq-cppd.dll .\bin
+copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2015-build\DebugDLL\activemq-cppd.dll .\bin
 copy /Y ..\..\..\lib\xerces-c\bin\xerces-c_3_1D.dll .\bin
 copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc140-mt-gd-1_59.dll .\bin
 copy /Y ..\..\..\lib\boost\lib\boost_system-vc140-mt-gd-1_59.dll .\bin
@@ -187,7 +187,7 @@ copy /Y ..\..\..\lib\pthreads\lib\pthreadVSE2.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr\lib\libapr-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr-iconv\lib\libapriconv-1.dll .\bin
 copy /Y ..\..\..\lib\activemq\apr\apr-util\lib\libaprutil-1.dll .\bin
-copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2010-build\ReleaseDLL\activemq-cpp.dll .\bin
+copy /Y ..\..\..\lib\activemq\activemq-cpp\vs2015-build\ReleaseDLL\activemq-cpp.dll .\bin
 copy /Y ..\..\..\lib\xerces-c\bin\xerces-c_3_1.dll .\bin
 copy /Y ..\..\..\lib\boost\lib\boost_filesystem-vc140-mt-1_59.dll .\bin
 copy /Y ..\..\..\lib\boost\lib\boost_system-vc140-mt-1_59.dll .\bin

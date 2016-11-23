@@ -23,8 +23,11 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBPython.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBVHMsgManager.h>
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBSceneListener.h>
+
+#include <sbm/sbm_constants.h>
 
 
 #include "SBOpenVRListener.h"
@@ -147,6 +150,35 @@ int main( int argc, char ** argv )
 	// initialize the Python libraries
 	//initPython("../Python27/Libs");
 
+	// set up VHMSG
+	char * vhmsg_server = getenv("VHMSG_SERVER");
+	char * vhmsg_port = getenv("VHMSG_PORT");
+
+	std::string vhmsgServerStr = "";
+	if (vhmsg_server)
+		vhmsgServerStr = vhmsg_server;
+	std::string vhmsgPortStr = "";
+	if (vhmsg_port)
+		vhmsgPortStr = vhmsg_port;
+
+
+	SmartBody::SBVHMsgManager* vhmsgManager = SmartBody::SBScene::getScene()->getVHMsgManager();
+	
+	if (vhmsgServerStr != "")
+		vhmsgManager->setServer(vhmsgServerStr);
+	if (vhmsgPortStr != "")
+		vhmsgManager->setPort(vhmsgPortStr);
+
+	vhmsgManager->setEnable(true);
+	if (!vhmsgManager->isEnable())
+	{
+		LOG("Could not connect to server %s, VHMSG service not enabled.", vhmsg_server);
+	}
+
+
+
+
+
 	// get the scene object
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SBOpenVRListener listener;
@@ -213,6 +245,15 @@ int main( int argc, char ** argv )
 	sim->start();
 	while (sim->isRunning() && !bQuit)
 	{
+		if (SmartBody::SBScene::getScene()->getVHMsgManager()->isEnable())
+		{
+			int err = SmartBody::SBScene::getScene()->getVHMsgManager()->poll();
+			if (err == CMD_FAILURE) {
+				fprintf(stderr, "ttu_poll ERROR\n");
+			}
+		}
+
+
 		scene->update();
 		bool update_sim = false; 
 		if (!useRealTimeClock)

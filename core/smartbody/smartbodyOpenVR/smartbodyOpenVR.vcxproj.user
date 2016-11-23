@@ -3,10 +3,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerWorkingDirectory>$(ProjectDir)\bin</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-mediapath=E:/Work/SmartBodyVS2015/data -scriptpath . -script TestTeddBodyFaceHand.py</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-mediapath=e:/smartbody/trunk/data -scriptpath e:/photorealfaces/Sharon -script Sharon.py</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerWorkingDirectory>$(ProjectDir)\bin</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>-mediapath=e:/smartbody/trunk/data -scriptpath e:/photorealfaces/Sharon -script Sharon.py</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>
