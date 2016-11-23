@@ -401,8 +401,11 @@ void SbmTexture::buildTexture(bool buildMipMap)
 #define GL_RGBA8 GL_RGBA
 #endif
     
-    glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_REPEAT);
+    //glTexParameteri(iType,GL_TEXTURE_WRAP_S, GL_REPEAT);
+    //glTexParameteri(iType,GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(iType, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(iType, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     //LOG("After Texture parameters : GL_TEXTURE_WRAP_S");
 
