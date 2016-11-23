@@ -248,7 +248,7 @@ bool CMainApplication::BInit()
 	m_fScaleSpacing = 2.0f;
 
 	m_fNearClip = 0.1f;
-	m_fFarClip = 30.0f;
+	m_fFarClip = 1000.0f;
 
 	m_iTexture = 0;
 	m_uiVertcount = 0;
@@ -1577,11 +1577,19 @@ void CMainApplication::RenderScene(vr::Hmd_Eye nEye)
 					DeformableMesh* mesh = meshInstance->getDeformableMesh();
 					SrGlRenderFuncs::renderDeformableMesh(meshInstance, false);
 				}
+				else
+				{
+					//LOG("drawStaticMesh(): Rendering %s", pawn->getName().c_str());
+					DeformableMesh* mesh = meshInstance->getDeformableMesh();
+					//if (mesh)
+					//	printf("drawStatic Mesh, mesh name = %s\n", mesh->getName().c_str());
+					SrGlRenderFuncs::renderDeformableMesh(meshInstance, false);
+				}
 			}
 		}
 #endif
 
-#if 1
+#if 0
 		// draw floor
 		static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
 		static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
@@ -1594,8 +1602,8 @@ void CMainApplication::RenderScene(vr::Hmd_Eye nEye)
 		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0);
 		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 		glEnable(GL_LIGHTING);
-		float floorSize = 1200;
-		float planeY = -0.0f;
+		float floorSize = 2;
+		float planeY = 0.0f;
 		glBegin(GL_QUADS);
 		glTexCoord2f(0, 0);
 		glNormal3f(0, 1, 0);

@@ -300,7 +300,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("Program does not exist yet");
+			LOG("Blend_Two_Textures::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendTextures.vert";
 			const std::string shaderFs	= shaderPath + "blendTextures.frag";
@@ -325,7 +325,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("Program does not exist yet");
+			//LOG("Blend_All_Textures::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendAllTextures.vert";
 			const std::string shaderFs	= shaderPath + "blendAllTextures.frag";
@@ -348,14 +348,15 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("Program does not exist yet");
+			LOG("Blend_All_Textures_Pairwise::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendAllTexturesPairwise.vert";
 			const std::string shaderFs	= shaderPath + "blendAllTexturesPairwise.frag";
 	
 			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
+			LOG("After addShader, VS = %s, FS = %s", shaderVs.c_str(), shaderFs.c_str());
 			SbmShaderManager::singleton().buildShaders();
-				
+			LOG("After buildShaders");				
 			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
 		}
 	}
@@ -371,7 +372,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("Program does not exist yet");
+			LOG("BlendGeometry::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendGeometry.vert";
 			const std::string shaderFs	= shaderPath + "blendGeometry.frag";
@@ -394,7 +395,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("Program does not exist yet");
+			LOG("ReadMasks::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "readMasks.vert";
 			const std::string shaderFs	= shaderPath + "readMasks.frag";
@@ -419,7 +420,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("Program does not exist yet");
+			LOG("BlendGeometryWithMasks::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendGeometryWithMasks.vert";
 			const std::string shaderFs	= shaderPath + "blendGeometryWithMasks.frag";
@@ -442,7 +443,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("Program does not exist yet");
+			LOG("BlendGeometryWithMasksFeedback::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendGeometryWithMasksFeedback.vert";
 			const std::string shaderFs	= ""; // no fragment shader//shaderPath + "blendGeometryWithMasks.frag";
@@ -465,7 +466,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("Program does not exist yet");
+			LOG("RenderGeometryWithMasks::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "renderGeometryWithMask.vert";
 			const std::string shaderFs	= shaderPath + "renderGeometryWithMask.frag";
@@ -488,7 +489,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("Program does not exist yet");
+			LOG("BlendAllTexturesWithMask::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendAllTexturesWithMask.vert";
 			const std::string shaderFs	= shaderPath + "blendAllTexturesWithMask.frag";
@@ -508,6 +509,12 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 
 void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * texDst, std::vector<float> weights, std::vector<GLuint> texIDs, std::vector<std::string> texture_names, GLuint program, int w, int h)
 {
+
+	GLint prevBufferObject;
+	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &prevBufferObject);
+
+	//LOG("PrevBufferObject = %d", prevBufferObject);
+
 	int numTextures		= weights.size();
 
 	float sumOfWeights	= 0;
@@ -721,7 +728,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 			glEnable(GL_DEPTH_TEST);
 		
 #endif
-			glBindRenderbuffer(GL_RENDERBUFFER, 0);                                                                                                          // Bind the render buffer
+			//glBindRenderbuffer(GL_RENDERBUFFER, 0);                                                                                                          // Bind the render buffer
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);         
 		
 			glActiveTexture(GL_TEXTURE0);
@@ -739,6 +746,11 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 		glBindTexture(GL_TEXTURE_2D, 0);
 		delete(image);
 		*/
+	}
+
+	if (prevBufferObject != 0)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, prevBufferObject);		
 	}
 	//LOG("Finish BlendAllAppearancesPairwise");
 }
