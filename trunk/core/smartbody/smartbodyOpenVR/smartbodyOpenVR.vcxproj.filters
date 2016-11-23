@@ -13,6 +13,7 @@
     </ClCompile>
     <ClCompile Include="CGLRenderModel.cpp" />
     <ClCompile Include="CMainApplication.cpp" />
+    <ClCompile Include="SBOpenVRListener.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="shared">
@@ -34,5 +35,6 @@
     </ClInclude>
     <ClInclude Include="CGLRenderModel.h" />
     <ClInclude Include="CMainApplication.h" />
+    <ClInclude Include="SBOpenVRListener.h" />
   </ItemGroup>
 </Project>
