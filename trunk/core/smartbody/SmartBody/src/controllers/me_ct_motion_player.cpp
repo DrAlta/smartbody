@@ -71,6 +71,11 @@ void MeCtMotionPlayer::init(SbmPawn* pawn, std::string name, double n)
 	//LOG("after if (controller != NULL)");
 		 
 	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(name);
+	if (!motion)
+	{
+		LOG("No motion named '%s' found. Motionplayer cannot play it.", name.c_str());
+		return;
+	}
 	motionName = name;
 	motion->connect(character->getSkeleton());
 	controller = new MeCtMotion();
