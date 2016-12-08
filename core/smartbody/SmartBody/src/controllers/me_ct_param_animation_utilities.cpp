@@ -228,6 +228,9 @@ void PATimeManager::updateWeights()
 
 double PATimeManager::getDuration()
 {
+	int numKeys = getNumKeys();
+	if (numKeys == 0)
+		return 0.0;
 	return (key[getNumKeys() - 1] - key[0]);
 }
 
@@ -288,6 +291,9 @@ void PATimeManager::setMotionTimes()
 
 int PATimeManager::getSection(double time)
 {
+	int numKeys = getNumKeys();
+	if (numKeys == 0)
+		return -1;
 	for (int i = 0; i < getNumKeys() - 1; i++)
 	{
 		if ((key[i] <= time || key[i] - time < gwiz::epsilon4()) && (key[i + 1] > time || time - key[i + 1] < gwiz::epsilon4()))

@@ -5,6 +5,7 @@
 #include <sr/sr_sn_colorsurf.h>
 #include <sb/PABlend.h>
 #include <sr/sr_lines.h>
+#include <sb/SBCharacter.h>
 
 
 # define VFLOW_LINE_WIDTH 2.0f
@@ -104,6 +105,9 @@ class SBAnimationBlend : public PABlend
 		SBAPI const SrMat& getPlotVectorFlowTransform() { return plotVectorFlowTransform; }
 		SBAPI void clearPlotVectorFlowTransform() { plotVectorFlowTransform.identity(); }
 
+		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character);
+		SBAPI void getAllChannels(SkChannelArray& channels);
+
 		bool addMotionRef( SBMotion* sbmotion );
 	protected:
 		bool addSkMotion(const std::string& motionName);		
@@ -145,6 +149,7 @@ class SBAnimationBlend0D : public SBAnimationBlend
 		SBAPI ~SBAnimationBlend0D();		
 		SBAPI virtual void addMotion(const std::string& motion);
 		SBAPI virtual void removeMotion(const std::string& motionName);
+		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character);
 		
 };
 
@@ -159,6 +164,7 @@ class SBAnimationBlend1D : public SBAnimationBlend
 		SBAPI virtual void addMotion(const std::string& motion, float parameter);
 		SBAPI virtual void removeMotion(const std::string& motionName);
 		SBAPI void setParameter(const std::string& motion, float parameter);
+		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character);
 };
 
 class SBAnimationBlend2D : public SBAnimationBlend
@@ -172,6 +178,7 @@ class SBAnimationBlend2D : public SBAnimationBlend
 		SBAPI virtual void removeMotion(const std::string& motionName);
 		SBAPI void setParameter(const std::string& motion, float parameter1, float parameter2);
 		SBAPI void addTriangle(const std::string& motion1, const std::string& motion2, const std::string&motion3);
+		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character);
 };
 
 class SBAnimationBlend3D : public SBAnimationBlend
@@ -185,6 +192,7 @@ class SBAnimationBlend3D : public SBAnimationBlend
 		SBAPI virtual void removeMotion(const std::string& motionName);
 		SBAPI void setParameter(const std::string& motion, float parameter1, float parameter2, float parameter3);
 		SBAPI void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
+		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character);
 
 };
 }
