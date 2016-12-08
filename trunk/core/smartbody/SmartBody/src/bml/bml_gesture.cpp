@@ -161,7 +161,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(animationName);
 		if (!blend)
 		{
-			LOG("Could not find blend named '%s' for gestures. Gesture will not be played.");
+			LOG("Could not find blend named '%s' for gestures. Gesture will not be played.", animationName.c_str());
 			return BehaviorRequestPtr();
 		}
 
