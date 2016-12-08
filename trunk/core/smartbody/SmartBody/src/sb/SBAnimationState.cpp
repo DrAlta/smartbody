@@ -6,11 +6,15 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBEvent.h>
 #include <sb/SBAssetManager.h>
-
+#include <sb/SBJointMap.h>
+#include <set>
 #include <boost/algorithm/string.hpp>
+#include <controllers/me_ct_param_animation.h>
+#include <controllers/me_controller_tree_root.hpp>
 
 #include <sr/sr.h>
 #include <sr/sr_lines.h>
+#include <sr/sr_quat.h>
 
 namespace SmartBody {
 
@@ -1528,6 +1532,24 @@ bool SBAnimationBlend::addMotionRef( SBMotion* sbmotion)
 	}
 }
 
+
+SBMotion* SBAnimationBlend::createMotionFromBlend(SrVec parameters, SBCharacter* character)
+{
+	return NULL;
+}
+
+void SBAnimationBlend::getAllChannels(SkChannelArray& channels)
+{
+	int numMotions = this->getNumMotions();
+
+	for (int m = 0; m < numMotions; m++)
+	{
+		SBMotion* motion = this->getSBMotion(m);
+		SkChannelArray motionChannels = motion->channels();
+		channels.merge(motionChannels);
+	}
+}
+
 SBAnimationBlend0D::SBAnimationBlend0D() : SBAnimationBlend("unknown")
 {
 }
@@ -1556,6 +1578,11 @@ void SBAnimationBlend0D::removeMotion(const std::string& motion)
 
 	// remove correspondence points
 	removeSkMotion(motion);
+}
+
+SBMotion* SBAnimationBlend0D::createMotionFromBlend(SrVec parameters, SBCharacter* character)
+{
+	return getSBMotion(0);
 }
 
 SBAnimationBlend1D::SBAnimationBlend1D() : SBAnimationBlend("unknown")
@@ -1601,6 +1628,215 @@ void SBAnimationBlend1D::setParameter(const std::string& motion, float parameter
 	PABlend::setParameter(motion, parameter);
 }
 
+SBMotion* SBAnimationBlend1D::createMotionFromBlend(SrVec parameters, SBCharacter* character)
+{
+	// let's start by assuming no keys and a linear retiming from one animation to another
+	double amount = parameters[0];
+
+	SBMotion* motion1 = SmartBody::SBScene::getScene()->getMotion(this->getMotion(0));
+	SBMotion* motion2 = SmartBody::SBScene::getScene()->getMotion(this->getMotion(1));
+	if (!motion1 || !motion2)
+		return NULL;
+
+	double blendedMotionLength = (1.0 - amount) * motion1->getDuration() +  amount * motion2->getDuration();
+	
+	std::stringstream strstr;
+	strstr.precision(2);
+	strstr << this->getName() << "_" << parameters[0] << "_" << parameters[1] << "_" << parameters[2];
+	
+	SBMotion* motion = new SBMotion();
+	motion->setName(strstr.str());
+	
+	SkChannelArray channelArray;
+	this->getAllChannels(channelArray);
+		
+	for (int c = 0; c < channelArray.size(); c++)
+	{
+		SkChannel& channel = channelArray.get(c);
+		std::string channelName = channelArray.name(c);
+		std::string channelType = SkChannel::type_name(channel.type);
+		motion->addChannel(channelName, channelType);
+	}
+
+	// perform a joint map if one exists on motion1 or motion2
+	SmartBody::SBJointMap* jointMap = motion1->getJointMap();
+	if (jointMap)
+		jointMap->applyMotion(motion);
+	
+	float fps = 30.0; // new motion is at 30 fps
+	float step = 1.0f / 30.0f;
+
+	SrBuffer<float> buffer(channelArray.count_floats());
+
+	SkChannelArray& channelArray1 = motion1->channels();
+	SkChannelArray& channelArray2 = motion2->channels();
+
+	double timeratio1 = motion1->getDuration() / blendedMotionLength;
+	double timeratio2 = motion2->getDuration() / blendedMotionLength;
+
+	std::vector<int> motionMap1;
+	motionMap1.resize(channelArray1.size());
+	int counter = 0;
+	for (int c = 0; c < channelArray1.size(); c++)
+	{
+		motionMap1[c] = counter;
+		counter += channelArray1.get(c).size();
+	}
+
+	std::vector<int> motionMap2;
+	motionMap2.resize(channelArray2.size());
+	counter = 0;
+	for (int c = 0; c < channelArray2.size(); c++)
+	{
+		motionMap2[c] = counter;
+		counter += channelArray2.get(c).size();
+	}
+
+	std::vector<float> frame;
+	frame.resize(channelArray.count_floats());
+	for (float t = 0.0; t < blendedMotionLength; t += step)
+	{
+		double localTime1 = t * timeratio1;
+		double localTime2 = t * timeratio2;
+
+		int whichFrame1 = (int)(localTime1 / motion1->getFrameRate());
+		int whichFrame2 = (int)(localTime2 / motion2->getFrameRate());
+
+		std::vector<float> data1 = motion1->getFrameData(whichFrame1);
+		std::vector<float> data2 = motion2->getFrameData(whichFrame2);
+
+		int channelPos = 0;
+		// for each channel, blend data into that channel
+		for (int c = 0; c < channelArray.size(); c++)
+		{
+			SkChannel& channel = channelArray.get(c);
+			const std::string& name = channelArray.name(c);
+			std::string mappedName = name;
+			if (jointMap)
+				mappedName = jointMap->getMapTarget(name);
+
+			int pos1 = channelArray1.search(mappedName, channel.type);
+			int pos2 = channelArray2.search(mappedName, channel.type);
+
+			int index1 = -1;
+			int index2 = -1;
+			if (pos1 >= 0)
+				index1 = motionMap1[pos1];
+			if (pos2 >= 0)
+				index2 = motionMap2[pos2];
+
+			std::vector<float> frame1 = motion1->getFrameData(whichFrame1);
+			std::vector<float> frame2 = motion2->getFrameData(whichFrame2);
+
+			if (index1 == -1 && index2 == -1)
+			{
+				if (channel.type == SkChannel::XPos ||
+					channel.type == SkChannel::YPos ||
+					channel.type == SkChannel::ZPos)
+				{
+					frame[channelPos] = 0.0;
+				}
+				else if (channel.type == SkChannel::Quat)
+				{
+					frame[channelPos] = 1.0;
+					frame[channelPos + 1] = 0.0;
+					frame[channelPos + 2] = 0.0;
+					frame[channelPos + 3] = 0.0;
+				}
+			}
+			else if (index1 == -1 && index2 >= 0)
+			{
+				if (channel.type == SkChannel::XPos ||
+					channel.type == SkChannel::YPos ||
+					channel.type == SkChannel::ZPos)
+				{
+					frame[channelPos] = frame2[index2];
+				}
+				else if (channel.type == SkChannel::Quat)
+				{
+					frame[channelPos] = frame2[index2];
+					frame[channelPos + 1] = frame2[index2 + 1];
+					frame[channelPos + 2] = frame2[index2 + 2];
+					frame[channelPos + 3] = frame2[index2 + 3];
+				}
+			}
+			else if (index1 >= 0 && index2 == -1)
+			{
+				if (channel.type == SkChannel::XPos ||
+					channel.type == SkChannel::YPos ||
+					channel.type == SkChannel::ZPos)
+				{
+					frame[channelPos] = frame1[index1];
+				}
+				else if (channel.type == SkChannel::Quat)
+				{
+					frame[channelPos] = frame1[index1];
+					frame[channelPos + 1] = frame1[index1 + 1];
+					frame[channelPos + 2] = frame1[index1 + 2];
+					frame[channelPos + 3] = frame1[index1 + 3];
+				}
+			}
+			else
+			{
+				// common channel, blend the two
+				if (channel.type == SkChannel::XPos ||
+					channel.type == SkChannel::YPos ||
+					channel.type == SkChannel::ZPos)
+				{
+					frame[channelPos] = frame1[index1] * (1.0 - amount) + amount * frame2[index2];
+				}
+				else if (channel.type == SkChannel::Quat)
+				{
+					SrQuat quat1(frame1[index1], frame1[index1 + 1], frame1[index1 + 2], frame1[index1 + 3]);
+					SrQuat quat2(frame2[index2], frame2[index2 + 1], frame2[index2 + 2], frame2[index2 + 3]);
+					SrQuat finalQuat = slerp(quat1, quat2, amount);
+					frame[channelPos] = finalQuat.getData(0);
+					frame[channelPos + 1] = finalQuat.getData(1);
+					frame[channelPos + 2] = finalQuat.getData(2);
+					frame[channelPos + 3] = finalQuat.getData(3);
+				}
+			}
+
+			channelPos += channel.size();
+		}
+
+		motion->addFrame(t, frame);
+	}
+
+	// set the sync point times
+	double timeStart1 = motion1->getTimeStart();
+	double timeStart2 = motion2->getTimeStart();
+	motion->setSyncPoint("start", (1.0 - amount) * timeStart1 +  amount * timeStart2);
+
+	double timeReady1 = motion1->getTimeReady();
+	double timeReady2 = motion2->getTimeReady();
+	motion->setSyncPoint("ready", (1.0 - amount) * timeReady1 + amount * timeReady2);
+
+	double timeStrokeStart1 = motion1->getTimeStrokeStart();
+	double timeStrokeStart2 = motion2->getTimeStrokeStart();
+	motion->setSyncPoint("stroke_start", (1.0 - amount) * timeStrokeStart1 +  amount * timeStrokeStart2);
+
+	double timeStroke1 = motion1->getTimeStroke();
+	double timeStroke2 = motion2->getTimeStroke();
+	motion->setSyncPoint("stroke", (1.0 - amount) * timeStroke1 + amount * timeStroke2);
+
+	double timeStrokeEnd1 = motion1->getTimeStrokeEnd();
+	double timeStrokeEnd2 = motion2->getTimeStrokeEnd();
+	motion->setSyncPoint("stroke_stop", (1.0 - amount) * timeStrokeEnd1 + amount * timeStrokeEnd2);
+
+	double timeRelax1 = motion1->getTimeRelax();
+	double timeRelax2 = motion2->getTimeRelax();
+	motion->setSyncPoint("relax", (1.0 - amount) * timeRelax1 + amount * timeRelax2);
+
+	double timeStop1 = motion1->getTimeStop();
+	double timeStop2 = motion2->getTimeStop();
+	motion->setSyncPoint("stop", (1.0 - amount) * timeStop1 + amount * timeStop2);
+
+	return motion;
+}
+
+
+
 SBAnimationBlend2D::SBAnimationBlend2D() : SBAnimationBlend("unknown")
 {
 }
@@ -1641,6 +1877,12 @@ void SBAnimationBlend2D::setParameter(const std::string& motion, float parameter
 void SBAnimationBlend2D::addTriangle(const std::string& motion1, const std::string& motion2, const std::string& motion3)
 {
 	PABlend::addTriangle(motion1, motion2, motion3);
+}
+
+SBMotion* SBAnimationBlend2D::createMotionFromBlend(SrVec parameters, SBCharacter* character)
+{
+	// fix this, this is incorrect
+	return getSBMotion(0);
 }
 
 SBAnimationBlend3D::SBAnimationBlend3D() : SBAnimationBlend("unknown")
@@ -1686,6 +1928,12 @@ void SBAnimationBlend3D::setParameter(const std::string& motion, float parameter
 void SBAnimationBlend3D::addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4)
 {
 	PABlend::addTetrahedron(motion1, motion2, motion3, motion4);
+}
+
+SBMotion* SBAnimationBlend3D::createMotionFromBlend(SrVec parameters, SBCharacter* character)
+{
+	// fix this, this is incorrect
+	return getSBMotion(0);
 }
 
 }

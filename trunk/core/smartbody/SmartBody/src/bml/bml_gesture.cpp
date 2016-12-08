@@ -11,10 +11,14 @@
 #include <sb/SBGestureMap.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBGestureMapManager.h>
+#include <sb/SBRetargetManager.h>
+#include <sb/SBRetarget.h>
 #include <sb/SBSteerManager.h>
 #include <sb/SBSteerAgent.h>
 #include <sb/SBBehavior.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBAnimationStateManager.h>
+#include <sb/SBAnimationState.h>
 #include <controllers/me_ct_motion.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <sbm/PPRAISteeringAgent.h>
@@ -39,18 +43,32 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	const XMLCh* modeAttr = elem->getAttribute(BMLDefs::ATTR_MODE);
 	const XMLCh* styleAttr = elem->getAttribute(BMLDefs::ATTR_STYLE);
 	const XMLCh* priorityAttr = elem->getAttribute(BMLDefs::ATTR_PRIORITY_JOINT);
+
+	const XMLCh* xVal = elem->getAttribute(BMLDefs::ATTR_X);
+	const XMLCh* yVal = elem->getAttribute(BMLDefs::ATTR_Y);
+	const XMLCh* zVal = elem->getAttribute(BMLDefs::ATTR_Z);
+
 	std::string animationName;
 	std::string localId;
 	std::string lexeme;
 	std::string type;
 	std::string mode;
 	std::string style;
+
+	std::string xvalStr;
+	std::string yvalStr;
+	std::string zvalStr;
+
 	xml_utils::xml_translate(&localId, id);
 	xml_utils::xml_translate(&animationName, animName);
 	xml_utils::xml_translate(&lexeme, lexemeAttr);
 	xml_utils::xml_translate(&type, typeAttr);
 	xml_utils::xml_translate(&mode, modeAttr);
 	xml_utils::xml_translate(&style, styleAttr);
+
+	xml_utils::xml_translate(&xvalStr, xVal);
+	xml_utils::xml_translate(&yvalStr, yVal);
+	xml_utils::xml_translate(&zvalStr, zVal);
 
 	bool isAdditive = false;
 	std::string additiveStr = xml_parse_string( BMLDefs::ATTR_ADDITIVE, elem, "false" );	
@@ -137,6 +155,34 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		return BehaviorRequestPtr();
 	}
 	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(animationName);
+
+	if (!motion) // gesture might be a blend, and not a simple motion
+	{
+		SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(animationName);
+		if (!blend)
+		{
+			LOG("Could not find blend named '%s' for gestures. Gesture will not be played.");
+			return BehaviorRequestPtr();
+		}
+
+		// compose a new motion consisting of the motion blend 
+		// including new sync points. Use that new motion as input into the gesture pipeline.
+		SrVec params(atof(xvalStr.c_str()), atof(yvalStr.c_str()), atof(zvalStr.c_str()));
+		motion = blend->createMotionFromBlend(params, character);
+
+
+		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(motion);
+
+		// perform a retargeting if needed
+		std::string blendSkeleton = blend->getBlendSkeleton();
+		if (blendSkeleton != "")
+		{
+			motion->setMotionSkeletonName(blendSkeleton);
+		}
+		
+		
+
+	}
 
 	if (motion)
 	{
