@@ -1533,7 +1533,7 @@ bool SBAnimationBlend::addMotionRef( SBMotion* sbmotion)
 }
 
 
-SBMotion* SBAnimationBlend::createMotionFromBlend(SrVec parameters, SBCharacter* character)
+SBMotion* SBAnimationBlend::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName)
 {
 	return NULL;
 }
@@ -1580,7 +1580,7 @@ void SBAnimationBlend0D::removeMotion(const std::string& motion)
 	removeSkMotion(motion);
 }
 
-SBMotion* SBAnimationBlend0D::createMotionFromBlend(SrVec parameters, SBCharacter* character)
+SBMotion* SBAnimationBlend0D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName)
 {
 	return getSBMotion(0);
 }
@@ -1628,7 +1628,7 @@ void SBAnimationBlend1D::setParameter(const std::string& motion, float parameter
 	PABlend::setParameter(motion, parameter);
 }
 
-SBMotion* SBAnimationBlend1D::createMotionFromBlend(SrVec parameters, SBCharacter* character)
+SBMotion* SBAnimationBlend1D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName)
 {
 	// let's start by assuming no keys and a linear retiming from one animation to another
 	double amount = parameters[0];
@@ -1639,13 +1639,9 @@ SBMotion* SBAnimationBlend1D::createMotionFromBlend(SrVec parameters, SBCharacte
 		return NULL;
 
 	double blendedMotionLength = (1.0 - amount) * motion1->getDuration() +  amount * motion2->getDuration();
-	
-	std::stringstream strstr;
-	strstr.precision(2);
-	strstr << this->getName() << "_" << parameters[0] << "_" << parameters[1] << "_" << parameters[2];
-	
+
 	SBMotion* motion = new SBMotion();
-	motion->setName(strstr.str());
+	motion->setName(motionName);
 	
 	SkChannelArray channelArray;
 	this->getAllChannels(channelArray);
@@ -1879,7 +1875,7 @@ void SBAnimationBlend2D::addTriangle(const std::string& motion1, const std::stri
 	PABlend::addTriangle(motion1, motion2, motion3);
 }
 
-SBMotion* SBAnimationBlend2D::createMotionFromBlend(SrVec parameters, SBCharacter* character)
+SBMotion* SBAnimationBlend2D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName)
 {
 	// fix this, this is incorrect
 	return getSBMotion(0);
@@ -1930,7 +1926,7 @@ void SBAnimationBlend3D::addTetrahedron(const std::string& motion1, const std::s
 	PABlend::addTetrahedron(motion1, motion2, motion3, motion4);
 }
 
-SBMotion* SBAnimationBlend3D::createMotionFromBlend(SrVec parameters, SBCharacter* character)
+SBMotion* SBAnimationBlend3D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName)
 {
 	// fix this, this is incorrect
 	return getSBMotion(0);

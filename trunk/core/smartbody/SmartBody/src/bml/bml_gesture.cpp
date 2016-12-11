@@ -17,6 +17,7 @@
 #include <sb/SBSteerAgent.h>
 #include <sb/SBBehavior.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBMotion.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationState.h>
 #include <controllers/me_ct_motion.h>
@@ -168,20 +169,27 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		// compose a new motion consisting of the motion blend 
 		// including new sync points. Use that new motion as input into the gesture pipeline.
 		SrVec params(atof(xvalStr.c_str()), atof(yvalStr.c_str()), atof(zvalStr.c_str()));
-		motion = blend->createMotionFromBlend(params, character);
 
+		std::stringstream strstr;
+		strstr.precision(2);
+		strstr << xVal << "_" << yVal << "_" << "_" << zVal;
+		std::string tempString = strstr.str();
+		std::string nameStr = vhcl::Replace(tempString, ".", "_");
+		std::stringstream strstr2;
+		strstr2 << blend->getName() << "_" << nameStr;
+		std::string blendedMotionName = strstr2.str();
 
-		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(motion);
-
-		// perform a retargeting if needed
-		std::string blendSkeleton = blend->getBlendSkeleton();
-		if (blendSkeleton != "")
+		motion = SmartBody::SBScene::getScene()->getMotion(blendedMotionName);
+		if (!motion)
 		{
-			motion->setMotionSkeletonName(blendSkeleton);
+			motion = blend->createMotionFromBlend(params, character, blendedMotionName);
+			// perform a retargeting if needed
+			std::string blendSkeleton = blend->getBlendSkeleton();
+			if (blendSkeleton != "")
+			{
+				motion->setMotionSkeletonName(blendSkeleton);
+			}
 		}
-		
-		
-
 	}
 
 	if (motion)
@@ -300,7 +308,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 
 
 
-		SkMotion* mForCt = motion;
+		SmartBody::SBMotion* mForCt = motion;
 		MeCtMotion* motionCt = new MeCtMotion();
 		if (isAdditive)
 		{
@@ -318,12 +326,12 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		// pre stroke hold
 		float prestrokehold = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_PRESTROKE_HOLD, elem, -1.0);
 		std::string prestrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_PRESTROKE_HOLD_IDLEMOTION, elem);
-		SkMotion* preIdleMotion = (SkMotion*)SmartBody::SBScene::getScene()->getMotion(prestrokehold_idlemotion);
+		SmartBody::SBMotion* preIdleMotion = SmartBody::SBScene::getScene()->getMotion(prestrokehold_idlemotion);
 		if (prestrokehold > 0)
-			mForCt = motion->buildPrestrokeHoldMotion(prestrokehold, preIdleMotion);
+			mForCt = dynamic_cast<SmartBody::SBMotion*>(motion->buildPrestrokeHoldMotion(prestrokehold, preIdleMotion));
 		float poststrokehold = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_POSTSTROKE_HOLD, elem, -1.0);
 		std::string poststrokehold_idlemotion = xml_utils::xml_parse_string(BMLDefs::ATTR_POSTSTROKE_HOLD_IDLEMOTION, elem);
-		SkMotion* postIdleMotion = (SkMotion*)SmartBody::SBScene::getScene()->getMotion(poststrokehold_idlemotion);
+		SmartBody::SBMotion* postIdleMotion = SmartBody::SBScene::getScene()->getMotion(poststrokehold_idlemotion);
 		
 		// post stroke hold (it's alternative to setting stroke and relax time)
 		std::string joints = xml_utils::xml_parse_string(BMLDefs::ATTR_JOINT_RANGE, elem);
@@ -335,7 +343,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		{
 			std::vector<std::string> jointVec;
 			vhcl::Tokenize(joints, jointVec);
-			mForCt = mForCt->buildPoststrokeHoldMotion(poststrokehold, jointVec, scale, freq, postIdleMotion);
+			mForCt = dynamic_cast<SmartBody::SBMotion*>(mForCt->buildPoststrokeHoldMotion(poststrokehold, jointVec, scale, freq, postIdleMotion));
 			SmartBody::SBMotion* sbMForCT = dynamic_cast<SmartBody::SBMotion*>(mForCt);
 			if (sbMForCT)
 				sbMForCT->setMotionSkeletonName(motion->getMotionSkeletonName());
