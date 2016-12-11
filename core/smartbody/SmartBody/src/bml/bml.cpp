@@ -1907,7 +1907,7 @@ void GestureRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* sc
 	double motionRelax = motion->time_relax();
 	
 	double holdTime = (relaxAt - strokeEndAt) - (motionRelax - motionStrokeEnd);
-	if (holdTime > 0)
+	if (holdTime > 0.01)
 	{	
 		std::vector<std::string> jointVec;
 		if (sbMotion)

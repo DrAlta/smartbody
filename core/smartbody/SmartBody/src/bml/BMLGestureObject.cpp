@@ -31,6 +31,10 @@ BMLGestureObject::BMLGestureObject() : BMLObject()
 	createStringAttribute("sbm:style", "", "", "Basic", 80, false, false, false, "Style of the gestures. Used to differentiate gestures with same type, posture and mode.");
 	createBoolAttribute("sbm:additive", false, true, "Basic", 90, false, false, false, "Whether this gesture is additive or not.");
 
+	createStringAttribute("x", "", "", "Basic", 94, false, false, false, "Parameter X, first gesture blend parameter.");
+	createStringAttribute("y", "", "", "Basic", 95, false, false, false, "Parameter Y, second gesture blend parameter.");
+	createStringAttribute("z", "", "", "Basic", 96, false, false, false, "Parameter Z, third gesture blend parameter.");
+
 	//createStringAttribute("target", "", "", "Basic", 90, false, false, false, "Target for POINT and REACH gestures.");
 	createStringAttribute("start", "", "", "Basic", 100, false, false, false, "Time when gesture starts.");
 	createStringAttribute("ready", "", "", "Basic", 110, false, false, false, "Time when gesture is fully blended in.");

@@ -42,6 +42,7 @@ sinbadPos = SrVec(0,5.16, 0)
 sinbad.setPosition(sinbadPos)
 sinbad.createStandardControllers()
 sinbad.setStringAttribute('deformableMesh', 'Sinbad.mesh.xml')
+
 # setup locomotion
 scene.run('BehaviorSetMaleLocomotion.py')
 setupBehaviorSet()
@@ -50,7 +51,16 @@ retargetBehaviorSet(sinbadName)
 scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
 retargetBehaviorSet(sinbadName)
+# setup gestures
+scene.run('BehaviorSetGestures.py')
+setupBehaviorSet()
+retargetBehaviorSet(sinbadName)
+
+
+
 sinbad.setStringAttribute("displayType", "GPUmesh")
+
+
 
 print 'Configuring scene parameters and camera'
 scene.setBoolAttribute('internalAudio', True)

@@ -105,7 +105,7 @@ class SBAnimationBlend : public PABlend
 		SBAPI const SrMat& getPlotVectorFlowTransform() { return plotVectorFlowTransform; }
 		SBAPI void clearPlotVectorFlowTransform() { plotVectorFlowTransform.identity(); }
 
-		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character);
+		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName);
 		SBAPI void getAllChannels(SkChannelArray& channels);
 
 		bool addMotionRef( SBMotion* sbmotion );
@@ -149,7 +149,7 @@ class SBAnimationBlend0D : public SBAnimationBlend
 		SBAPI ~SBAnimationBlend0D();		
 		SBAPI virtual void addMotion(const std::string& motion);
 		SBAPI virtual void removeMotion(const std::string& motionName);
-		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character);
+		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName);
 		
 };
 
@@ -164,7 +164,7 @@ class SBAnimationBlend1D : public SBAnimationBlend
 		SBAPI virtual void addMotion(const std::string& motion, float parameter);
 		SBAPI virtual void removeMotion(const std::string& motionName);
 		SBAPI void setParameter(const std::string& motion, float parameter);
-		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character);
+		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName);
 };
 
 class SBAnimationBlend2D : public SBAnimationBlend
@@ -178,7 +178,7 @@ class SBAnimationBlend2D : public SBAnimationBlend
 		SBAPI virtual void removeMotion(const std::string& motionName);
 		SBAPI void setParameter(const std::string& motion, float parameter1, float parameter2);
 		SBAPI void addTriangle(const std::string& motion1, const std::string& motion2, const std::string&motion3);
-		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character);
+		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName);
 };
 
 class SBAnimationBlend3D : public SBAnimationBlend
@@ -192,7 +192,7 @@ class SBAnimationBlend3D : public SBAnimationBlend
 		SBAPI virtual void removeMotion(const std::string& motionName);
 		SBAPI void setParameter(const std::string& motion, float parameter1, float parameter2, float parameter3);
 		SBAPI void addTetrahedron(const std::string& motion1, const std::string& motion2, const std::string& motion3, const std::string& motion4);
-		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character);
+		SBAPI virtual SBMotion* createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName);
 
 };
 }
