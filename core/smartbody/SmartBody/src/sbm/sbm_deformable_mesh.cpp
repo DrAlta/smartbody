@@ -558,6 +558,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	std::vector<SkinWeight*> skinWeightList;
 	meshIndexList.clear();
 	boneJointIdxMap.clear();
+	bindPoseMatList.clear();
 	LOG("dynamic mesh size = %d, skin weight size = %d",dMeshDynamic_p.size(), skinWeights.size());
 	if (buildSkinnedBuffer)
 	{
