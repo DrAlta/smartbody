@@ -3588,7 +3588,21 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 				// write-out bind material for this mesh
 				fprintf(fp,"<bind_material>\n");
 				fprintf(fp,"<technique_common>\n");
-				fprintf(fp,"<instance_material symbol=\"%s\" target=\"#%s\"/>\n",matID.c_str(),matName.c_str());
+				//fprintf(fp,"<instance_material symbol=\"%s\" target=\"#%s\"/>\n",matID.c_str(),matName.c_str());
+				if (model.mtlnames.size() > 0)
+				{
+					for (unsigned int k=0;k<model.mtlnames.size();k++)
+					{
+						matName = model.mtlnames[k];
+						matID = matName+"_SG";
+						fprintf(fp,"<instance_material symbol=\"%s\" target=\"#%s\"/>\n",matID.c_str(),matName.c_str());
+					}
+				}
+				else
+				{
+					fprintf(fp,"<instance_material symbol=\"%s\" target=\"#%s\"/>\n",matID.c_str(),matName.c_str());
+				}
+
 				fprintf(fp,"</technique_common>\n");
 				fprintf(fp,"</bind_material>\n");
 				fprintf(fp,"</instance_controller>\n");
@@ -3612,7 +3626,21 @@ bool ParserOpenCOLLADA::exportVisualScene( FILE* fp, std::string skeletonName, s
 				// write-out bind material for this mesh
 				fprintf(fp,"<bind_material>\n");
 				fprintf(fp,"<technique_common>\n");
-				fprintf(fp,"<instance_material symbol=\"%s\" target=\"#%s\"/>\n",matID.c_str(),matName.c_str());
+				if (model.mtlnames.size() > 0)
+				{
+					for (unsigned int k=0;k<model.mtlnames.size();k++)
+					{
+						matName = model.mtlnames[k];
+						matID = matName+"_SG";
+						fprintf(fp,"<instance_material symbol=\"%s\" target=\"#%s\"/>\n",matID.c_str(),matName.c_str());
+					}
+				}
+				else
+				{
+					fprintf(fp,"<instance_material symbol=\"%s\" target=\"#%s\"/>\n",matID.c_str(),matName.c_str());
+				}
+				
+				
 				fprintf(fp,"</technique_common>\n");
 				fprintf(fp,"</bind_material>\n");
 				fprintf(fp,"</node>\n");
@@ -3638,10 +3666,21 @@ void ParserOpenCOLLADA::writeJointNode( FILE* fp, SmartBody::SBJoint* joint, dou
 	fprintf(fp,"<translate sid=\"translate\">%f %f %f</translate>\n", pos[0],pos[1],pos[2]);
 	// output joint pre-rotation & orientation
 	SrQuat quat = joint->quat()->orientation()*joint->quat()->prerot();
-	SrVec eulerPrerot = quat.getEuler();
+	SrMat rotMat; quat.get_mat(rotMat);
+	SrVec eulerPrerot;// = quat.getEuler();
+	//sr_euler_angles_zyx(rotMat, eulerPrerot[0], eulerPrerot[1], eulerPrerot[2]);
+	sr_euler_angles_xyz(rotMat, eulerPrerot[0], eulerPrerot[1], eulerPrerot[2]);
+	for (int i=0;i<3;i++)
+		eulerPrerot[i] = sr_todeg(eulerPrerot[i]);
+#if 0
 	fprintf(fp,"<rotate sid=\"rotateY\">0 1 0 %f</rotate>\n",eulerPrerot[1]);	
 	fprintf(fp,"<rotate sid=\"rotateX\">1 0 0 %f</rotate>\n",eulerPrerot[0]);	
 	fprintf(fp,"<rotate sid=\"rotateZ\">0 0 1 %f</rotate>\n",eulerPrerot[2]);	
+#else
+	fprintf(fp,"<rotate sid=\"jointOrientZ\">0 0 1 %f</rotate>\n",eulerPrerot[2]);	
+	fprintf(fp,"<rotate sid=\"jointOrientY\">0 1 0 %f</rotate>\n",eulerPrerot[1]);	
+	fprintf(fp,"<rotate sid=\"jointOrientX\">1 0 0 %f</rotate>\n",eulerPrerot[0]);	
+#endif
 #if 0
 	SrQuat jorient = joint->quat()->orientation();
 	SrVec eulerOrient = jorient.getEuler();
