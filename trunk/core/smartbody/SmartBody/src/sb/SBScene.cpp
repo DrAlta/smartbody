@@ -3391,7 +3391,7 @@ void SBScene::saveLights(std::stringstream& strstr, bool remoteSetup)
 			 iter++)
 		{
 			SmartBody::SBAttribute* attr = pawn->getAttribute((*iter));
-			if (!attr->isDefaultValue())
+			if (true) // !attr->isDefaultValue())
 			{
 				std::string attrWrite = attr->write();
 				strstr << attrWrite;
