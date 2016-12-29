@@ -109,9 +109,26 @@ def setupBehaviorSet():
 			zebra2Map.applyMotion(motion)				
 		
 	print "| BradGestureMap.py |"
+	
+	# create sped-up versions of the gestures
+	for s in range(1, len(gestureMotions)):
+		m = scene.getMotion(gestureMotions[s])
+		n = m.copy(gestureMotions[s] + "2x")
+		n.speed(2)
+		scene.getAssetManager().addMotion(n)
+		
 
+	# create a set of blends between the 1x and the 2x speed motions
+	skeleton = "ChrBrad2.sk"
+	for s in range(1, len(gestureMotions)):
+		stateTest = scene.getBlendManager().createState1D(gestureMotions[s] + "Blend")
+		stateTest.setBlendSkeleton(skeleton)
+		stateTest.addMotion(gestureMotions[s], 0.0)
+		stateTest.addMotion(gestureMotions[s] + "2x", 1.0)
+	
 	# establish gesture data set
 	gMapManager = getScene().getGestureMapManager()
+	
 
 	# Brad's gestures
 	#neutral
@@ -181,69 +198,106 @@ def setupBehaviorSet():
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_ChopLf01", "METAPHORIC", "OBLIGATION", "LEFT_HAND", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("ChopLf", "METAPHORIC", "OBLIGATION", "LEFT_HAND", "", "ChrBrad@Idle01")
 
-	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopRt02", "METAPHORIC", "OBLIGATION", "RIGHT_HAND", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopBoth01", "METAPHORIC", "OBLIGATION", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopRt02Blend", "METAPHORIC", "OBLIGATION", "RIGHT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopBoth01Blend", "METAPHORIC", "OBLIGATION", "BOTH_HANDS", "", "ChrBrad@Idle01")
 
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf01", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf02", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowRt01", "BEAT", "RHYTHM", "RIGHT_HAND", "", "ChrBrad@Idle01")
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowBt01", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
+
+	# Begin STACY ADDING HERE
+	# hands terrible
+	# "ChrBrad@Idle01_BeatHighLf01"
+	# "ChrBrad@Idle01_BeatLowBt01"
+	# BeatLowLf01 and 02 
+
+	# Both hands
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatHighBt01Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatHighBt02Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatHighBt03Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidBt01Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopBoth01Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_Shrug02Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
+
+	# Left hand
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatFistMidLf01Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatFistMidLf02Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidLf01Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatPointMidLf01Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BesidesLf01Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopLf01Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopLf02Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_PointLf02Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_SafeLf01Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_YouLf02Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_YouPoint01Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+
+	# Right Hand
+	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopRt02Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_PointRt01Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
+        gMapB1.addGestureMapping("ChrBrad@Idle01_WeRt02Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
+
+
+
+	# End STACY ADDING HERE
+
 	gMapB1.addGestureMapping("BeatLowBt", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
 
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatHighLf01", "DEICTIC", "LEFT", "LEFT_HAND", "high", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidLf01", "DEICTIC", "LEFT", "LEFT_HAND", "high", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_HoweverLf01", "DEICTIC", "LEFT", "LEFT_HAND", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_IndicateLeftLf01", "DEICTIC", "LEFT", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatHighLf01Blend", "DEICTIC", "LEFT", "LEFT_HAND", "high", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidLf01Blend", "DEICTIC", "LEFT", "LEFT_HAND", "high", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_HoweverLf01Blend", "DEICTIC", "LEFT", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_IndicateLeftLf01Blend", "DEICTIC", "LEFT", "LEFT_HAND", "", "ChrBrad@Idle01")
 
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowRt01", "DEICTIC", "RIGHT", "RIGHT_HAND", "high", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_IndicateRightRt01", "DEICTIC", "RIGHT", "RIGHT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowRt01Blend", "DEICTIC", "RIGHT", "RIGHT_HAND", "high", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_IndicateRightRt01Blend", "DEICTIC", "RIGHT", "RIGHT_HAND", "", "ChrBrad@Idle01")
 
 	# gMapB1.addGestureMapping("ChrBrad@Idle01_HereBt02", "DEICTIC", "HERE", "BOTH_HANDS", "high", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("HereBt", "DEICTIC", "HERE", "BOTH_HANDS", "high", "ChrBrad@Idle01")
 	# gMapB1.addGestureMapping("ChrBrad@Idle01_ChopBoth01", "DEICTIC", "HERE", "BOTH_HANDS", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowBt01", "DEICTIC", "HERE", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowBt01Blend", "DEICTIC", "HERE", "BOTH_HANDS", "", "ChrBrad@Idle01")
 	# gMapB1.addGestureMapping("ChrBrad@Idle01_Frame", "DEICTIC", "HERE", "BOTH_HANDS", "", "ChrBrad@Idle01")
 
-	gMapB1.addGestureMapping("ChrBrad@Idle01_NegativeBt02", "METAPHORIC", "NEGATION", "BOTH_HANDS", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_NegativeRt01", "METAPHORIC", "NEGATION", "RIGHT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_NegativeBt02Blend", "METAPHORIC", "NEGATION", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_NegativeRt01Blend", "METAPHORIC", "NEGATION", "RIGHT_HAND", "", "ChrBrad@Idle01")
 
-	gMapB1.addGestureMapping("ChrBrad@Idle01_SafeLf01", "METAPHORIC", "ASIDE", "LEFT_HAND", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BesidesLf01", "METAPHORIC", "ASIDE", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_SafeLf01Blend", "METAPHORIC", "ASIDE", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BesidesLf01Blend", "METAPHORIC", "ASIDE", "LEFT_HAND", "", "ChrBrad@Idle01")
 
 
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidBt01", "METAPHORIC", "QUESTION", "BOTH_HANDS", "noheadtilt", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidLf01", "METAPHORIC", "QUESTION", "LEFT_HAND", "noheadtilt", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidBt01Blend", "METAPHORIC", "QUESTION", "BOTH_HANDS", "noheadtilt", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidLf01Blend", "METAPHORIC", "QUESTION", "LEFT_HAND", "noheadtilt", "ChrBrad@Idle01")
 
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_YouLf01", "DEICTIC", "YOU", "LEFT_HAND", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("YouLf", "DEICTIC", "YOU", "LEFT_HAND", "", "ChrBrad@Idle01")
 	
-	gMapB1.addGestureMapping("ChrBrad@Idle01_OfferBoth01", "DEICTIC", "YOU", "BOTH_HANDS", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_OfferLf01", "DEICTIC", "YOU", "LEFT_HAND", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_ReceiveRt01", "DEICTIC", "YOU", "RIGHT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_OfferBoth01Blend", "DEICTIC", "YOU", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_OfferLf01Blend", "DEICTIC", "YOU", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_ReceiveRt01Blend", "DEICTIC", "YOU", "RIGHT_HAND", "", "ChrBrad@Idle01")
 
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowBt01", "METAPHORIC", "INTENSIFIER_POSITIVE", "BOTH_HANDS", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidBt01", "METAPHORIC", "INTENSIFIER_POSITIVE", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowBt01Blend", "METAPHORIC", "INTENSIFIER_POSITIVE", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidBt01Blend", "METAPHORIC", "INTENSIFIER_POSITIVE", "BOTH_HANDS", "", "ChrBrad@Idle01")
 
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_MeLf01", "DEICTIC", "ME", "LEFT_HAND", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("MeLf", "DEICTIC", "ME", "LEFT_HAND", "", "ChrBrad@Idle01")
 	
-	gMapB1.addGestureMapping("ChrBrad@Idle01_WeRt01", "DEICTIC", "WE", "RIGHT_HAND", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_WeRt02", "DEICTIC", "WE", "RIGHT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_WeRt01Blend", "DEICTIC", "WE", "RIGHT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_WeRt02Blend", "DEICTIC", "WE", "RIGHT_HAND", "", "ChrBrad@Idle01")
 
 
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf01", "METAPHORIC", "CONTRAST", "LEFT_HAND", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowRt01", "METAPHORIC", "CONTRAST", "RIGHT_HAND", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf02", "METAPHORIC", "CONTRAST", "LEFT_HAND", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_IndicateRightR01", "METAPHORIC", "CONTRAST", "RIGHT_HAND", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_HoweverLf01", "METAPHORIC", "CONTRAST", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf01Blend", "METAPHORIC", "CONTRAST", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowRt01Blend", "METAPHORIC", "CONTRAST", "RIGHT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf02Blend", "METAPHORIC", "CONTRAST", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_IndicateRightR01Blend", "METAPHORIC", "CONTRAST", "RIGHT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_HoweverLf01Blend", "METAPHORIC", "CONTRAST", "LEFT_HAND", "", "ChrBrad@Idle01")
 
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_BeatHighBt01", "METAPHORIC", "QUESTION", "BOTH_HANDS", "noheadtilt", "ChrBrad@Idle01")
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_BeatHighBt02", "METAPHORIC", "QUESTION", "BOTH_HANDS", "noheadtilt", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("BeathHighBt", "METAPHORIC", "QUESTION", "BOTH_HANDS", "noheadtilt", "ChrBrad@Idle01")
 	
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowBt01", "METAPHORIC", "QUESTION", "BOTH_HANDS", "noheadtilt", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidBt01", "METAPHORIC", "QUESTION", "BOTH_HANDS", "noheadtilt", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidLf01", "METAPHORIC", "QUESTION", "LEFT_HAND", "noheadtilt", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowBt01Blend", "METAPHORIC", "QUESTION", "BOTH_HANDS", "noheadtilt", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidBt01Blend", "METAPHORIC", "QUESTION", "BOTH_HANDS", "noheadtilt", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidLf01Blend", "METAPHORIC", "QUESTION", "LEFT_HAND", "noheadtilt", "ChrBrad@Idle01")
 
 
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_Shrug01", "METAPHORIC", "UNCERTAINTY", "BOTH_HANDS", "", "ChrBrad@Idle01")
@@ -253,8 +307,8 @@ def setupBehaviorSet():
 	gMapB1.addGestureMapping("Shrug", "METAPHORIC", "INDIFFERENCE", "BOTH_HANDS", "", "ChrBrad@Idle01")
 
 	#metaphoric inclusivity
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidBt01", "METAPHORIC", "INCLUSIVITY", "BOTH_HANDS", "mid", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowBt01", "METAPHORIC", "INCLUSIVITY", "BOTH_HANDS", "low", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidBt01Blend", "METAPHORIC", "INCLUSIVITY", "BOTH_HANDS", "mid", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowBt01Blend", "METAPHORIC", "INCLUSIVITY", "BOTH_HANDS", "low", "ChrBrad@Idle01")
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_InclusivityPosBt01", "METAPHORIC", "INCLUSIVITY", "BOTH_HANDS", "low", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("InclusivityPosBt", "METAPHORIC", "INCLUSIVITY", "BOTH_HANDS", "low", "ChrBrad@Idle01")
 
@@ -263,7 +317,7 @@ def setupBehaviorSet():
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_NegativeBt02", "METAPHORIC", "EMPTY", "BOTH_HANDS", "high", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("NegativeBt", "METAPHORIC", "EMPTY", "BOTH_HANDS", "high", "ChrBrad@Idle01")
 	
-	gMapB1.addGestureMapping("ChrBrad@Idle01_NegativeRt01", "METAPHORIC", "EMPTY", "RIGHT_HAND", "high", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_NegativeRt01Blend", "METAPHORIC", "EMPTY", "RIGHT_HAND", "high", "ChrBrad@Idle01")
 
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_SurroundBt01", "METAPHORIC", "SURROUND", "BOTH_HANDS", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("SurroundBt", "METAPHORIC", "SURROUND", "BOTH_HANDS", "", "ChrBrad@Idle01")
@@ -271,8 +325,8 @@ def setupBehaviorSet():
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_StopBt01", "METAPHORIC", "STOP", "RIGHT_HAND", "", "ChrBrad@Idle02")
 	gMapB1.addGestureMapping("StopBt", "METAPHORIC", "STOP", "RIGHT_HAND", "", "ChrBrad@Idle02")
 
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf01", "EMBLEM", "GREETING", "LEFT_HAND", "", "ChrBrad@Idle01")
-	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowRt01", "EMBLEM", "GREETING", "RIGHT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf01Blend", "EMBLEM", "GREETING", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowRt01Blend", "EMBLEM", "GREETING", "RIGHT_HAND", "", "ChrBrad@Idle01")
 
 
 	# #metaphoric "UNCERTAINTY" to add (low energy shrug)
