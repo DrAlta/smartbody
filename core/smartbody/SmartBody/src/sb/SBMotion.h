@@ -126,6 +126,9 @@ class SBMotion : public SkMotion
 		SBAPI bool scale(float factor);		
 		SBAPI bool retime(float factor);
 		SBAPI bool downsample(int factor);
+		SBAPI SBMotion* SBMotion::copy(const std::string& motionName);
+		SBAPI bool SBMotion::speed(float factor);
+
 		SBAPI bool trim(int numFramesFromFront, int numFramesFromBack);
 	//	bool move(int startFrame, int endFrame, int position);
 		SBAPI void saveToSkm(const std::string& fileName);
