@@ -153,7 +153,9 @@ void pythonFuncsMotion()
 		.def("removeSimilarPose", &SBMotion::removeSimilarPose, "Removes a pose as being similar to this motion. This will be used by the gesture system to retarget gestures from one poses to a similar one.")
 		.def("getSimilarPoses", &SBMotion::getSimilarPoses, "Retrieves all the similar pose.")
 		.def("unrollPrerotation", &SBMotion::unrollPrerotation, "Remove pre-rotation from joints.")		
-		.def("addTemporalRotationOffset", &SBMotion::addTemporalRotationOffset, "Add a rotation offset on a joint.")		
+		.def("addTemporalRotationOffset", &SBMotion::addTemporalRotationOffset, "Add a rotation offset on a joint.")	
+		.def("copy", &SBMotion::copy, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Copy the motion to a new motion with a given name.")
+		.def("speed", &SBMotion::speed, "Changes the speed of the motion by the given scaling factor.")
 		;
 
 	boost::python::class_<SBMotionNode>("SBMotionNode")

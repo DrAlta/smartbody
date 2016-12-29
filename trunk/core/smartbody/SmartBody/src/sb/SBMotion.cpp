@@ -3411,4 +3411,64 @@ SBAPI void SBMotion::saveToBVH( const std::string& fileName, const std::string& 
 	fclose(fp);
 }
 
+SBMotion* SBMotion::copy(const std::string& motionName)
+{
+	SBMotion* newMotion = new SBMotion();
+	newMotion->setName(motionName);
+
+	SkChannelArray& ch = channels();
+	int numFrames = frames();
+	SmartBody::SBMotion* originalMotion = dynamic_cast<SmartBody::SBMotion*>(this);
+	newMotion->setMotionSkeletonName(originalMotion->getMotionSkeletonName());
+	std::string filebase = boost::filesystem::basename(this->getFullFilePath());
+	
+	newMotion->filename(filebase.c_str());
+	newMotion->init(ch);
+	//float* baseP = this->posture(0);
+	for (int f = 0; f < this->_frames.size(); f++)
+	{
+		newMotion->insert_frame(f, this->_frames[f].keytime);
+		float* ref_p = posture(f);
+		float *new_p = newMotion->posture(f);
+		memcpy(new_p, ref_p, sizeof(float)*posture_size());
+	}
+	newMotion->setSyncPoint("start", this->getTimeStart());
+	newMotion->setSyncPoint("ready", this->getTimeReady());
+	newMotion->setSyncPoint("stroke_start", this->getTimeStrokeStart());
+	newMotion->setSyncPoint("stroke", this->getTimeStroke());
+	newMotion->setSyncPoint("stroke_stop", this->getTimeStrokeEnd());
+	newMotion->setSyncPoint("relax", this->getTimeRelax());
+	newMotion->setSyncPoint("stop", this->getTimeStop());
+	
+	return newMotion;
+}
+
+bool SBMotion::speed(float factor)
+{
+	if (factor <= 0.0)
+	{
+		LOG("Cannot speed up motion '%s'to a factor of %f, ignoring...", this->getName().c_str(), factor);
+		return false;
+	}
+
+	for (int f = 0; f < _frames.size(); f++)
+	{
+		_frames[f].keytime = _frames[f].keytime / factor;
+	}
+	
+	// modify the syncpoints according to the speed factor
+
+	this->setSyncPoint("start", getTimeStart() / factor);
+	this->setSyncPoint("ready", getTimeReady() / factor);
+	this->setSyncPoint("stroke_start", getTimeStrokeStart() / factor);
+	this->setSyncPoint("stroke", getTimeStroke() / factor);
+	this->setSyncPoint("stroke_stop", getTimeStrokeEnd() / factor);
+	this->setSyncPoint("relax", getTimeRelax() / factor);
+	this->setSyncPoint("stop", getTimeStop() / factor);
+
+	return true;
+}
+
+
+
 };
