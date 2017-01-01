@@ -2350,7 +2350,12 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 {
 	std::string finalFileName = filename;
 	bool isAbsolute = false;
-	if (filename.find("file://") != std::string::npos)
+	if (filename.find("file:///") != std::string::npos)
+	{
+		finalFileName = filename.substr(8);
+		isAbsolute = true;
+	}
+	else if (filename.find("file://") != std::string::npos)
 	{
 		finalFileName = filename.substr(7);
 		isAbsolute = true;
