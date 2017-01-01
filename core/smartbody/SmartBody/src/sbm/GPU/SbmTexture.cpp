@@ -309,9 +309,14 @@ SbmTexture::~SbmTexture(void)
 bool SbmTexture::loadImage( const char* fileName )
 {
     buffer = SOIL_load_image(fileName, &width, &height, &channels, SOIL_LOAD_AUTO);	
-    if (width < 0 || height < 0 || channels < 0)
-        return false;
-    else {
+	if (width < 0 || height < 0 || channels < 0)
+	{
+		const char* errorString = SOIL_last_result();
+		LOG("Image %s failed to load: [%s]", fileName, errorString);
+		return false;
+	}
+    else
+	{
         LOG("Loading image       :%s\t%d\t%d\t%d", fileName, width, height, channels );
     }
     //std::string testOutFileName = fileName;
