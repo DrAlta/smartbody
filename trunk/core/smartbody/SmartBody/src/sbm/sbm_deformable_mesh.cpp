@@ -17,7 +17,10 @@
 #include <sbm/gwiz_math.h>
 #include <sbm/GPU/SbmTexture.h>
 
-
+#include <google/protobuf/io/coded_stream.h>
+#include <google/protobuf/io/zero_copy_stream.h>
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
 #include <boost/algorithm/string.hpp>
 #include <protocols/sbmesh.pb.h>
@@ -211,7 +214,7 @@ SBAPI void SkinWeight::mergeRedundantWeight( std::vector<int>& vtxIdxMap )
 	for (unsigned int i=0;i<vtxIdxMap.size();i++)
 	{
 		int numJoint = numInfJoints[i];
-		int newIdx = vtxIdxMap[i];
+		unsigned int newIdx = vtxIdxMap[i];
 		if (newIdx >= newNumInfJoints.size())
 		{
 			newNumInfJoints.push_back(numJoint);
@@ -260,7 +263,7 @@ SBAPI void SkinWeight::buildSkinWeightBuf()
 	boneIDs.resize(numSkinVtxs);
 	boneWeights.resize(numSkinVtxs);
 	int globalCounter = 0;
-	for (int i = 0; i < numInfJoints.size() ; i++)
+	for (unsigned int i = 0; i < numInfJoints.size() ; i++)
 	{
 		int numOfInfJoints = numInfJoints[i];
 		
@@ -476,7 +479,7 @@ bool DeformableMesh::buildBlendShapes()
 	int meshIdx = getMesh(neutralName);
 	SrModel& neutralMesh = getStaticModel(meshIdx);
 	// build Kd-tree from posBuf
-	int numKNN = 10;
+	unsigned int numKNN = 10;
 	MeshPointCloud posCloud;
 	posCloud.pts = posBuf;
 	std::vector<float> knnPtDists(numKNN);
@@ -680,8 +683,8 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		nTotalVtxs += nVtx;				
 		nTotalTris += nFace;
 		
-		int numTris = dMeshStatic->shape().F.size();
-		for (int i=0; i < numTris ; i++)
+		unsigned int numTris = dMeshStatic->shape().F.size();
+		for (unsigned int i=0; i < numTris ; i++)
 		{
 			SrModel& model = dMeshStatic->shape();
 			if (dMeshStatic->shape().F.size() == 0)
@@ -814,9 +817,9 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		SrSnModel* dMeshStatic = dMeshStatic_p[pos];
 		SrSnModel* dMeshDynamic = dMeshDynamic_p[pos];
 		dMeshDynamic->visible(false);
-		int numVertices = dMeshStatic->shape().V.size();
-		int numNormals = dMeshStatic->shape().N.size();
-		int numTexCoords = dMeshStatic->shape().T.size();
+		unsigned int numVertices = dMeshStatic->shape().V.size();
+		unsigned int numNormals = dMeshStatic->shape().N.size();
+		unsigned int numTexCoords = dMeshStatic->shape().T.size();
 		SrMat bindShapeMat;
 		SkinWeight* skinWeight = NULL;
 		if (buildSkinnedBuffer)
@@ -824,7 +827,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			skinWeight = skinWeightList[c];
 			bindShapeMat = skinWeight->bindShapeMat;
 		}
-		for (int i = 0; i < numVertices; i++)
+		for (unsigned int i = 0; i < numVertices; i++)
 		{
 			
 			if (buildSkinnedBuffer)
@@ -980,7 +983,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			{
 				SrVec nvec;
 				SrPnt2 tvec	= SrPnt2(0,0);
-				int nidx	= nIdx[k];
+				unsigned int nidx	= nIdx[k];
 
 				if (dMeshStatic->shape().N.size() > nidx &&
 					nidx > 0)
@@ -1085,128 +1088,147 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 	// 1	StaticMesh	
 	outputStaticMesh->set_staticmeshname(getName());
 	// 2
+	std::vector<SrModel*> modelsToSave;
+	// prepare models
 	for (size_t i = 0; i < dMeshStatic_p.size(); ++i)
+	{
+		modelsToSave.push_back(&(dMeshStatic_p[i]->shape()));
+	}
+	// prepare morph targets
+	for (std::map<std::string, std::vector<SrSnModel*> >::iterator iter = blendShapeMap.begin();
+		iter != blendShapeMap.end();
+		iter++)
+	{
+		std::vector<SrSnModel*>& targets = (*iter).second;
+		for (size_t t = 0; t < targets.size(); t++)
+		{
+			SrModel& curModel = targets[t]->shape();
+			modelsToSave.push_back(&curModel);
+		}
+	}
+
+	for (size_t s = 0; s < modelsToSave.size(); s++)
 	{
 		SmartBodyBinary::MeshModel* newMeshModel = outputStaticMesh->add_meshmodels();
 		// 1	MeshModel
-		SrModel& curModel = dMeshStatic_p[i]->shape();
-		newMeshModel->set_meshname((const char*)curModel.name);
+		SrModel* curModel = modelsToSave[s];
+		newMeshModel->set_meshname((const char*)curModel->name);
 		// 2
-		for (unsigned int m = 0; m < curModel.M.size(); ++m)
+		for (unsigned int m = 0; m < curModel->M.size(); ++m)
 		{
 			SmartBodyBinary::Material* newMaterial = newMeshModel->add_materials();
 			// 1 Material
-			newMaterial->add_ambient(curModel.M[m].ambient.r);
-			newMaterial->add_ambient(curModel.M[m].ambient.g);
-			newMaterial->add_ambient(curModel.M[m].ambient.b);
-			newMaterial->add_ambient(curModel.M[m].ambient.a);
+			newMaterial->add_ambient(curModel->M[m].ambient.r);
+			newMaterial->add_ambient(curModel->M[m].ambient.g);
+			newMaterial->add_ambient(curModel->M[m].ambient.b);
+			newMaterial->add_ambient(curModel->M[m].ambient.a);
 			// 2
-			newMaterial->add_diffuse(curModel.M[m].diffuse.r);
-			newMaterial->add_diffuse(curModel.M[m].diffuse.g);
-			newMaterial->add_diffuse(curModel.M[m].diffuse.b);
-			newMaterial->add_diffuse(curModel.M[m].diffuse.a);
+			newMaterial->add_diffuse(curModel->M[m].diffuse.r);
+			newMaterial->add_diffuse(curModel->M[m].diffuse.g);
+			newMaterial->add_diffuse(curModel->M[m].diffuse.b);
+			newMaterial->add_diffuse(curModel->M[m].diffuse.a);
 			// 3
-			newMaterial->add_specular(curModel.M[m].specular.r);
-			newMaterial->add_specular(curModel.M[m].specular.g);
-			newMaterial->add_specular(curModel.M[m].specular.b);
-			newMaterial->add_specular(curModel.M[m].specular.a);
+			newMaterial->add_specular(curModel->M[m].specular.r);
+			newMaterial->add_specular(curModel->M[m].specular.g);
+			newMaterial->add_specular(curModel->M[m].specular.b);
+			newMaterial->add_specular(curModel->M[m].specular.a);
 			// 4
-			newMaterial->add_emission(curModel.M[m].emission.r);
-			newMaterial->add_emission(curModel.M[m].emission.g);
-			newMaterial->add_emission(curModel.M[m].emission.b);
-			newMaterial->add_emission(curModel.M[m].emission.a);
+			newMaterial->add_emission(curModel->M[m].emission.r);
+			newMaterial->add_emission(curModel->M[m].emission.g);
+			newMaterial->add_emission(curModel->M[m].emission.b);
+			newMaterial->add_emission(curModel->M[m].emission.a);
 			// 5
-			newMaterial->set_shininess(curModel.M[m].shininess);
+			newMaterial->set_shininess(curModel->M[m].shininess);
 			// 6
-			newMaterial->set_transparency(curModel.M[m].transparency);
+			newMaterial->set_transparency(curModel->M[m].transparency);
 			// 7
-			newMaterial->set_usealphablend(curModel.M[m].useAlphaBlend);
+			newMaterial->set_usealphablend(curModel->M[m].useAlphaBlend);
 
 		}
 		// 3
-		for (unsigned int v = 0; v < curModel.V.size(); ++v)
+		for (unsigned int v = 0; v < curModel->V.size(); ++v)
 		{
-			newMeshModel->add_vertexcoordinates(curModel.V[v].x);
-			newMeshModel->add_vertexcoordinates(curModel.V[v].y);
-			newMeshModel->add_vertexcoordinates(curModel.V[v].z);
+			newMeshModel->add_vertexcoordinates(curModel->V[v].x);
+			newMeshModel->add_vertexcoordinates(curModel->V[v].y);
+			newMeshModel->add_vertexcoordinates(curModel->V[v].z);
 		}
 		// 4
-		for (unsigned int n = 0; n < curModel.N.size(); ++n)
+		for (unsigned int n = 0; n < curModel->N.size(); ++n)
 		{
-			newMeshModel->add_normals(curModel.N[n].x);
-			newMeshModel->add_normals(curModel.N[n].y);
-			newMeshModel->add_normals(curModel.N[n].z);
+			newMeshModel->add_normals(curModel->N[n].x);
+			newMeshModel->add_normals(curModel->N[n].y);
+			newMeshModel->add_normals(curModel->N[n].z);
 		}
 		// 5
-		for (unsigned int n = 0; n < curModel.Tangent.size(); ++n)
+		for (unsigned int n = 0; n < curModel->Tangent.size(); ++n)
 		{
-			newMeshModel->add_tangents(curModel.Tangent[n].x);
-			newMeshModel->add_tangents(curModel.Tangent[n].y);
-			newMeshModel->add_tangents(curModel.Tangent[n].z);
+			newMeshModel->add_tangents(curModel->Tangent[n].x);
+			newMeshModel->add_tangents(curModel->Tangent[n].y);
+			newMeshModel->add_tangents(curModel->Tangent[n].z);
 		}
 		// 5
-		for (unsigned int n = 0; n < curModel.BiNormal.size(); ++n)
+		for (unsigned int n = 0; n < curModel->BiNormal.size(); ++n)
 		{
-			newMeshModel->add_binormals(curModel.BiNormal[n].x);
-			newMeshModel->add_binormals(curModel.BiNormal[n].y);
-			newMeshModel->add_binormals(curModel.BiNormal[n].z);
+			newMeshModel->add_binormals(curModel->BiNormal[n].x);
+			newMeshModel->add_binormals(curModel->BiNormal[n].y);
+			newMeshModel->add_binormals(curModel->BiNormal[n].z);
 		}
 		//7
-		for (unsigned int t = 0; t < curModel.T.size(); ++t)
+		for (unsigned int t = 0; t < curModel->T.size(); ++t)
 		{
-			newMeshModel->add_texturecoordinates(curModel.T[t].x);
-			newMeshModel->add_texturecoordinates(curModel.T[t].y);
+			newMeshModel->add_texturecoordinates(curModel->T[t].x);
+			newMeshModel->add_texturecoordinates(curModel->T[t].y);
 		}
 		//8
-		for (unsigned int t = 0; t < curModel.F.size(); ++t)
+		for (unsigned int t = 0; t < curModel->F.size(); ++t)
 		{
-			newMeshModel->add_trianglefaceindices(curModel.F[t][0]);
-			newMeshModel->add_trianglefaceindices(curModel.F[t][1]);
-			newMeshModel->add_trianglefaceindices(curModel.F[t][2]);
+			newMeshModel->add_trianglefaceindices(curModel->F[t][0]);
+			newMeshModel->add_trianglefaceindices(curModel->F[t][1]);
+			newMeshModel->add_trianglefaceindices(curModel->F[t][2]);
 		}
 		// 9
-		for (unsigned int t = 0; t < curModel.Fm.size(); ++t)
+		for (unsigned int t = 0; t < curModel->Fm.size(); ++t)
 		{
-			newMeshModel->add_materialindices(curModel.Fm[t]);
+			newMeshModel->add_materialindices(curModel->Fm[t]);
 		}
 		// 10
-		for (unsigned int t = 0; t < curModel.Fn.size(); ++t)
+		for (unsigned int t = 0; t < curModel->Fn.size(); ++t)
 		{
-			newMeshModel->add_normalindices(curModel.Fn[t][0]);
-			newMeshModel->add_normalindices(curModel.Fn[t][1]);
-			newMeshModel->add_normalindices(curModel.Fn[t][2]);
+			newMeshModel->add_normalindices(curModel->Fn[t][0]);
+			newMeshModel->add_normalindices(curModel->Fn[t][1]);
+			newMeshModel->add_normalindices(curModel->Fn[t][2]);
 		}
 		// 11
-		for (unsigned int t = 0; t < curModel.Ft.size(); ++t)
+		for (unsigned int t = 0; t < curModel->Ft.size(); ++t)
 		{
-			newMeshModel->add_texturecoordinatesindices(curModel.Ft[t][0]);
-			newMeshModel->add_texturecoordinatesindices(curModel.Ft[t][1]);
-			newMeshModel->add_texturecoordinatesindices(curModel.Ft[t][2]);
+			newMeshModel->add_texturecoordinatesindices(curModel->Ft[t][0]);
+			newMeshModel->add_texturecoordinatesindices(curModel->Ft[t][1]);
+			newMeshModel->add_texturecoordinatesindices(curModel->Ft[t][2]);
 		}
 		// 12
-		newMeshModel->set_culling(curModel.culling);
+		newMeshModel->set_culling(curModel->culling);
 		// 13
-		for (unsigned int m = 0; m < curModel.mtlnames.size(); ++m)
+		for (unsigned int m = 0; m < curModel->mtlnames.size(); ++m)
 		{
-			newMeshModel->add_materialnames( curModel.mtlnames[m].c_str());
+			newMeshModel->add_materialnames( curModel->mtlnames[m].c_str());
 		}
 		// 14
 		std::map<std::string,std::string>::iterator iter;
-		for (iter = curModel.mtlTextureNameMap.begin(); iter != curModel.mtlTextureNameMap.end(); ++iter)
+		for (iter = curModel->mtlTextureNameMap.begin(); iter != curModel->mtlTextureNameMap.end(); ++iter)
 		{
 			SmartBodyBinary::StringToStringMap* m2DiffuseMapping = newMeshModel->add_materialtodiffusetexturemapping();
 			m2DiffuseMapping->set_from(iter->first);
 			m2DiffuseMapping->set_to(iter->second);
 		}
 		// 15
-		for (iter = curModel.mtlNormalTexNameMap.begin(); iter != curModel.mtlNormalTexNameMap.end(); ++iter)
+		for (iter = curModel->mtlNormalTexNameMap.begin(); iter != curModel->mtlNormalTexNameMap.end(); ++iter)
 		{
 			SmartBodyBinary::StringToStringMap* m2NormalMapping = newMeshModel->add_materialtonormaltexturemapping();
 			m2NormalMapping->set_from(iter->first);
 			m2NormalMapping->set_to(iter->second);
 		}
 		// 16
-		for (iter = curModel.mtlSpecularTexNameMap.begin(); iter != curModel.mtlSpecularTexNameMap.end(); ++iter)
+		for (iter = curModel->mtlSpecularTexNameMap.begin(); iter != curModel->mtlSpecularTexNameMap.end(); ++iter)
 		{
 			SmartBodyBinary::StringToStringMap* m2SpecularMapping = newMeshModel->add_materialtospeculartexturemapping();
 			m2SpecularMapping->set_from(iter->first);
@@ -1214,7 +1236,7 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		}
 		// 17
 		std::map<std::string,std::vector<int> >::iterator iter1;
-		for (iter1 = curModel.mtlFaceIndices.begin(); iter1 != curModel.mtlFaceIndices.end(); ++iter1)
+		for (iter1 = curModel->mtlFaceIndices.begin(); iter1 != curModel->mtlFaceIndices.end(); ++iter1)
 		{
 			SmartBodyBinary::StringToIntVectorMap* m2FaceIndicesMapping = newMeshModel->add_materialtofaceindices();
 			m2FaceIndicesMapping->set_from(iter1->first);
@@ -1222,9 +1244,10 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 				m2FaceIndicesMapping->add_to(iter1->second[f]);
 		}
 	}
+	
 }
 
-void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
+void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh, std::vector<SrModel*>& models)
 {
 	SmartBodyBinary::StaticMesh staticMesh = *mesh;
 
@@ -1379,22 +1402,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh)
 			newModel->computeNormals();
 		}
 
-		SrSnModel* srSnModelStatic = new SrSnModel();
-		srSnModelStatic->shape(*newModel);
-		srSnModelStatic->shape().name = newModel->name;
-		srSnModelStatic->ref();
-
-		SrSnModel* srSnModelDynamic = new SrSnModel();
-		srSnModelDynamic->shape(*newModel);
-		srSnModelDynamic->changed(true);
-		srSnModelDynamic->visible(false);
-		srSnModelDynamic->shape().name = newModel->name;
-		srSnModelDynamic->ref();
-
-		dMeshStatic_p.push_back(srSnModelStatic);
-		dMeshDynamic_p.push_back(srSnModelDynamic);
-		delete newModel;
-
+		models.push_back(newModel);
 	}
 }
 
@@ -1497,6 +1505,7 @@ bool DeformableMesh::saveToSmb(std::string inputFileName)
 		return false;
 	}
 	google::protobuf::ShutdownProtobufLibrary();
+
 	return true;
 }
 
@@ -1586,35 +1595,144 @@ bool DeformableMesh::saveToDmb(std::string inputFileName)
 bool DeformableMesh::readFromSmb(std::string inputFileName)
 {
 	SmartBodyBinary::StaticMesh staticMesh;
+
 	std::fstream input(inputFileName.c_str(), std::ios::in | std::ios::binary);
-	if (!staticMesh.ParseFromIstream(&input)) 
+	google::protobuf::io::IstreamInputStream* raw_input = new google::protobuf::io::IstreamInputStream(&input);
+	google::protobuf::io::CodedInputStream* coded_input = new google::protobuf::io::CodedInputStream(raw_input);
+	coded_input->SetTotalBytesLimit(256000000, 256000000);
+	
+	if (!staticMesh.ParseFromCodedStream(coded_input))
 	{
 		LOG("Failed to parse binary static mesh from file %s", inputFileName.c_str());
 		return false;
 	}
 
-	readFromStaticMeshBinary(&staticMesh);
+/*
+	std::fstream input(inputFileName.c_str(), std::ios::in | std::ios::binary);
+	if (!staticMesh.ParseFromIstream(&input))
+	{
+		LOG("Failed to parse binary static mesh from file %s", inputFileName.c_str());
+		return false;
+	}
+*/
+
+	std::vector<SrModel*> models;
+	readFromStaticMeshBinary(&staticMesh, models);
+
+	for (size_t m = 0; m > models.size(); m++)
+	{
+		SrSnModel* srSnModelStatic = new SrSnModel();
+		srSnModelStatic->shape(*models[m]);
+		srSnModelStatic->shape().name = models[m]->name;
+		srSnModelStatic->ref();
+		
+		dMeshStatic_p.push_back(srSnModelStatic);
+		
+		SrSnModel* srSnModelDynamic = new SrSnModel();
+		srSnModelDynamic->shape(*(models[m]));
+		srSnModelDynamic->changed(true);
+		srSnModelDynamic->visible(false);
+		srSnModelDynamic->shape().name = models[m]->name;
+		srSnModelDynamic->ref();
+		
+		dMeshDynamic_p.push_back(srSnModelDynamic);
+		//delete models[m];
+	}
 
 	// explicitly load all the textures
 	boost::filesystem::path p(inputFileName);
 	std::string filePath = p.parent_path().string();
 	loadAllFoundTextures(filePath);
-
+	
 	return true;
 }
 
 bool DeformableMesh::readFromDmb(std::string inputFileName)
 {
 	SmartBodyBinary::DeformableMesh deformableMesh;
+
 	std::fstream input(inputFileName.c_str(), std::ios::in | std::ios::binary);
-	if (!deformableMesh.ParseFromIstream(&input)) 
+	google::protobuf::io::IstreamInputStream* raw_input = new google::protobuf::io::IstreamInputStream(&input);
+	google::protobuf::io::CodedInputStream* coded_input = new google::protobuf::io::CodedInputStream(raw_input);
+	coded_input->SetTotalBytesLimit(256000000, 256000000);
+
+	if (!deformableMesh.ParseFromCodedStream(coded_input))
 	{
-		LOG("Failed to parse binary static mesh from file %s", inputFileName.c_str());
+		LOG("Failed to parse binary deformable mesh from file %s", inputFileName.c_str());
 		return false;
 	}
 
 	SmartBodyBinary::StaticMesh staticMesh = deformableMesh.staticmesh();
-	readFromStaticMeshBinary(&staticMesh);
+
+	std::vector<SrModel*> models;
+	readFromStaticMeshBinary(&staticMesh, models);
+
+	// don't write into static/dynamic models until we'll sure which models
+	// are base shapes and which are morphs. Morphs fo in the blendShapeMap
+
+	// make the models easier to access
+	std::map<std::string, SrSnModel*> modelMap;
+	std::map<std::string, bool> modelsUsed;
+	for (size_t m = 0; m < models.size(); m++)
+	{
+		SrSnModel* srSnModelStatic = new SrSnModel();
+		srSnModelStatic->shape(*models[m]);
+		srSnModelStatic->shape().name = models[m]->name;
+		modelMap.insert(std::pair<std::string, SrSnModel*>(std::string(models[m]->name), srSnModelStatic));
+		modelsUsed.insert(std::pair<std::string, bool>(std::string(models[m]->name), false));
+	}
+	// keep track of the models used for morphs; non-morph models are assumed to be part of the basic mesh
+
+	// load morph targets
+	for (int i = 0; i < deformableMesh.morphtargets_size(); ++i)
+	{
+		const SmartBodyBinary::StringToStringVectorMap& morphMap = deformableMesh.morphtargets(i);
+		std::vector<std::string> morphs;
+		
+		for (int x = 0; x < morphMap.to_size(); ++x)
+		{
+			SrString morphName(morphMap.to(x).c_str());
+			morphs.push_back(morphMap.to(x));
+		}
+		// morphTargets contains a morphgroup->morphname relationship
+		morphTargets.insert(std::make_pair(morphMap.from(), morphs));
+
+		// blendshapemap contains the morphgroup->model relationship
+		// add the accompanying models
+		std::vector<SrSnModel*> morphModels;
+		for (size_t n = 0; n < morphs.size(); n++)
+		{
+			std::map<std::string, SrSnModel*>::iterator iter = modelMap.find(morphs[n]);
+			if (iter != modelMap.end())
+			{
+				morphModels.push_back((*iter).second);
+				if (n > 0) // mark non-base models as morph targets so that they are not added as static/dynamic meshes
+					modelsUsed[morphs[n]] = true;
+			}
+		}
+		blendShapeMap.insert(std::make_pair(morphMap.from(), morphModels));	
+	}
+
+	for (std::map<std::string, SrSnModel*>::iterator iter = modelMap.begin();
+		iter != modelMap.end();
+		iter++)
+	{
+		if (modelsUsed[(*iter).first] == false)
+		{
+			SrSnModel* srsnmodel = (*iter).second;
+			dMeshStatic_p.push_back(srsnmodel);
+
+			SrSnModel* srSnModelDynamic = new SrSnModel();
+			srSnModelDynamic->shape(srsnmodel->shape());
+			srSnModelDynamic->changed(true);
+			srSnModelDynamic->visible(false);
+			srSnModelDynamic->shape().name = srsnmodel->shape().name;
+			srSnModelDynamic->ref();
+
+			dMeshDynamic_p.push_back(srSnModelDynamic);
+			//delete models[m];
+		}
+	}
 
 	// load skin weights
 	for (int i = 0; i < deformableMesh.skinweights_size(); ++i)
@@ -1666,37 +1784,13 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 		this->skinWeights.push_back(newSkinWeights);
 	}
 
-	// load morph targets
-	for (int i = 0; i < deformableMesh.morphtargets_size(); ++i)
-	{
-		const SmartBodyBinary::StringToStringVectorMap& morphMap = deformableMesh.morphtargets(i);
-		std::vector<std::string> morphs;
-		std::vector<SrSnModel*> morphModels;
-		for (int x = 0; x < morphMap.to_size(); ++x)
-		{
-			SrString morphName(morphMap.to(x).c_str());
-			morphs.push_back(morphMap.to(x));
-			for (size_t m = 0; m < dMeshStatic_p.size(); ++m)
-			{
-				if (dMeshStatic_p[m]->shape().name == morphName)
-				{
-					SrSnModel* srSnModelBlend = new SrSnModel();
-					srSnModelBlend->shape(dMeshStatic_p[m]->shape());
-					srSnModelBlend->shape().name = dMeshStatic_p[m]->shape().name;
-					srSnModelBlend->ref();
-					morphModels.push_back(srSnModelBlend);
-				}
-			}
-		}
-		morphTargets.insert(std::make_pair(morphMap.from(), morphs));
-		blendShapeMap.insert(std::make_pair(morphMap.from(), morphModels));
-	}
+	
 	
 	// explicitly load all the textures
 	boost::filesystem::path p(inputFileName);
 	std::string filePath = p.parent_path().string();
 	loadAllFoundTextures(filePath);
-
+	
 	return true;
 }
 
@@ -1712,7 +1806,11 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str());
 			if (!tex)
 			{
-				std::string textureName = textureDirectory + "/" + iter->second;
+				// separate the texture prefix and |
+				std::string textureLabel = iter->second;				
+				int labelIndex = textureLabel.find_first_of("|");
+				std::string textureFile = textureLabel.substr(labelIndex + 1);
+				std::string textureName = textureDirectory + "/" + textureFile;
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
 					LOG("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
 				texManager.loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str(), textureName.c_str());
@@ -1724,7 +1822,11 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str());
 			if (!tex)
 			{
-				std::string textureName = textureDirectory + "/" + iter->second;
+				// separate the texture prefix and |
+				std::string textureLabel = iter->second;
+				int labelIndex = textureLabel.find_first_of("|");
+				std::string textureFile = textureLabel.substr(labelIndex + 1);
+				std::string textureName = textureDirectory + "/" + textureFile;
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
 					LOG("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
 				texManager.loadTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str(), textureName.c_str());
@@ -1736,7 +1838,11 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 			SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str());
 			if (!tex)
 			{
-				std::string textureName = textureDirectory + "/" + iter->second;
+				// separate the texture prefix and |
+				std::string textureLabel = iter->second;
+				int labelIndex = textureLabel.find_first_of("|");
+				std::string textureFile = textureLabel.substr(labelIndex + 1);
+				std::string textureName = textureDirectory + "/" + textureFile;
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
 					LOG("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
 				texManager.loadTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str(), textureName.c_str());
@@ -2853,7 +2959,7 @@ int DeformableMesh::getNumMeshes()
 
 const std::string DeformableMesh::getMeshName(int index)
 {
-	if (dMeshStatic_p.size() > index &&
+	if ((int) dMeshStatic_p.size() > index &&
 		index >= 0)
 		return (const char*) dMeshStatic_p[index]->shape().name;
 	else
@@ -2862,7 +2968,7 @@ const std::string DeformableMesh::getMeshName(int index)
 
 SrModel& DeformableMesh::getStaticModel(int index)
 {
-	if (dMeshStatic_p.size() > index &&
+	if ((int) dMeshStatic_p.size() > index &&
 		index >= 0)
 		return dMeshStatic_p[index]->shape();
 	else
