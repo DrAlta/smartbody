@@ -838,10 +838,22 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 
 				SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, index);
 				joint->quat()->activate();
-				joint->name(nameAttr);
-				joint->extName(nameAttr);
+				// if this a duplicate joint name, use the sid attribute as a unique name instead of the name attribute
+				if (skeleton.search_joint(nameAttr.c_str()) != NULL)
+				{
+					LOG("Joint name %s already exists, using unique joint id %s instead.", nameAttr.c_str(), sidAttr.c_str());
+					joint->name(sidAttr);
+					joint->extName(sidAttr);
+				}
+				else
+				{
+					joint->name(nameAttr);
+					joint->extName(nameAttr);
+				}
+				
 				joint->extID(idAttr);
 				joint->extSID(sidAttr);
+
 
 
 				bool hasTranslate = false;

@@ -203,7 +203,7 @@ public:
 	SBAPI bool readFromDmb(std::string inputFileName);
 	// helper function
 	void saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh);
-	void readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh);
+	void readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh, std::vector<SrModel*>& models);
 	void loadAllFoundTextures(std::string textureDirectory);
 	SBAPI SrVec computeCenterOfMass();
 	SBAPI SrBox computeBoundingBox();

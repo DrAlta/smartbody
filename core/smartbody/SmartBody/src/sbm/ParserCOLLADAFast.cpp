@@ -664,8 +664,18 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 
 				SkJoint* joint = skeleton.add_joint(SkJoint::TypeQuat, index);
 				joint->quat()->activate();
-				joint->name(nameAttr);
-				joint->extName(nameAttr);
+				if (skeleton.search_joint(nameAttr.c_str()) != NULL)
+				{
+					LOG("Joint name %s already exists, using unique joint id %s instead.", nameAttr.c_str(), idAttr.c_str());
+					joint->name(idAttr);
+					joint->extName(idAttr);
+				}
+				else
+				{
+					joint->name(nameAttr);
+					joint->extName(nameAttr);
+				}
+
 				joint->extID(idAttr);
 				joint->extSID(sidAttr);
 				if (treatAsJoint)
@@ -2235,8 +2245,10 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 			   strstr << filename << "|";
 			   if (newModel->mtlTextureNameMap.find(matName) != newModel->mtlTextureNameMap.end())
 			   {
-				   strstr << newModel->mtlTextureNameMap[matName];
-				   std::string prefixedName = strstr.str();
+				   std::stringstream strstr2;
+				   strstr2 << strstr.str();
+				   strstr2 << newModel->mtlTextureNameMap[matName];
+				   std::string prefixedName = strstr2.str();
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_DIFFUSE, prefixedName.c_str(), newModel->mtlTextureNameMap[matName].c_str(), paths);
 				  
 				   if (transparentTexMap.find(matName) != transparentTexMap.end())
@@ -2252,15 +2264,19 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 			   }	
 			   if (newModel->mtlNormalTexNameMap.find(matName) != newModel->mtlNormalTexNameMap.end())
 			   {
-				   strstr << newModel->mtlNormalTexNameMap[matName];
-				   std::string prefixedName = strstr.str();
+				   std::stringstream strstr2;
+				   strstr2 << strstr.str();
+				   strstr2 << newModel->mtlNormalTexNameMap[matName];
+				   std::string prefixedName = strstr2.str();
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_NORMALMAP, prefixedName.c_str(), newModel->mtlNormalTexNameMap[matName].c_str(), paths);
 				   newModel->mtlNormalTexNameMap[matName] = prefixedName;
 			   }
 			   if (newModel->mtlSpecularTexNameMap.find(matName) != newModel->mtlSpecularTexNameMap.end())
 			   {
-				   strstr << newModel->mtlSpecularTexNameMap[matName];
-				   std::string prefixedName = strstr.str();
+				   std::stringstream strstr2;
+				   strstr2 << strstr.str();
+				   strstr2 << newModel->mtlSpecularTexNameMap[matName];
+				   std::string prefixedName = strstr2.str();
 				   //LOG("Load specular map = %s",newModel->mtlSpecularTexNameMap[matName].c_str());
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, prefixedName.c_str(), newModel->mtlSpecularTexNameMap[matName].c_str(), paths);
 
