@@ -727,9 +727,9 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 						offset.z = matrix[14];
 						SrQuat quat(matrix);
 						SrVec euler = quat.getEuler();
-						rotx = euler[0];
-						roty = euler[1];
-						rotz = euler[2];					
+						jorientx = euler[0];
+						jorienty = euler[1];
+						jorientz = euler[2];
 						orderVec.push_back("Y");
 						orderVec.push_back("X");
 						orderVec.push_back("Z");
@@ -812,25 +812,29 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 					}
 				}
 
+
+				joint->offset(offset);
+
 				SrMat rotMat;
 				rotx *= float(M_PI) / 180.0f;
 				roty *= float(M_PI) / 180.0f;
 				rotz *= float(M_PI) / 180.0f;
 				sr_euler_mat(order, rotMat, rotx, roty, rotz);
+
+				SrMat finalRotMat = rotMat;
+				SrQuat quat = SrQuat(rotMat);
+				SkJointQuat* jointQuat = joint->quat();
+				jointQuat->orientation(quat);
+
 				SrMat jorientMat;
 				jorientx *= float(M_PI) / 180.0f;
 				jorienty *= float(M_PI) / 180.0f;
 				jorientz *= float(M_PI) / 180.0f;
 				sr_euler_mat(order, jorientMat, jorientx, jorienty, jorientz);
-				joint->offset(offset);
-				SrMat finalRotMat = rotMat;
-				SrQuat quat = SrQuat(rotMat);
-				SkJointQuat* jointQuat = joint->quat();
-				jointQuat->prerot(quat);
+								
 				SrQuat jorientQ = SrQuat(jorientMat);
-				jointQuat->orientation(jorientQ);
-
-
+				jointQuat->prerot(jorientQ);
+				
 				rapidxml::xml_node<>* geometryNode = ParserCOLLADAFast::getNode("instance_geometry", childNode, 0, 1);
 				if (geometryNode)	// might need to add support for rotation as well later when the case showed up
 				{
