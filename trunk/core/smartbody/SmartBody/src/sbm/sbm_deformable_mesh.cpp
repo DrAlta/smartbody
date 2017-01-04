@@ -1710,7 +1710,8 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 					modelsUsed[morphs[n]] = true;
 			}
 		}
-		blendShapeMap.insert(std::make_pair(morphMap.from(), morphModels));	
+		if (morphs.size() > 0)
+			blendShapeMap.insert(std::make_pair(morphs[0], morphModels));
 	}
 
 	for (std::map<std::string, SrSnModel*>::iterator iter = modelMap.begin();
@@ -1810,6 +1811,12 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 				std::string textureLabel = iter->second;				
 				int labelIndex = textureLabel.find_first_of("|");
 				std::string textureFile = textureLabel.substr(labelIndex + 1);
+				int prefixIndex = textureFile.find_first_of("file:///");
+				if (prefixIndex == 0)
+					textureFile = textureFile.substr(7);
+				prefixIndex = textureFile.find_first_of("file://");
+				if (prefixIndex == 0)
+					textureFile = textureFile.substr(6);
 				std::string textureName = textureDirectory + "/" + textureFile;
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
 					LOG("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
@@ -1826,6 +1833,12 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 				std::string textureLabel = iter->second;
 				int labelIndex = textureLabel.find_first_of("|");
 				std::string textureFile = textureLabel.substr(labelIndex + 1);
+				int prefixIndex = textureFile.find_first_of("file:///");
+				if (prefixIndex == 0)
+					textureFile = textureFile.substr(7);
+				prefixIndex = textureFile.find_first_of("file://");
+				if (prefixIndex == 0)
+					textureFile = textureFile.substr(6);
 				std::string textureName = textureDirectory + "/" + textureFile;
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
 					LOG("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
@@ -1842,6 +1855,12 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 				std::string textureLabel = iter->second;
 				int labelIndex = textureLabel.find_first_of("|");
 				std::string textureFile = textureLabel.substr(labelIndex + 1);
+				int prefixIndex = textureFile.find_first_of("file:///");
+				if (prefixIndex == 0)
+					textureFile = textureFile.substr(7);
+				prefixIndex = textureFile.find_first_of("file://");
+				if (prefixIndex == 0)
+					textureFile = textureFile.substr(6);
 				std::string textureName = textureDirectory + "/" + textureFile;
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
 					LOG("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
