@@ -1100,7 +1100,7 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 		iter++)
 	{
 		std::vector<SrSnModel*>& targets = (*iter).second;
-		for (size_t t = 0; t < targets.size(); t++)
+		for (size_t t = 1; t < targets.size(); t++) // ignore first target since it is a base mesh
 		{
 			SrModel& curModel = targets[t]->shape();
 			modelsToSave.push_back(&curModel);
@@ -1569,7 +1569,7 @@ bool DeformableMesh::saveToDmb(std::string inputFileName)
 		for (size_t x = 0; x < skinWeights[i]->jointNameIndex.size(); ++x)
 			newSkinWeight->add_jointnameindices(skinWeights[i]->jointNameIndex[x]);
 	}
-
+	
 	// save morph targets
 	std::map<std::string, std::vector<std::string> >::iterator iter;
 	for (iter = this->morphTargets.begin(); iter != this->morphTargets.end(); ++iter)
@@ -1581,6 +1581,7 @@ bool DeformableMesh::saveToDmb(std::string inputFileName)
 			morphMap->add_to(iter->second[x]);
 		}
 	}
+	
 
 	std::fstream file(inputFileName.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 	if (!outputDeformableMesh->SerializeToOstream(&file)) 
@@ -1606,15 +1607,6 @@ bool DeformableMesh::readFromSmb(std::string inputFileName)
 		LOG("Failed to parse binary static mesh from file %s", inputFileName.c_str());
 		return false;
 	}
-
-/*
-	std::fstream input(inputFileName.c_str(), std::ios::in | std::ios::binary);
-	if (!staticMesh.ParseFromIstream(&input))
-	{
-		LOG("Failed to parse binary static mesh from file %s", inputFileName.c_str());
-		return false;
-	}
-*/
 
 	std::vector<SrModel*> models;
 	readFromStaticMeshBinary(&staticMesh, models);
@@ -1691,7 +1683,6 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 		
 		for (int x = 0; x < morphMap.to_size(); ++x)
 		{
-			SrString morphName(morphMap.to(x).c_str());
 			morphs.push_back(morphMap.to(x));
 		}
 		// morphTargets contains a morphgroup->morphname relationship
@@ -1714,13 +1705,18 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 			blendShapeMap.insert(std::make_pair(morphs[0], morphModels));
 	}
 
-	for (std::map<std::string, SrSnModel*>::iterator iter = modelMap.begin();
-		iter != modelMap.end();
+	for (std::vector<SrModel*>::iterator iter = models.begin();
+		iter != models.end();
 		iter++)
 	{
-		if (modelsUsed[(*iter).first] == false)
+		SrModel* model = (*iter);
+		std::string modelName = model->name;
+
+		std::map<std::string, bool>::iterator iter2 = modelsUsed.find(modelName);
+		if ((*iter2).second == false)
 		{
-			SrSnModel* srsnmodel = (*iter).second;
+			std::map<std::string, SrSnModel*>::iterator iter3 = modelMap.find(modelName);
+			SrSnModel* srsnmodel = (*iter3).second;
 			dMeshStatic_p.push_back(srsnmodel);
 
 			SrSnModel* srSnModelDynamic = new SrSnModel();
