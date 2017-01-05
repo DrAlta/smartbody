@@ -257,6 +257,8 @@ class SBScene : public SBObject
 		SBAPI void updatePawnNames();
 		SBAPI void updateCharacterNames();
 
+		SBAPI void rescalePartialMeshSkeleton(const std::string& meshName, const std::string& skelName, const std::string& rootJointName, float scaleRatio, float blendThreshold = 0.025f);
+
 #if 0 // should be creating navigation mesh directly in AssetManager
 		SBAPI bool createNavigationMesh(const std::string& meshfilename);
 #endif

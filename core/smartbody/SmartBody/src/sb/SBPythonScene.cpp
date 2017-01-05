@@ -77,7 +77,7 @@ typedef std::map<std::string, std::string> StringMap;
 
 #ifndef SB_NO_PYTHON
 
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
+#if 1
 namespace boost
 {
 	template<> const volatile SmartBody::SBNavigationMesh* get_pointer(const volatile SmartBody::SBNavigationMesh* p) { return p; }
@@ -151,6 +151,7 @@ void pythonFuncsScene()
 		.def("exportScenePackage", &SBScene::exportScenePackage, "Saves the entire SmartBody configuration and all assets into a given folder, or into a .zip archive")
 		.def("exportCharacter", &SBScene::exportCharacter, "Saves the character's skeleton, skinned mesh and all other assets into a given folder in Collada format. ")
 		#endif
+		.def("rescalePartialMeshSkeleton", &SBScene::rescalePartialMeshSkeleton, "Rescale part of the mesh and skeleton based on selected root joints. ")
 		.def("setNavigationMesh", &SBScene::setNavigationMesh, "Set the navigation mesh used for steering in the scene.\n Input : Navigation mesh name")
 		.def("getNavigationMesh", &SBScene::getNavigationMesh, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Get the navigation mesh in the scene")
 		.def("startFileLogging", &SBScene::startFileLogging, "Starts logging SmartBody messages to a given log file.")
