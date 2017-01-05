@@ -4135,6 +4135,123 @@ void SBScene::updateCharacterNames()
 	}
 }
 
+SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, const std::string& skelName, const std::string& rootJointName, float scaleRatio, float blendRatio)
+{
+	SBAssetManager* assetManager = getAssetManager();
+	DeformableMesh* mesh = assetManager->getDeformableMesh(meshName);
+	SmartBody::SBSkeleton* skel = assetManager->getSkeleton(skelName);
+	if (!mesh || !skel)
+	{
+		LOG("Warning, can't find mesh '%s' or skeleton '%s'.", meshName.c_str(), skelName.c_str());
+		return;
+	}
+
+	SmartBody::SBJoint* rootJoint = skel->getJointByName(rootJointName);
+	if (!rootJoint)
+	{
+		LOG("Warning, can't find joint '%s'.", rootJointName.c_str());
+		return;
+	}
+
+	skel->update_global_matrices();
+	SrVec rootPos = rootJoint->gmat().get_translation();
+	std::vector<std::string> belowJointNames;
+	belowJointNames.push_back(rootJointName);
+	for (unsigned int i = 0; i < skel->getNumJoints(); i++)
+	{
+		SmartBody::SBJoint* joint = skel->getJoint(i);
+		SrVec jpos = joint->gmat().get_translation();
+		if (jpos.y < rootPos.y) // lower than root position
+		{
+			belowJointNames.push_back(joint->getMappedJointName());
+		}
+	}
+	
+	float blendThreshold = skel->getBoundingBox().size().y*blendRatio;
+
+	for (unsigned int i = 0; i < mesh->dMeshStatic_p.size(); i++)
+	{
+		SrModel& model = mesh->dMeshStatic_p[i]->shape();
+		SrModel& dynModel = mesh->dMeshDynamic_p[i]->shape();
+
+		//std::map<std::string, std::vector<SrSnModel*> > blendShapeMap;
+
+		for (unsigned int k = 0; k < model.V.size(); k++)
+		{		
+			SrVec v = model.V[k];
+			if (v.y > rootPos.y + blendThreshold)
+				continue;
+			//float blendRatio = (v.y - rootPos.y + blendThreshold) / (blendThreshold*2.0);
+			float blendRatio = (v.y - rootPos.y ) / (blendThreshold);
+			if (blendRatio < 0.f ) blendRatio = 0.0;
+			float blendScaleRatio = (blendRatio) + (1.0 - blendRatio)*scaleRatio;
+			v = rootPos + (v - rootPos)*blendScaleRatio;
+			model.V[k] = v; // update the new position
+			dynModel.V[k] = v;
+			//model.VOrig[k] = v;
+		}		
+		std::string modelName = (const char*)model.name;
+		if (mesh->blendShapeMap.find(modelName) != mesh->blendShapeMap.end()) // the shape is associated with blendshape
+		{
+			std::vector<SrSnModel*>& blendShapes = mesh->blendShapeMap[modelName];
+			for (unsigned int j = 0; j < blendShapes.size(); j++)
+			{
+				SrModel& faceModel = blendShapes[j]->shape();
+				for (unsigned int k = 0; k < faceModel.V.size(); k++)
+				{
+					SrVec v = faceModel.V[k];
+					if (v.y > rootPos.y + blendThreshold)
+						continue;
+
+					float blendRatio = (v.y - rootPos.y) / (blendThreshold);
+					if (blendRatio < 0.f) blendRatio = 0.0;
+					float blendScaleRatio = (blendRatio)+(1.0 - blendRatio)*scaleRatio;
+					v = rootPos + (v - rootPos)*blendScaleRatio;
+
+					//v = rootPos + (v - rootPos)*scaleRatio;
+					//faceModel.V[k] = v; // update the new position					
+					faceModel.V[k] = model.V[k];
+				}
+			}
+
+		}
+	}
+	
+	// rescale the offset for each joint below root joint
+	for (unsigned int i = 0; i < belowJointNames.size(); i++)
+	{
+		SmartBody::SBJoint* joint = skel->getJointByMappedName(belowJointNames[i]);
+		joint->setOffset(joint->getOffset()*scaleRatio);
+	}
+
+	skel->invalidate_global_matrices();
+	skel->update_global_matrices();
+	SrVec newRootPos = rootJoint->gmat().get_translation();
+	SrVec rootOffset = rootPos - newRootPos;
+	SmartBody::SBJoint* skelRoot = dynamic_cast<SmartBody::SBJoint*>(skel->root());
+	skelRoot->setOffset(skelRoot->getOffset() + rootOffset);
+
+	skel->invalidate_global_matrices();
+	skel->update_global_matrices();
+	skel->updateGlobalMatricesZero();
+
+	// update bind pose matrices
+	for (unsigned int i = 0; i < mesh->skinWeights.size(); i++)
+	{
+		SkinWeight* sw = mesh->skinWeights[i];
+		for (unsigned int k = 0; k < sw->infJointName.size(); k++)
+		{
+			// manually add all joint names
+			SmartBody::SBJoint* joint = skel->getJointByName(sw->infJointName[k]);
+
+			SrMat gmatZeroInv = joint->gmatZero().rigidInverse();
+			sw->bindPoseMat[k] = gmatZeroInv;
+		}
+	}
+
+	mesh->rebuildVertexBuffer(true);
+}
+
 Heightfield* SBScene::getHeightfield()
 {
 	return _heightField;
