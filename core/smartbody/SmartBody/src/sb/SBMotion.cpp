@@ -3366,6 +3366,7 @@ SBAPI void SBMotion::saveToBVH( const std::string& fileName, const std::string& 
 	}
 	
 	FILE* fp = fopen(fileName.c_str(),"wt");
+	skel->updateJointMap();
 	SmartBody::SBJoint* root = dynamic_cast<SmartBody::SBJoint*>(skel->root());
 	std::vector<int> jointIdxs;
 	fprintf(fp,"HIERARCHY\n");
@@ -3375,12 +3376,14 @@ SBAPI void SBMotion::saveToBVH( const std::string& fileName, const std::string& 
 	fprintf(fp,"MOTION\n");
 	fprintf(fp,"Frames: %d\n",this->getNumFrames());
 	fprintf(fp,"Frame Time: %f\n",this->getFrameRate());
+	//LOG("Joint idxs size = %d", jointIdxs.size());
+	
 	for (int i=0;i<getNumFrames();i++)
 	{
 		float* frameBuf = posture(i);
 		for (unsigned int k=0;k<jointIdxs.size();k++)
 		{			
-			SmartBody::SBJoint* joint = skel->getJoint(k);
+			SmartBody::SBJoint* joint = skel->getJoint(jointIdxs[k]);
 			SrVec pos = joint->offset();
 			for (int c=0;c<3;c++)
 			{
@@ -3389,20 +3392,26 @@ SBAPI void SBMotion::saveToBVH( const std::string& fileName, const std::string& 
 				{
 					pos[c] = frameBuf[_channels.float_position(chanID)];
 				}
-			}
+			}			
 
-			SrQuat quat;
+			SrQuat quat = joint->quat()->orientation()*joint->quat()->prerot()*joint->quat()->postrot(); // bake all joint pre-post rotations into motion first
 			int quatID = _channels.search(joint->getMappedJointName(), SkChannel::Quat);
 			if (quatID != -1)
 			{
 				//pos[c] = frameBuf[_channels.float_position(chanID)];
-				int fidx = _channels.float_position(quatID);
-				quat = SrQuat(frameBuf[fidx], frameBuf[fidx+1], frameBuf[fidx+2], frameBuf[fidx+3]);
+				int fidx = _channels.float_position(quatID);						
+				// bake the quaternion based on joint orientation/pre/post-rotation since BVH can't store pre-rotation in the skeleton
+				//quat = SrQuat(frameBuf[fidx], frameBuf[fidx + 1], frameBuf[fidx + 2], frameBuf[fidx + 3]);
+				quat = joint->quat()->orientation()*joint->quat()->prerot()*SrQuat(frameBuf[fidx], frameBuf[fidx+1], frameBuf[fidx+2], frameBuf[fidx+3])*joint->quat()->postrot();				
 			}
 			SrMat rotMat;
 			quat.get_mat(rotMat);
 			float ex, ey, ez;
 			sr_euler_angles_yxz( rotMat, ex, ey, ez );
+// 			if (i == 0)
+// 			{
+// 				LOG("Joint name = %s, euler angle = %f %f %f", joint->getMappedJointName().c_str(), ex*57.295779513082323, ey*57.295779513082323, ez*57.295779513082323);
+// 			}
 			fprintf(fp," %f %f %f %f %f %f",pos[0],pos[1],pos[2], ez*57.295779513082323, ex*57.295779513082323, ey*57.295779513082323);
 		}
 		fprintf(fp,"\n");
