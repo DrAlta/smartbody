@@ -30,3 +30,5 @@ behav.setScript("BehaviorSetPunching.py")
 behav = behaviorSetManager.createBehaviorSet("FemaleGestures")
 behav.setScript("BehaviorSetFemaleGestures.py")
 
+behav = behaviorSetManager.createBehaviorSet("MaleGestures")
+behav.setScript("BehaviorSetMaleGestures.py")
