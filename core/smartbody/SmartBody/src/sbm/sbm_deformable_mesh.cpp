@@ -1696,7 +1696,11 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 			std::map<std::string, SrSnModel*>::iterator iter = modelMap.find(morphs[n]);
 			if (iter != modelMap.end())
 			{
-				morphModels.push_back((*iter).second);
+				SrSnModel* model = (*iter).second;
+				SrSnModel* baseModelCopy = new SrSnModel();
+				baseModelCopy->shape(model->shape());
+				baseModelCopy->ref();
+				morphModels.push_back(baseModelCopy);
 				if (n > 0) // mark non-base models as morph targets so that they are not added as static/dynamic meshes
 					modelsUsed[morphs[n]] = true;
 			}
@@ -1718,15 +1722,16 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 			std::map<std::string, SrSnModel*>::iterator iter3 = modelMap.find(modelName);
 			SrSnModel* srsnmodel = (*iter3).second;
 			dMeshStatic_p.push_back(srsnmodel);
+			srsnmodel->ref();
 
 			SrSnModel* srSnModelDynamic = new SrSnModel();
 			srSnModelDynamic->shape(srsnmodel->shape());
 			srSnModelDynamic->changed(true);
 			srSnModelDynamic->visible(false);
 			srSnModelDynamic->shape().name = srsnmodel->shape().name;
-			srSnModelDynamic->ref();
-
+			
 			dMeshDynamic_p.push_back(srSnModelDynamic);
+			srSnModelDynamic->ref();
 			//delete models[m];
 		}
 	}
