@@ -8,7 +8,7 @@
 #include <set>
 #include <algorithm>
 #include <sb/SBScene.h>
-
+#include <sb/SBSkeleton.h>
 #if !defined(EMSCRIPTEN)
 typedef std::pair<int,float> IntFloatPair;
 
@@ -653,7 +653,12 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 	glEnable ( GL_ALPHA_TEST );
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glAlphaFunc ( GL_GREATER, 0.5f ) ;
+
+	SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
+	SmartBody::SBPawn* pawn = skel->getPawn();
+	double alphaThreshold = pawn->getDoubleAttribute("alphaThreshold");
+
+	glAlphaFunc ( GL_GREATER,(float)alphaThreshold) ;
 	glEnable(GL_TEXTURE_2D);
 	glDisable(GL_COLOR_MATERIAL);
 	glUseProgram(program);		
