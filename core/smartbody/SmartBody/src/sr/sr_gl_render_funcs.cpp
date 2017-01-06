@@ -399,7 +399,10 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			#endif
 			glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			//glAlphaFunc ( GL_GREATER, 0.0f ) ;
-			glAlphaFunc(GL_GREATER, 0.5f);
+			SmartBody::SBSkeleton* skel = shape->getSkeleton();
+			SmartBody::SBPawn* pawn = skel->getPawn();
+			double alphaThreshold = pawn->getDoubleAttribute("alphaThreshold");
+			glAlphaFunc(GL_GREATER, (float)alphaThreshold);
 			myGLEnable(GL_CULL_FACE);
 	
 			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);

@@ -2238,8 +2238,6 @@ std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 			pawnCount++;
 			SmartBody::SBPawn* pawn = scene->createPawn(strstr.str());			
 			pawn->setStringAttribute("mesh",dndMesh->getName());	
-			pawn->setDoubleAttribute("rotY",180.0);
-			pawn->setDoubleAttribute("rotZ",-90.0);
 			pawn->dStaticMeshInstance_p->setVisibility(2);
 			return;
 		}

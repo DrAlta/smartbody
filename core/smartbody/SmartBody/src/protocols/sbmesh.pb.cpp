@@ -67,7 +67,7 @@ void protobuf_AssignDesc_sbmesh_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Material));
   MeshModel_descriptor_ = file->message_type(1);
-  static const int MeshModel_offsets_[17] = {
+  static const int MeshModel_offsets_[19] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MeshModel, meshname_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MeshModel, materials_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MeshModel, vertexcoordinates_),
@@ -85,6 +85,8 @@ void protobuf_AssignDesc_sbmesh_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MeshModel, materialtonormaltexturemapping_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MeshModel, materialtospeculartexturemapping_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MeshModel, materialtofaceindices_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MeshModel, materialtotransparenttexturemapping_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(MeshModel, materialtoglossytexturemapping_),
   };
   MeshModel_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -204,7 +206,7 @@ void protobuf_AddDesc_sbmesh_2eproto() {
     "ties.proto\"\220\001\n\010Material\022\017\n\007ambient\030\001 \003(\005"
     "\022\017\n\007diffuse\030\002 \003(\005\022\020\n\010specular\030\003 \003(\005\022\020\n\010e"
     "mission\030\004 \003(\005\022\021\n\tshininess\030\005 \002(\005\022\024\n\014tran"
-    "sparency\030\006 \002(\002\022\025\n\ruseAlphaBlend\030\007 \002(\010\"\375\004"
+    "sparency\030\006 \002(\002\022\025\n\ruseAlphaBlend\030\007 \002(\010\"\232\006"
     "\n\tMeshModel\022\020\n\010meshName\030\001 \002(\t\022,\n\tmateria"
     "ls\030\002 \003(\0132\031.SmartBodyBinary.Material\022\031\n\021v"
     "ertexCoordinates\030\003 \003(\002\022\017\n\007normals\030\004 \003(\002\022"
@@ -220,20 +222,24 @@ void protobuf_AddDesc_sbmesh_2eproto() {
     "StringMap\022L\n materialToSpecularTextureMa"
     "pping\030\020 \003(\0132\".SmartBodyBinary.StringToSt"
     "ringMap\022D\n\025materialToFaceIndices\030\021 \003(\0132%"
-    ".SmartBodyBinary.StringToIntVectorMap\"\332\001"
-    "\n\nSkinWeight\022\026\n\016sourceMeshName\030\001 \002(\t\022\033\n\023"
-    "influenceJointNames\030\002 \003(\t\022\023\n\013bindWeights"
-    "\030\003 \003(\002\022\027\n\017bindPoseMatrice\030\004 \003(\002\022\027\n\017bindS"
-    "hapeMatrix\030\005 \003(\002\022\037\n\027numberOfInfluenceJoi"
-    "nts\030\006 \003(\005\022\025\n\rweightIndices\030\007 \003(\005\022\030\n\020join"
-    "tNameIndices\030\010 \003(\005\"T\n\nStaticMesh\022\026\n\016stat"
-    "icMeshName\030\001 \002(\t\022.\n\nmeshModels\030\002 \003(\0132\032.S"
-    "martBodyBinary.MeshModel\"\317\001\n\016DeformableM"
-    "esh\022\032\n\022deformableMeshName\030\001 \002(\t\022/\n\nstati"
-    "cMesh\030\002 \002(\0132\033.SmartBodyBinary.StaticMesh"
-    "\0220\n\013skinWeights\030\003 \003(\0132\033.SmartBodyBinary."
-    "SkinWeight\022>\n\014morphTargets\030\004 \003(\0132(.Smart"
-    "BodyBinary.StringToStringVectorMap", 1354);
+    ".SmartBodyBinary.StringToIntVectorMap\022O\n"
+    "#materialToTransparentTextureMapping\030\022 \003"
+    "(\0132\".SmartBodyBinary.StringToStringMap\022J"
+    "\n\036materialToGlossyTextureMapping\030\023 \003(\0132\""
+    ".SmartBodyBinary.StringToStringMap\"\332\001\n\nS"
+    "kinWeight\022\026\n\016sourceMeshName\030\001 \002(\t\022\033\n\023inf"
+    "luenceJointNames\030\002 \003(\t\022\023\n\013bindWeights\030\003 "
+    "\003(\002\022\027\n\017bindPoseMatrice\030\004 \003(\002\022\027\n\017bindShap"
+    "eMatrix\030\005 \003(\002\022\037\n\027numberOfInfluenceJoints"
+    "\030\006 \003(\005\022\025\n\rweightIndices\030\007 \003(\005\022\030\n\020jointNa"
+    "meIndices\030\010 \003(\005\"T\n\nStaticMesh\022\026\n\016staticM"
+    "eshName\030\001 \002(\t\022.\n\nmeshModels\030\002 \003(\0132\032.Smar"
+    "tBodyBinary.MeshModel\"\317\001\n\016DeformableMesh"
+    "\022\032\n\022deformableMeshName\030\001 \002(\t\022/\n\nstaticMe"
+    "sh\030\002 \002(\0132\033.SmartBodyBinary.StaticMesh\0220\n"
+    "\013skinWeights\030\003 \003(\0132\033.SmartBodyBinary.Ski"
+    "nWeight\022>\n\014morphTargets\030\004 \003(\0132(.SmartBod"
+    "yBinary.StringToStringVectorMap", 1511);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "sbmesh.proto", &protobuf_RegisterTypes);
   Material::default_instance_ = new Material();
@@ -754,6 +760,8 @@ const int MeshModel::kMaterialToDiffuseTextureMappingFieldNumber;
 const int MeshModel::kMaterialToNormalTextureMappingFieldNumber;
 const int MeshModel::kMaterialToSpecularTextureMappingFieldNumber;
 const int MeshModel::kMaterialToFaceIndicesFieldNumber;
+const int MeshModel::kMaterialToTransparentTextureMappingFieldNumber;
+const int MeshModel::kMaterialToGlossyTextureMappingFieldNumber;
 #endif  // !_MSC_VER
 
 MeshModel::MeshModel()
@@ -836,6 +844,8 @@ void MeshModel::Clear() {
   materialtonormaltexturemapping_.Clear();
   materialtospeculartexturemapping_.Clear();
   materialtofaceindices_.Clear();
+  materialtotransparenttexturemapping_.Clear();
+  materialtoglossytexturemapping_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -1166,6 +1176,36 @@ bool MeshModel::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(138)) goto parse_materialToFaceIndices;
+        if (input->ExpectTag(146)) goto parse_materialToTransparentTextureMapping;
+        break;
+      }
+
+      // repeated .SmartBodyBinary.StringToStringMap materialToTransparentTextureMapping = 18;
+      case 18: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_materialToTransparentTextureMapping:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_materialtotransparenttexturemapping()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(146)) goto parse_materialToTransparentTextureMapping;
+        if (input->ExpectTag(154)) goto parse_materialToGlossyTextureMapping;
+        break;
+      }
+
+      // repeated .SmartBodyBinary.StringToStringMap materialToGlossyTextureMapping = 19;
+      case 19: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_materialToGlossyTextureMapping:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_materialtoglossytexturemapping()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(154)) goto parse_materialToGlossyTextureMapping;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1295,6 +1335,18 @@ void MeshModel::SerializeWithCachedSizes(
       17, this->materialtofaceindices(i), output);
   }
 
+  // repeated .SmartBodyBinary.StringToStringMap materialToTransparentTextureMapping = 18;
+  for (int i = 0; i < this->materialtotransparenttexturemapping_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      18, this->materialtotransparenttexturemapping(i), output);
+  }
+
+  // repeated .SmartBodyBinary.StringToStringMap materialToGlossyTextureMapping = 19;
+  for (int i = 0; i < this->materialtoglossytexturemapping_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      19, this->materialtoglossytexturemapping(i), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1414,6 +1466,20 @@ void MeshModel::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         17, this->materialtofaceindices(i), target);
+  }
+
+  // repeated .SmartBodyBinary.StringToStringMap materialToTransparentTextureMapping = 18;
+  for (int i = 0; i < this->materialtotransparenttexturemapping_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        18, this->materialtotransparenttexturemapping(i), target);
+  }
+
+  // repeated .SmartBodyBinary.StringToStringMap materialToGlossyTextureMapping = 19;
+  for (int i = 0; i < this->materialtoglossytexturemapping_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        19, this->materialtoglossytexturemapping(i), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -1564,6 +1630,22 @@ int MeshModel::ByteSize() const {
         this->materialtofaceindices(i));
   }
 
+  // repeated .SmartBodyBinary.StringToStringMap materialToTransparentTextureMapping = 18;
+  total_size += 2 * this->materialtotransparenttexturemapping_size();
+  for (int i = 0; i < this->materialtotransparenttexturemapping_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->materialtotransparenttexturemapping(i));
+  }
+
+  // repeated .SmartBodyBinary.StringToStringMap materialToGlossyTextureMapping = 19;
+  total_size += 2 * this->materialtoglossytexturemapping_size();
+  for (int i = 0; i < this->materialtoglossytexturemapping_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->materialtoglossytexturemapping(i));
+  }
+
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -1604,6 +1686,8 @@ void MeshModel::MergeFrom(const MeshModel& from) {
   materialtonormaltexturemapping_.MergeFrom(from.materialtonormaltexturemapping_);
   materialtospeculartexturemapping_.MergeFrom(from.materialtospeculartexturemapping_);
   materialtofaceindices_.MergeFrom(from.materialtofaceindices_);
+  materialtotransparenttexturemapping_.MergeFrom(from.materialtotransparenttexturemapping_);
+  materialtoglossytexturemapping_.MergeFrom(from.materialtoglossytexturemapping_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_meshname()) {
       set_meshname(from.meshname());
@@ -1647,6 +1731,12 @@ bool MeshModel::IsInitialized() const {
   for (int i = 0; i < materialtofaceindices_size(); i++) {
     if (!this->materialtofaceindices(i).IsInitialized()) return false;
   }
+  for (int i = 0; i < materialtotransparenttexturemapping_size(); i++) {
+    if (!this->materialtotransparenttexturemapping(i).IsInitialized()) return false;
+  }
+  for (int i = 0; i < materialtoglossytexturemapping_size(); i++) {
+    if (!this->materialtoglossytexturemapping(i).IsInitialized()) return false;
+  }
   return true;
 }
 
@@ -1669,6 +1759,8 @@ void MeshModel::Swap(MeshModel* other) {
     materialtonormaltexturemapping_.Swap(&other->materialtonormaltexturemapping_);
     materialtospeculartexturemapping_.Swap(&other->materialtospeculartexturemapping_);
     materialtofaceindices_.Swap(&other->materialtofaceindices_);
+    materialtotransparenttexturemapping_.Swap(&other->materialtotransparenttexturemapping_);
+    materialtoglossytexturemapping_.Swap(&other->materialtoglossytexturemapping_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
