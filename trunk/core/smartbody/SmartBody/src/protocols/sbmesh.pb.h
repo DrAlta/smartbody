@@ -453,6 +453,30 @@ class MeshModel : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToIntVectorMap >*
       mutable_materialtofaceindices();
 
+  // repeated .SmartBodyBinary.StringToStringMap materialToTransparentTextureMapping = 18;
+  inline int materialtotransparenttexturemapping_size() const;
+  inline void clear_materialtotransparenttexturemapping();
+  static const int kMaterialToTransparentTextureMappingFieldNumber = 18;
+  inline const ::SmartBodyBinary::StringToStringMap& materialtotransparenttexturemapping(int index) const;
+  inline ::SmartBodyBinary::StringToStringMap* mutable_materialtotransparenttexturemapping(int index);
+  inline ::SmartBodyBinary::StringToStringMap* add_materialtotransparenttexturemapping();
+  inline const ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap >&
+      materialtotransparenttexturemapping() const;
+  inline ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap >*
+      mutable_materialtotransparenttexturemapping();
+
+  // repeated .SmartBodyBinary.StringToStringMap materialToGlossyTextureMapping = 19;
+  inline int materialtoglossytexturemapping_size() const;
+  inline void clear_materialtoglossytexturemapping();
+  static const int kMaterialToGlossyTextureMappingFieldNumber = 19;
+  inline const ::SmartBodyBinary::StringToStringMap& materialtoglossytexturemapping(int index) const;
+  inline ::SmartBodyBinary::StringToStringMap* mutable_materialtoglossytexturemapping(int index);
+  inline ::SmartBodyBinary::StringToStringMap* add_materialtoglossytexturemapping();
+  inline const ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap >&
+      materialtoglossytexturemapping() const;
+  inline ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap >*
+      mutable_materialtoglossytexturemapping();
+
   // @@protoc_insertion_point(class_scope:SmartBodyBinary.MeshModel)
  private:
   inline void set_has_meshname();
@@ -478,10 +502,12 @@ class MeshModel : public ::google::protobuf::Message {
   ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap > materialtonormaltexturemapping_;
   ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap > materialtospeculartexturemapping_;
   ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToIntVectorMap > materialtofaceindices_;
+  ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap > materialtotransparenttexturemapping_;
+  ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap > materialtoglossytexturemapping_;
   bool culling_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(17 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(19 + 31) / 32];
 
   friend void  protobuf_AddDesc_sbmesh_2eproto();
   friend void protobuf_AssignDesc_sbmesh_2eproto();
@@ -1558,6 +1584,56 @@ MeshModel::materialtofaceindices() const {
 inline ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToIntVectorMap >*
 MeshModel::mutable_materialtofaceindices() {
   return &materialtofaceindices_;
+}
+
+// repeated .SmartBodyBinary.StringToStringMap materialToTransparentTextureMapping = 18;
+inline int MeshModel::materialtotransparenttexturemapping_size() const {
+  return materialtotransparenttexturemapping_.size();
+}
+inline void MeshModel::clear_materialtotransparenttexturemapping() {
+  materialtotransparenttexturemapping_.Clear();
+}
+inline const ::SmartBodyBinary::StringToStringMap& MeshModel::materialtotransparenttexturemapping(int index) const {
+  return materialtotransparenttexturemapping_.Get(index);
+}
+inline ::SmartBodyBinary::StringToStringMap* MeshModel::mutable_materialtotransparenttexturemapping(int index) {
+  return materialtotransparenttexturemapping_.Mutable(index);
+}
+inline ::SmartBodyBinary::StringToStringMap* MeshModel::add_materialtotransparenttexturemapping() {
+  return materialtotransparenttexturemapping_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap >&
+MeshModel::materialtotransparenttexturemapping() const {
+  return materialtotransparenttexturemapping_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap >*
+MeshModel::mutable_materialtotransparenttexturemapping() {
+  return &materialtotransparenttexturemapping_;
+}
+
+// repeated .SmartBodyBinary.StringToStringMap materialToGlossyTextureMapping = 19;
+inline int MeshModel::materialtoglossytexturemapping_size() const {
+  return materialtoglossytexturemapping_.size();
+}
+inline void MeshModel::clear_materialtoglossytexturemapping() {
+  materialtoglossytexturemapping_.Clear();
+}
+inline const ::SmartBodyBinary::StringToStringMap& MeshModel::materialtoglossytexturemapping(int index) const {
+  return materialtoglossytexturemapping_.Get(index);
+}
+inline ::SmartBodyBinary::StringToStringMap* MeshModel::mutable_materialtoglossytexturemapping(int index) {
+  return materialtoglossytexturemapping_.Mutable(index);
+}
+inline ::SmartBodyBinary::StringToStringMap* MeshModel::add_materialtoglossytexturemapping() {
+  return materialtoglossytexturemapping_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap >&
+MeshModel::materialtoglossytexturemapping() const {
+  return materialtoglossytexturemapping_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::SmartBodyBinary::StringToStringMap >*
+MeshModel::mutable_materialtoglossytexturemapping() {
+  return &materialtoglossytexturemapping_;
 }
 
 // -------------------------------------------------------------------

@@ -43,6 +43,8 @@ message MeshModel
 	repeated StringToStringMap materialToNormalTextureMapping = 15;
 	repeated StringToStringMap materialToSpecularTextureMapping = 16;
 	repeated StringToIntVectorMap materialToFaceIndices = 17;
+	repeated StringToStringMap materialToTransparentTextureMapping = 18;
+	repeated StringToStringMap materialToGlossyTextureMapping = 19;
 }
 
 message SkinWeight
