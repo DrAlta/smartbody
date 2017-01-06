@@ -2230,6 +2230,8 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 			newModel->mtlTextureNameMap = mtlTexMap;
 			newModel->mtlNormalTexNameMap = mtlTexBumpMap;
 			newModel->mtlSpecularTexNameMap = mtlTexSpecularMap;			
+			newModel->mtlTransparentTexNameMap = mtlTransparentMap;
+			newModel->mtlGlossyTexNameMap = mtlGlossyMap;
 			newModel->M = M;
 			newModel->mtlnames = mnames;
 

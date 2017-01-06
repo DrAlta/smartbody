@@ -35,6 +35,7 @@
 
 #include <boost/filesystem.hpp>
 #include <algorithm>
+#include <sbm/ParserCOLLADAFast.h>
 
 #define TEST_HAIR_RENDER 1
 
@@ -1243,11 +1244,25 @@ void DeformableMesh::saveToStaticMeshBinary(SmartBodyBinary::StaticMesh* outputS
 			for (size_t f = 0; f < iter1->second.size(); ++f)
 				m2FaceIndicesMapping->add_to(iter1->second[f]);
 		}
+		// 18
+		for (iter = curModel->mtlTransparentTexNameMap.begin(); iter != curModel->mtlTransparentTexNameMap.end(); ++iter)
+		{
+			SmartBodyBinary::StringToStringMap* m2TransparentMapping = newMeshModel->add_materialtotransparenttexturemapping();
+			m2TransparentMapping->set_from(iter->first);
+			m2TransparentMapping->set_to(iter->second);
+		}
+		// 19
+		for (iter = curModel->mtlGlossyTexNameMap.begin(); iter != curModel->mtlGlossyTexNameMap.end(); ++iter)
+		{
+			SmartBodyBinary::StringToStringMap* m2GlossyMapping = newMeshModel->add_materialtoglossytexturemapping();
+			m2GlossyMapping->set_from(iter->first);
+			m2GlossyMapping->set_to(iter->second);
+		}
 	}
 	
 }
 
-void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh, std::vector<SrModel*>& models)
+void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh, std::vector<SrModel*>& models, std::string file)
 {
 	SmartBodyBinary::StaticMesh staticMesh = *mesh;
 
@@ -1396,7 +1411,81 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 				indices.push_back(m2d.to(z));
 			newModel->mtlFaceIndices.insert(std::make_pair(m2d.from(), indices));
 		}
+		// 18
+		for (int x = 0; x < meshModel.materialtotransparenttexturemapping_size(); ++x)
+		{
+			const SmartBodyBinary::StringToStringMap& m2d = meshModel.materialtotransparenttexturemapping(x);
+			newModel->mtlTransparentTexNameMap.insert(std::make_pair(m2d.from(), m2d.to()));
+		}
+		// 19
+		for (int x = 0; x < meshModel.materialtoglossytexturemapping_size(); ++x)
+		{
+			const SmartBodyBinary::StringToStringMap& m2d = meshModel.materialtoglossytexturemapping(x);
+			newModel->mtlGlossyTexNameMap.insert(std::make_pair(m2d.from(), m2d.to()));
+		}
 
+		// bake transparent and glossy maps into diffuse and specular maps
+		SrString path = file.c_str();
+		SrString filename;
+		path.extract_file_name(filename);
+		SrStringArray paths;
+		paths.push(path);
+
+		SbmTextureManager& texManager = SbmTextureManager::singleton();
+
+		for (size_t i = 0; i < newModel->M.size(); i++)
+		{
+			std::string matName = newModel->mtlnames[i];			
+			if (newModel->mtlTextureNameMap.find(matName) != newModel->mtlTextureNameMap.end())
+			{
+				std::string prefixedName = newModel->mtlTextureNameMap[matName];
+				int index = prefixedName.find_first_of("|");
+				std::string fileName = prefixedName;
+				if (index >= 0)
+					fileName = prefixedName.substr(index + 1);
+				ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_DIFFUSE, prefixedName.c_str(), fileName.c_str(), paths);
+
+				if (newModel->mtlTransparentTexNameMap.find(matName) != newModel->mtlTransparentTexNameMap.end())
+				{
+					SbmTexture* diffuseTex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, prefixedName.c_str());
+					SbmTexture* transTex = new SbmTexture("Dummy");
+					std::string transpTexFile = (*newModel->mtlTransparentTexNameMap.find(matName)).second;
+					std::string finalTextureName = ParserCOLLADAFast::getFinalTextureFileName(transpTexFile, paths);
+					transTex->loadImage(finalTextureName.c_str());
+					if (diffuseTex && transTex)
+					{
+						diffuseTex->bakeAlphaIntoTexture(transTex);
+					}
+				}
+				newModel->mtlTextureNameMap[matName] = prefixedName;
+			}
+
+			if (newModel->mtlSpecularTexNameMap.find(matName) != newModel->mtlSpecularTexNameMap.end())
+			{
+				std::string prefixedName = newModel->mtlSpecularTexNameMap[matName];
+				int index = prefixedName.find_first_of("|");
+				std::string fileName = prefixedName;
+				if (index >= 0)
+					fileName = prefixedName.substr(index + 1);
+				ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, prefixedName.c_str(), fileName.c_str(), paths);
+
+				if (newModel->mtlGlossyTexNameMap.find(matName) != newModel->mtlGlossyTexNameMap.end())
+				{
+					SbmTexture* specularTex = texManager.findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, prefixedName.c_str());
+					SbmTexture* glossyTex = new SbmTexture("Dummy");
+					std::string glossyTexFile = (*newModel->mtlGlossyTexNameMap.find(matName)).second;
+					std::string finalTextureName = ParserCOLLADAFast::getFinalTextureFileName(glossyTexFile, paths);
+					glossyTex->loadImage(finalTextureName.c_str());
+					if (specularTex && glossyTex)
+					{
+						specularTex->bakeAlphaIntoTexture(glossyTex);
+					}
+				}
+
+				newModel->mtlSpecularTexNameMap[matName] = prefixedName;
+			}
+		}
+		
 		if (newModel->Fn.size() == 0)
 		{
 			newModel->computeNormals();
@@ -1609,7 +1698,7 @@ bool DeformableMesh::readFromSmb(std::string inputFileName)
 	}
 
 	std::vector<SrModel*> models;
-	readFromStaticMeshBinary(&staticMesh, models);
+	readFromStaticMeshBinary(&staticMesh, models, inputFileName);
 
 	for (size_t m = 0; m > models.size(); m++)
 	{
@@ -1657,7 +1746,7 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 	SmartBodyBinary::StaticMesh staticMesh = deformableMesh.staticmesh();
 
 	std::vector<SrModel*> models;
-	readFromStaticMeshBinary(&staticMesh, models);
+	readFromStaticMeshBinary(&staticMesh, models, inputFileName);
 
 	// don't write into static/dynamic models until we'll sure which models
 	// are base shapes and which are morphs. Morphs fo in the blendShapeMap

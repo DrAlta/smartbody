@@ -1208,6 +1208,8 @@ void SrModel::add_model ( const SrModel& m )
    mtlTextureNameMap.insert(m.mtlTextureNameMap.begin(), m.mtlTextureNameMap.end());
    mtlNormalTexNameMap.insert(m.mtlNormalTexNameMap.begin(), m.mtlNormalTexNameMap.end());
    mtlSpecularTexNameMap.insert(m.mtlSpecularTexNameMap.begin(), m.mtlSpecularTexNameMap.end());
+   mtlTransparentTexNameMap.insert(m.mtlTransparentTexNameMap.begin(), m.mtlTransparentTexNameMap.end());
+   mtlGlossyTexNameMap.insert(m.mtlGlossyTexNameMap.begin(), m.mtlGlossyTexNameMap.end());
 
    validate(); 
 //    save(sr_out);
@@ -1232,6 +1234,8 @@ void SrModel::operator = ( const SrModel& m )
    mtlTextureNameMap = m.mtlTextureNameMap;
    mtlNormalTexNameMap = m.mtlNormalTexNameMap;
    mtlSpecularTexNameMap = m.mtlSpecularTexNameMap;
+   mtlTransparentTexNameMap = m.mtlTransparentTexNameMap;
+   mtlGlossyTexNameMap = m.mtlGlossyTexNameMap;
    mtlFaceIndices = m.mtlFaceIndices;
     
    name = m.name;

@@ -2008,7 +2008,7 @@ std::string ParserOpenCOLLADA::getGeometryType(std::string idString)
 	return "";
 }
 
-void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file, std::vector<SrMaterial>& M, std::vector<std::string>& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap,std::vector<SrModel*>& meshModelVec, float scale )
+void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file, std::vector<SrMaterial>& M, std::vector<std::string>& mnames,std::map<std::string, std::string>& materialId2Name, std::map<std::string,std::string>& mtlTexMap, std::map<std::string,std::string>& mtlTexBumpMap, std::map<std::string,std::string>& mtlTexSpecularMap, std::map<std::string, std::string>& mtlTexTransparentMap, std::map<std::string, std::string>& mtlTexGlossyMap, std::vector<SrModel*>& meshModelVec, float scale )
 {
 	std::map<std::string,bool> vertexSemantics;
 	//const DOMNodeList* list = node->getChildNodes();
@@ -2349,6 +2349,9 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 			newModel->mtlTextureNameMap = mtlTexMap;
 			newModel->mtlNormalTexNameMap = mtlTexBumpMap;
 			newModel->mtlSpecularTexNameMap = mtlTexSpecularMap;
+			newModel->mtlTransparentTexNameMap = mtlTexTransparentMap;
+			newModel->mtlGlossyTexNameMap = mtlTexGlossyMap;
+
 			newModel->M = M;
 			newModel->mtlnames = mnames;
 
@@ -2937,6 +2940,9 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 		std::map<std::string,std::string> mtlTextMap;
 		std::map<std::string,std::string> mtlTextBumpMap;
 		std::map<std::string,std::string> mtlTextSpecularMap;
+		std::map<std::string, std::string> mtlTexTransparentMap;
+		std::map<std::string, std::string> mtlTexGlossyMap;
+
 		//DOMNode* effectNode = ParserOpenCOLLADA::getNode("library_effects", fileName, 2);
 		depth = 0;
 		DOMNode* effectNode = getNode("library_effects", doc, depth, 2);	
@@ -2945,7 +2951,7 @@ bool ParserOpenCOLLADA::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 			ParserOpenCOLLADA::parseLibraryEffects(effectNode, effectId2MaterialId, materialId2Name, pictureId2File, pictureId2Name, M, mnames, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap);
 		}
 		// parsing geometry
-		ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, fileName.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, meshModelVecs, 1.0f);
+		ParserOpenCOLLADA::parseLibraryGeometries(geometryNode, fileName.c_str(), M, mnames, materialId2Name, mtlTextMap, mtlTextBumpMap, mtlTextSpecularMap, mtlTexTransparentMap, mtlTexGlossyMap, meshModelVecs, 1.0f);
 	}
 	else
 	{
