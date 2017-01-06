@@ -155,6 +155,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createVec3Attribute("deformableMeshScale", 1.0, 1.0, 1.0, true, "Display", 220, false, false, false, "Scale factor when loading mesh.");
 	createStringAttribute("deformableMesh", "", true, "Display", 230, false, false, false, "Directory that contains mesh information.");
 	createBoolAttribute("showSelected", true, true, "Display", 250, false, false, false, "Shows selection indicator when selected.");
+	createDoubleAttribute("alphaThreshold", .5, true, "Display", 260, false, false, false, "Alpha threshold for transparent textures.");
 
 	createStringAttribute("receiverName", "kinect1", true, "Remote", 300, false, false, false, "Name to respond to when receiving joint positions and orientations remotely.");
 	createDoubleAttribute("receiverScale", 100.0, true, "Remote", 300, false, false, false, "Scaling factor when receiving a joint position.");
