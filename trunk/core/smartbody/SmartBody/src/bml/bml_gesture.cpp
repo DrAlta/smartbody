@@ -182,7 +182,12 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		motion = SmartBody::SBScene::getScene()->getMotion(blendedMotionName);
 		if (!motion)
 		{
-			motion = blend->createMotionFromBlend(params, character, blendedMotionName);
+			motion = blend->createMotionFromBlend(params, character, blendedMotionName, 30.0f);
+			if (!motion)
+			{
+				LOG("Blend %s triggered from gesture is missing animation.", blend->getName().c_str());
+				return BehaviorRequestPtr();
+			}
 			// perform a retargeting if needed
 			std::string blendSkeleton = blend->getBlendSkeleton();
 			if (blendSkeleton != "")
