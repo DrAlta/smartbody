@@ -1533,7 +1533,7 @@ bool SBAnimationBlend::addMotionRef( SBMotion* sbmotion)
 }
 
 
-SBMotion* SBAnimationBlend::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName)
+SBMotion* SBAnimationBlend::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName, float fps)
 {
 	return NULL;
 }
@@ -1580,7 +1580,7 @@ void SBAnimationBlend0D::removeMotion(const std::string& motion)
 	removeSkMotion(motion);
 }
 
-SBMotion* SBAnimationBlend0D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName)
+SBMotion* SBAnimationBlend0D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName, float fps)
 {
 	return getSBMotion(0);
 }
@@ -1628,7 +1628,7 @@ void SBAnimationBlend1D::setParameter(const std::string& motion, float parameter
 	PABlend::setParameter(motion, parameter);
 }
 
-SBMotion* SBAnimationBlend1D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName)
+SBMotion* SBAnimationBlend1D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName, float fps)
 {
 	// let's start by assuming no keys and a linear retiming from one animation to another
 	double amount = parameters[0];
@@ -1659,8 +1659,7 @@ SBMotion* SBAnimationBlend1D::createMotionFromBlend(SrVec parameters, SBCharacte
 	if (jointMap)
 		jointMap->applyMotion(motion);
 	
-	float fps = 30.0; // new motion is at 30 fps
-	float step = 1.0f / 30.0f;
+	float step = 1.0f / fps;
 
 	SrBuffer<float> buffer(channelArray.count_floats());
 
@@ -1875,7 +1874,7 @@ void SBAnimationBlend2D::addTriangle(const std::string& motion1, const std::stri
 	PABlend::addTriangle(motion1, motion2, motion3);
 }
 
-SBMotion* SBAnimationBlend2D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName)
+SBMotion* SBAnimationBlend2D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName, float fps)
 {
 	// fix this, this is incorrect
 	return getSBMotion(0);
@@ -1926,7 +1925,7 @@ void SBAnimationBlend3D::addTetrahedron(const std::string& motion1, const std::s
 	PABlend::addTetrahedron(motion1, motion2, motion3, motion4);
 }
 
-SBMotion* SBAnimationBlend3D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName)
+SBMotion* SBAnimationBlend3D::createMotionFromBlend(SrVec parameters, SBCharacter* character, std::string motionName, float fps)
 {
 	// fix this, this is incorrect
 	return getSBMotion(0);

@@ -49,6 +49,8 @@ MeCtMotion::MeCtMotion ()
    _offset = 0;
    _isAdditive = false;
    _useOffset = false;
+   _holdTime = 0.0;
+   _holdDuration = 0.0;
  }
 
 MeCtMotion::~MeCtMotion ()
@@ -397,6 +399,24 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	//	            _play_mode, &_last_apply_frame );	
 	//LOG("dt = %f, motionTime = %f, curMotionTime = %f, dur = %f, continue = %d",dt, motionTime, curMotionTime, dur, continuing);
 	float motionTime = float(curMotionTime + _offset);
+	// check to see if the motion is being held
+	if (_holdDuration > 0.001)
+	{
+		double holdPeriodStart = _holdTime;
+		double holdPeriodEnd = _holdTime + _holdDuration;
+		 
+		if (motionTime > holdPeriodStart &&
+			motionTime <= holdPeriodEnd)
+		{
+			motionTime = _holdTime;
+		}
+		else if (motionTime > holdPeriodEnd)
+		{
+			motionTime = motionTime - _holdDuration;
+		}
+	}
+	else
+	
 	_motion->apply( motionTime,
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
@@ -516,6 +536,27 @@ void MeCtMotion::checkMotionEvents(double time)
 		}
 	}
 }
+
+void MeCtMotion::setHoldTime(double time)
+{
+	_holdTime = time;
+}
+
+double MeCtMotion::getHoldTime()
+{
+	return _holdTime;
+}
+
+void MeCtMotion::setHoldDuration(double time)
+{
+	_holdDuration = time;
+}
+
+double MeCtMotion::getHoldDuration()
+{
+	return _holdDuration;
+}
+
 
 //======================================= EOF =====================================
 
