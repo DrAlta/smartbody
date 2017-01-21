@@ -82,6 +82,8 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createBoolAttribute("gestureRequest.matchingSpeed", true, true, "Gestures", 93, false, false, false, "Holding previous gesture if necessary to match up with current gesture stroke speed."); 
 	createDoubleAttribute("gestureRequest.gestureSpeedThreshold", 1.5, true, "Gestures", 95, false, false, false, "The speed threshold used to determine whether it's suitable to transition from one gesture to another"); 
 	createDoubleAttribute("gestureRequest.gestureWristActiveThreshold", 0.15, true, "Gestures", 96, false, false, false, "The speed threshold used to determine if this hand moving."); 
+	createBoolAttribute("gestureRequest.experimentalCoarticulation", false, true, "Gestures", 97, false, false, false, "Experimental coarticulation code.");
+
 	createStringAttribute("gestureMap", "", true, "Gestures", 50, false, false, false, "Name of the gesture map to use.");
 
 	std::vector<std::string> gesturePolicyVec;

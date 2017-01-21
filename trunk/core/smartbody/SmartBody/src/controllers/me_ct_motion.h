@@ -67,6 +67,8 @@ class MeCtMotion : public SmartBody::SBController, public FadingControl
 	double motionTime;
 	bool				_isAdditive;
 	bool				_useOffset;
+	double				_holdTime;
+	double				_holdDuration;
 
    public :
 	   static std::string type_name;
@@ -155,6 +157,11 @@ class MeCtMotion : public SmartBody::SBController, public FadingControl
 
 	void checkMotionEvents(double time);
 	void loadMotionEvents();
+
+	void setHoldTime(double time);
+	double getHoldTime();
+	void setHoldDuration(double time);
+	double getHoldDuration();
 
    private:
 	void map_floats();

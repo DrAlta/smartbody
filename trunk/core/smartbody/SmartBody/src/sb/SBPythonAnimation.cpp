@@ -118,6 +118,7 @@ void pythonFuncsAnimation()
 		.def("offsetMotion", &SBAnimationBlend::offsetMotion, "offset motion x from the blend using motion time t")
 		.def("unoffsetMotions", &SBAnimationBlend::unoffsetMotions, "un-offset motions for the blend")
 		.def("backupMotionKey", &SBAnimationBlend::backupMotionKey, "backup the motion keys")
+		.def("createMotionFromBlend", &SBAnimationBlend::createMotionFromBlend, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Construct a new motion with a given name from the blend.")
 		;
 
 	boost::python::class_<SBAnimationBlend0D, boost::python::bases<SBAnimationBlend> >("SBAnimationBlend0D")

@@ -344,6 +344,169 @@ BehaviorSpan BmlRequest::getBehaviorSpan() {
 
 void BmlRequest::gestureRequestProcess()
 {
+	if (actor->getBoolAttribute("gestureRequest.experimentalCoarticulation"))
+	{
+		std::vector<GestureRequest*> gestures;
+		for (VecOfBehaviorRequest::iterator i = behaviors.begin(); i != behaviors.end(); ++i)
+		{
+			BehaviorRequest* behavior = (*i).get();
+			GestureRequest* gesture = dynamic_cast<GestureRequest*> (behavior);
+			if (gesture)
+			{
+				gestures.push_back(gesture);
+			}
+		}
+		if (gestures.size() <= 1)
+			return;
+
+		// first pass, remove lower priority overlapping gesture
+		for (size_t i = 0; i < gestures.size(); i++)
+		{
+			MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
+			SBMotion* sbMotion = dynamic_cast<SBMotion*>(motionController->motion());
+			motionController->setHoldDuration(2.0);
+			motionController->setHoldTime(sbMotion->getTimeStrokeEnd());
+			continue;
+
+			if (gestures[i]->filtered)
+				continue;
+
+			double currGestureStrokeStartAt = (double)gestures[i]->behav_syncs.sync_stroke_start()->time();
+			double currGestureStrokeAt = (double)gestures[i]->behav_syncs.sync_stroke()->time();
+			double currGestureStrokeEndAt = (double)gestures[i]->behav_syncs.sync_stroke_end()->time();
+			double currGestureRelaxAt = (double)gestures[i]->behav_syncs.sync_relax()->time();
+
+			for (size_t j = i + 1; j < gestures.size(); j++)
+			{
+				if (gestures[j]->filtered)
+					continue;
+
+				double nextGestureStrokeStartAt = (double)gestures[j]->behav_syncs.sync_start()->time();
+				double nextGestureStrokeAt = (double)gestures[j]->behav_syncs.sync_stroke()->time();
+				double nextGestureStrokeEndAt = (double)gestures[j]->behav_syncs.sync_stroke()->time();
+				double nextGestureRelaxAt = (double)gestures[j]->behav_syncs.sync_relax()->time();
+
+				// check for overlapping stroke phases
+				if (currGestureStrokeEndAt > nextGestureStrokeStartAt)
+				{
+					// remove the lower priority gesture
+					if (gestures[i]->priority >= gestures[j]->priority)
+					{
+						gestures[j]->filtered = true;
+						continue;
+					}
+					else
+					{
+						gestures[i]->filtered = true;
+						break;
+					}
+				}
+			}
+		}
+
+		// second pass, find gestures for coarticulation
+		for (size_t i = 0; i < gestures.size(); i++)
+		{
+			if (gestures[i]->filtered)
+				continue;
+
+			double currGestureStrokeStartAt = (double)gestures[i]->behav_syncs.sync_stroke_start()->time();
+			double currGestureStrokeAt = (double)gestures[i]->behav_syncs.sync_stroke()->time();
+			double currGestureStrokeEndAt = (double)gestures[i]->behav_syncs.sync_stroke_end()->time();
+			double currGestureRelaxAt = (double)gestures[i]->behav_syncs.sync_relax()->time();
+
+			for (size_t j = i + 1; j < gestures.size(); j++)
+			{
+				if (gestures[j]->filtered)
+					continue;
+
+				double nextGestureStrokeReady = (double)gestures[j]->behav_syncs.sync_ready()->time();
+				double nextGestureStrokeStartAt = (double)gestures[j]->behav_syncs.sync_start()->time();
+				double nextGestureStrokeAt = (double)gestures[j]->behav_syncs.sync_stroke()->time();
+				double nextGestureStrokeEndAt = (double)gestures[j]->behav_syncs.sync_stroke()->time();
+				double nextGestureRelaxAt = (double)gestures[j]->behav_syncs.sync_relax()->time();
+				double nextFullStrokeTime = nextGestureStrokeEndAt - nextGestureStrokeStartAt;
+				if (nextFullStrokeTime <= 0.0) // bad metadata information, can't coarticuate gesture
+					continue;
+
+				//if (nextGestureStrokeReady > currGestureRelaxAt)
+					//continue;
+
+				double gestureInterval = nextGestureStrokeStartAt - currGestureStrokeEndAt;
+
+				// coarticulation: hold and transition to new gesture
+				// determine the speed of the stroke in order to determine 
+				// how long the hold and transition periods should be
+				MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gestures[j]->anim_ct);
+				SBMotion* sbMotion = dynamic_cast<SBMotion*>(motionController->motion());
+				SmartBody::SBSkeleton* tempSkel = SmartBody::SBScene::getScene()->createSkeleton(actor->getSkeleton()->getName());
+				sbMotion->connect(tempSkel);
+				SBJoint* lWrist = actor->getSkeleton()->getJointByMappedName("l_wrist");
+				SBJoint* rWrist = actor->getSkeleton()->getJointByMappedName("r_wrist");
+				if (!lWrist || !rWrist)
+				{
+					// no wrists to check for speed, so can't do coarticulation
+					sbMotion->disconnect();
+					continue;
+				}
+
+
+				SrVec lWristPosStart = sbMotion->getJointPosition(lWrist, (float)sbMotion->time_stroke_start());
+				SrVec rWristPosStart = sbMotion->getJointPosition(rWrist, (float)sbMotion->time_stroke_start());
+
+				SrVec lWristPosEnd = sbMotion->getJointPosition(lWrist, (float)sbMotion->time_stroke_end());
+				SrVec rWristPosEnd = sbMotion->getJointPosition(rWrist, (float)sbMotion->time_stroke_end());
+				
+				sbMotion->disconnect();
+				
+				SrVec leftDistanceVec = lWristPosEnd - lWristPosStart;
+				SrVec rightDistanceVec = rWristPosEnd - rWristPosStart;
+
+				double leftDistance = leftDistanceVec.len();
+				double leftSpeed = leftDistance / nextFullStrokeTime;
+				double rightDistance = rightDistanceVec.len();
+				double rightSpeed = rightDistance / nextFullStrokeTime;
+
+				// assume faster movement determines the handedness of the gesture
+				// if gesture uses both hands, doesn't matter which one is used
+				double gestureSpeed = rightSpeed;
+				double gestureDistance = rightDistance;
+				if (leftSpeed > rightSpeed)
+				{
+					gestureSpeed = leftSpeed;
+					gestureDistance = leftDistance;
+				}
+
+				// determine the hold and transition periods to the new motion
+				double transitionTime = 0.0;
+				if (fabs(gestureSpeed) > .001)
+				{
+					transitionTime = gestureDistance / gestureSpeed;
+				}
+
+				if (transitionTime > gestureInterval)
+				{
+					// no hold period, transition to next gesture quickly
+					gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt);
+					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt);
+				}
+				else
+				{
+					double holdTime = gestureInterval - transitionTime;
+					motionController->setHoldTime(currGestureStrokeEndAt);
+					motionController->setHoldDuration(holdTime);
+
+					
+					// hold previous gesture for holdTime seconds
+					//gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt + holdTime); // for now, no holds...
+				}
+			}
+		}
+		
+
+		return;
+	}
+
 	if (actor->getBoolAttribute("gestureUseBlends"))
 	{
 		std::vector<EventRequest*> blends;
@@ -1639,7 +1802,7 @@ SyncPointPtr BmlRequest::getSyncByReference( const std::wstring& notation ) {
 				catch(boost::bad_lexical_cast& e)
 				{
 					std::wstringstream wstrstr;
-					wstrstr<<"WARNING: BmlRequest::getSyncPoint: BML offset refers to unknown "<<key<<" point.  Ignoring...";
+					wstrstr<<"WARNING: BmlRequest::getSyncPoint: BML offset refers to unknown "<< key <<" point.  Ignoring..." << e.what();
 					LOG(convertWStringToString(wstrstr.str()).c_str());
 				}				
 			} else {
