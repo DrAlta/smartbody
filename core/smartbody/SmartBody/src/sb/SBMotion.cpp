@@ -390,8 +390,8 @@ void SBMotion::bakeFrames(float fps)
 		fps = 30.0;
 	}
 	float step = float(1.0) / fps;
-	if (step < .033)
-		step = .033;
+	if (step < .033f)
+		step = .033f;
 	int numChannels = _channels.size();
 	for (float curTime = 0.0; curTime <= _maxFrameValue; curTime += step)
 	{
@@ -3434,7 +3434,7 @@ SBMotion* SBMotion::copy(const std::string& motionName)
 	newMotion->filename(filebase.c_str());
 	newMotion->init(ch);
 	//float* baseP = this->posture(0);
-	for (int f = 0; f < this->_frames.size(); f++)
+	for (size_t f = 0; f < this->_frames.size(); f++)
 	{
 		newMotion->insert_frame(f, this->_frames[f].keytime);
 		float* ref_p = posture(f);
@@ -3460,7 +3460,7 @@ bool SBMotion::speed(float factor)
 		return false;
 	}
 
-	for (int f = 0; f < _frames.size(); f++)
+	for (size_t f = 0; f < _frames.size(); f++)
 	{
 		_frames[f].keytime = _frames[f].keytime / factor;
 	}
@@ -3476,6 +3476,146 @@ bool SBMotion::speed(float factor)
 	this->setSyncPoint("stop", getTimeStop() / factor);
 
 	return true;
+}
+
+/*
+This function can be made generic later on
+*/
+SBMotion* SBMotion::buildPoststrokeHoldMotion(float holdTime, std::vector<std::string>& joints, float scale, float freq, SBMotion* idleMotion)
+{
+	bool insertIdleMotion = (idleMotion != NULL) ? true : false;
+
+	int numHoldFrames = int(holdTime * this->frames() / this->duration());
+	int strokeEndFrameId = int(synch_points.get_time(srSynchPoints::STROKE_STOP) * this->frames() / this->duration());
+
+	SkChannelArray& mchan_arr = this->channels();
+	SBMotion* newMotion = new SmartBody::SBMotion();
+	newMotion->synch_points.set_time(synch_points.get_time(srSynchPoints::START),
+		synch_points.get_time(srSynchPoints::READY),
+		synch_points.get_time(srSynchPoints::STROKE_START),
+		synch_points.get_time(srSynchPoints::STROKE),
+		synch_points.get_time(srSynchPoints::STROKE_STOP),
+		synch_points.get_time(srSynchPoints::RELAX) + holdTime,
+		synch_points.get_time(srSynchPoints::STOP) + holdTime
+	);
+
+	newMotion->init(mchan_arr);
+	int num_f = this->frames();
+	for (int i = 0; i < (num_f + numHoldFrames); ++i)
+	{
+		newMotion->insert_frame(i, float(i) * this->duration() / float(this->frames() - 1));
+
+		int refPosId = i;
+		bool inHoldingPeriod = false;
+		if (i >= strokeEndFrameId && i <= (strokeEndFrameId + numHoldFrames))
+		{
+			if (insertIdleMotion)	// insert idle motion frames
+			{
+				int numIdleFrames = idleMotion->frames();
+				refPosId = (i - strokeEndFrameId) % numIdleFrames;
+			}
+			else
+				refPosId = strokeEndFrameId;
+			inHoldingPeriod = true;
+		}
+		else if (i < strokeEndFrameId)
+			refPosId = i;
+		else
+			refPosId = i - numHoldFrames;
+
+		float* ref_p;
+		if (inHoldingPeriod && insertIdleMotion)
+			ref_p = idleMotion->posture(refPosId);
+		else
+			ref_p = this->posture(refPosId);
+
+		float* new_p = newMotion->posture(i);
+		memcpy(new_p, ref_p, sizeof(float)*posture_size());
+	}
+	std::vector<int> toSmoothIds;
+	int wide = 5;
+	for (int i = strokeEndFrameId - wide; i <= strokeEndFrameId + wide; i++)
+		toSmoothIds.push_back(i);
+
+
+	// handle the base joints
+	if (strokeEndFrameId == 0)
+	{
+		LOG("SkMotion::buildPoststrokeHoldMotion ERR: please check if the stroke end time is set correctly!");
+		return newMotion;
+	}
+
+	if (insertIdleMotion)
+	{
+		float *ref_p = newMotion->posture(strokeEndFrameId - 1);
+		for (int i = strokeEndFrameId; i <= strokeEndFrameId + numHoldFrames; ++i)
+		{
+			for (int k = 0; k<mchan_arr.size(); k++)
+			{
+				SkChannel& chan = mchan_arr[k];
+				const std::string& jointName = mchan_arr.name(k);
+				int index = mchan_arr.float_position(k);
+				bool isPos = chan.type == SkChannel::XPos;
+				if (jointName == "base" && isPos)
+				{
+					newMotion->posture(i)[index] = ref_p[index];
+					newMotion->posture(i)[index + 1] = ref_p[index + 1];
+					newMotion->posture(i)[index + 2] = ref_p[index + 2];
+					break;
+				}
+			}
+		}
+		newMotion->smoothAtFrame(strokeEndFrameId, 1, 5);
+		newMotion->smoothAtFrame(strokeEndFrameId + numHoldFrames, 1, 5);
+	}
+	else if (joints.size() > 0)	// joint specified, add perlin noise
+	{
+		newMotion->addPerlinNoise(joints, strokeEndFrameId, strokeEndFrameId + numHoldFrames, scale, freq);
+		//newMotion->smoothAtFrame(strokeEndFrameId, 3, 5);
+		//newMotion->smoothAtFrame(strokeEndFrameId + numHoldFrames, 3, 5);
+	}
+
+
+	return newMotion;
+}
+
+/*
+This function can be made generic later on
+*/
+SBMotion* SBMotion::buildPrestrokeHoldMotion(float holdTime, SBMotion* idleMotion)
+{
+	int numHoldFrames = int(holdTime * this->frames() / this->duration());
+	int strokeStartFrameId = int(synch_points.get_time(srSynchPoints::STROKE_START) * this->frames() / this->duration());
+
+	SkChannelArray& mchan_arr = this->channels();
+	SBMotion* newMotion = new SmartBody::SBMotion();
+	newMotion->synch_points.set_time(synch_points.get_time(srSynchPoints::START),
+		synch_points.get_time(srSynchPoints::READY),
+		synch_points.get_time(srSynchPoints::STROKE_START) + holdTime,
+		synch_points.get_time(srSynchPoints::STROKE) + holdTime,
+		synch_points.get_time(srSynchPoints::STROKE_STOP) + holdTime,
+		synch_points.get_time(srSynchPoints::RELAX) + holdTime,
+		synch_points.get_time(srSynchPoints::STOP) + holdTime
+	);
+
+	newMotion->init(mchan_arr);
+	int num_f = this->frames();
+	for (int i = 0; i < (num_f + numHoldFrames); ++i)
+	{
+		newMotion->insert_frame(i, float(i) * this->duration() / float(this->frames()));
+
+		int refPosId = i;
+		if (i >= strokeStartFrameId && i <= (strokeStartFrameId + numHoldFrames))
+			refPosId = strokeStartFrameId;
+		else if (i < strokeStartFrameId)
+			refPosId = i;
+		else
+			refPosId = i - numHoldFrames;
+		float *ref_p = this->posture(refPosId);
+		float *new_p = newMotion->posture(i);
+		memcpy(new_p, ref_p, sizeof(float)*posture_size());
+	}
+	return newMotion;
 }
 
 

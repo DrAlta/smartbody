@@ -194,16 +194,18 @@ def setupBehaviorSet():
 	
 	
 	gMapB1 = gMapManager.createGestureMap("BradGesture")
-
+	
+	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopLf01", "BEAT", "", "", "", "ChrBrad@Idle01")
+'''
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_ChopLf01", "METAPHORIC", "OBLIGATION", "LEFT_HAND", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("ChopLf", "METAPHORIC", "OBLIGATION", "LEFT_HAND", "", "ChrBrad@Idle01")
 
 	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopRt02Blend", "METAPHORIC", "OBLIGATION", "RIGHT_HAND", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopBoth01Blend", "METAPHORIC", "OBLIGATION", "BOTH_HANDS", "", "ChrBrad@Idle01")
 
-	#gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf01", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
-	#gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf02", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
-	#gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowRt01", "BEAT", "RHYTHM", "RIGHT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf01", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowLf02", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowRt01", "BEAT", "RHYTHM", "RIGHT_HAND", "", "ChrBrad@Idle01")
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_BeatLowBt01", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
 
 	# Begin STACY ADDING HERE
@@ -213,6 +215,7 @@ def setupBehaviorSet():
 	# BeatLowLf01 and 02 
 
 	# Both hands
+
 	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatHighBt01Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatHighBt02Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatHighBt03Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
@@ -222,6 +225,9 @@ def setupBehaviorSet():
 
 	# Left hand
 	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatFistMidLf01Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
+	
+	
+	
 	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatFistMidLf02Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatMidLf01Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("ChrBrad@Idle01_BeatPointMidLf01Blend", "BEAT", "RHYTHM", "LEFT_HAND", "", "ChrBrad@Idle01")
@@ -236,7 +242,7 @@ def setupBehaviorSet():
 	# Right Hand
 	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopRt02Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("ChrBrad@Idle01_PointRt01Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
-        gMapB1.addGestureMapping("ChrBrad@Idle01_WeRt02Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
+	gMapB1.addGestureMapping("ChrBrad@Idle01_WeRt02Blend", "BEAT", "RHYTHM", "BOTH_HANDS", "", "ChrBrad@Idle01")
 
 
 
@@ -407,7 +413,7 @@ def setupBehaviorSet():
 
 	gMapB3.addGestureMapping("ChrBrad@Idle01_BeatLowLf02", "METAPHORIC", "INDIFFERENCE", "LEFT_HAND", "", "ChrBrad@Idle01")
 	gMapB3.addGestureMapping("ChrBrad@Idle01_BeatLowLf02", "METAPHORIC", "UNCERTAINTY", "LEFT_HAND", "", "ChrBrad@Idle01")
-
+'''
 		
 		
 		

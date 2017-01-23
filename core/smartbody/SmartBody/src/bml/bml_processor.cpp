@@ -49,7 +49,6 @@
 #include "bml_interrupt.hpp"
 #include "bml_speech.hpp"
 #include "bml_locomotion.hpp"
-#include "bml_quickdraw.hpp"
 #include "bml_general_param.hpp"
 #include "bml_states.hpp"
 #include "bml_noise.hpp"
@@ -480,8 +479,6 @@ void BML::Processor::parseBehaviorGroup( DOMElement *group, BmlRequestPtr reques
 				behavior = parse_bml_param( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_SBM_EVENT )==0 ) {
 				behavior = parse_bml_event( child, unique_id, behav_syncs, required, request, scene );
-			} else if( XMLString::compareString( tag, BMLDefs::TAG_QUICKDRAW )==0 ) {
-				behavior = parse_bml_quickdraw( child, unique_id, behav_syncs, required, request, scene );
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_SPEECH )==0 ) {
 				LOG("ERROR: BML::Processor::parseBML(): <speech> BML tag must be first behavior (TEMPORARY HACK).");
 			} else if( XMLString::compareString( tag, BMLDefs::TAG_LOCOTMOTION )==0 ) {

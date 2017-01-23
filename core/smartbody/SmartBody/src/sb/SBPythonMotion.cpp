@@ -69,7 +69,7 @@ typedef std::map<std::string, std::string> StringMap;
 
 #ifndef SB_NO_PYTHON
 
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
+#if 1 // defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
 namespace boost
 {
 	template<> const volatile SmartBody::SBMotion* get_pointer(const volatile SmartBody::SBMotion* p) { return p; }
@@ -156,6 +156,8 @@ void pythonFuncsMotion()
 		.def("addTemporalRotationOffset", &SBMotion::addTemporalRotationOffset, "Add a rotation offset on a joint.")	
 		.def("copy", &SBMotion::copy, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Copy the motion to a new motion with a given name.")
 		.def("speed", &SBMotion::speed, "Changes the speed of the motion by the given scaling factor.")
+		.def("buildPrestrokeHoldMotion", &SBMotion::buildPrestrokeHoldMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Builds a pre-stroke hold motion with noise.")
+		.def("buildPoststrokeHoldMotion", &SBMotion::buildPoststrokeHoldMotion, boost::python::return_value_policy<boost::python::reference_existing_object>(), "Builds a post-stroke hold motion with noise.")
 		;
 
 	boost::python::class_<SBMotionNode>("SBMotionNode")

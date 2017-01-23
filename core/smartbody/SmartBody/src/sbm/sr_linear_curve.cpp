@@ -251,6 +251,38 @@ double srLinearCurve::get_tail_slope( void )	{
 	return( 0.0 );
 }
 
+double srLinearCurve::get_key_param(int index)
+{
+	if (index >= this->get_num_keys())
+		return 0.0;
+
+	int curKeyIndex = 0;
+	Key* curKey = this->head_p;
+	while (curKey)
+	{
+		if (curKeyIndex == index)
+			return curKey->param;
+		curKey = curKey->next();
+		curKeyIndex++;
+	}
+}
+
+double srLinearCurve::get_key_value(int index)
+{
+	if (index >= this->get_num_keys())
+		return 0.0;
+
+	int curKeyIndex = 0;
+	Key* curKey = this->head_p;
+	while (curKey)
+	{
+		if (curKeyIndex == index)
+			return curKey->value;
+		curKey = curKey->next();
+		curKeyIndex++;
+	}
+}
+
 double srLinearCurve::get_next_nonzero_value( double after )	{
 
 	if( head_p == NULL )	{

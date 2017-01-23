@@ -72,6 +72,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "smartbody_dependencies", "s
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OgreViewer", "core\ogre-viewer\build\vs2015\OgreViewer.vcxproj", "{B19F5657-AA08-4D34-B3A3-58045074DBBB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioProcess", "core\AudioProcess\AudioProcess.vcxproj", "{515F1C34-7854-47E9-A97A-CE568B3D7972}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Emscripten = Debug|Emscripten
@@ -216,6 +218,12 @@ Global
 		{B19F5657-AA08-4D34-B3A3-58045074DBBB}.Release|Emscripten.Build.0 = Release|Emscripten
 		{B19F5657-AA08-4D34-B3A3-58045074DBBB}.Release|Win32.ActiveCfg = Release|Win32
 		{B19F5657-AA08-4D34-B3A3-58045074DBBB}.Release|Win32.Build.0 = Release|Win32
+		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Debug|Emscripten.ActiveCfg = Debug|Win32
+		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Debug|Win32.ActiveCfg = Debug|Win32
+		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Debug|Win32.Build.0 = Debug|Win32
+		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Release|Emscripten.ActiveCfg = Release|Win32
+		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Release|Win32.ActiveCfg = Release|Win32
+		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

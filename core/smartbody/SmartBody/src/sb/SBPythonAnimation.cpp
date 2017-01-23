@@ -67,7 +67,7 @@ typedef std::map<std::string, std::string> StringMap;
 
 
 #ifndef SB_NO_PYTHON
-#if defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
+#if 1 //defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
 namespace boost
 {
 	template<> const volatile SmartBody::SBAnimationBlend* get_pointer(const volatile SmartBody::SBAnimationBlend* p) { return p; }

@@ -104,7 +104,6 @@ copy /Y "$(OutDir)$(ProjectName)_d.pdb" lib
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-
       <Command>svn info src &gt;nul 2&gt;nul
 if %errorlevel% == 0 (
    if exist "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" "C:\Program Files\TortoiseSVN\bin\SubWCRev.exe" src src\sb\SBVersionTemplate.hpp src\sb\SBVersion.hpp
@@ -341,7 +340,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\bml\bml_locomotion.cpp" />
     <ClCompile Include="..\SmartBody\src\bml\bml_noise.cpp" />
     <ClCompile Include="..\SmartBody\src\bml\bml_processor.cpp" />
-    <ClCompile Include="..\SmartBody\src\bml\bml_quickdraw.cpp" />
     <ClCompile Include="..\SmartBody\src\bml\bml_reach.cpp" />
     <ClCompile Include="..\SmartBody\src\bml\bml_saccade.cpp" />
     <ClCompile Include="..\SmartBody\src\bml\bml_speech.cpp" />
@@ -355,7 +353,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\controllers\me_controller_context.cpp" />
     <ClCompile Include="..\SmartBody\src\controllers\me_controller_context_proxy.cpp" />
     <ClCompile Include="..\SmartBody\src\controllers\me_controller_tree_root.cpp" />
-    <ClCompile Include="..\SmartBody\src\controllers\me_ct_adshr_envelope.cpp" />
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_barycentric_interpolation.cpp" />
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_basic_locomotion.cpp" />
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_blend.cpp" />
@@ -400,7 +397,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_periodic_replay.cpp" />
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_physics_controller.cpp" />
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_pose.cpp" />
-    <ClCompile Include="..\SmartBody\src\controllers\me_ct_quick_draw.cpp" />
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_reach.cpp" />
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_reach_IK.cpp" />
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_saccade.cpp" />
@@ -680,7 +676,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\SmartBody\src\bml\bml_locomotion.hpp" />
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp" />
     <ClInclude Include="..\SmartBody\src\bml\bml_processor.hpp" />
-    <ClInclude Include="..\SmartBody\src\bml\bml_quickdraw.hpp" />
     <ClInclude Include="..\SmartBody\src\bml\bml_reach.hpp" />
     <ClInclude Include="..\SmartBody\src\bml\bml_saccade.hpp" />
     <ClInclude Include="..\SmartBody\src\bml\bml_schedule.hpp" />
@@ -698,7 +693,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\SmartBody\src\controllers\me_controller_context.hpp" />
     <ClInclude Include="..\SmartBody\src\controllers\me_controller_context_proxy.hpp" />
     <ClInclude Include="..\SmartBody\src\controllers\me_controller_tree_root.hpp" />
-    <ClInclude Include="..\SmartBody\src\controllers\me_ct_adshr_envelope.hpp" />
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_barycentric_interpolation.h" />
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_basic_locomotion.h" />
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_blend.hpp" />
@@ -742,7 +736,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_periodic_replay.hpp" />
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_physics_controller.h" />
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_pose.h" />
-    <ClInclude Include="..\SmartBody\src\controllers\me_ct_quick_draw.h" />
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_reach.hpp" />
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_reach_IK.hpp" />
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_saccade.h" />

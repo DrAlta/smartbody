@@ -197,7 +197,9 @@ class SBMotion : public SkMotion
 		float getScale() const;
 
 		void setMotion(const SBMotion& motion);
-		
+
+		SBMotion* buildPrestrokeHoldMotion(float holdTime, SBMotion* idleMotion);
+		SBMotion* buildPoststrokeHoldMotion(float holdTime, std::vector<std::string>& joints, float scale, float freq, SBMotion* idleMotion);
 
 		// serializable data
 		std::string sName;

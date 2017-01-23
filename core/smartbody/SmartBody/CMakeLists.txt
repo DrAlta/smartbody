@@ -300,7 +300,6 @@ set( SMARTBODY_LIB_ME_SRC
         ./src/controllers/me_controller_context_proxy.cpp
         ./src/controllers/me_controller.cpp
         ./src/controllers/me_controller_tree_root.cpp
-        ./src/controllers/me_ct_adshr_envelope.cpp
         ./src/controllers/me_ct_blend.cpp
         ./src/controllers/me_ct_channel_writer.cpp
         ./src/controllers/me_ct_container.cpp
@@ -428,7 +427,6 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/bml/bml_interrupt.cpp
         ./src/bml/bml_locomotion.cpp
         ./src/bml/bml_processor.cpp
-        ./src/bml/bml_quickdraw.cpp
         ./src/bml/bml_reach.cpp
         ./src/bml/bml_speech.cpp
         ./src/bml/bml_sync_point.cpp
@@ -488,7 +486,6 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/controllers/me_ct_motion_timewarp.cpp
         ./src/controllers/me_ct_param_animation.cpp
         ./src/controllers/me_ct_param_animation_utilities.cpp
-        ./src/controllers/me_ct_quick_draw.cpp
         ./src/controllers/me_ct_reach.cpp
         ./src/controllers/me_ct_hand.cpp
         ./src/controllers/me_ct_motion_profile.cpp

@@ -7,7 +7,7 @@ obj = scene.getPawn("light0")
 if obj == None:
 	obj = scene.createPawn("light0")
 obj.setPosition(SrVec(-0.24, 1.71, 0))
-obj.setOrientation(SrQuat(0.441375, -0.256798, 0.163409, 0.844121))
+obj.setOrientation(SrQuat(0.441373, -0.256798, 0.16341, 0.844122))
 if obj.getAttribute("blendTexturesWithLighting") != None :
 	obj.setBoolAttribute("blendTexturesWithLighting",True)
 else:
@@ -266,7 +266,7 @@ obj = scene.getPawn("light1")
 if obj == None:
 	obj = scene.createPawn("light1")
 obj.setPosition(SrVec(-0.26, 1.75, 0))
-obj.setOrientation(SrQuat(0.698223, -0.630226, 0.0281355, -0.338391))
+obj.setOrientation(SrQuat(0.698223, -0.630225, 0.0281358, -0.338391))
 if obj.getAttribute("blendTexturesWithLighting") != None :
 	obj.setBoolAttribute("blendTexturesWithLighting",True)
 else:
@@ -525,7 +525,7 @@ obj = scene.getPawn("light2")
 if obj == None:
 	obj = scene.createPawn("light2")
 obj.setPosition(SrVec(-0.26, 1.74, 0))
-obj.setOrientation(SrQuat(0.706875, 0.671407, -0.21128, -0.0700094))
+obj.setOrientation(SrQuat(0.678135, 0.70042, -0.214035, -0.0611105))
 if obj.getAttribute("blendTexturesWithLighting") != None :
 	obj.setBoolAttribute("blendTexturesWithLighting",True)
 else:
@@ -743,23 +743,23 @@ else:
 	attr.setDefaultValue(0)
 	attr.setValue(0)
 if obj.getAttribute("rotX") != None :
-	obj.setDoubleAttribute("rotX",66.8703)
+	obj.setDoubleAttribute("rotX",67.4878)
 else:
-	attr = obj.createDoubleAttribute("rotX", 66.8703, True, "transform", 40, False, False, False, "X rotation")
+	attr = obj.createDoubleAttribute("rotX", 67.4878, True, "transform", 40, False, False, False, "X rotation")
 	attr.setDefaultValue(0)
-	attr.setValue(66.8703)
+	attr.setValue(67.4878)
 if obj.getAttribute("rotY") != None :
-	obj.setDoubleAttribute("rotY",-88.6656)
+	obj.setDoubleAttribute("rotY",-100.96)
 else:
-	attr = obj.createDoubleAttribute("rotY", -88.6656, True, "transform", 50, False, False, False, "Y rotation")
+	attr = obj.createDoubleAttribute("rotY", -100.96, True, "transform", 50, False, False, False, "Y rotation")
 	attr.setDefaultValue(0)
-	attr.setValue(-88.6656)
+	attr.setValue(-100.96)
 if obj.getAttribute("rotZ") != None :
-	obj.setDoubleAttribute("rotZ",-76.9611)
+	obj.setDoubleAttribute("rotZ",-88.3004)
 else:
-	attr = obj.createDoubleAttribute("rotZ", -76.9611, True, "transform", 60, False, False, False, "Z rotation")
+	attr = obj.createDoubleAttribute("rotZ", -88.3004, True, "transform", 60, False, False, False, "Z rotation")
 	attr.setDefaultValue(0)
-	attr.setValue(-76.9611)
+	attr.setValue(-88.3004)
 if obj.getAttribute("showCollisionShape") != None :
 	obj.setBoolAttribute("showCollisionShape",True)
 else:
