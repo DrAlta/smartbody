@@ -168,6 +168,9 @@ class srLinearCurve	{
 		double get_tail_value( void );
 		double get_tail_slope( void );
 
+		double get_key_param(int index);
+		double get_key_value(int index);
+
 		double get_next_nonzero_value( double after );
 		double get_next_nonzero_slope( double after );
 //		double get_last_nonzero_param( double after );

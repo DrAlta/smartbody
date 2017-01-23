@@ -12,7 +12,7 @@ camera.setNearPlane(0.1*sscale)
 cameraPawn = scene.createPawn("camera")
 cameraPos = SrVec(0, 1.66*sscale, 1.85*sscale)
 cameraPawn.setPosition(cameraPos)
-
+'''
 light0 = scene.createPawn("light0")
 light0Pos = SrVec(1.00*sscale, 2.50*sscale, 4.00*sscale)
 light0.setPosition(light0Pos)
@@ -47,5 +47,5 @@ light1.createDoubleAttribute("lightSpotCutoff", 180.0, True, "LightAttributes", 
 light1.createDoubleAttribute("lightConstantAttenuation", 1.0, True, "LightAttributes", 70, False, False, False, "Constant attenuation")
 light1.createDoubleAttribute("lightLinearAttenuation", 0.0, True, "LightAttributes", 80, False, False, False, "Linear attenuation")
 light1.createDoubleAttribute("lightQuadraticAttenuation", 0.0, True, "LightAttributes", 90, False, False, False, "Quadratic attenuation")
-
+'''
 

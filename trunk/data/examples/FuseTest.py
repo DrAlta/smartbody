@@ -2,7 +2,7 @@ print "Sample Fuse Character"
 
 # location of the Fuse model as a COLLADA file
 modelName = "FuseC"
-scene.loadAssetsFromPath("c:/users/shapi/Dropbox/fuse/" + modelName)
+scene.loadAssetsFromPath("c:/users/Ari/Dropbox/fuse/" + modelName)
 
 obj = scene.createPawn("light0")
 obj.setPosition(SrVec(0, 180, 0))

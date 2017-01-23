@@ -45,6 +45,8 @@
 #include "controllers/me_ct_scheduler2.h"
 #include "controllers/me_ct_gaze.h"
 #include "controllers/me_controller_tree_root.hpp"
+#include "controllers/me_ct_scheduler2.h"
+#include "controllers/me_ct_blend.hpp"
 
 #include "sbm/BMLDefs.h"
 #include <sb/SBSimulationManager.h>
@@ -366,6 +368,8 @@ void BmlRequest::gestureRequestProcess()
 			SBMotion* sbMotion = dynamic_cast<SBMotion*>(motionController->motion());
 			motionController->setHoldDuration(2.0);
 			motionController->setHoldTime(sbMotion->getTimeStrokeEnd());
+			// change the blend controller to adjust fade out to match hold duration + hold time
+			
 			continue;
 
 			if (gestures[i]->filtered)
@@ -495,7 +499,17 @@ void BmlRequest::gestureRequestProcess()
 					double holdTime = gestureInterval - transitionTime;
 					motionController->setHoldTime(currGestureStrokeEndAt);
 					motionController->setHoldDuration(holdTime);
+					// change the blend controller to adjust fade out to match hold duration + hold time
+					std::vector<MeCtScheduler2::TrackPtr> tracks = gestures[i]->schedule_ct->tracks();
+					if (tracks.size() > 0)
+					{
+						MeCtUnary* unaryCt = tracks[0]->blending_ct();
+						MeCtBlend* blendCt = dynamic_cast<MeCtBlend*>(unaryCt);
+						srLinearCurve& blend_curve = blendCt->get_curve();
+						// push the blend out time by an amount equal to the hold time						
+						int keys = blend_curve.get_num_keys();
 
+					}
 					
 					// hold previous gesture for holdTime seconds
 					//gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt + holdTime); // for now, no holds...
@@ -2052,70 +2066,74 @@ void GestureRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* sc
 	if (filtered)
 		return;
 
-	// takes in stroke and stroke_end
-	double startAt		= (double)behav_syncs.sync_start()->time();
-	double readyAt		= (double)behav_syncs.sync_ready()->time();
-	double strokeStartAt= (double)behav_syncs.sync_stroke_start()->time();
-	double strokeAt		= (double)behav_syncs.sync_stroke()->time();
-	double strokeEndAt	= (double)behav_syncs.sync_stroke_end()->time();
-	double relaxAt		= (double)behav_syncs.sync_relax()->time();
-	double endAt		= (double)behav_syncs.sync_end()->time();
+	if (!request->actor->getBoolAttribute("gestureRequest.experimentalCoarticulation"))
+	{
+		// takes in stroke and stroke_end
+		double startAt		= (double)behav_syncs.sync_start()->time();
+		double readyAt		= (double)behav_syncs.sync_ready()->time();
+		double strokeStartAt= (double)behav_syncs.sync_stroke_start()->time();
+		double strokeAt		= (double)behav_syncs.sync_stroke()->time();
+		double strokeEndAt	= (double)behav_syncs.sync_stroke_end()->time();
+		double relaxAt		= (double)behav_syncs.sync_relax()->time();
+		double endAt		= (double)behav_syncs.sync_end()->time();
 
 
-	MeCtMotion* motion_ct = dynamic_cast<MeCtMotion*> (anim_ct);
-	SkMotion* motion = motion_ct->motion();
-	SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
-	double motionStroke = motion->time_stroke_emphasis();
-	double motionStrokeEnd = motion->time_stroke_end();
-	double motionRelax = motion->time_relax();
+		MeCtMotion* motion_ct = dynamic_cast<MeCtMotion*> (anim_ct);
+		SkMotion* motion = motion_ct->motion();
+		SBMotion* sbMotion = dynamic_cast<SBMotion*>(motion);
+		double motionStroke = motion->time_stroke_emphasis();
+		double motionStrokeEnd = motion->time_stroke_end();
+		double motionRelax = motion->time_relax();
 	
-	double holdTime = (relaxAt - strokeEndAt) - (motionRelax - motionStrokeEnd);
-	if (holdTime > 0.01)
-	{	
-		std::vector<std::string> jointVec;
-		if (sbMotion)
-		{
-			if (sbMotion->hasMetaData("noise_joints"))
-				joints = sbMotion->getMetaDataString("noise_joints");
-			if (sbMotion->hasMetaData("noise_scale"))
-				scale = (float)atof(sbMotion->getMetaDataString("noise_scale").c_str());
-			if (sbMotion->hasMetaData("noise_frequency"))
-				freq = (float)atof(sbMotion->getMetaDataString("noise_frequency").c_str());
-		}
-		vhcl::Tokenize(joints, jointVec);
-		SkMotion* holdM = motion->buildPoststrokeHoldMotion((float)holdTime, jointVec, scale, freq, NULL);
-		holdM->setName(motion->getName());	// even after holding, the name should be the same
-		SmartBody::SBMotion* sbHoldM = dynamic_cast<SmartBody::SBMotion*>(holdM);
-		if (sbHoldM)
-			sbHoldM->setMotionSkeletonName(sbMotion->getMotionSkeletonName());
-		SBCharacter* sbCharacter = dynamic_cast<SBCharacter*>(request->actor);
-		bool isInLocomotion = false;
-		SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
-		SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(sbCharacter->getName());
-		if (steerAgent)
-		{
-			for (size_t i = 0; i < request->behaviors.size(); ++i)
+		double holdTime = (relaxAt - strokeEndAt) - (motionRelax - motionStrokeEnd);
+		if (holdTime > 0.01)
+		{	
+			std::vector<std::string> jointVec;
+			if (sbMotion)
 			{
-				if ((request->behaviors)[i]->local_id == "locomotion")
-				{
-					isInLocomotion = true;
-					break;
-				}
+				if (sbMotion->hasMetaData("noise_joints"))
+					joints = sbMotion->getMetaDataString("noise_joints");
+				if (sbMotion->hasMetaData("noise_scale"))
+					scale = (float)atof(sbMotion->getMetaDataString("noise_scale").c_str());
+				if (sbMotion->hasMetaData("noise_frequency"))
+					freq = (float)atof(sbMotion->getMetaDataString("noise_frequency").c_str());
 			}
-			PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
-			if (ppraiAgent->isInLocomotion())
-				isInLocomotion = true;
-		}
-		if (isInLocomotion)
-		{
-			std::vector<std::string> jointNames = sbCharacter->getSkeleton()->getUpperBodyJointNames();
-			motion_ct->init( const_cast<SbmCharacter*>(request->actor), holdM, jointNames);
-		}
-		else
-		{
-			motion_ct->init(const_cast<SbmCharacter*>(request->actor), holdM, 0.0, 1.0);
+			vhcl::Tokenize(joints, jointVec);
+			SkMotion* holdM = motion->buildPoststrokeHoldMotion((float)holdTime, jointVec, scale, freq, NULL);
+			holdM->setName(motion->getName());	// even after holding, the name should be the same
+			SmartBody::SBMotion* sbHoldM = dynamic_cast<SmartBody::SBMotion*>(holdM);
+			if (sbHoldM)
+				sbHoldM->setMotionSkeletonName(sbMotion->getMotionSkeletonName());
+			SBCharacter* sbCharacter = dynamic_cast<SBCharacter*>(request->actor);
+			bool isInLocomotion = false;
+			SmartBody::SBSteerManager* steerManager = SmartBody::SBScene::getScene()->getSteerManager();
+			SmartBody::SBSteerAgent* steerAgent = steerManager->getSteerAgent(sbCharacter->getName());
+			if (steerAgent)
+			{
+				for (size_t i = 0; i < request->behaviors.size(); ++i)
+				{
+					if ((request->behaviors)[i]->local_id == "locomotion")
+					{
+						isInLocomotion = true;
+						break;
+					}
+				}
+				PPRAISteeringAgent* ppraiAgent = dynamic_cast<PPRAISteeringAgent*>(steerAgent);
+				if (ppraiAgent->isInLocomotion())
+					isInLocomotion = true;
+			}
+			if (isInLocomotion)
+			{
+				std::vector<std::string> jointNames = sbCharacter->getSkeleton()->getUpperBodyJointNames();
+				motion_ct->init( const_cast<SbmCharacter*>(request->actor), holdM, jointNames);
+			}
+			else
+			{
+				motion_ct->init(const_cast<SbmCharacter*>(request->actor), holdM, 0.0, 1.0);
+			}
 		}
 	}
+
 	MeControllerRequest::realize_impl(request, scene);
 }
 

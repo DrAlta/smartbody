@@ -171,8 +171,8 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		SrVec params(atof(xvalStr.c_str()), atof(yvalStr.c_str()), atof(zvalStr.c_str()));
 
 		std::stringstream strstr;
-		strstr.precision(2);
-		strstr << xVal << "_" << yVal << "_" << "_" << zVal;
+		strstr.precision(1);
+		strstr << params[0] << "_" << params[1] << "_" << "_" << params[2];
 		std::string tempString = strstr.str();
 		std::string nameStr = vhcl::Replace(tempString, ".", "_");
 		std::stringstream strstr2;

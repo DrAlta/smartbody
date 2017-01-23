@@ -55,9 +55,6 @@
     <ClCompile Include="..\SmartBody\src\bml\bml_processor.cpp">
       <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\SmartBody\src\bml\bml_quickdraw.cpp">
-      <Filter>bml</Filter>
-    </ClCompile>
     <ClCompile Include="..\SmartBody\src\bml\bml_reach.cpp">
       <Filter>bml</Filter>
     </ClCompile>
@@ -145,9 +142,6 @@
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_tether.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\SmartBody\src\controllers\me_ct_quick_draw.cpp">
-      <Filter>controllers</Filter>
-    </ClCompile>
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_examples.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
@@ -155,9 +149,6 @@
       <Filter>controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_motion.cpp">
-      <Filter>controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\controllers\me_ct_adshr_envelope.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\SmartBody\src\controllers\me_ct_scheduler2.cpp">
@@ -1338,9 +1329,6 @@
     <ClInclude Include="..\SmartBody\src\bml\bml_processor.hpp">
       <Filter>bml</Filter>
     </ClInclude>
-    <ClInclude Include="..\SmartBody\src\bml\bml_quickdraw.hpp">
-      <Filter>bml</Filter>
-    </ClInclude>
     <ClInclude Include="..\SmartBody\src\bml\bml_reach.hpp">
       <Filter>bml</Filter>
     </ClInclude>
@@ -1443,9 +1431,6 @@
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_tether.h">
       <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\SmartBody\src\controllers\me_ct_quick_draw.h">
-      <Filter>controllers</Filter>
-    </ClInclude>
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_examples.h">
       <Filter>controllers</Filter>
     </ClInclude>
@@ -1453,9 +1438,6 @@
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_motion.h">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\controllers\me_ct_adshr_envelope.hpp">
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\SmartBody\src\controllers\me_ct_scheduler2.h">

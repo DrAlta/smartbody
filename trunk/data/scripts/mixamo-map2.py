@@ -2,12 +2,16 @@
 
 jointMapManager = scene.getJointMapManager()
 mixamoMap = jointMapManager.createJointMap("mixamorig")
+
+mixamoMap.setMapping("mixamorig_RightEye", "eyeball_right")
+mixamoMap.setMapping("mixamorig_LeftEye", "eyeball_left")
+
 mixamoMap.setMapping("mixamorig_Hips", "base")
 mixamoMap.setMapping("mixamorig_Spine", "spine1")
 mixamoMap.setMapping("mixamorig_Spine1", "spine2")
 mixamoMap.setMapping("mixamorig_Spine2", "spine3")
 mixamoMap.setMapping("mixamorig_Neck", "spine4")
-mixamoMap.setMapping("mixamorig_Head", "skullbase")
+mixamoMap.setMapping("mixamorig_Head", "spine5")
 mixamoMap.setMapping("mixamorig_LeftShoulder", "l_sternoclavicular")
 mixamoMap.setMapping("mixamorig_LeftArm", "l_shoulder")
 mixamoMap.setMapping("mixamorig_LeftForeArm", "l_elbow")
@@ -68,8 +72,7 @@ mixamoMap.setMapping("mixamorig_RightFoot", "r_ankle")
 mixamoMap.setMapping("mixamorig_RightToeBase", "r_forefoot")
 mixamoMap.setMapping("mixamorig_RightFootToeBase_End", "r_toe")
 mixamoMap.setMapping("mixamorig_RightToe_End", "r_toe")
-mixamoMap.setMapping("mixamorig_RightEye", "eyeball_right")
-mixamoMap.setMapping("mixamorig_LeftEye", "eyeball_left")
+
 
 
 

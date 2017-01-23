@@ -65,7 +65,6 @@
 #include <controllers/me_ct_examples.h>
 #include <controllers/me_ct_motion_player.h>
 #include <controllers/me_ct_pose.h>
-#include <controllers/me_ct_quick_draw.h>
 #include <controllers/me_ct_noise_controller.h>
 #include <controllers/me_ct_motion_recorder.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -1488,7 +1487,7 @@ void prune_schedule( SbmCharacter*   actor,
 											hasBodyReach = true;
 										}
 									}
-									else if( anim_ct_type == MeCtMotion::type_name || anim_ct_type == MeCtQuickDraw::type_name ) {
+									else if( anim_ct_type == MeCtMotion::type_name ) {
 										if( motion_ct || pose_ct )
 										{
 											// if a motion is already present, other animations should be pruned
