@@ -19,7 +19,7 @@ SBRenderer* SBRenderer::_singleton = NULL;
 
 SBRenderer::SBRenderer()
 {
-	ssaoOutput = ssaoNoise = NULL;
+	ssaoOutput = ssaoNoise = ssaoBlurOutput = lightPassOutput = NULL;
 }
 
 
