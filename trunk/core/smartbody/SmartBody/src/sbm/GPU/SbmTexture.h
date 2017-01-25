@@ -3,13 +3,20 @@
 #include <string>
 #include <vector>
 #include <sb/SBTypes.h>
+#include <sb/SBAsset.h>
 #include <sr/sr_gl.h>
 
 class SbmTexture;
 typedef std::map<std::string,SbmTexture*> StrTextureMap;
 
-//support for cube map
 #if defined(EMSCRIPTEN)
+#define USE_CUBE_MAP 1
+#else
+#define USE_CUBE_MAP 0
+#endif
+
+//support for cube map
+#if USE_CUBE_MAP
 class SbmCubeMapTexture;
 typedef std::map<std::string,SbmCubeMapTexture*> StrCubeTextureMap;
 #endif
@@ -18,12 +25,14 @@ typedef std::map<std::string,SbmCubeMapTexture*> StrCubeTextureMap;
 class SbmTextureManager
 {
 public:
-	enum { TEXTURE_DIFFUSE = 0, TEXTURE_NORMALMAP, TEXTURE_SPECULARMAP, TEXTURE_CUBEMAP};
+	enum { TEXTURE_DIFFUSE = 0, TEXTURE_NORMALMAP, TEXTURE_SPECULARMAP, TEXTURE_RENDER_TARGET, TEXTURE_HDR_MAP, TEXTURE_CUBEMAP};
 protected:
 	StrTextureMap textureMap;
 	StrTextureMap normalTexMap;
 	StrTextureMap specularTexMap;
 	StrTextureMap glossyTexMap;
+	StrTextureMap renderTargetTexMap;
+	StrTextureMap hdrTexMap;
 	std::map<std::string, GLuint> FBOMap;
 private:
 	static SbmTextureManager* _singleton;
@@ -50,16 +59,17 @@ public:
 	SBAPI std::vector<std::string> getTextureNames(int type);
 
 	// Creates a 1x1 white texture
-	SBAPI void createWhiteTexture(const char* textureName, int width = 1, int height = 1);
-	SBAPI void createFBO(const char* fboName);
+	SBAPI SbmTexture* createTexture(int type, const char* textureName);
+	SBAPI void createWhiteTexture(const char* textureName, int width = 1, int height = 1);	
+	SBAPI GLuint createFBO(const char* fboName);
 
-	
+	SBAPI void updateEnvMaps();
 	void releaseAllTextures();	
 protected:
 	StrTextureMap& findMap(int type);
 
 //Zengrui: add some additional functions for cube-map texture
-#if defined(EMSCRIPTEN)
+#if USE_CUBE_MAP
 protected:
 	StrCubeTextureMap cubeTextureMap;
 public:
@@ -68,7 +78,8 @@ public:
 #endif
 };
 
-class SbmTexture // simple place holder for OpenGL texture
+
+class SbmTexture : public SmartBody::SBAsset// simple place holder for OpenGL texture
 {
 protected:
 	std::string textureName;
@@ -78,9 +89,11 @@ protected:
 	unsigned char* buffer;
 	std::vector<unsigned char> imgBuffer;
 	bool finishBuild;
-	bool transparentTexture;
+	bool transparentTexture;	
 	GLuint texID;	
-	GLuint internal_format, texture_format;		
+	GLint internal_format;
+	GLenum texture_format;		
+	GLenum dataType;
 public:
 	SBAPI SbmTexture(const char* texName);
 	SBAPI ~SbmTexture(void);
@@ -90,7 +103,10 @@ public:
 	SBAPI const std::string& getFileName() { return textureFileName; }
 	SBAPI GLuint getID() { return texID; }
 	SBAPI bool loadImage(const char* fileName);	
-	SBAPI void buildTexture(bool buildMipMap = true);
+
+	SBAPI bool loadHDRImage(const char* fileName);
+
+	SBAPI void buildTexture(bool buildMipMap = true, bool recreateTexture = true);
 
 	SBAPI unsigned char* getBuffer();
 	SBAPI int getBufferSize();
@@ -104,8 +120,9 @@ public:
 	SBAPI void bakeAlphaIntoTexture(SbmTexture* alphaTex);
 	// Creates a 1x1 white texture
 	SBAPI void createWhiteTexture(int w = 1, int h = 1);
+	SBAPI void createEmptyTexture(int w = 1, int h = 1, int numChannels = 1, GLenum type = GL_UNSIGNED_BYTE);	
 };
-#if defined(EMSCRIPTEN)
+#if USE_CUBE_MAP
 class SbmCubeMapTexture // simple place holder for OpenGL ES cubemap texture
 {
 protected:
@@ -118,7 +135,8 @@ protected:
 	bool finishBuild;
 	bool transparentTexture;
 	GLuint texID;	
-	GLuint internal_format, texture_format;		
+	GLuint internal_format, texture_format;	
+	GLenum dataType;
 public:
 	SBAPI SbmCubeMapTexture(const std::vector<std::string> &textureNames, const std::vector<std::string> &fileNames);
 	SBAPI ~SbmCubeMapTexture(void);
@@ -128,6 +146,7 @@ public:
 	SBAPI const std::vector<std::string>& getFileName() { return textureFileNames; }
 	SBAPI GLuint getID() { return texID; }
 	SBAPI bool loadImage(const char* fileName);	
+	SBAPI bool loadHDRImage(const char* fileName);
 	SBAPI void buildCubeMapTexture(bool buildMipMap = false);
 	SBAPI unsigned char* getBuffer();
 	SBAPI int getBufferSize();

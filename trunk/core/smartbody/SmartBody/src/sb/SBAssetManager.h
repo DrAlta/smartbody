@@ -9,6 +9,7 @@
 #include <sb/SBAssetHandler.h>
 
 class srPathList;
+class SbmTexture;
 
 namespace SmartBody {
 
@@ -73,6 +74,10 @@ class SBAssetManager : public SBObject
 		SBAPI std::vector<std::string> getDeformableMeshNames();
 		SBAPI void removeAllDeformableMeshes();
 		
+
+		SBAPI SbmTexture* getHDRTexture(const std::string& texName);
+		SBAPI std::vector<std::string> getHDRTextureNames();
+
 		SBAPI void addAssetHandler(SBAssetHandler* handler);
 		SBAPI void removeAssetHandler(SBAssetHandler* handler);
 		SBAPI std::vector<SBAssetHandler*>& getAssetHandlers();
@@ -103,8 +108,7 @@ protected:
 
 		std::map<std::string, SBSkeleton*> _skeletons;
 		std::map<std::string, SBMotion*> _motions;
-		std::map<std::string, DeformableMesh*> _deformableMeshMap;
-		
+		std::map<std::string, DeformableMesh*> _deformableMeshMap;		
 
 		srPathList*	seq_paths;
 		srPathList*	me_paths;

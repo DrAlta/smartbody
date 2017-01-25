@@ -373,18 +373,6 @@
     <ClCompile Include="..\SmartBody\src\external\parser\ValHeap.cpp">
       <Filter>external\parser</Filter>
     </ClCompile>
-    <ClCompile Include="..\SmartBody\src\external\SOIL\image_DXT.c">
-      <Filter>external\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\external\SOIL\image_helper.c">
-      <Filter>external\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\external\SOIL\SOIL.c">
-      <Filter>external\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\SmartBody\src\external\SOIL\stb_image_aug.c">
-      <Filter>external\SOIL</Filter>
-    </ClCompile>
     <ClCompile Include="..\SmartBody\src\external\perlin\perlin.cpp">
       <Filter>external\perlin</Filter>
     </ClCompile>
@@ -1270,6 +1258,12 @@
     <ClCompile Include="src\sb\SBJavascriptSystem.cpp">
       <Filter>Javascript</Filter>
     </ClCompile>
+    <ClCompile Include="src\external\stb\stb_vorbis.c">
+      <Filter>external\stb</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sb\SBAssetHandlerHDR.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -1661,24 +1655,6 @@
     </ClInclude>
     <ClInclude Include="..\SmartBody\src\external\parser\Wrd.h">
       <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\external\SOIL\image_DXT.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\external\SOIL\image_helper.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\external\SOIL\SOIL.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\external\SOIL\stb_image_aug.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\external\SOIL\stbi_DDS_aug.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SmartBody\src\external\SOIL\stbi_DDS_aug_c.h">
-      <Filter>external\SOIL</Filter>
     </ClInclude>
     <ClInclude Include="..\SmartBody\src\external\perlin\perlin.h">
       <Filter>external\perlin</Filter>
@@ -2514,6 +2490,66 @@
     <ClInclude Include="src\sb\SBJavascriptInternal.h">
       <Filter>Javascript</Filter>
     </ClInclude>
+    <ClInclude Include="src\external\stb\stb.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_c_lexer.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_connected_components.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_divide.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_dxt.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_easy_font.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_herringbone_wang_tile.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_image.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_image_resize.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_image_write.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_leakcheck.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_perlin.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_rect_pack.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_sprintf.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_textedit.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_tilemap_editor.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_truetype.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stb_voxel_render.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\external\stb\stretchy_buffer.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBAssetHandlerHDR.h">
+      <Filter>sb</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="bml">
@@ -2527,9 +2563,6 @@
     </Filter>
     <Filter Include="external\parser">
       <UniqueIdentifier>{5388eaa8-48cf-4d44-9bfd-c184e7ef92a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="external\SOIL">
-      <UniqueIdentifier>{c388505e-7ead-4350-8f86-36db47250b51}</UniqueIdentifier>
     </Filter>
     <Filter Include="external\perlin">
       <UniqueIdentifier>{9bca3bbf-9aee-429e-8ef1-be7c2a0a0f1d}</UniqueIdentifier>
@@ -2572,6 +2605,9 @@
     </Filter>
     <Filter Include="Javascript">
       <UniqueIdentifier>{5c7bc89a-224f-4846-a15d-62296326ee94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\stb">
+      <UniqueIdentifier>{d4688783-b03d-45ab-bfbf-ad606f2629d2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -32,7 +32,7 @@
 #else
 #if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
-#include "external/SOIL/SOIL.h"
+//#include "external/SOIL/SOIL.h"
 #endif
 #endif
 
@@ -390,6 +390,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			}
 
 			std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
+#if 0
 			myGLEnable(GL_LIGHTING);
 			myGLEnable(GL_TEXTURE_2D);	
 			myGLEnable ( GL_ALPHA_TEST );
@@ -404,6 +405,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			double alphaThreshold = pawn->getDoubleAttribute("alphaThreshold");
 			glAlphaFunc(GL_GREATER, (float)alphaThreshold);
 			myGLEnable(GL_CULL_FACE);
+#endif
 	
 			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
@@ -453,10 +455,11 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				glEnableClientState(GL_TEXTURE_COORD_ARRAY);  	
 				glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);   
 			}
-
+#if 0
 			glEnable(GL_POLYGON_OFFSET_FILL);
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			glPolygonOffset(2.0, 2.0);
+#endif
 			
 			//LOG("subMeshList size = %d", subMeshList.size());
 			for (unsigned int i=0;i<subMeshList.size();i++)
@@ -473,6 +476,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				
 
 				glMaterial(subMesh->material);	
+#if 1
 				if (subMesh->material.useAlphaBlend)
 				{
 					myGLDisable(GL_CULL_FACE);
@@ -486,6 +490,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 					myGLDisable(GL_ALPHA_TEST);
 					myGLDisable(GL_BLEND);
 				}
+#endif
 
 				std::string texturesType = "static";
 				if (shape->getCharacter())
@@ -498,7 +503,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				if( texturesType == "static" || texturesType == "dynamic")
 				{
 					SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());		
-					//LOG("tex = %d", tex);
+					//LOG("texName = %s, tex = %d", subMesh->texName.c_str(), tex->getID());
 					if (tex && !showSkinWeight)
 					{
 						glEnable(GL_TEXTURE_2D);

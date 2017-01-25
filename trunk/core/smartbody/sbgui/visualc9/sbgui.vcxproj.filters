@@ -67,6 +67,9 @@
     <Filter Include="posecreator">
       <UniqueIdentifier>{743ddff6-4108-4bd0-86e0-a35c4f86c1d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sbrender">
+      <UniqueIdentifier>{662cc2a8-078c-4ab8-877d-e8380e4a434b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\CharacterCreatorWindow.cpp">
@@ -297,6 +300,12 @@
     </ClCompile>
     <ClCompile Include="..\src\posecreator\PoseCreator.cpp">
       <Filter>posecreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SBRenderer.cpp">
+      <Filter>sbrender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SBFrameBufferObject.cpp">
+      <Filter>sbrender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -535,6 +544,12 @@
     </ClInclude>
     <ClInclude Include="..\src\posecreator\PoseCreator.h">
       <Filter>posecreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SBRenderer.h">
+      <Filter>sbrender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SBFrameBufferObject.h">
+      <Filter>sbrender</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
