@@ -434,7 +434,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 	virtual void updateOptions();
 
 	virtual void registerUIControls();
-	virtual void resize(int x, int y, int w, int j);
+	virtual void resize(int x, int y, int w, int h);
 
 public:
 	RetargetStepWindow* _retargetStepWindow;	
