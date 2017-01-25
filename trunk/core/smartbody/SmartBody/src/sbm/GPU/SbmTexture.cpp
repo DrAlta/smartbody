@@ -395,6 +395,11 @@ bool SbmTexture::loadImage( const char* fileName )
 	int transparentPixel = 0;
 	stbi_set_flip_vertically_on_load(true);
 	buffer = stbi_load(fileName, &width, &height, &channels, 0);
+	if (!buffer)
+	{
+		LOG("Image %s failed to load.", fileName);
+		return false;
+	}
 #if 0
     buffer = SOIL_load_image(fileName, &width, &height, &channels, SOIL_LOAD_AUTO);	
 	if (width < 0 || height < 0 || channels < 0)
