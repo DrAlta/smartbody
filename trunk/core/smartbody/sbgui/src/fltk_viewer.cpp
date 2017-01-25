@@ -20,7 +20,11 @@
 #include "FL/Fl_Slider.H"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
 #include "vhcl.h"
 #include "external/glew/glew.h"
-#include "external/SOIL/SOIL.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "external/stb/stb_image_write.h"
+
+//#include "external/SOIL/SOIL.h"
 //#include <FL/enumerations.H>
 #if !defined (__ANDROID__) && !defined(SBM_IPHONE) // disable shader support
 #include "sbm/GPU/SbmShader.h"
@@ -107,6 +111,7 @@
 #include "FLTKListener.h"
 #include "RootWindow.h"
 #include "SBInterfaceListener.h"
+#include "SBRenderer.h"
 
 #include <sbm/GPU/SbmBlendFace.h>
 #include <sbm/GPU/SbmTexture.h>
@@ -539,6 +544,11 @@ void FltkViewer::registerUIControls()
 	attribute->registerObserver(this);
 	attribute = scene->createVec3Attribute("GUI.BackgroundColor",0.63, 0.63, 0.63,true,"GUI",10,false,false,false,"Background color.");
 	attribute->registerObserver(this);
+
+	attribute = scene->createBoolAttribute("Renderer.UseDeferredRendering", false, true, "Renderer", 10, false, false, false, "Whether to use deferred rendering pipeline.");
+	attribute->registerObserver(this);
+
+	SBRenderer::singleton().registerGUI();
 }
 
 void FltkViewer::draw_message ( const char* s )
@@ -1582,13 +1592,69 @@ void FltkViewer::drawAllGeometries(bool shadowPass)
 			glUseProgram(0);	
 }
 
+void FltkViewer::resize(int x, int y, int w, int h)
+{
+	SBRenderer::singleton().resize(w, h);
+	Fl_Gl_Window::resize(x, y, w, h);
+}
 
+void FltkViewer::drawSBRender()
+{
+	if (!visible()) return;
+	SBRenderer& renderer = SBRenderer::singleton();
+	SbmShaderManager& ssm = SbmShaderManager::singleton();
+	SbmTextureManager& texm = SbmTextureManager::singleton();
+	static bool firstRun = true;
+	bool hasShaderSupport = false;
+	if (!context_valid() || firstRun)
+	{
+		hasShaderSupport = ssm.initGLExtension();
+		renderer.initRenderer(w(), h());
+		renderer.initSSAO(w(), h());
+		firstRun = false;
+	}
+
+	if (!valid())
+	{
+		// window resize				
+		init_opengl(w(), h()); // valid() is turned on by fltk after draw() returns
+							   //hasShaderSupport = SbmShaderManager::initGLExtension();	   
+		SBGUIManager::singleton().resize(w(), h());
+		SBInterfaceManager::getInterfaceManager()->resize(w(), h());
+	}
+	//make_current();
+	//wglMakeCurrent(fl_GetDC(fl_xid(this)),(HGLRC)context());
+	//LOG("viewer GL context = %d, current context = %d",context(), wglGetCurrentContext());	
+
+	bool hasOpenGL = ssm.initOpenGL();
+	// init OpenGL extension
+	if (hasOpenGL)
+	{
+		hasShaderSupport = ssm.initGLExtension();
+	}
+	// update the shader map  
+	if (hasShaderSupport)
+	{
+		ssm.buildShaders();
+		texm.updateTexture();
+	}
+	updateLights();
+	renderer.drawTestDeferred(_lights);
+}
    
 void FltkViewer::draw() 
 {	
+	if (!visible()) return;
 	printOglError2("draw()", 1);
 
-	if ( !visible() ) return;
+	bool useDeferredRendering = SmartBody::SBScene::getScene()->getBoolAttribute("Renderer.UseDeferredRendering");
+	if (useDeferredRendering)
+	{
+		drawSBRender();
+		return;
+	}
+
+	
 	
 	SrCamera* cam = SmartBody::SBScene::getScene()->getActiveCamera();
 	SbmShaderManager& ssm = SbmShaderManager::singleton();
@@ -1913,6 +1979,8 @@ void FltkViewer::snapshot_tga(int width, int height, int frame)
 
 	std::string path = getData()->snapshotPath + "/frame." + ZeroPadNumber(frame) + ".tga";
 
+	int save_result = stbi_write_tga(path.c_str(), width, height, channels, image);
+#if 0
 	int save_result = SOIL_save_image
 	(
 		path.c_str(),
@@ -1920,6 +1988,7 @@ void FltkViewer::snapshot_tga(int width, int height, int frame)
 		width, height, channels,
 		image
 	);
+#endif
 
 	free(image);
 }
