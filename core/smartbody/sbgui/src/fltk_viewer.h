@@ -358,6 +358,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 
 	void processDragAndDrop(std::string dndMsg, float x, float y);
 	void initGridList();	
+	void drawSBRender();
 	void drawAllGeometries(bool shadowPass = false); // draw all objects with geometry ( so no debug rendering included )
 	void drawFloor(bool shadowPass = false);
 
@@ -433,6 +434,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
 	virtual void updateOptions();
 
 	virtual void registerUIControls();
+	virtual void resize(int x, int y, int w, int j);
 
 public:
 	RetargetStepWindow* _retargetStepWindow;	

@@ -73,17 +73,17 @@ protected:
 public:
 	SbmShaderProgram();
 	~SbmShaderProgram();		
-	void initShaderProgram(const char* vsName, const char* fsName);		
-	void initShaderProgramStr(const char* shaderVS, const char* shaderFS);	
-	GLuint getShaderProgram() { return programID; }
+	SBAPI void initShaderProgram(const char* vsName, const char* fsName);
+	SBAPI void initShaderProgramStr(const char* shaderVS, const char* shaderFS);
+	SBAPI GLuint getShaderProgram() { return programID; }
 
-	void buildShader();
-	bool finishBuild() { return isBuilt; }
+	SBAPI void buildShader();
+	SBAPI bool finishBuild() { return isBuilt; }
 public:
-	static char *textFileRead(const char *fn); // text file reading 	
-	static void printShaderInfoLog(GLuint obj);
-	static void printProgramInfoLog(GLuint obj);
-	static void printOglError(const char* tag);
+	SBAPI static char *textFileRead(const char *fn); // text file reading 	
+	SBAPI static void printShaderInfoLog(GLuint obj);
+	SBAPI static void printProgramInfoLog(GLuint obj);
+	SBAPI static void printOglError(const char* tag);
 protected:
 	void loadShader(GLuint sID, const char* shaderFileName);
 	void loadShaderStr(GLuint sID, const char* shaderStr);
@@ -113,7 +113,7 @@ public:
 
 	SBAPI bool checkShaderInit(int &counter);
 	SBAPI void setViewer(SrViewer* vw);
-	SBAPI void addShader(const char* entryName,const char* vsName, const char* fsName, bool shaderFile = true);
+	SBAPI void addShader(const std::string& entryName, const std::string& vsName, const std::string& fsName, bool shaderFile = true);
 	SBAPI SbmShaderProgram* getShader(const std::string& entryName);
 	SBAPI void buildShaders();
 	SBAPI void rebuildShaders();

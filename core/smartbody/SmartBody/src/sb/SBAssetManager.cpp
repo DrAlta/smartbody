@@ -15,6 +15,7 @@
 #include <sb/SBAssetHandlerBvh.h>
 #include <sb/SBAssetHandlerAmc.h>
 #include <sb/SBAssetHandlerPly.h>
+#include <sb/SBAssetHandlerHDR.h>
 #include <sb/SBAssetHandlerSBMeshBinary.h>
 #ifndef SB_NO_ASSIMP
 #include <sb/SBAssetHandlerAssimp.h>
@@ -37,9 +38,12 @@
 #include <sbm/sr_path_list.h>
 #include <sbm/sbm_constants.h>
 #include <sbm/GPU/SbmTexture.h>
-#include <external/SOIL/SOIL.h>
+//#include <external/SOIL/SOIL.h>
 
 #include <boost/filesystem/path.hpp>
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <external/stb/stb_image_write.h>
 
 #if defined(EMSCRIPTEN)
 #include <emscripten.h>
@@ -78,6 +82,7 @@ SBAssetManager::SBAssetManager()
 	addAssetHandler(new SBAssetHandlerPly());	
 	addAssetHandler(new SBAssetHandlerSkmb());	
 	addAssetHandler(new SBAssetHandlerBvh());	
+	addAssetHandler(new SBAssetHandlerHdr());
 	addAssetHandler(new SBAssetHandlerSBMeshBinary());
 #ifndef SB_NO_ASSIMP
 	addAssetHandler(new SBAssetHandlerAssimp());	
@@ -583,9 +588,7 @@ std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 			addAssetHistory("MESH " + mesh->getName());
 			continue;
 		}
-		LOG("Unknown asset type for file %s", assetPath.c_str());
-
-
+		LOG("Unknown asset type for file %s", assetPath.c_str());		
 	}
 
 	return allAssets;
@@ -1870,6 +1873,19 @@ void SBAssetManager::removeAllDeformableMeshes()
 	_deformableMeshMap.clear();
 }
 
+SbmTexture* SBAssetManager::getHDRTexture(const std::string& texName)
+{
+	SbmTextureManager& texManager = SbmTextureManager::singleton();
+	SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_HDR_MAP, texName.c_str());
+	return tex;
+}
+
+std::vector<std::string> SBAssetManager::getHDRTextureNames()
+{	
+	SbmTextureManager& texManager = SbmTextureManager::singleton();
+	return texManager.getTextureNames(SbmTextureManager::TEXTURE_HDR_MAP);
+}
+
 void SBAssetManager::addAssetHandler(SBAssetHandler* handler)
 {
 	if (!handler)
@@ -2416,7 +2432,8 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	}
 	outputExpressiveTexture->setBuffer(outData, maxSize);
 	// save the texture here....
-	int ret = SOIL_save_image(outputTextureFile.c_str(), SOIL_SAVE_TYPE_BMP, mWidth, mHeight, 3, outData);
+	//int ret = SOIL_save_image(outputTextureFile.c_str(), SOIL_SAVE_TYPE_BMP, mWidth, mHeight, 3, outData);
+	int ret = stbi_write_bmp(outputTextureFile.c_str(), mWidth, mHeight, 3, outData);
 
 	if (ret == 0)
 	{

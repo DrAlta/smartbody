@@ -836,7 +836,9 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				if (i >= (int) skinWeight->numInfJoints.size())
 					continue;				
 			}
-			SrVec& lv = dMeshStatic->shape().V[i];					
+			SrVec& lv = dMeshStatic->shape().V[i];	
+			//if (i % 1000 == 0)
+			//	LOG("mesh vtx %d = %s", i, lv.toString().c_str());
 			posBuf[iVtx] = lv*bindShapeMat;
 			SrVec meshColor = SrVec(1.f,1.f,1.f);
 			if (i < dMeshStatic->shape().Vc.size())
@@ -2984,6 +2986,7 @@ SBAPI bool DeformableMeshInstance::isStaticMesh()
 
 SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 {
+	//return;
 	//LOG("Running blendShapeStaticMesh");
 
 	//SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #0 ");

@@ -11,7 +11,7 @@
 #include <controllers/me_ct_param_animation_utilities.h>
 #include <controllers/me_ct_jacobian_IK.hpp>
 #include <sr/sr_random.h>
-#include "external/SOIL/SOIL.h"
+//#include "external/SOIL/SOIL.h"
 
 namespace SmartBody {
 
@@ -1671,12 +1671,14 @@ void SBMotionGraph::writeOutTransitionMap( const std::string& outfilename, const
 		imgBuf[x*mat.size2()*3 + y*3 + 2] = 0;
 	}
 
+#if 0
 	SOIL_save_image(
 		outfilename.c_str(),
 		SOIL_SAVE_TYPE_BMP,
 		mat.size1(),mat.size2(), 3,
 		imgBuf
 		);
+#endif
 }
 
 int SBMotionGraph::findClosestElement( const std::vector<int>& intList, int val )

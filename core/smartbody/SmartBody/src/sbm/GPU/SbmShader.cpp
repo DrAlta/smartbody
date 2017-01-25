@@ -315,7 +315,14 @@ bool SbmShaderManager::initGLExtension()
 
 bool SbmShaderManager::checkShaderInit(int &counter)
 {
-	if (glewIsSupported("GL_VERSION_2_0") || glewIsSupported("GL_VERSION_3_0"))
+	if (glewIsSupported("GL_VERSION_4_0"))
+	{
+		LOG("Ready for OpenGL 4.0.\n");
+		shaderInit = true;
+		shaderSupport = SUPPORT_OPENGL_2_0;
+		return true;
+	}
+	else if (glewIsSupported("GL_VERSION_2_0") || glewIsSupported("GL_VERSION_3_0"))
 	{
 		LOG("Ready for OpenGL 2.0.\n");
 		shaderInit = true;
@@ -333,7 +340,7 @@ bool SbmShaderManager::checkShaderInit(int &counter)
 	}
 }
 
-void SbmShaderManager::addShader(const char* entryName, const char* vsName, const char* fsName, bool shaderFile )
+void SbmShaderManager::addShader(const std::string& entryName, const std::string& vsName, const std::string& fsName, bool shaderFile )
 {
     if (shaderSupport == NO_GPU_SUPPORT)
         return;
@@ -347,10 +354,10 @@ void SbmShaderManager::addShader(const char* entryName, const char* vsName, cons
 	
     SbmShaderProgram* program = new SbmShaderProgram();
 	if (shaderFile)
-		program->initShaderProgram(vsName,fsName);
+		program->initShaderProgram(vsName.c_str(),fsName.c_str());
 	else
 	{		
-		program->initShaderProgramStr(vsName,fsName);
+		program->initShaderProgramStr(vsName.c_str(),fsName.c_str());
 	}
 	shaderMap[keyName] = program;
 }
