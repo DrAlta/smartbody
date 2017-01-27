@@ -1,27 +1,22 @@
-/*
- *  bml.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
- *      Corne Versloot, while at USC
- *      Marcus Thiebaux, USC
- *      Ed Fast, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #include "vhcl.h"
 
@@ -364,13 +359,9 @@ void BmlRequest::gestureRequestProcess()
 		// first pass, remove lower priority overlapping gesture
 		for (size_t i = 0; i < gestures.size(); i++)
 		{
+			// mark the motions as gestures
 			MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
-			SBMotion* sbMotion = dynamic_cast<SBMotion*>(motionController->motion());
-			motionController->setHoldDuration(2.0);
-			motionController->setHoldTime(sbMotion->getTimeStrokeEnd());
-			// change the blend controller to adjust fade out to match hold duration + hold time
-			
-			continue;
+			motionController->setGesture(true);
 
 			if (gestures[i]->filtered)
 				continue;
@@ -380,15 +371,17 @@ void BmlRequest::gestureRequestProcess()
 			double currGestureStrokeEndAt = (double)gestures[i]->behav_syncs.sync_stroke_end()->time();
 			double currGestureRelaxAt = (double)gestures[i]->behav_syncs.sync_relax()->time();
 
+
 			for (size_t j = i + 1; j < gestures.size(); j++)
 			{
 				if (gestures[j]->filtered)
 					continue;
 
-				double nextGestureStrokeStartAt = (double)gestures[j]->behav_syncs.sync_start()->time();
+				double nextGestureStrokeStartAt = (double)gestures[j]->behav_syncs.sync_stroke_start()->time();
 				double nextGestureStrokeAt = (double)gestures[j]->behav_syncs.sync_stroke()->time();
-				double nextGestureStrokeEndAt = (double)gestures[j]->behav_syncs.sync_stroke()->time();
+				double nextGestureStrokeEndAt = (double)gestures[j]->behav_syncs.sync_stroke_end()->time();
 				double nextGestureRelaxAt = (double)gestures[j]->behav_syncs.sync_relax()->time();
+
 
 				// check for overlapping stroke phases
 				if (currGestureStrokeEndAt > nextGestureStrokeStartAt)
@@ -425,11 +418,12 @@ void BmlRequest::gestureRequestProcess()
 					continue;
 
 				double nextGestureStrokeReady = (double)gestures[j]->behav_syncs.sync_ready()->time();
-				double nextGestureStrokeStartAt = (double)gestures[j]->behav_syncs.sync_start()->time();
+				double nextGestureStrokeStartAt = (double)gestures[j]->behav_syncs.sync_stroke_start()->time();
 				double nextGestureStrokeAt = (double)gestures[j]->behav_syncs.sync_stroke()->time();
-				double nextGestureStrokeEndAt = (double)gestures[j]->behav_syncs.sync_stroke()->time();
+				double nextGestureStrokeEndAt = (double)gestures[j]->behav_syncs.sync_stroke_end()->time();
 				double nextGestureRelaxAt = (double)gestures[j]->behav_syncs.sync_relax()->time();
 				double nextFullStrokeTime = nextGestureStrokeEndAt - nextGestureStrokeStartAt;
+
 				if (nextFullStrokeTime <= 0.0) // bad metadata information, can't coarticuate gesture
 					continue;
 
@@ -493,26 +487,31 @@ void BmlRequest::gestureRequestProcess()
 					// no hold period, transition to next gesture quickly
 					gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt);
 					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt);
+
+					gestures[j]->behav_syncs.sync_start()->set_time(currGestureStrokeStartAt);
+					gestures[j]->behav_syncs.sync_ready()->set_time(currGestureStrokeStartAt);
+
 				}
 				else
 				{
 					double holdTime = gestureInterval - transitionTime;
-					motionController->setHoldTime(currGestureStrokeEndAt);
-					motionController->setHoldDuration(holdTime);
-					// change the blend controller to adjust fade out to match hold duration + hold time
-					std::vector<MeCtScheduler2::TrackPtr> tracks = gestures[i]->schedule_ct->tracks();
-					if (tracks.size() > 0)
-					{
-						MeCtUnary* unaryCt = tracks[0]->blending_ct();
-						MeCtBlend* blendCt = dynamic_cast<MeCtBlend*>(unaryCt);
-						srLinearCurve& blend_curve = blendCt->get_curve();
-						// push the blend out time by an amount equal to the hold time						
-						int keys = blend_curve.get_num_keys();
-
-					}
+					//double holdTime = nextGestureStrokeStartAt - currGestureStrokeEndAt;
+					MeCtMotion* prevMotionController = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
+					SBMotion* prevMotion = dynamic_cast<SBMotion*>(prevMotionController->motion());
+					prevMotionController->setHoldTime(prevMotion->time_stroke_end());
+					prevMotionController->setHoldDuration(holdTime);
 					
-					// hold previous gesture for holdTime seconds
-					//gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt + holdTime); // for now, no holds...
+					gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt + holdTime);
+					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt + holdTime);
+
+					SBMotion* nextMotion = dynamic_cast<SBMotion*>(motionController->motion());
+					double prestrokeHoldTime = transitionTime;
+					motionController->setPrestrokeHoldTime(nextMotion->time_stroke_start() - transitionTime);
+					motionController->setPrestrokeHoldDuration(transitionTime);
+
+					gestures[j]->behav_syncs.sync_start()->set_time(nextGestureStrokeStartAt - transitionTime);
+					gestures[j]->behav_syncs.sync_ready()->set_time(nextGestureStrokeStartAt - transitionTime);
+
 				}
 			}
 		}

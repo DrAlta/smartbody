@@ -1,25 +1,22 @@
-/*
- *  me_ct_motion.cpp - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
- *      Andrew n marshall, USC
- */
+/*************************************************************
+Copyright(C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software : you can redistribute it and / or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #include "vhcl_log.h"
 
@@ -51,6 +48,9 @@ MeCtMotion::MeCtMotion ()
    _useOffset = false;
    _holdTime = 0.0;
    _holdDuration = 0.0;
+   _prestrokeHoldTime = 0.0;
+   _prestrokeHoldDuration = 0.0;
+   _isGesture = true;
  }
 
 MeCtMotion::~MeCtMotion ()
@@ -116,49 +116,6 @@ void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, std::vector<std::string>& jo
 	_joints = joints;
 	init(pawn, m_p, 0.0, 1.0);
 }
-
-#if 0
-void MeCtMotion::init ( MeCtMotion* other ) {
-	clone_parameters( other );
-
-	_motion = other->_motion;
-	if( _motion )
-		_motion->ref();
-	_play_mode = other->_play_mode;
-	_duration  = other->_duration;
-	_maxtwarp  = other->_maxtwarp;
-	_mintwarp  = other->_mintwarp;
-	_twarp     = other->_twarp;
-	_loop      = other->_loop;
-
-	const int size = other->_mChan_to_buff.size();
-	_mChan_to_buff.size( size );
-	for( int i=0; i<size; ++i ) {
-		int data = other->_mChan_to_buff.get(i);
-		_mChan_to_buff.set( i, data );
-	}
-
-	_last_apply_frame = 0;
-
-	MeController::init ();
-
-	if( _context ) {
-		// Notify _context of channel change.
-		_context->child_channels_updated( this );
-	}
-}
-#endif
-
-/*
-void MeCtMotion::warp_limits ( float wmin, float wmax ) {
-	if ( wmin<0.0001f ) wmin=0.0001f;
-	if ( wmax>9999.0f ) wmax=9999.0f;
-	if ( wmin>wmax ) return;
-	_mintwarp = wmin;
-	_maxtwarp = wmax;
-	twarp ( _twarp );
-}
-*/
 
 void MeCtMotion::offset ( double amount )
 {
@@ -339,7 +296,8 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 
 #if 1
 	updateDt((float)t);
-	motionTime += dt;	
+	//motionTime += dt;
+	motionTime = t;
 #else
 	motionTime = t;
 #endif
@@ -399,7 +357,21 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 	//	            _play_mode, &_last_apply_frame );	
 	//LOG("dt = %f, motionTime = %f, curMotionTime = %f, dur = %f, continue = %d",dt, motionTime, curMotionTime, dur, continuing);
 	float motionTime = float(curMotionTime + _offset);
-	// check to see if the motion is being held
+	// check for prestroke or poststroke hold motion
+	if (_prestrokeHoldDuration > .001)
+	{
+		double prestrokeHoldPeriodStart = _prestrokeHoldTime;
+		double prestrokeHoldPeriodEnd = _prestrokeHoldTime + _prestrokeHoldDuration;
+
+		if (motionTime > prestrokeHoldPeriodStart &&
+			motionTime <= prestrokeHoldPeriodEnd)
+		{
+			// todo...
+		}
+	}
+
+
+
 	if (_holdDuration > 0.001)
 	{
 		double holdPeriodStart = _holdTime;
@@ -415,8 +387,19 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 			motionTime = motionTime - _holdDuration;
 		}
 	}
-	else
-	
+
+	if (_prestrokeHoldDuration > .001)
+	{
+		double prestrokeHoldPeriodStart = _prestrokeHoldTime;
+		double prestrokeHoldPeriodEnd = _prestrokeHoldTime + _prestrokeHoldDuration;
+
+		if (motionTime > prestrokeHoldPeriodStart &&
+			motionTime <= prestrokeHoldPeriodEnd)
+		{
+			motionTime = _prestrokeHoldTime;
+		}
+	}
+
 	_motion->apply( motionTime,
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
@@ -555,6 +538,36 @@ void MeCtMotion::setHoldDuration(double time)
 double MeCtMotion::getHoldDuration()
 {
 	return _holdDuration;
+}
+
+void MeCtMotion::setGesture(bool val)
+{
+	_isGesture = val;
+}
+
+bool MeCtMotion::isGesture()
+{
+	return _isGesture;
+}
+
+void MeCtMotion::setPrestrokeHoldTime(double time)
+{
+	_prestrokeHoldTime = time;
+}
+
+double MeCtMotion::getPrestrokeHoldTime()
+{
+	return _prestrokeHoldTime;
+}
+
+void MeCtMotion::setPrestrokeHoldDuration(double time)
+{
+	_prestrokeHoldDuration = time;
+}
+
+double MeCtMotion::getPrestrokeHoldDuration()
+{
+	return _prestrokeHoldDuration;
 }
 
 

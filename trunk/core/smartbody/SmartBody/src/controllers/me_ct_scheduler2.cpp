@@ -1,21 +1,22 @@
-/*
- *  me_ct_scheduler2.cpp - part of SmartBody-lib's Motion Engine
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #include "vhcl.h"
 
@@ -113,13 +114,6 @@ void MeCtScheduler2::Context::remove_controller( MeController* child ) {
 	MeCtContainer::Context::remove_controller( child );
 }
 
-//// Wrapper method to put within permission scope of MeCtScheduler2
-//void MeCtScheduler2::Context::add_controller( MeController* ct ) {
-//	MeControllerContext::add_controller( ct );
-//	childChannelsUpdated( ct );
-//}
-
-
 //======= MeCtScheduler2::Track ==============================
 
 // Constructor
@@ -144,26 +138,6 @@ MeCtScheduler2::Track::Track( MeCtUnary* blending_ct,
 		_root = _blending_ct;
 	}
 }
-
-
-//// No Copy Constructor (Copy TrackPtrs instead)
-//MeCtScheduler2::Track::Track( const MeCtScheduler2::Track& other )
-//:   _schedule_weak( other._schedule ),
-//	_blending_ct(  other._blending_ct ),
-//	_timing_ct(    other._timing_ct ),
-//	_animation_ct( other._animation_ct ),
-//	_root(         other._root )
-//#if TRACK_UNREF_CONTROLLERS
-//	, did_unref_controllers( false )
-//#endif // TRACK_UNREF_CONTROLLERS
-//{
-//	// Assume proper initialization from other controller
-//	_animation_ct->ref();
-//	if( _timing_ct )
-//		_timing_ct->ref();
-//	if( _blending_ct )
-//		_blending_ct->ref();
-//}
 
 // Destructor
 MeCtScheduler2::Track::~Track() {
@@ -251,41 +225,6 @@ void MeCtScheduler2::Track::remap() {
 		_root->remap();
 	}
 }
-
-//void MeCtScheduler2::Track::unref_controllers() {
-//	if( _root ) {
-//		_schedule._sub_sched_context->remove_controller( _root );
-//
-//		MeController* ct = _animation_ct;
-//		_animation_ct = NULL;
-//		if( _timing_ct ) {
-//			if( ct ) {
-//				_timing_ct->init( NULL );  // remove child
-//				ct->unref();
-//			}
-//			ct = _timing_ct;
-//			_timing_ct = NULL;
-//		}
-//		if( _blending_ct ) {
-//			if( ct ) {
-//				_blending_ct->init( NULL ); // remove child
-//				ct->unref();
-//			}
-//			ct = _blending_ct;
-//			_blending_ct = NULL;
-//		}
-//		if( ct ) {
-//			ct->unref();
-//			ct = NULL;
-//		}
-//
-//		_root = NULL;
-//
-//#if TRACK_UNREF_CONTROLLERS
-//		did_unref_controllers = true;
-//#endif
-//	}
-//}
 
 //=================================== MeCtScheduler2 =====================================
 
@@ -522,6 +461,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 
 	const char* ct_name = ct->getName().c_str();
 
+	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(ct);
 	
 	// Configure blend curve
 	srLinearCurve& blend_curve = blendingCt->get_curve();
@@ -529,13 +469,29 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 		blend_curve.insert( blendStartFirst,   0.0 );
 		blend_curve.insert( blendStartSecond,   1.0 );
 	} else {
+		blend_curve.insert(blendStartFirst - .001, 0.0);
 		blend_curve.insert( blendStartFirst, 1.0 );
 	}
 	if( dur_defined ) {
-		if( outdt > 0 ) {
+		if (motionController && 
+			motionController->isGesture())
+		{
+			if (fabs(endAt - relaxAt) < .001)
+			{
+				blend_curve.insert(relaxAt, 1.0);
+				blend_curve.insert(relaxAt + .001, 0.0);
+			}
+			else
+			{
+				blend_curve.insert(relaxAt, 1.0);
+				blend_curve.insert(endAt, 0.0);
+			}
+		}
+		else if (outdt > 0 ) {
 			blend_curve.insert( relaxAt, 1.0 );
 			blend_curve.insert( endAt,    0.0 );
 		} else {
+			blend_curve.insert(endAt - .001, 1.0);
 			blend_curve.insert( endAt, 0.0 );
 		}
 	}
@@ -548,7 +504,7 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 
 	// Configure time mapping
 	srLinearCurve& time_warp = timingCt->get_curve();
-	MeCtMotion* motionController = dynamic_cast<MeCtMotion*>(ct);
+
 	if (motionController)
 	{
 		SkMotion* skMotion = motionController->motion();
@@ -581,45 +537,59 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 				marker = strokeEndAt;
 				cut = skMotion->time_stroke_emphasis();// - skMotion->time_start();
 			}
-			if (counter > 0 && counter <= 3)
+			if (motionController->isGesture())
 			{
-				blend_curve.clear();
-				blend_curve.insert(startAt, 0.0f);
-				blend_curve.insert(marker, 1.0f);
-				blend_curve.insert(relaxAt, 1.0f);
-				blend_curve.insert(endAt, 0.0f);
-
-
-				time_warp.insert(startAt, cut);
-				if (counter <= 1)
-				{
-					time_warp.insert( strokeStartAt,	skMotion->time_stroke_start() );
-				}
-				if (counter <= 2)
-				{
-					time_warp.insert( strokeAt,			skMotion->time_stroke_emphasis() );		
-				}
-				time_warp.insert( strokeEndAt,		skMotion->time_stroke_end() );
-				time_warp.insert( relaxAt,			skMotion->time_relax() );
-				time_warp.insert(endAt, skMotion->duration());
-
-				motionController->offset(cut);
+				// lay the gesture controller on the time track without any warping
+				time_warp.insert(strokeStartAt - (skMotion->time_stroke_start() - skMotion->time_start()), skMotion->time_start());
+				time_warp.insert(strokeStartAt - (skMotion->time_stroke_start() - skMotion->time_ready()), skMotion->time_ready());
+				time_warp.insert(strokeStartAt, skMotion->time_stroke_start());
+				time_warp.insert(strokeAt, skMotion->time_stroke_emphasis());
+				time_warp.insert(strokeEndAt, skMotion->time_stroke_end());
+				time_warp.insert(strokeEndAt + (skMotion->time_relax() - skMotion->time_stroke_end()), skMotion->time_relax());
+				time_warp.insert(strokeEndAt + (skMotion->duration() - skMotion->time_stroke_end()), skMotion->duration());
 			}
 			else
 			{
-				time_warp.insert( startAt,			skMotion->time_start() );
-				//time_warp.insert( readyAt,			motionController->time_ready() );
-				//time_warp.insert( strokeStartAt,	motionController->time_stroke_start() );
- 				//time_warp.insert( strokeAt,			motionController->time_stroke_emphasis() );
-				//time_warp.insert( strokeEndAt,		motionController->time_stroke_end() );
-				//time_warp.insert( relaxAt,			motionController->time_relax() );
-				//time_warp.insert( endAt,	ct_dur );
-				time_warp.insert( readyAt,			skMotion->time_ready() );
-				time_warp.insert( strokeStartAt,	skMotion->time_stroke_start() );
- 				time_warp.insert( strokeAt,			skMotion->time_stroke_emphasis() );
-				time_warp.insert( strokeEndAt,		skMotion->time_stroke_end() );
-				time_warp.insert( relaxAt,			skMotion->time_relax() );
-				time_warp.insert( endAt,			skMotion->duration());
+				if (counter > 0 && counter <= 3)
+				{
+					blend_curve.clear();
+					blend_curve.insert(startAt, 0.0f);
+					blend_curve.insert(marker, 1.0f);
+					blend_curve.insert(relaxAt, 1.0f);
+					blend_curve.insert(endAt, 0.0f);
+
+
+					time_warp.insert(startAt, cut);
+					if (counter <= 1)
+					{
+						time_warp.insert(strokeStartAt, skMotion->time_stroke_start());
+					}
+					if (counter <= 2)
+					{
+						time_warp.insert(strokeAt, skMotion->time_stroke_emphasis());
+					}
+					time_warp.insert(strokeEndAt, skMotion->time_stroke_end());
+					time_warp.insert(relaxAt, skMotion->time_relax());
+					time_warp.insert(endAt, skMotion->duration());
+
+					motionController->offset(cut);
+				}
+				else
+				{
+					time_warp.insert(startAt, skMotion->time_start());
+					//time_warp.insert( readyAt,			motionController->time_ready() );
+					//time_warp.insert( strokeStartAt,	motionController->time_stroke_start() );
+					//time_warp.insert( strokeAt,			motionController->time_stroke_emphasis() );
+					//time_warp.insert( strokeEndAt,		motionController->time_stroke_end() );
+					//time_warp.insert( relaxAt,			motionController->time_relax() );
+					//time_warp.insert( endAt,	ct_dur );
+					time_warp.insert(readyAt, skMotion->time_ready());
+					time_warp.insert(strokeStartAt, skMotion->time_stroke_start());
+					time_warp.insert(strokeAt, skMotion->time_stroke_emphasis());
+					time_warp.insert(strokeEndAt, skMotion->time_stroke_end());
+					time_warp.insert(relaxAt, skMotion->time_relax());
+					time_warp.insert(endAt, skMotion->duration());
+				}
 			}
 		}
 	}
@@ -639,6 +609,10 @@ MeCtScheduler2::TrackPtr MeCtScheduler2::schedule( MeController* ct, BML::Behavi
 		timingCt->setName( timing_name.c_str() );
 	}
 
+	LOG("[%s] Blend curve:", this->getName().c_str());
+	blendingCt->get_curve().print();
+	LOG("[%s] Timewarp curve:", this->getName().c_str());
+	timingCt->get_curve().print();
 	return create_track( blendingCt, timingCt, ct );
 }
 
@@ -930,134 +904,6 @@ bool MeCtScheduler2::controller_evaluate( double time, MeFrameData& frame ) {
 		remove_tracks( to_remove );
 	
 	return _active_when_empty || !_tracks.empty();
-
-
-
-	///////////////////////////////////////////////////////////////////
-	//// Old Scheduler Code	
-	//if ( !_channels.size() ) return false; // no tracks, not active
-
-	//MeController* ct;
-	//Track* tr;
-	//unsigned int i;
-
-	///*  // Original Code for SrArray _tracks
-	//// remove 'Once' controllers that have finished:
-	//// note: when a controller with undetermined duration ends its tout is automatically set
-	//i=0;
-	//while ( i<_tracks.size() ) {
-	//tr = &_tracks[i];
-	//if( tr->_type==Once && tr->_tout>=0 && t>tr->_tout+tr->_ext ) { // remove this track
-	//tr->_controller->stop();
-	//tr->uninit();
-	//_tracks.remove(i); // after this call tr pointer becomes unusable
-	//} else {
-	//i++;
-	//}
-	//}
-	//*/
-	//std::vector<Track>::iterator last = std::remove_if( _tracks.begin(), _tracks.end(),
-	//	TrackFinalizer(t) );
-	//_tracks.erase( last, _tracks.end() );
-
-
-	//unsigned int trsize = _tracks.size();
-	//if ( trsize==0 ) return false; // no tracks, not active anymore
-
-	//// Mark/check controllers to be played:
-	//int toplay = 0;
-	//for ( i=0; i<trsize; i++ ) {
-	//	tr = &_tracks[i];
-	//	tr->_toplay = false; // mark as not to play
-	//	if( t<tr->_tin+tr->_waitdt )
-	//		continue; // not yet started
-	//	if( tr->_tout>0 && t>tr->_tout+tr->_ext ) { // finished
-	//		ct = tr->controller();
-	//		if( ct->active() )
-	//			ct->stop();
-	//		continue;
-	//	}
-
-	//	tr->_toplay = true; // mark as to be played
-	//	toplay++; // count number of motions to play
-	//}
-
-	//if ( toplay==0 ) return true; // no tracks were toplay at this time
-
-	//// Evaluate the tracks and blend the buffers marked to be played:
-	//float* trbuff;
-	//float* buff = &buffer()[0];
-	//float tloc;
-
-	//int k;     // current active track
-	//int c;     // cur channel in _channels
-	//unsigned int csize; // cur channel size
-	//int cf=0;  // cur channel float in _channels
-	//int channels_size = _channels.size();
-	//int tracks_size = _tracks.size();
-
-	//bool easein, easeout;
-
-	//for ( k=0; k<tracks_size; k++ )
-	//{ tr = &_tracks[k];
-	//if ( !tr->_toplay ) continue; // was not toplay
-
-	//cf = 0;
-	//buff = &buffer()[0];
-	//ct = tr->controller();
-
-	//double ctDuration = tr->controller()->controller_duration();
-	//double tLocal = (t - tr->_tin) * tr->_speed;
-	//if( tr->_toclamp ) {
-	//	if( tLocal < 0 )
-	//		tLocal = 0;  // first frame
-	//	if( ctDuration >=0 &&
-	//		tLocal > ctDuration )
-	//		tLocal = ctDuration;  // final frame
-	//}
-	//double tEnd = tr->_tin;
-
-	////  Anm: tout is not necessaily controller bounds..
-	////       Allow controller to decide whether to evaluate.
-	////       See new test in MeController::evaluate()
-	////if ( tr->tout>0 && t>tr->tout ) {  // in extension period: no evaluation
-	////} else {
-	//if ( !ct->active() )
-	//	ct->start();
-	//// TODO!  Replace with temp FrameData/buffer
-	//ct->evaluate ( float(tLocal), frame ); // evaluate with local time
-	//if( !ct->active() && tr->_tout<0 )
-	//	tr->_tout = t; // tout is now determined
-	////}
-
-	//easein = t<tr->_tin+double(tr->_waitdt+tr->_indt)? true:false; // check if in ease-in phase
-	//easeout = tr->_tout>0 && t>tr->_tout+double(tr->_ext-tr->_outdt)? true:false; // check if in ease-out phase
-
-	//for ( c=0; c<channels_size; c++ )
-	//{ csize = _channels[c].size();
-	//int ctChannel = ct->map()[cf];
-	//if ( ctChannel>=0 ) // channel used by this track
-	//{
-	//	trbuff = &ct->buffer()[ctChannel];
-
-	//	if ( easein )
-	//	{ tloc =  float(t-(tr->_tin+tr->_waitdt))/tr->_indt;
-	//	_channels[c].interp ( buff, buff, trbuff, spline3(tloc) );
-	//	}
-	//	else if ( easeout )
-	//	{ tloc =  float(tr->_tout+tr->_ext-t)/tr->_outdt;
-	//	_channels[c].interp ( buff, buff, trbuff, spline3(tloc) );
-	//	}
-	//	else // just copy values
-	//	{ for ( i=0; i<csize; i++ ) buff[i]=trbuff[i];
-	//	}
-	//}
-	//cf += csize;
-	//buff  += csize;
-	//}
-	//}
-
-	//return true; // returns the activation state
 }
 
 SkChannelArray& MeCtScheduler2::controller_channels ()

@@ -92,9 +92,6 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	StringAttribute* gesturePolicyAttr = createStringAttribute("gesturePolicy", "random", true, "Gestures", 60, false, false, false, "Gesture policy to be used");
 	gesturePolicyAttr->setValidValues(gesturePolicyVec);
 
-	createBoolAttribute("gestureRequest.holdOnCoarticulation", false, true, "Gestures", 97, false, false, false, "Use holds, noise and match transition speeds for coarticulated gestures.");
-
-
 	/*
 	SmartBody::DoubleAttribute* motionAttr = createDoubleAttribute("emotion", 0, true, "Basic", 70, false, false, false, "Current emotion state, 0 is neutral, 1 is extreme angry");
 	motionAttr->setMin(0.0);
