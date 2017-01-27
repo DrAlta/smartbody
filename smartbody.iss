@@ -11,7 +11,7 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r6594
+AppVersion=r6630
 OutputBaseFilename=SmartBody
 WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
@@ -24,7 +24,8 @@ Source: ".\SmartBodyPythonAPI.html"; DestDir: "{app}"
 Source: ".\3rd party licenses.txt"; DestDir: "{app}"
 
 ; executables
-Source: ".\core\smartbody\sbgui\bin\*.exe"; DestDir: "{app}\bin"
+Source: ".\core\smartbody\sbgui\bin\sbgui.exe"; DestDir: "{app}\bin"
+Source: ".\core\smartbody\sbgui\bin\sbguid.exe"; DestDir: "{app}\bin"
 Source: ".\core\smartbody\sbgui\bin\*.dll"; DestDir: "{app}\bin"
 Source: ".\core\smartbody\sbgui\bin\*.pyd"; DestDir: "{app}\bin"
 Source: ".\sdk\.smartbodysettings"; DestDir: "{app}\bin"
@@ -112,7 +113,7 @@ Source: ".\core\smartbody\simplesmartbody\simplesmartbody.vcxproj"; DestDir: "{a
 
 ; libraries
 Source: ".\core\smartbody\SmartBody\lib\*.lib"; DestDir: "{app}\lib"
-Source: ".\core\smartbody\SmartBody\lib\*.pdb"; DestDir: "{app}\lib"
+;Source: ".\core\smartbody\SmartBody\lib\*.pdb"; DestDir: "{app}\lib"
 
 Source: ".\core\smartbody\sbgui\external\fltk-1.3.3\lib\*.pdb"; DestDir: "{app}\lib"
 
@@ -146,7 +147,20 @@ Source: ".\lib\assimp-3.1.1\Debug\assimpd.lib"; DestDir: "{app}\lib"
 
 
 ; data
+
+; behaviorsets
 Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\data\behaviorsets\*"; DestDir: "{app}\data\behaviorsets";  Excludes: ".svn"; Flags: recursesubdirs
+
+
+
 Source: ".\data\examples\*"; DestDir: "{app}\data\examples"; Excludes: "Physics, Terrain, .svn";Flags: recursesubdirs
 Source: ".\data\fonts\*"; DestDir: "{app}\data\fonts";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\data\ChrBrad\*"; DestDir: "{app}\data\ChrBrad";  Excludes: ".svn"; Flags: recursesubdirs
@@ -160,7 +174,7 @@ Source: ".\data\mesh\Sinbad\*"; DestDir: "{app}\data\mesh\Sinbad"
 Source: ".\data\scripts\*"; DestDir: "{app}\data\scripts";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\data\Hand\*"; DestDir: "{app}\data\Hand"; Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\data\cegui\datafiles\*"; DestDir: "{app}\data\cegui\datafiles";  Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\data\perceptionneuron\*"; DestDir: "{app}\data\perceptionneuron"; Excludes: ".svn";Flags: recursesubdirs
+Source: ".\data\perceptionneuron\*"; DestDir: "{app}\data\perceptionneuron"; Excludes: ".svn, *.bvh";Flags: recursesubdirs
 
 Source: "e:\smartbody\externalprograms\vs2015\vc_redist.x86.exe"; DestDir: "{app}"
 
