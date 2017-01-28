@@ -366,7 +366,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 		if (motionTime > prestrokeHoldPeriodStart &&
 			motionTime <= prestrokeHoldPeriodEnd)
 		{
-			// todo...
+			motionTime = prestrokeHoldPeriodEnd;
 		}
 	}
 
