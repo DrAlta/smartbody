@@ -1,3 +1,23 @@
+/*************************************************************
+Copyright(C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software : you can redistribute it and / or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
 #include "vhcl.h"
 
 #include <iostream>
@@ -170,29 +190,51 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		// including new sync points. Use that new motion as input into the gesture pipeline.
 		SrVec params(atof(xvalStr.c_str()), atof(yvalStr.c_str()), atof(zvalStr.c_str()));
 
-		std::stringstream strstr;
-		strstr.precision(1);
-		strstr << params[0] << "_" << params[1] << "_" << "_" << params[2];
-		std::string tempString = strstr.str();
-		std::string nameStr = vhcl::Replace(tempString, ".", "_");
-		std::stringstream strstr2;
-		strstr2 << blend->getName() << "_" << nameStr;
-		std::string blendedMotionName = strstr2.str();
+		// optimization; if the blend parameters dictate no blending needed, return the motion directly
+		SmartBody::SBAnimationBlend1D* blend1D = dynamic_cast<SmartBody::SBAnimationBlend1D*>(blend);
+		if (blend1D)
+		{
+			int numMotions = blend1D->getNumMotions();
+			for (int m = 0; m < numMotions; m++)
+			{
+				std::string motionName = blend1D->getMotion(m);
+				double val;
+				blend1D->getParameter(motionName, val);
+				if (fabs(val - params[0]) < .01)
+				{
+					motion = scene->getMotion(motionName);
+					if (motion)
+						break;
+				}
+			}
+		}
 
-		motion = SmartBody::SBScene::getScene()->getMotion(blendedMotionName);
 		if (!motion)
 		{
-			motion = blend->createMotionFromBlend(params, character, blendedMotionName, 30.0f);
+			std::stringstream strstr;
+			strstr.precision(1);
+			strstr << params[0] << "_" << params[1] << "_" << "_" << params[2];
+			std::string tempString = strstr.str();
+			std::string nameStr = vhcl::Replace(tempString, ".", "_");
+			std::stringstream strstr2;
+			strstr2 << blend->getName() << "_" << nameStr;
+			std::string blendedMotionName = strstr2.str();
+
+			motion = SmartBody::SBScene::getScene()->getMotion(blendedMotionName);
 			if (!motion)
 			{
-				LOG("Blend %s triggered from gesture is missing animation.", blend->getName().c_str());
-				return BehaviorRequestPtr();
-			}
-			// perform a retargeting if needed
-			std::string blendSkeleton = blend->getBlendSkeleton();
-			if (blendSkeleton != "")
-			{
-				motion->setMotionSkeletonName(blendSkeleton);
+				motion = blend->createMotionFromBlend(params, character, blendedMotionName, 30.0f);
+				if (!motion)
+				{
+					LOG("Blend %s triggered from gesture is missing animation.", blend->getName().c_str());
+					return BehaviorRequestPtr();
+				}
+				// perform a retargeting if needed
+				std::string blendSkeleton = blend->getBlendSkeleton();
+				if (blendSkeleton != "")
+				{
+					motion->setMotionSkeletonName(blendSkeleton);
+				}
 			}
 		}
 	}
