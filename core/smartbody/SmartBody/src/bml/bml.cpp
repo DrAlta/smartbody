@@ -488,8 +488,8 @@ void BmlRequest::gestureRequestProcess()
 					gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt);
 					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt);
 
-					gestures[j]->behav_syncs.sync_start()->set_time(currGestureStrokeStartAt);
-					gestures[j]->behav_syncs.sync_ready()->set_time(currGestureStrokeStartAt);
+					gestures[j]->behav_syncs.sync_start()->set_time(currGestureStrokeEndAt);
+					gestures[j]->behav_syncs.sync_ready()->set_time(currGestureStrokeEndAt);
 
 				}
 				else
@@ -509,7 +509,7 @@ void BmlRequest::gestureRequestProcess()
 					nextMotionController->setPrestrokeHoldTime(nextMotion->time_stroke_start() - transitionTime);
 					nextMotionController->setPrestrokeHoldDuration(transitionTime);
 
-					gestures[j]->behav_syncs.sync_start()->set_time(nextGestureStrokeStartAt - transitionTime);
+					gestures[j]->behav_syncs.sync_start()->set_time(currGestureStrokeEndAt + holdTime);
 					gestures[j]->behav_syncs.sync_ready()->set_time(nextGestureStrokeStartAt - transitionTime);
 
 				}
