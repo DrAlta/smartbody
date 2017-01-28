@@ -486,10 +486,10 @@ void BmlRequest::gestureRequestProcess()
 				{
 					// no hold period, transition to next gesture quickly
 					gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt);
-					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt);
+					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt + transitionTime);
 
 					gestures[j]->behav_syncs.sync_start()->set_time(currGestureStrokeEndAt);
-					gestures[j]->behav_syncs.sync_ready()->set_time(currGestureStrokeEndAt);
+					gestures[j]->behav_syncs.sync_ready()->set_time(currGestureStrokeEndAt + transitionTime);
 
 				}
 				else
@@ -502,7 +502,7 @@ void BmlRequest::gestureRequestProcess()
 					prevMotionController->setHoldDuration(holdTime);
 					
 					gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt + holdTime);
-					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt + holdTime);
+					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt + holdTime + transitionTime);
 
 					SBMotion* nextMotion = dynamic_cast<SBMotion*>(nextMotionController->motion());
 					double prestrokeHoldTime = transitionTime;
