@@ -435,27 +435,27 @@ void BmlRequest::gestureRequestProcess()
 				// coarticulation: hold and transition to new gesture
 				// determine the speed of the stroke in order to determine 
 				// how long the hold and transition periods should be
-				MeCtMotion* motionController = dynamic_cast<MeCtMotion*> (gestures[j]->anim_ct);
-				SBMotion* sbMotion = dynamic_cast<SBMotion*>(motionController->motion());
+				MeCtMotion* nextMotionController = dynamic_cast<MeCtMotion*> (gestures[j]->anim_ct);
+				SBMotion* nextMotion = dynamic_cast<SBMotion*>(nextMotionController->motion());
 				SmartBody::SBSkeleton* tempSkel = SmartBody::SBScene::getScene()->createSkeleton(actor->getSkeleton()->getName());
-				sbMotion->connect(tempSkel);
-				SBJoint* lWrist = actor->getSkeleton()->getJointByMappedName("l_wrist");
-				SBJoint* rWrist = actor->getSkeleton()->getJointByMappedName("r_wrist");
+				nextMotion->connect(tempSkel);
+				SBJoint* lWrist = tempSkel->getJointByMappedName("l_wrist");
+				SBJoint* rWrist = tempSkel->getJointByMappedName("r_wrist");
 				if (!lWrist || !rWrist)
 				{
 					// no wrists to check for speed, so can't do coarticulation
-					sbMotion->disconnect();
+					nextMotion->disconnect();
 					continue;
 				}
 
 
-				SrVec lWristPosStart = sbMotion->getJointPosition(lWrist, (float)sbMotion->time_stroke_start());
-				SrVec rWristPosStart = sbMotion->getJointPosition(rWrist, (float)sbMotion->time_stroke_start());
+				SrVec lWristPosStart = nextMotion->getJointPosition(lWrist, (float)nextMotion->time_stroke_start());
+				SrVec rWristPosStart = nextMotion->getJointPosition(rWrist, (float)nextMotion->time_stroke_start());
 
-				SrVec lWristPosEnd = sbMotion->getJointPosition(lWrist, (float)sbMotion->time_stroke_end());
-				SrVec rWristPosEnd = sbMotion->getJointPosition(rWrist, (float)sbMotion->time_stroke_end());
+				SrVec lWristPosEnd = nextMotion->getJointPosition(lWrist, (float)nextMotion->time_stroke_end());
+				SrVec rWristPosEnd = nextMotion->getJointPosition(rWrist, (float)nextMotion->time_stroke_end());
 				
-				sbMotion->disconnect();
+				nextMotion->disconnect();
 				
 				SrVec leftDistanceVec = lWristPosEnd - lWristPosStart;
 				SrVec rightDistanceVec = rWristPosEnd - rWristPosStart;
@@ -504,10 +504,10 @@ void BmlRequest::gestureRequestProcess()
 					gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt + holdTime);
 					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt + holdTime);
 
-					SBMotion* nextMotion = dynamic_cast<SBMotion*>(motionController->motion());
+					SBMotion* nextMotion = dynamic_cast<SBMotion*>(nextMotionController->motion());
 					double prestrokeHoldTime = transitionTime;
-					motionController->setPrestrokeHoldTime(nextMotion->time_stroke_start() - transitionTime);
-					motionController->setPrestrokeHoldDuration(transitionTime);
+					nextMotionController->setPrestrokeHoldTime(nextMotion->time_stroke_start() - transitionTime);
+					nextMotionController->setPrestrokeHoldDuration(transitionTime);
 
 					gestures[j]->behav_syncs.sync_start()->set_time(nextGestureStrokeStartAt - transitionTime);
 					gestures[j]->behav_syncs.sync_ready()->set_time(nextGestureStrokeStartAt - transitionTime);
