@@ -384,7 +384,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 		}
 		else if (motionTime > holdPeriodEnd)
 		{
-			motionTime = motionTime - _holdDuration;
+			motionTime = _holdTime;// motionTime - _holdDuration;
 		}
 	}
 
