@@ -484,12 +484,19 @@ void BmlRequest::gestureRequestProcess()
 
 				if (transitionTime > gestureInterval)
 				{
-					// no hold period, transition to next gesture quickly
-					gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt);
-					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt + transitionTime);
+					// transition time is too fast to perform next gesture, remove it
+					gestures[j]->filtered = true;
+					if (actor->getBoolAttribute("gestureRequest.gestureLog"))
+					{
+						LOG("Gesture %s filtered because transition time %f from last gesture insufficient to match stroke time %f.", nextMotion->getName().c_str(), transitionTime, gestureInterval);
+					}
 
-					gestures[j]->behav_syncs.sync_start()->set_time(currGestureStrokeEndAt);
-					gestures[j]->behav_syncs.sync_ready()->set_time(currGestureStrokeEndAt + transitionTime);
+					// no hold period, transition to next gesture quickly
+					//gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt);
+					//gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt + transitionTime);
+
+					//gestures[j]->behav_syncs.sync_start()->set_time(currGestureStrokeEndAt);
+					//gestures[j]->behav_syncs.sync_ready()->set_time(nextGestureStrokeStartAt);
 
 				}
 				else
@@ -506,11 +513,19 @@ void BmlRequest::gestureRequestProcess()
 
 					SBMotion* nextMotion = dynamic_cast<SBMotion*>(nextMotionController->motion());
 					double prestrokeHoldTime = transitionTime;
+					double gesturePrepareTime = nextMotion->time_stroke_start() - nextMotion->time_start();
+					if (prestrokeHoldTime > gesturePrepareTime)
+					{
+						// make sure the transition time isn't so slow that we calculate that the gesture has to move
+						// more slowly than originally intended
+						prestrokeHoldTime = gesturePrepareTime;
+					}
+
 					nextMotionController->setPrestrokeHoldTime(nextMotion->time_stroke_start() - transitionTime);
 					nextMotionController->setPrestrokeHoldDuration(transitionTime);
 
 					gestures[j]->behav_syncs.sync_start()->set_time(currGestureStrokeEndAt + holdTime);
-					gestures[j]->behav_syncs.sync_ready()->set_time(nextGestureStrokeStartAt - transitionTime);
+					gestures[j]->behav_syncs.sync_ready()->set_time(nextGestureStrokeStartAt);
 
 				}
 			}
