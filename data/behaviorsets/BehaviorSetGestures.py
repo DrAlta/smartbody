@@ -195,8 +195,6 @@ def setupBehaviorSet():
 	
 	gMapB1 = gMapManager.createGestureMap("BradGesture")
 	
-	gMapB1.addGestureMapping("ChrBrad@Idle01_ChopLf01", "BEAT", "", "", "", "ChrBrad@Idle01")
-'''
 	#gMapB1.addGestureMapping("ChrBrad@Idle01_ChopLf01", "METAPHORIC", "OBLIGATION", "LEFT_HAND", "", "ChrBrad@Idle01")
 	gMapB1.addGestureMapping("ChopLf", "METAPHORIC", "OBLIGATION", "LEFT_HAND", "", "ChrBrad@Idle01")
 
@@ -413,7 +411,7 @@ def setupBehaviorSet():
 
 	gMapB3.addGestureMapping("ChrBrad@Idle01_BeatLowLf02", "METAPHORIC", "INDIFFERENCE", "LEFT_HAND", "", "ChrBrad@Idle01")
 	gMapB3.addGestureMapping("ChrBrad@Idle01_BeatLowLf02", "METAPHORIC", "UNCERTAINTY", "LEFT_HAND", "", "ChrBrad@Idle01")
-'''
+
 		
 		
 		

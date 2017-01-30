@@ -37,6 +37,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace SmartBody {
 
+
 class SBMotionEvent;
 }
 
@@ -69,6 +70,9 @@ class MeCtMotion : public SmartBody::SBController, public FadingControl
 	double				_prestrokeHoldTime;
 	double				_prestrokeHoldDuration;
 	bool				_isGesture;
+	bool				_hasNoise;
+	std::vector<std::vector<float> > _noise;
+	std::vector<std::string> _noiseJoints;
 
    public :
 	   static std::string type_name;

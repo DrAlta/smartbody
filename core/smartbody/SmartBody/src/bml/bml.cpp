@@ -482,6 +482,10 @@ void BmlRequest::gestureRequestProcess()
 					transitionTime = gestureDistance / gestureSpeed;
 				}
 
+				double transitionTimeMultiplier = 1.0;
+				if (actor->getAttribute("gestureRequest.transitionTimeMultiplier"))
+					transitionTime *= actor->getDoubleAttribute("gestureRequest.transitionTimeMultiplier");
+
 				if (transitionTime > gestureInterval)
 				{
 					// transition time is too fast to perform next gesture, remove it

@@ -30,6 +30,7 @@ along with Smartbody.If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
 #include "controllers/me_ct_generic_hand.h"
+#include <external/perlin/perlin.h>
 
 //=================================== MeCtMotion =====================================
 
@@ -381,6 +382,7 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 			motionTime <= holdPeriodEnd)
 		{
 			motionTime = _holdTime;
+			
 		}
 		else if (motionTime > holdPeriodEnd)
 		{
@@ -404,6 +406,24 @@ bool MeCtMotion::controller_evaluate ( double t, MeFrameData& frame ) {
 		            &(frame.buffer()[0]),  // pointer to buffer's float array
 					&_mChan_to_buff,
 		            _play_mode, &_last_apply_frame, _isAdditive, retarget );
+
+	/* apply noise
+	for (int i = startFrame; i <= endFrame; ++i)
+	{
+		// set to motion
+		float* ref_p = this->posture(i);
+		for (size_t j = 0; j < affectedJoints.size(); ++j)
+		{
+			int chanId = mchan_arr.linear_search(affectedJoints[j], SkChannel::Quat);
+			if (chanId < 0)
+				continue;
+			int index = mchan_arr.float_position(chanId);
+			ref_p[index + 1] += vecRandomN[j * 3 + 0][i - startFrame];
+			ref_p[index + 2] += vecRandomN[j * 3 + 1][i - startFrame];
+			ref_p[index + 3] += vecRandomN[j * 3 + 2][i - startFrame];
+		}
+	}
+	*/
 
 #if 1 // disable IK post-processing for posture/motion by default
 	if (retarget && sbMotion)
@@ -533,6 +553,54 @@ double MeCtMotion::getHoldTime()
 void MeCtMotion::setHoldDuration(double time)
 {
 	_holdDuration = time;
+	if (_holdDuration < .001)
+		return;
+
+	// prepare noise data for use during hold periods
+	float scale = 0.f;
+	float freq = 0.f;
+	std::string jointStr;
+	SmartBody::SBMotion* sbmotion = dynamic_cast<SmartBody::SBMotion*>(_motion);
+	if (sbmotion->hasMetaData("noise_joints"))
+		jointStr = sbmotion->getMetaDataString("noise_joints");
+	if (sbmotion->hasMetaData("noise_scale"))
+		scale = (float)atof(sbmotion->getMetaDataString("noise_scale").c_str());
+	if (sbmotion->hasMetaData("noise_frequency"))
+		freq = (float)atof(sbmotion->getMetaDataString("noise_frequency").c_str());
+
+	std::vector<std::string> jointVec;
+	vhcl::Tokenize(jointStr, _noiseJoints);
+	if (_noiseJoints.size() == 0)
+	{
+		_hasNoise = false;
+		return;
+	}
+
+	double frameRate = sbmotion->getFrameRate();
+	int numFrames = int(time / frameRate);
+
+	Perlin perlinNoise;
+	if (freq < 0)
+		freq = 1.0f / float(numFrames);
+
+	_noise.resize(_noiseJoints.size() * 3);
+	// generate random number
+	for (size_t j = 0; j < _noiseJoints.size(); ++j)
+	{
+		for (int d = 0; d < 3; ++d)
+		{
+			std::vector<float> randomN;
+			randomN.resize(numFrames);
+			perlinNoise.init();
+			for (int f = 0; f <= numFrames; ++f)
+			{
+				float x = (f - 0) * freq;
+				float v = perlinNoise.noise1(x);
+				randomN[f - 0] = v * scale;
+			}
+			_noise[j * 3 + d] = randomN;
+		}
+	}
 }
 
 double MeCtMotion::getHoldDuration()
