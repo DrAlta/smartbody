@@ -484,7 +484,9 @@ void BmlRequest::gestureRequestProcess()
 
 				double transitionTimeMultiplier = 1.0;
 				if (actor->getAttribute("gestureRequest.transitionTimeMultiplier"))
+				{
 					transitionTime *= actor->getDoubleAttribute("gestureRequest.transitionTimeMultiplier");
+				}
 
 				if (transitionTime > gestureInterval)
 				{
@@ -509,8 +511,12 @@ void BmlRequest::gestureRequestProcess()
 					//double holdTime = nextGestureStrokeStartAt - currGestureStrokeEndAt;
 					MeCtMotion* prevMotionController = dynamic_cast<MeCtMotion*> (gestures[i]->anim_ct);
 					SBMotion* prevMotion = dynamic_cast<SBMotion*>(prevMotionController->motion());
-					prevMotionController->setHoldTime(prevMotion->time_stroke_end());
-					prevMotionController->setHoldDuration(holdTime);
+
+					if (!actor->getBoolAttribute("gestureRequest.experimentalTransitions"))
+					{
+						prevMotionController->setHoldTime(prevMotion->time_stroke_end());
+						prevMotionController->setHoldDuration(holdTime);
+					}
 					
 					gestures[i]->behav_syncs.sync_relax()->set_time(currGestureStrokeEndAt + holdTime);
 					gestures[i]->behav_syncs.sync_end()->set_time(currGestureStrokeEndAt + holdTime + transitionTime);
@@ -525,8 +531,11 @@ void BmlRequest::gestureRequestProcess()
 						prestrokeHoldTime = gesturePrepareTime;
 					}
 
-					nextMotionController->setPrestrokeHoldTime(nextMotion->time_stroke_start() - transitionTime);
-					nextMotionController->setPrestrokeHoldDuration(transitionTime);
+					if (!actor->getBoolAttribute("gestureRequest.experimentalTransitions"))
+					{
+						nextMotionController->setPrestrokeHoldTime(nextMotion->time_stroke_start() - transitionTime);
+						nextMotionController->setPrestrokeHoldDuration(transitionTime);
+					}
 
 					gestures[j]->behav_syncs.sync_start()->set_time(currGestureStrokeEndAt + holdTime);
 					gestures[j]->behav_syncs.sync_ready()->set_time(nextGestureStrokeStartAt);
