@@ -104,6 +104,7 @@ SBCharacter::SBCharacter(const std::string& name, const std::string& type) : Sbm
 	createDoubleAttribute("gestureRequest.gestureWristActiveThreshold", 0.15, true, "Gestures", 96, false, false, false, "The speed threshold used to determine if this hand moving."); 
 	createBoolAttribute("gestureRequest.experimentalCoarticulation", false, true, "Gestures", 97, false, false, false, "Experimental coarticulation code.");
 	createDoubleAttribute("gestureRequest.transitionTimeMultiplier", 1.0, true, "Gestures", 97, false, false, false, "Experimental coarticulation code; transition time adjustment.");
+	createBoolAttribute("gestureRequest.experimentalTransitions", false, true, "Gestures", 97, false, false, false, "Experimental transition code.");
 
 	createStringAttribute("gestureMap", "", true, "Gestures", 50, false, false, false, "Name of the gesture map to use.");
 
