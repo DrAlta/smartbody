@@ -36,7 +36,7 @@ std::string getVersion(void)
 #endif
 #endif
 #endif
-	strstr << "version 6649 2017/01/30 07:22:01";
+	strstr << "version 6651 2017/02/05 06:27:22";
 
 	return strstr.str();
 }

@@ -1,21 +1,23 @@
-/*
- *  sr_viewer.cpp - part of SBM: SmartBody Module
- *  Copyright (C) 2008  University of Southern California
- *
- *  SBM is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SBM is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SBM.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
 
 #include "FL/Fl_Slider.H"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
 #include "vhcl.h"
@@ -1392,40 +1394,40 @@ void FltkViewer::updateLights()
 		numLightsInScene == 0 &&
 		SmartBody::SBScene::getScene()->getBoolAttribute("useDefaultLights"))
 	{
+		SrVec up(0, 1, 0);
+
 		SrLight light;		
 		light.directional = true;
-		light.diffuse = SrColor( 1.0f, 1.0f, 1.0f );
+		light.diffuse = SrColor(1.0f, 1.0f, 1.0f);
 		SrMat mat;
-		sr_euler_mat_xyz (mat, SR_TORAD(-5), SR_TORAD(-76), SR_TORAD(-117));
+		sr_euler_mat_xyz (mat, SR_TORAD(-3.55), SR_TORAD(0.0), SR_TORAD(135));
 		SrQuat orientation(mat);
-		SrVec up(0,1,0);
 		SrVec lightDirection = -up * orientation;
-		light.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
-	//	light.constant_attenuation = 1.0f/cam.scale;
+		//light.position = SrVec(lightDirection.x, lightDirection.y, lightDirection.z);
+		light.position = SrVec(.019, .437, .898);
 		light.constant_attenuation = 1.0f;
 		_lights.push_back(light);
 
 		SrLight light2 = light;
 		light2.directional = true;
 		light2.diffuse = SrColor(1.0f, 1.0f, 1.0f);
-		sr_euler_mat_xyz (mat, SR_TORAD(12), SR_TORAD(125), SR_TORAD(-121));
-		SrQuat orientation2(mat);
-		lightDirection = -up * orientation2;
-		light2.position = SrVec( lightDirection.x, lightDirection.y, lightDirection.z);
-	//	light2.constant_attenuation = 1.0f;
-	//	light2.linear_attenuation = 2.0f;
+		SrMat mat2;
+		sr_euler_mat_xyz (mat2, SR_TORAD(-2.5), SR_TORAD(-90), SR_TORAD(116));
+		SrQuat orientation2(mat2);
+		SrVec lightDirection2 = -up * orientation2;
+		//light2.position = SrVec(lightDirection2.x, lightDirection2.y, lightDirection2.z);
+		light2.position = SrVec(.820, -.525, .227);
 		_lights.push_back(light2);
-
 
 		SrLight light3 = light;
 		light3.directional = true;
 		light3.diffuse = SrColor(1.0f, 1.0f, 1.0f);
-		sr_euler_mat_xyz(mat, SR_TORAD(-57), SR_TORAD(-134), SR_TORAD(103));
-		SrQuat orientation3(mat);
-		lightDirection = -up * orientation3;
-		light3.position = SrVec(lightDirection.x, lightDirection.y, lightDirection.z);
-		//	light2.constant_attenuation = 1.0f;
-		//	light2.linear_attenuation = 2.0f;
+		SrMat mat3;
+		sr_euler_mat_xyz(mat3, SR_TORAD(-20), SR_TORAD(2.5), SR_TORAD(-56));
+		SrQuat orientation3(mat3);
+		SrVec lightDirection3 = -up * orientation3;
+		//light3.position = SrVec(lightDirection3.x, lightDirection3.y, lightDirection3.z);
+		light3.position = SrVec(.707, .705, .044);
 		_lights.push_back(light3);
 	}
 	
@@ -1459,6 +1461,7 @@ void FltkViewer::drawFloor(bool shadowPass)
 		static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
 		static GLfloat mat_diffuse[] = { 0.5f,  0.5f,    0.5f,    1.f };
 		static GLfloat mat_speclar[] = { 0.f,  0.f,    0.f,    1.f }; 
+		glPushAttrib(GL_LIGHTING_BIT);
 		glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin );
 		glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient );
 
@@ -1484,6 +1487,7 @@ void FltkViewer::drawFloor(bool shadowPass)
 		glNormal3f(0,1,0);
 		glVertex3f(-floorSize,planeY,-floorSize);	
 		glEnd();
+		glPopAttrib();
 	}	
 }
 
