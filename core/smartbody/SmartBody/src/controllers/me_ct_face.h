@@ -1,25 +1,23 @@
-/*
- *  me_ct_face.h - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
 
 # ifndef ME_CT_FACE_H
 # define ME_CT_FACE_H
@@ -90,7 +88,7 @@ class MeCtFace : public SmartBody::SBController	{
 
 		void customizeMotion(const std::string& motionName, double startTime);
 		
-		virtual void init (SbmPawn* pawn);
+		virtual void init (SmartBody::SBPawn* pawn);
 		void remove_joint( const char *joint_name );
 		void remove_channel( const char *joint_name, SkChannel::Type ch_type );
 		void add_key( const char *weight_key, SkMotion* key_pose_p );

@@ -1,23 +1,22 @@
-/*
-*  sbm_pawn.cpp - part of SmartBody-lib
-*  Copyright (C) 2008  University of Southern California
-*
-*  SmartBody-lib is free software: you can redistribute it and/or
-*  modify it under the terms of the Lesser GNU General Public License
-*  as published by the Free Software Foundation, version 3 of the
-*  license.
-*
-*  SmartBody-lib is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  Lesser GNU General Public License for more details.
-*
-*  You should have received a copy of the Lesser GNU General Public
-*  License along with SmartBody-lib.  If not, see:
-*      http://www.gnu.org/licenses/lgpl-3.0.txt
-*
-*/
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 #include "vhcl.h"
 #include <sb/SBTypes.h>
 
@@ -42,6 +41,7 @@
 #include <sbm/SteerSuiteEngineDriver.h>
 #include <sbm/sr_arg_buff.h>
 #include "sbm/sbm_deformable_mesh.h"
+#include <sb/SBPawn.h>
 
 #if defined(__ANDROID__) || defined(SB_IPHONE) || defined(__native_client__) || defined(__FLASHPLAYER__)
 #include <sbm/sbm_deformable_mesh.h>
@@ -262,7 +262,8 @@ int SbmPawn::setup() {
 		WORLD_OFFSET_CHANNELS_P.add( world_offset_joint_name, SkChannel::ZPos );
 		WORLD_OFFSET_CHANNELS_P.add( world_offset_joint_name, SkChannel::Quat );
 	}
-	world_offset_writer_p->init( this, WORLD_OFFSET_CHANNELS_P, true );
+	SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(this);
+	world_offset_writer_p->init(sbpawn, WORLD_OFFSET_CHANNELS_P, true );
 
 	wo_cache.x = 0;
 	wo_cache.y = 0;
@@ -302,7 +303,8 @@ int SbmPawn::init_skeleton() {
 	_skeleton->compress();
 
 	init_world_offset_channels();
-	world_offset_writer_p->init( this, WORLD_OFFSET_CHANNELS_P, true );
+	SmartBody::SBPawn* sbpawn = dynamic_cast<SmartBody::SBPawn*>(this);
+	world_offset_writer_p->init(sbpawn, WORLD_OFFSET_CHANNELS_P, true );
 
 	wo_cache.x = 0;
 	wo_cache.y = 0;

@@ -1,24 +1,22 @@
-/*
- *  me_ct_blend.hpp - part of SmartBody-lib's Motion Engine
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #ifndef ME_CT_BLEND_HPP
 #define ME_CT_BLEND_HPP
@@ -30,6 +28,11 @@
 #include <controllers/me_controller_context_proxy.hpp>
 
 #include <sbm/sr_linear_curve.h>
+
+namespace SmartBody {
+	class SBPawn;
+}
+
 
 class MeCtBlend : public MeCtUnary  {
 public:
@@ -150,7 +153,7 @@ public:
 	virtual ~MeCtBlend();
 
 	/** Initialize the Blend controller with the given child controller.  */
-	void init( MeController* child, SbmPawn* pawn );
+	void init( MeController* child, SmartBody::SBPawn* pawn );
 
 	//virtual void set_child( MeController* child );  // Use init( child )
 

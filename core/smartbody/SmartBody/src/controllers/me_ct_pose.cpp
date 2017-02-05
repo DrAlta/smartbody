@@ -1,33 +1,28 @@
-/*
- *  me_ct_pose.cpp - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
- *      Andrew n marshall, USC
- *      Marcus Thiebaux, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
 
 
 # include <controllers/me_ct_pose.h>
 #include <vhcl_log.h>
-
-
-
+#include <sb/SBPawn.h>
 
 // Enable the inspection of channel values
 #define DEBUG_CHANNELS 0
@@ -58,7 +53,7 @@ void MeCtPose::init_channel_map( void )	{
 		_context->child_channels_updated( this );
 }
 
-void MeCtPose::init ( SbmPawn* pawn, const SkChannelArray& ca )
+void MeCtPose::init (SmartBody::SBPawn* pawn, const SkChannelArray& ca )
 {
 	// use copy operator to get channels:
 	_channels = ca;
@@ -73,7 +68,7 @@ void MeCtPose::init ( SbmPawn* pawn, const SkChannelArray& ca )
 	init_channel_map();
 }
 
-void MeCtPose::init ( SbmPawn* pawn, const SkPosture& p )
+void MeCtPose::init(SmartBody::SBPawn* pawn, const SkPosture& p )
 {
 	// use copy operator to get a copy of the channels:
 	_channels = *(p.const_channels());
@@ -93,7 +88,7 @@ void MeCtPose::init ( SbmPawn* pawn, const SkPosture& p )
 	init_channel_map();
 }
 
-void MeCtPose::init ( SbmPawn* pawn, SkMotion* m, float t )
+void MeCtPose::init (SmartBody::SBPawn* pawn, SkMotion* m, float t )
 {
 	// use copy operator to get a copy of the channels:
 	_channels = m->channels();
@@ -115,7 +110,7 @@ void MeCtPose::init ( SbmPawn* pawn, SkMotion* m, float t )
 	init_channel_map();
 }
 
-void MeCtPose::init( SbmPawn* pawn, MeCtPose* other ) {
+void MeCtPose::init(SmartBody::SBPawn* pawn, MeCtPose* other ) {
 	clone_parameters( other );
 
 	// use copy operator to get a copy of the channels:

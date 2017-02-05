@@ -90,9 +90,9 @@ class MeCtMotion : public SmartBody::SBController, public FadingControl
         (SkMotion derives SrSharedClass and has ref/unref methods)
         The keytimes of m are translated to ensure start from zero. 
         MeController::init() is automatically called. */
-    void init (SbmPawn* pawn, SkMotion* m_p );
-    void init (SbmPawn* pawn, SkMotion* m_p, double time_offset, double time_scale );
-	void init (SbmPawn* pawn, SkMotion* m_p, std::vector<std::string>& joints);
+    void init (SmartBody::SBPawn* pawn, SkMotion* m_p );
+    void init (SmartBody::SBPawn* pawn, SkMotion* m_p, double time_offset, double time_scale );
+	void init (SmartBody::SBPawn* pawn, SkMotion* m_p, std::vector<std::string>& joints);
 
 	/*! Initialize a controller by cloning another */
 //	void init ( MeCtMotion* other );

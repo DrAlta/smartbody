@@ -58,7 +58,7 @@ MeCtMotion::~MeCtMotion ()
  {
  }
 
-void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, double time_offset, double time_scale)	{
+void MeCtMotion::init(SmartBody::SBPawn* pawn, SkMotion* m_p, double time_offset, double time_scale)	{
 
 	if ( _motion ) {
 		if( m_p == _motion ) {
@@ -108,11 +108,11 @@ void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, double time_offset, double t
 	//_character->generic_hand_ct->init(_motion);
 }
 
-void MeCtMotion::init (SbmPawn* pawn, SkMotion* m_p ) {
+void MeCtMotion::init (SmartBody::SBPawn* pawn, SkMotion* m_p ) {
 	init(pawn, m_p, 0.0, 1.0 );
 }
 
-void MeCtMotion::init(SbmPawn* pawn, SkMotion* m_p, std::vector<std::string>& joints)
+void MeCtMotion::init(SmartBody::SBPawn* pawn, SkMotion* m_p, std::vector<std::string>& joints)
 {
 	_joints = joints;
 	init(pawn, m_p, 0.0, 1.0);

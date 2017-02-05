@@ -140,8 +140,8 @@ void MeController::remove_all_children() {
 	}
 }
 
-void MeController::init (SbmPawn* pawn) {
-	_pawn = dynamic_cast<SmartBody::SBPawn*>(pawn);
+void MeController::init (SmartBody::SBPawn* pawn) {
+	_pawn = pawn;
 	_active = false;
 	controller_init ();
 
