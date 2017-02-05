@@ -1,26 +1,23 @@
-/*
- *  me_ct_pose.h - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
- *      Andrew n marshall, USC
- *      Marcus Thiebaux, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
 
 
 # ifndef ME_CT_POSE_H
@@ -56,18 +53,18 @@ class MeCtPose : public SmartBody::SBController
 	void init_channel_map( void );
 
     /*! Defines the channels to be used and fill the rest posture with zeros */
-    void init ( SbmPawn* pawn,  const SkChannelArray& ca);
+    void init (SmartBody::SBPawn* pawn,  const SkChannelArray& ca);
 
     /*! Defines the channels and the values from the given posture p */
-    void init ( SbmPawn* pawn, const SkPosture& p );
+    void init (SmartBody::SBPawn* pawn, const SkPosture& p );
 
     /*! Defines the channels as those declared in the given motion, and set the
         MeCtPose posture from the motion at time t. After this call, motion m
         will be disconnected to any previous connection in the motion. */
-    void init ( SbmPawn* pawn, SkMotion* m, float t );
+    void init (SmartBody::SBPawn* pawn, SkMotion* m, float t );
 
 	/*! Initialize a controller by cloning another */
-	void init( SbmPawn* pawn, MeCtPose* other);
+	void init(SmartBody::SBPawn* pawn, MeCtPose* other);
 
     /*! Sets the name of the SkPosture used to initialize this pose controller. */
     void posture_name ( const char* posture_name ) { _posture_name = posture_name; }

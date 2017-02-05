@@ -1,25 +1,23 @@
-/*
- *  me_ct_examples.h - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
 
 #ifndef ME_CT_EXAMPLES_H
 #define ME_CT_EXAMPLES_H
@@ -44,7 +42,7 @@ class MeCtHeadOrient : public SmartBody::SBController	{
 		MeCtHeadOrient();
 		virtual ~MeCtHeadOrient();
 		
-		void init( SbmPawn* pawn );
+		void init(SmartBody::SBPawn* pawn);
 		void set_orient( float dur, float p, float h, float r );
 		
 
@@ -75,7 +73,7 @@ class MeCtSimpleTilt : public SmartBody::SBController	{
 		MeCtSimpleTilt();
 		virtual ~MeCtSimpleTilt();
 		
-		void init( SbmPawn* pawn );
+		void init(SmartBody::SBPawn* pawn);
 		void set_tilt( float dur, float angle_deg );
 		
 		// Following must be public for comparisons
@@ -114,7 +112,7 @@ class MeCtSimpleNod : public SmartBody::SBController	{
 		MeCtSimpleNod();
 		virtual ~MeCtSimpleNod();
 		
-		void init( SbmPawn* pawn );
+		void init(SmartBody::SBPawn* pawn);
 		void set_nod( float dur, float mag, float rep, int movementType, float smooth = 0.5 );
 //		void set_nod( int axis, float dur, float mag, float rep, float smooth = 0.5 );
 
