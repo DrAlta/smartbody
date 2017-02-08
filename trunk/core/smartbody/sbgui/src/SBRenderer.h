@@ -7,6 +7,9 @@
 #include <sr/sr_light.h>
 
 
+class FltkViewerData;
+
+
 class SBGBuffer : public SBFrameBufferObject
 {
 public:
@@ -20,7 +23,8 @@ public:
 	SbmTexture* posTex;
 	SbmTexture* normalTex;
 	SbmTexture* diffuseTex;
-	SbmTexture* texCoordTex;
+	SbmTexture* specularTex;
+	SbmTexture* glossyTex;
 	SbmTexture* depthTex;
 	GLuint fboID;
 };
@@ -45,13 +49,16 @@ public:
 	
 	void resize(int w, int h);
 
-	void drawTestDeferred(std::vector<SrLight>& lights);
+	void drawTestDeferred(std::vector<SrLight>& lights, FltkViewerData* viewData);
 	void drawTestSSAO();	
 	void drawLightPass(std::vector<SrLight>& lights);
 	void drawIBLPass();
 	void renderMesh(DeformableMeshInstance* meshInstance);
 
 	void registerGUI();
+
+protected:
+	void drawFloor(FltkViewerData* viewerData);
 	
 protected:	
 	int width, height;

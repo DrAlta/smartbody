@@ -5,6 +5,7 @@
 #include <sb/SBTypes.h>
 #include <sb/SBAsset.h>
 #include <sr/sr_gl.h>
+#include <sr/sr_color.h>
 
 class SbmTexture;
 typedef std::map<std::string,SbmTexture*> StrTextureMap;
@@ -25,7 +26,7 @@ typedef std::map<std::string,SbmCubeMapTexture*> StrCubeTextureMap;
 class SbmTextureManager
 {
 public:
-	enum { TEXTURE_DIFFUSE = 0, TEXTURE_NORMALMAP, TEXTURE_SPECULARMAP, TEXTURE_RENDER_TARGET, TEXTURE_HDR_MAP, TEXTURE_CUBEMAP};
+	enum { TEXTURE_DIFFUSE = 0, TEXTURE_NORMALMAP, TEXTURE_SPECULARMAP, TEXTURE_GLOSSYMAP, TEXTURE_RENDER_TARGET, TEXTURE_HDR_MAP, TEXTURE_CUBEMAP};
 protected:
 	StrTextureMap textureMap;
 	StrTextureMap normalTexMap;
@@ -61,6 +62,9 @@ public:
 	// Creates a 1x1 white texture
 	SBAPI SbmTexture* createTexture(int type, const char* textureName);
 	SBAPI void createWhiteTexture(const char* textureName, int width = 1, int height = 1);	
+	SBAPI void createBlackTexture(const char* textureName, int width = 1, int height = 1);
+	SBAPI void createColorTexture(const char* textureName, SrColor initColor, int width = 1, int height = 1);
+	
 	SBAPI GLuint createFBO(const char* fboName);
 
 	SBAPI void updateEnvMaps();
@@ -119,8 +123,8 @@ public:
 
 	SBAPI void bakeAlphaIntoTexture(SbmTexture* alphaTex);
 	// Creates a 1x1 white texture
-	SBAPI void createWhiteTexture(int w = 1, int h = 1);
-	SBAPI void createEmptyTexture(int w = 1, int h = 1, int numChannels = 1, GLenum type = GL_UNSIGNED_BYTE);	
+	SBAPI void createWhiteTexture(int w = 1, int h = 1);	
+	SBAPI void createEmptyTexture(int w , int h, int numChannels, GLenum type = GL_UNSIGNED_BYTE, SrColor initColor = SrColor::white);	
 };
 #if USE_CUBE_MAP
 class SbmCubeMapTexture // simple place holder for OpenGL ES cubemap texture

@@ -53,6 +53,7 @@ public:
 	std::vector<float> *data_float;
 public:	
 	VBOData(char* name, int type, std::vector<SrVec2>& Data) {}
+
 	VBOData(char* name, int type, std::vector<SrVec>& Data) {}
 	VBOData(char* name, int type, std::vector<SrVec3i>& Data) {}
 	VBOData(char* name, int type, std::vector<SrVec4>& Data) {}
@@ -76,12 +77,14 @@ protected:
 
 #else
 
+#if 0
 class VBOData
 {
 public:
 	unsigned int m_iVBO_ID;
 	bool m_bUpdate;
 	GLuint m_ArrayType;
+	GLuint m_UsageType;
 
 	char m_Name[20];		
 	std::vector<SrVec2> *data_Vec2f;
@@ -102,14 +105,123 @@ public:
 	
 	void BindBuffer();
 	void UnbindBuffer();
-	void Update();
-
+	void Update();	
 	void Debug(const char* tag = "VBO");
 
 protected:
 	void EnableClient(int ArrayType);
 	void DisableClient(int ArrayType);
 };
+#endif
+
+template <class S>
+class VBOData
+{
+public:
+	unsigned int m_iVBO_ID;
+	bool m_bUpdate;
+	bool isIndexBuffer;
+	GLuint m_ArrayType;
+	GLuint m_UsageType;
+
+	char m_Name[20];
+	std::vector<S>* dataPtr;
+public:
+	VBOData(char* name, GLuint ArrayType, GLuint UsageType, std::vector<S>& Data);
+	~VBOData();
+
+	void BindBuffer();
+	void UnbindBuffer();
+	void Update();
+	void UpdateWithData(std::vector<S>& updateData);
+};
+
+
+template <class S>
+VBOData<S>::VBOData(char* name, GLuint ArrayType, GLuint UsageType, std::vector<S>& Data)
+{
+	isIndexBuffer = false;
+	m_ArrayType = ArrayType;
+	m_UsageType = UsageType;
+	strcpy(m_Name, name);
+	dataPtr = &Data;
+	m_bUpdate = true;
+	m_iVBO_ID = 0;
+}
+
+template <class S>
+VBOData<S>::~VBOData(void)
+{
+	if (m_iVBO_ID)
+		glDeleteBuffers(1, &m_iVBO_ID);	
+}
+
+template <class S>
+void VBOData<S>::BindBuffer()
+{
+	if (m_ArrayType == GL_ELEMENT_ARRAY_BUFFER)
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iVBO_ID);
+	else
+		glBindBuffer(GL_ARRAY_BUFFER, m_iVBO_ID);			
+}
+
+template <class S>
+void VBOData<S>::UnbindBuffer()
+{	
+	if (m_ArrayType == GL_ELEMENT_ARRAY_BUFFER)
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	else
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+template <class S>
+void VBOData<S>::Update()
+{
+	m_bUpdate = true;
+
+	if (m_bUpdate)
+	{
+		if (m_iVBO_ID <= 0)
+			// Get A Valid Name
+			glGenBuffers(1, &m_iVBO_ID);
+
+		if (m_ArrayType == GL_ELEMENT_ARRAY_BUFFER)
+		{
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iVBO_ID);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, dataPtr->size() * sizeof(S),
+				getPtr(*dataPtr), m_UsageType);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		}
+		else 
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, m_iVBO_ID);
+			glBufferData(GL_ARRAY_BUFFER, dataPtr->size() *sizeof(S),
+				getPtr(*dataPtr), m_UsageType);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}		
+	}
+}
+
+
+template <class S>
+void VBOData<S>::UpdateWithData(std::vector<S>& updateData)
+{
+	if (m_ArrayType == GL_ELEMENT_ARRAY_BUFFER)
+	{
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iVBO_ID);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, updateData.size() * sizeof(S),
+			getPtr(updateData), m_UsageType);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+	else
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, m_iVBO_ID);
+		glBufferData(GL_ARRAY_BUFFER, updateData.size() * sizeof(S),
+			getPtr(updateData), m_UsageType);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
+}
+
 
 #endif
 
@@ -118,20 +230,20 @@ class VBODataArray
 {	
 protected:
 	std::vector<S> m_Data;
-	VBOData*   m_pVBO;	
+	VBOData<S>*   m_pVBO;	
 public:
-	VBODataArray(char* name, int type, std::vector<S>& data);
-	VBODataArray(char* name, int type, std::vector<S>& data, int number_of_shapes);
-	VBODataArray(char* name, int type, int nSize);
+	VBODataArray(char* name, GLuint type, std::vector<S>& data);
+	VBODataArray(char* name, GLuint type, std::vector<S>& data, int number_of_shapes);
+	VBODataArray(char* name, GLuint type, int nSize);
 	~VBODataArray();
-	VBOData* VBO() const { return m_pVBO; }
+	VBOData<S>* VBO() const { return m_pVBO; }
 };
 
 template<class S>
-VBODataArray<S>::VBODataArray( char* name, int type, int nSize )
+VBODataArray<S>::VBODataArray( char* name, GLuint type, int nSize )
 {
 	m_Data.resize(nSize);
-	m_pVBO = new VBOData(name,type,m_Data);
+	m_pVBO = new VBOData<S>(name,type, GL_STATIC_DRAW, m_Data);
 	m_pVBO->Update();
 }
 
@@ -143,22 +255,22 @@ VBODataArray<S>::~VBODataArray()
 }
 
 template<class S>
-VBODataArray<S>::VBODataArray( char* name, int type, std::vector<S>& data )
+VBODataArray<S>::VBODataArray( char* name, GLuint type, std::vector<S>& data )
 {
 	m_Data.resize(data.size());
 	//copy(data,m_Data);
 	m_Data = data;
-	m_pVBO = new VBOData(name,type,m_Data);
+	m_pVBO = new VBOData<S>(name,type, GL_STATIC_DRAW,m_Data);
 	m_pVBO->Update();
 }
 
 template<class S>
-VBODataArray<S>::VBODataArray( char* name, int type, std::vector<S>& data, int number_of_shapes )
+VBODataArray<S>::VBODataArray( char* name, GLuint type, std::vector<S>& data, int number_of_shapes )
 {
 	m_Data.resize(data.size());
 	//copy(data,m_Data);
 	m_Data = data;
-	m_pVBO = new VBOData(name,type,m_Data);
+	m_pVBO = new VBOData<S>(name,type, GL_STATIC_DRAW,m_Data);
 	m_pVBO->Update();
 }
 

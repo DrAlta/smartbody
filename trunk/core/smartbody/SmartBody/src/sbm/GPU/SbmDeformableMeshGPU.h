@@ -52,6 +52,14 @@ public:
 	void skinTransformGPU(DeformableMeshInstance* meshInstance);
 	static void initShaderProgram();	
 	VBOVec3f* getPosVBO() { return VBOPos; }
+	VBOVec3f* getNormalVBO() { return VBONormal; }
+	VBOVec3f* getTangentVBO() { return VBOTangent; }
+	VBOVec3f* getBiNormalVBO() { return VBOBiNormal; }
+	VBOVec2f* getTexCoordVBO() { return VBOTexCoord; }
+	VBOVec3i* getTriVBO() { return VBOTri; }
+	std::vector<VBOVec3i*>& getVBOSubMeshTris() {
+		return subMeshTris;
+	}
 protected:
 	bool initBuffer(); // initialize VBO and related GPU data buffer	
 	bool initBuffer1();	
@@ -62,18 +70,21 @@ class SbmDeformableMeshGPUInstance : public DeformableMeshInstance
 {
 protected:	
 	TBOData  *TBOTran; // bone transformation	
+	VBOVec3f *VBODeformPos;
 	bool     bufferReady;
 public:
 	SBAPI SbmDeformableMeshGPUInstance();
 	~SbmDeformableMeshGPUInstance();
 	
-	virtual void update();			
-	virtual void setDeformableMesh(DeformableMesh* mesh);
-	std::vector<SrMat>& getTransformBuffer() { return transformBuffer; }
-	TBOData*            getTBOTransforBuffer() { return TBOTran; }
+	SBAPI virtual void update();			
+	SBAPI virtual void setDeformableMesh(DeformableMesh* mesh);
+	SBAPI bool initBuffer();
+
+	SBAPI std::vector<SrMat>& getTransformBuffer() { return transformBuffer; }
+	SBAPI TBOData*            getTBOTransforBuffer() { return TBOTran; }
+	SBAPI VBOVec3f*           getVBODeformPos() { return VBODeformPos; }
 protected:
-	void gpuBlendShape();
-	bool initBuffer();	
+	void gpuBlendShape();	
 	void cleanBuffer();	
 };
 

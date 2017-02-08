@@ -10,7 +10,7 @@
 
 #ifndef SB_NO_PYTHON
 
-#if 1
+#if 0
 namespace boost
 {
 	template<> const volatile DeformableMesh* get_pointer(const volatile DeformableMesh* p) { return p; }
