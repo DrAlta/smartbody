@@ -1643,7 +1643,22 @@ void FltkViewer::drawSBRender()
 		texm.updateTexture();
 	}
 	updateLights();
-	renderer.drawTestDeferred(_lights);
+	renderer.drawTestDeferred(_lights, _data);
+
+	SrCamera* cam = SmartBody::SBScene::getScene()->getActiveCamera();
+	cam->setAspectRatio((float)w() / (float)h());
+	SrMat mat(SrMat::NotInitialized);
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrix(cam->get_perspective_mat(mat));
+
+	//----- Set Visualisation -------------------------------------------
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrix(cam->get_view_mat(mat));
+
+	glScalef(cam->getScale(), cam->getScale(), cam->getScale());
+
+	//drawPawns();
+
 }
    
 void FltkViewer::draw() 

@@ -1457,7 +1457,7 @@ bool SbmDeformableMeshGPU::buildVertexBufferGPU()
 	VBOWeight2 = new VBOVec4f((char*)"Weight2",VERTEX_BONE_WEIGHT_2,boneWeightBuf[1]);
 #endif
 	//VBOOutPos  = new VBOVec4f((char*)"OutPos",VERTEX_POSITION,posBuffer);
-	VBOTri     = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,triBuf);
+	VBOTri     = new VBOVec3i((char*)"TriIdx",GL_ELEMENT_ARRAY_BUFFER,triBuf);	
 	
 	for (unsigned int i=0;i<subMeshList.size();i++)
 	{
@@ -1517,6 +1517,7 @@ SbmDeformableMeshGPUInstance::SbmDeformableMeshGPUInstance()
 {
 	_mesh = NULL;
 	TBOTran = NULL;
+	VBODeformPos = NULL;
 	bufferReady = false;
 }
 
@@ -1649,12 +1650,15 @@ bool SbmDeformableMeshGPUInstance::initBuffer()
 		return false;
 	bool hasVertexBuffer = gpuMesh->buildVertexBufferGPU();	
 	if (!hasVertexBuffer) return false;
-	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_3_0)
+	if (SbmShaderManager::getShaderSupport() == SbmShaderManager::SUPPORT_OPENGL_2_0)
 	{
 		cleanBuffer();
 		int tranSize = _mesh->boneJointIdxMap.size()*16;
 		//int colorSize = dynamicMesh.size()*3;
 		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
+
+		VBODeformPos = new VBOVec3f((char*)"DeformPos", VERTEX_POSITION, _deformPosBuf);
+		bufferReady = true;
 	}
 	return true;
 }

@@ -8,6 +8,9 @@
 
 //Zengrui: ifdef out function definition for SmartBody Javascript
 #if !defined(EMSCRIPTEN)
+
+
+#if 0
 VBOData::~VBOData(void)
 {
 	if (m_iVBO_ID)
@@ -96,6 +99,7 @@ void VBOData::Update()
 VBOData::VBOData( char* name, int type, std::vector<SrVec2>& Data )
 {
 	m_ArrayType=type;
+	m_UsageType = GL_STATIC_DRAW;
 	strcpy(m_Name,name);
 
 	data_Vec2f = &Data;	
@@ -112,6 +116,7 @@ VBOData::VBOData( char* name, int type, std::vector<SrVec2>& Data )
 VBOData::VBOData( char* name, int type, std::vector<float>& Data )
 {
 	m_ArrayType=type;
+	m_UsageType = GL_STATIC_DRAW;
 	strcpy(m_Name,name);
 	data_float = &Data;
 	data_Vec3f = NULL;
@@ -127,6 +132,7 @@ VBOData::VBOData( char* name, int type, std::vector<float>& Data )
 VBOData::VBOData( char* name, int type, std::vector<SrVec>& Data )
 {
 	m_ArrayType=type;
+	m_UsageType = GL_STATIC_DRAW;
 	strcpy(m_Name,name);
 	data_Vec2f = NULL;
 	data_Vec3f = &Data;
@@ -142,6 +148,7 @@ VBOData::VBOData( char* name, int type, std::vector<SrVec>& Data )
 VBOData::VBOData( char* name, int type, std::vector<SrVec3i>& Data )
 {
 	m_ArrayType=type;
+	m_UsageType = GL_STATIC_DRAW;
 	strcpy(m_Name,name);
 	data_Vec2f = NULL;
 	data_Vec3f = NULL;
@@ -157,6 +164,7 @@ VBOData::VBOData( char* name, int type, std::vector<SrVec3i>& Data )
 VBOData::VBOData( char* name, int type, std::vector<SrVec4>& Data )
 {
 	m_ArrayType=type;
+	m_UsageType = GL_STATIC_DRAW;
 	strcpy(m_Name,name);
 	data_Vec2f = NULL;
 	data_Vec3f = NULL;
@@ -173,6 +181,7 @@ VBOData::VBOData( char* name, int type, std::vector<SrVec4>& Data )
 VBOData::VBOData( char* name, int type, std::vector<SrVec4i>& Data )
 {
 	m_ArrayType=type;
+	m_UsageType = GL_STATIC_DRAW;
 	strcpy(m_Name,name);
 	data_Vec2f = NULL;
 	data_Vec3f = NULL;
@@ -223,4 +232,5 @@ void VBOData::Debug(const char* tag/* = "TBO"*/)
 	printf("\n");
 
 }
+#endif
 #endif

@@ -70,10 +70,20 @@ void SbmTextureManager::releaseAllTextures()
         delete tex;
     }
 
+	for (vi = glossyTexMap.begin();
+		vi != glossyTexMap.end();
+		vi++)
+	{
+		SbmTexture* tex = vi->second;
+		delete tex;
+	}
+
+
 
     textureMap.clear();
     normalTexMap.clear();
     specularTexMap.clear();	
+	glossyTexMap.clear();
 	
 #if USE_CUBE_MAP
     StrCubeTextureMap::iterator it;
@@ -93,6 +103,8 @@ StrTextureMap& SbmTextureManager::findMap( int type )
         return normalTexMap;
     else if (type == TEXTURE_SPECULARMAP)
 		return specularTexMap;
+	else if (type == TEXTURE_GLOSSYMAP)
+		return glossyTexMap;
 	else if (type == TEXTURE_HDR_MAP)
 		return hdrTexMap;
 	
@@ -138,6 +150,8 @@ void SbmTextureManager::loadTexture(int iType, const char* textureName, const ch
 
 void SbmTextureManager::createWhiteTexture(const char* textureName, int width, int height)
 {
+	createColorTexture(textureName, SrColor::white, width, height);
+#if 0
     StrTextureMap& texMap	= findMap(SbmTextureManager::TEXTURE_DIFFUSE);
 
     // If the texture does not exist in the texture map, create a new one
@@ -148,8 +162,28 @@ void SbmTextureManager::createWhiteTexture(const char* textureName, int width, i
         texMap[std::string(textureName)] = texture;
         texture->buildTexture(false);
     }	
+#endif
 }
 
+
+SBAPI void SbmTextureManager::createBlackTexture(const char* textureName, int width /*= 1*/, int height /*= 1*/)
+{
+	createColorTexture(textureName, SrColor::black, width, height);
+}
+
+SBAPI void SbmTextureManager::createColorTexture(const char* textureName, SrColor initColor, int width /*= 1*/, int height /*= 1*/) 
+{
+	StrTextureMap& texMap = findMap(SbmTextureManager::TEXTURE_DIFFUSE);
+
+	// If the texture does not exist in the texture map, create a new one
+	if (texMap.find(std::string(textureName)) == texMap.end())
+	{
+		SbmTexture* texture = new SbmTexture(textureName);
+		texture->createEmptyTexture(width, height, 4, GL_UNSIGNED_BYTE, initColor);
+		texMap[std::string(textureName)] = texture;
+		texture->buildTexture(false);
+	}
+}
 
 SBAPI SbmTexture* SbmTextureManager::createTexture(int type, const char* textureName)
 {
@@ -516,6 +550,8 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 #else
     glTexParameteri(iType, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 #endif
+
+	glTexParameteri(iType, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(iType, GL_TEXTURE_MAG_FILTER,GL_LINEAR); 
 
 	bool isFloatTexture = (dataType == GL_FLOAT);
@@ -551,10 +587,11 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 		buffer = &imgBuffer[0];
     //glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE,buffer);	
 #if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(__linux__) &!defined(EMSCRIPTEN)
-    if (buildMipMap)
-        gluBuild2DMipmaps(iType, channels, width, height, texture_format, dataType, buffer);
-    else
+    //if (buildMipMap)
+    //    gluBuild2DMipmaps(iType, channels, width, height, texture_format, dataType, buffer);
+    //else
         glTexImage2D(iType,0,internal_format, width,height,0,texture_format, dataType, buffer);
+		glGenerateMipmap(GL_TEXTURE_2D);
 #elif defined(EMSCRIPTEN)
     glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, buffer);
     glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
@@ -612,6 +649,7 @@ void SbmTexture::setTextureSize(int w, int h, int numChannels)
 
 void SbmTexture::createWhiteTexture(int w, int h)
 {
+#if 0
     unsigned char* data;
 
     width		= w;
@@ -631,13 +669,14 @@ void SbmTexture::createWhiteTexture(int w, int h)
     {
         imgBuffer[i] = data[i];
     }
-
+#endif
+	createEmptyTexture(w, h, 4, GL_UNSIGNED_BYTE, SrColor::white);
     //textureFileName		= "white";	
     //textureName			= "white";
 }
 
 
-SBAPI void SbmTexture::createEmptyTexture(int w /*= 1*/, int h /*= 1*/, int numChannels /*= 1*/, GLenum type /*= GL_UNSIGNED_BYTE*/)
+SBAPI void SbmTexture::createEmptyTexture(int w /*= 1*/, int h /*= 1*/, int numChannels /*= 1*/, GLenum type /*= GL_UNSIGNED_BYTE*/, SrColor initColor)
 {
 	unsigned char* data;
 
@@ -652,9 +691,30 @@ SBAPI void SbmTexture::createEmptyTexture(int w /*= 1*/, int h /*= 1*/, int numC
 
 	data = new unsigned char[width * height * channels * sizeof(unsigned char)*bytesPerChannel];
 
-	for (int i = 0; i < (int)(width * height * channels * sizeof(unsigned char))*bytesPerChannel; i++)
+	if (dataType == GL_FLOAT)
 	{
-		data[i] = 255;
+		float color[4];
+		initColor.get(color);
+		float* floatData = (float*)data;
+		for (unsigned int i = 0; i < width*height; i++)
+		{
+			for (int j = 0; j < channels; j++)
+			{
+				floatData[i*channels + j] = color[j];
+			}			
+		}
+	}
+	else // (dataType == GL_UNSIGNED_BYTE)
+	{
+		unsigned char color[4];
+		initColor.get(color);
+		for (unsigned int i = 0; i < width*height; i++)
+		{
+			for (int j = 0; j < channels; j++)
+			{
+				data[i*channels + j] = color[j];
+			}
+		}
 	}
 
 	imgBuffer.resize(width*height*channels*bytesPerChannel);
@@ -663,9 +723,7 @@ SBAPI void SbmTexture::createEmptyTexture(int w /*= 1*/, int h /*= 1*/, int numC
 	{
 		imgBuffer[i] = data[i];
 	}
-	delete [] data;
-	//textureFileName		= "white";	
-	//textureName			= "white";
+	delete [] data;	
 }
 
 

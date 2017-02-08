@@ -24,6 +24,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #include "SBRenderer.h"
+#include "fltk_viewer.h"
+
 #include <sb/SBObject.h>
 #include <sb/SBAttribute.h>
 #include <sb/SBScene.h>
@@ -33,6 +35,11 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sr/sr_camera.h>
 #include <sr/sr_mat.h>
 #include <sr/sr_random.h>
+
+#include <sbm/GPU/SbmDeformableMeshGPU.h>
+#include <sbm/GPU/VBOData.h>
+
+#include <algorithm>
 
 
 SBRenderer* SBRenderer::_singleton = NULL;
@@ -73,8 +80,10 @@ void SBRenderer::drawDebugFBO()
 		debugTex = gbuffer.normalTex;
 	else if (gbufferDebug == "diffuseTex")
 		debugTex = gbuffer.diffuseTex;
-	else if (gbufferDebug == "texCoordTex")
-		debugTex = gbuffer.texCoordTex;
+	else if (gbufferDebug == "specularTex")
+		debugTex = gbuffer.specularTex;
+	else if (gbufferDebug == "glossyTex")
+		debugTex = gbuffer.glossyTex;
 	else if (gbufferDebug == "depthTex")
 		debugTex = gbuffer.depthTex;
 	else if (gbufferDebug == "ssaoTex")
@@ -138,6 +147,10 @@ void SBRenderer::initRenderer(int w, int h)
 	shaderManager.addShader("ibl_shader", shaderPath + "ibl.vert", shaderPath + "ibl.frag", true);
 	iblShader = shaderManager.getShader("ibl_shader");
 
+	texManager.createColorTexture("white_tex", SrColor::white);
+	texManager.createColorTexture("black_tex", SrColor::black);
+	texManager.createColorTexture("gray_tex", SrColor::darkgray);
+	texManager.createColorTexture("defaultNormal_tex", SrColor(0.5f, 0.5f, 1.0f));
 	texManager.updateEnvMaps();
 }
 
@@ -247,7 +260,7 @@ void SBRenderer::resize(int w, int h)
 	height = h;
 }
 
-void SBRenderer::drawTestDeferred(std::vector<SrLight>& lights)
+void SBRenderer::drawTestDeferred(std::vector<SrLight>& lights, FltkViewerData* viewData)
 {
 	gbuffer.bindFBO();
 	glUseProgram(gbufferShader->getShaderProgram());
@@ -257,13 +270,14 @@ void SBRenderer::drawTestDeferred(std::vector<SrLight>& lights)
 	if (!cam)
 		return;	
 
-	SrMat mat;
+	SrMat mat, modelViewMat, modelViewProjMat;
 	//----- Set Projection ----------------------------------------------
 	cam->setAspectRatio((float)width / (float)height);
 
 	glViewport(0, 0, width, height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#if 0
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrix(cam->get_perspective_mat(mat));
 
@@ -271,10 +285,17 @@ void SBRenderer::drawTestDeferred(std::vector<SrLight>& lights)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrix(cam->get_view_mat(mat));
 	glScalef(cam->getScale(), cam->getScale(), cam->getScale());
-
+#endif
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_ALPHA_TEST);
 	glDisable(GL_BLEND);
+
+	cam->get_view_mat(modelViewMat);
+	cam->get_perspective_mat(modelViewProjMat);
+	modelViewProjMat = modelViewMat*modelViewProjMat;
+
+	glUniformMatrix4fv(glGetUniformLocation(gbufferShader->getShaderProgram(), "modelViewMat"), 1, GL_FALSE, (GLfloat*)&modelViewMat);
+	glUniformMatrix4fv(glGetUniformLocation(gbufferShader->getShaderProgram(), "modelViewProjMat"), 1, GL_FALSE, (GLfloat*)&modelViewProjMat);
 
 	std::vector<std::string> pawnNames = scene->getPawnNames();
 	for (unsigned int i = 0; i < pawnNames.size(); i++)
@@ -286,10 +307,14 @@ void SBRenderer::drawTestDeferred(std::vector<SrLight>& lights)
 		if (meshInstance)
 		{
 			if (!meshInstance->isStaticMesh())
+			{
 				meshInstance->updateFast();
+			}				
 			renderMesh(meshInstance);
 		}
 	}
+
+	drawFloor(viewData);
 	glUseProgram(0);
 	gbuffer.unbindFBO();
 
@@ -298,6 +323,13 @@ void SBRenderer::drawTestDeferred(std::vector<SrLight>& lights)
 	//drawLightPass(lights);
 	drawIBLPass();
 	drawDebugFBO();
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, gbuffer.fboID);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height,
+		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 }
 
 void SBRenderer::drawLightPass(std::vector<SrLight>& lights)
@@ -407,9 +439,31 @@ void SBRenderer::drawIBLPass()
 	if (curEnvDiffuseMap)
 		envDiffuseTexId = curEnvDiffuseMap->getID();
 
+	float roughness = 0.f;
+	float metallic = 0.f;
+	
+	roughness = scene->getDoubleAttribute("Renderer.roughness");
+	roughness = std::min(1.f, std::max(roughness, 0.f));
+	metallic = scene->getDoubleAttribute("Renderer.metallic");
+	metallic = std::min(1.f, std::max(metallic, 0.f));
+
+	float exposure = 1.f;
+	float gamma = 1.f;
+	exposure = scene->getDoubleAttribute("Renderer.exposure");
+	exposure = std::min(100.f, std::max(exposure, 0.f));
+	//gamma = scene->getDoubleAttribute("Renderer.gamma");
+	//gamma = std::min(10.f, std::max(gamma, 0.f));
+	
+
 	glUniformMatrix4fv(glGetUniformLocation(iblShader->getShaderProgram(), "uViewToWorldMatrix"), 1, GL_FALSE, (GLfloat*)&invViewMat);
-	glUniform1f(glGetUniformLocation(iblShader->getShaderProgram(), "uTanHalfFov"), tanHalfFov);
+ 	glUniform1f(glGetUniformLocation(iblShader->getShaderProgram(), "uTanHalfFov"), tanHalfFov);
 	glUniform1f(glGetUniformLocation(iblShader->getShaderProgram(), "uAspectRatio"), aspectRatio);
+	glUniform1f(glGetUniformLocation(iblShader->getShaderProgram(), "roughness"), roughness);
+	glUniform1f(glGetUniformLocation(iblShader->getShaderProgram(), "metallic"), metallic);
+
+	glUniform1f(glGetUniformLocation(iblShader->getShaderProgram(), "exposure"), exposure);
+	//glUniform1f(glGetUniformLocation(iblShader->getShaderProgram(), "gamma"), gamma);
+	//glUniform1f(glGetUniformLocation(iblShader->getShaderProgram(), "shininess"), shininess);
 
 	glViewport(0, 0, width, height);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -425,7 +479,7 @@ void SBRenderer::drawIBLPass()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, envMapTexID);
 	//glBindTexture(GL_TEXTURE_2D, gbuffer.posTex->getID());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -589,7 +643,13 @@ void SBRenderer::renderMesh(DeformableMeshInstance* meshInstance)
 		return; // no deformable mesh
 	}
 
+	SbmTextureManager& texManager = SbmTextureManager::singleton();
+	SbmTexture* whiteTex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, "white_tex");
+	SbmTexture* blackTex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, "black_tex");
+	SbmTexture* grayTex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, "gray_tex");
+	SbmTexture* blueTex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, "defaultNormal_tex");
 
+#if 0
 	if (meshInstance->_deformPosBuf.size() > 0)
 	{
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -608,10 +668,51 @@ void SBRenderer::renderMesh(DeformableMeshInstance* meshInstance)
 		glTexCoordPointer(2, GL_FLOAT, 0, (GLfloat*)&mesh->texCoordBuf[0]);
 	}	
 
-	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;	
+	if (mesh->tangentBuf.size() > 0)
+	{
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLfloat*)&mesh->tangentBuf[0]);
+	}
+#else // use vertex attribute array
+	
+	SbmDeformableMeshGPUInstance* gpuMeshInstance = (SbmDeformableMeshGPUInstance*)meshInstance;
+	if (!gpuMeshInstance->getVBODeformPos())
+		gpuMeshInstance->initBuffer();	
+
+	glDisable(GL_CULL_FACE);
+	SbmDeformableMeshGPU* gpuMesh = (SbmDeformableMeshGPU*)gpuMeshInstance->getDeformableMesh();
+	VBOVec3f* posVBO = gpuMeshInstance->getVBODeformPos();
+	posVBO->VBO()->UpdateWithData(meshInstance->_deformPosBuf);
+
+
+	glEnableVertexAttribArray(0);
+	posVBO->VBO()->BindBuffer();
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(1);
+	gpuMesh->getNormalVBO()->VBO()->BindBuffer();
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(2);
+	gpuMesh->getTexCoordVBO()->VBO()->BindBuffer();
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glEnableVertexAttribArray(3);
+	gpuMesh->getTangentVBO()->VBO()->BindBuffer();
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+// 	glEnableVertexAttribArray(4);
+// 	gpuMesh->getBiNormalVBO()->VBO()->BindBuffer();
+// 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+#endif
+
+	std::vector<SbmSubMesh*>& subMeshList = mesh->subMeshList;
+	std::vector<VBOVec3i*>& subMeshTris = gpuMesh->getVBOSubMeshTris();
 	for (unsigned int i = 0; i < subMeshList.size(); i++)
 	{
-		SbmSubMesh* subMesh = subMeshList[i];		
+		SbmSubMesh* subMesh = subMeshList[i];	
+		VBOVec3i* subMeshVBO = subMeshTris[i];
 		glMaterial(subMesh->material);		
 		if (subMesh->material.useAlphaBlend)
 		{
@@ -624,20 +725,48 @@ void SBRenderer::renderMesh(DeformableMeshInstance* meshInstance)
 
 		SmartBody::SBSkeleton* skel = meshInstance->getSkeleton();
 		SmartBody::SBPawn* pawn = skel->getPawn();		
-		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());
-		if (tex)
-		{			
-			glEnable(GL_TEXTURE_2D);
-			GLint activeTexture = -1;
-			glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
-			if (activeTexture != GL_TEXTURE0)
-				glActiveTexture(GL_TEXTURE0);			
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glBindTexture(GL_TEXTURE_2D, tex->getID());			
-		}
-		glDrawElements(GL_TRIANGLES, subMesh->triBuf.size() * 3, GL_UNSIGNED_INT, &subMesh->triBuf[0]);
+		
+		SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());
+		SbmTexture* normalTex = texManager.findTexture(SbmTextureManager::TEXTURE_NORMALMAP, subMesh->normalMapName.c_str());	
+		SbmTexture* specularTex = texManager.findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, subMesh->specularMapName.c_str());
+		//SbmTexture* glossyTex = texManager.findTexture(SbmTextureManager::TEXTURE_SPECULARMAP, subMesh->specularMapName.c_str());
+
+		if (!tex)
+			tex = whiteTex;
+		if (!normalTex)
+			normalTex = blueTex; // to use only original normal
+
+		if (!specularTex)
+			specularTex = grayTex;
+
+		glEnable(GL_TEXTURE_2D);
+		glActiveTexture(GL_TEXTURE0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, tex->getID());		
+
+		glActiveTexture(GL_TEXTURE1);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, normalTex->getID());
+
+		glActiveTexture(GL_TEXTURE2);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, specularTex->getID());
+		
+		subMeshVBO->VBO()->BindBuffer();
+		//glDrawElements(GL_TRIANGLES, subMesh->triBuf.size() * 3, GL_UNSIGNED_INT, &subMesh->triBuf[0]);
+		glDrawElements(GL_TRIANGLES, subMesh->triBuf.size() * 3, GL_UNSIGNED_INT, 0);
+		subMeshVBO->VBO()->UnbindBuffer();
 	}
+
+	posVBO->VBO()->UnbindBuffer();
+	gpuMesh->getNormalVBO()->VBO()->UnbindBuffer();
+	gpuMesh->getTexCoordVBO()->VBO()->UnbindBuffer();
+	gpuMesh->getTangentVBO()->VBO()->UnbindBuffer();
+	//gpuMesh->getBiNormalVBO()->VBO()->UnbindBuffer();
+
 }
 
 void SBRenderer::registerGUI()
@@ -649,7 +778,8 @@ void SBRenderer::registerGUI()
 	GBufferOptions.push_back("posTex");
 	GBufferOptions.push_back("normalTex");
 	GBufferOptions.push_back("diffuseTex");
-	GBufferOptions.push_back("texCoordTex");
+	GBufferOptions.push_back("specularTex");
+	GBufferOptions.push_back("glossyTex");
 	GBufferOptions.push_back("depthTex");
 	GBufferOptions.push_back("ssaoTex");
 	GBufferOptions.push_back("ssaoBlurTex");
@@ -665,13 +795,79 @@ void SBRenderer::registerGUI()
 		
 	SmartBody::DoubleAttribute* ssaoRadiusAttr = scene->createDoubleAttribute("Renderer.ssaoRadius", 0.15, true, "Renderer", 60, false, false, false, "SSAO Kernel Size");
 	SmartBody::DoubleAttribute* ssaoPowerAttr = scene->createDoubleAttribute("Renderer.ssaoPower", 1.0, true, "Renderer", 60, false, false, false, "SSAO Kernel Size");
+
+	SmartBody::DoubleAttribute* roughnessAttr = scene->createDoubleAttribute("Renderer.roughness", 0.0, true, "Renderer", 60, false, false, false, "SSAO Kernel Size");
+	SmartBody::DoubleAttribute* metallicAttr = scene->createDoubleAttribute("Renderer.metallic", 0.0, true, "Renderer", 60, false, false, false, "SSAO Kernel Size");
+	SmartBody::DoubleAttribute* exposureAttr = scene->createDoubleAttribute("Renderer.exposure", 5.0, true, "Renderer", 60, false, false, false, "SSAO Kernel Size");
+	//SmartBody::DoubleAttribute* gammaAttr = scene->createDoubleAttribute("Renderer.gamma", 1.0, true, "Renderer", 60, false, false, false, "SSAO Kernel Size");
+
+
+
+	//SmartBody::DoubleAttribute* roughnessAttr = scene->createDoubleAttribute("Renderer.shininess", 0.0, true, "Renderer", 60, false, false, false, "SSAO Kernel Size");
 }
 
 
 
+void SBRenderer::drawFloor(FltkViewerData* viewerData)
+{
+	if (viewerData->showFloor)
+	{
+		static GLfloat mat_emissin[] = { 0.f,  0.f,    0.f,    1.f };
+		static GLfloat mat_ambient[] = { 0.f,  0.f,    0.f,    1.f };
+		static GLfloat mat_diffuse[] = { 0.5f,  0.5f,    0.5f,    1.f };
+		static GLfloat mat_speclar[] = { 0.f,  0.f,    0.f,    1.f };
+		std::string defaultTexName = "white_tex";
+		std::string defaultNormalTex = "defaultNormal_tex";
+		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_emissin);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+
+		viewerData->floorColor.get(mat_diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_speclar);
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0);
+		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+		glEnable(GL_LIGHTING);
+		
+		SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, defaultTexName.c_str());
+		SbmTexture* blueTex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, defaultNormalTex.c_str());
+		//	If we are using blended textures
+		glEnable(GL_TEXTURE_2D);
+		glActiveTexture(GL_TEXTURE0);
+		if (tex)
+			glBindTexture(GL_TEXTURE_2D, tex->getID());
+
+		glActiveTexture(GL_TEXTURE1);
+		if (blueTex)
+			glBindTexture(GL_TEXTURE_2D, blueTex->getID());
+
+		SrVec upVec = SrVec(0.f, 1.f, 0.01f);
+		float floorSize = 1200;
+		float planeY = -0.0f;
+		glBegin(GL_QUADS);
+		glVertexAttrib2f(2, 0, 0);
+		glVertexAttrib3f(1, upVec[0], upVec[1], upVec[2]);
+		glVertex3f(-floorSize, planeY, floorSize);
+		glVertexAttrib2f(2, 0, 1);
+		glVertexAttrib3f(1, upVec[0], upVec[1], upVec[2]);
+		glVertex3f(floorSize, planeY, floorSize);
+		glVertexAttrib2f(2, 1, 1);
+		glVertexAttrib3f(1, upVec[0], upVec[1], upVec[2]);
+		glVertex3f(floorSize, planeY, -floorSize);
+		glVertexAttrib2f(2, 1, 0);
+		glVertexAttrib3f(1, upVec[0], upVec[1], upVec[2]);
+		glVertex3f(-floorSize, planeY, -floorSize);
+		glEnd();
+		// unbind texture
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+}
+
 SBGBuffer::SBGBuffer()
 {
-	posTex = normalTex = diffuseTex = texCoordTex = depthTex = NULL;
+	posTex = normalTex = diffuseTex = specularTex = glossyTex = depthTex = NULL;
 }
 
 void SBGBuffer::initBuffer(int w, int h)
@@ -683,14 +879,16 @@ void SBGBuffer::initBuffer(int w, int h)
 	posTex = texManager.createTexture(SbmTextureManager::TEXTURE_RENDER_TARGET, "gbuffer_posTex");
 	normalTex = texManager.createTexture(SbmTextureManager::TEXTURE_RENDER_TARGET, "gbuffer_normalTex");
 	diffuseTex = texManager.createTexture(SbmTextureManager::TEXTURE_RENDER_TARGET, "gbuffer_diffuseTex");
-	texCoordTex = texManager.createTexture(SbmTextureManager::TEXTURE_RENDER_TARGET, "gbuffer_texCoordTex");
+	specularTex = texManager.createTexture(SbmTextureManager::TEXTURE_RENDER_TARGET, "gbuffer_specularTex");
+	glossyTex = texManager.createTexture(SbmTextureManager::TEXTURE_RENDER_TARGET, "gbuffer_glossyTex");
 	depthTex = texManager.createTexture(SbmTextureManager::TEXTURE_RENDER_TARGET, "gbuffer_depthTex");
 
 	createBufferTex(w, h, true);	
 	attachTexture(posTex, GL_COLOR_ATTACHMENT0);
 	attachTexture(normalTex, GL_COLOR_ATTACHMENT1);
 	attachTexture(diffuseTex, GL_COLOR_ATTACHMENT2);
-	attachTexture(texCoordTex, GL_COLOR_ATTACHMENT3);
+	attachTexture(specularTex, GL_COLOR_ATTACHMENT3);
+	attachTexture(glossyTex, GL_COLOR_ATTACHMENT4);
 	attachTexture(depthTex, GL_DEPTH_ATTACHMENT);
 	setDrawBufferDefault();	
 }
@@ -710,13 +908,15 @@ void SBGBuffer::createBufferTex(int w, int h, bool rebuild)
 	posTex->createEmptyTexture(w, h, 3, GL_FLOAT);
 	normalTex->createEmptyTexture(w, h, 3, GL_FLOAT);
 	diffuseTex->createEmptyTexture(w, h, 4, GL_FLOAT);
-	texCoordTex->createEmptyTexture(w, h, 3, GL_FLOAT);
+	specularTex->createEmptyTexture(w, h, 4, GL_FLOAT);
+	glossyTex->createEmptyTexture(w, h, 3, GL_FLOAT);
 	depthTex->createEmptyTexture(w, h, 1, GL_FLOAT);
 
 	posTex->buildTexture(false, rebuild);
 	normalTex->buildTexture(false, rebuild);
 	diffuseTex->buildTexture(false, rebuild);
-	texCoordTex->buildTexture(false, rebuild);
+	specularTex->buildTexture(false, rebuild);
+	glossyTex->buildTexture(false, rebuild);
 	depthTex->buildTexture(false, rebuild);
 }
 
