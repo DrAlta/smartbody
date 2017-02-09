@@ -19,6 +19,7 @@
 #include <sb/SBAnimationTransition.h>
 #include <sbm/GenericViewer.h>
 #include <sbm/sbm_deformable_mesh.h>
+#include <sbm/GPU/SbmTexture.h>
 #include <sb/SBEvent.h>
 #include "Fl_Tree_Horizontal.h" // a custom tree widget with horizontal scroll bar
 #include "TreeItemInfoWidget.h"
@@ -103,6 +104,7 @@ class ResourceWindow : public Fl_Group, public SmartBody::SBObserver, public SBW
 		void updateAnimationBlend(Fl_Tree_Item* tree, SmartBody::SBAnimationBlend* blend);
 		void updateBlendTransition(Fl_Tree_Item* tree, SmartBody::SBAnimationTransition* transition);
 		void updateMesh(Fl_Tree_Item* tree, DeformableMesh* mesh);
+		void updateEnvMap(Fl_Tree_Item* tree, SbmTexture* texture);
 		void updatePawn(Fl_Tree_Item* tree, SmartBody::SBPawn* pawn);
 		void updateCharacter(Fl_Tree_Item* tree, SmartBody::SBCharacter* character);
 		void updatePhysicsCharacter(Fl_Tree_Item* tree, SmartBody::SBPhysicsCharacter* phyChar);

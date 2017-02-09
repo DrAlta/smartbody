@@ -80,6 +80,7 @@
 #include <sbm/Heightfield.h>
 #include <sbm/action_unit.hpp>
 #include <sbm/xercesc_utils.hpp>
+#include <sbm/GPU/SbmTexture.h>
 #include <sr/sr_camera.h>
 #include <controllers/me_ct_gaze.h>
 #include <controllers/me_ct_eyelid.h>
@@ -5253,10 +5254,16 @@ SmartBody::SBObject* SBScene::getObjectFromString(const std::string& value)
 		SmartBody::SBService* service = this->getServiceManager()->getService(suffix);
 		return service;
 	}
-	else if (prefix == "model")
+	else if (prefix == "mesh")
 	{
 		DeformableMesh* mesh = this->getAssetManager()->getDeformableMesh(suffix);
 		return mesh;
+	}
+	else if (prefix == "envmap")
+	{
+		SbmTextureManager& texManager = SbmTextureManager::singleton();
+		SbmTexture* texture = texManager.findTexture(SbmTextureManager::TEXTURE_HDR_MAP, suffix.c_str());
+		return texture;
 	}
 	else if (prefix == "controller")
 	{

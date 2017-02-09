@@ -12,6 +12,7 @@
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationTransition.h>
 #include <sbm/sbm_deformable_mesh.h>
+#include <sbm/GPU/SbmTexture.h>
 #include <sb/SBEvent.h>
 
 AttributeEditor::AttributeEditor(int x, int y, int w, int h, char* name) : Fl_Group(x, y, w, h, name), SmartBody::SBObserver(), SBWindowListener(), SelectionListener()
@@ -187,7 +188,14 @@ TreeItemInfoWidget* AttributeEditor::createInfoWidget( int x, int y, int w, int 
 	DeformableMesh* mesh = dynamic_cast<DeformableMesh*>(object);
 	if (mesh)
 	{
-		widget = new AttributeItemWidget(service,x,y,w,h,strdup(object->getName().c_str()),NULL);
+		widget = new AttributeItemWidget(mesh,x,y,w,h,strdup(object->getName().c_str()),NULL);
+		return widget;
+	}
+
+	SbmTexture* texture = dynamic_cast<SbmTexture*>(object);
+	if (texture)
+	{
+		widget = new AttributeItemWidget(texture, x, y, w, h, strdup(object->getName().c_str()), NULL);
 		return widget;
 	}
 

@@ -399,23 +399,23 @@ struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrappe
 		SmartBody::PythonController::start();
 	}
 
-	virtual void init()
+	virtual void init(SBPawn* pawn)
 	{
 		if (boost::python::override o = this->get_override("init"))
 		{
 			try {
-				o();
+				o(pawn);
 			} catch (...) {
 				PyErr_Print();
 			}
 		}
 
-		return PythonController::init();
+		return PythonController::init(pawn);
 	};
 
-	void default_init()
+	void default_init(SBPawn* pawn)
 	{
-		SmartBody::PythonController::init();
+		SmartBody::PythonController::init(pawn);
 	}
 
 	virtual void evaluate()

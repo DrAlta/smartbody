@@ -588,6 +588,13 @@ std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 			addAssetHistory("MESH " + mesh->getName());
 			continue;
 		}
+		SbmTexture* texture = dynamic_cast<SbmTexture*>(asset);
+		if (texture)
+		{
+			addAssetHistory("ENVMAP " + texture->getName());
+			continue;
+		}
+
 		LOG("Unknown asset type for file %s", assetPath.c_str());		
 	}
 
