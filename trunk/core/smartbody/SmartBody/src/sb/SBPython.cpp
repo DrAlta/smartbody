@@ -77,7 +77,7 @@ typedef std::vector<SrVec> VecArray;
 
 #ifndef SB_NO_PYTHON
 
-#if  1 //defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
+#if  defined(_MSC_FULL_VER) && _MSC_FULL_VER == 190024210
 namespace boost
 {
 	template<> const volatile SmartBody::SBSubject* get_pointer(const volatile SmartBody::SBSubject* p) { return p; }

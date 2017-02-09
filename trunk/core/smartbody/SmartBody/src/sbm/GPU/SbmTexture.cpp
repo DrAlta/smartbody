@@ -676,7 +676,7 @@ void SbmTexture::createWhiteTexture(int w, int h)
 }
 
 
-SBAPI void SbmTexture::createEmptyTexture(int w /*= 1*/, int h /*= 1*/, int numChannels /*= 1*/, GLenum type /*= GL_UNSIGNED_BYTE*/, SrColor initColor)
+void SbmTexture::createEmptyTexture(int w /*= 1*/, int h /*= 1*/, int numChannels /*= 1*/, GLenum type /*= GL_UNSIGNED_BYTE*/, SrColor initColor)
 {
 	unsigned char* data;
 
@@ -728,7 +728,7 @@ SBAPI void SbmTexture::createEmptyTexture(int w /*= 1*/, int h /*= 1*/, int numC
 
 
 
-SBAPI void SbmTexture::bakeAlphaIntoTexture(SbmTexture* alphaTex)
+void SbmTexture::bakeAlphaIntoTexture(SbmTexture* alphaTex)
 {
 	unsigned char* alphaBuf = alphaTex->getBuffer();	
 	if (alphaTex->getWidth() != getWidth() || alphaTex->getHeight() != getHeight())
