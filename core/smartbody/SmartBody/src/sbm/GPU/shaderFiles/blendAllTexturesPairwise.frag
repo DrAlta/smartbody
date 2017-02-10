@@ -10,6 +10,8 @@ uniform sampler2D	uPreviousResultSampler;		// Result sampler
 
 void main()
 {
+	gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+	#if 0
 		vec4 new			= vec4(0.0, 0.0, 0.0, 1.0);
 		
 		vec4 texNeutral		= texture2D(uNeutralSampler, gl_TexCoord[0].st);
@@ -97,6 +99,7 @@ void main()
 				gl_FragColor	= color_other;
 			}
 		}
+	#endif
 
 //		if(uFaceArea == 2)
 //			gl_FragColor	= vec4(1.0,0.0,0.0,1.0);
