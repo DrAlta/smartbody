@@ -1658,6 +1658,8 @@ bool SbmDeformableMeshGPUInstance::initBuffer()
 		TBOTran    = new TBOData((char*)"BoneTran",tranSize); 
 
 		VBODeformPos = new VBOVec3f((char*)"DeformPos", VERTEX_POSITION, _deformPosBuf);
+		VBODeformNormal = new VBOVec3f((char*)"DeformNormal", VERTEX_POSITION, _deformNormalBuf);
+		VBODeformTangent = new VBOVec3f((char*)"DeformTangent", VERTEX_POSITION, _deformTangentBuf);
 		bufferReady = true;
 	}
 	return true;

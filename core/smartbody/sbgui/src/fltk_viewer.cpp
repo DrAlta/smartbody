@@ -1657,7 +1657,7 @@ void FltkViewer::drawSBRender()
 
 	glScalef(cam->getScale(), cam->getScale(), cam->getScale());
 
-	//drawPawns();
+	drawInteraction(cam);
 
 }
    
@@ -1856,62 +1856,8 @@ void FltkViewer::draw()
 
 	printOglError2("draw()", 3);
 
-	drawPawns();
-	// draw the grid
-	//   if (gridList == -1)
-	//	   initGridList();	
-	drawNavigationMesh();
-	
-	drawGrid();
-	drawSteeringInfo();
-	drawCollisionInfo();
-	drawEyeBeams();
-	drawGazeJointLimits();
-	drawEyeLids();
-	drawDynamics();
-	drawLocomotion();
-	drawGestures();
-	drawJointLabels();
+	drawInteraction(cam);
 
-	drawMotionVectorFlow();
-	drawPlotMotion();
-	
-	//drawKinematicFootprints(0);
-
-
-	static GLfloat terrainMatDiffuse[] = { 0.8f,  0.8f,    0.5f,    1.f };
-	static GLfloat terrainMatSpecular[] = { 0.f,  0.f,    0.f,    1.f }; 
-	glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, terrainMatDiffuse );	
-	glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, terrainMatSpecular );
-	glMaterialf( GL_FRONT_AND_BACK, GL_SHININESS, 0.0 );
-	glColorMaterial( GL_FRONT_AND_BACK, GL_DIFFUSE );
-	if (_data->terrainMode == FltkViewer::ModeTerrain)
-	{
-		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();		
-		if (h)
-			h->render(0);
-	}
-	else if (_data->terrainMode == FltkViewer::ModeTerrainWireframe)
-	{
-		Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
-		if (h)
-			h->render(1);
-	}
-	
-
-
-	//if (_data->showcollisiongeometry)
-		drawCharacterPhysicsObjs();
-	if (_data->showBoundingVolume)
-		drawCharacterBoundingVolumes();
-
-	drawDynamicVisuals();
-
-	drawInteractiveLocomotion();	
-	//_posControl.Draw();
-	_objManipulator.draw(*cam);
-	// feng : debugging draw for reach controller
-	drawReach();
 
 	_data->fcounter.stop();
 
@@ -1955,6 +1901,66 @@ void FltkViewer::draw()
 		
  }
 
+
+ void FltkViewer::drawInteraction(SrCamera* cam)
+ {
+	 drawPawns();
+	 // draw the grid
+	 //   if (gridList == -1)
+	 //	   initGridList();	
+	 drawNavigationMesh();
+
+	 drawGrid();
+	 drawSteeringInfo();
+	 drawCollisionInfo();
+	 drawEyeBeams();
+	 drawGazeJointLimits();
+	 drawEyeLids();
+	 drawDynamics();
+	 drawLocomotion();
+	 drawGestures();
+	 drawJointLabels();
+
+	 drawMotionVectorFlow();
+	 drawPlotMotion();
+
+	 //drawKinematicFootprints(0);
+
+
+	 static GLfloat terrainMatDiffuse[] = { 0.8f,  0.8f,    0.5f,    1.f };
+	 static GLfloat terrainMatSpecular[] = { 0.f,  0.f,    0.f,    1.f };
+	 glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, terrainMatDiffuse);
+	 glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, terrainMatSpecular);
+	 glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0);
+	 glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+	 if (_data->terrainMode == FltkViewer::ModeTerrain)
+	 {
+		 Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
+		 if (h)
+			 h->render(0);
+	 }
+	 else if (_data->terrainMode == FltkViewer::ModeTerrainWireframe)
+	 {
+		 Heightfield* h = SmartBody::SBScene::getScene()->getHeightfield();
+		 if (h)
+			 h->render(1);
+	 }
+
+
+
+	 //if (_data->showcollisiongeometry)
+	 drawCharacterPhysicsObjs();
+	 if (_data->showBoundingVolume)
+		 drawCharacterBoundingVolumes();
+
+	 drawDynamicVisuals();
+
+	 drawInteractiveLocomotion();
+	 //_posControl.Draw();
+	 _objManipulator.draw(*cam);
+	 // feng : debugging draw for reach controller
+	 drawReach();
+ }
 
 std::string FltkViewer::ZeroPadNumber(int num)
 {
@@ -4060,7 +4066,9 @@ void FltkViewer::drawPawns()
 			sphere.shape().center = SrPnt(0, 0, 0);
 			sphere.shape().radius = pawnSize;
 			sphere.render_mode(srRenderModeLines);
+			//sphere.render_mode(srRenderModeSmooth);
 			SrGlRenderFuncs::render_sphere(&sphere);
+
 			//glEnd();
 			glPopMatrix();
 			glPopMatrix();

@@ -52,13 +52,15 @@ public:
 	void drawTestDeferred(std::vector<SrLight>& lights, FltkViewerData* viewData);
 	void drawTestSSAO();	
 	void drawLightPass(std::vector<SrLight>& lights);
-	void drawIBLPass();
+	void drawIBLPass(std::vector<SrLight>& lights);
 	void renderMesh(DeformableMeshInstance* meshInstance);
 
 	void registerGUI();
 
 protected:
 	void drawFloor(FltkViewerData* viewerData);
+	void GPUMeshUpdate(DeformableMeshInstance* meshInstance);
+	void drawTextureQuadWithDepth(SbmTexture* tex, SbmTexture* depthTex);
 	
 protected:	
 	int width, height;
@@ -68,6 +70,8 @@ protected:
 
 	SbmShaderProgram* lightPassShader; // compute lighting and combine with ambient occlusion
 	SbmShaderProgram* iblShader; // compute lighting and combine with ambient occlusion
+	SbmShaderProgram* skinningShader;
+	SbmShaderProgram* depthQuadShader;
 
 	SBFrameBufferObject lightPassFBO;
 	SbmTexture* lightPassOutput;

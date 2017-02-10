@@ -236,6 +236,8 @@ protected:
 public:
 	std::vector<SrVec> _restPosBuf;
 	std::vector<SrVec> _deformPosBuf;	
+	std::vector<SrVec> _deformNormalBuf;
+	std::vector<SrVec> _deformTangentBuf;
 	std::vector<SrMat>  transformBuffer;	
 
 	GLuint _tempTex;
