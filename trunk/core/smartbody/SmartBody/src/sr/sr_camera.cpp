@@ -77,8 +77,8 @@ SrCamera::SrCamera () : SBPawn()
 	createDoubleAttribute("centerZ", 0.0, true, "Camera", 220, false, false, false, "");
 	createVec3Attribute("up", 0, 1, 0, true, "Camera", 230, false, false, false, "");
 	createDoubleAttribute("fov", 1.0472, true, "Camera", 240, false, false, false, "");
-	createDoubleAttribute("near", 0.1, true, "Camera", 250, false, false, false, "");
-	createDoubleAttribute("far", 100, true, "Camera", 260, false, false, false, "");
+	createDoubleAttribute("near", 0.01, true, "Camera", 250, false, false, false, "");
+	createDoubleAttribute("far", 1000, true, "Camera", 260, false, false, false, "");
 	createDoubleAttribute("aspectRatio", .879121, true, "Camera", 270, false, false, false, "");
 	createDoubleAttribute("scale", 1.0, true, "Camera", 280, false, false, false, "");
 	

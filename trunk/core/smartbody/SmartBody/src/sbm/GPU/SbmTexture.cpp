@@ -591,9 +591,9 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
     //    gluBuild2DMipmaps(iType, channels, width, height, texture_format, dataType, buffer);
     //else
         glTexImage2D(iType,0,internal_format, width,height,0,texture_format, dataType, buffer);
+		//if (buildMipMap)
 		glGenerateMipmap(GL_TEXTURE_2D);
-#elif defined(EMSCRIPTEN)
-    glTexImage2D(iType,0,texture_format,width,height,0,texture_format,GL_UNSIGNED_BYTE, buffer);
+#elif defined(EMSCRIPTEN)    
     glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
     glGenerateMipmap(GL_TEXTURE_2D);
 #else

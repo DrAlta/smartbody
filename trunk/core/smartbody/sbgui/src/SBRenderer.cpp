@@ -967,9 +967,12 @@ void SBRenderer::GPUMeshUpdate(DeformableMeshInstance* meshInstance)
 	glEnable(GL_RASTERIZER_DISCARD);
 	gpuMeshInstance->updateTransformBuffer();
 	std::vector<SrMat>& transBuffer = gpuMeshInstance->getTransformBuffer();
+	//float meshScale = 
+	SrVec meshScale = meshInstance->getMeshScale();
+	
 	glUseProgram(skinningShader->getShaderProgram());	
 	glUniformMatrix4fv(glGetUniformLocation(skinningShader->getShaderProgram(), "Transform"), transBuffer.size(), true, (GLfloat*)getPtr(transBuffer));
-
+	glUniform1f(glGetUniformLocation(skinningShader->getShaderProgram(), "meshScale"), meshScale[0]);
 	// bind transform feedback buffer
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, gpuMeshInstance->getVBODeformPos()->VBO()->m_iVBO_ID);
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 1, gpuMeshInstance->getVBODeformNormal()->VBO()->m_iVBO_ID);

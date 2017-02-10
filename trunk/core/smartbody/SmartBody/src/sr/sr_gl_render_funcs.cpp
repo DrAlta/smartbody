@@ -476,7 +476,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				
 
 				glMaterial(subMesh->material);	
-#if 1
+#if 0
 				if (subMesh->material.useAlphaBlend)
 				{
 					myGLDisable(GL_CULL_FACE);
