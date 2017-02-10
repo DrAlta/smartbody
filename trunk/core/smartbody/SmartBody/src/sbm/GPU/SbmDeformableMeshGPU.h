@@ -55,6 +55,8 @@ public:
 	VBOVec3f* getNormalVBO() { return VBONormal; }
 	VBOVec3f* getTangentVBO() { return VBOTangent; }
 	VBOVec3f* getBiNormalVBO() { return VBOBiNormal; }
+	VBOVec4f* getBoneIDVBO() { return VBOBoneID1; }
+	VBOVec4f* getBoneWeightVBO() { return VBOWeight1; }
 	VBOVec2f* getTexCoordVBO() { return VBOTexCoord; }
 	VBOVec3i* getTriVBO() { return VBOTri; }
 	std::vector<VBOVec3i*>& getVBOSubMeshTris() {
@@ -71,6 +73,8 @@ class SbmDeformableMeshGPUInstance : public DeformableMeshInstance
 protected:	
 	TBOData  *TBOTran; // bone transformation	
 	VBOVec3f *VBODeformPos;
+	VBOVec3f *VBODeformNormal;
+	VBOVec3f *VBODeformTangent;
 	bool     bufferReady;
 public:
 	SBAPI SbmDeformableMeshGPUInstance();
@@ -83,8 +87,10 @@ public:
 	SBAPI std::vector<SrMat>& getTransformBuffer() { return transformBuffer; }
 	SBAPI TBOData*            getTBOTransforBuffer() { return TBOTran; }
 	SBAPI VBOVec3f*           getVBODeformPos() { return VBODeformPos; }
-protected:
-	void gpuBlendShape();	
+	SBAPI VBOVec3f*           getVBODeformNormal() { return VBODeformNormal; }
+	SBAPI VBOVec3f*           getVBODeformTangent() { return VBODeformTangent; }
+	SBAPI void gpuBlendShape();
+protected:	
 	void cleanBuffer();	
 };
 

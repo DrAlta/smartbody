@@ -2721,6 +2721,8 @@ void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 	_mesh->buildSkinnedVertexBuffer(); // make sure the deformable mesh has vertex buffer
 	_deformPosBuf.resize(_mesh->posBuf.size()); // initialized deformation posBuffer
 	_restPosBuf.resize(_mesh->posBuf.size());
+	_deformNormalBuf.resize(_mesh->normalBuf.size());
+	_deformTangentBuf.resize(_mesh->tangentBuf.size());
 	for (unsigned int i=0;i<_deformPosBuf.size();i++)
 	{
 		_restPosBuf[i] = _mesh->posBuf[i];
@@ -2805,7 +2807,6 @@ void DeformableMeshInstance::updateSkin( const std::vector<SrVec>& restPos, std:
 #endif
 			vSkinPos += (vPos*transformBuffer[_mesh->boneIDBuf[a][i][b]])*_mesh->boneWeightBuf[a][i][b];
 		}
-
 		deformPos[i] = vSkinPos;
 	}
 }

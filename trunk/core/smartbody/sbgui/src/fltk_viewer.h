@@ -343,6 +343,7 @@ class FltkViewer : public Fl_Gl_Window, public SmartBody::SBObserver, public Sel
         To draw the window contents, use render() instead. */
     virtual void draw ();	
 
+	void drawInteraction(SrCamera* cam);
     /*! Called to initialize opengl and to set the viewport to (w,h). This
         method is called also each time the window is reshaped. */
     virtual void init_opengl ( int w, int h );

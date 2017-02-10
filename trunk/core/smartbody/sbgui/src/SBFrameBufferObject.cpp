@@ -100,22 +100,23 @@ void SBFrameBufferObject::drawScreenQuad()
 	gluOrtho2D(-1, 1, -1, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
-	glPushAttrib(GL_VIEWPORT_BIT);
-	glPushAttrib(GL_TEXTURE_BIT);
+	//glPushAttrib(GL_VIEWPORT_BIT);
+	//glPushAttrib(GL_TEXTURE_BIT);
 	glLoadIdentity();
 
+	float zDepth = -0.5f;
 	glBegin(GL_QUADS);
 	glTexCoord2f(0, 1);
-	glVertex3f(-1.0f, 1.0f, -0.5f);
+	glVertex3f(-1.0f, 1.0f, zDepth);
 
 	glTexCoord2f(0, 0);
-	glVertex3f(-1.0f, -1.0f, -0.5f);
+	glVertex3f(-1.0f, -1.0f, zDepth);
 
 	glTexCoord2f(1, 0);
-	glVertex3f(1.0f, -1.0f, -0.5f);
+	glVertex3f(1.0f, -1.0f, zDepth);
 
 	glTexCoord2f(1, 1);
-	glVertex3f(1.0f, 1.0f, -0.5f);
+	glVertex3f(1.0f, 1.0f, zDepth);
 	glEnd();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();                              // Pops ENABLE_BIT
