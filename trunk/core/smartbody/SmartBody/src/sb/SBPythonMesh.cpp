@@ -10,7 +10,7 @@
 
 #ifndef SB_NO_PYTHON
 
-#if 0 //defined(_MSC_FULL_VER) && (_MSC_FULL_VER == 190024210 || _MSC_FULL_VER == 190024215)
+#if defined(_MSC_FULL_VER) && (_MSC_FULL_VER == 190024210 || _MSC_FULL_VER == 190024215)
 namespace boost
 {
 	template<> const volatile DeformableMesh* get_pointer(const volatile DeformableMesh* p) { return p; }

@@ -30,7 +30,7 @@
 #include <sb/SBBehaviorSetManager.h>
 #include <sb/SBGestureMap.h>
 #include <sb/nvbg.h>
-
+#include <sbm/GPU/SbmTexture.h>
 #include <sbm/action_unit.hpp>
 #include <sbm/sr_path_list.h>
 #include <sb/sbm_character.hpp>
@@ -76,6 +76,7 @@ ResourceWindow::ResourceWindow(int x, int y, int w, int h, char* name) : Fl_Grou
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Blends"), "blend"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Transitions"), "transition"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Models"), "mesh"));	
+	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Environment Maps"), "envmap"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Face Definitions"), "facedefinition"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Event Handlers"), "eventhandler"));
 	_treeMap.insert(std::pair<Fl_Tree_Item*, std::string>(resourceTree->add("Pawns"), "pawn"));
@@ -474,6 +475,16 @@ void ResourceWindow::updateGUI()
 		updateMesh(meshItem, mesh);
 	}
 
+	// update environment map
+	resourceTree->clear_children(getTreeFromName("envmap"));
+	SbmTextureManager& texManager = SbmTextureManager::singleton();
+	std::vector<std::string> envMaps = texManager.getTextureNames(SbmTextureManager::TEXTURE_HDR_MAP);
+	for (size_t i = 0; i < envMaps.size(); i++)
+	{
+		SbmTexture* texture = texManager.findTexture(SbmTextureManager::TEXTURE_HDR_MAP, envMaps[i].c_str());
+		Fl_Tree_Item* meshItem = resourceTree->add(getTreeFromName("envmap"), texture->getName().c_str());
+		updateEnvMap(meshItem, texture);
+	}
 
 	// update face definition map
 	resourceTree->clear_children(getTreeFromName("facedefinition"));
@@ -772,8 +783,6 @@ void ResourceWindow::updateSkeleton( Fl_Tree_Item* tree, SmartBody::SBSkeleton* 
 
 void ResourceWindow::updateMesh( Fl_Tree_Item* tree, DeformableMesh* mesh )
 {
-//	item->user_data((void*)ITEM_MESH);
-
 	for (int i=0; i< mesh->getNumMeshes();i++)
 	{
 		std::string meshName = mesh->getMeshName(i);
@@ -810,6 +819,10 @@ void ResourceWindow::updateMesh( Fl_Tree_Item* tree, DeformableMesh* mesh )
 		}
 	}
 
+}
+
+void ResourceWindow::updateEnvMap(Fl_Tree_Item* tree, SbmTexture* texture)
+{
 }
 
 void ResourceWindow::updateAnimationBlend( Fl_Tree_Item* tree, SmartBody::SBAnimationBlend* blend )
