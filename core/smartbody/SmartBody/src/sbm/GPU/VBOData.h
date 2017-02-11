@@ -37,6 +37,7 @@ enum
 
 
 #if defined (ANDROID_BUILD) || defined(EMSCRIPTEN)
+template <class S>
 class VBOData
 {
 public:

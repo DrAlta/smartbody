@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "wes_begin.h"
 #include "wes_shader.h"
 #include "wes_matrix.h"
-//#include <GLES2/gl2.h>
 
 #if defined(_WIN32)
     #include <windows.h>

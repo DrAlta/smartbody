@@ -212,7 +212,7 @@ typedef double          GLdouble;
 //typedef int             GLsizeiptr;
 
 /* OpenGL ES core versions */
-#define GL_ES_VERSION_2_0                 1
+//#define GL_ES_VERSION_2_0                 1
 
 /* ClearBufferMask */
 #define GL_DEPTH_BUFFER_BIT               0x00000100

@@ -63,7 +63,9 @@
 #include <vector>
 #include <string>
 #include <sys/types.h>
+#if 0
 #include <sys/timeb.h>
+#endif
 #include <sstream>
 #include <float.h>
 #include "time.h"
