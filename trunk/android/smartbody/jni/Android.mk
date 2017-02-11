@@ -556,7 +556,6 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/controllers/me_controller_context_proxy.cpp \
 	$(SB_MY_DIR)/controllers/me_controller.cpp \
 	$(SB_MY_DIR)/controllers/me_controller_tree_root.cpp \
-	$(SB_MY_DIR)/controllers/me_ct_adshr_envelope.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_blend.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_channel_writer.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_container.cpp \
@@ -637,7 +636,6 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_IK.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_IK_scenario.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_jacobian_IK.cpp \
-	$(SB_MY_DIR)/controllers/me_ct_lilt_try.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_limb.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_breathing.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_breathing_interface.cpp \
@@ -649,7 +647,6 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_new_locomotion.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_param_animation.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_param_animation_utilities.cpp \
-	$(SB_MY_DIR)/controllers/me_ct_quick_draw.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_hand.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_motion_profile.cpp \
 	$(SB_MY_DIR)/controllers/me_ct_barycentric_interpolation.cpp \
