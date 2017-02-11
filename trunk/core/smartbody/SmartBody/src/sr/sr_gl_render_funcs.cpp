@@ -25,7 +25,7 @@
 
 #ifdef __ANDROID__
 //#include <GLES/gl.h>
-#include <GLES2/gl2.h>
+#include <GLES3/gl3.h>
 //#include <wes_gl.h>
 #elif defined(SB_IPHONE)
 #include <OpenGLES/ES1/gl.h>

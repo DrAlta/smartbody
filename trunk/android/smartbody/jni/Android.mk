@@ -198,165 +198,8 @@ include $(BUILD_STATIC_LIBRARY)
 
 
 include $(CLEAR_VARS)	
-LOCAL_MODULE := assimp
-LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions -DASSIMP_BUILD_NO_OWN_ZLIB
-LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(LIB_DIR)/assimp-3.1.1/include \
-					$(SB_LOCAL_PATH)/$(BOOST_INCLUDE_DIR) \
-					#$(SB_LOCAL_PATH)/$(LIB_DIR)/boost \
-LOCAL_LDLIBS    := -lz
-
-LOCAL_SRC_FILES :=  $(LIB_DIR)/assimp-3.1.1/code/3DSConverter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/3DSLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ACLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ASELoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ASEParser.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/AssimpCExport.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/Assimp.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/AssimpPCH.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/B3DImporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/BaseImporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/BaseProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/Bitmap.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/BlenderBMesh.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/BlenderDNA.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/BlenderLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/BlenderModifier.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/BlenderScene.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/BlenderTessellator.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/BVHLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/CalcTangentsProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/COBLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ColladaExporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ColladaLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ColladaParser.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ComputeUVMappingProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ConvertToLHProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/CSMLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/DeboneProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/DefaultIOStream.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/DefaultIOSystem.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/DefaultLogger.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/DXFLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/Exporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXAnimation.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXBinaryTokenizer.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXConverter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXDeformer.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXDocument.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXDocumentUtil.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXImporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXMaterial.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXMeshGeometry.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXModel.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXNodeAttribute.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXParser.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXProperties.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXTokenizer.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FBXUtil.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FindDegenerates.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FindInstancesProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FindInvalidDataProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/FixNormalsStep.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/GenFaceNormalsProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/GenVertexNormalsProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/HMPLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IFCBoolean.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IFCCurve.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IFCGeometry.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IFCLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IFCMaterial.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IFCOpenings.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IFCProfile.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IFCReaderGen.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IFCUtil.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/Importer.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ImporterRegistry.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ImproveCacheLocality.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IRRLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IRRMeshLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/IRRShared.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/JoinVerticesProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/LimitBoneWeightsProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/LWOAnimation.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/LWOBLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/LWOLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/LWOMaterial.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/LWSLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/MakeVerboseFormat.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/MaterialSystem.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/MD2Loader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/MD3Loader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/MD5Loader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/MD5Parser.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/MDCLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/MDLLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/MDLMaterialLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/MS3DLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/NDOLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/NFFLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ObjExporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ObjFileImporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ObjFileMtlImporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ObjFileParser.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/OFFLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/OgreBinarySerializer.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/OgreImporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/OgreMaterial.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/OgreStructs.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/OgreXmlSerializer.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/OptimizeGraph.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/OptimizeMeshes.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/PlyExporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/PlyLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/PlyParser.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/PostStepRegistry.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/PretransformVertices.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ProcessHelper.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/Q3BSPFileImporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/Q3BSPFileParser.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/Q3BSPZipArchive.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/Q3DLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/RawLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/RemoveComments.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/RemoveRedundantMaterials.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/RemoveVCProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/SceneCombiner.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ScenePreprocessor.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/SGSpatialSort.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/SkeletonMeshBuilder.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/SMDLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/SortByPTypeProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/SpatialSort.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/SplitByBoneCountProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/SplitLargeMeshes.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/StandardShapes.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/STEPFileEncoding.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/STEPFileReader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/STLExporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/STLLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/Subdivision.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/TargetAnimation.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/TerragenLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/TextureTransform.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/TriangulateProcess.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/UnrealLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/ValidateDataStructure.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/VertexTriangleAdjacency.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/XFileImporter.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/XFileParser.cpp \
-$(LIB_DIR)/assimp-3.1.1/code/XGLLoader.cpp \
-$(LIB_DIR)/assimp-3.1.1/contrib/clipper/clipper.cpp \
-$(LIB_DIR)/assimp-3.1.1/contrib/ConvertUTF/ConvertUTF.c \
-$(LIB_DIR)/assimp-3.1.1/contrib/irrXML/irrXML.cpp \
-$(LIB_DIR)/assimp-3.1.1/contrib/poly2tri/poly2tri/common/shapes.cc \
-$(LIB_DIR)/assimp-3.1.1/contrib/poly2tri/poly2tri/sweep/advancing_front.cc \
-$(LIB_DIR)/assimp-3.1.1/contrib/poly2tri/poly2tri/sweep/cdt.cc \
-$(LIB_DIR)/assimp-3.1.1/contrib/poly2tri/poly2tri/sweep/sweep.cc \
-$(LIB_DIR)/assimp-3.1.1/contrib/poly2tri/poly2tri/sweep/sweep_context.cc \
 
 
-include $(BUILD_STATIC_LIBRARY)
-#include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := ann
@@ -804,9 +647,9 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 
 #LOCAL_LDLIBS    := -llog -lEGL -lGLESv1_CM
 #LOCAL_LDLIBS    := -llog -gstabs
-LOCAL_LDLIBS    := -landroid -llog -lGLESv2
+LOCAL_LDLIBS    := -landroid -llog -lGLESv3
 #LOCAL_LDLIBS    := -landroid -llog 
-LOCAL_STATIC_LIBRARIES := assimp ann gl-wes xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ode  openal alut tremolo sndfile python-prebuilt proto-prebuilt $(CEREVOICE_LIBS)
+LOCAL_STATIC_LIBRARIES := ann gl-wes xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ode  openal alut tremolo sndfile python-prebuilt proto-prebuilt $(CEREVOICE_LIBS)
 #festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt
 #LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt
 #LOCAL_SHARED_LIBRARIES := python-prebuilt 

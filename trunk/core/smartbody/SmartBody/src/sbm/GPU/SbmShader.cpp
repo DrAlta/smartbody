@@ -315,6 +315,7 @@ bool SbmShaderManager::initGLExtension()
 
 bool SbmShaderManager::checkShaderInit(int &counter)
 {
+#ifndef __ANDROID__
 	if (glewIsSupported("GL_VERSION_4_0"))
 	{
 		LOG("Ready for OpenGL 4.0.\n");
@@ -338,6 +339,13 @@ bool SbmShaderManager::checkShaderInit(int &counter)
 			shaderInit = true;
 		return false;
 	}
+#else
+	LOG("Ready for OpenGL 3.0.\n");
+	shaderInit = true;
+	shaderSupport = SUPPORT_OPENGL_2_0;
+
+	return true;
+#endif
 }
 
 void SbmShaderManager::addShader(const std::string& entryName, const std::string& vsName, const std::string& fsName, bool shaderFile )

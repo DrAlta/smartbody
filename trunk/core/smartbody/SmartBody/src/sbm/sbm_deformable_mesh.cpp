@@ -1805,7 +1805,7 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 		iter++)
 	{
 		SrModel* model = (*iter);
-		std::string modelName = model->name;
+		std::string modelName((const char*) model->name);
 
 		std::map<std::string, bool>::iterator iter2 = modelsUsed.find(modelName);
 		if ((*iter2).second == false)
