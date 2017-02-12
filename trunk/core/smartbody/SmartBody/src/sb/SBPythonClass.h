@@ -131,7 +131,7 @@ public:
 	std::string controllerType;
 	PythonController() : SBController() { controllerType = "python";}
 	virtual void start() {};
-	virtual void init(SmartBody::SBPawn* pawn) {};
+	virtual void init(SmartBody::SBPawn* pawn) { SBController::init(pawn);  };
 	virtual void evaluate() {};
 	virtual void stop() {};
 
