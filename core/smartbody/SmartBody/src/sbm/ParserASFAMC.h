@@ -1,43 +1,22 @@
-/**************************************************
-Copyright 2005 by Ari Shapiro and Petros Faloutsos
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
-DANCE
-Dynamic ANimation and Control Environment
+This file is part of Smartbody.
 
- ***************************************************************
- ******General License Agreement and Lack of Warranty ***********
- ****************************************************************
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-This software is distributed for noncommercial use in the hope that it will 
-be useful but WITHOUT ANY WARRANTY. The author(s) do not accept responsibility
-to anyone for the consequences	of using it or for whether it serves any 
-particular purpose or works at all. No warranty is made about the software 
-or its performance. Commercial use is prohibited. 
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
 
-Any plugin code written for DANCE belongs to the developer of that plugin,
-who is free to license that code in any manner desired.
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
-Content and code development by third parties (such as FLTK, Python, 
-ImageMagick, ODE) may be governed by different licenses.
-You may modify and distribute this software as long as you give credit 
-to the original authors by including the following text in every file 
-that is distributed: */
-
-/*********************************************************
-	Copyright 2005 by Ari Shapiro and Petros Faloutsos
-
-	DANCE
-	Dynamic ANimation and Control Environment
-	-----------------------------------------
-	AUTHOR:
-		Ari Shapiro (ashapiro@cs.ucla.edu)
-	ORIGINAL AUTHORS: 
-		Victor Ng (victorng@dgp.toronto.edu)
-		Petros Faloutsos (pfal@cs.ucla.edu)
-	CONTRIBUTORS:
-		Yong Cao (abingcao@cs.ucla.edu)
-		Paco Abad (fjabad@dsic.upv.es)
-**********************************************************/
+**************************************************************/
 
 #ifndef ASFAMCPARSER_H
 #define ASFAMCPARSER_H
