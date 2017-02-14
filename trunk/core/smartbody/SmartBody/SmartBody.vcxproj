@@ -618,7 +618,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClCompile Include="src\sb\SBAssetHandler.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerAmc.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerAsf.cpp" />
-    <ClCompile Include="src\sb\SBAssetHandlerAssimp.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerBvh.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerCOLLADA.cpp" />
     <ClCompile Include="src\sb\SBAssetHandlerHDR.cpp" />
@@ -1056,7 +1055,6 @@ copy /Y "$(OutDir)$(ProjectName).pdb" lib</Command>
     <ClInclude Include="src\sb\SBAssetHandler.h" />
     <ClInclude Include="src\sb\SBAssetHandlerAmc.h" />
     <ClInclude Include="src\sb\SBAssetHandlerAsf.h" />
-    <ClInclude Include="src\sb\SBAssetHandlerAssimp.h" />
     <ClInclude Include="src\sb\SBAssetHandlerBvh.h" />
     <ClInclude Include="src\sb\SBAssetHandlerCOLLADA.h" />
     <ClInclude Include="src\sb\SBAssetHandlerHDR.h" />

@@ -1150,9 +1150,6 @@
     <ClCompile Include="src\external\jpge\jpge.cpp">
       <Filter>external\jpge</Filter>
     </ClCompile>
-    <ClCompile Include="src\sb\SBAssetHandlerAssimp.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
     <ClCompile Include="src\controllers\RealTimeLipSyncController.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
@@ -2423,9 +2420,6 @@
     </ClInclude>
     <ClInclude Include="src\external\jpge\jpge.h">
       <Filter>external\jpge</Filter>
-    </ClInclude>
-    <ClInclude Include="src\sb\SBAssetHandlerAssimp.h">
-      <Filter>sb</Filter>
     </ClInclude>
     <ClInclude Include="src\controllers\RealTimeLipSyncController.h">
       <Filter>controllers</Filter>

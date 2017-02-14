@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vs2010-activemq", "lib\activemq\activemq-dotnet\Apache.NMS.ActiveMQ\vs2010-activemq.csproj", "{08321F42-4B3D-4815-B592-95962BAC3B9F}"
 EndProject
@@ -46,7 +46,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SmartBody", "core\smartbody
 	ProjectSection(ProjectDependencies) = postProject
 		{4559341E-D53D-45E5-A67C-43D7C5956636} = {4559341E-D53D-45E5-A67C-43D7C5956636}
 		{A8E03E2E-B9AE-4574-81A2-F661819322E1} = {A8E03E2E-B9AE-4574-81A2-F661819322E1}
-		{15792434-64D2-43D6-9029-259721587DA2} = {15792434-64D2-43D6-9029-259721587DA2}
 		{BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6} = {BFC6E348-DBEA-4118-94E6-BB7FCD8EC7F6}
 		{49840C67-5A25-4D7A-AF21-5976735F7D7D} = {49840C67-5A25-4D7A-AF21-5976735F7D7D}
 		{662CF3EB-B816-4727-9D1D-4071C25A3312} = {662CF3EB-B816-4727-9D1D-4071C25A3312}
@@ -64,15 +63,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pinocchio", "core\smartbody
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PolyVoxCore", "core\smartbody\sbgui\external\polyvox\build\library\PolyVoxCore\PolyVoxCore.vcxproj", "{E1BABF1B-764A-46BC-9E0B-9948D6DEEBA0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "assimp", "lib\assimp-3.1.1\assimp.vcxproj", "{15792434-64D2-43D6-9029-259721587DA2}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sbgui_dependencies", "sbgui_dependencies", "{2E9977E0-CEAD-4288-90BA-B4569CDE9ADB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "smartbody_dependencies", "smartbody_dependencies", "{4CF6AB09-45E2-4D6A-9DA4-AB2AC50AF902}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OgreViewer", "core\ogre-viewer\build\vs2015\OgreViewer.vcxproj", "{B19F5657-AA08-4D34-B3A3-58045074DBBB}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioProcess", "core\AudioProcess\AudioProcess.vcxproj", "{515F1C34-7854-47E9-A97A-CE568B3D7972}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -204,12 +199,6 @@ Global
 		{E1BABF1B-764A-46BC-9E0B-9948D6DEEBA0}.Release|Emscripten.ActiveCfg = Release|Win32
 		{E1BABF1B-764A-46BC-9E0B-9948D6DEEBA0}.Release|Win32.ActiveCfg = Release|Win32
 		{E1BABF1B-764A-46BC-9E0B-9948D6DEEBA0}.Release|Win32.Build.0 = Release|Win32
-		{15792434-64D2-43D6-9029-259721587DA2}.Debug|Emscripten.ActiveCfg = Debug|Win32
-		{15792434-64D2-43D6-9029-259721587DA2}.Debug|Win32.ActiveCfg = Debug|Win32
-		{15792434-64D2-43D6-9029-259721587DA2}.Debug|Win32.Build.0 = Debug|Win32
-		{15792434-64D2-43D6-9029-259721587DA2}.Release|Emscripten.ActiveCfg = Release|Win32
-		{15792434-64D2-43D6-9029-259721587DA2}.Release|Win32.ActiveCfg = Release|Win32
-		{15792434-64D2-43D6-9029-259721587DA2}.Release|Win32.Build.0 = Release|Win32
 		{B19F5657-AA08-4D34-B3A3-58045074DBBB}.Debug|Emscripten.ActiveCfg = Debug|Emscripten
 		{B19F5657-AA08-4D34-B3A3-58045074DBBB}.Debug|Emscripten.Build.0 = Debug|Emscripten
 		{B19F5657-AA08-4D34-B3A3-58045074DBBB}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -218,12 +207,6 @@ Global
 		{B19F5657-AA08-4D34-B3A3-58045074DBBB}.Release|Emscripten.Build.0 = Release|Emscripten
 		{B19F5657-AA08-4D34-B3A3-58045074DBBB}.Release|Win32.ActiveCfg = Release|Win32
 		{B19F5657-AA08-4D34-B3A3-58045074DBBB}.Release|Win32.Build.0 = Release|Win32
-		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Debug|Emscripten.ActiveCfg = Debug|Win32
-		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Debug|Win32.ActiveCfg = Debug|Win32
-		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Debug|Win32.Build.0 = Debug|Win32
-		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Release|Emscripten.ActiveCfg = Release|Win32
-		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Release|Win32.ActiveCfg = Release|Win32
-		{515F1C34-7854-47E9-A97A-CE568B3D7972}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -244,7 +227,6 @@ Global
 		{2E2A44E1-D441-4A88-9125-E6DA9BCA5352} = {8BAFDAFC-F40D-43E8-9765-C8FBEC2F42AD}
 		{835E35C4-9AB1-4CB3-A8A9-A0B89171280D} = {2E9977E0-CEAD-4288-90BA-B4569CDE9ADB}
 		{E1BABF1B-764A-46BC-9E0B-9948D6DEEBA0} = {2E9977E0-CEAD-4288-90BA-B4569CDE9ADB}
-		{15792434-64D2-43D6-9029-259721587DA2} = {4CF6AB09-45E2-4D6A-9DA4-AB2AC50AF902}
 	EndGlobalSection
 	GlobalSection(DPCodeReviewSolutionGUID) = preSolution
 		DPCodeReviewSolutionGUID = {00000000-0000-0000-0000-000000000000}

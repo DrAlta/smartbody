@@ -159,16 +159,6 @@ set( ODE_LIB
 )
 endif()
 
-if (${SB_NO_ASSIMP})
-set( ASSIMP_LIB
-)
-else()
-include_directories( ../../../lib/assimp-3.1.1/include)
-set( ASSIMP_LIB
-	assimp
-)
-endif()
-
 
 
 
@@ -643,7 +633,6 @@ set( SMARTBODY_LIB_SBM_SRC
 	./src/sb/SBAssetHandlerObj.cpp
 	./src/sb/SBAssetHandlerBvh.cpp
 	./src/sb/SBAssetHandlerPly.cpp
-	./src/sb/SBAssetHandlerAssimp.cpp
         ./src/sb/SBBehavior.cpp
 	./src/sb/SBAssetHandlerSkmb.cpp
 	./src/sb/SBAssetHandlerSBMeshBinary.cpp
@@ -709,7 +698,6 @@ target_link_libraries( SmartBody
 	${BONEBUS_LIB}
 	${VHMSG_LIB}
 	${PYTHON_LIB}
-	${ASSIMP_LIB}
 	vhcl
 	${XERCESLIB}
 	${BOOSTFILESYSTEMLIB}
@@ -721,7 +709,6 @@ target_link_libraries( SmartBody
 	steerlib
 	pprAI
 	${ODE_LIB}
-	${ASSIMP_LIB}
 	ncurses
 	${MORE_LIBS}
 	${PROTOCLIB}
