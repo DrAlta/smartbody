@@ -17,9 +17,6 @@
 #include <sb/SBAssetHandlerPly.h>
 #include <sb/SBAssetHandlerHDR.h>
 #include <sb/SBAssetHandlerSBMeshBinary.h>
-#ifndef SB_NO_ASSIMP
-#include <sb/SBAssetHandlerAssimp.h>
-#endif
 #ifdef USE_FBX_PARSER
 #include <sb/SBAssetHandlerFbx.h>
 #endif
@@ -84,9 +81,6 @@ SBAssetManager::SBAssetManager()
 	addAssetHandler(new SBAssetHandlerBvh());	
 	addAssetHandler(new SBAssetHandlerHdr());
 	addAssetHandler(new SBAssetHandlerSBMeshBinary());
-#ifndef SB_NO_ASSIMP
-	addAssetHandler(new SBAssetHandlerAssimp());	
-#endif
 #ifdef USE_FBX_PARSER
 	addAssetHandler(new SBAssetHandlerFbx());
 #endif

@@ -13,9 +13,7 @@ namespace SmartBody {
 
 SBAssetHandlerHdr::SBAssetHandlerHdr()
 {
-//#ifdef SB_NO_ASSIMP
 	assetTypes.push_back("hdr");
-//#endif
 }
 
 SBAssetHandlerHdr::~SBAssetHandlerHdr()
