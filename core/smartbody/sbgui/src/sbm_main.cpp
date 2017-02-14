@@ -379,6 +379,41 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	return( CMD_FAILURE );
 }
 
+int mcu_snapshot_func2(srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
+{// get the image data
+	BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
+	if (!rootWindow)
+	{
+		LOG("Viewer doesn't exist. Cannot take snapshot.");
+		return CMD_FAILURE;
+	}
+	string output_file = args.read_token();
+
+	std::stringstream output_file_os;
+	output_file_os << "snapshot_" << snapshotCounter << ".tga";	// default output name
+	snapshotCounter++;
+	output_file = output_file_os.str();
+
+	int y = rootWindow->curViewer->h();
+	int x = rootWindow->curViewer->w();
+
+	long imageSize = x * y * 3;
+
+	unsigned char *data = new unsigned char[imageSize];
+	glReadPixels(0, 0, x, y, GL_BGR, GL_UNSIGNED_BYTE, data);// split x and y sizes into bytes
+	int xa = x % 256;
+	int xb = (x - xa) / 256; int ya = y % 256;
+	int yb = (y - ya) / 256;//assemble the header
+	unsigned char header[18] = { 0,0,2,0,0,0,0,0,0,0,0,0,(char)xa,(char)xb,(char)ya,(char)yb,24,0 };
+	// write header and data to file
+	fstream File(output_file, ios::out | ios::binary);
+	File.write(reinterpret_cast<char *>(header), sizeof(char) * 18);
+	File.write(reinterpret_cast<char *>(data), sizeof(char)*imageSize);
+	File.close();
+
+	delete[] data;
+	data = NULL;
+}
 
 // snapshot <output file>
 int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
@@ -428,6 +463,7 @@ int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	return(CMD_SUCCESS);
 }
 
+
 int mcu_quit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )	{
 
 	
@@ -467,6 +503,7 @@ void mcu_register_callbacks( void ) {
 	cmdMgr->insert( "q",			mcu_quit_func );
 	cmdMgr->insert( "quit",			mcu_quit_func );
 	cmdMgr->insert( "snapshot",		mcu_snapshot_func );
+	cmdMgr->insert( "snapshot2",	mcu_snapshot_func2);
 	cmdMgr->insert( "viewer",		mcu_viewer_func );
 	cmdMgr->insert( "camera",		mcu_camera_func );
 }
