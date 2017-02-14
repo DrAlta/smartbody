@@ -94,6 +94,7 @@ protected:
 	std::vector<unsigned char> imgBuffer;
 	bool finishBuild;
 	bool transparentTexture;	
+	bool buildMipMap;
 	GLuint texID;	
 	GLint internal_format;
 	GLenum texture_format;		
@@ -103,6 +104,9 @@ public:
 	SBAPI ~SbmTexture(void);
 	SBAPI bool hasBuild() { return finishBuild; }
 	SBAPI bool isTransparent() { return transparentTexture; }
+	bool isBuildMipMap() const { return buildMipMap; }
+	void setBuildMipMap(bool val) { buildMipMap = val; }
+
 	SBAPI const std::string& getName() { return textureName; }
 	SBAPI const std::string& getFileName() { return textureFileName; }
 	SBAPI GLuint getID() { return texID; }
@@ -110,7 +114,7 @@ public:
 
 	SBAPI bool loadHDRImage(const char* fileName);
 
-	SBAPI void buildTexture(bool buildMipMap = true, bool recreateTexture = true);
+	SBAPI void buildTexture(bool buildMipMap = false, bool recreateTexture = true);
 
 	SBAPI unsigned char* getBuffer();
 	SBAPI int getBufferSize();
@@ -124,7 +128,7 @@ public:
 	SBAPI void bakeAlphaIntoTexture(SbmTexture* alphaTex);
 	// Creates a 1x1 white texture
 	SBAPI void createWhiteTexture(int w = 1, int h = 1);	
-	SBAPI void createEmptyTexture(int w , int h, int numChannels, GLenum type = GL_UNSIGNED_BYTE, SrColor initColor = SrColor::white);	
+	SBAPI void createEmptyTexture(int w , int h, int numChannels, GLenum type = GL_UNSIGNED_BYTE, SrColor initColor = SrColor::white);		
 };
 #if USE_CUBE_MAP
 class SbmCubeMapTexture // simple place holder for OpenGL ES cubemap texture
