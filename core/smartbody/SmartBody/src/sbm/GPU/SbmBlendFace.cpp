@@ -524,6 +524,18 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 	for(std::vector<float>::iterator j=weights.begin(); j!=weights.end(); ++j)
 		sumOfWeights += *j;
 	//LOG("Blend ApperancePairWise");
+// 	glActiveTexture(GL_TEXTURE0);
+// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+// 
+// 	glActiveTexture(GL_TEXTURE1);
+// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+// 
+// 	glActiveTexture(GL_TEXTURE2);
+// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 	for(int i = numTextures-1; i >= 0; i--) 
 	{
 		//LOG("BlendTexture %d", i);
@@ -593,7 +605,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 						glUniform1i(uExpressionSampler, 1);
 						glUniform1i(uPreviousResultSampler, 2);
 
-						glActiveTexture(GL_TEXTURE0);
+						glActiveTexture(GL_TEXTURE0);						
 						glBindTexture(GL_TEXTURE_2D, texIDs[0]);
 
 						glActiveTexture(GL_TEXTURE1);
