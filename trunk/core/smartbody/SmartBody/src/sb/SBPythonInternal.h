@@ -403,8 +403,9 @@ struct PythonControllerWrap : SmartBody::PythonController, boost::python::wrappe
 	{
 		if (boost::python::override o = this->get_override("init"))
 		{
+			PythonController::init(pawn);
 			try {
-				o(pawn);
+				o();
 			} catch (...) {
 				PyErr_Print();
 			}
