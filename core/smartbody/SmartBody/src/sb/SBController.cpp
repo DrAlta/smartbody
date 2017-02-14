@@ -40,6 +40,16 @@ SBController::~SBController()
 {
 }
 
+void SBController::setPawn(SBPawn* pawn)
+{
+	_pawn = pawn;
+}
+
+SBPawn* SBController::getPawn()
+{
+	return _pawn;
+}
+
 void SBController::addChannel(std::string channelName, std::string type)
 {
 	SkChannel::Type channelType = SkChannel::XPos;

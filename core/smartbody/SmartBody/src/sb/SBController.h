@@ -24,6 +24,8 @@ class SBController : public MeController
 		SBAPI int getNumChildren();
 		SBAPI void addChannel(std::string channelName, std::string type);
 
+		SBAPI void setPawn(SBPawn* pawn);
+		SBAPI SBPawn* getPawn();
 		SBAPI const std::string& getCharacterName();
 
 		SBAPI void setIgnore(bool val);
