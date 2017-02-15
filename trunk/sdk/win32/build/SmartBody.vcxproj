@@ -50,7 +50,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\include\bonebus;..\include\;..\include\steersuite;..\include\vhcl;..\include\vhmsg;..\include\wsp;..\include\assimp-3.1.1;..\include\xercesc;..\python27\include;..\src\SmartBody;..\include\boostnumeric;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SB_NO_ASSIMP;SB_EXPORTS;dDOUBLE;WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -58,7 +58,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc140-mt-gd-1_59.lib;boost_system-vc140-mt-gd-1_59.lib;boost_regex-vc140-mt-gd-1_59.lib;boost_python-vc140-mt-gd-1_59.lib;boost_serialization-vc140-mt-gd-1_59.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;python27.lib;libprotobufd.lib;assimpd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl_d.lib;vhmsg_d.lib;bonebus_d.lib;blasd.lib;libf2cd.lib;lapackd.lib;activemq-cppd.lib;xerces-c_3D.lib;boost_filesystem-vc140-mt-gd-1_59.lib;boost_system-vc140-mt-gd-1_59.lib;boost_regex-vc140-mt-gd-1_59.lib;boost_python-vc140-mt-gd-1_59.lib;boost_serialization-vc140-mt-gd-1_59.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlibd.lib;pprAId.lib;ode_doubled.lib;python27.lib;libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib;..\python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <OutputFile>..\bin\$(TargetName)$(TargetExt)</OutputFile>
       <ImportLibrary>..\lib\$(TargetName).lib</ImportLibrary>
@@ -76,7 +76,7 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SB_NO_ASSIMP;SB_EXPORTS;dDOUBLE;WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;SMARTBODY_DLL_EXPORTS;SMARTBODY_C_DLL_EXPORTS;BOOST_ALL_NO_LIB;BOOST_TYPEOF_SILENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include\bonebus;..\include\;..\include\steersuite;..\include\vhcl;..\include\vhmsg;..\include\wsp;..\include\assimp-3.1.1;..\include\xercesc;..\python27\include;..\src\SmartBody;..\include\boostnumeric;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <WarningLevel>Level3</WarningLevel>
@@ -92,7 +92,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\lib;..\python27\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc140-mt-1_59.lib;boost_system-vc140-mt-1_59.lib;boost_regex-vc140-mt-1_59.lib;boost_python-vc140-mt-1_59.lib;boost_serialization-vc140-mt-1_59.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;python27.lib;libprotobuf.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;glu32.lib;vhcl.lib;vhmsg.lib;bonebus.lib;blas.lib;libf2c.lib;lapack.lib;activemq-cpp.lib;xerces-c_3.lib;boost_filesystem-vc140-mt-1_59.lib;boost_system-vc140-mt-1_59.lib;boost_regex-vc140-mt-1_59.lib;boost_python-vc140-mt-1_59.lib;boost_serialization-vc140-mt-1_59.lib;OpenAL32.lib;alut.lib;libsndfile-1.lib;pthreadVSE2.lib;opengl32.lib;ws2_32.lib;winmm.lib;dbghelp.lib;comctl32.lib;rpcrt4.lib;steerlib.lib;pprAI.lib;ode_double.lib;python27.lib;libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <PerUserRedirection>true</PerUserRedirection>
       <OutputFile>..\bin\$(TargetName)$(TargetExt)</OutputFile>
@@ -133,6 +133,7 @@
     <ClCompile Include="..\src\SmartBody\external\faceshift\fsbinarystream.cpp" />
     <ClCompile Include="..\src\SmartBody\external\jpge\jpge.cpp" />
     <ClCompile Include="..\src\SmartBody\external\rply\rply.c" />
+    <ClCompile Include="..\src\SmartBody\external\stb\stb_vorbis.c" />
     <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\adler32.c" />
     <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\compress.c" />
     <ClCompile Include="..\src\SmartBody\external\zlib-1.2.5\crc32.c" />
@@ -172,9 +173,9 @@
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandler.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerAmc.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerAsf.cpp" />
-    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerAssimp.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerBvh.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerCOLLADA.cpp" />
+    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerHDR.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerObj.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerOgre.cpp" />
     <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerPly.cpp" />
@@ -275,7 +276,6 @@
     <ClCompile Include="..\src\SmartBody\bml\bml_locomotion.cpp" />
     <ClCompile Include="..\src\SmartBody\bml\bml_noise.cpp" />
     <ClCompile Include="..\src\SmartBody\bml\bml_processor.cpp" />
-    <ClCompile Include="..\src\SmartBody\bml\bml_quickdraw.cpp" />
     <ClCompile Include="..\src\SmartBody\bml\bml_reach.cpp" />
     <ClCompile Include="..\src\SmartBody\bml\bml_saccade.cpp" />
     <ClCompile Include="..\src\SmartBody\bml\bml_speech.cpp" />
@@ -289,7 +289,6 @@
     <ClCompile Include="..\src\SmartBody\controllers\me_controller_context.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_controller_context_proxy.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_controller_tree_root.cpp" />
-    <ClCompile Include="..\src\SmartBody\controllers\me_ct_adshr_envelope.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_barycentric_interpolation.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_basic_locomotion.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_blend.cpp" />
@@ -334,7 +333,6 @@
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_periodic_replay.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_physics_controller.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_pose.cpp" />
-    <ClCompile Include="..\src\SmartBody\controllers\me_ct_quick_draw.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_reach.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_reach_IK.cpp" />
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_saccade.cpp" />
@@ -400,10 +398,6 @@
     <ClCompile Include="..\src\SmartBody\external\recast\RecastMeshDetail.cpp" />
     <ClCompile Include="..\src\SmartBody\external\recast\RecastRasterization.cpp" />
     <ClCompile Include="..\src\SmartBody\external\recast\RecastRegion.cpp" />
-    <ClCompile Include="..\src\SmartBody\external\SOIL\image_DXT.c" />
-    <ClCompile Include="..\src\SmartBody\external\SOIL\image_helper.c" />
-    <ClCompile Include="..\src\SmartBody\external\SOIL\SOIL.c" />
-    <ClCompile Include="..\src\SmartBody\external\SOIL\stb_image_aug.c" />
     <ClCompile Include="..\src\SmartBody\sbm\action_unit.cpp" />
     <ClCompile Include="..\src\SmartBody\sbm\BMLDefs.cpp" />
     <ClCompile Include="..\src\SmartBody\sbm\GenericViewer.cpp" />
@@ -548,7 +542,6 @@
     <ClInclude Include="..\src\SmartBody\bml\bml_locomotion.hpp" />
     <ClInclude Include="..\src\SmartBody\bml\bml_noise.hpp" />
     <ClInclude Include="..\src\SmartBody\bml\bml_processor.hpp" />
-    <ClInclude Include="..\src\SmartBody\bml\bml_quickdraw.hpp" />
     <ClInclude Include="..\src\SmartBody\bml\bml_reach.hpp" />
     <ClInclude Include="..\src\SmartBody\bml\bml_saccade.hpp" />
     <ClInclude Include="..\src\SmartBody\bml\bml_schedule.hpp" />
@@ -566,7 +559,6 @@
     <ClInclude Include="..\src\SmartBody\controllers\me_controller_context.hpp" />
     <ClInclude Include="..\src\SmartBody\controllers\me_controller_context_proxy.hpp" />
     <ClInclude Include="..\src\SmartBody\controllers\me_controller_tree_root.hpp" />
-    <ClInclude Include="..\src\SmartBody\controllers\me_ct_adshr_envelope.hpp" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_barycentric_interpolation.h" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_basic_locomotion.h" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_blend.hpp" />
@@ -614,7 +606,6 @@
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_physics_controller.h" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_pose.h" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_pose_postprocessing.hpp" />
-    <ClInclude Include="..\src\SmartBody\controllers\me_ct_quick_draw.h" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_reach.hpp" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_reach_IK.hpp" />
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_saccade.h" />
@@ -681,12 +672,25 @@
     <ClInclude Include="..\src\SmartBody\external\recast\RecastAlloc.h" />
     <ClInclude Include="..\src\SmartBody\external\recast\RecastAssert.h" />
     <ClInclude Include="..\src\SmartBody\external\rply\rply.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\image_DXT.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\image_helper.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\SOIL.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug_c.h" />
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stb_image_aug.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_connected_components.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_c_lexer.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_divide.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_dxt.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_easy_font.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_herringbone_wang_tile.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_image.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_image_resize.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_image_write.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_leakcheck.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_perlin.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_rect_pack.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_sprintf.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_textedit.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_tilemap_editor.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_truetype.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_voxel_render.h" />
+    <ClInclude Include="..\src\SmartBody\external\stb\stretchy_buffer.h" />
     <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\crc32.h" />
     <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\crypt.h" />
     <ClInclude Include="..\src\SmartBody\external\zlib-1.2.5\deflate.h" />
@@ -775,9 +779,9 @@
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandler.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerAmc.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerAsf.h" />
-    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerAssimp.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerBvh.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerCOLLADA.h" />
+    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerHDR.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerObj.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerOgre.h" />
     <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerPly.h" />

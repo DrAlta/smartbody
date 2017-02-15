@@ -217,10 +217,12 @@
     <ClCompile Include="..\src\sbgui\glfont2.cpp" />
     <ClCompile Include="..\src\sbgui\pic.cpp" />
     <ClCompile Include="..\src\sbgui\ppm.cpp" />
+    <ClCompile Include="..\src\sbgui\SBFrameBufferObject.cpp" />
     <ClCompile Include="..\src\sbgui\SBGUIManager.cpp" />
     <ClCompile Include="..\src\sbgui\SBInterfaceListener.cpp" />
     <ClCompile Include="..\src\sbgui\sbm_main.cpp" />
     <ClCompile Include="..\src\sbgui\SBOgreListener.cpp" />
+    <ClCompile Include="..\src\sbgui\SBRenderer.cpp" />
     <ClCompile Include="..\src\sbgui\SBSelectionManager.cpp" />
     <ClCompile Include="..\src\sbgui\SBWindowListener.cpp" />
     <ClCompile Include="..\src\sbgui\visemeviewer\ImageSequencePlayer.cpp" />
@@ -300,9 +302,11 @@
     <ClInclude Include="..\src\sbgui\bmlcreator\BMLCreatorWindow.h" />
     <ClInclude Include="..\src\sbgui\glfont2.h" />
     <ClInclude Include="..\src\sbgui\pic.h" />
+    <ClInclude Include="..\src\sbgui\SBFrameBufferObject.h" />
     <ClInclude Include="..\src\sbgui\SBGUIManager.h" />
     <ClInclude Include="..\src\sbgui\SBInterfaceListener.h" />
     <ClInclude Include="..\src\sbgui\SBOgreListener.h" />
+    <ClInclude Include="..\src\sbgui\SBRenderer.h" />
     <ClInclude Include="..\src\sbgui\SBSelectionManager.h" />
     <ClInclude Include="..\src\sbgui\SBWindowListener.h" />
     <ClInclude Include="..\src\sbgui\visemeviewer\ImageSequencePlayer.h" />
