@@ -48,6 +48,9 @@ brad.createStandardControllers()
 brad.setVec3Attribute('deformableMeshScale', .01, .01, .01)
 brad.setStringAttribute('deformableMesh', 'ChrBrad.dae')
 
+# disable the postprocess/ik controller (doesn't work well with reaching)
+brad.getControllerByName("ChrBrad1_postprocessController").setIgnore(True)
+
 scene.run('BehaviorSetReaching.py')
 setupBehaviorSet()
 retargetBehaviorSet(baseName)		
@@ -60,8 +63,8 @@ retargetBehaviorSet(baseName)
 bml.execBML(baseName, '<body posture="ChrMarine@Idle01"/>')
 
 # make the lights invisible
-scene.getPawn("light0").setBoolAttribute("visible", False)
-scene.getPawn("light1").setBoolAttribute("visible", False)
+#scene.getPawn("light0").setBoolAttribute("visible", False)
+#scene.getPawn("light1").setBoolAttribute("visible", False)
 
 
 # set gravity 
