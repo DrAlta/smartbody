@@ -3,7 +3,7 @@
 
 BMLReachObject::BMLReachObject() : BMLObject()
 {
-	setName("reach");
+	setName("sbm:reach");
 
 	createStringAttribute("target", "", true, "Basic", 10, false, false, false, "reach target");
 	createVec3Attribute("sbm:target-pos", 0,0,0, true, "Basic", 10, false, false, false, "reach target position");
