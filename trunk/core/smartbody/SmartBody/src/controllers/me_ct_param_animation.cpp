@@ -910,7 +910,11 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 		module->interpolator->initChanId(_context, baseJointName);
 		SkJoint* baseJoint = character->getSkeleton()->search_joint(baseJointName.c_str());
 		if (!baseJoint)
-			return NULL;		
+		{
+			if (module)
+				delete module;
+			return NULL;
+		}
 		module->interpolator->initPreRotation(baseJoint->quat()->orientation()*baseJoint->quat()->prerot());
 		module->woManager->setMotionContextMaps(_context);
 		module->woManager->initChanId(_context, baseJointName);		
@@ -919,7 +923,11 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 		module->woManager->initPreRotation(preRot);
 	}
 	else
+	{
+		if (module)
+			delete module;
 		return NULL;
+	}
 
 	/*
 	for (int i = 0; i < module->state->getNumMotions(); ++i)
