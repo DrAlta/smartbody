@@ -1,3 +1,0 @@
-0.1 pawn foo setshape geom sphere size 5
-0.2 bml char billford <sbm:reach sbm:handle="rbrad" sbm:action="pick-up" target="ball1"/>
-

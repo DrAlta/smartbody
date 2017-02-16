@@ -1,2 +1,0 @@
-1. Install SbmUnity.apk to the android device ( Note : the device must support Android OS 2.3 or higher ). 
-2. Copy the directory SbmUnity/ to the sdcard in the android device.

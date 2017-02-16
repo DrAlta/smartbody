@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:icon="@android:drawable/ic_media_play" android:title="Start Sim" android:id="@+id/StartSim"/>
-    <item android:icon="@android:drawable/ic_media_pause" android:title="Pause Sim" android:id="@+id/PauseSim"/>
-    <item android:title="Show Log" android:id="@+id/ShowLog" android:icon="@android:drawable/ic_menu_agenda"></item>
-    <item android:id="@+id/Connect" android:title="Connect"></item><item android:id="@+id/Disconnect" android:title="Disconnect"></item>
-    
-</menu>

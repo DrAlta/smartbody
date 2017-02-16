@@ -1,9 +1,0 @@
-!SESSION 2011-08-16 14:08:38.029 -----------------------------------------------
-eclipse.buildId=I20110613-1736
-java.version=1.6.0_26
-java.vendor=Sun Microsystems Inc.
-BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=en_US
-Command-line arguments:  -os win32 -ws win32 -arch x86 -data C:\SmartBodyAndroid\android\sbm
-
-!ENTRY org.eclipse.ui 4 4 2011-08-16 14:09:14.265
-!MESSAGE Invalid preference page path: XML Syntax
