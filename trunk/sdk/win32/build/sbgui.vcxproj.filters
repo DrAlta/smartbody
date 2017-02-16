@@ -67,6 +67,9 @@
     <Filter Include="posecreator">
       <UniqueIdentifier>{08ccd5b8-9776-44f4-9c6e-6bb4581308f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sbrender">
+      <UniqueIdentifier>{627bbbdd-fcfb-4146-a21f-9723863da0e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\sbgui\glfont2.cpp" />
@@ -297,6 +300,12 @@
     </ClCompile>
     <ClCompile Include="..\src\sbgui\posecreator\PoseCreator.cpp">
       <Filter>posecreator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\SBFrameBufferObject.cpp">
+      <Filter>sbrender</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sbgui\SBRenderer.cpp">
+      <Filter>sbrender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -535,6 +544,12 @@
     </ClInclude>
     <ClInclude Include="..\src\sbgui\posecreator\PoseCreator.h">
       <Filter>posecreator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\SBFrameBufferObject.h">
+      <Filter>sbrender</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sbgui\SBRenderer.h">
+      <Filter>sbrender</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
