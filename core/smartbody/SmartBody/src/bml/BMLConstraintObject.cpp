@@ -3,7 +3,7 @@
 
 BMLConstraintObject::BMLConstraintObject() : BMLObject()
 {
-	setName("constraint");
+	setName("sbm:constraint");
 
 	createStringAttribute("target", "", true, "Basic", 10, false, false, false, "target pawn/joint whose the positional or rotational values will be used as constraints");
 	createStringAttribute("sbm:handle", "", true, "Basic", 20, false, false, false, "Handle of this constraint instance, can be reused during later constraint commands.");
