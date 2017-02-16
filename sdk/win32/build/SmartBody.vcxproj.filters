@@ -55,9 +55,6 @@
     <ClCompile Include="..\src\SmartBody\bml\bml_processor.cpp">
       <Filter>bml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SmartBody\bml\bml_quickdraw.cpp">
-      <Filter>bml</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SmartBody\bml\bml_reach.cpp">
       <Filter>bml</Filter>
     </ClCompile>
@@ -145,9 +142,6 @@
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_tether.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SmartBody\controllers\me_ct_quick_draw.cpp">
-      <Filter>controllers</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_examples.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
@@ -155,9 +149,6 @@
       <Filter>controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_motion.cpp">
-      <Filter>controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\controllers\me_ct_adshr_envelope.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\src\SmartBody\controllers\me_ct_scheduler2.cpp">
@@ -381,18 +372,6 @@
     </ClCompile>
     <ClCompile Include="..\src\SmartBody\external\parser\ValHeap.cpp">
       <Filter>external\parser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\external\SOIL\image_DXT.c">
-      <Filter>external\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\external\SOIL\image_helper.c">
-      <Filter>external\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\external\SOIL\SOIL.c">
-      <Filter>external\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\SmartBody\external\SOIL\stb_image_aug.c">
-      <Filter>external\SOIL</Filter>
     </ClCompile>
     <ClCompile Include="..\src\SmartBody\external\perlin\perlin.cpp">
       <Filter>external\perlin</Filter>
@@ -1183,9 +1162,6 @@
     <ClCompile Include="..\src\SmartBody\controllers\RealTimeLipSyncController.cpp">
       <Filter>controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerAssimp.cpp">
-      <Filter>sb</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SmartBody\protocols\sbmesh.pb.cpp">
       <Filter>protocols</Filter>
     </ClCompile>
@@ -1249,6 +1225,12 @@
     <ClCompile Include="..\src\SmartBody\bml\BMLStateObject.cpp">
       <Filter>bml</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\SmartBody\sb\SBAssetHandlerHDR.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SmartBody\external\stb\stb_vorbis.c">
+      <Filter>external\stb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\SmartBody\bml\bml_noise.hpp">
@@ -1306,9 +1288,6 @@
       <Filter>bml</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\bml\bml_processor.hpp">
-      <Filter>bml</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\bml\bml_quickdraw.hpp">
       <Filter>bml</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\bml\bml_reach.hpp">
@@ -1413,9 +1392,6 @@
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_tether.h">
       <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SmartBody\controllers\me_ct_quick_draw.h">
-      <Filter>controllers</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_examples.h">
       <Filter>controllers</Filter>
     </ClInclude>
@@ -1423,9 +1399,6 @@
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_motion.h">
-      <Filter>controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\controllers\me_ct_adshr_envelope.hpp">
       <Filter>controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\controllers\me_ct_scheduler2.h">
@@ -1649,24 +1622,6 @@
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\external\parser\Wrd.h">
       <Filter>external\parser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\image_DXT.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\image_helper.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\SOIL.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stb_image_aug.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug.h">
-      <Filter>external\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SmartBody\external\SOIL\stbi_DDS_aug_c.h">
-      <Filter>external\SOIL</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SmartBody\external\perlin\perlin.h">
       <Filter>external\perlin</Filter>
@@ -2430,11 +2385,68 @@
     <ClInclude Include="..\src\SmartBody\controllers\RealTimeLipSyncController.h">
       <Filter>controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerAssimp.h">
-      <Filter>sb</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\SmartBody\sb\SBRealtimeManager.h">
       <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\sb\SBAssetHandlerHDR.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_c_lexer.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_connected_components.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_divide.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_dxt.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_easy_font.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_herringbone_wang_tile.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_image.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_image_resize.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_image_write.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_leakcheck.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_perlin.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_rect_pack.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_sprintf.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_textedit.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_tilemap_editor.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_truetype.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stb_voxel_render.h">
+      <Filter>external\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SmartBody\external\stb\stretchy_buffer.h">
+      <Filter>external\stb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2449,9 +2461,6 @@
     </Filter>
     <Filter Include="external\parser">
       <UniqueIdentifier>{5388eaa8-48cf-4d44-9bfd-c184e7ef92a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="external\SOIL">
-      <UniqueIdentifier>{c388505e-7ead-4350-8f86-36db47250b51}</UniqueIdentifier>
     </Filter>
     <Filter Include="external\perlin">
       <UniqueIdentifier>{9bca3bbf-9aee-429e-8ef1-be7c2a0a0f1d}</UniqueIdentifier>
@@ -2491,6 +2500,9 @@
     </Filter>
     <Filter Include="external\jpge">
       <UniqueIdentifier>{83687d68-fb0a-461f-aa83-8007f08088e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\stb">
+      <UniqueIdentifier>{d26cda78-ca47-49f1-be3d-1d0eeed8bcca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
