@@ -42,8 +42,17 @@ SBGestureMap::SBGestureMap() : SBObject()
 	defaultGestureInfo._style = "";
 	defaultGestureInfo._posture = "";
 
-	srand((unsigned int)time(0));
-	//srand(clock());
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string seedStr = scene.getStringAttribute("randomseed");
+	if (seedStr == "")
+	{
+		srand((unsigned int)time(0));
+	}
+	else
+	{
+		unsigned int seed = atoi(seedStr.c_str());
+		srand(seed);
+	}
 }
 
 SBGestureMap::SBGestureMap(const std::string& name)

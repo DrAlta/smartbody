@@ -61,7 +61,17 @@ MeCtSaccade::MeCtSaccade(SbmCharacter* c) : SmartBody::SBController()
 	_intercept = 0.025f;				// unit: sec
 	_slope = 0.0024f;					// unit: sec/degree
 
-	srand((unsigned int)time(0));	
+	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+	std::string seedStr = scene.getStringAttribute("randomseed");
+	if (seedStr == "")
+	{
+		srand((unsigned int)time(0));
+	}
+	else
+	{
+		unsigned int seed = atoi(seedStr.c_str());
+		srand(seed);
+	}
 }
 
 MeCtSaccade::~MeCtSaccade()
