@@ -168,7 +168,18 @@ float MeCtMath::Random( float r_min, float r_max )
 	static bool initRand = false;
 	if (!initRand)
 	{
-		srand(int(time(NULL)));
+		SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
+		std::string seedStr = scene.getStringAttribute("randomseed");
+		if (seedStr == "")
+		{
+			srand((unsigned int)time(0));
+		}
+		else
+		{
+			unsigned int seed = atoi(seedStr.c_str());
+			srand(seed);
+		}
+		
 		initRand = true;
 	}
 	float frand = (float)rand()/(float)RAND_MAX; 
