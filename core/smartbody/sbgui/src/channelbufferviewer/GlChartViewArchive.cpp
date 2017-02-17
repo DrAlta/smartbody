@@ -21,6 +21,7 @@
  */
 
 #include "GlChartViewArchive.hpp"
+#include "sb/SBScene.h"
 #include <string.h>
 #include <sr/sr_euler.h>
 #include <vhcl_math.h>
@@ -151,7 +152,7 @@ void GlChartViewSeries::SetColorOnBufferIndex()
 void GlChartViewSeries::SetColorOnBufferIndex(int index)
 {
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
-	std::string seedStr = scene.getStringAttribute("randomseed");
+	std::string seedStr = scene->getStringAttribute("randomseed");
 	if (seedStr == "")
 	{
 		srand((unsigned int)time(0));
