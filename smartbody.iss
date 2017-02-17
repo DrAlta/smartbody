@@ -11,7 +11,7 @@ SolidCompression=yes
 OutputDir=.
 AppPublisher=USC Institute for Creative Technologies
 AppPublisherURL=http://smartbody.ict.usc.edu
-AppVersion=r6630
+AppVersion=r6676
 OutputBaseFilename=SmartBody
 WizardImageFile=".\sdk\SmartBody_splash.bmp"
 RestartIfNeededByRun=yes
@@ -74,8 +74,8 @@ Source: ".\core\smartbody\SmartBody\src\external\protobuf\include\*"; DestDir: "
 Source: ".\lib\vhcl\include\*"; DestDir: "{app}\include\vhcl"
 Source: ".\lib\vhmsg\vhmsg-c\include\*"; DestDir: "{app}\include\vhmsg"
 Source: ".\lib\bonebus\include\*"; DestDir: "{app}\include\bonebus"
-Source: ".\lib\assimp-3.1.1\include\assimp\*"; DestDir: "{app}\include\assimp-3.1.1\assimp"; Excludes: ".svn"; Flags: recursesubdirs
-Source: ".\core\smartbody\sbgui\external\fltk-1.3.3\FL\*"; DestDir: "{app}\include\FL"
+;Source: ".\lib\assimp-3.1.1\include\assimp\*"; DestDir: "{app}\include\assimp-3.1.1\assimp"; Excludes: ".svn"; Flags: recursesubdirs
+Source: ".\core\smartbody\sbgui\external\fltk-1.3.4-1\FL\*"; DestDir: "{app}\include\FL"
 Source: ".\core\smartbody\sbgui\external\cegui-0.8.7\include\*"; DestDir: "{app}\include\CEGUI";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\core\smartbody\sbgui\external\Pinocchio\*.h"; DestDir: "{app}\include\Pinocchio";
 Source: ".\core\smartbody\sbgui\external\polyvox\library\PolyVoxCore\include\*"; DestDir: "{app}\include\polyvox";   Excludes: ".svn"; Flags: recursesubdirs
@@ -115,7 +115,7 @@ Source: ".\core\smartbody\simplesmartbody\simplesmartbody.vcxproj"; DestDir: "{a
 Source: ".\core\smartbody\SmartBody\lib\*.lib"; DestDir: "{app}\lib"
 ;Source: ".\core\smartbody\SmartBody\lib\*.pdb"; DestDir: "{app}\lib"
 
-Source: ".\core\smartbody\sbgui\external\fltk-1.3.3\lib\*.pdb"; DestDir: "{app}\lib"
+Source: ".\core\smartbody\sbgui\external\fltk-1.3.4-1\lib\*.pdb"; DestDir: "{app}\lib"
 
 Source: ".\core\smartbody\SmartBody\src\external\glew\glew32.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\SmartBody\src\external\protobuf\lib\Release\*.lib"; DestDir: "{app}\lib"
@@ -137,12 +137,12 @@ Source: ".\core\smartbody\ode\lib\ode*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\steersuite-1.3\build\win32\Release\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\steersuite-1.3\build\win32\Debug\*.lib"; DestDir: "{app}\lib"
 Source: ".\lib\pthreads\lib\pthreadVSE2.lib"; DestDir: "{app}\lib"
-Source: ".\core\smartbody\sbgui\external\fltk-1.3.3\lib\*.lib"; DestDir: "{app}\lib"
+Source: ".\core\smartbody\sbgui\external\fltk-1.3.4-1\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\sbgui\external\cegui-0.8.7\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\sbgui\external\Pinocchio\lib\*.lib"; DestDir: "{app}\lib"
 Source: ".\core\smartbody\sbgui\external\polyvox\build\lib\*.lib"; DestDir: "{app}\lib"
-Source: ".\lib\assimp-3.1.1\Release\assimp.lib"; DestDir: "{app}\lib"
-Source: ".\lib\assimp-3.1.1\Debug\assimpd.lib"; DestDir: "{app}\lib"
+;Source: ".\lib\assimp-3.1.1\Release\assimp.lib"; DestDir: "{app}\lib"
+;Source: ".\lib\assimp-3.1.1\Debug\assimpd.lib"; DestDir: "{app}\lib"
 
 
 
@@ -175,6 +175,7 @@ Source: ".\data\scripts\*"; DestDir: "{app}\data\scripts";  Excludes: ".svn"; Fl
 Source: ".\data\Hand\*"; DestDir: "{app}\data\Hand"; Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\data\cegui\datafiles\*"; DestDir: "{app}\data\cegui\datafiles";  Excludes: ".svn"; Flags: recursesubdirs
 Source: ".\data\perceptionneuron\*"; DestDir: "{app}\data\perceptionneuron"; Excludes: ".svn, *.bvh";Flags: recursesubdirs
+Source: ".\data\shaders\*"; DestDir: "{app}\data\shaders"; Excludes: ".svn"; Flags: recursesubdirs
 
 Source: "e:\smartbody\externalprograms\vs2015\vc_redist.x86.exe"; DestDir: "{app}"
 
