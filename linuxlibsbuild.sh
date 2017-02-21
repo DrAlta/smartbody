@@ -5,7 +5,8 @@ mkdir -p dependencies
 cd dependencies
 
 echo "Building boost numeric bindings..."
-tar -xvzf boost-numeric-bindings-20081116.tar.gz
+gunzip boost-numeric-bindings-20081116.tar.gz
+tar -xvf boost-numeric-bindings-20081116.tar
 cd boost-numeric-bindings
 mkdir -p ${MAINDIR}/include/boost
 mkdir -p ${MAINDIR}/include/boost/numeric

@@ -2423,7 +2423,7 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 		{
 			boost::filesystem::path texturePath(paths[0]);
 			boost::filesystem::path textureSource(imageFile);
-			texturePath.append(textureSource.string());
+			texturePath /= textureSource.string();
 			finalTexturePath = boost::filesystem::complete(texturePath).string();
 			in.init(fopen(finalTexturePath.c_str(), "r"));
 			if (in.valid())
@@ -2435,7 +2435,8 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 
 			boost::filesystem::path texturePath2(paths[0]);
 			boost::filesystem::path textureFilename(textureSource.filename());
-			texturePath2.append(textureFilename.string());
+			texturePath2 /= textureFilename.string();
+
 			finalTexturePath = boost::filesystem::complete(texturePath2).string();
 
 			in.init(fopen(finalTexturePath.c_str(), "r"));

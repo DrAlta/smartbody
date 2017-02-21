@@ -24,7 +24,7 @@ set( SB_NO_ASSIMP TRUE)
 
 #add_definitions(	-D__linux__	-fPIC -m32 -Ignore -fpermissive -g3 )
 #add_definitions(	-g3 -fPIC )
-add_definitions(	-O3 -fPIC )
+add_definitions(	-O3 -fPIC -fpermissive )
 #add_definitions(	-v -W -Wall -Wextra -pedantic )
 
 set ( ACTIVEMQ_VERSION activemq-cpp-3.9.0)
@@ -51,20 +51,12 @@ set (BONEBUS_INCLUDE
 	)
 endif()
 
-if (${SB_NO_ASSIMP})
-add_definitions(-DSB_NO_ASSIMP)
-endif()
-
 if (${SB_NO_PYTHON})
 add_definitions(-DSB_NO_PYTHON)
 endif()
 
 if (${SB_NO_ODE_PHYSICS})
 add_definitions(-DSB_NO_ODE_PHYSICS)
-endif()
-
-if (${SB_NO_ASSIMP})
-add_definitions(-DSB_NO_ASSIMP)
 endif()
 
 include_directories(

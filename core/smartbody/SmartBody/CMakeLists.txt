@@ -270,15 +270,6 @@ set( SMARTBODY_LIB_EXT_RECAST_SRC
         ./src/external/recast/DetourNode.cpp
 )
 
-set( SMARTBODY_LIB_EXT_SOIL_SRC
-
-        ./src/external/SOIL/image_DXT.c
-        ./src/external/SOIL/image_helper.c
-        ./src/external/SOIL/SOIL.c
-        ./src/external/SOIL/stb_image_aug.c
-		./src/external/SOIL/stbi_DDS_aug_c.h
-)
-
 set( SMARTBODY_LIB_EXT_PERLIN_SRC
 
         ./src/external/perlin/perlin.cpp
@@ -624,6 +615,7 @@ set( SMARTBODY_LIB_SBM_SRC
         ./src/sb/SBPythonClass.cpp
 		
         ./src/sb/SBAssetHandler.cpp
+        ./src/sb/SBAssetHandlerHDR.cpp
         ./src/sb/SBAssetHandlerCOLLADA.cpp
         ./src/sb/SBAssetHandlerSk.cpp
         ./src/sb/SBAssetHandlerSkm.cpp
