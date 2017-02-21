@@ -63,10 +63,11 @@ bool SBFrameBufferObject::setDrawBuffer(std::vector<GLenum>& drawBuffers)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
 	glDrawBuffers(drawBuffers.size(),(GLenum*)&drawBuffers[0]);
 
-	GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	GLenum frameStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	if (Status != GL_FRAMEBUFFER_COMPLETE) {
-		LOG("SBFrameBufferObject error, name = %s, status: 0x%x\n", fboName.c_str(), Status);		
+	if (frameStatus != GL_FRAMEBUFFER_COMPLETE)
+	{
+		LOG("SBFrameBufferObject error, name = %s, status: 0x%x\n", fboName.c_str(), frameStatus);		
 		return false;
 	}		
 	//LOG("SBFrameBufferObject::set Draw buffer successfully.");

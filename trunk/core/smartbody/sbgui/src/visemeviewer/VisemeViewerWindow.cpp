@@ -933,8 +933,10 @@ void VisemeViewerWindow::OnXMLFileSelectCB(Fl_Widget* widget, void* data)
 		if (audioPaths.size() > 0)
 		{
 			boost::filesystem::path path(audioPaths[0]);
-			std::string xmlFile = xmlFileName;
-			path.append(xmlFile + ".xml");
+			std::stringstream strstr;
+			strstr << xmlFileName <<  ".xml";
+			std::string xmlPath = strstr.str();
+			path /= xmlPath;
 			LOG("Playing XML file %s", path.string().c_str());
 			SmartBody::SBScene::getScene()->getBmlProcessor()->execXMLFile(character->getName(), path.string());
 		}

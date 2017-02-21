@@ -2,6 +2,7 @@
 #include "SbmShader.h"
 #include <sr/sr_vec.h>
 #include <sr/sr_vec2.h>
+#include <string.h>
 
 
 enum

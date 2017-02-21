@@ -255,10 +255,14 @@ set( SBM_FLTK_SRC
 	./src/jointmapviewer/JointMapViewer.cpp
 	./src/jointmapviewer/RetargetStepWindow.cpp
 
+	./src/posecreator/PoseCreator.cpp
+
 	./src/faceviewer/FaceViewer.cpp
 	./src/faceshiftviewer/FaceShiftViewer.cpp
 	./src/FLTKListener.cpp
 	./src/SBGUIManager.cpp
+	./src/SBRenderer.cpp
+	./src/SBFrameBufferObject.cpp
 	
 	./src/flu/Flu_Button.cpp
 	./src/flu/Flu_Collapsable_Group.cpp

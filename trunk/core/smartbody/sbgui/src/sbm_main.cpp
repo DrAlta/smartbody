@@ -739,7 +739,7 @@ int main( int argc, char **argv )	{
 		LOG("Did not find .smartbodysettings in current directory, checking binary location.");
 		
 		boost::filesystem::path settingsPath = parentPath;
-		settingsPath.append(".smartbodysettings");
+		settingsPath /= ".smartbodysettings";
 		settingsFile.close();
 		settingsFile.open(boost::filesystem::complete(settingsPath).string());
 		if (!settingsFile.good())
@@ -785,7 +785,7 @@ int main( int argc, char **argv )	{
 						if (useBinaryPath)
 						{
 							boost::filesystem::path pythonFolderPath = parentPath;
-							pythonFolderPath.append(python_lib_path);
+							pythonFolderPath /= python_lib_path;
 							std::string absPath = boost::filesystem::canonical(pythonFolderPath).string();
 #ifdef WIN32
 							absPath = vhcl::Replace(absPath, "\\", "/");
@@ -811,7 +811,7 @@ int main( int argc, char **argv )	{
 						if (useBinaryPath)
 						{
 							boost::filesystem::path ogreFolderPath = parentPath;
-							ogreFolderPath.append(tokens[t + 1]);
+							ogreFolderPath /= tokens[t + 1];
 							std::string absPath = boost::filesystem::canonical(ogreFolderPath).string();
 #ifdef WIN32
 							absPath = vhcl::Replace(absPath, "\\", "/");
@@ -837,7 +837,7 @@ int main( int argc, char **argv )	{
 						if (useBinaryPath)
 						{
 							boost::filesystem::path mediaFolderPath = parentPath;
-							mediaFolderPath.append(mediaPath);
+							mediaFolderPath /= mediaPath;
 							std::string absPath = boost::filesystem::canonical(mediaFolderPath).string();
 #ifdef WIN32
 							absPath = vhcl::Replace(absPath, "\\", "/");

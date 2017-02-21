@@ -257,95 +257,94 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 			if (behav_syncs.sync_stroke()->sync())
 			{
 				behav_syncs.sync_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_ready()->set_time(TIME_UNSET);
-				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_ready()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_end()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_relax()->set_time(TIME_UNSET);
-				behav_syncs.sync_relax()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_end()->sync()->parent = NULL;
+				behav_syncs.sync_end()->sync()->parent = SyncPointPtr();
 			}
 			else if (behav_syncs.sync_start()->sync())
 			{
 				behav_syncs.sync_ready()->set_time(TIME_UNSET);
-				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_ready()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_end()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_relax()->set_time(TIME_UNSET);
-				behav_syncs.sync_relax()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_end()->sync()->parent = NULL;
+				behav_syncs.sync_end()->sync()->parent = SyncPointPtr();
 			}
 			else if (behav_syncs.sync_ready()->sync())
 			{
 				behav_syncs.sync_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_end()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_relax()->set_time(TIME_UNSET);
-				behav_syncs.sync_relax()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_end()->sync()->parent = NULL;
+				behav_syncs.sync_end()->sync()->parent = SyncPointPtr();
 			}
 			else if (behav_syncs.sync_relax()->sync())
 			{
 				behav_syncs.sync_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_ready()->set_time(TIME_UNSET);
-				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_ready()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
 				behav_syncs.sync_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_end()->sync()->parent = NULL;
+				behav_syncs.sync_end()->sync()->parent = SyncPointPtr();
 			}
 			else if (behav_syncs.sync_stroke_start()->sync())
 			{
 				behav_syncs.sync_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_ready()->set_time(TIME_UNSET);
-				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_ready()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_end()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_relax()->set_time(TIME_UNSET);
-				behav_syncs.sync_relax()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_end()->sync()->parent = NULL;
+				behav_syncs.sync_end()->sync()->parent = SyncPointPtr();
 			}
 			else if (behav_syncs.sync_stroke_end()->sync())
 			{
 				behav_syncs.sync_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_ready()->set_time(TIME_UNSET);
-				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_ready()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_relax()->set_time(TIME_UNSET);
-				behav_syncs.sync_relax()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_end()->sync()->parent = NULL;
+				behav_syncs.sync_end()->sync()->parent = SyncPointPtr();
 			}
 			else if (behav_syncs.sync_end()->sync())
 			{
 				behav_syncs.sync_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_start()->sync()->parent = NULL;
+				behav_syncs.sync_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_ready()->set_time(TIME_UNSET);
-				behav_syncs.sync_ready()->sync()->parent = NULL;
+				behav_syncs.sync_ready()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_start()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_start()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_start()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_stroke_end()->set_time(TIME_UNSET);
-				behav_syncs.sync_stroke_end()->sync()->parent = NULL;
+				behav_syncs.sync_stroke_end()->sync()->parent = SyncPointPtr();
 				behav_syncs.sync_relax()->set_time(TIME_UNSET);
-				behav_syncs.sync_relax()->sync()->parent = NULL;
+				behav_syncs.sync_relax()->sync()->parent = SyncPointPtr();
 			}
 			//behav_syncs.printSyncTimes();
 			BehaviorRequestPtr behavPtr(new MotionRequest(unique_id, localId, motionCt, request->actor->motion_sched_p, behav_syncs));
