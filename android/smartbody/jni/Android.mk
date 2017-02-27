@@ -1,30 +1,6 @@
-# log4cxx
-#
-#  Files not yet added to the build :
-#  1. these files depend on the GL/GLU/GLEW. Need to figure out a way to build them with OpenGL ES
-#	$(SB_MY_DIR)/sr/sr_gl.cpp \
-#	$(SB_MY_DIR)/sr/sr_gl_render_funcs.cpp \
-#   
-#   $(SB_MY_DIR)/sr/sr_sa_gl_render.cpp \
-#	$(SB_MY_DIR)/sbm/GPU/SbmTexture.cpp \
-#	$(SB_MY_DIR)/sbm/GPU/SbmDeformableMeshGPU.cpp \
-#	$(SB_MY_DIR)/sbm/GPU/TBOData.cpp \
-#	$(SB_MY_DIR)/sbm/GPU/VBOData.cpp \
-#	$(SB_MY_DIR)/sbm/GPU/SbmShader.cpp 
-#  2. Unused or to be removed soon
-#   $(SB_MY_DIR)/sbm/me_ct_reach.cpp \
-#   $(SB_MY_DIR)/sbm/bml_reach.cpp \
-#   $(SB_MY_DIR)/sbm/VisemeMap.cpp \
-# $(SB_LOCAL_PATH)/$(SB_LIB_PATH)/festival/speech_tools/include/ \
-# $(SB_LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/include \
-# $(SB_LOCAL_PATH)/$(SB_LIB_PATH)/festival/festival/src/modules/VHDuration \
-# $(SB_LOCAL_PATH)/../../include/speech_tools/include \
-# $(SB_LOCAL_PATH)/../../include/festival/include \
-# $(SB_LOCAL_PATH)/../../include/festival/include/VHDuration \
-
 LOCAL_SHORT_COMMANDS := true
 
-USE_CEREVOICE:=true
+USE_CEREVOICE:=false
 
 
 SB_LOCAL_PATH := $(call my-dir)
@@ -38,7 +14,7 @@ CEREVOICE_LIB_DIR := ../../cerevoice_lib
 LIB_DIR := ../../../lib
 
 
-ifeq ($(USE_CEREVOICE),true)
+ifeq ($(USE_CEREVOICE),false)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := cerevoice-eng
@@ -73,34 +49,33 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := boost-filesystem-prebuilt
-#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_filesystem.a
-#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_filesystem-gcc-mt-1_53.a
 LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_filesystem-gcc-mt-1_59.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := boost-system-prebuilt
-#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_system.a
 LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_system-gcc-mt-1_59.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := boost-regex-prebuilt
-#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_regex.a
 LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_regex-gcc-mt-1_59.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := python-prebuilt
-#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.6.a
 LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.7.a
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
+LOCAL_MODULE := python-prebuilt-share
+LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.7.so
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
 LOCAL_MODULE := boost-python-prebuilt
-#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libboost_python.a
 LOCAL_SRC_FILES := $(BOOST_LIB_DIR)/libboost_python-gcc-mt-1_59.a
-LOCAL_STATIC_LIBRARIES := python-prebuilt	
+LOCAL_SHARED_LIBRARIES := python-prebuilt-share	
 include $(PREBUILT_STATIC_LIBRARY)
 
 
@@ -126,12 +101,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := iconv-prebuilt
 LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libiconv.a
 include $(PREBUILT_STATIC_LIBRARY)
-
-#include $(CLEAR_VARS)
-#LOCAL_MODULE := python-prebuilt
-#LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libpython2.6.so
-#include $(PREBUILT_SHARED_LIBRARY)
-
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := estbase-prebuilt
@@ -179,28 +148,7 @@ LOCAL_MODULE := proto-prebuilt
 LOCAL_SRC_FILES := $(ANDROID_LIB_DIR)/libprotobuf.a
 include $(PREBUILT_STATIC_LIBRARY)
 
-
 include $(CLEAR_VARS)	
-LOCAL_MODULE := gl-wes
-LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions 
-LOCAL_C_INCLUDES := $(ANDROID_DIR)/gl-wes-v2/src \
-
-LOCAL_SRC_FILES :=  $(ANDROID_DIR)/gl-wes-v2/src/wes.cpp \
-					$(ANDROID_DIR)/gl-wes-v2/src/wes_begin.cpp \
-					$(ANDROID_DIR)/gl-wes-v2/src/wes_fragment.cpp \
-					$(ANDROID_DIR)/gl-wes-v2/src/wes_matrix.cpp \
-					$(ANDROID_DIR)/gl-wes-v2/src/wes_shader.cpp \
-					$(ANDROID_DIR)/gl-wes-v2/src/wes_state.cpp \
-					$(ANDROID_DIR)/gl-wes-v2/src/wes_texture.cpp \	
-					
-LOCAL_LDLIBS    := -lGLESv2
-include $(BUILD_STATIC_LIBRARY)
-
-
-include $(CLEAR_VARS)	
-
-
-
 include $(CLEAR_VARS)
 LOCAL_MODULE := ann
 LOCAL_CFLAGS    := -DBUILD_ANDROID -frtti -fexceptions 
@@ -287,7 +235,6 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/external/parser/Bchart.cpp \
 	$(SB_MY_DIR)/external/rply/rply.c \
 	
 include $(BUILD_STATIC_LIBRARY)	
-#include $(BUILD_SHARED_LIBRARY)
 
 include $(SB_LOCAL_PATH)/../../ode/jni/Android.mk
 include $(SB_LOCAL_PATH)/../../vhmsg/jni/Android.mk
@@ -298,8 +245,6 @@ SB_LIB_PATH := ../../../lib
 LOCAL_PATH := $(SB_LOCAL_PATH)
 include $(CLEAR_VARS)
 LOCAL_MODULE := smartbody
-#LOCAL_CFLAGS    :=  -gstabs -g -DBUILD_ANDROID -frtti 
-#$(SB_LOCAL_PATH)/../../cerevoice/cerevoice_eng/include \
 LOCAL_CFLAGS    := -O3 -DBUILD_ANDROID -frtti -fexceptions -g -DASSIMP_BUILD_NO_OWN_ZLIB
 LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(SB_MY_DIR) \
 					$(SB_LOCAL_PATH)/../../pythonLib_27/include/python2.7 \
@@ -320,9 +265,6 @@ LOCAL_C_INCLUDES := $(SB_LOCAL_PATH)/$(SB_MY_DIR) \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/steersuite-1.3/pprAI/include \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/sbm-debugger/lib \
 					$(SB_LOCAL_PATH)/../../../core/smartbody/ode/include \
-					$(SB_LOCAL_PATH)/$(LIB_DIR)/assimp-3.1.1/include \
-					#$(SB_LOCAL_PATH)/$(SB_LIB_PATH)/boost \
-					#$(LOCAL_PATH)/$(ANDROID_DIR)/gl-wes-v2/src \
 					
 					
 LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
@@ -430,7 +372,6 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/bml/bml_interrupt.cpp \
 	$(SB_MY_DIR)/bml/bml_locomotion.cpp \
 	$(SB_MY_DIR)/bml/bml_processor.cpp \
-	$(SB_MY_DIR)/bml/bml_quickdraw.cpp \
 	$(SB_MY_DIR)/bml/bml_speech.cpp \
 	$(SB_MY_DIR)/bml/bml_sync_point.cpp \
 	$(SB_MY_DIR)/bml/bml_target.cpp \
@@ -632,6 +573,7 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
     $(SB_MY_DIR)/sb/SBAssetHandlerObj.cpp \
     $(SB_MY_DIR)/sb/SBAssetHandlerBvh.cpp \
 	$(SB_MY_DIR)/sb/SBAssetHandlerPly.cpp \
+	$(SB_MY_DIR)/sb/SBAssetHandlerHdr.cpp \
     $(SB_MY_DIR)/sb/SBAssetHandlerSBMeshBinary.cpp \
     $(SB_MY_DIR)/sb/SBAssetHandlerSkmb.cpp \
 	$(SB_MY_DIR)/sb/SBMotionGraph.cpp \
@@ -644,17 +586,14 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/protocols/sbmotion.pb.cpp \
 	$(SB_MY_DIR)/protocols/sbutilities.pb.cpp
 
-
-#LOCAL_LDLIBS    := -llog -lEGL -lGLESv1_CM
-#LOCAL_LDLIBS    := -llog -gstabs
 LOCAL_LDLIBS    := -landroid -llog -lGLESv3
-#LOCAL_LDLIBS    := -landroid -llog 
-LOCAL_STATIC_LIBRARIES := ann gl-wes xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ode  openal alut tremolo sndfile python-prebuilt proto-prebuilt $(CEREVOICE_LIBS)
-#festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt
-#LOCAL_STATIC_LIBRARIES := xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ann ode festival-prebuilt estools-prebuilt estbase-prebuilt eststring-prebuilt openal alut tremolo sndfile cerevoice-eng cerevoice-pmod cerehts cerevoice python-prebuilt
-#LOCAL_SHARED_LIBRARIES := python-prebuilt 
+
+#LOCAL_STATIC_LIBRARIES := ann gl-wes xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ode  openal alut tremolo sndfile python-prebuilt proto-prebuilt $(CEREVOICE_LIBS)
+LOCAL_STATIC_LIBRARIES := ann xerces-prebuilt boost-filesystem-prebuilt boost-system-prebuilt boost-regex-prebuilt boost-python-prebuilt lapack blas f2c vhcl vhmsg bonebus iconv-prebuilt pprAI steerlib ode  openal alut tremolo sndfile proto-prebuilt $(CEREVOICE_LIBS)
+LOCAL_SHARED_LIBRARIES := python-prebuilt-share 
 include $(BUILD_STATIC_LIBRARY)
 #include $(BUILD_SHARED_LIBRARY)
+
 
 
 
