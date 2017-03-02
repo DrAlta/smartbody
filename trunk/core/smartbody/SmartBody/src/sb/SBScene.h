@@ -21,7 +21,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef SBSCENE_H
 #define SBSCENE_H
 
-#include <vhcl.h>
 #include <sb/SBTypes.h>
 #include <sb/SBObject.h>
 #include <sb/SBScript.h>
