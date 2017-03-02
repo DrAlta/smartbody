@@ -21,6 +21,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include "SBScene.h"
+#include <vhcl.h>
 #ifdef WIN32
 #include <direct.h>
 #endif

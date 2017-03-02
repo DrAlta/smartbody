@@ -28,6 +28,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBPhysicsSim.h>
 #include <sb/SBUtilities.h>
 #include <sbm/ODEPhysicsSim.h>
+#include <vhcl.h>
 
 #ifdef __ANDROID__
 #define USE_PHYSICS_CHARACTER 0

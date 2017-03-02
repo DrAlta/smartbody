@@ -1,7 +1,6 @@
 #ifndef _SBLISTENER_H
 #define _SBLISTENER_H
 
-#include "vhcl.h"
 #include <string>
 
 class OgreRenderer;

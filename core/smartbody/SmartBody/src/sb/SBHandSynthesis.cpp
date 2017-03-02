@@ -356,7 +356,7 @@ void SBHandSynthesis::synthesizeHands(SmartBody::SBMotion* bodyMotion, int maxLe
 	// check if database is present
 	if (_leftDb->getBodyDbSegments().size() == 0 && _rightDb->getBodyDbSegments().size() == 0 )
 	{
-		LOG ("No body database selected. unable to generate hand motion");
+		SmartBody::util::log ("No body database selected. unable to generate hand motion");
 		return;
 	}
 
@@ -366,7 +366,7 @@ void SBHandSynthesis::synthesizeHands(SmartBody::SBMotion* bodyMotion, int maxLe
 
 	// log here
 	if (_printDebug)
-		LOG (" Synthesizing hand motion in SBHandSynthesis " );
+		SmartBody::util::log(" Synthesizing hand motion in SBHandSynthesis " );
 
 	// set max levels
 	_maxLevels = maxLevels;
@@ -597,18 +597,18 @@ void SBHandSynthesis::findSimilarSegments()
 
 	if (_printDebug)
 	{
-		LOG ("Done comparing all segments" );
+		SmartBody::util::log("Done comparing all segments" );
 
 		// print out all the similar segments 
 		for (int i = 0 ; i < num_levels ; i++ )
 		{
 			CostList list = _selectDb->getSimilarSegments()[i];
 
-			LOG ( " Level no %d" , i );
+			SmartBody::util::log( " Level no %d" , i );
 
 			for (int j = 0 ; j < _k ; j++)
 			{
-				LOG ( " Value at index %d is %d with cost %f " , j , list[j].first , list[j].second );
+				SmartBody::util::log( " Value at index %d is %d with cost %f " , j , list[j].first , list[j].second );
 			}	
 		}
 
@@ -696,7 +696,7 @@ void SBHandSynthesis::buildGraphAlternate()
 
 	// printing stuff
 	if (_printDebug)
-		LOG (" \n Building the graph now \n");
+		SmartBody::util::log(" \n Building the graph now \n");
 
 
 	// create the edge array
@@ -788,9 +788,9 @@ void SBHandSynthesis::buildGraphAlternate()
 		graph_traits < graph_t >::vertex_iterator vi, vend;
 		for (boost::tie(vi, vend) = vertices(g); vi != vend; ++vi) {
 
-			LOG ( " distance(%d) = %d , parent(%d) = %d ", *vi, d[*vi], *vi, p[*vi]);
+			SmartBody::util::log( " distance(%d) = %d , parent(%d) = %d ", *vi, d[*vi], *vi, p[*vi]);
 	  	}
-	  	LOG (" ");
+		SmartBody::util::log(" ");
 	}
 
 	// getting the final motion strip
@@ -811,9 +811,9 @@ void SBHandSynthesis::buildGraphAlternate()
 
 		if (_printDebug)
 		{
-			LOG ("the curr node is %d" , currNode );
-			LOG ("the segment number is %d" , segNumber);
-			LOG ("The computed index is %d" , index);
+			SmartBody::util::log("the curr node is %d" , currNode );
+			SmartBody::util::log("the segment number is %d" , segNumber);
+			SmartBody::util::log("The computed index is %d" , index);
 		}
 
 		// set the new parent and level
@@ -829,10 +829,10 @@ void SBHandSynthesis::buildGraphAlternate()
 	// print the vector 
 	if (_printDebug)
 	{
-	  LOG ("myvector contains:");
+		SmartBody::util::log("myvector contains:");
 	  for (std::vector<int>::iterator it=_selectDb->getMotionIndices().begin(); it!=_selectDb->getMotionIndices().end(); ++it)
 		SmartBody::util::log( " %d " , *it);
-	  LOG ("");
+	  SmartBody::util::log("");
 	}
 
 	// outputting the graph in a dot file
@@ -902,7 +902,7 @@ void SBHandSynthesis::buildGraph()
 
 	// printing stuff
 	if (_printDebug)
-		LOG (" \n Building the graph now \n");
+		SmartBody::util::log(" \n Building the graph now \n");
 
 	// create a graph 
 	Graph g;
@@ -936,7 +936,7 @@ void SBHandSynthesis::buildGraph()
 		CostList list_b = _selectDb->getSimilarSegments()[i+1];
 
 		if (_printDebug)
-			LOG ("Starting new level with index %d " , i );
+			SmartBody::util::log("Starting new level with index %d " , i );
 
 		// go through each level and create a graph
 		for (int x = 0 ; x < _k ; x++)
@@ -955,7 +955,7 @@ void SBHandSynthesis::buildGraph()
 
 				// output the cost here
 				if (_printDebug)
-					LOG ("x is %d, y is %d , i is %d, c_s is %f, c_t is %f, and total cost from node %d to %d is %f", x , y, i , c_s, c_t ,  i*_k + x + 1, (i+1)*_k + y + 1 , w_s * c_s + w_t * c_t);
+					SmartBody::util::log("x is %d, y is %d , i is %d, c_s is %f, c_t is %f, and total cost from node %d to %d is %f", x , y, i , c_s, c_t ,  i*_k + x + 1, (i+1)*_k + y + 1 , w_s * c_s + w_t * c_t);
 			}
 		}
 
@@ -1012,7 +1012,7 @@ void SBHandSynthesis::buildGraph()
 	{
 		BGL_FORALL_VERTICES(v, g, Graph)
 		{
-			LOG ("distance(%d,%d) = %f , predecessor(%d) = %d )" , indexMap[START], indexMap[v], distanceMap[v], indexMap[v], indexMap[predecessorMap[v]]);
+			SmartBody::util::log("distance(%d,%d) = %f , predecessor(%d) = %d )" , indexMap[START], indexMap[v], distanceMap[v], indexMap[v], indexMap[predecessorMap[v]]);
 		}
 	}
 
@@ -1064,9 +1064,9 @@ void SBHandSynthesis::buildGraph()
 
 		if (_printDebug)
 		{	
-			LOG ("the current node is %d" , target_vertex_index);
+			SmartBody::util::log("the current node is %d" , target_vertex_index);
 			SmartBody::util::log( "the segment number is %d" , segNumber);
-			LOG ("The computed index is %d" , index );
+			SmartBody::util::log("The computed index is %d" , index );
 		}
 
 		currLevel++;
@@ -1384,7 +1384,7 @@ void SBHandSynthesis::printResults()
 								+ "/Hand/" + fileName + "_" + _selectDb->getJointName() + ".txt";
 
 	if (_printDebug)
-		LOG ("Saving to file path %s ", filePath.c_str());
+		SmartBody::util::log("Saving to file path %s ", filePath.c_str());
 
 	// open stream
 	std::ofstream myFile(filePath.c_str());

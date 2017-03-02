@@ -18,7 +18,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
 #include "CommandWindow.h"
 #include <vector>
 #include <iostream>
