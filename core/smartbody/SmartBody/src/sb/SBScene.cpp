@@ -884,15 +884,15 @@ void SBScene::notify( SBSubject* subject )
 		bool val = boolAttr->getValue();
 		if (val)
 		{
-			if (vhcl::Log::g_log.IsEnabled())
+			if (SmartBody::util::g_log.IsEnabled())
 				return;
 
-			vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
-			vhcl::Log::g_log.AddListener(listener);
+			SmartBody::util::StdoutListener* listener = new SmartBody::util::StdoutListener();
+			SmartBody::util::g_log.AddListener(listener);
 		}
 		else
 		{		
-			vhcl::Log::g_log.RemoveAllListeners();
+			SmartBody::util::g_log.RemoveAllListeners();
 		}
 	}
 	else if (boolAttr && boolAttr->getName() == "bmlstatus")

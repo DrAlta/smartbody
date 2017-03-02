@@ -62,7 +62,7 @@ SBPhonemeManager::SBPhonemeManager()
 	addPhonemeMapping("DH", "Th");
 	addPhonemeMapping("DX", "D");
 	addPhonemeMapping("EH", "Eh");
-	addPhonemeMapping("EL", "Eh");
+	//addPhonemeMapping("EL", "Eh");
 	addPhonemeMapping("EN", "Eh");
 	addPhonemeMapping("ER", "Er");
 	addPhonemeMapping("EY", "Eh");
@@ -85,7 +85,6 @@ SBPhonemeManager::SBPhonemeManager()
 	addPhonemeMapping("S", "Z");
 	addPhonemeMapping("T", "D");
 	addPhonemeMapping("SH", "Sh");
-	addPhonemeMapping("T", "D");
 	addPhonemeMapping("TH", "Th");
 	addPhonemeMapping("UH", "Eh");
 	addPhonemeMapping("UW", "W");
