@@ -132,7 +132,7 @@ SrVec SBInterfaceManager::convertScreenSpaceTo3D(int x, int y, SrVec ground, SrV
 	screenY *= -1.0;
 
 	SmartBody::SBScene::getScene()->getActiveCamera()->get_ray(screenX, screenY, p1, p2);
-	//LOG("mouse click = %d, %d,   p1 = %f %f %f, p2 = %f %f %f", x,y, p1[0], p1[1], p1[2],  p2[0], p2[1], p2[2]);
+	//SmartBody::util::log("mouse click = %d, %d,   p1 = %f %f %f, p2 = %f %f %f", x,y, p1[0], p1[1], p1[2],  p2[0], p2[1], p2[2]);
 	bool intersectGround = true;
 	SrVec dest, src;				
 	SrPlane plane(ground, upVector);

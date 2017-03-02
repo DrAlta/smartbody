@@ -42,6 +42,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBAssetManager.h>
 #include <sb/SBHandConfigurationManager.h>
 #include <sb/SBHandConfiguration.h>
+#include <sb/SBUtilities.h>
 
 #include <string>
 #include <iostream>
@@ -145,7 +146,7 @@ void SBHandSynthesis::addDatabaseMotion(SmartBody::SBMotion* dbMotion)
 	// check if motion exists or not 
 	if (dbMotion == NULL)
 	{
-		LOG("Unable to add motion (its NULL)");
+		SmartBody::util::log("Unable to add motion (its NULL)");
 		return;
 	}
 
@@ -199,7 +200,7 @@ bool SBHandSynthesis::loadDatabase()
 
 	// config name to be loaded
 	if (_printDebug)
-		LOG("Going to use hand configuration %s", _configName.c_str());
+		SmartBody::util::log("Going to use hand configuration %s", _configName.c_str());
 
 	// instead get the database from the configuration manager
 	SBHandConfiguration* config = SmartBody::SBScene::getScene()->getHandConfigurationManager()->getHandConfiguration(_configName);
@@ -266,8 +267,8 @@ void SBHandSynthesis::generateDatabaseSegments()
 		// print some stats here 
 		if (_printDebug)
 		{
-			LOG( "Processing body database named %s ", curBodyDbMotion->getName().c_str());
-			LOG( "Time of original body motion is %f ", curBodyDbMotion->duration() );
+			SmartBody::util::log( "Processing body database named %s ", curBodyDbMotion->getName().c_str());
+			SmartBody::util::log( "Time of original body motion is %f ", curBodyDbMotion->duration() );
 		}
 
 		// make segments
@@ -298,7 +299,7 @@ void SBHandSynthesis::generateDatabaseSegments()
 				added = true;
 
 				// creating a new segment
-				//LOG("Creating new segment of time %f", bodySegment->duration());
+				//SmartBody::util::log("Creating new segment of time %f", bodySegment->duration());
  			}
 		}
 	
@@ -321,7 +322,7 @@ void SBHandSynthesis::generateDatabaseSegments()
 			handSegment->setName(curHandDbMotion->getName()+"_hand_db_seg_"+_selectDb->getJointName()+"_"+ boost::lexical_cast<std::string>(_selectDb->getHandDbSegments().size()));			
 		
 			// log results
-			//LOG("No segment generated. Adding motion with time %f", bodySegment->duration());
+			//SmartBody::util::log("No segment generated. Adding motion with time %f", bodySegment->duration());
 		}
 
 		// disconnect motion from skeleton
@@ -329,8 +330,8 @@ void SBHandSynthesis::generateDatabaseSegments()
 	}
 
 	// finished processsing. output results	
-	//LOG( "Number of segments are %d" , _selectDb->getBodyDbSegments().size() );
-	//LOG( "Number of segments are %d" , _selectDb->getHandDbSegments().size() );
+	//SmartBody::util::log( "Number of segments are %d" , _selectDb->getBodyDbSegments().size() );
+	//SmartBody::util::log( "Number of segments are %d" , _selectDb->getHandDbSegments().size() );
 
 	// check if _k is more than the size
 	if (_k > _selectDb->getBodyDbSegments().size() )
@@ -393,25 +394,25 @@ void SBHandSynthesis::synthesizeHands(SmartBody::SBMotion* bodyMotion, int maxLe
 void SBHandSynthesis::synthesizeHandMotion()
 {
 	// print here
-	LOG("Generating motion segments ... ");
+	SmartBody::util::log("Generating motion segments ... ");
 
 	// generate motion segments
 	generateMotionSegments();
 
 	// print next
-	LOG("Finding similar segments ...");
+	SmartBody::util::log("Finding similar segments ...");
 
 	// find similar segments
 	findSimilarSegments();
 
 	// print graph
-	LOG("Building graph ...");
+	SmartBody::util::log("Building graph ...");
 
 	// build the graph and solve it
 	buildGraph();
 
 	// print final
-	LOG("Creating Final Motion ...");
+	SmartBody::util::log("Creating Final Motion ...");
 	
 	// create the final motion
 	createFinalMotion();
@@ -424,7 +425,7 @@ void SBHandSynthesis::synthesizeHandMotion()
 void SBHandSynthesis::synthesizeRandomHandMotion()
 {
 	// print first
-	LOG("Generating motion segments ... ");
+	SmartBody::util::log("Generating motion segments ... ");
 
 	// generate the motion segments
 	generateMotionSegments();
@@ -488,7 +489,7 @@ void SBHandSynthesis::generateMotionSegments()
 
 	// print out some stats
 	if (_printDebug)
-		LOG( "Body motion segments are %d" , _selectDb->getMotionSegments().size() );
+		SmartBody::util::log( "Body motion segments are %d" , _selectDb->getMotionSegments().size() );
 
 	// disconnect skeleton
 	_bodyMotion->disconnect();
@@ -611,7 +612,7 @@ void SBHandSynthesis::findSimilarSegments()
 			}	
 		}
 
-		LOG( " Done printing segments " );
+		SmartBody::util::log( " Done printing segments " );
 	}
 }
 
@@ -716,13 +717,13 @@ void SBHandSynthesis::buildGraphAlternate()
 		CostList list_b = _selectDb->getSimilarSegments()[i+1];
 
 		if (_printDebug)
-			LOG("Starting a new level ");
+			SmartBody::util::log("Starting a new level ");
 
 		// go through each level and create graph
 		for (int x = 0; x < _k ; x++)
 		{
 			if (_printDebug)
-				LOG(" New node for level %d at index  " , x );
+				SmartBody::util::log(" New node for level %d at index  " , x );
 
 			// go through the next level
 			for (int y = 0; y < _k ; y++)
@@ -744,7 +745,7 @@ void SBHandSynthesis::buildGraphAlternate()
 		if ( i == num_levels - 2)
 		{
 			if (_printDebug)
-				LOG( "Got to the end " );
+				SmartBody::util::log( "Got to the end " );
 
 			for (int n=0 ; n < _k ; n++ )
 			{
@@ -754,12 +755,12 @@ void SBHandSynthesis::buildGraphAlternate()
 			}
 
 			if (_printDebug)
-				LOG( " End is done " );
+				SmartBody::util::log( " End is done " );
 		}
 	}
 
 	if (_printDebug)
-		LOG( " creating a graph " );
+		SmartBody::util::log( " creating a graph " );
 
 	// creating graph from list of edges
 	graph_t g(edge_array, edge_array + num_edges , weights, num_nodes);
@@ -775,7 +776,7 @@ void SBHandSynthesis::buildGraphAlternate()
 	vertex_descriptor s = vertex(START, g);
 
 	if (_printDebug)
-		LOG( " going to find shortest paths " );
+		SmartBody::util::log( " going to find shortest paths " );
 
 	// evaluate dijkstras on graph g with source s, predecessor_map p and distance_map d
 	dijkstra_shortest_paths(g, s, predecessor_map(&p[0]).distance_map(&d[0]));
@@ -783,7 +784,7 @@ void SBHandSynthesis::buildGraphAlternate()
 	// getting back the graphs and everything else
 	if (_printDebug)
 	{	
-		LOG( "distances and parents:" );
+		SmartBody::util::log( "distances and parents:" );
 		graph_traits < graph_t >::vertex_iterator vi, vend;
 		for (boost::tie(vi, vend) = vertices(g); vi != vend; ++vi) {
 
@@ -830,7 +831,7 @@ void SBHandSynthesis::buildGraphAlternate()
 	{
 	  LOG ("myvector contains:");
 	  for (std::vector<int>::iterator it=_selectDb->getMotionIndices().begin(); it!=_selectDb->getMotionIndices().end(); ++it)
-		LOG( " %d " , *it);
+		SmartBody::util::log( " %d " , *it);
 	  LOG ("");
 	}
 
@@ -966,7 +967,7 @@ void SBHandSynthesis::buildGraph()
 	{
 
 		if (_printDebug)
-			LOG( "Got to the end " );	
+			SmartBody::util::log( "Got to the end " );	
 
 		CostList list_b = _selectDb->getSimilarSegments()[num_levels-1];
 
@@ -980,11 +981,11 @@ void SBHandSynthesis::buildGraph()
 		}
 
 		if (_printDebug)
-			LOG( " End is done " );
+			SmartBody::util::log( " End is done " );
 	}
 
 	if (_printDebug)
-			LOG( " creating a graph " );
+			SmartBody::util::log( " creating a graph " );
 
 	// Create things for Dijkstra
 	std::vector<Vertex> predecessors(boost::num_vertices(g)); // To store parents
@@ -1064,7 +1065,7 @@ void SBHandSynthesis::buildGraph()
 		if (_printDebug)
 		{	
 			LOG ("the current node is %d" , target_vertex_index);
-			LOG( "the segment number is %d" , segNumber);
+			SmartBody::util::log( "the segment number is %d" , segNumber);
 			LOG ("The computed index is %d" , index );
 		}
 
@@ -1095,7 +1096,7 @@ float SBHandSynthesis::calcTransitionCost(SmartBody::SBMotion* segmentA, SmartBo
 	std::vector<SmartBody::SBJoint*> descendants = wristJoint->getDescendants();
 
 	// go through all the descendants
-	for (int i = 0; i < descendants.size(); i++ ) 
+	for (size_t i = 0; i < descendants.size(); i++ )
 	{
 		SmartBody::SBJoint* curJoint = descendants[i];
 
@@ -1150,7 +1151,7 @@ void SBHandSynthesis::createFinalMotion()
 
 	// print some stuff
 	if (_printDebug)
-		LOG("Starting to combine motions");
+		SmartBody::util::log("Starting to combine motions");
 	
 
 	// go through the final motion vector 
@@ -1194,11 +1195,11 @@ void SBHandSynthesis::combineMotion(SmartBody::SBMotion* destMotion, SmartBody::
 	//cout << " Inverse frame rate is " << invFrameRate << endl;
 
 	// print out some stuff here
-	//LOG(" Duration of the destMotion in start is %f", destMotion->duration());
-	//LOG(" Number of frames in destMotion in start is %d", destMotion->getNumFrames());
+	//SmartBody::util::log(" Duration of the destMotion in start is %f", destMotion->duration());
+	//SmartBody::util::log(" Number of frames in destMotion in start is %d", destMotion->getNumFrames());
 
-	//LOG(" Duration of the srcMotion in start is  %f", srcMotion->duration());
-	//LOG(" Number of frames in srcMotion in start is %d", srcMotion->getNumFrames());
+	//SmartBody::util::log(" Duration of the srcMotion in start is  %f", srcMotion->duration());
+	//SmartBody::util::log(" Number of frames in srcMotion in start is %d", srcMotion->getNumFrames());
 
 	// find all the offsets 
 	for (size_t i = 0 ; i < descendants.size() ; i++)
@@ -1230,7 +1231,7 @@ void SBHandSynthesis::combineMotion(SmartBody::SBMotion* destMotion, SmartBody::
 
 	// find the mean angular difference
 	float total = 0;
-	for ( int i = 0 ; i < offsets.size() ; i++)
+	for (size_t i = 0 ; i < offsets.size() ; i++)
 	{
 		SrQuat offset = offsets[i];
 		total += offset.angle();
@@ -1260,7 +1261,7 @@ void SBHandSynthesis::combineMotion(SmartBody::SBMotion* destMotion, SmartBody::
 		offsets.clear();
 
 		// create new offsets  
-		for (int i = 0 ; i < descendants.size() ; i++)
+		for (size_t i = 0 ; i < descendants.size() ; i++)
 		{
 			// get the channel id 
 			int chanIdx = channels.search(descendants[i]->getMappedJointName(), SkChannel::Quat);
@@ -1288,7 +1289,7 @@ void SBHandSynthesis::combineMotion(SmartBody::SBMotion* destMotion, SmartBody::
 			float* frameBuf = destMotion->posture(i);
 
 			// for all desendants
-			for (int j = 0 ; j < descendants.size() ; j++ )
+			for (size_t j = 0 ; j < descendants.size() ; j++ )
 			{
 				// get the channel id 
 				int chanIdx = channels.search(descendants[j]->getMappedJointName(), SkChannel::Quat);
@@ -1302,7 +1303,7 @@ void SBHandSynthesis::combineMotion(SmartBody::SBMotion* destMotion, SmartBody::
 				//LOG ("weight is %f ", weight);
 				SrQuat identity(1,0,0,0);
 				SrQuat newOffset = slerp( identity, offsets[j], weight);
-				//LOG("new offset is %s ", newOffset.toString().c_str());
+				//SmartBody::util::log("new offset is %s ", newOffset.toString().c_str());
 				SrQuat newRot = rot * newOffset;
 
 				// put the rotation back 
@@ -1321,7 +1322,7 @@ void SBHandSynthesis::combineMotion(SmartBody::SBMotion* destMotion, SmartBody::
 		std::vector<float> frameCurr = srcMotion->getFrameData(i);
 
 		// add offset to all the joints
-		for (int j = 0 ; j < descendants.size() ; j++ )
+		for (size_t j = 0 ; j < descendants.size() ; j++ )
 		{
 			// get the channel id 
 			int chanIdx = channels.search(descendants[j]->getMappedJointName(), SkChannel::Quat);
@@ -1354,11 +1355,11 @@ void SBHandSynthesis::combineMotion(SmartBody::SBMotion* destMotion, SmartBody::
 	// print out some stuff 
 	if (_printDebug)
 	{
-		LOG(" Num frames and Duration of the motion %s is %d/%f", destMotion->getName().c_str(), destMotion->getNumFrames(), destMotion->duration());
+		SmartBody::util::log(" Num frames and Duration of the motion %s is %d/%f", destMotion->getName().c_str(), destMotion->getNumFrames(), destMotion->duration());
 	}
 
-	//LOG(" Combining motions completed ");
-	//LOG(" ");
+	//SmartBody::util::log(" Combining motions completed ");
+	//SmartBody::util::log(" ");
 }
 
 // get right database
@@ -1582,7 +1583,7 @@ void MotionDatabase::printDatabase(std::ofstream& myFile)
 
 	// print out all the motion segments
 	myFile << "\n Motion Segments : \n";
-	for (int i = 0 ; i < _motionSegments.size() ; i++)
+	for (size_t i = 0 ; i < _motionSegments.size() ; i++)
 	{
 		printMotion(_motionSegments[i], myFile);
 	}
@@ -1598,7 +1599,7 @@ void MotionDatabase::printDatabase(std::ofstream& myFile)
 		myFile << "Cost vector "<< i << " : ";
 
 		// print the cost list 
-		for ( int j = 0 ; j < list.size() ; j++)
+		for (size_t j = 0 ; j < list.size() ; j++)
 		{
 			// retrieve the item
 			std::pair<int, float> item = list[j];

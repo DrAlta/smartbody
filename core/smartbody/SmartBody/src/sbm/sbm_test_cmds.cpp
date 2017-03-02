@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 
 #include <string>
 #include <iostream>
@@ -37,6 +37,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBAttribute.h>
+#include <sb/SBUtilities.h>
 #include <boost/filesystem.hpp>
 #include <boost/version.hpp>
 #include <bml/bml_processor.hpp>
@@ -63,7 +64,7 @@ bool normalize_character_id( const string& module, const string& role, const str
 	if( char_id.length()==0 ) {
 		std::stringstream strstr;
 		strstr << "ERROR: "<<module<<": No "<<role<<" specified.";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 
 		return false;
 	} else {
@@ -73,7 +74,7 @@ bool normalize_character_id( const string& module, const string& role, const str
 			if( character == NULL ) {
 				std::stringstream strstr;
 				strstr << "WARNING: "<<module<<": Unknown "<<role<<" id \""<<char_id<<"\".";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 		}
 	}
@@ -164,7 +165,7 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 		if( echo ) {
 			build_vrX( msg, cmd, char_id, recip_id, bml, false );
 			// removed logging of vr messages
-			//LOG("%s %s", cmd, msg.str().c_str());
+			//SmartBody::util::log("%s %s", cmd, msg.str().c_str());
 		}
 
 		if( send ) {
@@ -196,13 +197,13 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 				std::stringstream strstr;
 				strstr << "WARNING: send_vrX(..): Failed to insert echo header command for character \"" << char_id << "\".";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 			build_vrX( msg, cmd, char_id, recip_id, bml, false );
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 				std::stringstream strstr;
 				strstr << "WARNING: send_vrX(..): Failed to insert echoed command for character \"" << char_id << "\".";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 		}
 
@@ -225,7 +226,7 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 				if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 					std::stringstream strstr;
 					strstr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\".";
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 				}
 			}
 		} else {
@@ -240,7 +241,7 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 			if( seq->insert( 0, msg.str().c_str() )!=CMD_SUCCESS ) {
 				std::stringstream strstr;
 				strstr << "WARNING: send_vrX(..): Failed to insert vrSpeak command for character \"" << char_id << "\".";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 		}
 
@@ -250,7 +251,7 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 			{
 				std::stringstream strstr;
 				strstr << "ERROR: send_vrX(..): Failed to insert seq into active sequences.";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 				return CMD_FAILURE;
 			}
 		} else {
@@ -259,7 +260,7 @@ int send_vrX( const char* cmd, const string& char_id, const string& recip_id,
 			{
 				std::stringstream strstr;
 				strstr << "ERROR: send_vrX(..): Failed to insert seq into pending sequences.";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 				return CMD_FAILURE;
 			}
 		}
@@ -291,7 +292,7 @@ void print_test_bml_help() {
 	     << "\t<act>...</act>                   // sends inline <act> XML" << endl
 	     << "\t<bml>...</bml>                   // sends inline <bml> XML" << endl
 	     << "\t< ... />                         // sends inline behavior XML (can be multiple)" << endl;
-	LOG("%s", strstr.str().c_str());
+	SmartBody::util::log("%s", strstr.str().c_str());
 }
 
 // Handles all "test bml ..." sbm commands.
@@ -318,7 +319,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		SmartBody::SBCharacter* character = scene->getCharacter(char_id);
 		if (!character)
 		{
-			LOG("No character named '%s'.", char_id.c_str());
+			SmartBody::util::log("No character named '%s'.", char_id.c_str());
 			return CMD_FAILURE; // short circuit requests that do not map to a character that exists in this sbm instance
 		}
 	}
@@ -379,7 +380,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			if (!boost::filesystem2::exists( finalPath ))
 #endif
 			{
-				LOG("File %s was not found using media path %s. BML will not be processed.", filename.c_str(), scene->getMediaPath().c_str());
+				SmartBody::util::log("File %s was not found using media path %s. BML will not be processed.", filename.c_str(), scene->getMediaPath().c_str());
 				return CMD_FAILURE;
 			}
 			p = finalPath;
@@ -419,13 +420,13 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	} else if( arg=="anim" || arg=="animation") { //  anim[ation] <animation name>
 		string anim = args.read_token();
 		if( anim.length()==0 ) {
-			LOG("ERROR: test bml %s: Missing animation name.", arg.c_str());
+			SmartBody::util::log("ERROR: test bml %s: Missing animation name.", arg.c_str());
 			return CMD_FAILURE;
 		}
 
 		SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(anim);
 		if (!motion)
-			LOG("WARNING: Unknown animation \"%s\".", anim.c_str());
+			SmartBody::util::log("WARNING: Unknown animation \"%s\".", anim.c_str());
 
 		ostringstream bml;
 		bml << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
@@ -442,7 +443,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	} else if( arg=="posture") { // posture <posture name>
 		string posture = args.read_token();
 		if( posture.length()==0 ) {
-			LOG("ERROR: test bml %s Missing posture name.", arg.c_str());
+			SmartBody::util::log("ERROR: test bml %s Missing posture name.", arg.c_str());
 			return CMD_FAILURE;
 		}
 
@@ -500,7 +501,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 				if( arg=="target" ) {
 					arg = args.read_token();
 				} else if( targetAttr.length()>0 ) {
-					LOG("ERROR: test bml gaze: Unexpected second target value.");
+					SmartBody::util::log("ERROR: test bml gaze: Unexpected second target value.");
 					return CMD_FAILURE;
 				}
 
@@ -512,10 +513,10 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		}
 
 		if( targetAttr.length()==0 ) {
-			LOG("WARNING: test bml gaze: Expected a target value.");
+			SmartBody::util::log("WARNING: test bml gaze: Expected a target value.");
 		}
 		if( angleAttr.length()>0 && directionAttr.length()==0 ) {
-			LOG("WARNING: test bml gaze: Expected a direction when specifying angle.");
+			SmartBody::util::log("WARNING: test bml gaze: Expected a direction when specifying angle.");
 			return CMD_FAILURE;
 		}
 
@@ -544,7 +545,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			     << "\ttoss                        // z-axis nod?" << endl
 			     << "\torient <direction> <angle>  // angles the head" << endl
 			     << "\torient target <target>      // orients head toward target";
-			LOG("%s", strstr.str().c_str());
+			SmartBody::util::log("%s", strstr.str().c_str());
 			   //<< "\torient target <target> [<direction> <angle>]" << endl;
 			return CMD_SUCCESS;
 		} else if( arg=="nod" ) {
@@ -558,7 +559,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 			arg = args.read_token();
 			if( arg=="target" ) {
-				LOG("ERROR: test bml head orient: Command \"target\" unimplemented.");
+				SmartBody::util::log("ERROR: test bml head orient: Command \"target\" unimplemented.");
 				return CMD_FAILURE;
 			} else if( arg=="right" || arg=="left" || arg=="up" || arg=="down" ||
 			           arg=="rollright" || arg=="rollleft" ) {
@@ -572,14 +573,14 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 				std::stringstream strstr;
 				strstr << "ERROR: test bml head orient: Unrecognized head orientation \""<<arg<<"\"."<< endl
 					<< "\tRecognized directions: right, left, up, down, rollright, rollleft";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 
 				return CMD_FAILURE;
 			}
 		} else {
 			std::stringstream strstr;
 			strstr << "ERROR: test bml head: Unrecognized command \""<<arg<<"\". Expected: orient, shake, or nod";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			return CMD_FAILURE;
 		}
 		ostringstream bml;
@@ -626,7 +627,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 				speech_tag = "<speech type=\"application/ssml+xml\"" + refTag + ">";
 				break;
 			default:
-				LOG("INTERNAL ERROR: BML::Processor::test_bml_func(..): Invalid speech_type: %d", speech_type);
+				SmartBody::util::log("INTERNAL ERROR: BML::Processor::test_bml_func(..): Invalid speech_type: %d", speech_type);
 		}		
 
 		ostringstream bml;
@@ -644,7 +645,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	} else if( arg=="interrupt") {
 		string act = args.read_token();
 		if( act.length()==0 ) {
-			LOG("ERROR: test bml %s: Missing BML performance id.", arg.c_str());
+			SmartBody::util::log("ERROR: test bml %s: Missing BML performance id.", arg.c_str());
 			return CMD_FAILURE;
 		}
 
@@ -663,7 +664,7 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	} else if( arg=="qdraw" || arg=="quickdraw" ) {  // Shhh! Its a secret!
 		string target = args.read_token();
 		if( target.length()==0 ) {
-			LOG("ERROR: test bml %s: Missing target id.", arg.c_str());
+			SmartBody::util::log("ERROR: test bml %s: Missing target id.", arg.c_str());
 			return CMD_FAILURE;
 		}
 
@@ -705,23 +706,23 @@ int test_bml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 		return send_vrX( "vrSpeak", char_id, recip_id, seq_id, echo, send, bml.str() );
 	} else {
-		LOG("ERROR: test bml: Unrecognized \"test bml\" subscommand \"%s\".", arg.c_str());
+		SmartBody::util::log("ERROR: test bml: Unrecognized \"test bml\" subscommand \"%s\".", arg.c_str());
 		print_test_bml_help();
 		return CMD_FAILURE;
 	}
 }
 
 void print_test_fml_help() {
-	LOG("Syntax:");
-	LOG("\ttest fml [char[acter] <character id or * for all>] [echo|noecho] [send|nosend] [seq <seq id>] <test subcommand>");
-	LOG("where the test subcommand can be any of . . .");
-	LOG("\thelp                        // prints this text");
-	LOG("\tspeech [text] <sentence>    // performs plain text speech");
-	LOG("\tspeech ssml <sentence>      // performs ssml speech");
-	LOG("\tfile <filename>             // calls vrSpeak on a BML file");
-	LOG("\t<?xml ...                   // sends inline XML");
-	LOG("\t<act>...</act>              // sends inline <act> XML");
-	LOG("\t<fml>...</fml>              // sends inline <fml> XML");
+	SmartBody::util::log("Syntax:");
+	SmartBody::util::log("\ttest fml [char[acter] <character id or * for all>] [echo|noecho] [send|nosend] [seq <seq id>] <test subcommand>");
+	SmartBody::util::log("where the test subcommand can be any of . . .");
+	SmartBody::util::log("\thelp                        // prints this text");
+	SmartBody::util::log("\tspeech [text] <sentence>    // performs plain text speech");
+	SmartBody::util::log("\tspeech ssml <sentence>      // performs ssml speech");
+	SmartBody::util::log("\tfile <filename>             // calls vrSpeak on a BML file");
+	SmartBody::util::log("\t<?xml ...                   // sends inline XML");
+	SmartBody::util::log("\t<act>...</act>              // sends inline <act> XML");
+	SmartBody::util::log("\t<fml>...</fml>              // sends inline <fml> XML");
 }
 
 int test_fml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
@@ -760,7 +761,7 @@ int test_fml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 			fml << arg << args.read_remainder_raw() << "</act>";
 			return send_vrX( "vrExpress", char_id, recip_id, seq_id, echo, send, fml.str() );
 		} else {
-			LOG("ERROR: test_fml_func: Unrecognized test FML command: \"%s\"", arg.c_str());
+			SmartBody::util::log("ERROR: test_fml_func: Unrecognized test FML command: \"%s\"", arg.c_str());
 			return CMD_FAILURE;
 		}
 	} else if( arg=="file") {
@@ -774,7 +775,7 @@ int test_fml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 		ostringstream fml;
 		ifstream file( filename.c_str() );
 		if( !file ) {
-			LOG("ERROR: test_fml_func: Unable to open file: \"%s\"", filename.c_str());
+			SmartBody::util::log("ERROR: test_fml_func: Unable to open file: \"%s\"", filename.c_str());
 			return CMD_FAILURE;
 		}
 		fml << file.rdbuf();
@@ -804,7 +805,7 @@ int test_fml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 				speech_tag = "<speech id=\"s1\" type=\"application/ssml+xml\">";
 				break;
 			default:
-				LOG("INTERNAL ERROR: BML::Processor::test_bml_func(..): Invalid speech_type: %d", speech_type);
+				SmartBody::util::log("INTERNAL ERROR: BML::Processor::test_bml_func(..): Invalid speech_type: %d", speech_type);
 		}
 
 		ostringstream fml;
@@ -821,7 +822,7 @@ int test_fml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 			<< "</act>";
 		return send_vrX( "vrExpress", char_id, recip_id, seq_id, echo, send, fml.str() );
 	} else {
-		LOG("ERROR: test bml: Unrecognized command \"%s\".", arg.c_str());
+		SmartBody::util::log("ERROR: test bml: Unrecognized command \"%s\".", arg.c_str());
 		print_test_fml_help();
 		return CMD_FAILURE;
 	}
@@ -831,13 +832,13 @@ int test_fml_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 int test_bone_pos_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr ) {
 	const string& character_id = SmartBody::SBScene::getScene()->getStringAttribute("defaultCharacter");
 	if( character_id.empty() ) {
-		LOG("ERROR: No test character defined");
+		SmartBody::util::log("ERROR: No test character defined");
 		return CMD_FAILURE;
 	}
 
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter( character_id );
 	if( character == NULL ) {
-		LOG("ERROR: Unknown test character \"%s\"", character_id.c_str());
+		SmartBody::util::log("ERROR: Unknown test character \"%s\"", character_id.c_str());
 		return CMD_FAILURE;
 	}
 

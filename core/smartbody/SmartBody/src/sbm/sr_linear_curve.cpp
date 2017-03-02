@@ -439,7 +439,7 @@ double srLinearCurve::head_boundary( double t, bool *cropped_p ) {
 				return( max_value );
 			}
 		default:
-//			LOG( "srLinearCurve::head_boundary ERR: bound-mode %d not recognized", head_bound_mode );
+//			SmartBody::util::log( "srLinearCurve::head_boundary ERR: bound-mode %d not recognized", head_bound_mode );
 			printf( "srLinearCurve::head_boundary ERR: bound-mode %d not recognized\n", head_bound_mode );
 	}
 	return( 0.0 );
@@ -488,7 +488,7 @@ double srLinearCurve::tail_boundary( double t, bool *cropped_p ) {
 				return( max_value );
 			}
 		default:
-//			LOG( "srLinearCurve::tail_boundary ERR: bound-mode %d not recognized", tail_bound_mode );
+//			SmartBody::util::log( "srLinearCurve::tail_boundary ERR: bound-mode %d not recognized", tail_bound_mode );
 			printf( "srLinearCurve::tail_boundary ERR: bound-mode %d not recognized\n", tail_bound_mode );
 	}
 	return( 0.0 );
@@ -627,7 +627,7 @@ void srLinearCurve::update( void )	{
 
 	dirty = false;
 	if( c != key_count )	{
-//		LOG( "srLinearCurve::update ERR: corruption: counted %d of %d keys", c, key_count );
+//		SmartBody::util::log( "srLinearCurve::update ERR: corruption: counted %d of %d keys", c, key_count );
 		printf( "srLinearCurve::update ERR: corruption: counted %d of %d keys\n", c, key_count );
 	}
 }

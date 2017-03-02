@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 
 #include "smartbody-c-dll.h"
 #include "sb/SBScene.h"
@@ -33,6 +33,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include "sb/SBPhoneme.h"
 #include "sb/SBPhonemeManager.h"
 #include "sb/SBVHMsgManager.h"
+#include "sb/SBUtilities.h"
 #include "sbm/local_speech.h"
 #include "sbm/mcontrol_callbacks.h"
 #include "sbm/sbm_constants.h"
@@ -172,7 +173,7 @@ void SBM_SmartbodyListener::OnCharacterCreate( const std::string & name, const s
     info.name = name;
     info.objectClass = objectClass;
     g_smartbodyDLLInstances[m_sbmHandle]->m_createCallbackInfo.push(info);
-    //LOG("smartbody-c-dll : OnCharacterCreate, name = %s, objectClass = %s, number of callback info = %d",name.c_str(), objectClass.c_str(), g_CreateCallbackInfo[m_sbmHandle].size());
+    //SmartBody::util::log("smartbody-c-dll : OnCharacterCreate, name = %s, objectClass = %s, number of callback info = %d",name.c_str(), objectClass.c_str(), g_CreateCallbackInfo[m_sbmHandle].size());
 }
 
 void SBM_SmartbodyListener::OnCharacterDelete( const std::string & name )
@@ -415,7 +416,7 @@ SBAPI bool SBM_GetCharacter( SBMHANDLE sbmHandle, const char * name, SBM_Charact
 {
    if ( !SBM_HandleExists( sbmHandle ) )
    {
-      LOG("SBM_GetCharcter : Handle %d does not exist", sbmHandle);
+      SmartBody::util::log("SBM_GetCharcter : Handle %d does not exist", sbmHandle);
       return false;
    }
 
@@ -862,7 +863,7 @@ SBAPI void SBM_SBMotion_AddChannels( SBMHANDLE sbmHandle, const char * motionNam
 
    for (int i = 0; i < count; i++)
    {
-       //LOG("%s - %s - %s", motionName, channelNames[i], channelTypes[i]);
+       //SmartBody::util::log("%s - %s - %s", motionName, channelNames[i], channelTypes[i]);
 
        motion->addChannel(channelNames[i], channelTypes[i]);
    }

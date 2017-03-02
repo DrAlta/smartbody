@@ -1,7 +1,6 @@
 #ifndef _TRANSPARENTLISTENER_H_
 #define _TRANSPARENTLISTENER_H_
 
-#include <vhcl.h>
 #include <external/glew/glew.h>
 #include <sb/SBSceneListener.h>
 #include <sb/SBObserver.h>

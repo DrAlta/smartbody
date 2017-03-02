@@ -31,7 +31,8 @@
 # include <sk/sk_scene.h>
 # include <sk/sk_skeleton.h>
 # include <sk/sk_joint.h>
-#include <vhcl.h>
+#include <sb/SBUtilities.h>
+
 
 
 # define DEF_CYL_RADIUS 0.5f
@@ -67,7 +68,7 @@ static SrSnGroup* make_joint_group ( const SkJoint* j, SkSkeleton* s, SrArray<Sr
    g->separator ( true );
    if (j->index() < 0)
    {
-	   LOG("Joint %s cannot be added to scene graph since joint index is %d", j->jointName().c_str(), j->index());
+	   SmartBody::util::log("Joint %s cannot be added to scene graph since joint index is %d", j->jointName().c_str(), j->index());
 	   return NULL;
    }
    _jgroup [ j->index() ] = g;
@@ -130,7 +131,7 @@ void SkScene::initInternal()
    SrSnGroup* g = make_joint_group ( root, _skeleton, _jgroup );
    if (!g)
    {
-	   LOG("Skeleton %s cannot be added to the scene.", _skeleton->getName().c_str());
+	   SmartBody::util::log("Skeleton %s cannot be added to the scene.", _skeleton->getName().c_str());
 	   return;
    }
    g->separator ( true );

@@ -21,11 +21,12 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include "controllers/me_ct_gaze.h"
 #include "sbm/lin_win.h"
 using namespace gwiz;
-#include <vhcl_log.h>
+
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBPawn.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBUtilities.h>
 #include <sb/sbm_pawn.hpp>
 
 //#define DFL_GAZE_HEAD_SPEED 180.0
@@ -75,7 +76,7 @@ const float MeCtGaze::DEFAULT_SMOOTHING_EYEBALL  = 0.0f;
 #if TEST_SENSOR
 #include "controllers/me_ct_gaze_sensor.h"
 void test_sensor_callback( int id, int status )	{
-	LOG( "test_sensor_callback: id:%d status:%d\n", id, status );
+	SmartBody::util::log( "test_sensor_callback: id:%d status:%d\n", id, status );
 }
 #endif
 
@@ -558,8 +559,8 @@ if( once )	{
 once = 0;
 vector_t a( 0.0, 0.0, 1.0 ), b( 1.0, 0.0, 1.0 );
 float deg = DEG( acos( a.normal().dot( b.normal() ) ) );
-LOG( "test dot: %f deg\n", deg );
-LOG( "CALC: joint: %s\n", joint_label( priority_joint ) );
+SmartBody::util::log( "test dot: %f deg\n", deg );
+SmartBody::util::log( "CALC: joint: %s\n", joint_label( priority_joint ) );
 }
 #endif
 
@@ -568,7 +569,7 @@ LOG( "CALC: joint: %s\n", joint_label( priority_joint ) );
 	char *joint_str = joint_label( priority_joint );
 	SkJoint* joint_p = skeleton_ref_p->search_joint( joint_str );
 	if( !joint_p ) {
-		LOG("MeCtGaze::calc_real_angle_to_target ERR: joint '%s' NOT FOUND in skeleton\n", joint_str );
+		SmartBody::util::log("MeCtGaze::calc_real_angle_to_target ERR: joint '%s' NOT FOUND in skeleton\n", joint_str );
 		return( false );
 	}
 	joint_p->update_gmat_up();
@@ -624,7 +625,7 @@ LOG( "CALC: joint: %s\n", joint_label( priority_joint ) );
 		get_deg = (float)DEG( acos( fwd_dir.dot( tgt_dir ) ) );
 #endif
 
-//LOG( "deg: %f\n", get_deg );
+//SmartBody::util::log( "deg: %f\n", get_deg );
 	}
 	else	{
 		quat_t w_tgt_rot = world_target_orient();
@@ -665,7 +666,7 @@ void MeCtGaze::inspect_skeleton_down( SkJoint* joint_p, int depth )	{
 		char indent[ 256 ];
 		int c, i, n;
 		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
-		LOG( "%s%s\n", indent, name );
+		SmartBody::util::log( "%s%s\n", indent, name );
 		n = joint_p->num_children();
 		for( i=0; i<n; i++ )	{
 			inspect_skeleton_down( joint_p->child( i ), depth + 1 );
@@ -692,7 +693,7 @@ void MeCtGaze::inspect_skeleton_local_transform_down( SkJoint* joint_p, int dept
 		char indent[ 256 ];
 		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
 		indent[ c ] = 0;
-		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }", 
+		SmartBody::util::log( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }", 
 			indent, name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -725,7 +726,7 @@ void MeCtGaze::inspect_skeleton_world_transform_down( SkJoint* joint_p, int dept
 		char indent[ 256 ];
 		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
 		indent[ c ] = 0;
-		LOG( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }", 
+		SmartBody::util::log( "%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }", 
 			indent, name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -757,7 +758,7 @@ void MeCtGaze::inspect_skeleton_local_transform_up( SkJoint* joint_p, int depth 
 		char indent[ 256 ];
 		for( c=0; c<depth; c++ ) { indent[ c ] = ' '; }
 		indent[ c ] = 0;
-		LOG( "%s%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }", 
+		SmartBody::util::log( "%s%s : pos{ %.3f %.3f %.3f } : phr{ %.2f %.2f %.2f }", 
 			indent, name,
 			pos.x(), pos.y(), pos.z(),
 			rot.p(), rot.h(), rot.r()
@@ -775,7 +776,7 @@ void MeCtGaze::update_skeleton_gmat( void )	{
 			joint_p->update_gmat_up();
 		}
 		else	{
-//			LOG("MeCtGaze::update_skeleton_gmat ERR: joint 'skullbase' NOT FOUND in skeleton" );
+//			SmartBody::util::log("MeCtGaze::update_skeleton_gmat ERR: joint 'skullbase' NOT FOUND in skeleton" );
 		}
 
 		joint_p = skeleton_ref_p->search_joint( "eyeball_left" );
@@ -783,7 +784,7 @@ void MeCtGaze::update_skeleton_gmat( void )	{
 			joint_p->update_gmat_up();
 		}
 		else	{
-//			LOG("MeCtGaze::update_skeleton_gmat ERR: joint 'eyeball_left' NOT FOUND in skeleton" );
+//			SmartBody::util::log("MeCtGaze::update_skeleton_gmat ERR: joint 'eyeball_left' NOT FOUND in skeleton" );
 		}
 
 		joint_p = skeleton_ref_p->search_joint( "eyeball_right" );
@@ -791,11 +792,11 @@ void MeCtGaze::update_skeleton_gmat( void )	{
 			joint_p->update_gmat_up();
 		}
 		else	{
-//			LOG("MeCtGaze::update_skeleton_gmat ERR: joint 'eyeball_right' NOT FOUND in skeleton" );
+//			SmartBody::util::log("MeCtGaze::update_skeleton_gmat ERR: joint 'eyeball_right' NOT FOUND in skeleton" );
 		}
 	}
 	else	{
-		//LOG("MeCtGaze::update_skeleton_gmat ERR: skeleton NOT FOUND" );
+		//SmartBody::util::log("MeCtGaze::update_skeleton_gmat ERR: skeleton NOT FOUND" );
 	}
 }
 
@@ -884,18 +885,18 @@ printf( "s1: %f\n", joint_arr[ GAZE_JOINT_SPINE1 ].local_pos.y() );
 		) +
 		vector_t( 0.0, 0.0, interocular.length()); // NOTE: PRESUMES 5CM SCALE...
 	
-	//LOG("before ,  interocular length = %f, skull pos = %f %f %f, mideye pos = %f %f %f", interocular.length(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.x(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.y(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.z(), world_mid_eye_pos.x(), world_mid_eye_pos.y(), world_mid_eye_pos.z() );
+	//SmartBody::util::log("before ,  interocular length = %f, skull pos = %f %f %f, mideye pos = %f %f %f", interocular.length(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.x(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.y(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.z(), world_mid_eye_pos.x(), world_mid_eye_pos.y(), world_mid_eye_pos.z() );
 
 
 	if (!joint_arr[GAZE_JOINT_EYE_L].active && !joint_arr[GAZE_JOINT_EYE_R].active && skeleton_ref_p) // no eye joints
 	{		
 		double forwardLen = skeleton_ref_p->getCurrentHeight()*0.03;		
 		world_mid_eye_pos = joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos + vector_t(0.0,forwardLen*2.0, forwardLen*3.0);
-		//LOG("has skeleton ref, forward len = %f, skull pos = %f %f %f, mideye pos = %f %f %f",forwardLen, joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.x(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.y(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.z(), world_mid_eye_pos.x(), world_mid_eye_pos.y(), world_mid_eye_pos.z() );
+		//SmartBody::util::log("has skeleton ref, forward len = %f, skull pos = %f %f %f, mideye pos = %f %f %f",forwardLen, joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.x(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.y(), joint_arr[ GAZE_JOINT_SKULL ].world_zero_pos.z(), world_mid_eye_pos.x(), world_mid_eye_pos.y(), world_mid_eye_pos.z() );
 	}	
 	else
 	{
-		//LOG("no skeleton ref");
+		//SmartBody::util::log("no skeleton ref");
 	}
 
 	//printf( "eyes:\n" );
@@ -965,13 +966,13 @@ SkJoint* MeCtGaze::reference_joint( void )	{
 			if( skeleton_ref_p )	{
 				ref_joint_p = skeleton_ref_p->search_joint( ref_joint_str );
 				if( ref_joint_p == NULL )	{
-					LOG("MeCtGaze::reference_joint ERR: joint '%s' NOT FOUND in skeleton", ref_joint_str );
+					SmartBody::util::log("MeCtGaze::reference_joint ERR: joint '%s' NOT FOUND in skeleton", ref_joint_str );
 					free( ref_joint_str );
 					ref_joint_str = NULL;
 				}
 			}
 			else	{
-				LOG("MeCtGaze::reference_joint ERR: skeleton NOT FOUND" );
+				SmartBody::util::log("MeCtGaze::reference_joint ERR: skeleton NOT FOUND" );
 			}
 		}
 	}
@@ -1033,7 +1034,7 @@ quat_t MeCtGaze::world_target_orient( void )	{
 
 void MeCtGaze::controller_start( void )	{
 	
-//	LOG("START ON %s", this->name());
+//	SmartBody::util::log("START ON %s", this->name());
 #if ENABLE_HACK_TARGET_CIRCLE
 //G_hack_target_heading = 0.0;  // don't update this for every gaze controller
 #endif
@@ -1048,7 +1049,7 @@ void MeCtGaze::controller_start( void )	{
 }
 
 void MeCtGaze::controller_start_evaluate( void )	{
-//	LOG("START_EVALUTE ON %s", this->name());
+//	SmartBody::util::log("START_EVALUTE ON %s", this->name());
 	int i;
 
 	if( _context->channels().size() > 0 )	{
@@ -1056,7 +1057,7 @@ void MeCtGaze::controller_start_evaluate( void )	{
 	}
 	else
 	{
-		LOG("No gazing channels found.");
+		SmartBody::util::log("No gazing channels found.");
 	}
 	
 	// ensure skeleton global tansforms are up to date
@@ -1076,13 +1077,13 @@ void MeCtGaze::controller_start_evaluate( void )	{
 		int context_index = _toContextCh[ i ];
 		if( context_index < 0 ) {
 			joint_arr[ i ].active = 0;
-			LOG("MeCtGaze:: ERR: '%s' NOT FOUND in skeleton", joint_label( i ) );
+			SmartBody::util::log("MeCtGaze:: ERR: '%s' NOT FOUND in skeleton", joint_label( i ) );
 		} 
 		else {
 			SkJoint* joint_p = _context->channels().joint( context_index );
 			if( !joint_p )	{
 				joint_arr[ i ].active = 0;
-				LOG("MeCtGaze:: ERR: joint( %d ): '%s' NOT FOUND in skeleton", context_index, joint_label( i ) );
+				SmartBody::util::log("MeCtGaze:: ERR: joint( %d ): '%s' NOT FOUND in skeleton", context_index, joint_label( i ) );
 			} 
 			else {
 				joint_arr[ i ].init( joint_p );
@@ -1090,8 +1091,8 @@ void MeCtGaze::controller_start_evaluate( void )	{
 			}
 		}
 #if 0
-		LOG( "start: [%d]", i );
-		LOG( " wgt: %.4f",
+		SmartBody::util::log( "start: [%d]", i );
+		SmartBody::util::log( " wgt: %.4f",
 			joint_arr[ i ].task_weight 
 		);
 #endif
@@ -1134,7 +1135,7 @@ void MeCtGaze::controller_start_evaluate( void )	{
 		quat_t head_task_rot = ( -body_head_rot ).product( body_task_rot );
 		gwiz::float_t head_task_deg = head_task_rot.degrees();
 		head_speed = (float)( head_task_deg / head_time );
-//LOG( "MeCtGaze::controller_start TASK: %f deg  %f dps\n", head_task_deg, head_speed );
+//SmartBody::util::log( "MeCtGaze::controller_start TASK: %f deg  %f dps\n", head_task_deg, head_speed );
 	}
 
 	float total_w = 0.0;
@@ -1190,7 +1191,7 @@ void MeCtGaze::set_fade_in_scheduled(float interval, double time)
 	info.fadingInterval = interval;
 	double fadingScheduleTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime() + time;
 	fadingSchedules.insert(std::make_pair((float)fadingScheduleTime, info));
-	//LOG("set_fade_in_scheduled(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, fadingScheduleTime);
+	//SmartBody::util::log("set_fade_in_scheduled(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, fadingScheduleTime);
 }
 
 void MeCtGaze::set_fade_out_scheduled(float interval, double time)
@@ -1200,7 +1201,7 @@ void MeCtGaze::set_fade_out_scheduled(float interval, double time)
 	info.fadingInterval = interval;
 	double fadingScheduleTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime() + time;
 	fadingSchedules.insert(std::make_pair((float)fadingScheduleTime, info));
-	//LOG("set_fade_out_scheduled(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, fadingScheduleTime);
+	//SmartBody::util::log("set_fade_out_scheduled(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, fadingScheduleTime);
 }
 
 #define SMOOTH_RATE_REF (30.0f)
@@ -1213,11 +1214,11 @@ bool MeCtGaze::update_fading( float dt )	{
 	{
 		if (SmartBody::SBScene::getScene()->getSimulationManager()->getTime() >= iter->first)
 		{
-			//LOG("update_fading(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, scheduled_time);	
+			//SmartBody::util::log("update_fading(%s): Current time %f, scheduled fading time is at %f.", this->_handle.c_str(), mcuCBHandle::singleton().time, scheduled_time);	
 			if (iter->second.fadingMode == FADING_MODE_IN)
 				if (!isFadingIn())
 				{
-					//LOG("fade in!");
+					//SmartBody::util::log("fade in!");
 					set_fade_in(iter->second.fadingInterval);
 				
 				//II set zeros for FADING_MODE_IN
@@ -1228,7 +1229,7 @@ bool MeCtGaze::update_fading( float dt )	{
 			if (iter->second.fadingMode == FADING_MODE_OUT)
 				if (!isFadingOut())
 				{
-					//LOG("fade out!");
+					//SmartBody::util::log("fade out!");
 					set_fade_out(iter->second.fadingInterval);				
 				}
 			fadingSchedules.erase(iter);
@@ -1273,7 +1274,7 @@ bool MeCtGaze::update_fading( float dt )	{
 				set_speed( initialNeckSpeed, initialEyeSpeed );
 
 
-//				LOG( "MeCtGaze::update_fading FULL WEIGHT" );
+//				SmartBody::util::log( "MeCtGaze::update_fading FULL WEIGHT" );
 			}
 
 		}
@@ -1307,7 +1308,7 @@ bool MeCtGaze::update_fading( float dt )	{
 					fading_mode = FADING_MODE_OFF;
 					set_speed( initialNeckSpeed, initialEyeSpeed );
 
-//					LOG( "MeCtGaze::update_fading ZERO WEIGHT" );
+//					SmartBody::util::log( "MeCtGaze::update_fading ZERO WEIGHT" );
 				}
 			}
 		}
@@ -1338,14 +1339,14 @@ void MeCtGaze::updateGazeSchedules( float dt )
 						SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(t);
 						if (!pawn)
 						{
-							LOG("Gaze cannot be switched to %s, does not exist.", s.targetJoint.c_str());
+							SmartBody::util::log("Gaze cannot be switched to %s, does not exist.", s.targetJoint.c_str());
 						}
 						else
 						{
 							SmartBody::SBJoint* sbjoint = dynamic_cast<SmartBody::SBJoint*>(pawn->getSkeleton()->getJointByMappedName(joint));
 							if (!sbjoint)
 							{
-								LOG("Gaze cannot be switched to %s/%s - joint does not exist.", s.targetJoint.c_str(), joint.c_str());
+								SmartBody::util::log("Gaze cannot be switched to %s/%s - joint does not exist.", s.targetJoint.c_str(), joint.c_str());
 							}
 							else
 							{
@@ -1366,7 +1367,7 @@ void MeCtGaze::updateGazeSchedules( float dt )
 						SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(s.targetJoint.c_str());
 						if (!pawn)
 						{
-							LOG("Gaze cannot be switched to %s, does not exist.", s.targetJoint.c_str());
+							SmartBody::util::log("Gaze cannot be switched to %s, does not exist.", s.targetJoint.c_str());
 						}
 						else
 						{
@@ -1376,7 +1377,7 @@ void MeCtGaze::updateGazeSchedules( float dt )
 								sbjoint = dynamic_cast<SmartBody::SBJoint*>(pawn->getSkeleton()->getJointByMappedName(SbmPawn::WORLD_OFFSET_JOINT_NAME));
 								if (!sbjoint)
 								{
-									LOG("Target character does not have joint named left_eyeball or %s, cannot switch gaze.", SbmPawn::WORLD_OFFSET_JOINT_NAME);
+									SmartBody::util::log("Target character does not have joint named left_eyeball or %s, cannot switch gaze.", SbmPawn::WORLD_OFFSET_JOINT_NAME);
 								}
 								else
 								{
@@ -1427,7 +1428,7 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 
 //		test_forward_ray();
 #if 0
-		LOG( "-- skeleton:" );
+		SmartBody::util::log( "-- skeleton:" );
 		if( skeleton_ref_p )	{
 
 //			SkJoint* joint_p = skeleton_ref_p->search_joint( SbmPawn::WORLD_OFFSET_JOINT_NAME );
@@ -1438,7 +1439,7 @@ bool MeCtGaze::controller_evaluate( double t, MeFrameData& frame )	{
 			SkJoint* joint_p = skeleton_ref_p->search_joint( "eyeball_left" );
 			inspect_skeleton_local_transform_up( joint_p );
 		}
-		LOG( "--" );
+		SmartBody::util::log( "--" );
 #endif
 	}
 #endif
@@ -1569,7 +1570,7 @@ int MeCtGaze::getStart()
 
 void MeCtGaze::setStart(int value)
 {
-//	LOG("START SET TO %d ON %s", value, this->name());
+//	SmartBody::util::log("START SET TO %d ON %s", value, this->name());
 	foostart = value;
 }
 

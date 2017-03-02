@@ -128,14 +128,14 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 				continue;			
 			for (int i=0; i< pjoint->num_children(); i++)
 			{
-				//LOG("target joint = %s, child = %s",pjoint->name().c_str(), pjoint->child(i)->name().c_str());
+				//SmartBody::util::log("target joint = %s, child = %s",pjoint->name().c_str(), pjoint->child(i)->name().c_str());
 				SkJoint* child = pjoint->child(i);
 				jointQueues.push(child->getMappedJointName());
 			}
 		}				
 	}
 	heightRatio = (interSk->getBaseHeight("base")/tempSrcSk->getBaseHeight("base"));//*0.99f;
-	//LOG("height ratio = %f", heightRatio);
+	//SmartBody::util::log("height ratio = %f", heightRatio);
 
 	std::vector<std::string> srcJointNames = tempSrcSk->getJointMappedNames();
 	for (unsigned int i=0;i<srcJointNames.size();i++)
@@ -236,7 +236,7 @@ bool SBRetarget::initRetarget( std::vector<std::string>& endJoints, std::vector<
 				// just copy over the translation for now
 				float chanValue = ref_p[ index ];				
 				new_p[ index ] = chanValue*heightRatio;
-				//LOG("jointName = %s, new_p = %f",jointName.c_str(), new_p[index]);
+				//SmartBody::util::log("jointName = %s, new_p = %f",jointName.c_str(), new_p[index]);
 				// 				if (jointPosMap.find(jointName) != jointPosMap.end())
 				// 				{
 				// 					SrVec pos = jointPosMap[jointName];

@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "SBJavascript.h"
 #include <sbm/sbm_deformable_mesh.h>
 #include <functional>

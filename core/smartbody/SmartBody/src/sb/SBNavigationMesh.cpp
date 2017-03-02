@@ -28,6 +28,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBAttribute.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 
 const int MaxPolys = 255;
 
@@ -71,7 +72,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 {	
 	if (inMesh.V.size() <= 0 || inMesh.F.size() <= 0)
 	{
-		LOG("buildNavigation: The number of vertices or faces is zero.");
+		SmartBody::util::log("buildNavigation: The number of vertices or faces is zero.");
 		return false;
 	}
 	unsigned char* m_triareas;
@@ -114,7 +115,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
  	//const int* tris = &inMesh.F.get(0)[0];
         // need to convert to integer array
         int* tris = new int[inMesh.F.size()*3];
-	for (int i=0;i<inMesh.F.size();i++)
+	for (size_t i=0;i<inMesh.F.size();i++)
 	{
               tris[i*3+0] = inMesh.F[i][0];
               tris[i*3+1] = inMesh.F[i][1];
@@ -162,12 +163,12 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 	m_solid = rcAllocHeightfield();
 	if (!m_solid)
 	{
-		LOG("buildNavigation: Out of memory 'solid'.");
+		SmartBody::util::log("buildNavigation: Out of memory 'solid'.");
 		return false;
 	}
 	if (!rcCreateHeightfield(m_ctx, *m_solid, m_cfg.width, m_cfg.height, m_cfg.bmin, m_cfg.bmax, m_cfg.cs, m_cfg.ch))
 	{
-		LOG("buildNavigation: Could not create solid heightfield.");
+		SmartBody::util::log("buildNavigation: Could not create solid heightfield.");
 		return false;
 	}
 
@@ -343,7 +344,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 		{
 			naviMesh->V[i] = SrPnt(m_dmesh->verts[i*3+0],m_dmesh->verts[i*3+1],m_dmesh->verts[i*3+2]);
 		}
-		//LOG("nverts = %d, ntris = %d",m_dmesh->nverts, m_dmesh->ntris);
+		//SmartBody::util::log("nverts = %d, ntris = %d",m_dmesh->nverts, m_dmesh->ntris);
 
 		for (int i=0;i<m_dmesh->nmeshes;i++)
 		{
@@ -351,7 +352,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 			const unsigned int bverts = m[0];
 			const unsigned int btris = m[2];
 			const int ntris = (int)m[3];	
-			//LOG("bverts = %d, btris = %d, ntris = %d",bverts,btris, ntris);
+			//SmartBody::util::log("bverts = %d, btris = %d, ntris = %d",bverts,btris, ntris);
 			for (int j=0;j<ntris;j++)
 			{
 				int a,b,c;
@@ -359,7 +360,7 @@ SBAPI bool SBNavigationMesh::buildNavigationMeshFromModel( SrModel& inMesh )
 				b = m_dmesh->tris[(j+btris)*4+1] + bverts;
 				c = m_dmesh->tris[(j+btris)*4+2] + bverts;
 				naviMesh->F[j+btris] = SrVec3i(a,b,c);
-				//LOG("face %d, idx = %d %d %d",j+btris, a,b,c);
+				//SmartBody::util::log("face %d, idx = %d %d %d",j+btris, a,b,c);
 			}
 		}
 

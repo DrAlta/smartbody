@@ -21,7 +21,7 @@
  *      Ed Fast, USC
  */
 
-#include "vhcl.h"
+
 #include <controllers/me_ct_periodic_replay.hpp>
 
 

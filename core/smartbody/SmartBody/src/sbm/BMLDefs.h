@@ -308,7 +308,7 @@ class BMLDefs
 		static XMLCh* ATTR_SID;
 		static XMLCh* ATTR_COUNT;
 		static XMLCh* ATTR_STRIDE;
-		static XMLCh* ATTR_INPUT;
+		static XMLCh* ATTR_INPUTSTR;
 		static XMLCh* ATTR_SEMANTIC;
 		static XMLCh* ATTR_VCOUNT;
 		static XMLCh* ATTR_SOURCE;

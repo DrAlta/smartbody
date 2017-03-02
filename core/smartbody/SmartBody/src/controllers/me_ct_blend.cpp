@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #include <controllers/me_ct_blend.hpp>
 
 
@@ -31,6 +31,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <controllers/me_controller_context_proxy.hpp>
 #include <controllers/me_controller_context_proxy.hpp>
 #include <controllers/me_evaluation_logger.hpp>
+#include <sb/SBUtilities.h>
 
 
 using namespace std;
@@ -251,7 +252,7 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 
 	if( child() ) {
 		float a = (float)_curve.evaluate( t ); // interpolation alpha
-		//LOG("MeCtBlend %s, %f, %f", this->getName().c_str(), t, a);
+		//SmartBody::util::log("MeCtBlend %s, %f, %f", this->getName().c_str(), t, a);
 		if( a > 0 )
 		{
 			SkChannelArray& local_channels = _sub_blend_context->_local_channels;  // controller_channels actually gives child's requested channels
@@ -317,18 +318,18 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 							// Print lots of details to identify the problem
 							if( !has_printed_error_header ) {
 								has_printed_error_header = true;
-								LOG("===================================================================");
+								SmartBody::util::log("===================================================================");
 								//print_state( 0 );
 								//print_children( 0 );
 							}
-							LOG("ERROR: MeCtBlend: parent_index out of bounds.");
+							SmartBody::util::log("ERROR: MeCtBlend: parent_index out of bounds.");
 							std::stringstream strstr;
 							strstr << "\ti: " << i << " of " << num_channels
 								<< " (channel \"" << local_channels.name( i ) << "\" " << SkChannel::type_name( local_channels.type( i ) ) << ")";
-							LOG("%s", strstr.str().c_str());
+							SmartBody::util::log("%s", strstr.str().c_str());
 							strstr.clear();
 							strstr << "\tparent_index: " << parent_index << " of " << parent_ch_size;
-							LOG("%s", strstr.str().c_str());
+							SmartBody::util::log("%s", strstr.str().c_str());
 							continue;
 						}
 
@@ -350,12 +351,12 @@ bool MeCtBlend::controller_evaluate( double t, MeFrameData & frame ) {
 									//print_state( 0 );
 									//print_children( 0 );
 								}
-								LOG("ERROR: MeCtBlend: local_buffer_index out of bounds.");
+								SmartBody::util::log("ERROR: MeCtBlend: local_buffer_index out of bounds.");
 								std::stringstream strstr;
 								strstr << "\ti: " << i << " of " << num_channels
 								     << " (channel \"" << local_channels.name( i ) << "\" " << SkChannel::type_name( local_channels.type( i ) ) << ")" << endl;
 								strstr << "\tlocal_buffer_index: " << local_buffer_index << " of " << local_buffer_size;
-								LOG("%s", strstr.str().c_str());
+								SmartBody::util::log("%s", strstr.str().c_str());
 								
 							}
 						}

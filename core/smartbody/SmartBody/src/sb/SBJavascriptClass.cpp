@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "SBJavascriptClass.h"
 #include "controllers/me_ct_reach.hpp"
 
@@ -50,13 +50,13 @@ namespace SmartBody
 		SmartBody::SBScene::destroyScene();
 	}
 
-	void printLog(const std::string& message)
+	void printlog(const std::string& message)
 	{
 		string s = message;
 		if (vhcl::EndsWith(s, "\n"))
 			s.erase(s.length() - 1);
 		if (s.length() > 0)
-			LOG(message.c_str());
+			SmartBody::util::log(message.c_str());
 	}
 
 
@@ -276,11 +276,11 @@ namespace SmartBody
 		strBuffer +=".";
 	}
 
-	void JsLogger::outlog()
+	void JsLogger::outSmartBody::util::log()
 	{
 		if (strBuffer.size() > 1)
 		{
-			LOG("pyLog : %s",strBuffer.c_str());
+			SmartBody::util::log("pyLog : %s",strBuffer.c_str());
 			strBuffer = "";
 		}	
 	}

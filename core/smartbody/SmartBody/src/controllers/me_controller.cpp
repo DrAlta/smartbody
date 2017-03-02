@@ -26,13 +26,13 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sr/sr_euler.h>
 #include <controllers/me_prune_policy.hpp>
 #include <controllers/me_default_prune_policy.hpp>
-#include <vhcl_log.h>
 #include <controllers/me_controller_tree_root.hpp>
 #include <sb/sbm_pawn.hpp>
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
 #include <sb/SBPawn.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBUtilities.h>
 
 #include "sbm/lin_win.h"
 using namespace std;
@@ -204,7 +204,7 @@ void MeController::stop (double time) {
 	stop_record();
 	controller_stop ();
 
-// LOG( ">>> MeController::stop <<<\n" );
+// SmartBody::util::log( ">>> MeController::stop <<<\n" );
 }
 
 double MeController::stop_time ()
@@ -239,7 +239,7 @@ void MeController::remap() {
 				std::stringstream strstr;
 				strstr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->getName()<<"\": "
 					<<_context->context_type()<<" channel "<<parent_index<<", \""<<parent_ch_name<<"\" ("<<parent_ch_type<<") lacks valid buffer index!!";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 #endif
 
@@ -256,7 +256,7 @@ void MeController::remap() {
 				strstr << "ERROR: MeController::remap(): " << controller_type() << " \"" << _name << "\" :"
 					<< " Local \"" << local_ch_name << "\" " << SkChannel::type_name(type) << " != "
 					<< " Parent \"" << parent_ch_name << "\" " << SkChannel::type_name(parent_ch_type) << std::endl;
-				LOG(strstr.str());
+				SmartBody::util::log(strstr.str());
 			}
 
 #endif
@@ -298,7 +298,7 @@ void MeController::dumpChannelMap()
 				std::stringstream strstr;
 				strstr << "WARNING: MeController::remap(): "<<controller_type()<<" \""<<this->getName()<<"\": "
 					<<_context->context_type()<<" channel "<<parent_index<<", \""<<parent_ch_name<<"\" ("<<parent_ch_type<<") lacks valid buffer index!!";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 #endif
 
@@ -308,14 +308,14 @@ void MeController::dumpChannelMap()
 			const char*     parent_ch_name = _context->channels().name( parent_index ).c_str();
 
 			// Print it out...
-			LOG("L# %d \t-> P#%d\t\t%s (%s)", i, parent_index, local_ch_name, SkChannel::type_name(type));
+			SmartBody::util::log("L# %d \t-> P#%d\t\t%s (%s)", i, parent_index, local_ch_name, SkChannel::type_name(type));
 
 			if( strcmp( local_ch_name, parent_ch_name ) || (type != parent_ch_type ) ) {
 				std::stringstream strstr;
 				strstr << "ERROR: MeController::remap(): " << controller_type() << " \"" << getName() << "\" :"
 					<< " Local \"" << local_ch_name << "\" " << SkChannel::type_name(type) << " != "
 					<< " Parent \"" << parent_ch_name << "\" " << SkChannel::type_name(parent_ch_type) << std::endl;
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 
 		}
@@ -350,7 +350,7 @@ void MeController::record_motion( int max_num_of_frames ) {
 	stop_record();
 	_record_mode = RECORD_MOTION; 
 	_record_max_frames = max_num_of_frames;
-	LOG("MeController::record_motion START");
+	SmartBody::util::log("MeController::record_motion START");
 }
 
 void MeController::record_bvh( int max_num_of_frames, double dt )	{
@@ -359,7 +359,7 @@ void MeController::record_bvh( int max_num_of_frames, double dt )	{
 	_record_mode = RECORD_BVH_MOTION; 
 	_record_max_frames = max_num_of_frames;
 	_record_dt = dt;
-	LOG("MeController::record_bvh START");
+	SmartBody::util::log("MeController::record_bvh START");
 }
 
 void MeController::load_bvh_joint_hmap( void )	{
@@ -377,10 +377,10 @@ void MeController::load_bvh_joint_hmap( void )	{
 //			bool b = _record_joint_hmap.insertstat( strname, 1 );
 			bool b = _record_joint_hmap.insert( jname, 1 );
 			if( b ) {
-				LOG( "MeController::load_bvh_joint_hmap SUCCESS: '%s'\n", strname );
+				SmartBody::util::log( "MeController::load_bvh_joint_hmap SUCCESS: '%s'\n", strname );
 			}
 			else	{
-				LOG( "MeController::load_bvh_joint_hmap FAILURE: '%s'\n", strname );
+				SmartBody::util::log( "MeController::load_bvh_joint_hmap FAILURE: '%s'\n", strname );
 			}
 		}
 	}
@@ -396,7 +396,7 @@ bool MeController::print_bvh_hierarchy( SkJoint* joint_p, int depth )	{
 	int i;
 	
 	if( joint_p == NULL )	{
-		LOG("MeController::print_bvh_hierarchy ERR: NULL joint_p");
+		SmartBody::util::log("MeController::print_bvh_hierarchy ERR: NULL joint_p");
 		return( false );
 	}
 	
@@ -476,7 +476,7 @@ bool MeController::print_bvh_motion( SkJoint* joint_p, int depth, FRAME& frame_d
 	int i;
 
 	if( joint_p == NULL )	{
-		LOG("MeController::print_bvh_motion ERR: NULL joint_p");
+		SmartBody::util::log("MeController::print_bvh_motion ERR: NULL joint_p");
 		return( false );
 	}
 	
@@ -534,7 +534,7 @@ bool MeController::print_bvh_motion( SkJoint* joint_p, int depth, FRAME& frame_d
 
 void MeController::record_stop()	{
 	stop_record();
-	LOG("MeController::record_stop");
+	SmartBody::util::log("MeController::record_stop");
 }
 
 void MeController::record_clear()	{
@@ -569,7 +569,7 @@ void MeController::saveMotionRecord( const std::string &recordname )
 		SkSkeleton* skeleton_p = _pawn->getSkeleton();
 
 		if( skeleton_p == NULL )	{
-			LOG("MeController::record_write NOTICE: SkSkeleton not available");
+			SmartBody::util::log("MeController::record_write NOTICE: SkSkeleton not available");
 			_record_mode = RECORD_NULL;
 		}
 
@@ -583,7 +583,7 @@ void MeController::saveMotionRecord( const std::string &recordname )
 
 		*_record_output << "Frame Time: " << _record_dt << srnl;	
 		//		load_bvh_joint_hmap();
-		LOG("MeController::write_record BVH: %s", filename.c_str() );
+		SmartBody::util::log("MeController::write_record BVH: %s", filename.c_str() );
 	}
 	else if( _record_mode == RECORD_MOTION )
 	{
@@ -601,11 +601,11 @@ void MeController::saveMotionRecord( const std::string &recordname )
 		*_record_output << channels << srnl;
 		*_record_output << "frames " << (int)_frames->size() << srnl;	
 
-		LOG("MeController::write_record SKM: %s", filename.c_str() );
+		SmartBody::util::log("MeController::write_record SKM: %s", filename.c_str() );
 	}
 	else	
 	{
-		LOG("MeController::init_record NOTICE: POSE not implemented");
+		SmartBody::util::log("MeController::init_record NOTICE: POSE not implemented");
 			_record_mode = RECORD_NULL;
 			_frames->clear();
 			//filename = _record_full_prefix + recordname + ".skp";
@@ -613,12 +613,12 @@ void MeController::saveMotionRecord( const std::string &recordname )
 
 	std::list<FRAME>::iterator iter = _frames->begin();
 	std::list<FRAME>::iterator end  = _frames->end();
-	LOG("Output Motion, num frames = %d",_frames->size());
+	SmartBody::util::log("Output Motion, num frames = %d",_frames->size());
 	int frameCount = 0;
 	for(;iter!=end; iter++)
 	{
 		*_record_output<<(*iter).c_str()<<srnl;
-		//LOG("finish writing frame %d",frameCount++);
+		//SmartBody::util::log("finish writing frame %d",frameCount++);
 	}
 	if (_record_mode == RECORD_MOTION) // write out time sync point to avoid erroneous results
 	{
@@ -634,7 +634,7 @@ void MeController::saveMotionRecord( const std::string &recordname )
 	SmartBody::SBMotion* sbMotion = SmartBody::SBScene::getScene()->createMotion(recordname);
 	if (sbMotion == NULL)
 	{
-		LOG("Recorded motion %s is already existing!", recordname.c_str());
+		SmartBody::util::log("Recorded motion %s is already existing!", recordname.c_str());
 		return;
 	}
 
@@ -665,7 +665,7 @@ void MeController::cont_record( double time, MeFrameData& frame )	{
 			skeleton_p = _context->channels().skeleton();
 		}
 		if( skeleton_p == NULL )	{
-			LOG("MeController::cont_record NOTICE: SkSkeleton not available");
+			SmartBody::util::log("MeController::cont_record NOTICE: SkSkeleton not available");
 			_record_mode = RECORD_NULL;
 			return;
 		}

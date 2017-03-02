@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 
 #include "ParserFBX.h"
 
@@ -64,7 +64,7 @@ bool ParserFBX::parse(SkSkeleton& skeleton, SkMotion& motion, const std::string&
    }
    else
    {
-      LOG("Failed to load fbx: %s\n", filebasename.c_str());
+      SmartBody::util::log("Failed to load fbx: %s\n", filebasename.c_str());
       return false;
    }
           
@@ -125,7 +125,7 @@ bool ParserFBX::parseSkin(const std::string& fileName, const char* char_name, fl
    }
    else
    {
-      LOG("No root node found in %s", fileName.c_str());
+      SmartBody::util::log("No root node found in %s", fileName.c_str());
    }
 
    Shutdown(pSdkManager, pImporter);
@@ -348,7 +348,7 @@ bool ParserFBX::Init(KFbxSdkManager** pSdkManager, KFbxImporter** pImporter, KFb
    // Use the first argument as the filename for the importer.
    if(!(*pImporter)->Initialize(fileName.c_str(), -1, (*pSdkManager)->GetIOSettings())) 
    {
-       LOG("Call to KFbxImporter::Initialize() failed. Error returned: %s\n\n", (*pImporter)->GetLastErrorString());
+       SmartBody::util::log("Call to KFbxImporter::Initialize() failed. Error returned: %s\n\n", (*pImporter)->GetLastErrorString());
        return false;
    }
 
@@ -451,7 +451,7 @@ SkJoint* ParserFBX::createJoint(KFbxNode* pNode, SkSkeleton& skeleton, SkMotion&
 
    order = 123;//getRotationOrder(orderVec);
    if (order == -1)
-      LOG("ParserFBX::parseJoints ERR: rotation info not correct in the file");
+      SmartBody::util::log("ParserFBX::parseJoints ERR: rotation info not correct in the file");
 
    // get local position
    fbxDouble3 translation = pNode->LclTranslation.Get();
@@ -737,7 +737,7 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
             //float zRot = fbxAnimData[j+2]->keyFrameDataFrame[i];
             
             //if (stricmp(joint->name().c_str(), "JtElbowLf") == 0)
-            //   LOG("Frame %d %s, x: %.2f, y: %.2f, z: %.2f", i, joint->name().c_str(), xRot, yRot, zRot);
+            //   SmartBody::util::log("Frame %d %s, x: %.2f, y: %.2f, z: %.2f", i, joint->name().c_str(), xRot, yRot, zRot);
 
             // convert euler angles to mat
             sr_euler_mat(order, mat, fbxAnimData[j]->keyFrameDataFrame[i] * DEG_TO_RAD,
@@ -772,7 +772,7 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
   
    if (metaData == (double)0)
    {
-      LOG("FBX animation %s has no SBM Metadata", motion.getName().c_str());
+      SmartBody::util::log("FBX animation %s has no SBM Metadata", motion.getName().c_str());
    }
    
    // set the meta data
@@ -784,7 +784,7 @@ void ParserFBX::ConvertfbxAnimToSBM(const std::vector<FBXAnimData*>& fbxAnimData
    }
    else
    {
-      LOG("FBX animation %s metadata was not set because it doesn't have any key frames", motion.getName().c_str());
+      SmartBody::util::log("FBX animation %s metadata was not set because it doesn't have any key frames", motion.getName().c_str());
    }
 }
 

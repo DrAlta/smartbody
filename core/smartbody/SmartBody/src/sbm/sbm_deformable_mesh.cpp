@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #include <sb/SBTypes.h>
 
 #if !defined(__FLASHPLAYER__) && !defined(ANDROID_BUILD) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
@@ -31,6 +31,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 #include <sr/sr_sn_group.h>
 #include <sr/sr_random.h>
 #include <sbm/gwiz_math.h>
@@ -222,7 +223,7 @@ SBAPI void SkinWeight::mergeRedundantWeight( std::vector<int>& vtxIdxMap )
 {
 	if (vtxIdxMap.size() != numInfJoints.size())
 	{
-		LOG("Warning!! mergeRedundantWeight() : vtxIdxMap.size() != numInfJoint.size()");
+		SmartBody::util::log("Warning!! mergeRedundantWeight() : vtxIdxMap.size() != numInfJoint.size()");
 		return;
 	}
 	
@@ -547,7 +548,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 
 	bool buildSkinnedBuffer = isSkinnedMesh();
 
-	LOG("Build Skinned Buffer");
+	SmartBody::util::log("Build Skinned Buffer");
 	int nTotalVtxs=0, nTotalTris = 0, nTotalBones = 0;	
 	std::vector<std::set<IntPair> > vtxNormalIdxMap;
 	std::vector<std::set<int> > vtxMaterialIdxMap;
@@ -582,7 +583,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	meshIndexList.clear();
 	boneJointIdxMap.clear();
 	bindPoseMatList.clear();
-	LOG("dynamic mesh size = %d, skin weight size = %d",dMeshDynamic_p.size(), skinWeights.size());
+	SmartBody::util::log("dynamic mesh size = %d, skin weight size = %d",dMeshDynamic_p.size(), skinWeights.size());
 	if (buildSkinnedBuffer)
 	{
 		for (unsigned int skinCounter = 0; skinCounter < skinWeights.size(); skinCounter++)
@@ -592,7 +593,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			int globalCounter = 0;
 			//pos = this->getMesh(skinWeight->sourceMesh);
 			pos = this->getValidSkinMesh(skinWeight->sourceMesh);
-			//LOG("skinWeight->sourceMesh = %s, pos = %d", skinWeight->sourceMesh.c_str(), pos);
+			//SmartBody::util::log("skinWeight->sourceMesh = %s, pos = %d", skinWeight->sourceMesh.c_str(), pos);
 			if (pos != -1)
 			{
 				meshIndexList.push_back(pos);
@@ -626,7 +627,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			meshIndexList.push_back(i);
 	}
 
-	//LOG("meshIndexList.size() = %d \n", meshIndexList.size());
+	//SmartBody::util::log("meshIndexList.size() = %d \n", meshIndexList.size());
 	for (unsigned int i=0;i<meshIndexList.size();i++)
 	{
 		int pos = meshIndexList[i];
@@ -638,7 +639,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		std::map<std::string,std::string> mtlTexMap = dMeshDynamic->shape().mtlTextureNameMap;
 		std::map<std::string,std::string> mtlNormalTexMap = dMeshDynamic->shape().mtlNormalTexNameMap;		
 		std::map<std::string,std::string> mtlSpecularTexMap = dMeshDynamic->shape().mtlSpecularTexNameMap;		
-		//LOG("meshIndexList %d, matList.size() = %d \n", i, matList.size());
+		//SmartBody::util::log("meshIndexList %d, matList.size() = %d \n", i, matList.size());
 		for (size_t j=0;j<matList.size();j++)
 		{			
 			SrMaterial& mat = matList[j];	
@@ -738,7 +739,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 				std::map<int,std::vector<int> >::iterator iter = meshSubsetMap.find(nMatIdx);
 				if (iter == meshSubsetMap.end())
 				{
-					LOG("Bad material index %d", nMatIdx);
+					SmartBody::util::log("Bad material index %d", nMatIdx);
 					nMatIdx = 0;
 				}
 			}
@@ -752,7 +753,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		//printf("iMaterial Offset = %d\n",iMaterialOffset);			
 	}
 
-	LOG("nTotalVtxs = %d, nTotalTris = %d", nTotalVtxs, nTotalTris);
+	SmartBody::util::log("nTotalVtxs = %d, nTotalTris = %d", nTotalVtxs, nTotalTris);
 
 	if (nTotalVtxs == 0 || nTotalTris ==0)
 		return false;
@@ -764,7 +765,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		std::set<IntPair>& idxMap = vtxNormalIdxMap[i];
 		if (idxMap.size() > 1)
 		{
-			//LOG("vtx %d, idxMap size = %d", i, idxMap.size());
+			//SmartBody::util::log("vtx %d, idxMap size = %d", i, idxMap.size());
 			vtxNewVtxIdxMap[i] = std::vector<int>();
 			std::set<IntPair>::iterator si = idxMap.begin();
 			si++;
@@ -857,7 +858,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 			}
 			SrVec& lv = dMeshStatic->shape().V[i];	
 			//if (i % 1000 == 0)
-			//	LOG("mesh vtx %d = %s", i, lv.toString().c_str());
+			//	SmartBody::util::log("mesh vtx %d = %s", i, lv.toString().c_str());
 			posBuf[iVtx] = lv*bindShapeMat;
 			SrVec meshColor = SrVec(1.f,1.f,1.f);
 			if (i < dMeshStatic->shape().Vc.size())
@@ -1041,7 +1042,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 	std::vector<SbmSubMesh*> alphaMeshList;
 	std::map<int,std::vector<int> >::iterator vi;
 	subMeshList.clear();
-	LOG("subMeshList.size() = %d \n", meshSubsetMap.size());
+	SmartBody::util::log("subMeshList.size() = %d \n", meshSubsetMap.size());
 	for (vi  = meshSubsetMap.begin();
 		vi != meshSubsetMap.end();
 		vi++)
@@ -1077,7 +1078,7 @@ bool DeformableMesh::buildSkinnedVertexBuffer()
 		boost::algorithm::to_lower(lowMatName);		
 		if (mesh->material.useAlphaBlend)
 		{
-			LOG("alpha mesh = %s",mesh->matName.c_str());
+			SmartBody::util::log("alpha mesh = %s",mesh->matName.c_str());
 			alphaMeshList.push_back(mesh);
 		}
 		else
@@ -1312,7 +1313,7 @@ void DeformableMesh::readFromStaticMeshBinary(SmartBodyBinary::StaticMesh* mesh,
 			newMat.diffuse.a = material.diffuse(3);
 			if (newMat.diffuse.a < 1.0)
 			{
-				LOG("mesh %d, mat %d, useAlphaBlending",numMeshModels, numMaterials);
+				SmartBody::util::log("mesh %d, mat %d, useAlphaBlending",numMeshModels, numMaterials);
 				newMat.useAlphaBlend = true;
 			}
 			// 3
@@ -1611,7 +1612,7 @@ bool DeformableMesh::saveToSmb(std::string inputFileName)
 	std::fstream file(inputFileName.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 	if (!outputStaticMesh->SerializeToOstream(&file)) 
 	{
-		LOG("Fail to write to binary file %s", inputFileName.c_str());
+		SmartBody::util::log("Fail to write to binary file %s", inputFileName.c_str());
 		return false;
 	}
 	google::protobuf::ShutdownProtobufLibrary();
@@ -1623,7 +1624,7 @@ bool DeformableMesh::saveToDmb(std::string inputFileName)
 {
 	if (!isSkinnedMesh())
 	{
-		LOG("mesh %s is a static mesh, skip saving to %s", this->getName().c_str(), inputFileName.c_str());
+		SmartBody::util::log("mesh %s is a static mesh, skip saving to %s", this->getName().c_str(), inputFileName.c_str());
 		return false;
 	}
 	boost::filesystem::path p(inputFileName);
@@ -1696,7 +1697,7 @@ bool DeformableMesh::saveToDmb(std::string inputFileName)
 	std::fstream file(inputFileName.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 	if (!outputDeformableMesh->SerializeToOstream(&file)) 
 	{
-		LOG("Fail to write to binary file %s", inputFileName.c_str());
+		SmartBody::util::log("Fail to write to binary file %s", inputFileName.c_str());
 		return false;
 	}
 	google::protobuf::ShutdownProtobufLibrary();
@@ -1714,7 +1715,7 @@ bool DeformableMesh::readFromSmb(std::string inputFileName)
 	
 	if (!staticMesh.ParseFromCodedStream(coded_input))
 	{
-		LOG("Failed to parse binary static mesh from file %s", inputFileName.c_str());
+		SmartBody::util::log("Failed to parse binary static mesh from file %s", inputFileName.c_str());
 		return false;
 	}
 
@@ -1760,7 +1761,7 @@ bool DeformableMesh::readFromDmb(std::string inputFileName)
 
 	if (!deformableMesh.ParseFromCodedStream(coded_input))
 	{
-		LOG("Failed to parse binary deformable mesh from file %s", inputFileName.c_str());
+		SmartBody::util::log("Failed to parse binary deformable mesh from file %s", inputFileName.c_str());
 		return false;
 	}
 
@@ -1930,7 +1931,7 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 					textureFile = textureFile.substr(6);
 				std::string textureName = textureDirectory + "/" + textureFile;
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
-					LOG("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
+					SmartBody::util::log("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
 				texManager.loadTexture(SbmTextureManager::TEXTURE_DIFFUSE, iter->second.c_str(), textureName.c_str());
 			}
 		}
@@ -1952,7 +1953,7 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 					textureFile = textureFile.substr(6);
 				std::string textureName = textureDirectory + "/" + textureFile;
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
-					LOG("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
+					SmartBody::util::log("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
 				texManager.loadTexture(SbmTextureManager::TEXTURE_NORMALMAP, iter->second.c_str(), textureName.c_str());
 			}
 		}
@@ -1974,7 +1975,7 @@ void DeformableMesh::loadAllFoundTextures(std::string textureDirectory)
 					textureFile = textureFile.substr(6);
 				std::string textureName = textureDirectory + "/" + textureFile;
 				if (!boost::filesystem::exists(boost::filesystem::path(textureName)))
-					LOG("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
+					SmartBody::util::log("Texture %s doesn't exist under same path of mesh %s", textureName.c_str(), getName().c_str());
 				texManager.loadTexture(SbmTextureManager::TEXTURE_SPECULARMAP, iter->second.c_str(), textureName.c_str());
 			}
 		}
@@ -2038,7 +2039,7 @@ DeformableMeshInstance::~DeformableMeshInstance()
 
 	if(_tempTex > 0)
 	{
-		LOG("Deleting _tempTex #%d", _tempTex);
+		SmartBody::util::log("Deleting _tempTex #%d", _tempTex);
 		glDeleteTextures(1, &_tempTex);
 	}
 
@@ -2115,7 +2116,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 
 		if (writeToBaseModel == NULL)
 		{
-			//LOG("base model to write to cannot be found");
+			//SmartBody::util::log("base model to write to cannot be found");
 			continue;
 		}
 		for (size_t i = 0; i < mIter->second.size(); ++i)
@@ -2129,7 +2130,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 		}
 		if (baseModel == NULL)
 		{
-			LOG("original base model cannot be found");
+			SmartBody::util::log("original base model cannot be found");
 			continue;
 		}
 
@@ -2162,7 +2163,7 @@ void DeformableMeshInstance::GPUblendShapes(glm::mat4x4 translation, glm::mat4x4
 					{
 						SrVec pos = joint->getPosition();
 						w = pos.x;
-						//LOG("shape %s(%s) with weight %f", (const char*)mIter->second[i]->shape().name, mappedCName.c_str(), w);
+						//SmartBody::util::log("shape %s(%s) with weight %f", (const char*)mIter->second[i]->shape().name, mappedCName.c_str(), w);
 						// clamp
 						//if (w > wLimit)
 						//	w = wLimit;
@@ -2358,7 +2359,7 @@ void DeformableMeshInstance::blendShapes()
 
 		if (writeToBaseModel == NULL)
 		{
-			//LOG("base model to write to cannot be found");
+			//SmartBody::util::log("base model to write to cannot be found");
 			continue;
 		}
 		for (size_t i = 0; i < targets.size(); ++i)
@@ -2372,7 +2373,7 @@ void DeformableMeshInstance::blendShapes()
 		}
 		if (baseModel == NULL)
 		{
-			LOG("original base model cannot be found");
+			SmartBody::util::log("original base model cannot be found");
 			continue;
 		}
 
@@ -2395,7 +2396,7 @@ void DeformableMeshInstance::blendShapes()
 			std::vector<BlendShapeData>& optimizedShapeData = (*optIter).second;
 			if (optimizedShapeData.size() != targets.size())
 			{
-				LOG("Optimizing blend shapes. Only have %d/%d shapes.", optimizedShapeData.size(), targets.size());
+				SmartBody::util::log("Optimizing blend shapes. Only have %d/%d shapes.", optimizedShapeData.size(), targets.size());
 				optimizedShapeData.clear();
 				// optimize the blend shape maps as needed
 				for (size_t i = 0; i < targets.size(); ++i)
@@ -2440,7 +2441,7 @@ void DeformableMeshInstance::blendShapes()
 							blendData.diffN.push_back(std::pair<int, SrVec>(n, nVec));
 						}
 					}
-					LOG("Optimized blend %s has %d/%d vertices, %d/%d normals.", (const char*) targets[i]->shape().name, blendData.diffV.size(), visemeV.size(), blendData.diffN.size(), visemeN.size());
+					SmartBody::util::log("Optimized blend %s has %d/%d vertices, %d/%d normals.", (const char*) targets[i]->shape().name, blendData.diffV.size(), visemeV.size(), blendData.diffN.size(), visemeN.size());
 				}
 			}
 		}
@@ -2487,7 +2488,7 @@ void DeformableMeshInstance::blendShapes()
 					{
 						SrVec pos = joint->getPosition();
 						w = pos.x;
-						//LOG("shape %s(%s) with weight %f", (const char*)mIter->second[i]->shape().name, mappedCName.c_str(), w);
+						//SmartBody::util::log("shape %s(%s) with weight %f", (const char*)mIter->second[i]->shape().name, mappedCName.c_str(), w);
 						// clamp
 						//if (w > wLimit)
 						//	w = wLimit;
@@ -2508,18 +2509,18 @@ void DeformableMeshInstance::blendShapes()
 
 			if (fabs(w) > gwiz::epsilon4())	// if it has weight
 			{
-				//LOG("blend in %s with weight %f", (const char*)mIter->second[i]->shape().name, w);
+				//SmartBody::util::log("blend in %s with weight %f", (const char*)mIter->second[i]->shape().name, w);
 				//SrArray<SrPnt>& visemeV = mIter->second[i]->shape().V;
 				std::vector<SrVec>& visemeV = targets[i]->shape().V;
 				std::vector<SrPnt>& visemeN = targets[i]->shape().N;
 				if (visemeV.size() != neutralV.size())
 				{
-					LOG("number of vertices for %s (%d) is not same as neutral (%d)", baseModelName.c_str(), visemeV.size(), neutralV.size());
+					SmartBody::util::log("number of vertices for %s (%d) is not same as neutral (%d)", baseModelName.c_str(), visemeV.size(), neutralV.size());
 					continue;
 				}
 				if (visemeN.size() != neutralN.size())
 				{
-					LOG("number of normals for %s (%d) is not same as neutral (%d)", baseModelName.c_str(), visemeN.size(), neutralN.size());
+					SmartBody::util::log("number of normals for %s (%d) is not same as neutral (%d)", baseModelName.c_str(), visemeN.size(), neutralN.size());
 					continue;
 				}
 
@@ -2714,7 +2715,7 @@ void DeformableMeshInstance::blendShapes()
 			}
 			else
 			{
-				LOG("Error : BlendShape Texture, '%s' does not exist.", tempTexName.c_str());
+				SmartBody::util::log("Error : BlendShape Texture, '%s' does not exist.", tempTexName.c_str());
 			}
 		}		
 
@@ -2735,7 +2736,7 @@ void DeformableMeshInstance::blendShapes()
 
 void DeformableMeshInstance::setDeformableMesh( DeformableMesh* mesh )
 {
-	//LOG("setDeformableMesh to be %s", mesh->meshName.c_str());
+	//SmartBody::util::log("setDeformableMesh to be %s", mesh->meshName.c_str());
 	_mesh = mesh;
 	_mesh->buildSkinnedVertexBuffer(); // make sure the deformable mesh has vertex buffer
 	_deformPosBuf.resize(_mesh->posBuf.size()); // initialized deformation posBuffer
@@ -2836,33 +2837,33 @@ SBAPI void DeformableMeshInstance::updateFast()
 	if (!_updateMesh)	return;
 	if (!_skeleton || !_mesh) return;	
 	if (isStaticMesh()) return; // not update the buffer if it's a static mesh
-	//LOG("Update Skin...");
+	//SmartBody::util::log("Update Skin...");
 	//updateSkin(_mesh->posBuf,  _deformPosBuf);
 	updateSkin(_restPosBuf, _deformPosBuf);
 
 	SrVec tempPos = _deformPosBuf[150];
-	//LOG("deformPos = %f %f %f",tempPos[0],tempPos[1],tempPos[2]);
+	//SmartBody::util::log("deformPos = %f %f %f",tempPos[0],tempPos[1],tempPos[2]);
 }
 
 
 void DeformableMeshInstance::update()
 {
 	//blendShapes();
-	//LOG("Update deformable mesh");
+	//SmartBody::util::log("Update deformable mesh");
 #define RECOMPUTE_NORMAL 0
 	if (!_updateMesh)
 	{
-		//LOG("!_updateMesh...");
+		//SmartBody::util::log("!_updateMesh...");
 		return;
 	}
 	if (!_skeleton || !_mesh)
 	{
-		//LOG("No skeleton or no mesh...");
+		//SmartBody::util::log("No skeleton or no mesh...");
 		return;
 	}
 	if (isStaticMesh())
 	{
-		//LOG("is static mesh...");
+		//SmartBody::util::log("is static mesh...");
 		return; // not update the buffer if it's a static mesh
 	}
 	_skeleton->update_global_matrices();
@@ -2870,7 +2871,7 @@ void DeformableMeshInstance::update()
 	updateTransformBuffer();
 	return;
 #endif
-	//LOG("Update DeformableMeshInstance");
+	//SmartBody::util::log("Update DeformableMeshInstance");
 	updateFast();
 	return;
 
@@ -2895,7 +2896,7 @@ void DeformableMeshInstance::update()
 		else																pos = _mesh->getMesh(skinWeight->sourceMesh);
 		if (pos != -1)
 		{
-			//LOG("update skinning, skin counter = %d", skinCounter);
+			//SmartBody::util::log("update skinning, skin counter = %d", skinCounter);
 			SrSnModel* dMeshStatic = _mesh->dMeshStatic_p[pos];
 			//SrSnModel* dMeshDynamic = dynamicMesh[pos];
 			int numVertices = dMeshStatic->shape().V.size();
@@ -3007,13 +3008,13 @@ SBAPI bool DeformableMeshInstance::isStaticMesh()
 SBAPI void DeformableMeshInstance::blendShapeStaticMesh()
 {
 	//return;
-	//LOG("Running blendShapeStaticMesh");
+	//SmartBody::util::log("Running blendShapeStaticMesh");
 
 	//SbmShaderProgram::printOglError("DeformableMeshInstance::blendShapeStaticMesh() #0 ");
 
 	if (!_mesh) 
 		return;
-	//LOG("Mesh blendshape size = %d", _mesh->blendShapeMap.size());
+	//SmartBody::util::log("Mesh blendshape size = %d", _mesh->blendShapeMap.size());
 	if (_mesh->blendShapeMap.size() == 0)
 		return;
 
@@ -3109,7 +3110,7 @@ SrModel& DeformableMesh::getStaticModel(int index)
 
 void DeformableMesh::copySkinWeights(DeformableMesh* fromMesh, const std::string& morphName)
 {
-	LOG("Start copy skin weights");
+	SmartBody::util::log("Start copy skin weights");
 	// clear any existing skin weights
 	for (size_t w = 0; w < this->skinWeights.size(); w++)
 	{
@@ -3121,10 +3122,10 @@ void DeformableMesh::copySkinWeights(DeformableMesh* fromMesh, const std::string
 
 	for (size_t w = 0; w < fromMesh->skinWeights.size(); w++)
 	{
-		LOG("copy weight %d...", w);
+		SmartBody::util::log("copy weight %d...", w);
 		SkinWeight* weight = new SkinWeight();
 		weight->copyWeights(fromMesh->skinWeights[w], morphName);
 		this->skinWeights.push_back(weight);
 	}
-	LOG("Finish copy skin weights");
+	SmartBody::util::log("Finish copy skin weights");
 }

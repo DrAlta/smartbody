@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "SBPythonAutoRig.h"
 #include "SBInterfaceListener.h"
 #include <sb/SBObject.h>

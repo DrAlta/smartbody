@@ -4,8 +4,8 @@
 #include <string>
 #include <cstring>
 #include <cstdlib>
-#include <vhcl_log.h>
 #include "pic.h"
+#include <sb/SBUtilities.h>
 
 /*
  * ppm: subroutines for reading PPM picture files
@@ -104,7 +104,7 @@ Pic *ppm_read(char *file, Pic *opic) {
     }
 
     p = pic_alloc(nx, ny, 3, opic);
-    LOG("reading PPM file %s: %dx%d pixels\n", file, p->nx, p->ny);
+    SmartBody::util::log("reading PPM file %s: %dx%d pixels\n", file, p->nx, p->ny);
 
     if (fread(p->pix, p->nx*3, p->ny, fp) != p->ny) {	/* read pixels */
 	fprintf(stderr, "premature EOF on file %s\n", file);

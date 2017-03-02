@@ -1,5 +1,5 @@
 
-#include "vhcl.h"
+
 
 #include "BehaviorWindow.h"
 
@@ -16,6 +16,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBBmlProcessor.h>
+#include <sb/SBUtilities.h>
 #include "BehaviorBlock.h"
 #include <bml/bml_types.hpp>
 #include <sbm/text_speech.h>
@@ -1394,7 +1395,7 @@ void BehaviorWindow::processSpeechRequest(BML::SpeechRequest* speechRequest, nle
 						//XMLString::release(&tempStr);
 						if (markTimeFromInterface == -1.0 || fabs(markTimeFromInterface + triggerTime - markerTime) > .001)
 						{
-							LOG("Interface time %f does not match sync point time %f", (markTimeFromInterface + triggerTime), markerTime);
+							SmartBody::util::log("Interface time %f does not match sync point time %f", (markTimeFromInterface + triggerTime), markerTime);
 						}
 						
 						// add these times to the syncMap so that we can use them 

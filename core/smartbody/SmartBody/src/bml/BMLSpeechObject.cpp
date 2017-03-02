@@ -2,7 +2,7 @@
 #include <sstream>
 #include <sb/SBAttribute.h>
 #include <sb/SBUtilities.h>
-#include <vhcl.h>
+
 
 BMLSpeechObject::BMLSpeechObject() : BMLObject()
 {

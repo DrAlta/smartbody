@@ -18,7 +18,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-//#include "vhcl_log.h"
 #include "SBEvent.h"
 #include <sb/SBScene.h>
 #include <sb/SBCommandManager.h>

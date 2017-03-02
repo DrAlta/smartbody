@@ -83,13 +83,13 @@ MeCtQuickDraw::~MeCtQuickDraw( void )	{
 void print_motion( SkMotion* mot_p )	{
 
 	if( mot_p ) {
-		LOG( "motion:'%s'\n", mot_p->getName().c_str() );
-		LOG( "file:'%s'\n", mot_p->filename().c_str() );
-		LOG( " ready:     %f\n", mot_p->time_ready() );
-		LOG( " str-start: %f \n", mot_p->time_stroke_start() );
-		LOG( " str-emph:  %f \n", mot_p->time_stroke_emphasis() );
-		LOG( " str-end:   %f \n", mot_p->time_stroke_end() );
-		LOG( " relax:     %f \n", mot_p->time_relax() );
+		SmartBody::util::log( "motion:'%s'\n", mot_p->getName().c_str() );
+		SmartBody::util::log( "file:'%s'\n", mot_p->filename().c_str() );
+		SmartBody::util::log( " ready:     %f\n", mot_p->time_ready() );
+		SmartBody::util::log( " str-start: %f \n", mot_p->time_stroke_start() );
+		SmartBody::util::log( " str-emph:  %f \n", mot_p->time_stroke_emphasis() );
+		SmartBody::util::log( " str-end:   %f \n", mot_p->time_stroke_end() );
+		SmartBody::util::log( " relax:     %f \n", mot_p->time_relax() );
 	}
 }
 
@@ -137,7 +137,7 @@ void MeCtQuickDraw::init( SbmPawn* pawn, SkMotion* mot_p, SkMotion* mot2_p ) {
 			set_holster_duration( raw_holster_dur );
 		}
 		else	{
-			LOG( "MeCtQuickDraw::init ERR: unmatched channels in reholster motion '%s', IGNORED\n", mot2_p->filename().c_str() );
+			SmartBody::util::log( "MeCtQuickDraw::init ERR: unmatched channels in reholster motion '%s', IGNORED\n", mot2_p->filename().c_str() );
 		}
 	}
 	else	{
@@ -324,7 +324,7 @@ MeCtQuickDraw::joint_state_t MeCtQuickDraw::capture_joint_state( SkJoint *joint_
 		}
 		else	{
 			const char *name = joint_p->jointName().c_str();
-			LOG( "MeCtQuickDraw::capture_joint_state ERR: parent of joint '%s' not found\n", name );
+			SmartBody::util::log( "MeCtQuickDraw::capture_joint_state ERR: parent of joint '%s' not found\n", name );
 		}
 	}
 	return( state );
@@ -397,11 +397,11 @@ void MeCtQuickDraw::context_updated( void ) {
 	if( _context ) {
 		skeleton_ref_p = _context->channels().skeleton(); // WHY HERE?
 		if( skeleton_ref_p == NULL )	{
-			LOG( "MeCtQuickDraw::context_updated ERR: skeleton_ref_p is NULL\n" );
+			SmartBody::util::log( "MeCtQuickDraw::context_updated ERR: skeleton_ref_p is NULL\n" );
 		}
 	}
 	else	{
-		LOG( "MeCtQuickDraw::context_updated ERR: context is NULL\n" );
+		SmartBody::util::log( "MeCtQuickDraw::context_updated ERR: context is NULL\n" );
 	}
 #endif
 }
@@ -423,7 +423,7 @@ void MeCtQuickDraw::controller_map_updated( void ) {
 
 	} 
 	else {
-		LOG( "MeCtQuickDraw::controller_map_updated: context NOT found\n" );
+		SmartBody::util::log( "MeCtQuickDraw::controller_map_updated: context NOT found\n" );
 		_motion_chan_to_buff.setall( -1 );
 	}
 }
@@ -436,20 +436,20 @@ void MeCtQuickDraw::controller_start( void )	{
 	
 #if 0
 	if( has_gundraw_leadup )
-		LOG( "animated indt: %f\n", indt() );
+		SmartBody::util::log( "animated indt: %f\n", indt() );
 	else
-		LOG( "static indt: %f\n", indt() );
+		SmartBody::util::log( "static indt: %f\n", indt() );
 	if( has_holster_leadaway )
-		LOG( "animated outdt: %f\n", outdt() );
+		SmartBody::util::log( "animated outdt: %f\n", outdt() );
 	else
-		LOG( "static outdt: %f\n", outdt() );
+		SmartBody::util::log( "static outdt: %f\n", outdt() );
 #endif
 
 	hard_gundraw_dur = play_gundraw_dur - ( has_gundraw_leadup ? indt() : 0.0f );
 	hard_holster_dur = play_holster_dur - ( has_holster_leadaway ? outdt() : 0.0f );
 
-//LOG( "drawgun: play:%f hard:%f\n", play_gundraw_dur, hard_gundraw_dur );
-//LOG( "holster: play:%f hard:%f\n", play_holster_dur, hard_holster_dur );
+//SmartBody::util::log( "drawgun: play:%f hard:%f\n", play_gundraw_dur, hard_gundraw_dur );
+//SmartBody::util::log( "holster: play:%f hard:%f\n", play_holster_dur, hard_holster_dur );
 
 	start = 1;
 	draw_mode = DRAW_READY;
@@ -522,7 +522,7 @@ else	{
 		if( t > indt() )	{
 			draw_mode = DRAW_AIMING;
 		}
-//LOG( "READY: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", play_gundraw_dur, hard_gundraw_dur, motion_time, raw_lerp );
+//SmartBody::util::log( "READY: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", play_gundraw_dur, hard_gundraw_dur, motion_time, raw_lerp );
 	}
 	if( draw_mode == DRAW_AIMING )	{
 		float mode_time = (float)t - indt();
@@ -539,7 +539,7 @@ else	{
 		else	{
 			draw_mode = DRAW_TRACKING; 
 		}
-//LOG( "AIM: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", play_gundraw_dur, hard_gundraw_dur, motion_time, raw_lerp );
+//SmartBody::util::log( "AIM: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", play_gundraw_dur, hard_gundraw_dur, motion_time, raw_lerp );
 	}
 	if( draw_mode == DRAW_TRACKING )	{
 		motion_time = play_gundraw_dur;
@@ -552,8 +552,8 @@ else	{
 				draw_mode = DRAW_RETURN; 
 			}
 		}
-//LOG( "TRACK: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", play_gundraw_dur, hard_gundraw_dur, motion_time, raw_lerp );
-//LOG( "TRACK:%.2f time:%.2f modeT:%.2f motT:%.2f lerp:%.3f\n", track_dur, t, mode_time, motion_time, raw_lerp );
+//SmartBody::util::log( "TRACK: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", play_gundraw_dur, hard_gundraw_dur, motion_time, raw_lerp );
+//SmartBody::util::log( "TRACK:%.2f time:%.2f modeT:%.2f motT:%.2f lerp:%.3f\n", track_dur, t, mode_time, motion_time, raw_lerp );
 	}
 	if( draw_mode == DRAW_RETURN )	{
 		if( _holster_motion )	{
@@ -577,7 +577,7 @@ else	{
 			else	{
 				raw_lerp = 1.0 - mode_time / curr_hard_dur;
 			}
-//LOG( "RET: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", curr_play_dur, curr_hard_dur, motion_time, raw_lerp );
+//SmartBody::util::log( "RET: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", curr_play_dur, curr_hard_dur, motion_time, raw_lerp );
 		}
 		else	{
 			complete_time = (float)t;
@@ -604,7 +604,7 @@ else	{
 				}
 			}
 			raw_lerp = 0.0;
-//LOG( "COMPL: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", curr_play_dur, curr_hard_dur, motion_time, raw_lerp );
+//SmartBody::util::log( "COMPL: play:%.2f hard:%.2f motT:%.2f lerp:%.3f\n", curr_play_dur, curr_hard_dur, motion_time, raw_lerp );
 		}
 		else	{
 			draw_mode = DRAW_DISABLED; 
@@ -626,7 +626,7 @@ else	{
 	gwiz::float_t lerp_power = 2.0;
 	gwiz::float_t lerp_value = pow( raw_lerp, lerp_power );
 	
-//	LOG( "mot: %f dur: %f lerp: %f\n", motion_time, curr_play_dur, raw_lerp );
+//	SmartBody::util::log( "mot: %f dur: %f lerp: %f\n", motion_time, curr_play_dur, raw_lerp );
 
 #if 0 // RAW QUICKDRAW
 	_curr_motion_p->apply( 
@@ -721,7 +721,7 @@ else	{
 
 		SkJoint* joint_p = _context->channels().joint( _toContextCh[ _arm_chan_indices[ j ] ] );
 		if( joint_p == NULL ) 
-			LOG( "MeCtQuickDraw::controller_evaluate: joint is NULL\n" );
+			SmartBody::util::log( "MeCtQuickDraw::controller_evaluate: joint is NULL\n" );
 		joint_state_t joint_state = capture_joint_state( joint_p );
 
 		quat_t out_q;

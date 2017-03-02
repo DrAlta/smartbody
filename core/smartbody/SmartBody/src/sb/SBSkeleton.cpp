@@ -27,6 +27,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBCharacter.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBUtilities.h>
 #include <sr/sr_string.h>
 #include <controllers/me_controller_tree_root.hpp>
 
@@ -65,14 +66,14 @@ SBAPI SBJoint* SBSkeleton::createChannel(const std::string& name)
 {
 	if (this->getJointByName(name))
 	{
-		LOG("Joint or channel %s already created.", name.c_str());
+		SmartBody::util::log("Joint or channel %s already created.", name.c_str());
 		return NULL;
 	}
 
 	SmartBody::SBJoint* rootJoint = this->getJoint(0);
 	if (!rootJoint)
 	{
-		LOG("Root joint not present. Please add root joint before adding channels.");
+		SmartBody::util::log("Root joint not present. Please add root joint before adding channels.");
 		return NULL;
 	}
 
@@ -104,7 +105,7 @@ SBAPI SBJoint* SBSkeleton::createJoint(const std::string& name, SBJoint* parent)
 {
 	if (this->getJointByName(name))
 	{
-		LOG("Joint %s already created.", name.c_str());
+		SmartBody::util::log("Joint %s already created.", name.c_str());
 		return NULL;
 	}
 	SBJoint* joint = new SBJoint();
@@ -162,7 +163,7 @@ SBAPI SBJoint* SBSkeleton::createStaticJoint(const std::string& name, SBJoint* p
 {
 	if (this->getJointByName(name))
 	{
-		LOG("Joint %s already created.", name.c_str());
+		SmartBody::util::log("Joint %s already created.", name.c_str());
 		return NULL;
 	}
 	SBJoint* joint = new SBJoint();
@@ -241,7 +242,7 @@ bool SBSkeleton::load(const std::string& skeletonFile)
 		fp = fopen(skeletonFile.c_str(), "rt");
 		if (fp == NULL )
 		{
-			LOG("No skeleton found for file %s.", skeletonFile.c_str());
+			SmartBody::util::log("No skeleton found for file %s.", skeletonFile.c_str());
 			return false;
 		}
 		SrInput input(fp);
@@ -250,7 +251,7 @@ bool SBSkeleton::load(const std::string& skeletonFile)
 			input.filename(skeletonFile.c_str());
 			if (!SkSkeleton::loadSk(input, 1.0f))
 			{
-				LOG("Problem loading skeleton from file %s.", skeletonFile.c_str());
+				SmartBody::util::log("Problem loading skeleton from file %s.", skeletonFile.c_str());
 				return false;
 			} 
 			else
@@ -261,7 +262,7 @@ bool SBSkeleton::load(const std::string& skeletonFile)
 		}
 		else
 		{
-			LOG("No skeleton found for file %s.", skeletonFile.c_str());
+			SmartBody::util::log("No skeleton found for file %s.", skeletonFile.c_str());
 			return false;
 		}
 	}
@@ -273,7 +274,7 @@ bool SBSkeleton::save(const std::string& skeletonFile)
 	fp = fopen(skeletonFile.c_str(), "w");
 	if (fp == NULL )
 	{
-		LOG("Can't create skeleton file %s.", skeletonFile.c_str());
+		SmartBody::util::log("Can't create skeleton file %s.", skeletonFile.c_str());
 		return false;
 	}
 	SrOutput output(fp);
@@ -282,18 +283,18 @@ bool SBSkeleton::save(const std::string& skeletonFile)
 		output.filename(skeletonFile.c_str());
 		if (!SkSkeleton::save(output))
 		{
-			LOG("Problem saving skeleton to file %s.", skeletonFile.c_str());
+			SmartBody::util::log("Problem saving skeleton to file %s.", skeletonFile.c_str());
 			return false;
 		} 
 		else
 		{
-			LOG("Skeleton saved to file %s.", skeletonFile.c_str());
+			SmartBody::util::log("Skeleton saved to file %s.", skeletonFile.c_str());
 			return true;
 		}
 	}
 	else
 	{
-		LOG("Problem saving skeleton to file %s.", skeletonFile.c_str());
+		SmartBody::util::log("Problem saving skeleton to file %s.", skeletonFile.c_str());
 		return false;
 	}
 }
@@ -313,7 +314,7 @@ std::string SBSkeleton::saveToString()
 
 void SBSkeleton::loadFromString(const std::string& info )
 {
-	//LOG("loadFromString = %s",info.c_str());
+	//SmartBody::util::log("loadFromString = %s",info.c_str());
 	SrInput input(info.c_str());	
 	SkSkeleton::loadSk(input);
 }
@@ -382,7 +383,7 @@ std::vector<std::string> SBSkeleton::getUpperBodyJointNames()
 	SkJoint* spine1 = search_joint("spine1");
 	if (!spine1)
 	{
-		LOG("SBSkeleton::getUpperBodyJointNames WARNING: cannot find spine1");
+		SmartBody::util::log("SBSkeleton::getUpperBodyJointNames WARNING: cannot find spine1");
 		return std::vector<std::string>();
 	}
 	std::vector<SkJoint*> alljoints;

@@ -107,7 +107,7 @@ void SBDebuggerClient::Connect(const string & id)
       return;
    }
 #else
-	LOG("VHMSG has been disabled, debugger is not available.");
+	SmartBody::util::log("VHMSG has been disabled, debugger is not available.");
 #endif
 }
 
@@ -128,7 +128,7 @@ void SBDebuggerClient::Disconnect()
    m_sbmId = "";
    m_connectResult = false;
 #else
-	LOG("VHMSG has been disabled, debugger cannot connect.");
+	SmartBody::util::log("VHMSG has been disabled, debugger cannot connect.");
 #endif
 }
 
@@ -137,7 +137,7 @@ void SBDebuggerClient::Init()
 #ifndef SB_NO_VHMSG
    vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s send_init", m_sbmId.c_str()).c_str());
 #else
-	LOG("VHMSG has been disabled, debugger cannot init.");
+	SmartBody::util::log("VHMSG has been disabled, debugger cannot init.");
 #endif
 }
 
@@ -173,14 +173,14 @@ void SBDebuggerClient::Update()
 
             tcpDataPending = vhcl::SocketIsDataPending(s);
 
-			//LOG("TCP Data Count %d, tcpDataPending = %d\n", m_tcpDataCount, tcpDataPending);
+			//SmartBody::util::log("TCP Data Count %d, tcpDataPending = %d\n", m_tcpDataCount, tcpDataPending);
          }
 
          // sanity check for spamming too much data
          if (m_tcpData.length() > 500000)
          {
             static int i = 0;
-            LOG("TCP Overflow %d, length = %d\n", i++,m_tcpData.length());
+            SmartBody::util::log("TCP Overflow %d, length = %d\n", i++,m_tcpData.length());
             tcpDataPending = 0;
          }
       }
@@ -242,7 +242,7 @@ void SBDebuggerClient::Update()
 // 						  {							  
 // 							  static double prevTime = 0.0;
 // 							  float dt = SmartBody::SBScene::getScene()->getSimulationManager()->getTime() - prevTime;
-// 							  LOG("Update ChrBackovic, time = %f, num bones = %d", dt,split.size() - 7);
+// 							  SmartBody::util::log("Update ChrBackovic, time = %f, num bones = %d", dt,split.size() - 7);
 // 							  prevTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 // 						  }
                           for (size_t i = 7; i < split.size(); i++)
@@ -414,8 +414,8 @@ void SBDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
 						  if (split[3] == "scene")
 						  {
 							  //initialize the rest of scene
-							  //LOG("test = %s",rest.c_str());
-// 							  LOG("rest string size = %d",rest.size());
+							  //SmartBody::util::log("test = %s",rest.c_str());
+// 							  SmartBody::util::log("rest string size = %d",rest.size());
 // 							  FILE* fp = fopen("e:/scene.py","wt");
 // 							  fprintf(fp,"%s",rest.c_str());
 // 							  fclose(fp);

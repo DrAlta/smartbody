@@ -18,7 +18,7 @@ along with Smartbody.If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 
 #include <iostream>
 #include <sstream>
@@ -120,7 +120,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		SmartBody::SBGestureMap* gestureMap = SmartBody::SBScene::getScene()->getGestureMapManager()->getGestureMap(gestureMapName);
 		if (!gestureMap)
 		{
-			//LOG("WARNING: BML::parse_bml_gesture(): gesture map '%s' for emotion '%s' on character %s doesn't exist.", gestureMapName.c_str(), finalGestureMapName.c_str(), request->actor->getName().c_str());
+			//SmartBody::util::log("WARNING: BML::parse_bml_gesture(): gesture map '%s' for emotion '%s' on character %s doesn't exist.", gestureMapName.c_str(), finalGestureMapName.c_str(), request->actor->getName().c_str());
 			// get the default gesture map if the emotional one isn't available
 			if (gestureMapName != "gestureMap")
 			{
@@ -128,7 +128,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 			}
 			if (!gestureMap)
 			{
-				LOG("No default gesture map. Gesture will not be played.");
+				SmartBody::util::log("No default gesture map. Gesture will not be played.");
 				return BehaviorRequestPtr();
 			}
 		}
@@ -155,25 +155,25 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		animationList = gestureMap->getGestureListByInfo(lexeme, type, mode, style, posture);
 		if (animationName == "")
 		{
-			LOG("Could not find animation for: %s %s %s %s %s", lexeme.c_str(), type.c_str(), mode.c_str(), style.c_str(), posture.c_str());
+			SmartBody::util::log("Could not find animation for: %s %s %s %s %s", lexeme.c_str(), type.c_str(), mode.c_str(), style.c_str(), posture.c_str());
 			return BehaviorRequestPtr();
 		}
 		else
 		{
-			//LOG("bml_gesture gesture retrieval: %s", animationName.c_str());
+			//SmartBody::util::log("bml_gesture gesture retrieval: %s", animationName.c_str());
 		}
 	}
 
 	if (animationName == "")
 	{
-		LOG("WARNING: BML::parse_bml_gesture(): invalid animation name");
+		SmartBody::util::log("WARNING: BML::parse_bml_gesture(): invalid animation name");
 		return BehaviorRequestPtr();
 	}
 
 	// play the animation
 	if (!request->actor->motion_sched_p)
 	{
-		LOG("Character %s does not have a motion scheduler, so cannot schedule motion.", request->actor->getName().c_str());
+		SmartBody::util::log("Character %s does not have a motion scheduler, so cannot schedule motion.", request->actor->getName().c_str());
 		return BehaviorRequestPtr();
 	}
 	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(animationName);
@@ -183,7 +183,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(animationName);
 		if (!blend)
 		{
-			LOG("Could not find blend named '%s' for gestures. Gesture will not be played.", animationName.c_str());
+			SmartBody::util::log("Could not find blend named '%s' for gestures. Gesture will not be played.", animationName.c_str());
 			return BehaviorRequestPtr();
 		}
 
@@ -227,7 +227,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 				motion = blend->createMotionFromBlend(params, character, blendedMotionName, 30.0f);
 				if (!motion)
 				{
-					LOG("Blend %s triggered from gesture is missing animation.", blend->getName().c_str());
+					SmartBody::util::log("Blend %s triggered from gesture is missing animation.", blend->getName().c_str());
 					return BehaviorRequestPtr();
 				}
 				// perform a retargeting if needed
@@ -431,7 +431,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 	} 
 	else 
 	{
-		LOG("WARNING: BML::parse_bml_gesture(): behavior \"%s\": name=\"%s\" not loaded; ignoring behavior.", unique_id.c_str(), animationName.c_str());
+		SmartBody::util::log("WARNING: BML::parse_bml_gesture(): behavior \"%s\": name=\"%s\" not loaded; ignoring behavior.", unique_id.c_str(), animationName.c_str());
 		return BehaviorRequestPtr();
 	}
 }

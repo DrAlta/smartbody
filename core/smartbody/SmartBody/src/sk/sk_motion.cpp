@@ -18,7 +18,7 @@ along with Smartbody.If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 # include <math.h>
 # include <stdlib.h>
 # include <string.h>
@@ -35,6 +35,7 @@ along with Smartbody.If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBRetarget.h>
+#include <sb/SBUtilities.h>
 #include <external/perlin/perlin.h>
 
 using namespace gwiz;
@@ -316,7 +317,7 @@ void SkMotion::applyNew ( float t,
 		return;
 	if ( t!= 0.f && t<=_frames[0].keytime )	{
 #if DEBUG_T
-		LOG("SkMotion::apply NOTICE: t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
+		SmartBody::util::log("SkMotion::apply NOTICE: t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
 #endif
 		return;
 	}
@@ -326,7 +327,7 @@ void SkMotion::applyNew ( float t,
 
 #if DEBUG_T
 	if ( t<_frames[0].keytime )	{
-		LOG("SkMotion::apply ERR: cubic t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
+		SmartBody::util::log("SkMotion::apply ERR: cubic t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
 	}
 #endif
 
@@ -364,7 +365,7 @@ void SkMotion::applyNew ( float t,
 
 #if DEBUG_T
 	if ( t<0.0 )	{
-		LOG("SkMotion::apply ERR: mapped t=%.16f < 0.0 \n", t );
+		SmartBody::util::log("SkMotion::apply ERR: mapped t=%.16f < 0.0 \n", t );
 	}
 #endif
 
@@ -518,7 +519,7 @@ void SkMotion::apply ( float t,
 		return;
 	if ( t!= 0.f && t<=_frames[0].keytime )	{
 #if DEBUG_T
-		LOG("SkMotion::apply NOTICE: t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
+		SmartBody::util::log("SkMotion::apply NOTICE: t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
 #endif
 		return;
 	}
@@ -528,7 +529,7 @@ void SkMotion::apply ( float t,
 
 #if DEBUG_T
 	if ( t<_frames[0].keytime )	{
-		LOG("SkMotion::apply ERR: cubic t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
+		SmartBody::util::log("SkMotion::apply ERR: cubic t=%.16f < f[0]:%.16f \n", t, _frames[0].keytime );
 	}
 #endif
 
@@ -571,7 +572,7 @@ void SkMotion::apply ( float t,
 
 #if DEBUG_T
 	if ( t<0.0 )	{
-		LOG("SkMotion::apply ERR: mapped t=%.16f < 0.0 \n", t );
+		SmartBody::util::log("SkMotion::apply ERR: mapped t=%.16f < 0.0 \n", t );
 	}
 #endif
 
@@ -815,13 +816,13 @@ void SkMotion::registerAnimation()
 	
 	if (xPos == -1 || yPos == -1 || zPos == -1)
 	{
-		LOG("No base position found in motion %s, cannot register.", this->getName().c_str());
+		SmartBody::util::log("No base position found in motion %s, cannot register.", this->getName().c_str());
 		return;
 	}
 
 	if (qPos == -1)
 	{
-		LOG("No base orientation found in motion %s, cannot register.", this->getName().c_str());
+		SmartBody::util::log("No base orientation found in motion %s, cannot register.", this->getName().c_str());
 		return;
 	}
 
@@ -861,13 +862,13 @@ void SkMotion::registerAnimation()
 	
 	if (xPos == -1 || yPos == -1 || zPos == -1)
 	{
-		LOG("No base position found in motion %s, cannot register.", this->getName().c_str());
+		SmartBody::util::log("No base position found in motion %s, cannot register.", this->getName().c_str());
 		return;
 	}
 
 	if (qPos == -1)
 	{
-		LOG("No base orientation found in motion %s, cannot register.", this->getName().c_str());
+		SmartBody::util::log("No base orientation found in motion %s, cannot register.", this->getName().c_str());
 		return;
 	}
 
@@ -1055,7 +1056,7 @@ SkMotion* SkMotion::buildSmoothMotionCycle( float timeInterval )
 	// smooth the first and last s frames
 	float *first_p = this->posture( 0 );
 	float *last_p  = this->posture( num_f - 1 );	
-	//LOG("num_f = %d, intervalFrames = %d",num_f, intervalFrames);
+	//SmartBody::util::log("num_f = %d, intervalFrames = %d",num_f, intervalFrames);
 	for (int i = 0; i< num_f; i++)
 	{
 		if (i > intervalFrames && i < num_f - intervalFrames)
@@ -1160,9 +1161,9 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		{
 			SrVec srcdir = tempSrcSk->boneGlobalDirection(pjoint->getMappedJointName(),childName);
 			SrVec dstdir = interSk->boneGlobalDirection(pjoint->getMappedJointName(),childName);	
-			//LOG("pjoint = %s, childName = %s",pjoint->name().c_str(), childName.c_str());
+			//SmartBody::util::log("pjoint = %s, childName = %s",pjoint->name().c_str(), childName.c_str());
 
-			//LOG("src dir = %f %f %f, dst dir = %f %f %f",srcdir[0],srcdir[1],srcdir[2], dstdir[0],dstdir[1],dstdir[2]);
+			//SmartBody::util::log("src dir = %f %f %f, dst dir = %f %f %f",srcdir[0],srcdir[1],srcdir[2], dstdir[0],dstdir[1],dstdir[2]);
 
 
 			//jointQueues.push(child->name());
@@ -1210,7 +1211,7 @@ void SkMotion::convertBoneOrientation( std::string &pjointName, SkSkeleton* inte
 		SrMat prerotMat;				
 		SrMat pmatInv;
 
-		//LOG("joint = %s, src dir = %f %f %f, dst dir = %f %f %f, rot axist = %f %f %f, angle = %f",pjointName.c_str(), srcDir[0],srcDir[1],srcDir[2], dstDir[0],dstDir[1],dstDir[2], rotAxis[0], rotAxis[1], rotAxis[2], sr_todeg(angle));
+		//SmartBody::util::log("joint = %s, src dir = %f %f %f, dst dir = %f %f %f, rot axist = %f %f %f, angle = %f",pjointName.c_str(), srcDir[0],srcDir[1],srcDir[2], dstDir[0],dstDir[1],dstDir[2], rotAxis[0], rotAxis[1], rotAxis[2], sr_todeg(angle));
 
 
 		SrMat gmatRot = pjoint->gmat().get_rotation();				
@@ -1271,7 +1272,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 
 // 	for (unsigned int i=0;i<relativeJoints.size();i++)
 // 	{
-// 		LOG("relativeJoint %d = %s",i,relativeJoints[i].c_str());
+// 		SmartBody::util::log("relativeJoint %d = %s",i,relativeJoints[i].c_str());
 // 	}
 
 	std::map<std::string, SrQuat> jointRotationMap;
@@ -1304,7 +1305,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 		}
 		else
 		{
-			//LOG("pjoint name = %s",pjointName.c_str());
+			//SmartBody::util::log("pjoint name = %s",pjointName.c_str());
 			convertBoneOrientation(pjointName, interSk, tempSrcSk, endJoints);
 			interSk->invalidate_global_matrices();
 			interSk->update_global_matrices();
@@ -1316,14 +1317,14 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 			//pjoint->quat()->value(SrQuat()); // cleanup quat value
 			for (int i=0; i< pjoint->num_children(); i++)
 			{
-				//LOG("target joint = %s, child = %s",pjoint->name().c_str(), pjoint->child(i)->name().c_str());
+				//SmartBody::util::log("target joint = %s, child = %s",pjoint->name().c_str(), pjoint->child(i)->name().c_str());
 				SkJoint* child = pjoint->child(i);
 				jointQueues.push(child->jointName());
 			}
 		}				
 	}
 	float heightRatio = (interSk->getBaseHeight("base")/tempSrcSk->getBaseHeight("base"));//*0.99f;
-	//LOG("height ratio = %f", heightRatio);
+	//SmartBody::util::log("height ratio = %f", heightRatio);
 	for (int i = 0; i < num_f; i++)
 	{
 		retarget_p->insert_frame(i, this->keytime(i));		
@@ -1368,7 +1369,7 @@ SkMotion* SkMotion::buildRetargetMotionV2( SkSkeleton* sourceSk, SkSkeleton* tar
 				// just copy over the translation for now
 				float chanValue = ref_p[ index ];				
 				new_p[ index ] = chanValue*heightRatio;
-				//LOG("jointName = %s, new_p = %f",jointName.c_str(), new_p[index]);
+				//SmartBody::util::log("jointName = %s, new_p = %f",jointName.c_str(), new_p[index]);
 				// 				if (jointPosMap.find(jointName) != jointPosMap.end())
 				// 				{
 				// 					SrVec pos = jointPosMap[jointName];
@@ -1568,7 +1569,7 @@ SkMotion* SkMotion::buildRetargetMotion3( SkSkeleton* sourceSk, SkSkeleton* targ
 		if (srcjoint)
 		{
 			SrVec srcPos = srcjoint->gmat().get_translation();
-			LOG("joint = %s, src pos = %f %f %f, dst pos = %f %f %f",pjointName.c_str(),srcPos[0],srcPos[1],srcPos[2],pos[0],pos[1],pos[2]);
+			SmartBody::util::log("joint = %s, src pos = %f %f %f, dst pos = %f %f %f",pjointName.c_str(),srcPos[0],srcPos[1],srcPos[2],pos[0],pos[1],pos[2]);
 		}
 		for (int i=0; i< pjoint->num_children(); i++)
 		{
@@ -1596,7 +1597,7 @@ SkMotion* SkMotion::buildRetargetMotion3( SkSkeleton* sourceSk, SkSkeleton* targ
 			}
 			srcDir.normalize(); dstDir.normalize();
 
-			//LOG("joint = %s, src dir = %f %f %f, dst dir = %f %f %f",pjointName.c_str(), srcDir[0],srcDir[1],srcDir[2], dstDir[0],dstDir[1],dstDir[2]);
+			//SmartBody::util::log("joint = %s, src dir = %f %f %f, dst dir = %f %f %f",pjointName.c_str(), srcDir[0],srcDir[1],srcDir[2], dstDir[0],dstDir[1],dstDir[2]);
 			double dot_v = dot(srcDir, dstDir);
 			if(dot_v >= 0.9999995000000f) 
 			{				
@@ -1629,7 +1630,7 @@ SkMotion* SkMotion::buildRetargetMotion3( SkSkeleton* sourceSk, SkSkeleton* targ
 			//pjoint->update_gmat();
 			interSk->invalidate_global_matrices();
 			interSk->update_global_matrices();
-			//LOG("skeleton align rotation, joint = %s, rotation = %f %f %f",pjointName.c_str(),rotAxisAngle[0],rotAxisAngle[1],rotAxisAngle[2]);			
+			//SmartBody::util::log("skeleton align rotation, joint = %s, rotation = %f %f %f",pjointName.c_str(),rotAxisAngle[0],rotAxisAngle[1],rotAxisAngle[2]);			
 			SrVec newDstDir = SrVec();
 			for (int k=0;k<pjoint->num_children();k++)
 			{
@@ -1916,7 +1917,7 @@ SkMotion* SkMotion::buildPoststrokeHoldMotion(float holdTime, std::vector<std::s
 	// handle the base joints
 	if (strokeEndFrameId == 0)
 	{
-		LOG("SkMotion::buildPoststrokeHoldMotion ERR: please check if the stroke end time is set correctly!");
+		SmartBody::util::log("SkMotion::buildPoststrokeHoldMotion ERR: please check if the stroke end time is set correctly!");
 		return newMotion;
 	}
 
@@ -1966,7 +1967,7 @@ void SkMotion::smoothAtFrame(int frameId, int interval, int maskSize, int maskTy
 {
 	if (maskSize == 0 || (maskSize % 2) == 0)
 	{
-		LOG("SkMotion::smoothAtFrame Warning: mask size has to be odd number.");
+		SmartBody::util::log("SkMotion::smoothAtFrame Warning: mask size has to be odd number.");
 		return;
 	}
 
@@ -2042,7 +2043,7 @@ void SkMotion::smoothByMask(std::vector<int>& frameIds, std::vector<float>& mask
 {
 	if (mask.size() == 0 || (mask.size() % 2) == 0)
 	{
-		LOG("SkMotion::smoothByMask Warning: mask size has to be odd number or non-zero.");
+		SmartBody::util::log("SkMotion::smoothByMask Warning: mask size has to be odd number or non-zero.");
 		return;
 	}
 
@@ -2184,7 +2185,7 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 				SkJoint* joint = skeleton->search_joint(jointName.c_str());
 				if (!joint)
 				{
-					//LOG("Joint %s not found")
+					//SmartBody::util::log("Joint %s not found")
 					// joint not found, simply write to channels
 					for (int n=0;n<chan.size();n++)
 						new_p[index+n] = ref_p[index+n];
@@ -2222,12 +2223,12 @@ SkMotion* SkMotion::buildMirrorMotionJoints(SkSkeleton* skeleton, const std::map
 					{
 						euler_t ref_eorig = euler_t(quat_t(q_orig.w,q_orig.x,q_orig.y,q_orig.z));	
 						euler_t final_euler = euler_t(quat_t(final_q.w,final_q.x,final_q.y,final_q.z));
-						LOG("joint %s : ",joint->name().c_str());
+						SmartBody::util::log("joint %s : ",joint->name().c_str());
 						sr_out << "qa before rot = " << qa << srnl;
 						sr_out << "qa after rot = " << qa_rot << srnl;
-						LOG("euler before rot = %f %f %f",ref_eorig.x(),ref_eorig.y(),ref_eorig.z());
-						LOG("euler after rot = %f %f %f",ref_e.x(),ref_e.y(),ref_e.z());
-						LOG("euler final = %f %f %f",final_euler.x(),final_euler.y(),final_euler.z());
+						SmartBody::util::log("euler before rot = %f %f %f",ref_eorig.x(),ref_eorig.y(),ref_eorig.z());
+						SmartBody::util::log("euler after rot = %f %f %f",ref_e.x(),ref_e.y(),ref_e.z());
+						SmartBody::util::log("euler final = %f %f %f",final_euler.x(),final_euler.y(),final_euler.z());
 					}
 #endif
 					new_p[ index + 0 ] = (float)final_q.w;

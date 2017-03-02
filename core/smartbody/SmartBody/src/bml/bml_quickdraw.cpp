@@ -20,7 +20,7 @@
  *      Marcus Thiebaux, USC
  */
 
-#include "vhcl.h"
+
 #include <string>
 
 
@@ -65,7 +65,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 	string anim_name = xml_parse_string( BMLDefs::ATTR_ANIM, elem, DEFAULT_QUICKDRAW_ANIM );
 	SmartBody::SBMotion* anim = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(anim_name);
 	if (!anim){
-		LOG( "BML::parse_bml_quickdraw ERR: unknown motion: \"%s\"", anim_name.c_str() );
+		SmartBody::util::log( "BML::parse_bml_quickdraw ERR: unknown motion: \"%s\"", anim_name.c_str() );
 		return BehaviorRequestPtr();  // NULL
 	}
 	
@@ -145,7 +145,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 	string anim_name = xml_parse_string( BMLDefs::ATTR_ANIM, elem, DEFAULT_QUICKDRAW_ANIM );
 	std::map< std::string, SkMotion* >::iterator motionIter = mcu->motion_map.find( anim_name );
 	if( motionIter ==  mcu->motion_map.end() ){
-		LOG( "BML::parse_bml_quickdraw ERR: unknown motion: \"%s\"", anim_name.c_str() );
+		SmartBody::util::log( "BML::parse_bml_quickdraw ERR: unknown motion: \"%s\"", anim_name.c_str() );
 		return BehaviorRequestPtr();  // NULL
 	}
 	SkMotion* anim = (*motionIter).second;
@@ -185,7 +185,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 			std::wstringstream wstrstr;
 			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_AIM_OFFSET<<"=\""<<attrAimOffset<<"\" is not valid.";
 			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
+			SmartBody::util::log(str.c_str());
 		}
 		else	{
 			set_aim_offset_param = true;
@@ -231,7 +231,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 	if( motionIter ==  mcu->motion_map.end()){
 		std::stringstream strstr;
         strstr << "WARNING: BML::parse_bml_quickdraw(): Unknown source animation \"" << anim_name << "\"." << endl;
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
 	}
 
@@ -247,7 +247,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 			std::wstringstream wstrstr;
 			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_TRACK_DUR<<"=\""<<attrTrackDur<<"\" is not a valid number.";
 			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
+			SmartBody::util::log(str.c_str());
 
 		}
 		XMLString::release( &temp_ascii );
@@ -264,7 +264,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 			std::wstringstream wstrstr;
 			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_GUNDRAW_DUR<<"=\""<<attrGundrawDur<<"\" is not a valid number.";
 			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
+			SmartBody::util::log(str.c_str());
 		}
 		else	{
 			set_gundraw_dur_param = true;
@@ -283,7 +283,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 			std::wstringstream wstrstr;
 			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_HOLSTER_DUR<<"=\""<<attrHolsterDur<<"\" is not a valid number.";
 			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
+			SmartBody::util::log(str.c_str());
 		}
 		else	{
 			set_holster_dur_param = true;
@@ -304,7 +304,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 			std::wstringstream wstrstr;
 			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_AIM_OFFSET<<"=\""<<attrAimOffset<<"\" is not valid.";
 			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
+			SmartBody::util::log(str.c_str());
 		}
 		else	{
 			set_aim_offset_param = true;
@@ -323,7 +323,7 @@ BehaviorRequestPtr BML::parse_bml_quickdraw(
 			std::wstringstream wstrstr;
 			wstrstr << "WARNING: BML::parse_bml_quickdraw(): Attribute "<< BMLDefs::ATTR_SMOOTH<<"=\""<<attrSmooth<<"\" is not a valid number.";
 			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
+			SmartBody::util::log(str.c_str());
 		}
 		else	{
 			set_smooth_param = true;

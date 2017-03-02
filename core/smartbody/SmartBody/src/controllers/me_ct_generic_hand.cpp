@@ -1,24 +1,22 @@
-/*
- *  me_ct_generic_hand.cpp - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2011  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *  Mohammad Adil
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #include "controllers/me_ct_generic_hand.h"
 #include <sb/SBScene.h>
@@ -29,6 +27,7 @@
 #include <sb/SBRetargetManager.h>
 #include <sb/SBRetarget.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBUtilities.h>
 #include <algorithm>
 
 #include <boost/config.hpp>
@@ -111,7 +110,7 @@ MeCtGenericHand::MeCtGenericHand( SmartBody::SBSkeleton* skeleton, SbmCharacter*
 	_enableHand = true;
 	_enableBody = true;
 
-//	LOG("Trying to initalize hand controller here");
+//	SmartBody::util::log("Trying to initalize hand controller here");
 
 	// wrist joint names
 	_wristJtRtName = "r_wrist";
@@ -153,7 +152,7 @@ void MeCtGenericHand::init(SmartBody::SBMotion* m , int num_levels = -1)
 {
 	
 	// initailzing controller
-	LOG("itializing genric hand controller ");
+	SmartBody::util::log("initializing genric hand controller ");
 
 	// initialize number of levels 
 	_maxLevels = num_levels;
@@ -174,8 +173,8 @@ void MeCtGenericHand::init(SmartBody::SBMotion* m , int num_levels = -1)
 	SmartBody::SBMotion* _rightMotion = _handSynthesis->getRightDb()->getFinalMotion();
 
 	//// print the duration of the hand motion
-	LOG("The duration of left loaded motion is %f",_leftMotion->duration());
-	LOG("The duration of right loaded motion is %f",_rightMotion->duration());
+	SmartBody::util::log("The duration of left loaded motion is %f",_leftMotion->duration());
+	SmartBody::util::log("The duration of right loaded motion is %f",_rightMotion->duration());
 }
 
 
@@ -389,14 +388,14 @@ void MeCtGenericHand::notify(SBSubject* subject)
 			std::string motionName = _character->getStringAttribute("hand.motionName");
 			if (motionName == "")
 			{
-				LOG("No motion specified. Cannot initialize hand controller.");
+				SmartBody::util::log("No motion specified. Cannot initialize hand controller.");
 				return;
 			}
 			int numLevels = _character->getIntAttribute("hand.levels");
 			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(motionName);
 			if (!motion)
 			{
-				LOG("No motion named %s available. Cannot initialize hand controller.", motionName.c_str());
+				SmartBody::util::log("No motion named %s available. Cannot initialize hand controller.", motionName.c_str());
 				return;
 			}
 			this->init(motion, numLevels);

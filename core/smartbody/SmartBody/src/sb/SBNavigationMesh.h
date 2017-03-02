@@ -21,7 +21,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _SBNAVIGATIONMESH_H_
 #define _SBNAVIGATIONMESH_H_
 
-#include <vhcl.h>
 #include <sb/SBTypes.h>
 #include <sr/sr_model.h>
 #include <sbm/sbm_deformable_mesh.h>

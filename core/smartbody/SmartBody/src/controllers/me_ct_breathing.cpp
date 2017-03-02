@@ -24,7 +24,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstdio>
 #include <sb/SBMotion.h>
 #include <sb/SBScene.h>
-
+#include <sb/SBUtilities.h>
 
 std::string MeCtBreathing::type_name = "Breathing";
 
@@ -375,7 +375,7 @@ void MeCtBreathing::notify(SBSubject* subject)
 			SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(attr->getValue());
 			if (!motion)
 			{
-				LOG("No motion named '%s' found.", attr->getValue().c_str());
+				SmartBody::util::log("No motion named '%s' found.", attr->getValue().c_str());
 			}
 			else
 			{

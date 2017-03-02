@@ -21,7 +21,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _SBFACESHIFTMANAGER_H_
 #define _SBFACESHIFTMANAGER_H_
 
-#include <vhcl.h>
 #include <sb/SBTypes.h>
 #include <sb/SBService.h>
 #include <sr/sr_quat.h>

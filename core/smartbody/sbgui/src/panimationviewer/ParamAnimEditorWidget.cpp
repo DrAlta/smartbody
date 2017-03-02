@@ -20,7 +20,7 @@
  *      Yuyu Xu, USC
  */
 
-#include "vhcl.h"
+
 #include "ParamAnimEditorWidget.h"
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>

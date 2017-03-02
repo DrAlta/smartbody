@@ -1,7 +1,6 @@
 #ifndef _ATTRIBUTEEDITOR_
 #define _ATTRIBUTEEDITOR_
 
-#include <vhcl.h>
 #include <FL/Fl_Group.H>
 #include "TreeItemInfoWidget.h"
 #include <SBWindowListener.h>

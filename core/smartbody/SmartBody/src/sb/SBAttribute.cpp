@@ -20,6 +20,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "SBAttribute.h"
 #include "sb/SBObject.h"
+#include <sb/SBUtilities.h>
 
 #include <sstream>
 #include <limits>
@@ -67,7 +68,7 @@ void SBAttributeGroup::addAttribute(SBAttribute* attr)
 	}
 	else
 	{
-		LOG("Attribute info for %s already exists in attribute group %s!", attr->getName().c_str(), this->getName().c_str());
+		SmartBody::util::log("Attribute info for %s already exists in attribute group %s!", attr->getName().c_str(), this->getName().c_str());
 	}
 }
 
@@ -76,7 +77,7 @@ void  SBAttributeGroup::removeAttribute(SBAttribute* attr)
 	std::map<std::string, SBAttribute*>::iterator iter = m_attributeMap.find(attr->getName());
 	if (iter == m_attributeMap.end())
 	{
-		LOG("Attribute info for %s does not exists in attribute group %s!", attr->getName().c_str(), this->getName().c_str());
+		SmartBody::util::log("Attribute info for %s does not exists in attribute group %s!", attr->getName().c_str(), this->getName().c_str());
 	}
 	else
 	{
@@ -106,7 +107,7 @@ SBAttribute* SBAttributeGroup::getAttribute(std::string name)
 	std::map<std::string, SBAttribute*>::iterator iter = m_attributeMap.find(name);
 	if (iter == m_attributeMap.end())
 	{
-		LOG("Attribute for %s does not exist in attribute group %s!", name.c_str(), this->getName().c_str());
+		SmartBody::util::log("Attribute for %s does not exist in attribute group %s!", name.c_str(), this->getName().c_str());
 		return NULL;
 	}
 	else

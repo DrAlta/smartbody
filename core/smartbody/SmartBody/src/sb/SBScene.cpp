@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 
 #include "SBScene.h"
 #ifdef WIN32
@@ -146,7 +146,7 @@ const std::string defautAssetPath = "Assets";
 std::map<std::string, std::string> SBScene::_systemParameters;
 
 
-class ForwardLogListener : public vhcl::Log::Listener
+class ForwardLogListener : public SmartBody::util::Listener
 {
     public:
 		ForwardLogListener() {}
@@ -278,9 +278,9 @@ void SBScene::initialize()
 #endif
 	createBoolAttribute("drawMeshWireframe",false,true,"",120,false,false,false,"Render mesh with wireframe.");
 	
-	vhcl::Log::g_log.RemoveAllListeners();
+	SmartBody::util::g_log.RemoveAllListeners();
 	ForwardLogListener* forwardListener = new ForwardLogListener();
-	vhcl::Log::g_log.AddListener(forwardListener);
+	SmartBody::util::g_log.AddListener(forwardListener);
 	
 	//consoleAttr->setValue(true); // set up the console logging
 	
@@ -687,12 +687,12 @@ void SBScene::update()
 				cmd = seq->pop( (float) getSimulationManager()->getTime() );
 				if (cmd != "")			
 				{
-					//LOG("execute command = %s",cmd);
+					//SmartBody::util::log("execute command = %s",cmd);
 					this->getProfiler()->mark("commands", 1, cmd.c_str() );
 					int err = getCommandManager()->execute( (char*)  cmd.c_str() );
 					if( err != CMD_SUCCESS )
 					{
-						LOG( "update ERR: execute FAILED: '%s'\n", cmd.c_str() );
+						SmartBody::util::log( "update ERR: execute FAILED: '%s'\n", cmd.c_str() );
 					}
 					this->getProfiler()->mark("commands");
 				} 
@@ -839,7 +839,7 @@ void SBScene::setScale(float val)
 {
 	if (val == 0.0)
 	{
-		LOG("Scene scale cannot be set to 0.0, keeping it at %f", val);
+		SmartBody::util::log("Scene scale cannot be set to 0.0, keeping it at %f", val);
 		return;
 	}
 	_scale = val;
@@ -868,12 +868,12 @@ void SBScene::notify( SBSubject* subject )
 		bool val = boolAttr->getValue();
 		if (!val)
 		{
-			LOG("Turning off audio...");
+			SmartBody::util::log("Turning off audio...");
 			AUDIO_Close();
 		}
 		else
 		{
-			LOG("Turning on audio...");
+			SmartBody::util::log("Turning on audio...");
 			AUDIO_Init();
 		}
 		return;
@@ -913,7 +913,7 @@ SBAPI SBCharacter* SBScene::copyCharacter( const std::string& origCharName, cons
 	SmartBody::SBCharacter* origChar = getCharacter(origCharName);
 	if (!origChar)
 	{
-		LOG("Character '%s' does not exists !", origCharName.c_str());
+		SmartBody::util::log("Character '%s' does not exists !", origCharName.c_str());
 		return NULL;
 	}
 	else
@@ -921,7 +921,7 @@ SBAPI SBCharacter* SBScene::copyCharacter( const std::string& origCharName, cons
 		SmartBody::SBCharacter* copyChar = createCharacter(copyCharName,"");
 		if (!copyChar)
 		{
-			LOG("Can not copy to existing character '%s'",copyCharName.c_str());
+			SmartBody::util::log("Can not copy to existing character '%s'",copyCharName.c_str());
 			return NULL;
 		}
 		// successfully create a new character
@@ -953,7 +953,7 @@ SBAPI SBPawn* SBScene::copyPawn( const std::string& origPawnName, const std::str
 	SmartBody::SBPawn* origPawn = getPawn(origPawnName);
 	if (!origPawn)
 	{
-		LOG("Pawn '%s' does not exists !", origPawnName.c_str());
+		SmartBody::util::log("Pawn '%s' does not exists !", origPawnName.c_str());
 		return NULL;
 	}
 	else
@@ -961,7 +961,7 @@ SBAPI SBPawn* SBScene::copyPawn( const std::string& origPawnName, const std::str
 		SmartBody::SBPawn* copyPawn = createPawn(copyPawnName);
 		if (!copyPawn)
 		{
-			LOG("Can not copy to existing pawn '%s'",copyPawnName.c_str());
+			SmartBody::util::log("Can not copy to existing pawn '%s'",copyPawnName.c_str());
 			return NULL;
 		}
 		// successfully create a new character
@@ -977,7 +977,7 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(charName);
 	if (character)
 	{
-		LOG("Character '%s' already exists!", charName.c_str());
+		SmartBody::util::log("Character '%s' already exists!", charName.c_str());
 		return NULL;
 	}
 	else
@@ -987,7 +987,7 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(character->getName());
 		if (iter != _pawnMap.end())
 		{
-			LOG( "Register character: pawn_map.insert(..) '%s' FAILED\n", character->getName().c_str() );
+			SmartBody::util::log( "Register character: pawn_map.insert(..) '%s' FAILED\n", character->getName().c_str() );
 			delete character;
 			return NULL;
 		}
@@ -998,7 +998,7 @@ SBCharacter* SBScene::createCharacter(const std::string& charName, const std::st
 		std::map<std::string, SbmCharacter*>::iterator citer = _characterMap.find(character->getName());
 		if (citer != _characterMap.end())
 		{
-			LOG( "Register character: character_map.insert(..) '%s' FAILED\n", character->getName().c_str() );
+			SmartBody::util::log( "Register character: character_map.insert(..) '%s' FAILED\n", character->getName().c_str() );
 			_pawnMap.erase(iter);
 			delete character;
 			return NULL;
@@ -1049,12 +1049,12 @@ SBPawn* SBScene::createPawn(const std::string& pawnName)
 	SBCharacter* character = dynamic_cast<SBCharacter*>(pawn);
 	if (character)
 	{
-		LOG("Pawn '%s' is a character.", pawnName.c_str());
+		SmartBody::util::log("Pawn '%s' is a character.", pawnName.c_str());
 		return NULL;
 	}
 	if (pawn)
 	{
-		LOG("Pawn '%s' already exists!", pawnName.c_str());
+		SmartBody::util::log("Pawn '%s' already exists!", pawnName.c_str());
 		return NULL;
 	}
 	else
@@ -1068,7 +1068,7 @@ SBPawn* SBScene::createPawn(const std::string& pawnName)
 		std::map<std::string, SbmPawn*>::iterator iter = _pawnMap.find(pawn->getName());
 		if (iter != _pawnMap.end())
 		{
-			LOG( "Register pawn: pawn_map.insert(..) '%s' FAILED\n", pawn->getName().c_str() );
+			SmartBody::util::log( "Register pawn: pawn_map.insert(..) '%s' FAILED\n", pawn->getName().c_str() );
 			delete pawn;
 			return NULL;
 		}
@@ -1338,7 +1338,7 @@ bool SBScene::command(const std::string& command)
 {
 	if (this->getBoolAttribute("warnDeprecatedCommands"))
 	{
-		LOG("Warning: Deprecated command [%s]", command.c_str());
+		SmartBody::util::log("Warning: Deprecated command [%s]", command.c_str());
 	}
 
 	int ret = getCommandManager()->execute((char*) command.c_str());
@@ -1353,7 +1353,7 @@ bool SBScene::commandAt(float seconds, const std::string& command)
 {
 	if (this->getBoolAttribute("warnDeprecatedCommands"))
 	{
-		LOG("Warning: Deprecated command [%f] [%s]", seconds, command.c_str());
+		SmartBody::util::log("Warning: Deprecated command [%f] [%s]", seconds, command.c_str());
 	}
 
 	int ret = getCommandManager()->execute_later((char*) command.c_str(), seconds);
@@ -1385,10 +1385,10 @@ bool SBScene::run(const std::string& command)
 {
 #ifndef SB_NO_PYTHON
 	try {
-		//LOG("executePython = %s",command);
+		//SmartBody::util::log("executePython = %s",command);
 
 		PyRun_SimpleString(command.c_str());
-		//LOG("cmd result = %d",result);
+		//SmartBody::util::log("cmd result = %d",result);
 
 		return true;
 	} catch (...) {
@@ -1440,7 +1440,7 @@ bool SBScene::runScript(const std::string& script)
 		}
 	}
 
-	LOG("Could not find Python script '%s'", script.c_str());
+	SmartBody::util::log("Could not find Python script '%s'", script.c_str());
 	return false;
 
 #endif
@@ -1594,7 +1594,7 @@ SmartBody::SBFaceDefinition* SBScene::createFaceDefinition(const std::string& na
 	// make sure the name doesn't already exist
 	if (_faceDefinitions.find(name) != _faceDefinitions.end())
 	{
-		LOG("Face definition named '%s' already exists. Returning existing one", name.c_str());
+		SmartBody::util::log("Face definition named '%s' already exists. Returning existing one", name.c_str());
 		return _faceDefinitions[name];
 	}
 
@@ -1616,7 +1616,7 @@ void SBScene::removeFaceDefinition(const std::string& name)
 	std::map<std::string, SBFaceDefinition*>::iterator iter = _faceDefinitions.find(name);
 	if (iter ==_faceDefinitions.end())
 	{
-		LOG("Face definition named '%s' does not exist.", name.c_str());
+		SmartBody::util::log("Face definition named '%s' does not exist.", name.c_str());
 		return;
 	}
 	for (size_t l = 0; l < this->_sceneListeners.size(); l++)
@@ -1635,7 +1635,7 @@ SmartBody::SBFaceDefinition* SBScene::getFaceDefinition(const std::string& name)
 	std::map<std::string, SBFaceDefinition*>::iterator iter = _faceDefinitions.find(name);
 	if (iter == _faceDefinitions.end())
 	{
-		LOG("Face definition named '%s' does not exist.", name.c_str());
+		SmartBody::util::log("Face definition named '%s' does not exist.", name.c_str());
 		return NULL;
 	}
 
@@ -1665,7 +1665,7 @@ void SBScene::addScript(const std::string& name, SBScript* script)
 	std::map<std::string, SBScript*>::iterator iter = _scripts.find(name);
 	if (iter != _scripts.end())
 	{
-		LOG("Script with name %s already exists. Remove current script.", name.c_str());
+		SmartBody::util::log("Script with name %s already exists. Remove current script.", name.c_str());
 		//return;
 		_scripts.erase(iter);
 	}
@@ -1684,7 +1684,7 @@ void SBScene::removeScript(const std::string& name)
 		_scripts.erase(iter);
 		return;
 	}
-	LOG("Script with name %s does not exist.", name.c_str());
+	SmartBody::util::log("Script with name %s does not exist.", name.c_str());
 
 
 }
@@ -1714,7 +1714,7 @@ SBScript* SBScene::getScript(const std::string& name)
 	std::map<std::string, SBScript*>::iterator iter = _scripts.find(name);
 	if (iter == _scripts.end())
 	{
-		LOG("Script with name %s already exists.", name.c_str());
+		SmartBody::util::log("Script with name %s already exists.", name.c_str());
 		return NULL;
 	}
 
@@ -2186,7 +2186,7 @@ naive_uncomplete(boost::filesystem2::path const p, boost::filesystem2::path cons
 #if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 void writeFileToZip(zipFile& zf, std::string readFileName, std::string fileNameInZip)
 {
-	//LOG("writeFileToZip, srcFile = %s, fileInZip = %s",readFileName.c_str(),fileNameInZip.c_str());
+	//SmartBody::util::log("writeFileToZip, srcFile = %s, fileInZip = %s",readFileName.c_str(),fileNameInZip.c_str());
 	const int bufferSize = 16384;
 	int size_buf = bufferSize;
 	void* buf = NULL; 
@@ -2325,7 +2325,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 	}
 	else
 	{
-		LOG("Fail to save scene. Abort export operation");
+		SmartBody::util::log("Fail to save scene. Abort export operation");
 		file.close();
 		return;
 	}
@@ -2343,7 +2343,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		SmartBody::SBMotion* motion = getMotion(motionNames[i]);
 		if (!motion)
 		{
-			LOG("Motion %s cannot be found.", motionNames[i].c_str());
+			SmartBody::util::log("Motion %s cannot be found.", motionNames[i].c_str());
 			continue;
 		}
 		if (motion->getTransformDepth() > 0) // not an original motion
@@ -2352,7 +2352,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		if (motion->getFullFilePath() == "")
 		{
 			std::string motionFullPath = tempPath.string()+ "/" + motion->getName() + ".skm";
-			LOG("Skeleton %s is not loaded from a file, save the skeleton to temp directory %s",motion->getName().c_str(), motionFullPath.c_str());
+			SmartBody::util::log("Skeleton %s is not loaded from a file, save the skeleton to temp directory %s",motion->getName().c_str(), motionFullPath.c_str());
 			motion->saveToSkm(motionFullPath);
 			motion->setFullFilePath(motionFullPath);
 		}
@@ -2414,14 +2414,14 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		SmartBody::SBSkeleton* skel = getSkeleton(skelNames[i]);
 		if (!skel)
 		{
-			LOG("Skeleton %s cannot be found.", skelNames[i].c_str());
+			SmartBody::util::log("Skeleton %s cannot be found.", skelNames[i].c_str());
 			continue;
 		}	
 		
 		if (skel->getFullFilePath() == "")
 		{
 			std::string skelFullPath = tempPath.string()+ "/" + skel->getName();
-			LOG("Skeleton %s is not loaded from a file, save the skeleton to temp directory %s",skel->getName().c_str(), skelFullPath.c_str());
+			SmartBody::util::log("Skeleton %s is not loaded from a file, save the skeleton to temp directory %s",skel->getName().c_str(), skelFullPath.c_str());
 			skel->save(skelFullPath);
 			skel->setFullFilePath(skelFullPath);
 		}
@@ -2432,7 +2432,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		fs::path diffPath;	
 		fs::path outPath;
 		diffPath = naive_uncomplete(skelDir,mePath);
-		//LOG("diffPath after uncomplete = '%s'",diffPath.string().c_str());
+		//SmartBody::util::log("diffPath after uncomplete = '%s'",diffPath.string().c_str());
 		if (tempPath == skelDir)
 		{
 			diffPath = fs::path(defautAssetPath);			
@@ -2449,9 +2449,9 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 // 			fs::path assetPath(assetLocation);			
 // 			diffPath = naive_uncomplete(assetPath,mePath);			
 // 		}
-		//LOG("final diffpath = '%s'",diffPath.string().c_str());
+		//SmartBody::util::log("final diffpath = '%s'",diffPath.string().c_str());
 		outPath = fs::path(outDir + "/" + diffPath.string());
-		//LOG("skeleton = %s, file = %s, outpath = %s", skel->getName().c_str(), skelFile.string().c_str(), outPath.string().c_str());
+		//SmartBody::util::log("skeleton = %s, file = %s, outpath = %s", skel->getName().c_str(), skelFile.string().c_str(), outPath.string().c_str());
 		if (!writeToZip)
 		{
 			if (!fs::exists(outPath))
@@ -2476,7 +2476,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 			writeFileToZip(zf, skelFile.string(), zipFileName);
 		}	
 	}
-	//LOG("finish copying skeleton files");
+	//SmartBody::util::log("finish copying skeleton files");
 	std::vector<std::string> deformableMeshNames = assetManager->getDeformableMeshNames();
 	for (unsigned int i=0;i<deformableMeshNames.size();i++)
 	{
@@ -2484,7 +2484,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		DeformableMesh* mesh = assetManager->getDeformableMesh(meshName);
 		if (!mesh)
 		{
-			LOG("Mesh %s cannot be found.", meshName.c_str());
+			SmartBody::util::log("Mesh %s cannot be found.", meshName.c_str());
 			continue;
 		}
 		
@@ -2501,9 +2501,9 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 			{
 				fs::create_directories(meshPath);
 			}
-			LOG("mesh %s is not loaded from a file. Export the mesh to %s",meshName.c_str(),exportMeshFullPath.c_str());
+			SmartBody::util::log("mesh %s is not loaded from a file. Export the mesh to %s",meshName.c_str(),exportMeshFullPath.c_str());
 			ParserOpenCOLLADA::exportCollada(exportMeshFullPath,meshSkName,meshName,moNames,true,true,false, 1.0);
-			//LOG("finish exporting mesh as Collada files");
+			//SmartBody::util::log("finish exporting mesh as Collada files");
 			mesh->setFullFilePath(exportMeshFullPath +  "/" + meshName);
 			//continue;
 		}
@@ -2537,7 +2537,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 			writeDirToZip(zf,meshDir.string(),diffPath.string());
 		}
 	}
-	//LOG("finish copying deformable mesh files");
+	//SmartBody::util::log("finish copying deformable mesh files");
 	/*
 	const std::vector<std::string>& characters = getCharacterNames();
 	for (unsigned int i=0;i<characters.size();i++)
@@ -2570,7 +2570,7 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 			fs::path diffPath = naive_uncomplete(curpath,mePath);
 			fs::path newMeshPath(outDir+"/"+diffPath.string());
 
-			//LOG("curPath = %s, newMeshPath = %s", curpath.string().c_str(), newMeshPath.string().c_str());
+			//SmartBody::util::log("curPath = %s, newMeshPath = %s", curpath.string().c_str(), newMeshPath.string().c_str());
 			//path targetPath()
 			// copy dir
 			hasMeshPath = true;
@@ -2588,21 +2588,21 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 
 #if 0
 	// save motions
-	//LOG("Num of motionNames = %d",motionNames.size());
+	//SmartBody::util::log("Num of motionNames = %d",motionNames.size());
 	for (unsigned int i=0;i<motionNames.size();i++)
 	{
 		SmartBody::SBMotion* motion = getMotion(motionNames[i]);
-		//LOG("motionName = %s",motionNames[i].c_str());
+		//SmartBody::util::log("motionName = %s",motionNames[i].c_str());
 
 		if (!motion)
 		{
-			LOG("Motion %s cannot be found.", motionNames[i].c_str());
+			SmartBody::util::log("Motion %s cannot be found.", motionNames[i].c_str());
 			continue;
 		}
 	
 		fs::path motionFile(motion->filename());			
 		fs::path motionPath = motionFile.parent_path();
-		//LOG("motion %d, motionName = %s, filename = %s",motionNames[i].c_str(), motion->filename().c_str());
+		//SmartBody::util::log("motion %d, motionName = %s, filename = %s",motionNames[i].c_str(), motion->filename().c_str());
 		if (motionPath.empty()) // don't care about empty path
 			continue;
 		if (motion->getTransformDepth() > 0) // not an original motion
@@ -2617,8 +2617,8 @@ void SBScene::exportScenePackage( std::string outDir, std::string outZipArchiveN
 		}
 		fs::path newPath(outDir+"/"+diffPath.string());	
 		
-		//LOG("motionpath = %s, mediapath = %s, diffpath = %s, filename = %s", motionFile.directory_string().c_str(), mePath.native_directory_string().c_str(), diffPath.string().c_str(), motionFile.filename().c_str());		
-		//LOG("new Path = %s, newFileName = %s",newPath.string().c_str(), newFileName.c_str());
+		//SmartBody::util::log("motionpath = %s, mediapath = %s, diffpath = %s, filename = %s", motionFile.directory_string().c_str(), mePath.native_directory_string().c_str(), diffPath.string().c_str(), motionFile.filename().c_str());		
+		//SmartBody::util::log("new Path = %s, newFileName = %s",newPath.string().c_str(), newFileName.c_str());
 		//motion->saveToSkm(newFileName);
 		if (!writeToZip)
 		{
@@ -2661,7 +2661,7 @@ else
 		}
 		fs::path newPath(outDir+"/"+diffPath.string());		
 
-		  //LOG("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
+		  //SmartBody::util::log("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
 		//skel->save(newFileName);
 		//copy_file(path(skelFile),path(newFileName), fs::copy_option::none);
 
@@ -2723,7 +2723,7 @@ else
 			fs::path diffPath = naive_uncomplete(curpath,mePath);
 			fs::path newMeshPath(outDir+"/"+diffPath.string());
 			
-			//LOG("curPath = %s, newMeshPath = %s", curpath.string().c_str(), newMeshPath.string().c_str());
+			//SmartBody::util::log("curPath = %s, newMeshPath = %s", curpath.string().c_str(), newMeshPath.string().c_str());
 			//path targetPath()
 			// copy dir
 			hasMeshPath = true;
@@ -2862,7 +2862,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 		{
 			continue;
 		}
-		//LOG("motionpath = %s, mediapath = %s, diffpath = %s", motionFile.directory_string().c_str(), mePath.string().c_str(), diffPath.string().c_str());
+		//SmartBody::util::log("motionpath = %s, mediapath = %s, diffpath = %s", motionFile.directory_string().c_str(), mePath.string().c_str(), diffPath.string().c_str());
 		std::vector<std::string>::iterator st = std::find(motionPaths.begin(),motionPaths.end(),diffPath.string());
 		//if (st == motionPaths.end())
 		if (assetExist == "") // can not find this asset in the motion path
@@ -2890,7 +2890,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 		std::string assetExist = assetManager->findAsset("motion",assetName);
 		path mePath(systemMediaPath);
 		path diffPath = naive_uncomplete(skelPath,mePath);
-		//LOG("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
+		//SmartBody::util::log("motionpath = %s, mediapath = %s, diffpath = %s", skelPath.directory_string().c_str(), mePath.directory_string().c_str(), diffPath.directory_string().c_str());
 		if (diffPath.is_absolute()) // the path is not under media path, skip
 		{
 			continue;
@@ -2948,7 +2948,7 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 				//skelSaveStr.replace('\n',)
 				boost::replace_all(skelSaveStr,"\n","\\n");
 				boost::replace_all(skelSaveStr,"\"","");
-				LOG("Skeleton %s :\n%s",skelName.c_str(),skelSaveStr.c_str());
+				SmartBody::util::log("Skeleton %s :\n%s",skelName.c_str(),skelSaveStr.c_str());
 				strstr << "tempSkel.loadFromString(\"" << skelSaveStr << "\")\n";
 				charSkelMap[skelName] = skelName;
 			}			
@@ -2970,8 +2970,8 @@ void SBScene::saveAssets(std::stringstream& strstr, bool remoteSetup, std::strin
 				//skelSaveStr.replace('\n',)
 				boost::replace_all(skelSaveStr,"\n","\\n");
 				boost::replace_all(skelSaveStr,"\"","");
-				//LOG("Skeleton %s :\n%s",skelName.c_str(),skelSaveStr.c_str());
-				LOG("Skeleton %s :\n",skelName.c_str());
+				//SmartBody::util::log("Skeleton %s :\n%s",skelName.c_str(),skelSaveStr.c_str());
+				SmartBody::util::log("Skeleton %s :\n",skelName.c_str());
 				strstr << "tempSkel.loadFromString(\"" << skelSaveStr << "\")\n";
 				charSkelMap[skelName] = charName;
 			}
@@ -3737,7 +3737,7 @@ void SBScene::removeSystemParameter(const std::string& name)
 		return;
 	}
 
-	LOG("Cannot remove system parameter named '%s', does not exist.", name.c_str());
+	SmartBody::util::log("Cannot remove system parameter named '%s', does not exist.", name.c_str());
 
 }
 
@@ -3766,13 +3766,13 @@ SrCamera* SBScene::createCamera(const std::string& name)
 	SrCamera* camera = dynamic_cast<SrCamera*>(pawn);
 // 	if (camera)
 // 	{
-// 		LOG("A camera with name '%s' already exists.", name.c_str());
+// 		SmartBody::util::log("A camera with name '%s' already exists.", name.c_str());
 // 		return camera;
 // 	}
 // 	else 
 	if (pawn)
 	{
-		LOG("A pawn with name '%s' already exists. Camera will not be created.", name.c_str());
+		SmartBody::util::log("A pawn with name '%s' already exists. Camera will not be created.", name.c_str());
 		return NULL;
 	}
 	camera = new SrCamera();
@@ -3787,7 +3787,7 @@ SrCamera* SBScene::createCamera(const std::string& name)
 	std::map<std::string, SbmPawn*>:: iterator iter = _pawnMap.find(camera->getName());
 	if (iter != _pawnMap.end())
 	{
-		LOG( "Register pawn: pawn_map.insert(..) '%s' FAILED\n", camera->getName().c_str() ); 
+		SmartBody::util::log( "Register pawn: pawn_map.insert(..) '%s' FAILED\n", camera->getName().c_str() ); 
 	}
 
 	_pawnMap.insert(std::pair<std::string, SbmPawn*>(camera->getName(), camera));
@@ -3824,14 +3824,14 @@ void SBScene::removeCamera(SrCamera* camera)
 	SBPawn* pawn = getPawn(camera->getName());
 	if (!pawn)
 	{
-		LOG("No camera with name '%s' already exists. Camera will not be removed.", camera->getName().c_str());
+		SmartBody::util::log("No camera with name '%s' already exists. Camera will not be removed.", camera->getName().c_str());
 		return;
 	}
 
 	std::map<std::string, SrCamera*>::iterator iter = _cameras.find(camera->getName());
 	if (iter == _cameras.end())
 	{
-		LOG("Pawn with name '%s' already exists, but is not a camera. It will not be removed.", camera->getName().c_str());
+		SmartBody::util::log("Pawn with name '%s' already exists, but is not a camera. It will not be removed.", camera->getName().c_str());
 		return;
 	}
 
@@ -3872,7 +3872,7 @@ SrCamera* SBScene::getCamera(const std::string& name)
 	std::map<std::string, SrCamera*>::iterator iter = _cameras.find(name);
 	if (iter == _cameras.end())
 	{
-		//LOG("No camera with name '%s' found.", name.c_str());
+		//SmartBody::util::log("No camera with name '%s' found.", name.c_str());
 		return NULL;
 	}
 	return (*iter).second;
@@ -3938,70 +3938,70 @@ void SBScene::removeDefaultControllers()
 std::vector<std::string> SBScene::getAssetPaths(const std::string& type)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.getAssetPaths() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.getAssetPaths() instead.");
 	return getAssetManager()->getAssetPaths(type);
 }
 
 std::vector<std::string> SBScene::getLocalAssetPaths(const std::string& type)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.getLocalAssetPaths() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.getLocalAssetPaths() instead.");
 	return getAssetManager()->getLocalAssetPaths(type);
 }
 
 void SBScene::addAssetPath(const std::string& type, const std::string& path)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.addAssetPath() instead.");
 	getAssetManager()->addAssetPath(type, path);
 }
 
 void SBScene::removeAssetPath(const std::string& type, const std::string& path)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.addAssetPath() instead.");
 	getAssetManager()->removeAssetPath(type, path);
 }
 
 void SBScene::removeAllAssetPaths(const std::string& type)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.removeAllAssetPaths() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.removeAllAssetPaths() instead.");
 	getAssetManager()->removeAllAssetPaths(type);
 }
 
 void SBScene::loadAssets()
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.addAssetPath() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.addAssetPath() instead.");
 	getAssetManager()->loadAssets();
 }
 
 void SBScene::loadAsset(const std::string& assetPath)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.loadAsset() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.loadAsset() instead.");
 	getAssetManager()->loadAsset(assetPath);
 }
 
 void SBScene::loadAssetsFromPath(const std::string& assetPath)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.loadAssetsFromPath() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.loadAssetsFromPath() instead.");
 	getAssetManager()->loadAssetsFromPath(assetPath);
 }
 
 SBSkeleton* SBScene::addSkeletonDefinition(const std::string& skelName )
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.addSkeletonDefinition() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.addSkeletonDefinition() instead.");
 	return getAssetManager()->addSkeletonDefinition(skelName);
 }
 
 void SBScene::removeSkeletonDefinition(const std::string& skelName )
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.removeSkeletonDefinition() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.removeSkeletonDefinition() instead.");
 	return getAssetManager()->removeSkeletonDefinition(skelName);
 }
 
@@ -4009,7 +4009,7 @@ void SBScene::removeSkeletonDefinition(const std::string& skelName )
 SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double duration, int numFrames )
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.addSkeletonDefinition() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.addSkeletonDefinition() instead.");
 	
 	SBMotion* sbMotion = new SBMotion();
 	return this->getAssetManager()->addMotionDefinition(motionName, duration, numFrames);
@@ -4018,63 +4018,63 @@ SBMotion* SBScene::addMotionDefinition(const std::string& motionName, double dur
 SBMotion* SBScene::createMotion(const std::string& motionName)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.createMotion() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.createMotion() instead.");
 	return getAssetManager()->createMotion(motionName);
 }
 
 void SBScene::addMotions(const std::string& path, bool recursive)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.addMotion() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.addMotion() instead.");
 	getAssetManager()->addMotions(path, recursive);
 }
 
 int SBScene::getNumSkeletons()
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.getNumSkeletons() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.getNumSkeletons() instead.");
 	return getAssetManager()->getNumSkeletons();
 }
 
 std::vector<std::string> SBScene::getSkeletonNames()
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.getSkeletonNames() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.getSkeletonNames() instead.");
 	return getAssetManager()->getSkeletonNames();
 }
 
 SBMotion* SBScene::getMotion(const std::string& name)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.getMotion() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.getMotion() instead.");
 	return getAssetManager()->getMotion(name);
 }
 
 int SBScene::getNumMotions()
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.getNumMotions() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.getNumMotions() instead.");
 	return getAssetManager()->getNumMotions();
 }
 
 std::vector<std::string> SBScene::getMotionNames()
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.getNumMotions() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.getNumMotions() instead.");
 	return getAssetManager()->getMotionNames();
 }
 
 SBSkeleton* SBScene::createSkeleton(const std::string& skeletonDefinition)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.createSkeleton() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.createSkeleton() instead.");
 	return getAssetManager()->createSkeleton(skeletonDefinition);
 }
 
 SBSkeleton* SBScene::getSkeleton(const std::string& name)
 {
 	if (SHOW_DEPRECATION_MESSAGES)
-		LOG("DEPRECATED: Use AssetManager.getSkeleton() instead.");
+		SmartBody::util::log("DEPRECATED: Use AssetManager.getSkeleton() instead.");
 	return getAssetManager()->getSkeleton(name);
 }
 
@@ -4165,14 +4165,14 @@ SBAPI void SBScene::rescalePartialMeshSkeleton(const std::string& meshName, cons
 	SmartBody::SBSkeleton* skel = assetManager->getSkeleton(skelName);
 	if (!mesh || !skel)
 	{
-		LOG("Warning, can't find mesh '%s' or skeleton '%s'.", meshName.c_str(), skelName.c_str());
+		SmartBody::util::log("Warning, can't find mesh '%s' or skeleton '%s'.", meshName.c_str(), skelName.c_str());
 		return;
 	}
 
 	SmartBody::SBJoint* rootJoint = skel->getJointByName(rootJointName);
 	if (!rootJoint)
 	{
-		LOG("Warning, can't find joint '%s'.", rootJointName.c_str());
+		SmartBody::util::log("Warning, can't find joint '%s'.", rootJointName.c_str());
 		return;
 	}
 
@@ -4337,25 +4337,25 @@ bool SBScene::setCameraConeOfSight(const std::string& characterName) {
 	SrCamera* camera = getActiveCamera();
 	if (!camera)
 	{
-		LOG("No active camera found. Cannot create camera track.");
+		SmartBody::util::log("No active camera found. Cannot create camera track.");
 		return false;
 	}
 	SbmPawn* pawn = SmartBody::SBScene::getScene()->getPawn(characterName);
 	if (!pawn)
 	{
-		LOG("Object %s was not found, cannot track.", characterName.c_str());
+		SmartBody::util::log("Object %s was not found, cannot track.", characterName.c_str());
 		return false;
 	}
 
 	SkSkeleton* skeleton	= pawn->getSkeleton();
 
 	if(!skeleton->search_joint("eyeball_left")) {
-		LOG("Can't enable coneOfsight: 'eyeball_left' joint not found.");
+		SmartBody::util::log("Can't enable coneOfsight: 'eyeball_left' joint not found.");
 		return false;
 	}
 
 	if(!skeleton->search_joint("eyeball_right")) {
-		LOG("Can't enable coneOfsight: 'eyeball_right' joint not found.");
+		SmartBody::util::log("Can't enable coneOfsight: 'eyeball_right' joint not found.");
 		return false;
 	}
 
@@ -4390,7 +4390,7 @@ void SBScene::updateConeOfSight()
 	//	Left eye world location
 	SkJoint * leftEye			= character->getSkeleton()->search_joint("eyeball_left");
 	if(!leftEye) {
-		LOG("Can't find 'eyeball_left' joint.\n");
+		SmartBody::util::log("Can't find 'eyeball_left' joint.\n");
 	}
 	const SrMat& gmat_leftEye	= leftEye->gmat();
 	SrVec leftEye_location		= SrVec(gmat_leftEye.get(3, 0), gmat_leftEye.get(3, 1), gmat_leftEye.get(3, 2));
@@ -4398,7 +4398,7 @@ void SBScene::updateConeOfSight()
 	//	Right eye world location
 	SkJoint* rightEye			= character->getSkeleton()->search_joint("eyeball_right");
 	if(!rightEye) {
-		LOG("Can't find 'eyeball_right' joint.\n");
+		SmartBody::util::log("Can't find 'eyeball_right' joint.\n");
 	}
 	const SrMat& gmat_rightEye	= rightEye->gmat();
 	SrVec rightEye_location		= SrVec(gmat_rightEye.get(3, 0), gmat_rightEye.get(3, 1), gmat_rightEye.get(3, 2));
@@ -4450,7 +4450,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	SmartBody::SBCharacter* character = getCharacter(characterName);
 	
 	if(!character) {
-		LOG("Character %s not found.", characterName.c_str());
+		SmartBody::util::log("Character %s not found.", characterName.c_str());
 		return visible_pawns;
 	}
 
@@ -4460,7 +4460,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	//	Left eye world location
 	SkJoint* leftEye			= character->getSkeleton()->search_joint("eyeball_left");
 	if(!leftEye) {
-		LOG("Can't find 'eyeball_left' joint.\n");
+		SmartBody::util::log("Can't find 'eyeball_left' joint.\n");
 		return visible_pawns;
 	}
 	const SrMat& gmat_leftEye	= leftEye->gmat();
@@ -4469,7 +4469,7 @@ std::vector<std::string> SBScene::checkVisibility(const std::string& characterNa
 	//	Right eye world location
 	SkJoint* rightEye			= character->getSkeleton()->search_joint("eyeball_right");
 	if(!rightEye) {
-		LOG("Can't find 'eyeball_right' joint.\n");
+		SmartBody::util::log("Can't find 'eyeball_right' joint.\n");
 		return visible_pawns;
 	}
 	const SrMat& gmat_rightEye	= rightEye->gmat();
@@ -4587,7 +4587,7 @@ std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>&
 	reverse(pawnZSortedList.begin(),pawnZSortedList.end()); // reverse the order so the order is front to back
 
 	//for (unsigned int i=0;i<pawnZSortedList.size();i++)
-	//	LOG("Pawn %d, zMin = %f", pawnZSortedList[i].second, pawnZSortedList[i].first);
+	//	SmartBody::util::log("Pawn %d, zMin = %f", pawnZSortedList[i].second, pawnZSortedList[i].first);
 
 	// occlusion window width/height
 	int width = 256, height = 256;
@@ -4619,11 +4619,11 @@ std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>&
     switch(status)
     {
 		case GL_FRAMEBUFFER_COMPLETE:
-            LOG("FrameBufferObject success");
+            SmartBody::util::log("FrameBufferObject success");
 			break;
 	
 	   default:
-			LOG("FrameBufferObject error");
+			SmartBody::util::log("FrameBufferObject error");
 	}
 	*/
     //-------------------------
@@ -4647,7 +4647,7 @@ std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>&
 		SmartBody::SBPawn* pawn		= scene->getPawn(testPawns[pawnIdx]);
 		SrBox pawn_bb;
 		pawn_bb = pawn->getBoundingBox();		
-		//LOG("pawn %s, min = %.3f %.3f %.3f, max = %.3f %.3f %.3f", pawn->getName().c_str(), pawn_bb.a[0], pawn_bb.a[1], pawn_bb.a[2], pawn_bb.b[0], pawn_bb.b[1], pawn_bb.b[2]);
+		//SmartBody::util::log("pawn %s, min = %.3f %.3f %.3f, max = %.3f %.3f %.3f", pawn->getName().c_str(), pawn_bb.a[0], pawn_bb.a[1], pawn_bb.a[2], pawn_bb.b[0], pawn_bb.b[1], pawn_bb.b[2]);
 		glBeginQuery(GL_SAMPLES_PASSED, uiOcclusionQuery); 
 		// Every pixel that passes the depth test now gets added to the result		
 		glDrawBox(pawn_bb.a, pawn_bb.b);
@@ -4657,7 +4657,7 @@ std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>&
 		glGetQueryObjectiv(uiOcclusionQuery, GL_QUERY_RESULT, &iSamplesPassed); 
 		if (iSamplesPassed > 0) // not occluded
 		{
-			//LOG("pawn %s, visible samples = %d", pawn->getName().c_str(), iSamplesPassed);
+			//SmartBody::util::log("pawn %s, visible samples = %d", pawn->getName().c_str(), iSamplesPassed);
 			visiblePawns.push_back(pawn->getName());
 			//glDrawBox(pawn_bb.a, pawn_bb.b);
 		}		
@@ -4674,7 +4674,7 @@ std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>&
 	glDeleteFramebuffersEXT(1, &fb);
 
 	//for (unsigned int i=0;i<visiblePawns.size();i++)
-	//	LOG("Visible pawn %d = %s", i, visiblePawns[i].c_str());
+	//	SmartBody::util::log("Visible pawn %d = %s", i, visiblePawns[i].c_str());
 #endif
 	return visiblePawns;
 }
@@ -4753,7 +4753,7 @@ std::vector<std::string> SBScene::frustumTest(const std::vector<std::string>& te
 //		Returns a list of visible pawns from current view port
 //	
 std::vector<std::string> SBScene::checkVisibility_current_view() {
-	//LOG("Checking visibility...\n");
+	//SmartBody::util::log("Checking visibility...\n");
 	SmartBody::SBScene * scene	= SmartBody::SBScene::getScene();
 	std::vector<std::string> pawnNames = scene->getPawnNames();
 	std::vector<std::string>::iterator removeItem = std::remove(pawnNames.begin(),pawnNames.end(), "cameraDefault");
@@ -4788,7 +4788,7 @@ std::vector<std::string> SBScene::checkVisibility_current_view() {
 			Ogre::Vector3 point_max		= Ogre::Vector3(pawn_bb.b.x, pawn_bb.b.y, pawn_bb.b.z); 
 
 			if(ogreCam->isVisible(point_min) || ogreCam->isVisible(point_max))
-				LOG("Pawn %s is visible", pawn->getName().c_str());
+				SmartBody::util::log("Pawn %s is visible", pawn->getName().c_str());
 		}
 		*/
 	}
@@ -4824,19 +4824,19 @@ void SBScene::checkVisibility() {
 		l		= camera->getCenter();
 		u		= camera->getUpVector();
 
-		//LOG("Eye:    %f, %f, %f", p.x, p.y, p.z);
-		//LOG("Center: %f, %f, %f", l.x, l.y, l.z);
-		//LOG("Up: %f, %f, %f", u.x, u.y, u.z);
-		//LOG("Fovy: %f\tAspect %f\tClip %f, %f\n", angle, aspect, znear, zfar);
+		//SmartBody::util::log("Eye:    %f, %f, %f", p.x, p.y, p.z);
+		//SmartBody::util::log("Center: %f, %f, %f", l.x, l.y, l.z);
+		//SmartBody::util::log("Up: %f, %f, %f", u.x, u.y, u.z);
+		//SmartBody::util::log("Fovy: %f\tAspect %f\tClip %f, %f\n", angle, aspect, znear, zfar);
 
 		SrFrustum frustum;
 		frustum.setCamInternals(angle, aspect, znear, zfar);
 		frustum.setCamDef(p, l, u);
 		
 		//if(frustum.pointInFrustum(SrVec(0,0,0)) != SrFrustum::OUTSIDE)
-		//	LOG("Center visible\n");
+		//	SmartBody::util::log("Center visible\n");
 		//else
-		//	LOG("Center NOt visible\n");
+		//	SmartBody::util::log("Center NOt visible\n");
 		
 		SrCamera* check_is_camera = dynamic_cast<SrCamera*>(pawn);
 		if (!check_is_camera) {
@@ -4855,10 +4855,10 @@ void SBScene::checkVisibility() {
 			max_point.y = pawn_bb.b.y;
 			max_point.z = pawn_bb.b.z;
 
-			LOG("InFrustum: %d\t%d\n", frustum.pointInFrustum(min_point), frustum.pointInFrustum(min_point));
+			SmartBody::util::log("InFrustum: %d\t%d\n", frustum.pointInFrustum(min_point), frustum.pointInFrustum(min_point));
 
 			if(frustum.pointInFrustum(min_point) > 0 || frustum.pointInFrustum(max_point) > 0) 
-				LOG("Pawn %s is visible", pawn->getName().c_str());
+				SmartBody::util::log("Pawn %s is visible", pawn->getName().c_str());
 			
 		}
 	}
@@ -4870,18 +4870,18 @@ void SBScene::setCameraTrack(const std::string& characterName, const std::string
 	SrCamera* camera = getActiveCamera();
 	if (!camera)
 	{
-		LOG("No active camera found. Cannot create camera track.");
+		SmartBody::util::log("No active camera found. Cannot create camera track.");
 		return;
 	}
 	SbmPawn* pawn = SmartBody::SBScene::getScene()->getPawn(characterName);
 	if (!pawn)
 	{
-		LOG("Object %s was not found, cannot track.", characterName.c_str());
+		SmartBody::util::log("Object %s was not found, cannot track.", characterName.c_str());
 		return;
 	}
 	if (jointName == "")
 	{
-		LOG("Need to specify a joint to track.");
+		SmartBody::util::log("Need to specify a joint to track.");
 		return;
 	}
 
@@ -4891,7 +4891,7 @@ void SBScene::setCameraTrack(const std::string& characterName, const std::string
 	SkJoint* joint = pawn->getSkeleton()->search_joint(jointName.c_str());
 	if (!joint)
 	{
-		LOG("Could not find joint %s on object %s.", jointName.c_str(), characterName.c_str());
+		SmartBody::util::log("Could not find joint %s on object %s.", jointName.c_str(), characterName.c_str());
 		return;
 	}
 
@@ -4902,11 +4902,11 @@ void SBScene::setCameraTrack(const std::string& characterName, const std::string
 	CameraTrack* cameraTrack = new CameraTrack();
 	cameraTrack->joint = joint;
 	cameraTrack->jointToCamera = camera->getEye() - jointPos;
-	LOG("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
+	SmartBody::util::log("Vector from joint to target is %f %f %f", cameraTrack->jointToCamera.x, cameraTrack->jointToCamera.y, cameraTrack->jointToCamera.z);
 	cameraTrack->targetToCamera = camera->getEye() - camera->getCenter();
-	LOG("Vector from target to eye is %f %f %f", cameraTrack->targetToCamera.x, cameraTrack->targetToCamera.y, cameraTrack->targetToCamera.z);				
+	SmartBody::util::log("Vector from target to eye is %f %f %f", cameraTrack->targetToCamera.x, cameraTrack->targetToCamera.y, cameraTrack->targetToCamera.z);				
 	_cameraTracking.push_back(cameraTrack);
-	LOG("Object %s will now be tracked at joint %s.", characterName.c_str(), jointName.c_str());
+	SmartBody::util::log("Object %s will now be tracked at joint %s.", characterName.c_str(), jointName.c_str());
 }
 
 void SBScene::removeCameraTrack()
@@ -4921,7 +4921,7 @@ void SBScene::removeCameraTrack()
 			delete cameraTrack;
 		}
 		_cameraTracking.clear();
-		LOG("Removing current tracked object.");
+		SmartBody::util::log("Removing current tracked object.");
 	}
 }
 
@@ -5040,7 +5040,7 @@ SBAPI bool SBScene::createNavigationMesh( const std::string& meshfilename )
 	
 	if (!loadSuccess || meshVec.size() == 0)
 	{
-		LOG("Error loading navigation mesh, filename = %s",meshfilename.c_str());
+		SmartBody::util::log("Error loading navigation mesh, filename = %s",meshfilename.c_str());
 		return false;
 	}
 	//mesh.scale(0.3f);
@@ -5076,14 +5076,14 @@ SBAPI SBNavigationMesh* SBScene::getNavigationMesh()
 
 void SBScene::startFileLogging(const std::string& filename)
 {
-	_logListener = new vhcl::Log::FileListener(filename.c_str());
-	vhcl::Log::g_log.AddListener(_logListener);
+	_logListener = new SmartBody::util::FileListener(filename.c_str());
+	SmartBody::util::g_log.AddListener(_logListener);
 }
 
 void SBScene::stopFileLogging()
 {
 	if (_logListener)
-		vhcl::Log::g_log.RemoveListener(_logListener);
+		SmartBody::util::g_log.RemoveListener(_logListener);
 }
 
 std::string SBScene::getStringFromObject(SmartBody::SBObject* object)

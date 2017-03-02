@@ -51,7 +51,7 @@ bool MeCtMotionGraph::controller_evaluate( double t, MeFrameData& frame )
 		//getJointChannelValues(SbmPawn::WORLD_OFFSET_JOINT_NAME, frame, curWO);		
 		SrMat deltaWO = motionState->stepMotionState(dt);
 		SrVec deltaTran = deltaWO.get_translation();
-		//LOG("delta Tran = %f %f %f", deltaTran[0],deltaTran[1],deltaTran[2]);
+		//SmartBody::util::log("delta Tran = %f %f %f", deltaTran[0],deltaTran[1],deltaTran[2]);
 		// write the result back to MeFrameBuffer
 		SmartBody::SBMotionFrameBuffer& motionBuffer = motionState->getCurMotionFrameBuffer();
 		outMotionBuffer.getBuffer() = motionBuffer.getBuffer(); // copy buufer
@@ -83,8 +83,8 @@ void MeCtMotionGraph::updateWO( const SrMat& curWO, const SrMat& deltaWO, MeFram
 	SrMat nextMat = negOffset * deltaWO * posOffset * curWO;
 	SrVec newTran = nextMat.get_translation();
 	SrVec curTran = curWO.get_translation();
-	//LOG("curTran = %f %f %f", curTran[0],curTran[1],curTran[2]);
-	//LOG("newTran = %f %f %f", newTran[0],newTran[1],newTran[2]);
+	//SmartBody::util::log("curTran = %f %f %f", curTran[0],curTran[1],curTran[2]);
+	//SmartBody::util::log("newTran = %f %f %f", newTran[0],newTran[1],newTran[2]);
 	SrQuat newRot = SrQuat(nextMat.get_rotation());
 	std::string woJointName = SbmPawn::WORLD_OFFSET_JOINT_NAME;	
 	setJointChannelPos(woJointName, frame, newTran);

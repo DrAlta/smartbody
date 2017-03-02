@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #ifndef __native_client__
 #ifndef SB_NO_VHMSG
 #include "vhmsg.h"
@@ -119,7 +119,7 @@ using namespace std;
 
 int deprecatedMessage( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )
 {
-	LOG("Command %s has been deprecated.", args.read_remainder_raw());
+	SmartBody::util::log("Command %s has been deprecated.", args.read_remainder_raw());
 	return CMD_FAILURE;
 }
 
@@ -151,7 +151,7 @@ void mcu_preprocess_sequence( srCmdSeq *to_seq_p, srCmdSeq *fr_seq_p, SmartBody:
 				delete [] cmd;
 				cmd = NULL;
 				if( inline_seq_p == NULL )	{
-					LOG( "mcu_preprocess_sequence ERR: inline seq '%s' NOT FOUND\n", name );
+					SmartBody::util::log( "mcu_preprocess_sequence ERR: inline seq '%s' NOT FOUND\n", name );
 					return;
 				}
 			}
@@ -188,7 +188,7 @@ int begin_sequence( char* name )	{
 
 		if( !success )
 		{
-			LOG( "begin_sequence ERR: insert active: '%s' FAILED\n", name ); 
+			SmartBody::util::log( "begin_sequence ERR: insert active: '%s' FAILED\n", name ); 
 			return CMD_FAILURE;
 		}
 		
@@ -213,7 +213,7 @@ int mcu_sequence_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 	//std::cout << "SEQUENCE LOADED: " << seq_name << " " << seq_cmd << std::endl;
 	//std::string seqStr = seq_cmd;
-	//LOG("mcu_sequence_func : seq_name = %s, seqStr = %s",seq_cmd, seqStr.c_str());
+	//SmartBody::util::log("mcu_sequence_func : seq_name = %s, seqStr = %s",seq_cmd, seqStr.c_str());
 	if( ( strcmp( seqCmd, "begin" ) == 0 )||( strcmp( seqCmd, EMPTY_STRING ) == 0 ) )	{
 		int ret = begin_sequence( seqName );
 		return ret;
@@ -228,7 +228,7 @@ int mcu_sequence_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			bool success = SmartBody::SBScene::getScene()->getCommandManager()->getPendingSequences()->addSequence( seqName, seq );
 			if( !success )
 			{
-				LOG( "mcu_sequence_func ERR: insert pending '%s' FAILED\n", seqName ); 
+				SmartBody::util::log( "mcu_sequence_func ERR: insert pending '%s' FAILED\n", seqName ); 
 				return( CMD_FAILURE );
 			}
 		}
@@ -244,7 +244,7 @@ int mcu_sequence_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		srCmdSeq* seq = SmartBody::SBScene::getScene()->getCommandManager()->getPendingSequences()->getSequence( seqName );
 		if (!seq)
 		{
-			LOG( "mcu_sequence_func ERR: print: '%s' NOT FOUND\n", seqName ); 
+			SmartBody::util::log( "mcu_sequence_func ERR: print: '%s' NOT FOUND\n", seqName ); 
 			return( CMD_FAILURE );
 		}
 		seq->print( stdout );
@@ -253,7 +253,7 @@ int mcu_sequence_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	if( ( strcmp( seqCmd, "abort" ) == 0 )||( strcmp( seqCmd, "delete" ) == 0 ) )	{
 		int result = SmartBody::SBScene::getScene()->getCommandManager()->abortSequence( seqName );
 		if( result == CMD_NOT_FOUND )	{
-			LOG( "mcu_sequence_func ERR: abort|delete: '%s' NOT FOUND\n", seqName ); 
+			SmartBody::util::log( "mcu_sequence_func ERR: abort|delete: '%s' NOT FOUND\n", seqName ); 
 		}
 		return( result );
 	}
@@ -277,7 +277,7 @@ int mcu_sequence_chain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 	}
 
 	if( seq_names.empty() ) {
-		LOG("ERROR: seq-chain expected one or more .seq filenames.");
+		SmartBody::util::log("ERROR: seq-chain expected one or more .seq filenames.");
 		return CMD_FAILURE;
 	}
 
@@ -337,7 +337,7 @@ double parseMotionParameters(std::string m, std::string parameter, double min, d
 
 		sk = SmartBody::SBScene::getScene()->getAssetManager()->getSkeleton(skeletonName);
 		if (!sk)
-			LOG("parseMotionParameters ERR: skeleton %s not found! Parameter won't be setup properly", skeletonName.c_str());
+			SmartBody::util::log("parseMotionParameters ERR: skeleton %s not found! Parameter won't be setup properly", skeletonName.c_str());
 	}
 	int type = 0;
 	if (parameter == "speed1")
@@ -368,7 +368,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	std::string operation = args.read_token();
 	if (operation == "enable")
 	{
-		LOG("Command: 'panim enable' has been deprecated.");
+		SmartBody::util::log("Command: 'panim enable' has been deprecated.");
 		return CMD_FAILURE;
 	}
 	if (operation == "state")
@@ -507,7 +507,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			return CMD_FAILURE;
 		if (!character->param_animation_ct)
 		{
-			LOG("Parameterized Animation Not Enabled!");
+			SmartBody::util::log("Parameterized Animation Not Enabled!");
 			return CMD_SUCCESS;
 		}
 
@@ -519,7 +519,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			std::string blendName = args.read_token();
 			SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
 			if (!blend)
-				LOG("Blend %s not exist, schedule Idle blend.", blendName.c_str());
+				SmartBody::util::log("Blend %s not exist, schedule Idle blend.", blendName.c_str());
 			std::string loopString = args.read_token();
 			if (loopString != "loop")
 				return CMD_FAILURE;
@@ -596,7 +596,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			{
 				for (int i = 0; i < character->param_animation_ct->getNumWeights(); i++)
 					w.push_back(args.read_double());
-				//LOG("weight size = %d",w.size());
+				//SmartBody::util::log("weight size = %d",w.size());
 				character->param_animation_ct->updateWeights(w);
 			}
 		}
@@ -604,14 +604,14 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		{
 			if (!character->param_animation_ct->getCurrentPABlendData())
 			{
-				LOG("No state available for character %s.", character->getName().c_str());
+				SmartBody::util::log("No state available for character %s.", character->getName().c_str());
 				return CMD_FAILURE;
 			}
 
 			int type = character->param_animation_ct->getCurrentPABlendData()->state->getType();
 			if (args.calc_num_tokens() != type + 1)
 			{
-				LOG("Cannot update state %s for character %s which has %d parameters, you sent %d.", character->param_animation_ct->getName().c_str(), character->getName().c_str(), (type + 1), args.calc_num_tokens());
+				SmartBody::util::log("Cannot update state %s for character %s which has %d parameters, you sent %d.", character->param_animation_ct->getName().c_str(), character->getName().c_str(), (type + 1), args.calc_num_tokens());
 				return CMD_FAILURE;
 			}
 			std::vector<double> p;
@@ -636,7 +636,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		
 	else
 	{
-		LOG("mcu_panim_cmd_func ERR: operation not valid.");
+		SmartBody::util::log("mcu_panim_cmd_func ERR: operation not valid.");
 		return CMD_FAILURE;
 	}
 	return CMD_SUCCESS;
@@ -659,9 +659,9 @@ int mcu_motion_player_func(srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 		else
 		{			
 			double frameNumber = args.read_double();
-			//LOG("before motionplayer_ct->init(), next = %s, frameNumber = %f", next.c_str(), frameNumber);
+			//SmartBody::util::log("before motionplayer_ct->init(), next = %s, frameNumber = %f", next.c_str(), frameNumber);
 			character->motionplayer_ct->init(character,next, frameNumber);
-			//LOG("after motionplayer_ct->init()");
+			//SmartBody::util::log("after motionplayer_ct->init()");
 		}
 		return CMD_SUCCESS;
 	}
@@ -681,11 +681,11 @@ int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	char *terr_cmd = args.read_token();
 
 	if( strcmp( terr_cmd, "help" ) == 0 )	{
-		LOG("HELP: terrain");	
-		LOG("  load [<filename>]");
-		LOG("  scale <X Y Z>");
-		LOG("  origin <X Y Z>|auto");
-		LOG("  delete");
+		SmartBody::util::log("HELP: terrain");	
+		SmartBody::util::log("  load [<filename>]");
+		SmartBody::util::log("  scale <X Y Z>");
+		SmartBody::util::log("  origin <X Y Z>|auto");
+		SmartBody::util::log("  delete");
 		return( CMD_SUCCESS );
 	}
 	else
@@ -706,7 +706,7 @@ int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	}
 	else
 	if( heightfield == NULL ) {
-		LOG( "mcu_terrain_func: ERR: no heightfield loaded" );
+		SmartBody::util::log( "mcu_terrain_func: ERR: no heightfield loaded" );
 		return( CMD_FAILURE );
 	}
 
@@ -727,7 +727,7 @@ int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 				heightfield->set_auto_origin();
 			}
 			else	{
-				LOG( "mcu_terrain_func: ERR: token '%s' not recognized", sub_cmd );
+				SmartBody::util::log( "mcu_terrain_func: ERR: token '%s' not recognized", sub_cmd );
 				return( CMD_NOT_FOUND );
 			}
 		}
@@ -755,34 +755,34 @@ int mcu_terrain_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 
 void mcu_print_timer_deprecation_warning( void )	{
 
-	LOG("WARNING: fps/lockdt feature is deprecated");
-	LOG("  - If you insist, be sure to set fps first, then lockdt...");
-	LOG("  - Use 'time sleepfps <fps>' and 'time simfps <fps>' instead");
+	SmartBody::util::log("WARNING: fps/lockdt feature is deprecated");
+	SmartBody::util::log("  - If you insist, be sure to set fps first, then lockdt...");
+	SmartBody::util::log("  - Use 'time sleepfps <fps>' and 'time simfps <fps>' instead");
 }
 
 void mcu_print_timer_help( int level = 0 )	{
 	
 	if( level == 2 ) {
-		LOG("API help...");
+		SmartBody::util::log("API help...");
 	
 	}
 	else
 	if( level == 1 )	{
-		LOG("Full help...");
+		SmartBody::util::log("Full help...");
 	}
 	else	{
-		LOG("HELP: time");	
-		LOG("  help | fullhelp");
-		LOG("  maxfps | fps <desired-max-fps>	(DEPRECATED)");
-		LOG("  lockdt [0|1]					(DEPRECATED)");
-		LOG("  perf [0|1 [<interval>]]");
-		LOG("  speed <real-time-factor>");
-		LOG("  sleepfps | simfps | evalfps <fps>");
-		LOG("  sleepdt | simdt | evaldt <dt>");
-		LOG("  pause | resume");
-		LOG("  step [num-steps]");
-		LOG("  perf [<interval>]");
-		LOG("  print");
+		SmartBody::util::log("HELP: time");	
+		SmartBody::util::log("  help | fullhelp");
+		SmartBody::util::log("  maxfps | fps <desired-max-fps>	(DEPRECATED)");
+		SmartBody::util::log("  lockdt [0|1]					(DEPRECATED)");
+		SmartBody::util::log("  perf [0|1 [<interval>]]");
+		SmartBody::util::log("  speed <real-time-factor>");
+		SmartBody::util::log("  sleepfps | simfps | evalfps <fps>");
+		SmartBody::util::log("  sleepdt | simdt | evaldt <dt>");
+		SmartBody::util::log("  pause | resume");
+		SmartBody::util::log("  step [num-steps]");
+		SmartBody::util::log("  perf [<interval>]");
+		SmartBody::util::log("  print");
 	}
 }
 
@@ -817,7 +817,7 @@ int mcu_time_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 			SmartBody::SBScene::getScene()->getSimulationManager()->printInfo();
 		}
 		{
-			LOG( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
+			SmartBody::util::log( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
 				SmartBody::SBScene::getScene()->getSimulationManager()->getTime(),
 				SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt(),
 				1.0 / SmartBody::SBScene::getScene()->getSimulationManager()->getTimeDt()
@@ -827,7 +827,7 @@ int mcu_time_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 	}
 
 //		if( mcu.timer_p == NULL )	{
-//		LOG( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
+//		SmartBody::util::log( "mcu_time_func NOTICE: %s: TimeRegulator was NOT REGISTERED\n", time_cmd );
 //		SmartBody::SBScene::getScene()->getSimulationManager()->switch_internal_timer(); 
 //		}
 		
@@ -914,29 +914,29 @@ int mcu_time_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 void mcu_print_profiler_help( int level = 0 )	{
 	
 	if( level == 2 ) {
-		LOG("API help...");
+		SmartBody::util::log("API help...");
 	}
 	else
 	if( level == 1 )	{
-		LOG("Full help...");
+		SmartBody::util::log("Full help...");
 	}
 	else	{
-		LOG( "HELP: tip" );	
-		LOG( "  help | fullhelp | legend" );
-		LOG( "  on | off | enable | disable | preload" );
-		LOG( "  group <name> enable | disable | preload" );
-		LOG( "  suppress | select [<level>]" );
-		LOG( "  abs <delta> | 0" );
-		LOG( "  rel <factor> | 0" );
-		LOG( "  fix [abs|rel]" );
-		LOG( "  dyn [abs|rel]" );
-		LOG( "  sniff <factor:[0.0,1.0)>" );
-		LOG( "  avoid <factor:(1.0,...)>" );
-		LOG( "  decaying <factor:[0.0,1.0)>" );
-		LOG( "  rolling <count>" );
-		LOG( "  print | report" );
-		LOG( "  erase | reset" );
-		LOG( "  test [reps]" );
+		SmartBody::util::log( "HELP: tip" );	
+		SmartBody::util::log( "  help | fullhelp | legend" );
+		SmartBody::util::log( "  on | off | enable | disable | preload" );
+		SmartBody::util::log( "  group <name> enable | disable | preload" );
+		SmartBody::util::log( "  suppress | select [<level>]" );
+		SmartBody::util::log( "  abs <delta> | 0" );
+		SmartBody::util::log( "  rel <factor> | 0" );
+		SmartBody::util::log( "  fix [abs|rel]" );
+		SmartBody::util::log( "  dyn [abs|rel]" );
+		SmartBody::util::log( "  sniff <factor:[0.0,1.0)>" );
+		SmartBody::util::log( "  avoid <factor:(1.0,...)>" );
+		SmartBody::util::log( "  decaying <factor:[0.0,1.0)>" );
+		SmartBody::util::log( "  rolling <count>" );
+		SmartBody::util::log( "  print | report" );
+		SmartBody::util::log( "  erase | reset" );
+		SmartBody::util::log( "  test [reps]" );
 	}
 }
 
@@ -962,7 +962,7 @@ int mcu_time_ival_prof_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 		}
 
 		if( mcu.profiler_p == NULL )	{
-			LOG( "mcu_time_ival_prof_func NOTICE: %s: TimeIntervalProfiler was NOT REGISTERED\n", tip_cmd ); 
+			SmartBody::util::log( "mcu_time_ival_prof_func NOTICE: %s: TimeIntervalProfiler was NOT REGISTERED\n", tip_cmd ); 
 			mcu.switch_internal_profiler();
 		}
 		TimeIntervalProfiler *prof_p = mcu.profiler_p;
@@ -1060,7 +1060,7 @@ int mcu_time_ival_prof_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 					prof_p->set_dynamic_rel( false );
 				}
 				else	{
-					LOG("ERROR: Unknown command option '%s'", opt );
+					SmartBody::util::log("ERROR: Unknown command option '%s'", opt );
 					return( CMD_NOT_FOUND );
 				}
 			}
@@ -1082,7 +1082,7 @@ int mcu_time_ival_prof_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 					prof_p->set_dynamic_rel( true );
 				}
 				else	{
-					LOG("ERROR: Unknown command option '%s'", opt );
+					SmartBody::util::log("ERROR: Unknown command option '%s'", opt );
 					return( CMD_NOT_FOUND );
 				}
 			}
@@ -1146,25 +1146,25 @@ int set_controller_timing(
 int query_controller(
 	MeController* ctrl_p
 )	{
-	LOG( "MCU QUERY: MeController '%s':\n", ctrl_p->getName().c_str());
-	LOG( "  type... %s\n", ctrl_p->controller_type().c_str() );
-	LOG( "  indt... %.3f\n", ctrl_p->indt() );
-	LOG( "  outdt.. %.3f\n", ctrl_p->outdt() );
+	SmartBody::util::log( "MCU QUERY: MeController '%s':\n", ctrl_p->getName().c_str());
+	SmartBody::util::log( "  type... %s\n", ctrl_p->controller_type().c_str() );
+	SmartBody::util::log( "  indt... %.3f\n", ctrl_p->indt() );
+	SmartBody::util::log( "  outdt.. %.3f\n", ctrl_p->outdt() );
 	float emph = ctrl_p->emphasist();
 	if( emph < 0.0 )	{
-		LOG( "  emph... UNK\n");
+		SmartBody::util::log( "  emph... UNK\n");
 	}
 	else	{
-		LOG( "  emph... %.3f\n", emph );
+		SmartBody::util::log( "  emph... %.3f\n", emph );
 	}
 	double dur = ctrl_p->controller_duration();
 	if( dur < 0.0 )	{
-		LOG( "  dur.... UNK\n" );
+		SmartBody::util::log( "  dur.... UNK\n" );
 	}
 	else	{
-		LOG( "  dur.... %.3f\n", dur );
+		SmartBody::util::log( "  dur.... %.3f\n", dur );
 	}
-//	LOG( "> " );
+//	SmartBody::util::log( "> " );
 	return( CMD_SUCCESS );
 }
 
@@ -1234,7 +1234,7 @@ int mcu_controller_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 			}
 			else
 			{
-				LOG("Use syntax: ctrl %s enable <true|false|status>, or ctrl %s enable ", ctrl_name, ctrl_name);
+				SmartBody::util::log("Use syntax: ctrl %s enable <true|false|status>, or ctrl %s enable ", ctrl_name, ctrl_name);
 				return CMD_FAILURE;
 			}
 		}
@@ -1262,7 +1262,7 @@ int mcu_controller_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 				if (checkStatus)
 				{
 					std::string passThroughStr = (controllerTree->controller(c)->isEnabled())? " true " : " false";							
-					LOG("[%s] %s = %s", character->getName().c_str(), controllerTree->controller(c)->getName().c_str(), passThroughStr.c_str());
+					SmartBody::util::log("[%s] %s = %s", character->getName().c_str(), controllerTree->controller(c)->getName().c_str(), passThroughStr.c_str());
 					numControllersAffected = numControllers;	// just so it won't generate error
 				}
 				else if (allControllers)
@@ -1325,12 +1325,12 @@ int mcu_controller_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 							return( CMD_SUCCESS );
 						}
 						else	{
-							LOG( "mcu_controller_func ERR: BVH recording requires 'time simfps|simdt' set\n" );
+							SmartBody::util::log( "mcu_controller_func ERR: BVH recording requires 'time simfps|simdt' set\n" );
 							return( CMD_FAILURE );
 						}
 					}
 					else	{
-						LOG( "mcu_controller_func ERR: BVH recording requires registered TimeRegulator\n" );
+						SmartBody::util::log( "mcu_controller_func ERR: BVH recording requires registered TimeRegulator\n" );
 						return( CMD_FAILURE );
 					}
 				}
@@ -1408,7 +1408,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		keyIndex = MeCtGaze::key_index( key_label );
 		if (keyIndex == -1)
 		{
-				LOG("%s is not a valid key.", key_label);
+				SmartBody::util::log("%s is not a valid key.", key_label);
 				return CMD_FAILURE;
 		}
 	}
@@ -1424,7 +1424,7 @@ int mcu_gaze_limit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 	}
 	else if (n == 1 || n == 0)
 	{
-		LOG("To set limits, use: gazelimit <lumbar|thorax|cervical|cranial|optical|back|chest|neck|head|eyes> pitchup pitchdown heading roll");
+		SmartBody::util::log("To set limits, use: gazelimit <lumbar|thorax|cervical|cranial|optical|back|chest|neck|head|eyes> pitchup pitchdown heading roll");
 		int start = 0; 
 		int finish = MeCtGaze::GAZE_KEY_EYES;
 		if (n == 1)
@@ -1433,10 +1433,10 @@ int mcu_gaze_limit_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		{
 			char* label = MeCtGaze::key_label(x);
 			// show the limits for that particular key
-			LOG("%s Pitch up  : %f ", label, MeCtGaze::DEFAULT_LIMIT_PITCH_UP[x]);
-			LOG("%s Pitch down: %f", label, MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[x]);
-			LOG("%s Heading   : %f", label, MeCtGaze::DEFAULT_LIMIT_HEADING[x]);
-			LOG("%s Roll      : %f", label, MeCtGaze::DEFAULT_LIMIT_ROLL[x]);
+			SmartBody::util::log("%s Pitch up  : %f ", label, MeCtGaze::DEFAULT_LIMIT_PITCH_UP[x]);
+			SmartBody::util::log("%s Pitch down: %f", label, MeCtGaze::DEFAULT_LIMIT_PITCH_DOWN[x]);
+			SmartBody::util::log("%s Heading   : %f", label, MeCtGaze::DEFAULT_LIMIT_HEADING[x]);
+			SmartBody::util::log("%s Roll      : %f", label, MeCtGaze::DEFAULT_LIMIT_ROLL[x]);
 		}
 	}
 	return( CMD_SUCCESS );
@@ -1545,14 +1545,14 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 				size_t first = sArgs.find_first_of( "\"" );
 				if ( first == string::npos )
 				{
-					LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
+					SmartBody::util::log( "Error parsing PlaySound message ''", sArgs.c_str() );
 					return CMD_FAILURE;
 				}
 
 				size_t second = sArgs.find_first_of( "\"", first + 1 );
 				if ( second == string::npos )
 				{
-					LOG( "Error parsing PlaySound message ''", sArgs.c_str() );
+					SmartBody::util::log( "Error parsing PlaySound message ''", sArgs.c_str() );
 					return CMD_FAILURE;
 				}
 
@@ -1611,13 +1611,13 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
         if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
         {
 #if !defined(__FLASHPLAYER__)
-		LOG("Play AudioFile = %s", soundFile.c_str() );
+		SmartBody::util::log("Play AudioFile = %s", soundFile.c_str() );
 		
         AUDIO_Play( soundFile.c_str() );			
 #else
 		std::string souldFileBase = boost::filesystem::basename(soundFile);
 		std::string soundFileBaseMP3 = souldFileBase + ".mp3";
-		LOG("Sound file name: %s", soundFileBaseMP3.c_str());
+		SmartBody::util::log("Sound file name: %s", soundFileBaseMP3.c_str());
 			inline_as3(
 				"import flash.media.Sound;\n\
 				 import flash.net.URLRequest;\n\
@@ -1671,14 +1671,14 @@ int mcu_stop_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
             size_t first = sArgs.find_first_of( "\"" );
             if ( first == string::npos )
             {
-                LOG( "Error parsing StopSound message ''", sArgs.c_str() );
+                SmartBody::util::log( "Error parsing StopSound message ''", sArgs.c_str() );
                 return CMD_FAILURE;
             }
 
             size_t second = sArgs.find_first_of( "\"", first + 1 );
             if ( second == string::npos )
             {
-                LOG( "Error parsing StopSound message ''", sArgs.c_str() );
+                SmartBody::util::log( "Error parsing StopSound message ''", sArgs.c_str() );
                 return CMD_FAILURE;
             }
 
@@ -1889,7 +1889,7 @@ int mcu_vrPerception_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 	//only considering kinect or gavam or both
 	if (_stricmp(command, "kinect") == 0 || _stricmp(command, "gavam") == 0)
 	{
-		LOG("coordinates received");
+		SmartBody::util::log("coordinates received");
 		//if the message contains kinect data
 		if (_stricmp(command, "kinect") == 0)
 		{
@@ -1943,7 +1943,7 @@ int mcu_vrPerception_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 				float quatZ = sin_z_2*cos_y_2*cos_x_2 - cos_z_2*sin_y_2*sin_x_2;
 
 				// Log the Gavam data
-				LOG("Gavam Coordinates - %f %f %f %f %f %f", pos[0], pos[1], pos[2], rot[0], rot[1], rot[2]);
+				SmartBody::util::log("Gavam Coordinates - %f %f %f %f %f %f", pos[0], pos[1], pos[2], rot[0], rot[1], rot[2]);
 				char *messg = new char[1024];
 				#ifdef WIN32
 				sprintf_s(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
@@ -1951,7 +1951,7 @@ int mcu_vrPerception_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 				snprintf(messg, 1024, "receiver skeleton brad generic rotation skullbase %f %f %f %f", quatW, quatX, quatY, quatZ);
 				#endif
 				//log message before sending it
-				//LOG(messg);
+				//SmartBody::util::log(messg);
 				//sending temp mesg just to make sure it works 
 				//SmartBody::SBScene::getScene()->getVHMsgManager()->send("test", messg);
 				//send the receiver message to orient the skullbase of brad as per the user's head orientation as detected by Gavam
@@ -1988,14 +1988,14 @@ int mcu_vrPerception_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 			bool ok = nvbg->execute(character->getName(), "", "", pml);
 			if (!ok)
 			{
-				LOG("NVBG for perception did not handle message %s.", pml.c_str());
+				SmartBody::util::log("NVBG for perception did not handle message %s.", pml.c_str());
 			}
 		}			
 		return CMD_SUCCESS;	
 	}
 	else
 	{
-		LOG("mcu_vrPerception_func ERR: message not recognized!");
+		SmartBody::util::log("mcu_vrPerception_func ERR: message not recognized!");
 		return CMD_FAILURE;
 	}
 
@@ -2016,19 +2016,19 @@ int mcu_vrBCFeedback_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMg
 		SmartBody::Nvbg* nvbg = character->getNvbg();
 		if (!nvbg)
 		{
-			LOG("mcu_vrBCFeedback_func ERR: character %s doesn't has NVBG attached", cName.c_str());
+			SmartBody::util::log("mcu_vrBCFeedback_func ERR: character %s doesn't has NVBG attached", cName.c_str());
 			return CMD_FAILURE;
 		}
 		bool ok = nvbg->execute(cName, "", "", xml);
 		if (!ok)
 		{
-			LOG("NVBG for perception did not handle message %s.", xml.c_str());
+			SmartBody::util::log("NVBG for perception did not handle message %s.", xml.c_str());
 			return CMD_FAILURE;
 		}			
 	}
 	else
 	{
-		LOG("mcu_vrBCFeedback_func ERR: character %s not found.", cName.c_str());
+		SmartBody::util::log("mcu_vrBCFeedback_func ERR: character %s not found.", cName.c_str());
 		return CMD_FAILURE;
 	}
 	return CMD_SUCCESS;
@@ -2061,7 +2061,7 @@ int mcu_vrSpeech_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		bool ok = nvbg->executeSpeech(character->getName(), status, id, speaker);
 		if (!ok)
 		{
-			LOG("NVBG cannot handle vrSpeech message");
+			SmartBody::util::log("NVBG cannot handle vrSpeech message");
 		}
 	}			
 	return CMD_SUCCESS;
@@ -2087,7 +2087,7 @@ int mcu_sbmdebugger_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 
 	std::string returnType = args.read_token();
 	std::string code = args.read_token();
-	//LOG("mcu_sbmdebugger_func code: %s", code.c_str());
+	//SmartBody::util::log("mcu_sbmdebugger_func code: %s", code.c_str());
 	if (code.size() == 0)
 	{
 		std::stringstream strstr;
@@ -2267,7 +2267,7 @@ int mcu_syncpolicy_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 		}
 		else
 		{
-		LOG("Usage: syncpolicy <delay|nodelay>");
+		SmartBody::util::log("Usage: syncpolicy <delay|nodelay>");
 		return CMD_FAILURE;
 		}
  
@@ -2277,11 +2277,11 @@ int mcu_syncpolicy_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
 	{
 		if (SmartBody::SBScene::getScene()->getBoolAttribute("delaySpeechIfNeeded"))
 		{
-			LOG("Behavior policy is 'delay'. Behaviors will be offset to a future time to make sure that all behaviors are executed in full.");
+			SmartBody::util::log("Behavior policy is 'delay'. Behaviors will be offset to a future time to make sure that all behaviors are executed in full.");
 		}
 		else
 		{
-			LOG("Behavior policy is 'nodelay'. Behaviors that are calculated to start in the past will be partially executed.");
+			SmartBody::util::log("Behavior policy is 'nodelay'. Behaviors that are calculated to start in the past will be partially executed.");
 		}
 		return CMD_SUCCESS;
 	}
@@ -2310,7 +2310,7 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	if (strcmp(operation, "skeleton") == 0)	mode = 2;
 	if (mode == -1)
 	{
-		LOG("mcu_check_func ERR: Mode %s not FOUND!", operation);
+		SmartBody::util::log("mcu_check_func ERR: Mode %s not FOUND!", operation);
 		return CMD_FAILURE;
 	}
 
@@ -2318,7 +2318,7 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionName);
 	if (!motion)
 	{
-		LOG("mcu_check_func ERR: Motion %s NOT EXIST!", motionName);
+		SmartBody::util::log("mcu_check_func ERR: Motion %s NOT EXIST!", motionName);
 		return CMD_FAILURE;
 	}
 	if (character)
@@ -2331,16 +2331,16 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		if (mode == 1)
 		{
 			chanSize = mChanSize;
-			LOG("Channels in motion %s's channel matching %s's skeleton are preceeded with '+'", motionName, charName);
-			LOG("motion %s's Channel Info:", motionName);
+			SmartBody::util::log("Channels in motion %s's channel matching %s's skeleton are preceeded with '+'", motionName, charName);
+			SmartBody::util::log("motion %s's Channel Info:", motionName);
 		}
 		if (mode == 2)
 		{
 			chanSize = skelChanSize;
-			LOG("Channels in skeleton %s's channel matching motion %s's channel are preceeded with '+'", charName, motionName);
-			LOG("character %s's Channel Info:", charName);
+			SmartBody::util::log("Channels in skeleton %s's channel matching motion %s's channel are preceeded with '+'", charName, motionName);
+			SmartBody::util::log("character %s's Channel Info:", charName);
 		}
-		LOG("Channel Size: %d", chanSize);
+		SmartBody::util::log("Channel Size: %d", chanSize);
 		for (int i = 0; i < chanSize; i++)
 		{				
 			std::stringstream outputInfo;
@@ -2358,7 +2358,7 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 			if (!chan.joint)
 			{
-				LOG("  %d: (No mathing joint)", i);
+				SmartBody::util::log("  %d: (No mathing joint)", i);
 				continue;
 			}
 
@@ -2398,7 +2398,7 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			if (pos == -1)	
 				outputInfo << "  ";
 			outputInfo << i << ": " << jointName.c_str() << " (" << chanTypeString << ")";
-			LOG("%s", outputInfo.str().c_str());
+			SmartBody::util::log("%s", outputInfo.str().c_str());
 		}
 			
 		// check the non-zero channel
@@ -2445,11 +2445,11 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 					if (chanType == SkChannel::XPos || chanType == SkChannel::YPos || chanType == SkChannel::ZPos ||
 						chanType == SkChannel::XRot || chanType == SkChannel::YRot || chanType == SkChannel::ZRot || 
 						chanType == SkChannel::Twist)
-						LOG("Channel %s/%s has non-zero value: %f.", jointName.c_str(), channel.type_name(), frameData[curIndex]);
+						SmartBody::util::log("Channel %s/%s has non-zero value: %f.", jointName.c_str(), channel.type_name(), frameData[curIndex]);
 					else if (chanType == SkChannel::Swing)
-						LOG("Channel %s/%s has non-zero value: %f %f.", jointName.c_str(), channel.type_name(), frameData[curIndex], frameData[curIndex + 1]);
+						SmartBody::util::log("Channel %s/%s has non-zero value: %f %f.", jointName.c_str(), channel.type_name(), frameData[curIndex], frameData[curIndex + 1]);
 					else if (chanType == SkChannel::Quat)
-						LOG("Channel %s/%s has non-zero value: %f %f %f %f.", jointName.c_str(), channel.type_name(), frameData[curIndex], frameData[curIndex+ 1], frameData[curIndex + 2], frameData[curIndex + 3]);
+						SmartBody::util::log("Channel %s/%s has non-zero value: %f %f %f %f.", jointName.c_str(), channel.type_name(), frameData[curIndex], frameData[curIndex+ 1], frameData[curIndex + 2], frameData[curIndex + 3]);
 				}
 			}
 			motion->disconnect();
@@ -2458,7 +2458,7 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 		{
 			if (strcmp(frameNumString, "") != 0)
 			{
-				LOG("mcu_check_func ERR: Frame Number not Exist!");
+				SmartBody::util::log("mcu_check_func ERR: Frame Number not Exist!");
 				motion->disconnect();
 				return CMD_FAILURE;			
 			}
@@ -2466,7 +2466,7 @@ int mcu_check_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	}
 	else
 	{
-		LOG("mcu_check_func ERR: Character %s NOT EXIST!", charName);
+		SmartBody::util::log("mcu_check_func ERR: Character %s NOT EXIST!", charName);
 		return CMD_FAILURE;
 	}
 
@@ -2498,13 +2498,13 @@ int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	std::string command = args.read_token();
 	if (command == "help")
 	{
-		LOG("Use: steer <start|stop>");
-		LOG("     steer move <character> <mode> <x> <y> <z>");
+		SmartBody::util::log("Use: steer <start|stop>");
+		SmartBody::util::log("     steer move <character> <mode> <x> <y> <z>");
 		return CMD_SUCCESS;
 	}
 	else if (command == "unit")
 	{
-		LOG("Unit no longer supported. Use scene.setScale()");
+		SmartBody::util::log("Unit no longer supported. Use scene.setScale()");
 		return CMD_SUCCESS;
 	}
 	else if (command == "start")
@@ -2519,13 +2519,13 @@ int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	}
 	else if (command == "move")
 	{
-		//LOG("run steer move command");
+		//SmartBody::util::log("run steer move command");
 		std::string characterName = args.read_token();
 		std::string mode = args.read_token();
 		int num = args.calc_num_tokens();
 		if (num % 3 != 0)
 		{
-			LOG("Syntax: steer move <character> <mode> <x1> <y1> <z1> <x2> <y2> <z2> ...");
+			SmartBody::util::log("Syntax: steer move <character> <mode> <x1> <y1> <z1> <x2> <y2> <z2> ...");
 			return CMD_FAILURE;
 		}
 		if (SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
@@ -2561,7 +2561,7 @@ int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 							ppraiAgent->sendLocomotionEvent("interrupt");
 						}
 						ppraiAgent->goalList.clear();
-						//LOG("steer move : add agent goals. Num goal = %d",num);
+						//SmartBody::util::log("steer move : add agent goals. Num goal = %d",num);
 						for (int i = 0; i < num; i++)
 						{
 							float v = args.read_float();
@@ -2579,7 +2579,7 @@ int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 						}
 					}
 					else
-						LOG("steer move mode not recognized!");
+						SmartBody::util::log("steer move mode not recognized!");
 
 					std::vector<float>& trajList = character->trajectoryGoalList;
 					std::vector<SrVec> trajPtList;
@@ -2612,7 +2612,7 @@ int mcu_steer_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			}
 			else
 			{
-				LOG("No steering agent for character '%s'.", character->getName().c_str());
+				SmartBody::util::log("No steering agent for character '%s'.", character->getName().c_str());
 				return CMD_FAILURE;
 			}
 		}
@@ -2779,8 +2779,8 @@ int syncpoint_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 	if (motionStr == "")
 	{
-		LOG("Usage: syncpoint <motion>");
-		LOG("Usage: syncpoint <motion> <start> <ready> <strokestart> <stroke> <strokeend> <relax> <end>");
+		SmartBody::util::log("Usage: syncpoint <motion>");
+		SmartBody::util::log("Usage: syncpoint <motion> <start> <ready> <strokestart> <stroke> <strokeend> <relax> <end>");
 	}
 
 	SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motionStr);	
@@ -2797,12 +2797,12 @@ int syncpoint_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 			double strokeEnd = motion->time_stroke_end();
 			double relax = motion->time_relax();
 			double end = motion->time_stop();
-			LOG("%f %f %f %f %f %f %f", start, ready, strokeStart, stroke, strokeEnd, relax, end);
+			SmartBody::util::log("%f %f %f %f %f %f %f", start, ready, strokeStart, stroke, strokeEnd, relax, end);
 			return CMD_SUCCESS;
 		}
 		else if (num != 7)
 		{
-			LOG("Usage: syncpoint <motion> <start> <ready> <strokestart> <stroke> <strokeend> <relax> <end>");
+			SmartBody::util::log("Usage: syncpoint <motion> <start> <ready> <strokestart> <stroke> <strokeend> <relax> <end>");
 			return CMD_FAILURE;
 		}
 		else
@@ -2826,27 +2826,27 @@ int syncpoint_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 #ifdef USE_GOOGLE_PROFILER
 int startprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {	
-	LOG("Starting the CPU Profiler...");
+	SmartBody::util::log("Starting the CPU Profiler...");
 	ProfilerStart("/tmp/smartbodyprofile");
 	return CMD_SUCCESS;
 }
 
 int stopprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	LOG("Stopping the CPU Profiler...");
+	SmartBody::util::log("Stopping the CPU Profiler...");
 	ProfilerStop();
 	return CMD_SUCCESS;
 }
 int startheapprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	LOG("Starting the heap Profiler...");
+	SmartBody::util::log("Starting the heap Profiler...");
 	HeapProfilerStart("/tmp/smartbodyheapprofile");
 	return CMD_SUCCESS;
 }
 
 int stopheapprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	LOG("Stopping the heap Profiler...");
+	SmartBody::util::log("Stopping the heap Profiler...");
 	HeapProfilerStop();
 	HeapProfilerDump("/tmp/smartbodyheapprofile");
 	return CMD_SUCCESS;
@@ -2865,10 +2865,10 @@ int stopheapprofile_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 // currently position is for global and rotation is for local
 int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 {
-	//LOG("in data receiver function");
+	//SmartBody::util::log("in data receiver function");
 	std::string operation = args.read_token();
 	if (operation == "echo")
-		LOG("%s", args.read_remainder_raw());
+		SmartBody::util::log("%s", args.read_remainder_raw());
 	if (operation == "skeleton")
 	{		
 		std::string skelName = args.read_token();
@@ -3004,7 +3004,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 				int numRemainTokens = args.calc_num_tokens();
 				if (numRemainTokens < 25*4)
 				{
-					LOG("Kinect skeleton %s rotation data is not valid.", skelName.c_str());
+					SmartBody::util::log("Kinect skeleton %s rotation data is not valid.", skelName.c_str());
 					return CMD_FAILURE;
 				}
 				std::vector<SrQuat> quats;
@@ -3057,7 +3057,7 @@ int mcu_joint_datareceiver_func( srArgBuffer& args, SmartBody::SBCommandManager*
 				int numRemainTokens = args.calc_num_tokens();
 				if (numRemainTokens < 25*7)
 				{
-					LOG("Kinect skeleton %s rotation and position data is not valid.", skelName.c_str());
+					SmartBody::util::log("Kinect skeleton %s rotation and position data is not valid.", skelName.c_str());
 					return CMD_FAILURE;
 				}
 				std::vector<SrQuat> quats;
@@ -3092,14 +3092,14 @@ int mcu_character_breathing( const char* name, srArgBuffer& args, SmartBody::SBC
 	SmartBody::SBCharacter* char_p = SmartBody::SBScene::getScene()->getCharacter( name );
 	if( !char_p )	
 	{
-		LOG( "mcu_character_breathing ERR: Character '%s' NOT FOUND\n", name ); 
+		SmartBody::util::log( "mcu_character_breathing ERR: Character '%s' NOT FOUND\n", name ); 
 		return( CMD_FAILURE );
 	}
 
 	MeCtBreathing* breathing_p = char_p->breathing_p;
 	if (!breathing_p)
 	{
-		LOG("Character '%s' has no breathing controller.", name);
+		SmartBody::util::log("Character '%s' has no breathing controller.", name);
 		return CMD_FAILURE;
 	}
 
@@ -3118,7 +3118,7 @@ int mcu_character_breathing( const char* name, srArgBuffer& args, SmartBody::SBC
 		}
 		else
 		{
-			LOG("Usage: char %s breathing usechannels true|false", char_p->getName().c_str());
+			SmartBody::util::log("Usage: char %s breathing usechannels true|false", char_p->getName().c_str());
 			return CMD_FAILURE;
 		}
 		return CMD_SUCCESS;
@@ -3316,7 +3316,7 @@ int mcu_vrExpress_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 	if (!ok)
 	{
-		LOG("NVBG for character %s to %s did not handle message %s.", actor.c_str(), to.c_str(), messageId.c_str());
+		SmartBody::util::log("NVBG for character %s to %s did not handle message %s.", actor.c_str(), to.c_str(), messageId.c_str());
 	}
 	return CMD_SUCCESS;
 }
@@ -3365,7 +3365,7 @@ int mcu_vhmsg_connect_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdM
 	}
 	else
 	{
-		LOG("Could not connect to %s:%s", vhmsgServer.c_str(), vhmsgPort.c_str());
+		SmartBody::util::log("Could not connect to %s:%s", vhmsgServer.c_str(), vhmsgPort.c_str());
 		vhmsgManager->setEnable(false);
 		return CMD_FAILURE;
 	}
@@ -3379,23 +3379,23 @@ int mcu_vhmsg_disconnect_func( srArgBuffer& args, SmartBody::SBCommandManager* c
 	
 	if (!vhmsgManager->isEnable())
 	{
-		LOG("VHMSG is not connected.");
+		SmartBody::util::log("VHMSG is not connected.");
 		return CMD_FAILURE;
 	}
 	int ret = vhmsg::ttu_close();
 	if (ret == vhmsg::TTU_ERROR)
 	{
-		LOG("Problem disconnecting VHMSG.");
+		SmartBody::util::log("Problem disconnecting VHMSG.");
 		return CMD_FAILURE;
 	}
 	else
 	{
 		vhmsgManager->setEnable(false);
-		LOG("VHMSG has been disconnected.");
+		SmartBody::util::log("VHMSG has been disconnected.");
 		return CMD_SUCCESS;
 	}
 #else
-	LOG("VHMSG is disabled.");
+	SmartBody::util::log("VHMSG is disabled.");
 	return CMD_FAILURE;
 #endif
 	
@@ -3413,10 +3413,10 @@ void mcu_vhmsg_callback( const char *op, const char *args, void * user_data )
 
 	switch(SmartBody::SBScene::getScene()->getCommandManager()->execute( op, (char *)args ) ) {
         case CMD_NOT_FOUND:
-            LOG("SmartBody error: command NOT FOUND: '%s' + '%s'", op, args );
+            SmartBody::util::log("SmartBody error: command NOT FOUND: '%s' + '%s'", op, args );
             break;
         case CMD_FAILURE:
-            LOG("SmartBody error: command FAILED: '%s' + '%s'", op, args );
+            SmartBody::util::log("SmartBody error: command FAILED: '%s' + '%s'", op, args );
             break;
     }
 }
@@ -3441,11 +3441,11 @@ int vhmsglog_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	{
 		if (vhmsgManager->isEnableLogging())
 		{
-			LOG("VHMSG logging is on");
+			SmartBody::util::log("VHMSG logging is on");
 		}
 		else
 		{
-			LOG("VHMSG logging is off");
+			SmartBody::util::log("VHMSG logging is off");
 		}
 		return CMD_SUCCESS;
 	}
@@ -3455,13 +3455,13 @@ int vhmsglog_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	{
 		if (vhmsgManager->isEnableLogging())
 		{
-			LOG("VHMSG logging is already on");
+			SmartBody::util::log("VHMSG logging is already on");
 			return CMD_SUCCESS;
 		}
 		else
 		{
 			vhmsgManager->setEnableLogging(true);
-			LOG("VHMSG logging is now on");
+			SmartBody::util::log("VHMSG logging is now on");
 			return CMD_SUCCESS;
 		}
 	}
@@ -3469,19 +3469,19 @@ int vhmsglog_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	{
 		if (!vhmsgManager->isEnableLogging())
 		{
-			LOG("VHMSG logging is already off");
+			SmartBody::util::log("VHMSG logging is already off");
 			return CMD_SUCCESS;
 		}
 		else
 		{
 			vhmsgManager->setEnableLogging(false);
-			LOG("VHMSG logging is now off");
+			SmartBody::util::log("VHMSG logging is now off");
 			return CMD_SUCCESS;
 		}
 	}
 	else
 	{
-		LOG("Usage: vhmsglog <on|off>");
+		SmartBody::util::log("Usage: vhmsglog <on|off>");
 		return CMD_FAILURE;
 	}
 
@@ -3496,7 +3496,7 @@ int mcu_echo_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr  )
 	if (pos != std::string::npos)
 		boost::replace_all(echoStr, "$time", timeStr.str());
 	
-    LOG("%s ", echoStr.c_str() );
+    SmartBody::util::log("%s ", echoStr.c_str() );
 	return( CMD_SUCCESS );
 }
 
@@ -3526,7 +3526,7 @@ int sb_main_func( srArgBuffer & args, SmartBody::SBCommandManager* cmdMgr )
    }
    else
    {
-	     LOG( "Python error: command FAILED: '%s %s'> ", token, args_raw );
+	     SmartBody::util::log( "Python error: command FAILED: '%s %s'> ", token, args_raw );
 		 return  CMD_FAILURE;
    }
 
@@ -3551,10 +3551,10 @@ int sbm_main_func( srArgBuffer & args, SmartBody::SBCommandManager* cmdMgr )
    switch( result )
    {
       case CMD_NOT_FOUND:
-         LOG( "SmartBody error: command NOT FOUND: '%s %s'> ", token, args_raw );
+         SmartBody::util::log( "SmartBody error: command NOT FOUND: '%s %s'> ", token, args_raw );
          break;
       case CMD_FAILURE:
-         LOG( "SmartBody error: command FAILED: '%s %s'> ", token, args_raw );
+         SmartBody::util::log( "SmartBody error: command FAILED: '%s %s'> ", token, args_raw );
          break;
       case CMD_SUCCESS:
          break;
@@ -3582,7 +3582,7 @@ int mcu_triggerevent_func(srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr
 	SmartBody::SBEvent* e = eventManager->createEvent(eventName, eventParameters);
 	eventManager->handleEvent(e);
 
-	LOG("TRIGGERING EVENT %s %s AT TIME %f", eventName, eventParameters, scene->getSimulationManager()->getTime());
+	SmartBody::util::log("TRIGGERING EVENT %s %s AT TIME %f", eventName, eventParameters, scene->getSimulationManager()->getTime());
 	return CMD_SUCCESS;
 }
 

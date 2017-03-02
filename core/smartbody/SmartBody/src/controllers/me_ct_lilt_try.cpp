@@ -132,8 +132,8 @@ const std::string& MeCtAnkleLilt::controller_type() const {
 }
 
 void MeCtAnkleLilt::print_state( int tabs ){
-	LOG("MeCtAnkleLilt\n" );
-	LOG("currentAngle :", _currentAngle);
-	LOG("duration :",_duration); 
+	SmartBody::util::log("MeCtAnkleLilt\n" );
+	SmartBody::util::log("currentAngle :", _currentAngle);
+	SmartBody::util::log("duration :",_duration); 
 
 }

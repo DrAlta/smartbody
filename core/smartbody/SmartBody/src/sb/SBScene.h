@@ -25,6 +25,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBTypes.h>
 #include <sb/SBObject.h>
 #include <sb/SBScript.h>
+#include <sb/SBUtilities.h>
 #include <map>
 #include <sstream>
 #include <sr/sr_viewer.h>
@@ -404,7 +405,7 @@ class SBScene : public SBObject
 		SrViewerFactory* _viewerFactory;
 		SrViewerFactory* _ogreViewerFactory;
 
-		vhcl::Log::Listener* _logListener;
+		SmartBody::util::Listener* _logListener;
 
 		KinectProcessor* _kinectProcessor;
 		Heightfield* _heightField;

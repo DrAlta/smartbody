@@ -19,7 +19,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "SBAssetHandlerCOLLADA.h"
-#include <vhcl.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -28,6 +27,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 #include "sbm/ParserCOLLADAFast.h"
 #include "sbm/ParserOpenCOLLADA.h"
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
@@ -66,13 +66,13 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 		rapidxml::file<char>* rapidFile = ParserCOLLADAFast::getParserDocumentFile(convertedPath, &doc);
 		if (!rapidFile)
 		{
-			LOG("Problem parsing file '%s'", convertedPath.c_str());
+			SmartBody::util::log("Problem parsing file '%s'", convertedPath.c_str());
 			return assets;
 		}
 		rapidxml::xml_node<>* colladaNode = doc.first_node("COLLADA");
 		if (!colladaNode)
 		{
-			LOG("Problem parsing file '%s': not a COLLADA file.", convertedPath.c_str());
+			SmartBody::util::log("Problem parsing file '%s': not a COLLADA file.", convertedPath.c_str());
 			delete rapidFile;
 			return assets;
 		}
@@ -101,7 +101,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			std::map<std::string, std::string> materialId2Name;
 			rapidxml::xml_node<>* visualSceneNode = ParserCOLLADAFast::getNode("library_visual_scenes", colladaNode, 0, 1);
 			if (!visualSceneNode)
-				LOG(" .dae file %s doesn't contain visual scene information.", convertedPath.c_str());
+				SmartBody::util::log(" .dae file %s doesn't contain visual scene information.", convertedPath.c_str());
 			SBSkeleton* skeleton = new SBSkeleton();
 			skeleton->setName(basename + extension);
 			SBMotion* motion = new SBMotion();
@@ -125,8 +125,8 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 							SrQuat adjustY(SrVec(0,1,0), 3.14159f );
 							//SrQuat final = adjustY * adjust * prerot; 
 							SrQuat final = adjust * prerot;
-							//LOG("before = %f %f %f %f", prerot.w, prerot.x, prerot.y, prerot.z);
-							//LOG("after = %f %f %f %f", final.w, final.x, final.y, final.z);
+							//SmartBody::util::log("before = %f %f %f %f", prerot.w, prerot.x, prerot.y, prerot.z);
+							//SmartBody::util::log("after = %f %f %f %f", final.w, final.x, final.y, final.z);
 							root->quat()->prerot(final);
 							root->offset(root->offset()*adjust);
 						}
@@ -205,7 +205,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 			rapidxml::xml_node<>* controllerNode = ParserCOLLADAFast::getNode("library_controllers", colladaNode, 0, 2);		
 			if (!controllerNode)
 			{
-				LOG("mcu_character_load_skinweights ERR: no binding info contained");
+				SmartBody::util::log("mcu_character_load_skinweights ERR: no binding info contained");
 			}
 			else
 			{
@@ -273,7 +273,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 					if (strcmp(baseShape.c_str(), (const char*)meshModelVec[i]->name) == 0)
 					{
 						isBaseShape = true;
-						LOG("Processing morph controller %s with %d targets.", morphControllerName.c_str(), targets.size());
+						SmartBody::util::log("Processing morph controller %s with %d targets.", morphControllerName.c_str(), targets.size());
 						break;
 					}
 					else
@@ -283,7 +283,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 							if (strcmp(targets[c].c_str(), (const char*)meshModelVec[i]->name) == 0)
 							{
 									isBlendShape = true;
-									LOG("Found morph target %s for controller %s.", (const char*)meshModelVec[i]->name, morphControllerName.c_str());
+									SmartBody::util::log("Found morph target %s for controller %s.", (const char*)meshModelVec[i]->name, morphControllerName.c_str());
 									break;
 							}
 						}
@@ -298,19 +298,19 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 					if (iter == mesh->blendShapeMap.end())
 					{
 						mesh->blendShapeMap.insert(std::make_pair(baseShape, std::vector<SrSnModel*>()));
-						//LOG("ADDED BLENDSHAPE FROM BASE %s", baseShape.c_str());
+						//SmartBody::util::log("ADDED BLENDSHAPE FROM BASE %s", baseShape.c_str());
 						iter = mesh->blendShapeMap.find(baseShape);
 					}
 					else
 					{
-						//LOG("RETRIEVED BASE %s", baseShape.c_str());
+						//SmartBody::util::log("RETRIEVED BASE %s", baseShape.c_str());
 					}
 					std::vector<SrSnModel*>& models = (*iter).second;
 					models.push_back(srSnModelStatic);
-					//LOG("INSERTED BLENDSHAPE %s INTO BASE %s", (const char*) srSnModelStatic->shape().name, baseShape.c_str());
+					//SmartBody::util::log("INSERTED BLENDSHAPE %s INTO BASE %s", (const char*) srSnModelStatic->shape().name, baseShape.c_str());
 					srSnModelStatic->ref();
 					delete srSnModelDynamic;
-					//LOG("Insert blend shape %s with base shape %s", (const char*)meshModelVec[i]->name, baseShape.c_str());
+					//SmartBody::util::log("Insert blend shape %s with base shape %s", (const char*)meshModelVec[i]->name, baseShape.c_str());
 				}
 
 				if (isBaseShape)
@@ -329,7 +329,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 					srSnModelStaticBase->ref();
 					mesh->dMeshDynamic_p.push_back(srSnModelDynamicBase);
 					srSnModelDynamicBase->ref();
-					//LOG("Insert base mesh %s", (const char*)meshModelVec[i]->name);
+					//SmartBody::util::log("Insert base mesh %s", (const char*)meshModelVec[i]->name);
 				}
 
 				if (!isBlendShape && !isBaseShape)
@@ -338,7 +338,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 					srSnModelStatic->ref();
 					mesh->dMeshDynamic_p.push_back(srSnModelDynamic);
 					srSnModelDynamic->ref();
-					//LOG("Insert mesh %s", (const char*)meshModelVec[i]->name);
+					//SmartBody::util::log("Insert mesh %s", (const char*)meshModelVec[i]->name);
 				}
 			
 				/* perform this when the character wants to attach to the mesh
@@ -362,13 +362,13 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 				 iter != mesh->blendShapeMap.end(); 
 				 iter++)
 			{
-				//LOG("BLENDSHAPE: %s", iter->first.c_str());
+				//SmartBody::util::log("BLENDSHAPE: %s", iter->first.c_str());
 				std::vector<SrSnModel*>& modelList = (*iter).second;
 				for (std::vector<SrSnModel*>::iterator iter2 = modelList.begin();
 					iter2 != modelList.end();
 					iter2++)
 				{
-					LOG("\t %s", (const char*) (*iter2)->shape().name);
+					SmartBody::util::log("\t %s", (const char*) (*iter2)->shape().name);
 				}
 			}
 
@@ -380,7 +380,7 @@ std::vector<SBAsset*> SBAssetHandlerCOLLADA::getAssets(const std::string& path)
 		}
 		else
 		{
-			LOG( "Could not load mesh from file '%s'", convertedPath.c_str());
+			SmartBody::util::log( "Could not load mesh from file '%s'", convertedPath.c_str());
 			if (rapidFile)
 				delete rapidFile;
 			return assets;

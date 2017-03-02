@@ -26,7 +26,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBJoint.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBAttribute.h>
-#include <vhcl.h>
+#include <sb/SBUtilities.h>
+
 #include <iostream>
 #include <sstream>
 
@@ -137,7 +138,7 @@ void SBFaceShiftManager::update( double time )
 					{
 						if (this->getBoolAttribute("debug"))
 						{
-							LOG("Shape names (%d) cannot handle data for shape %d", shapeNames.size(), i);
+							SmartBody::util::log("Shape names (%d) cannot handle data for shape %d", shapeNames.size(), i);
 						}
 					}
 						
@@ -145,8 +146,8 @@ void SBFaceShiftManager::update( double time )
 				headRotation = SrQuat(data.m_headRotation.w, data.m_headRotation.x, data.m_headRotation.y, data.m_headRotation.z);				
 				// Do something with the Tracking Data (change controllers in DAZ or record into the timeline, depending 
 				// on the state of the plugin
-				//LOG("head rotation = %f %f %f %f",data.m_headRotation.w, data.m_headRotation.x, data.m_headRotation.y, data.m_headRotation.z);
-				//LOG("head translation: %f %f %f",data.m_headTranslation.x,data.m_headTranslation.y,data.m_headTranslation.z);						
+				//SmartBody::util::log("head rotation = %f %f %f %f",data.m_headRotation.w, data.m_headRotation.x, data.m_headRotation.y, data.m_headRotation.z);
+				//SmartBody::util::log("head translation: %f %f %f",data.m_headTranslation.x,data.m_headTranslation.y,data.m_headTranslation.z);						
 			} 
 
 			if (dynamic_cast<fs::fsMsgBlendshapeNames*>(msg.get()))
@@ -155,12 +156,12 @@ void SBFaceShiftManager::update( double time )
 				
 				std::vector<std::string>& names = bsnames->blendshape_names();
 				shapeNames.clear();
-				LOG("Shapes sent from FaceShift:");
+				SmartBody::util::log("Shapes sent from FaceShift:");
 				for (std::vector<std::string>::iterator iter = names.begin();
 					 iter != names.end();
 					 iter++)
 				{
-					LOG("[%s]", (*iter).c_str());
+					SmartBody::util::log("[%s]", (*iter).c_str());
 					
 					shapeNames.push_back(*iter);
 				}
@@ -236,7 +237,7 @@ double SBFaceShiftManager::getCoeffValue( const std::string& blendName )
 	else
 	{
 		if (this->getBoolAttribute("debug"))
-			LOG("Cannot find shape named: %s", blendName.c_str());
+			SmartBody::util::log("Cannot find shape named: %s", blendName.c_str());
 	}
 	if (coeff < 0.0) coeff = 0.0;
 	return coeff;
@@ -265,7 +266,7 @@ void SBFaceShiftManager::notify(SBSubject* subject)
 				 iter != coeffTable.end();
 				 iter++)
 			{
-				LOG("[%s] = %f", (*iter).first.c_str(), (*iter).second);
+				SmartBody::util::log("[%s] = %f", (*iter).first.c_str(), (*iter).second);
 			}
 		}
 	}

@@ -22,7 +22,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef ME_CT_SIMPLE_GAZE_H
 #define ME_CT_SIMPLE_GAZE_H
 
-#include <vhcl.h>
 #include <sk/sk_skeleton.h>
 #include <sb/SBController.h>
 

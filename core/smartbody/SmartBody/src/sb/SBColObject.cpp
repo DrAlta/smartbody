@@ -362,12 +362,12 @@ SrBox SBGeomBox::getBoundingBox()
 
 	SrVec finalMin = globalTransform.localToGlobal(min);
 	SrVec finalMax = globalTransform.localToGlobal(max);
-	//LOG("finalMin = %.3f %.3f %.3f, finalMax = %.3f %.3f %.3f", finalMin[0],finalMin[1],finalMin[2], finalMax[0],finalMax[1],finalMax[2]);
+	//SmartBody::util::log("finalMin = %.3f %.3f %.3f, finalMax = %.3f %.3f %.3f", finalMin[0],finalMin[1],finalMin[2], finalMax[0],finalMax[1],finalMax[2]);
 	if (this->attachedObj)
 	{
 		SrVec min = this->attachedObj->getGlobalTransform().localToGlobal(finalMin);
 		SrVec max = this->attachedObj->getGlobalTransform().localToGlobal(finalMax);
-		//LOG("min = %.3f %.3f %.3f, max = %.3f %.3f %.3f", min[0],min[1],min[2], max[0],max[1],max[2]);
+		//SmartBody::util::log("min = %.3f %.3f %.3f, max = %.3f %.3f %.3f", min[0],min[1],min[2], max[0],max[1],max[2]);
 
 		box.set(min, max);
 	}

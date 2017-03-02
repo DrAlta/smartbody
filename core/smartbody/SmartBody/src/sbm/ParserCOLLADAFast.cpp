@@ -169,7 +169,7 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		rapidxml::xml_node<>* skNode = getNode("library_visual_scenes", node, depth, 2);
 		if (!skNode)
 		{
-			LOG("ParserCOLLADAFast::parse ERR: no skeleton info contained in this file");
+			SmartBody::util::log("ParserCOLLADAFast::parse ERR: no skeleton info contained in this file");
 			if (rapidFile)
 				delete rapidFile;
 			return false;
@@ -180,7 +180,7 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 
 		if (zaxis)
 		{
-			LOG("Prerot z-axis");
+			SmartBody::util::log("Prerot z-axis");
 			// get the root node
 			SkJoint* root = skeleton.root();
 			if (root)
@@ -192,8 +192,8 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 					SrQuat adjust(xaxis, 3.14159f / -2.0f);
 					SrQuat adjustY(SrVec(0,1,0), 3.14159f );
 					SrQuat final = adjust * adjustY * prerot; 
-					LOG("before = %f %f %f %f", prerot.w, prerot.x, prerot.y, prerot.z);
-					LOG("after = %f %f %f %f", final.w, final.x, final.y, final.z);
+					SmartBody::util::log("before = %f %f %f %f", prerot.w, prerot.x, prerot.y, prerot.z);
+					SmartBody::util::log("after = %f %f %f %f", final.w, final.x, final.y, final.z);
 					root->quat()->prerot(final);
 					root->offset(root->offset()*adjust);
 				}
@@ -204,7 +204,7 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		rapidxml::xml_node<>* skmNode = getNode("library_animations", node, depth, 2);
 		if (!skmNode)
 		{
-		//	LOG("ParserCOLLADAFast::parse WARNING: no motion info contained in this file");
+		//	SmartBody::util::log("ParserCOLLADAFast::parse WARNING: no motion info contained in this file");
 			if (rapidFile)
 				delete rapidFile;
 			return true;
@@ -232,7 +232,7 @@ bool ParserCOLLADAFast::parse(SkSkeleton& skeleton, SkMotion& motion, std::strin
 		return false;
 	}
 	catch (...) {
-		LOG("Unexpected Exception in ParseOpenCollada::parse()");
+		SmartBody::util::log("Unexpected Exception in ParseOpenCollada::parse()");
 		if (rapidFile)
 			delete rapidFile;
 		return false;
@@ -322,7 +322,7 @@ rapidxml::file<char>* ParserCOLLADAFast::getParserDocumentFile(std::string fileN
 		doc->parse< rapidxml::parse_declaration_node>(rapidFile->data());
 		return rapidFile;
 	} catch (std::exception &e) {
-		LOG(e.what());
+		SmartBody::util::log(e.what());
 	}
 	return NULL;
 }
@@ -687,7 +687,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 				joint->quat()->activate();
 				if (skeleton.search_joint(nameAttr.c_str()) != NULL)
 				{
-					LOG("Joint name %s already exists, using unique joint id %s instead.", nameAttr.c_str(), idAttr.c_str());
+					SmartBody::util::log("Joint name %s already exists, using unique joint id %s instead.", nameAttr.c_str(), idAttr.c_str());
 					joint->name(idAttr);
 					joint->extName(idAttr);
 				}
@@ -829,7 +829,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 					}
 					else
 					{
-						LOG("COLLADA Parser: skeleton joint has invalid rotations.");
+						SmartBody::util::log("COLLADA Parser: skeleton joint has invalid rotations.");
 					}
 				}
 
@@ -862,15 +862,15 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 					rapidxml::xml_attribute<>* geometryNodeAt= geometryNode->first_attribute("url");
 					std::string sidAttr = geometryNodeAt->value();
 					sidAttr = sidAttr.substr(1);
-					//LOG("translate: %f, %f, %f", offset.x, offset.y, offset.z);
-					//LOG("instance_geometry: %s", sidAttr.c_str());
+					//SmartBody::util::log("translate: %f, %f, %f", offset.x, offset.y, offset.z);
+					//SmartBody::util::log("instance_geometry: %s", sidAttr.c_str());
 					SrModel* newModel = new SrModel();
 					newModel->name = SrString(sidAttr.c_str());
 					newModel->translate(offset);
 					//newModel->translate(offset);
 					if (!parent)
 					{
-						LOG("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
+						SmartBody::util::log("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
 						delete newModel;
 					}
 					else
@@ -936,15 +936,15 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 					rapidxml::xml_attribute<>* geometryNodeAt= geometryNode->first_attribute("url");
 					std::string sidAttr = geometryNodeAt->value();
 					sidAttr = sidAttr.substr(1);
-					//LOG("translate: %f, %f, %f", offset.x, offset.y, offset.z);
-					//LOG("instance_geometry: %s", sidAttr.c_str());
+					//SmartBody::util::log("translate: %f, %f, %f", offset.x, offset.y, offset.z);
+					//SmartBody::util::log("instance_geometry: %s", sidAttr.c_str());
 					SrModel* newModel = new SrModel();
 					newModel->name = SrString(sidAttr.c_str());
 					newModel->translate(offset);
 					//newModel->translate(offset);
 					if (!parent)
 					{
-						LOG("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
+						SmartBody::util::log("No parent for geometry '%s', geometry will be ignored...", (const char*) newModel->name);
 						delete newModel;
 					}
 					else
@@ -1187,7 +1187,7 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 		vi++)
 	{
 		std::string jointName = (*vi).first;
-		//LOG("joint name = %s",jointName.c_str());
+		//SmartBody::util::log("joint name = %s",jointName.c_str());
 		int channelID = motionChannels.search(jointName,SkChannel::Quat);
 		if (channelID != -1)
 		{
@@ -1206,7 +1206,7 @@ void ParserCOLLADAFast::parseLibraryAnimations( rapidxml::xml_node<>* node, SkSk
 			float rotx = motion.posture(frameCt)[quatId + 0] / scale;
 			float roty = motion.posture(frameCt)[quatId + 1] / scale;
 			float rotz = motion.posture(frameCt)[quatId + 2] / scale;
-			//LOG("rotx = %f, roty = %f, rotz = %f",rotx,roty,rotz);
+			//SmartBody::util::log("rotx = %f, roty = %f, rotz = %f",rotx,roty,rotz);
 			rotx *= float(M_PI) / 180.0f;
 			roty *= float(M_PI) / 180.0f;
 			rotz *= float(M_PI) / 180.0f;
@@ -1295,7 +1295,7 @@ void ParserCOLLADAFast::parseLibraryAnimations2(rapidxml::xml_node<>* node, SkSk
 				idAttr = idNode->value();
 			std::string jointName = tokenize(idAttr, ".-");	
 			std::string channelType = tokenize(idAttr, "_");
-			//LOG("joint name = %s, channel type = %s",jointName.c_str(),channelType.c_str());
+			//SmartBody::util::log("joint name = %s, channel type = %s",jointName.c_str(),channelType.c_str());
 			int numTimeInput = -1;
 			if (channelType == "rotateX" || channelType == "rotateY" || channelType == "rotateZ")
 			{
@@ -1529,7 +1529,7 @@ void ParserCOLLADAFast::parseLibraryAnimations2(rapidxml::xml_node<>* node, SkSk
 		 vi++)
 	{
 		std::string jointName = (*vi).first;
-		//LOG("joint name = %s",jointName.c_str());
+		//SmartBody::util::log("joint name = %s",jointName.c_str());
 		int channelID = motionChannels.search(jointName,SkChannel::Quat);
 		if (channelID != -1)
 		{
@@ -1546,7 +1546,7 @@ void ParserCOLLADAFast::parseLibraryAnimations2(rapidxml::xml_node<>* node, SkSk
 			float rotx = motion.posture(frameCt)[quatId + 0] / scale;
 			float roty = motion.posture(frameCt)[quatId + 1] / scale;
 			float rotz = motion.posture(frameCt)[quatId + 2] / scale;
-			//LOG("rotx = %f, roty = %f, rotz = %f",rotx,roty,rotz);
+			//SmartBody::util::log("rotx = %f, roty = %f, rotz = %f",rotx,roty,rotz);
 			rotx *= float(M_PI) / 180.0f;
 			roty *= float(M_PI) / 180.0f;
 			rotz *= float(M_PI) / 180.0f;
@@ -1639,7 +1639,7 @@ void ParserCOLLADAFast::animationPostProcessByChannels(SkSkeleton& skeleton, SkM
 			{
 				SrQuat globalQuat = SrQuat(motion.posture(i)[dataId], motion.posture(i)[dataId + 1], motion.posture(i)[dataId + 2], motion.posture(i)[dataId + 3]);
 				SrQuat preQuat = joint->quat()->prerot();
-				//LOG("prerot = %f",preQuat.angle());
+				//SmartBody::util::log("prerot = %f",preQuat.angle());
 				SrQuat localQuat = preQuat.inverse() * globalQuat;
 				motion.posture(i)[dataId] = localQuat.w;
 				motion.posture(i)[dataId + 1] = localQuat.x;
@@ -1851,7 +1851,7 @@ std::string ParserCOLLADAFast::getGeometryType(std::string idString)
 	if (found != std::string::npos)
 		return "texcoords";
 
-//	LOG("ParserCOLLADAFast::getGeometryType WARNING: type %s not supported!", idString.c_str());	
+//	SmartBody::util::log("ParserCOLLADAFast::getGeometryType WARNING: type %s not supported!", idString.c_str());	
 	return "";
 }
 
@@ -1905,13 +1905,13 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 	while (curNode)
 	//for (unsigned int c = 0; c < list->getLength(); c++)
 	{
-		//LOG("parseLibraryGeometries, iter %d", c);
+		//SmartBody::util::log("parseLibraryGeometries, iter %d", c);
 		//rapidxml::xml_node<>* node = list->item(c);
 		rapidxml::xml_node<>* node = curNode;
 		std::string nodeName = node->name();	
 		if (nodeName == "geometry")
 		{
-			//LOG("nodeName = geometry");
+			//SmartBody::util::log("nodeName = geometry");
 			std::map<std::string, std::string> verticesArrayMap;
 			std::map<std::string, std::vector<SrVec> > floatArrayMap;	
 
@@ -1937,7 +1937,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 				
 				if (nodeName1 == "source")
 				{
-					//LOG("nodeName1 = source");
+					//SmartBody::util::log("nodeName1 = source");
 					rapidxml::xml_attribute<>* idNode = node1->first_attribute("id");
 					std::string idString = idNode->value();
 					std::string sourceID = idString;
@@ -2043,7 +2043,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 				}			
 				if (nodeName1 == "vertices")
 				{
-					//LOG("nodeName1 = vertices");
+					//SmartBody::util::log("nodeName1 = vertices");
 					vertexSemantics.clear();
 					rapidxml::xml_node<>* verticeCurNode = node1->first_node();
 					while (verticeCurNode)
@@ -2081,7 +2081,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 						materialID = materialId2Name[materialName];
 					curmtl = std::find(mnames.begin(),mnames.end(), materialID.c_str()) - mnames.begin();
 					//curmtl = mnames.lsearch(materialName.c_str());
-					//LOG("Material name is %s", materialName.c_str());
+					//SmartBody::util::log("Material name is %s", materialName.c_str());
 					std::map<int, std::string> inputMap;
 					int pStride = 0;
 					std::vector<int> vcountList;
@@ -2104,7 +2104,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 							if (inputMap.find(offset) != inputMap.end())	// same offset is wrong
 							{
 								if (inputSemantic == "VERTEX" || inputSemantic == "NORMAL" || inputSemantic == "TEXCOORD")
-									LOG("ParserCOLLADAFast::parseLibraryGeometries ERR: file not correct.");
+									SmartBody::util::log("ParserCOLLADAFast::parseLibraryGeometries ERR: file not correct.");
 							}
 							else
 							{
@@ -2241,7 +2241,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					}
 					/*
 					if (tokens.size() != index)
-						LOG("ParserCOLLADAFast::parseLibraryGeometries ERR: parsing <p> list uncorrectly (%s)!", nameAttr.c_str());
+						SmartBody::util::log("ParserCOLLADAFast::parseLibraryGeometries ERR: parsing <p> list uncorrectly (%s)!", nameAttr.c_str());
 						*/
 				}
 				meshCurNode = meshCurNode->next_sibling();
@@ -2264,7 +2264,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 			newModel->compress();
 			
 			meshModelVec.push_back(newModel);
-			//LOG("Added model %s", (const char*) newModel->name);			
+			//SmartBody::util::log("Added model %s", (const char*) newModel->name);			
 			for (size_t i = 0; i < newModel->M.size(); i++)
 			{
 			   std::string matName = newModel->mtlnames[i];
@@ -2304,7 +2304,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 				   strstr2 << strstr.str();
 				   strstr2 << newModel->mtlSpecularTexNameMap[matName];
 				   std::string prefixedName = strstr2.str();
-				   //LOG("Load specular map = %s",newModel->mtlSpecularTexNameMap[matName].c_str());
+				   //SmartBody::util::log("Load specular map = %s",newModel->mtlSpecularTexNameMap[matName].c_str());
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_SPECULARMAP, prefixedName.c_str(), newModel->mtlSpecularTexNameMap[matName].c_str(), paths);
 
 				   if (glossyTexMap.find(matName) != glossyTexMap.end())
@@ -2324,7 +2324,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 			   {
 				   strstr << newModel->mtlGlossyTexNameMap[matName];
 				   std::string prefixedName = strstr.str();
-				   LOG("Load glossy map = %s",newModel->mtlGlossyTexNameMap[matName].c_str());
+				   SmartBody::util::log("Load glossy map = %s",newModel->mtlGlossyTexNameMap[matName].c_str());
 				   ParserCOLLADAFast::load_texture(SbmTextureManager::TEXTURE_GLOSSYMAP, prefixedName.c_str(), newModel->mtlGlossyTexNameMap[matName].c_str(), paths);
 				   newModel->mtlGlossyTexNameMap[matName] = prefixedName;
 			   }
@@ -2352,7 +2352,7 @@ void ParserCOLLADAFast::setModelVertexSource( std::string& sourceName, std::stri
 		bool printOut = false;
 // 		if (sourceName.find("LEyeLashShape-positions") != std::string::npos || sourceName.find("REyelashShape-positions") != std::string::npos)
 // 		{
-// 			LOG("sourname = %s",sourceName.c_str());
+// 			SmartBody::util::log("sourname = %s",sourceName.c_str());
 // 			printOut = true;
 // 		}
 		for (unsigned int i=0;i<sourceArray->size();i++)
@@ -2360,7 +2360,7 @@ void ParserCOLLADAFast::setModelVertexSource( std::string& sourceName, std::stri
 // 			if (printOut)
 // 			{
 // 				SrVec pos = (*sourceArray)[i];
-// 				LOG("pos = %f %f %f",pos[0],pos[1],pos[2]);
+// 				SmartBody::util::log("pos = %f %f %f",pos[0],pos[1],pos[2]);
 // 			}
 			model->V.push_back((*sourceArray)[i]);										
 		}
@@ -2452,7 +2452,7 @@ std::string ParserCOLLADAFast::getFinalTextureFileName(std::string filename, con
 	
 	if (!foundFile)
 	{
-		LOG("Could not find texture in file %s", filename.c_str());
+		SmartBody::util::log("Could not find texture in file %s", filename.c_str());
 		return "";
 	}
 
@@ -2495,7 +2495,7 @@ void ParserCOLLADAFast::parseLibraryMaterials(rapidxml::xml_node<>* node, std::m
 				if (effectId2MaterialId.find(effectId) == effectId2MaterialId.end())
 					effectId2MaterialId.insert(std::make_pair(effectId, materialId));
 				else
-					LOG("ParserCOLLADAFast::parseLibraryMaterials ERR: two effects mapped to material %s", materialId.c_str());
+					SmartBody::util::log("ParserCOLLADAFast::parseLibraryMaterials ERR: two effects mapped to material %s", materialId.c_str());
 			}
 		}
 		curNode = curNode->next_sibling();
@@ -2529,7 +2529,7 @@ void ParserCOLLADAFast::parseLibraryImages(rapidxml::xml_node<>* node, std::map<
 				pictureId2Name.insert(std::make_pair(imageId, imageName));
 			}
 			else
-				LOG("ParserCOLLADAFast::parseLibraryImages ERR: two image files mapped to same image id %s", imageId.c_str());
+				SmartBody::util::log("ParserCOLLADAFast::parseLibraryImages ERR: two image files mapped to same image id %s", imageId.c_str());
 		}
 		curNode = curNode->next_sibling();
 	}
@@ -2619,7 +2619,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 			}
 			else if (displacementNode)
 			{
-				//LOG("Found displacement node");
+				//SmartBody::util::log("Found displacement node");
 				rapidxml::xml_node<>* texNode = ParserCOLLADAFast::getNode("texture", displacementNode);
 				if (texNode)
 				{
@@ -2794,7 +2794,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 					mtlTransparentMap[mtlName] = imageFile; // fileName + fileExt;
 				else if (glossyTexture.find(imageName) != std::string::npos)
 				{
-					LOG("Gloosy imageFile = %s", imageFile.c_str());
+					SmartBody::util::log("Gloosy imageFile = %s", imageFile.c_str());
 					mtlGlossyMap[mtlName] = imageFile; // fileName + fileExt;
 				}					
 			}
@@ -2904,12 +2904,12 @@ void ParserCOLLADAFast::parseNodeAnimation(rapidxml::xml_node<>* node1, std::map
 					if (attrSemantic == "INPUT")
 					{
 						sampler.inputName = getNodeAttributeString(node3, "source").substr(1);	
-						//LOG("sampelr input name = %s",sampler.inputName.c_str());
+						//SmartBody::util::log("sampelr input name = %s",sampler.inputName.c_str());
 					}
 					else if (attrSemantic == "OUTPUT")
 					{
 						sampler.outputName = getNodeAttributeString(node3, "source").substr(1);
-						//LOG("sampelr input name = %s",sampler.outputName.c_str());
+						//SmartBody::util::log("sampelr input name = %s",sampler.outputName.c_str());
 					}
 				}
 				curNode2 = curNode2->next_sibling();
@@ -2922,10 +2922,10 @@ void ParserCOLLADAFast::parseNodeAnimation(rapidxml::xml_node<>* node1, std::map
 			channelSamplerNameMap.push_back(ColladChannelFast());
 			ColladChannelFast& colChannel = channelSamplerNameMap.back();
 			colChannel.sourceName = source.substr(1);
-			//LOG("colChannel input name = %s",colChannel.sourceName.c_str());
+			//SmartBody::util::log("colChannel input name = %s",colChannel.sourceName.c_str());
 			std::vector<std::string> tokens;
 			SmartBody::util::tokenize(target, tokens, "/.");
-			//LOG("token1 = %s, token2 = %s",tokens[0].c_str(),tokens[1].c_str());
+			//SmartBody::util::log("token1 = %s, token2 = %s",tokens[0].c_str(),tokens[1].c_str());
 			std::string jname = tokens[0];
 			SkJoint* joint = skeleton.search_joint(jname.c_str());
 			if (joint) jname = joint->jointName();
@@ -2946,7 +2946,7 @@ bool ParserCOLLADAFast::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 	rapidxml::file<char>* rapidFile = ParserCOLLADAFast::getParserDocumentFile(fileName, &doc);
 	if (!rapidFile)
 	{
-		LOG("Problem parsing file '%s", fileName.c_str());
+		SmartBody::util::log("Problem parsing file '%s", fileName.c_str());
 		return false;
 	}
 	rapidxml::xml_node<>* node = doc.first_node("COLLADA");
@@ -2962,7 +2962,7 @@ bool ParserCOLLADAFast::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 		depth = 0;
 		rapidxml::xml_node<>* visualSceneNode = getNode("library_visual_scenes", node, depth, 2);	
 		if (!visualSceneNode)
-			LOG("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
+			SmartBody::util::log("mcu_character_load_mesh ERR: .dae file doesn't contain correct geometry information.");
 		SkSkeleton skeleton;
 		SkMotion motion;
 		int order;
@@ -3005,7 +3005,7 @@ bool ParserCOLLADAFast::parseStaticMesh( std::vector<SrModel*>& meshModelVecs, s
 	}
 	else
 	{
-		LOG( "Could not load mesh from file '%s'", fileName.c_str());
+		SmartBody::util::log( "Could not load mesh from file '%s'", fileName.c_str());
 		if (rapidFile)
 			delete rapidFile;
 		return false;

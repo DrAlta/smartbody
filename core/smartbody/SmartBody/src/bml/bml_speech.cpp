@@ -18,7 +18,7 @@
 
  */
 
-#include "vhcl.h"
+
 
 #include <iostream>
 #include <sstream>
@@ -80,10 +80,10 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	BML::BmlRequestPtr request,
 	SmartBody::SBScene* scene )
 {
-	//LOG("parse BML speech");
+	//SmartBody::util::log("parse BML speech");
 	if (!request->actor->face_ct)
 	{
-		LOG("Character %s does not have a face controller, so cannot create speech.", request->actor->getName().c_str());
+		SmartBody::util::log("Character %s does not have a face controller, so cannot create speech.", request->actor->getName().c_str());
 		return SpeechRequestPtr();
 	}
 
@@ -150,7 +150,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 #else
 							std::wstringstream wstrstr;
 							wstrstr << "ERROR: Invalid <tm> id=\"" << tmId << "\"";
-							LOG(convertWStringToString(wstrstr.str()).c_str());
+							SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 #endif
 							// TODO: remove mark from XML
 						}
@@ -179,7 +179,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 						} else {
 							std::wstringstream wstrstr;
 							wstrstr << "ERROR: Invalid <mark> name=\"" << tmId << "\"" << endl;
-							LOG(convertWStringToString(wstrstr.str()).c_str());
+							SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 							// TODO: remove <mark> from XML
 						}
 					}
@@ -189,10 +189,10 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 		} else {
 			std::wstringstream wstrstr;
 			wstrstr << "ERROR: SpeechRequest::SpeechRequest(..): Unrecognized speech behavior type=\"" << type << "\"";
-			LOG(convertWStringToString(wstrstr.str()).c_str());
+			SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 		}
 	} else {
-		LOG("ERROR: SpeechRequest::SpeechRequest(..): Speech behavior lacks type attribute");
+		SmartBody::util::log("ERROR: SpeechRequest::SpeechRequest(..): Speech behavior lacks type attribute");
 	}
 	// Successfully parsed!!
 
@@ -236,7 +236,7 @@ BML::SpeechRequestPtr BML::parse_bml_speech(
 	// Found speech implementation.  Making request.
 	RequestId speech_request_id;
 	try {
-		//LOG("cur_speech, requestSpeechAudio");
+		//SmartBody::util::log("cur_speech, requestSpeechAudio");
 		speech_request_id = cur_speech_impl->requestSpeechAudio( request->actorId.c_str(), request->actor->get_voice_code(), xml, "bp speech_ready " );
 	} catch (...) {
 		if (cur_speech_impl_backup) {
@@ -351,7 +351,7 @@ BML::SpeechRequest::SpeechRequest(
 		{
 			std::wstringstream wstrstr;
 			wstrstr << "ERROR: SpeechRequest(..): Failed to insert word break SyncPoint \""<<mark->id<<"\" into wbToSync map.";
-			LOG(convertWStringToString(wstrstr.str()).c_str());
+			SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 		}
 	}
 }
@@ -549,7 +549,7 @@ void BML::SpeechRequest::processVisemes(std::vector<VisemeData*>* result_visemes
 			std::vector<float> mergedCurve;
 			for (size_t i = 0; i < iter->second.size(); i++)
 			{
-				LOG("add curve for %s", iter->first.c_str());
+				SmartBody::util::log("add curve for %s", iter->first.c_str());
 				std::vector<float> tempCurve = addCurve(mergedCurve, iter->second[i]);
 				mergedCurve = tempCurve;
 			}
@@ -800,7 +800,7 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 		int shchIndex = -1;
 		for (size_t i = 0; i < visemeProcessedData.size(); i++)
 		{
-			//LOG("viseme name %s", visemeProcessedData[i]->id());
+			//SmartBody::util::log("viseme name %s", visemeProcessedData[i]->id());
 			if (strcmp(visemeProcessedData[i]->id(), "open") == 0)
 				openIndex = i;
 			if (strcmp(visemeProcessedData[i]->id(), "PBM") == 0)
@@ -917,7 +917,7 @@ std::map<std::string, std::vector<float> > BML::SpeechRequest::generateCurvesGiv
 		}
 		else
 		{
-			LOG("Cannot have two final curves that have same name!");
+			SmartBody::util::log("Cannot have two final curves that have same name!");
 		}
 	}
 
@@ -936,7 +936,7 @@ std::vector<float> BML::SpeechRequest::scaleCurve(std::vector<float>& c1, std::v
 	{
 		if (c1[i * 2] < c1[(i - 1) * 2])
 		{
-			LOG("scaleCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
+			SmartBody::util::log("scaleCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
 		}
 	}
 
@@ -1022,14 +1022,14 @@ std::vector<float> BML::SpeechRequest::addCurve(std::vector<float>& c1, std::vec
 	{
 		if (c1[i * 2] < c1[(i - 1) * 2])
 		{
-			//LOG("addCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
+			//SmartBody::util::log("addCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
 		}
 	}
 	for (size_t i = 1; i < c2.size() / 2; ++i)
 	{
 		if (c2[i * 2] < c2[(i - 1) * 2])
 		{
-			//LOG("addCurve: curve 2 is not in ascending order: %f %f", c2[(i - 1) * 2], c2[i * 2]);
+			//SmartBody::util::log("addCurve: curve 2 is not in ascending order: %f %f", c2[(i - 1) * 2], c2[i * 2]);
 		}
 	}
 
@@ -1072,7 +1072,7 @@ std::vector<float> BML::SpeechRequest::addCurve(std::vector<float>& c1, std::vec
 				}
 				else
 				{
-					LOG("addCurve Warning: should not be here, point1(%f, %f), point2(%f, %f), previous point2(%f, %f)", x1, y1, x2, y2, x2Prev, y2Prev);
+					SmartBody::util::log("addCurve Warning: should not be here, point1(%f, %f), point2(%f, %f), previous point2(%f, %f)", x1, y1, x2, y2, x2Prev, y2Prev);
 					ret.push_back(x1);
 					ret.push_back(y1);
 				}
@@ -1103,7 +1103,7 @@ std::vector<float> BML::SpeechRequest::addCurve(std::vector<float>& c1, std::vec
 				}
 				else
 				{
-					LOG("addCurve Warning: should not be here, point1(%f, %f), point2(%f, %f), previous point1(%f, %f)", x1, y1, x2, y2, x1Prev, y1Prev);
+					SmartBody::util::log("addCurve Warning: should not be here, point1(%f, %f), point2(%f, %f), previous point1(%f, %f)", x1, y1, x2, y2, x1Prev, y1Prev);
 					ret.push_back(x2);
 					ret.push_back(y2);
 				}
@@ -1278,14 +1278,14 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 	{
 		if (c1[i * 2] < c1[(i - 1) * 2])
 		{
-			//LOG("stitchCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
+			//SmartBody::util::log("stitchCurve: curve 1 is not in ascending order: %f %f", c1[(i - 1) * 2], c1[i * 2]);
 		}
 	}
 	for (int i = 1; i < size2 / 2; ++i)
 	{
 		if (c2[i * 2] < c2[(i - 1) * 2])
 		{
-			//LOG("stitchCurve: curve 2 is not in ascending order: %f %f", c2[(i - 1) * 2], c2[i * 2]);
+			//SmartBody::util::log("stitchCurve: curve 2 is not in ascending order: %f %f", c2[(i - 1) * 2], c2[i * 2]);
 		}
 	}
 
@@ -1337,7 +1337,7 @@ std::vector<float> BML::SpeechRequest::stitchCurve(std::vector<float>& c1, std::
 	}
 	if (leftX < 0 || rightX < 0)
 	{
-		LOG("BML::SpeechRequest::stitchCurve ERR: Did not find overlapping area.");
+		SmartBody::util::log("BML::SpeechRequest::stitchCurve ERR: Did not find overlapping area.");
 	}
 
 	int index1 = 0;
@@ -1457,7 +1457,7 @@ void BML::SpeechRequest::filterCurve(std::vector<float>&c, float speedLimit)
 		float speed = fabs(y[i] - y[i + 1]) / fabs(x[i] - x[i + 1]);
 		if (speed > speedLimit)
 		{
-			//LOG("[%d]: %f", i, speed);
+			//SmartBody::util::log("[%d]: %f", i, speed);
 			float sign = (y[i] <= y[i + 1]) ? 1.0f : -1.0f;
 
 			bool isZero = false;
@@ -1568,7 +1568,7 @@ void BML::SpeechRequest::smoothCurve(std::vector<float>& c, std::vector<float>& 
 		if (c.size() == x.size() * 2)
 			keepSmoothing = false;
 	}
-//	LOG("Number of smoothing iteration %d", numIter);
+//	SmartBody::util::log("Number of smoothing iteration %d", numIter);
 }
 
 void BML::SpeechRequest::constrainCurve(std::vector<float>& openCurve, std::vector<float>& otherCurve, float ratio)
@@ -1804,7 +1804,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		{
 			std::stringstream strstr;
 			strstr << "ERROR: BodyPlannerImpl::speechReply(): speech.getVisemes( " << speech_request_id << " ) is empty.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 
 		for( ; cur!=end; ++cur ) {
@@ -1832,7 +1832,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		{
 			std::stringstream strstr;
 			strstr << "WARNING: BodyPlannerImpl::speechReply(): speech.getVisemes( " << speech_request_id << " ) returned NULL.";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 	}
 
@@ -1892,7 +1892,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 			{
 				std::wstringstream wstrstr;
 				wstrstr << "ERROR: BodyPlannerImpl::speechReply(): Unhandled case of Wordbreak SyncPoint \"" << wb_id << "\" with scheduled parent SyncPoint.  Ignoring offset.";
-				LOG(convertWStringToString(wstrstr.str()).c_str());
+				SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 			}
 
 //			float audioTime = speech_impl->getMarkTime( speech_request_id, wb_id.c_str() );
@@ -1931,7 +1931,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 			} else {
 				std::wstringstream wstrstr;
 				wstrstr << "ERROR: BodyPlannerImpl::speechReply(): No audioTime for Wordbreak SyncPoint \"" << wb_id << "\"";
-				LOG(convertWStringToString(wstrstr.str()).c_str());
+				SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 			}
 		}
 	} else {
@@ -1942,7 +1942,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 
 void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* scene )
 {
-	//LOG("SpeechRequest, realize impl");
+	//SmartBody::util::log("SpeechRequest, realize impl");
 	// Get times from SyncPoints
 	time_sec startAt  = behav_syncs.sync_start()->time();
 	time_sec readyAt  = behav_syncs.sync_ready()->time();
@@ -2085,7 +2085,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 							{
 								if (!SmartBody::SBScene::getScene()->getCharacter(actor_id)->hasAttribute(std::string(v->id())))
 								{
-									LOG("Error! doesn't have attribute %s", v->id());
+									SmartBody::util::log("Error! doesn't have attribute %s", v->id());
 									continue;
 								}
 								double attr = SmartBody::SBScene::getScene()->getCharacter(actor_id)->getDoubleAttribute(std::string(v->id()));
@@ -2101,7 +2101,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 					}
 					else
 					{
-						LOG("Bad input data!");
+						SmartBody::util::log("Bad input data!");
 					}		
 				}
 				/*
@@ -2143,7 +2143,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 			}
 		}
 	} else {
-		LOG("WARNING: BodyPlannerImpl::realizeRequest(..): SpeechRequest has no visemes.");
+		SmartBody::util::log("WARNING: BodyPlannerImpl::realizeRequest(..): SpeechRequest has no visemes.");
 	}
 
 	// Schedule audio
@@ -2153,10 +2153,10 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 		// schedule for later		
 		sbm_commands.push_back( new SbmCommand( audioPlay, startAt + request->actor->get_viseme_sound_delay() ) );
 		//if( seq->insert( (float)(audioOffset<0? 0: audioOffset), audioPlay.c_str() ) != CMD_SUCCESS ) {
-		//	LOG( "ERROR: BodyPlannerImpl::realizeRequest: insert audio trigger into seq FAILED, msgId=%s\n", bpMsg.msgId ); 
+		//	SmartBody::util::log( "ERROR: BodyPlannerImpl::realizeRequest: insert audio trigger into seq FAILED, msgId=%s\n", bpMsg.msgId ); 
 		//}
 	} else {
-		LOG("WARNING: BodyPlannerImpl::realizeRequest(..): SpeechRequest has no audioPlay command.");
+		SmartBody::util::log("WARNING: BodyPlannerImpl::realizeRequest(..): SpeechRequest has no audioPlay command.");
 	}
 
 	behav_syncs.sync_end()->set_time(lastTime);
@@ -2197,7 +2197,7 @@ void BML::SpeechRequest::unschedule(  SmartBody::SBScene* scene,
 	if( !audioStop.empty() )
 		SmartBody::SBScene::getScene()->getCommandManager()->execute_later( audioStop.c_str(), request->actor->get_viseme_sound_delay() );
 	else
-		LOG("WARNING: SpeechRequest::unschedule(): unique_id \"%s\": Missing audioStop.", unique_id.c_str());
+		SmartBody::util::log("WARNING: SpeechRequest::unschedule(): unique_id \"%s\": Missing audioStop.", unique_id.c_str());
 }
 	                            
 void BML::SpeechRequest::cleanup( SmartBody::SBScene* scene, BmlRequestPtr request )

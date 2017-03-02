@@ -48,7 +48,7 @@ int MeCtLocomotionTimingSpace::set_mode(int mode)
 {
 	if(mode != 1 && mode != -1) 
 	{
-		LOG("Error: timing space mode must be either 1 or -1");
+		SmartBody::util::log("Error: timing space mode must be either 1 or -1");
 	}
 	else this->mode = mode;
 	return this->mode;
@@ -70,7 +70,7 @@ void MeCtLocomotionTimingSpace::set_ref_time(int index, float frame)
 {
 	if(index > _ref_time.size())
 	{
-		LOG("Error: MeCtLocomotionTimingSpace::set_ref_time(), index out of range");
+		SmartBody::util::log("Error: MeCtLocomotionTimingSpace::set_ref_time(), index out of range");
 	}
 	_ref_time.set(index, frame);
 }
@@ -81,7 +81,7 @@ float MeCtLocomotionTimingSpace::get_ref_time(char* ref_name)
 	{
 		if(strcmp(ref_name, _ref_time_name.get(i)) == 0) return _ref_time.get(i);
 	}
-	LOG("Error: failed to get ref time.");
+	SmartBody::util::log("Error: failed to get ref time.");
 	return -1.0f;
 }
 
@@ -171,7 +171,7 @@ float MeCtLocomotionTimingSpace::get_ref_time(int index)
 {
 	if(index < 0 || index > _ref_time.size()-1) 
 	{
-		LOG("Error: wrong reference time index: %d", index);
+		SmartBody::util::log("Error: wrong reference time index: %d", index);
 		return 0;
 	}
 	if(mode == -1) return frame_num - _ref_time.get(index);
@@ -187,7 +187,7 @@ float MeCtLocomotionTimingSpace::get_virtual_frame(float space_value)
 {
 	if(space_value < 0.0f || space_value >= _ref_time.size())
 	{
-		LOG("Error: invalid space_value: %f", space_value);
+		SmartBody::util::log("Error: invalid space_value: %f", space_value);
 		return -1.0f;
 	}
 	int space_index = 0;
@@ -233,7 +233,7 @@ float MeCtLocomotionTimingSpace::get_space_value(float frame)
 {
 	if(frame < 0.0f || frame > frame_num)
 	{
-		LOG("Error: invalid input frame: %f", frame);
+		SmartBody::util::log("Error: invalid input frame: %f", frame);
 	}
 
 	float space_value = 0.0f;
@@ -407,10 +407,10 @@ bool check_timing_space(MeCtLocomotionTimingSpace* space1, MeCtLocomotionTimingS
 
 void MeCtLocomotionTimingSpace::print_info()
 {
-	LOG("\nnew MeCtLocomotionTimingSpace");
-	LOG("\nframe num: %f", frame_num);
+	SmartBody::util::log("\nnew MeCtLocomotionTimingSpace");
+	SmartBody::util::log("\nframe num: %f", frame_num);
 	for(int i = 0; i < _ref_time.size(); ++i)
 	{
-		LOG("\n[%d]: frame:%f", i, _ref_time.get(i));
+		SmartBody::util::log("\n[%d]: frame:%f", i, _ref_time.get(i));
 	}
 }

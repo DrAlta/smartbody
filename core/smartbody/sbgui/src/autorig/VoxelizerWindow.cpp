@@ -1,7 +1,8 @@
-#include "vhcl.h"
+
 #include "VoxelizerWindow.h"
 #include "external/glew/glew.h"
 #include <sr/sr_gl.h>
+#include <sb/SBUtilities.h>
 //#include <imdebug/imdebug.h>
 #include <queue>
 
@@ -829,9 +830,9 @@ float VoxelizerWindow::getVoxelGeodesicDist( SrVec3i& voxID1, SrVec3i& voxID2 )
 	std::list<PolyVox::Vector3DInt32> geoPath;
 	PolyVox::AStarPathfinderParams< PolyVox::SimpleVolume<uint8_t> > params(voxels,v1,v2,&geoPath,0.f,10000,PolyVox::SixConnected,&aStarVoxelInsideValidator,0);	
 	PolyVox::AStarPathfinder< PolyVox::SimpleVolume<uint8_t> > pathFinder(params);
-	LOG("Before A* path finder");
+	SmartBody::util::log("Before A* path finder");
 	pathFinder.execute();
-	LOG("After A* path finder");
+	SmartBody::util::log("After A* path finder");
 	
 	return (float)params.result->size();	
 

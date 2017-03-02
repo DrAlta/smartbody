@@ -31,7 +31,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBTypes.h>
 #include <sb/SBAttribute.h>
 #include <sb/SBScene.h>
-#include <vhcl_log.h>
+#include <sb/SBUtilities.h>
 //#include "external/imdebug/imdebug.h"
 
 /************************************************************************/
@@ -162,7 +162,7 @@ void SbmTextureManager::loadTexture(int iType, const char* textureName, const ch
         SbmTexture* texture = new SbmTexture(textureName);
         if(!texture->loadImage(fileName))
         {
-            LOG("ERROR: Can't load image %s. Invalid path? Is it an 8-bit image?", fileName);
+            SmartBody::util::log("ERROR: Can't load image %s. Invalid path? Is it an 8-bit image?", fileName);
         }
         texMap[strTex] = texture;
     }
@@ -353,7 +353,7 @@ SBAPI void SbmTextureManager::reloadTexture()
 SbmTexture* SbmTextureManager::findTexture(int type, const char* textureName )
 {
     std::string strTex = textureName;
-    //LOG("Tex name: %s\tType: %d", strTex.c_str(), type);
+    //SmartBody::util::log("Tex name: %s\tType: %d", strTex.c_str(), type);
     StrTextureMap& texMap = findMap(type);
     if (texMap.find(strTex) != texMap.end())
         return texMap[strTex];
@@ -369,7 +369,7 @@ SbmCubeMapTexture* SbmTextureManager::findCubeMapTexture(const char* cubeMapName
 
 void SbmTextureManager::loadCubeMapTextures(const std::string cubeMapName, const std::vector<std::string> &textureNames, const std::vector<std::string> &textureFileNames){
     if(textureNames.size() != 6 || textureFileNames.size() != 6){
-        LOG("Textures provided are not enough to build cube map!\n");
+        SmartBody::util::log("Textures provided are not enough to build cube map!\n");
         return;
     }
     
@@ -380,7 +380,7 @@ void SbmTextureManager::loadCubeMapTextures(const std::string cubeMapName, const
         for(int i = 0; i < textureNames.size(); ++i){
             if(!texture->loadImage(textureFileNames[i].c_str()))
             {
-                LOG("ERROR: Can't load image %s. Invalid path? Is it an 8-bit image?", textureFileNames[i].c_str());
+                SmartBody::util::log("ERROR: Can't load image %s. Invalid path? Is it an 8-bit image?", textureFileNames[i].c_str());
             }
         }
         
@@ -452,7 +452,7 @@ bool SbmTexture::loadImage( const char* fileName )
 	buffer = stbi_load(fileName, &width, &height, &channels, 0);
 	if (!buffer)
 	{
-		LOG("Image %s failed to load.", fileName);
+		SmartBody::util::log("Image %s failed to load.", fileName);
 		return false;
 	}
 #if 0
@@ -460,12 +460,12 @@ bool SbmTexture::loadImage( const char* fileName )
 	if (width < 0 || height < 0 || channels < 0)
 	{
 		const char* errorString = SOIL_last_result();
-		LOG("Image %s failed to load: [%s]", fileName, errorString);
+		SmartBody::util::log("Image %s failed to load: [%s]", fileName, errorString);
 		return false;
 	}
     else
 	{
-        LOG("Loading image       :%s\t%d\t%d\t%d", fileName, width, height, channels );
+        SmartBody::util::log("Loading image       :%s\t%d\t%d\t%d", fileName, width, height, channels );
     }
     //std::string testOutFileName = fileName;
     //testOutFileName += ".bmp";
@@ -504,11 +504,11 @@ bool SbmTexture::loadImage( const char* fileName )
     if (transparentPixel*50 > height*width)
     {
         transparentTexture = true;
-        LOG("Texture %s is transparent.",fileName);
+        SmartBody::util::log("Texture %s is transparent.",fileName);
     }
     else
     {
-        LOG("Texture %s is opaque",fileName);
+        SmartBody::util::log("Texture %s is opaque",fileName);
     }
 
     imgBuffer.resize(width*height*channels);
@@ -528,7 +528,7 @@ bool SbmTexture::loadImage( const char* fileName )
 
 void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 {	
-    //LOG("Start Build Texture");
+    //SmartBody::util::log("Start Build Texture");
     if (!getBuffer()) return;
 #if !defined(__native_client__)
     //SbmShaderProgram::printOglError("SbmTexture.cpp:10");		
@@ -558,7 +558,7 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 	glTexParameteri(iType, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(iType, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    //LOG("After Texture parameters : GL_TEXTURE_WRAP_S");
+    //SmartBody::util::log("After Texture parameters : GL_TEXTURE_WRAP_S");
 
 #if !defined (__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE)
     if (buildMipMap)
@@ -577,7 +577,7 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 
 	bool isFloatTexture = (dataType == GL_FLOAT);
 	//if (isFloatTexture)
-	//	LOG("Texture %s, is float texture.", getName().c_str());
+	//	SmartBody::util::log("Texture %s, is float texture.", getName().c_str());
     if (channels == 3)
     {
 #if !defined(EMSCRIPTEN)
@@ -624,7 +624,7 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
 		glGenerateMipmap(GL_TEXTURE_2D);
 #endif
 
-    //LOG("texture id = %u, texture name = %s, width = %d, height = %d, channel = %d",texID, textureName.c_str(), width, height, channels);
+    //SmartBody::util::log("texture id = %u, texture name = %s, width = %d, height = %d, channel = %d",texID, textureName.c_str(), width, height, channels);
 
     //glGenerateMipmap(iType);
     //SbmShaderProgram::printOglError("Sb!defined(SB_IPHONE)mTexture.cpp:200");
@@ -635,9 +635,9 @@ void SbmTexture::buildTexture(bool buildMipMap, bool recreateTexture)
     //TextureDebug();	
     glBindTexture(iType,0);	
     finishBuild = true;
-    //LOG("Finish build texture");
+    //SmartBody::util::log("Finish build texture");
     //SbmShaderProgram::printOglError("SbmTexture.cpp:300");
-    //LOG("Texture name = %s, texture ID = %d",textureName.c_str(),texID);	
+    //SmartBody::util::log("Texture name = %s, texture ID = %d",textureName.c_str(),texID);	
     //imdebug("rgb w=%d h=%d %p", width, height, buffer);
 #endif
 }
@@ -756,7 +756,7 @@ void SbmTexture::bakeAlphaIntoTexture(SbmTexture* alphaTex)
 	unsigned char* alphaBuf = alphaTex->getBuffer();	
 	if (alphaTex->getWidth() != getWidth() || alphaTex->getHeight() != getHeight())
 	{
-		LOG("Warning! Alpha texture size (%d, %d) do not match diffuse texture '%s' size (%d, %d)", alphaTex->getWidth(), alphaTex->getHeight(), this->getName().c_str(), getWidth(), getHeight());
+		SmartBody::util::log("Warning! Alpha texture size (%d, %d) do not match diffuse texture '%s' size (%d, %d)", alphaTex->getWidth(), alphaTex->getHeight(), this->getName().c_str(), getWidth(), getHeight());
 		return;
 	}
 
@@ -791,7 +791,7 @@ void SbmTexture::bakeAlphaIntoTexture(SbmTexture* alphaTex)
 #if USE_CUBE_MAP
 SbmCubeMapTexture::SbmCubeMapTexture(const std::vector<std::string>& texNames, const std::vector<std::string> &fileNames){
     if(texNames.size() != 6 || fileNames.size())
-        LOG("Wrong number of textures!");
+        SmartBody::util::log("Wrong number of textures!");
     textureNames = texNames;
     textureFileNames = fileNames;
     texID				= 0;
@@ -818,7 +818,7 @@ bool SbmCubeMapTexture::loadImage(const char* fileName){
     if (width < 0 || height < 0 || channels < 0)
         return false;
     else {
-        LOG("Loading image       :%s\t%d\t%d\t%d", fileName, width, height, channels );
+        SmartBody::util::log("Loading image       :%s\t%d\t%d\t%d", fileName, width, height, channels );
     }
     
     int transparentPixel = 0;

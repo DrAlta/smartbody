@@ -18,9 +18,10 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include <vhcl.h>
+
 #include <controllers/me_ct_curve_writer.hpp>
 #include <sb/SBPawn.h>
+#include <sb/SBUtilities.h>
 
 std::string MeCtCurveWriter::TYPE = "MeCtCurveWriter";
 
@@ -56,7 +57,7 @@ void MeCtCurveWriter::init(
 		_local_ch_to_buffer[i] = index;
 		int chan_size = SkChannel::size( _channels.type( i ) );
 		if( chan_size > 1 ) {
-			LOG( "MeCtCurveWriter::init ERR: channel '%s' not a scalar", _channels.name( i ).c_str() );
+			SmartBody::util::log( "MeCtCurveWriter::init ERR: channel '%s' not a scalar", _channels.name( i ).c_str() );
 		}
 		index += chan_size;
 	}

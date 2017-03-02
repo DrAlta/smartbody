@@ -1,6 +1,6 @@
 #include "PositionControl.h"
 
-#include "vhcl.h"
+
 #include <FL/gl.h>
 #include <FL/glu.h>
 #include <sr/sr_gl.h>
@@ -515,7 +515,7 @@ bool PositionControl::drag(SrCamera& cam,  float fx, float fy, float tx, float t
 	{
 		inc = mouseToWorld(cam,fx,fy,tx,ty);
 		ratio = -worldToEye(cam,center).z/(cam.getCenter()-cam.getEye()).norm();
-		//LOG("opdir = %d, ratio = %f",opdir, ratio);
+		//SmartBody::util::log("opdir = %d, ratio = %f",opdir, ratio);
 		inc *= ratio;
 	}
 	else
@@ -525,7 +525,7 @@ bool PositionControl::drag(SrCamera& cam,  float fx, float fy, float tx, float t
 		screenParallelPlane(cam,center,dirx,diry);
 		float ratio=dirx.norm();
 
-		//LOG("opdir = %d, ratio = %f",opdir, ratio);
+		//SmartBody::util::log("opdir = %d, ratio = %f",opdir, ratio);
 
 		SrVec t(center[0],center[1],center[2]);
 		t[opdir]+=ratio*base;

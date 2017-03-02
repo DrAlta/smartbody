@@ -22,6 +22,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBPawn.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>
+#include <sb/SBUtilities.h>
+
 
 namespace SmartBody {
 
@@ -71,14 +73,14 @@ void SBController::addChannel(std::string channelName, std::string type)
 	}
 	else 
 	{
-		LOG("Channel type %s not valid, must be one of: XPos, YPos, ZPos, Quat. Channel %s not added.", type.c_str(), channelName.c_str());
+		SmartBody::util::log("Channel type %s not valid, must be one of: XPos, YPos, ZPos, Quat. Channel %s not added.", type.c_str(), channelName.c_str());
 		return;
 	}
 
 	int index = _context->channels().search(channelName, channelType);
 	if (index != -1)
 	{
-		LOG("Channel %s of type %s already present in motion, duplicate channel not added.", channelName.c_str(), type.c_str());
+		SmartBody::util::log("Channel %s of type %s already present in motion, duplicate channel not added.", channelName.c_str(), type.c_str());
 		return;
 	}
 
@@ -136,7 +138,7 @@ void SBController::setJointChannelPos( const std::string& jointName, MeFrameData
 		if (positionChannelID < 0) hasTranslation = false;
 		int posBufferID = frame.toBufferIndex(positionChannelID);
 		if (posBufferID < 0) hasTranslation = false;
-		//LOG("SBController : posChannelID = %d, posBufferID = %d",positionChannelID, posBufferID);
+		//SmartBody::util::log("SBController : posChannelID = %d, posBufferID = %d",positionChannelID, posBufferID);
 		if (hasTranslation)
 		{		
 			frame.buffer()[posBufferID] = outPos[i];				
@@ -256,7 +258,7 @@ void SBController::setChannelValue(const std::string& channelName, double val)
 	if (positionChannelID < 0) hasTranslation = false;
 	int posBufferID = (*_curFrame).toBufferIndex(positionChannelID);
 	if (posBufferID < 0) hasTranslation = false;
-	//LOG("SBController : posChannelID = %d, posBufferID = %d",positionChannelID, posBufferID);
+	//SmartBody::util::log("SBController : posChannelID = %d, posBufferID = %d",positionChannelID, posBufferID);
 	if (hasTranslation)
 	{		
 		(*_curFrame).buffer()[posBufferID] = val;				

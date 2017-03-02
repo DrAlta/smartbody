@@ -19,13 +19,14 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "SBBoneBusManager.h"
-#include "vhcl.h"
+
 #include <sb/SBAttribute.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBScene.h>
 #include <sb/SBPawn.h>
 #include <sb/SBCharacter.h>
+#include <sb/SBUtilities.h>
 #include <controllers/me_controller_tree_root.hpp>
 
 namespace SmartBody {
@@ -52,7 +53,7 @@ bonebus::BoneBusClient& SBBoneBusManager::getBoneBus()
 void SBBoneBusManager::setEnable(bool val)
 {
 #ifdef SB_NO_BONEBUS
-	LOG("Bonebus has been disabled and is not available.");
+	SmartBody::util::log("Bonebus has been disabled and is not available.");
 	return;
 #else
 	SBService::setEnable(val);
@@ -61,7 +62,7 @@ void SBBoneBusManager::setEnable(bool val)
 	{
 		if (_boneBus.IsOpen())
 		{
-			LOG("Closing Bone Bus connection.");
+			SmartBody::util::log("Closing Bone Bus connection.");
 			_boneBus.CloseConnection();
 		}
 
@@ -71,7 +72,7 @@ void SBBoneBusManager::setEnable(bool val)
 		bool success = _boneBus.OpenConnection(host.c_str());
 		if (!success)
 		{
-			LOG("Could not open Bone Bus connection to %s", host.c_str());
+			SmartBody::util::log("Could not open Bone Bus connection to %s", host.c_str());
 			SmartBody::BoolAttribute* enableAttribute = dynamic_cast<SmartBody::BoolAttribute*>(getAttribute("enable"));
 			if (enableAttribute)
 				enableAttribute->setValueFast(false);
@@ -79,7 +80,7 @@ void SBBoneBusManager::setEnable(bool val)
 		}
 		else
 		{
-			LOG("Connected Bone Bus to %s", host.c_str());
+			SmartBody::util::log("Connected Bone Bus to %s", host.c_str());
 		}
 
 	}
@@ -87,7 +88,7 @@ void SBBoneBusManager::setEnable(bool val)
 	{
 		if (_boneBus.IsOpen())
 		{
-			LOG("Closing Bone Bus connection.");
+			SmartBody::util::log("Closing Bone Bus connection.");
 			_boneBus.CloseConnection();
 		}
 	}
@@ -101,7 +102,7 @@ void SBBoneBusManager::setEnable(bool val)
 void SBBoneBusManager::setHost(const std::string& host)
 {
 #ifdef SB_NO_BONEBUS
-	LOG("Bonebus has been disabled and can not set the bonebus host.");
+	SmartBody::util::log("Bonebus has been disabled and can not set the bonebus host.");
 	return;
 #endif
 	_host = host;
@@ -155,7 +156,7 @@ void SBBoneBusManager::afterUpdate(double time)
 			if (pawn->bonebusCharacter && pawn->bonebusCharacter->GetNumErrors() > 3)
 			{
 				// connection is bad, remove the bonebus character 
-				LOG("BoneBus cannot connect to server. Removing pawn %s", pawn->getName().c_str());
+				SmartBody::util::log("BoneBus cannot connect to server. Removing pawn %s", pawn->getName().c_str());
 				this->getBoneBus().DeleteCharacter(pawn->bonebusCharacter);
 				character->bonebusCharacter = NULL;
 				isClosingBoneBus = true;
@@ -198,7 +199,7 @@ void SBBoneBusManager::afterUpdate(double time)
 			{
 				// connection is bad, remove the bonebus character
 				isClosingBoneBus = true;
-				LOG("BoneBus cannot connect to server after visemes sent. Removing all characters.");
+				SmartBody::util::log("BoneBus cannot connect to server after visemes sent. Removing all characters.");
 			}
 
 			if ( character->getSkeleton() && 
@@ -228,7 +229,7 @@ void SBBoneBusManager::afterUpdate(double time)
 				{
 					// connection is bad, remove the bonebus character 
 					isClosingBoneBus = true;
-					LOG("BoneBus cannot connect to server. Removing all characters");
+					SmartBody::util::log("BoneBus cannot connect to server. Removing all characters");
 				}
 			}
 			else if (!isClosingBoneBus && !character->bonebusCharacter && getBoneBus().IsOpen())

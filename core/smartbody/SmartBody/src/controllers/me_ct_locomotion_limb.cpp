@@ -148,7 +148,7 @@ int MeCtLocomotionLimb::set_limb_base(const std::string& name)
 	SkJoint* joint = standing_skeleton->search_joint(name.c_str());
 	if(joint == NULL) 
 	{
-		LOG("MeCtLocomotionLimb::set_limb_base(): Joint:%s does not exist", name.c_str());
+		SmartBody::util::log("MeCtLocomotionLimb::set_limb_base(): Joint:%s does not exist", name.c_str());
 		return -1;
 	}
 
@@ -208,8 +208,8 @@ void MeCtLocomotionLimb::set_ground_height(float ground_height)
 //temp function for test, to be deleted......
 void MeCtLocomotionLimb::print_info()
 {
-	LOG("\n ground_height: %f", ground_height);
-	LOG("\n height_bound: %f", height_bound);
+	SmartBody::util::log("\n ground_height: %f", ground_height);
+	SmartBody::util::log("\n height_bound: %f", height_bound);
 	for(int i = 0; i < walking_list.size(); ++i)
 	{
 		SrVec walking_dir = walking_list.get(i)->local_direction;
@@ -217,7 +217,7 @@ void MeCtLocomotionLimb::print_info()
 	}
 	for(int i = 0; i < get_support_joint_num(); ++i)
 	{
-		LOG("\n support_height[%s]: %f", (const char*)*support_joint_list.get(i), support_height.get(i));
+		SmartBody::util::log("\n support_height[%s]: %f", (const char*)*support_joint_list.get(i), support_height.get(i));
 	}
 	for(int j = 0; j < walking_list.size(); ++j)
 	{

@@ -1,27 +1,24 @@
-/*
- *  bml_sync_point.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
- *      Ed Fast, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
-#include "vhcl.h"
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
+
 
 #include "bml_sync_point.hpp"
 
@@ -31,6 +28,7 @@
 #include "bml_exception.hpp"
 #include "bml_xml_consts.hpp"
 #include "sbm/BMLDefs.h"
+#include <sb/SBUtilities.h>
 
 
 using namespace std;
@@ -198,7 +196,7 @@ SetOfWstring BehaviorSyncPoints::get_sync_names() {
 			std::wstringstream wstrstr;
 			wstrstr << "ERROR: BehaviorSyncPoints::get_sync_names(): Failed to insert SyncPoint name \""<<name<<"\".";
 			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
+			SmartBody::util::log(str.c_str());
 		}
 	}
 
@@ -300,7 +298,7 @@ BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement*
 
 		std::string e = xml_utils::xml_w2s( elem_id );
 		std::string a = xml_utils::xml_w2s( sync_attr );
-		LOG( "BehaviorSyncPoints::parseSyncPointAttr ERR: >>SyncPoint of this name already exists<< %s %s", e.c_str(), a.c_str() );
+		SmartBody::util::log( "BehaviorSyncPoints::parseSyncPointAttr ERR: >>SyncPoint of this name already exists<< %s %s", e.c_str(), a.c_str() );
 #if 0
 		// TODO: Throw BML ParsingException
 		std::stringstream strm;
@@ -310,7 +308,7 @@ BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement*
 		else
 			strm<<">";
 		strm << " and returning existing SyncPoint.";
-		LOG(strm.str().c_str());
+		SmartBody::util::log(strm.str().c_str());
 #endif
 		return map_it->second;
 	}
@@ -338,7 +336,7 @@ BehaviorSyncPoints::iterator BehaviorSyncPoints::parseSyncPointAttr( DOMElement*
 			std::stringstream strstr;
 			strstr << "BehaviorSyncPoint:parseSyncPointAttr(..): Invalid SyncPoint reference \"" << temp_sync_ref << "\" in behavior \"" << behavior_id << "\" " << temp_sync_att << "; generated unconstrained sync point.";		
 #if HACK_BAD_SYNC_POINT_REF_WARN_ONLY
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 
 			// TEMPORARY HACK: Warn but don't error out, generate blank sync point
 			sync = request->start_trigger->addSyncPoint();
@@ -469,7 +467,7 @@ void BehaviorSyncPoints::applyParentTimes( std::string& warning_context ) {
 						if( !warning_context.empty() )
 							strstr << warning_context << ": ";
 						strstr << "SyncPoint \""<<ascii_sync_id<<"\" time set before applyParentTimes().";
-						LOG(strstr.str().c_str());
+						SmartBody::util::log(strstr.str().c_str());
 					}
 					sync->time = parent->time + sync->offset;
 				} else {
@@ -481,7 +479,7 @@ void BehaviorSyncPoints::applyParentTimes( std::string& warning_context ) {
 					if( !warning_context.empty() )
 						strstr << warning_context << ": ";
 					strstr << "SyncPoint \""<<ascii_sync_id<<"\" parent unset.";
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 				}
 			}
 		}

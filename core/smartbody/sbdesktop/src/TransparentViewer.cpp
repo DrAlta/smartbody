@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "TransparentViewer.h"
 #include <windowsx.h>
 //#include <GL/glaux.h>
@@ -797,7 +797,7 @@ void TransparentViewer::initShadowMap()
 	
 	int depth_size = SHADOW_MAP_RES;
 	//glGenTextures(1, &_data->shadowMapID);
-	//LOG("Shadow map ID = %d\n",_data->shadowMapID);	
+	//SmartBody::util::log("Shadow map ID = %d\n",_data->shadowMapID);	
 	glGenFramebuffersEXT(1, &_data.depthFB);	
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _data.depthFB);
 	glDrawBuffer(GL_FRONT_AND_BACK);

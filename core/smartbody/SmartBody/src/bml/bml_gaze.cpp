@@ -1,27 +1,24 @@
-/*
- *  bml_gaze.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Andrew n marshall, USC
- *      Ed Fast, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
-#include "vhcl.h"
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -39,6 +36,7 @@
 #include "sbm/xercesc_utils.hpp"
 #include "sbm/BMLDefs.h"
 #include "controllers/me_controller_tree_root.hpp"
+#include <sb/SBUtilities.h>
 
 
 #define LOG_GAZE_PARAMS				(0)
@@ -113,7 +111,7 @@ int check_gaze_speed( float head, float eyeball ) {
 	if( head <= 0 || eyeball <= 0 ) {
 		std::stringstream strstr;
 		strstr << "ERROR: Gaze joint speed cannot be <= 0.";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return false;
 	}
 	// TODO: Print warning on extremely slow / fast speeds.
@@ -141,13 +139,13 @@ bool check_gaze_smoothing( float lumbar, float cervical, float eyeball ) {
 	if( lumbar < 0 || cervical < 0 || eyeball < 0 ) {
 		std::stringstream strstr;
 		strstr << "ERROR: Gaze speed smoothing cannot be < 0." << endl;
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return false;
 	}
 	if( lumbar > 1 || cervical > 1 || eyeball > 1 ) {
 		std::stringstream strstr;
 		strstr << "ERROR: Gaze speed smoothing cannot be > 1.";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		return false;
 	}
 	return true;
@@ -221,7 +219,7 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 					} else {
 						std::stringstream strstr;
 						strstr << "WARNING: Invalid level number \""<<level_str<<"\" in gaze description.";
-						LOG(strstr.str().c_str());
+						SmartBody::util::log(strstr.str().c_str());
 					}
 				}
 			} // end type == DTYPE_SBM
@@ -237,19 +235,19 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 				} else {
 					std::stringstream strstr;
 					strstr << "WARNING: BML::Gaze::parse_children(..): Gaze joint element \""<<child_tag<<"\" overwriting existing KeyData.";
-					LOG(strstr.str().c_str());
+					SmartBody::util::log(strstr.str().c_str());
 				}
 
 				parse_gaze_key_element( child, key_data[key] );
 			} else {
 				std::stringstream strstr;
 				strstr << "WARNING: Unrecognized <"<<child_tag<<" ../> element inside gaze behavior.  Ignoring element.";
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 		} else {
 			std::stringstream strstr;
 			strstr << "WARNING: Unrecognized <"<<child_tag<<" ../> inside element gaze behavior.  Ignoring element." << endl;
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 		}
 		
 		child = getNextElement( child );
@@ -271,14 +269,14 @@ bool BML::Gaze::parse_children( DOMElement* elem, Gaze::KeyData* key_data[] ) {
 				} else {
 					std::stringstream strm;
 					strm << "WARNING: BML::Gaze::parse_children(..): Gaze description \""<<child_tag<<"\" overwriting existing KeyData.";
-					LOG(strm.str().c_str());
+					SmartBody::util::log(strm.str().c_str());
 				}
 
 				parse_gaze_key_element( child, key_data[key] );
 			} else {
 				std::stringstream strm;
 				strm << "WARNING: Unrecognized <" << child_tag << " ../> element inside \"isi:sbm\" typed gaze description level.  Ignoring element.";
-				LOG(strm.str().c_str());
+				SmartBody::util::log(strm.str().c_str());
 			}
 
 
@@ -302,7 +300,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 	if (!request->actor->gaze_sched_p)
 	{
-		LOG("Character %s does not have a gaze scheduler, so cannot use gaze.", request->actor->getName().c_str());
+		SmartBody::util::log("Character %s does not have a gaze scheduler, so cannot use gaze.", request->actor->getName().c_str());
 		return BehaviorRequestPtr();
 	}
 
@@ -342,7 +340,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		std::wstringstream wstrstr;
         wstrstr << "WARNING: BML::parse_bml_gaze(): <"<<tag<<"> BML tag missing "<< BMLDefs::ATTR_TARGET <<"= attribute.";
 		std::string str = convertWStringToString(wstrstr.str());
-		LOG(str.c_str());
+		SmartBody::util::log(str.c_str());
 		//return BehaviorRequestPtr();  // a.k.a., NULL
     }
 
@@ -387,7 +385,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	{
 		if (gaze_ct)
 		{
-			LOG("WARNING: BML::parse_bml_gaze(..): Gaze joints cannot be reassigned.");
+			SmartBody::util::log("WARNING: BML::parse_bml_gaze(..): Gaze joints cannot be reassigned.");
 		}
 		else
 		{
@@ -401,7 +399,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 				std::wstringstream wstrstr;
 				wstrstr << "ERROR: No valid tokens in <gaze ../> behavior attribute "<<BMLDefs::ATTR_JOINT_RANGE;
 				std::string str = convertWStringToString(wstrstr.str());
-				LOG(str.c_str());
+				SmartBody::util::log(str.c_str());
 			} else {
 				const char* key_name = asciiString( tokenizer.nextToken() );
 				int key_index = MeCtGaze::key_index( key_name );
@@ -409,7 +407,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 					std::wstringstream wstrstr;
 					wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name<<"\".";
 					std::string str = convertWStringToString(wstrstr.str());
-					LOG(str.c_str());
+					SmartBody::util::log(str.c_str());
 				}
 				delete [] key_name;
 
@@ -420,7 +418,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 						std::wstringstream wstrstr;
 						wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name<<"\".";
 						std::string str = convertWStringToString(wstrstr.str());
-						LOG(str.c_str());
+						SmartBody::util::log(str.c_str());
 					}
 					delete [] key_name;
 				}
@@ -439,7 +437,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 							std::wstringstream wstrstr;
 							wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid joint range token \""<<key_name<<"\".";
 							std::string str = convertWStringToString(wstrstr.str());
-							LOG(str.c_str());
+							SmartBody::util::log(str.c_str());
 						}
 						delete [] key_name;
 					}
@@ -466,7 +464,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 			std::wstringstream wstrstr;
 			wstrstr << "WARNING: BML::parse_bml_gaze(..): Priority joint cannot be reassigned." << endl;
 			std::string str = convertWStringToString(wstrstr.str());
-			LOG(str.c_str());
+			SmartBody::util::log(str.c_str());
 		}
 		else
 		{
@@ -478,7 +476,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 				std::wstringstream wstrstr;
 				wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name << "\"." << endl;
 				std::string str = convertWStringToString(wstrstr.str());
-				LOG(str.c_str());
+				SmartBody::util::log(str.c_str());
 			}
 			if(priority_key_index > high_key_index)
 			{
@@ -486,7 +484,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 				std::wstringstream wstrstr;
 				wstrstr << "WARNING: BML::parse_bml_gaze(..): Invalid priority key attribute\"" << priority_key_name << "\"." << endl;
 				std::string str = convertWStringToString(wstrstr.str());
-				LOG(str.c_str());
+				SmartBody::util::log(str.c_str());
 			}
 		}
 	}
@@ -527,7 +525,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		if( num_toks )	{
 			if( gaze_time_hint > 0.0f )	{
 				xml_utils::xml_parse_error( BMLDefs::ATTR_JOINT_SPEED, elem );
-				LOG( "WARNING: speed not supported with time-hint attribute set" );
+				SmartBody::util::log( "WARNING: speed not supported with time-hint attribute set" );
 			}
 			switch( num_toks )	{
 				case 1: {
@@ -549,7 +547,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 
 					if( num_toks > 3 )	{
 						xml_utils::xml_parse_error( BMLDefs::ATTR_JOINT_SPEED, elem );
-						LOG( "WARNING: expecting 1, 2, or 3 values" );
+						SmartBody::util::log( "WARNING: expecting 1, 2, or 3 values" );
 					}
 					break;
 				}
@@ -571,7 +569,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 			else	{
 			
 				xml_utils::xml_parse_error( BMLDefs::ATTR_JOINT_SMOOTH, elem );
-				LOG( "WARNING: expecting 3 smooth values" );
+				SmartBody::util::log( "WARNING: expecting 3 smooth values" );
 			}
 		}
 	}
@@ -581,7 +579,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 	float gaze_fade_ival = 0.0f;
 	int gaze_fade_mode = 0;
 	if (gaze_fade_out_ival > 0 && gaze_fade_in_ival > 0)
-		LOG( "WARNING: fade in and out cannot be both valid" );
+		SmartBody::util::log( "WARNING: fade in and out cannot be both valid" );
 	else
 	{
 		if (gaze_fade_out_ival > 0)
@@ -785,7 +783,7 @@ BehaviorRequestPtr BML::parse_bml_gaze( DOMElement* elem, const std::string& uni
 		} else if( tok == xml_utils::xml_translate_string( BMLDefs::DIR_UPLEFT ) )	{
 			dir_angle = 315.0f;
 		} else	{
-			LOG( "WARNING: direction '%s' not recognized", tok.c_str() );
+			SmartBody::util::log( "WARNING: direction '%s' not recognized", tok.c_str() );
 		}
 		// sweep_angle = 30.0f; reasonable default, of not further specified.
 		sweep_angle = xml_utils::xml_parse_float( BMLDefs::ATTR_ANGLE, elem, 30.0f );

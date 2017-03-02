@@ -24,7 +24,6 @@
 #define _VISUALIZATION_VIEW_H_
 
 #include <FL/Fl_Slider.H>
-#include <vhcl.h>
 #include <FL/Fl_Gl_Window.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Group.H>

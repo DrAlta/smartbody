@@ -54,7 +54,7 @@ bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector
 	{
 		std::string message = "";
 		xml_utils::xml_translate(&message, toCatch.getMessage());
-		LOG("Error during ParserOgre initialization! :\n %s\n", message.c_str());
+		SmartBody::util::log("Error during ParserOgre initialization! :\n %s\n", message.c_str());
 		return false;
 	}
 
@@ -72,7 +72,7 @@ bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector
 		std::string filebasename = boost::filesystem::basename(pathName);
 		std::string fileextension = boost::filesystem::extension(pathName);
 		boost::filesystem::path filepath(pathName);
-		//LOG("directory string = %s",filepath.parent_path().directory_string().c_str());
+		//SmartBody::util::log("directory string = %s",filepath.parent_path().directory_string().c_str());
 		//std::string filepath = boost::filesystem::
 		std::stringstream strstr;
 		if (fileextension.size() > 0 && fileextension[0] == '.')
@@ -91,10 +91,10 @@ bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector
 				DOMNode* colladaNode = getNode("library_geometry", doc);
 				if (colladaNode)
 				{
-					LOG("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
+					SmartBody::util::log("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
 					return false;
 				}
-				LOG("<mesh> was not found in file %s.", pathName.c_str());
+				SmartBody::util::log("<mesh> was not found in file %s.", pathName.c_str());
 				return false;
 			}
 			parseOk = parseMesh(meshNode, meshModelVec, scale);
@@ -135,10 +135,10 @@ bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector
 				DOMNode* colladaNode = getNode("library_controller", doc);
 				if (colladaNode)
 				{
-					LOG("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
+					SmartBody::util::log("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
 					return false;
 				}
-				LOG("<mesh> was not found in file %s. No skinweights will be loaded.", pathName.c_str());
+				SmartBody::util::log("<mesh> was not found in file %s. No skinweights will be loaded.", pathName.c_str());
 				return false;
 			}			
 			parseOk =  parseSkinWeight(meshNode, skinWeights, scale);
@@ -161,7 +161,7 @@ bool ParserOgre::parseSkinMesh( std::vector<SrModel*>& meshModelVec, std::vector
 		return false;
 	}
 	catch (...) {
-		LOG("Unexpected Exception in ParserOgreSkeleton::parse()");
+		SmartBody::util::log("Unexpected Exception in ParserOgreSkeleton::parse()");
 		return false;
 	}
 
@@ -182,7 +182,7 @@ bool ParserOgre::parse(SmartBody::SBSkeleton& skeleton, std::vector<SmartBody::S
 	{
 		std::string message = "";
 		xml_utils::xml_translate(&message, toCatch.getMessage());
-		LOG("Error during ParserOgre initialization! :\n %s\n", message.c_str());
+		SmartBody::util::log("Error during ParserOgre initialization! :\n %s\n", message.c_str());
 		return false;
 	}
 
@@ -247,7 +247,7 @@ bool ParserOgre::parse(SmartBody::SBSkeleton& skeleton, std::vector<SmartBody::S
 						}
 						else
 						{
-							LOG("Skeleton linked in file %s, which does not exist", nameAttr.c_str());
+							SmartBody::util::log("Skeleton linked in file %s, which does not exist", nameAttr.c_str());
 						}	
 					}
 
@@ -258,10 +258,10 @@ bool ParserOgre::parse(SmartBody::SBSkeleton& skeleton, std::vector<SmartBody::S
 					DOMNode* colladaNode = getNode("library_visual_scenes", doc);
 					if (colladaNode)
 					{
-						LOG("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
+						SmartBody::util::log("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
 						return false;
 					}
-					LOG("<skeleton> was not found in file %s.", pathName.c_str());
+					SmartBody::util::log("<skeleton> was not found in file %s.", pathName.c_str());
 					return false;
 				}
 			}
@@ -278,10 +278,10 @@ bool ParserOgre::parse(SmartBody::SBSkeleton& skeleton, std::vector<SmartBody::S
 				DOMNode* colladaNode = getNode("library_animations", doc);
 				if (colladaNode)
 				{
-					LOG("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
+					SmartBody::util::log("File is a COLLADA file, not an Ogre file. Please use a .dae extension.");
 					return false;
 				}
-				LOG("<animations> was not found in file %s. No motions will be loaded.", pathName.c_str());
+				SmartBody::util::log("<animations> was not found in file %s. No motions will be loaded.", pathName.c_str());
 				return false;
 			}
 			SmartBody::SBMotion* motion = new SmartBody::SBMotion(""); 
@@ -306,7 +306,7 @@ bool ParserOgre::parse(SmartBody::SBSkeleton& skeleton, std::vector<SmartBody::S
 		return false;
 	}
 	catch (...) {
-		LOG("Unexpected Exception in ParserOgreSkeleton::parse()");
+		SmartBody::util::log("Unexpected Exception in ParserOgreSkeleton::parse()");
 		return false;
 	}
 
@@ -339,11 +339,11 @@ DOMNode* ParserOgre::getNode(const std::string& nodeName, DOMNode* node)
 bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& skeleton, std::string pathName, float scale)
 {
 	// get the bone hierarchy
-	//LOG("Start Parse Ogre Skeleton");
+	//SmartBody::util::log("Start Parse Ogre Skeleton");
 	DOMNode* hierarchy = getNode("bonehierarchy", skeletonNode);
 	if (!hierarchy)
 	{
-		LOG("<hierarchy> was not found in file %s.", pathName.c_str());
+		SmartBody::util::log("<hierarchy> was not found in file %s.", pathName.c_str());
 		return false;
 	}
 
@@ -365,7 +365,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& ske
 			std::string parentAttr = "";
 			if (parentNode)
 				xml_utils::xml_translate(&parentAttr, parentNode->getNodeValue());
-			//LOG("bone node = %s, parent node = %s",boneAttr.c_str(),parentAttr.c_str());
+			//SmartBody::util::log("bone node = %s, parent node = %s",boneAttr.c_str(),parentAttr.c_str());
 			if (boneNode && parentNode)
 				parentHierarchy.insert(std::pair<std::string, std::string>(boneAttr, parentAttr));
 		}
@@ -376,7 +376,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& ske
 	DOMNode* bones = getNode("bones", skeletonNode);
 	if (!hierarchy)
 	{
-		LOG("<bones> was not found in file %s.", pathName.c_str());
+		SmartBody::util::log("<bones> was not found in file %s.", pathName.c_str());
 		return false;
 	}
 	const DOMNodeList* boneList = bones->getChildNodes();
@@ -407,7 +407,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& ske
 					SkJoint* parentJoint = skeleton.linear_search_joint(parent.c_str());
 					if (!parentJoint)
 					{
-						LOG("Parent joint %s to joint %s was not found in file %s.", parent.c_str(), nameAttr.c_str(), pathName.c_str());
+						SmartBody::util::log("Parent joint %s to joint %s was not found in file %s.", parent.c_str(), nameAttr.c_str(), pathName.c_str());
 					}
 					else
 					{
@@ -510,7 +510,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& ske
 									if (zNode)
 										xml_utils::xml_translate(&zAttr, zNode->getNodeValue());
 									axis.z = (float) atof(zAttr.c_str());
-									//LOG("axis = %f %f %f, angle = %f",axis.x,axis.y,axis.z,angle);
+									//SmartBody::util::log("axis = %f %f %f, angle = %f",axis.x,axis.y,axis.z,angle);
 									SrQuat orientation(axis, angle);	
 									SkJointQuat* jointQuat = joint->quat();
 									jointQuat->prerot(orientation);
@@ -535,7 +535,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& ske
 			SkJoint* parentJoint = skeleton.linear_search_joint(parent.c_str());
 			if (!parentJoint)
 			{
-				LOG("Parent joint %s to joint %s was not found in file %s.", parent.c_str(), jointName.c_str(), pathName.c_str());
+				SmartBody::util::log("Parent joint %s to joint %s was not found in file %s.", parent.c_str(), jointName.c_str(), pathName.c_str());
 			}
 			else
 			{
@@ -544,7 +544,7 @@ bool ParserOgre::parseSkeleton(DOMNode* skeletonNode, SmartBody::SBSkeleton& ske
 		}
 		else // root joint
 		{
-			//LOG("root joint = %s",joint->name().c_str());
+			//SmartBody::util::log("root joint = %s",joint->name().c_str());
 			rootJoint = joint;
 			skeleton.root(rootJoint);
 		}
@@ -1002,7 +1002,7 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SmartBody::SBM
 			}
 			else
 			{
-				LOG("Animation in file %s has no name or length, will not be parsed.", pathName.c_str());
+				SmartBody::util::log("Animation in file %s has no name or length, will not be parsed.", pathName.c_str());
 				return false;
 			}
 		}
@@ -1012,11 +1012,11 @@ bool ParserOgre::parseMotion(DOMNode* animationsNode, std::vector<SmartBody::SBM
 
 bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelVec, float scaleFactor )
 {
-	//LOG("ParseOgre::parseMesh");
+	//SmartBody::util::log("ParseOgre::parseMesh");
 	DOMNode* subMeshNode = getNode("submeshes",meshNode);
 	if (!subMeshNode) return false;
 	const DOMNodeList* subMeshList = subMeshNode->getChildNodes();
-	//LOG("Num of submeshes = %d",subMeshList->getLength());
+	//SmartBody::util::log("Num of submeshes = %d",subMeshList->getLength());
 	for (unsigned int i=0;i<subMeshList->getLength(); i++)
 	{
 		DOMNode* subMesh = subMeshList->item(i);	
@@ -1041,7 +1041,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 			model->mtlnames.push_back(materialName.c_str());
 
 		meshModelVec.push_back(model);
-		//LOG("SubMesh %d ... ",i);
+		//SmartBody::util::log("SubMesh %d ... ",i);
 		const DOMNodeList* subMeshChildren = subMesh->getChildNodes();
 		for (unsigned int a = 0; a < subMeshChildren->getLength(); a++)
 		{
@@ -1050,7 +1050,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 			xml_utils::xml_translate(&childNodeStr, subMeshChild->getNodeName());
 			if (childNodeStr == "geometry")
 			{
-				//LOG("parse geometry");
+				//SmartBody::util::log("parse geometry");
 				DOMNamedNodeMap* childAttr = subMeshChild->getAttributes();
 				int vertexCount = 0;
 				if (childAttr)
@@ -1069,7 +1069,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 					xml_utils::xml_translate(&bufferNodeStr, bufferNode->getNodeName());
 					if (bufferNodeStr != "vertexbuffer")
 						continue;
-					//LOG("vertex buffer %d ...",b);
+					//SmartBody::util::log("vertex buffer %d ...",b);
 					const DOMNodeList* vertexList = bufferNode->getChildNodes();
 					DOMNode* vertexNode = bufferNode->getFirstChild();
 					//for (unsigned int v = 0; v < vertexList->getLength(); v++)
@@ -1083,7 +1083,7 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 							vertexNode = vertexNode->getNextSibling();
 							continue;
 						}
-						//LOG("vertex %d ... ",v);
+						//SmartBody::util::log("vertex %d ... ",v);
 						const DOMNodeList* vertexDataList = vertexNode->getChildNodes();
 						for (unsigned int j = 0; j < vertexDataList->getLength(); j++)
 						{
@@ -1142,16 +1142,16 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 						vertexNode = vertexNode->getNextSibling();
 					}
 				}
-				//LOG("parse geometry complete");
+				//SmartBody::util::log("parse geometry complete");
 
 			}
 			else if (childNodeStr == "faces")
 			{
-				//LOG("parse faces");
+				//SmartBody::util::log("parse faces");
 				const DOMNodeList* faceList = subMeshChild->getChildNodes();
 				DOMNode* faceNode = subMeshChild->getFirstChild();
 				//std::map<int,int> infJointCount;
-				//LOG("weight list size = %d",weightList->getLength());
+				//SmartBody::util::log("weight list size = %d",weightList->getLength());
 				//for (unsigned int w = 0; w < weightList->getLength(); w++)
 				//{
 				int w = 0;
@@ -1217,17 +1217,17 @@ bool ParserOgre::parseMesh( DOMNode* meshNode, std::vector<SrModel*>& meshModelV
 					}	
 					faceNode = faceNode->getNextSibling();
 				}
-				//LOG("parse faces complete");
+				//SmartBody::util::log("parse faces complete");
 			}
 		}
 	}
-	LOG("ParseOgre::parseMesh complete");
+	SmartBody::util::log("ParseOgre::parseMesh complete");
 	return true;
 }
 
 bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& skinWeights, float scaleFactor )
 {
-	//LOG("ParseOgre::parseSkinWeight");
+	//SmartBody::util::log("ParseOgre::parseSkinWeight");
 	DOMNode* subMeshNode = getNode("submeshes",meshNode);
 	if (!subMeshNode) return false;
 	const DOMNodeList* subMeshList = subMeshNode->getChildNodes();
@@ -1257,7 +1257,7 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 				int infJointCount = 0;
 				DOMNode* weightNode = subMeshChild->getFirstChild();
 				//std::map<int,int> infJointCount;
-				//LOG("weight list size = %d",weightList->getLength());
+				//SmartBody::util::log("weight list size = %d",weightList->getLength());
 				//for (unsigned int w = 0; w < weightList->getLength(); w++)
 				//{
 				int w = 0;
@@ -1309,7 +1309,7 @@ bool ParserOgre::parseSkinWeight( DOMNode* meshNode, std::vector<SkinWeight*>& s
 		}			
 	}
 
-	LOG("ParseOgre::parseSkinWeight Complete");
+	SmartBody::util::log("ParseOgre::parseSkinWeight Complete");
 	return true;
 }
 
@@ -1367,7 +1367,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 			// the material name is in the mesh models, parse this material
 			{
 				std::string materialName = tokens[idx];
-				//LOG("material name = %s",materialName.c_str());
+				//SmartBody::util::log("material name = %s",materialName.c_str());
 				SrMaterial& curMaterial = materialMap[materialName];
 				int bracketCounter = 0;
 				do {
@@ -1394,7 +1394,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 							floatVec.push_back((float)atof(tokens[idx+1].c_str()));
 							idx++;
 						}			
-						//LOG("ambient, vec size = %d",floatVec.size());
+						//SmartBody::util::log("ambient, vec size = %d",floatVec.size());
 						if (floatVec.size() >=3 && floatVec.size() <= 4)
 						{
 							float c[4];
@@ -1402,7 +1402,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 								c[i] = floatVec[i];
 							if (floatVec.size() == 3)
 								c[3] = 1.f;
-							//LOG("color = %f %f %f %f",c[0],c[1],c[2],c[3]);
+							//SmartBody::util::log("color = %f %f %f %f",c[0],c[1],c[2],c[3]);
 							curMaterial.ambient = SrColor(c);
 						}						
 					}
@@ -1415,7 +1415,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 							floatVec.push_back((float)atof(tokens[idx+1].c_str()));
 							idx++;
 						}			
-						//LOG("diffuse, vec size = %d",floatVec.size());
+						//SmartBody::util::log("diffuse, vec size = %d",floatVec.size());
 						if (floatVec.size() >=3 && floatVec.size() <= 4)
 						{
 							float c[4];
@@ -1423,7 +1423,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 								c[i] = floatVec[i];
 							if (floatVec.size() == 3)
 								c[3] = 1.f;
-							//LOG("color = %f %f %f %f",c[0],c[1],c[2],c[3]);
+							//SmartBody::util::log("color = %f %f %f %f",c[0],c[1],c[2],c[3]);
 							curMaterial.diffuse = SrColor(c);
 						}	
 
@@ -1437,7 +1437,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 							floatVec.push_back((float)atof(tokens[idx+1].c_str()));
 							idx++;
 						}
-						//LOG("specular, vec size = %d",floatVec.size());
+						//SmartBody::util::log("specular, vec size = %d",floatVec.size());
 						if (floatVec.size() >=3 && floatVec.size() <= 5)
 						{
 							float c[4];
@@ -1455,7 +1455,7 @@ void ParserOgre::loadMeshMaterial( std::vector<SrModel*>& meshModelVec, std::str
 								curMaterial.shininess = (int)floatVec[3];
 
 							curMaterial.specular = SrColor(c);
-							//LOG("color = %f %f %f %f",c[0],c[1],c[2],c[3]);
+							//SmartBody::util::log("color = %f %f %f %f",c[0],c[1],c[2],c[3]);
 						}						
 					}				
 

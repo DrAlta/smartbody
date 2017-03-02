@@ -126,11 +126,11 @@ void MeCtLocomotionLimbAnim::apply_frame(int frame)
 void MeCtLocomotionLimbAnim::print_info()
 {
 	SrVec* velocity = NULL;
-	LOG("\n Printing info for walking animation %s:", walking->getName().c_str());
+	SmartBody::util::log("\n Printing info for walking animation %s:", walking->getName().c_str());
 	/*for(int i = 0; i < get_support_joint_num(); ++i)
 	{
-		LOG("\n land_frame[%s]: %d", (const char*)*(support_joint_list->get(i)), land_frame.get(i));
-		LOG("\n lift_frame[%s]: %d", (const char*)*(support_joint_list->get(i)), lift_frame.get(i));
+		SmartBody::util::log("\n land_frame[%s]: %d", (const char*)*(support_joint_list->get(i)), land_frame.get(i));
+		SmartBody::util::log("\n lift_frame[%s]: %d", (const char*)*(support_joint_list->get(i)), lift_frame.get(i));
 	}*/
 	for(int i = 0; i < this->timing_space.get_ref_time_num(); ++i)
 	{
@@ -139,7 +139,7 @@ void MeCtLocomotionLimbAnim::print_info()
 	for(int j = 0; j < walking->frames() && j < displacement_list.size(); ++j)
 	{
 		velocity = displacement_list.get(j);
-		LOG("\n%d (%.2f, %.2f, %.2f)", j, velocity->x, velocity->y, velocity->z);
+		SmartBody::util::log("\n%d (%.2f, %.2f, %.2f)", j, velocity->x, velocity->y, velocity->z);
 		//printf("\n%d (%f, %f, %f)", j, velocity->x, velocity->y, velocity->z);
 	}
 }

@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #include "SBMotion.h"
 #include <sb/SBScene.h>
 #include <sr/sr_euler.h>
@@ -28,6 +28,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBEvent.h>
 #include <sb/SBJointMapManager.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBUtilities.h>
 #include <controllers/me_ct_jacobian_IK.hpp>
 #include <controllers/me_ct_ccd_IK.hpp>
 #include <boost/lexical_cast.hpp>
@@ -301,14 +302,14 @@ void SBMotion::addChannel(const std::string& channelName, const std::string& typ
 	}
 	else 
 	{
-		LOG("Channel type %s not valid, must be one of: XPos, YPos, ZPos, Quat. Channel %s not added.", type.c_str(), channelName.c_str());
+		SmartBody::util::log("Channel type %s not valid, must be one of: XPos, YPos, ZPos, Quat. Channel %s not added.", type.c_str(), channelName.c_str());
 		return;
 	}
 
 	int index = _channels.search(channelName, channelType);
 	if (index != -1)
 	{
-		LOG("Channel %s of type %s already present in motion, duplicate channel not added.", channelName.c_str(), type.c_str());
+		SmartBody::util::log("Channel %s of type %s already present in motion, duplicate channel not added.", channelName.c_str(), type.c_str());
 		return;
 	}
 
@@ -321,7 +322,7 @@ void SBMotion::addFrame(float frameTime, const std::vector<float>& frameData)
 	int channelSize = _channels.floats();
 	if (channelSize != frameData.size())
 	{
-		LOG("Motion %s needs %d values, only have %d values, data not added.", this->getName().c_str(), channelSize, frameData.size());
+		SmartBody::util::log("Motion %s needs %d values, only have %d values, data not added.", this->getName().c_str(), channelSize, frameData.size());
 		return;
 	}
 
@@ -340,7 +341,7 @@ void SBMotion::addFrame(float frameTime, const std::vector<float>& frameData)
 	}
 	else
 	{
-		LOG("Frame must be added in time-order. Motion %s has duration %f, frame is at time %f. Frame not added.", this->getName().c_str(), duration, frameTime);
+		SmartBody::util::log("Frame must be added in time-order. Motion %s has duration %f, frame is at time %f. Frame not added.", this->getName().c_str(), duration, frameTime);
 		return;
 	}
 
@@ -400,13 +401,13 @@ void SBMotion::bakeFrames(float fps)
 	if (_channelFrameValues.size() == 0 &&
 		_quatFrameValues.size() == 0)
 	{
-		LOG("No motion data to bake.");
+		SmartBody::util::log("No motion data to bake.");
 		return;
 	} 
 
 	if (fabs(fps) < .0001)
 	{
-		LOG("FPS set to zero, resetting to 30.");
+		SmartBody::util::log("FPS set to zero, resetting to 30.");
 		fps = 30.0;
 	}
 	float step = float(1.0) / fps;
@@ -512,7 +513,7 @@ void SBMotion::checkSkeleton(std::string skel)
 	SBMotion* motion = SmartBody::SBScene::getScene()->getMotion(getName());
 	if (!motion)
 	{
-		LOG("checkSkeleton ERR: Motion %s NOT EXIST!", getName().c_str());
+		SmartBody::util::log("checkSkeleton ERR: Motion %s NOT EXIST!", getName().c_str());
 		return;
 	}
 
@@ -526,9 +527,9 @@ void SBMotion::checkSkeleton(std::string skel)
 		SkChannelArray& skelChanArray = skSkel->channels();
 		int skelChanSize = skelChanArray.size();
 		chanSize = mChanSize;
-		LOG("Channels in skeleton %s's channel matching motion %s's channel are preceeded with '+'", skel.c_str(), getName().c_str());
-		LOG("motion %s's Channel Info:", getName().c_str());
-		LOG("Channel Size: %d", chanSize);
+		SmartBody::util::log("Channels in skeleton %s's channel matching motion %s's channel are preceeded with '+'", skel.c_str(), getName().c_str());
+		SmartBody::util::log("motion %s's Channel Info:", getName().c_str());
+		SmartBody::util::log("Channel Size: %d", chanSize);
 		for (int i = 0; i < chanSize; i++)
 		{				
 			std::stringstream outputInfo;
@@ -560,11 +561,11 @@ void SBMotion::checkSkeleton(std::string skel)
 			if (pos == -1)	
 				outputInfo << "  ";
 			outputInfo << i << ": " << jointName.c_str() << " (" << chanTypeString << ")";
-			LOG("%s", outputInfo.str().c_str());
+			SmartBody::util::log("%s", outputInfo.str().c_str());
 		}
 	}
 	else
-		LOG("Skeleton %s does NOT exist!", skel.c_str());
+		SmartBody::util::log("Skeleton %s does NOT exist!", skel.c_str());
 }
 
 int SBMotion::connect(SBSkeleton* skel)
@@ -605,19 +606,19 @@ void SBMotion::alignToSide(int numFrames, int direction)
 {
 	if (numFrames >= getNumFrames())
 	{
-		LOG("SBMotion::alignToSide WARNING: number of frames %d exceed the motion cycle.", numFrames);
+		SmartBody::util::log("SBMotion::alignToSide WARNING: number of frames %d exceed the motion cycle.", numFrames);
 		return;
 	}
 
 	if (direction != 0 && direction != 1)
 	{
-		LOG("SBMotion::alignToSide WARNING: direction %d not valid.", direction);
+		SmartBody::util::log("SBMotion::alignToSide WARNING: direction %d not valid.", direction);
 		return;
 	}
 
 	if (getNumFrames() == 1)
 	{
-		LOG("SBMotion::alignToSide WARNING: motion %s only has one frame, no need to align.", this->getName().c_str());
+		SmartBody::util::log("SBMotion::alignToSide WARNING: motion %s only has one frame, no need to align.", this->getName().c_str());
 		return;
 	}
 
@@ -792,7 +793,7 @@ void SBMotion::addSimilarPose(const std::string& motionName)
 	{
 		if ((*iter) == motionName)
 		{
-			LOG("Pose named '%s' already similar to motion %s.", motionName.c_str(), this->getName().c_str());
+			SmartBody::util::log("Pose named '%s' already similar to motion %s.", motionName.c_str(), this->getName().c_str());
 			return;
 		}
 	}
@@ -812,7 +813,7 @@ void SBMotion::removeSimilarPose(const std::string& motionName)
 			return;
 		}
 	}
-	LOG("Could not find similar pose '%s' for motion '%s'.", motionName.c_str(), this->getName().c_str());
+	SmartBody::util::log("Could not find similar pose '%s' for motion '%s'.", motionName.c_str(), this->getName().c_str());
 }
 
 std::vector<std::string> SBMotion::getSimilarPoses() const
@@ -944,7 +945,7 @@ void SBMotion::pertainMotionChannelsByEndJoints( std::string skelName, std::vect
 	SBSkeleton* srcSkeleton = SmartBody::SBScene::getScene()->getSkeleton(skelName);
 	if (!srcSkeleton)
 	{
-		LOG("No skeleton named %s found. Can not match joint names and descendents", skelName.c_str());
+		SmartBody::util::log("No skeleton named %s found. Can not match joint names and descendents", skelName.c_str());
 		return;
 	}
 	std::vector<std::string> pertainJoints;
@@ -986,7 +987,7 @@ void SBMotion::removeMotionChannelsByEndJoints(std::string skelName, std::vector
 	SBSkeleton* srcSkeleton = SmartBody::SBScene::getScene()->getSkeleton(skelName);
 	if (!srcSkeleton)
 	{
-		LOG("No skeleton named %s found. Can not match joint names and descendents", skelName.c_str());
+		SmartBody::util::log("No skeleton named %s found. Can not match joint names and descendents", skelName.c_str());
 		return;
 	}
 	std::vector<std::string> removeJoints;
@@ -1012,20 +1013,20 @@ SBMotion* SBMotion::retarget( std::string name, std::string srcSkeletonName, std
 	SBSkeleton* srcSkeleton = SmartBody::SBScene::getScene()->getSkeleton(srcSkeletonName);
 	if (!srcSkeleton)
 	{
-		LOG("No retarget source skeleton named %s found.", srcSkeletonName.c_str());
+		SmartBody::util::log("No retarget source skeleton named %s found.", srcSkeletonName.c_str());
 		return NULL;
 	}
 	SBSkeleton* dstSkeleton = SmartBody::SBScene::getScene()->getSkeleton(dstSkeletonName);
 	if (!dstSkeleton)
 	{
-		LOG("No retarget destination skeleton named %s found.", dstSkeletonName.c_str());
+		SmartBody::util::log("No retarget destination skeleton named %s found.", dstSkeletonName.c_str());
 		return NULL;
 	}
 	srcSkeleton->clearJointValues();
 	dstSkeleton->clearJointValues();
 	if (!srcSkeleton || !dstSkeleton)
 	{
-		LOG("Skeleton %s or %s not found. Retargeted motion %s not built.",srcSkeletonName.c_str(),dstSkeletonName.c_str(),name.c_str());
+		SmartBody::util::log("Skeleton %s or %s not found. Retargeted motion %s not built.",srcSkeletonName.c_str(),dstSkeletonName.c_str(),name.c_str());
 		return NULL;
 	}
 	
@@ -1228,9 +1229,9 @@ SBMotion* SBMotion::buildConstraintMotion( SBSkeleton* sourceSk, SBSkeleton* tar
 			if (chanID != -1)
 			{
 				int floatIdx = mchan_arr.float_position(chanID);
-				//LOG("old quat = %f %f %f %f",cur_p[ floatIdx + 0 ],cur_p[ floatIdx + 1 ],cur_p[ floatIdx + 2 ],cur_p[ floatIdx + 3 ] );
-				//LOG("new quat = %f %f %f %f",nq.w,nq.x,nq.y,nq.z );
-				//LOG("skel quat = %f %f %f %f",kq.w,kq.x,kq.y,kq.z );
+				//SmartBody::util::log("old quat = %f %f %f %f",cur_p[ floatIdx + 0 ],cur_p[ floatIdx + 1 ],cur_p[ floatIdx + 2 ],cur_p[ floatIdx + 3 ] );
+				//SmartBody::util::log("new quat = %f %f %f %f",nq.w,nq.x,nq.y,nq.z );
+				//SmartBody::util::log("skel quat = %f %f %f %f",kq.w,kq.x,kq.y,kq.z );
 				cur_p[ floatIdx + 0 ] = nq.w;
 				cur_p[ floatIdx + 1 ] = nq.x;
 				cur_p[ floatIdx + 2 ] = nq.y;
@@ -1303,7 +1304,7 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 				constraint->targetPos = rec.posVec[k];
 				SBJoint* pjoint = dynamic_cast<SBJoint*>(conJoint->getParent()->getParent()->getParent());
 				constraint->rootName = pjoint->jointName();
-				//LOG("effector = %s, root = %s, target pos = %f %f %f",rec.jointNames[k].c_str(),constraint->rootName.c_str(), rec.posVec[k][0],rec.posVec[k][1],rec.posVec[k][2]);
+				//SmartBody::util::log("effector = %s, root = %s, target pos = %f %f %f",rec.jointNames[k].c_str(),constraint->rootName.c_str(), rec.posVec[k][0],rec.posVec[k][1],rec.posVec[k][2]);
 				cons[rec.jointNames[k]] = constraint;
 			}				
 		}
@@ -1386,9 +1387,9 @@ SBMotion* SBMotion::autoFootSkateCleanUp( std::string name, std::string srcSkele
 			if (chanID != -1)
 			{
 				int floatIdx = mchan_arr.float_position(chanID);
-				//LOG("old quat = %f %f %f %f",cur_p[ floatIdx + 0 ],cur_p[ floatIdx + 1 ],cur_p[ floatIdx + 2 ],cur_p[ floatIdx + 3 ] );
-				//LOG("new quat = %f %f %f %f",nq.w,nq.x,nq.y,nq.z );
-				//LOG("skel quat = %f %f %f %f",kq.w,kq.x,kq.y,kq.z );
+				//SmartBody::util::log("old quat = %f %f %f %f",cur_p[ floatIdx + 0 ],cur_p[ floatIdx + 1 ],cur_p[ floatIdx + 2 ],cur_p[ floatIdx + 3 ] );
+				//SmartBody::util::log("new quat = %f %f %f %f",nq.w,nq.x,nq.y,nq.z );
+				//SmartBody::util::log("skel quat = %f %f %f %f",kq.w,kq.x,kq.y,kq.z );
 				cur_p[ floatIdx + 0 ] = nq.w;
 				cur_p[ floatIdx + 1 ] = nq.x;
 				cur_p[ floatIdx + 2 ] = nq.y;
@@ -1408,7 +1409,7 @@ SBMotion* SBMotion::mirror(std::string name, std::string skeletonName)
 	SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
 	if (!skeleton)
 	{
-		LOG("Skeleton %s not found. Mirror motion %s not built.",skeletonName.c_str(),name.c_str());
+		SmartBody::util::log("Skeleton %s not found. Mirror motion %s not built.",skeletonName.c_str(),name.c_str());
 		return NULL;
 	}
 	SkMotion* motion = buildMirrorMotion(skeleton);
@@ -1450,7 +1451,7 @@ SBMotion* SBMotion::mirrorChildren( std::string name, std::string skeletonName, 
 	SBSkeleton* skeleton = SmartBody::SBScene::getScene()->getSkeleton(skeletonName);
 	if (!skeleton)
 	{
-		LOG("Skeleton %s not found. Mirror motion %s not built.",skeletonName.c_str(),name.c_str());
+		SmartBody::util::log("Skeleton %s not found. Mirror motion %s not built.",skeletonName.c_str(),name.c_str());
 		return NULL;
 	}
 	std::map<std::string,bool> jointNameMap;
@@ -1514,7 +1515,7 @@ float SBMotion::getJointSpeed(SBJoint* joint, float startTime, float endTime)
 		return 0.f;
 	if (connected_skeleton() == NULL)
 	{
-		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
+		SmartBody::util::log("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
 		return 0;
 	}
 
@@ -1550,14 +1551,14 @@ float SBMotion::getJointSpeedAxis(SBJoint* joint, const std::string& axis, float
 		axisIndex = 2;
 	else
 	{
-		LOG("Bad axis specified '%s', defaulting to use the X-axis.", axis.c_str());
+		SmartBody::util::log("Bad axis specified '%s', defaulting to use the X-axis.", axis.c_str());
 	}
 
 	if (!joint)
 		return 0.f;
 	if (connected_skeleton() == NULL)
 	{
-		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
+		SmartBody::util::log("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
 		return 0;
 	}
 
@@ -1592,7 +1593,7 @@ float SBMotion::getJointAngularSpeed(SBJoint* joint, float startTime, float endT
 	}
 	if (connected_skeleton() == NULL)
 	{
-		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
+		SmartBody::util::log("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
 		return 0;
 	}
 	float dt = duration() / float(frames() - 1);
@@ -1639,7 +1640,7 @@ float SBMotion::getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis
 		axisIndex = 2;
 	else
 	{
-		LOG("Bad axis specified '%s', defaulting to use the X-axis.", axis.c_str());
+		SmartBody::util::log("Bad axis specified '%s', defaulting to use the X-axis.", axis.c_str());
 	}
 
 	if (!joint)
@@ -1648,7 +1649,7 @@ float SBMotion::getJointAngularSpeedAxis(SBJoint* joint, const std::string& axis
 	}
 	if (connected_skeleton() == NULL)
 	{
-		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
+		SmartBody::util::log("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
 		return 0;
 	}
 	float dt = duration() / float(frames() - 1);
@@ -1701,12 +1702,12 @@ SrVec SBMotion::getJointAngularVelocity(SBJoint* joint, float startTime, float e
 
 	if (!joint)
 	{
-		LOG("Joint is NULL");
+		SmartBody::util::log("Joint is NULL");
 		return SrVec();
 	}
 	if (connected_skeleton() == NULL)
 	{
-		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
+		SmartBody::util::log("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
 		return SrVec();
 	}
 	float dt = duration() / float(frames() - 1);
@@ -1744,7 +1745,7 @@ std::vector<float> SBMotion::getJointTransition(SBJoint* joint, float startTime,
 	std::vector<float> transitions;
 	if (!joint)
 	{
-		LOG("No joint found when determining joint transitions.");
+		SmartBody::util::log("No joint found when determining joint transitions.");
 		transitions.push_back(0);
 		transitions.push_back(0);
 		transitions.push_back(0);
@@ -1753,7 +1754,7 @@ std::vector<float> SBMotion::getJointTransition(SBJoint* joint, float startTime,
 
 	if (connected_skeleton() == NULL)
 	{
-		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
+		SmartBody::util::log("Motion %s is not connected to any skeleton, cannot retrieve parameter angular speed.", getName().c_str());
 		transitions.push_back(0);
 		transitions.push_back(0);
 		transitions.push_back(0);
@@ -1794,7 +1795,7 @@ SrVec SBMotion::getJointPosition(SBJoint* joint, float time)
 		return SrVec();
 	if (connected_skeleton() == NULL)
 	{
-		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
+		SmartBody::util::log("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
 		return SrVec();
 	}
 
@@ -1817,7 +1818,7 @@ SrVec SBMotion::getJointPositionFromBase(SBJoint* joint, SBJoint* baseJoint, flo
 		return SrVec();
 	if (connected_skeleton() == NULL)
 	{
-		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
+		SmartBody::util::log("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
 		return SrVec();
 	}
 
@@ -1846,7 +1847,7 @@ SrQuat SBMotion::getJointRotation(SBJoint* joint, float time)
 		return SrVec();
 	if (connected_skeleton() == NULL)
 	{
-		LOG("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
+		SmartBody::util::log("Motion %s is not connected to any skeleton, cannot retrieve parameter speed.", getName().c_str());
 		return SrVec();
 	}
 
@@ -1939,7 +1940,7 @@ SBAPI SBMotion* SBMotion::getOffset(SBMotion* baseMotion, std::string motionName
 	if (offsetMotion != NULL)
 	{
 		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(offsetMotion);
-		LOG("Add motion %s to scene", offsetMotion->getName().c_str());
+		SmartBody::util::log("Add motion %s to scene", offsetMotion->getName().c_str());
 	}
 
 	return offsetMotion;
@@ -2006,7 +2007,7 @@ SBMotion* SBMotion::getOffset(std::string motionName, int index)
 	if (offsetMotion != NULL)
 	{
 		SmartBody::SBScene::getScene()->getAssetManager()->addMotion(offsetMotion);
-		LOG("Add motion %s to scene", offsetMotion->getName().c_str());
+		SmartBody::util::log("Add motion %s to scene", offsetMotion->getName().c_str());
 	}
 
 	// insert into the map
@@ -2033,7 +2034,7 @@ bool SBMotion::translate(float x, float y, float z, const std::string& baseJoint
 	pos[2] = ch.search(baseJointName, SkChannel::ZPos);
 	if (pos[0] == -1 || pos[1] == -1 || pos[2] == -1)
 	{
-		LOG("No joint named '%s' found in motion %s, cannot translate.", baseJointName.c_str(), getName().c_str());
+		SmartBody::util::log("No joint named '%s' found in motion %s, cannot translate.", baseJointName.c_str(), getName().c_str());
 		return false;
 	}
 
@@ -2048,7 +2049,7 @@ bool SBMotion::translate(float x, float y, float z, const std::string& baseJoint
 
 	}
 
-	LOG("Motion %s with %d frames offset by (%f, %f, %f)", getName().c_str(), frames(), offset[0], offset[1], offset[2]);
+	SmartBody::util::log("Motion %s with %d frames offset by (%f, %f, %f)", getName().c_str(), frames(), offset[0], offset[1], offset[2]);
 	return true;
 }
 
@@ -2065,7 +2066,7 @@ bool SBMotion::rotate(float xaxis, float yaxis, float zaxis, const std::string& 
 	pos = ch.search(baseJointName.c_str(), SkChannel::Quat);
 	if (pos == -1)
 	{
-		LOG("No joint named '%s' found in motion %s, cannot rotate.", baseJointName.c_str(), getName().c_str());
+		SmartBody::util::log("No joint named '%s' found in motion %s, cannot rotate.", baseJointName.c_str(), getName().c_str());
 		return false;
 	}
 
@@ -2092,7 +2093,7 @@ bool SBMotion::rotate(float xaxis, float yaxis, float zaxis, const std::string& 
 		curFrame[pos + 3] = newQuat.z;
 	}
 
-	LOG("Motion %s with %d frames rotated by (%f, %f, %f)", getName().c_str(), frames(), rotation[0], rotation[1], rotation[2]);
+	SmartBody::util::log("Motion %s with %d frames rotated by (%f, %f, %f)", getName().c_str(), frames(), rotation[0], rotation[1], rotation[2]);
 	return true;
 }
 
@@ -2117,7 +2118,7 @@ bool SBMotion::scale(float factor)
 			index += channel.size();
 		}
 	}
-	LOG("Motion %s with %d frames scaled by a factor of %f", getName().c_str(), frames(), factor);
+	SmartBody::util::log("Motion %s with %d frames scaled by a factor of %f", getName().c_str(), frames(), factor);
 	return true;
 }
 
@@ -2128,7 +2129,7 @@ bool SBMotion::retime(float factor)
 		keytime(f, keytime(f) * factor);
 	}
 
-	//LOG("Motion %s with %d frames retimed by a factor of %f", getName().c_str(), frames(), factor);
+	//SmartBody::util::log("Motion %s with %d frames retimed by a factor of %f", getName().c_str(), frames(), factor);
 	return true;
 }
 
@@ -2138,12 +2139,12 @@ bool SBMotion::trim(int numFramesFromFront, int numFramesFromBack)
 	int newFrames = frames() - numFramesFromFront - numFramesFromBack;
 	if (numFramesFromFront < 0 || numFramesFromBack < 0)
 	{
-		LOG("trim frames can not be negative");
+		SmartBody::util::log("trim frames can not be negative");
 		return false;
 	}
 	if (newFrames < 1)
 	{
-		LOG("Motion %s has only %d frames, can not be trimmed by %d frames at front and %d frames at back",getName().c_str(), frames(), numFramesFromFront, numFramesFromBack);
+		SmartBody::util::log("Motion %s has only %d frames, can not be trimmed by %d frames at front and %d frames at back",getName().c_str(), frames(), numFramesFromFront, numFramesFromBack);
 		return false;
 	}
 	for (int i=0;i<newFrames;i++)
@@ -2171,7 +2172,7 @@ void SBMotion::saveToSkm(const std::string& fileName)
 	SrOutput* out = new SrOutput(fileName.c_str(), "w");
 	if (!out->valid())
 	{
-		LOG("Cannot write to file %s", fileName.c_str());
+		SmartBody::util::log("Cannot write to file %s", fileName.c_str());
 		delete out;
 		return;
 	}
@@ -2259,7 +2260,7 @@ void SBMotion::saveToSkb(const std::string& fileName)
 	std::fstream file(fileName.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 	if (!outputMotion->SerializeToOstream(&file)) 
 	{
-		LOG("Fail to write to binary file %s", fileName.c_str());
+		SmartBody::util::log("Fail to write to binary file %s", fileName.c_str());
 	}
 	google::protobuf::ShutdownProtobufLibrary();
 
@@ -2271,7 +2272,7 @@ bool SBMotion::readFromSkb(const std::string& fileName)
 	std::fstream input(fileName.c_str(), std::ios::in | std::ios::binary);
 	if (!inputMotion.ParseFromIstream(&input)) 
 	{
-		LOG("Failed to parse binary motion from file %s", fileName.c_str());
+		SmartBody::util::log("Failed to parse binary motion from file %s", fileName.c_str());
 		return false;
 	}
 	this->_filename = fileName;
@@ -2470,7 +2471,7 @@ bool SBMotion::kMeansClustering1D(int num, std::vector<double>& inputPoints, std
 {
 	if ((int)inputPoints.size() < num)
 	{
-		LOG("PAAutoFootStepsEditor::kMeansClustering1D Warning: Input points are less than number of means");
+		SmartBody::util::log("PAAutoFootStepsEditor::kMeansClustering1D Warning: Input points are less than number of means");
 		return false;
 	}
 
@@ -2576,14 +2577,14 @@ SBMotion* SBMotion::footSkateCleanUp( std::string name, std::vector<std::string>
 									  std::string srcMotionName, std::string tgtSkeletonName, std::string tgtRootName, 
 									  float floorHeight, float heightThreshold, float speedThreshold )
 {
-	LOG("foot skate cleanup for motion %s.", this->getName().c_str());
+	SmartBody::util::log("foot skate cleanup for motion %s.", this->getName().c_str());
 
 	SBSkeleton* origSkel = SBScene::getScene()->getSkeleton(srcSkeletonName);
 	if (!origSkel) return NULL;
 	SBMotion* origMotion = SBScene::getScene()->getMotion(srcMotionName);
 	if (!origMotion) return NULL;
 
-	LOG("foot skate cleanup for motion %s.", this->getName().c_str());
+	SmartBody::util::log("foot skate cleanup for motion %s.", this->getName().c_str());
 
 	SBSkeleton* skelCopy = new SBSkeleton(origSkel);
 	std::vector<FootStepRecord> footStepRecords;
@@ -2592,7 +2593,7 @@ SBMotion* SBMotion::footSkateCleanUp( std::string name, std::vector<std::string>
 	for (unsigned int i=0;i<footStepRecords.size();i++)
 	{
 		FootStepRecord& record = footStepRecords[i];
-		LOG("Footstep joint = %s, start frame = %f, end frame = %f",record.jointNames[0].c_str(), record.startTime, record.endTime);
+		SmartBody::util::log("Footstep joint = %s, start frame = %f, end frame = %f",record.jointNames[0].c_str(), record.startTime, record.endTime);
 	}
 
 	SBMotion* cleanUpMotion = autoFootSkateCleanUp(name,tgtSkeletonName, tgtRootName, footStepRecords);
@@ -2760,7 +2761,7 @@ bool SBMotion::autoFootStepDetection( std::vector<double>& outMeans, int numStep
 
 			// print info
 			if (isPrintDebugInfo)
-				LOG("motion %s at time %f-> speed is %f, height is %f, joint is %s", getName().c_str(), f * getFrameRate(), speed, gPos.y, jointName.c_str());
+				SmartBody::util::log("motion %s at time %f-> speed is %f, height is %f, joint is %s", getName().c_str(), f * getFrameRate(), speed, gPos.y, jointName.c_str());
 
 			// filter for height
 			if (gPos.y < floorHeight || gPos.y > (floorHeight + floorThreshold))
@@ -2817,7 +2818,7 @@ bool SBMotion::autoFootStepDetection( std::vector<double>& outMeans, int numStep
 		ss << "[" << motion->getName() << "]detected ";
 		for (size_t i = 0; i < outMeans.size(); i++)
 			ss << outMeans[i] << " ";
-		LOG("%s", ss.str().c_str());
+		SmartBody::util::log("%s", ss.str().c_str());
 		finalMessage << ss.str() << "\n";
 		currentState->keys[motionIndex].clear();
 		if (footStepEditor->isProcessAll)
@@ -2842,7 +2843,7 @@ bool SBMotion::autoFootStepDetection( std::vector<double>& outMeans, int numStep
 			currentState->keys[motionIndex].push_back(step * i);
 			ss << step * i << " ";
 		}
-		LOG("%s", ss.str().c_str());
+		SmartBody::util::log("%s", ss.str().c_str());
 		finalMessage << ss.str() << "\n";
 	}
 	*/
@@ -2878,7 +2879,7 @@ bool SBMotion::removeMetaData( const std::string& tagName )
 	}
 	else
 	{
-		LOG("Tag %s not found !", tagName.c_str());
+		SmartBody::util::log("Tag %s not found !", tagName.c_str());
 	}
 	return false;
 }
@@ -2904,7 +2905,7 @@ std::string SBMotion::getMetaDataString( const std::string& tagName )
 	}
 	else
 	{
-		LOG("Tag %s not found !", tagName.c_str());
+		SmartBody::util::log("Tag %s not found !", tagName.c_str());
 	}
 	return strValue;
 }
@@ -2937,13 +2938,13 @@ SBAPI void SBMotion::buildJointTrajectory( const std::string& effectorName, cons
 	SBSkeleton* motionSkel = SBScene::getScene()->getSkeleton(getMotionSkeletonName());
 	if (!motionSkel)
 	{
-		LOG("Motion skeleton doesn't exist. Cannot compute effector trajectory");
+		SmartBody::util::log("Motion skeleton doesn't exist. Cannot compute effector trajectory");
 		return;
 	}
 	SBSkeleton* skelCopy = new SmartBody::SBSkeleton(motionSkel);
 	if (!skelCopy->getJointByName(effectorName) || !skelCopy->getJointByName(refJointName))
 	{
-		LOG("Effector joint '%s' or reference joint '%s' does not exist.", effectorName.c_str(), refJointName.c_str());
+		SmartBody::util::log("Effector joint '%s' or reference joint '%s' does not exist.", effectorName.c_str(), refJointName.c_str());
 	}
 	JointTrajectory* traj = new JointTrajectory();
 	traj->effectorName = effectorName;
@@ -3028,7 +3029,7 @@ void SBMotion::setEmptyMotion(float duration, int numFrames)
 {
 	if (duration <= 0.0 || numFrames <= 0)
 	{
-		LOG("Duration for motion %s should be > 0 and frames > 0", this->getName().c_str());
+		SmartBody::util::log("Duration for motion %s should be > 0 and frames > 0", this->getName().c_str());
 		return;
 	}
 
@@ -3382,7 +3383,7 @@ SBAPI void SBMotion::saveToBVH( const std::string& fileName, const std::string& 
 	SmartBody::SBSkeleton* skel = SmartBody::SBScene::getScene()->getSkeleton(skelName);
 	if (!skel) 
 	{
-		LOG("Error : skeleton '%s' does not exist.", skelName.c_str());
+		SmartBody::util::log("Error : skeleton '%s' does not exist.", skelName.c_str());
 	}
 	
 	FILE* fp = fopen(fileName.c_str(),"wt");
@@ -3396,7 +3397,7 @@ SBAPI void SBMotion::saveToBVH( const std::string& fileName, const std::string& 
 	fprintf(fp,"MOTION\n");
 	fprintf(fp,"Frames: %d\n",this->getNumFrames());
 	fprintf(fp,"Frame Time: %f\n",this->getFrameRate());
-	//LOG("Joint idxs size = %d", jointIdxs.size());
+	//SmartBody::util::log("Joint idxs size = %d", jointIdxs.size());
 	
 	for (int i=0;i<getNumFrames();i++)
 	{
@@ -3430,7 +3431,7 @@ SBAPI void SBMotion::saveToBVH( const std::string& fileName, const std::string& 
 			sr_euler_angles_yxz( rotMat, ex, ey, ez );
 // 			if (i == 0)
 // 			{
-// 				LOG("Joint name = %s, euler angle = %f %f %f", joint->getMappedJointName().c_str(), ex*57.295779513082323, ey*57.295779513082323, ez*57.295779513082323);
+// 				SmartBody::util::log("Joint name = %s, euler angle = %f %f %f", joint->getMappedJointName().c_str(), ex*57.295779513082323, ey*57.295779513082323, ez*57.295779513082323);
 // 			}
 			fprintf(fp," %f %f %f %f %f %f",pos[0],pos[1],pos[2], ez*57.295779513082323, ex*57.295779513082323, ey*57.295779513082323);
 		}
@@ -3476,7 +3477,7 @@ bool SBMotion::speed(float factor)
 {
 	if (factor <= 0.0)
 	{
-		LOG("Cannot speed up motion '%s'to a factor of %f, ignoring...", this->getName().c_str(), factor);
+		SmartBody::util::log("Cannot speed up motion '%s'to a factor of %f, ignoring...", this->getName().c_str(), factor);
 		return false;
 	}
 
@@ -3561,7 +3562,7 @@ SBMotion* SBMotion::buildPoststrokeHoldMotion(float holdTime, std::vector<std::s
 	// handle the base joints
 	if (strokeEndFrameId == 0)
 	{
-		LOG("SkMotion::buildPoststrokeHoldMotion ERR: please check if the stroke end time is set correctly!");
+		SmartBody::util::log("SkMotion::buildPoststrokeHoldMotion ERR: please check if the stroke end time is set correctly!");
 		return newMotion;
 	}
 

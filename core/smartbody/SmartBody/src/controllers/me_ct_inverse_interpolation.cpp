@@ -57,7 +57,7 @@ void InverseInterpolation::predictInterpWeights( const dVector& para, VecOfInter
 	vector<float> KNNDists, KNNWeights;
 	VecOfInterpWeight tempWeight;
 
-	//LOG("numKNN = %d",numKNN);
+	//SmartBody::util::log("numKNN = %d",numKNN);
 	// calculate the initial weights
 	kdTreeKNN(kdTree,para,numKNN,tempWeight);
 	pairToVec(tempWeight,KNNIdx,KNNDists);

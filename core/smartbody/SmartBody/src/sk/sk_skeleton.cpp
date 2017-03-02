@@ -1,28 +1,24 @@
-/*
-*  sk_skeleton.cpp - part of Motion Engine and SmartBody-lib
-*  Copyright (C) 2008  University of Southern California
-*
-*  SmartBody-lib is free software: you can redistribute it and/or
-*  modify it under the terms of the Lesser GNU General Public License
-*  as published by the Free Software Foundation, version 3 of the
-*  license.
-*
-*  SmartBody-lib is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  Lesser GNU General Public License for more details.
-*
-*  You should have received a copy of the Lesser GNU General Public
-*  License along with SmartBody-lib.  If not, see:
-*      http://www.gnu.org/licenses/lgpl-3.0.txt
-*
-*  CONTRIBUTORS:
-*      Marcelo Kallmann, USC (currently UC Merced)
-*      Andrew n marshall, USC
-*      Marcus Thiebaux, USC
-*/
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
-#include <vhcl.h>
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
+
 # include <sr/sr_model.h>
 
 # include <sk/sk_skeleton.h>
@@ -32,6 +28,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBJointMapManager.h>
 #include <sb/SBJointMap.h>
+#include <sb/SBUtilities.h>
 
 //============================ SkSkeleton ============================
 
@@ -93,9 +90,9 @@ SkSkeleton::SkSkeleton (SkSkeleton* origSkel)  : SmartBody::SBAsset()
 
 SkSkeleton::~SkSkeleton ()
 {
-	//LOG("delete skeleton %s",getName().c_str());
+	//SmartBody::util::log("delete skeleton %s",getName().c_str());
 	init ();
-	//LOG("channel ref count = %d",_channels->getref());
+	//SmartBody::util::log("channel ref count = %d",_channels->getref());
 	_channels->unref();
 }
 
@@ -103,7 +100,7 @@ void SkSkeleton::copy(SkSkeleton* origSkel)
 {
 	if (!origSkel->root())
 	{
-		LOG("Original skeleton has no root joint, cannot be copied.");
+		SmartBody::util::log("Original skeleton has no root joint, cannot be copied.");
 		return;
 	}
 	setName(origSkel->getName());
@@ -515,7 +512,7 @@ void SkSkeleton::updateJointMap()
 		}
 		std::map<std::string, SkJoint*>::iterator iter = _jointMap.find(jname);
 		//if (iter != _jointMap.end())
-		//	LOG("Found duplicate joint name %s", jname.c_str());
+		//	SmartBody::util::log("Found duplicate joint name %s", jname.c_str());
 		_jointMap.insert(std::pair<std::string, SkJoint*>(jname, _joints[i]));
 
 	}

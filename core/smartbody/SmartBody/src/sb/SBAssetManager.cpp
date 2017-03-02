@@ -236,7 +236,7 @@ std::vector<std::string> SBAssetManager::getAssetPaths(const std::string& type)
 	}
 	else
 	{
-		LOG("Unknown path type: %s", type.c_str());
+		SmartBody::util::log("Unknown path type: %s", type.c_str());
 		return list;
 	}
 	
@@ -273,7 +273,7 @@ std::vector<std::string> SBAssetManager::getLocalAssetPaths(const std::string& t
 	}
 	else
 	{
-		LOG("Unknown path type: %s", type.c_str());
+		SmartBody::util::log("Unknown path type: %s", type.c_str());
 		return list;
 	}
 	
@@ -307,7 +307,7 @@ void SBAssetManager::addAssetPath(const std::string& type, const std::string& pa
 	}
 	else
 	{
-		LOG("Input type %s not recognized!", type.c_str());
+		SmartBody::util::log("Input type %s not recognized!", type.c_str());
 		return;
 	}
 }
@@ -328,7 +328,7 @@ void SBAssetManager::removeAssetPath(const std::string& type, const std::string&
 	}
 	else
 	{
-		LOG("Input type %s not recognized!", type.c_str());
+		SmartBody::util::log("Input type %s not recognized!", type.c_str());
 		return;
 	}
 }
@@ -353,7 +353,7 @@ void SBAssetManager::removeAllAssetPaths(const std::string& type)
 	}
 	else
 	{
-		LOG("Input type %s not recognized!", type.c_str());
+		SmartBody::util::log("Input type %s not recognized!", type.c_str());
 		return;
 	}
 }
@@ -397,7 +397,7 @@ std::string SBAssetManager::findAssetFromLocation(const std::string& filepath, c
 					path = finalPath;
 				else
 				{
-					LOG("Could not load assets from %s, does not exist", finalPath.string().c_str());
+					SmartBody::util::log("Could not load assets from %s, does not exist", finalPath.string().c_str());
 					return "";
 				}
 			}
@@ -470,7 +470,7 @@ void SBAssetManager::loadAssets()
 
 std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 {
-	//LOG("Loading asset [%s]", assetPath.c_str());
+	//SmartBody::util::log("Loading asset [%s]", assetPath.c_str());
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	const std::string& mediaPath = scene->getMediaPath();
 	boost::filesystem::path p( mediaPath );
@@ -509,19 +509,19 @@ std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 
 	std::vector<SBAsset*> allAssets;
 	
-	//LOG("Asset loading from final path = %s", finalPath.c_str());
+	//SmartBody::util::log("Asset loading from final path = %s", finalPath.c_str());
 
 	// make sure the file exists and is readable
 	std::ifstream file(finalPath.c_str());
 	if (!file.good())
 	{
-		LOG("File %s cannot be read, asset will not be loaded.", finalPath.c_str());
+		SmartBody::util::log("File %s cannot be read, asset will not be loaded.", finalPath.c_str());
 		return allAssets;
 	}
 
 	if (boost::filesystem::is_directory(p))
 	{
-		LOG("%s is a directory, cannot load asset.", finalPath.c_str());
+		SmartBody::util::log("%s is a directory, cannot load asset.", finalPath.c_str());
 		return allAssets;
 	}
 
@@ -561,7 +561,7 @@ std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 			if (existingMotion)
 			{
 				std::string name = this->getAssetNameVariation(existingMotion);
-				LOG("Motion named %s already exist, changing name to %s", motion->getName().c_str(), name.c_str());
+				SmartBody::util::log("Motion named %s already exist, changing name to %s", motion->getName().c_str(), name.c_str());
 				motion->setName(name);
 			}
 			this->addMotion(motion);
@@ -575,7 +575,7 @@ std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 			if (existingSkeleton)
 			{
 				std::string name = this->getAssetNameVariation(existingSkeleton);
-				LOG("Skeleton named %s already exist, changing name to %s", skeleton->getName().c_str(), name.c_str());
+				SmartBody::util::log("Skeleton named %s already exist, changing name to %s", skeleton->getName().c_str(), name.c_str());
 				skeleton->setName(name);
 			}
 			this->addSkeleton(skeleton);
@@ -590,7 +590,7 @@ std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 			if (existingMesh)
 			{
 				std::string name = this->getAssetNameVariation(existingMesh);
-				LOG("Mesh named %s already exist, changing name to %s", existingMesh->getName().c_str(), name.c_str());
+				SmartBody::util::log("Mesh named %s already exist, changing name to %s", existingMesh->getName().c_str(), name.c_str());
 				existingMesh->setName(name);
 			}
 			this->addMesh(mesh);
@@ -604,7 +604,7 @@ std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 			continue;
 		}
 
-		LOG("Unknown asset type for file %s", assetPath.c_str());		
+		SmartBody::util::log("Unknown asset type for file %s", assetPath.c_str());		
 	}
 
 	return allAssets;
@@ -612,7 +612,7 @@ std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 
 void SBAssetManager::loadAssetsFromPath(const std::string& assetPath)
 {
-	LOG("Loading [%s]", assetPath.c_str());
+	SmartBody::util::log("Loading [%s]", assetPath.c_str());
 
 	boost::filesystem::path path(assetPath);
 
@@ -638,7 +638,7 @@ void SBAssetManager::loadAssetsFromPath(const std::string& assetPath)
 					path = finalPath;
 				else
 				{
-					LOG("Could not load assets from %s, does not exist", finalPath.string().c_str());
+					SmartBody::util::log("Could not load assets from %s, does not exist", finalPath.string().c_str());
 					return;
 				}
 			}
@@ -699,7 +699,7 @@ SBSkeleton* SBAssetManager::addSkeletonDefinition(const std::string& skelName )
 	SBSkeleton* existingSkeleton = this->getSkeleton(skelName);
 	if (existingSkeleton)
 	{
-		LOG("Skeleton named %s already exists, new skeleton will not be created.", skelName.c_str());
+		SmartBody::util::log("Skeleton named %s already exists, new skeleton will not be created.", skelName.c_str());
 		return NULL;
 	}
 	SBSkeleton* sbSkel = new SBSkeleton();	
@@ -721,7 +721,7 @@ void SBAssetManager::removeSkeletonDefinition(const std::string& skelName )
 	std::map<std::string, SBSkeleton*>::iterator iter = _skeletons.find(skelName);
 	if (iter == _skeletons.end())
 	{
-		LOG("Skeleton named %s does not exist.", skelName.c_str());
+		SmartBody::util::log("Skeleton named %s does not exist.", skelName.c_str());
 		return;
 	}
 
@@ -747,7 +747,7 @@ SBMotion* SBAssetManager::createMotion(const std::string& motionName)
 	std::map<std::string, SBMotion*>::iterator iter = _motions.find(motionName);
 	if (iter != _motions.end())
 	{
-		LOG("Motion named %s already exists, new motion will not be created.", motionName.c_str());
+		SmartBody::util::log("Motion named %s already exists, new motion will not be created.", motionName.c_str());
 		return NULL;
 	}
 
@@ -769,7 +769,7 @@ SBAPI bool SBAssetManager::addMotion(SmartBody::SBMotion* motion)
 	std::map<std::string, SBMotion*>::iterator iter = _motions.find(motion->getName());
 	if (iter != _motions.end())
 	{
-		LOG("Motion named %s already exists, new motion will not be added.", motion->getName().c_str());
+		SmartBody::util::log("Motion named %s already exists, new motion will not be added.", motion->getName().c_str());
 		return false;
 	}
 	_motions[motion->getName()] = motion;
@@ -786,7 +786,7 @@ SBMotion* SBAssetManager::addMotionDefinition(const std::string& name, double du
 	std::map<std::string, SBMotion*>::iterator iter = _motions.find(name);
 	if (iter != _motions.end())
 	{
-		LOG("Motion named %s already exists, new motion will not be added.", name.c_str());
+		SmartBody::util::log("Motion named %s already exists, new motion will not be added.", name.c_str());
 		return NULL;
 	}
 
@@ -832,7 +832,7 @@ SBAPI void SBAssetManager::addMesh(DeformableMesh* mesh)
 	std::map<std::string, DeformableMesh*>::iterator iter = _deformableMeshMap.find(mesh->getName());
 	if (iter != _deformableMeshMap.end())
 	{
-		LOG("Mesh named %s already exists, new mesh will not be added.", mesh->getName().c_str());
+		SmartBody::util::log("Mesh named %s already exists, new mesh will not be added.", mesh->getName().c_str());
 		return;
 	}
 	_deformableMeshMap.insert(std::pair<std::string, DeformableMesh*>(mesh->getName(), mesh));
@@ -980,7 +980,7 @@ int SBAssetManager::load_me_motions( const char* pathname, bool recurse_dirs, do
 #endif
 		return load_me_motions_impl( finalPathStr, recurse_dirs, scale, "ERROR: " );
 	} else {
-		LOG("ERROR: Invalid motion path \"%s\".", finalPath.string().c_str());
+		SmartBody::util::log("ERROR: Invalid motion path \"%s\".", finalPath.string().c_str());
 		return CMD_FAILURE;
 	}
 }
@@ -993,9 +993,9 @@ int SBAssetManager::load_me_motions_impl( const std::string& pathStr, bool recur
 	if( !boost::filesystem::exists( pathname ) )
 	{
 #if (BOOST_VERSION > 104400)
-		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.string().c_str());
+		SmartBody::util::log("%s Motion path \"%s\" not found.", error_prefix,  pathname.string().c_str());
 #else
-		LOG("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
+		SmartBody::util::log("%s Motion path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
 #endif
 		return CMD_FAILURE;
 	}
@@ -1013,7 +1013,7 @@ int SBAssetManager::load_me_motions_impl( const std::string& pathStr, bool recur
 			// ignore hidden directories
 			return CMD_SUCCESS;
 		}
-		LOG("Attempting to load motions from path '%s'...", pathname.string().c_str());	
+		SmartBody::util::log("Attempting to load motions from path '%s'...", pathname.string().c_str());	
 	
 
 		boost::filesystem::directory_iterator end;
@@ -1047,7 +1047,7 @@ int SBAssetManager::load_me_motions_impl( const std::string& pathStr, bool recur
 					load_me_motions_impl( curStr, false, scale, "WARNING: " );
 				} 
 				else if( DEBUG_LOAD_PATHS2 ) {
-					LOG("DEBUG: load_me_motion_impl(): Skipping \"%s\".  Extension \"%s\" does not match MOTION_EXT.", cur.string().c_str(), ext.c_str() );
+					SmartBody::util::log("DEBUG: load_me_motion_impl(): Skipping \"%s\".  Extension \"%s\" does not match MOTION_EXT.", cur.string().c_str(), ext.c_str() );
 				}
 			}
 		}
@@ -1145,7 +1145,7 @@ int SBAssetManager::load_me_motions_impl( const std::string& pathStr, bool recur
 		else if (ext == ".fbx" || ext == ".FBX")
 		{
 			SkSkeleton skeleton;
-			LOG("FBX motion parse: %s", convertedPath.c_str());
+			SmartBody::util::log("FBX motion parse: %s", convertedPath.c_str());
 			parseSuccessful = ParserFBX::parse(skeleton, *motion, pathname.string(), float(scale));	
 			if (parseSuccessful)
 				motions.push_back(motion);
@@ -1179,15 +1179,15 @@ int SBAssetManager::load_me_motions_impl( const std::string& pathStr, bool recur
 #endif
 
 				//filename = mcn_return_full_filename_func( CurrentPath, finalPath.string().c_str() );
-				//LOG("motion filename = %s, pathname string = %s, pathname nativestring = %s",filename.c_str(), pathname.string().c_str(), pathname.native_file_string().c_str());
+				//SmartBody::util::log("motion filename = %s, pathname string = %s, pathname nativestring = %s",filename.c_str(), pathname.string().c_str(), pathname.native_file_string().c_str());
 				std::string filebase = boost::filesystem::basename( pathname );
 				const char* name = motion->getName().c_str();
 				if( name && _stricmp( filebase.c_str(), name ) )
 				{
 #if (BOOST_VERSION > 104400)
-					LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.string().c_str(), filebase.c_str());
+					SmartBody::util::log("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.string().c_str(), filebase.c_str());
 #else
-					LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.native_file_string().c_str(), filebase.c_str());
+					SmartBody::util::log("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, pathname.native_file_string().c_str(), filebase.c_str());
 #endif
 					//motion->setName( filebase.c_str() );
 				}
@@ -1196,13 +1196,13 @@ int SBAssetManager::load_me_motions_impl( const std::string& pathStr, bool recur
 				SBMotion* existingMotion = getMotion(filebase);
 				if (existingMotion)
 				{
-	//				LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
+	//				SmartBody::util::log("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
 #else
 				motion->filename( pathname.native_file_string().c_str() );				
 				SBMotion* existingMotion = getMotion(filebase);
 				if (existingMotion)
 				{
-					LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					SmartBody::util::log("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 #endif
 
 					delete motion;
@@ -1231,11 +1231,11 @@ int SBAssetManager::load_me_motion_individual( SrInput & input, const std::strin
 	std::string filename = motionName;
 
 	std::string filebase = boost::filesystem::basename( motionName );
-	//LOG("loadMotionIndividual, filename = %s, filebase = %s",filename.c_str(), filebase.c_str());
+	//SmartBody::util::log("loadMotionIndividual, filename = %s, filebase = %s",filename.c_str(), filebase.c_str());
 	const char* name = motion->getName().c_str();
 	if( name && _stricmp( filebase.c_str(), name ) )
 	{
-		LOG("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, motionName.c_str(), filebase.c_str());
+		SmartBody::util::log("WARNING: Motion name \"%s\" does not equal base of filename '%s'. Using '%s' in posture map.", name, motionName.c_str(), filebase.c_str());
 		motion->setName( filebase.c_str() );
 	}
 
@@ -1244,7 +1244,7 @@ int SBAssetManager::load_me_motion_individual( SrInput & input, const std::strin
 	std::map<std::string, SBMotion*>::iterator motionIter = map.find(filebase);
 	if (motionIter != map.end()) 
 	{
-		LOG("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), motionName.c_str());
+		SmartBody::util::log("ERROR: Motion by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), motionName.c_str());
 		delete motion;
 		return CMD_FAILURE;
 	}
@@ -1325,12 +1325,12 @@ SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srP
 		}
 	}
 	if( fp == NULL )	{
-		LOG("ERROR: load_skeleton(..): Skeleton file \"%s\" not found.", skel_file);
+		SmartBody::util::log("ERROR: load_skeleton(..): Skeleton file \"%s\" not found.", skel_file);
 		return NULL;
 	}
 	SrInput input( fp );
 	if( !input.valid() ) {
-		LOG("ERROR: load_skeleton(..): Unable to access skeleton file \"%s\".", skel_file);
+		SmartBody::util::log("ERROR: load_skeleton(..): Unable to access skeleton file \"%s\".", skel_file);
 		return NULL;
 	}
 
@@ -1387,7 +1387,7 @@ SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srP
 	{
 		fclose(fp);
 		SkMotion motion;
-		//LOG("FBX parse load skeleton: %s", filename.c_str());
+		//SmartBody::util::log("FBX parse load skeleton: %s", filename.c_str());
 		ParserFBX::parse(*skeleton_p, motion, filename, float(scale));
 		skeleton_p->skfilename(filename.c_str());
 		skeleton_p->name(skel_file);
@@ -1401,7 +1401,7 @@ SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srP
 		input.filename(filename.c_str());
 		if( !skeleton_p->loadSk( input, scale ) )	{ 
 #endif
-			LOG("ERROR: load_skeleton(..): Unable to load skeleton file \"%s\".", skel_file);
+			SmartBody::util::log("ERROR: load_skeleton(..): Unable to load skeleton file \"%s\".", skel_file);
 			return NULL;
 		}
 		skeleton_p->skfilename(filename.c_str());
@@ -1425,7 +1425,7 @@ SmartBody::SBSkeleton* SBAssetManager::load_skeleton( const char *skel_file, srP
 		
 	}
 	else	{
-		LOG( "load_skeleton ERR: path '%s' does not exist\n", abs_p.string().c_str() );
+		SmartBody::util::log( "load_skeleton ERR: path '%s' does not exist\n", abs_p.string().c_str() );
 	}
 	// SUCCESS
 	return skeleton_p;
@@ -1439,9 +1439,9 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 	boost::filesystem::path pathname(pathStr);	
 	if( !exists( pathname ) ) {
 #if (BOOST_VERSION > 104400)
-		LOG("%s Skeleton path \"%s\" not found.", error_prefix,  pathname.string().c_str());
+		SmartBody::util::log("%s Skeleton path \"%s\" not found.", error_prefix,  pathname.string().c_str());
 #else
-		LOG("%s Skeleton path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
+		SmartBody::util::log("%s Skeleton path \"%s\" not found.", error_prefix,  pathname.native_file_string().c_str());
 #endif
 		return CMD_FAILURE;
 	}
@@ -1494,7 +1494,7 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 					load_me_skeletons_impl( curStr, map, recurse_dirs, scale, "WARNING: " );
 				} 
 				else if( DEBUG_LOAD_PATHS2 ) {
-					LOG("DEBUG: load_me_skeleton_impl(): Skipping \"%s\".  Extension \"%s\" does not match .sk.", cur.string().c_str(), ext.c_str() );
+					SmartBody::util::log("DEBUG: load_me_skeleton_impl(): Skipping \"%s\".  Extension \"%s\" does not match .sk.", cur.string().c_str(), ext.c_str() );
 				}
 			}
 		}
@@ -1516,7 +1516,7 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 				input.filename(pathname.string().c_str());
 				if( !skeleton->loadSk( input, scale ) )
 				{ 
-					LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+					SmartBody::util::log("Problem loading skeleton from file '%s'.", pathname.string().c_str());
 					input.close();
 					delete skeleton;
 					return CMD_FAILURE;
@@ -1546,9 +1546,9 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 				if (motionIter != map.end()) {
 #if (BOOST_VERSION > 104400)
 
-					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
+					SmartBody::util::log("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
 #else
-					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					SmartBody::util::log("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 #endif
 					delete skeleton;
 					return CMD_FAILURE;
@@ -1557,7 +1557,7 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 			}
 			else
 			{
-				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				SmartBody::util::log("Problem loading skeleton from file '%s'.", pathname.string().c_str());
 				return CMD_FAILURE;
 			}
 		}
@@ -1575,9 +1575,9 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
 #if (BOOST_VERSION > 104400)
-					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
+					SmartBody::util::log("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
 #else
-					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					SmartBody::util::log("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 #endif
 					delete skeleton;
 					return CMD_FAILURE;
@@ -1586,7 +1586,7 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 			}
 			else
 			{
-				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				SmartBody::util::log("Problem loading skeleton from file '%s'.", pathname.string().c_str());
 				return CMD_FAILURE;
 			}
 		}
@@ -1606,9 +1606,9 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
 #if (BOOST_VERSION > 104400)
-					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
+					SmartBody::util::log("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
 #else
-					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					SmartBody::util::log("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 #endif
 					delete skeleton;
 					return CMD_FAILURE;
@@ -1617,7 +1617,7 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 			}
 			else
 			{
-				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				SmartBody::util::log("Problem loading skeleton from file '%s'.", pathname.string().c_str());
 				return CMD_FAILURE;
 			}
 		}
@@ -1633,9 +1633,9 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 				std::map<std::string, SmartBody::SBSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
 #if (BOOST_VERSION > 104400)
-					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
+					SmartBody::util::log("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.string().c_str());
 #else
-					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					SmartBody::util::log("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 #endif
 					delete skeleton;
 					return CMD_FAILURE;
@@ -1644,7 +1644,7 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 			}
 			else
 			{
-				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				SmartBody::util::log("Problem loading skeleton from file '%s'.", pathname.string().c_str());
 				return CMD_FAILURE;
 			}
 		}
@@ -1655,13 +1655,13 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 			skeleton->skfilename(filebase.c_str());
 			skeleton->name(filebase.c_str());
 			SkMotion motion;
-			//LOG("FBX skeleton skeleton load: %s", pathname.string().c_str());
+			//SmartBody::util::log("FBX skeleton skeleton load: %s", pathname.string().c_str());
 			bool ok = ParserFBX::parse(*skeleton, motion, pathname.string(), float(scale));
 			if (ok)
 			{
 				std::map<std::string, SkSkeleton*>::iterator motionIter = map.find(filebase);
 				if (motionIter != map.end()) {
-					LOG("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
+					SmartBody::util::log("ERROR: Skeleton by name of \"%s\" already exists. Ignoring file '%s'.", filebase.c_str(), pathname.native_file_string().c_str());
 					delete skeleton;
 					return CMD_FAILURE;
 				}
@@ -1669,7 +1669,7 @@ int SBAssetManager::load_me_skeletons_impl( const std::string& pathStr, std::map
 			}
 			else
 			{
-				LOG("Problem loading skeleton from file '%s'.", pathname.string().c_str());
+				SmartBody::util::log("Problem loading skeleton from file '%s'.", pathname.string().c_str());
 				return CMD_FAILURE;
 			}
 		}
@@ -1697,7 +1697,7 @@ int SBAssetManager::load_me_skeleton_individual( SrInput & input, const std::str
 
 	if( !skeleton->loadSk( input, scale ) )
 	{ 
-		LOG("Problem loading skeleton from file ''.");
+		SmartBody::util::log("Problem loading skeleton from file ''.");
 		input.close();
 		delete skeleton;
 		return CMD_FAILURE;
@@ -1712,7 +1712,7 @@ int SBAssetManager::load_me_skeleton_individual( SrInput & input, const std::str
 		sbskel->setFileName(skeletonName);
 		map.insert(std::pair<std::string, SmartBody::SBSkeleton*>(skeleton->getName(), skeleton));
 	}
-	//LOG("skeleton %s, filename = %s, skfilename = %s",skeleton->getName().c_str(),skeleton->getFileName().c_str(), skeleton->skfilename().c_str());
+	//SmartBody::util::log("skeleton %s, filename = %s, skfilename = %s",skeleton->getName().c_str(),skeleton->getFileName().c_str(), skeleton->skfilename().c_str());
 
 	return CMD_SUCCESS;
 }
@@ -1745,7 +1745,7 @@ int SBAssetManager::load_me_skeletons( const char* pathname, std::map<std::strin
 #endif
 		return load_me_skeletons_impl( finalPathStr, map, recurse_dirs, scale, "ERROR: " );
 	} else {
-		LOG("ERROR: Invalid skeleton path \"%s\".", finalPath.string().c_str() );
+		SmartBody::util::log("ERROR: Invalid skeleton path \"%s\".", finalPath.string().c_str() );
 		return CMD_FAILURE;
 	}
 }
@@ -1770,7 +1770,7 @@ FILE* SBAssetManager::open_sequence_file( const char *seq_name, std::string& ful
 	seq_paths->reset();
 	std::string filename = seq_paths->next_filename( buffer, candidateSeqName.c_str() );
 	//filename = mcn_return_full_filename_func( CurrentPath, filename );
-	//LOG("seq name = %s, filename = %s\n",seq_name,filename.c_str());
+	//SmartBody::util::log("seq name = %s, filename = %s\n",seq_name,filename.c_str());
 	
 	while(filename.size() > 0)	{
 		file_p = fopen( filename.c_str(), "r" );
@@ -1824,7 +1824,7 @@ const std::string SBAssetManager::findFileName(const std::string& type, const st
 	}
 	else
 	{
-		LOG("findFileName(): type name needs to be 'script', 'motion', 'mesh' or 'audio'");
+		SmartBody::util::log("findFileName(): type name needs to be 'script', 'motion', 'mesh' or 'audio'");
 		return "";
 	}
 
@@ -2058,7 +2058,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	}
 	if (!neutralMesh)
 	{
-		LOG("Could not find neutral mesh in file %s.", neutralShapeFile.c_str());
+		SmartBody::util::log("Could not find neutral mesh in file %s.", neutralShapeFile.c_str());
 		ok = false;
 	}
 
@@ -2095,7 +2095,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	}
 	if (!neutralTexture)
 	{
-		LOG("Could not find neutral diffuse texture in file %s.", neutralShapeFile.c_str());
+		SmartBody::util::log("Could not find neutral diffuse texture in file %s.", neutralShapeFile.c_str());
 		ok = false;
 	}
 
@@ -2112,7 +2112,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	}
 	if (!expressiveMesh)
 	{
-		LOG("Could not find expressive mesh in file %s.", expressiveShapeFile.c_str());
+		SmartBody::util::log("Could not find expressive mesh in file %s.", expressiveShapeFile.c_str());
 		ok = false;
 	}
 
@@ -2149,7 +2149,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	}
 	if (!expressiveTexture)
 	{
-		LOG("Could not find expressive diffuse texture in file %s.", expressiveShapeFile.c_str());
+		SmartBody::util::log("Could not find expressive diffuse texture in file %s.", expressiveShapeFile.c_str());
 		ok = false;
 	}
 
@@ -2158,7 +2158,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	SbmTexture* maskedTexture = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE, maskTextureFile.c_str());
 	if (!maskedTexture)
 	{
-		LOG("Could not load masked texture file %s.", maskTextureFile.c_str());
+		SmartBody::util::log("Could not load masked texture file %s.", maskTextureFile.c_str());
 		ok = false;
 	}
 
@@ -2172,7 +2172,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 		numNMeshes = neutralMesh->dMeshStatic_p.size();
 	if (numEMeshes != numNMeshes)
 	{
-		LOG("Neutral mesh %s has different number of meshes as expresive mesh %s (%d vs %d).", neutralShapeFile.c_str(), expressiveShapeFile.c_str(), numNMeshes, numEMeshes);
+		SmartBody::util::log("Neutral mesh %s has different number of meshes as expresive mesh %s (%d vs %d).", neutralShapeFile.c_str(), expressiveShapeFile.c_str(), numNMeshes, numEMeshes);
 		ok = false;
 	}
 	
@@ -2194,7 +2194,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 	}
 	if (numEVertices != numNVertices)
 	{
-		LOG("Neutral mesh %s has different number of vertices as expresive mesh %s (%d vs %d).", neutralShapeFile.c_str(), expressiveShapeFile.c_str(), numNMeshes, numEMeshes);
+		SmartBody::util::log("Neutral mesh %s has different number of vertices as expresive mesh %s (%d vs %d).", neutralShapeFile.c_str(), expressiveShapeFile.c_str(), numNMeshes, numEMeshes);
 		ok = false;
 	}
 
@@ -2228,14 +2228,14 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 		eHeight != mHeight ||
 		nHeight != mHeight)
 	{
-		LOG("Texture heights don't match (%s: %d, %s: %d, %s: %d", neutralTextureFile.c_str(), nHeight, expressiveTextureFile.c_str(), eHeight, maskTextureFile.c_str(), mHeight);
+		SmartBody::util::log("Texture heights don't match (%s: %d, %s: %d, %s: %d", neutralTextureFile.c_str(), nHeight, expressiveTextureFile.c_str(), eHeight, maskTextureFile.c_str(), mHeight);
 		ok = false;
 	}
 	if (eWidth != nWidth || 
 		eWidth != mWidth ||
 		nWidth != mWidth)
 	{
-		LOG("Texture heights don't match (%s: %d, %s: %d, %s: %d", neutralTextureFile.c_str(), nWidth, expressiveTextureFile.c_str(), eWidth, maskTextureFile.c_str(), mWidth);
+		SmartBody::util::log("Texture heights don't match (%s: %d, %s: %d, %s: %d", neutralTextureFile.c_str(), nWidth, expressiveTextureFile.c_str(), eWidth, maskTextureFile.c_str(), mWidth);
 		ok = false;
 	}
 
@@ -2445,11 +2445,11 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 
 	if (ret == 0)
 	{
-		LOG("Could not save masked texture image to file %s.", outputTextureFile.c_str());
+		SmartBody::util::log("Could not save masked texture image to file %s.", outputTextureFile.c_str());
 	}
 	else
 	{
-		LOG("Successfully saved masked texture image to file %s.", outputTextureFile.c_str());
+		SmartBody::util::log("Successfully saved masked texture image to file %s.", outputTextureFile.c_str());
 	}
 
 	return true;

@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #endif
@@ -806,7 +806,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 		glUniform4f(specularLoc,color[0],color[1],color[2],color[3]);	
 		//printf("shineness = %d\n",mesh->material.shininess);
 		glUniform1f(shinenessLoc,mesh->material.shininess);
-		//LOG("mat color = %f %f %f\n",color[0],color[1],color[2]);
+		//SmartBody::util::log("mat color = %f %f %f\n",color[0],color[1],color[2]);
 		SbmTexture* tex = texManager.findTexture(SbmTextureManager::TEXTURE_DIFFUSE,mesh->texName.c_str());
 
 		if (mesh->material.useAlphaBlend)
@@ -839,7 +839,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 		SbmTexture* texNormal = texManager.findTexture(SbmTextureManager::TEXTURE_NORMALMAP,mesh->normalMapName.c_str());			
 		if (texNormal)
 		{
-			//LOG("use texture normal, id = %d", texNormal->getID());
+			//SmartBody::util::log("use texture normal, id = %d", texNormal->getID());
 			glActiveTexture(GL_TEXTURE2_ARB);
 			glBindTexture(GL_TEXTURE_2D,texNormal->getID());
 			glUniform1i(normal_sampler_location, 2);
@@ -853,7 +853,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 		SbmTexture* texSpecular = texManager.findTexture(SbmTextureManager::TEXTURE_SPECULARMAP,mesh->specularMapName.c_str());		
 		if (texSpecular)
 		{
-			//LOG("use texture specualr, id = %d",texSpecular->getID());
+			//SmartBody::util::log("use texture specualr, id = %d",texSpecular->getID());
 			glActiveTexture(GL_TEXTURE3_ARB);
 			glBindTexture(GL_TEXTURE_2D,texSpecular->getID());
 			glUniform1i(specular_sampler_location, 3);
@@ -866,7 +866,7 @@ void SbmDeformableMeshGPU::skinTransformGPU(DeformableMeshInstance* meshInstance
 		
 		if (texSpecular)
 		{
-			//LOG("use texture specualr, id = %d",texSpecular->getID());
+			//SmartBody::util::log("use texture specualr, id = %d",texSpecular->getID());
 			glActiveTexture(GL_TEXTURE3_ARB);
 			glBindTexture(GL_TEXTURE_2D, texSpecular->getID());
 			glUniform1i(specular_sampler_location, 3);

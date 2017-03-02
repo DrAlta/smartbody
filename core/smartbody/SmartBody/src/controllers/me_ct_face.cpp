@@ -22,7 +22,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 //#include "sbm_pawn.hpp"
 #include "sbm/gwiz_math.h"
 #include "controllers/me_ct_face.h"
-#include <vhcl_log.h>
 #include <sstream>
 #include <sbm/action_unit.hpp>
 #include <sb/sbm_pawn.hpp>
@@ -30,6 +29,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBScene.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sb/SBPawn.h>
+#include <sb/SBUtilities.h>
 //////////////////////////////////////////////////////////////////////////////////
 
 std::string MeCtFace::type_name = "Face";
@@ -163,22 +163,22 @@ void MeCtFace::remove_joint( const char *joint_name ) {
 			int size = mchan_arr.size();
 			for( int i = 0; i < size; i++ )	{
 				if( mchan_arr.mappedName( i ) == joint_name ) {
-//					LOG( "MeCtFace::remove_joint: exclude[ %d ]: '%s:%s'\n", 
+//					SmartBody::util::log( "MeCtFace::remove_joint: exclude[ %d ]: '%s:%s'\n", 
 //						i, mchan_arr.name( i ).get_string(), SkChannel::type_name( mchan_arr.type( i ) ) );
 					_include_chan_flag[ i ] = 0;
 					found = 1;
 				}
 			}
 			if( !found )	{
-				LOG( "MeCtFace::remove_joint Warning: joint '%s' NOT FOUND\n", joint_name );
+				SmartBody::util::log( "MeCtFace::remove_joint Warning: joint '%s' NOT FOUND\n", joint_name );
 			}
 		}
 		else	{
-			LOG( "MeCtFace::remove_joint ERR: _base_pose_p is NULL\n" );
+			SmartBody::util::log( "MeCtFace::remove_joint ERR: _base_pose_p is NULL\n" );
 		}
 	}
 	else	{
-		LOG( "MeCtFace::remove_joint ERR: joint_name is NULL\n" );
+		SmartBody::util::log( "MeCtFace::remove_joint ERR: joint_name is NULL\n" );
 	}
 }
 
@@ -191,22 +191,22 @@ void MeCtFace::remove_channel( const char *joint_name, SkChannel::Type ch_type )
 			int size = mchan_arr.size();
 			for( int i = 0; i < size; i++ )	{
 				if( ( mchan_arr.name( i ) == joint_name )&&( mchan_arr.type( i ) == ch_type ) ) {
-//					LOG( "MeCtFace::remove_channel: exclude[ %d ]: '%s:%s'\n", 
+//					SmartBody::util::log( "MeCtFace::remove_channel: exclude[ %d ]: '%s:%s'\n", 
 //						i, mchan_arr.name( i ).get_string(), SkChannel::type_name( mchan_arr.type( i ) ) );
 					_include_chan_flag[ i ] = 0;
 					found = 1;
 				}
 			}
 			if( !found )	{
-				LOG( "MeCtFace::remove_channel ERR: channel '%s:%s' NOT FOUND\n", joint_name, SkChannel::type_name( ch_type ) );
+				SmartBody::util::log( "MeCtFace::remove_channel ERR: channel '%s:%s' NOT FOUND\n", joint_name, SkChannel::type_name( ch_type ) );
 			}
 		}
 		else	{
-			LOG( "MeCtFace::remove_channel ERR: _base_pose_p is NULL\n" );
+			SmartBody::util::log( "MeCtFace::remove_channel ERR: _base_pose_p is NULL\n" );
 		}
 	}
 	else	{
-		LOG( "MeCtFace::remove_channel ERR: joint_name is NULL\n" );
+		SmartBody::util::log( "MeCtFace::remove_channel ERR: joint_name is NULL\n" );
 	}
 }
 
@@ -278,11 +278,11 @@ void MeCtFace::context_updated( void ) {
 	if( _context ) {
 		_skeleton_ref_p = _context->channels().skeleton(); // WHY HERE?
 		if( _skeleton_ref_p == NULL )	{
-			LOG( "MeCtFace::context_updated ERR: _skeleton_ref_p is NULL\n" );
+			SmartBody::util::log( "MeCtFace::context_updated ERR: _skeleton_ref_p is NULL\n" );
 		}
 	}
 	else	{
-		LOG( "MeCtFace::context_updated ERR: context is NULL\n" );
+		SmartBody::util::log( "MeCtFace::context_updated ERR: context is NULL\n" );
 	}
 #endif
 }
@@ -422,7 +422,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 				}
 				else
 				{
-					;//LOG("channel not found %s", visemeChannelName.c_str());
+					;//SmartBody::util::log("channel not found %s", visemeChannelName.c_str());
 				}
 			}
 		}		
@@ -481,7 +481,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 			if( fabs( key_weight ) > 0.01 )	{
 				float adjustedWeight = key_weight;
 			
-				//LOG( "Face: '%s': %f\n", key_pose_p->getName().c_str(), key_weight );
+				//SmartBody::util::log( "Face: '%s': %f\n", key_pose_p->getName().c_str(), key_weight );
 			
 				if (key_pose_p->frames() == 0)
 					continue;
@@ -493,7 +493,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 				std::map<std::string, std::vector<int> >::iterator iter = _visemeChannelMap.find(std::string(key_pose_p->getName()));
 				if (iter == _visemeChannelMap.end())
 				{
-					LOG("Viseme %s not found in channel-buffer map. Programmer needs to fix this! Might be lack of finish_adding function.", key_pose_p->getName().c_str());
+					SmartBody::util::log("Viseme %s not found in channel-buffer map. Programmer needs to fix this! Might be lack of finish_adding function.", key_pose_p->getName().c_str());
 					key_pose_p = _key_pose_map.next();
 					continue;
 				}
@@ -559,7 +559,7 @@ bool MeCtFace::controller_evaluate( double t, MeFrameData& frame ) {
 						}
 					}
 					else	{
-//						LOG( "exclude: %d\n", i );
+//						SmartBody::util::log( "exclude: %d\n", i );
 					}
 					pose_var_index += ch_size;
 				}

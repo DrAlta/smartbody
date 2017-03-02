@@ -20,7 +20,7 @@
  */
 
 //# include <stdlib.h>
-#include "vhcl.h"
+
 # include <sr/sr_sa.h>
 # include <sr/sr_sn_group.h>
 # include <sr/sr_sn_editor.h>
@@ -46,7 +46,7 @@ SrSa::~SrSa ()
 
 bool SrSa::apply ( SrSn* n, bool init )
  {  
-   //LOG("SrSs::apply");
+   //SmartBody::util::log("SrSs::apply");
    if ( init ) init_matrix ();
 	
    apply_begin ();
@@ -56,17 +56,17 @@ bool SrSa::apply ( SrSn* n, bool init )
 
    if ( t==SrSn::TypeMatrix )
     {
-      //LOG("TypeMatrix");
+      //SmartBody::util::log("TypeMatrix");
       result = matrix_apply ( (SrSnMatrix*) n );
     }
    else if ( t==SrSn::TypeGroup )
     {
-      //LOG("TypeGroup");
+      //SmartBody::util::log("TypeGroup");
       result = group_apply ( (SrSnGroup*) n );
     }
    else if ( t==SrSn::TypeShape )
     {
-      //LOG("TypeShape");
+      //SmartBody::util::log("TypeShape");
       result = shape_apply ( (SrSnShapeBase*) n );
     }
    else if ( t==SrSn::TypeEditor )
@@ -134,7 +134,7 @@ bool SrSa::group_apply ( SrSnGroup* g )
    if ( g->separator() ) push_matrix();
 
    s = g->size();
-   //LOG("group size = %d",s);
+   //SmartBody::util::log("group size = %d",s);
    for ( i=0; i<s; i++ )
     { b = apply ( g->get(i), false );
       if ( !b ) break;

@@ -1,27 +1,25 @@
-/*
- *  me_ct_gaze_alg.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcus Thiebaux, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #include "controllers/me_ct_gaze_alg.h"
-#include <vhcl_log.h>
+#include <sb/SBUtilities.h>
 
 using namespace gwiz;
 
@@ -56,7 +54,7 @@ quat_t rotation_ray_to_target_orient(
 )	{
 	
 	if( Fd.length() < FORWARD_RAY_EPSILON ) {
-		LOG( "rotation_ray_to_target_orient ERR: forward direction has no length\n" );
+		SmartBody::util::log( "rotation_ray_to_target_orient ERR: forward direction has no length\n" );
 		return( quat_t() );
 	}
 	
@@ -80,20 +78,20 @@ quat_t rotation_ray_to_target_point(
 	
 #if 0
 if( G_debug )	{
-LOG( "-- --\n" );
+SmartBody::util::log( "-- --\n" );
 
 X.print();
 R.print();
 Fo.print();
 Fd.print();
 
-LOG( "-- --\n" );
+SmartBody::util::log( "-- --\n" );
 }
 #endif
 
 	if( Fd.length() < FORWARD_RAY_EPSILON ) {
 		if( heading_only == false ) {
-			LOG( "rotation_ray_to_target_point ERR: forward direction has no length\n" );
+			SmartBody::util::log( "rotation_ray_to_target_point ERR: forward direction has no length\n" );
 		}
 		return( quat_t() );
 	}
@@ -187,7 +185,7 @@ LOG( "-- --\n" );
 	vector_t Aaxis = RT.cross( RX );
 
 	if( gamma > 180.0 )	{
-//LOG( "flip gamma\n" );
+//SmartBody::util::log( "flip gamma\n" );
 		gamma = 360.0 - gamma;
 		Aaxis = -Aaxis; // axis of shortest rotation
 	}
@@ -241,14 +239,14 @@ LOG( "-- --\n" );
 
 #if 0
 if( G_debug )	{
-LOG( "--\n" );
+SmartBody::util::log( "--\n" );
 
-LOG( "alpha: %f\n", alpha );
+SmartBody::util::log( "alpha: %f\n", alpha );
 euler_t( Qalpha ).print();
-LOG( "beta:  %f\n", beta );
+SmartBody::util::log( "beta:  %f\n", beta );
 euler_t( RT ).print();
 
-LOG( "--\n" );
+SmartBody::util::log( "--\n" );
 }
 #endif
 
@@ -293,25 +291,25 @@ void test_forward_ray( void )	{
 	vector_t Fd( 5.0, -10.0, 1.0 );
 #endif
 
-	LOG( "--- FORWARD RAY TEST:\n" );
+	SmartBody::util::log( "--- FORWARD RAY TEST:\n" );
 	quat_t Q = rotation_ray_to_target_point( X, R, Fo, Fd, 0.0 );
 
-	LOG( "ROTATION:\n" );
+	SmartBody::util::log( "ROTATION:\n" );
 	euler_t E = Q;
 	E.print();
 
-	LOG( "NEW FORWARD DIR:\n" );
+	SmartBody::util::log( "NEW FORWARD DIR:\n" );
 	vector_t newFd = Q * Fd;
 	newFd.normal().print();
 
-	LOG( "FORWARD ORIGIN TO TARGET:\n" );
+	SmartBody::util::log( "FORWARD ORIGIN TO TARGET:\n" );
 	vector_t Td = X - ( R + Q * ( Fo - R ) );
 	Td.normal().print();
 
-	LOG( "DIFF:\n" );
+	SmartBody::util::log( "DIFF:\n" );
 	( Td.normal() - newFd.normal() ).print();
 	
-	LOG( "DIFF HEADING-ONLY:\n" );
+	SmartBody::util::log( "DIFF HEADING-ONLY:\n" );
 	( vector_t( Td.x(), 0.0, Td.z() ).normal() - vector_t( newFd.x(), 0.0, newFd.z() ).normal() ).print();
-	LOG( "---\n" );
+	SmartBody::util::log( "---\n" );
 }

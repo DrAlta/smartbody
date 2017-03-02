@@ -21,7 +21,7 @@
  *      Ed Fast, USC
  */
 
-#include "vhcl.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -65,7 +65,7 @@ static void buildReachCtExamples(MeCtDataDrivenReach* reachCt)
 			std::stringstream strstr;
 			strstr << "Motion Name = "<<motionNames[i]<<", motion does not exist.";
 			std::string str = strstr.str();
-			LOG(str.c_str());
+			SmartBody::util::log(str.c_str());
 		}
 		else
 		{
@@ -117,7 +117,7 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 
 		if (!reachCt)
 		{
-			LOG("Handle : %s, controller not found.",handle.c_str());
+			SmartBody::util::log("Handle : %s, controller not found.",handle.c_str());
 		}
 	}
 	
@@ -126,7 +126,7 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 	if( !reachCt && (!attrTarget || !XMLString::stringLen( attrTarget ) ) ) {		
         wstrstr << "WARNING: BML::parse_bml_reach(): <"<<tag<<"> BML tag missing "<<BMLDefs::ATTR_TARGET<<"= attribute.";
 		std::string str = convertWStringToString(wstrstr.str());
-		LOG(str.c_str());
+		SmartBody::util::log(str.c_str());
 		return BehaviorRequestPtr();  // a.k.a., NULL
     }
 
@@ -189,12 +189,12 @@ BehaviorRequestPtr BML::parse_bml_reach( DOMElement* elem, const std::string& un
 	{
 		if( XMLString::compareIString( attrUseExample, L"true" )==0 ) 
 		{			
-			LOG("Use Example = 'true'");
+			SmartBody::util::log("Use Example = 'true'");
 			reachCt->useDataDriven = true;
 		}
 		else if( XMLString::compareIString( attrUseExample, L"false" )==0 )
 		{			
-			LOG("Use Example = 'false'");
+			SmartBody::util::log("Use Example = 'false'");
 			reachCt->useDataDriven = false;
 		}
 	}	

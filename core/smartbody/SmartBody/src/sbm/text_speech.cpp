@@ -36,6 +36,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBBoneBusManager.h>
 #include <sb/SBSpeechManager.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBUtilities.h>
 #include "sbm/BMLDefs.h"
 
 
@@ -180,7 +181,7 @@ std::vector<VisemeData*>* text_speech::extractVisemes(DOMNode* node, vector<Vise
 
 				visemes->push_back(singleViseme);
 			} else {
-				LOG("ERROR: text_speech::extractVisemes(..): <viseme> without type= attribute found... Ignoring");
+				SmartBody::util::log("ERROR: text_speech::extractVisemes(..): <viseme> without type= attribute found... Ignoring");
 			}
 		}
 	}
@@ -267,7 +268,7 @@ float text_speech::getMarkTime( RequestId requestId, const XMLCh* markId ){
 		}
 	std::wstringstream wstrstr;
 	wstrstr << "ERROR: text_speech::getMarkTime("<<requestId<<",\""<<markId<<"\"): Mark Id Not Found" << endl; //if nothing is found print error message and return -1
-	LOG(convertWStringToString(wstrstr.str()).c_str());
+	SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 	return -1;
 }
 

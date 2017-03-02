@@ -43,7 +43,6 @@ that is distributed: */
 #define _ATTRIBUTEWINDOW_
 
 #include <FL/Fl_Scroll.H>
-#include "vhcl.h"
 #include "sb/SBObserver.h"
 #include "sb/SBAttribute.h"
 #include <map>

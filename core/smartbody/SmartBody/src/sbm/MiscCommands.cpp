@@ -38,6 +38,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBCommandManager.h>
 #include <sb/SBBmlProcessor.h>
 #include <sb/SBReach.h>
+#include <sb/SBUtilities.h>
 #include <sb/SBTypes.h>
 #include <bml/bml_processor.hpp>
 #include <controllers/me_ct_scheduler2.h>
@@ -74,7 +75,7 @@ int set_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args)
 			std::vector<SkJoint*>& joints = skeleton->get_joint_array();
 			for (size_t j = 0; j < joints.size(); j++)
 			{
-				LOG("%s : %f", joints[j]->jointName().c_str(), joints[j]->mass());
+				SmartBody::util::log("%s : %f", joints[j]->jointName().c_str(), joints[j]->mass());
 
 			}
 			return CMD_SUCCESS;
@@ -82,31 +83,31 @@ int set_attribute( SbmPawn* pawn, std::string& attribute, srArgBuffer& args)
 		std::string jointName = args.read_token();
 		if (jointName.length() == 0)
 		{
-			LOG("ERROR: SbmCharacter::set_cmd_func(..): Need joint name. Use: set char mass <joint> <amount>");
+			SmartBody::util::log("ERROR: SbmCharacter::set_cmd_func(..): Need joint name. Use: set char mass <joint> <amount>");
 			return CMD_FAILURE;
 		}
 		const SkJoint* joint = pawn->get_joint(jointName.c_str());
 		if (!joint)
 		{
-			LOG("ERROR: SbmCharacter::set_cmd_func(..): No joint found with name '%s'.", jointName.c_str());
+			SmartBody::util::log("ERROR: SbmCharacter::set_cmd_func(..): No joint found with name '%s'.", jointName.c_str());
 			return CMD_FAILURE;
 		}
 		float mass = args.read_float();
 		if (mass < 0)
 		{
-			LOG("ERROR: SbmCharacter::set_cmd_func(..): Mass must be > 0.");
+			SmartBody::util::log("ERROR: SbmCharacter::set_cmd_func(..): Mass must be > 0.");
 			return CMD_FAILURE;
 		}
 		// is there a function that returns an SkJoint* and not a const SkJoint*?
 		// That would make this next line of code unnecessary.
 		SkJoint* editableJoint = const_cast<SkJoint*>(joint);
 		editableJoint->mass(mass);
-		//LOG("Set joint '%s' on character '%s' to mass '%f'.", jointName.c_str(), pawn->name, mass);
+		//SmartBody::util::log("Set joint '%s' on character '%s' to mass '%f'.", jointName.c_str(), pawn->name, mass);
 		return CMD_SUCCESS;
 	} 	
 	else 
 	{
-		LOG("ERROR: SbmPawn::set_cmd_func(..): Unknown attribute \"%s\".", attribute.c_str() );
+		SmartBody::util::log("ERROR: SbmPawn::set_cmd_func(..): Unknown attribute \"%s\".", attribute.c_str() );
 		return CMD_FAILURE;
 	}
 }
@@ -115,7 +116,7 @@ int pawn_set_cmd_funcx( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 {
 	std::string pawn_id = args.read_token();
 	if( pawn_id.length()==0 ) {
-		LOG("ERROR: SbmPawn::set_cmd_func(..): Missing pawn id.");
+		SmartBody::util::log("ERROR: SbmPawn::set_cmd_func(..): Missing pawn id.");
 		return CMD_FAILURE;
 	}
 
@@ -123,13 +124,13 @@ int pawn_set_cmd_funcx( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 
 	SbmPawn* pawn =  SmartBody::SBScene::getScene()->getPawn( pawn_id );
 	if( pawn==NULL ) {
-		LOG("ERROR: SbmPawn::set_cmd_func(..): Unknown pawn id \"%s\".", pawn_id.c_str());
+		SmartBody::util::log("ERROR: SbmPawn::set_cmd_func(..): Unknown pawn id \"%s\".", pawn_id.c_str());
 		return CMD_FAILURE;
 	}
 
 	std::string attribute = args.read_token();
 	if( attribute.length()==0 ) {
-		LOG("ERROR: SbmPawn::set_cmd_func(..): Missing attribute \"%s\" to set.", attribute.c_str());
+		SmartBody::util::log("ERROR: SbmPawn::set_cmd_func(..): Missing attribute \"%s\" to set.", attribute.c_str());
 		return CMD_FAILURE;
 	}
 
@@ -150,11 +151,11 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 		character->set_voice_code( s );
 
 		// Give feedback if unsetting
-		LOG("Unset %s's voice.", character->getName().c_str());
+		SmartBody::util::log("Unset %s's voice.", character->getName().c_str());
 	} else if( _stricmp( impl_id, "remote" )==0 ) {
 		const char* voice_id = args.read_token();
 		if( strlen( voice_id )==0 ) {
-			LOG("ERROR: Expected remote voice id.");
+			SmartBody::util::log("ERROR: Expected remote voice id.");
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl(SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice() );
@@ -163,10 +164,10 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 	} else if( _stricmp( impl_id, "local" )==0 ) {
 		const char* voice_id = args.read_token();
 		if( strlen( voice_id )==0 ) {
-			LOG("ERROR: Expected local voice id.");
+			SmartBody::util::log("ERROR: Expected local voice id.");
 			return CMD_FAILURE;
 		}
-		LOG("set local voice");
+		SmartBody::util::log("set local voice");
 		character->set_speech_impl( SmartBody::SBScene::getScene()->getSpeechManager()->speech_localvoice() );
 		FestivalSpeechRelayLocal* relay = SmartBody::SBScene::getScene()->getSpeechManager()->festivalRelay();
 		relay->setVoice(voice_id);
@@ -175,7 +176,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 	} else if( _stricmp( impl_id, "audiofile" )==0 ) {
 		const char* voice_path = args.read_token();
 		if( strlen( voice_path )==0 ) {
-			LOG("ERROR: Expected audiofile voice path.");
+			SmartBody::util::log("ERROR: Expected audiofile voice path.");
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl( SmartBody::SBScene::getScene()->getSpeechManager()->speech_audiofile() );
@@ -185,7 +186,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 	} else if( _stricmp( impl_id, "text" )==0 ) {
 		const char* voice_path = args.read_token();
 		if( strlen( voice_path )==0 ) {
-			LOG("ERROR: Expected id.");
+			SmartBody::util::log("ERROR: Expected id.");
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl(SmartBody::SBScene::getScene()->getSpeechManager()->speech_text() );
@@ -193,7 +194,7 @@ int set_voice_cmd_func( SbmCharacter* character, srArgBuffer& args)
 		voice_path_str+=voice_path;
 		character->set_voice_code( voice_path_str );
 	} else {
-		LOG("ERROR: Unknown speech implementation \"%s\".", impl_id);
+		SmartBody::util::log("ERROR: Unknown speech implementation \"%s\".", impl_id);
 		return CMD_FAILURE;
 	}
 	return CMD_SUCCESS;
@@ -213,11 +214,11 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 		character->set_voice_code_backup( s );
 
 		// Give feedback if unsetting
-		LOG("Unset %s's voice.", character->getName().c_str());
+		SmartBody::util::log("Unset %s's voice.", character->getName().c_str());
 	} else if( _stricmp( impl_id, "remote" )==0 ) {
 		const char* voice_id = args.read_token();
 		if( strlen( voice_id )==0 ) {
-			LOG("ERROR: Expected remote voice id.");
+			SmartBody::util::log("ERROR: Expected remote voice id.");
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_rvoice() );
@@ -226,10 +227,10 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 	} else if( _stricmp( impl_id, "local" )==0 ) {
 		const char* voice_id = args.read_token();
 		if( strlen( voice_id )==0 ) {
-			LOG("ERROR: Expected local voice id.");
+			SmartBody::util::log("ERROR: Expected local voice id.");
 			return CMD_FAILURE;
 		}
-		LOG("set local voice");
+		SmartBody::util::log("set local voice");
 		character->set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_localvoice() );
 		FestivalSpeechRelayLocal* relay =SmartBody::SBScene::getScene()->getSpeechManager()->festivalRelay();
 		relay->setVoice(voice_id);
@@ -238,7 +239,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 	} else if( _stricmp( impl_id, "audiofile" )==0 ) {
 		const char* voice_path = args.read_token();
 		if( strlen( voice_path )==0 ) {
-			LOG("ERROR: Expected audiofile voice path.");
+			SmartBody::util::log("ERROR: Expected audiofile voice path.");
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_audiofile() );
@@ -248,7 +249,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 	} else if( _stricmp( impl_id, "text" )==0 ) {
 		const char* voice_path = args.read_token();
 		if( strlen( voice_path )==0 ) {
-			LOG("ERROR: Expected id.");
+			SmartBody::util::log("ERROR: Expected id.");
 			return CMD_FAILURE;
 		}
 		character->set_speech_impl_backup(SmartBody::SBScene::getScene()->getSpeechManager()->speech_text() );
@@ -256,7 +257,7 @@ int set_voicebackup_cmd_func( SbmCharacter* character, srArgBuffer& args)
 		voice_path_str+=voice_path;
 		character->set_voice_code_backup( voice_path_str );
 	} else {
-		LOG("ERROR: Unknown speech implementation \"%s\".", impl_id);
+		SmartBody::util::log("ERROR: Unknown speech implementation \"%s\".", impl_id);
 		return CMD_FAILURE;
 	}
 	return CMD_SUCCESS;
@@ -275,14 +276,14 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	std::string pawn_name = args.read_token();
 	if( pawn_name.length()==0 )
 	{
-		LOG("ERROR: Expected pawn name.");
+		SmartBody::util::log("ERROR: Expected pawn name.");
 		return CMD_FAILURE;
 	}
 
 	std::string pawn_cmd = args.read_token();
 	if( pawn_cmd.length()==0 )
 	{
-		LOG("ERROR: Expected pawn command.");
+		SmartBody::util::log("ERROR: Expected pawn command.");
 		return CMD_FAILURE;
 	}
 
@@ -291,7 +292,7 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 		// pawn <name> init [loc <x> <y> <z>] [geom <shape name>] [color <color hex>] [size <size>]
 		SbmPawn* pawn_p =  SmartBody::SBScene::getScene()->getPawn(pawn_name);
 		if( pawn_p != NULL ) {
-			LOG("ERROR: Pawn \"%s\" already exists.", pawn_name.c_str());
+			SmartBody::util::log("ERROR: Pawn \"%s\" already exists.", pawn_name.c_str());
 			return CMD_FAILURE;
 		}
 		// Options
@@ -337,7 +338,7 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 			} else {
 				std::stringstream strstr;
 				strstr << "WARNING: Unrecognized pawn init option \"" << option << "\"." << std::endl;
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 		}		
 
@@ -355,7 +356,7 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 		if( err != CMD_SUCCESS ) {
 			std::stringstream strstr;		
 			strstr << "ERROR: Unable to initialize SbmPawn \"" << pawn_name << "\".";
-			LOG(strstr.str().c_str());
+			SmartBody::util::log(strstr.str().c_str());
 			delete pawn_p;
 			skeleton->unref();
 			return err;
@@ -363,7 +364,7 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 
 		// setting up geometry and physics 
 		if( has_geom && !geom_str.empty() ) {
-			//LOG("WARNING: SbmPawn geometry not implemented.  Ignoring options.");			
+			//SmartBody::util::log("WARNING: SbmPawn geometry not implemented.  Ignoring options.");			
 			if (!size_str.empty())
 			{
 				float uniformSize = (float)atof(size_str.c_str());
@@ -449,7 +450,7 @@ int pawn_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 		}
 		else
 		{
-			LOG("No pawn named '%s' exists.", pawn_name.c_str());
+			SmartBody::util::log("No pawn named '%s' exists.", pawn_name.c_str());
 			return CMD_FAILURE;
 		}
 	}
@@ -461,47 +462,47 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 
 	std::string char_name = args.read_token();
 	if( char_name.length()==0 ) {
-		LOG( "HELP: char <> <command>" );
-		LOG( "  param" );
-		LOG( "  smoothbindmesh" );
-		LOG( "  smoothbindweight" );
-		LOG( "  mesh");
-		LOG( "  ctrl" );
-		LOG( "  inspect" );
-		LOG( "  channels" );
-		LOG( "  controllers" );
-		LOG( "  prune" );
-		LOG( "  viseme curveon|curveoff" );
-		LOG( "  viseme timedelay <timedelay>" );
-		LOG( "  viseme magnitude <amount>" );
-		LOG( "  viseme <viseme name> <weight> <ramp in>" );
-		LOG( "  viseme <viseme name> trap <weight> <dur> [<ramp-in> [<ramp-out>]]" );
-		LOG( "  viseme <viseme name> curve <number of keys> <curve information>" );
-		LOG( "  viseme curve" );
-		LOG( "  viseme plateau on|off" );
-		LOG( "  clampvisemes on|off" );
-		LOG( "  minvisemetime <amount>" );
-		LOG( "  bone" );
-		LOG( "  bonep" );
-		LOG( "  remove" );
-		LOG( "  viewer" );
-		LOG( "  gazefade in|out [<interval>]" );
-		LOG( "  gazefade print" );
-		LOG( "  reholster" );
-		LOG( "  blink" );
-		LOG( "  eyelid pitch <enable>" );
-		LOG( "  eyelid range <min-angle> <max-angle> [<lower-min> <lower-max>]" );
-		LOG( "  eyelid close <closed-angle>" );
-		LOG( "  eyelid tight <upper-norm> [<lower-norm>]" );
-		LOG( "  softeyes" );
-		LOG( "  sk <file> <scale>");
-		LOG( "  minibrain <on|off>");
+		SmartBody::util::log( "HELP: char <> <command>" );
+		SmartBody::util::log( "  param" );
+		SmartBody::util::log( "  smoothbindmesh" );
+		SmartBody::util::log( "  smoothbindweight" );
+		SmartBody::util::log( "  mesh");
+		SmartBody::util::log( "  ctrl" );
+		SmartBody::util::log( "  inspect" );
+		SmartBody::util::log( "  channels" );
+		SmartBody::util::log( "  controllers" );
+		SmartBody::util::log( "  prune" );
+		SmartBody::util::log( "  viseme curveon|curveoff" );
+		SmartBody::util::log( "  viseme timedelay <timedelay>" );
+		SmartBody::util::log( "  viseme magnitude <amount>" );
+		SmartBody::util::log( "  viseme <viseme name> <weight> <ramp in>" );
+		SmartBody::util::log( "  viseme <viseme name> trap <weight> <dur> [<ramp-in> [<ramp-out>]]" );
+		SmartBody::util::log( "  viseme <viseme name> curve <number of keys> <curve information>" );
+		SmartBody::util::log( "  viseme curve" );
+		SmartBody::util::log( "  viseme plateau on|off" );
+		SmartBody::util::log( "  clampvisemes on|off" );
+		SmartBody::util::log( "  minvisemetime <amount>" );
+		SmartBody::util::log( "  bone" );
+		SmartBody::util::log( "  bonep" );
+		SmartBody::util::log( "  remove" );
+		SmartBody::util::log( "  viewer" );
+		SmartBody::util::log( "  gazefade in|out [<interval>]" );
+		SmartBody::util::log( "  gazefade print" );
+		SmartBody::util::log( "  reholster" );
+		SmartBody::util::log( "  blink" );
+		SmartBody::util::log( "  eyelid pitch <enable>" );
+		SmartBody::util::log( "  eyelid range <min-angle> <max-angle> [<lower-min> <lower-max>]" );
+		SmartBody::util::log( "  eyelid close <closed-angle>" );
+		SmartBody::util::log( "  eyelid tight <upper-norm> [<lower-norm>]" );
+		SmartBody::util::log( "  softeyes" );
+		SmartBody::util::log( "  sk <file> <scale>");
+		SmartBody::util::log( "  minibrain <on|off>");
 		return( CMD_SUCCESS );
 	}
 
 	std::string char_cmd = args.read_token();
 	if( char_cmd.length()==0 ) {
-		LOG( "SbmCharacter::character_cmd_func: ERR: Expected character command." );
+		SmartBody::util::log( "SbmCharacter::character_cmd_func: ERR: Expected character command." );
 		return CMD_FAILURE;
 	}
 
@@ -543,7 +544,7 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 
 			if( new_param->size == 0 )
 			{
-				LOG("SbmCharacter::parse_character_command: param_registeration ERR: parameter size not defined!\n");
+				SmartBody::util::log("SbmCharacter::parse_character_command: param_registeration ERR: parameter size not defined!\n");
 				delete new_param;
 				return( CMD_FAILURE );
 			}
@@ -551,7 +552,7 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 			{
 				if(char_name == new_param->char_names[i])
 				{
-					LOG("SbmCharacter::parse_character_command: param_registeration ERR: parameter redefinition!\n");
+					SmartBody::util::log("SbmCharacter::parse_character_command: param_registeration ERR: parameter redefinition!\n");
 					delete new_param;
 					return( CMD_FAILURE );	
 				}
@@ -570,7 +571,7 @@ int character_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 			return( CMD_SUCCESS );
 		}
 
-		LOG( "SbmCharacter::character_cmd_func ERR: char '%s' or cmd '%s' NOT FOUND", char_name.c_str(), char_cmd.c_str() );
+		SmartBody::util::log( "SbmCharacter::character_cmd_func ERR: char '%s' or cmd '%s' NOT FOUND", char_name.c_str(), char_cmd.c_str() );
 		return( CMD_FAILURE );
 }
 
@@ -584,7 +585,7 @@ int create_remote_pawn_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 	int interval = args.read_int();
 
 	if( pawn_and_attribute.length()==0 ) {
-		LOG("ERROR: Expected pawn name.");
+		SmartBody::util::log("ERROR: Expected pawn name.");
 		return CMD_FAILURE;
 	}
 
@@ -593,7 +594,7 @@ int create_remote_pawn_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 	pawn_p =  SmartBody::SBScene::getScene()->getPawn( pawn_and_attribute );
 
 	if( pawn_p != NULL ) {
-		LOG("ERROR: Pawn \"%s\" already exists.", pawn_and_attribute.c_str() );
+		SmartBody::util::log("ERROR: Pawn \"%s\" already exists.", pawn_and_attribute.c_str() );
 		return CMD_FAILURE;
 	}
 
@@ -615,14 +616,14 @@ int create_remote_pawn_func( srArgBuffer& args, SmartBody::SBCommandManager* cmd
 	}
 		
 	if( err != CMD_SUCCESS ) {
-		LOG("ERROR: Unable to initialize SbmPawn \"%s\".", pawn_and_attribute.c_str() );
+		SmartBody::util::log("ERROR: Unable to initialize SbmPawn \"%s\".", pawn_and_attribute.c_str() );
 		delete pawn_p;
 		skeleton->unref();
 		return err;
 	}
 
 	if( err != CMD_SUCCESS )	{
-		LOG("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute.c_str() );
+		SmartBody::util::log("ERROR: SbmPawn pawn_map.insert(..) \"%s\" FAILED", pawn_and_attribute.c_str() );
 		delete pawn_p;
 		skeleton->unref();
 		return err;
@@ -636,19 +637,19 @@ int character_set_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdM
 {
 	std::string character_id = args.read_token();
 	if( character_id.length()==0 ) {
-		LOG("ERROR: SbmCharacter::set_cmd_func(..): Missing character id.");
+		SmartBody::util::log("ERROR: SbmCharacter::set_cmd_func(..): Missing character id.");
 		return CMD_FAILURE;
 	}
 
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter( character_id );
 	if( character==NULL ) {
-		LOG("ERROR: SbmCharacter::set_cmd_func(..): Unknown character \"%s\" to set.", character_id.c_str());
+		SmartBody::util::log("ERROR: SbmCharacter::set_cmd_func(..): Unknown character \"%s\" to set.", character_id.c_str());
 		return CMD_FAILURE;
 	}
 
 	std::string attribute = args.read_token();
 	if( attribute.length()==0 ) {
-		LOG("ERROR: SbmCharacter::set_cmd_func(..): Missing attribute to set.");
+		SmartBody::util::log("ERROR: SbmCharacter::set_cmd_func(..): Missing attribute to set.");
 		return CMD_FAILURE;
 	}
 
@@ -668,7 +669,7 @@ bool parse_float_or_error( float& var, const char* str, const std::string& var_n
 	if( std::istringstream( str ) >> var )
 		return true; // no error
 	// else
-	LOG("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
+	SmartBody::util::log("ERROR: Invalid value for %s: %s", var_name.c_str(), str);
 	return false;
 }
 
@@ -681,7 +682,7 @@ int set_world_offset_cmd( SbmPawn* pawn, srArgBuffer& args )
 	bool has_error = false;
 	std::string arg = args.read_token();
 	if( arg.length() == 0 ) {
-		LOG("ERROR: SbmPawn::set_world_offset: Missing offset parameters.");
+		SmartBody::util::log("ERROR: SbmPawn::set_world_offset: Missing offset parameters.");
 		return CMD_FAILURE;
 	}
 
@@ -710,7 +711,7 @@ int set_world_offset_cmd( SbmPawn* pawn, srArgBuffer& args )
 			has_error |= !parse_float_or_error( p, args.read_token(), arg );
 			has_error |= !parse_float_or_error( r, args.read_token(), arg );
 		} else {
-			LOG("ERROR: Unknown world_offset attribute \"%s\".", arg.c_str());
+			SmartBody::util::log("ERROR: Unknown world_offset attribute \"%s\".", arg.c_str());
 			has_error = true;
 		}
 		arg = args.read_token();
@@ -737,7 +738,7 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 		int result = pawn->prune_controller_tree();
 		if( result != CMD_SUCCESS )
 		{
-			LOG("ERROR: Failed to prune pawn \"%s\"", pawn->getName().c_str());
+			SmartBody::util::log("ERROR: Failed to prune pawn \"%s\"", pawn->getName().c_str());
 			return CMD_FAILURE;
 		}
 		else 
@@ -784,7 +785,7 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 			} else {
 				std::stringstream strstr;
 				strstr << "WARNING: Unrecognized pawn setshape option \"" << option << "\"." << endl;
-				LOG(strstr.str().c_str());
+				SmartBody::util::log(strstr.str().c_str());
 			}
 		}	
 
@@ -802,7 +803,7 @@ int pawn_parse_pawn_command( SbmPawn* pawn, std::string cmd, srArgBuffer& args)
 		}
 		else
 		{
-			LOG("Pawn %s, fail to setshape. Incorrect parameters.", pawn->getName().c_str());
+			SmartBody::util::log("Pawn %s, fail to setshape. Incorrect parameters.", pawn->getName().c_str());
 			return CMD_FAILURE;
 		} 
 	}
@@ -894,7 +895,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 									// get the channel index
 									int channelIndex = character->ct_tree_p->toBufferIndex(c);
 									strstr << channelIndex << " (" << channelSize << ") ";
-									LOG( "%s", strstr.str().c_str() );
+									SmartBody::util::log( "%s", strstr.str().c_str() );
 								}
 							}
 						}
@@ -908,7 +909,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								int n = character->ct_tree_p->count_controllers();
 								for (int c = 0; c < n; c++)
 								{
-									LOG( "%s", character->ct_tree_p->controller(c)->getName().c_str() );
+									SmartBody::util::log( "%s", character->ct_tree_p->controller(c)->getName().c_str() );
 								}
 							}
 							return CMD_SUCCESS;
@@ -923,7 +924,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								{
 									if (all_characters)
 									{
-										LOG("%s", (*iter).second->requestId.c_str());
+										SmartBody::util::log("%s", (*iter).second->requestId.c_str());
 									}
 									else
 									{			
@@ -934,7 +935,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 										int index = requestWithName.find(charName);
 										if (index == 0)
 										{
-											LOG("%s", (*iter).second->requestId.c_str());
+											SmartBody::util::log("%s", (*iter).second->requestId.c_str());
 										}
 									}
 								}
@@ -976,7 +977,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 										}
 									}
 									std::string name = character->getName();
-									LOG("%d requests interrupted on character %s.", numRequestsInterrupted, name.c_str());
+									SmartBody::util::log("%d requests interrupted on character %s.", numRequestsInterrupted, name.c_str());
 								}
 								return CMD_SUCCESS;
 							}
@@ -1005,7 +1006,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								MeCtScheduler2* scheduler = character->head_sched_p;
 								if (!scheduler)
 								{
-									LOG("No scheduler available");
+									SmartBody::util::log("No scheduler available");
 									return CMD_SUCCESS;
 								}
 								std::vector<MeCtScheduler2::TrackPtr> tracksToRemove;
@@ -1021,7 +1022,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 									}
 								}
 								scheduler->remove_tracks(tracksToRemove);
-								LOG("Removed %d visemes/Action Units", tracksToRemove.size());
+								SmartBody::util::log("Removed %d visemes/Action Units", tracksToRemove.size());
 								return CMD_SUCCESS;
 							}
 
@@ -1052,22 +1053,22 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 							{
 								if (!next)
 								{
-									LOG("Character %s viseme plateau setting is %s", character->getName().c_str(), character->isVisemePlateau()? "on" : "off");
+									SmartBody::util::log("Character %s viseme plateau setting is %s", character->getName().c_str(), character->isVisemePlateau()? "on" : "off");
 									return CMD_SUCCESS;
 								}
 								if (_stricmp(next, "on") == 0)
 								{
 									character->setVisemePlateau(true);
-									LOG("Character %s viseme plateau setting is now on.", character->getName().c_str());
+									SmartBody::util::log("Character %s viseme plateau setting is now on.", character->getName().c_str());
 								}
 								else if (_stricmp(next, "off") == 0)
 								{
 									character->setVisemePlateau(false);
-									LOG("Character %s viseme plateau setting is now off.", character->getName().c_str());
+									SmartBody::util::log("Character %s viseme plateau setting is now off.", character->getName().c_str());
 								}
 								else
 								{
-									LOG("use: char %s viseme plateau <on|off>", character->getName().c_str());
+									SmartBody::util::log("use: char %s viseme plateau <on|off>", character->getName().c_str());
 								}
 								return CMD_SUCCESS;
 							}
@@ -1075,22 +1076,22 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 							{
 								if (!next)
 								{
-									LOG("Character %s diphone setting is %s", character->getName().c_str(), character->isDiphone()? "on" : "off");
+									SmartBody::util::log("Character %s diphone setting is %s", character->getName().c_str(), character->isDiphone()? "on" : "off");
 									return CMD_SUCCESS;
 								}
 								if (_stricmp(next, "on") == 0)
 								{
 									character->setDiphone(true);
-									LOG("Character %s diphone setting is now on.", character->getName().c_str());
+									SmartBody::util::log("Character %s diphone setting is now on.", character->getName().c_str());
 								}
 								else if (_stricmp(next, "off") == 0)
 								{
 									character->setDiphone(false);
-									LOG("Character %s diphone setting is now off.", character->getName().c_str());
+									SmartBody::util::log("Character %s diphone setting is now off.", character->getName().c_str());
 								}
 								else
 								{
-									LOG("use: char %s diphone <on|off>", character->getName().c_str());
+									SmartBody::util::log("use: char %s diphone <on|off>", character->getName().c_str());
 								}
 								return CMD_SUCCESS;
 							}
@@ -1098,7 +1099,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 							{
 								if (!next)
 								{
-									LOG("Character %s min viseme time is %f", character->getName().c_str(), character->getMinVisemeTime());
+									SmartBody::util::log("Character %s min viseme time is %f", character->getName().c_str(), character->getMinVisemeTime());
 									return CMD_SUCCESS;
 								}
 								float minTime = (float)atof( next );
@@ -1120,13 +1121,13 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								int numKeys = args.read_int();
 								if( numKeys <= 0 )	
 								{
-									LOG( "Viseme data is missing" );
+									SmartBody::util::log( "Viseme data is missing" );
 									return CMD_FAILURE;
 								}
 								int num_remaining = args.calc_num_tokens();
 								int numKeyParams = num_remaining / numKeys;
 								if( num_remaining != numKeys * numKeyParams )	{
-									LOG( "Viseme data is malformed" );
+									SmartBody::util::log( "Viseme data is malformed" );
 									return CMD_FAILURE;
 								}
 								float* curveInfo = new float[ num_remaining ];
@@ -1162,7 +1163,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 							SmartBody::SBFaceDefinition* faceDefinition = character->getFaceDefinition();
 							if (!faceDefinition)
 							{
-								LOG("Character %s does not have any visemes defined.", character->getName().c_str());
+								SmartBody::util::log("Character %s does not have any visemes defined.", character->getName().c_str());
 								return CMD_FAILURE;
 							}
 							int numRemaining = args.calc_num_tokens();
@@ -1175,7 +1176,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								{
 									const std::string& visemeName = faceDefinition->getVisemeName(v);
 									float weight = faceDefinition->getVisemeWeight(visemeName);
-									LOG("%s %f", visemeName.c_str(), weight);
+									SmartBody::util::log("%s %f", visemeName.c_str(), weight);
 
 								}
 								return CMD_SUCCESS;
@@ -1185,11 +1186,11 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 								std::string visemeName = args.read_token();
 								if (!faceDefinition->hasViseme(visemeName))
 								{
-									LOG("Character %s does not have viseme %s defined.", character->getName().c_str(), visemeName.c_str());
+									SmartBody::util::log("Character %s does not have viseme %s defined.", character->getName().c_str(), visemeName.c_str());
 									return CMD_FAILURE;
 								}
 								float weight = faceDefinition->getVisemeWeight(visemeName);
-								LOG("%s %f", visemeName.c_str(), weight);
+								SmartBody::util::log("%s %f", visemeName.c_str(), weight);
 								return CMD_SUCCESS;
 							}
 							if (numRemaining == 2)
@@ -1205,21 +1206,21 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 										std::string viseme = faceDefinition->getVisemeName(v);
 										faceDefinition->setVisemeWeight(viseme, weight);
 									}
-									LOG("Set all visemes to weight %f", visemeName.c_str(), weight);
+									SmartBody::util::log("Set all visemes to weight %f", visemeName.c_str(), weight);
 									return CMD_SUCCESS;
 								}
 								if (!faceDefinition->hasViseme(visemeName))
 								{
-									LOG("Character %s does not have viseme %s defined.", character->getName().c_str(), visemeName.c_str());
+									SmartBody::util::log("Character %s does not have viseme %s defined.", character->getName().c_str(), visemeName.c_str());
 									return CMD_FAILURE;
 								}
 								faceDefinition->setVisemeWeight(visemeName, weight);
-								LOG("%s %f", visemeName.c_str(), weight);
+								SmartBody::util::log("%s %f", visemeName.c_str(), weight);
 								return CMD_SUCCESS;
 							}
 							if (numRemaining > 2)
 							{
-								LOG("Usage:\nchar %s visemeweight\nchar %s visemeweight <visemename>\nchar %s visemeweight <visemename> <weight>", character->getName().c_str(), character->getName().c_str(), character->getName().c_str());
+								SmartBody::util::log("Usage:\nchar %s visemeweight\nchar %s visemeweight <visemename>\nchar %s visemeweight <visemename> <weight>", character->getName().c_str(), character->getName().c_str(), character->getName().c_str());
 								return CMD_FAILURE;
 							}
 
@@ -1253,7 +1254,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 							}
 							else
 							{
-								LOG("Usage: char <name> viewer <bones|visgeo|colgeo|axis|deformable>");
+								SmartBody::util::log("Usage: char <name> viewer <bones|visgeo|colgeo|axis|deformable>");
 							}
 							return CMD_SUCCESS;
 						} 
@@ -1278,7 +1279,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 							}
 							float interval = args.read_float();
 							if( print_track )	{
-								LOG( "char '%s' gaze tracks:",character->getName().c_str() );
+								SmartBody::util::log( "char '%s' gaze tracks:",character->getName().c_str() );
 							}
 							
 							double curTime = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
@@ -1306,7 +1307,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 										}
 									}
 									if( print_track )	{
-										LOG( " %s", gaze_p->getName().c_str() );
+										SmartBody::util::log( " %s", gaze_p->getName().c_str() );
 									}
 									else
 										if( fade_in )	{
@@ -1346,13 +1347,13 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 										std::string eyelid_cmd  = args.read_token();
 										if( eyelid_cmd.length()==0 ) {
 
-											LOG( "char <> eyelid <command>:" );
-											LOG( " eyelid print" );
-											LOG( " eyelid pitch 0|1" );
-											LOG( " eyelid range <upper-min> <upper-max> [<lower-min> <lower-max>]" );
-											LOG( " eyelid close <closed-angle>" );
-											LOG( " eyelid tight <upper-weight> [<lower-weight>]" );
-											LOG( " eyelid delay <upper-delay> [<upper-delay>]" );
+											SmartBody::util::log( "char <> eyelid <command>:" );
+											SmartBody::util::log( " eyelid print" );
+											SmartBody::util::log( " eyelid pitch 0|1" );
+											SmartBody::util::log( " eyelid range <upper-min> <upper-max> [<lower-min> <lower-max>]" );
+											SmartBody::util::log( " eyelid close <closed-angle>" );
+											SmartBody::util::log( " eyelid tight <upper-weight> [<lower-weight>]" );
+											SmartBody::util::log( " eyelid delay <upper-delay> [<upper-delay>]" );
 
 
 											//				eyelid_reg_ct_p->test();
@@ -1367,7 +1368,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 												character->eyelid_reg_ct_p->set_eyeball_tracking( enable );
 											}
 											else	{
-												LOG( "MeCtEyeLidRegulator: pitch tracking %s", 
+												SmartBody::util::log( "MeCtEyeLidRegulator: pitch tracking %s", 
 													character->eyelid_reg_ct_p->get_eyeball_tracking() ?
 													"ENABLED" : "DISABLED"
 													);
@@ -1435,31 +1436,31 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 									{
 										if(character->eyelid_ct == NULL )
 										{
-											LOG("ERROR: SbmCharacter::parse_character_command(..): character \"%s\" has no eyelid_ct.", character->getName().c_str() );
+											SmartBody::util::log("ERROR: SbmCharacter::parse_character_command(..): character \"%s\" has no eyelid_ct.", character->getName().c_str() );
 											return CMD_FAILURE;
 										}
 
 										if( args.calc_num_tokens() == 0 )
 										{
-											LOG( "softeyes params: %s", character->isSoftEyes() ? "ENABLED" : "DISABLED" );
+											SmartBody::util::log( "softeyes params: %s", character->isSoftEyes() ? "ENABLED" : "DISABLED" );
 											float lo, up;
 
 											character->eyelid_ct->get_weight( lo, up );
-											LOG( " eyelid weight: { %f, %f }", lo, up );
+											SmartBody::util::log( " eyelid weight: { %f, %f }", lo, up );
 
 											character->eyelid_ct->get_upper_lid_range( lo, up );
-											LOG( " eyelid upper trans: { %f, %f }", lo, up );
+											SmartBody::util::log( " eyelid upper trans: { %f, %f }", lo, up );
 
 											character->eyelid_ct->get_lower_lid_range( lo, up );
-											LOG( " eyelid lower trans: { %f, %f }", lo, up );
+											SmartBody::util::log( " eyelid lower trans: { %f, %f }", lo, up );
 
 											character->eyelid_ct->get_eye_pitch_range( lo, up );
-											LOG( " eyeball pitch: { %f, %f }", lo, up );
+											SmartBody::util::log( " eyeball pitch: { %f, %f }", lo, up );
 
-											LOG( "commmands:" );
-											LOG( " char <> softeyes [on|off] " );
-											LOG( " char <> softeyes weight <lower> <upper>" );
-											LOG( " char <> softeyes upperlid|lowerlid|eyepitch <lower-lim> <upper-lim>" );
+											SmartBody::util::log( "commmands:" );
+											SmartBody::util::log( " char <> softeyes [on|off] " );
+											SmartBody::util::log( " char <> softeyes weight <lower> <upper>" );
+											SmartBody::util::log( " char <> softeyes upperlid|lowerlid|eyepitch <lower-lim> <upper-lim>" );
 											return CMD_SUCCESS;
 										}
 
@@ -1499,7 +1500,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 															}
 															else
 															{
-																LOG( "SbmCharacter::parse_character_command ERR: command '%s' not recognized", softEyesCommand.c_str());
+																SmartBody::util::log( "SbmCharacter::parse_character_command ERR: command '%s' not recognized", softEyesCommand.c_str());
 																return CMD_NOT_FOUND;
 															}
 															return CMD_SUCCESS;
@@ -1520,11 +1521,11 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											SmartBody::MiniBrain* miniBrain = character->getMiniBrain();
 											if (miniBrain)
 											{
-												LOG("Character %s has an active minibrain.", character->getName().c_str());
+												SmartBody::util::log("Character %s has an active minibrain.", character->getName().c_str());
 											}
 											else
 											{
-												LOG("Character %s has an inactive minibrain.", character->getName().c_str());
+												SmartBody::util::log("Character %s has an inactive minibrain.", character->getName().c_str());
 											}
 											return CMD_SUCCESS;
 										}
@@ -1539,7 +1540,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											}
 											miniBrain = new SmartBody::MiniBrain();
 											character->setMiniBrain(miniBrain);
-											LOG("Minibrain for character %s is now on", character->getName().c_str());
+											SmartBody::util::log("Minibrain for character %s is now on", character->getName().c_str());
 										}
 										else if (tok == "off")
 										{
@@ -1550,11 +1551,11 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											}
 											
 											character->setMiniBrain(NULL);
-											LOG("Minibrain for character %s is now off", character->getName().c_str());
+											SmartBody::util::log("Minibrain for character %s is now off", character->getName().c_str());
 										}
 										else
 										{
-											LOG("Usage: char %s minibrain <on|off>", character->getName().c_str());
+											SmartBody::util::log("Usage: char %s minibrain <on|off>", character->getName().c_str());
 										}
 										return CMD_SUCCESS;
 									}
@@ -1573,7 +1574,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 // 										}
 // 										else
 // 										{
-// 											LOG( "SbmCharacter::parse_character_command ERR: incorrect parameter for collision = %s",phyCmd.c_str());
+// 											SmartBody::util::log( "SbmCharacter::parse_character_command ERR: incorrect parameter for collision = %s",phyCmd.c_str());
 // 											return CMD_FAILURE;
 // 										}
 // 									}
@@ -1596,7 +1597,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motion_name);
 
 											SmartBody::SBReach* reach = sbChar->getReach();
-											//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
+											//SmartBody::util::log("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
 											int reachType = MeCtReachEngine::getReachType(tagName);//
 											if (reachType == -1)
 												reachType = MeCtReachEngine::RIGHT_ARM;
@@ -1615,7 +1616,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											}
 											else
 											{
-												LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
+												SmartBody::util::log( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
 												return CMD_FAILURE;
 											}
 										}
@@ -1633,7 +1634,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											if (reachType == -1)
 												reachType = MeCtReachEngine::RIGHT_ARM;
 											SmartBody::SBMotion* motion = SmartBody::SBScene::getScene()->getAssetManager()->getMotion(motion_name);
-											//LOG("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
+											//SmartBody::util::log("SbmCharacter::parse_character_command LOG: add motion name : %s ", motion_name.c_str());
 											if (motion && reach)
 											{
 												// assume the right hand motion and mirror the left hand motion
@@ -1642,7 +1643,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											}
 											else
 											{
-												LOG( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
+												SmartBody::util::log( "SbmCharacter::parse_character_command ERR: motion '%s' not found", motion_name.c_str());
 												return CMD_NOT_FOUND;
 											}
 										}
@@ -1654,7 +1655,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											std::vector<std::string> reachMotionNames = reach->getMotionNames();
 											for (unsigned int c = 0; c < reachMotionNames.size(); c++)
 											{
-												LOG( "%s", reachMotionNames[c].c_str() );
+												SmartBody::util::log( "%s", reachMotionNames[c].c_str() );
 											}
 #endif
 											return CMD_SUCCESS;
@@ -1664,7 +1665,7 @@ int character_parse_character_command( SbmCharacter* character, std::string cmd,
 											SmartBody::SBReach* reach = sbChar->getReach();
 											if (!reach || reach->getReachEngineMap().size() == 0)
 											{
-												LOG("character %s, reach engine is not initialized.", character->getName().c_str());
+												SmartBody::util::log("character %s, reach engine is not initialized.", character->getName().c_str());
 												return CMD_FAILURE;
 											}
 											std::map<int,MeCtReachEngine*>& reachEngineMap = reach->getReachEngineMap();

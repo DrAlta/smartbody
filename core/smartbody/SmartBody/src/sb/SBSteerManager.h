@@ -22,7 +22,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #define _STEERMANAGER_H_
 
 #include <sb/SBTypes.h>
-#include <vhcl.h>
 #include <sb/SBService.h>
 
 class SteerSuiteEngineDriver;

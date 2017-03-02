@@ -3,6 +3,7 @@
 #include <sb/SBMotion.h>
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBPhoneme.h>
+#include <sb/SBUtilities.h>
 #include <bml/bml_speech.hpp>
 #include <vector>
 
@@ -174,7 +175,7 @@ bool RealTimeLipSyncController::controller_evaluate ( double t, MeFrameData& fra
 				this->setChannelValue(curCurveName, val);
 			}
 			if (_pawn->getBoolAttribute("lipsync.useRealTimeDebug"))
-				LOG("%s %f", curCurveName.c_str(), val);
+				SmartBody::util::log("%s %f", curCurveName.c_str(), val);
 			finishedVisemes.insert(curCurveName);
 			startIter++;
 		}
@@ -360,7 +361,7 @@ void RealTimeLipSyncController::smoothCurve(std::vector<float>& c, float windowS
 		if (c.size() == x.size() * 2)
 			keepSmoothing = false;
 	}
-//	LOG("Number of smoothing iteration %d", numIter);
+//	SmartBody::util::log("Number of smoothing iteration %d", numIter);
 }
 
 

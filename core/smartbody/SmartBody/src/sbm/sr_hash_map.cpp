@@ -1,31 +1,26 @@
-/*
- *  sr_hash_map.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcelo Kallmann, USC (currently at UC Merced)
- *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
- *      Ashok Basawapatna, USC (no longer)
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #include	<stdio.h>
 #include	<string.h>
-#include <vhcl_log.h>
+#include <sb/SBUtilities.h>
 
 #include "sr_hash_map.h"
 
@@ -79,11 +74,11 @@ srHashMapBase::sr_map_entry_t *srHashMapBase::new_table_entry( const char *key, 
 void *srHashMapBase::find_table_data( sr_map_entry_t *bucket_p, const char *key )	{
 		
 		if( !bucket_p ) { 
-			LOG( "srHashMapBase::find_table_data ERR: bucket_p is NULL \n" ); 
+			SmartBody::util::log( "srHashMapBase::find_table_data ERR: bucket_p is NULL \n" ); 
 			return( NULL ); 
 		}
 		if( !key ) { 
-			LOG( "srHashMapBase::find_table_data ERR: key is NULL \n" ); 
+			SmartBody::util::log( "srHashMapBase::find_table_data ERR: key is NULL \n" ); 
 			return( NULL ); 
 		}
 		if( strcmp( bucket_p->key, key ) == 0 )	{
@@ -101,7 +96,7 @@ srHashMapBase::srHashMapBase( unsigned int size )	{
 	unsigned int i;
 		
 		if( size < 1 )	{
-			LOG( "srHashMapBase::srHashMapBase ERR: needs non-zero size\n" );
+			SmartBody::util::log( "srHashMapBase::srHashMapBase ERR: needs non-zero size\n" );
 			return;
 		}
 		
@@ -126,7 +121,7 @@ srHashMapBase::~srHashMapBase( void )	{
 		
 	if( shallow_copy == false )	{
 		if( entry_count > 0 )	{
-			LOG( "srHashMapBase::~srHashMapBase ERR: leaking %d entries\n", entry_count );
+			SmartBody::util::log( "srHashMapBase::~srHashMapBase ERR: leaking %d entries\n", entry_count );
 		}
 		delete [] bucket_pp;
 	}
@@ -163,7 +158,7 @@ void srHashMapBase::print( int reverse )	{
 					}
 					sprintf( label, "%s|", label );
 				}
-				LOG( "%s \n", label );
+				SmartBody::util::log( "%s \n", label );
 			}
 		}
 }
@@ -173,11 +168,11 @@ void srHashMapBase::print( int reverse )	{
 int srHashMapBase::insert( const char *key, void *data, int claim )	{
 		
 		if( bucket_pp == NULL ) {
-			LOG( "srHashMapBase::insert ERR: bucket_pp is NULL \n" ); 
+			SmartBody::util::log( "srHashMapBase::insert ERR: bucket_pp is NULL \n" ); 
 			return( CMD_FAILURE );
 		}
 		if( key == NULL ) { 
-			LOG( "srHashMapBase::insert ERR: NULL key \n" ); 
+			SmartBody::util::log( "srHashMapBase::insert ERR: NULL key \n" ); 
 			return( CMD_FAILURE );
 		}
 		
@@ -186,7 +181,7 @@ int srHashMapBase::insert( const char *key, void *data, int claim )	{
 		if( head_entry_p )	{
 			if( find_table_data( head_entry_p, key ) )	{
 				// commented out for now - causing noisy log messages - AS 7/24/12
-				//LOG( "srHashMapBase::insert ERR: duplicate key '%s'\n", key ); 
+				//SmartBody::util::log( "srHashMapBase::insert ERR: duplicate key '%s'\n", key ); 
 				return( CMD_FAILURE );
 			}
 		}
@@ -198,11 +193,11 @@ int srHashMapBase::insert( const char *key, void *data, int claim )	{
 void *srHashMapBase::lookup( const char *key )	{
 	
 		if( bucket_pp == NULL ) {
-			LOG("srHashMapBase::lookup ERR: bucket_pp is NULL \n" ); 
+			SmartBody::util::log("srHashMapBase::lookup ERR: bucket_pp is NULL \n" ); 
 			return( NULL );
 		}
 		if( key == NULL ) {
-			LOG("srHashMapBase::lookup ERR: key is NULL \n" ); 
+			SmartBody::util::log("srHashMapBase::lookup ERR: key is NULL \n" ); 
 			return( NULL );
 		}
 
@@ -218,11 +213,11 @@ void *srHashMapBase::remove( const char *key, int *claimed_p )	{
 	void *data;
 	
 		if( bucket_pp == NULL ) {
-			LOG( "srHashMapBase::remove ERR: bucket_pp is NULL \n" ); 
+			SmartBody::util::log( "srHashMapBase::remove ERR: bucket_pp is NULL \n" ); 
 			return( NULL );
 		}
 		if( key == NULL ) {
-			LOG( "srHashMapBase::remove ERR: key is NULL \n" ); 
+			SmartBody::util::log( "srHashMapBase::remove ERR: key is NULL \n" ); 
 			return(NULL);
 		}
 
@@ -269,7 +264,7 @@ void srHashMapBase::removeAll()	{
 	while( get_num_entries() )	{
         pull( &claimed );
 		if( claimed )	{
-			LOG( "srHashMapBase::removeAll WARNING: leaking claimed entry!\n" );
+			SmartBody::util::log( "srHashMapBase::removeAll WARNING: leaking claimed entry!\n" );
 		}
 	}
 }
@@ -285,7 +280,7 @@ void srHashMapBase::reset(void)	{
 void *srHashMapBase::next( char** key_ref_p )	{
 
 		if( bucket_pp == NULL ) {
-			LOG( "srHashMapBase::next ERR: bucket_pp is NULL \n" ); 
+			SmartBody::util::log( "srHashMapBase::next ERR: bucket_pp is NULL \n" ); 
 			return( NULL );
 		}
 		increment_iterator();
@@ -301,7 +296,7 @@ void *srHashMapBase::next( char** key_ref_p )	{
 void *srHashMapBase::pull( int *claimed_p )	{
 
 		if( bucket_pp == NULL ) {
-			LOG( "srHashMapBase::pull ERR: bucket_pp is NULL \n" ); 
+			SmartBody::util::log( "srHashMapBase::pull ERR: bucket_pp is NULL \n" ); 
 			return( NULL );
 		}
 		increment_iterator();
@@ -316,7 +311,7 @@ void *srHashMapBase::pull( int *claimed_p )	{
 void srHashMapBase::increment_iterator(void)	{
 
 		if( bucket_pp == NULL ) {
-			LOG( "srHashMapBase::increment_iterator ERR: bucket_pp is NULL \n" ); 
+			SmartBody::util::log( "srHashMapBase::increment_iterator ERR: bucket_pp is NULL \n" ); 
 			return;
 		}
 		if( iterator_p )	{
@@ -330,7 +325,7 @@ void srHashMapBase::increment_iterator(void)	{
 void srHashMapBase::decrement_iterator(void)	{
 
 		if( bucket_pp == NULL ) {
-			LOG( "srHashMapBase::decrement_iterator ERR: bucket_pp is NULL \n" ); 
+			SmartBody::util::log( "srHashMapBase::decrement_iterator ERR: bucket_pp is NULL \n" ); 
 			return;
 		}
 		if( iterator_p )	{

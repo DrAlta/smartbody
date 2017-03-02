@@ -1,10 +1,11 @@
-#include "vhcl.h"
+
 #include "ParamAnimAutoMarkingEditor.h"
 #include <sb/SBCharacter.h>
 #include <sb/SBJoint.h>
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
+#include <sb/SBUtilities.h>
 #include "ParamAnimEditorWidget.h"
 #include "ParamAnimStateEditor.h"
 
@@ -82,7 +83,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 	PABlend* currentState = footStepEditor->stateEditor->getCurrentState();
 	if (!currentState)
 	{	
-		LOG("PAAutoFootStepsEditor::confirmEditting WARNING: please select a state!");
+		SmartBody::util::log("PAAutoFootStepsEditor::confirmEditting WARNING: please select a state!");
 		return;
 	}
 
@@ -165,7 +166,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 // 		for (int i=0;i<footSteps.size();i++)
 // 		{
 // 			FootStepRecord& record = footSteps[i];
-// 			LOG("Footstep joint = %s, start frame = %f, end frame = %f",record.jointName.c_str(), record.startTime, record.endTime);
+// 			SmartBody::util::log("Footstep joint = %s, start frame = %f, end frame = %f",record.jointName.c_str(), record.startTime, record.endTime);
 // 		}
 
 
@@ -200,7 +201,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 				
 				// print info
 				if (footStepEditor->isPrintDebugInfo)
-					LOG("motion %s at time %f-> speed is %f, height is %f, joint is %s", motion->getName().c_str(), f * motion->getFrameRate(), speed, gPos.y, jointName.c_str());
+					SmartBody::util::log("motion %s at time %f-> speed is %f, height is %f, joint is %s", motion->getName().c_str(), f * motion->getFrameRate(), speed, gPos.y, jointName.c_str());
 
 				// filter for height
 				if (gPos.y < floorHeight || gPos.y > (floorHeight + heightThresh))
@@ -268,7 +269,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 			ss << "[" << motion->getName() << "]detected ";
 			for (size_t i = 0; i < outMeans.size(); i++)
 				ss << outMeans[i] << " ";
-			LOG("%s", ss.str().c_str());
+			SmartBody::util::log("%s", ss.str().c_str());
 			finalMessage << ss.str() << "\n";
 			currentState->keys[motionIndex].clear();
 			if (footStepEditor->isProcessAll)
@@ -293,7 +294,7 @@ void PAAutoFootStepsEditor::confirmEditting(Fl_Widget* widget, void* data)
 				currentState->keys[motionIndex].push_back(step * i);
 				ss << step * i << " ";
 			}
-			LOG("%s", ss.str().c_str());
+			SmartBody::util::log("%s", ss.str().c_str());
 			finalMessage << ss.str() << "\n";
 		}
 		motion->disconnect();

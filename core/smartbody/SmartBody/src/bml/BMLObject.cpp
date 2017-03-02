@@ -1,6 +1,7 @@
 #include "BMLObject.h"
 #include <sstream>
 #include <sb/SBAttribute.h>
+#include <sb/SBUtilities.h>
 #include <boost/lexical_cast.hpp>
 
 BMLObject::BMLObject()
@@ -120,7 +121,7 @@ void BMLObject::parse(rapidxml::xml_node<>* node)
 		SmartBody::SBAttribute* attribute = this->getAttribute(attrName);
 		if (!attribute)
 		{
-			LOG("No parameter named '%s' in BML '%s', ignoring...", attrName.c_str(), this->getName().c_str());
+			SmartBody::util::log("No parameter named '%s' in BML '%s', ignoring...", attrName.c_str(), this->getName().c_str());
 		}
 
 		SmartBody::StringAttribute* stringAttribute = dynamic_cast<SmartBody::StringAttribute*>(attribute);
@@ -142,7 +143,7 @@ void BMLObject::parse(rapidxml::xml_node<>* node)
 				}
 				if (!match)
 				{
-					LOG("Bad value '%s' for parameter '%s' in BML behavior '%s', setting to '%s' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), stringAttribute->getDefaultValue().c_str());
+					SmartBody::util::log("Bad value '%s' for parameter '%s' in BML behavior '%s', setting to '%s' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), stringAttribute->getDefaultValue().c_str());
 				}
 				else
 				{
@@ -159,18 +160,18 @@ void BMLObject::parse(rapidxml::xml_node<>* node)
 				double val = boost::lexical_cast<double>(attrValue);
 				if (doubleAttribute->getMin() > val)
 				{
-					LOG("Value '%s' for parameter '%s' in BML behavior '%s' is too small. Setting to '%f' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), doubleAttribute->getMin());			
+					SmartBody::util::log("Value '%s' for parameter '%s' in BML behavior '%s' is too small. Setting to '%f' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), doubleAttribute->getMin());			
 					doubleAttribute->setValue(doubleAttribute->getMin());
 				}
 				else if (doubleAttribute->getMax() < val)
 				{
-					LOG("Value '%s' for parameter '%s' in BML behavior '%s' is too large. Setting to '%f' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), doubleAttribute->getMax());			
+					SmartBody::util::log("Value '%s' for parameter '%s' in BML behavior '%s' is too large. Setting to '%f' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), doubleAttribute->getMax());			
 					doubleAttribute->setValue(doubleAttribute->getMax());
 				}
 			}
 			catch(...)
 			{ 
-				LOG("Value '%s' for parameter '%s' in BML behavior '%s' is not a number. Setting to '%f' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), doubleAttribute->getDefaultValue());
+				SmartBody::util::log("Value '%s' for parameter '%s' in BML behavior '%s' is not a number. Setting to '%f' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), doubleAttribute->getDefaultValue());
 				doubleAttribute->setValue(doubleAttribute->getDefaultValue());
 			}
 		}
@@ -183,18 +184,18 @@ void BMLObject::parse(rapidxml::xml_node<>* node)
 				int val = boost::lexical_cast<int>(attrValue);
 				if (intAttribute->getMin() > val)
 				{
-					LOG("Value '%s' for parameter '%s' in BML behavior '%s' is too small. Setting to '%f' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), intAttribute->getMin());			
+					SmartBody::util::log("Value '%s' for parameter '%s' in BML behavior '%s' is too small. Setting to '%f' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), intAttribute->getMin());			
 					intAttribute->setValue(intAttribute->getMin());
 				}
 				else if (intAttribute->getMax() < val)
 				{
-					LOG("Value '%s' for parameter '%s' in BML behavior '%s' is too large. Setting to '%f' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), intAttribute->getMax());			
+					SmartBody::util::log("Value '%s' for parameter '%s' in BML behavior '%s' is too large. Setting to '%f' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), intAttribute->getMax());			
 					intAttribute->setValue(intAttribute->getMax());
 				}
 			}
 			catch(...)
 			{ 
-				LOG("Value '%s' for parameter '%s' in BML behavior '%s' is not an integer. Setting to '%d' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), intAttribute->getDefaultValue());
+				SmartBody::util::log("Value '%s' for parameter '%s' in BML behavior '%s' is not an integer. Setting to '%d' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), intAttribute->getDefaultValue());
 				doubleAttribute->setValue(intAttribute->getDefaultValue());
 			}
 		}
@@ -214,7 +215,7 @@ void BMLObject::parse(rapidxml::xml_node<>* node)
 			}
 			else
 			{
-				LOG("Value '%s' for parameter '%s' in BML behavior '%s' is not a true/false value. Setting to '%s' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), boolAttribute->getDefaultValue() ? "true" : "false");
+				SmartBody::util::log("Value '%s' for parameter '%s' in BML behavior '%s' is not a true/false value. Setting to '%s' instead.", attrValue.c_str(), attrName.c_str(), behaviorName.c_str(), boolAttribute->getDefaultValue() ? "true" : "false");
 			}
 		}
 	}

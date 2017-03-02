@@ -22,6 +22,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBAttribute.h>
 #include <sb/SBScene.h>
 #include <sb/SBScript.h>
+#include <sb/SBUtilities.h>
 #include <sb/SBSteerManager.h>
 #include <sbm/time_regulator.h>
 #include <sbm/time_profiler.h>
@@ -223,7 +224,7 @@ void SBSimulationManager::printInfo()
 		timer_p->print();
 	else	
 	{
-		LOG( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
+		SmartBody::util::log( "TIME:%.3f ~ DT:%.3f %.2f:FPS\n",
 			time,
 			time_dt,
 			1.0 / time_dt
@@ -241,7 +242,7 @@ void SBSimulationManager::printPerf(float v)
 			timer_p->set_perf(10.0);	
 	}
 	else
-		LOG("Time regulator does not exist!");
+		SmartBody::util::log("Time regulator does not exist!");
 }
 
 double SBSimulationManager::getTime()
@@ -400,7 +401,7 @@ void SBSimulationManager::setSleepFps(float v)
 {
 	if (!timer_p)	
 	{
-		LOG("Time regulator not exist!");
+		SmartBody::util::log("Time regulator not exist!");
 		return;
 	}
 	timer_p->set_sleep_fps(v);
@@ -410,7 +411,7 @@ void SBSimulationManager::setEvalFps(float v)
 {
 	if (!timer_p)	
 	{
-		LOG("Time regulator does not exist!");
+		SmartBody::util::log("Time regulator does not exist!");
 		return;
 	}
 	timer_p->set_eval_fps(v);
@@ -420,7 +421,7 @@ void SBSimulationManager::setSimFps(float v)
 {
 	if (!timer_p)	
 	{
-		LOG("Time regulator does not exist!");
+		SmartBody::util::log("Time regulator does not exist!");
 		return;
 	}
 	timer_p->set_sim_fps(v);
@@ -430,7 +431,7 @@ void SBSimulationManager::setSleepDt(float v)
 {
 	if (!timer_p)	
 	{
-		LOG("Time regulator not exist!");
+		SmartBody::util::log("Time regulator not exist!");
 		return;
 	}
 	timer_p->set_sleep_dt(v);
@@ -440,7 +441,7 @@ void SBSimulationManager::setEvalDt(float v)
 {
 	if (!timer_p)	
 	{
-		LOG("Time regulator does not exist!");
+		SmartBody::util::log("Time regulator does not exist!");
 		return;
 	}
 	timer_p->set_eval_dt(v);
@@ -450,7 +451,7 @@ void SBSimulationManager::setSimDt(float v)
 {
 	if (!timer_p)	
 	{
-		LOG("Time regulator does not exist!");
+		SmartBody::util::log("Time regulator does not exist!");
 		return;
 	}
 	timer_p->set_sim_dt(v);
@@ -461,7 +462,7 @@ void SBSimulationManager::setSpeed(float v)
 	if (timer_p)	
 		timer_p->set_speed(v);
 	else
-		LOG("Time regulator does not exist!");
+		SmartBody::util::log("Time regulator does not exist!");
 }
 
 void SBSimulationManager::setupTimer()
@@ -476,7 +477,7 @@ void SBSimulationManager::setSleepLock()
 {
 	if (!timer_p)	
 	{
-		LOG("Time regulator does not exist!");
+		SmartBody::util::log("Time regulator does not exist!");
 		return;
 	}
 	timer_p->set_sleep_lock();

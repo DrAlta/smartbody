@@ -5,7 +5,7 @@
 #define SBM_EMAIL_CRASH_REPORTS  1
 
 #include "external/glew/glew.h"
-#include "vhcl.h"
+
 #ifndef SB_NO_VHMSG
 #include "vhmsg-tt.h"
 #endif
@@ -149,7 +149,7 @@ void sbm_vhmsg_callback( const char *op, const char *args, void * user_data )
 	switch( scene->command(strstr.str() ))
 	{
         case false:
-            LOG("SmartBody Error: command FAILED: '%s' + '%s'", op, args );
+            SmartBody::util::log("SmartBody Error: command FAILED: '%s' + '%s'", op, args );
             break;
     }
 }
@@ -259,7 +259,7 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 		SrCamera* camera = SmartBody::SBScene::getScene()->getActiveCamera();
 		if (!camera)
 		{
-			LOG("No active camera. Camera command not executed.");
+			SmartBody::util::log("No active camera. Camera command not executed.");
 			return CMD_FAILURE;
 		}
 		char *cam_cmd = args.read_token();
@@ -288,10 +288,10 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 				if (SmartBody::SBScene::getScene()->hasCameraTrack())
 				{
 					SmartBody::SBScene::getScene()->removeCameraTrack();
-					LOG("Removing current tracked object.");
+					SmartBody::util::log("Removing current tracked object.");
 						return( CMD_SUCCESS );
 				}
-				LOG("Need to specify an object and a joint to track.");
+				SmartBody::util::log("Need to specify an object and a joint to track.");
 				return( CMD_FAILURE );
 			}
 			SmartBody::SBPawn* pawn = SmartBody::SBScene::getScene()->getPawn(name);
@@ -300,14 +300,14 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 				pawn = SmartBody::SBScene::getScene()->getCharacter(name);
 				if (!pawn)
 				{
-					LOG("Object %s was not found, cannot track.", name);
+					SmartBody::util::log("Object %s was not found, cannot track.", name);
 					return( CMD_FAILURE );
 				}
 			}
 			char* jointName = args.read_token();
 			if (!jointName || strcmp(jointName, "") == 0)
 			{
-				LOG("Need to specify a joint to track.");
+				SmartBody::util::log("Need to specify a joint to track.");
 				return( CMD_FAILURE );
 			}
 			SkSkeleton* skeleton = NULL;
@@ -316,7 +316,7 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 			SkJoint* joint = pawn->getSkeleton()->search_joint(jointName);
 			if (!joint)
 			{
-				LOG("Could not find joint %s on object %s.", jointName, name);
+				SmartBody::util::log("Could not find joint %s on object %s.", jointName, name);
 				return( CMD_FAILURE );
 			}
 	
@@ -324,7 +324,7 @@ int mcu_camera_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )	{
 			if (hasTracks)
 			{
 				SmartBody::SBScene::getScene()->removeCameraTrack();
-				LOG("Removing current tracked object.");
+				SmartBody::util::log("Removing current tracked object.");
 			}
 			SmartBody::SBScene::getScene()->setCameraTrack(name, joint->getName());
 			return CMD_SUCCESS;			
@@ -385,7 +385,7 @@ int mcu_snapshot_func2(srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr)
 	BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 	if (!rootWindow)
 	{
-		LOG("Viewer doesn't exist. Cannot take snapshot.");
+		SmartBody::util::log("Viewer doesn't exist. Cannot take snapshot.");
 		return CMD_FAILURE;
 	}
 	string output_file = args.read_token();
@@ -422,7 +422,7 @@ int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	BaseWindow* rootWindow = dynamic_cast<BaseWindow*>(SmartBody::SBScene::getScene()->getViewer());
 	if (!rootWindow)
 	{
-		LOG("Viewer doesn't exist. Cannot take snapshot.");
+		SmartBody::util::log("Viewer doesn't exist. Cannot take snapshot.");
 		return CMD_FAILURE;
 	}
 	string output_file = args.read_token();
@@ -441,7 +441,7 @@ int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	}
 	// Allocate a picture buffer 
 	Pic * in = pic_alloc(windowWidth, windowHeight, 3, NULL);
-	LOG("  File to save to: %s", output_file.c_str());
+	SmartBody::util::log("  File to save to: %s", output_file.c_str());
 
 	for (int i = windowHeight - 1; i >= 0; i--)
 	{
@@ -451,13 +451,13 @@ int mcu_snapshot_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 	if (ppm_write(output_file.c_str(), in))
 	{
 		pic_free(in);
-		LOG("  File saved Successfully\n");
+		SmartBody::util::log("  File saved Successfully\n");
 		return(CMD_SUCCESS);
 	}
 	else
 	{
 		pic_free(in);
-		LOG("  Error in Saving\n");
+		SmartBody::util::log("  Error in Saving\n");
 		return(CMD_FAILURE);
 	}
 
@@ -516,7 +516,7 @@ void cleanup( void )	{
 		
 		if (SmartBody::SBScene::getScene()->getSimulationManager()->isStopped())
 		{
-			LOG( "SmartBody NOTE: unexpected exit " );
+			SmartBody::util::log( "SmartBody NOTE: unexpected exit " );
 		}
 
 		if (SmartBody::SBScene::getScene()->getBoolAttribute("internalAudio"))
@@ -546,7 +546,7 @@ void cleanup( void )	{
 	//delete SmartBody::SBScene::getScene();	
 	XMLPlatformUtils::Terminate();
 
-	LOG( "sbgui terminated gracefully." );
+	SmartBody::util::log( "sbgui terminated gracefully." );
 
 
 #if SBM_REPORT_MEMORY_LEAKS
@@ -692,8 +692,8 @@ int main( int argc, char **argv )	{
 	//FltkViewer* viewer = new FltkViewer(100, 150, 640, 480, "SmartBody");
 
 	// register the log listener
-	vhcl::Log::StdoutListener* listener = new vhcl::Log::StdoutListener();
-	vhcl::Log::g_log.AddListener(listener);
+	SmartBody::util::StdoutListener* listener = new SmartBody::util::StdoutListener();
+	SmartBody::util::g_log.AddListener(listener);
 
 	int err;
 	string net_host;
@@ -737,7 +737,7 @@ int main( int argc, char **argv )	{
 	bool useBinaryPath = false;
 	if (!settingsFile.good())
 	{
-		LOG("Did not find .smartbodysettings in current directory, checking binary location.");
+		SmartBody::util::log("Did not find .smartbodysettings in current directory, checking binary location.");
 		
 		boost::filesystem::path settingsPath = parentPath;
 		settingsPath /= ".smartbodysettings";
@@ -745,17 +745,17 @@ int main( int argc, char **argv )	{
 		settingsFile.open(boost::filesystem::complete(settingsPath).string());
 		if (!settingsFile.good())
 		{
-			LOG("Did not find .smartbodysettings in binary directory, using defaults.");
+			SmartBody::util::log("Did not find .smartbodysettings in binary directory, using defaults.");
 		}
 		else
 		{
-			LOG("Found .smartbodysettings file in binary folder.");
+			SmartBody::util::log("Found .smartbodysettings file in binary folder.");
 			useBinaryPath = true;
 		}
 	}
 	else
 	{
-		LOG("Found .smartbodysettings file in current folder.");
+		SmartBody::util::log("Found .smartbodysettings file in current folder.");
 	}
 
 	if (settingsFile.good())
@@ -767,7 +767,7 @@ int main( int argc, char **argv )	{
 #else
 		SmartBody::SBScene::setSystemParameter(".smartbodysettings",  boost::filesystem::complete(settingsPath).string());
 #endif
-		LOG("Found .smartbodysettings file.");
+		SmartBody::util::log("Found .smartbodysettings file.");
 		std::string line;
 		while (!settingsFile.eof())
 		{
@@ -782,7 +782,7 @@ int main( int argc, char **argv )	{
 					if (tokens.size() > t + 1)
 					{
 						python_lib_path = tokens[t + 1];
-						LOG("Setting Python Library path to %s", tokens[t + 1].c_str());
+						SmartBody::util::log("Setting Python Library path to %s", tokens[t + 1].c_str());
 						if (useBinaryPath)
 						{
 							boost::filesystem::path pythonFolderPath = parentPath;
@@ -792,12 +792,12 @@ int main( int argc, char **argv )	{
 							absPath = SmartBody::util::replace(absPath, "\\", "/");
 #endif
 							python_lib_path = absPath;
-							LOG("pythonlibpath = %s", absPath.c_str());
+							SmartBody::util::log("pythonlibpath = %s", absPath.c_str());
 							SmartBody::SBScene::setSystemParameter("pythonlibpath", absPath);
 						}
 						else
 						{
-							LOG("pythonlibpath = %s", python_lib_path.c_str());
+							SmartBody::util::log("pythonlibpath = %s", python_lib_path.c_str());
 							SmartBody::SBScene::setSystemParameter("pythonlibpath", python_lib_path);
 						}
 						t++;
@@ -808,7 +808,7 @@ int main( int argc, char **argv )	{
 				{
 					if (tokens.size() > t + 1)
 					{
-						LOG("Setting Ogre path to %s", tokens[t + 1].c_str());
+						SmartBody::util::log("Setting Ogre path to %s", tokens[t + 1].c_str());
 						if (useBinaryPath)
 						{
 							boost::filesystem::path ogreFolderPath = parentPath;
@@ -817,12 +817,12 @@ int main( int argc, char **argv )	{
 #ifdef WIN32
 							absPath = SmartBody::util::replace(absPath, "\\", "/");
 #endif
-							LOG("ogrepath = %s", absPath.c_str());
+							SmartBody::util::log("ogrepath = %s", absPath.c_str());
 							SmartBody::SBScene::setSystemParameter("ogrepath", absPath);
 						}
 						else
 						{
-							LOG("ogrepath = %s", tokens[t + 1].c_str());
+							SmartBody::util::log("ogrepath = %s", tokens[t + 1].c_str());
 							SmartBody::SBScene::setSystemParameter("ogrepath", tokens[t + 1]);
 						}
 						t++;
@@ -834,7 +834,7 @@ int main( int argc, char **argv )	{
 					if (tokens.size() > t + 1)
 					{
 						mediaPath = tokens[t + 1];
-						LOG("Setting mediapath to %s", tokens[t + 1].c_str());
+						SmartBody::util::log("Setting mediapath to %s", tokens[t + 1].c_str());
 						if (useBinaryPath)
 						{
 							boost::filesystem::path mediaFolderPath = parentPath;
@@ -843,13 +843,13 @@ int main( int argc, char **argv )	{
 #ifdef WIN32
 							absPath = SmartBody::util::replace(absPath, "\\", "/");
 #endif
-							LOG("mediapath = %s", absPath.c_str());
+							SmartBody::util::log("mediapath = %s", absPath.c_str());
 							mediaPath = absPath;
 							SmartBody::SBScene::setSystemParameter("mediapath", absPath);
 						}
 						else
 						{
-							LOG("mediapath = %s", mediaPath.c_str());
+							SmartBody::util::log("mediapath = %s", mediaPath.c_str());
 							SmartBody::SBScene::setSystemParameter("mediapath", mediaPath);
 						}
 						t++;
@@ -859,7 +859,7 @@ int main( int argc, char **argv )	{
 				{
 					if (tokens.size() > t + 1)
 					{
-						LOG("Setting speech relay command to %s", tokens[t + 1].c_str());
+						SmartBody::util::log("Setting speech relay command to %s", tokens[t + 1].c_str());
 						SmartBody::SBScene::setSystemParameter("speechrelaycommand", tokens[t + 1]);
 						t++;
 					}
@@ -869,7 +869,7 @@ int main( int argc, char **argv )	{
 					if (tokens.size() > t + 1)
 					{
 						renderer = tokens[t + 1];
-						LOG("Setting renderer to %s", tokens[t + 1].c_str());
+						SmartBody::util::log("Setting renderer to %s", tokens[t + 1].c_str());
 						SmartBody::SBScene::setSystemParameter("renderer", renderer);
 						t++;
 					}
@@ -878,13 +878,13 @@ int main( int argc, char **argv )	{
 				{
 					if (tokens.size() > t + 1)
 					{
-						LOG("Setting system parameter %s to %s", tokens[t].c_str(), tokens[t + 1].c_str());
+						SmartBody::util::log("Setting system parameter %s to %s", tokens[t].c_str(), tokens[t + 1].c_str());
 						SmartBody::SBScene::setSystemParameter(tokens[t], tokens[t + 1]);
 						t++;
 					}
 					else
 					{
-						LOG("Setting system parameter %s to \"\"", tokens[t].c_str());
+						SmartBody::util::log("Setting system parameter %s to \"\"", tokens[t].c_str());
 						SmartBody::SBScene::setSystemParameter(tokens[t], "");
 					}
 				}
@@ -914,7 +914,7 @@ int main( int argc, char **argv )	{
 	std::string logFile = "./smartbody.log";
 	for (int i=1; i<argc; i++ )
 	{
-		LOG( "SmartBody ARG[%d]: '%s'", i, argv[i] );
+		SmartBody::util::log( "SmartBody ARG[%d]: '%s'", i, argv[i] );
 		std::string s = argv[i];
 		std::string mediapathstr = "";
 		std::string fpsStr = "";
@@ -927,10 +927,10 @@ int main( int argc, char **argv )	{
 		if( s == "-pythonpath" )  // argument -pythonpath
 		{
 			if( ++i < argc ) {
-				LOG( "    Adding path path '%s'\n", argv[i] );
+				SmartBody::util::log( "    Adding path path '%s'\n", argv[i] );
 				python_lib_path = argv[i];
 			} else {
-				LOG( "ERROR: Expected directory path to follow -pythonpath\n" );
+				SmartBody::util::log( "ERROR: Expected directory path to follow -pythonpath\n" );
 				// return -1
 			}
 		}
@@ -942,45 +942,45 @@ int main( int argc, char **argv )	{
 		else if( s == "-mepath" )  // -mepath <dirpath> to specify where Motion Engine files (.sk, .skm) should be loaded from
 		{
 			if( ++i < argc ) {
-				LOG( "    Adding ME path '%s'\n", argv[i] );
+				SmartBody::util::log( "    Adding ME path '%s'\n", argv[i] );
 
 				me_paths.push_back( argv[i] );
 			} else {
-				LOG( "ERROR: Expected directory path to follow -mepath\n" );
+				SmartBody::util::log( "ERROR: Expected directory path to follow -mepath\n" );
 				// return -1
 			}
 		}
 		else if( s == "-seqpath" || s == "-scriptpath" )  // -mepath <dirpath> to specify where sequence files (.seq) should be loaded from
 		{
 			if( ++i < argc ) {
-				LOG( "    Adding sequence path '%s'\n", argv[i] );
+				SmartBody::util::log( "    Adding sequence path '%s'\n", argv[i] );
 
 				//seq_paths.push_back( argv[i] );
 				py_paths.push_back( argv[i] );
 			} else {
-				LOG( "ERROR: Expected directory path to follow -seqpath\n" );
+				SmartBody::util::log( "ERROR: Expected directory path to follow -seqpath\n" );
 				// return -1
 			}
 		}
 		else if( s == "-pypath" )  // -mepath <dirpath> to specify where sequence files (.seq) should be loaded from
 		{
 			if( ++i < argc ) {
-				LOG( "    Adding python script path '%s'\n", argv[i] );
+				SmartBody::util::log( "    Adding python script path '%s'\n", argv[i] );
 
 				py_paths.push_back( argv[i] );
 			} else {
-				LOG( "ERROR: Expected directory path to follow -pypath\n" );
+				SmartBody::util::log( "ERROR: Expected directory path to follow -pypath\n" );
 				// return -1
 			}
 		}
 		else if( s == "-audiopath" )  // -audiopath <dirpath> to specify where audio files (.wav and .bml) should be loaded from
 		{
 			if( ++i < argc ) {
-				LOG( "    Addcore/smartbody/sbm/src/sbm_main.cpping audio path '%s'\n", argv[i] );
+				SmartBody::util::log( "    Addcore/smartbody/sbm/src/sbm_main.cpping audio path '%s'\n", argv[i] );
 
 				audio_paths.push_back( argv[i] );
 			} else {
-				LOG( "ERROR: Expected directory path to follow -audiopath\n" );
+				SmartBody::util::log( "ERROR: Expected directory path to follow -audiopath\n" );
 				// return -1
 			}
 		}
@@ -997,23 +997,23 @@ int main( int argc, char **argv )	{
 					std::string extension = filename.substr(idx+1);
 					if (extension == "py")
 					{
-						LOG( "    Loading Python scrypt '%s'\n", argv[i] );
+						SmartBody::util::log( "    Loading Python scrypt '%s'\n", argv[i] );
 						init_pys.push_back( argv[i] );
 					}
 					else
 					{
-						LOG( "    Loading sequence '%s'\n", argv[i] );
+						SmartBody::util::log( "    Loading sequence '%s'\n", argv[i] );
 						init_seqs.push_back( argv[i] );
 					}
 				}
 				else
 				{
 					// No extension found
-					LOG( "    Loading sequence '%s'\n", argv[i] );
+					SmartBody::util::log( "    Loading sequence '%s'\n", argv[i] );
 					init_seqs.push_back( argv[i] );
 				}
 			} else {
-				LOG( "ERROR: Expected filename to follow -seq\n" );
+				SmartBody::util::log( "ERROR: Expected filename to follow -seq\n" );
 				// return -1
 			}
 		}
@@ -1045,7 +1045,7 @@ int main( int argc, char **argv )	{
 		}
 		else if ( s.compare( "-facebone" ) == 0 )
 		{
-			LOG("-facebone option has been deprecated.");
+			SmartBody::util::log("-facebone option has been deprecated.");
 		}
 		else if ( s.compare( "-skscale=" ) == 0 )
 		{
@@ -1144,13 +1144,13 @@ int main( int argc, char **argv )	{
         }
 		else
 		{
-			LOG( "ERROR: Unrecognized command line argument: \"%s\"\n", s.c_str() );
+			SmartBody::util::log( "ERROR: Unrecognized command line argument: \"%s\"\n", s.c_str() );
 		}
 	}
 
 #ifndef SB_NO_PYTHON
 	// initialize python
-	LOG("Initializing Python with libraries at location: %s", python_lib_path.c_str());
+	SmartBody::util::log("Initializing Python with libraries at location: %s", python_lib_path.c_str());
 
 	SmartBody::SBScene::setSystemParameter("pythonlibpath", python_lib_path);
 	initPython(python_lib_path);
@@ -1165,7 +1165,7 @@ int main( int argc, char **argv )	{
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	//scene->addSceneListener(&fltkListener);
 
-	LOG("Logging to file %s", logFile.c_str());
+	SmartBody::util::log("Logging to file %s", logFile.c_str());
 	scene->startFileLogging(logFile);
 
 
@@ -1219,20 +1219,20 @@ int main( int argc, char **argv )	{
 		vhmsgManager->setEnable(true);
 		if (!vhmsgManager->isEnable())
 		{
-			LOG("Could not connect to server %s, VHMSG service not enabled.", vhmsg_server);
+			SmartBody::util::log("Could not connect to server %s, VHMSG service not enabled.", vhmsg_server);
 		}
 	}
 	else
 	{
 		if( vhmsg_disabled )
 		{
-			LOG( "SmartBody: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
+			SmartBody::util::log( "SmartBody: VHMSG_SERVER='%s': Messaging disabled.\n", vhmsg_server?"NULL":vhmsg_server );
 		} else {
 #if 0 // disable server name query until vhmsg is fixed
 			std::string vhserver = (vhmsg_server? vhmsg_server : "localhost");
 			std::string vhport = (vhmsg_port ? vhmsg_port : "61616");
-			LOG( "SmartBody Error: ttu_open FAILED\n" );
-			LOG("Could not connect to %s:%s", vhserver.c_str(), vhport.c_str());
+			SmartBody::util::log( "SmartBody Error: ttu_open FAILED\n" );
+			SmartBody::util::log("Could not connect to %s:%s", vhserver.c_str(), vhport.c_str());
 #endif
 		}
 		vhmsgManager->setEnable(false);
@@ -1260,7 +1260,7 @@ int main( int argc, char **argv )	{
 	{
 		if ( !AUDIO_Init() )
 		{
-			LOG( "ERROR: Audio initialization failed\n" );
+			SmartBody::util::log( "ERROR: Audio initialization failed\n" );
 		}
 	}
 
@@ -1272,7 +1272,7 @@ int main( int argc, char **argv )	{
 	{
 		std::stringstream strstr;
 		strstr << envNames[x] << " = \"" << envValues[x] << "\"";
-		LOG(strstr.str().c_str());
+		SmartBody::util::log(strstr.str().c_str());
 		scene->run(strstr.str());
 	}
 #endif
@@ -1294,7 +1294,7 @@ int main( int argc, char **argv )	{
 	vector<string>::iterator it;
 
 	if( seq_paths.empty() && py_paths.empty() ) {
-		LOG( "No script paths specified. Adding current working directory to script path.\n" );
+		SmartBody::util::log( "No script paths specified. Adding current working directory to script path.\n" );
 		seq_paths.push_back( "." );
 	}
 
@@ -1338,7 +1338,7 @@ int main( int argc, char **argv )	{
 	// run the specified scripts
 	if( init_seqs.empty() && init_pys.empty())
 	{
-		LOG( "No Python scripts specified. Loading default configuration.'\n" );
+		SmartBody::util::log( "No Python scripts specified. Loading default configuration.'\n" );
 		SmartBody::SBScene::getScene()->run("getViewer().show()\ngetCamera().reset()");
 	}
 
@@ -1359,9 +1359,9 @@ int main( int argc, char **argv )	{
 		std::stringstream strstr;
 		strstr << "scene.run(\"" << cmd.c_str() << "\")";
 		SmartBody::SBScene::getScene()->run(strstr.str().c_str());
-		LOG("Run Script = %s", strstr.str().c_str());
+		SmartBody::util::log("Run Script = %s", strstr.str().c_str());
 	}
-	LOG("After running init python script");
+	SmartBody::util::log("After running init python script");
 	me_paths.clear();
 	seq_paths.clear();
 	init_seqs.clear();

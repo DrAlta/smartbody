@@ -21,7 +21,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _SBVHMSGMANAGER_H_
 #define _SBVHMSGMANAGER_H_
 
-#include <vhcl.h>
 #include <sb/SBTypes.h>
 #include <sb/SBService.h>
 #include <string>

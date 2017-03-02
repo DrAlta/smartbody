@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 
 #include <iostream>
 #include <sstream>
@@ -7,6 +7,7 @@
 #include <sb/SBScene.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
+#include <sb/SBUtilities.h>
 #include <controllers/me_ct_param_animation.h>
 #include "bml_states.hpp"
 
@@ -29,7 +30,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 	if (character == NULL)
 	{
-		LOG("parse_bml_states ERR: cannot find character with name %s.", characterName.c_str());
+		SmartBody::util::log("parse_bml_states ERR: cannot find character with name %s.", characterName.c_str());
 		return BehaviorRequestPtr();
 	}
 
@@ -45,7 +46,7 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 
 	if (!paramCt)
 	{
-		LOG("No parameterized animation controller present for character %s.", character->getName().c_str());
+		SmartBody::util::log("No parameterized animation controller present for character %s.", character->getName().c_str());
 		return BehaviorRequestPtr();
 	}
 
@@ -53,13 +54,13 @@ BML::BehaviorRequestPtr BML::parse_bml_states( DOMElement* elem, const std::stri
 	std::string stateName = xml_parse_string(BMLDefs::ATTR_NAME, elem);
 	if (stateName == "")
 	{
-		LOG("parse_bml_states ERR: expecting a state name.");
+		SmartBody::util::log("parse_bml_states ERR: expecting a state name.");
 		return BehaviorRequestPtr();
 	}
 	PABlend* state = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(stateName);
 	if (!state)
 	{
-		LOG("parse_bml_states WARNING: Can't find state name %s, will schedule PseudoIdle state under schedule mode", stateName.c_str());
+		SmartBody::util::log("parse_bml_states WARNING: Can't find state name %s, will schedule PseudoIdle state under schedule mode", stateName.c_str());
 	}
 
 	// get parameters

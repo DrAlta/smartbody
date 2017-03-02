@@ -1,5 +1,5 @@
 
-#include "vhcl.h"
+
 
 #include "ResourceWindow.h"
 #include <sbm/lin_win.h>
@@ -228,11 +228,11 @@ int ResourceWindow::handle( int event )
 	std::string dndText;
 	switch ( event ) {
 		case FL_DND_RELEASE:
-			//LOG("DND Release");
+			//SmartBody::util::log("DND Release");
 			ret = 1;
 			break;
 		case FL_DND_ENTER:          // return(1) for these events to 'accept' dnd
-			//LOG("DND Enter");
+			//SmartBody::util::log("DND Enter");
 			//Fl::belowmouse(this); // send the leave events first
 			//Fl::focus(this);
 			//handle(FL_FOCUS);		
@@ -242,14 +242,14 @@ int ResourceWindow::handle( int event )
 			ret = 1;
 			break;
 		case FL_DND_LEAVE:
-			//LOG("DND Leave");
+			//SmartBody::util::log("DND Leave");
 			ret = 1;
 			break;	  
 		case FL_PASTE:              // handle actual drop (paste) operation		   
 			{
 				//label(Fl::event_text());
 				//fprintf(stderr, "PASTE: %s\n", Fl::event_text());
-				//LOG("PASTE: %s\n", Fl::event_text());
+				//SmartBody::util::log("PASTE: %s\n", Fl::event_text());
 				dndText = Fl::event_text();
 				bool hasAsset = processedDragAndDrop(dndText);
 				ret = 1;				
@@ -259,8 +259,8 @@ int ResourceWindow::handle( int event )
 		{// do 'copy/dnd' when someone clicks on box
 			if (Fl::event_button() == 2)
 			{
-				LOG("press middle button");
-				LOG("lastClickedItemPath = %s",lastClickedItemPath.c_str());
+				SmartBody::util::log("press middle button");
+				SmartBody::util::log("lastClickedItemPath = %s",lastClickedItemPath.c_str());
 				Fl_Tree_Item* lastItem = resourceTree->find_item(lastClickedItemPath.c_str());	
 				if (lastItem)
 				{
@@ -897,7 +897,7 @@ void ResourceWindow::updateCharacter( Fl_Tree_Item* tree, SmartBody::SBCharacter
 		int n = ctTree->count_controllers();
 		for (int c = 0; c < n; c++)
 		{
-			//LOG( "%s", ctTree->controller(c)->name() );
+			//SmartBody::util::log( "%s", ctTree->controller(c)->name() );
 			std::string controllerName = ctTree->controller(c)->getName();
 			Fl_Tree_Item* ctrlItem = resourceTree->add(controllerFolder, controllerName.c_str());
 //			ctrlItem->user_data((void*)ITEM_CONTROLLER);
@@ -952,7 +952,7 @@ void ResourceWindow::refreshUI( Fl_Widget* widget, void* data )
 
 void ResourceWindow::treeCallBack( Fl_Widget* widget, void* data )
 {
-	//LOG("Tree call back....");
+	//SmartBody::util::log("Tree call back....");
 
 	Fl_Tree      *tree = (Fl_Tree*)widget;
 	Fl_Tree_Item *item = (Fl_Tree_Item*)tree->callback_item();	// get selected item

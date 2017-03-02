@@ -1,5 +1,26 @@
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
 #include <sr/sr_euler.h>
 #include "controllers/me_ct_motion_parameter.h"
+#include <sb/SBUtilities.h>
 
 MotionParameter::MotionParameter(SmartBody::SBSkeleton* skel, std::vector<SmartBody::SBJoint*>& joints)
 {
@@ -96,7 +117,7 @@ void LocomotionParameter::getMotionParameter( BodyMotionInterface* motion, dVect
 	outPara(0) = speed;
 	outPara(1) = angVel;
 	outPara(2) = strafeVel;
-	//LOG("para = %f %f %f", outPara(0),outPara(1),outPara(2));
+	//SmartBody::util::log("para = %f %f %f", outPara(0),outPara(1),outPara(2));
 }
 
 void LocomotionParameter::getMotionFrameParameter( BodyMotionInterface* motion, float refTime, dVector& outPara )
@@ -168,7 +189,7 @@ float LocomotionParameter::getMotionSpeedAxis( BodyMotionInterface* motion, cons
 		axisIndex = 2;
 	else
 	{
-		LOG("Bad axis specified '%s', defaulting to use the X-axis.", axis.c_str());
+		SmartBody::util::log("Bad axis specified '%s', defaulting to use the X-axis.", axis.c_str());
 	}
 #if 1
 	int nSegment = 5;
@@ -273,7 +294,7 @@ void JumpParameter::getMotionParameter( BodyMotionInterface* motion, dVector& ou
 	outPara(0) = distance;
 	outPara(1) = height;
 	outPara(2) = angle;
-	//LOG("distance = %f, height = %f, angle = %f",distance,height, angle);
+	//SmartBody::util::log("distance = %f, height = %f, angle = %f",distance,height, angle);
 }
 
 float JumpParameter::getMotionHeight( BodyMotionInterface* motion, const std::string& jointName )
@@ -293,7 +314,7 @@ float JumpParameter::getMotionDirection( BodyMotionInterface* motion, const std:
 	SrVec endPos = motion->getMotionBaseTranslation((float)timeEnd, jointName);
 	SrVec dir = endPos - startPos; dir.y = 0.f; dir.normalize();
 	SrVec ang = cross(SrVec(0,0,1), dir);
-	//LOG("cross = %f %f %f",ang[0],ang[1],ang[2]);
+	//SmartBody::util::log("cross = %f %f %f",ang[0],ang[1],ang[2]);
 	float rotAngle = asinf(ang.y);	
 	return rotAngle;
 }

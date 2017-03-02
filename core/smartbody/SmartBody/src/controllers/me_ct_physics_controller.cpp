@@ -5,6 +5,7 @@
 #include <sb/SBEvent.h>
 #include <sb/SBScene.h>
 #include <sb/SBSceneListener.h>
+#include <sb/SBUtilities.h>
 
 std::string MeCtPhysicsController::CONTROLLER_TYPE = "PhysicsController";
 
@@ -92,7 +93,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 			//sprintf(eventMsg,"start %s %f %f %f",_character->getName().c_str(),hitPos[0],hitPos[1],hitPos[2]);
 			SmartBody::SBJoint* hitJoint = col.hitJointObj->getSBJoint();
 			sprintf(eventMsg,"start %s %s %s %f %f %f %f",_character->getName().c_str(),col.collider->getName().c_str(),hitJoint->jointName().c_str(),hitPos[0],hitPos[1],hitPos[2], col.momentum.len());			
-			LOG("eventMsg = %s",eventMsg);
+			SmartBody::util::log("eventMsg = %s",eventMsg);
 			std::string cmd = eventMsg;
 #if !defined(EMSCRIPTEN)
 			SmartBody::SBMotionEvent motionEvent;
@@ -233,12 +234,12 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 				pQuatPhy = obj->getParentObj()->getGlobalTransform().rot;
 
 			SrQuat newGQuat = SrQuat(newMat);			
-			//LOG("joint name = %s",joint->getName().c_str());
+			//SmartBody::util::log("joint name = %s",joint->getName().c_str());
 			//sr_out << "gmat Quat = " << SrQuat(joint->getMatrixGlobal()) << srnl;
 			//sr_out << "old phyQuat = " << pQuatPhy*oldPhyQuat << "  , newQuat = " << newQuat*pQuat << srnl;
 			//sr_out << "new GQuat = " << newGQuat << srnl;
 			
-			//LOG("joint name = %s",joint->getName().c_str());
+			//SmartBody::util::log("joint name = %s",joint->getName().c_str());
 			//sr_out << "angVel = " << angDiff << srnl;
  			//phyJoint->setRefAngularVel(angDiff);			
 			phyJoint->setRefQuat(inQuat);
@@ -265,7 +266,7 @@ bool MeCtPhysicsController::controller_evaluate(double t, MeFrameData& frame)
 					frame.buffer()[posBufferID + 1] = pos.y;
 					frame.buffer()[posBufferID + 2] = pos.z;	
 				}
-				//LOG("joint name = %s",joint->getName().c_str());
+				//SmartBody::util::log("joint name = %s",joint->getName().c_str());
 				//sr_out << "Pos = " << pos << srnl;				
 			}
 			else

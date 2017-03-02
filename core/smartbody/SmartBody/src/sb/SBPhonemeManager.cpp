@@ -27,7 +27,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <vector>
 #include <set>
-#include <vhcl.h>
+
 #include <fstream>
 #include <cctype>
 #include <cstring>
@@ -108,7 +108,7 @@ void SBPhonemeManager::addPhonemeMapping(const std::string& from, const std::str
 	std::map<std::string, std::string>::iterator iter = _phonemeToCommonPhonemeMap.find(upperCaseFrom);
 	if (iter != _phonemeToCommonPhonemeMap.end())
 	{
-		LOG("Phoneme mapping from %s->%s already found, replacing with %s->%s", (*iter).first.c_str(), (*iter).second.c_str(), upperCaseFrom.c_str(), upperCaseTo.c_str());
+		SmartBody::util::log("Phoneme mapping from %s->%s already found, replacing with %s->%s", (*iter).first.c_str(), (*iter).second.c_str(), upperCaseFrom.c_str(), upperCaseTo.c_str());
 	}
 	_phonemeToCommonPhonemeMap[from] = upperCaseTo;
 }
@@ -185,7 +185,7 @@ SBDiphone* SBPhonemeManager::createDiphone(const std::string& fromPhoneme, const
 	SBDiphone* diphone = getDiphone(upperCaseFromPhoneme, upperCaseToPhoneme, name);
 	if (diphone)
 	{
-		;//LOG("Diphone set %s already contain diphone pair %s to %s, return existing one.", name.c_str(), lowerCaseFromPhoneme.c_str(), lowerCaseToPhoneme.c_str());
+		;//SmartBody::util::log("Diphone set %s already contain diphone pair %s to %s, return existing one.", name.c_str(), lowerCaseFromPhoneme.c_str(), lowerCaseToPhoneme.c_str());
 	}
 	else
 	{
@@ -334,7 +334,7 @@ void SBPhonemeManager::normalizeCurves(const std::string& name)
 				}
 
 				// normalize the values according the the scale
-				LOG("Normalize scale is %f", maxVal);
+				SmartBody::util::log("Normalize scale is %f", maxVal);
 				float scale = 1.0f / ((1.0f + maxVal) / 2.0f);
 				for (std::vector<std::string>::iterator visemeIter = visemes.begin();
 					 visemeIter != visemes.end();
@@ -370,7 +370,7 @@ void SBPhonemeManager::loadDictionary(const std::string& language, const std::st
 	std::ifstream filestream( file.c_str() );
 	if (!filestream.good())
 	{
-		LOG("Could not open dictionary file %s", file.c_str());
+		SmartBody::util::log("Could not open dictionary file %s", file.c_str());
 		return;
 	}
 	
@@ -413,7 +413,7 @@ void SBPhonemeManager::loadDictionary(const std::string& language, const std::st
 
 	}
 	filestream.close();
-	LOG("Dictionary for language %s loaded with %d words.", language.c_str(), numWords);
+	SmartBody::util::log("Dictionary for language %s loaded with %d words.", language.c_str(), numWords);
 	_dictionaryFileMap[language] = file;
 }
 
@@ -432,7 +432,7 @@ void SBPhonemeManager::addDictionaryWord(const std::string& language, const std:
 	if (phonemeLookupIter != (*iter).second.end())
 	{
 		// if the word already exists, warn and replace it
-		LOG("Dictionary word %s in language %s already found, replacing...", word.c_str(), language.c_str());
+		SmartBody::util::log("Dictionary word %s in language %s already found, replacing...", word.c_str(), language.c_str());
 	}
 	(*iter).second[word] = phonemes;
 }
@@ -444,7 +444,7 @@ std::vector<std::string>& SBPhonemeManager::getDictionaryWord(const std::string&
 	std::map<std::string, std::map<std::string, std::vector<std::string> > >::iterator iter = _wordToPhonemeMaps.find(language);
 	if (iter == _wordToPhonemeMaps.end())
 	{
-		LOG("Dictionary word %s cannot be found: no lanugage %s present.", uppercaseWord.c_str(), language.c_str());
+		SmartBody::util::log("Dictionary word %s cannot be found: no lanugage %s present.", uppercaseWord.c_str(), language.c_str());
 		return _emptyPhonemeSet;
 	}
 
@@ -453,7 +453,7 @@ std::vector<std::string>& SBPhonemeManager::getDictionaryWord(const std::string&
 	std::map<std::string, std::vector<std::string> >::iterator phonemeLookupIter = wordPhonemeMap.find(uppercaseWord);
 	if (phonemeLookupIter == wordPhonemeMap.end())
 	{
-		LOG("Dictionary word %s in language %s cannot be found.", uppercaseWord.c_str(), language.c_str());
+		SmartBody::util::log("Dictionary word %s in language %s cannot be found.", uppercaseWord.c_str(), language.c_str());
 		return _emptyPhonemeSet;
 	}
 
@@ -598,7 +598,7 @@ void SBPhonemeManager::setPhonemesRealtime(const std::string& character, const s
 	rtp.phoneme = phoneme;
 	rtp.time = SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 	(*iter).second.push_back(rtp);
-	LOG("Got phoneme %s at time %f",  rtp.phoneme.c_str(), rtp.time);
+	SmartBody::util::log("Got phoneme %s at time %f",  rtp.phoneme.c_str(), rtp.time);
 }
 
 void SBPhonemeManager::clearPhonemesRealtime(const std::string& character, const std::string& phoneme)
@@ -617,7 +617,7 @@ void SBPhonemeManager::generatePhoneTrigrams(const std::string& lipsyncSetName)
 	std::map<std::string, std::vector<SBDiphone*> >::iterator iter = _diphoneMap.find(lipsyncSetName);
 	if (iter == _diphoneMap.end())
 	{
-		LOG("Cannot produce trigrams for lip sync set name: %s, does not exist.", lipsyncSetName.c_str());
+		SmartBody::util::log("Cannot produce trigrams for lip sync set name: %s, does not exist.", lipsyncSetName.c_str());
 		return;
 	}
 
@@ -667,28 +667,28 @@ void SBPhonemeManager::saveLipSyncAnimation(const std::string characterName, con
 
 	if (!bmlnode)
 	{
-		LOG( "Could not find <bml> tag in %s. No output file named '%s' written.", lipsyncFile.c_str(), outputFile.c_str());
+		SmartBody::util::log( "Could not find <bml> tag in %s. No output file named '%s' written.", lipsyncFile.c_str(), outputFile.c_str());
 		return;
 	}
 
 	SmartBody::SBCharacter* character = SmartBody::SBScene::getScene()->getCharacter(characterName);
 	if (!character)
 	{
-		LOG("Could not find character with name '%s'. No output file named '%s' written.", characterName.c_str(), outputFile.c_str());
+		SmartBody::util::log("Could not find character with name '%s'. No output file named '%s' written.", characterName.c_str(), outputFile.c_str());
 		return;
 	}
 
 	std::string lipSyncSetName = character->getStringAttribute("lipSyncSetName");
 	if (lipSyncSetName == "")
 	{
-		LOG("Could not find lip sync data set '%s' for character with name '%s'. Please set the 'lipsyncSetName' attribute to a valid lip sync set first. No output file named '%s' written.", lipSyncSetName.c_str(), characterName.c_str(), outputFile.c_str());
+		SmartBody::util::log("Could not find lip sync data set '%s' for character with name '%s'. Please set the 'lipsyncSetName' attribute to a valid lip sync set first. No output file named '%s' written.", lipSyncSetName.c_str(), characterName.c_str(), outputFile.c_str());
 		return;
 	}
 
 	std::vector<SmartBody::SBDiphone*>& diphones = this->getDiphones(lipSyncSetName);
 	if (diphones.size() == 0)
 	{
-		LOG("Lip sync data for set '%s' is empty. Please load a lip sync set first. No output file named '%s' written.", lipSyncSetName.c_str(), outputFile.c_str());
+		SmartBody::util::log("Lip sync data for set '%s' is empty. Please load a lip sync set first. No output file named '%s' written.", lipSyncSetName.c_str(), outputFile.c_str());
 		return;
 	}
 
@@ -737,7 +737,7 @@ void SBPhonemeManager::saveLipSyncAnimation(const std::string characterName, con
 	std::ofstream daeStream (outputFile.c_str(), std::ios::out);
 	if (!daeStream.good())
 	{
-		LOG("Cannot write to file '%s'. No output file written.", outputFile.c_str());
+		SmartBody::util::log("Cannot write to file '%s'. No output file written.", outputFile.c_str());
 		return;
 	}
 

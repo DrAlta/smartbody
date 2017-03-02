@@ -18,7 +18,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 **************************************************************/
 
-#include "vhcl.h"
+
 #if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #include "external/jpge/jpge.h"
@@ -36,12 +36,11 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <algorithm>
 #include "SbmBlendFace.h"
-
 #include <sr/jpge.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
 #include <sb/SBPawn.h>
-
+#include <sb/SBUtilities.h>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
@@ -88,11 +87,11 @@ void SbmBlendFace::initShader() {
 	if(program) 
 	{
 		_programID	= program->getShaderProgram();
-//		LOG("Program %d exisits already", _programID);
+//		SmartBody::util::log("Program %d exisits already", _programID);
 	} 
 	else
 	{
-//		LOG("Program does not exist yet");
+//		SmartBody::util::log("Program does not exist yet");
 		initShaderProgram();
 		_programID	= SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
 	}
@@ -210,7 +209,7 @@ void SbmBlendFace::initShaderProgram_Dan() {
 	glCompileShader(_vsID);
 	glGetShaderiv(_vsID, GL_COMPILE_STATUS, &success);
 	if(success == GL_FALSE) {
-		LOG("ERROR in glCompileShader(_vsID);");
+		SmartBody::util::log("ERROR in glCompileShader(_vsID);");
 	}
 
 	//loadShaderStr(_vsID, vsShaderStr.c_str());
@@ -227,7 +226,7 @@ void SbmBlendFace::initShaderProgram_Dan() {
 	
 	glGetShaderiv(_fsID, GL_COMPILE_STATUS, &success);
 	if(success == GL_FALSE) {
-		LOG("ERROR in glCompileShader(_fsID);");
+		SmartBody::util::log("ERROR in glCompileShader(_fsID);");
 	}
 
 	SbmShaderProgram::printShaderInfoLog(_vsID);
@@ -243,10 +242,10 @@ void SbmBlendFace::initShaderProgram_Dan() {
 	GLint isLinked = 0;
 	glGetProgramiv(_programID, GL_LINK_STATUS, (int *)&isLinked);
 	if(isLinked == GL_FALSE) {
-		LOG("ERROR inglLinkProgram(_programID);;");
+		SmartBody::util::log("ERROR inglLinkProgram(_programID);;");
 		SbmShaderProgram::printProgramInfoLog(_programID);
 	} else {
-		LOG("ProgramID: %d", _programID);
+		SmartBody::util::log("ProgramID: %d", _programID);
 	}
 
 	
@@ -320,7 +319,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("Blend_Two_Textures::Program does not exist yet");
+			SmartBody::util::log("Blend_Two_Textures::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendTextures.vert";
 			const std::string shaderFs	= shaderPath + "blendTextures.frag";
@@ -345,7 +344,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			//LOG("Blend_All_Textures::Program does not exist yet");
+			//SmartBody::util::log("Blend_All_Textures::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendAllTextures.vert";
 			const std::string shaderFs	= shaderPath + "blendAllTextures.frag";
@@ -368,15 +367,15 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("Blend_All_Textures_Pairwise::Program does not exist yet");
+			SmartBody::util::log("Blend_All_Textures_Pairwise::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendAllTexturesPairwise.vert";
 			const std::string shaderFs	= shaderPath + "blendAllTexturesPairwise.frag";
 	
 			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
-			LOG("After addShader, VS = %s, FS = %s", shaderVs.c_str(), shaderFs.c_str());
+			SmartBody::util::log("After addShader, VS = %s, FS = %s", shaderVs.c_str(), shaderFs.c_str());
 			SbmShaderManager::singleton().buildShaders();
-			LOG("After buildShaders");				
+			SmartBody::util::log("After buildShaders");				
 			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
 		}
 	}
@@ -392,7 +391,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("BlendGeometry::Program does not exist yet");
+			SmartBody::util::log("BlendGeometry::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendGeometry.vert";
 			const std::string shaderFs	= shaderPath + "blendGeometry.frag";
@@ -415,15 +414,15 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("ReadMasks::Program does not exist yet");
+			SmartBody::util::log("ReadMasks::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "readMasks.vert";
 			const std::string shaderFs	= shaderPath + "readMasks.frag";
 	
 			SbmShaderManager::singleton().addShader(_shaderName.c_str(), shaderVs.c_str(), shaderFs.c_str(), true);
-			LOG("Before build shader");
+			SmartBody::util::log("Before build shader");
 			SbmShaderManager::singleton().buildShaders();
-			LOG("After build shader");
+			SmartBody::util::log("After build shader");
 				
 			return SbmShaderManager::singleton().getShader(_shaderName)->getShaderProgram();
 		}
@@ -440,7 +439,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("BlendGeometryWithMasks::Program does not exist yet");
+			SmartBody::util::log("BlendGeometryWithMasks::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendGeometryWithMasks.vert";
 			const std::string shaderFs	= shaderPath + "blendGeometryWithMasks.frag";
@@ -463,7 +462,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("BlendGeometryWithMasksFeedback::Program does not exist yet");
+			SmartBody::util::log("BlendGeometryWithMasksFeedback::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendGeometryWithMasksFeedback.vert";
 			const std::string shaderFs	= ""; // no fragment shader//shaderPath + "blendGeometryWithMasks.frag";
@@ -486,7 +485,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("RenderGeometryWithMasks::Program does not exist yet");
+			SmartBody::util::log("RenderGeometryWithMasks::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "renderGeometryWithMask.vert";
 			const std::string shaderFs	= shaderPath + "renderGeometryWithMask.frag";
@@ -509,7 +508,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 		//	If the GLSL shader is not in the ShaderManager yet
 		else
 		{
-			LOG("BlendAllTexturesWithMask::Program does not exist yet");
+			SmartBody::util::log("BlendAllTexturesWithMask::Program does not exist yet");
 
 			const std::string shaderVs	= shaderPath + "blendAllTexturesWithMask.vert";
 			const std::string shaderFs	= shaderPath + "blendAllTexturesWithMask.frag";
@@ -522,7 +521,7 @@ GLuint SbmBlendTextures::getShader(const std::string _shaderName)
 	}
 	else
 	{
-		LOG("*** ERROR: Invalid BlendTextures shader");
+		SmartBody::util::log("*** ERROR: Invalid BlendTextures shader");
 		return 0;
 	}
 }
@@ -533,7 +532,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 	GLint prevBufferObject;
 	glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &prevBufferObject);
 
-	//LOG("PrevBufferObject = %d", prevBufferObject);
+	//SmartBody::util::log("PrevBufferObject = %d", prevBufferObject);
 
 	int numTextures		= weights.size();
 
@@ -543,7 +542,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 
 	for(std::vector<float>::iterator j=weights.begin(); j!=weights.end(); ++j)
 		sumOfWeights += *j;
-	//LOG("Blend ApperancePairWise");
+	//SmartBody::util::log("Blend ApperancePairWise");
 // 	glActiveTexture(GL_TEXTURE0);
 // 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 // 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -558,7 +557,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 
 	for(int i = numTextures-1; i >= 0; i--) 
 	{
-		//LOG("BlendTexture %d", i);
+		//SmartBody::util::log("BlendTexture %d", i);
 		WeightUpToNow += weights[i];
 
 		int faceArea;
@@ -581,7 +580,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 		
 			glBindFramebuffer(GL_FRAMEBUFFER, FBODst[i]);                                                              // Bind the framebuffer object
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDst[i], 0);              // Attach texture to FBO
-		//LOG("After bind framebuffer");
+		//SmartBody::util::log("After bind framebuffer");
 			assert( glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE );
 			
 #if !defined(__ANDROID__)
@@ -678,7 +677,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 			glGetIntegerv(GL_VIEWPORT, viewport);
 			GLfloat clearColors[4];
 			glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColors);
-			//LOG("Viewport size = %d %d %d %d", viewport[0], viewport[1], viewport[2], viewport[3]);
+			//SmartBody::util::log("Viewport size = %d %d %d %d", viewport[0], viewport[1], viewport[2], viewport[3]);
 
 			glViewport(0, 0, w, h);
 			
@@ -687,7 +686,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			
-			//LOG("After clear buffer");
+			//SmartBody::util::log("After clear buffer");
 			GLuint uNumberOfTextures		= glGetUniformLocation(program, "uNumberOfTextures");
 			GLuint uIteration				= glGetUniformLocation(program, "uIteration");
 			GLuint uWeight					= glGetUniformLocation(program, "uWeight");
@@ -697,12 +696,12 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 			GLuint uNeutralSampler			= glGetUniformLocation(program, "uNeutralSampler");
 			GLuint uExpressionSampler		= glGetUniformLocation(program, "uExpressionSampler");
 			GLuint uPreviousResultSampler	= glGetUniformLocation(program, "uPreviousResultSampler");
-			//LOG("program = %d", program);
+			//SmartBody::util::log("program = %d", program);
 	
 			glUseProgram(program);
 	#if 1		
 			//glEnable(GL_TEXTURE_2D);
-			//LOG("After use program");
+			//SmartBody::util::log("After use program");
 			glUniform1i(uNumberOfTextures, numTextures);
 			glUniform1i(uIteration, i);
 			glUniform1f(uWeight, weights[i]);
@@ -712,13 +711,13 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 			glUniform1i(uNeutralSampler, 0);
 			glUniform1i(uExpressionSampler, 1);
 			glUniform1i(uPreviousResultSampler, 2);
-			//LOG("After glUniform1i");
+			//SmartBody::util::log("After glUniform1i");
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, texIDs[0]);
-			//LOG("after bind tedIDs[0]");
+			//SmartBody::util::log("after bind tedIDs[0]");
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, texIDs[i]);
-			//LOG("After bindTexture");
+			//SmartBody::util::log("After bindTexture");
 			//std::cerr << "uNeutral: " << texIDs[0] << "\tuExpression: " << texIDs[i];
 
 			// if first iteration, previous result will not be used, passing a random texture just for completeness  
@@ -732,7 +731,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 				//std::cerr << "\tprevious: " << texDst[i+1] << "\tDest:" << texDst[i] <<  "\ti = " << i << "\n";
 			}
 			
-			//LOG("before bindAttrib");
+			//SmartBody::util::log("before bindAttrib");
 			SrVec4 quad[4] = { SrVec4(-1.0, 1.0f, -0.5f, 1.f), SrVec4(-1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, -1.0f, -0.5f, 1.f), SrVec4(1.0f, 1.0f, -0.5f, 1.f) };
 			SrVec4 quadT[4] = { SrVec4(0.f, 1.f, 0.f, 0.f), SrVec4(0.f, 0.f, 0.f, 0.f), SrVec4(1.f, 0.f, 0.f, 0.f), SrVec4(1.f, 1.f, 0.f, 0.f) };
 			unsigned short indices[] = {0,1,2, 0,2,3};
@@ -746,9 +745,9 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 			glVertexAttribPointer(texcoord_loc,4,GL_FLOAT,0,0,(GLfloat*)&quadT[0]);
 			//wes_matrix_mvp();
 			glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(projMat));
-			//LOG("Before draw elements");
+			//SmartBody::util::log("Before draw elements");
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, indices);
-			//LOG("After draw elements");
+			//SmartBody::util::log("After draw elements");
 			
 			glDisableVertexAttribArray(pos_loc);
 			glDisableVertexAttribArray(texcoord_loc);
@@ -766,7 +765,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 			glActiveTexture(GL_TEXTURE0);
 																									   // Bind the frame buffer object
 		
-		//LOG("After bind framebuffer");
+		//SmartBody::util::log("After bind framebuffer");
 		/*
 		//	Saves USColorCode for current weight i in EXR32 format
 		int channels = 3;
@@ -784,7 +783,7 @@ void SbmBlendTextures::BlendAllAppearancesPairwise(GLuint * FBODst, GLuint * tex
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, prevBufferObject);		
 	}
-	//LOG("Finish BlendAllAppearancesPairwise");
+	//SmartBody::util::log("Finish BlendAllAppearancesPairwise");
 }
 
 
@@ -846,11 +845,11 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 		std::string extension = path.extension().string();
 		std::string mask		= boost::replace_all_copy(textureFileNames[i], extension, "_mask" + extension);
 		SbmTexture* tex_mask;
-		LOG("mask name = %s\n",mask.c_str());
+		SmartBody::util::log("mask name = %s\n",mask.c_str());
 		// Checks if mask file exists
 		if (!boost::filesystem::exists(mask))
 		{
-			LOG("WARNING! Can't find mask named %s for texture %s, using a white mask instead.\n", mask.c_str(), textureFileNames[i].c_str());
+			SmartBody::util::log("WARNING! Can't find mask named %s for texture %s, using a white mask instead.\n", mask.c_str(), textureFileNames[i].c_str());
 			SbmTextureManager::singleton().createWhiteTexture("white");
 			tex_mask	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,"white");
 		}
@@ -861,7 +860,7 @@ void SbmBlendTextures::ReadMasks(GLuint * FBODst, GLuint * texDst, std::vector<f
 			tex_mask	= SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, mask.c_str());
 	
 			if(tex_mask == NULL)
-				LOG("ERROR loading texture %s",mask.c_str());
+				SmartBody::util::log("ERROR loading texture %s",mask.c_str());
 		
 			// Builds mask to generate OpenGL texture ID
 			tex_mask->buildTexture();
@@ -1111,7 +1110,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		}
 		if (baseModel == NULL)
 		{
-			LOG("original base model cannot be found");
+			SmartBody::util::log("original base model cannot be found");
 			continue;
 		}
 
@@ -1157,7 +1156,7 @@ void SbmBlendTextures::BlendGeometryWithMasks(GLuint * FBODst, std::vector<float
 		if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
 		{
 			GLuint vertexAttribLoc = aVertexPosition + usedWeights.size();
-			//LOG("vertexAttribLoc = %d", vertexAttribLoc);
+			//SmartBody::util::log("vertexAttribLoc = %d", vertexAttribLoc);
 			glEnableVertexAttribArray(vertexAttribLoc);
 			VBOVec3f* vbo = aux->getVBOPos(i);
 			if (!vbo)
@@ -1342,7 +1341,7 @@ void SbmBlendTextures::RenderGeometryWithMasks(GLuint * FBODst, std::vector<floa
 		if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
 		{
 // 			GLuint vertexAttribLoc = aVertexPosition + usedWeights.size();
-// 			//LOG("vertexAttribLoc = %d", vertexAttribLoc);
+// 			//SmartBody::util::log("vertexAttribLoc = %d", vertexAttribLoc);
 // 			glEnableVertexAttribArray(vertexAttribLoc);
 // 			VBOVec3f* vbo = aux->getVBOPos(i);
 // 			if (!vbo)
@@ -1535,7 +1534,7 @@ void SbmBlendTextures::BlendGeometry(GLuint * FBODst, std::vector<float> weights
 		}
 		if (baseModel == NULL)
 		{
-			LOG("original base model cannot be found");
+			SmartBody::util::log("original base model cannot be found");
 			continue;
 		}
 
@@ -1672,7 +1671,7 @@ void SbmBlendTextures::BlendGeometry(GLuint * FBODst, std::vector<float> weights
 	aux->getVBOPos(1)->VBO()->UnbindBuffer();
 	aux->getVBOTexCoord()->VBO()->UnbindBuffer();
 
-	for(int i=0; i<usedWeights.size(); i++)
+	for(size_t i=0; i<usedWeights.size(); i++)
 	{
 		glDisableVertexAttribArray(aVertexPosition + i);
 	}
@@ -2000,7 +1999,7 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 		}
 		if (baseModel == NULL)
 		{
-			LOG("original base model cannot be found");
+			SmartBody::util::log("original base model cannot be found");
 			continue;
 		}
 
@@ -2022,13 +2021,13 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 			int bufSize = _mesh->posBuf.size();
 			if (visemeV.size() > bufSize)
 			{
-				LOG("Warning: inconsistent number of vertices in shape %s, shape %d %s", _mesh->getName().c_str(), i,  (const char*) mIter->second[i]->shape().name);
+				SmartBody::util::log("Warning: inconsistent number of vertices in shape %s, shape %d %s", _mesh->getName().c_str(), i,  (const char*) mIter->second[i]->shape().name);
 				bufSize = visemeV.size();
 			}
 			std::vector<SrVec> visemeBuf(bufSize);
 			// convert to vertex buffer by adding all new vertices
-			//LOG("visemeV size = %d, visemeBuf size = %d", visemeV.size(), visemeBuf.size());
-			for (int j=0;j<visemeV.size();j++)
+			//SmartBody::util::log("visemeV size = %d, visemeBuf size = %d", visemeV.size(), visemeBuf.size());
+			for (size_t j=0;j<visemeV.size();j++)
 			{
 				visemeBuf[j] = visemeV[j];
 				if (_mesh->vtxNewVtxIdxMap.find(j) != _mesh->vtxNewVtxIdxMap.end())
@@ -2062,13 +2061,13 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 	GLuint aVertexTexcoord	= glGetAttribLocation(program, "aVertexTexcoord");
 	GLuint aVertexPosition	= glGetAttribLocation(program, "aVertexPosition");
 
-	for(int i=0; i<weights.size(); i++)
+	for(size_t i=0; i<weights.size(); i++)
 	{
 		// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
 		if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))
 		{
 			GLuint vertexAttribLoc = aVertexPosition + usedWeights.size();
-			//LOG("vertexAttribLoc = %d", vertexAttribLoc);
+			//SmartBody::util::log("vertexAttribLoc = %d", vertexAttribLoc);
 			glEnableVertexAttribArray(vertexAttribLoc);
 			VBOVec3f* vbo = aux->getVBOPos(i);
 			if (!vbo)
@@ -2154,7 +2153,7 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 	SbmShaderProgram::printOglError("BlendGeometry Feedback GetBuffer Begin");
 	glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, blendRestPos.size()*sizeof(SrVec),&blendRestPos[0]);
 	SbmShaderProgram::printOglError("BlendGeometry Feedback GetBuffer End");
-	//LOG("blendRestPos size = %d, deformPosBuf size = %d", blendRestPos.size(), deformPosBuf.size());
+	//SmartBody::util::log("blendRestPos size = %d, deformPosBuf size = %d", blendRestPos.size(), deformPosBuf.size());
 	if (meshInstance->isStaticMesh())
 	{
 		deformPosBuf = blendRestPos;
@@ -2171,7 +2170,7 @@ void SbmBlendTextures::BlendGeometryWithMasksFeedback( GLuint * FBODst, std::vec
 	aux->getVBOPos(1)->VBO()->UnbindBuffer();
 	aux->getVBOTexCoord()->VBO()->UnbindBuffer();
 
-	for(int i=0; i<usedWeights.size(); i++)
+	for(size_t i=0; i<usedWeights.size(); i++)
 	{
 		glDisableVertexAttribArray(aVertexPosition + i);
 	}
@@ -2242,7 +2241,7 @@ void SbmBlendTextures::BlendTextureWithMasks(GLuint FBODst, GLuint FBOTex,std::v
 	std::vector<float>	usedWeights;
 	std::vector<int>	usedShapeIDs;
 
-	for(int i=0; i<weights.size(); i++)
+	for(size_t i=0; i<weights.size(); i++)
 	{
 		// If it is the first weight (netural shape), or wieght is > 0.000, sends this shape to shader
 		if(((weights[i] > 0.0001) && (usedWeights.size() < MAX_SHAPES)) || (i == 0))

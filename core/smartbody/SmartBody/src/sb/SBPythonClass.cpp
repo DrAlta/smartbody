@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "SBPythonClass.h"
 #include "controllers/me_ct_reach.hpp"
 
@@ -8,6 +8,7 @@
 #include <sbm/sbm_test_cmds.hpp>
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBUtilities.h>
 #include <controllers/me_ct_param_animation.h>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_gaze.h>
@@ -286,7 +287,7 @@ void PyLogger::outlog()
 {
 	if (strBuffer.size() > 1)
 	{
-		LOG("pyLog : %s",strBuffer.c_str());
+		SmartBody::util::log("pyLog : %s",strBuffer.c_str());
 		strBuffer = "";
 	}	
 }

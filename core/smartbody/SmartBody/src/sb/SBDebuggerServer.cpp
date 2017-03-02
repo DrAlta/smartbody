@@ -91,14 +91,14 @@ void SBDebuggerServer::Init()
    bool ret = vhcl::SocketStartup();
    if (!ret)
    {
-      LOG("SocketStartup() failed for Debugger Server\n");
+      SmartBody::util::log("SocketStartup() failed for Debugger Server\n");
    }
 
 
    if (m_hostname == "")
    {
 	   m_hostname = vhcl::SocketGetHostname();
-	   LOG("Setting debugger server hostname to %s", m_hostname.c_str());
+	   SmartBody::util::log("Setting debugger server hostname to %s", m_hostname.c_str());
 	   setStringAttribute("hostname", m_hostname);
    }
 
@@ -109,7 +109,7 @@ void SBDebuggerServer::Init()
    if (m_sockTCP == -1)
 #endif
    {
-      LOG( "SocketOpenTcp() failed for Debugger Server. \n" );
+      SmartBody::util::log( "SocketOpenTcp() failed for Debugger Server. \n" );
       vhcl::SocketShutdown();
       return;
    }
@@ -129,7 +129,7 @@ void SBDebuggerServer::Init()
          break;
       }
 
-      LOG( "SocketBind() failed for Debugger Server. Trying next port up.\n" );
+      SmartBody::util::log( "SocketBind() failed for Debugger Server. Trying next port up.\n" );
       portToTry++;
    }
 
@@ -267,7 +267,7 @@ void SBDebuggerServer::Update()
                for ( size_t i = 0; i < m_sockConnectionsTCP.size(); i++ )
                {
                   //static int c = 0;
-                  //LOG("TCP Send %d - %d\n", c++, i);
+                  //SmartBody::util::log("TCP Send %d - %d\n", c++, i);
                   vhcl::SocketSend(m_sockConnectionsTCP[ i ], msg);
                }
             //}
@@ -289,7 +289,7 @@ void SBDebuggerServer::Update()
       }
 	  else
 	  {
-		  LOG("Could not create socket on %s");
+		  SmartBody::util::log("Could not create socket on %s");
 	  }
    }
 
@@ -384,7 +384,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
    {
       if (split[0] == "sbmdebugger")
       {
-         //LOG("SBDebuggerServer::ProcessVHMsgs() - %s", message.c_str());
+         //SmartBody::util::log("SBDebuggerServer::ProcessVHMsgs() - %s", message.c_str());
 
          if (split.size() > 1)
          {
@@ -410,11 +410,11 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
                      if (true)
                      {
 						 std::string message = vhcl::Format("sbmdebugger %s init scene\n", m_fullId.c_str());	
-						 //LOG("before scene save");
+						 //SmartBody::util::log("before scene save");
 						 std::string initScript = SmartBody::SBScene::getScene()->save(true); // save for remote connection	 
-						 //LOG("initScript = %s",initScript.c_str());
+						 //SmartBody::util::log("initScript = %s",initScript.c_str());
 						 message += initScript;
-						 //LOG("initScript size = %d",initScript.size());
+						 //SmartBody::util::log("initScript size = %d",initScript.size());
 						 //FILE* fp = fopen("e:/sceneServer.py","wt");
 						 //fprintf(fp,"%s",initScript.c_str());
 						 //fclose(fp);
@@ -427,7 +427,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
 							SmartBody::SBSkeleton* skeleton = m_scene->getSkeleton(skeletonNames[i]);
 							if (!skeleton)
 							{
-								LOG("Cannot find skeleton %s.", skeletonNames[i].c_str());
+								SmartBody::util::log("Cannot find skeleton %s.", skeletonNames[i].c_str());
 							}
 							else
 							{
@@ -535,7 +535,7 @@ void SBDebuggerServer::ProcessVHMsgs(const char * op, const char * args)
             }
             else if (split[1] == "queryids")
             {
-               LOG("SBDebuggerServer::ProcessVHMsgs() - queryids");
+               SmartBody::util::log("SBDebuggerServer::ProcessVHMsgs() - queryids");
                vhmsg::ttu_notify1(vhcl::Format("sbmdebugger %s id", m_fullId.c_str()).c_str());
             }
          }
@@ -584,7 +584,7 @@ void SBDebuggerServer::notify(SBSubject* subject)
 		if (attribute->getName() == "hostname")
 		{
 			std::string hostname = this->getStringAttribute("hostname");
-			LOG("Debugger hostname set to %s", hostname.c_str());
+			SmartBody::util::log("Debugger hostname set to %s", hostname.c_str());
 			m_hostname = this->getStringAttribute("hostname");
 			m_fullId = vhcl::Format("%s:%d:%s", m_hostname.c_str(), m_port, m_sbmFriendlyName.c_str());
 		}

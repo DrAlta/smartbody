@@ -26,7 +26,7 @@ using namespace gwiz;
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBJoint.h>
-#include <vhcl_log.h>
+#include <sb/SBUtilities.h>
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -39,15 +39,15 @@ void MeCtEyeLidRegulator::LidSet::print( void )	{
 	if( dirty_bit ) {
 		update();
 	}
-	LOG( "base_angle : %f", base_angle );
-	LOG( "full_angle : %f", full_angle );
-	LOG( "close_angle: %f", close_angle );
-	LOG( "diff       : %f: %f", diff, inv_diff );
-	LOG( "lid_tight  : %f", lid_tight );
-	LOG( "open_angle : %f", open_angle );
-	LOG( "tight_sweep: %f", tight_sweep );
-	LOG( "full_sweep : %f", close_sweep );
-	LOG( "eye_pitch  : %f", eye_pitch );
+	SmartBody::util::log( "base_angle : %f", base_angle );
+	SmartBody::util::log( "full_angle : %f", full_angle );
+	SmartBody::util::log( "close_angle: %f", close_angle );
+	SmartBody::util::log( "diff       : %f: %f", diff, inv_diff );
+	SmartBody::util::log( "lid_tight  : %f", lid_tight );
+	SmartBody::util::log( "open_angle : %f", open_angle );
+	SmartBody::util::log( "tight_sweep: %f", tight_sweep );
+	SmartBody::util::log( "full_sweep : %f", close_sweep );
+	SmartBody::util::log( "eye_pitch  : %f", eye_pitch );
 }
 
 void MeCtEyeLidRegulator::LidSet::set_range( float fr, float to )	{
@@ -402,7 +402,7 @@ bool MeCtEyeLidRegulator::controller_evaluate( double t, MeFrameData& frame ) {
 
 	double blink_elapsed = t - prev_blink;
 	if( blink_elapsed >= blink_period ) {
-		//LOG( "blink @ %f", blink_elapsed );
+		//SmartBody::util::log( "blink @ %f", blink_elapsed );
 		blink_elapsed = 0.0;
 		prev_blink = t;
 		float r = (float)rand() / (float)RAND_MAX;
@@ -739,7 +739,7 @@ float MeCtEyeLid::calc_lid_correction(
 		out_lid_y = adj_lid_y + blink_norm * ( lid_range[ 1 ] - adj_lid_y );
 	}
 
-	if( G_debug ) LOG( "eye: %f  lid: %f  --> %f", in_eye_p, in_lid_y, out_lid_y );
+	if( G_debug ) SmartBody::util::log( "eye: %f  lid: %f  --> %f", in_eye_p, in_lid_y, out_lid_y );
 
 	return( out_lid_y );
 }
@@ -783,27 +783,27 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		once = 0;
 		G_debug = 1;
 		
-		LOG( "eye: %f %f", eye_pitch_range[ 0 ], eye_pitch_range[ 1 ] );
+		SmartBody::util::log( "eye: %f %f", eye_pitch_range[ 0 ], eye_pitch_range[ 1 ] );
 		int i;
 #if 1
 
-		LOG( "UPPER:" );
-		LOG( "lid: %f %f", upper_lid_range[ 0 ], upper_lid_range[ 1 ] );
+		SmartBody::util::log( "UPPER:" );
+		SmartBody::util::log( "lid: %f %f", upper_lid_range[ 0 ], upper_lid_range[ 1 ] );
 
 		float up_lid_samps[ 8 ] = { -1.0f, -0.5f, -0.2f, -0.1f, 0.0f, 0.001f, 0.1f, 0.4f };
 
-		LOG( "look up:" );
+		SmartBody::util::log( "look up:" );
 		for( i=0; i<8; i++ )	{
 			calc_lid_correction( -30.0f, eye_pitch_range, up_lid_samps[ i ], upper_lid_range );
 		}
 		for( i=0; i<8; i++ )	{
 			calc_lid_correction( -10.0f, eye_pitch_range, up_lid_samps[ i ], upper_lid_range );
 		}
-		LOG( "look fwd:" ); 
+		SmartBody::util::log( "look fwd:" ); 
 		for( i=0; i<8; i++ )	{
 			calc_lid_correction( 0.0f, eye_pitch_range, up_lid_samps[ i ], upper_lid_range );
 		}
-		LOG( "look down:" );
+		SmartBody::util::log( "look down:" );
 		for( i=0; i<8; i++ )	{
 			calc_lid_correction( 10.0f, eye_pitch_range, up_lid_samps[ i ], upper_lid_range );
 		}
@@ -812,23 +812,23 @@ bool MeCtEyeLid::controller_evaluate( double t, MeFrameData& frame ) {
 		}
 #endif
 #if 1
-		LOG( "LOWER:" );
-		LOG( "lid: %f %f", lower_lid_range[ 0 ], lower_lid_range[ 1 ] );
+		SmartBody::util::log( "LOWER:" );
+		SmartBody::util::log( "lid: %f %f", lower_lid_range[ 0 ], lower_lid_range[ 1 ] );
 
 		float lo_lid_samps[ 8 ] = { -0.3f, -0.2f, -0.1f, 0.0f, 0.001f, 0.1f, 0.2f, 0.3f };
 
-		LOG( "look up:" );
+		SmartBody::util::log( "look up:" );
 		for( i=0; i<8; i++ )	{
 			calc_lid_correction( -30.0f, eye_pitch_range, lo_lid_samps[ i ], lower_lid_range );
 		}
 		for( i=0; i<8; i++ )	{
 			calc_lid_correction( -10.0f, eye_pitch_range, lo_lid_samps[ i ], lower_lid_range );
 		}
-		LOG( "look fwd:" ); 
+		SmartBody::util::log( "look fwd:" ); 
 		for( i=0; i<8; i++ )	{
 			calc_lid_correction( 0.0f, eye_pitch_range, lo_lid_samps[ i ], lower_lid_range );
 		}
-		LOG( "look down:" );
+		SmartBody::util::log( "look down:" );
 		for( i=0; i<8; i++ )	{
 			calc_lid_correction( 10.0f, eye_pitch_range, lo_lid_samps[ i ], lower_lid_range );
 		}

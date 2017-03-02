@@ -1,7 +1,28 @@
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
+
 #include "MeCtBodyReachState.h"
 #include <sb/SBEvent.h>
 #include <sb/SBScene.h>
 #include <sb/SBPawn.h>
+#include <sb/SBUtilities.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -53,7 +74,7 @@ SRT ReachTarget::getTargetState()
 	SRT st = targetState;
 	if (targetIsPawn())
 	{
-		//LOG("target is pawn");
+		//SmartBody::util::log("target is pawn");
 		SbmPawn* targetPawn = getTargetPawn();
 		
 //  		SkJoint* worldJoint = const_cast<SkJoint*>(targetPawn->get_world_offset_joint());
@@ -65,7 +86,7 @@ SRT ReachTarget::getTargetState()
 	}
 	else if (targetIsJoint())
 	{
-		//LOG("target is joint");
+		//SmartBody::util::log("target is joint");
 		targetJoint->update_gmat();
 		st.gmat(targetJoint->gmat());
 	}
@@ -93,7 +114,7 @@ bool ReachTarget::targetIsPawn()
 bool ReachTarget::targetHasGeometry()
 {
 	if (!targetIsPawn()) return false;
-	//LOG("target pawn name = %s",targetPawn->getName().c_str());
+	//SmartBody::util::log("target pawn name = %s",targetPawn->getName().c_str());
 	SbmPawn* targetPawn = getTargetPawn();
 	if (!targetPawn) return false;
 	if (targetPawn->getGeomObject() == NULL) return false;
@@ -247,7 +268,7 @@ void ReachHandAction::reachPreCompleteAction( ReachStateData* rd )
 
 	cmd = "bml char " + charName + " reach-preComplete";
 	sendReachEvent("reachNotifier",cmd);
-	//LOG("Reach Pre Complete Action");
+	//SmartBody::util::log("Reach Pre Complete Action");
 }
 
 void ReachHandAction::reachCompleteAction( ReachStateData* rd )
@@ -270,12 +291,12 @@ void ReachHandAction::reachCompleteAction( ReachStateData* rd )
 	cmd = generateGrabCmd(charName,targetName,"reach",rd->reachType, rd->grabSpeed);
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:wrist=\"r_wrist\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + reachType + "_gc\" sbm:wrist=\"" + wristName + "\"sbm:grab-type=\"" + reachType + "\" sbm:grab-state=\"reach\" target=\"" + targetName  + "\"/>";
-	//LOG("send out grab command = %s",cmd.c_str());
+	//SmartBody::util::log("send out grab command = %s",cmd.c_str());
 	sendReachEvent("reach",cmd);
 
 	cmd = "bml char " + charName + " reach-complete: " + reachType;
 	sendReachEvent("reachNotifier",cmd);
-	//LOG("Reach Complete Action");
+	//SmartBody::util::log("Reach Complete Action");
 }
 
 void ReachHandAction::reachNewTargetAction( ReachStateData* rd )
@@ -297,7 +318,7 @@ void ReachHandAction::reachNewTargetAction( ReachStateData* rd )
 		sendReachEvent("reachNotifier",cmd);
 	}
 	//rd->effectorState.removeAttachedPawn(rd);
-	//LOG("Reach New Target Action");	
+	//SmartBody::util::log("Reach New Target Action");	
 }
 
 void ReachHandAction::reachReturnAction( ReachStateData* rd )
@@ -321,7 +342,7 @@ void ReachHandAction::reachReturnAction( ReachStateData* rd )
 	
 	cmd = "char " + charName + " gazefade out 0.5";
 	sendReachEvent("reach",cmd);
-	//LOG("Reach Return Action");	
+	//SmartBody::util::log("Reach Return Action");	
 	//rd->effectorState.removeAttachedPawn(rd);
 }
 
@@ -355,7 +376,7 @@ void ReachHandAction::pickUpAttachedPawn( ReachStateData* rd )
 	std::string cmd;
 	//cmd = "bml char " + charName + " <sbm:grab sbm:handle=\"" + charName + "_gc\" sbm:source-joint=\"" + "r_wrist" + "\" sbm:attach-pawn=\"" + targetName + "\"/>";
 	cmd = generateAttachCmd(charName,targetName,rd->reachType, rd->grabSpeed);
-	LOG("   pawn attached: %s",targetName.c_str());
+	SmartBody::util::log("   pawn attached: %s",targetName.c_str());
 	rd->curHandAction->sendReachEvent("reach",cmd);
 
 	cmd = "bml char " + charName + " pawn-attached";
@@ -394,7 +415,7 @@ void ReachHandAction::putDownAttachedPawn( ReachStateData* rd )
 	std::string targetName = "";	
 	if (attachedPawn)
 		targetName = attachedPawn->getName();
-	LOG("   pawn released: %s",targetName.c_str());
+	SmartBody::util::log("   pawn released: %s",targetName.c_str());
 	cmd = "pawn " + targetName + " physics on";
 	rd->curHandAction->sendReachEvent("reach",cmd);
 	rd->effectorState.removeAttachedPawn(rd);
@@ -407,10 +428,10 @@ void ReachHandAction::reachPreReturnAction( ReachStateData* rd )
 
 void ReachHandAction::reachPostCompleteAction(ReachStateData* rd)
 {
-// 	LOG("reachPostCompleteAction");
+// 	SmartBody::util::log("reachPostCompleteAction");
 // 	if (rd->effectorState.getAttachedPawn())
 // 	{
-// 		LOG("Pick-up attached pawn = '%s'",rd->effectorState.getAttachedPawn()->getName().c_str());
+// 		SmartBody::util::log("Pick-up attached pawn = '%s'",rd->effectorState.getAttachedPawn()->getName().c_str());
 // 		pickUpAttachedPawn(rd);
 // 	}
 }
@@ -758,7 +779,7 @@ void ReachStateInterface::updateReachToTarget( ReachStateData* rd )
 		tsBlend = rd->getBlendPoseState(estate.paraTarget,stime);		
 		rd->getInterpFrame(stime,rd->targetRefFrame);
 	}			
-	//LOG("reach target before offset = %f %f %f\n",ts.tran[0],ts.tran[1],ts.tran[2]);
+	//SmartBody::util::log("reach target before offset = %f %f %f\n",ts.tran[0],ts.tran[1],ts.tran[2]);
 	tsBlend.tran = ts.tran;
 	tsBlendGlobal = tsBlend;
 	SrQuat newRot = SrQuat(rd->effectorState.gmatZero.inverse()*tsBlendGlobal.gmat());
@@ -806,7 +827,7 @@ void ReachStateInterface::updateMotionPoseInterpolation( ReachStateData* rd )
 		//MotionExampleSet::blendMotionFrameProfile(rd->interpMotion,rd->startRefFrame,rd->targetRefFrame,morphWeight,morphFrame);		
 		float timeFactor = MotionExampleSet::blendMotionFrameEulerProfile(rd->interpMotion,rd->startRefFrame,rd->targetRefFrame,scaleFactor,morphWeight,morphFrame);
 		rd->retimingFactor = pow(timeFactor,2.f);//timeFactor*timeFactor;	
-		//LOG("retiming factor = %f\n",rd->retimingFactor);
+		//SmartBody::util::log("retiming factor = %f\n",rd->retimingFactor);
 	}
 	else
 	{
@@ -831,7 +852,7 @@ void ReachStateInterface::updateMotionIK( ReachStateData* rd )
 {
 	EffectorState& estate = rd->effectorState;
 	float reachStep = rd->linearVel*rd->dt;
-    //LOG("liner vel = %f, reachStep = %f",rd->linearVel, reachStep);	
+    //SmartBody::util::log("liner vel = %f, reachStep = %f",rd->linearVel, reachStep);	
 	SRT diff = SRT::diff(estate.curIKTargetState,estate.ikTargetState);
 	SrVec offset = diff.tran;
 
@@ -867,7 +888,7 @@ void ReachStateInterface::updateMotionInterp( ReachStateData* rd )
 	SRT stateError = SRT::diff(rd->getPoseState(rd->targetRefFrame),estate.ikTargetState);	
 
 	float percentTime = curStatePercentTime(rd,rd->curRefTime);		
-	//LOG("percent time = %f, dt = %f, ref time = %f, du = %f",percentTime,rd->dt, rd->curRefTime, rd->du);
+	//SmartBody::util::log("percent time = %f, dt = %f, ref time = %f, du = %f",percentTime,rd->dt, rd->curRefTime, rd->du);
 	float deltaPercent = percentTime - curStatePercentTime(rd,rd->curRefTime-rd->du);
 	float remain = 1.f - percentTime;
 	float weight = 1.f;
@@ -1007,7 +1028,7 @@ std::string ReachStateComplete::nextState( ReachStateData* rd )
 {
 	std::string nextStateName = "Complete";	
 	bool toNextState = rd->autoReturnTime > 0.f ? rd->autoReturnTime < rd->stateTime : rd->endReach;
-	//LOG("ReachComplete:rd->stateTime = %f",rd->stateTime);
+	//SmartBody::util::log("ReachComplete:rd->stateTime = %f",rd->stateTime);
 	if (rd->endReach)
 		toNextState = true;
 	if (rd->curHandAction->isPickingUpNewPawn(rd))
@@ -1120,10 +1141,10 @@ float ReachStateReturn::curStatePercentTime( ReachStateData* rd, float refTime )
 
 void ReachStateReturn::update( ReachStateData* rd )
 {
-	//LOG("curRefTime = %f\n",rd->curRefTime);
+	//SmartBody::util::log("curRefTime = %f\n",rd->curRefTime);
 	ReachStateInterface::updateMotionInterp(rd);
 	rd->blendWeight = curStatePercentTime(rd,rd->curRefTime);	
-	//LOG("Blend weight = %f\n",rd->blendWeight);
+	//SmartBody::util::log("Blend weight = %f\n",rd->blendWeight);
 }
 
 std::string ReachStateReturn::nextState( ReachStateData* rd )

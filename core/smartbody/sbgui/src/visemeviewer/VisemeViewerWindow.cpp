@@ -1,4 +1,4 @@
-#include <vhcl.h>
+
 #include <algorithm>
 #include <cctype>
 #include <stdlib.h>
@@ -714,7 +714,7 @@ void VisemeViewerWindow::OnSliderSelectCB(Fl_Widget* widget, void* data)
 		if (SmartBody::SBScene::getScene()->isRemoteMode())
 			strstr << "send sbm ";
 		strstr << "char " << characterName << " viseme " << visemeNames[i] << " " << curveValue;
-		//LOG("%s", strstr.str().c_str());
+		//SmartBody::util::log("%s", strstr.str().c_str());
 		SmartBody::SBScene::getScene()->command(strstr.str());
 	}
 	viewer->_curveEditor->redraw();
@@ -871,7 +871,7 @@ void VisemeViewerWindow::loadAudioFiles()
 		if( !boost::filesystem2::exists( abs_p ))
 #endif
 		{
-			//LOG( "VisemeViewerWindow::loadAudioFiles: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
+			//SmartBody::util::log( "VisemeViewerWindow::loadAudioFiles: path to audio file cannot be found: %s", abs_p.native_directory_string().c_str());
 			continue;
 		}
 		boost::filesystem::directory_iterator end;
@@ -938,7 +938,7 @@ void VisemeViewerWindow::OnXMLFileSelectCB(Fl_Widget* widget, void* data)
 			strstr << xmlFileName <<  ".xml";
 			std::string xmlPath = strstr.str();
 			path /= xmlPath;
-			LOG("Playing XML file %s", path.string().c_str());
+			SmartBody::util::log("Playing XML file %s", path.string().c_str());
 			SmartBody::SBScene::getScene()->getBmlProcessor()->execXMLFile(character->getName(), path.string());
 		}
 	}
@@ -1132,7 +1132,7 @@ void VisemeViewerWindow::OnDiphoneSelectCB(Fl_Widget* widget, void* data)
 
 	if (diphones.size() != 2)
 	{
-		LOG("Could not parse two phonemes from '%s'", str.c_str()); 
+		SmartBody::util::log("Could not parse two phonemes from '%s'", str.c_str()); 
 			return;
 	}
 
@@ -1638,7 +1638,7 @@ void VisemeViewerWindow::OnGenerateLipSyncCB(Fl_Widget* widget, void* data)
 			fl_alert("No batch processing folder specified.\nPlease enter a folder in the Batch Lip Sync Folder input\nthat contains both .wav and .txt files.");
 			return;
 		}
-		LOG("Running forced alignment on folder %s", viewer->_inputLipSyncFolder->value());
+		SmartBody::util::log("Running forced alignment on folder %s", viewer->_inputLipSyncFolder->value());
 		boost::filesystem::path someDir(viewer->_inputLipSyncFolder->value());
 		boost::filesystem::directory_iterator end_iter;
 
@@ -1658,7 +1658,7 @@ void VisemeViewerWindow::OnGenerateLipSyncCB(Fl_Widget* widget, void* data)
 				if (fileExtension == ".WAV")
 				{
 					filesToProcess.push_back((*dir_iter).path());
-					LOG("Found sound file %s", (*dir_iter).path().string().c_str());
+					SmartBody::util::log("Found sound file %s", (*dir_iter).path().string().c_str());
 				}
 			}
 		  }
@@ -1680,7 +1680,7 @@ void VisemeViewerWindow::OnGenerateLipSyncCB(Fl_Widget* widget, void* data)
 		}
 		filesToProcess.push_back(viewer->_inputSpeechFile->value());
 	}
-	LOG("Running forced alignment on %d files.", filesToProcess.size());
+	SmartBody::util::log("Running forced alignment on %d files.", filesToProcess.size());
 
 	for (size_t f = 0; f < filesToProcess.size(); f++)
 	{
@@ -1697,7 +1697,7 @@ void VisemeViewerWindow::OnGenerateLipSyncCB(Fl_Widget* widget, void* data)
 			if (!boost::filesystem::exists(transcriptionPath) || 
 				boost::filesystem::is_directory(transcriptionPath))
 			{
-				LOG("Transcription file %s does not exist, speech for file %s will not be processed.", 
+				SmartBody::util::log("Transcription file %s does not exist, speech for file %s will not be processed.", 
 					transcriptionPath.string().c_str(), filesToProcess[f].string().c_str());
 				continue;
 			}
@@ -1750,12 +1750,12 @@ void VisemeViewerWindow::OnGenerateLipSyncCB(Fl_Widget* widget, void* data)
 		finalLipSyncCommand = SmartBody::util::replace(finalLipSyncCommand, "%2", phonePath.string());
 		finalLipSyncCommand = SmartBody::util::replace(finalLipSyncCommand, "%3", transcriptionPath.string());
 	
-		LOG("Running lip sync with command: %s", finalLipSyncCommand.c_str());
+		SmartBody::util::log("Running lip sync with command: %s", finalLipSyncCommand.c_str());
 
 		int ret = system(finalLipSyncCommand.c_str());
 		if (ret == -1)
 		{
-			LOG("Lip sync command failed: %s", lipSyncCommand.c_str());
+			SmartBody::util::log("Lip sync command failed: %s", lipSyncCommand.c_str());
 		}
 	}
 }

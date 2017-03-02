@@ -1,24 +1,22 @@
-/*
- *  me_ct_param_animation_utilities.cpp - part of Motion Engine and SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Yuyu Xu, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #include "controllers/me_ct_param_animation_utilities.h"
 #include <sbm/gwiz_math.h>
@@ -29,6 +27,7 @@
 #include <sb/SBEvent.h>
 #include <sb/SBScene.h>
 #include <sb/SBMotion.h>
+#include <sb/SBUtilities.h>
 #include <math.h>
 
 const double timeThreshold = 0.05;
@@ -58,12 +57,12 @@ PATimeManager::PATimeManager(PABlendData* data)
 		SmartBody::SBAnimationBlend0D* state0D = dynamic_cast<SmartBody::SBAnimationBlend0D*>(blendData->state);
 		if (state0D)
 		{
-			//LOG("state 0D, use blend offset");
+			//SmartBody::util::log("state 0D, use blend offset");
 			localTimes.push_back(blendData->blendStartOffset);			
 		}
 		else
 		{
-			LOG("State %s has no keys, setting all local times to zero.", blendData->state->stateName.c_str());
+			SmartBody::util::log("State %s has no keys, setting all local times to zero.", blendData->state->stateName.c_str());
 			for (int x = 0; x < blendData->state->getNumMotions(); x++)
 			{
 				localTimes.push_back(0);
@@ -73,7 +72,7 @@ PATimeManager::PATimeManager(PABlendData* data)
 	}
 	if (blendData->weights.size() > localTimes.size())
 	{
-		LOG("Problem: fewer keys (%d) than weights (%d)", blendData->state->keys.size(), blendData->weights.size());
+		SmartBody::util::log("Problem: fewer keys (%d) than weights (%d)", blendData->state->keys.size(), blendData->weights.size());
 	}
 	setMotionTimes();
 	setKey();
@@ -155,7 +154,7 @@ bool PATimeManager::step(double timeStep)
 	getParallelTimes(localTime, localTimes);
 	if (localTimes.size() == 0)
 	{
-		LOG("PATimeManager::step ERROR: Miss the timing.");
+		SmartBody::util::log("PATimeManager::step ERROR: Miss the timing.");
 		return notReachDuration;
 	}
 
@@ -170,9 +169,9 @@ bool PATimeManager::step(double timeStep)
 	}
 	else
 	{
-		LOG("Motion times do not match! Please check!");
+		SmartBody::util::log("Motion times do not match! Please check!");
 	}
-	//LOG("newLocal time = %f, lastKey = %f, notReachDuration = %d",newLocalTime, lastKey,notReachDuration);
+	//SmartBody::util::log("newLocal time = %f, lastKey = %f, notReachDuration = %d",newLocalTime, lastKey,notReachDuration);
 
 	return notReachDuration;
 }
@@ -209,7 +208,7 @@ void PATimeManager::checkEvents()
 			manager->handleEvent(event.first);
 			std::string type = event.first->getType();
 			std::string params = event.first->getParameters();
-			//LOG("EVENT: %f %s %s", time, type.c_str(), params.c_str());
+			//SmartBody::util::log("EVENT: %f %s %s", time, type.c_str(), params.c_str());
 			_events.pop();
 		}
 		else
@@ -262,7 +261,7 @@ void PATimeManager::setLocalTime()
 {
 	if (localTimes.size() < blendData->weights.size())
 	{
-		LOG("Problem with number of local times (%d) versus number of weights (%d)", localTimes.size(), blendData->weights.size());
+		SmartBody::util::log("Problem with number of local times (%d) versus number of weights (%d)", localTimes.size(), blendData->weights.size());
 		return;
 	}
 	localTime = 0.0;
@@ -311,7 +310,7 @@ void PATimeManager::getParallelTimes(double time, std::vector<double>& times)
 	times.clear();
 	double offsetTime = time;// + blendData->blendStartOffset;
 	int section = getSection(offsetTime);
-	//LOG("localtime = %f, section = %d",offsetTime,section);
+	//SmartBody::util::log("localtime = %f, section = %d",offsetTime,section);
 	if (section < 0)
 	{
 		for (size_t i = 0; i < blendData->weights.size(); i++)
@@ -358,7 +357,7 @@ void PATimeManager::getParallelTimes(int motionIndex, double time, std::vector<d
 
 	if (motionSectionId < 0 || motionSectionId == motionKey.size())
 	{
-		LOG("getParallelTimes ERR:: motion time %f(%d) is not valid", time, motionIndex);
+		SmartBody::util::log("getParallelTimes ERR:: motion time %f(%d) is not valid", time, motionIndex);
 		for  (int i = 0; i < blendData->state->getNumMotions(); ++i)
 			times.push_back(time);
 		return;
@@ -551,7 +550,7 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 
 	SrVec vec = quat.axis() * quat.angle();
 	SrVec vec1 = vec * prerotMat;//prerotMat.inverse();
-	//LOG("quat = %f %f %f %f, axis angle = %f %f %f", quat.w, quat.x, quat.y,quat.z, vec1[0],vec1[1],vec1[2]);
+	//SmartBody::util::log("quat = %f %f %f %f, axis angle = %f %f %f", quat.w, quat.x, quat.y,quat.z, vec1[0],vec1[1],vec1[2]);
 	quat = SrQuat(vec1);	
 	SrMat mat;
 	quat.get_mat(mat);	
@@ -569,16 +568,16 @@ void PAMotions::getProcessedMat(SrMat& dest, SrMat& src)
 	SrMat xzRotMat = mat*yRotMat.inverse();
 	SrQuat quatP = SrQuat(xzRotMat);
 	quatP.normalize();
-	//LOG("state = %s, y rotation = %f",this->blendData->state->stateName.c_str(), vec1.y);
-	//LOG("xzQuat = %f %f %f %f",quatP.x, quatP.y,quatP.z,quatP.w);
+	//SmartBody::util::log("state = %s, y rotation = %f",this->blendData->state->stateName.c_str(), vec1.y);
+	//SmartBody::util::log("xzQuat = %f %f %f %f",quatP.x, quatP.y,quatP.z,quatP.w);
 	/*	
 	gwiz::euler_t eu = gwiz::euler_t(gwiz::quat_t(quat.w, quat.x,quat.y,quat.z));
-	//LOG("eu = %f %f %f", eu.x(), eu.y(), eu.z());
+	//SmartBody::util::log("eu = %f %f %f", eu.x(), eu.y(), eu.z());
 	eu.y(0.f);
 	gwiz::quat_t gw_q = gwiz::quat_t(eu);
 	SrQuat quatP = SrQuat((float)gw_q.w(),(float)gw_q.x(),(float)gw_q.y(),(float)gw_q.z());
 	gwiz::euler_t euNew = gwiz::euler_t(gwiz::quat_t(quatP.w, quatP.x,quatP.y,quatP.z));
-	//LOG("euNew = %f %f %f", euNew.x(), euNew.y(), euNew.z());
+	//SmartBody::util::log("euNew = %f %f %f", euNew.x(), euNew.y(), euNew.z());
 	*/
 #endif	
 	vec1 = quatP.axis() * quatP.angle();	
@@ -830,7 +829,7 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 			}
 			else
 			{
-				//LOG("loop back to beginning");
+				//SmartBody::util::log("loop back to beginning");
 			}
 	#if LoopHandle
 			else
@@ -853,7 +852,7 @@ void PAWoManager::apply(std::vector<double>& times, std::vector<double>& timeDif
 					mat = currentBaseMats[indices[i]] * baseMats[indices[i]].inverse();
 				else
 				{
-					//LOG("loop back to beginning");
+					//SmartBody::util::log("loop back to beginning");
 				}
 	#if LoopHandle
 				else
@@ -1103,7 +1102,7 @@ void PABlendData::evaluate(double timeStep, SrBuffer<float>& buffer)
 	SrBuffer<float> buffCopy = buffer;
 	if (wrapMode == Loop || ((wrapMode == Once) && notReachCycle) || wrapMode == Clamp)
 	{
-		//LOG("motion time = %f",timeManager->motionTimes[0]);			
+		//SmartBody::util::log("motion time = %f",timeManager->motionTimes[0]);			
 		interpolator->blending(timeManager->motionTimes, buffer);
 		woManager->apply(timeManager->motionTimes, timeManager->timeDiffs, buffCopy);
 			
@@ -1270,7 +1269,7 @@ void PATransitionManager::align(PABlendData* current, PABlendData* next)
 		curve->insert(0.0, 1.0);
 		curve->insert(duration, 0.0);
 #if PrintPADebugInfo
-		LOG("State %s being scheduled.[ACTIVE]", next->data->stateName.c_str());
+		SmartBody::util::log("State %s being scheduled.[ACTIVE]", next->data->stateName.c_str());
 #endif
 	}
 #else	
@@ -1290,7 +1289,7 @@ void PATransitionManager::align(PABlendData* current, PABlendData* next)
 		next->active = true;
 		blendingMode = true;
 		// Important: adjust for the duration (is this enough?)
-		//LOG("start transition, s1 = %f, local time = %f",s1,current->timeManager->getNormalizeLocalTime());
+		//SmartBody::util::log("start transition, s1 = %f, local time = %f",s1,current->timeManager->getNormalizeLocalTime());
 		duration += (current->timeManager->getPrevNormalizeLocalTime() - current->timeManager->getNormalizeLocalTime());				
 		curve->insert(0.0, 1.0);
 		curve->insert(duration, 0.0);
@@ -1425,7 +1424,7 @@ void PATransitionManager::bufferBlending(SrBuffer<float>& buffer, SrBuffer<float
 
 // 			if (channels.mappedName(i) == "base")
 // 			{
-// 				LOG("quat1 = %.3f %.3f %.3f %.3f, quat2 = %.3f %.3f %.3f %.3f, combine quat = %.3f %.3f %.3f %.3f", v1[0],v1[1],v1[2],v1[3],v2[0],v2[1],v2[2],v2[3], v[0],v[1],v[2],v[3]);
+// 				SmartBody::util::log("quat1 = %.3f %.3f %.3f %.3f, quat2 = %.3f %.3f %.3f %.3f, combine quat = %.3f %.3f %.3f %.3f", v1[0],v1[1],v1[2],v1[3],v2[0],v2[1],v2[2],v2[3], v[0],v[1],v[2],v[3]);
 // 			}
 
 		}
@@ -1448,7 +1447,7 @@ double PATransitionManager::getTime(double time, const std::vector<double>& key,
 
 	if (section < 0)
 	{
-		LOG("PATransitionManager::getTime ERR!");
+		SmartBody::util::log("PATransitionManager::getTime ERR!");
 		return -1.0;
 	}
 	for (size_t i = 0; i < w.size(); i++)

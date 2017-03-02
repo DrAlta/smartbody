@@ -1,43 +1,22 @@
-/**************************************************
-Copyright 2005 by Ari Shapiro and Petros Faloutsos
+/*************************************************************
+Copyright (C) 2017 University of Southern California
 
-DANCE
-Dynamic ANimation and Control Environment
+This file is part of Smartbody.
 
- ***************************************************************
- ******General License Agreement and Lack of Warranty ***********
- ****************************************************************
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-This software is distributed for noncommercial use in the hope that it will 
-be useful but WITHOUT ANY WARRANTY. The author(s) do not accept responsibility
-to anyone for the consequences	of using it or for whether it serves any 
-particular purpose or works at all. No warranty is made about the software 
-or its performance. Commercial use is prohibited. 
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
 
-Any plugin code written for DANCE belongs to the developer of that plugin,
-who is free to license that code in any manner desired.
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
-Content and code development by third parties (such as FLTK, Python, 
-ImageMagick, ODE) may be governed by different licenses.
-You may modify and distribute this software as long as you give credit 
-to the original authors by including the following text in every file 
-that is distributed: */
-
-/*********************************************************
-	Copyright 2005 by Ari Shapiro and Petros Faloutsos
-
-	DANCE
-	Dynamic ANimation and Control Environment
-	-----------------------------------------
-	AUTHOR:
-		Ari Shapiro (ashapiro@cs.ucla.edu)
-	ORIGINAL AUTHORS: 
-		Victor Ng (victorng@dgp.toronto.edu)
-		Petros Faloutsos (pfal@cs.ucla.edu)
-	CONTRIBUTORS:
-		Yong Cao (abingcao@cs.ucla.edu)
-		Paco Abad (fjabad@dsic.upv.es)
-**********************************************************/
+**************************************************************/
 
 #include "AttributeWindow.h"
 
@@ -60,6 +39,7 @@ that is distributed: */
 #include <sb/SBAttributeManager.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBCharacter.h>
+#include <sb/SBUtilities.h>
 #include "TextEditor.h"
 #include "../flu/Flu_Collapsable_Group.h"
 #include "sb/SBTypes.h"
@@ -67,6 +47,9 @@ that is distributed: */
 #ifndef WIN32
 #define _strdup strdup
 #endif
+
+#undef max
+#undef min
 
 
 AttributeWindow::AttributeWindow(SmartBody::SBObject* obj, int x, int y, int w, int h, const char *s, bool upDownBox) : Fl_Group(x, y, w, h, s)
@@ -124,7 +107,7 @@ int AttributeWindow::getOffset()
 
 void AttributeWindow::cleanUpAttributesInfo()
 {
-	//LOG("AttributeWindow Destructor\n");
+	//SmartBody::util::log("AttributeWindow Destructor\n");
 	// unregister the observer for each object attributes before destruction
 	SmartBody::SBObject* obj = getObject();	
 	//obj->getAttributeManager()->unregisterObserver(this);
@@ -278,7 +261,7 @@ void AttributeWindow::reorderAttributes()
 		sortedIter != list.end();
 		sortedIter++)
 	{
-		//LOG("Now writing attribute %s", (*sortedIter)->getName().c_str());
+		//SmartBody::util::log("Now writing attribute %s", (*sortedIter)->getName().c_str());
 		// get the widget
 		std::map<std::string, Fl_Widget*>::iterator mapIter = widgetMap.find((*sortedIter)->getName());
 		if (mapIter != widgetMap.end())
@@ -504,6 +487,7 @@ void AttributeWindow::draw()
 						doubleGroup->add(input);
 						// show a wheel is there is no limit
 						// show a slider if there is a limit
+			
 						if (doubleAttr->getMin() == -std::numeric_limits<double>::max() ||
 							doubleAttr->getMax() == std::numeric_limits<double>::max())
 						{
@@ -858,12 +842,12 @@ void AttributeWindow::ActionCB(Fl_Widget *w, void *data)
 		}
 		else
 		{
-			LOG("Attribute with name %s.%s is not an action attribute. Please check code.", obj->getName().c_str(), check->label());
+			SmartBody::util::log("Attribute with name %s.%s is not an action attribute. Please check code.", obj->getName().c_str(), check->label());
 		}
 	}
 	else
 	{
-		LOG("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), check->label());
+		SmartBody::util::log("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), check->label());
 	}
 }
 
@@ -911,12 +895,12 @@ void AttributeWindow::BoolCB(Fl_Widget *w, void *data)
 		}
 		else
 		{
-			LOG("Attribute with name %s.%s is not a boolean attribute. Please check code.", obj->getName().c_str(), check->label());
+			SmartBody::util::log("Attribute with name %s.%s is not a boolean attribute. Please check code.", obj->getName().c_str(), check->label());
 		}
 	}
 	else
 	{
-		LOG("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), check->label());
+		SmartBody::util::log("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), check->label());
 	}
 }
 
@@ -991,7 +975,7 @@ void AttributeWindow::IntCB(Fl_Widget *w, void *data)
 	}
 	else
 	{
-		LOG("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), input->label());
+		SmartBody::util::log("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), input->label());
 	}
 }
 
@@ -1061,12 +1045,12 @@ void AttributeWindow::DoubleCB(Fl_Widget *w, void *data)
 		}
 		else
 		{
-			LOG("Attribute with name %s.%s is not a double attribute. Please check code.", obj->getName().c_str(), input->label());
+			SmartBody::util::log("Attribute with name %s.%s is not a double attribute. Please check code.", obj->getName().c_str(), input->label());
 		}
 	}
 	else
 	{
-		LOG("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), input->label());
+		SmartBody::util::log("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), input->label());
 	}
 }
 
@@ -1130,12 +1114,12 @@ void AttributeWindow::StringCB(Fl_Widget *w, void *data)
 		}
 		else
 		{
-			LOG("Attribute with name %s.%s is not a string attribute. Please check code.", obj->getName().c_str(), input->label());
+			SmartBody::util::log("Attribute with name %s.%s is not a string attribute. Please check code.", obj->getName().c_str(), input->label());
 		}
 	}
 	else
 	{
-		LOG("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), input->label());
+		SmartBody::util::log("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), input->label());
 	}
 }
 
@@ -1195,12 +1179,12 @@ void AttributeWindow::Vec3CB(Fl_Widget *w, void *data)
 		}
 		else
 		{
-			LOG("Attribute with name %s.%s is not a vec3 attribute. Please check code.", obj->getName().c_str(), group->label());
+			SmartBody::util::log("Attribute with name %s.%s is not a vec3 attribute. Please check code.", obj->getName().c_str(), group->label());
 		}
 	}
 	else
 	{
-		LOG("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), group->label());
+		SmartBody::util::log("Attribute with name %s.%s is no longer present.", obj->getName().c_str(), group->label());
 	}
 }
 
@@ -1225,7 +1209,7 @@ void AttributeWindow::notify(SmartBody::SBSubject* subject)
 		std::map<std::string, Fl_Widget*>::iterator iter = widgetMap.find(attr->getName());
 		if (iter == widgetMap.end())
 		{
-			LOG("Widget for attribute %s.%s was not found. Please check code.", this->object->getName().c_str(), attr->getName().c_str());
+			SmartBody::util::log("Widget for attribute %s.%s was not found. Please check code.", this->object->getName().c_str(), attr->getName().c_str());
 			return;
 		}
 		SmartBody::ActionAttribute* aattr = dynamic_cast<SmartBody::ActionAttribute*>(attr);
@@ -1533,7 +1517,7 @@ void AttributeWindow::notify(SmartBody::SBSubject* subject)
 	else
 	{
 		// non-attribute ?
-		LOG("AttributeWindow for object %s got a notify() with a non-attribute.", this->object->getName().c_str());
+		SmartBody::util::log("AttributeWindow for object %s got a notify() with a non-attribute.", this->object->getName().c_str());
 	}
 }
 

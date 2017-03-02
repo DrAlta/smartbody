@@ -4,6 +4,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
 #include <sb/SBAttribute.h>
+#include <sb/SBUtilities.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 
@@ -61,7 +62,7 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	Entity * ent = NULL;
 	if (ogreInterface->getSceneManager()->hasEntity(name))
 	{
-		LOG("ALREADY FOUND ENTITY NAMED %s", name.c_str());
+		SmartBody::util::log("ALREADY FOUND ENTITY NAMED %s", name.c_str());
 		return;
 	}
 
@@ -102,7 +103,7 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	{
 		//Create character from characterType
 		//ent = ogreInterface->getSceneManager()->createEntity(name, name + ".mesh" );
-		//LOG("create ogre chracter = %s",name.c_str());		
+		//SmartBody::util::log("create ogre chracter = %s",name.c_str());		
 		if (isPawn)
 			ent = ogreInterface->createOgrePawn(pawn);
 		else
@@ -115,8 +116,8 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 	catch( Ogre::Exception& e )
 	{
 		if (sbChar)
-			LOG("Can not create character %s ...",sbChar->getName().c_str());
-		LOG("Exception %s",e.getDescription().c_str());
+			SmartBody::util::log("Can not create character %s ...",sbChar->getName().c_str());
+		SmartBody::util::log("Exception %s",e.getDescription().c_str());
 		if( e.getNumber() == Ogre::Exception::ERR_FILE_NOT_FOUND ) 
 		{
 			//Default to existing Brad character			
@@ -129,9 +130,9 @@ void OgreListener::OnCharacterCreate( const std::string & name, const std::strin
 		if (objectClass != "")
 		{
 			if (isPawn)
-				LOG("Can not create pawn %s, no mesh exists with type %s",pawn->getName().c_str(), objectClass.c_str());
+				SmartBody::util::log("Can not create pawn %s, no mesh exists with type %s",pawn->getName().c_str(), objectClass.c_str());
 			else
-				LOG("Can not create character %s, no mesh or skeleton exists with type %s",sbChar->getName().c_str(), objectClass.c_str());
+				SmartBody::util::log("Can not create character %s, no mesh or skeleton exists with type %s",sbChar->getName().c_str(), objectClass.c_str());
 		}
 		return;
 	}

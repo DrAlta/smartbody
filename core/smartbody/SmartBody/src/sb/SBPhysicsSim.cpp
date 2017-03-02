@@ -25,6 +25,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBAttribute.h>
+#include <sb/SBUtilities.h>
 #include <sr/sr_output.h>
 #include <sbm/gwiz_math.h>
 #include <controllers/me_ct_ublas.hpp>
@@ -408,7 +409,7 @@ void SBPhysicsJoint::updateTotalSupportMass()
 	SbmJointObj* obj = getChildObj();
 	if (!obj)
 	{
-		LOG("Child object for joint %s does not exist.", this->sbmJoint->getName().c_str());
+		SmartBody::util::log("Child object for joint %s does not exist.", this->sbmJoint->getName().c_str());
 		return;
 	}
 	totalSupportMass += obj->getMass();
@@ -422,7 +423,7 @@ void SBPhysicsJoint::updateTotalSupportMass()
 			totalSupportMass += cj->getTotalSupportMass();
 		}		
 	}
-//	LOG("joint %s, total mass = %f",this->getSBJoint()->getName().c_str(),totalSupportMass);
+//	SmartBody::util::log("joint %s, total mass = %f",this->getSBJoint()->getName().c_str(),totalSupportMass);
 }
 
 void SBPhysicsJoint::notify( SBSubject* subject )
@@ -988,7 +989,7 @@ SrVec SBPhysicsCharacter::computeSPDTorque( SrQuat& q, SrQuat& qD, SrVec& w, SrV
 	SrVec ktp = w*dt*(-Ks);
 	SrVec damp = (vD - w)*(-Kd);
 	float scale = mass/(mass+Kd*dt);//+Ks*dt*dt);
-	//LOG("torque scale = %f",scale);
+	//SmartBody::util::log("torque scale = %f",scale);
 	torque = (kpq+damp-ktp)*scale;	
 
 	return torque;

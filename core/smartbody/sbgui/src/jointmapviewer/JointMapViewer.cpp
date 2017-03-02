@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "JointMapViewer.h"
 #include "PositionControl.h"
 #include <sb/SBJointMapManager.h>
@@ -7,6 +7,7 @@
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBSimulationManager.h>
+#include <sb/SBUtilities.h>
 #include <sk/sk_joint.h>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Input.H>
@@ -1011,7 +1012,7 @@ int SkeletonViewer::handle( int event )
 		{
 			make_current();
 			std::string focusName = pickJointName(e.mouse.x,e.mouse.y);
-			//LOG("focus joint name = %s",focusName.c_str());
+			//SmartBody::util::log("focus joint name = %s",focusName.c_str());
 			if (focusName != "")
 			{
 				if (focusName != focusJointName)
@@ -1153,7 +1154,7 @@ void SkeletonViewer::setFocusJointName( std::string focusName )
 			SkJoint* joint = skeleton->search_joint(jname.c_str());
 			if (focusJointName == jname || focusJointName == origName)
 			{
-				//LOG("focus joint name = %s",jname.c_str());
+				//SmartBody::util::log("focus joint name = %s",jname.c_str());
 				skeletonScene->setJointColor(joint, SrColor(1.f,0.f,0.f));
 				skeletonScene->setJointRadius(joint, defaultRadius*2.5f);
 			}
@@ -1582,7 +1583,7 @@ void JointMapViewer::updateJointLists()
 	for (unsigned int i=0;i<skelJointNames.size();i++)
 	{
 		std::string name = skelJointNames[i];
-		//LOG("joint name = %s",name.c_str());
+		//SmartBody::util::log("joint name = %s",name.c_str());
 		//Fl_Check_Button* check = new Fl_Check_Button(20, curY, 100, 20, _strdup(name.c_str()));
 		//Fl_Group* jointMapGroup = new Fl_Group(20, curY , 200, 20, _strdup(name.c_str()));
 		//Fl_Input* input = new Fl_Input(100 , scrollY, 150, 20, _strdup(name.c_str()));
@@ -1884,7 +1885,7 @@ void JointMapViewer::ApplyMapCB(Fl_Widget* widget, void* data)
 // 				SmartBody::SBBehaviorSet* behavSet = behavMgr->getBehaviorSet(check->label());
 // 				if (behavSet)
 // 				{
-// 					LOG("Retargetting %s...", check->label());
+// 					SmartBody::util::log("Retargetting %s...", check->label());
 // 					const std::string& script = behavSet->getScript();
 // 					SmartBody::SBScene::getScene()->runScript(script.c_str());
 // 					std::stringstream strstr;
@@ -2014,7 +2015,7 @@ void JointMapViewer::resetJointMap(bool restore)
 
 void JointMapViewer::showJointLabels( int showLabel )
 {
-	LOG("joint label = %d",showLabel);
+	SmartBody::util::log("joint label = %d",showLabel);
 	standardSkeletonViewer->setShowJointLabels(showLabel);
 	targetSkeletonViewer->setShowJointLabels(showLabel);
 }
@@ -2168,7 +2169,7 @@ int JointMapInputChoice::handle( int event )
 	switch ( event )	
 	{  
 	case FL_PUSH:
-		//LOG("widget %s is in focus",label());	
+		//SmartBody::util::log("widget %s is in focus",label());	
 		ret = 1;
 		break;
 	}

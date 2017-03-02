@@ -24,7 +24,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 /// @file SteerSuiteEngineDriver.h
 /// @brief Declares the SteerSuiteEngineDriver class
 #include <sb/SBTypes.h>
-#include <vhcl.h>
 #include <SteerLib.h>
 #include <PPRAgent.h>
 #include <sb/SBObject.h>

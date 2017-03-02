@@ -1,9 +1,10 @@
-#include "vhcl.h"
+
 #include <sb/SBScene.h>
 #include <sb/SBJoint.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBAttribute.h>
+#include <sb/SBUtilities.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmTexture.h>
 #include <sr/sr_euler.h>
@@ -505,7 +506,7 @@ void EmbeddedOgre::createDefaultScene()
 	// Give it a little ambience with lights
 
 #if 1
-	LOG("---------------------------------------");
+	SmartBody::util::log("---------------------------------------");
 	Light * light1;
 	Vector3 dir;
 
@@ -703,11 +704,11 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 			 optionIter++)
 		{
 			Ogre::String name = (*optionIter).first;
-			LOG("[%s]", name.c_str());
+			SmartBody::util::log("[%s]", name.c_str());
 			Ogre::ConfigOption& option = (*optionIter).second;
 			for (unsigned int x = 0; x < option.possibleValues.size(); x++)
 			{
-				LOG("%s ", option.possibleValues[x].c_str());
+				SmartBody::util::log("%s ", option.possibleValues[x].c_str());
 			}
 			
 		}
@@ -724,7 +725,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 			}
 		}
 		params["FSAA"] = lastFSAAVal;
-		LOG("Using FSAA level %s", lastFSAAVal.c_str());
+		SmartBody::util::log("Using FSAA level %s", lastFSAAVal.c_str());
 		//if (parentHandle)
 		//	params["parentWindowHandle"] = Ogre::StringConverter::toString((size_t)parentHandle);	
         
@@ -779,7 +780,7 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 		ogreSceneMgr= ogreRoot->createSceneManager("OctreeSceneManager", "MyFirstSceneManager");
 		//ogreSceneMgr= ogreRoot->createSceneManager("DefaultSceneManager", "MyFirstSceneManager");
 
-		LOG("Scene Manager Type = %s",ogreSceneMgr->getTypeName().c_str());
+		SmartBody::util::log("Scene Manager Type = %s",ogreSceneMgr->getTypeName().c_str());
 		// The 'root SceneNode' is the only scenenode at the beginning in the SceneManager.
 		// The SceneNodes can be seen as 'transformation' containers <=> it contains scale/position/rotation
 		// of the objects. There is only 1 root scenenode, and all other scenenode are 
@@ -828,20 +829,20 @@ void EmbeddedOgre::createOgreWindow( void* windowHandle, void* parentHandle, uns
 	{
 		Ogre::String s = "FLTKOgreWindow::createOgreWindow() - Exception:\n" + e.getFullDescription() +  "\n"; 
 		Ogre::LogManager::getSingleton().logMessage( s, Ogre::LML_CRITICAL );		
-		LOG("Ogre error: %s", s.c_str());		
+		SmartBody::util::log("Ogre error: %s", s.c_str());		
 	}
 	if (!ogreWnd)
 	{
-		LOG("Cannot launch Ogre window...");
+		SmartBody::util::log("Cannot launch Ogre window...");
 		return;
 	}
-	//LOG("Finish setup resource");
+	//SmartBody::util::log("Finish setup resource");
 	// create frame listener
 	ogreFrameListener = new OgreFrameListener(ogreWnd,ogreCamera,"Create Ogre Frame Listener", ogreSceneMgr, this);
 	ogreRoot->addFrameListener(ogreFrameListener);
-	//LOG("Before setup default scene");
+	//SmartBody::util::log("Before setup default scene");
 	createDefaultScene();	
-	//LOG("After setup default scene");	
+	//SmartBody::util::log("After setup default scene");	
 
 }
 
@@ -1020,11 +1021,11 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 					if (vba.weight > 0)
 					{
 						ogreMesh->addBoneAssignment(vba);		
-						//LOG("jName = %s, origID = %d, ogreBoneID = %d, weight = %f",jName.c_str(),origBoneID,vba.boneIndex, vba.weight);
+						//SmartBody::util::log("jName = %s, origID = %d, ogreBoneID = %d, weight = %f",jName.c_str(),origBoneID,vba.boneIndex, vba.weight);
 					}
 					else if (vba.weight < 0)
 					{
-						LOG("negative weight, jName = %s, origID = %d, ogreBoneID = %d, weight = %f",jName.c_str(),origBoneID,vba.boneIndex, vba.weight);	
+						SmartBody::util::log("negative weight, jName = %s, origID = %d, ogreBoneID = %d, weight = %f",jName.c_str(),origBoneID,vba.boneIndex, vba.weight);	
 					}
 				}	
 			}			
@@ -1049,11 +1050,11 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 				Pass* pass = bestTechnique->getPass(0);
 				if (pass && pass->hasVertexProgram() && pass->getVertexProgram()->isSkeletalAnimationIncluded()) 
 				{
-					LOG("Entity %d, Has Hardware Skinning",i);
+					SmartBody::util::log("Entity %d, Has Hardware Skinning",i);
 				}
 				else
 				{
-					LOG("Entity %d, Has Software Skinning",i);
+					SmartBody::util::log("Entity %d, Has Software Skinning",i);
 				}
 			}
 		}
@@ -1061,11 +1062,11 @@ Ogre::Entity* EmbeddedOgre::createOgreCharacter( SmartBody::SBCharacter* sbChar 
 
 	if (outChar->isHardwareAnimationEnabled())
 	{
-		LOG("outChar has hardware skinning");
+		SmartBody::util::log("outChar has hardware skinning");
 	}
 	else
 	{
-		LOG("outChar has software skinning");
+		SmartBody::util::log("outChar has software skinning");
 	}
 	*/
 // 	RTShader::HardwareSkinningFactory::getSingleton().setMaxCalculableBoneCount(150);
@@ -1222,7 +1223,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 	float meshScale = meshInstance->getMeshScale()[0];
 	Ogre::MeshPtr ogreMesh = meshManager.create(meshName,"General",true);
 	mesh->buildSkinnedVertexBuffer(); // if not already built
-	LOG("Generating Deformable Model Name = %s, size of pos buffer = %d, size of color buffer = %d", meshName.c_str(), meshInstance->getDeformableMesh()->posBuf.size(), meshInstance->getDeformableMesh()->meshColorBuf.size());
+	SmartBody::util::log("Generating Deformable Model Name = %s, size of pos buffer = %d, size of color buffer = %d", meshName.c_str(), meshInstance->getDeformableMesh()->posBuf.size(), meshInstance->getDeformableMesh()->meshColorBuf.size());
 	Ogre::VertexData* vtxData = new Ogre::VertexData();
 	ogreMesh->sharedVertexData = vtxData;
 	vtxData->vertexCount = mesh->posBuf.size();
@@ -1264,7 +1265,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 			if (bbMin[k] > meshPos[k])
 				bbMin[k] = meshPos[k];
 		}		
-		//LOG("vtx %d, mesh normal = %f %f %f", j, mesh->normalBuf[j][0], mesh->normalBuf[j][1], mesh->normalBuf[j][2]);
+		//SmartBody::util::log("vtx %d, mesh normal = %f %f %f", j, mesh->normalBuf[j][0], mesh->normalBuf[j][1], mesh->normalBuf[j][2]);
 	}
 	if (vtxData->vertexCount == 0)
 	{
@@ -1362,13 +1363,13 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		}		
 		//pass->setDiffuse(1.0,1.0,1.0,1.0);
 		SrMaterial& mat = subModel->material;
-		//LOG("diffuse material = %f %f %f %f",mat.diffuse.r,mat.diffuse.g,mat.diffuse.b,mat.diffuse.a);
+		//SmartBody::util::log("diffuse material = %f %f %f %f",mat.diffuse.r,mat.diffuse.g,mat.diffuse.b,mat.diffuse.a);
 		float color[4];
 		mat.ambient.get(color);	
-		//LOG("ambient color = %f %f %f",color[0],color[1],color[2]);
+		//SmartBody::util::log("ambient color = %f %f %f",color[0],color[1],color[2]);
 		//pass->setAmbient(color[0],color[1],color[2]);
 		mat.diffuse.get(color);	
-		//LOG("diffuse color = %f %f %f %f",color[0],color[1],color[2],color[3]);
+		//SmartBody::util::log("diffuse color = %f %f %f %f",color[0],color[1],color[2],color[3]);
 		//if (hasColorBuf && !hasTexture)
 		if (hasTexture || hasColorBuf)
 		{
@@ -1379,7 +1380,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		{			
 			pass->setDiffuse(color[0],color[1],color[2],color[3]);
 			mat.specular.get(color);				
-			//LOG("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
+			//SmartBody::util::log("specular color = %f %f %f %f",color[0],color[1],color[2],color[3]);
 			pass->setSpecular(color[0],color[1],color[2],color[3]);
 			pass->setShininess(mat.shininess);	
 			pass->setLightingEnabled(true);
@@ -1391,7 +1392,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 			if (mat.useAlphaBlend)
 			{
 				//pass->setAlphaRejectSettings(CMPF_GREATER, 0, true);	
-				//LOG("material %s has alpha blending", materialName.c_str());
+				//SmartBody::util::log("material %s has alpha blending", materialName.c_str());
 				pass->setSceneBlending(SBT_TRANSPARENT_ALPHA);	
 				pass->setSceneBlending(SBF_SOURCE_ALPHA,SBF_ONE_MINUS_SOURCE_ALPHA);
 				pass->setTransparentSortingEnabled(true);
@@ -1409,7 +1410,7 @@ void EmbeddedOgre::addDeformableMesh( std::string meshName, DeformableMeshInstan
 		//pass->setVertexProgram("Ogre/RTShader/shadow_caster_dq_skinning_4weight_vs");		
 		//pass->setVertexProgram("Ogre/HardwareSkinningFourWeightsGLSL");
 		//pass->setShadowCasterVertexProgram("Ogre/HardwareSkinningFourWeightsShadowCasterGLSL");		
-		//LOG("subMesh mat name = %s",materialName.c_str());
+		//SmartBody::util::log("subMesh mat name = %s",materialName.c_str());
  		ogSubMesh->setMaterialName(materialName);	
 		if (ogSubMesh->vertexData)
 			ogSubMesh->generateExtremes(8);
@@ -1443,7 +1444,7 @@ void EmbeddedOgre::addTexture( std::string texName )
 		pixelFormat,     // pixel format
 		TU_DEFAULT );  	
 	HardwarePixelBufferSharedPtr pixelBuffer = ogreTex->getBuffer();
-	//LOG("texture format = %d, buffer format = %d",ogreTex->getFormat(), pixelBuffer->getFormat());
+	//SmartBody::util::log("texture format = %d, buffer format = %d",ogreTex->getFormat(), pixelBuffer->getFormat());
 	pixelBuffer->lock(HardwareBuffer::HBL_NORMAL);
 	const PixelBox& pixelBox = pixelBuffer->getCurrentLock();
 	uint8* pDest = static_cast<uint8*>(pixelBox.data);

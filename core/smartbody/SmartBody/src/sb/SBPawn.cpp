@@ -31,6 +31,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBSimulationManager.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 #include <sbm/sbm_deformable_mesh.h>
 #include <sbm/GPU/SbmDeformableMeshGPU.h>
 #include <sr/sr_model.h>
@@ -146,14 +147,14 @@ void SBPawn::setSkeleton(SBSkeleton* skel)
 {
 	if (!skel)
 	{
-		LOG("Skeleton is nonexistent. Skeleton not set on pawn %s", this->getName().c_str());
+		SmartBody::util::log("Skeleton is nonexistent. Skeleton not set on pawn %s", this->getName().c_str());
 		return;
 	}
 
 	// make sure that this skeleton isn't one of the skeleton templates
 	if (SmartBody::SBScene::getScene()->getSkeleton(skel->getName()) == skel)
 	{
-		LOG("Skeleton is a template. Make a copy of this skeleton (scene.createSkeleton()) first.");
+		SmartBody::util::log("Skeleton is a template. Make a copy of this skeleton (scene.createSkeleton()) first.");
 		return;
 	}
 
@@ -349,7 +350,7 @@ void SBPawn::notify(SBSubject* subject)
 		{
 			SBGeomObject* geomObject = getGeomObject();
 			std::string shapeName = getStringAttribute("collisionShape");
-//			LOG("collisionShape = %s",shapeName.c_str());
+//			SmartBody::util::log("collisionShape = %s",shapeName.c_str());
 			if (shapeName != geomObject->geomType())
 			{
 				SBCollisionManager* colManager = SmartBody::SBScene::getScene()->getCollisionManager();
@@ -436,7 +437,7 @@ void SBPawn::notify(SBSubject* subject)
 			{
 				SrVec r(meshAttr->getValue());
 				r *= 3.14159f / 180.0f;
-				LOG("Rotating by %f %f %f", r[0], r[1], r[2]);
+				SmartBody::util::log("Rotating by %f %f %f", r[0], r[1], r[2]);
 				for (size_t x = 0; x < this->dMesh_p->dMeshStatic_p.size(); x++)
 				{
 					SrSnModel* srSnmodel = this->dMesh_p->dMeshStatic_p[x];

@@ -20,7 +20,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "SBNavigationMeshManager.h"
 #include <sb/SBNavigationMesh.h>
-
+#include <sb/SBUtilities.h>
 
 namespace SmartBody {
 
@@ -40,7 +40,7 @@ SBNavigationMesh* SBNavigationMeshManager::createNavigationMesh( const std::stri
 	SBNavigationMesh* naviMesh = NULL;
 	if (_navigationMeshMap.find(naviMeshName) != _navigationMeshMap.end())
 	{
-		LOG("Navigation mesh '%s' already exists. Returns the copy in system. ", naviMeshName.c_str());
+		SmartBody::util::log("Navigation mesh '%s' already exists. Returns the copy in system. ", naviMeshName.c_str());
 		return _navigationMeshMap[naviMeshName];
 	}
 

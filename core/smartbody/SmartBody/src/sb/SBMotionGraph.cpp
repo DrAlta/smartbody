@@ -27,6 +27,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBSkeleton.h>
 #include <sb/SBRetarget.h>
 #include <sb/SBRetargetManager.h>
+#include <sb/SBUtilities.h>
 #include <controllers/me_ct_motion_timewarp.hpp>
 #include <controllers/me_ct_param_animation_utilities.h>
 #include <controllers/me_ct_jacobian_IK.hpp>
@@ -642,7 +643,7 @@ SBAPI SBMotionNode* SBMotionGraph::addMotionNodeFromBlend( SBAnimationBlend* ble
 	SBMotionNode* node = getMotionNode(blend->getName());
 	if (node)
 	{
-		LOG("Motion Node '%s' already exists.", blend->getName().c_str());
+		SmartBody::util::log("Motion Node '%s' already exists.", blend->getName().c_str());
 		return NULL;
 	}
 	int nodeIdx = motionNodes.size();
@@ -708,7 +709,7 @@ SBMotionNode* SBMotionGraph::addMotionNodeFromMotionTransition( const std::strin
 	std::vector<SrVec>  posList1, posList2;
 	SrMat yMat1, yMat2; 
 	float frameStep = (float)motion1->getFrameRate();
-	//LOG("motion1 = %s, motion2 = %s, frame1 = %d, frame2 = %d", motionName1.c_str(), motionName2.c_str(), mo1EndFrme, mo2StartFrame);
+	//SmartBody::util::log("motion1 = %s, motion2 = %s, frame1 = %d, frame2 = %d", motionName1.c_str(), motionName2.c_str(), mo1EndFrme, mo2StartFrame);
 	for (int i=0;i<transitionLength;i++)
 	{
 		int keyFrame1 = i+mo1EndFrme;
@@ -745,8 +746,8 @@ SBMotionNode* SBMotionGraph::addMotionNodeFromMotionTransition( const std::strin
 		baseMat2 = baseMat2*yMat2;
 		SrVec baseTran1 = baseMat1.get_translation();
 		SrVec baseTran2 = baseMat2.get_translation();
-		//LOG("node %s, baseTran1 = %f %f %f",nodeName.c_str(), baseTran1[0],baseTran1[1],baseTran1[2]);
-		//LOG("node %s, baseTran2 = %f %f %f",nodeName.c_str(), baseTran2[0],baseTran2[1],baseTran2[2]);
+		//SmartBody::util::log("node %s, baseTran1 = %f %f %f",nodeName.c_str(), baseTran1[0],baseTran1[1],baseTran1[2]);
+		//SmartBody::util::log("node %s, baseTran2 = %f %f %f",nodeName.c_str(), baseTran2[0],baseTran2[1],baseTran2[2]);
 
 		frame1.setMat("base",baseMat1);
 		frame2.setMat("base",baseMat2);
@@ -792,7 +793,7 @@ SBAPI SBMotionTransitionEdge* SBMotionGraph::addMotionEdge( const std::string& f
 	SBMotionTransitionEdge* edge = getMotionEdge(fromNodeName, toNodeName);
 	if (edge)
 	{
-		LOG("Motion Edge '%s'->'%s' already exists.",fromNodeName.c_str(), toNodeName.c_str());
+		SmartBody::util::log("Motion Edge '%s'->'%s' already exists.",fromNodeName.c_str(), toNodeName.c_str());
 		return NULL;
 	}
 
@@ -802,7 +803,7 @@ SBAPI SBMotionTransitionEdge* SBMotionGraph::addMotionEdge( const std::string& f
 
 	if (!fromNode || !toNode)
 	{
-		LOG("Can not create edge. Motion node '%s' or '%s' could not be found. ", fromNodeName.c_str(), toNodeName.c_str());
+		SmartBody::util::log("Can not create edge. Motion node '%s' or '%s' could not be found. ", fromNodeName.c_str(), toNodeName.c_str());
 		return NULL;
 	}
 
@@ -934,9 +935,9 @@ SBAPI void SBMotionGraph::synthesizePath( SteerPath& desiredPath, const std::str
 
 		// attach current path to the edge list
 		//bestEdgeList.insert(bestEdgeList.end(), bestGraphTraverse.graphEdges.begin(), bestGraphTraverse.graphEdges.end());		
-		//LOG("best graph traverse, Node Idx = %d",bestGraphTraverse.curNodeIdx, bestGraphTraverse.graphEdges.size());
+		//SmartBody::util::log("best graph traverse, Node Idx = %d",bestGraphTraverse.curNodeIdx, bestGraphTraverse.graphEdges.size());
 		
-		LOG("curError = %f, traverseDit = %f, total edge size = %d", finalGraphTraverse.traverseError, finalGraphTraverse.traversePathDist, finalGraphTraverse.graphEdges.size());
+		SmartBody::util::log("curError = %f, traverseDit = %f, total edge size = %d", finalGraphTraverse.traverseError, finalGraphTraverse.traversePathDist, finalGraphTraverse.graphEdges.size());
 		curGraphTraverse = finalGraphTraverse;		
 		// reset the best path, since we will restart the traverse from previous result.
 		curGraphTraverse.graphEdges.clear(); 
@@ -949,11 +950,11 @@ SBAPI void SBMotionGraph::synthesizePath( SteerPath& desiredPath, const std::str
 
 	graphTraverseEdges.clear();
 	bestEdgeList = finalGraphTraverse.graphEdges;
-	LOG("Finish traverse graph, best edge size = %d", bestEdgeList.size());
+	SmartBody::util::log("Finish traverse graph, best edge size = %d", bestEdgeList.size());
 	for (unsigned int i=0;i<bestEdgeList.size();i++)
 	{
 		std::pair<int,int>& edge = bestEdgeList[i];
-		//LOG("Edge %d, node %s to node %s", i, motionNodes[edge.first]->getName().c_str(), motionNodes[edge.second]->getName().c_str() );
+		//SmartBody::util::log("Edge %d, node %s to node %s", i, motionNodes[edge.first]->getName().c_str(), motionNodes[edge.second]->getName().c_str() );
 		graphTraverseEdges.push_back(std::pair<std::string,std::string>(motionNodes[edge.first]->getName(), motionNodes[edge.second]->getName()));				
 	}
 
@@ -984,7 +985,7 @@ float SBMotionGraph::traverseGraph(SteerPath& curPath, MotionGraphTraverse& curG
 		{	
 			bestTraverseError = curGraphTraverse.traverseError;
 			bestGraphTraverse = curGraphTraverse;
-			LOG("Best error = %f, node idx = %d, traverseDist = %f, traverseTime = %f, num nodes = %d", bestTraverseError, curGraphTraverse.curNodeIdx, curGraphTraverse.traversePathDist, curGraphTraverse.traverseTime, curGraphTraverse.graphEdges.size());			
+			SmartBody::util::log("Best error = %f, node idx = %d, traverseDist = %f, traverseTime = %f, num nodes = %d", bestTraverseError, curGraphTraverse.curNodeIdx, curGraphTraverse.traversePathDist, curGraphTraverse.traverseTime, curGraphTraverse.graphEdges.size());			
 		}
 		
 		return curGraphTraverse.traverseError;
@@ -1094,7 +1095,7 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 		for (unsigned int j=0;j<motionNames.size();j++)
 		{
 			std::vector<std::pair<int,int> > outTransition;
-			//LOG("Building motion transition from '%s' to '%s'",motionNames[i].c_str(),motionNames[j].c_str());
+			//SmartBody::util::log("Building motion transition from '%s' to '%s'",motionNames[i].c_str(),motionNames[j].c_str());
 			//computeMotionTransition(motionNames[i],motionNames[j], skelName, affectedJointNames, threshold, outTransition);	
 			computeMotionTransitionFast(motionNames[i],motionNames[j], skelName, affectedJointNames, threshold, outTransition);
 			std::vector<int>& motion1FromToList = fromToList[i];
@@ -1122,7 +1123,7 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 				motion1FromToList.push_back(elem.first);
 				motion2FromToList.push_back(elem.second);
 			}
-			//LOG("Num of transitions = %d", outTransition.size());
+			//SmartBody::util::log("Num of transitions = %d", outTransition.size());
 			transitionMap[IntPair(i,j)] = outTransition;
 		}
 	}
@@ -1144,7 +1145,7 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 		for (unsigned j=0;j<frameList.size();j++)
 		{
 			int curFrame = frameList[j];
-			//LOG("curFrame = %d", curFrame);
+			//SmartBody::util::log("curFrame = %d", curFrame);
 			if (curFrame == prevFrame)
 				continue;
 			MotionGraphNode node;
@@ -1231,7 +1232,7 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 			MotionGraphNode& node = motionNodeList[i];
 			std::string motionName = motionNames[node.moIndex];
 			std::string nodeName = motionName + "_" + boost::lexical_cast<std::string>(nodeIdx);
-			//LOG("Node %s, frame length = %d", nodeName.c_str(), node.endFrame - node.startFrame);
+			//SmartBody::util::log("Node %s, frame length = %d", nodeName.c_str(), node.endFrame - node.startFrame);
 			SBMotionNode* moNode = addMotionNodeFromMotion(nodeName, motionName, node.startFrame, node.endFrame);
 			totalValidFrames += node.endFrame-node.startFrame;
 			std::vector<float> weights;
@@ -1240,7 +1241,7 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 			validNodeIdxMap[i] = nodeIdx;
 		}
 	}	
-	LOG("Total valid frames in motion graph = %d, avgFrames per node = %f, avgTime per node = %f", totalValidFrames, (float)totalValidFrames/validNodeIdxMap.size(), avgTime/validNodeIdxMap.size());
+	SmartBody::util::log("Total valid frames in motion graph = %d, avgFrames per node = %f, avgTime per node = %f", totalValidFrames, (float)totalValidFrames/validNodeIdxMap.size(), avgTime/validNodeIdxMap.size());
 	// add all valid motion edges
 	for (unsigned int i=0;i<forwardEdgeList.size();i++)
 	{
@@ -1255,7 +1256,7 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 		SBMotionNode* toNode = motionNodes[mapToIdx];
 		SBAnimationBlend* blendFrom = fromNode->getAnimBlend();
 		SBAnimationBlend* blendTo = toNode->getAnimBlend();
-		//LOG("fromNode frame = %f, toNode frame = %f", blendFrom->getMotionKey(blendFrom->getMotionName(0), 1), blendTo->getMotionKey(blendTo->getMotionName(0), 0));
+		//SmartBody::util::log("fromNode frame = %f, toNode frame = %f", blendFrom->getMotionKey(blendFrom->getMotionName(0), 1), blendTo->getMotionKey(blendTo->getMotionName(0), 0));
 
 		SBMotionTransitionEdge* transEdge = addMotionEdgeByIndex(mapFromIdx, mapToIdx);
 		transEdge->forwardEdge = true;
@@ -1308,14 +1309,14 @@ SBAPI void SBMotionGraph::buildAutomaticMotionGraph( const std::vector<std::stri
 			}
 			else // simply connect the edge
 			{
-				//LOG("forward edge, fromMotion = %d, toMotion = %d, fromFrame = %d, toFrame = %d", fromMotion, toMotion, tPoint.first, tPoint.second);
+				//SmartBody::util::log("forward edge, fromMotion = %d, toMotion = %d, fromFrame = %d, toFrame = %d", fromMotion, toMotion, tPoint.first, tPoint.second);
 				mapFromIdx = validNodeIdxMap[fromIdx];
 				mapToIdx = validNodeIdxMap[toIdx];
 				addMotionEdgeByIndex(mapFromIdx, mapToIdx);
 			}			
 		}
 	}
-	LOG("total number of graph nodes = %d, graph edges = %d", motionNodes.size(), motionEdges.size());
+	SmartBody::util::log("total number of graph nodes = %d, graph edges = %d", motionNodes.size(), motionEdges.size());
 	// finish building the motion graph.
 }
 
@@ -1415,7 +1416,7 @@ void SBMotionGraph::computeMotionTransitionFast( const std::string& moName1, con
 		for (int j=0;j<mo2Frames;j++)
 		{
 			float transError = computeTransitionErrorFast(m,i,j,windowSize);
-			//LOG("transition error (%d, %d) = %f", i,j, transError);
+			//SmartBody::util::log("transition error (%d, %d) = %f", i,j, transError);
 			transitionMat(i,j) = transError;
 		}
 	}
@@ -1540,14 +1541,14 @@ void SBMotionGraph::computeMotionTransition( const std::string& moName1, const s
 		curCloud2 = pointCloud2;
 		posIdx2 = (windowSize-1);
 		if (i%100 == 0)
-			LOG("iteration : Frame %d", i);
+			SmartBody::util::log("iteration : Frame %d", i);
 		for (int j=0;j<mo2Frames;j++)
 		{
 			motion2->apply_frame(j);
 			skelCopy2->update_global_matrices();
 			skelCopy2->getJointPositions(affectedJointNames, curCloud2, posIdx2*affectedJointNames.size());
 			float transError = computeTransitionError(curCloud1, curCloud2, posIdx1*affectedJointNames.size(), posIdx2*affectedJointNames.size());
-			//LOG("transition error (%d, %d) = %f", i,j, transError);
+			//SmartBody::util::log("transition error (%d, %d) = %f", i,j, transError);
 			transitionMat(i,j) = transError;
 			posIdx2 = (posIdx2+1)%(windowSize);
 		}
@@ -1786,7 +1787,7 @@ bool SBMotionNodeState::addNextTransition( SBMotionTransitionEdge* edge, std::ve
 	}
 	else // error
 	{
-		LOG("Error, edge '%s' is not valid for current state.", edge->getName().c_str());
+		SmartBody::util::log("Error, edge '%s' is not valid for current state.", edge->getName().c_str());
 		return false;		
 	}
 }
@@ -1830,9 +1831,9 @@ float SBMotionNodeState::applyTransition( float dt, float curDu )
 	float dtNext = dt - dtLeft;
 	float duRatio = 1.f - (motionNode->getRefDuration() - currentRefTime)/curDu;
 	//if (transEdge->forwardEdge)
-	//	LOG("Edge is forward edge");
-	//LOG("dtLeft = %f, motionDuration = %f, motionActualTime = %f", dtLeft, motionNode->getActualDuration(blendWeights), motionNode->getActualTime(currentRefTime, blendWeights));
-	//LOG("duRatio = %f, newDt = %f, dtNext = %f",duRatio, dt*duRatio, dtNext);
+	//	SmartBody::util::log("Edge is forward edge");
+	//SmartBody::util::log("dtLeft = %f, motionDuration = %f, motionActualTime = %f", dtLeft, motionNode->getActualDuration(blendWeights), motionNode->getActualTime(currentRefTime, blendWeights));
+	//SmartBody::util::log("duRatio = %f, newDt = %f, dtNext = %f",duRatio, dt*duRatio, dtNext);
 	currentRefTime = 0.f; // a simple hack for now. later should handle multiple transition points
 	newDu = targetNode->getRefDeltaTime(currentRefTime, dtNext, transWeight);
 
@@ -1843,7 +1844,7 @@ float SBMotionNodeState::applyTransition( float dt, float curDu )
 	motionNode = targetNode;
 	blendWeights = transWeight;
 
-	//LOG("transition from node %s to node %s", prevNode->getName().c_str(), motionNode->getName().c_str());
+	//SmartBody::util::log("transition from node %s to node %s", prevNode->getName().c_str(), motionNode->getName().c_str());
 	// also update the cache for the next transition if available
 	// caveat : should we do it here, or just-in-time when necessary ?
 	updateNextStateBufferCache(); 
@@ -1928,7 +1929,7 @@ SrMat SBMotionNodeState::stepMotionState( float dt )
 // 		{
 // 			float ratio = (actualTime+activeTransitionLength)/activeTransitionLength;
 // 			float yf =  fabs(-0.5f*ratio*ratio + 2.f*ratio - 2.f); // transition weight
-// 			//LOG("trans In, yf = %f",yf);
+// 			//SmartBody::util::log("trans In, yf = %f",yf);
 // 			SBMotionFrameBuffer::interpMotionFrameBuffer(curBuffer,prevBuffer,yf, curBuffer);
 // 
 // 		}
@@ -1936,7 +1937,7 @@ SrMat SBMotionNodeState::stepMotionState( float dt )
 // 		{
 // 			float ratio = (actualTime+activeTransitionLength-actualDuration)/activeTransitionLength;
 // 			float yf =  fabs(0.5f*ratio*ratio); // transition weight
-// 			//LOG("trans Out, yf = %f", yf);
+// 			//SmartBody::util::log("trans Out, yf = %f", yf);
 // 			SBMotionFrameBuffer::interpMotionFrameBuffer(curBuffer,nextBuffer,yf, curBuffer);
 // 		}
 // 	}	
@@ -2038,7 +2039,7 @@ SBAPI SBMotionGraph* SBMotionGraphManager::createMotionGraph( const std::string&
 	SBMotionGraph* moGraph = getMotionGraph(moGraphName);
 	if (moGraph)
 	{
-		LOG("Warning, Can't Create Motion Graph '%s', already exists.");
+		SmartBody::util::log("Warning, Can't Create Motion Graph '%s', already exists.");
 		return NULL;
 	}
 

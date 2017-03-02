@@ -19,7 +19,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "SBAssetHandlerAsf.h"
-#include <vhcl.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -27,6 +26,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/algorithm/string.hpp>
 #include <sb/SBScene.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBUtilities.h>
 #include <sbm/ParserASFAMC.h>
 
 namespace SmartBody {
@@ -48,9 +48,9 @@ std::vector<SBAsset*> SBAssetHandlerAsf::getAssets(const std::string& path)
 	if( !boost::filesystem::exists( pathname ) )
 	{
 #if (BOOST_VERSION > 104400)
-		LOG("Asset path \"%s\" not found.",  pathname.string().c_str());
+		SmartBody::util::log("Asset path \"%s\" not found.",  pathname.string().c_str());
 #else
-		LOG("Asset path \"%s\" not found.", pathname.native_file_string().c_str());
+		SmartBody::util::log("Asset path \"%s\" not found.", pathname.native_file_string().c_str());
 #endif
 		return assets;
 	}
@@ -58,9 +58,9 @@ std::vector<SBAsset*> SBAssetHandlerAsf::getAssets(const std::string& path)
 	if( boost::filesystem::is_directory( pathname ) ) // path indicates a directory
 	{
 		#if (BOOST_VERSION > 104400)
-		LOG("Asset path \"%s\" is a directory.",  pathname.string().c_str());
+		SmartBody::util::log("Asset path \"%s\" is a directory.",  pathname.string().c_str());
 #else
-		LOG("Asset path \"%s\" is a directory.", pathname.native_file_string().c_str());
+		SmartBody::util::log("Asset path \"%s\" is a directory.", pathname.native_file_string().c_str());
 #endif
 		return assets;
 	}
@@ -90,7 +90,7 @@ std::vector<SBAsset*> SBAssetHandlerAsf::getAssets(const std::string& path)
 	else
 	{
 		delete skeleton;
-		LOG("Could not load skeleton from file %s", convertedPath.c_str());
+		SmartBody::util::log("Could not load skeleton from file %s", convertedPath.c_str());
 	}
 
 	return assets;

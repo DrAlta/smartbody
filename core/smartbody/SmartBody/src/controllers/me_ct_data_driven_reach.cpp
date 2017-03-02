@@ -242,7 +242,7 @@ void MeCtDataDrivenReach::computeWeightFromDists( vector<float>& dists, vector<f
 		strstr << outWeights[i] << " ,";				
 	}
 	strstr << std::endl;
-	//LOG(strstr.str().c_str());
+	//SmartBody::util::log(strstr.str().c_str());
 }
 
 bool MeCtDataDrivenReach::controller_evaluate( double t, MeFrameData& frame )

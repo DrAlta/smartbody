@@ -1,9 +1,10 @@
-#include "vhcl.h"
+
 #if !defined(__FLASHPLAYER__) && !defined(__ANDROID__) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #endif
 
 #include "SBFrameBufferObject.h"
+#include <sb/SBUtilities.h>
 
 
 
@@ -51,10 +52,10 @@ bool SBFrameBufferObject::setDrawBufferDefault()
 		 mi != attachmentMap.end();
 		 mi++)
 	{
-		//LOG("Draw Buffer = %d", mi->first);
+		//SmartBody::util::log("Draw Buffer = %d", mi->first);
 		drawBuffers.push_back(mi->first);
 	}
-	//LOG("Draw Buffer size = %d", drawBuffers.size());
+	//SmartBody::util::log("Draw Buffer size = %d", drawBuffers.size());
 	return setDrawBuffer(drawBuffers);	
 }
 
@@ -67,10 +68,10 @@ bool SBFrameBufferObject::setDrawBuffer(std::vector<GLenum>& drawBuffers)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	if (frameStatus != GL_FRAMEBUFFER_COMPLETE)
 	{
-		LOG("SBFrameBufferObject error, name = %s, status: 0x%x\n", fboName.c_str(), frameStatus);		
+		SmartBody::util::log("SBFrameBufferObject error, name = %s, status: 0x%x\n", fboName.c_str(), frameStatus);		
 		return false;
 	}		
-	//LOG("SBFrameBufferObject::set Draw buffer successfully.");
+	//SmartBody::util::log("SBFrameBufferObject::set Draw buffer successfully.");
 	return true;
 }
 

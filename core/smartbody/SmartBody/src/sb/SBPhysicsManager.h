@@ -21,7 +21,6 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef _SBPHYSICSMANAGER_H_
 #define _SBPHYSICSMANAGER_H_
 
-#include <vhcl.h>
 #include <sb/SBTypes.h>
 #include <sb/SBService.h>
 

@@ -21,7 +21,7 @@
  *		Yuyu Xu, ICT USC
  */
 
-#include "vhcl.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -79,7 +79,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			{
 				std::wstringstream wstrstr;
 				wstrstr << "WARNING: BML::parse_bml_locomotion(): <"<<tag<<"> BML target type conflicts with previous setting ";
-				LOG(convertWStringToString(wstrstr.str()).c_str());
+				SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 			}
 
 		} 
@@ -94,7 +94,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			{
 				std::wstringstream wstrstr;
 				wstrstr << "WARNING: BML::parse_bml_locomotion(): <"<<tag<<"> BML target type conflicts with previous setting ";
-				LOG(convertWStringToString(wstrstr.str()).c_str());
+				SmartBody::util::log(convertWStringToString(wstrstr.str()).c_str());
 			}
 		} 
 	}
@@ -109,12 +109,12 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 	if (!SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->isInitialized())
 	{
-		LOG("Steering Engine not started. Call \"steer start\" first");
+		SmartBody::util::log("Steering Engine not started. Call \"steer start\" first");
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", "", behav_syncs, ""));
 	}
 	if (!SmartBody::SBScene::getScene()->getSteerManager()->getEngineDriver()->_engine)
 	{
-		LOG("Steering Engine not started. Call \"steer start\" first");
+		SmartBody::util::log("Steering Engine not started. Call \"steer start\" first");
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", "", behav_syncs, ""));
 	}
 	std::stringstream command;
@@ -123,7 +123,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	SmartBody::SBCharacter* c = SmartBody::SBScene::getScene()->getCharacter(request->actor->getName());
 	if (!steerAgent)
 	{
-		LOG("Steering Agent not attached. Check initialization");
+		SmartBody::util::log("Steering Agent not attached. Check initialization");
 		return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", "", behav_syncs, ""));	
 	}
 
@@ -189,7 +189,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	{
 		if (c->locomotion_type == c->Procedural)
 		{
-			LOG("This mode does not support Procedural Locomotion currently!");
+			SmartBody::util::log("This mode does not support Procedural Locomotion currently!");
 			return BehaviorRequestPtr();
 		}		
 		
@@ -309,13 +309,13 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 
 	// parsing target
 	std::string targetString = xml_parse_string(BMLDefs::ATTR_TARGET, elem);
-	//LOG("target string = %s",targetString.c_str());
+	//SmartBody::util::log("target string = %s",targetString.c_str());
 	std::vector<std::string> tokens;
 	SmartBody::util::tokenize(targetString, tokens, " ");
 	int tokenSize = tokens.size();
 	if (tokenSize == 0)			// wrong
 	{
-		LOG("Warning: target's format is (X Z) | (X1 Z1 X2 Z2 X3 Z3...) | backward | forward | left | right.");
+		SmartBody::util::log("Warning: target's format is (X Z) | (X1 Z1 X2 Z2 X3 Z3...) | backward | forward | left | right.");
 	}
 	else if (tokenSize == 1)	// step mode or pawn name
 	{
@@ -353,7 +353,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 #define PAWN_WAY_POINTS 1
 #ifndef PAWN_WAY_POINTS
 		if (tokens.size() % 2 != 0)
-			LOG("Warning: target points are not paired");
+			SmartBody::util::log("Warning: target points are not paired");
 
 		for (size_t i = 0; i < (tokens.size() / 2); i++)
 			command << tokens[i * 2 + 0] << " 0 " << tokens[i * 2 + 1] << " ";
@@ -397,7 +397,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	{		
 		if (!c->param_animation_ct)
 		{
-			LOG("Parameterized Animation Engine not setup, cannot use step control.");
+			SmartBody::util::log("Parameterized Animation Engine not setup, cannot use step control.");
 			return BehaviorRequestPtr();
 		}
 		if (c->param_animation_ct->hasPABlend(ppraiAgent->stepStateName) || !c->param_animation_ct->isIdle())
@@ -428,7 +428,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 			}
 		}
 	}
-	//LOG("behavior sync stroke =  %f",behav_syncs.sync_stroke()->time());
+	//SmartBody::util::log("behavior sync stroke =  %f",behav_syncs.sync_stroke()->time());
 	std::stringstream strstr;
 	strstr << "scene.command(\"" << command.str() << "\")";
 	return BehaviorRequestPtr( new EventRequest(unique_id, localId, "", strstr.str(), behav_syncs, ""));
@@ -452,7 +452,7 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 		{
 			if(type != BML_LOCOMOTION_TARGET_TYPE_TARGET)
 			{
-				LOG("WARNING: BML::parse_routine(): locomotion routine type unmatched");
+				SmartBody::util::log("WARNING: BML::parse_routine(): locomotion routine type unmatched");
 				return;  // a.k.a., NULL
 			}
 
@@ -465,7 +465,7 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 		{
 			if(type != BML_LOCOMOTION_TARGET_TYPE_DIRECTION)
 			{
-				LOG("WARNING: BML::parse_routine(): locomotion routine type unmatched");
+				SmartBody::util::log("WARNING: BML::parse_routine(): locomotion routine type unmatched");
 				return;  // a.k.a., NULL
 			}
 
@@ -485,7 +485,7 @@ void BML::Locomotion::parse_routine(DOMElement* elem, BmlRequestPtr request, int
 		{
 			if(type != BML_LOCOMOTION_TARGET_TYPE_DIRECTION)
 			{
-				LOG("WARNING: BML::parse_routine(): locomotion routine type unmatched.");
+				SmartBody::util::log("WARNING: BML::parse_routine(): locomotion routine type unmatched.");
 				return;  // a.k.a., NULL
 			}
 

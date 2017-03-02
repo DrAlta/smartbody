@@ -19,7 +19,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 **************************************************************/
 
 #include "SBPhoneme.h"
-#include <vhcl.h>
+
 
 namespace SmartBody{
 

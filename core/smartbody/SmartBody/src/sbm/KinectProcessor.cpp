@@ -25,6 +25,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBAssetManager.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBRetarget.h>
+#include <sb/SBUtilities.h>
 
 KinectProcessor::KinectProcessor()
 {
@@ -301,7 +302,7 @@ void KinectProcessor::processRetargetPosition( std::string targetSkelName, SrVec
 	SmartBody::SBSkeleton* kinectSk = assetManager->getSkeleton(kinectSkName);
 	if (!kinectSk)
 	{
-		LOG("No Kinect skeleton found when processing translations.");
+		SmartBody::util::log("No Kinect skeleton found when processing translations.");
 		return;
 	}
 
@@ -348,7 +349,7 @@ void KinectProcessor::processRetargetRotation(std::string targetSkelName, std::v
 	SmartBody::SBSkeleton* kinectSk = assetManager->getSkeleton(kinectSkName);
 	if (!kinectSk)
 	{
-		LOG("No Kinect skeleton found when processing rotations.");
+		SmartBody::util::log("No Kinect skeleton found when processing rotations.");
 		return;
 	}
 

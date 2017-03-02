@@ -1,6 +1,6 @@
 
 
-#include "vhcl.h"
+
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>

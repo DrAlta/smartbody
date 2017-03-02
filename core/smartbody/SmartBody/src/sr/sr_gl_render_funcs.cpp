@@ -20,7 +20,7 @@
  *      Marcelo Kallmann, USC (currently UC Merced)
  */
 
-#include "vhcl.h"
+
 #include <sb/SBTypes.h>
 
 #ifdef __ANDROID__
@@ -61,6 +61,7 @@
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
 #include <sb/SBPawn.h>
+#include <sb/SBUtilities.h>
 #include <sr/sr_sn.h>
 #include <sr/sr_sn_shape.h>
 #include <sr/sr_gl_render_funcs.h>
@@ -94,11 +95,11 @@ void SrGlRenderFuncs::renderBlendFace(DeformableMeshInstance* shape)
 	bool loadSuccess		= model->import_obj(model_path.c_str());	
 	if (loadSuccess)
 	{
-		LOG("Model %s loaded OK", model_path.c_str());
+		SmartBody::util::log("Model %s loaded OK", model_path.c_str());
 	} 
 	else
 	{
-		LOG("*** ERROR: Couldn't load %s", model_path.c_str());
+		SmartBody::util::log("*** ERROR: Couldn't load %s", model_path.c_str());
 		delete model;
 		return;
 	}
@@ -277,18 +278,18 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	bool USE_GPU_BLENDSHAPES = false; // set to false for no masks, true for masks
 #endif
 #if USE_GL_FIXED_PIPELINE
-	//LOG("Render Deformable Model");
+	//SmartBody::util::log("Render Deformable Model");
 	DeformableMesh* mesh = shape->getDeformableMesh();
     if (!mesh)
     {
-        //LOG("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
+        //SmartBody::util::log("SrGlRenderFuncs::renderDeformableMesh ERR: no deformable mesh found!");
         return; // no deformable mesh
     }
 #if !defined(__ANDROID__)
-	//LOG("Shape visibility = %d", shape->getVisibility());
+	//SmartBody::util::log("Shape visibility = %d", shape->getVisibility());
 // 	if (SmartBody::SBScene::getScene()->getBoolAttribute("drawMeshWireframe"))
 // 	{
-// 		//LOG("Render in Wireframe mode\n");
+// 		//SmartBody::util::log("Render in Wireframe mode\n");
 // 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 // 	}
 // 	else
@@ -349,7 +350,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	else
 	{
 		
-			//LOG("No GPU BlendShapes");
+			//SmartBody::util::log("No GPU BlendShapes");
 			if (shape->isStaticMesh())
 			{
 				SmartBody::SBSkeleton* skel = shape->getSkeleton();
@@ -412,7 +413,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	
 
 			//SrVec tempPos = shape->_deformPosBuf[150];
-			//LOG("deformPos = %f %f %f",tempPos[0],tempPos[1],tempPos[2]);
+			//SmartBody::util::log("deformPos = %f %f %f",tempPos[0],tempPos[1],tempPos[2]);
 			if (shape->_deformPosBuf.size() > 0)
 			{
 				glEnableClientState(GL_VERTEX_ARRAY);
@@ -461,7 +462,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 			glPolygonOffset(2.0, 2.0);
 #endif
 			
-			//LOG("subMeshList size = %d", subMeshList.size());
+			//SmartBody::util::log("subMeshList size = %d", subMeshList.size());
 			for (unsigned int i=0;i<subMeshList.size();i++)
 			{	
 				SbmSubMesh* subMesh = subMeshList[i];
@@ -499,11 +500,11 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 				SmartBody::SBSkeleton* skel = shape->getSkeleton();
 				SmartBody::SBPawn* pawn		= skel->getPawn();
 				bool useTexBlend = pawn->getBoolAttribute("blendTexturesWithLighting");
-				//LOG("textureType = %s", texturesType.c_str());
+				//SmartBody::util::log("textureType = %s", texturesType.c_str());
 				if( texturesType == "static" || texturesType == "dynamic")
 				{
 					SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE, subMesh->texName.c_str());		
-					//LOG("texName = %s, tex = %d", subMesh->texName.c_str(), tex->getID());
+					//SmartBody::util::log("texName = %s, tex = %d", subMesh->texName.c_str(), tex->getID());
 					if (tex && !showSkinWeight)
 					{
 						glEnable(GL_TEXTURE_2D);
@@ -528,11 +529,11 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 							{
 								glBindTexture(GL_TEXTURE_2D, shape->_tempTexPairs[0]);
 								//std::cerr << "Using tex: " << shape->_tempTexPairs[0] << "\n";
-								//LOG("Use Blended texture");
+								//SmartBody::util::log("Use Blended texture");
 							}
 							else 
 							{
-								//LOG("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
+								//SmartBody::util::log("*** WARNING: Blended texture shape->_tempTex not initialized. Using tex->getID() instead.");
 								glBindTexture(GL_TEXTURE_2D, tex->getID());
 							}
 					
@@ -540,7 +541,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 						else 		//	If blended textures not used, use neutral appearance				
 						{
 							glBindTexture(GL_TEXTURE_2D, tex->getID());
-							//LOG("Use original texture, texID = %d", tex->getID());
+							//SmartBody::util::log("Use original texture, texID = %d", tex->getID());
 						}				
 
 						if (useTexBlend)
@@ -600,7 +601,7 @@ void SrGlRenderFuncs::renderDeformableMesh( DeformableMeshInstance* shape, bool 
 	}
 #endif
 	//SbmShaderProgram::printOglError("SrGlRenderFuncs::renderDeformableMesh FINAL");
-	//LOG("Finish render deformable model");
+	//SmartBody::util::log("Finish render deformable model");
 }
 
 void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
@@ -620,7 +621,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    std::vector<SrPnt2>&        T = model.T;
    std::vector<SrMaterial>&    M = model.M;
 
-   //LOG("F = %d, V = %d",F.size(), V.size());
+   //SmartBody::util::log("F = %d, V = %d",F.size(), V.size());
    int fsize = F.size();
    int fmsize = Fm.size();
    if ( fsize==0 ) return;
@@ -667,7 +668,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
       glActiveTexture(GL_TEXTURE0);
       myGLEnable(GL_TEXTURE_2D);	 	
       glBindTexture(GL_TEXTURE_2D,tex->getID());	   	      
-      //LOG("mtlName = %s, has texture = %s, texID = %d", mtlName.c_str(), texName.c_str(), tex->getID());
+      //SmartBody::util::log("mtlName = %s, has texture = %s, texID = %d", mtlName.c_str(), texName.c_str(), tex->getID());
 #if !defined (__FLASHPLAYER__)
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 #else
@@ -709,11 +710,11 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
            break;
     }    
 
-   //LOG("(model.mtlnames.size() == 0 #1\n");
+   //SmartBody::util::log("(model.mtlnames.size() == 0 #1\n");
 
    if (model.mtlnames.size() == 0)
    {
-	   //LOG("(model.mtlnames.size() == 0\n");
+	   //SmartBody::util::log("(model.mtlnames.size() == 0\n");
 	   glBegin ( GL_TRIANGLES ); // some cards do require begin/end for each triangle!
 	   for (int k=0; k<F.size(); k++ )
 	   {	
@@ -728,8 +729,8 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
    }
    else
    {	   
-	   //LOG("(model.mtlnames.size() != 0\n");
-	   for (int i=0;i<model.mtlnames.size();i++)
+	   //SmartBody::util::log("(model.mtlnames.size() != 0\n");
+	   for (size_t i=0;i<model.mtlnames.size();i++)
 	   {
 		   std::string mtlName = model.mtlnames[i];
 		   if (model.mtlFaceIndices.find(mtlName) == model.mtlFaceIndices.end())
@@ -742,7 +743,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 		   SbmTexture* tex = SbmTextureManager::singleton().findTexture(SbmTextureManager::TEXTURE_DIFFUSE,texName.c_str());
 		   if ( fsize > Fn.size() || flat ) // no normal
 		   {
-			   //LOG("No normal\n");
+			   //SmartBody::util::log("No normal\n");
 			   glBegin ( GL_TRIANGLES ); // some cards do require begin/end for each triangle!
 			   for (unsigned int k=0; k<mtlFaces.size(); k++ )
 			   {  
@@ -757,7 +758,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 		   }
 		   else if ( fsize > Ft.size() || !tex ) // no texture
 		   {
-			   //LOG("No texture\n");
+			   //SmartBody::util::log("No texture\n");
 			   glBegin ( GL_TRIANGLES );
 			   for (unsigned int k=0; k<mtlFaces.size(); k++ )
 			   {	
@@ -771,7 +772,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 		   else // has normal and texture
 		   {   // to-do : figure out why texture does not work in the fixed-pipeline ?	  
 			   //myGLDisable(GL_LIGHTING);	
-			   //LOG("Normal and texture\n");
+			   //SmartBody::util::log("Normal and texture\n");
 			   myGLEnable ( GL_ALPHA_TEST );
 			   myGLEnable (GL_BLEND);
 			   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -802,7 +803,7 @@ void SrGlRenderFuncs::render_model ( SrSnShapeBase* shape )
 				   int ft_c = Ft[f][2];
 				   if (ft_a >= T.size() || ft_b >= T.size() || ft_c >= T.size())
 				   {
-					   LOG("(%s): ft %d %d %d is bigger than T size %d\n", mtlName.c_str(), ft_a, ft_b, ft_c, T.size());
+					   SmartBody::util::log("(%s): ft %d %d %d is bigger than T size %d\n", mtlName.c_str(), ft_a, ft_b, ft_c, T.size());
 					   continue;
 				   }				   
 

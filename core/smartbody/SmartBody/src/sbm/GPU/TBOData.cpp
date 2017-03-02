@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #if !defined(__FLASHPLAYER__) && !defined(EMSCRIPTEN)
 #include "external/glew/glew.h"
 #endif

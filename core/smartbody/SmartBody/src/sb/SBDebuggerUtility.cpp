@@ -88,25 +88,25 @@ void SBDebuggerUtility::initCharacter(const std::string& name, const std::string
 {
 	if (name == "")
 	{
-		LOG("Character has no name - will not be created.");
+		SmartBody::util::log("Character has no name - will not be created.");
 		return;
 	}
 	SmartBody::SBCharacter* sbCharacter = SmartBody::SBScene::getScene()->createCharacter(name, "");
 	if (!sbCharacter)
 	{
-		LOG("Problem creating character %s, will not be created in remote session...", name.c_str());
+		SmartBody::util::log("Problem creating character %s, will not be created in remote session...", name.c_str());
 		return;
 	}
 	SmartBody::SBSkeleton* sbSkeleton = SmartBody::SBScene::getScene()->getSkeleton(skelName);
 	if (!sbSkeleton)
 	{
-		LOG("Problem creating skeleton %s, character %s will not be created in remote session...", name.c_str(), skelName.c_str());
+		SmartBody::util::log("Problem creating skeleton %s, character %s will not be created in remote session...", name.c_str(), skelName.c_str());
 		return;
 	}
 	SmartBody::SBSkeleton* copySbSkeleton = new SmartBody::SBSkeleton(sbSkeleton);
 	if (!copySbSkeleton)
 	{
-		LOG("Problem creating copy of skeleton %s, character %s will not be created in remote session...", name.c_str(), skelName.c_str());
+		SmartBody::util::log("Problem creating copy of skeleton %s, character %s will not be created in remote session...", name.c_str(), skelName.c_str());
 		return;
 	}
 	sbCharacter->setSkeleton(copySbSkeleton);	

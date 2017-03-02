@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "ObjectManipulationHandle.h"
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
@@ -154,7 +154,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 		else if (curChar) // the selected pawn is actually a character
 		{			
 			SrBox bbox = curChar->getBoundingBox();
-			//LOG("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",curChar->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
+			//SmartBody::util::log("curChar = %s, bounding box : max = %f %f %f, min = %f %f %f",curChar->getName().c_str(),bbox.b[0],bbox.b[1],bbox.b[2],bbox.a[0],bbox.a[1],bbox.a[2]);
 			PositionControl::drawBox(bbox, false, defaultColor);						
 		}
 		else if (sbpawn->getPhysicsObject())
@@ -176,7 +176,7 @@ SbmPawn* ObjectManipulationHandle::getPickingPawn( float x, float y, SrCamera* c
 	glMatrixMode(GL_MODELVIEW);
 	glFlush();
 	hits = glRenderMode(GL_RENDER);
-	//LOG("num of hits = %d",hits);
+	//SmartBody::util::log("num of hits = %d",hits);
 	SbmPawn* selectPawn = NULL;
 	if (hits != 0){
 		//processHits2(hits,selectBuf,0);

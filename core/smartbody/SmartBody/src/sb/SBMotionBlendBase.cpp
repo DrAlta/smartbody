@@ -23,6 +23,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 
 #include <boost/algorithm/string.hpp>
 #include <controllers/MeCtBlendEngine.h>
@@ -155,9 +156,9 @@ void SBMotionBlendBase::setMotionParameter( const std::string& motion, std::vect
 void SBMotionBlendBase::buildBlendBase( const std::string& motionParameter, const std::string& interpolatorType, bool copySimplex)
 {
 	blendType = motionParameter;
-	LOG("build blend base");
+	SmartBody::util::log("build blend base");
 	blendEngine->init(motionParameter);	
-	LOG("num motions = %d, motion parameter = %s, interpolator type = %s",motions.size(), motionParameter.c_str(), interpolatorType.c_str());
+	SmartBody::util::log("num motions = %d, motion parameter = %s, interpolator type = %s",motions.size(), motionParameter.c_str(), interpolatorType.c_str());
 	interpType = interpolatorType;	
 	blendEngine->updateMotionExamples(motions, interpolatorType);	
 	// update all motion parameters

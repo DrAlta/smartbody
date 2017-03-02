@@ -177,7 +177,7 @@ void FLTKOgreWindow::updateOgreCamera()
 //			Ogre::Vector3 point_max		= Ogre::Vector3(pawn_bb.b.x, pawn_bb.b.y, pawn_bb.b.z); 
 //
 //			if(ogreCam->isVisible(point_min) || ogreCam->isVisible(point_max))
-//				LOG("Pawn %s is visible", pawn->getName().c_str());
+//				SmartBody::util::log("Pawn %s is visible", pawn->getName().c_str());
 //		}
 //
 //	}
@@ -401,7 +401,7 @@ void FLTKOgreWindow::fltkRender2()
 	} 	
 	//make_current();
 	//wglMakeCurrent(fl_GetDC(fl_xid(this)),(HGLRC)context());
-	//LOG("viewer GL context = %d, current context = %d",context(), wglGetCurrentContext());	
+	//SmartBody::util::log("viewer GL context = %d, current context = %d",context(), wglGetCurrentContext());	
 	
 	bool hasOpenGL = ssm.initOpenGL();   
 	// init OpenGL extension

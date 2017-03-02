@@ -25,6 +25,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <sb/SBEvent.h>
+#include <sb/SBUtilities.h>
 
 #ifdef USE_TETGEN
 #include <external/tetgen/tetgen.h>
@@ -123,7 +124,7 @@ int PABlend::getMotionId(const std::string& motion)
 		if (motion == mName || mName.find(offsetMotionName) != std::string::npos)
 			return i;
 	}
-	LOG("PABlend::getMotionId Warning: cannot get motion with name %s", motion.c_str());
+	SmartBody::util::log("PABlend::getMotionId Warning: cannot get motion with name %s", motion.c_str());
 	return -1;
 }
 
@@ -327,7 +328,7 @@ bool PABlend::getWeightsFromParameters(double x, double y, std::vector<double>& 
 	}
 	else
 	{
-		LOG("Not inside triangle.");
+		SmartBody::util::log("Not inside triangle.");
 	}
 	return true;
 }
@@ -368,7 +369,7 @@ bool PABlend::getWeightsFromParameters(double x, double y, double z, std::vector
 			weights[id2] = w2;
 			weights[id3] = w3;
 			weights[id4] = w4;
-			//LOG("weight = %f %f %f %f",w1,w2,w3,w4);
+			//SmartBody::util::log("weight = %f %f %f %f",w1,w2,w3,w4);
 			return true;
 		} 
 	}
@@ -475,7 +476,7 @@ bool PABlend::getWeightsFromParameters(double x, double y, double z, std::vector
 		}
 		else
 		{
-			//LOG("Not inside tetrahedron.");
+			//SmartBody::util::log("Not inside tetrahedron.");
 		}
 	}
 	return false;
@@ -762,7 +763,7 @@ void PABlend::addTriangle(const std::string& motion1, const std::string& motion2
 {
 	if (getTriangleIndex(motion1, motion2, motion3) >= 0)
 	{
-		LOG("PABlend::addTriangle ERR: triangle with motion %s, %s, %s already exist!", motion1.c_str(), motion2.c_str(), motion3.c_str());
+		SmartBody::util::log("PABlend::addTriangle ERR: triangle with motion %s, %s, %s already exist!", motion1.c_str(), motion2.c_str(), motion3.c_str());
 		return;
 	}
 
@@ -839,7 +840,7 @@ void PABlend::addTetrahedron(const std::string& motion1, const std::string& moti
 {
 	if (getTetrahedronIndex(motion1, motion2, motion3, motion4) >= 0)
 	{
-		LOG("PABlend::addTetrahedron ERR: triangle with motion %s, %s, %s, %s already exist!", motion1.c_str(), motion2.c_str(), motion3.c_str(), motion4.c_str());
+		SmartBody::util::log("PABlend::addTetrahedron ERR: triangle with motion %s, %s, %s, %s already exist!", motion1.c_str(), motion2.c_str(), motion3.c_str(), motion4.c_str());
 		return;
 	}
 
@@ -1142,7 +1143,7 @@ void PABlend::getWeight(SrVec& pt, SrVec& v1, SrVec& v2, SrVec& v3, double& w1, 
 		w1 = 1.0;
 		w2 = 0.0;
 		w3 = 0.0;
-		LOG("ParameterManager::getWeight Warning: parameters not set correctly, check the initalization.");
+		SmartBody::util::log("ParameterManager::getWeight Warning: parameters not set correctly, check the initalization.");
 	}
 	else
 	{
@@ -1251,7 +1252,7 @@ double PABlend::getLocalTime(double motionTime, int motionIndex)
 {
 	if (keys.size() <= (size_t) motionIndex)
 	{
-		LOG("Only %d motions for state %s, cannot find local time at index %d.", getNumMotions(), stateName.c_str(), motionIndex);
+		SmartBody::util::log("Only %d motions for state %s, cannot find local time at index %d.", getNumMotions(), stateName.c_str(), motionIndex);
 		return motionTime;
 	}
 	if (keys[motionIndex].size() == 0)
@@ -1269,7 +1270,7 @@ double PABlend::getMotionTime(double localTime, int motionIndex)
 {
 	if (keys.size() <= (size_t) motionIndex)
 	{
-		LOG("Only %d motions for state %s, cannot find local time at index %d.", getNumMotions(), stateName.c_str(), motionIndex);
+		SmartBody::util::log("Only %d motions for state %s, cannot find local time at index %d.", getNumMotions(), stateName.c_str(), motionIndex);
 		return localTime;
 	}
 	if (keys[motionIndex].size() == 0)
@@ -1303,7 +1304,7 @@ void PABlend::addEventToMotion(const std::string& motion, SmartBody::SBMotionEve
 	int index = getMotionId(motion);
 	if (index == -1)
 	{
-		LOG("Could not add event to state %s: no motion named %s found.", stateName.c_str(), motion.c_str());
+		SmartBody::util::log("Could not add event to state %s: no motion named %s found.", stateName.c_str(), motion.c_str());
 	}
 
 	_events.push_back(std::pair<SmartBody::SBMotionEvent*, int>(motionEvent, index));

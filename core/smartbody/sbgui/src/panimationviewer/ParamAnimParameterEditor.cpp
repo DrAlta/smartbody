@@ -1,4 +1,4 @@
-#include "vhcl.h"
+
 #include "ParamAnimParameterEditor.h"
 #include <sb/SBAnimationState.h>
 #include <sb/SBCharacter.h>
@@ -6,6 +6,7 @@
 #include <sb/SBJoint.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
+#include <sb/SBUtilities.h>
 #include "ParamAnimStateEditor.h"
 
 PAParameterEditor::PAParameterEditor(PABlendEditor* editor, int x, int y, int w, int h) : Fl_Window(x, y, w, h)
@@ -103,7 +104,7 @@ void PAParameterEditor::confirmEditting(Fl_Widget* widget, void* data)
 	SmartBody::SBJoint* joint = curCharacter->getSkeleton()->getJointByName(jointName);
 	if (!joint)
 	{
-		LOG("PAParameterEditor::confirmEditting WARNING: %s not found!", jointName.c_str());
+		SmartBody::util::log("PAParameterEditor::confirmEditting WARNING: %s not found!", jointName.c_str());
 		return;
 	}
 

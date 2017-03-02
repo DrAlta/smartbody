@@ -20,7 +20,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include "FL/Fl_Slider.H"  // before vhcl.h because of LOG enum which conflicts with vhcl::Log
-#include "vhcl.h"
+
 #include "external/glew/glew.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -457,7 +457,7 @@ static void set_menu_data ( FltkViewer::RenderMode r, FltkViewer::CharacterMode 
 // Called when the small "cross" button to close the window is pressed
 static void _callback_func ( Fl_Widget* win, void* pt )
  {
-   //LOG("DBG callback_func!\n");
+   //SmartBody::util::log("DBG callback_func!\n");
    FltkViewer* v = (FltkViewer*)pt;
    v->close_requested ();
  }
@@ -1086,7 +1086,7 @@ void FltkViewer::initShadowMap()
 	
 	int depth_size = SHADOW_MAP_RES;
 	//glGenTextures(1, &_data->shadowMapID);
-	//LOG("Shadow map ID = %d\n",_data->shadowMapID);	
+	//SmartBody::util::log("Shadow map ID = %d\n",_data->shadowMapID);	
 	glGenFramebuffersEXT(1, &_data->depthFB);	
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, _data->depthFB);
 	glDrawBuffer(GL_FRONT_AND_BACK);
@@ -1387,10 +1387,10 @@ void FltkViewer::updateLights()
 			_lights.push_back(light);
 		}
 	}
-	//LOG("light size = %d\n",_lights.size());
+	//SmartBody::util::log("light size = %d\n",_lights.size());
 
 	SmartBody::SBScene::getScene()->setIntAttribute("numLightsInScene", numLightsInScene);
-	//LOG("numLightsInScene = %d\n", numLightsInScene);
+	//SmartBody::util::log("numLightsInScene = %d\n", numLightsInScene);
 	if (_lights.size() == 0 && 
 		numLightsInScene == 0 &&
 		SmartBody::SBScene::getScene()->getBoolAttribute("useDefaultLights"))
@@ -1629,7 +1629,7 @@ void FltkViewer::drawSBRender()
 	}
 	//make_current();
 	//wglMakeCurrent(fl_GetDC(fl_xid(this)),(HGLRC)context());
-	//LOG("viewer GL context = %d, current context = %d",context(), wglGetCurrentContext());	
+	//SmartBody::util::log("viewer GL context = %d, current context = %d",context(), wglGetCurrentContext());	
 
 	bool hasOpenGL = ssm.initOpenGL();
 	// init OpenGL extension
@@ -1699,7 +1699,7 @@ void FltkViewer::draw()
 	} 	
 	//make_current();
 	//wglMakeCurrent(fl_GetDC(fl_xid(this)),(HGLRC)context());
-	//LOG("viewer GL context = %d, current context = %d",context(), wglGetCurrentContext());	
+	//SmartBody::util::log("viewer GL context = %d, current context = %d",context(), wglGetCurrentContext());	
    
    bool hasOpenGL = ssm.initOpenGL();   
    // init OpenGL extension
@@ -2118,7 +2118,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 			SmartBody::SBSkeleton* skeleton = scene->createSkeleton(toks[1]);
 			if (!skeleton)
 			{
-				LOG("Could not find skeleton named %s, character will not be created.", toks[1].c_str());
+				SmartBody::util::log("Could not find skeleton named %s, character will not be created.", toks[1].c_str());
 				return;
 			}
 			character->setSkeleton(skeleton);
@@ -2133,7 +2133,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		}
 		else
 		{
-			LOG("Error : Drag and drop,  skeleton %s not found",skelName.c_str());
+			SmartBody::util::log("Error : Drag and drop,  skeleton %s not found",skelName.c_str());
 		}		
 	}
 #if 0 // don't think this will be useful anymore
@@ -2153,7 +2153,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		bool isDir = boost::filesystem::is_directory(dndPath);
 		if (isDir) // dropping a folder tells SmartBody to load all the assets from that folder
 		{
-			LOG("Loading assets from path %s", dndPath.string().c_str());
+			SmartBody::util::log("Loading assets from path %s", dndPath.string().c_str());
 			SmartBody::SBScene::getScene()->loadAssetsFromPath(dndPath.string());
 			return;
 		}
@@ -2176,7 +2176,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 				SmartBody::SBScene::getScene()->setActiveCamera(camera);
 			}
 			else
-				LOG("WARNING: can not load cam file!");
+				SmartBody::util::log("WARNING: can not load cam file!");
 			return;
 		}
 		else if (fileextension == ".py")
@@ -2382,11 +2382,11 @@ std::cout << "LOADING [" << fullPathName << "]" << std::endl;
 
 			if (manager->getNumBehaviorSets() == 0)
 			{
-				LOG("Can not find any behavior sets under path %s/behaviorsets.", scene->getMediaPath().c_str());
+				SmartBody::util::log("Can not find any behavior sets under path %s/behaviorsets.", scene->getMediaPath().c_str());
 			}
 			else
 			{
-				LOG("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
+				SmartBody::util::log("Found %d behavior sets under path %s/behaviorsets", manager->getNumBehaviorSets(), scene->getMediaPath().c_str());
 			}
 		}
 
@@ -2430,18 +2430,18 @@ int FltkViewer::handle ( int event )
    switch ( event )
    {   
 	   case FL_DND_RELEASE:
-//		   LOG("DND Release");
+//		   SmartBody::util::log("DND Release");
 		   ret = 1;
 		   break;
 	   case FL_DND_ENTER:          // return(1) for these events to 'accept' dnd
-//		   LOG("DND Enter");
+//		   SmartBody::util::log("DND Enter");
 		   Fl::belowmouse(this); // send the leave events first
 		   Fl::focus(this);
 		   handle(FL_FOCUS);		
 		   ret = 1;
 		   break;
 	   case FL_DND_DRAG:
-//		   LOG("DND Drag");
+//		   SmartBody::util::log("DND Drag");
 		   translate_event ( e, SrEvent::EventPush, w(), h(), this );
 		   dndX = e.mouse.x;
 		   dndY = e.mouse.y;
@@ -2449,7 +2449,7 @@ int FltkViewer::handle ( int event )
 		   break;
 
 	   case FL_DND_LEAVE:
-//		   LOG("DND Leave");
+//		   SmartBody::util::log("DND Leave");
 		   ret = 1;
 		   break;	  
 	   case FL_PASTE:              // handle actual drop (paste) operation		   
@@ -2527,7 +2527,7 @@ int FltkViewer::handle ( int event )
 
 		 if (e.button3 && e.ctrl)
 		 {
-			 LOG("Create Right Click Pop-up Menus");
+			 SmartBody::util::log("Create Right Click Pop-up Menus");
 			 SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
 			 bool hasSelection = (selectedPawn != NULL)? true : false;
 			 createRightClickMenu(hasSelection,Fl::event_x(), Fl::event_y());
@@ -2620,12 +2620,12 @@ int FltkViewer::handle ( int event )
 // 		else if (e.button == 3)
 // 			ceguiButton = CEGUI::RightButton;
 // 
-// 		//LOG("Mouse Release %d",e.button);
+// 		//SmartBody::util::log("Mouse Release %d",e.button);
 // 		CEGUI::System::getSingleton().injectMouseButtonUp(ceguiButton);
 		// process picking
 		//if (!e.button1)	
 		//printf("Mouse Release\n");
-		//LOG("Mouse release");
+		//SmartBody::util::log("Mouse release");
 		break;
 
 	  case FL_MOVE:
@@ -2643,7 +2643,7 @@ int FltkViewer::handle ( int event )
 			   return true;
 		  }
 		//SR_TRACE2 ( "Move buts: "<<(Fl::event_state(FL_BUTTON1)?1:0)<<" "<<(Fl::event_state(FL_BUTTON2)?1:0) );
-		//LOG("Move mouse cursor to %f %f",e.mouseCoord.x, e.mouseCoord.y);
+		//SmartBody::util::log("Move mouse cursor to %f %f",e.mouseCoord.x, e.mouseCoord.y);
 		//translate_event ( e, SrEvent::EventNone, w(), h(), this );
 		//CEGUI::System::getSingleton().injectMousePosition(e.mouseCoord.x, e.mouseCoord.y);
 		if ( !Fl::event_state(FL_BUTTON1) && !Fl::event_state(FL_BUTTON2) ) break;
@@ -2675,7 +2675,7 @@ int FltkViewer::handle ( int event )
 
 	  case FL_KEYDOWN:
 		  {
-		 //LOG("Receiving FL_KEYDOWN");
+		 //SmartBody::util::log("Receiving FL_KEYDOWN");
 		 e.type = SrEvent::EventKeyboard;
 		 e.key = Fl::event_key();
 
@@ -2917,7 +2917,7 @@ int FltkViewer::handle ( int event )
 
    if (ret == 1)  // a drag and drop event
    {	
-	   //LOG("ret == 1");
+	   //SmartBody::util::log("ret == 1");
 	   return ret;
    }
    else
@@ -5827,7 +5827,7 @@ void FltkViewer::drawDeformableModels()
 		if(meshInstance)
 		{
 			meshInstance->blendShapeStaticMesh();
-			//LOG("drawDeformableModels(): Rendering %s", pawn->getName().c_str());
+			//SmartBody::util::log("drawDeformableModels(): Rendering %s", pawn->getName().c_str());
 			//pawn->dMesh_p->update();
 			if (!meshInstance->isStaticMesh()) // is skinned mesh
 			{
@@ -5876,7 +5876,7 @@ void FltkViewer::drawDeformableModels()
 int FltkViewer::deleteSelectedObject( int ret )
 {
 	SbmPawn* selectedPawn = _objManipulator.get_selected_pawn();
-	//LOG("1");
+	//SmartBody::util::log("1");
 	if (selectedPawn)
 	{	
 		int confirm = fl_choice(SmartBody::util::format("Are you sure you want to delete '%s'?", selectedPawn->getName().c_str()).c_str(), "No", "Yes", NULL);
@@ -5890,17 +5890,17 @@ int FltkViewer::deleteSelectedObject( int ret )
 		{
 			SmartBody::SBScene::getScene()->removeCharacter(character->getName());
 			ret = 1;
-			//LOG("2");
+			//SmartBody::util::log("2");
 		}
 		else
 		{
 			SmartBody::SBPawn* pawn = dynamic_cast<SmartBody::SBPawn*>(selectedPawn);
 			SmartBody::SBScene::getScene()->removePawn(pawn->getName());
 			ret = 1;
-			//LOG("3");
+			//SmartBody::util::log("3");
 		}		
 	}
-	//LOG("4");	
+	//SmartBody::util::log("4");	
 	//baseWin->updateObjectList();
 	return ret;
 }

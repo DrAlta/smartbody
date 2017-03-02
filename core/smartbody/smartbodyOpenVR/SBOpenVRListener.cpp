@@ -1,5 +1,5 @@
 #include "SBOpenVRListener.h"
-#include "vhcl.h"
+
 #include <sb/SBScene.h>
 #include <sb/SBJavascript.h>
 #include <sb/SBCharacter.h>
@@ -19,7 +19,7 @@
 void SBOpenVRListener::OnLogMessage(const std::string & message)
 {
 #ifdef WIN32
-	LOG("%s", message.c_str());
+	SmartBody::util::log("%s", message.c_str());
 #else
 	std::cout << message << std::endl;
 #endif
@@ -165,7 +165,7 @@ void SBOpenVRListener::notify(SmartBody::SBSubject* subject)
 
 		//if(name == "mesh")
 		//{
-		//	LOG("name = mesh");
+		//	SmartBody::util::log("name = mesh");
 		//}
 		//mesh attribute
 		if (name == "deformableMeshScale")
@@ -182,7 +182,7 @@ void SBOpenVRListener::notify(SmartBody::SBSubject* subject)
 				DeformableMeshInstance* meshInstance = useDeformableMesh ? pawn->dMeshInstance_p : pawn->dStaticMeshInstance_p;
 				SrVec scale(vec3Attribute->getValue().x, vec3Attribute->getValue().y, vec3Attribute->getValue().z);
 				meshInstance->setMeshScale(scale);
-				//LOG("Set mesh scale = %f",doubleAttribute->getValue());
+				//SmartBody::util::log("Set mesh scale = %f",doubleAttribute->getValue());
 			}
 		}
 		else if (name == "deformableMesh" || name == "mesh")

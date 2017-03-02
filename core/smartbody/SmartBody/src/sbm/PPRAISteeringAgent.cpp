@@ -42,6 +42,8 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBEvent.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBRetarget.h>
+
+#include <sb/SBUtilities.h>
 #include <sbm/Heightfield.h>
 
 #define DebugInfo 0
@@ -441,7 +443,7 @@ SrVec PPRAISteeringAgent::getCollisionFreeGoal( SrVec targetPos, SrVec curPos )
 	}
 	catch  (std::exception &e) 
 	{
-		LOG("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
+		SmartBody::util::log("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
 	}
 
 	return newGoal;
@@ -449,7 +451,7 @@ SrVec PPRAISteeringAgent::getCollisionFreeGoal( SrVec targetPos, SrVec curPos )
 
 void PPRAISteeringAgent::evaluate(double dtime)
 {
-	//LOG("evaluate PPRAISteeringAgent, time = %f",dtime);
+	//SmartBody::util::log("evaluate PPRAISteeringAgent, time = %f",dtime);
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SmartBody::SBSteerManager* manager = scene->getSteerManager();
 	
@@ -469,7 +471,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 	curSteerPos = SrVec(x,y,z);
 	nextSteerPos = curSteerPos;
 
-	//LOG("Character world offset : x = %f, y = %f, z = %f",x,y,z);
+	//SmartBody::util::log("Character world offset : x = %f, y = %f, z = %f",x,y,z);
 
 	// parameter testing
 	if (paramTestFlag)
@@ -492,7 +494,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 		{
 			if (numGoals > 0)
 			{
-				LOG("Character %s is out of range of grid (%f, %f). All goals will be cancelled.", character->getName().c_str(), x * scene->getScale(), z * scene->getScale());
+				SmartBody::util::log("Character %s is out of range of grid (%f, %f). All goals will be cancelled.", character->getName().c_str(), x * scene->getScale(), z * scene->getScale());
 				agent->clearGoals();
 				sendLocomotionEvent("failure");
 			}
@@ -513,7 +515,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 			agent->clearGoals();
 			SrVec newGoal = getCollisionFreeGoal(SrVec(goalx,goaly,goalz)*scene->getScale(),curSteerPos*scene->getScale());		
 
-			//LOG("original goal = %f %f %f, new goal = %f %f %f",goalx,goaly,goalz, newGoal.x*100.f, newGoal.y*100.f, newGoal.z*100.f);
+			//SmartBody::util::log("original goal = %f %f %f, new goal = %f %f %f",goalx,goaly,goalz, newGoal.x*100.f, newGoal.y*100.f, newGoal.z*100.f);
 			SteerLib::AgentGoalInfo goal;		
 			goal.desiredSpeed = desiredSpeed;
 			goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
@@ -524,7 +526,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 			// make sure that the desired goal is within the bounds of the steering grid
 			if (!pathFollowing && manager->getEngineDriver()->_engine->getSpatialDatabase()->getCellIndexFromLocation(goal.targetLocation.x, goal.targetLocation.z) == -1)
 			{
-				LOG("Goal (%f, %f) for character %s is out of range of grid.", goal.targetLocation.x, goal.targetLocation.z, character->getName().c_str());
+				SmartBody::util::log("Goal (%f, %f) for character %s is out of range of grid.", goal.targetLocation.x, goal.targetLocation.z, character->getName().c_str());
 			}
 			else
 			{
@@ -541,7 +543,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 	}
 	catch  (std::exception &e) 
 	{
-		LOG("Exception '%s' occurs at PPRAISteeringAgent::evaluate",e.what());
+		SmartBody::util::log("Exception '%s' occurs at PPRAISteeringAgent::evaluate",e.what());
 	}
 	
 
@@ -563,12 +565,12 @@ void PPRAISteeringAgent::evaluate(double dtime)
 			numMessageRepeats++;
 			if (numMessageRepeats % 100 == 0)
 			{
-				LOG("Message repeated %d times", numMessageRepeats);
+				SmartBody::util::log("Message repeated %d times", numMessageRepeats);
 			}
 			else
 			{
 				numMessageRepeats = 0;
-				LOG("Problem updating agent state: %s", ge.what());
+				SmartBody::util::log("Problem updating agent state: %s", ge.what());
 			}
 		}
 	}
@@ -587,7 +589,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 	}
 	catch  (std::exception &e) 
 	{
-		LOG("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
+		SmartBody::util::log("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
 	}
 	
 
@@ -659,7 +661,7 @@ void PPRAISteeringAgent::evaluate(double dtime)
 	}
 	catch  (std::exception &e) 
 	{
-		LOG("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
+		SmartBody::util::log("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
 	}
 	
 
@@ -677,7 +679,7 @@ void PPRAISteeringAgent::sendLocomotionEvent(const std::string& status)
 	motionEvent->setParameters(strstr.str());
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 	manager->handleEvent(motionEvent, SmartBody::SBScene::getScene()->getSimulationManager()->getTime());
-	//LOG("PPRAISteeringAgent::sendLocomotionEvent Over");
+	//SmartBody::util::log("PPRAISteeringAgent::sendLocomotionEvent Over");
 #else
 	std::string eventType = "locomotion";
 	SmartBody::SBMotionEvent motionEvent;
@@ -688,7 +690,7 @@ void PPRAISteeringAgent::sendLocomotionEvent(const std::string& status)
 	SmartBody::SBEventManager* manager = SmartBody::SBScene::getScene()->getEventManager();		
 	manager->handleEvent(&motionEvent);
 #endif
-	//LOG("locomotio sucess");
+	//SmartBody::util::log("locomotio sucess");
 }
 
 void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float z, float yaw)
@@ -737,14 +739,14 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		//SrVec targetPos = steerPath.closestPointOnPath(SrVec(x,0,z),pathDir,pathDist);
 		float distOnPath = steerPath.pathDistance(targetPos);
 		float sceneScale = 1.f/SmartBody::SBScene::getScene()->getScale();
-		//LOG("pathfollowing:targetSpeed = %f",this->currentTargetSpeed);
+		//SmartBody::util::log("pathfollowing:targetSpeed = %f",this->currentTargetSpeed);
 		float maxSpeed = this->currentTargetSpeed*sceneScale;//(float)character->getDoubleAttribute("steering.pathMaxSpeed")*sceneScale;
 		nextPtOnPath = steerPath.pathPoint(distOnPath+maxSpeed);
 		
 		float targetAngle = radToDeg(atan2(nextPtOnPath.x - x, nextPtOnPath.z - z));
 		normalizeAngle(targetAngle);
-		//LOG("nextPtOnPath = %f %f, curePt = %f %f",nextPtOnPath.x,nextPtOnPath.z, x,z);
-		//LOG("path following:normalize target angle = %f",targetAngle);
+		//SmartBody::util::log("nextPtOnPath = %f %f, curePt = %f %f",nextPtOnPath.x,nextPtOnPath.z, x,z);
+		//SmartBody::util::log("path following:normalize target angle = %f",targetAngle);
 		normalizeAngle(yaw);
 		float diff = targetAngle - yaw;
 		normalizeAngle(diff);
@@ -755,7 +757,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 			if (character->getBoolAttribute("steering.pathStartStep"))// && distToTarget > distThreshold*10.f)
 				//if (0)
 			{
-				//LOG("Path following, start locomotion, diff = %f",diff);
+				//SmartBody::util::log("Path following, start locomotion, diff = %f",diff);
 				startIdleToWalkState(diff);
 			}
 			else
@@ -779,7 +781,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 	float curTurningAngle;
 	float curScoot;
 
-	//LOG("dt = %f, curSteerPos = %f %f, dir = %f",dt, x,z, yaw);
+	//SmartBody::util::log("dt = %f, curSteerPos = %f %f, dir = %f",dt, x,z, yaw);
 
 	if (curStateName == locomotionName && steerPath.pathLength() != 0)
 	{
@@ -802,7 +804,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		float radius = fabs(curSpeed/curTurningAngle);
 		nextSteerPos = curSteerPos;// + curSteerDir*curSpeed*dt;//curSteerPos - curSteerDir*radius + nextSteerDir*radius; //
 		// predict next position
-		//LOG("curSpeed = %f, curTurningAngle = %f, curScoot = %f",curSpeed,curTurningAngle,curScoot);
+		//SmartBody::util::log("curSpeed = %f, curTurningAngle = %f, curScoot = %f",curSpeed,curTurningAngle,curScoot);
 #if 1
 		//SrVec nextPos = curPos + (curDir+nextDir)*0.5f*curSpeed*dt;
 		SrVec pathDir;
@@ -870,7 +872,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		if (counter > 100)
 		{
 			counter = 0;
-			LOG("path curvature = %f, curveSpeed = %f, newSpeed = %f, distToTarget = %f, newTurningAngle = %f",pathCurvature,curvSpeed,newSpeed,distToTarget, newTurningAngle);			
+			SmartBody::util::log("path curvature = %f, curveSpeed = %f, newSpeed = %f, distToTarget = %f, newTurningAngle = %f",pathCurvature,curvSpeed,newSpeed,distToTarget, newTurningAngle);			
 		}
 		counter++;
 #endif
@@ -884,7 +886,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		}
 		float difference = y - terrainHeight;
 		float ang = - difference * tiltGain;
-		//LOG("current y %f, terrain height %f, character height %f, difference %f, angle %f", y, terrainHeight, character->getHeight(), difference, ang);
+		//SmartBody::util::log("current y %f, terrain height %f, character height %f, difference %f, angle %f", y, terrainHeight, character->getHeight(), difference, ang);
 
 		std::vector<double> weights;
 		weights.resize(curStateData->state->getNumMotions());
@@ -892,7 +894,7 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		//	curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, ang, weights);
 		//else		
 		curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, nextTurningAngle, newScoot, weights);
-		//LOG("dt = %f, newSpeed = %f, newTurningAngle = %f, newScoot = %f",dt, newSpeed,nextTurningAngle,newScoot);
+		//SmartBody::util::log("dt = %f, newSpeed = %f, newTurningAngle = %f, newScoot = %f",dt, newSpeed,nextTurningAngle,newScoot);
 		//curStateData->state->getWeightsFromParameters(newSpeed*parameterScale, 0.f, 0.f, weights);
 		character->param_animation_ct->updateWeights(weights);	
 #endif
@@ -905,13 +907,13 @@ void PPRAISteeringAgent::evaluatePathFollowing(float dt, float x, float y, float
 		locomotionHalt();
 		facingAdjust = true;		
 		//character->param_animation_ct->schedule(NULL, weights);		
-		//LOG("path following end");			
+		//SmartBody::util::log("path following end");			
 	}
 	// adjust facing angle 			
 	if (fabs(facingAngle) <= 180 && character->param_animation_ct->isIdle() && facingAdjust )
 	{		
 		float diff = facingAngle - yaw;
-		//LOG("Idle state, facing angle = %f, diff = %f", facingAngle, diff);
+		//SmartBody::util::log("Idle state, facing angle = %f, diff = %f", facingAngle, diff);
 		normalizeAngle(diff);
 		adjustFacingAngle(diff);			
 	}
@@ -1052,7 +1054,7 @@ float PPRAISteeringAgent::evaluateBasicLoco(float dt, float x, float y, float z,
 	normalizeAngle(angleGlobal);
 	normalizeAngle(yaw);
 	float angleDiff = angleGlobal - yaw;
-	//LOG("turning Rate= %f\n",angleDiff/dt);
+	//SmartBody::util::log("turning Rate= %f\n",angleDiff/dt);
 	normalizeAngle(angleDiff);
 
 	float newSpeed = desiredSpeed;
@@ -1363,7 +1365,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 	PPRAgent* pprAgent = dynamic_cast<PPRAgent*>(agent);
 	const std::queue<SteerLib::AgentGoalInfo>& goalQueue = pprAgent->getLandmarkQueue();
 	const SteerLib::SteeringCommand & steeringCommand = pprAgent->getSteeringCommand();
-	//LOG("%f %f %f %f %f %f", steeringCommand.acceleration, steeringCommand.targetDirection.x, steeringCommand.targetDirection.y, steeringCommand.targetDirection.z, steeringCommand.targetSpeed, steeringCommand.turningAmount);
+	//SmartBody::util::log("%f %f %f %f %f %f", steeringCommand.acceleration, steeringCommand.targetDirection.x, steeringCommand.targetDirection.y, steeringCommand.targetDirection.z, steeringCommand.targetSpeed, steeringCommand.turningAmount);
 	
 
 	//*** IMPORTANT: use the example-based animation to update the steering agent
@@ -1462,7 +1464,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 					goal.targetIsRandom = false;
 					//goal.targetLocation = Util::Point(goalx * scene->getScale(), 0.0f, goalz * scene->getScale());
 					goal.targetLocation = Util::Point(newTarget.x, 0.0f, newTarget.z);
-					//LOG("agent %s, newTarget = %f %f %f",character->getName().c_str(),newTarget.x, newTarget.y,newTarget.z);
+					//SmartBody::util::log("agent %s, newTarget = %f %f %f",character->getName().c_str(),newTarget.x, newTarget.y,newTarget.z);
 					agent->addGoal(goal);
 					collisionTime = 0;
 					pprAgent->_nextFrameToRunLongTermPlanningPhase = 0;
@@ -1476,13 +1478,13 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 				getAgent()->clearGoals();
 				sendLocomotionEvent("success");
 				sentLocomotionEvent = true;
-				//LOG("dist close to target. stop locomotion");
+				//SmartBody::util::log("dist close to target. stop locomotion");
 			}
 		}
 	}
 	catch  (std::exception &e) 
 	{
-		LOG("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
+		SmartBody::util::log("Exception '%s' occurs at PPRAISteeringAgent::getCollisionFreeGoal",e.what());
 	}
 	
 
@@ -1494,7 +1496,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 		reachTarget = true;		
 		character->_reachTarget = reachTarget;
 		//if (!character->_lastReachStatus)
-		//	LOG("locomotion complete:reachTarget = true");
+		//	SmartBody::util::log("locomotion complete:reachTarget = true");
 	}
 	if (_numSteeringGoal == 0 && numGoals != 0 && distToTarget < distThreshold)
 	{
@@ -1544,7 +1546,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 		//float targetAngle = radToDeg(atan2(pprAgent->getStartTargetPosition().x - x * scene->getScale(), pprAgent->getStartTargetPosition().z - z * scene->getScale()));
 		float targetAngle = radToDeg(atan2(targetLoc.x - x * scene->getScale(), targetLoc.z - z * scene->getScale()));
 		normalizeAngle(targetAngle);
-		//LOG("steering:normalize target angle = %f",targetAngle);
+		//SmartBody::util::log("steering:normalize target angle = %f",targetAngle);
 		normalizeAngle(yaw);
 		float diff = targetAngle - yaw;
 		normalizeAngle(diff);
@@ -1582,7 +1584,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 			fastInitial = false;
 		if (!fastInitial)
 		{
-			//LOG("start locomotion %f",diff);
+			//SmartBody::util::log("start locomotion %f",diff);
 			startIdleToWalkState(diff);	
 		}
 		else
@@ -1605,9 +1607,9 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 			character->param_animation_ct->schedule(NULL, weights);
 			if (!sentLocomotionEvent)
 				sendLocomotionEvent("success");	
-			//LOG("locomotion complete:numGoals = 0");
+			//SmartBody::util::log("locomotion complete:numGoals = 0");
 			facingAdjust = true;	
-			//LOG("no next goal now. stop locomotion");
+			//SmartBody::util::log("no next goal now. stop locomotion");
 		}
 		else
 		{
@@ -1620,7 +1622,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 			agent->clearGoals();
 
 			SrVec newGoal = getCollisionFreeGoal(SrVec(goalx,goaly,goalz)*scene->getScale(),curSteerPos*scene->getScale());		
-			//LOG("evaluateExampleLoco : original goal = %f %f %f, new goal = %f %f %f",goalx,goaly,goalz, newGoal.x*100.f, newGoal.y*100.f, newGoal.z*100.f);
+			//SmartBody::util::log("evaluateExampleLoco : original goal = %f %f %f, new goal = %f %f %f",goalx,goaly,goalz, newGoal.x*100.f, newGoal.y*100.f, newGoal.z*100.f);
 			SteerLib::AgentGoalInfo goal;
 			goal.desiredSpeed = desiredSpeed;
 			goal.goalType = SteerLib::GOAL_TYPE_SEEK_STATIC_TARGET;
@@ -1682,7 +1684,7 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 		{
 			SmartBody::SBScene::getScene()->queryTerrain(x, z, tnormal);
 		}
-		//LOG("current normal %f %f %f", tnormal[0], tnormal[1], tnormal[2]);
+		//SmartBody::util::log("current normal %f %f %f", tnormal[0], tnormal[1], tnormal[2]);
 
 		curStateData->state->getParametersFromWeights(curSpeed, curTurningAngle, curScoot, curStateData->weights);	
 		curSpeed /= parameterScale;
@@ -1793,8 +1795,8 @@ float PPRAISteeringAgent::evaluateExampleLoco(float dt, float x, float y, float 
 		{
 			std::vector<double> weights;
 			weights.resize(curStateData->state->getNumMotions());
-			//LOG("Character name = %s",character->getName().c_str());
-			//LOG("target Speed = %f, curSpeed = %f, angleDiff = %f, curTurningAngle = %f, curScoot = %f",targetSpeed, curSpeed, targetAngleDiff, curTurningAngle, curScoot);			
+			//SmartBody::util::log("Character name = %s",character->getName().c_str());
+			//SmartBody::util::log("target Speed = %f, curSpeed = %f, angleDiff = %f, curTurningAngle = %f, curScoot = %f",targetSpeed, curSpeed, targetAngleDiff, curTurningAngle, curScoot);			
 			curStateData->state->getWeightsFromParameters(curSpeed*parameterScale, curTurningAngle, curScoot, weights);
 			character->param_animation_ct->updateWeights(weights);
 		}
@@ -1819,7 +1821,7 @@ void PPRAISteeringAgent::startIdleToWalkState( float angleDiff )
 		//double w;
 		float maxRotAngle = 180;
 		
-		//LOG("angleDiff = %f",angleDiff);
+		//SmartBody::util::log("angleDiff = %f",angleDiff);
 		if (angleDiff > 0)
 		{
 			adjustLocomotionBlend(character, startingLName, 1,-angleDiff, 0, 0, false, false);
@@ -1829,7 +1831,7 @@ void PPRAISteeringAgent::startIdleToWalkState( float angleDiff )
 		{
 			adjustLocomotionBlend(character, startingRName, 1, -angleDiff, 0, 0, false, false);
 		}
-		//LOG("start turn command = %s",command.str().c_str());
+		//SmartBody::util::log("start turn command = %s",command.str().c_str());
 		
 		startLocomotionState();
 		return;
@@ -1895,7 +1897,7 @@ float PPRAISteeringAgent::evaluateSteppingLoco(float dt, float x, float y, float
 
 void PPRAISteeringAgent::startParameterTesting()
 {
-	LOG("Parameter Testing Start...");
+	SmartBody::util::log("Parameter Testing Start...");
 	
 	paramTestStartTime = (float) SmartBody::SBScene::getScene()->getSimulationManager()->getTime();
 	paramTestFlag = true;
@@ -1915,10 +1917,10 @@ void PPRAISteeringAgent::parameterTesting()
 		paramTestAngle *= (float(M_PI) / 1.8f);
 		float paramTestVelocity = paramTestDistance / paramTestDur;
 		float paramTestAngleVelocity = paramTestAngle / paramTestDur;
-		LOG("Parameter Testing Result");
-		LOG("Duration: %f", paramTestDur);
-		LOG("Velocity: %f", paramTestVelocity);
-		LOG("Angle Velocity: %f", paramTestAngleVelocity);
+		SmartBody::util::log("Parameter Testing Result");
+		SmartBody::util::log("Duration: %f", paramTestDur);
+		SmartBody::util::log("Velocity: %f", paramTestVelocity);
+		SmartBody::util::log("Angle Velocity: %f", paramTestAngleVelocity);
 		return;
 	}
 	// current location
@@ -1968,7 +1970,7 @@ bool PPRAISteeringAgent::isSteerParamsDirty()
 
 void PPRAISteeringAgent::locomotionReset()
 {
-	//LOG("reset locomotion");
+	//SmartBody::util::log("reset locomotion");
 	locomotionHalt();
 	if (character->param_animation_ct)
 	{			
@@ -1978,7 +1980,7 @@ void PPRAISteeringAgent::locomotionReset()
 
 void PPRAISteeringAgent::locomotionHalt()
 {
-	//LOG("halt locomotion");
+	//SmartBody::util::log("halt locomotion");
 	std::vector<double> weights;
 	ScheduleType sc;
 	if (character->param_animation_ct)
@@ -2024,7 +2026,7 @@ void PPRAISteeringAgent::startLocomotionState()
 	SmartBody::SBAnimationBlend* state = stateManager->getBlend(locomotionName);
 	if (!state)
 	{
-		LOG("No state named %s found for character %s. Cannot start locomotion.", locomotionName.c_str(), character->getName().c_str());
+		SmartBody::util::log("No state named %s found for character %s. Cannot start locomotion.", locomotionName.c_str(), character->getName().c_str());
 		return;
 	}
 	
@@ -2035,7 +2037,7 @@ void PPRAISteeringAgent::startLocomotionState()
 		if (retarget)
 			parameterScale = 1.f/retarget->getHeightRatio();
 	}
-	//LOG("desire speed = %f, parameter scele = %f",targetSpeed, parameterScale);
+	//SmartBody::util::log("desire speed = %f, parameter scele = %f",targetSpeed, parameterScale);
 	adjustLocomotionBlend(character, locomotionName, 3, targetSpeed*parameterScale, 0, 0, false, true);
 }
 
@@ -2043,14 +2045,14 @@ void PPRAISteeringAgent::adjustLocomotionBlend(SmartBody::SBCharacter* character
 {
 	if (!character->param_animation_ct)
 	{
-		LOG("Parameterized animation Not Enabled, cannot update locomotion to (%d, %d, %d)", x, y, z);
+		SmartBody::util::log("Parameterized animation Not Enabled, cannot update locomotion to (%d, %d, %d)", x, y, z);
 		return;
 	}
 
 	SmartBody::SBAnimationBlend* blend = SmartBody::SBScene::getScene()->getBlendManager()->getBlend(blendName);
 	if (!blend)
 	{
-		LOG("Blend %s does not exist, cannot update locomotion to (%d, %d, %d)", blendName.c_str(), x, y, z);
+		SmartBody::util::log("Blend %s does not exist, cannot update locomotion to (%d, %d, %d)", blendName.c_str(), x, y, z);
 		return;
 	}
 
@@ -2085,7 +2087,7 @@ void PPRAISteeringAgent::adjustLocomotionBlend(SmartBody::SBCharacter* character
 			wrap = PABlendData::Once;
 		PABlendData::ScheduleMode schedule = PABlendData::Now;
 		PABlendData::BlendMode blendMode = PABlendData::Overwrite;
-		//LOG("blendName = %s, parameter = %f %f %f",blendName.c_str(), x,y,z);
+		//SmartBody::util::log("blendName = %s, parameter = %f %f %f",blendName.c_str(), x,y,z);
 		character->param_animation_ct->schedule(blend, weights, wrap, schedule, blendMode, "null", 0.0, 0.0, 0.0, -1.0, directPlay);
 	}
 }

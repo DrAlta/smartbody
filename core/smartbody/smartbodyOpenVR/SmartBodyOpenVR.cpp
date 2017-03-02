@@ -17,7 +17,7 @@
 #include "CMainApplication.h"
 
 // === SmartBody Headers ===
-#include "vhcl.h"
+
 #include <sb/SBScene.h>
 #include <sb/SBCharacter.h>
 #include <sb/SBSkeleton.h>
@@ -82,7 +82,7 @@ int main( int argc, char ** argv )
 	std::string scriptName = "TestDrSaxonScriptPi.py";
 	for (int i = 1; i < argc; i++)
 	{
-		LOG("SmartBody ARG[%d]: '%s'", i, argv[i]);
+		SmartBody::util::log("SmartBody ARG[%d]: '%s'", i, argv[i]);
 		std::string s = argv[i];
 		std::string mediapathstr = "";
 		std::string fpsStr = "";
@@ -94,13 +94,13 @@ int main( int argc, char ** argv )
 		if (s == "-scriptpath")  // -mepath <dirpath> to specify where sequence files (.seq) should be loaded from
 		{
 			if (++i < argc) {
-				LOG("    Adding sequence path '%s'\n", argv[i]);
+				SmartBody::util::log("    Adding sequence path '%s'\n", argv[i]);
 
 				//seq_paths.push_back( argv[i] );
 				py_paths.push_back(argv[i]);
 			}
 			else {
-				LOG("ERROR: Expected directory path to follow -seqpath\n");
+				SmartBody::util::log("ERROR: Expected directory path to follow -seqpath\n");
 				// return -1
 			}
 		}
@@ -117,13 +117,13 @@ int main( int argc, char ** argv )
 					std::string extension = filename.substr(idx + 1);
 					if (extension == "py")
 					{
-						LOG("    Loading Python scrypt '%s'\n", argv[i]);
+						SmartBody::util::log("    Loading Python scrypt '%s'\n", argv[i]);
 						init_pys.push_back(argv[i]);
 					}					
 				}				
 			}
 			else {
-				LOG("ERROR: Expected filename to follow -script\n");
+				SmartBody::util::log("ERROR: Expected filename to follow -script\n");
 				// return -1
 			}
 		}
@@ -134,7 +134,7 @@ int main( int argc, char ** argv )
 		}
 		else
 		{
-			LOG("ERROR: Unrecognized command line argument: \"%s\"\n", s.c_str());
+			SmartBody::util::log("ERROR: Unrecognized command line argument: \"%s\"\n", s.c_str());
 		}
 	}
 
@@ -144,7 +144,7 @@ int main( int argc, char ** argv )
 	// add a message logger to stdout
 	
 
-	LOG("Loading Python...");
+	SmartBody::util::log("Loading Python...");
 	SmartBody::SBScene::setSystemParameter("pythonlibpath", python_lib_path);
 	initPython(python_lib_path);
 	// initialize the Python libraries
@@ -172,7 +172,7 @@ int main( int argc, char ** argv )
 	vhmsgManager->setEnable(true);
 	if (!vhmsgManager->isEnable())
 	{
-		LOG("Could not connect to server %s, VHMSG service not enabled.", vhmsg_server);
+		SmartBody::util::log("Could not connect to server %s, VHMSG service not enabled.", vhmsg_server);
 	}
 
 
@@ -208,14 +208,14 @@ int main( int argc, char ** argv )
 		std::stringstream strstr;
 		strstr << "scene.run(\"" << cmd.c_str() << "\")";
 		SmartBody::SBScene::getScene()->run(strstr.str().c_str());
-		LOG("Run Script = %s", strstr.str().c_str());
+		SmartBody::util::log("Run Script = %s", strstr.str().c_str());
 	}
 
-	LOG("After InitVRBuffers");
+	SmartBody::util::log("After InitVRBuffers");
 	
-	LOG("ShaderManageR::LoadShaders");
+	SmartBody::util::log("ShaderManageR::LoadShaders");
 	
-	LOG("g_application.OnStart()");
+	SmartBody::util::log("g_application.OnStart()");
 	// get the simulation object 
 	SmartBody::SBSimulationManager* sim = scene->getSimulationManager();
 
@@ -239,7 +239,7 @@ int main( int argc, char ** argv )
 	SDL_ShowCursor(SDL_DISABLE);
 	
 	// make the character do something	
-	LOG("Starting the simulation...");
+	SmartBody::util::log("Starting the simulation...");
 	double lastPrint = 0;
 	bool bFirst = true;
 	sim->start();
@@ -264,7 +264,7 @@ int main( int argc, char ** argv )
 		if (update_sim || bFirst)
 		{
 			scene->update();
-			//LOG("Scene update, simulation is at time: %5.2f\n", sim->getTime());
+			//SmartBody::util::log("Scene update, simulation is at time: %5.2f\n", sim->getTime());
 
 			// Update blendshape and body animation
 #if 1
@@ -281,7 +281,7 @@ int main( int argc, char ** argv )
 					//pawn->dMesh_p->update();
 					if (!meshInstance->isStaticMesh()) // is skinned mesh
 					{
-						//LOG("drawDeformableModels(): Rendering %s", pawn->getName().c_str());
+						//SmartBody::util::log("drawDeformableModels(): Rendering %s", pawn->getName().c_str());
 						//meshInstance->update();
 					}
 				}

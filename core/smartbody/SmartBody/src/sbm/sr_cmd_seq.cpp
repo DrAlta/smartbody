@@ -1,25 +1,22 @@
-/*
- *  sr_cmd_seq.cpp - part of SmartBody-lib
- *  Copyright (C) 2008  University of Southern California
- *
- *  SmartBody-lib is free software: you can redistribute it and/or
- *  modify it under the terms of the Lesser GNU General Public License
- *  as published by the Free Software Foundation, version 3 of the
- *  license.
- *
- *  SmartBody-lib is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  Lesser GNU General Public License for more details.
- *
- *  You should have received a copy of the Lesser GNU General Public
- *  License along with SmartBody-lib.  If not, see:
- *      http://www.gnu.org/licenses/lgpl-3.0.txt
- *
- *  CONTRIBUTORS:
- *      Marcus Thiebaux, USC
- *      Andrew n marshall, USC
- */
+/*************************************************************
+Copyright (C) 2017 University of Southern California
+
+This file is part of Smartbody.
+
+Smartbody is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Smartbody is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
+
+**************************************************************/
 
 #include "sbm/lin_win.h"
 
@@ -27,7 +24,7 @@
 #include "sr_arg_buff.h"
 
 #include <string.h>
-#include <vhcl_log.h>
+#include <sb/SBUtilities.h>
 
 #define MAX_CMD_ARGL 8192
 
@@ -49,7 +46,7 @@ srCmdSeq::srCmdSeq( void )	{
 srCmdSeq::~srCmdSeq( void )	{
 
 	if( event_count > 0 )	{
-		//LOG( "srCmdSeq::~srCmdSeq NOTE: deleting %d events\n", event_count );
+		//SmartBody::util::log( "srCmdSeq::~srCmdSeq NOTE: deleting %d events\n", event_count );
 		char *cmd;
 		reset();
 		while( ( cmd = pull() ) != NULL )	{
@@ -75,12 +72,12 @@ int srCmdSeq::write_file( char *seq_file )	{
 	FILE *out_fp;
 
 	if( seq_file == NULL )	{
-	    LOG("srCmdSeq::write_file ERR: NULL filename\n" ); 
+	    SmartBody::util::log("srCmdSeq::write_file ERR: NULL filename\n" ); 
 		return( CMD_FAILURE );
 	}
 
 	if( ( out_fp = fopen( seq_file, "w" ) ) == NULL ) { 
-	    LOG("srCmdSeq::write_file ERR: file '%s' not opened\n", seq_file ); 
+	    SmartBody::util::log("srCmdSeq::write_file ERR: file '%s' not opened\n", seq_file ); 
 		return( CMD_FAILURE );
 	}
 	
@@ -95,7 +92,7 @@ int srCmdSeq::write_file( char *seq_file )	{
 int srCmdSeq::read_file( FILE *seq_fp )	{
 
 	if( seq_fp == NULL )	{
-	    LOG("srCmdSeq::read_file ERR: NULL fp\n" ); 
+	    SmartBody::util::log("srCmdSeq::read_file ERR: NULL fp\n" ); 
 		return( CMD_FAILURE );
 	}
 	
@@ -129,19 +126,19 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 					
 					if( strcmp( tok, "end" ) == 0 )	{
 						extended_cmd = false;
-//	LOG( "srCmdSeq::read_file EXTENDED: '%s'\n", ext_line_buff );
+//	SmartBody::util::log( "srCmdSeq::read_file EXTENDED: '%s'\n", ext_line_buff );
 						
 						srArgBuffer ext_args( ext_line_buff );
 						int token_count = ext_args.calc_num_tokens();
 						if( token_count > 0 )	{
 
 							if( insert( t, ext_line_buff ) == CMD_FAILURE )	{
-								LOG("srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
+								SmartBody::util::log("srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
 								done = TRUE;
 							}
 						}
 						else	{
-							LOG("srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
+							SmartBody::util::log("srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
 						}
 					}
 					else	{
@@ -172,12 +169,12 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 						}
 						else
 						if( insert( t, cmd_buff ) == CMD_FAILURE )	{
-							LOG("srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
+							SmartBody::util::log("srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
 							done = TRUE;
 						}
 					}
 					else	{
-						LOG("srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
+						SmartBody::util::log("srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
 					}
 				}
 			}
@@ -186,7 +183,7 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 	}
 
 	if( extended_cmd ) {
-		LOG("srCmdSeq::read_file ERR: UNMATCHED begin/end\n" );
+		SmartBody::util::log("srCmdSeq::read_file ERR: UNMATCHED begin/end\n" );
 		return( CMD_FAILURE );
 	}
 	return( CMD_SUCCESS );
@@ -195,7 +192,7 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 int srCmdSeq::read_file( FILE *seq_fp )	{
 
 	if( seq_fp == NULL )	{
-	    LOG("srCmdSeq::read_file ERR: NULL fp\n" ); 
+	    SmartBody::util::log("srCmdSeq::read_file ERR: NULL fp\n" ); 
 		return( CMD_FAILURE );
 	}
 	char fill_buff[ MAX_CMD_ARGL ] = "";
@@ -221,12 +218,12 @@ int srCmdSeq::read_file( FILE *seq_fp )	{
 						float t = args.read_float();
 						char *cmd = args.read_remainder_raw();
 						if( insert( t, cmd ) == CMD_FAILURE )	{
-							LOG("srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
+							SmartBody::util::log("srCmdSeq::read_file ERR: insert FAILED: line # %d\n", line_count + 1 );
 							done = TRUE;
 						}
 					}
 					else	{
-						LOG("srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
+						SmartBody::util::log("srCmdSeq::read_file ERR: line # %d\n", line_count + 1 );
 					}
 				}
 			}
@@ -241,20 +238,20 @@ int srCmdSeq::read_file( char *seq_file, int report_open_fail )	{
 	FILE *in_fp;
 	
 	if( seq_file == NULL )	{
-	    LOG("srCmdSeq::read_file ERR: NULL filename\n" ); 
+	    SmartBody::util::log("srCmdSeq::read_file ERR: NULL filename\n" ); 
 		return( CMD_FAILURE );
 	}
 	
 	if( ( in_fp = fopen( seq_file, "r" ) ) == NULL ) { 
 		if( report_open_fail )	{
-		    LOG("srCmdSeq::read_file ERR: file '%s' not found\n", seq_file ); 
+		    SmartBody::util::log("srCmdSeq::read_file ERR: file '%s' not found\n", seq_file ); 
 		}
 		return( CMD_FAILURE );
 	}
 
 	int err = read_file( in_fp );
 	if( err != CMD_SUCCESS )	{
-	    LOG("srCmdSeq::read_file ERR: '%s' FAILED\n", seq_file ); 
+	    SmartBody::util::log("srCmdSeq::read_file ERR: '%s' FAILED\n", seq_file ); 
 		return( err );
 	}
 	fclose( in_fp );
@@ -289,7 +286,7 @@ std::string srCmdSeq::pop( float time )	{
 	float offset_time = time - event_offset;
 	event = handle->next;
 	if( event != NULL )	{
-		//LOG("event time = %f, time = %f",event->time, time);
+		//SmartBody::util::log("event time = %f, time = %f",event->time, time);
 		if( event->time <= offset_time )	{
 			handle->next = event->next;
 			std::string cmdStr = "";

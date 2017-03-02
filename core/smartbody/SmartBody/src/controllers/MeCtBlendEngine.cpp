@@ -157,7 +157,7 @@ void MeCtBlendEngine::updateMotionExamples( const std::vector<SmartBody::SBMotio
  		SrVec reachPos;
  		for (int i=0;i<3;i++)
  			reachPos[i] = (float)ex->parameter[i];
-		//LOG("reach pos =  %f %f %f",reachPos[0], reachPos[1], reachPos[2]);
+		//SmartBody::util::log("reach pos =  %f %f %f",reachPos[0], reachPos[1], reachPos[2]);
 // 		examplePts.push_back(reachPos);		
 		motionExamples.addMotionExample(ex);
 	}	
@@ -268,7 +268,7 @@ void MeCtBlendEngine::setBlendParameter( dVector& para, std::vector<double>& out
 	dataInterpolator->predictInterpWeights(targetParameter,weight);	
 	outWeight.resize(motionData.size());
 	//for (unsigned int i=0;i<weight.size();i++)
-	//	LOG("weight %d = %f",weight[i].first, weight[i].second);
+	//	SmartBody::util::log("weight %d = %f",weight[i].first, weight[i].second);
 	for (unsigned int i=0;i<outWeight.size();i++)
 		outWeight[i] = 0.0;
 	for (unsigned int i=0;i<weight.size();i++)

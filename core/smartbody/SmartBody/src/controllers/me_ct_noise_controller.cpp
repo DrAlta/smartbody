@@ -37,7 +37,7 @@ void MeCtNoiseController::setValid(bool v)
 	{
 		_fadeType = 2;
 	}
-	//LOG("fade for noise controller %d", _fadeType);
+	//SmartBody::util::log("fade for noise controller %d", _fadeType);
 }
 
 void MeCtNoiseController::setJointNoise( std::vector<std::string>& jointNames, float scale, float frequency )
@@ -101,7 +101,7 @@ bool MeCtNoiseController::controller_evaluate(double t, MeFrameData& frame)
 					fadeWeight = ratio;
 				if (_fadeType == 2)
 					fadeWeight = 1 - ratio;
-				//LOG("fade %d weight %f, time %f, start %f", _fadeType, fadeWeight, t, _fadeStartTime);
+				//SmartBody::util::log("fade %d weight %f, time %f, start %f", _fadeType, fadeWeight, t, _fadeStartTime);
 			}
 			if (_fadeType == 2 && ratio > 1)
 			{
@@ -142,7 +142,7 @@ bool MeCtNoiseController::controller_evaluate(double t, MeFrameData& frame)
 				if (_fadeType == 2)
 					weightedQuat = slerp(oldQuat, newQuat, (float)fadeWeight);
 				weightedQuat.normalize();
-				//LOG("fade %d weight %f, time %f, start %f, Original %f %f %f %f, weighted %f %f %f %f, new %f %f %f %f", _fadeType, fadeWeight, t, _fadeStartTime, oldQuat.w, oldQuat.x, oldQuat.y, oldQuat.z, weightedQuat.w, weightedQuat.x, weightedQuat.y, weightedQuat.z, newQuat.w, newQuat.x, newQuat.y, newQuat.z);
+				//SmartBody::util::log("fade %d weight %f, time %f, start %f, Original %f %f %f %f, weighted %f %f %f %f, new %f %f %f %f", _fadeType, fadeWeight, t, _fadeStartTime, oldQuat.w, oldQuat.x, oldQuat.y, oldQuat.z, weightedQuat.w, weightedQuat.x, weightedQuat.y, weightedQuat.z, newQuat.w, newQuat.x, newQuat.y, newQuat.z);
 				setJointChannelQuat(jname, frame, weightedQuat);
 			}
 			else
