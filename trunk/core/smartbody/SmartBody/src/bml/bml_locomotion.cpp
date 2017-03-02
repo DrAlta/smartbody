@@ -44,6 +44,7 @@
 #include <boost/lexical_cast.hpp>
 #include <sb/SBSteerManager.h>
 #include <sb/SBCommandManager.h>
+#include <sb/SBUtilities.h>
 
 ////// XML ATTRIBUTES
 
@@ -310,7 +311,7 @@ BehaviorRequestPtr BML::parse_bml_locomotion( DOMElement* elem, const std::strin
 	std::string targetString = xml_parse_string(BMLDefs::ATTR_TARGET, elem);
 	//LOG("target string = %s",targetString.c_str());
 	std::vector<std::string> tokens;
-	vhcl::Tokenize(targetString, tokens, " ");
+	SmartBody::util::tokenize(targetString, tokens, " ");
 	int tokenSize = tokens.size();
 	if (tokenSize == 0)			// wrong
 	{

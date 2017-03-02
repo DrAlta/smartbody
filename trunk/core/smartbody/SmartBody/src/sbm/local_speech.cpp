@@ -668,10 +668,10 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
                     XMLCh * type = XMLString::transcode( "type" );
                     XMLCh * phone_type = XMLString::transcode( iter->second.c_str() );
 
-                    std::string end_f = vhcl::Format( "%0.6f", abuf->trans[i].end );
+                    std::string end_f = SmartBody::util::format( "%0.6f", abuf->trans[i].end );
                     XMLCh * end_time = XMLString::transcode( end_f.c_str() );
 
-                    std::string start_f = vhcl::Format( "%0.6f", abuf->trans[i].start );
+                    std::string start_f = SmartBody::util::format( "%0.6f", abuf->trans[i].start );
                     XMLCh * start_time = XMLString::transcode( start_f.c_str() );
 
                     DOMElement * visemeElement = doc->createElement( X( "viseme" ) );
@@ -699,7 +699,7 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
    
                            wordElement = doc->createElement( X( "word" ) );
 
-                           std::string word_start_f = vhcl::Format( "%0.6f", abuf->trans[ i + 1 ].start );
+                           std::string word_start_f = SmartBody::util::format( "%0.6f", abuf->trans[ i + 1 ].start );
                            XMLCh * word_start_time = XMLString::transcode( word_start_f.c_str() );
                            wordElement->setAttribute( start, word_start_time );
 
@@ -785,7 +785,7 @@ std::string CereprocSpeechRelayLocal::textToSpeech( const char * text, const cha
                     XMLCh * mark_name = XMLString::transcode( abuf->trans[ i ].name );
                     markElement->setAttribute( name, mark_name ) ;
 
-                    std::string word_start_f = vhcl::Format( "%0.6f", abuf->trans[ i ].start );
+                    std::string word_start_f = SmartBody::util::format( "%0.6f", abuf->trans[ i ].start );
                     XMLCh * word_start_time = XMLString::transcode( word_start_f.c_str() );
                     markElement->setAttribute( time, word_start_time );
 
@@ -874,7 +874,7 @@ void CereprocSpeechRelayLocal::processSpeechMessage( const char * message )
    // parse the string
    std::vector< std::string > tokens;
    const std::string delimiters = " ";
-   vhcl::Tokenize( message_c, tokens, delimiters );
+   SmartBody::util::tokenize( message_c, tokens, delimiters );
 
    /// Get non-XML components of the message
    std::string command = tokens.at( 0 );
@@ -1279,7 +1279,7 @@ void FestivalSpeechRelayLocal::processSpeechMessage( const char * message )
 	// parse the string
 	std::vector< std::string > tokens;
 	const std::string delimiters = " ";
-	vhcl::Tokenize( message_c, tokens, delimiters );
+	SmartBody::util::tokenize( message_c, tokens, delimiters );
 
 	/// Get non-XML components of the message
 	std::string command = tokens.at( 0 );
@@ -1524,7 +1524,7 @@ void FestivalSpeechRelayLocal::initSpeechRelay(std::string libPath, std::string 
 		std::string temp = "";
 		std::vector< std::string > tokens;
 		const std::string delimiters = "\\/";
-		vhcl::Tokenize( cache_directory.c_str(), tokens, delimiters );
+		SmartBody::util::tokenize( cache_directory.c_str(), tokens, delimiters );
 		printf( "Warning, audio cache directory, %s, does not exist. Creating directory...\n", cache_directory.c_str() );
 		for (unsigned int i = 0; i < tokens.size(); i++)
 		{

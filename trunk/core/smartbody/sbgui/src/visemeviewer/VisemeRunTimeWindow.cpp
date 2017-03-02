@@ -2,6 +2,7 @@
 #include "VisemeRunTimeWindow.h"
 #include "VisemeRTCurveViewer.h"
 #include <sb/SBBmlProcessor.h>
+#include <sb/SBUtilities.h>
 #include <bml/bml_speech.hpp>
 #include <bml/bml_processor.hpp>
 #include <algorithm>
@@ -180,7 +181,7 @@ bool VisemeRunTimeWindow::matchingPattern(std::string input, std::string pattern
 	}
 
 	std::vector<std::string> tokens;
-	vhcl::Tokenize(pattern, tokens);
+	SmartBody::util::tokenize(pattern, tokens);
 	if (tokens.size() == 0)
 		return true;
 

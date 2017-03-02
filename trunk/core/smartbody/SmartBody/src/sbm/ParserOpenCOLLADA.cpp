@@ -35,6 +35,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBAssetManager.h>
 #include <sb/SBSkeleton.h>
 #include <sb/SBMotion.h>
+#include <sb/SBUtilities.h>
 #include <sbm/sbm_deformable_mesh.h>
 
 
@@ -913,7 +914,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 						std::string matrixString;
 						xml_utils::xml_translate(&matrixString, infoNode->getTextContent());
 						std::vector<std::string> tokens;
-						vhcl::Tokenize(matrixString, tokens, " \n");
+						SmartBody::util::tokenize(matrixString, tokens, " \n");
 						SrMat matrix;
 						for (int m = 0; m < 16; m++)
 							matrix[m] = (float)atof(tokens[m].c_str());
@@ -937,7 +938,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 							std::string offsetString;
 							xml_utils::xml_translate(&offsetString, infoNode->getTextContent());
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(offsetString, tokens, " \n");
+							SmartBody::util::tokenize(offsetString, tokens, " \n");
 							offset.x = (float)atof(tokens[0].c_str()) * scale;
 							offset.y = (float)atof(tokens[1].c_str()) * scale;
 							offset.z = (float)atof(tokens[2].c_str()) * scale;
@@ -959,7 +960,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 							std::string jointOrientationString;
 							xml_utils::xml_translate(&jointOrientationString, infoNode->getTextContent());
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(jointOrientationString, tokens, " \n");
+							SmartBody::util::tokenize(jointOrientationString, tokens, " \n");
 							float finalValue;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
@@ -974,7 +975,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 							std::string rotationString;
 							xml_utils::xml_translate(&rotationString, infoNode->getTextContent());
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(rotationString, tokens, " \n");
+							SmartBody::util::tokenize(rotationString, tokens, " \n");
 							float finalValue;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
@@ -989,7 +990,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 							std::string rotationString;
 							xml_utils::xml_translate(&rotationString, infoNode->getTextContent());
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(rotationString, tokens, " \n");
+							SmartBody::util::tokenize(rotationString, tokens, " \n");
 							float finalValue;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
@@ -1107,7 +1108,7 @@ void ParserOpenCOLLADA::parseJoints(DOMNode* node, SkSkeleton& skeleton, SkMotio
 					std::string offsetString;
 					xml_utils::xml_translate(&offsetString, translateNode->getTextContent());
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(offsetString, tokens, " \n");
+					SmartBody::util::tokenize(offsetString, tokens, " \n");
 					offset.x = (float)atof(tokens[0].c_str()) * scale;
 					offset.y = (float)atof(tokens[1].c_str()) * scale;
 					offset.z = (float)atof(tokens[2].c_str()) * scale;
@@ -1527,7 +1528,7 @@ void ParserOpenCOLLADA::parseLibraryAnimations2(DOMNode* node, SkSkeleton& skele
 							std::string arrayString;
 							xml_utils::xml_translate(&arrayString, node3->getTextContent());
 							//std::vector<std::string> tokens;
-							//vhcl::Tokenize(arrayString, tokens, " \n");
+							//SmartBody::util::tokenize(arrayString, tokens, " \n");
 							TextLineSplitter spl(counter);
 							spl.SplitLine(arrayString.c_str(), ' ');
 						
@@ -2113,7 +2114,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 					}
 					/*
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(floatString, tokens, " \n");
+					SmartBody::util::tokenize(floatString, tokens, " \n");
 					
 					floatArrayMap[sourceID] = std::vector<SrVec>();					
 					for (int i=0; i< count ; i+= stride)
@@ -2139,7 +2140,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 					std::string floatString;
 					xml_utils::xml_translate(&floatString, floatNode->getTextContent());
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(floatString, tokens, " \n");
+					SmartBody::util::tokenize(floatString, tokens, " \n");
 					int index = 0;
 					for (int i = 0; i < count; i++)
 					{
@@ -2269,7 +2270,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 							std::string vcountString;
 							xml_utils::xml_translate(&vcountString, inputNode->getTextContent());
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(vcountString, tokens, " \n");
+							SmartBody::util::tokenize(vcountString, tokens, " \n");
 							for (int i = 0; i < count; i++)
 								vcountList.push_back(atoi(tokens[i].c_str()));
 						}
@@ -2305,7 +2306,7 @@ void ParserOpenCOLLADA::parseLibraryGeometries( DOMNode* node, const char* file,
 
 					/*
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(pString, tokens, " \n");
+					SmartBody::util::tokenize(pString, tokens, " \n");
 					int index = 0;
 					for (int i = 0; i < count; i++)
 					{
@@ -2614,7 +2615,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 					std::string color;
 					xml_utils::xml_translate(&color, colorNode->getTextContent());
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(color, tokens, " \n");
+					SmartBody::util::tokenize(color, tokens, " \n");
 					float w = 1;
 					if (tokens.size() == 4)
 						w = (float)atof(tokens[3].c_str());
@@ -2714,7 +2715,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 				std::string color;
 				xml_utils::xml_translate(&color, colorNode->getTextContent());
 				std::vector<std::string> tokens;
-				vhcl::Tokenize(color, tokens, " \n");
+				SmartBody::util::tokenize(color, tokens, " \n");
 				float w = 1;
 				if (tokens.size() == 4)
 					w = (float)atof(tokens[3].c_str());
@@ -2728,7 +2729,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 				std::string color;
 				xml_utils::xml_translate(&color, colorNode->getTextContent());
 				std::vector<std::string> tokens;
-				vhcl::Tokenize(color, tokens, " \n");
+				SmartBody::util::tokenize(color, tokens, " \n");
 				float w = 1;
 				if (tokens.size() == 4)
 					w = (float)atof(tokens[3].c_str());
@@ -2753,7 +2754,7 @@ void ParserOpenCOLLADA::parseLibraryEffects( DOMNode* node, std::map<std::string
 						{
 							xml_utils::xml_translate(&color, colorNode->getTextContent());
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(color, tokens, " \n");
+							SmartBody::util::tokenize(color, tokens, " \n");
 							SrVec colorVec;
 							if (tokens.size() >= 3)
 							{
@@ -2824,7 +2825,7 @@ void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string
 					std::string arrayString;
 					xml_utils::xml_translate(&arrayString, node3->getTextContent());
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(arrayString, tokens, " \n");		
+					SmartBody::util::tokenize(arrayString, tokens, " \n");
 					if (floatArrayMap.find(sourceIdAttr) == floatArrayMap.end())
 					{
 						floatArrayMap[sourceIdAttr] = ColladaFloatArray();
@@ -2894,7 +2895,7 @@ void ParserOpenCOLLADA::parseNodeAnimation( DOMNode* node1, std::map<std::string
 			colChannel.sourceName = source.substr(1);
 			//LOG("colChannel input name = %s",colChannel.sourceName.c_str());
 			std::vector<std::string> tokens;
-			vhcl::Tokenize(target, tokens, "/.");
+			SmartBody::util::tokenize(target, tokens, "/.");
 			//LOG("token1 = %s, token2 = %s",tokens[0].c_str(),tokens[1].c_str());
 			std::string jname = tokens[0];
 			SkJoint* joint = skeleton.search_joint(jname.c_str());

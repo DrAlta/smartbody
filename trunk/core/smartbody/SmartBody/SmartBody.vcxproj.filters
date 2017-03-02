@@ -1261,6 +1261,9 @@
     <ClCompile Include="src\sb\SBAssetHandlerHDR.cpp">
       <Filter>sb</Filter>
     </ClCompile>
+    <ClCompile Include="src\sb\SBUtilities.cpp">
+      <Filter>sb</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SmartBody\src\bml\bml_noise.hpp">
@@ -2542,6 +2545,9 @@
       <Filter>external\stb</Filter>
     </ClInclude>
     <ClInclude Include="src\sb\SBAssetHandlerHDR.h">
+      <Filter>sb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sb\SBUtilities.h">
       <Filter>sb</Filter>
     </ClInclude>
   </ItemGroup>

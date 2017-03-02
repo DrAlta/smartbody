@@ -25,6 +25,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBJoint.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBAttribute.h>
+#include <sb/SBUtilities.h>
 #include <vhcl.h>
 #include <iostream>
 #include <sstream>
@@ -191,7 +192,7 @@ void SBRealtimeManager::setChannelNames(const std::string& channels)
 	channelNames.clear();
 
 	std::vector<std::string> tokens;
-	vhcl::Tokenize(channels, tokens, " ");
+	SmartBody::util::tokenize(channels, tokens, " ");
 	
 	for (size_t c = 0; c < tokens.size(); c++)
 	{
@@ -242,7 +243,7 @@ SrQuat SBRealtimeManager::getDataQuat(const std::string& channel)
 		return quat;
 
 	std::vector<std::string> tokens;
-	vhcl::Tokenize(data, tokens, " ");
+	SmartBody::util::tokenize(data, tokens, " ");
 	if (tokens.size() < 4)
 		return quat;
 
@@ -264,7 +265,7 @@ SrMat SBRealtimeManager::getDataMat(const std::string& channel)
 		return mat;
 
 	std::vector<std::string> tokens;
-	vhcl::Tokenize(data, tokens, " ");
+	SmartBody::util::tokenize(data, tokens, " ");
 	if (tokens.size() < 16)
 		return mat;
 
@@ -282,7 +283,7 @@ SrVec SBRealtimeManager::getDataVec(const std::string& channel)
 		return vec;
 
 	std::vector<std::string> tokens;
-	vhcl::Tokenize(data, tokens, " ");
+	SmartBody::util::tokenize(data, tokens, " ");
 	if (tokens.size() < 3)
 		return vec;
 

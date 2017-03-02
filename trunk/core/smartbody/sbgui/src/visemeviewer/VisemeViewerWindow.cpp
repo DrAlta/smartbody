@@ -10,6 +10,7 @@
 #include <sb/SBPhonemeManager.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBBmlProcessor.h>
+#include <sb/SBUtilities.h>
 #include <bml/bml_speech.hpp>
 #include <bml/bml_processor.hpp>
 #include <boost/version.hpp>
@@ -814,7 +815,7 @@ void VisemeViewerWindow::OnPlayDialogCB(Fl_Widget* widget, void* data)
 	VisemeViewerWindow* viewer = (VisemeViewerWindow*) data;
 	
 	std::string utterance = viewer->_inputUtterance->value(); 	
-	std::string utteranceClean = vhcl::Replace(utterance, "'", "\\'");
+	std::string utteranceClean = SmartBody::util::replace(utterance, "'", "\\'");
 	if (utterance != "")
 	{
 		std::stringstream strstr;
@@ -1274,7 +1275,7 @@ void VisemeViewerWindow::OnShowStatsCB(Fl_Widget* widget, void* data)
 		strstr << (*iter).first << " " << (*iter).second << " " << percentage;
 		// if the diphone is missing from the current set, highlight it
 		std::vector<std::string> tmp;
-		vhcl::Tokenize((*iter).first, tmp, " -");
+		SmartBody::util::tokenize((*iter).first, tmp, " -");
 		if (tmp.size() == 2)
 		{
 			SmartBody::SBDiphone* diphone = diphoneManager->getMappedDiphone(tmp[0], tmp[1], curDiphoneSet);
@@ -1543,7 +1544,7 @@ std::string VisemeViewerWindow::translateWordsToPhonemes(const std::string& utte
 	std::stringstream strstr;
 
 	std::vector<std::string> tokens;
-	vhcl::Tokenize(utterance, tokens, " .,?!\n\r\t");
+	SmartBody::util::tokenize(utterance, tokens, " .,?!\n\r\t");
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
 		if (tokens[i] == "<sil>" ||
@@ -1745,9 +1746,9 @@ void VisemeViewerWindow::OnGenerateLipSyncCB(Fl_Widget* widget, void* data)
 			return;
 		}
 	
-		std::string finalLipSyncCommand = vhcl::Replace(lipSyncCommand, "%1", filesToProcess[f].string());
-		finalLipSyncCommand = vhcl::Replace(finalLipSyncCommand, "%2", phonePath.string());
-		finalLipSyncCommand = vhcl::Replace(finalLipSyncCommand, "%3", transcriptionPath.string());
+		std::string finalLipSyncCommand = SmartBody::util::replace(lipSyncCommand, "%1", filesToProcess[f].string());
+		finalLipSyncCommand = SmartBody::util::replace(finalLipSyncCommand, "%2", phonePath.string());
+		finalLipSyncCommand = SmartBody::util::replace(finalLipSyncCommand, "%3", transcriptionPath.string());
 	
 		LOG("Running lip sync with command: %s", finalLipSyncCommand.c_str());
 

@@ -8,6 +8,7 @@
 #include <sbm/lin_win.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBFaceDefinition.h>
+#include <sb/SBUtilities.h>
 
 FaceViewer::FaceViewer(int x, int y, int w, int h, char* name) : GenericViewer(x, y, w, h), Fl_Double_Window(x, y, w, h, name), SBWindowListener()
 {
@@ -342,8 +343,8 @@ void FaceViewer::ResetCB(Fl_Widget* widget, void* data)
 				if (name.find(" weight") == std::string::npos)
 					slider->value(0);
 
-				//std::string message = vhcl::Format("char %s viseme %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), name.c_str(), slider->value());
-				std::string message = vhcl::Format("char %s viseme clear", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label());
+				//std::string message = SmartBody::util::format("char %s viseme %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), name.c_str(), slider->value());
+				std::string message = SmartBody::util::format("char %s viseme clear", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label());
 				if (!SmartBody::SBScene::getScene()->isRemoteMode())
 				{
 					SmartBody::SBScene::getScene()->command(message);
@@ -439,7 +440,7 @@ void FaceViewer::FaceCB(Fl_Widget* widget, void* data)
 
 	std::string name = slider->label();
 #if 0
-	std::string message = vhcl::Format("char %s viseme %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), name.c_str(), slider->value());
+	std::string message = SmartBody::util::format("char %s viseme %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), name.c_str(), slider->value());
 	if (!SmartBody::SBScene::getScene()->isRemoteMode())
 	{
 		SmartBody::SBScene::getScene()->command(message);
@@ -453,7 +454,7 @@ void FaceViewer::FaceCB(Fl_Widget* widget, void* data)
 	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (unsigned int i=0;i<charNames.size();i++)
 	{
-		std::string message = vhcl::Format("char %s viseme %s %f", charNames[i].c_str(), name.c_str(), slider->value());
+		std::string message = SmartBody::util::format("char %s viseme %s %f", charNames[i].c_str(), name.c_str(), slider->value());
 		if (!SmartBody::SBScene::getScene()->isRemoteMode())
 		{
 			SmartBody::SBScene::getScene()->command(message);
@@ -485,7 +486,7 @@ void FaceViewer::FaceWeightCB(Fl_Widget* widget, void* data)
 	}
 
 #if 1
-	std::string message = vhcl::Format("char %s visemeweight %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), visemeName.c_str(), weightSlider->value());
+	std::string message = SmartBody::util::format("char %s visemeweight %s %f", faceViewer->choiceCharacters->menu()[faceViewer->choiceCharacters->value()].label(), visemeName.c_str(), weightSlider->value());
 	if (!SmartBody::SBScene::getScene()->isRemoteMode())
 	{
 		SmartBody::SBScene::getScene()->command(message);
@@ -499,7 +500,7 @@ void FaceViewer::FaceWeightCB(Fl_Widget* widget, void* data)
 	std::vector<std::string> charNames = SmartBody::SBScene::getScene()->getCharacterNames();
 	for (unsigned int i=0;i<charNames.size();i++)
 	{
-		std::string message = vhcl::Format("char %s visemeweight %s %f", charNames[i].c_str(), visemeName.c_str(), weightSlider->value());
+		std::string message = SmartBody::util::format("char %s visemeweight %s %f", charNames[i].c_str(), visemeName.c_str(), weightSlider->value());
 		if (!SmartBody::SBScene::getScene()->isRemoteMode())
 		{
 			SmartBody::SBScene::getScene()->command(message);

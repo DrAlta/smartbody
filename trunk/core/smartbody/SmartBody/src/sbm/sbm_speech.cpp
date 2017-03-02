@@ -20,7 +20,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include "vhcl.h"
 
 #include "sbm/sbm_speech.hpp"
-
+#include <sb/SBUtilities.h>
 
 using namespace std;
 using namespace SmartBody;
@@ -35,7 +35,7 @@ VisemeData::VisemeData( const std::string& id, int numKeys, const std::string& c
 	//       entire curve data string, we are only interested in the last control point.
 
 	std::vector<std::string> tokens;
-	vhcl::Tokenize(curveInfo, tokens, " ");
+	SmartBody:util::tokenize(curveInfo, tokens, " ");
 	if (tokens.size() > 0 && numKeys > 0)
 	{
 		// make sure the curve info is properly created

@@ -34,6 +34,7 @@
 #include <sbm/action_unit.hpp>
 #include <sbm/sr_path_list.h>
 #include <sb/sbm_character.hpp>
+#include <sb/SBUtilities.h>
 #include "FLTKListener.h"
 
 
@@ -203,7 +204,7 @@ bool ResourceWindow::processedDragAndDrop( std::string& dndText )
 	if (fileextension == ".py")
 	{
 #ifdef WIN32
-		fullPath = vhcl::Replace(fullPath, "\\", "/");
+		fullPath = SmartBody::util::replace(fullPath, "\\", "/");
 #endif
 		// script file, run it
 		scene->addAssetPath("script", fullPath);
@@ -305,7 +306,7 @@ int ResourceWindow::handle( int event )
 						if (child->is_selected())
 						{
 							const char* name = child->label();
-							int confirm = fl_choice(vhcl::Format("Are you sure you want to delete '%s'?",name).c_str(), "No", "Yes", NULL);
+							int confirm = fl_choice(SmartBody::util::format("Are you sure you want to delete '%s'?",name).c_str(), "No", "Yes", NULL);
 							if (confirm == 0)
 								return 0;
 							SmartBody::SBScene::getScene()->removePawn(name);
@@ -322,7 +323,7 @@ int ResourceWindow::handle( int event )
 						if (child->is_selected())
 						{
 							const char* name = child->label();
-							int confirm = fl_choice(vhcl::Format("Are you sure you want to delete '%s'?",name).c_str(), "No", "Yes", NULL);
+							int confirm = fl_choice(SmartBody::util::format("Are you sure you want to delete '%s'?",name).c_str(), "No", "Yes", NULL);
 							if (confirm == 0)
 								return 0;
 							SmartBody::SBScene::getScene()->removeCharacter(name);

@@ -573,7 +573,7 @@ void FLTKOgreWindow::fltkRender2()
 // 	}
 // 	else if ( _data->statistics )
 // 	{
-// 		_data->message = vhcl::Format( "FPS:%5.2f frame(%2.0f):%4.1fms render:%4.1fms", 
+// 		_data->message = SmartBody::util::format( "FPS:%5.2f frame(%2.0f):%4.1fms render:%4.1fms", 
 // 			_data->fcounter.mps(),
 // 			_data->fcounter.measurements(),
 // 			_data->fcounter.loopdt()*1000.0,

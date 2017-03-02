@@ -581,6 +581,7 @@ LOCAL_SRC_FILES := $(SB_MY_DIR)/sr/sr_alg.cpp \
 	$(SB_MY_DIR)/sb/SBHandConfigurationManager.cpp \
 	$(SB_MY_DIR)/sb/SBHandSynthesis.cpp \
 	$(SB_MY_DIR)/sb/SBRigNode.cpp \
+	$(SB_MY_DIR)/sb/SBUtilities.cpp \
     $(SB_MY_DIR)/sb/smartbody-c-dll.cpp \
 	$(SB_MY_DIR)/protocols/sbmesh.pb.cpp \
 	$(SB_MY_DIR)/protocols/sbmotion.pb.cpp \

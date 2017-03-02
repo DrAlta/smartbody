@@ -44,6 +44,7 @@ along with Smartbody.If not, see <http://www.gnu.org/licenses/>.
 #include <controllers/me_ct_scheduler2.h>
 #include <sbm/PPRAISteeringAgent.h>
 #include <sb/SBMotion.h>
+#include <sb/SBUtilities.h>
 
 using namespace std;
 using namespace BML;
@@ -106,7 +107,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 
 	SmartBody::SBCharacter* character = dynamic_cast<SmartBody::SBCharacter*>(request->actor);
 	std::string gestureMapName = "";
-	std::string mapNameLower = vhcl::ToLower(emotion);
+	std::string mapNameLower = SmartBody::util::toLower(emotion);
 	// capitalize the first letter 
 	if (mapNameLower.size() > 0)
 		mapNameLower[0] = toupper(mapNameLower[0]);
@@ -215,7 +216,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 			strstr.precision(1);
 			strstr << params[0] << "_" << params[1] << "_" << "_" << params[2];
 			std::string tempString = strstr.str();
-			std::string nameStr = vhcl::Replace(tempString, ".", "_");
+			std::string nameStr = SmartBody::util::replace(tempString, ".", "_");
 			std::stringstream strstr2;
 			strstr2 << blend->getName() << "_" << nameStr;
 			std::string blendedMotionName = strstr2.str();
@@ -388,7 +389,7 @@ BML::BehaviorRequestPtr BML::parse_bml_gesture( DOMElement* elem, const std::str
 		if (poststrokehold > 0 && (strokeString == "" || relaxString == ""))
 		{
 			std::vector<std::string> jointVec;
-			vhcl::Tokenize(joints, jointVec);
+			SmartBody::util::tokenize(joints, jointVec);
 			mForCt = dynamic_cast<SmartBody::SBMotion*>(mForCt->buildPoststrokeHoldMotion(poststrokehold, jointVec, scale, freq, postIdleMotion));
 			SmartBody::SBMotion* sbMForCT = dynamic_cast<SmartBody::SBMotion*>(mForCt);
 			if (sbMForCT)

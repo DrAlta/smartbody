@@ -47,6 +47,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBAnimationTransition.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBCommandManager.h>
+#include <sb/SBUtilities.h>
 #include <controllers/me_ct_param_animation.h>
 #include <controllers/me_ct_data_receiver.h>
 #include <controllers/me_ct_scheduler2.h>
@@ -552,7 +553,7 @@ int mcu_panim_cmd_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr )
 
 			std::string directPlayStr = args.peek_string();			
 			std::vector<std::string> tokens;
-			vhcl::Tokenize(directPlayStr, tokens);
+			SmartBody::util::tokenize(directPlayStr, tokens);
 			bool directPlay = false;
 			if (tokens.size() > 0 && tokens[0] == "direct-play")
 			{
@@ -1529,7 +1530,7 @@ int mcu_play_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
     char * remainder = args.read_remainder_raw();
     string sArgs = remainder;
     vector< string > splitArgs;
-    vhcl::Tokenize( sArgs, splitArgs );
+	SmartBody::util::tokenize( sArgs, splitArgs );
 
     if ( splitArgs.size() >= 2 )
     {
@@ -1655,7 +1656,7 @@ int mcu_stop_sound_func( srArgBuffer& args, SmartBody::SBCommandManager* cmdMgr 
     char * remainder = args.read_remainder_raw();
     string sArgs = remainder;
     vector< string > splitArgs;
-    vhcl::Tokenize( sArgs, splitArgs );
+	SmartBody::util::tokenize( sArgs, splitArgs );
 
     if ( splitArgs.size() >= 2 )
     {

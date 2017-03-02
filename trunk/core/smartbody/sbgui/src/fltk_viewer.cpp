@@ -93,6 +93,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 # include <sb/SBAssetManager.h>
 # include <sb/SBBmlProcessor.h>
 # include <sb/SBNavigationMesh.h>
+# include <sb/SBUtilities.h>
 
 #include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -542,9 +543,9 @@ void FltkViewer::registerUIControls()
 	attribute->registerObserver(this);
 	attribute = scene->createBoolAttribute("GUI.ShowFloor",true,true,"GUI",10,false,false,false,"Show/hide the floor.");
 	attribute->registerObserver(this);
-	attribute = scene->createVec3Attribute("GUI.FloorColor",0.6, 0.6, 0.6,true,"GUI",10,false,false,false,"Floor color.");
+	attribute = scene->createVec3Attribute("GUI.FloorColor",0.6f, 0.6f, 0.6f,true,"GUI",10,false,false,false,"Floor color.");
 	attribute->registerObserver(this);
-	attribute = scene->createVec3Attribute("GUI.BackgroundColor",0.63, 0.63, 0.63,true,"GUI",10,false,false,false,"Background color.");
+	attribute = scene->createVec3Attribute("GUI.BackgroundColor",0.63f, 0.63f, 0.63f,true,"GUI",10,false,false,false,"Background color.");
 	attribute->registerObserver(this);
 
 	attribute = scene->createBoolAttribute("Renderer.UseDeferredRendering", false, true, "Renderer", 10, false, false, false, "Whether to use deferred rendering pipeline.");
@@ -1404,7 +1405,7 @@ void FltkViewer::updateLights()
 		SrQuat orientation(mat);
 		SrVec lightDirection = -up * orientation;
 		//light.position = SrVec(lightDirection.x, lightDirection.y, lightDirection.z);
-		light.position = SrVec(.019, .437, .898);
+		light.position = SrVec(.019f, .437f, .898f);
 		light.constant_attenuation = 1.0f;
 		_lights.push_back(light);
 
@@ -1416,7 +1417,7 @@ void FltkViewer::updateLights()
 		SrQuat orientation2(mat2);
 		SrVec lightDirection2 = -up * orientation2;
 		//light2.position = SrVec(lightDirection2.x, lightDirection2.y, lightDirection2.z);
-		light2.position = SrVec(.820, -.525, .227);
+		light2.position = SrVec(.820f, -.525f, .227f);
 		_lights.push_back(light2);
 
 		SrLight light3 = light;
@@ -1427,7 +1428,7 @@ void FltkViewer::updateLights()
 		SrQuat orientation3(mat3);
 		SrVec lightDirection3 = -up * orientation3;
 		//light3.position = SrVec(lightDirection3.x, lightDirection3.y, lightDirection3.z);
-		light3.position = SrVec(.707, .705, .044);
+		light3.position = SrVec(.707f, .705f, .044f);
 		_lights.push_back(light3);
 	}
 	
@@ -1867,7 +1868,7 @@ void FltkViewer::draw()
 	}
 	else if ( _data->statistics )
 	{
-		_data->message = vhcl::Format( "FPS:%5.2f frame(%2.0f):%4.1fms render:%4.1fms", 
+		_data->message = SmartBody::util::format( "FPS:%5.2f frame(%2.0f):%4.1fms render:%4.1fms",
 				  _data->fcounter.mps(),
 				  _data->fcounter.measurements(),
 				  _data->fcounter.loopdt()*1000.0,
@@ -2091,7 +2092,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 	static int characterCount = 0;
 	static int pawnCount = 0;
 	std::vector<std::string> toks;
-	vhcl::Tokenize(dndMsg,toks,":");
+	SmartBody::util::tokenize(dndMsg,toks,":");
 	SmartBody::SBScene* scene = SmartBody::SBScene::getScene();
 	SrVec p1;
 	SrVec p2;
@@ -2182,7 +2183,7 @@ void FltkViewer::processDragAndDrop( std::string dndMsg, float x, float y )
 		{
 			// run the python script
 #ifdef WIN32
-			fullPath = vhcl::Replace(fullPath, "\\", "/");
+			fullPath = SmartBody::util::replace(fullPath, "\\", "/");
 #endif
 			SmartBody::SBScene::getScene()->addAssetPath("script", fullPath);
 			SmartBody::SBScene::getScene()->runScript(filebasename + fileextension);
@@ -3184,14 +3185,14 @@ int FltkViewer::handle_default_camera_manipulation ( const SrEvent &e, SrCamera*
 			   return 1;
 
 		   SrVec forward =origCenter - origCamera; 		   
-		   SrQuat q = SrQuat(origUp, vhcl::DEG_TO_RAD()*deltaX*150.f);			   
+		   SrQuat q = SrQuat(origUp, SmartBody::util::degToRad(deltaX*150.f));			   
 		   forward = forward*q;
 		   SrVec tmp = get_camera()->getEye() + forward;
 		   camera->setCenter(tmp.x, tmp.y, tmp.z);
 
 		   SrVec cameraRight = cross(forward,origUp);
 		   cameraRight.normalize();		   
-		   q = SrQuat(cameraRight, vhcl::DEG_TO_RAD()*deltaY*150.f);	
+		   q = SrQuat(cameraRight, SmartBody::util::degToRad(deltaY*150.f));
 		   camera->setUpVector(origUp*q);
 		   forward = forward*q;
 		   SrVec tmpCenter = camera->getEye() + forward;
@@ -3276,14 +3277,14 @@ int FltkViewer::handle_freelook_camera_manipulation ( const SrEvent &e, SrCamera
 			return 1;
 
 		SrVec forward =origCenter - origCamera; 		   
-		SrQuat q = SrQuat(origUp, vhcl::DEG_TO_RAD()*deltaX*150.f);			   
+		SrQuat q = SrQuat(origUp, SmartBody::util::degToRad(deltaX*150.f));
 		forward = forward*q;
 		SrVec tmp = get_camera()->getEye() + forward;
 		camera->setCenter(tmp.x, tmp.y, tmp.z);
 
 		SrVec cameraRight = cross(forward,origUp);
 		cameraRight.normalize();		   
-		q = SrQuat(cameraRight, vhcl::DEG_TO_RAD()*deltaY*150.f);	
+		q = SrQuat(cameraRight, SmartBody::util::degToRad(deltaY*150.f));
 		camera->setUpVector(origUp*q);
 		forward = forward*q;
 		SrVec tmpCenter = camera->getEye() + forward;
@@ -5878,7 +5879,7 @@ int FltkViewer::deleteSelectedObject( int ret )
 	//LOG("1");
 	if (selectedPawn)
 	{	
-		int confirm = fl_choice(vhcl::Format("Are you sure you want to delete '%s'?", selectedPawn->getName().c_str()).c_str(), "No", "Yes", NULL);
+		int confirm = fl_choice(SmartBody::util::format("Are you sure you want to delete '%s'?", selectedPawn->getName().c_str()).c_str(), "No", "Yes", NULL);
 		if (confirm == 0)
 			return ret;
 		//_objManipulator.set_selected_pawn(NULL);
@@ -5981,7 +5982,7 @@ void GestureVisualizationHandler::executeAction(SmartBody::SBEvent* event)
 
 	std::vector<std::string> parameters;
 	std::string param = event->getParameters();
-	vhcl::Tokenize(param, parameters);
+	SmartBody::util::tokenize(param, parameters);
 	if (parameters[0] == "syncpointprogress")
 	{	
 		_gestureData->currentCharacter = parameters[1];

@@ -38,6 +38,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBCommandManager.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 #include <sbm/local_speech.h>
 
 #include "sbm/xercesc_utils.hpp"
@@ -451,9 +452,9 @@ char* remote_speech::getSpeechPlayCommand( RequestId requestId, SbmCharacter* ch
 
 	string cmd;
 	if (character)
-		cmd = vhcl::Format( "send PlaySound \"%s\" %s", soundFile.c_str(), character->getName().c_str() );
+		cmd = SmartBody::util::format( "send PlaySound \"%s\" %s", soundFile.c_str(), character->getName().c_str() );
 	else
-		cmd = vhcl::Format( "send PlaySound \"%s\"", soundFile.c_str());
+		cmd = SmartBody::util::format( "send PlaySound \"%s\"", soundFile.c_str());
 
 	//LOG("souldFile = %s\n",soundFile.c_str());
 	char* retSoundFile= new char[ cmd.length() + 1];
@@ -497,7 +498,7 @@ char* remote_speech::getSpeechStopCommand( RequestId requestId, SbmCharacter* ch
 #endif
 	}
 
-	string cmd = vhcl::Format( "send StopSound \"%s\" %s", soundFile.c_str(), characterName.c_str() );
+	string cmd = SmartBody::util::format( "send StopSound \"%s\" %s", soundFile.c_str(), characterName.c_str() );
 
 	char* retSoundFile= new char[cmd.length() + 1];
 	strcpy(retSoundFile, cmd.c_str());

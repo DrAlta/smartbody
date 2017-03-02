@@ -41,6 +41,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <external/parser/InputTree.h>
 
 #include <sb/SBParseNode.h>
+#include <sb/SBUtilities.h>
 
 #define log2(x) (log (x) / M_LN2)
 
@@ -316,7 +317,7 @@ std::string SBParser::parseUtterance(SBParserListener* listener, std::string utt
 	listener->resetBML();
 
 	std::vector<std::string> tokens;
-	vhcl::Tokenize(utterance, tokens, " ");
+	SmartBody::util::tokenize(utterance, tokens, " ");
 
 	// users can put a '-' to indicate negative expression, or a '+' to indicate positive expression
 	// in front of a word. This information must be extracted from the utterance, and presented
@@ -401,7 +402,7 @@ void SBParser::parseTraverse(SBParserListener* listener, SmartBody::SBParseNode*
 
 	std::stringstream strstr;
 	strstr << "T" << (2 * curWord);
-	std::string terminal = vhcl::Replace(node->getTerm(), " ", "");
+	std::string terminal = SmartBody::util::replace(node->getTerm(), " ", "");
 	listener->onPartOfSpeech(strstr.str(), terminal);
 
 	for (int c = 0; c < node->getNumChildren(); c++)

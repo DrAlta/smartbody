@@ -63,6 +63,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBAnimationState.h>
 #include <sb/SBSceneListener.h>
 #include <sb/SBFaceDefinition.h>
+#include <sb/SBUtilities.h>
 #include <controllers/me_ct_examples.h>
 #include <controllers/me_ct_motion_player.h>
 #include <controllers/me_ct_pose.h>
@@ -1747,7 +1748,7 @@ void SbmCharacter::schedule_viseme_curve(
 		{
 			int auNum = -1;
 			std::vector<std::string> tokens;
-			vhcl::Tokenize(viseme, tokens, "_");
+			SmartBody::util::tokenize(viseme, tokens, "_");
 			if (tokens.size() >= 2)
 			{
 				if (tokens[0] == "au")
@@ -1900,7 +1901,7 @@ void SbmCharacter::schedule_viseme_blend_curve(
 		{
 			int auNum = -1;
 			std::vector<std::string> tokens;
-			vhcl::Tokenize(viseme, tokens, "_");
+			SmartBody::util::tokenize(viseme, tokens, "_");
 			if (tokens.size() >= 2)
 			{
 				if (tokens[0] == "au")

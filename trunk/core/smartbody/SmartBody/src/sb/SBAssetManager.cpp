@@ -37,9 +37,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBAssetHandlerPly.h>
 #include <sb/SBAssetHandlerHDR.h>
 #include <sb/SBAssetHandlerSBMeshBinary.h>
-#ifdef USE_FBX_PARSER
-#include <sb/SBAssetHandlerFbx.h>
-#endif
+#include <sb/SBUtilities.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -101,9 +99,6 @@ SBAssetManager::SBAssetManager()
 	addAssetHandler(new SBAssetHandlerBvh());	
 	addAssetHandler(new SBAssetHandlerHdr());
 	addAssetHandler(new SBAssetHandlerSBMeshBinary());
-#ifdef USE_FBX_PARSER
-	addAssetHandler(new SBAssetHandlerFbx());
-#endif
 	uniqueSkeletonId = 0;
 
 	_motionCounter = 0;
@@ -509,7 +504,7 @@ std::vector<SBAsset*> SBAssetManager::loadAsset(const std::string& assetPath)
 
 	std::string finalPath = p.string();
 #ifdef WIN32
-	finalPath = vhcl::Replace(finalPath, "\\", "/");
+	finalPath = SmartBody::util::replace(finalPath, "\\", "/");
 #endif
 
 	std::vector<SBAsset*> allAssets;
@@ -1037,20 +1032,12 @@ int SBAssetManager::load_me_motions_impl( const std::string& pathStr, bool recur
 				}
 			} else {
 				std::string ext = boost::filesystem::extension( cur );
-#if ENABLE_FBX_PARSER
-				if( _stricmp( ext.c_str(), ".skm" ) == 0 || 
-					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
-					_stricmp( ext.c_str(), ".dae" ) == 0 ||
-					_stricmp( ext.c_str(), ".amc" ) == 0 ||
-					_stricmp( ext.c_str(), ".xml" ) == 0 ||
-					_stricmp( ext.c_str(), ".fbx" ) == 0)
-#else
+
 				if( _stricmp( ext.c_str(), ".skm" ) == 0 || 
 					_stricmp( ext.c_str(), ".bvh" ) == 0 ||
 					_stricmp( ext.c_str(), ".dae" ) == 0 ||
 					_stricmp( ext.c_str(), ".xml" ) == 0 ||
 					_stricmp( ext.c_str(), ".amc" ) == 0)
-#endif
 				{
 #if (BOOST_VERSION > 104400)
 					std::string curStr = cur.string();
@@ -1705,7 +1692,7 @@ int SBAssetManager::load_me_skeleton_individual( SrInput & input, const std::str
 
 	//path skeletonPath(skeletonName);
 	//string ext = extension(skeletonPath);
-	//ext = vhcl::ToLower(ext);
+	//ext = SmartBody::util::toLower(ext);
 	//if (ext == ".sk")
 
 	if( !skeleton->loadSk( input, scale ) )
@@ -1974,7 +1961,7 @@ std::vector<SBAssetHandler*>& SBAssetManager::getAssetHandlers()
 std::vector<SBAssetHandler*> SBAssetManager::getAssetHandlers(const std::string& assetTypes)
 {
 	// search for file extensions in lower case only
-	std::string lowerCaseAssetTypes = vhcl::ToLower(assetTypes);
+	std::string lowerCaseAssetTypes = SmartBody::util::toLower(assetTypes);
 	std::map<std::string, std::vector<SBAssetHandler*> >::iterator mapIter = _assetHandlerMap.find(lowerCaseAssetTypes);
 	if (mapIter == _assetHandlerMap.end())
 		return std::vector<SBAssetHandler*>();
@@ -2280,7 +2267,7 @@ bool SBAssetManager::createMeshFromBlendMasks(const std::string& neutralShapeFil
 
 
 		std::set<int> vertexUsed;
-		for (int f = 0; f < neutralModel.F.size(); f++)
+		for (size_t f = 0; f < neutralModel.F.size(); f++)
 		{
 			SrVec3i& face = neutralModel.F[f];
 			SrVec3i& faceTextureIndex = neutralModel.Ft[f];
