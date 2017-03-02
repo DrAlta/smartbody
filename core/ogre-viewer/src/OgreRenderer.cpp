@@ -3,6 +3,7 @@
 #include "OgreRenderer.h"
 #include "OgreFrameListener.h"
 #include "BoneBusHandler.h"
+#include <sb/SBUtilities.h>
 
 OgreRenderer::OgreRenderer() : ExampleApplication()
 {
@@ -244,7 +245,7 @@ void OgreRenderer::tt_client_callback( const char * op, const char * args, void 
    std::string sOp = op;
    std::string sArgs = args;
    std::vector< std::string > splitArgs;
-   vhcl::Tokenize( sArgs, splitArgs );
+   SmartBody::util::tokenize( sArgs, splitArgs );
 
    if ( sOp == "vrAllCall" )
    {

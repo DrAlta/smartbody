@@ -36,6 +36,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationTransition.h>
+#include <sb/SBUtilities.h>
 #include <sr/sr_camera.h>
 
 using std::string;
@@ -314,12 +315,12 @@ void SBDebuggerServer::Update()
             string recvStr = overflowData + str;
 
             vector< string > tokens;
-            vhcl::Tokenize( recvStr, tokens, ";" );
+			SmartBody::util::tokenize( recvStr, tokens, ";" );
 
             for ( int t = 0; t < (int)tokens.size(); t++ )
             {
                vector< string > msgTokens;
-               vhcl::Tokenize( tokens[ t ], msgTokens, "|" );
+			   SmartBody::util::tokenize( tokens[ t ], msgTokens, "|" );
 
                if ( msgTokens.size() > 0 )
                {

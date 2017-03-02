@@ -165,7 +165,7 @@ bool OgreFrameListener::processUnbufferedKeyInput(const FrameEvent& evt)
 
 	if ( mKeyboard->isKeyDown( OIS::KC_T ) )
 	{
-		std::string message = vhcl::Format("sbm bml char %s <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><act><participant id=\"%s\" role=\"actor\"/><bml><speech id=\"sp1\" ref=\"%s\" type=\"application/ssml+xml\">%s</speech></bml></act>",
+		std::string message = SmartBody::util::format("sbm bml char %s <?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><act><participant id=\"%s\" role=\"actor\"/><bml><speech id=\"sp1\" ref=\"%s\" type=\"application/ssml+xml\">%s</speech></bml></act>",
 			"brad", "brad", "speechTTS", 
 			"If the system cannot find my regular voice, it defaults back to the Windows standard voice. Depending on your version of Windows that can be a woman's voice. Don't I sound delightful?");
 		vhmsg::ttu_notify1(message.c_str());

@@ -23,6 +23,7 @@
 #include <sr/sr_string_array.h>
 #include <sr/sr_model.h>
 #include <sb/SBTypes.h>
+#include <sb/SBUtilities.h>
 #include <external/rply/rply.h>
 
 #if !defined (__ANDROID__) && !defined(SB_IPHONE) && !defined(EMSCRIPTEN)
@@ -179,7 +180,7 @@ bool SrModel::import_ply( const char* file )
 	{
 		std::string commentStr = comment;
 		std::vector<std::string> tokens;
-		vhcl::Tokenize(commentStr,tokens);
+		SmartBody::util::tokenize(commentStr,tokens);
 		if (tokens.size() > 1 && tokens[0] == "TextureFile")
 		{
 			std::string texFile = tokens[1];

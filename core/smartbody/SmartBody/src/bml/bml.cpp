@@ -57,6 +57,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBSteerManager.h>
 #include <sb/SBSteerAgent.h>
 #include <sb/SBCommandManager.h>
+#include <sb/SBUtilities.h>
 #include <sbm/PPRAISteeringAgent.h>
 #include <sbm/ParserOpenCOLLADA.h>
 
@@ -570,7 +571,7 @@ void BmlRequest::gestureRequestProcess()
 			double x = 0;
 			double y = 0;
 			double z = 0;
-			vhcl::Tokenize(blendCommand, tokens, "=\\\" ");
+			SmartBody::util::tokenize(blendCommand, tokens, "=\\\" ");
 			for (size_t j = 0; j < tokens.size(); ++j)
 			{
 				if (tokens[j] == "name")
@@ -2125,7 +2126,7 @@ void GestureRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene* sc
 				if (sbMotion->hasMetaData("noise_frequency"))
 					freq = (float)atof(sbMotion->getMetaDataString("noise_frequency").c_str());
 			}
-			vhcl::Tokenize(joints, jointVec);
+			SmartBody::util::tokenize(joints, jointVec);
 			SkMotion* holdM = motion->buildPoststrokeHoldMotion((float)holdTime, jointVec, scale, freq, NULL);
 			holdM->setName(motion->getName());	// even after holding, the name should be the same
 			SmartBody::SBMotion* sbHoldM = dynamic_cast<SmartBody::SBMotion*>(holdM);

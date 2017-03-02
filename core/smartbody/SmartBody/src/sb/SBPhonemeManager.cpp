@@ -23,6 +23,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBScene.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCharacter.h>
+#include <sb/SBUtilities.h>
 #include <algorithm>
 #include <vector>
 #include <set>
@@ -389,7 +390,7 @@ void SBPhonemeManager::loadDictionary(const std::string& language, const std::st
 		if (line[0] == ';')
 			continue;
 		std::vector<std::string> tokens;
-		vhcl::Tokenize(strLine, tokens, " ");
+		SmartBody::util::tokenize(strLine, tokens, " ");
 		if (tokens.size() > 0)
 		{
 			std::vector<std::string> phonemes;
@@ -438,7 +439,7 @@ void SBPhonemeManager::addDictionaryWord(const std::string& language, const std:
 
 std::vector<std::string>& SBPhonemeManager::getDictionaryWord(const std::string& language, const std::string& word)
 {
-	std::string uppercaseWord = vhcl::ToUpper(word);
+	std::string uppercaseWord = SmartBody::util::toUpper(word);
 	
 	std::map<std::string, std::map<std::string, std::vector<std::string> > >::iterator iter = _wordToPhonemeMaps.find(language);
 	if (iter == _wordToPhonemeMaps.end())

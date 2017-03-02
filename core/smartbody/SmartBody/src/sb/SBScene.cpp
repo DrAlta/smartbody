@@ -81,6 +81,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBDebuggerUtility.h>
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBMotionGraph.h>
+#include <sb/SBUtilities.h>
 #include <sbm/sbm_audio.h>
 #include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -509,39 +510,39 @@ void SBScene::cleanup()
 		// initPythonLibPath - eg:  "../../../../core/smartbody/Python26/Lib"
 		std::string pythonLibPath = Py_GetPythonHome();
 		HMODULE hmodule;
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/bz2.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/bz2.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/pyexpat.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/pyexpat.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/select.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/select.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/unicodedata.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/unicodedata.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/winsound.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/winsound.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_bsddb.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_bsddb.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ctypes.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_ctypes.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ctypes_test.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_ctypes_test.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_elementtree.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_elementtree.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_hashlib.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_hashlib.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_msi.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_msi.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_multiprocessing.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_multiprocessing.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_socket.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_socket.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_sqlite3.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_sqlite3.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_ssl.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_ssl.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_testcapi.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_testcapi.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
-		hmodule = GetModuleHandle(vhcl::Format("%s/../DLLs/_tkinter.pyd", pythonLibPath.c_str()).c_str());
+		hmodule = GetModuleHandle(SmartBody::util::format("%s/../DLLs/_tkinter.pyd", pythonLibPath.c_str()).c_str());
 		FreeLibrary(hmodule);
 	}
 #endif  // WIN_BUILD
@@ -4573,7 +4574,7 @@ std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>&
 		SrBox pawn_bb;
 		pawn_bb = pawn->getBoundingBox();		
 		std::vector<SrVec> bbPts = pawn_bb.getCorners();
-		float zMin = -1e30;
+		float zMin = -1e30f;
 		for (unsigned int k=0;k<bbPts.size();k++)
 		{
 			SrVec camPt = bbPts[k]*modelViewMat;
@@ -4640,7 +4641,7 @@ std::vector<std::string> SBScene::occlusionTest( const std::vector<std::string>&
 	// perform occlusion test
 	GLuint uiOcclusionQuery;
 	glGenQueries(1, &uiOcclusionQuery);
-	for (int i=0;i<pawnZSortedList.size();i++)
+	for (size_t i=0;i<pawnZSortedList.size();i++)
 	{
 		int pawnIdx = pawnZSortedList[i].second;
 		SmartBody::SBPawn* pawn		= scene->getPawn(testPawns[pawnIdx]);

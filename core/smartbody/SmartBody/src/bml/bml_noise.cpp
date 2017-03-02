@@ -4,7 +4,7 @@
 #include <string>
 
 #include <xercesc/util/XMLStringTokenizer.hpp>
-
+#include <sb/SBUtilities.h>
 #include "bml_noise.hpp"
 
 
@@ -36,7 +36,7 @@ BehaviorRequestPtr BML::parse_bml_noise( DOMElement* elem, const std::string& un
 	float scale = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_SCALE, elem, 0.02f);
 	float freq = (float)xml_utils::xml_parse_double(BMLDefs::ATTR_FREQUENCY, elem, 0.03f);
 	std::vector<std::string> jointVec;
-	vhcl::Tokenize(joints, jointVec);
+	SmartBody::util::tokenize(joints, jointVec);
 	std::string enableFlag;
 	noise_ct->setJointNoise(jointVec, scale, freq);
 	xml_utils::xml_translate(&enableFlag, elem->getAttribute(BMLDefs::ATTR_ENABLE));

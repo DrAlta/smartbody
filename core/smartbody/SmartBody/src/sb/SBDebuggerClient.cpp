@@ -24,6 +24,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include "SBDebuggerClient.h"
 #include "SBDebuggerUtility.h"
 #include <sb/SBSimulationManager.h>
+#include <sb/SBUtilities.h>
 
 #include <string>
 #include <vector>
@@ -73,9 +74,9 @@ void SBDebuggerClient::Connect(const string & id)
 
    // id == host:port:friendlyName
    vector<string> idSplit;
-   vhcl::Tokenize(id, idSplit, ":");
+   SmartBody::util::tokenize(id, idSplit, ":");
    const char * server = idSplit[0].c_str();
-   int port = vhcl::ToInt(idSplit[1]);
+   int port = SmartBody::util::toInt(idSplit[1]);
 
 
    bool ret = vhcl::SocketStartup();
@@ -250,14 +251,14 @@ void SBDebuggerClient::Update()
 							 {
 								 string name = split[i];
 								 string pos  = split[i + 1];
-								 float posX = vhcl::ToFloat(split[i + 2]);
-								 float posY = vhcl::ToFloat(split[i + 3]);
-								 float posZ = vhcl::ToFloat(split[i + 4]);
+								 float posX = SmartBody::util::toFloat(split[i + 2]);
+								 float posY = SmartBody::util::toFloat(split[i + 3]);
+								 float posZ = SmartBody::util::toFloat(split[i + 4]);
 								 string rot  = split[i + 5];
-								 float rotX = vhcl::ToFloat(split[i + 6]);
-								 float rotY = vhcl::ToFloat(split[i + 7]);
-								 float rotZ = vhcl::ToFloat(split[i + 8]);
-								 float rotW = vhcl::ToFloat(split[i + 9]);
+								 float rotX = SmartBody::util::toFloat(split[i + 6]);
+								 float rotY = SmartBody::util::toFloat(split[i + 7]);
+								 float rotZ = SmartBody::util::toFloat(split[i + 8]);
+								 float rotW = SmartBody::util::toFloat(split[i + 9]);
 								 i += 9;
 
 								SmartBody::SBScene::getScene()->getDebuggerUtility()->updateCharacter(split[4], name, posX, posY, posZ, rotX, rotY, rotZ, rotW);
@@ -269,36 +270,36 @@ void SBDebuggerClient::Update()
                   {
 					// sbmdebugger <sbmid> update pawn <name> pos <x y z> rot <x y z w> geom <s> size <s> 
 
-						float posX = vhcl::ToFloat(split[6]);
-						float posY = vhcl::ToFloat(split[7]);
-						float posZ = vhcl::ToFloat(split[8]);
-						float rotX = vhcl::ToFloat(split[10]);
-						float rotY = vhcl::ToFloat(split[11]);
-						float rotZ = vhcl::ToFloat(split[12]);
-						float rotW = vhcl::ToFloat(split[13]);
+						float posX = SmartBody::util::toFloat(split[6]);
+						float posY = SmartBody::util::toFloat(split[7]);
+						float posZ = SmartBody::util::toFloat(split[8]);
+						float rotX = SmartBody::util::toFloat(split[10]);
+						float rotY = SmartBody::util::toFloat(split[11]);
+						float rotZ = SmartBody::util::toFloat(split[12]);
+						float rotW = SmartBody::util::toFloat(split[13]);
 						SmartBody::SBScene::getScene()->getDebuggerUtility()->updatePawn(split[4], posX, posY, posZ, rotX, rotY, rotZ, rotW);                
                   }
                   else if (split[3] == "camera")
                   {
                      int i = 4;
                      string pos  = split[i];
-                     float posX = vhcl::ToFloat(split[i + 1]);
-                     float posY = vhcl::ToFloat(split[i + 2]);
-                     float posZ = vhcl::ToFloat(split[i + 3]);
+                     float posX = SmartBody::util::toFloat(split[i + 1]);
+                     float posY = SmartBody::util::toFloat(split[i + 2]);
+                     float posZ = SmartBody::util::toFloat(split[i + 3]);
                      string rot  = split[i + 4];
-                     float rotX = vhcl::ToFloat(split[i + 5]);
-                     float rotY = vhcl::ToFloat(split[i + 6]);
-                     float rotZ = vhcl::ToFloat(split[i + 7]);
-                     float rotW = vhcl::ToFloat(split[i + 8]);
+                     float rotX = SmartBody::util::toFloat(split[i + 5]);
+                     float rotY = SmartBody::util::toFloat(split[i + 6]);
+                     float rotZ = SmartBody::util::toFloat(split[i + 7]);
+                     float rotW = SmartBody::util::toFloat(split[i + 8]);
                      string persp  = split[i + 9];
-                     float fovY   = vhcl::ToFloat(split[i + 10]);
-                     float aspect = vhcl::ToFloat(split[i + 11]);
-                     float zNear  = vhcl::ToFloat(split[i + 12]);
-                     float zFar   = vhcl::ToFloat(split[i + 13]);
+                     float fovY   = SmartBody::util::toFloat(split[i + 10]);
+                     float aspect = SmartBody::util::toFloat(split[i + 11]);
+                     float zNear  = SmartBody::util::toFloat(split[i + 12]);
+                     float zFar   = SmartBody::util::toFloat(split[i + 13]);
 					       string center  = split[i + 14];
-					       float centerX = vhcl::ToFloat(split[i + 15]);
-					       float centerY = vhcl::ToFloat(split[i + 16]);
-					       float centerZ = vhcl::ToFloat(split[i + 17]);
+					       float centerX = SmartBody::util::toFloat(split[i + 15]);
+					       float centerY = SmartBody::util::toFloat(split[i + 16]);
+					       float centerZ = SmartBody::util::toFloat(split[i + 17]);
 					       SmartBody::SBScene::getScene()->getDebuggerUtility()->updateCamera(posX, posY, posZ, centerX, centerY, centerZ, fovY, aspect, zNear, zFar);
                   }
                }
@@ -366,8 +367,8 @@ void SBDebuggerClient::ProcessVHMsgs(const char * op, const char * args)
 	   line1 = message.substr(0, nl );
 	   rest = message.substr(nl);
    }  
-   vhcl::Tokenize(line1, split, " \t\n");
-   //vhcl::Tokenize(message, lines, "\n"); // separate lines
+   SmartBody::util::tokenize(line1, split, " \t\n");
+   //SmartBody::util::tokenize(message, lines, "\n"); // separate lines
    if (split.size() > 0)
    {
       if (split[0] == "sbmdebugger")

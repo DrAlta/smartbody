@@ -29,6 +29,7 @@ along with Smartbody.If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBRetarget.h>
 #include <sb/SBMotion.h>
 #include <sb/SBSkeleton.h>
+#include <sb/SBUtilities.h>
 #include "controllers/me_ct_generic_hand.h"
 #include <external/perlin/perlin.h>
 
@@ -569,7 +570,7 @@ void MeCtMotion::setHoldDuration(double time)
 		freq = (float)atof(sbmotion->getMetaDataString("noise_frequency").c_str());
 
 	std::vector<std::string> jointVec;
-	vhcl::Tokenize(jointStr, _noiseJoints);
+	SmartBody::util::tokenize(jointStr, _noiseJoints);
 	if (_noiseJoints.size() == 0)
 	{
 		_hasNoise = false;

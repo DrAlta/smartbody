@@ -38,6 +38,7 @@
 #include <sb/SBCommandManager.h>
 #include <sb/SBSimulationManager.h>
 #include <sb/SBCharacter.h>
+#include <sb/SBUtilities.h>
 #include <sbm/sbm_speech_audiofile.hpp>
 #include <controllers/me_ct_scheduler2.h>
 #include <controllers/me_ct_blend.hpp>
@@ -1731,7 +1732,7 @@ void BML::SpeechRequest::schedule( time_sec now ) {
 		{
 			emotionViseme = new VisemeData(temp->id(), temp->time());
 			std::vector<std::string> tokens;
-			vhcl::Tokenize(temp->getCurveInfo(), tokens);
+			SmartBody::util::tokenize(temp->getCurveInfo(), tokens);
 			for (size_t i = 0; i < tokens.size(); ++i)
 				temp->getFloatCurve().push_back(atof(tokens[i].c_str()));
 			emotionViseme->setFloatCurve(temp->getFloatCurve(), temp->getNumKeys(), 4);
@@ -2067,7 +2068,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 				if (SmartBody::SBScene::getScene()->getCharacter(actor_id)->getBoolAttribute("dominancecurve"))
 				{
 					std::vector<std::string> cTokens;
-					vhcl::Tokenize(v->getCurveInfo(), cTokens);
+					SmartBody::util::tokenize(v->getCurveInfo(), cTokens);
 					std::vector<float> cValue;
 					cValue.resize(cTokens.size());
 					for (size_t i = 0; i < cTokens.size(); ++i)
@@ -2114,7 +2115,7 @@ void BML::SpeechRequest::realize_impl( BmlRequestPtr request, SmartBody::SBScene
 
 				// directly schedule into head_schedule_ct
 				std::vector<std::string> tokens;
-				vhcl::Tokenize(v->getCurveInfo(), tokens);
+				SmartBody::util::tokenize(v->getCurveInfo(), tokens);
 				int numKeyParam = tokens.size() / v->getNumKeys();
 				float* curve = new float[tokens.size()];
 				for (size_t i = 0; i < tokens.size(); ++i)

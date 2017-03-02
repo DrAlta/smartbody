@@ -31,6 +31,7 @@
 #include <sb/SBSceneListener.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBRetarget.h>
+#include <sb/SBUtilities.h>
 #include <sr/sr_euler.h>
 #include <sr/sr_mat.h>
 #include "controllers/MotionAnalysis.h"
@@ -883,7 +884,7 @@ PABlendData* MeCtParamAnimation::createStateModule(ScheduleUnit su)
 		}
 		std::vector<std::string> joints;
 		std::vector<std::string> jointNameVec;
-		vhcl::Tokenize(su.partialJoint, jointNameVec);
+		SmartBody::util::tokenize(su.partialJoint, jointNameVec);
 		for (size_t jointId = 0; jointId < jointNameVec.size(); ++jointId)
 		{
 			SkJoint* j = character->getSkeleton()->search_joint(jointNameVec[jointId].c_str());

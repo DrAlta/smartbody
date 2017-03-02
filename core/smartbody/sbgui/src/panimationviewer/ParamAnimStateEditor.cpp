@@ -27,6 +27,7 @@
 #include <sb/SBAnimationState.h>
 #include <sb/SBAnimationStateManager.h>
 #include <sb/SBMotion.h>
+#include <sb/SBUtilities.h>
 
 #include "ParamAnimBlock.h"
 #include "ParamAnimStateCreatorWidget.h"
@@ -1451,7 +1452,7 @@ void PABlendEditor::removeShape(Fl_Widget* widget, void* data)
 	{
 		// remove from state
 		std::vector<std::string> motions;
-		vhcl::Tokenize(selectedShapes[i], motions, "|");		
+		SmartBody::util::tokenize(selectedShapes[i], motions, "|");		
 		SmartBody::SBAnimationBlend2D* state2D = dynamic_cast<SmartBody::SBAnimationBlend2D*>(currentState);
 		SmartBody::SBAnimationBlend3D* state3D = dynamic_cast<SmartBody::SBAnimationBlend3D*>(currentState);
 		if (state2D && motions.size() == 3)

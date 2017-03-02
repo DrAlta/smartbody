@@ -27,6 +27,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sb/SBScene.h>
 #include <sb/SBAssetManager.h>
 #include <sb/SBCommandManager.h>
+#include <sb/SBUtilities.h>
 
 #include <boost/version.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -236,7 +237,7 @@ RequestId AudioFileSpeech::requestSpeechAudioFast( const char * agentName, std::
 	m_speechRequestInfo[m_requestIdCounter].emotionData.clear();
 	ReadEmotionData(emoFilename.c_str(), m_speechRequestInfo[m_requestIdCounter].emotionData);
 
-	SmartBody::SBScene::getScene()->getCommandManager()->execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
+	SmartBody::SBScene::getScene()->getCommandManager()->execute_later(SmartBody::util::format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
 	return m_requestIdCounter++;
 }
 
@@ -368,7 +369,7 @@ RequestId AudioFileSpeech::requestSpeechAudio( const char * agentName, std::stri
    m_speechRequestInfo[m_requestIdCounter].emotionData.clear();
    ReadEmotionData(emoFilename.c_str(), m_speechRequestInfo[m_requestIdCounter].emotionData);
 
-   SmartBody::SBScene::getScene()->getCommandManager()->execute_later( vhcl::Format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
+   SmartBody::SBScene::getScene()->getCommandManager()->execute_later(SmartBody::util::format( "%s %s %d %s", callbackCmd, agentName, m_requestIdCounter, "SUCCESS" ).c_str() );
 
 
    return m_requestIdCounter++;
@@ -451,7 +452,7 @@ char * AudioFileSpeech::getSpeechPlayCommand( RequestId requestId, SbmCharacter 
    std::map< RequestId, SpeechRequestInfo >::iterator it = m_speechRequestInfo.find( requestId );
    if ( it != m_speechRequestInfo.end() )
    {
-      it->second.playCommand = vhcl::Format( "send PlaySound \"%s\" %s", it->second.audioFilename.c_str(), character->getName().c_str() );
+      it->second.playCommand = SmartBody::util::format( "send PlaySound \"%s\" %s", it->second.audioFilename.c_str(), character->getName().c_str() );
       return (char *)it->second.playCommand.c_str();
    }
 
@@ -484,7 +485,7 @@ char * AudioFileSpeech::getSpeechStopCommand( RequestId requestId, SbmCharacter 
 		  characterName = character->getName();
 #endif
 
-      it->second.stopCommand = vhcl::Format( "send StopSound \"%s\" %s", it->second.audioFilename.c_str(), characterName.c_str() );
+      it->second.stopCommand = SmartBody::util::format( "send StopSound \"%s\" %s", it->second.audioFilename.c_str(), characterName.c_str() );
       return (char *)it->second.stopCommand.c_str();
    }
 
@@ -633,7 +634,7 @@ void AudioFileSpeech::ReadVisemeDataLTF( const char * filename, std::vector< Vis
       //   eg: 40 0 0.123
 
       vector<string> tokens;
-      vhcl::Tokenize( strLine, tokens );
+     SmartBody::util::tokenize( strLine, tokens );
 
       if ( tokens.size() < 3 )
       {
@@ -912,7 +913,7 @@ void AudioFileSpeech::ReadEmotionData(const char* filename, std::map<std::string
 	{
 		getline(emoFile, line);
 		std::vector<std::string> tokens;
-		vhcl::Tokenize(line, tokens);
+		SmartBody::util::tokenize(line, tokens);
 		if (tokens.size() == 0)					// empty line
 		{
 			continue;

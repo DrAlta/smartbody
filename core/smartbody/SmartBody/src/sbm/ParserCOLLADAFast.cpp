@@ -32,6 +32,7 @@ along with Smartbody.  If not, see <http://www.gnu.org/licenses/>.
 #include <sbm/BMLDefs.h>
 #include <sbm/GPU/SbmTexture.h>
 #include <sb/SBScene.h>
+#include <sb/SBUtilities.h>
 #include <sbm/sbm_deformable_mesh.h>
 
 
@@ -737,7 +738,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 					{
 						std::string matrixString = infoNode->value();
 						std::vector<std::string> tokens;
-						vhcl::Tokenize(matrixString, tokens, " \n");
+						SmartBody::util::tokenize(matrixString, tokens, " \n");
 						SrMat matrix;
 						for (int m = 0; m < 16; m++)
 							matrix[m] = (float)atof(tokens[m].c_str());
@@ -760,7 +761,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 						{
 							std::string offsetString = infoNode->value();
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(offsetString, tokens, " \n");
+							SmartBody::util::tokenize(offsetString, tokens, " \n");
 							offset.x = (float)atof(tokens[0].c_str()) * scale;
 							offset.y = (float)atof(tokens[1].c_str()) * scale;
 							offset.z = (float)atof(tokens[2].c_str()) * scale;
@@ -778,7 +779,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 						{
 							std::string jointOrientationString = infoNode->value();
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(jointOrientationString, tokens, " \n");
+							SmartBody::util::tokenize(jointOrientationString, tokens, " \n");
 							float finalValue;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
@@ -792,7 +793,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 						{
 							std::string rotationString = infoNode->value();
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(rotationString, tokens, " \n");
+							SmartBody::util::tokenize(rotationString, tokens, " \n");
 							float finalValue;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
@@ -806,7 +807,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 						{
 							std::string rotationString = infoNode->value();
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(rotationString, tokens, " \n");
+							SmartBody::util::tokenize(rotationString, tokens, " \n");
 							float finalValue;
 							for (int tokenizeC = 0; tokenizeC < 4; tokenizeC++)
 								finalValue = (float)atof(tokens[tokenizeC].c_str());
@@ -924,7 +925,7 @@ void ParserCOLLADAFast::parseJoints(rapidxml::xml_node<>* node, SkSkeleton& skel
 				{
 					std::string offsetString = translateNode->value();
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(offsetString, tokens, " \n");
+					SmartBody::util::tokenize(offsetString, tokens, " \n");
 					offset.x = (float)atof(tokens[0].c_str()) * scale;
 					offset.y = (float)atof(tokens[1].c_str()) * scale;
 					offset.z = (float)atof(tokens[2].c_str()) * scale;
@@ -1353,7 +1354,7 @@ void ParserCOLLADAFast::parseLibraryAnimations2(rapidxml::xml_node<>* node, SkSk
 							int counter = atoi(temp.c_str());
 							std::string arrayString = node3->value();
 							//std::vector<std::string> tokens;
-							//vhcl::Tokenize(arrayString, tokens, " \n");
+							//SmartBody::util::tokenize(arrayString, tokens, " \n");
 							TextLineSplitterFast spl(counter);
 							spl.SplitLine(arrayString.c_str(), ' ');
 						
@@ -1985,7 +1986,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					}
 					/*
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(floatString, tokens, " \n");
+					SmartBody::util::tokenize(floatString, tokens, " \n");
 					
 					floatArrayMap[sourceID] = std::vector<SrVec>();					
 					for (int i=0; i< count ; i+= stride)
@@ -2011,7 +2012,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 					std::string floatString;
 					xml_utils::xml_translate(&floatString, floatNode->getTextContent());
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(floatString, tokens, " \n");
+					SmartBody::util::tokenize(floatString, tokens, " \n");
 					int index = 0;
 					for (int i = 0; i < count; i++)
 					{
@@ -2129,7 +2130,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 						{
 							std::string vcountString = inputNode->value();
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(vcountString, tokens, " \n");
+							SmartBody::util::tokenize(vcountString, tokens, " \n");
 							for (int i = 0; i < count; i++)
 								vcountList.push_back(atoi(tokens[i].c_str()));
 						}
@@ -2165,7 +2166,7 @@ void ParserCOLLADAFast::parseLibraryGeometries( rapidxml::xml_node<>* node, cons
 
 					/*
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(pString, tokens, " \n");
+					SmartBody::util::tokenize(pString, tokens, " \n");
 					int index = 0;
 					for (int i = 0; i < count; i++)
 					{
@@ -2598,7 +2599,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 				{
 					std::string color = colorNode->value();
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(color, tokens, " \n");
+					SmartBody::util::tokenize(color, tokens, " \n");
 					float w = 1;
 					if (tokens.size() == 4)
 						w = (float)atof(tokens[3].c_str());
@@ -2664,7 +2665,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 				rapidxml::xml_node<>* colorNode = ParserCOLLADAFast::getNode("color", emissionNode);
 				std::string color = colorNode->value();
 				std::vector<std::string> tokens;
-				vhcl::Tokenize(color, tokens, " \n");
+				SmartBody::util::tokenize(color, tokens, " \n");
 				float w = 1;
 				if (tokens.size() == 4)
 					w = (float)atof(tokens[3].c_str());
@@ -2679,7 +2680,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 				{
 					std::string color = colorNode->value();
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(color, tokens, " \n");
+					SmartBody::util::tokenize(color, tokens, " \n");
 					float w = 1;
 					if (tokens.size() == 4)
 						w = (float)atof(tokens[3].c_str());
@@ -2712,7 +2713,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 						{
 							color = colorNode->value();
 							std::vector<std::string> tokens;
-							vhcl::Tokenize(color, tokens, " \n");
+							SmartBody::util::tokenize(color, tokens, " \n");
 							SrVec colorVec;
 							if (tokens.size() >= 3)
 							{
@@ -2743,7 +2744,7 @@ void ParserCOLLADAFast::parseLibraryEffects( rapidxml::xml_node<>* node, std::st
 					{
 						color = colorNode->value();
 						std::vector<std::string> tokens;
-						vhcl::Tokenize(color, tokens, " \n");
+						SmartBody::util::tokenize(color, tokens, " \n");
 						SrVec colorVec;
 						if (tokens.size() >= 3)
 						{
@@ -2854,7 +2855,7 @@ void ParserCOLLADAFast::parseNodeAnimation(rapidxml::xml_node<>* node1, std::map
 					std::string nodeID = getNodeAttributeString(node3, "id");
 					std::string arrayString = node3->value();
 					std::vector<std::string> tokens;
-					vhcl::Tokenize(arrayString, tokens, " \n");		
+					SmartBody::util::tokenize(arrayString, tokens, " \n");
 					if (floatArrayMap.find(sourceIdAttr) == floatArrayMap.end())
 					{
 						floatArrayMap[sourceIdAttr] = ColladaFloatArrayFast();
@@ -2923,7 +2924,7 @@ void ParserCOLLADAFast::parseNodeAnimation(rapidxml::xml_node<>* node1, std::map
 			colChannel.sourceName = source.substr(1);
 			//LOG("colChannel input name = %s",colChannel.sourceName.c_str());
 			std::vector<std::string> tokens;
-			vhcl::Tokenize(target, tokens, "/.");
+			SmartBody::util::tokenize(target, tokens, "/.");
 			//LOG("token1 = %s, token2 = %s",tokens[0].c_str(),tokens[1].c_str());
 			std::string jname = tokens[0];
 			SkJoint* joint = skeleton.search_joint(jname.c_str());

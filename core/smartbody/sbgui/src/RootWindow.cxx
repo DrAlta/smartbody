@@ -26,6 +26,7 @@
 #include <sb/SBPython.h>
 #include <sb/SBVersion.hpp>
 #include <sb/SBBehaviorSetManager.h>
+#include <sb/SBUtilities.h>
 #include"resourceViewer/AttributeEditor.h"
 
 
@@ -2340,7 +2341,7 @@ void BaseWindow::CreatePythonAPICB(Fl_Widget* widget, void* data)
 #endif
 	
 	std::string outFile = file.string();
-	std::string cleanedFile = vhcl::Replace(outFile, "\\", "/");
+	std::string cleanedFile = SmartBody::util::replace(outFile, "\\", "/");
 
 	std::stringstream strstr;
 	strstr << "from pydoc import *\n";
@@ -2467,7 +2468,7 @@ void BaseWindow::ResizeWindowCB(Fl_Widget* widget, void* data)
 		return;
 	}
 
-	vhcl::Tokenize(resStr, tokens, "x");
+	SmartBody::util::tokenize(resStr, tokens, "x");
 	if (tokens.size() < 2)
 		return;
 
@@ -2546,7 +2547,7 @@ void BaseWindow::DeleteObjectCB( Fl_Widget* widget, void* data )
 		return;
 	}
 
-	int confirm = fl_choice(vhcl::Format("Are you sure you want to delete '%s'?", objName.c_str()).c_str(), "No", "Yes", NULL);
+	int confirm = fl_choice(SmartBody::util::format("Are you sure you want to delete '%s'?", objName.c_str()).c_str(), "No", "Yes", NULL);
 	if (confirm == 0)
 		return ;
 	if (sbChar)

@@ -28,7 +28,7 @@
 #include <sbm/gwiz_math.h>
 #include <sb/SBRetargetManager.h>
 #include <sb/SBRetarget.h>
-
+#include <sb/SBUtilities.h>
 
 std::string MeCtNewLocomotion::_type_name = "NewLocomotion";
 
@@ -187,7 +187,7 @@ void MeCtNewLocomotion::setup()
 
 		std::string rightPlants = character->getStringAttribute("footPlantRight");
 		std::vector<std::string> rPlantVector;
-		vhcl::Tokenize(rightPlants, rPlantVector, ",");
+		SmartBody::util::tokenize(rightPlants, rPlantVector, ",");
 		rplant.clear();
 		rplant.resize(rPlantVector.size());
 		for (size_t p = 0; p < rPlantVector.size(); p++)
@@ -197,7 +197,7 @@ void MeCtNewLocomotion::setup()
 
 		std::string leftPlants = character->getStringAttribute("footPlantLeft");
 		std::vector<std::string> lPlantVector;
-		vhcl::Tokenize(leftPlants, lPlantVector, ",");
+		SmartBody::util::tokenize(leftPlants, lPlantVector, ",");
 		lplant.clear();
 		lplant.resize(lPlantVector.size());
 		for (size_t p = 0; p < lPlantVector.size(); p++)

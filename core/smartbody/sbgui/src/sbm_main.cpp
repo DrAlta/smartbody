@@ -57,6 +57,7 @@
 #include <sb/SBVHMsgManager.h>
 #include <sb/SBSpeechManager.h>
 #include <sb/SBAssetManager.h>
+#include <sb/SBUtilities.h>
 #ifdef SB_NO_BONEBUS
 #include <sb/SBBoneBusManager.h>
 #endif
@@ -773,7 +774,7 @@ int main( int argc, char **argv )	{
 			getline(settingsFile, line);
 			
 			std::vector<std::string> tokens;
-			vhcl::Tokenize(line, tokens, "=");
+			SmartBody::util::tokenize(line, tokens, "=");
 			for (size_t t = 0; t < tokens.size(); t++)
 			{
 				if (tokens[t] == "pythonlibpath")
@@ -788,7 +789,7 @@ int main( int argc, char **argv )	{
 							pythonFolderPath /= python_lib_path;
 							std::string absPath = boost::filesystem::canonical(pythonFolderPath).string();
 #ifdef WIN32
-							absPath = vhcl::Replace(absPath, "\\", "/");
+							absPath = SmartBody::util::replace(absPath, "\\", "/");
 #endif
 							python_lib_path = absPath;
 							LOG("pythonlibpath = %s", absPath.c_str());
@@ -814,7 +815,7 @@ int main( int argc, char **argv )	{
 							ogreFolderPath /= tokens[t + 1];
 							std::string absPath = boost::filesystem::canonical(ogreFolderPath).string();
 #ifdef WIN32
-							absPath = vhcl::Replace(absPath, "\\", "/");
+							absPath = SmartBody::util::replace(absPath, "\\", "/");
 #endif
 							LOG("ogrepath = %s", absPath.c_str());
 							SmartBody::SBScene::setSystemParameter("ogrepath", absPath);
@@ -840,7 +841,7 @@ int main( int argc, char **argv )	{
 							mediaFolderPath /= mediaPath;
 							std::string absPath = boost::filesystem::canonical(mediaFolderPath).string();
 #ifdef WIN32
-							absPath = vhcl::Replace(absPath, "\\", "/");
+							absPath = SmartBody::util::replace(absPath, "\\", "/");
 #endif
 							LOG("mediapath = %s", absPath.c_str());
 							mediaPath = absPath;
@@ -1121,7 +1122,7 @@ int main( int argc, char **argv )	{
 			{
 				logFile = argv[i];
 #ifdef WIN32
-				logFile = vhcl::Replace(logFile, "\\", "/");
+				logFile = SmartBody::util::replace(logFile, "\\", "/");
 #endif
 			}
 		}
